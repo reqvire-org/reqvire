@@ -1,0 +1,31 @@
+name: PR
+concurrency:
+  group: ${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+on: [merge_group, pull_request]
+ 
+jobs:
+  check-duplicates:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Find duplicate filenames
+        run: |
+          # Collect all filenames (just the base name) under e2e-tests/ 
+          dup_files=$(find e2e-tests/ -type f -exec basename {} \; \
+            | sort \
+            | uniq -d)
+
+          # If dup_files is non-empty, we fail
+          if [ -n "$dup_files" ]; then
+            echo "Error: Duplicate test filenames found:"
+            echo "$dup_files"
+            exit 1
+          else
+            echo "No duplicates found."
+          fi
+
+
