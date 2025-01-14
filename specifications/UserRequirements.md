@@ -1,94 +1,60 @@
 # User Stories and User Requirements
 
-User requirements describe the specific functionalities and capabilities that users expect from the system. They focus on *what* the system must provide to fulfill user needs, improve user experience, and achieve business objectives as well as capture specific needs of end-users.
+## User Story: Automate Diagram Generation
 
-
-User requirements are directly related to user story and expected format is following:
-```
-## User story title
+Relations:
+ * tracedFrom: specifications/MOEs.md/MOE_UA
 
 As a user, I want to:
-   * some user story
-   * another related user story
-   
-   
-### Requirement title
+   * Automatically generate diagrams from Markdown files with minimal manual intervention.
+   * Ensure that diagrams are always consistent with the underlying requirements and models.
 
-Requirement text.
+### Generate Diagrams Automatically
 
-### Requirement title
-
-Requirement text.
-
-
-```
-
-Example:
-```
-
-
-## User Sign-Up and Sign-In
-
-As a user, I want to:
-  * Sign up for the platform using either email or a federated login provider.
-  * Validate my email when signing up via email.
-  * Sign in using either email or a federated login provider.
-  * Reset my password if I forget it.
-
-### Email Signup
-The system shall allow users to sign up using an email address.
-
-### Federated Login Signup
-The system shall allow users to sign up using a federated login provider.
-
-### Email Validation
-When a user signs up using an email address, the system shall send a validation email.
-
-### Email Sign-In
-The system shall allow users to sign in using an email address.
-
-### Federated Login Sign-In
-The system shall allow users to sign in using a federated login provider.
-
-### Password Reset
-When a user forgets their password, the system shall allow them to reset their password.
+The system shall generate diagrams, such as use case diagrams or traceability matrices, using Mermaid syntax from structured Markdown files.
 
 ---
 
-```
+## User Story: Validate Requirements Structure
 
+Relations:
+ * tracedFrom: specifications/MOEs.md/MOE_CE
 
-The user stories and requirements are derived from the use case diagram provided below:
-```mermaid   
-flowchart LR    
+As a user, I want to:
+   * Validate the structure of Markdown files to ensure they adhere to defined conventions.
+   * Identify errors or inconsistencies in requirement relations or documentation.
 
-    user[User👤]
+### Validate Markdown Structure
 
-    subgraph "GDB Product usecase diagram"
-        signup((Sign Up))
-        signin((Sign In))
+The system shall validate Markdown files to ensure compliance with the required conventions for requirements, relations, and documentation.
 
-        emailSignup[Sign Up via Email]
-        validateEmail[Validate Email]
-        federatedLogin[Sign Up via Federated Login]
-        federatedLoginSignIn[Sign In via Federated Login]
-        emailLogin[Sign In via Email]
-        PasswordReset[Reset Password]  
-    
-    end
+---
 
+## User Story: Support CI/CD Integration
 
-    %% Relationships for Sign Up and Sign In
-    user --> signup
-    user --> signin
-    signup -. include .-> emailSignup
-    emailSignup -. with .-> validateEmail
-    signup -. include .-> federatedLogin
-    signin -. include .-> federatedLoginSignIn
-    signin -. include .-> emailLogin
-    emailLogin -. with .-> PasswordReset    
+Relations:
+ * tracedFrom: specifications/MOEs.md/MOE_UA
 
-```
+As a user, I want to:
+   * Integrate the ReqFlow tool with Git-based CI/CD pipelines for automated validation and traceability tasks.
+   * Ensure that validation and diagram generation are executed during every pipeline run.
 
+### Automate CI/CD Tasks
 
+The system shall provide automation for validation, traceability matrix generation, and diagram creation within CI/CD pipelines.
+
+---
+
+## User Story: Trace Changes in Requirements
+
+Relations:
+ * tracedFrom: specifications/MOEs.md/MOE_CE
+
+As a user, I want to:
+   * Trace changes in requirements using Git diffs to understand the impact of modifications.
+   * Generate summary reports highlighting how changes affect downstream artifacts like test cases and designs.
+
+### Trace Changes via Git Diffs
+
+The system shall trace requirement changes through Git diffs and generate summary reports showing their impact on related elements.
 
