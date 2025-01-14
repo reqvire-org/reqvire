@@ -39,17 +39,6 @@ flowchart LR
         emailLogin[Sign In via Email]
         PasswordReset[Reset Password]
 
-        manageAccount((Manage account))
-        
-        editPassword[Edit Password]
-        deleteAccount[Delete Account]
-                
-        viewAnnouncements[View Announcements]
-        
-        accessDocumentation((Access Documentation))
-        
-        manageAccountSecurity((Manage security))         
-        manageMFA[Add/Remove MFA]
          
     end
 
@@ -67,9 +56,6 @@ flowchart LR
     signin -. include .-> federatedLoginSignIn
     signin -. include .-> emailLogin
     emailLogin -. with .-> PasswordReset
-
-
-
 ```
 
 
