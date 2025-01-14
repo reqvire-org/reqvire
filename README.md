@@ -1,6 +1,21 @@
 # ReqFlow
 
-**ReqFlow** is a comprehensive **Model-Based Systems Engineering (MBSE)** framework that combines a **methodology**, a **toolset**, and a **language** to streamline the management of system requirements and models. Designed to integrate seamlessly with modern Git workflows, ReqFlow simplifies MBSE by leveraging Markdown-based artifacts and automation, making it accessible to engineers, developers, and product managers alike.
+**ReqFlow** is an **agile** **Model-Based Systems Engineering (MBSE)** framework designed to integrate seamlessly with modern Git workflows.
+
+ReqFlow simplifies MBSE by leveraging Markdown-based artifacts, automation, and Agile principles all within the familiar environment of tools like GitHub, GitLab, and CI/CD pipelines.
+This makes ReqFlow intuitive and accessible to engineers, developers, and product managers alike, enabling iterative development and enhanced collaboration.
+
+---
+
+## Why ReqFlow?
+
+- **A Unified Framework**: Combines methodology, tools, and language into a cohesive MBSE solution.
+- **Git-Centric**: Built around Git workflows, enabling integration with GitHub, GitLab, Bitbucket, and CI/CD pipelines.
+- **Lightweight & Accessible**: Uses Markdown for requirements and models, ensuring readability and ease of use.
+- **Methodology**: Follows ISO/IEC/IEEE 15288 principles, tailored to software product development and agile workflows.
+- **Agile MBSE**: Facilitates iterative development, continuous integration, and cross-functional collaboration, aligning MBSE with agile principles.
+- **Toolset**: Automates traceability, validation, and diagram generation, integrating seamlessly with version control.
+- **Language**: Inspired by SysML but optimized for Markdown and Mermaid, ensuring compatibility with modern AI tools.
 
 
 ## Why ReqFlow?
