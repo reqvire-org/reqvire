@@ -382,37 +382,34 @@ graph TD
     subgraph Requirements Design
   
 
-      subgraph System Requirements
-        REQ_ENCRYPT["**REQ_ID**: 2.1<br>**Text**: The system shall encrypt authentication data."]
-        style REQ_ENCRYPT font-color:#000000,fill:#FFCCCC,stroke:#FF0000,stroke-width:2px;
+      subgraph System Requirements        
+        subgraph IDP
+
+            REQ_ENCRYPT["**REQ_ID**: 2.1<br>**Text**: The system shall encrypt authentication data."]
+            style REQ_ENCRYPT font-color:#000000,fill:#FFCCCC,stroke:#FF0000,stroke-width:2px;
 
 
-        REQ_SESSION["**REQ_ID**: 2.2<br>**Text**: The system shall manage user sessions securely."]
-        style REQ_SESSION font-color:#000000,fill:#FFCCCC,stroke:#FF0000,stroke-width:2px;
-
-        REQ_PASSWORD["**REQ_ID**: 1.1<br>**Text**: The system shall support password-based authentication."]
-        style REQ_PASSWORD font-color:#000000,fill:#FFCCCC,stroke:#FF0000,stroke-width:2px;
-
-        REQ_OAUTH["**REQ_ID**: 1.2<br>**Text**: The system shall support federated login using OAuth."]
-        style REQ_OAUTH font-color:#000000,fill:#FFCCCC,stroke:#FF0000,stroke-width:2px;
+            REQ_SESSION["**REQ_ID**: 2.2<br>**Text**: The system shall manage user sessions securely."]
+            style REQ_SESSION font-color:#000000,fill:#FFCCCC,stroke:#FF0000,stroke-width:2px;
 
 
-        %% System Element (satisfies)
-        AuthenticationSubsystem["System Element: Authentication Subsystem"]
-        style AuthenticationSubsystem fill:#D3D3D3,stroke:#808080,stroke-width:2px;
 
-        %% Test Case (verifies)
-        TestPasswordStrength["Test Case: Password Strength Validation"]
-        style TestPasswordStrength fill:#CCFFCC,stroke:#008000,stroke-width:2px;
+            REQ_PASSWORD["**REQ_ID**: 1.1<br>**Text**: The system shall support password-based authentication."]
+            style REQ_PASSWORD font-color:#000000,fill:#FFCCCC,stroke:#FF0000,stroke-width:2px;
 
-        %% Behavior (traces)
-        LoginBehavior["Behavior: Login and Authentication Flow"]
-        style LoginBehavior fill:#ADD8E6,stroke:#00BFFF,stroke-width:2px;
-    
+            REQ_OAUTH["**REQ_ID**: 1.2<br>**Text**: The system shall support federated login using OAuth."]
+            style REQ_OAUTH font-color:#000000,fill:#FFCCCC,stroke:#FF0000,stroke-width:2px;
+
+
+            %% Test Case (verifies)
+            TestPasswordStrength["Test Case: Password Strength Validation"]
+            style TestPasswordStrength fill:#CCFFCC,stroke:#008000,stroke-width:2px;
+
+        end 
 
       end
 
-      subgraph Stakeholder Requirements
+      subgraph Stakeholder Needs
 
         subgraph Mission Requirements
 
@@ -455,14 +452,8 @@ graph TD
     REQ_AUTH -.->|contains| REQ_PASSWORD
     REQ_AUTH -.->|contains| REQ_OAUTH
 
-    AuthenticationSubsystem -.->|satisfy| REQ_PASSWORD
-    AuthenticationSubsystem -.->|satisfy| REQ_OAUTH
-    AuthenticationSubsystem -.->|satisfy| REQ_ENCRYPT
-    AuthenticationSubsystem -.->|satisfy| REQ_SESSION
-
 
     TestPasswordStrength -.->|verify| REQ_PASSWORD
-    LoginBehavior -.->|trace| REQ_AUTH
 
 
     %% Click Actions
