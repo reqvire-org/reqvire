@@ -1,20 +1,121 @@
-# Requirements in the Reqflow
+# Requirements in ReqFlow
 
-mermaid's requirementsDiagram is not that flexible in regards to picking colors and making links for docRefs thefor we use graphTD diagram.
+## What Are Requirements?
+
+In **ReqFlow**, a requirement represents a stakeholder's need, system capability, or constraint that the system must fulfill. Requirements define **what the system must do** (functional requirements) and **how well it must perform** (non-functional requirements), serving as the foundation for system design, development, and verification.
+
+Mention EARS format but say that ReqFlow doesn't mandate specific format for requirements expression.
+
+
+## Structure of Requirements in ReqFlow
+
+Requirements in ReqFlow are structurally divided into 3 categories:
+ * User Requirements
+ * Mission Requirements
+ * System Requirements
+ 
+Format of User Requirements is different from the later two.
+
+
+### User Requirements
+
+User requirements describe the specific functionalities and capabilities that users expect from the system. They focus on *what* the system must provide to fulfill user needs, improve user experience, and achieve business objectives as well as capture specific needs of end-users.
+
+User requirements are directly related to user story.
+
+User requirements are expected to be documented in the `specifications/UserRequirement.md` file.
+
+Each user requirement is associated with a **user story**, and a single user story may contain multiple requirements. 
+**user story** must at least have a relation to specific MOE, while relations for individual requirements within the user story are optional.
+
+A user requirement in ReqFlow includes the following elements:
+- **## USER STORY TITLE**
+  - The name acts as a unique identifier, and ReqFlow tools ensure uniqueness is maintained.
+  - Names must be unique within the document for user stories
+- **User story Text**  
+  - FILL IN 
+- **User story Relations**  
+  - Each user story must define at least one relation, and that one being **tracedFrom** linking to MOE element
+- One or more requrements
+- **### REQUIREMENT TITLE**
+  - The name acts as a unique identifier, and ReqFlow tools ensure uniqueness is maintained.
+  - Names must be unique within the document, as ReqFlow internally uses the file path and document name as part of its uniqueness mechanism.
+- **Requirement Text**
+  - The text describing the requirement comes directly below the name.
+- **Relations**
+  - Relations are optional for user requirements
+
+Example format:
+```markdown
+## User story title
+
+Relations:
+ * tracedFrom: specifications/MOEs.md/elementName
+
+As a user, I want to:
+   * some user story
+   * another related user story
+   
+### Requirement title
+
+Requirement text.
+
+### Requirement title
+
+Requirement text.
+```
+
+### Mission and System Requirements
+
+Mission and System Requirements are expected to be documented in the `specifications/MissionRequirement.md` file.
+
+These requirements represent the high-level mission / enterprise  objectives, needs and measures of effectiveness, that a system must fulfill to align with the strategic goals of the organization and satisfy stakeholder expectations. 
+
+**mission requirement** must at least have a relation to specific MOE.
+
+A Mission or System Requirement includes the following elements:
+- **### NAME**
+  - The name acts as a unique identifier, and ReqFlow tools ensure uniqueness.
+  - Names must be unique within the document, with ReqFlow leveraging the file path and document name as part of its uniqueness logic.
+- **Requirement Text**
+  - A concise description of the requirement, ideally written using structured methods such as **EARS (Easy Approach to Requirements Syntax)**.
+- **Relations**
+  - Each requirement must define at least one relation, such as:
+    - **derivedFrom**: Linking to higher-level requirements or MOEs.
+    - **satisfiedBy**: Linking to design specifications or test cases.
+
+Example format:
+```markdown
+
+### Requirement name
+
+A concise text describing the requirement, preferably using structured syntax like EARS.
+
+Relations:
+ * derivedFrom: path/documentName.md/ElementName
+ * satisfiedBy: path/otherDocumentName.md/OtherElementName
+
+```
+
+# Requirements Diagramsa
+
+mermaid's requirementsDiagram which is bases on SysML is not that flexible in regards to picking colors and making links for docRefs thefor ReqFlow uses graphTD diagram.
 
 ## Requirements relations
 
-A relationship type can be one of:
- * contains
- * derives 
- * refines 
- * copies
- * satisfies
- * verifies
- * traces
- 
- 
-
+In ReqFlow, requirements can be linked using the following types of relationships:
+ * containedBy
+ * contain
+ * derivedFrom 
+ * derive
+ * refine
+ * satisfiedBy
+ * satisfy
+ * verifiedBy
+ * verify 
+ * tracedFrom
+ * trace 
+  
 
 ### `contains` and `derives`
 

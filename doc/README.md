@@ -4,17 +4,20 @@ Welcome to the **ReqFlow** documentation! This folder contains all the informati
 
 ## Table of Contents
 
-- [Introduction](./introduction.md)
-- [Getting Started](./getting-started.md)
-- [Features](./features/README.md)
-  - [Markdown Structure](./features/markdown-structure.md)
-  - [GitHub Actions](./features/github-actions.md)
-  - [Traceability](./features/traceability.md)
+- [About](./About.md)
+  - [ReqFlow MBSE Methodology](./About.md#reqflow-mbse-methodology)
+  - [ReqFlow Model](./About.md#reqflow-model)
+  - [Pillars of the ReqFlow](./About.md#pillars-of-the-reqflow)
+  - [Mapping to ISO/IEC/IEEE 15288](./About.md#mapping-to-isoiecieee-15288)
+- [MOEs](./MOEs.md.md)
+- [UseCases](./Usecases.md)
+- [Design Specification Document](./DSDs.md)
+- [Requirements](./Requirements.md)
 - [Use Cases](./use-cases/README.md)
   - [For Developers](./use-cases/developers.md)
   - [For Product Managers](./use-cases/product-managers.md)
 - [FAQ](./faq.md)
-- [Contributing](./contributing.md)
+- [Contributing](./CONTRIBUTING.md)
 
 ---
 
@@ -22,10 +25,8 @@ Welcome to the **ReqFlow** documentation! This folder contains all the informati
 
 Each section in the Table of Contents links to a markdown file that provides detailed information on the respective topic. Subsections are grouped into folders for better organization.
 
-- Start with the [Introduction](./introduction.md) for an overview.
+- Start with the [About](./About.md) for an overview.
 - Follow the [Getting Started](./getting-started.md) guide for installation and setup instructions.
-- Explore the [Features](./features/README.md) to understand the core functionalities of ReqFlow.
-- Review the [Use Cases](./use-cases/README.md) to see how ReqFlow can be applied in different scenarios.
 - Check out the [FAQ](./faq.md) for common questions and answers.
 - Learn how to contribute to the project in [Contributing](./contributing.md).
 
