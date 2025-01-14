@@ -2,9 +2,10 @@
 
 ## What Are Requirements?
 
-In **ReqFlow**, a requirement represents a stakeholder's need, system capability, or constraint that the system must fulfill. Requirements define **what the system must do** (functional requirements) and **how well it must perform** (non-functional requirements), serving as the foundation for system design, development, and verification.
+In ReqFlow, a requirement represents a stakeholder's need, system capability, or constraint that the system must fulfill. 
+Requirements define **what the system must do** (functional requirements) and **how well it must perform** (non-functional requirements), serving as the foundation for system design, development, and verification.
 
-Mention EARS format but say that ReqFlow doesn't mandate specific format for requirements expression.
+ReqFlow does not mandate a specific format for expressing requirements, offering flexibility based on the project's needs and team's preferences. However, structured formats like **EARS (Easy Approach to Requirements Syntax)** are encouraged to improve clarity and consistency. Using such formats can make requirements easier to read, analyze, and validate.
 
 
 ## Structure of Requirements in ReqFlow
