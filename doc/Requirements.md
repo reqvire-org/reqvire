@@ -97,7 +97,7 @@ Relations:
 
 ```
 
-# Requirements Diagramsa
+# Requirements Diagrams
 
 mermaid's requirementsDiagram which is bases on SysML is not that flexible in regards to picking colors and making links for docRefs thefor ReqFlow uses graphTD diagram.
 
