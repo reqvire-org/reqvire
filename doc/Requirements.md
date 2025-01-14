@@ -9,6 +9,101 @@ Mention EARS format but say that ReqFlow doesn't mandate specific format for req
 
 ## Structure of Requirements in ReqFlow
 
+The diagram below provides an example of how requirements, relationships, and their hierarchical structure are organized within the **ReqFlow methodology**. It illustrates the integration of stakeholder requirements, system requirements, and their connections to system elements, test cases, and other elements. 
+
+```mermaid
+graph TD
+    subgraph Requirements Design
+  
+
+      subgraph System Requirements        
+        subgraph IDP
+
+            REQ_ENCRYPT["**REQ_ID**: 2.1<br>**Text**: The system shall encrypt authentication data."]
+            style REQ_ENCRYPT font-color:#000000,fill:#FFCCCC,stroke:#FF0000,stroke-width:2px;
+
+
+            REQ_SESSION["**REQ_ID**: 2.2<br>**Text**: The system shall manage user sessions securely."]
+            style REQ_SESSION font-color:#000000,fill:#FFCCCC,stroke:#FF0000,stroke-width:2px;
+
+
+
+            REQ_PASSWORD["**REQ_ID**: 1.1<br>**Text**: The system shall support password-based authentication."]
+            style REQ_PASSWORD font-color:#000000,fill:#FFCCCC,stroke:#FF0000,stroke-width:2px;
+
+            REQ_OAUTH["**REQ_ID**: 1.2<br>**Text**: The system shall support federated login using OAuth."]
+            style REQ_OAUTH font-color:#000000,fill:#FFCCCC,stroke:#FF0000,stroke-width:2px;
+
+
+            %% Test Case (verifies)
+            TestPasswordStrength["Test Case: Password Strength Validation"]
+            style TestPasswordStrength fill:#CCFFCC,stroke:#008000,stroke-width:2px;
+
+        end 
+
+      end
+
+      subgraph Stakeholder Needs
+
+        subgraph Mission Requirements
+
+                MOE_CPD["MOE_CPD: Decrease Costs and Increase Profitability"]
+    
+                REQ_LIMITS["**REQ_ID**: 3<br>**Text**:Specification Design Document for Resource Rates and Limits"]
+                style REQ_LIMITS font-color:#000001,fill:#FFCCCC,stroke:#FF0000,stroke-width:2px;
+
+                SDD_LIMITS["SDD_LIMITS_AND_RATES: Specification Design Document: Limits and Rates"]
+                style SDD_LIMITS font-color:#000001,fill:#FFA500,stroke:#db9d00,stroke-width:2px;
+
+        end
+        subgraph User Requirements
+
+                MOE_CR["MOE_CR: Maintain High Customer Retention by Reducing Churn"]
+                USER_STORY_PASSWORD["User Story: User Sign-Up and Sign-In"]
+                style USER_STORY_PASSWORD fill:#FFFF99,stroke:#FFD700,stroke-width:2px;
+    
+                REQ_AUTH["**REQ_ID**: 1<br>**Text**: The system shall provide user authentication."]
+                style REQ_AUTH font-color:#000000,fill:#FFCCCC,stroke:#FF0000,stroke-width:2px;  
+    
+                REQ_SECURITY["**REQ_ID**: 2<br>**Text**: The system shall ensure authentication security."]
+                style REQ_SECURITY font-color:#000001,fill:#FFCCCC,stroke:#FF0000,stroke-width:2px;
+
+        end    
+    end 
+
+    MOE_CPD -.->|trace| REQ_LIMITS
+    SDD_LIMITS -.->|satisy| REQ_LIMITS
+
+    MOE_CR -.->|trace| USER_STORY_PASSWORD
+    USER_STORY_PASSWORD -.->|refine| REQ_AUTH
+    USER_STORY_PASSWORD -.->|refine| REQ_SECURITY
+    
+    %% Relationships
+    REQ_ENCRYPT -.->|derive| REQ_SECURITY 
+    REQ_SESSION -.->|derive| REQ_SECURITY
+
+
+    REQ_AUTH -.->|contains| REQ_PASSWORD
+    REQ_AUTH -.->|contains| REQ_OAUTH
+
+
+    TestPasswordStrength -.->|verify| REQ_PASSWORD
+
+
+    %% Click Actions
+    click TestPasswordStrength href "https://example.com/docs/test-case-222" "Test Case Documentation"
+    click USER_STORY_PASSWORD href "https://example.com/docs/user-story-password-login" "User Story Documentation"
+    click USER_STORY_OAUTH href "https://example.com/docs/user-story-google-login" "User Story Documentation"
+    click AuthenticationSubsystem href "https://example.com/docs/authentication-subsystem" "Subsystem Documentation"
+    click LoginBehavior href "https://example.com/docs/login-behavior" "Behavior Documentation"
+
+
+
+
+end
+
+```
+
 Requirements in ReqFlow are structurally divided into 3 categories:
  * User Requirements
  * Mission Requirements
@@ -371,103 +466,6 @@ SysML requirement relationships provide powerful ways to structure, trace, and v
 Each relationship ensures traceability and alignment between requirements and system design, facilitating clear communication and robust development processes.
 
 
-## Requirments and relation in the ReqFlow
 
-The diagram below provides an example of how requirements, relationships, and their hierarchical structure are organized within the **ReqFlow methodology**. It illustrates the integration of stakeholder requirements, system requirements, and their connections to system elements, test cases, and behaviors. 
-
-This structured framework ensures the alignment of requirements at all levels, enabling a clear trace from high-level stakeholder needs to system-level validation and implementation.
-
-```mermaid
-graph TD
-    subgraph Requirements Design
-  
-
-      subgraph System Requirements        
-        subgraph IDP
-
-            REQ_ENCRYPT["**REQ_ID**: 2.1<br>**Text**: The system shall encrypt authentication data."]
-            style REQ_ENCRYPT font-color:#000000,fill:#FFCCCC,stroke:#FF0000,stroke-width:2px;
-
-
-            REQ_SESSION["**REQ_ID**: 2.2<br>**Text**: The system shall manage user sessions securely."]
-            style REQ_SESSION font-color:#000000,fill:#FFCCCC,stroke:#FF0000,stroke-width:2px;
-
-
-
-            REQ_PASSWORD["**REQ_ID**: 1.1<br>**Text**: The system shall support password-based authentication."]
-            style REQ_PASSWORD font-color:#000000,fill:#FFCCCC,stroke:#FF0000,stroke-width:2px;
-
-            REQ_OAUTH["**REQ_ID**: 1.2<br>**Text**: The system shall support federated login using OAuth."]
-            style REQ_OAUTH font-color:#000000,fill:#FFCCCC,stroke:#FF0000,stroke-width:2px;
-
-
-            %% Test Case (verifies)
-            TestPasswordStrength["Test Case: Password Strength Validation"]
-            style TestPasswordStrength fill:#CCFFCC,stroke:#008000,stroke-width:2px;
-
-        end 
-
-      end
-
-      subgraph Stakeholder Needs
-
-        subgraph Mission Requirements
-
-                MOE_CPD["MOE_CPD: Decrease Costs and Increase Profitability"]
-    
-                REQ_LIMITS["**REQ_ID**: 3<br>**Text**:Specification Design Document for Resource Rates and Limits"]
-                style REQ_LIMITS font-color:#000001,fill:#FFCCCC,stroke:#FF0000,stroke-width:2px;
-
-                SDD_LIMITS["SDD_LIMITS_AND_RATES: Specification Design Document: Limits and Rates"]
-                style SDD_LIMITS font-color:#000001,fill:#FFA500,stroke:#db9d00,stroke-width:2px;
-
-        end
-        subgraph User Requirements
-
-                MOE_CR["MOE_CR: Maintain High Customer Retention by Reducing Churn"]
-                USER_STORY_PASSWORD["User Story: User Sign-Up and Sign-In"]
-                style USER_STORY_PASSWORD fill:#FFFF99,stroke:#FFD700,stroke-width:2px;
-    
-                REQ_AUTH["**REQ_ID**: 1<br>**Text**: The system shall provide user authentication."]
-                style REQ_AUTH font-color:#000000,fill:#FFCCCC,stroke:#FF0000,stroke-width:2px;  
-    
-                REQ_SECURITY["**REQ_ID**: 2<br>**Text**: The system shall ensure authentication security."]
-                style REQ_SECURITY font-color:#000001,fill:#FFCCCC,stroke:#FF0000,stroke-width:2px;
-
-        end    
-    end 
-
-    MOE_CPD -.->|trace| REQ_LIMITS
-    SDD_LIMITS -.->|satisy| REQ_LIMITS
-
-    MOE_CR -.->|trace| USER_STORY_PASSWORD
-    USER_STORY_PASSWORD -.->|refine| REQ_AUTH
-    USER_STORY_PASSWORD -.->|refine| REQ_SECURITY
-    
-    %% Relationships
-    REQ_ENCRYPT -.->|derive| REQ_SECURITY 
-    REQ_SESSION -.->|derive| REQ_SECURITY
-
-
-    REQ_AUTH -.->|contains| REQ_PASSWORD
-    REQ_AUTH -.->|contains| REQ_OAUTH
-
-
-    TestPasswordStrength -.->|verify| REQ_PASSWORD
-
-
-    %% Click Actions
-    click TestPasswordStrength href "https://example.com/docs/test-case-222" "Test Case Documentation"
-    click USER_STORY_PASSWORD href "https://example.com/docs/user-story-password-login" "User Story Documentation"
-    click USER_STORY_OAUTH href "https://example.com/docs/user-story-google-login" "User Story Documentation"
-    click AuthenticationSubsystem href "https://example.com/docs/authentication-subsystem" "Subsystem Documentation"
-    click LoginBehavior href "https://example.com/docs/login-behavior" "Behavior Documentation"
-
-
-
-
-end
-
-```
 
 
