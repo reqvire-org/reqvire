@@ -10,7 +10,8 @@ ReqFlow does not mandate a specific format for expressing requirements, offering
 
 ## Structure of Requirements in ReqFlow
 
-The diagram below provides an example of how requirements, relationships, and their hierarchical structure are organized within the **ReqFlow methodology**. It illustrates the integration of stakeholder requirements, system requirements, and their connections to system elements, test cases, and other elements. 
+The diagram below demonstrates how requirements, their relationships, and hierarchical structures are organized within the **ReqFlow methodology**. 
+It showcases the connection between stakeholder needs, user requirements, mission requirements, system requirements, and their links to test cases, specification documents, and other system elements.
 
 ```mermaid
 graph TD
@@ -105,13 +106,13 @@ end
 
 ```
 
-Requirements in ReqFlow are structurally divided into 3 categories:
+Requirements in ReqFlow are divided into three main categories:
  * User Requirements
  * Mission Requirements
  * System Requirements
  
-Format of User Requirements is different from the later two.
-
+ 
+The structure of User Requirements differs from Mission and System Requirements.
 
 ### User Requirements
 
