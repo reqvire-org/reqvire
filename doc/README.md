@@ -9,7 +9,7 @@ Welcome to the **ReqFlow** documentation! This folder contains all the informati
   - [ReqFlow Model](./About.md#reqflow-model)
   - [Pillars of the ReqFlow](./About.md#pillars-of-the-reqflow)
   - [Mapping to ISO/IEC/IEEE 15288](./About.md#mapping-to-isoiecieee-15288)
-- [MOEs](./MOEs.md.md)
+- [MOEs](./MOEs.md)
 - [UseCases](./Usecases.md)
 - [Design Specification Document](./DSDs.md)
 - [Requirements](./Requirements.md)
