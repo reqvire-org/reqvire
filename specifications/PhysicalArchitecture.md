@@ -2,106 +2,131 @@
 
 The Physical Architecture represents the concrete systems, services, and components that implement the functionality of ReqFlow. It defines the deployment-level structure of the tool, detailing how various components interact.
 
----
 
 ## Architecture Diagram
 
-```mermaid
 
+```mermaid
 classDiagram
     class ReqFlow {
         <<system>>
-        + CLI tool for managing requirements
-        + Provides integration with Git-based workflows
     }
 
-    class CoreCLI {
+    class ReqFlowTool {
         <<subsystem>>
-        + Parse user commands
-        + Manage requirements and relations
-        + Generate Markdown artifacts
     }
 
-    class DiagramService {
-        <<service>>
-        + Generate Mermaid diagrams
-        + Support rendering for traceability matrices
+    class UserInterface {
+        <<component>>
     }
 
-    class ValidationService {
-        <<service>>
-        + Validate Markdown structure
-        + Check requirements and relations
+    class CLI {
+        <<component>>
+    }
+    class ChatOps {
+        <<component>>
+    }    
+
+    class ModelManagement {
+        <<component>>
     }
 
-    class CIIntegration {
+    class ValidationAndReporting {
+        <<component>>
+    }
+
+    class Integrations {
         <<subsystem>>
-        + Provide GitHub Actions workflows
-        + Automate validation and diagram generation
     }
 
-    class GitService {
-        <<service>>
-        + Handle Git operations
-        + Track diffs and changes
-        + Interact with repositories
+    class GitHubIntegration {
+        <<component>>
     }
 
-    %% Relationships
-    ReqFlow --> CoreCLI : "Executes commands"
-    ReqFlow --> DiagramService : "Generates diagrams"
-    ReqFlow --> ValidationService : "Validates structures"
-    ReqFlow --> CIIntegration : "Supports CI/CD workflows"
-    ReqFlow --> GitService : "Manages Git interactions"
+    class CICDIntegration {
+        <<component>>
+    }
 
-    CoreCLI --> ValidationService : "Validates input"
-    CoreCLI --> DiagramService : "Calls for diagram generation"
-    CIIntegration --> ValidationService : "Automates validations"
-    CIIntegration --> DiagramService : "Automates diagram generation"
-    CIIntegration --> GitService : "Interacts with repositories"
+    class AIWorkflows {
+        <<workflow>>
+    }
+
+    class Storage {
+        <<component>>
+    }
+
+ 
+    %% Hierarchical Relationships
+    ReqFlow --> ReqFlowTool
+    ReqFlow --> Integrations
+    
+
+    ReqFlowTool --> UserInterface
+    ReqFlowTool --> Storage
+
+    UserInterface--> CLI
+    UserInterface--> ChatOps    
+
+    ReqFlowTool --> ModelManagement
+    ReqFlowTool --> ValidationAndReporting
+
+    Integrations --> GitHubIntegration
+    Integrations --> CICDIntegration
+
+    CICDIntegration --> AIWorkflows
+
+ 
 ```
 
----
+Logical to physical architecture mapping:
+```mermaid
+graph TD
+    %% Root System
+    ReqFlow["ReqFlow (system)"]
 
-### Explanation of Physical Components
+    %% Subsystems under ReqFlow
+    subgraph ReqFlowTool["ReqFlowTool (subsystem)"]
+        UserInterface["UserInterface (component)"]
+        ModelManagement["ModelManagement (component)"]
+        ValidationAndReporting["ValidationAndReporting (component)"]
+        Storage["Storage (component)"]
+    end
 
-1. ReqFlow:
-   - The overarching system that encapsulates all physical components.
-   - Provides a CLI interface for users and integrates with CI/CD pipelines.
+    subgraph Integrations["Integrations (subsystem)"]
+        GitHubIntegration["GitHubIntegration (component)"]
+        CICDIntegration["CICDIntegration (component)"]
+    end
 
-2. CoreCLI:
-   - Parses user input and executes commands.
-   - Manages requirements, relations, and artifact generation in Markdown.
+    subgraph AIWorkflows["AIWorkflows (workflow)"]
+        AIWorkflowsComponent["AIWorkflows (workflow)"]
+    end
 
-3. DiagramService:
-   - Handles the creation of diagrams such as use case diagrams and traceability matrices using Mermaid syntax.
-   - Provides rendering support for CI/CD pipelines and local CLI usage.
+    %% AI component (added based on the logical architecture)
+    AI["AI (component)"]
 
-4. ValidationService:
-   - Validates the structure and consistency of Markdown files, ensuring requirements and relations comply with standards.
-   - Provides immediate feedback during CLI operations or automated workflows.
+    %% Systems
+    SystemOfInterest["SystemOfInterest (system)"]
 
-5. CIIntegration:
-   - Supplies GitHub workflows to automate validation, diagram generation, and traceability processes.
-   - Enables seamless integration into Git-based CI/CD pipelines.
+    %% Hierarchical Structure
+    ReqFlow --> ReqFlowTool
+    ReqFlow --> Integrations
+    ReqFlow --> AIWorkflows
 
-6. GitService:
-   - Interacts with Git repositories to manage requirements stored in Markdown files.
-   - Tracks diffs and changes in requirements and generates traceability summaries.
+    ReqFlowTool --> UserInterface
+    ReqFlowTool --> ModelManagement
+    ReqFlowTool --> ValidationAndReporting
+    ReqFlowTool --> Storage
 
----
+    UserInterface --> CLI["CLI (component)"]
+    UserInterface --> ChatOps["ChatOps (component)"]
 
-### Interaction and Use Cases
+    Integrations --> GitHubIntegration
+    Integrations --> CICDIntegration
 
-- Local CLI Use:
-  - Users interact with the CoreCLI to manage requirements and validate their structure.
-  - The DiagramService is invoked to generate diagrams for local documentation.
+    CICDIntegration --> AIWorkflowsComponent
 
-- CI/CD Integration:
-  - The CIIntegration component automates validation and diagram generation during CI/CD pipeline runs.
-  - The GitService manages repository interactions, tracking changes and ensuring traceability.
+    AIWorkflowsComponent --> AI
 
+    SystemOfInterest --> Storage
 
-
-
-
+```

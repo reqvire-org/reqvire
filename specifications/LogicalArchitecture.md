@@ -4,58 +4,138 @@ The Logical Architecture for ReqFlow defines the high-level functional organizat
 
 ```mermaid
 classDiagram
-    %% Logical Architecture Components
-    class ReqFlow {
-        <<Logical System>>
+    class UserInteraction {
+        +CLIInterface
+        +ChatOpsInterface
+    }
+    class CLI {
+        +InteractWithModelManagement()
+    }
+    class ModelManagement {
+        +ManageModel()
+        +GenerateDiagrams()
+        +AnalyzeRelations()
+        +ValidateStructure()
+        +TraceChanges()
+        +GenerateTraceabilityMatrix()
+    }
+    class AI {
+        +ProvideAISuggestions()
+        +DevelopSystemOfInterest()
+        +ApplyAISuggestions()
+        +CallModelManagementFunctions()        
+    }
+    class AIWorkflow {
+        +DriveAIAgentsDevelopment()
+        +ProvidesCollaborationFeedback()
+        +TrackSystemOfInterestProgress()
+    }
+    class ValidationAndReporting {
+        +ValidateMarkdownStructure()
+        +ValidateFilesystemStructure()
+        +ValidateModelConsistency()
+        +GenerateReports()
+    }
+    class Storage {
+        +GitRepository
+        +ModelStorage
+    }
+    class Integrations {
+        +CollaboratesWithGitHub()
+        +CollaboratesWithCICD()
     }
 
-    class RequirementManagement {
-        <<Logical Component>>
-        + validateStructure()
-    }
-
-    class DiagramGeneration {
-        <<Logical Component>>
-        + generateUseCaseDiagram()
-        + generateTraceabilityMatrix()
-    }
-
-    class Traceability {
-        <<Logical Component>>
-        + linkRequirements()
-        + generateImpactReports()
-        + handleDiffs()
+    class GitHubIntegration {
     }
 
     class CICDIntegration {
-        <<Logical Component>>
-        + provideWorkflows()
-        + openIssues()
-        + submitCommentsInPrs()
+        +TriggerBuilds()
+        +RunTests()
+        +RunActions()
+        +TriggerValidations()
     }
 
-    %% Relationships
-    ReqFlow --> RequirementManagement : "Manages Requirements"
-    ReqFlow --> DiagramGeneration : "Generates Diagrams"
-    ReqFlow --> Traceability : "Ensures Traceability"
-    ReqFlow --> CICDIntegration : "Supports CI/CD Integration"
+    class SystemOfInterest {
+        +MBSEModel
+        +DevelopedSystem
+    }
+
+    %% Relationships		
+    UserInteraction --> CLI : "Interacts via CLI"
+    UserInteraction --> AI : "Interacts via ChatOps"
+    CLI --> ModelManagement
+    AI --> ModelManagement : "Calls Functions for Model Management"
+    CLI --> ValidationAndReporting : "Triggers validation/reporting"
+    CLI --> Storage : "Reads/Writes Model Data"
+    AI --> ValidationAndReporting : "Provides AI Validation Suggestions"
+    AI --> Storage : "Saves Approved Changes"
+    ValidationAndReporting --> Storage : "Accesses Model Data"
+    Integrations --> ValidationAndReporting : "Triggers Validations"
+    Integrations --> GitHubIntegration : "Manages GitHub-related tasks"
+    Integrations --> CICDIntegration : "Manages CI/CD workflows"
+    GitHubIntegration --> Storage : "Syncs changes with Git Repository"
+    GitHubIntegration --> AIWorkflow : "Triggers AI-driven commits/changes"
+    GitHubIntegration --> ModelManagement : "Facilitates version control of model"
+    CICDIntegration --> GitHubIntegration : "Triggers actions based on PR/Merge status"
+    CICDIntegration --> ValidationAndReporting : "Performs automated validations during builds"
+    CICDIntegration --> AIWorkflow : "Enables AI-driven tests and deployment"    
+    
+    Storage --> SystemOfInterest : "Stores MBSE Model and Developed System"
+    
+    %% New AIWorkflow Component Relationships
+    AIWorkflow --> Integration : "Collaborates with CI/CD and Github"
+    AIWorkflow --> SystemOfInterest : "Guides System Development"
+    AIWorkflow --> AI : "Drives AI Agent Actions"
+    AIWorkflow --> ModelManagement : "Interacts with Model Management Functions"
+
+
+
 ```
+### Explanation of the Logical Architecture
 
-### Explanation of the Diagram
+1. UserInteraction:
+   - Facilitates interaction through CLI and ChatOps interfaces.
+   - Users can perform tasks like managing models, validating structures, and interacting with AI agents.
 
-1. ReqFlow:
-   - Serves as the overarching logical system, encompassing all key components that deliver the tool’s core functionalities.
+2. CLI:
+   - The CLI interface serves as the user-facing component that allows users to initiate interactions with the system.
+   - It delegates tasks related to model management to the ModelManagement component.
 
-2. RequirementManagement:
-   - Responsible for validating the structure of requirements to ensure compliance with conventions and rules defined in the methodology.
+3. ModelManagement:
+   - This is the core logical component responsible for performing the core functionalities associated with managing the MBSE model.
+   - Functions include managing models, generating diagrams, analyzing relations, validating structures, and creating traceability matrices.
+   - AI can also call these functions to interact with the model.
 
-3. DiagramGeneration:
-   - Handles the creation of visual representations, such as use case diagrams and traceability matrices, using Mermaid syntax from structured Markdown files.
+4. AI:
+   - Provides AI-powered suggestions for model refinement and validation.
+   - In addition to suggesting changes, the AI component can also take a part in developing the SystemOfInterest.
+   - It can also apply suggested changes and call ModelManagement functions to interact with the model directly.
 
-4. Traceability:
-   - Ensures relationships between requirements and other artifacts are maintained. It includes functionality for linking requirements, generating impact reports, and managing changes through Git diffs.
+5. AIWorkflow:
+   - The AIWorkflow component orchestrates AI-driven workflows that guide AI agents in the development process of the SystemOfInterest.
+   - It provides feedback on collaboration between AI and CI/CD workflows and tracks the progress of the system's development.
 
-5. CICDIntegration:
-   - Focuses on automating processes within CI/CD pipelines, providing GitHub workflows for tasks like validation and diagram generation. Additionally, it supports managing isssues, comments and PRs.
+6. ValidationAndReporting:
+   - This component performs checks on model consistency, structure (both filesystem and markdown), and generates reports summarizing relationships, changes, and dependencies within the MBSE model.
 
+7. Storage:
+   - Handles the storage of the MBSE model and developed system in Git repositories.
+   - The Storage component serves as the central data source for the rest of the system, ensuring versioning and proper management of model-related data.
+
+8. Integrations*
+   - The Integrations factiliates agile workflows while adhering to MBSE methodologies.
+   - It manages the connection between the ReqFlow tool and external systems like GitHub and CI/CD tools, ensuring that both human users and AI agents collaborate seamlessly in an agile environment.
+   - This component facilitates smooth synchronization of model changes, pull request management, automated testing, and deployment, all while ensuring the integrity of the MBSE model and system development process.
+
+9. GitHubIntegration:
+   - Manages tasks related to GitHub, including monitoring pull requests (PRs), syncing branches, and handling commits.
+   - Triggers AI-driven activities, such as committing changes or updating the model.
+
+10. CICDIntegration:
+   - The CICDIntegration component manages the CI/CD pipeline, including triggering builds, running automated tests, and validating changes.
+   - It also integrates with the AIWorkflow to enable AI-driven tests and deployments.
+
+11. SystemOfInterest:
+   - The SystemOfInterest represents the real-world system being developed, which is guided by the MBSE model.
+   - It includes the MBSEModel and the DevelopedSystem, both of which are versioned and stored in Git repositories.
 
