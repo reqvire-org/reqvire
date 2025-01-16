@@ -1,10 +1,7 @@
-# Usecase diagrams
+# ReqFlow use case
 
 
-## ReqFlow usecase
-
-
-## ReqFlow Tool Use Case Diagram
+## Use Case Diagram
 
 The use case diagram below highlights the primary interactions between the ReqFlow Tool and its users, including developers, CI/CD systems, and other actors. It captures the high-level functional behaviors that the tool is designed to support, from managing requirements to automating tasks in Git workflows.
 
