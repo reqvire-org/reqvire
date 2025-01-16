@@ -25,7 +25,7 @@ Requirements are organizied within requirements documents: a markdow document wi
 The system shall provide a login interface that allows users to authenticate using a username and password.
 
 Relations:
- * tracedFrom: specifications/UserNeeds.md/authentication
+ * tracedFrom: specifications/UserStories.md/authentication
  * verifiedBy: specifications/tests.md/testLogin
 
 ## Other group
@@ -72,7 +72,7 @@ Example:
 The system shall provide a login interface that allows users to authenticate using a username and password.
 
 Relations:
- * tracedFrom: specifications/UserNeeds.md/authentication
+ * tracedFrom: specifications/UserStories.md/Authentication
 
 
 ### Password Recovery
@@ -80,7 +80,7 @@ Relations:
 The system shall provide a mechanism for users to recover forgotten passwords.
 
 Relations:
- * tracedFrom: specifications/UserNeeds.md/security
+ * tracedFrom: specifications/UserStories.md/Security
  * verifiedBy: specifications/tests.md/testPasswordRecovery
   
 Metadata

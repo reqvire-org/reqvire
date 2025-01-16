@@ -19,7 +19,9 @@ The user story document organizes stories into logical groups under grouping tit
 ```markdown
 # Document Title
 
-## <Grouping Title>
+## Personas, actions and values
+
+Here one may explain which personas, actions and values are going to be used in the user stories
 
 ### <User Story Title>
 
