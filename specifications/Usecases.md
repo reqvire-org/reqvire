@@ -104,11 +104,6 @@ flowchart LR
 
 ```
 
-## Explanation of ReqFlow Use Case Diagram
-
-This diagram outlines the core interactions, components, and workflows of the **ReqFlow** tool in the context of managing Model-Based Systems Engineering (MBSE) models, integrating with external systems, and supporting development activities for a System of Interest (SOI).
-
-
 ### ReqFlow Tool
 
 The central component of the system, which facilitates various MBSE-related activities. It consists of two primary submodules:
