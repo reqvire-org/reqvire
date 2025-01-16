@@ -185,11 +185,6 @@ These features allow teams to seamlessly integrate MBSE practices into their dev
 
 ### Human Interaction
 
-Humans use a ReqFlow tool :<_____FIX THIS LINE
-- Via CLI: Users interact with ReqFlow’s CLI to manage models and validate structures.
-- Via ChatOps: Users interact with AI agents to receive suggestions, review changes, and approve updates.
-- Collaboration: Users collaborate through GitHub or similar tools to manage repositories and track changes.
-
 Humans interact with ReqFlow tools to manage, refine, and validate MBSE models, as well as to collaborate effectively within development workflows:
 - Via CLI: Users leverage ReqFlow’s CLI to perform tasks such as managing models, generating diagrams, analyzing relationships, and validating structures.
 - Via ChatOps: Users interact with AI agents through chat-based tools to receive intelligent suggestions, review potential improvements, and approve changes, ensuring a human-in-the-loop approach.
