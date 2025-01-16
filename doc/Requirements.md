@@ -5,8 +5,149 @@
 In ReqFlow, a requirement represents a stakeholder's need, system capability, or constraint that the system must fulfill. 
 Requirements define **what the system must do** (functional requirements) and **how well it must perform** (non-functional requirements), serving as the foundation for system design, development, and verification.
 
-ReqFlow does not mandate a specific format for expressing requirements, offering flexibility based on the project's needs and team's preferences. However, structured formats like **EARS (Easy Approach to Requirements Syntax)** are encouraged to improve clarity and consistency. Using such formats can make requirements easier to read, analyze, and validate.
+ReqFlow mandates a specific format for organizing and presenting requirements to ensure consistency across the project. 
+However, it does not impose a specific syntax for expressing the content of requirements, offering flexibility to tailor expressions based on the project's needs and the team's preferences. 
+Structured syntaxes like **EARS (Easy Approach to Requirements Syntax)** are encouraged to improve clarity and consistency, but their use is not required.
 
+
+### Requirements document format
+ 
+Requirements are organizied within requirements documents: a markdow document with specific format.
+
+
+```
+# Document title
+
+## Grouping Title: User Interface Requirements
+
+### Requirement Title: Login Functionality
+
+The system shall provide a login interface that allows users to authenticate using a username and password.
+
+Relations:
+ * tracedFrom: specifications/UserNeeds.md/authentication
+ * verifiedBy: specifications/tests.md/testLogin
+
+## Other group
+
+### Requirement 4
+
+### Requirement 5
+
+### Requirement 6
+
+```
+
+
+#### Document title
+
+The **Document Title** provides a descriptive name for the entire requirements document. 
+It identifies the scope or subject of the requirements contained within and is placed at the very beginning of the file.
+
+Expected Markdown:
+
+```
+# <Descriptive Title for the Document>
+```
+
+#### Grouping Title
+
+Each group of related requirements is introduced by a **Grouping Title**. This serves as a high-level categorization or organizational header for the set of requirements.
+
+Expected Markdown:
+
+```
+## <Descriptive Title for the Group>
+
+```
+
+
+### Requirements format
+
+
+Example:
+```
+### Login Functionality
+
+The system shall provide a login interface that allows users to authenticate using a username and password.
+
+Relations:
+ * tracedFrom: specifications/UserNeeds.md/authentication
+
+
+### Password Recovery
+
+The system shall provide a mechanism for users to recover forgotten passwords.
+
+Relations:
+ * tracedFrom: specifications/UserNeeds.md/security
+ * verifiedBy: specifications/tests.md/testPasswordRecovery
+  
+Metadata
+ * Priority: High
+ * Criticality: Moderate
+
+#### Some other additional context
+
+```
+
+#### Requirement Name
+
+Each individual requirement is identified with a Requirement Name. This provides a brief and descriptive name for the requirement and must be unique within a document itself.
+
+```
+### <Requirement name>
+
+```
+
+#### Requirement Text
+
+The Requirement Text describes the specific functionality, constraint, or need in detail. This is the main body of the requirement.
+
+#### Relations
+
+The Relations section documents links between this requirement and other system elements,requirements, specifications, or validation methods.
+
+Relations used for the requirements are a subset of relations that exist in the **Reqflow**:
+ * containedBy
+ * derivedFrom 
+ * refine
+ * satisfiedBy 
+ * verifiedBy
+ * tracedFrom
+
+Relations foher the requirements are mandatory: at least 1 relation to parent object must exist.
+The parent objects depends on type of requirement and is explained further down.
+
+
+#### Metadata
+
+The **Metadata** section is optional and provides additional key-value pair details about the requirement. These details help define attributes or characteristics of the requirement.
+
+The keys and values are expressed as bullet points. Accepted key-value pairs include:
+
+- **Priority**: High | Medium | Low
+- **Criticality**: High | Moderate | Low
+
+
+Expected markdow:
+```
+#### Metadata
+  * Key: value
+```
+
+#### Additional context section
+
+The Additional Context Section is optional and allows for any supplementary information that might be relevant or useful for understanding the requirement. It provides flexibility to include detailed explanations, clarifications, or related information.
+
+Content in this section should follow valid Markdown syntax and cannot include headers with a level less than ####.
+Expected markdow:
+```
+#### <A section title>
+
+Markdown valid text which cannot have headers less than ####
+
+```
 
 ## Structure of Requirements in ReqFlow
 
@@ -110,59 +251,18 @@ Requirements in ReqFlow are divided into three main categories:
  * User Requirements
  * Mission Requirements
  * System Requirements
- 
- 
-The structure of User Requirements differs from Mission and System Requirements.
 
+  
 ### User Requirements
 
 User requirements describe the specific functionalities and capabilities that users expect from the system. They focus on *what* the system must provide to fulfill user needs, improve user experience, and achieve business objectives as well as capture specific needs of end-users.
 
-User requirements are directly related to user story.
+User requirements are directly related to user story: they **refine** user story.
 
 User requirements are expected to be documented in the `specifications/UserRequirement.md` file.
 
-Each user requirement is associated with a **user story**, and a single user story may contain multiple requirements. 
-**user story** must at least have a relation to specific MOE, while relations for individual requirements within the user story are optional.
 
-A user requirement in ReqFlow includes the following elements:
-- **## USER STORY TITLE**
-  - The name acts as a unique identifier, and ReqFlow tools ensure uniqueness is maintained.
-  - Names must be unique within the document for user stories
-- **User story Text**  
-  - FILL IN 
-- **User story Relations**  
-  - Each user story must define at least one relation, and that one being **tracedFrom** linking to MOE element
-- One or more requrements
-- **### REQUIREMENT TITLE**
-  - The name acts as a unique identifier, and ReqFlow tools ensure uniqueness is maintained.
-  - Names must be unique within the document, as ReqFlow internally uses the file path and document name as part of its uniqueness mechanism.
-- **Requirement Text**
-  - The text describing the requirement comes directly below the name.
-- **Relations**
-  - Relations are optional for user requirements
-
-Example format:
-```markdown
-## User story title
-
-Relations:
- * tracedFrom: specifications/MOEs.md/elementName
-
-As a user, I want to:
-   * some user story
-   * another related user story
-   
-### Requirement title
-
-Requirement text.
-
-### Requirement title
-
-Requirement text.
-```
-
-### Mission and System Requirements
+### Mission Requirements
 
 Mission and System Requirements are expected to be documented in the `specifications/MissionRequirement.md` file.
 
@@ -170,303 +270,43 @@ These requirements represent the high-level mission / enterprise  objectives, ne
 
 **mission requirement** must at least have a relation to specific MOE.
 
-A Mission or System Requirement includes the following elements:
-- **### NAME**
-  - The name acts as a unique identifier, and ReqFlow tools ensure uniqueness.
-  - Names must be unique within the document, with ReqFlow leveraging the file path and document name as part of its uniqueness logic.
-- **Requirement Text**
-  - A concise description of the requirement, ideally written using structured methods such as **EARS (Easy Approach to Requirements Syntax)**.
-- **Relations**
-  - Each requirement must define at least one relation, such as:
-    - **derivedFrom**: Linking to higher-level requirements or MOEs.
-    - **satisfiedBy**: Linking to design specifications or test cases.
+User requirements are expected to be documented in the `specifications/MissionRequirement.md` file.
 
-Example format:
-```markdown
+### System  Requirements
 
-### Requirement name
+System requirements define the detailed technical and functional specifications that the system must meet to fulfill the user and mission requirements. They describe *how* the system will achieve the objectives set by the user and mission requirements.
 
-A concise text describing the requirement, preferably using structured syntax like EARS.
+System requirements are structured to map to specific subsystems or components of the overall system. Each subsystem or component has its own dedicated folder in the `specifications/systemRequirements` directory, ensuring modularity and clarity.
 
-Relations:
- * derivedFrom: path/documentName.md/ElementName
- * satisfiedBy: path/otherDocumentName.md/OtherElementName
+#### Organization and File Structure
 
-```
+1. **Location**: System requirements must be documented in the `specifications/systemRequirements` directory.
+2. **Subfolders**: Each subsystem has its own subfolder. Subfolders can nest further into sub-subsystems as needed.
+3. **File Name**: Each folder must contain exactly one `Requirements.md` file, where the requirements for that specific subsystem are documented.
 
-# Requirements Diagrams
+#### Traceability
 
-mermaid's requirementsDiagram which is bases on SysML is not that flexible in regards to picking colors and making links for docRefs thefor ReqFlow uses graphTD diagram.
+System requirements must trace back to their respective user and mission requirements to ensure alignment with user needs and mission objectives. Traceability is documented through relations like `tracedFrom` and `verifiedBy`.
 
-## Requirements relations
+#### Expected File Structure for System Requirements
 
-In ReqFlow, requirements can be linked using the following types of relationships:
- * containedBy
- * contain
- * derivedFrom 
- * derive
- * refine
- * satisfiedBy
- * satisfy
- * verifiedBy
- * verify 
- * tracedFrom
- * trace 
-  
+- **Top-Level File**: 
+  - `specifications/systemRequirements/Requirements.md` – Contains high-level system requirements that apply to the overall system.
+- **Subsystem Folders**:
+  - `specifications/systemRequirements/<subsystem>/Requirements.md`
+  - Subsystems can have nested folders, as shown:
+    ```plaintext
+    specifications/systemRequirements/subsystem/subsubsystem/Requirements.md
+    specifications/systemRequirements/othersubsystem/subsystem/Requirements.md
+    ```
 
-### `contains` and `derives`
+Each `Requirements.md` file contains requirements specific to the subsystem or component it corresponds to.
 
-Both `contains` and `derives` relationships in SysML allow breaking down requirements, and their implementation may often look similar. However, the difference lies in the **modeling intent**:
 
-- **`contains`**: Groups **independent, standalone sub-requirements** under a broader parent requirement.
-- **`derives`**: Decomposes a **high-level requirement** into more specific, actionable requirements to show how the overall goal is achieved.
 
-The choice depends on how you want to structure and trace your requirements:
-- Use `contains` for **organizational grouping** eg. per feature sub-requirements.
-- Use `derives` for **breaking down abstract requirements into detailed ones**.
+## Requirements Diagrams
 
-While both relationships allow sub-requirements to be implemented independently, the clarity and traceability differ based on the intent of their relationship.
-
----
-
-#### Practical Comparison
-
-| Aspect                  | **`contains`**                           | **`derives`**                           |
-|--------------------------|------------------------------------------|------------------------------------------|
-| **Purpose**             | Groups **independent sub-requirements** under a parent. | Decomposes a general requirement into **specific actionable requirements**. |
-| **Relationship**         | Parent is **loosely coupled** to sub-requirements. | Derived requirements are **traceable back** to the high-level requirement. |
-| **Dependency**           | No logical or contextual dependency implied. | Derived requirements **logically flow** from the parent. |
-| **Use Case**             | Organizing independent tasks or features. | Breaking down a general goal into specific system requirements. |
-| **Example**              | User management grouped under a parent. | SaaS subscription management decomposed into feature requirements. |
-
----
-
-#### Examples
-
-**Contains**:
-  * Parent requirement: **"The system shall support multiple user roles."**
-  * Sub-requirements (distinct, independent features):
-     *  **"The system shall support administrator roles."**
-     *  **"The system shall support editor roles."**
-     *  **"The system shall support viewer roles."**
-
-**Why `contains` fits**:
-- Each sub-requirement is a **separate feature** within the broader scope of user roles.
-- Sub-requirements don’t explain **how roles are managed**; they are distinct components grouped under a common parent.
-- Implementation of each sub-requirement is **independent** of the others but collectively satisfies the parent.
-
-```mermaid
-requirementDiagram
-
-    %% Parent Requirement
-    requirement REQ_PARENT {
-        id: 1
-        text: "The system shall support multiple user roles."
-    }
-
-    %% Sub-requirements
-    requirement REQ_ADMIN {
-        id: 1.1
-        text: "The system shall support administrator roles."
-    }
-
-    requirement REQ_EDITOR {
-        id: 1.2
-        text: "The system shall support editor roles."
-    }
-
-    requirement REQ_VIEWER {
-        id: 1.3
-        text: "The system shall support viewer roles."
-    }
-
-    %% Relationship
-    REQ_PARENT - contains -> REQ_ADMIN
-    REQ_PARENT - contains -> REQ_EDITOR
-    REQ_PARENT - contains -> REQ_VIEWER
-```
-
-**Derives**:
-  * Parent requirement: **"The system shall support SaaS subscription management."**
-  * Derived requirements (specific, actionable details):
-     *  **"The system shall enable subscription plan selection."**
-     *  **"The system shall process subscription payments securely."**
-     *  **"The system shall send subscription renewal reminders."**
-
-**Why `derives` fits**:
-- These derived requirements **decompose the parent requirement** into specific, actionable tasks.
-- Each derived requirement explains **how the parent goal is achieved**.
-- Together, they trace back to the broader objective of subscription management.
-
-```mermaid
-requirementDiagram
-
-    %% Parent Requirement
-    requirement REQ_PARENT {
-        id: 2
-        text: "The system shall support SaaS subscription management."
-    }
-
-    %% Derived Requirements
-    requirement REQ_PLAN {
-        id: 2.1
-        text: "The system shall enable subscription plan selection."
-    }
-
-    requirement REQ_PAYMENT {
-        id: 2.2
-        text: "The system shall process subscription payments securely."
-    }
-
-    requirement REQ_REMINDERS {
-        id: 2.3
-        text: "The system shall send subscription renewal reminders."
-    }
-
-    %% Relationship
-    REQ_PARENT - derives -> REQ_PLAN
-    REQ_PARENT - derives -> REQ_PAYMENT
-    REQ_PARENT - derives -> REQ_REMINDERS
-```
-
----
-
-
-#### `copies`
-- **Definition**: Creates a duplicate of an existing requirement, retaining the same text as the master requirement. The copied requirement references the original for traceability but may be applied in a different context.
-- **When to Use**: Use `copies` when a requirement needs to be reused in another context, ensuring consistency in description while maintaining traceability to the original.
-- **Example**: 
-  - Original Requirement: "The system shall support user authentication."
-  - Copied Requirement: "The system shall support user authentication." (applied to the mobile subsystem).
-
-```mermaid
-requirementDiagram
-    %% Master Requirement
-    requirement REQ_MASTER {
-        id: 1
-        text: "The system shall support user authentication."
-    }
-
-    %% Copied Requirement
-    requirement REQ_COPIED {
-        id: 1.1
-        text: "The system shall support user authentication."
-    }
-
-    %% Relationship
-    REQ_COPIED - copies -> REQ_MASTER
-```
----
-
-
-#### `refines`
-
-- **Definition**: A `refines` relationship is a dependency that describes how a model element (e.g., use case, activity diagram, or text) provides further detail or context to a requirement. It can also describe how a text-based requirement refines a model element, elaborating on its purpose or functionality.
-
-- **Purpose**: Use `refines` to illustrate how a requirement or model element is **further detailed or elaborated** to make its meaning clearer. This is particularly useful for connecting requirements to modeling elements (like use cases, activity diagrams, or blocks) that provide implementation or operational context.
-
-- **When to Use**: Use `refines` when:
-  1. A requirement needs to be connected to a more detailed model element (e.g., activity diagrams, use cases, or state machines).
-  2. A text-based requirement refines a higher-level model element to provide more descriptive detail.
-
-#### Example
-
-### Updated Example with User Story Refining a Requirement
-
-**Scenario**: A SaaS platform has a **user story** that refines a **functional requirement** for login, and this refinement adds more context and details.
-
-- **Functional Requirement**: "The system shall support federated login using Google OAuth."
-- **User Story**: "As a user, I want to log in to the system using my Google account so that I can access my personal dashboard."
-
-
-```mermaid
-requirementDiagram
-
-    %% Functional Requirement
-    requirement REQ_FEDERATED_LOGIN {
-        id: 1
-        text: "The system shall support federated login using Google OAuth."
-    }
-
-    %% Refining User Story
-    element USER_STORY_FEDERATED_LOGIN {
-        type: userstory
-        docRef: "https://github.com/GrapheneDB/red/blob/reqman/README.md"
-    }  
-
-
-
-    %% Relationships
-    USER_STORY_FEDERATED_LOGIN - refines -> REQ_FEDERATED_LOGIN
-
-```
----
-
-
-#### `satisfies`
-- **Definition**: Links a system element (e.g., block, behavior) to the requirement it fulfills.
-- **When to Use**: Use `satisfies` to trace the implementation of requirements to specific system elements.
-- **Example**: 
-  - Requirement: "The system shall support user authentication."
-  - System Element: `AuthenticationSubsystem`.
-
-```mermaid
-requirementDiagram
-    requirement REQ_AUTH {
-        id: 3
-        text: "The system shall support user authentication."
-    }
-    element AuthenticationSubsystem {
-        type: "Block"
-    }
-    AuthenticationSubsystem - satisfies -> REQ_AUTH
-
-```
----
-
-
-### `verifies`
-- **Definition**: Links a test case to a requirement to indicate how the requirement is validated.
-- **When to Use**: Use `verifies` when you need to demonstrate or test that a requirement is met.
-- **Example**: A test case "Verify system can encrypt files with AES-256" verifies "The system shall encrypt all uploaded files."
-
----
-
-### `traces`
-- **Definition**: Establishes a generic relationship between requirements or between a requirement and a system element, without specifying a strict semantic meaning.
-- **When to Use**: Use `traces` when a relationship exists but doesn’t fit into the specific categories like `satisfies`, `verifies`, or `refines`.
-- **Example**: "The system shall notify users of critical events" traces to the behavior "CriticalNotificationBehavior."
-
----
-
-### Summary Table of Relationships
-
-| Relationship Type | Definition                                                                 | Typical Use Case                                               |
-|--------------------|---------------------------------------------------------------------------|----------------------------------------------------------------|
-| **`contains`**     | Groups independent, parallel sub-requirements under a broader requirement. | Organizational grouping of standalone features or tasks.       |
-| **`copies`**       | Creates a duplicate of an existing requirement for reuse while maintaining traceability to the original. | Reusing and adapting requirements in different contexts.       |
-| **`derives`**      | Breaks down a high-level requirement into more specific ones.             | Decomposing general goals into specific system requirements.   |
-| **`satisfies`**    | Links a system element (block, behavior) to the requirement it fulfills.  | Tracing system design elements to requirements.                |
-| **`verifies`**     | Links a test case to a requirement for validation.                        | Testing or demonstrating that a requirement is met.            |
-| **`refines`**      | Describes how a model element or set of elements further elaborates a requirement. | Detailing a requirement through use cases, activity diagrams, or textual elaboration. |
-| **`traces`**       | Establishes a general dependency or relationship.                        | Linking requirements to elements without strict semantics.      |
-
----
-
-### Conclusion
-
-SysML requirement relationships provide powerful ways to structure, trace, and validate system requirements. Choosing the correct relationship depends on the intent and context:
-
-- Use **`contains`** for grouping independent tasks.
-- Use **`copies`** for reusing requirements in different contexts while maintaining traceability.
-- Use **`derives`** for breaking down high-level requirements into specific actionable components.
-- Use **`satisfies`** to ensure system components fulfill requirements.
-- Use **`verifies`** to connect test cases for validation of requirements.
-- Use **`refines`** for providing additional detail or elaboration to a requirement.
-- Use **`traces`** for general-purpose, flexible dependency mapping.
-
-Each relationship ensures traceability and alignment between requirements and system design, facilitating clear communication and robust development processes.
-
+mermaid's requirementsDiagram which is based on SysML is not that flexible in regards to picking colors and making links for docRefs thefor ReqFlow uses graphTD diagram for the time being.
 
 
 

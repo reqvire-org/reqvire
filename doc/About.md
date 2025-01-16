@@ -92,7 +92,7 @@ TODO: Write which are pillars of ReqFlow
 
 ## Mapping to ISO/IEC/IEEE 15288
 
-The **ReqFlow methodology**, a model-based systems engineering (MBSE) approach, aligns closely with the processes defined in **ISO/IEC/IEEE 15288** but organizes and emphasizes them according to its structured model-driven workflow. Drawing inspiration and best practices from methodologies such as **Arcadia**, **MBSE Grid**, **SOSEM (System-Oriented Systems Engineering Methodology)**, **OPM (Object-Process Methodology)**, and others, ReqFlow integrates key principles to provide a comprehensive framework for managing system requirements and architecture.
+The **ReqFlow methodology**, a model-based systems engineering (MBSE) approach, aligns closely with the processes defined in **ISO/IEC/IEEE 15288** but organizes and emphasizes them according to its structured model-driven workflow. Drawing inspiration and best practices from methodologies such as **Arcadia**, **MBSE Grid**, **OOSEM**, **OPM**, and others, ReqFlow integrates key principles to provide a comprehensive framework for managing system requirements and architecture.
 
 
 ---

@@ -10,32 +10,88 @@ The use case diagram below highlights the primary interactions between the ReqFl
 
 ```mermaid
 flowchart LR
-    subgraph "ReqFlow Tool Use Case Diagram"
-        generateDiagrams((Generate Diagrams))
-        validateStructure((Validate Markdown Structure))
-        traceability((Generate Traceability Matrix))
-        integrateCICD((Integrate with CI/CD Pipelines))
-        automation((Automate Requirement Checks))
-        handleDiffs((Trace Changes in Requirements))
+    subgraph "ReqFlowTool"
+        subgraph "Cli"
+            manageModel((Manage MBSE Model))
+            generateDiagrams((Generate Diagrams))
+            analiseRelations((Analyze Relations))
+            reports[Provide Reports]
+            validateStructure((Validate Structure))			
+            filesStructure[Filesystem Structure]
+            markdownSucture[Markdown Structure]
+            traceability((Generate Traceability Matrix))
+            handleDiffs((Trace Changes))        
+        end  
+
+        subgraph "ChatOps"
+            aiAgents((Provide AI Agents🤖))
+            aiSuggestions((Suggestions)) 
+            reviewSuggestions((Review Suggestions))                
+            applySuggestions((Apply Approved Suggestions))                
+        end
+                 
     end
 
-    user[Developer👤]
-    ciSystem[CI/CD System🤖]
+    human[Human👤]
+    human -. build .-> model
+    human -. develop .-> developedSystem
 
-    %% User interactions
-    user --> generateDiagrams
-    user --> validateStructure
-    user --> traceability
+    subgraph "External Systems"
+        ciSystem[CI/CD System]
+        gitTools[GitHub/GitLab/etc.]
+    end
 
-    %% CI/CD interactions
-    ciSystem --> validateStructure
-    ciSystem --> generateDiagrams
-    ciSystem --> automation
-    ciSystem --> traceability
+    subgraph "System of Interest: SOI"
+        model[MBSE Model]
+        developedSystem["Developed System"]
+        gitRepository[Git Repository]
+    end
 
-    %% New relation for tracing changes
-    handleDiffs -. include .-> traceability
-    handleDiffs -. include .-> generateDiagrams
+    %% Human Interactions
+    human -. via CLI .-> manageModel
+
+    ReqFlowTool -. read/write/get diffs .-> gitRepository
+ 
+    manageModel -. provide .-> validateStructure
+    validateStructure -. include .-> markdownSucture
+    validateStructure -. include .-> filesStructure  
+    validateStructure -. include .-> reports    
+
+    manageModel -. provide .-> traceability
+    manageModel -. provide .-> analiseRelations
+    analiseRelations -. include .-> reports      
+    manageModel -. provide .-> generateDiagrams
+    manageModel -. provide .-> handleDiffs
+
+    human -. via ChatOps .-> aiAgents    
+    aiAgents -. interact with via functions .-> manageModel    
+
+    aiAgents -. assist .-> human
+    aiAgents -. provide .-> aiSuggestions
+    aiSuggestions -. pending review .-> reviewSuggestions
+    reviewSuggestions -. approval required .-> applySuggestions
+    applySuggestions -. interact with via functions .-> manageModel    
+
+    %% CI/CD and Git Systems
+    ciSystem -. trigger .-> validateStructure
+    ciSystem -. trigger .-> generateDiagrams
+    ciSystem -. trigger .-> traceability
+    ciSystem -. fail merges if invalid .-> gitTools
+    gitTools -. manage .-> gitRepository
+
+    %% Relationships with SOI
+    model -- stored & versioned in --> gitRepository
+    developedSystem -- stored & versioned in --> gitRepository
+    developedSystem <-- implemented from --> model
+    model -- guides development of --> developedSystem
+
+    %% ReqFlow Interactions with SOI
+    handleDiffs -. include .-> reports    
+
+    %% SOI Feedback Loop
+    developedSystem -. feedback .-> model
+
+
 ```
 
 ### Explanation of Use Cases
