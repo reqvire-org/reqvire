@@ -1,8 +1,10 @@
-# Measures of Effectiveness (MOEs) and Key Performance Parameters (KPPs) for Stakeholder Requirements
+# MOEs 
+
+## Measues of Effectiveness (MOEs) and Key Performance Parameters (KPPs) for Stakeholder Requirements
 
 The **Measures of Effectiveness (MOEs)** and **Key Performance Parameters (KPPs)** in this document are tailored to evaluate how well the system meets **stakeholder requirements**. These metrics focus on outcomes that align with stakeholder goals, such as user satisfaction, operational efficiency, and business impact, rather than the technical specifications of the system itself.
 
----
+
 
 ## Key Performance Parameters (KPPs)
 
@@ -16,7 +18,7 @@ KPPs for stakeholder requirements define **critical thresholds** for performance
 
 KPPs for stakeholder requirements emphasize results that stakeholders care about, ensuring that their expectations are met or exceeded.
 
----
+
 
 ## Measures of Effectiveness (MOEs)
 
@@ -25,7 +27,10 @@ MOEs for stakeholder requirements evaluate how well the system achieves **outcom
 ### Examples of MOEs
 
 
-#### MOE_CR: Maintain High Customer Retention
+### MOE_CR
+
+**Maintain High Customer Retention**
+
 - **Goal**: Minimize churn and retain stakeholders through enhanced value delivery.
 - **Metric**: Churn Rate (CR)
 - **Metric Calculation**:  
@@ -35,9 +40,12 @@ MOEs for stakeholder requirements evaluate how well the system achieves **outcom
 - **Target Statement**: Reduce churn rate by X% over the 1-year period.
 - **Objective**: Build long-term relationships with stakeholders by consistently meeting their expectations.
 
----
 
-#### MOE_OPE: Increase Operational Efficiency for Stakeholders
+
+### MOE_OPE
+
+**Increase Operational Efficiency for Stakeholders**
+
 - **Goal**: Streamline stakeholder operations by reducing inefficiencies in workflows.
 - **Metric**: Operational Process Efficiency (OPE)
 - **Metric Calculation**:  
@@ -47,9 +55,12 @@ MOEs for stakeholder requirements evaluate how well the system achieves **outcom
 - **Target Statement**: Improve OPE by X% over the 6-month period.
 - **Objective**: Deliver tools and features that enable stakeholders to achieve more with fewer resources.
 
----
 
-#### MOE_MDAU: Increase Stakeholder Engagement
+
+### MOE_MDAU
+
+**Increase Stakeholder Engagement** 
+
 - **Goal**: Foster higher engagement with the system from stakeholders.
 - **Metric**: Monthly Daily Active Users (MDAU)
 - **Metric Calculation**:  
@@ -59,9 +70,12 @@ MOEs for stakeholder requirements evaluate how well the system achieves **outcom
 - **Target Statement**: Achieve an increase in MDAU by X% over the period.
 - **Objective**: Encourage stakeholders to interact with the system regularly through improved usability and features.
 
----
 
-#### MOE_AVA: Ensure High Availability for Stakeholders
+
+### MOE_AVA
+
+**Ensure High Availability for Stakeholders**
+
 - **Goal**: Provide uninterrupted access to stakeholders to meet operational needs.
 - **Metric**: System Availability (AVA)
 - **Metric Calculation**:  
@@ -71,9 +85,9 @@ MOEs for stakeholder requirements evaluate how well the system achieves **outcom
 - **Target Statement**: Maintain AVA at or above 99.9% over the 1-year period.
 - **Objective**: Deliver a reliable system for stakeholders, minimizing disruptions to their workflows.
 
----
 
-### Relationship Between MOEs and KPPs for Stakeholder Requirements
+
+## Relationship Between MOEs and KPPs for Stakeholder Requirements
 
 - **KPPs**: Represent critical performance thresholds directly tied to stakeholder success and satisfaction.
 - **MOEs**: Evaluate broader outcomes, focusing on how effectively the system supports stakeholder goals and operational impact.

@@ -17,6 +17,31 @@ In ReqFlow, element can be linked using the following types of relationships:
  * trace 
   
 
+Relations in the markdown are expected to be in following format:
+```
+### <element name>
+
+<Element text>
+
+#### Relations
+ * verifiedBy: <element identifier>
+ * contain: <element identifier>
+ 
+``` 
+
+There must be at least one relation if '#### Relations' exist under the  element text.
+
+### Element identifier
+
+Element identifier is like an URI which consist of path part and element name part:
+ * specifications/Document.md/Element name
+
+
+Special case is if relation is inside same document then it is enough to put Element name only:
+ * Element name
+
+## Relations types 
+
 ### `contain`, `containedBy`, `derive` and `derivedBy`
 
 Both `contains` and `derives` relationships in SysML allow breaking down requirements, and their implementation may often look similar. However, the difference lies in the **modeling intent**:

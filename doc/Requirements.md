@@ -79,11 +79,11 @@ Relations:
 
 The system shall provide a mechanism for users to recover forgotten passwords.
 
-Relations:
+#### Relations
  * tracedFrom: specifications/UserStories.md/Security
  * verifiedBy: specifications/tests.md/testPasswordRecovery
   
-Metadata
+#### Metadata
  * Priority: High
  * Criticality: Moderate
 
@@ -106,7 +106,7 @@ The Requirement Text describes the specific functionality, constraint, or need i
 
 #### Relations
 
-The Relations section documents links between this requirement and other system elements,requirements, specifications, or validation methods.
+The **"#### Relations** section documents links between this requirement and other system elements,requirements, specifications, or validation methods.
 
 Relations used for the requirements are a subset of relations that exist in the **Reqflow**:
  * containedBy
@@ -122,7 +122,7 @@ The parent objects depends on type of requirement and is explained further down.
 
 #### Metadata
 
-The **Metadata** section is optional and provides additional key-value pair details about the requirement. These details help define attributes or characteristics of the requirement.
+The **#### Metadata** section is optional and provides additional key-value pair details about the requirement. These details help define attributes or characteristics of the requirement.
 
 The keys and values are expressed as bullet points. Accepted key-value pairs include:
 

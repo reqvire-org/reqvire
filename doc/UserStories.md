@@ -27,6 +27,6 @@ Here one may explain which personas, actions and values are going to be used in 
 
 As [persona], I want to [action], so that I can [value].
 
-Relations:
+#### Relations
  * tracedFrom: MOEs.md/MOE_CR
 
