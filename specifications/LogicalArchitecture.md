@@ -34,6 +34,7 @@ classDiagram
         +ValidateMarkdownStructure()
         +ValidateFilesystemStructure()
         +ValidateModelConsistency()
+        +FixModelIssues()
         +GenerateReports()
     }
     class Storage {
@@ -65,7 +66,7 @@ classDiagram
     UserInteraction --> AI : "Interacts via ChatOps"
     CLI --> ModelManagement
     AI --> ModelManagement : "Calls Functions for Model Management"
-    CLI --> ValidationAndReporting : "Triggers validation/reporting"
+    CLI --> ValidationAndReporting : "Triggers validation/fixing/reporting"
     CLI --> Storage : "Reads/Writes Model Data"
     AI --> ValidationAndReporting : "Provides AI Validation Suggestions"
     AI --> Storage : "Saves Approved Changes"
@@ -119,6 +120,7 @@ classDiagram
 
 #### ValidationAndReporting
   - This component performs checks on model consistency, structure (both filesystem and markdown), and generates reports summarizing relationships, changes, and dependencies within the MBSE model.
+  - Also this component can be tasked with fixing some of consistency issues it finds.
 
 #### Storage
   - Handles the storage of the MBSE model and developed system in Git repositories.

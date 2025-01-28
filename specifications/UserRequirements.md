@@ -8,7 +8,6 @@ The system shall provide a command to automatically bootstrap a predefined direc
 
 #### Relations
   * refine: UserStories.md/Managing MBSE Models
-  * verifiedBy: README.md/Not Implemented Yet
 
 
 ## Generate Diagrams
@@ -19,7 +18,6 @@ The system shall allow users to select custom viewpoints for diagrams, tailored 
 
 #### Relations
   * refine: UserStories.md/Generate Diagrams
-  * verifiedBy: README.md/Not Implemented Yet
 
 
 ### Export Diagrams in Standard Formats
@@ -28,7 +26,6 @@ The system shall allow users to export generated diagrams in standard formats (e
 
 #### Relations
   * refine: UserStories.md/Generate Diagrams
-  * verifiedBy: README.md/Not Implemented Yet
 
 
 
@@ -38,7 +35,6 @@ The system shall provide an option to highlight changes made to the model in the
 
 #### Relations
   * refine: UserStories.md/Generate Diagrams
-  * verifiedBy: README.md/Not Implemented Yet
 
 
 ### Visualize Model Relationships
@@ -47,7 +43,6 @@ The system shall provide visual representations of relationships within the MBSE
 
 #### Relations
   * refine: UserStories.md/Generate Diagrams
-  * verifiedBy: README.md/Not Implemented Yet
 
 
 
@@ -57,7 +52,6 @@ The system shall allow users to filter relationships in the MBSE model by type, 
 
 #### Relations
   * refine: UserStories.md/Generate Diagrams
-  * verifiedBy: README.md/Not Implemented Yet
 
 
 ## Automate Diagram Generation
@@ -69,7 +63,6 @@ The system shall store automatically generated diagrams in pre-configured locati
 
 #### Relations
   * refine: UserStories.md/Automate Diagram Generation
-  * verifiedBy: README.md/Not Implemented Yet
 
 
 
@@ -81,7 +74,6 @@ The system shall enable users to trace implemented code components back to corre
 
 #### Relations
   * refine: UserStories.md/Aligning Design with Code
-  * verifiedBy: README.md/Not Implemented Yet
 
 
 ### Suggest Code Refactoring
@@ -90,10 +82,14 @@ The system shall suggest code refactoring opportunities to better align with the
 
 #### Relations
   * refine: UserStories.md/Aligning Design with Code
-  * verifiedBy: README.md/Not Implemented Yet
 
 
 ## Validating Structures
+
+### Linting the specifications
+
+
+
 
 ### Validate Markdown Structure
 
@@ -101,7 +97,6 @@ The system shall validate the Markdown structure of MBSE documentation to ensure
 
 #### Relations
   * refine: UserStories.md/Validating Structures
-  * verifiedBy: README.md/Not Implemented Yet
 
 ### Validate Filesystem Structure
 
@@ -109,7 +104,6 @@ The system shall validate the organization of files and folders in the repositor
 
 #### Relations
   * refine: UserStories.md/Validating Structures
-  * verifiedBy: README.md/Not Implemented Yet
 
 ### Validate Internal Consistency
 
@@ -117,7 +111,6 @@ The system shall check the internal consistency of the MBSE model, ensuring that
 
 #### Relations
   * refine: UserStories.md/Validating Structures
-  * verifiedBy: README.md/Not Implemented Yet
 
 
 ### Validate Cross-Component Dependencies
@@ -126,8 +119,22 @@ The system shall validate dependencies across different components of the MBSE m
 
 #### Relations
   * refine: UserStories.md/Validating Structures
-  * verifiedBy: README.md/Not Implemented Yet
 
+### Fix Model Issues
+
+The system shall provide mechanisms to fix identified issues in the MBSE model to ensure alignment with repository standards and improve consistency.
+
+#### Relations
+  * refine: UserStories.md/Validating Structures
+
+
+### Replace Absolute Links with Relative Links
+
+The system shall replace absolute links with relative links, where applicable and contextually appropriate, to conform to repository standards and enhance portability.
+
+
+#### Relations
+  * derivedFrom: Fix Model Issues
 
 ## Integrate with GitHub Workflows
 
@@ -138,7 +145,6 @@ The system shall automate validations of pull requests in the GitHub workflow to
 
 #### Relations
   * refine: UserStories.md/Integrate with GitHub Workflows
-  * verifiedBy: README.md/Not Implemented Yet
 
 
 ### Generate Change Logs for Pull Requests
@@ -147,7 +153,6 @@ The system shall generate detailed change logs for pull requests, summarizing mo
 
 #### Relations
   * refine: UserStories.md/Integrate with GitHub Workflows
-  * verifiedBy: README.md/Not Implemented Yet
 
 
 ## Grouping Title: AI-Driven Code Suggestions
@@ -158,7 +163,6 @@ The system shall allow AI agents to analyze code and identify deviations from th
 
 #### Relations
   * refine: UserStories.md/AI-Driven Code Suggestions
-  * verifiedBy: README.md/Not Implemented Yet
 
 
 
@@ -169,7 +173,6 @@ The system shall enable AI agents to suggest refactoring opportunities to ensure
 
 #### Relations
   * refine: UserStories.md/AI-Driven Code Suggestions
-  * verifiedBy: README.md/Not Implemented Yet
 
 ### Highlight Potential Code-Model Conflicts --> also too advanced for now
 
@@ -177,7 +180,6 @@ The system shall allow AI agents to highlight potential conflicts between code a
 
 #### Relations
   * refine: UserStories.md/AI-Driven Code Suggestions
-  * verifiedBy: README.md/Not Implemented Yet
 
 
 ## AI-Driven Model Suggestions
@@ -188,7 +190,6 @@ The system shall enable AI agents to suggest refinements to relationships within
 
 #### Relations
   * refine: UserStories.md/AI-Driven Model Suggestions
-  * verifiedBy: README.md/Not Implemented Yet
 
 
 ### Recommend Missing Components
@@ -197,7 +198,6 @@ The system shall allow AI agents to recommend missing components or elements bas
 
 #### Relations
   * refine: UserStories.md/AI-Driven Model Suggestions
-  * verifiedBy: README.md/Not Implemented Yet
 
 
 ### Propose Validation Fixes
@@ -206,7 +206,6 @@ The system shall enable AI agents to propose fixes for validation errors in the 
 
 #### Relations
   * refine: UserStories.md/AI-Driven Model Suggestions
-  * verifiedBy: README.md/Not Implemented Yet
 
 
 ## Provide Reports
@@ -218,7 +217,6 @@ The system shall generate reports summarizing the relationships in the MBSE mode
 
 #### Relations
   * refine: UserStories.md/Provide Reports
-  * verifiedBy: README.md/Not Implemented Yet
 
 
 ### Generate Structural Change Reports
@@ -227,7 +225,6 @@ The system shall generate detailed reports summarizing the impact of structural 
 
 #### Relations
   * refine: UserStories.md/Provide Reports
-  * verifiedBy: README.md/Not Implemented Yet
 
 
 ### Provide Validation Reports
@@ -236,7 +233,14 @@ The system shall generate detailed validation reports, highlighting any inconsis
 
 #### Relations
   * refine: UserStories.md/Provide Reports
-  * verifiedBy: README.md/Not Implemented Yet
+
+
+### Generate Verifications Reports
+
+The system shall produce reports identifying User and Mission requirements that lack a verifiedBy relationship.
+
+#### Relations
+  * refine: UserStories.md/Provide Reports
 
 
 
@@ -246,7 +250,6 @@ The system shall allow users to generate summary reports highlighting key metric
 
 #### Relations
   * refine: UserStories.md/Provide Reports
-  * verifiedBy: README.md/Not Implemented Yet
 
 
 ### Generate Dependency Reports
@@ -255,7 +258,6 @@ The system shall generate reports summarizing dependencies between requirements,
 
 #### Relations
   * refine: UserStories.md/Provide Reports
-  * verifiedBy: README.md/Not Implemented Yet
 
 
 ### Export Reports to Standard Formats
@@ -264,7 +266,6 @@ The system shall allow users to export generated reports in standard formats (e.
 
 #### Relations
   * refine: UserStories.md/Provide Reports
-  * verifiedBy: README.md/Not Implemented Yet
 
 
 
@@ -305,7 +306,6 @@ The system shall create a traceability matrices when requested by a user or as p
 
 #### Relations
   * refine: UserStories.md/Generate Traceability Matrix
-  * verifiedBy: README.md/Not Implemented Yet
 
 
 ### Support Relation-Based Views
@@ -318,7 +318,6 @@ The system shall generate traceability matrix views based on relations to requir
 
 #### Relations
   * containedBy: Create Traceability Matrices
-  * verifiedBy: README.md/Not Implemented Yet
  
 
 ### Interactive Mermaid Diagrams
@@ -327,7 +326,6 @@ The system shall include Mermaid diagrams in the traceability matrix that provid
 
 #### Relations
   * containedBy: Create Traceability Matrices
-  * verifiedBy: README.md/Not Implemented Yet
 
 ### Markdown-Based Default Format
 
@@ -335,7 +333,6 @@ The system shall generate the traceability matrix in Markdown format by default,
 
 #### Relations
   * containedBy: Create Traceability Matrices
-  * verifiedBy: README.md/Not Implemented Yet
 
 ### Save matrices to designated files
 
@@ -343,7 +340,6 @@ The system shall save the generated traceability matrices as a Markdown document
 
 #### Relations
   * containedBy: Create Traceability Matrices
-  * verifiedBy: README.md/Not Implemented Yet
 
 
 
@@ -353,7 +349,6 @@ The system shall include checkboxes in the traceability matrix for each verifica
 
 #### Relations
   * refine: UserStories.md/Generate Traceability Matrix
-  * verifiedBy: README.md/Not Implemented Yet
 
 
 ### Handle Affected Verifications on Model Changes
@@ -371,7 +366,6 @@ The system shall provide an option to export the traceability matrix in formats 
 
 #### Relations
   * refine: UserStories.md/Generate Traceability Matrix
-  * verifiedBy: README.md/Not Implemented Yet
 
 
 ### Support CI/CD Integration
@@ -380,7 +374,6 @@ The system shall integrate with CI/CD pipelines to generate or update traceabili
 
 #### Relations
   * refine: UserStories.md/Automate Traceability Matrix
-  * verifiedBy: README.md/Not Implemented Yet
 
 
 
