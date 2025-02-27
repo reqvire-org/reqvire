@@ -24,6 +24,10 @@ pub enum ReqFlowError {
     #[allow(dead_code)]
     #[error("Duplicate element: {0}")]
     DuplicateElement(String),
+    
+    #[allow(dead_code)]
+    #[error("Duplicate subsection: {0}")]
+    DuplicateSubsection(String),
 
     #[allow(dead_code)]
     #[error("Missing element: {0}")]

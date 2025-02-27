@@ -13,6 +13,9 @@ mod utils;
 mod validation;
 #[cfg(test)]
 mod tests;
+#[path = "tests/validation_tests.rs"]
+#[cfg(test)]
+mod validation_tests;
 
 use model::ModelManager;
 

@@ -310,6 +310,9 @@ impl ModelManager {
                         ReqFlowError::DuplicateElement(msg) => {
                             ReqFlowError::DuplicateElement(format!("File {}: {}", file_path, msg))
                         },
+                        ReqFlowError::DuplicateSubsection(msg) => {
+                            ReqFlowError::DuplicateSubsection(format!("File {}: {}", file_path, msg))
+                        },
                         ReqFlowError::InvalidMarkdownStructure(msg) => {
                             ReqFlowError::InvalidMarkdownStructure(format!("File {}: {}", file_path, msg))
                         },
