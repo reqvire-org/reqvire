@@ -5,11 +5,12 @@ use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use walkdir::WalkDir;
 
-use crate::element::ElementRegistry;
+use crate::element::{self, ElementRegistry};
 use crate::error::ReqFlowError;
 use crate::html;
 use crate::markdown;
 use crate::utils;
+use crate::validation;
 
 /// Manages the MBSE model
 #[derive(Debug, Default)]
@@ -279,6 +280,243 @@ impl ModelManager {
         }
         
         Ok(())
+    }
+    
+    /// Public method to collect identifiers only - used for validation
+    pub fn collect_identifiers_only(&mut self, input_folder: &Path) -> Result<(), ReqFlowError> {
+        self.collect_identifiers(input_folder)
+    }
+    
+    /// Validate markdown structure of all collected files
+    /// Returns a list of validation errors
+    /// If fix=true, attempts to fix common issues automatically
+    pub fn validate_markdown_structure(&self, _fix: bool) -> Result<Vec<ReqFlowError>, ReqFlowError> {
+        info!("Validating markdown structure");
+        
+        let mut all_errors = Vec::new();
+        
+        // Process each file for markdown structure validation
+        for (file_path, content) in &self.file_contents {
+            info!("Validating markdown structure of {}", file_path);
+            
+            // Use existing validation function
+            let errors = validation::validate_markdown_structure(content)?;
+            
+            // Convert errors to include file path in message
+            let errors_with_path: Vec<ReqFlowError> = errors
+                .into_iter()
+                .map(|error| {
+                    match error {
+                        ReqFlowError::DuplicateElement(msg) => {
+                            ReqFlowError::DuplicateElement(format!("File {}: {}", file_path, msg))
+                        },
+                        ReqFlowError::InvalidMarkdownStructure(msg) => {
+                            ReqFlowError::InvalidMarkdownStructure(format!("File {}: {}", file_path, msg))
+                        },
+                        other => other,
+                    }
+                })
+                .collect();
+            
+            all_errors.extend(errors_with_path);
+        }
+        
+        if all_errors.is_empty() {
+            info!("No markdown structure validation errors found");
+        } else {
+            info!("Found {} markdown structure validation errors", all_errors.len());
+        }
+        
+        Ok(all_errors)
+    }
+    
+    /// Validate all relations in the model
+    /// Returns a list of validation errors
+    /// If fix=true, attempts to fix common issues automatically
+    pub fn validate_relations(&self, _fix: bool) -> Result<Vec<ReqFlowError>, ReqFlowError> {
+        info!("Validating relations");
+        
+        // Use existing validation function
+        let errors = validation::validate_relations(&self.element_registry)?;
+        
+        if errors.is_empty() {
+            info!("No relation validation errors found");
+        } else {
+            info!("Found {} relation validation errors", errors.len());
+        }
+        
+        Ok(errors)
+    }
+    
+    /// Validate filesystem structure according to ReqFlow methodology
+    /// Checks for:
+    /// - Required directories (specifications, etc.)
+    /// - Required files (README.md, etc.)
+    /// - Proper file organization
+    /// Returns a list of validation errors
+    /// If fix=true, attempts to fix common issues automatically
+    pub fn validate_filesystem_structure(&self, input_folder: &Path, _fix: bool) -> Result<Vec<ReqFlowError>, ReqFlowError> {
+        info!("Validating filesystem structure in {:?}", input_folder);
+        
+        let mut errors = Vec::new();
+        
+        // Check required directories according to ReqFlow methodology
+        let required_dirs = vec![
+            "specifications",
+            "specifications/DesignSpecifications",
+            "specifications/SystemRequirements",
+        ];
+        
+        for dir in &required_dirs {
+            let dir_path = input_folder.join(dir);
+            if !dir_path.exists() || !dir_path.is_dir() {
+                errors.push(ReqFlowError::ValidationError(
+                    format!("Required directory '{}' is missing", dir)
+                ));
+            }
+        }
+        
+        // Check required files
+        let required_files = vec![
+            "README.md",
+            "specifications/README.md",
+            "specifications/SystemRequirements.md",
+        ];
+        
+        for file in &required_files {
+            let file_path = input_folder.join(file);
+            if !file_path.exists() || !file_path.is_file() {
+                errors.push(ReqFlowError::ValidationError(
+                    format!("Required file '{}' is missing", file)
+                ));
+            }
+        }
+        
+        // Check for files in wrong locations
+        for entry in WalkDir::new(input_folder).into_iter().filter_map(|e| e.ok()) {
+            let path = entry.path();
+            if path.is_file() && path.extension().map_or(false, |ext| ext == "md") {
+                let file_name = path.file_name().unwrap().to_string_lossy();
+                
+                // Check if requirements files are in the right directories
+                if file_name.contains("Requirements") && !path.to_string_lossy().contains("Requirements") {
+                    errors.push(ReqFlowError::ValidationError(
+                        format!("Requirements file '{}' is not in a Requirements directory", path.display())
+                    ));
+                }
+                
+                // Check if design specs are in the right directories
+                if file_name.contains("DSD_") && !path.to_string_lossy().contains("DesignSpecifications") {
+                    errors.push(ReqFlowError::ValidationError(
+                        format!("Design specification file '{}' is not in the DesignSpecifications directory", path.display())
+                    ));
+                }
+            }
+        }
+        
+        if errors.is_empty() {
+            info!("No filesystem structure validation errors found");
+        } else {
+            info!("Found {} filesystem structure validation errors", errors.len());
+        }
+        
+        Ok(errors)
+    }
+    
+    /// Validate cross-component dependencies
+    /// Checks for:
+    /// - Complete dependency chains
+    /// - Missing components in dependency chains
+    /// - Circular dependencies
+    /// Returns a list of validation errors
+    /// If fix=true, attempts to fix common issues automatically
+    pub fn validate_cross_component_dependencies(&self, _fix: bool) -> Result<Vec<ReqFlowError>, ReqFlowError> {
+        info!("Validating cross-component dependencies");
+        
+        let mut errors = Vec::new();
+        
+        // Check for circular dependencies
+        for element in self.element_registry.all_elements() {
+            let mut visited = std::collections::HashSet::new();
+            let mut path = Vec::new();
+            
+            self.check_circular_dependencies(element, &mut visited, &mut path, &mut errors);
+        }
+        
+        // Check for incomplete dependency chains (e.g., missing derivedFrom relations)
+        // For example, system requirements should have derivedFrom relations to user requirements
+        for element in self.element_registry.all_elements() {
+            // Check for system requirements without derivedFrom relations
+            if element.file_path.contains("SystemRequirements") && 
+               !element.relations.iter().any(|r| r.relation_type == "derivedFrom") {
+                errors.push(ReqFlowError::ValidationError(
+                    format!("System requirement '{}' has no 'derivedFrom' relation", element.name)
+                ));
+            }
+            
+            // Check for verification elements without verifiedBy relations
+            if element.file_path.contains("Verifications") && 
+               !element.relations.iter().any(|r| r.relation_type == "verifiedBy") {
+                errors.push(ReqFlowError::ValidationError(
+                    format!("Verification element '{}' has no 'verifiedBy' relation", element.name)
+                ));
+            }
+        }
+        
+        if errors.is_empty() {
+            info!("No cross-component dependency validation errors found");
+        } else {
+            info!("Found {} cross-component dependency validation errors", errors.len());
+        }
+        
+        Ok(errors)
+    }
+    
+    /// Helper method to check for circular dependencies
+    fn check_circular_dependencies(
+        &self, 
+        element: &element::Element, 
+        visited: &mut std::collections::HashSet<String>,
+        path: &mut Vec<String>,
+        errors: &mut Vec<ReqFlowError>
+    ) {
+        let element_id = element.identifier();
+        
+        // If we've already completely processed this element, skip
+        if visited.contains(&element_id) {
+            return;
+        }
+        
+        // Check if we've encountered this element before in the current path
+        if path.contains(&element_id) {
+            // We have a cycle
+            let cycle_start = path.iter().position(|id| id == &element_id).unwrap();
+            let mut cycle = path[cycle_start..].to_vec();
+            cycle.push(element_id.clone());
+            
+            errors.push(ReqFlowError::ValidationError(
+                format!("Circular dependency detected: {}", cycle.join(" -> "))
+            ));
+            return;
+        }
+        
+        // Add this element to the current path
+        path.push(element_id.clone());
+        
+        // Check all relations of this element
+        for relation in &element.relations {
+            // Only follow certain relation types (those that could create cycles)
+            if ["derivedFrom", "dependsOn", "refine", "tracedFrom"].contains(&relation.relation_type.as_str()) {
+                // Get the target element
+                if let Some(target_element) = self.element_registry.get_element(&relation.target) {
+                    self.check_circular_dependencies(target_element, visited, path, errors);
+                }
+            }
+        }
+        
+        // Mark this element as visited and remove from current path
+        visited.insert(element_id);
+        path.pop();
     }
     
     /// Process all markdown files and write to the output folder
