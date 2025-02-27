@@ -75,12 +75,18 @@ pub fn validate_relations(registry: &ElementRegistry) -> Result<Vec<ReqFlowError
 pub fn validate_markdown_structure(content: &str) -> Result<Vec<ReqFlowError>, ReqFlowError> {
     let mut errors = Vec::new();
     let mut element_names = Vec::new();
+    let mut current_element: Option<String> = None;
+    let mut current_element_subsections: Vec<String> = Vec::new();
     
-    // Validate element headers are unique
+    // Validate element headers are unique, considering subsections within their parent context
     for (line_num, line) in content.lines().enumerate() {
-        if line.trim().starts_with("### ") {
-            let name = line.trim()[4..].trim().to_string();
+        let trimmed = line.trim();
+        
+        if trimmed.starts_with("### ") {
+            // New level 3 header (element) - check for uniqueness among elements
+            let name = trimmed[4..].trim().to_string();
             
+            // Check if this element name is a duplicate at the same level
             if element_names.contains(&name) {
                 errors.push(ReqFlowError::DuplicateElement(format!(
                     "Duplicate element '{}' found at line {}",
@@ -88,8 +94,35 @@ pub fn validate_markdown_structure(content: &str) -> Result<Vec<ReqFlowError>, R
                     line_num + 1
                 )));
             } else {
-                element_names.push(name);
+                // Record this as a new element
+                element_names.push(name.clone());
+                
+                // Update current element tracking
+                current_element = Some(name);
+                
+                // Reset subsections for the new element
+                current_element_subsections.clear();
             }
+        } else if trimmed.starts_with("#### ") && current_element.is_some() {
+            // Level 4 header (subsection) - check for uniqueness within current element
+            let subsection_name = trimmed[5..].trim().to_string();
+            
+            // Check if this subsection is a duplicate within this element
+            if current_element_subsections.contains(&subsection_name) {
+                errors.push(ReqFlowError::DuplicateSubsection(format!(
+                    "Duplicate subsection '{}' within element '{}' found at line {}",
+                    subsection_name,
+                    current_element.as_ref().unwrap(),
+                    line_num + 1
+                )));
+            } else {
+                // Record this subsection for the current element
+                current_element_subsections.push(subsection_name);
+            }
+        } else if trimmed.starts_with("## ") || trimmed.starts_with("# ") {
+            // Higher level heading - reset current element tracking
+            current_element = None;
+            current_element_subsections.clear();
         }
     }
     
