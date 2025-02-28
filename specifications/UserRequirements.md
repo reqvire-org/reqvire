@@ -147,6 +147,20 @@ The system shall replace absolute links with relative links, where applicable an
   * containedBy: Model Linting
 
 
+### Format Consistency Enforcement
+
+The system shall provide linting capability to ensure consistent formatting in specification documents.
+
+#### Details
+1. Trimming excess whitespace after element names and relation identifiers
+2. Normalizing to exactly two newlines before subsections (e.g., "#### Details")
+3. Automatically inserting separator lines ("---") between elements if not already present
+4. Ensuring consistent indentation in relation lists
+
+#### Relations
+  * containedBy: Model Linting
+
+
 ### Validate Markdown Structure
 
 The system shall validate the Markdown structure of MBSE documentation to ensure compliance with formatting standards.
