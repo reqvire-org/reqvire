@@ -28,11 +28,13 @@ use model::ModelManager;
 #[clap(author, version, about)]
 struct Args {
     /// Path to the input folder containing Markdown files
+    /// If not provided, this will be read from the configuration file
     #[clap(index = 1)]
-    input_folder: PathBuf,
+    input_folder: Option<PathBuf>,
 
     /// Path to the output folder (not required for validate commands)
-    #[clap(index = 2, required_unless_present_any = &["validate_markdown", "validate_relations", "validate_all"])]
+    /// If not provided, this will be read from the configuration file
+    #[clap(index = 2)]
     output_folder: Option<PathBuf>,
 
     /// Convert Markdown to HTML with embedded styles
@@ -65,10 +67,9 @@ struct Args {
     #[clap(long, conflicts_with = "html")]
     validate_all: bool,
     
-    /// Fixes common issues automatically
-    /// Can be combined with validation commands
+    /// Enable linting to find potential improvements (non-blocking)
     #[clap(long)]
-    fix: bool,
+    lint: bool,
     
     /// Output validation results in JSON format
     /// Useful for CI/CD pipelines and automation
@@ -131,13 +132,20 @@ fn main() -> Result<()> {
         config.validation.validate_all = true;
     }
     
-    if args.fix {
-        config.validation.fix_automatically = true;
+    if args.lint {
+        config.linting.lint = true;
     }
     
     if args.json {
         config.validation.json_output = true;
     }
+    
+    // Get input and output folders from command line arguments or configuration
+    let input_folder_path = args.input_folder
+        .unwrap_or_else(|| PathBuf::from(&config.paths.specifications_folder));
+    
+    let output_folder_path = args.output_folder
+        .unwrap_or_else(|| PathBuf::from(&config.paths.output_folder));
 
     // Create model manager with the configuration
     let mut model_manager = ModelManager::new_with_config(config.clone());
@@ -150,17 +158,17 @@ fn main() -> Result<()> {
     if validation_mode {
         // Run in validation mode
         if config.general.verbose {
-            println!("Validating files in {:?}", args.input_folder);
+            println!("Validating files in {:?}", input_folder_path);
         }
         
         // Only collect identifiers, don't process files
-        model_manager.collect_identifiers_only(&args.input_folder)?;
+        model_manager.collect_identifiers_only(&input_folder_path)?;
         
         // Run the appropriate validations
         let mut exit_code = 0;
         
         if config.validation.validate_markdown || config.validation.validate_all {
-            let markdown_errors = model_manager.validate_markdown_structure(config.validation.fix_automatically)?;
+            let markdown_errors = model_manager.validate_markdown_structure()?;
             if !markdown_errors.is_empty() {
                 exit_code = 1;
                 
@@ -169,7 +177,7 @@ fn main() -> Result<()> {
                     println!("{}", serde_json::to_string_pretty(&ValidationResult {
                         validation_type: "markdown".to_string(),
                         errors: markdown_errors.iter().map(|e| e.to_string()).collect(),
-                        fixed: config.validation.fix_automatically,
+                        fixed: false,
                     })?);
                 } else {
                     // Human-readable output
@@ -184,7 +192,7 @@ fn main() -> Result<()> {
         }
         
         if config.validation.validate_relations || config.validation.validate_all {
-            let relation_errors = model_manager.validate_relations(config.validation.fix_automatically)?;
+            let relation_errors = model_manager.validate_relations()?;
             if !relation_errors.is_empty() {
                 exit_code = 1;
                 
@@ -193,7 +201,7 @@ fn main() -> Result<()> {
                     println!("{}", serde_json::to_string_pretty(&ValidationResult {
                         validation_type: "relations".to_string(),
                         errors: relation_errors.iter().map(|e| e.to_string()).collect(),
-                        fixed: config.validation.fix_automatically,
+                        fixed: false,
                     })?);
                 } else {
                     // Human-readable output
@@ -209,9 +217,7 @@ fn main() -> Result<()> {
         
         if config.validation.validate_all {
             // Filesystem structure validation (directory layout, file naming, etc.)
-            let filesystem_errors = model_manager.validate_filesystem_structure(&args.input_folder, 
-                                                               config.validation.fix_automatically,
-                                                               &config)?;
+            let filesystem_errors = model_manager.validate_filesystem_structure(&input_folder_path, &config)?;
             if !filesystem_errors.is_empty() {
                 exit_code = 1;
                 
@@ -220,7 +226,7 @@ fn main() -> Result<()> {
                     println!("{}", serde_json::to_string_pretty(&ValidationResult {
                         validation_type: "filesystem".to_string(),
                         errors: filesystem_errors.iter().map(|e| e.to_string()).collect(),
-                        fixed: config.validation.fix_automatically,
+                        fixed: false,
                     })?);
                 } else {
                     // Human-readable output
@@ -234,7 +240,7 @@ fn main() -> Result<()> {
             }
             
             // Cross-component dependency validation
-            let dependency_errors = model_manager.validate_cross_component_dependencies(config.validation.fix_automatically)?;
+            let dependency_errors = model_manager.validate_cross_component_dependencies()?;
             if !dependency_errors.is_empty() {
                 exit_code = 1;
                 
@@ -243,7 +249,7 @@ fn main() -> Result<()> {
                     println!("{}", serde_json::to_string_pretty(&ValidationResult {
                         validation_type: "dependencies".to_string(),
                         errors: dependency_errors.iter().map(|e| e.to_string()).collect(),
-                        fixed: config.validation.fix_automatically,
+                        fixed: false,
                     })?);
                 } else {
                     // Human-readable output
@@ -266,15 +272,15 @@ fn main() -> Result<()> {
     } else {
         // Normal processing mode
         if config.general.verbose {
-            println!("Processing files from {:?} to {:?}", args.input_folder, args.output_folder.as_ref().unwrap());
+            println!("Processing files from {:?} to {:?}", input_folder_path, output_folder_path);
         }
 
         // Process files normally
-        model_manager.process_files(&args.input_folder, 
-                                  args.output_folder.as_ref().unwrap(), 
+        model_manager.process_files(&input_folder_path, 
+                                  &output_folder_path, 
                                   config.general.html_output)?;
 
-        println!("Files processed and saved to {:?}", args.output_folder.as_ref().unwrap());
+        println!("Files processed and saved to {:?}", output_folder_path);
     }
     
     Ok(())
@@ -285,5 +291,5 @@ fn main() -> Result<()> {
 struct ValidationResult {
     validation_type: String,
     errors: Vec<String>,
-    fixed: bool,
+    fixed: bool, // Kept for API compatibility but always false now
 }
