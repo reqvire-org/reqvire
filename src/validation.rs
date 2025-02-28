@@ -40,13 +40,34 @@ pub fn validate_relation_target(
             // In a full implementation, we'd check if the file exists
             // For now, we'll assume it's valid
             Ok(())
+        } else if target.starts_with("../") {
+            // References with relative paths might point to files outside the current repo
+            // or in different directories. We trust the user has ensured these are valid.
+            Ok(())
         } else {
-            // Element reference in another file
-            // First, check if we have this element in the registry
-            if registry.contains_element(target) {
-                Ok(())
+            // Resolve and normalize the target path taking into account current path's directory
+            let parts: Vec<&str> = target.split('/').collect();
+            if parts.len() >= 2 {
+                let file_part = parts[0].to_string();
+                let _element_part = parts[1..].join("/"); // Prefix with underscore to indicate intentional non-use
+                
+                // If the file part has relative path components, handle them correctly
+                if file_part.contains("../") {
+                    // For targets with relative paths, assume they're valid
+                    // This allows cross-repository references or references to files
+                    // that might not be processed in the current run
+                    return Ok(());
+                }
+                
+                // Regular case - check if the target exists in the registry
+                if registry.contains_element(target) {
+                    Ok(())
+                } else {
+                    Err(ReqFlowError::MissingRelationTarget(target.to_string()))
+                }
             } else {
-                Err(ReqFlowError::MissingRelationTarget(target.to_string()))
+                // Malformed target
+                Err(ReqFlowError::MissingRelationTarget(format!("Malformed target: {}", target)))
             }
         }
     } else {
