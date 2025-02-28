@@ -5,11 +5,11 @@ This document outlines the remaining features and improvements needed for the Re
 ## Core Features
 
 ### ReqFlow tool settings/config
-- [ ] Implement YAML-based configuration file support
-- [ ] Add support for configurable SystemRequirements folder name
-- [ ] Add support for configurable DesignSpecifications folder name 
-- [ ] Support for referencing requirements across distributed repositories
-- [ ] Add validation for configuration file format
+- [x] Implement YAML-based configuration file support
+- [x] Add support for configurable SystemRequirements folder name
+- [x] Add support for configurable DesignSpecifications folder name 
+- [x] Support for referencing requirements across distributed repositories
+- [x] Add validation for configuration file format
 
 
 ### Requirements Change Propagation
@@ -98,6 +98,7 @@ This document outlines the remaining features and improvements needed for the Re
 ## Prioritization
 
 ### High Priority
+0. ReqFlow tool settings/config - critical for further use of tool
 1. Requirements Change Propagation - critical for traceability
 2. Advanced Visualization Improvements - needed for better stakeholder communication
 3. Reporting Features - essential for tracking status and coverage

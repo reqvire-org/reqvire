@@ -16,6 +16,9 @@ mod tests;
 #[path = "tests/validation_tests.rs"]
 #[cfg(test)]
 mod validation_tests;
+#[path = "tests/config_tests.rs"]
+#[cfg(test)]
+mod config_tests;
 
 use model::ModelManager;
 
@@ -71,6 +74,12 @@ struct Args {
     /// Useful for CI/CD pipelines and automation
     #[clap(long)]
     json: bool,
+    
+    /// Path to a custom configuration file (YAML format)
+    /// If not provided, the system will look for reqflow.yml, reqflow.yaml, 
+    /// .reqflow.yml, or .reqflow.yaml in the current directory
+    #[clap(long, short = 'c')]
+    config: Option<PathBuf>,
 }
 
 fn main() -> Result<()> {
@@ -81,15 +90,66 @@ fn main() -> Result<()> {
     env_logger::init();
     let args = Args::parse();
 
-    // Create model manager that will load model data
-    let mut model_manager = ModelManager::new();
+    // Load configuration
+    let mut config = match &args.config {
+        Some(config_path) => {
+            match config::Config::from_file(config_path) {
+                Ok(cfg) => {
+                    println!("Loaded configuration from {:?}", config_path);
+                    cfg
+                },
+                Err(e) => {
+                    eprintln!("Error loading configuration from {:?}: {}", config_path, e);
+                    eprintln!("Using default configuration");
+                    config::Config::default()
+                }
+            }
+        },
+        None => {
+            config::Config::load()
+        }
+    };
+    
+    // Update config with command line arguments
+    if args.html {
+        config.general.html_output = true;
+    }
+    
+    if args.verbose {
+        config.general.verbose = true;
+    }
+    
+    if args.validate_markdown {
+        config.validation.validate_markdown = true;
+    }
+    
+    if args.validate_relations {
+        config.validation.validate_relations = true;
+    }
+    
+    if args.validate_all {
+        config.validation.validate_all = true;
+    }
+    
+    if args.fix {
+        config.validation.fix_automatically = true;
+    }
+    
+    if args.json {
+        config.validation.json_output = true;
+    }
+
+    // Create model manager with the configuration
+    let mut model_manager = ModelManager::new_with_config(config.clone());
     
     // Determine if we're in validation mode
-    let validation_mode = args.validate_markdown || args.validate_relations || args.validate_all;
+    let validation_mode = config.validation.validate_markdown || 
+                          config.validation.validate_relations || 
+                          config.validation.validate_all;
     
     if validation_mode {
         // Run in validation mode
-        if args.verbose {
+        if config.general.verbose {
             println!("Validating files in {:?}", args.input_folder);
         }
         
@@ -99,17 +159,17 @@ fn main() -> Result<()> {
         // Run the appropriate validations
         let mut exit_code = 0;
         
-        if args.validate_markdown || args.validate_all {
-            let markdown_errors = model_manager.validate_markdown_structure(args.fix)?;
+        if config.validation.validate_markdown || config.validation.validate_all {
+            let markdown_errors = model_manager.validate_markdown_structure(config.validation.fix_automatically)?;
             if !markdown_errors.is_empty() {
                 exit_code = 1;
                 
-                if args.json {
+                if config.validation.json_output {
                     // Output JSON for CI/CD integration
                     println!("{}", serde_json::to_string_pretty(&ValidationResult {
                         validation_type: "markdown".to_string(),
                         errors: markdown_errors.iter().map(|e| e.to_string()).collect(),
-                        fixed: args.fix,
+                        fixed: config.validation.fix_automatically,
                     })?);
                 } else {
                     // Human-readable output
@@ -118,22 +178,22 @@ fn main() -> Result<()> {
                         println!("  - {}", error);
                     }
                 }
-            } else if args.verbose || !args.json {
+            } else if config.general.verbose || !config.validation.json_output {
                 println!("✅ Markdown structure validation passed");
             }
         }
         
-        if args.validate_relations || args.validate_all {
-            let relation_errors = model_manager.validate_relations(args.fix)?;
+        if config.validation.validate_relations || config.validation.validate_all {
+            let relation_errors = model_manager.validate_relations(config.validation.fix_automatically)?;
             if !relation_errors.is_empty() {
                 exit_code = 1;
                 
-                if args.json {
+                if config.validation.json_output {
                     // Output JSON for CI/CD integration
                     println!("{}", serde_json::to_string_pretty(&ValidationResult {
                         validation_type: "relations".to_string(),
                         errors: relation_errors.iter().map(|e| e.to_string()).collect(),
-                        fixed: args.fix,
+                        fixed: config.validation.fix_automatically,
                     })?);
                 } else {
                     // Human-readable output
@@ -142,23 +202,25 @@ fn main() -> Result<()> {
                         println!("  - {}", error);
                     }
                 }
-            } else if args.verbose || !args.json {
+            } else if config.general.verbose || !config.validation.json_output {
                 println!("✅ Relations validation passed");
             }
         }
         
-        if args.validate_all {
+        if config.validation.validate_all {
             // Filesystem structure validation (directory layout, file naming, etc.)
-            let filesystem_errors = model_manager.validate_filesystem_structure(&args.input_folder, args.fix)?;
+            let filesystem_errors = model_manager.validate_filesystem_structure(&args.input_folder, 
+                                                               config.validation.fix_automatically,
+                                                               &config)?;
             if !filesystem_errors.is_empty() {
                 exit_code = 1;
                 
-                if args.json {
+                if config.validation.json_output {
                     // Output JSON for CI/CD integration
                     println!("{}", serde_json::to_string_pretty(&ValidationResult {
                         validation_type: "filesystem".to_string(),
                         errors: filesystem_errors.iter().map(|e| e.to_string()).collect(),
-                        fixed: args.fix,
+                        fixed: config.validation.fix_automatically,
                     })?);
                 } else {
                     // Human-readable output
@@ -167,21 +229,21 @@ fn main() -> Result<()> {
                         println!("  - {}", error);
                     }
                 }
-            } else if args.verbose || !args.json {
+            } else if config.general.verbose || !config.validation.json_output {
                 println!("✅ Filesystem structure validation passed");
             }
             
             // Cross-component dependency validation
-            let dependency_errors = model_manager.validate_cross_component_dependencies(args.fix)?;
+            let dependency_errors = model_manager.validate_cross_component_dependencies(config.validation.fix_automatically)?;
             if !dependency_errors.is_empty() {
                 exit_code = 1;
                 
-                if args.json {
+                if config.validation.json_output {
                     // Output JSON for CI/CD integration
                     println!("{}", serde_json::to_string_pretty(&ValidationResult {
                         validation_type: "dependencies".to_string(),
                         errors: dependency_errors.iter().map(|e| e.to_string()).collect(),
-                        fixed: args.fix,
+                        fixed: config.validation.fix_automatically,
                     })?);
                 } else {
                     // Human-readable output
@@ -190,7 +252,7 @@ fn main() -> Result<()> {
                         println!("  - {}", error);
                     }
                 }
-            } else if args.verbose || !args.json {
+            } else if config.general.verbose || !config.validation.json_output {
                 println!("✅ Cross-component dependency validation passed");
             }
         }
@@ -203,12 +265,14 @@ fn main() -> Result<()> {
         println!("All validations passed successfully!");
     } else {
         // Normal processing mode
-        if args.verbose {
+        if config.general.verbose {
             println!("Processing files from {:?} to {:?}", args.input_folder, args.output_folder.as_ref().unwrap());
         }
 
         // Process files normally
-        model_manager.process_files(&args.input_folder, args.output_folder.as_ref().unwrap(), args.html)?;
+        model_manager.process_files(&args.input_folder, 
+                                  args.output_folder.as_ref().unwrap(), 
+                                  config.general.html_output)?;
 
         println!("Files processed and saved to {:?}", args.output_folder.as_ref().unwrap());
     }

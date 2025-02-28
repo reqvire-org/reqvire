@@ -1,10 +1,165 @@
 use lazy_static::lazy_static;
 use regex::Regex;
+use std::fs;
+use std::path::{Path, PathBuf};
+use anyhow::Result;
+use log::{info, warn};
+use serde::{Deserialize, Serialize};
 
 /// Configuration settings for the ReqFlow application
-pub struct Config;
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct Config {
+    #[serde(default)]
+    pub general: GeneralConfig,
+    
+    #[serde(default)]
+    pub paths: PathsConfig,
+    
+    #[serde(default)]
+    pub style: StyleConfig,
+    
+    // These are needed for validation logic but not exposed in the config file
+    #[serde(skip_serializing, skip_deserializing)]
+    pub validation: ValidationConfig,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct GeneralConfig {
+    #[serde(default)]
+    pub html_output: bool,
+    pub verbose: bool,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct PathsConfig {
+    pub specifications_folder: String,
+    #[serde(alias = "system_requirements_folder_name")]
+    pub system_requirements_folder: String,
+    #[serde(alias = "design_specifications_folder_name")]
+    pub design_specifications_folder: String,
+    pub output_folder: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct StyleConfig {
+    pub theme: String,
+    pub max_width: usize,
+    pub custom_css: Option<String>,
+}
+
+// The following structs are kept for backwards compatibility
+// but are not exposed in the config file
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct ValidationConfig {
+    pub validate_markdown: bool,
+    pub validate_relations: bool,
+    pub validate_all: bool,
+    pub fix_automatically: bool,
+    pub json_output: bool,
+}
+
+impl Default for GeneralConfig {
+    fn default() -> Self {
+        Self {
+            html_output: false,
+            verbose: false,
+        }
+    }
+}
+
+impl Default for PathsConfig {
+    fn default() -> Self {
+        Self {
+            specifications_folder: "specifications".to_string(),
+            system_requirements_folder: "SystemRequirements".to_string(),
+            design_specifications_folder: "DesignSpecifications".to_string(),
+            output_folder: "output".to_string(),
+        }
+    }
+}
+
+impl Default for ValidationConfig {
+    fn default() -> Self {
+        Self {
+            validate_markdown: false,
+            validate_relations: false,
+            validate_all: false,
+            fix_automatically: false,
+            json_output: false,
+        }
+    }
+}
+
+impl Default for StyleConfig {
+    fn default() -> Self {
+        Self {
+            theme: "default".to_string(),
+            max_width: 1200,
+            custom_css: None,
+        }
+    }
+}
+
+impl Default for Config {
+    fn default() -> Self {
+        Self {
+            general: GeneralConfig::default(),
+            paths: PathsConfig::default(),
+            style: StyleConfig::default(),
+            validation: ValidationConfig::default(),
+        }
+    }
+}
 
 impl Config {
+    /// Get the full path for the system requirements directory
+    pub fn system_requirements_path(&self, base_path: &Path) -> PathBuf {
+        base_path.join(&self.paths.specifications_folder).join(&self.paths.system_requirements_folder)
+    }
+    
+    /// Get the full path for the design specifications directory
+    pub fn design_specifications_path(&self, base_path: &Path) -> PathBuf {
+        base_path.join(&self.paths.specifications_folder).join(&self.paths.design_specifications_folder)
+    }
+    
+    /// Load configuration from a YAML file
+    pub fn from_file(path: &Path) -> Result<Self> {
+        let content = fs::read_to_string(path)?;
+        let config: Config = serde_yml::from_str(&content)?;
+        Ok(config)
+    }
+    
+    /// Find and load the configuration file
+    pub fn load() -> Self {
+        let config_paths = [
+            "reqflow.yml",
+            "reqflow.yaml",
+            ".reqflow.yml",
+            ".reqflow.yaml",
+            ".config/reqflow.yml",
+            ".config/reqflow.yaml",
+        ];
+        
+        for path_str in &config_paths {
+            let path = Path::new(path_str);
+            if path.exists() {
+                match Self::from_file(path) {
+                    Ok(config) => {
+                        info!("Loaded configuration from {}", path_str);
+                        return config;
+                    },
+                    Err(e) => {
+                        warn!("Error loading configuration from {}: {}", path_str, e);
+                    }
+                }
+            }
+        }
+        
+        info!("No configuration file found, using defaults");
+        Self::default()
+    }
+    
     /// Regular expression to match element headers (level 3)
     pub fn element_regex() -> &'static Regex {
         lazy_static! {
