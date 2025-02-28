@@ -331,37 +331,48 @@ pub fn lint_directory_with_config(directory: &Path, dry_run: bool, config: &Conf
                 file_suggestions.extend(find_inconsistent_indentation(&content, file_path));
                 
                 // If not in dry-run mode, apply the fixes
-                if !dry_run {
+                if !dry_run && !file_suggestions.is_empty() {
+                    // Start with the original content
+                    let mut updated_content = content.clone();
+                    let mut content_changed = false;
+                    
+                    // Apply all fixes sequentially to the updated content
                     for suggestion in &file_suggestions {
                         match &suggestion.fix {
                             LintFix::ReplacePattern { pattern, replacement } => {
-                                // Create a new file content with the fix applied
-                                let new_content = content.replace(pattern, replacement);
+                                // Apply this fix to the current updated content
+                                let new_content = updated_content.replace(pattern, replacement);
                                 
-                                // Write the file back if content has changed
-                                if new_content != content {
-                                    fs::write(file_path, new_content)?;
+                                // Update the content if something was changed
+                                if new_content != updated_content {
+                                    updated_content = new_content;
+                                    content_changed = true;
                                 }
                             },
                             LintFix::ReplaceLine { line, new_content: new_line } => {
-                                // Split content into lines, replace the specified line, and join back
-                                let mut lines: Vec<&str> = content.lines().collect();
+                                // Split current content into lines, replace the specified line, and join back
+                                let mut lines: Vec<&str> = updated_content.lines().collect();
                                 if line < &lines.len() {
                                     lines[*line] = new_line;
-                                    let new_content = lines.join("\n");
-                                    fs::write(file_path, new_content)?;
+                                    updated_content = lines.join("\n");
+                                    content_changed = true;
                                 }
                             },
                             LintFix::InsertAt { line, content: insert_content } => {
-                                // Split content into lines, insert at the specified line, and join back
-                                let mut lines: Vec<&str> = content.lines().collect();
+                                // Split current content into lines, insert at the specified line, and join back
+                                let mut lines: Vec<&str> = updated_content.lines().collect();
                                 if line <= &lines.len() {
                                     lines.insert(*line, insert_content);
-                                    let new_content = lines.join("\n");
-                                    fs::write(file_path, new_content)?;
+                                    updated_content = lines.join("\n");
+                                    content_changed = true;
                                 }
                             },
                         }
+                    }
+                    
+                    // Write the file back only once, after all fixes have been applied
+                    if content_changed {
+                        fs::write(file_path, updated_content)?;
                     }
                 }
                 

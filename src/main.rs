@@ -294,11 +294,38 @@ fn main() -> Result<()> {
         }
         
         // Run the linting with the configuration
-        let lint_suggestions = linting::lint_directory_with_config(
-            &input_folder_path, 
-            config.linting.dry_run,
-            &config
-        )?;
+        // If not in dry-run mode, we might need multiple passes to fix everything
+        let mut lint_suggestions = Vec::new();
+        let mut iteration = 0;
+        let max_iterations = 5; // Prevent infinite loops
+        
+        loop {
+            let current_suggestions = linting::lint_directory_with_config(
+                &input_folder_path, 
+                config.linting.dry_run,
+                &config
+            )?;
+            
+            // If no more issues or in dry-run mode, we're done
+            if current_suggestions.is_empty() {
+                break;
+            }
+            
+            // Add to total suggestions found
+            lint_suggestions.extend(current_suggestions.clone());
+            
+            // If in dry-run mode, don't attempt multiple passes
+            if config.linting.dry_run {
+                break;
+            }
+            
+            // Check iteration count to prevent infinite loops
+            iteration += 1;
+            if iteration >= max_iterations {
+                println!("⚠️ Reached maximum lint iterations ({}). Some fixes might require manual adjustment.", max_iterations);
+                break;
+            }
+        }
         
         if lint_suggestions.is_empty() {
             println!("✅ No linting suggestions found. Your files are clean!");
