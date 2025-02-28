@@ -17,6 +17,32 @@ mod linting_tests {
         test_fixture_directory("test-lint-simple", fixtures_dir);
     }
     
+    /// Test that properly formatted documents with existing separators don't get duplicate separators
+    #[test]
+    fn test_no_duplicate_separators_in_linting() {
+        // Path to test fixtures
+        let fixtures_dir = Path::new("test-fixtures");
+        let fixture_path = fixtures_dir.join("test-duplicate-separators");
+        
+        // Skip if the fixture directory doesn't exist
+        if !fixture_path.exists() {
+            println!("Skipping non-existent fixture: {}", fixture_path.display());
+            return;
+        }
+        
+        // Run linter with the fixture
+        let suggestions = linting::lint_directory_with_config(
+            &fixture_path, 
+            true, // dry run
+            &Config::default()
+        ).expect("Failed to run linter on fixture");
+        
+        // Verify that linter found NO issues in a properly formatted document
+        assert!(suggestions.is_empty(), 
+                "Expected to find no issues in properly formatted document, but found {}", 
+                suggestions.len());
+    }
+    
     /// Helper function to test a specific fixture directory
     fn test_fixture_directory(fixture_name: &str, fixtures_dir: &Path) {
         let fixture_path = fixtures_dir.join(fixture_name);
