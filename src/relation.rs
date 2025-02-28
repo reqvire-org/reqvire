@@ -212,9 +212,12 @@ impl Relation {
     /// Validate that the relation type follows the required format
     #[allow(dead_code)]
     pub fn validate_type(&self) -> Result<(), ReqFlowError> {
+        // Normalize the type by trimming whitespace
+        let normalized_type = self.relation_type.trim();
+        
         // More relaxed validation: 
         // Relation type should be at least 2 characters and at most 80 characters
-        if self.relation_type.len() < 2 || self.relation_type.len() > 80 {
+        if normalized_type.len() < 2 || normalized_type.len() > 80 {
             return Err(ReqFlowError::InvalidRelationFormat(format!(
                 "Relation type '{}' must be between 2 and 80 characters",
                 self.relation_type
@@ -223,7 +226,7 @@ impl Relation {
         
         // Very basic check - allow any alphanumeric characters for relation types to be more permissive
         // This allows camelCase and other formats commonly used in ReqFlow
-        if !self.relation_type.chars().all(|c| c.is_alphanumeric()) {
+        if !normalized_type.chars().all(|c| c.is_alphanumeric()) {
             return Err(ReqFlowError::InvalidRelationFormat(format!(
                 "Relation type '{}' must contain only alphanumeric characters",
                 self.relation_type
