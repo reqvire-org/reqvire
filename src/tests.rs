@@ -5,6 +5,7 @@ mod tests {
     use assert_fs::TempDir;
     use predicates::prelude::*;
     
+    use crate::config::Config;
     use crate::element::{Element, ElementRegistry};
     use crate::relation::Relation;
     use crate::markdown;
@@ -132,7 +133,7 @@ This is requirement 2.
             .unwrap();
         
         // Process the files
-        let mut model_manager = ModelManager::new();
+        let mut model_manager = ModelManager::new_with_config(Config::default());
         model_manager
             .process_files(
                 input_dir.path(),

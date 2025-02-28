@@ -5,6 +5,7 @@ use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use walkdir::WalkDir;
 
+use crate::config::Config;
 use crate::element::{self, ElementRegistry};
 use crate::error::ReqFlowError;
 use crate::html;
@@ -13,21 +14,45 @@ use crate::utils;
 use crate::validation;
 
 /// Manages the MBSE model
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct ModelManager {
     /// Registry of all elements in the model
     element_registry: ElementRegistry,
     
     /// Cache of file contents for validation and processing
     file_contents: HashMap<String, String>,
+    
+    /// Configuration settings
+    config: Config,
+}
+
+impl Default for ModelManager {
+    fn default() -> Self {
+        Self {
+            element_registry: ElementRegistry::new(),
+            file_contents: HashMap::new(),
+            config: Config::default(),
+        }
+    }
 }
 
 impl ModelManager {
-    /// Create a new model manager
+    /// Create a new model manager with default configuration
+    #[allow(dead_code)]
     pub fn new() -> Self {
         Self {
             element_registry: ElementRegistry::new(),
             file_contents: HashMap::new(),
+            config: Config::default(),
+        }
+    }
+    
+    /// Create a new model manager with a provided configuration
+    pub fn new_with_config(config: Config) -> Self {
+        Self {
+            element_registry: ElementRegistry::new(),
+            file_contents: HashMap::new(),
+            config,
         }
     }
     
@@ -40,6 +65,11 @@ impl ModelManager {
     ) -> Result<(), ReqFlowError> {
         info!("Processing files from {:?} to {:?}", input_folder, output_folder);
         
+        // Update HTML output setting in config if specified
+        if convert_to_html {
+            self.config.general.html_output = true;
+        }
+        
         // Create the output folder if it doesn't exist
         utils::create_dir_all(output_folder)?;
         
@@ -51,11 +81,11 @@ impl ModelManager {
         self.validate_model()?;
         
         // Second pass: process files
-        self.process_markdown_files(input_folder, output_folder, convert_to_html)?;
+        self.process_markdown_files(input_folder, output_folder, self.config.general.html_output)?;
         
         // Generate traceability matrix
         info!("Generating traceability matrix...");
-        self.generate_traceability_matrix(output_folder, convert_to_html)?;
+        self.generate_traceability_matrix(output_folder, self.config.general.html_output)?;
         
         Ok(())
     }
@@ -358,39 +388,52 @@ impl ModelManager {
     /// - Proper file organization
     /// Returns a list of validation errors
     /// If fix=true, attempts to fix common issues automatically
-    pub fn validate_filesystem_structure(&self, input_folder: &Path, _fix: bool) -> Result<Vec<ReqFlowError>, ReqFlowError> {
+    pub fn validate_filesystem_structure(&self, input_folder: &Path, _fix: bool, config: &Config) -> Result<Vec<ReqFlowError>, ReqFlowError> {
         info!("Validating filesystem structure in {:?}", input_folder);
         
         let mut errors = Vec::new();
         
-        // Check required directories according to ReqFlow methodology
-        let required_dirs = vec![
-            "specifications",
-            "specifications/DesignSpecifications",
-            "specifications/SystemRequirements",
+        // Get configuration values for folders
+        let specs_folder = &config.paths.specifications_folder;
+        let system_reqs_folder = &config.paths.system_requirements_folder; // Used below
+        
+        // Get paths from config using helper methods
+        let specs_dir_path = input_folder.join(specs_folder);
+        let system_reqs_dir_path = config.system_requirements_path(input_folder);
+        let design_specs_dir_path = config.design_specifications_path(input_folder);
+        
+        // Required directories
+        let required_dir_paths = vec![
+            specs_dir_path.clone(),
+            system_reqs_dir_path.clone(),
+            design_specs_dir_path.clone(),
         ];
         
-        for dir in &required_dirs {
-            let dir_path = input_folder.join(dir);
+        // Check required directories
+        for dir_path in &required_dir_paths {
             if !dir_path.exists() || !dir_path.is_dir() {
                 errors.push(ReqFlowError::ValidationError(
-                    format!("Required directory '{}' is missing", dir)
+                    format!("Required directory '{}' is missing", dir_path.display())
                 ));
             }
         }
         
+        // Construct required files paths
+        let root_readme_path = input_folder.join("README.md");
+        let specs_readme_path = specs_dir_path.join("README.md");
+        let system_reqs_file_path = system_reqs_dir_path.with_extension("md");
+        
         // Check required files
-        let required_files = vec![
-            "README.md",
-            "specifications/README.md",
-            "specifications/SystemRequirements.md",
+        let required_file_paths = vec![
+            root_readme_path.clone(),
+            specs_readme_path.clone(),
+            system_reqs_file_path.clone(),
         ];
         
-        for file in &required_files {
-            let file_path = input_folder.join(file);
+        for file_path in &required_file_paths {
             if !file_path.exists() || !file_path.is_file() {
                 errors.push(ReqFlowError::ValidationError(
-                    format!("Required file '{}' is missing", file)
+                    format!("Required file '{}' is missing", file_path.display())
                 ));
             }
         }
@@ -402,16 +445,19 @@ impl ModelManager {
                 let file_name = path.file_name().unwrap().to_string_lossy();
                 
                 // Check if requirements files are in the right directories
-                if file_name.contains("Requirements") && !path.to_string_lossy().contains("Requirements") {
-                    errors.push(ReqFlowError::ValidationError(
-                        format!("Requirements file '{}' is not in a Requirements directory", path.display())
-                    ));
+                if file_name.contains("Requirements") && !path.starts_with(&system_reqs_dir_path) {
+                    // Don't flag the main SystemRequirements.md file
+                    if !file_name.contains(system_reqs_folder) {
+                        errors.push(ReqFlowError::ValidationError(
+                            format!("Requirements file '{}' is not in the System Requirements directory", path.display())
+                        ));
+                    }
                 }
                 
                 // Check if design specs are in the right directories
-                if file_name.contains("DSD_") && !path.to_string_lossy().contains("DesignSpecifications") {
+                if file_name.contains("DSD_") && !path.starts_with(&design_specs_dir_path) {
                     errors.push(ReqFlowError::ValidationError(
-                        format!("Design specification file '{}' is not in the DesignSpecifications directory", path.display())
+                        format!("Design specification file '{}' is not in the Design Specifications directory", path.display())
                     ));
                 }
             }
@@ -446,11 +492,14 @@ impl ModelManager {
             self.check_circular_dependencies(element, &mut visited, &mut path, &mut errors);
         }
         
+        // Get system requirements folder name from config
+        let system_reqs_folder = &self.config.paths.system_requirements_folder;
+        
         // Check for incomplete dependency chains (e.g., missing derivedFrom relations)
         // For example, system requirements should have derivedFrom relations to user requirements
         for element in self.element_registry.all_elements() {
             // Check for system requirements without derivedFrom relations
-            if element.file_path.contains("SystemRequirements") && 
+            if element.file_path.contains(system_reqs_folder) && 
                !element.relations.iter().any(|r| r.relation_type == "derivedFrom") {
                 errors.push(ReqFlowError::ValidationError(
                     format!("System requirement '{}' has no 'derivedFrom' relation", element.name)
