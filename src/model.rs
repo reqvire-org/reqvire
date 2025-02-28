@@ -579,7 +579,8 @@ impl ModelManager {
             if element.file_path.contains(system_reqs_folder) && 
                !element.relations.iter().any(|r| r.relation_type == "derivedFrom") {
                 errors.push(ReqFlowError::ValidationError(
-                    format!("System requirement '{}' has no 'derivedFrom' relation", element.name)
+                    format!("System requirement '{}' has no 'derivedFrom' relation (in file '{}')", 
+                           element.name, element.file_path)
                 ));
             }
             
@@ -587,7 +588,8 @@ impl ModelManager {
             if element.file_path.contains("Verifications") && 
                !element.relations.iter().any(|r| r.relation_type == "verifiedBy") {
                 errors.push(ReqFlowError::ValidationError(
-                    format!("Verification element '{}' has no 'verifiedBy' relation", element.name)
+                    format!("Verification element '{}' has no 'verifiedBy' relation (in file '{}')", 
+                           element.name, element.file_path)
                 ));
             }
         }
@@ -624,7 +626,8 @@ impl ModelManager {
             cycle.push(element_id.clone());
             
             errors.push(ReqFlowError::ValidationError(
-                format!("Circular dependency detected: {}", cycle.join(" -> "))
+                format!("Circular dependency detected: {} (in file '{}', element '{}')", 
+                       cycle.join(" -> "), element.file_path, element.name)
             ));
             return;
         }
