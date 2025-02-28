@@ -6,6 +6,7 @@ mod config;
 mod element;
 mod error;
 mod html;
+mod linting;
 mod markdown;
 mod model;
 mod relation;
@@ -68,8 +69,13 @@ struct Args {
     validate_all: bool,
     
     /// Enable linting to find potential improvements (non-blocking)
+    /// By default, fixes will be applied automatically
     #[clap(long)]
     lint: bool,
+    
+    /// When linting, only show suggestions without applying fixes
+    #[clap(long, requires = "lint")]
+    dry_run: bool,
     
     /// Output validation results in JSON format
     /// Useful for CI/CD pipelines and automation
@@ -134,6 +140,7 @@ fn main() -> Result<()> {
     
     if args.lint {
         config.linting.lint = true;
+        config.linting.dry_run = args.dry_run;
     }
     
     if args.json {
@@ -154,6 +161,9 @@ fn main() -> Result<()> {
     let validation_mode = config.validation.validate_markdown || 
                           config.validation.validate_relations || 
                           config.validation.validate_all;
+                          
+    // Determine if we're in linting mode
+    let linting_mode = config.linting.lint;
     
     if validation_mode {
         // Run in validation mode
@@ -269,6 +279,31 @@ fn main() -> Result<()> {
         }
         
         println!("All validations passed successfully!");
+    } else if linting_mode {
+        // Run in linting mode
+        if config.general.verbose {
+            println!("Linting files in {:?}{}", input_folder_path, 
+                    if config.linting.dry_run { " (dry run)" } else { "" });
+        }
+        
+        // Run the linting
+        let lint_suggestions = linting::lint_directory(&input_folder_path, config.linting.dry_run)?;
+        
+        if lint_suggestions.is_empty() {
+            println!("✅ No linting suggestions found. Your files are clean!");
+        } else {
+            println!("ℹ️ Found {} linting suggestions:", lint_suggestions.len());
+            
+            for suggestion in &lint_suggestions {
+                println!("  - {}", suggestion.format());
+            }
+            
+            if config.linting.dry_run {
+                println!("\nRun without --dry-run to apply these fixes automatically");
+            } else {
+                println!("\n✅ All suggestions have been applied");
+            }
+        }
     } else {
         // Normal processing mode
         if config.general.verbose {

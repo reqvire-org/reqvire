@@ -97,7 +97,7 @@ Content of the second duplicate.
 ## Identifiers
 
 The **identifier** is represented as a path following a filename with extension (eg file.md) and optionally an **element** name.
-Identifier path if starting with '/' is considered starting from a documentation 'root' folder.
+Identifier path if starting with '/' is considered starting from a 'specification' folder.
 If path doesn't not start with the '/', it is considered **relative** to a path of the document itself.
 
 
@@ -107,7 +107,7 @@ Each **identifier** must uniquely reference either:
 
 
 Examples of Identifiers:
-  - When documentation **root** folder is : `/path/to/project`
+  - When **specifications** root folder is : `/path/to/project`
   - And a file path: `/path/to/project/documents/File1.md`
   - Identifiers in the document would resolve to:
     - 'File2.md' -> path/to/project/documents/File2.md'

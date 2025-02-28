@@ -1,0 +1,25 @@
+# ReqFlow Test Configuration
+
+general:
+  # Enable verbose output
+  verbose: false
+
+paths:
+  # Path to the specifications folder - using current directory
+  specifications_folder: "specifications"
+  
+  # Folder name for system requirements 
+  system_requirements_folder_name: "SystemRequirements"
+  
+  # Folder name for design specifications 
+  design_specifications_folder_name: "DesignSpecifications"
+  
+  # Default output folder
+  output_folder: "output"
+
+style:
+  # Theme for HTML output (default, dark, light)
+  theme: "default"
+  
+  # Maximum width for HTML output
+  max_width: 1200

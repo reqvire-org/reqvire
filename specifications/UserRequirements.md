@@ -138,6 +138,15 @@ The system shall provide a linting command that by default automatically applies
   * containedBy: Model Linting
 
 
+### Linting Command Output
+
+The system shall display linting changes suggestion in simular manner as git diffs.
+
+
+#### Relations
+  * refine: Linting Command Behavior
+
+
 ### Replace Absolute Links with Relative Links
 
 The system shall replace absolute links with relative links, where applicable and contextually appropriate, to conform to repository standards and enhance portability.
@@ -152,10 +161,10 @@ The system shall replace absolute links with relative links, where applicable an
 The system shall provide linting capability to ensure consistent formatting in specification documents.
 
 #### Details
-1. Trimming excess whitespace after element names and relation identifiers
-2. Normalizing to exactly two newlines before subsections (e.g., "#### Details")
-3. Automatically inserting separator lines ("---") between elements if not already present
-4. Ensuring consistent indentation in relation lists
+  * Trimming excess whitespace after element names and relation identifiers
+  * Normalizing to exactly two newlines before subsections (e.g., "#### Details")
+  * Automatically inserting separator lines ("---") between elements if not already present
+  * Ensuring consistent indentation in relation lists
 
 #### Relations
   * containedBy: Model Linting

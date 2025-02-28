@@ -1,0 +1,28 @@
+# ReqFlow Configuration
+
+general:
+  # Enable verbose output
+  verbose: false
+
+paths:
+  # Path to the specifications folder
+  specifications_folder: "../graphenedb/sources/red/specifications/"
+  
+  # Folder name for system requirements 
+  system_requirements_folder_name: "SystemRequirements"
+  
+  # Folder name for design specifications 
+  design_specifications_folder_name: "DesignSpecifications"
+  
+  # Default output folder
+  output_folder: "output"
+
+style:
+  # Theme for HTML output (default, dark, light)
+  theme: "default"
+  
+  # Maximum width for HTML output
+  max_width: 1200
+  
+  # Optional path to custom CSS file
+  # custom_css: "path/to/custom.css"

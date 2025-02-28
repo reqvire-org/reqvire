@@ -20,8 +20,11 @@ mod config_tests {
         assert_eq!(config.validation.validate_markdown, false);
         assert_eq!(config.validation.validate_relations, false);
         assert_eq!(config.validation.validate_all, false);
-        assert_eq!(config.validation.fix_automatically, false);
         assert_eq!(config.validation.json_output, false);
+        
+        // Verify linting defaults
+        assert_eq!(config.linting.lint, false);
+        assert_eq!(config.linting.dry_run, false);
         
         // Verify style defaults
         assert_eq!(config.style.theme, "default");
