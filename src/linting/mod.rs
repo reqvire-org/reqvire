@@ -265,52 +265,30 @@ pub fn lint_directory_with_config(directory: &Path, dry_run: bool, config: &Conf
                 return false;
             }
             
-            // If requirements_only is true, only include files that appear to be requirements documents
+            // If requirements_only is true, only include files that match the requirements filename pattern
+            // or are in the SystemRequirements folder
             if config.linting.requirements_only {
                 // Check if filename contains "Requirements" or the file is in a requirements directory
                 let path_str = path.to_string_lossy().to_lowercase();
                 let filename = path.file_name().unwrap_or_default().to_string_lossy().to_lowercase();
                 let req_pattern = config.paths.requirements_filename_match.to_lowercase();
                 
-                // File with "notreq" or "not_req" in the name should be excluded
-                if filename.contains("notreq") || filename.contains("not_req") || filename.contains("not-req") {
-                    return false;
-                }
-                
-                // Check different criteria for a requirements file
+                // Check criteria for a requirements file:
+                // 1. Filename contains the requirements pattern (e.g., "Requirements")
                 let is_req_filename = filename.contains(&req_pattern);
+                
+                // 2. File is in the system requirements folder or any folder containing the requirements pattern
                 let is_in_req_directory = path_str.contains(&format!("/{}/", config.paths.system_requirements_folder.to_lowercase())) ||
-                                         path_str.contains(&format!("/{}/", req_pattern.to_lowercase()));
+                                        path_str.contains(&format!("/{}/", req_pattern.to_lowercase()));
                 
-                // If the directories or filenames match, it's definitely a requirements file
-                if is_req_filename || is_in_req_directory {
-                    if config.general.verbose {
-                        println!("DEBUG: File {} identified as requirements document by name/path", path.display());
-                    }
-                    return true;
+                // If filename or directory match, it's a requirements file
+                let is_requirements_file = is_req_filename || is_in_req_directory;
+                
+                if is_requirements_file && config.general.verbose {
+                    println!("DEBUG: File {} identified as requirements document", path.display());
                 }
                 
-                // If still not identified, check file content as a last resort
-                if let Ok(content) = std::fs::read_to_string(path) {
-                    // Requirements files must have both elements and Relations sections
-                    let has_elements = content.contains("### ");
-                    let has_relations = content.contains("#### Relations");
-                    
-                    // And ideally contain some key phrases that indicate it's a requirements document
-                    let has_req_keywords = content.to_lowercase().contains("requirement") || 
-                                          content.to_lowercase().contains("specification");
-                    
-                    // The most strict check is to require all three conditions
-                    let is_requirements_file = has_elements && has_relations && has_req_keywords;
-                    
-                    if is_requirements_file && config.general.verbose {
-                        println!("DEBUG: File {} identified as requirements document by content", path.display());
-                    }
-                    
-                    is_requirements_file
-                } else {
-                    false
-                }
+                is_requirements_file
             } else {
                 // If not requirements_only, include all markdown files
                 true

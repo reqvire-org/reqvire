@@ -351,23 +351,8 @@ fn main() -> Result<()> {
                     false
                 };
                 
-                // For more precise identification, also look at file content
-                let file_content_type = if let Ok(content) = std::fs::read_to_string(path) {
-                    // Requirements files typically have both elements and Relations sections
-                    let has_elements = content.contains("### ");
-                    let has_relations = content.contains("#### Relations");
-                    
-                    if has_elements && has_relations {
-                        true // It has the structure of a requirements document
-                    } else {
-                        false
-                    }
-                } else {
-                    false
-                };
-                
                 // Add a tag to indicate if this is a requirements file
-                let file_type_tag = if is_requirements_file || file_content_type {
+                let file_type_tag = if is_requirements_file {
                     "[requirement document]"
                 } else {
                     "[other document]" 
