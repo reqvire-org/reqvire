@@ -116,6 +116,10 @@ The system shall suggest code refactoring opportunities to better align with the
 
 ### Linting the specifications
 
+The system shall provide comprehensive validation messages that include file paths and line numbers when available, to help users quickly locate and fix issues in their MBSE specifications.
+
+#### Relations
+  * refine: UserStories.md/Validating Structures
 
 
 
