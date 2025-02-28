@@ -1,7 +1,6 @@
 #[cfg(test)]
 mod config_tests {
     use std::fs;
-    use std::path::Path;
     use tempfile::tempdir;
     use crate::config::Config;
 
@@ -77,29 +76,6 @@ style:
         assert_eq!(config.validation.validate_markdown, false);
     }
     
-    #[test]
-    fn test_system_requirements_path() {
-        let mut config = Config::default();
-        config.paths.specifications_folder = "docs".to_string();
-        config.paths.system_requirements_folder = "SysReqs".to_string();
-        
-        let base_path = Path::new("/project");
-        let sys_reqs_path = config.system_requirements_path(base_path);
-        
-        assert_eq!(sys_reqs_path, Path::new("/project/docs/SysReqs"));
-    }
-    
-    #[test]
-    fn test_design_specifications_path() {
-        let mut config = Config::default();
-        config.paths.specifications_folder = "docs".to_string();
-        config.paths.design_specifications_folder = "Design".to_string();
-        
-        let base_path = Path::new("/project");
-        let design_specs_path = config.design_specifications_path(base_path);
-        
-        assert_eq!(design_specs_path, Path::new("/project/docs/Design"));
-    }
     
     #[test]
     fn test_user_requirements_detection() {

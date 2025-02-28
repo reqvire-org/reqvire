@@ -1,7 +1,7 @@
 use lazy_static::lazy_static;
 use regex::Regex;
 use std::fs;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use anyhow::Result;
 use log::{info, warn};
 use serde::{Deserialize, Serialize};
@@ -121,23 +121,6 @@ impl Default for Config {
 }
 
 impl Config {
-    /// Get the full path for the system requirements directory
-    /// Note: This is deprecated in favor of direct path construction
-    pub fn system_requirements_path(&self, base_path: &Path) -> PathBuf {
-        // First, construct the specs directory path
-        let specs_dir = base_path.join(&self.paths.specifications_folder);
-        // Then, join the system requirements folder to that
-        specs_dir.join(&self.paths.system_requirements_folder)
-    }
-    
-    /// Get the full path for the design specifications directory
-    /// Note: This is deprecated in favor of direct path construction  
-    pub fn design_specifications_path(&self, base_path: &Path) -> PathBuf {
-        // First, construct the specs directory path
-        let specs_dir = base_path.join(&self.paths.specifications_folder);
-        // Then, join the design specs folder to that
-        specs_dir.join(&self.paths.design_specifications_folder)
-    }
     
     /// Load configuration from a YAML file
     pub fn from_file(path: &Path) -> Result<Self> {
