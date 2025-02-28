@@ -575,13 +575,21 @@ impl ModelManager {
         // Check for incomplete dependency chains (e.g., missing derivedFrom relations)
         // For example, system requirements should have derivedFrom relations to user requirements
         for element in self.element_registry.all_elements() {
-            // Check for system requirements without derivedFrom relations
-            if element.file_path.contains(system_reqs_folder) && 
-               !element.relations.iter().any(|r| r.relation_type == "derivedFrom") {
-                errors.push(ReqFlowError::ValidationError(
-                    format!("System requirement '{}' has no 'derivedFrom' relation (in file '{}')", 
-                           element.name, element.file_path)
-                ));
+            // Check for system requirements without any parent relation
+            // System requirements must have at least one relation that points to a parent requirement
+            if element.file_path.contains(system_reqs_folder) {
+                // List of valid parent-child relationship types
+                let valid_parent_relations = ["derivedFrom", "tracedFrom", "refine"];
+                
+                // Check if the element has at least one valid parent relation
+                let has_parent_relation = element.relations.iter().any(|r| valid_parent_relations.contains(&r.relation_type.as_str()));
+                
+                if !has_parent_relation {
+                    errors.push(ReqFlowError::ValidationError(
+                        format!("System requirement '{}' has no parent requirement relation (needs 'derivedFrom', 'tracedFrom', or 'refine') (in file '{}')", 
+                               element.name, element.file_path)
+                    ));
+                }
             }
             
             // Check for verification elements without verifiedBy relations
