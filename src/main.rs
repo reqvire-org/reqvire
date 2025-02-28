@@ -447,15 +447,23 @@ fn main() -> Result<()> {
     } else {
         // Normal processing mode
         if config.general.verbose {
-            println!("Processing files from {:?} to {:?}", input_folder_path, output_folder_path);
+            if config.general.html_output {
+                println!("Converting all markdown files from {:?} to HTML in {:?}", input_folder_path, output_folder_path);
+            } else {
+                println!("Processing requirements files from {:?} to {:?}", input_folder_path, output_folder_path);
+            }
         }
 
-        // Process files normally (traceability matrix is no longer generated automatically)
+        // Process files - in HTML mode all markdown files in all subfolders are converted
         model_manager.process_files(&input_folder_path, 
                                   &output_folder_path, 
                                   config.general.html_output)?;
 
-        println!("Files processed and saved to {:?}", output_folder_path);
+        if config.general.html_output {
+            println!("All markdown files converted to HTML and saved to {:?}", output_folder_path);
+        } else {
+            println!("Requirements files processed and saved to {:?}", output_folder_path);
+        }
     }
     
     Ok(())

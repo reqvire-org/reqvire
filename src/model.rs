@@ -817,75 +817,45 @@ impl ModelManager {
     ) -> Result<(), ReqFlowError> {
         info!("Processing markdown files");
         
-        // First, gather all primary requirements files and design specifications
-        let mut requirements_files: Vec<PathBuf> = WalkDir::new(input_folder)
-            .into_iter()
-            .filter_map(|e| e.ok())
-            .filter(|e| {
-                let file_path = e.path();
-                
-                if !file_path.is_file() || file_path.extension().map_or(true, |ext| ext != "md") {
-                    return false;
-                }
-                
-                // Use the new path-based detection that respects configuration
-                utils::is_requirements_file_by_path(file_path, &self.config, input_folder)
-            })
-            .map(|e| e.path().to_path_buf())
-            .collect();
-            
-        // Next, if HTML output is requested, find all referenced files through relations
-        if convert_to_html {
-            // Build a set of all referenced files from relations
-            let mut referenced_files = std::collections::HashSet::new();
-            
-            // README.md files are processed if they exist but are not required
-            
-            // Analyze all relations in the elements to find referenced files
-            for element in self.element_registry.all_elements() {
-                for relation in &element.relations {
-                    let target = &relation.target;
-                    
-                    // Check if the target references a file
-                    if target.contains('/') {
-                        let parts: Vec<&str> = target.split('/').collect();
-                        if parts.len() >= 1 {
-                            // Extract the file part
-                            let mut file_part = parts[0].to_string();
-                            
-                            // Add .md extension if needed
-                            if !file_part.ends_with(".md") {
-                                file_part = format!("{}.md", file_part);
-                            }
-                            
-                            // Add the file to our set of referenced files
-                            let referenced_path = input_folder.join(&file_part);
-                            if referenced_path.exists() {
-                                referenced_files.insert(referenced_path);
-                            } else {
-                                // Try looking in subdirectories
-                                for entry in WalkDir::new(input_folder).into_iter().filter_map(|e| e.ok()) {
-                                    if entry.path().is_file() && 
-                                       entry.path().file_name().map_or(false, |name| name.to_string_lossy() == file_part) {
-                                        referenced_files.insert(entry.path().to_path_buf());
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            
-            // Add all referenced files to our processing list, if they aren't already included
-            for file_path in referenced_files {
-                if !requirements_files.contains(&file_path) {
-                    requirements_files.push(file_path);
-                }
-            }
-        }
+        // Collect files to process based on mode
+        let files: Vec<PathBuf>;
         
-        let files = requirements_files;
+        if convert_to_html {
+            // For HTML conversion, get ALL markdown files in the input folder and its subfolders
+            info!("HTML mode: Processing all markdown files in all subfolders");
+            files = WalkDir::new(input_folder)
+                .into_iter()
+                .filter_map(|e| e.ok())
+                .filter(|e| {
+                    let file_path = e.path();
+                    file_path.is_file() && file_path.extension().map_or(false, |ext| ext == "md")
+                })
+                .map(|e| e.path().to_path_buf())
+                .collect();
+                
+            info!("Found {} markdown files to convert to HTML", files.len());
+        } else {
+            // Regular mode: Process only requirements files
+            info!("Regular mode: Processing only requirements files");
+            // First, gather all primary requirements files and design specifications
+            files = WalkDir::new(input_folder)
+                .into_iter()
+                .filter_map(|e| e.ok())
+                .filter(|e| {
+                    let file_path = e.path();
+                    
+                    if !file_path.is_file() || file_path.extension().map_or(true, |ext| ext != "md") {
+                        return false;
+                    }
+                    
+                    // Use the path-based detection that respects configuration
+                    utils::is_requirements_file_by_path(file_path, &self.config, input_folder)
+                })
+                .map(|e| e.path().to_path_buf())
+                .collect();
+                
+            info!("Found {} requirements files to process", files.len());
+        }
         
         // Process files in parallel
         files.par_iter().try_for_each(|file_path| {
