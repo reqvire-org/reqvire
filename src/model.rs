@@ -466,24 +466,7 @@ impl ModelManager {
             }
         }
         
-        // Check for required files, but only if their parent directories exist
-        // Root README is always required
-        let root_readme_path = input_folder.join("README.md");
-        if !root_readme_path.exists() || !root_readme_path.is_file() {
-            errors.push(ReqFlowError::ValidationError(
-                format!("Required README file '{}' is missing", root_readme_path.display())
-            ));
-        }
-        
-        // Check specs README if the specs directory exists
-        if specs_dir_path.exists() && specs_dir_path.is_dir() {
-            let specs_readme_path = specs_dir_path.join("README.md");
-            if !specs_readme_path.exists() || !specs_readme_path.is_file() {
-                errors.push(ReqFlowError::ValidationError(
-                    format!("Required specifications README file '{}' is missing", specs_readme_path.display())
-                ));
-            }
-        }
+        // No README validation - README files are optional
         
         // Check SystemRequirements.md file if the system reqs directory exists
         if system_reqs_dir_path.exists() && system_reqs_dir_path.is_dir() {
@@ -696,12 +679,7 @@ impl ModelManager {
             // Build a set of all referenced files from relations
             let mut referenced_files = std::collections::HashSet::new();
             
-            // Add core files needed for the system (README.md, etc)
-            for entry in WalkDir::new(input_folder).into_iter().filter_map(|e| e.ok()) {
-                if entry.path().is_file() && entry.file_name().to_string_lossy() == "README.md" {
-                    referenced_files.insert(entry.path().to_path_buf());
-                }
-            }
+            // README.md files are processed if they exist but are not required
             
             // Analyze all relations in the elements to find referenced files
             for element in self.element_registry.all_elements() {
