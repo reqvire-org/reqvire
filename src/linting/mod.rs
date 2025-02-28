@@ -265,29 +265,46 @@ pub fn lint_directory_with_config(directory: &Path, dry_run: bool, config: &Conf
                 return false;
             }
             
-            // Only include files that match the requirements filename pattern
-            // or are in the SystemRequirements folder
-                // Check if filename contains "Requirements" or the file is in a requirements directory
-                let path_str = path.to_string_lossy().to_lowercase();
-                let filename = path.file_name().unwrap_or_default().to_string_lossy().to_lowercase();
-                let req_pattern = config.paths.requirements_filename_match.to_lowercase();
-                
-                // Check criteria for a requirements file:
-                // 1. Filename contains the requirements pattern (e.g., "Requirements")
-                let is_req_filename = filename.contains(&req_pattern);
-                
-                // 2. File is in the system requirements folder or any folder containing the requirements pattern
-                let is_in_req_directory = path_str.contains(&format!("/{}/", config.paths.system_requirements_folder.to_lowercase())) ||
-                                        path_str.contains(&format!("/{}/", req_pattern.to_lowercase()));
-                
-                // If filename or directory match, it's a requirements file
-                let is_requirements_file = is_req_filename || is_in_req_directory;
-                
-                if is_requirements_file && config.general.verbose {
-                    println!("DEBUG: File {} identified as requirements document", path.display());
-                }
-                
-                is_requirements_file
+            // Only include files that are requirements documents
+            let path_str = path.to_string_lossy().to_lowercase();
+            let filename = path.file_name().unwrap_or_default().to_string_lossy().to_lowercase();
+            let req_pattern = config.paths.requirements_filename_match.to_lowercase();
+            let sys_req_folder = config.paths.system_requirements_folder.to_lowercase();
+            
+            // File must match the requirements filename pattern
+            let matches_req_pattern = filename.contains(&req_pattern);
+            
+            // Due to configuration variations, we need to look at the path differently:
+            // - Either the path is at the root of the input directory
+            // - Or it's in a SystemRequirements folder (regardless of where that is)
+            
+            // Determine if this file is at the root level of the directory we're processing
+            let input_dir = directory.to_string_lossy().to_lowercase();
+            let path_without_input = path_str.strip_prefix(&input_dir)
+                .unwrap_or(&path_str)
+                .trim_start_matches('/');
+            
+            // Check if file is directly in the root, not in a subfolder
+            let in_spec_root = !path_without_input.contains('/');
+            
+            // Determine if file is in SystemRequirements folder or subfolder
+            let is_in_sys_req_dir = path_str.contains(&format!("/{}/", sys_req_folder));
+            
+            // Final check: 
+            // 1. If file is in specifications root, it must match requirements pattern
+            let is_req_file_in_spec_root = in_spec_root && matches_req_pattern;
+            
+            // 2. If file is in SystemRequirements folder, it must match requirements pattern
+            let is_req_file_in_sys_req_dir = is_in_sys_req_dir && matches_req_pattern;
+            
+            // A requirements file matches either condition
+            let is_requirements_file = is_req_file_in_spec_root || is_req_file_in_sys_req_dir;
+            
+            if is_requirements_file && config.general.verbose {
+                println!("DEBUG: File {} identified as requirements document", path.display());
+            }
+            
+            is_requirements_file
         }) 
     {
         let file_path = entry.path();
