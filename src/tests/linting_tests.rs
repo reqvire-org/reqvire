@@ -1,9 +1,47 @@
 #[cfg(test)]
 mod linting_tests {
     use std::fs;
-    use std::path::PathBuf;
+    use std::path::Path;
     use tempfile::tempdir;
     use crate::linting;
+    use crate::config::Config;
+    
+    /// Test lint directory with fixtures from test-fixtures directory
+    #[test]
+    fn test_lint_directory_with_fixtures() {
+        // Path to test fixtures
+        let fixtures_dir = Path::new("test-fixtures");
+        
+        // Test different fixture directories
+        test_fixture_directory("test-lint-headers", fixtures_dir);
+        test_fixture_directory("test-lint-simple", fixtures_dir);
+    }
+    
+    /// Helper function to test a specific fixture directory
+    fn test_fixture_directory(fixture_name: &str, fixtures_dir: &Path) {
+        let fixture_path = fixtures_dir.join(fixture_name);
+        println!("Testing fixture directory: {}", fixture_path.display());
+        
+        // Skip if the fixture directory doesn't exist
+        if !fixture_path.exists() {
+            println!("Skipping non-existent fixture: {}", fixture_path.display());
+            return;
+        }
+        
+        // Run linter with the fixture
+        let suggestions = linting::lint_directory_with_config(
+            &fixture_path, 
+            true, // dry run
+            &Config::default()
+        ).expect("Failed to run linter on fixture");
+        
+        // Verify that linter found issues in requirements files
+        assert!(!suggestions.is_empty(), 
+                "Expected to find issues in fixture {}, but found none", 
+                fixture_name);
+                
+        println!("Found {} issues in fixture {}", suggestions.len(), fixture_name);
+    }
 
     #[test]
     fn test_lint_directory_finds_issues() {
