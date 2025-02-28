@@ -12,8 +12,8 @@ mod linting_tests {
         let temp_path = temp_dir.path();
         
         // Create a test markdown file with linting issues
-        let file_path = temp_path.join("test_lint.md");
-        let test_content = r#"# Test Document
+        let file_path = temp_path.join("Requirements.md");
+        let test_content = r#"# Test Requirements Document
         
 ### Element With Excess Whitespace    
 
@@ -79,8 +79,8 @@ Content here.
         let temp_path = temp_dir.path();
         
         // Create a test markdown file with linting issues
-        let file_path = temp_path.join("test_fix.md");
-        let test_content = r#"# Test Document
+        let file_path = temp_path.join("Requirements.md");
+        let test_content = r#"# Test Requirements Document
         
 ### Element With Excess Whitespace    
 
