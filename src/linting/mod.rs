@@ -265,9 +265,8 @@ pub fn lint_directory_with_config(directory: &Path, dry_run: bool, config: &Conf
                 return false;
             }
             
-            // If requirements_only is true, only include files that match the requirements filename pattern
+            // Only include files that match the requirements filename pattern
             // or are in the SystemRequirements folder
-            if config.linting.requirements_only {
                 // Check if filename contains "Requirements" or the file is in a requirements directory
                 let path_str = path.to_string_lossy().to_lowercase();
                 let filename = path.file_name().unwrap_or_default().to_string_lossy().to_lowercase();
@@ -289,10 +288,6 @@ pub fn lint_directory_with_config(directory: &Path, dry_run: bool, config: &Conf
                 }
                 
                 is_requirements_file
-            } else {
-                // If not requirements_only, include all markdown files
-                true
-            }
         }) 
     {
         let file_path = entry.path();

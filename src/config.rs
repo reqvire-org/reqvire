@@ -68,12 +68,8 @@ pub struct ValidationConfig {
 pub struct LintingConfig {
     pub lint: bool,                // Enable linting
     pub dry_run: bool,             // Preview changes without applying them
-    #[serde(default = "default_lint_requirements_only")]
-    pub requirements_only: bool,   // Only lint requirements documents
-}
-
-fn default_lint_requirements_only() -> bool {
-    true // Default to only linting requirements documents
+    #[serde(skip)]
+    pub requirements_only: bool,   // For backwards compatibility only - we always lint only requirements
 }
 
 impl Default for LintingConfig {
@@ -81,7 +77,7 @@ impl Default for LintingConfig {
         Self {
             lint: false,
             dry_run: false,
-            requirements_only: default_lint_requirements_only(),
+            requirements_only: true, // Always only lint requirements files
         }
     }
 }
