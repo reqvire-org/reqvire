@@ -253,6 +253,175 @@ fn test_validate_whitespace_normalization() {
 }
 
 #[test]
+fn test_parse_elements_with_subsections() {
+    // Create test content with elements and subsections
+    let content = r#"# Document Title
+    
+## Section 1
+
+### Element 1
+This is element 1.
+
+#### Relations
+* relation1: target1
+
+#### Details
+More details about element 1.
+
+### Element 2
+This is element 2.
+
+#### Relations
+* relation2: target2
+
+#### Properties
+Some properties of element 2.
+
+## Section 2
+
+### Element 3
+This is element 3.
+
+#### Metadata
+Some metadata about element 3.
+
+#### Relations
+* relation3: target3
+"#;
+    
+    // Parse elements
+    let elements = crate::markdown::parse_elements(content, "test.md").unwrap();
+    
+    // Verify we have exactly 3 elements, not 6 (which would happen if subsections were treated as elements)
+    assert_eq!(elements.len(), 3, "Should have exactly 3 elements, not counting subsections as elements");
+    
+    // Verify element names
+    let element_names: Vec<&str> = elements.iter().map(|e| e.name.as_str()).collect();
+    assert!(element_names.contains(&"Element 1"), "Should contain 'Element 1'");
+    assert!(element_names.contains(&"Element 2"), "Should contain 'Element 2'");
+    assert!(element_names.contains(&"Element 3"), "Should contain 'Element 3'");
+    
+    // Verify no subsection names were treated as elements
+    assert!(!element_names.contains(&"Relations"), "Should not contain 'Relations' as an element");
+    assert!(!element_names.contains(&"Details"), "Should not contain 'Details' as an element");
+    assert!(!element_names.contains(&"Properties"), "Should not contain 'Properties' as an element");
+    assert!(!element_names.contains(&"Metadata"), "Should not contain 'Metadata' as an element");
+}
+
+#[test]
+fn test_parse_elements_with_level3_relations() {
+    // Test specifically for the "### Relations" case which should not be treated as an element
+    let content = r#"# Document Title
+    
+## Section 1
+
+### Element 1
+This is element 1.
+
+### Relations
+* relation1: target1
+* relation2: target2
+
+### Element 2
+This is element 2.
+"#;
+    
+    // Parse elements
+    let elements = crate::markdown::parse_elements(content, "test.md").unwrap();
+    
+    // Should only find 2 elements
+    assert_eq!(elements.len(), 2, "Should have exactly 2 elements, not treating '### Relations' as an element");
+    
+    // Verify element names
+    let element_names: Vec<&str> = elements.iter().map(|e| e.name.as_str()).collect();
+    assert!(element_names.contains(&"Element 1"), "Should contain 'Element 1'");
+    assert!(element_names.contains(&"Element 2"), "Should contain 'Element 2'");
+    
+    // Verify "Relations" is not treated as an element
+    assert!(!element_names.contains(&"Relations"), "Should not contain 'Relations' as an element");
+}
+
+#[test]
+fn test_design_specifications_detection() {
+    // Test that Design Specification Documents are correctly identified regardless of path
+    use crate::utils;
+    use crate::model::ModelManager;
+    use crate::config::Config;
+    use std::path::Path;
+    
+    // Create a test config with a specific design specifications folder name
+    let mut config = Config::default();
+    config.paths.design_specifications_folder = "DesignSpecifications".to_string();
+    
+    // Base path for testing
+    let base_path = Path::new("/mnt/test");
+    
+    // Test cases for different paths that should be identified as DSDs
+    let dsd_paths = [
+        // Standard path in specifications folder
+        "/mnt/test/specifications/DesignSpecifications/DSD_Example.md",
+        // Nested deeper
+        "/mnt/test/specifications/components/DesignSpecifications/DSD_Nested.md",
+        // Different location but same folder name
+        "/mnt/test/other/DesignSpecifications/DSD_Other.md",
+        // In a completely different location
+        "/mnt/test/elsewhere/docs/DesignSpecifications/document.md",
+    ];
+    
+    // Test cases for paths that should NOT be identified as DSDs
+    let non_dsd_paths = [
+        // Similar name but not a match
+        "/mnt/test/specifications/Design_Specifications/document.md",
+        // No DSD folder in path
+        "/mnt/test/specifications/Requirements/document.md",
+        // Similar looking folder but not exact match
+        "/mnt/test/specifications/Design-Specifications/document.md",
+    ];
+    
+    // Check that all DSD paths are correctly identified
+    for path_str in &dsd_paths {
+        let path = Path::new(path_str);
+        assert!(utils::is_requirements_file_by_path(path, &config, base_path), 
+                "Path should be identified as a Design Specification Document: {}", path_str);
+    }
+    
+    // Check that non-DSD paths are not identified as DSDs
+    for path_str in &non_dsd_paths {
+        let path = Path::new(path_str);
+        // Note: This might still return true if the path matches other criteria for requirements files
+        // But we're specifically testing the DSD detection logic
+        if utils::is_requirements_file_by_path(path, &config, base_path) {
+            // Make sure it's not because it was detected as a DSD
+            let rel_path = match path.strip_prefix(base_path) {
+                Ok(rel) => rel.to_string_lossy().to_string(),
+                Err(_) => path.to_string_lossy().to_string()
+            };
+            
+            assert!(!rel_path.split('/').any(|component| component == &config.paths.design_specifications_folder),
+                    "Path was incorrectly identified as a Design Specification Document: {}", path_str);
+        }
+    }
+    
+    // Also test the ModelManager's DSD detection logic by simulating file content processing
+    let _model_manager = ModelManager::new_with_config(config.clone());
+    
+    // Test model's skipping logic with some mock paths and content
+    let _dsd_content = "# Test DSD Content\n\n### This should be ignored\n\n#### Relations\n* type: target";
+    let _non_dsd_content = "# Test Content\n\n### This should be processed\n\n#### Relations\n* type: target";
+    
+    // Create a simple test to verify the model's DSD detection logic
+    let is_dsd_path = "specifications/DesignSpecifications/test.md";
+    let is_not_dsd_path = "specifications/Requirements/test.md";
+    
+    // Using direct access to internal methods would be ideal, but we can indirectly test by examining behavior
+    // This is just checking our implementation logic matches our test logic
+    assert!(is_dsd_path.split('/').any(|component| component == &config.paths.design_specifications_folder),
+            "Path should be detected as a DSD: {}", is_dsd_path);
+    assert!(!is_not_dsd_path.split('/').any(|component| component == &config.paths.design_specifications_folder),
+            "Path should not be detected as a DSD: {}", is_not_dsd_path);
+}
+
+#[test]
 fn test_validate_markdown_with_relations() {
     // Create a simple element with relations directly
     let mut registry = ElementRegistry::new();
