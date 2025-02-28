@@ -331,8 +331,7 @@ impl ModelManager {
     
     /// Validate markdown structure of all collected files
     /// Returns a list of validation errors
-    /// If fix=true, attempts to fix common issues automatically
-    pub fn validate_markdown_structure(&self, _fix: bool) -> Result<Vec<ReqFlowError>, ReqFlowError> {
+    pub fn validate_markdown_structure(&self) -> Result<Vec<ReqFlowError>, ReqFlowError> {
         info!("Validating markdown structure");
         
         let mut all_errors = Vec::new();
@@ -389,8 +388,7 @@ impl ModelManager {
     
     /// Validate all relations in the model
     /// Returns a list of validation errors
-    /// If fix=true, attempts to fix common issues automatically
-    pub fn validate_relations(&self, _fix: bool) -> Result<Vec<ReqFlowError>, ReqFlowError> {
+    pub fn validate_relations(&self) -> Result<Vec<ReqFlowError>, ReqFlowError> {
         info!("Validating relations");
         
         // Use existing validation function
@@ -408,11 +406,10 @@ impl ModelManager {
     /// Validate filesystem structure according to ReqFlow methodology
     /// Checks for:
     /// - Required directories (specifications, etc.)
-    /// - Required files (README.md, etc.)
+    /// - Required files
     /// - Proper file organization
     /// Returns a list of validation errors with file paths and line numbers (where applicable)
-    /// If fix=true, attempts to fix common issues automatically
-    pub fn validate_filesystem_structure(&self, input_folder: &Path, _fix: bool, config: &Config) -> Result<Vec<ReqFlowError>, ReqFlowError> {
+    pub fn validate_filesystem_structure(&self, input_folder: &Path, config: &Config) -> Result<Vec<ReqFlowError>, ReqFlowError> {
         info!("Validating filesystem structure in {:?}", input_folder);
         
         let mut errors = Vec::new();
@@ -555,8 +552,7 @@ impl ModelManager {
     /// - Missing components in dependency chains
     /// - Circular dependencies
     /// Returns a list of validation errors
-    /// If fix=true, attempts to fix common issues automatically
-    pub fn validate_cross_component_dependencies(&self, _fix: bool) -> Result<Vec<ReqFlowError>, ReqFlowError> {
+    pub fn validate_cross_component_dependencies(&self) -> Result<Vec<ReqFlowError>, ReqFlowError> {
         info!("Validating cross-component dependencies");
         
         let mut errors = Vec::new();
@@ -579,14 +575,14 @@ impl ModelManager {
             // System requirements must have at least one relation that points to a parent requirement
             if element.file_path.contains(system_reqs_folder) {
                 // List of valid parent-child relationship types
-                let valid_parent_relations = ["derivedFrom", "tracedFrom", "refine"];
+                let valid_parent_relations = ["derivedFrom", "tracedFrom", "refine", "containedBy"];
                 
                 // Check if the element has at least one valid parent relation
                 let has_parent_relation = element.relations.iter().any(|r| valid_parent_relations.contains(&r.relation_type.as_str()));
                 
                 if !has_parent_relation {
                     errors.push(ReqFlowError::ValidationError(
-                        format!("System requirement '{}' has no parent requirement relation (needs 'derivedFrom', 'tracedFrom', or 'refine') (in file '{}')", 
+                        format!("System requirement '{}' has no parent requirement relation (needs 'derivedFrom', 'tracedFrom', 'refine', or 'containedBy') (in file '{}')", 
                                element.name, element.file_path)
                     ));
                 }
