@@ -114,13 +114,37 @@ The system shall suggest code refactoring opportunities to better align with the
 
 ## Validating Structures
 
-### Linting the specifications
+### Enhanced Validation Error Reporting
 
-The system shall provide comprehensive validation messages that include file paths and line numbers when available, to help users quickly locate and fix issues in their MBSE specifications.
+The system shall provide comprehensive validation messages that include file paths and line numbers when available, to help users quickly locate and fix model integrity and structure issues in their MBSE specifications.
 
 #### Relations
   * refine: UserStories.md/Validating Structures
 
+
+### Model Linting
+
+The system shall provide linting capabilities to identify and fix stylistic, formatting, and non-critical issues in MBSE models that don't affect functional integrity.
+
+#### Relations
+  * refine: UserStories.md/Validating Structures
+
+
+### Linting Command Behavior
+
+The system shall provide a linting command that by default automatically applies fixes to stylistic and non-critical formatting issues, while offering a --dry-run flag to preview changes without applying them.
+
+#### Relations
+  * containedBy: Model Linting
+
+
+### Replace Absolute Links with Relative Links
+
+The system shall replace absolute links with relative links, where applicable and contextually appropriate, to conform to repository standards and enhance portability.
+
+
+#### Relations
+  * containedBy: Model Linting
 
 
 ### Validate Markdown Structure
@@ -152,21 +176,7 @@ The system shall validate dependencies across different components of the MBSE m
 #### Relations
   * refine: UserStories.md/Validating Structures
 
-### Fix Model Issues
 
-The system shall provide mechanisms to fix identified issues in the MBSE model to ensure alignment with repository standards and improve consistency.
-
-#### Relations
-  * refine: UserStories.md/Validating Structures
-
-
-### Replace Absolute Links with Relative Links
-
-The system shall replace absolute links with relative links, where applicable and contextually appropriate, to conform to repository standards and enhance portability.
-
-
-#### Relations
-  * derivedFrom: Fix Model Issues
 
 ## Integrate with GitHub Workflows
 
