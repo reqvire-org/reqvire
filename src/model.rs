@@ -83,15 +83,15 @@ impl ModelManager {
         // Second pass: process files
         self.process_markdown_files(input_folder, output_folder, self.config.general.html_output)?;
         
-        // Generate traceability matrix
-        info!("Generating traceability matrix...");
-        self.generate_traceability_matrix(output_folder, self.config.general.html_output)?;
+        // Note: Traceability matrix is now generated only when explicitly requested
+        // with the --generate-matrix flag
         
         Ok(())
     }
     
     /// Generate a traceability matrix showing dependencies between elements
-    fn generate_traceability_matrix(&self, output_folder: &Path, convert_to_html: bool) -> Result<(), ReqFlowError> {
+    /// The matrix is saved to the specifications root directory (input_folder)
+    pub fn generate_traceability_matrix(&self, input_folder: &Path, convert_to_html: bool) -> Result<(), ReqFlowError> {
         // Debug information to help diagnose the issue
         info!("Generating traceability matrix with {} elements", self.element_registry.all_elements().count());
         
@@ -220,11 +220,11 @@ impl ModelManager {
         
         matrix_content.push_str("```\n");
         
-        // Write the traceability matrix
-        let matrix_path = output_folder.join("traceability_matrix.md");
+        // Write the traceability matrix to the specifications root directory
+        let matrix_path = input_folder.join("traceability_matrix.md");
         utils::write_file(&matrix_path, &matrix_content)?;
         
-        // Convert to HTML if requested
+        // Convert to HTML if requested - HTML goes to the same directory as markdown
         if convert_to_html {
             let html_content = crate::html::convert_to_html(&matrix_content, "Traceability Matrix")?;
             let html_path = matrix_path.with_extension("html");
