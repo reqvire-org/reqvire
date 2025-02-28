@@ -31,7 +31,8 @@ pub fn is_requirements_file_by_path(path: &Path, config: &crate::config::Config,
     }
     
     // Check if the file is in the system requirements directory
-    let system_reqs_path = config.system_requirements_path(base_path);
+    let specs_dir = base_path.join(&config.paths.specifications_folder);
+    let system_reqs_path = specs_dir.join(&config.paths.system_requirements_folder);
     if path.starts_with(&system_reqs_path) {
         return true;
     }
