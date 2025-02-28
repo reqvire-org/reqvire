@@ -91,7 +91,8 @@ impl ModelManager {
     
     /// Generate a traceability matrix showing dependencies between elements
     /// The matrix is saved to the specifications root directory (input_folder)
-    pub fn generate_traceability_matrix(&self, input_folder: &Path, convert_to_html: bool) -> Result<(), ReqFlowError> {
+    /// If convert_to_html is true, HTML will be saved to output_folder
+    pub fn generate_traceability_matrix(&self, input_folder: &Path, output_folder: &Path, convert_to_html: bool) -> Result<(), ReqFlowError> {
         // Debug information to help diagnose the issue
         info!("Generating traceability matrix with {} elements", self.element_registry.all_elements().count());
         
@@ -153,7 +154,37 @@ impl ModelManager {
                 for relation in &element.relations {
                     if relation.relation_type == relation_type {
                         has_relations = true;
-                        matrix_content.push_str(&format!("|{}|{}|\n", element.name, relation.target));
+                        
+                        // Create clickable links for HTML output
+                        let source_element = if convert_to_html {
+                            let file_path = element.file_path.replace(".md", ".html");
+                            let anchor = element.name.replace(' ', "-").to_lowercase();
+                            format!("[{}]({}#{})", element.name, file_path, anchor)
+                        } else {
+                            element.name.clone()
+                        };
+                        
+                        // Format the target with proper links if needed
+                        let target = &relation.target;
+                        let target_element = if convert_to_html && target.contains('/') {
+                            // This is a reference to another file, possibly with an element
+                            if target.contains(".md/") {
+                                // Handle path/file.md/element format
+                                let parts: Vec<&str> = target.split("/").collect();
+                                let file_path = parts[0..parts.len()-1].join("/").replace(".md", ".html");
+                                let element_name = parts.last().unwrap();
+                                let anchor = element_name.replace(' ', "-").to_lowercase();
+                                format!("[{}]({}#{})", target, file_path, anchor)
+                            } else {
+                                // Simple file reference
+                                let file_path = target.replace(".md", ".html");
+                                format!("[{}]({})", target, file_path)
+                            }
+                        } else {
+                            target.clone()
+                        };
+                        
+                        matrix_content.push_str(&format!("|{}|{}|\n", source_element, target_element));
                     }
                 }
             }
@@ -165,70 +196,192 @@ impl ModelManager {
             matrix_content.push_str("\n");
         }
         
-        // Generate a comprehensive relationships diagram
-        matrix_content.push_str("## Requirements Relationship Diagram\n\n");
+        // Organize requirements by file for diagram generation
+        let mut files_with_elements: std::collections::HashMap<String, Vec<&element::Element>> = std::collections::HashMap::new();
         
-        // Add a section that explains the diagram
-        matrix_content.push_str("This diagram shows the relationships between requirements and other elements in the model.\n");
+        for element in self.element_registry.all_elements() {
+            files_with_elements.entry(element.file_path.clone())
+                .or_insert_with(Vec::new)
+                .push(element);
+        }
+        
+        // Generate diagrams by file
+        matrix_content.push_str("## Requirements Relationship Diagrams\n\n");
+        matrix_content.push_str("These diagrams show the relationships between requirements organized by file.\n\n");
         matrix_content.push_str("* Red nodes: Requirements\n");
         matrix_content.push_str("* Green nodes: Verification elements\n");
         matrix_content.push_str("* Gray nodes: Other elements\n\n");
-        matrix_content.push_str("```mermaid\ngraph TD;\n");
         
-        // Add graph styling
-        matrix_content.push_str("  %% Graph styling\n");
-        matrix_content.push_str("  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;\n");
-        matrix_content.push_str("  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;\n");
-        matrix_content.push_str("  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;\n\n");
-        
-        // Add nodes and relationships for verification
-        for element in self.element_registry.all_elements() {
-            // Create a safe ID using a hash-based approach to avoid any possible Mermaid syntax issues
-            // This way we avoid all syntax issues with special characters in IDs
-            let safe_id = format!("node_{}", element.name.bytes().map(|b| b as u32).sum::<u32>());
+        // Iterate through files and create a diagram for each
+        for (file_path, elements) in files_with_elements.iter() {
+            // Only generate diagrams for files that have elements with relations
+            let has_relations = elements.iter().any(|e| !e.relations.is_empty());
             
-            // Encode the label text properly for Mermaid
-            let label = element.name.replace('"', "&quot;");
-            matrix_content.push_str(&format!("  {}[\"{}\"];\n", safe_id, label));
-            
-            // Apply requirement style to all elements
-            matrix_content.push_str(&format!("  class {} requirement;\n", safe_id));
-            
-            for relation in &element.relations {
-                // Create a safe ID for the target using the same hash-based approach
-                let target_safe_id = format!("node_{}", relation.target.bytes().map(|b| b as u32).sum::<u32>());
-                
-                // Different arrow styles and labels based on relation type
-                let (arrow_style, _style_class) = match relation.relation_type.as_str() {
-                    "verifiedBy" | "verify" => ("-->|verifies|", "verification"),
-                    "satisfiedBy" | "satisfy" => ("-->|satisfies|", "default"),
-                    "derivedFrom" | "derive" => ("-.->|derives from|", "default"),
-                    "refine" => ("==>|refines|", "default"),
-                    "tracedFrom" | "trace" => ("~~~>|traces from|", "default"),
-                    "containedBy" | "contain" => ("--o|contains|", "default"),
-                    _ => ("-->|relates to|", "default")
+            if has_relations {
+                // Create a header for this file's diagram
+                let file_name = if let Some(idx) = file_path.rfind('/') {
+                    &file_path[idx + 1..]
+                } else {
+                    file_path
                 };
                 
-                matrix_content.push_str(&format!("  {} {} {};\n", safe_id, arrow_style, target_safe_id));
+                matrix_content.push_str(&format!("### Diagram for {}\n\n", file_name));
+                matrix_content.push_str("```mermaid\ngraph LR;\n");
                 
-                // Apply style to target if it's a verification
-                if relation.relation_type == "verifiedBy" || relation.relation_type == "verify" {
-                    matrix_content.push_str(&format!("  class {} verification;\n", target_safe_id));
+                // Add graph styling
+                matrix_content.push_str("  %% Graph styling\n");
+                matrix_content.push_str("  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;\n");
+                matrix_content.push_str("  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;\n");
+                matrix_content.push_str("  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;\n\n");
+                
+                // Create a set of elements already included in this diagram
+                let mut included_elements = std::collections::HashSet::new();
+                
+                // Add nodes for this file's elements
+                for element in elements {
+                    // Safe ID for element
+                    let element_id = element.name.replace(' ', "_").replace('-', "_")
+                        .replace('/', "_").replace(':', "_").replace("'", "")
+                        .replace('(', "_").replace(')', "_").replace(".", "_");
+                    
+                    // Encode the label text properly for Mermaid
+                    let label = element.name.replace('"', "&quot;");
+                    
+                    matrix_content.push_str(&format!("  {}[\"{}\"];\n", element_id, label));
+                    
+                    // Add click behavior for HTML
+                    let html_file = if convert_to_html {
+                        file_path.replace(".md", ".html")
+                    } else {
+                        file_path.clone()
+                    };
+                    
+                    matrix_content.push_str(&format!("  click {} \"{}\";", 
+                        element_id, 
+                        format!("{}#{}", html_file, element.name.replace(' ', "-").to_lowercase())
+                    ));
+                    matrix_content.push_str("\n");
+                    
+                    // Apply requirement style to all elements in this file
+                    matrix_content.push_str(&format!("  class {} requirement;\n", element_id));
+                    
+                    // Mark this element as included
+                    included_elements.insert(element.name.clone());
+                    
+                    // Process relations for this element
+                    for relation in &element.relations {
+                        // Get target element
+                        let target = &relation.target;
+                        
+                        // Generate safe ID for target
+                        let target_id = target.replace(' ', "_").replace('-', "_")
+                            .replace('/', "_").replace(':', "_").replace("'", "")
+                            .replace('(', "_").replace(')', "_").replace(".", "_");
+                        
+                        // Different arrow styles and labels based on relation type
+                        let (arrow_style, style_class) = match relation.relation_type.as_str() {
+                            "verifiedBy" | "verify" => ("-->|verifies|", "verification"),
+                            "satisfiedBy" | "satisfy" => ("-->|satisfies|", "default"),
+                            "derivedFrom" | "derive" => ("-.->|derives from|", "default"),
+                            "refine" => ("==>|refines|", "default"),
+                            "tracedFrom" | "trace" => ("~~~>|traces from|", "default"),
+                            "containedBy" | "contain" => ("--o|contains|", "default"),
+                            _ => ("-->|relates to|", "default")
+                        };
+                        
+                        // Add the relationship
+                        matrix_content.push_str(&format!("  {} {} {};\n", element_id, arrow_style, target_id));
+                        
+                        // If the target is not already included in the diagram, add it
+                        if !included_elements.contains(target) {
+                            // Add the target node
+                            matrix_content.push_str(&format!("  {}[\"{}\"];\n", target_id, target.replace('"', "&quot;")));
+                            
+                            // Try to find the target element in the registry
+                            let target_element = self.element_registry.get_element(target);
+                            
+                            if let Some(target_elem) = target_element {
+                                // Add click behavior for HTML if we found the target
+                                let target_html_file = if convert_to_html {
+                                    target_elem.file_path.replace(".md", ".html")
+                                } else {
+                                    target_elem.file_path.clone()
+                                };
+                                
+                                matrix_content.push_str(&format!("  click {} \"{}\";\n", 
+                                    target_id, 
+                                    format!("{}#{}", target_html_file, target_elem.name.replace(' ', "-").to_lowercase())
+                                ));
+                            } else if target.contains('/') {
+                                // This might be a file reference
+                                // Extract file path and element name if present
+                                let parts: Vec<&str> = target.split('/').collect();
+                                let file_part = if parts.len() > 1 {
+                                    let mut path = String::new();
+                                    for i in 0..parts.len()-1 {
+                                        if i > 0 { path.push('/'); }
+                                        path.push_str(parts[i]);
+                                    }
+                                    if convert_to_html {
+                                        path.replace(".md", ".html")
+                                    } else {
+                                        path
+                                    }
+                                } else {
+                                    let path = parts[0].to_string();
+                                    if convert_to_html {
+                                        path.replace(".md", ".html")
+                                    } else {
+                                        path
+                                    }
+                                };
+                                
+                                let element_part = if parts.len() > 1 {
+                                    parts[parts.len()-1]
+                                } else {
+                                    ""
+                                };
+                                
+                                let link = if !element_part.is_empty() {
+                                    format!("{}#{}", file_part, element_part.replace(' ', "-").to_lowercase())
+                                } else {
+                                    file_part
+                                };
+                                
+                                matrix_content.push_str(&format!("  click {} \"{}\";\n", target_id, link));
+                            }
+                            
+                            // Apply appropriate style class
+                            if style_class == "verification" {
+                                matrix_content.push_str(&format!("  class {} verification;\n", target_id));
+                            } else {
+                                matrix_content.push_str(&format!("  class {} default;\n", target_id));
+                            }
+                            
+                            // Mark target as included
+                            included_elements.insert(target.clone());
+                        }
+                    }
                 }
+                
+                // Close the mermaid diagram
+                matrix_content.push_str("```\n\n");
             }
         }
         
-        matrix_content.push_str("```\n");
-        
         // Write the traceability matrix to the specifications root directory
-        let matrix_path = input_folder.join("traceability_matrix.md");
+        let matrix_path = input_folder.join("TraceabilityMatrix.md");
         utils::write_file(&matrix_path, &matrix_content)?;
         
-        // Convert to HTML if requested - HTML goes to the same directory as markdown
+        // Convert to HTML if requested - HTML goes to the output folder
         if convert_to_html {
             let html_content = crate::html::convert_to_html(&matrix_content, "Traceability Matrix")?;
-            let html_path = matrix_path.with_extension("html");
+            
+            // Create output folder path for HTML
+            let html_path = output_folder.join("TraceabilityMatrix.html");
             utils::write_file(&html_path, html_content)?;
+            
+            info!("Traceability matrix HTML saved to {:?}", html_path);
         }
         
         info!("Traceability matrix generated");
