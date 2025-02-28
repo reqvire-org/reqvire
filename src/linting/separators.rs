@@ -117,4 +117,29 @@ This is also fine.
         
         assert_eq!(suggestions.len(), 0);
     }
+    
+    #[test]
+    fn test_no_duplicate_separators_added() {
+        let content = r#"# Test Document
+        
+### First Element
+Content here.
+
+---
+        
+### Second Element With Existing Separator
+This already has a separator before it.
+
+### Third Element Without Separator
+This should have a separator.
+"#;
+        
+        let file_path = PathBuf::from("test.md");
+        let suggestions = find_missing_separators(content, &file_path);
+        
+        // We should find exactly one suggestion for the third element, but not for the second
+        assert_eq!(suggestions.len(), 1);
+        assert!(suggestions[0].description.contains("Third Element Without Separator"));
+        assert!(!suggestions.iter().any(|s| s.description.contains("Second Element With Existing Separator")));
+    }
 }
