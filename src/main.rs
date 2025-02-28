@@ -145,7 +145,6 @@ fn main() -> Result<()> {
     if args.lint {
         config.linting.lint = true;
         config.linting.dry_run = args.dry_run;
-        config.linting.requirements_only = true; // Always only lint requirements files
     }
     
     if args.json {
