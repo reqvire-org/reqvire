@@ -238,8 +238,19 @@ impl LintSuggestion {
 use walkdir::WalkDir;
 use std::fs;
 
+use crate::config::Config;
+
 /// Run linting on all files in a directory
+/// 
+/// This is kept for backward compatibility. New code should use lint_directory_with_config instead.
+#[allow(dead_code)]
 pub fn lint_directory(directory: &Path, dry_run: bool) -> Result<Vec<LintSuggestion>, ReqFlowError> {
+    // Use default config initially
+    lint_directory_with_config(directory, dry_run, &Config::default())
+}
+
+/// Run linting on all files in a directory with the given configuration
+pub fn lint_directory_with_config(directory: &Path, dry_run: bool, config: &Config) -> Result<Vec<LintSuggestion>, ReqFlowError> {
     let mut all_suggestions = Vec::new();
     
     // Find all markdown files in the directory
@@ -248,7 +259,62 @@ pub fn lint_directory(directory: &Path, dry_run: bool) -> Result<Vec<LintSuggest
         .filter_map(|e| e.ok())
         .filter(|e| {
             let path = e.path();
-            path.is_file() && path.extension().map_or(false, |ext| ext == "md")
+            
+            // Check if file is a markdown file
+            if !path.is_file() || path.extension().map_or(true, |ext| ext != "md") {
+                return false;
+            }
+            
+            // If requirements_only is true, only include files that appear to be requirements documents
+            if config.linting.requirements_only {
+                // Check if filename contains "Requirements" or the file is in a requirements directory
+                let path_str = path.to_string_lossy().to_lowercase();
+                let filename = path.file_name().unwrap_or_default().to_string_lossy().to_lowercase();
+                let req_pattern = config.paths.requirements_filename_match.to_lowercase();
+                
+                // File with "notreq" or "not_req" in the name should be excluded
+                if filename.contains("notreq") || filename.contains("not_req") || filename.contains("not-req") {
+                    return false;
+                }
+                
+                // Check different criteria for a requirements file
+                let is_req_filename = filename.contains(&req_pattern);
+                let is_in_req_directory = path_str.contains(&format!("/{}/", config.paths.system_requirements_folder.to_lowercase())) ||
+                                         path_str.contains(&format!("/{}/", req_pattern.to_lowercase()));
+                
+                // If the directories or filenames match, it's definitely a requirements file
+                if is_req_filename || is_in_req_directory {
+                    if config.general.verbose {
+                        println!("DEBUG: File {} identified as requirements document by name/path", path.display());
+                    }
+                    return true;
+                }
+                
+                // If still not identified, check file content as a last resort
+                if let Ok(content) = std::fs::read_to_string(path) {
+                    // Requirements files must have both elements and Relations sections
+                    let has_elements = content.contains("### ");
+                    let has_relations = content.contains("#### Relations");
+                    
+                    // And ideally contain some key phrases that indicate it's a requirements document
+                    let has_req_keywords = content.to_lowercase().contains("requirement") || 
+                                          content.to_lowercase().contains("specification");
+                    
+                    // The most strict check is to require all three conditions
+                    let is_requirements_file = has_elements && has_relations && has_req_keywords;
+                    
+                    if is_requirements_file && config.general.verbose {
+                        println!("DEBUG: File {} identified as requirements document by content", path.display());
+                    }
+                    
+                    is_requirements_file
+                } else {
+                    false
+                }
+            } else {
+                // If not requirements_only, include all markdown files
+                true
+            }
         }) 
     {
         let file_path = entry.path();

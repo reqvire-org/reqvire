@@ -64,10 +64,26 @@ pub struct ValidationConfig {
     pub json_output: bool,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, Default)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct LintingConfig {
     pub lint: bool,                // Enable linting
     pub dry_run: bool,             // Preview changes without applying them
+    #[serde(default = "default_lint_requirements_only")]
+    pub requirements_only: bool,   // Only lint requirements documents
+}
+
+fn default_lint_requirements_only() -> bool {
+    true // Default to only linting requirements documents
+}
+
+impl Default for LintingConfig {
+    fn default() -> Self {
+        Self {
+            lint: false,
+            dry_run: false,
+            requirements_only: default_lint_requirements_only(),
+        }
+    }
 }
 
 impl Default for GeneralConfig {
