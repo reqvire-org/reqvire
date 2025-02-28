@@ -1,6 +1,8 @@
 use std::path::{Path, PathBuf};
 use anyhow::Result;
 use crate::error::ReqFlowError;
+use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
+use std::io::Write;
 
 /// Represents a lint suggestion (like a warning) that can be fixed automatically
 #[derive(Debug, Clone)]
@@ -18,20 +20,16 @@ pub struct LintSuggestion {
 }
 
 /// Type of lint suggestion
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum LintType {
     /// Absolute links that could be relative
     AbsoluteLink,
     /// Excess whitespace after element names or relation identifiers
     ExcessWhitespace,
-    // The following are currently placeholders for future implementation
-    #[allow(dead_code)]
     /// Inconsistent newlines before subsections
     InconsistentNewlines,
-    #[allow(dead_code)]
     /// Missing separator lines between elements
     MissingSeparator,
-    #[allow(dead_code)]
     /// Inconsistent indentation in relation lists
     InconsistentIndentation,
 }
@@ -83,8 +81,9 @@ impl LintSuggestion {
         }
     }
 
-    /// Format a user-friendly description of the suggestion
-    pub fn format(&self) -> String {
+    /// Format a user-friendly description of the suggestion (used for non-visual output)
+    #[allow(dead_code)]
+    fn format(&self) -> String {
         match &self.line_number {
             Some(line) => format!("{} (in {}:{}): {}", 
                                 self.suggestion_type_name(), 
@@ -96,6 +95,129 @@ impl LintSuggestion {
                          self.file_path.display(), 
                          self.description),
         }
+    }
+
+    /// Format a git-like diff for the suggestion (used as fallback for non-colorized output)
+    #[allow(dead_code)]
+    pub fn format_diff(&self) -> String {
+        let file_header = format!("diff --lint a/{} b/{}", 
+                                self.file_path.display(), 
+                                self.file_path.display());
+        
+        let line_info = match &self.line_number {
+            Some(line) => format!("@@ line {} @@", line),
+            None => "@@ unknown line @@".to_string(),
+        };
+        
+        // Format the change based on the type of fix
+        let change_diff = match &self.fix {
+            LintFix::ReplacePattern { pattern, replacement } => {
+                // Handle multiline patterns by adding prefix to each line
+                let pattern_lines: Vec<_> = pattern.lines().collect();
+                let replacement_lines: Vec<_> = replacement.lines().collect();
+                
+                let mut diff_lines = Vec::new();
+                
+                // Add the pattern lines with '-' prefix
+                for line in &pattern_lines {
+                    diff_lines.push(format!("- {}", line));
+                }
+                
+                // Add the replacement lines with '+' prefix
+                for line in &replacement_lines {
+                    diff_lines.push(format!("+ {}", line));
+                }
+                
+                // If pattern or replacement is empty, show it explicitly
+                if pattern_lines.is_empty() {
+                    diff_lines.insert(0, "- <empty line>".to_string());
+                }
+                if replacement_lines.is_empty() {
+                    diff_lines.push("+ <empty line>".to_string());
+                }
+                
+                diff_lines.join("\n")
+            },
+            LintFix::ReplaceLine { line: _, new_content } => {
+                format!("- <current line>\n+ {}", new_content)
+            },
+            LintFix::InsertAt { line: _, content } => {
+                format!("+ {}", content)
+            },
+        };
+        
+        let description = format!("# {}: {}", self.suggestion_type_name(), self.description);
+        
+        format!("{}\n{}\n{}\n{}\n", file_header, description, line_info, change_diff)
+    }
+    
+    /// Print a colorized git-style diff to the terminal
+    pub fn print_colorized_diff(&self) -> Result<(), std::io::Error> {
+        let mut stdout = StandardStream::stdout(ColorChoice::Auto);
+        
+        // Print file header in bold
+        stdout.set_color(ColorSpec::new().set_bold(true))?;
+        writeln!(&mut stdout, "diff --lint a/{} b/{}", 
+                 self.file_path.display(), 
+                 self.file_path.display())?;
+        
+        // Print description in cyan
+        stdout.set_color(ColorSpec::new().set_fg(Some(Color::Cyan)))?;
+        writeln!(&mut stdout, "# {}: {}", self.suggestion_type_name(), self.description)?;
+        
+        // Print line info in magenta
+        stdout.set_color(ColorSpec::new().set_fg(Some(Color::Magenta)))?;
+        let line_info = match &self.line_number {
+            Some(line) => format!("@@ line {} @@", line),
+            None => "@@ unknown line @@".to_string(),
+        };
+        writeln!(&mut stdout, "{}", line_info)?;
+        
+        // Format and print the change diff with colors
+        match &self.fix {
+            LintFix::ReplacePattern { pattern, replacement } => {
+                // Handle multiline patterns by adding prefix to each line
+                let pattern_lines: Vec<_> = pattern.lines().collect();
+                let replacement_lines: Vec<_> = replacement.lines().collect();
+                
+                // Add the pattern lines with '-' prefix in red
+                stdout.set_color(ColorSpec::new().set_fg(Some(Color::Red)))?;
+                if pattern_lines.is_empty() {
+                    writeln!(&mut stdout, "- <empty line>")?;
+                } else {
+                    for line in &pattern_lines {
+                        writeln!(&mut stdout, "- {}", line)?;
+                    }
+                }
+                
+                // Add the replacement lines with '+' prefix in green
+                stdout.set_color(ColorSpec::new().set_fg(Some(Color::Green)))?;
+                if replacement_lines.is_empty() {
+                    writeln!(&mut stdout, "+ <empty line>")?;
+                } else {
+                    for line in &replacement_lines {
+                        writeln!(&mut stdout, "+ {}", line)?;
+                    }
+                }
+            },
+            LintFix::ReplaceLine { line: _, new_content } => {
+                stdout.set_color(ColorSpec::new().set_fg(Some(Color::Red)))?;
+                writeln!(&mut stdout, "- <current line>")?;
+                
+                stdout.set_color(ColorSpec::new().set_fg(Some(Color::Green)))?;
+                writeln!(&mut stdout, "+ {}", new_content)?;
+            },
+            LintFix::InsertAt { line: _, content } => {
+                stdout.set_color(ColorSpec::new().set_fg(Some(Color::Green)))?;
+                writeln!(&mut stdout, "+ {}", content)?;
+            },
+        }
+        
+        // Reset color
+        stdout.reset()?;
+        writeln!(&mut stdout, "")?;
+        
+        Ok(())
     }
 
     /// Get a user-friendly name for the suggestion type
