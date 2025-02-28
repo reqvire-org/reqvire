@@ -80,6 +80,10 @@ struct Args {
     #[clap(long, requires = "lint")]
     dry_run: bool,
     
+    /// Generate traceability matrix without processing other files
+    /// Creates a matrix showing relationships between elements in the model
+    #[clap(long)]
+    generate_matrix: bool,
     
     /// Output validation results in JSON format
     /// Useful for CI/CD pipelines and automation
@@ -151,6 +155,10 @@ fn main() -> Result<()> {
         config.validation.json_output = true;
     }
     
+    if args.generate_matrix {
+        config.validation.generate_matrix = true;
+    }
+    
     // Get input and output folders from command line arguments or configuration
     let input_folder_path = args.input_folder
         .unwrap_or_else(|| PathBuf::from(&config.paths.specifications_folder));
@@ -168,6 +176,9 @@ fn main() -> Result<()> {
                           
     // Determine if we're in linting mode
     let linting_mode = config.linting.lint;
+    
+    // Determine if we're in matrix generation mode
+    let matrix_mode = config.validation.generate_matrix;
     
     if validation_mode {
         // Run in validation mode
@@ -412,13 +423,29 @@ fn main() -> Result<()> {
                 println!("✅ All suggestions have been applied");
             }
         }
+    } else if matrix_mode {
+        // Run in matrix generation mode
+        if config.general.verbose {
+            println!("Generating traceability matrix from {:?} to {:?}", input_folder_path, output_folder_path);
+        }
+        
+        // Create the output folder if it doesn't exist
+        std::fs::create_dir_all(&output_folder_path)?;
+        
+        // First collect identifiers to build the element registry
+        model_manager.collect_identifiers_only(&input_folder_path)?;
+        
+        // Generate the traceability matrix to be saved in the input directory (specifications root)
+        model_manager.generate_traceability_matrix(&input_folder_path, config.general.html_output)?;
+        
+        println!("Traceability matrix generated and saved to {:?}", input_folder_path);
     } else {
         // Normal processing mode
         if config.general.verbose {
             println!("Processing files from {:?} to {:?}", input_folder_path, output_folder_path);
         }
 
-        // Process files normally
+        // Process files normally (traceability matrix is no longer generated automatically)
         model_manager.process_files(&input_folder_path, 
                                   &output_folder_path, 
                                   config.general.html_output)?;

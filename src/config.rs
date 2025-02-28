@@ -62,6 +62,7 @@ pub struct ValidationConfig {
     pub validate_relations: bool,
     pub validate_all: bool,
     pub json_output: bool,
+    pub generate_matrix: bool,  // Generate traceability matrix
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -112,6 +113,7 @@ impl Default for ValidationConfig {
             validate_relations: false,
             validate_all: false,
             json_output: false,
+            generate_matrix: false,
         }
     }
 }
