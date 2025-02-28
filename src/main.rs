@@ -80,9 +80,6 @@ struct Args {
     #[clap(long, requires = "lint")]
     dry_run: bool,
     
-    /// When linting, process all markdown files, not just requirements documents
-    #[clap(long, requires = "lint")]
-    all_files: bool,
     
     /// Output validation results in JSON format
     /// Useful for CI/CD pipelines and automation
@@ -148,7 +145,7 @@ fn main() -> Result<()> {
     if args.lint {
         config.linting.lint = true;
         config.linting.dry_run = args.dry_run;
-        config.linting.requirements_only = !args.all_files;
+        config.linting.requirements_only = true; // Always only lint requirements files
     }
     
     if args.json {
@@ -290,17 +287,10 @@ fn main() -> Result<()> {
     } else if linting_mode {
         // Run in linting mode
         if config.general.verbose {
-            let requirements_only_msg = if config.linting.requirements_only {
-                " (requirements files only)"
-            } else {
-                " (all markdown files)"
-            };
-            
             let dry_run_msg = if config.linting.dry_run { " (dry run)" } else { "" };
             
-            println!("Linting files in {:?}{}{}", 
+            println!("Linting requirements files in {:?}{}", 
                 input_folder_path, 
-                requirements_only_msg,
                 dry_run_msg);
         }
         
