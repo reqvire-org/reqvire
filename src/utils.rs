@@ -5,6 +5,8 @@ use std::path::{Path, PathBuf};
 use crate::error::ReqFlowError;
 
 /// Check if a file is a requirements file or related specification according to ReqFlow
+/// This is a legacy method that uses filename-based heuristics
+/// Use is_requirements_file_by_path with configuration when possible
 pub fn is_requirements_file(filename: &str) -> bool {
     let lowercase = filename.to_lowercase();
     
@@ -19,6 +21,33 @@ pub fn is_requirements_file(filename: &str) -> bool {
     lowercase.contains("usecases") || 
     lowercase.contains("moes") ||
     lowercase.contains("dsd_") // Include Design Specification Documents
+}
+
+/// Check if a file is a requirements file or design specification based on its path and configuration
+pub fn is_requirements_file_by_path(path: &Path, config: &crate::config::Config, base_path: &Path) -> bool {
+    // Early return if not a markdown file
+    if path.extension().map_or(false, |ext| ext != "md") {
+        return false;
+    }
+    
+    // Check if the file is in the system requirements directory
+    let system_reqs_path = config.system_requirements_path(base_path);
+    if path.starts_with(&system_reqs_path) {
+        return true;
+    }
+    
+    // Check if the file is in the design specifications directory
+    let design_specs_path = config.design_specifications_path(base_path);
+    if path.starts_with(&design_specs_path) {
+        return true;
+    }
+    
+    // Fall back to filename-based check for compatibility
+    if let Some(filename) = path.file_name() {
+        return is_requirements_file(filename.to_string_lossy().as_ref());
+    }
+    
+    false
 }
 
 /// Check if a file should be considered for processing in the ReqFlow system
