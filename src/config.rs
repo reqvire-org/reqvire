@@ -21,6 +21,10 @@ pub struct Config {
     // These are needed for validation logic but not exposed in the config file
     #[serde(skip_serializing, skip_deserializing)]
     pub validation: ValidationConfig,
+    
+    // Linting configuration
+    #[serde(skip_serializing, skip_deserializing)]
+    pub linting: LintingConfig,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -57,8 +61,13 @@ pub struct ValidationConfig {
     pub validate_markdown: bool,
     pub validate_relations: bool,
     pub validate_all: bool,
-    pub fix_automatically: bool,
     pub json_output: bool,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, Default)]
+pub struct LintingConfig {
+    pub lint: bool,                // Enable linting
+    pub dry_run: bool,             // Preview changes without applying them
 }
 
 impl Default for GeneralConfig {
@@ -93,7 +102,6 @@ impl Default for ValidationConfig {
             validate_markdown: false,
             validate_relations: false,
             validate_all: false,
-            fix_automatically: false,
             json_output: false,
         }
     }
@@ -116,6 +124,7 @@ impl Default for Config {
             paths: PathsConfig::default(),
             style: StyleConfig::default(),
             validation: ValidationConfig::default(),
+            linting: LintingConfig::default(),
         }
     }
 }

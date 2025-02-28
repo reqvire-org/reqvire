@@ -31,6 +31,7 @@ paths:
   system_requirements_folder_name: "SystemRequirements"
   design_specifications_folder_name: "DesignSpecifications"
   output_folder: "output"
+  requirements_filename_match: "Requirements"
 
 # Style settings for HTML output
 style:
@@ -53,6 +54,7 @@ general:
 ```yaml
 paths:
   # Main folder containing specifications (relative to execution directory)
+  # Can be overridden via command line by providing the input folder argument
   specifications_folder: "specifications"
   
   # Folder name for system requirements (relative to specifications_folder)
@@ -62,7 +64,11 @@ paths:
   design_specifications_folder_name: "DesignSpecifications"
   
   # Default output folder
+  # Can be overridden via command line by providing the output folder argument
   output_folder: "output"
+  
+  # String to match in filename for identifying Requirements files
+  requirements_filename_match: "Requirements"
 ```
 
 ### Style Settings
@@ -73,6 +79,16 @@ style:
   max_width: 1200             # Maximum width for HTML content (in pixels)
   custom_css: null            # Optional path to a custom CSS file
 ```
+
+## Command Line Arguments
+
+With the configuration file in place, the command line arguments for input and output folders become optional:
+
+```
+reqflow [INPUT_FOLDER] [OUTPUT_FOLDER] [OPTIONS]
+```
+
+If the input folder or output folder is not provided on the command line, ReqFlow will use the values from the configuration file.
 
 ## Command Line Override
 
@@ -89,3 +105,13 @@ cp /path/to/reqflow.yml.example ./reqflow.yml
 # Edit the configuration file
 nano reqflow.yml
 ```
+
+## Using with CI/CD
+
+When using ReqFlow in CI/CD pipelines, you can either:
+
+1. Include a reqflow.yml file in your repository
+2. Pass a configuration file explicitly using the `--config` option
+3. Override specific settings using command line arguments
+
+This flexibility makes it easy to adapt ReqFlow to various CI/CD environments and workflows.

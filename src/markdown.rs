@@ -14,8 +14,26 @@ pub fn parse_elements(content: &str, file_path: &str) -> Result<Vec<Element>, Re
     let mut current_element: Option<Element> = None;
     let mut in_relations_section = false;
     
+    // Use the config's subsection regex
+    
+    // List of reserved subsections that should never be treated as elements
+    let reserved_subsections = vec!["Relations", "Details", "Properties", "Metadata"];
+    
     for line in content.lines() {
-        if Config::element_regex().is_match(line) {
+        if line.trim() == "### Relations" {
+            // Special case: "### Relations" could be mistaken for an element but should be treated as a Relations subsection
+            if current_element.is_some() {
+                in_relations_section = true;
+                
+                // Add the relations header to the element content
+                if let Some(element) = &mut current_element {
+                    element.add_content(&format!("{}\n", line));
+                }
+            } else {
+                // We found a Relations header outside of an element - log it but don't create an element for it
+                info!("Found '### Relations' outside of an element in {}", file_path);
+            }
+        } else if Config::element_regex().is_match(line) {
             // Save previous element if exists
             if let Some(element) = current_element.take() {
                 elements.push(element);
@@ -38,12 +56,35 @@ pub fn parse_elements(content: &str, file_path: &str) -> Result<Vec<Element>, Re
             if let Some(element) = &mut current_element {
                 element.add_content(&format!("{}\n", line));
             }
-        } else if line.trim() == "#### Relations" || line.trim() == "### Relations" {
-            in_relations_section = true;
+        } else if let Some(subsection_match) = Config::subsection_regex().captures(line) {
+            // Got a level 4 header (subsection)
+            let subsection_name = subsection_match.get(1).unwrap().as_str().trim();
             
-            // Add the relations header to the element content
-            if let Some(element) = &mut current_element {
-                element.add_content(&format!("{}\n", line));
+            // Check if this is a reserved subsection
+            if reserved_subsections.contains(&subsection_name) {
+                // Check that we're inside an element
+                if current_element.is_some() {
+                    // Set in_relations_section flag if this is a Relations subsection
+                    if subsection_name == "Relations" {
+                        in_relations_section = true;
+                    } else {
+                        in_relations_section = false;
+                    }
+                    
+                    // Add the subsection header to the element content
+                    if let Some(element) = &mut current_element {
+                        element.add_content(&format!("{}\n", line));
+                    }
+                } else {
+                    // We found a subsection header outside of an element - this is unusual
+                    // but we shouldn't create an element for it
+                    info!("Found {} subsection header outside of an element in {}", subsection_name, file_path);
+                }
+            } else {
+                // Not a reserved subsection, treat as normal content
+                if let Some(element) = &mut current_element {
+                    element.add_content(&format!("{}\n", line));
+                }
             }
         } else if in_relations_section && (line.trim().starts_with("* ") || line.trim().starts_with("  * ") || 
                                           line.trim().starts_with("- ") || line.trim().starts_with("  - ")) {
