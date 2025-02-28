@@ -444,8 +444,12 @@ impl ModelManager {
             if path.is_file() && path.extension().map_or(false, |ext| ext == "md") {
                 let file_name = path.file_name().unwrap().to_string_lossy();
                 
-                // Check if requirements files are in the right directories
-                if file_name.contains("Requirements") && !path.starts_with(&system_reqs_dir_path) {
+                // Check if files are in the System Requirements directory
+                if path.starts_with(&system_reqs_dir_path) {
+                    // All files in this directory are considered system requirements
+                    // No need for additional validation
+                } else if file_name.contains("Requirements") {
+                    // For backward compatibility, flag Requirements files not in the system requirements directory
                     // Don't flag the main SystemRequirements.md file
                     if !file_name.contains(system_reqs_folder) {
                         errors.push(ReqFlowError::ValidationError(
@@ -454,8 +458,13 @@ impl ModelManager {
                     }
                 }
                 
-                // Check if design specs are in the right directories
-                if file_name.contains("DSD_") && !path.starts_with(&design_specs_dir_path) {
+                // Check if files in the Design Specifications directory
+                if path.starts_with(&design_specs_dir_path) {
+                    // We don't need to validate that DSD files have the "DSD_" prefix anymore
+                    // All files in this directory are considered design specifications
+                } else if file_name.contains("DSD_") {
+                    // If a file has DSD_ prefix but is not in the design specs directory,
+                    // that's still an error for backward compatibility
                     errors.push(ReqFlowError::ValidationError(
                         format!("Design specification file '{}' is not in the Design Specifications directory", path.display())
                     ));
@@ -585,16 +594,14 @@ impl ModelManager {
             .into_iter()
             .filter_map(|e| e.ok())
             .filter(|e| {
-                e.path().is_file() && 
-                e.path().extension().map_or(false, |ext| ext == "md") && 
-                (e.path().file_name().map_or(false, |name| utils::is_requirements_file(name.to_string_lossy().as_ref())) ||
-                 // Handle system requirements in subfolders according to the documentation
-                 e.path().parent().map_or(false, |parent| parent.file_name().map_or(false, |name| 
-                     name.to_string_lossy().contains("systemRequirements"))) &&
-                 e.path().file_name().map_or(false, |name| name.to_string_lossy() == "Requirements.md") ||
-                 // Explicitly include all design specification documents
-                 e.path().parent().map_or(false, |parent| parent.file_name().map_or(false, |name| 
-                     name.to_string_lossy().contains("DesignSpecifications"))))
+                let file_path = e.path();
+                
+                if !file_path.is_file() || file_path.extension().map_or(true, |ext| ext != "md") {
+                    return false;
+                }
+                
+                // Use the new path-based detection that respects configuration
+                utils::is_requirements_file_by_path(file_path, &self.config, input_folder)
             })
             .map(|e| e.path().to_path_buf())
             .collect();
