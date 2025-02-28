@@ -20,6 +20,9 @@ mod validation_tests;
 #[path = "tests/config_tests.rs"]
 #[cfg(test)]
 mod config_tests;
+#[path = "tests/linting_tests.rs"]
+#[cfg(test)]
+mod linting_tests;
 
 use model::ModelManager;
 
