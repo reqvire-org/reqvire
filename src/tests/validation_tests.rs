@@ -118,15 +118,44 @@ fn test_validate_unique_relations() {
     // Create a registry and add elements with unique relations
     let mut registry = ElementRegistry::new();
     
+    // Basic unique relations case
     let mut element = Element::new("TestElement".to_string(), "test.md".to_string());
     element.add_relation(Relation::new("dependsOn".to_string(), "target1".to_string()));
     element.add_relation(Relation::new("satisfiedBy".to_string(), "target2".to_string()));
     element.add_relation(Relation::new("verifiedBy".to_string(), "target3".to_string()));
     
+    // Test edge cases that should NOT be considered duplicates
+    let mut element2 = Element::new("EdgeCases".to_string(), "test.md".to_string());
+    
+    // Same relation type but different targets
+    element2.add_relation(Relation::new("dependsOn".to_string(), "targetA".to_string()));
+    element2.add_relation(Relation::new("dependsOn".to_string(), "targetB".to_string()));
+    
+    // Same target but different relation types
+    element2.add_relation(Relation::new("satisfiedBy".to_string(), "commonTarget".to_string()));
+    element2.add_relation(Relation::new("verifiedBy".to_string(), "commonTarget".to_string()));
+    
+    // Whitespace differences (should be normalized)
+    element2.add_relation(Relation::new("tracedFrom".to_string(), "  targetWithSpaces  ".to_string()));
+    
+    // Case sensitivity (should be case-sensitive)
+    element2.add_relation(Relation::new("refine".to_string(), "CaseSensitiveTarget".to_string()));
+    element2.add_relation(Relation::new("refine".to_string(), "casesensitivetarget".to_string()));
+    
     registry.add_element(element).unwrap();
+    registry.add_element(element2).unwrap();
     
     // Validate relations
     let errors = validation::validate_relations(&registry).unwrap();
+    
+    // Debug output for any errors found
+    if !errors.is_empty() {
+        println!("Unexpected errors found during unique relations test:");
+        for error in &errors {
+            println!("  - {}", error);
+        }
+    }
+    
     assert!(errors.is_empty(), "Should not find any errors with unique relations");
 }
 
@@ -187,6 +216,40 @@ fn test_validate_multiple_duplicate_relations() {
     
     assert!(has_verifiedby_error, "Should have error about duplicate verifiedBy relation");
     assert!(has_satisfiedby_error, "Should have error about duplicate satisfiedBy relation");
+}
+
+#[test]
+fn test_validate_whitespace_normalization() {
+    // Create a registry with elements that have relations with extra whitespace
+    let mut registry = ElementRegistry::new();
+    
+    // Create element with relations that should be considered duplicates after whitespace normalization
+    let mut element = Element::new("WhitespaceElement".to_string(), "test.md".to_string());
+    element.add_relation(Relation::new("dependsOn".to_string(), "target1".to_string()));
+    element.add_relation(Relation::new("dependsOn".to_string(), "  target1  ".to_string())); // Extra whitespace
+    
+    element.add_relation(Relation::new("satisfiedBy".to_string(), "  target2  ".to_string())); // Extra whitespace in target
+    element.add_relation(Relation::new("satisfiedBy".to_string(), "target2".to_string()));
+    
+    registry.add_element(element).unwrap();
+    
+    // Validate relations
+    let errors = validation::validate_relations(&registry).unwrap();
+    
+    println!("Found {} whitespace normalization errors:", errors.len());
+    for error in &errors {
+        println!("  - {}", error);
+    }
+    
+    // Should find exactly 2 duplicate errors (one for each pair)
+    assert_eq!(errors.len(), 2, "Should find two errors for relations with extra whitespace");
+    
+    // Verify both errors are DuplicateRelation errors
+    let duplicate_errors = errors.iter().filter(|e| {
+        matches!(e, ReqFlowError::DuplicateRelation(_))
+    }).count();
+    
+    assert_eq!(duplicate_errors, 2, "Both errors should be DuplicateRelation errors");
 }
 
 #[test]
