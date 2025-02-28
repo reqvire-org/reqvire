@@ -203,6 +203,9 @@ pub fn lint_directory(directory: &Path, dry_run: bool) -> Result<Vec<LintSuggest
 // Import submodules
 pub mod absolute_links;
 pub mod whitespace;
+pub mod newlines;
+pub mod separators;
+pub mod indentation;
 
 /// Find absolute links that could be converted to relative links
 pub fn find_absolute_links(content: &str, file_path: &Path) -> Vec<LintSuggestion> {
@@ -215,21 +218,18 @@ pub fn find_excess_whitespace(content: &str, file_path: &Path) -> Vec<LintSugges
 }
 
 /// Find and fix inconsistent newlines
-pub fn find_inconsistent_newlines(_content: &str, _file_path: &Path) -> Vec<LintSuggestion> {
-    // Implementation will be added
-    Vec::new()
+pub fn find_inconsistent_newlines(content: &str, file_path: &Path) -> Vec<LintSuggestion> {
+    newlines::find_inconsistent_newlines(content, file_path)
 }
 
 /// Find missing separator lines
-pub fn find_missing_separators(_content: &str, _file_path: &Path) -> Vec<LintSuggestion> {
-    // Implementation will be added
-    Vec::new()
+pub fn find_missing_separators(content: &str, file_path: &Path) -> Vec<LintSuggestion> {
+    separators::find_missing_separators(content, file_path)
 }
 
 /// Find inconsistent indentation in relation lists
-pub fn find_inconsistent_indentation(_content: &str, _file_path: &Path) -> Vec<LintSuggestion> {
-    // Implementation will be added
-    Vec::new()
+pub fn find_inconsistent_indentation(content: &str, file_path: &Path) -> Vec<LintSuggestion> {
+    indentation::find_inconsistent_indentation(content, file_path)
 }
 
 // Add test module
