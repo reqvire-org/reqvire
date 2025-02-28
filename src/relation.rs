@@ -39,6 +39,33 @@ impl Relation {
         // Any link should convert between .md and .html based on output mode
         let mut enhanced_target = target.to_string();
         
+        // Check if this is a markdown link already (e.g., [text](url))
+        if enhanced_target.contains("](") && enhanced_target.contains(")") {
+            info!("Target appears to be a markdown link already: {}", enhanced_target);
+            
+            // Extract the URL part from the markdown link
+            let url_start = enhanced_target.find("](").unwrap() + 2;
+            let url_end = enhanced_target.rfind(")").unwrap();
+            let url = &enhanced_target[url_start..url_end];
+            
+            if convert_to_html && url.ends_with(".md") {
+                // Replace .md with .html in the URL part only
+                let new_url = url.replace(".md", ".html");
+                enhanced_target = format!("{}{}{}",
+                    &enhanced_target[0..url_start],
+                    new_url,
+                    &enhanced_target[url_end..]
+                );
+                info!("Converted markdown link URL to HTML: {}", enhanced_target);
+                
+                // Return immediately with the formatted relation
+                return Ok(format!("  * {}: {}", self.relation_type, enhanced_target));
+            }
+            
+            // If it's already a properly formatted markdown link, just return it
+            return Ok(format!("  * {}: {}", self.relation_type, enhanced_target));
+        }
+        
         // We need to specifically handle the case where the link already has a .md extension
         // and ensure it's converted to .html when in HTML mode
         if convert_to_html && enhanced_target.ends_with(".md") {
@@ -250,20 +277,51 @@ pub fn process_relations(content: &str, current_file: &Path, convert_to_html: bo
                 // Process existing markdown links to convert .md to .html if needed
                 info!("Line contains a markdown link, processing: {}", line);
                 
-                // Special handling for existing markdown links
-                if convert_to_html {
-                    // Use regex to specifically target the .md extension in the URL part
-                    // This is more precise than simple string replacement
-                    let converted_line = MD_LINK_REGEX.replace_all(line, "${1}.html${2}").to_string();
+                // Extract relation type and target (the markdown link) from the line
+                let relation_type_and_link = RELATION_REGEX.captures(line)
+                    .or_else(|| FALLBACK_RELATION_REGEX.captures(line));
+                
+                if let Some(captures) = relation_type_and_link {
+                    // If we could extract relation type and target
+                    let relation_type = captures.get(1).unwrap().as_str().to_string();
+                    let target = captures.get(2).unwrap().as_str().trim().to_string();
                     
-                    if converted_line != line {
-                        info!("Converted markdown link: {} -> {}", line, converted_line);
-                        updated_lines.push(converted_line);
+                    info!("Extracted relation from markdown link line: {} -> {}", relation_type, target);
+                    
+                    // Create a relation object and let its to_markdown_link method handle conversion
+                    let relation = Relation::new(relation_type, target);
+                    match relation.to_markdown_link(current_file, convert_to_html) {
+                        Ok(converted_line) => {
+                            info!("Converted markdown link through relation: {}", converted_line);
+                            updated_lines.push(converted_line);
+                        },
+                        Err(e) => {
+                            info!("Error converting relation with markdown link: {}", e);
+                            // Fall back to regex-based conversion
+                            if convert_to_html {
+                                let converted_line = MD_LINK_REGEX.replace_all(line, "${1}.html${2}").to_string();
+                                info!("Fallback conversion: {} -> {}", line, converted_line);
+                                updated_lines.push(converted_line);
+                            } else {
+                                updated_lines.push(line.to_string());
+                            }
+                        }
+                    }
+                } else {
+                    // If we couldn't extract relation and target, fall back to regex-based conversion
+                    info!("Could not extract relation from markdown link line, using regex");
+                    if convert_to_html {
+                        let converted_line = MD_LINK_REGEX.replace_all(line, "${1}.html${2}").to_string();
+                        
+                        if converted_line != line {
+                            info!("Converted markdown link: {} -> {}", line, converted_line);
+                            updated_lines.push(converted_line);
+                        } else {
+                            updated_lines.push(line.to_string());
+                        }
                     } else {
                         updated_lines.push(line.to_string());
                     }
-                } else {
-                    updated_lines.push(line.to_string());
                 }
             } else {
                 // Process relation to create a link - try multiple approaches
@@ -353,6 +411,14 @@ mod tests {
             // Test case 5: Element reference in file
             ("satisfiedBy", "DesignSpecifications/EventNotifications.md/Element Name", true, 
              "  * satisfiedBy: [DesignSpecifications/EventNotifications.md/Element Name](DesignSpecifications/EventNotifications.html#element-name)"),
+             
+            // Test case 6: Already formatted markdown link - convert to HTML
+            ("satisfiedBy", "[DesignSpecifications/ActivityFeed.md](DesignSpecifications/ActivityFeed.md)", true, 
+             "  * satisfiedBy: [DesignSpecifications/ActivityFeed.md](DesignSpecifications/ActivityFeed.html)"),
+             
+            // Test case 7: Already formatted markdown link - keep as markdown
+            ("satisfiedBy", "[DesignSpecifications/ActivityFeed.md](DesignSpecifications/ActivityFeed.md)", false, 
+             "  * satisfiedBy: [DesignSpecifications/ActivityFeed.md](DesignSpecifications/ActivityFeed.md)"),
         ];
         
         // Test pre-existing markdown links
