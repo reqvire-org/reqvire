@@ -9,6 +9,34 @@ The system shall provide a command to automatically bootstrap a predefined direc
 #### Relations
   * refine: UserStories.md/Managing MBSE Models
 
+### Project Configuration with YAML
+
+The system shall support a YAML-based configuration file that defines folder names and structures to be used by the ReqFlow tool when processing model artifacts.
+
+#### Relations
+  * refine: UserStories.md/Managing MBSE Models
+
+### Configurable SystemRequirements Folder Name
+
+The system shall allow users to configure the name of the SystemRequirements folder through the configuration file, supporting flexible project organization.
+
+#### Relations
+  * derivedFrom: Project Configuration with YAML
+
+### Configurable DesignSpecifications Folder Name
+
+The system shall allow users to configure the DesignSpecifications folder name through the configuration file, with this name consistently applied across all model levels.
+
+#### Relations
+  * derivedFrom: Project Configuration with YAML
+
+### Support for Distributed Requirements
+
+The system shall support referencing folders that may exist in different repositories through configuration, allowing for distributed requirements management across multiple repositories.
+
+#### Relations
+  * derivedFrom: Project Configuration with YAML
+
 
 ## Generate Diagrams
 
