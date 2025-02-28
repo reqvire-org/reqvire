@@ -48,6 +48,14 @@ pub fn is_requirements_file_by_path(path: &Path, config: &crate::config::Config,
         return true;
     }
     
+    // Check if the file matches the requirements_filename_match pattern
+    if let Some(filename) = path.file_name() {
+        let filename_str = filename.to_string_lossy();
+        if filename_str.contains(&config.paths.requirements_filename_match) {
+            return true;
+        }
+    }
+    
     // Fall back to filename-based check for compatibility
     if let Some(filename) = path.file_name() {
         return is_requirements_file(filename.to_string_lossy().as_ref());

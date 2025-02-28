@@ -83,7 +83,14 @@ pub fn validate_relations(registry: &ElementRegistry) -> Result<Vec<ReqFlowError
             
             // Then validate relation target
             if let Err(err) = validate_relation_target(relation, element_path, registry) {
-                errors.push(err);
+                // Add file path to the error message for better debugging
+                if let ReqFlowError::MissingRelationTarget(target) = err {
+                    errors.push(ReqFlowError::MissingRelationTarget(
+                        format!("In file '{}', element '{}': {}", element.file_path, element.name, target)
+                    ));
+                } else {
+                    errors.push(err);
+                }
             }
             
             // Check for duplicate relations (same type and target)

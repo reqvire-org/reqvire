@@ -38,6 +38,8 @@ pub struct PathsConfig {
     #[serde(alias = "design_specifications_folder_name")]
     pub design_specifications_folder: String,
     pub output_folder: String,
+    #[serde(default = "default_requirements_filename_match")]
+    pub requirements_filename_match: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -68,6 +70,11 @@ impl Default for GeneralConfig {
     }
 }
 
+// Default value for requirements filename matching
+fn default_requirements_filename_match() -> String {
+    "Requirements".to_string()
+}
+
 impl Default for PathsConfig {
     fn default() -> Self {
         Self {
@@ -75,6 +82,7 @@ impl Default for PathsConfig {
             system_requirements_folder: "SystemRequirements".to_string(),
             design_specifications_folder: "DesignSpecifications".to_string(),
             output_folder: "output".to_string(),
+            requirements_filename_match: default_requirements_filename_match(),
         }
     }
 }
@@ -114,13 +122,21 @@ impl Default for Config {
 
 impl Config {
     /// Get the full path for the system requirements directory
+    /// Note: This is deprecated in favor of direct path construction
     pub fn system_requirements_path(&self, base_path: &Path) -> PathBuf {
-        base_path.join(&self.paths.specifications_folder).join(&self.paths.system_requirements_folder)
+        // First, construct the specs directory path
+        let specs_dir = base_path.join(&self.paths.specifications_folder);
+        // Then, join the system requirements folder to that
+        specs_dir.join(&self.paths.system_requirements_folder)
     }
     
     /// Get the full path for the design specifications directory
+    /// Note: This is deprecated in favor of direct path construction  
     pub fn design_specifications_path(&self, base_path: &Path) -> PathBuf {
-        base_path.join(&self.paths.specifications_folder).join(&self.paths.design_specifications_folder)
+        // First, construct the specs directory path
+        let specs_dir = base_path.join(&self.paths.specifications_folder);
+        // Then, join the design specs folder to that
+        specs_dir.join(&self.paths.design_specifications_folder)
     }
     
     /// Load configuration from a YAML file
@@ -163,9 +179,17 @@ impl Config {
     /// Regular expression to match element headers (level 3)
     pub fn element_regex() -> &'static Regex {
         lazy_static! {
-            static ref ELEMENT_REGEX: Regex = Regex::new(r"### (.+)").unwrap();
+            static ref ELEMENT_REGEX: Regex = Regex::new(r"^###\s+(.+)").unwrap();
         }
         &ELEMENT_REGEX
+    }
+    
+    /// Regular expression to match subsection headers (level 4)
+    pub fn subsection_regex() -> &'static Regex {
+        lazy_static! {
+            static ref SUBSECTION_REGEX: Regex = Regex::new(r"^####\s+(.+)").unwrap();
+        }
+        &SUBSECTION_REGEX
     }
 
     /// Regular expression to match relation entries

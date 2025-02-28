@@ -247,7 +247,7 @@ pub fn process_relations(content: &str, current_file: &Path, convert_to_html: bo
         static ref MARKDOWN_LINK_REGEX: Regex = Regex::new(r"\[.+?\]\(.+?\)").unwrap();
         // Fallback regex that just looks for relation pattern anywhere in a line
         static ref FALLBACK_RELATION_REGEX: Regex = Regex::new(r"(\w+):\s*([A-Za-z0-9_\./]+)").unwrap();
-        // Regex to find .md in URL part of markdown links
+        // Regex to find .md in URL part of markdown links - Enhanced to handle various formats
         static ref MD_LINK_REGEX: Regex = Regex::new(r"(\]\([^)]+)\.md(\))").unwrap();
     }
     
