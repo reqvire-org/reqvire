@@ -297,14 +297,62 @@ fn main() -> Result<()> {
         } else {
             println!("ℹ️ Found {} linting suggestions:", lint_suggestions.len());
             
+            // Group suggestions by file and type for better readability
+            let mut grouped_by_file: std::collections::HashMap<String, Vec<&linting::LintSuggestion>> = 
+                std::collections::HashMap::new();
+            
             for suggestion in &lint_suggestions {
-                println!("  - {}", suggestion.format());
+                let file_path = suggestion.file_path.to_string_lossy().to_string();
+                grouped_by_file.entry(file_path).or_default().push(suggestion);
+            }
+            
+            // Print a summary first
+            println!("Files with formatting issues:");
+            for (file_path, suggestions) in &grouped_by_file {
+                // Group by issue type within each file
+                let mut type_counts: std::collections::HashMap<linting::LintType, usize> = 
+                    std::collections::HashMap::new();
+                
+                for suggestion in suggestions {
+                    *type_counts.entry(suggestion.suggestion_type.clone()).or_default() += 1;
+                }
+                
+                println!("  {} ({})", file_path, suggestions.len());
+                for (lint_type, count) in &type_counts {
+                    let type_name = match lint_type {
+                        linting::LintType::AbsoluteLink => "Absolute links",
+                        linting::LintType::ExcessWhitespace => "Excess whitespace",
+                        linting::LintType::InconsistentNewlines => "Inconsistent newlines",
+                        linting::LintType::MissingSeparator => "Missing separators",
+                        linting::LintType::InconsistentIndentation => "Inconsistent indentation",
+                    };
+                    println!("    - {}: {}", type_name, count);
+                }
+            }
+            
+            // Then print detailed git-style diffs
+            println!("\nSuggested changes (git diff style):");
+            
+            // Sort suggestions by file and line number for easier reading
+            let mut sorted_suggestions = lint_suggestions.clone();
+            sorted_suggestions.sort_by(|a, b| {
+                let file_cmp = a.file_path.to_string_lossy().cmp(&b.file_path.to_string_lossy());
+                if file_cmp == std::cmp::Ordering::Equal {
+                    a.line_number.unwrap_or(0).cmp(&b.line_number.unwrap_or(0))
+                } else {
+                    file_cmp
+                }
+            });
+            
+            for suggestion in &sorted_suggestions {
+                // Print the colorized diff, ignoring any errors
+                let _ = suggestion.print_colorized_diff();
             }
             
             if config.linting.dry_run {
-                println!("\nRun without --dry-run to apply these fixes automatically");
+                println!("Run without --dry-run to apply these fixes automatically");
             } else {
-                println!("\n✅ All suggestions have been applied");
+                println!("✅ All suggestions have been applied");
             }
         }
     } else {
