@@ -436,9 +436,14 @@ fn main() -> Result<()> {
         model_manager.collect_identifiers_only(&input_folder_path)?;
         
         // Generate the traceability matrix to be saved in the input directory (specifications root)
-        model_manager.generate_traceability_matrix(&input_folder_path, config.general.html_output)?;
+        // and HTML version to output directory if requested
+        model_manager.generate_traceability_matrix(&input_folder_path, &output_folder_path, config.general.html_output)?;
         
-        println!("Traceability matrix generated and saved to {:?}", input_folder_path);
+        if config.general.html_output {
+            println!("Traceability matrix generated: Markdown saved to {:?}, HTML saved to {:?}", input_folder_path, output_folder_path);
+        } else {
+            println!("Traceability matrix generated and saved to {:?}", input_folder_path);
+        }
     } else {
         // Normal processing mode
         if config.general.verbose {
