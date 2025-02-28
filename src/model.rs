@@ -306,8 +306,13 @@ impl ModelManager {
                 self.file_contents.insert(relative_path_str.clone(), content.clone());
                 
                 // Skip collecting elements from Design Specification Documents
-                let design_specs_folder = &self.config.paths.design_specifications_folder;
-                if !relative_path_str.contains(design_specs_folder) {
+                // DSDs are identified by being in any folder that matches the design_specifications_folder name
+                let design_specs_folder_name = &self.config.paths.design_specifications_folder;
+                
+                // Check if any component of the path matches the design specs folder name
+                let is_dsd = relative_path_str.split('/').any(|component| component == design_specs_folder_name);
+                
+                if !is_dsd {
                     // Only collect elements from non-DSD documents
                     markdown::collect_elements(&content, &relative_path_str, registry)?;
                 } else {
@@ -335,8 +340,13 @@ impl ModelManager {
         // Process each file for markdown structure validation
         for (file_path, content) in &self.file_contents {
             // Skip validation for Design Specification Documents
-            let design_specs_folder = &self.config.paths.design_specifications_folder;
-            if file_path.contains(design_specs_folder) {
+            // DSDs are identified by being in any folder that matches the design_specifications_folder name
+            let design_specs_folder_name = &self.config.paths.design_specifications_folder;
+            
+            // Check if any component of the path matches the design specs folder name
+            let is_dsd = file_path.split('/').any(|component| component == design_specs_folder_name);
+            
+            if is_dsd {
                 info!("Skipping validation for Design Specification Document: {}", file_path);
                 continue;
             }

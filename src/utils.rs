@@ -36,9 +36,15 @@ pub fn is_requirements_file_by_path(path: &Path, config: &crate::config::Config,
         return true;
     }
     
-    // Check if the file is in the design specifications directory
-    let design_specs_path = config.design_specifications_path(base_path);
-    if path.starts_with(&design_specs_path) {
+    // Check if the file is in any design specifications directory
+    // Design specs are identified by being in any folder that matches the design_specifications_folder name
+    let rel_path = match path.strip_prefix(base_path) {
+        Ok(rel) => rel.to_string_lossy().to_string(),
+        Err(_) => path.to_string_lossy().to_string()
+    };
+    
+    let design_specs_folder_name = &config.paths.design_specifications_folder;
+    if rel_path.split('/').any(|component| component == design_specs_folder_name) {
         return true;
     }
     
