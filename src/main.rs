@@ -80,6 +80,10 @@ struct Args {
     #[clap(long, requires = "lint")]
     dry_run: bool,
     
+    /// When linting, process all markdown files, not just requirements documents
+    #[clap(long, requires = "lint")]
+    all_files: bool,
+    
     /// Output validation results in JSON format
     /// Useful for CI/CD pipelines and automation
     #[clap(long)]
@@ -144,6 +148,7 @@ fn main() -> Result<()> {
     if args.lint {
         config.linting.lint = true;
         config.linting.dry_run = args.dry_run;
+        config.linting.requirements_only = !args.all_files;
     }
     
     if args.json {
@@ -285,12 +290,26 @@ fn main() -> Result<()> {
     } else if linting_mode {
         // Run in linting mode
         if config.general.verbose {
-            println!("Linting files in {:?}{}", input_folder_path, 
-                    if config.linting.dry_run { " (dry run)" } else { "" });
+            let requirements_only_msg = if config.linting.requirements_only {
+                " (requirements files only)"
+            } else {
+                " (all markdown files)"
+            };
+            
+            let dry_run_msg = if config.linting.dry_run { " (dry run)" } else { "" };
+            
+            println!("Linting files in {:?}{}{}", 
+                input_folder_path, 
+                requirements_only_msg,
+                dry_run_msg);
         }
         
-        // Run the linting
-        let lint_suggestions = linting::lint_directory(&input_folder_path, config.linting.dry_run)?;
+        // Run the linting with the configuration
+        let lint_suggestions = linting::lint_directory_with_config(
+            &input_folder_path, 
+            config.linting.dry_run,
+            &config
+        )?;
         
         if lint_suggestions.is_empty() {
             println!("✅ No linting suggestions found. Your files are clean!");
@@ -317,7 +336,44 @@ fn main() -> Result<()> {
                     *type_counts.entry(suggestion.suggestion_type.clone()).or_default() += 1;
                 }
                 
-                println!("  {} ({})", file_path, suggestions.len());
+                // Check if this is a requirements file (more thorough check)
+                let path = std::path::Path::new(file_path);
+                let is_requirements_file = if let Some(filename) = path.file_name() {
+                    let filename_str = filename.to_string_lossy().to_lowercase();
+                    let path_str = path.to_string_lossy().to_lowercase();
+                    let req_pattern = config.paths.requirements_filename_match.to_lowercase();
+                    
+                    // Check filename and path
+                    filename_str.contains(&req_pattern) || 
+                    path_str.contains(&format!("/{}/", config.paths.system_requirements_folder.to_lowercase())) ||
+                    path_str.contains(&format!("/{}/", req_pattern.to_lowercase()))
+                } else {
+                    false
+                };
+                
+                // For more precise identification, also look at file content
+                let file_content_type = if let Ok(content) = std::fs::read_to_string(path) {
+                    // Requirements files typically have both elements and Relations sections
+                    let has_elements = content.contains("### ");
+                    let has_relations = content.contains("#### Relations");
+                    
+                    if has_elements && has_relations {
+                        true // It has the structure of a requirements document
+                    } else {
+                        false
+                    }
+                } else {
+                    false
+                };
+                
+                // Add a tag to indicate if this is a requirements file
+                let file_type_tag = if is_requirements_file || file_content_type {
+                    "[requirement document]"
+                } else {
+                    "[other document]" 
+                };
+                
+                println!("  {} {} ({})", file_path, file_type_tag, suggestions.len());
                 for (lint_type, count) in &type_counts {
                     let type_name = match lint_type {
                         linting::LintType::AbsoluteLink => "Absolute links",
