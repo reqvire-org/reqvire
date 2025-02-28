@@ -305,7 +305,14 @@ impl ModelManager {
                 // Store file content for later validation and processing
                 self.file_contents.insert(relative_path_str.clone(), content.clone());
                 
-                markdown::collect_elements(&content, &relative_path_str, registry)?;
+                // Skip collecting elements from Design Specification Documents
+                let design_specs_folder = &self.config.paths.design_specifications_folder;
+                if !relative_path_str.contains(design_specs_folder) {
+                    // Only collect elements from non-DSD documents
+                    markdown::collect_elements(&content, &relative_path_str, registry)?;
+                } else {
+                    debug!("Skipping element collection for Design Specification Document: {}", relative_path_str);
+                }
             }
         }
         
@@ -327,6 +334,13 @@ impl ModelManager {
         
         // Process each file for markdown structure validation
         for (file_path, content) in &self.file_contents {
+            // Skip validation for Design Specification Documents
+            let design_specs_folder = &self.config.paths.design_specifications_folder;
+            if file_path.contains(design_specs_folder) {
+                info!("Skipping validation for Design Specification Document: {}", file_path);
+                continue;
+            }
+            
             info!("Validating markdown structure of {}", file_path);
             
             // Use existing validation function
