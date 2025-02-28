@@ -1,15 +1,13 @@
 # Design Specification Document: Structure and Addressing in Markdown Documents
 
-This document defines the structure, rules, and usage of **Elements**, **Relations**, and **Identifiers** in Markdown (`.md`) documents. 
-
-- **Elements** represent distinct, identifiable sections within a document and are the foundation of the model's structure and relationships.  
-- The **Relations** subsection within elements specifies associations between elements, files, or other resources, forming the logical and dependency structure of the model.  
-- **Identifiers** are relative URIs derived from a defined root folder, providing unambiguous references to files or specific fragments (elements) within files, serving as a consistent addressing mechanism for the model.  
+This document defines the structure, rules, and usage of **Elements**, **Subsections** including **Relations**, and **Details**, as well as **Identifiers** in Markdown (`.md`) documents. 
 
 
-## Elements in Markdown Documents
+## Elements
 
-An **Element** is a uniquely identifiable section within a Markdown document. It starts with a `###` header and includes all content under that header until the next header of the same or higher hierarchy.
+An **Element** is a uniquely identifiable section within a Markdown document and form the foundation of the model’s structure and relationships:
+
+Elements may contain structured **Subsections**, each serving a specific purpose.
 
 ### Structure of an Element
 
@@ -25,7 +23,7 @@ An **Element** is a uniquely identifiable section within a Markdown document. It
     - The end of the document.
   - The content can include:
     - Text
-    - Subheaders (e.g., `####`)
+    - Subheaders (e.g., `####`) representing a start of subsection.
     - Bullet points, code blocks, tables, etc.
 
 
@@ -96,7 +94,7 @@ Content of the first duplicate.
 Content of the second duplicate.
 ```
 
-## Identifiers in Markdown Documents
+## Identifiers
 
 The **identifier** is represented as a path following a filename with extension (eg file.md) and optionally an **element** name.
 Identifier path if starting with '/' is considered starting from a documentation 'root' folder.
@@ -125,14 +123,41 @@ Other Examples of Identifiers:
  * Element fragment with special characters: 'path/file.md/My Element (Draft)'
 
 
+##  Subsections
 
-##  Relations in Markdown Documents
+An element may contain different **Subsections**, some of which are strictly defined, while others allow free-form content.
+- **Reserved Subsections**: These subsections follow a predefined structure.
+- **Other Subsections**: These allow additional descriptive or supporting information.
 
-The `#### Relations` subsection:
-- Is a dedicated part of an **element** section in Markdown document.
-- Starts with the `#### Relations` header.
-- Contains a list of relations in a specific format.
+Subsections starts with the `#### Subsection Name` and ends either with new element or next subsection.
 
+The reserved subsections are:
+ * Relations
+ * Details
+ * Properties
+ * Metadata
+ 
+Those have defines structure that must be followed.
+
+### Details Subsection
+
+The **#### Details** subsection within an element provides additional information directly related to the main requirement text.
+
+- Content within the **Details** subsection is considered an **extension of the requirement text**.
+- Any statements in the **Details** subsection hold the same validity as the main requirement text.
+
+###  Relations Subsection
+
+The `#### Relations` subsection specifies associations between elements, files, or other resources, forming the logical and dependency structure of the model.
+
+- Relations must follow a **structured reference format** to ensure clear traceability.
+- Supported relation types include (but are not limited to):
+  - `refine:` (further elaborates on another element)
+  - `verifiedBy:` (links to test or validation resources)
+  - `dependsOn:` (establishes dependency on another requirement or component)
+
+
+`#### Relations` contains a list of relations in a specific format.
 
 The `#### Relations` subsection must be located within an element chunk.
 Each element chunk can have at most one `#### Relations` subsection.
@@ -140,7 +165,7 @@ Each element chunk can have at most one `#### Relations` subsection.
 The `#### Relations` header marks the beginning of the subsection.
 
 The `#### Relations` subsection must appear directly within an element  chunk.
-It must follow the `###` header of the parent element and any preceding content.
+It must follow the `###` header of the parent element and any preceding content including previous subsections.
 
 Relation entries are listed as bullet points (`*`) with 2 spaces '  *' indentation from the beginning of the line, and follow this format:
  * relationType: **identifier**
@@ -157,7 +182,7 @@ Relation entries are listed as bullet points (`*`) with 2 spaces '  *' indentati
 Duplicate relation entries within the same `#### Relations` subsection are not allowed.
 
 
-### Examples of `#### Relations`
+#### Examples of `#### Relations`
 
 Simple Relations:
 ```markdown
@@ -194,7 +219,7 @@ This element contains invalid relation entries.
 
 
 
-## Identifier Usage in Relations
+### Identifier Usage in Relations
 
 Identifiers are used in relations to reference files or specific elements within files. Examples:
 

@@ -353,11 +353,19 @@ The system shall include checkboxes in the traceability matrix for each verifica
 
 ### Handle Affected Verifications on Model Changes
 
-The system shall uncheck verification checkboxes in the traceability matrix and save updated if a diff affects the related requirements or components, ensuring re-validation is required.
+The system shall uncheck verification checkboxes in the traceability matrix and save updates if a diff affects the related requirements or components, ensuring re-validation is required.
 
 #### Relations
   * refine: UserStories.md/Generate Traceability Matrix
   * verifiedBy: README.md/Not Implemented Yet 
+
+### Specification Design Document for Requirements Change Propagation
+
+The system **shall provide a Specification Design Document (DSD)** that defines how changes in requirements affect child requirements and verifications, ensuring traceability and controlled impact analysis.
+
+#### Relations
+  * refine: UserStories.md/Handle Affected Verifications on Model Changes
+  * satisfiedBy: DesignSpecifications/RequirementsChangePropagation.md
 
 
 ### Export Traceability Matrix

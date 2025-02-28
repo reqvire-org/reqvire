@@ -1,5 +1,6 @@
 # ReqFlow Development Guide
 
+## 
 ## Build and Test Commands
 - Build: `cargo build`
 - Run: `cargo run -- <input_folder> <output_folder> [--html]`
@@ -25,4 +26,5 @@
 - Document all public APIs with rustdoc
 - Organize code in modules by functionality
 - Prefer strong typing over string manipulation
-- Follow the logical architecture defined in specifications/
+- Follow the requirements, logical and physical architecture defined in specifications/
+  - specifically cread and understand Design Specifications in specifications/DesignSpecifications/
