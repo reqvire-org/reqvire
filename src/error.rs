@@ -44,6 +44,10 @@ pub enum ReqFlowError {
     #[allow(dead_code)]
     #[error("Invalid markdown structure: {0}")]
     InvalidMarkdownStructure(String),
+    
+    #[allow(dead_code)]
+    #[error("Duplicate relation: {0}")]
+    DuplicateRelation(String),
 
     #[error("Path error: {0}")]
     PathError(String),

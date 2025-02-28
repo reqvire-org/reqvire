@@ -80,6 +80,17 @@ pub fn parse_elements(content: &str, file_path: &str) -> Result<Vec<Element>, Re
                 let relation = Relation::new(relation_type, target);
                 
                 if let Some(element) = &mut current_element {
+                    // Check for duplicates in the current element's relations
+                    let is_duplicate = element.relations.iter().any(|r| 
+                        r.relation_type == relation.relation_type && r.target == relation.target
+                    );
+                    
+                    if is_duplicate {
+                        info!("Found duplicate relation: {} -> {} in element '{}'", 
+                              relation.relation_type, relation.target, element.name);
+                    }
+                    
+                    // Add it regardless for later validation
                     element.add_relation(relation);
                     element.add_content(&format!("{}\n", line));
                     // Log total relations after adding
