@@ -294,13 +294,19 @@ pub fn generate_requirements_diagram(
     let lines: Vec<&str> = content.lines().collect();
     let mut result_lines = Vec::new();
     
-    // First, remove any existing ReqFlow-generated diagrams
+    // First, remove any existing ReqFlow-generated diagrams and cleanup markers
     let mut i = 0;
     let mut in_diagram = false;
     let mut skipping_diagram = false;
     
     while i < lines.len() {
         let line = lines[i];
+        
+        // Skip any standalone ReqFlow marker comments
+        if line.trim().contains("<!-- ReqFlow-generated diagram") {
+            i += 1;
+            continue;
+        }
         
         // Check for start of mermaid diagram
         if line.trim() == "```mermaid" {
@@ -311,10 +317,19 @@ pub fn generate_requirements_diagram(
                 j += 1;
             }
             
-            // Look for the metadata comment after the diagram
-            if j < lines.len() && j + 1 < lines.len() && 
-               lines[j + 1].contains("<!-- ReqFlow-generated diagram") {
-                // This is a ReqFlow-generated diagram, skip it
+            // Look for the typical ReqFlow-generated diagram pattern
+            // ReqFlow diagrams always contain specific class definitions
+            let mut contains_req_styling = false;
+            for k in i + 1..j {
+                if lines[k].contains("classDef requirement") && 
+                   lines[k].contains("fill:#f9d6d6") {
+                    contains_req_styling = true;
+                    break;
+                }
+            }
+            
+            if contains_req_styling {
+                // This is likely a ReqFlow-generated diagram, skip it
                 skipping_diagram = true;
                 in_diagram = true;
                 i += 1;
@@ -326,13 +341,15 @@ pub fn generate_requirements_diagram(
         if in_diagram {
             if line.trim().ends_with("```") {
                 in_diagram = false;
+                i += 1;
                 
-                // Skip the metadata comment too
-                if i + 1 < lines.len() && 
-                   lines[i + 1].contains("<!-- ReqFlow-generated diagram") {
-                    i += 2; // Skip closing ``` and metadata comment
-                    continue;
+                // Skip any marker comments that might follow the diagram
+                while i < lines.len() && 
+                      (lines[i].trim().is_empty() || 
+                       lines[i].trim().contains("<!-- ReqFlow-generated diagram")) {
+                    i += 1;
                 }
+                continue;
             }
             
             if skipping_diagram {
@@ -444,10 +461,9 @@ pub fn generate_requirements_diagram(
                         convert_to_html
                     )?;
                     
-                    // Add an empty line, the diagram, and metadata comment
+                    // Add an empty line and the diagram
                     result_lines.push("".to_string());
                     result_lines.push(diagram);
-                    result_lines.push("<!-- ReqFlow-generated diagram - do not modify manually -->".to_string());
                     result_lines.push("".to_string());
                 }
             }
@@ -491,8 +507,7 @@ fn generate_diagram_for_paragraph(
         // Create a set to track included elements
         let mut included_elements = HashSet::new();
         
-        // Create a subgraph for this paragraph
-        diagram.push_str(&format!("  subgraph para[\"{}\"];\n", paragraph_name));
+
         
         // Add each element in this paragraph
         for element in elements {
@@ -507,9 +522,7 @@ fn generate_diagram_for_paragraph(
             )?;
         }
         
-        // End the subgraph
-        diagram.push_str("  end;\n");
-        diagram.push_str("  class para paragraph;\n");
+
     }
     
     // Close the diagram
@@ -621,7 +634,7 @@ fn add_element_to_diagram(
             if let Some(target_elem) = target_element {
                 // Add click behavior for HTML if we found the target
                 let target_html_file = if convert_to_html {
-                    target_elem.file_path.replace(".md", ".html")
+                    convert_path_to_html_link(&target_elem.file_path)
                 } else {
                     target_elem.file_path.clone()
                 };
@@ -642,16 +655,8 @@ fn add_element_to_diagram(
                         path.push_str(parts[i]);
                     }
                     if convert_to_html {
-                        // If it has .md extension, replace it with .html
-                        if path.ends_with(".md") {
-                            path.replace(".md", ".html")
-                        } else if !path.contains('.') {
-                            // If it's a path without extension, add .html
-                            format!("{}.html", path)
-                        } else {
-                            // Otherwise keep as is
-                            path
-                        }
+                        // Use helper function to convert to HTML links
+                        convert_path_to_html_link(&path)
                     } else {
                         // In markdown mode, keep path as is
                         path
@@ -659,16 +664,8 @@ fn add_element_to_diagram(
                 } else {
                     let path = parts[0].to_string();
                     if convert_to_html {
-                        // If it has .md extension, replace it with .html
-                        if path.ends_with(".md") {
-                            path.replace(".md", ".html")
-                        } else if !path.contains('.') {
-                            // If it's a path without extension, add .html
-                            format!("{}.html", path)
-                        } else {
-                            // Otherwise keep as is
-                            path
-                        }
+                        // Use helper function to convert to HTML links
+                        convert_path_to_html_link(&path)
                     } else {
                         // In markdown mode, keep path as is
                         path
@@ -682,7 +679,13 @@ fn add_element_to_diagram(
                 };
                 
                 let link = if !element_part.is_empty() {
-                    format!("{}#{}", file_part, element_part.replace(' ', "-").to_lowercase())
+                    // Check if the element part already has .html suffix, and remove it if present
+                    let element_anchor = if element_part.ends_with(".html") {
+                        element_part[..element_part.len()-5].replace(' ', "-").to_lowercase()
+                    } else {
+                        element_part.replace(' ', "-").to_lowercase()
+                    };
+                    format!("{}#{}", file_part, element_anchor)
                 } else {
                     file_part
                 };
@@ -699,4 +702,18 @@ fn add_element_to_diagram(
     }
     
     Ok(())
+}
+
+/// Helper function to convert path to HTML format with proper extension handling
+fn convert_path_to_html_link(path: &str) -> String {
+    if path.ends_with(".md") {
+        // Replace .md with .html
+        path.replace(".md", ".html")
+    } else if !path.contains('.') {
+        // If no extension, add .html
+        format!("{}.html", path)
+    } else {
+        // Otherwise keep as is
+        path.to_string()
+    }
 }
