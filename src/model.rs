@@ -65,6 +65,8 @@ impl ModelManager {
         // Set the diagram generation flag in the element registry
         // This will be checked by markdown.rs when processing the files
         self.element_registry.set_diagram_generation_enabled(true);
+        // Pass the configuration to the registry
+        self.element_registry.set_config(self.config.clone());
         
         // Manually collect key requirements files first, since the automated detection
         // can sometimes have issues with specifications/ as the base path
@@ -163,7 +165,7 @@ impl ModelManager {
                 let relative_path = utils::get_relative_path(file_path, input_folder)?;
                 
                 // Remove any existing diagrams first to ensure clean generation
-                let mermaid_regex = regex::Regex::new(r"(?s)```mermaid\s*graph LR;.*?```\s*").unwrap();
+                let mermaid_regex = regex::Regex::new(r"(?s)```mermaid\s*graph (TD|LR);.*?```\s*").unwrap();
                 let content_without_diagrams = mermaid_regex.replace_all(&content, "").to_string();
                 
                 // Pass the diagram_config value to ensure diagrams are generated
@@ -512,7 +514,9 @@ impl ModelManager {
                 };
                 
                 matrix_content.push_str(&format!("{}\n\n", diagram_header));
-                matrix_content.push_str("```mermaid\ngraph LR;\n");
+                // Use the configured diagram direction
+                let direction = &self.config.style.diagram_direction;
+                matrix_content.push_str(&format!("```mermaid\ngraph {};\n", direction));
                 
                 // Add graph styling with updated colors
                 matrix_content.push_str("  %% Graph styling\n");
