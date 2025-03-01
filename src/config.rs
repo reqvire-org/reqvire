@@ -53,6 +53,8 @@ pub struct StyleConfig {
     pub theme: String,
     pub max_width: usize,
     pub custom_css: Option<String>,
+    #[serde(default = "default_diagram_direction")]
+    pub diagram_direction: String,
 }
 
 // The following structs are kept for backwards compatibility
@@ -121,12 +123,18 @@ impl Default for ValidationConfig {
     }
 }
 
+// Default value for diagram direction
+fn default_diagram_direction() -> String {
+    "TD".to_string()  // Default to top-down layout
+}
+
 impl Default for StyleConfig {
     fn default() -> Self {
         Self {
             theme: "default".to_string(),
             max_width: 1200,
             custom_css: None,
+            diagram_direction: default_diagram_direction(),
         }
     }
 }

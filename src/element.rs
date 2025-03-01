@@ -54,13 +54,16 @@ impl Element {
 }
 
 /// Collection of elements with operations for finding and managing them
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct ElementRegistry {
     /// Map of full identifiers to elements
     elements: HashMap<String, Element>,
     
     /// Flag to indicate if diagram generation is enabled
     diagram_generation_enabled: bool,
+    
+    /// Configuration for the registry
+    config: crate::config::Config,
 }
 
 impl ElementRegistry {
@@ -69,7 +72,18 @@ impl ElementRegistry {
         Self {
             elements: HashMap::new(),
             diagram_generation_enabled: false,
+            config: crate::config::Config::default(),
         }
+    }
+    
+    /// Get a reference to the configuration
+    pub fn config(&self) -> &crate::config::Config {
+        &self.config
+    }
+    
+    /// Set the configuration
+    pub fn set_config(&mut self, config: crate::config::Config) {
+        self.config = config;
     }
     
     /// Set the diagram generation flag

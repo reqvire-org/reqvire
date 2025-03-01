@@ -487,8 +487,9 @@ fn generate_diagram_for_paragraph(
 ) -> Result<String, ReqFlowError> {
     use std::collections::HashSet;
     
-    // Start the diagram
-    let mut diagram = String::from("```mermaid\ngraph LR;\n");
+    // Get diagram direction from config (TD or LR)
+    let direction = &registry.config().style.diagram_direction;
+    let mut diagram = String::from(format!("```mermaid\ngraph {};\n", direction));
     
     // Add graph styling
     diagram.push_str("  %% Graph styling\n");
@@ -600,9 +601,20 @@ fn add_element_to_diagram(
         
         // If the target is not already included in the diagram, add it
         if !included_elements.contains(target) {
-            // Add the target node - always at top level, not inside a subgraph
-            // as the target element might be in a different paragraph or file
-            diagram.push_str(&format!("  {}[\"{}\"];\n", target_id, target.replace('"', "&quot;")));
+            // Add the target node without markdown link syntax to avoid rendering issues
+            let display_text = if target.contains('[') && target.contains(']') && target.contains('(') && target.contains(')') {
+                // This is a markdown link [text](url) format, extract just the text part
+                let link_text_start = target.find('[').unwrap() + 1;
+                let link_text_end = target.find(']').unwrap();
+                target[link_text_start..link_text_end].replace('"', "&quot;")
+            } else if target.contains('#') {
+                // For anchor links like Element 1#element-1, extract the element name
+                let parts: Vec<&str> = target.split('#').collect();
+                parts[0].trim().replace('"', "&quot;")
+            } else {
+                target.replace('"', "&quot;")
+            };
+            diagram.push_str(&format!("  {}[\"{}\"];\n", target_id, display_text));
             
             // Try to find the target element in the registry
             let target_element = registry.get_element(target);
@@ -639,6 +651,7 @@ fn add_element_to_diagram(
                     target_elem.file_path.clone()
                 };
                 
+                // Simple plain URL format without markdown link syntax
                 diagram.push_str(&format!("  click {} \"{}#{}\";\n", 
                     target_id, 
                     target_html_file,
@@ -690,6 +703,7 @@ fn add_element_to_diagram(
                     file_part
                 };
                 
+                // Use direct URL without markdown formatting for diagram click links
                 diagram.push_str(&format!("  click {} \"{}\";\n", target_id, link));
             }
             
