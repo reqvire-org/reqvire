@@ -30,11 +30,18 @@ mod linting_tests {
             return;
         }
         
+        // Create a custom config to help with test fixtures
+        let mut test_config = Config::default();
+        
+        // For test fixtures, assume any file with "Requirements" in the name is a requirements file
+        // regardless of its location, to make testing easier
+        test_config.paths.specifications_folder = "".to_string();
+        
         // Run linter with the fixture
         let suggestions = linting::lint_directory_with_config(
             &fixture_path, 
             true, // dry run
-            &Config::default()
+            &test_config
         ).expect("Failed to run linter on fixture");
         
         // Verify that linter found NO issues in a properly formatted document
@@ -54,11 +61,18 @@ mod linting_tests {
             return;
         }
         
+        // Create a custom config to help with test fixtures
+        let mut test_config = Config::default();
+        
+        // For test fixtures, assume any file with "Requirements" in the name is a requirements file
+        // regardless of its location, to make testing easier
+        test_config.paths.specifications_folder = "".to_string();
+        
         // Run linter with the fixture
         let suggestions = linting::lint_directory_with_config(
             &fixture_path, 
             true, // dry run
-            &Config::default()
+            &test_config
         ).expect("Failed to run linter on fixture");
         
         // Verify that linter found issues in requirements files
@@ -98,8 +112,15 @@ Content here.
 "#;
         fs::write(&file_path, test_content).expect("Failed to write test file");
         
+        // Create a custom config for testing
+        let mut test_config = Config::default();
+        
+        // For test fixtures, assume any file with "Requirements" in the name is a requirements file
+        // regardless of its location, to make testing easier
+        test_config.paths.specifications_folder = "".to_string();
+        
         // Run linter in dry-run mode to avoid modifying the file
-        let suggestions = linting::lint_directory(temp_path, true)
+        let suggestions = linting::lint_directory_with_config(temp_path, true, &test_config)
             .expect("Failed to run linter");
         
         // Verify that linter found at least the whitespace and newline issues
@@ -154,13 +175,20 @@ This should have a blank line before it.
 "#;
         fs::write(&file_path, test_content).expect("Failed to write test file");
         
+        // Create a custom config for testing
+        let mut test_config = Config::default();
+        
+        // For test fixtures, assume any file with "Requirements" in the name is a requirements file
+        // regardless of its location, to make testing easier
+        test_config.paths.specifications_folder = "".to_string();
+        
         // First count the issues
-        let initial_suggestions = linting::lint_directory(temp_path, true)
+        let initial_suggestions = linting::lint_directory_with_config(temp_path, true, &test_config)
             .expect("Failed to run linter");
         assert!(!initial_suggestions.is_empty(), "Expected at least one issue to fix");
         
         // Run linter again, but this time apply the fixes
-        linting::lint_directory(temp_path, false)
+        linting::lint_directory_with_config(temp_path, false, &test_config)
             .expect("Failed to run linter with fixes");
         
         // Check file content after fixes
@@ -168,7 +196,7 @@ This should have a blank line before it.
             .expect("Failed to read fixed file");
         
         // Run linter again to verify no more issues
-        let final_suggestions = linting::lint_directory(temp_path, true)
+        let final_suggestions = linting::lint_directory_with_config(temp_path, true, &test_config)
             .expect("Failed to run linter");
         
         // Assert that there are fewer issues after fixing

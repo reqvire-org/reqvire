@@ -32,5 +32,3 @@ These metrics emphasize outcomes such as user adoption, operational efficiency, 
 - Target Window: Monthly metric values averaged over the target period.
 - Target Statement: Increase CE by X% over 6 months.
 - Objective: Encourage contributions, feedback, and community involvement in the project’s growth.
-
-

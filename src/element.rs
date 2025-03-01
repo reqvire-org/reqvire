@@ -58,6 +58,9 @@ impl Element {
 pub struct ElementRegistry {
     /// Map of full identifiers to elements
     elements: HashMap<String, Element>,
+    
+    /// Flag to indicate if diagram generation is enabled
+    diagram_generation_enabled: bool,
 }
 
 impl ElementRegistry {
@@ -65,7 +68,18 @@ impl ElementRegistry {
     pub fn new() -> Self {
         Self {
             elements: HashMap::new(),
+            diagram_generation_enabled: false,
         }
+    }
+    
+    /// Set the diagram generation flag
+    pub fn set_diagram_generation_enabled(&mut self, enabled: bool) {
+        self.diagram_generation_enabled = enabled;
+    }
+    
+    /// Check if diagram generation is enabled
+    pub fn is_diagram_generation_enabled(&self) -> bool {
+        self.diagram_generation_enabled
     }
 
     /// Add an element to the registry

@@ -95,13 +95,13 @@ If a change results in a requirement being merged, split, or removed, update its
 This requirement defines a high-level system constraint.
 
 #### Relations
-  * contain: Child Requirement
+  * contain: [Child Requirement](#child-requirement)
 
 ### Child Requirement
 This requirement defines additional functionality.
 
 #### Relations
-  * containedBy: Parent Requirement
+  * containedBy: [Parent Requirement](#parent-requirement)
   
 ```
 
@@ -114,7 +114,7 @@ If Parent Requirement changes, Child Requirement must be reviewed and updated.
 The system shall process transactions within 500ms.
 
 #### Relations
-  * satisfiedBy: architecture/system_design.md/Performance Constraints
+  * satisfiedBy: [architecture/system_design.md/Performance Constraints](architecture/system_design.html#performance-constraints)
 ```
 
 If Functional Requirement changes, Performance Constraints in the architecture document must be updated.
@@ -127,7 +127,7 @@ If Functional Requirement changes, Performance Constraints in the architecture d
 The system shall shut down if temperature exceeds 100°C.
 
 #### Relations
-  * verifiedBy: test_cases/safety_verification.md/Overheat Shutdown Test
+  * verifiedBy: [test_cases/safety_verification.md/Overheat Shutdown Test](test_cases/safety_verification.html#overheat-shutdown-test)
 
 ```
 
@@ -152,9 +152,9 @@ The system shall implement power-saving mechanisms to optimize battery usage.
 The system shall activate power-saving mode when the battery level drops below 20%.  
 
 #### Relations  
-  * refine: System Power Management 
-  * satisfiedBy: software/power_control.md  
-  * verifiedBy: test_cases/power_saving.md  
+  * refine: [System Power Management](#system-power-management)
+  * satisfiedBy: [software/power_control.md](software/power_control.html)
+  * verifiedBy: [test_cases/power_saving.md](test_cases/power_saving.html)
 
 ---
 
@@ -163,9 +163,9 @@ The system shall activate power-saving mode when the battery level drops below 2
 The system shall reduce CPU frequency by 30% in power-saving mode.  
 
 #### Relations  
-  * derivedFrom: Power Saving Mode  
-  * satisfiedBy: firmware/cpu_manager.md  
-  * verifiedBy: test_cases/cpu_throttling.md  
+  * derivedFrom: [Power Saving Mode](#power-saving-mode)
+  * satisfiedBy: [firmware/cpu_manager.md](firmware/cpu_manager.html)
+  * verifiedBy: [test_cases/cpu_throttling.md](test_cases/cpu_throttling.html)
 
 ---
 
@@ -174,8 +174,8 @@ The system shall reduce CPU frequency by 30% in power-saving mode.
 The system shall reduce screen brightness by 40% in power-saving mode.  
 
 #### Relations  
-  * derivedFrom: Power Saving Mode  
-  * verifiedBy: test_cases/screen_brightness.md  
+  * derivedFrom: [Power Saving Mode](#power-saving-mode)
+  * verifiedBy: [test_cases/screen_brightness.md](test_cases/screen_brightness.html)
 
 ---
 
@@ -184,9 +184,9 @@ The system shall reduce screen brightness by 40% in power-saving mode.
 The system shall disable non-essential background services when battery levels drop below 15%.  
 
 #### Relations  
-  * derivedFrom: System Power Management  
-  * satisfiedBy: software/battery_manager.md  
-  * verifiedBy: test_cases/battery_saving.md  
+  * derivedFrom: [System Power Management](#system-power-management)
+  * satisfiedBy: [software/battery_manager.md](software/battery_manager.html)
+  * verifiedBy: [test_cases/battery_saving.md](test_cases/battery_saving.html)
 
 ---
 
@@ -194,8 +194,8 @@ The system shall disable non-essential background services when battery levels d
 The system shall reduce network polling frequency when battery levels drop below 15%.  
 
 #### Relations  
-  * derivedFrom: Battery Optimization  
-  * satisfiedBy: software/network_manager.md  
+  * derivedFrom: [Battery Optimization](#battery-optimization)
+  * satisfiedBy: [software/network_manager.md](software/network_manager.html)
 ```
 
 **Power Saving Mode** requirment has been changed to:
@@ -296,4 +296,3 @@ flowchart TD;
 ```
 
 ---
-

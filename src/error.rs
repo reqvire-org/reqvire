@@ -51,4 +51,7 @@ pub enum ReqFlowError {
 
     #[error("Path error: {0}")]
     PathError(String),
+    
+    #[error("Invalid regex: {0}")]
+    InvalidRegex(String),
 }

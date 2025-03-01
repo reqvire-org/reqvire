@@ -1,5 +1,5 @@
 use anyhow::Result;
-use clap::Parser;
+use clap::{Parser, CommandFactory};
 use std::path::PathBuf;
 
 mod config;
@@ -90,6 +90,11 @@ struct Args {
     #[clap(long)]
     json: bool,
     
+    /// Generate mermaid diagrams in markdown files showing requirements relationships
+    /// The diagrams will be placed at the top of each requirements document
+    #[clap(long)]
+    generate_diagrams: bool,
+    
     /// Path to a custom configuration file (YAML format)
     /// If not provided, the system will look for reqflow.yml, reqflow.yaml, 
     /// .reqflow.yml, or .reqflow.yaml in the current directory
@@ -159,6 +164,10 @@ fn main() -> Result<()> {
         config.validation.generate_matrix = true;
     }
     
+    if args.generate_diagrams {
+        config.general.generate_diagrams = true;
+    }
+    
     // Get input and output folders from command line arguments or configuration
     let input_folder_path = args.input_folder
         .unwrap_or_else(|| PathBuf::from(&config.paths.specifications_folder));
@@ -180,7 +189,40 @@ fn main() -> Result<()> {
     // Determine if we're in matrix generation mode
     let matrix_mode = config.validation.generate_matrix;
     
-    if validation_mode {
+    // Determine if we're in diagram generation mode
+    let diagrams_mode = config.general.generate_diagrams;
+    
+    if diagrams_mode {
+        // Run in diagram generation mode - only update the source files with diagrams
+        
+        // Set log level to INFO by default for diagram generation mode
+        if std::env::var("RUST_LOG").is_err() {
+            std::env::set_var("RUST_LOG", "info");
+            // Re-initialize logger with new setting
+            env_logger::builder().init();
+        }
+        
+        println!("Generating mermaid diagrams in requirements files in {:?}", input_folder_path);
+        
+        // Additional information to help diagnose path issues
+        let abs_path = std::fs::canonicalize(&input_folder_path)
+            .unwrap_or_else(|_| input_folder_path.clone());
+        println!("Absolute path: {:?}", abs_path);
+        
+        // Always set verbose mode for diagram generation
+        config.general.verbose = true;
+        model_manager = ModelManager::new_with_config(config.clone());
+        
+        // Only collect identifiers and process files to add diagrams
+        // Skip validation checks for diagram generation mode
+        model_manager.collect_identifiers_only(&input_folder_path)?;
+        
+        // Process just to generate diagrams (without writing to output folder)
+        // This will update source files in place with diagrams
+        model_manager.process_diagrams(&input_folder_path)?;
+        
+        println!("Requirements diagrams generated and updated in source files");
+    } else if validation_mode {
         // Run in validation mode
         if config.general.verbose {
             println!("Validating files in {:?}", input_folder_path);
@@ -363,20 +405,14 @@ fn main() -> Result<()> {
                     *type_counts.entry(suggestion.suggestion_type.clone()).or_default() += 1;
                 }
                 
-                // Check if this is a requirements file (more thorough check)
+                // Check if this is a requirements file using our enhanced utility function
                 let path = std::path::Path::new(file_path);
-                let is_requirements_file = if let Some(filename) = path.file_name() {
-                    let filename_str = filename.to_string_lossy().to_lowercase();
-                    let path_str = path.to_string_lossy().to_lowercase();
-                    let req_pattern = config.paths.requirements_filename_match.to_lowercase();
-                    
-                    // Check filename and path
-                    filename_str.contains(&req_pattern) || 
-                    path_str.contains(&format!("/{}/", config.paths.system_requirements_folder.to_lowercase())) ||
-                    path_str.contains(&format!("/{}/", req_pattern.to_lowercase()))
-                } else {
-                    false
-                };
+                let is_requirements_file = crate::utils::is_requirements_file_only(
+                    path, 
+                    &config, 
+                    &std::path::PathBuf::from(input_folder_path.to_str().unwrap_or(".")), 
+                    config.general.verbose
+                );
                 
                 // Add a tag to indicate if this is a requirements file
                 let file_type_tag = if is_requirements_file {
@@ -444,26 +480,29 @@ fn main() -> Result<()> {
         } else {
             println!("Traceability matrix generated and saved to {:?}", input_folder_path);
         }
-    } else {
-        // Normal processing mode
+    } else if config.general.html_output {
+        // Run in HTML conversion mode
         if config.general.verbose {
-            if config.general.html_output {
-                println!("Converting all markdown files from {:?} to HTML in {:?}", input_folder_path, output_folder_path);
-            } else {
-                println!("Processing requirements files from {:?} to {:?}", input_folder_path, output_folder_path);
-            }
+            println!("Converting markdown files to HTML from {:?} to {:?}", input_folder_path, output_folder_path);
         }
-
-        // Process files - in HTML mode all markdown files in all subfolders are converted
-        model_manager.process_files(&input_folder_path, 
-                                  &output_folder_path, 
-                                  config.general.html_output)?;
-
-        if config.general.html_output {
-            println!("All markdown files converted to HTML and saved to {:?}", output_folder_path);
-        } else {
-            println!("Requirements files processed and saved to {:?}", output_folder_path);
-        }
+        
+        // Create the output folder if it doesn't exist
+        std::fs::create_dir_all(&output_folder_path)?;
+        
+        // Process the files and convert to HTML
+        // The convert_to_html flag is set to true
+        model_manager.process_files(
+            &input_folder_path,
+            &output_folder_path,
+            true, // Convert to HTML
+        )?;
+        
+        println!("Markdown files converted to HTML and saved to {:?}", output_folder_path);
+    } else {
+        // No specific mode was selected - print help and exit
+        Args::command().print_help()?;
+        println!("\n\nNo operation specified. Please select an operation to perform.");
+        std::process::exit(1)
     }
     
     Ok(())

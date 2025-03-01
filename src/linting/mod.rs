@@ -253,59 +253,18 @@ pub fn lint_directory(directory: &Path, dry_run: bool) -> Result<Vec<LintSuggest
 pub fn lint_directory_with_config(directory: &Path, dry_run: bool, config: &Config) -> Result<Vec<LintSuggestion>, ReqFlowError> {
     let mut all_suggestions = Vec::new();
     
-    // Find all markdown files in the directory
+    // Find all markdown files in the directory that are requirements documents
     for entry in WalkDir::new(directory)
         .into_iter()
         .filter_map(|e| e.ok())
         .filter(|e| {
-            let path = e.path();
-            
-            // Check if file is a markdown file
-            if !path.is_file() || path.extension().map_or(true, |ext| ext != "md") {
-                return false;
-            }
-            
-            // Only include files that are requirements documents
-            let path_str = path.to_string_lossy().to_lowercase();
-            let filename = path.file_name().unwrap_or_default().to_string_lossy().to_lowercase();
-            let req_pattern = config.paths.requirements_filename_match.to_lowercase();
-            let sys_req_folder = config.paths.system_requirements_folder.to_lowercase();
-            
-            // File must match the requirements filename pattern
-            let matches_req_pattern = filename.contains(&req_pattern);
-            
-            // Due to configuration variations, we need to look at the path differently:
-            // - Either the path is at the root of the input directory
-            // - Or it's in a SystemRequirements folder (regardless of where that is)
-            
-            // Determine if this file is at the root level of the directory we're processing
-            let input_dir = directory.to_string_lossy().to_lowercase();
-            let path_without_input = path_str.strip_prefix(&input_dir)
-                .unwrap_or(&path_str)
-                .trim_start_matches('/');
-            
-            // Check if file is directly in the root, not in a subfolder
-            let in_spec_root = !path_without_input.contains('/');
-            
-            // Determine if file is in SystemRequirements folder or subfolder
-            let is_in_sys_req_dir = path_str.contains(&format!("/{}/", sys_req_folder));
-            
-            // Final check: 
-            // 1. If file is in specifications root, it must match requirements pattern
-            let is_req_file_in_spec_root = in_spec_root && matches_req_pattern;
-            
-            // 2. If file is in SystemRequirements folder, it must match requirements pattern
-            let is_req_file_in_sys_req_dir = is_in_sys_req_dir && matches_req_pattern;
-            
-            // A requirements file matches either condition
-            let is_requirements_file = is_req_file_in_spec_root || is_req_file_in_sys_req_dir;
-            
-            if is_requirements_file && config.general.verbose {
-                println!("DEBUG: File {} identified as requirements document", path.display());
-            }
-            
-            is_requirements_file
-        }) 
+            crate::utils::is_requirements_file_only(
+                e.path(), 
+                config, 
+                directory, 
+                config.general.verbose
+            )
+        })
     {
         let file_path = entry.path();
         
