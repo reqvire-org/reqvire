@@ -6,6 +6,9 @@ use crate::error::ReqFlowError;
 
 /// Convert markdown content to styled HTML with additional processing
 pub fn convert_to_html(markdown_content: &str, title: &str) -> Result<String, ReqFlowError> {
+    // First, convert all Markdown links to use .html extension
+    let markdown_content_with_html_links = convert_markdown_links_to_html(markdown_content);
+    
     // Parse the markdown content to HTML
     let mut options = Options::empty();
     options.insert(Options::ENABLE_TABLES);
@@ -16,7 +19,7 @@ pub fn convert_to_html(markdown_content: &str, title: &str) -> Result<String, Re
     options.insert(Options::ENABLE_HEADING_ATTRIBUTES);
     options.insert(Options::ENABLE_SMART_PUNCTUATION);
     
-    let parser = Parser::new_ext(markdown_content, options);
+    let parser = Parser::new_ext(&markdown_content_with_html_links, options);
     let mut html_output = String::new();
     html::push_html(&mut html_output, parser);
     
@@ -71,4 +74,56 @@ pub fn process_mermaid_diagrams(html_content: &str) -> String {
             )
         })
         .to_string()
+}
+
+/// Convert all markdown links from .md to .html for HTML output
+/// Pre-processes markdown content to convert all markdown links with .md extension to .html 
+/// This is used to ensure all links in the generated HTML point to HTML files
+fn convert_markdown_links_to_html(markdown_content: &str) -> String {
+    use regex::Regex;
+    
+    lazy_static::lazy_static! {
+        // Match markdown links: [text](url.md) or [text](path/to/url.md)
+        static ref MD_LINK_REGEX: Regex = Regex::new(r"(\]\()[^)]+\.md(\))").unwrap();
+        
+        // Match markdown links to directories without extension: [text](path/to/dir)
+        // Only if 'dir' doesn't contain a dot (not an extension)
+        static ref DIR_LINK_REGEX: Regex = Regex::new(r"(\]\()([^)]+/)([^)/\.]+)(\))").unwrap();
+        
+        // Match markdown links with md/element format: [text](path/to/url.md/element)
+        static ref MD_ELEMENT_LINK_REGEX: Regex = Regex::new(r"(\]\()([^)]+)\.md/([^)]+)(\))").unwrap();
+    }
+    
+    // First convert .md files to .html
+    let content = MD_LINK_REGEX.replace_all(markdown_content, |caps: &regex::Captures| {
+        let prefix = &caps[1]; // ](
+        let url_with_md = &caps[0][prefix.len()..caps[0].len()-caps[2].len()]; // url.md part
+        let suffix = &caps[2]; // )
+        
+        format!("{}{}html{}", prefix, url_with_md.replace(".md", "."), suffix)
+    });
+    
+    // Then convert .md/element to .html#element
+    let content = MD_ELEMENT_LINK_REGEX.replace_all(&content, |caps: &regex::Captures| {
+        let prefix = &caps[1]; // ](
+        let path = &caps[2]; // path/to/url
+        let element = &caps[3]; // element
+        let suffix = &caps[4]; // )
+        
+        let element_anchor = element.replace(' ', "-").to_lowercase();
+        format!("{}{}.html#{}{}", prefix, path, element_anchor, suffix)
+    });
+    
+    // Finally add .html to directory links without extension
+    let content = DIR_LINK_REGEX.replace_all(&content, |caps: &regex::Captures| {
+        let prefix = &caps[1]; // ](
+        let path = &caps[2]; // path/to/
+        let dir = &caps[3]; // dir
+        let suffix = &caps[4]; // )
+        
+        // Add .html to all directory links for consistency
+        format!("{}{}{}.html{}", prefix, path, dir, suffix)
+    });
+    
+    content.to_string()
 }
