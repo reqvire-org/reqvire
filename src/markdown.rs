@@ -642,15 +642,35 @@ fn add_element_to_diagram(
                         path.push_str(parts[i]);
                     }
                     if convert_to_html {
-                        path.replace(".md", ".html")
+                        // If it has .md extension, replace it with .html
+                        if path.ends_with(".md") {
+                            path.replace(".md", ".html")
+                        } else if !path.contains('.') {
+                            // If it's a path without extension, add .html
+                            format!("{}.html", path)
+                        } else {
+                            // Otherwise keep as is
+                            path
+                        }
                     } else {
+                        // In markdown mode, keep path as is
                         path
                     }
                 } else {
                     let path = parts[0].to_string();
                     if convert_to_html {
-                        path.replace(".md", ".html")
+                        // If it has .md extension, replace it with .html
+                        if path.ends_with(".md") {
+                            path.replace(".md", ".html")
+                        } else if !path.contains('.') {
+                            // If it's a path without extension, add .html
+                            format!("{}.html", path)
+                        } else {
+                            // Otherwise keep as is
+                            path
+                        }
                     } else {
+                        // In markdown mode, keep path as is
                         path
                     }
                 };
