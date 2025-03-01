@@ -1,7 +1,11 @@
 # User Requirements
 
+This is a test user requirements document for diagram generation.
+
+## User Interface Requirements
+
 ```mermaid
-graph LR;
+graph TD;
   %% Graph styling
   classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
   classDef satisfies fill:#fff2cc,stroke:#ffcc00,stroke-width:1px;
@@ -10,7 +14,7 @@ graph LR;
   classDef paragraph fill:#efefef,stroke:#999999,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  subgraph para1["User Interface Requirements"];
+  subgraph para["User Interface Requirements"];
     UI_Element_1["UI Element 1"];
     click UI_Element_1 "UserRequirements.md#ui-element-1";
     class UI_Element_1 requirement;
@@ -26,28 +30,9 @@ graph LR;
   click _SystemRequirements_md_System_Element_2__SystemRequirements_html_system_element_2_ "[SystemRequirements.md#system-element-2](systemrequirements.html#system-element-2)";
   class _SystemRequirements_md_System_Element_2__SystemRequirements_html_system_element_2_ externalLink;
   end;
-  class para1 paragraph;
-  subgraph para2["Performance Requirements"];
-    Performance_Element_1["Performance Element 1"];
-    click Performance_Element_1 "UserRequirements.md#performance-element-1";
-    class Performance_Element_1 requirement;
-    Performance_Element_1 -->|traces from| _UI_Element_1___ui_element_1_;
-  _UI_Element_1___ui_element_1_["[UI Element 1](#ui-element-1)"];
-  class _UI_Element_1___ui_element_1_ externalLink;
-    Performance_Element_2["Performance Element 2"];
-    click Performance_Element_2 "UserRequirements.md#performance-element-2";
-    class Performance_Element_2 requirement;
-  end;
-  class para2
-<!-- ReqFlow-generated diagram - do not modify manually -->
- paragraph;
+  class para paragraph;
 ```
 
-
-
-This is a test user requirements document for diagram generation.
-
-## User Interface Requirements
 
 ### UI Element 1
 
@@ -64,6 +49,31 @@ Second user interface requirement.
   * refine: [SystemRequirements.md/System Element 2](SystemRequirements.html#system-element-2)
 
 ## Performance Requirements
+
+```mermaid
+graph TD;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef satisfies fill:#fff2cc,stroke:#ffcc00,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef paragraph fill:#efefef,stroke:#999999,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+
+  subgraph para["Performance Requirements"];
+    Performance_Element_1["Performance Element 1"];
+    click Performance_Element_1 "UserRequirements.md#performance-element-1";
+    class Performance_Element_1 requirement;
+    Performance_Element_1 -->|traces from| _UI_Element_1___ui_element_1_;
+  _UI_Element_1___ui_element_1_["[UI Element 1](#ui-element-1)"];
+  class _UI_Element_1___ui_element_1_ externalLink;
+    Performance_Element_2["Performance Element 2"];
+    click Performance_Element_2 "UserRequirements.md#performance-element-2";
+    class Performance_Element_2 requirement;
+  end;
+  class para paragraph;
+```
+
 
 ### Performance Element 1
 

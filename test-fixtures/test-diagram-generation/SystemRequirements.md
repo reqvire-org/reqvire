@@ -1,7 +1,11 @@
 # System Requirements
 
+This is a test system requirements document for diagram generation.
+
+## Functional Requirements
+
 ```mermaid
-graph LR;
+graph TD;
   %% Graph styling
   classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
   classDef satisfies fill:#fff2cc,stroke:#ffcc00,stroke-width:1px;
@@ -10,7 +14,7 @@ graph LR;
   classDef paragraph fill:#efefef,stroke:#999999,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  subgraph para1["Functional Requirements"];
+  subgraph para["Functional Requirements"];
     System_Element_1["System Element 1"];
     click System_Element_1 "SystemRequirements.md#system-element-1";
     class System_Element_1 requirement;
@@ -29,34 +33,9 @@ graph LR;
   click _UserRequirements_md_UI_Element_2__UserRequirements_html_ui_element_2_ "[UserRequirements.md#ui-element-2](userrequirements.html#ui-element-2)";
   class _UserRequirements_md_UI_Element_2__UserRequirements_html_ui_element_2_ externalLink;
   end;
-  class para1 paragraph;
-  subgraph para2["Security Requirements"];
-    System_Element_3["System Element 3"];
-    click System_Element_3 "SystemRequirements.md#system-element-3";
-    class System_Element_3 requirement;
-    System_Element_3 -->|verifies| _System_Verification_Test_1___system_verification_test_1_;
-  _System_Verification_Test_1___system_verification_test_1_["[System Verification Test 1](#system-verification-test-1)"];
-  class _System_Verification_Test_1___system_verification_test_1_ externalLink;
-    System_Element_4["System Element 4"];
-    click System_Element_4 "SystemRequirements.md#system-element-4";
-    class System_Element_4 requirement;
-    System_Element_4 -->|traces from| _System_Element_1___system_element_1_;
-  _System_Element_1___system_element_1_["[System Element 1](#system-element-1)"];
-  class _System_Element_1___system_element_1_ externalLink;
-    System_Element_4 -->|verifies| _System_Verification_Test_2___system_verification_test_2_;
-  _System_Verification_Test_2___system_verification_test_2_["[System Verification Test 2](#system-verification-test-2)"];
-  class _System_Verification_Test_2___system_verification_test_2_ externalLink;
-  end;
-  class par
-<!-- ReqFlow-generated diagram - do not modify manually -->
-a2 paragraph;
+  class para paragraph;
 ```
 
-
-
-This is a test system requirements document for diagram generation.
-
-## Functional Requirements
 
 ### System Element 1
 
@@ -74,6 +53,37 @@ Second system requirement.
   * satisfies: [UserRequirements.md/UI Element 2](UserRequirements.html#ui-element-2)
 
 ## Security Requirements
+
+```mermaid
+graph TD;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef satisfies fill:#fff2cc,stroke:#ffcc00,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef paragraph fill:#efefef,stroke:#999999,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+
+  subgraph para["Security Requirements"];
+    System_Element_3["System Element 3"];
+    click System_Element_3 "SystemRequirements.md#system-element-3";
+    class System_Element_3 requirement;
+    System_Element_3 -->|verifies| _System_Verification_Test_1___system_verification_test_1_;
+  _System_Verification_Test_1___system_verification_test_1_["[System Verification Test 1](#system-verification-test-1)"];
+  class _System_Verification_Test_1___system_verification_test_1_ externalLink;
+    System_Element_4["System Element 4"];
+    click System_Element_4 "SystemRequirements.md#system-element-4";
+    class System_Element_4 requirement;
+    System_Element_4 -->|traces from| _System_Element_1___system_element_1_;
+  _System_Element_1___system_element_1_["[System Element 1](#system-element-1)"];
+  class _System_Element_1___system_element_1_ externalLink;
+    System_Element_4 -->|verifies| _System_Verification_Test_2___system_verification_test_2_;
+  _System_Verification_Test_2___system_verification_test_2_["[System Verification Test 2](#system-verification-test-2)"];
+  class _System_Verification_Test_2___system_verification_test_2_ externalLink;
+  end;
+  class para paragraph;
+```
+
 
 ### System Element 3
 

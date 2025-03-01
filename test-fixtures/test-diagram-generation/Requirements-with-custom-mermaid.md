@@ -1,7 +1,11 @@
 # Test Requirements with Custom Mermaid
 
+This is a requirements document specifically created for testing diagram generation.
+
+## Section 1
+
 ```mermaid
-graph LR;
+graph TD;
   %% Graph styling
   classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
   classDef satisfies fill:#fff2cc,stroke:#ffcc00,stroke-width:1px;
@@ -10,7 +14,7 @@ graph LR;
   classDef paragraph fill:#efefef,stroke:#999999,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  subgraph para1["Section 1"];
+  subgraph para["Section 1"];
     Element_1["Element 1"];
     click Element_1 "Requirements-with-custom-mermaid.md#element-1";
     class Element_1 requirement;
@@ -27,26 +31,9 @@ graph LR;
   _Element_1___element_1_["[Element 1](#element-1)"];
   class _Element_1___element_1_ externalLink;
   end;
-  class para1 paragraph;
-  subgraph para3["Section 2"];
-    Element_3["Element 3"];
-    click Element_3 "Requirements-with-custom-mermaid.md#element-3";
-    class Element_3 requirement;
-    Element_3 -->|verifies| _Element_1___element_1_;
-    Element_4["Element 4"];
-    click Element_4 "Requirements-with-custom-mermaid.md#element-4";
-    class Element_4 requirement;
-
-<!-- ReqFlow-generated diagram - do not modify manually -->
-  end;
-  class para3 paragraph;
+  class para paragraph;
 ```
 
-
-
-This is a requirements document specifically created for testing diagram generation.
-
-## Section 1
 
 ### Element 1
 
@@ -77,6 +64,31 @@ flowchart TD
 ```
 
 ## Section 2
+
+```mermaid
+graph TD;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef satisfies fill:#fff2cc,stroke:#ffcc00,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef paragraph fill:#efefef,stroke:#999999,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+
+  subgraph para["Section 2"];
+    Element_3["Element 3"];
+    click Element_3 "Requirements-with-custom-mermaid.md#element-3";
+    class Element_3 requirement;
+    Element_3 -->|verifies| _Element_1___element_1_;
+  _Element_1___element_1_["[Element 1](#element-1)"];
+  class _Element_1___element_1_ externalLink;
+    Element_4["Element 4"];
+    click Element_4 "Requirements-with-custom-mermaid.md#element-4";
+    class Element_4 requirement;
+  end;
+  class para paragraph;
+```
+
 
 ### Element 3
 
