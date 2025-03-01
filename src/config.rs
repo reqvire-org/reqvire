@@ -32,6 +32,8 @@ pub struct GeneralConfig {
     #[serde(default)]
     pub html_output: bool,
     pub verbose: bool,
+    #[serde(default)]
+    pub generate_diagrams: bool,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -85,6 +87,7 @@ impl Default for GeneralConfig {
         Self {
             html_output: false,
             verbose: false,
+            generate_diagrams: false,
         }
     }
 }
@@ -325,6 +328,7 @@ blockquote {
         mermaid.initialize({ 
             startOnLoad: true,
             theme: 'neutral',
+            maxTextSize: 90000,
             flowchart: {
                 useMaxWidth: true,
                 htmlLabels: true,

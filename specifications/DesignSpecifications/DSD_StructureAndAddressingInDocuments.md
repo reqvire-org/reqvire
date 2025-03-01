@@ -168,9 +168,9 @@ Simple Relations:
 This is the content of My Element.
 
 #### Relations
-  * dependsOn: Element2
-  * relatedTo: path/to/anotherFile.md/Section3
-  * uses: file.md
+  * dependsOn: [Element2](#element2)
+  * relatedTo: [path/to/anotherFile.md/Section3](path/to/anotherFile.html#section3)
+  * uses: [file.md](file.html)
 ```
 
 Relations with Special Characters:
@@ -179,8 +179,8 @@ Relations with Special Characters:
 This is the content of a complex element.
 
 #### Relations
-* dependsOn: Element (Alpha & Beta)
-* relatedTo: path/to/special File.md/Section (Draft)
+  * dependsOn: [Element (Alpha & Beta)](#element-(alpha-&-beta))
+  * relatedTo: [path/to/special File.md/Section (Draft)](path/to/special File.html#section-(draft))
 ```
 
 Invalid Entries:
@@ -189,10 +189,10 @@ Invalid Entries:
 This element contains invalid relation entries.
 
 #### Relations
-* dependsOn: Element2
+  * dependsOn: [Element2](#element2)
 * InvalidEntry
 * : MissingRelationType
-* relatedTo: path/to/file.md
+  * relatedTo: [path/to/file.md](path/to/file.html)
 ```
 
 
@@ -204,13 +204,12 @@ Identifiers are used in relations to reference files or specific elements within
 1. **Relation to a File**:
    ```markdown
    #### Relations
-     * satisfiedBy: documents/specification.md  
+  * satisfiedBy: [documents/specification.md](documents/specification.html)
    ```
     
 2. **Relation to an Element**:
    ```markdown
    #### Relations
-     * dependsOn: documents/specification.md/section one      
+  * dependsOn: [documents/specification.md/section one](documents/specification.html#section-one)
    ```
-
 

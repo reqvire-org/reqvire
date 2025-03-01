@@ -56,6 +56,173 @@ impl ModelManager {
         }
     }
     
+    /// Process diagram generation for markdown files in place (without writing to output)
+    /// This method is used when the --generate-diagrams flag is set
+    /// Note: This method deliberately skips validation to focus only on diagram generation
+    pub fn process_diagrams(&mut self, input_folder: &Path) -> Result<(), ReqFlowError> {
+        info!("Processing diagrams for markdown files in {:?} (skipping validation)", input_folder);
+        
+        // Set the diagram generation flag in the element registry
+        // This will be checked by markdown.rs when processing the files
+        self.element_registry.set_diagram_generation_enabled(true);
+        
+        // Manually collect key requirements files first, since the automated detection
+        // can sometimes have issues with specifications/ as the base path
+        let mut files = Vec::new();
+        
+        // Use the requirements filename match from config
+        // instead of hardcoding filenames
+        let req_pattern = &self.config.paths.requirements_filename_match;
+        
+        // Instead of hardcoding filenames, find requirements files using the utility functions
+        // First, look directly in the input folder for any matching requirement files
+        if let Ok(entries) = std::fs::read_dir(input_folder) {
+            for entry in entries.filter_map(|e| e.ok()) {
+                let path = entry.path();
+                if path.is_file() && path.extension().map_or(false, |ext| ext == "md") {
+                    // Use the proper config-driven utility function
+                    if crate::utils::is_requirements_file_by_path(&path, &self.config, input_folder) {
+                        info!("Adding requirements file from input folder: {:?}", path);
+                        files.push(path);
+                    }
+                }
+            }
+        }
+        
+        // Then also check specifications/ subfolder if input_folder doesn't already end with 'specifications'
+        let input_path_str = input_folder.to_string_lossy().to_lowercase();
+        if !input_path_str.ends_with("/specifications") && !input_path_str.ends_with("\\specifications") {
+            let specs_folder = input_folder.join(&self.config.paths.specifications_folder);
+            if specs_folder.exists() && specs_folder.is_dir() {
+                if let Ok(entries) = std::fs::read_dir(&specs_folder) {
+                    for entry in entries.filter_map(|e| e.ok()) {
+                        let path = entry.path();
+                        if path.is_file() && path.extension().map_or(false, |ext| ext == "md") {
+                            // Use the proper config-driven utility function 
+                            if crate::utils::is_requirements_file_by_path(&path, &self.config, input_folder) {
+                                info!("Adding requirements file from specifications folder: {:?}", path);
+                                files.push(path);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Now add any files from the system requirements folder
+        let sys_req_folder = input_folder.join(&self.config.paths.system_requirements_folder);
+        if sys_req_folder.exists() && sys_req_folder.is_dir() {
+            for entry in WalkDir::new(&sys_req_folder).into_iter().filter_map(|e| e.ok()) {
+                let path = entry.path();
+                if path.is_file() && path.extension().map_or(false, |ext| ext == "md") {
+                    // Check if it's a requirements file by name
+                    if path.file_name().map_or(false, |f| {
+                        f.to_string_lossy().to_lowercase().contains(&self.config.paths.requirements_filename_match.to_lowercase())
+                    }) {
+                        info!("Adding system requirements file: {:?}", path);
+                        files.push(path.to_path_buf());
+                    }
+                }
+            }
+        }
+        
+        // As a final fallback, also add files detected by the normal mechanism
+        let detected_files: Vec<PathBuf> = WalkDir::new(input_folder)
+            .into_iter()
+            .filter_map(|e| e.ok())
+            .filter(|e| {
+                utils::is_requirements_file_only(
+                    e.path(), 
+                    &self.config, 
+                    input_folder, 
+                    self.config.general.verbose
+                )
+            })
+            .map(|e| e.path().to_path_buf())
+            .collect();
+        
+        // Add any additional files found by the normal detection mechanism
+        for file in detected_files {
+            if !files.contains(&file) {
+                info!("Adding detected requirements file: {:?}", file);
+                files.push(file);
+            }
+        }
+            
+        info!("Found {} requirements files to update with diagrams", files.len());
+        
+        // Note: No need to modify the configuration as diagram generation
+        // is triggered by the --generate-diagrams flag in main.rs
+        
+        // Process files in parallel and track which ones were updated
+        let results = files.par_iter().map(|file_path| {
+            let result: Result<bool, ReqFlowError> = (|| {
+                debug!("Generating diagram for file {:?}", file_path);
+                
+                let content = utils::read_file(file_path)?;
+                let relative_path = utils::get_relative_path(file_path, input_folder)?;
+                
+                // Remove any existing diagrams first to ensure clean generation
+                let mermaid_regex = regex::Regex::new(r"(?s)```mermaid\s*graph LR;.*?```\s*").unwrap();
+                let content_without_diagrams = mermaid_regex.replace_all(&content, "").to_string();
+                
+                // Pass the diagram_config value to ensure diagrams are generated
+                // Update content with mermaid diagrams using our modified config that has diagram generation enabled
+                println!("FILE CONTENT BEFORE DIAGRAM GENERATION:");
+                println!("{}", &content_without_diagrams);
+                
+                let updated_content = markdown::replace_relations(
+                    &content_without_diagrams,
+                    &self.element_registry,
+                    &relative_path,
+                    false, // Not converting to HTML
+                )?;
+                
+                println!("FILE CONTENT AFTER DIAGRAM GENERATION:");
+                println!("{}", &updated_content);
+                
+                // Always update the file in diagram generation mode, even if there aren't apparent changes
+                info!("Updating {:?} with mermaid diagram", file_path);
+                
+                // Debug info to compare content before and after
+                if content != updated_content {
+                    debug!("Content differs, updating file");
+                    debug!("Content lengths - before: {}, after: {}", content.len(), updated_content.len());
+                    if content.len() >= 100 && updated_content.len() >= 100 {
+                        debug!("First 100 chars - before: {}", &content[..100]);
+                        debug!("First 100 chars - after: {}", &updated_content[..100]);
+                    }
+                } else {
+                    // Even when content appears the same, force addition of diagram
+                    // by appending a newline to make them different
+                    let force_updated_content = updated_content + "\n";
+                    debug!("No content changes detected, forcing update with newline");
+                    utils::write_file(file_path, &force_updated_content)?;
+                    return Ok(true);
+                }
+                
+                // Regular case: content differs, just write it
+                utils::write_file(file_path, &updated_content)?;
+                Ok(true) // File was updated
+            })();
+            
+            match result {
+                Ok(updated) => updated,
+                Err(e) => {
+                    // Log the error but continue processing other files
+                    info!("Error processing diagrams for {:?}: {}", file_path, e);
+                    false
+                }
+            }
+        }).collect::<Vec<bool>>();
+        
+        // Count how many files were updated
+        let updated_count = results.into_iter().filter(|&updated| updated).count();
+        
+        info!("Finished processing diagrams for all files. Updated {} of {} files.", updated_count, files.len());
+        Ok(())
+    }
+    
     /// Process all files in the input folder and write to the output folder
     pub fn process_files(
         &mut self,
@@ -69,6 +236,10 @@ impl ModelManager {
         if convert_to_html {
             self.config.general.html_output = true;
         }
+        
+        // Set the diagram generation flag in the element registry
+        // This matches the config setting which was already set from the CLI flag
+        self.element_registry.set_diagram_generation_enabled(self.config.general.generate_diagrams);
         
         // Create the output folder if it doesn't exist
         utils::create_dir_all(output_folder)?;
@@ -196,7 +367,42 @@ impl ModelManager {
             matrix_content.push_str("\n");
         }
         
-        // Organize requirements by file for diagram generation
+        // Define regex for level 2 (paragraph) headers
+        lazy_static::lazy_static! {
+            static ref PARAGRAPH_REGEX: regex::Regex = regex::Regex::new(r"^##\s+(.+)").unwrap();
+        }
+        
+        // First, collect file contents for header detection
+        let mut file_contents: std::collections::HashMap<String, String> = std::collections::HashMap::new();
+        for (file_path, content) in &self.file_contents {
+            file_contents.insert(file_path.clone(), content.clone());
+        }
+        
+        // Map to store paragraphs (by file and section name)
+        let mut paragraphs_map: std::collections::HashMap<String, Vec<String>> = std::collections::HashMap::new();
+        
+        // Parse all files to extract paragraph (level 2) headers
+        for (file_path, content) in &file_contents {
+            let mut paragraphs = Vec::new();
+            
+            for line in content.lines() {
+                if let Some(captures) = PARAGRAPH_REGEX.captures(line) {
+                    if let Some(para_name) = captures.get(1) {
+                        paragraphs.push(para_name.as_str().to_string());
+                    }
+                }
+            }
+            
+            // Store the paragraphs for this file
+            if !paragraphs.is_empty() {
+                paragraphs_map.insert(file_path.clone(), paragraphs);
+            }
+        }
+        
+        // Create the combined map of file+section to elements
+        let mut section_element_map: std::collections::HashMap<String, Vec<&element::Element>> = std::collections::HashMap::new();
+        
+        // First, organize elements by file
         let mut files_with_elements: std::collections::HashMap<String, Vec<&element::Element>> = std::collections::HashMap::new();
         
         for element in self.element_registry.all_elements() {
@@ -205,44 +411,129 @@ impl ModelManager {
                 .push(element);
         }
         
-        // Generate diagrams by file
-        matrix_content.push_str("## Requirements Relationship Diagrams\n\n");
-        matrix_content.push_str("These diagrams show the relationships between requirements organized by file.\n\n");
-        matrix_content.push_str("* Red nodes: Requirements\n");
-        matrix_content.push_str("* Green nodes: Verification elements\n");
-        matrix_content.push_str("* Gray nodes: Other elements\n\n");
+        // Now, for each file, detect which elements belong to which section
+        for (file_path, elements) in &files_with_elements {
+            // If the file has paragraphs, organize by paragraphs
+            if let Some(paragraphs) = paragraphs_map.get(file_path) {
+                // Get the file content
+                if let Some(content) = file_contents.get(file_path) {
+                    // Map to store which element belongs to which paragraph
+                    let mut paragraph_elements: std::collections::HashMap<String, Vec<&element::Element>> = 
+                        std::collections::HashMap::new();
+                    
+                    // Initialize with empty vectors for each paragraph
+                    for paragraph in paragraphs {
+                        paragraph_elements.insert(paragraph.clone(), Vec::new());
+                    }
+                    
+                    // Track current paragraph
+                    let mut current_paragraph: Option<String> = None;
+                    
+                    // Go through file line by line
+                    for line in content.lines() {
+                        // Check if this is a paragraph header
+                        if let Some(captures) = PARAGRAPH_REGEX.captures(line) {
+                            if let Some(para_name) = captures.get(1) {
+                                current_paragraph = Some(para_name.as_str().to_string());
+                            }
+                        }
+                        // Check if this is an element header
+                        else if let Some(captures) = Config::element_regex().captures(line) {
+                            if let Some(elem_name) = captures.get(1) {
+                                let elem_name = elem_name.as_str().trim().to_string();
+                                
+                                // Find the element
+                                if let Some(element) = elements.iter().find(|e| e.name == elem_name) {
+                                    // Add to current paragraph if exists, otherwise to "Other"
+                                    if let Some(paragraph) = &current_paragraph {
+                                        paragraph_elements.entry(paragraph.clone())
+                                            .or_insert_with(Vec::new)
+                                            .push(*element);
+                                    } else {
+                                        // Element outside any section goes to file-level
+                                        section_element_map.entry(format!("{}/no_section", file_path))
+                                            .or_insert_with(Vec::new)
+                                            .push(*element);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                    // Add all paragraphs to the main map
+                    for (paragraph, para_elements) in paragraph_elements {
+                        if !para_elements.is_empty() {
+                            section_element_map.insert(format!("{}/{}", file_path, paragraph), para_elements);
+                        }
+                    }
+                }
+            } else {
+                // No paragraphs in this file, add all elements to file-level
+                section_element_map.insert(file_path.clone(), elements.clone());
+            }
+        }
         
-        // Iterate through files and create a diagram for each
-        for (file_path, elements) in files_with_elements.iter() {
-            // Only generate diagrams for files that have elements with relations
+        // Generate diagrams by section
+        matrix_content.push_str("## Requirements Relationship Diagrams\n\n");
+        matrix_content.push_str("These diagrams show the relationships between requirements organized by file and section.\n\n");
+        matrix_content.push_str("* Red nodes: Requirements\n");
+        matrix_content.push_str("* Yellow nodes: Elements that satisfy requirements\n");
+        matrix_content.push_str("* Green nodes: Verification elements\n");
+        matrix_content.push_str("* Light blue nodes: Links to other sections/files\n\n");
+        
+        // Iterate through sections and create a diagram for each
+        for (section_id, elements) in section_element_map.iter() {
+            // Only generate diagrams for sections that have elements with relations
             let has_relations = elements.iter().any(|e| !e.relations.is_empty());
             
             if has_relations {
-                // Create a header for this file's diagram
-                let file_name = if let Some(idx) = file_path.rfind('/') {
-                    &file_path[idx + 1..]
+                // Parse the section ID to get file and paragraph
+                let parts: Vec<&str> = section_id.split('/').collect();
+                let file_path_str = if parts.len() > 1 {
+                    parts[0..parts.len()-1].join("/")
                 } else {
-                    file_path
+                    section_id.clone()
                 };
                 
-                matrix_content.push_str(&format!("### Diagram for {}\n\n", file_name));
+                let section_name = parts.last().unwrap_or(&"");
+                
+                // Create a header for this section's diagram
+                let file_name = if let Some(idx) = file_path_str.rfind('/') {
+                    &file_path_str[idx + 1..]
+                } else {
+                    &file_path_str
+                };
+                
+                // Use section name or file name as header
+                let diagram_header = if *section_name == "no_section" {
+                    format!("### Diagram for {}", file_name)
+                } else {
+                    format!("### Diagram for {} - {}", file_name, section_name)
+                };
+                
+                matrix_content.push_str(&format!("{}\n\n", diagram_header));
                 matrix_content.push_str("```mermaid\ngraph LR;\n");
                 
-                // Add graph styling
+                // Add graph styling with updated colors
                 matrix_content.push_str("  %% Graph styling\n");
                 matrix_content.push_str("  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;\n");
+                matrix_content.push_str("  classDef satisfies fill:#fff2cc,stroke:#ffcc00,stroke-width:1px;\n");
                 matrix_content.push_str("  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;\n");
+                matrix_content.push_str("  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;\n");
                 matrix_content.push_str("  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;\n\n");
                 
                 // Create a set of elements already included in this diagram
                 let mut included_elements = std::collections::HashSet::new();
                 
+                // Get file_path_str as PathBuf for comparison
+                let section_file_path = Path::new(&file_path_str);
+                
                 // Add nodes for this file's elements
                 for element in elements {
-                    // Safe ID for element
-                    let element_id = element.name.replace(' ', "_").replace('-', "_")
-                        .replace('/', "_").replace(':', "_").replace("'", "")
-                        .replace('(', "_").replace(')', "_").replace(".", "_");
+                    // Safe ID for element - sanitize by replacing all non-alphanumeric chars with underscore
+                    let element_id = element.name.chars()
+                        .map(|c| if c.is_alphanumeric() { c } else { '_' })
+                        .collect::<String>();
                     
                     // Encode the label text properly for Mermaid
                     let label = element.name.replace('"', "&quot;");
@@ -251,16 +542,15 @@ impl ModelManager {
                     
                     // Add click behavior for HTML
                     let html_file = if convert_to_html {
-                        file_path.replace(".md", ".html")
+                        element.file_path.replace(".md", ".html")
                     } else {
-                        file_path.clone()
+                        element.file_path.clone()
                     };
                     
-                    matrix_content.push_str(&format!("  click {} \"{}\";", 
+                    matrix_content.push_str(&format!("  click {} \"{}\";\n", 
                         element_id, 
                         format!("{}#{}", html_file, element.name.replace(' ', "-").to_lowercase())
                     ));
-                    matrix_content.push_str("\n");
                     
                     // Apply requirement style to all elements in this file
                     matrix_content.push_str(&format!("  class {} requirement;\n", element_id));
@@ -273,20 +563,20 @@ impl ModelManager {
                         // Get target element
                         let target = &relation.target;
                         
-                        // Generate safe ID for target
-                        let target_id = target.replace(' ', "_").replace('-', "_")
-                            .replace('/', "_").replace(':', "_").replace("'", "")
-                            .replace('(', "_").replace(')', "_").replace(".", "_");
+                        // Generate safe ID for target - sanitize by replacing all non-alphanumeric chars with underscore
+                        let target_id = target.chars()
+                            .map(|c| if c.is_alphanumeric() { c } else { '_' })
+                            .collect::<String>();
                         
                         // Different arrow styles and labels based on relation type
-                        let (arrow_style, style_class) = match relation.relation_type.as_str() {
-                            "verifiedBy" | "verify" => ("-->|verifies|", "verification"),
-                            "satisfiedBy" | "satisfy" => ("-->|satisfies|", "default"),
-                            "derivedFrom" | "derive" => ("-.->|derives from|", "default"),
-                            "refine" => ("==>|refines|", "default"),
-                            "tracedFrom" | "trace" => ("~~~>|traces from|", "default"),
-                            "containedBy" | "contain" => ("--o|contains|", "default"),
-                            _ => ("-->|relates to|", "default")
+                        let arrow_style = match relation.relation_type.as_str() {
+                            "verifiedBy" | "verify" => "-->|verifies|",
+                            "satisfiedBy" | "satisfy" => "-->|satisfies|",
+                            "derivedFrom" | "derive" => "-.->|derives from|",
+                            "refine" => "==>|refines|",
+                            "tracedFrom" | "trace" => "-->|traces from|", // Changed from ~~~> which is not valid in mermaid
+                            "containedBy" | "contain" => "--o|contains|",
+                            _ => "-->|relates to|"
                         };
                         
                         // Add the relationship
@@ -299,6 +589,31 @@ impl ModelManager {
                             
                             // Try to find the target element in the registry
                             let target_element = self.element_registry.get_element(target);
+                            
+                            // Check if the target element is from the same file+section
+                            let is_external_link = if let Some(target_elem) = target_element {
+                                // It's external if it's from a different file 
+                                let target_file_path = Path::new(&target_elem.file_path);
+                                section_file_path != target_file_path
+                            } else {
+                                // If we can't find the element, it's external
+                                true
+                            };
+                            
+                            // Determine the style class based on relation type and element location
+                            let style_class = if is_external_link {
+                                // External elements get the blue link style
+                                "externalLink"
+                            } else if relation.relation_type == "verifiedBy" || relation.relation_type == "verify" {
+                                // Verification elements get the green verification style
+                                "verification"
+                            } else if relation.relation_type == "satisfiedBy" || relation.relation_type == "satisfy" {
+                                // Elements that satisfy requirements get the yellow satisfy style
+                                "satisfies"
+                            } else {
+                                // Default style for other elements
+                                "default"
+                            };
                             
                             if let Some(target_elem) = target_element {
                                 // Add click behavior for HTML if we found the target
@@ -352,11 +667,7 @@ impl ModelManager {
                             }
                             
                             // Apply appropriate style class
-                            if style_class == "verification" {
-                                matrix_content.push_str(&format!("  class {} verification;\n", target_id));
-                            } else {
-                                matrix_content.push_str(&format!("  class {} default;\n", target_id));
-                            }
+                            matrix_content.push_str(&format!("  class {} {};\n", target_id, style_class));
                             
                             // Mark target as included
                             included_elements.insert(target.clone());
@@ -439,9 +750,15 @@ impl ModelManager {
         // Use existing registry
         let registry = &mut self.element_registry;
         
+        // Get the current diagram generation setting
+        let diagram_enabled = registry.is_diagram_generation_enabled();
+        
         // Clear the registry first to avoid duplicates
         // (not ideal for incremental updates, but ensures clean collection)
         *registry = ElementRegistry::new();
+        
+        // Restore the diagram generation setting
+        registry.set_diagram_generation_enabled(diagram_enabled);
         
         for entry in WalkDir::new(input_folder).into_iter().filter_map(|e| e.ok()) {
             let path = entry.path();
@@ -477,8 +794,13 @@ impl ModelManager {
         Ok(())
     }
     
-    /// Public method to collect identifiers only - used for validation
+    /// Public method to collect identifiers only - used for validation, diagram generation and other operations
+    /// This method just does basic element collection without performing any validation
     pub fn collect_identifiers_only(&mut self, input_folder: &Path) -> Result<(), ReqFlowError> {
+        // When in diagram generation mode, set the flag in the element registry
+        // We'll transfer the config setting to the registry
+        self.element_registry.set_diagram_generation_enabled(self.config.general.generate_diagrams);
+        
         self.collect_identifiers(input_folder)
     }
     
@@ -864,13 +1186,20 @@ impl ModelManager {
             let content = utils::read_file(file_path)?;
             let relative_path = utils::get_relative_path(file_path, input_folder)?;
             
-            // Replace relations with markdown links
+            // Replace relations with markdown links and add mermaid diagrams if needed
             let updated_content = markdown::replace_relations(
                 &content,
                 &self.element_registry,
                 &relative_path,
                 convert_to_html, // Pass the convert_to_html flag
             )?;
+            
+            // For requirements files, also update the source file with the improved content
+            // (with mermaid diagrams and processed relations) but only if diagrams are enabled
+            if self.config.general.generate_diagrams && 
+               utils::is_requirements_file_by_path(file_path, &self.config, input_folder) {
+                utils::write_file(file_path, &updated_content)?;
+            }
             
             // Determine output file path and format
             let output_file = if convert_to_html {

@@ -210,6 +210,3 @@ Humans interact with ReqFlow tools to manage, refine, and validate MBSE models, 
 - The ReqFlow CLI provides tools to validate, analyze, and generate artifacts from the model.
 - AI Agents assist humans by generating suggestions and automating repetitive tasks.
 - The **CI/CD System** ensures quality control and prevents invalid changes from being merged.
-
-
-
