@@ -222,7 +222,8 @@ pub fn replace_relations(
     }
 }
 
-/// Generate a mermaid diagram for requirements documents
+/// Generate mermaid diagrams for requirements documents
+/// This function creates a separate diagram for each section (level 2 heading)
 pub fn generate_requirements_diagram(
     content: &str,
     registry: &ElementRegistry,
@@ -276,7 +277,7 @@ pub fn generate_requirements_diagram(
         log::info!("File contains elements with relations, proceeding with diagram generation despite not being a requirements document: {}", file_path);
     }
     
-    log::info!("Generating diagram for requirements file: {}", file_path);
+    log::info!("Generating diagrams for requirements file: {}", file_path);
     
     // Define regex for paragraph headers
     let para_regex = match Regex::new(r"(?m)^##\s+(.+)$") {
@@ -289,146 +290,113 @@ pub fn generate_requirements_diagram(
         .filter(|e| e.file_path == file_path)
         .collect();
     
-    // Even if there are no elements, we'll proceed to generate an empty diagram
-    // This helps us confirm the diagram generation logic is working
-    
-    // Only remove ReqFlow-generated diagrams at the top of the document
-    // First, let's split the content into lines
+    // Split the content into lines
     let lines: Vec<&str> = content.lines().collect();
-    let mut updated_lines = Vec::new();
+    let mut result_lines = Vec::new();
     
-    // Skip past the title (first line)
+    // First, remove any existing ReqFlow-generated diagrams
     let mut i = 0;
-    let mut title_found = false;
+    let mut in_diagram = false;
+    let mut skipping_diagram = false;
     
-    // Add the title (first line with # prefix)
     while i < lines.len() {
         let line = lines[i];
-        if line.starts_with("# ") {
-            updated_lines.push(line);
-            title_found = true;
-            i += 1;
-            break;
-        }
-        updated_lines.push(line);
-        i += 1;
-    }
-    
-    // Skip any blank lines after the title
-    while i < lines.len() && lines[i].trim().is_empty() {
-        i += 1;
-    }
-    
-    // Now check if there's a ReqFlow-generated diagram (skip past it)
-    let mut diagram_found = false;
-    if i < lines.len() {
-        // Check if next non-empty line starts a mermaid diagram
-        if lines[i].trim() == "```mermaid" {
-            diagram_found = true;
-            
-            // Skip past the entire mermaid diagram
-            while i < lines.len() && !lines[i].trim().contains("```") {
-                i += 1;
-            }
-            
-            // Skip the closing ``` line
-            if i < lines.len() {
-                i += 1;
-            }
-            
-            // Also skip metadata comment if it exists
-            while i < lines.len() && (
-                lines[i].trim().is_empty() || 
-                lines[i].contains("<!-- ReqFlow-generated diagram")
-            ) {
-                i += 1;
-            }
-            
-            log::info!("Removed existing mermaid diagram from {}", file_path);
-        }
-    }
-    
-    // Add the rest of the document (preserving any other mermaid diagrams)
-    while i < lines.len() {
-        updated_lines.push(lines[i]);
-        i += 1;
-    }
-    
-    // Join the lines back together
-    let mut updated_content = updated_lines.join("\n");
-    
-    // If we removed a diagram, clean up any excess blank lines
-    if diagram_found {
-        let multiline_regex = match Regex::new(r"\n\n\n+") {
-            Ok(regex) => regex,
-            Err(e) => return Err(ReqFlowError::InvalidRegex(format!("Error compiling regex: {}", e)))
-        };
         
-        updated_content = multiline_regex.replace_all(&updated_content, "\n\n").to_string();
-    } else {
-        log::info!("No existing mermaid diagram found in {}", file_path);
+        // Check for start of mermaid diagram
+        if line.trim() == "```mermaid" {
+            // Look ahead to see if this is a ReqFlow-generated diagram
+            let mut j = i + 1;
+            
+            while j < lines.len() && !lines[j].trim().ends_with("```") {
+                j += 1;
+            }
+            
+            // Look for the metadata comment after the diagram
+            if j < lines.len() && j + 1 < lines.len() && 
+               lines[j + 1].contains("<!-- ReqFlow-generated diagram") {
+                // This is a ReqFlow-generated diagram, skip it
+                skipping_diagram = true;
+                in_diagram = true;
+                i += 1;
+                continue;
+            }
+        }
+        
+        // If we're skipping a diagram, check for end of diagram
+        if in_diagram {
+            if line.trim().ends_with("```") {
+                in_diagram = false;
+                
+                // Skip the metadata comment too
+                if i + 1 < lines.len() && 
+                   lines[i + 1].contains("<!-- ReqFlow-generated diagram") {
+                    i += 2; // Skip closing ``` and metadata comment
+                    continue;
+                }
+            }
+            
+            if skipping_diagram {
+                i += 1;
+                continue;
+            }
+        }
+        
+        // Add this line to result
+        result_lines.push(line.to_string());
+        i += 1;
     }
     
-    // Add debug logging to understand the content at this point
-    println!("UPDATED CONTENT (after cleaning, before new diagram):\n{}", updated_content.lines().take(10).collect::<Vec<&str>>().join("\n"));
+    // Clean up any excess newlines
+    let mut final_content = result_lines.join("\n");
+    let multiline_regex = match Regex::new(r"\n\n\n+") {
+        Ok(regex) => regex,
+        Err(e) => return Err(ReqFlowError::InvalidRegex(format!("Error compiling regex: {}", e)))
+    };
     
-    // Always generate a diagram, even if just with placeholder nodes for visualization
-    let mut diagram = String::from("```mermaid\ngraph LR;\n");
-    
-    // Add graph styling with the required colors
-    diagram.push_str("  %% Graph styling\n");
-    diagram.push_str("  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;\n");
-    diagram.push_str("  classDef satisfies fill:#fff2cc,stroke:#ffcc00,stroke-width:1px;\n");
-    diagram.push_str("  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;\n");
-    diagram.push_str("  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;\n");
-    diagram.push_str("  classDef paragraph fill:#efefef,stroke:#999999,stroke-width:1px;\n");
-    diagram.push_str("  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;\n\n");
-    
-    // If there are no elements, add a placeholder node so we still get a valid diagram
-    if elements_in_file.is_empty() {
-        log::info!("No elements found in file, adding placeholder node to diagram");
-        diagram.push_str("  placeholder[\"No requirements elements found in this document\"];\n");
-        diagram.push_str("  class placeholder default;\n");
-    }
-    
-    // Debug full diagram content to console
-    println!("MERMAID DIAGRAM CONTENT:\n{}", diagram);
-    println!("ELEMENTS IN FILE: {}", elements_in_file.len());
-    
-    log::info!("MERMAID DIAGRAM CONTENT:\n{}", diagram);
-    log::debug!("Generated base diagram with {} element styles", elements_in_file.len());
+    final_content = multiline_regex.replace_all(&final_content, "\n\n").to_string();
     
     // Parse the document to identify paragraphs and elements within each paragraph
-    let lines: Vec<&str> = content.lines().collect();
-    let mut paragraphs: Vec<String> = Vec::new();
+    // We'll generate a separate diagram for each paragraph
+    let lines: Vec<&str> = final_content.lines().collect();
+    let mut paragraphs: Vec<(usize, String)> = Vec::new(); // (line index, paragraph name)
     let mut elements_by_paragraph: HashMap<String, Vec<&Element>> = HashMap::new();
     let mut current_paragraph: Option<String> = None;
     
-    for line in &lines {
+    // First, find all paragraph headings and their line positions
+    for (i, line) in lines.iter().enumerate() {
         if let Some(captures) = para_regex.captures(line) {
             if let Some(para_name) = captures.get(1) {
                 let paragraph_name = para_name.as_str().to_string();
-                paragraphs.push(paragraph_name.clone());
+                paragraphs.push((i, paragraph_name.clone()));
                 current_paragraph = Some(paragraph_name);
             }
         }
     }
     
-    // Add "No Section" for elements before any paragraph
-    paragraphs.insert(0, "No Section".to_string());
+    // Add a special "Introduction" section for any elements before the first paragraph
+    if !paragraphs.is_empty() {
+        paragraphs.insert(0, (0, "Document Overview".to_string()));
+    } else {
+        // If no paragraphs, use a single "Document" section
+        paragraphs.push((0, "Document".to_string()));
+    }
     
-    // Now parse the document again to associate elements with paragraphs
-    current_paragraph = Some(paragraphs[0].clone()); // Start with "No Section"
+    // Associate elements with paragraphs
+    current_paragraph = Some(paragraphs[0].1.clone());
+    let mut current_para_idx = 0;
     
-    for line in &lines {
-        if let Some(captures) = para_regex.captures(line) {
-            if let Some(para_name) = captures.get(1) {
-                current_paragraph = Some(para_name.as_str().to_string());
-            }
-        } else if let Some(element_name) = crate::config::Config::element_regex()
-                                             .captures(line)
-                                             .and_then(|caps| caps.get(1))
-                                             .map(|m| m.as_str().trim().to_string()) {
+    for (i, line) in lines.iter().enumerate() {
+        // Check if we've reached a new paragraph
+        if current_para_idx < paragraphs.len() - 1 && i >= paragraphs[current_para_idx + 1].0 {
+            current_para_idx += 1;
+            current_paragraph = Some(paragraphs[current_para_idx].1.clone());
+        }
+        
+        // Check if line contains an element heading
+        if let Some(element_name) = crate::config::Config::element_regex()
+                                     .captures(line)
+                                     .and_then(|caps| caps.get(1))
+                                     .map(|m| m.as_str().trim().to_string()) {
             // Found an element, associate it with the current paragraph
             if let Some(paragraph) = &current_paragraph {
                 if let Some(element) = elements_in_file.iter().find(|e| e.name == element_name) {
@@ -440,147 +408,114 @@ pub fn generate_requirements_diagram(
         }
     }
     
-    // Create a set of elements already included in this diagram
-    let mut included_elements = HashSet::new();
+    // Now create a new version of the document with diagrams inserted after each paragraph heading
+    let mut result_lines = Vec::new();
+    let mut in_first_intro_section = true;
     
-    // Add paragraph subgraphs to the diagram
-    for (i, paragraph) in paragraphs.iter().enumerate() {
-        let paragraph_id = format!("para{}", i);
+    for (i, line) in lines.iter().enumerate() {
+        let is_paragraph_heading = para_regex.is_match(line);
         
-        // Only include paragraphs that have elements
-        if let Some(elements) = elements_by_paragraph.get(paragraph) {
-            if !elements.is_empty() {
-                if paragraph == "No Section" {
-                    // For elements not in any paragraph, don't create a subgraph
-                    // Just add them directly to the main graph
-                    for element in elements {
-                        add_element_to_diagram(
-                            &mut diagram, 
-                            element, 
-                            &mut included_elements, 
-                            registry, 
-                            file_path, 
-                            convert_to_html,
-                            None
-                        )?;
-                    }
-                } else {
-                    // Create a subgraph for this paragraph
-                    diagram.push_str(&format!("  subgraph {}[\"{}\"];\n", paragraph_id, paragraph));
+        // Add the line
+        result_lines.push(line.to_string());
+        
+        // If this is a paragraph heading, insert a diagram after it
+        if is_paragraph_heading || in_first_intro_section {
+            in_first_intro_section = false;
+            
+            // Figure out which paragraph this is
+            let para_name = if is_paragraph_heading {
+                para_regex.captures(line)
+                    .and_then(|caps| caps.get(1))
+                    .map(|m| m.as_str().to_string())
+                    .unwrap_or_else(|| "Unknown".to_string())
+            } else {
+                paragraphs[0].1.clone() // Introduction section
+            };
+            
+            // Only generate a diagram if the paragraph has elements
+            if let Some(elements) = elements_by_paragraph.get(&para_name) {
+                if !elements.is_empty() {
+                    // Generate a diagram for this paragraph
+                    let diagram = generate_diagram_for_paragraph(
+                        &para_name,
+                        elements,
+                        registry,
+                        file_path,
+                        convert_to_html
+                    )?;
                     
-                    // Add elements in this paragraph
-                    for element in elements {
-                        add_element_to_diagram(
-                            &mut diagram, 
-                            element, 
-                            &mut included_elements, 
-                            registry, 
-                            file_path, 
-                            convert_to_html,
-                            Some(paragraph_id.clone())
-                        )?;
-                    }
-                    
-                    diagram.push_str("  end;\n");
-                    diagram.push_str(&format!("  class {} paragraph;\n", paragraph_id));
+                    // Add an empty line, the diagram, and metadata comment
+                    result_lines.push("".to_string());
+                    result_lines.push(diagram);
+                    result_lines.push("<!-- ReqFlow-generated diagram - do not modify manually -->".to_string());
+                    result_lines.push("".to_string());
                 }
             }
         }
     }
     
-    // Close the mermaid diagram
-    diagram.push_str("```\n\n");
-    
-    // Find the position to insert the diagram
-    // It should be after the main title but before the first paragraph heading
-    let mut lines = updated_content.lines().collect::<Vec<&str>>();
-    let mut insert_pos = 0;
-    
-    // Skip past the title heading (# Title)
-    let title_regex = match Regex::new(r"^#\s+.*") {
-        Ok(regex) => regex,
-        Err(e) => return Err(ReqFlowError::InvalidRegex(format!("Error compiling regex: {}", e)))
-    };
-    
-    // Log first few lines for debugging
-    println!("FIRST 10 LINES OF CONTENT:");
-    for (i, line) in lines.iter().enumerate().take(10) {
-        println!("Line {}: '{}'", i, line);
-    }
-    
-    log::debug!("First 5 lines of content:");
-    for (i, line) in lines.iter().enumerate().take(5) {
-        log::debug!("Line {}: '{}'", i, line);
-    }
-    
-    let mut title_found = false;
-    for (i, line) in lines.iter().enumerate() {
-        if title_regex.is_match(line) {
-            println!("Found title at line {}: '{}'", i, line);
-            log::debug!("Found title at line {}: '{}'", i, line);
-            insert_pos = i + 1;
-            title_found = true;
-            break;
-        }
-    }
-    
-    // If no title was found, insert at the beginning
-    if !title_found {
-        println!("No title found, using position 0");
-        log::debug!("No title found, using position 0");
-        insert_pos = 0;
-    }
-    
-    // Find first non-empty line after title
-    while insert_pos < lines.len() && lines[insert_pos].trim().is_empty() {
-        println!("Skipping empty line at position {}", insert_pos);
-        log::debug!("Skipping empty line at position {}", insert_pos);
-        insert_pos += 1;
-    }
-    
-    println!("Final insert position: {}", insert_pos);
-    log::debug!("Final insert position: {}", insert_pos);
-    log::info!("Inserting diagram after title at position {}", insert_pos);
-    println!("DIAGRAM TO INSERT (length: {} chars):\n{}", diagram.len(), diagram.lines().take(5).collect::<Vec<&str>>().join("\n"));
-    
-    // Insert the diagram at the determined position
-    // We'll add an extra empty line before and after for better visual separation
-    lines.insert(insert_pos, "");
-    lines.insert(insert_pos + 1, &diagram);
-    lines.insert(insert_pos + 2, "");
-    
-    // Debug the first few lines after insertion
-    println!("AFTER INSERTION - FIRST 15 LINES:");
-    for (i, line) in lines.iter().enumerate().take(15) {
-        println!("Line {}: '{}'", i, line);
-    }
-    
-    // Log information at appropriate level
-    log::debug!("Added diagram to file: {}", file_path);
-    log::debug!("Diagram position: {}", insert_pos);
-    log::debug!("Diagram content length: {} characters", diagram.len());
-    
-    // Before joining lines, add a metadata comment right after the closing ``` of the diagram
-    // This ensures the comment doesn't break the mermaid syntax
-    for (i, line) in lines.iter().enumerate() {
-        if i > insert_pos && line.trim() == "```" {
-            // Insert the metadata comment after the closing ``` line
-            lines.insert(i + 1, "<!-- ReqFlow-generated diagram - do not modify manually -->");
-            lines.insert(i + 2, ""); // Add an empty line after the comment for better readability
-            break;
-        }
-    }
-    
-    // Join the lines with newlines, ensuring we have consistent line endings
-    let result = lines.join("\n");
-    
-    // Final debug of the result (truncated)
-    println!("FINAL RESULT (first 500 chars):\n{:.500}...", result);
-    println!("RESULT LENGTH: {} characters", result.len());
+    let result = result_lines.join("\n");
     
     log::info!("Diagram generation complete for file: {}", file_path);
     
     Ok(result)
+}
+
+/// Generate a mermaid diagram for a specific paragraph
+fn generate_diagram_for_paragraph(
+    paragraph_name: &str,
+    elements: &[&Element],
+    registry: &ElementRegistry,
+    file_path: &str,
+    convert_to_html: bool
+) -> Result<String, ReqFlowError> {
+    use std::collections::HashSet;
+    
+    // Start the diagram
+    let mut diagram = String::from("```mermaid\ngraph LR;\n");
+    
+    // Add graph styling
+    diagram.push_str("  %% Graph styling\n");
+    diagram.push_str("  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;\n");
+    diagram.push_str("  classDef satisfies fill:#fff2cc,stroke:#ffcc00,stroke-width:1px;\n");
+    diagram.push_str("  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;\n");
+    diagram.push_str("  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;\n");
+    diagram.push_str("  classDef paragraph fill:#efefef,stroke:#999999,stroke-width:1px;\n");
+    diagram.push_str("  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;\n\n");
+    
+    // If there are no elements, add a placeholder node
+    if elements.is_empty() {
+        diagram.push_str(&format!("  placeholder[\"No elements in '{}' section\"];\n", paragraph_name));
+        diagram.push_str("  class placeholder default;\n");
+    } else {
+        // Create a set to track included elements
+        let mut included_elements = HashSet::new();
+        
+        // Create a subgraph for this paragraph
+        diagram.push_str(&format!("  subgraph para[\"{}\"];\n", paragraph_name));
+        
+        // Add each element in this paragraph
+        for element in elements {
+            add_element_to_diagram(
+                &mut diagram,
+                element,
+                &mut included_elements,
+                registry,
+                file_path,
+                convert_to_html,
+                Some("para".to_string())
+            )?;
+        }
+        
+        // End the subgraph
+        diagram.push_str("  end;\n");
+        diagram.push_str("  class para paragraph;\n");
+    }
+    
+    // Close the diagram
+    diagram.push_str("```");
+    
+    Ok(diagram)
 }
 
 /// Add an element and its relationships to the diagram
