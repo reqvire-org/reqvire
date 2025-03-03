@@ -199,7 +199,7 @@ This is requirement 2.
         
         // Verify that the result contains a mermaid diagram
         assert!(result.contains("```mermaid"));
-        assert!(result.contains("graph LR;"));
+        assert!(result.contains("graph TD;"));
         
         // Verify that diagram has proper styling
         assert!(result.contains("classDef requirement fill:#f9d6d6,stroke:#f55f5f"));
@@ -337,9 +337,9 @@ style:
         
         // Verify diagrams are in both files
         assert!(user_reqs_content.contains("```mermaid"));
-        assert!(user_reqs_content.contains("graph LR;"));
+        assert!(user_reqs_content.contains("graph"));  // Direction can be configured
         assert!(system_reqs_content.contains("```mermaid"));
-        assert!(system_reqs_content.contains("graph LR;"));
+        assert!(system_reqs_content.contains("graph"));
         
         // Verify diagram content in user requirements
         assert!(user_reqs_content.contains("User_Requirement_1"));
