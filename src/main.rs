@@ -98,6 +98,8 @@ struct Args {
     /// Path to a custom configuration file (YAML format)
     /// If not provided, the system will look for reqflow.yml, reqflow.yaml, 
     /// .reqflow.yml, or .reqflow.yaml in the current directory
+    #[clap(long, short = 'c')]
+    config: Option<PathBuf>,
     
     /// Output LLM context document
     /// Generates a comprehensive context document with information about ReqFlow
@@ -105,8 +107,6 @@ struct Args {
     /// Large Language Models understand and work with ReqFlow-based projects
     #[clap(long)]
     llm_context: bool,
-    #[clap(long, short = 'c')]
-    config: Option<PathBuf>,
 }
 
 fn main() -> Result<()> {
@@ -123,7 +123,7 @@ fn main() -> Result<()> {
         match std::fs::read_to_string("src/llm_context.md") {
             Ok(content) => {
                 println!("{}", content);
-                let cmd = Args::command();
+                let mut cmd = Args::command();
                 let help_text = cmd.render_help().to_string();
                 println!("\n\n# ReqFlow CLI Reference\n\n```\n{}\n```", help_text);
                 return Ok(());
