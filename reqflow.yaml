@@ -31,4 +31,4 @@ style:
   # custom_css: "path/to/custom.css"
   
   # Diagram direction (TD for top-down, LR for left-to-right)
-  diagram_direction: "TD"
+  diagram_direction: "LR"

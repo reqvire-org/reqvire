@@ -57,7 +57,7 @@ fn add_anchor_ids(html_content: &str) -> String {
 }
 
 /// Process mermaid diagrams to ensure they render correctly in HTML
-#[allow(dead_code)]
+/// Also handles conversion of .md links to .html links within the diagrams
 pub fn process_mermaid_diagrams(html_content: &str) -> String {
     use regex::Regex;
     
@@ -99,8 +99,12 @@ fn convert_markdown_links_to_html(markdown_content: &str) -> String {
     use regex::Regex;
     
     lazy_static::lazy_static! {
+        // Match markdown links with hash fragments: [text](url.md#fragment)
+        static ref MD_LINK_WITH_HASH_REGEX: Regex = Regex::new(r"(\]\()([^#)]+)\.md(#[^)]+)(\))").unwrap();
+        
         // Match markdown links: [text](url.md) or [text](path/to/url.md) - including with parent directory references (../../)
-        static ref MD_LINK_REGEX: Regex = Regex::new(r"(\]\()([^)]+)\.md(\))").unwrap();
+        // This pattern also handles links in relation sections like: * satisfiedBy: [link](path.md)
+        static ref MD_LINK_REGEX: Regex = Regex::new(r"(\]\()([^#)]+)\.md(\))").unwrap();
         
         // Match markdown links to directories without extension: [text](path/to/dir)
         // Only if 'dir' doesn't contain a dot (not an extension)
@@ -109,16 +113,30 @@ fn convert_markdown_links_to_html(markdown_content: &str) -> String {
         // Match markdown links with md/element format: [text](path/to/url.md/element)
         // Including paths with parent directory references (../../)
         static ref MD_ELEMENT_LINK_REGEX: Regex = Regex::new(r"(\]\()([^)]+)\.md/([^)]+)(\))").unwrap();
+        
+        // Match link text that refers to .md files: [path/to/file.md]
+        static ref MD_LINK_TEXT_REGEX: Regex = Regex::new(r"\[([^]]+)\.md\]").unwrap();
     }
     
-    // First convert .md files to .html
-    let content = MD_LINK_REGEX.replace_all(markdown_content, |caps: &regex::Captures| {
+    // First convert markdown links with hash fragments: [text](url.md#fragment)
+    let content = MD_LINK_WITH_HASH_REGEX.replace_all(markdown_content, |caps: &regex::Captures| {
+        let prefix = &caps[1]; // ](
+        let path = &caps[2];   // path/to/file part
+        let fragment = &caps[3]; // #fragment
+        let suffix = &caps[4]; // )
+        
+        // Replace .md extension with .html, preserving the hash fragment
+        format!("{}{}.html{}{}", prefix, path, fragment, suffix)
+    });
+    
+    // Then convert regular .md files to .html
+    let content = MD_LINK_REGEX.replace_all(&content, |caps: &regex::Captures| {
         let prefix = &caps[1]; // ](
         let path = &caps[2];   // path/to/file part
         let suffix = &caps[3]; // )
         
         // Replace .md extension with .html
-        format!("{}{}html{}", prefix, path.replace(".md", "."), suffix)
+        format!("{}{}.html{}", prefix, path, suffix)
     });
     
     // Then convert .md/element to .html#element
@@ -143,5 +161,73 @@ fn convert_markdown_links_to_html(markdown_content: &str) -> String {
         format!("{}{}{}.html{}", prefix, path, dir, suffix)
     });
     
+    // Convert link text that contains .md to use .html instead
+    // This is useful for links in relation sections where the display text should also be updated
+    // Example: * satisfiedBy: [DesignSpecifications/DirectMessages.md](DesignSpecifications/DirectMessages.md)
+    let content = MD_LINK_TEXT_REGEX.replace_all(&content, |caps: &regex::Captures| {
+        let path = &caps[1]; // path/to/file part without the .md
+        
+        // Replace .md with .html in the link text
+        format!("[{}.html]", path)
+    });
+    
     content.to_string()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    
+    #[test]
+    fn test_convert_markdown_links_to_html_with_parent_paths() {
+        // Test with relative paths containing parent directory references
+        let markdown = r#"
+- [Normal Link](file.md)
+- [Parent Link](../parent.md)
+- [Multiple Parents](../../grandparent.md)
+- [Element in Parent](../other.md/Element)
+- [Element with Hash](../something.md#header)
+- * satisfiedBy: [DesignSpecifications/DirectMessages.md](DesignSpecifications/DirectMessages.md)
+"#;
+        
+        let html = convert_markdown_links_to_html(markdown);
+        println!("Converted HTML: {}", html);
+        
+        // Check that all links are converted properly
+        assert!(!html.contains("file.md"));
+        assert!(!html.contains("../parent.md"));
+        assert!(!html.contains("../../grandparent.md"));
+        assert!(!html.contains("../other.md/Element"));
+        assert!(!html.contains("../something.md#header"));
+        assert!(!html.contains("DesignSpecifications/DirectMessages.md"));
+        
+        // Check that they're converted to HTML
+        assert!(html.contains("file.html"));
+        assert!(html.contains("../parent.html"));
+        assert!(html.contains("../../grandparent.html"));
+        assert!(html.contains("../other.html#element"));
+        assert!(html.contains("../something.html#header"));
+        assert!(html.contains("DesignSpecifications/DirectMessages.html"));
+    }
+    
+    #[test]
+    fn test_process_mermaid_diagrams_with_parent_paths() {
+        // Test with mermaid diagrams containing parent directory references
+        let html_with_mermaid = r#"<pre><code class="language-mermaid">
+graph TD;
+    A[Start] --> B[End];
+    click A &quot;../../path/to/file.md#section&quot;;
+    click B &quot;../another/file.md&quot;;
+</code></pre>"#;
+        
+        let processed = process_mermaid_diagrams(html_with_mermaid);
+        
+        // Check that all links are converted properly
+        assert!(!processed.contains("../../path/to/file.md#section"));
+        assert!(!processed.contains("../another/file.md"));
+        
+        // Check that they're converted to HTML
+        assert!(processed.contains("../../path/to/file.html#section"));
+        assert!(processed.contains("../another/file.html"));
+    }
 }

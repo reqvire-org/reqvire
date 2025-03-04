@@ -10,8 +10,11 @@ pub struct Relation {
     /// Type of the relation (e.g., dependsOn, verifiedBy)
     pub relation_type: String,
     
-    /// Target identifier of the relation
+    /// Target identifier of the relation (may be markdown link syntax or plain text)
     pub target: String,
+    
+    /// URL part of the target (if it's a markdown link)
+    pub url: Option<String>,
     
     /// Whether the relation has been processed into a markdown link
     #[allow(dead_code)]
@@ -21,9 +24,34 @@ pub struct Relation {
 impl Relation {
     /// Create a new relation
     pub fn new(relation_type: String, target: String) -> Self {
+        // Check if target is a markdown link and extract the URL part if it is
+        let url = if target.contains("](") && target.contains("]") && target.contains("(") && target.contains(")") {
+            // Extract URL from markdown link
+            let url_start = target.find("(").unwrap() + 1;
+            let url_end = target.rfind(")").unwrap();
+            
+            // Get the raw URL without markdown syntax
+            let raw_url = target[url_start..url_end].to_string();
+            
+            // Fix URL if it contains '#' where it should have '/' in a file path
+            // This fixes paths like "DesignSpecifications#Status.md"
+            let fixed_url = if raw_url.contains('#') && !raw_url.starts_with('#') &&
+                            raw_url.split('#').last().map_or(false, |last| last.contains('.')) {
+                // This is likely a path with hash that should be slash
+                raw_url.replace('#', "/")
+            } else {
+                raw_url
+            };
+            
+            Some(fixed_url)
+        } else {
+            None
+        };
+        
         Self {
             relation_type,
             target,
+            url,
             processed: false,
         }
     }
@@ -162,12 +190,10 @@ impl Relation {
             // Case 3: Simple file reference with extension
             let target_file = if convert_to_html {
                 target.replace(".md", ".html")
+            } else if target.ends_with(".html") {
+                target.replace(".html", ".md")
             } else {
-                if target.ends_with(".html") {
-                    target.replace(".html", ".md")
-                } else {
-                    target.to_string()
-                }
+                target.to_string()
             };
             format!("[{}]({})", self.target, target_file) // Use original target for display
         } else {
