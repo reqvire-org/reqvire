@@ -1,5 +1,14 @@
 # System Requirements
 
+### LLM Context Command
+
+The system shall provide a command-line option `--llm-context` that outputs comprehensive contextual information about ReqFlow methodology, document structure, relation types, and CLI usage to help Large Language Models understand and work with ReqFlow-based projects.
+
+#### Relations
+  * refine: [UserRequirements.md/AI-Driven Model Suggestions](UserRequirements.html#ai-driven-model-suggestions)
+
+---
+
 ### JSON Validation Output Format
 
 The system shall provide validation results in machine-readable JSON format to facilitate integration with CI/CD pipelines and automated reporting tools.

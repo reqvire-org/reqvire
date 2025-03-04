@@ -98,6 +98,13 @@ struct Args {
     /// Path to a custom configuration file (YAML format)
     /// If not provided, the system will look for reqflow.yml, reqflow.yaml, 
     /// .reqflow.yml, or .reqflow.yaml in the current directory
+    
+    /// Output LLM context document
+    /// Generates a comprehensive context document with information about ReqFlow
+    /// methodology, document structure, relation types, and CLI usage to help
+    /// Large Language Models understand and work with ReqFlow-based projects
+    #[clap(long)]
+    llm_context: bool,
     #[clap(long, short = 'c')]
     config: Option<PathBuf>,
 }
@@ -109,7 +116,25 @@ fn main() -> Result<()> {
     }
     env_logger::init();
     let args = Args::parse();
-
+    
+    // Handle LLM context option
+    if args.llm_context {
+        // Read and output the LLM context file
+        match std::fs::read_to_string("src/llm_context.md") {
+            Ok(content) => {
+                println!("{}", content);
+                let cmd = Args::command();
+                let help_text = cmd.render_help().to_string();
+                println!("\n\n# ReqFlow CLI Reference\n\n```\n{}\n```", help_text);
+                return Ok(());
+            },
+            Err(e) => {
+                eprintln!("Error reading LLM context file: {}", e);
+                return Err(anyhow::anyhow!("Failed to read LLM context file"));
+            }
+        }
+    }
+    
     // Load configuration
     let mut config = match &args.config {
         Some(config_path) => {
