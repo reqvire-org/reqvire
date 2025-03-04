@@ -122,6 +122,7 @@ fn main() -> Result<()> {
         // Read and output the LLM context file
         match std::fs::read_to_string("src/llm_context.md") {
             Ok(content) => {
+                // This is a special case for direct output to stdout
                 println!("{}", content);
                 let mut cmd = Args::command();
                 let help_text = cmd.render_help().to_string();
@@ -129,7 +130,7 @@ fn main() -> Result<()> {
                 return Ok(());
             },
             Err(e) => {
-                eprintln!("Error reading LLM context file: {}", e);
+                log::error!("Error reading LLM context file: {}", e);
                 return Err(anyhow::anyhow!("Failed to read LLM context file"));
             }
         }
@@ -140,12 +141,12 @@ fn main() -> Result<()> {
         Some(config_path) => {
             match config::Config::from_file(config_path) {
                 Ok(cfg) => {
-                    println!("Loaded configuration from {:?}", config_path);
+                    log::info!("Loaded configuration from {:?}", config_path);
                     cfg
                 },
                 Err(e) => {
-                    eprintln!("Error loading configuration from {:?}: {}", config_path, e);
-                    eprintln!("Using default configuration");
+                    log::error!("Error loading configuration from {:?}: {}", config_path, e);
+                    log::warn!("Using default configuration");
                     config::Config::default()
                 }
             }
@@ -227,12 +228,12 @@ fn main() -> Result<()> {
             env_logger::builder().init();
         }
         
-        println!("Generating mermaid diagrams in requirements files in {:?}", input_folder_path);
+        log::info!("Generating mermaid diagrams in requirements files in {:?}", input_folder_path);
         
         // Additional information to help diagnose path issues
         let abs_path = std::fs::canonicalize(&input_folder_path)
             .unwrap_or_else(|_| input_folder_path.clone());
-        println!("Absolute path: {:?}", abs_path);
+        log::debug!("Absolute path: {:?}", abs_path);
         
         // Always set verbose mode for diagram generation
         config.general.verbose = true;
@@ -246,12 +247,10 @@ fn main() -> Result<()> {
         // This will update source files in place with diagrams
         model_manager.process_diagrams(&input_folder_path)?;
         
-        println!("Requirements diagrams generated and updated in source files");
+        log::info!("Requirements diagrams generated and updated in source files");
     } else if validation_mode {
         // Run in validation mode
-        if config.general.verbose {
-            println!("Validating files in {:?}", input_folder_path);
-        }
+        log::info!("Validating files in {:?}", input_folder_path);
         
         // Only collect identifiers, don't process files
         model_manager.collect_identifiers_only(&input_folder_path)?;
@@ -273,13 +272,13 @@ fn main() -> Result<()> {
                     })?);
                 } else {
                     // Human-readable output
-                    println!("❌ Markdown validation failed with {} errors:", markdown_errors.len());
+                    log::error!("❌ Markdown validation failed with {} errors:", markdown_errors.len());
                     for error in markdown_errors {
-                        println!("  - {}", error);
+                        log::error!("  - {}", error);
                     }
                 }
             } else if config.general.verbose || !config.validation.json_output {
-                println!("✅ Markdown structure validation passed");
+                log::info!("✅ Markdown structure validation passed");
             }
         }
         
