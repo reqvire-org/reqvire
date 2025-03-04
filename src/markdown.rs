@@ -555,10 +555,12 @@ fn add_element_to_diagram(
     
     diagram.push_str(&format!("{}{}[\"{}\"];\n", indent, element_id, label));
     
-    // Add click behavior for HTML
+    // Add click behavior for HTML - only convert to HTML if we're in HTML mode
     let html_file = if convert_to_html {
-        element.file_path.replace(".md", ".html")
+        // In HTML mode, convert .md to .html
+        convert_path_to_html_link(&element.file_path)
     } else {
+        // In markdown mode, keep as .md
         element.file_path.clone()
     };
     
@@ -646,13 +648,16 @@ fn add_element_to_diagram(
             if let Some(target_elem) = target_element {
                 // Add click behavior for HTML if we found the target
                 let target_html_file = if convert_to_html {
+                    // In HTML mode, convert .md to .html
                     convert_path_to_html_link(&target_elem.file_path)
                 } else {
+                    // In markdown mode, keep as .md
                     target_elem.file_path.clone()
                 };
                 
                 // Simple plain URL format without markdown link syntax
-                diagram.push_str(&format!("  click {} \"{}#{}\";\n", 
+                diagram.push_str(&format!("{}click {} \"{}#{}\";\n", 
+                    indent,
                     target_id, 
                     target_html_file,
                     target_elem.name.replace(' ', "-").to_lowercase()
@@ -668,7 +673,7 @@ fn add_element_to_diagram(
                         path.push_str(parts[i]);
                     }
                     if convert_to_html {
-                        // Use helper function to convert to HTML links
+                        // In HTML mode, convert .md to .html
                         convert_path_to_html_link(&path)
                     } else {
                         // In markdown mode, keep path as is
@@ -677,7 +682,7 @@ fn add_element_to_diagram(
                 } else {
                     let path = parts[0].to_string();
                     if convert_to_html {
-                        // Use helper function to convert to HTML links
+                        // In HTML mode, convert .md to .html
                         convert_path_to_html_link(&path)
                     } else {
                         // In markdown mode, keep path as is
@@ -704,7 +709,7 @@ fn add_element_to_diagram(
                 };
                 
                 // Use direct URL without markdown formatting for diagram click links
-                diagram.push_str(&format!("  click {} \"{}\";\n", target_id, link));
+                diagram.push_str(&format!("{}click {} \"{}\";\n", indent, target_id, link));
             }
             
             // Apply appropriate style class
