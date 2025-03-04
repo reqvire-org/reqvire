@@ -170,8 +170,8 @@ impl ModelManager {
                 
                 // Pass the diagram_config value to ensure diagrams are generated
                 // Update content with mermaid diagrams using our modified config that has diagram generation enabled
-                println!("FILE CONTENT BEFORE DIAGRAM GENERATION:");
-                println!("{}", &content_without_diagrams);
+                log::debug!("FILE CONTENT BEFORE DIAGRAM GENERATION:");
+                log::debug!("{}", &content_without_diagrams);
                 
                 let updated_content = markdown::replace_relations(
                     &content_without_diagrams,
@@ -180,8 +180,8 @@ impl ModelManager {
                     false, // Not converting to HTML
                 )?;
                 
-                println!("FILE CONTENT AFTER DIAGRAM GENERATION:");
-                println!("{}", &updated_content);
+                log::debug!("FILE CONTENT AFTER DIAGRAM GENERATION:");
+                log::debug!("{}", &updated_content);
                 
                 // Always update the file in diagram generation mode, even if there aren't apparent changes
                 info!("Updating {:?} with mermaid diagram", file_path);
