@@ -170,6 +170,24 @@ The system shall provide linting capability to ensure consistent formatting in r
 #### Relations
   * containedBy: [Model Linting](#model-linting)
 
+---
+
+### Generate Documentation Index
+
+The system shall generate an index.md file in the specifications root folder during linting that contains a structured summary of all specification documents and folders.
+
+#### Relations
+  * refine: [UserStories.md/Managing MBSE Models](UserStories.html#managing-mbse-models)
+
+---
+
+### Documentation Index HTML Integration
+
+The index.md file shall be converted to index.html when HTML output is generated, serving as the primary entry point for HTML documentation.
+
+#### Relations
+  * refine: [Generate Documentation Index](#generate-documentation-index)
+
 
 ### Validate Markdown Structure
 
