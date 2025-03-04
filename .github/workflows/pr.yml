@@ -1,31 +1,25 @@
-name: PR
-concurrency:
-  group: ${{ github.event.pull_request.number }}
-  cancel-in-progress: true
+name: Rust Tests on PR
 
-on: [merge_group, pull_request]
- 
+on:
+  pull_request:
+    branches:
+      - main  # Change this to match your default branch
+
 jobs:
-  check-duplicates:
-    runs-on: ubuntu-latest
+  test:
+    name: Run Rust Tests
+    runs-on: ubuntu-latest  # Runs on an Ubuntu machine
+
     steps:
-      - name: Check out code
-        uses: actions/checkout@v3
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-      - name: Find duplicate filenames
-        run: |
-          # Collect all filenames (just the base name) under e2e-tests/ 
-          dup_files=$(find e2e-tests/ -type f -exec basename {} \; \
-            | sort \
-            | uniq -d)
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
 
-          # If dup_files is non-empty, we fail
-          if [ -n "$dup_files" ]; then
-            echo "Error: Duplicate test filenames found:"
-            echo "$dup_files"
-            exit 1
-          else
-            echo "No duplicates found."
-          fi
+      - name: Cache Cargo dependencies
+        uses: Swatinem/rust-cache@v2
 
+      - name: Run Tests
+        run: cargo test --verbose
 

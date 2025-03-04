@@ -17,16 +17,6 @@ This makes ReqFlow intuitive and accessible to engineers, developers, and produc
 - **Toolset**: Automates traceability, validation, and diagram generation, integrating seamlessly with version control.
 - **Language**: Inspired by SysML but optimized for Markdown and Mermaid, ensuring compatibility with modern AI tools.
 
-
-## Why ReqFlow?
-
-- **A Unified Framework**: Combines methodology, tools, and language into a MBSE solution.
-- **Git-Centric**: Built around Git workflows, enabling integration with GitHub, GitLab, Bitbucket, and CI/CD pipelines.
-- **Lightweight & Accessible**: Uses Markdown for requirements and models, ensuring readability and ease of use.
-- **Methodology**: Follows ISO/IEC/IEEE 15288 principles, tailored to software product development and agile workflows.
-- **Toolset**: Automates traceability, validation, and diagram generation, integrating seamlessly with version control.
-- **Language**: Inspired by SysML but optimized for Markdown and Mermaid, ensuring compatibility with modern AI tools.
-
 ### ReqFlow as a tool
 
 ReqFlow is a requirements management tool designed to integrate directly into Git workflows. It uses a file-based approach where requirements are stored in markdown files within the project repository. This allows teams to manage requirements alongside their code, using familiar Git processes.

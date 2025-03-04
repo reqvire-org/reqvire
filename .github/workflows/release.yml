@@ -1,130 +1,87 @@
-name: Release
+name: Rust Release
 
 on:
   push:
-    branches: [ main, master ]
-    tags: [ "v*" ]
+    tags:
+      - "v*"  # Runs when pushing a tag like v0.1.0
+
+permissions:
+  contents: write  # Required to create releases
 
 jobs:
   build:
-    name: Build and Release
+    name: Build Rust Binaries on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
+
     strategy:
       matrix:
-        include:
-          - os: ubuntu-latest
-            target: x86_64-unknown-linux-gnu
-            name: linux-x86_64
-            bin: reqflow
-          - os: macos-latest
-            target: x86_64-apple-darwin
-            name: macos-x86_64
-            bin: reqflow
-          - os: macos-latest
-            target: aarch64-apple-darwin
-            name: macos-arm64
-            bin: reqflow
+        #os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest, macos-latest]        
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-      - name: Setup Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-          target: ${{ matrix.target }}
-          override: true
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
 
-      - name: Build
-        uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args: --release --target ${{ matrix.target }}
+      - name: Cache Cargo dependencies
+        uses: Swatinem/rust-cache@v2
 
-      - name: Package
+      - name: Run Tests
+        run: cargo test --verbose
+
+      - name: Build Binary
+        run: cargo build --release
+
+      - name: Rename Binary for OS
         shell: bash
         run: |
-          cd target/${{ matrix.target }}/release
-          tar czvf ../../../reqflow-${{ matrix.name }}.tar.gz ${{ matrix.bin }}
-          cd -
+          mkdir -p artifacts
+          if [[ "$RUNNER_OS" == "Linux" ]]; then
+            mv target/release/reqflow artifacts/reqflow-linux
+          elif [[ "$RUNNER_OS" == "macOS" ]]; then
+            mv target/release/reqflow artifacts/reqflow-macos
+          elif [[ "$RUNNER_OS" == "Windows" ]]; then
+            mv target/release/reqflow.exe artifacts/reqflow-windows.exe
+          fi
 
-      - name: Archive production artifacts
-        uses: actions/upload-artifact@v3
+      - name: Debug: List Built Binaries
+        run: ls -R artifacts  # Verify that files exist before upload
+
+      - name: Upload Built Binaries as Artifacts
+        uses: actions/upload-artifact@v4
         with:
-          name: reqflow-${{ matrix.name }}
-          path: reqflow-${{ matrix.name }}.tar.gz
+          name: binaries-${{ matrix.os }}
+          path: artifacts/*
 
   release:
-    name: Create Release
-    needs: build
+    name: Create GitHub Release and Upload Binaries
+    needs: build  # Runs after all builds finish
     runs-on: ubuntu-latest
-    # Only run on tagged commits
-    if: startsWith(github.ref, 'refs/tags/')
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-      - name: Get the version
-        id: get_version
-        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
-
-      - name: Download all artifacts
-        uses: actions/download-artifact@v3
-
-      - name: Create Release
-        id: create_release
-        uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Download All Built Binaries
+        uses: actions/download-artifact@v4
         with:
-          tag_name: ${{ steps.get_version.outputs.VERSION }}
-          name: Release ${{ steps.get_version.outputs.VERSION }}
+          pattern: binaries-*  # Match all OS binaries
+          path: artifacts
+
+      - name: Debug: List Downloaded Binaries
+        run: ls -R artifacts  # Debugging step to verify files exist
+
+      - name: Create GitHub Release and Upload Binaries
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: "Release ${{ github.ref_name }}"
+          body: "Automated release of ${{ github.ref_name }}"
           draft: false
           prerelease: false
-          files: reqflow-*/reqflow-*.tar.gz
-          generate_release_notes: true
+          files: artifacts/*  # Uploads all binaries
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  bump-version:
-    name: Automatic Version Bump on PR Merge
-    runs-on: ubuntu-latest
-    # Only run on pushes to main/master branches (not tags)
-    if: github.event_name == 'push' && !startsWith(github.ref, 'refs/tags/') && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
-      - name: Get Latest Tag
-        id: get_latest_tag
-        run: |
-          git fetch --tags
-          LATEST_TAG=$(git tag --sort=-v:refname | head -n 1)
-          echo "LATEST_TAG=${LATEST_TAG:-v0.0.0}" >> $GITHUB_OUTPUT
-          echo "Latest tag is ${LATEST_TAG:-v0.0.0}"
-
-      - name: Bump Version
-        id: bump_version
-        run: |
-          LATEST_TAG=${{ steps.get_latest_tag.outputs.LATEST_TAG }}
-          # Remove 'v' prefix
-          VERSION=${LATEST_TAG#v}
-          IFS='.' read -r -a VERSION_PARTS <<< "$VERSION"
-          
-          # Increment patch version
-          MAJOR=${VERSION_PARTS[0]:-0}
-          MINOR=${VERSION_PARTS[1]:-0}
-          PATCH=$((${VERSION_PARTS[2]:-0} + 1))
-          
-          NEW_VERSION="v$MAJOR.$MINOR.$PATCH"
-          echo "NEW_VERSION=${NEW_VERSION}" >> $GITHUB_OUTPUT
-          echo "New version will be ${NEW_VERSION}"
-
-      - name: Create Tag
-        run: |
-          git config user.name "GitHub Actions Bot"
-          git config user.email "actions@github.com"
-          git tag -a ${{ steps.bump_version.outputs.NEW_VERSION }} -m "Release ${{ steps.bump_version.outputs.NEW_VERSION }}"
-          git push origin ${{ steps.bump_version.outputs.NEW_VERSION }}
