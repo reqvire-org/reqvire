@@ -64,7 +64,8 @@ pub fn process_mermaid_diagrams(html_content: &str) -> String {
     lazy_static::lazy_static! {
         static ref MERMAID_REGEX: Regex = Regex::new(r#"<pre><code class="language-mermaid">([\s\S]*?)</code></pre>"#).unwrap();
         // Add regex to fix mermaid click links - convert .md to .html in click statements
-        static ref MERMAID_CLICK_REGEX: Regex = Regex::new(r#"(click\s+\S+\s+&quot;)([^&]*)\.md(#[^&]*&quot;)"#).unwrap();
+        // This pattern captures parent directory references (../../) correctly
+        static ref MERMAID_CLICK_REGEX: Regex = Regex::new(r#"(click\s+\S+\s+&quot;)([^&\#"]*)\.md((?:#[^&"]*)?&quot;)"#).unwrap();
     }
     
     // First extract the mermaid content
@@ -98,24 +99,26 @@ fn convert_markdown_links_to_html(markdown_content: &str) -> String {
     use regex::Regex;
     
     lazy_static::lazy_static! {
-        // Match markdown links: [text](url.md) or [text](path/to/url.md)
-        static ref MD_LINK_REGEX: Regex = Regex::new(r"(\]\()[^)]+\.md(\))").unwrap();
+        // Match markdown links: [text](url.md) or [text](path/to/url.md) - including with parent directory references (../../)
+        static ref MD_LINK_REGEX: Regex = Regex::new(r"(\]\()([^)]+)\.md(\))").unwrap();
         
         // Match markdown links to directories without extension: [text](path/to/dir)
         // Only if 'dir' doesn't contain a dot (not an extension)
         static ref DIR_LINK_REGEX: Regex = Regex::new(r"(\]\()([^)]+/)([^)/\.]+)(\))").unwrap();
         
         // Match markdown links with md/element format: [text](path/to/url.md/element)
+        // Including paths with parent directory references (../../)
         static ref MD_ELEMENT_LINK_REGEX: Regex = Regex::new(r"(\]\()([^)]+)\.md/([^)]+)(\))").unwrap();
     }
     
     // First convert .md files to .html
     let content = MD_LINK_REGEX.replace_all(markdown_content, |caps: &regex::Captures| {
         let prefix = &caps[1]; // ](
-        let url_with_md = &caps[0][prefix.len()..caps[0].len()-caps[2].len()]; // url.md part
-        let suffix = &caps[2]; // )
+        let path = &caps[2];   // path/to/file part
+        let suffix = &caps[3]; // )
         
-        format!("{}{}html{}", prefix, url_with_md.replace(".md", "."), suffix)
+        // Replace .md extension with .html
+        format!("{}{}html{}", prefix, path.replace(".md", "."), suffix)
     });
     
     // Then convert .md/element to .html#element

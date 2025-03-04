@@ -763,34 +763,117 @@ fn add_element_to_diagram(
                 };
                 
                 let link = if !element_part.is_empty() {
-                    // Check if the element part already has .html suffix, and remove it if present
-                    let element_anchor = if element_part.ends_with(".html") {
-                        element_part[..element_part.len()-5].replace(' ', "-").to_lowercase()
+                    // Determine if this is a path to a file or a fragment identifier
+                    let is_file_path = element_part.contains(".md") || element_part.contains(".html");
+                    
+                    if is_file_path {
+                        // For file paths, use slash separator
+                        if element_part.ends_with(".html") {
+                            format!("{}/{}", file_part, element_part)
+                        } else {
+                            // For markdown links, convert if needed
+                            let element_file = if convert_to_html && element_part.ends_with(".md") {
+                                element_part.replace(".md", ".html")
+                            } else {
+                                element_part.to_string()
+                            };
+                            format!("{}/{}", file_part, element_file)
+                        }
                     } else {
-                        element_part.replace(' ', "-").to_lowercase()
-                    };
-                    format!("{}#{}", file_part, element_anchor)
+                        // For fragment identifiers, use hash separator
+                        // Check if the element part already has .html suffix, and remove it if present
+                        let element_anchor = if element_part.ends_with(".html") {
+                            element_part[..element_part.len()-5].replace(' ', "-").to_lowercase()
+                        } else {
+                            element_part.replace(' ', "-").to_lowercase()
+                        };
+                        format!("{}#{}", file_part, element_anchor)
+                    }
                 } else {
                     file_part
                 };
                 
                 // Use direct URL without markdown formatting for diagram click links
-                diagram.push_str(&format!("{}click {} \"{}\";\n", indent, target_id, link));
+                // Make sure no markdown links are included
+                let sanitized_link = if link.contains('[') && link.contains(']') && link.contains('(') && link.contains(')') {
+                    // Extract just the URL part from a markdown link
+                    let url_start = link.find('(').unwrap() + 1;
+                    let url_end = link.rfind(')').unwrap();
+                    link[url_start..url_end].to_string()
+                } else {
+                    link
+                };
+                diagram.push_str(&format!("{}click {} \"{}\";\n", indent, target_id, sanitized_link));
+            } else if let Some(url) = &relation.url {
+                // Use the URL extracted from the markdown link in the Relation struct
+                // This ensures we always have the correct URL, not the markdown syntax
+                
+                // Add a click event with the right URL
+                let mut click_url = if convert_to_html && url.ends_with(".md") {
+                    url.replace(".md", ".html")
+                } else {
+                    url.to_string()
+                };
+                
+                // Fix any paths where '#' was incorrectly used instead of '/'
+                // This is a common issue when links look like "DesignSpecifications#Status.md"
+                if click_url.contains('#') && !click_url.starts_with('#') {
+                    // Check if this looks like a file path with a hash instead of a slash
+                    if click_url.contains('#') && 
+                       click_url.split('#').last().map_or(false, |last| last.contains('.')) {
+                        // This is likely a path with a hash that should be a slash
+                        click_url = click_url.replace('#', "/");
+                    }
+                }
+                
+                // Use just the URL for the click event, don't include markdown syntax
+                // Make sure no markdown links are included
+                let sanitized_url = if click_url.contains('[') && click_url.contains(']') && click_url.contains('(') && click_url.contains(')') {
+                    // Extract just the URL part from a markdown link
+                    let url_start = click_url.find('(').unwrap() + 1;
+                    let url_end = click_url.rfind(')').unwrap();
+                    click_url[url_start..url_end].to_string()
+                } else {
+                    click_url
+                };
+                diagram.push_str(&format!("{}click {} \"{}\";\n", indent, target_id, sanitized_url));
             } else if target.contains('(') && target.contains(')') && target.contains('[') && target.contains(']') {
-                // This is a markdown link [text](url) format
+                // This is a markdown link [text](url) format but wasn't extracted in the Relation struct
+                // This is a fallback case
                 // Extract the URL part
                 let url_start = target.find('(').unwrap() + 1;
                 let url_end = target.find(')').unwrap();
                 let url = &target[url_start..url_end];
                 
                 // Add a click event with the right URL
-                let click_url = if convert_to_html && url.ends_with(".md") {
+                let mut click_url = if convert_to_html && url.ends_with(".md") {
                     url.replace(".md", ".html")
                 } else {
                     url.to_string()
                 };
                 
-                diagram.push_str(&format!("{}click {} \"{}\";\n", indent, target_id, click_url));
+                // Fix any paths where '#' was incorrectly used instead of '/'
+                if click_url.contains('#') && !click_url.starts_with('#') {
+                    // Check if this looks like a file path with a hash instead of a slash
+                    if click_url.contains('#') && 
+                       click_url.split('#').last().map_or(false, |last| last.contains('.')) {
+                        // This is likely a path with a hash that should be a slash
+                        click_url = click_url.replace('#', "/");
+                    }
+                }
+                
+                // Use just the URL for the click event, don't include markdown syntax
+                // IMPORTANT: Make sure target_id is used for node ID, click_url for URL
+                // Make sure no markdown links are included
+                let sanitized_url = if click_url.contains('[') && click_url.contains(']') && click_url.contains('(') && click_url.contains(')') {
+                    // Extract just the URL part from a markdown link
+                    let url_start = click_url.find('(').unwrap() + 1;
+                    let url_end = click_url.rfind(')').unwrap();
+                    click_url[url_start..url_end].to_string()
+                } else {
+                    click_url
+                };
+                diagram.push_str(&format!("{}click {} \"{}\";\n", indent, target_id, sanitized_url));
             } else {
                 // For completely external elements without a known link,
                 // Create a generic link back to the document with the element as fragment
