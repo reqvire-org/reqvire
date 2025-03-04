@@ -91,6 +91,7 @@ pub fn generate_index(directory: &Path, config: &Config) -> Result<(), ReqFlowEr
 }
 
 /// Information about a file for the index
+#[derive(Clone)]
 struct FileInfo {
     file_name: String,
     relative_path: PathBuf,
@@ -100,7 +101,7 @@ struct FileInfo {
 /// Extract a summary from markdown content
 fn extract_summary(content: &str) -> String {
     // Try to find the first level 1 heading
-    let title_regex = regex::Regex::new(r"^#\s+(.+)$").unwrap();
+    let title_regex = regex::RegexBuilder::new(r"^#\s+(.+)$").multi_line(true).build().unwrap();
     
     // First try to get the title from a level 1 heading
     if let Some(captures) = title_regex.captures(content) {
@@ -201,4 +202,93 @@ fn generate_index_content(directory_map: &HashMap<String, Vec<FileInfo>>) -> Str
     }
     
     content
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::fs::File;
+    use std::io::Write;
+    use tempfile::tempdir;
+    
+    fn create_test_file(dir: &Path, name: &str, content: &str) -> PathBuf {
+        let file_path = dir.join(name);
+        let mut file = File::create(&file_path).unwrap();
+        file.write_all(content.as_bytes()).unwrap();
+        file_path
+    }
+
+    #[test]
+    fn test_extract_summary() {
+        // Create a regex for testing (not actually used but demonstrates pattern)
+        let _engine = regex::RegexBuilder::new(r"^#\s+(.+)$").multi_line(true).build().unwrap();
+        
+        // Test with title and paragraph
+        let content = "# Test Title\n\nThis is a test paragraph.";
+        let expected = "Test Title: This is a test paragraph.";
+        let result = extract_summary(content);
+        assert_eq!(result, expected, "Expected '{}' but got '{}'", expected, result);
+        
+        // Test with just title
+        let content = "# Only Title";
+        let expected = "Only Title";
+        let result = extract_summary(content);
+        assert_eq!(result, expected, "Expected '{}' but got '{}'", expected, result);
+        
+        // Test with no title but paragraph
+        let content = "This is just a paragraph.";
+        let expected = "This is just a paragraph.";
+        let result = extract_summary(content);
+        assert_eq!(result, expected, "Expected '{}' but got '{}'", expected, result);
+        
+        // Test with empty content
+        let content = "";
+        let expected = "No description available";
+        let result = extract_summary(content);
+        assert_eq!(result, expected, "Expected '{}' but got '{}'", expected, result);
+    }
+    
+    #[test]
+    fn test_index_generation() {
+        // Create a temporary directory for the test
+        let temp_dir = tempdir().unwrap();
+        let specs_dir = temp_dir.path().join("specifications");
+        std::fs::create_dir_all(&specs_dir).unwrap();
+        
+        // Create a subdirectory
+        let design_specs_dir = specs_dir.join("DesignSpecifications");
+        std::fs::create_dir_all(&design_specs_dir).unwrap();
+        
+        // Create test files
+        create_test_file(&specs_dir, "Requirements.md", "# Requirements\n\nThis describes requirements.");
+        create_test_file(&design_specs_dir, "Architecture.md", "# Architecture\n\nThis describes architecture.");
+        
+        // Create a config for testing
+        let mut config = Config::default();
+        config.paths.specifications_folder = "specifications".to_string();
+        
+        // Generate the index
+        let result = generate_index(temp_dir.path(), &config);
+        assert!(result.is_ok(), "Index generation failed: {:?}", result);
+        
+        // Check that the index file was created
+        let index_path = specs_dir.join("index.md");
+        assert!(index_path.exists(), "Index file was not created");
+        
+        // Read the index content
+        let index_content = fs::read_to_string(index_path).unwrap();
+        println!("Generated index content:\n{}", index_content);
+        
+        // Verify the content
+        assert!(index_content.contains("# ReqFlow Specifications Index"), "Missing index title");
+        assert!(index_content.contains("Requirements.md"), "Missing reference to Requirements.md");
+        assert!(index_content.contains("DesignSpecifications"), "Missing DesignSpecifications section");
+        assert!(index_content.contains("Architecture.md"), "Missing reference to Architecture.md");
+        
+        // Verify summary extraction - use contains rather than exact match since format might change
+        let req_summary = "Requirements: This describes requirements";
+        assert!(index_content.contains(req_summary), 
+                "Summary extraction failed for Requirements.md. Expected to contain '{}' in: '{}'", 
+                req_summary, index_content);
+    }
 }
