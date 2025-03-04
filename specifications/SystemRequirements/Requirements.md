@@ -1,5 +1,50 @@
 # System Requirements
 
+### Index Generator Implementation
+
+The system shall implement an IndexGenerator component that traverses the specifications directory structure and creates a hierarchical index.md file with links and summaries.
+
+#### Relations
+  * refine: [UserRequirements.md/Generate Documentation Index](UserRequirements.html#generate-documentation-index)
+
+---
+
+### Directory Structure Processing
+
+The system shall parse the specifications directory structure using the configured paths from reqflow.yaml to identify documentation files and their hierarchical relationships.
+
+#### Relations
+  * containedBy: [Index Generator Implementation](#index-generator-implementation)
+
+---
+
+### Markdown Content Summary Extraction
+
+The system shall extract summaries from the first heading and paragraph of each document to include meaningful descriptions in the generated index.
+
+#### Relations
+  * containedBy: [Index Generator Implementation](#index-generator-implementation)
+
+---
+
+### Proper Link URL Generation
+
+The system shall generate URLs in the index file with both Markdown (.md) and HTML (.html) extensions, ensuring documentation navigation works in both formats.
+
+#### Relations
+  * containedBy: [Index Generator Implementation](#index-generator-implementation)
+
+---
+
+### HTML Navigation Enhancement 
+
+The system shall enhance the HTML generator to process index.md as a special file, adding navigation elements and ensuring it serves as the primary entry point.
+
+#### Relations
+  * refine: [UserRequirements.md/Documentation Index HTML Integration](UserRequirements.html#documentation-index-html-integration)
+
+---
+
 ### LLM Context Command
 
 The system shall provide a command-line option `--llm-context` that outputs comprehensive contextual information about ReqFlow methodology, document structure, relation types, and CLI usage to help Large Language Models understand and work with ReqFlow-based projects.
