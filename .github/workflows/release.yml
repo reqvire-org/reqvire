@@ -7,6 +7,9 @@ on:
 
 jobs:
   build:
+    permissions:
+      contents: write
+        
     name: Build and Release Rust Project
     runs-on: ubuntu-latest
 
