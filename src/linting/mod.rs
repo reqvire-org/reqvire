@@ -253,6 +253,13 @@ pub fn lint_directory(directory: &Path, dry_run: bool) -> Result<Vec<LintSuggest
 pub fn lint_directory_with_config(directory: &Path, dry_run: bool, config: &Config) -> Result<Vec<LintSuggestion>, ReqFlowError> {
     let mut all_suggestions = Vec::new();
     
+    // Generate the index.md file
+    if !dry_run {
+        if let Err(e) = index_generator::generate_index(directory, config) {
+            log::warn!("Failed to generate index.md: {}", e);
+        }
+    }
+    
     // Find all markdown files in the directory that are requirements documents
     for entry in WalkDir::new(directory)
         .into_iter()
@@ -354,6 +361,7 @@ pub mod whitespace;
 pub mod newlines;
 pub mod separators;
 pub mod indentation;
+pub mod index_generator;
 
 /// Find absolute links that could be converted to relative links
 pub fn find_absolute_links(content: &str, file_path: &Path) -> Vec<LintSuggestion> {
