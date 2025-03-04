@@ -1,130 +1,56 @@
-name: Release
+name: Rust Linux Release
 
 on:
   push:
-    branches: [ main, master ]
-    tags: [ "v*" ]
+    branches:
+      - main
 
 jobs:
   build:
-    name: Build and Release
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        include:
-          - os: ubuntu-latest
-            target: x86_64-unknown-linux-gnu
-            name: linux-x86_64
-            bin: reqflow
-          - os: macos-latest
-            target: x86_64-apple-darwin
-            name: macos-x86_64
-            bin: reqflow
-          - os: macos-latest
-            target: aarch64-apple-darwin
-            name: macos-arm64
-            bin: reqflow
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Setup Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-          target: ${{ matrix.target }}
-          override: true
-
-      - name: Build
-        uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args: --release --target ${{ matrix.target }}
-
-      - name: Package
-        shell: bash
-        run: |
-          cd target/${{ matrix.target }}/release
-          tar czvf ../../../reqflow-${{ matrix.name }}.tar.gz ${{ matrix.bin }}
-          cd -
-
-      - name: Archive production artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: reqflow-${{ matrix.name }}
-          path: reqflow-${{ matrix.name }}.tar.gz
-
-  release:
-    name: Create Release
-    needs: build
+    name: Build and Release Rust Project
     runs-on: ubuntu-latest
-    # Only run on tagged commits
-    if: startsWith(github.ref, 'refs/tags/')
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Get the version
-        id: get_version
-        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
 
-      - name: Download all artifacts
-        uses: actions/download-artifact@v2
-
-      - name: Create Release
-        id: create_release
-        uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Cache Cargo dependencies
+        uses: actions/cache@v3
         with:
-          tag_name: ${{ steps.get_version.outputs.VERSION }}
-          name: Release ${{ steps.get_version.outputs.VERSION }}
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
+      - name: Build Rust project
+        run: cargo build --release
+
+      - name: Get version from Cargo.toml
+        id: get_version
+        run: echo "VERSION=$(cargo metadata --format-version 1 --no-deps | jq -r '.packages[0].version')" >> $GITHUB_ENV
+
+      - name: Create release artifacts
+        run: |
+          mkdir release
+          cp target/release/reqflow release/
+          tar -czvf reqflow-linux.tar.gz -C release reqflow
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ env.VERSION }}
+          name: Release v${{ env.VERSION }}
+          body: |
+            Automated release of version ${{ env.VERSION }}.
           draft: false
           prerelease: false
-          files: reqflow-*/reqflow-*.tar.gz
-          generate_release_notes: true
+          files: reqflow-linux.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  bump-version:
-    name: Automatic Version Bump on PR Merge
-    runs-on: ubuntu-latest
-    # Only run on pushes to main/master branches (not tags)
-    if: github.event_name == 'push' && !startsWith(github.ref, 'refs/tags/') && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
-      - name: Get Latest Tag
-        id: get_latest_tag
-        run: |
-          git fetch --tags
-          LATEST_TAG=$(git tag --sort=-v:refname | head -n 1)
-          echo "LATEST_TAG=${LATEST_TAG:-v0.0.0}" >> $GITHUB_OUTPUT
-          echo "Latest tag is ${LATEST_TAG:-v0.0.0}"
-
-      - name: Bump Version
-        id: bump_version
-        run: |
-          LATEST_TAG=${{ steps.get_latest_tag.outputs.LATEST_TAG }}
-          # Remove 'v' prefix
-          VERSION=${LATEST_TAG#v}
-          IFS='.' read -r -a VERSION_PARTS <<< "$VERSION"
-          
-          # Increment patch version
-          MAJOR=${VERSION_PARTS[0]:-0}
-          MINOR=${VERSION_PARTS[1]:-0}
-          PATCH=$((${VERSION_PARTS[2]:-0} + 1))
-          
-          NEW_VERSION="v$MAJOR.$MINOR.$PATCH"
-          echo "NEW_VERSION=${NEW_VERSION}" >> $GITHUB_OUTPUT
-          echo "New version will be ${NEW_VERSION}"
-
-      - name: Create Tag
-        run: |
-          git config user.name "GitHub Actions Bot"
-          git config user.email "actions@github.com"
-          git tag -a ${{ steps.bump_version.outputs.NEW_VERSION }} -m "Release ${{ steps.bump_version.outputs.NEW_VERSION }}"
-          git push origin ${{ steps.bump_version.outputs.NEW_VERSION }}
