@@ -599,17 +599,50 @@ fn add_element_to_diagram(
             // Relations originating from requirements ("By" suffix) - reverse direction
             "verifiedBy" => RelationProperties { arrow: "-->", label: "verifies", reverse_direction: true },
             "satisfiedBy" => RelationProperties { arrow: "-->", label: "satisfies", reverse_direction: true },
-            "derivedFrom" => RelationProperties { arrow: "-.->", label: "derives from", reverse_direction: true },
-            "tracedFrom" => RelationProperties { arrow: "-->", label: "traces from", reverse_direction: true },
+            // For derivedFrom, we DON'T reverse the direction to get the opposite effect
+            "derivedFrom" => RelationProperties { arrow: "-.->", label: "deriveReqT", reverse_direction: false },  
+            "tracedFrom" => RelationProperties { arrow: "-->", label: "traces", reverse_direction: true },  // Changed to "traces"
             "containedBy" => RelationProperties { arrow: "--o", label: "contains", reverse_direction: true },
             
             // Relations originating from other elements - normal direction
             "verify" => RelationProperties { arrow: "-->", label: "verifies", reverse_direction: false },
             "satisfy" => RelationProperties { arrow: "-->", label: "satisfies", reverse_direction: false },
-            "derive" => RelationProperties { arrow: "-.->", label: "derives from", reverse_direction: false },
+            // For derive, we reverse the direction to get the opposite effect
+            "derive" => RelationProperties { arrow: "-.->", label: "deriveReqT", reverse_direction: true },
             "refine" => RelationProperties { arrow: "==>", label: "refines", reverse_direction: false },
-            "trace" => RelationProperties { arrow: "-->", label: "traces from", reverse_direction: false },
+            "trace" => RelationProperties { arrow: "-->", label: "traces", reverse_direction: false },  // Changed to "traces"
             "contain" => RelationProperties { arrow: "--o", label: "contains", reverse_direction: false },
+            
+            // Handle any relation type that ends with "By" - reverse direction
+            rel_type if rel_type.ends_with("By") => {
+                // Extract the base relation name by removing the "By" suffix
+                let base_len = rel_type.len() - 2;  // Length without "By"
+                let base_name = &rel_type[0..base_len];
+                
+                // Determine the arrow style and label based on the base relation
+                let (arrow, label, should_reverse) = if base_name.contains("derive") {
+                    // For derive relations, DON'T reverse the direction
+                    ("-.->", "deriveReqT", false)  // Special label for derive relations
+                } else if base_name.contains("refine") {
+                    ("==>", "refines", true)
+                } else if base_name.contains("contain") {
+                    ("--o", "contains", true) 
+                } else if base_name.contains("trace") {
+                    ("-->", "traces", true)
+                } else if base_name.contains("verify") {
+                    ("-->", "verifies", true)
+                } else if base_name.contains("satisfy") {
+                    ("-->", "satisfies", true)
+                } else {
+                    ("-->", "relates to", true)
+                };
+                
+                RelationProperties { 
+                    arrow,
+                    label,
+                    reverse_direction: should_reverse  // Not all "By" relations should reverse direction
+                }
+            },
             
             // Default for any other relation type
             _ => RelationProperties { arrow: "-->", label: "relates to", reverse_direction: false },
@@ -624,7 +657,7 @@ fn add_element_to_diagram(
         };
         
         // Add the relationship with the correct directionality, arrow style, and label
-        diagram.push_str(&format!("{}{}{}|{}|{};\n", 
+        diagram.push_str(&format!("{}{} {}|{}| {};\n", 
             indent,
             from_id,
             properties.arrow, 
