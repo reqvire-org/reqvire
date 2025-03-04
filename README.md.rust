@@ -1,6 +1,6 @@
 # ReqFlow Rust Implementation
 
-A Rust implementation of ReqFlow, an agile Model-Based Systems Engineering (MBSE) framework designed to integrate seamlessly with modern Git workflows.
+A Rust implementation of ReqFlow tool, an agile Model-Based Systems Engineering (MBSE) framework tool designed to integrate seamlessly with modern Git workflows.
 
 ## Features
 
