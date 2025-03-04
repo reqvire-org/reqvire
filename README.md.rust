@@ -1,0 +1,88 @@
+# ReqFlow Rust Implementation
+
+A Rust implementation of ReqFlow, an agile Model-Based Systems Engineering (MBSE) framework designed to integrate seamlessly with modern Git workflows.
+
+## Features
+
+- Parse and process Markdown files containing requirements
+- Extract elements and relations from markdown documents
+- Generate proper markdown links for relations
+- Convert markdown to HTML with styling
+- Validate element structure and consistency
+- Process files in parallel for better performance
+
+## Installation
+
+### Prerequisites
+
+- Rust toolchain (1.70.0 or newer)
+
+### Building from source
+
+```bash
+git clone https://github.com/youruser/reqflow.git
+cd reqflow
+cargo build --release
+```
+
+The compiled binary will be available at `target/release/reqflow`.
+
+## Usage
+
+Basic usage:
+
+```bash
+reqflow <input_folder> <output_folder>
+```
+
+Convert Markdown to HTML:
+
+```bash
+reqflow <input_folder> <output_folder> --html
+```
+
+Enable verbose output:
+
+```bash
+reqflow <input_folder> <output_folder> --verbose
+```
+
+### Example
+
+```bash
+reqflow specifications/ output/ --html
+```
+
+This will process all requirement markdown files in the `specifications/` directory and output HTML files to the `output/` directory.
+
+## Development
+
+### Running tests
+
+```bash
+cargo test
+```
+
+### Code style
+
+```bash
+cargo fmt
+cargo clippy
+```
+
+## Project Structure
+
+- `src/main.rs` - Main application entry point
+- `src/model.rs` - Model management and file processing
+- `src/element.rs` - Element data structures and registry
+- `src/relation.rs` - Relation handling and processing
+- `src/markdown.rs` - Markdown parsing and processing
+- `src/html.rs` - HTML conversion
+- `src/validation.rs` - Validation utilities
+- `src/utils.rs` - Utility functions
+- `src/error.rs` - Error types
+- `src/config.rs` - Configuration and constants
+
+## License
+
+Apache License 2.0

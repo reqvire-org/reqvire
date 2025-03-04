@@ -1,0 +1,14 @@
+general:
+  verbose: true
+  html_output: true
+  diagrams:
+    enabled: true
+    direction: TD
+    per_element: true
+
+paths:
+  specifications_folder: "specifications"
+  system_requirements_folder_name: "SystemRequirements"
+  design_specifications_folder_name: "DesignSpecifications"
+  output_folder: "output"
+  requirements_filename_match: ".*Requirements.*"

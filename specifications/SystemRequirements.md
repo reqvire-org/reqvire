@@ -4,6 +4,3 @@ System Requirements are derived from business and user requirements to describe 
 Purpose is to translate stakeholder and user needs into system-level specifications.
 
 System requirements must be verifiable.
-
-
-

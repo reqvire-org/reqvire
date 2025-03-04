@@ -1,0 +1,31 @@
+# ReqFlow Configuration
+
+general:
+  # Enable verbose output
+  verbose: false
+
+paths:
+  # Path to the specifications folder (can be set via command line argument)
+  specifications_folder: "specifications"
+  
+  # Folder name for system requirements (relative to specifications_folder)
+  system_requirements_folder_name: "SystemRequirements"
+  
+  # Folder name for design specifications (relative to specifications_folder)
+  design_specifications_folder_name: "DesignSpecifications"
+  
+  # Default output folder (can be set via command line argument)
+  output_folder: "output"
+  
+  # String to match in filename for identifying Requirements files
+  requirements_filename_match: "Requirements"
+
+style:
+  # Theme for HTML output (default, dark, light)
+  theme: "default"
+  
+  # Maximum width for HTML output
+  max_width: 1200
+  
+  # Optional path to custom CSS file
+  # custom_css: "path/to/custom.css"

@@ -1,0 +1,29 @@
+reqflow.py
+tmpspec
+tmpdoc
+
+# Rust-specific ignores
+/target/
+**/*.rs.bk
+Cargo.lock
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+.DS_Store
+
+# Generated output
+/output/
+/test-output/
+*.bak
+
+# Python-specific ignores
+__pycache__/
+*.py[cod]
+*$py.class
+.env
+.venv
+env/
+venv/
+ENV/

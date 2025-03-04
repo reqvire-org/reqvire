@@ -1,0 +1,28 @@
+# ReqFlow Configuration for Diagram Testing
+
+general:
+  # Enable verbose output
+  verbose: true
+  
+paths:
+  # Path to the specifications folder
+  specifications_folder: "test-fixtures/test-diagram-generation"
+  
+  # Folder name for system requirements 
+  system_requirements_folder_name: "SystemRequirements"
+  
+  # Folder name for design specifications 
+  design_specifications_folder_name: "DesignSpecifications"
+  
+  # Default output folder
+  output_folder: "test-fixtures/test-diagram-generation/output"
+  
+  # String to match in filename for identifying Requirements files
+  requirements_filename_match: "Requirements"
+
+style:
+  # Theme for HTML output (default, dark, light)
+  theme: "default"
+  
+  # Maximum width for HTML output
+  max_width: 1200
