@@ -63,17 +63,32 @@ pub fn process_mermaid_diagrams(html_content: &str) -> String {
     
     lazy_static::lazy_static! {
         static ref MERMAID_REGEX: Regex = Regex::new(r#"<pre><code class="language-mermaid">([\s\S]*?)</code></pre>"#).unwrap();
+        // Add regex to fix mermaid click links - convert .md to .html in click statements
+        static ref MERMAID_CLICK_REGEX: Regex = Regex::new(r#"(click\s+\S+\s+&quot;)([^&]*)\.md(#[^&]*&quot;)"#).unwrap();
     }
     
-    MERMAID_REGEX
+    // First extract the mermaid content
+    let with_div = MERMAID_REGEX
         .replace_all(html_content, |caps: &regex::Captures| {
             let diagram_content = &caps[1];
+            
+            // Convert any .md links in the diagram to .html
+            let fixed_content = MERMAID_CLICK_REGEX.replace_all(diagram_content, |caps: &regex::Captures| {
+                let prefix = &caps[1];   // "click ID "
+                let path = &caps[2];     // path part before .md
+                let suffix = &caps[3];   // #anchor" part
+                
+                format!("{}{}.html{}", prefix, path, suffix)
+            });
+            
             format!(
                 r#"<div class="mermaid">{}</div>"#,
-                diagram_content
+                fixed_content
             )
         })
-        .to_string()
+        .to_string();
+    
+    with_div
 }
 
 /// Convert all markdown links from .md to .html for HTML output
