@@ -16,6 +16,7 @@ Cargo.lock
 # Generated output
 /output/
 /test-output/
+*.bak
 
 # Python-specific ignores
 __pycache__/
