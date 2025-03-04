@@ -571,7 +571,7 @@ fn add_element_to_diagram(
         element.name.replace(' ', "-").to_lowercase()
     ));
     
-    // Apply requirement style to this element
+    // Apply requirement style to this element - all direct elements in document are requirements
     diagram.push_str(&format!("{}class {} requirement;\n", indent, element_id));
     
     // Mark this element as included
@@ -587,19 +587,50 @@ fn add_element_to_diagram(
             .map(|c| if c.is_alphanumeric() { c } else { '_' })
             .collect::<String>();
         
-        // Different arrow styles and labels based on relation type
-        let arrow_style = match relation.relation_type.as_str() {
-            "verifiedBy" | "verify" => "-->|verifies|",
-            "satisfiedBy" | "satisfy" => "-->|satisfies|",
-            "derivedFrom" | "derive" => "-.->|derives from|",
-            "refine" => "==>|refines|",
-            "tracedFrom" | "trace" => "-->|traces from|", // Changed from ~~~> which is not valid in mermaid
-            "containedBy" | "contain" => "--o|contains|",
-            _ => "-->|relates to|"
+        // Define a small struct to represent the relationship properties
+        struct RelationProperties {
+            arrow: &'static str,      // Arrow style
+            label: &'static str,      // Displayed label
+            reverse_direction: bool,  // Whether to reverse the arrow direction
+        }
+        
+        // Get relation properties based on relation type
+        let properties = match relation.relation_type.as_str() {
+            // Relations originating from requirements ("By" suffix) - reverse direction
+            "verifiedBy" => RelationProperties { arrow: "-->", label: "verifies", reverse_direction: true },
+            "satisfiedBy" => RelationProperties { arrow: "-->", label: "satisfies", reverse_direction: true },
+            "derivedFrom" => RelationProperties { arrow: "-.->", label: "derives from", reverse_direction: true },
+            "tracedFrom" => RelationProperties { arrow: "-->", label: "traces from", reverse_direction: true },
+            "containedBy" => RelationProperties { arrow: "--o", label: "contains", reverse_direction: true },
+            
+            // Relations originating from other elements - normal direction
+            "verify" => RelationProperties { arrow: "-->", label: "verifies", reverse_direction: false },
+            "satisfy" => RelationProperties { arrow: "-->", label: "satisfies", reverse_direction: false },
+            "derive" => RelationProperties { arrow: "-.->", label: "derives from", reverse_direction: false },
+            "refine" => RelationProperties { arrow: "==>", label: "refines", reverse_direction: false },
+            "trace" => RelationProperties { arrow: "-->", label: "traces from", reverse_direction: false },
+            "contain" => RelationProperties { arrow: "--o", label: "contains", reverse_direction: false },
+            
+            // Default for any other relation type
+            _ => RelationProperties { arrow: "-->", label: "relates to", reverse_direction: false },
         };
         
-        // Add the relationship
-        diagram.push_str(&format!("{}{} {} {};\n", indent, element_id, arrow_style, target_id));
+        // Determine the source and target IDs based on direction
+        // Clone the strings to avoid ownership issues
+        let (from_id, to_id) = if properties.reverse_direction {
+            (target_id.clone(), element_id.clone())  // Reversed: from target to element
+        } else {
+            (element_id.clone(), target_id.clone())  // Normal: from element to target
+        };
+        
+        // Add the relationship with the correct directionality, arrow style, and label
+        diagram.push_str(&format!("{}{}{}|{}|{};\n", 
+            indent,
+            from_id,
+            properties.arrow, 
+            properties.label,
+            to_id
+        ));
         
         // If the target is not already included in the diagram, add it
         if !included_elements.contains(target) {
@@ -616,13 +647,14 @@ fn add_element_to_diagram(
             } else {
                 target.replace('"', "&quot;")
             };
-            diagram.push_str(&format!("  {}[\"{}\"];\n", target_id, display_text));
+            diagram.push_str(&format!("{}{}[\"{}\"];\n", indent, target_id, display_text));
             
             // Try to find the target element in the registry
             let target_element = registry.get_element(target);
             
-            // Check if the target element is from a different file
-            let is_external_link = if let Some(target_elem) = target_element {
+            // We previously checked if the target was external, but now we color strictly by relation type
+            // We'll keep the check for debugging purposes
+            let _is_external = if let Some(target_elem) = target_element {
                 // It's external if it's from a different file
                 target_elem.file_path != file_path
             } else {
@@ -630,20 +662,21 @@ fn add_element_to_diagram(
                 true
             };
             
-            // Determine the style class based on relation type and element location
-            let style_class = if is_external_link {
-                // External elements get the blue link style
-                "externalLink"
-            } else if relation.relation_type == "verifiedBy" || relation.relation_type == "verify" {
-                // Verification elements get the green verification style
+            // Always determine style class based purely on relation type
+            // This ensures consistent coloring based on relation
+            let style_class = if relation.relation_type == "verifiedBy" || relation.relation_type == "verify" {
+                // Verification relations get the green verification style
                 "verification"
             } else if relation.relation_type == "satisfiedBy" || relation.relation_type == "satisfy" {
-                // Elements that satisfy requirements get the yellow satisfy style
+                // Satisfy relations get the yellow satisfy style
                 "satisfies"
             } else {
-                // Default style for other elements
-                "default"
+                // Default style for other relation types - use requirement style (red)
+                "requirement"
             };
+            
+            // Note: We're no longer overriding style based on external link status
+            // This ensures color is based on relation type, not location
             
             if let Some(target_elem) = target_element {
                 // Add click behavior for HTML if we found the target
@@ -710,10 +743,42 @@ fn add_element_to_diagram(
                 
                 // Use direct URL without markdown formatting for diagram click links
                 diagram.push_str(&format!("{}click {} \"{}\";\n", indent, target_id, link));
+            } else if target.contains('(') && target.contains(')') && target.contains('[') && target.contains(']') {
+                // This is a markdown link [text](url) format
+                // Extract the URL part
+                let url_start = target.find('(').unwrap() + 1;
+                let url_end = target.find(')').unwrap();
+                let url = &target[url_start..url_end];
+                
+                // Add a click event with the right URL
+                let click_url = if convert_to_html && url.ends_with(".md") {
+                    url.replace(".md", ".html")
+                } else {
+                    url.to_string()
+                };
+                
+                diagram.push_str(&format!("{}click {} \"{}\";\n", indent, target_id, click_url));
+            } else {
+                // For completely external elements without a known link,
+                // Create a generic link back to the document with the element as fragment
+                let doc_link = if convert_to_html {
+                    convert_path_to_html_link(file_path)
+                } else {
+                    file_path.to_string()
+                };
+                
+                // Assume we can link back to original document with target as fragment
+                let target_fragment = target.replace(' ', "-").to_lowercase();
+                diagram.push_str(&format!("{}click {} \"{}#{}\";\n", 
+                    indent, 
+                    target_id, 
+                    doc_link,
+                    target_fragment
+                ));
             }
             
-            // Apply appropriate style class
-            diagram.push_str(&format!("  class {} {};\n", target_id, style_class));
+            // Apply appropriate style class - maintain consistent indentation
+            diagram.push_str(&format!("{}class {} {};\n", indent, target_id, style_class));
             
             // Mark target as included
             included_elements.insert(target.clone());
