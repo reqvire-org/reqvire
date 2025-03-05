@@ -277,6 +277,108 @@ pub fn get_relative_path<P: AsRef<Path>, B: AsRef<Path>>(path: P, base: B) -> Re
     }
 }
 
+/// Normalize a path string for consistent registry lookups
+/// This handles paths that might be written in different forms but refer to the same file
+/// 
+/// Always normalizes to absolute paths where specifications or external folders are at the root
+/// For example: 
+/// - "./DesignSpecifications/File.md" becomes "/specifications/DesignSpecifications/File.md"
+/// - "../../Requirements.md" in external-folder/subfolder/subfolder becomes "/external-folder/Requirements.md"
+/// - "#fragment" becomes "/specifications/current-file.md#fragment" with absolute path
+pub fn normalize_path(path: &str, config: &crate::config::Config, current_file: &str) -> String {
+    // Handle fragment-only references (like #fragment)
+    if path.starts_with("#") {
+        // For fragment-only paths, combine with current file path
+        // Normalize current file path first if needed (avoid infinite recursion by using empty string for current_file)
+        let current_file_normalized = if current_file.is_empty() {
+            "".to_string()
+        } else {
+            normalize_path(current_file, config, "")
+        };
+        
+        // Ensure fragments are appended directly to the file path WITHOUT a slash
+        log::info!("Normalizing fragment-only reference: {} -> {}{}", path, current_file_normalized, path);
+        return format!("{}{}", current_file_normalized, path);
+    }
+    
+    // Split the path and fragment if present
+    let (base_path, fragment) = if let Some(fragment_idx) = path.find('#') {
+        // Keep the fragment part intact, including the # character
+        (path[0..fragment_idx].to_string(), path[fragment_idx..].to_string())
+    } else {
+        (path.to_string(), "".to_string())
+    };
+    
+    let path_obj = Path::new(&base_path);
+    
+    // For a simple filename with no path components, we need context to normalize it
+    if path_obj.parent().is_none() || path_obj.parent().unwrap() == Path::new("") {
+        return format!("{}{}", base_path, fragment);
+    }
+    
+    // Get path components - we're looking for specifications folder or external folders
+    let specs_folder = &config.paths.specifications_folder;
+    let design_specs_folder = &config.paths.design_specifications_folder;
+    
+    // If path contains specifications folder already, make sure it's prefixed with /
+    if base_path.contains(specs_folder) {
+        let normalized = if base_path.starts_with("/") {
+            format!("{}{}", base_path, fragment)
+        } else {
+            format!("/{}{}", base_path.trim_start_matches("./"), fragment)
+        };
+        log::debug!("Path contains specs folder, normalized to: {}", normalized);
+        return normalized;
+    }
+    
+    // If path contains design specifications folder
+    if base_path.contains(design_specs_folder) {
+        // Handle special case where specifications_folder is "."
+        if specs_folder == "." {
+            // Don't add /specifications/ prefix when the specs folder is the current directory
+            let normalized = format!("/{}{}", 
+                            base_path.trim_start_matches("./"), 
+                            fragment);
+            log::debug!("Path contains design specs folder, normalized to: {}", normalized);
+            return normalized;
+        } else {
+            // Standard case - add specifications folder as parent
+            let normalized = format!("/{}/{}{}", 
+                            specs_folder, 
+                            base_path.trim_start_matches("./"), 
+                            fragment);
+            log::debug!("Path contains design specs folder, normalized to: {}", normalized);
+            return normalized;
+        }
+    }
+    
+    // Check for external folders
+    for ext_folder in &config.paths.external_folders {
+        if base_path.contains(ext_folder) {
+            let normalized = if base_path.starts_with("/") {
+                format!("{}{}", base_path, fragment)
+            } else {
+                format!("/{}{}", base_path.trim_start_matches("./"), fragment) 
+            };
+            log::debug!("Path contains external folder, normalized to: {}", normalized);
+            return normalized;
+        }
+    }
+    
+    // Default normalization - prepend with /specifications/
+    let normalized = format!("/{}/{}{}", 
+                           specs_folder, 
+                           base_path.trim_start_matches("./"),
+                           fragment);
+    log::debug!("Default normalization: {}", normalized);
+    normalized
+}
+
+// Keep the old function name for backward compatibility, just forwarding to the new function
+pub fn normalize_path_for_validation(path: &str, config: &crate::config::Config) -> String {
+    normalize_path(path, config, "")
+}
+
 /// Create directory and any parent directories if they don't exist
 pub fn create_dir_all<P: AsRef<Path>>(path: P) -> Result<(), ReqFlowError> {
     fs::create_dir_all(path.as_ref()).map_err(|e| {
@@ -300,6 +402,18 @@ pub fn read_file<P: AsRef<Path>>(path: P) -> Result<String, ReqFlowError> {
     fs::read_to_string(path.as_ref()).map_err(|e| {
         ReqFlowError::IoError(e)
     })
+}
+
+/// Normalize a string to GitHub-style fragment identifier
+/// This follows GitHub's rules for converting headings to link anchors:
+/// 1. Convert to lowercase
+/// 2. Replace spaces with hyphens
+/// 3. Remove special characters
+/// 
+/// This function should be used consistently across the codebase whenever
+/// creating or looking up fragment identifiers.
+pub fn normalize_fragment(text: &str) -> String {
+    text.to_lowercase().replace(' ', "-")
 }
 
 /// Helper function to check if a file is excluded by any of the provided glob patterns

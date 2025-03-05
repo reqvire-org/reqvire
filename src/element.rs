@@ -84,15 +84,19 @@ impl Element {
         self.relations.push(relation);
     }
 
-    /// Get the full identifier for this element (file_path/element_name)
+    /// Get the full identifier for this element (file_path#normalized-element-name)
+    /// This matches the format used in GitHub-style fragment references
     pub fn identifier(&self) -> String {
-        format!("{}/{}", self.file_path, self.name)
+        // Use the common utility function for normalization
+        let normalized_fragment = crate::utils::normalize_fragment(&self.name);
+        format!("{}#{}", self.file_path, normalized_fragment)
     }
 
     /// Create an anchor ID for HTML links
     #[allow(dead_code)]
     pub fn anchor_id(&self) -> String {
-        self.name.replace(' ', "-").to_lowercase()
+        // Use the common utility function for normalization
+        crate::utils::normalize_fragment(&self.name)
     }
 }
 
@@ -150,7 +154,7 @@ impl ElementRegistry {
         self.elements.insert(identifier, element);
         Ok(())
     }
-
+    
     /// Get an element by its identifier
     #[allow(dead_code)]
     pub fn get_element(&self, identifier: &str) -> Option<&Element> {
@@ -166,7 +170,37 @@ impl ElementRegistry {
     /// Check if an element exists in the registry
     #[allow(dead_code)]
     pub fn contains_element(&self, identifier: &str) -> bool {
-        self.elements.contains_key(identifier)
+        // Enhanced debugging - use INFO level for better visibility
+        log::info!("Checking for element: {}", identifier);
+        
+        // Direct lookup - fastest path
+        if self.elements.contains_key(identifier) {
+            log::info!("Direct element match found: {}", identifier);
+            return true;
+        }
+        
+        // Check if this might be a file reference without an element identifier
+        if identifier.ends_with(".md") {
+            // Check if any element in registry has this file path
+            for (id, elem) in &self.elements {
+                if elem.file_path == identifier {
+                    log::info!("Found matching file path: {} -> {}", identifier, id);
+                    return true;
+                }
+            }
+        }
+        
+        // Enhanced logging for debugging fragment references
+        if identifier.contains("#") {
+            log::info!("Fragment identifier not found directly: {}", identifier);
+            // Log some similar keys for comparison
+            for (id, _) in self.elements.iter().filter(|(k, _)| k.contains("#") || k.contains(&identifier.split("#").next().unwrap_or(""))) {
+                log::info!("  Similar registry element: {}", id);
+            }
+        }
+        
+        log::info!("Element not found: {}", identifier);
+        false
     }
 
     /// Get elements from a specific file
