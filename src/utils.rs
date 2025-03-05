@@ -96,11 +96,23 @@ pub fn is_requirements_file_only(path: &Path, config: &crate::config::Config, ba
     }
     
     // Skip design specifications
-    let design_specs_folder = config.paths.design_specifications_folder.to_lowercase();
+    let mut design_specs_folder = config.paths.design_specifications_folder.to_lowercase();
     let path_str_lower = path_str.to_lowercase();
     let filename_lower = filename.to_lowercase();
     
-    if path_str_lower.contains(&format!("/{}/", design_specs_folder)) || filename_lower.contains("dsd_") {
+    // Remove trailing slash if present
+    if design_specs_folder.ends_with('/') {
+        design_specs_folder = design_specs_folder[0..design_specs_folder.len()-1].to_string();
+    }
+    
+    // More comprehensive check for design specs
+    let is_design_spec = 
+        filename_lower.contains("dsd_") || // File with DSD_ prefix
+        path_str_lower.contains(&format!("/{}/", design_specs_folder)) || 
+        path_str_lower.contains(&format!("/{}", design_specs_folder)) || // Allow for end of path
+        path_str_lower.ends_with(&design_specs_folder);
+        
+    if is_design_spec {
         if verbose {
             log::info!("Skipping design spec: {}", path.display());
         }
@@ -110,8 +122,21 @@ pub fn is_requirements_file_only(path: &Path, config: &crate::config::Config, ba
     // Check if file is in any external folder
     let in_external_folder = if !config.paths.external_folders.is_empty() {
         config.paths.external_folders.iter().any(|ext_folder| {
-            let ext_folder_lower = ext_folder.to_lowercase();
-            path_str_lower.contains(&format!("/{}/", ext_folder_lower))
+            let mut ext_folder_lower = ext_folder.to_lowercase();
+            // Remove trailing slash if present
+            if ext_folder_lower.ends_with('/') {
+                ext_folder_lower = ext_folder_lower[0..ext_folder_lower.len()-1].to_string();
+            }
+            // Remove leading "./" if present
+            if ext_folder_lower.starts_with("./") {
+                ext_folder_lower = ext_folder_lower[2..].to_string();
+            }
+            
+            // More flexible matching for external folders
+            path_str_lower == ext_folder_lower || 
+            path_str_lower.contains(&format!("/{}/", ext_folder_lower)) || 
+            path_str_lower.starts_with(&format!("{}/", ext_folder_lower)) ||
+            path_str_lower.starts_with(&format!("./{}/", ext_folder_lower))
         })
     } else {
         false
@@ -140,13 +165,32 @@ pub fn is_requirements_file_only(path: &Path, config: &crate::config::Config, ba
     
     // Normal case - proper path checking
     // Determine if file is in the specifications folder or subfolder
-    let specs_folder = config.paths.specifications_folder.to_lowercase();
-    let in_specifications = path_str_lower.contains(&format!("/{}/", specs_folder));
+    let mut specs_folder = config.paths.specifications_folder.to_lowercase();
+    // Remove trailing slash if present
+    if specs_folder.ends_with('/') {
+        specs_folder = specs_folder[0..specs_folder.len()-1].to_string();
+    }
+    // Remove leading "./" if present
+    if specs_folder.starts_with("./") {
+        specs_folder = specs_folder[2..].to_string();
+    }
+    
+    // More flexible matching to check if the path contains the specifications folder
+    let in_specifications = 
+        // Check for exact folder match
+        path_str_lower == specs_folder || 
+        // Check if path contains the specifications folder as a component (with slashes)
+        path_str_lower.contains(&format!("/{}/", specs_folder)) || 
+        // Check if path starts with specifications folder
+        path_str_lower.starts_with(&format!("{}/", specs_folder)) ||
+        // Check if path starts with ./specifications folder
+        path_str_lower.starts_with(&format!("./{}/", specs_folder));
     
     if !in_specifications {
         // If not in specifications or external folders, it's not a requirements file
         if verbose {
             log::info!("File is not in specifications folder or external folder, skipping");
+            log::info!("  specs_folder: '{}', path: '{}'", specs_folder, path_str_lower);
         }
         return false;
     }
@@ -275,7 +319,7 @@ pub fn is_excluded_by_patterns(path: &Path, patterns: &[String], base_path: &Pat
             
             let matches = glob::Pattern::new(pattern).map(|p| p.matches(&rel_path)).unwrap_or(false);
             if matches && verbose {
-                log::info!("File {} matches excluded pattern {} (checking rel_path: {})", 
+                log::debug!("File {} matches excluded pattern {} (checking rel_path: {})", 
                            path.display(), pattern, rel_path);
             }
             matches
@@ -283,7 +327,7 @@ pub fn is_excluded_by_patterns(path: &Path, patterns: &[String], base_path: &Pat
             // For simple patterns, just check against the filename
             let matches = glob::Pattern::new(pattern).map(|p| p.matches(&file_path_for_pattern)).unwrap_or(false);
             if matches && verbose {
-                log::info!("File {} matches excluded pattern {} (checking filename only: {})", 
+                log::debug!("File {} matches excluded pattern {} (checking filename only: {})", 
                            path.display(), pattern, file_path_for_pattern);
             }
             matches

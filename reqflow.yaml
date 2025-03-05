@@ -6,11 +6,10 @@ general:
 
 paths:
   # Path to the specifications folder
-  specifications_folder: "../graphenedb/sources/red/specifications/"
-  
+  specifications_folder: "specifications"
   
   # Folder name for design specifications 
-  design_specifications_folder_name: "DesignSpecifications"
+  design_specifications_folder: "DesignSpecifications"
   
   # Default output folder
   output_folder: "output"
@@ -24,8 +23,7 @@ paths:
   # These are patterns that shouldn't be considered requirements even if they're in specifications or external folders
   excluded_filename_patterns:
     - "**/Logical*.md"
-    - "**/Physical*.md"    
-    - "**/index.md"
+    - "**/Physical*.md"
 
 
 style:

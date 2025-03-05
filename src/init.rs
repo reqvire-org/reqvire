@@ -1,12 +1,22 @@
 use std::fs;
 use std::path::Path;
-use log::{info, warn};
+use log::info;
 
 use crate::error::ReqFlowError;
 
 /// Initialize a new ReqFlow project with basic structure
 pub fn initialize_project(target_dir: &Path) -> Result<(), ReqFlowError> {
     info!("Initializing a new ReqFlow project in {:?}", target_dir);
+    
+    // Check if standard configuration files already exist (only reqflow.yaml or reqflow.yml)
+    let config_yaml = target_dir.join("reqflow.yaml");
+    let config_yml = target_dir.join("reqflow.yml");
+    
+    if config_yaml.exists() || config_yml.exists() {
+        return Err(ReqFlowError::InitializationError(
+            "ReqFlow configuration file (reqflow.yaml or reqflow.yml) already exists. Initialization aborted to prevent overwriting existing project.".to_string()
+        ));
+    }
     
     // Create the target directory if it doesn't exist
     if !target_dir.exists() {
@@ -36,8 +46,7 @@ pub fn initialize_project(target_dir: &Path) -> Result<(), ReqFlowError> {
     
     // Create example configuration file
     let config_path = target_dir.join("reqflow.yaml");
-    if !config_path.exists() {
-        let config_content = r#"# ReqFlow Configuration
+    let config_content = r#"# ReqFlow Configuration
 
 general:
   # Enable verbose output
@@ -51,9 +60,6 @@ paths:
   
   # Folder name for design specifications 
   design_specifications_folder: "DesignSpecifications"
-  
-  # String to match in filename for identifying Requirements files
-  requirements_filename_match: "Requirements"
 
 style:
   # Diagram direction (TD for top-down, LR for left-to-right)
@@ -76,11 +82,8 @@ linting:
   # Show suggestions without applying (dry run mode)
   dry_run: false
 "#;
-        fs::write(&config_path, config_content)?;
-        info!("Created configuration file at {:?}", config_path);
-    } else {
-        warn!("Configuration file already exists, skipping");
-    }
+    fs::write(&config_path, config_content)?;
+    info!("Created configuration file at {:?}", config_path);
     
     info!("Project initialization complete!");
     print_next_steps();

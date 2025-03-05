@@ -1,5 +1,5 @@
 use anyhow::Result;
-use log::info;
+use log::debug;
 use regex::Regex;
 use std::path::Path;
 
@@ -19,11 +19,15 @@ pub fn parse_elements(content: &str, file_path: &str) -> Result<Vec<Element>, Re
     // List of reserved subsections that should never be treated as elements
     let reserved_subsections = vec!["Relations", "Details", "Properties", "Metadata"];
     
+    // Track if we're in a metadata section
+    let mut in_metadata_section = false;
+    
     for line in content.lines() {
         if line.trim() == "### Relations" {
             // Special case: "### Relations" could be mistaken for an element but should be treated as a Relations subsection
             if current_element.is_some() {
                 in_relations_section = true;
+                in_metadata_section = false;
                 
                 // Add the relations header to the element content
                 if let Some(element) = &mut current_element {
@@ -31,7 +35,21 @@ pub fn parse_elements(content: &str, file_path: &str) -> Result<Vec<Element>, Re
                 }
             } else {
                 // We found a Relations header outside of an element - log it but don't create an element for it
-                info!("Found '### Relations' outside of an element in {}", file_path);
+                debug!("Found '### Relations' outside of an element in {}", file_path);
+            }
+        } else if line.trim() == "#### Metadata" {
+            // Special case: Metadata subsection
+            if current_element.is_some() {
+                in_metadata_section = true;
+                in_relations_section = false;
+                
+                // Add the metadata header to the element content
+                if let Some(element) = &mut current_element {
+                    element.add_content(&format!("{}\n", line));
+                }
+            } else {
+                // We found a Metadata subsection outside of an element
+                debug!("Found 'Metadata' subsection outside of an element in {}", file_path);
             }
         } else if Config::element_regex().is_match(line) {
             // Save previous element if exists
@@ -64,11 +82,16 @@ pub fn parse_elements(content: &str, file_path: &str) -> Result<Vec<Element>, Re
             if reserved_subsections.contains(&subsection_name) {
                 // Check that we're inside an element
                 if current_element.is_some() {
-                    // Set in_relations_section flag if this is a Relations subsection
+                    // Set flags based on subsection type
                     if subsection_name == "Relations" {
                         in_relations_section = true;
+                        in_metadata_section = false;
+                    } else if subsection_name == "Metadata" {
+                        in_metadata_section = true;
+                        in_relations_section = false;
                     } else {
                         in_relations_section = false;
+                        in_metadata_section = false;
                     }
                     
                     // Add the subsection header to the element content
@@ -78,10 +101,36 @@ pub fn parse_elements(content: &str, file_path: &str) -> Result<Vec<Element>, Re
                 } else {
                     // We found a subsection header outside of an element - this is unusual
                     // but we shouldn't create an element for it
-                    info!("Found {} subsection header outside of an element in {}", subsection_name, file_path);
+                    debug!("Found {} subsection header outside of an element in {}", subsection_name, file_path);
                 }
             } else {
                 // Not a reserved subsection, treat as normal content
+                if let Some(element) = &mut current_element {
+                    element.add_content(&format!("{}\n", line));
+                }
+            }
+        } else if in_metadata_section && (line.trim().starts_with("* ") || line.trim().starts_with("- ")) {
+            // Parse metadata property
+            let metadata_regex = Regex::new(r"[\*\-]\s+(\w+):\s*(.+)").unwrap();
+            
+            if let Some(captures) = metadata_regex.captures(line) {
+                let property_name = captures.get(1).unwrap().as_str().to_string();
+                let property_value = captures.get(2).unwrap().as_str().trim().to_string();
+                
+                debug!("Found metadata property: {} = {} in element '{}'", 
+                      property_name, property_value,
+                      current_element.as_ref().map_or("Unknown", |e| &e.name));
+                
+                // Add metadata to the element
+                if let Some(element) = &mut current_element {
+                    element.metadata.insert(property_name, property_value);
+                    element.add_content(&format!("{}\n", line));
+                    
+                    // If we've added a type, update the element type
+                    element.set_type_from_metadata();
+                }
+            } else {
+                // If it doesn't match the metadata pattern, still add it as content
                 if let Some(element) = &mut current_element {
                     element.add_content(&format!("{}\n", line));
                 }
@@ -104,7 +153,7 @@ pub fn parse_elements(content: &str, file_path: &str) -> Result<Vec<Element>, Re
                 // Try both alternatives
                 alt_regex1.captures(line).or_else(|| {
                     // Log an attempt with alt_regex2
-                    info!("Trying flexible relation parsing for line: {}", line);
+                    debug!("Trying flexible relation parsing for line: {}", line);
                     alt_regex2.captures(line)
                 })
             } else {
@@ -116,7 +165,7 @@ pub fn parse_elements(content: &str, file_path: &str) -> Result<Vec<Element>, Re
                 let target = captures.get(2).unwrap().as_str().trim().to_string();
                 
                 // More detailed logging to help diagnose issues
-                info!("Found relation: {} -> {} in element '{}'", relation_type, target, 
+                debug!("Found relation: {} -> {} in element '{}'", relation_type, target, 
                       current_element.as_ref().map_or("Unknown", |e| &e.name));
                 let relation = Relation::new(relation_type, target);
                 
@@ -127,7 +176,7 @@ pub fn parse_elements(content: &str, file_path: &str) -> Result<Vec<Element>, Re
                     );
                     
                     if is_duplicate {
-                        info!("Found duplicate relation: {} -> {} in element '{}'", 
+                        debug!("Found duplicate relation: {} -> {} in element '{}'", 
                               relation.relation_type, relation.target, element.name);
                     }
                     
@@ -135,7 +184,7 @@ pub fn parse_elements(content: &str, file_path: &str) -> Result<Vec<Element>, Re
                     element.add_relation(relation);
                     element.add_content(&format!("{}\n", line));
                     // Log total relations after adding
-                    info!("Element '{}' now has {} relations", element.name, element.relations.len());
+                    debug!("Element '{}' now has {} relations", element.name, element.relations.len());
                 }
             } else {
                 // If it doesn't match the relation pattern, still add it as content
@@ -147,6 +196,7 @@ pub fn parse_elements(content: &str, file_path: &str) -> Result<Vec<Element>, Re
             // Regular content line
             if line.trim().starts_with("###") && !line.trim().starts_with("####") {
                 in_relations_section = false;
+                in_metadata_section = false;
             }
             
             if let Some(element) = &mut current_element {
@@ -254,7 +304,7 @@ pub fn generate_requirements_diagram(
     let path_filename = path_obj.file_name().map(|f| f.to_string_lossy().to_string()).unwrap_or_default();
     println!("FILE PATH: {}", file_path);
     println!("FILENAME: {}", path_filename);
-    println!("PATTERN MATCH: {}", &config.paths.requirements_filename_match);
+    println!("Checking requirements file by path...");
     println!("IS REQUIREMENTS DOC: {}", is_requirements_doc);
     println!("BY PATH: {}", by_path);
     println!("BY TITLE: {}", by_title);

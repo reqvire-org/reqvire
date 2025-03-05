@@ -1,6 +1,5 @@
 # User stories
 
-
 ## Personas
 
 1. System Engineer: Focused on managing system models, ensuring alignment with project requirements, and validating structures.  
@@ -8,8 +7,78 @@
 3. Contributor: An external community member contributing to ReqFlow by improving models, creating features, or providing feedback.  
 4. Manager: Oversees the MBSE processes, tracks progress, ensures alignment with objectives, and generates reports for decision-making.  
 
-
 ## User Stories
+
+```mermaid
+graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef satisfies fill:#fff2cc,stroke:#ffcc00,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef paragraph fill:#efefef,stroke:#999999,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+
+    Managing_MBSE_Models["Managing MBSE Models"];
+    click Managing_MBSE_Models "specifications/UserStories.md#managing-mbse-models";
+    class Managing_MBSE_Models requirement;
+    _MOEs_md_MOE_UA__MOEs_html_moe_ua_ -->|traces| Managing_MBSE_Models;
+    _MOEs_md_MOE_UA__MOEs_html_moe_ua_["MOEs.md/MOE_UA"];
+    click _MOEs_md_MOE_UA__MOEs_html_moe_ua_ "MOEs.html#moe_ua";
+    class _MOEs_md_MOE_UA__MOEs_html_moe_ua_ requirement;
+    Generate_Diagrams["Generate Diagrams"];
+    click Generate_Diagrams "specifications/UserStories.md#generate-diagrams";
+    class Generate_Diagrams requirement;
+    _MOEs_md_MOE_UA__MOEs_html_moe_ua_ -->|traces| Generate_Diagrams;
+    Automate_Diagram_Generation["Automate Diagram Generation"];
+    click Automate_Diagram_Generation "specifications/UserStories.md#automate-diagram-generation";
+    class Automate_Diagram_Generation requirement;
+    _MOEs_md_MOE_UA__MOEs_html_moe_ua_ -->|traces| Automate_Diagram_Generation;
+    Generating_Visual_Representations["Generating Visual Representations"];
+    click Generating_Visual_Representations "specifications/UserStories.md#generating-visual-representations";
+    class Generating_Visual_Representations requirement;
+    _MOEs_md_MOE_UA__MOEs_html_moe_ua_ -->|traces| Generating_Visual_Representations;
+    Aligning_Design_with_Code["Aligning Design with Code"];
+    click Aligning_Design_with_Code "specifications/UserStories.md#aligning-design-with-code";
+    class Aligning_Design_with_Code requirement;
+    _MOEs_md_MOE_UA__MOEs_html_moe_ua_ -->|traces| Aligning_Design_with_Code;
+    Validating_Structures["Validating Structures"];
+    click Validating_Structures "specifications/UserStories.md#validating-structures";
+    class Validating_Structures requirement;
+    _MOEs_md_MOE_UA__MOEs_html_moe_ua_ -->|traces| Validating_Structures;
+    Integrate_with_GitHub_Workflows["Integrate with GitHub Workflows"];
+    click Integrate_with_GitHub_Workflows "specifications/UserStories.md#integrate-with-github-workflows";
+    class Integrate_with_GitHub_Workflows requirement;
+    _MOEs_md_MOE_CE__MOEs_html_moe_ce_ -->|traces| Integrate_with_GitHub_Workflows;
+    _MOEs_md_MOE_CE__MOEs_html_moe_ce_["MOEs.md/MOE_CE"];
+    click _MOEs_md_MOE_CE__MOEs_html_moe_ce_ "MOEs.html#moe_ce";
+    class _MOEs_md_MOE_CE__MOEs_html_moe_ce_ requirement;
+    AI_Driven_Code_Suggestions["AI-Driven Code Suggestions"];
+    click AI_Driven_Code_Suggestions "specifications/UserStories.md#ai-driven-code-suggestions";
+    class AI_Driven_Code_Suggestions requirement;
+    _MOEs_md_MOE_UA__MOEs_html_moe_ua_ -->|traces| AI_Driven_Code_Suggestions;
+    AI_Driven_Model_Suggestions["AI-Driven Model Suggestions"];
+    click AI_Driven_Model_Suggestions "specifications/UserStories.md#ai-driven-model-suggestions";
+    class AI_Driven_Model_Suggestions requirement;
+    _MOEs_md_MOE_UA__MOEs_html_moe_ua_ -->|traces| AI_Driven_Model_Suggestions;
+    Provide_Reports["Provide Reports"];
+    click Provide_Reports "specifications/UserStories.md#provide-reports";
+    class Provide_Reports requirement;
+    _MOEs_md_MOE_CE__MOEs_html_moe_ce_ -->|traces| Provide_Reports;
+    Trace_Changes_in_MBSE_Model["Trace Changes in MBSE Model"];
+    click Trace_Changes_in_MBSE_Model "specifications/UserStories.md#trace-changes-in-mbse-model";
+    class Trace_Changes_in_MBSE_Model requirement;
+    _MOEs_md_MOE_UA__MOEs_html_moe_ua_ -->|traces| Trace_Changes_in_MBSE_Model;
+    Generate_Traceability_Matrix["Generate Traceability Matrix"];
+    click Generate_Traceability_Matrix "specifications/UserStories.md#generate-traceability-matrix";
+    class Generate_Traceability_Matrix requirement;
+    _MOEs_md_MOE_UA__MOEs_html_moe_ua_ -->|traces| Generate_Traceability_Matrix;
+    Fostering_Community_Contributions["Fostering Community Contributions"];
+    click Fostering_Community_Contributions "specifications/UserStories.md#fostering-community-contributions";
+    class Fostering_Community_Contributions requirement;
+    _MOEs_md_MOE_CE__MOEs_html_moe_ce_ -->|traces| Fostering_Community_Contributions;
+```
+
 
 ### Managing MBSE Models
 
@@ -24,7 +93,6 @@ As a **System Engineer**, I want to generate diagrams for different system viewp
 
 #### Relations
   * tracedFrom: [MOEs.md/MOE_UA](MOEs.html#moe_ua)
-
 
 ### Automate Diagram Generation
 
@@ -54,8 +122,6 @@ As an **System Engineer**, I want to validate the structure of MBSE models, so t
 #### Relations
   * tracedFrom: [MOEs.md/MOE_UA](MOEs.html#moe_ua)
 
-
-
 ### Integrate with GitHub Workflows
 
 As a **Contributor**, I want ReqFlow to integrate seamlessly with GitHub workflows, so that I can collaborate on updates and manage contributions effectively.
@@ -69,7 +135,6 @@ As a **Developer**, I want AI agents to provide actionable suggestions for code 
 
 #### Relations
   * tracedFrom: [MOEs.md/MOE_UA](MOEs.html#moe_ua)
-
 
 ### AI-Driven Model Suggestions
 		
@@ -86,14 +151,12 @@ As a **Manager**, I want to generate structured reports based on the MBSE model,
 #### Relations
   * tracedFrom: [MOEs.md/MOE_CE](MOEs.html#moe_ce)
 
-
 ### Trace Changes in MBSE Model
 
 As a **System Engineer**, I want to trace changes in the MBSE model to identify affected components and ensure all updates are consistent across the system.
 
 #### Relations
   * tracedFrom: [MOEs.md/MOE_UA](MOEs.html#moe_ua)
-
 
 ### Generate Traceability Matrix
 
