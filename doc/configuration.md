@@ -57,8 +57,6 @@ paths:
   # Can be overridden via command line by providing the input folder argument
   specifications_folder: "specifications"
   
-  # Folder name for system requirements (relative to specifications_folder)
-  system_requirements_folder_name: "SystemRequirements"
   
   # Folder name for design specifications (relative to specifications_folder)
   design_specifications_folder_name: "DesignSpecifications"
@@ -69,10 +67,17 @@ paths:
   
   # Additional external folders that contain system requirements and other files
   # These can be absolute paths or paths relative to the input folder
-  # External folders can only contain SystemRequirements, not User or Mission Requirements
+  # All markdown files in these folders are considered requirements (except excluded patterns)
   external_folders:
     - "../other-project/specifications"
     - "/mnt/shared/team-requirements"
+    
+  # Glob patterns to exclude from requirements processing
+  # These are patterns that shouldn't be considered requirements even if they're in 
+  # specifications or external folders
+  excluded_filename_patterns:
+    - "**/README*.md"
+    - "**/index.md"
 ```
 
 ### Style Settings
@@ -97,16 +102,29 @@ paths:
   external_folders:
     - "../other-project/specifications"
     - "/mnt/shared/team-requirements"
+    
+  # Glob patterns to exclude from requirements processing
+  # These are patterns that shouldn't be considered requirements even if they're in specifications or external folders
+  excluded_filename_patterns:
+    - "**/README*.md"
+    - "**/index.md"
 ```
 
 Key points about external folders:
 
-1. External folders can contain SystemRequirements and other supporting files
+1. External folders can contain requirements and other supporting files
 2. They CANNOT contain User Requirements or Mission Requirements (these must be in the main specifications folder)
-3. Each external folder is expected to have a similar structure to the main specifications folder
+3. All markdown files in external folders are treated as system requirements (except those matching excluded patterns)
 4. Paths can be absolute or relative to the input folder
-5. System requirements from external folders will be included in diagrams, validation, and relation checking
+5. Requirements from external folders will be included in diagrams, validation, and relation checking
 6. External folders are useful for cross-repository references and distributed requirements management
+
+Key points about excluded filename patterns:
+
+1. These glob patterns determine which files should be skipped during requirements processing
+2. Patterns follow glob syntax (e.g., `**/README*.md` matches any README.md file in any directory)
+3. Files matching these patterns won't be processed even if they're in specifications or external folders
+4. This is useful for excluding documentation files like README.md, index.md, etc. that aren't requirements
 
 ## Command Line Arguments
 

@@ -114,22 +114,8 @@ impl ModelManager {
             }
         }
         
-        // Process system requirements folder
-        let sys_req_folder = input_folder.join(&self.config.paths.system_requirements_folder);
-        if sys_req_folder.exists() && sys_req_folder.is_dir() {
-            for entry in WalkDir::new(&sys_req_folder).into_iter().filter_map(|e| e.ok()) {
-                let path = entry.path();
-                if path.is_file() && path.extension().map_or(false, |ext| ext == "md") {
-                    // Check if it's a requirements file by name
-                    if path.file_name().map_or(false, |f| {
-                        f.to_string_lossy().to_lowercase().ends_with(".md")
-                    }) {
-                        info!("Adding system requirements file: {:?}", path);
-                        files.push(path.to_path_buf());
-                    }
-                }
-            }
-        }
+        // We no longer have a specific system requirements folder
+        // All files in specifications subfolders are processed automatically
 
         // Process external folders
         for external_folder in &self.config.paths.external_folders {
@@ -925,7 +911,6 @@ impl ModelManager {
         // Get paths from config using helper methods, but use them correctly
         // These paths should all be within the input folder, not absolute or in another repository
         let specs_dir_path = input_folder.join(specs_folder);
-        let system_reqs_dir_path = specs_dir_path.join(&config.paths.system_requirements_folder);
         let design_specs_dir_path = specs_dir_path.join(&config.paths.design_specifications_folder);
         
         // Special case for testing - if input_folder is already "specifications", don't add it again
@@ -933,13 +918,6 @@ impl ModelManager {
             input_folder.to_path_buf()
         } else {
             specs_dir_path.clone()
-        };
-        
-        // Special case for testing - adapt system and design specs paths if needed
-        let actual_system_reqs_dir_path = if input_folder.file_name().map_or(false, |name| name == "specifications") {
-            input_folder.join(&config.paths.system_requirements_folder)
-        } else {
-            system_reqs_dir_path.clone()  
         };
         
         let actual_design_specs_dir_path = if input_folder.file_name().map_or(false, |name| name == "specifications") {
@@ -954,18 +932,15 @@ impl ModelManager {
                 format!("Required specifications directory '{}' is missing", actual_specs_dir_path.display())
             ));
         } else {
-            // Only check these subdirectories if the main specs directory exists
-            if !actual_system_reqs_dir_path.exists() || !actual_system_reqs_dir_path.is_dir() {
-                errors.push(ReqFlowError::ValidationError(
-                    format!("Required system requirements directory '{}' is missing", actual_system_reqs_dir_path.display())
-                ));
-            }
-            
+            // Design Specifications directory is still required
             if !actual_design_specs_dir_path.exists() || !actual_design_specs_dir_path.is_dir() {
                 errors.push(ReqFlowError::ValidationError(
                     format!("Required design specifications directory '{}' is missing", actual_design_specs_dir_path.display())
                 ));
             }
+            
+            // We no longer require a specific SystemRequirements directory
+            // Any requirement in a specifications subfolder is treated as a system requirement
         }
         
         // Validate external folders
@@ -985,15 +960,8 @@ impl ModelManager {
         
         // No README validation - README files are optional
         
-        // Check SystemRequirements.md file if the system reqs directory exists
-        if system_reqs_dir_path.exists() && system_reqs_dir_path.is_dir() {
-            let system_reqs_file_path = system_reqs_dir_path.with_extension("md");
-            if !system_reqs_file_path.exists() || !system_reqs_file_path.is_file() {
-                errors.push(ReqFlowError::ValidationError(
-                    format!("Required system requirements file '{}' is missing", system_reqs_file_path.display())
-                ));
-            }
-        }
+        // We no longer require a specific SystemRequirements.md file
+        // Any markdown file in a specifications subfolder or external folder can be a system requirement
         
         // Check for files in wrong locations within the main specs directory
         for entry in WalkDir::new(input_folder).into_iter().filter_map(|e| e.ok()) {
@@ -1018,10 +986,9 @@ impl ModelManager {
                 // All markdown files are now considered for element extraction
                 
                 // Determine the root directory for this file (specifications or external folder)
-                let (root_dir, sys_req_dir, design_spec_dir) = if in_external_folder {
+                let (root_dir, design_spec_dir) = if in_external_folder {
                     // Find which external folder contains this file
                     let mut ext_root_dir = PathBuf::new();
-                    let mut ext_sys_req_dir = PathBuf::new(); 
                     let mut ext_design_spec_dir = PathBuf::new();
                     
                     for folder in &config.paths.external_folders {
@@ -1034,16 +1001,15 @@ impl ModelManager {
                         if path.starts_with(&folder_path) {
                             // This is the external folder containing our file
                             ext_root_dir = folder_path.clone();
-                            ext_sys_req_dir = folder_path.join(&config.paths.system_requirements_folder);
                             ext_design_spec_dir = folder_path.join(&config.paths.design_specifications_folder);
                             break;
                         }
                     }
                     
-                    (ext_root_dir, ext_sys_req_dir, ext_design_spec_dir)
+                    (ext_root_dir, ext_design_spec_dir)
                 } else {
                     // Use the regular specifications folder
-                    (actual_specs_dir_path.clone(), actual_system_reqs_dir_path.clone(), actual_design_specs_dir_path.clone())
+                    (actual_specs_dir_path.clone(), actual_design_specs_dir_path.clone())
                 };
                 
                 let in_specs_root = path.parent().map_or(false, |p| p == root_dir);
@@ -1078,22 +1044,8 @@ impl ModelManager {
                     }
                 }
                 
-                // System Requirements should be in the System Requirements directory
-                if path.starts_with(&sys_req_dir) {
-                    // All files in this directory are considered system requirements
-                    // No need for additional validation
-                } else if is_system_req_file && !path.starts_with(&sys_req_dir) {
-                    // DSD files get special treatment - don't flag them as misplaced system requirements
-                    let is_dsd_file = file_name.contains("DSD_") || path.starts_with(&design_spec_dir);
-                    
-                    if !is_dsd_file {
-                        // Flag System Requirements files not in the system requirements directory
-                        errors.push(ReqFlowError::ValidationError(
-                            format!("File '{}': System Requirements file should be in the System Requirements directory '{}'", 
-                                    path.display(), sys_req_dir.display())
-                        ));
-                    }
-                }
+                // System Requirements can be in any subfolder of specifications or in external folders
+                // No need to validate specific directory location for system requirements
                 
                 // Check if files in the Design Specifications directory
                 if path.starts_with(&design_spec_dir) {
@@ -1137,8 +1089,7 @@ impl ModelManager {
             self.check_circular_dependencies(element, &mut visited, &mut path, &mut errors);
         }
         
-        // Get system requirements folder name from config
-        let system_reqs_folder = &self.config.paths.system_requirements_folder;
+        // We no longer use a specific system requirements folder
         
         // Check for incomplete dependency chains (e.g., missing derivedFrom relations)
         // For example, system requirements should have derivedFrom relations to user requirements
@@ -1146,15 +1097,23 @@ impl ModelManager {
             // Check for system requirements without any parent relation
             // System requirements must have at least one relation that points to a parent requirement
             
-            // Determine if element is in a system requirements folder
-            let is_in_system_reqs = element.file_path.contains(system_reqs_folder);
+            // Determine if this is a system requirement
+            // System requirements are:
+            // 1. Any requirement in a specifications subfolder (not in the root)
+            // 2. Any requirement in an external folder
             
-            // Check if element is in an external folder - all requirements in external folders are system requirements
+            // Check if element is in the specifications folder but not at the root level
+            let specs_folder = Path::new(&self.config.paths.specifications_folder);
+            let is_in_specs_subfolder = element.file_path.contains(&specs_folder.to_string_lossy()) && 
+                                        element.file_path.matches('/').count() > 1;
+            
+            // Check if element is in an external folder
             let is_in_external_folder = self.config.paths.external_folders.iter().any(|ext_folder| {
                 element.file_path.contains(ext_folder)
             });
             
-            if is_in_system_reqs || is_in_external_folder {
+            // Any requirement in a subfolder or external folder is a system requirement
+            if is_in_specs_subfolder || is_in_external_folder {
                 // List of valid parent-child relationship types
                 let valid_parent_relations = ["derivedFrom", "tracedFrom", "refine", "containedBy"];
                 

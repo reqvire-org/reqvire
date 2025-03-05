@@ -8,8 +8,6 @@ paths:
   # Path to the specifications folder
   specifications_folder: "../graphenedb/sources/red/specifications/"
   
-  # Folder name for system requirements 
-  system_requirements_folder_name: "SystemRequirements"
   
   # Folder name for design specifications 
   design_specifications_folder_name: "DesignSpecifications"
@@ -19,8 +17,15 @@ paths:
   
   # Additional external folders that contain system requirements and other files
   # These can be absolute paths or paths relative to the input folder
-  # External folders can only contain SystemRequirements, not User or Mission Requirements
+  # All markdown files in these folders are considered requirements (except those matching exclusion patterns)
   external_folders:
+  
+  # Glob patterns to exclude from requirements processing
+  # These are patterns that shouldn't be considered requirements even if they're in specifications or external folders
+  excluded_filename_patterns:
+    - "**/Logical*.md"
+    - "**/Physical*.md"    
+    - "**/index.md"
 
 
 style:

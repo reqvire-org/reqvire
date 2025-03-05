@@ -110,8 +110,12 @@ mod tests {
         input_dir.create_dir_all().unwrap();
         output_dir.create_dir_all().unwrap();
         
-        // Create test requirement file
-        input_dir
+        // Create specifications folder in the input directory
+        let specs_dir = input_dir.child("specifications");
+        specs_dir.create_dir_all().unwrap();
+        
+        // Create test requirement file in specifications folder
+        specs_dir
             .child("requirements.md")
             .write_str(
                 r#"# Requirements
@@ -143,13 +147,16 @@ This is requirement 2.
             )
             .unwrap();
         
+        // The output path structure should match the input structure
+        let output_specs_dir = output_dir.child("specifications");
+        
         // Check that the output file exists
-        output_dir
+        output_specs_dir
             .child("requirements.md")
             .assert(predicate::path::exists());
         
         // Check the content of the output file (should have links)
-        let output_content = std::fs::read_to_string(output_dir.child("requirements.md").path()).unwrap();
+        let output_content = std::fs::read_to_string(output_specs_dir.child("requirements.md").path()).unwrap();
         assert!(output_content.contains("  * dependsOn: [Requirement 2](#requirement-2"));
     }
     
@@ -292,31 +299,14 @@ style:
         let mut config = Config::default();
         config.general.generate_diagrams = true;
         
-        // Create a copy of the config for testing file detection
-        let test_config = config.clone();
+        // For test environment, make specs folder empty to process all .md files
+        config.paths.specifications_folder = "".to_string();
         
-        // Create a model manager with a separate config instance
+        // Create a model manager
         let mut model_manager = ModelManager::new_with_config(config);
         
         // Collect identifiers (needed before diagram generation)
         model_manager.collect_identifiers_only(input_dir.path()).unwrap();
-        
-        // Debug information to see the issue
-        println!("Checking if requirements files are detected properly:");
-        println!("UserRequirements.md is requirements file: {}", 
-                 utils::is_requirements_file_only(
-                     input_dir.child("UserRequirements.md").path(),
-                     &test_config,
-                     input_dir.path(),
-                     true
-                 ));
-        println!("SystemRequirements/Requirements.md is requirements file: {}", 
-                 utils::is_requirements_file_only(
-                     system_reqs_dir.child("Requirements.md").path(),
-                     &test_config,
-                     input_dir.path(),
-                     true
-                 ));
         
         // Switch to the temp directory so Config::load() can find reqflow.yml
         let original_dir = std::env::current_dir().unwrap();
