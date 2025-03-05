@@ -81,8 +81,8 @@ pub fn is_requirements_file_only(path: &Path, config: &crate::config::Config, ba
     let path_str = path.to_string_lossy();
     
     if verbose {
-        log::info!("Checking file {}, base_path: {}", path.display(), base_path.display());
-        log::info!("Path: {}, Filename: {}", path_str, filename);
+        log::debug!("Checking file {}, base_path: {}", path.display(), base_path.display());
+        log::debug!("Path: {}, Filename: {}", path_str, filename);
     }
     
     // Check if file matches any excluded filename patterns
@@ -90,31 +90,22 @@ pub fn is_requirements_file_only(path: &Path, config: &crate::config::Config, ba
     
     if is_excluded {
         if verbose {
-            log::info!("Skipping excluded file: {}", path.display());
+            log::debug!("Skipping excluded file: {}", path.display());
         }
         return false;
     }
     
     // Skip design specifications
-    let mut design_specs_folder = config.paths.design_specifications_folder.to_lowercase();
-    let path_str_lower = path_str.to_lowercase();
+    let design_specs_folder = &config.paths.design_specifications_folder; // Keep the exact name as specified in config
+    let path_str = path.to_string_lossy();
     let filename_lower = filename.to_lowercase();
     
-    // Remove trailing slash if present
-    if design_specs_folder.ends_with('/') {
-        design_specs_folder = design_specs_folder[0..design_specs_folder.len()-1].to_string();
-    }
-    
-    // More comprehensive check for design specs
-    let is_design_spec = 
-        filename_lower.contains("dsd_") || // File with DSD_ prefix
-        path_str_lower.contains(&format!("/{}/", design_specs_folder)) || 
-        path_str_lower.contains(&format!("/{}", design_specs_folder)) || // Allow for end of path
-        path_str_lower.ends_with(&design_specs_folder);
+    // Simple check for design specs based only on folder location, not on filename patterns
+    let is_design_spec = path_str.contains(design_specs_folder); // Match exact folder name anywhere in the path
         
     if is_design_spec {
         if verbose {
-            log::info!("Skipping design spec: {}", path.display());
+            log::debug!("Skipping design spec: {}", path.display());
         }
         return false;
     }
@@ -122,21 +113,11 @@ pub fn is_requirements_file_only(path: &Path, config: &crate::config::Config, ba
     // Check if file is in any external folder
     let in_external_folder = if !config.paths.external_folders.is_empty() {
         config.paths.external_folders.iter().any(|ext_folder| {
-            let mut ext_folder_lower = ext_folder.to_lowercase();
-            // Remove trailing slash if present
-            if ext_folder_lower.ends_with('/') {
-                ext_folder_lower = ext_folder_lower[0..ext_folder_lower.len()-1].to_string();
-            }
-            // Remove leading "./" if present
-            if ext_folder_lower.starts_with("./") {
-                ext_folder_lower = ext_folder_lower[2..].to_string();
-            }
+            // Use exact folder names from config for matching
+            let ext_folder_name = ext_folder.trim_end_matches('/');
             
-            // More flexible matching for external folders
-            path_str_lower == ext_folder_lower || 
-            path_str_lower.contains(&format!("/{}/", ext_folder_lower)) || 
-            path_str_lower.starts_with(&format!("{}/", ext_folder_lower)) ||
-            path_str_lower.starts_with(&format!("./{}/", ext_folder_lower))
+            // Check if path contains the external folder name
+            path_str.contains(ext_folder_name)
         })
     } else {
         false
@@ -145,7 +126,7 @@ pub fn is_requirements_file_only(path: &Path, config: &crate::config::Config, ba
     // If file is in an external folder, it's automatically considered a requirements file
     if in_external_folder {
         if verbose {
-            log::info!("File is in external folder, treating as requirements document");
+            log::debug!("File is in external folder, treating as requirements document");
         }
         return true;
     }
@@ -157,7 +138,7 @@ pub fn is_requirements_file_only(path: &Path, config: &crate::config::Config, ba
         let is_requirements_file = is_requirements_file(&filename);
         
         if is_requirements_file && verbose {
-            log::info!("Test environment: File {} identified as requirements document", path.display());
+            log::debug!("Test environment: File {} identified as requirements document", path.display());
         }
         
         return is_requirements_file;
@@ -165,40 +146,24 @@ pub fn is_requirements_file_only(path: &Path, config: &crate::config::Config, ba
     
     // Normal case - proper path checking
     // Determine if file is in the specifications folder or subfolder
-    let mut specs_folder = config.paths.specifications_folder.to_lowercase();
-    // Remove trailing slash if present
-    if specs_folder.ends_with('/') {
-        specs_folder = specs_folder[0..specs_folder.len()-1].to_string();
-    }
-    // Remove leading "./" if present
-    if specs_folder.starts_with("./") {
-        specs_folder = specs_folder[2..].to_string();
-    }
+    let specs_folder = &config.paths.specifications_folder;
     
-    // More flexible matching to check if the path contains the specifications folder
-    let in_specifications = 
-        // Check for exact folder match
-        path_str_lower == specs_folder || 
-        // Check if path contains the specifications folder as a component (with slashes)
-        path_str_lower.contains(&format!("/{}/", specs_folder)) || 
-        // Check if path starts with specifications folder
-        path_str_lower.starts_with(&format!("{}/", specs_folder)) ||
-        // Check if path starts with ./specifications folder
-        path_str_lower.starts_with(&format!("./{}/", specs_folder));
+    // Check if the path contains the specifications folder name
+    let in_specifications = path_str.contains(specs_folder);
     
     if !in_specifications {
         // If not in specifications or external folders, it's not a requirements file
         if verbose {
-            log::info!("File is not in specifications folder or external folder, skipping");
-            log::info!("  specs_folder: '{}', path: '{}'", specs_folder, path_str_lower);
+            log::debug!("File is not in specifications folder or external folder, skipping");
+            log::debug!("  specs_folder: '{}', path: '{}'", specs_folder, path_str);
         }
         return false;
     }
     
     // In specifications folder, all files are considered requirements (except those already filtered out)
     if verbose {
-        log::info!("File is in specifications folder, treating as requirements document");
-        log::info!("FINAL RESULT: true");
+        log::debug!("File is in specifications folder, treating as requirements document");
+        log::debug!("FINAL RESULT: true");
     }
     
     true
@@ -216,18 +181,12 @@ pub fn is_design_specification(path: &Path, config: &crate::config::Config, _bas
         return false;
     }
     
-    // Path string for easier checking
-    let path_str = path.to_string_lossy().to_lowercase();
+    // Path string for easier checking - use exact case as in config
+    let path_str = path.to_string_lossy();
     
-    // Check filename for DSD prefix
-    let filename = path.file_name().unwrap_or_default().to_string_lossy().to_lowercase();
-    if filename.contains("dsd_") {
-        return true;
-    }
-    
-    // Check if in design specifications folder
-    let design_specs_folder = config.paths.design_specifications_folder.to_lowercase();
-    if path_str.contains(&format!("/{}/", design_specs_folder)) {
+    // Check if in design specifications folder - use exact folder name from config
+    let design_specs_folder = &config.paths.design_specifications_folder;
+    if path_str.contains(design_specs_folder) {
         return true;
     }
     
@@ -297,7 +256,7 @@ pub fn normalize_path(path: &str, config: &crate::config::Config, current_file: 
         };
         
         // Ensure fragments are appended directly to the file path WITHOUT a slash
-        log::info!("Normalizing fragment-only reference: {} -> {}{}", path, current_file_normalized, path);
+        log::debug!("Normalizing fragment-only reference: {} -> {}{}", path, current_file_normalized, path);
         return format!("{}{}", current_file_normalized, path);
     }
     
@@ -308,6 +267,49 @@ pub fn normalize_path(path: &str, config: &crate::config::Config, current_file: 
     } else {
         (path.to_string(), "".to_string())
     };
+    
+    // Handle relative paths with ../ (parent directory references)
+    if base_path.contains("../") && !current_file.is_empty() {
+        // Get the current file's parent directory to resolve relative paths
+        let current_dir = Path::new(current_file).parent().unwrap_or(Path::new(""));
+        let specs_folder = &config.paths.specifications_folder;
+        
+        // Extract just the path part (not including the filename) from current_file
+        let current_dir_str = current_dir.to_string_lossy().to_string();
+        
+        // Resolve the relative path - replace "../" with appropriate path components
+        let mut target_parts: Vec<&str> = base_path.split('/').collect();
+        let mut current_parts: Vec<&str> = current_dir_str.split('/').collect();
+        
+        // For each "../" in the target, remove the last directory from current parts
+        let mut parent_count = 0;
+        while !target_parts.is_empty() && target_parts[0] == ".." {
+            parent_count += 1;
+            target_parts.remove(0);
+            if !current_parts.is_empty() {
+                current_parts.pop();
+            }
+        }
+        
+        // Combine the remaining parts to form the resolved path
+        let mut resolved_parts = current_parts;
+        resolved_parts.extend(target_parts);
+        let resolved_path = resolved_parts.join("/");
+        
+        // Make sure the result is properly formatted
+        let normalized = if resolved_path.starts_with('/') {
+            format!("{}{}", resolved_path, fragment)
+        } else if resolved_path.starts_with("./") {
+            format!("/{}{}", resolved_path.trim_start_matches("./"), fragment)
+        } else {
+            format!("/{}{}", resolved_path, fragment)
+        };
+        
+        log::debug!("Normalized relative path (../) reference: {} -> {} (from current file: {})", 
+                 path, normalized, current_file);
+        
+        return normalized;
+    }
     
     let path_obj = Path::new(&base_path);
     
@@ -408,12 +410,28 @@ pub fn read_file<P: AsRef<Path>>(path: P) -> Result<String, ReqFlowError> {
 /// This follows GitHub's rules for converting headings to link anchors:
 /// 1. Convert to lowercase
 /// 2. Replace spaces with hyphens
-/// 3. Remove special characters
+/// 3. Remove disallowed characters
+/// 4. Remove leading and trailing whitespace
 /// 
 /// This function should be used consistently across the codebase whenever
 /// creating or looking up fragment identifiers.
 pub fn normalize_fragment(text: &str) -> String {
-    text.to_lowercase().replace(' ', "-")
+    // Trim whitespace
+    let trimmed = text.trim();
+    
+    // Convert to lowercase
+    let lowercase = trimmed.to_lowercase();
+    
+    // Replace spaces with hyphens
+    let with_hyphens = lowercase.replace(' ', "-");
+    
+    // Remove any disallowed characters (keeping only alphanumeric and hyphens)
+    let normalized = with_hyphens
+        .chars()
+        .filter(|c| c.is_alphanumeric() || *c == '-')
+        .collect::<String>();
+    
+    normalized
 }
 
 /// Helper function to check if a file is excluded by any of the provided glob patterns

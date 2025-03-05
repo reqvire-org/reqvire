@@ -35,24 +35,48 @@ pub fn validate_relation_target(
             // Get current file path for normalizing fragment-only references
             let current_file_path = current_path.to_string_lossy().to_string();
             
-            // Normalize the path for lookup, including current file context for fragments
+            // Handle fragment references in markdown links
+            if url.starts_with("#") {
+                // For fragment references with markdown links, we need to:
+                // 1. Extract the fragment part (without the #)
+                // 2. Normalize it using the shared utility function
+                // 3. Format with the file path
+                
+                // Parse the fragment part (without the #)
+                let fragment_part = &url[1..];
+                
+                // Normalize using the same utility function
+                let normalized_fragment = crate::utils::normalize_fragment(fragment_part);
+                
+                // Format with the current file path and # symbol
+                let normalized_url = format!("{}#{}", current_file_path, normalized_fragment);
+                
+                log::debug!("Normalized markdown link fragment: {} -> {}", url, normalized_url);
+                
+                if registry.contains_element(&normalized_url) {
+                    log::debug!("Found element in registry for markdown link fragment: {}", normalized_url);
+                    return Ok(());
+                }
+                
+                // If no match was found, report the error - don't log all registry elements
+                
+                return Err(ReqFlowError::MissingRelationTarget(
+                    format!("Referenced file not found: {}", url)
+                ));
+            }
+            
+            // For non-fragment markdown links, use the regular normalization
             let normalized_url = crate::utils::normalize_path(url, registry.config(), &current_file_path);
-            log::info!("Normalized relation target: {} -> {} (current file: {})", 
+            log::debug!("Normalized relation target: {} -> {} (current file: {})", 
                       url, normalized_url, current_file_path);
             
             // Single lookup with normalized path
             if registry.contains_element(&normalized_url) {
-                log::info!("Found element in registry using normalized path: {}", normalized_url);
+                log::debug!("Found element in registry using normalized path: {}", normalized_url);
                 return Ok(());
             }
             
-            // If no match was found, report the error
-            // Debug by listing contents of registry
-            let paths: Vec<String> = registry.all_elements()
-                .map(|e| format!("'{}' ({})", e.file_path, e.name))
-                .collect();
-            
-            log::info!("Available files in registry: {}", paths.join(", "));
+            // If no match was found, report the error - don't log all registry elements
             
             return Err(ReqFlowError::MissingRelationTarget(
                 format!("Referenced file not found: {}", url)
@@ -77,9 +101,25 @@ pub fn validate_relation_target(
             // For now, we'll assume it's valid
             Ok(())
         } else if target.starts_with("../") {
-            // References with relative paths might point to files outside the current repo
-            // or in different directories. We trust the user has ensured these are valid.
-            Ok(())
+            // Get current file path for normalizing relative path references
+            let current_file_path = current_path.to_string_lossy().to_string();
+            
+            // Use the general path normalization function that now properly handles ../ paths
+            let normalized_url = crate::utils::normalize_path(target, registry.config(), &current_file_path);
+            log::debug!("Normalized relative path target: {} -> {} (current file: {})", 
+                      target, normalized_url, current_file_path);
+            
+            // Check if the normalized path exists in the registry
+            if registry.contains_element(&normalized_url) {
+                log::debug!("Found element in registry using normalized path: {}", normalized_url);
+                return Ok(());
+            }
+            
+            // If no match was found, report the error - don't log all registry elements
+            
+            Err(ReqFlowError::MissingRelationTarget(
+                format!("Referenced file not found: {}", target)
+            ))
         } else {
             // Resolve and normalize the target path taking into account current path's directory
             let parts: Vec<&str> = target.split('/').collect();
@@ -111,28 +151,26 @@ pub fn validate_relation_target(
         // Construct the full identifier by combining current path with fragment
         let current_file = current_path.to_string_lossy();
         
-        // When looking up fragment references in the same file, we need to apply
-        // consistent normalization as used when storing elements in the registry
+        // We need to handle both fragment formats:
+        // 1. With # prefix: #NOTIF-IMPL-001 Notifications Publishing
+        // 2. Without # prefix: NOTIF-IMPL-001 Notifications Publishing
         let full_identifier = if target.starts_with("#") {
-            // For fragment references:
-            // 1. Extract the fragment part (without the #)
-            // 2. Normalize it using the shared utility function
-            // 3. Format with the file path
-            
-            // Parse the fragment part (without the #)
+            // Format 1: With # prefix
+            // Extract the fragment (without #) and normalize it
             let fragment_part = &target[1..];
-            
-            // Normalize using the same utility function used in Element.identifier()
             let normalized_fragment = crate::utils::normalize_fragment(fragment_part);
-            
-            // Format with the file path and # symbol
+            format!("{}#{}", current_file, normalized_fragment)
+        } else if !target.contains('/') {
+            // Format 2: Without # prefix, but no path separator
+            // This is a reference to an element in the current file
+            let normalized_fragment = crate::utils::normalize_fragment(target);
             format!("{}#{}", current_file, normalized_fragment)
         } else {
-            // For non-fragment references (rare case), we add a separator
+            // For references with path separators, keep using the separator
             format!("{}/{}", current_file, target)
         };
         
-        log::info!("Constructed full identifier for fragment reference: {} -> {}", target, full_identifier);
+        log::debug!("Constructed full identifier for fragment reference: {} -> {}", target, full_identifier);
         
         log::debug!("Checking same-file fragment reference: {} -> {}", target, full_identifier);
         
@@ -140,7 +178,8 @@ pub fn validate_relation_target(
             log::debug!("Found matching fragment reference: {}", full_identifier);
             Ok(())
         } else {
-            Err(ReqFlowError::MissingRelationTarget(full_identifier))
+            // Use original target in error message for better readability
+            Err(ReqFlowError::MissingRelationTarget(target.to_string()))
         }
     }
 }
@@ -151,12 +190,12 @@ pub fn validate_relations(registry: &ElementRegistry) -> Result<Vec<ReqFlowError
     let mut errors = Vec::new();
     
     // Log all elements in the registry to understand what's available
-    log::info!("Registry contains the following elements:");
+    log::debug!("Registry contains the following elements:");
     for element in registry.all_elements() {
-        log::info!("  Element: {}/{}", element.file_path, element.name);
+        log::debug!("  Element: {}/{}", element.file_path, element.name);
         // Log metadata if available
         for (key, value) in &element.metadata {
-            log::info!("    Metadata: {} = {}", key, value);
+            log::debug!("    Metadata: {} = {}", key, value);
         }
     }
     

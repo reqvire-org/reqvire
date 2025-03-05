@@ -42,6 +42,12 @@ Elements may contain structured **Subsections**, each serving a specific purpose
 4. **No Overlapping Content**:
    - Content in an element belongs exclusively to that element and cannot overlap with another.
 
+5. **Allowed Characters**
+   - **Letters**: `a-z`, `A-Z`
+   - **Numbers**: `0-9`
+   - **Spaces**: ` `
+   - **Special characters allowed**: `-`, `_`, `.` (hyphen, underscore, and period)
+
 
 ### Examples of Elements
 
@@ -96,32 +102,7 @@ Content of the second duplicate.
 
 ## Identifiers
 
-The **identifier** is represented as a path following a filename with extension (eg file.md) and optionally an **element** name.
-Identifier path if starting with '/' is considered starting from a 'specification' folder.
-If path doesn't not start with the '/', it is considered **relative** to a path of the document itself.
-
-
-Each **identifier** must uniquely reference either:
-  * A file, or
-  * An element within a file.
-
-
-Examples of Identifiers:
-  - When **specifications** root folder is : `/path/to/project`
-  - And a file path: `/path/to/project/documents/File1.md`
-  - Identifiers in the document would resolve to:
-    - 'File2.md' -> path/to/project/documents/File2.md'
-    - 'subfolder/File3.md' -> path/to/project/documents/subfolder/File3.md'    
-    - '/File4.md' -> '/path/to/project/File4.md'
-    - '../File4.md' -> '/path/to/project/File4.md'    
-
-Other Examples of Identifiers:
- * Relative path with element fragment: 'relative_path/file.md/element name'.
- * File with element fragment: 'file.md/element name'.
- * File only: 'file.md'.
- * Element name fragment only: 'element name'.
- * Element fragment with special characters: 'path/file.md/My Element (Draft)'
-
+See more in design specification document [DSD_RepresentationOfIdentifiersAndRelations.md](DSD_RepresentationOfIdentifiersAndRelations.md).
 
 ##  Subsections
 
@@ -148,90 +129,11 @@ The **#### Details** subsection within an element provides additional informatio
 
 ###  Relations Subsection
 
-The `#### Relations` subsection specifies associations between elements, files, or other resources, forming the logical and dependency structure of the model.
+- The `#### Relations` subsection must be located **within an element chunk**.
+- Each element chunk can have **at most one** `#### Relations` subsection.
+- The `#### Relations` header marks the beginning of the subsection.
+- It must appear directly within an element chunk, **following** the `###` header of the parent element and any preceding content, including previous subsections.
+- Duplicate relation entries within the same `#### Relations` subsection are not allowed.
 
-- Relations must follow a **structured reference format** to ensure clear traceability.
-- Supported relation types include (but are not limited to):
-  - `refine:` (further elaborates on another element)
-  - `verifiedBy:` (links to test or validation resources)
-  - `dependsOn:` (establishes dependency on another requirement or component)
-
-
-`#### Relations` contains a list of relations in a specific format.
-
-The `#### Relations` subsection must be located within an element chunk.
-Each element chunk can have at most one `#### Relations` subsection.
-
-The `#### Relations` header marks the beginning of the subsection.
-
-The `#### Relations` subsection must appear directly within an element  chunk.
-It must follow the `###` header of the parent element and any preceding content including previous subsections.
-
-Relation entries are listed as bullet points (`*`) with 2 spaces '  *' indentation from the beginning of the line, and follow this format:
- * relationType: **identifier**
-
-**relationType**:
- - Specifies the type of the relationship.
- - Allowed characters are [a-zA-z].
- - Min 2 characters and Max 80 characters.
-
-**identifier**:
- - Specifies the target of the relation.
- - For the details see **identifier** specification.
-
-Duplicate relation entries within the same `#### Relations` subsection are not allowed.
-
-
-#### Examples of `#### Relations`
-
-Simple Relations:
-```markdown
-### My Element
-This is the content of My Element.
-
-#### Relations
-  * dependsOn: [Element2](#element2)
-  * relatedTo: [path/to/anotherFile.md/Section3](path/to/anotherFile.html#section3)
-  * uses: [file.md](file.html)
-```
-
-Relations with Special Characters:
-```
-### Complex Element
-This is the content of a complex element.
-
-#### Relations
-  * dependsOn: [Element (Alpha & Beta)](#element-(alpha-&-beta))
-  * relatedTo: [path/to/special File.md/Section (Draft)](path/to/special File.html#section-(draft))
-```
-
-Invalid Entries:
-```
-### Invalid Relations Example
-This element contains invalid relation entries.
-
-#### Relations
-  * dependsOn: [Element2](#element2)
-* InvalidEntry
-* : MissingRelationType
-  * relatedTo: [path/to/file.md](path/to/file.html)
-```
-
-
-
-### Identifier Usage in Relations
-
-Identifiers are used in relations to reference files or specific elements within files. Examples:
-
-1. **Relation to a File**:
-   ```markdown
-   #### Relations
-  * satisfiedBy: [documents/specification.md](documents/specification.html)
-   ```
-    
-2. **Relation to an Element**:
-   ```markdown
-   #### Relations
-  * dependsOn: [documents/specification.md/section one](documents/specification.html#section-one)
-   ```
+See more in design specification document [DSD_RepresentationOfIdentifiersAndRelations.md](DSD_RepresentationOfIdentifiersAndRelations.md).
 

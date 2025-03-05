@@ -169,7 +169,7 @@ impl Config {
             if path.exists() {
                 match Self::from_file(path) {
                     Ok(loaded_config) => {
-                        info!("Loaded configuration from {}", path_str);
+                        debug!("Loaded configuration from {}", path_str);
                         config = Some(loaded_config);
                         break;
                     },
@@ -182,7 +182,7 @@ impl Config {
         
         // If no config file was found, use the default config
         let mut final_config = config.unwrap_or_else(|| {
-            info!("No configuration file found, using defaults");
+            warn!("No configuration file found, using defaults");
             Self::default()
         });
         
@@ -196,6 +196,8 @@ impl Config {
                 debug!("Added auto-generated file pattern {} to excluded_filename_patterns", pattern);
             }
         }
+        
+        // No path normalization needed - we handle exact folder names in the validation logic
         
         final_config
     }
