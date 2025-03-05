@@ -34,21 +34,7 @@ pub fn is_requirements_file_by_path(path: &Path, config: &crate::config::Config,
     }
     
     // Check if file matches any excluded filename patterns
-    let is_excluded = config.paths.excluded_filename_patterns.iter().any(|pattern| {
-        // Same exclusion logic as in is_requirements_file_only
-        let file_path_for_pattern = format!("{}", path.file_name().unwrap_or_default().to_string_lossy());
-        
-        if pattern.starts_with("**/") {
-            let rel_path = match path.strip_prefix(base_path) {
-                Ok(rel) => rel.to_string_lossy().to_string(),
-                Err(_) => path.to_string_lossy().to_string()
-            };
-            
-            glob::Pattern::new(pattern).map(|p| p.matches(&rel_path)).unwrap_or(false)
-        } else {
-            glob::Pattern::new(pattern).map(|p| p.matches(&file_path_for_pattern)).unwrap_or(false)
-        }
-    });
+    let is_excluded = is_excluded_by_patterns(path, &config.paths.excluded_filename_patterns, base_path, false);
     
     if is_excluded {
         return false;
@@ -100,35 +86,7 @@ pub fn is_requirements_file_only(path: &Path, config: &crate::config::Config, ba
     }
     
     // Check if file matches any excluded filename patterns
-    let is_excluded = config.paths.excluded_filename_patterns.iter().any(|pattern| {
-        // We need to test the pattern against the relative path, not the full absolute path
-        // This makes patterns like "**/Logical*.md" work correctly
-        let file_path_for_pattern = format!("{}", path.file_name().unwrap_or_default().to_string_lossy());
-        
-        // If the pattern starts with "**/" we need to include parent directories in the check
-        if pattern.starts_with("**/") {
-            // For **/ patterns, check against a path that includes parent directories
-            let rel_path = match path.strip_prefix(base_path) {
-                Ok(rel) => rel.to_string_lossy().to_string(),
-                Err(_) => path.to_string_lossy().to_string()
-            };
-            
-            let matches = glob::Pattern::new(pattern).map(|p| p.matches(&rel_path)).unwrap_or(false);
-            if matches && verbose {
-                log::info!("File {} matches excluded pattern {} (checking rel_path: {})", 
-                           path.display(), pattern, rel_path);
-            }
-            matches
-        } else {
-            // For simple patterns, just check against the filename
-            let matches = glob::Pattern::new(pattern).map(|p| p.matches(&file_path_for_pattern)).unwrap_or(false);
-            if matches && verbose {
-                log::info!("File {} matches excluded pattern {} (checking filename only: {})", 
-                           path.display(), pattern, file_path_for_pattern);
-            }
-            matches
-        }
-    });
+    let is_excluded = is_excluded_by_patterns(path, &config.paths.excluded_filename_patterns, base_path, verbose);
     
     if is_excluded {
         if verbose {
@@ -297,6 +255,39 @@ pub fn write_file<P: AsRef<Path>, C: AsRef<[u8]>>(path: P, content: C) -> Result
 pub fn read_file<P: AsRef<Path>>(path: P) -> Result<String, ReqFlowError> {
     fs::read_to_string(path.as_ref()).map_err(|e| {
         ReqFlowError::IoError(e)
+    })
+}
+
+/// Helper function to check if a file is excluded by any of the provided glob patterns
+pub fn is_excluded_by_patterns(path: &Path, patterns: &[String], base_path: &Path, verbose: bool) -> bool {
+    patterns.iter().any(|pattern| {
+        // We need to test the pattern against the relative path, not the full absolute path
+        // This makes patterns like "**/Logical*.md" work correctly
+        let file_path_for_pattern = format!("{}", path.file_name().unwrap_or_default().to_string_lossy());
+        
+        // If the pattern starts with "**/" we need to include parent directories in the check
+        if pattern.starts_with("**/") {
+            // For **/ patterns, check against a path that includes parent directories
+            let rel_path = match path.strip_prefix(base_path) {
+                Ok(rel) => rel.to_string_lossy().to_string(),
+                Err(_) => path.to_string_lossy().to_string()
+            };
+            
+            let matches = glob::Pattern::new(pattern).map(|p| p.matches(&rel_path)).unwrap_or(false);
+            if matches && verbose {
+                log::info!("File {} matches excluded pattern {} (checking rel_path: {})", 
+                           path.display(), pattern, rel_path);
+            }
+            matches
+        } else {
+            // For simple patterns, just check against the filename
+            let matches = glob::Pattern::new(pattern).map(|p| p.matches(&file_path_for_pattern)).unwrap_or(false);
+            if matches && verbose {
+                log::info!("File {} matches excluded pattern {} (checking filename only: {})", 
+                           path.display(), pattern, file_path_for_pattern);
+            }
+            matches
+        }
     })
 }
 
