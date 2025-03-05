@@ -312,12 +312,12 @@ pub fn generate_requirements_diagram(
     
     // Debug information - print to console to make sure it appears with additional path details
     let path_filename = path_obj.file_name().map(|f| f.to_string_lossy().to_string()).unwrap_or_default();
-    println!("FILE PATH: {}", file_path);
-    println!("FILENAME: {}", path_filename);
-    println!("Checking requirements file by path...");
-    println!("IS REQUIREMENTS DOC: {}", is_requirements_doc);
-    println!("BY PATH: {}", by_path);
-    println!("BY TITLE: {}", by_title);
+    debug!("FILE PATH: {}", file_path);
+    debug!("FILENAME: {}", path_filename);
+    debug!("Checking requirements file by path...");
+    debug!("IS REQUIREMENTS DOC: {}", is_requirements_doc);
+    debug!("BY PATH: {}", by_path);
+    debug!("BY TITLE: {}", by_title);
     
     // Use log module for more controlled output
     log::debug!("Checking if file is a requirements document: {}", file_path);
