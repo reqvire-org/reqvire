@@ -589,6 +589,7 @@ The system shall validate relation types against a defined vocabulary and provid
 
 #### Relations
   * refine: [UserRequirements.md/Enhanced Validation Error Reporting](../UserRequirements.html#enhanced-validation-error-reporting)
+  * satisfiedBy: [src/relation.rs](https://github.com/reqflow/reqflow/src/relation.rs)
 
 ---
 
@@ -614,8 +615,12 @@ The system shall generate HTML output for all markdown files, not just requireme
 
 The system shall implement detailed error handling and logging throughout the application to facilitate troubleshooting and provide meaningful feedback.
 
+#### Metadata
+* type: requirement
+
 #### Relations
   * refine: [UserRequirements.md/Enhanced Validation Error Reporting](UserRequirements.html#enhanced-validation-error-reporting)
+  * satisfiedBy: [src/error.rs](https://github.com/reqflow/reqflow/src/error.rs)
 
 ---
 
