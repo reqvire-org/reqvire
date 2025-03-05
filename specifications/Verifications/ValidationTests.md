@@ -30,7 +30,7 @@ This verification test checks that ReqFlow correctly identifies and reports rela
 - Test will be implemented in `/tests/e2e-validation/test_unsupported_relations.sh`
 
 #### Relations
-* verifies: [SystemRequirements/Requirements.md/Relation Type Validation](../SystemRequirements/Requirements.html#relation-type-validation)
+  * verifies: [SystemRequirements/Requirements.md/Relation Type Validation](../SystemRequirements/Requirements.html#relation-type-validation)
 
 ---
 
@@ -56,8 +56,8 @@ The verification test checks that ReqFlow correctly identifies and reports inval
 4. Verify that error messages contain details about the specific typos found
 
 #### Relations
-* verifies: [SystemRequirements/Requirements.md/Detailed Error Handling and Logging](../SystemRequirements/Requirements.html#detailed-error-handling-and-logging)
-* trace: [tests/e2e-validation/test_invalid_relations.sh](../../../tests/e2e-validation/test_invalid_relations.sh)
+  * verifies: [SystemRequirements/Requirements.md/Detailed Error Handling and Logging](../SystemRequirements/Requirements.html#detailed-error-handling-and-logging)
+  * trace: [tests/e2e-validation/test_invalid_relations.sh](../../../tests/e2e-validation/test_invalid_relations.sh)
 
 ---
 
@@ -83,8 +83,8 @@ The verification test checks that ReqFlow correctly identifies and reports relat
 4. Verify that error messages indicate what characters are not allowed
 
 #### Relations
-* verifies: [SystemRequirements/Requirements.md/Detailed Error Handling and Logging](../SystemRequirements/Requirements.html#detailed-error-handling-and-logging)
-* trace: [tests/e2e-validation/test_invalid_relations.sh](../../../tests/e2e-validation/test_invalid_relations.sh)
+  * verifies: [SystemRequirements/Requirements.md/Detailed Error Handling and Logging](../SystemRequirements/Requirements.html#detailed-error-handling-and-logging)
+  * trace: [tests/e2e-validation/test_invalid_relations.sh](../../../tests/e2e-validation/test_invalid_relations.sh)
 
 ---
 
@@ -111,8 +111,8 @@ The verification test checks that ReqFlow correctly identifies and reports dupli
 4. Verify that error messages identify which relations are duplicated
 
 #### Relations
-* verifies: [SystemRequirements/Requirements.md/Detailed Error Handling and Logging](../SystemRequirements/Requirements.html#detailed-error-handling-and-logging)
-* trace: [tests/e2e-validation/test_invalid_relations.sh](../../../tests/e2e-validation/test_invalid_relations.sh)
+  * verifies: [SystemRequirements/Requirements.md/Detailed Error Handling and Logging](../SystemRequirements/Requirements.html#detailed-error-handling-and-logging)
+  * trace: [tests/e2e-validation/test_invalid_relations.sh](../../../tests/e2e-validation/test_invalid_relations.sh)
 
 ---
 
@@ -153,5 +153,5 @@ The verification test checks that ReqFlow correctly identifies and reports relat
 - Test for valid targets is implemented in `/tests/e2e-validation/test_valid_relations.sh`
 
 #### Relations
-* verifies: [SystemRequirements/Requirements.md/Detailed Error Handling and Logging](../SystemRequirements/Requirements.html#detailed-error-handling-and-logging)
-* trace: [tests/e2e-validation/test_missing_targets.sh](../../../tests/e2e-validation/test_missing_targets.sh)
+  * verifies: [SystemRequirements/Requirements.md/Detailed Error Handling and Logging](../SystemRequirements/Requirements.html#detailed-error-handling-and-logging)
+  * trace: [tests/e2e-validation/test_missing_targets.sh](../../../tests/e2e-validation/test_missing_targets.sh)
