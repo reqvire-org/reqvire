@@ -58,5 +58,12 @@ if ! echo "$OUTPUT" | grep -q "NonExistentFile.md"; then
   exit 1
 fi
 
+# Check for validation of markdown link format with incorrect target
+if ! echo "$OUTPUT" | grep -q "DesignSpecifications/API2.md"; then
+  echo "FAILED: Missing error about non-existent file 'DesignSpecifications/API2.md' in markdown link format"
+  echo "Output: $OUTPUT"
+  exit 1
+fi
+
 echo "SUCCESS: All expected missing target validation errors were detected"
 exit 0

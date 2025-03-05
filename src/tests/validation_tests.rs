@@ -78,6 +78,57 @@ fn test_invalid_external_folder() {
 }
 
 #[test]
+fn test_markdown_link_validation() {
+    use crate::element::{Element, ElementRegistry};
+    use crate::relation::Relation;
+    use crate::validation::validate_relation_target;
+    use std::path::Path;
+    
+    // Create a test registry with some elements
+    let mut registry = ElementRegistry::new();
+    
+    // Add a few sample elements to the registry
+    let mut element1 = Element::new(
+        "Element1".to_string(),
+        "DesignSpecifications/API.md".to_string()
+    );
+    element1.content = "Test content".to_string();
+    
+    let mut element2 = Element::new(
+        "Element2".to_string(),
+        "specifications/SystemRequirements.md".to_string()
+    );
+    element2.content = "Test content".to_string();
+    
+    registry.add_element(element1);
+    registry.add_element(element2);
+    
+    // Test case 1: Valid markdown link to existing file
+    let relation1 = Relation::new(
+        "satisfiedBy".to_string(),
+        "[DesignSpecifications/API.md](DesignSpecifications/API.md)".to_string()
+    );
+    let result1 = validate_relation_target(&relation1, Path::new("current_file.md"), &registry);
+    assert!(result1.is_ok(), "Valid markdown link should pass validation");
+    
+    // Test case 2: Invalid markdown link to non-existing file
+    let relation2 = Relation::new(
+        "satisfiedBy".to_string(),
+        "[DesignSpecifications/API.md](DesignSpecifications/API2.md)".to_string()
+    );
+    let result2 = validate_relation_target(&relation2, Path::new("current_file.md"), &registry);
+    assert!(result2.is_err(), "Invalid markdown link should fail validation");
+    
+    // Test case 3: Mismatch between display text and URL in markdown link
+    let relation3 = Relation::new(
+        "satisfiedBy".to_string(),
+        "[specifications/NonExistent.md](specifications/SystemRequirements.md)".to_string()
+    );
+    let result3 = validate_relation_target(&relation3, Path::new("current_file.md"), &registry);
+    assert!(result3.is_ok(), "Mismatched markdown link should still pass if target exists");
+}
+
+#[test]
 fn test_user_requirements_in_external_folder() {
     // Create a custom configuration with external folders
     let mut config = Config::default();

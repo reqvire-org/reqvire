@@ -170,12 +170,12 @@ impl ElementRegistry {
     /// Check if an element exists in the registry
     #[allow(dead_code)]
     pub fn contains_element(&self, identifier: &str) -> bool {
-        // Enhanced debugging - use INFO level for better visibility
-        log::info!("Checking for element: {}", identifier);
+        // Use DEBUG level instead of INFO for most logs
+        log::debug!("Checking for element: {}", identifier);
         
         // Direct lookup - fastest path
         if self.elements.contains_key(identifier) {
-            log::info!("Direct element match found: {}", identifier);
+            log::debug!("Direct element match found: {}", identifier);
             return true;
         }
         
@@ -184,22 +184,65 @@ impl ElementRegistry {
             // Check if any element in registry has this file path
             for (id, elem) in &self.elements {
                 if elem.file_path == identifier {
-                    log::info!("Found matching file path: {} -> {}", identifier, id);
+                    log::debug!("Found matching file path: {} -> {}", identifier, id);
                     return true;
                 }
             }
         }
         
-        // Enhanced logging for debugging fragment references
+        // Handle fragment references with special logic
         if identifier.contains("#") {
-            log::info!("Fragment identifier not found directly: {}", identifier);
+            // Split the identifier into file path and fragment
+            let parts: Vec<&str> = identifier.split('#').collect();
+            if parts.len() == 2 {
+                let file_path = parts[0];
+                let fragment = parts[1];
+                
+                log::debug!("Checking fragment reference with path '{}' and fragment '{}'", file_path, fragment);
+                
+                // Normalize the fragment for comparison
+                let normalized_fragment = crate::utils::normalize_fragment(fragment);
+                
+                // Check all elements for matches based on fragment
+                for (id, elem) in &self.elements {
+                    // Extract element's fragment for comparison
+                    if let Some(elem_fragment_idx) = id.find('#') {
+                        let elem_fragment = &id[elem_fragment_idx+1..];
+                        let elem_path = &id[0..elem_fragment_idx];
+                        
+                        let elem_normalized = crate::utils::normalize_fragment(elem_fragment);
+                        let paths_match = if !file_path.is_empty() {
+                            // Check for path match when file_path is provided
+                            elem_path.ends_with(file_path) || 
+                            file_path.ends_with(elem_path) ||
+                            elem.file_path.contains(file_path) ||
+                            file_path.contains(&elem.file_path)
+                        } else {
+                            // No path specified, so any path matches
+                            true
+                        };
+                        
+                        // For fragment matching, compare the normalized versions with various cases
+                        let fragments_match = normalized_fragment == elem_normalized || 
+                            elem.name.to_lowercase().contains(&fragment.to_lowercase());
+                        
+                        if paths_match && fragments_match {
+                            log::debug!("Found matching element through fragment identification: {} matches {}", identifier, id);
+                            return true;
+                        }
+                    }
+                }
+            }
+            
+            // Enhanced logging for debugging fragment references
+            log::debug!("Fragment identifier not found directly: {}", identifier);
             // Log some similar keys for comparison
             for (id, _) in self.elements.iter().filter(|(k, _)| k.contains("#") || k.contains(&identifier.split("#").next().unwrap_or(""))) {
-                log::info!("  Similar registry element: {}", id);
+                log::debug!("  Similar registry element: {}", id);
             }
         }
         
-        log::info!("Element not found: {}", identifier);
+        log::debug!("Element not found: {}", identifier);
         false
     }
 

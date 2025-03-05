@@ -13,9 +13,10 @@ The notification system must be designed with reliability and fault tolerance in
 * priority: high
 
 #### Relations
-* satisfiedBy: #NOTIF-IMPL-001 Notifications Publishing
-* satisfiedBy: #NOTIF-IMPL-002 Notifications Delivery
-* tracedFrom: #reliability-requirements
+* satisfiedBy: NOTIF-IMPL-001 Notifications Publishing
+* satisfiedBy: NOTIF-IMPL-002 Notifications Delivery
+* tracedFrom: [Reliable Requirements](#reliability-requirements)
+* tracedFrom: [User Preferences](../UserRequirements/BasicRequirements.md#user-req-001-notification-preferences)
 
 ---
 
@@ -30,8 +31,9 @@ The system should implement a reliable publishing mechanism for notifications.
 * priority: high
 
 #### Relations
-* tracedFrom: #NOTIF-ARCH-001 Reliable and Fault Tolerant Architecture
-* satisfiedBy: #NOTIF-IMPL-003 Notifications Persistence
+* tracedFrom: NOTIF-ARCH-001 Reliable and Fault Tolerant Architecture
+* satisfiedBy: [Notifications Persistence](#notif-impl-003-notifications-persistence)
+* tracedFrom: ../UserRequirements/BasicRequirements.md#USER-REQ-002 Multi-channel Notifications
 
 ---
 
@@ -44,8 +46,9 @@ The system should implement efficient delivery of notifications to recipients.
 * priority: high
 
 #### Relations
-* tracedFrom: #NOTIF-ARCH-001 Reliable and Fault Tolerant Architecture
-* satisfiedBy: #NOTIF-IMPL-003 Notifications Persistence
+* tracedFrom: NOTIF-ARCH-001 Reliable and Fault Tolerant Architecture
+* satisfiedBy: [Notifications Persistence](#notif-impl-003-notifications-persistence)
+* tracedFrom: [User Notification Grouping](../UserRequirements/BasicRequirements.md#user-req-003-notification-grouping)
 
 ---
 
@@ -58,8 +61,9 @@ The system should store notifications for retrieval and audit purposes.
 * priority: medium
 
 #### Relations
-* tracedFrom: #NOTIF-IMPL-001 Notifications Publishing
-* tracedFrom: #NOTIF-IMPL-002 Notifications Delivery
+* tracedFrom: NOTIF-IMPL-001 Notifications Publishing
+* tracedFrom: NOTIF-IMPL-002 Notifications Delivery
+* tracedFrom: [Notification Interaction](../UserRequirements/BasicRequirements.md#user-ux-001-notification-interaction)
 
 ---
 
@@ -72,4 +76,4 @@ The notification system must meet specific reliability requirements.
 * priority: high
 
 #### Relations
-* satisfiedBy: #NOTIF-ARCH-001 Reliable and Fault Tolerant Architecture
+* satisfiedBy: NOTIF-ARCH-001 Reliable and Fault Tolerant Architecture

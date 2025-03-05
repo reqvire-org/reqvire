@@ -12,7 +12,7 @@
 #
 # Test Implementation for Verification:
 # - Tests requirements with fragment-only references like "#fragment-id"
-# - Tests fragments referenced by proper element ID and by custom ID in metadata
+# - Tests fragments referenced by proper element ID
 
 # Setup
 TEST_NAME="Same-File Fragment Relations Validation"
@@ -43,6 +43,14 @@ echo "Exit code $EXIT_CODE indicates validation succeeded as expected"
 MISSING_FRAGMENT_PATTERN="Referenced file not found: #NOTIF-IMPL"
 if echo "$OUTPUT" | grep -q "$MISSING_FRAGMENT_PATTERN"; then
   echo "FAILED: Found unexpected error about missing fragment target"
+  echo "Output: $OUTPUT"
+  exit 1
+fi
+
+# Check for kebab-case fragment reference by element name (reliability-requirements)
+MISSING_KEBAB_PATTERN="Missing relation target: .*#reliability-requirements"
+if echo "$OUTPUT" | grep -q "$MISSING_KEBAB_PATTERN"; then
+  echo "FAILED: Found unexpected error about missing kebab-case fragment target"
   echo "Output: $OUTPUT"
   exit 1
 fi

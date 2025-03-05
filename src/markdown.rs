@@ -221,6 +221,16 @@ pub fn collect_elements(
 ) -> Result<(), ReqFlowError> {
     let elements = parse_elements(content, file_path)?;
     
+    // Log all elements before adding to registry
+    log::debug!("Collecting elements from file: {}", file_path);
+    for element in &elements {
+        log::debug!("  Element: {} from file {}", element.name, file_path);
+        // Log custom IDs if available
+        if let Some(id_value) = element.metadata.get("id") {
+            log::debug!("    Custom ID: {}", id_value);
+        }
+    }
+    
     for element in elements {
         registry.add_element(element)?;
     }
@@ -259,7 +269,7 @@ pub fn replace_relations(
     // Generate diagrams if in diagrams mode
     if diagrams_mode {
         // Always attempt to generate a diagram for requirements files
-        log::info!("Attempting to generate diagram for file: {}", current_file.display());
+        log::debug!("Attempting to generate diagram for file: {}", current_file.display());
         
         // Generate and add mermaid diagram regardless of file type
         let updated_content = generate_requirements_diagram(&processed_content, registry, &current_file.to_string_lossy(), convert_to_html)?;
@@ -310,24 +320,24 @@ pub fn generate_requirements_diagram(
     println!("BY TITLE: {}", by_title);
     
     // Use log module for more controlled output
-    log::info!("Checking if file is a requirements document: {}", file_path);
-    log::info!("Requirements check using config-driven detection: {}", is_requirements_doc);
-    log::info!("Title regex match: {}", req_title_regex.is_match(content));
+    log::debug!("Checking if file is a requirements document: {}", file_path);
+    log::debug!("Requirements check using config-driven detection: {}", is_requirements_doc);
+    log::debug!("Title regex match: {}", req_title_regex.is_match(content));
     
     // Force diagram generation for files that contain at least one element with relations
     // This respects the original detection but generates diagrams for any file with relations
     let has_elements_with_relations = content.contains("### ") && content.contains("#### Relations");
     
     if !is_requirements_doc && !has_elements_with_relations {
-        log::info!("Skipping diagram generation - file is not a requirements document and has no elements with relations: {}", file_path);
+        log::debug!("Skipping diagram generation - file is not a requirements document and has no elements with relations: {}", file_path);
         return Ok(content.to_string());
     }
     
     if has_elements_with_relations && !is_requirements_doc {
-        log::info!("File contains elements with relations, proceeding with diagram generation despite not being a requirements document: {}", file_path);
+        log::debug!("File contains elements with relations, proceeding with diagram generation despite not being a requirements document: {}", file_path);
     }
     
-    log::info!("Generating diagrams for requirements file: {}", file_path);
+    log::debug!("Generating diagrams for requirements file: {}", file_path);
     
     // Define regex for paragraph headers
     let para_regex = match Regex::new(r"(?m)^##\s+(.+)$") {
@@ -522,7 +532,7 @@ pub fn generate_requirements_diagram(
     
     let result = result_lines.join("\n");
     
-    log::info!("Diagram generation complete for file: {}", file_path);
+    log::debug!("Diagram generation complete for file: {}", file_path);
     
     Ok(result)
 }

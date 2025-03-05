@@ -1,5 +1,5 @@
 use anyhow::Result;
-use log::info;
+use log::debug;
 use std::path::Path;
 use std::collections::HashMap;
 use lazy_static::lazy_static;
@@ -120,6 +120,12 @@ pub fn get_supported_relation_types() -> Vec<&'static str> {
     RELATION_TYPES.keys().cloned().collect()
 }
 
+/// Get the list of valid parent relation types
+/// These are relations that indicate an element has a parent (hierarchical relationship)
+pub fn get_parent_relation_types() -> Vec<&'static str> {
+    vec!["derivedFrom", "tracedFrom", "refine", "containedBy"]
+}
+
 /// Get information about a relation type
 pub fn get_relation_type_info(relation_type: &str) -> Option<&RelationTypeInfo> {
     RELATION_TYPES.get(relation_type)
@@ -183,14 +189,14 @@ impl Relation {
         let target = self.target.trim();
         
         // For debugging
-        info!("Processing relation: {} -> {}", self.relation_type, target);
+        debug!("Processing relation: {} -> {}", self.relation_type, target);
         
         // Any link should convert between .md and .html based on output mode
         let mut enhanced_target = target.to_string();
         
         // Check if this is a markdown link already (e.g., [text](url))
         if enhanced_target.contains("](") && enhanced_target.contains(")") {
-            info!("Target appears to be a markdown link already: {}", enhanced_target);
+            debug!("Target appears to be a markdown link already: {}", enhanced_target);
             
             // Extract the URL part from the markdown link
             let url_start = enhanced_target.find("](").unwrap() + 2;
@@ -205,7 +211,7 @@ impl Relation {
                     new_url,
                     &enhanced_target[url_end..]
                 );
-                info!("Converted markdown link URL to HTML: {}", enhanced_target);
+                debug!("Converted markdown link URL to HTML: {}", enhanced_target);
                 
                 // Return immediately with the formatted relation
                 return Ok(format!("  * {}: {}", self.relation_type, enhanced_target));
@@ -218,7 +224,7 @@ impl Relation {
         // We need to specifically handle the case where the link already has a .md extension
         // and ensure it's converted to .html when in HTML mode
         if convert_to_html && enhanced_target.ends_with(".md") {
-            info!("Converting .md link to .html: {}", enhanced_target);
+            debug!("Converting .md link to .html: {}", enhanced_target);
             enhanced_target = enhanced_target.replace(".md", ".html");
         }
         
@@ -227,12 +233,12 @@ impl Relation {
         if convert_to_html && 
            enhanced_target.contains('/') && 
            !enhanced_target.contains('.') {
-            info!("Adding .html extension to directory path: {}", enhanced_target);
+            debug!("Adding .html extension to directory path: {}", enhanced_target);
             enhanced_target = format!("{}.html", enhanced_target);
         } else if !convert_to_html && 
                  enhanced_target.contains('/') && 
                  !enhanced_target.contains('.') {
-            info!("Adding .md extension to directory path: {}", enhanced_target);
+            debug!("Adding .md extension to directory path: {}", enhanced_target);
             enhanced_target = format!("{}.md", enhanced_target);
         }
         
@@ -327,7 +333,7 @@ impl Relation {
                                 target.to_lowercase() == "status";
             
             if is_likely_doc {
-                info!("Processing as document reference: {}", target);
+                debug!("Processing as document reference: {}", target);
                 
                 // For "Status DSD" we need to handle it specially
                 if target.to_lowercase() == "status" {
@@ -390,7 +396,7 @@ pub fn process_relations(content: &str, current_file: &Path, convert_to_html: bo
     }
     
     // Debug output
-    info!("Processing relations in document: {}", current_file.display());
+    debug!("Processing relations in document: {}", current_file.display());
     
     // Process only relations sections
     let mut in_relations_section = false;
@@ -401,7 +407,7 @@ pub fn process_relations(content: &str, current_file: &Path, convert_to_html: bo
         // Recognize various Relations section headers
         if line.trim() == "#### Relations" || line.trim() == "### Relations" || 
            line.trim() == "Relations:" || line.trim() == "## Relations" {
-            info!("Found Relations section in {}", current_file.display());
+            debug!("Found Relations section in {}", current_file.display());
             in_relations_section = true;
             updated_lines.push(line.to_string());
         } else if in_relations_section && !(line.trim().starts_with("* ") || 
@@ -409,14 +415,14 @@ pub fn process_relations(content: &str, current_file: &Path, convert_to_html: bo
                                           line.trim().starts_with("- ") || 
                                           line.trim().starts_with("  - ") ||
                                           FALLBACK_RELATION_REGEX.is_match(line)) {
-            info!("Exiting relations section at line: {}", line);
+            debug!("Exiting relations section at line: {}", line);
             in_relations_section = false;
             updated_lines.push(line.to_string());
         } else if in_relations_section {
-            info!("Processing relation line: {}", line);
+            debug!("Processing relation line: {}", line);
             if MARKDOWN_LINK_REGEX.is_match(line) {
                 // Process existing markdown links to convert .md to .html if needed
-                info!("Line contains a markdown link, processing: {}", line);
+                debug!("Line contains a markdown link, processing: {}", line);
                 
                 // Extract relation type and target (the markdown link) from the line
                 let relation_type_and_link = RELATION_REGEX.captures(line)
@@ -427,21 +433,21 @@ pub fn process_relations(content: &str, current_file: &Path, convert_to_html: bo
                     let relation_type = captures.get(1).unwrap().as_str().to_string();
                     let target = captures.get(2).unwrap().as_str().trim().to_string();
                     
-                    info!("Extracted relation from markdown link line: {} -> {}", relation_type, target);
+                    debug!("Extracted relation from markdown link line: {} -> {}", relation_type, target);
                     
                     // Create a relation object and let its to_markdown_link method handle conversion
                     let relation = Relation::new(relation_type, target);
                     match relation.to_markdown_link(current_file, convert_to_html) {
                         Ok(converted_line) => {
-                            info!("Converted markdown link through relation: {}", converted_line);
+                            debug!("Converted markdown link through relation: {}", converted_line);
                             updated_lines.push(converted_line);
                         },
                         Err(e) => {
-                            info!("Error converting relation with markdown link: {}", e);
+                            debug!("Error converting relation with markdown link: {}", e);
                             // Fall back to regex-based conversion
                             if convert_to_html {
                                 let converted_line = MD_LINK_REGEX.replace_all(line, "${1}.html${2}").to_string();
-                                info!("Fallback conversion: {} -> {}", line, converted_line);
+                                debug!("Fallback conversion: {} -> {}", line, converted_line);
                                 updated_lines.push(converted_line);
                             } else {
                                 updated_lines.push(line.to_string());
@@ -450,12 +456,12 @@ pub fn process_relations(content: &str, current_file: &Path, convert_to_html: bo
                     }
                 } else {
                     // If we couldn't extract relation and target, fall back to regex-based conversion
-                    info!("Could not extract relation from markdown link line, using regex");
+                    debug!("Could not extract relation from markdown link line, using regex");
                     if convert_to_html {
                         let converted_line = MD_LINK_REGEX.replace_all(line, "${1}.html${2}").to_string();
                         
                         if converted_line != line {
-                            info!("Converted markdown link: {} -> {}", line, converted_line);
+                            debug!("Converted markdown link: {} -> {}", line, converted_line);
                             updated_lines.push(converted_line);
                         } else {
                             updated_lines.push(line.to_string());
@@ -469,7 +475,7 @@ pub fn process_relations(content: &str, current_file: &Path, convert_to_html: bo
                 let captures = RELATION_REGEX.captures(line)
                     .or_else(|| {
                         // If standard regex fails, try the fallback
-                        info!("Trying fallback relation detection for: {}", line);
+                        debug!("Trying fallback relation detection for: {}", line);
                         FALLBACK_RELATION_REGEX.captures(line)
                     });
                 
@@ -478,12 +484,12 @@ pub fn process_relations(content: &str, current_file: &Path, convert_to_html: bo
                     let relation_type = captures.get(1).unwrap().as_str().to_string();
                     let target = captures.get(2).unwrap().as_str().trim().to_string();
                     
-                    info!("Found relation: {} -> {}", relation_type, target);
+                    debug!("Found relation: {} -> {}", relation_type, target);
                     
                     let relation = Relation::new(relation_type, target);
                     match relation.to_markdown_link(current_file, convert_to_html) {
                         Ok(link) => {
-                            info!("Converted to link: {}", link);
+                            debug!("Converted to link: {}", link);
                             
                             // Preserve the original bullet style (- or *)
                             let bullet = if line.trim().starts_with("- ") || line.trim().starts_with("  - ") {
@@ -502,13 +508,13 @@ pub fn process_relations(content: &str, current_file: &Path, convert_to_html: bo
                             updated_lines.push(link)
                         },
                         Err(e) => {
-                            info!("Error converting relation to link: {}", e);
+                            debug!("Error converting relation to link: {}", e);
                             updated_lines.push(line.to_string())
                         },
                     }
                 } else {
                     // If the line doesn't match the relation pattern, keep it as is
-                    info!("Line doesn't match relation pattern, keeping as is");
+                    debug!("Line doesn't match relation pattern, keeping as is");
                     updated_lines.push(line.to_string());
                 }
             }
@@ -517,7 +523,7 @@ pub fn process_relations(content: &str, current_file: &Path, convert_to_html: bo
         }
     }
     
-    info!("Processed {} relations in document {}", relations_found, current_file.display());
+    debug!("Processed {} relations in document {}", relations_found, current_file.display());
     Ok(updated_lines.join("\n"))
 }
 

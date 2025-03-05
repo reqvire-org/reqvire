@@ -1,0 +1,4 @@
+paths:
+  specifications_folder: "specifications"
+  design_specifications_folder: "DesignSpecifications"
+  output_folder: "./output"

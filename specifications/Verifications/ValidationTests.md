@@ -118,7 +118,7 @@ The verification test checks that ReqFlow correctly identifies and reports dupli
 
 ### Missing Relation Target Test
 
-The verification test checks that ReqFlow correctly identifies and reports relations with targets that do not exist in the model.
+The verification test checks that ReqFlow correctly identifies and reports relations with targets that do not exist in the model, while properly validating relations to existing targets.
 
 #### Metadata
 * type: verification
@@ -126,20 +126,31 @@ The verification test checks that ReqFlow correctly identifies and reports relat
 #### Acceptance Criteria
 - System should detect and report relations to non-existent targets
 - System should provide clear error messages identifying the missing targets
+- System should properly validate relations in both standard and markdown link formats
+- System should correctly validate valid relations to existing targets
+- System should extract target URLs from markdown links for validation
 
 #### Test Criteria
-- Command exits with error (non-zero) return code
+- Command exits with error (non-zero) return code when there are invalid targets
+- Command exits with success (zero) return code when all targets are valid
 - Error output contains specific error messages about the missing relation targets
 - Error messages include both source element and target information
+- No errors reported for valid relations to existing targets
 
 #### Test Procedure
-1. Create a test fixture in `/tests/fixtures/test-missing-targets/` with requirements containing relations to non-existent elements
+1. Create a test fixture in `/tests/fixtures/test-missing-targets/` with requirements containing:
+   - Relations to non-existent elements in standard format 
+   - Relations to non-existent targets in markdown link format
+   - Relations to existing elements in standard format
+   - Relations to existing elements in markdown link format
 2. Run ReqFlow validation on the test fixture
-3. Verify that the validation reports errors for the missing targets
+3. Verify that the validation reports errors only for the missing targets
 4. Verify that error messages clearly identify which targets are missing
+5. Create a fixture with only valid relations and verify validation passes
 
 #### Implementation
 - Test is implemented in `/tests/e2e-validation/test_missing_targets.sh`
+- Test for valid targets is implemented in `/tests/e2e-validation/test_valid_relations.sh`
 
 #### Relations
 * verifies: [SystemRequirements/Requirements.md/Detailed Error Handling and Logging](../SystemRequirements/Requirements.html#detailed-error-handling-and-logging)

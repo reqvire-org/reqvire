@@ -126,7 +126,7 @@ impl ModelManager {
             };
 
             if folder_path.exists() && folder_path.is_dir() {
-                info!("Processing external folder: {:?}", folder_path);
+                debug!("Processing external folder: {:?}", folder_path);
                 for entry in WalkDir::new(&folder_path).into_iter().filter_map(|e| e.ok()) {
                     let path = entry.path();
                     if path.is_file() && path.extension().map_or(false, |ext| ext == "md") {
@@ -136,7 +136,7 @@ impl ModelManager {
                     }
                 }
             } else {
-                info!("External folder not found or not a directory: {:?}", folder_path);
+                debug!("External folder not found or not a directory: {:?}", folder_path);
             }
         }
         
@@ -224,7 +224,7 @@ impl ModelManager {
                 Ok(updated) => updated,
                 Err(e) => {
                     // Log the error but continue processing other files
-                    info!("Error processing diagrams for {:?}: {}", file_path, e);
+                    debug!("Error processing diagrams for {:?}: {}", file_path, e);
                     false
                 }
             }
@@ -279,7 +279,7 @@ impl ModelManager {
     /// If convert_to_html is true, HTML will be saved to output_folder
     pub fn generate_traceability_matrix(&self, input_folder: &Path, output_folder: &Path, convert_to_html: bool) -> Result<(), ReqFlowError> {
         // Debug information to help diagnose the issue
-        info!("Generating traceability matrix with {} elements", self.element_registry.all_elements().count());
+        debug!("Generating traceability matrix with {} elements", self.element_registry.all_elements().count());
         
         // Create a simple traceability matrix as markdown
         let mut matrix_content = String::from("# Traceability Matrix\n\n");
@@ -296,21 +296,21 @@ impl ModelManager {
         
         for element in self.element_registry.all_elements() {
             element_count += 1;
-            info!("Checking element '{}' for relations - has {} relations", 
+            debug!("Checking element '{}' for relations - has {} relations", 
                   element.name, element.relations.len());
                   
             if !element.relations.is_empty() {
                 elements_with_relations += 1;
-                info!("Element '{}' has the following relations:", element.name);
+                debug!("Element '{}' has the following relations:", element.name);
                 
                 for relation in &element.relations {
-                    info!("  - {}: {}", relation.relation_type, relation.target);
+                    debug!("  - {}: {}", relation.relation_type, relation.target);
                     *relation_count.entry(relation.relation_type.clone()).or_insert(0) += 1;
                 }
             }
         }
         
-        info!("Found {} elements total, {} with relations", element_count, elements_with_relations);
+        debug!("Found {} elements total, {} with relations", element_count, elements_with_relations);
         
         if !relation_count.is_empty() {
             matrix_content.push_str("- Relations by type:\n");
@@ -711,7 +711,7 @@ impl ModelManager {
             debug!("Traceability matrix HTML saved to {:?}", html_path);
         }
         
-        info!("Traceability matrix generated");
+        debug!("Traceability matrix generated");
         Ok(())
     }
     
@@ -723,10 +723,10 @@ impl ModelManager {
         let relation_errors = validate_relations(&self.element_registry)?;
         
         if !relation_errors.is_empty() {
-            info!("Found {} relation validation errors", relation_errors.len());
+            debug!("Found {} relation validation errors", relation_errors.len());
             for error in &relation_errors {
                 // Error details need to be visible in normal mode
-                info!("Validation error: {}", error);
+                debug!("Validation error: {}", error);
             }
             // For now, we'll just log errors but continue processing
             // In a production implementation, we might want to fail or handle differently
@@ -745,7 +745,7 @@ impl ModelManager {
                     debug!("Found {} structure validation errors in {}", structure_errors.len(), file_path);
                     for error in &structure_errors {
                         // Error details need to be visible in normal mode
-                        info!("Structure error: {}", error);
+                        debug!("Structure error: {}", error);
                     }
                     total_structure_errors += structure_errors.len();
                 }
@@ -753,7 +753,7 @@ impl ModelManager {
         }
         
         if total_structure_errors > 0 {
-            info!("Total of {} structure validation errors found", total_structure_errors);
+            debug!("Total of {} structure validation errors found", total_structure_errors);
         } else {
             debug!("No structure validation errors found");
         }
@@ -778,11 +778,41 @@ impl ModelManager {
         // Restore the diagram generation setting
         registry.set_diagram_generation_enabled(diagram_enabled);
         
+        debug!("Scanning directory for all markdown files: {}", input_folder.display());
+        debug!("Input folder for scanning: {}", input_folder.display());
+        
+        // Debug: List all files in the directory
+        for entry in walkdir::WalkDir::new(input_folder).max_depth(2).into_iter().filter_map(|e| e.ok()) {
+            debug!("Found file in directory: {}", entry.path().display());
+        }
+        
         for entry in WalkDir::new(input_folder).into_iter().filter_map(|e| e.ok()) {
             let path = entry.path();
+            debug!("Processing entry: {}", path.display());
             
             // Process all potentially relevant files to collect identifiers
-            if path.is_file() && path.file_name().map_or(false, |name| utils::is_processable_file(name.to_string_lossy().as_ref())) {
+            if path.is_file() {
+                if path.extension().map_or(false, |ext| ext == "md") {
+                    // Log all markdown files for debugging
+                    debug!("Found Markdown file: {}", path.display());
+                    
+                    // Check if it's processable
+                    let is_proc = path.file_name().map_or(false, |name| utils::is_processable_file(name.to_string_lossy().as_ref()));
+                    debug!("File {} is processable: {}", path.display(), is_proc);
+                    
+                    if !is_proc {
+                        // Force processing for DSD files based on path
+                        let is_dsd_by_path = path.to_string_lossy().contains(&self.config.paths.design_specifications_folder);
+                        if is_dsd_by_path {
+                            debug!("Forcing processing of DSD file by path: {}", path.display());
+                        } else {
+                            continue;
+                        }
+                    }
+                } else {
+                    // Not a markdown file
+                    continue;
+                }
                 
                 // Check if this file should be excluded by any excluded filename patterns
                 let should_exclude = utils::is_excluded_by_patterns(path, &self.config.paths.excluded_filename_patterns, input_folder, self.config.general.verbose);
@@ -801,18 +831,64 @@ impl ModelManager {
                 // Store file content for later validation and processing
                 self.file_contents.insert(relative_path_str.clone(), content.clone());
                 
-                // Skip collecting elements from Design Specification Documents
-                // DSDs are identified by being in any folder that matches the design_specifications_folder name
+                // Check if this is a Design Specification Document
+                // DSDs are identified by being in the design_specifications_folder from config
                 let design_specs_folder_name = &self.config.paths.design_specifications_folder;
                 
-                // Check if any component of the path matches the design specs folder name
-                let is_dsd = relative_path_str.split('/').any(|component| component == design_specs_folder_name);
+                // Check if this is a Design Specification Document based on its path
+                debug!("Checking if '{}' is a DSD file (config DSD folder: '{}')", 
+                      relative_path_str, design_specs_folder_name);
+                
+                // Simple check: is the design specification folder name anywhere in the path?
+                let is_dsd = path.to_string_lossy().contains(design_specs_folder_name);
+                             
+                debug!("is_dsd={} for {} (design_specs_folder={})", 
+                       is_dsd, relative_path_str, design_specs_folder_name);
+                
+                // Create a document element for the file
+                let title = if let Some(title_line) = content.lines().find(|line| line.starts_with("# ")) {
+                    title_line.trim_start_matches("# ").trim().to_string()
+                } else {
+                    // Default title if none found
+                    Path::new(&relative_path_str)
+                        .file_stem()
+                        .and_then(|s| s.to_str())
+                        .unwrap_or("Untitled Document")
+                        .to_string()
+                };
+                
+                // Normalize the path for consistent registry lookup
+                // IMPORTANT: This path is where the file is stored in the registry
+                // It must match the path used in relation validation
+                let normalized_path = crate::utils::normalize_path(&relative_path_str, &self.config, "");
+                debug!("Normalized path for registry: {} -> {}", relative_path_str, normalized_path);
+                
+                // Log the normalized path for DSD files
+                if is_dsd {
+                    debug!("DSD file normalized path: {}", normalized_path);
+                }
+                
+                // Add the file as an element for relation validation using the normalized path
+                let file_element = crate::element::Element::new(
+                    title.clone(),
+                    normalized_path,
+                );
+                
+                // Add document to registry for validation
+                if let Err(e) = registry.add_element(file_element) {
+                    debug!("Error adding file element: {}", e);
+                } else {
+                        // For DSD files, we've already added the file with its normalized path
+                    // We don't need to create hack paths - validation should handle normalization
+                    
+                    debug!("Successfully added file element for validation: {}", relative_path_str);
+                }
                 
                 if !is_dsd {
-                    // Only collect elements from non-DSD documents
+                    // Also collect individual elements for non-DSD documents
                     markdown::collect_elements(&content, &relative_path_str, registry)?;
                 } else {
-                    debug!("Skipping element collection for Design Specification Document: {}", relative_path_str);
+                    debug!("Skipping detailed element collection for Design Specification Document: {}", relative_path_str);
                 }
             }
         }
@@ -893,10 +969,10 @@ impl ModelManager {
         }
         
         if !all_errors.is_empty() {
-            info!("Found {} markdown structure validation errors", all_errors.len());
+            debug!("Found {} markdown structure validation errors", all_errors.len());
             // Error details need to be visible in normal mode
             for error in &all_errors {
-                info!("Markdown error: {}", error);
+                debug!("Markdown error: {}", error);
             }
         } else {
             debug!("No markdown structure validation errors found");
@@ -914,10 +990,10 @@ impl ModelManager {
         let errors = validation::validate_relations(&self.element_registry)?;
         
         if !errors.is_empty() {
-            info!("Found {} relation validation errors", errors.len());
+            debug!("Found {} relation validation errors", errors.len());
             // Error details need to be visible in normal mode
             for error in &errors {
-                info!("Relation error: {}", error);
+                debug!("Relation error: {}", error);
             }
         } else {
             debug!("No relation validation errors found");
@@ -1079,25 +1155,27 @@ impl ModelManager {
                 // System Requirements can be in any subfolder of specifications or in external folders
                 // No need to validate specific directory location for system requirements
                 
-                // Check if files in the Design Specifications directory
-                if path.starts_with(&design_spec_dir) {
+                // Check if file is in the Design Specifications directory by matching the exact folder name
+                let path_str = path.to_string_lossy();
+                let design_folder_name = &config.paths.design_specifications_folder;
+                
+                // The key check is whether the path contains the exact design specifications folder name 
+                let is_in_design_specs = path_str.contains(design_folder_name);
+                
+                if is_in_design_specs {
                     // All files in this directory are considered design specifications
                     // No need for additional validation
-                } else if file_name.contains("DSD_") {
-                    // If a file has DSD_ prefix but is not in the design specs directory, flag it
-                    errors.push(ReqFlowError::ValidationError(
-                        format!("File '{}': Design specification file is not in the Design Specifications directory '{}'", 
-                                path.display(), design_spec_dir.display())
-                    ));
+                // Only files inside the design specifications folder are considered design specifications
+                // We no longer check file names
                 }
             }
         }
         
         if !errors.is_empty() {
-            info!("Found {} filesystem structure validation errors", errors.len());
+            debug!("Found {} filesystem structure validation errors", errors.len());
             // Error details need to be visible in normal mode
             for error in &errors {
-                info!("Filesystem error: {}", error);
+                debug!("Filesystem error: {}", error);
             }
         } else {
             debug!("No filesystem structure validation errors found");
@@ -1149,18 +1227,25 @@ impl ModelManager {
                 element.file_path.contains(ext_folder)
             });
             
-            // Any requirement in a subfolder or external folder is a system requirement
-            if is_in_specs_subfolder || is_in_external_folder {
-                // List of valid parent-child relationship types
-                let valid_parent_relations = ["derivedFrom", "tracedFrom", "refine", "containedBy"];
+            // Check if this is a Design Specification Document - using same logic as in file processing 
+            let design_specs_folder_name = &self.config.paths.design_specifications_folder;
+            let is_dsd = element.file_path.contains(design_specs_folder_name);
+            
+            // Any requirement in a subfolder or external folder is a system requirement (except for Design Specifications)
+            if (is_in_specs_subfolder || is_in_external_folder) && !is_dsd {
+                // Get valid parent relation types from relation module
+                let valid_parent_relations = crate::relation::get_parent_relation_types();
                 
                 // Check if the element has at least one valid parent relation
                 let has_parent_relation = element.relations.iter().any(|r| valid_parent_relations.contains(&r.relation_type.as_str()));
                 
                 if !has_parent_relation {
+                    // Format the valid relation types for the error message
+                    let relation_types_str = valid_parent_relations.join("', '");
+                    
                     errors.push(ReqFlowError::ValidationError(
-                        format!("System requirement '{}' has no parent requirement relation (needs 'derivedFrom', 'tracedFrom', 'refine', or 'containedBy') (in file '{}')", 
-                               element.name, element.file_path)
+                        format!("System requirement '{}' has no parent requirement relation (needs '{}') (in file '{}')", 
+                               element.name, relation_types_str, element.file_path)
                     ));
                 }
             }
@@ -1176,10 +1261,10 @@ impl ModelManager {
         }
         
         if !errors.is_empty() {
-            info!("Found {} cross-component dependency validation errors", errors.len());
+            debug!("Found {} cross-component dependency validation errors", errors.len());
             // Error details need to be visible in normal mode
             for error in &errors {
-                info!("Dependency error: {}", error);
+                debug!("Dependency error: {}", error);
             }
         } else {
             debug!("No cross-component dependency validation errors found");
