@@ -17,8 +17,12 @@ paths:
   # Default output folder (can be set via command line argument)
   output_folder: "output"
   
-  # String to match in filename for identifying Requirements files
-  requirements_filename_match: "Requirements"
+  # Additional external folders that contain system requirements and other files
+  # These can be absolute paths or paths relative to the input folder
+  # External folders can only contain SystemRequirements, not User or Mission Requirements
+  # external_folders:
+  #   - "../other-project/specifications"
+  #   - "/mnt/shared/team-requirements"
 
 style:
   # Theme for HTML output (default, dark, light)

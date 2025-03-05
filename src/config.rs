@@ -44,8 +44,8 @@ pub struct PathsConfig {
     #[serde(alias = "design_specifications_folder_name")]
     pub design_specifications_folder: String,
     pub output_folder: String,
-    #[serde(default = "default_requirements_filename_match")]
-    pub requirements_filename_match: String,
+    #[serde(default)]
+    pub external_folders: Vec<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -94,11 +94,6 @@ impl Default for GeneralConfig {
     }
 }
 
-// Default value for requirements filename matching
-fn default_requirements_filename_match() -> String {
-    "Requirements".to_string()
-}
-
 impl Default for PathsConfig {
     fn default() -> Self {
         Self {
@@ -106,7 +101,7 @@ impl Default for PathsConfig {
             system_requirements_folder: "SystemRequirements".to_string(),
             design_specifications_folder: "DesignSpecifications".to_string(),
             output_folder: "output".to_string(),
-            requirements_filename_match: default_requirements_filename_match(),
+            external_folders: Vec::new(),
         }
     }
 }
@@ -165,10 +160,6 @@ impl Config {
         let config_paths = [
             "reqflow.yml",
             "reqflow.yaml",
-            ".reqflow.yml",
-            ".reqflow.yaml",
-            ".config/reqflow.yml",
-            ".config/reqflow.yaml",
         ];
         
         for path_str in &config_paths {

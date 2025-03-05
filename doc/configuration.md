@@ -67,8 +67,12 @@ paths:
   # Can be overridden via command line by providing the output folder argument
   output_folder: "output"
   
-  # String to match in filename for identifying Requirements files
-  requirements_filename_match: "Requirements"
+  # Additional external folders that contain system requirements and other files
+  # These can be absolute paths or paths relative to the input folder
+  # External folders can only contain SystemRequirements, not User or Mission Requirements
+  external_folders:
+    - "../other-project/specifications"
+    - "/mnt/shared/team-requirements"
 ```
 
 ### Style Settings
@@ -79,6 +83,30 @@ style:
   max_width: 1200             # Maximum width for HTML content (in pixels)
   custom_css: null            # Optional path to a custom CSS file
 ```
+
+## External Folders
+
+The `external_folders` configuration option allows you to include system requirements from other repositories or different directory structures in your ReqFlow processing:
+
+```yaml
+paths:
+  # Main specifications folder
+  specifications_folder: "specifications"
+  
+  # External folders with additional system requirements
+  external_folders:
+    - "../other-project/specifications"
+    - "/mnt/shared/team-requirements"
+```
+
+Key points about external folders:
+
+1. External folders can contain SystemRequirements and other supporting files
+2. They CANNOT contain User Requirements or Mission Requirements (these must be in the main specifications folder)
+3. Each external folder is expected to have a similar structure to the main specifications folder
+4. Paths can be absolute or relative to the input folder
+5. System requirements from external folders will be included in diagrams, validation, and relation checking
+6. External folders are useful for cross-repository references and distributed requirements management
 
 ## Command Line Arguments
 

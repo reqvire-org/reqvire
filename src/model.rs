@@ -56,6 +56,11 @@ impl ModelManager {
         }
     }
     
+    /// Get a reference to the configuration
+    pub fn config(&self) -> &Config {
+        &self.config
+    }
+    
     /// Process diagram generation for markdown files in place (without writing to output)
     /// This method is used when the --generate-diagrams flag is set
     /// Note: This method deliberately skips validation to focus only on diagram generation
@@ -72,9 +77,7 @@ impl ModelManager {
         // can sometimes have issues with specifications/ as the base path
         let mut files = Vec::new();
         
-        // Use the requirements filename match from config
-        // instead of hardcoding filenames
-        let req_pattern = &self.config.paths.requirements_filename_match;
+        // We now process all markdown files as potential element containers
         
         // Instead of hardcoding filenames, find requirements files using the utility functions
         // First, look directly in the input folder for any matching requirement files
@@ -111,7 +114,7 @@ impl ModelManager {
             }
         }
         
-        // Now add any files from the system requirements folder
+        // Process system requirements folder
         let sys_req_folder = input_folder.join(&self.config.paths.system_requirements_folder);
         if sys_req_folder.exists() && sys_req_folder.is_dir() {
             for entry in WalkDir::new(&sys_req_folder).into_iter().filter_map(|e| e.ok()) {
@@ -119,12 +122,35 @@ impl ModelManager {
                 if path.is_file() && path.extension().map_or(false, |ext| ext == "md") {
                     // Check if it's a requirements file by name
                     if path.file_name().map_or(false, |f| {
-                        f.to_string_lossy().to_lowercase().contains(&self.config.paths.requirements_filename_match.to_lowercase())
+                        f.to_string_lossy().to_lowercase().ends_with(".md")
                     }) {
                         info!("Adding system requirements file: {:?}", path);
                         files.push(path.to_path_buf());
                     }
                 }
+            }
+        }
+
+        // Process external folders
+        for external_folder in &self.config.paths.external_folders {
+            let folder_path = if Path::new(external_folder).is_absolute() {
+                PathBuf::from(external_folder)
+            } else {
+                input_folder.join(external_folder)
+            };
+
+            if folder_path.exists() && folder_path.is_dir() {
+                info!("Processing external folder: {:?}", folder_path);
+                for entry in WalkDir::new(&folder_path).into_iter().filter_map(|e| e.ok()) {
+                    let path = entry.path();
+                    if path.is_file() && path.extension().map_or(false, |ext| ext == "md") {
+                        // Process all markdown files in external folders
+                        info!("Adding file from external folder: {:?}", path);
+                        files.push(path.to_path_buf());
+                    }
+                }
+            } else {
+                info!("External folder not found or not a directory: {:?}", folder_path);
             }
         }
         
@@ -922,7 +948,7 @@ impl ModelManager {
             design_specs_dir_path.clone()
         };
         
-        // Check only the primary directories within the input folder
+        // Always validate the main specifications directory
         if !actual_specs_dir_path.exists() || !actual_specs_dir_path.is_dir() {
             errors.push(ReqFlowError::ValidationError(
                 format!("Required specifications directory '{}' is missing", actual_specs_dir_path.display())
@@ -942,6 +968,21 @@ impl ModelManager {
             }
         }
         
+        // Validate external folders
+        for external_folder in &config.paths.external_folders {
+            let folder_path = if Path::new(external_folder).is_absolute() {
+                PathBuf::from(external_folder)
+            } else {
+                input_folder.join(external_folder)
+            };
+            
+            if !folder_path.exists() || !folder_path.is_dir() {
+                errors.push(ReqFlowError::ValidationError(
+                    format!("External folder '{}' is missing or not a directory", folder_path.display())
+                ));
+            }
+        }
+        
         // No README validation - README files are optional
         
         // Check SystemRequirements.md file if the system reqs directory exists
@@ -954,63 +995,115 @@ impl ModelManager {
             }
         }
         
-        // Check for files in wrong locations
+        // Check for files in wrong locations within the main specs directory
         for entry in WalkDir::new(input_folder).into_iter().filter_map(|e| e.ok()) {
             let path = entry.path();
+            
+            // Check if this file is in an external folder - apply folder structure rules to external folders too
+            let in_external_folder = config.paths.external_folders.iter().any(|folder| {
+                let folder_path = if Path::new(folder).is_absolute() {
+                    PathBuf::from(folder)
+                } else {
+                    input_folder.join(folder)
+                };
+                path.starts_with(&folder_path)
+            });
+            
+            // For files in external folders, we'll apply standard folder structure rules
+            // but with the external folder as the root instead of the specifications folder
+            
             if path.is_file() && path.extension().map_or(false, |ext| ext == "md") {
                 let file_name = path.file_name().unwrap().to_string_lossy();
                 
-                // Check if the file is a Requirements file - we use the requirements_filename_match parameter from config
-                let requirements_match = &config.paths.requirements_filename_match;
-                let in_specs_root = path.parent().map_or(false, |p| p == actual_specs_dir_path);
-                let is_requirements_file = file_name.contains(requirements_match);
+                // All markdown files are now considered for element extraction
+                
+                // Determine the root directory for this file (specifications or external folder)
+                let (root_dir, sys_req_dir, design_spec_dir) = if in_external_folder {
+                    // Find which external folder contains this file
+                    let mut ext_root_dir = PathBuf::new();
+                    let mut ext_sys_req_dir = PathBuf::new(); 
+                    let mut ext_design_spec_dir = PathBuf::new();
+                    
+                    for folder in &config.paths.external_folders {
+                        let folder_path = if Path::new(folder).is_absolute() {
+                            PathBuf::from(folder)
+                        } else {
+                            input_folder.join(folder)
+                        };
+                        
+                        if path.starts_with(&folder_path) {
+                            // This is the external folder containing our file
+                            ext_root_dir = folder_path.clone();
+                            ext_sys_req_dir = folder_path.join(&config.paths.system_requirements_folder);
+                            ext_design_spec_dir = folder_path.join(&config.paths.design_specifications_folder);
+                            break;
+                        }
+                    }
+                    
+                    (ext_root_dir, ext_sys_req_dir, ext_design_spec_dir)
+                } else {
+                    // Use the regular specifications folder
+                    (actual_specs_dir_path.clone(), actual_system_reqs_dir_path.clone(), actual_design_specs_dir_path.clone())
+                };
+                
+                let in_specs_root = path.parent().map_or(false, |p| p == root_dir);
+                let is_requirements_file = file_name.ends_with(".md");
                 
                 // User requirements are in specs root, system requirements are in system_requirements_folder
                 // A file is considered a User Requirements file if it:
                 // 1. Contains the requirements_filename_match string
-                // 2. Is directly in the specifications root folder 
+                // 2. Is directly in the root folder (specifications or external)
                 let is_user_req_file = is_requirements_file && in_specs_root;
                 
                 // A file is considered a System Requirements file if it:
                 // 1. Contains the requirements_filename_match string
-                // 2. Is NOT directly in the specifications root folder (meaning it's either in a subfolder or outside specs)
+                // 2. Is NOT directly in the root folder (meaning it's in a subfolder)
                 let is_system_req_file = is_requirements_file && !is_user_req_file;
                 
-                // User Requirements should be in the specifications root folder
-                if is_user_req_file && !in_specs_root {
-                    errors.push(ReqFlowError::ValidationError(
-                        format!("File '{}': User Requirements file must be in the specifications root folder '{}'", 
-                                path.display(), actual_specs_dir_path.display())
-                    ));
+                // User Requirements should be in the specifications root folder, NOT in external folders
+                if is_user_req_file {
+                    if !in_specs_root {
+                        errors.push(ReqFlowError::ValidationError(
+                            format!("File '{}': User Requirements file must be in the root folder '{}'", 
+                                    path.display(), root_dir.display())
+                        ));
+                    }
+                    
+                    // Check if User Requirements file is in an external folder
+                    if in_external_folder {
+                        errors.push(ReqFlowError::ValidationError(
+                            format!("File '{}': User Requirements are not allowed in external folders", 
+                                    path.display())
+                        ));
+                    }
                 }
                 
                 // System Requirements should be in the System Requirements directory
-                if path.starts_with(&actual_system_reqs_dir_path) {
+                if path.starts_with(&sys_req_dir) {
                     // All files in this directory are considered system requirements
                     // No need for additional validation
-                } else if is_system_req_file && !path.starts_with(&actual_system_reqs_dir_path) {
+                } else if is_system_req_file && !path.starts_with(&sys_req_dir) {
                     // DSD files get special treatment - don't flag them as misplaced system requirements
-                    let is_dsd_file = file_name.contains("DSD_") || path.starts_with(&actual_design_specs_dir_path);
+                    let is_dsd_file = file_name.contains("DSD_") || path.starts_with(&design_spec_dir);
                     
                     if !is_dsd_file {
-                        // For backward compatibility, flag System Requirements files not in the system requirements directory
+                        // Flag System Requirements files not in the system requirements directory
                         errors.push(ReqFlowError::ValidationError(
                             format!("File '{}': System Requirements file should be in the System Requirements directory '{}'", 
-                                    path.display(), actual_system_reqs_dir_path.display())
+                                    path.display(), sys_req_dir.display())
                         ));
                     }
                 }
                 
                 // Check if files in the Design Specifications directory
-                if path.starts_with(&actual_design_specs_dir_path) {
-                    // We don't need to validate that DSD files have the "DSD_" prefix anymore
+                if path.starts_with(&design_spec_dir) {
                     // All files in this directory are considered design specifications
+                    // No need for additional validation
                 } else if file_name.contains("DSD_") {
-                    // If a file has DSD_ prefix but is not in the design specs directory,
-                    // that's still an error for backward compatibility
+                    // If a file has DSD_ prefix but is not in the design specs directory, flag it
                     errors.push(ReqFlowError::ValidationError(
                         format!("File '{}': Design specification file is not in the Design Specifications directory '{}'", 
-                                path.display(), actual_design_specs_dir_path.display())
+                                path.display(), design_spec_dir.display())
                     ));
                 }
             }
@@ -1052,7 +1145,16 @@ impl ModelManager {
         for element in self.element_registry.all_elements() {
             // Check for system requirements without any parent relation
             // System requirements must have at least one relation that points to a parent requirement
-            if element.file_path.contains(system_reqs_folder) {
+            
+            // Determine if element is in a system requirements folder
+            let is_in_system_reqs = element.file_path.contains(system_reqs_folder);
+            
+            // Check if element is in an external folder - all requirements in external folders are system requirements
+            let is_in_external_folder = self.config.paths.external_folders.iter().any(|ext_folder| {
+                element.file_path.contains(ext_folder)
+            });
+            
+            if is_in_system_reqs || is_in_external_folder {
                 // List of valid parent-child relationship types
                 let valid_parent_relations = ["derivedFrom", "tracedFrom", "refine", "containedBy"];
                 
