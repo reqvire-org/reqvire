@@ -22,8 +22,44 @@ pub fn validate_relation_target(
         return Ok(());
     }
     
-    // Skip validation for markdown links in tests
+    // Extract and validate the actual target from markdown links
     if target.contains("](") {
+        // Extract URL from markdown link syntax [text](url)
+        let url_start = target.find("(").unwrap_or(0) + 1;
+        let url_end = target.rfind(")").unwrap_or(target.len());
+        
+        if url_start > 1 && url_end < target.len() {
+            // Extract the actual URL (what's inside parentheses)
+            let url = &target[url_start..url_end];
+            
+            // Get current file path for normalizing fragment-only references
+            let current_file_path = current_path.to_string_lossy().to_string();
+            
+            // Normalize the path for lookup, including current file context for fragments
+            let normalized_url = crate::utils::normalize_path(url, registry.config(), &current_file_path);
+            log::info!("Normalized relation target: {} -> {} (current file: {})", 
+                      url, normalized_url, current_file_path);
+            
+            // Single lookup with normalized path
+            if registry.contains_element(&normalized_url) {
+                log::info!("Found element in registry using normalized path: {}", normalized_url);
+                return Ok(());
+            }
+            
+            // If no match was found, report the error
+            // Debug by listing contents of registry
+            let paths: Vec<String> = registry.all_elements()
+                .map(|e| format!("'{}' ({})", e.file_path, e.name))
+                .collect();
+            
+            log::info!("Available files in registry: {}", paths.join(", "));
+            
+            return Err(ReqFlowError::MissingRelationTarget(
+                format!("Referenced file not found: {}", url)
+            ));
+        }
+        
+        // For all other markdown links, perform standard validation
         return Ok(());
     }
     
@@ -74,9 +110,34 @@ pub fn validate_relation_target(
         // Same-document element reference
         // Construct the full identifier by combining current path with fragment
         let current_file = current_path.to_string_lossy();
-        let full_identifier = format!("{}/{}", current_file, target);
+        
+        // When looking up fragment references in the same file, we need to apply
+        // consistent normalization as used when storing elements in the registry
+        let full_identifier = if target.starts_with("#") {
+            // For fragment references:
+            // 1. Extract the fragment part (without the #)
+            // 2. Normalize it using the shared utility function
+            // 3. Format with the file path
+            
+            // Parse the fragment part (without the #)
+            let fragment_part = &target[1..];
+            
+            // Normalize using the same utility function used in Element.identifier()
+            let normalized_fragment = crate::utils::normalize_fragment(fragment_part);
+            
+            // Format with the file path and # symbol
+            format!("{}#{}", current_file, normalized_fragment)
+        } else {
+            // For non-fragment references (rare case), we add a separator
+            format!("{}/{}", current_file, target)
+        };
+        
+        log::info!("Constructed full identifier for fragment reference: {} -> {}", target, full_identifier);
+        
+        log::debug!("Checking same-file fragment reference: {} -> {}", target, full_identifier);
         
         if registry.contains_element(&full_identifier) {
+            log::debug!("Found matching fragment reference: {}", full_identifier);
             Ok(())
         } else {
             Err(ReqFlowError::MissingRelationTarget(full_identifier))
@@ -88,6 +149,16 @@ pub fn validate_relation_target(
 #[allow(dead_code)]
 pub fn validate_relations(registry: &ElementRegistry) -> Result<Vec<ReqFlowError>, ReqFlowError> {
     let mut errors = Vec::new();
+    
+    // Log all elements in the registry to understand what's available
+    log::info!("Registry contains the following elements:");
+    for element in registry.all_elements() {
+        log::info!("  Element: {}/{}", element.file_path, element.name);
+        // Log metadata if available
+        for (key, value) in &element.metadata {
+            log::info!("    Metadata: {} = {}", key, value);
+        }
+    }
     
     for element in registry.all_elements() {
         let element_path = Path::new(&element.file_path);
