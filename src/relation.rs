@@ -1,8 +1,129 @@
 use anyhow::Result;
 use log::info;
 use std::path::Path;
+use std::collections::HashMap;
+use lazy_static::lazy_static;
 
 use crate::error::ReqFlowError;
+
+// Define relation direction types
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum RelationDirection {
+    Forward,   // From source to target (e.g., "refine")
+    Backward,  // From target to source (e.g., "refinedBy")
+    Neutral    // Non-directional (e.g., "trace")
+}
+
+// Define a struct to hold relation type information
+#[derive(Debug, Clone)]
+pub struct RelationTypeInfo {
+    pub name: &'static str,          // Name of the relation type
+    pub direction: RelationDirection, // Direction of relation
+    pub opposite: Option<&'static str>, // The opposite relation name, if any
+    pub description: &'static str,    // Description of what the relation means
+}
+
+// Define only the exact relation types specified in DSD_RepresentationOfIdentifiersAndRelations.md
+lazy_static! {
+    pub static ref RELATION_TYPES: HashMap<&'static str, RelationTypeInfo> = {
+        let mut m = HashMap::new();
+        
+        // Containment relations
+        m.insert("containedBy", RelationTypeInfo {
+            name: "containedBy", 
+            direction: RelationDirection::Backward, 
+            opposite: Some("contain"),
+            description: "Element is contained by another element",
+        });
+        m.insert("contain", RelationTypeInfo {
+            name: "contain", 
+            direction: RelationDirection::Forward, 
+            opposite: Some("containedBy"),
+            description: "Element contains another element",
+        });
+        
+        // Derive relations
+        m.insert("derivedFrom", RelationTypeInfo {
+            name: "derivedFrom", 
+            direction: RelationDirection::Backward, 
+            opposite: Some("derive"),
+            description: "Element is source for a derived element",
+        });
+        m.insert("derive", RelationTypeInfo {
+            name: "derive", 
+            direction: RelationDirection::Forward, 
+            opposite: Some("derivedFrom"),
+            description: "Element is derived from another element",
+        });
+        
+        // Refine relation
+        m.insert("refine", RelationTypeInfo {
+            name: "refine", 
+            direction: RelationDirection::Forward, 
+            opposite: None,
+            description: "Element refines a higher-level element",
+        });
+        
+        // Satisfy relations
+        m.insert("satisfiedBy", RelationTypeInfo {
+            name: "satisfiedBy", 
+            direction: RelationDirection::Backward, 
+            opposite: Some("satisfy"),
+            description: "Element is satisfied by another element",
+        });
+        m.insert("satisfy", RelationTypeInfo {
+            name: "satisfy", 
+            direction: RelationDirection::Forward, 
+            opposite: Some("satisfiedBy"),
+            description: "Element satisfies another element",
+        });
+        
+        // Verify relations
+        m.insert("verifiedBy", RelationTypeInfo {
+            name: "verifiedBy", 
+            direction: RelationDirection::Backward, 
+            opposite: Some("verify"),
+            description: "Element is verified by another element",
+        });
+        m.insert("verify", RelationTypeInfo {
+            name: "verify", 
+            direction: RelationDirection::Forward, 
+            opposite: Some("verifiedBy"),
+            description: "Element verifies another element",
+        });
+        
+        // Trace relations
+        m.insert("tracedFrom", RelationTypeInfo {
+            name: "tracedFrom", 
+            direction: RelationDirection::Backward, 
+            opposite: None,
+            description: "Element is traced from another element",
+        });
+        m.insert("trace", RelationTypeInfo {
+            name: "trace", 
+            direction: RelationDirection::Neutral, 
+            opposite: None,
+            description: "Element is related to another element in a non-directional way",
+        });
+        
+        m
+    };
+}
+
+/// Check if a relation type is supported according to the DSD
+pub fn is_supported_relation_type(relation_type: &str) -> bool {
+    RELATION_TYPES.contains_key(relation_type)
+}
+
+/// Get the list of all supported relation types
+pub fn get_supported_relation_types() -> Vec<&'static str> {
+    RELATION_TYPES.keys().cloned().collect()
+}
+
+/// Get information about a relation type
+pub fn get_relation_type_info(relation_type: &str) -> Option<&RelationTypeInfo> {
+    RELATION_TYPES.get(relation_type)
+}
 
 /// Represents a relation between elements in the MBSE model
 #[derive(Debug, Clone)]
@@ -241,21 +362,12 @@ impl Relation {
         // Normalize the type by trimming whitespace
         let normalized_type = self.relation_type.trim();
         
-        // More relaxed validation: 
-        // Relation type should be at least 2 characters and at most 80 characters
-        if normalized_type.len() < 2 || normalized_type.len() > 80 {
-            return Err(ReqFlowError::InvalidRelationFormat(format!(
-                "Relation type '{}' must be between 2 and 80 characters",
-                self.relation_type
-            )));
-        }
-        
-        // Very basic check - allow any alphanumeric characters for relation types to be more permissive
-        // This allows camelCase and other formats commonly used in ReqFlow
-        if !normalized_type.chars().all(|c| c.is_alphanumeric()) {
-            return Err(ReqFlowError::InvalidRelationFormat(format!(
-                "Relation type '{}' must contain only alphanumeric characters",
-                self.relation_type
+        // Check if the relation type is supported according to the DSD
+        if !is_supported_relation_type(normalized_type) {
+            let supported_types = get_supported_relation_types().join(", ");
+            return Err(ReqFlowError::UnsupportedRelationType(format!(
+                "Unsupported relation type: '{}'. Supported types are: {}",
+                normalized_type, supported_types
             )));
         }
         
