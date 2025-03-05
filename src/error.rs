@@ -48,6 +48,10 @@ pub enum ReqFlowError {
     #[allow(dead_code)]
     #[error("Duplicate relation: {0}")]
     DuplicateRelation(String),
+    
+    #[allow(dead_code)]
+    #[error("Unsupported relation type: {0}")]
+    UnsupportedRelationType(String),
 
     #[error("Path error: {0}")]
     PathError(String),

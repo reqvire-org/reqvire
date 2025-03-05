@@ -4,6 +4,36 @@ This document verifies the requirements for ReqFlow's validation functionality.
 
 ## Relation Validation Tests
 
+### Unsupported Relation Type Test
+
+This verification test checks that ReqFlow correctly identifies and reports relation types that are not part of the supported vocabulary (e.g., "satisfieddBy" instead of "satisfiedBy").
+
+#### Metadata
+* type: verification
+
+#### Acceptance Criteria
+- System should detect and report relation types that are not in the supported vocabulary
+- System should provide clear error messages suggesting the closest valid relation type
+
+#### Test Criteria
+- Command exits with error (non-zero) return code
+- Error output contains specific error messages about unsupported relation types
+- Error message suggests possible correct relation types
+
+#### Test Procedure
+1. Create a test fixture with requirements containing unsupported relation types (e.g., "satisfieddBy", "basedFrom")
+2. Run ReqFlow validation on the test fixture
+3. Verify that the validation reports an error for the unsupported relation types
+4. Verify that error messages suggest the correct relation types (e.g., "satisfiedBy", "derivedFrom")
+
+#### Implementation
+- Test will be implemented in `/tests/e2e-validation/test_unsupported_relations.sh`
+
+#### Relations
+* verifies: [SystemRequirements/Requirements.md/Relation Type Validation](../SystemRequirements/Requirements.html#relation-type-validation)
+
+---
+
 ### Invalid Relation Types Test
 
 The verification test checks that ReqFlow correctly identifies and reports invalid relation types such as typos (e.g., "satisfieddBy" instead of "satisfiedBy").

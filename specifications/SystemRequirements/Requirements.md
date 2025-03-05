@@ -580,6 +580,18 @@ The system shall provide special handling for Design Specification Documents whe
 
 ---
 
+### Relation Type Validation
+
+The system shall validate relation types against a defined vocabulary and provide clear error messages for unsupported relation types, including suggestions for the correct relation types.
+
+#### Metadata
+* type: requirement
+
+#### Relations
+  * refine: [UserRequirements.md/Enhanced Validation Error Reporting](../UserRequirements.html#enhanced-validation-error-reporting)
+
+---
+
 ### Multi-Pass Linting Capability
 
 The system shall support multi-pass linting with a configurable iteration limit to ensure all interdependent formatting issues are resolved.
