@@ -15,14 +15,14 @@ graph LR;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
     Align_with_Industry_Standards["Align with Industry Standards"];
-    click Align_with_Industry_Standards "specifications/MissionRequirements.md#align-with-industry-standards";
+    click Align_with_Industry_Standards "MissionRequirements.md#align-with-industry-standards";
     class Align_with_Industry_Standards requirement;
     Align_with_Industry_Standards -.->|deriveReqT| _MOEs_md_MOE_CE__MOEs_html_moe_ce_;
     _MOEs_md_MOE_CE__MOEs_html_moe_ce_["MOEs.md/MOE_CE"];
     click _MOEs_md_MOE_CE__MOEs_html_moe_ce_ "MOEs.html#moe_ce";
     class _MOEs_md_MOE_CE__MOEs_html_moe_ce_ requirement;
     Promote_Automation_and_Efficiency["Promote Automation and Efficiency"];
-    click Promote_Automation_and_Efficiency "specifications/MissionRequirements.md#promote-automation-and-efficiency";
+    click Promote_Automation_and_Efficiency "MissionRequirements.md#promote-automation-and-efficiency";
     class Promote_Automation_and_Efficiency requirement;
     Promote_Automation_and_Efficiency -.->|deriveReqT| _MOEs_md_MOE_UA__MOEs_html_moe_ua_;
     _MOEs_md_MOE_UA__MOEs_html_moe_ua_["MOEs.md/MOE_UA"];
