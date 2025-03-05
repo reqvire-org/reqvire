@@ -6,6 +6,7 @@ mod config;
 mod element;
 mod error;
 mod html;
+mod init;
 mod linting;
 mod markdown;
 mod model;
@@ -107,6 +108,11 @@ struct Args {
     /// Large Language Models understand and work with ReqFlow-based projects
     #[clap(long)]
     llm_context: bool,
+    
+    /// Initialize a new ReqFlow project
+    /// Bootstraps a basic project structure with example requirements and configuration
+    #[clap(long)]
+    init: bool,
 }
 
 fn main() -> Result<()> {
@@ -132,6 +138,22 @@ fn main() -> Result<()> {
             Err(e) => {
                 log::error!("Error reading LLM context file: {}", e);
                 return Err(anyhow::anyhow!("Failed to read LLM context file"));
+            }
+        }
+    }
+    
+    // Handle init option
+    if args.init {
+        // Get the current directory if no input folder is provided
+        let target_dir = args.input_folder
+            .unwrap_or_else(|| std::env::current_dir().unwrap_or_else(|_| PathBuf::from(".")));
+        
+        // Initialize the project
+        match init::initialize_project(&target_dir) {
+            Ok(_) => return Ok(()),
+            Err(e) => {
+                log::error!("Failed to initialize project: {}", e);
+                return Err(anyhow::anyhow!("Project initialization failed: {}", e));
             }
         }
     }

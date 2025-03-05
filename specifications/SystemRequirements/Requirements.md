@@ -1,5 +1,14 @@
 # System Requirements
 
+### Initialization Command
+
+The system shall implement an `init` command that bootstraps a basic ReqFlow project structure with example requirements, folder hierarchy, and a configuration file.
+
+#### Relations
+  * refine: [UserRequirements.md/Bootstrap model struture](UserRequirements.html#bootstrap-model-struture)
+
+---
+
 ### Index Generator Implementation
 
 The system shall implement an IndexGenerator component that traverses the specifications directory structure and creates a hierarchical index.md file with links and summaries.
