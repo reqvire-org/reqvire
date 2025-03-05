@@ -8,8 +8,6 @@ paths:
   # Path to the specifications folder (can be set via command line argument)
   specifications_folder: "specifications"
   
-  # Folder name for system requirements (relative to specifications_folder)
-  system_requirements_folder_name: "SystemRequirements"
   
   # Folder name for design specifications (relative to specifications_folder)
   design_specifications_folder_name: "DesignSpecifications"

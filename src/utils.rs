@@ -33,40 +33,33 @@ pub fn is_requirements_file_by_path(path: &Path, config: &crate::config::Config,
         return false;
     }
     
-    // Check if the file is in the system requirements directory
+    // Check if file matches any excluded filename patterns
+    let path_str = path.to_string_lossy();
+    let is_excluded = config.paths.excluded_filename_patterns.iter().any(|pattern| {
+        glob::Pattern::new(pattern).map(|p| p.matches(&path_str)).unwrap_or(false)
+    });
+    
+    if is_excluded {
+        return false;
+    }
+    
+    // Check if the file is in specifications folder
     let specs_dir = base_path.join(&config.paths.specifications_folder);
-    let system_reqs_path = specs_dir.join(&config.paths.system_requirements_folder);
-    if path.starts_with(&system_reqs_path) {
+    if path.starts_with(&specs_dir) {
+        // Design specs are still included here since this function should match both
+        // requirements and design specs
         return true;
     }
     
-    // Check if the file is in any design specifications directory
-    // Design specs are identified by being in any folder that matches the design_specifications_folder name
-    let rel_path = match path.strip_prefix(base_path) {
-        Ok(rel) => rel.to_string_lossy().to_string(),
-        Err(_) => path.to_string_lossy().to_string()
-    };
-    
-    let design_specs_folder_name = &config.paths.design_specifications_folder;
-    if rel_path.split('/').any(|component| component == design_specs_folder_name) {
-        return true;
-    }
-    
-    // No special case for UserRequirements.md - it will be detected by the standard pattern matching
-    
-    // Check if the file matches the requirements_filename_match pattern
-    if let Some(filename) = path.file_name() {
-        let filename_str = filename.to_string_lossy();
-        if filename_str.contains(&config.paths.requirements_filename_match) {
+    // Check if the file is in any external folder
+    for ext_folder in &config.paths.external_folders {
+        let ext_path = base_path.join(ext_folder);
+        if path.starts_with(&ext_path) {
             return true;
         }
     }
     
-    // Fall back to filename-based check for compatibility
-    if let Some(filename) = path.file_name() {
-        return is_requirements_file(filename.to_string_lossy().as_ref());
-    }
-    
+    // No fallback - if not in specifications or external folders, it's not a requirements file
     false
 }
 
@@ -87,29 +80,65 @@ pub fn is_requirements_file_only(path: &Path, config: &crate::config::Config, ba
     }
     
     // Get filename for checking
-    let filename = path.file_name().unwrap_or_default().to_string_lossy().to_lowercase();
-    let path_str = path.to_string_lossy().to_lowercase();
+    let filename = path.file_name().unwrap_or_default().to_string_lossy();
+    let path_str = path.to_string_lossy();
     
     if verbose {
         log::info!("Checking file {}, base_path: {}", path.display(), base_path.display());
         log::info!("Path: {}, Filename: {}", path_str, filename);
     }
     
+    // Check if file matches any excluded filename patterns
+    let is_excluded = config.paths.excluded_filename_patterns.iter().any(|pattern| {
+        let matches = glob::Pattern::new(pattern).map(|p| p.matches(&path_str)).unwrap_or(false);
+        if matches && verbose {
+            log::info!("File {} matches excluded pattern {}", path.display(), pattern);
+        }
+        matches
+    });
+    
+    if is_excluded {
+        if verbose {
+            log::info!("Skipping excluded file: {}", path.display());
+        }
+        return false;
+    }
+    
     // Skip design specifications
     let design_specs_folder = config.paths.design_specifications_folder.to_lowercase();
-    if path_str.contains(&format!("/{}/", design_specs_folder)) || filename.contains("dsd_") {
+    let path_str_lower = path_str.to_lowercase();
+    let filename_lower = filename.to_lowercase();
+    
+    if path_str_lower.contains(&format!("/{}/", design_specs_folder)) || filename_lower.contains("dsd_") {
         if verbose {
             log::info!("Skipping design spec: {}", path.display());
         }
         return false;
     }
     
+    // Check if file is in any external folder
+    let in_external_folder = if !config.paths.external_folders.is_empty() {
+        config.paths.external_folders.iter().any(|ext_folder| {
+            let ext_folder_lower = ext_folder.to_lowercase();
+            path_str_lower.contains(&format!("/{}/", ext_folder_lower))
+        })
+    } else {
+        false
+    };
+    
+    // If file is in an external folder, it's automatically considered a requirements file
+    if in_external_folder {
+        if verbose {
+            log::info!("File is in external folder, treating as requirements document");
+        }
+        return true;
+    }
+    
     // Special case for test fixtures and empty specifications folder:
     // If specifications_folder is empty, we're likely in a test environment
-    // In this case, just check if the filename contains the requirements pattern
+    // In this case, just check if the filename contains "requirements"
     if config.paths.specifications_folder.is_empty() {
-        let req_pattern = config.paths.requirements_filename_match.to_lowercase();
-        let is_requirements_file = filename.contains(&req_pattern);
+        let is_requirements_file = is_requirements_file(&filename);
         
         if is_requirements_file && verbose {
             log::info!("Test environment: File {} identified as requirements document", path.display());
@@ -119,153 +148,25 @@ pub fn is_requirements_file_only(path: &Path, config: &crate::config::Config, ba
     }
     
     // Normal case - proper path checking
-    let req_pattern = config.paths.requirements_filename_match.to_lowercase();
-    let sys_req_folder = config.paths.system_requirements_folder.to_lowercase();
-    
-    // File must match the requirements filename pattern
-    let matches_req_pattern = filename.contains(&req_pattern);
-    
-    // Determine if this file is at the root level of the directory we're processing
-    let input_dir = base_path.to_string_lossy().to_lowercase();
-    let path_without_input = path_str.strip_prefix(&input_dir)
-        .unwrap_or(&path_str)
-        .trim_start_matches('/');
-    
-    // Check if file is directly in the specifications root, not in a subfolder
+    // Determine if file is in the specifications folder or subfolder
     let specs_folder = config.paths.specifications_folder.to_lowercase();
-    let path_parts: Vec<&str> = path_without_input.split('/').collect();
+    let in_specifications = path_str_lower.contains(&format!("/{}/", specs_folder));
     
-    // For contains() we need to compare &str with &str, not &str with &String
-    let sys_req_folder_str = sys_req_folder.as_str();
-    let design_specs_folder_str = design_specs_folder.as_str();
-    
-    // Enhanced detection for specifications folder - matches several common cases:
-    // 1. base_path is exactly named "specifications"
-    // 2. base_path ends with "/specifications"
-    // 3. base_path contains "/specifications/" but with a trailing component
-    let base_path_str = base_path.to_string_lossy().to_lowercase();
-    let base_is_spec_folder = base_path.file_name().map_or(false, |name| name.to_string_lossy().to_lowercase() == specs_folder) ||
-                             base_path_str.ends_with(&format!("/{}", specs_folder));
-    
-    // Additional logging for diagnosis
-    if verbose {
-        log::info!("Enhanced specs folder detection:");
-        log::info!("base_is_spec_folder: {}", base_is_spec_folder);
-        log::info!("base_path: {}", base_path.display());
-        log::info!("path_parts: {:?}", path_parts);
-    }
-    
-    // CRITICAL: Files directly in specifications/ (without SystemRequirements/ or DesignSpecifications/)
-    // are considered to be in specifications root. This is true when:
-    // 1. When base_path is already specifications/, path_str is like "/path/to/specifications/file.md"
-    // 2. When base_path is project root, path_str is like "/path/to/project/specifications/file.md"
-    
-    // Handle special case when base_path is already the specifications folder
-    let in_spec_root = if base_is_spec_folder {
-        // When base_path is specifications/, files directly in it are at the spec root
-        // We just need to check that they don't have subfolders like SystemRequirements/ or DesignSpecifications/
-        // This is a simple parent check - if the parent is the base_path, the file is at the root
-        let is_direct_child = path.parent().map_or(false, |p| p.to_string_lossy().to_lowercase() == base_path.to_string_lossy().to_lowercase());
-        if verbose && is_direct_child {
-            log::info!("File is directly in the specifications folder (special case when base_path is specifications/)");
-        }
-        is_direct_child
-    } else if path_str.contains(&format!("/{}/", specs_folder)) {
-        // Normal case: base_path is not specifications/
-        // Need to check if file is in specifications/ but not in a subfolder
-        
-        // First, extract the part after specifications/
-        if let Some(after_specs) = path_str.split(&format!("/{}/", specs_folder)).nth(1) {
-            // If there are no slashes in the part after specifications/, it's at the root
-            let is_at_root = !after_specs.contains('/');
-            if verbose && is_at_root {
-                log::info!("File is at specifications root (base_path is not specifications/)");
-            }
-            is_at_root
-        } else {
-            false
-        }
-    } else {
-        // If not in specifications/ at all, definitely not in specifications root
-        false
-    };
-    
-    // Enhanced approach for handling the specifications root detection:
-    // 1. Check if parent of the file is the base path (direct file in input folder)
-    // 2. Check if parent is named "specifications" (file directly in specifications folder)
-    // 3. Check if file's parent path contains "/specifications" as its final component
-    let parent_path = path.parent().map(|p| p.to_string_lossy().to_lowercase());
-    let base_path_str = base_path.to_string_lossy().to_lowercase();
-    
-    let in_spec_root = if path.parent().map_or(false, |p| p.to_string_lossy().to_lowercase() == base_path_str) {
-        // Direct child of the input folder
+    if !in_specifications {
+        // If not in specifications or external folders, it's not a requirements file
         if verbose {
-            log::info!("File is directly in the input folder (direct parent check)");
+            log::info!("File is not in specifications folder or external folder, skipping");
         }
-        true
-    } else if path.parent().map_or(false, |p| p.file_name().map_or(false, |name| name.to_string_lossy().to_lowercase() == "specifications")) {
-        // Parent directory is named "specifications"
-        if verbose {
-            log::info!("File's parent is named 'specifications'");
-        }
-        true
-    } else if let Some(parent) = parent_path {
-        // Check if parent ends with "/specifications"
-        let parent_ends_with_specs = parent.ends_with("/specifications");
-        if parent_ends_with_specs && verbose {
-            log::info!("File's parent path ends with '/specifications'");
-        }
-        parent_ends_with_specs || in_spec_root
-    } else {
-        in_spec_root
-    };
+        return false;
+    }
     
+    // In specifications folder, all files are considered requirements (except those already filtered out)
     if verbose {
-        log::info!("Final in_spec_root determination: {}", in_spec_root);
+        log::info!("File is in specifications folder, treating as requirements document");
+        log::info!("FINAL RESULT: true");
     }
     
-    // Determine if file is in SystemRequirements folder or subfolder
-    let is_in_sys_req_dir = path_str.contains(&format!("/{}/", sys_req_folder));
-    
-    // Final check: 
-    // 1. If file is in specifications root, it must match requirements pattern
-    let is_req_file_in_spec_root = in_spec_root && matches_req_pattern;
-    
-    // 2. If file is in SystemRequirements folder, it must match requirements pattern
-    let is_req_file_in_sys_req_dir = is_in_sys_req_dir && matches_req_pattern;
-    
-    // A requirements file matches any of these conditions:
-    // 1. It's in the specifications root folder and matches the requirements pattern
-    // 2. It's in the system requirements folder and matches the requirements pattern
-    // 3. It's a standalone file (not in specifications) but matches the requirements pattern
-    //    This is for the case of directly running on a file like `cargo run -- --generate-diagrams test_requirements.md`
-    let is_standalone_requirements_file = matches_req_pattern && !path_str.contains("specifications/");
-    
-    let is_requirements_file = is_req_file_in_spec_root || is_req_file_in_sys_req_dir || is_standalone_requirements_file;
-    
-    if is_standalone_requirements_file && verbose {
-        log::info!("File is a standalone requirements file outside of specifications directory");
-    }
-    
-    // No special case handling - rely on the standard detection logic
-    // UserRequirements.md will be detected correctly if it's in specifications folder 
-    // and matches the requirements pattern
-    
-    if verbose {
-        log::info!("Requirements file checks for {}", path.display());
-        log::info!("  File in spec root: {}", in_spec_root);
-        log::info!("  Matches requirements pattern: {}", matches_req_pattern);
-        log::info!("  Is in system requirements dir: {}", is_in_sys_req_dir);
-        log::info!("  is_req_file_in_spec_root: {}", is_req_file_in_spec_root);
-        log::info!("  is_req_file_in_sys_req_dir: {}", is_req_file_in_sys_req_dir);
-        log::info!("  FINAL RESULT: {}", is_requirements_file);
-    }
-    
-    if is_requirements_file && verbose {
-        log::info!("File {} identified as requirements document", path.display());
-    }
-    
-    is_requirements_file
+    true
 }
 
 /// Check if a file is a design specification document

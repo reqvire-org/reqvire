@@ -39,13 +39,13 @@ pub struct GeneralConfig {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct PathsConfig {
     pub specifications_folder: String,
-    #[serde(alias = "system_requirements_folder_name")]
-    pub system_requirements_folder: String,
     #[serde(alias = "design_specifications_folder_name")]
     pub design_specifications_folder: String,
     pub output_folder: String,
     #[serde(default)]
     pub external_folders: Vec<String>,
+    #[serde(default)]
+    pub excluded_filename_patterns: Vec<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -98,10 +98,10 @@ impl Default for PathsConfig {
     fn default() -> Self {
         Self {
             specifications_folder: "specifications".to_string(),
-            system_requirements_folder: "SystemRequirements".to_string(),
             design_specifications_folder: "DesignSpecifications".to_string(),
             output_folder: "output".to_string(),
             external_folders: Vec::new(),
+            excluded_filename_patterns: vec!["**/README*.md".to_string(), "**/index.md".to_string()],
         }
     }
 }

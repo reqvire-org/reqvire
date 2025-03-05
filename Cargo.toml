@@ -23,6 +23,7 @@ serde_json = "1.0"
 serde_yml = "0.0.12"
 pathdiff = "0.2"
 termcolor = "1.4"
+glob = "0.3"
 
 [dev-dependencies]
 assert_fs = "1.0"

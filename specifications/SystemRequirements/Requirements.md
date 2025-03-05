@@ -1,11 +1,78 @@
 # System Requirements
 
+### External Folders Support
+
+The system shall support processing requirements stored in external folders outside the main specifications directory structure, treating them as system requirements in diagram generation and validation.
+
+#### Metadata
+* type: requirement
+
+#### Relations
+  * refine: [UserRequirements.md/Support for Distributed Requirements](../UserRequirements.html#support-for-distributed-requirements)
+  * satisfiedBy: [DesignSpecifications/DSD_ExternalFolders.md](../DesignSpecifications/DSD_ExternalFolders.html)
+
+---
+
+### Configurable Filename Exclusion Patterns
+
+The system shall support configurable glob patterns to exclude specific files from requirement processing, even if they are located in specifications or external folders.
+
+#### Metadata
+* type: requirement
+
+#### Relations
+  * refine: [UserRequirements.md/Project Configuration with YAML](../UserRequirements.html#project-configuration-with-yaml)
+  * satisfiedBy: [DesignSpecifications/DSD_ExternalFolders.md](../DesignSpecifications/DSD_ExternalFolders.html)
+
+---
+
+### Unified System Requirements Processing
+
+The system shall process all requirements in specifications subfolders (except design specifications) and external folders consistently as system requirements, without requiring a specific SystemRequirements folder.
+
+#### Metadata
+* type: requirement
+
+#### Relations
+  * refine: [UserRequirements.md/Support for Distributed Requirements](../UserRequirements.html#support-for-distributed-requirements)
+  * satisfiedBy: [DesignSpecifications/DSD_ExternalFolders.md](../DesignSpecifications/DSD_ExternalFolders.html)
+
+---
+
+### Element Type and Metadata Support
+
+The system shall support defining element types (requirement, verification, or other custom types) through metadata sections within elements, allowing for flexible organization and explicit type definition.
+
+#### Metadata
+* type: requirement
+
+#### Relations
+  * refine: [UserRequirements.md/Model Linting](UserRequirements.html#model-linting)
+  * satisfiedBy: [DesignSpecifications/DSD_ElementTypeAndMetadata.md](../DesignSpecifications/DSD_ElementTypeAndMetadata.html)
+
+---
+
 ### Initialization Command
 
 The system shall implement an `init` command that bootstraps a basic ReqFlow project structure with example requirements, folder hierarchy, and a configuration file.
 
+#### Metadata
+* type: requirement
+
 #### Relations
   * refine: [UserRequirements.md/Bootstrap model struture](UserRequirements.html#bootstrap-model-struture)
+
+---
+
+### Initialization Command Configuration Check
+
+The system shall prevent the initialization command from modifying an existing project by detecting if a configuration file already exists (in any of its accepted formats: .yaml, .yml) and report an error instead of proceeding.
+
+#### Metadata
+* type: requirement
+
+#### Relations
+  * refine: [Initialization Command](#initialization-command)
 
 ---
 
