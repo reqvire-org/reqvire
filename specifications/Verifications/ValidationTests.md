@@ -133,11 +133,14 @@ The verification test checks that ReqFlow correctly identifies and reports relat
 - Error messages include both source element and target information
 
 #### Test Procedure
-1. Create a test fixture in `/tests/fixtures/test-invalid-relations/` with requirements containing relations to non-existent elements
+1. Create a test fixture in `/tests/fixtures/test-missing-targets/` with requirements containing relations to non-existent elements
 2. Run ReqFlow validation on the test fixture
 3. Verify that the validation reports errors for the missing targets
 4. Verify that error messages clearly identify which targets are missing
 
+#### Implementation
+- Test is implemented in `/tests/e2e-validation/test_missing_targets.sh`
+
 #### Relations
 * verifies: [SystemRequirements/Requirements.md/Detailed Error Handling and Logging](../SystemRequirements/Requirements.html#detailed-error-handling-and-logging)
-* trace: [tests/e2e-validation/test_invalid_relations.sh](../../../tests/e2e-validation/test_invalid_relations.sh)
+* trace: [tests/e2e-validation/test_missing_targets.sh](../../../tests/e2e-validation/test_missing_targets.sh)

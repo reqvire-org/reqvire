@@ -69,12 +69,8 @@ fi
 #   exit 1
 # fi
 
-# Missing relation target validation is not implemented yet, so we'll comment this out for now
-# if ! echo "$OUTPUT" | grep -q "Missing relation target"; then
-#   echo "FAILED: Missing error about non-existent relation target"
-#   echo "Output: $OUTPUT"
-#   exit 1
-# fi
+# This test now only checks for duplicate relations and unsupported relation types
+# Missing relation target validation is tested in test_missing_targets.sh
 
 echo "SUCCESS: All expected validation errors were detected"
 exit 0
