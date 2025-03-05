@@ -782,6 +782,14 @@ impl ModelManager {
             // Process all potentially relevant files to collect identifiers
             if path.is_file() && path.file_name().map_or(false, |name| utils::is_processable_file(name.to_string_lossy().as_ref())) {
                 
+                // Check if this file should be excluded by any excluded filename patterns
+                let should_exclude = utils::is_excluded_by_patterns(path, &self.config.paths.excluded_filename_patterns, input_folder, self.config.general.verbose);
+                
+                if should_exclude {
+                    debug!("Skipping excluded file: {:?}", path);
+                    continue;
+                }
+                
                 debug!("Collecting identifiers from {:?}", path);
                 
                 let content = utils::read_file(path)?;
@@ -838,6 +846,20 @@ impl ModelManager {
             
             if is_dsd {
                 info!("Skipping validation for Design Specification Document: {}", file_path);
+                continue;
+            }
+            
+            // Check if this file should be excluded by any excluded filename patterns
+            let path_obj = std::path::Path::new(file_path);
+            let should_exclude = utils::is_excluded_by_patterns(
+                path_obj, 
+                &self.config.paths.excluded_filename_patterns, 
+                std::path::Path::new(&self.config.paths.specifications_folder),
+                false
+            );
+            
+            if should_exclude {
+                info!("Skipping validation for excluded file: {}", file_path);
                 continue;
             }
             
@@ -1104,7 +1126,8 @@ impl ModelManager {
             
             // Check if element is in the specifications folder but not at the root level
             let specs_folder = Path::new(&self.config.paths.specifications_folder);
-            let is_in_specs_subfolder = element.file_path.contains(&specs_folder.to_string_lossy()) && 
+            let specs_folder_str = self.config.paths.specifications_folder.as_str();
+            let is_in_specs_subfolder = element.file_path.contains(specs_folder_str) && 
                                         element.file_path.matches('/').count() > 1;
             
             // Check if element is in an external folder
@@ -1215,7 +1238,12 @@ impl ModelManager {
                 .filter_map(|e| e.ok())
                 .filter(|e| {
                     let file_path = e.path();
-                    file_path.is_file() && file_path.extension().map_or(false, |ext| ext == "md")
+                    if !(file_path.is_file() && file_path.extension().map_or(false, |ext| ext == "md")) {
+                        return false;
+                    }
+                    
+                    // Check if this file should be excluded by any excluded filename patterns
+                    !utils::is_excluded_by_patterns(file_path, &self.config.paths.excluded_filename_patterns, input_folder, self.config.general.verbose)
                 })
                 .map(|e| e.path().to_path_buf())
                 .collect();
@@ -1236,6 +1264,7 @@ impl ModelManager {
                     }
                     
                     // Use the path-based detection that respects configuration
+                    // (this already includes the excluded_filename_patterns check)
                     utils::is_requirements_file_by_path(file_path, &self.config, input_folder)
                 })
                 .map(|e| e.path().to_path_buf())
