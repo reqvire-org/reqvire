@@ -65,7 +65,7 @@ impl ModelManager {
     /// This method is used when the --generate-diagrams flag is set
     /// Note: This method deliberately skips validation to focus only on diagram generation
     pub fn process_diagrams(&mut self, input_folder: &Path) -> Result<(), ReqFlowError> {
-        info!("Processing diagrams for markdown files in {:?} (skipping validation)", input_folder);
+        debug!("Processing diagrams for markdown files in {:?} (skipping validation)", input_folder);
         
         // Set the diagram generation flag in the element registry
         // This will be checked by markdown.rs when processing the files
@@ -87,7 +87,7 @@ impl ModelManager {
                 if path.is_file() && path.extension().map_or(false, |ext| ext == "md") {
                     // Use the proper config-driven utility function
                     if crate::utils::is_requirements_file_by_path(&path, &self.config, input_folder) {
-                        info!("Adding requirements file from input folder: {:?}", path);
+                        debug!("Adding requirements file from input folder: {:?}", path);
                         files.push(path);
                     }
                 }
@@ -105,7 +105,7 @@ impl ModelManager {
                         if path.is_file() && path.extension().map_or(false, |ext| ext == "md") {
                             // Use the proper config-driven utility function 
                             if crate::utils::is_requirements_file_by_path(&path, &self.config, input_folder) {
-                                info!("Adding requirements file from specifications folder: {:?}", path);
+                                debug!("Adding requirements file from specifications folder: {:?}", path);
                                 files.push(path);
                             }
                         }
@@ -131,7 +131,7 @@ impl ModelManager {
                     let path = entry.path();
                     if path.is_file() && path.extension().map_or(false, |ext| ext == "md") {
                         // Process all markdown files in external folders
-                        info!("Adding file from external folder: {:?}", path);
+                        debug!("Adding file from external folder: {:?}", path);
                         files.push(path.to_path_buf());
                     }
                 }
@@ -158,12 +158,12 @@ impl ModelManager {
         // Add any additional files found by the normal detection mechanism
         for file in detected_files {
             if !files.contains(&file) {
-                info!("Adding detected requirements file: {:?}", file);
+                debug!("Adding detected requirements file: {:?}", file);
                 files.push(file);
             }
         }
             
-        info!("Found {} requirements files to update with diagrams", files.len());
+        debug!("Found {} requirements files to update with diagrams", files.len());
         
         // Note: No need to modify the configuration as diagram generation
         // is triggered by the --generate-diagrams flag in main.rs
@@ -196,7 +196,7 @@ impl ModelManager {
                 log::debug!("{}", &updated_content);
                 
                 // Always update the file in diagram generation mode, even if there aren't apparent changes
-                info!("Updating {:?} with mermaid diagram", file_path);
+                debug!("Updating {:?} with mermaid diagram", file_path);
                 
                 // Debug info to compare content before and after
                 if content != updated_content {
@@ -233,7 +233,7 @@ impl ModelManager {
         // Count how many files were updated
         let updated_count = results.into_iter().filter(|&updated| updated).count();
         
-        info!("Finished processing diagrams for all files. Updated {} of {} files.", updated_count, files.len());
+        debug!("Finished processing diagrams for all files. Updated {} of {} files.", updated_count, files.len());
         Ok(())
     }
     
@@ -244,7 +244,7 @@ impl ModelManager {
         output_folder: &Path,
         convert_to_html: bool,
     ) -> Result<(), ReqFlowError> {
-        info!("Processing files from {:?} to {:?}", input_folder, output_folder);
+        debug!("Processing files from {:?} to {:?}", input_folder, output_folder);
         
         // Update HTML output setting in config if specified
         if convert_to_html {
@@ -262,7 +262,7 @@ impl ModelManager {
         self.collect_identifiers(input_folder)?;
         
         // Validate model consistency
-        info!("Validating model consistency...");
+        debug!("Validating model consistency...");
         self.validate_model()?;
         
         // Second pass: process files
@@ -708,7 +708,7 @@ impl ModelManager {
             let html_path = output_folder.join("TraceabilityMatrix.html");
             utils::write_file(&html_path, html_content)?;
             
-            info!("Traceability matrix HTML saved to {:?}", html_path);
+            debug!("Traceability matrix HTML saved to {:?}", html_path);
         }
         
         info!("Traceability matrix generated");
@@ -725,12 +725,13 @@ impl ModelManager {
         if !relation_errors.is_empty() {
             info!("Found {} relation validation errors", relation_errors.len());
             for error in &relation_errors {
+                // Error details need to be visible in normal mode
                 info!("Validation error: {}", error);
             }
             // For now, we'll just log errors but continue processing
             // In a production implementation, we might want to fail or handle differently
         } else {
-            info!("No relation validation errors found");
+            debug!("No relation validation errors found");
         }
         
         // Validate markdown structure for each file
@@ -741,8 +742,9 @@ impl ModelManager {
             if let Some(content) = self.file_contents.get(file_path) {
                 let structure_errors = validate_markdown_structure(content)?;
                 if !structure_errors.is_empty() {
-                    info!("Found {} structure validation errors in {}", structure_errors.len(), file_path);
+                    debug!("Found {} structure validation errors in {}", structure_errors.len(), file_path);
                     for error in &structure_errors {
+                        // Error details need to be visible in normal mode
                         info!("Structure error: {}", error);
                     }
                     total_structure_errors += structure_errors.len();
@@ -753,7 +755,7 @@ impl ModelManager {
         if total_structure_errors > 0 {
             info!("Total of {} structure validation errors found", total_structure_errors);
         } else {
-            info!("No structure validation errors found");
+            debug!("No structure validation errors found");
         }
         
         Ok(())
@@ -761,7 +763,7 @@ impl ModelManager {
     
     /// Collect identifiers from all markdown files in the input folder
     fn collect_identifiers(&mut self, input_folder: &Path) -> Result<(), ReqFlowError> {
-        info!("Collecting identifiers from markdown files");
+        debug!("Collecting identifiers from markdown files");
         
         // Use existing registry
         let registry = &mut self.element_registry;
@@ -831,7 +833,7 @@ impl ModelManager {
     /// Validate markdown structure of all collected files
     /// Returns a list of validation errors
     pub fn validate_markdown_structure(&self) -> Result<Vec<ReqFlowError>, ReqFlowError> {
-        info!("Validating markdown structure");
+        debug!("Validating markdown structure");
         
         let mut all_errors = Vec::new();
         
@@ -845,7 +847,7 @@ impl ModelManager {
             let is_dsd = file_path.split('/').any(|component| component == design_specs_folder_name);
             
             if is_dsd {
-                info!("Skipping validation for Design Specification Document: {}", file_path);
+                debug!("Skipping validation for Design Specification Document: {}", file_path);
                 continue;
             }
             
@@ -859,11 +861,11 @@ impl ModelManager {
             );
             
             if should_exclude {
-                info!("Skipping validation for excluded file: {}", file_path);
+                debug!("Skipping validation for excluded file: {}", file_path);
                 continue;
             }
             
-            info!("Validating markdown structure of {}", file_path);
+            debug!("Validating markdown structure of {}", file_path);
             
             // Use existing validation function
             let errors = validation::validate_markdown_structure(content)?;
@@ -890,10 +892,14 @@ impl ModelManager {
             all_errors.extend(errors_with_path);
         }
         
-        if all_errors.is_empty() {
-            info!("No markdown structure validation errors found");
-        } else {
+        if !all_errors.is_empty() {
             info!("Found {} markdown structure validation errors", all_errors.len());
+            // Error details need to be visible in normal mode
+            for error in &all_errors {
+                info!("Markdown error: {}", error);
+            }
+        } else {
+            debug!("No markdown structure validation errors found");
         }
         
         Ok(all_errors)
@@ -902,15 +908,19 @@ impl ModelManager {
     /// Validate all relations in the model
     /// Returns a list of validation errors
     pub fn validate_relations(&self) -> Result<Vec<ReqFlowError>, ReqFlowError> {
-        info!("Validating relations");
+        debug!("Validating relations");
         
         // Use existing validation function
         let errors = validation::validate_relations(&self.element_registry)?;
         
-        if errors.is_empty() {
-            info!("No relation validation errors found");
-        } else {
+        if !errors.is_empty() {
             info!("Found {} relation validation errors", errors.len());
+            // Error details need to be visible in normal mode
+            for error in &errors {
+                info!("Relation error: {}", error);
+            }
+        } else {
+            debug!("No relation validation errors found");
         }
         
         Ok(errors)
@@ -923,7 +933,7 @@ impl ModelManager {
     /// - Proper file organization
     /// Returns a list of validation errors with file paths and line numbers (where applicable)
     pub fn validate_filesystem_structure(&self, input_folder: &Path, config: &Config) -> Result<Vec<ReqFlowError>, ReqFlowError> {
-        info!("Validating filesystem structure in {:?}", input_folder);
+        debug!("Validating filesystem structure in {:?}", input_folder);
         
         let mut errors = Vec::new();
         
@@ -1083,10 +1093,14 @@ impl ModelManager {
             }
         }
         
-        if errors.is_empty() {
-            info!("No filesystem structure validation errors found");
-        } else {
+        if !errors.is_empty() {
             info!("Found {} filesystem structure validation errors", errors.len());
+            // Error details need to be visible in normal mode
+            for error in &errors {
+                info!("Filesystem error: {}", error);
+            }
+        } else {
+            debug!("No filesystem structure validation errors found");
         }
         
         Ok(errors)
@@ -1099,7 +1113,7 @@ impl ModelManager {
     /// - Circular dependencies
     /// Returns a list of validation errors
     pub fn validate_cross_component_dependencies(&self) -> Result<Vec<ReqFlowError>, ReqFlowError> {
-        info!("Validating cross-component dependencies");
+        debug!("Validating cross-component dependencies");
         
         let mut errors = Vec::new();
         
@@ -1161,10 +1175,14 @@ impl ModelManager {
             }
         }
         
-        if errors.is_empty() {
-            info!("No cross-component dependency validation errors found");
-        } else {
+        if !errors.is_empty() {
             info!("Found {} cross-component dependency validation errors", errors.len());
+            // Error details need to be visible in normal mode
+            for error in &errors {
+                info!("Dependency error: {}", error);
+            }
+        } else {
+            debug!("No cross-component dependency validation errors found");
         }
         
         Ok(errors)
@@ -1225,14 +1243,14 @@ impl ModelManager {
         output_folder: &Path,
         convert_to_html: bool,
     ) -> Result<(), ReqFlowError> {
-        info!("Processing markdown files");
+        debug!("Processing markdown files");
         
         // Collect files to process based on mode
         let files: Vec<PathBuf>;
         
         if convert_to_html {
             // For HTML conversion, get ALL markdown files in the input folder and its subfolders
-            info!("HTML mode: Processing all markdown files in all subfolders");
+            debug!("HTML mode: Processing all markdown files in all subfolders");
             files = WalkDir::new(input_folder)
                 .into_iter()
                 .filter_map(|e| e.ok())
@@ -1248,10 +1266,10 @@ impl ModelManager {
                 .map(|e| e.path().to_path_buf())
                 .collect();
                 
-            info!("Found {} markdown files to convert to HTML", files.len());
+            debug!("Found {} markdown files to convert to HTML", files.len());
         } else {
             // Regular mode: Process only requirements files
-            info!("Regular mode: Processing only requirements files");
+            debug!("Regular mode: Processing only requirements files");
             // First, gather all primary requirements files and design specifications
             files = WalkDir::new(input_folder)
                 .into_iter()
@@ -1270,7 +1288,7 @@ impl ModelManager {
                 .map(|e| e.path().to_path_buf())
                 .collect();
                 
-            info!("Found {} requirements files to process", files.len());
+            debug!("Found {} requirements files to process", files.len());
         }
         
         // Process files in parallel
@@ -1317,7 +1335,7 @@ impl ModelManager {
             Ok::<(), ReqFlowError>(())
         })?;
         
-        info!("Finished processing all files");
+        debug!("Finished processing all files");
         Ok(())
     }
 }

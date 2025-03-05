@@ -4,6 +4,20 @@ use std::path::Path;
 use crate::error::ReqFlowError;
 use crate::relation::Relation;
 
+/// Type of element in the MBSE model
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ElementType {
+    Requirement,
+    Verification,
+    Other(String),
+}
+
+impl Default for ElementType {
+    fn default() -> Self {
+        ElementType::Requirement
+    }
+}
+
 /// Represents an Element in the MBSE model
 #[derive(Debug, Clone)]
 pub struct Element {
@@ -18,6 +32,12 @@ pub struct Element {
     
     /// File path relative to the input folder
     pub file_path: String,
+    
+    /// Type of element (requirement, verification, etc.)
+    pub element_type: ElementType,
+    
+    /// Additional metadata properties for the element
+    pub metadata: HashMap<String, String>,
 }
 
 impl Element {
@@ -28,7 +48,30 @@ impl Element {
             content: String::new(),
             relations: Vec::new(),
             file_path,
+            element_type: ElementType::default(),
+            metadata: HashMap::new(),
         }
+    }
+    
+    /// Set the element type based on metadata
+    pub fn set_type_from_metadata(&mut self) {
+        if let Some(type_value) = self.metadata.get("type") {
+            match type_value.to_lowercase().as_str() {
+                "verification" => self.element_type = ElementType::Verification,
+                "requirement" => self.element_type = ElementType::Requirement,
+                other => self.element_type = ElementType::Other(other.to_string()),
+            }
+        }
+    }
+    
+    /// Check if this element is a verification
+    pub fn is_verification(&self) -> bool {
+        matches!(self.element_type, ElementType::Verification)
+    }
+    
+    /// Check if this element is a requirement
+    pub fn is_requirement(&self) -> bool {
+        matches!(self.element_type, ElementType::Requirement)
     }
 
     /// Add content to the element

@@ -272,7 +272,7 @@ fn main() -> Result<()> {
         log::info!("Requirements diagrams generated and updated in source files");
     } else if validation_mode {
         // Run in validation mode
-        log::info!("Validating files in {:?}", input_folder_path);
+        println!("Validating files in {:?}...", input_folder_path);
         
         // Only collect identifiers, don't process files
         model_manager.collect_identifiers_only(&input_folder_path)?;
@@ -294,13 +294,13 @@ fn main() -> Result<()> {
                     })?);
                 } else {
                     // Human-readable output
-                    log::error!("❌ Markdown validation failed with {} errors:", markdown_errors.len());
+                    println!("❌ Markdown validation failed with {} errors:", markdown_errors.len());
                     for error in markdown_errors {
-                        log::error!("  - {}", error);
+                        println!("  - {}", error);
                     }
                 }
             } else if config.general.verbose || !config.validation.json_output {
-                log::info!("✅ Markdown structure validation passed");
+                println!("✅ Markdown structure validation passed");
             }
         }
         

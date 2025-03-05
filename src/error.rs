@@ -54,4 +54,7 @@ pub enum ReqFlowError {
     
     #[error("Invalid regex: {0}")]
     InvalidRegex(String),
+    
+    #[error("Initialization error: {0}")]
+    InitializationError(String),
 }
