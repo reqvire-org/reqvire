@@ -34,9 +34,20 @@ pub fn is_requirements_file_by_path(path: &Path, config: &crate::config::Config,
     }
     
     // Check if file matches any excluded filename patterns
-    let path_str = path.to_string_lossy();
     let is_excluded = config.paths.excluded_filename_patterns.iter().any(|pattern| {
-        glob::Pattern::new(pattern).map(|p| p.matches(&path_str)).unwrap_or(false)
+        // Same exclusion logic as in is_requirements_file_only
+        let file_path_for_pattern = format!("{}", path.file_name().unwrap_or_default().to_string_lossy());
+        
+        if pattern.starts_with("**/") {
+            let rel_path = match path.strip_prefix(base_path) {
+                Ok(rel) => rel.to_string_lossy().to_string(),
+                Err(_) => path.to_string_lossy().to_string()
+            };
+            
+            glob::Pattern::new(pattern).map(|p| p.matches(&rel_path)).unwrap_or(false)
+        } else {
+            glob::Pattern::new(pattern).map(|p| p.matches(&file_path_for_pattern)).unwrap_or(false)
+        }
     });
     
     if is_excluded {
@@ -90,11 +101,33 @@ pub fn is_requirements_file_only(path: &Path, config: &crate::config::Config, ba
     
     // Check if file matches any excluded filename patterns
     let is_excluded = config.paths.excluded_filename_patterns.iter().any(|pattern| {
-        let matches = glob::Pattern::new(pattern).map(|p| p.matches(&path_str)).unwrap_or(false);
-        if matches && verbose {
-            log::info!("File {} matches excluded pattern {}", path.display(), pattern);
+        // We need to test the pattern against the relative path, not the full absolute path
+        // This makes patterns like "**/Logical*.md" work correctly
+        let file_path_for_pattern = format!("{}", path.file_name().unwrap_or_default().to_string_lossy());
+        
+        // If the pattern starts with "**/" we need to include parent directories in the check
+        if pattern.starts_with("**/") {
+            // For **/ patterns, check against a path that includes parent directories
+            let rel_path = match path.strip_prefix(base_path) {
+                Ok(rel) => rel.to_string_lossy().to_string(),
+                Err(_) => path.to_string_lossy().to_string()
+            };
+            
+            let matches = glob::Pattern::new(pattern).map(|p| p.matches(&rel_path)).unwrap_or(false);
+            if matches && verbose {
+                log::info!("File {} matches excluded pattern {} (checking rel_path: {})", 
+                           path.display(), pattern, rel_path);
+            }
+            matches
+        } else {
+            // For simple patterns, just check against the filename
+            let matches = glob::Pattern::new(pattern).map(|p| p.matches(&file_path_for_pattern)).unwrap_or(false);
+            if matches && verbose {
+                log::info!("File {} matches excluded pattern {} (checking filename only: {})", 
+                           path.display(), pattern, file_path_for_pattern);
+            }
+            matches
         }
-        matches
     });
     
     if is_excluded {
@@ -326,6 +359,170 @@ mod tests {
             }
             assert!(!is_requirements_file_only(&path, &config, &base_path, false), 
                     "Expected {} to NOT be identified as a requirements file", path_str);
+        }
+    }
+    
+    // Test excluded_filename_patterns
+    #[test]
+    fn test_excluded_filename_patterns() {
+        // Create a temporary directory structure for testing
+        let temp_dir = tempfile::tempdir().unwrap();
+        
+        // Create subdirectories
+        let paths = [
+            "specifications",
+            "specifications/subfolder",
+            "specifications/deep/nested/folder",
+            "external_repo",
+            "external_repo/specs",
+            "other_folder"
+        ];
+        
+        // Configure external folders for these tests
+        let mut config_with_externals = Config::default();
+        config_with_externals.paths.external_folders = vec!["external_repo".to_string()];
+        
+        for path in &paths {
+            std::fs::create_dir_all(temp_dir.path().join(path)).unwrap();
+        }
+        
+        // Create test files for different pattern types
+        let test_files = [
+            // README* pattern test files
+            ("specifications/README.md", true), // Should be excluded
+            ("specifications/READMEtest.md", true), // Should be excluded
+            ("specifications/readme.md", false), // Should NOT be excluded (case sensitive)
+            ("specifications/READ.md", false), // Should NOT be excluded
+            ("specifications/subfolder/README.md", true), // Should be excluded
+            ("specifications/deep/nested/folder/README.md", true), // Should be excluded
+            ("other_folder/README.md", true), // Should be excluded 
+            
+            // Logical* pattern test files
+            ("specifications/LogicalArchitecture.md", true), // Should be excluded
+            ("specifications/LOGICAL_view.md", false), // Should NOT be excluded (case sensitive)
+            ("specifications/logical_design.md", false), // Should NOT be excluded (case sensitive)
+            ("specifications/Logicless.md", false), // Should NOT be excluded
+            ("specifications/subfolder/LogicalModel.md", true), // Should be excluded
+            ("external_repo/specs/LogicalView.md", true), // Should be excluded
+            
+            // Physical* pattern test files
+            ("specifications/PhysicalArchitecture.md", true), // Should be excluded
+            ("specifications/subfolder/PhysicalDiagram.md", true), // Should be excluded
+            ("specifications/NotPhysical.md", false), // Should NOT be excluded
+            ("specifications/Physicalsomething.md", true), // Should be excluded
+            
+            // index.md pattern test files
+            ("specifications/index.md", true), // Should be excluded
+            ("specifications/subfolder/index.md", true), // Should be excluded
+            ("specifications/INDEX.md", false), // Should NOT be excluded (case sensitive)
+            ("specifications/indexing_guide.md", false), // Should NOT be excluded
+            ("specifications/deep/nested/folder/index.md", true), // Should be excluded
+            
+            // Standard requirement files - should never be excluded
+            ("specifications/Requirements.md", false),
+            ("specifications/SystemRequirements.md", false),
+            ("specifications/UserRequirements.md", false),
+            ("specifications/subfolder/Requirements.md", false),
+            ("external_repo/specs/Requirements.md", false),
+        ];
+        
+        // Create all test files
+        for (path, _) in &test_files {
+            let file_path = temp_dir.path().join(path);
+            std::fs::write(&file_path, "test content").unwrap();
+        }
+        
+        // Test individual patterns to ensure each one works correctly
+        let patterns = [
+            "**/README*.md", 
+            "**/Logical*.md",
+            "**/Physical*.md",
+            "**/index.md"
+        ];
+        
+        // Test each pattern individually
+        for pattern in &patterns {
+            let mut config = Config::default();
+            config.paths.excluded_filename_patterns = vec![pattern.to_string()];
+            
+            println!("Testing pattern: {}", pattern);
+            
+            for (path, should_exclude) in &test_files {
+                let test_path = temp_dir.path().join(path);
+                let matches_pattern = is_excluded_by_pattern(&test_path, &config, &temp_dir.path());
+                
+                // Use the expected value from the test_files array rather than a string check
+                if *should_exclude && *pattern == get_pattern_for_file(path) {
+                    assert!(matches_pattern, 
+                        "File '{}' should be excluded by pattern '{}' but isn't", path, pattern);
+                } else if !*should_exclude || *pattern != get_pattern_for_file(path) {
+                    assert!(!matches_pattern,
+                        "File '{}' should NOT be excluded by pattern '{}' but is", path, pattern);
+                }
+            }
+        }
+        
+        // Test all patterns together (combined test)
+        let mut config = config_with_externals.clone();
+        config.paths.excluded_filename_patterns = patterns.iter().map(|s| s.to_string()).collect();
+        
+        // We need to check if the file would be a valid requirements file 
+        // (in specs folder or external folder) before applying exclusion rules
+        for (path, should_exclude) in &test_files {
+            let test_path = temp_dir.path().join(path);
+            
+            // First check if the file is in specifications/ or external_repo/
+            let in_specs = path.starts_with("specifications/");
+            let in_external = path.starts_with("external_repo/");
+            
+            if in_specs || in_external {
+                if *should_exclude {
+                    // If the file should be excluded, it shouldn't be considered a requirements file
+                    assert!(!is_requirements_file_only(&test_path, &config, &temp_dir.path(), false),
+                        "File '{}' should be excluded but is identified as a requirements file", path);
+                } else {
+                    // If the file shouldn't be excluded, it should be a requirements file
+                    assert!(is_requirements_file_only(&test_path, &config, &temp_dir.path(), false),
+                        "File '{}' should NOT be excluded but is", path);
+                }
+            } else {
+                // Files not in specifications/ or external/ aren't requirements even if they match pattern
+                assert!(!is_requirements_file_only(&test_path, &config, &temp_dir.path(), false),
+                    "File '{}' outside specs/external should NOT be a requirements file", path);
+            }
+        }
+    }
+    
+    // Helper function to check if a file is excluded by pattern
+    fn is_excluded_by_pattern(path: &Path, config: &crate::config::Config, base_path: &Path) -> bool {
+        config.paths.excluded_filename_patterns.iter().any(|pattern| {
+            let file_path_for_pattern = format!("{}", path.file_name().unwrap_or_default().to_string_lossy());
+            
+            if pattern.starts_with("**/") {
+                let rel_path = match path.strip_prefix(base_path) {
+                    Ok(rel) => rel.to_string_lossy().to_string(),
+                    Err(_) => path.to_string_lossy().to_string()
+                };
+                
+                glob::Pattern::new(pattern).map(|p| p.matches(&rel_path)).unwrap_or(false)
+            } else {
+                glob::Pattern::new(pattern).map(|p| p.matches(&file_path_for_pattern)).unwrap_or(false)
+            }
+        })
+    }
+    
+    // Helper function to determine which pattern should match a file
+    fn get_pattern_for_file(path: &str) -> &str {
+        if path.contains("README") {
+            "**/README*.md"
+        } else if path.contains("Logical") {
+            "**/Logical*.md"
+        } else if path.contains("Physical") && !path.contains("NotPhysical") {
+            "**/Physical*.md"
+        } else if path.contains("index") {
+            "**/index.md"
+        } else {
+            "no-matching-pattern"
         }
     }
     
