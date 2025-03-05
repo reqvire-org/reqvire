@@ -28,10 +28,7 @@ for test in ./test_*.sh; do
   echo ""
 done
 
-# Add this temporarily to avoid running potentially failing test during development
-if [ -f "./test_unsupported_relations.sh" ]; then
-  echo "Skipping newly added test_unsupported_relations.sh as it may not be supported yet"
-fi
+# All tests should now run correctly
 
 # Report results
 echo "========================================="

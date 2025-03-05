@@ -9,7 +9,7 @@ This document contains requirements with intentional relation errors for testing
 This is a valid requirement with proper relation types.
 
 #### Relations
-* refines: [UserRequirements.md/Valid User Requirement](UserRequirements.html#valid-user-requirement)
+* refine: [UserRequirements.md/Valid User Requirement](UserRequirements.html#valid-user-requirement)
 * satisfiedBy: [ValidImplementation.md](ValidImplementation.html)
 
 ---
@@ -19,7 +19,7 @@ This is a valid requirement with proper relation types.
 This requirement has an invalid relation type with a typo.
 
 #### Relations
-* refines: [UserRequirements.md/Valid User Requirement](UserRequirements.html#valid-user-requirement)
+* refine: [UserRequirements.md/Valid User Requirement](UserRequirements.html#valid-user-requirement)
 * satisfieddBy: [InvalidImplementation.md](InvalidImplementation.html)
 
 ---
@@ -29,7 +29,7 @@ This requirement has an invalid relation type with a typo.
 This requirement has a relation type with invalid characters.
 
 #### Relations
-* refines: [UserRequirements.md/Valid User Requirement](UserRequirements.html#valid-user-requirement)
+* refine: [UserRequirements.md/Valid User Requirement](UserRequirements.html#valid-user-requirement)
 * depends-on: [AnotherRequirement.md](AnotherRequirement.html)
 
 ---
@@ -39,7 +39,7 @@ This requirement has a relation type with invalid characters.
 This requirement has duplicate relations.
 
 #### Relations
-* refines: [UserRequirements.md/Valid User Requirement](UserRequirements.html#valid-user-requirement)
+* refine: [UserRequirements.md/Valid User Requirement](UserRequirements.html#valid-user-requirement)
 * satisfiedBy: [SameImplementation.md](SameImplementation.html)
 * satisfiedBy: [SameImplementation.md](SameImplementation.html)
 
@@ -50,5 +50,5 @@ This requirement has duplicate relations.
 This requirement has a relation to a non-existent element.
 
 #### Relations
-* refines: [UserRequirements.md/Valid User Requirement](UserRequirements.html#valid-user-requirement)
+* refine: [UserRequirements.md/Valid User Requirement](UserRequirements.html#valid-user-requirement)
 * satisfiedBy: [NonExistentElement.md/Missing Element](NonExistentElement.html#missing-element)
