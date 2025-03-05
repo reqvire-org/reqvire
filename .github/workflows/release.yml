@@ -15,9 +15,7 @@ jobs:
 
     strategy:
       matrix:
-        #os: [ubuntu-latest, macos-latest, windows-latest]
-        os: [ubuntu-latest, macos-latest]        
-
+        os: [ubuntu-latest, macos-latest] 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -26,13 +24,22 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Cache Cargo dependencies
-        uses: Swatinem/rust-cache@v2
+        uses: Swatinem/rust-cache@v2                
 
       - name: Run Tests
         run: cargo test --verbose
 
       - name: Build Binary
-        run: cargo build --release
+        run: |
+          if [[ "$RUNNER_OS" == "macOS" ]]; then
+            if [[ "$(uname -m)" == "arm64" ]]; then
+              cargo build --release --target=aarch64-apple-darwin
+            else
+              cargo build --release --target=x86_64-apple-darwin
+            fi
+          else
+            cargo build --release
+          fi
 
       - name: Rename Binary for OS
         shell: bash
@@ -41,12 +48,16 @@ jobs:
           if [[ "$RUNNER_OS" == "Linux" ]]; then
             mv target/release/reqflow artifacts/reqflow-linux
           elif [[ "$RUNNER_OS" == "macOS" ]]; then
-            mv target/release/reqflow artifacts/reqflow-macos
+            if [[ "$(uname -m)" == "arm64" ]]; then
+              mv target/aarch64-apple-darwin/release/reqflow artifacts/reqflow-macos-arm64
+            else
+              mv target/x86_64-apple-darwin/release/reqflow artifacts/reqflow-macos-x86_64
+            fi
           elif [[ "$RUNNER_OS" == "Windows" ]]; then
             mv target/release/reqflow.exe artifacts/reqflow-windows.exe
           fi
 
-      - name: Debug: List Built Binaries
+      - name: Debug List Built Binaries
         run: ls -R artifacts  # Verify that files exist before upload
 
       - name: Upload Built Binaries as Artifacts
@@ -70,7 +81,7 @@ jobs:
           pattern: binaries-*  # Match all OS binaries
           path: artifacts
 
-      - name: Debug: List Downloaded Binaries
+      - name: Debug List Downloaded Binaries
         run: ls -R artifacts  # Debugging step to verify files exist
 
       - name: Create GitHub Release and Upload Binaries
@@ -81,7 +92,7 @@ jobs:
           body: "Automated release of ${{ github.ref_name }}"
           draft: false
           prerelease: false
-          files: artifacts/*  # Uploads all binaries
+          files: artifacts/binaries-*/*  # Match all OS binaries
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
