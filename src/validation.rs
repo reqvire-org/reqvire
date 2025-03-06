@@ -32,6 +32,11 @@ pub fn validate_relation_target(
             // Extract the actual URL (what's inside parentheses)
             let url = &target[url_start..url_end];
             
+            //Ignore http urls
+            if url.starts_with("http://") || url.starts_with("https://") {
+                log::debug!("Found external link: {}", url);
+                return Ok(());
+            }
             // Get current file path for normalizing fragment-only references
             let current_file_path = current_path.to_string_lossy().to_string();
             
