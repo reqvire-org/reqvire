@@ -54,11 +54,8 @@ if [ ! -d "$TEST_DIR/specifications/SystemRequirements" ]; then
   exit 1
 fi
 
-if [ ! -d "$TEST_DIR/specifications/DesignSpecifications" ]; then
-  echo "FAILED: DesignSpecifications directory was not created"
-  rm -rf "$TEST_DIR"
-  exit 1
-fi
+# DesignSpecifications directory is no longer created by default
+# Instead, we use excluded_filename_patterns to filter out design specifications
 
 # Verifications directory no longer needed, removed check
 

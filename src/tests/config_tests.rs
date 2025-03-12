@@ -12,8 +12,8 @@ mod config_tests {
         assert_eq!(config.general.verbose, false);
         
         assert_eq!(config.paths.specifications_folder, "specifications");
-        assert_eq!(config.paths.design_specifications_folder, "DesignSpecifications");
         assert_eq!(config.paths.output_folder, "output");
+        assert!(config.paths.excluded_filename_patterns.contains(&"**/DesignSpecifications/**/*.md".to_string()));
         
         assert_eq!(config.validation.validate_markdown, false);
         assert_eq!(config.validation.validate_relations, false);
@@ -43,8 +43,10 @@ general:
 
 paths:
   specifications_folder: "docs"
-  design_specifications_folder_name: "Design"
   output_folder: "generated"
+  excluded_filename_patterns:
+    - "**/README*.md"
+    - "**/Design/**/*.md"
 
 style:
   theme: "dark"
@@ -62,8 +64,9 @@ style:
         assert_eq!(config.general.verbose, true);
         
         assert_eq!(config.paths.specifications_folder, "docs");
-        assert_eq!(config.paths.design_specifications_folder, "Design");
         assert_eq!(config.paths.output_folder, "generated");
+        assert!(config.paths.excluded_filename_patterns.contains(&"**/README*.md".to_string()));
+        assert!(config.paths.excluded_filename_patterns.contains(&"**/Design/**/*.md".to_string()));
         
         assert_eq!(config.style.theme, "dark");
         assert_eq!(config.style.max_width, 1000);

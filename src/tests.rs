@@ -285,9 +285,11 @@ general:
   generate_diagrams: true
 paths:
   specifications_folder: "specifications"
-  system_requirements_folder: "SystemRequirements"
-  design_specifications_folder: "DesignSpecifications"
   output_folder: "output"
+  excluded_filename_patterns:
+    - "**/README*.md"
+    - "**/index.md"
+    - "**/DesignSpecifications/**/*.md"
 style:
   theme: "default"
   max_width: 1200

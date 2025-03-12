@@ -49,10 +49,14 @@ Elements may contain structured **Subsections**, each serving a specific purpose
    - **Special characters allowed**: `-`, `_`, `.` (hyphen, underscore, and period)
 
 
+
+
 ### Examples of Elements
 
 Single Element:
 ```markdown
+
+
 ### My Element
 
 This is the content of My Element.
@@ -63,9 +67,13 @@ Additional details about My Element.
 
 Multiple Elements:
 ```
+
+
 ### Element One
 
 This is the content of Element One.
+
+
 
 ### Element Two
 
@@ -74,6 +82,8 @@ This is the content of Element Two.
 
 Nested Subheaders:
 ```
+
+
 ### Main Element
 This is the main element content.
 
@@ -84,6 +94,8 @@ Details about the subsection.
 More details about another subsection.
 ```
 
+
+
 ### Invalid Cases
 
 Element headers not empty:
@@ -93,8 +105,14 @@ Element headers not empty:
 
 Headers not unique within the same document:
 ```
+
+
+
+
 ### Duplicate
 Content of the first duplicate.
+
+
 
 ### Duplicate
 Content of the second duplicate.
@@ -124,6 +142,8 @@ The reserved subsections are:
  
 Those have defines structure that must be followed.
 
+
+
 ### Details Subsection
 
 Must be defined with a level 4 header: `#### Details`.
@@ -133,6 +153,8 @@ The **#### Details** subsection within an element provides additional informatio
 - Content within the **Details** subsection is considered an **extension of the requirement text**.
 - Any statements in the **Details** subsection hold the same validity as the main requirement text.
 
+
+
 ###  Relations Subsection
 
 Must be defined with a level 4 header: `#### Relations`.
@@ -140,6 +162,8 @@ Must be defined with a level 4 header: `#### Relations`.
 Duplicate relation entries within the same `#### Relations` subsection are not allowed.
 
 See more in design specification document [DSD_RepresentationOfIdentifiersAndRelations.md](DSD_RepresentationOfIdentifiersAndRelations.md).
+
+
 
 ### Metadata Subsection
 
@@ -160,6 +184,8 @@ The following properties have special meaning:
 #### Example Metadata Section
 
 ```markdown
+
+
 ### My Element
 
 This is a verification element.
@@ -174,6 +200,8 @@ This is a verification element.
 ```
 
 ```markdown
+
+
 ### My Element
 
 This is a verification element.
@@ -201,6 +229,8 @@ When parsing elements from Markdown:
 
 
 Elements types are defined in a **#### Metadata**  **subsection** within an **element** as a **type** property and value, see more for structure of elements in  [ElementsInDocument.md](ElementsInDocument.md).
+
+
 
 ### Element Types in Metadata Section
 

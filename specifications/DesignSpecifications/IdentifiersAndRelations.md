@@ -16,6 +16,9 @@ Each **identifier** must uniquely reference either:
   - A **file**, or
   - An **element within a file**.
 
+
+---
+
 ### Identifier Types and Examples
 
 #### 1. **Simple Identifiers**
@@ -61,6 +64,9 @@ Each **identifier** must uniquely reference either:
        [My Element](documents/specification.md#my-element)
        ```
 
+
+---
+
 ### Path Resolution Examples
 
 Assuming the **specifications root folder** is `/path/to/project`  
@@ -80,6 +86,9 @@ And a file exists at `/path/to/project/documents/File1.md`
 The `#### Relations` subsection specifies associations between elements, files, or other resources, forming the logical and dependency structure of the model.  
 
 Relations must follow a **structured reference format** to ensure clear traceability.
+
+
+---
 
 ### Relation Structure
 
@@ -117,10 +126,15 @@ Relations must follow a **structured reference format** to ensure clear traceabi
    - Specifies the target of the relation.
    - Must be a valid **Simple Identifier** or **Git Valid Markdown Link Identifier** as defined in this document.
 
+
+---
+
 ### Examples of `#### Relations`
 
 #### 1. **Simple Relations**
 ```markdown
+
+
 ### My Element
 This is the content of My Element.
 
@@ -132,6 +146,8 @@ This is the content of My Element.
 
 #### 2. **Relations with Special Characters**
 ```markdown
+
+
 ### API v2.0
 Details about API version 2.0.
 
@@ -144,6 +160,7 @@ Details about API version 2.0.
 If the referenced element exists within the same file, the identifier can be a fragment only.
 
 ```markdown
+
 #### Relations
   * extends: [Another Section](#another-section)
 ```
@@ -151,21 +168,26 @@ If the referenced element exists within the same file, the identifier can be a f
 #### 4. **Relative Path Relations**
 If the referenced file is located in a subfolder relative to the current document, use a relative path.
 ```markdown
+
 #### Relations
   * refines: [subfolder/details.md#refined-section](subfolder/details.html#refined-section)
 
 ```
+
 #### 5. **Absolute Path Relations**
 
 If the reference starts with /, it points to a file or element relative to the root specifications folder.
 
 ```markdown
+
 #### Relations
   * verifiedBy: [/specifications.md#verification-steps](/specifications.html#verification-steps)
 
 ```
 
 ## Additional Rules for Relations
+
+
 
 ### 6. **Handling of Special Characters in Identifiers**
    - Identifiers within relations must correctly preserve special characters unless they are part of a Git Valid Markdown Link Identifier, which follows GitHub-style encoding.

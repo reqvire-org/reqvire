@@ -95,20 +95,10 @@ pub fn is_requirements_file_only(path: &Path, config: &crate::config::Config, ba
         return false;
     }
     
-    // Skip design specifications
-    let design_specs_folder = &config.paths.design_specifications_folder; // Keep the exact name as specified in config
-    let path_str = path.to_string_lossy();
-    let filename_lower = filename.to_lowercase();
-    
-    // Simple check for design specs based only on folder location, not on filename patterns
-    let is_design_spec = path_str.contains(design_specs_folder); // Match exact folder name anywhere in the path
+    // Design specifications are excluded based on patterns
+    // This check is no longer needed as we use excluded_filename_patterns instead
         
-    if is_design_spec {
-        if verbose {
-            log::debug!("Skipping design spec: {}", path.display());
-        }
-        return false;
-    }
+    // Design specification files are handled by excluded_filename_patterns
     
     // Check if file is in any external folder
     let in_external_folder = if !config.paths.external_folders.is_empty() {
@@ -169,29 +159,8 @@ pub fn is_requirements_file_only(path: &Path, config: &crate::config::Config, ba
     true
 }
 
-/// Check if a file is a design specification document
-/// 
-/// @param path The path to the file to check
-/// @param config The ReqFlow configuration 
-/// @param _base_path The base path for relative path resolution (unused but kept for API consistency)
-/// @return true if the file is a design specification, false otherwise
-pub fn is_design_specification(path: &Path, config: &crate::config::Config, _base_path: &Path) -> bool {
-    // Check if file is a markdown file
-    if !path.is_file() || path.extension().map_or(true, |ext| ext != "md") {
-        return false;
-    }
-    
-    // Path string for easier checking - use exact case as in config
-    let path_str = path.to_string_lossy();
-    
-    // Check if in design specifications folder - use exact folder name from config
-    let design_specs_folder = &config.paths.design_specifications_folder;
-    if path_str.contains(design_specs_folder) {
-        return true;
-    }
-    
-    false
-}
+// is_design_specification function has been removed
+// Use excluded_filename_patterns for filtering instead
 
 /// Check if a file should be considered for processing in the ReqFlow system
 /// This is more inclusive than is_requirements_file and includes all markdown files
@@ -320,7 +289,6 @@ pub fn normalize_path(path: &str, config: &crate::config::Config, current_file: 
     
     // Get path components - we're looking for specifications folder or external folders
     let specs_folder = &config.paths.specifications_folder;
-    let design_specs_folder = &config.paths.design_specifications_folder;
     
     // If path contains specifications folder already, make sure it's prefixed with /
     if base_path.contains(specs_folder) {
@@ -331,27 +299,6 @@ pub fn normalize_path(path: &str, config: &crate::config::Config, current_file: 
         };
         log::debug!("Path contains specs folder, normalized to: {}", normalized);
         return normalized;
-    }
-    
-    // If path contains design specifications folder
-    if base_path.contains(design_specs_folder) {
-        // Handle special case where specifications_folder is "."
-        if specs_folder == "." {
-            // Don't add /specifications/ prefix when the specs folder is the current directory
-            let normalized = format!("/{}{}", 
-                            base_path.trim_start_matches("./"), 
-                            fragment);
-            log::debug!("Path contains design specs folder, normalized to: {}", normalized);
-            return normalized;
-        } else {
-            // Standard case - add specifications folder as parent
-            let normalized = format!("/{}/{}{}", 
-                            specs_folder, 
-                            base_path.trim_start_matches("./"), 
-                            fragment);
-            log::debug!("Path contains design specs folder, normalized to: {}", normalized);
-            return normalized;
-        }
     }
     
     // Check for external folders
@@ -693,49 +640,6 @@ mod tests {
         }
     }
     
-    // Test the is_design_specification function
-    #[test]
-    fn test_is_design_specification() {
-        let config = Config::default();
-        let base_path = PathBuf::from("/mnt/Radni/ReqFlow");
-        
-        // Test cases for design specifications
-        let design_spec_cases = vec![
-            "/mnt/Radni/ReqFlow/specifications/DesignSpecifications/DSD_Diagram.md",
-            "/mnt/Radni/ReqFlow/specifications/DSD_Architecture.md",
-        ];
-        
-        // Test cases for non-design specifications
-        let non_design_spec_cases = vec![
-            // Requirements files
-            "/mnt/Radni/ReqFlow/specifications/UserRequirements.md",
-            "/mnt/Radni/ReqFlow/specifications/SystemRequirements.md",
-            "/mnt/Radni/ReqFlow/specifications/SystemRequirements/Requirements.md",
-            
-            // Other markdown files
-            "/mnt/Radni/ReqFlow/specifications/README.md",
-        ];
-        
-        // Test that design specifications are properly identified
-        for path_str in design_spec_cases {
-            let path = PathBuf::from(path_str);
-            // Skip tests if the path doesn't exist
-            if !path.exists() {
-                continue;
-            }
-            assert!(is_design_specification(&path, &config, &base_path), 
-                    "Expected {} to be identified as a design specification", path_str);
-        }
-        
-        // Test that non-design specifications are properly excluded
-        for path_str in non_design_spec_cases {
-            let path = PathBuf::from(path_str);
-            // Skip tests if the path doesn't exist
-            if !path.exists() {
-                continue;
-            }
-            assert!(!is_design_specification(&path, &config, &base_path), 
-                    "Expected {} to NOT be identified as a design specification", path_str);
-        }
-    }
+    // Design specifications are now handled via excluded_filename_patterns
+    // This test has been removed as is_design_specification function no longer exists
 }

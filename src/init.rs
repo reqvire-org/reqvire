@@ -27,7 +27,6 @@ pub fn initialize_project(target_dir: &Path) -> Result<(), ReqFlowError> {
     // Create the basic directory structure
     let specs_dir = target_dir.join("specifications");
     let system_reqs_dir = specs_dir.join("SystemRequirements");
-    let design_specs_dir = specs_dir.join("DesignSpecifications");
     
     if !specs_dir.exists() {
         fs::create_dir_all(&specs_dir)?;
@@ -37,11 +36,6 @@ pub fn initialize_project(target_dir: &Path) -> Result<(), ReqFlowError> {
     if !system_reqs_dir.exists() {
         fs::create_dir_all(&system_reqs_dir)?;
         info!("Created SystemRequirements directory");
-    }
-    
-    if !design_specs_dir.exists() {
-        fs::create_dir_all(&design_specs_dir)?;
-        info!("Created DesignSpecifications directory");
     }
     
     // Create example configuration file
@@ -55,11 +49,14 @@ general:
   generate_diagrams: true
 
 paths:
-  # Folder name for system requirements 
-  system_requirements_folder: "SystemRequirements"
+  # Folder containing requirements and other specification files
+  specifications_folder: "specifications"
   
-  # Folder name for design specifications 
-  design_specifications_folder: "DesignSpecifications"
+  # Patterns to exclude from processing
+  excluded_filename_patterns:
+    - "**/README*.md"
+    - "**/index.md"
+    - "**/DesignSpecifications/**/*.md"
 
 style:
   # Diagram direction (TD for top-down, LR for left-to-right)
@@ -98,7 +95,6 @@ fn print_next_steps() {
     println!("\nDirectory structure:");
     println!("- specifications/");
     println!("  - SystemRequirements/");
-    println!("  - DesignSpecifications/");
     println!("- reqflow.yaml (configuration file)");
     println!("\nNext steps:");
     println!("1. Create your requirements files in the appropriate directories");

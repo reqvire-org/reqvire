@@ -127,10 +127,10 @@ fn test_markdown_link_validation() {
     let result1 = validate_relation_target(&relation1, Path::new("current_file.md"), &registry);
     assert!(result1.is_ok(), "Valid markdown link should pass validation");
     
-    // Test case 2: Invalid markdown link to non-existing file
+    // Test case 2: Invalid markdown link to non-existing file (that's not in an excluded folder)
     let relation2 = Relation::new(
         "satisfiedBy".to_string(),
-        "[DesignSpecifications/API.md](DesignSpecifications/API2.md)".to_string()
+        "[REG-001](specifications/NonExistentFile.md)".to_string()
     );
     let result2 = validate_relation_target(&relation2, Path::new("current_file.md"), &registry);
     assert!(result2.is_err(), "Invalid markdown link should fail validation");

@@ -263,13 +263,33 @@ impl ElementRegistry {
         
         // Check all elements to see if any are from this file
         for elem in self.elements.values() {
+            // Direct match
             if elem.file_path == file_path {
                 log::debug!("Found file in registry: {}", file_path);
+                return true;
+            }
+            
+            // Check if the element's file path ends with the search path
+            // This helps when a file is referenced with a relative path
+            if elem.file_path.ends_with(file_path) {
+                log::debug!("Found matching file in registry (via suffix): {} matches {}", 
+                            elem.file_path, file_path);
                 return true;
             }
         }
         
         log::debug!("File not found in registry: {}", file_path);
         false
+    }
+    
+    /// Check if a file is excluded based on the configuration's excluded_filename_patterns
+    pub fn is_file_excluded(&self, file_path: &str) -> bool {
+        let path = std::path::Path::new(file_path);
+        crate::utils::is_excluded_by_patterns(
+            path,
+            &self.config.paths.excluded_filename_patterns,
+            std::path::Path::new(&self.config.paths.specifications_folder),
+            false
+        )
     }
 }
