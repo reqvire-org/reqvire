@@ -224,6 +224,7 @@ TODO: this needs to be more clear on what folders to walk
 
 #### Relations
   * refine: [Index Generator Implementation](#index-generator-implementation)
+  * satisfiedBy: [linting/index_generator.rs](https://github.com/reqflow/reqflow/src/linting/index_generator.rs)
 
 ---
 
@@ -273,6 +274,7 @@ paths:
 
 #### Relations
   * refine: [UserRequirements.md/Support for Distributed Requirements](../UserRequirements.md#support-for-distributed-requirements)
+  * satisfiedBy: [config.rs](https://github.com/reqflow/reqflow/src/config.rs)
 
 ---
 
@@ -414,6 +416,7 @@ The system shall implement an `init` command that bootstraps a basic ReqFlow pro
 
 #### Relations
   * refine: [UserRequirements.md/Bootstrap model struture](UserRequirements.md#bootstrap-model-struture)
+  * satisfiedBy: [init.rs](https://github.com/reqflow/reqflow/src/init.rs)
 
 ---
 
@@ -425,6 +428,7 @@ The system shall prevent the initialization command from modifying an existing p
 
 #### Relations
   * refine: [Initialization Command](#initialization-command)
+  * satisfiedBy: [init.rs](https://github.com/reqflow/reqflow/src/init.rs)
 
 ---
 
@@ -434,6 +438,7 @@ The system shall implement an IndexGenerator component that traverses the specif
 
 #### Relations
   * refine: [UserRequirements.md/Generate Documentation Index](UserRequirements.md#generate-documentation-index)
+  * satisfiedBy: [linting/index_generator.rs](https://github.com/reqflow/reqflow/src/linting/index_generator.rs)
 
 ---
 
@@ -443,6 +448,7 @@ The system shall extract summaries from the first heading and paragraph of each 
 
 #### Relations
   * containedBy: [Index Generator Implementation](#index-generator-implementation)
+  * satisfiedBy: [linting/index_generator.rs](https://github.com/reqflow/reqflow/src/linting/index_generator.rs)
 
 ---
 
@@ -452,6 +458,7 @@ The system shall generate URLs in the index file with both Markdown (.md) and HT
 
 #### Relations
   * containedBy: [Index Generator Implementation](#index-generator-implementation)
+  * satisfiedBy: [linting/index_generator.rs](https://github.com/reqflow/reqflow/src/linting/index_generator.rs)
 
 ---
 
@@ -461,6 +468,7 @@ The system shall enhance the HTML generator to process index.md as a special fil
 
 #### Relations
   * refine: [UserRequirements.md/Documentation Index HTML Integration](UserRequirements.md#documentation-index-html-integration)
+  * satisfiedBy: [html.rs](https://github.com/reqflow/reqflow/src/html.rs)
 
 ---
 
@@ -470,6 +478,7 @@ The system shall provide a command-line option `--llm-context` that outputs comp
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Provide Actionable Model Improvement Suggestions](UserRequirements.md#provide-actionable-model-improvement-suggestions)
+  * satisfiedBy: [main.rs](https://github.com/reqflow/reqflow/src/main.rs)
 
 ---
 
@@ -479,6 +488,7 @@ The system shall provide validation results in machine-readable JSON format to f
 
 #### Relations
   * refine: [UserStories.md/Validating Structures](UserStories.md#validating-structures)
+  * satisfiedBy: [validation.rs](https://github.com/reqflow/reqflow/src/validation.rs)
 
 ---
 
@@ -488,6 +498,7 @@ The system shall support different validation modes (validate_markdown, validate
 
 #### Relations
   * refine: [UserStories.md/Validating Structures](UserStories.md#validating-structures)
+  * satisfiedBy: [validation.rs](https://github.com/reqflow/reqflow/src/validation.rs)
 
 ---
 
@@ -497,6 +508,7 @@ The system shall implement interactive click behavior for Mermaid diagram nodes 
 
 #### Relations
   * refine: [UserRequirements.md/Interactive Mermaid Diagrams](UserRequirements.md#interactive-mermaid-diagrams)
+  * satisfiedBy: [html.rs](https://github.com/reqflow/reqflow/src/html.rs)
 
 ---
 
@@ -506,6 +518,7 @@ The system shall allow command line arguments to override YAML configuration set
 
 #### Relations
   * refine: [UserRequirements.md/Project Configuration with YAML](UserRequirements.md#project-configuration-with-yaml)
+  * satisfiedBy: [main.rs](https://github.com/reqflow/reqflow/src/main.rs)
 
 ---
 
@@ -515,6 +528,7 @@ The system shall provide special handling for Design Specification Documents whe
 
 #### Relations
   * refine: [UserStories.md/Managing MBSE Models](UserStories.md#managing-mbse-models)
+  * satisfiedBy: [model.rs](https://github.com/reqflow/reqflow/src/model.rs)
 
 ---
 
@@ -533,7 +547,8 @@ The system shall validate relation types against a defined vocabulary and provid
 The system shall support multi-pass linting with a configurable iteration limit to ensure all interdependent formatting issues are resolved.
 
 #### Relations
-  * refine: [UserRequirements.md/Format Consistency Enforcement](UserRequirements.md#format-consistency-enforcement)
+  * derivedFrom: [UserRequirements.md/Format Consistency Enforcement](UserRequirements.md#format-consistency-enforcement)
+  * satisfiedBy: [linting/mod.rs](https://github.com/reqflow/reqflow/src/linting/mod.rs)
 
 ---
 
@@ -543,6 +558,7 @@ The system shall generate HTML output for all markdown files, not just requireme
 
 #### Relations
   * refine: [UserStories.md/Managing MBSE Models](UserStories.md#managing-mbse-models)
+  * satisfiedBy: [html.rs](https://github.com/reqflow/reqflow/src/html.rs)
 
 ---
 
@@ -551,7 +567,7 @@ The system shall generate HTML output for all markdown files, not just requireme
 The system shall implement detailed error handling and logging throughout the application to facilitate troubleshooting and provide meaningful feedback.
 
 #### Relations
-  * refine: [UserRequirements.md/Enhanced Validation Error Reporting](UserRequirements.md#enhanced-validation-error-reporting)
+  * derivedFrom: [UserRequirements.md/Enhanced Validation Error Reporting](UserRequirements.md#enhanced-validation-error-reporting)
   * satisfiedBy: [src/error.rs](https://github.com/reqflow/reqflow/src/error.rs)
 
 ---
@@ -562,6 +578,7 @@ The system shall cache file contents during processing to optimize performance f
 
 #### Relations
   * refine: [UserStories.md/Managing MBSE Models](UserStories.md#managing-mbse-models)
+  * satisfiedBy: [model.rs](https://github.com/reqflow/reqflow/src/model.rs)
   
   
 ---
@@ -598,7 +615,8 @@ graph LR;
 The system shall find and process all requirements in  'external_folders' and it's subfolders' consistently and 'system requirements'.
 
 #### Relations
-  * refine: [UserRequirements.md/Support for Distributed Requirements](../UserRequirements.md#support-for-distributed-requirements)
+  * derivedFrom: [UserRequirements.md/Support for Distributed Requirements](../UserRequirements.md#support-for-distributed-requirements)
+  * satisfiedBy: [model.rs](https://github.com/reqflow/reqflow/src/model.rs)
 
 ---
 
@@ -618,6 +636,9 @@ The process follows these steps to determine whether a file contains requirement
 4. **Design Folder Check**: If the file is located in a folder defined by the `design_specifications_folder` configuration, it is marked as **not a requirements file**.
 5. **External Folder Check**: If the file is found in an external folder (or any of its subfolders), it is categorized as a **System Requirements file**.
 6. **Root Folder Check**: If the file is located at the root of the `specifications` folder, it is categorized as a **Stakeholder Needs Requirements file**. Otherwise, it is categorized as a **System Requirements file**.
+
+#### Relations
+  * satisfiedBy: [model.rs](https://github.com/reqflow/reqflow/src/model.rs)
 
 ## Categorization Outcomes
 
@@ -665,6 +686,308 @@ paths:
 ```
 
 #### Relations
-  * refine: [UserRequirements.md/Project Configuration with YAML](../UserRequirements.md#project-configuration-with-yaml)
+  * derivedFrom: [UserRequirements.md/Project Configuration with YAML](../UserRequirements.md#project-configuration-with-yaml)
+  * satisfiedBy: [config.rs](https://github.com/reqflow/reqflow/src/config.rs)
+
+---
+
+### Mermaid Diagram Format Conversion
+
+The system shall implement an export functionality that converts Mermaid diagram syntax to standard image formats (PNG, SVG) using external rendering tools or APIs, with configurable resolution and quality settings.
+
+#### Relations
+  * derivedFrom: [UserRequirements.md/Export Diagrams in Standard Formats](../UserRequirements.md#export-diagrams-in-standard-formats)
+  * satisfiedBy: [markdown.rs](https://github.com/reqflow/reqflow/src/markdown.rs)
+
+---
+
+### Visual Differential Rendering
+
+The system shall implement a visual differential rendering algorithm that compares the current and previous versions of a diagram, visually highlighting elements that have been added, modified, or removed using distinct color coding and graphical indicators.
+
+#### Relations
+  * derivedFrom: [UserRequirements.md/Highlight Changes in Diagrams](../UserRequirements.md#highlight-changes-in-diagrams)
+
+---
+
+### SysML-Compatible Relationship Rendering
+
+The system shall implement a relationship rendering engine that adheres to SysML notation standards, defining specific arrow styles, line types, and visual properties for each relationship type to ensure diagram consistency and standards compliance.
+
+
+#### Details
+
+The visual representation and direction of relationships in diagrams aligns with the SysML specification. 
+
+Each relationship is represented using SysML standard notation with a specified arrow direction.
+
+derive (deriveReqT):
+- Definition: Indicates that a requirement is derived from a higher-level requirement.  
+- Notation: Dashed arrow with an open arrowhead.  
+- Direction:  
+  - Derived Requirement → Source Requirement  
+
+contains:
+- Definition: Represents an element containing another element.  
+- Notation: Solid arrow with no arrowhead.  
+- Direction:  
+  - Container Element → Contained Element  
+
+refine:
+- Definition: Indicates that an element provides further detail or enhancement of another element.  
+- Notation: Dashed arrow with an open arrowhead.  
+- Direction:  
+  - Refining Element → Refined Element  
+
+verify:
+- Definition: Represents verification of a requirement by a test case or other verification element.  
+- Notation: Dashed arrow with an open arrowhead.  
+- Direction:  
+  - Verification Element (Test Case, Analysis, Inspection, Demonstration) → Requirement  
+
+trace:
+- Definition: Shows a general traceability relationship between elements without implying derivation or refinement.  
+- Notation: Dashed arrow with an open arrowhead.  
+- Direction:  
+  - Dependent Element → Source Element  
+
+satisfy:
+- Definition: Indicates that a design or model element satisfies a requirement.  
+- Notation: Solid arrow with an open arrowhead.  
+- Direction:  
+  - Design / Model Element → Requirement  
+
+**Summary Table**
+
+| Relationship | Notation | Arrow Direction |
+|-------------|---------|----------------|
+| deriveReqT | Dashed, open arrowhead | Derived Requirement → Source Requirement |
+| contain | Solid, no arrowhead | Container Element → Contained Element |
+| refine | Dashed, open arrowhead | Refining Element → Refined Element |
+| verify | Dashed, open arrowhead | Verification Element → Requirement |
+| trace | Dashed, open arrowhead | Dependent Element → Source Element |
+| satisfy | Solid, open arrowhead | Design/Model Element → Requirement |
+
+#### Relations
+  * derivedFrom: [UserRequirements.md/Visualize Model Relationships](../UserRequirements.md#visualize-model-relationships)
+  * satisfiedBy: [markdown.rs](https://github.com/reqflow/reqflow/src/markdown.rs)
+
+---
+
+### Relationship Type Filter Implementation
+
+The system shall implement filtering capabilities in the diagram generation logic that allow selective inclusion or exclusion of relationship types through command-line arguments and configuration settings, supporting regex patterns for complex filtering rules.
+
+#### Relations
+  * derivedFrom: [UserRequirements.md/Filter Relationships by Type](../UserRequirements.md#filter-relationships-by-type)
+
+---
+
+### Diagram Storage Path Configuration
+
+The system shall implement a configurable storage mechanism for generated diagrams that uses a combination of YAML configuration settings and command-line overrides to determine storage paths, file naming patterns, and versioning strategies.
+
+#### Relations
+  * derivedFrom: [UserRequirements.md/Store Automated Diagrams in Designated Locations](../UserRequirements.md#store-automated-diagrams-in-designated-locations)
+  * satisfiedBy: [model.rs](https://github.com/reqflow/reqflow/src/model.rs)
+
+---
+
+## Traceability Matrix Generation
+
+### Traceability Matrix Builder Implementation
+
+The system shall implement a traceability matrix builder component that extracts relationship data from the model, processes it according to configured parameters, and generates structured matrix representations showing connections between requirements and other elements.
+
+#### Relations
+  * derivedFrom: [UserRequirements.md/Create Traceability Matrices](../UserRequirements.md#create-traceability-matrices)
+  * satisfiedBy: [model.rs](https://github.com/reqflow/reqflow/src/model.rs)
+
+---
+
+### Relation-Based Matrix View Generator
+
+The system shall implement specialized view generators for different relationship types (VerifiedBy, SatisfiedBy, TracedFrom), each producing a focused matrix view that filters and organizes data according to the specific relationship semantics.
+
+#### Relations
+  * derivedFrom: [UserRequirements.md/Support Relation-Based Views](../UserRequirements.md#support-relation-based-views)
+  * satisfiedBy: [model.rs](https://github.com/reqflow/reqflow/src/model.rs)
+
+---
+
+### Markdown Matrix Formatter
+
+The system shall implement a markdown formatter for traceability matrices that produces well-structured, readable markdown tables and diagrams conforming to the ReqFlow markdown-first methodology.
+
+#### Relations
+  * derivedFrom: [UserRequirements.md/Markdown-Based Default Format](../UserRequirements.md#markdown-based-default-format)
+  * satisfiedBy: [model.rs](https://github.com/reqflow/reqflow/src/model.rs)
+
+---
+
+### Matrix File Output Handler
+
+The system shall implement a file output handler for traceability matrices that saves generated content to designated locations with appropriate naming conventions, handles file conflicts, and maintains content consistency.
+
+#### Relations
+  * derivedFrom: [UserRequirements.md/Save matrices to designated files](../UserRequirements.md#save-matrices-to-designated-files)
+  * satisfiedBy: [model.rs](https://github.com/reqflow/reqflow/src/model.rs)
+
+---
+
+### Verification Checkbox Implementation
+
+The system shall implement an interactive checkbox mechanism in HTML output that allows users to mark verification statuses, storing this data in a format that persists across report regenerations.
+
+#### Relations
+  * derivedFrom: [UserRequirements.md/Include Verification Checkboxes](../UserRequirements.md#include-verification-checkboxes)
+
+---
+
+### Matrix Export Format Handler
+
+The system shall implement export handlers for traceability matrices that convert the internal matrix representation to various external formats including Excel-compatible CSV/XLSX and PDF, preserving structural relationships and formatting.
+
+#### Relations
+  * derivedFrom: [UserRequirements.md/Export Traceability Matrix](../UserRequirements.md#export-traceability-matrix)
+
+---
+
+### CI/CD Pipeline Integration Interface
+
+The system shall implement an interface compatible with common CI/CD platforms that allows automated generation and verification of traceability matrices as part of build and deployment processes.
+
+#### Relations
+  * derivedFrom: [UserRequirements.md/Support CI/CD Integration](../UserRequirements.md#support-ci/cd-integration)
+
+---
+
+## Validation Capabilities
+
+### Markdown Structure Validator
+
+The system shall implement a markdown structure validator that enforces ReqFlow's requirements for header levels, element structure, relation formatting, and other markdown-specific syntax rules, reporting violations with line numbers and suggested fixes.
+
+#### Relations
+  * derivedFrom: [UserRequirements.md/Validate Markdown Structure](../UserRequirements.md#validate-markdown-structure)
+  * satisfiedBy: [validation.rs](https://github.com/reqflow/reqflow/src/validation.rs)
+
+---
+
+### Filesystem Structure Validator
+
+The system shall implement a validator that checks the organization of files and directories against the expected ReqFlow project structure, verifying required folders exist and files are appropriately placed according to configuration settings.
+
+#### Relations
+  * derivedFrom: [UserRequirements.md/Validate Filesystem Structure](../UserRequirements.md#validate-filesystem-structure)
+  * satisfiedBy: [model.rs](https://github.com/reqflow/reqflow/src/model.rs)
+
+---
+
+### Internal Consistency Validator
+
+The system shall implement a consistency validator that verifies logical coherence within the model, including checking for circular dependencies, orphaned elements, and inconsistent relationship patterns, with detailed error reporting.
+
+#### Relations
+  * derivedFrom: [UserRequirements.md/Validate Internal Consistency](../UserRequirements.md#validate-internal-consistency)
+  * satisfiedBy: [validation.rs](https://github.com/reqflow/reqflow/src/validation.rs)
+
+---
+
+### Cross-Component Dependency Validator
+
+The system shall implement a specialized validator that analyzes dependencies across different model components, ensuring proper alignment between architectural layers, requirement levels, and verification elements.
+
+#### Relations
+  * derivedFrom: [UserRequirements.md/Validate Cross-Component Dependencies](../UserRequirements.md#validate-cross-component-dependencies)
+  * satisfiedBy: [model.rs](https://github.com/reqflow/reqflow/src/model.rs)
+
+---
+
+## Reporting Features
+
+### Relationship Report Generator
+
+The system shall implement a relationship report generator that produces comprehensive summaries of model relationships, including statistics on relationship types, connection patterns, and outlier detection with visualizations.
+
+#### Relations
+  * derivedFrom: [UserRequirements.md/Generate Relationship Reports](../UserRequirements.md#generate-relationship-reports)
+  * satisfiedBy: [model.rs](https://github.com/reqflow/reqflow/src/model.rs)
+
+---
+
+### Structural Change Analysis Engine
+
+The system shall implement a change analysis engine that compares model versions to identify structural modifications, analyzes impact chains, and generates reports highlighting affected elements with severity classifications.
+
+#### Relations
+  * derivedFrom: [UserRequirements.md/Generate Structural Change Reports](../UserRequirements.md#generate-structural-change-reports)
+
+---
+
+### Validation Report Generator
+
+The system shall implement a validation report generator that compiles and formats validation results from all validators, providing a unified view of model quality with categorized issues, remediation suggestions, and compliance metrics.
+
+#### Relations
+  * derivedFrom: [UserRequirements.md/Provide Validation Reports](../UserRequirements.md#provide-validation-reports)
+  * satisfiedBy: [model.rs](https://github.com/reqflow/reqflow/src/model.rs)
+
+---
+
+### Verification Gap Analyzer
+
+The system shall implement a verification gap analyzer that identifies requirements lacking verification relationships, assesses verification coverage across the model, and produces reports highlighting verification deficiencies.
+
+#### Relations
+  * derivedFrom: [UserRequirements.md/Generate Verifications Reports](../UserRequirements.md#generate-verifications-reports)
+
+---
+
+### Model Summary Report Generator
+
+The system shall implement a summary report generator that produces high-level overviews of the model state, including key metrics, element counts by type, relationship densities, and change statistics with trend analysis.
+
+#### Relations
+  * derivedFrom: [UserRequirements.md/Generate Summary Reports](../UserRequirements.md#generate-summary-reports)
+  * satisfiedBy: [model.rs](https://github.com/reqflow/reqflow/src/model.rs)
+
+---
+
+### Dependency Report Generator
+
+The system shall implement a dependency report generator that analyzes and visualizes complex dependency chains within the model, highlighting critical paths, dependency clusters, and potential bottlenecks with impact assessments.
+
+#### Relations
+  * derivedFrom: [UserRequirements.md/Generate Dependency Reports](../UserRequirements.md#generate-dependency-reports)
+
+---
+
+### Report Export Formatter
+
+The system shall implement format conversion engines for reports that transform internal report representations to standardized external formats including PDF, Excel, and HTML, preserving structural information and visual elements.
+
+#### Relations
+  * derivedFrom: [UserRequirements.md/Export Reports to Standard Formats](../UserRequirements.md#export-reports-to-standard-formats)
+
+---
+
+## Change Tracing
+
+### Structural Change Analyzer
+
+The system shall implement a model change analyzer that identifies structural modifications between model versions, determines affected elements through relationship traversal, and categorizes impacts according to change propagation rules.
+
+#### Relations
+  * derivedFrom: [UserRequirements.md/Tracing Structural Changes](../UserRequirements.md#tracing-structural-changes)
+
+---
+
+### Structural Update Recommender
+
+The system shall implement a recommendation engine that analyzes model changes, identifies inconsistencies or incomplete modifications, and generates specific suggestions for structural updates to maintain model integrity.
+
+#### Relations
+  * derivedFrom: [UserRequirements.md/Suggest Structural Updates](../UserRequirements.md#suggest-structural-updates)
 
 ---
