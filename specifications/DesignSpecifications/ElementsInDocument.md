@@ -111,6 +111,10 @@ An element may contain different **Subsections**, some of which are strictly def
 - **Other Subsections**: These allow additional descriptive or supporting information.
 
 Subsections starts with the `#### Subsection Name` and ends either with new element or next subsection.
+Subsection must be located **within an element chunk**.
+The `#### ` header marks the beginning of the subsection.
+It must appear directly within an element chunk, **following** the `###` header of the parent element and any preceding content, including previous subsections.
+Each element chunk can have **at most one** `#### SubsectionName` subsection where 'SubsectionName' is a unique name of the subsection within an element.
 
 The reserved subsections are:
  * Relations
@@ -122,6 +126,8 @@ Those have defines structure that must be followed.
 
 ### Details Subsection
 
+Must be defined with a level 4 header: `#### Details`.
+
 The **#### Details** subsection within an element provides additional information directly related to the main requirement text.
 
 - Content within the **Details** subsection is considered an **extension of the requirement text**.
@@ -129,11 +135,90 @@ The **#### Details** subsection within an element provides additional informatio
 
 ###  Relations Subsection
 
-- The `#### Relations` subsection must be located **within an element chunk**.
-- Each element chunk can have **at most one** `#### Relations` subsection.
-- The `#### Relations` header marks the beginning of the subsection.
-- It must appear directly within an element chunk, **following** the `###` header of the parent element and any preceding content, including previous subsections.
-- Duplicate relation entries within the same `#### Relations` subsection are not allowed.
+Must be defined with a level 4 header: `#### Relations`.
+
+Duplicate relation entries within the same `#### Relations` subsection are not allowed.
 
 See more in design specification document [DSD_RepresentationOfIdentifiersAndRelations.md](DSD_RepresentationOfIdentifiersAndRelations.md).
+
+### Metadata Subsection
+
+Must be defined with a level 4 header: `#### Metadata`.
+
+The metadata section of an element follows these rules:
+1. Contains properties in list format: `* property_name: property_value`
+2. Property entries are listed as bullet points (`*`), with **two spaces** (`  *`) of indentation followed by property_name + ': ' + property_value.
+3. May include any custom properties, not just `type`
+
+#### Reserved Properties
+
+The following properties have special meaning:
+
+- `type`: Defines the element type (requirement, verification, etc.)
+- Additional reserved properties may be defined in future releases
+
+#### Example Metadata Section
+
+```markdown
+### My Element
+
+This is a verification element.
+
+#### Metadata
+  * type: verification
+  * priority: high
+  * owner: team-a
+
+#### Relations
+* verifies: [Some Requirement](#some-requirement)
+```
+
+```markdown
+### My Element
+
+This is a verification element.
+
+#### Details
+
+Some details.
+
+#### Metadata
+  * type: verification
+  * priority: high
+  * owner: team-a
+
+#### Relations
+  * verifies: [Some Requirement](#some-requirement)
+```
+
+#### Metadata Parsing
+
+When parsing elements from Markdown:
+1. The parser identifies `#### Metadata` sections within elements
+2. Properties are extracted from list items following the metadata header
+3. The element type is set based on the metadata "type" property if present otherwise defaults to a **requirement** type.
+4. All metadata is stored for potential future use.
+
+
+Elements types are defined in a **#### Metadata**  **subsection** within an **element** as a **type** property and value, see more for structure of elements in  [ElementsInDocument.md](ElementsInDocument.md).
+
+### Element Types in Metadata Section
+
+#### Supported Element Types
+
+Element types are identified through a reserved "type" metadata property. The following types are supported:
+
+1. **requirement**: The default element type when no type is specified
+2. **verification**: For verification tests and validation procedures
+3. **other**: Custom element types defined by users
+
+#### Type Determination
+
+The type of an element is determined through the following process:
+
+1. If a `#### Metadata` subsection exists and includes a `type` property, use that value
+2. If no type is specified, default to `Requirement`
+3. Future versions may add more built-in types as needed
+
+
 

@@ -29,8 +29,4 @@ To run a specific test:
 
 Test fixtures are located in the `/tests/fixtures/test-invalid-relations/` directory. These fixtures contain intentionally invalid relations to verify that validation correctly identifies them.
 
-## Verification Requirements
 
-These tests verify the following requirements:
-
-- [Detailed Error Handling and Logging](../../specifications/SystemRequirements/Requirements.md#detailed-error-handling-and-logging): "The system shall implement detailed error handling and logging throughout the application to facilitate troubleshooting and provide meaningful feedback."

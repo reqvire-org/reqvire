@@ -32,14 +32,14 @@ An **Element** is a uniquely identifiable section within a Markdown document. It
 ## Rules for Elements
 
 1. **Header Format**:
-   - An element must start with a `###` header.
+   - An element must start with a 3 `###` header.
    - The `###` header text must not be empty.
 
 2. **Uniqueness**:
    - Element names must be unique within the same file.
  
 3. **Nested Subheaders**:
-   - Subheaders within an element (e.g., `####`) are part of the same element and do not create new elements.
+   - Subheaders within an element defined with 4 header (e.g., `####`) are part of the same element and do not create new elements.
 
 4. **No Overlapping Content**:
    - Content in an element belongs exclusively to that element and cannot overlap with another.

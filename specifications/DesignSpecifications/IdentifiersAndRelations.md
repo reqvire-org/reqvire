@@ -165,7 +165,7 @@ If the reference starts with /, it points to a file or element relative to the r
 
 ```
 
-## Additional Rules for Relations (Continued)
+## Additional Rules for Relations
 
 ### 6. **Handling of Special Characters in Identifiers**
    - Identifiers within relations must correctly preserve special characters unless they are part of a Git Valid Markdown Link Identifier, which follows GitHub-style encoding.
@@ -177,8 +177,8 @@ If the reference starts with /, it points to a file or element relative to the r
    **Examples:**
    ```markdown
    #### Relations
-     * refines: [API v2.0](file.md#api-v20) ✅ (Git Valid Markdown Link Identifier)
-     * refines: file.md#API v2.0 ✅ (Simple Identifier)
+     * refines: [API v2.0](file.md#api-v20)
+     * refines: file.md#API v2.0 
    ```
 
 

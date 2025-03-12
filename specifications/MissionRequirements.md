@@ -17,17 +17,17 @@ graph LR;
     Align_with_Industry_Standards["Align with Industry Standards"];
     click Align_with_Industry_Standards "MissionRequirements.md#align-with-industry-standards";
     class Align_with_Industry_Standards requirement;
-    Align_with_Industry_Standards -.->|deriveReqT| _MOEs_md_MOE_CE__MOEs_html_moe_ce_;
-    _MOEs_md_MOE_CE__MOEs_html_moe_ce_["MOEs.md/MOE_CE"];
-    click _MOEs_md_MOE_CE__MOEs_html_moe_ce_ "MOEs.html#moe_ce";
-    class _MOEs_md_MOE_CE__MOEs_html_moe_ce_ requirement;
+    Align_with_Industry_Standards -.->|deriveReqT| _MOEs_md_MOE_CE__MOEs_md_moe_ce_;
+    _MOEs_md_MOE_CE__MOEs_md_moe_ce_["MOEs.md/MOE_CE"];
+    click _MOEs_md_MOE_CE__MOEs_md_moe_ce_ "MOEs.md#moe_ce";
+    class _MOEs_md_MOE_CE__MOEs_md_moe_ce_ requirement;
     Promote_Automation_and_Efficiency["Promote Automation and Efficiency"];
     click Promote_Automation_and_Efficiency "MissionRequirements.md#promote-automation-and-efficiency";
     class Promote_Automation_and_Efficiency requirement;
-    Promote_Automation_and_Efficiency -.->|deriveReqT| _MOEs_md_MOE_UA__MOEs_html_moe_ua_;
-    _MOEs_md_MOE_UA__MOEs_html_moe_ua_["MOEs.md/MOE_UA"];
-    click _MOEs_md_MOE_UA__MOEs_html_moe_ua_ "MOEs.html#moe_ua";
-    class _MOEs_md_MOE_UA__MOEs_html_moe_ua_ requirement;
+    Promote_Automation_and_Efficiency -.->|deriveReqT| _MOEs_md_MOE_UA__MOEs_md_moe_ua_;
+    _MOEs_md_MOE_UA__MOEs_md_moe_ua_["MOEs.md/MOE_UA"];
+    click _MOEs_md_MOE_UA__MOEs_md_moe_ua_ "MOEs.md#moe_ua";
+    class _MOEs_md_MOE_UA__MOEs_md_moe_ua_ requirement;
 ```
 
 
@@ -36,7 +36,7 @@ graph LR;
 The system must adhere to widely recognized industry standards, such as ISO/IEC/IEEE 15288, to ensure compatibility and relevance in systems engineering practices.
 
 #### Relations
-  * derivedFrom: [MOEs.md/MOE_CE](MOEs.html#moe_ce)
+  * derivedFrom: [MOEs.md/MOE_CE](MOEs.md#moe_ce)
 
 ---
 
@@ -45,4 +45,4 @@ The system must adhere to widely recognized industry standards, such as ISO/IEC/
 The system must significantly reduce manual effort in managing requirements, models, and traceability by automating routine tasks.
 
 #### Relations
-  * derivedFrom: [MOEs.md/MOE_UA](MOEs.html#moe_ua)
+  * derivedFrom: [MOEs.md/MOE_UA](MOEs.md#moe_ua)
