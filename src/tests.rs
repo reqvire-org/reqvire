@@ -24,7 +24,7 @@ mod tests {
     #[test]
     fn test_element_identifier() {
         let element = Element::new("Test Element".to_string(), "test/path.md".to_string());
-        assert_eq!(element.identifier(), "test/path.md/Test Element");
+        assert_eq!(element.identifier(), "test/path.md#test-element");
     }
     
     #[test]
@@ -42,9 +42,9 @@ mod tests {
         registry.add_element(element1).unwrap();
         registry.add_element(element2).unwrap();
         
-        assert!(registry.contains_element("test/path1.md/Element 1"));
-        assert!(registry.contains_element("test/path2.md/Element 2"));
-        assert!(!registry.contains_element("test/path3.md/Element 3"));
+        assert!(registry.contains_element("test/path1.md#element-1"));
+        assert!(registry.contains_element("test/path2.md#element-2"));
+        assert!(!registry.contains_element("test/path3.md#element-3"));
     }
     
     #[test]
@@ -143,7 +143,6 @@ This is requirement 2.
             .process_files(
                 input_dir.path(),
                 output_dir.path(),
-                false, // Don't convert to HTML for this test
             )
             .unwrap();
         

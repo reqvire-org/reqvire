@@ -75,14 +75,56 @@ pub fn validate_relation_target(
             log::debug!("Normalized relation target: {} -> {} (current file: {})", 
                       url, normalized_url, current_file_path);
             
-            // Single lookup with normalized path
+            // First try exact match
             if registry.contains_element(&normalized_url) {
                 log::debug!("Found element in registry using normalized path: {}", normalized_url);
                 return Ok(());
             }
             
-            // If no match was found, report the error - don't log all registry elements
+            // Remove leading slash if present for comparison
+            let clean_url = normalized_url.trim_start_matches('/');
+            log::debug!("Cleaned URL for comparison: {}", clean_url);
             
+            // Try with cleaned URL 
+            if registry.contains_element(clean_url) {
+                log::debug!("Found element in registry using cleaned path: {}", clean_url);
+                return Ok(());
+            }
+            
+            // Try the original URL as-is (this will handle markdown links with non-normalized paths)
+            if registry.contains_element(url) {
+                log::debug!("Found element in registry using original URL: {}", url);
+                return Ok(());
+            }
+            
+            // If no exact match, check if the file itself exists in the registry
+            // This is to validate links like [display_text](file.md) where only the file exists, not a specific element
+            if url.ends_with(".md") {
+                log::debug!("Checking if file exists in registry: {}", normalized_url);
+                
+                // Try with cleaned URL
+                if registry.contains_file(clean_url) {
+                    log::debug!("Found file in registry using cleaned path: {}", clean_url);
+                    return Ok(());
+                }
+                
+                // Try with original URL
+                if registry.contains_file(url) {
+                    log::debug!("Found file in registry using original URL: {}", url);
+                    return Ok(());
+                }
+                
+                // Try alternate formats (this is for markdown links)
+                for elem in registry.all_elements() {
+                    log::debug!("Comparing {} with {}", elem.file_path, url);
+                    if elem.file_path == url || elem.file_path == clean_url {
+                        log::debug!("Found file match in registry using element comparison: {}", url);
+                        return Ok(());
+                    }
+                }
+            }
+            
+            // If no match was found, report the error - don't log all registry elements
             return Err(ReqFlowError::MissingRelationTarget(
                 format!("Referenced file not found: {}", url)
             ));

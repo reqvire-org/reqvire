@@ -6,6 +6,7 @@ mod config;
 mod element;
 mod error;
 mod html;
+mod html_export;
 mod init;
 mod linting;
 mod markdown;
@@ -517,33 +518,24 @@ fn main() -> Result<()> {
         // First collect identifiers to build the element registry
         model_manager.collect_identifiers_only(&input_folder_path)?;
         
-        // Generate the traceability matrix to be saved in the input directory (specifications root)
-        // and HTML version to output directory if requested
-        model_manager.generate_traceability_matrix(&input_folder_path, &output_folder_path, config.general.html_output)?;
+        // Generate the traceability matrix
+        model_manager.generate_traceability_matrix(&input_folder_path, &output_folder_path)?;
         
-        if config.general.html_output {
-            println!("Traceability matrix generated: Markdown saved to {:?}, HTML saved to {:?}", input_folder_path, output_folder_path);
-        } else {
-            println!("Traceability matrix generated and saved to {:?}", input_folder_path);
-        }
+        println!("Traceability matrix generated and saved to {:?}", output_folder_path);
     } else if config.general.html_output {
         // Run in HTML conversion mode
         if config.general.verbose {
             println!("Converting markdown files to HTML from {:?} to {:?}", input_folder_path, output_folder_path);
         }
         
-        // Create the output folder if it doesn't exist
-        std::fs::create_dir_all(&output_folder_path)?;
-        
-        // Process the files and convert to HTML
-        // The convert_to_html flag is set to true
-        model_manager.process_files(
+        // Use the standalone HTML export functionality instead of model processing
+        let processed_count = html_export::export_markdown_to_html(
             &input_folder_path,
             &output_folder_path,
-            true, // Convert to HTML
+            config.general.verbose
         )?;
         
-        println!("Markdown files converted to HTML and saved to {:?}", output_folder_path);
+        println!("{} markdown files converted to HTML and saved to {:?}", processed_count, output_folder_path);
     } else {
         // No specific mode was selected - print help and exit
         Args::command().print_help()?;

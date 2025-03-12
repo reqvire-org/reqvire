@@ -255,4 +255,21 @@ impl ElementRegistry {
             .filter(|e| e.file_path == file_path_str)
             .collect()
     }
+    
+    /// Check if a file exists in the registry (by checking if any element has this file path)
+    #[allow(dead_code)]
+    pub fn contains_file(&self, file_path: &str) -> bool {
+        log::debug!("Checking if file exists in registry: {}", file_path);
+        
+        // Check all elements to see if any are from this file
+        for elem in self.elements.values() {
+            if elem.file_path == file_path {
+                log::debug!("Found file in registry: {}", file_path);
+                return true;
+            }
+        }
+        
+        log::debug!("File not found in registry: {}", file_path);
+        false
+    }
 }
