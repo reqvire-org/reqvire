@@ -171,58 +171,6 @@ The system shall provide an option to highlight changes made to the model in the
 
 The system shall provide visual representations of relationships within the MBSE model in the diagrams, enabling users to understand dependencies and their impact.
 
-#### Details
-
-The visual representation and direction of relationships in diagrams aligns with the SysML specification. 
-
-Each relationship is represented using SysML standard notation with a specified arrow direction.
-
-derive (deriveReqT):
-- Definition: Indicates that a requirement is derived from a higher-level requirement.  
-- Notation: Dashed arrow with an open arrowhead.  
-- Direction:  
-  - Derived Requirement → Source Requirement  
-
-contains:
-- Definition: Represents an element containing another element.  
-- Notation: Solid arrow with no arrowhead.  
-- Direction:  
-  - Container Element → Contained Element  
-
-refine:
-- Definition: Indicates that an element provides further detail or enhancement of another element.  
-- Notation: Dashed arrow with an open arrowhead.  
-- Direction:  
-  - Refining Element → Refined Element  
-
-verify:
-- Definition: Represents verification of a requirement by a test case or other verification element.  
-- Notation: Dashed arrow with an open arrowhead.  
-- Direction:  
-  - Verification Element (Test Case, Analysis, Inspection, Demonstration) → Requirement  
-
-trace:
-- Definition: Shows a general traceability relationship between elements without implying derivation or refinement.  
-- Notation: Dashed arrow with an open arrowhead.  
-- Direction:  
-  - Dependent Element → Source Element  
-
-satisfy:
-- Definition: Indicates that a design or model element satisfies a requirement.  
-- Notation: Solid arrow with an open arrowhead.  
-- Direction:  
-  - Design / Model Element → Requirement  
-
-**Summary Table**
-
-| Relationship | Notation | Arrow Direction |
-|-------------|---------|----------------|
-| deriveReqT | Dashed, open arrowhead | Derived Requirement → Source Requirement |
-| contain | Solid, no arrowhead | Container Element → Contained Element |
-| refine | Dashed, open arrowhead | Refining Element → Refined Element |
-| verify | Dashed, open arrowhead | Verification Element → Requirement |
-| trace | Dashed, open arrowhead | Dependent Element → Source Element |
-| satisfy | Solid, open arrowhead | Design/Model Element → Requirement |
 
 #### Relations
   * refine: [UserStories.md/Generate Diagrams](UserStories.md#generate-diagrams)
