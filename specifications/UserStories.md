@@ -90,6 +90,16 @@ As a **System Engineer**, I want to generate diagrams for different system viewp
 
 ---
 
+### Export Specifications
+
+As a **Manager**, I want to export specifications into diferent formats including HTML, so that I can communicate system architecture effectively.
+
+#### Relations
+  * tracedFrom: [MOEs.md/MOE_UA](MOEs.md#moe_ua)
+
+---
+
+
 ### Aligning Design with Code
 
 As a **Developer**, I want to align code with MBSE models, so that implementation remains consistent with design specifications.
