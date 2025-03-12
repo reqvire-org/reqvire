@@ -40,6 +40,26 @@ graph LR;
     Support_for_Distributed_Requirements -.->|deriveReqT| _Project_Configuration_with_YAML___project_configuration_with_yaml_;
 ```
 
+### Unstructured Documents
+
+The system shall allow structured markdown and unstructured (eg., markdown, PDFs, DOCX, raw text) documents to coexist within the same MBSE model.
+
+#### Relations
+  * refine: [UserStories.md/Managing MBSE Models](UserStories.md#managing-mbse-models)
+
+
+
+---
+
+### Efficient Processings
+
+The system shall process structured documents and relations to extract model-relevant information efficiently.
+
+#### Relations
+  * refine: [UserStories.md/Managing MBSE Models](UserStories.md#managing-mbse-models)
+
+---
+
 
 ### Bootstrap model struture
 
@@ -171,7 +191,6 @@ The system shall provide an option to highlight changes made to the model in the
 
 The system shall provide visual representations of relationships within the MBSE model in the diagrams, enabling users to understand dependencies and their impact.
 
-
 #### Relations
   * refine: [UserStories.md/Generate Diagrams](UserStories.md#generate-diagrams)
 
@@ -199,10 +218,10 @@ graph LR;
     Store_Automated_Diagrams_in_Designated_Locations["Store Automated Diagrams in Designated Locations"];
     click Store_Automated_Diagrams_in_Designated_Locations "UserRequirements.md#store-automated-diagrams-in-designated-locations";
     class Store_Automated_Diagrams_in_Designated_Locations requirement;
-    Store_Automated_Diagrams_in_Designated_Locations ==>|refines| _UserStories_md_Automate_Diagram_Generation__UserStories_md_automate_diagram_generation_;
-    _UserStories_md_Automate_Diagram_Generation__UserStories_md_automate_diagram_generation_["UserStories.md/Automate Diagram Generation"];
-    click _UserStories_md_Automate_Diagram_Generation__UserStories_md_automate_diagram_generation_ "UserStories.md#automate-diagram-generation";
-    class _UserStories_md_Automate_Diagram_Generation__UserStories_md_automate_diagram_generation_ requirement;
+    Store_Automated_Diagrams_in_Designated_Locations ==>|refines| _UserStories_md_Generate_Diagrams__UserStories_md_generate_diagrams_;
+    _UserStories_md_Generate_Diagrams__UserStories_md_generate_diagrams_["UserStories.md/Generate Diagrams"];
+    click _UserStories_md_Generate_Diagrams__UserStories_md_generate_diagrams_ "UserStories.md#generate-diagrams";
+    class _UserStories_md_Generate_Diagrams__UserStories_md_generate_diagrams_ requirement;
 ```
 
 
@@ -227,10 +246,10 @@ graph LR;
   classDef paragraph fill:#efefef,stroke:#999999,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-    Trace_Code_to_MBSE_Model["Trace Code to MBSE Model"];
-    click Trace_Code_to_MBSE_Model "UserRequirements.md#trace-code-to-mbse-model";
-    class Trace_Code_to_MBSE_Model requirement;
-    Trace_Code_to_MBSE_Model ==>|refines| _UserStories_md_Aligning_Design_with_Code__UserStories_md_aligning_design_with_code_;
+    Code_Traceability["Code Traceability"];
+    click Code_Traceability "UserRequirements.md#code-traceability";
+    class Code_Traceability requirement;
+    Code_Traceability ==>|refines| _UserStories_md_Aligning_Design_with_Code__UserStories_md_aligning_design_with_code_;
     _UserStories_md_Aligning_Design_with_Code__UserStories_md_aligning_design_with_code_["UserStories.md/Aligning Design with Code"];
     click _UserStories_md_Aligning_Design_with_Code__UserStories_md_aligning_design_with_code_ "UserStories.md#aligning-design-with-code";
     class _UserStories_md_Aligning_Design_with_Code__UserStories_md_aligning_design_with_code_ requirement;
@@ -249,7 +268,6 @@ The system shall support code traceability by using structured comments to link 
 
 #### Relations
   * refine: [UserStories.md/Aligning Design with Code](UserStories.md#aligning-design-with-code)
-
 
 ---
 
@@ -972,6 +990,20 @@ The system shall provide an option to export the traceability matrix in formats 
 
 #### Relations
   * refine: [UserStories.md/Generate Traceability Matrix](UserStories.md#generate-traceability-matrix)
+
+---
+
+## Exporting Specifications
+
+
+---
+
+### Export HTML specifications
+
+The system shall export specifications into HTML format and save in designated output location.
+
+#### Relations
+  * derivedFrom: [UserStories.md/Export Specifications](UserStories.md#export-specifications)
 
 ---
 

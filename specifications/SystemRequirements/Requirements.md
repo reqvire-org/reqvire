@@ -1,6 +1,6 @@
 # System Requirements
 
-## Linting
+## Linting    
 
 ```mermaid
 graph LR;
@@ -111,6 +111,7 @@ graph LR;
     _Index_Generator_Implementation___index_generator_implementation_["Index Generator Implementation"];
     click _Index_Generator_Implementation___index_generator_implementation_ "#index-generator-implementation";
     class _Index_Generator_Implementation___index_generator_implementation_ requirement;
+    _linting_index_generator_rs__https___github_com_reqflow_reqflow_src_linting_index_generator_rs_ -->|satisfies| Directory_Structure_Processing;
 ```
 
 
@@ -119,17 +120,18 @@ graph LR;
 The system shall detect and fix excess whitespace after element headers, subsection headers, and relation identifiers to maintain consistent formatting across all requirements documents.
 
 #### Relations
-  * refine: [UserRequirements.md/Format Consistency Enforcement](../UserRequirements.md#format-consistency-enforcement)
+  * derivedFrom: [UserRequirements.md/Format Consistency Enforcement](../UserRequirements.md#format-consistency-enforcement)
   * satisfiedBy: [linting/whitespace.rs](https://github.com/reqflow/reqflow/src/linting/whitespace.rs)
 
 ---
+
 
 ### Inconsistent Newlines Linting Implementation
 
 The system shall identify instances where subsection headers lack proper spacing (a blank line before them) and add the necessary spacing to ensure consistent document structure.
 
 #### Relations
-  * refine: [UserRequirements.md/Format Consistency Enforcement](../UserRequirements.md#format-consistency-enforcement)
+  * derivedFrom: [UserRequirements.md/Format Consistency Enforcement](../UserRequirements.md#format-consistency-enforcement)
   * satisfiedBy: [linting/newlines.rs](https://github.com/reqflow/reqflow/src/linting/newlines.rs)
 
 ---
@@ -139,7 +141,7 @@ The system shall identify instances where subsection headers lack proper spacing
 The system shall detect consecutive element sections that lack a separator line (---) between them and insert the separator to maintain consistent visual separation in the documentation.
 
 #### Relations
-  * refine: [UserRequirements.md/Format Consistency Enforcement](../UserRequirements.md#format-consistency-enforcement)
+  * derivedFrom: [UserRequirements.md/Format Consistency Enforcement](../UserRequirements.md#format-consistency-enforcement)
   * satisfiedBy: [linting/separators.rs](https://github.com/reqflow/reqflow/src/linting/separators.rs)
 
 ---
@@ -149,7 +151,7 @@ The system shall detect consecutive element sections that lack a separator line 
 The system shall identify and fix inconsistent indentation and bullet types in relation lists, standardizing to a consistent format across all requirements documents.
 
 #### Relations
-  * refine: [UserRequirements.md/Format Consistency Enforcement](../UserRequirements.md#format-consistency-enforcement)
+  * derivedFrom: [UserRequirements.md/Format Consistency Enforcement](../UserRequirements.md#format-consistency-enforcement)
   * satisfiedBy: [linting/indentation.rs](https://github.com/reqflow/reqflow/src/linting/indentation.rs)
 
 ---
@@ -159,7 +161,7 @@ The system shall identify and fix inconsistent indentation and bullet types in r
 The system shall provide a dry run mode (--dry-run flag) for linting that shows the suggested changes without applying them, allowing users to review modifications before committing to them.
 
 #### Relations
-  * refine: [UserRequirements.md/Linting Command Behavior](../UserRequirements.md#linting-command-behavior)
+  * derivedFrom: [UserRequirements.md/Linting Command Behavior](../UserRequirements.md#linting-command-behavior)
   * satisfiedBy: [linting/mod.rs](https://github.com/reqflow/reqflow/src/linting/mod.rs)
 
 ---
@@ -169,7 +171,7 @@ The system shall provide a dry run mode (--dry-run flag) for linting that shows 
 The system shall display linting change suggestions in a git-style diff format, color-coded when possible, to clearly show what modifications will be or have been made to the documents.
 
 #### Relations
-  * refine: [UserRequirements.md/Linting Command Output](../UserRequirements.md#linting-command-output)
+  * derivedFrom: [UserRequirements.md/Linting Command Output](../UserRequirements.md#linting-command-output)
   * satisfiedBy: [linting/mod.rs](https://github.com/reqflow/reqflow/src/linting/mod.rs)
 
 ---
@@ -189,7 +191,7 @@ The system shall support automatic multiple linting passes with a configurable i
 The system shall implement parallel processing for linting operations when possible, leveraging multi-core capabilities to improve performance on large documentation sets.
 
 #### Relations
-  * refine: [UserRequirements.md/Model Linting](../UserRequirements.md#model-linting)
+  * derivedFrom: [UserRequirements.md/Model Linting](../UserRequirements.md#model-linting)
   * satisfiedBy: [linting/mod.rs](https://github.com/reqflow/reqflow/src/linting/mod.rs)
 
 ---
@@ -209,7 +211,7 @@ The system shall respect configured excluded filename patterns when performing l
 The system shall generate or update an index.md file in the specifications root directory when linting is performed, creating a structured table of contents that links to all documentation files.
 
 #### Relations
-  * refine: [UserRequirements.md/Generate Documentation Index](../UserRequirements.md#generate-documentation-index)
+  * derivedFrom: [UserRequirements.md/Generate Documentation Index](../UserRequirements.md#generate-documentation-index)
   * satisfiedBy: [linting/index_generator.rs](https://github.com/reqflow/reqflow/src/linting/index_generator.rs)
 
 ---
@@ -247,6 +249,10 @@ graph LR;
     _UserRequirements_md_Support_for_Distributed_Requirements_____UserRequirements_md_support_for_distributed_requirements_["UserRequirements.md/Support for Distributed Requirements"];
     click _UserRequirements_md_Support_for_Distributed_Requirements_____UserRequirements_md_support_for_distributed_requirements_ "../UserRequirements.md#support-for-distributed-requirements";
     class _UserRequirements_md_Support_for_Distributed_Requirements_____UserRequirements_md_support_for_distributed_requirements_ requirement;
+    _config_rs__https___github_com_reqflow_reqflow_src_config_rs_ -->|satisfies| External_Folders_Support;
+    _config_rs__https___github_com_reqflow_reqflow_src_config_rs_["config.rs"];
+    click _config_rs__https___github_com_reqflow_reqflow_src_config_rs_ "https://github.com/reqflow/reqflow/src#config.rs";
+    class _config_rs__https___github_com_reqflow_reqflow_src_config_rs_ satisfies;
 ```
 
 
@@ -273,7 +279,7 @@ paths:
 ```
 
 #### Relations
-  * refine: [UserRequirements.md/Support for Distributed Requirements](../UserRequirements.md#support-for-distributed-requirements)
+  * derivedFrom: [UserRequirements.md/Support for Distributed Requirements](../UserRequirements.md#support-for-distributed-requirements)
   * satisfiedBy: [config.rs](https://github.com/reqflow/reqflow/src/config.rs)
 
 ---
@@ -297,6 +303,10 @@ graph LR;
     _UserRequirements_md_Bootstrap_model_struture__UserRequirements_md_bootstrap_model_struture_["UserRequirements.md/Bootstrap model struture"];
     click _UserRequirements_md_Bootstrap_model_struture__UserRequirements_md_bootstrap_model_struture_ "UserRequirements.md#bootstrap-model-struture";
     class _UserRequirements_md_Bootstrap_model_struture__UserRequirements_md_bootstrap_model_struture_ requirement;
+    _init_rs__https___github_com_reqflow_reqflow_src_init_rs_ -->|satisfies| Initialization_Command;
+    _init_rs__https___github_com_reqflow_reqflow_src_init_rs_["init.rs"];
+    click _init_rs__https___github_com_reqflow_reqflow_src_init_rs_ "https://github.com/reqflow/reqflow/src#init.rs";
+    class _init_rs__https___github_com_reqflow_reqflow_src_init_rs_ satisfies;
     Initialization_Command_Configuration_Check["Initialization Command Configuration Check"];
     click Initialization_Command_Configuration_Check "SystemRequirements/Requirements.md#initialization-command-configuration-check";
     class Initialization_Command_Configuration_Check requirement;
@@ -304,6 +314,7 @@ graph LR;
     _Initialization_Command___initialization_command_["Initialization Command"];
     click _Initialization_Command___initialization_command_ "#initialization-command";
     class _Initialization_Command___initialization_command_ requirement;
+    _init_rs__https___github_com_reqflow_reqflow_src_init_rs_ -->|satisfies| Initialization_Command_Configuration_Check;
     Index_Generator_Implementation["Index Generator Implementation"];
     click Index_Generator_Implementation "SystemRequirements/Requirements.md#index-generator-implementation";
     class Index_Generator_Implementation requirement;
@@ -311,6 +322,10 @@ graph LR;
     _UserRequirements_md_Generate_Documentation_Index__UserRequirements_md_generate_documentation_index_["UserRequirements.md/Generate Documentation Index"];
     click _UserRequirements_md_Generate_Documentation_Index__UserRequirements_md_generate_documentation_index_ "UserRequirements.md#generate-documentation-index";
     class _UserRequirements_md_Generate_Documentation_Index__UserRequirements_md_generate_documentation_index_ requirement;
+    _linting_index_generator_rs__https___github_com_reqflow_reqflow_src_linting_index_generator_rs_ -->|satisfies| Index_Generator_Implementation;
+    _linting_index_generator_rs__https___github_com_reqflow_reqflow_src_linting_index_generator_rs_["linting/index_generator.rs"];
+    click _linting_index_generator_rs__https___github_com_reqflow_reqflow_src_linting_index_generator_rs_ "https://github.com/reqflow/reqflow/src/linting#index_generator.rs";
+    class _linting_index_generator_rs__https___github_com_reqflow_reqflow_src_linting_index_generator_rs_ satisfies;
     Markdown_Content_Summary_Extraction["Markdown Content Summary Extraction"];
     click Markdown_Content_Summary_Extraction "SystemRequirements/Requirements.md#markdown-content-summary-extraction";
     class Markdown_Content_Summary_Extraction requirement;
@@ -318,10 +333,12 @@ graph LR;
     _Index_Generator_Implementation___index_generator_implementation_["Index Generator Implementation"];
     click _Index_Generator_Implementation___index_generator_implementation_ "#index-generator-implementation";
     class _Index_Generator_Implementation___index_generator_implementation_ requirement;
+    _linting_index_generator_rs__https___github_com_reqflow_reqflow_src_linting_index_generator_rs_ -->|satisfies| Markdown_Content_Summary_Extraction;
     Proper_Link_URL_Generation["Proper Link URL Generation"];
     click Proper_Link_URL_Generation "SystemRequirements/Requirements.md#proper-link-url-generation";
     class Proper_Link_URL_Generation requirement;
     _Index_Generator_Implementation___index_generator_implementation_ --o|contains| Proper_Link_URL_Generation;
+    _linting_index_generator_rs__https___github_com_reqflow_reqflow_src_linting_index_generator_rs_ -->|satisfies| Proper_Link_URL_Generation;
     HTML_Navigation_Enhancement["HTML Navigation Enhancement"];
     click HTML_Navigation_Enhancement "SystemRequirements/Requirements.md#html-navigation-enhancement";
     class HTML_Navigation_Enhancement requirement;
@@ -329,6 +346,14 @@ graph LR;
     _UserRequirements_md_Documentation_Index_HTML_Integration__UserRequirements_md_documentation_index_html_integration_["UserRequirements.md/Documentation Index HTML Integration"];
     click _UserRequirements_md_Documentation_Index_HTML_Integration__UserRequirements_md_documentation_index_html_integration_ "UserRequirements.md#documentation-index-html-integration";
     class _UserRequirements_md_Documentation_Index_HTML_Integration__UserRequirements_md_documentation_index_html_integration_ requirement;
+    _html_rs__https___github_com_reqflow_reqflow_src_html_rs_ -->|satisfies| HTML_Navigation_Enhancement;
+    _html_rs__https___github_com_reqflow_reqflow_src_html_rs_["html.rs"];
+    click _html_rs__https___github_com_reqflow_reqflow_src_html_rs_ "https://github.com/reqflow/reqflow/src#html.rs";
+    class _html_rs__https___github_com_reqflow_reqflow_src_html_rs_ satisfies;
+    _html_export_rs__https___github_com_reqflow_reqflow_src_html_export_rs_ -->|satisfies| HTML_Navigation_Enhancement;
+    _html_export_rs__https___github_com_reqflow_reqflow_src_html_export_rs_["html_export.rs"];
+    click _html_export_rs__https___github_com_reqflow_reqflow_src_html_export_rs_ "https://github.com/reqflow/reqflow/src#html_export.rs";
+    class _html_export_rs__https___github_com_reqflow_reqflow_src_html_export_rs_ satisfies;
     LLM_Context_Command["LLM Context Command"];
     click LLM_Context_Command "SystemRequirements/Requirements.md#llm-context-command";
     class LLM_Context_Command requirement;
@@ -336,6 +361,10 @@ graph LR;
     _UserRequirements_md_Provide_Actionable_Model_Improvement_Suggestions__UserRequirements_md_provide_actionable_model_improvement_suggestions_["UserRequirements.md/Provide Actionable Model Improvement Suggestions"];
     click _UserRequirements_md_Provide_Actionable_Model_Improvement_Suggestions__UserRequirements_md_provide_actionable_model_improvement_suggestions_ "UserRequirements.md#provide-actionable-model-improvement-suggestions";
     class _UserRequirements_md_Provide_Actionable_Model_Improvement_Suggestions__UserRequirements_md_provide_actionable_model_improvement_suggestions_ requirement;
+    _main_rs__https___github_com_reqflow_reqflow_src_main_rs_ -->|satisfies| LLM_Context_Command;
+    _main_rs__https___github_com_reqflow_reqflow_src_main_rs_["main.rs"];
+    click _main_rs__https___github_com_reqflow_reqflow_src_main_rs_ "https://github.com/reqflow/reqflow/src#main.rs";
+    class _main_rs__https___github_com_reqflow_reqflow_src_main_rs_ satisfies;
     JSON_Validation_Output_Format["JSON Validation Output Format"];
     click JSON_Validation_Output_Format "SystemRequirements/Requirements.md#json-validation-output-format";
     class JSON_Validation_Output_Format requirement;
@@ -343,10 +372,15 @@ graph LR;
     _UserStories_md_Validating_Structures__UserStories_md_validating_structures_["UserStories.md/Validating Structures"];
     click _UserStories_md_Validating_Structures__UserStories_md_validating_structures_ "UserStories.md#validating-structures";
     class _UserStories_md_Validating_Structures__UserStories_md_validating_structures_ requirement;
+    _validation_rs__https___github_com_reqflow_reqflow_src_validation_rs_ -->|satisfies| JSON_Validation_Output_Format;
+    _validation_rs__https___github_com_reqflow_reqflow_src_validation_rs_["validation.rs"];
+    click _validation_rs__https___github_com_reqflow_reqflow_src_validation_rs_ "https://github.com/reqflow/reqflow/src#validation.rs";
+    class _validation_rs__https___github_com_reqflow_reqflow_src_validation_rs_ satisfies;
     Multiple_Validation_Modes_Support["Multiple Validation Modes Support"];
     click Multiple_Validation_Modes_Support "SystemRequirements/Requirements.md#multiple-validation-modes-support";
     class Multiple_Validation_Modes_Support requirement;
     Multiple_Validation_Modes_Support ==>|refines| _UserStories_md_Validating_Structures__UserStories_md_validating_structures_;
+    _validation_rs__https___github_com_reqflow_reqflow_src_validation_rs_ -->|satisfies| Multiple_Validation_Modes_Support;
     Interactive_Mermaid_Diagram_Node_Behavior["Interactive Mermaid Diagram Node Behavior"];
     click Interactive_Mermaid_Diagram_Node_Behavior "SystemRequirements/Requirements.md#interactive-mermaid-diagram-node-behavior";
     class Interactive_Mermaid_Diagram_Node_Behavior requirement;
@@ -354,6 +388,8 @@ graph LR;
     _UserRequirements_md_Interactive_Mermaid_Diagrams__UserRequirements_md_interactive_mermaid_diagrams_["UserRequirements.md/Interactive Mermaid Diagrams"];
     click _UserRequirements_md_Interactive_Mermaid_Diagrams__UserRequirements_md_interactive_mermaid_diagrams_ "UserRequirements.md#interactive-mermaid-diagrams";
     class _UserRequirements_md_Interactive_Mermaid_Diagrams__UserRequirements_md_interactive_mermaid_diagrams_ requirement;
+    _html_rs__https___github_com_reqflow_reqflow_src_html_rs_ -->|satisfies| Interactive_Mermaid_Diagram_Node_Behavior;
+    _html_export_rs__https___github_com_reqflow_reqflow_src_html_export_rs_ -->|satisfies| Interactive_Mermaid_Diagram_Node_Behavior;
     Command_Line_Configuration_Overrides["Command Line Configuration Overrides"];
     click Command_Line_Configuration_Overrides "SystemRequirements/Requirements.md#command-line-configuration-overrides";
     class Command_Line_Configuration_Overrides requirement;
@@ -361,6 +397,7 @@ graph LR;
     _UserRequirements_md_Project_Configuration_with_YAML__UserRequirements_md_project_configuration_with_yaml_["UserRequirements.md/Project Configuration with YAML"];
     click _UserRequirements_md_Project_Configuration_with_YAML__UserRequirements_md_project_configuration_with_yaml_ "UserRequirements.md#project-configuration-with-yaml";
     class _UserRequirements_md_Project_Configuration_with_YAML__UserRequirements_md_project_configuration_with_yaml_ requirement;
+    _main_rs__https___github_com_reqflow_reqflow_src_main_rs_ -->|satisfies| Command_Line_Configuration_Overrides;
     Design_Specification_Document_Special_Handling["Design Specification Document Special Handling"];
     click Design_Specification_Document_Special_Handling "SystemRequirements/Requirements.md#design-specification-document-special-handling";
     class Design_Specification_Document_Special_Handling requirement;
@@ -368,6 +405,10 @@ graph LR;
     _UserStories_md_Managing_MBSE_Models__UserStories_md_managing_mbse_models_["UserStories.md/Managing MBSE Models"];
     click _UserStories_md_Managing_MBSE_Models__UserStories_md_managing_mbse_models_ "UserStories.md#managing-mbse-models";
     class _UserStories_md_Managing_MBSE_Models__UserStories_md_managing_mbse_models_ requirement;
+    _model_rs__https___github_com_reqflow_reqflow_src_model_rs_ -->|satisfies| Design_Specification_Document_Special_Handling;
+    _model_rs__https___github_com_reqflow_reqflow_src_model_rs_["model.rs"];
+    click _model_rs__https___github_com_reqflow_reqflow_src_model_rs_ "https://github.com/reqflow/reqflow/src#model.rs";
+    class _model_rs__https___github_com_reqflow_reqflow_src_model_rs_ satisfies;
     Relation_Type_Validation["Relation Type Validation"];
     click Relation_Type_Validation "SystemRequirements/Requirements.md#relation-type-validation";
     class Relation_Type_Validation requirement;
@@ -382,18 +423,23 @@ graph LR;
     Multi_Pass_Linting_Capability["Multi-Pass Linting Capability"];
     click Multi_Pass_Linting_Capability "SystemRequirements/Requirements.md#multi-pass-linting-capability";
     class Multi_Pass_Linting_Capability requirement;
-    Multi_Pass_Linting_Capability ==>|refines| _UserRequirements_md_Format_Consistency_Enforcement__UserRequirements_md_format_consistency_enforcement_;
+    Multi_Pass_Linting_Capability -.->|deriveReqT| _UserRequirements_md_Format_Consistency_Enforcement__UserRequirements_md_format_consistency_enforcement_;
     _UserRequirements_md_Format_Consistency_Enforcement__UserRequirements_md_format_consistency_enforcement_["UserRequirements.md/Format Consistency Enforcement"];
     click _UserRequirements_md_Format_Consistency_Enforcement__UserRequirements_md_format_consistency_enforcement_ "UserRequirements.md#format-consistency-enforcement";
     class _UserRequirements_md_Format_Consistency_Enforcement__UserRequirements_md_format_consistency_enforcement_ requirement;
+    _linting_mod_rs__https___github_com_reqflow_reqflow_src_linting_mod_rs_ -->|satisfies| Multi_Pass_Linting_Capability;
+    _linting_mod_rs__https___github_com_reqflow_reqflow_src_linting_mod_rs_["linting/mod.rs"];
+    click _linting_mod_rs__https___github_com_reqflow_reqflow_src_linting_mod_rs_ "https://github.com/reqflow/reqflow/src/linting#mod.rs";
+    class _linting_mod_rs__https___github_com_reqflow_reqflow_src_linting_mod_rs_ satisfies;
     Comprehensive_HTML_Generation["Comprehensive HTML Generation"];
     click Comprehensive_HTML_Generation "SystemRequirements/Requirements.md#comprehensive-html-generation";
     class Comprehensive_HTML_Generation requirement;
     Comprehensive_HTML_Generation ==>|refines| _UserStories_md_Managing_MBSE_Models__UserStories_md_managing_mbse_models_;
+    _html_export_rs__https___github_com_reqflow_reqflow_src_html_export_rs_ -->|satisfies| Comprehensive_HTML_Generation;
     Detailed_Error_Handling_and_Logging["Detailed Error Handling and Logging"];
     click Detailed_Error_Handling_and_Logging "SystemRequirements/Requirements.md#detailed-error-handling-and-logging";
     class Detailed_Error_Handling_and_Logging requirement;
-    Detailed_Error_Handling_and_Logging ==>|refines| _UserRequirements_md_Enhanced_Validation_Error_Reporting__UserRequirements_md_enhanced_validation_error_reporting_;
+    Detailed_Error_Handling_and_Logging -.->|deriveReqT| _UserRequirements_md_Enhanced_Validation_Error_Reporting__UserRequirements_md_enhanced_validation_error_reporting_;
     _UserRequirements_md_Enhanced_Validation_Error_Reporting__UserRequirements_md_enhanced_validation_error_reporting_["UserRequirements.md/Enhanced Validation Error Reporting"];
     click _UserRequirements_md_Enhanced_Validation_Error_Reporting__UserRequirements_md_enhanced_validation_error_reporting_ "UserRequirements.md#enhanced-validation-error-reporting";
     class _UserRequirements_md_Enhanced_Validation_Error_Reporting__UserRequirements_md_enhanced_validation_error_reporting_ requirement;
@@ -405,6 +451,7 @@ graph LR;
     click File_Content_Caching_for_Performance "SystemRequirements/Requirements.md#file-content-caching-for-performance";
     class File_Content_Caching_for_Performance requirement;
     File_Content_Caching_for_Performance ==>|refines| _UserStories_md_Managing_MBSE_Models__UserStories_md_managing_mbse_models_;
+    _model_rs__https___github_com_reqflow_reqflow_src_model_rs_ -->|satisfies| File_Content_Caching_for_Performance;
 ```
 
 
@@ -415,7 +462,7 @@ graph LR;
 The system shall implement an `init` command that bootstraps a basic ReqFlow project structure with example requirements, folder hierarchy, and a configuration file.
 
 #### Relations
-  * refine: [UserRequirements.md/Bootstrap model struture](UserRequirements.md#bootstrap-model-struture)
+  * derivedFrom: [UserRequirements.md/Bootstrap model struture](UserRequirements.md#bootstrap-model-struture)
   * satisfiedBy: [init.rs](https://github.com/reqflow/reqflow/src/init.rs)
 
 ---
@@ -437,7 +484,7 @@ The system shall prevent the initialization command from modifying an existing p
 The system shall implement an IndexGenerator component that traverses the specifications directory structure and creates a hierarchical index.md file with links and summaries.
 
 #### Relations
-  * refine: [UserRequirements.md/Generate Documentation Index](UserRequirements.md#generate-documentation-index)
+  * derivedFrom: [UserRequirements.md/Generate Documentation Index](UserRequirements.md#generate-documentation-index)
   * satisfiedBy: [linting/index_generator.rs](https://github.com/reqflow/reqflow/src/linting/index_generator.rs)
 
 ---
@@ -467,8 +514,9 @@ The system shall generate URLs in the index file with both Markdown (.md) and HT
 The system shall enhance the HTML generator to process index.md as a special file, adding navigation elements and ensuring it serves as the primary entry point.
 
 #### Relations
-  * refine: [UserRequirements.md/Documentation Index HTML Integration](UserRequirements.md#documentation-index-html-integration)
+  * derivedFrom: [UserRequirements.md/Documentation Index HTML Integration](UserRequirements.md#documentation-index-html-integration)
   * satisfiedBy: [html.rs](https://github.com/reqflow/reqflow/src/html.rs)
+  * satisfiedBy: [html_export.rs](https://github.com/reqflow/reqflow/src/html_export.rs)
 
 ---
 
@@ -487,7 +535,7 @@ The system shall provide a command-line option `--llm-context` that outputs comp
 The system shall provide validation results in machine-readable JSON format to facilitate integration with CI/CD pipelines and automated reporting tools.
 
 #### Relations
-  * refine: [UserStories.md/Validating Structures](UserStories.md#validating-structures)
+  * derivedFrom: [UserRequirements.md/Enhanced Validation Error Reporting](UserRequirements.md#enhanced-validation-error-reporting)
   * satisfiedBy: [validation.rs](https://github.com/reqflow/reqflow/src/validation.rs)
 
 ---
@@ -497,7 +545,7 @@ The system shall provide validation results in machine-readable JSON format to f
 The system shall support different validation modes (validate_markdown, validate_relations, validate_all) with configurable behaviors to accommodate different use cases.
 
 #### Relations
-  * refine: [UserStories.md/Validating Structures](UserStories.md#validating-structures)
+  * derivedFrom: [UserRequirements.md/Enhanced Validation Error Reporting](UserRequirements.md#enhanced-validation-error-reporting)
   * satisfiedBy: [validation.rs](https://github.com/reqflow/reqflow/src/validation.rs)
 
 ---
@@ -507,8 +555,9 @@ The system shall support different validation modes (validate_markdown, validate
 The system shall implement interactive click behavior for Mermaid diagram nodes that redirects to the referenced element when clicked.
 
 #### Relations
-  * refine: [UserRequirements.md/Interactive Mermaid Diagrams](UserRequirements.md#interactive-mermaid-diagrams)
+  * derivedFrom: [UserRequirements.md/Interactive Mermaid Diagrams](UserRequirements.md#interactive-mermaid-diagrams)
   * satisfiedBy: [html.rs](https://github.com/reqflow/reqflow/src/html.rs)
+  * satisfiedBy: [html_export.rs](https://github.com/reqflow/reqflow/src/html_export.rs)
 
 ---
 
@@ -517,18 +566,19 @@ The system shall implement interactive click behavior for Mermaid diagram nodes 
 The system shall allow command line arguments to override YAML configuration settings to provide flexibility without modifying configuration files.
 
 #### Relations
-  * refine: [UserRequirements.md/Project Configuration with YAML](UserRequirements.md#project-configuration-with-yaml)
+  * derivedFrom: [UserRequirements.md/Project Configuration with YAML](UserRequirements.md#project-configuration-with-yaml)
   * satisfiedBy: [main.rs](https://github.com/reqflow/reqflow/src/main.rs)
 
 ---
 
-### Design Specification Document Special Handling
+### Unstructured Documents
 
-The system shall provide special handling for Design Specification Documents when collecting elements to accommodate their unique structure and purpose.
+The system shall allow unstructured documents to be ignored during processing.
+TODO: add requirment that defines a config filter out patterns.
 
 #### Relations
-  * refine: [UserStories.md/Managing MBSE Models](UserStories.md#managing-mbse-models)
-  * satisfiedBy: [model.rs](https://github.com/reqflow/reqflow/src/model.rs)
+  * derivedFrom: [UserRequirements.md/Unstructured Documents](UserRequirements.md/unstructured-documents)
+
 
 ---
 
@@ -537,7 +587,7 @@ The system shall provide special handling for Design Specification Documents whe
 The system shall validate relation types against a defined vocabulary and provide clear error messages for unsupported relation types, including suggestions for the correct relation types.
 
 #### Relations
-  * refine: [UserRequirements.md/Enhanced Validation Error Reporting](../UserRequirements.md#enhanced-validation-error-reporting)
+  * derivedFrom: [UserRequirements.md/Enhanced Validation Error Reporting](../UserRequirements.md#enhanced-validation-error-reporting)
   * satisfiedBy: [src/relation.rs](https://github.com/reqflow/reqflow/src/relation.rs)
 
 ---
@@ -552,13 +602,13 @@ The system shall support multi-pass linting with a configurable iteration limit 
 
 ---
 
-### Comprehensive HTML Generation
+### HTML Export
 
 The system shall generate HTML output for all markdown files, not just requirements documents, to provide consistent representation of the entire model.
 
 #### Relations
-  * refine: [UserStories.md/Managing MBSE Models](UserStories.md#managing-mbse-models)
-  * satisfiedBy: [html.rs](https://github.com/reqflow/reqflow/src/html.rs)
+  * derivedFrom: [UserRequirements.md/Export HTML specifications](UserRequirements.md/#export-html-specifications)
+  * satisfiedBy: [html_export.rs](https://github.com/reqflow/reqflow/src/html_export.rs)
 
 ---
 
@@ -577,7 +627,7 @@ The system shall implement detailed error handling and logging throughout the ap
 The system shall cache file contents during processing to optimize performance for operations that require multiple passes through the same files.
 
 #### Relations
-  * refine: [UserStories.md/Managing MBSE Models](UserStories.md#managing-mbse-models)
+  * derivedFrom: [UserRequirements.md/Efficient Processings](UserRequirements.md/efficient_processings)
   * satisfiedBy: [model.rs](https://github.com/reqflow/reqflow/src/model.rs)
   
   
@@ -598,13 +648,18 @@ graph LR;
     Requirements_Processing["Requirements Processing"];
     click Requirements_Processing "SystemRequirements/Requirements.md#requirements-processing";
     class Requirements_Processing requirement;
-    Requirements_Processing ==>|refines| _UserRequirements_md_Support_for_Distributed_Requirements_____UserRequirements_md_support_for_distributed_requirements_;
+    Requirements_Processing -.->|deriveReqT| _UserRequirements_md_Support_for_Distributed_Requirements_____UserRequirements_md_support_for_distributed_requirements_;
     _UserRequirements_md_Support_for_Distributed_Requirements_____UserRequirements_md_support_for_distributed_requirements_["UserRequirements.md/Support for Distributed Requirements"];
     click _UserRequirements_md_Support_for_Distributed_Requirements_____UserRequirements_md_support_for_distributed_requirements_ "../UserRequirements.md#support-for-distributed-requirements";
     class _UserRequirements_md_Support_for_Distributed_Requirements_____UserRequirements_md_support_for_distributed_requirements_ requirement;
+    _model_rs__https___github_com_reqflow_reqflow_src_model_rs_ -->|satisfies| Requirements_Processing;
+    _model_rs__https___github_com_reqflow_reqflow_src_model_rs_["model.rs"];
+    click _model_rs__https___github_com_reqflow_reqflow_src_model_rs_ "https://github.com/reqflow/reqflow/src#model.rs";
+    class _model_rs__https___github_com_reqflow_reqflow_src_model_rs_ satisfies;
     Requirements_Files_Search_and_Detection["Requirements Files Search and Detection"];
     click Requirements_Files_Search_and_Detection "SystemRequirements/Requirements.md#requirements-files-search-and-detection";
     class Requirements_Files_Search_and_Detection requirement;
+    _model_rs__https___github_com_reqflow_reqflow_src_model_rs_ -->|satisfies| Requirements_Files_Search_and_Detection;
 ```
 
 
@@ -655,10 +710,58 @@ graph LR;
     Configurable_Filename_Exclusion_Patterns["Configurable Filename Exclusion Patterns"];
     click Configurable_Filename_Exclusion_Patterns "SystemRequirements/Requirements.md#configurable-filename-exclusion-patterns";
     class Configurable_Filename_Exclusion_Patterns requirement;
-    Configurable_Filename_Exclusion_Patterns ==>|refines| _UserRequirements_md_Project_Configuration_with_YAML_____UserRequirements_md_project_configuration_with_yaml_;
+    Configurable_Filename_Exclusion_Patterns -.->|deriveReqT| _UserRequirements_md_Project_Configuration_with_YAML_____UserRequirements_md_project_configuration_with_yaml_;
     _UserRequirements_md_Project_Configuration_with_YAML_____UserRequirements_md_project_configuration_with_yaml_["UserRequirements.md/Project Configuration with YAML"];
     click _UserRequirements_md_Project_Configuration_with_YAML_____UserRequirements_md_project_configuration_with_yaml_ "../UserRequirements.md#project-configuration-with-yaml";
     class _UserRequirements_md_Project_Configuration_with_YAML_____UserRequirements_md_project_configuration_with_yaml_ requirement;
+    _config_rs__https___github_com_reqflow_reqflow_src_config_rs_ -->|satisfies| Configurable_Filename_Exclusion_Patterns;
+    _config_rs__https___github_com_reqflow_reqflow_src_config_rs_["config.rs"];
+    click _config_rs__https___github_com_reqflow_reqflow_src_config_rs_ "https://github.com/reqflow/reqflow/src#config.rs";
+    class _config_rs__https___github_com_reqflow_reqflow_src_config_rs_ satisfies;
+    Mermaid_Diagram_Format_Conversion["Mermaid Diagram Format Conversion"];
+    click Mermaid_Diagram_Format_Conversion "SystemRequirements/Requirements.md#mermaid-diagram-format-conversion";
+    class Mermaid_Diagram_Format_Conversion requirement;
+    Mermaid_Diagram_Format_Conversion -.->|deriveReqT| _UserRequirements_md_Export_Diagrams_in_Standard_Formats_____UserRequirements_md_export_diagrams_in_standard_formats_;
+    _UserRequirements_md_Export_Diagrams_in_Standard_Formats_____UserRequirements_md_export_diagrams_in_standard_formats_["UserRequirements.md/Export Diagrams in Standard Formats"];
+    click _UserRequirements_md_Export_Diagrams_in_Standard_Formats_____UserRequirements_md_export_diagrams_in_standard_formats_ "../UserRequirements.md#export-diagrams-in-standard-formats";
+    class _UserRequirements_md_Export_Diagrams_in_Standard_Formats_____UserRequirements_md_export_diagrams_in_standard_formats_ requirement;
+    _markdown_rs__https___github_com_reqflow_reqflow_src_markdown_rs_ -->|satisfies| Mermaid_Diagram_Format_Conversion;
+    _markdown_rs__https___github_com_reqflow_reqflow_src_markdown_rs_["markdown.rs"];
+    click _markdown_rs__https___github_com_reqflow_reqflow_src_markdown_rs_ "https://github.com/reqflow/reqflow/src#markdown.rs";
+    class _markdown_rs__https___github_com_reqflow_reqflow_src_markdown_rs_ satisfies;
+    Visual_Differential_Rendering["Visual Differential Rendering"];
+    click Visual_Differential_Rendering "SystemRequirements/Requirements.md#visual-differential-rendering";
+    class Visual_Differential_Rendering requirement;
+    Visual_Differential_Rendering -.->|deriveReqT| _UserRequirements_md_Highlight_Changes_in_Diagrams_____UserRequirements_md_highlight_changes_in_diagrams_;
+    _UserRequirements_md_Highlight_Changes_in_Diagrams_____UserRequirements_md_highlight_changes_in_diagrams_["UserRequirements.md/Highlight Changes in Diagrams"];
+    click _UserRequirements_md_Highlight_Changes_in_Diagrams_____UserRequirements_md_highlight_changes_in_diagrams_ "../UserRequirements.md#highlight-changes-in-diagrams";
+    class _UserRequirements_md_Highlight_Changes_in_Diagrams_____UserRequirements_md_highlight_changes_in_diagrams_ requirement;
+    SysML_Compatible_Relationship_Rendering["SysML-Compatible Relationship Rendering"];
+    click SysML_Compatible_Relationship_Rendering "SystemRequirements/Requirements.md#sysml-compatible-relationship-rendering";
+    class SysML_Compatible_Relationship_Rendering requirement;
+    SysML_Compatible_Relationship_Rendering -.->|deriveReqT| _UserRequirements_md_Visualize_Model_Relationships_____UserRequirements_md_visualize_model_relationships_;
+    _UserRequirements_md_Visualize_Model_Relationships_____UserRequirements_md_visualize_model_relationships_["UserRequirements.md/Visualize Model Relationships"];
+    click _UserRequirements_md_Visualize_Model_Relationships_____UserRequirements_md_visualize_model_relationships_ "../UserRequirements.md#visualize-model-relationships";
+    class _UserRequirements_md_Visualize_Model_Relationships_____UserRequirements_md_visualize_model_relationships_ requirement;
+    _markdown_rs__https___github_com_reqflow_reqflow_src_markdown_rs_ -->|satisfies| SysML_Compatible_Relationship_Rendering;
+    Relationship_Type_Filter_Implementation["Relationship Type Filter Implementation"];
+    click Relationship_Type_Filter_Implementation "SystemRequirements/Requirements.md#relationship-type-filter-implementation";
+    class Relationship_Type_Filter_Implementation requirement;
+    Relationship_Type_Filter_Implementation -.->|deriveReqT| _UserRequirements_md_Filter_Relationships_by_Type_____UserRequirements_md_filter_relationships_by_type_;
+    _UserRequirements_md_Filter_Relationships_by_Type_____UserRequirements_md_filter_relationships_by_type_["UserRequirements.md/Filter Relationships by Type"];
+    click _UserRequirements_md_Filter_Relationships_by_Type_____UserRequirements_md_filter_relationships_by_type_ "../UserRequirements.md#filter-relationships-by-type";
+    class _UserRequirements_md_Filter_Relationships_by_Type_____UserRequirements_md_filter_relationships_by_type_ requirement;
+    Diagram_Storage_Path_Configuration["Diagram Storage Path Configuration"];
+    click Diagram_Storage_Path_Configuration "SystemRequirements/Requirements.md#diagram-storage-path-configuration";
+    class Diagram_Storage_Path_Configuration requirement;
+    Diagram_Storage_Path_Configuration -.->|deriveReqT| _UserRequirements_md_Store_Automated_Diagrams_in_Designated_Locations_____UserRequirements_md_store_automated_diagrams_in_designated_locations_;
+    _UserRequirements_md_Store_Automated_Diagrams_in_Designated_Locations_____UserRequirements_md_store_automated_diagrams_in_designated_locations_["UserRequirements.md/Store Automated Diagrams in Designated Locations"];
+    click _UserRequirements_md_Store_Automated_Diagrams_in_Designated_Locations_____UserRequirements_md_store_automated_diagrams_in_designated_locations_ "../UserRequirements.md#store-automated-diagrams-in-designated-locations";
+    class _UserRequirements_md_Store_Automated_Diagrams_in_Designated_Locations_____UserRequirements_md_store_automated_diagrams_in_designated_locations_ requirement;
+    _model_rs__https___github_com_reqflow_reqflow_src_model_rs_ -->|satisfies| Diagram_Storage_Path_Configuration;
+    _model_rs__https___github_com_reqflow_reqflow_src_model_rs_["model.rs"];
+    click _model_rs__https___github_com_reqflow_reqflow_src_model_rs_ "https://github.com/reqflow/reqflow/src#model.rs";
+    class _model_rs__https___github_com_reqflow_reqflow_src_model_rs_ satisfies;
 ```
 
 
@@ -713,7 +816,6 @@ The system shall implement a visual differential rendering algorithm that compar
 ### SysML-Compatible Relationship Rendering
 
 The system shall implement a relationship rendering engine that adheres to SysML notation standards, defining specific arrow styles, line types, and visual properties for each relationship type to ensure diagram consistency and standards compliance.
-
 
 #### Details
 
@@ -795,6 +897,77 @@ The system shall implement a configurable storage mechanism for generated diagra
 
 ## Traceability Matrix Generation
 
+```mermaid
+graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef satisfies fill:#fff2cc,stroke:#ffcc00,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef paragraph fill:#efefef,stroke:#999999,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+
+    Traceability_Matrix_Builder_Implementation["Traceability Matrix Builder Implementation"];
+    click Traceability_Matrix_Builder_Implementation "SystemRequirements/Requirements.md#traceability-matrix-builder-implementation";
+    class Traceability_Matrix_Builder_Implementation requirement;
+    Traceability_Matrix_Builder_Implementation -.->|deriveReqT| _UserRequirements_md_Create_Traceability_Matrices_____UserRequirements_md_create_traceability_matrices_;
+    _UserRequirements_md_Create_Traceability_Matrices_____UserRequirements_md_create_traceability_matrices_["UserRequirements.md/Create Traceability Matrices"];
+    click _UserRequirements_md_Create_Traceability_Matrices_____UserRequirements_md_create_traceability_matrices_ "../UserRequirements.md#create-traceability-matrices";
+    class _UserRequirements_md_Create_Traceability_Matrices_____UserRequirements_md_create_traceability_matrices_ requirement;
+    _model_rs__https___github_com_reqflow_reqflow_src_model_rs_ -->|satisfies| Traceability_Matrix_Builder_Implementation;
+    _model_rs__https___github_com_reqflow_reqflow_src_model_rs_["model.rs"];
+    click _model_rs__https___github_com_reqflow_reqflow_src_model_rs_ "https://github.com/reqflow/reqflow/src#model.rs";
+    class _model_rs__https___github_com_reqflow_reqflow_src_model_rs_ satisfies;
+    Relation_Based_Matrix_View_Generator["Relation-Based Matrix View Generator"];
+    click Relation_Based_Matrix_View_Generator "SystemRequirements/Requirements.md#relation-based-matrix-view-generator";
+    class Relation_Based_Matrix_View_Generator requirement;
+    Relation_Based_Matrix_View_Generator -.->|deriveReqT| _UserRequirements_md_Support_Relation_Based_Views_____UserRequirements_md_support_relation_based_views_;
+    _UserRequirements_md_Support_Relation_Based_Views_____UserRequirements_md_support_relation_based_views_["UserRequirements.md/Support Relation-Based Views"];
+    click _UserRequirements_md_Support_Relation_Based_Views_____UserRequirements_md_support_relation_based_views_ "../UserRequirements.md#support-relation-based-views";
+    class _UserRequirements_md_Support_Relation_Based_Views_____UserRequirements_md_support_relation_based_views_ requirement;
+    _model_rs__https___github_com_reqflow_reqflow_src_model_rs_ -->|satisfies| Relation_Based_Matrix_View_Generator;
+    Markdown_Matrix_Formatter["Markdown Matrix Formatter"];
+    click Markdown_Matrix_Formatter "SystemRequirements/Requirements.md#markdown-matrix-formatter";
+    class Markdown_Matrix_Formatter requirement;
+    Markdown_Matrix_Formatter -.->|deriveReqT| _UserRequirements_md_Markdown_Based_Default_Format_____UserRequirements_md_markdown_based_default_format_;
+    _UserRequirements_md_Markdown_Based_Default_Format_____UserRequirements_md_markdown_based_default_format_["UserRequirements.md/Markdown-Based Default Format"];
+    click _UserRequirements_md_Markdown_Based_Default_Format_____UserRequirements_md_markdown_based_default_format_ "../UserRequirements.md#markdown-based-default-format";
+    class _UserRequirements_md_Markdown_Based_Default_Format_____UserRequirements_md_markdown_based_default_format_ requirement;
+    _model_rs__https___github_com_reqflow_reqflow_src_model_rs_ -->|satisfies| Markdown_Matrix_Formatter;
+    Matrix_File_Output_Handler["Matrix File Output Handler"];
+    click Matrix_File_Output_Handler "SystemRequirements/Requirements.md#matrix-file-output-handler";
+    class Matrix_File_Output_Handler requirement;
+    Matrix_File_Output_Handler -.->|deriveReqT| _UserRequirements_md_Save_matrices_to_designated_files_____UserRequirements_md_save_matrices_to_designated_files_;
+    _UserRequirements_md_Save_matrices_to_designated_files_____UserRequirements_md_save_matrices_to_designated_files_["UserRequirements.md/Save matrices to designated files"];
+    click _UserRequirements_md_Save_matrices_to_designated_files_____UserRequirements_md_save_matrices_to_designated_files_ "../UserRequirements.md#save-matrices-to-designated-files";
+    class _UserRequirements_md_Save_matrices_to_designated_files_____UserRequirements_md_save_matrices_to_designated_files_ requirement;
+    _model_rs__https___github_com_reqflow_reqflow_src_model_rs_ -->|satisfies| Matrix_File_Output_Handler;
+    Verification_Checkbox_Implementation["Verification Checkbox Implementation"];
+    click Verification_Checkbox_Implementation "SystemRequirements/Requirements.md#verification-checkbox-implementation";
+    class Verification_Checkbox_Implementation requirement;
+    Verification_Checkbox_Implementation -.->|deriveReqT| _UserRequirements_md_Include_Verification_Checkboxes_____UserRequirements_md_include_verification_checkboxes_;
+    _UserRequirements_md_Include_Verification_Checkboxes_____UserRequirements_md_include_verification_checkboxes_["UserRequirements.md/Include Verification Checkboxes"];
+    click _UserRequirements_md_Include_Verification_Checkboxes_____UserRequirements_md_include_verification_checkboxes_ "../UserRequirements.md#include-verification-checkboxes";
+    class _UserRequirements_md_Include_Verification_Checkboxes_____UserRequirements_md_include_verification_checkboxes_ requirement;
+    Matrix_Export_Format_Handler["Matrix Export Format Handler"];
+    click Matrix_Export_Format_Handler "SystemRequirements/Requirements.md#matrix-export-format-handler";
+    class Matrix_Export_Format_Handler requirement;
+    Matrix_Export_Format_Handler -.->|deriveReqT| _UserRequirements_md_Export_Traceability_Matrix_____UserRequirements_md_export_traceability_matrix_;
+    _UserRequirements_md_Export_Traceability_Matrix_____UserRequirements_md_export_traceability_matrix_["UserRequirements.md/Export Traceability Matrix"];
+    click _UserRequirements_md_Export_Traceability_Matrix_____UserRequirements_md_export_traceability_matrix_ "../UserRequirements.md#export-traceability-matrix";
+    class _UserRequirements_md_Export_Traceability_Matrix_____UserRequirements_md_export_traceability_matrix_ requirement;
+    CI_CD_Pipeline_Integration_Interface["CI/CD Pipeline Integration Interface"];
+    click CI_CD_Pipeline_Integration_Interface "SystemRequirements/Requirements.md#ci/cd-pipeline-integration-interface";
+    class CI_CD_Pipeline_Integration_Interface requirement;
+    CI_CD_Pipeline_Integration_Interface -.->|deriveReqT| _UserRequirements_md_Support_CI_CD_Integration_____UserRequirements_md_support_ci_cd_integration_;
+    _UserRequirements_md_Support_CI_CD_Integration_____UserRequirements_md_support_ci_cd_integration_["UserRequirements.md/Support CI/CD Integration"];
+    click _UserRequirements_md_Support_CI_CD_Integration_____UserRequirements_md_support_ci_cd_integration_ "../UserRequirements.md#support-ci#cd-integration";
+    class _UserRequirements_md_Support_CI_CD_Integration_____UserRequirements_md_support_ci_cd_integration_ requirement;
+```
+
+
+---
+
 ### Traceability Matrix Builder Implementation
 
 The system shall implement a traceability matrix builder component that extracts relationship data from the model, processes it according to configured parameters, and generates structured matrix representations showing connections between requirements and other elements.
@@ -864,6 +1037,59 @@ The system shall implement an interface compatible with common CI/CD platforms t
 
 ## Validation Capabilities
 
+```mermaid
+graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef satisfies fill:#fff2cc,stroke:#ffcc00,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef paragraph fill:#efefef,stroke:#999999,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+
+    Markdown_Structure_Validator["Markdown Structure Validator"];
+    click Markdown_Structure_Validator "SystemRequirements/Requirements.md#markdown-structure-validator";
+    class Markdown_Structure_Validator requirement;
+    Markdown_Structure_Validator -.->|deriveReqT| _UserRequirements_md_Validate_Markdown_Structure_____UserRequirements_md_validate_markdown_structure_;
+    _UserRequirements_md_Validate_Markdown_Structure_____UserRequirements_md_validate_markdown_structure_["UserRequirements.md/Validate Markdown Structure"];
+    click _UserRequirements_md_Validate_Markdown_Structure_____UserRequirements_md_validate_markdown_structure_ "../UserRequirements.md#validate-markdown-structure";
+    class _UserRequirements_md_Validate_Markdown_Structure_____UserRequirements_md_validate_markdown_structure_ requirement;
+    _validation_rs__https___github_com_reqflow_reqflow_src_validation_rs_ -->|satisfies| Markdown_Structure_Validator;
+    _validation_rs__https___github_com_reqflow_reqflow_src_validation_rs_["validation.rs"];
+    click _validation_rs__https___github_com_reqflow_reqflow_src_validation_rs_ "https://github.com/reqflow/reqflow/src#validation.rs";
+    class _validation_rs__https___github_com_reqflow_reqflow_src_validation_rs_ satisfies;
+    Filesystem_Structure_Validator["Filesystem Structure Validator"];
+    click Filesystem_Structure_Validator "SystemRequirements/Requirements.md#filesystem-structure-validator";
+    class Filesystem_Structure_Validator requirement;
+    Filesystem_Structure_Validator -.->|deriveReqT| _UserRequirements_md_Validate_Filesystem_Structure_____UserRequirements_md_validate_filesystem_structure_;
+    _UserRequirements_md_Validate_Filesystem_Structure_____UserRequirements_md_validate_filesystem_structure_["UserRequirements.md/Validate Filesystem Structure"];
+    click _UserRequirements_md_Validate_Filesystem_Structure_____UserRequirements_md_validate_filesystem_structure_ "../UserRequirements.md#validate-filesystem-structure";
+    class _UserRequirements_md_Validate_Filesystem_Structure_____UserRequirements_md_validate_filesystem_structure_ requirement;
+    _model_rs__https___github_com_reqflow_reqflow_src_model_rs_ -->|satisfies| Filesystem_Structure_Validator;
+    _model_rs__https___github_com_reqflow_reqflow_src_model_rs_["model.rs"];
+    click _model_rs__https___github_com_reqflow_reqflow_src_model_rs_ "https://github.com/reqflow/reqflow/src#model.rs";
+    class _model_rs__https___github_com_reqflow_reqflow_src_model_rs_ satisfies;
+    Internal_Consistency_Validator["Internal Consistency Validator"];
+    click Internal_Consistency_Validator "SystemRequirements/Requirements.md#internal-consistency-validator";
+    class Internal_Consistency_Validator requirement;
+    Internal_Consistency_Validator -.->|deriveReqT| _UserRequirements_md_Validate_Internal_Consistency_____UserRequirements_md_validate_internal_consistency_;
+    _UserRequirements_md_Validate_Internal_Consistency_____UserRequirements_md_validate_internal_consistency_["UserRequirements.md/Validate Internal Consistency"];
+    click _UserRequirements_md_Validate_Internal_Consistency_____UserRequirements_md_validate_internal_consistency_ "../UserRequirements.md#validate-internal-consistency";
+    class _UserRequirements_md_Validate_Internal_Consistency_____UserRequirements_md_validate_internal_consistency_ requirement;
+    _validation_rs__https___github_com_reqflow_reqflow_src_validation_rs_ -->|satisfies| Internal_Consistency_Validator;
+    Cross_Component_Dependency_Validator["Cross-Component Dependency Validator"];
+    click Cross_Component_Dependency_Validator "SystemRequirements/Requirements.md#cross-component-dependency-validator";
+    class Cross_Component_Dependency_Validator requirement;
+    Cross_Component_Dependency_Validator -.->|deriveReqT| _UserRequirements_md_Validate_Cross_Component_Dependencies_____UserRequirements_md_validate_cross_component_dependencies_;
+    _UserRequirements_md_Validate_Cross_Component_Dependencies_____UserRequirements_md_validate_cross_component_dependencies_["UserRequirements.md/Validate Cross-Component Dependencies"];
+    click _UserRequirements_md_Validate_Cross_Component_Dependencies_____UserRequirements_md_validate_cross_component_dependencies_ "../UserRequirements.md#validate-cross-component-dependencies";
+    class _UserRequirements_md_Validate_Cross_Component_Dependencies_____UserRequirements_md_validate_cross_component_dependencies_ requirement;
+    _model_rs__https___github_com_reqflow_reqflow_src_model_rs_ -->|satisfies| Cross_Component_Dependency_Validator;
+```
+
+
+---
+
 ### Markdown Structure Validator
 
 The system shall implement a markdown structure validator that enforces ReqFlow's requirements for header levels, element structure, relation formatting, and other markdown-specific syntax rules, reporting violations with line numbers and suggested fixes.
@@ -905,6 +1131,76 @@ The system shall implement a specialized validator that analyzes dependencies ac
 ---
 
 ## Reporting Features
+
+```mermaid
+graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef satisfies fill:#fff2cc,stroke:#ffcc00,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef paragraph fill:#efefef,stroke:#999999,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+
+    Relationship_Report_Generator["Relationship Report Generator"];
+    click Relationship_Report_Generator "SystemRequirements/Requirements.md#relationship-report-generator";
+    class Relationship_Report_Generator requirement;
+    Relationship_Report_Generator -.->|deriveReqT| _UserRequirements_md_Generate_Relationship_Reports_____UserRequirements_md_generate_relationship_reports_;
+    _UserRequirements_md_Generate_Relationship_Reports_____UserRequirements_md_generate_relationship_reports_["UserRequirements.md/Generate Relationship Reports"];
+    click _UserRequirements_md_Generate_Relationship_Reports_____UserRequirements_md_generate_relationship_reports_ "../UserRequirements.md#generate-relationship-reports";
+    class _UserRequirements_md_Generate_Relationship_Reports_____UserRequirements_md_generate_relationship_reports_ requirement;
+    _model_rs__https___github_com_reqflow_reqflow_src_model_rs_ -->|satisfies| Relationship_Report_Generator;
+    _model_rs__https___github_com_reqflow_reqflow_src_model_rs_["model.rs"];
+    click _model_rs__https___github_com_reqflow_reqflow_src_model_rs_ "https://github.com/reqflow/reqflow/src#model.rs";
+    class _model_rs__https___github_com_reqflow_reqflow_src_model_rs_ satisfies;
+    Structural_Change_Analysis_Engine["Structural Change Analysis Engine"];
+    click Structural_Change_Analysis_Engine "SystemRequirements/Requirements.md#structural-change-analysis-engine";
+    class Structural_Change_Analysis_Engine requirement;
+    Structural_Change_Analysis_Engine -.->|deriveReqT| _UserRequirements_md_Generate_Structural_Change_Reports_____UserRequirements_md_generate_structural_change_reports_;
+    _UserRequirements_md_Generate_Structural_Change_Reports_____UserRequirements_md_generate_structural_change_reports_["UserRequirements.md/Generate Structural Change Reports"];
+    click _UserRequirements_md_Generate_Structural_Change_Reports_____UserRequirements_md_generate_structural_change_reports_ "../UserRequirements.md#generate-structural-change-reports";
+    class _UserRequirements_md_Generate_Structural_Change_Reports_____UserRequirements_md_generate_structural_change_reports_ requirement;
+    Validation_Report_Generator["Validation Report Generator"];
+    click Validation_Report_Generator "SystemRequirements/Requirements.md#validation-report-generator";
+    class Validation_Report_Generator requirement;
+    Validation_Report_Generator -.->|deriveReqT| _UserRequirements_md_Provide_Validation_Reports_____UserRequirements_md_provide_validation_reports_;
+    _UserRequirements_md_Provide_Validation_Reports_____UserRequirements_md_provide_validation_reports_["UserRequirements.md/Provide Validation Reports"];
+    click _UserRequirements_md_Provide_Validation_Reports_____UserRequirements_md_provide_validation_reports_ "../UserRequirements.md#provide-validation-reports";
+    class _UserRequirements_md_Provide_Validation_Reports_____UserRequirements_md_provide_validation_reports_ requirement;
+    _model_rs__https___github_com_reqflow_reqflow_src_model_rs_ -->|satisfies| Validation_Report_Generator;
+    Verification_Gap_Analyzer["Verification Gap Analyzer"];
+    click Verification_Gap_Analyzer "SystemRequirements/Requirements.md#verification-gap-analyzer";
+    class Verification_Gap_Analyzer requirement;
+    Verification_Gap_Analyzer -.->|deriveReqT| _UserRequirements_md_Generate_Verifications_Reports_____UserRequirements_md_generate_verifications_reports_;
+    _UserRequirements_md_Generate_Verifications_Reports_____UserRequirements_md_generate_verifications_reports_["UserRequirements.md/Generate Verifications Reports"];
+    click _UserRequirements_md_Generate_Verifications_Reports_____UserRequirements_md_generate_verifications_reports_ "../UserRequirements.md#generate-verifications-reports";
+    class _UserRequirements_md_Generate_Verifications_Reports_____UserRequirements_md_generate_verifications_reports_ requirement;
+    Model_Summary_Report_Generator["Model Summary Report Generator"];
+    click Model_Summary_Report_Generator "SystemRequirements/Requirements.md#model-summary-report-generator";
+    class Model_Summary_Report_Generator requirement;
+    Model_Summary_Report_Generator -.->|deriveReqT| _UserRequirements_md_Generate_Summary_Reports_____UserRequirements_md_generate_summary_reports_;
+    _UserRequirements_md_Generate_Summary_Reports_____UserRequirements_md_generate_summary_reports_["UserRequirements.md/Generate Summary Reports"];
+    click _UserRequirements_md_Generate_Summary_Reports_____UserRequirements_md_generate_summary_reports_ "../UserRequirements.md#generate-summary-reports";
+    class _UserRequirements_md_Generate_Summary_Reports_____UserRequirements_md_generate_summary_reports_ requirement;
+    _model_rs__https___github_com_reqflow_reqflow_src_model_rs_ -->|satisfies| Model_Summary_Report_Generator;
+    Dependency_Report_Generator["Dependency Report Generator"];
+    click Dependency_Report_Generator "SystemRequirements/Requirements.md#dependency-report-generator";
+    class Dependency_Report_Generator requirement;
+    Dependency_Report_Generator -.->|deriveReqT| _UserRequirements_md_Generate_Dependency_Reports_____UserRequirements_md_generate_dependency_reports_;
+    _UserRequirements_md_Generate_Dependency_Reports_____UserRequirements_md_generate_dependency_reports_["UserRequirements.md/Generate Dependency Reports"];
+    click _UserRequirements_md_Generate_Dependency_Reports_____UserRequirements_md_generate_dependency_reports_ "../UserRequirements.md#generate-dependency-reports";
+    class _UserRequirements_md_Generate_Dependency_Reports_____UserRequirements_md_generate_dependency_reports_ requirement;
+    Report_Export_Formatter["Report Export Formatter"];
+    click Report_Export_Formatter "SystemRequirements/Requirements.md#report-export-formatter";
+    class Report_Export_Formatter requirement;
+    Report_Export_Formatter -.->|deriveReqT| _UserRequirements_md_Export_Reports_to_Standard_Formats_____UserRequirements_md_export_reports_to_standard_formats_;
+    _UserRequirements_md_Export_Reports_to_Standard_Formats_____UserRequirements_md_export_reports_to_standard_formats_["UserRequirements.md/Export Reports to Standard Formats"];
+    click _UserRequirements_md_Export_Reports_to_Standard_Formats_____UserRequirements_md_export_reports_to_standard_formats_ "../UserRequirements.md#export-reports-to-standard-formats";
+    class _UserRequirements_md_Export_Reports_to_Standard_Formats_____UserRequirements_md_export_reports_to_standard_formats_ requirement;
+```
+
+
+---
 
 ### Relationship Report Generator
 
@@ -973,6 +1269,35 @@ The system shall implement format conversion engines for reports that transform 
 ---
 
 ## Change Tracing
+
+```mermaid
+graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef satisfies fill:#fff2cc,stroke:#ffcc00,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef paragraph fill:#efefef,stroke:#999999,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+
+    Structural_Change_Analyzer["Structural Change Analyzer"];
+    click Structural_Change_Analyzer "SystemRequirements/Requirements.md#structural-change-analyzer";
+    class Structural_Change_Analyzer requirement;
+    Structural_Change_Analyzer -.->|deriveReqT| _UserRequirements_md_Tracing_Structural_Changes_____UserRequirements_md_tracing_structural_changes_;
+    _UserRequirements_md_Tracing_Structural_Changes_____UserRequirements_md_tracing_structural_changes_["UserRequirements.md/Tracing Structural Changes"];
+    click _UserRequirements_md_Tracing_Structural_Changes_____UserRequirements_md_tracing_structural_changes_ "../UserRequirements.md#tracing-structural-changes";
+    class _UserRequirements_md_Tracing_Structural_Changes_____UserRequirements_md_tracing_structural_changes_ requirement;
+    Structural_Update_Recommender["Structural Update Recommender"];
+    click Structural_Update_Recommender "SystemRequirements/Requirements.md#structural-update-recommender";
+    class Structural_Update_Recommender requirement;
+    Structural_Update_Recommender -.->|deriveReqT| _UserRequirements_md_Suggest_Structural_Updates_____UserRequirements_md_suggest_structural_updates_;
+    _UserRequirements_md_Suggest_Structural_Updates_____UserRequirements_md_suggest_structural_updates_["UserRequirements.md/Suggest Structural Updates"];
+    click _UserRequirements_md_Suggest_Structural_Updates_____UserRequirements_md_suggest_structural_updates_ "../UserRequirements.md#suggest-structural-updates";
+    class _UserRequirements_md_Suggest_Structural_Updates_____UserRequirements_md_suggest_structural_updates_ requirement;
+```
+
+
+---
 
 ### Structural Change Analyzer
 
