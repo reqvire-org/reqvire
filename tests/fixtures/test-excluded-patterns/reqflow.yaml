@@ -4,4 +4,4 @@ paths:
   excluded_filename_patterns:
     - "**/README*.md"
     - "**/index.md"
-    - "**/DesignSpecifications/**/*.md"  # Exclude the DesignSpecifications folder from processing
+    - "**/DesignSpecifications/**/*.md"  # Exclude DesignSpecifications

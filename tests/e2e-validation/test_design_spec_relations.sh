@@ -1,17 +1,17 @@
 #!/bin/bash
 
-# Test: Validation of Relations to Design Specification Documents
+# Test: Validation of Relations to Excluded Folder Documents
 # ------------------------------------------------------------
 # Acceptance Criteria:
-# - System should correctly validate relations to files in the DesignSpecifications folder
-# - System should properly handle markdown links to Design Specification Documents
+# - System should correctly validate relations to files in excluded folders (like DesignSpecifications)
+# - System should maintain relations even when folders are excluded from main processing
 #
 # Test Criteria:
-# - Command should correctly identify when a DSD file exists and validate the relation
-# - Current implementation will fail until fixed
+# - Command should correctly validate relations to files in excluded_filename_patterns
+# - Using '**/DesignSpecifications/**/*.md' pattern to exclude processing but not for relations
 #
 # Test Implementation for Verification:
-# - Shows the need to add DSD files to registry for relation validation
+# - Tests that relations to excluded files still work properly in the model
 
 # Setup
 TEST_NAME="Design Specification Relations Validation"
@@ -37,31 +37,32 @@ echo "Checking results..."
 # Expected to succeed with the updated implementation
 if [ $EXIT_CODE -eq 0 ]; then
   echo "SUCCESS: Test passed with the updated implementation."
-  echo "The implementation now correctly validates relations to Design Specification Documents."
+  echo "The implementation correctly validates relations to files in excluded folders."
   echo ""
   echo "Output: $OUTPUT"
 else
   echo "FAILED: Test failed with the updated implementation."
-  echo "Relations to Design Specification Documents are still not being validated correctly."
+  echo "Relations to files in excluded folders (DesignSpecifications) are not being validated correctly."
   echo ""
   echo "Output: $OUTPUT"
   
   # Check if the error is specifically about DirectMessages.md
   if echo "$OUTPUT" | grep -q "DesignSpecifications/DirectMessages.md"; then
-    echo "Issue detected: Relations to DesignSpecifications/DirectMessages.md not validating correctly."
+    echo "Issue detected: Relations to DesignSpecifications/DirectMessages.md (in excluded folder) not validating correctly."
     echo ""
     echo "Debug information:"
-    echo "- Check if DSDs are being added to the registry with correct paths"
-    echo "- Check if path normalization is handling DSDs correctly" 
-    echo "- Check if file is properly processable"
+    echo "- Check if files in excluded folders are being added to the registry for relation tracking"
+    echo "- Check if path normalization is handling excluded folders correctly"
+    echo "- Verify if validation is respecting the excluded_filename_patterns setting but still tracking relations"
   fi
   exit 1
 fi
 
 echo ""
 echo "Implemented Changes:"
-echo "1. Added path normalization to handle both normal files and fragment-only references"
-echo "2. Updated validation logic to use normalized paths for consistent lookup"
+echo "1. Updated validation to handle relations to files in excluded folders"
+echo "2. Separated processing path from relation validation to maintain references"
+echo "3. Ensured relations work even when folders are excluded from processing"
 echo ""
 # Now exit with the actual test result (success or failure)
 exit $EXIT_CODE

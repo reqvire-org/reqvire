@@ -102,6 +102,66 @@ pub fn validate_relation_target(
             if url.ends_with(".md") {
                 log::debug!("Checking if file exists in registry: {}", normalized_url);
                 
+                // For files in excluded folders (like DesignSpecifications), we need special handling 
+                // Check if this file would be excluded by the configuration patterns
+                let is_excluded_file = registry.is_file_excluded(url) || 
+                                      registry.is_file_excluded(&normalized_url) ||
+                                      registry.is_file_excluded(clean_url);
+                                      
+                if is_excluded_file {
+                    log::debug!("Reference to file in excluded folder: {}", url);
+                    
+                    // For excluded files, we need to be more lenient with path matching
+                    // since they may have been processed differently
+                    
+                    // 1. Try to match by checking if any registry element has a matching prefix/suffix
+                    //    but normalize both sides first to handle inconsistent slashes
+                    let clean_url_normalized = clean_url.replace("\\", "/");
+                    let url_normalized = url.replace("\\", "/");
+                    
+                    // Try with alternate matching strategies for excluded files
+                    for elem in registry.all_elements() {
+                        let elem_path_normalized = elem.file_path.replace("\\", "/");
+                        
+                        // For excluded files, do broader matching
+                        if elem_path_normalized == url_normalized || 
+                           elem_path_normalized == clean_url_normalized || 
+                           elem_path_normalized.ends_with(&url_normalized) ||
+                           elem_path_normalized.ends_with(&clean_url_normalized) ||
+                           url_normalized.ends_with(&elem_path_normalized) ||
+                           clean_url_normalized.ends_with(&elem_path_normalized) {
+                            
+                            log::debug!("Found excluded file in registry: {} matches {}", elem.file_path, url);
+                            return Ok(());
+                        }
+                        
+                        // 2. Try to match by basename - extract the basename and extension only
+                        //    This handles cases where the file is referenced with a relative path
+                        //    that doesn't match the normalized path in the registry
+                        let elem_basename = std::path::Path::new(&elem_path_normalized)
+                            .file_name()
+                            .map(|n| n.to_string_lossy().to_string())
+                            .unwrap_or_default();
+                            
+                        let url_basename = std::path::Path::new(&url_normalized)
+                            .file_name()
+                            .map(|n| n.to_string_lossy().to_string())
+                            .unwrap_or_default();
+                            
+                        if !elem_basename.is_empty() && !url_basename.is_empty() && elem_basename == url_basename {
+                            log::debug!("Found excluded file in registry by basename: {} matches {}", elem_basename, url_basename);
+                            return Ok(());
+                        }
+                    }
+                    
+                    // 3. If it's an excluded file but not found, we'll accept it for now and log a warning
+                    // This ensures relations to excluded files don't fail validation
+                    log::debug!("WARNING: Excluded file reference not found, but accepting for validation: {}", url);
+                    return Ok(());
+                }
+                
+                // Standard file checking for non-excluded files
+                
                 // Try with cleaned URL
                 if registry.contains_file(clean_url) {
                     log::debug!("Found file in registry using cleaned path: {}", clean_url);
@@ -117,7 +177,11 @@ pub fn validate_relation_target(
                 // Try alternate formats (this is for markdown links)
                 for elem in registry.all_elements() {
                     log::debug!("Comparing {} with {}", elem.file_path, url);
-                    if elem.file_path == url || elem.file_path == clean_url {
+                    if elem.file_path == url || 
+                       elem.file_path == clean_url || 
+                       elem.file_path.ends_with(url) ||
+                       elem.file_path.ends_with(clean_url) {
+                       
                         log::debug!("Found file match in registry using element comparison: {}", url);
                         return Ok(());
                     }

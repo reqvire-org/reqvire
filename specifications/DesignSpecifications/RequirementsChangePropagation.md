@@ -20,82 +20,115 @@ Automated tools should flag all impacted requirements for review.
 
 These relations define hierarchical connections where changes to a parent requirement propagate to child requirements.
 
-#### containedBy  
+#### containedBy
 Links a child requirement to a parent requirement. Changes in the parent propagate to the child.
 
-#### contain  
+#### contain
 Links a parent requirement to a child requirement. Changes in the parent propagate to the child.
 
-#### derivedFrom  
+#### derivedFrom
 Links a child requirement to a parent requirement. Changes in the parent propagate to the child.
 
-#### derive  
+#### derive
 Links a parent requirement to a child requirement. Changes in the parent propagate to the child.
 
-#### refine  
+#### refine
 Links a child requirement refining a parent requirement. Changes in any requirement in the hierarchy propagate throughout the refinement chain.
+
+
+---
 
 ### Requirement Satisfaction and Design Impact
 
 These relations define how a requirement is satisfied by design, code, or architecture.
 
-#### satisfiedBy  
+#### satisfiedBy
 Links a requirement to code, architecture, or specifications that satisfy it. Changes in the requirement propagate to the satisfying resource.
 
-#### satisfy  
+#### satisfy
 Links a design artifact to the requirement it satisfies. Changes in the design artifact propagate to the requirement.
+
+
+---
 
 ### Verification and Validation Impact
 
 These relations define verification artifacts that confirm a requirement is met.
 
-#### verifiedBy  
+#### verifiedBy
 Links a requirement to a document or test that verifies it. Changes in the requirement propagate to the verification artifact, requiring re-validation.
 
-#### verify  
+#### verify
 Links a verification document to the requirement it verifies. Changes in the verification artifact may require changes in the requirement or test process.
+
+
+---
 
 ### Traceability and Non-Propagating Relations
 
 These relations establish soft traceability and do not propagate changes.
 
-#### tracedFrom  
+#### tracedFrom
 Soft traceability relation to another requirement. No direct impact on change propagation.
 
-#### trace  
+#### trace
 Soft traceability relation pointing to a source. No direct impact on change propagation.
 
 ## Change Propagation Mechanism
 
 When a requirement changes, impact analysis must be conducted based on its relations. The following mechanism ensures traceability and controlled updates.
 
-### Identify Impacted Relations  
+
+---
+
+### Identify Impacted Relations
 When a requirement is modified, check its Relations subsection to identify linked elements.
 
-### Determine Change Propagation Scope  
+
+---
+
+### Determine Change Propagation Scope
 Apply the rules in Relation Types and Change Propagation Rules to assess whether the change affects child requirements, design artifacts, verification, or other linked documents.
 
-### Invalidate Affected Elements  
+
+---
+
+### Invalidate Affected Elements
 If a related element is impacted, flag it for review.  
 Example: If a requirement verified by a test changes, the test must be reviewed.
 
-### Require Re-validation or Re-design  
+
+---
+
+### Require Re-validation or Re-design
 If changes affect satisfaction (e.g., code or architecture), update the relevant design.  
 If changes affect verification, update test cases or validation documents.
 
-### Update Relations  
+
+---
+
+### Update Relations
 If a change results in a requirement being merged, split, or removed, update its Relations to maintain traceability.
 
 ## Examples of Change Propagation
 
+
+---
+
 ### Parent-Child Requirement Change
 
 ```markdown
+
+---
+
 ### Parent Requirement
 This requirement defines a high-level system constraint.
 
 #### Relations
   * contain: [Child Requirement](#child-requirement)
+
+
+---
 
 ### Child Requirement
 This requirement defines additional functionality.
@@ -107,9 +140,15 @@ This requirement defines additional functionality.
 
 If Parent Requirement changes, Child Requirement must be reviewed and updated.
 
+
+---
+
 ### Requirement Satisfied by a Design Specification
 
 ```markdown
+
+---
+
 ### Functional Requirement
 The system shall process transactions within 500ms.
 
@@ -120,9 +159,15 @@ The system shall process transactions within 500ms.
 If Functional Requirement changes, Performance Constraints in the architecture document must be updated.
 
 
+
+---
+
 ### Requirement Verified by a Test
 
 ```
+
+---
+
 ### Safety Requirement
 The system shall shut down if temperature exceeds 100°C.
 
@@ -134,6 +179,9 @@ The system shall shut down if temperature exceeds 100°C.
 If Safety Requirement changes, the Overheat Shutdown Test must be reviewed for update and executed again for verification.
 
 
+
+---
+
 ### Example of Multi-Level Change Propagation in Requirements
 
 The following analysis explains how a **change in the requirement that refine root requirement** propagates through multiple levels of related requirements, impacting their definitions, design artifacts, and verification processes.
@@ -141,59 +189,62 @@ The following analysis explains how a **change in the requirement that refine ro
 ---
 
 ```
-### Root Requirement: System Power Management  
+
+---
+
+### Root Requirement: System Power Management
 
 The system shall implement power-saving mechanisms to optimize battery usage.  
 
 ---
 
-### Power Saving Mode  
+### Power Saving Mode
 
 The system shall activate power-saving mode when the battery level drops below 20%.  
 
-#### Relations  
+#### Relations
   * refine: [System Power Management](#system-power-management)
   * satisfiedBy: [software/power_control.md](software/power_control.html)
   * verifiedBy: [test_cases/power_saving.md](test_cases/power_saving.html)
 
 ---
 
-### CPU Power Reduction  
+### CPU Power Reduction
 
 The system shall reduce CPU frequency by 30% in power-saving mode.  
 
-#### Relations  
+#### Relations
   * derivedFrom: [Power Saving Mode](#power-saving-mode)
   * satisfiedBy: [firmware/cpu_manager.md](firmware/cpu_manager.html)
   * verifiedBy: [test_cases/cpu_throttling.md](test_cases/cpu_throttling.html)
 
 ---
 
-### Screen Brightness Adjustment  
+### Screen Brightness Adjustment
 
 The system shall reduce screen brightness by 40% in power-saving mode.  
 
-#### Relations  
+#### Relations
   * derivedFrom: [Power Saving Mode](#power-saving-mode)
   * verifiedBy: [test_cases/screen_brightness.md](test_cases/screen_brightness.html)
 
 ---
 
-### Battery Optimization  
+### Battery Optimization
 
 The system shall disable non-essential background services when battery levels drop below 15%.  
 
-#### Relations  
+#### Relations
   * derivedFrom: [System Power Management](#system-power-management)
   * satisfiedBy: [software/battery_manager.md](software/battery_manager.html)
   * verifiedBy: [test_cases/battery_saving.md](test_cases/battery_saving.html)
 
 ---
 
-### Network Power Optimization  
+### Network Power Optimization
 The system shall reduce network polling frequency when battery levels drop below 15%.  
 
-#### Relations  
+#### Relations
   * derivedFrom: [Battery Optimization](#battery-optimization)
   * satisfiedBy: [software/network_manager.md](software/network_manager.html)
 ```

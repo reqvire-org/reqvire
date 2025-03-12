@@ -24,7 +24,7 @@ paths:
   excluded_filename_patterns:
     - "**/Logical*.md"
     - "**/Physical*.md"
-    - "**/DesignSpecifications/*"
+    - "**/DesignSpecifications/**"
 
 style:
   # Theme for HTML output (default, dark, light)

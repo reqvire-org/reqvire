@@ -722,6 +722,8 @@ impl ModelManager {
         
         // Restore the diagram generation setting
         registry.set_diagram_generation_enabled(diagram_enabled);
+        // Pass the configuration to the registry
+        registry.set_config(self.config.clone());
         
         debug!("Scanning directory for all markdown files: {}", input_folder.display());
         debug!("Input folder for scanning: {}", input_folder.display());
@@ -746,13 +748,9 @@ impl ModelManager {
                     debug!("File {} is processable: {}", path.display(), is_proc);
                     
                     if !is_proc {
-                        // Force processing for DSD files based on path
-                        let is_dsd_by_path = path.to_string_lossy().contains(&self.config.paths.design_specifications_folder);
-                        if is_dsd_by_path {
-                            debug!("Forcing processing of DSD file by path: {}", path.display());
-                        } else {
-                            continue;
-                        }
+                        // Skip files that are not considered processable
+                        // Design spec documents are now handled via excluded_filename_patterns
+                        continue;
                     }
                 } else {
                     // Not a markdown file
@@ -762,9 +760,15 @@ impl ModelManager {
                 // Check if this file should be excluded by any excluded filename patterns
                 let should_exclude = utils::is_excluded_by_patterns(path, &self.config.paths.excluded_filename_patterns, input_folder, self.config.general.verbose);
                 
+                // Log all excluded patterns for debugging
+                debug!("Excluded filename patterns:");
+                for pattern in &self.config.paths.excluded_filename_patterns {
+                    debug!("  Pattern: {}", pattern);
+                }
+                
                 if should_exclude {
-                    debug!("Skipping excluded file: {:?}", path);
-                    continue;
+                    debug!("Found excluded file (will add to registry for relation validation): {:?}", path);
+                    // Don't skip excluded files here - we'll handle them properly later
                 }
                 
                 debug!("Collecting identifiers from {:?}", path);
@@ -776,19 +780,19 @@ impl ModelManager {
                 // Store file content for later validation and processing
                 self.file_contents.insert(relative_path_str.clone(), content.clone());
                 
-                // Check if this is a Design Specification Document
-                // DSDs are identified by being in the design_specifications_folder from config
-                let design_specs_folder_name = &self.config.paths.design_specifications_folder;
+                // Check if this file is excluded by patterns
+                // Design specifications are now handled via excluded_filename_patterns
+                let should_exclude = utils::is_excluded_by_patterns(
+                    path, 
+                    &self.config.paths.excluded_filename_patterns, 
+                    input_folder, 
+                    self.config.general.verbose
+                );
                 
-                // Check if this is a Design Specification Document based on its path
-                debug!("Checking if '{}' is a DSD file (config DSD folder: '{}')", 
-                      relative_path_str, design_specs_folder_name);
-                
-                // Simple check: is the design specification folder name anywhere in the path?
-                let is_dsd = path.to_string_lossy().contains(design_specs_folder_name);
+                // Determine if this is a special file that should be treated differently
+                let is_dsd = should_exclude;
                              
-                debug!("is_dsd={} for {} (design_specs_folder={})", 
-                       is_dsd, relative_path_str, design_specs_folder_name);
+                debug!("is_excluded={} for {}", is_dsd, relative_path_str);
                 
                 // Create a document element for the file
                 let title = if let Some(title_line) = content.lines().find(|line| line.starts_with("# ")) {
@@ -823,17 +827,17 @@ impl ModelManager {
                 if let Err(e) = registry.add_element(file_element) {
                     debug!("Error adding file element: {}", e);
                 } else {
-                        // For DSD files, we've already added the file with its normalized path
-                    // We don't need to create hack paths - validation should handle normalization
-                    
                     debug!("Successfully added file element for validation: {}", relative_path_str);
                 }
                 
-                if !is_dsd {
-                    // Also collect individual elements for non-DSD documents
-                    markdown::collect_elements(&content, &relative_path_str, registry)?;
+                // For excluded files, we don't process the elements inside, but we need
+                // to make sure the file itself is registered so relations TO it can be validated
+                if is_dsd {
+                    debug!("Skipping detailed element collection for excluded file: {}", relative_path_str);
+                    // File itself is already registered above, but we don't process internal elements
                 } else {
-                    debug!("Skipping detailed element collection for Design Specification Document: {}", relative_path_str);
+                    // For non-excluded files, collect all elements as normal
+                    markdown::collect_elements(&content, &relative_path_str, registry)?;
                 }
             }
         }
@@ -860,18 +864,6 @@ impl ModelManager {
         
         // Process each file for markdown structure validation
         for (file_path, content) in &self.file_contents {
-            // Skip validation for Design Specification Documents
-            // DSDs are identified by being in any folder that matches the design_specifications_folder name
-            let design_specs_folder_name = &self.config.paths.design_specifications_folder;
-            
-            // Check if any component of the path matches the design specs folder name
-            let is_dsd = file_path.split('/').any(|component| component == design_specs_folder_name);
-            
-            if is_dsd {
-                debug!("Skipping validation for Design Specification Document: {}", file_path);
-                continue;
-            }
-            
             // Check if this file should be excluded by any excluded filename patterns
             let path_obj = std::path::Path::new(file_path);
             let should_exclude = utils::is_excluded_by_patterns(
@@ -964,7 +956,6 @@ impl ModelManager {
         // Get paths from config using helper methods, but use them correctly
         // These paths should all be within the input folder, not absolute or in another repository
         let specs_dir_path = input_folder.join(specs_folder);
-        let design_specs_dir_path = specs_dir_path.join(&config.paths.design_specifications_folder);
         
         // Special case for testing - if input_folder is already "specifications", don't add it again
         let actual_specs_dir_path = if input_folder.file_name().map_or(false, |name| name == "specifications") {
@@ -973,28 +964,16 @@ impl ModelManager {
             specs_dir_path.clone()
         };
         
-        let actual_design_specs_dir_path = if input_folder.file_name().map_or(false, |name| name == "specifications") {
-            input_folder.join(&config.paths.design_specifications_folder)
-        } else {
-            design_specs_dir_path.clone()
-        };
-        
         // Always validate the main specifications directory
         if !actual_specs_dir_path.exists() || !actual_specs_dir_path.is_dir() {
             errors.push(ReqFlowError::ValidationError(
                 format!("Required specifications directory '{}' is missing", actual_specs_dir_path.display())
             ));
-        } else {
-            // Design Specifications directory is still required
-            if !actual_design_specs_dir_path.exists() || !actual_design_specs_dir_path.is_dir() {
-                errors.push(ReqFlowError::ValidationError(
-                    format!("Required design specifications directory '{}' is missing", actual_design_specs_dir_path.display())
-                ));
-            }
-            
-            // We no longer require a specific SystemRequirements directory
-            // Any requirement in a specifications subfolder is treated as a system requirement
         }
+        
+        // No specific folder structure is required
+        // Any requirement in a specifications subfolder is treated as a system requirement
+        // Design specifications are now handled via excluded_filename_patterns
         
         // Validate external folders
         for external_folder in &config.paths.external_folders {
@@ -1039,10 +1018,9 @@ impl ModelManager {
                 // All markdown files are now considered for element extraction
                 
                 // Determine the root directory for this file (specifications or external folder)
-                let (root_dir, design_spec_dir) = if in_external_folder {
+                let root_dir = if in_external_folder {
                     // Find which external folder contains this file
                     let mut ext_root_dir = PathBuf::new();
-                    let mut ext_design_spec_dir = PathBuf::new();
                     
                     for folder in &config.paths.external_folders {
                         let folder_path = if Path::new(folder).is_absolute() {
@@ -1054,15 +1032,14 @@ impl ModelManager {
                         if path.starts_with(&folder_path) {
                             // This is the external folder containing our file
                             ext_root_dir = folder_path.clone();
-                            ext_design_spec_dir = folder_path.join(&config.paths.design_specifications_folder);
                             break;
                         }
                     }
                     
-                    (ext_root_dir, ext_design_spec_dir)
+                    ext_root_dir
                 } else {
                     // Use the regular specifications folder
-                    (actual_specs_dir_path.clone(), actual_design_specs_dir_path.clone())
+                    actual_specs_dir_path.clone()
                 };
                 
                 let in_specs_root = path.parent().map_or(false, |p| p == root_dir);
@@ -1100,19 +1077,8 @@ impl ModelManager {
                 // System Requirements can be in any subfolder of specifications or in external folders
                 // No need to validate specific directory location for system requirements
                 
-                // Check if file is in the Design Specifications directory by matching the exact folder name
-                let path_str = path.to_string_lossy();
-                let design_folder_name = &config.paths.design_specifications_folder;
-                
-                // The key check is whether the path contains the exact design specifications folder name 
-                let is_in_design_specs = path_str.contains(design_folder_name);
-                
-                if is_in_design_specs {
-                    // All files in this directory are considered design specifications
-                    // No need for additional validation
-                // Only files inside the design specifications folder are considered design specifications
-                // We no longer check file names
-                }
+                // Design specifications are now handled via excluded_filename_patterns
+                // No specific directory validation is needed
             }
         }
         
@@ -1172,12 +1138,17 @@ impl ModelManager {
                 element.file_path.contains(ext_folder)
             });
             
-            // Check if this is a Design Specification Document - using same logic as in file processing 
-            let design_specs_folder_name = &self.config.paths.design_specifications_folder;
-            let is_dsd = element.file_path.contains(design_specs_folder_name);
+            // Check if this file should be excluded based on patterns
+            let path_obj = Path::new(&element.file_path);
+            let is_excluded = utils::is_excluded_by_patterns(
+                path_obj,
+                &self.config.paths.excluded_filename_patterns,
+                Path::new(&self.config.paths.specifications_folder),
+                false
+            );
             
-            // Any requirement in a subfolder or external folder is a system requirement (except for Design Specifications)
-            if (is_in_specs_subfolder || is_in_external_folder) && !is_dsd {
+            // Any requirement in a subfolder or external folder is a system requirement (except for excluded files)
+            if (is_in_specs_subfolder || is_in_external_folder) && !is_excluded {
                 // Get valid parent relation types from relation module
                 let valid_parent_relations = crate::relation::get_parent_relation_types();
                 

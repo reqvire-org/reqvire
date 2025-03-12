@@ -45,10 +45,14 @@ An **Element** is a uniquely identifiable section within a Markdown document. It
    - Content in an element belongs exclusively to that element and cannot overlap with another.
 
 
+
+
 ### Examples of Elements
 
 Single Element:
 ```markdown
+
+
 ### My Element
 
 This is the content of My Element.
@@ -59,9 +63,13 @@ Additional details about My Element.
 
 Multiple Elements:
 ```
+
+
 ### Element One
 
 This is the content of Element One.
+
+
 
 ### Element Two
 
@@ -70,6 +78,8 @@ This is the content of Element Two.
 
 Nested Subheaders:
 ```
+
+
 ### Main Element
 This is the main element content.
 
@@ -80,6 +90,8 @@ Details about the subsection.
 More details about another subsection.
 ```
 
+
+
 ### Invalid Cases
 
 Element headers empty:
@@ -89,8 +101,14 @@ Element headers empty:
 
 Headers not unique within the same document:
 ```
+
+
+
+
 ### Duplicate
 Content of the first duplicate.
+
+
 
 ### Duplicate
 Content of the second duplicate.
@@ -160,10 +178,14 @@ Relation entries are listed as bullet points (`*`) with 2 spaces '  *' indentati
 Duplicate relation entries within the same `#### Relations` subsection are not allowed.
 
 
+
+
 ### Examples of `#### Relations`
 
 Simple Relations:
 ```markdown
+
+
 ### My Element
 This is the content of My Element.
 
@@ -175,6 +197,8 @@ This is the content of My Element.
 
 Relations with Special Characters:
 ```
+
+
 ### Complex Element
 This is the content of a complex element.
 
@@ -185,6 +209,8 @@ This is the content of a complex element.
 
 Invalid Entries:
 ```
+
+
 ### Invalid Relations Example
 This element contains invalid relation entries.
 
