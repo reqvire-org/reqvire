@@ -242,14 +242,8 @@ impl ModelManager {
         &mut self,
         input_folder: &Path,
         output_folder: &Path,
-        convert_to_html: bool,
     ) -> Result<(), ReqFlowError> {
         debug!("Processing files from {:?} to {:?}", input_folder, output_folder);
-        
-        // Update HTML output setting in config if specified
-        if convert_to_html {
-            self.config.general.html_output = true;
-        }
         
         // Set the diagram generation flag in the element registry
         // This matches the config setting which was already set from the CLI flag
@@ -266,7 +260,7 @@ impl ModelManager {
         self.validate_model()?;
         
         // Second pass: process files
-        self.process_markdown_files(input_folder, output_folder, self.config.general.html_output)?;
+        self.process_markdown_files(input_folder, output_folder)?;
         
         // Note: Traceability matrix is now generated only when explicitly requested
         // with the --generate-matrix flag
@@ -276,8 +270,7 @@ impl ModelManager {
     
     /// Generate a traceability matrix showing dependencies between elements
     /// The matrix is saved to the specifications root directory (input_folder)
-    /// If convert_to_html is true, HTML will be saved to output_folder
-    pub fn generate_traceability_matrix(&self, input_folder: &Path, output_folder: &Path, convert_to_html: bool) -> Result<(), ReqFlowError> {
+    pub fn generate_traceability_matrix(&self, input_folder: &Path, output_folder: &Path) -> Result<(), ReqFlowError> {
         // Debug information to help diagnose the issue
         debug!("Generating traceability matrix with {} elements", self.element_registry.all_elements().count());
         
@@ -340,34 +333,12 @@ impl ModelManager {
                     if relation.relation_type == relation_type {
                         has_relations = true;
                         
-                        // Create clickable links for HTML output
-                        let source_element = if convert_to_html {
-                            let file_path = element.file_path.replace(".md", ".html");
-                            let anchor = element.name.replace(' ', "-").to_lowercase();
-                            format!("[{}]({}#{})", element.name, file_path, anchor)
-                        } else {
-                            element.name.clone()
-                        };
+                        // Always create markdown links
+                        let source_element = element.name.clone();
                         
-                        // Format the target with proper links if needed
+                        // Format the target with markdown links
                         let target = &relation.target;
-                        let target_element = if convert_to_html && target.contains('/') {
-                            // This is a reference to another file, possibly with an element
-                            if target.contains(".md/") {
-                                // Handle path/file.md/element format
-                                let parts: Vec<&str> = target.split("/").collect();
-                                let file_path = parts[0..parts.len()-1].join("/").replace(".md", ".html");
-                                let element_name = parts.last().unwrap();
-                                let anchor = element_name.replace(' ', "-").to_lowercase();
-                                format!("[{}]({}#{})", target, file_path, anchor)
-                            } else {
-                                // Simple file reference
-                                let file_path = target.replace(".md", ".html");
-                                format!("[{}]({})", target, file_path)
-                            }
-                        } else {
-                            target.clone()
-                        };
+                        let target_element = target.clone();
                         
                         matrix_content.push_str(&format!("|{}|{}|\n", source_element, target_element));
                     }
@@ -556,16 +527,12 @@ impl ModelManager {
                     
                     matrix_content.push_str(&format!("  {}[\"{}\"];\n", element_id, label));
                     
-                    // Add click behavior for HTML
-                    let html_file = if convert_to_html {
-                        element.file_path.replace(".md", ".html")
-                    } else {
-                        element.file_path.clone()
-                    };
+                    // Always use markdown paths in the matrix, HTML conversion happens separately
+                    let file_path = element.file_path.clone();
                     
                     matrix_content.push_str(&format!("  click {} \"{}\";\n", 
                         element_id, 
-                        format!("{}#{}", html_file, element.name.replace(' ', "-").to_lowercase())
+                        format!("{}#{}", file_path, element.name.replace(' ', "-").to_lowercase())
                     ));
                     
                     // Apply requirement style to all elements in this file
@@ -632,16 +599,12 @@ impl ModelManager {
                             };
                             
                             if let Some(target_elem) = target_element {
-                                // Add click behavior for HTML if we found the target
-                                let target_html_file = if convert_to_html {
-                                    target_elem.file_path.replace(".md", ".html")
-                                } else {
-                                    target_elem.file_path.clone()
-                                };
+                                // Always use markdown paths in the matrix, HTML conversion happens separately
+                                let target_file_path = target_elem.file_path.clone();
                                 
                                 matrix_content.push_str(&format!("  click {} \"{}\";\n", 
                                     target_id, 
-                                    format!("{}#{}", target_html_file, target_elem.name.replace(' ', "-").to_lowercase())
+                                    format!("{}#{}", target_file_path, target_elem.name.replace(' ', "-").to_lowercase())
                                 ));
                             } else if target.contains('/') {
                                 // This might be a file reference
@@ -653,18 +616,9 @@ impl ModelManager {
                                         if i > 0 { path.push('/'); }
                                         path.push_str(parts[i]);
                                     }
-                                    if convert_to_html {
-                                        path.replace(".md", ".html")
-                                    } else {
-                                        path
-                                    }
+                                    path
                                 } else {
-                                    let path = parts[0].to_string();
-                                    if convert_to_html {
-                                        path.replace(".md", ".html")
-                                    } else {
-                                        path
-                                    }
+                                    parts[0].to_string()
                                 };
                                 
                                 let element_part = if parts.len() > 1 {
@@ -696,20 +650,11 @@ impl ModelManager {
             }
         }
         
-        // Write the traceability matrix to the specifications root directory
-        let matrix_path = input_folder.join("TraceabilityMatrix.md");
+        // Write the traceability matrix to the output directory
+        let matrix_path = output_folder.join("TraceabilityMatrix.md");
         utils::write_file(&matrix_path, &matrix_content)?;
         
-        // Convert to HTML if requested - HTML goes to the output folder
-        if convert_to_html {
-            let html_content = crate::html::convert_to_html(&matrix_content, "Traceability Matrix")?;
-            
-            // Create output folder path for HTML
-            let html_path = output_folder.join("TraceabilityMatrix.html");
-            utils::write_file(&html_path, html_content)?;
-            
-            debug!("Traceability matrix HTML saved to {:?}", html_path);
-        }
+        // Note: HTML conversion is now handled by the html_export module
         
         debug!("Traceability matrix generated");
         Ok(())
@@ -1326,55 +1271,29 @@ impl ModelManager {
         &self,
         input_folder: &Path,
         output_folder: &Path,
-        convert_to_html: bool,
     ) -> Result<(), ReqFlowError> {
         debug!("Processing markdown files");
         
-        // Collect files to process based on mode
-        let files: Vec<PathBuf>;
-        
-        if convert_to_html {
-            // For HTML conversion, get ALL markdown files in the input folder and its subfolders
-            debug!("HTML mode: Processing all markdown files in all subfolders");
-            files = WalkDir::new(input_folder)
-                .into_iter()
-                .filter_map(|e| e.ok())
-                .filter(|e| {
-                    let file_path = e.path();
-                    if !(file_path.is_file() && file_path.extension().map_or(false, |ext| ext == "md")) {
-                        return false;
-                    }
-                    
-                    // Check if this file should be excluded by any excluded filename patterns
-                    !utils::is_excluded_by_patterns(file_path, &self.config.paths.excluded_filename_patterns, input_folder, self.config.general.verbose)
-                })
-                .map(|e| e.path().to_path_buf())
-                .collect();
+        // Collect files to process - only requirements files
+        debug!("Processing only requirements files");
+        // Gather all primary requirements files and design specifications
+        let files: Vec<PathBuf> = WalkDir::new(input_folder)
+            .into_iter()
+            .filter_map(|e| e.ok())
+            .filter(|e| {
+                let file_path = e.path();
                 
-            debug!("Found {} markdown files to convert to HTML", files.len());
-        } else {
-            // Regular mode: Process only requirements files
-            debug!("Regular mode: Processing only requirements files");
-            // First, gather all primary requirements files and design specifications
-            files = WalkDir::new(input_folder)
-                .into_iter()
-                .filter_map(|e| e.ok())
-                .filter(|e| {
-                    let file_path = e.path();
-                    
-                    if !file_path.is_file() || file_path.extension().map_or(true, |ext| ext != "md") {
-                        return false;
-                    }
-                    
-                    // Use the path-based detection that respects configuration
-                    // (this already includes the excluded_filename_patterns check)
-                    utils::is_requirements_file_by_path(file_path, &self.config, input_folder)
-                })
-                .map(|e| e.path().to_path_buf())
-                .collect();
+                if !file_path.is_file() || file_path.extension().map_or(true, |ext| ext != "md") {
+                    return false;
+                }
                 
-            debug!("Found {} requirements files to process", files.len());
-        }
+                // Use the path-based detection that respects configuration
+                utils::is_requirements_file_by_path(file_path, &self.config, input_folder)
+            })
+            .map(|e| e.path().to_path_buf())
+            .collect();
+            
+        debug!("Found {} requirements files to process", files.len());
         
         // Process files in parallel
         files.par_iter().try_for_each(|file_path| {
@@ -1388,7 +1307,7 @@ impl ModelManager {
                 &content,
                 &self.element_registry,
                 &relative_path,
-                convert_to_html, // Pass the convert_to_html flag
+                false
             )?;
             
             // For requirements files, also update the source file with the improved content
@@ -1398,25 +1317,11 @@ impl ModelManager {
                 utils::write_file(file_path, &updated_content)?;
             }
             
-            // Determine output file path and format
-            let output_file = if convert_to_html {
-                let file_name = file_path.file_name().unwrap().to_string_lossy();
-                let title = file_name.replace(".md", "");
-                
-                let html_content = html::convert_to_html(&updated_content, &title)?;
-                
-                let mut html_path = output_folder.join(relative_path);
-                html_path.set_extension("html");
-                
-                utils::write_file(&html_path, html_content)?;
-                html_path.clone()
-            } else {
-                let output_path = output_folder.join(relative_path);
-                utils::write_file(&output_path, updated_content)?;
-                output_path.clone()
-            };
+            // Write to output folder
+            let output_path = output_folder.join(relative_path);
+            utils::write_file(&output_path, updated_content)?;
             
-            debug!("Wrote output to {:?}", output_file);
+            debug!("Wrote output to {:?}", output_path);
             Ok::<(), ReqFlowError>(())
         })?;
         
