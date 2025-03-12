@@ -7,7 +7,7 @@ This document verifies the requirements for the ReqFlow initialization command.
 The verification test checks that a new ReqFlow project can be initialized with the correct directory structure and configuration file.
 
 #### Metadata
-* type: verification
+  * type: verification
 
 #### Acceptance Criteria
 - Initialize a new project in an empty directory
@@ -41,7 +41,7 @@ The verification test checks that a new ReqFlow project can be initialized with 
 The verification test checks that the init command fails when a reqflow.yaml file already exists.
 
 #### Metadata
-* type: verification
+  * type: verification
 
 #### Acceptance Criteria
 - Attempt to initialize a project in a directory with existing reqflow.yaml
@@ -74,7 +74,7 @@ The verification test checks that the init command fails when a reqflow.yaml fil
 The verification test checks that the init command fails when a reqflow.yml file already exists.
 
 #### Metadata
-* type: verification
+  * type: verification
 
 #### Acceptance Criteria
 - Attempt to initialize a project in a directory with existing reqflow.yml

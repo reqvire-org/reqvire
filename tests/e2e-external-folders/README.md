@@ -31,9 +31,4 @@ Test fixtures are located in the `/tests/fixtures/` directory:
 - `test-external-folders/` - Contains external folders with invalid setup (user requirements in external folder)
 - `test-external-folders-clean/` - Contains external folders with valid setup
 
-## Verification Requirements
 
-These tests verify the following requirements:
-
-- [External Folders Support](../../specifications/SystemRequirements/Requirements.md#external-folders-support): "The system shall support processing requirements stored in external folders outside the main specifications directory structure..."
-- [Unified System Requirements Processing](../../specifications/SystemRequirements/Requirements.md#unified-system-requirements-processing): "The system shall process all requirements in specifications subfolders (except design specifications) and external folders consistently as system requirements..."

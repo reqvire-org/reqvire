@@ -9,7 +9,7 @@ This document verifies the requirements for ReqFlow's linting functionality.
 The verification test checks that ReqFlow correctly identifies and fixes excess whitespace after headers.
 
 #### Metadata
-* type: verification
+  * type: verification
 
 #### Acceptance Criteria
 - System should detect excess whitespace after headers
@@ -35,12 +35,14 @@ The verification test checks that ReqFlow correctly identifies and fixes excess 
 
 ## External Folders Tests
 
+---
+
 ### External Folders Support Verification
 
 The verification test checks that ReqFlow correctly processes requirements in external folders.
 
 #### Metadata
-* type: verification
+  * type: verification
 
 #### Acceptance Criteria
 - System should process requirements in external folders

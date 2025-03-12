@@ -364,7 +364,7 @@ impl Relation {
 
     /// Validate that the relation type follows the required format
     #[allow(dead_code)]
-    pub fn validate_type(&self) -> Result<(), ReqFlowError> {
+    pub fn validate_type(&self,element_file_path:String, element_name:String) -> Result<(), ReqFlowError> {
         // Normalize the type by trimming whitespace
         let normalized_type = self.relation_type.trim();
         
@@ -372,8 +372,8 @@ impl Relation {
         if !is_supported_relation_type(normalized_type) {
             let supported_types = get_supported_relation_types().join(", ");
             return Err(ReqFlowError::UnsupportedRelationType(format!(
-                "Unsupported relation type: '{}'. Supported types are: {}",
-                normalized_type, supported_types
+                "'{} (in file '{}' and element '{}')'. Supported types are: {}",
+                normalized_type,element_file_path, element_name, supported_types
             )));
         }
         

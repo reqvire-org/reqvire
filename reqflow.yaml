@@ -25,7 +25,6 @@ paths:
     - "**/Logical*.md"
     - "**/Physical*.md"
 
-
 style:
   # Theme for HTML output (default, dark, light)
   theme: "default"

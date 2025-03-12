@@ -212,7 +212,7 @@ pub fn validate_relations(registry: &ElementRegistry) -> Result<Vec<ReqFlowError
         
         for (index, relation) in element.relations.iter().enumerate() {
             // First validate relation type format
-            if let Err(err) = relation.validate_type() {
+            if let Err(err) = relation.validate_type(element.file_path.clone(),element.name.clone()) {
                 errors.push(err);
                 continue; // Skip target validation if type is invalid
             }

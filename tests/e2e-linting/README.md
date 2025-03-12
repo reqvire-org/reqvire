@@ -32,14 +32,4 @@ To run a specific test:
 
 Test fixtures are located in the `/tests/fixtures/` directory. These fixtures contain intentionally problematic markdown files to verify that linting correctly identifies and fixes them.
 
-## Verification Requirements
 
-These tests verify the following requirements:
-
-- [Excess Whitespace Linting Implementation](../../specifications/SystemRequirements/Requirements.md#excess-whitespace-linting-implementation)
-- [Inconsistent Newlines Linting Implementation](../../specifications/SystemRequirements/Requirements.md#inconsistent-newlines-linting-implementation)
-- [Missing Separators Linting Implementation](../../specifications/SystemRequirements/Requirements.md#missing-separators-linting-implementation)
-- [Indentation Consistency Linting Implementation](../../specifications/SystemRequirements/Requirements.md#indentation-consistency-linting-implementation)
-- [Linting Absolute Links Implementation](../../specifications/SystemRequirements/Requirements.md#linting-absolute-links-implementation)
-- [Dry Run Mode Implementation](../../specifications/SystemRequirements/Requirements.md#dry-run-mode-implementation)
-- [Git-Style Diff Output for Linting](../../specifications/SystemRequirements/Requirements.md#git-style-diff-output-for-linting)

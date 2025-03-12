@@ -25,16 +25,6 @@ To run a specific test:
 ./test_init_success.sh
 ```
 
-## Requirements Coverage
-
-These tests verify the following requirements:
-
-- **System Requirements/Initialization Command**
-  - The system shall implement an `init` command that bootstraps a basic ReqFlow project structure with example requirements, folder hierarchy, and a configuration file.
-
-- **System Requirements/Initialization Command Configuration Check**
-  - The system shall prevent the initialization command from modifying an existing project by detecting if a configuration file already exists (specifically "reqflow.yaml" or "reqflow.yml") and report an error instead of proceeding. Other configuration file formats that may be valid for general use (such as ".reqflow.yml", ".reqflow.yaml", etc.) shall not prevent initialization.
-
 ## Test Dependencies
 
 - Bash shell

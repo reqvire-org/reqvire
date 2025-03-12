@@ -132,6 +132,9 @@ The central component of the system, which facilitates various MBSE-related acti
  - With human in the loop workflow.
 - Apply Approved Suggestions: Commits approved changes to the model.
 
+
+---
+
 ### AI Agents in Development
 
 ReqFlow's **AI Agents 🤖** are uniquely equipped with deep knowledge of the ReqFlow methodology and structure. 
@@ -146,6 +149,9 @@ Key capabilities include:
 - Automated Commitments: AI Agents can commit approved code changes directly to the Git repository, following project workflows and standards.
 - Development Assistance: AI Agents provide context-aware assistance to human developers, including debugging, refactoring, and optimization.
 
+
+
+---
 
 ### System of Interest (SOI)
 
@@ -163,9 +169,15 @@ The SOI serves as the centerpiece of the ReqFlow framework, linking specificatio
 
 
 
+
+---
+
 ### External Systems
 
 ReqFlow interacts with external systems to enhance functionality and support development workflows.
+
+
+---
 
 ### CI/CD System
 
@@ -173,10 +185,16 @@ ReqFlow provides tools and features that CI/CD systems, such as GitHub Actions, 
 
 These tools enable CI/CD systems to enforce PR merge rules, validate changes, and automate feedback processes, such as adding comments, creating issues, or reporting statuses. 
 
+
+---
+
 ### GitHub or Similar
 
 ReqFlow integrates into existing agile and collaborative workflows by providing the necessary tools and scripts to support version control, change management, and traceability. 
 These features allow teams to seamlessly integrate MBSE practices into their development processes, enabling effective collaboration through GitHub or similar platforms.
+
+
+---
 
 ### Human Interaction
 
@@ -189,15 +207,24 @@ Humans interact with ReqFlow tools to manage, refine, and validate MBSE models, 
 ## Workflows and Interactions
 
 
+
+---
+
 ### ReqFlow Interactions with Git
 
 - ReqFlow uses Git repositories to store and version the MBSE model and developed system.
 - Changes, including approved AI suggestions, are prepared and committed through standard Git workflows.
 
 
+
+---
+
 ### CI/CD Integration
 - CI/CD pipelines trigger validation, diagram generation, and traceability processes.
 - Invalid merges are prevented based on the validation results.
+
+
+---
 
 ### SOI Feedback Loop
 - The Developed System provides feedback to the MBSE Model, enabling iterative refinement.
