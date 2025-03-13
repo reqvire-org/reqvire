@@ -2,6 +2,8 @@ use anyhow::Result;
 use clap::{Parser, CommandFactory};
 use std::path::PathBuf;
 
+
+
 mod config;
 mod element;
 mod error;
@@ -14,6 +16,14 @@ mod model;
 mod relation;
 mod utils;
 mod validation;
+mod cli;
+
+use model::ModelManager;
+use crate::cli::handle_command;
+use cli::Args;
+use log::error;
+
+
 #[cfg(test)]
 mod tests;
 #[path = "tests/validation_tests.rs"]
@@ -26,96 +36,37 @@ mod config_tests;
 #[cfg(test)]
 mod linting_tests;
 
-use model::ModelManager;
 
-/// ReqFlow is an agile Model-Based Systems Engineering (MBSE) framework
-/// designed to integrate seamlessly with modern Git workflows.
-#[derive(Parser, Debug)]
-#[clap(author, version, about)]
-struct Args {
-    /// Path to the input folder containing Markdown files
-    /// If not provided, this will be read from the configuration file
-    #[clap(index = 1)]
-    input_folder: Option<PathBuf>,
+fn main() -> Result<()> {
+    if std::env::var("RUST_LOG").is_err() {
+        std::env::set_var("RUST_LOG", "info");
+    }
+    env_logger::init();
 
-    /// Path to the output folder (not required for validate commands)
-    /// If not provided, this will be read from the configuration file
-    #[clap(index = 2)]
-    output_folder: Option<PathBuf>,
+    let args = Args::parse_args();
+    let config = config::Config::load_from_args(&args);
 
-    /// Convert Markdown to HTML with embedded styles
-    #[clap(long)]
-    html: bool,
+    let input_folder_path = args.input_folder.clone().unwrap_or_else(|| PathBuf::from(&config.paths.specifications_folder));
+    let output_folder_path = args.output_folder.clone().unwrap_or_else(|| PathBuf::from(&config.paths.output_folder));
 
-    /// Enable verbose output
-    #[clap(short, long)]
-    verbose: bool,
-    
-    /// Validate Markdown structure only
-    /// Checks for:
-    /// - Unique element names within documents
-    /// - Proper heading hierarchy
-    /// - Well-formed relation sections
-    #[clap(long, conflicts_with = "html")]
-    validate_markdown: bool,
-    
-    /// Validate relations only
-    /// Checks for:
-    /// - Valid relation types according to spec
-    /// - Valid relation targets (elements and files exist)
-    /// - Proper relation formatting
-    #[clap(long, conflicts_with = "html")]
-    validate_relations: bool,
-    
-    /// Run all validations
-    /// Includes markdown structure validation, relation validation,
-    /// and cross-component dependency validation
-    #[clap(long, conflicts_with = "html")]
-    validate_all: bool,
-    
-    /// Enable linting to find potential improvements (non-blocking)
-    /// By default, fixes will be applied automatically
-    #[clap(long)]
-    lint: bool,
-    
-    /// When linting, only show suggestions without applying fixes
-    #[clap(long, requires = "lint")]
-    dry_run: bool,
-    
-    /// Generate traceability matrix without processing other files
-    /// Creates a matrix showing relationships between elements in the model
-    #[clap(long)]
-    generate_matrix: bool,
-    
-    /// Output validation results in JSON format
-    /// Useful for CI/CD pipelines and automation
-    #[clap(long)]
-    json: bool,
-    
-    /// Generate mermaid diagrams in markdown files showing requirements relationships
-    /// The diagrams will be placed at the top of each requirements document
-    #[clap(long)]
-    generate_diagrams: bool,
-    
-    /// Path to a custom configuration file (YAML format)
-    /// If not provided, the system will look for reqflow.yml, reqflow.yaml, 
-    /// .reqflow.yml, or .reqflow.yaml in the current directory
-    #[clap(long, short = 'c')]
-    config: Option<PathBuf>,
-    
-    /// Output LLM context document
-    /// Generates a comprehensive context document with information about ReqFlow
-    /// methodology, document structure, relation types, and CLI usage to help
-    /// Large Language Models understand and work with ReqFlow-based projects
-    #[clap(long)]
-    llm_context: bool,
-    
-    /// Initialize a new ReqFlow project
-    /// Bootstraps a basic project structure with example requirements and configuration
-    #[clap(long)]
-    init: bool,
+    // reate a SINGLE model registry in `main.rs`
+    let mut model_manager = ModelManager::new_with_config(config.clone());
+
+    // Collect identifiers ONCE before running other processes
+    model_manager.collect_identifiers_only(&input_folder_path)?;
+
+    // Run `handle_command` and get exit code
+    let exit_code = handle_command(args, &mut model_manager, &config, &input_folder_path, &output_folder_path)
+        .unwrap_or_else(|e| {
+            error!("Execution failed: {}", e);
+            1 // Return exit code 1 in case of an error
+        });
+
+    std::process::exit(exit_code); 
 }
 
+
+/*
 fn main() -> Result<()> {
     // Initialize logger with a more verbose default level
     if std::env::var("RUST_LOG").is_err() {
@@ -545,11 +496,4 @@ fn main() -> Result<()> {
     
     Ok(())
 }
-
-/// Structure for JSON output of validation results
-#[derive(serde::Serialize)]
-struct ValidationResult {
-    validation_type: String,
-    errors: Vec<String>,
-    fixed: bool, // Kept for API compatibility but always false now
-}
+*/

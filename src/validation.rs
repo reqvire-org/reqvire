@@ -1,9 +1,83 @@
 use anyhow::Result;
 use std::path::Path;
+use std::path::PathBuf;
 
 use crate::element::ElementRegistry;
 use crate::error::ReqFlowError;
 use crate::relation::Relation;
+use crate::config::Config;
+use crate::ModelManager;
+
+/// Structure for JSON output of validation results
+#[derive(serde::Serialize)]
+struct ValidationResult {
+    validation_type: String,
+    errors: Vec<String>,
+    fixed: bool, // Kept for API compatibility but always false now
+}
+
+pub fn run_validation_checks(
+    model_manager: &mut ModelManager,
+    config: &Config,
+    input_folder_path: &PathBuf,
+) -> Result<i32> {  
+    let mut exit_code = 0;
+
+    //  Markdown validation
+    if config.validation.validate_markdown || config.validation.validate_all {
+        let markdown_errors = model_manager.validate_markdown_structure()?;
+        if !markdown_errors.is_empty() {
+            exit_code = 1;
+            print_validation_results("markdown", &markdown_errors, config.validation.json_output);
+        }
+    }
+
+    // Relation validation
+    if config.validation.validate_relations || config.validation.validate_all {
+        let relation_errors = model_manager.validate_relations()?;
+        if !relation_errors.is_empty() {
+            exit_code = 1;
+            print_validation_results("relations", &relation_errors, config.validation.json_output);
+        }
+    }
+
+    // Filesystem structure validation (Missing Before)
+    if config.validation.validate_all {
+        let filesystem_errors = model_manager.validate_filesystem_structure(input_folder_path, config)?;
+        if !filesystem_errors.is_empty() {
+            exit_code = 1;
+            print_validation_results("filesystem", &filesystem_errors, config.validation.json_output);
+        }
+    }
+
+    // Cross-component dependency validation (Missing Before)
+    if config.validation.validate_all {
+        let dependency_errors = model_manager.validate_cross_component_dependencies()?;
+        if !dependency_errors.is_empty() {
+            exit_code = 1;
+            print_validation_results("dependencies", &dependency_errors, config.validation.json_output);
+        }
+    }
+
+    Ok(exit_code)
+}
+
+// Helper function to print validation results
+fn print_validation_results(validation_type: &str, errors: &[impl ToString], json_output: bool) {
+    if json_output {
+        let json_result = ValidationResult {
+            validation_type: validation_type.to_string(),
+            errors: errors.iter().map(|e| e.to_string()).collect(),
+            fixed: false,
+        };
+        println!("{}", serde_json::to_string_pretty(&json_result).unwrap());
+    } else {
+        println!("❌ {} validation failed with {} errors.", validation_type, errors.len());
+        for error in errors {
+            println!("  - {}", error.to_string());
+        }
+    }
+}
 
 /// Validate a relation target exists in the element registry
 #[allow(dead_code)]

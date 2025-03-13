@@ -15,7 +15,7 @@ graph LR;
     Excess_Whitespace_Linting_Implementation["Excess Whitespace Linting Implementation"];
     click Excess_Whitespace_Linting_Implementation "SystemRequirements/Requirements.md#excess-whitespace-linting-implementation";
     class Excess_Whitespace_Linting_Implementation requirement;
-    Excess_Whitespace_Linting_Implementation ==>|refines| _UserRequirements_md_Format_Consistency_Enforcement_____UserRequirements_md_format_consistency_enforcement_;
+    Excess_Whitespace_Linting_Implementation -.->|deriveReqT| _UserRequirements_md_Format_Consistency_Enforcement_____UserRequirements_md_format_consistency_enforcement_;
     _UserRequirements_md_Format_Consistency_Enforcement_____UserRequirements_md_format_consistency_enforcement_["UserRequirements.md/Format Consistency Enforcement"];
     click _UserRequirements_md_Format_Consistency_Enforcement_____UserRequirements_md_format_consistency_enforcement_ "../UserRequirements.md#format-consistency-enforcement";
     class _UserRequirements_md_Format_Consistency_Enforcement_____UserRequirements_md_format_consistency_enforcement_ requirement;
@@ -26,7 +26,7 @@ graph LR;
     Inconsistent_Newlines_Linting_Implementation["Inconsistent Newlines Linting Implementation"];
     click Inconsistent_Newlines_Linting_Implementation "SystemRequirements/Requirements.md#inconsistent-newlines-linting-implementation";
     class Inconsistent_Newlines_Linting_Implementation requirement;
-    Inconsistent_Newlines_Linting_Implementation ==>|refines| _UserRequirements_md_Format_Consistency_Enforcement_____UserRequirements_md_format_consistency_enforcement_;
+    Inconsistent_Newlines_Linting_Implementation -.->|deriveReqT| _UserRequirements_md_Format_Consistency_Enforcement_____UserRequirements_md_format_consistency_enforcement_;
     _linting_newlines_rs__https___github_com_reqflow_reqflow_src_linting_newlines_rs_ -->|satisfies| Inconsistent_Newlines_Linting_Implementation;
     _linting_newlines_rs__https___github_com_reqflow_reqflow_src_linting_newlines_rs_["linting/newlines.rs"];
     click _linting_newlines_rs__https___github_com_reqflow_reqflow_src_linting_newlines_rs_ "https://github.com/reqflow/reqflow/src/linting#newlines.rs";
@@ -34,7 +34,7 @@ graph LR;
     Missing_Separators_Linting_Implementation["Missing Separators Linting Implementation"];
     click Missing_Separators_Linting_Implementation "SystemRequirements/Requirements.md#missing-separators-linting-implementation";
     class Missing_Separators_Linting_Implementation requirement;
-    Missing_Separators_Linting_Implementation ==>|refines| _UserRequirements_md_Format_Consistency_Enforcement_____UserRequirements_md_format_consistency_enforcement_;
+    Missing_Separators_Linting_Implementation -.->|deriveReqT| _UserRequirements_md_Format_Consistency_Enforcement_____UserRequirements_md_format_consistency_enforcement_;
     _linting_separators_rs__https___github_com_reqflow_reqflow_src_linting_separators_rs_ -->|satisfies| Missing_Separators_Linting_Implementation;
     _linting_separators_rs__https___github_com_reqflow_reqflow_src_linting_separators_rs_["linting/separators.rs"];
     click _linting_separators_rs__https___github_com_reqflow_reqflow_src_linting_separators_rs_ "https://github.com/reqflow/reqflow/src/linting#separators.rs";
@@ -42,7 +42,7 @@ graph LR;
     Indentation_Consistency_Linting_Implementation["Indentation Consistency Linting Implementation"];
     click Indentation_Consistency_Linting_Implementation "SystemRequirements/Requirements.md#indentation-consistency-linting-implementation";
     class Indentation_Consistency_Linting_Implementation requirement;
-    Indentation_Consistency_Linting_Implementation ==>|refines| _UserRequirements_md_Format_Consistency_Enforcement_____UserRequirements_md_format_consistency_enforcement_;
+    Indentation_Consistency_Linting_Implementation -.->|deriveReqT| _UserRequirements_md_Format_Consistency_Enforcement_____UserRequirements_md_format_consistency_enforcement_;
     _linting_indentation_rs__https___github_com_reqflow_reqflow_src_linting_indentation_rs_ -->|satisfies| Indentation_Consistency_Linting_Implementation;
     _linting_indentation_rs__https___github_com_reqflow_reqflow_src_linting_indentation_rs_["linting/indentation.rs"];
     click _linting_indentation_rs__https___github_com_reqflow_reqflow_src_linting_indentation_rs_ "https://github.com/reqflow/reqflow/src/linting#indentation.rs";
@@ -50,7 +50,7 @@ graph LR;
     Dry_Run_Mode_Implementation["Dry Run Mode Implementation"];
     click Dry_Run_Mode_Implementation "SystemRequirements/Requirements.md#dry-run-mode-implementation";
     class Dry_Run_Mode_Implementation requirement;
-    Dry_Run_Mode_Implementation ==>|refines| _UserRequirements_md_Linting_Command_Behavior_____UserRequirements_md_linting_command_behavior_;
+    Dry_Run_Mode_Implementation -.->|deriveReqT| _UserRequirements_md_Linting_Command_Behavior_____UserRequirements_md_linting_command_behavior_;
     _UserRequirements_md_Linting_Command_Behavior_____UserRequirements_md_linting_command_behavior_["UserRequirements.md/Linting Command Behavior"];
     click _UserRequirements_md_Linting_Command_Behavior_____UserRequirements_md_linting_command_behavior_ "../UserRequirements.md#linting-command-behavior";
     class _UserRequirements_md_Linting_Command_Behavior_____UserRequirements_md_linting_command_behavior_ requirement;
@@ -61,7 +61,7 @@ graph LR;
     Git_Style_Diff_Output_for_Linting["Git-Style Diff Output for Linting"];
     click Git_Style_Diff_Output_for_Linting "SystemRequirements/Requirements.md#git-style-diff-output-for-linting";
     class Git_Style_Diff_Output_for_Linting requirement;
-    Git_Style_Diff_Output_for_Linting ==>|refines| _UserRequirements_md_Linting_Command_Output_____UserRequirements_md_linting_command_output_;
+    Git_Style_Diff_Output_for_Linting -.->|deriveReqT| _UserRequirements_md_Linting_Command_Output_____UserRequirements_md_linting_command_output_;
     _UserRequirements_md_Linting_Command_Output_____UserRequirements_md_linting_command_output_["UserRequirements.md/Linting Command Output"];
     click _UserRequirements_md_Linting_Command_Output_____UserRequirements_md_linting_command_output_ "../UserRequirements.md#linting-command-output";
     class _UserRequirements_md_Linting_Command_Output_____UserRequirements_md_linting_command_output_ requirement;
@@ -77,7 +77,7 @@ graph LR;
     Parallel_Linting_Processing["Parallel Linting Processing"];
     click Parallel_Linting_Processing "SystemRequirements/Requirements.md#parallel-linting-processing";
     class Parallel_Linting_Processing requirement;
-    Parallel_Linting_Processing ==>|refines| _UserRequirements_md_Model_Linting_____UserRequirements_md_model_linting_;
+    Parallel_Linting_Processing -.->|deriveReqT| _UserRequirements_md_Model_Linting_____UserRequirements_md_model_linting_;
     _UserRequirements_md_Model_Linting_____UserRequirements_md_model_linting_["UserRequirements.md/Model Linting"];
     click _UserRequirements_md_Model_Linting_____UserRequirements_md_model_linting_ "../UserRequirements.md#model-linting";
     class _UserRequirements_md_Model_Linting_____UserRequirements_md_model_linting_ requirement;
@@ -96,7 +96,7 @@ graph LR;
     Index_Generation_During_Linting["Index Generation During Linting"];
     click Index_Generation_During_Linting "SystemRequirements/Requirements.md#index-generation-during-linting";
     class Index_Generation_During_Linting requirement;
-    Index_Generation_During_Linting ==>|refines| _UserRequirements_md_Generate_Documentation_Index_____UserRequirements_md_generate_documentation_index_;
+    Index_Generation_During_Linting -.->|deriveReqT| _UserRequirements_md_Generate_Documentation_Index_____UserRequirements_md_generate_documentation_index_;
     _UserRequirements_md_Generate_Documentation_Index_____UserRequirements_md_generate_documentation_index_["UserRequirements.md/Generate Documentation Index"];
     click _UserRequirements_md_Generate_Documentation_Index_____UserRequirements_md_generate_documentation_index_ "../UserRequirements.md#generate-documentation-index";
     class _UserRequirements_md_Generate_Documentation_Index_____UserRequirements_md_generate_documentation_index_ requirement;
@@ -115,6 +115,33 @@ graph LR;
 ```
 
 
+
+### CLI Lint Flag
+
+The system shall provide a linting function, activated by the (--lint flag), which shall execute the linting process upon user request.
+
+#### Relations
+  * derivedFrom: [UserRequirements.md/Linting Command Behavior](../UserRequirements.md#linting-command)
+  * satisfiedBy: [linting/mod.rs](https://github.com/reqflow/reqflow/src/linting/mod.rs)
+  * satisfiedBy: [cli.rs](https://github.com/reqflow/reqflow/src/cli.rs)  
+
+---
+  
+### Dry Run Mode
+
+The system shall provide a dry run mode (--dry-run flag) for linting that shows the suggested changes without applying them, allowing users to review modifications before committing to them.
+
+#### Details
+
+--dry-run flag works in tandem with the main lint command flag and cannot be used standalone.
+
+#### Relations
+  * derivedFrom: [CLI Lint Flag](cli-lint-flag)
+  * satisfiedBy: [linting/mod.rs](https://github.com/reqflow/reqflow/src/linting/mod.rs)
+  * satisfiedBy: [cli.rs](https://github.com/reqflow/reqflow/src/cli.rs)    
+
+---
+  
 ### Excess Whitespace Linting Implementation
 
 The system shall detect and fix excess whitespace after element headers, subsection headers, and relation identifiers to maintain consistent formatting across all requirements documents.
@@ -124,7 +151,6 @@ The system shall detect and fix excess whitespace after element headers, subsect
   * satisfiedBy: [linting/whitespace.rs](https://github.com/reqflow/reqflow/src/linting/whitespace.rs)
 
 ---
-
 
 ### Inconsistent Newlines Linting Implementation
 
@@ -153,16 +179,6 @@ The system shall identify and fix inconsistent indentation and bullet types in r
 #### Relations
   * derivedFrom: [UserRequirements.md/Format Consistency Enforcement](../UserRequirements.md#format-consistency-enforcement)
   * satisfiedBy: [linting/indentation.rs](https://github.com/reqflow/reqflow/src/linting/indentation.rs)
-
----
-
-### Dry Run Mode Implementation
-
-The system shall provide a dry run mode (--dry-run flag) for linting that shows the suggested changes without applying them, allowing users to review modifications before committing to them.
-
-#### Relations
-  * derivedFrom: [UserRequirements.md/Linting Command Behavior](../UserRequirements.md#linting-command-behavior)
-  * satisfiedBy: [linting/mod.rs](https://github.com/reqflow/reqflow/src/linting/mod.rs)
 
 ---
 
@@ -245,7 +261,7 @@ graph LR;
     External_Folders_Support["External Folders Support"];
     click External_Folders_Support "SystemRequirements/Requirements.md#external-folders-support";
     class External_Folders_Support requirement;
-    External_Folders_Support ==>|refines| _UserRequirements_md_Support_for_Distributed_Requirements_____UserRequirements_md_support_for_distributed_requirements_;
+    External_Folders_Support -.->|deriveReqT| _UserRequirements_md_Support_for_Distributed_Requirements_____UserRequirements_md_support_for_distributed_requirements_;
     _UserRequirements_md_Support_for_Distributed_Requirements_____UserRequirements_md_support_for_distributed_requirements_["UserRequirements.md/Support for Distributed Requirements"];
     click _UserRequirements_md_Support_for_Distributed_Requirements_____UserRequirements_md_support_for_distributed_requirements_ "../UserRequirements.md#support-for-distributed-requirements";
     class _UserRequirements_md_Support_for_Distributed_Requirements_____UserRequirements_md_support_for_distributed_requirements_ requirement;
@@ -299,7 +315,7 @@ graph LR;
     Initialization_Command["Initialization Command"];
     click Initialization_Command "SystemRequirements/Requirements.md#initialization-command";
     class Initialization_Command requirement;
-    Initialization_Command ==>|refines| _UserRequirements_md_Bootstrap_model_struture__UserRequirements_md_bootstrap_model_struture_;
+    Initialization_Command -.->|deriveReqT| _UserRequirements_md_Bootstrap_model_struture__UserRequirements_md_bootstrap_model_struture_;
     _UserRequirements_md_Bootstrap_model_struture__UserRequirements_md_bootstrap_model_struture_["UserRequirements.md/Bootstrap model struture"];
     click _UserRequirements_md_Bootstrap_model_struture__UserRequirements_md_bootstrap_model_struture_ "UserRequirements.md#bootstrap-model-struture";
     class _UserRequirements_md_Bootstrap_model_struture__UserRequirements_md_bootstrap_model_struture_ requirement;
@@ -318,7 +334,7 @@ graph LR;
     Index_Generator_Implementation["Index Generator Implementation"];
     click Index_Generator_Implementation "SystemRequirements/Requirements.md#index-generator-implementation";
     class Index_Generator_Implementation requirement;
-    Index_Generator_Implementation ==>|refines| _UserRequirements_md_Generate_Documentation_Index__UserRequirements_md_generate_documentation_index_;
+    Index_Generator_Implementation -.->|deriveReqT| _UserRequirements_md_Generate_Documentation_Index__UserRequirements_md_generate_documentation_index_;
     _UserRequirements_md_Generate_Documentation_Index__UserRequirements_md_generate_documentation_index_["UserRequirements.md/Generate Documentation Index"];
     click _UserRequirements_md_Generate_Documentation_Index__UserRequirements_md_generate_documentation_index_ "UserRequirements.md#generate-documentation-index";
     class _UserRequirements_md_Generate_Documentation_Index__UserRequirements_md_generate_documentation_index_ requirement;
@@ -342,7 +358,7 @@ graph LR;
     HTML_Navigation_Enhancement["HTML Navigation Enhancement"];
     click HTML_Navigation_Enhancement "SystemRequirements/Requirements.md#html-navigation-enhancement";
     class HTML_Navigation_Enhancement requirement;
-    HTML_Navigation_Enhancement ==>|refines| _UserRequirements_md_Documentation_Index_HTML_Integration__UserRequirements_md_documentation_index_html_integration_;
+    HTML_Navigation_Enhancement -.->|deriveReqT| _UserRequirements_md_Documentation_Index_HTML_Integration__UserRequirements_md_documentation_index_html_integration_;
     _UserRequirements_md_Documentation_Index_HTML_Integration__UserRequirements_md_documentation_index_html_integration_["UserRequirements.md/Documentation Index HTML Integration"];
     click _UserRequirements_md_Documentation_Index_HTML_Integration__UserRequirements_md_documentation_index_html_integration_ "UserRequirements.md#documentation-index-html-integration";
     class _UserRequirements_md_Documentation_Index_HTML_Integration__UserRequirements_md_documentation_index_html_integration_ requirement;
@@ -368,10 +384,10 @@ graph LR;
     JSON_Validation_Output_Format["JSON Validation Output Format"];
     click JSON_Validation_Output_Format "SystemRequirements/Requirements.md#json-validation-output-format";
     class JSON_Validation_Output_Format requirement;
-    JSON_Validation_Output_Format ==>|refines| _UserStories_md_Validating_Structures__UserStories_md_validating_structures_;
-    _UserStories_md_Validating_Structures__UserStories_md_validating_structures_["UserStories.md/Validating Structures"];
-    click _UserStories_md_Validating_Structures__UserStories_md_validating_structures_ "UserStories.md#validating-structures";
-    class _UserStories_md_Validating_Structures__UserStories_md_validating_structures_ requirement;
+    JSON_Validation_Output_Format -.->|deriveReqT| _UserRequirements_md_Enhanced_Validation_Error_Reporting__UserRequirements_md_enhanced_validation_error_reporting_;
+    _UserRequirements_md_Enhanced_Validation_Error_Reporting__UserRequirements_md_enhanced_validation_error_reporting_["UserRequirements.md/Enhanced Validation Error Reporting"];
+    click _UserRequirements_md_Enhanced_Validation_Error_Reporting__UserRequirements_md_enhanced_validation_error_reporting_ "UserRequirements.md#enhanced-validation-error-reporting";
+    class _UserRequirements_md_Enhanced_Validation_Error_Reporting__UserRequirements_md_enhanced_validation_error_reporting_ requirement;
     _validation_rs__https___github_com_reqflow_reqflow_src_validation_rs_ -->|satisfies| JSON_Validation_Output_Format;
     _validation_rs__https___github_com_reqflow_reqflow_src_validation_rs_["validation.rs"];
     click _validation_rs__https___github_com_reqflow_reqflow_src_validation_rs_ "https://github.com/reqflow/reqflow/src#validation.rs";
@@ -379,12 +395,12 @@ graph LR;
     Multiple_Validation_Modes_Support["Multiple Validation Modes Support"];
     click Multiple_Validation_Modes_Support "SystemRequirements/Requirements.md#multiple-validation-modes-support";
     class Multiple_Validation_Modes_Support requirement;
-    Multiple_Validation_Modes_Support ==>|refines| _UserStories_md_Validating_Structures__UserStories_md_validating_structures_;
+    Multiple_Validation_Modes_Support -.->|deriveReqT| _UserRequirements_md_Enhanced_Validation_Error_Reporting__UserRequirements_md_enhanced_validation_error_reporting_;
     _validation_rs__https___github_com_reqflow_reqflow_src_validation_rs_ -->|satisfies| Multiple_Validation_Modes_Support;
     Interactive_Mermaid_Diagram_Node_Behavior["Interactive Mermaid Diagram Node Behavior"];
     click Interactive_Mermaid_Diagram_Node_Behavior "SystemRequirements/Requirements.md#interactive-mermaid-diagram-node-behavior";
     class Interactive_Mermaid_Diagram_Node_Behavior requirement;
-    Interactive_Mermaid_Diagram_Node_Behavior ==>|refines| _UserRequirements_md_Interactive_Mermaid_Diagrams__UserRequirements_md_interactive_mermaid_diagrams_;
+    Interactive_Mermaid_Diagram_Node_Behavior -.->|deriveReqT| _UserRequirements_md_Interactive_Mermaid_Diagrams__UserRequirements_md_interactive_mermaid_diagrams_;
     _UserRequirements_md_Interactive_Mermaid_Diagrams__UserRequirements_md_interactive_mermaid_diagrams_["UserRequirements.md/Interactive Mermaid Diagrams"];
     click _UserRequirements_md_Interactive_Mermaid_Diagrams__UserRequirements_md_interactive_mermaid_diagrams_ "UserRequirements.md#interactive-mermaid-diagrams";
     class _UserRequirements_md_Interactive_Mermaid_Diagrams__UserRequirements_md_interactive_mermaid_diagrams_ requirement;
@@ -393,26 +409,22 @@ graph LR;
     Command_Line_Configuration_Overrides["Command Line Configuration Overrides"];
     click Command_Line_Configuration_Overrides "SystemRequirements/Requirements.md#command-line-configuration-overrides";
     class Command_Line_Configuration_Overrides requirement;
-    Command_Line_Configuration_Overrides ==>|refines| _UserRequirements_md_Project_Configuration_with_YAML__UserRequirements_md_project_configuration_with_yaml_;
+    Command_Line_Configuration_Overrides -.->|deriveReqT| _UserRequirements_md_Project_Configuration_with_YAML__UserRequirements_md_project_configuration_with_yaml_;
     _UserRequirements_md_Project_Configuration_with_YAML__UserRequirements_md_project_configuration_with_yaml_["UserRequirements.md/Project Configuration with YAML"];
     click _UserRequirements_md_Project_Configuration_with_YAML__UserRequirements_md_project_configuration_with_yaml_ "UserRequirements.md#project-configuration-with-yaml";
     class _UserRequirements_md_Project_Configuration_with_YAML__UserRequirements_md_project_configuration_with_yaml_ requirement;
     _main_rs__https___github_com_reqflow_reqflow_src_main_rs_ -->|satisfies| Command_Line_Configuration_Overrides;
-    Design_Specification_Document_Special_Handling["Design Specification Document Special Handling"];
-    click Design_Specification_Document_Special_Handling "SystemRequirements/Requirements.md#design-specification-document-special-handling";
-    class Design_Specification_Document_Special_Handling requirement;
-    Design_Specification_Document_Special_Handling ==>|refines| _UserStories_md_Managing_MBSE_Models__UserStories_md_managing_mbse_models_;
-    _UserStories_md_Managing_MBSE_Models__UserStories_md_managing_mbse_models_["UserStories.md/Managing MBSE Models"];
-    click _UserStories_md_Managing_MBSE_Models__UserStories_md_managing_mbse_models_ "UserStories.md#managing-mbse-models";
-    class _UserStories_md_Managing_MBSE_Models__UserStories_md_managing_mbse_models_ requirement;
-    _model_rs__https___github_com_reqflow_reqflow_src_model_rs_ -->|satisfies| Design_Specification_Document_Special_Handling;
-    _model_rs__https___github_com_reqflow_reqflow_src_model_rs_["model.rs"];
-    click _model_rs__https___github_com_reqflow_reqflow_src_model_rs_ "https://github.com/reqflow/reqflow/src#model.rs";
-    class _model_rs__https___github_com_reqflow_reqflow_src_model_rs_ satisfies;
+    Unstructured_Documents["Unstructured Documents"];
+    click Unstructured_Documents "SystemRequirements/Requirements.md#unstructured-documents";
+    class Unstructured_Documents requirement;
+    Unstructured_Documents -.->|deriveReqT| _UserRequirements_md_Unstructured_Documents__UserRequirements_md_unstructured_documents_;
+    _UserRequirements_md_Unstructured_Documents__UserRequirements_md_unstructured_documents_["UserRequirements.md/Unstructured Documents"];
+    click _UserRequirements_md_Unstructured_Documents__UserRequirements_md_unstructured_documents_ "UserRequirements.md#unstructured-documents";
+    class _UserRequirements_md_Unstructured_Documents__UserRequirements_md_unstructured_documents_ requirement;
     Relation_Type_Validation["Relation Type Validation"];
     click Relation_Type_Validation "SystemRequirements/Requirements.md#relation-type-validation";
     class Relation_Type_Validation requirement;
-    Relation_Type_Validation ==>|refines| _UserRequirements_md_Enhanced_Validation_Error_Reporting_____UserRequirements_md_enhanced_validation_error_reporting_;
+    Relation_Type_Validation -.->|deriveReqT| _UserRequirements_md_Enhanced_Validation_Error_Reporting_____UserRequirements_md_enhanced_validation_error_reporting_;
     _UserRequirements_md_Enhanced_Validation_Error_Reporting_____UserRequirements_md_enhanced_validation_error_reporting_["UserRequirements.md/Enhanced Validation Error Reporting"];
     click _UserRequirements_md_Enhanced_Validation_Error_Reporting_____UserRequirements_md_enhanced_validation_error_reporting_ "../UserRequirements.md#enhanced-validation-error-reporting";
     class _UserRequirements_md_Enhanced_Validation_Error_Reporting_____UserRequirements_md_enhanced_validation_error_reporting_ requirement;
@@ -431,18 +443,18 @@ graph LR;
     _linting_mod_rs__https___github_com_reqflow_reqflow_src_linting_mod_rs_["linting/mod.rs"];
     click _linting_mod_rs__https___github_com_reqflow_reqflow_src_linting_mod_rs_ "https://github.com/reqflow/reqflow/src/linting#mod.rs";
     class _linting_mod_rs__https___github_com_reqflow_reqflow_src_linting_mod_rs_ satisfies;
-    Comprehensive_HTML_Generation["Comprehensive HTML Generation"];
-    click Comprehensive_HTML_Generation "SystemRequirements/Requirements.md#comprehensive-html-generation";
-    class Comprehensive_HTML_Generation requirement;
-    Comprehensive_HTML_Generation ==>|refines| _UserStories_md_Managing_MBSE_Models__UserStories_md_managing_mbse_models_;
-    _html_export_rs__https___github_com_reqflow_reqflow_src_html_export_rs_ -->|satisfies| Comprehensive_HTML_Generation;
+    HTML_Export["HTML Export"];
+    click HTML_Export "SystemRequirements/Requirements.md#html-export";
+    class HTML_Export requirement;
+    HTML_Export -.->|deriveReqT| _UserRequirements_md_Export_HTML_specifications__UserRequirements_md__export_html_specifications_;
+    _UserRequirements_md_Export_HTML_specifications__UserRequirements_md__export_html_specifications_["UserRequirements.md/Export HTML specifications"];
+    click _UserRequirements_md_Export_HTML_specifications__UserRequirements_md__export_html_specifications_ "UserRequirements.md##export-html-specifications";
+    class _UserRequirements_md_Export_HTML_specifications__UserRequirements_md__export_html_specifications_ requirement;
+    _html_export_rs__https___github_com_reqflow_reqflow_src_html_export_rs_ -->|satisfies| HTML_Export;
     Detailed_Error_Handling_and_Logging["Detailed Error Handling and Logging"];
     click Detailed_Error_Handling_and_Logging "SystemRequirements/Requirements.md#detailed-error-handling-and-logging";
     class Detailed_Error_Handling_and_Logging requirement;
     Detailed_Error_Handling_and_Logging -.->|deriveReqT| _UserRequirements_md_Enhanced_Validation_Error_Reporting__UserRequirements_md_enhanced_validation_error_reporting_;
-    _UserRequirements_md_Enhanced_Validation_Error_Reporting__UserRequirements_md_enhanced_validation_error_reporting_["UserRequirements.md/Enhanced Validation Error Reporting"];
-    click _UserRequirements_md_Enhanced_Validation_Error_Reporting__UserRequirements_md_enhanced_validation_error_reporting_ "UserRequirements.md#enhanced-validation-error-reporting";
-    class _UserRequirements_md_Enhanced_Validation_Error_Reporting__UserRequirements_md_enhanced_validation_error_reporting_ requirement;
     _src_error_rs__https___github_com_reqflow_reqflow_src_error_rs_ -->|satisfies| Detailed_Error_Handling_and_Logging;
     _src_error_rs__https___github_com_reqflow_reqflow_src_error_rs_["src/error.rs"];
     click _src_error_rs__https___github_com_reqflow_reqflow_src_error_rs_ "https://github.com/reqflow/reqflow/src#error.rs";
@@ -450,8 +462,14 @@ graph LR;
     File_Content_Caching_for_Performance["File Content Caching for Performance"];
     click File_Content_Caching_for_Performance "SystemRequirements/Requirements.md#file-content-caching-for-performance";
     class File_Content_Caching_for_Performance requirement;
-    File_Content_Caching_for_Performance ==>|refines| _UserStories_md_Managing_MBSE_Models__UserStories_md_managing_mbse_models_;
+    File_Content_Caching_for_Performance -.->|deriveReqT| _UserRequirements_md_Efficient_Processings__UserRequirements_md_efficient_processings_;
+    _UserRequirements_md_Efficient_Processings__UserRequirements_md_efficient_processings_["UserRequirements.md/Efficient Processings"];
+    click _UserRequirements_md_Efficient_Processings__UserRequirements_md_efficient_processings_ "UserRequirements.md#efficient_processings";
+    class _UserRequirements_md_Efficient_Processings__UserRequirements_md_efficient_processings_ requirement;
     _model_rs__https___github_com_reqflow_reqflow_src_model_rs_ -->|satisfies| File_Content_Caching_for_Performance;
+    _model_rs__https___github_com_reqflow_reqflow_src_model_rs_["model.rs"];
+    click _model_rs__https___github_com_reqflow_reqflow_src_model_rs_ "https://github.com/reqflow/reqflow/src#model.rs";
+    class _model_rs__https___github_com_reqflow_reqflow_src_model_rs_ satisfies;
 ```
 
 
@@ -579,7 +597,6 @@ TODO: add requirment that defines a config filter out patterns.
 #### Relations
   * derivedFrom: [UserRequirements.md/Unstructured Documents](UserRequirements.md/unstructured-documents)
 
-
 ---
 
 ### Relation Type Validation
@@ -592,6 +609,31 @@ The system shall validate relation types against a defined vocabulary and provid
 
 ---
 
+### Excluded File Relation Validation
+
+The system shall properly validate relations targeting files matching excluded filename patterns, enabling references to excluded files while still respecting their exclusion from processing and linting operations.
+
+#### Details
+
+The validation process for excluded files:
+1. Files matching excluded patterns are registered in the element registry for relation validation only
+2. Internal elements within excluded files are not processed or validated
+
+#### Todo
+Decide to which parent relation it relates to:
+  * derivedFrom: [Configurable Filename Exclusion Patterns](#configurable-filename-exclusion-patterns) 
+  * refine: [File Pattern Exclusion for Linting](#file-pattern-exclusion-for-linting)
+  
+#### Relations
+  * satisfiedBy: [src/validation.rs](https://github.com/reqflow/reqflow/src/validation.rs)
+  * satisfiedBy: [src/model.rs](https://github.com/reqflow/reqflow/src/model.rs)
+  * satisfiedBy: [src/element.rs](https://github.com/reqflow/reqflow/src/element.rs)
+
+---
+
+### Multi-Pass Linting Capability
+
+---
 ### Multi-Pass Linting Capability
 
 The system shall support multi-pass linting with a configurable iteration limit to ensure all interdependent formatting issues are resolved.

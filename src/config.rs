@@ -148,8 +148,58 @@ impl Default for Config {
     }
 }
 
+
 impl Config {
-    
+    /// Load configuration from CLI arguments and update settings accordingly
+    pub fn load_from_args(args: &crate::cli::Args) -> Self {
+        // Load configuration from a file if provided, otherwise use default
+        let mut config = match &args.config {
+            Some(config_path) => match Self::from_file(config_path) {
+                Ok(cfg) => {
+                    log::info!("Loaded configuration from {:?}", config_path);
+                    cfg
+                }
+                Err(e) => {
+                    log::error!("Error loading configuration from {:?}: {}", config_path, e);
+                    log::warn!("Using default configuration");
+                    Self::default()
+                }
+            },
+            None => Self::load(), // Load from default locations
+        };
+
+        // Apply CLI arguments to override config settings
+        if args.html {
+            config.general.html_output = true;
+        }
+        if args.verbose {
+            config.general.verbose = true;
+        }
+        if args.generate_diagrams {
+            config.general.generate_diagrams = true;
+        }
+        if args.validate_markdown {
+            config.validation.validate_markdown = true;
+        }
+        if args.validate_relations {
+            config.validation.validate_relations = true;
+        }
+        if args.validate_all {
+            config.validation.validate_all = true;
+        }
+        if args.lint {
+            config.linting.lint = true;
+            config.linting.dry_run = args.dry_run;
+        }
+        if args.json {
+            config.validation.json_output = true;
+        }
+        if args.generate_matrix {
+            config.validation.generate_matrix = true;
+        }
+
+        config
+    }
     /// Load configuration from a YAML file
     pub fn from_file(path: &Path) -> Result<Self> {
         let content = fs::read_to_string(path)?;

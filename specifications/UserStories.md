@@ -30,6 +30,10 @@ graph LR;
     click Generate_Diagrams "UserStories.md#generate-diagrams";
     class Generate_Diagrams requirement;
     _MOEs_md_MOE_UA__MOEs_md_moe_ua_ -->|traces| Generate_Diagrams;
+    Export_Specifications["Export Specifications"];
+    click Export_Specifications "UserStories.md#export-specifications";
+    class Export_Specifications requirement;
+    _MOEs_md_MOE_UA__MOEs_md_moe_ua_ -->|traces| Export_Specifications;
     Aligning_Design_with_Code["Aligning Design with Code"];
     click Aligning_Design_with_Code "UserStories.md#aligning-design-with-code";
     class Aligning_Design_with_Code requirement;
@@ -99,7 +103,6 @@ As a **Manager**, I want to export specifications into diferent formats includin
 
 ---
 
-
 ### Aligning Design with Code
 
 As a **Developer**, I want to align code with MBSE models, so that implementation remains consistent with design specifications.
@@ -116,7 +119,7 @@ As an **System Engineer**, I want to validate the structure of MBSE models, so t
 #### Relations
   * tracedFrom: [MOEs.md/MOE_UA](MOEs.md#moe_ua)
 
----
+
 
 ### Integrate with GitHub Workflows
 

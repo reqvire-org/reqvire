@@ -12,13 +12,21 @@ graph LR;
   classDef paragraph fill:#efefef,stroke:#999999,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
+    Unstructured_Documents["Unstructured Documents"];
+    click Unstructured_Documents "UserRequirements.md#unstructured-documents";
+    class Unstructured_Documents requirement;
+    Unstructured_Documents ==>|refines| _UserStories_md_Managing_MBSE_Models__UserStories_md_managing_mbse_models_;
+    _UserStories_md_Managing_MBSE_Models__UserStories_md_managing_mbse_models_["UserStories.md/Managing MBSE Models"];
+    click _UserStories_md_Managing_MBSE_Models__UserStories_md_managing_mbse_models_ "UserStories.md#managing-mbse-models";
+    class _UserStories_md_Managing_MBSE_Models__UserStories_md_managing_mbse_models_ requirement;
+    Efficient_Processings["Efficient Processings"];
+    click Efficient_Processings "UserRequirements.md#efficient-processings";
+    class Efficient_Processings requirement;
+    Efficient_Processings ==>|refines| _UserStories_md_Managing_MBSE_Models__UserStories_md_managing_mbse_models_;
     Bootstrap_model_struture["Bootstrap model struture"];
     click Bootstrap_model_struture "UserRequirements.md#bootstrap-model-struture";
     class Bootstrap_model_struture requirement;
     Bootstrap_model_struture ==>|refines| _UserStories_md_Managing_MBSE_Models__UserStories_md_managing_mbse_models_;
-    _UserStories_md_Managing_MBSE_Models__UserStories_md_managing_mbse_models_["UserStories.md/Managing MBSE Models"];
-    click _UserStories_md_Managing_MBSE_Models__UserStories_md_managing_mbse_models_ "UserStories.md#managing-mbse-models";
-    class _UserStories_md_Managing_MBSE_Models__UserStories_md_managing_mbse_models_ requirement;
     Project_Configuration_with_YAML["Project Configuration with YAML"];
     click Project_Configuration_with_YAML "UserRequirements.md#project-configuration-with-yaml";
     class Project_Configuration_with_YAML requirement;
@@ -40,14 +48,13 @@ graph LR;
     Support_for_Distributed_Requirements -.->|deriveReqT| _Project_Configuration_with_YAML___project_configuration_with_yaml_;
 ```
 
+
 ### Unstructured Documents
 
 The system shall allow structured markdown and unstructured (eg., markdown, PDFs, DOCX, raw text) documents to coexist within the same MBSE model.
 
 #### Relations
   * refine: [UserStories.md/Managing MBSE Models](UserStories.md#managing-mbse-models)
-
-
 
 ---
 
@@ -59,7 +66,6 @@ The system shall process structured documents and relations to extract model-rel
   * refine: [UserStories.md/Managing MBSE Models](UserStories.md#managing-mbse-models)
 
 ---
-
 
 ### Bootstrap model struture
 
@@ -376,9 +382,9 @@ The system shall provide linting capabilities to identify and fix stylistic, for
 
 ---
 
-### Linting Command Behavior
+### Linting Command
 
-The system shall provide a linting command that by default automatically applies fixes to stylistic and non-critical formatting issues, while offering a --dry-run flag to preview changes without applying them.
+The system shall provide a linting command that by default automatically applies fixes to stylistic and non-critical formatting issues, while offering option to preview changes without applying them.
 
 #### Relations
   * containedBy: [Model Linting](#model-linting)
@@ -390,7 +396,7 @@ The system shall provide a linting command that by default automatically applies
 The system shall display linting changes suggestion in similar manner as git diffs.
 
 #### Relations
-  * refine: [Linting Command Behavior](#linting-command-behavior)
+  * refine: [Linting Command](#linting-command)
 
 ---
 
@@ -879,13 +885,6 @@ graph LR;
     click Export_Traceability_Matrix "UserRequirements.md#export-traceability-matrix";
     class Export_Traceability_Matrix requirement;
     Export_Traceability_Matrix ==>|refines| _UserStories_md_Generate_Traceability_Matrix__UserStories_md_generate_traceability_matrix_;
-    Support_CI_CD_Integration["Support CI/CD Integration"];
-    click Support_CI_CD_Integration "UserRequirements.md#support-ci/cd-integration";
-    class Support_CI_CD_Integration requirement;
-    Support_CI_CD_Integration ==>|refines| _UserStories_md_Automate_Traceability_Matrix__UserStories_md_generate_traceability_matrix_;
-    _UserStories_md_Automate_Traceability_Matrix__UserStories_md_generate_traceability_matrix_["UserStories.md/Automate Traceability Matrix"];
-    click _UserStories_md_Automate_Traceability_Matrix__UserStories_md_generate_traceability_matrix_ "UserStories.md#generate-traceability-matrix";
-    class _UserStories_md_Automate_Traceability_Matrix__UserStories_md_generate_traceability_matrix_ requirement;
 ```
 
 
@@ -994,6 +993,32 @@ The system shall provide an option to export the traceability matrix in formats 
 ---
 
 ## Exporting Specifications
+
+```mermaid
+graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef satisfies fill:#fff2cc,stroke:#ffcc00,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef paragraph fill:#efefef,stroke:#999999,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+
+    Export_HTML_specifications["Export HTML specifications"];
+    click Export_HTML_specifications "UserRequirements.md#export-html-specifications";
+    class Export_HTML_specifications requirement;
+    Export_HTML_specifications -.->|deriveReqT| _UserStories_md_Export_Specifications__UserStories_md_export_specifications_;
+    _UserStories_md_Export_Specifications__UserStories_md_export_specifications_["UserStories.md/Export Specifications"];
+    click _UserStories_md_Export_Specifications__UserStories_md_export_specifications_ "UserStories.md#export-specifications";
+    class _UserStories_md_Export_Specifications__UserStories_md_export_specifications_ requirement;
+    Support_CI_CD_Integration["Support CI/CD Integration"];
+    click Support_CI_CD_Integration "UserRequirements.md#support-ci/cd-integration";
+    class Support_CI_CD_Integration requirement;
+    Support_CI_CD_Integration ==>|refines| _UserStories_md_Automate_Traceability_Matrix__UserStories_md_generate_traceability_matrix_;
+    _UserStories_md_Automate_Traceability_Matrix__UserStories_md_generate_traceability_matrix_["UserStories.md/Automate Traceability Matrix"];
+    click _UserStories_md_Automate_Traceability_Matrix__UserStories_md_generate_traceability_matrix_ "UserStories.md#generate-traceability-matrix";
+    class _UserStories_md_Automate_Traceability_Matrix__UserStories_md_generate_traceability_matrix_ requirement;
+```
 
 
 ---
