@@ -1,8 +1,104 @@
 use std::path::{Path, PathBuf};
 use anyhow::Result;
-use crate::error::ReqFlowError;
 use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
 use std::io::Write;
+use std::collections::HashMap;
+use walkdir::WalkDir;
+use std::fs;
+
+use crate::error::ReqFlowError;
+use crate::config::Config;
+
+
+
+pub fn run_linting(input_folder_path: &PathBuf, config: &Config) -> Result<()> {
+    if config.general.verbose {
+        let dry_run_msg = if config.linting.dry_run { " (dry run)" } else { "" };
+        println!("Linting requirements files in {:?}{}", input_folder_path, dry_run_msg);
+    }
+
+    let mut lint_suggestions = Vec::new();
+    let mut iteration = 0;
+    let max_iterations = 5; // Prevent infinite loops
+
+    loop {
+        let current_suggestions = lint_directory_with_config(input_folder_path, config.linting.dry_run, config)?;
+        
+        if current_suggestions.is_empty() {
+            break;
+        }
+
+        lint_suggestions.extend(current_suggestions.clone());
+
+        if config.linting.dry_run {
+            break; // If dry-run, stop after one iteration
+        }
+
+        iteration += 1;
+        if iteration >= max_iterations {
+            println!("⚠️ Reached maximum lint iterations ({}). Some fixes might require manual adjustment.", max_iterations);
+            break;
+        }
+    }
+
+    if lint_suggestions.is_empty() {
+        println!("✅ No linting suggestions found. Your files are clean!");
+    } else {
+        println!("ℹ️ Found {} linting suggestions:", lint_suggestions.len());
+
+        // Group suggestions by file and type
+        let mut grouped_by_file: HashMap<String, Vec<&LintSuggestion>> = HashMap::new();
+        for suggestion in &lint_suggestions {
+            let file_path = suggestion.file_path.to_string_lossy().to_string();
+            grouped_by_file.entry(file_path).or_default().push(suggestion);
+        }
+
+        println!("Files with formatting issues:");
+        for (file_path, suggestions) in &grouped_by_file {
+            let mut type_counts: HashMap<LintType, usize> = HashMap::new();
+
+            for suggestion in suggestions {
+                *type_counts.entry(suggestion.suggestion_type.clone()).or_default() += 1;
+            }
+
+            println!("  {} ({} issues)", file_path, suggestions.len());
+            for (lint_type, count) in &type_counts {
+                let type_name = match lint_type {
+                    LintType::AbsoluteLink => "Absolute links",
+                    LintType::ExcessWhitespace => "Excess whitespace",
+                    LintType::InconsistentNewlines => "Inconsistent newlines",
+                    LintType::MissingSeparator => "Missing separators",
+                    LintType::InconsistentIndentation => "Inconsistent indentation",
+                };
+                println!("    - {}: {}", type_name, count);
+            }
+        }
+
+        println!("\nSuggested changes (git diff style):");
+        let mut sorted_suggestions = lint_suggestions.clone();
+        sorted_suggestions.sort_by(|a, b| {
+            let file_cmp = a.file_path.to_string_lossy().cmp(&b.file_path.to_string_lossy());
+            if file_cmp == std::cmp::Ordering::Equal {
+                a.line_number.unwrap_or(0).cmp(&b.line_number.unwrap_or(0))
+            } else {
+                file_cmp
+            }
+        });
+
+        for suggestion in &sorted_suggestions {
+            let _ = suggestion.print_colorized_diff();
+        }
+
+        if config.linting.dry_run {
+            println!("Run without --dry-run to apply these fixes automatically.");
+        } else {
+            println!("✅ All suggestions have been applied.");
+        }
+    }
+
+    Ok(())
+}
+
 
 /// Represents a lint suggestion (like a warning) that can be fixed automatically
 #[derive(Debug, Clone)]
@@ -235,19 +331,7 @@ impl LintSuggestion {
     // to avoid redundant code
 }
 
-use walkdir::WalkDir;
-use std::fs;
 
-use crate::config::Config;
-
-/// Run linting on all files in a directory
-/// 
-/// This is kept for backward compatibility. New code should use lint_directory_with_config instead.
-#[allow(dead_code)]
-pub fn lint_directory(directory: &Path, dry_run: bool) -> Result<Vec<LintSuggestion>, ReqFlowError> {
-    // Use default config initially
-    lint_directory_with_config(directory, dry_run, &Config::default())
-}
 
 /// Run linting on all files in a directory with the given configuration
 pub fn lint_directory_with_config(directory: &Path, dry_run: bool, config: &Config) -> Result<Vec<LintSuggestion>, ReqFlowError> {
