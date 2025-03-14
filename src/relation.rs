@@ -2,6 +2,8 @@ use lazy_static::lazy_static;
 use std::collections::HashMap;
 use crate::identifier::normalize_identifier;
 use crate::config::Config;
+use crate::error::ReqFlowError;
+
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum RelationDirection {
@@ -106,16 +108,17 @@ pub struct Relation {
 }
 
 impl Relation {
-    pub fn new(config: &Config, relation_type: &str, raw_target: &str, name: &str) -> Option<Self> {
-        if let Some(relation_info) = RELATION_TYPES.get(relation_type) {
-            Some(Self {
-                relation_type: relation_info,
-                target: normalize_identifier(config, "", raw_target),
-                name: name.to_string(),
-            })
-        } else {
-            None
-        }
+    pub fn new(config: &Config, relation_type: &str, raw_target: &str, name: &str) -> Result<Self, ReqFlowError> {
+        let relation_info = RELATION_TYPES.get(relation_type)
+            .ok_or_else(|| ReqFlowError::UnsupportedRelationType(relation_type.to_string()))?;
+
+        let normalized_target = normalize_identifier(config, "", raw_target)?;
+
+        Ok(Self {
+            relation_type: relation_info,
+            target: normalized_target,
+            name: name.to_string(),
+        })
     }
 }
 
