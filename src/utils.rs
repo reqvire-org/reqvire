@@ -1,195 +1,136 @@
 use anyhow::Result;
 use std::fs;
 use std::path::{Path, PathBuf};
+use glob::Pattern;
+use crate::config::Config;
+use log::debug;
 
 use crate::error::ReqFlowError;
 
-/// Check if a file is a requirements file or related specification according to ReqFlow
-/// This is a legacy method that uses filename-based heuristics
-/// Use is_requirements_file_by_path with configuration when possible
-pub fn is_requirements_file(filename: &str) -> bool {
-    let lowercase = filename.to_lowercase();
+
+pub fn is_in_specifications(file_path: &Path, config: &Config) -> bool {
+    let specifications_root = config.paths.base_path.join(&config.paths.specifications_folder);
     
-    // According to the documentation, we should process:
-    // 1. Files with "requirements" in the name
-    // 2. UserRequirements.md, MissionRequirements.md files
-    // 3. User stories and other specification files
-    // 4. Design specifications (DSD)
-    
-    lowercase.contains("requirements") || 
-    lowercase.contains("userstories") || 
-    lowercase.contains("usecases") || 
-    lowercase.contains("moes") ||
-    lowercase.contains("dsd_") // Include Design Specification Documents
+    match file_path.strip_prefix(&config.paths.base_path) {
+        Ok(relative_path) => relative_path.starts_with(&config.paths.specifications_folder),
+        Err(_) => file_path.starts_with(&specifications_root),
+    }
 }
 
-/// Check if a file is a requirements file or design specification based on its path and configuration
-/// 
-/// Note: This function is more permissive and includes both requirements files and design specifications.
-/// For more specific filtering, use is_requirements_file_only() or is_design_specification().
-pub fn is_requirements_file_by_path(path: &Path, config: &crate::config::Config, base_path: &Path) -> bool {
+
+/// Check if a file is inside any external folder or its subfolders
+pub fn is_in_external_folder(file_path: &Path, config: &Config) -> bool {
+    for external_folder in &config.paths.external_folders {
+        let external_root = config.paths.base_path.join(external_folder);
+
+        if match file_path.strip_prefix(&config.paths.base_path) {
+            Ok(relative_path) => relative_path.starts_with(external_folder),
+            Err(_) => file_path.starts_with(&external_root),
+        } {
+            return true;
+        }
+    }
+    false
+}
+
+
+/// Check if a file is in a **subfolder** of the specifications folder (not in the root)
+pub fn is_in_specifications_subfolder(file_path: &Path, config: &Config) -> bool {
+    let specifications_root = config.paths.base_path.join(&config.paths.specifications_folder);
+
+    match file_path.strip_prefix(&config.paths.base_path) {
+        Ok(relative_path) => {
+            relative_path.starts_with(&config.paths.specifications_folder)
+                && relative_path != Path::new(&config.paths.specifications_folder)
+        }
+        Err(_) => {
+            file_path.starts_with(&specifications_root) && file_path.parent() != Some(&specifications_root)
+        }
+    }
+}
+
+
+
+
+
+/// Check if a file is inside specifications, a subfolder of specifications, or an external folder
+pub fn is_relevant_file(file_path: &Path, config: &Config) -> bool {
+    is_in_specifications(file_path, config) 
+        || is_in_specifications_subfolder(file_path, config) 
+        || is_in_external_folder(file_path, config)
+}
+
+
+
+/// Helper function to check if a file is excluded by any of the provided glob patterns
+/// Checks if a file should be excluded based on glob patterns in the configuration.
+pub fn is_excluded_by_patterns(file_path: &Path, config: &Config, verbose: bool) -> bool {
+    // Check if file is in specifications or external folders
+    if !is_relevant_file(file_path, config) {
+        return false; // Skip files that are outside relevant directories
+    }
+
+    // Use the configured base path for relative path calculation
+    let base_path = Path::new(&config.paths.base_path);
+
+    // Compute relative path within the base path
+    let relative_path = match file_path.strip_prefix(base_path) {
+        Ok(rel) => rel.to_string_lossy().replace("\\", "/"), // Normalize slashes for glob matching
+        Err(_) => file_path.to_string_lossy().replace("\\", "/"), // Use full path if stripping fails
+    };
+
+    // Extract just the filename
+    let file_name = file_path.file_name().unwrap_or_default().to_string_lossy().to_string();
+
+    for pattern in &config.paths.excluded_filename_patterns {
+        let glob_pattern = match Pattern::new(pattern.as_str()) {
+            Ok(p) => p,
+            Err(e) => {
+                log::warn!("Invalid glob pattern '{}': {}", pattern, e);
+                continue;
+            }
+        };
+
+        // Match against both relative path and filename
+        let matches_full_path = glob_pattern.matches(&relative_path);
+        let matches_filename = glob_pattern.matches(&file_name);
+
+        if matches_full_path || matches_filename {
+            if verbose {
+                debug!(
+                    "File '{}' matches excluded pattern '{}' (relative_path='{}', filename='{}')",
+                    file_path.display(),
+                    pattern,
+                    relative_path,
+                    file_name
+                );
+            }
+            return true;
+        }
+    }
+
+    false
+}
+
+
+
+/// Check if a file is a processable file based on its path and configuration
+pub fn is_requirements_file_by_path(path: &Path, config: &crate::config::Config) -> bool {
     // Early return if not a markdown file
     if path.extension().map_or(false, |ext| ext != "md") {
         return false;
     }
     
     // Check if file matches any excluded filename patterns
-    let is_excluded = is_excluded_by_patterns(path, &config.paths.excluded_filename_patterns, base_path, false);
+    let is_excluded = is_excluded_by_patterns(path, &config, false);
     
     if is_excluded {
         return false;
     }
-    
-    // Check if the file is in specifications folder
-    let specs_dir = base_path.join(&config.paths.specifications_folder);
-    if path.starts_with(&specs_dir) {
-        // Design specs are still included here since this function should match both
-        // requirements and design specs
-        return true;
-    }
-    
-    // Check if the file is in any external folder
-    for ext_folder in &config.paths.external_folders {
-        let ext_path = base_path.join(ext_folder);
-        if path.starts_with(&ext_path) {
-            return true;
-        }
-    }
-    
-    // No fallback - if not in specifications or external folders, it's not a requirements file
-    false
+      
+    is_relevant_file(path,&config)
 }
 
-/// Checks if a file is a requirements file only (excluding design specifications)
-/// 
-/// This function is used to identify files that should be processed for diagram generation
-/// or linting when we want to exclude design specifications.
-/// 
-/// @param path The path to the file to check
-/// @param config The ReqFlow configuration
-/// @param base_path The base path for relative path resolution
-/// @param verbose Whether to output debug information
-/// @return true if the file is a requirements file, false otherwise
-pub fn is_requirements_file_only(path: &Path, config: &crate::config::Config, base_path: &Path, verbose: bool) -> bool {
-    // Check if file is a markdown file
-    if !path.is_file() || path.extension().map_or(true, |ext| ext != "md") {
-        return false;
-    }
-    
-    // Get filename for checking
-    let filename = path.file_name().unwrap_or_default().to_string_lossy();
-    let path_str = path.to_string_lossy();
-    
-    if verbose {
-        log::debug!("Checking file {}, base_path: {}", path.display(), base_path.display());
-        log::debug!("Path: {}, Filename: {}", path_str, filename);
-    }
-    
-    // Check if file matches any excluded filename patterns
-    let is_excluded = is_excluded_by_patterns(path, &config.paths.excluded_filename_patterns, base_path, verbose);
-    
-    if is_excluded {
-        if verbose {
-            log::debug!("Skipping excluded file: {}", path.display());
-        }
-        return false;
-    }
-    
-    // Design specifications are excluded based on patterns
-    // This check is no longer needed as we use excluded_filename_patterns instead
-        
-    // Design specification files are handled by excluded_filename_patterns
-    
-    // Check if file is in any external folder
-    let in_external_folder = if !config.paths.external_folders.is_empty() {
-        config.paths.external_folders.iter().any(|ext_folder| {
-            // Use exact folder names from config for matching
-            let ext_folder_name = ext_folder.trim_end_matches('/');
-            
-            // Check if path contains the external folder name
-            path_str.contains(ext_folder_name)
-        })
-    } else {
-        false
-    };
-    
-    // If file is in an external folder, it's automatically considered a requirements file
-    if in_external_folder {
-        if verbose {
-            log::debug!("File is in external folder, treating as requirements document");
-        }
-        return true;
-    }
-    
-    // Special case for test fixtures and empty specifications folder:
-    // If specifications_folder is empty, we're likely in a test environment
-    // In this case, just check if the filename contains "requirements"
-    if config.paths.specifications_folder.is_empty() {
-        let is_requirements_file = is_requirements_file(&filename);
-        
-        if is_requirements_file && verbose {
-            log::debug!("Test environment: File {} identified as requirements document", path.display());
-        }
-        
-        return is_requirements_file;
-    }
-    
-    // Normal case - proper path checking
-    // Determine if file is in the specifications folder or subfolder
-    let specs_folder = &config.paths.specifications_folder;
-    
-    // Check if the path contains the specifications folder name
-    let in_specifications = path_str.contains(specs_folder);
-    
-    if !in_specifications {
-        // If not in specifications or external folders, it's not a requirements file
-        if verbose {
-            log::debug!("File is not in specifications folder or external folder, skipping");
-            log::debug!("  specs_folder: '{}', path: '{}'", specs_folder, path_str);
-        }
-        return false;
-    }
-    
-    // In specifications folder, all files are considered requirements (except those already filtered out)
-    if verbose {
-        log::debug!("File is in specifications folder, treating as requirements document");
-        log::debug!("FINAL RESULT: true");
-    }
-    
-    true
-}
-
-// is_design_specification function has been removed
-// Use excluded_filename_patterns for filtering instead
-
-/// Check if a file should be considered for processing in the ReqFlow system
-/// This is more inclusive than is_requirements_file and includes all markdown files
-/// that might be referenced or part of the specification set
-pub fn is_processable_file(filename: &str) -> bool {
-    // Only markdown files
-    if !filename.to_lowercase().ends_with(".md") {
-        return false;
-    }
-    
-    // Include requirements files
-    if is_requirements_file(filename) {
-        return true;
-    }
-    
-    // Include design specifications, relations documentation, etc.
-    let lowercase = filename.to_lowercase();
-    lowercase.contains("specification") || 
-    lowercase.contains("design") || 
-    lowercase.contains("dsd") || 
-    lowercase.contains("relation") || 
-    lowercase.contains("architecture") || 
-    lowercase.contains("story") || 
-    lowercase.contains("diagram") || 
-    lowercase.contains("model") || 
-    lowercase.contains("trace") || 
-    // Also include README files as they're often referenced
-    lowercase.contains("readme")
-}
 
 /// Get relative path from a base directory
 pub fn get_relative_path<P: AsRef<Path>, B: AsRef<Path>>(path: P, base: B) -> Result<PathBuf, ReqFlowError> {
@@ -205,134 +146,56 @@ pub fn get_relative_path<P: AsRef<Path>, B: AsRef<Path>>(path: P, base: B) -> Re
     }
 }
 
-/// Normalize a path string for consistent registry lookups
-/// This handles paths that might be written in different forms but refer to the same file
-/// 
-/// Always normalizes to absolute paths where specifications or external folders are at the root
-/// For example: 
-/// - "./DesignSpecifications/File.md" becomes "/specifications/DesignSpecifications/File.md"
-/// - "../../Requirements.md" in external-folder/subfolder/subfolder becomes "/external-folder/Requirements.md"
-/// - "#fragment" becomes "/specifications/current-file.md#fragment" with absolute path
-pub fn normalize_path(path: &str, config: &crate::config::Config, current_file: &str) -> String {
-    // Handle fragment-only references (like #fragment)
-    if path.starts_with("#") {
-        // For fragment-only paths, combine with current file path
-        // Normalize current file path first if needed (avoid infinite recursion by using empty string for current_file)
-        let current_file_normalized = if current_file.is_empty() {
-            "".to_string()
-        } else {
-            normalize_path(current_file, config, "")
-        };
-        
-        // Ensure fragments are appended directly to the file path WITHOUT a slash
-        log::debug!("Normalizing fragment-only reference: {} -> {}{}", path, current_file_normalized, path);
-        return format!("{}{}", current_file_normalized, path);
-    }
-    
-    // Split the path and fragment if present
-    let (base_path, fragment) = if let Some(fragment_idx) = path.find('#') {
-        // Keep the fragment part intact, including the # character
-        (path[0..fragment_idx].to_string(), path[fragment_idx..].to_string())
-    } else {
-        (path.to_string(), "".to_string())
-    };
-    
-    // Handle relative paths with ../ (parent directory references)
-    if base_path.contains("../") && !current_file.is_empty() {
-        // Get the current file's parent directory to resolve relative paths
-        let current_dir = Path::new(current_file).parent().unwrap_or(Path::new(""));
-        let specs_folder = &config.paths.specifications_folder;
-        
-        // Extract just the path part (not including the filename) from current_file
-        let current_dir_str = current_dir.to_string_lossy().to_string();
-        
-        // Resolve the relative path - replace "../" with appropriate path components
-        let mut target_parts: Vec<&str> = base_path.split('/').collect();
-        let mut current_parts: Vec<&str> = current_dir_str.split('/').collect();
-        
-        // For each "../" in the target, remove the last directory from current parts
-        let mut parent_count = 0;
-        while !target_parts.is_empty() && target_parts[0] == ".." {
-            parent_count += 1;
-            target_parts.remove(0);
-            if !current_parts.is_empty() {
-                current_parts.pop();
-            }
-        }
-        
-        // Combine the remaining parts to form the resolved path
-        let mut resolved_parts = current_parts;
-        resolved_parts.extend(target_parts);
-        let resolved_path = resolved_parts.join("/");
-        
-        // Make sure the result is properly formatted
-        let normalized = if resolved_path.starts_with('/') {
-            format!("{}{}", resolved_path, fragment)
-        } else if resolved_path.starts_with("./") {
-            format!("/{}{}", resolved_path.trim_start_matches("./"), fragment)
-        } else {
-            format!("/{}{}", resolved_path, fragment)
-        };
-        
-        log::debug!("Normalized relative path (../) reference: {} -> {} (from current file: {})", 
-                 path, normalized, current_file);
-        
-        return normalized;
-    }
-    
-    let path_obj = Path::new(&base_path);
-    
-    // For a simple filename with no path components, we need context to normalize it
-    if path_obj.parent().is_none() || path_obj.parent().unwrap() == Path::new("") {
-        return format!("{}{}", base_path, fragment);
-    }
-    
-    // Get path components - we're looking for specifications folder or external folders
-    let specs_folder = &config.paths.specifications_folder;
-    
-    // If path contains specifications folder already, make sure it's prefixed with /
-    if base_path.contains(specs_folder) {
-        let normalized = if base_path.starts_with("/") {
-            format!("{}{}", base_path, fragment)
-        } else {
-            format!("/{}{}", base_path.trim_start_matches("./"), fragment)
-        };
-        log::debug!("Path contains specs folder, normalized to: {}", normalized);
-        return normalized;
-    }
-    
-    // Check for external folders
-    for ext_folder in &config.paths.external_folders {
-        if base_path.contains(ext_folder) {
-            let normalized = if base_path.starts_with("/") {
-                format!("{}{}", base_path, fragment)
-            } else {
-                format!("/{}{}", base_path.trim_start_matches("./"), fragment) 
-            };
-            log::debug!("Path contains external folder, normalized to: {}", normalized);
-            return normalized;
-        }
-    }
-    
-    // Default normalization - prepend with /specifications/
-    let normalized = format!("/{}/{}{}", 
-                           specs_folder, 
-                           base_path.trim_start_matches("./"),
-                           fragment);
-    log::debug!("Default normalization: {}", normalized);
-    normalized
-}
 
-// Keep the old function name for backward compatibility, just forwarding to the new function
-pub fn normalize_path_for_validation(path: &str, config: &crate::config::Config) -> String {
-    normalize_path(path, config, "")
-}
 
 /// Create directory and any parent directories if they don't exist
 pub fn create_dir_all<P: AsRef<Path>>(path: P) -> Result<(), ReqFlowError> {
     fs::create_dir_all(path.as_ref()).map_err(|e| {
         ReqFlowError::IoError(e)
     })
+}
+
+
+/// Normalize a path string for consistent registry lookups.
+/// - **Relative paths (`../`)** → Resolved based on `current_file`.
+/// - **Fragment-only paths (`#fragment`)** → Prefixed with `current_file`.
+/// - **Other paths remain unchanged** (no conversion to absolute).
+pub fn normalize_path(path: &str, config: &crate::config::Config, current_file: &str) -> String {
+    if path.is_empty() {
+        return "".to_string();
+    }
+
+    // Handle fragment-only references like `#fragment`
+    if path.starts_with("#") {
+        let current_file_normalized = if current_file.is_empty() {
+            "".to_string()
+        } else {
+            normalize_path(current_file, config, "")
+        };
+        return format!("{}{}", current_file_normalized, path);
+    }
+
+    // Split path and fragment
+    let (base_path, fragment) = if let Some(fragment_idx) = path.find('#') {
+        (path[..fragment_idx].to_string(), path[fragment_idx..].to_string())
+    } else {
+        (path.to_string(), "".to_string())
+    };
+
+    let path_obj = Path::new(&base_path);
+
+    // Handle relative paths with `../`
+    if path_obj.components().any(|c| c == std::path::Component::ParentDir) {
+        if current_file.is_empty() {
+            return format!("{}{}", base_path, fragment);
+        }
+        let current_dir = Path::new(current_file).parent().unwrap_or(Path::new(""));
+        let resolved_path = current_dir.join(path_obj).canonicalize().unwrap_or_else(|_| current_dir.join(path_obj));
+        return format!("{}{}", resolved_path.to_string_lossy(), fragment);
+    }
+
+    // Other paths remain unchanged
+    format!("{}{}", base_path, fragment)
 }
 
 /// Write content to a file, creating parent directories if needed
@@ -381,38 +244,7 @@ pub fn normalize_fragment(text: &str) -> String {
     normalized
 }
 
-/// Helper function to check if a file is excluded by any of the provided glob patterns
-pub fn is_excluded_by_patterns(path: &Path, patterns: &[String], base_path: &Path, verbose: bool) -> bool {
-    patterns.iter().any(|pattern| {
-        // We need to test the pattern against the relative path, not the full absolute path
-        // This makes patterns like "**/Logical*.md" work correctly
-        let file_path_for_pattern = format!("{}", path.file_name().unwrap_or_default().to_string_lossy());
-        
-        // If the pattern starts with "**/" we need to include parent directories in the check
-        if pattern.starts_with("**/") {
-            // For **/ patterns, check against a path that includes parent directories
-            let rel_path = match path.strip_prefix(base_path) {
-                Ok(rel) => rel.to_string_lossy().to_string(),
-                Err(_) => path.to_string_lossy().to_string()
-            };
-            
-            let matches = glob::Pattern::new(pattern).map(|p| p.matches(&rel_path)).unwrap_or(false);
-            if matches && verbose {
-                log::debug!("File {} matches excluded pattern {} (checking rel_path: {})", 
-                           path.display(), pattern, rel_path);
-            }
-            matches
-        } else {
-            // For simple patterns, just check against the filename
-            let matches = glob::Pattern::new(pattern).map(|p| p.matches(&file_path_for_pattern)).unwrap_or(false);
-            if matches && verbose {
-                log::debug!("File {} matches excluded pattern {} (checking filename only: {})", 
-                           path.display(), pattern, file_path_for_pattern);
-            }
-            matches
-        }
-    })
-}
+
 
 #[cfg(test)]
 mod tests {
@@ -420,36 +252,57 @@ mod tests {
     use crate::config::Config;
     use std::path::PathBuf;
 
-    // Test the is_requirements_file_only function
+    // Test the is_requirements_file_by_path function
     #[test]
-    fn test_is_requirements_file_only() {
-        let config = Config::default();
-        let base_path = PathBuf::from("/mnt/Radni/ReqFlow");
+    fn test_is_requirements_file_by_path() {
+
+        let paths = [
+            "specifications",
+            "specifications/subfolder",
+            "specifications/deep/nested/folder",
+            "external_repo",
+            "external_repo/specs",
+            "other_folder"
+        ];
         
+        // Configure external folders for these tests
+        let mut config_with_externals = Config::default();
+        config_with_externals.paths.external_folders = vec!["external_repo".to_string()];        
+        config_with_externals.paths.specifications_folder = "specifications".to_string();
+        config_with_externals.paths.base_path = PathBuf::from("");                 
+    
+        config_with_externals.paths.excluded_filename_patterns=vec![
+            "**/README*.md".to_string(),
+            "**/Logical*.md".to_string(),
+            "**/Physical*.md".to_string(),
+            "**/index.md".to_string()
+        ];
+               
+                       
         // Test cases for requirements files
         let req_file_cases = vec![
             // Requirements files in specifications root
-            "/mnt/Radni/ReqFlow/specifications/UserRequirements.md",
-            "/mnt/Radni/ReqFlow/specifications/SystemRequirements.md",
-            "/mnt/Radni/ReqFlow/specifications/MissionRequirements.md",
+            "specifications/UserRequirements.md",
+            "specifications/SystemRequirements.md",
+            "specifications/MissionRequirements.md",
             
             // Requirements files in system requirements folder
-            "/mnt/Radni/ReqFlow/specifications/SystemRequirements/Requirements.md",
-            "/mnt/Radni/ReqFlow/specifications/SystemRequirements/Subsystem/Requirements.md",
+            "specifications/SystemRequirements/Requirements.md",
+            "specifications/SystemRequirements/Subsystem/Requirements.md",
         ];
         
         // Test cases for non-requirements files
         let non_req_file_cases = vec![
             // Design specifications
-            "/mnt/Radni/ReqFlow/specifications/DesignSpecifications/DSD_Diagram.md",
-            "/mnt/Radni/ReqFlow/specifications/DSD_Architecture.md",
+            "specifications/DesignSpecifications/DSD_Diagram.md",
+            "specifications/DSD_Architecture.md",
             
             // Other markdown files
-            "/mnt/Radni/ReqFlow/specifications/README.md",
-            "/mnt/Radni/ReqFlow/README.md",
+            "specifications/README.md",
+            "README.md",
             
             // Non-markdown files
-            "/mnt/Radni/ReqFlow/specifications/document.txt",
+            "specifications/document.txt",
         ];
         
         // Test that requirements files are properly identified
@@ -460,7 +313,7 @@ mod tests {
             if !path.exists() {
                 continue;
             }
-            assert!(is_requirements_file_only(&path, &config, &base_path, false), 
+            assert!(is_requirements_file_by_path(&path, &config_with_externals), 
                     "Expected {} to be identified as a requirements file", path_str);
         }
         
@@ -471,7 +324,7 @@ mod tests {
             if !path.exists() {
                 continue;
             }
-            assert!(!is_requirements_file_only(&path, &config, &base_path, false), 
+            assert!(!is_requirements_file_by_path(&path, &config_with_externals), 
                     "Expected {} to NOT be identified as a requirements file", path_str);
         }
     }
@@ -479,10 +332,8 @@ mod tests {
     // Test excluded_filename_patterns
     #[test]
     fn test_excluded_filename_patterns() {
-        // Create a temporary directory structure for testing
-        let temp_dir = tempfile::tempdir().unwrap();
-        
-        // Create subdirectories
+        //let _ = env_logger::builder().is_test(true).try_init();   
+                     
         let paths = [
             "specifications",
             "specifications/subfolder",
@@ -495,12 +346,18 @@ mod tests {
         // Configure external folders for these tests
         let mut config_with_externals = Config::default();
         config_with_externals.paths.external_folders = vec!["external_repo".to_string()];
+        config_with_externals.paths.base_path = PathBuf::from("");         
+        config_with_externals.paths.specifications_folder = "specifications".to_string();
+    
+        config_with_externals.paths.excluded_filename_patterns=vec![
+            "**/README*.md".to_string(),
+            "**/Logical*.md".to_string(),
+            "**/Physical*.md".to_string(),
+            "**/index.md".to_string()
+        ];
+                
         
-        for path in &paths {
-            std::fs::create_dir_all(temp_dir.path().join(path)).unwrap();
-        }
-        
-        // Create test files for different pattern types
+
         let test_files = [
             // README* pattern test files
             ("specifications/README.md", true), // Should be excluded
@@ -509,7 +366,6 @@ mod tests {
             ("specifications/READ.md", false), // Should NOT be excluded
             ("specifications/subfolder/README.md", true), // Should be excluded
             ("specifications/deep/nested/folder/README.md", true), // Should be excluded
-            ("other_folder/README.md", true), // Should be excluded 
             
             // Logical* pattern test files
             ("specifications/LogicalArchitecture.md", true), // Should be excluded
@@ -540,106 +396,28 @@ mod tests {
             ("external_repo/specs/Requirements.md", false),
         ];
         
-        // Create all test files
-        for (path, _) in &test_files {
-            let file_path = temp_dir.path().join(path);
-            std::fs::write(&file_path, "test content").unwrap();
-        }
         
-        // Test individual patterns to ensure each one works correctly
-        let patterns = [
-            "**/README*.md", 
-            "**/Logical*.md",
-            "**/Physical*.md",
-            "**/index.md"
-        ];
-        
-        // Test each pattern individually
-        for pattern in &patterns {
-            let mut config = Config::default();
-            config.paths.excluded_filename_patterns = vec![pattern.to_string()];
-            
-            println!("Testing pattern: {}", pattern);
-            
-            for (path, should_exclude) in &test_files {
-                let test_path = temp_dir.path().join(path);
-                let matches_pattern = is_excluded_by_pattern(&test_path, &config, &temp_dir.path());
-                
-                // Use the expected value from the test_files array rather than a string check
-                if *should_exclude && *pattern == get_pattern_for_file(path) {
-                    assert!(matches_pattern, 
-                        "File '{}' should be excluded by pattern '{}' but isn't", path, pattern);
-                } else if !*should_exclude || *pattern != get_pattern_for_file(path) {
-                    assert!(!matches_pattern,
-                        "File '{}' should NOT be excluded by pattern '{}' but is", path, pattern);
-                }
-            }
-        }
-        
-        // Test all patterns together (combined test)
-        let mut config = config_with_externals.clone();
-        config.paths.excluded_filename_patterns = patterns.iter().map(|s| s.to_string()).collect();
-        
-        // We need to check if the file would be a valid requirements file 
-        // (in specs folder or external folder) before applying exclusion rules
         for (path, should_exclude) in &test_files {
-            let test_path = temp_dir.path().join(path);
-            
-            // First check if the file is in specifications/ or external_repo/
-            let in_specs = path.starts_with("specifications/");
-            let in_external = path.starts_with("external_repo/");
-            
-            if in_specs || in_external {
-                if *should_exclude {
-                    // If the file should be excluded, it shouldn't be considered a requirements file
-                    assert!(!is_requirements_file_only(&test_path, &config, &temp_dir.path(), false),
-                        "File '{}' should be excluded but is identified as a requirements file", path);
-                } else {
-                    // If the file shouldn't be excluded, it should be a requirements file
-                    assert!(is_requirements_file_only(&test_path, &config, &temp_dir.path(), false),
-                        "File '{}' should NOT be excluded but is", path);
-                }
+            let test_path = PathBuf::from(path);
+            let matches_pattern = is_excluded_by_patterns(&test_path, &config_with_externals,true);                
+
+            if *should_exclude {
+                 assert!(
+                     matches_pattern,
+                     "❌ File '{}' should be EXCLUDED by pattern but is NOT",
+                      path
+                 );
             } else {
-                // Files not in specifications/ or external/ aren't requirements even if they match pattern
-                assert!(!is_requirements_file_only(&test_path, &config, &temp_dir.path(), false),
-                    "File '{}' outside specs/external should NOT be a requirements file", path);
-            }
+                   assert!(
+                      !matches_pattern,
+                      "❌ File '{}' should NOT be excluded by pattern but IS",
+                      path
+                   );
+           }
         }
+        
     }
     
-    // Helper function to check if a file is excluded by pattern
-    fn is_excluded_by_pattern(path: &Path, config: &crate::config::Config, base_path: &Path) -> bool {
-        config.paths.excluded_filename_patterns.iter().any(|pattern| {
-            let file_path_for_pattern = format!("{}", path.file_name().unwrap_or_default().to_string_lossy());
-            
-            if pattern.starts_with("**/") {
-                let rel_path = match path.strip_prefix(base_path) {
-                    Ok(rel) => rel.to_string_lossy().to_string(),
-                    Err(_) => path.to_string_lossy().to_string()
-                };
-                
-                glob::Pattern::new(pattern).map(|p| p.matches(&rel_path)).unwrap_or(false)
-            } else {
-                glob::Pattern::new(pattern).map(|p| p.matches(&file_path_for_pattern)).unwrap_or(false)
-            }
-        })
-    }
+
     
-    // Helper function to determine which pattern should match a file
-    fn get_pattern_for_file(path: &str) -> &str {
-        if path.contains("README") {
-            "**/README*.md"
-        } else if path.contains("Logical") {
-            "**/Logical*.md"
-        } else if path.contains("Physical") && !path.contains("NotPhysical") {
-            "**/Physical*.md"
-        } else if path.contains("index") {
-            "**/index.md"
-        } else {
-            "no-matching-pattern"
-        }
-    }
-    
-    // Design specifications are now handled via excluded_filename_patterns
-    // This test has been removed as is_design_specification function no longer exists
 }

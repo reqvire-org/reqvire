@@ -9,7 +9,7 @@ This document verifies the requirements for ReqFlow's validation functionality.
 This verification test checks that ReqFlow correctly identifies and reports relation types that are not part of the supported vocabulary (e.g., "satisfieddBy" instead of "satisfiedBy").
 
 #### Metadata
-* type: verification
+  * type: verification
 
 #### Acceptance Criteria
 - System should detect and report relation types that are not in the supported vocabulary
@@ -30,7 +30,7 @@ This verification test checks that ReqFlow correctly identifies and reports rela
 - Test will be implemented in `/tests/e2e-validation/test_unsupported_relations.sh`
 
 #### Relations
-  * verifies: [SystemRequirements/Requirements.md/Relation Type Validation](../SystemRequirements/Requirements.html#relation-type-validation)
+  * verify: [SystemRequirements/Requirement.md/Relation Type Validation](../SystemRequirements/Requirements.md#relation-type-validation)
 
 ---
 
@@ -56,8 +56,8 @@ The verification test checks that ReqFlow correctly identifies and reports inval
 4. Verify that error messages contain details about the specific typos found
 
 #### Relations
-  * verifies: [SystemRequirements/Requirements.md/Detailed Error Handling and Logging](../SystemRequirements/Requirements.html#detailed-error-handling-and-logging)
-  * trace: [tests/e2e-validation/test_invalid_relations.sh](../../../tests/e2e-validation/test_invalid_relations.sh)
+  * verify: [SystemRequirements/Requirement.md/Detailed Error Handling and Logging](../SystemRequirements/Requirements.md#detailed-error-handling-and-logging)
+  * trace: [tests/e2e-validation/test_invalid_relations.sh](../../tests/e2e-validation/test_invalid_relations.sh)
 
 ---
 
@@ -66,7 +66,7 @@ The verification test checks that ReqFlow correctly identifies and reports inval
 The verification test checks that ReqFlow correctly identifies and reports relation types with invalid formats (e.g., containing non-alphanumeric characters).
 
 #### Metadata
-* type: verification
+  * type: verification
 
 #### Acceptance Criteria
 - System should detect and report relation types with non-alphanumeric characters
@@ -83,8 +83,8 @@ The verification test checks that ReqFlow correctly identifies and reports relat
 4. Verify that error messages indicate what characters are not allowed
 
 #### Relations
-  * verifies: [SystemRequirements/Requirements.md/Detailed Error Handling and Logging](../SystemRequirements/Requirements.html#detailed-error-handling-and-logging)
-  * trace: [tests/e2e-validation/test_invalid_relations.sh](../../../tests/e2e-validation/test_invalid_relations.sh)
+  * verify: [SystemRequirements/Requirement.md/Detailed Error Handling and Logging](../SystemRequirements/Requirements.md#detailed-error-handling-and-logging)
+  * trace: [tests/e2e-validation/test_invalid_relations.sh](../../tests/e2e-validation/test_invalid_relations.sh)
 
 ---
 
@@ -111,8 +111,8 @@ The verification test checks that ReqFlow correctly identifies and reports dupli
 4. Verify that error messages identify which relations are duplicated
 
 #### Relations
-  * verifies: [SystemRequirements/Requirements.md/Detailed Error Handling and Logging](../SystemRequirements/Requirements.html#detailed-error-handling-and-logging)
-  * trace: [tests/e2e-validation/test_invalid_relations.sh](../../../tests/e2e-validation/test_invalid_relations.sh)
+  * verify: [SystemRequirements/Requirement.md/Detailed Error Handling and Logging](../SystemRequirements/Requirements.md#detailed-error-handling-and-logging)
+  * trace: [tests/e2e-validation/test_invalid_relations.sh](../../tests/e2e-validation/test_invalid_relations.sh)
 
 ---
 
@@ -121,7 +121,7 @@ The verification test checks that ReqFlow correctly identifies and reports dupli
 The verification test checks that ReqFlow correctly identifies and reports relations with targets that do not exist in the model, while properly validating relations to existing targets.
 
 #### Metadata
-* type: verification
+  * type: verification
 
 #### Acceptance Criteria
 - System should detect and report relations to non-existent targets
@@ -153,5 +153,5 @@ The verification test checks that ReqFlow correctly identifies and reports relat
 - Test for valid targets is implemented in `/tests/e2e-validation/test_valid_relations.sh`
 
 #### Relations
-  * verifies: [SystemRequirements/Requirements.md/Detailed Error Handling and Logging](../SystemRequirements/Requirements.html#detailed-error-handling-and-logging)
-  * trace: [tests/e2e-validation/test_missing_targets.sh](../../../tests/e2e-validation/test_missing_targets.sh)
+  * verify: [SystemRequirements/Requirement.md/Detailed Error Handling and Logging](../SystemRequirements/Requirements.md#detailed-error-handling-and-logging)
+  * trace: [tests/e2e-validation/test_missing_targets.sh](../../tests/e2e-validation/test_missing_targets.sh)

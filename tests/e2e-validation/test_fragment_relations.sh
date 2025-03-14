@@ -15,6 +15,7 @@
 # - Tests fragments referenced by proper element ID
 
 # Setup
+
 TEST_NAME="Same-File Fragment Relations Validation"
 TEST_DIR="../fixtures/test-fragment-relations"
 REQFLOW_BIN="${REQFLOW_BIN:-$(cd ../../ && pwd)/target/debug/reqflow}"
@@ -24,7 +25,7 @@ echo "Test directory: $TEST_DIR"
 
 # Run validation with increased logging level for debugging
 echo "Running validation command..."
-OUTPUT=$(cd "$TEST_DIR" && RUST_LOG=info "$REQFLOW_BIN" --validate-relations --verbose 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && RUST_LOG=debug "$REQFLOW_BIN" --validate-relations --verbose 2>&1)
 EXIT_CODE=$?
 
 # Verify results

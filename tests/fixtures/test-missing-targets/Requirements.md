@@ -9,8 +9,8 @@ This document contains intentional errors for testing validation of missing targ
 This requirement has a relation to a non-existent element, using a non-markdown link format.
 
 #### Relations
-* refine: UserRequirements.md/MissingRequirement
-* satisfiedBy: NonExistentFile.md
+  * refine: UserRequirements.md/MissingRequirement
+  * satisfiedBy: NonExistentFile.md
 
 ---
 
@@ -19,8 +19,8 @@ This requirement has a relation to a non-existent element, using a non-markdown 
 This requirement has a relation to a non-existent element, using markdown link format where the display text and URL don't match.
 
 #### Relations
-* satisfiedBy: [DesignSpecifications/API.md](DesignSpecifications/API2.md)
-* verifiedBy: [Existing File](specifications/SystemRequirements.md)
+  * satisfiedBy: [DesignSpecifications/API.md](DesignSpecifications/API2.md)
+  * verifiedBy: [Existing File](specifications/SystemRequirements.md)
 
 ---
 
@@ -29,5 +29,5 @@ This requirement has a relation to a non-existent element, using markdown link f
 This requirement has valid relations to existing files in the model, to verify that validation correctly handles both valid and invalid targets.
 
 #### Relations
-* refine: Requirements.md/Requirement with Missing Target Reference
-* trace: [This document](Requirements.md)
+  * refine: Requirements.md/Requirement with Missing Target Reference
+  * trace: [This document](Requirements.md)

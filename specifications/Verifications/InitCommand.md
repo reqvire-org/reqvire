@@ -31,8 +31,8 @@ The verification test checks that a new ReqFlow project can be initialized with 
 5. Verify that a reqflow.yaml configuration file is created
 
 #### Relations
-  * verifies: [SystemRequirements/Requirements.md/Initialization Command](../SystemRequirements/Requirements.html#initialization-command)
-  * trace: [tests/e2e-init/test_init_success.sh](../../../tests/e2e-init/test_init_success.sh)
+  * verify: [../SystemRequirements/Requirements.md#Initialization Command](../SystemRequirements/Requirements.md#initialization-command)
+  * trace: [tests/e2e-init/test_init_success.sh](../../tests/e2e-init/test_init_success.sh)
 
 ---
 
@@ -64,8 +64,8 @@ The verification test checks that the init command fails when a reqflow.yaml fil
 - Test is implemented in `/tests/e2e-init/test_init_existing_yaml.sh`
 
 #### Relations
-  * verifies: [SystemRequirements/Requirements.md/Initialization Command Configuration Check](../SystemRequirements/Requirements.html#initialization-command-configuration-check)
-  * trace: [tests/e2e-init/test_init_existing_yaml.sh](../../../tests/e2e-init/test_init_existing_yaml.sh)
+  * verify: [../SystemRequirements/Requirements.md#Initialization Command Configuration Check](../SystemRequirements/Requirements.md#initialization-command-configuration-check)
+  * trace: [tests/e2e-init/test_init_existing_yaml.sh](../../tests/e2e-init/test_init_existing_yaml.sh)
 
 ---
 
@@ -94,8 +94,8 @@ The verification test checks that the init command fails when a reqflow.yml file
 5. Verify that the original reqflow.yml file is not modified
 
 #### Relations
-  * verifies: [SystemRequirements/Requirements.md/Initialization Command Configuration Check](../SystemRequirements/Requirements.html#initialization-command-configuration-check)
-  * trace: [tests/e2e-init/test_init_existing_yml.sh](../../../tests/e2e-init/test_init_existing_yml.sh)
+  * verify: [../SystemRequirements/Requirements.md#Initialization Command Configuration Check](../SystemRequirements/Requirements.md#initialization-command-configuration-check)
+  * trace: [tests/e2e-init/test_init_existing_yml.sh](../../tests/e2e-init/test_init_existing_yml.sh)
 
 ---
 
@@ -125,5 +125,5 @@ The verification test checks that the init command succeeds when other configura
 5. Verify that the original .reqflow.yml file is not modified
 
 #### Relations
-  * verifies: [SystemRequirements/Requirements.md/Initialization Command Configuration Check](../SystemRequirements/Requirements.html#initialization-command-configuration-check)
-  * trace: [tests/e2e-init/test_init_dot_reqflow.sh](../../../tests/e2e-init/test_init_dot_reqflow.sh)
+  * verify: [../SystemRequirements/Requirements.md#Initialization Command Configuration Check](../SystemRequirements/Requirements.md#initialization-command-configuration-check)
+  * trace: [tests/e2e-init/test_init_dot_reqflow.sh](../../tests/e2e-init/test_init_dot_reqflow.sh)

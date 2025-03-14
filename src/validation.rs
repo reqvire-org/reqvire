@@ -7,6 +7,7 @@ use crate::error::ReqFlowError;
 use crate::relation::Relation;
 use crate::config::Config;
 use crate::ModelManager;
+use crate::relation::get_parent_relation_types;
 
 /// Structure for JSON output of validation results
 #[derive(serde::Serialize)]
@@ -43,7 +44,7 @@ pub fn run_validation_checks(
 
     // Filesystem structure validation (Missing Before)
     if config.validation.validate_all {
-        let filesystem_errors = model_manager.validate_filesystem_structure(input_folder_path, config)?;
+        let filesystem_errors = model_manager.validate_filesystem_structure(input_folder_path)?;
         if !filesystem_errors.is_empty() {
             exit_code = 1;
             print_validation_results("filesystem", &filesystem_errors, config.validation.json_output);
@@ -80,297 +81,89 @@ fn print_validation_results(validation_type: &str, errors: &[impl ToString], jso
 }
 
 /// Validate a relation target exists in the element registry
-#[allow(dead_code)]
 pub fn validate_relation_target(
     relation: &Relation,
     current_path: &Path,
     registry: &ElementRegistry,
 ) -> Result<(), ReqFlowError> {
     let target = relation.target.trim();
-    
-    // For test purposes, don't validate targets in tests
-    if target.starts_with("target") || 
-       target == "test.md" || 
-       target.contains("Target") || 
-       target.starts_with("common") {
+    let config = registry.config();
+    let base_path = &config.paths.base_path;
+
+    log::debug!("Validating relation target: '{}' from '{}'", target, current_path.display());
+
+    // **Ignore external HTTP/HTTPS links**
+    if target.starts_with("http://") || target.starts_with("https://") {
+        log::debug!("Ignoring external link: {}", target);
         return Ok(());
     }
-    
-    // Extract and validate the actual target from markdown links
-    if target.contains("](") {
-        // Extract URL from markdown link syntax [text](url)
-        let url_start = target.find("(").unwrap_or(0) + 1;
-        let url_end = target.rfind(")").unwrap_or(target.len());
-        
-        if url_start > 1 && url_end < target.len() {
-            // Extract the actual URL (what's inside parentheses)
-            let url = &target[url_start..url_end];
+
+    // **Extract URL from Markdown links `[text](url)`**
+    if let Some(start) = target.find("(") {
+        if let Some(end) = target.rfind(")") {
+            let url = &target[start + 1..end];
+
+            // Ensure resolved_path is stored properly before using
+            let resolved_path = crate::utils::normalize_path(url, registry.config(), &registry.config().paths.base_path.display().to_string());
+
+            let (file_path, fragment) = if let Some(pos) = resolved_path.find('#') {
+                (&resolved_path[..pos], Some(&resolved_path[pos + 1..]))
+            } else {
+                (resolved_path.as_ref(), None)
+            };            
             
-            //Ignore http urls
-            if url.starts_with("http://") || url.starts_with("https://") {
-                log::debug!("Found external link: {}", url);
-                return Ok(());
-            }
-            // Get current file path for normalizing fragment-only references
-            let current_file_path = current_path.to_string_lossy().to_string();
-            
-            // Handle fragment references in markdown links
-            if url.starts_with("#") {
-                // For fragment references with markdown links, we need to:
-                // 1. Extract the fragment part (without the #)
-                // 2. Normalize it using the shared utility function
-                // 3. Format with the file path
-                
-                // Parse the fragment part (without the #)
-                let fragment_part = &url[1..];
-                
-                // Normalize using the same utility function
-                let normalized_fragment = crate::utils::normalize_fragment(fragment_part);
-                
-                // Format with the current file path and # symbol
-                let normalized_url = format!("{}#{}", current_file_path, normalized_fragment);
-                
-                log::debug!("Normalized markdown link fragment: {} -> {}", url, normalized_url);
-                
-                if registry.contains_element(&normalized_url) {
-                    log::debug!("Found element in registry for markdown link fragment: {}", normalized_url);
-                    return Ok(());
-                }
-                
-                // If no match was found, report the error - don't log all registry elements
-                
-                return Err(ReqFlowError::MissingRelationTarget(
-                    format!("Referenced file not found: {}", url)
-                ));
-            }
-            
-            // For non-fragment markdown links, use the regular normalization
-            let normalized_url = crate::utils::normalize_path(url, registry.config(), &current_file_path);
-            log::debug!("Normalized relation target: {} -> {} (current file: {})", 
-                      url, normalized_url, current_file_path);
-            
-            // First try exact match
-            if registry.contains_element(&normalized_url) {
-                log::debug!("Found element in registry using normalized path: {}", normalized_url);
-                return Ok(());
-            }
-            
-            // Remove leading slash if present for comparison
-            let clean_url = normalized_url.trim_start_matches('/');
-            log::debug!("Cleaned URL for comparison: {}", clean_url);
-            
-            // Try with cleaned URL 
-            if registry.contains_element(clean_url) {
-                log::debug!("Found element in registry using cleaned path: {}", clean_url);
-                return Ok(());
-            }
-            
-            // Try the original URL as-is (this will handle markdown links with non-normalized paths)
-            if registry.contains_element(url) {
-                log::debug!("Found element in registry using original URL: {}", url);
-                return Ok(());
-            }
-            
-            // If no exact match, check if the file itself exists in the registry
-            // This is to validate links like [display_text](file.md) where only the file exists, not a specific element
-            if url.ends_with(".md") {
-                log::debug!("Checking if file exists in registry: {}", normalized_url);
-                
-                // For files in excluded folders (like DesignSpecifications), we need special handling 
-                // Check if this file would be excluded by the configuration patterns
-                let is_excluded_file = registry.is_file_excluded(url) || 
-                                      registry.is_file_excluded(&normalized_url) ||
-                                      registry.is_file_excluded(clean_url);
-                                      
-                if is_excluded_file {
-                    log::debug!("Reference to file in excluded folder: {}", url);
-                    
-                    // For excluded files, we need to be more lenient with path matching
-                    // since they may have been processed differently
-                    
-                    // 1. Try to match by checking if any registry element has a matching prefix/suffix
-                    //    but normalize both sides first to handle inconsistent slashes
-                    let clean_url_normalized = clean_url.replace("\\", "/");
-                    let url_normalized = url.replace("\\", "/");
-                    
-                    // Try with alternate matching strategies for excluded files
-                    for elem in registry.all_elements() {
-                        let elem_path_normalized = elem.file_path.replace("\\", "/");
-                        
-                        // For excluded files, do broader matching
-                        if elem_path_normalized == url_normalized || 
-                           elem_path_normalized == clean_url_normalized || 
-                           elem_path_normalized.ends_with(&url_normalized) ||
-                           elem_path_normalized.ends_with(&clean_url_normalized) ||
-                           url_normalized.ends_with(&elem_path_normalized) ||
-                           clean_url_normalized.ends_with(&elem_path_normalized) {
-                            
-                            log::debug!("Found excluded file in registry: {} matches {}", elem.file_path, url);
-                            return Ok(());
-                        }
-                        
-                        // 2. Try to match by basename - extract the basename and extension only
-                        //    This handles cases where the file is referenced with a relative path
-                        //    that doesn't match the normalized path in the registry
-                        let elem_basename = std::path::Path::new(&elem_path_normalized)
-                            .file_name()
-                            .map(|n| n.to_string_lossy().to_string())
-                            .unwrap_or_default();
-                            
-                        let url_basename = std::path::Path::new(&url_normalized)
-                            .file_name()
-                            .map(|n| n.to_string_lossy().to_string())
-                            .unwrap_or_default();
-                            
-                        if !elem_basename.is_empty() && !url_basename.is_empty() && elem_basename == url_basename {
-                            log::debug!("Found excluded file in registry by basename: {} matches {}", elem_basename, url_basename);
-                            return Ok(());
-                        }
-                    }
-                    
-                    // 3. If it's an excluded file but not found, we'll accept it for now and log a warning
-                    // This ensures relations to excluded files don't fail validation
-                    log::debug!("WARNING: Excluded file reference not found, but accepting for validation: {}", url);
-                    return Ok(());
-                }
-                
-                // Standard file checking for non-excluded files
-                
-                // Try with cleaned URL
-                if registry.contains_file(clean_url) {
-                    log::debug!("Found file in registry using cleaned path: {}", clean_url);
-                    return Ok(());
-                }
-                
-                // Try with original URL
-                if registry.contains_file(url) {
-                    log::debug!("Found file in registry using original URL: {}", url);
-                    return Ok(());
-                }
-                
-                // Try alternate formats (this is for markdown links)
-                for elem in registry.all_elements() {
-                    log::debug!("Comparing {} with {}", elem.file_path, url);
-                    if elem.file_path == url || 
-                       elem.file_path == clean_url || 
-                       elem.file_path.ends_with(url) ||
-                       elem.file_path.ends_with(clean_url) {
-                       
-                        log::debug!("Found file match in registry using element comparison: {}", url);
-                        return Ok(());
-                    }
-                }
-            }
-            
-            // If no match was found, report the error - don't log all registry elements
-            return Err(ReqFlowError::MissingRelationTarget(
-                format!("Referenced file not found: {}", url)
-            ));
-        }
-        
-        // For all other markdown links, perform standard validation
-        return Ok(());
-    }
-    
-    // For test files, don't validate targets
-    if current_path.to_string_lossy().contains("test.md") {
-        return Ok(());
-    }
-    
-    // Handle different types of targets
-    if target.contains('/') {
-        // External document or specific element reference
-        if target.ends_with(".md") {
-            // Just a file reference, ensure file exists
-            // In a full implementation, we'd check if the file exists
-            // For now, we'll assume it's valid
-            Ok(())
-        } else if target.starts_with("../") {
-            // Get current file path for normalizing relative path references
-            let current_file_path = current_path.to_string_lossy().to_string();
-            
-            // Use the general path normalization function that now properly handles ../ paths
-            let normalized_url = crate::utils::normalize_path(target, registry.config(), &current_file_path);
-            log::debug!("Normalized relative path target: {} -> {} (current file: {})", 
-                      target, normalized_url, current_file_path);
-            
-            // Check if the normalized path exists in the registry
-            if registry.contains_element(&normalized_url) {
-                log::debug!("Found element in registry using normalized path: {}", normalized_url);
-                return Ok(());
-            }
-            
-            // If no match was found, report the error - don't log all registry elements
-            
-            Err(ReqFlowError::MissingRelationTarget(
-                format!("Referenced file not found: {}", target)
-            ))
-        } else {
-            // Resolve and normalize the target path taking into account current path's directory
-            let parts: Vec<&str> = target.split('/').collect();
-            if parts.len() >= 2 {
-                let file_part = parts[0].to_string();
-                let _element_part = parts[1..].join("/"); // Prefix with underscore to indicate intentional non-use
-                
-                // If the file part has relative path components, handle them correctly
-                if file_part.contains("../") {
-                    // For targets with relative paths, assume they're valid
-                    // This allows cross-repository references or references to files
-                    // that might not be processed in the current run
-                    return Ok(());
-                }
-                
-                // Regular case - check if the target exists in the registry
-                if registry.contains_element(target) {
-                    Ok(())
+            let normalized_file_path = crate::utils::normalize_path(file_path, registry.config(),"");
+
+            // Step 4: Normalize fragment (if it exists)
+            let normalized_fragment = fragment.map(crate::utils::normalize_fragment);
+
+            // Step 5: Construct **correct** full identifier
+            let full_identifier = if let Some(fragment) = normalized_fragment {
+                if resolved_path.contains('#') {
+                    resolved_path.to_string() // Avoid duplicate `#fragment`
                 } else {
-                    Err(ReqFlowError::MissingRelationTarget(target.to_string()))
+                    format!("{}#{}", resolved_path, fragment)
                 }
             } else {
-                // Malformed target
-                Err(ReqFlowError::MissingRelationTarget(format!("Malformed target: {}", target)))
+                resolved_path.to_string()
+            };
+
+
+            log::debug!(
+                "Resolved path: {} -> Normalized path: {} -> Final identifier: {}",
+                resolved_path,
+                normalized_file_path,
+                full_identifier
+            );
+
+            // Step 6: Check if element exists in registry
+            if registry.contains_element(&full_identifier) || registry.contains_element(&normalized_file_path) {
+                return Ok(());
             }
-        }
-    } else {
-        // Same-document element reference
-        // Construct the full identifier by combining current path with fragment
-        let current_file = current_path.to_string_lossy();
-        
-        // We need to handle both fragment formats:
-        // 1. With # prefix: #NOTIF-IMPL-001 Notifications Publishing
-        // 2. Without # prefix: NOTIF-IMPL-001 Notifications Publishing
-        let full_identifier = if target.starts_with("#") {
-            // Format 1: With # prefix
-            // Extract the fragment (without #) and normalize it
-            let fragment_part = &target[1..];
-            let normalized_fragment = crate::utils::normalize_fragment(fragment_part);
-            format!("{}#{}", current_file, normalized_fragment)
-        } else if !target.contains('/') {
-            // Format 2: Without # prefix, but no path separator
-            // This is a reference to an element in the current file
-            let normalized_fragment = crate::utils::normalize_fragment(target);
-            format!("{}#{}", current_file, normalized_fragment)
-        } else {
-            // For references with path separators, keep using the separator
-            format!("{}/{}", current_file, target)
-        };
-        
-        log::debug!("Constructed full identifier for fragment reference: {} -> {}", target, full_identifier);
-        
-        log::debug!("Checking same-file fragment reference: {} -> {}", target, full_identifier);
-        
-        if registry.contains_element(&full_identifier) {
-            log::debug!("Found matching fragment reference: {}", full_identifier);
-            Ok(())
-        } else {
-            // Use original target in error message for better readability
-            Err(ReqFlowError::MissingRelationTarget(target.to_string()))
+
+            return Err(ReqFlowError::MissingRelationTarget(format!(
+                "Referenced identifier not found: {}",
+                url
+            )));
         }
     }
+     // Handle simple file references without `[text](...)` format
+    //let resolved_path = crate::utils::resolve_relative_path(current_path, target);
+    let normalized_file_path = crate::utils::normalize_path(target, registry.config(), "");
+    let normalized_fragment = crate::utils::normalize_fragment(target);
+
+    let full_identifier = format!("{}#{}", normalized_file_path, normalized_fragment);
+
+    if registry.contains_element(&full_identifier) || registry.contains_element(&normalized_file_path) {
+        return Ok(());
+    }
+
+    Err(ReqFlowError::MissingRelationTarget(target.to_string()))
 }
 
+
+
 /// Validate that all relation targets exist in the model
-#[allow(dead_code)]
 pub fn validate_relations(registry: &ElementRegistry) -> Result<Vec<ReqFlowError>, ReqFlowError> {
     let mut errors = Vec::new();
     
@@ -387,6 +180,19 @@ pub fn validate_relations(registry: &ElementRegistry) -> Result<Vec<ReqFlowError
     for element in registry.all_elements() {
         let element_path = Path::new(&element.file_path);
         
+        // Check if this element requires a parent relation
+        if element.requires_parent_relation(registry) {
+            let has_parent = element.relations.iter().any(|relation| {
+                get_parent_relation_types().contains(&relation.relation_type.as_str())
+            });
+
+            if !has_parent {
+                errors.push(ReqFlowError::MissingParentRelation(format!(
+                    "In file '{}', Element '{}' requires a parent relation but none found.",
+                    element.file_path, element.name
+                )));
+            }
+        }        
         // Check for duplicate relations within the same element
         let mut relation_map = std::collections::HashMap::new();
         

@@ -122,8 +122,7 @@ The system shall provide a linting function, activated by the (--lint flag), whi
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Linting Command Behavior](../UserRequirements.md#linting-command)
-  * satisfiedBy: [linting/mod.rs](https://github.com/reqflow/reqflow/src/linting/mod.rs)
-  * satisfiedBy: [cli.rs](https://github.com/reqflow/reqflow/src/cli.rs)  
+  * satisfiedBy: [cli.rs](https://github.com/reqflow/reqflow/src/cli.rs)    
 
 ---
   
@@ -136,8 +135,7 @@ The system shall provide a dry run mode (--dry-run flag) for linting that shows 
 --dry-run flag works in tandem with the main lint command flag and cannot be used standalone.
 
 #### Relations
-  * derivedFrom: [CLI Lint Flag](cli-lint-flag)
-  * satisfiedBy: [linting/mod.rs](https://github.com/reqflow/reqflow/src/linting/mod.rs)
+  * derivedFrom: [CLI Lint Flag](#cli-lint-flag)
   * satisfiedBy: [cli.rs](https://github.com/reqflow/reqflow/src/cli.rs)    
 
 ---
@@ -595,7 +593,7 @@ The system shall allow unstructured documents to be ignored during processing.
 TODO: add requirment that defines a config filter out patterns.
 
 #### Relations
-  * derivedFrom: [UserRequirements.md/Unstructured Documents](UserRequirements.md/unstructured-documents)
+  * derivedFrom: [UserRequirements.md#Unstructured Documents](UserRequirements.md#unstructured-documents)
 
 ---
 
@@ -620,20 +618,15 @@ The validation process for excluded files:
 2. Internal elements within excluded files are not processed or validated
 
 #### Todo
-Decide to which parent relation it relates to:
   * derivedFrom: [Configurable Filename Exclusion Patterns](#configurable-filename-exclusion-patterns) 
   * refine: [File Pattern Exclusion for Linting](#file-pattern-exclusion-for-linting)
   
 #### Relations
+  * refine: [File Pattern Exclusion for Linting](#file-pattern-exclusion-for-linting)
   * satisfiedBy: [src/validation.rs](https://github.com/reqflow/reqflow/src/validation.rs)
-  * satisfiedBy: [src/model.rs](https://github.com/reqflow/reqflow/src/model.rs)
-  * satisfiedBy: [src/element.rs](https://github.com/reqflow/reqflow/src/element.rs)
 
 ---
 
-### Multi-Pass Linting Capability
-
----
 ### Multi-Pass Linting Capability
 
 The system shall support multi-pass linting with a configurable iteration limit to ensure all interdependent formatting issues are resolved.
@@ -649,7 +642,7 @@ The system shall support multi-pass linting with a configurable iteration limit 
 The system shall generate HTML output for all markdown files, not just requirements documents, to provide consistent representation of the entire model.
 
 #### Relations
-  * derivedFrom: [UserRequirements.md/Export HTML specifications](UserRequirements.md/#export-html-specifications)
+  * derivedFrom: [../UserRequirements.md/Export HTML specifications](../UserRequirements.md/#export-html-specifications)
   * satisfiedBy: [html_export.rs](https://github.com/reqflow/reqflow/src/html_export.rs)
 
 ---
@@ -659,7 +652,7 @@ The system shall generate HTML output for all markdown files, not just requireme
 The system shall implement detailed error handling and logging throughout the application to facilitate troubleshooting and provide meaningful feedback.
 
 #### Relations
-  * derivedFrom: [UserRequirements.md/Enhanced Validation Error Reporting](UserRequirements.md#enhanced-validation-error-reporting)
+  * derivedFrom: [../UserRequirements.md#Enhanced Validation Error Reporting](../UserRequirements.md#enhanced-validation-error-reporting)
   * satisfiedBy: [src/error.rs](https://github.com/reqflow/reqflow/src/error.rs)
 
 ---
@@ -669,7 +662,7 @@ The system shall implement detailed error handling and logging throughout the ap
 The system shall cache file contents during processing to optimize performance for operations that require multiple passes through the same files.
 
 #### Relations
-  * derivedFrom: [UserRequirements.md/Efficient Processings](UserRequirements.md/efficient_processings)
+  * derivedFrom: [../UserRequirements.md#Efficient Processing](../UserRequirements.md#efficient-processing)
   * satisfiedBy: [model.rs](https://github.com/reqflow/reqflow/src/model.rs)
   
   

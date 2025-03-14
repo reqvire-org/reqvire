@@ -38,6 +38,10 @@ pub enum ReqFlowError {
     MissingRelationTarget(String),
 
     #[allow(dead_code)]
+    #[error("Missing parent relation: {0}")]
+    MissingParentRelation(String),
+    
+    #[allow(dead_code)]
     #[error("Invalid relation format: {0}")]
     InvalidRelationFormat(String),
 

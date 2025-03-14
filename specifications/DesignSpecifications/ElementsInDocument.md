@@ -5,7 +5,8 @@ This document defines the structure, rules, and usage of **Elements**, **Subsect
 
 ## Elements
 
-An **Element** is a uniquely identifiable section within a Markdown document and form the foundation of the model’s structure and relationships:
+An **Element** is a uniquely identifiable section within a Markdown document and form the foundation of the model’s structure and relationships.
+An **Element** is equivalent to a **node** in the internal representation of the model structure.
 
 Elements may contain structured **Subsections**, each serving a specific purpose.
 
@@ -120,7 +121,7 @@ Content of the second duplicate.
 
 ## Identifiers
 
-See more in design specification document [DSD_RepresentationOfIdentifiersAndRelations.md](DSD_RepresentationOfIdentifiersAndRelations.md).
+See more in design specification document [RepresentationOfIdentifiersAndRelations.md](RepresentationOfIdentifiersAndRelations.md).
 
 ##  Subsections
 
@@ -161,7 +162,7 @@ Must be defined with a level 4 header: `#### Relations`.
 
 Duplicate relation entries within the same `#### Relations` subsection are not allowed.
 
-See more in design specification document [DSD_RepresentationOfIdentifiersAndRelations.md](DSD_RepresentationOfIdentifiersAndRelations.md).
+See more in design specification document [IdentifiersAndRelations.md](IdentifiersAndRelations.md).
 
 
 
@@ -231,7 +232,6 @@ When parsing elements from Markdown:
 Elements types are defined in a **#### Metadata**  **subsection** within an **element** as a **type** property and value, see more for structure of elements in  [ElementsInDocument.md](ElementsInDocument.md).
 
 
-
 ### Element Types in Metadata Section
 
 #### Supported Element Types
@@ -251,4 +251,82 @@ The type of an element is determined through the following process:
 3. Future versions may add more built-in types as needed
 
 
+### Element algebraic data type representation
 
+
+Relation ADT:
+```
+pub enum RelationDirection {
+    Forward,   // From source to target (e.g., "refine")
+    Backward,  // From target to source (e.g., "refinedBy")
+    Neutral    // Non-directional (e.g., "trace")
+}
+
+pub struct RelationType {
+    pub name: &'static str,          // Name of the relation type
+    pub direction: RelationDirection, // Direction of relation
+    pub opposite: Option<&'static str>, // The opposite relation name, if any
+    pub description: &'static str,    // Description of what the relation means
+}
+
+pub struct Relation {
+    /// Type of the relation (e.g., dependsOn, verifiedBy)
+    pub relation_type: RelationType,
+    
+    /// Target identifier of the relation (normalized)
+    pub target: String,
+    
+    /// raw URL/Link part of the target identifier if was a markdown link representation or identifer in raw form otherwise
+    pub name: String,
+}
+```
+
+Element ADT:
+```
+
+pub enum ElementType {
+    Requirement,
+    Verification,
+    File,
+    Other(String),
+}
+
+pub struct Element {
+    /// Name of the element (from the level 3 header)
+    pub name: String,
+    
+    /// Content of the element (excluding relations)
+    pub content: String,
+    
+    /// Relations defined within this element
+    pub relations: Vec<Relation>,
+
+    /// Normalized identifier
+    pub identifier: String,
+        
+    /// Normalized file path
+    pub file_path: String,
+    
+    /// Type of element (requirement, verification, etc.)
+    pub element_type: ElementType,
+    
+    /// Additional metadata properties for the element
+    pub metadata: HashMap<String, String>,
+}
+```
+
+Files ADT (a separate system representation is kept with all relations that were pointing to files and not elements in documents):
+```
+pub struct File {
+    /// Filename of the file with extension
+    pub name: String,
+    
+    /// Normalized identifier
+    pub identifier: String,
+        
+    /// Normalized file path
+    pub file_path: String,
+}
+```
+
+See specifications for normalizing identifiers and file_path in [IdentifiersAndRelations.md](IdentifiersAndRelations.md).

@@ -6,11 +6,11 @@ mod linting_tests {
     use crate::linting;
     use crate::config::Config;
     
-    /// Test lint directory with fixtures from test-fixtures directory
+    /// Test lint directory with fixtures from src/tests/fixtures directory
     #[test]
     fn test_lint_directory_with_fixtures() {
         // Path to test fixtures
-        let fixtures_dir = Path::new("test-fixtures");
+        let fixtures_dir = Path::new("src/tests/fixtures/");
         
         // Test different fixture directories
         test_fixture_directory("test-lint-headers", fixtures_dir);
@@ -21,7 +21,7 @@ mod linting_tests {
     #[test]
     fn test_no_duplicate_separators_in_linting() {
         // Path to test fixtures
-        let fixtures_dir = Path::new("test-fixtures");
+        let fixtures_dir = Path::new("src/tests/fixtures");
         let fixture_path = fixtures_dir.join("test-duplicate-separators");
         
         // Skip if the fixture directory doesn't exist
@@ -114,6 +114,8 @@ Content here.
         
         // Create a custom config for testing
         let mut test_config = Config::default();
+        test_config.paths.specifications_folder = "specifications".to_string();
+        test_config.paths.base_path = temp_path.to_path_buf();             
         
         // For test fixtures, assume any file with "Requirements" in the name is a requirements file
         // regardless of its location, to make testing easier
@@ -177,6 +179,8 @@ This should have a blank line before it.
         
         // Create a custom config for testing
         let mut test_config = Config::default();
+        test_config.paths.specifications_folder = "specifications".to_string();
+        test_config.paths.base_path = temp_path.to_path_buf();            
         
         // For test fixtures, assume any file with "Requirements" in the name is a requirements file
         // regardless of its location, to make testing easier

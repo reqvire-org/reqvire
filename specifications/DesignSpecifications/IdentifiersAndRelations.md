@@ -7,79 +7,130 @@ The design ensures consistency, validity, and efficient querying and manipulatio
 
 An **identifier** consists of a path following a filename with an extension (e.g., `file.md`) and optionally an **element** name (fragment).  
 
+Every **element** in the system has unique identifier that depends on document it appears in, path of the document, and element name (fragment).
+
+
 ### Path Resolution Rules
 
-- If an identifier **starts with `/`**, it is considered relative to the **specifications root folder**.
+- If an identifier **starts with `/<specficiation_folder>/`**, it is considered relative to the **specifications folder**.
+- If an identifier **starts with `/<external_folder>/`**, it is considered relative to the **external folder**.
+  - Such identifiers keep exact path as given.
 - If an identifier **does not start with `/`**, it is considered **relative** to the path of the document in which it appears.
+  - Such identifiers are normalized to to absolute paths starting either from <specficiation_folder> or <external_folder>, depending on where is a document in which it appears.
+- If an identifier **starts with `/`**, it is considered absolute path that is preserved during normalizations.
 
 Each **identifier** must uniquely reference either:
   - A **file**, or
   - An **element within a file**.
 
+#### Path Resolution Examples
 
----
-
-### Identifier Types and Examples
-
-#### 1. **Simple Identifiers**
-   - Plain file or element references, following the path resolution rules.
-   - Examples:
-     - File only:  
-       ```
-       file.md
-       ```
-     - File with an element fragment:  
-       ```
-       file.md#element name
-       ```
-     - Relative path with an element fragment:  
-       ```
-       relative_path/file.md#element name
-       ```
-     - Element name fragment only (within the same file):  
-       ```
-       element name
-       ```
-     - Element fragment with special characters:  
-       ```
-       path/file.md#My Element (Draft)
-       ```
-
-#### 2. **Git Valid Markdown Link Identifiers**
-   - A valid GitHub-style Markdown link to a file or a fragment within a file.
-   
-   - When converting an element name to a **GitHub-style anchor link**, apply the following transformations:
-     - Convert to **lowercase**.
-     - Replace **spaces with hyphens (`-`)**.
-     - Remove **disallowed characters**.
-     - Remove **leading and trailing whitespace**.
-   
-   - Examples:
-     - File link:  
-       ```
-       [Specification](documents/specification.md)
-       ```
-     - Fragment link:  
-       ```
-       [My Element](documents/specification.md#my-element)
-       ```
-
-
----
-
-### Path Resolution Examples
-
-Assuming the **specifications root folder** is `/path/to/project`  
-And a file exists at `/path/to/project/documents/File1.md`
+Assuming the **<specifications> folder** is `/path/to/project` and a file exists at `/path/to/project/documents/File1.md`:
 
 | Identifier | Resolves to |
 |------------|------------|
 | `File2.md` | `/path/to/project/documents/File2.md` |
 | `subfolder/File3.md` | `/path/to/project/documents/subfolder/File3.md` |
-| `/File4.md` | `/path/to/project/File4.md` |
 | `../File4.md` | `/path/to/project/File4.md` |
+| `../../somefolder/File4.md` | `/path/to/somefolder/File4.md` |
+| `/project/File4.md` | `/path/to/project/File4.md` |
+---
+
+Assuming the **<external_folder> folder** is `/path/to/project` and a file exists at `/path/to/project/documents/File1.md`:
+
+| Identifier | Resolves to |
+|------------|------------|
+| `File2.md` | `/path/to/project/documents/File2.md` |
+| `subfolder/File3.md` | `/path/to/project/documents/subfolder/File3.md` |
+| `../File4.md` | `/path/to/project/File4.md` |
+| `/project/File4.md` | `/path/to/project/File4.md` |
+---
+
+
+### Identifier Form Variations and Examples
+
+System recognises 2 variations of identifier form that may appear in documents:
+ * Simple identifiers
+ * Git Valid Markdown Link Identifiers
+ 
+ 
+When parsing identifiers, both styles are nomarlized into the same form used internally by the system.
+
+As part of normailization process, element names are converted to **GitHub-style anchor link** fragments which are internal identifer representations:
+  - Convert to **lowercase**.
+  - Replace **spaces with hyphens (`-`)**.
+  - Remove **disallowed characters**.
+  - Remove **leading and trailing whitespace**.
+
+
+#### 1. Simple Identifiers
+
+Plain file or element references, following the path resolution rules.
+
+Examples:
+
+- File only identifier found in the document '<specifications>/path/to/document.md'
+```
+file.md
+```
+  - Normalized to '/<specifications>/path/to/file.md'
+
+- File with an element fragment in the document '<specifications>/path/to/document.md':  
+```
+file.md#element name
+```
+  - Normalized to '/<specifications>/path/to/file.md#element-name'
+
+- Relative path with an element fragment in the document '<specifications>/path/to/document.md':  
+```
+../relative_path/file.md#element name
+```
+  - Normalized to '/<specifications>/path/file.md#element-name'
+
+- Element name fragment only (within the same file) in the document '<specifications>/path/to/document.md':  
+```
+#element name
+```
+  - Normalized to '/<specifications>/path/to/document.md#element-name'
+  
+  
+- Relative path with the element fragment with special characters in the document '<specifications>/path/to/document.md'::  
+```
+path/file.md#My Element (Draft)
+```
+  - Normalized to '/<specifications>/path/to/path/file.md##my-element-draft'
+  
+
+- Absolute path starting with the 'specifications' <specification> folder with the element fragment in any document:
+```
+/specifications/path/file.md#Elements
+```
+  - Normalized to '/specifications/path/file.md#elements'
+  
+       
+#### 2. Git Valid Markdown Link Identifiers
+
+A valid GitHub-style Markdown link to a file or a fragment within a file.
+Identifier is considered the **link** part of the markdown link: everything inside '(identifier)'.
+
+Once link part is obtained from GitHub-style Markdown link, it is following same rules for normalization as **simple identifiers**. 
+   
+Examples:
+
+- File link in '<specifications>/path/to/document.md':  
+```
+[Specification](documents/specification.md)
+```
+  - Normalized to '/<specifications>/path/to/path/documents/specification.md'
+
+- Fragment link in '<specifications>/path/to/document.md':  :  
+```
+[My Element](documents/specification.md#my-element)
+```
+  - Normalized to '/<specifications>/path/to/path/documents/specification.md#my-element'
 
 ---
+
 
 ## Relations
 

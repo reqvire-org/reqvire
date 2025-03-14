@@ -349,11 +349,10 @@ pub fn lint_directory_with_config(directory: &Path, dry_run: bool, config: &Conf
         .into_iter()
         .filter_map(|e| e.ok())
         .filter(|e| {
-            crate::utils::is_requirements_file_only(
+            e.file_type().is_file() &&
+            crate::utils::is_requirements_file_by_path(
                 e.path(), 
-                config, 
-                directory, 
-                config.general.verbose
+                config
             )
         })
     {

@@ -1,12 +1,14 @@
 use anyhow::Result;
 use log::debug;
-use regex::Regex;
 use std::path::Path;
-
+use regex::Regex;
+use std::collections::{HashMap};
+    
 use crate::config::Config;
 use crate::element::{Element, ElementRegistry};
 use crate::error::ReqFlowError;
 use crate::relation::Relation;
+use crate::relation::process_relations;
 
 /// Parse a markdown document and extract elements
 pub fn parse_elements(content: &str, file_path: &str) -> Result<Vec<Element>, ReqFlowError> {
@@ -14,8 +16,7 @@ pub fn parse_elements(content: &str, file_path: &str) -> Result<Vec<Element>, Re
     let mut current_element: Option<Element> = None;
     let mut in_relations_section = false;
     
-    // Use the config's subsection regex
-    
+   
     // List of reserved subsections that should never be treated as elements
     let reserved_subsections = vec!["Relations", "Details", "Properties", "Metadata"];
     
@@ -110,10 +111,8 @@ pub fn parse_elements(content: &str, file_path: &str) -> Result<Vec<Element>, Re
                 }
             }
         } else if in_metadata_section && (line.trim().starts_with("* ") || line.trim().starts_with("- ")) {
-            // Parse metadata property
-            let metadata_regex = Regex::new(r"[\*\-]\s+(\w+):\s*(.+)").unwrap();
-            
-            if let Some(captures) = metadata_regex.captures(line) {
+            // Parse metadata property  
+            if let Some(captures) = Config::metadata_regex().captures(line) {
                 let property_name = captures.get(1).unwrap().as_str().to_string();
                 let property_value = captures.get(2).unwrap().as_str().trim().to_string();
                 
@@ -138,27 +137,7 @@ pub fn parse_elements(content: &str, file_path: &str) -> Result<Vec<Element>, Re
         } else if in_relations_section && (line.trim().starts_with("* ") || line.trim().starts_with("  * ") || 
                                           line.trim().starts_with("- ") || line.trim().starts_with("  - ")) {
             // Parse relation - be more flexible to match ReqFlow format
-            // First attempt with the precise regex
             let captures = Config::relation_regex().captures(line);
-            
-            // If that doesn't work, try a more forgiving approach
-            let captures = if captures.is_none() {
-                // First attempt with single-character bullet + space
-                let bullet_type = if line.trim().starts_with("-") { r"\-" } else { r"\*" };
-                let alt_regex1 = Regex::new(&format!(r"{}\s+(\w+):\s*(.+)", bullet_type)).unwrap();
-                
-                // Second attempt with just looking for type: target pattern anywhere in the line
-                let alt_regex2 = Regex::new(r"(\w+):\s*(.+)").unwrap();
-                
-                // Try both alternatives
-                alt_regex1.captures(line).or_else(|| {
-                    // Log an attempt with alt_regex2
-                    debug!("Trying flexible relation parsing for line: {}", line);
-                    alt_regex2.captures(line)
-                })
-            } else {
-                captures
-            };
             
             if let Some(captures) = captures {
                 let relation_type = captures.get(1).unwrap().as_str().to_string();
@@ -245,13 +224,8 @@ pub fn replace_relations(
     current_file: &Path,
     convert_to_html: bool,
 ) -> Result<String, ReqFlowError> {
-    use crate::relation::process_relations;
-    use crate::config::Config;
-    
-    // For diagram generation, we need to check if we're in the diagram generation context
-    // This is set by main.rs when using the --generate-diagrams flag
-    // We'll check this instead of reloading the config
-    
+
+
     // When we're in diagram generation mode but not HTML conversion mode,
     // we don't want to replace markdown links with HTML links
     let diagrams_mode = registry.is_diagram_generation_enabled();
@@ -264,14 +238,17 @@ pub fn replace_relations(
     };
     
     // Process the content to replace relations with markdown links
+
+
     let processed_content = process_relations(content, current_file, should_convert_links)?;
-    
+
     // Generate diagrams if in diagrams mode
     if diagrams_mode {
         // Always attempt to generate a diagram for requirements files
         log::debug!("Attempting to generate diagram for file: {}", current_file.display());
         
         // Generate and add mermaid diagram regardless of file type
+
         let updated_content = generate_requirements_diagram(&processed_content, registry, &current_file.to_string_lossy(), convert_to_html)?;
         log::debug!("Diagram generation completed for file: {}", current_file.display());
         Ok(updated_content)
@@ -282,7 +259,7 @@ pub fn replace_relations(
     }
 }
 
-/// Generate mermaid diagrams for requirements documents
+/// Generate mermaid diagrams for documents with relations and elements
 /// This function creates a separate diagram for each section (level 2 heading)
 pub fn generate_requirements_diagram(
     content: &str,
@@ -290,61 +267,11 @@ pub fn generate_requirements_diagram(
     file_path: &str,
     convert_to_html: bool,
 ) -> Result<String, ReqFlowError> {
-    use regex::Regex;
-    use std::collections::{HashMap, HashSet};
     
-    // Check if this is a requirements document by file path or content
-    let req_title_regex = match Regex::new(r"(?m)^#\s+.*Requirements") {
-        Ok(regex) => regex,
-        Err(e) => return Err(ReqFlowError::InvalidRegex(format!("Error compiling regex: {}", e)))
-    };
     
-    // Get the config to properly use configuration-driven detection
-    let config = crate::config::Config::load();
-    
-    // Use the built-in utils function to check if this is a requirements file
-    // This will use the proper config-driven approach, not hardcoded values
-    let path_obj = std::path::Path::new(file_path);
-    let base_path = std::path::Path::new("./");
-    let by_path = crate::utils::is_requirements_file_by_path(path_obj, &config, base_path);
-    let by_title = req_title_regex.is_match(content);
-    let is_requirements_doc = by_path || by_title;
-    
-    // Debug information - print to console to make sure it appears with additional path details
-    let path_filename = path_obj.file_name().map(|f| f.to_string_lossy().to_string()).unwrap_or_default();
-    debug!("FILE PATH: {}", file_path);
-    debug!("FILENAME: {}", path_filename);
-    debug!("Checking requirements file by path...");
-    debug!("IS REQUIREMENTS DOC: {}", is_requirements_doc);
-    debug!("BY PATH: {}", by_path);
-    debug!("BY TITLE: {}", by_title);
-    
-    // Use log module for more controlled output
-    log::debug!("Checking if file is a requirements document: {}", file_path);
-    log::debug!("Requirements check using config-driven detection: {}", is_requirements_doc);
-    log::debug!("Title regex match: {}", req_title_regex.is_match(content));
-    
-    // Force diagram generation for files that contain at least one element with relations
-    // This respects the original detection but generates diagrams for any file with relations
-    let has_elements_with_relations = content.contains("### ") && content.contains("#### Relations");
-    
-    if !is_requirements_doc && !has_elements_with_relations {
-        log::debug!("Skipping diagram generation - file is not a requirements document and has no elements with relations: {}", file_path);
-        return Ok(content.to_string());
-    }
-    
-    if has_elements_with_relations && !is_requirements_doc {
-        log::debug!("File contains elements with relations, proceeding with diagram generation despite not being a requirements document: {}", file_path);
-    }
-    
-    log::debug!("Generating diagrams for requirements file: {}", file_path);
-    
-    // Define regex for paragraph headers
-    let para_regex = match Regex::new(r"(?m)^##\s+(.+)$") {
-        Ok(regex) => regex,
-        Err(e) => return Err(ReqFlowError::InvalidRegex(format!("Error compiling regex: {}", e)))
-    };
-    
+
+    log::debug!("Generating diagrams for elements document file: {}", file_path);
+
     // Find all elements in this file
     let elements_in_file: Vec<&Element> = registry.all_elements()
         .filter(|e| e.file_path == file_path)
@@ -358,7 +285,7 @@ pub fn generate_requirements_diagram(
     let mut i = 0;
     let mut in_diagram = false;
     let mut skipping_diagram = false;
-    
+
     while i < lines.len() {
         let line = lines[i];
         
@@ -367,7 +294,7 @@ pub fn generate_requirements_diagram(
             i += 1;
             continue;
         }
-        
+
         // Check for start of mermaid diagram
         if line.trim() == "```mermaid" {
             // Look ahead to see if this is a ReqFlow-generated diagram
@@ -437,15 +364,13 @@ pub fn generate_requirements_diagram(
     let lines: Vec<&str> = final_content.lines().collect();
     let mut paragraphs: Vec<(usize, String)> = Vec::new(); // (line index, paragraph name)
     let mut elements_by_paragraph: HashMap<String, Vec<&Element>> = HashMap::new();
-    let mut current_paragraph: Option<String> = None;
     
     // First, find all paragraph headings and their line positions
-    for (i, line) in lines.iter().enumerate() {
-        if let Some(captures) = para_regex.captures(line) {
+    for (_i, line) in lines.iter().enumerate() {
+        if let Some(captures) = Config::paragraph_regex().captures(line) {
             if let Some(para_name) = captures.get(1) {
                 let paragraph_name = para_name.as_str().to_string();
                 paragraphs.push((i, paragraph_name.clone()));
-                current_paragraph = Some(paragraph_name);
             }
         }
     }
@@ -459,12 +384,13 @@ pub fn generate_requirements_diagram(
     }
     
     // Associate elements with paragraphs
-    current_paragraph = Some(paragraphs[0].1.clone());
+    let mut current_paragraph: Option<String> = Some(paragraphs[0].1.clone());
     let mut current_para_idx = 0;
     
-    for (i, line) in lines.iter().enumerate() {
+
+    for (_i, line) in lines.iter().enumerate() {
         // Check if we've reached a new paragraph
-        if current_para_idx < paragraphs.len() - 1 && i >= paragraphs[current_para_idx + 1].0 {
+        if current_para_idx < paragraphs.len() - 1 && _i >= paragraphs[current_para_idx + 1].0 {
             current_para_idx += 1;
             current_paragraph = Some(paragraphs[current_para_idx].1.clone());
         }
@@ -489,8 +415,9 @@ pub fn generate_requirements_diagram(
     let mut result_lines = Vec::new();
     let mut in_first_intro_section = true;
     
-    for (i, line) in lines.iter().enumerate() {
-        let is_paragraph_heading = para_regex.is_match(line);
+
+    for (_i, line) in lines.iter().enumerate() {
+        let is_paragraph_heading = Config::paragraph_regex().is_match(line);
         
         // Add the line
         result_lines.push(line.to_string());
@@ -501,7 +428,7 @@ pub fn generate_requirements_diagram(
             
             // Figure out which paragraph this is
             let para_name = if is_paragraph_heading {
-                para_regex.captures(line)
+                Config::paragraph_regex().captures(line)
                     .and_then(|caps| caps.get(1))
                     .map(|m| m.as_str().to_string())
                     .unwrap_or_else(|| "Unknown".to_string())
@@ -509,6 +436,7 @@ pub fn generate_requirements_diagram(
                 paragraphs[0].1.clone() // Introduction section
             };
             
+
             // Only generate a diagram if the paragraph has elements
             if let Some(elements) = elements_by_paragraph.get(&para_name) {
                 if !elements.is_empty() {

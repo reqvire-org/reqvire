@@ -29,9 +29,9 @@ The verification test checks that ReqFlow correctly identifies and fixes excess 
 5. Verify that the whitespace has been corrected in the output files
 
 #### Relations
-  * verifies: [SystemRequirements/Requirements.md/Excess Whitespace Linting Implementation](../SystemRequirements/Requirements.html#excess-whitespace-linting-implementation)
-  * verifies: [SystemRequirements/Requirements.md/Dry Run Mode Implementation](../SystemRequirements/Requirements.html#dry-run-mode-implementation)
-  * trace: [tests/e2e-linting/test_whitespace_linting.sh](../../../tests/e2e-linting/test_whitespace_linting.sh)
+  * verify: [SystemRequirements/Requirements.md/Excess Whitespace Linting Implementation](../SystemRequirements/Requirements.md#excess-whitespace-linting-implementation)
+  * verify: [SystemRequirements/Requirements.md/Dry Run Mode Implementation](../SystemRequirements/Requirements.md#dry-run-mode-implementation)
+  * trace: [tests/e2e-linting/test_whitespace_linting.sh](../../tests/e2e-linting/test_whitespace_linting.sh)
 
 ## External Folders Tests
 
@@ -62,6 +62,6 @@ The verification test checks that ReqFlow correctly processes requirements in ex
 5. Verify that validation succeeds and requirements are properly processed
 
 #### Relations
-  * verifies: [SystemRequirements/Requirements.md/External Folders Support](../SystemRequirements/Requirements.html#external-folders-support)
-  * verifies: [SystemRequirements/Requirements.md/Unified System Requirements Processing](../SystemRequirements/Requirements.html#unified-system-requirements-processing)
-  * trace: [tests/e2e-external-folders/test_external_folders.sh](../../../tests/e2e-external-folders/test_external_folders.sh)
+  * verify: [SystemRequirements/Requirements.md/External Folders Support](../SystemRequirements/Requirements.md#external-folders-support)
+  * verify: [SystemRequirements/Requirements.md/Unified System Requirements Processing](../SystemRequirements/Requirements.md#unified-system-requirements-processing)
+  * trace: [tests/e2e-external-folders/test_external_folders.sh](../../tests/e2e-external-folders/test_external_folders.sh)

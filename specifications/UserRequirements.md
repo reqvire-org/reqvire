@@ -2,52 +2,6 @@
 
 ## Managing MBSE Models
 
-```mermaid
-graph LR;
-  %% Graph styling
-  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
-  classDef satisfies fill:#fff2cc,stroke:#ffcc00,stroke-width:1px;
-  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
-  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
-  classDef paragraph fill:#efefef,stroke:#999999,stroke-width:1px;
-  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
-
-    Unstructured_Documents["Unstructured Documents"];
-    click Unstructured_Documents "UserRequirements.md#unstructured-documents";
-    class Unstructured_Documents requirement;
-    Unstructured_Documents ==>|refines| _UserStories_md_Managing_MBSE_Models__UserStories_md_managing_mbse_models_;
-    _UserStories_md_Managing_MBSE_Models__UserStories_md_managing_mbse_models_["UserStories.md/Managing MBSE Models"];
-    click _UserStories_md_Managing_MBSE_Models__UserStories_md_managing_mbse_models_ "UserStories.md#managing-mbse-models";
-    class _UserStories_md_Managing_MBSE_Models__UserStories_md_managing_mbse_models_ requirement;
-    Efficient_Processings["Efficient Processings"];
-    click Efficient_Processings "UserRequirements.md#efficient-processings";
-    class Efficient_Processings requirement;
-    Efficient_Processings ==>|refines| _UserStories_md_Managing_MBSE_Models__UserStories_md_managing_mbse_models_;
-    Bootstrap_model_struture["Bootstrap model struture"];
-    click Bootstrap_model_struture "UserRequirements.md#bootstrap-model-struture";
-    class Bootstrap_model_struture requirement;
-    Bootstrap_model_struture ==>|refines| _UserStories_md_Managing_MBSE_Models__UserStories_md_managing_mbse_models_;
-    Project_Configuration_with_YAML["Project Configuration with YAML"];
-    click Project_Configuration_with_YAML "UserRequirements.md#project-configuration-with-yaml";
-    class Project_Configuration_with_YAML requirement;
-    Project_Configuration_with_YAML ==>|refines| _UserStories_md_Managing_MBSE_Models__UserStories_md_managing_mbse_models_;
-    Configurable_SystemRequirements_Folder_Name["Configurable SystemRequirements Folder Name"];
-    click Configurable_SystemRequirements_Folder_Name "UserRequirements.md#configurable-systemrequirements-folder-name";
-    class Configurable_SystemRequirements_Folder_Name requirement;
-    Configurable_SystemRequirements_Folder_Name -.->|deriveReqT| _Project_Configuration_with_YAML___project_configuration_with_yaml_;
-    _Project_Configuration_with_YAML___project_configuration_with_yaml_["Project Configuration with YAML"];
-    click _Project_Configuration_with_YAML___project_configuration_with_yaml_ "#project-configuration-with-yaml";
-    class _Project_Configuration_with_YAML___project_configuration_with_yaml_ requirement;
-    Configurable_DesignSpecifications_Folder_Name["Configurable DesignSpecifications Folder Name"];
-    click Configurable_DesignSpecifications_Folder_Name "UserRequirements.md#configurable-designspecifications-folder-name";
-    class Configurable_DesignSpecifications_Folder_Name requirement;
-    Configurable_DesignSpecifications_Folder_Name -.->|deriveReqT| _Project_Configuration_with_YAML___project_configuration_with_yaml_;
-    Support_for_Distributed_Requirements["Support for Distributed Requirements"];
-    click Support_for_Distributed_Requirements "UserRequirements.md#support-for-distributed-requirements";
-    class Support_for_Distributed_Requirements requirement;
-    Support_for_Distributed_Requirements -.->|deriveReqT| _Project_Configuration_with_YAML___project_configuration_with_yaml_;
-```
-
 
 ### Unstructured Documents
 
@@ -58,7 +12,7 @@ The system shall allow structured markdown and unstructured (eg., markdown, PDFs
 
 ---
 
-### Efficient Processings
+### Efficient Processing
 
 The system shall process structured documents and relations to extract model-relevant information efficiently.
 

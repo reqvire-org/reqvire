@@ -4,12 +4,12 @@ This file should be processed.
 
 ## Requirements
 
-### SYS-001 System Requirement
+### SYS 001 System Requirement
 
 This is a system requirement.
 
 #### Metadata
-* type: requirement
+  * type: requirement
 
 #### Relations
-* satisfiedBy: [../DesignSpecifications/ExcludedFile.md](../DesignSpecifications/ExcludedFile.md)
+  * derivedFrom: [../DesignSpecifications/ExcludedFile.md](../DesignSpecifications/ExcludedFile.md)

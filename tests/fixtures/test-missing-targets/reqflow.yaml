@@ -3,7 +3,6 @@ general:
 
 paths:
   specifications_folder: "."
-  design_specifications_folder: "DesignSpecifications"
   output_folder: "output"
   excluded_filename_patterns:
     - "**/Logical*.md"
