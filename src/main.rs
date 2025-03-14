@@ -1,9 +1,3 @@
-use anyhow::Result;
-use clap::{Parser, CommandFactory};
-use std::path::PathBuf;
-
-
-
 mod config;
 mod element;
 mod error;
@@ -18,14 +12,19 @@ mod utils;
 mod validation;
 mod cli;
 
+use anyhow::Result;
+use std::path::PathBuf;
+
+
 use model::ModelManager;
 use crate::cli::handle_command;
 use cli::Args;
 use log::error;
 
 
+#[path = "tests/general_tests.rs"]
 #[cfg(test)]
-mod tests;
+mod general_tests;
 #[path = "tests/validation_tests.rs"]
 #[cfg(test)]
 mod validation_tests;
@@ -49,7 +48,7 @@ fn main() -> Result<()> {
     let input_folder_path = args.input_folder.clone().unwrap_or_else(|| PathBuf::from(&config.paths.specifications_folder));
     let output_folder_path = args.output_folder.clone().unwrap_or_else(|| PathBuf::from(&config.paths.output_folder));
 
-    // reate a SINGLE model registry in `main.rs`
+    // recreate a SINGLE model registry in `main.rs`
     let mut model_manager = ModelManager::new_with_config(config.clone());
 
     // Collect identifiers ONCE before running other processes

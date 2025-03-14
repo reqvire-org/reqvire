@@ -10,8 +10,6 @@
 # - Command exits with error (non-zero) return code
 # - Error output contains specific error messages about missing relation targets
 #
-# Test Implementation for Verification:
-# - See: specifications/Verifications/ValidationTests.md
 
 # Setup
 TEST_NAME="Missing Relation Targets Validation"

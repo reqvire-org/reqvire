@@ -141,11 +141,15 @@ pub fn handle_command(
     // Determine execution mode
     let validation_mode = config.validation.validate_markdown || config.validation.validate_relations || config.validation.validate_all;
     let linting_mode = config.linting.lint;
+    
     let matrix_mode = config.validation.generate_matrix;
+
     let diagrams_mode = config.general.generate_diagrams;
 
     if diagrams_mode {
         info!("Generating mermaid diagrams in {:?}", input_folder_path);
+        // Only collect identifiers and process files to add diagrams
+        // Skip validation checks for diagram generation mode
         model_manager.process_diagrams(input_folder_path)?;
         info!("Requirements diagrams updated in source files");
         return Ok(0);
@@ -183,18 +187,60 @@ pub fn handle_command(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::path::PathBuf;
+    use crate::config::Config;
+    use crate::model::ModelManager;
+
 
     #[test]
     fn test_cli_parsing() {
         let args = Args::parse_from(&["reqflow", "--init"]);
         assert!(args.init);
     }
-
+    
     #[test]
-    fn test_handle_init() {
-        let args = Args::parse_from(&["reqflow", "--init"]);
-        let result = handle_command(args);
-        assert!(result.is_ok());
+    fn test_handle_command() {
+        // Mock CLI arguments
+        let args = Args {
+            llm_context: false,
+            init: false,
+            html: false,
+            verbose: false,
+            validate_markdown: false,
+            validate_relations: false,
+            validate_all: false,
+            lint: false,
+            dry_run: false,
+            json: false,
+            generate_matrix: false,
+            generate_diagrams: false,
+            input_folder: Some(PathBuf::from("test/specifications")),
+            output_folder: Some(PathBuf::from("test/output")),
+            config: None, // No custom config file for the test
+        };
+
+        // Create a default config instance
+        let config = Config::default();
+
+        // Define test input and output paths
+        let input_folder_path = PathBuf::from("test/specifications");
+        let output_folder_path = PathBuf::from("test/output");
+
+        // Create a mock model manager
+        let mut model_manager = ModelManager::new_with_config(config.clone());
+
+        // Run the handle_command function
+        let result = handle_command(
+            args,
+            &mut model_manager,
+            &config,
+            &input_folder_path,
+            &output_folder_path
+        );
+
+        // Assert that it runs without error
+        assert!(result.is_ok(), "handle_command should execute without errors");
     }
 }
+
 

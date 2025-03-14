@@ -3,12 +3,14 @@ use std::path::Path;
 
 use crate::error::ReqFlowError;
 use crate::relation::Relation;
+use crate::utils;
 
 /// Type of element in the MBSE model
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ElementType {
     Requirement,
     Verification,
+    File,
     Other(String),
 }
 
@@ -41,6 +43,28 @@ pub struct Element {
 }
 
 impl Element {
+    /// Checks if this element requires a parent relation.
+    pub fn requires_parent_relation(&self, registry: &ElementRegistry) -> bool {
+        //dbg!(self);
+        // Never required for File elements or Other
+        if self.is_file() || self.is_other() {
+            return false;
+        }        
+        // Always required for Verification type
+        if self.is_verification() {
+            return true;
+        }
+
+        let file_path = Path::new(&self.file_path);
+
+        let is_in_external = utils::is_in_external_folder(file_path, &registry.config());
+        let is_in_specifications_subfolder = utils::is_in_specifications_subfolder(file_path, &registry.config());
+
+        // Requirements inside external folders or in subfolders of specifications require a parent
+        self.is_requirement() && (is_in_external || is_in_specifications_subfolder)    
+    }
+
+
     /// Create a new element with the given name and file path
     pub fn new(name: String, file_path: String) -> Self {
         Self {
@@ -63,13 +87,22 @@ impl Element {
             }
         }
     }
-    
+
+    /// Check if this element is a file
+    pub fn is_file(&self) -> bool {
+        matches!(self.element_type, ElementType::File)
+    }
+    /// Check if this element is a Other
+    pub fn is_other(&self) -> bool {
+        matches!(self.element_type, ElementType::Other(_))
+    }    
     /// Check if this element is a verification
     pub fn is_verification(&self) -> bool {
         matches!(self.element_type, ElementType::Verification)
     }
     
     /// Check if this element is a requirement
+    #[allow(dead_code)]
     pub fn is_requirement(&self) -> bool {
         matches!(self.element_type, ElementType::Requirement)
     }
@@ -154,7 +187,12 @@ impl ElementRegistry {
         self.elements.insert(identifier, element);
         Ok(())
     }
-    
+
+    /// Add a file element to the registry
+    pub fn add_file_element(&mut self, mut element: Element) -> Result<(), ReqFlowError> {
+        element.element_type = ElementType::File;    
+        self.add_element(element)
+    }    
     /// Get an element by its identifier
     #[allow(dead_code)]
     pub fn get_element(&self, identifier: &str) -> Option<&Element> {
@@ -168,83 +206,29 @@ impl ElementRegistry {
     }
 
     /// Check if an element exists in the registry
-    #[allow(dead_code)]
-    pub fn contains_element(&self, identifier: &str) -> bool {
-        // Use DEBUG level instead of INFO for most logs
-        log::debug!("Checking for element: {}", identifier);
-        
-        // Direct lookup - fastest path
-        if self.elements.contains_key(identifier) {
-            log::debug!("Direct element match found: {}", identifier);
-            return true;
-        }
-        
-        // Check if this might be a file reference without an element identifier
-        if identifier.ends_with(".md") {
-            // Check if any element in registry has this file path
-            for (id, elem) in &self.elements {
-                if elem.file_path == identifier {
-                    log::debug!("Found matching file path: {} -> {}", identifier, id);
-                    return true;
-                }
-            }
-        }
-        
-        // Handle fragment references with special logic
-        if identifier.contains("#") {
-            // Split the identifier into file path and fragment
-            let parts: Vec<&str> = identifier.split('#').collect();
-            if parts.len() == 2 {
-                let file_path = parts[0];
-                let fragment = parts[1];
-                
-                log::debug!("Checking fragment reference with path '{}' and fragment '{}'", file_path, fragment);
-                
-                // Normalize the fragment for comparison
-                let normalized_fragment = crate::utils::normalize_fragment(fragment);
-                
-                // Check all elements for matches based on fragment
-                for (id, elem) in &self.elements {
-                    // Extract element's fragment for comparison
-                    if let Some(elem_fragment_idx) = id.find('#') {
-                        let elem_fragment = &id[elem_fragment_idx+1..];
-                        let elem_path = &id[0..elem_fragment_idx];
-                        
-                        let elem_normalized = crate::utils::normalize_fragment(elem_fragment);
-                        let paths_match = if !file_path.is_empty() {
-                            // Check for path match when file_path is provided
-                            elem_path.ends_with(file_path) || 
-                            file_path.ends_with(elem_path) ||
-                            elem.file_path.contains(file_path) ||
-                            file_path.contains(&elem.file_path)
-                        } else {
-                            // No path specified, so any path matches
-                            true
-                        };
-                        
-                        // For fragment matching, compare the normalized versions with various cases
-                        let fragments_match = normalized_fragment == elem_normalized || 
-                            elem.name.to_lowercase().contains(&fragment.to_lowercase());
-                        
-                        if paths_match && fragments_match {
-                            log::debug!("Found matching element through fragment identification: {} matches {}", identifier, id);
-                            return true;
-                        }
-                    }
-                }
-            }
-            
-            // Enhanced logging for debugging fragment references
-            log::debug!("Fragment identifier not found directly: {}", identifier);
-            // Log some similar keys for comparison
-            for (id, _) in self.elements.iter().filter(|(k, _)| k.contains("#") || k.contains(&identifier.split("#").next().unwrap_or(""))) {
-                log::debug!("  Similar registry element: {}", id);
-            }
-        }
-        
-        log::debug!("Element not found: {}", identifier);
-        false
+pub fn contains_element(&self, identifier: &str) -> bool {
+    let normalized_identifier = crate::utils::normalize_path(identifier, self.config(), "");
+    
+    log::debug!("Checking for element: {}", normalized_identifier);
+    
+    if self.elements.contains_key(&normalized_identifier) {
+        log::debug!("Direct element match found: {}", normalized_identifier);
+        return true;
     }
+
+    if identifier.ends_with(".md") {
+        for (id, elem) in &self.elements {
+            if elem.file_path == normalized_identifier {
+                log::debug!("Found matching file path: {} -> {}", identifier, id);
+                return true;
+            }
+        }
+    }
+
+    false
+}
+
+
 
     /// Get elements from a specific file
     #[allow(dead_code)]
@@ -287,8 +271,7 @@ impl ElementRegistry {
         let path = std::path::Path::new(file_path);
         crate::utils::is_excluded_by_patterns(
             path,
-            &self.config.paths.excluded_filename_patterns,
-            std::path::Path::new(&self.config.paths.specifications_folder),
+            &self.config,
             false
         )
     }

@@ -3,9 +3,11 @@ use regex::Regex;
 use std::fs;
 use std::path::Path;
 use anyhow::Result;
-use log::{debug, info, warn};
+use log::{debug, warn};
+use std::path::PathBuf;
 use serde::{Deserialize, Serialize};
-
+use std::env;
+ 
 /// Configuration settings for the ReqFlow application
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Config {
@@ -44,6 +46,9 @@ pub struct PathsConfig {
     pub external_folders: Vec<String>,
     #[serde(default)]
     pub excluded_filename_patterns: Vec<String>,
+    /// Base path where the tool is running (default: current working directory)
+    #[serde(skip)]  // Skip serialization (hidden in config files)
+    pub base_path: PathBuf,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -104,9 +109,11 @@ impl Default for PathsConfig {
                 // Exclude design specifications folder by pattern instead of dedicated parameter
                 "**/DesignSpecifications/**/*.md".to_string()
             ],
+            base_path: env::current_dir().expect("Failed to get current directory"),            
         }
     }
 }
+
 
 impl Default for ValidationConfig {
     fn default() -> Self {
@@ -263,6 +270,25 @@ impl Config {
         ]
     }
 
+
+   
+    /// Regular expression to match mermaid diagram
+    pub fn mermaid_regex() -> &'static Regex {
+        lazy_static! {
+            static ref MERMAID_REGEX: Regex = Regex::new(r"(?s)```mermaid\s*graph (TD|LR);.*?```\s*").unwrap();
+        }
+        &MERMAID_REGEX
+    }
+                        
+    /// Regular expression to match paragraph headers (level 2)
+    pub fn paragraph_regex() -> &'static Regex {
+        lazy_static! {
+            static ref PARAGRAPH_REGEX: Regex = Regex::new(r"^##\s+(.+)").unwrap();
+        }
+        &PARAGRAPH_REGEX
+    }
+
+            
     /// Regular expression to match element headers (level 3)
     pub fn element_regex() -> &'static Regex {
         lazy_static! {
@@ -278,6 +304,16 @@ impl Config {
         }
         &SUBSECTION_REGEX
     }
+    
+    /// Regular expression to match metadata properties
+    pub fn metadata_regex() -> &'static Regex {
+        lazy_static! {
+            static ref METADATA_REGEX: Regex = Regex::new(r"[\*\-]\s+(\w+):\s*(.+)").unwrap();
+        }
+        &METADATA_REGEX
+    }
+        
+
 
     /// Regular expression to match relation entries
     pub fn relation_regex() -> &'static Regex {

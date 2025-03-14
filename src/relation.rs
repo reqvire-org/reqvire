@@ -16,6 +16,7 @@ pub enum RelationDirection {
 
 // Define a struct to hold relation type information
 #[derive(Debug, Clone)]
+#[allow(dead_code)]
 pub struct RelationTypeInfo {
     pub name: &'static str,          // Name of the relation type
     pub direction: RelationDirection, // Direction of relation
@@ -93,12 +94,6 @@ lazy_static! {
         });
         
         // Trace relations
-        m.insert("tracedFrom", RelationTypeInfo {
-            name: "tracedFrom", 
-            direction: RelationDirection::Backward, 
-            opposite: None,
-            description: "Element is traced from another element",
-        });
         m.insert("trace", RelationTypeInfo {
             name: "trace", 
             direction: RelationDirection::Neutral, 
@@ -120,16 +115,36 @@ pub fn get_supported_relation_types() -> Vec<&'static str> {
     RELATION_TYPES.keys().cloned().collect()
 }
 
-/// Get the list of valid parent relation types
-/// These are relations that indicate an element has a parent (hierarchical relationship)
+/// Get the list of valid parent relation types (hierarchical relationships).
 pub fn get_parent_relation_types() -> Vec<&'static str> {
-    vec!["derivedFrom", "tracedFrom", "refine", "containedBy"]
+    RELATION_TYPES
+        .iter()
+        .filter(|(_, info)| info.direction == RelationDirection::Backward)
+        .map(|(name, _)| *name)
+        .collect()
 }
 
+
+/// Returns a list of valid relation types as per ReqFlow documentation.
+pub fn get_valid_relation_types() -> Vec<&'static str> {
+    RELATION_TYPES.keys().cloned().collect()
+}
+
+
 /// Get information about a relation type
+#[allow(dead_code)]
 pub fn get_relation_type_info(relation_type: &str) -> Option<&RelationTypeInfo> {
     RELATION_TYPES.get(relation_type)
 }
+
+/// Determines if a relation type should be checked for circular dependencies.
+pub fn is_circular_dependency_relation(relation_type: &str) -> bool {
+    match RELATION_TYPES.get(relation_type) {
+        Some(info) => matches!(info.name, "derivedFrom" | "dependsOn" | "refine" | "tracedFrom"),
+        None => false,
+    }
+}
+
 
 /// Represents a relation between elements in the MBSE model
 #[derive(Debug, Clone)]
@@ -160,17 +175,7 @@ impl Relation {
             // Get the raw URL without markdown syntax
             let raw_url = target[url_start..url_end].to_string();
             
-            // Fix URL if it contains '#' where it should have '/' in a file path
-            // This fixes paths like "DesignSpecifications#Status.md"
-            let fixed_url = if raw_url.contains('#') && !raw_url.starts_with('#') &&
-                            raw_url.split('#').last().map_or(false, |last| last.contains('.')) {
-                // This is likely a path with hash that should be slash
-                raw_url.replace('#', "/")
-            } else {
-                raw_url
-            };
-            
-            Some(fixed_url)
+            Some(raw_url)
         } else {
             None
         };
@@ -324,39 +329,12 @@ impl Relation {
             };
             format!("[{}]({})", self.target, target_file) // Use original target for display
         } else {
-            // Case 4: Element name only or document without extension
-            
-            // Check if this is a likely document reference
-            let is_likely_doc = target.contains("DSD") || 
-                                target.contains("Specification") || 
-                                target.contains("Document") || 
-                                target.to_lowercase() == "status";
-            
-            if is_likely_doc {
-                debug!("Processing as document reference: {}", target);
-                
-                // For "Status DSD" we need to handle it specially
-                if target.to_lowercase() == "status" {
-                    let file_name = if convert_to_html {
-                        "Status_DSD.html"
-                    } else {
-                        "Status_DSD.md"
-                    };
-                    format!("[{}]({})", self.target, file_name) // Use original target for display
-                } else {
-                    // Normal document reference - add file extension
-                    let file_name = if convert_to_html {
-                        format!("{}.html", target)
-                    } else {
-                        format!("{}.md", target)
-                    };
-                    format!("[{}]({})", self.target, file_name) // Use original target for display
-                }
-            } else {
-                // Same-document element reference
-                let anchor = target.replace(' ', "-").to_lowercase();
-                format!("[{}](#{})", self.target, anchor) // Use original target for display
-            }
+            // Case 4: Element name only or document without extension (not supported)
+
+            // Same-document element reference
+            let anchor = target.replace(' ', "-").to_lowercase();
+            format!("[{}](#{})", self.target, anchor) // Use original target for display
+
         };
         
         Ok(format!("  * {}: {}", self.relation_type, link))
@@ -404,6 +382,7 @@ pub fn process_relations(content: &str, current_file: &Path, convert_to_html: bo
     let mut relations_found = 0;
     
     for line in content.lines() {
+
         // Recognize various Relations section headers
         if line.trim() == "#### Relations" || line.trim() == "### Relations" || 
            line.trim() == "Relations:" || line.trim() == "## Relations" {
