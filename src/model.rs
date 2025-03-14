@@ -1,1058 +1,222 @@
-use anyhow::Result;
-use log::{debug};
-use rayon::prelude::*;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
+use std::fs;
 use std::path::{Path, PathBuf};
 use walkdir::WalkDir;
-
+use log::{debug, error};
 use crate::config::Config;
-use crate::element::{self, ElementRegistry};
+use crate::element::Element;
+use crate::element_registry::ElementRegistry;
 use crate::error::ReqFlowError;
-use crate::markdown;
+use crate::relation::{get_parent_relation_types, is_circular_dependency_relation};
 use crate::utils;
-use crate::validation;
-use crate::relation::is_circular_dependency_relation;
-use crate::relation::get_valid_relation_types;
+use crate::parser::parse_elements;
 
-/// Manages the MBSE model
+
 #[derive(Debug)]
 pub struct ModelManager {
-    /// Registry of all elements in the model
+    /// In-memory registry of elements
     element_registry: ElementRegistry,
-    
-    /// Cache of file contents for validation and processing
+
+    /// Stores file content for validation
     file_contents: HashMap<String, String>,
-    
-    /// Configuration settings
+
+    /// Configuration for the model manager
     config: Config,
 }
 
-impl Default for ModelManager {
-    fn default() -> Self {
-        Self {
-            element_registry: ElementRegistry::new(),
-            file_contents: HashMap::new(),
-            config: Config::default(),
-        }
-    }
-}
-
 impl ModelManager {
-    /// Create a new model manager with default configuration
-    #[allow(dead_code)]
-    pub fn new() -> Self {
-        Self {
-            element_registry: ElementRegistry::new(),
-            file_contents: HashMap::new(),
-            config: Config::default(),
-        }
-    }
-    
-    /// Create a new model manager with a provided configuration
-    pub fn new_with_config(config: Config) -> Self {
-        Self {
-            element_registry: ElementRegistry::new(),
-            file_contents: HashMap::new(),
-            config,
-        }
-    }
-
-    pub fn process_diagrams(&mut self, input_folder: &Path) -> Result<(), ReqFlowError> {
-        debug!("Processing diagrams for markdown files in {:?} (skipping validation)", input_folder);
-
-        // Set the diagram generation flag in the element registry
-        self.element_registry.set_diagram_generation_enabled(true);
-        self.element_registry.set_config(self.config.clone());
-
-
-        // Get all file paths from the registry instead of re-scanning**
-        let files: Vec<_> = self.element_registry
-            .all_elements()
-            .filter(|e| e.is_requirement() || e.is_verification()) //Only verifications and requirements are used for diagrams
-            .map(|e| e.file_path.clone())
-            .collect();
-        
-
-        debug!("Found {} valid files (Requirements & Verifications) for diagrams", files.len());
-
-        // Process files in parallel and track which ones were updated
-        let results = files.par_iter().map(|file_path| {
-            let result: Result<bool, ReqFlowError> = (|| {
-                debug!("Generating diagram for file {:?}", file_path);
-
-                let full_path = input_folder.join(file_path);
-                debug!("Resolving full path: {:?}", full_path);
-
-                if !full_path.exists() {
-                    debug!("Skipping missing file: {:?}", full_path);
-                    return Ok(false);
-                }
-
-
-                let content = utils::read_file(&full_path)?;
-
-                let relative_path = if PathBuf::from(file_path).is_absolute() {
-                    utils::get_relative_path(Path::new(file_path), input_folder)?
-                } else {
-                    PathBuf::from(file_path) // Already relative
-                };
-
-                
-                // Remove any existing diagrams first to ensure clean generation
-
-                let content_without_diagrams = Config::mermaid_regex().replace_all(&content, "").to_string();
-
-                // Pass the diagram_config value to ensure diagrams are generated
-                let updated_content = markdown::replace_relations(
-                    &content_without_diagrams,
-                    &self.element_registry,
-                    &relative_path,
-                    false, // Not converting to HTML
-                )?;
-
-                // Only write if content actually changed
-                if content != updated_content {
-                    utils::write_file(full_path, &updated_content)?;
-                    return Ok(true);
-                }
-
-                // Force a small change to ensure reprocessing
-                //utils::write_file(full_path, &(updated_content + "\n"))?;
-                Ok(true)
-            })();
-
-            match result {
-                Ok(updated) => updated,
-                Err(e) => {
-                    debug!("Error processing diagrams for {:?}: {}", file_path, e);
-                    false
-                }
-            }
-        }).collect::<Vec<bool>>();
-
-        // Count how many files were updated
-        let updated_count = results.into_iter().filter(|&updated| updated).count();
-
-        debug!("Finished processing diagrams. Updated {} of {} files.", updated_count, files.len());
-        Ok(())
-    }
-    
-
-    
-    /// Generate a traceability matrix showing dependencies between elements
-    /// The matrix is saved to the specifications root directory (input_folder)
-    pub fn generate_traceability_matrix(&self, _input_folder: &Path, output_folder: &Path) -> Result<(), ReqFlowError> {
-        // Debug information to help diagnose the issue
-        debug!("Generating traceability matrix with {} elements", self.element_registry.all_elements().count());
-        
-        // Create a simple traceability matrix as markdown
-        let mut matrix_content = String::from("# Traceability Matrix\n\n");
-        matrix_content.push_str("This matrix shows the relationships between elements in the model.\n\n");
-        
-        // Add summary information
-        matrix_content.push_str("## Summary\n\n");
-        matrix_content.push_str(&format!("- Total elements: {}\n", self.element_registry.all_elements().count()));
-        
-        // Count relations by type for summary with detailed debugging
-        let mut relation_count: std::collections::HashMap<String, usize> = std::collections::HashMap::new();
-        let mut element_count = 0;
-        let mut elements_with_relations = 0;
-        
-        for element in self.element_registry.all_elements() {
-            element_count += 1;
-            debug!("Checking element '{}' for relations - has {} relations", 
-                  element.name, element.relations.len());
-                  
-            if !element.relations.is_empty() {
-                elements_with_relations += 1;
-                debug!("Element '{}' has the following relations:", element.name);
-                
-                for relation in &element.relations {
-                    debug!("  - {}: {}", relation.relation_type, relation.target);
-                    *relation_count.entry(relation.relation_type.clone()).or_insert(0) += 1;
-                }
-            }
-        }
-        
-        debug!("Found {} elements total, {} with relations", element_count, elements_with_relations);
-        
-        if !relation_count.is_empty() {
-            matrix_content.push_str("- Relations by type:\n");
-            for (rel_type, count) in relation_count.iter() {
-                matrix_content.push_str(&format!("  - {}: {}\n", rel_type, count));
-            }
-        } else {
-            matrix_content.push_str("- No relations found in the model\n");
-        }
-        matrix_content.push_str("\n");
-        
-        // List of relation types to include based on ReqFlow documentation
-        let relation_types = get_valid_relation_types();
-        
-
-        for relation_type in relation_types {
-            matrix_content.push_str(&format!("## {} Relations\n\n", relation_type));
-            matrix_content.push_str("|Source Element|Target Element|\n");
-            matrix_content.push_str("|-------------|-------------|\n");
-            
-            let mut has_relations = false;
-            
-            // Find all relations of this type
-            for element in self.element_registry.all_elements() {
-                for relation in &element.relations {
-                    if relation.relation_type == relation_type.to_string() {
-                        has_relations = true;
-                        
-                        // Always create markdown links
-                        let source_element = element.name.clone();
-                        
-                        // Format the target with markdown links
-                        let target = &relation.target;
-                        let target_element = target.clone();
-                        
-                        matrix_content.push_str(&format!("|{}|{}|\n", source_element, target_element));
-                    }
-                }
-            }
-            
-            if !has_relations {
-                matrix_content.push_str("|No relations found||\n");
-            }
-            
-            matrix_content.push_str("\n");
-        }
-        
-        
-        // First, collect file contents for header detection
-        let mut file_contents: std::collections::HashMap<String, String> = std::collections::HashMap::new();
-        for (file_path, content) in &self.file_contents {
-            file_contents.insert(file_path.clone(), content.clone());
-        }
-        
-        // Map to store paragraphs (by file and section name)
-        let mut paragraphs_map: std::collections::HashMap<String, Vec<String>> = std::collections::HashMap::new();
-        
-        // Parse all files to extract paragraph (level 2) headers
-        for (file_path, content) in &file_contents {
-            let mut paragraphs = Vec::new();
-            
-            for line in content.lines() {
-                if let Some(captures) = Config::paragraph_regex().captures(line) {
-                    if let Some(para_name) = captures.get(1) {
-                        paragraphs.push(para_name.as_str().to_string());
-                    }
-                }
-            }
-            
-            // Store the paragraphs for this file
-            if !paragraphs.is_empty() {
-                paragraphs_map.insert(file_path.clone(), paragraphs);
-            }
-        }
-        
-        // Create the combined map of file+section to elements
-        let mut section_element_map: std::collections::HashMap<String, Vec<&element::Element>> = std::collections::HashMap::new();
-        
-        // First, organize elements by file
-        let mut files_with_elements: std::collections::HashMap<String, Vec<&element::Element>> = std::collections::HashMap::new();
-        
-        for element in self.element_registry.all_elements() {
-            files_with_elements.entry(element.file_path.clone())
-                .or_insert_with(Vec::new)
-                .push(element);
-        }
-        
-        // Now, for each file, detect which elements belong to which section
-        for (file_path, elements) in &files_with_elements {
-            // If the file has paragraphs, organize by paragraphs
-            if let Some(paragraphs) = paragraphs_map.get(file_path) {
-                // Get the file content
-                if let Some(content) = file_contents.get(file_path) {
-                    // Map to store which element belongs to which paragraph
-                    let mut paragraph_elements: std::collections::HashMap<String, Vec<&element::Element>> = 
-                        std::collections::HashMap::new();
-                    
-                    // Initialize with empty vectors for each paragraph
-                    for paragraph in paragraphs {
-                        paragraph_elements.insert(paragraph.clone(), Vec::new());
-                    }
-                    
-                    // Track current paragraph
-                    let mut current_paragraph: Option<String> = None;
-                    
-                    // Go through file line by line
-                    for line in content.lines() {
-
-                        // Check if this is a paragraph header
-                        if let Some(captures) = Config::paragraph_regex().captures(line) {
-                            if let Some(para_name) = captures.get(1) {
-                                current_paragraph = Some(para_name.as_str().to_string());
-                            }
-                        }
-                        // Check if this is an element header
-                        else if let Some(captures) = Config::element_regex().captures(line) {
-                            if let Some(elem_name) = captures.get(1) {
-                                let elem_name = elem_name.as_str().trim().to_string();
-                                
-                                // Find the element
-                                if let Some(element) = elements.iter().find(|e| e.name == elem_name) {
-                                    // Add to current paragraph if exists, otherwise to "Other"
-                                    if let Some(paragraph) = &current_paragraph {
-                                        paragraph_elements.entry(paragraph.clone())
-                                            .or_insert_with(Vec::new)
-                                            .push(*element);
-                                    } else {
-                                        // Element outside any section goes to file-level
-                                        section_element_map.entry(format!("{}/no_section", file_path))
-                                            .or_insert_with(Vec::new)
-                                            .push(*element);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    
-                    // Add all paragraphs to the main map
-                    for (paragraph, para_elements) in paragraph_elements {
-                        if !para_elements.is_empty() {
-                            section_element_map.insert(format!("{}/{}", file_path, paragraph), para_elements);
-                        }
-                    }
-                }
-            } else {
-                // No paragraphs in this file, add all elements to file-level
-                section_element_map.insert(file_path.clone(), elements.clone());
-            }
-        }
-        
-        // Generate diagrams by section
-        matrix_content.push_str("## Requirements Relationship Diagrams\n\n");
-        matrix_content.push_str("These diagrams show the relationships between requirements organized by file and section.\n\n");
-        matrix_content.push_str("* Red nodes: Requirements\n");
-        matrix_content.push_str("* Yellow nodes: Elements that satisfy requirements\n");
-        matrix_content.push_str("* Green nodes: Verification elements\n");
-        matrix_content.push_str("* Light blue nodes: Links to other sections/files\n\n");
-        
-        // Iterate through sections and create a diagram for each
-        for (section_id, elements) in section_element_map.iter() {
-            // Only generate diagrams for sections that have elements with relations
-            let has_relations = elements.iter().any(|e| !e.relations.is_empty());
-            
-            if has_relations {
-                // Parse the section ID to get file and paragraph
-                let parts: Vec<&str> = section_id.split('/').collect();
-                let file_path_str = if parts.len() > 1 {
-                    parts[0..parts.len()-1].join("/")
-                } else {
-                    section_id.clone()
-                };
-                
-                let section_name = parts.last().unwrap_or(&"");
-                
-                // Create a header for this section's diagram
-                let file_name = if let Some(idx) = file_path_str.rfind('/') {
-                    &file_path_str[idx + 1..]
-                } else {
-                    &file_path_str
-                };
-                
-                // Use section name or file name as header
-                let diagram_header = if *section_name == "no_section" {
-                    format!("### Diagram for {}", file_name)
-                } else {
-                    format!("### Diagram for {} - {}", file_name, section_name)
-                };
-                
-                matrix_content.push_str(&format!("{}\n\n", diagram_header));
-                // Use the configured diagram direction
-                let direction = &self.config.style.diagram_direction;
-                matrix_content.push_str(&format!("```mermaid\ngraph {};\n", direction));
-                
-                // Add graph styling with updated colors
-                matrix_content.push_str("  %% Graph styling\n");
-                matrix_content.push_str("  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;\n");
-                matrix_content.push_str("  classDef satisfies fill:#fff2cc,stroke:#ffcc00,stroke-width:1px;\n");
-                matrix_content.push_str("  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;\n");
-                matrix_content.push_str("  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;\n");
-                matrix_content.push_str("  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;\n\n");
-                
-                // Create a set of elements already included in this diagram
-                let mut included_elements = std::collections::HashSet::new();
-                
-                // Get file_path_str as PathBuf for comparison
-                let section_file_path = Path::new(&file_path_str);
-                
-                // Add nodes for this file's elements
-                for element in elements {
-                    // Safe ID for element - sanitize by replacing all non-alphanumeric chars with underscore
-                    let element_id = element.name.chars()
-                        .map(|c| if c.is_alphanumeric() { c } else { '_' })
-                        .collect::<String>();
-                    
-                    // Encode the label text properly for Mermaid
-                    let label = element.name.replace('"', "&quot;");
-                    
-                    matrix_content.push_str(&format!("  {}[\"{}\"];\n", element_id, label));
-                    
-                    // Always use markdown paths in the matrix, HTML conversion happens separately
-                    let file_path = element.file_path.clone();
-                    
-                    matrix_content.push_str(&format!("  click {} \"{}\";\n", 
-                        element_id, 
-                        format!("{}#{}", file_path, element.name.replace(' ', "-").to_lowercase())
-                    ));
-                    
-                    // Apply requirement style to all elements in this file
-                    matrix_content.push_str(&format!("  class {} requirement;\n", element_id));
-                    
-                    // Mark this element as included
-                    included_elements.insert(element.name.clone());
-                    
-                    // Process relations for this element
-                    for relation in &element.relations {
-                        // Get target element
-                        let target = &relation.target;
-                        
-                        // Generate safe ID for target - sanitize by replacing all non-alphanumeric chars with underscore
-                        let target_id = target.chars()
-                            .map(|c| if c.is_alphanumeric() { c } else { '_' })
-                            .collect::<String>();
-                        
-                        // Different arrow styles and labels based on relation type
-                        let arrow_style = match relation.relation_type.as_str() {
-                            "verifiedBy" | "verify" => "-->|verifies|",
-                            "satisfiedBy" | "satisfy" => "-->|satisfies|",
-                            "derivedFrom" | "derive" => "-.->|derives from|",
-                            "refine" => "==>|refines|",
-                            "tracedFrom" | "trace" => "-->|traces from|", // Changed from ~~~> which is not valid in mermaid
-                            "containedBy" | "contain" => "--o|contains|",
-                            _ => "-->|relates to|"
-                        };
-                        
-                        // Add the relationship
-                        matrix_content.push_str(&format!("  {} {} {};\n", element_id, arrow_style, target_id));
-                        
-                        // If the target is not already included in the diagram, add it
-                        if !included_elements.contains(target) {
-                            // Add the target node
-                            matrix_content.push_str(&format!("  {}[\"{}\"];\n", target_id, target.replace('"', "&quot;")));
-                            
-                            // Try to find the target element in the registry
-                            let target_element = self.element_registry.get_element(target);
-                            
-                            // Check if the target element is from the same file+section
-                            let is_external_link = if let Some(target_elem) = target_element {
-                                // It's external if it's from a different file 
-                                let target_file_path = Path::new(&target_elem.file_path);
-                                section_file_path != target_file_path
-                            } else {
-                                // If we can't find the element, it's external
-                                true
-                            };
-                            
-                            // Determine the style class based on relation type and element location
-                            let style_class = if is_external_link {
-                                // External elements get the blue link style
-                                "externalLink"
-                            } else if relation.relation_type == "verifiedBy" || relation.relation_type == "verify" {
-                                // Verification elements get the green verification style
-                                "verification"
-                            } else if relation.relation_type == "satisfiedBy" || relation.relation_type == "satisfy" {
-                                // Elements that satisfy requirements get the yellow satisfy style
-                                "satisfies"
-                            } else {
-                                // Default style for other elements
-                                "default"
-                            };
-                            
-                            if let Some(target_elem) = target_element {
-                                // Always use markdown paths in the matrix, HTML conversion happens separately
-                                let target_file_path = target_elem.file_path.clone();
-                                
-                                matrix_content.push_str(&format!("  click {} \"{}\";\n", 
-                                    target_id, 
-                                    format!("{}#{}", target_file_path, target_elem.name.replace(' ', "-").to_lowercase())
-                                ));
-                            } else if target.contains('/') {
-                                // This might be a file reference
-                                // Extract file path and element name if present
-                                let parts: Vec<&str> = target.split('/').collect();
-                                let file_part = if parts.len() > 1 {
-                                    let mut path = String::new();
-                                    for i in 0..parts.len()-1 {
-                                        if i > 0 { path.push('/'); }
-                                        path.push_str(parts[i]);
-                                    }
-                                    path
-                                } else {
-                                    parts[0].to_string()
-                                };
-                                
-                                let element_part = if parts.len() > 1 {
-                                    parts[parts.len()-1]
-                                } else {
-                                    ""
-                                };
-                                
-                                let link = if !element_part.is_empty() {
-                                    format!("{}#{}", file_part, element_part.replace(' ', "-").to_lowercase())
-                                } else {
-                                    file_part
-                                };
-                                
-                                matrix_content.push_str(&format!("  click {} \"{}\";\n", target_id, link));
-                            }
-                            
-                            // Apply appropriate style class
-                            matrix_content.push_str(&format!("  class {} {};\n", target_id, style_class));
-                            
-                            // Mark target as included
-                            included_elements.insert(target.clone());
-                        }
-                    }
-                }
-                
-                // Close the mermaid diagram
-                matrix_content.push_str("```\n\n");
-            }
-        }
-        
-        // Write the traceability matrix to the output directory
-        let matrix_path = output_folder.join("TraceabilityMatrix.md");
-        utils::write_file(&matrix_path, &matrix_content)?;
-        
-        // Note: HTML conversion is now handled by the html_export module
-        
-        debug!("Traceability matrix generated");
-        Ok(())
-    }
-    
-
-    
-    /// Collect identifiers from all markdown files in the input folder
-    fn collect_identifiers(&mut self, input_folder: &Path) -> Result<(), ReqFlowError> {
-        debug!("Collecting identifiers from markdown files");
-        
-        // Use existing registry
-        let registry = &mut self.element_registry;
-        
-        // Get the current diagram generation setting
-        let diagram_enabled = registry.is_diagram_generation_enabled();
-        
-        // Clear the registry first to avoid duplicates
-        // (not ideal for incremental updates, but ensures clean collection)
-        *registry = ElementRegistry::new();
-        
-        // Restore the diagram generation setting
-        registry.set_diagram_generation_enabled(diagram_enabled);
-        // Pass the configuration to the registry
-        registry.set_config(self.config.clone());
-        
-        debug!("Scanning directory for all markdown files: {}", input_folder.display());
-        debug!("Input folder for scanning: {}", input_folder.display());
-        
-        // Debug: List all files in the directory
-        for entry in walkdir::WalkDir::new(input_folder).max_depth(100).into_iter().filter_map(|e| e.ok()) {
-            debug!("Found file in directory: {}", entry.path().display());
-        }
-        
-        for entry in WalkDir::new(input_folder).into_iter().filter_map(|e| e.ok()) {
-            let path = entry.path();
-            debug!("Processing entry: {}", path.display());
-            
-            // Process all potentially relevant files to collect identifiers
-            if path.is_file() {
-                let is_markdown_file = path.extension().map_or(false, |ext| ext == "md");
-
-                if is_markdown_file{
-                    // Log all markdown files for debugging
-                    debug!("Found Markdown file: {}", path.display());
-                    
-                    // Check if it's processable
-                    let is_proc = utils::is_requirements_file_by_path(path, &self.config);
-                    debug!(
-                        "Checking file: {} | Processable: {} | Exists: {} | Extension: {:?}",
-                        path.display(),
-                        is_proc,
-                        path.exists(),
-                        path.extension()
-                    );
-                    
-                    if !is_proc {
-                        // Skip files that are not considered processable
-                        continue;
-                    }
-                } else {
-                    // Not a markdown file
-                    debug!("Found file: {}", path.display());
-                    continue;
-                }
-                
-                                         
-                // Check if this file is excluded by patterns
-                let should_exclude = utils::is_excluded_by_patterns(
-                    path, 
-                    &self.config, 
-                    self.config.general.verbose
-                ); 
-                                
-                // Log all excluded patterns for debugging
-                debug!("Excluded filename patterns:");
-                for pattern in &self.config.paths.excluded_filename_patterns {
-                    debug!("  Pattern: {}", pattern);
-                }
-                
-                if should_exclude {
-                    debug!("Found excluded file (will add to registry for relation validation): {:?}", path);
-                    // Don't skip excluded files here - we'll handle them properly later
-                }
-                
-                debug!("Collecting identifiers from {:?}", path);
-                
-                      
-                let relative_path = utils::get_relative_path(path, input_folder)?;                      
-                let relative_path_str = relative_path.to_string_lossy().to_string();
-         
-
-                debug!("is_excluded={} for {}", should_exclude, relative_path_str);
-                                                                                            
-                // Create a document element for the file
-                // Use file name with extension, replacing dots with underscores
-                let title = Path::new(&relative_path_str)
-                    .file_name()
-                    .and_then(|s| s.to_str())
-                    .map(|s| s.replace('.', "_")) // Replace '.' with '_'
-                    .unwrap_or("Untitled_Document".to_string())
-                    .to_string();
-
-                log::debug!("Using file name as title: '{}'", title);
-                                                                                             
-                if is_markdown_file{
-                    let content = utils::read_file(path)?;
-
-                    // Store file content for later validation and processing
-                    self.file_contents.insert(relative_path_str.clone(), content.clone());                            
-                    
-                    // For excluded files, we don't process the elements inside, but we need
-                    if is_markdown_file && !should_exclude  {
-                       // For non-excluded files, collect all elements as normal
-                       markdown::collect_elements(&content, &relative_path_str, registry)?;
-                    }
-                }
-
-
-                // Normalize the path for consistent registry lookup
-                // IMPORTANT: This path is where the file is stored in the registry
-                // It must match the path used in relation validation
-                let normalized_path = crate::utils::normalize_path(&relative_path_str, &self.config, "");
-                debug!("Normalized path for registry: {} -> {}", relative_path_str, normalized_path);
-                
-                
-                // Add the file as an element for relation validation using the normalized path
-                let file_element = crate::element::Element::new(
-                    title.clone(),
-                    normalized_path,
-                );
-                
-                // Add document to registry for validation
-                if let Err(e) = registry.add_file_element(file_element) {
-                    debug!("Error adding file element: {}", e);
-                } else {
-                    debug!("Successfully added file element for validation: {}", relative_path_str);
-                }
-                
-
-            }
-        }
-        
-        Ok(())
-    }
-    
-    /// Public method to collect identifiers only - used for validation, diagram generation and other operations
-    /// This method just does basic element collection without performing any validation
-    pub fn collect_identifiers_only(&mut self, input_folder: &Path) -> Result<(), ReqFlowError> {
-        // When in diagram generation mode, set the flag in the element registry
-        // We'll transfer the config setting to the registry
-        self.element_registry.set_diagram_generation_enabled(self.config.general.generate_diagrams);
-        
-        self.collect_identifiers(input_folder)
-    }
-    
-    /// Validate markdown structure of all collected files
-    /// Returns a list of validation errors
-    pub fn validate_markdown_structure(&self) -> Result<Vec<ReqFlowError>, ReqFlowError> {
-        debug!("Validating markdown structure");
-        
-        let mut all_errors = Vec::new();
-        
-        // Process each file for markdown structure validation
-        for (file_path, content) in &self.file_contents {
-            // Check if this file should be excluded by any excluded filename patterns
-            let path_obj = std::path::Path::new(file_path);
-            let should_exclude = utils::is_excluded_by_patterns(
-                path_obj, 
-                &self.config,
-                false
-            );
-            
-            if should_exclude {
-                debug!("Skipping validation for excluded file: {}", file_path);
-                continue;
-            }
-            
-            debug!("Validating markdown structure of {}", file_path);
-            
-            // Use existing validation function
-            let errors = validation::validate_markdown_structure(content)?;
-            
-            // Convert errors to include file path in message
-            let errors_with_path: Vec<ReqFlowError> = errors
-                .into_iter()
-                .map(|error| {
-                    match error {
-                        ReqFlowError::DuplicateElement(msg) => {
-                            ReqFlowError::DuplicateElement(format!("File {}: {}", file_path, msg))
-                        },
-                        ReqFlowError::DuplicateSubsection(msg) => {
-                            ReqFlowError::DuplicateSubsection(format!("File {}: {}", file_path, msg))
-                        },
-                        ReqFlowError::InvalidMarkdownStructure(msg) => {
-                            ReqFlowError::InvalidMarkdownStructure(format!("File {}: {}", file_path, msg))
-                        },
-                        other => other,
-                    }
-                })
-                .collect();
-            
-            all_errors.extend(errors_with_path);
-        }
-        
-        if !all_errors.is_empty() {
-            debug!("Found {} markdown structure validation errors", all_errors.len());
-            // Error details need to be visible in normal mode
-            for error in &all_errors {
-                debug!("Markdown error: {}", error);
-            }
-        } else {
-            debug!("No markdown structure validation errors found");
-        }
-        
-        Ok(all_errors)
-    }
-    
-    /// Validate all relations in the model
-    /// Returns a list of validation errors
-    pub fn validate_relations(&self) -> Result<Vec<ReqFlowError>, ReqFlowError> {
-        debug!("Validating relations");
-        
-        // Use existing validation function
-        let errors = validation::validate_relations(&self.element_registry)?;
-        
-        if !errors.is_empty() {
-            debug!("Found {} relation validation errors", errors.len());
-            // Error details need to be visible in normal mode
-            for error in &errors {
-                debug!("Relation error: {}", error);
-            }
-        } else {
-            debug!("No relation validation errors found");
-        }
-        
-        Ok(errors)
-    }
-    
-    /// Validate filesystem structure according to ReqFlow methodology
-    /// Checks for:    /// - Required directories (specifications, etc.)
-    /// - Required files
-    /// - Proper file organization
-    /// Returns a list of validation errors with file paths and line numbers (where applicable)
-    pub fn validate_filesystem_structure(&self, input_folder: &Path) -> Result<Vec<ReqFlowError>, ReqFlowError> {
-        debug!("Validating filesystem structure in {:?}", input_folder);
-        
+    /// Parses and validates all Markdown files while building the registry.
+    /// Returns a list of validation errors.
+    pub fn parse_and_validate(&mut self, input_folder: &Path) -> Result<Vec<ReqFlowError>, ReqFlowError> {
+        debug!("Parsing and validating files in {:?}", input_folder);
         let mut errors = Vec::new();
         
-        // Get configuration values for folders
-        let specs_folder = &self.config.paths.specifications_folder;
-        
-        // Get paths from config using helper methods, but use them correctly
-        // These paths should all be within the input folder, not absolute or in another repository
-        let specs_dir_path = input_folder.join(specs_folder);
-        
-        // Special case for testing - if input_folder is already "specifications", don't add it again
-        let actual_specs_dir_path = if input_folder.file_name().map_or(false, |name| name == "specifications") {
-            input_folder.to_path_buf()
-        } else {
-            specs_dir_path.clone()
-        };
-        
-        // Always validate the main specifications directory
-        if !actual_specs_dir_path.exists() || !actual_specs_dir_path.is_dir() {
-            errors.push(ReqFlowError::ValidationError(
-                format!("Required specifications directory '{}' is missing", actual_specs_dir_path.display())
-            ));
-        }
-        
-        // No specific folder structure is required
-        // Any requirement in a specifications subfolder is treated as a system requirement
-        // Design specifications are now handled via excluded_filename_patterns
-        
-        // Validate external folders
-        for external_folder in &self.config.paths.external_folders {
-            let folder_path = if Path::new(&external_folder).is_absolute() {
-                PathBuf::from(external_folder)
-            } else {
-                input_folder.join(external_folder)
-            };
-            
-            if !folder_path.exists() || !folder_path.is_dir() {
-                errors.push(ReqFlowError::ValidationError(
-                    format!("External folder '{}' is missing or not a directory", folder_path.display())
-                ));
-            }
-        }
-        
-        // No README validation - README files are optional
-        
-        // We no longer require a specific SystemRequirements.md file
-        // Any markdown file in a specifications subfolder or external folder can be a system requirement
-        
-        // Check for files in wrong locations within the main specs directory
         for entry in WalkDir::new(input_folder).into_iter().filter_map(|e| e.ok()) {
             let path = entry.path();
-            
-            // Check if this file is in an external folder - apply folder structure rules to external folders too
-            let in_external_folder = self.config.paths.external_folders.iter().any(|folder| {
-                let folder_path = if Path::new(&folder).is_absolute() {
-                    PathBuf::from(folder)
-                } else {
-                    input_folder.join(folder)
-                };
-                path.starts_with(&folder_path)
-            });
-            
-            // For files in external folders, we'll apply standard folder structure rules
-            // but with the external folder as the root instead of the specifications folder
-            
             if path.is_file() && path.extension().map_or(false, |ext| ext == "md") {
-                let file_name = path.file_name().unwrap().to_string_lossy();
-                
-                // All markdown files are now considered for element extraction
-                
-                // Determine the root directory for this file (specifications or external folder)
-                let root_dir = if in_external_folder {
-                    // Find which external folder contains this file
-                    let mut ext_root_dir = PathBuf::new();
-                    
-                    for folder in &self.config.paths.external_folders {
-                        let folder_path = if Path::new(&folder).is_absolute() {
-                            PathBuf::from(folder)
-                        } else {
-                            input_folder.join(folder)
-                        };
-                        
-                        if path.starts_with(&folder_path) {
-                            // This is the external folder containing our file
-                            ext_root_dir = folder_path.clone();
-                            break;
+                let file_content = fs::read_to_string(path)?;
+                let relative_path = utils::get_relative_path(path, input_folder)?;
+                let relative_path_str = relative_path.to_string_lossy().to_string();
+
+                self.file_contents.insert(relative_path_str.clone(), file_content.clone());
+
+                // **Step 1: Markdown Structure Validation**
+                let markdown_errors = self.validate_markdown_structure(&file_content, &relative_path_str);
+                errors.extend(markdown_errors);
+
+                // **Step 2: Parse Elements**
+                match parse_elements(&file_content, &relative_path_str) {
+                    Ok(elements) => {
+                        for element in elements {
+                            if let Err(e) = self.element_registry.register_element(element, &relative_path_str) {
+                                errors.push(e);
+                            }
                         }
                     }
-                    
-                    ext_root_dir
-                } else {
-                    // Use the regular specifications folder
-                    actual_specs_dir_path.clone()
-                };
-                
-                let in_specs_root = path.parent().map_or(false, |p| p == root_dir);
-                let is_requirements_file = file_name.ends_with(".md");
-                
-                // User requirements are in specs root, system requirements are in system_requirements_folder
-                // A file is considered a User Requirements file if it:
-                // 1. Contains the requirements_filename_match string
-                // 2. Is directly in the root folder (specifications or external)
-                let is_user_req_file = is_requirements_file && in_specs_root;
-                
-                // A file is considered a System Requirements file if it:
-                // 1. Is NOT directly in the root folder (meaning it's in a subfolder)
-                //let is_system_req_file = is_requirements_file && !is_user_req_file;
-                
-                // User Requirements should be in the specifications root folder, NOT in external folders
-                if is_user_req_file {
-                    if !in_specs_root {
-                        errors.push(ReqFlowError::ValidationError(
-                            format!("File '{}': User Requirements file must be in the root folder '{}'", 
-                                    path.display(), root_dir.display())
-                        ));
-                    }
-                    
-                    // Check if User Requirements file is in an external folder
-                    if in_external_folder {
-                        errors.push(ReqFlowError::ValidationError(
-                            format!("File '{}': User Requirements are not allowed in external folders", 
-                                    path.display())
-                        ));
+                    Err(parse_errors) => {
+                        errors.push(parse_errors);
                     }
                 }
-                
-                // System Requirements can be in any subfolder of specifications or in external folders
-                // No need to validate specific directory location for system requirements
-                
-                // Design specifications are now handled via excluded_filename_patterns
-                // No specific directory validation is needed
             }
         }
-        
-        if !errors.is_empty() {
-            debug!("Found {} filesystem structure validation errors", errors.len());
-            // Error details need to be visible in normal mode
-            for error in &errors {
-                debug!("Filesystem error: {}", error);
-            }
-        } else {
-            debug!("No filesystem structure validation errors found");
-        }
-        
+
+        // **Step 3: Validate Relations**
+        errors.extend(self.validate_relations()?);
+
+        // **Step 4: Validate Cross-Component Dependencies**
+        errors.extend(self.validate_cross_component_dependencies()?);
+
+
         Ok(errors)
     }
-    
-    /// Validate cross-component dependencies
-    /// Checks for:
-    /// - Complete dependency chains
-    /// - Missing components in dependency chains
-    /// - Circular dependencies
-    /// Returns a list of validation errors
-    pub fn validate_cross_component_dependencies(&self) -> Result<Vec<ReqFlowError>, ReqFlowError> {
-        debug!("Validating cross-component dependencies");
-        
+
+    /// Validates relations inside the `ElementRegistry`
+    fn validate_relations(&self) -> Result<Vec<ReqFlowError>, ReqFlowError> {
+        debug!("Validating relations...");
         let mut errors = Vec::new();
-        
+
+        for element in self.element_registry.get_all_elements() {
+            for relation in &element.relations {
+                if self.element_registry.get_element(&relation.target).is_none() {
+                    errors.push(ReqFlowError::MissingRelationTarget(
+                        format!("Element '{}' references missing target '{}'", element.name, relation.target),
+                    ));
+                }
+            }
+        }
+
+        if errors.is_empty() {
+            debug!("No relation validation errors found.");
+        } else {
+            debug!("{} relation validation errors found.", errors.len());
+        }
+
+        Ok(errors)
+    }
+
+    /// Validates cross-component dependencies for circular dependencies and missing links.
+    fn validate_cross_component_dependencies(&self) -> Result<Vec<ReqFlowError>, ReqFlowError> {
+        debug!("Validating cross-component dependencies...");
+        let mut errors = Vec::new();
+        let mut visited = HashSet::new();
+
         // Check for circular dependencies
-        for element in self.element_registry.all_elements() {
-            let mut visited = std::collections::HashSet::new();
+        for element in self.element_registry.get_all_elements() {
             let mut path = Vec::new();
-            
             self.check_circular_dependencies(element, &mut visited, &mut path, &mut errors);
         }
-        
-        // We no longer use a specific system requirements folder
-        
-        // Check for incomplete dependency chains (e.g., missing derivedFrom relations)
-        // For example, system requirements should have derivedFrom relations to user requirements
-        for element in self.element_registry.all_elements() {
-            // Check for system requirements without any parent relation
-            // System requirements must have at least one relation that points to a parent requirement
-            
-            // Determine if this is a system requirement
-            // System requirements are:
-            // 1. Any requirement in a specifications subfolder (not in the root)
-            // 2. Any requirement in an external folder
-            
-            // Check if element is in the specifications folder but not at the root level
-            let specs_folder_str = self.config.paths.specifications_folder.as_str();
-            let is_in_specs_subfolder = element.file_path.contains(specs_folder_str) && 
-                                        element.file_path.matches('/').count() > 1;
-            
-            // Check if element is in an external folder
-            let is_in_external_folder = self.config.paths.external_folders.iter().any(|ext_folder| {
-                element.file_path.contains(ext_folder)
-            });
-            
-            // Check if this file should be excluded based on patterns
-            let path_obj = Path::new(&element.file_path);
-            let is_excluded = utils::is_excluded_by_patterns(
-                path_obj,
-                &self.config,
-                false
-            );
-            
-            // Any requirement in a subfolder or external folder is a system requirement (except for excluded files)
-            if (is_in_specs_subfolder || is_in_external_folder) && !is_excluded {
-                // Get valid parent relation types from relation module
-                let valid_parent_relations = crate::relation::get_parent_relation_types();
-                
-                // Check if the element has at least one valid parent relation
-                let has_parent_relation = element.relations.iter().any(|r| valid_parent_relations.contains(&r.relation_type.as_str()));
-                
-                if !has_parent_relation {
-                    // Format the valid relation types for the error message
-                    let relation_types_str = valid_parent_relations.join("', '");
-                    
-                    errors.push(ReqFlowError::ValidationError(
-                        format!("System requirement '{}' has no parent requirement relation (needs '{}') (in file '{}')", 
-                               element.name, relation_types_str, element.file_path)
-                    ));
-                }
-            }
-            
-            // Check for verification elements without verifiedBy relations
-            if element.file_path.contains("Verifications") && 
-               !element.relations.iter().any(|r| r.relation_type == "verifiedBy") {
-                errors.push(ReqFlowError::ValidationError(
-                    format!("Verification element '{}' has no 'verifiedBy' relation (in file '{}')", 
-                           element.name, element.file_path)
+
+        // Check for missing parent relations
+        let valid_parent_relations = get_parent_relation_types();
+        for element in self.element_registry.get_all_elements() {
+            let has_parent_relation = element.relations.iter()
+                .any(|r| valid_parent_relations.contains(&r.relation_type.name));
+
+            if !has_parent_relation {
+                errors.push(ReqFlowError::MissingParentRelation(
+                    format!("Element '{}' has no parent relation (needs one of: {:?})", element.name, valid_parent_relations),
                 ));
             }
         }
-        
-        if !errors.is_empty() {
-            debug!("Found {} cross-component dependency validation errors", errors.len());
-            // Error details need to be visible in normal mode
-            for error in &errors {
-                debug!("Dependency error: {}", error);
-            }
+
+        if errors.is_empty() {
+            debug!("No cross-component dependency validation errors found.");
         } else {
-            debug!("No cross-component dependency validation errors found");
+            debug!("{} cross-component validation errors found.", errors.len());
         }
-        
+
         Ok(errors)
     }
-    
-    /// Helper method to check for circular dependencies
+    /// Validates the Markdown structure of a document, ensuring:
+    /// - Element (`###`) names are unique.
+    /// - Subsection (`####`) names are unique within each element.
+    /// - Provides error messages with line numbers.
+    fn validate_markdown_structure(&self, content: &str, file_path: &str) -> Vec<ReqFlowError> {
+        let mut errors = Vec::new();
+        let mut element_names = Vec::new();
+        let mut current_element: Option<String> = None;
+        let mut current_element_subsections: Vec<String> = Vec::new();
+
+        for (line_num, line) in content.lines().enumerate() {
+            let trimmed = line.trim();
+
+            if trimmed.starts_with("### ") {
+                // Level 3 header (element)
+                let name = trimmed[4..].trim().to_string();
+
+                if element_names.contains(&name) {
+                    errors.push(ReqFlowError::DuplicateElement(format!(
+                        "File '{}': Duplicate element '{}' found at line {}",
+                        file_path, name, line_num + 1
+                    )));
+                } else {
+                    element_names.push(name.clone());
+                    current_element = Some(name);
+                    current_element_subsections.clear();
+                }
+            } else if trimmed.starts_with("#### ") && current_element.is_some() {
+                // Level 4 header (subsection)
+                let subsection_name = trimmed[5..].trim().to_string();
+
+                if current_element_subsections.contains(&subsection_name) {
+                    errors.push(ReqFlowError::DuplicateSubsection(format!(
+                        "File '{}': Duplicate subsection '{}' within element '{}' found at line {}",
+                        file_path,
+                        subsection_name,
+                        current_element.as_ref().unwrap(),
+                        line_num + 1
+                    )));
+                } else {
+                    current_element_subsections.push(subsection_name);
+                }
+            } else if trimmed.starts_with("## ") || trimmed.starts_with("# ") {
+                // Reset current element tracking on higher-level headers
+                current_element = None;
+                current_element_subsections.clear();
+            }
+        }
+
+       if errors.is_empty() {
+            debug!("No markdown validation errors found.");
+        } else {
+            debug!("{} markdown validation errors found.", errors.len());
+        }
+        errors
+    }    
+
+    /// Recursive function to check for circular dependencies
     fn check_circular_dependencies(
-        &self, 
-        element: &element::Element, 
-        visited: &mut std::collections::HashSet<String>,
+        &self,
+        element: &Element,
+        visited: &mut HashSet<String>,
         path: &mut Vec<String>,
-        errors: &mut Vec<ReqFlowError>
+        errors: &mut Vec<ReqFlowError>,
     ) {
-        let element_id = element.identifier();
-        
-        // If we've already completely processed this element, skip
+        let element_id = element.identifier.clone();
         if visited.contains(&element_id) {
             return;
         }
-        
-        // Check if we've encountered this element before in the current path
+
         if path.contains(&element_id) {
-            // We have a cycle
             let cycle_start = path.iter().position(|id| id == &element_id).unwrap();
-            let mut cycle = path[cycle_start..].to_vec();
-            cycle.push(element_id.clone());
-            
+            let cycle = path[cycle_start..].join(" -> ");
             errors.push(ReqFlowError::ValidationError(
-                format!("Circular dependency detected: {} (in file '{}', element '{}')", 
-                       cycle.join(" -> "), element.file_path, element.name)
+                format!("Circular dependency detected: {}", cycle),
             ));
             return;
         }
-        
-        // Add this element to the current path
+
         path.push(element_id.clone());
-        
-        // Check all relations of this element
         for relation in &element.relations {
-            // Only follow certain relation types (those that could create cycles)
-            if is_circular_dependency_relation(&relation.relation_type.as_str()) {
-                // Get the target element
+            if is_circular_dependency_relation(relation.relation_type.name) {
                 if let Some(target_element) = self.element_registry.get_element(&relation.target) {
                     self.check_circular_dependencies(target_element, visited, path, errors);
                 }
             }
         }
-        
-        // Mark this element as visited and remove from current path
+
         visited.insert(element_id);
         path.pop();
     }
- 
 }
+

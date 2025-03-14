@@ -1,66 +1,66 @@
 use std::path::{Path, PathBuf};
 use crate::config::Config;
 use regex::Regex;
+use crate::error::ReqFlowError;
 
-/// Normalize an identifier based on the specifications folder and external folders.
-/// If an identifier is a **fragment only**, it is relative to the current document.
-pub fn normalize_identifier(config: &Config, current_file: &str, raw_identifier: &str) -> String {
-    let fragment_re = Regex::new(r"^#(.+)$").unwrap();
-    let markdown_link_re = Regex::new(r"^\[.*\]\((.+)\)$").unwrap();
+/// Normalize an identifier based on paths and element names.
+pub fn normalize_identifier(config: &Config, current_file: &str, raw_identifier: &str) -> Result<String, String> {
+    let fragment_re = Regex::new(r"^#(.+)$").map_err(|_| ReqFlowError::InvalidRegex("Invalid regex for fragment parsing".to_string()))?;
+    let markdown_link_re = Regex::new(r"^\[.*\]\((.+)\)$").map_err(|_| ReqFlowError::InvalidRegex("Invalid regex for markdown links".to_string()))?;
 
     let mut identifier = raw_identifier.trim().to_string();
 
-    // Case 1: If it's a Markdown link, extract the identifier
+    // Extract identifier from Markdown link if applicable
     if let Some(caps) = markdown_link_re.captures(&identifier) {
         identifier = caps.get(1).unwrap().as_str().to_string();
     }
 
-    // Case 2: If the identifier is a fragment only (e.g., `#element-name`), prepend current file
+    // If identifier is only a fragment (e.g., `#element-name`), prepend current file
     if let Some(caps) = fragment_re.captures(&identifier) {
         let element_name = caps.get(1).unwrap().as_str();
-        return format!("{}#{}", normalize_path(config, current_file), normalize_element_name(element_name));
+        return Ok(format!("{}#{}", normalize_path(config, current_file)?, normalize_element_name(element_name)));
     }
 
-    // Case 3: If the identifier contains `#`, split file and fragment
+    // Split into file + fragment
     let (file_part, fragment_part) = match identifier.split_once('#') {
         Some((file, fragment)) => (file.trim(), Some(fragment.trim())),
         None => (identifier.as_str(), None),
     };
 
-    let normalized_path = normalize_path(config, file_part);
+    let normalized_path = normalize_path(config, file_part)?;
     if let Some(fragment) = fragment_part {
-        format!("{}#{}", normalized_path, normalize_element_name(fragment))
+        Ok(format!("{}#{}", normalized_path, normalize_element_name(fragment)))
     } else {
-        normalized_path
+        Ok(normalized_path)
     }
 }
 
 /// Normalize a file path according to the `specifications_folder` and `external_folders`
-pub fn normalize_path(config: &Config, path: &str) -> String {
+pub fn normalize_path(config: &Config, path: &str) -> Result<String, ReqFlowError> {
     let path = Path::new(path);
     
-    // If already absolute, return as is
     if path.is_absolute() {
-        return path.to_string_lossy().to_string();
+        return Ok(path.to_string_lossy().to_string());
     }
 
-    // Try to resolve within the specifications folder
     let spec_path = Path::new(&config.paths.specifications_folder).join(path);
     if spec_path.exists() {
-        return spec_path.to_string_lossy().to_string();
+        return Ok(spec_path.to_string_lossy().to_string());
     }
 
-    // Try to resolve within external folders
     for external_folder in &config.paths.external_folders {
         let external_path = Path::new(external_folder).join(path);
         if external_path.exists() {
-            return external_path.to_string_lossy().to_string();
+            return Ok(external_path.to_string_lossy().to_string());
         }
     }
 
-    // Default: Treat as a relative path
     let relative_path = Path::new(&config.paths.base_path).join(path);
-    relative_path.to_string_lossy().to_string()
+    if relative_path.exists() {
+        return Ok(relative_path.to_string_lossy().to_string());
+    }
+
+    Err(ReqFlowError::PathError(format!("Path resolution failed for: {}", path)))
 }
 
 /// Normalize an element name to GitHub-style anchor links
@@ -71,6 +71,7 @@ pub fn normalize_element_name(element_name: &str) -> String {
         .replace(' ', "-")
         .replace(&['(', ')', '.', ',', ':', ';', '\''][..], "")
 }
+
 
 #[cfg(test)]
 mod tests {
