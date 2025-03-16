@@ -61,7 +61,7 @@ pub fn scan_markdown_files(
             .filter(|e| e.path().is_file() && e.path().extension().map_or(false, |ext| ext == "md"))
             .filter(|e| is_requirements_file_by_path(e.path(), excluded_filename_patterns))
         {
-            files.push((entry.path().to_path_buf(),folder));
+            files.push((entry.path().to_path_buf(),folder.clone()));
         }
     }
 

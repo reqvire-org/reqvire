@@ -291,7 +291,8 @@ impl ModelManager {
         &mut self, 
         specification_folder: &PathBuf, 
         external_folders: &[PathBuf],
-        excluded_filename_patterns: &GlobSet    
+        excluded_filename_patterns: &GlobSet,
+        diagram_direction: &str  
     ) -> Result<(), ReqFlowError> {
 
         let files_with_base = utils::scan_markdown_files(specification_folder, external_folders, excluded_filename_patterns);
@@ -302,7 +303,7 @@ impl ModelManager {
            .iter()
            .par_bridge() 
            .map(|(file_path, base)| {
-               self.process_single_diagram(file_path, base).unwrap_or(false)
+               self.process_single_diagram(file_path, base,diagram_direction).unwrap_or(false)
            })
         .collect();
         
@@ -318,7 +319,7 @@ impl ModelManager {
 
 
     /// Processes a single file to generate diagrams and updates it.
-    fn process_single_diagram(&self, file_path: &Path, input_folder: &Path) -> Result<bool, ReqFlowError> {
+    fn process_single_diagram(&self, file_path: &Path, input_folder: &Path, diagram_direction: &str) -> Result<bool, ReqFlowError> {
         debug!("Generating diagram for file {:?}", file_path);
 
         let content = filesystem::read_file(file_path)?;
@@ -335,6 +336,7 @@ impl ModelManager {
             &content_without_diagrams,
             &self.element_registry,
             &relative_path,
+            diagram_direction,
             false, // Not converting to HTML
         )?;
 
