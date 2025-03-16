@@ -1,6 +1,7 @@
 use anyhow::Result;
 use std::path::{Path, PathBuf};
 use log::debug;
+use walkdir::WalkDir;
 use crate::error::ReqFlowError;
 use globset::GlobSet;
 use regex::Regex;
@@ -12,8 +13,6 @@ pub fn is_requirements_file_by_path(path: &Path, excluded_filename_patterns: &Gl
        
     filename.ends_with(".md") && !is_excluded_by_patterns(path, &excluded_filename_patterns)
 }
-
-
 
 
 /// Checks if a file is excluded based on configured patterns
@@ -42,6 +41,33 @@ pub fn is_in_specification_root(
     }
 }
 
+/// Scans the specification and external folders for markdown files, excluding files based on patterns.
+pub fn scan_markdown_files(
+    specification_folder: &PathBuf, 
+    external_folders: &[PathBuf], 
+    excluded_filename_patterns: &GlobSet
+) -> Vec<(PathBuf,PathBuf)> {
+    let mut files = Vec::new();
+    
+    // Define all folders to scan
+    let all_folders: Vec<&PathBuf> = std::iter::once(specification_folder)
+        .chain(external_folders.iter())
+        .collect();
+
+    for folder in all_folders {
+        for entry in WalkDir::new(folder)
+            .into_iter()
+            .filter_map(Result::ok)
+            .filter(|e| e.path().is_file() && e.path().extension().map_or(false, |ext| ext == "md"))
+            .filter(|e| is_requirements_file_by_path(e.path(), excluded_filename_patterns))
+        {
+            files.push((entry.path().to_path_buf(),folder));
+        }
+    }
+
+    debug!("Scanned {} markdown files.", files.len());
+    files
+}
 
 
 /// Gets the relative path of a file

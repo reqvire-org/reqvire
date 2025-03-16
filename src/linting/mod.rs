@@ -12,6 +12,7 @@ use crate::error::ReqFlowError;
 use crate::utils;
 
 
+
 /// Runs linting checks on all Markdown files in the specification folder.
 /// If `dry_run == false`, it automatically applies the fixes.
 pub fn run_linting(
@@ -24,39 +25,26 @@ pub fn run_linting(
     
     let mut lint_suggestions = Vec::new();
 
-    // Define all folders to check (specification folder + external folders)
-    let all_folders: Vec<&PathBuf> = std::iter::once(specification_folder)
-        .chain(external_folders.iter())
-        .collect();
+    let files = utils::scan_markdown_files(specification_folder, external_folders, excluded_filename_patterns);
+    debug!("Found {} markdown files to update with diagrams", files.len());
 
-    // Iterate over all folders (main + external)
-    for folder in &all_folders {
-    
-             for entry in WalkDir::new(folder)
-             .into_iter()
-             .filter_map(Result::ok)
-             .filter(|e| e.path().is_file())
-             .filter(|e| e.path().extension().map_or(false, |ext| ext == "md"))
-             .filter(|e| utils::is_requirements_file_by_path(e.path(), excluded_filename_patterns))
-         {
-             let file_path = entry.path();
+    for (file_path,_) in files {        
+         // No need for `.map_err()` - automatically converts `std::io::Error` to `ReqFlowError::IoError`
+         let mut file_content = fs::read_to_string(&file_path)?;
+         let suggestions = lint_file_content(&file_content, &file_path)?;
 
-             // No need for `.map_err()` - automatically converts `std::io::Error` to `ReqFlowError::IoError`
-             let mut file_content = fs::read_to_string(file_path)?;
-
-             let suggestions = lint_file_content(&file_content, file_path)?;
-
-             if !suggestions.is_empty() {
-                 if dry_run {
-                     lint_suggestions.extend(suggestions);
-                 } else {
-                     file_content = apply_fixes(&file_content, &suggestions);
-                     fs::write(file_path, file_content)?;
-                     println!("✅ Applied {} fixes to {}", suggestions.len(), file_path.display());
-                 }
+          if !suggestions.is_empty() {
+             if dry_run {
+                 lint_suggestions.extend(suggestions);
+             } else {
+                 file_content = apply_fixes(&file_content, &suggestions);
+                 fs::write(&file_path, file_content)?;
+                 println!("✅ Applied {} fixes to {}", suggestions.len(), file_path.display());
              }
-         }
-     }
+         }             
+    }
+     
+     
 
     if dry_run {
         if lint_suggestions.is_empty() {
