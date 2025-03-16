@@ -54,7 +54,8 @@ fn main() {
         &config.get_specification_folder(),
         &config.get_external_folders(), 
         &config.get_output_folder(), 
-        &config.get_excluded_filename_patterns_glob_set()
+        &config.get_excluded_filename_patterns_glob_set(),
+        &config.style.diagram_direction
      )
         .unwrap_or_else(|e| {
             error!("Execution failed: {}", e);
