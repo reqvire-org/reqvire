@@ -478,7 +478,7 @@ graph LR;
 The system shall implement an `init` command that bootstraps a basic ReqFlow project structure with example requirements, folder hierarchy, and a configuration file.
 
 #### Relations
-  * derivedFrom: [UserRequirements.md/Bootstrap model struture](UserRequirements.md#bootstrap-model-struture)
+  * derivedFrom: [UserRequirements.md/Bootstrap model struture](../UserRequirements.md#bootstrap-model-struture)
   * satisfiedBy: [init.rs](https://github.com/reqflow/reqflow/src/init.rs)
 
 ---
@@ -500,7 +500,7 @@ The system shall prevent the initialization command from modifying an existing p
 The system shall implement an IndexGenerator component that traverses the specifications directory structure and creates a hierarchical index.md file with links and summaries.
 
 #### Relations
-  * derivedFrom: [UserRequirements.md/Generate Documentation Index](UserRequirements.md#generate-documentation-index)
+  * derivedFrom: [UserRequirements.md/Generate Documentation Index](../UserRequirements.md#generate-documentation-index)
   * satisfiedBy: [linting/index_generator.rs](https://github.com/reqflow/reqflow/src/linting/index_generator.rs)
 
 ---
@@ -530,7 +530,7 @@ The system shall generate URLs in the index file with both Markdown (.md) and HT
 The system shall enhance the HTML generator to process index.md as a special file, adding navigation elements and ensuring it serves as the primary entry point.
 
 #### Relations
-  * derivedFrom: [UserRequirements.md/Documentation Index HTML Integration](UserRequirements.md#documentation-index-html-integration)
+  * derivedFrom: [UserRequirements.md/Documentation Index HTML Integration](../UserRequirements.md#documentation-index-html-integration)
   * satisfiedBy: [html.rs](https://github.com/reqflow/reqflow/src/html.rs)
   * satisfiedBy: [html_export.rs](https://github.com/reqflow/reqflow/src/html_export.rs)
 
@@ -541,7 +541,7 @@ The system shall enhance the HTML generator to process index.md as a special fil
 The system shall provide a command-line option `--llm-context` that outputs comprehensive contextual information about ReqFlow methodology, document structure, relation types, and CLI usage to help Large Language Models understand and work with ReqFlow-based projects.
 
 #### Relations
-  * derivedFrom: [UserRequirements.md/Provide Actionable Model Improvement Suggestions](UserRequirements.md#provide-actionable-model-improvement-suggestions)
+  * derivedFrom: [UserRequirements.md/Provide Actionable Model Improvement Suggestions](../UserRequirements.md#provide-actionable-model-improvement-suggestions)
   * satisfiedBy: [main.rs](https://github.com/reqflow/reqflow/src/main.rs)
 
 ---
@@ -551,7 +551,7 @@ The system shall provide a command-line option `--llm-context` that outputs comp
 The system shall provide validation results in machine-readable JSON format to facilitate integration with CI/CD pipelines and automated reporting tools.
 
 #### Relations
-  * derivedFrom: [UserRequirements.md/Enhanced Validation Error Reporting](UserRequirements.md#enhanced-validation-error-reporting)
+  * derivedFrom: [UserRequirements.md/Enhanced Validation Error Reporting](../UserRequirements.md#enhanced-validation-error-reporting)
   * satisfiedBy: [validation.rs](https://github.com/reqflow/reqflow/src/validation.rs)
 
 ---
@@ -561,7 +561,7 @@ The system shall provide validation results in machine-readable JSON format to f
 The system shall support different validation modes (validate_markdown, validate_relations, validate_all) with configurable behaviors to accommodate different use cases.
 
 #### Relations
-  * derivedFrom: [UserRequirements.md/Enhanced Validation Error Reporting](UserRequirements.md#enhanced-validation-error-reporting)
+  * derivedFrom: [UserRequirements.md/Enhanced Validation Error Reporting](../UserRequirements.md#enhanced-validation-error-reporting)
   * satisfiedBy: [validation.rs](https://github.com/reqflow/reqflow/src/validation.rs)
 
 ---
@@ -571,7 +571,7 @@ The system shall support different validation modes (validate_markdown, validate
 The system shall implement interactive click behavior for Mermaid diagram nodes that redirects to the referenced element when clicked.
 
 #### Relations
-  * derivedFrom: [UserRequirements.md/Interactive Mermaid Diagrams](UserRequirements.md#interactive-mermaid-diagrams)
+  * derivedFrom: [UserRequirements.md/Interactive Mermaid Diagrams](../UserRequirements.md#interactive-mermaid-diagrams)
   * satisfiedBy: [html.rs](https://github.com/reqflow/reqflow/src/html.rs)
   * satisfiedBy: [html_export.rs](https://github.com/reqflow/reqflow/src/html_export.rs)
 
@@ -582,7 +582,7 @@ The system shall implement interactive click behavior for Mermaid diagram nodes 
 The system shall allow command line arguments to override YAML configuration settings to provide flexibility without modifying configuration files.
 
 #### Relations
-  * derivedFrom: [UserRequirements.md/Project Configuration with YAML](UserRequirements.md#project-configuration-with-yaml)
+  * derivedFrom: [UserRequirements.md/Project Configuration with YAML](../UserRequirements.md#project-configuration-with-yaml)
   * satisfiedBy: [main.rs](https://github.com/reqflow/reqflow/src/main.rs)
 
 ---
@@ -593,7 +593,7 @@ The system shall allow unstructured documents to be ignored during processing.
 TODO: add requirment that defines a config filter out patterns.
 
 #### Relations
-  * derivedFrom: [UserRequirements.md#Unstructured Documents](UserRequirements.md#unstructured-documents)
+  * derivedFrom: [UserRequirements.md#Unstructured Documents](../UserRequirements.md#unstructured-documents)
 
 ---
 
@@ -632,7 +632,7 @@ The validation process for excluded files:
 The system shall support multi-pass linting with a configurable iteration limit to ensure all interdependent formatting issues are resolved.
 
 #### Relations
-  * derivedFrom: [UserRequirements.md/Format Consistency Enforcement](UserRequirements.md#format-consistency-enforcement)
+  * derivedFrom: [UserRequirements.md/Format Consistency Enforcement](../UserRequirements.md#format-consistency-enforcement)
   * satisfiedBy: [linting/mod.rs](https://github.com/reqflow/reqflow/src/linting/mod.rs)
 
 ---
@@ -642,7 +642,7 @@ The system shall support multi-pass linting with a configurable iteration limit 
 The system shall generate HTML output for all markdown files, not just requirements documents, to provide consistent representation of the entire model.
 
 #### Relations
-  * derivedFrom: [../UserRequirements.md/Export HTML specifications](../UserRequirements.md/#export-html-specifications)
+  * derivedFrom: [../UserRequirements.md/Export HTML specifications](../UserRequirements.md#export-html-specifications)
   * satisfiedBy: [html_export.rs](https://github.com/reqflow/reqflow/src/html_export.rs)
 
 ---

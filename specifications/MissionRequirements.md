@@ -38,7 +38,6 @@ The system must adhere to widely recognized industry standards, such as ISO/IEC/
 #### Relations
   * derivedFrom: [MOEs.md/MOE_CE](MOEs.md#moe_ce)
 
----
 
 ### Promote Automation and Efficiency
 

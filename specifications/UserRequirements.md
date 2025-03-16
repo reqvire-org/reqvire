@@ -923,7 +923,6 @@ The system shall uncheck verification checkboxes in the traceability matrix and 
 
 #### Relations
   * refine: [UserStories.md/Generate Traceability Matrix](UserStories.md#generate-traceability-matrix)
-  * verifiedBy: [README.md/Not Implemented Yet](README.md#not-implemented-yet)
 
 ---
 

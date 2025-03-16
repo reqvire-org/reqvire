@@ -1,21 +1,27 @@
+use anyhow::Result;
 use std::collections::{HashMap, HashSet};
 use std::fs;
-use std::path::{Path, PathBuf};
+use std::path::{ PathBuf};
 use walkdir::WalkDir;
-use log::{debug, error};
+use log::{debug};
 use crate::config::Config;
 use crate::element::Element;
 use crate::element_registry::ElementRegistry;
 use crate::error::ReqFlowError;
+use crate::relation::LinkType;
 use crate::relation::{get_parent_relation_types, is_circular_dependency_relation};
+use crate::element::ElementType;
+use crate::element::RequirementType;
+
+
 use crate::utils;
 use crate::parser::parse_elements;
-
+use globset::GlobSet;
 
 #[derive(Debug)]
 pub struct ModelManager {
     /// In-memory registry of elements
-    element_registry: ElementRegistry,
+    pub element_registry: ElementRegistry,
 
     /// Stores file content for validation
     file_contents: HashMap<String, String>,
@@ -25,37 +31,76 @@ pub struct ModelManager {
 }
 
 impl ModelManager {
+    /// Creates a new ModelManager with the given configuration.
+    pub fn new(config: Config) -> Self {
+        // Initialize empty element registry
+        let element_registry = ElementRegistry::new();
+
+        // Initialize empty file contents
+        let file_contents = HashMap::new();
+
+        Self {
+            element_registry,
+            file_contents,
+            config,
+        }
+    }
+
     /// Parses and validates all Markdown files while building the registry.
     /// Returns a list of validation errors.
-    pub fn parse_and_validate(&mut self, input_folder: &Path) -> Result<Vec<ReqFlowError>, ReqFlowError> {
-        debug!("Parsing and validating files in {:?}", input_folder);
+    pub fn parse_and_validate(
+        &mut self, 
+        specification_folder: &PathBuf, 
+        external_folders: &[PathBuf],
+        excluded_filename_patterns: &GlobSet
+    ) -> Result<Vec<ReqFlowError>, ReqFlowError> {
+        debug!("Parsing and validating files in {:?}", specification_folder);
         let mut errors = Vec::new();
-        
-        for entry in WalkDir::new(input_folder).into_iter().filter_map(|e| e.ok()) {
+
+        for entry in WalkDir::new(specification_folder)
+            .into_iter()
+            .filter_map(Result::ok) // Skip errors during directory iteration
+            .filter(|e| e.path().is_file()) //  Process only files
+            .filter(|e| e.path().extension().map_or(false, |ext| ext == "md")) //  Only `.md` files 
+            .filter(|e| utils::is_requirements_file_by_path(e.path(), excluded_filename_patterns)) // Only files with elements
+        {
             let path = entry.path();
-            if path.is_file() && path.extension().map_or(false, |ext| ext == "md") {
-                let file_content = fs::read_to_string(path)?;
-                let relative_path = utils::get_relative_path(path, input_folder)?;
-                let relative_path_str = relative_path.to_string_lossy().to_string();
 
-                self.file_contents.insert(relative_path_str.clone(), file_content.clone());
+            match (path.file_name(), path) {
+                (Some(file_name), file_path) => {
+                    debug!("Markdown File found: {}", file_name.to_string_lossy());
 
-                // **Step 1: Markdown Structure Validation**
-                let markdown_errors = self.validate_markdown_structure(&file_content, &relative_path_str);
-                errors.extend(markdown_errors);
-
-                // **Step 2: Parse Elements**
-                match parse_elements(&file_content, &relative_path_str) {
-                    Ok(elements) => {
-                        for element in elements {
-                            if let Err(e) = self.element_registry.register_element(element, &relative_path_str) {
-                                errors.push(e);
+                    let file_content = fs::read_to_string(path)?;
+                    let relative_path = utils::get_relative_path(path, specification_folder)?;
+                    let relative_path_str = relative_path.to_string_lossy().to_string();
+    
+                    self.file_contents.insert(relative_path_str.clone(), file_content.clone());
+    
+                    // **Step 1: Markdown Structure Validation**
+                    errors.extend(self.validate_markdown_structure(&file_content, &relative_path_str));
+    
+                    // **Step 2: Parse Elements**
+                    match parse_elements(
+                        &file_name.to_string_lossy(),
+                        &file_content,
+                        &file_path.to_path_buf(),
+                        specification_folder,
+                        external_folders,
+                    ) {
+                        Ok(elements) => {
+                            for element in elements {
+                                if let Err(e) = self.element_registry.register_element(element, &relative_path_str) {
+                                    errors.push(e);
+                                }
                             }
                         }
+                        Err(parse_errors) => errors.extend(parse_errors),
                     }
-                    Err(parse_errors) => {
-                        errors.push(parse_errors);
-                    }
+                },
+                _ => {                
+                    errors.push(ReqFlowError::PathError(
+                        format!("File '{}' could not be processed.", path.to_string_lossy()),
+                    ));
                 }
             }
         }
@@ -66,7 +111,8 @@ impl ModelManager {
         // **Step 4: Validate Cross-Component Dependencies**
         errors.extend(self.validate_cross_component_dependencies()?);
 
-
+        //self.element_registry.debug_print_registry();
+        
         Ok(errors)
     }
 
@@ -77,11 +123,17 @@ impl ModelManager {
 
         for element in self.element_registry.get_all_elements() {
             for relation in &element.relations {
-                if self.element_registry.get_element(&relation.target).is_none() {
-                    errors.push(ReqFlowError::MissingRelationTarget(
-                        format!("Element '{}' references missing target '{}'", element.name, relation.target),
-                    ));
-                }
+            
+                // Only validate if the relation target is an Identifier
+                if let LinkType::Identifier(ref identifier) = relation.target.link {
+                    if self.element_registry.get_element(identifier).is_err() {
+                        errors.push(ReqFlowError::MissingRelationTarget(
+                            format!("Element '{}' references missing target '{}'", element.identifier, identifier),
+                        ));
+                    }
+                }else{
+                    log::debug!("Skipping external target {}",relation.target.link.as_str());
+                }            
             }
         }
 
@@ -109,14 +161,25 @@ impl ModelManager {
         // Check for missing parent relations
         let valid_parent_relations = get_parent_relation_types();
         for element in self.element_registry.get_all_elements() {
-            let has_parent_relation = element.relations.iter()
-                .any(|r| valid_parent_relations.contains(&r.relation_type.name));
+            // Important: Only system requirements needs parent
+            if let ElementType::Requirement(req_type) = &element.element_type {
+                match req_type {
+                    RequirementType::User => continue,                    
+                    RequirementType::System =>{
+                    
+                        let has_parent_relation = element.relations.iter()
+                            .any(|r| valid_parent_relations.contains(&r.relation_type.name));
 
-            if !has_parent_relation {
-                errors.push(ReqFlowError::MissingParentRelation(
-                    format!("Element '{}' has no parent relation (needs one of: {:?})", element.name, valid_parent_relations),
-                ));
+                        if !has_parent_relation {
+                            errors.push(ReqFlowError::MissingParentRelation(
+                                format!("Element '{}' has no parent relation (needs one of: {:?})", element.name, valid_parent_relations),
+                            ));
+                        }                    
+                    
+                    }
+                }
             }
+
         }
 
         if errors.is_empty() {
@@ -184,7 +247,8 @@ impl ModelManager {
         errors
     }    
 
-    /// Recursive function to check for circular dependencies
+    
+    /// Recursive function to check for circular dependencies, but only for Identifier links.
     fn check_circular_dependencies(
         &self,
         element: &Element,
@@ -207,10 +271,14 @@ impl ModelManager {
         }
 
         path.push(element_id.clone());
+
         for relation in &element.relations {
-            if is_circular_dependency_relation(relation.relation_type.name) {
-                if let Some(target_element) = self.element_registry.get_element(&relation.target) {
-                    self.check_circular_dependencies(target_element, visited, path, errors);
+            // Only check relations that have an Identifier as the target
+            if let LinkType::Identifier(ref identifier) = relation.target.link {
+                if is_circular_dependency_relation(relation.relation_type.name) {
+                    if let Ok(target_element) = self.element_registry.get_element(identifier) {
+                        self.check_circular_dependencies(target_element, visited, path, errors);
+                    }
                 }
             }
         }
@@ -218,5 +286,6 @@ impl ModelManager {
         visited.insert(element_id);
         path.pop();
     }
+
 }
 
