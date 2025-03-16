@@ -1,38 +1,32 @@
 use std::collections::HashMap;
 use crate::element::Element;
-use crate::identifier::normalize_identifier;
-use crate::config::Config;
 use crate::error::ReqFlowError;
+use crate::relation::LinkType;
+
 
 #[derive(Debug)]
 pub struct ElementRegistry {
     /// Map of full identifiers to elements
-    elements: HashMap<String, Element>,   
-    
-    /// Configuration for the registry
-    config: Config,
+    elements: HashMap<String, Element>
 }
 
 impl ElementRegistry {
     /// Creates a new registry with a given configuration
-    pub fn new(config: Config) -> Self {
+    pub fn new() -> Self {
         Self {
             elements: HashMap::new(),
-            config,
         }
     }
 
     /// Registers an element, ensuring identifier uniqueness
-    pub fn register_element(&mut self, mut element: Element, file_path: &str) -> Result<(), ReqFlowError> {
-        let normalized_id = normalize_identifier(&self.config, file_path, &element.name)
-            .map_err(|e| ReqFlowError::InvalidIdentifier(e))?;
-
-        if self.elements.contains_key(&normalized_id) {
-            return Err(ReqFlowError::DuplicateElement(normalized_id));
+    pub fn register_element(&mut self, element: Element, _file_path: &str) -> Result<(), ReqFlowError> {
+   
+        if self.elements.contains_key(&element.identifier) {
+            return Err(ReqFlowError::DuplicateElement(element.identifier));
         }
 
-        element.identifier = normalized_id.clone();
-        self.elements.insert(normalized_id, element);
+        let identifier=element.identifier.clone();
+        self.elements.insert(identifier, element);
         Ok(())
     }
 
@@ -65,5 +59,30 @@ impl ElementRegistry {
 
         errors
     }
+    /// Prints all elements in the registry along with their relations.
+    pub fn debug_print_registry(&self) {
+        println!("--- Element Registry Debug Print ---");
+        for (identifier, element) in &self.elements {
+            println!("Element: {}", identifier);
+            
+            if element.relations.is_empty() {
+                println!("  No relations.");
+            } else {
+                println!("  Relations:");
+                for relation in &element.relations {
+                    match &relation.target.link {
+                        LinkType::Identifier(target_id) => {
+                            println!("    - {} (Identifier)", target_id);
+                        }
+                        LinkType::ExternalUrl(url) => {
+                            println!("    - {} (External URL)", url);
+                        }
+                    }
+                }
+            }
+            println!(); // Add spacing between elements for readability
+        }
+        println!("------------------------------------");
+    }    
 }
 

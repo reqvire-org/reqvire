@@ -1,5 +1,3 @@
-use lazy_static::lazy_static;
-use regex::Regex;
 use std::fs;
 use std::path::Path;
 use anyhow::Result;
@@ -7,36 +5,20 @@ use log::{debug, warn};
 use std::path::PathBuf;
 use serde::{Deserialize, Serialize};
 use std::env;
+use globset::{Glob, GlobSet, GlobSetBuilder};
  
 /// Configuration settings for the ReqFlow application
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Config {
-    #[serde(default)]
-    pub general: GeneralConfig,
-    
     #[serde(default)]
     pub paths: PathsConfig,
     
     #[serde(default)]
     pub style: StyleConfig,
     
-    // These are needed for validation logic but not exposed in the config file
-    #[serde(skip_serializing, skip_deserializing)]
-    pub validation: ValidationConfig,
-    
-    // Linting configuration
-    #[serde(skip_serializing, skip_deserializing)]
-    pub linting: LintingConfig,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct GeneralConfig {
-    #[serde(default)]
-    pub html_output: bool,
-    pub verbose: bool,
-    #[serde(default)]
-    pub generate_diagrams: bool,
-}
+
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct PathsConfig {
@@ -48,7 +30,7 @@ pub struct PathsConfig {
     pub excluded_filename_patterns: Vec<String>,
     /// Base path where the tool is running (default: current working directory)
     #[serde(skip)]  // Skip serialization (hidden in config files)
-    pub base_path: PathBuf,
+    pub base_path: PathBuf,             
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -60,45 +42,11 @@ pub struct StyleConfig {
     pub diagram_direction: String,
 }
 
-// The following structs are kept for backwards compatibility
-// but are not exposed in the config file
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct ValidationConfig {
-    pub validate_markdown: bool,
-    pub validate_relations: bool,
-    pub validate_all: bool,
-    pub json_output: bool,
-    pub generate_matrix: bool,  // Generate traceability matrix
-}
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct LintingConfig {
-    pub lint: bool,                // Enable linting
-    pub dry_run: bool,             // Preview changes without applying them
-}
-
-impl Default for LintingConfig {
+impl Default for PathsConfig {     
     fn default() -> Self {
-        Self {
-            lint: false,
-            dry_run: false,
-        }
-    }
-}
-
-impl Default for GeneralConfig {
-    fn default() -> Self {
-        Self {
-            html_output: false,
-            verbose: false,
-            generate_diagrams: false,
-        }
-    }
-}
-
-impl Default for PathsConfig {
-    fn default() -> Self {
+    
         Self {
             specifications_folder: "specifications".to_string(),
             output_folder: "output".to_string(),
@@ -114,18 +62,6 @@ impl Default for PathsConfig {
     }
 }
 
-
-impl Default for ValidationConfig {
-    fn default() -> Self {
-        Self {
-            validate_markdown: false,
-            validate_relations: false,
-            validate_all: false,
-            json_output: false,
-            generate_matrix: false,
-        }
-    }
-}
 
 // Default value for diagram direction
 fn default_diagram_direction() -> String {
@@ -146,21 +82,51 @@ impl Default for StyleConfig {
 impl Default for Config {
     fn default() -> Self {
         Self {
-            general: GeneralConfig::default(),
             paths: PathsConfig::default(),
-            style: StyleConfig::default(),
-            validation: ValidationConfig::default(),
-            linting: LintingConfig::default(),
+            style: StyleConfig::default()
         }
     }
 }
 
 
-impl Config {
+impl Config {    
+
+    pub fn get_external_folders(&self) -> Vec<PathBuf> {
+        self.paths.external_folders.iter()
+        .map(|folder| {
+            let path = self.paths.base_path.join(folder.clone());
+            path.canonicalize().expect(&format!("FATAL: Failed to resolve external folder {:?}", path)).clone()
+        })
+        .collect::<Vec<PathBuf>>()
+    }   
+    pub fn get_specification_folder(&self) -> std::path::PathBuf {
+        let path = self.paths.base_path.join(self.paths.specifications_folder.clone());
+        path.canonicalize().expect(&format!("FATAL: Failed to resolve external folder {:?}", path)).clone()
+    }   
+
+    pub fn get_output_folder(&self) -> std::path::PathBuf {
+        let path = self.paths.base_path.join(self.paths.output_folder.clone());
+        path.canonicalize().expect(&format!("FATAL: Failed to resolve external folder {:?}", path)).clone()
+    }   
+    
+    /// Builds a GlobSet from the excluded filename patterns
+    pub fn get_excluded_filename_patterns_glob_set(&self) -> GlobSet {
+        let mut builder = GlobSetBuilder::new();
+        for pattern in &self.paths.excluded_filename_patterns {
+            if let Ok(glob) = Glob::new(pattern.as_str()) {
+                builder.add(glob);
+            } else {
+                warn!("Invalid glob pattern: {}", pattern);
+            }
+        }
+        builder.build().expect("Failed to build glob set")
+    }
+    
+    
     /// Load configuration from CLI arguments and update settings accordingly
     pub fn load_from_args(args: &crate::cli::Args) -> Self {
         // Load configuration from a file if provided, otherwise use default
-        let mut config = match &args.config {
+        let config = match &args.config {
             Some(config_path) => match Self::from_file(config_path) {
                 Ok(cfg) => {
                     log::info!("Loaded configuration from {:?}", config_path);
@@ -175,35 +141,6 @@ impl Config {
             None => Self::load(), // Load from default locations
         };
 
-        // Apply CLI arguments to override config settings
-        if args.html {
-            config.general.html_output = true;
-        }
-        if args.verbose {
-            config.general.verbose = true;
-        }
-        if args.generate_diagrams {
-            config.general.generate_diagrams = true;
-        }
-        if args.validate_markdown {
-            config.validation.validate_markdown = true;
-        }
-        if args.validate_relations {
-            config.validation.validate_relations = true;
-        }
-        if args.validate_all {
-            config.validation.validate_all = true;
-        }
-        if args.lint {
-            config.linting.lint = true;
-            config.linting.dry_run = args.dry_run;
-        }
-        if args.json {
-            config.validation.json_output = true;
-        }
-        if args.generate_matrix {
-            config.validation.generate_matrix = true;
-        }
 
         config
     }
@@ -266,72 +203,9 @@ impl Config {
     pub fn get_reqflow_generated_files() -> Vec<String> {
         vec![
             "**/TraceabilityMatrix.md".to_string(),   // Matrix generated by ReqFlow
+            "**/index.md".to_string(),   // Index generated by Reqflow           
             // Add more patterns here as new features are added that generate files
         ]
-    }
-
-
-   
-    /// Regular expression to match mermaid diagram
-    pub fn mermaid_regex() -> &'static Regex {
-        lazy_static! {
-            static ref MERMAID_REGEX: Regex = Regex::new(r"(?s)```mermaid\s*graph (TD|LR);.*?```\s*").unwrap();
-        }
-        &MERMAID_REGEX
-    }
-                        
-    /// Regular expression to match paragraph headers (level 2)
-    pub fn paragraph_regex() -> &'static Regex {
-        lazy_static! {
-            static ref PARAGRAPH_REGEX: Regex = Regex::new(r"^##\s+(.+)").unwrap();
-        }
-        &PARAGRAPH_REGEX
-    }
-
-            
-    /// Regular expression to match element headers (level 3)
-    pub fn element_regex() -> &'static Regex {
-        lazy_static! {
-            static ref ELEMENT_REGEX: Regex = Regex::new(r"^###\s+(.+)").unwrap();
-        }
-        &ELEMENT_REGEX
-    }
-    
-    /// Regular expression to match subsection headers (level 4)
-    pub fn subsection_regex() -> &'static Regex {
-        lazy_static! {
-            static ref SUBSECTION_REGEX: Regex = Regex::new(r"^####\s+(.+)").unwrap();
-        }
-        &SUBSECTION_REGEX
-    }
-    
-    /// Regular expression to match metadata properties
-    pub fn metadata_regex() -> &'static Regex {
-        lazy_static! {
-            static ref METADATA_REGEX: Regex = Regex::new(r"[\*\-]\s+(\w+):\s*(.+)").unwrap();
-        }
-        &METADATA_REGEX
-    }
-        
-
-
-    /// Regular expression to match relation entries
-    pub fn relation_regex() -> &'static Regex {
-        lazy_static! {
-            // Updated to handle ReqFlow relation format with various indentation styles and bullet formats
-            // This handles both * and - bullets with either 0, 2 or 4 spaces of indentation
-            static ref RELATION_REGEX: Regex = Regex::new(r"^\s*(?:\*|-)\s+(\w+):\s*(.+)").unwrap();
-        }
-        &RELATION_REGEX
-    }
-
-    /// Regular expression to check if a line is a valid markdown link
-    #[allow(dead_code)]
-    pub fn markdown_link_regex() -> &'static Regex {
-        lazy_static! {
-            static ref MARKDOWN_LINK_REGEX: Regex = Regex::new(r"\[.+?\]\(.+?\)").unwrap();
-        }
-        &MARKDOWN_LINK_REGEX
     }
 
     /// Embedded CSS styles for HTML output

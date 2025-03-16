@@ -30,7 +30,7 @@ The verification test checks that ReqFlow correctly identifies and fixes excess 
 
 #### Relations
   * verify: [SystemRequirements/Requirements.md/Excess Whitespace Linting Implementation](../SystemRequirements/Requirements.md#excess-whitespace-linting-implementation)
-  * verify: [SystemRequirements/Requirements.md/Dry Run Mode Implementation](../SystemRequirements/Requirements.md#dry-run-mode-implementation)
+  * verify: [SystemRequirements/Requirements.md/Dry Run Mode Implementation](../SystemRequirements/Requirements.md#dry-run-mode)
   * trace: [tests/e2e-linting/test_whitespace_linting.sh](../../tests/e2e-linting/test_whitespace_linting.sh)
 
 ## External Folders Tests
@@ -62,6 +62,6 @@ The verification test checks that ReqFlow correctly processes requirements in ex
 5. Verify that validation succeeds and requirements are properly processed
 
 #### Relations
-  * verify: [SystemRequirements/Requirements.md/External Folders Support](../SystemRequirements/Requirements.md#external-folders-support)
-  * verify: [SystemRequirements/Requirements.md/Unified System Requirements Processing](../SystemRequirements/Requirements.md#unified-system-requirements-processing)
+  * verify: [SystemRequirements/Requirements.md#External Folders Support](../SystemRequirements/Requirements.md#external-folders-support)
+  * verify: [SystemRequirements/Requirements.md#Directory Structure Processing](../SystemRequirements/Requirements.md#directory-structure-processing)
   * trace: [tests/e2e-external-folders/test_external_folders.sh](../../tests/e2e-external-folders/test_external_folders.sh)

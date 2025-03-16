@@ -2,52 +2,19 @@ use clap::{Parser, CommandFactory};
 use std::path::PathBuf;
 use anyhow::Result;
 use log::{error, info};
-
-use crate::{config::Config, html_export, init, linting, model::ModelManager, validation};
+use serde::Serialize;
+use crate::error::ReqFlowError;
+use crate::{html_export, init, linting, model::ModelManager};
+use globset::GlobSet;
 
 #[derive(Parser, Debug)]
 #[clap(author,version, about = "Reqflow MBSE model management tool", long_about = None)]
 pub struct Args {
-    /// Path to the input folder containing Markdown files
-    /// If not provided, this will be read from the configuration file
-    #[clap(index = 1)]
-    pub input_folder: Option<PathBuf>,
-
-    /// Path to the output folder (not required for validate commands)
-    /// If not provided, this will be read from the configuration file
-    #[clap(index = 2)]
-    pub output_folder: Option<PathBuf>,
 
     /// Convert Markdown to HTML with embedded styles
     #[clap(long)]
     pub html: bool,
-
-    /// Enable verbose output
-    #[clap(short, long)]
-    pub verbose: bool,
-    
-    /// Validate Markdown structure only
-    /// Checks for:
-    /// - Unique element names within documents
-    /// - Proper heading hierarchy
-    /// - Well-formed relation sections
-    #[clap(long, conflicts_with = "html")]
-    pub validate_markdown: bool,
-    
-    /// Validate relations only
-    /// Checks for:
-    /// - Valid relation types according to spec
-    /// - Valid relation targets (elements and files exist)
-    /// - Proper relation formatting
-    #[clap(long, conflicts_with = "html")]
-    pub validate_relations: bool,
-    
-    /// Run all validations
-    /// Includes markdown structure validation, relation validation,
-    /// and cross-component dependency validation
-    #[clap(long, conflicts_with = "html")]
-    pub validate_all: bool,
-    
+       
     /// Enable linting to find potential improvements (non-blocking)
     /// By default, fixes will be applied automatically
     #[clap(long)]
@@ -66,7 +33,11 @@ pub struct Args {
     /// Useful for CI/CD pipelines and automation
     #[clap(long)]
     pub json: bool,
-    
+
+    /// Validate model
+    #[clap(long)]
+    pub validate: bool,
+            
     /// Generate mermaid diagrams in markdown files showing requirements relationships
     /// The diagrams will be placed at the top of each requirements document
     #[clap(long)]
@@ -102,13 +73,42 @@ impl Args {
         println!();
     }
 }
+
+
+/// Structure for JSON output of validation results
+#[derive(Serialize)]
+struct ValidationResult {
+    validation_type: String,
+    errors: Vec<String>,
+    fixed: bool, // Kept for API compatibility but always false now
+}
+
+/// Helper function to print validation results
+fn print_validation_results(validation_type: &str, errors: &[ReqFlowError], json_output: bool) {
+    if json_output {
+        let json_result = ValidationResult {
+            validation_type: validation_type.to_string(),
+            errors: errors.iter().map(|e| e.to_string()).collect(),
+            fixed: false,
+        };
+        println!("{}", serde_json::to_string_pretty(&json_result).unwrap());
+    } else {
+        println!("❌ {} validation failed with {} errors.", validation_type, errors.len());
+        for error in errors {
+            println!("  - {}", error);
+        }
+    }
+}
+
 pub fn handle_command(
     args: Args,
     model_manager: &mut ModelManager, 
-    config: &Config,
-    input_folder_path: &PathBuf,
+    specification_folder_path: &PathBuf,
+    external_folders_path: &[PathBuf],    
     output_folder_path: &PathBuf,
+    excluded_filename_patterns: &GlobSet
 ) -> Result<i32> {
+
     // Handle LLM context
     if args.llm_context {
         match std::fs::read_to_string("src/llm_context.md") {
@@ -122,64 +122,55 @@ pub fn handle_command(
                 return Err(anyhow::anyhow!("Failed to read LLM context file"));
             }
         }
-    }
-
-    // Handle `init` command
-    if args.init {
-        let target_dir = args.input_folder
-            .unwrap_or_else(|| std::env::current_dir().unwrap_or_else(|_| PathBuf::from(".")));
-
-        match init::initialize_project(&target_dir) {
+    }else if args.init {
+       // Handle `init` command    
+        match init::initialize_project(&specification_folder_path) {
             Ok(_) => return Ok(0), 
             Err(e) => {
                 error!("Failed to initialize project: {}", e);
                 return Err(anyhow::anyhow!("Project initialization failed: {}", e));
             }
         }
-    }
+    }else{
+  
+        let parse_result=model_manager.parse_and_validate(&specification_folder_path, &external_folders_path,excluded_filename_patterns);
 
-    // Determine execution mode
-    let validation_mode = config.validation.validate_markdown || config.validation.validate_relations || config.validation.validate_all;
-    let linting_mode = config.linting.lint;
-    
-    let matrix_mode = config.validation.generate_matrix;
-
-    let diagrams_mode = config.general.generate_diagrams;
-
-    if diagrams_mode {
-        info!("Generating mermaid diagrams in {:?}", input_folder_path);
-        // Only collect identifiers and process files to add diagrams
-        // Skip validation checks for diagram generation mode
-        model_manager.process_diagrams(input_folder_path)?;
-        info!("Requirements diagrams updated in source files");
-        return Ok(0);
-    } 
-    if validation_mode {
-        let exit_code = validation::run_validation_checks(model_manager, config, input_folder_path)?;
-        if exit_code != 0 {
-            return Ok(exit_code); 
+        if args.validate {
+            match parse_result {
+                Ok(errors) => {
+                    if errors.is_empty() {
+                        println!("✅ Validation completed successfully with no errors.");
+                    } else {
+                        print_validation_results("Validation Summary", &errors, args.json);
+                    }
+                }
+                Err(e) => eprintln!("❌ Validation failed: {}", e),
+            }                                 
+        }else if args.generate_diagrams {
+            info!("Generating mermaid diagrams in {:?}", specification_folder_path);
+            // Only collect identifiers and process files to add diagrams
+            // Skip validation checks for diagram generation mode
+            //model_manager.process_diagrams(specification_folder_path)?;
+            info!("Requirements diagrams updated in source files");
+            return Ok(0);
+        }else if args.lint {
+            linting::run_linting(&specification_folder_path, &external_folders_path,excluded_filename_patterns, args.dry_run)?;
+            return Ok(0);
+        }else if args.generate_matrix {
+            std::fs::create_dir_all(output_folder_path)?;
+            //model_manager.generate_traceability_matrix(specification_folder_path, output_folder_path)?;
+            info!("Traceability matrix saved to {:?}", output_folder_path);
+            return Ok(0);
+        } else if args.html {
+            let processed_count = html_export::export_markdown_to_html(specification_folder_path, output_folder_path)?;
+            info!("{} markdown files converted to HTML", processed_count);
+            return Ok(0);
+        }else{
+            Args::print_help();        
         }
-        info!("All validations passed successfully!");
-        return Ok(0);
-    } 
-    if linting_mode {
-        linting::run_linting(input_folder_path, config)?;
-        return Ok(0);
-    } 
-    if matrix_mode {
-        std::fs::create_dir_all(output_folder_path)?;
-        model_manager.generate_traceability_matrix(input_folder_path, output_folder_path)?;
-        info!("Traceability matrix saved to {:?}", output_folder_path);
-        return Ok(0);
-    } 
-    if config.general.html_output {
-        let processed_count = html_export::export_markdown_to_html(input_folder_path, output_folder_path, config.general.verbose)?;
-        info!("{} markdown files converted to HTML", processed_count);
-        return Ok(0);
-    } 
     
-    Args::print_help();
-    Ok(1) // 
+    }
+    Ok(1)
 }
 
 
@@ -190,7 +181,20 @@ mod tests {
     use std::path::PathBuf;
     use crate::config::Config;
     use crate::model::ModelManager;
+    use globset::{Glob, GlobSet, GlobSetBuilder};
 
+
+    fn build_glob_set(patterns: &[String]) -> GlobSet {
+        let mut builder = GlobSetBuilder::new();
+        for pattern in patterns {
+            if let Ok(glob) = Glob::new(pattern) {
+                builder.add(glob);
+            } else {
+                eprintln!("Invalid glob pattern: {}", pattern);
+            }
+        }
+        builder.build().expect("Failed to build glob set")
+    }
 
     #[test]
     fn test_cli_parsing() {
@@ -205,37 +209,41 @@ mod tests {
             llm_context: false,
             init: false,
             html: false,
-            verbose: false,
-            validate_markdown: false,
-            validate_relations: false,
-            validate_all: false,
             lint: false,
             dry_run: false,
             json: false,
             generate_matrix: false,
             generate_diagrams: false,
-            input_folder: Some(PathBuf::from("test/specifications")),
-            output_folder: Some(PathBuf::from("test/output")),
+            validate: false,
             config: None, // No custom config file for the test
         };
 
         // Create a default config instance
         let config = Config::default();
 
-        // Define test input and output paths
-        let input_folder_path = PathBuf::from("test/specifications");
+        // Define test input and output pathse
+        let specification_folder_path = PathBuf::from("test/specifications");
         let output_folder_path = PathBuf::from("test/output");
-
+        let external_folders_path = vec![PathBuf::from("test/external")];
+        
+        let excluded_filename_patterns=vec![
+            "**/README*.md".to_string(),
+            "**/Logical*.md".to_string(),
+            "**/Physical*.md".to_string(),
+            "**/index.md".to_string()
+        ];
+                        
         // Create a mock model manager
-        let mut model_manager = ModelManager::new_with_config(config.clone());
+        let mut model_manager = ModelManager::new(config.clone());
 
         // Run the handle_command function
         let result = handle_command(
             args,
             &mut model_manager,
-            &config,
-            &input_folder_path,
-            &output_folder_path
+            &specification_folder_path,
+            &external_folders_path,            
+            &output_folder_path,
+            &build_glob_set(&excluded_filename_patterns)
         );
 
         // Assert that it runs without error

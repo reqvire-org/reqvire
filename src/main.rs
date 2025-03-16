@@ -1,63 +1,66 @@
-use std::env;
-use std::path::Path;
-use serde::Serialize;
-use crate::config::Config;
+use std::path::PathBuf;
+use log::error;
+
+pub mod model;
+pub mod cli;
+pub mod config;
+pub mod element_registry;
+pub mod element;
+pub mod relation;
+pub mod error;
+pub mod utils;
+pub mod parser;
+pub mod html_export;
+pub mod linting;
+pub mod init;
+pub mod html;
+
 use crate::model::ModelManager;
-use crate::error::ReqFlowError;
+use crate::cli::handle_command;
+use crate::cli::Args;
+use crate::config::Config;
 
-/// Structure for JSON output of validation results
-#[derive(Serialize)]
-struct ValidationResult {
-    validation_type: String,
-    errors: Vec<String>,
-    fixed: bool, // Kept for API compatibility but always false now
-}
-
-/// Helper function to print validation results
-fn print_validation_results(validation_type: &str, errors: &[ReqFlowError], json_output: bool) {
-    if json_output {
-        let json_result = ValidationResult {
-            validation_type: validation_type.to_string(),
-            errors: errors.iter().map(|e| e.to_string()).collect(),
-            fixed: false,
-        };
-        println!("{}", serde_json::to_string_pretty(&json_result).unwrap());
-    } else {
-        println!("❌ {} validation failed with {} errors.", validation_type, errors.len());
-        for error in errors {
-            println!("  - {}", error);
-        }
-    }
-}
+/*
+#[path = "tests/general_tests.rs"]
+#[cfg(test)]
+mod general_tests;
+#[path = "tests/validation_tests.rs"]
+#[cfg(test)]
+mod validation_tests;
+#[path = "tests/config_tests.rs"]
+#[cfg(test)]
+mod config_tests;
+#[path = "tests/linting_tests.rs"]
+#[cfg(test)]
+mod linting_tests;
+*/
 
 fn main() {
-    let config = Config {
-        paths: config::PathsConfig {
-            specifications_folder: "/specifications".to_string(),
-            output_folder: "/output".to_string(),
-            external_folders: vec!["/external1".to_string(), "/external2".to_string()],
-            excluded_filename_patterns: vec![],
-            base_path: std::env::current_dir().unwrap(),
-        },
-        ..Default::default()
-    };
-
-    let input_folder = Path::new("/path/to/markdown");
-
-    // Check if the user provided `--json` flag
-    let json_output = env::args().any(|arg| arg == "--json");
-
-    let mut model_manager = ModelManager::new(config);
-
-    match model_manager.parse_and_validate(input_folder) {
-        Ok(errors) => {
-            if errors.is_empty() {
-                println!("✅ Validation completed successfully with no errors.");
-            } else {
-                print_validation_results("Validation Summary", &errors, json_output);
-            }
-        }
-        Err(e) => eprintln!("❌ Validation failed: {}", e),
+    if std::env::var("RUST_LOG").is_err() {
+        std::env::set_var("RUST_LOG", "info");
     }
+    env_logger::init();
+
+    let args = Args::parse_args();
+    let config = Config::load_from_args(&args);
+
+    let mut model_manager = ModelManager::new(config.clone());
+
+  
+    // Run `handle_command` and get exit code
+    let exit_code = handle_command(
+        args, 
+        &mut model_manager, 
+        &config.get_specification_folder(),
+        &config.get_external_folders(), 
+        &config.get_output_folder(), 
+        &config.get_excluded_filename_patterns_glob_set()
+     )
+        .unwrap_or_else(|e| {
+            error!("Execution failed: {}", e);
+            1 // Return exit code 1 in case of an error
+        });
+
+    std::process::exit(exit_code); 
 }
 

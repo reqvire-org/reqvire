@@ -46,6 +46,10 @@ pub enum ReqFlowError {
     InvalidRelationFormat(String),
 
     #[allow(dead_code)]
+    #[error("Invalid metadata format: {0}")]
+    InvalidMetadataFormat(String),
+    
+    #[allow(dead_code)]
     #[error("Invalid markdown structure: {0}")]
     InvalidMarkdownStructure(String),
     
@@ -65,4 +69,8 @@ pub enum ReqFlowError {
     
     #[error("Initialization error: {0}")]
     InitializationError(String),
+    
+    #[error("Linting error: {0}")]    
+    LintError(String),  
+    
 }

@@ -9,10 +9,9 @@ use crate::error::ReqFlowError;
 use crate::utils;
 
 /// Exports all markdown files to HTML without any processing or filtering
-pub fn export_markdown_to_html(input_folder: &Path, output_folder: &Path, verbose: bool) -> Result<usize, ReqFlowError> {
-    if verbose {
-        info!("Exporting all markdown files to HTML from {:?} to {:?}", input_folder, output_folder);
-    }
+pub fn export_markdown_to_html(input_folder: &Path, output_folder: &Path) -> Result<usize, ReqFlowError> {
+    info!("Exporting all markdown files to HTML from {:?} to {:?}", input_folder, output_folder);
+
     
     // Create the output folder if it doesn't exist
     fs::create_dir_all(output_folder)?;
@@ -28,9 +27,8 @@ pub fn export_markdown_to_html(input_folder: &Path, output_folder: &Path, verbos
         .map(|e| e.path().to_path_buf())
         .collect();
     
-    if verbose {
-        info!("Found {} markdown files to convert to HTML", files.len());
-    }
+    info!("Found {} markdown files to convert to HTML", files.len());
+
     
     // Process files in parallel
     let processed_count = files.par_iter()
@@ -38,9 +36,7 @@ pub fn export_markdown_to_html(input_folder: &Path, output_folder: &Path, verbos
             let result = export_file_to_html(file_path, input_folder, output_folder);
             match result {
                 Ok(_) => {
-                    if verbose {
-                        debug!("Successfully converted {:?} to HTML", file_path);
-                    }
+                    debug!("Successfully converted {:?} to HTML", file_path);
                     1
                 },
                 Err(e) => {

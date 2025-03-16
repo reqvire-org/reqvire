@@ -1,7 +1,5 @@
 use lazy_static::lazy_static;
 use std::collections::HashMap;
-use crate::identifier::normalize_identifier;
-use crate::config::Config;
 use crate::error::ReqFlowError;
 
 
@@ -101,25 +99,69 @@ lazy_static! {
 }
 
 #[derive(Debug, Clone)]
+pub struct RelationTarget {
+    pub text: String,
+    pub link: LinkType,
+}
+
+#[derive(Debug, Clone)]
+pub enum LinkType {
+    Identifier(String), // Internal reference, e.g., "some-identifier"
+    ExternalUrl(String), // External URL, e.g., "https://example.com"
+}
+impl LinkType {
+    /// Converts `LinkType` into a string representation.
+    pub fn as_str(&self) -> &str {
+        match self {
+            LinkType::Identifier(id) => id,
+            LinkType::ExternalUrl(url) => url,
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
 pub struct Relation {
     pub relation_type: &'static RelationTypeInfo,
-    pub target: String,
-    pub name: String,
+    pub target: RelationTarget,
 }
 
 impl Relation {
-    pub fn new(config: &Config, relation_type: &str, raw_target: &str, name: &str) -> Result<Self, ReqFlowError> {
+    pub fn new(relation_type: &str, text: String, normalized_target: &str) -> Result<Self, ReqFlowError> {   
+        let link=Self::parse_link_type(normalized_target);
+               
         let relation_info = RELATION_TYPES.get(relation_type)
             .ok_or_else(|| ReqFlowError::UnsupportedRelationType(relation_type.to_string()))?;
-
-        let normalized_target = normalize_identifier(config, "", raw_target)?;
-
         Ok(Self {
             relation_type: relation_info,
-            target: normalized_target,
-            name: name.to_string(),
+            target: RelationTarget{text: text, link: link}
         })
     }
+    
+    /// Determines if the link should be treated as an identifier or an external URL.
+    fn parse_link_type(link: &str) -> LinkType {
+        if Self::is_path_reference(link) {
+            LinkType::Identifier(link.to_string())
+        } else {
+            LinkType::ExternalUrl(link.to_string())
+        }
+    }
+
+    /// Determines whether the given string is a path reference (i.e., identifier).
+    fn is_path_reference(link: &str) -> bool {
+        // Common external protocols used in documentation and software
+        let external_protocols = [
+            "http://", "https://", // Web
+            "file://",  // Local file paths
+            "ftp://",   // FTP links
+            "mailto:",  // Email links
+            "ssh://",   // SSH links
+            "git://",   // Git repository links
+            "data:",    // Data URIs
+        ];
+
+        // Check if the link starts with any of these external protocols
+        !external_protocols.iter().any(|&proto| link.starts_with(proto))
+    } 
 }
 
 /// Check if a relation type is supported according to the DSD
@@ -147,5 +189,15 @@ pub fn is_circular_dependency_relation(relation_type: &str) -> bool {
         Some(info) => matches!(info.name, "derivedFrom" | "dependsOn" | "refine" | "tracedFrom"),
         None => false,
     }
+}
+
+
+
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
 }
 
