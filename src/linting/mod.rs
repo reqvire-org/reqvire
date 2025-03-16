@@ -1,11 +1,8 @@
 use anyhow::Result;
 use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
 use std::io::Write;
-
-/// Runs linting on all **Requirement** and **Verification** elements from the `ElementRegistry`,
 use std::fs;
 use std::path::{Path, PathBuf};
-use walkdir::WalkDir;
 use log::debug;
 use globset::GlobSet;
 use crate::error::ReqFlowError;

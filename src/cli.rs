@@ -151,7 +151,8 @@ pub fn handle_command(
             info!("Generating mermaid diagrams in {:?}", specification_folder_path);
             // Only collect identifiers and process files to add diagrams
             // Skip validation checks for diagram generation mode
-            model_manager.process_diagrams(&specification_folder_path, &external_folders_path,excluded_filename_patterns,diagram_direction)?;
+            model_manager.process_diagrams(diagram_direction, false)?;
+       
             info!("Requirements diagrams updated in source files");
             return Ok(0);
         }else if args.lint {

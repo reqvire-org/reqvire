@@ -12,7 +12,7 @@ pub mod linting;
 pub mod init;
 pub mod html;
 pub mod filesystem;
-pub mod markdown;
+pub mod diagrams;
 
 use log::error;
 use crate::model::ModelManager;

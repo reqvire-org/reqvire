@@ -66,49 +66,6 @@ The system shall support referencing folders that may exist in different reposit
 
 ## Generate Diagrams
 
-```mermaid
-graph LR;
-  %% Graph styling
-  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
-  classDef satisfies fill:#fff2cc,stroke:#ffcc00,stroke-width:1px;
-  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
-  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
-  classDef paragraph fill:#efefef,stroke:#999999,stroke-width:1px;
-  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
-
-    Automate_Diagram_Generation["Automate Diagram Generation"];
-    click Automate_Diagram_Generation "UserRequirements.md#automate-diagram-generation";
-    class Automate_Diagram_Generation requirement;
-    Automate_Diagram_Generation ==>|refines| _UserStories_md_Generate_Diagrams__UserStories_md_generate_diagrams_;
-    _UserStories_md_Generate_Diagrams__UserStories_md_generate_diagrams_["UserStories.md#Generate Diagrams"];
-    click _UserStories_md_Generate_Diagrams__UserStories_md_generate_diagrams_ "UserStories.md#generate-diagrams";
-    class _UserStories_md_Generate_Diagrams__UserStories_md_generate_diagrams_ requirement;
-    Select_Custom_Diagram_Viewpoints["Select Custom Diagram Viewpoints"];
-    click Select_Custom_Diagram_Viewpoints "UserRequirements.md#select-custom-diagram-viewpoints";
-    class Select_Custom_Diagram_Viewpoints requirement;
-    Select_Custom_Diagram_Viewpoints ==>|refines| _UserStories_md_Generate_Diagrams__UserStories_md_generate_diagrams_;
-    _UserStories_md_Generate_Diagrams__UserStories_md_generate_diagrams_["UserStories.md/Generate Diagrams"];
-    click _UserStories_md_Generate_Diagrams__UserStories_md_generate_diagrams_ "UserStories.md#generate-diagrams";
-    class _UserStories_md_Generate_Diagrams__UserStories_md_generate_diagrams_ requirement;
-    Export_Diagrams_in_Standard_Formats["Export Diagrams in Standard Formats"];
-    click Export_Diagrams_in_Standard_Formats "UserRequirements.md#export-diagrams-in-standard-formats";
-    class Export_Diagrams_in_Standard_Formats requirement;
-    _UserStories_md_Generate_Diagrams__UserStories_md_generate_diagrams_ --o|contains| Export_Diagrams_in_Standard_Formats;
-    Highlight_Changes_in_Diagrams["Highlight Changes in Diagrams"];
-    click Highlight_Changes_in_Diagrams "UserRequirements.md#highlight-changes-in-diagrams";
-    class Highlight_Changes_in_Diagrams requirement;
-    Highlight_Changes_in_Diagrams ==>|refines| _UserStories_md_Generate_Diagrams__UserStories_md_generate_diagrams_;
-    Visualize_Model_Relationships["Visualize Model Relationships"];
-    click Visualize_Model_Relationships "UserRequirements.md#visualize-model-relationships";
-    class Visualize_Model_Relationships requirement;
-    Visualize_Model_Relationships ==>|refines| _UserStories_md_Generate_Diagrams__UserStories_md_generate_diagrams_;
-    Filter_Relationships_by_Type["Filter Relationships by Type"];
-    click Filter_Relationships_by_Type "UserRequirements.md#filter-relationships-by-type";
-    class Filter_Relationships_by_Type requirement;
-    Filter_Relationships_by_Type ==>|refines| _UserStories_md_Generate_Diagrams__UserStories_md_generate_diagrams_;
-```
-
-
 ---
 
 ### Automate Diagram Generation
@@ -165,26 +122,6 @@ The system shall allow users to filter relationships in the MBSE model by type, 
 
 ## Automate Diagram Generation
 
-```mermaid
-graph LR;
-  %% Graph styling
-  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
-  classDef satisfies fill:#fff2cc,stroke:#ffcc00,stroke-width:1px;
-  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
-  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
-  classDef paragraph fill:#efefef,stroke:#999999,stroke-width:1px;
-  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
-
-    Store_Automated_Diagrams_in_Designated_Locations["Store Automated Diagrams in Designated Locations"];
-    click Store_Automated_Diagrams_in_Designated_Locations "UserRequirements.md#store-automated-diagrams-in-designated-locations";
-    class Store_Automated_Diagrams_in_Designated_Locations requirement;
-    Store_Automated_Diagrams_in_Designated_Locations ==>|refines| _UserStories_md_Generate_Diagrams__UserStories_md_generate_diagrams_;
-    _UserStories_md_Generate_Diagrams__UserStories_md_generate_diagrams_["UserStories.md/Generate Diagrams"];
-    click _UserStories_md_Generate_Diagrams__UserStories_md_generate_diagrams_ "UserStories.md#generate-diagrams";
-    class _UserStories_md_Generate_Diagrams__UserStories_md_generate_diagrams_ requirement;
-```
-
-
 ---
 
 ### Store Automated Diagrams in Designated Locations
@@ -195,30 +132,6 @@ The system shall store automatically generated diagrams in pre-configured locati
   * refine: [UserStories.md/Generate Diagrams](UserStories.md#generate-diagrams)
 
 ## Aligning Design with Code
-
-```mermaid
-graph LR;
-  %% Graph styling
-  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
-  classDef satisfies fill:#fff2cc,stroke:#ffcc00,stroke-width:1px;
-  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
-  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
-  classDef paragraph fill:#efefef,stroke:#999999,stroke-width:1px;
-  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
-
-    Code_Traceability["Code Traceability"];
-    click Code_Traceability "UserRequirements.md#code-traceability";
-    class Code_Traceability requirement;
-    Code_Traceability ==>|refines| _UserStories_md_Aligning_Design_with_Code__UserStories_md_aligning_design_with_code_;
-    _UserStories_md_Aligning_Design_with_Code__UserStories_md_aligning_design_with_code_["UserStories.md/Aligning Design with Code"];
-    click _UserStories_md_Aligning_Design_with_Code__UserStories_md_aligning_design_with_code_ "UserStories.md#aligning-design-with-code";
-    class _UserStories_md_Aligning_Design_with_Code__UserStories_md_aligning_design_with_code_ requirement;
-    Suggest_Code_Refactoring["Suggest Code Refactoring"];
-    click Suggest_Code_Refactoring "UserRequirements.md#suggest-code-refactoring";
-    class Suggest_Code_Refactoring requirement;
-    Suggest_Code_Refactoring ==>|refines| _UserStories_md_Aligning_Design_with_Code__UserStories_md_aligning_design_with_code_;
-```
-
 
 ---
 
@@ -239,82 +152,6 @@ The system shall suggest code refactoring opportunities to better align with the
   * refine: [UserStories.md/Aligning Design with Code](UserStories.md#aligning-design-with-code)
 
 ## Validating Structures
-
-```mermaid
-graph LR;
-  %% Graph styling
-  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
-  classDef satisfies fill:#fff2cc,stroke:#ffcc00,stroke-width:1px;
-  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
-  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
-  classDef paragraph fill:#efefef,stroke:#999999,stroke-width:1px;
-  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
-
-    Enhanced_Validation_Error_Reporting["Enhanced Validation Error Reporting"];
-    click Enhanced_Validation_Error_Reporting "UserRequirements.md#enhanced-validation-error-reporting";
-    class Enhanced_Validation_Error_Reporting requirement;
-    Enhanced_Validation_Error_Reporting ==>|refines| _UserStories_md_Validating_Structures__UserStories_md_validating_structures_;
-    _UserStories_md_Validating_Structures__UserStories_md_validating_structures_["UserStories.md/Validating Structures"];
-    click _UserStories_md_Validating_Structures__UserStories_md_validating_structures_ "UserStories.md#validating-structures";
-    class _UserStories_md_Validating_Structures__UserStories_md_validating_structures_ requirement;
-    Model_Linting["Model Linting"];
-    click Model_Linting "UserRequirements.md#model-linting";
-    class Model_Linting requirement;
-    Model_Linting ==>|refines| _UserStories_md_Validating_Structures__UserStories_md_validating_structures_;
-    Linting_Command_Behavior["Linting Command Behavior"];
-    click Linting_Command_Behavior "UserRequirements.md#linting-command-behavior";
-    class Linting_Command_Behavior requirement;
-    _Model_Linting___model_linting_ --o|contains| Linting_Command_Behavior;
-    _Model_Linting___model_linting_["Model Linting"];
-    click _Model_Linting___model_linting_ "#model-linting";
-    class _Model_Linting___model_linting_ requirement;
-    Linting_Command_Output["Linting Command Output"];
-    click Linting_Command_Output "UserRequirements.md#linting-command-output";
-    class Linting_Command_Output requirement;
-    Linting_Command_Output ==>|refines| _Linting_Command_Behavior___linting_command_behavior_;
-    _Linting_Command_Behavior___linting_command_behavior_["Linting Command Behavior"];
-    click _Linting_Command_Behavior___linting_command_behavior_ "#linting-command-behavior";
-    class _Linting_Command_Behavior___linting_command_behavior_ requirement;
-    Replace_Absolute_Links_with_Relative_Links["Replace Absolute Links with Relative Links"];
-    click Replace_Absolute_Links_with_Relative_Links "UserRequirements.md#replace-absolute-links-with-relative-links";
-    class Replace_Absolute_Links_with_Relative_Links requirement;
-    _Model_Linting___model_linting_ --o|contains| Replace_Absolute_Links_with_Relative_Links;
-    Format_Consistency_Enforcement["Format Consistency Enforcement"];
-    click Format_Consistency_Enforcement "UserRequirements.md#format-consistency-enforcement";
-    class Format_Consistency_Enforcement requirement;
-    _Model_Linting___model_linting_ --o|contains| Format_Consistency_Enforcement;
-    Generate_Documentation_Index["Generate Documentation Index"];
-    click Generate_Documentation_Index "UserRequirements.md#generate-documentation-index";
-    class Generate_Documentation_Index requirement;
-    Generate_Documentation_Index ==>|refines| _UserStories_md_Managing_MBSE_Models__UserStories_md_managing_mbse_models_;
-    _UserStories_md_Managing_MBSE_Models__UserStories_md_managing_mbse_models_["UserStories.md/Managing MBSE Models"];
-    click _UserStories_md_Managing_MBSE_Models__UserStories_md_managing_mbse_models_ "UserStories.md#managing-mbse-models";
-    class _UserStories_md_Managing_MBSE_Models__UserStories_md_managing_mbse_models_ requirement;
-    Documentation_Index_HTML_Integration["Documentation Index HTML Integration"];
-    click Documentation_Index_HTML_Integration "UserRequirements.md#documentation-index-html-integration";
-    class Documentation_Index_HTML_Integration requirement;
-    Documentation_Index_HTML_Integration ==>|refines| _Generate_Documentation_Index___generate_documentation_index_;
-    _Generate_Documentation_Index___generate_documentation_index_["Generate Documentation Index"];
-    click _Generate_Documentation_Index___generate_documentation_index_ "#generate-documentation-index";
-    class _Generate_Documentation_Index___generate_documentation_index_ requirement;
-    Validate_Markdown_Structure["Validate Markdown Structure"];
-    click Validate_Markdown_Structure "UserRequirements.md#validate-markdown-structure";
-    class Validate_Markdown_Structure requirement;
-    Validate_Markdown_Structure ==>|refines| _UserStories_md_Validating_Structures__UserStories_md_validating_structures_;
-    Validate_Filesystem_Structure["Validate Filesystem Structure"];
-    click Validate_Filesystem_Structure "UserRequirements.md#validate-filesystem-structure";
-    class Validate_Filesystem_Structure requirement;
-    Validate_Filesystem_Structure ==>|refines| _UserStories_md_Validating_Structures__UserStories_md_validating_structures_;
-    Validate_Internal_Consistency["Validate Internal Consistency"];
-    click Validate_Internal_Consistency "UserRequirements.md#validate-internal-consistency";
-    class Validate_Internal_Consistency requirement;
-    Validate_Internal_Consistency ==>|refines| _UserStories_md_Validating_Structures__UserStories_md_validating_structures_;
-    Validate_Cross_Component_Dependencies["Validate Cross-Component Dependencies"];
-    click Validate_Cross_Component_Dependencies "UserRequirements.md#validate-cross-component-dependencies";
-    class Validate_Cross_Component_Dependencies requirement;
-    Validate_Cross_Component_Dependencies ==>|refines| _UserStories_md_Validating_Structures__UserStories_md_validating_structures_;
-```
-
 
 ---
 
@@ -433,30 +270,6 @@ The system shall validate dependencies across different components of the MBSE m
 
 ## Integrate with GitHub Workflows
 
-```mermaid
-graph LR;
-  %% Graph styling
-  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
-  classDef satisfies fill:#fff2cc,stroke:#ffcc00,stroke-width:1px;
-  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
-  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
-  classDef paragraph fill:#efefef,stroke:#999999,stroke-width:1px;
-  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
-
-    Automate_Pull_Request_Validations["Automate Pull Request Validations"];
-    click Automate_Pull_Request_Validations "UserRequirements.md#automate-pull-request-validations";
-    class Automate_Pull_Request_Validations requirement;
-    Automate_Pull_Request_Validations ==>|refines| _UserStories_md_Integrate_with_GitHub_Workflows__UserStories_md_integrate_with_github_workflows_;
-    _UserStories_md_Integrate_with_GitHub_Workflows__UserStories_md_integrate_with_github_workflows_["UserStories.md/Integrate with GitHub Workflows"];
-    click _UserStories_md_Integrate_with_GitHub_Workflows__UserStories_md_integrate_with_github_workflows_ "UserStories.md#integrate-with-github-workflows";
-    class _UserStories_md_Integrate_with_GitHub_Workflows__UserStories_md_integrate_with_github_workflows_ requirement;
-    Generate_Change_Logs_for_Pull_Requests["Generate Change Logs for Pull Requests"];
-    click Generate_Change_Logs_for_Pull_Requests "UserRequirements.md#generate-change-logs-for-pull-requests";
-    class Generate_Change_Logs_for_Pull_Requests requirement;
-    Generate_Change_Logs_for_Pull_Requests ==>|refines| _UserStories_md_Integrate_with_GitHub_Workflows__UserStories_md_integrate_with_github_workflows_;
-```
-
-
 ---
 
 ### Automate Pull Request Validations
@@ -476,34 +289,6 @@ The system shall generate detailed change logs for pull requests, summarizing mo
   * refine: [UserStories.md/Integrate with GitHub Workflows](UserStories.md#integrate-with-github-workflows)
 
 ## AI-Driven Code Suggestions
-
-```mermaid
-graph LR;
-  %% Graph styling
-  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
-  classDef satisfies fill:#fff2cc,stroke:#ffcc00,stroke-width:1px;
-  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
-  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
-  classDef paragraph fill:#efefef,stroke:#999999,stroke-width:1px;
-  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
-
-    Analyze_Code_for_Alignment______Needs_more_work["Analyze Code for Alignment ---> Needs more work"];
-    click Analyze_Code_for_Alignment______Needs_more_work "UserRequirements.md#analyze-code-for-alignment---->-needs-more-work";
-    class Analyze_Code_for_Alignment______Needs_more_work requirement;
-    Analyze_Code_for_Alignment______Needs_more_work ==>|refines| _UserStories_md_AI_Driven_Code_Suggestions__UserStories_md_ai_driven_code_suggestions_;
-    _UserStories_md_AI_Driven_Code_Suggestions__UserStories_md_ai_driven_code_suggestions_["UserStories.md/AI-Driven Code Suggestions"];
-    click _UserStories_md_AI_Driven_Code_Suggestions__UserStories_md_ai_driven_code_suggestions_ "UserStories.md#ai-driven-code-suggestions";
-    class _UserStories_md_AI_Driven_Code_Suggestions__UserStories_md_ai_driven_code_suggestions_ requirement;
-    Suggest_Refactoring_for_MBSE_Consistency_______Needs_more_work["Suggest Refactoring for MBSE Consistency  ---> Needs more work"];
-    click Suggest_Refactoring_for_MBSE_Consistency_______Needs_more_work "UserRequirements.md#suggest-refactoring-for-mbse-consistency----->-needs-more-work";
-    class Suggest_Refactoring_for_MBSE_Consistency_______Needs_more_work requirement;
-    Suggest_Refactoring_for_MBSE_Consistency_______Needs_more_work ==>|refines| _UserStories_md_AI_Driven_Code_Suggestions__UserStories_md_ai_driven_code_suggestions_;
-    Highlight_Potential_Code_Model_Conflicts_____also_too_advanced_for_now["Highlight Potential Code-Model Conflicts --> also too advanced for now"];
-    click Highlight_Potential_Code_Model_Conflicts_____also_too_advanced_for_now "UserRequirements.md#highlight-potential-code-model-conflicts--->-also-too-advanced-for-now";
-    class Highlight_Potential_Code_Model_Conflicts_____also_too_advanced_for_now requirement;
-    Highlight_Potential_Code_Model_Conflicts_____also_too_advanced_for_now ==>|refines| _UserStories_md_AI_Driven_Code_Suggestions__UserStories_md_ai_driven_code_suggestions_;
-```
-
 
 ---
 
@@ -533,41 +318,6 @@ The system shall allow AI agents to highlight potential conflicts between code a
   * refine: [UserStories.md/AI-Driven Code Suggestions](UserStories.md#ai-driven-code-suggestions)
 
 ## AI-Driven Model Suggestions
-
-```mermaid
-graph LR;
-  %% Graph styling
-  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
-  classDef satisfies fill:#fff2cc,stroke:#ffcc00,stroke-width:1px;
-  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
-  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
-  classDef paragraph fill:#efefef,stroke:#999999,stroke-width:1px;
-  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
-
-    Provide_Actionable_Model_Improvement_Suggestions["Provide Actionable Model Improvement Suggestions"];
-    click Provide_Actionable_Model_Improvement_Suggestions "UserRequirements.md#provide-actionable-model-improvement-suggestions";
-    class Provide_Actionable_Model_Improvement_Suggestions requirement;
-    Provide_Actionable_Model_Improvement_Suggestions ==>|refines| _UserStories_md_AI_Driven_Model_Suggestions__UserStories_md_ai_driven_model_suggestions_;
-    _UserStories_md_AI_Driven_Model_Suggestions__UserStories_md_ai_driven_model_suggestions_["UserStories.md/AI-Driven Model Suggestions"];
-    click _UserStories_md_AI_Driven_Model_Suggestions__UserStories_md_ai_driven_model_suggestions_ "UserStories.md#ai-driven-model-suggestions";
-    class _UserStories_md_AI_Driven_Model_Suggestions__UserStories_md_ai_driven_model_suggestions_ requirement;
-    Suggest_Refinements_to_Model_Relationships["Suggest Refinements to Model Relationships"];
-    click Suggest_Refinements_to_Model_Relationships "UserRequirements.md#suggest-refinements-to-model-relationships";
-    class Suggest_Refinements_to_Model_Relationships requirement;
-    Suggest_Refinements_to_Model_Relationships ==>|refines| _Provide_Actionable_Model_Improvement_Suggestions___provide_actionable_model_improvement_suggestions_;
-    _Provide_Actionable_Model_Improvement_Suggestions___provide_actionable_model_improvement_suggestions_["Provide Actionable Model Improvement Suggestions"];
-    click _Provide_Actionable_Model_Improvement_Suggestions___provide_actionable_model_improvement_suggestions_ "#provide-actionable-model-improvement-suggestions";
-    class _Provide_Actionable_Model_Improvement_Suggestions___provide_actionable_model_improvement_suggestions_ requirement;
-    Recommend_Missing_Components["Recommend Missing Components"];
-    click Recommend_Missing_Components "UserRequirements.md#recommend-missing-components";
-    class Recommend_Missing_Components requirement;
-    Recommend_Missing_Components ==>|refines| _Provide_Actionable_Model_Improvement_Suggestions___provide_actionable_model_improvement_suggestions_;
-    Propose_Validation_Fixes["Propose Validation Fixes"];
-    click Propose_Validation_Fixes "UserRequirements.md#propose-validation-fixes";
-    class Propose_Validation_Fixes requirement;
-    Propose_Validation_Fixes ==>|refines| _Provide_Actionable_Model_Improvement_Suggestions___provide_actionable_model_improvement_suggestions_;
-```
-
 
 ---
 
@@ -606,50 +356,6 @@ The system shall enable AI agents to propose fixes for validation errors in the 
   * refine: [Provide Actionable Model Improvement Suggestions](#provide-actionable-model-improvement-suggestions)
 
 ## Provide Reports
-
-```mermaid
-graph LR;
-  %% Graph styling
-  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
-  classDef satisfies fill:#fff2cc,stroke:#ffcc00,stroke-width:1px;
-  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
-  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
-  classDef paragraph fill:#efefef,stroke:#999999,stroke-width:1px;
-  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
-
-    Generate_Relationship_Reports["Generate Relationship Reports"];
-    click Generate_Relationship_Reports "UserRequirements.md#generate-relationship-reports";
-    class Generate_Relationship_Reports requirement;
-    Generate_Relationship_Reports ==>|refines| _UserStories_md_Provide_Reports__UserStories_md_provide_reports_;
-    _UserStories_md_Provide_Reports__UserStories_md_provide_reports_["UserStories.md/Provide Reports"];
-    click _UserStories_md_Provide_Reports__UserStories_md_provide_reports_ "UserStories.md#provide-reports";
-    class _UserStories_md_Provide_Reports__UserStories_md_provide_reports_ requirement;
-    Generate_Structural_Change_Reports["Generate Structural Change Reports"];
-    click Generate_Structural_Change_Reports "UserRequirements.md#generate-structural-change-reports";
-    class Generate_Structural_Change_Reports requirement;
-    Generate_Structural_Change_Reports ==>|refines| _UserStories_md_Provide_Reports__UserStories_md_provide_reports_;
-    Provide_Validation_Reports["Provide Validation Reports"];
-    click Provide_Validation_Reports "UserRequirements.md#provide-validation-reports";
-    class Provide_Validation_Reports requirement;
-    Provide_Validation_Reports ==>|refines| _UserStories_md_Provide_Reports__UserStories_md_provide_reports_;
-    Generate_Verifications_Reports["Generate Verifications Reports"];
-    click Generate_Verifications_Reports "UserRequirements.md#generate-verifications-reports";
-    class Generate_Verifications_Reports requirement;
-    Generate_Verifications_Reports ==>|refines| _UserStories_md_Provide_Reports__UserStories_md_provide_reports_;
-    Generate_Summary_Reports["Generate Summary Reports"];
-    click Generate_Summary_Reports "UserRequirements.md#generate-summary-reports";
-    class Generate_Summary_Reports requirement;
-    Generate_Summary_Reports ==>|refines| _UserStories_md_Provide_Reports__UserStories_md_provide_reports_;
-    Generate_Dependency_Reports["Generate Dependency Reports"];
-    click Generate_Dependency_Reports "UserRequirements.md#generate-dependency-reports";
-    class Generate_Dependency_Reports requirement;
-    Generate_Dependency_Reports ==>|refines| _UserStories_md_Provide_Reports__UserStories_md_provide_reports_;
-    Export_Reports_to_Standard_Formats["Export Reports to Standard Formats"];
-    click Export_Reports_to_Standard_Formats "UserRequirements.md#export-reports-to-standard-formats";
-    class Export_Reports_to_Standard_Formats requirement;
-    Export_Reports_to_Standard_Formats ==>|refines| _UserStories_md_Provide_Reports__UserStories_md_provide_reports_;
-```
-
 
 ---
 
@@ -716,37 +422,6 @@ The system shall allow users to export generated reports in standard formats (e.
 
 ## Trace Changes in MBSE Model
 
-```mermaid
-graph LR;
-  %% Graph styling
-  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
-  classDef satisfies fill:#fff2cc,stroke:#ffcc00,stroke-width:1px;
-  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
-  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
-  classDef paragraph fill:#efefef,stroke:#999999,stroke-width:1px;
-  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
-
-    Tracing_Structural_Changes["Tracing Structural Changes"];
-    click Tracing_Structural_Changes "UserRequirements.md#tracing-structural-changes";
-    class Tracing_Structural_Changes requirement;
-    Tracing_Structural_Changes ==>|refines| _UserStories_md_Trace_Changes_in_MBSE_Model__UserStories_md_trace_changes_in_mbse_model_;
-    _UserStories_md_Trace_Changes_in_MBSE_Model__UserStories_md_trace_changes_in_mbse_model_["UserStories.md/Trace Changes in MBSE Model"];
-    click _UserStories_md_Trace_Changes_in_MBSE_Model__UserStories_md_trace_changes_in_mbse_model_ "UserStories.md#trace-changes-in-mbse-model";
-    class _UserStories_md_Trace_Changes_in_MBSE_Model__UserStories_md_trace_changes_in_mbse_model_ requirement;
-    Suggest_Structural_Updates["Suggest Structural Updates"];
-    click Suggest_Structural_Updates "UserRequirements.md#suggest-structural-updates";
-    class Suggest_Structural_Updates requirement;
-    Suggest_Structural_Updates ==>|refines| _UserStories_md_Trace_Changes_in_MBSE_Model__UserStories_md_trace_changes_in_mbse_model_;
-    AI_Feedback_on_Structural_Changes["AI Feedback on Structural Changes"];
-    click AI_Feedback_on_Structural_Changes "UserRequirements.md#ai-feedback-on-structural-changes";
-    class AI_Feedback_on_Structural_Changes requirement;
-    AI_Feedback_on_Structural_Changes -.->|deriveReqT| _Suggest_Structural_Updates___suggest_structural_updates_;
-    _Suggest_Structural_Updates___suggest_structural_updates_["Suggest Structural Updates"];
-    click _Suggest_Structural_Updates___suggest_structural_updates_ "#suggest-structural-updates";
-    class _Suggest_Structural_Updates___suggest_structural_updates_ requirement;
-```
-
-
 ---
 
 ### Tracing Structural Changes
@@ -775,72 +450,6 @@ When a report of impacted elements is fed into the AI agents' context, the syste
   * derivedFrom: [Suggest Structural Updates](#suggest-structural-updates)
 
 ## Generate Traceability Matrix			
-
-```mermaid
-graph LR;
-  %% Graph styling
-  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
-  classDef satisfies fill:#fff2cc,stroke:#ffcc00,stroke-width:1px;
-  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
-  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
-  classDef paragraph fill:#efefef,stroke:#999999,stroke-width:1px;
-  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
-
-    Create_Traceability_Matrices["Create Traceability Matrices"];
-    click Create_Traceability_Matrices "UserRequirements.md#create-traceability-matrices";
-    class Create_Traceability_Matrices requirement;
-    Create_Traceability_Matrices ==>|refines| _UserStories_md_Generate_Traceability_Matrix__UserStories_md_generate_traceability_matrix_;
-    _UserStories_md_Generate_Traceability_Matrix__UserStories_md_generate_traceability_matrix_["UserStories.md/Generate Traceability Matrix"];
-    click _UserStories_md_Generate_Traceability_Matrix__UserStories_md_generate_traceability_matrix_ "UserStories.md#generate-traceability-matrix";
-    class _UserStories_md_Generate_Traceability_Matrix__UserStories_md_generate_traceability_matrix_ requirement;
-    Support_Relation_Based_Views["Support Relation-Based Views"];
-    click Support_Relation_Based_Views "UserRequirements.md#support-relation-based-views";
-    class Support_Relation_Based_Views requirement;
-    _Create_Traceability_Matrices___create_traceability_matrices_ --o|contains| Support_Relation_Based_Views;
-    _Create_Traceability_Matrices___create_traceability_matrices_["Create Traceability Matrices"];
-    click _Create_Traceability_Matrices___create_traceability_matrices_ "#create-traceability-matrices";
-    class _Create_Traceability_Matrices___create_traceability_matrices_ requirement;
-    Interactive_Mermaid_Diagrams["Interactive Mermaid Diagrams"];
-    click Interactive_Mermaid_Diagrams "UserRequirements.md#interactive-mermaid-diagrams";
-    class Interactive_Mermaid_Diagrams requirement;
-    _Create_Traceability_Matrices___create_traceability_matrices_ --o|contains| Interactive_Mermaid_Diagrams;
-    Markdown_Based_Default_Format["Markdown-Based Default Format"];
-    click Markdown_Based_Default_Format "UserRequirements.md#markdown-based-default-format";
-    class Markdown_Based_Default_Format requirement;
-    _Create_Traceability_Matrices___create_traceability_matrices_ --o|contains| Markdown_Based_Default_Format;
-    Save_matrices_to_designated_files["Save matrices to designated files"];
-    click Save_matrices_to_designated_files "UserRequirements.md#save-matrices-to-designated-files";
-    class Save_matrices_to_designated_files requirement;
-    _Create_Traceability_Matrices___create_traceability_matrices_ --o|contains| Save_matrices_to_designated_files;
-    Include_Verification_Checkboxes["Include Verification Checkboxes"];
-    click Include_Verification_Checkboxes "UserRequirements.md#include-verification-checkboxes";
-    class Include_Verification_Checkboxes requirement;
-    Include_Verification_Checkboxes ==>|refines| _UserStories_md_Generate_Traceability_Matrix__UserStories_md_generate_traceability_matrix_;
-    Handle_Affected_Verifications_on_Model_Changes["Handle Affected Verifications on Model Changes"];
-    click Handle_Affected_Verifications_on_Model_Changes "UserRequirements.md#handle-affected-verifications-on-model-changes";
-    class Handle_Affected_Verifications_on_Model_Changes requirement;
-    Handle_Affected_Verifications_on_Model_Changes ==>|refines| _UserStories_md_Generate_Traceability_Matrix__UserStories_md_generate_traceability_matrix_;
-    _README_md_Not_Implemented_Yet__README_md_not_implemented_yet_ -->|verifies| Handle_Affected_Verifications_on_Model_Changes;
-    _README_md_Not_Implemented_Yet__README_md_not_implemented_yet_["README.md/Not Implemented Yet"];
-    click _README_md_Not_Implemented_Yet__README_md_not_implemented_yet_ "README.md#not-implemented-yet";
-    class _README_md_Not_Implemented_Yet__README_md_not_implemented_yet_ verification;
-    Specification_Design_Document_for_Requirements_Change_Propagation["Specification Design Document for Requirements Change Propagation"];
-    click Specification_Design_Document_for_Requirements_Change_Propagation "UserRequirements.md#specification-design-document-for-requirements-change-propagation";
-    class Specification_Design_Document_for_Requirements_Change_Propagation requirement;
-    Specification_Design_Document_for_Requirements_Change_Propagation ==>|refines| _UserStories_md_Trace_Changes_in_MBSE_Model__UserStories_md_trace_changes_in_mbse_model_;
-    _UserStories_md_Trace_Changes_in_MBSE_Model__UserStories_md_trace_changes_in_mbse_model_["UserStories.md/Trace Changes in MBSE Model"];
-    click _UserStories_md_Trace_Changes_in_MBSE_Model__UserStories_md_trace_changes_in_mbse_model_ "UserStories.md#trace-changes-in-mbse-model";
-    class _UserStories_md_Trace_Changes_in_MBSE_Model__UserStories_md_trace_changes_in_mbse_model_ requirement;
-    _DesignSpecifications_RequirementsChangePropagation_md__DesignSpecifications_RequirementsChangePropagation_md_ -->|satisfies| Specification_Design_Document_for_Requirements_Change_Propagation;
-    _DesignSpecifications_RequirementsChangePropagation_md__DesignSpecifications_RequirementsChangePropagation_md_["DesignSpecifications/RequirementsChangePropagation.md"];
-    click _DesignSpecifications_RequirementsChangePropagation_md__DesignSpecifications_RequirementsChangePropagation_md_ "DesignSpecifications/RequirementsChangePropagation.md";
-    class _DesignSpecifications_RequirementsChangePropagation_md__DesignSpecifications_RequirementsChangePropagation_md_ satisfies;
-    Export_Traceability_Matrix["Export Traceability Matrix"];
-    click Export_Traceability_Matrix "UserRequirements.md#export-traceability-matrix";
-    class Export_Traceability_Matrix requirement;
-    Export_Traceability_Matrix ==>|refines| _UserStories_md_Generate_Traceability_Matrix__UserStories_md_generate_traceability_matrix_;
-```
-
 
 ---
 
@@ -946,33 +555,6 @@ The system shall provide an option to export the traceability matrix in formats 
 ---
 
 ## Exporting Specifications
-
-```mermaid
-graph LR;
-  %% Graph styling
-  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
-  classDef satisfies fill:#fff2cc,stroke:#ffcc00,stroke-width:1px;
-  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
-  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
-  classDef paragraph fill:#efefef,stroke:#999999,stroke-width:1px;
-  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
-
-    Export_HTML_specifications["Export HTML specifications"];
-    click Export_HTML_specifications "UserRequirements.md#export-html-specifications";
-    class Export_HTML_specifications requirement;
-    Export_HTML_specifications -.->|deriveReqT| _UserStories_md_Export_Specifications__UserStories_md_export_specifications_;
-    _UserStories_md_Export_Specifications__UserStories_md_export_specifications_["UserStories.md/Export Specifications"];
-    click _UserStories_md_Export_Specifications__UserStories_md_export_specifications_ "UserStories.md#export-specifications";
-    class _UserStories_md_Export_Specifications__UserStories_md_export_specifications_ requirement;
-    Support_CI_CD_Integration["Support CI/CD Integration"];
-    click Support_CI_CD_Integration "UserRequirements.md#support-ci/cd-integration";
-    class Support_CI_CD_Integration requirement;
-    Support_CI_CD_Integration ==>|refines| _UserStories_md_Automate_Traceability_Matrix__UserStories_md_generate_traceability_matrix_;
-    _UserStories_md_Automate_Traceability_Matrix__UserStories_md_generate_traceability_matrix_["UserStories.md/Automate Traceability Matrix"];
-    click _UserStories_md_Automate_Traceability_Matrix__UserStories_md_generate_traceability_matrix_ "UserStories.md#generate-traceability-matrix";
-    class _UserStories_md_Automate_Traceability_Matrix__UserStories_md_generate_traceability_matrix_ requirement;
-```
-
 
 ---
 

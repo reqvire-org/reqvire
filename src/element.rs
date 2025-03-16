@@ -34,6 +34,7 @@ impl ElementType {
 pub struct Element {
     pub name: String,
     pub content: String,
+    pub section: String,
     pub relations: Vec<Relation>,
     pub identifier: String,
     pub file_path: String,
@@ -44,10 +45,11 @@ pub struct Element {
 
 
 impl Element {
-    pub fn new(name: &str, identifier: &str, file_path: &str, element_type: Option<ElementType>) -> Self {
+    pub fn new(name: &str, identifier: &str, file_path: &str, section: &str, element_type: Option<ElementType>) -> Self {
         Self {
             name: name.to_string(),
             content: "".to_string(),
+            section: section.to_string(),
             relations: vec![],
             identifier: identifier.to_string(),
             file_path: file_path.to_string(),
@@ -59,6 +61,7 @@ impl Element {
     pub fn add_relation(&mut self, relation: Relation) -> () {
       self.relations.push(relation);
     }
+
     pub fn add_content(&mut self, content: &str) {
         if !self.content.is_empty() {
             self.content.push('\n');

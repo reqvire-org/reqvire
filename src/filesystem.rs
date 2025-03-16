@@ -1,5 +1,5 @@
 use crate::error::ReqFlowError;
-use std::path::{Path, PathBuf};
+use std::path::{Path};
 use std::fs;
 
 /// Reads a file's content

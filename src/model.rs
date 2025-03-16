@@ -11,13 +11,9 @@ use crate::relation::LinkType;
 use crate::relation::{get_parent_relation_types, is_circular_dependency_relation};
 use crate::element::ElementType;
 use crate::element::RequirementType;
-use regex::Regex;
 use crate::filesystem;
-use crate::markdown;
+use crate::diagrams;
 
-
-use rayon::iter::ParallelBridge;
-use rayon::iter::ParallelIterator;
 
 use crate::utils;
 use crate::parser::parse_elements;
@@ -285,75 +281,95 @@ impl ModelManager {
         path.pop();
     }
     
+  
+
     /// Processes diagram generation for markdown files in place (without writing to output).
     /// Used when the `--generate-diagrams` flag is set.
     pub fn process_diagrams(
-        &mut self, 
-        specification_folder: &PathBuf, 
-        external_folders: &[PathBuf],
-        excluded_filename_patterns: &GlobSet,
-        diagram_direction: &str  
+        &mut self,
+        diagram_direction: &str,  
+        convert_to_html: bool
     ) -> Result<(), ReqFlowError> {
-
-        let files_with_base = utils::scan_markdown_files(specification_folder, external_folders, excluded_filename_patterns);
-        debug!("Found {} markdown files to update with diagrams", files_with_base.len());
-
-        // Process files in parallel and track which ones were updated
-        let results: Vec<bool> = files_with_base
-           .iter()
-           .par_bridge() 
-           .map(|(file_path, base)| {
-               self.process_single_diagram(file_path, base,diagram_direction).unwrap_or(false)
-           })
-        .collect();
         
-  
+         let diagrams = diagrams::generate_diagrams_by_section(&self.element_registry, diagram_direction, convert_to_html)?;
+ 
+         //  Replace old diagrams in files
+         for (file_section_key, new_diagram) in diagrams {
+            // Extract file path and section name from key
+            let parts: Vec<&str> = file_section_key.split("::").collect();
+            if parts.len() != 2 {
+                continue;
+            }
+            let file_path = parts[0];
+            let section = parts[1];
 
-        // Count how many files were updated
-        let updated_count = results.into_iter().filter(|&updated| updated).count();
-        debug!("Diagrams processed. Updated {} of {} files.", updated_count, files_with_base.len());
+           let file_content = match filesystem::read_file(Path::new(file_path)) {
+                Ok(content) => content,
+                Err(e) => {
+                    log::error!("Failed to read file '{}': {}", file_path, e);
+                    continue;
+                }
+            };
 
-        Ok(())
-    }
+            // Replace the old diagram for the specific section
+            let updated_content = self.replace_section_diagram(&file_content, section, &new_diagram);
 
-
-
-    /// Processes a single file to generate diagrams and updates it.
-    fn process_single_diagram(&self, file_path: &Path, input_folder: &Path, diagram_direction: &str) -> Result<bool, ReqFlowError> {
-        debug!("Generating diagram for file {:?}", file_path);
-
-        let content = filesystem::read_file(file_path)?;
-        let relative_path = utils::get_relative_path(file_path, input_folder)?;
-
-        // Remove existing diagrams
-        let mermaid_regex = Regex::new(r"(?s)```mermaid\s*graph (TD|LR);.*?```\s*").unwrap();
-        let content_without_diagrams = mermaid_regex.replace_all(&content, "").to_string();
-
-        debug!("FILE CONTENT BEFORE DIAGRAM GENERATION:\n{}", &content_without_diagrams);
-
-        // Generate updated content
-        let updated_content = markdown::replace_relations(
-            &content_without_diagrams,
-            &self.element_registry,
-            &relative_path,
-            diagram_direction,
-            false, // Not converting to HTML
-        )?;
-
-        debug!("FILE CONTENT AFTER DIAGRAM GENERATION:\n{}", &updated_content);
-
-        // If content hasn't changed, force a newline update
-        if content == updated_content {
-            debug!("No content changes detected, forcing update with newline");
-            let forced_update = updated_content + "\n";
-            filesystem::write_file(file_path, &forced_update)?;
-            return Ok(true);
+            // Write the updated content back to the file
+            if file_content != updated_content {
+                if let Err(e) = filesystem::write_file(Path::new(file_path), &updated_content) {
+                    log::error!("Failed to write updated diagram to '{}': {}", file_path, e);
+                } else {
+                    log::info!("Updated diagrams in '{}'", file_path);
+                }
+            }
         }
 
-        // Write updated content
-        filesystem::write_file(file_path, &updated_content)?;
-        Ok(true)
-    }    
+        Ok(())
+    }   
+  
+    
+    /// Replaces the old diagram in a specific section of a markdown file.
+    ///
+    /// - `content`: The original file content.
+    /// - `section`: The section name where the diagram should be replaced.
+    /// - `new_diagram`: The newly generated Mermaid diagram.
+    ///
+    /// Returns the modified file content as a `String`.
+    fn replace_section_diagram(&mut self,content: &str, section: &str, new_diagram: &str) -> String {
+        let section_header = format!("## {}", section);
+        let mermaid_block_start = "```mermaid";
+        let mermaid_block_end = "```";
 
+        let lines = content.lines().collect::<Vec<&str>>();
+        let mut new_content = Vec::new();
+        let mut in_target_section = false;
+        let mut in_old_diagram = false;
+
+        for line in &lines {
+            if line.trim() == section_header {
+                in_target_section = true;
+                new_content.push(line.to_string());
+                new_content.push(new_diagram.to_string());
+                continue;
+            }
+
+            if in_target_section {
+                if line.trim().starts_with(mermaid_block_start) {
+                    in_old_diagram = true;
+                    continue; // Skip old diagram start
+                }
+                if in_old_diagram && line.trim().starts_with(mermaid_block_end) {
+                    in_old_diagram = false;
+                    continue; // Skip old diagram end
+                }
+            }
+
+            if !in_old_diagram {
+                new_content.push(line.to_string());
+            }
+        }
+
+        new_content.join("\n")
+    }
 }
 
