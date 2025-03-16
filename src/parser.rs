@@ -18,6 +18,8 @@ pub fn parse_elements(file: &str, content: &str, file_path: &PathBuf,  specifica
     let mut in_relations_section = false;
     let mut in_metadata_section = false;
     
+    let mut current_section_name = "Requirements";
+
     
     // Reserved subsections that should not be treated as standalone elements
     let reserved_subsections = vec!["Relations", "Details", "Metadata"];
@@ -25,7 +27,12 @@ pub fn parse_elements(file: &str, content: &str, file_path: &PathBuf,  specifica
     for line in content.lines() {
         let trimmed = line.trim();
 
-        if trimmed.starts_with("### ") {
+        if trimmed.starts_with("## ") {
+            // Extract section name and update tracking variable
+            current_section_name = trimmed[3..].trim();
+            debug!("Switched to section: {}", current_section_name);
+            
+        }else if trimmed.starts_with("### ") {
             // Save previous element
             if let Some(element) = current_element.take() {
                 elements.push(element);
@@ -54,7 +61,7 @@ pub fn parse_elements(file: &str, content: &str, file_path: &PathBuf,  specifica
                                ElementType::Requirement(RequirementType::System)
                             };
 
-                            current_element = Some(Element::new(&element_name.clone(), &identifier.clone(), &file_path.to_string_lossy().into_owned(),Some(element_type)));
+                            current_element = Some(Element::new(&element_name.clone(), &identifier.clone(), &file_path.to_string_lossy().into_owned(),&current_section_name, Some(element_type)));
                             debug!("Found element: {}", element_name);
                         },
                         Err(e) => {
