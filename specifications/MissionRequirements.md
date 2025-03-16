@@ -39,6 +39,9 @@ The system must adhere to widely recognized industry standards, such as ISO/IEC/
   * derivedFrom: [MOEs.md/MOE_CE](MOEs.md#moe_ce)
 
 
+
+---
+
 ### Promote Automation and Efficiency
 
 The system must significantly reduce manual effort in managing requirements, models, and traceability by automating routine tasks.

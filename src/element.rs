@@ -21,8 +21,8 @@ impl ElementType {
     /// Parses a string into an ElementType
     pub fn from_metadata(value: &str) -> Self {
         match value.to_lowercase().as_str() {
-            "user_requirement" | "user" => ElementType::Requirement(RequirementType::User),
-            "requirement" | "user" => ElementType::Requirement(RequirementType::System),
+            "user_requirement" => ElementType::Requirement(RequirementType::User),
+            "requirement" => ElementType::Requirement(RequirementType::System),
             "verification" => ElementType::Verification,
             "file" => ElementType::File,
             other => ElementType::Other(other.to_string()),

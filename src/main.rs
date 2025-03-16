@@ -1,6 +1,3 @@
-use std::path::PathBuf;
-use log::error;
-
 pub mod model;
 pub mod cli;
 pub mod config;
@@ -15,6 +12,7 @@ pub mod linting;
 pub mod init;
 pub mod html;
 
+use log::error;
 use crate::model::ModelManager;
 use crate::cli::handle_command;
 use crate::cli::Args;
@@ -44,7 +42,7 @@ fn main() {
     let args = Args::parse_args();
     let config = Config::load_from_args(&args);
 
-    let mut model_manager = ModelManager::new(config.clone());
+    let mut model_manager = ModelManager::new();
 
   
     // Run `handle_command` and get exit code

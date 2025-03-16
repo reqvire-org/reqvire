@@ -4,7 +4,6 @@ use std::fs;
 use std::path::{ PathBuf};
 use walkdir::WalkDir;
 use log::{debug};
-use crate::config::Config;
 use crate::element::Element;
 use crate::element_registry::ElementRegistry;
 use crate::error::ReqFlowError;
@@ -26,13 +25,11 @@ pub struct ModelManager {
     /// Stores file content for validation
     file_contents: HashMap<String, String>,
 
-    /// Configuration for the model manager
-    config: Config,
 }
 
 impl ModelManager {
-    /// Creates a new ModelManager with the given configuration.
-    pub fn new(config: Config) -> Self {
+    /// Creates a new ModelManager
+    pub fn new() -> Self {
         // Initialize empty element registry
         let element_registry = ElementRegistry::new();
 
@@ -41,8 +38,7 @@ impl ModelManager {
 
         Self {
             element_registry,
-            file_contents,
-            config,
+            file_contents
         }
     }
 
