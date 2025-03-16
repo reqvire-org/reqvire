@@ -11,8 +11,9 @@ use globset::GlobSet;
 use crate::error::ReqFlowError;
 use crate::utils;
 
+
 /// Runs linting checks on all Markdown files in the specification folder.
-/// Runs linting checks on all Markdown files in the specification folder.
+/// If `dry_run == false`, it automatically applies the fixes.
 pub fn run_linting(
     specification_folder: &PathBuf, 
     external_folders: &[PathBuf], 
@@ -23,42 +24,50 @@ pub fn run_linting(
     
     let mut lint_suggestions = Vec::new();
 
-    for entry in WalkDir::new(specification_folder)
-        .into_iter()
-        .filter_map(Result::ok)
-        .filter(|e| e.path().is_file())
-        .filter(|e| e.path().extension().map_or(false, |ext| ext == "md"))
-        .filter(|e| utils::is_requirements_file_by_path(e.path(), excluded_filename_patterns))
-    {
-        let file_path = entry.path();
+    // Define all folders to check (specification folder + external folders)
+    let all_folders: Vec<&PathBuf> = std::iter::once(specification_folder)
+        .chain(external_folders.iter())
+        .collect();
 
-        match fs::read_to_string(file_path) {
-            Ok(file_content) => {
-                debug!("Linting file: {}", file_path.display());
-                
-                let suggestions = lint_file_content(&file_content, file_path)
-                                 .map_err(|e| ReqFlowError::LintError(e.to_string()))?; 
+    // Iterate over all folders (main + external)
+    for folder in &all_folders {
+    
+             for entry in WalkDir::new(folder)
+             .into_iter()
+             .filter_map(Result::ok)
+             .filter(|e| e.path().is_file())
+             .filter(|e| e.path().extension().map_or(false, |ext| ext == "md"))
+             .filter(|e| utils::is_requirements_file_by_path(e.path(), excluded_filename_patterns))
+         {
+             let file_path = entry.path();
 
-                if !suggestions.is_empty() {
-                    lint_suggestions.extend(suggestions);
-                }
+             // No need for `.map_err()` - automatically converts `std::io::Error` to `ReqFlowError::IoError`
+             let mut file_content = fs::read_to_string(file_path)?;
+
+             let suggestions = lint_file_content(&file_content, file_path)?;
+
+             if !suggestions.is_empty() {
+                 if dry_run {
+                     lint_suggestions.extend(suggestions);
+                 } else {
+                     file_content = apply_fixes(&file_content, &suggestions);
+                     fs::write(file_path, file_content)?;
+                     println!("✅ Applied {} fixes to {}", suggestions.len(), file_path.display());
+                 }
+             }
+         }
+     }
+
+    if dry_run {
+        if lint_suggestions.is_empty() {
+            println!("✅ No linting issues found.");
+        } else {
+            println!("⚠️ Found {} linting issues:", lint_suggestions.len());
+
+            for suggestion in &lint_suggestions {
+                let _ = suggestion.print_colorized_diff();
             }
-            Err(err) => {
-                debug!("❌ Failed to read file: {} → {:?}", file_path.display(), err);
-            }
-        }
-    }
 
-    if lint_suggestions.is_empty() {
-        println!("✅ No linting issues found.");
-    } else {
-        println!("⚠️ Found {} linting issues:", lint_suggestions.len());
-
-        for suggestion in &lint_suggestions {
-            let _ = suggestion.print_colorized_diff(); // 🔹 Now uses colored diff output
-        }
-
-        if dry_run {
             println!("Run without --dry-run to apply fixes.");
         }
     }
@@ -66,6 +75,47 @@ pub fn run_linting(
     Ok(())
 }
 
+
+/// Applies all lint fixes to the given file content.
+fn apply_fixes(content: &str, suggestions: &[LintSuggestion]) -> String {
+    let mut updated_content = content.to_string();
+
+    for suggestion in suggestions {
+        match &suggestion.fix {
+            LintFix::ReplacePattern { pattern, replacement } => {
+                updated_content = updated_content.replace(pattern, replacement);
+            }
+            LintFix::ReplaceLine { line, new_content } => {
+                updated_content = replace_line(&updated_content, *line, new_content);
+            }
+            LintFix::InsertAt { line, content } => {
+                updated_content = insert_at_line(&updated_content, *line, content);
+            }
+        }
+    }
+
+    updated_content
+}
+
+/// Inserts content at a specific line in the file.
+fn insert_at_line(content: &str, line: usize, new_content: &str) -> String {
+    let mut lines: Vec<&str> = content.lines().collect();
+    if line > lines.len() {
+        return content.to_string(); // No change if line number is invalid
+    }
+    lines.insert(line, new_content);
+    lines.join("\n")
+}
+
+/// Replaces a specific line in the file content.
+fn replace_line(content: &str, line: usize, new_content: &str) -> String {
+    let mut lines: Vec<&str> = content.lines().collect();
+    if line >= lines.len() {
+        return content.to_string(); // No change if line number is invalid
+    }
+    lines[line] = new_content;
+    lines.join("\n")
+}
 
 
 /// Represents a lint suggestion (like a warning) that can be fixed automatically
@@ -145,24 +195,9 @@ impl LintSuggestion {
         }
     }
 
-    /// Format a user-friendly description of the suggestion (used for non-visual output)
-    #[allow(dead_code)]
-    fn format(&self) -> String {
-        match &self.line_number {
-            Some(line) => format!("{} (in {}:{}): {}", 
-                                self.suggestion_type_name(), 
-                                self.file_path.display(), 
-                                line, 
-                                self.description),
-            None => format!("{} (in {}): {}", 
-                         self.suggestion_type_name(), 
-                         self.file_path.display(), 
-                         self.description),
-        }
-    }
+
 
     /// Format a git-like diff for the suggestion (used as fallback for non-colorized output)
-    #[allow(dead_code)]
     pub fn format_diff(&self) -> String {
         let file_header = format!("diff --lint a/{} b/{}", 
                                 self.file_path.display(), 
@@ -215,7 +250,7 @@ impl LintSuggestion {
         format!("{}\n{}\n{}\n{}\n", file_header, description, line_info, change_diff)
     }
     
-    /// Print a colorized git-style diff to the terminal
+
     /// Print a colorized git-style diff to the terminal
     pub fn print_colorized_diff(&self) -> Result<(), std::io::Error> {
         let mut stdout = StandardStream::stdout(ColorChoice::Auto);
@@ -302,28 +337,31 @@ impl LintSuggestion {
 
 
 /// Runs linting checks on a file's content and returns a list of linting suggestions.
-/// Runs linting checks on a file's content.
-pub fn lint_file_content(content: &str, file_path: &Path) -> Result<Vec<LintSuggestion>> {
+pub fn lint_file_content(content: &str, file_path: &Path) -> Result<Vec<LintSuggestion>, ReqFlowError> {
     let mut suggestions = Vec::new();
 
 
+    let result = || -> Result<(), ReqFlowError> {
+        // Rule 1: Detect absolute links
+        suggestions.extend(find_absolute_links(content, file_path));
 
-    // Rule 1: Detect absolute links
-    suggestions.extend(find_absolute_links(content, file_path));
+        // Rule 2: Detect excess whitespace
+        suggestions.extend(find_excess_whitespace(content, file_path));
 
-    // Rule 2: Detect excess whitespace
-    suggestions.extend(find_excess_whitespace(content, file_path));
+        // Rule 3: Detect inconsistent newlines
+        suggestions.extend(find_inconsistent_newlines(content, file_path));
 
-    // Rule 3: Detect inconsistent newlines
-    suggestions.extend(find_inconsistent_newlines(content, file_path));
+        // Rule 4: Detect missing separator lines
+        suggestions.extend(find_missing_separators(content, file_path));
 
-    // Rule 4: Detect missing separator lines
-    suggestions.extend(find_missing_separators(content, file_path));
+        // Rule 5: Detect inconsistent indentation
+        suggestions.extend(find_inconsistent_indentation(content, file_path));
 
-    // Rule 5: Detect inconsistent indentation
-    suggestions.extend(find_inconsistent_indentation(content, file_path));
+        Ok(())
+    }();
 
-    Ok(suggestions)
+    // If there was an error, return it as `ReqFlowError::LintError`
+    result.map(|_| suggestions).map_err(|e| ReqFlowError::LintError(e.to_string()))
 }
 
 

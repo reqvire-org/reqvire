@@ -1,7 +1,5 @@
 use anyhow::Result;
-use std::fs;
 use std::path::{Path, PathBuf};
-use crate::config::Config;
 use log::debug;
 use crate::error::ReqFlowError;
 use globset::GlobSet;
@@ -51,33 +49,6 @@ pub fn get_relative_path(path: &Path, base: &Path) -> Result<PathBuf, ReqFlowErr
     path.strip_prefix(base)
         .map_err(|_| ReqFlowError::PathError(format!("Failed to determine relative path: {}", path.display())))
         .map(|p| p.to_path_buf())
-}
-
-
-/// Reads a file's content
-pub fn read_file(path: &Path) -> Result<String, ReqFlowError> {
-    fs::read_to_string(path).map_err(|e| ReqFlowError::IoError(e))
-}
-
-
-
-/// Create directory and any parent directories if they don't exist
-pub fn create_dir_all<P: AsRef<Path>>(path: P) -> Result<(), ReqFlowError> {
-    fs::create_dir_all(path.as_ref()).map_err(|e| {
-        ReqFlowError::IoError(e)
-    })
-}
-
-
-/// Write content to a file, creating parent directories if needed
-pub fn write_file<P: AsRef<Path>, C: AsRef<[u8]>>(path: P, content: C) -> Result<(), ReqFlowError> {
-    if let Some(parent) = path.as_ref().parent() {
-        create_dir_all(parent)?;
-    }
-    
-    fs::write(path.as_ref(), content).map_err(|e| {
-        ReqFlowError::IoError(e)
-    })
 }
 
 
