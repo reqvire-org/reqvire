@@ -1,8 +1,8 @@
 use anyhow::Result;
 use std::collections::{HashMap, HashSet};
 use std::fs;
-use std::path::{ PathBuf};
-use walkdir::WalkDir;
+use std::path::{ PathBuf,Path};
+
 use log::{debug};
 use crate::element::Element;
 use crate::element_registry::ElementRegistry;
@@ -11,7 +11,13 @@ use crate::relation::LinkType;
 use crate::relation::{get_parent_relation_types, is_circular_dependency_relation};
 use crate::element::ElementType;
 use crate::element::RequirementType;
+use regex::Regex;
+use crate::filesystem;
+use crate::markdown;
 
+
+use rayon::iter::ParallelBridge;
+use rayon::iter::ParallelIterator;
 
 use crate::utils;
 use crate::parser::parse_elements;
@@ -53,21 +59,17 @@ impl ModelManager {
         debug!("Parsing and validating files in {:?}", specification_folder);
         let mut errors = Vec::new();
 
-        for entry in WalkDir::new(specification_folder)
-            .into_iter()
-            .filter_map(Result::ok) // Skip errors during directory iteration
-            .filter(|e| e.path().is_file()) //  Process only files
-            .filter(|e| e.path().extension().map_or(false, |ext| ext == "md")) //  Only `.md` files 
-            .filter(|e| utils::is_requirements_file_by_path(e.path(), excluded_filename_patterns)) // Only files with elements
-        {
-            let path = entry.path();
+        let files = utils::scan_markdown_files(specification_folder, external_folders, excluded_filename_patterns);
+        debug!("Found {} markdown files to update with diagrams", files.len());
 
-            match (path.file_name(), path) {
-                (Some(file_name), file_path) => {
+        for (path,_) in files {
+            match (path.file_name(), path.clone()) {
+                (Some(file_name), file_path) if path == path.clone() =>{
+
                     debug!("Markdown File found: {}", file_name.to_string_lossy());
 
-                    let file_content = fs::read_to_string(path)?;
-                    let relative_path = utils::get_relative_path(path, specification_folder)?;
+                    let file_content = fs::read_to_string(&path)?;
+                    let relative_path = utils::get_relative_path(&path, specification_folder)?;
                     let relative_path_str = relative_path.to_string_lossy().to_string();
     
                     self.file_contents.insert(relative_path_str.clone(), file_content.clone());
@@ -282,6 +284,74 @@ impl ModelManager {
         visited.insert(element_id);
         path.pop();
     }
+    
+    /// Processes diagram generation for markdown files in place (without writing to output).
+    /// Used when the `--generate-diagrams` flag is set.
+    pub fn process_diagrams(
+        &mut self, 
+        specification_folder: &PathBuf, 
+        external_folders: &[PathBuf],
+        excluded_filename_patterns: &GlobSet    
+    ) -> Result<(), ReqFlowError> {
+
+        let files_with_base = utils::scan_markdown_files(specification_folder, external_folders, excluded_filename_patterns);
+        debug!("Found {} markdown files to update with diagrams", files_with_base.len());
+
+        // Process files in parallel and track which ones were updated
+        let results: Vec<bool> = files_with_base
+           .iter()
+           .par_bridge() 
+           .map(|(file_path, base)| {
+               self.process_single_diagram(file_path, base).unwrap_or(false)
+           })
+        .collect();
+        
+  
+
+        // Count how many files were updated
+        let updated_count = results.into_iter().filter(|&updated| updated).count();
+        debug!("Diagrams processed. Updated {} of {} files.", updated_count, files_with_base.len());
+
+        Ok(())
+    }
+
+
+
+    /// Processes a single file to generate diagrams and updates it.
+    fn process_single_diagram(&self, file_path: &Path, input_folder: &Path) -> Result<bool, ReqFlowError> {
+        debug!("Generating diagram for file {:?}", file_path);
+
+        let content = filesystem::read_file(file_path)?;
+        let relative_path = utils::get_relative_path(file_path, input_folder)?;
+
+        // Remove existing diagrams
+        let mermaid_regex = Regex::new(r"(?s)```mermaid\s*graph (TD|LR);.*?```\s*").unwrap();
+        let content_without_diagrams = mermaid_regex.replace_all(&content, "").to_string();
+
+        debug!("FILE CONTENT BEFORE DIAGRAM GENERATION:\n{}", &content_without_diagrams);
+
+        // Generate updated content
+        let updated_content = markdown::replace_relations(
+            &content_without_diagrams,
+            &self.element_registry,
+            &relative_path,
+            false, // Not converting to HTML
+        )?;
+
+        debug!("FILE CONTENT AFTER DIAGRAM GENERATION:\n{}", &updated_content);
+
+        // If content hasn't changed, force a newline update
+        if content == updated_content {
+            debug!("No content changes detected, forcing update with newline");
+            let forced_update = updated_content + "\n";
+            filesystem::write_file(file_path, &forced_update)?;
+            return Ok(true);
+        }
+
+        // Write updated content
+        filesystem::write_file(file_path, &updated_content)?;
+        Ok(true)
+    }    
 
 }
 

@@ -11,6 +11,8 @@ pub mod html_export;
 pub mod linting;
 pub mod init;
 pub mod html;
+pub mod filesystem;
+pub mod markdown;
 
 use log::error;
 use crate::model::ModelManager;

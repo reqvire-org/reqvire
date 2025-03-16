@@ -1,3 +1,10 @@
+use crate::element_registry::ElementRegistry;
+use std::path::Path;
+use crate::error::ReqFlowError;
+use crate::element::Element;
+use regex::Regex;
+use std::collections::HashMap;
+
 
 /// Replace relations in markdown with proper links
 pub fn replace_relations(
