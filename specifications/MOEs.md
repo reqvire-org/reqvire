@@ -8,6 +8,7 @@ graph LR;
   classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+
   f6237e49f7["MOE_UA"];
   click f6237e49f7 "MOEs.md#moe_ua";
   class f6237e49f7 requirement;
