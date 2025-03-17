@@ -2,6 +2,9 @@
 
 This document verifies the requirements for the ReqFlow initialization command.
 
+## Initialization
+
+
 ### Basic Initialization Test
 
 The verification test checks that a new ReqFlow project can be initialized with the correct directory structure and configuration file.
@@ -32,7 +35,7 @@ The verification test checks that a new ReqFlow project can be initialized with 
 
 #### Relations
   * verify: [../SystemRequirements/Requirements.md#Initialization Command](../SystemRequirements/Requirements.md#initialization-command)
-  * trace: [tests/e2e-init/test_init_success.sh](../../tests/e2e-init/test_init_success.sh)
+  * trace: [tests/e2e-init/test_init_success.sh](/tests/e2e-init/test_init_success.sh)
 
 ---
 
@@ -65,7 +68,7 @@ The verification test checks that the init command fails when a reqflow.yaml fil
 
 #### Relations
   * verify: [../SystemRequirements/Requirements.md#Initialization Command Configuration Check](../SystemRequirements/Requirements.md#initialization-command-configuration-check)
-  * trace: [tests/e2e-init/test_init_existing_yaml.sh](../../tests/e2e-init/test_init_existing_yaml.sh)
+  * trace: [tests/e2e-init/test_init_existing_yaml.sh](/tests/e2e-init/test_init_existing_yaml.sh)
 
 ---
 
@@ -95,7 +98,7 @@ The verification test checks that the init command fails when a reqflow.yml file
 
 #### Relations
   * verify: [../SystemRequirements/Requirements.md#Initialization Command Configuration Check](../SystemRequirements/Requirements.md#initialization-command-configuration-check)
-  * trace: [tests/e2e-init/test_init_existing_yml.sh](../../tests/e2e-init/test_init_existing_yml.sh)
+  * trace: [tests/e2e-init/test_init_existing_yml.sh](/tests/e2e-init/test_init_existing_yml.sh)
 
 ---
 
@@ -126,4 +129,4 @@ The verification test checks that the init command succeeds when other configura
 
 #### Relations
   * verify: [../SystemRequirements/Requirements.md#Initialization Command Configuration Check](../SystemRequirements/Requirements.md#initialization-command-configuration-check)
-  * trace: [tests/e2e-init/test_init_dot_reqflow.sh](../../tests/e2e-init/test_init_dot_reqflow.sh)
+  * trace: [tests/e2e-init/test_init_dot_reqflow.sh](/tests/e2e-init/test_init_dot_reqflow.sh)

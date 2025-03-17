@@ -142,4 +142,3 @@ classDiagram
 #### SystemOfInterest
   - The SystemOfInterest represents the real-world system being developed, which is guided by the MBSE model.
   - It includes the MBSEModel and the DevelopedSystem, both of which are versioned and stored in Git repositories.
-
