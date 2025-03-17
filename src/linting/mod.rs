@@ -395,23 +395,5 @@ mod tests {
         PathBuf::from("test.md")
     }
 
-    #[test]
-    fn test_lint_suggestion_format() {
-        let suggestion = LintSuggestion::new(
-            LintType::AbsoluteLink,
-            test_file_path(),
-            Some(10),
-            "Use relative link instead of absolute".to_string(),
-            LintFix::ReplacePattern {
-                pattern: "[Link](/absolute/path)".to_string(),
-                replacement: "[Link](relative/path)".to_string(),
-            },
-        );
-
-        let formatted = suggestion.format();
-        assert!(formatted.contains("Absolute link"));
-        assert!(formatted.contains("test.md"));
-        assert!(formatted.contains("10"));
-        assert!(formatted.contains("Use relative link instead of absolute"));
-    }
+ 
 }

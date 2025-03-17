@@ -75,6 +75,11 @@ impl Element {
         }
      }
    
-
+    pub fn extract_fragment(&self) -> String {
+        match self.identifier.split_once('#') {
+            Some((_, fragment)) => fragment.to_string(),
+            None => "".to_string(),
+        }
+    }
 }
 

@@ -1,5 +1,6 @@
 use anyhow::Result;
 use std::path::{Path, PathBuf};
+use pathdiff::diff_paths;
 use log::debug;
 use walkdir::WalkDir;
 use crate::error::ReqFlowError;
@@ -126,14 +127,14 @@ pub fn normalize_path(
    
     let path =Path::new(path_str);
 
-    // 0. Check if the path is an external URL and return it as-is
+    // Check if the path is an external URL and return it as-is
     if EXTERNAL_SCHEMES.iter().any(|&scheme| path_str.starts_with(scheme)) {
         debug!("Skipping normalization for external URL: {}", path_str);
         return Ok(path_str.to_string());
     }
 
 
-    // 1. If the path is already absolute, return it but normalize if needed
+    // If the path is already absolute, return it but normalize if needed
     if path.is_absolute() {
     
         if let Some(spec_folder_name) = specifications_folder.file_name() {
@@ -160,10 +161,10 @@ pub fn normalize_path(
         return Ok(path_str.to_string());
     }
 
-    // 2. Convert relative path to absolute
+    // Convert relative path to absolute
     let absolute_path = PathBuf::from(base_path).join(path_str);
 
-    // 3. Convert to canonical absolute path
+    // Convert to canonical absolute path
     let canonical_path = absolute_path
         .canonicalize()
         .map_err(|e| ReqFlowError::PathError(format!(
@@ -179,6 +180,61 @@ pub fn normalize_path(
 }
 
 
+/// Converts a normalized identifier back to a relative path identifier
+/// depending on the location of `base_path` and its relation to 
+/// `specifications_folder` and `external_folders`.
+pub fn to_relative_identifier(
+    normalized_identifier: &str,
+    base_path: &PathBuf,
+    specifications_folder: &PathBuf,
+    external_folders: &[PathBuf],
+) -> Result<String, ReqFlowError> {
+
+    let (normalized_path, fragment_opt) = extract_path_and_fragment(normalized_identifier);
+    let normalized_path = Path::new(normalized_path);
+
+    // Check if the path is an external URL, return as is
+    if EXTERNAL_SCHEMES.iter().any(|&scheme| normalized_identifier.starts_with(scheme)) {
+        debug!("Skipping denormalization for external URL: {}", normalized_identifier);
+        return Ok(normalized_identifier.to_string());
+    }
+
+    // Compute relative path if inside `specifications_folder`
+    if normalized_path.starts_with(specifications_folder) {
+        if let Some(relative_path) = diff_paths(normalized_path, base_path) {
+            let relative_identifier = relative_path.to_string_lossy().into_owned();
+            return Ok(append_fragment(&relative_identifier, fragment_opt));
+        }
+    }
+
+    // Compute relative path if inside `external_folders`
+    for external_folder in external_folders {
+        if normalized_path.starts_with(external_folder) {
+            if let Some(relative_path) = diff_paths(normalized_path, base_path) {
+                let relative_identifier = relative_path.to_string_lossy().into_owned();
+                return Ok(append_fragment(&relative_identifier, fragment_opt));
+            }
+        }
+    }
+
+    // Compute relative path based on `base_path`
+    if let Some(relative_path) = diff_paths(normalized_path, base_path) {
+        let relative_identifier = relative_path.to_string_lossy().into_owned();
+        return Ok(append_fragment(&relative_identifier, fragment_opt));
+    }
+
+    // If all else fails, return absolute path
+    Ok(append_fragment(&normalized_identifier.to_string(), fragment_opt))
+}
+
+
+/// Helper function to append a fragment (e.g., `#section-name`) to a path if it exists.
+fn append_fragment(path: &str, fragment_opt: Option<&str>) -> String {
+    match fragment_opt {
+        Some(fragment) => format!("{}#{}", path, fragment),
+        None => path.to_string(),
+    }
+}
 
 /// Parses a metadata line and extracts a (key, value) pair if valid.
 /// Expected format: `* key: value` or `- key: value`
@@ -249,7 +305,9 @@ mod tests {
     use std::fs;
     use std::path::{ PathBuf};
     use tempfile::TempDir;
-
+    use crate::Config;
+    
+    
     #[test]
     fn test_extract_path_and_fragment() {
         let test_cases = vec![
@@ -526,4 +584,83 @@ mod tests {
         }
     }
     
+    #[test]
+    fn test_to_relative_identifier() {
+
+        let temp_spec_folder = TempDir::new().expect("Failed to create temp dir");
+        let specifications_folder = temp_spec_folder.path().to_path_buf();
+
+        let spec_folder_name = specifications_folder.file_name()
+            .and_then(|name| name.to_str()) 
+            .unwrap_or("<unknown>");
+
+
+        let temp_external_folder =  TempDir::new().expect("Failed to create temp dir");
+        let external_folder = temp_external_folder.path().to_path_buf();
+        let external_folders = vec![external_folder.clone()];
+        
+        
+        let base_path = specifications_folder.join("in/side/");
+        let base_path_in_ext = external_folder.join("in/side/");
+
+
+        // Test external URL (should be returned as-is)
+        let external_url = "http://example.com/path/to/spec";
+        let result = to_relative_identifier(external_url, &base_path, &specifications_folder, &external_folders)
+            .expect("Should return external URL as-is");
+        assert_eq!(result, external_url, "Failed external URL check");
+
+        // Test path inside specifications_folder
+        /*
+            When specification folder is "/tmp/spec/" and indentifier is "/tmp/spec/subfolder/file.yaml"
+            then for the base_path "/tmp/spec/in/side/":
+                * relative identifier must be relative reference from base_path: "../../subfolder/file.yaml"
+                
+            Same functionality applies when identifier path and base_path are inside external folder
+        
+        */
+        let spec_path = specifications_folder.join("subfolder/file.yaml");
+        let spec_identifier = spec_path.to_string_lossy().to_string();
+        let result = to_relative_identifier(&spec_identifier, &base_path, &specifications_folder, &external_folders)
+            .expect("Should return relative path inside specifications folder");
+        assert_eq!(result, "../../subfolder/file.yaml", "Failed specifications folder check");
+
+        // Test path in same folder as specification folder
+        let spec_path = specifications_folder.join("file.yaml");
+        let spec_identifier = spec_path.to_string_lossy().to_string();
+        let result = to_relative_identifier(&spec_identifier, &specifications_folder, &specifications_folder, &external_folders)
+            .expect("Should return relative path inside specifications folder");
+        assert_eq!(result, "file.yaml", "Failed specifications folder check");
+
+
+        // Test path inside external_folders        
+        let external_path = external_folder.join("external_spec.yaml");
+        let external_identifier = external_path.to_string_lossy().to_string();
+       
+        let result = to_relative_identifier(&external_identifier, &base_path_in_ext, &specifications_folder, &external_folders)
+            .expect("Should return relative path inside external folders");
+        assert_eq!(result, "../../external_spec.yaml", "Failed external folder check");
+
+
+        // Test path inside external_folders with identifer in specification folder      
+        /*
+            When external folder is "/tmp/external/" and indentifier is pointing to file in specification folder "/tmp/spec/subfolder/file.yaml"
+            then for the base_path in external folder  "/tmp/external/in/side/":
+                * relative identifier must be relative reference from base_path: "../../../spec/subfolder/file.yaml"
+                
+        */
+        let spec_path = specifications_folder.join("subfolder/file.yaml");
+        let spec_identifier = spec_path.to_string_lossy().to_string();
+        
+        let result = to_relative_identifier(&spec_identifier, &base_path_in_ext, &specifications_folder, &external_folders)
+            .expect("Should return relative path inside specifications folder");
+        assert_eq!(result, format!("../../../{}/subfolder/file.yaml",spec_folder_name), "Failed specifications folder check");
+        
+        
+        // Test absolute path that does not match any provided folders
+        let unmatched_path = "/some/other/path/spec.yaml".to_string();
+        let result = to_relative_identifier(&unmatched_path, &base_path, &specifications_folder, &external_folders)
+            .expect("Should return absolute path when no match is found");
+        assert_eq!(result, "../../../../some/other/path/spec.yaml", "Failed unmatched absolute path check");
+    }    
 }
