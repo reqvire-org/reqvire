@@ -72,6 +72,9 @@ fn generate_section_diagram(
         add_element_to_diagram(registry, &mut diagram, element, &mut included_elements, file_path,specification_folder,external_folders)?;
     }
 
+
+    diagram.push_str("```");
+
     Ok(diagram)
 }
 
