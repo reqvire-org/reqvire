@@ -151,7 +151,7 @@ pub fn handle_command(
             info!("Generating mermaid diagrams in {:?}", specification_folder_path);
             // Only collect identifiers and process files to add diagrams
             // Skip validation checks for diagram generation mode
-            model_manager.process_diagrams(diagram_direction, false)?;
+            model_manager.process_diagrams(&specification_folder_path, &external_folders_path, diagram_direction)?;
        
             info!("Requirements diagrams updated in source files");
             return Ok(0);
@@ -181,7 +181,6 @@ pub fn handle_command(
 mod tests {
     use super::*;
     use std::path::PathBuf;
-    use crate::config::Config;
     use crate::model::ModelManager;
     use globset::{Glob, GlobSet, GlobSetBuilder};
 
@@ -220,8 +219,6 @@ mod tests {
             config: None, // No custom config file for the test
         };
 
-        // Create a default config instance
-        let config = Config::default();
 
         // Define test input and output pathse
         let specification_folder_path = PathBuf::from("test/specifications");
@@ -236,8 +233,10 @@ mod tests {
         ];
                         
         // Create a mock model manager
-        let mut model_manager = ModelManager::new(config.clone());
+        let mut model_manager = ModelManager::new();
 
+
+    
         // Run the handle_command function
         let result = handle_command(
             args,
@@ -245,7 +244,8 @@ mod tests {
             &specification_folder_path,
             &external_folders_path,            
             &output_folder_path,
-            &build_glob_set(&excluded_filename_patterns)
+            &build_glob_set(&excluded_filename_patterns),
+            "TD",
         );
 
         // Assert that it runs without error

@@ -3,6 +3,59 @@
 This document verifies the requirements for ReqFlow's linting functionality.
 
 ## Whitespace Linting Tests
+```mermaid
+graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+
+  4cd0fe733f["Excess Whitespace Detection and Correction"];
+  click 4cd0fe733f "LintingTests.md#excess-whitespace-detection-and-correction";
+  class 4cd0fe733f verification;
+  3f3d3f9ccb["SystemRequirements/Requirements.md/Excess Whitespace Linting Implementation"];
+  class 3f3d3f9ccb requirement;
+  click 3f3d3f9ccb "../SystemRequirements/Requirements.md#excess-whitespace-linting-implementation";
+  4cd0fe733f -->|verifies| 3f3d3f9ccb;
+  8f2198f681["SystemRequirements/Requirements.md/Dry Run Mode Implementation"];
+  class 8f2198f681 requirement;
+  click 8f2198f681 "../SystemRequirements/Requirements.md#dry-run-mode";
+  4cd0fe733f -->|verifies| 8f2198f681;
+  e349eadbaa["tests/e2e-linting/test_whitespace_linting.sh"];
+  class e349eadbaa default;
+  click e349eadbaa "../../tests/e2e-linting/test_whitespace_linting.sh";
+  4cd0fe733f -->|traces| e349eadbaa;
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ### Excess Whitespace Detection and Correction
 
@@ -34,6 +87,35 @@ The verification test checks that ReqFlow correctly identifies and fixes excess 
   * trace: [tests/e2e-linting/test_whitespace_linting.sh](../../tests/e2e-linting/test_whitespace_linting.sh)
 
 ## External Folders Tests
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ---
 

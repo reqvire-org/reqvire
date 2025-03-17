@@ -1,6 +1,50 @@
 # MOEs
 
 ## Measures of Effectiveness (MOEs) and Key Performance Parameters (KPPs)
+```mermaid
+graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+
+  b3f57e49f7["MOE_CE"];
+  click b3f57e49f7 "MOEs.md#moe_ce";
+  class b3f57e49f7 requirement;
+  f6237e49f7["MOE_UA"];
+  click f6237e49f7 "MOEs.md#moe_ua";
+  class f6237e49f7 requirement;
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 The **MOEs** and **KPPs** for **ReqFlow** are designed to evaluate how effectively the methodology, toolset, and language deliver value to users and stakeholders. 
 These metrics emphasize outcomes such as user adoption, operational efficiency, and community engagement, ensuring that ReqFlow aligns with the needs of its open-source ecosystem.

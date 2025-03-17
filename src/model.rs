@@ -70,10 +70,10 @@ impl ModelManager {
     
                     self.file_contents.insert(relative_path_str.clone(), file_content.clone());
     
-                    // **Step 1: Markdown Structure Validation**
+                    // Markdown Structure Validation
                     errors.extend(self.validate_markdown_structure(&file_content, &relative_path_str));
     
-                    // **Step 2: Parse Elements**
+                    // Parse Elements
                     match parse_elements(
                         &file_name.to_string_lossy(),
                         &file_content,
@@ -99,10 +99,10 @@ impl ModelManager {
             }
         }
 
-        // **Step 3: Validate Relations**
+        // Validate Relations
         errors.extend(self.validate_relations()?);
 
-        // **Step 4: Validate Cross-Component Dependencies**
+        // Validate Cross-Component Dependencies
         errors.extend(self.validate_cross_component_dependencies()?);
 
         //self.element_registry.debug_print_registry();
@@ -287,23 +287,37 @@ impl ModelManager {
     /// Used when the `--generate-diagrams` flag is set.
     pub fn process_diagrams(
         &mut self,
-        diagram_direction: &str,  
-        convert_to_html: bool
+        specification_folder: &PathBuf, 
+        external_folders: &[PathBuf],        
+        diagram_direction: &str
     ) -> Result<(), ReqFlowError> {
         
-         let diagrams = diagrams::generate_diagrams_by_section(&self.element_registry, diagram_direction, convert_to_html)?;
- 
-         //  Replace old diagrams in files
-         for (file_section_key, new_diagram) in diagrams {
-            // Extract file path and section name from key
+        // Generate diagrams by section
+        let diagrams = diagrams::generate_diagrams_by_section(&self.element_registry, diagram_direction, specification_folder, external_folders)?;
+
+        // Group diagrams by file path
+        let mut files_to_update: HashMap<String, Vec<(&str, &String)>> = HashMap::new();
+
+        for (file_section_key, new_diagram) in &diagrams {
             let parts: Vec<&str> = file_section_key.split("::").collect();
             if parts.len() != 2 {
-                continue;
+                continue; // Skip invalid entries
             }
             let file_path = parts[0];
             let section = parts[1];
 
-           let file_content = match filesystem::read_file(Path::new(file_path)) {
+            files_to_update
+                .entry(file_path.to_string())
+                .or_insert_with(Vec::new)
+                .push((section, new_diagram));
+        }
+
+        // Process each file
+        for (file_path, section_diagrams) in files_to_update {
+            let file_path_obj = Path::new(&file_path);
+
+            // Read file content
+            let mut file_content = match filesystem::read_file(file_path_obj) {
                 Ok(content) => content,
                 Err(e) => {
                     log::error!("Failed to read file '{}': {}", file_path, e);
@@ -311,22 +325,21 @@ impl ModelManager {
                 }
             };
 
-            // Replace the old diagram for the specific section
-            let updated_content = self.replace_section_diagram(&file_content, section, &new_diagram);
+            // Replace diagrams for all sections in this file
+            for (section, new_diagram) in section_diagrams {
+                file_content = self.replace_section_diagram(&file_content, section, new_diagram);
+            }
 
-            // Write the updated content back to the file
-            if file_content != updated_content {
-                if let Err(e) = filesystem::write_file(Path::new(file_path), &updated_content) {
-                    log::error!("Failed to write updated diagram to '{}': {}", file_path, e);
-                } else {
-                    log::info!("Updated diagrams in '{}'", file_path);
-                }
+            // Write updated content back if modified
+            if let Err(e) = filesystem::write_file(file_path_obj, &file_content) {
+                log::error!("Failed to write updated diagrams to '{}': {}", file_path, e);
+            } else {
+                println!("Updated diagrams in '{}'", file_path);
             }
         }
 
         Ok(())
-    }   
-  
+    }
     
     /// Replaces the old diagram in a specific section of a markdown file.
     ///

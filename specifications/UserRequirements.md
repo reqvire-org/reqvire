@@ -1,9 +1,49 @@
 # User Requirements
 
 ## Managing MBSE Models
+```mermaid
+graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+
+  a2398f7051["Bootstrap model struture"];
+  click a2398f7051 "UserRequirements.md#bootstrap-model-struture";
+  class a2398f7051 requirement;
+  852dea6cfe["UserStories.md/Managing MBSE Models"];
+  class 852dea6cfe requirement;
+  click 852dea6cfe "UserStories.md#managing-mbse-models";
+  a2398f7051 ==>|refines| 852dea6cfe;
+  fc49f77257["Support for Distributed Requirements"];
+  click fc49f77257 "UserRequirements.md#support-for-distributed-requirements";
+  class fc49f77257 requirement;
+  7430e12113["Project Configuration with YAML"];
+  class 7430e12113 requirement;
+  click 7430e12113 "UserRequirements.md#project-configuration-with-yaml";
+  fc49f77257 -.->|deriveReqT| 7430e12113;
+  7430e12113 ==>|refines| 852dea6cfe;
+  3745496893["Configurable DesignSpecifications Folder Name"];
+  click 3745496893 "UserRequirements.md#configurable-designspecifications-folder-name";
+  class 3745496893 requirement;
+  3745496893 -.->|deriveReqT| 7430e12113;
+  f07cf1cbfa["Efficient Processing"];
+  click f07cf1cbfa "UserRequirements.md#efficient-processing";
+  class f07cf1cbfa requirement;
+  f07cf1cbfa ==>|refines| 852dea6cfe;
+  438060bb46["Configurable SystemRequirements Folder Name"];
+  click 438060bb46 "UserRequirements.md#configurable-systemrequirements-folder-name";
+  class 438060bb46 requirement;
+  438060bb46 -.->|deriveReqT| 7430e12113;
+```
 
 
-### Unstructured Documents
+
+
+
+
+
 
 The system shall allow structured markdown and unstructured (eg., markdown, PDFs, DOCX, raw text) documents to coexist within the same MBSE model.
 
@@ -65,8 +105,57 @@ The system shall support referencing folders that may exist in different reposit
   * derivedFrom: [Project Configuration with YAML](#project-configuration-with-yaml)
 
 ## Generate Diagrams
+```mermaid
+graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
----
+  a6a8362836["Visualize Model Relationships"];
+  click a6a8362836 "UserRequirements.md#visualize-model-relationships";
+  class a6a8362836 requirement;
+  cf0026c2fe["UserStories.md/Generate Diagrams"];
+  class cf0026c2fe requirement;
+  click cf0026c2fe "UserStories.md#generate-diagrams";
+  a6a8362836 ==>|refines| cf0026c2fe;
+  81f9235ded["Automate Diagram Generation"];
+  click 81f9235ded "UserRequirements.md#automate-diagram-generation";
+  class 81f9235ded requirement;
+  81f9235ded ==>|refines| cf0026c2fe;
+  30d97803eb["Filter Relationships by Type"];
+  click 30d97803eb "UserRequirements.md#filter-relationships-by-type";
+  class 30d97803eb requirement;
+  30d97803eb ==>|refines| cf0026c2fe;
+  30053341d8["Select Custom Diagram Viewpoints"];
+  click 30053341d8 "UserRequirements.md#select-custom-diagram-viewpoints";
+  class 30053341d8 requirement;
+  30053341d8 ==>|refines| cf0026c2fe;
+  fd7388e379["Highlight Changes in Diagrams"];
+  click fd7388e379 "UserRequirements.md#highlight-changes-in-diagrams";
+  class fd7388e379 requirement;
+  fd7388e379 ==>|refines| cf0026c2fe;
+  aee397f35b["Store Automated Diagrams in Designated Locations"];
+  click aee397f35b "UserRequirements.md#store-automated-diagrams-in-designated-locations";
+  class aee397f35b requirement;
+  aee397f35b ==>|refines| cf0026c2fe;
+  10c00a1bd1["Export Diagrams in Standard Formats"];
+  click 10c00a1bd1 "UserRequirements.md#export-diagrams-in-standard-formats";
+  class 10c00a1bd1 requirement;
+  cf0026c2fe --o|contains| 10c00a1bd1;
+```
+
+
+
+
+
+
+
+
+
+
+
 
 ### Automate Diagram Generation
 
@@ -120,8 +209,6 @@ The system shall allow users to filter relationships in the MBSE model by type, 
 #### Relations
   * refine: [UserStories.md/Generate Diagrams](UserStories.md#generate-diagrams)
 
-## Automate Diagram Generation
-
 ---
 
 ### Store Automated Diagrams in Designated Locations
@@ -133,7 +220,16 @@ The system shall store automatically generated diagrams in pre-configured locati
 
 ## Aligning Design with Code
 
----
+
+
+
+
+
+
+
+
+
+
 
 ### Code Traceability
 
@@ -152,8 +248,78 @@ The system shall suggest code refactoring opportunities to better align with the
   * refine: [UserStories.md/Aligning Design with Code](UserStories.md#aligning-design-with-code)
 
 ## Validating Structures
+```mermaid
+graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
----
+  85f6854a46["Replace Absolute Links with Relative Links"];
+  click 85f6854a46 "UserRequirements.md#replace-absolute-links-with-relative-links";
+  class 85f6854a46 requirement;
+  103ddb8dc3["Model Linting"];
+  class 103ddb8dc3 requirement;
+  click 103ddb8dc3 "UserRequirements.md#model-linting";
+  103ddb8dc3 --o|contains| 85f6854a46;
+  81758bdb22["Format Consistency Enforcement"];
+  click 81758bdb22 "UserRequirements.md#format-consistency-enforcement";
+  class 81758bdb22 requirement;
+  103ddb8dc3 --o|contains| 81758bdb22;
+  887a7d36ca["Linting Command"];
+  click 887a7d36ca "UserRequirements.md#linting-command";
+  class 887a7d36ca requirement;
+  103ddb8dc3 --o|contains| 887a7d36ca;
+  d834cc4bc9["Validate Filesystem Structure"];
+  click d834cc4bc9 "UserRequirements.md#validate-filesystem-structure";
+  class d834cc4bc9 requirement;
+  a60d88b6e2["UserStories.md/Validating Structures"];
+  class a60d88b6e2 requirement;
+  click a60d88b6e2 "UserStories.md#validating-structures";
+  d834cc4bc9 ==>|refines| a60d88b6e2;
+  808b1863c8["Linting Command Output"];
+  click 808b1863c8 "UserRequirements.md#linting-command-output";
+  class 808b1863c8 requirement;
+  808b1863c8 ==>|refines| 887a7d36ca;
+  9e524ac696["Validate Internal Consistency"];
+  click 9e524ac696 "UserRequirements.md#validate-internal-consistency";
+  class 9e524ac696 requirement;
+  9e524ac696 ==>|refines| a60d88b6e2;
+  7cf5cf9900["Enhanced Validation Error Reporting"];
+  click 7cf5cf9900 "UserRequirements.md#enhanced-validation-error-reporting";
+  class 7cf5cf9900 requirement;
+  7cf5cf9900 ==>|refines| a60d88b6e2;
+  103ddb8dc3 ==>|refines| a60d88b6e2;
+  f5b5eaeb28["Generate Documentation Index"];
+  click f5b5eaeb28 "UserRequirements.md#generate-documentation-index";
+  class f5b5eaeb28 requirement;
+  852dea6cfe["UserStories.md/Managing MBSE Models"];
+  class 852dea6cfe requirement;
+  click 852dea6cfe "UserStories.md#managing-mbse-models";
+  f5b5eaeb28 ==>|refines| 852dea6cfe;
+  e1c89b5d94["Documentation Index HTML Integration"];
+  click e1c89b5d94 "UserRequirements.md#documentation-index-html-integration";
+  class e1c89b5d94 requirement;
+  e1c89b5d94 ==>|refines| f5b5eaeb28;
+  6e40bf9f83["Validate Cross-Component Dependencies"];
+  click 6e40bf9f83 "UserRequirements.md#validate-cross-component-dependencies";
+  class 6e40bf9f83 requirement;
+  6e40bf9f83 ==>|refines| a60d88b6e2;
+  7b1772417b["Validate Markdown Structure"];
+  click 7b1772417b "UserRequirements.md#validate-markdown-structure";
+  class 7b1772417b requirement;
+  7b1772417b ==>|refines| a60d88b6e2;
+```
+
+
+
+
+
+
+
+
+
 
 ### Enhanced Validation Error Reporting
 
@@ -268,9 +434,17 @@ The system shall validate dependencies across different components of the MBSE m
 #### Relations
   * refine: [UserStories.md/Validating Structures](UserStories.md#validating-structures)
 
+
 ## Integrate with GitHub Workflows
 
----
+
+
+
+
+
+
+
+
 
 ### Automate Pull Request Validations
 
@@ -290,7 +464,16 @@ The system shall generate detailed change logs for pull requests, summarizing mo
 
 ## AI-Driven Code Suggestions
 
----
+
+
+
+
+
+
+
+
+
+
 
 ### Analyze Code for Alignment ---> Needs more work
 
@@ -319,7 +502,17 @@ The system shall allow AI agents to highlight potential conflicts between code a
 
 ## AI-Driven Model Suggestions
 
----
+
+
+
+
+
+
+
+
+
+
+
 
 ### Provide Actionable Model Improvement Suggestions
 
@@ -357,7 +550,17 @@ The system shall enable AI agents to propose fixes for validation errors in the 
 
 ## Provide Reports
 
----
+
+
+
+
+
+
+
+
+
+
+
 
 ### Generate Relationship Reports
 
@@ -422,7 +625,17 @@ The system shall allow users to export generated reports in standard formats (e.
 
 ## Trace Changes in MBSE Model
 
----
+
+
+
+
+
+
+
+
+
+
+
 
 ### Tracing Structural Changes
 
@@ -451,7 +664,17 @@ When a report of impacted elements is fed into the AI agents' context, the syste
 
 ## Generate Traceability Matrix			
 
----
+
+
+
+
+
+
+
+
+
+
+
 
 ### Create Traceability Matrices
 
@@ -556,7 +779,17 @@ The system shall provide an option to export the traceability matrix in formats 
 
 ## Exporting Specifications
 
----
+
+
+
+
+
+
+
+
+
+
+
 
 ### Export HTML specifications
 
