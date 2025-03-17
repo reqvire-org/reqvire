@@ -1069,13 +1069,23 @@ graph LR;
 ```
 ---
 
-### Relationship Report Generator
-The system shall implement a relationship report generator that produces comprehensive summaries of model relationships, including statistics on relationship types, connection patterns, and outlier detection with visualizations.
+### Model Summary Report Generator
+The system shall implement a summary report generator that  produces comprehensive summaries of model relationships, including key metrics, element counts by type and counts.
 
 #### Relations
-  * derivedFrom: [UserRequirements.md/Generate Relationship Reports](../UserRequirements.md#generate-relationship-reports)
-  * satisfiedBy: [model.rs](../../src/model.rs)
+  * derivedFrom: [UserRequirements.md/Model Structure and Summaries](../UserRequirements.md#model-structure-and-summaries)
+  * satisfiedBy: [model.rs](../../src/reports.rs)
 ---
+
+### CLI Summary Report Flag
+
+The system shall provide a model summary report function, activated by the (--model-summary flag), which shall generate model summary report
+
+#### Relations
+  * refine: [Model Summary Report Generator](#model-summary-report-generator)
+  * satisfiedBy: [cli.rs](../../src/cli.rs)    
+---
+  
 
 ### Structural Change Analysis Engine
 The system shall implement a change analysis engine that compares model versions to identify structural modifications, analyzes impact chains, and generates reports highlighting affected elements with severity classifications.
@@ -1099,13 +1109,6 @@ The system shall implement a verification gap analyzer that identifies requireme
   * derivedFrom: [UserRequirements.md/Generate Verifications Reports](../UserRequirements.md#generate-verifications-reports)
 ---
 
-### Model Summary Report Generator
-The system shall implement a summary report generator that produces high-level overviews of the model state, including key metrics, element counts by type, relationship densities, and change statistics with trend analysis.
-
-#### Relations
-  * derivedFrom: [UserRequirements.md/Generate Summary Reports](../UserRequirements.md#generate-summary-reports)
-  * satisfiedBy: [model.rs](../../src/model.rs)
----
 
 ### Dependency Report Generator
 The system shall implement a dependency report generator that analyzes and visualizes complex dependency chains within the model, highlighting critical paths, dependency clusters, and potential bottlenecks with impact assessments.

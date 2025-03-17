@@ -1,6 +1,5 @@
 use anyhow::Result;
 use pulldown_cmark::{html, Options, Parser};
-use crate::utils;
 use crate::config::Config;
 use crate::error::ReqFlowError;
 use std::path::PathBuf;
@@ -82,8 +81,6 @@ pub fn process_mermaid_diagrams(
         ).unwrap();
     }
 
-    // Use the folder of `file_path` as the base for relative links.
-    let file_dir = file_path.parent().unwrap_or(file_path).to_path_buf();
 
 
     MERMAID_REGEX.replace_all(html_content, |caps: &regex::Captures| {
@@ -129,7 +126,7 @@ pub fn process_mermaid_diagrams(
 /// Pre-processes markdown content to convert all markdown links with .md extension to .html 
 /// This is used to ensure all links in the generated HTML point to HTML files
 fn convert_markdown_links_to_html(
-    file_path: &PathBuf,
+    _file_path: &PathBuf,
     markdown_content: &str, 
     specification_folder: &PathBuf,
     external_folders: &[PathBuf],   

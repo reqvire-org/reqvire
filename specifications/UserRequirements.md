@@ -75,17 +75,9 @@ The system shall support a YAML-based configuration file that defines folder nam
   * refine: [UserStories.md/Managing MBSE Models](UserStories.md#managing-mbse-models)
 ---
 
-### Configurable SystemRequirements Folder Name
+### Configurable Specifications Folder
 
-The system shall allow users to configure the name of the SystemRequirements folder through the configuration file, supporting flexible project organization.
-
-#### Relations
-  * derivedFrom: [Project Configuration with YAML](#project-configuration-with-yaml)
----
-
-### Configurable DesignSpecifications Folder Name
-
-The system shall allow users to configure the DesignSpecifications folder name through the configuration file, with this name consistently applied across all model levels.
+The system shall allow users to configure the main specification folder through the configuration file, supporting flexible project organization.
 
 #### Relations
   * derivedFrom: [Project Configuration with YAML](#project-configuration-with-yaml)
@@ -97,6 +89,16 @@ The system shall support referencing folders that may exist in different reposit
 
 #### Relations
   * derivedFrom: [Project Configuration with YAML](#project-configuration-with-yaml)
+
+
+### Configurable External Folders
+
+The system shall allow users to configure the External folders through the configuration file.
+
+#### Relations
+  * refine: [Support for Distributed Requirements](#support-for-distributed-requirements)
+---
+
 
 ## Generate Diagrams
 ```mermaid
@@ -141,13 +143,6 @@ graph LR;
 ```
 ---
 
-### Automate Diagram Generation
-
-When requested the system shall automatically generate diagrams and save them to the required locations of the model, so that the diagrams are always accessible and up-to-date.
-
-#### Relations
-  * refine: [UserStories.md#Generate Diagrams](UserStories.md#generate-diagrams)
----
 
 ### Select Custom Diagram Viewpoints
 
@@ -180,6 +175,18 @@ The system shall provide visual representations of relationships within the MBSE
 #### Relations
   * refine: [UserStories.md/Generate Diagrams](UserStories.md#generate-diagrams)
 ---
+
+
+### Automate Diagram Generation
+
+When requested the system shall automatically generate diagrams and save them to the required locations of the model, so that the diagrams are always accessible and up-to-date.
+
+#### Relations
+  * derivedFrom: [Visualize Model Relationships](#visualize-model-relationships)
+---
+
+
+
 
 ### Filter Relationships by Type
 
@@ -595,20 +602,31 @@ graph LR;
 ```
 ---
 
-### Generate Relationship Reports
+### Model Reports
 
-The system shall generate reports summarizing the relationships in the MBSE model, including counts and types of connections.
+When requested the system shall provide human readable MBSE model reports.
 
 #### Relations
   * refine: [UserStories.md/Provide Reports](UserStories.md#provide-reports)
 ---
+
+
+### Model Structure and Summaries
+
+When requested the system shall generate reports summarizing the structure and relationships in the MBSE model, including counts and types of connections.
+
+#### Relations
+  * derivedFrom: [Model Reports](#model-reports)
+---
+
 
 ### Generate Structural Change Reports
 
 The system shall generate detailed reports summarizing the impact of structural changes, including affected relationships and components.
 
 #### Relations
-  * refine: [UserStories.md/Provide Reports](UserStories.md#provide-reports)
+  * derivedFrom: [Model Reports](#model-reports)
+  
 ---
 
 ### Provide Validation Reports
