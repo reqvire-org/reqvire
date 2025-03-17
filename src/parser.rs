@@ -30,7 +30,7 @@ pub fn parse_elements(file: &str, content: &str, file_path: &PathBuf,  specifica
         if trimmed.starts_with("## ") {
             // Extract section name and update tracking variable
             current_section_name = trimmed[3..].trim();
-            debug!("Switched to section: {}", current_section_name);
+
             
         }else if trimmed.starts_with("### ") {
             // Save previous element
@@ -107,7 +107,6 @@ pub fn parse_elements(file: &str, content: &str, file_path: &PathBuf,  specifica
         } else if in_metadata_section {
             // Strictly allow only metadata lines (e.g., "* key: value")
             if !trimmed.starts_with("* ") {
-                debug!("Detected non-metadata line, exiting Metadata section.");
                 in_metadata_section = false;
             } else if let Some(element) = &mut current_element {
                 if let Some((key, value)) = utils::parse_metadata_line(trimmed) {
@@ -129,7 +128,6 @@ pub fn parse_elements(file: &str, content: &str, file_path: &PathBuf,  specifica
         
             // Strictly allow only relation lines (e.g., "* derivedFrom: identifier")
             if !trimmed.starts_with("* ") {
-                debug!("Detected non-relation line, exiting Relations section.");
                 in_relations_section = false;
             } else if let Some(element) = &mut current_element {            
                 if let Ok((relation_type, (text, link))) = utils::parse_relation_line(trimmed) {

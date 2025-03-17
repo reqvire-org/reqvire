@@ -72,10 +72,19 @@ pub fn scan_markdown_files(
 
 
 /// Gets the relative path of a file
-pub fn get_relative_path(path: &Path, base: &Path) -> Result<PathBuf, ReqFlowError> {
-    path.strip_prefix(base)
-        .map_err(|_| ReqFlowError::PathError(format!("Failed to determine relative path: {}", path.display())))
-        .map(|p| p.to_path_buf())
+pub fn get_relative_path(path: &Path, specification_folder: &Path, external_folders: &[PathBuf]) -> Result<PathBuf, ReqFlowError> {
+    if let Ok(relative) = path.strip_prefix(specification_folder) {
+        return Ok(relative.to_path_buf());
+    }
+    for ext in external_folders {
+        if let Ok(relative) = path.strip_prefix(ext) {
+            return Ok(relative.to_path_buf());
+        }
+    }
+    Err(ReqFlowError::PathError(format!(
+        "Failed to determine relative path: {}",
+        path.display()
+    )))
 }
 
 
@@ -96,19 +105,26 @@ pub fn normalize_identifier(
 
     let (path, fragment_opt) = extract_path_and_fragment(identifier);
 
-    let normalized_path = normalize_path(path, base_path, specifications_folder, external_folders)?;
+    
+    let result=match normalize_path(path, base_path, specifications_folder, external_folders){
+        Ok(normalized_path) => {     
+            // Normalize element name into GitHub-style fragment
+            if let Some(fragment) = fragment_opt{
+                let normalized_fragment = fragment
+                    .trim()
+                    .to_lowercase()
+                    .replace(' ', "-")     // Replace spaces with hyphens
+                    .replace(['(', ')', ',', ':'], ""); // Remove disallowed characters
+                Ok(format!("{}#{}", normalized_path, normalized_fragment))            
+            }else{
+                Ok(normalized_path)
+            }            
+        },
+        Err(e) => Err(e)
+    };
+    
+    result
 
-    // Normalize element name into GitHub-style fragment
-    if let Some(fragment) = fragment_opt{
-        let normalized_fragment = fragment
-            .trim()
-            .to_lowercase()
-            .replace(' ', "-")     // Replace spaces with hyphens
-            .replace(['(', ')', ',', ':'], ""); // Remove disallowed characters
-        Ok(format!("{}#{}", normalized_path, normalized_fragment))            
-    }else{
-        Ok(normalized_path)
-    }
 }
 
 
@@ -133,10 +149,9 @@ pub fn normalize_path(
         return Ok(path_str.to_string());
     }
 
-
     // If the path is already absolute, return it but normalize if needed
     if path.is_absolute() {
-    
+            
         if let Some(spec_folder_name) = specifications_folder.file_name() {
             let spec_folder_str = spec_folder_name.to_string_lossy();        
             if path_str.starts_with(&format!("/{}", spec_folder_str)) {
@@ -164,17 +179,19 @@ pub fn normalize_path(
     // Convert relative path to absolute
     let absolute_path = PathBuf::from(base_path).join(path_str);
 
-    // Convert to canonical absolute path
-    let canonical_path = absolute_path
-        .canonicalize()
-        .map_err(|e| ReqFlowError::PathError(format!(
-            "Failed to normalize path '{}': {}", 
-            path_str, 
-            e
-        )))?;
-
+    // Explicitly canonicalize the path and handle any errors.
+    let canonical_path = match absolute_path.canonicalize() {
+        Ok(path) => path,
+        Err(e) => {
+            return Err(ReqFlowError::PathError(format!(
+                "Failed to normalize path'{}': {}",
+                absolute_path.to_string_lossy(), e
+            )))
+        }
+    };
+    
+    
     let normalized_path = canonical_path.to_string_lossy().to_string();
-
     return Ok(normalized_path);
 
 }

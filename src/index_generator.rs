@@ -95,7 +95,7 @@ fn generate_section_slug(section: &str) -> String {
 /// Computes a relative path to a file from the specification root
 fn get_relative_path(file: &str, specification_folder: &PathBuf,external_folders: &[PathBuf]) -> String {
 
-    let relative_path = utils::to_relative_identifier(&file, specification_folder,specification_folder,external_folders);
+    let _relative_path = utils::to_relative_identifier(&file, specification_folder,specification_folder,external_folders);
     
     let file_path = Path::new(file);
     match file_path.strip_prefix(specification_folder) {

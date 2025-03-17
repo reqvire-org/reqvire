@@ -3,6 +3,53 @@
 This document verifies the requirements for the ReqFlow initialization command.
 
 ## Initialization
+```mermaid
+graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+
+  ded065cba0["Alternative Configuration Format Test"];
+  click ded065cba0 "InitCommand.md#alternative-configuration-format-test";
+  class ded065cba0 verification;
+  714d92f4ec["../SystemRequirements/Requirements.md#Initialization Command Configuration Check"];
+  class 714d92f4ec default;
+  click 714d92f4ec "../SystemRequirements/Requirements.md#initialization-command-configuration-check";
+  ded065cba0 -->|verifies| 714d92f4ec;
+  16c44ab644["tests/e2e-init/test_init_dot_reqflow.sh"];
+  class 16c44ab644 default;
+  click 16c44ab644 "../../../../../tests/e2e-init/test_init_dot_reqflow.sh";
+  ded065cba0 -->|traces| 16c44ab644;
+  5598547396["Basic Initialization Test"];
+  click 5598547396 "InitCommand.md#basic-initialization-test";
+  class 5598547396 verification;
+  2294a7e703["../SystemRequirements/Requirements.md#Initialization Command"];
+  class 2294a7e703 default;
+  click 2294a7e703 "../SystemRequirements/Requirements.md#initialization-command";
+  5598547396 -->|verifies| 2294a7e703;
+  689824eae1["tests/e2e-init/test_init_success.sh"];
+  class 689824eae1 default;
+  click 689824eae1 "../../../../../tests/e2e-init/test_init_success.sh";
+  5598547396 -->|traces| 689824eae1;
+  b34b4c38b7["Existing Configuration Detection Test (YML)"];
+  click b34b4c38b7 "InitCommand.md#existing-configuration-detection-test-yml";
+  class b34b4c38b7 verification;
+  b34b4c38b7 -->|verifies| 714d92f4ec;
+  a4882eec03["tests/e2e-init/test_init_existing_yml.sh"];
+  class a4882eec03 default;
+  click a4882eec03 "../../../../../tests/e2e-init/test_init_existing_yml.sh";
+  b34b4c38b7 -->|traces| a4882eec03;
+  92cc4429d1["Existing Configuration Detection Test (YAML)"];
+  click 92cc4429d1 "InitCommand.md#existing-configuration-detection-test-yaml";
+  class 92cc4429d1 verification;
+  92cc4429d1 -->|verifies| 714d92f4ec;
+  58b5d18e25["tests/e2e-init/test_init_existing_yaml.sh"];
+  class 58b5d18e25 default;
+  click 58b5d18e25 "../../../../../tests/e2e-init/test_init_existing_yaml.sh";
+  92cc4429d1 -->|traces| 58b5d18e25;
+```
 
 
 ### Basic Initialization Test
