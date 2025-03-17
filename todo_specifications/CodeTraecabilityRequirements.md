@@ -26,7 +26,7 @@ Where:
 - `<element identifier>` is the identifier of the requirement being traced.
 
 #### Relations
-  * refine: [/specifications/UserRequirements#Code Traceability](../UserRequirements.md#code-traceability)
+  * refine: [../specifications/UserRequirements#Code Traceability](../specifications/UserRequirements.md#code-traceability)
 
 ---
 

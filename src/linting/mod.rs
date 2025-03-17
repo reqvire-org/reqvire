@@ -26,7 +26,7 @@ pub fn run_linting(
     debug!("Found {} markdown files to update with diagrams", files.len());
 
     for (file_path,_) in files {        
-         // No need for `.map_err()` - automatically converts `std::io::Error` to `ReqFlowError::IoError`
+
          let mut file_content = fs::read_to_string(&file_path)?;
          let suggestions = lint_file_content(&file_content, &file_path)?;
 

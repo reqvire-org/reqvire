@@ -1,10 +1,5 @@
 use std::fs;
 use std::path::{Path, PathBuf};
-use walkdir::WalkDir;
-use log::{debug, info};
-use rayon::prelude::*;
-
-
 use crate::html;
 use crate::error::ReqFlowError;
 use crate::utils;
@@ -19,7 +14,7 @@ pub fn export_markdown_to_html(
     let mut processed_count = 0;
 
     // Process the main specification folder
-    processed_count += process_markdown_folder(specification_folder, specification_folder, &[specification_folder.clone()], output_folder)?;
+    processed_count += process_markdown_folder(specification_folder, specification_folder,external_folders, output_folder)?;
 
     // Process each external folder
     for folder in external_folders {
@@ -68,7 +63,7 @@ fn export_file_to_html(
     // Read the markdown content
     let content = fs::read_to_string(file_path)?;
 
-    // Get the file name for the title
+    // Get the file name for the titleconvert_to_html
     let file_name = file_path.file_name()
         .ok_or_else(|| ReqFlowError::ValidationError("Invalid file path".to_string()))?
         .to_string_lossy();
@@ -76,7 +71,7 @@ fn export_file_to_html(
     let title = file_name.replace(".md", "");
 
     // Convert Markdown to HTML
-    let html_content = html::convert_to_html(&content, &title, specification_folder, external_folders,&output_folder.to_path_buf())?;
+    let html_content = html::convert_to_html(&file_path.to_path_buf(), &content, &title, specification_folder, external_folders)?;
 
     // Determine the relative path
     let file=file_path.to_string_lossy().to_owned();

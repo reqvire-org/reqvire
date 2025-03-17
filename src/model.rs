@@ -65,7 +65,7 @@ impl ModelManager {
                     debug!("Markdown File found: {}", file_name.to_string_lossy());
 
                     let file_content = fs::read_to_string(&path)?;
-                    let relative_path = utils::get_relative_path(&path, specification_folder)?;
+                    let relative_path = utils::get_relative_path(&path, specification_folder, external_folders)?;
                     let relative_path_str = relative_path.to_string_lossy().to_string();
     
                     self.file_contents.insert(relative_path_str.clone(), file_content.clone());
@@ -88,7 +88,7 @@ impl ModelManager {
                                 }
                             }
                         }
-                        Err(parse_errors) => errors.extend(parse_errors),
+                        Err(parse_errors) => errors.extend(parse_errors.into_iter()),
                     }
                 },
                 _ => {                
@@ -100,7 +100,7 @@ impl ModelManager {
         }
 
         // Validate Relations
-        errors.extend(self.validate_relations()?);
+        errors.extend(self.validate_relations(excluded_filename_patterns)?);
 
         // Validate Cross-Component Dependencies
         errors.extend(self.validate_cross_component_dependencies()?);
@@ -110,20 +110,36 @@ impl ModelManager {
     }
 
     /// Validates relations inside the `ElementRegistry`
-    fn validate_relations(&self) -> Result<Vec<ReqFlowError>, ReqFlowError> {
+    fn validate_relations(&self,excluded_filename_patterns: &GlobSet) -> Result<Vec<ReqFlowError>, ReqFlowError> {
         debug!("Validating relations...");
         let mut errors = Vec::new();
 
         for element in self.element_registry.get_all_elements() {
             for relation in &element.relations {
             
+            
                 // Only validate if the relation target is an Identifier
                 if let LinkType::Identifier(ref identifier) = relation.target.link {
+
+                    // Skip validation if the identifier is not a markdown file.
+                    if !identifier.ends_with(".md") {
+                        log::debug!("Skipping validation for non-markdown identifier: {}", identifier);
+                        continue;
+                    }
+            
+                    // Skip validation if the identifier is in an excluded folder/file pattern.
+                    if excluded_filename_patterns.is_match(identifier) {
+                        log::debug!("Skipping validation for excluded identifier: {}", identifier);
+                       continue;
+                    }
+                            
+                    // Validate: if the element is not found in the registry, add an error.
                     if self.element_registry.get_element(identifier).is_err() {
                         errors.push(ReqFlowError::MissingRelationTarget(
                             format!("Element '{}' references missing target '{}'", element.identifier, identifier),
                         ));
                     }
+
                 }else{
                     log::debug!("Skipping external target {}",relation.target.link.as_str());
                 }            
