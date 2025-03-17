@@ -7,6 +7,8 @@ use crate::error::ReqFlowError;
 use crate::{html_export, linting, model::ModelManager};
 use crate::index_generator;
 use globset::GlobSet;
+use crate::reports;
+
 
 #[derive(Parser, Debug)]
 #[clap(author,version, about = "Reqflow MBSE model management tool", long_about = None)]
@@ -48,8 +50,12 @@ pub struct Args {
     /// Generate index document with links and summaries to all documents
     #[clap(long)]
     pub generate_index: bool,
-    
+
+    /// Output model registry and summary
+    #[clap(long)]
+    pub model_summary: bool,
         
+      
     /// Path to a custom configuration file (YAML format)
     /// If not provided, the system will look for reqflow.yml, reqflow.yaml, 
     /// .reqflow.yml, or .reqflow.yaml in the current directory
@@ -130,7 +136,6 @@ pub fn handle_command(
   
         let parse_result=model_manager.parse_and_validate(&specification_folder_path, &external_folders_path,excluded_filename_patterns);
 
-        model_manager.element_registry.print_registry();
         if args.validate {
             match parse_result {
                 Ok(errors) => {
@@ -160,7 +165,11 @@ pub fn handle_command(
             info!("Requirements diagrams updated in source files");
             return Ok(0);
             
+        }else if args.model_summary {
+            reports::print_registry_summary(&model_manager.element_registry);
+            return Ok(0);        
             
+                          
         }else if args.lint {
             linting::run_linting(&specification_folder_path, &external_folders_path,excluded_filename_patterns, args.dry_run)?;
             return Ok(0);
@@ -225,6 +234,7 @@ mod tests {
             generate_matrix: false,
             generate_diagrams: false,
             generate_index: false,
+            model_summary: false,
             validate: false,
             config: None, // No custom config file for the test
         };

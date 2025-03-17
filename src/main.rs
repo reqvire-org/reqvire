@@ -13,6 +13,8 @@ pub mod html;
 pub mod filesystem;
 pub mod diagrams;
 pub mod index_generator;
+pub mod reports;
+
 
 use log::error;
 use crate::model::ModelManager;
