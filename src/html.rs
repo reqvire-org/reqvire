@@ -1,11 +1,20 @@
 use anyhow::Result;
 use pulldown_cmark::{html, Options, Parser};
-
+use crate::utils;
 use crate::config::Config;
 use crate::error::ReqFlowError;
+use std::path::PathBuf;
+use lazy_static::lazy_static;
+use regex::Regex;
 
 /// Convert markdown content to styled HTML with additional processing
-pub fn convert_to_html(markdown_content: &str, title: &str) -> Result<String, ReqFlowError> {
+pub fn convert_to_html(
+    markdown_content: &str, 
+    title: &str,
+    specification_folder: &PathBuf,
+    external_folders: &[PathBuf],   
+    output_folder: &PathBuf,     
+) -> Result<String, ReqFlowError> {
     // First, convert all Markdown links to use .html extension
     let markdown_content_with_html_links = convert_markdown_links_to_html(markdown_content);
     
@@ -27,7 +36,7 @@ pub fn convert_to_html(markdown_content: &str, title: &str) -> Result<String, Re
     let html_with_anchors = add_anchor_ids(&html_output);
     
     // Process mermaid diagrams for proper rendering
-    let html_with_mermaid = process_mermaid_diagrams(&html_with_anchors);
+    let html_with_mermaid = process_mermaid_diagrams(&html_with_anchors, specification_folder, external_folders,output_folder );
     
     // Insert into HTML template
     let html_document = Config::html_template()
@@ -56,40 +65,59 @@ fn add_anchor_ids(html_content: &str) -> String {
         .to_string()
 }
 
-/// Process mermaid diagrams to ensure they render correctly in HTML
-/// Also handles conversion of .md links to .html links within the diagrams
-pub fn process_mermaid_diagrams(html_content: &str) -> String {
-    use regex::Regex;
-    
-    lazy_static::lazy_static! {
+/// Process Mermaid diagrams to ensure links point to the correct `.html` files.
+/// Uses `to_relative_identifier` to correctly resolve paths.
+pub fn process_mermaid_diagrams(
+    html_content: &str,
+    specification_folder: &PathBuf,
+    external_folders: &[PathBuf],
+    output_folder: &PathBuf,    
+) -> String {
+
+    lazy_static! {
         static ref MERMAID_REGEX: Regex = Regex::new(r#"<pre><code class="language-mermaid">([\s\S]*?)</code></pre>"#).unwrap();
-        // Add regex to fix mermaid click links - convert .md to .html in click statements
-        // This pattern captures parent directory references (../../) correctly
-        static ref MERMAID_CLICK_REGEX: Regex = Regex::new(r#"(click\s+\S+\s+&quot;)([^&\#"]*)\.md((?:#[^&"]*)?&quot;)"#).unwrap();
+        
+        static ref MERMAID_CLICK_REGEX: Regex = Regex::new(
+            r#"(click\s+\S+\s+&quot;)([^&\#"]+\.[a-zA-Z0-9]+)((?:#[^&"]*)?&quot;)"#
+        ).unwrap();
     }
-    
-    // First extract the mermaid content
-    let with_div = MERMAID_REGEX
-        .replace_all(html_content, |caps: &regex::Captures| {
-            let diagram_content = &caps[1];
-            
-            // Convert any .md links in the diagram to .html
-            let fixed_content = MERMAID_CLICK_REGEX.replace_all(diagram_content, |caps: &regex::Captures| {
-                let prefix = &caps[1];   // "click ID "
-                let path = &caps[2];     // path part before .md
-                let suffix = &caps[3];   // #anchor" part
-                
-                format!("{}{}.html{}", prefix, path, suffix)
-            });
-            
-            format!(
-                r#"<div class="mermaid">{}</div>"#,
-                fixed_content
-            )
-        })
-        .to_string();
-    
-    with_div
+
+
+    MERMAID_REGEX.replace_all(html_content, |caps: &regex::Captures| {
+        let diagram_content = &caps[1];        // Convert Markdown links inside Mermaid diagrams to correct HTML paths
+        
+        let fixed_content = MERMAID_CLICK_REGEX.replace_all(diagram_content, |caps: &regex::Captures| {
+            let prefix = &caps[1];   // "click ID "
+            let full_filename = caps[2].to_string(); // Extracted full filename with extension
+            let fragment = &caps[3]; // Optional hash fragment (e.g., `#section"`)
+
+            // Determine the correct base path for the file
+            let base_path = if external_folders.iter().any(|folder| full_filename.starts_with(folder.to_string_lossy().as_ref())) {
+                // If the file is in an external folder, find which one
+                external_folders.iter()
+                    .find(|folder| full_filename.starts_with(folder.to_string_lossy().as_ref()))
+                    .unwrap_or(specification_folder) // Default fallback
+            } else {
+                specification_folder
+            };
+
+
+            // Convert the Markdown file reference to the correct `.html` path
+            let converted_path = match utils::to_relative_identifier(
+                &full_filename,
+                output_folder,  // Use correct base path depending on location
+                output_folder,
+                external_folders,
+            ) {
+                Ok(mut relative_path) => relative_path.replace(".md", ".html"),
+                Err(_) =>  full_filename.clone(),
+            };
+
+            format!("{}{}{}", prefix, converted_path, fragment)
+        });
+
+        format!(r#"<div class="mermaid">{}</div>"#, fixed_content)
+    }).to_string()
 }
 
 /// Convert all markdown links from .md to .html for HTML output

@@ -9,10 +9,10 @@ pub mod utils;
 pub mod parser;
 pub mod html_export;
 pub mod linting;
-pub mod init;
 pub mod html;
 pub mod filesystem;
 pub mod diagrams;
+pub mod index_generator;
 
 use log::error;
 use crate::model::ModelManager;

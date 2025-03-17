@@ -105,7 +105,6 @@ impl ModelManager {
         // Validate Cross-Component Dependencies
         errors.extend(self.validate_cross_component_dependencies()?);
 
-        //self.element_registry.debug_print_registry();
         
         Ok(errors)
     }

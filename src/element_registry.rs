@@ -59,30 +59,56 @@ impl ElementRegistry {
 
         errors
     }
-    /// Prints all elements in the registry along with their relations.
-    pub fn debug_print_registry(&self) {
+    /// Prints all elements in the registry grouped by file and then by section
+    pub fn print_registry(&self) {
         println!("--- Element Registry Debug Print ---");
-        for (identifier, element) in &self.elements {
-            println!("Element: {}", identifier);
-            
-            if element.relations.is_empty() {
-                println!("  No relations.");
-            } else {
-                println!("  Relations:");
-                for relation in &element.relations {
-                    match &relation.target.link {
-                        LinkType::Identifier(target_id) => {
-                            println!("    - {} (Identifier)", target_id);
-                        }
-                        LinkType::ExternalUrl(url) => {
-                            println!("    - {} (External URL)", url);
+
+        // Group elements by file_path and then by section
+        let mut grouped_elements: HashMap<String, HashMap<String, Vec<&Element>>> = HashMap::new();
+
+        for element in self.elements.values() {
+            grouped_elements
+                .entry(element.file_path.clone()) // Group by file path
+                .or_insert_with(HashMap::new)
+                .entry(element.section.clone()) // Group by section inside file
+                .or_insert_with(Vec::new)
+                .push(element);
+        }
+
+        // Print elements in a structured format
+        for (file_path, sections) in grouped_elements {
+            println!("📂 File: {}", file_path);
+
+            for (section, elements) in sections {
+                println!("  📖 Section: {}", section);
+
+                for element in elements {
+                    println!("    🔹 Element: {}", element.identifier);
+                    println!("      - Name: {}", element.name);
+                    println!("      - File: {}", element.file_path); // Include file of the element
+                    println!("      - Type: {:?}", element.element_type);
+                    
+                    if element.relations.is_empty() {
+                        println!("      - No relations.");
+                    } else {
+                        println!("      - Relations:");
+                        for relation in &element.relations {
+                            match &relation.target.link {
+                                LinkType::Identifier(target_id) => {
+                                    println!("        ↪ {} (Identifier)", target_id);
+                                }
+                                LinkType::ExternalUrl(url) => {
+                                    println!("        🔗 {} (External URL)", url);
+                                }
+                            }
                         }
                     }
+                    println!(); // Add spacing for readability
                 }
             }
-            println!(); // Add spacing between elements for readability
         }
+
         println!("------------------------------------");
-    }    
+    }
 }
 
