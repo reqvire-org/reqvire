@@ -97,6 +97,14 @@ pub fn process_mermaid_diagrams(
 
         let mut modified_filename = full_filename.to_string();
 
+        if let Some(spec_name) = specification_folder.file_name().and_then(|s| s.to_str()) {
+                // Construct the needle as "/SPECIFICATION_FOLDER_NAME/"
+                let needle = format!("/{}/", spec_name);
+                // And the replacement is simply "/"
+                let replacement = format!("/");
+                // Perform a simple string replacement.
+                modified_filename = modified_filename.replace(&needle, &replacement);       
+        }     
         for ext in external_folders {
             if let Some(ext_name) = ext.file_name().and_then(|s| s.to_str()) {
                 // Construct the needle as "../EXTERNAL_FOLDER_NAME/"
@@ -139,23 +147,36 @@ fn convert_markdown_links_to_html(
         // Match link text that refers to .md files: [path/to/file.md]
         static ref MD_LINK_TEXT_REGEX: Regex = Regex::new(r"\[([^]]+)\.md\]").unwrap();
     }
-    
-    // Helper function: If a link contains a pattern like "../EXTERNAL_FOLDER_NAME/",
+
+    // Helper function: If a link contains a pattern like "../SPECIFICATION_FOLDER_NAME/",
+    // remove the preceding "SPECIFICATION_FOLDER_NAME" so that it becomes "../".       
+    // If a link contains a pattern like "../EXTERNAL_FOLDER_NAME/",
     // remove the preceding "../" so that it becomes "/EXTERNAL_FOLDER_NAME/".
-    fn fix_link_path(link: &str, external_folders: &[std::path::PathBuf]) -> String {
+    fn fix_link_path(link: &str, specification_folder: &PathBuf, external_folders: &[std::path::PathBuf]) -> String {
         let mut fixed = link.to_string();
-        for ext in external_folders {
-            if let Some(ext_name) = ext.file_name().and_then(|s| s.to_str()) {
-                // Define the needle we're looking for:
-                let needle = format!("../{}/", ext_name);
-                // Define the replacement (i.e. without the preceding "../")
-                let replacement = format!("/{}/", ext_name);
-                // A simple string-level replacement.
-                fixed = fixed.replace(&needle, &replacement);
+        
+        if let Some(spec_name) = specification_folder.file_name().and_then(|s| s.to_str()) {
+            let needle = format!("/{}/", spec_name);
+            // Define the replacement (i.e. without the preceding "../")
+            let replacement = "/";
+            // A simple string-level replacement.
+            fixed = fixed.replace(&needle, &replacement);
+        }else{
+                  
+            for ext in external_folders {
+                if let Some(ext_name) = ext.file_name().and_then(|s| s.to_str()) {
+                    // Define the needle we're looking for:
+                    let needle = format!("../{}/", ext_name);
+                    // Define the replacement (i.e. without the preceding "../")
+                    let replacement = format!("/{}/", ext_name);
+                    // A simple string-level replacement.
+                    fixed = fixed.replace(&needle, &replacement);
+                }
             }
         }
         fixed
     }
+    
     
     // Process links with hash fragments.
     let content = MD_LINK_WITH_HASH_REGEX.replace_all(markdown_content, |caps: &regex::Captures| {
@@ -164,7 +185,7 @@ fn convert_markdown_links_to_html(
         let fragment = &caps[3];  // the hash fragment, e.g. "#section"
         let suffix   = &caps[4];  // the closing ")"
         
-        let fixed_link = fix_link_path(link, external_folders);
+        let fixed_link = fix_link_path(link, specification_folder, external_folders);
         format!("{}{}.html{}{}", prefix, fixed_link, fragment, suffix)
     });
     
@@ -174,7 +195,7 @@ fn convert_markdown_links_to_html(
         let link   = &caps[2];
         let suffix = &caps[3];
         
-        let fixed_link = fix_link_path(link, external_folders);
+        let fixed_link = fix_link_path(link, specification_folder, external_folders);
         format!("{}{}.html{}", prefix, fixed_link, suffix)
     });
 
@@ -195,42 +216,50 @@ fn convert_markdown_links_to_html(
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+    use std::path::PathBuf;
+
     #[test]
     fn test_convert_markdown_links_to_html_with_parent_paths() {
-        // Test with relative paths containing parent directory references
+        // Test with relative paths containing parent directory references.
         let markdown = r#"
 - [Normal Link](file.md)
 - [Parent Link](../parent.md)
 - [Multiple Parents](../../grandparent.md)
-- [Element in Parent](../other.md/Element)
+- [Element in Parent](../other.md#element)
 - [Element with Hash](../something.md#header)
 - * satisfiedBy: [DesignSpecifications/DirectMessages.md](DesignSpecifications/DirectMessages.md)
 "#;
-        
-        let html = convert_markdown_links_to_html(markdown);
+        // Dummy file path.
+        let file_path = &PathBuf::from("dummy.md");
+        // Use "DesignSpecifications" as the specification folder.
+        let specification_folder = &PathBuf::from("./");
+        // Provide an external folder that does not interfere with these links.
+        let external_folders: Vec<PathBuf> = vec![PathBuf::from("external")];
+
+        let html = convert_markdown_links_to_html(file_path, markdown, specification_folder, &external_folders);
         println!("Converted HTML: {}", html);
         
-        // Check that all links are converted properly
+        // Check that no link still contains ".md".
         assert!(!html.contains("file.md"));
         assert!(!html.contains("../parent.md"));
         assert!(!html.contains("../../grandparent.md"));
-        assert!(!html.contains("../other.md/Element"));
+        assert!(!html.contains("../other.md#element"));
         assert!(!html.contains("../something.md#header"));
         assert!(!html.contains("DesignSpecifications/DirectMessages.md"));
         
-        // Check that they're converted to HTML
+        // Check that links are converted to .html.
         assert!(html.contains("file.html"));
         assert!(html.contains("../parent.html"));
         assert!(html.contains("../../grandparent.html"));
         assert!(html.contains("../other.html#element"));
         assert!(html.contains("../something.html#header"));
+        // Specification folder links remain intact.
         assert!(html.contains("DesignSpecifications/DirectMessages.html"));
     }
     
     #[test]
     fn test_process_mermaid_diagrams_with_parent_paths() {
-        // Test with mermaid diagrams containing parent directory references
+        // Test with mermaid diagrams containing parent directory references.
         let html_with_mermaid = r#"<pre><code class="language-mermaid">
 graph TD;
     A[Start] --> B[End];
@@ -238,13 +267,18 @@ graph TD;
     click B &quot;../another/file.md&quot;;
 </code></pre>"#;
         
-        let processed = process_mermaid_diagrams(html_with_mermaid);
+        let file_path = &PathBuf::from("dummy.md");
+        // For testing, use a specification folder and external folder that do not affect these links.
+        let specification_folder = &PathBuf::from("DesignSpecifications");
+        let external_folders: Vec<PathBuf> = vec![PathBuf::from("external")];
+
+        let processed = process_mermaid_diagrams(file_path, html_with_mermaid, specification_folder, &external_folders);
         
-        // Check that all links are converted properly
+        // Check that original .md links are not present.
         assert!(!processed.contains("../../path/to/file.md#section"));
         assert!(!processed.contains("../another/file.md"));
         
-        // Check that they're converted to HTML
+        // Check that they're converted to .html.
         assert!(processed.contains("../../path/to/file.html#section"));
         assert!(processed.contains("../another/file.html"));
     }

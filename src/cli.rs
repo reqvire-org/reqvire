@@ -224,6 +224,7 @@ mod tests {
             json: false,
             generate_matrix: false,
             generate_diagrams: false,
+            generate_index: false,
             validate: false,
             config: None, // No custom config file for the test
         };

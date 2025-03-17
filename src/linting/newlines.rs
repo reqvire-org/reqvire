@@ -3,40 +3,66 @@ use regex::Regex;
 use lazy_static::lazy_static;
 use crate::linting::{LintSuggestion, LintType, LintFix};
 
-/// Find inconsistent newlines before subsections in markdown content
+/// Enforces that every header (levels 1–4) in the markdown content is preceded
+/// by exactly one blank line. If not, a suggestion is generated using LintType::InconsistentNewlines.
+/// Note: This check only looks *before* headers.
 pub fn find_inconsistent_newlines(content: &str, file_path: &Path) -> Vec<LintSuggestion> {
     lazy_static! {
-        // Match subsection headers (level 4)
-        static ref SUBSECTION_REGEX: Regex = Regex::new(r"^####\s+(.+)$").unwrap();
+        // Match headers (levels 1–4) with optional leading whitespace.
+        static ref HEADER_REGEX: Regex = Regex::new(r"^\s*(#{1,4})\s+(.+)$").unwrap();
     }
     
     let mut suggestions = Vec::new();
     let lines: Vec<&str> = content.lines().collect();
     
-    for (i, line) in lines.iter().enumerate() {
-        // Skip the first line since we need to check what's before it
-        if i == 0 {
-            continue;
-        }
-        
-        // Check if this is a subsection header
-        if let Some(capture) = SUBSECTION_REGEX.captures(line) {
-            let subsection_name = capture[1].trim();
-            let prev_line = lines[i - 1];
+    // Iterate over all lines.
+    for i in 0..lines.len() {
+        if let Some(caps) = HEADER_REGEX.captures(lines[i]) {
+            let header_text = caps.get(2).unwrap().as_str().trim();
+            // Skip headers at the very start of the document.
+            if i == 0 {
+                continue;
+            }
             
-            // Check if there should be a blank line before subsection
-            if !prev_line.trim().is_empty() && i > 1 && !prev_line.trim().starts_with("#") {
-                // Create a fix by adding a blank line
-                // (We don't need the actual joined content here, just the pattern and replacement for this specific line)
-                
+            // Walk backward from the header to count consecutive blank lines.
+            let mut blank_count = 0;
+            let mut k = i;
+            while k > 0 {
+                k -= 1;
+                if lines[k].trim().is_empty() {
+                    blank_count += 1;
+                } else {
+                    break;
+                }
+            }
+            
+            // If there is not exactly one blank line, we need a suggestion.
+            if blank_count == 0 {
+                // No blank line: insert one between previous line and the header.
+                let prev_line = lines[i - 1];
                 suggestions.push(LintSuggestion::new(
                     LintType::InconsistentNewlines,
                     file_path.to_path_buf(),
-                    Some(i + 1), // Line numbers are 1-based for users
-                    format!("Missing blank line before subsection '{}'", subsection_name),
+                    Some(i + 1), // header line (1-indexed)
+                    format!("Missing blank line before header '{}'", header_text),
                     LintFix::ReplacePattern {
-                        pattern: format!("{}\n{}", prev_line, line),
-                        replacement: format!("{}\n\n{}", prev_line, line),
+                        pattern: format!("{}\n{}", prev_line, lines[i]),
+                        replacement: format!("{}\n\n{}", prev_line, lines[i]),
+                    },
+                ));
+            } else if blank_count > 1 {
+                // Too many blank lines: create a string that represents the actual blank block.
+                // For example, if blank_count is 2, then the actual block is "\n\n".
+                let pattern = "\n".repeat(blank_count);
+                let replacement = "\n".to_string(); // exactly one blank line.
+                suggestions.push(LintSuggestion::new(
+                    LintType::InconsistentNewlines,
+                    file_path.to_path_buf(),
+                    Some(k + 2), // starting at the first blank line (1-indexed)
+                    format!("Excess blank lines before header '{}'", header_text),
+                    LintFix::ReplacePattern {
+                        pattern,
+                        replacement,
                     },
                 ));
             }
@@ -46,49 +72,67 @@ pub fn find_inconsistent_newlines(content: &str, file_path: &Path) -> Vec<LintSu
     suggestions
 }
 
+
+
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::path::PathBuf; // Used in tests
-    
-    #[test]
-    fn test_find_inconsistent_newlines() {
-        let content = r#"# Test Document
-        
-### Element Name
-Content here.
-#### Subsection Without Blank Line
-This should have a blank line before it.
+    use std::path::PathBuf;
 
-#### Subsection With Blank Line
-This is fine.
+    #[test]
+    fn test_missing_blank_line_before_header() {
+        // In this test the header "## Second Header" is immediately preceded by content.
+        let content = r#"# Test Document
+Content preceding header.
+## Second Header
+More content.
 "#;
-        
         let file_path = PathBuf::from("test.md");
         let suggestions = find_inconsistent_newlines(content, &file_path);
-        
+        // Expect one suggestion for the missing blank line before "## Second Header".
         assert_eq!(suggestions.len(), 1);
-        assert_eq!(suggestions[0].suggestion_type, LintType::InconsistentNewlines);
-        assert!(suggestions[0].description.contains("Subsection Without Blank Line"));
+        assert!(suggestions[0].description.contains("Missing blank line before header"));
     }
-    
+
     #[test]
-    fn test_no_issue_with_consistent_newlines() {
-        let content = r#"# Test Document
-        
-### Element Name
-Content here.
+    fn test_excess_blank_lines_before_header() {
+        // In this test, there are two consecutive blank lines before "## Second Header".
+        // Lines (ignoring leading/trailing spaces):
+        // 0: "# Header"
+        // 1: "Some content."
+        // 2: ""         (blank)
+        // 3: "   "      (blank with spaces)
+        // 4: "## Second Header"
+        // 5: "More content."
+        let content = r#"# Header
+Some content.
 
-#### Subsection With Blank Line
-This is fine.
-
-#### Another Subsection With Blank Line
-This is also fine.
+   
+## Second Header
+More content.
 "#;
-        
         let file_path = PathBuf::from("test.md");
         let suggestions = find_inconsistent_newlines(content, &file_path);
-        
+        // Expect one suggestion for excess blank lines before "## Second Header".
+        assert_eq!(suggestions.len(), 1);
+        assert!(suggestions[0].description.contains("Excess blank lines before header"));
+    }
+
+    #[test]
+    fn test_no_issue_with_consistent_blank_line_before_header() {
+        // Here, every header is preceded by exactly one blank line.
+        let content = r#"# Test Document
+
+Content here.
+
+## Second Header
+
+More content.
+"#;
+        let file_path = PathBuf::from("test.md");
+        let suggestions = find_inconsistent_newlines(content, &file_path);
+        // There should be no suggestions when formatting is correct.
         assert_eq!(suggestions.len(), 0);
     }
 }
+

@@ -131,6 +131,8 @@ pub enum LintType {
     MissingSeparator,
     /// Inconsistent indentation in relation lists
     InconsistentIndentation,
+    /// Incosistent Reserved Sections
+    InconsistentReservedSubsections
 }
 
 /// Represents a fix for a lint issue
@@ -312,6 +314,7 @@ impl LintSuggestion {
             LintType::InconsistentNewlines => "Inconsistent newlines",
             LintType::MissingSeparator => "Missing separator",
             LintType::InconsistentIndentation => "Inconsistent indentation",
+            LintType::InconsistentReservedSubsections => "Inconsistent reserved subsections",            
         }
     }
 
@@ -326,21 +329,26 @@ pub fn lint_file_content(content: &str, file_path: &Path) -> Result<Vec<LintSugg
     let mut suggestions = Vec::new();
 
 
+
     let result = || -> Result<(), ReqFlowError> {
         // Rule 1: Detect absolute links
-        suggestions.extend(find_absolute_links(content, file_path));
+        suggestions.extend(absolute_links::find_absolute_links(content, file_path));
 
         // Rule 2: Detect excess whitespace
-        suggestions.extend(find_excess_whitespace(content, file_path));
+        suggestions.extend(whitespace::find_excess_whitespace(content, file_path));
 
         // Rule 3: Detect inconsistent newlines
-        suggestions.extend(find_inconsistent_newlines(content, file_path));
+        suggestions.extend(newlines::find_inconsistent_newlines(content, file_path));
 
         // Rule 4: Detect missing separator lines
-        suggestions.extend(find_missing_separators(content, file_path));
+        suggestions.extend(separators::find_missing_separators(content, file_path));
 
         // Rule 5: Detect inconsistent indentation
-        suggestions.extend(find_inconsistent_indentation(content, file_path));
+        suggestions.extend(indentation::find_inconsistent_indentation(content, file_path));
+
+        // Rule 6: Detect inconsistent reserved subsections
+        suggestions.extend(reserved_subsections::fix_reserved_subsections(content, file_path));
+
 
         Ok(())
     }();
@@ -357,32 +365,8 @@ pub mod newlines;
 pub mod separators;
 pub mod indentation;
 pub mod index_generator;
+pub mod reserved_subsections;
 
-
-/// Find absolute links that could be converted to relative links
-pub fn find_absolute_links(content: &str, file_path: &Path) -> Vec<LintSuggestion> {
-    absolute_links::find_absolute_links(content, file_path)
-}
-
-/// Find and fix excess whitespace
-pub fn find_excess_whitespace(content: &str, file_path: &Path) -> Vec<LintSuggestion> {
-    whitespace::find_excess_whitespace(content, file_path,)
-}
-
-/// Find and fix inconsistent newlines
-pub fn find_inconsistent_newlines(content: &str, file_path: &Path) -> Vec<LintSuggestion> {
-    newlines::find_inconsistent_newlines(content, file_path)
-}
-
-/// Find missing separator lines
-pub fn find_missing_separators(content: &str, file_path: &Path) -> Vec<LintSuggestion> {
-    separators::find_missing_separators(content, file_path)
-}
-
-/// Find inconsistent indentation in relation lists
-pub fn find_inconsistent_indentation(content: &str, file_path: &Path) -> Vec<LintSuggestion> {
-    indentation::find_inconsistent_indentation(content, file_path)
-}
 
 // Add test module
 #[cfg(test)]

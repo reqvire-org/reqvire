@@ -10,59 +10,28 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  86fecce1d6["System of Interest (SOI)"];
-  click 86fecce1d6 "Usecases.md#system-of-interest-soi";
-  class 86fecce1d6 requirement;
-  e17b2dcca4["AI Agents in Development"];
-  click e17b2dcca4 "Usecases.md#ai-agents-in-development";
-  class e17b2dcca4 requirement;
   d5b0f3d359["ReqFlow Tool"];
   click d5b0f3d359 "Usecases.md#reqflow-tool";
   class d5b0f3d359 requirement;
-  c8dea69e6b["External Systems"];
-  click c8dea69e6b "Usecases.md#external-systems";
-  class c8dea69e6b requirement;
   1df1330ea0["GitHub or Similar"];
   click 1df1330ea0 "Usecases.md#github-or-similar";
   class 1df1330ea0 requirement;
-  42704f2447["Human Interaction"];
-  click 42704f2447 "Usecases.md#human-interaction";
-  class 42704f2447 requirement;
+  86fecce1d6["System of Interest (SOI)"];
+  click 86fecce1d6 "Usecases.md#system-of-interest-soi";
+  class 86fecce1d6 requirement;
   2e9c51c95d["CI/CD System"];
   click 2e9c51c95d "Usecases.md#ci/cd-system";
   class 2e9c51c95d requirement;
+  42704f2447["Human Interaction"];
+  click 42704f2447 "Usecases.md#human-interaction";
+  class 42704f2447 requirement;
+  c8dea69e6b["External Systems"];
+  click c8dea69e6b "Usecases.md#external-systems";
+  class c8dea69e6b requirement;
+  e17b2dcca4["AI Agents in Development"];
+  click e17b2dcca4 "Usecases.md#ai-agents-in-development";
+  class e17b2dcca4 requirement;
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 The use case diagram below highlights the primary interactions between the ReqFlow Tool and its users, including developers, CI/CD systems, and other actors. It captures the high-level functional behaviors that the tool is designed to support, from managing requirements to automating tasks in Git workflows.
 
@@ -129,10 +98,6 @@ It represents the primary focus of development and includes the following key el
   - This repository can be organized as a monorepo or a multirepo, depending on the project’s needs.
 
 The SOI serves as the centerpiece of the ReqFlow framework, linking specifications, development, and validation processes.
-
-
-
-
 ---
 
 ### External Systems
@@ -168,39 +133,24 @@ Humans interact with ReqFlow tools to manage, refine, and validate MBSE models, 
 
 
 ## Workflows and Interactions
+```mermaid
+graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  5ae5dd57e3["ReqFlow Interactions with Git"];
+  click 5ae5dd57e3 "Usecases.md#reqflow-interactions-with-git";
+  class 5ae5dd57e3 requirement;
+  6a81d11f3f["SOI Feedback Loop"];
+  click 6a81d11f3f "Usecases.md#soi-feedback-loop";
+  class 6a81d11f3f requirement;
+  51daee6ead["CI/CD Integration"];
+  click 51daee6ead "Usecases.md#ci/cd-integration";
+  class 51daee6ead requirement;
+```
 
 ---
 

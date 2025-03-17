@@ -11,6 +11,14 @@ pub fn export_markdown_to_html(
     external_folders: &[PathBuf],
     output_folder: &Path,
 ) -> Result<usize, ReqFlowError> {
+
+    // Clean the output folder: if it exists, remove it, then re-create it.
+    if output_folder.exists() {
+        fs::remove_dir_all(output_folder)?;
+    }
+    fs::create_dir_all(output_folder)?;
+
+
     let mut processed_count = 0;
 
     // Process the main specification folder
