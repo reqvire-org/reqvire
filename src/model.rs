@@ -14,6 +14,7 @@ use crate::element::RequirementType;
 use crate::filesystem;
 use crate::diagrams;
 
+use regex::Regex;
 
 use crate::utils;
 use crate::parser::parse_elements;
@@ -115,16 +116,16 @@ impl ModelManager {
         let mut errors = Vec::new();
 
         for element in self.element_registry.get_all_elements() {
-            for relation in &element.relations {
-            
+            for relation in &element.relations {            
             
                 // Only validate if the relation target is an Identifier
                 if let LinkType::Identifier(ref identifier) = relation.target.link {
 
                     // Skip validation if the identifier is not a markdown file.
-                    if !identifier.ends_with(".md") {
-                        log::debug!("Skipping validation for non-markdown identifier: {}", identifier);
-                        continue;
+                    let md_regex = Regex::new(r"\.md(?:#|$)").unwrap();
+                    if !md_regex.is_match(identifier) {
+                       log::debug!("Skipping validation for non-markdown identifier: {}", identifier);
+                       continue;
                     }
             
                     // Skip validation if the identifier is in an excluded folder/file pattern.
@@ -340,8 +341,12 @@ impl ModelManager {
                 }
             };
 
+
+
             // Replace diagrams for all sections in this file
             for (section, new_diagram) in section_diagrams {
+                println!("----->{}",section);
+                println!("----->{}",new_diagram);                
                 file_content = self.replace_section_diagram(&file_content, section, new_diagram);
             }
 
@@ -356,48 +361,53 @@ impl ModelManager {
         Ok(())
     }
     
-    /// Replaces the old diagram in a specific section of a markdown file.
+     /// Replaces the old diagram in a specific section of a markdown file.
     ///
     /// - `content`: The original file content.
     /// - `section`: The section name where the diagram should be replaced.
     /// - `new_diagram`: The newly generated Mermaid diagram.
     ///
     /// Returns the modified file content as a `String`.
-    fn replace_section_diagram(&mut self,content: &str, section: &str, new_diagram: &str) -> String {
+    fn replace_section_diagram(&mut self, content: &str, section: &str, new_diagram: &str) -> String {
         let section_header = format!("## {}", section);
         let mermaid_block_start = "```mermaid";
         let mermaid_block_end = "```";
 
-        let lines = content.lines().collect::<Vec<&str>>();
-        let mut new_content = Vec::new();
-        let mut in_target_section = false;
-        let mut in_old_diagram = false;
-
-        for line in &lines {
+        let mut new_lines = Vec::new();
+        let mut lines = content.lines().peekable();
+        while let Some(line) = lines.next() {
             if line.trim() == section_header {
-                in_target_section = true;
-                new_content.push(line.to_string());
-                new_content.push(new_diagram.to_string());
-                continue;
-            }
-
-            if in_target_section {
-                if line.trim().starts_with(mermaid_block_start) {
-                    in_old_diagram = true;
-                    continue; // Skip old diagram start
+                // Found the target section header.
+                new_lines.push(line.to_string());
+                // Insert the new diagram immediately after the header.
+                new_lines.push(new_diagram.to_string());
+                // Skip any blank lines immediately after the header.
+                while let Some(&next_line) = lines.peek() {
+                    if next_line.trim().is_empty() {
+                        lines.next();
+                    } else {
+                        break;
+                    }
                 }
-                if in_old_diagram && line.trim().starts_with(mermaid_block_end) {
-                    in_old_diagram = false;
-                    continue; // Skip old diagram end
+                // If the next non-empty line starts a Mermaid block, skip it.
+                if let Some(&next_line) = lines.peek() {
+                    if next_line.trim().starts_with(mermaid_block_start) {
+                        // Skip the mermaid block: first skip the start marker.
+                        lines.next();
+                        // Then skip lines until the end marker is found.
+                        while let Some(l) = lines.next() {
+                            if l.trim().starts_with(mermaid_block_end) {
+                                break;
+                            }
+                        }
+                    }
                 }
-            }
-
-            if !in_old_diagram {
-                new_content.push(line.to_string());
+                // Continue with the rest of the file.
+            } else {
+                new_lines.push(line.to_string());
             }
         }
-
-        new_content.join("\n")
+        new_lines.join("\n")
     }
 }
 

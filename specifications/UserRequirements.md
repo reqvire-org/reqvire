@@ -1,7 +1,6 @@
 # User Requirements
 
 ## Managing MBSE Models
-
 ```mermaid
 graph LR;
   %% Graph styling
@@ -9,34 +8,40 @@ graph LR;
   classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
-  a2398f7051["Bootstrap model struture"];
-  click a2398f7051 "UserRequirements.md#bootstrap-model-struture";
-  class a2398f7051 requirement;
-  852dea6cfe["UserStories.md/Managing MBSE Models"];
-  class 852dea6cfe requirement;
-  click 852dea6cfe "UserStories.md#managing-mbse-models";
-  a2398f7051 ==>|refines| 852dea6cfe;
-  fc49f77257["Support for Distributed Requirements"];
-  click fc49f77257 "UserRequirements.md#support-for-distributed-requirements";
-  class fc49f77257 requirement;
-  7430e12113["Project Configuration with YAML"];
-  class 7430e12113 requirement;
-  click 7430e12113 "UserRequirements.md#project-configuration-with-yaml";
-  fc49f77257 -.->|deriveReqT| 7430e12113;
-  7430e12113 ==>|refines| 852dea6cfe;
+
   438060bb46["Configurable SystemRequirements Folder Name"];
   click 438060bb46 "UserRequirements.md#configurable-systemrequirements-folder-name";
   class 438060bb46 requirement;
+  7430e12113["Project Configuration with YAML"];
+  class 7430e12113 requirement;
+  click 7430e12113 "UserRequirements.md#project-configuration-with-yaml";
   438060bb46 -.->|deriveReqT| 7430e12113;
-  f07cf1cbfa["Efficient Processing"];
-  click f07cf1cbfa "UserRequirements.md#efficient-processing";
-  class f07cf1cbfa requirement;
-  f07cf1cbfa ==>|refines| 852dea6cfe;
   3745496893["Configurable DesignSpecifications Folder Name"];
   click 3745496893 "UserRequirements.md#configurable-designspecifications-folder-name";
   class 3745496893 requirement;
   3745496893 -.->|deriveReqT| 7430e12113;
+  852dea6cfe["UserStories.md/Managing MBSE Models"];
+  class 852dea6cfe requirement;
+  click 852dea6cfe "UserStories.md#managing-mbse-models";
+  7430e12113 ==>|refines| 852dea6cfe;
+  6849361af5["Coexistence of Structured and Unstructured Documents"];
+  click 6849361af5 "UserRequirements.md#coexistence-of-structured-and-unstructured-documents";
+  class 6849361af5 requirement;
+  6849361af5 ==>|refines| 852dea6cfe;
+  a2398f7051["Bootstrap model struture"];
+  click a2398f7051 "UserRequirements.md#bootstrap-model-struture";
+  class a2398f7051 requirement;
+  a2398f7051 ==>|refines| 852dea6cfe;
+  fc49f77257["Support for Distributed Requirements"];
+  click fc49f77257 "UserRequirements.md#support-for-distributed-requirements";
+  class fc49f77257 requirement;
+  fc49f77257 -.->|deriveReqT| 7430e12113;
+  f07cf1cbfa["Efficient Processing"];
+  click f07cf1cbfa "UserRequirements.md#efficient-processing";
+  class f07cf1cbfa requirement;
+  f07cf1cbfa ==>|refines| 852dea6cfe;
 ```
+
 
 ### Coexistence of Structured and Unstructured Documents
 
@@ -154,25 +159,6 @@ The system shall store automatically generated diagrams in pre-configured locati
 
 ## Aligning Design with Code
 
-```mermaid
-graph LR;
-  %% Graph styling
-  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
-  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
-  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
-  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
-  1fc4e44d5f["Code Traceability"];
-  click 1fc4e44d5f "UserRequirements.md#code-traceability";
-  class 1fc4e44d5f requirement;
-  de2d3516cd["UserStories.md/Aligning Design with Code"];
-  class de2d3516cd requirement;
-  click de2d3516cd "UserStories.md#aligning-design-with-code";
-  1fc4e44d5f ==>|refines| de2d3516cd;
-  5922f3ef03["Suggest Code Refactoring"];
-  click 5922f3ef03 "UserRequirements.md#suggest-code-refactoring";
-  class 5922f3ef03 requirement;
-  5922f3ef03 ==>|refines| de2d3516cd;
-```
 ---
 
 ### Code Traceability
@@ -317,29 +303,6 @@ The system shall generate detailed change logs for pull requests, summarizing mo
 
 ## AI-Driven Code Suggestions
 
-```mermaid
-graph LR;
-  %% Graph styling
-  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
-  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
-  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
-  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
-  e19f1380d9["Analyze Code for Alignment ---> Needs more work"];
-  click e19f1380d9 "UserRequirements.md#analyze-code-for-alignment---->-needs-more-work";
-  class e19f1380d9 requirement;
-  a4657fca5a["UserStories.md/AI-Driven Code Suggestions"];
-  class a4657fca5a requirement;
-  click a4657fca5a "UserStories.md#ai-driven-code-suggestions";
-  e19f1380d9 ==>|refines| a4657fca5a;
-  c6d300e51a["Highlight Potential Code-Model Conflicts --> also too advanced for now"];
-  click c6d300e51a "UserRequirements.md#highlight-potential-code-model-conflicts--->-also-too-advanced-for-now";
-  class c6d300e51a requirement;
-  c6d300e51a ==>|refines| a4657fca5a;
-  71ba0e325e["Suggest Refactoring for MBSE Consistency  ---> Needs more work"];
-  click 71ba0e325e "UserRequirements.md#suggest-refactoring-for-mbse-consistency----->-needs-more-work";
-  class 71ba0e325e requirement;
-  71ba0e325e ==>|refines| a4657fca5a;
-```
 ---
 
 ### Analyze Code for Alignment ---> Needs more work
