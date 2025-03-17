@@ -344,9 +344,7 @@ impl ModelManager {
 
 
             // Replace diagrams for all sections in this file
-            for (section, new_diagram) in section_diagrams {
-                println!("----->{}",section);
-                println!("----->{}",new_diagram);                
+            for (section, new_diagram) in section_diagrams {              
                 file_content = self.replace_section_diagram(&file_content, section, new_diagram);
             }
 

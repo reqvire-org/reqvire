@@ -9,33 +9,33 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  438060bb46["Configurable SystemRequirements Folder Name"];
-  click 438060bb46 "UserRequirements.md#configurable-systemrequirements-folder-name";
-  class 438060bb46 requirement;
-  7430e12113["Project Configuration with YAML"];
-  class 7430e12113 requirement;
-  click 7430e12113 "UserRequirements.md#project-configuration-with-yaml";
-  438060bb46 -.->|deriveReqT| 7430e12113;
-  3745496893["Configurable DesignSpecifications Folder Name"];
-  click 3745496893 "UserRequirements.md#configurable-designspecifications-folder-name";
-  class 3745496893 requirement;
-  3745496893 -.->|deriveReqT| 7430e12113;
+  a2398f7051["Bootstrap model struture"];
+  click a2398f7051 "UserRequirements.md#bootstrap-model-struture";
+  class a2398f7051 requirement;
   852dea6cfe["UserStories.md/Managing MBSE Models"];
   class 852dea6cfe requirement;
   click 852dea6cfe "UserStories.md#managing-mbse-models";
-  7430e12113 ==>|refines| 852dea6cfe;
+  a2398f7051 ==>|refines| 852dea6cfe;
   6849361af5["Coexistence of Structured and Unstructured Documents"];
   click 6849361af5 "UserRequirements.md#coexistence-of-structured-and-unstructured-documents";
   class 6849361af5 requirement;
   6849361af5 ==>|refines| 852dea6cfe;
-  a2398f7051["Bootstrap model struture"];
-  click a2398f7051 "UserRequirements.md#bootstrap-model-struture";
-  class a2398f7051 requirement;
-  a2398f7051 ==>|refines| 852dea6cfe;
   fc49f77257["Support for Distributed Requirements"];
   click fc49f77257 "UserRequirements.md#support-for-distributed-requirements";
   class fc49f77257 requirement;
+  7430e12113["Project Configuration with YAML"];
+  class 7430e12113 requirement;
+  click 7430e12113 "UserRequirements.md#project-configuration-with-yaml";
   fc49f77257 -.->|deriveReqT| 7430e12113;
+  3745496893["Configurable DesignSpecifications Folder Name"];
+  click 3745496893 "UserRequirements.md#configurable-designspecifications-folder-name";
+  class 3745496893 requirement;
+  3745496893 -.->|deriveReqT| 7430e12113;
+  438060bb46["Configurable SystemRequirements Folder Name"];
+  click 438060bb46 "UserRequirements.md#configurable-systemrequirements-folder-name";
+  class 438060bb46 requirement;
+  438060bb46 -.->|deriveReqT| 7430e12113;
+  7430e12113 ==>|refines| 852dea6cfe;
   f07cf1cbfa["Efficient Processing"];
   click f07cf1cbfa "UserRequirements.md#efficient-processing";
   class f07cf1cbfa requirement;
@@ -99,7 +99,46 @@ The system shall support referencing folders that may exist in different reposit
   * derivedFrom: [Project Configuration with YAML](#project-configuration-with-yaml)
 
 ## Generate Diagrams
+```mermaid
+graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
+  30d97803eb["Filter Relationships by Type"];
+  click 30d97803eb "UserRequirements.md#filter-relationships-by-type";
+  class 30d97803eb requirement;
+  cf0026c2fe["UserStories.md/Generate Diagrams"];
+  class cf0026c2fe requirement;
+  click cf0026c2fe "UserStories.md#generate-diagrams";
+  30d97803eb ==>|refines| cf0026c2fe;
+  10c00a1bd1["Export Diagrams in Standard Formats"];
+  click 10c00a1bd1 "UserRequirements.md#export-diagrams-in-standard-formats";
+  class 10c00a1bd1 requirement;
+  cf0026c2fe --o|contains| 10c00a1bd1;
+  30053341d8["Select Custom Diagram Viewpoints"];
+  click 30053341d8 "UserRequirements.md#select-custom-diagram-viewpoints";
+  class 30053341d8 requirement;
+  30053341d8 ==>|refines| cf0026c2fe;
+  81f9235ded["Automate Diagram Generation"];
+  click 81f9235ded "UserRequirements.md#automate-diagram-generation";
+  class 81f9235ded requirement;
+  81f9235ded ==>|refines| cf0026c2fe;
+  fd7388e379["Highlight Changes in Diagrams"];
+  click fd7388e379 "UserRequirements.md#highlight-changes-in-diagrams";
+  class fd7388e379 requirement;
+  fd7388e379 ==>|refines| cf0026c2fe;
+  a6a8362836["Visualize Model Relationships"];
+  click a6a8362836 "UserRequirements.md#visualize-model-relationships";
+  class a6a8362836 requirement;
+  a6a8362836 ==>|refines| cf0026c2fe;
+  aee397f35b["Store Automated Diagrams in Designated Locations"];
+  click aee397f35b "UserRequirements.md#store-automated-diagrams-in-designated-locations";
+  class aee397f35b requirement;
+  aee397f35b ==>|refines| cf0026c2fe;
+```
 ---
 
 ### Automate Diagram Generation
@@ -158,7 +197,26 @@ The system shall store automatically generated diagrams in pre-configured locati
   * refine: [UserStories.md/Generate Diagrams](UserStories.md#generate-diagrams)
 
 ## Aligning Design with Code
+```mermaid
+graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
+  5922f3ef03["Suggest Code Refactoring"];
+  click 5922f3ef03 "UserRequirements.md#suggest-code-refactoring";
+  class 5922f3ef03 requirement;
+  de2d3516cd["UserStories.md/Aligning Design with Code"];
+  class de2d3516cd requirement;
+  click de2d3516cd "UserStories.md#aligning-design-with-code";
+  5922f3ef03 ==>|refines| de2d3516cd;
+  1fc4e44d5f["Code Traceability"];
+  click 1fc4e44d5f "UserRequirements.md#code-traceability";
+  class 1fc4e44d5f requirement;
+  1fc4e44d5f ==>|refines| de2d3516cd;
+```
 ---
 
 ### Code Traceability
@@ -177,7 +235,69 @@ The system shall suggest code refactoring opportunities to better align with the
   * refine: [UserStories.md/Aligning Design with Code](UserStories.md#aligning-design-with-code)
 
 ## Validating Structures
+```mermaid
+graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
+  808b1863c8["Linting Command Output"];
+  click 808b1863c8 "UserRequirements.md#linting-command-output";
+  class 808b1863c8 requirement;
+  887a7d36ca["Linting Command"];
+  class 887a7d36ca requirement;
+  click 887a7d36ca "UserRequirements.md#linting-command";
+  808b1863c8 ==>|refines| 887a7d36ca;
+  9e524ac696["Validate Internal Consistency"];
+  click 9e524ac696 "UserRequirements.md#validate-internal-consistency";
+  class 9e524ac696 requirement;
+  a60d88b6e2["UserStories.md/Validating Structures"];
+  class a60d88b6e2 requirement;
+  click a60d88b6e2 "UserStories.md#validating-structures";
+  9e524ac696 ==>|refines| a60d88b6e2;
+  d834cc4bc9["Validate Filesystem Structure"];
+  click d834cc4bc9 "UserRequirements.md#validate-filesystem-structure";
+  class d834cc4bc9 requirement;
+  d834cc4bc9 ==>|refines| a60d88b6e2;
+  103ddb8dc3["Model Linting"];
+  class 103ddb8dc3 requirement;
+  click 103ddb8dc3 "UserRequirements.md#model-linting";
+  103ddb8dc3 --o|contains| 887a7d36ca;
+  85f6854a46["Replace Absolute Links with Relative Links"];
+  click 85f6854a46 "UserRequirements.md#replace-absolute-links-with-relative-links";
+  class 85f6854a46 requirement;
+  103ddb8dc3 --o|contains| 85f6854a46;
+  e1c89b5d94["Documentation Index HTML Integration"];
+  click e1c89b5d94 "UserRequirements.md#documentation-index-html-integration";
+  class e1c89b5d94 requirement;
+  f5b5eaeb28["Generate Documentation Index"];
+  class f5b5eaeb28 requirement;
+  click f5b5eaeb28 "UserRequirements.md#generate-documentation-index";
+  e1c89b5d94 ==>|refines| f5b5eaeb28;
+  6e40bf9f83["Validate Cross-Component Dependencies"];
+  click 6e40bf9f83 "UserRequirements.md#validate-cross-component-dependencies";
+  class 6e40bf9f83 requirement;
+  6e40bf9f83 ==>|refines| a60d88b6e2;
+  852dea6cfe["UserStories.md/Managing MBSE Models"];
+  class 852dea6cfe requirement;
+  click 852dea6cfe "UserStories.md#managing-mbse-models";
+  f5b5eaeb28 ==>|refines| 852dea6cfe;
+  81758bdb22["Format Consistency Enforcement"];
+  click 81758bdb22 "UserRequirements.md#format-consistency-enforcement";
+  class 81758bdb22 requirement;
+  103ddb8dc3 --o|contains| 81758bdb22;
+  7b1772417b["Validate Markdown Structure"];
+  click 7b1772417b "UserRequirements.md#validate-markdown-structure";
+  class 7b1772417b requirement;
+  7b1772417b ==>|refines| a60d88b6e2;
+  7cf5cf9900["Enhanced Validation Error Reporting"];
+  click 7cf5cf9900 "UserRequirements.md#enhanced-validation-error-reporting";
+  class 7cf5cf9900 requirement;
+  7cf5cf9900 ==>|refines| a60d88b6e2;
+  103ddb8dc3 ==>|refines| a60d88b6e2;
+```
 ---
 
 ### Enhanced Validation Error Reporting
@@ -283,7 +403,26 @@ The system shall validate dependencies across different components of the MBSE m
   * refine: [UserStories.md/Validating Structures](UserStories.md#validating-structures)
 
 ## Integrate with GitHub Workflows
+```mermaid
+graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
+  68454e6166["Automate Pull Request Validations"];
+  click 68454e6166 "UserRequirements.md#automate-pull-request-validations";
+  class 68454e6166 requirement;
+  ba120b7caf["UserStories.md/Integrate with GitHub Workflows"];
+  class ba120b7caf requirement;
+  click ba120b7caf "UserStories.md#integrate-with-github-workflows";
+  68454e6166 ==>|refines| ba120b7caf;
+  b2a387077d["Generate Change Logs for Pull Requests"];
+  click b2a387077d "UserRequirements.md#generate-change-logs-for-pull-requests";
+  class b2a387077d requirement;
+  b2a387077d ==>|refines| ba120b7caf;
+```
 ---
 
 ### Automate Pull Request Validations
@@ -302,7 +441,30 @@ The system shall generate detailed change logs for pull requests, summarizing mo
   * refine: [UserStories.md/Integrate with GitHub Workflows](UserStories.md#integrate-with-github-workflows)
 
 ## AI-Driven Code Suggestions
+```mermaid
+graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
+  71ba0e325e["Suggest Refactoring for MBSE Consistency  ---> Needs more work"];
+  click 71ba0e325e "UserRequirements.md#suggest-refactoring-for-mbse-consistency----->-needs-more-work";
+  class 71ba0e325e requirement;
+  a4657fca5a["UserStories.md/AI-Driven Code Suggestions"];
+  class a4657fca5a requirement;
+  click a4657fca5a "UserStories.md#ai-driven-code-suggestions";
+  71ba0e325e ==>|refines| a4657fca5a;
+  c6d300e51a["Highlight Potential Code-Model Conflicts --> also too advanced for now"];
+  click c6d300e51a "UserRequirements.md#highlight-potential-code-model-conflicts--->-also-too-advanced-for-now";
+  class c6d300e51a requirement;
+  c6d300e51a ==>|refines| a4657fca5a;
+  e19f1380d9["Analyze Code for Alignment ---> Needs more work"];
+  click e19f1380d9 "UserRequirements.md#analyze-code-for-alignment---->-needs-more-work";
+  class e19f1380d9 requirement;
+  e19f1380d9 ==>|refines| a4657fca5a;
+```
 ---
 
 ### Analyze Code for Alignment ---> Needs more work
@@ -329,7 +491,34 @@ The system shall allow AI agents to highlight potential conflicts between code a
   * refine: [UserStories.md/AI-Driven Code Suggestions](UserStories.md#ai-driven-code-suggestions)
 
 ## AI-Driven Model Suggestions
+```mermaid
+graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
+  ec56dd665a["Provide Actionable Model Improvement Suggestions"];
+  click ec56dd665a "UserRequirements.md#provide-actionable-model-improvement-suggestions";
+  class ec56dd665a requirement;
+  6912d98267["UserStories.md/AI-Driven Model Suggestions"];
+  class 6912d98267 requirement;
+  click 6912d98267 "UserStories.md#ai-driven-model-suggestions";
+  ec56dd665a ==>|refines| 6912d98267;
+  44c87c93a4["Propose Validation Fixes"];
+  click 44c87c93a4 "UserRequirements.md#propose-validation-fixes";
+  class 44c87c93a4 requirement;
+  44c87c93a4 ==>|refines| ec56dd665a;
+  a8f00c5619["Recommend Missing Components"];
+  click a8f00c5619 "UserRequirements.md#recommend-missing-components";
+  class a8f00c5619 requirement;
+  a8f00c5619 ==>|refines| ec56dd665a;
+  72e13dc549["Suggest Refinements to Model Relationships"];
+  click 72e13dc549 "UserRequirements.md#suggest-refinements-to-model-relationships";
+  class 72e13dc549 requirement;
+  72e13dc549 ==>|refines| ec56dd665a;
+```
 ---
 
 ### Provide Actionable Model Improvement Suggestions
@@ -364,7 +553,46 @@ The system shall enable AI agents to propose fixes for validation errors in the 
   * refine: [Provide Actionable Model Improvement Suggestions](#provide-actionable-model-improvement-suggestions)
 
 ## Provide Reports
+```mermaid
+graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
+  596c459d31["Generate Summary Reports"];
+  click 596c459d31 "UserRequirements.md#generate-summary-reports";
+  class 596c459d31 requirement;
+  fe32882ee2["UserStories.md/Provide Reports"];
+  class fe32882ee2 requirement;
+  click fe32882ee2 "UserStories.md#provide-reports";
+  596c459d31 ==>|refines| fe32882ee2;
+  812d42f453["Generate Dependency Reports"];
+  click 812d42f453 "UserRequirements.md#generate-dependency-reports";
+  class 812d42f453 requirement;
+  812d42f453 ==>|refines| fe32882ee2;
+  2afa7f3a20["Export Reports to Standard Formats"];
+  click 2afa7f3a20 "UserRequirements.md#export-reports-to-standard-formats";
+  class 2afa7f3a20 requirement;
+  2afa7f3a20 ==>|refines| fe32882ee2;
+  d0e9e8d143["Generate Verifications Reports"];
+  click d0e9e8d143 "UserRequirements.md#generate-verifications-reports";
+  class d0e9e8d143 requirement;
+  d0e9e8d143 ==>|refines| fe32882ee2;
+  6a2d21600e["Generate Structural Change Reports"];
+  click 6a2d21600e "UserRequirements.md#generate-structural-change-reports";
+  class 6a2d21600e requirement;
+  6a2d21600e ==>|refines| fe32882ee2;
+  482c757913["Provide Validation Reports"];
+  click 482c757913 "UserRequirements.md#provide-validation-reports";
+  class 482c757913 requirement;
+  482c757913 ==>|refines| fe32882ee2;
+  5c96cb8685["Generate Relationship Reports"];
+  click 5c96cb8685 "UserRequirements.md#generate-relationship-reports";
+  class 5c96cb8685 requirement;
+  5c96cb8685 ==>|refines| fe32882ee2;
+```
 ---
 
 ### Generate Relationship Reports
@@ -423,7 +651,30 @@ The system shall allow users to export generated reports in standard formats (e.
   * refine: [UserStories.md/Provide Reports](UserStories.md#provide-reports)
 
 ## Trace Changes in MBSE Model
+```mermaid
+graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
+  c43ff279c1["AI Feedback on Structural Changes"];
+  click c43ff279c1 "UserRequirements.md#ai-feedback-on-structural-changes";
+  class c43ff279c1 requirement;
+  e8cb10f42e["Suggest Structural Updates"];
+  class e8cb10f42e requirement;
+  click e8cb10f42e "UserRequirements.md#suggest-structural-updates";
+  c43ff279c1 -.->|deriveReqT| e8cb10f42e;
+  91ebf7e73d["Tracing Structural Changes"];
+  click 91ebf7e73d "UserRequirements.md#tracing-structural-changes";
+  class 91ebf7e73d requirement;
+  36d8b2eb16["UserStories.md/Trace Changes in MBSE Model"];
+  class 36d8b2eb16 requirement;
+  click 36d8b2eb16 "UserStories.md#trace-changes-in-mbse-model";
+  91ebf7e73d ==>|refines| 36d8b2eb16;
+  e8cb10f42e ==>|refines| 36d8b2eb16;
+```
 ---
 
 ### Tracing Structural Changes
@@ -450,7 +701,61 @@ When a report of impacted elements is fed into the AI agents' context, the syste
   * derivedFrom: [Suggest Structural Updates](#suggest-structural-updates)
 
 ## Generate Traceability Matrix			
+```mermaid
+graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
+  9fe409695e["Create Traceability Matrices"];
+  click 9fe409695e "UserRequirements.md#create-traceability-matrices";
+  class 9fe409695e requirement;
+  e4eb5bf7e5["UserStories.md/Generate Traceability Matrix"];
+  class e4eb5bf7e5 requirement;
+  click e4eb5bf7e5 "UserStories.md#generate-traceability-matrix";
+  9fe409695e ==>|refines| e4eb5bf7e5;
+  e867499409["Interactive Mermaid Diagrams"];
+  click e867499409 "UserRequirements.md#interactive-mermaid-diagrams";
+  class e867499409 requirement;
+  9fe409695e --o|contains| e867499409;
+  c7a213987b["Markdown-Based Default Format"];
+  click c7a213987b "UserRequirements.md#markdown-based-default-format";
+  class c7a213987b requirement;
+  9fe409695e --o|contains| c7a213987b;
+  273dcdad7a["Include Verification Checkboxes"];
+  click 273dcdad7a "UserRequirements.md#include-verification-checkboxes";
+  class 273dcdad7a requirement;
+  273dcdad7a ==>|refines| e4eb5bf7e5;
+  c4b025f6ac["Save matrices to designated files"];
+  click c4b025f6ac "UserRequirements.md#save-matrices-to-designated-files";
+  class c4b025f6ac requirement;
+  9fe409695e --o|contains| c4b025f6ac;
+  1521bb4ce2["Handle Affected Verifications on Model Changes"];
+  click 1521bb4ce2 "UserRequirements.md#handle-affected-verifications-on-model-changes";
+  class 1521bb4ce2 requirement;
+  1521bb4ce2 ==>|refines| e4eb5bf7e5;
+  442da629f6["Specification Design Document for Requirements Change Propagation"];
+  click 442da629f6 "UserRequirements.md#specification-design-document-for-requirements-change-propagation";
+  class 442da629f6 requirement;
+  36d8b2eb16["UserStories.md/Trace Changes in MBSE Model"];
+  class 36d8b2eb16 requirement;
+  click 36d8b2eb16 "UserStories.md#trace-changes-in-mbse-model";
+  442da629f6 ==>|refines| 36d8b2eb16;
+  33e6fb86b3["DesignSpecifications/RequirementsChangePropagation.md"];
+  class 33e6fb86b3 default;
+  click 33e6fb86b3 "DesignSpecifications/RequirementsChangePropagation.md";
+  33e6fb86b3 -->|satisfies| 442da629f6;
+  fc0d98c588["Support Relation-Based Views"];
+  click fc0d98c588 "UserRequirements.md#support-relation-based-views";
+  class fc0d98c588 requirement;
+  9fe409695e --o|contains| fc0d98c588;
+  4b7b432817["Export Traceability Matrix"];
+  click 4b7b432817 "UserRequirements.md#export-traceability-matrix";
+  class 4b7b432817 requirement;
+  4b7b432817 ==>|refines| e4eb5bf7e5;
+```
 ---
 
 ### Create Traceability Matrices
@@ -544,7 +849,29 @@ The system shall provide an option to export the traceability matrix in formats 
 ---
 
 ## Exporting Specifications
+```mermaid
+graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
+  33733d2f42["Support CI/CD Integration"];
+  click 33733d2f42 "UserRequirements.md#support-ci/cd-integration";
+  class 33733d2f42 requirement;
+  e4eb5bf7e5["UserStories.md/Automate Traceability Matrix"];
+  class e4eb5bf7e5 requirement;
+  click e4eb5bf7e5 "UserStories.md#generate-traceability-matrix";
+  33733d2f42 ==>|refines| e4eb5bf7e5;
+  72c7eda618["Export HTML specifications"];
+  click 72c7eda618 "UserRequirements.md#export-html-specifications";
+  class 72c7eda618 requirement;
+  100197ce81["UserStories.md/Export Specifications"];
+  class 100197ce81 requirement;
+  click 100197ce81 "UserStories.md#export-specifications";
+  72c7eda618 -.->|deriveReqT| 100197ce81;
+```
 ---
 
 ### Export HTML specifications
