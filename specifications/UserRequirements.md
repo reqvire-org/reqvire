@@ -1,6 +1,7 @@
 # User Requirements
 
 ## Managing MBSE Models
+
 ```mermaid
 graph LR;
   %% Graph styling
@@ -8,40 +9,41 @@ graph LR;
   classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
-
-  3745496893["Configurable DesignSpecifications Folder Name"];
-  click 3745496893 "UserRequirements.md#configurable-designspecifications-folder-name";
-  class 3745496893 requirement;
-  7430e12113["Project Configuration with YAML"];
-  class 7430e12113 requirement;
-  click 7430e12113 "UserRequirements.md#project-configuration-with-yaml";
-  3745496893 -.->|deriveReqT| 7430e12113;
-  852dea6cfe["UserStories.md/Managing MBSE Models"];
-  class 852dea6cfe requirement;
-  click 852dea6cfe "UserStories.md#managing-mbse-models";
-  7430e12113 ==>|refines| 852dea6cfe;
-  f07cf1cbfa["Efficient Processing"];
-  click f07cf1cbfa "UserRequirements.md#efficient-processing";
-  class f07cf1cbfa requirement;
-  f07cf1cbfa ==>|refines| 852dea6cfe;
   a2398f7051["Bootstrap model struture"];
   click a2398f7051 "UserRequirements.md#bootstrap-model-struture";
   class a2398f7051 requirement;
+  852dea6cfe["UserStories.md/Managing MBSE Models"];
+  class 852dea6cfe requirement;
+  click 852dea6cfe "UserStories.md#managing-mbse-models";
   a2398f7051 ==>|refines| 852dea6cfe;
   fc49f77257["Support for Distributed Requirements"];
   click fc49f77257 "UserRequirements.md#support-for-distributed-requirements";
   class fc49f77257 requirement;
+  7430e12113["Project Configuration with YAML"];
+  class 7430e12113 requirement;
+  click 7430e12113 "UserRequirements.md#project-configuration-with-yaml";
   fc49f77257 -.->|deriveReqT| 7430e12113;
+  7430e12113 ==>|refines| 852dea6cfe;
   438060bb46["Configurable SystemRequirements Folder Name"];
   click 438060bb46 "UserRequirements.md#configurable-systemrequirements-folder-name";
   class 438060bb46 requirement;
   438060bb46 -.->|deriveReqT| 7430e12113;
+  f07cf1cbfa["Efficient Processing"];
+  click f07cf1cbfa "UserRequirements.md#efficient-processing";
+  class f07cf1cbfa requirement;
+  f07cf1cbfa ==>|refines| 852dea6cfe;
+  3745496893["Configurable DesignSpecifications Folder Name"];
+  click 3745496893 "UserRequirements.md#configurable-designspecifications-folder-name";
+  class 3745496893 requirement;
+  3745496893 -.->|deriveReqT| 7430e12113;
 ```
+
+### Coexistence of Structured and Unstructured Documents
+
 The system shall allow structured markdown and unstructured (eg., markdown, PDFs, DOCX, raw text) documents to coexist within the same MBSE model.
 
 #### Relations
   * refine: [UserStories.md/Managing MBSE Models](UserStories.md#managing-mbse-models)
-
 ---
 
 ### Efficient Processing
@@ -50,7 +52,6 @@ The system shall process structured documents and relations to extract model-rel
 
 #### Relations
   * refine: [UserStories.md/Managing MBSE Models](UserStories.md#managing-mbse-models)
-
 ---
 
 ### Bootstrap model struture
@@ -59,7 +60,6 @@ The system shall provide a command to automatically bootstrap a predefined direc
 
 #### Relations
   * refine: [UserStories.md/Managing MBSE Models](UserStories.md#managing-mbse-models)
-
 ---
 
 ### Project Configuration with YAML
@@ -68,7 +68,6 @@ The system shall support a YAML-based configuration file that defines folder nam
 
 #### Relations
   * refine: [UserStories.md/Managing MBSE Models](UserStories.md#managing-mbse-models)
-
 ---
 
 ### Configurable SystemRequirements Folder Name
@@ -77,7 +76,6 @@ The system shall allow users to configure the name of the SystemRequirements fol
 
 #### Relations
   * derivedFrom: [Project Configuration with YAML](#project-configuration-with-yaml)
-
 ---
 
 ### Configurable DesignSpecifications Folder Name
@@ -86,7 +84,6 @@ The system shall allow users to configure the DesignSpecifications folder name t
 
 #### Relations
   * derivedFrom: [Project Configuration with YAML](#project-configuration-with-yaml)
-
 ---
 
 ### Support for Distributed Requirements
@@ -97,46 +94,7 @@ The system shall support referencing folders that may exist in different reposit
   * derivedFrom: [Project Configuration with YAML](#project-configuration-with-yaml)
 
 ## Generate Diagrams
-```mermaid
-graph LR;
-  %% Graph styling
-  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
-  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
-  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
-  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  30d97803eb["Filter Relationships by Type"];
-  click 30d97803eb "UserRequirements.md#filter-relationships-by-type";
-  class 30d97803eb requirement;
-  cf0026c2fe["UserStories.md/Generate Diagrams"];
-  class cf0026c2fe requirement;
-  click cf0026c2fe "UserStories.md#generate-diagrams";
-  30d97803eb ==>|refines| cf0026c2fe;
-  10c00a1bd1["Export Diagrams in Standard Formats"];
-  click 10c00a1bd1 "UserRequirements.md#export-diagrams-in-standard-formats";
-  class 10c00a1bd1 requirement;
-  cf0026c2fe --o|contains| 10c00a1bd1;
-  81f9235ded["Automate Diagram Generation"];
-  click 81f9235ded "UserRequirements.md#automate-diagram-generation";
-  class 81f9235ded requirement;
-  81f9235ded ==>|refines| cf0026c2fe;
-  30053341d8["Select Custom Diagram Viewpoints"];
-  click 30053341d8 "UserRequirements.md#select-custom-diagram-viewpoints";
-  class 30053341d8 requirement;
-  30053341d8 ==>|refines| cf0026c2fe;
-  fd7388e379["Highlight Changes in Diagrams"];
-  click fd7388e379 "UserRequirements.md#highlight-changes-in-diagrams";
-  class fd7388e379 requirement;
-  fd7388e379 ==>|refines| cf0026c2fe;
-  aee397f35b["Store Automated Diagrams in Designated Locations"];
-  click aee397f35b "UserRequirements.md#store-automated-diagrams-in-designated-locations";
-  class aee397f35b requirement;
-  aee397f35b ==>|refines| cf0026c2fe;
-  a6a8362836["Visualize Model Relationships"];
-  click a6a8362836 "UserRequirements.md#visualize-model-relationships";
-  class a6a8362836 requirement;
-  a6a8362836 ==>|refines| cf0026c2fe;
-```
 ---
 
 ### Automate Diagram Generation
@@ -145,7 +103,6 @@ When requested the system shall automatically generate diagrams and save them to
 
 #### Relations
   * refine: [UserStories.md#Generate Diagrams](UserStories.md#generate-diagrams)
-
 ---
 
 ### Select Custom Diagram Viewpoints
@@ -154,7 +111,6 @@ The system shall allow users to select custom viewpoints for diagrams, tailored 
 
 #### Relations
   * refine: [UserStories.md/Generate Diagrams](UserStories.md#generate-diagrams)
-
 ---
 
 ### Export Diagrams in Standard Formats
@@ -163,7 +119,6 @@ The system shall allow users to export generated diagrams in standard formats (e
 
 #### Relations
   * containedBy: [UserStories.md/Generate Diagrams](UserStories.md#generate-diagrams)
-
 ---
 
 ### Highlight Changes in Diagrams
@@ -172,7 +127,6 @@ The system shall provide an option to highlight changes made to the model in the
 
 #### Relations
   * refine: [UserStories.md/Generate Diagrams](UserStories.md#generate-diagrams)
-
 ---
 
 ### Visualize Model Relationships
@@ -181,7 +135,6 @@ The system shall provide visual representations of relationships within the MBSE
 
 #### Relations
   * refine: [UserStories.md/Generate Diagrams](UserStories.md#generate-diagrams)
-
 ---
 
 ### Filter Relationships by Type
@@ -190,7 +143,6 @@ The system shall allow users to filter relationships in the MBSE model by type, 
 
 #### Relations
   * refine: [UserStories.md/Generate Diagrams](UserStories.md#generate-diagrams)
-
 ---
 
 ### Store Automated Diagrams in Designated Locations
@@ -201,6 +153,26 @@ The system shall store automatically generated diagrams in pre-configured locati
   * refine: [UserStories.md/Generate Diagrams](UserStories.md#generate-diagrams)
 
 ## Aligning Design with Code
+
+```mermaid
+graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+  1fc4e44d5f["Code Traceability"];
+  click 1fc4e44d5f "UserRequirements.md#code-traceability";
+  class 1fc4e44d5f requirement;
+  de2d3516cd["UserStories.md/Aligning Design with Code"];
+  class de2d3516cd requirement;
+  click de2d3516cd "UserStories.md#aligning-design-with-code";
+  1fc4e44d5f ==>|refines| de2d3516cd;
+  5922f3ef03["Suggest Code Refactoring"];
+  click 5922f3ef03 "UserRequirements.md#suggest-code-refactoring";
+  class 5922f3ef03 requirement;
+  5922f3ef03 ==>|refines| de2d3516cd;
+```
 ---
 
 ### Code Traceability
@@ -209,7 +181,6 @@ The system shall support code traceability by using structured comments to link 
 
 #### Relations
   * refine: [UserStories.md/Aligning Design with Code](UserStories.md#aligning-design-with-code)
-
 ---
 
 ### Suggest Code Refactoring
@@ -221,8 +192,6 @@ The system shall suggest code refactoring opportunities to better align with the
 
 ## Validating Structures
 
-
-
 ---
 
 ### Enhanced Validation Error Reporting
@@ -231,7 +200,6 @@ The system shall provide comprehensive validation messages that include file pat
 
 #### Relations
   * refine: [UserStories.md/Validating Structures](UserStories.md#validating-structures)
-
 ---
 
 ### Model Linting
@@ -240,7 +208,6 @@ The system shall provide linting capabilities to identify and fix stylistic, for
 
 #### Relations
   * refine: [UserStories.md/Validating Structures](UserStories.md#validating-structures)
-
 ---
 
 ### Linting Command
@@ -249,7 +216,6 @@ The system shall provide a linting command that by default automatically applies
 
 #### Relations
   * containedBy: [Model Linting](#model-linting)
-
 ---
 
 ### Linting Command Output
@@ -258,7 +224,6 @@ The system shall display linting changes suggestion in similar manner as git dif
 
 #### Relations
   * refine: [Linting Command](#linting-command)
-
 ---
 
 ### Replace Absolute Links with Relative Links
@@ -267,7 +232,6 @@ The system shall replace absolute links with relative links, where applicable an
 
 #### Relations
   * containedBy: [Model Linting](#model-linting)
-
 ---
 
 ### Format Consistency Enforcement
@@ -275,15 +239,14 @@ The system shall replace absolute links with relative links, where applicable an
 The system shall provide linting capability to ensure consistent formatting in requirements documents.
 
 #### Details
+
   * Trimming excess whitespace after element names and relation identifiers
   * Normalizing to exactly two newlines before subsections (e.g., "#### Details")
   * Automatically inserting separator lines ("---") between elements if not already present
   * Ensuring consistent indentation in relation lists
  
-
 #### Relations
   * containedBy: [Model Linting](#model-linting)
-
 ---
 
 ### Generate Documentation Index
@@ -292,7 +255,6 @@ The system shall generate an index.md file in the specifications root folder dur
 
 #### Relations
   * refine: [UserStories.md/Managing MBSE Models](UserStories.md#managing-mbse-models)
-
 ---
 
 ### Documentation Index HTML Integration
@@ -301,7 +263,6 @@ The index.md file shall be converted to index.md when HTML output is generated, 
 
 #### Relations
   * refine: [Generate Documentation Index](#generate-documentation-index)
-
 ---
 
 ### Validate Markdown Structure
@@ -310,7 +271,6 @@ The system shall validate the Markdown structure of MBSE documentation to ensure
 
 #### Relations
   * refine: [UserStories.md/Validating Structures](UserStories.md#validating-structures)
-
 ---
 
 ### Validate Filesystem Structure
@@ -319,7 +279,6 @@ The system shall validate the organization of files and folders in the repositor
 
 #### Relations
   * refine: [UserStories.md/Validating Structures](UserStories.md#validating-structures)
-
 ---
 
 ### Validate Internal Consistency
@@ -328,7 +287,6 @@ The system shall check the internal consistency of the MBSE model, ensuring that
 
 #### Relations
   * refine: [UserStories.md/Validating Structures](UserStories.md#validating-structures)
-
 ---
 
 ### Validate Cross-Component Dependencies
@@ -338,10 +296,7 @@ The system shall validate dependencies across different components of the MBSE m
 #### Relations
   * refine: [UserStories.md/Validating Structures](UserStories.md#validating-structures)
 
-
 ## Integrate with GitHub Workflows
-
-
 
 ---
 
@@ -351,7 +306,6 @@ The system shall automate validations of pull requests in the GitHub workflow to
 
 #### Relations
   * refine: [UserStories.md/Integrate with GitHub Workflows](UserStories.md#integrate-with-github-workflows)
-
 ---
 
 ### Generate Change Logs for Pull Requests
@@ -362,6 +316,30 @@ The system shall generate detailed change logs for pull requests, summarizing mo
   * refine: [UserStories.md/Integrate with GitHub Workflows](UserStories.md#integrate-with-github-workflows)
 
 ## AI-Driven Code Suggestions
+
+```mermaid
+graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+  e19f1380d9["Analyze Code for Alignment ---> Needs more work"];
+  click e19f1380d9 "UserRequirements.md#analyze-code-for-alignment---->-needs-more-work";
+  class e19f1380d9 requirement;
+  a4657fca5a["UserStories.md/AI-Driven Code Suggestions"];
+  class a4657fca5a requirement;
+  click a4657fca5a "UserStories.md#ai-driven-code-suggestions";
+  e19f1380d9 ==>|refines| a4657fca5a;
+  c6d300e51a["Highlight Potential Code-Model Conflicts --> also too advanced for now"];
+  click c6d300e51a "UserRequirements.md#highlight-potential-code-model-conflicts--->-also-too-advanced-for-now";
+  class c6d300e51a requirement;
+  c6d300e51a ==>|refines| a4657fca5a;
+  71ba0e325e["Suggest Refactoring for MBSE Consistency  ---> Needs more work"];
+  click 71ba0e325e "UserRequirements.md#suggest-refactoring-for-mbse-consistency----->-needs-more-work";
+  class 71ba0e325e requirement;
+  71ba0e325e ==>|refines| a4657fca5a;
+```
 ---
 
 ### Analyze Code for Alignment ---> Needs more work
@@ -370,7 +348,6 @@ The system shall allow AI agents to analyze code and identify deviations from th
 
 #### Relations
   * refine: [UserStories.md/AI-Driven Code Suggestions](UserStories.md#ai-driven-code-suggestions)
-
 ---
 
 ### Suggest Refactoring for MBSE Consistency  ---> Needs more work
@@ -379,7 +356,6 @@ The system shall enable AI agents to suggest refactoring opportunities to ensure
 
 #### Relations
   * refine: [UserStories.md/AI-Driven Code Suggestions](UserStories.md#ai-driven-code-suggestions)
-
 ---
 
 ### Highlight Potential Code-Model Conflicts --> also too advanced for now
@@ -399,7 +375,6 @@ The system shall enable AI agents to provide actionable suggestions for improvin
 
 #### Relations
   * refine: [UserStories.md/AI-Driven Model Suggestions](UserStories.md#ai-driven-model-suggestions)
-
 ---
 
 ### Suggest Refinements to Model Relationships
@@ -408,7 +383,6 @@ The system shall enable AI agents to suggest refinements to relationships within
 
 #### Relations
   * refine: [Provide Actionable Model Improvement Suggestions](#provide-actionable-model-improvement-suggestions)
-
 ---
 
 ### Recommend Missing Components
@@ -417,7 +391,6 @@ The system shall allow AI agents to recommend missing components or elements bas
 
 #### Relations
   * refine: [Provide Actionable Model Improvement Suggestions](#provide-actionable-model-improvement-suggestions)
-
 ---
 
 ### Propose Validation Fixes
@@ -437,7 +410,6 @@ The system shall generate reports summarizing the relationships in the MBSE mode
 
 #### Relations
   * refine: [UserStories.md/Provide Reports](UserStories.md#provide-reports)
-
 ---
 
 ### Generate Structural Change Reports
@@ -446,7 +418,6 @@ The system shall generate detailed reports summarizing the impact of structural 
 
 #### Relations
   * refine: [UserStories.md/Provide Reports](UserStories.md#provide-reports)
-
 ---
 
 ### Provide Validation Reports
@@ -455,7 +426,6 @@ The system shall generate detailed validation reports, highlighting any inconsis
 
 #### Relations
   * refine: [UserStories.md/Provide Reports](UserStories.md#provide-reports)
-
 ---
 
 ### Generate Verifications Reports
@@ -464,7 +434,6 @@ The system shall produce reports identifying User and Mission requirements that 
 
 #### Relations
   * refine: [UserStories.md/Provide Reports](UserStories.md#provide-reports)
-
 ---
 
 ### Generate Summary Reports
@@ -473,7 +442,6 @@ The system shall allow users to generate summary reports highlighting key metric
 
 #### Relations
   * refine: [UserStories.md/Provide Reports](UserStories.md#provide-reports)
-
 ---
 
 ### Generate Dependency Reports
@@ -482,7 +450,6 @@ The system shall generate reports summarizing dependencies between requirements,
 
 #### Relations
   * refine: [UserStories.md/Provide Reports](UserStories.md#provide-reports)
-
 ---
 
 ### Export Reports to Standard Formats
@@ -502,7 +469,6 @@ When tracing structural changes, the system shall analyze the MBSE model and dif
 
 #### Relations
   * refine: [UserStories.md/Trace Changes in MBSE Model](UserStories.md#trace-changes-in-mbse-model)
-
 ---
 
 ### Suggest Structural Updates
@@ -511,7 +477,6 @@ The system shall suggest updates to maintain structural consistency when changes
 
 #### Relations
   * refine: [UserStories.md/Trace Changes in MBSE Model](UserStories.md#trace-changes-in-mbse-model)
-
 ---
 
 ### AI Feedback on Structural Changes
@@ -531,13 +496,11 @@ The system shall create a traceability matrices when requested by a user or as p
 
 #### Relations
   * refine: [UserStories.md/Generate Traceability Matrix](UserStories.md#generate-traceability-matrix)
-
 ---
 
 ### Support Relation-Based Views
 
 The system shall generate traceability matrix views based on relations to requirements, such as:
-
 1. **VerifiedBy**: Mapping requirements to their verification methods.
 2. **SatisfiedBy**: Mapping system components to the requirements they satisfy.
 3. **TracedFrom**: Mapping requirements to their parent or related elements.
@@ -545,7 +508,6 @@ The system shall generate traceability matrix views based on relations to requir
 #### Relations
   * containedBy: [Create Traceability Matrices](#create-traceability-matrices)
  
-
 ---
 
 ### Interactive Mermaid Diagrams
@@ -559,7 +521,6 @@ Diagrams must be broken into several diagrams using following logic:
    * all requirements inside are 1 diagram
    * if requirements documents doesn't have '##' paragraphs then requirements file name is used only
    * external related resources box must be a link to actual resource
-
 Color code for rendering diagrams:
  * red for requirement
  * yellow for resources which satisfies requirement
@@ -568,7 +529,6 @@ Color code for rendering diagrams:
 
 #### Relations
   * containedBy: [Create Traceability Matrices](#create-traceability-matrices)
-
 ---
 
 ### Markdown-Based Default Format
@@ -577,7 +537,6 @@ The system shall generate the traceability matrix in Markdown format by default,
 
 #### Relations
   * containedBy: [Create Traceability Matrices](#create-traceability-matrices)
-
 ---
 
 ### Save matrices to designated files
@@ -586,7 +545,6 @@ The system shall save the generated traceability matrices as a Markdown document
 
 #### Relations
   * containedBy: [Create Traceability Matrices](#create-traceability-matrices)
-
 ---
 
 ### Include Verification Checkboxes
@@ -595,7 +553,6 @@ The system shall include checkboxes in the traceability matrix for each verifica
 
 #### Relations
   * refine: [UserStories.md/Generate Traceability Matrix](UserStories.md#generate-traceability-matrix)
-
 ---
 
 ### Handle Affected Verifications on Model Changes
@@ -604,7 +561,6 @@ The system shall uncheck verification checkboxes in the traceability matrix and 
 
 #### Relations
   * refine: [UserStories.md/Generate Traceability Matrix](UserStories.md#generate-traceability-matrix)
-
 ---
 
 ### Specification Design Document for Requirements Change Propagation
@@ -614,7 +570,6 @@ The system **shall provide a Specification Design Document (DSD)** that defines 
 #### Relations
   * refine: [UserStories.md/Trace Changes in MBSE Model](UserStories.md#trace-changes-in-mbse-model)
   * satisfiedBy: [DesignSpecifications/RequirementsChangePropagation.md](DesignSpecifications/RequirementsChangePropagation.md)
-
 ---
 
 ### Export Traceability Matrix
@@ -623,7 +578,6 @@ The system shall provide an option to export the traceability matrix in formats 
 
 #### Relations
   * refine: [UserStories.md/Generate Traceability Matrix](UserStories.md#generate-traceability-matrix)
-
 ---
 
 ## Exporting Specifications
@@ -636,7 +590,6 @@ The system shall export specifications into HTML format and save in designated o
 
 #### Relations
   * derivedFrom: [UserStories.md/Export Specifications](UserStories.md#export-specifications)
-
 ---
 
 ### Support CI/CD Integration

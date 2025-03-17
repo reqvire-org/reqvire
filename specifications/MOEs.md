@@ -8,7 +8,6 @@ graph LR;
   classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
-
   f6237e49f7["MOE_UA"];
   click f6237e49f7 "MOEs.md#moe_ua";
   class f6237e49f7 requirement;
@@ -32,30 +31,11 @@ graph LR;
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 The **MOEs** and **KPPs** for **ReqFlow** are designed to evaluate how effectively the methodology, toolset, and language deliver value to users and stakeholders. 
 These metrics emphasize outcomes such as user adoption, operational efficiency, and community engagement, ensuring that ReqFlow aligns with the needs of its open-source ecosystem.
 
-
 ### MOE_UA
-
 **Increase User Adoption**
-
 - Goal: Drive adoption of ReqFlow within the open-source and engineering communities.
 - Metric: User Adoption Rate (UA)
 - Metric Calculation:  
@@ -65,14 +45,10 @@ These metrics emphasize outcomes such as user adoption, operational efficiency, 
 - Target Statement: Achieve a user adoption rate of X% within the first year.
 - Objective: Expand ReqFlow’s reach and influence in MBSE practices.
 
-
-
 ---
 
 ### MOE_CE
-
 **Boost Community Engagement**
-
 - Goal: Foster an active and collaborative open-source community around ReqFlow.
 - Metric: Contributor Engagement (CE)
 - Metric Calculation:  

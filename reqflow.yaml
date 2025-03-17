@@ -23,6 +23,7 @@ paths:
   # Glob patterns to exclude from requirements processing
   # These are patterns that shouldn't be considered requirements even if they're in specifications or external folders
   excluded_filename_patterns:
+    - "Usecases.md"
     - "**/Logical*.md"
     - "**/Physical*.md"
     - "**/TODO.md"

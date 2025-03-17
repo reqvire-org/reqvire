@@ -1,5 +1,4 @@
 # Validation Tests
-
 This document verifies the requirements for ReqFlow's validation functionality.
 
 ## Relation Validation Tests
@@ -10,30 +9,29 @@ graph LR;
   classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
-
-  b598b28754["Invalid Relation Format Test"];
-  click b598b28754 "ValidationTests.md#invalid-relation-format-test";
-  class b598b28754 verification;
-  bdfd9d65e4["SystemRequirements/Requirement.md/Detailed Error Handling and Logging"];
-  class bdfd9d65e4 default;
-  click bdfd9d65e4 "../SystemRequirements/Requirements.md#detailed-error-handling-and-logging";
-  b598b28754 -->|verifies| bdfd9d65e4;
-  376aa21c53["tests/e2e-validation/test_invalid_relations.sh"];
-  class 376aa21c53 default;
-  click 376aa21c53 "../../tests/e2e-validation/test_invalid_relations.sh";
-  b598b28754 -->|traces| 376aa21c53;
   47e4d671c1["Unsupported Relation Type Test"];
   click 47e4d671c1 "ValidationTests.md#unsupported-relation-type-test";
   class 47e4d671c1 verification;
   5870488e00["SystemRequirements/Requirement.md/Relation Type Validation"];
-  class 5870488e00 default;
+  class 5870488e00 requirement;
   click 5870488e00 "../SystemRequirements/Requirements.md#relation-type-validation";
   47e4d671c1 -->|verifies| 5870488e00;
   cea8390c33["Invalid Relation Types Test"];
   click cea8390c33 "ValidationTests.md#invalid-relation-types-test";
   class cea8390c33 verification;
+  bdfd9d65e4["SystemRequirements/Requirement.md/Detailed Error Handling and Logging"];
+  class bdfd9d65e4 requirement;
+  click bdfd9d65e4 "../SystemRequirements/Requirements.md#detailed-error-handling-and-logging";
   cea8390c33 -->|verifies| bdfd9d65e4;
+  376aa21c53["tests/e2e-validation/test_invalid_relations.sh"];
+  class 376aa21c53 default;
+  click 376aa21c53 "../../tests/e2e-validation/test_invalid_relations.sh";
   cea8390c33 -->|traces| 376aa21c53;
+  b598b28754["Invalid Relation Format Test"];
+  click b598b28754 "ValidationTests.md#invalid-relation-format-test";
+  class b598b28754 verification;
+  b598b28754 -->|verifies| bdfd9d65e4;
+  b598b28754 -->|traces| 376aa21c53;
   d0187b8703["Duplicate Relations Test"];
   click d0187b8703 "ValidationTests.md#duplicate-relations-test";
   class d0187b8703 verification;
@@ -49,39 +47,7 @@ graph LR;
   5ee74702ae -->|traces| 62736884ad;
 ```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ### Unsupported Relation Type Test
-
 This verification test checks that ReqFlow correctly identifies and reports relation types that are not part of the supported vocabulary (e.g., "satisfieddBy" instead of "satisfiedBy").
 
 #### Metadata
@@ -107,15 +73,13 @@ This verification test checks that ReqFlow correctly identifies and reports rela
 
 #### Relations
   * verify: [SystemRequirements/Requirement.md/Relation Type Validation](../SystemRequirements/Requirements.md#relation-type-validation)
-
 ---
 
 ### Invalid Relation Types Test
-
 The verification test checks that ReqFlow correctly identifies and reports invalid relation types such as typos (e.g., "satisfieddBy" instead of "satisfiedBy").
 
 #### Metadata
-* type: verification
+  * type: verification
 
 #### Acceptance Criteria
 - System should detect and report invalid relation types (typos, etc.)
@@ -134,11 +98,9 @@ The verification test checks that ReqFlow correctly identifies and reports inval
 #### Relations
   * verify: [SystemRequirements/Requirement.md/Detailed Error Handling and Logging](../SystemRequirements/Requirements.md#detailed-error-handling-and-logging)
   * trace: [tests/e2e-validation/test_invalid_relations.sh](../../tests/e2e-validation/test_invalid_relations.sh)
-
 ---
 
 ### Invalid Relation Format Test
-
 The verification test checks that ReqFlow correctly identifies and reports relation types with invalid formats (e.g., containing non-alphanumeric characters).
 
 #### Metadata
@@ -161,15 +123,13 @@ The verification test checks that ReqFlow correctly identifies and reports relat
 #### Relations
   * verify: [SystemRequirements/Requirement.md/Detailed Error Handling and Logging](../SystemRequirements/Requirements.md#detailed-error-handling-and-logging)
   * trace: [tests/e2e-validation/test_invalid_relations.sh](../../tests/e2e-validation/test_invalid_relations.sh)
-
 ---
 
 ### Duplicate Relations Test
-
 The verification test checks that ReqFlow correctly identifies and reports duplicate relations (same type and target) within an element.
 
 #### Metadata
-* type: verification
+  * type: verification
 
 #### Acceptance Criteria
 - System should detect and report duplicate relations within the same element
@@ -189,11 +149,9 @@ The verification test checks that ReqFlow correctly identifies and reports dupli
 #### Relations
   * verify: [SystemRequirements/Requirement.md/Detailed Error Handling and Logging](../SystemRequirements/Requirements.md#detailed-error-handling-and-logging)
   * trace: [tests/e2e-validation/test_invalid_relations.sh](../../tests/e2e-validation/test_invalid_relations.sh)
-
 ---
 
 ### Missing Relation Target Test
-
 The verification test checks that ReqFlow correctly identifies and reports relations with targets that do not exist in the model, while properly validating relations to existing targets.
 
 #### Metadata
