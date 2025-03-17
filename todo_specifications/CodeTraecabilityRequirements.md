@@ -38,6 +38,9 @@ While processing traceability in code, the system shall ensure that each `[reqfl
   * refine: [Traceability Format](#traceability-format)
 
 
+
+---
+
 ### Comment Style by File Extension
 
 The system shall use different comment style based of file extension of the code source file.
@@ -45,6 +48,9 @@ The system shall use different comment style based of file extension of the code
 #### Relations
   * refine: [Traceability Format](#traceability-format)
 
+
+
+---
 
 ### Slash style comment
 
@@ -65,6 +71,9 @@ void processSensorData() {
   * containedBy: [Comment Style by File Extension](#comment-style-by-file-extension)
 
 
+
+---
+
 ### Dash style comment
 
 When a source file has a `.py`, `.sh`, `.rb`, or `.yml` extension, the system shall use `#` for single-line comments.
@@ -82,6 +91,9 @@ def process_sensor_data():
   * containedBy: [Comment Style by File Extension](#comment-style-by-file-extension)
 
 
+
+---
+
 ### XML style comment
 
 When a source file has a `.html`, `.xml`, or `.xsl` extension, the system shall use `<!-- -->` for comments.
@@ -94,9 +106,13 @@ When a source file has a `.html`, `.xml`, or `.xsl` extension, the system shall 
 <!-- [reqflow::satisfies: Req1] END -->
 
 ```
+
 #### Relations
   * containedBy: [Comment Style by File Extension](#comment-style-by-file-extension)
 
+
+
+---
 
 ### CSS style comment
 
@@ -110,9 +126,13 @@ When a source file has a `.css` or `.scss` extension, the system shall use `/* *
 /* [reqflow::satisfies: Req1] END */
 
 ```
+
 #### Relations
   * containedBy: [Comment Style by File Extension](#comment-style-by-file-extension)
 
+
+
+---
 
 ### SQL style comment
 
@@ -127,6 +147,9 @@ SELECT * FROM users;
 #### Relations
   * containedBy: [Comment Style by File Extension](#comment-style-by-file-extension)
 
+
+
+---
 
 ### BAT style comment
 
