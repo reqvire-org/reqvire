@@ -1,0 +1,455 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>llm_context</title>
+    
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa;
+    color: #333;
+}
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+.content {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+h1 {
+    color: #333;
+    border-bottom: 2px solid #eaecef;
+    padding-bottom: 10px;
+    margin-top: 0;
+}
+h2 {
+    color: #333;
+    border-bottom: 1px solid #eaecef;
+    padding-bottom: 5px;
+}
+h3 {
+    color: #1a6fb7;
+    margin-top: 25px;
+}
+h4 {
+    color: #555;
+    font-weight: 600;
+}
+a {
+    color: #0366d6;
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 20px 0;
+}
+table, th, td {
+    border: 1px solid #dfe2e5;
+}
+th, td {
+    padding: 8px 12px;
+    text-align: left;
+}
+th {
+    background-color: #f6f8fa;
+}
+code {
+    background: #f6f8fa;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 90%;
+}
+pre {
+    background: #f6f8fa;
+    border-radius: 3px;
+    padding: 16px;
+    overflow: auto;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+}
+blockquote {
+    margin: 0;
+    padding: 0 15px;
+    color: #777;
+    border-left: 4px solid #dfe2e5;
+}
+.mermaid {
+    margin: 20px 0;
+    text-align: center;
+}
+</style>
+
+    <!-- Enhanced mermaid configuration for ReqFlow diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'neutral',
+            maxTextSize: 90000,
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            securityLevel: 'loose'
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="content">
+            <h1 id="reqflow-for-llm-context">ReqFlow for LLM Context</h1>
+<p>This document provides essential context for Large Language Models (LLMs) to understand and work effectively with ReqFlow-based specifications and requirements management.</p>
+<h2 id="what-is-reqflow?">What is ReqFlow?</h2>
+<p>ReqFlow is a methodology and toolset for Model-Based Systems Engineering (MBSE) that uses Markdown as the primary format for requirements documentation and traceability. It enables:</p>
+<ul>
+<li>Requirements management in human-readable Markdown</li>
+<li>Relationship tracing between requirements and other artifacts</li>
+<li>Automated validation of document structure and relationships</li>
+<li>Diagram generation from requirements</li>
+<li>Change impact analysis and propagation</li>
+<li>HTML generation with navigable links</li>
+<li>Traceability matrix generation</li>
+</ul>
+<h2 id="core-concepts">Core Concepts</h2>
+<h3 id="elements">Elements</h3>
+<ul>
+<li>An <strong>Element</strong> is the fundamental unit in ReqFlow, defined by a <code>###</code> header in Markdown</li>
+<li>Elements must have unique names within a document</li>
+<li>Element content includes everything under the header until the next element or end of document</li>
+<li>Example:
+<pre><code class="language-markdown">### My Requirement
+
+This is the requirement text that describes what the system must do.
+
+#### Relations
+...
+</code></pre>
+</li>
+</ul>
+<h3 id="relations">Relations</h3>
+<ul>
+<li>Relations connect elements to other elements, forming the traceability structure</li>
+<li>Relations are defined in a <code>#### Relations</code> subsection within an element using bullet points</li>
+<li>Format: <code>* relationType: [identifier](link)</code></li>
+<li>Each relation must be on a separate line with proper indentation (2 spaces before bullet)</li>
+<li>Example:
+<pre><code class="language-markdown">#### Relations
+  * refine: [UserStories.md/Generate Diagrams](UserStories.html#generate-diagrams)
+  * verifiedBy: [TestCases.md/TC12](TestCases.html#tc12)
+</code></pre>
+</li>
+</ul>
+<h3 id="key-relation-types">Key Relation Types</h3>
+<ul>
+<li><strong>refine</strong>: Further elaborates another element (bidirectional impact)</li>
+<li><strong>verifiedBy/verify</strong>: Links to verification methods or tests</li>
+<li><strong>derivedFrom/derive</strong>: Source and derived requirements (upward impact)</li>
+<li><strong>containedBy/contain</strong>: Parent-child relationships (hierarchical)</li>
+<li><strong>satisfiedBy/satisfy</strong>: Implementation relationships (implementation artifacts)</li>
+<li><strong>tracedFrom/trace</strong>: General traceability without specific semantics</li>
+<li><strong>dependsOn/enable</strong>: Dependency relationships (directional)</li>
+</ul>
+<h3 id="identifiers">Identifiers</h3>
+<ul>
+<li>Identifiers uniquely reference elements across documents</li>
+<li>Format: <code>path/to/file.md/element name</code></li>
+<li>Relative or absolute paths are supported
+<ul>
+<li>Relative paths: Based on document location (<code>../UserStories.md/My Element</code>)</li>
+<li>Absolute paths: Starting from specifications root (<code>/Requirements.md/My Element</code>)</li>
+</ul>
+</li>
+<li>Element names in identifiers must match the exact element name in the target file</li>
+<li>Links in Markdown vs HTML:
+<ul>
+<li>Markdown links use file.md format</li>
+<li>HTML links replace .md with .html and use URL-encoded fragment identifiers</li>
+</ul>
+</li>
+</ul>
+<h3 id="subsections">Subsections</h3>
+<ul>
+<li>Elements may contain various subsections marked by <code>####</code> headers</li>
+<li>Reserved subsections with defined structures include:
+<ul>
+<li><strong>Relations</strong>: Defines connections to other elements</li>
+<li><strong>Details</strong>: Extension of requirement text with the same validity</li>
+<li><strong>Properties</strong>: Contains structured metadata about the element</li>
+<li><strong>Metadata</strong>: Additional standard metadata fields</li>
+</ul>
+</li>
+</ul>
+<h2 id="document-structure">Document Structure</h2>
+<p>A typical ReqFlow document follows this structure:</p>
+<ol>
+<li><strong>Document title</strong> (<code># Title</code>)</li>
+<li><strong>Optional overview sections</strong> (<code>## Section</code>)</li>
+<li><strong>Elements</strong> (<code>### Element Name</code>) containing:
+<ul>
+<li>Primary content describing the element</li>
+<li>Relations subsection (<code>#### Relations</code>)</li>
+<li>Optional Details subsection (<code>#### Details</code>)</li>
+<li>Separators between elements (<code>---</code>)</li>
+</ul>
+</li>
+</ol>
+<p>Example document structure:</p>
+<pre><code class="language-markdown"># Requirements Document
+
+This document contains system requirements.
+
+## Functional Requirements
+
+### Requirement One
+
+The system shall provide feature X.
+
+#### Relations
+  * refine: [UserStories.md/Story One](UserStories.html#story-one)
+  * verifiedBy: [TestCases.md/Test Case 1](TestCases.html#test-case-1)
+
+---
+
+### Requirement Two
+
+The system shall implement capability Y.
+
+#### Relations
+  * derivedFrom: [Requirements.md/Requirement One](Requirements.html#requirement-one)
+  * satisfiedBy: [Components.md/Component Alpha](Components.html#component-alpha)
+
+#### Details
+
+Additional details about Requirement Two implementation.
+</code></pre>
+<h2 id="reqflow-cli-operations">ReqFlow CLI Operations</h2>
+<p>The ReqFlow CLI tool provides various operations:</p>
+<ul>
+<li>
+<p><strong>Validation</strong>: Check structure and relationships for errors</p>
+<ul>
+<li><code>cargo run -- validate</code></li>
+<li><code>cargo run -- --validate_markdown</code> (structure only)</li>
+<li><code>cargo run -- --validate_relations</code> (relations only)</li>
+<li><code>cargo run -- --validate_all</code> (comprehensive validation)</li>
+</ul>
+</li>
+<li>
+<p><strong>Linting</strong>: Automatically fix formatting issues</p>
+<ul>
+<li><code>cargo run -- --lint</code> (apply fixes)</li>
+<li><code>cargo run -- --lint --dry-run</code> (suggest fixes without applying)</li>
+</ul>
+</li>
+<li>
+<p><strong>HTML Generation</strong>: Convert markdown to browsable HTML with linkable elements</p>
+<ul>
+<li><code>cargo run --  --html</code></li>
+</ul>
+</li>
+<li>
+<p><strong>Matrix Generation</strong>: Create traceability matrices</p>
+<ul>
+<li><code>cargo run --  --generate_matrix</code></li>
+</ul>
+</li>
+<li>
+<p><strong>Diagram Generation</strong>: Create Mermaid diagrams from requirements</p>
+<ul>
+<li><code>cargo run -- --generate_diagrams</code></li>
+</ul>
+</li>
+<li>
+<p><strong>JSON Output</strong>: Machine-readable validation results</p>
+<ul>
+<li><code>cargo run -- --validate_all --json</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="configuration-options">Configuration Options</h2>
+<p>ReqFlow supports configuration via YAML files:</p>
+<pre><code class="language-yaml">general:
+  html_output: true
+  verbose: false
+  
+paths:
+  specifications_folder: &quot;specifications&quot;
+  system_requirements_folder: &quot;SystemRequirements&quot;
+  design_specifications_folder: &quot;DesignSpecifications&quot;
+  
+validation:
+  validate_markdown: true
+  validate_relations: true
+  validate_cross_components: true
+</code></pre>
+<h2 id="change-impact-analysis">Change Impact Analysis</h2>
+<p>ReqFlow analyzes how changes propagate through the requirement hierarchy:</p>
+<ul>
+<li>
+<p><strong>Upward Propagation</strong>: Changes flow up to parent/dependent elements</p>
+<ul>
+<li>Affected by: derivedFrom, containedBy relations</li>
+</ul>
+</li>
+<li>
+<p><strong>Downward Propagation</strong>: Changes flow down to child/derived elements</p>
+<ul>
+<li>Affected by: derive, contain relations</li>
+</ul>
+</li>
+<li>
+<p><strong>Bidirectional Impact</strong>: Changes affect both directions</p>
+<ul>
+<li>Affected by: refine relations</li>
+</ul>
+</li>
+<li>
+<p><strong>Implementation Impact</strong>: Changes require implementation updates</p>
+<ul>
+<li>Affected by: satisfiedBy relations</li>
+</ul>
+</li>
+<li>
+<p><strong>Verification Impact</strong>: Changes require revalidation</p>
+<ul>
+<li>Affected by: verifiedBy relations</li>
+</ul>
+</li>
+</ul>
+<h2 id="diagrams-and-visualization">Diagrams and Visualization</h2>
+<p>ReqFlow generates Mermaid diagrams to visualize requirement relationships:</p>
+<ul>
+<li>
+<p><strong>Node Types</strong>:</p>
+<ul>
+<li>Red nodes: Requirements</li>
+<li>Yellow nodes: Satisfying components</li>
+<li>Green nodes: Verification artifacts</li>
+<li>Light blue nodes: References to other diagrams/categories</li>
+</ul>
+</li>
+<li>
+<p><strong>Edge Types</strong>:</p>
+<ul>
+<li>Different arrow styles represent relationship types</li>
+<li>Direction indicates flow of relationship</li>
+</ul>
+</li>
+</ul>
+<p>Example Mermaid diagram structure:</p>
+<div class="mermaid">graph TD
+    Req1[&quot;Requirement One&quot;] --&gt; Req2[&quot;Requirement Two&quot;]
+    Req1 --&gt; Comp1[&quot;Component Alpha&quot;]
+    Req2 --&gt; Test1[&quot;Test Case 1&quot;]
+</div>
+<h2 id="validation-and-linting">Validation and Linting</h2>
+<p>ReqFlow performs multiple types of validation and linting:</p>
+<h3 id="validation-(structural-errors)">Validation (Structural Errors)</h3>
+<ul>
+<li>Unique element names within documents</li>
+<li>Proper heading hierarchy</li>
+<li>Valid relation types according to specification</li>
+<li>Valid relation targets (elements and files exist)</li>
+<li>Proper relationship format</li>
+<li>Cross-component dependency validation</li>
+</ul>
+<h3 id="linting-(formatting-improvements)">Linting (Formatting Improvements)</h3>
+<ul>
+<li>Replacing absolute links with relative links</li>
+<li>Trimming excess whitespace</li>
+<li>Normalizing newlines before subsections</li>
+<li>Inserting separator lines between elements</li>
+<li>Ensuring consistent indentation in relation lists</li>
+</ul>
+<h2 id="best-practices-for-working-with-reqflow">Best Practices for Working with ReqFlow</h2>
+<ol>
+<li>
+<p><strong>Element Naming</strong>:</p>
+<ul>
+<li>Make names unique and descriptive</li>
+<li>Use consistent naming patterns</li>
+<li>Avoid special characters when possible</li>
+</ul>
+</li>
+<li>
+<p><strong>Relation Management</strong>:</p>
+<ul>
+<li>Choose relation types based on their semantic meaning</li>
+<li>Maintain bidirectional relationships where appropriate</li>
+<li>Ensure targets exist before creating relations</li>
+</ul>
+</li>
+<li>
+<p><strong>Path Handling</strong>:</p>
+<ul>
+<li>Use relative paths when possible for portability</li>
+<li>Verify paths resolve correctly</li>
+</ul>
+</li>
+<li>
+<p><strong>Formatting Consistency</strong>:</p>
+<ul>
+<li>Follow standard indentation (2 spaces for bullets)</li>
+<li>Use consistent separator lines between elements</li>
+<li>Maintain proper nesting of headers</li>
+</ul>
+</li>
+<li>
+<p><strong>Change Management</strong>:</p>
+<ul>
+<li>Consider change propagation when modifying elements</li>
+<li>Review impacted elements when making changes</li>
+<li>Update verification artifacts when requirements change</li>
+</ul>
+</li>
+</ol>
+<h2 id="tips-for-llms-working-with-reqflow">Tips for LLMs Working with ReqFlow</h2>
+<ol>
+<li>
+<p>When creating requirements, always follow the exact format shown above</p>
+</li>
+<li>
+<p>When modifying requirements, maintain all existing relationships unless explicitly directed to change them</p>
+</li>
+<li>
+<p>When adding relationships, verify that target elements exist and use exact element names</p>
+</li>
+<li>
+<p>When analyzing changes, trace through the relationship network to identify all potentially affected elements</p>
+</li>
+<li>
+<p>When creating new files, follow existing naming and folder conventions</p>
+</li>
+<li>
+<p>Always maintain separation between elements with horizontal rules <code>---</code> for better readability</p>
+</li>
+<li>
+<p>Use the correct relation type based on the semantic relationship being established</p>
+</li>
+<li>
+<p>Consider both upstream and downstream impacts when suggesting requirement changes</p>
+</li>
+</ol>
+
+        </div>
+    </div>
+</body>
+</html>

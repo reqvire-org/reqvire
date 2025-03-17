@@ -1,3 +1,6 @@
+# Requirements
+
+
 ## Code Traecability
 
 TODO:
@@ -23,7 +26,7 @@ Where:
 - `<element identifier>` is the identifier of the requirement being traced.
 
 #### Relations
-  * refine: [UserRequirements#Code Traceability](UserRequirements##code-traceability)
+  * refine: [/specifications/UserRequirements#Code Traceability](../UserRequirements.md#code-traceability)
 
 ---
 

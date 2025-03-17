@@ -18,8 +18,7 @@ paths:
   # These can be absolute paths or paths relative to the input folder
   # All markdown files in these folders are considered requirements (except those matching exclusion patterns)
   external_folders:
-    - tests
-    - src
+    - todo_specifications
       
   # Glob patterns to exclude from requirements processing
   # These are patterns that shouldn't be considered requirements even if they're in specifications or external folders

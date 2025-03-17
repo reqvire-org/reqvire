@@ -4,7 +4,8 @@ use anyhow::Result;
 use log::{error, info};
 use serde::Serialize;
 use crate::error::ReqFlowError;
-use crate::{html_export, init, linting, model::ModelManager};
+use crate::{html_export, linting, model::ModelManager};
+use crate::index_generator;
 use globset::GlobSet;
 
 #[derive(Parser, Debug)]
@@ -43,6 +44,12 @@ pub struct Args {
     #[clap(long)]
     pub generate_diagrams: bool,
     
+            
+    /// Generate index document with links and summaries to all documents
+    #[clap(long)]
+    pub generate_index: bool,
+    
+        
     /// Path to a custom configuration file (YAML format)
     /// If not provided, the system will look for reqflow.yml, reqflow.yaml, 
     /// .reqflow.yml, or .reqflow.yaml in the current directory
@@ -55,11 +62,7 @@ pub struct Args {
     /// Large Language Models understand and work with ReqFlow-based projects
     #[clap(long)]
     pub llm_context: bool,
-    
-    /// Initialize a new ReqFlow project
-    /// Bootstraps a basic project structure with example requirements and configuration
-    #[clap(long)]
-    pub init: bool,
+
 }
 
 impl Args {
@@ -123,19 +126,11 @@ pub fn handle_command(
                 return Err(anyhow::anyhow!("Failed to read LLM context file"));
             }
         }
-    }else if args.init {
-       // Handle `init` command    
-        match init::initialize_project(&specification_folder_path) {
-            Ok(_) => return Ok(0), 
-            Err(e) => {
-                error!("Failed to initialize project: {}", e);
-                return Err(anyhow::anyhow!("Project initialization failed: {}", e));
-            }
-        }
     }else{
   
         let parse_result=model_manager.parse_and_validate(&specification_folder_path, &external_folders_path,excluded_filename_patterns);
 
+        model_manager.element_registry.print_registry();
         if args.validate {
             match parse_result {
                 Ok(errors) => {
@@ -146,7 +141,16 @@ pub fn handle_command(
                     }
                 }
                 Err(e) => eprintln!("❌ Validation failed: {}", e),
-            }                                 
+            }  
+        }else if args.generate_index {
+            info!("Generating index.....");
+            match index_generator::generate_readme_index(&model_manager.element_registry, &specification_folder_path,&external_folders_path){
+                Ok(_index_content) => {},
+                Err(e) => eprintln!("❌ Failed to generate README.md: {:?}", e),
+            }
+            return Ok(0);        
+            
+                                                    
         }else if args.generate_diagrams {
             info!("Generating mermaid diagrams in {:?}", specification_folder_path);
             // Only collect identifiers and process files to add diagrams
@@ -155,16 +159,22 @@ pub fn handle_command(
        
             info!("Requirements diagrams updated in source files");
             return Ok(0);
+            
+            
         }else if args.lint {
             linting::run_linting(&specification_folder_path, &external_folders_path,excluded_filename_patterns, args.dry_run)?;
             return Ok(0);
+            
+            
         }else if args.generate_matrix {
             std::fs::create_dir_all(output_folder_path)?;
             //model_manager.generate_traceability_matrix(specification_folder_path, output_folder_path)?;
             info!("Traceability matrix saved to {:?}", output_folder_path);
             return Ok(0);
+            
+            
         } else if args.html {
-            let processed_count = html_export::export_markdown_to_html(specification_folder_path, output_folder_path)?;
+            let processed_count = html_export::export_markdown_to_html(specification_folder_path,&external_folders_path, output_folder_path)?;
             info!("{} markdown files converted to HTML", processed_count);
             return Ok(0);
         }else{
@@ -199,8 +209,8 @@ mod tests {
 
     #[test]
     fn test_cli_parsing() {
-        let args = Args::parse_from(&["reqflow", "--init"]);
-        assert!(args.init);
+        let args = Args::parse_from(&["reqflow", "--html"]);
+        assert!(args.html);
     }
     
     #[test]
@@ -208,7 +218,6 @@ mod tests {
         // Mock CLI arguments
         let args = Args {
             llm_context: false,
-            init: false,
             html: false,
             lint: false,
             dry_run: false,
