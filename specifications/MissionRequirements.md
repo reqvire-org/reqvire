@@ -56,6 +56,8 @@ graph LR;
 
 
 
+
+
 ### Align with Industry Standards
 
 The system must adhere to widely recognized industry standards, such as ISO/IEC/IEEE 15288, to ensure compatibility and relevance in systems engineering practices.

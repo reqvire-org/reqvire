@@ -57,6 +57,8 @@ graph LR;
 
 
 
+
+
 ### Excess Whitespace Detection and Correction
 
 The verification test checks that ReqFlow correctly identifies and fixes excess whitespace after headers.
@@ -87,6 +89,8 @@ The verification test checks that ReqFlow correctly identifies and fixes excess 
   * trace: [tests/e2e-linting/test_whitespace_linting.sh](../../tests/e2e-linting/test_whitespace_linting.sh)
 
 ## External Folders Tests
+
+
 
 
 

@@ -11,13 +11,6 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  47e4d671c1["Unsupported Relation Type Test"];
-  click 47e4d671c1 "ValidationTests.md#unsupported-relation-type-test";
-  class 47e4d671c1 verification;
-  5870488e00["SystemRequirements/Requirement.md/Relation Type Validation"];
-  class 5870488e00 requirement;
-  click 5870488e00 "../SystemRequirements/Requirements.md#relation-type-validation";
-  47e4d671c1 -->|verifies| 5870488e00;
   cea8390c33["Invalid Relation Types Test"];
   click cea8390c33 "ValidationTests.md#invalid-relation-types-test";
   class cea8390c33 verification;
@@ -29,6 +22,11 @@ graph LR;
   class 376aa21c53 default;
   click 376aa21c53 "../../tests/e2e-validation/test_invalid_relations.sh";
   cea8390c33 -->|traces| 376aa21c53;
+  b598b28754["Invalid Relation Format Test"];
+  click b598b28754 "ValidationTests.md#invalid-relation-format-test";
+  class b598b28754 verification;
+  b598b28754 -->|verifies| bdfd9d65e4;
+  b598b28754 -->|traces| 376aa21c53;
   5ee74702ae["Missing Relation Target Test"];
   click 5ee74702ae "ValidationTests.md#missing-relation-target-test";
   class 5ee74702ae verification;
@@ -37,17 +35,21 @@ graph LR;
   class 62736884ad default;
   click 62736884ad "../../tests/e2e-validation/test_missing_targets.sh";
   5ee74702ae -->|traces| 62736884ad;
+  47e4d671c1["Unsupported Relation Type Test"];
+  click 47e4d671c1 "ValidationTests.md#unsupported-relation-type-test";
+  class 47e4d671c1 verification;
+  5870488e00["SystemRequirements/Requirement.md/Relation Type Validation"];
+  class 5870488e00 requirement;
+  click 5870488e00 "../SystemRequirements/Requirements.md#relation-type-validation";
+  47e4d671c1 -->|verifies| 5870488e00;
   d0187b8703["Duplicate Relations Test"];
   click d0187b8703 "ValidationTests.md#duplicate-relations-test";
   class d0187b8703 verification;
   d0187b8703 -->|verifies| bdfd9d65e4;
   d0187b8703 -->|traces| 376aa21c53;
-  b598b28754["Invalid Relation Format Test"];
-  click b598b28754 "ValidationTests.md#invalid-relation-format-test";
-  class b598b28754 verification;
-  b598b28754 -->|verifies| bdfd9d65e4;
-  b598b28754 -->|traces| 376aa21c53;
 ```
+
+
 
 
 

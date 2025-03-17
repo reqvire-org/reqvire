@@ -9,96 +9,6 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  dd0846393d["Missing Separators Linting Implementation"];
-  click dd0846393d "Requirements.md#missing-separators-linting-implementation";
-  class dd0846393d requirement;
-  81758bdb22["UserRequirements.md/Format Consistency Enforcement"];
-  class 81758bdb22 requirement;
-  click 81758bdb22 "../UserRequirements.md#format-consistency-enforcement";
-  dd0846393d -.->|deriveReqT| 81758bdb22;
-  c5bb68b4c4["linting/separators.rs"];
-  class c5bb68b4c4 default;
-  click c5bb68b4c4 "https://github.com/reqflow/reqflow/src/linting/separators.rs";
-  c5bb68b4c4 -->|satisfies| dd0846393d;
-  45770e9b31["File Pattern Exclusion for Linting"];
-  click 45770e9b31 "Requirements.md#file-pattern-exclusion-for-linting";
-  class 45770e9b31 requirement;
-  cc8128cae3["Configurable Filename Exclusion Patterns"];
-  class cc8128cae3 requirement;
-  click cc8128cae3 "Requirements.md#configurable-filename-exclusion-patterns";
-  45770e9b31 ==>|refines| cc8128cae3;
-  e3935df50d["utils.rs"];
-  class e3935df50d default;
-  click e3935df50d "https://github.com/reqflow/reqflow/src/utils.rs";
-  e3935df50d -->|satisfies| 45770e9b31;
-  3efb9595f2["Indentation Consistency Linting Implementation"];
-  click 3efb9595f2 "Requirements.md#indentation-consistency-linting-implementation";
-  class 3efb9595f2 requirement;
-  3efb9595f2 -.->|deriveReqT| 81758bdb22;
-  a33e375c37["linting/indentation.rs"];
-  class a33e375c37 default;
-  click a33e375c37 "https://github.com/reqflow/reqflow/src/linting/indentation.rs";
-  a33e375c37 -->|satisfies| 3efb9595f2;
-  d93eda81e3["Directory Structure Processing"];
-  click d93eda81e3 "Requirements.md#directory-structure-processing";
-  class d93eda81e3 requirement;
-  ec70b05609["Index Generator Implementation"];
-  class ec70b05609 requirement;
-  click ec70b05609 "Requirements.md#index-generator-implementation";
-  d93eda81e3 ==>|refines| ec70b05609;
-  6433b28d02["linting/index_generator.rs"];
-  class 6433b28d02 default;
-  click 6433b28d02 "https://github.com/reqflow/reqflow/src/linting/index_generator.rs";
-  6433b28d02 -->|satisfies| d93eda81e3;
-  6e1435ad10["Inconsistent Newlines Linting Implementation"];
-  click 6e1435ad10 "Requirements.md#inconsistent-newlines-linting-implementation";
-  class 6e1435ad10 requirement;
-  6e1435ad10 -.->|deriveReqT| 81758bdb22;
-  f771dce14b["linting/newlines.rs"];
-  class f771dce14b default;
-  click f771dce14b "https://github.com/reqflow/reqflow/src/linting/newlines.rs";
-  f771dce14b -->|satisfies| 6e1435ad10;
-  8f2198f681["Dry Run Mode"];
-  click 8f2198f681 "Requirements.md#dry-run-mode";
-  class 8f2198f681 requirement;
-  fffbb22796["CLI Lint Flag"];
-  class fffbb22796 requirement;
-  click fffbb22796 "Requirements.md#cli-lint-flag";
-  8f2198f681 -.->|deriveReqT| fffbb22796;
-  b04c66abda["cli.rs"];
-  class b04c66abda default;
-  click b04c66abda "https://github.com/reqflow/reqflow/src/cli.rs";
-  b04c66abda -->|satisfies| 8f2198f681;
-  3f3d3f9ccb["Excess Whitespace Linting Implementation"];
-  click 3f3d3f9ccb "Requirements.md#excess-whitespace-linting-implementation";
-  class 3f3d3f9ccb requirement;
-  3f3d3f9ccb -.->|deriveReqT| 81758bdb22;
-  890ff61be8["linting/whitespace.rs"];
-  class 890ff61be8 default;
-  click 890ff61be8 "https://github.com/reqflow/reqflow/src/linting/whitespace.rs";
-  890ff61be8 -->|satisfies| 3f3d3f9ccb;
-  74344124a8["Index Generation During Linting"];
-  click 74344124a8 "Requirements.md#index-generation-during-linting";
-  class 74344124a8 requirement;
-  f5b5eaeb28["UserRequirements.md/Generate Documentation Index"];
-  class f5b5eaeb28 requirement;
-  click f5b5eaeb28 "../UserRequirements.md#generate-documentation-index";
-  74344124a8 -.->|deriveReqT| f5b5eaeb28;
-  6433b28d02["linting/index_generator.rs"];
-  class 6433b28d02 default;
-  click 6433b28d02 "https://github.com/reqflow/reqflow/src/linting/index_generator.rs";
-  6433b28d02 -->|satisfies| 74344124a8;
-  63f1cd4974["Git-Style Diff Output for Linting"];
-  click 63f1cd4974 "Requirements.md#git-style-diff-output-for-linting";
-  class 63f1cd4974 requirement;
-  808b1863c8["UserRequirements.md/Linting Command Output"];
-  class 808b1863c8 requirement;
-  click 808b1863c8 "../UserRequirements.md#linting-command-output";
-  63f1cd4974 -.->|deriveReqT| 808b1863c8;
-  5d72a78def["linting/mod.rs"];
-  class 5d72a78def default;
-  click 5d72a78def "https://github.com/reqflow/reqflow/src/linting/mod.rs";
-  5d72a78def -->|satisfies| 63f1cd4974;
   ec14dc67ea["Automated Multiple Linting Passes"];
   click ec14dc67ea "Requirements.md#automated-multiple-linting-passes";
   class ec14dc67ea requirement;
@@ -108,16 +18,27 @@ graph LR;
   ec14dc67ea ==>|refines| feb2e14e3b;
   5d72a78def["linting/mod.rs"];
   class 5d72a78def default;
-  click 5d72a78def "https://github.com/reqflow/reqflow/src/linting/mod.rs";
+  click 5d72a78def "/src/linting/mod.rs";
   5d72a78def -->|satisfies| ec14dc67ea;
-  887a7d36ca["UserRequirements.md/Linting Command Behavior"];
-  class 887a7d36ca requirement;
-  click 887a7d36ca "../UserRequirements.md#linting-command";
-  fffbb22796 -.->|deriveReqT| 887a7d36ca;
-  b04c66abda["cli.rs"];
-  class b04c66abda default;
-  click b04c66abda "https://github.com/reqflow/reqflow/src/cli.rs";
-  b04c66abda -->|satisfies| fffbb22796;
+  6e1435ad10["Inconsistent Newlines Linting Implementation"];
+  click 6e1435ad10 "Requirements.md#inconsistent-newlines-linting-implementation";
+  class 6e1435ad10 requirement;
+  81758bdb22["UserRequirements.md/Format Consistency Enforcement"];
+  class 81758bdb22 requirement;
+  click 81758bdb22 "../UserRequirements.md#format-consistency-enforcement";
+  6e1435ad10 -.->|deriveReqT| 81758bdb22;
+  f771dce14b["linting/newlines.rs"];
+  class f771dce14b default;
+  click f771dce14b "/src/linting/newlines.rs";
+  f771dce14b -->|satisfies| 6e1435ad10;
+  dd0846393d["Missing Separators Linting Implementation"];
+  click dd0846393d "Requirements.md#missing-separators-linting-implementation";
+  class dd0846393d requirement;
+  dd0846393d -.->|deriveReqT| 81758bdb22;
+  c5bb68b4c4["linting/separators.rs"];
+  class c5bb68b4c4 default;
+  click c5bb68b4c4 "/src/linting/separators.rs";
+  c5bb68b4c4 -->|satisfies| dd0846393d;
   66aa36deca["Parallel Linting Processing"];
   click 66aa36deca "Requirements.md#parallel-linting-processing";
   class 66aa36deca requirement;
@@ -127,38 +48,88 @@ graph LR;
   66aa36deca -.->|deriveReqT| 103ddb8dc3;
   5d72a78def["linting/mod.rs"];
   class 5d72a78def default;
-  click 5d72a78def "https://github.com/reqflow/reqflow/src/linting/mod.rs";
+  click 5d72a78def "/src/linting/mod.rs";
   5d72a78def -->|satisfies| 66aa36deca;
+  8f2198f681["Dry Run Mode"];
+  click 8f2198f681 "Requirements.md#dry-run-mode";
+  class 8f2198f681 requirement;
+  fffbb22796["CLI Lint Flag"];
+  class fffbb22796 requirement;
+  click fffbb22796 "Requirements.md#cli-lint-flag";
+  8f2198f681 -.->|deriveReqT| fffbb22796;
+  b04c66abda["cli.rs"];
+  class b04c66abda default;
+  click b04c66abda "/src/cli.rs";
+  b04c66abda -->|satisfies| 8f2198f681;
+  63f1cd4974["Git-Style Diff Output for Linting"];
+  click 63f1cd4974 "Requirements.md#git-style-diff-output-for-linting";
+  class 63f1cd4974 requirement;
+  808b1863c8["UserRequirements.md/Linting Command Output"];
+  class 808b1863c8 requirement;
+  click 808b1863c8 "../UserRequirements.md#linting-command-output";
+  63f1cd4974 -.->|deriveReqT| 808b1863c8;
+  5d72a78def["linting/mod.rs"];
+  class 5d72a78def default;
+  click 5d72a78def "/src/linting/mod.rs";
+  5d72a78def -->|satisfies| 63f1cd4974;
+  3f3d3f9ccb["Excess Whitespace Linting Implementation"];
+  click 3f3d3f9ccb "Requirements.md#excess-whitespace-linting-implementation";
+  class 3f3d3f9ccb requirement;
+  3f3d3f9ccb -.->|deriveReqT| 81758bdb22;
+  890ff61be8["linting/whitespace.rs"];
+  class 890ff61be8 default;
+  click 890ff61be8 "/src/linting/whitespace.rs";
+  890ff61be8 -->|satisfies| 3f3d3f9ccb;
+  3efb9595f2["Indentation Consistency Linting Implementation"];
+  click 3efb9595f2 "Requirements.md#indentation-consistency-linting-implementation";
+  class 3efb9595f2 requirement;
+  3efb9595f2 -.->|deriveReqT| 81758bdb22;
+  a33e375c37["linting/indentation.rs"];
+  class a33e375c37 default;
+  click a33e375c37 "/src/linting/indentation.rs";
+  a33e375c37 -->|satisfies| 3efb9595f2;
+  887a7d36ca["UserRequirements.md/Linting Command Behavior"];
+  class 887a7d36ca requirement;
+  click 887a7d36ca "../UserRequirements.md#linting-command";
+  fffbb22796 -.->|deriveReqT| 887a7d36ca;
+  b04c66abda["cli.rs"];
+  class b04c66abda default;
+  click b04c66abda "/src/cli.rs";
+  b04c66abda -->|satisfies| fffbb22796;
+  d93eda81e3["Directory Structure Processing"];
+  click d93eda81e3 "Requirements.md#directory-structure-processing";
+  class d93eda81e3 requirement;
+  ec70b05609["Index Generator Implementation"];
+  class ec70b05609 requirement;
+  click ec70b05609 "Requirements.md#index-generator-implementation";
+  d93eda81e3 ==>|refines| ec70b05609;
+  6433b28d02["linting/index_generator.rs"];
+  class 6433b28d02 default;
+  click 6433b28d02 "/src/linting/index_generator.rs";
+  6433b28d02 -->|satisfies| d93eda81e3;
+  74344124a8["Index Generation During Linting"];
+  click 74344124a8 "Requirements.md#index-generation-during-linting";
+  class 74344124a8 requirement;
+  f5b5eaeb28["UserRequirements.md/Generate Documentation Index"];
+  class f5b5eaeb28 requirement;
+  click f5b5eaeb28 "../UserRequirements.md#generate-documentation-index";
+  74344124a8 -.->|deriveReqT| f5b5eaeb28;
+  6433b28d02["linting/index_generator.rs"];
+  class 6433b28d02 default;
+  click 6433b28d02 "/src/linting/index_generator.rs";
+  6433b28d02 -->|satisfies| 74344124a8;
+  45770e9b31["File Pattern Exclusion for Linting"];
+  click 45770e9b31 "Requirements.md#file-pattern-exclusion-for-linting";
+  class 45770e9b31 requirement;
+  cc8128cae3["Configurable Filename Exclusion Patterns"];
+  class cc8128cae3 requirement;
+  click cc8128cae3 "Requirements.md#configurable-filename-exclusion-patterns";
+  45770e9b31 ==>|refines| cc8128cae3;
+  e3935df50d["utils.rs"];
+  class e3935df50d default;
+  click e3935df50d "/src/utils.rs";
+  e3935df50d -->|satisfies| 45770e9b31;
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ### CLI Lint Flag
 
@@ -166,7 +137,7 @@ The system shall provide a linting function, activated by the (--lint flag), whi
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Linting Command Behavior](../UserRequirements.md#linting-command)
-  * satisfiedBy: [cli.rs](https://github.com/reqflow/reqflow/src/cli.rs)    
+  * satisfiedBy: [cli.rs](/src/cli.rs)    
 
 ---
   
@@ -180,7 +151,7 @@ The system shall provide a dry run mode (--dry-run flag) for linting that shows 
 
 #### Relations
   * derivedFrom: [CLI Lint Flag](#cli-lint-flag)
-  * satisfiedBy: [cli.rs](https://github.com/reqflow/reqflow/src/cli.rs)    
+  * satisfiedBy: [cli.rs](/src/cli.rs)    
 
 ---
   
@@ -190,7 +161,7 @@ The system shall detect and fix excess whitespace after element headers, subsect
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Format Consistency Enforcement](../UserRequirements.md#format-consistency-enforcement)
-  * satisfiedBy: [linting/whitespace.rs](https://github.com/reqflow/reqflow/src/linting/whitespace.rs)
+  * satisfiedBy: [linting/whitespace.rs](/src/linting/whitespace.rs)
 
 ---
 
@@ -200,7 +171,7 @@ The system shall identify instances where subsection headers lack proper spacing
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Format Consistency Enforcement](../UserRequirements.md#format-consistency-enforcement)
-  * satisfiedBy: [linting/newlines.rs](https://github.com/reqflow/reqflow/src/linting/newlines.rs)
+  * satisfiedBy: [linting/newlines.rs](/src/linting/newlines.rs)
 
 ---
 
@@ -210,7 +181,7 @@ The system shall detect consecutive element sections that lack a separator line 
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Format Consistency Enforcement](../UserRequirements.md#format-consistency-enforcement)
-  * satisfiedBy: [linting/separators.rs](https://github.com/reqflow/reqflow/src/linting/separators.rs)
+  * satisfiedBy: [linting/separators.rs](/src/linting/separators.rs)
 
 ---
 
@@ -220,7 +191,7 @@ The system shall identify and fix inconsistent indentation and bullet types in r
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Format Consistency Enforcement](../UserRequirements.md#format-consistency-enforcement)
-  * satisfiedBy: [linting/indentation.rs](https://github.com/reqflow/reqflow/src/linting/indentation.rs)
+  * satisfiedBy: [linting/indentation.rs](/src/linting/indentation.rs)
 
 ---
 
@@ -230,7 +201,7 @@ The system shall display linting change suggestions in a git-style diff format, 
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Linting Command Output](../UserRequirements.md#linting-command-output)
-  * satisfiedBy: [linting/mod.rs](https://github.com/reqflow/reqflow/src/linting/mod.rs)
+  * satisfiedBy: [linting/mod.rs](/src/linting/mod.rs)
 
 ---
 
@@ -240,7 +211,7 @@ The system shall support automatic multiple linting passes with a configurable i
 
 #### Relations
   * refine: [Multi-Pass Linting Capability](#multi-pass-linting-capability)
-  * satisfiedBy: [linting/mod.rs](https://github.com/reqflow/reqflow/src/linting/mod.rs)
+  * satisfiedBy: [linting/mod.rs](/src/linting/mod.rs)
 
 ---
 
@@ -250,7 +221,7 @@ The system shall implement parallel processing for linting operations when possi
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Model Linting](../UserRequirements.md#model-linting)
-  * satisfiedBy: [linting/mod.rs](https://github.com/reqflow/reqflow/src/linting/mod.rs)
+  * satisfiedBy: [linting/mod.rs](/src/linting/mod.rs)
 
 ---
 
@@ -260,7 +231,7 @@ The system shall respect configured excluded filename patterns when performing l
 
 #### Relations
   * refine: [Configurable Filename Exclusion Patterns](#configurable-filename-exclusion-patterns)
-  * satisfiedBy: [utils.rs](https://github.com/reqflow/reqflow/src/utils.rs)
+  * satisfiedBy: [utils.rs](/src/utils.rs)
 
 ---
 
@@ -270,7 +241,7 @@ The system shall generate or update an index.md file in the specifications root 
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Generate Documentation Index](../UserRequirements.md#generate-documentation-index)
-  * satisfiedBy: [linting/index_generator.rs](https://github.com/reqflow/reqflow/src/linting/index_generator.rs)
+  * satisfiedBy: [linting/index_generator.rs](/src/linting/index_generator.rs)
 
 ---
 
@@ -284,7 +255,7 @@ TODO: this needs to be more clear on what folders to walk
 
 #### Relations
   * refine: [Index Generator Implementation](#index-generator-implementation)
-  * satisfiedBy: [linting/index_generator.rs](https://github.com/reqflow/reqflow/src/linting/index_generator.rs)
+  * satisfiedBy: [linting/index_generator.rs](/src/linting/index_generator.rs)
 
 ---
 
@@ -306,38 +277,9 @@ graph LR;
   d38ab4ad13 -.->|deriveReqT| fc49f77257;
   cf300641f5["config.rs"];
   class cf300641f5 default;
-  click cf300641f5 "https://github.com/reqflow/reqflow/src/config.rs";
+  click cf300641f5 "/src/config.rs";
   cf300641f5 -->|satisfies| d38ab4ad13;
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ---
 
@@ -363,7 +305,7 @@ paths:
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Support for Distributed Requirements](../UserRequirements.md#support-for-distributed-requirements)
-  * satisfiedBy: [config.rs](https://github.com/reqflow/reqflow/src/config.rs)
+  * satisfiedBy: [config.rs](/src/config.rs)
 
 ---
 
@@ -376,126 +318,6 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  8ba9c7e059["LLM Context Command"];
-  click 8ba9c7e059 "Requirements.md#llm-context-command";
-  class 8ba9c7e059 requirement;
-  ec56dd665a["UserRequirements.md/Provide Actionable Model Improvement Suggestions"];
-  class ec56dd665a requirement;
-  click ec56dd665a "../UserRequirements.md#provide-actionable-model-improvement-suggestions";
-  8ba9c7e059 -.->|deriveReqT| ec56dd665a;
-  1e4703f03b["main.rs"];
-  class 1e4703f03b default;
-  click 1e4703f03b "https://github.com/reqflow/reqflow/src/main.rs";
-  1e4703f03b -->|satisfies| 8ba9c7e059;
-  c8b6ccc187["HTML Export"];
-  click c8b6ccc187 "Requirements.md#html-export";
-  class c8b6ccc187 requirement;
-  72c7eda618["../UserRequirements.md/Export HTML specifications"];
-  class 72c7eda618 requirement;
-  click 72c7eda618 "../UserRequirements.md#export-html-specifications";
-  c8b6ccc187 -.->|deriveReqT| 72c7eda618;
-  95675a5651["html_export.rs"];
-  class 95675a5651 default;
-  click 95675a5651 "https://github.com/reqflow/reqflow/src/html_export.rs";
-  95675a5651 -->|satisfies| c8b6ccc187;
-  e30559f0b9["Proper Link URL Generation"];
-  click e30559f0b9 "Requirements.md#proper-link-url-generation";
-  class e30559f0b9 requirement;
-  ec70b05609["Index Generator Implementation"];
-  class ec70b05609 requirement;
-  click ec70b05609 "Requirements.md#index-generator-implementation";
-  ec70b05609 --o|contains| e30559f0b9;
-  6433b28d02["linting/index_generator.rs"];
-  class 6433b28d02 default;
-  click 6433b28d02 "https://github.com/reqflow/reqflow/src/linting/index_generator.rs";
-  6433b28d02 -->|satisfies| e30559f0b9;
-  94546ef055["Command Line Configuration Overrides"];
-  click 94546ef055 "Requirements.md#command-line-configuration-overrides";
-  class 94546ef055 requirement;
-  7430e12113["UserRequirements.md/Project Configuration with YAML"];
-  class 7430e12113 requirement;
-  click 7430e12113 "../UserRequirements.md#project-configuration-with-yaml";
-  94546ef055 -.->|deriveReqT| 7430e12113;
-  1e4703f03b["main.rs"];
-  class 1e4703f03b default;
-  click 1e4703f03b "https://github.com/reqflow/reqflow/src/main.rs";
-  1e4703f03b -->|satisfies| 94546ef055;
-  2294a7e703["Initialization Command"];
-  click 2294a7e703 "Requirements.md#initialization-command";
-  class 2294a7e703 requirement;
-  a2398f7051["UserRequirements.md/Bootstrap model struture"];
-  class a2398f7051 requirement;
-  click a2398f7051 "../UserRequirements.md#bootstrap-model-struture";
-  2294a7e703 -.->|deriveReqT| a2398f7051;
-  5a12561904["init.rs"];
-  class 5a12561904 default;
-  click 5a12561904 "https://github.com/reqflow/reqflow/src/init.rs";
-  5a12561904 -->|satisfies| 2294a7e703;
-  5870488e00["Relation Type Validation"];
-  click 5870488e00 "Requirements.md#relation-type-validation";
-  class 5870488e00 requirement;
-  7cf5cf9900["UserRequirements.md/Enhanced Validation Error Reporting"];
-  class 7cf5cf9900 requirement;
-  click 7cf5cf9900 "../UserRequirements.md#enhanced-validation-error-reporting";
-  5870488e00 -.->|deriveReqT| 7cf5cf9900;
-  3fc2f2af6f["src/relation.rs"];
-  class 3fc2f2af6f default;
-  click 3fc2f2af6f "https://github.com/reqflow/reqflow/src/relation.rs";
-  3fc2f2af6f -->|satisfies| 5870488e00;
-  714d92f4ec["Initialization Command Configuration Check"];
-  click 714d92f4ec "Requirements.md#initialization-command-configuration-check";
-  class 714d92f4ec requirement;
-  714d92f4ec ==>|refines| 2294a7e703;
-  5a12561904["init.rs"];
-  class 5a12561904 default;
-  click 5a12561904 "https://github.com/reqflow/reqflow/src/init.rs";
-  5a12561904 -->|satisfies| 714d92f4ec;
-  feb2e14e3b["Multi-Pass Linting Capability"];
-  click feb2e14e3b "Requirements.md#multi-pass-linting-capability";
-  class feb2e14e3b requirement;
-  81758bdb22["UserRequirements.md/Format Consistency Enforcement"];
-  class 81758bdb22 requirement;
-  click 81758bdb22 "../UserRequirements.md#format-consistency-enforcement";
-  feb2e14e3b -.->|deriveReqT| 81758bdb22;
-  5d72a78def["linting/mod.rs"];
-  class 5d72a78def default;
-  click 5d72a78def "https://github.com/reqflow/reqflow/src/linting/mod.rs";
-  5d72a78def -->|satisfies| feb2e14e3b;
-  464cd8f172["Markdown Content Summary Extraction"];
-  click 464cd8f172 "Requirements.md#markdown-content-summary-extraction";
-  class 464cd8f172 requirement;
-  ec70b05609 --o|contains| 464cd8f172;
-  6433b28d02["linting/index_generator.rs"];
-  class 6433b28d02 default;
-  click 6433b28d02 "https://github.com/reqflow/reqflow/src/linting/index_generator.rs";
-  6433b28d02 -->|satisfies| 464cd8f172;
-  98bd2bd6bd["File Content Caching for Performance"];
-  click 98bd2bd6bd "Requirements.md#file-content-caching-for-performance";
-  class 98bd2bd6bd requirement;
-  f07cf1cbfa["../UserRequirements.md#Efficient Processing"];
-  class f07cf1cbfa requirement;
-  click f07cf1cbfa "../UserRequirements.md#efficient-processing";
-  98bd2bd6bd -.->|deriveReqT| f07cf1cbfa;
-  f40f16b635["model.rs"];
-  class f40f16b635 default;
-  click f40f16b635 "https://github.com/reqflow/reqflow/src/model.rs";
-  f40f16b635 -->|satisfies| 98bd2bd6bd;
-  3b4ff428f7["Multiple Validation Modes Support"];
-  click 3b4ff428f7 "Requirements.md#multiple-validation-modes-support";
-  class 3b4ff428f7 requirement;
-  3b4ff428f7 -.->|deriveReqT| 7cf5cf9900;
-  23c0490f7b["validation.rs"];
-  class 23c0490f7b default;
-  click 23c0490f7b "https://github.com/reqflow/reqflow/src/validation.rs";
-  23c0490f7b -->|satisfies| 3b4ff428f7;
-  bdfd9d65e4["Detailed Error Handling and Logging"];
-  click bdfd9d65e4 "Requirements.md#detailed-error-handling-and-logging";
-  class bdfd9d65e4 requirement;
-  bdfd9d65e4 -.->|deriveReqT| 7cf5cf9900;
-  9cc67347e0["src/error.rs"];
-  class 9cc67347e0 default;
-  click 9cc67347e0 "https://github.com/reqflow/reqflow/src/error.rs";
-  9cc67347e0 -->|satisfies| bdfd9d65e4;
   c5c85bedd1["Excluded File Relation Validation"];
   click c5c85bedd1 "Requirements.md#excluded-file-relation-validation";
   class c5c85bedd1 requirement;
@@ -505,46 +327,60 @@ graph LR;
   c5c85bedd1 ==>|refines| 45770e9b31;
   23c0490f7b["src/validation.rs"];
   class 23c0490f7b default;
-  click 23c0490f7b "https://github.com/reqflow/reqflow/src/validation.rs";
+  click 23c0490f7b "/src/validation.rs";
   23c0490f7b -->|satisfies| c5c85bedd1;
-  5a1719a264["Unstructured Documents"];
-  click 5a1719a264 "Requirements.md#unstructured-documents";
-  class 5a1719a264 requirement;
-  925533940c["UserRequirements.md#Unstructured Documents"];
-  class 925533940c default;
-  click 925533940c "../UserRequirements.md#unstructured-documents";
-  5a1719a264 -.->|deriveReqT| 925533940c;
+  ec70b05609["Index Generator Implementation"];
+  click ec70b05609 "Requirements.md#index-generator-implementation";
+  class ec70b05609 requirement;
   f5b5eaeb28["UserRequirements.md/Generate Documentation Index"];
   class f5b5eaeb28 requirement;
   click f5b5eaeb28 "../UserRequirements.md#generate-documentation-index";
   ec70b05609 -.->|deriveReqT| f5b5eaeb28;
   6433b28d02["linting/index_generator.rs"];
   class 6433b28d02 default;
-  click 6433b28d02 "https://github.com/reqflow/reqflow/src/linting/index_generator.rs";
+  click 6433b28d02 "/src/linting/index_generator.rs";
   6433b28d02 -->|satisfies| ec70b05609;
+  2294a7e703["Initialization Command"];
+  click 2294a7e703 "Requirements.md#initialization-command";
+  class 2294a7e703 requirement;
+  a2398f7051["UserRequirements.md/Bootstrap model struture"];
+  class a2398f7051 requirement;
+  click a2398f7051 "../UserRequirements.md#bootstrap-model-struture";
+  2294a7e703 -.->|deriveReqT| a2398f7051;
+  5a12561904["init.rs"];
+  class 5a12561904 default;
+  click 5a12561904 "/src/init.rs";
+  5a12561904 -->|satisfies| 2294a7e703;
+  3b4ff428f7["Multiple Validation Modes Support"];
+  click 3b4ff428f7 "Requirements.md#multiple-validation-modes-support";
+  class 3b4ff428f7 requirement;
+  7cf5cf9900["UserRequirements.md/Enhanced Validation Error Reporting"];
+  class 7cf5cf9900 requirement;
+  click 7cf5cf9900 "../UserRequirements.md#enhanced-validation-error-reporting";
+  3b4ff428f7 -.->|deriveReqT| 7cf5cf9900;
+  23c0490f7b["validation.rs"];
+  class 23c0490f7b default;
+  click 23c0490f7b "/src/validation.rs";
+  23c0490f7b -->|satisfies| 3b4ff428f7;
+  94546ef055["Command Line Configuration Overrides"];
+  click 94546ef055 "Requirements.md#command-line-configuration-overrides";
+  class 94546ef055 requirement;
+  7430e12113["UserRequirements.md/Project Configuration with YAML"];
+  class 7430e12113 requirement;
+  click 7430e12113 "../UserRequirements.md#project-configuration-with-yaml";
+  94546ef055 -.->|deriveReqT| 7430e12113;
+  1e4703f03b["main.rs"];
+  class 1e4703f03b default;
+  click 1e4703f03b "/src/main.rs";
+  1e4703f03b -->|satisfies| 94546ef055;
   dcf18d2ae4["JSON Validation Output Format"];
   click dcf18d2ae4 "Requirements.md#json-validation-output-format";
   class dcf18d2ae4 requirement;
   dcf18d2ae4 -.->|deriveReqT| 7cf5cf9900;
   23c0490f7b["validation.rs"];
   class 23c0490f7b default;
-  click 23c0490f7b "https://github.com/reqflow/reqflow/src/validation.rs";
+  click 23c0490f7b "/src/validation.rs";
   23c0490f7b -->|satisfies| dcf18d2ae4;
-  7a8da8dfee["Interactive Mermaid Diagram Node Behavior"];
-  click 7a8da8dfee "Requirements.md#interactive-mermaid-diagram-node-behavior";
-  class 7a8da8dfee requirement;
-  e867499409["UserRequirements.md/Interactive Mermaid Diagrams"];
-  class e867499409 requirement;
-  click e867499409 "../UserRequirements.md#interactive-mermaid-diagrams";
-  7a8da8dfee -.->|deriveReqT| e867499409;
-  2634dfc94f["html.rs"];
-  class 2634dfc94f default;
-  click 2634dfc94f "https://github.com/reqflow/reqflow/src/html.rs";
-  2634dfc94f -->|satisfies| 7a8da8dfee;
-  95675a5651["html_export.rs"];
-  class 95675a5651 default;
-  click 95675a5651 "https://github.com/reqflow/reqflow/src/html_export.rs";
-  95675a5651 -->|satisfies| 7a8da8dfee;
   86e0701b6c["HTML Navigation Enhancement"];
   click 86e0701b6c "Requirements.md#html-navigation-enhancement";
   class 86e0701b6c requirement;
@@ -554,42 +390,119 @@ graph LR;
   86e0701b6c -.->|deriveReqT| e1c89b5d94;
   2634dfc94f["html.rs"];
   class 2634dfc94f default;
-  click 2634dfc94f "https://github.com/reqflow/reqflow/src/html.rs";
+  click 2634dfc94f "/src/html.rs";
   2634dfc94f -->|satisfies| 86e0701b6c;
   95675a5651["html_export.rs"];
   class 95675a5651 default;
-  click 95675a5651 "https://github.com/reqflow/reqflow/src/html_export.rs";
+  click 95675a5651 "/src/html_export.rs";
   95675a5651 -->|satisfies| 86e0701b6c;
+  5a1719a264["Unstructured Documents"];
+  click 5a1719a264 "Requirements.md#unstructured-documents";
+  class 5a1719a264 requirement;
+  925533940c["UserRequirements.md#Unstructured Documents"];
+  class 925533940c default;
+  click 925533940c "../UserRequirements.md#unstructured-documents";
+  5a1719a264 -.->|deriveReqT| 925533940c;
+  5870488e00["Relation Type Validation"];
+  click 5870488e00 "Requirements.md#relation-type-validation";
+  class 5870488e00 requirement;
+  5870488e00 -.->|deriveReqT| 7cf5cf9900;
+  3fc2f2af6f["src/relation.rs"];
+  class 3fc2f2af6f default;
+  click 3fc2f2af6f "/src/relation.rs";
+  3fc2f2af6f -->|satisfies| 5870488e00;
+  714d92f4ec["Initialization Command Configuration Check"];
+  click 714d92f4ec "Requirements.md#initialization-command-configuration-check";
+  class 714d92f4ec requirement;
+  714d92f4ec ==>|refines| 2294a7e703;
+  5a12561904["init.rs"];
+  class 5a12561904 default;
+  click 5a12561904 "/src/init.rs";
+  5a12561904 -->|satisfies| 714d92f4ec;
+  98bd2bd6bd["File Content Caching for Performance"];
+  click 98bd2bd6bd "Requirements.md#file-content-caching-for-performance";
+  class 98bd2bd6bd requirement;
+  f07cf1cbfa["../UserRequirements.md#Efficient Processing"];
+  class f07cf1cbfa requirement;
+  click f07cf1cbfa "../UserRequirements.md#efficient-processing";
+  98bd2bd6bd -.->|deriveReqT| f07cf1cbfa;
+  f40f16b635["model.rs"];
+  class f40f16b635 default;
+  click f40f16b635 "/src/model.rs";
+  f40f16b635 -->|satisfies| 98bd2bd6bd;
+  c8b6ccc187["HTML Export"];
+  click c8b6ccc187 "Requirements.md#html-export";
+  class c8b6ccc187 requirement;
+  72c7eda618["../UserRequirements.md/Export HTML specifications"];
+  class 72c7eda618 requirement;
+  click 72c7eda618 "../UserRequirements.md#export-html-specifications";
+  c8b6ccc187 -.->|deriveReqT| 72c7eda618;
+  95675a5651["html_export.rs"];
+  class 95675a5651 default;
+  click 95675a5651 "/src/html_export.rs";
+  95675a5651 -->|satisfies| c8b6ccc187;
+  464cd8f172["Markdown Content Summary Extraction"];
+  click 464cd8f172 "Requirements.md#markdown-content-summary-extraction";
+  class 464cd8f172 requirement;
+  ec70b05609 --o|contains| 464cd8f172;
+  6433b28d02["linting/index_generator.rs"];
+  class 6433b28d02 default;
+  click 6433b28d02 "/src/linting/index_generator.rs";
+  6433b28d02 -->|satisfies| 464cd8f172;
+  feb2e14e3b["Multi-Pass Linting Capability"];
+  click feb2e14e3b "Requirements.md#multi-pass-linting-capability";
+  class feb2e14e3b requirement;
+  81758bdb22["UserRequirements.md/Format Consistency Enforcement"];
+  class 81758bdb22 requirement;
+  click 81758bdb22 "../UserRequirements.md#format-consistency-enforcement";
+  feb2e14e3b -.->|deriveReqT| 81758bdb22;
+  5d72a78def["linting/mod.rs"];
+  class 5d72a78def default;
+  click 5d72a78def "/src/linting/mod.rs";
+  5d72a78def -->|satisfies| feb2e14e3b;
+  e30559f0b9["Proper Link URL Generation"];
+  click e30559f0b9 "Requirements.md#proper-link-url-generation";
+  class e30559f0b9 requirement;
+  ec70b05609 --o|contains| e30559f0b9;
+  6433b28d02["linting/index_generator.rs"];
+  class 6433b28d02 default;
+  click 6433b28d02 "/src/linting/index_generator.rs";
+  6433b28d02 -->|satisfies| e30559f0b9;
+  8ba9c7e059["LLM Context Command"];
+  click 8ba9c7e059 "Requirements.md#llm-context-command";
+  class 8ba9c7e059 requirement;
+  ec56dd665a["UserRequirements.md/Provide Actionable Model Improvement Suggestions"];
+  class ec56dd665a requirement;
+  click ec56dd665a "../UserRequirements.md#provide-actionable-model-improvement-suggestions";
+  8ba9c7e059 -.->|deriveReqT| ec56dd665a;
+  1e4703f03b["main.rs"];
+  class 1e4703f03b default;
+  click 1e4703f03b "/src/main.rs";
+  1e4703f03b -->|satisfies| 8ba9c7e059;
+  bdfd9d65e4["Detailed Error Handling and Logging"];
+  click bdfd9d65e4 "Requirements.md#detailed-error-handling-and-logging";
+  class bdfd9d65e4 requirement;
+  bdfd9d65e4 -.->|deriveReqT| 7cf5cf9900;
+  9cc67347e0["src/error.rs"];
+  class 9cc67347e0 default;
+  click 9cc67347e0 "/src/error.rs";
+  9cc67347e0 -->|satisfies| bdfd9d65e4;
+  7a8da8dfee["Interactive Mermaid Diagram Node Behavior"];
+  click 7a8da8dfee "Requirements.md#interactive-mermaid-diagram-node-behavior";
+  class 7a8da8dfee requirement;
+  e867499409["UserRequirements.md/Interactive Mermaid Diagrams"];
+  class e867499409 requirement;
+  click e867499409 "../UserRequirements.md#interactive-mermaid-diagrams";
+  7a8da8dfee -.->|deriveReqT| e867499409;
+  2634dfc94f["html.rs"];
+  class 2634dfc94f default;
+  click 2634dfc94f "/src/html.rs";
+  2634dfc94f -->|satisfies| 7a8da8dfee;
+  95675a5651["html_export.rs"];
+  class 95675a5651 default;
+  click 95675a5651 "/src/html_export.rs";
+  95675a5651 -->|satisfies| 7a8da8dfee;
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ---
 
@@ -599,7 +512,7 @@ The system shall implement an `init` command that bootstraps a basic ReqFlow pro
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Bootstrap model struture](../UserRequirements.md#bootstrap-model-struture)
-  * satisfiedBy: [init.rs](https://github.com/reqflow/reqflow/src/init.rs)
+  * satisfiedBy: [init.rs](/src/init.rs)
 
 ---
 
@@ -611,7 +524,7 @@ The system shall prevent the initialization command from modifying an existing p
 
 #### Relations
   * refine: [Initialization Command](#initialization-command)
-  * satisfiedBy: [init.rs](https://github.com/reqflow/reqflow/src/init.rs)
+  * satisfiedBy: [init.rs](/src/init.rs)
 
 ---
 
@@ -621,7 +534,7 @@ The system shall implement an IndexGenerator component that traverses the specif
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Generate Documentation Index](../UserRequirements.md#generate-documentation-index)
-  * satisfiedBy: [linting/index_generator.rs](https://github.com/reqflow/reqflow/src/linting/index_generator.rs)
+  * satisfiedBy: [linting/index_generator.rs](/src/linting/index_generator.rs)
 
 ---
 
@@ -631,7 +544,7 @@ The system shall extract summaries from the first heading and paragraph of each 
 
 #### Relations
   * containedBy: [Index Generator Implementation](#index-generator-implementation)
-  * satisfiedBy: [linting/index_generator.rs](https://github.com/reqflow/reqflow/src/linting/index_generator.rs)
+  * satisfiedBy: [linting/index_generator.rs](/src/linting/index_generator.rs)
 
 ---
 
@@ -641,7 +554,7 @@ The system shall generate URLs in the index file with both Markdown (.md) and HT
 
 #### Relations
   * containedBy: [Index Generator Implementation](#index-generator-implementation)
-  * satisfiedBy: [linting/index_generator.rs](https://github.com/reqflow/reqflow/src/linting/index_generator.rs)
+  * satisfiedBy: [linting/index_generator.rs](/src/linting/index_generator.rs)
 
 ---
 
@@ -651,8 +564,8 @@ The system shall enhance the HTML generator to process index.md as a special fil
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Documentation Index HTML Integration](../UserRequirements.md#documentation-index-html-integration)
-  * satisfiedBy: [html.rs](https://github.com/reqflow/reqflow/src/html.rs)
-  * satisfiedBy: [html_export.rs](https://github.com/reqflow/reqflow/src/html_export.rs)
+  * satisfiedBy: [html.rs](/src/html.rs)
+  * satisfiedBy: [html_export.rs](/src/html_export.rs)
 
 ---
 
@@ -662,7 +575,7 @@ The system shall provide a command-line option `--llm-context` that outputs comp
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Provide Actionable Model Improvement Suggestions](../UserRequirements.md#provide-actionable-model-improvement-suggestions)
-  * satisfiedBy: [main.rs](https://github.com/reqflow/reqflow/src/main.rs)
+  * satisfiedBy: [main.rs](/src/main.rs)
 
 ---
 
@@ -672,7 +585,7 @@ The system shall provide validation results in machine-readable JSON format to f
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Enhanced Validation Error Reporting](../UserRequirements.md#enhanced-validation-error-reporting)
-  * satisfiedBy: [validation.rs](https://github.com/reqflow/reqflow/src/validation.rs)
+  * satisfiedBy: [validation.rs](/src/validation.rs)
 
 ---
 
@@ -682,7 +595,7 @@ The system shall support different validation modes (validate_markdown, validate
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Enhanced Validation Error Reporting](../UserRequirements.md#enhanced-validation-error-reporting)
-  * satisfiedBy: [validation.rs](https://github.com/reqflow/reqflow/src/validation.rs)
+  * satisfiedBy: [validation.rs](/src/validation.rs)
 
 ---
 
@@ -692,8 +605,8 @@ The system shall implement interactive click behavior for Mermaid diagram nodes 
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Interactive Mermaid Diagrams](../UserRequirements.md#interactive-mermaid-diagrams)
-  * satisfiedBy: [html.rs](https://github.com/reqflow/reqflow/src/html.rs)
-  * satisfiedBy: [html_export.rs](https://github.com/reqflow/reqflow/src/html_export.rs)
+  * satisfiedBy: [html.rs](/src/html.rs)
+  * satisfiedBy: [html_export.rs](/src/html_export.rs)
 
 ---
 
@@ -703,7 +616,7 @@ The system shall allow command line arguments to override YAML configuration set
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Project Configuration with YAML](../UserRequirements.md#project-configuration-with-yaml)
-  * satisfiedBy: [main.rs](https://github.com/reqflow/reqflow/src/main.rs)
+  * satisfiedBy: [main.rs](/src/main.rs)
 
 ---
 
@@ -723,7 +636,7 @@ The system shall validate relation types against a defined vocabulary and provid
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Enhanced Validation Error Reporting](../UserRequirements.md#enhanced-validation-error-reporting)
-  * satisfiedBy: [src/relation.rs](https://github.com/reqflow/reqflow/src/relation.rs)
+  * satisfiedBy: [src/relation.rs](/src/relation.rs)
 
 ---
 
@@ -743,7 +656,7 @@ The validation process for excluded files:
   
 #### Relations
   * refine: [File Pattern Exclusion for Linting](#file-pattern-exclusion-for-linting)
-  * satisfiedBy: [src/validation.rs](https://github.com/reqflow/reqflow/src/validation.rs)
+  * satisfiedBy: [src/validation.rs](/src/validation.rs)
 
 ---
 
@@ -753,7 +666,7 @@ The system shall support multi-pass linting with a configurable iteration limit 
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Format Consistency Enforcement](../UserRequirements.md#format-consistency-enforcement)
-  * satisfiedBy: [linting/mod.rs](https://github.com/reqflow/reqflow/src/linting/mod.rs)
+  * satisfiedBy: [linting/mod.rs](/src/linting/mod.rs)
 
 ---
 
@@ -763,7 +676,7 @@ The system shall generate HTML output for all markdown files, not just requireme
 
 #### Relations
   * derivedFrom: [../UserRequirements.md/Export HTML specifications](../UserRequirements.md#export-html-specifications)
-  * satisfiedBy: [html_export.rs](https://github.com/reqflow/reqflow/src/html_export.rs)
+  * satisfiedBy: [html_export.rs](/src/html_export.rs)
 
 ---
 
@@ -773,7 +686,7 @@ The system shall implement detailed error handling and logging throughout the ap
 
 #### Relations
   * derivedFrom: [../UserRequirements.md#Enhanced Validation Error Reporting](../UserRequirements.md#enhanced-validation-error-reporting)
-  * satisfiedBy: [src/error.rs](https://github.com/reqflow/reqflow/src/error.rs)
+  * satisfiedBy: [src/error.rs](/src/error.rs)
 
 ---
 
@@ -783,41 +696,12 @@ The system shall cache file contents during processing to optimize performance f
 
 #### Relations
   * derivedFrom: [../UserRequirements.md#Efficient Processing](../UserRequirements.md#efficient-processing)
-  * satisfiedBy: [model.rs](https://github.com/reqflow/reqflow/src/model.rs)
+  * satisfiedBy: [model.rs](/src/model.rs)
   
   
 ---
 
 ## Logic
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ---
 
@@ -827,7 +711,7 @@ The system shall find and process all requirements in  'external_folders' and it
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Support for Distributed Requirements](../UserRequirements.md#support-for-distributed-requirements)
-  * satisfiedBy: [model.rs](https://github.com/reqflow/reqflow/src/model.rs)
+  * satisfiedBy: [model.rs](/src/model.rs)
 
 ---
 
@@ -849,38 +733,9 @@ The process follows these steps to determine whether a file contains requirement
 6. **Root Folder Check**: If the file is located at the root of the `specifications` folder, it is categorized as a **Stakeholder Needs Requirements file**. Otherwise, it is categorized as a **System Requirements file**.
 
 #### Relations
-  * satisfiedBy: [model.rs](https://github.com/reqflow/reqflow/src/model.rs)
+  * satisfiedBy: [model.rs](/src/model.rs)
 
 ## Categorization Outcomes
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 - **Stakeholder Needs Requirements File**: Files located in the root of the `specifications` folder and meeting all conditions.
 - **System Requirements File**: Files found in external folders or subfolders within `specifications`.
@@ -907,7 +762,7 @@ paths:
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Project Configuration with YAML](../UserRequirements.md#project-configuration-with-yaml)
-  * satisfiedBy: [config.rs](https://github.com/reqflow/reqflow/src/config.rs)
+  * satisfiedBy: [config.rs](/src/config.rs)
 
 ---
 
@@ -917,7 +772,7 @@ The system shall implement an export functionality that converts Mermaid diagram
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Export Diagrams in Standard Formats](../UserRequirements.md#export-diagrams-in-standard-formats)
-  * satisfiedBy: [markdown.rs](https://github.com/reqflow/reqflow/src/markdown.rs)
+  * satisfiedBy: [markdown.rs](/src/markdown.rs)
 
 ---
 
@@ -989,7 +844,7 @@ satisfy:
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Visualize Model Relationships](../UserRequirements.md#visualize-model-relationships)
-  * satisfiedBy: [markdown.rs](https://github.com/reqflow/reqflow/src/markdown.rs)
+  * satisfiedBy: [markdown.rs](/src/markdown.rs)
 
 ---
 
@@ -1008,114 +863,11 @@ The system shall implement a configurable storage mechanism for generated diagra
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Store Automated Diagrams in Designated Locations](../UserRequirements.md#store-automated-diagrams-in-designated-locations)
-  * satisfiedBy: [model.rs](https://github.com/reqflow/reqflow/src/model.rs)
+  * satisfiedBy: [model.rs](/src/model.rs)
 
 ---
 
 ## Traceability Matrix Generation
-```mermaid
-graph LR;
-  %% Graph styling
-  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
-  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
-  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
-  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
-
-  3feb0576ff["Verification Checkbox Implementation"];
-  click 3feb0576ff "Requirements.md#verification-checkbox-implementation";
-  class 3feb0576ff requirement;
-  273dcdad7a["UserRequirements.md/Include Verification Checkboxes"];
-  class 273dcdad7a requirement;
-  click 273dcdad7a "../UserRequirements.md#include-verification-checkboxes";
-  3feb0576ff -.->|deriveReqT| 273dcdad7a;
-  5eca866a03["Traceability Matrix Builder Implementation"];
-  click 5eca866a03 "Requirements.md#traceability-matrix-builder-implementation";
-  class 5eca866a03 requirement;
-  9fe409695e["UserRequirements.md/Create Traceability Matrices"];
-  class 9fe409695e requirement;
-  click 9fe409695e "../UserRequirements.md#create-traceability-matrices";
-  5eca866a03 -.->|deriveReqT| 9fe409695e;
-  f40f16b635["model.rs"];
-  class f40f16b635 default;
-  click f40f16b635 "https://github.com/reqflow/reqflow/src/model.rs";
-  f40f16b635 -->|satisfies| 5eca866a03;
-  4edf5c26da["CI/CD Pipeline Integration Interface"];
-  click 4edf5c26da "Requirements.md#ci/cd-pipeline-integration-interface";
-  class 4edf5c26da requirement;
-  33733d2f42["UserRequirements.md/Support CI/CD Integration"];
-  class 33733d2f42 requirement;
-  click 33733d2f42 "../UserRequirements.md#support-ci/cd-integration";
-  4edf5c26da -.->|deriveReqT| 33733d2f42;
-  dd7b536571["Relation-Based Matrix View Generator"];
-  click dd7b536571 "Requirements.md#relation-based-matrix-view-generator";
-  class dd7b536571 requirement;
-  fc0d98c588["UserRequirements.md/Support Relation-Based Views"];
-  class fc0d98c588 requirement;
-  click fc0d98c588 "../UserRequirements.md#support-relation-based-views";
-  dd7b536571 -.->|deriveReqT| fc0d98c588;
-  f40f16b635["model.rs"];
-  class f40f16b635 default;
-  click f40f16b635 "https://github.com/reqflow/reqflow/src/model.rs";
-  f40f16b635 -->|satisfies| dd7b536571;
-  8897111f9b["Matrix Export Format Handler"];
-  click 8897111f9b "Requirements.md#matrix-export-format-handler";
-  class 8897111f9b requirement;
-  4b7b432817["UserRequirements.md/Export Traceability Matrix"];
-  class 4b7b432817 requirement;
-  click 4b7b432817 "../UserRequirements.md#export-traceability-matrix";
-  8897111f9b -.->|deriveReqT| 4b7b432817;
-  d7e5fbf806["Markdown Matrix Formatter"];
-  click d7e5fbf806 "Requirements.md#markdown-matrix-formatter";
-  class d7e5fbf806 requirement;
-  c7a213987b["UserRequirements.md/Markdown-Based Default Format"];
-  class c7a213987b requirement;
-  click c7a213987b "../UserRequirements.md#markdown-based-default-format";
-  d7e5fbf806 -.->|deriveReqT| c7a213987b;
-  f40f16b635["model.rs"];
-  class f40f16b635 default;
-  click f40f16b635 "https://github.com/reqflow/reqflow/src/model.rs";
-  f40f16b635 -->|satisfies| d7e5fbf806;
-  83a2343e97["Matrix File Output Handler"];
-  click 83a2343e97 "Requirements.md#matrix-file-output-handler";
-  class 83a2343e97 requirement;
-  c4b025f6ac["UserRequirements.md/Save matrices to designated files"];
-  class c4b025f6ac requirement;
-  click c4b025f6ac "../UserRequirements.md#save-matrices-to-designated-files";
-  83a2343e97 -.->|deriveReqT| c4b025f6ac;
-  f40f16b635["model.rs"];
-  class f40f16b635 default;
-  click f40f16b635 "https://github.com/reqflow/reqflow/src/model.rs";
-  f40f16b635 -->|satisfies| 83a2343e97;
-```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ---
 
@@ -1125,7 +877,7 @@ The system shall implement a traceability matrix builder component that extracts
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Create Traceability Matrices](../UserRequirements.md#create-traceability-matrices)
-  * satisfiedBy: [model.rs](https://github.com/reqflow/reqflow/src/model.rs)
+  * satisfiedBy: [model.rs](/src/model.rs)
 
 ---
 
@@ -1135,7 +887,7 @@ The system shall implement specialized view generators for different relationshi
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Support Relation-Based Views](../UserRequirements.md#support-relation-based-views)
-  * satisfiedBy: [model.rs](https://github.com/reqflow/reqflow/src/model.rs)
+  * satisfiedBy: [model.rs](/src/model.rs)
 
 ---
 
@@ -1145,7 +897,7 @@ The system shall implement a markdown formatter for traceability matrices that p
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Markdown-Based Default Format](../UserRequirements.md#markdown-based-default-format)
-  * satisfiedBy: [model.rs](https://github.com/reqflow/reqflow/src/model.rs)
+  * satisfiedBy: [model.rs](/src/model.rs)
 
 ---
 
@@ -1155,7 +907,7 @@ The system shall implement a file output handler for traceability matrices that 
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Save matrices to designated files](../UserRequirements.md#save-matrices-to-designated-files)
-  * satisfiedBy: [model.rs](https://github.com/reqflow/reqflow/src/model.rs)
+  * satisfiedBy: [model.rs](/src/model.rs)
 
 ---
 
@@ -1188,35 +940,6 @@ The system shall implement an interface compatible with common CI/CD platforms t
 
 ## Validation Capabilities
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ---
 
 ### Markdown Structure Validator
@@ -1225,7 +948,7 @@ The system shall implement a markdown structure validator that enforces ReqFlow'
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Validate Markdown Structure](../UserRequirements.md#validate-markdown-structure)
-  * satisfiedBy: [validation.rs](https://github.com/reqflow/reqflow/src/validation.rs)
+  * satisfiedBy: [validation.rs](/src/validation.rs)
 
 ---
 
@@ -1235,7 +958,7 @@ The system shall implement a validator that checks the organization of files and
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Validate Filesystem Structure](../UserRequirements.md#validate-filesystem-structure)
-  * satisfiedBy: [model.rs](https://github.com/reqflow/reqflow/src/model.rs)
+  * satisfiedBy: [model.rs](/src/model.rs)
 
 ---
 
@@ -1245,7 +968,7 @@ The system shall implement a consistency validator that verifies logical coheren
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Validate Internal Consistency](../UserRequirements.md#validate-internal-consistency)
-  * satisfiedBy: [validation.rs](https://github.com/reqflow/reqflow/src/validation.rs)
+  * satisfiedBy: [validation.rs](/src/validation.rs)
 
 ---
 
@@ -1255,40 +978,11 @@ The system shall implement a specialized validator that analyzes dependencies ac
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Validate Cross-Component Dependencies](../UserRequirements.md#validate-cross-component-dependencies)
-  * satisfiedBy: [model.rs](https://github.com/reqflow/reqflow/src/model.rs)
+  * satisfiedBy: [model.rs](/src/model.rs)
 
 ---
 
 ## Reporting Features
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ---
 
@@ -1298,7 +992,7 @@ The system shall implement a relationship report generator that produces compreh
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Generate Relationship Reports](../UserRequirements.md#generate-relationship-reports)
-  * satisfiedBy: [model.rs](https://github.com/reqflow/reqflow/src/model.rs)
+  * satisfiedBy: [model.rs](/src/model.rs)
 
 ---
 
@@ -1317,7 +1011,7 @@ The system shall implement a validation report generator that compiles and forma
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Provide Validation Reports](../UserRequirements.md#provide-validation-reports)
-  * satisfiedBy: [model.rs](https://github.com/reqflow/reqflow/src/model.rs)
+  * satisfiedBy: [model.rs](/src/model.rs)
 
 ---
 
@@ -1336,7 +1030,7 @@ The system shall implement a summary report generator that produces high-level o
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Generate Summary Reports](../UserRequirements.md#generate-summary-reports)
-  * satisfiedBy: [model.rs](https://github.com/reqflow/reqflow/src/model.rs)
+  * satisfiedBy: [model.rs](/src/model.rs)
 
 ---
 
@@ -1359,35 +1053,6 @@ The system shall implement format conversion engines for reports that transform 
 ---
 
 ## Change Tracing
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ---
 
