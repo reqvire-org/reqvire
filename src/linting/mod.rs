@@ -7,11 +7,18 @@ use log::debug;
 use globset::GlobSet;
 use crate::error::ReqFlowError;
 use crate::utils;
+use std::collections::HashMap;
 
 
+// Import submodules
+pub mod absolute_links;
+pub mod whitespace;
+pub mod newlines;
+pub mod separators;
+pub mod indentation;
+pub mod index_generator;
+pub mod reserved_subsections;
 
-/// Runs linting checks on all Markdown files in the specification folder.
-/// If `dry_run == false`, it automatically applies the fixes.
 pub fn run_linting(
     specification_folder: &PathBuf, 
     external_folders: &[PathBuf], 
@@ -21,38 +28,55 @@ pub fn run_linting(
     debug!("Starting linting process in {:?}", specification_folder);
     
     let mut lint_suggestions = Vec::new();
-
     let files = utils::scan_markdown_files(specification_folder, external_folders, excluded_filename_patterns);
-    debug!("Found {} markdown files to update with diagrams", files.len());
+    debug!("Found {} markdown files to lint", files.len());
 
-    for (file_path,_) in files {        
+    for (file_path, _) in files {        
+        // Read file content.
+        let mut file_content = fs::read_to_string(&file_path)?;
 
-         let mut file_content = fs::read_to_string(&file_path)?;
-         let suggestions = lint_file_content(&file_content, &file_path)?;
+        // Apply each linting rule separately, saving the file after each.
+        let linting_rules: Vec<fn(&str, &Path) -> Vec<LintSuggestion>> = vec![
+            absolute_links::find_absolute_links,
+            whitespace::find_excess_whitespace,
+            newlines::find_inconsistent_newlines,
+            separators::find_missing_separators,
+            indentation::find_inconsistent_indentation,
+            reserved_subsections::fix_reserved_subsections,
+        ];
 
-          if !suggestions.is_empty() {
-             if dry_run {
-                 lint_suggestions.extend(suggestions);
-             } else {
-                 file_content = apply_fixes(&file_content, &suggestions);
-                 fs::write(&file_path, file_content)?;
-                 println!("✅ Applied {} fixes to {}", suggestions.len(), file_path.display());
-             }
-         }             
+        for lint_rule in linting_rules {
+            let mut suggestions = lint_rule(&file_content, &file_path);
+
+            if suggestions.is_empty() {
+                continue; // No issues found in this rule, move to the next rule
+            }
+
+            if dry_run {
+                lint_suggestions.extend(suggestions);
+            } else {
+                // Sort suggestions by line_number descending so that fixes are applied from bottom to top
+                suggestions.sort_by(|a, b| b.line_number.unwrap_or(0).cmp(&a.line_number.unwrap_or(0)));
+
+                for suggestion in &suggestions {
+                    let new_file_content = apply_fix(&file_content, suggestion);
+                    file_content=new_file_content;
+                    println!("✅ Applied fix: {} to {}", suggestion.description, file_path.display());                    
+                }
+                fs::write(&file_path, &file_content)?;
+             
+            }
+        }
     }
-     
-     
-
+    
     if dry_run {
         if lint_suggestions.is_empty() {
             println!("✅ No linting issues found.");
         } else {
-            println!("⚠️ Found {} linting issues:", lint_suggestions.len());
-
             for suggestion in &lint_suggestions {
                 let _ = suggestion.print_colorized_diff();
             }
-
+            println!("⚠️ Found {} linting issues:", lint_suggestions.len());             
             println!("Run without --dry-run to apply fixes.");
         }
     }
@@ -60,48 +84,52 @@ pub fn run_linting(
     Ok(())
 }
 
-
-/// Applies all lint fixes to the given file content.
-fn apply_fixes(content: &str, suggestions: &[LintSuggestion]) -> String {
-    let mut updated_content = content.to_string();
-
-    for suggestion in suggestions {
-        match &suggestion.fix {
-            LintFix::ReplacePattern { pattern, replacement } => {
-                updated_content = updated_content.replace(pattern, replacement);
-            }
-            LintFix::ReplaceLine { line, new_content } => {
-                updated_content = replace_line(&updated_content, *line, new_content);
-            }
-            LintFix::InsertAt { line, content } => {
-                updated_content = insert_at_line(&updated_content, *line, content);
-            }
-        }
+/// Applies a single lint fix to the given content.
+fn apply_fix(content: &str, suggestion: &LintSuggestion) -> String {
+    match &suggestion.fix {
+        LintFix::ReplacePattern { pattern, replacement } => content.replace(pattern, replacement),
+        LintFix::ReplaceLine { line, new_content } => replace_line(content, *line, new_content),
+        LintFix::InsertAt { line, content: insert_content } => insert_at_line(content, *line, insert_content),
+        LintFix::RemoveLine { line } => {
+            remove_line(content, *line)
+        }        
     }
-
-    updated_content
 }
-
 /// Inserts content at a specific line in the file.
 fn insert_at_line(content: &str, line: usize, new_content: &str) -> String {
     let mut lines: Vec<&str> = content.lines().collect();
+    
+    // Ensure the line number is within range
     if line > lines.len() {
-        return content.to_string(); // No change if line number is invalid
+        return content.to_string(); // No change if line number is out of bounds
     }
+
     lines.insert(line, new_content);
-    lines.join("\n")
+    lines.join("\n") + "\n" // Preserve trailing newline
 }
 
 /// Replaces a specific line in the file content.
 fn replace_line(content: &str, line: usize, new_content: &str) -> String {
     let mut lines: Vec<&str> = content.lines().collect();
+    
+    // Ensure the line number is within range
     if line >= lines.len() {
-        return content.to_string(); // No change if line number is invalid
+        return content.to_string(); // No change if line number is out of bounds
     }
-    lines[line] = new_content;
-    lines.join("\n")
-}
 
+    lines[line] = new_content;
+    lines.join("\n") + "\n" // Preserve trailing newline
+}
+/// Removes the line at index `line` (0-based).
+fn remove_line(content: &str, line: usize) -> String {
+    let mut lines: Vec<&str> = content.lines().collect();
+    
+    // Ensure the line number is within range
+    if line < lines.len() {
+        lines.remove(line);
+    }
+    lines.join("\n") + "\n" // Preserve trailing newline
+}
 
 /// Represents a lint suggestion (like a warning) that can be fixed automatically
 #[derive(Debug, Clone)]
@@ -145,8 +173,6 @@ pub enum LintFix {
         /// What to replace it with
         replacement: String,
     },
-    // The following are placeholders for future implementation
-    #[allow(dead_code)]
     /// Replace an entire line in a file
     ReplaceLine {
         /// Line number to replace
@@ -154,7 +180,6 @@ pub enum LintFix {
         /// New line content
         new_content: String,
     },
-    #[allow(dead_code)]
     /// Insert content at a specific line
     InsertAt {
         /// Line number to insert at
@@ -162,6 +187,10 @@ pub enum LintFix {
         /// Content to insert
         content: String,
     },
+    /// Remove a specific line from the file.
+    RemoveLine {
+        line: usize,
+    },    
 }
 
 impl LintSuggestion {
@@ -186,9 +215,11 @@ impl LintSuggestion {
 
     /// Format a git-like diff for the suggestion (used as fallback for non-colorized output)
     pub fn format_diff(&self) -> String {
-        let file_header = format!("diff --lint a/{} b/{}", 
-                                self.file_path.display(), 
-                                self.file_path.display());
+        let file_header = format!(
+            "diff --lint a/{} b/{}",
+            self.file_path.display(),
+            self.file_path.display()
+        );
         
         let line_info = match &self.line_number {
             Some(line) => format!("@@ line {} @@", line),
@@ -198,7 +229,7 @@ impl LintSuggestion {
         // Format the change based on the type of fix
         let change_diff = match &self.fix {
             LintFix::ReplacePattern { pattern, replacement } => {
-                // Handle multiline patterns by adding prefix to each line
+                // Handle multi-line patterns by adding prefix to each line
                 let pattern_lines: Vec<_> = pattern.lines().collect();
                 let replacement_lines: Vec<_> = replacement.lines().collect();
                 
@@ -223,34 +254,58 @@ impl LintSuggestion {
                 }
                 
                 diff_lines.join("\n")
-            },
+            }
             LintFix::ReplaceLine { line: _, new_content } => {
                 format!("- <current line>\n+ {}", new_content)
-            },
+            }
             LintFix::InsertAt { line: _, content } => {
-                format!("+ {}", content)
-            },
+                // InsertAt means we add a new line
+                if content.is_empty() {
+                    "+ <empty line>".to_string()
+                } else {
+                    format!("+ {}", content)
+                }
+            }
+            LintFix::RemoveLine { line } => {
+                // Show removal of line (we don't store old content in LintFix::RemoveLine)
+                format!("- <line {} removed>", line)
+            }
         };
         
-        let description = format!("# {}: {}", self.suggestion_type_name(), self.description);
+        // Give a descriptive header for the suggestion
+        let description = format!(
+            "# {}: {}",
+            self.suggestion_type_name(),
+            self.description
+        );
         
         format!("{}\n{}\n{}\n{}\n", file_header, description, line_info, change_diff)
     }
     
 
-    /// Print a colorized git-style diff to the terminal
-    pub fn print_colorized_diff(&self) -> Result<(), std::io::Error> {
+    /// Print a colorized git-style diff to the terminal for the current suggestion.
+    pub fn print_colorized_diff(&self) -> std::io::Result<()> {
+
+        
         let mut stdout = StandardStream::stdout(ColorChoice::Auto);
 
         // Print file header in bold
         stdout.set_color(ColorSpec::new().set_bold(true))?;
-        writeln!(&mut stdout, "diff --lint a/{} b/{}", 
-                 self.file_path.display(), 
-                 self.file_path.display())?;
+        writeln!(
+            &mut stdout,
+            "diff --lint a/{} b/{}",
+            self.file_path.display(),
+            self.file_path.display()
+        )?;
 
         // Print description in cyan
         stdout.set_color(ColorSpec::new().set_fg(Some(Color::Cyan)))?;
-        writeln!(&mut stdout, "# {}: {}", self.suggestion_type_name(), self.description)?;
+        writeln!(
+            &mut stdout,
+            "# {}: {}",
+            self.suggestion_type_name(),
+            self.description
+        )?;
 
         // Print line info in magenta
         stdout.set_color(ColorSpec::new().set_fg(Some(Color::Magenta)))?;
@@ -262,41 +317,59 @@ impl LintSuggestion {
 
         // Format and print the change diff with colors
         match &self.fix {
+            // 1) Pattern-based fixes
             LintFix::ReplacePattern { pattern, replacement } => {
-                let pattern_lines: Vec<_> = pattern.lines().collect();
-                let replacement_lines: Vec<_> = replacement.lines().collect();
-
                 // Removed lines in RED
                 stdout.set_color(ColorSpec::new().set_fg(Some(Color::Red)))?;
+                let pattern_lines: Vec<_> = pattern.lines().collect();
                 if pattern_lines.is_empty() {
                     writeln!(&mut stdout, "- <empty line>")?;
                 } else {
-                    for line in &pattern_lines {
+                    for line in pattern_lines {
                         writeln!(&mut stdout, "- {}", line)?;
                     }
                 }
 
                 // Added lines in GREEN
                 stdout.set_color(ColorSpec::new().set_fg(Some(Color::Green)))?;
+                let replacement_lines: Vec<_> = replacement.lines().collect();
                 if replacement_lines.is_empty() {
                     writeln!(&mut stdout, "+ <empty line>")?;
                 } else {
-                    for line in &replacement_lines {
+                    for line in replacement_lines {
                         writeln!(&mut stdout, "+ {}", line)?;
                     }
                 }
-            },
+            }
+
+            // 2) Replace an entire line with new content
             LintFix::ReplaceLine { line: _, new_content } => {
                 stdout.set_color(ColorSpec::new().set_fg(Some(Color::Red)))?;
                 writeln!(&mut stdout, "- <current line>")?;
 
                 stdout.set_color(ColorSpec::new().set_fg(Some(Color::Green)))?;
-                writeln!(&mut stdout, "+ {}", new_content)?;
-            },
+                if new_content.is_empty() {
+                    writeln!(&mut stdout, "+ <empty line>")?;
+                } else {
+                    writeln!(&mut stdout, "+ {}", new_content)?;
+                }
+            }
+
+            // 3) Insert a new line
             LintFix::InsertAt { line: _, content } => {
                 stdout.set_color(ColorSpec::new().set_fg(Some(Color::Green)))?;
-                writeln!(&mut stdout, "+ {}", content)?;
-            },
+                if content.is_empty() {
+                    writeln!(&mut stdout, "+ <empty line>")?;
+                } else {
+                    writeln!(&mut stdout, "+ {}", content)?;
+                }
+            }
+
+            // 4) Remove a specific line
+            LintFix::RemoveLine { line } => {
+                stdout.set_color(ColorSpec::new().set_fg(Some(Color::Red)))?;
+                writeln!(&mut stdout, "- <line {} removed>", line)?;
+            }
         }
 
         // Reset color
@@ -305,6 +378,8 @@ impl LintSuggestion {
 
         Ok(())
     }
+
+
 
     /// Get a user-friendly name for the suggestion type
     fn suggestion_type_name(&self) -> &'static str {
@@ -323,49 +398,6 @@ impl LintSuggestion {
 }
 
 
-
-/// Runs linting checks on a file's content and returns a list of linting suggestions.
-pub fn lint_file_content(content: &str, file_path: &Path) -> Result<Vec<LintSuggestion>, ReqFlowError> {
-    let mut suggestions = Vec::new();
-
-
-
-    let result = || -> Result<(), ReqFlowError> {
-        // Rule 1: Detect absolute links
-        suggestions.extend(absolute_links::find_absolute_links(content, file_path));
-
-        // Rule 2: Detect excess whitespace
-        suggestions.extend(whitespace::find_excess_whitespace(content, file_path));
-
-        // Rule 3: Detect inconsistent newlines
-        suggestions.extend(newlines::find_inconsistent_newlines(content, file_path));
-
-        // Rule 4: Detect missing separator lines
-        suggestions.extend(separators::find_missing_separators(content, file_path));
-
-        // Rule 5: Detect inconsistent indentation
-        suggestions.extend(indentation::find_inconsistent_indentation(content, file_path));
-
-        // Rule 6: Detect inconsistent reserved subsections
-        suggestions.extend(reserved_subsections::fix_reserved_subsections(content, file_path));
-
-
-        Ok(())
-    }();
-
-    // If there was an error, return it as `ReqFlowError::LintError`
-    result.map(|_| suggestions).map_err(|e| ReqFlowError::LintError(e.to_string()))
-}
-
-
-// Import submodules
-pub mod absolute_links;
-pub mod whitespace;
-pub mod newlines;
-pub mod separators;
-pub mod indentation;
-pub mod index_generator;
-pub mod reserved_subsections;
 
 
 // Add test module

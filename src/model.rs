@@ -111,11 +111,12 @@ impl ModelManager {
     }
 
     /// Validates relations inside the `ElementRegistry`
-    fn validate_relations(&self,excluded_filename_patterns: &GlobSet) -> Result<Vec<ReqFlowError>, ReqFlowError> {
+    fn validate_relations(&self, excluded_filename_patterns: &GlobSet) -> Result<Vec<ReqFlowError>, ReqFlowError> {
         debug!("Validating relations...");
         let mut errors = Vec::new();
 
         for element in self.element_registry.get_all_elements() {
+            
             for relation in &element.relations {            
             
                 // Only validate if the relation target is an Identifier
@@ -171,6 +172,9 @@ impl ModelManager {
         // Check for missing parent relations
         let valid_parent_relations = get_parent_relation_types();
         for element in self.element_registry.get_all_elements() {
+        
+            let element_file= &element.file_path;
+            
             // Important: Only system requirements needs parent
             if let ElementType::Requirement(req_type) = &element.element_type {
                 match req_type {
@@ -182,8 +186,9 @@ impl ModelManager {
 
                         if !has_parent_relation {
                             errors.push(ReqFlowError::MissingParentRelation(
-                                format!("Element '{}' has no parent relation (needs one of: {:?})", element.name, valid_parent_relations),
+                                format!("File {}: Element '{}' has no parent relation (needs one of: {:?})", element_file,element.name, valid_parent_relations),
                             ));
+                    
                         }                    
                     
                     }
