@@ -2,38 +2,35 @@ use std::path::Path;
 use regex::Regex;
 use lazy_static::lazy_static;
 use crate::linting::{LintSuggestion, LintType, LintFix};
-
-/// Ensures exactly one blank line before headers (##, ###, ####).
+/// Ensures exactly one blank line before each heading (##, ###, ####) or horizontal rule (`---`).
 pub fn find_inconsistent_newlines(content: &str, file_path: &Path) -> Vec<LintSuggestion> {
     lazy_static! {
-        static ref HEADER_REGEX: Regex = Regex::new(r"^\s*(#{1,4})\s+(.+)$").unwrap();
+        // Combine your old heading check with an `---` check in a single pattern.
+        // This pattern means: start of line, then either exactly `---` or `##+ some text`.
+        // Adjust if you also want # or other heading forms.
+        static ref TRIGGER_REGEX: Regex = Regex::new(r"^(---|#{2,4}\s+.+)$").unwrap();
     }
 
+    // Keep your existing required blank lines
     let required_blank_lines = 1;
     let lines: Vec<&str> = content.lines().collect();
     let mut suggestions = Vec::new();
 
-    // Go top-to-bottom so line numbering remains stable in the final output,
-    // and gather all suggestions without attempting to "apply" them yet.
     for i in 0..lines.len() {
-    
-        // If we're at line 0, there's no "previous line" to consider, so skip
+        // If we're at line 0, there's no line above. Typically skip or handle differently
         if i == 0 {
-           continue;
+            continue;
         }
         let current_line = lines[i];
 
-        // Check if this line is a header
-        if let Some(caps) = HEADER_REGEX.captures(current_line) {
-            let header_text = caps.get(2).map_or("", |m| m.as_str().trim());
-
-            // Count the number of consecutive blank lines *immediately* above `i`.
-            // We'll walk backwards from `i-1`, as long as lines are blank.
+        // Check if line is "### heading" OR "---"
+        if TRIGGER_REGEX.is_match(current_line.trim()) {
+            // We now enforce exactly one blank line above `i`.
+            // Count how many consecutive blank lines are immediately above `i`.
             let mut blank_count = 0;
             let mut j = i;
             while j > 0 {
-                let line_above = lines[j - 1];
-                if line_above.trim().is_empty() {
+                if lines[j - 1].trim().is_empty() {
                     blank_count += 1;
                     j -= 1;
                 } else {
@@ -42,43 +39,61 @@ pub fn find_inconsistent_newlines(content: &str, file_path: &Path) -> Vec<LintSu
             }
 
             match blank_count.cmp(&required_blank_lines) {
-                // Not enough blank lines
+                // ============================================
+                // 0 blank lines => Insert the missing one
+                // ============================================
                 std::cmp::Ordering::Less => {
                     let needed = required_blank_lines - blank_count;
-                    // We want to insert these newlines *immediately* above `i - blank_count`.
-                    // Because `j` now points to the first non-blank line above the blank block.
-                    // The "insert line" for the user is `j + blank_count` or simply `i`.
-                    //
-                    // For the "line to insert at," we typically use 1-based indexing in lint messages,
-                    // so the displayed line is `i + 1` for humans. But the fix struct often wants
-                    // a 0-based insertion index. Make sure you’re consistent with your own crate’s convention.
-                    let insert_at = i; 
                     suggestions.push(LintSuggestion::new(
                         LintType::InconsistentNewlines,
                         file_path.to_path_buf(),
                         Some(i + 1),
                         format!(
-                            "Missing blank line(s) before header '{}'. Need {} blank line(s).",
-                            header_text, required_blank_lines
+                            "Missing blank line(s) before '{}'. Need {}.",
+                            current_line.trim(),
+                            required_blank_lines
                         ),
                         LintFix::InsertAt {
-                            line: insert_at,
+                            line: i,
                             new_content: "\n".repeat(needed),
                         },
                     ));
                 }
-                // Exactly right
+
+                // ============================================
+                // Exactly 1 blank line => Maybe fix trailing spaces
+                // ============================================
                 std::cmp::Ordering::Equal => {
-                    // No suggestion needed
+                    // If there's exactly 1 blank line, see if it has trailing spaces
+                    let blank_line_index = i - 1;
+                    let actual_line = lines[blank_line_index];
+                    if !actual_line.is_empty() {
+                        // Means there's some whitespace
+                        suggestions.push(LintSuggestion::new(
+                            LintType::InconsistentNewlines,
+                            file_path.to_path_buf(),
+                            Some(blank_line_index + 1),
+                            format!(
+                                "Blank line above '{}' contains trailing spaces. Replacing with a truly empty line.",
+                                current_line.trim()
+                            ),
+                            LintFix::ReplaceLine {
+                                line: blank_line_index,
+                                new_content: "".to_string(),
+                            }
+                        ));
+                    }
                 }
-                // Too many blank lines
+
+                // ============================================
+                // More than 1 => remove extras
+                // ============================================
                 std::cmp::Ordering::Greater => {
-                    // The "blank lines" above are those in the range (j..i).
-                    // We want to remove `excess` lines from that block of blank lines.
-                    // E.g., if blank_count=3 and required_blank_lines=1, we have 2 too many lines.
-                    // That means removing lines [j, j+1] if those are both blank.
-                    let remove_start = j + required_blank_lines; 
-                    let remove_end   = j + blank_count; // exclusive end
+                    let excess = blank_count - required_blank_lines;
+
+                    // We keep the *topmost* blank line, remove the rest
+                    let remove_start = j + 1; // j is the index of the first blank line, keep that
+                    let remove_end = j + blank_count; 
                     let remove_lines: Vec<usize> = (remove_start..remove_end).collect();
 
                     suggestions.push(LintSuggestion::new(
@@ -86,8 +101,9 @@ pub fn find_inconsistent_newlines(content: &str, file_path: &Path) -> Vec<LintSu
                         file_path.to_path_buf(),
                         Some(i + 1),
                         format!(
-                            "Excess blank lines before header '{}'. Expected {} blank line(s).",
-                            header_text, required_blank_lines
+                            "Excess blank lines before '{}'. Expected {}.",
+                            current_line.trim(),
+                            required_blank_lines
                         ),
                         LintFix::RemoveLines { lines: remove_lines },
                     ));
@@ -98,8 +114,6 @@ pub fn find_inconsistent_newlines(content: &str, file_path: &Path) -> Vec<LintSu
 
     suggestions
 }
-
-
 #[cfg(test)]
 mod tests {
     use super::*;
