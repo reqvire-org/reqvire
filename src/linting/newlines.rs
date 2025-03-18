@@ -132,7 +132,7 @@ More content.
         // Expect one suggestion for the missing blank line before "## Second Header".
 
         assert_eq!(suggestions.len(), 1);
-        assert!(suggestions[0].description.contains("Missing blank line(s) before header"));
+        assert!(suggestions[0].description.contains("Missing blank line(s) before '## Second Header'. Need 1."));
     }
 
     #[test]
@@ -149,7 +149,7 @@ More content.
         // Expect one suggestion for excess blank lines before "## Second Header".
         assert_eq!(suggestions.len(), 1);
         println!("{}",&suggestions[0].description);
-        assert!(suggestions[0].description.contains("Excess blank lines before header"));
+        assert!(suggestions[0].description.contains("Excess blank lines before '## Second Header'. Expected 1."));
     }
 
     #[test]
