@@ -35,9 +35,7 @@ graph LR;
 The **MOEs** and **KPPs** for **ReqFlow** are designed to evaluate how effectively the methodology, toolset, and language deliver value to users and stakeholders. 
 These metrics emphasize outcomes such as user adoption, operational efficiency, and community engagement, ensuring that ReqFlow aligns with the needs of its open-source ecosystem.
 
-
 ---
-
 
 ### MOE_UA
 **Increase User Adoption**
