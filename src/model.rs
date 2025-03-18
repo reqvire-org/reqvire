@@ -414,3 +414,172 @@ impl ModelManager {
     }
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::path::PathBuf;
+    use globset::{Glob, GlobSet, GlobSetBuilder};
+    use crate::error::ReqFlowError;
+    use crate::element_registry::ElementRegistry;
+    use crate::linting::LintFix;
+    // Dummy implementation of utils::normalize_fragment for testing.
+    mod utils {
+        pub fn normalize_fragment(fragment: &str) -> String {
+            // For testing, simply lowercase and replace spaces with hyphens.
+            fragment.to_lowercase().replace(' ', "-")
+        }
+    }
+
+    // Dummy implementation of get_supported_relation_types in crate::relation
+    mod relation {
+        pub fn get_supported_relation_types() -> Vec<&'static str> {
+            vec!["derivedFrom", "satisfiedBy", "tracedFrom", "containedBy"]
+        }
+    }
+
+    #[test]
+    fn test_extract_path_and_fragment() {
+        // Test file reference with fragment.
+        let input = "/user/repo#readme";
+        let (file, frag) = crate::utils::extract_path_and_fragment(input);
+        assert_eq!(file, "/user/repo");
+        assert_eq!(frag, Some("readme"));
+
+        // Test fragment-only with leading '#'.
+        let input = "#intro";
+        let (file, frag) = crate::utils::extract_path_and_fragment(input);
+        assert_eq!(file, "");
+        assert_eq!(frag, Some("intro"));
+
+        // Test file only.
+        let input = "document.md";
+        let (file, frag) = crate::utils::extract_path_and_fragment(input);
+        assert_eq!(file, "document.md");
+        assert_eq!(frag, None);
+
+        // Test fragment-only without '#' (treated as fragment-only)
+        let input = "onlyfragment";
+        let (file, frag) = crate::utils::extract_path_and_fragment(input);
+        assert_eq!(file, "");
+        assert_eq!(frag, Some("onlyfragment"));
+    }
+
+    #[test]
+    fn test_find_nonlink_identifiers_plain_file_md() {
+        // This test verifies that non-link plain file references are detected.
+        let content = "Check out file.md please.";
+        let file_path = PathBuf::from("test.md");
+        let suggestions = crate::linting::nonlink_identifiers::find_nonlink_identifiers(content, &file_path);
+        // Our regex for relation lines only matches relation bullet lines.
+        // So this should produce 0 suggestions.
+        assert_eq!(suggestions.len(), 0);
+    }
+
+    #[test]
+    fn test_find_nonlink_identifiers_file_md_with_fragment() {
+        let content = " * derivedFrom: file.md#Element Name with spaces";
+        let file_path = PathBuf::from("test.md");
+        let suggestions = crate::linting::nonlink_identifiers::find_nonlink_identifiers(content, &file_path);
+        assert_eq!(suggestions.len(), 1, "Expected one suggestion");
+
+        let suggestion = &suggestions[0];
+        if let LintFix::ReplacePattern { pattern, replacement } = &suggestion.fix {
+            // Pattern should contain the original raw identifier.
+            assert!(pattern.contains("file.md#Element Name with spaces"), "pattern: {:?}", pattern);
+            // Normalized: "file.md#element-name-with-spaces", link text remains as "file.md#Element Name with spaces"
+            let expected_link = "[file.md#Element Name with spaces](file.md#element-name-with-spaces)";
+            assert!(replacement.contains(expected_link), "replacement: {:?}", replacement);
+        } else {
+            panic!("Expected ReplacePattern fix");
+        }
+    }
+
+    #[test]
+    fn test_find_nonlink_identifiers_hash_only_fragment() {
+        let content = " * derivedFrom: #Some Fragment";
+        let file_path = PathBuf::from("test.md");
+        let suggestions = crate::linting::nonlink_identifiers::find_nonlink_identifiers(content, &file_path);
+        assert_eq!(suggestions.len(), 1, "Expected one suggestion");
+
+        let suggestion = &suggestions[0];
+        if let LintFix::ReplacePattern { pattern, replacement } = &suggestion.fix {
+            // For a hash-only fragment, the file part is empty.
+            assert!(pattern.contains("#Some Fragment"), "pattern: {:?}", pattern);
+            // Link text should be "Some Fragment" (without '#') and link target should be "#some-fragment"
+            let expected_link = "[Some Fragment](#some-fragment)";
+            assert!(replacement.contains(expected_link), "replacement: {:?}", replacement);
+        } else {
+            panic!("Expected ReplacePattern fix");
+        }
+    }
+
+    #[test]
+    fn test_find_nonlink_identifiers_already_bracketed_link_ignored() {
+        let content = "Check out [file.md](file.md) for details.";
+        let file_path = PathBuf::from("test.md");
+        let suggestions = crate::linting::nonlink_identifiers::find_nonlink_identifiers(content, &file_path);
+        // Should ignore already bracketed links.
+        assert_eq!(suggestions.len(), 0, "Expected no suggestions for already bracketed links");
+    }
+
+    #[test]
+    fn test_validate_markdown_structure_duplicates() {
+        // Test a file with duplicate element names and subsection names.
+        let md_content = r#"
+# Document Title
+
+### Element One
+Content.
+
+### Element One
+Content again.
+
+#### Subsection A
+Details.
+
+#### Subsection A
+More details.
+"#;
+        let file_path = "test.md";
+        let errors = ModelManager::new().validate_markdown_structure(md_content, file_path);
+        assert!(!errors.is_empty(), "Expected duplicate element/subsection errors");
+    }
+
+    #[test]
+    fn test_parse_and_validate_no_errors() {
+        // Simulate a simple valid markdown file.
+        let md_content = r#"
+# Test Document
+
+### Element One
+Some content.
+
+#### Subsection A
+Details here.
+
+### Element Two
+Other content.
+
+#### Subsection B
+More details.
+"#;
+        let spec_folder = PathBuf::from("/specifications");
+        let external_folders: Vec<PathBuf> = vec![];
+        let mut builder = GlobSetBuilder::new();
+        builder.add(Glob::new("**").unwrap());
+        let globset = builder.build().unwrap();
+
+        let mut model_manager = ModelManager::new();
+        // Simulate file scanning by inserting our content into file_contents.
+        model_manager.file_contents.insert("Test Document.md".to_string(), md_content.to_string());
+
+        // Call parse_and_validate and expect no errors.
+        let result = model_manager.parse_and_validate(&spec_folder, &external_folders, &globset);
+        match result {
+            Ok(errs) => assert!(errs.is_empty(), "Expected no errors, got: {:?}", errs),
+            Err(e) => panic!("parse_and_validate failed: {:?}", e),
+        }
+    }
+}
+
+

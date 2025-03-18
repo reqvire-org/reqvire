@@ -340,3 +340,77 @@ blockquote {
 "#
     }
 }
+
+
+#[cfg(test)]
+mod config_tests {
+    use std::fs;
+    use tempfile::tempdir;
+    use crate::config::Config;
+
+    #[test]
+    fn test_default_config() {
+        let config = Config::default();
+        
+ 
+        assert_eq!(config.paths.specifications_folder, "specifications");
+        assert_eq!(config.paths.output_folder, "output");
+        assert!(config.paths.excluded_filename_patterns.contains(&"**/DesignSpecifications/**/*.md".to_string()));
+        
+
+        
+        // Verify style defaults
+        assert_eq!(config.style.theme, "default");
+        assert_eq!(config.style.max_width, 1200);
+        assert_eq!(config.style.custom_css, None);
+    }
+
+    #[test]
+    fn test_load_from_yaml() {
+        // Create a temporary directory for our test config
+        let temp_dir = tempdir().unwrap();
+        let config_path = temp_dir.path().join("reqflow.yml");
+        
+        // Create a test YAML configuration
+        let yaml_content = r#"
+general:
+  verbose: true
+
+paths:
+  specifications_folder: "docs"
+  output_folder: "generated"
+  excluded_filename_patterns:
+    - "**/README*.md"
+    - "**/Design/**/*.md"
+
+style:
+  theme: "dark"
+  max_width: 1000
+  custom_css: "custom.css"
+"#;
+        
+        // Write the test config to the temporary file
+        fs::write(&config_path, yaml_content).unwrap();
+        
+        // Load the config
+        let config = Config::from_file(&config_path).unwrap();
+        
+        
+        assert_eq!(config.paths.specifications_folder, "docs");
+        assert_eq!(config.paths.output_folder, "generated");
+        assert!(config.paths.excluded_filename_patterns.contains(&"**/README*.md".to_string()));
+        assert!(config.paths.excluded_filename_patterns.contains(&"**/Design/**/*.md".to_string()));
+        
+        assert_eq!(config.style.theme, "dark");
+        assert_eq!(config.style.max_width, 1000);
+        assert_eq!(config.style.custom_css, Some("custom.css".to_string()));
+ 
+    }
+    
+    
+    #[test]
+    fn test_element_type_detection() {
+        // This test will be updated to test the new element type detection through metadata
+        // when the corresponding test infrastructure is available
+    }
+}

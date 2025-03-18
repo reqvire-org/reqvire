@@ -9,4 +9,4 @@ This document contains mission requirements for testing validation.
 This is a test mission requirement for validation.
 
 #### Metadata
-* type: requirement
+  * type: requirement
