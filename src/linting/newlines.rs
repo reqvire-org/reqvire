@@ -89,7 +89,7 @@ pub fn find_inconsistent_newlines(content: &str, file_path: &Path) -> Vec<LintSu
                 // More than 1 => remove extras
                 // ============================================
                 std::cmp::Ordering::Greater => {
-                    let excess = blank_count - required_blank_lines;
+
 
                     // We keep the *topmost* blank line, remove the rest
                     let remove_start = j + 1; // j is the index of the first blank line, keep that

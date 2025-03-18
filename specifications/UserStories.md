@@ -6,9 +6,7 @@
 3. Contributor: An external community member contributing to ReqFlow by improving models, creating features, or providing feedback.  
 4. Manager: Oversees the MBSE processes, tracks progress, ensures alignment with objectives, and generates reports for decision-making.  
 
-
 ---
-
 
 ## User Stories
 ```mermaid
@@ -75,15 +73,15 @@ graph LR;
   36d8b2eb16 -->|traces| f6237e49f7;
 ```
 
-
 ---
-
 
 ### Managing MBSE Models
 As an **System Engineer**, I want to manage MBSE models effectively, so that I can ensure they align with project requirements and deliverable goals.
 
 #### Relations
   * trace: [MOEs.md/MOE_UA](MOEs.md#moe_ua)
+
+
 ---
 
 ### Generate Diagrams
@@ -91,6 +89,8 @@ As a **System Engineer**, I want to generate diagrams for different system viewp
 
 #### Relations
   * trace: [MOEs.md/MOE_UA](MOEs.md#moe_ua)
+
+
 ---
 
 ### Export Specifications
@@ -98,6 +98,8 @@ As a **Manager**, I want to export specifications into diferent formats includin
 
 #### Relations
   * trace: [MOEs.md/MOE_UA](MOEs.md#moe_ua)
+
+
 ---
 
 ### Aligning Design with Code
@@ -105,6 +107,8 @@ As a **Developer**, I want to align code with MBSE models, so that implementatio
 
 #### Relations
   * trace: [MOEs.md/MOE_UA](MOEs.md#moe_ua)
+
+
 ---
 
 ### Validating Structures
@@ -113,7 +117,6 @@ As an **System Engineer**, I want to validate the structure of MBSE models, so t
 #### Relations
   * trace: [MOEs.md/MOE_UA](MOEs.md#moe_ua)
 
-
 ---
 
 ### Integrate with GitHub Workflows
@@ -121,6 +124,8 @@ As a **Contributor**, I want ReqFlow to integrate seamlessly with GitHub workflo
 
 #### Relations
   * trace: [MOEs.md/MOE_CE](MOEs.md#moe_ce)
+
+
 ---
 
 ### AI-Driven Code Suggestions
@@ -128,6 +133,8 @@ As a **Developer**, I want AI agents to provide actionable suggestions for code 
 
 #### Relations
   * trace: [MOEs.md/MOE_UA](MOEs.md#moe_ua)
+
+
 ---
 
 ### AI-Driven Model Suggestions
@@ -137,7 +144,6 @@ As a **System Engineer**, I want AI agents to provide actionable suggestions for
 #### Relations
   * trace: [MOEs.md/MOE_UA](MOEs.md#moe_ua)
  
- 
 ---
 
 ### Provide Reports
@@ -145,6 +151,8 @@ As a **Manager**, I want to generate structured reports based on the MBSE model,
 
 #### Relations
   * trace: [MOEs.md/MOE_CE](MOEs.md#moe_ce)
+
+
 ---
 
 ### Trace Changes in MBSE Model
@@ -152,6 +160,8 @@ As a **System Engineer**, I want to trace changes in the MBSE model to identify 
 
 #### Relations
   * trace: [MOEs.md/MOE_UA](MOEs.md#moe_ua)
+
+
 ---
 
 ### Generate Traceability Matrix
@@ -159,6 +169,8 @@ As a **System Engineer**, I want ReqFlow to generate traceability matrices, so t
 
 #### Relations
   * trace: [MOEs.md/MOE_UA](MOEs.md#moe_ua)
+
+
 ---
 
 ### Fostering Community Contributions

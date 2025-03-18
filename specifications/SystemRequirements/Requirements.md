@@ -123,9 +123,7 @@ graph LR;
   6b749da146 -->|satisfies| 8f2198f681;
 ```
 
-
 ---
-
 
 ### CLI Lint Flag
 The system shall provide a linting function, activated by the (--lint flag), which shall execute the linting process upon user request.
@@ -133,8 +131,9 @@ The system shall provide a linting function, activated by the (--lint flag), whi
 #### Relations
   * derivedFrom: [UserRequirements.md/Linting Command Behavior](../UserRequirements.md#linting-command)
   * satisfiedBy: [cli.rs](../../src/cli.rs)    
+
+
 ---
-  
 ### Dry Run Mode
 The system shall provide a dry run mode (--dry-run flag) for linting that shows the suggested changes without applying them, allowing users to review modifications before committing to them.
 
@@ -144,14 +143,17 @@ The system shall provide a dry run mode (--dry-run flag) for linting that shows 
 #### Relations
   * derivedFrom: [CLI Lint Flag](#cli-lint-flag)
   * satisfiedBy: [cli.rs](../../src/cli.rs)    
+
+
 ---
-  
 ### Excess Whitespace Linting Implementation
 The system shall detect and fix excess whitespace after element headers, subsection headers, and relation identifiers to maintain consistent formatting across all requirements documents.
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Format Consistency Enforcement](../UserRequirements.md#format-consistency-enforcement)
   * satisfiedBy: [linting/whitespace.rs](../../src/linting/whitespace.rs)
+
+
 ---
 
 ### Excess Newlines Linting Implementation
@@ -160,6 +162,8 @@ The system shall detect and fix excess newlines after element headers, subsectio
 #### Relations
   * derivedFrom: [UserRequirements.md/Format Consistency Enforcement](../UserRequirements.md#format-consistency-enforcement)
   * satisfiedBy: [linting/whitespace.rs](../../src/linting/newlines.rs)
+
+
 ---
 
 ### Inconsistent Newlines Linting Implementation
@@ -168,6 +172,8 @@ The system shall identify instances where subsection headers lack proper spacing
 #### Relations
   * derivedFrom: [UserRequirements.md/Format Consistency Enforcement](../UserRequirements.md#format-consistency-enforcement)
   * satisfiedBy: [linting/newlines.rs](../../src/linting/newlines.rs)
+
+
 ---
 
 ### Missing Separators Linting Implementation
@@ -176,6 +182,8 @@ The system shall detect consecutive element sections that lack a separator line 
 #### Relations
   * derivedFrom: [UserRequirements.md/Format Consistency Enforcement](../UserRequirements.md#format-consistency-enforcement)
   * satisfiedBy: [linting/separators.rs](../../src/linting/separators.rs)
+
+
 ---
 
 ### Indentation Consistency Linting Implementation
@@ -184,6 +192,8 @@ The system shall identify and fix inconsistent indentation and bullet types in r
 #### Relations
   * derivedFrom: [UserRequirements.md/Format Consistency Enforcement](../UserRequirements.md#format-consistency-enforcement)
   * satisfiedBy: [linting/indentation.rs](../../src/linting/indentation.rs)
+
+
 ---
 
 ### Git-Style Diff Output for Linting
@@ -192,6 +202,8 @@ The system shall display linting change suggestions in a git-style diff format, 
 #### Relations
   * derivedFrom: [UserRequirements.md/Linting Command Output](../UserRequirements.md#linting-command-output)
   * satisfiedBy: [linting/mod.rs](../../src/linting/mod.rs)
+
+
 ---
 
 ### Automated Multiple Linting Passes 
@@ -200,6 +212,8 @@ The system shall support automatic multiple linting passes with a configurable i
 #### Relations
   * refine: [Multi-Pass Linting Capability](#multi-pass-linting-capability)
   * satisfiedBy: [linting/mod.rs](../../src/linting/mod.rs)
+
+
 ---
 
 ### Parallel Linting Processing
@@ -208,6 +222,8 @@ The system shall implement parallel processing for linting operations when possi
 #### Relations
   * derivedFrom: [UserRequirements.md/Model Linting](../UserRequirements.md#model-linting)
   * satisfiedBy: [linting/mod.rs](../../src/linting/mod.rs)
+
+
 ---
 
 ### File Pattern Exclusion for Linting
@@ -216,6 +232,8 @@ The system shall respect configured excluded filename patterns when performing l
 #### Relations
   * refine: [Configurable Filename Exclusion Patterns](#configurable-filename-exclusion-patterns)
   * satisfiedBy: [utils.rs](../../src/utils.rs)
+
+
 ---
 
 ### Index Generation During Linting
@@ -224,6 +242,8 @@ The system shall generate or update an index.md file in the specifications root 
 #### Relations
   * derivedFrom: [UserRequirements.md/Generate Documentation Index](../UserRequirements.md#generate-documentation-index)
   * satisfiedBy: [linting/index_generator.rs](../../src/linting/index_generator.rs)
+
+
 ---
 
 ### Directory Structure Processing
@@ -235,6 +255,8 @@ TODO: this needs to be more clear on what folders to walk
 #### Relations
   * refine: [Index Generator Implementation](#index-generator-implementation)
   * satisfiedBy: [linting/index_generator.rs](../../src/linting/index_generator.rs)
+
+
 ---
 
 ## Configuration
@@ -257,6 +279,8 @@ graph LR;
   click 5adb6eb451 "../../src/config.rs";
   5adb6eb451 -->|satisfies| d38ab4ad13;
 ```
+
+
 ---
 
 ### External Folders Support
@@ -277,6 +301,8 @@ paths:
 #### Relations
   * derivedFrom: [UserRequirements.md/Support for Distributed Requirements](../UserRequirements.md#support-for-distributed-requirements)
   * satisfiedBy: [config.rs](../../src/config.rs)
+
+
 ---
 
 ## CLI
@@ -429,6 +455,8 @@ graph LR;
   c5c85bedd1 ==>|refines| 45770e9b31;
   c1dd54a249 -->|satisfies| c5c85bedd1;
 ```
+
+
 ---
 
 ### Index Generator Implementation
@@ -437,6 +465,8 @@ The system shall implement an IndexGenerator component that traverses the specif
 #### Relations
   * derivedFrom: [UserRequirements.md/Generate Documentation Index](../UserRequirements.md#generate-documentation-index)
   * satisfiedBy: [linting/index_generator.rs](../../src/linting/index_generator.rs)
+
+
 ---
 
 ### Markdown Content Summary Extraction
@@ -445,6 +475,8 @@ The system shall extract summaries from the first heading and paragraph of each 
 #### Relations
   * containedBy: [Index Generator Implementation](#index-generator-implementation)
   * satisfiedBy: [linting/index_generator.rs](../../src/linting/index_generator.rs)
+
+
 ---
 
 ### Proper Link URL Generation
@@ -453,6 +485,8 @@ The system shall generate URLs in the index file with both Markdown (.md) and HT
 #### Relations
   * containedBy: [Index Generator Implementation](#index-generator-implementation)
   * satisfiedBy: [linting/index_generator.rs](../../src/linting/index_generator.rs)
+
+
 ---
 
 ### HTML Navigation Enhancement 
@@ -462,6 +496,8 @@ The system shall enhance the HTML generator to process index.md as a special fil
   * derivedFrom: [UserRequirements.md/Documentation Index HTML Integration](../UserRequirements.md#documentation-index-html-integration)
   * satisfiedBy: [html.rs](../../src/html.rs)
   * satisfiedBy: [html_export.rs](../../src/html_export.rs)
+
+
 ---
 
 ### LLM Context Command
@@ -470,6 +506,8 @@ The system shall provide a command-line option `--llm-context` that outputs comp
 #### Relations
   * derivedFrom: [UserRequirements.md/Provide Actionable Model Improvement Suggestions](../UserRequirements.md#provide-actionable-model-improvement-suggestions)
   * satisfiedBy: [main.rs](../../src/main.rs)
+
+
 ---
 
 ### JSON Validation Output Format
@@ -478,6 +516,8 @@ The system shall provide validation results in machine-readable JSON format to f
 #### Relations
   * derivedFrom: [UserRequirements.md/Enhanced Validation Error Reporting](../UserRequirements.md#enhanced-validation-error-reporting)
   * satisfiedBy: [parser.rs](../../src/parser.rs)
+
+
 ---
 
 ### Multiple Validation Modes Support
@@ -486,6 +526,8 @@ The system shall support different validation modes (validate_markdown, validate
 #### Relations
   * derivedFrom: [UserRequirements.md/Enhanced Validation Error Reporting](../UserRequirements.md#enhanced-validation-error-reporting)
   * satisfiedBy: [parser.rs](../../src/parser.rs)
+
+
 ---
 
 ### Interactive Mermaid Diagram Node Behavior
@@ -495,6 +537,8 @@ The system shall implement interactive click behavior for Mermaid diagram nodes 
   * derivedFrom: [UserRequirements.md/Interactive Mermaid Diagrams](../UserRequirements.md#interactive-mermaid-diagrams)
   * satisfiedBy: [html.rs](../../src/html.rs)
   * satisfiedBy: [html_export.rs](../../src/html_export.rs)
+
+
 ---
 
 ### Command Line Configuration Overrides
@@ -503,6 +547,8 @@ The system shall allow command line arguments to override YAML configuration set
 #### Relations
   * derivedFrom: [UserRequirements.md/Project Configuration with YAML](../UserRequirements.md#project-configuration-with-yaml)
   * satisfiedBy: [main.rs](../../src/main.rs)
+
+
 ---
 
 ### Unstructured Documents
@@ -511,6 +557,8 @@ TODO: add requirment that defines a config filter out patterns.
 
 #### Relations
   * derivedFrom: [UserRequirements.md#Unstructured Documents](../UserRequirements.md#unstructured-documents)
+
+
 ---
 
 ### Relation Type Validation
@@ -519,6 +567,8 @@ The system shall validate relation types against a defined vocabulary and provid
 #### Relations
   * derivedFrom: [UserRequirements.md/Enhanced Validation Error Reporting](../UserRequirements.md#enhanced-validation-error-reporting)
   * satisfiedBy: [src/relation.rs](../../src/relation.rs)
+
+
 ---
 
 ### Excluded File Relation Validation
@@ -532,10 +582,11 @@ The validation process for excluded files:
 #### Todo
   * derivedFrom: [Configurable Filename Exclusion Patterns](#configurable-filename-exclusion-patterns) 
   * refine: [File Pattern Exclusion for Linting](#file-pattern-exclusion-for-linting)
-  
 #### Relations
   * refine: [File Pattern Exclusion for Linting](#file-pattern-exclusion-for-linting)
   * satisfiedBy: [src/parser.rs](../../src/parser.rs)
+
+
 ---
 
 ### Multi-Pass Linting Capability
@@ -544,6 +595,8 @@ The system shall support multi-pass linting with a configurable iteration limit 
 #### Relations
   * derivedFrom: [UserRequirements.md/Format Consistency Enforcement](../UserRequirements.md#format-consistency-enforcement)
   * satisfiedBy: [linting/mod.rs](../../src/linting/mod.rs)
+
+
 ---
 
 ### HTML Export
@@ -552,6 +605,8 @@ The system shall generate HTML output for all markdown files, not just requireme
 #### Relations
   * derivedFrom: [../UserRequirements.md/Export HTML specifications](../UserRequirements.md#export-html-specifications)
   * satisfiedBy: [html_export.rs](../../src/html_export.rs)
+
+
 ---
 
 ### Detailed Error Handling and Logging
@@ -560,6 +615,8 @@ The system shall implement detailed error handling and logging throughout the ap
 #### Relations
   * derivedFrom: [../UserRequirements.md#Enhanced Validation Error Reporting](../UserRequirements.md#enhanced-validation-error-reporting)
   * satisfiedBy: [src/error.rs](../../src/error.rs)
+
+
 ---
 
 ### File Content Caching for Performance
@@ -568,7 +625,6 @@ The system shall cache file contents during processing to optimize performance f
 #### Relations
   * derivedFrom: [../UserRequirements.md#Efficient Processing](../UserRequirements.md#efficient-processing)
   * satisfiedBy: [model.rs](../../src/model.rs)
-  
   
 ---
 
@@ -596,6 +652,8 @@ graph LR;
   99bed90a0d -.->|deriveReqT| fc49f77257;
   74b4dd6a32 -->|satisfies| 99bed90a0d;
 ```
+
+
 ---
 
 ### Requirements Processing
@@ -604,6 +662,8 @@ The system shall find and process all requirements in  'external_folders' and it
 #### Relations
   * derivedFrom: [UserRequirements.md/Support for Distributed Requirements](../UserRequirements.md#support-for-distributed-requirements)
   * satisfiedBy: [model.rs](../../src/model.rs)
+
+
 ---
 
 ### Requirements Files Search and Detection
@@ -622,9 +682,7 @@ The process follows these steps to determine whether a file contains requirement
 #### Relations
   * satisfiedBy: [model.rs](../../src/model.rs)
 
-
 ---
-
 
 ## Categorization Outcomes
 ```mermaid
@@ -693,6 +751,8 @@ graph LR;
 - **Stakeholder Needs Requirements File**: Files located in the root of the `specifications` folder and meeting all conditions.
 - **System Requirements File**: Files found in external folders or subfolders within `specifications`.
 - **Not a Requirements File**: Files that match exclusion patterns, do not have a `.md` extension, or are in the design folder.
+
+
 ---
 
 ### Configurable Filename Exclusion Patterns
@@ -713,6 +773,8 @@ paths:
 #### Relations
   * derivedFrom: [UserRequirements.md/Project Configuration with YAML](../UserRequirements.md#project-configuration-with-yaml)
   * satisfiedBy: [config.rs](../../src/config.rs)
+
+
 ---
 
 ### Mermaid Diagram Format Conversion
@@ -721,6 +783,8 @@ The system shall implement an export functionality that converts Mermaid diagram
 #### Relations
   * derivedFrom: [UserRequirements.md/Export Diagrams in Standard Formats](../UserRequirements.md#export-diagrams-in-standard-formats)
   * satisfiedBy: [diagrams.rs](../../src/diagrams.rs)
+
+
 ---
 
 ### Visual Differential Rendering
@@ -728,6 +792,8 @@ The system shall implement a visual differential rendering algorithm that compar
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Highlight Changes in Diagrams](../UserRequirements.md#highlight-changes-in-diagrams)
+
+
 ---
 
 ### SysML-Compatible Relationship Rendering
@@ -779,6 +845,8 @@ satisfy:
 #### Relations
   * derivedFrom: [UserRequirements.md/Visualize Model Relationships](../UserRequirements.md#visualize-model-relationships)
   * satisfiedBy: [diagrams.rs](../../src/diagrams.rs)
+
+
 ---
 
 ### Relationship Type Filter Implementation
@@ -786,6 +854,8 @@ The system shall implement filtering capabilities in the diagram generation logi
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Filter Relationships by Type](../UserRequirements.md#filter-relationships-by-type)
+
+
 ---
 
 ### Diagram Storage Path Configuration
@@ -794,6 +864,8 @@ The system shall implement a configurable storage mechanism for generated diagra
 #### Relations
   * derivedFrom: [UserRequirements.md/Store Automated Diagrams in Designated Locations](../UserRequirements.md#store-automated-diagrams-in-designated-locations)
   * satisfiedBy: [model.rs](../../src/model.rs)
+
+
 ---
 
 ## Traceability Matrix Generation
@@ -861,6 +933,8 @@ graph LR;
   dd7b536571 -.->|deriveReqT| fc0d98c588;
   74b4dd6a32 -->|satisfies| dd7b536571;
 ```
+
+
 ---
 
 ### Traceability Matrix Builder Implementation
@@ -869,6 +943,8 @@ The system shall implement a traceability matrix builder component that extracts
 #### Relations
   * derivedFrom: [UserRequirements.md/Create Traceability Matrices](../UserRequirements.md#create-traceability-matrices)
   * satisfiedBy: [model.rs](../../src/model.rs)
+
+
 ---
 
 ### Relation-Based Matrix View Generator
@@ -877,6 +953,8 @@ The system shall implement specialized view generators for different relationshi
 #### Relations
   * derivedFrom: [UserRequirements.md/Support Relation-Based Views](../UserRequirements.md#support-relation-based-views)
   * satisfiedBy: [model.rs](../../src/model.rs)
+
+
 ---
 
 ### Markdown Matrix Formatter
@@ -885,6 +963,8 @@ The system shall implement a markdown formatter for traceability matrices that p
 #### Relations
   * derivedFrom: [UserRequirements.md/Markdown-Based Default Format](../UserRequirements.md#markdown-based-default-format)
   * satisfiedBy: [model.rs](../../src/model.rs)
+
+
 ---
 
 ### Matrix File Output Handler
@@ -893,6 +973,8 @@ The system shall implement a file output handler for traceability matrices that 
 #### Relations
   * derivedFrom: [UserRequirements.md/Save matrices to designated files](../UserRequirements.md#save-matrices-to-designated-files)
   * satisfiedBy: [model.rs](../../src/model.rs)
+
+
 ---
 
 ### Verification Checkbox Implementation
@@ -900,6 +982,8 @@ The system shall implement an interactive checkbox mechanism in HTML output that
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Include Verification Checkboxes](../UserRequirements.md#include-verification-checkboxes)
+
+
 ---
 
 ### Matrix Export Format Handler
@@ -907,6 +991,8 @@ The system shall implement export handlers for traceability matrices that conver
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Export Traceability Matrix](../UserRequirements.md#export-traceability-matrix)
+
+
 ---
 
 ### CI/CD Pipeline Integration Interface
@@ -914,6 +1000,8 @@ The system shall implement an interface compatible with common CI/CD platforms t
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Support CI/CD Integration](../UserRequirements.md#support-ci/cd-integration)
+
+
 ---
 
 ## Validation Capabilities
@@ -966,6 +1054,8 @@ graph LR;
   ec201a112c -.->|deriveReqT| d834cc4bc9;
   74b4dd6a32 -->|satisfies| ec201a112c;
 ```
+
+
 ---
 
 ### Markdown Structure Validator
@@ -975,6 +1065,8 @@ The system shall implement a markdown structure validator that enforces ReqFlow'
   * derivedFrom: [UserRequirements.md/Validate Markdown Structure](../UserRequirements.md#validate-markdown-structure)
   * satisfiedBy: [parser.rs](../../src/model.rs)  
   * satisfiedBy: [parser.rs](../../src/parser.rs)
+
+
 ---
 
 ### Filesystem Structure Validator
@@ -983,6 +1075,8 @@ The system shall implement a validator that checks the organization of files and
 #### Relations
   * derivedFrom: [UserRequirements.md/Validate Filesystem Structure](../UserRequirements.md#validate-filesystem-structure)
   * satisfiedBy: [model.rs](../../src/model.rs)
+
+
 ---
 
 ### Internal Consistency Validator
@@ -992,6 +1086,8 @@ The system shall implement a consistency validator that verifies logical coheren
   * derivedFrom: [UserRequirements.md/Validate Internal Consistency](../UserRequirements.md#validate-internal-consistency)
   * satisfiedBy: [parser.rs](../../src/model.rs)    
   * satisfiedBy: [parser.rs](../../src/parser.rs)
+
+
 ---
 
 ### Cross-Component Dependency Validator
@@ -1001,6 +1097,8 @@ The system shall implement a specialized validator that analyzes dependencies ac
   * derivedFrom: [UserRequirements.md/Validate Cross-Component Dependencies](../UserRequirements.md#validate-cross-component-dependencies)
   * satisfiedBy: [parser.rs](../../src/model.rs)    
   * satisfiedBy: [model.rs](../../src/model.rs)
+
+
 ---
 
 ## Reporting Features
@@ -1067,6 +1165,8 @@ graph LR;
   click 6a2d21600e "../UserRequirements.md#generate-structural-change-reports";
   3e181ceb83 -.->|deriveReqT| 6a2d21600e;
 ```
+
+
 ---
 
 ### Model Summary Report Generator
@@ -1075,6 +1175,8 @@ The system shall implement a summary report generator that  produces comprehensi
 #### Relations
   * derivedFrom: [UserRequirements.md/Model Structure and Summaries](../UserRequirements.md#model-structure-and-summaries)
   * satisfiedBy: [model.rs](../../src/reports.rs)
+
+
 ---
 
 ### CLI Summary Report Flag
@@ -1083,13 +1185,16 @@ The system shall provide a model summary report function, activated by the (--mo
 #### Relations
   * refine: [Model Summary Report Generator](#model-summary-report-generator)
   * satisfiedBy: [cli.rs](../../src/cli.rs)    
+
+
 ---
-  
 ### Structural Change Analysis Engine
 The system shall implement a change analysis engine that compares model versions to identify structural modifications, analyzes impact chains, and generates reports highlighting affected elements with severity classifications.
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Generate Structural Change Reports](../UserRequirements.md#generate-structural-change-reports)
+
+
 ---
 
 ### Validation Report Generator
@@ -1098,6 +1203,8 @@ The system shall implement a validation report generator that compiles and forma
 #### Relations
   * derivedFrom: [UserRequirements.md/Provide Validation Reports](../UserRequirements.md#provide-validation-reports)
   * satisfiedBy: [model.rs](../../src/model.rs)
+
+
 ---
 
 ### Verification Gap Analyzer
@@ -1105,6 +1212,8 @@ The system shall implement a verification gap analyzer that identifies requireme
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Generate Verifications Reports](../UserRequirements.md#generate-verifications-reports)
+
+
 ---
 
 ### Dependency Report Generator
@@ -1112,6 +1221,8 @@ The system shall implement a dependency report generator that analyzes and visua
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Generate Dependency Reports](../UserRequirements.md#generate-dependency-reports)
+
+
 ---
 
 ### Report Export Formatter
@@ -1119,6 +1230,8 @@ The system shall implement format conversion engines for reports that transform 
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Export Reports to Standard Formats](../UserRequirements.md#export-reports-to-standard-formats)
+
+
 ---
 
 ## Change Tracing
@@ -1144,6 +1257,8 @@ graph LR;
   click e8cb10f42e "../UserRequirements.md#suggest-structural-updates";
   21b263e7b2 -.->|deriveReqT| e8cb10f42e;
 ```
+
+
 ---
 
 ### Structural Change Analyzer
@@ -1151,6 +1266,8 @@ The system shall implement a model change analyzer that identifies structural mo
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Tracing Structural Changes](../UserRequirements.md#tracing-structural-changes)
+
+
 ---
 
 ### Structural Update Recommender
@@ -1158,4 +1275,6 @@ The system shall implement a recommendation engine that analyzes model changes, 
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Suggest Structural Updates](../UserRequirements.md#suggest-structural-updates)
+
+
 ---
