@@ -18,6 +18,7 @@ pub mod separators;
 pub mod indentation;
 pub mod index_generator;
 pub mod reserved_subsections;
+pub mod nonlink_identifiers;
 
 pub fn run_linting(
     specification_folder: &PathBuf, 
@@ -43,6 +44,7 @@ pub fn run_linting(
             separators::find_missing_separators,
             indentation::find_inconsistent_indentation,
             reserved_subsections::fix_reserved_subsections,
+            nonlink_identifiers::find_nonlink_identifiers,            
         ];
 
         for lint_rule in linting_rules {
@@ -160,7 +162,9 @@ pub enum LintType {
     /// Inconsistent indentation in relation lists
     InconsistentIndentation,
     /// Incosistent Reserved Sections
-    InconsistentReservedSubsections
+    InconsistentReservedSubsections,
+    /// Identifier not a markdown link
+    NonLinkIdentifier    
 }
 
 /// Represents a fix for a lint issue
@@ -385,6 +389,7 @@ impl LintSuggestion {
     fn suggestion_type_name(&self) -> &'static str {
         match self.suggestion_type {
             LintType::AbsoluteLink => "Absolute link",
+            LintType::NonLinkIdentifier => "Nonlink identifier",            
             LintType::ExcessWhitespace => "Excess whitespace",
             LintType::InconsistentNewlines => "Inconsistent newlines",
             LintType::MissingSeparator => "Missing separator",
