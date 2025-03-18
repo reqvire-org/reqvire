@@ -6,6 +6,10 @@
 3. Contributor: An external community member contributing to ReqFlow by improving models, creating features, or providing feedback.  
 4. Manager: Oversees the MBSE processes, tracks progress, ensures alignment with objectives, and generates reports for decision-making.  
 
+
+---
+
+
 ## User Stories
 ```mermaid
 graph LR;
@@ -70,6 +74,10 @@ graph LR;
   class 36d8b2eb16 requirement;
   36d8b2eb16 -->|traces| f6237e49f7;
 ```
+
+
+---
+
 
 ### Managing MBSE Models
 As an **System Engineer**, I want to manage MBSE models effectively, so that I can ensure they align with project requirements and deliverable goals.

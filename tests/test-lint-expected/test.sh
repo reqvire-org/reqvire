@@ -29,7 +29,7 @@ ISSUE_COUNTS=$(echo "$ISSUES" | awk -F': ' '{counts[$1]++} END {for (type in cou
 EXPECTED_ISSUES=$(cat <<EOF
 1 # Nonlink identifier
 1 # Inconsistent reserved subsections
-2 # Inconsistent newlines
+3 # Inconsistent newlines
 2 # Excess whitespace
 1 # Missing separator
 EOF
@@ -87,7 +87,14 @@ More content
 More content
 
 #### Relations
-  * refine: [Element Header](#element-header)"
+  * refine: [Element Header](#element-header)
+
+
+---
+
+### New Requirement
+ 
+Other stuff."
 
 
 

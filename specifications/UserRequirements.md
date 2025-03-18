@@ -41,6 +41,10 @@ graph LR;
   f07cf1cbfa ==>|refines| 852dea6cfe;
 ```
 
+
+---
+
+
 ### Coexistence of Structured and Unstructured Documents
 The system shall allow structured markdown and unstructured (eg., markdown, PDFs, DOCX, raw text) documents to coexist within the same MBSE model.
 
@@ -181,6 +185,10 @@ The system shall store automatically generated diagrams in pre-configured locati
 #### Relations
   * refine: [UserStories.md/Generate Diagrams](UserStories.md#generate-diagrams)
 
+
+---
+
+
 ## Aligning Design with Code
 ```mermaid
 graph LR;
@@ -215,6 +223,10 @@ The system shall suggest code refactoring opportunities to better align with the
 
 #### Relations
   * refine: [UserStories.md/Aligning Design with Code](UserStories.md#aligning-design-with-code)
+
+
+---
+
 
 ## Validating Structures
 ```mermaid
@@ -370,6 +382,10 @@ The system shall validate dependencies across different components of the MBSE m
 #### Relations
   * refine: [UserStories.md/Validating Structures](UserStories.md#validating-structures)
 
+
+---
+
+
 ## Integrate with GitHub Workflows
 ```mermaid
 graph LR;
@@ -404,6 +420,10 @@ The system shall generate detailed change logs for pull requests, summarizing mo
 
 #### Relations
   * refine: [UserStories.md/Integrate with GitHub Workflows](UserStories.md#integrate-with-github-workflows)
+
+
+---
+
 
 ## AI-Driven Code Suggestions
 ```mermaid
@@ -450,6 +470,10 @@ The system shall allow AI agents to highlight potential conflicts between code a
 
 #### Relations
   * refine: [UserStories.md/AI-Driven Code Suggestions](UserStories.md#ai-driven-code-suggestions)
+
+
+---
+
 
 ## AI-Driven Model Suggestions
 ```mermaid
@@ -507,6 +531,10 @@ The system shall enable AI agents to propose fixes for validation errors in the 
 
 #### Relations
   * refine: [Provide Actionable Model Improvement Suggestions](#provide-actionable-model-improvement-suggestions)
+
+
+---
+
 
 ## Provide Reports
 ```mermaid
@@ -606,6 +634,10 @@ The system shall allow users to export generated reports in standard formats (e.
 #### Relations
   * refine: [UserStories.md/Provide Reports](UserStories.md#provide-reports)
 
+
+---
+
+
 ## Trace Changes in MBSE Model
 ```mermaid
 graph LR;
@@ -651,6 +683,10 @@ When a report of impacted elements is fed into the AI agents' context, the syste
 
 #### Relations
   * derivedFrom: [Suggest Structural Updates](#suggest-structural-updates)
+
+
+---
+
 
 ## Generate Traceability Matrix			
 ```mermaid

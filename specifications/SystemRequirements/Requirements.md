@@ -123,6 +123,10 @@ graph LR;
   6b749da146 -->|satisfies| 8f2198f681;
 ```
 
+
+---
+
+
 ### CLI Lint Flag
 The system shall provide a linting function, activated by the (--lint flag), which shall execute the linting process upon user request.
 
@@ -617,6 +621,10 @@ The process follows these steps to determine whether a file contains requirement
 
 #### Relations
   * satisfiedBy: [model.rs](../../src/model.rs)
+
+
+---
+
 
 ## Categorization Outcomes
 ```mermaid
