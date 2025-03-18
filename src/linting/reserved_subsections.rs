@@ -34,7 +34,7 @@ pub fn fix_reserved_subsections(content: &str, file_path: &Path) -> Vec<LintSugg
 
         // Entire matched block (header + blank lines).
         let mat = mat_caps.get(0).unwrap();
-        let end_index = mat.end(); 
+
 
         // 1) Find line index of the header by counting lines up to `mat.start()`.
         let start_index = mat.start();
@@ -79,7 +79,7 @@ pub fn fix_reserved_subsections(content: &str, file_path: &Path) -> Vec<LintSugg
         let replacement = format!("{}\n{}", header_line.trim_end(), fixed_bullet_line);
 
         suggestions.push(LintSuggestion::new(
-            LintType::InconsistentNewlines,
+            LintType::InconsistentReservedSubsections,
             file_path.to_path_buf(),
             None,
             format!(

@@ -147,8 +147,12 @@ pub fn handle_command(
                     } else {
                         print_validation_results("Validation Summary", &errors, args.json);
                     }
+                    return Ok(0);
                 }
-                Err(e) => eprintln!("❌ Validation failed: {}", e),
+                Err(e) => {
+                    eprintln!("❌ Validation failed: {}", e);
+                    return Ok(0);
+                }
             }  
         }else if args.generate_index {
             info!("Generating index.....");

@@ -1,0 +1,13 @@
+paths:
+  specifications_folder: "./specifications"
+  output_folder: "output"
+  excluded_filename_patterns:
+    - "**/Logical*.md"
+    - "**/Physical*.md"
+    - "Sample*"
+
+style:
+  theme: "light"
+  max_width: 1200
+
+

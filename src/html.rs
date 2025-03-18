@@ -67,7 +67,7 @@ fn add_anchor_ids(html_content: &str) -> String {
 /// Process Mermaid diagrams to ensure links point to the correct `.html` files.
 /// Uses `to_relative_identifier` to correctly resolve paths.
 pub fn process_mermaid_diagrams(
-    file_path: &PathBuf,
+    _file_path: &PathBuf,
     html_content: &str,
     specification_folder: &PathBuf,
     external_folders: &[PathBuf],

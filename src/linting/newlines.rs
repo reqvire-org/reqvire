@@ -2,100 +2,94 @@ use std::path::Path;
 use regex::Regex;
 use lazy_static::lazy_static;
 use crate::linting::{LintSuggestion, LintType, LintFix};
-/// Checks that each header (levels 1–4) has exactly 1 blank line before it.
-/// Produces InsertAt suggestions if there are too few blank lines,
-/// and RemoveLine suggestions if there are too many.
-pub fn find_inconsistent_newlines(
-    content: &str,
-    file_path: &Path,
-) -> Vec<LintSuggestion> {
-    // We want exactly 1 blank line
-    let required_blank_lines = 1;
-    
+
+/// Ensures exactly one blank line before headers (##, ###, ####).
+pub fn find_inconsistent_newlines(content: &str, file_path: &Path) -> Vec<LintSuggestion> {
     lazy_static! {
-        // Match headers (levels 1..=4) with optional leading whitespace.
         static ref HEADER_REGEX: Regex = Regex::new(r"^\s*(#{1,4})\s+(.+)$").unwrap();
     }
 
-    // Convert the file content into a list of lines
+    let required_blank_lines = 1;
     let lines: Vec<&str> = content.lines().collect();
     let mut suggestions = Vec::new();
 
-    // Traverse lines from top to bottom (0..lines.len()) for detection
+    // Go top-to-bottom so line numbering remains stable in the final output,
+    // and gather all suggestions without attempting to "apply" them yet.
     for i in 0..lines.len() {
-        // Skip if it's the very first line (can't have preceding lines)
+    
+        // If we're at line 0, there's no "previous line" to consider, so skip
         if i == 0 {
-            continue;
+           continue;
         }
+        let current_line = lines[i];
 
-        // Check if the line is a header
-        if let Some(caps) = HEADER_REGEX.captures(lines[i]) {
-            let header_text = caps.get(2).unwrap().as_str().trim();
+        // Check if this line is a header
+        if let Some(caps) = HEADER_REGEX.captures(current_line) {
+            let header_text = caps.get(2).map_or("", |m| m.as_str().trim());
 
-            // Count consecutive blank lines above this header
+            // Count the number of consecutive blank lines *immediately* above `i`.
+            // We'll walk backwards from `i-1`, as long as lines are blank.
             let mut blank_count = 0;
-            let mut k = i;
-            while k > 0 {
-                k -= 1;
-                if lines[k].trim().is_empty() {
+            let mut j = i;
+            while j > 0 {
+                let line_above = lines[j - 1];
+                if line_above.trim().is_empty() {
                     blank_count += 1;
+                    j -= 1;
                 } else {
                     break;
                 }
             }
 
-            // If blank_count == required_blank_lines, do nothing
-            if blank_count == required_blank_lines {
-                continue;
-            }
-
-            let desc = if blank_count < required_blank_lines {
-                "Missing blank lines"
-            } else {
-                "Excess blank lines"
-            };
-
-            // The topmost blank line index is (i - blank_count).
-            let top_blank_idx = i - blank_count;
-
-            if blank_count < required_blank_lines {
-                // We need to insert (required_blank_lines - blank_count) extra blank lines
-                let needed = required_blank_lines - blank_count;
-                for _ in 0..needed {
-                    // We produce an InsertAt suggestion for each missing blank line
+            match blank_count.cmp(&required_blank_lines) {
+                // Not enough blank lines
+                std::cmp::Ordering::Less => {
+                    let needed = required_blank_lines - blank_count;
+                    // We want to insert these newlines *immediately* above `i - blank_count`.
+                    // Because `j` now points to the first non-blank line above the blank block.
+                    // The "insert line" for the user is `j + blank_count` or simply `i`.
+                    //
+                    // For the "line to insert at," we typically use 1-based indexing in lint messages,
+                    // so the displayed line is `i + 1` for humans. But the fix struct often wants
+                    // a 0-based insertion index. Make sure you’re consistent with your own crate’s convention.
+                    let insert_at = i; 
                     suggestions.push(LintSuggestion::new(
                         LintType::InconsistentNewlines,
                         file_path.to_path_buf(),
-                        Some(i + 1), // 1-based line number for the header
+                        Some(i + 1),
                         format!(
-                            "{} before header '{}', enforcing exactly {} blank line(s).",
-                            desc, header_text, required_blank_lines
+                            "Missing blank line(s) before header '{}'. Need {} blank line(s).",
+                            header_text, required_blank_lines
                         ),
                         LintFix::InsertAt {
-                            // Insert the blank line above the header
-                            line: top_blank_idx,
-                            content: "".to_string(), // a truly empty line
+                            line: insert_at,
+                            new_content: "\n".repeat(needed),
                         },
                     ));
                 }
-            } else {
-                // blank_count > required_blank_lines
-                // We have too many blank lines; we need to remove (blank_count - required_blank_lines).
-                let remove_count = blank_count - required_blank_lines;
-                for r in 0..remove_count {
-                    let line_to_remove = top_blank_idx + r;
-                    // We'll produce a RemoveLine fix for each line that should be removed.
+                // Exactly right
+                std::cmp::Ordering::Equal => {
+                    // No suggestion needed
+                }
+                // Too many blank lines
+                std::cmp::Ordering::Greater => {
+                    // The "blank lines" above are those in the range (j..i).
+                    // We want to remove `excess` lines from that block of blank lines.
+                    // E.g., if blank_count=3 and required_blank_lines=1, we have 2 too many lines.
+                    // That means removing lines [j, j+1] if those are both blank.
+                    let remove_start = j + required_blank_lines; 
+                    let remove_end   = j + blank_count; // exclusive end
+                    let remove_lines: Vec<usize> = (remove_start..remove_end).collect();
+
                     suggestions.push(LintSuggestion::new(
                         LintType::InconsistentNewlines,
                         file_path.to_path_buf(),
-                        Some(i + 1), // 1-based line number for the header
+                        Some(i + 1),
                         format!(
-                            "{} before header '{}', enforcing exactly {} blank line(s).",
-                            desc, header_text, required_blank_lines
+                            "Excess blank lines before header '{}'. Expected {} blank line(s).",
+                            header_text, required_blank_lines
                         ),
-                        LintFix::RemoveLine {
-                            line: line_to_remove,
-                        },
+                        LintFix::RemoveLines { lines: remove_lines },
                     ));
                 }
             }
@@ -122,8 +116,9 @@ More content.
         let file_path = PathBuf::from("test.md");
         let suggestions = find_inconsistent_newlines(content, &file_path);
         // Expect one suggestion for the missing blank line before "## Second Header".
+
         assert_eq!(suggestions.len(), 1);
-        assert!(suggestions[0].description.contains("Missing blank lines before header"));
+        assert!(suggestions[0].description.contains("Missing blank line(s) before header"));
     }
 
     #[test]
