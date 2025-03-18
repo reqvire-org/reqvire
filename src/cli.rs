@@ -102,10 +102,13 @@ fn print_validation_results(validation_type: &str, errors: &[ReqFlowError], json
         };
         println!("{}", serde_json::to_string_pretty(&json_result).unwrap());
     } else {
-        println!("❌ {} validation failed with {} errors.", validation_type, errors.len());
-        for error in errors {
-            println!("  - {}", error);
+        println!("\n❌ {} validation failed with {} error(s):", validation_type, errors.len());
+        println!("");        
+        for (i, error) in errors.iter().enumerate() {
+            println!("  {}. {}", i + 1, error);
+            println!("");
         }
+        println!();
     }
 }
 

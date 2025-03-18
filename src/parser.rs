@@ -196,11 +196,4 @@ pub fn parse_elements(file: &str, content: &str, file_path: &PathBuf,  specifica
 
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-
-}
-
 

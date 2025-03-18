@@ -1,9 +1,5 @@
-general:
-  verbose: false
-
 paths:
   specifications_folder: "."
-  design_specifications_folder: "DesignSpecifications"
   output_folder: "output"
   excluded_filename_patterns:
     - "**/Logical*.md"
@@ -13,7 +9,4 @@ style:
   theme: "light"
   max_width: 1200
 
-validation:
-  validate_markdown: true
-  validate_relations: true
-  validate_structure: true
+
