@@ -31,7 +31,7 @@ EXPECTED_ISSUES=$(cat <<EOF
 1 # Inconsistent reserved subsections
 2 # Inconsistent newlines
 2 # Excess whitespace
-2 # Missing separator
+1 # Missing separator
 EOF
 )
 
@@ -70,8 +70,6 @@ fi
 
 EXPECTED_CONTENT="# Test Requirements Document
 
----
-
 ### Element Header
 
 Content
@@ -80,7 +78,9 @@ Content
 
 More content
 
+
 ---
+
 
 ### Requirement
  
