@@ -88,12 +88,41 @@ pub fn get_relative_path(path: &Path, specification_folder: &Path, external_fold
 }
 
 
-/// Normalize an identifier found in the document (base_path)
-pub fn extract_path_and_fragment(url_part: &str) -> (&str, Option<&str>) {
-    match url_part.split_once('#') {
-        Some((path, fragment)) => (path, Some(fragment)),
-        None => (url_part, None),
+/// Splits an identifier into (file_part, Option(fragment)) following these rules:
+/// - If the identifier starts with '#' then it is treated as a fragment-only reference 
+///   (file_part is empty, and the fragment is the whole identifier without the leading '#').
+/// - Otherwise, if the identifier contains a '/' or a '.' (indicating a file extension), 
+///   it is treated as a file reference. In that case, if a '#' is present, split at the first '#' 
+///   into file_part and fragment; otherwise, fragment is None.
+/// - Otherwise (if there is neither '/' nor '.'), treat the entire identifier as a fragment-only reference.
+pub fn extract_path_and_fragment(identifier: &str) -> (&str, Option<&str>) {
+    if identifier.is_empty(){
+        return ("",None);
     }
+    if identifier.starts_with('#') {
+        let frag = &identifier[1..];
+        return ("", Some(frag));
+    }
+    // If identifier contains a '/' or a '.', assume it's a file reference.
+    if identifier.contains('/') || identifier.contains('.') {
+        if let Some(idx) = identifier.find('#') {
+            let file_part = &identifier[..idx];
+            let frag = &identifier[idx + 1..];
+            (file_part, Some(frag))
+        } else {
+            (identifier, None)
+        }
+    } else {
+        // Otherwise, treat as fragment-only.
+        ("", Some(identifier))
+    }
+}
+pub fn normalize_fragment(fragment: &str) -> String{
+    fragment
+        .trim()
+        .to_lowercase()
+        .replace(' ', "-")     // Replace spaces with hyphens
+        .replace(['(', ')', ',', ':'], "") // Remove disallowed characters
 }
 
 pub fn normalize_identifier(
@@ -110,11 +139,7 @@ pub fn normalize_identifier(
         Ok(normalized_path) => {     
             // Normalize element name into GitHub-style fragment
             if let Some(fragment) = fragment_opt{
-                let normalized_fragment = fragment
-                    .trim()
-                    .to_lowercase()
-                    .replace(' ', "-")     // Replace spaces with hyphens
-                    .replace(['(', ')', ',', ':'], ""); // Remove disallowed characters
+                let normalized_fragment =normalize_fragment(&fragment);                
                 Ok(format!("{}#{}", normalized_path, normalized_fragment))            
             }else{
                 Ok(normalized_path)
@@ -332,7 +357,9 @@ mod tests {
             ("/repo/path/to/file.md", "/repo/path/to/file.md", None),
             ("/user/repo#readme", "/user/repo", Some("readme")),
             ("/user/repo/", "/user/repo/", None),
-            ("#onlyfragment", "", Some("onlyfragment")), // Edge case: only fragment
+            ("File1.md", "File1.md", None),            
+            ("onlyfragment", "", Some("onlyfragment")),
+            ("#onlyfragment", "", Some("onlyfragment")),
             ("", "", None), // Empty input
         ];
 
