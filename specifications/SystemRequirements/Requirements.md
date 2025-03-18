@@ -8,7 +8,6 @@ graph LR;
   classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
-
   66aa36deca["Parallel Linting Processing"];
   click 66aa36deca "Requirements.md#parallel-linting-processing";
   class 66aa36deca requirement;
@@ -242,7 +241,6 @@ graph LR;
   classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
-
   d38ab4ad13["External Folders Support"];
   click d38ab4ad13 "Requirements.md#external-folders-support";
   class d38ab4ad13 requirement;
@@ -285,7 +283,6 @@ graph LR;
   classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
-
   5870488e00["Relation Type Validation"];
   click 5870488e00 "Requirements.md#relation-type-validation";
   class 5870488e00 requirement;
@@ -579,7 +576,6 @@ graph LR;
   classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
-
   2737f2d770["Requirements Files Search and Detection"];
   click 2737f2d770 "Requirements.md#requirements-files-search-and-detection";
   class 2737f2d770 requirement;
@@ -630,7 +626,6 @@ graph LR;
   classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
-
   9860815d52["Visual Differential Rendering"];
   click 9860815d52 "Requirements.md#visual-differential-rendering";
   class 9860815d52 requirement;
@@ -801,7 +796,6 @@ graph LR;
   classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
-
   d7e5fbf806["Markdown Matrix Formatter"];
   click d7e5fbf806 "Requirements.md#markdown-matrix-formatter";
   class d7e5fbf806 requirement;
@@ -922,7 +916,6 @@ graph LR;
   classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
-
   887db62e0f["Markdown Structure Validator"];
   click 887db62e0f "Requirements.md#markdown-structure-validator";
   class 887db62e0f requirement;
@@ -1010,7 +1003,6 @@ graph LR;
   classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
-
   cccd4e46e2["Model Summary Report Generator"];
   click cccd4e46e2 "Requirements.md#model-summary-report-generator";
   class cccd4e46e2 requirement;
@@ -1078,7 +1070,6 @@ The system shall implement a summary report generator that  produces comprehensi
 ---
 
 ### CLI Summary Report Flag
-
 The system shall provide a model summary report function, activated by the (--model-summary flag), which shall generate model summary report
 
 #### Relations
@@ -1086,7 +1077,6 @@ The system shall provide a model summary report function, activated by the (--mo
   * satisfiedBy: [cli.rs](../../src/cli.rs)    
 ---
   
-
 ### Structural Change Analysis Engine
 The system shall implement a change analysis engine that compares model versions to identify structural modifications, analyzes impact chains, and generates reports highlighting affected elements with severity classifications.
 
@@ -1108,7 +1098,6 @@ The system shall implement a verification gap analyzer that identifies requireme
 #### Relations
   * derivedFrom: [UserRequirements.md/Generate Verifications Reports](../UserRequirements.md#generate-verifications-reports)
 ---
-
 
 ### Dependency Report Generator
 The system shall implement a dependency report generator that analyzes and visualizes complex dependency chains within the model, highlighting critical paths, dependency clusters, and potential bottlenecks with impact assessments.
@@ -1132,7 +1121,6 @@ graph LR;
   classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
-
   918cc4a26d["Structural Change Analyzer"];
   click 918cc4a26d "Requirements.md#structural-change-analyzer";
   class 918cc4a26d requirement;

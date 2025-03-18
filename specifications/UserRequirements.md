@@ -8,7 +8,6 @@ graph LR;
   classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
-
   a2398f7051["Bootstrap model struture"];
   click a2398f7051 "UserRequirements.md#bootstrap-model-struture";
   class a2398f7051 requirement;
@@ -42,9 +41,7 @@ graph LR;
   f07cf1cbfa ==>|refines| 852dea6cfe;
 ```
 
-
 ### Coexistence of Structured and Unstructured Documents
-
 The system shall allow structured markdown and unstructured (eg., markdown, PDFs, DOCX, raw text) documents to coexist within the same MBSE model.
 
 #### Relations
@@ -52,7 +49,6 @@ The system shall allow structured markdown and unstructured (eg., markdown, PDFs
 ---
 
 ### Efficient Processing
-
 The system shall process structured documents and relations to extract model-relevant information efficiently.
 
 #### Relations
@@ -60,7 +56,6 @@ The system shall process structured documents and relations to extract model-rel
 ---
 
 ### Bootstrap model struture
-
 The system shall provide a command to automatically bootstrap a predefined directory and file structure for an MBSE model, ensuring compliance with ReqFlow methodology.
 
 #### Relations
@@ -68,7 +63,6 @@ The system shall provide a command to automatically bootstrap a predefined direc
 ---
 
 ### Project Configuration with YAML
-
 The system shall support a YAML-based configuration file that defines folder names and structures to be used by the ReqFlow tool when processing model artifacts.
 
 #### Relations
@@ -76,7 +70,6 @@ The system shall support a YAML-based configuration file that defines folder nam
 ---
 
 ### Configurable Specifications Folder
-
 The system shall allow users to configure the main specification folder through the configuration file, supporting flexible project organization.
 
 #### Relations
@@ -84,21 +77,19 @@ The system shall allow users to configure the main specification folder through 
 ---
 
 ### Support for Distributed Requirements
-
 The system shall support referencing folders that may exist in different repositories through configuration, allowing for distributed requirements management across multiple repositories.
 
 #### Relations
   * derivedFrom: [Project Configuration with YAML](#project-configuration-with-yaml)
 
+---
 
 ### Configurable External Folders
-
 The system shall allow users to configure the External folders through the configuration file.
 
 #### Relations
   * refine: [Support for Distributed Requirements](#support-for-distributed-requirements)
 ---
-
 
 ## Generate Diagrams
 ```mermaid
@@ -108,7 +99,6 @@ graph LR;
   classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
-
   30d97803eb["Filter Relationships by Type"];
   click 30d97803eb "UserRequirements.md#filter-relationships-by-type";
   class 30d97803eb requirement;
@@ -143,9 +133,7 @@ graph LR;
 ```
 ---
 
-
 ### Select Custom Diagram Viewpoints
-
 The system shall allow users to select custom viewpoints for diagrams, tailored to specific stakeholder needs.
 
 #### Relations
@@ -153,7 +141,6 @@ The system shall allow users to select custom viewpoints for diagrams, tailored 
 ---
 
 ### Export Diagrams in Standard Formats
-
 The system shall allow users to export generated diagrams in standard formats (e.g., PNG, SVG, PDF) for easy sharing and presentation.
 
 #### Relations
@@ -161,7 +148,6 @@ The system shall allow users to export generated diagrams in standard formats (e
 ---
 
 ### Highlight Changes in Diagrams
-
 The system shall provide an option to highlight changes made to the model in the generated diagrams for better traceability.
 
 #### Relations
@@ -169,27 +155,20 @@ The system shall provide an option to highlight changes made to the model in the
 ---
 
 ### Visualize Model Relationships
-
 The system shall provide visual representations of relationships within the MBSE model in the diagrams, enabling users to understand dependencies and their impact.
 
 #### Relations
   * refine: [UserStories.md/Generate Diagrams](UserStories.md#generate-diagrams)
 ---
 
-
 ### Automate Diagram Generation
-
 When requested the system shall automatically generate diagrams and save them to the required locations of the model, so that the diagrams are always accessible and up-to-date.
 
 #### Relations
   * derivedFrom: [Visualize Model Relationships](#visualize-model-relationships)
 ---
 
-
-
-
 ### Filter Relationships by Type
-
 The system shall allow users to filter relationships in the MBSE model by type, such as dependency, refinement, or verification when generating diagrams.
 
 #### Relations
@@ -197,7 +176,6 @@ The system shall allow users to filter relationships in the MBSE model by type, 
 ---
 
 ### Store Automated Diagrams in Designated Locations
-
 The system shall store automatically generated diagrams in pre-configured locations in the model repository.
 
 #### Relations
@@ -211,7 +189,6 @@ graph LR;
   classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
-
   5922f3ef03["Suggest Code Refactoring"];
   click 5922f3ef03 "UserRequirements.md#suggest-code-refactoring";
   class 5922f3ef03 requirement;
@@ -227,7 +204,6 @@ graph LR;
 ---
 
 ### Code Traceability
-
 The system shall support code traceability by using structured comments to link code implementations to corresponding requirements in the MBSE model.
 
 #### Relations
@@ -235,7 +211,6 @@ The system shall support code traceability by using structured comments to link 
 ---
 
 ### Suggest Code Refactoring
-
 The system shall suggest code refactoring opportunities to better align with the structure and relationships in the MBSE model.
 
 #### Relations
@@ -249,7 +224,6 @@ graph LR;
   classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
-
   808b1863c8["Linting Command Output"];
   click 808b1863c8 "UserRequirements.md#linting-command-output";
   class 808b1863c8 requirement;
@@ -308,7 +282,6 @@ graph LR;
 ---
 
 ### Enhanced Validation Error Reporting
-
 The system shall provide comprehensive validation messages that include file paths and line numbers when available, to help users quickly locate and fix model integrity and structure issues in their MBSE specifications.
 
 #### Relations
@@ -316,7 +289,6 @@ The system shall provide comprehensive validation messages that include file pat
 ---
 
 ### Model Linting
-
 The system shall provide linting capabilities to identify and fix stylistic, formatting, and non-critical issues in MBSE models that don't affect functional integrity.
 
 #### Relations
@@ -324,7 +296,6 @@ The system shall provide linting capabilities to identify and fix stylistic, for
 ---
 
 ### Linting Command
-
 The system shall provide a linting command that by default automatically applies fixes to stylistic and non-critical formatting issues, while offering option to preview changes without applying them.
 
 #### Relations
@@ -332,7 +303,6 @@ The system shall provide a linting command that by default automatically applies
 ---
 
 ### Linting Command Output
-
 The system shall display linting changes suggestion in similar manner as git diffs.
 
 #### Relations
@@ -340,7 +310,6 @@ The system shall display linting changes suggestion in similar manner as git dif
 ---
 
 ### Replace Absolute Links with Relative Links
-
 The system shall replace absolute links with relative links, where applicable and contextually appropriate, to conform to repository standards and enhance portability.
 
 #### Relations
@@ -348,11 +317,9 @@ The system shall replace absolute links with relative links, where applicable an
 ---
 
 ### Format Consistency Enforcement
-
 The system shall provide linting capability to ensure consistent formatting in requirements documents.
 
 #### Details
-
   * Trimming excess whitespace after element names and relation identifiers
   * Normalizing to exactly two newlines before subsections (e.g., "#### Details")
   * Automatically inserting separator lines ("---") between elements if not already present
@@ -363,7 +330,6 @@ The system shall provide linting capability to ensure consistent formatting in r
 ---
 
 ### Generate Documentation Index
-
 The system shall generate an index.md file in the specifications root folder during linting that contains a structured summary of all specification documents and folders.
 
 #### Relations
@@ -371,7 +337,6 @@ The system shall generate an index.md file in the specifications root folder dur
 ---
 
 ### Documentation Index HTML Integration
-
 The index.md file shall be converted to index.md when HTML output is generated, serving as the primary entry point for HTML documentation.
 
 #### Relations
@@ -379,7 +344,6 @@ The index.md file shall be converted to index.md when HTML output is generated, 
 ---
 
 ### Validate Markdown Structure
-
 The system shall validate the Markdown structure of MBSE documentation to ensure compliance with formatting standards.
 
 #### Relations
@@ -387,7 +351,6 @@ The system shall validate the Markdown structure of MBSE documentation to ensure
 ---
 
 ### Validate Filesystem Structure
-
 The system shall validate the organization of files and folders in the repository to ensure consistency with the MBSE methodology.
 
 #### Relations
@@ -395,7 +358,6 @@ The system shall validate the organization of files and folders in the repositor
 ---
 
 ### Validate Internal Consistency
-
 The system shall check the internal consistency of the MBSE model, ensuring that relationships and elements align correctly.
 
 #### Relations
@@ -403,7 +365,6 @@ The system shall check the internal consistency of the MBSE model, ensuring that
 ---
 
 ### Validate Cross-Component Dependencies
-
 The system shall validate dependencies across different components of the MBSE model to identify mismatches or gaps.
 
 #### Relations
@@ -417,7 +378,6 @@ graph LR;
   classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
-
   68454e6166["Automate Pull Request Validations"];
   click 68454e6166 "UserRequirements.md#automate-pull-request-validations";
   class 68454e6166 requirement;
@@ -433,7 +393,6 @@ graph LR;
 ---
 
 ### Automate Pull Request Validations
-
 The system shall automate validations of pull requests in the GitHub workflow to ensure model consistency before merging.
 
 #### Relations
@@ -441,7 +400,6 @@ The system shall automate validations of pull requests in the GitHub workflow to
 ---
 
 ### Generate Change Logs for Pull Requests
-
 The system shall generate detailed change logs for pull requests, summarizing modifications to the MBSE model and related components.
 
 #### Relations
@@ -455,7 +413,6 @@ graph LR;
   classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
-
   71ba0e325e["Suggest Refactoring for MBSE Consistency  ---> Needs more work"];
   click 71ba0e325e "UserRequirements.md#suggest-refactoring-for-mbse-consistency----->-needs-more-work";
   class 71ba0e325e requirement;
@@ -475,7 +432,6 @@ graph LR;
 ---
 
 ### Analyze Code for Alignment ---> Needs more work
-
 The system shall allow AI agents to analyze code and identify deviations from the MBSE model.
 
 #### Relations
@@ -483,7 +439,6 @@ The system shall allow AI agents to analyze code and identify deviations from th
 ---
 
 ### Suggest Refactoring for MBSE Consistency  ---> Needs more work
-
 The system shall enable AI agents to suggest refactoring opportunities to ensure code consistency with the MBSE model.
 
 #### Relations
@@ -491,7 +446,6 @@ The system shall enable AI agents to suggest refactoring opportunities to ensure
 ---
 
 ### Highlight Potential Code-Model Conflicts --> also too advanced for now
-
 The system shall allow AI agents to highlight potential conflicts between code and the MBSE model, providing recommendations for resolution.
 
 #### Relations
@@ -505,7 +459,6 @@ graph LR;
   classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
-
   ec56dd665a["Provide Actionable Model Improvement Suggestions"];
   click ec56dd665a "UserRequirements.md#provide-actionable-model-improvement-suggestions";
   class ec56dd665a requirement;
@@ -529,7 +482,6 @@ graph LR;
 ---
 
 ### Provide Actionable Model Improvement Suggestions
-
 The system shall enable AI agents to provide actionable suggestions for improving the MBSE model based on system performance data, design inconsistencies, and project requirements.
 
 #### Relations
@@ -537,7 +489,6 @@ The system shall enable AI agents to provide actionable suggestions for improvin
 ---
 
 ### Suggest Refinements to Model Relationships
-
 The system shall enable AI agents to suggest refinements to relationships within the MBSE model to improve consistency and traceability.
 
 #### Relations
@@ -545,7 +496,6 @@ The system shall enable AI agents to suggest refinements to relationships within
 ---
 
 ### Recommend Missing Components
-
 The system shall allow AI agents to recommend missing components or elements based on gaps in the MBSE model.
 
 #### Relations
@@ -553,7 +503,6 @@ The system shall allow AI agents to recommend missing components or elements bas
 ---
 
 ### Propose Validation Fixes
-
 The system shall enable AI agents to propose fixes for validation errors in the MBSE model.
 
 #### Relations
@@ -567,7 +516,6 @@ graph LR;
   classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
-
   596c459d31["Generate Summary Reports"];
   click 596c459d31 "UserRequirements.md#generate-summary-reports";
   class 596c459d31 requirement;
@@ -603,25 +551,20 @@ graph LR;
 ---
 
 ### Model Reports
-
 When requested the system shall provide human readable MBSE model reports.
 
 #### Relations
   * refine: [UserStories.md/Provide Reports](UserStories.md#provide-reports)
 ---
 
-
 ### Model Structure and Summaries
-
 When requested the system shall generate reports summarizing the structure and relationships in the MBSE model, including counts and types of connections.
 
 #### Relations
   * derivedFrom: [Model Reports](#model-reports)
 ---
 
-
 ### Generate Structural Change Reports
-
 The system shall generate detailed reports summarizing the impact of structural changes, including affected relationships and components.
 
 #### Relations
@@ -630,7 +573,6 @@ The system shall generate detailed reports summarizing the impact of structural 
 ---
 
 ### Provide Validation Reports
-
 The system shall generate detailed validation reports, highlighting any inconsistencies or errors in the MBSE model structure.
 
 #### Relations
@@ -638,7 +580,6 @@ The system shall generate detailed validation reports, highlighting any inconsis
 ---
 
 ### Generate Verifications Reports
-
 The system shall produce reports identifying User and Mission requirements that lack a verifiedBy relationship.
 
 #### Relations
@@ -646,7 +587,6 @@ The system shall produce reports identifying User and Mission requirements that 
 ---
 
 ### Generate Summary Reports
-
 The system shall allow users to generate summary reports highlighting key metrics and statuses within the MBSE model.
 
 #### Relations
@@ -654,7 +594,6 @@ The system shall allow users to generate summary reports highlighting key metric
 ---
 
 ### Generate Dependency Reports
-
 The system shall generate reports summarizing dependencies between requirements, components, and test cases in the MBSE model.
 
 #### Relations
@@ -662,7 +601,6 @@ The system shall generate reports summarizing dependencies between requirements,
 ---
 
 ### Export Reports to Standard Formats
-
 The system shall allow users to export generated reports in standard formats (e.g., PDF, Excel) for external sharing.
 
 #### Relations
@@ -676,7 +614,6 @@ graph LR;
   classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
-
   c43ff279c1["AI Feedback on Structural Changes"];
   click c43ff279c1 "UserRequirements.md#ai-feedback-on-structural-changes";
   class c43ff279c1 requirement;
@@ -696,7 +633,6 @@ graph LR;
 ---
 
 ### Tracing Structural Changes
-
 When tracing structural changes, the system shall analyze the MBSE model and diffs to identify affected components and generate a report of impacted elements and structures, so that the user can review the changes and decide on further actions.
 
 #### Relations
@@ -704,7 +640,6 @@ When tracing structural changes, the system shall analyze the MBSE model and dif
 ---
 
 ### Suggest Structural Updates
-
 The system shall suggest updates to maintain structural consistency when changes are introduced to the MBSE model.
 
 #### Relations
@@ -712,7 +647,6 @@ The system shall suggest updates to maintain structural consistency when changes
 ---
 
 ### AI Feedback on Structural Changes
-
 When a report of impacted elements is fed into the AI agents' context, the system shall provide suggestions for propagating changes across the MBSE model and allow the user to approve or reject each suggestion, so that updates can be applied consistently and committed to the model after user validation.
 
 #### Relations
@@ -726,7 +660,6 @@ graph LR;
   classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
-
   9fe409695e["Create Traceability Matrices"];
   click 9fe409695e "UserRequirements.md#create-traceability-matrices";
   class 9fe409695e requirement;
@@ -777,7 +710,6 @@ graph LR;
 ---
 
 ### Create Traceability Matrices
-
 The system shall create a traceability matrices when requested by a user or as part of CI/CD actions.
 
 #### Relations
@@ -785,7 +717,6 @@ The system shall create a traceability matrices when requested by a user or as p
 ---
 
 ### Support Relation-Based Views
-
 The system shall generate traceability matrix views based on relations to requirements, such as:
 1. **VerifiedBy**: Mapping requirements to their verification methods.
 2. **SatisfiedBy**: Mapping system components to the requirements they satisfy.
@@ -797,11 +728,9 @@ The system shall generate traceability matrix views based on relations to requir
 ---
 
 ### Interactive Mermaid Diagrams
-
 The system shall include Mermaid diagrams in the traceability matrix that provide interactive links to related elements in other documents, enabling navigation and exploration of dependencies.
 
 #### Details
-
 Diagrams must be broken into several diagrams using following logic:
  * requirements_file_name/'## paragraph name'
    * all requirements inside are 1 diagram
@@ -818,7 +747,6 @@ Color code for rendering diagrams:
 ---
 
 ### Markdown-Based Default Format
-
 The system shall generate the traceability matrix in Markdown format by default, adhering to ReqFlow's markdown-first methodology.
 
 #### Relations
@@ -826,7 +754,6 @@ The system shall generate the traceability matrix in Markdown format by default,
 ---
 
 ### Save matrices to designated files
-
 The system shall save the generated traceability matrices as a Markdown documents with Mermaid diagrams.
 
 #### Relations
@@ -834,7 +761,6 @@ The system shall save the generated traceability matrices as a Markdown document
 ---
 
 ### Include Verification Checkboxes
-
 The system shall include checkboxes in the traceability matrix for each verification entry, allowing users to manually mark verification as completed and commit the updated status.
 
 #### Relations
@@ -842,7 +768,6 @@ The system shall include checkboxes in the traceability matrix for each verifica
 ---
 
 ### Handle Affected Verifications on Model Changes
-
 The system shall uncheck verification checkboxes in the traceability matrix and save updates if a diff affects the related requirements or components, ensuring re-validation is required.
 
 #### Relations
@@ -850,7 +775,6 @@ The system shall uncheck verification checkboxes in the traceability matrix and 
 ---
 
 ### Specification Design Document for Requirements Change Propagation
-
 The system **shall provide a Specification Design Document (DSD)** that defines how changes in requirements affect child requirements and verifications, ensuring traceability and controlled impact analysis.
 
 #### Relations
@@ -859,7 +783,6 @@ The system **shall provide a Specification Design Document (DSD)** that defines 
 ---
 
 ### Export Traceability Matrix
-
 The system shall provide an option to export the traceability matrix in formats such as Excel or PDF for external sharing and analysis.
 
 #### Relations
@@ -874,7 +797,6 @@ graph LR;
   classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
-
   33733d2f42["Support CI/CD Integration"];
   click 33733d2f42 "UserRequirements.md#support-ci/cd-integration";
   class 33733d2f42 requirement;
@@ -893,7 +815,6 @@ graph LR;
 ---
 
 ### Export HTML specifications
-
 The system shall export specifications into HTML format and save in designated output location.
 
 #### Relations
@@ -901,7 +822,6 @@ The system shall export specifications into HTML format and save in designated o
 ---
 
 ### Support CI/CD Integration
-
 The system shall integrate with CI/CD pipelines to generate or update traceability matrices as part of automated workflows.
 
 #### Relations
