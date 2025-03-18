@@ -68,7 +68,7 @@ pub fn print_registry_summary(element_registry: &ElementRegistry) {
                 } else {
                     println!("      - Relations:");
                     for relation in &element.relations {
-                        let rel_type = relation.relation_type.name.clone();
+                        let rel_type = relation.relation_type.name;
                         match &relation.target.link {
                             LinkType::Identifier(target_id) => {
                                 println!("        ↪ {}: {} (Identifier)", rel_type, target_id);

@@ -7,7 +7,6 @@ use log::debug;
 use globset::GlobSet;
 use crate::error::ReqFlowError;
 use crate::utils;
-use std::collections::HashMap;
 
 
 // Import submodules
@@ -16,7 +15,6 @@ pub mod whitespace;
 pub mod newlines;
 pub mod separators;
 pub mod indentation;
-pub mod index_generator;
 pub mod reserved_subsections;
 pub mod nonlink_identifiers;
 
@@ -33,21 +31,21 @@ pub fn run_linting(
     debug!("Found {} markdown files to lint", files.len());
 
     for (file_path, _) in files {        
-        // Read file content.
-        let mut file_content = fs::read_to_string(&file_path)?;
-
-        // Apply each linting rule separately, saving the file after each.
+        // Apply each linting rule separately, saving the file after each. (order matters).
         let linting_rules: Vec<fn(&str, &Path) -> Vec<LintSuggestion>> = vec![
+            reserved_subsections::fix_reserved_subsections,                
             absolute_links::find_absolute_links,
-            whitespace::find_excess_whitespace,
-            newlines::find_inconsistent_newlines,
-            separators::find_missing_separators,
-            indentation::find_inconsistent_indentation,
-            reserved_subsections::fix_reserved_subsections,
             nonlink_identifiers::find_nonlink_identifiers,            
+            whitespace::find_excess_whitespace,
+            newlines::find_inconsistent_newlines,            
+            separators::find_missing_separators,                                                            
+          //  indentation::find_inconsistent_indentation,
         ];
 
+        let mut file_content = fs::read_to_string(&file_path)?;
+
         for lint_rule in linting_rules {
+            // Read file content.
             let mut suggestions = lint_rule(&file_content, &file_path);
 
             if suggestions.is_empty() {
@@ -59,15 +57,17 @@ pub fn run_linting(
             } else {
                 // Sort suggestions by line_number descending so that fixes are applied from bottom to top
                 suggestions.sort_by(|a, b| b.line_number.unwrap_or(0).cmp(&a.line_number.unwrap_or(0)));
-
+ 
+                let mut new_file_content=file_content.clone();
                 for suggestion in &suggestions {
-                    let new_file_content = apply_fix(&file_content, suggestion);
-                    file_content=new_file_content;
-                    println!("✅ Applied fix: {} to {}", suggestion.description, file_path.display());                    
-                }
-                fs::write(&file_path, &file_content)?;
-             
+                    new_file_content = apply_fix(&new_file_content, suggestion);
+                    println!("✅ Applied fix: {} to {}", suggestion.description, file_path.display());  
+                }    
+                file_content=new_file_content.clone();
+                fs::write(&file_path, &file_content)?;                                                                                                                              
+
             }
+
         }
     }
     
@@ -91,45 +91,57 @@ fn apply_fix(content: &str, suggestion: &LintSuggestion) -> String {
     match &suggestion.fix {
         LintFix::ReplacePattern { pattern, replacement } => content.replace(pattern, replacement),
         LintFix::ReplaceLine { line, new_content } => replace_line(content, *line, new_content),
-        LintFix::InsertAt { line, content: insert_content } => insert_at_line(content, *line, insert_content),
-        LintFix::RemoveLine { line } => {
-            remove_line(content, *line)
-        }        
+        LintFix::RemoveLines { lines } => remove_lines(content, lines), 
+        LintFix::InsertAt { line, new_content } => insert_at_line(content, *line, new_content),         
     }
 }
+
 /// Inserts content at a specific line in the file.
 fn insert_at_line(content: &str, line: usize, new_content: &str) -> String {
-    let mut lines: Vec<&str> = content.lines().collect();
-    
-    // Ensure the line number is within range
+    let mut lines: Vec<String> = content.lines().map(String::from).collect();
+
+    // Ensure the line number is within range (allowing append at EOF)
     if line > lines.len() {
         return content.to_string(); // No change if line number is out of bounds
     }
 
-    lines.insert(line, new_content);
-    lines.join("\n") + "\n" // Preserve trailing newline
+    // Insert the new content as a single block at the correct position
+    lines.insert(line, new_content.to_string());
+
+    // Ensure proper formatting with a trailing newline
+    lines.join("\n") + "\n"
 }
 
 /// Replaces a specific line in the file content.
 fn replace_line(content: &str, line: usize, new_content: &str) -> String {
-    let mut lines: Vec<&str> = content.lines().collect();
-    
-    // Ensure the line number is within range
+    let mut lines: Vec<String> = content.lines().map(String::from).collect();
+
     if line >= lines.len() {
         return content.to_string(); // No change if line number is out of bounds
     }
 
-    lines[line] = new_content;
+    let new_lines: Vec<String> = new_content.lines().map(String::from).collect();
+
+    // Replace single line with multiple lines if needed
+    lines.splice(line..=line, new_lines);
+
     lines.join("\n") + "\n" // Preserve trailing newline
 }
-/// Removes the line at index `line` (0-based).
-fn remove_line(content: &str, line: usize) -> String {
-    let mut lines: Vec<&str> = content.lines().collect();
-    
-    // Ensure the line number is within range
-    if line < lines.len() {
-        lines.remove(line);
+
+/// Removes multiple lines at once (supports `RemoveLines`)
+fn remove_lines(content: &str, lines_to_remove: &[usize]) -> String {
+    let mut lines: Vec<String> = content.lines().map(String::from).collect();
+
+    // Sort indices in descending order to avoid shifting issues
+    let mut sorted_lines: Vec<usize> = lines_to_remove.to_vec();
+    sorted_lines.sort_by(|a, b| b.cmp(a));
+
+    for &line in &sorted_lines {
+        if line < lines.len() {
+            lines.remove(line);
+        }
     }
+
     lines.join("\n") + "\n" // Preserve trailing newline
 }
 
@@ -189,11 +201,11 @@ pub enum LintFix {
         /// Line number to insert at
         line: usize,
         /// Content to insert
-        content: String,
-    },
-    /// Remove a specific line from the file.
-    RemoveLine {
-        line: usize,
+        new_content: String,
+    }, 
+    /// Remove n lines in a row from the file.  
+    RemoveLines {
+        lines: Vec<usize>,
     },    
 }
 
@@ -262,18 +274,11 @@ impl LintSuggestion {
             LintFix::ReplaceLine { line: _, new_content } => {
                 format!("- <current line>\n+ {}", new_content)
             }
-            LintFix::InsertAt { line: _, content } => {
-                // InsertAt means we add a new line
-                if content.is_empty() {
-                    "+ <empty line>".to_string()
-                } else {
-                    format!("+ {}", content)
-                }
-            }
-            LintFix::RemoveLine { line } => {
-                // Show removal of line (we don't store old content in LintFix::RemoveLine)
-                format!("- <line {} removed>", line)
-            }
+            LintFix::InsertAt { line, new_content } => format!("+ <insert at line {}>: {}", line, new_content),
+
+            LintFix::RemoveLines { lines } => {
+                lines.iter().map(|line| format!("- <line {} removed>", line)).collect::<Vec<_>>().join("\n")
+            }            
         };
         
         // Give a descriptive header for the suggestion
@@ -360,20 +365,19 @@ impl LintSuggestion {
             }
 
             // 3) Insert a new line
-            LintFix::InsertAt { line: _, content } => {
+            LintFix::InsertAt { line, new_content } => {
                 stdout.set_color(ColorSpec::new().set_fg(Some(Color::Green)))?;
-                if content.is_empty() {
-                    writeln!(&mut stdout, "+ <empty line>")?;
-                } else {
-                    writeln!(&mut stdout, "+ {}", content)?;
-                }
+                writeln!(stdout, "+ <insert at line {}>: {}", line, new_content)?;
             }
 
-            // 4) Remove a specific line
-            LintFix::RemoveLine { line } => {
+   
+            // 4) Remove a specific lines            
+            LintFix::RemoveLines { lines } => {
                 stdout.set_color(ColorSpec::new().set_fg(Some(Color::Red)))?;
-                writeln!(&mut stdout, "- <line {} removed>", line)?;
-            }
+                for line in lines {
+                    writeln!(stdout, "- <line {} removed>", line)?;
+                }
+            }            
         }
 
         // Reset color
@@ -403,18 +407,136 @@ impl LintSuggestion {
 }
 
 
-
-
-// Add test module
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::fs;
     use std::path::PathBuf;
+    use globset::GlobSetBuilder;
 
-    // Helper function to create a test file path
+    /// Helper function to create a test file path
     fn test_file_path() -> PathBuf {
         PathBuf::from("test.md")
     }
 
- 
+    /// Test: Insert content at a specific line
+    #[test]
+    fn test_insert_at_line() {
+        let content = "Line 1\nLine 2\nLine 3\n";
+        let result = insert_at_line(content, 1, "Inserted Line");
+
+        assert_eq!(result, "Line 1\nInserted Line\nLine 2\nLine 3\n");
+    }
+
+    /// Test: Replace a specific line
+    #[test]
+    fn test_replace_line() {
+        let content = "Line 1\nLine 2\nLine 3\n";
+        let result = replace_line(content, 1, "New Line 2");
+
+        assert_eq!(result, "Line 1\nNew Line 2\nLine 3\n");
+    }
+
+    /// Test: Remove a specific line
+    #[test]
+    fn test_remove_line() {
+        let content = "Line 1\nLine 2\nLine 3\n";
+        let result = remove_lines(content, &[1]);
+
+        assert_eq!(result, "Line 1\nLine 3\n");
+    }
+
+    /// Test: Apply Fix - Replace Pattern
+    #[test]
+    fn test_apply_fix_replace_pattern() {
+        let content = "Hello, world!";
+        let fix = LintFix::ReplacePattern {
+            pattern: "world".to_string(),
+            replacement: "Rust".to_string(),
+        };
+        let suggestion = LintSuggestion::new(
+            LintType::ExcessWhitespace,
+            test_file_path(),
+            Some(1),
+            "Replace 'world' with 'Rust'".to_string(),
+            fix,
+        );
+
+        let result = apply_fix(content, &suggestion);
+        assert_eq!(result, "Hello, Rust!");
+    }
+
+    /// Test: Apply Fix - Replace Line
+    #[test]
+    fn test_apply_fix_replace_line() {
+        let content = "Hello\nWorld\nRust";
+        let fix = LintFix::ReplaceLine {
+            line: 1,
+            new_content: "New Line".to_string(),
+        };
+        let suggestion = LintSuggestion::new(
+            LintType::InconsistentNewlines,
+            test_file_path(),
+            Some(1),
+            "Replace line 1".to_string(),
+            fix,
+        );
+
+        let result = apply_fix(content, &suggestion);
+        assert_eq!(result, "Hello\nNew Line\nRust\n");
+    }
+
+    /// Test: Apply Fix - Insert At Line
+    #[test]
+    fn test_apply_fix_insert_at() {
+        let content = "Hello\nWorld";
+        let fix = LintFix::InsertAt {
+            line: 1,
+            new_content: "Inserted Line".to_string(),
+        };
+        let suggestion = LintSuggestion::new(
+            LintType::InconsistentNewlines,
+            test_file_path(),
+            Some(1),
+            "Insert line at position 1".to_string(),
+            fix,
+        );
+
+        let result = apply_fix(content, &suggestion);
+        assert_eq!(result, "Hello\nInserted Line\nWorld\n");
+    }
+
+    /// Test: Apply Fix - Remove Line
+    #[test]
+    fn test_apply_fix_remove_line() {
+        let content = "Hello\nWorld\nRust";
+        let fix = LintFix::RemoveLines { lines: [1].to_vec() };
+        let suggestion = LintSuggestion::new(
+            LintType::NonLinkIdentifier,
+            test_file_path(),
+            Some(1),
+            "Remove line 1".to_string(),
+            fix,
+        );
+
+        let result = apply_fix(content, &suggestion);
+        assert_eq!(result, "Hello\nRust\n");
+    }
+
+    /// Test: Running Linting with Dry Run Mode
+    #[test]
+    fn test_run_linting_dry_run() {
+        let temp_dir = tempfile::tempdir().unwrap();
+        let test_file_path = temp_dir.path().join("test.md");
+
+        // Create a markdown file with intentional linting issues
+        let test_content = "## Test Header\n\n \nThis is a test file.\n";
+        fs::write(&test_file_path, test_content).unwrap();
+
+        let excluded_patterns = GlobSetBuilder::new().build().unwrap();
+        let result = run_linting(&temp_dir.path().to_path_buf(), &[], &excluded_patterns, true);
+
+        assert!(result.is_ok(), "Linting should run without errors");
+    }
 }
+
