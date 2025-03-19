@@ -1,5 +1,41 @@
 use std::collections::HashMap;
 use crate::relation::{Relation};
+use crate::utils;
+
+
+#[derive(Debug, PartialEq)]
+pub enum SubSection {
+    Other,
+    Requirement,    
+    Relations,
+    Metadata,
+    Details,
+    Properties,
+}
+impl SubSection {
+    pub fn name(&self) -> &str {
+        match self {
+            SubSection::Requirement => "Requirement",        
+            SubSection::Relations => "Relations",
+            SubSection::Metadata => "Metadata",
+            SubSection::Details => "Details",
+            SubSection::Properties => "Properties",
+            SubSection::Other => "Other",            
+        }
+    }
+    pub fn from_str(s: &str) -> Self {
+        match s {
+            "Requirement" => SubSection::Requirement,        
+            "Relations" => SubSection::Relations,
+            "Metadata" => SubSection::Metadata,
+            "Details" =>   SubSection::Details,
+            "Properties" => SubSection::Properties,
+            _ => SubSection::Other,
+        }
+    }    
+}
+
+
 
 
 #[derive(Debug, Clone, PartialEq, Eq)] 
@@ -34,12 +70,20 @@ impl ElementType {
 pub struct Element {
     pub name: String,
     pub content: String,
+    pub change_impact_hash: String,
     pub section: String,
     pub relations: Vec<Relation>,
     pub identifier: String,
     pub file_path: String,
     pub element_type: ElementType,
     pub metadata: HashMap<String, String>,
+    //
+    hash_identifier: String,
+    // hash of content that is taken into impact change detection
+    hash_impact_content: String,
+    //
+    changed_since_commit: bool,
+    invalidated: bool
 }
 
 
@@ -49,26 +93,41 @@ impl Element {
         Self {
             name: name.to_string(),
             content: "".to_string(),
+            hash_impact_content: "".to_string(),
+            change_impact_hash: "".to_string(),
             section: section.to_string(),
             relations: vec![],
             identifier: identifier.to_string(),
+            hash_identifier: utils::hash_identifier(&identifier),
             file_path: file_path.to_string(),
             element_type: element_type.unwrap_or(ElementType::Requirement(RequirementType::System)), 
             metadata: HashMap::new(),
+            changed_since_commit: false,
+            invalidated: false
         }
     }
 
     pub fn add_relation(&mut self, relation: Relation) -> () {
+    
+    
       self.relations.push(relation);
     }
 
     pub fn add_content(&mut self, content: &str) {
-        if !self.content.is_empty() {
-            self.content.push('\n');
-        }
         self.content.push_str(content);
     }
-    
+
+    pub fn freeze_content(&mut self) {
+        // Trim newlines and tabs from the beginning and end.
+        let trimmed = self.content.trim_matches(&['\n', '\t'][..]);     
+                
+        // Normalize content by removing all whitespace (spaces, tabs, newlines, etc.)
+        let normalized: String = trimmed.chars().filter(|c| !c.is_whitespace()).collect();
+
+        self.content=trimmed.to_string();
+        self.hash_impact_content=utils::hash_content(&normalized);
+    }
+        
     pub fn set_type_from_metadata(&mut self) {
         if let Some(type_value) = self.metadata.get("type") {
             self.element_type = ElementType::from_metadata(type_value);
@@ -81,5 +140,8 @@ impl Element {
             None => "".to_string(),
         }
     }
+    
+     
+    
 }
 

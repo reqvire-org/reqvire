@@ -1,5 +1,5 @@
 use anyhow::Result;
-use crate::element::{Element};
+use crate::element::{Element,SubSection};
 use crate::relation::{Relation};
 use crate::element::ElementType;
 use crate::element::RequirementType;
@@ -15,14 +15,11 @@ pub fn parse_elements(file: &str, content: &str, file_path: &PathBuf,  specifica
     let mut elements = Vec::new();
     let mut current_element: Option<Element> = None;
     let mut errors = Vec::new();
-    let mut in_relations_section = false;
-    let mut in_metadata_section = false;
-    
+
+
+    let mut current_subsection = SubSection::Other;     
     let mut current_section_name = "Requirements";
 
-    
-    // Reserved subsections that should not be treated as standalone elements
-    let reserved_subsections = vec!["Relations", "Details", "Metadata"];
 
     for line in content.lines() {
         let trimmed = line.trim();
@@ -30,11 +27,14 @@ pub fn parse_elements(file: &str, content: &str, file_path: &PathBuf,  specifica
         if trimmed.starts_with("## ") {
             // Extract section name and update tracking variable
             current_section_name = trimmed[3..].trim();
-
+            current_subsection = SubSection::Other;
             
         }else if trimmed.starts_with("### ") {
+            current_subsection = SubSection::Requirement;        
+            
             // Save previous element
-            if let Some(element) = current_element.take() {
+            if let Some(mut element) = current_element.take() {
+                element.freeze_content();
                 elements.push(element);
             }
             
@@ -78,36 +78,23 @@ pub fn parse_elements(file: &str, content: &str, file_path: &PathBuf,  specifica
                         debug!("Error: {}",msg);
                 }
             }
-            in_relations_section = false;
-            in_metadata_section = false;
+            
+            
         } else if trimmed.starts_with("#### ") && current_element.is_some() {
             // Level 4 headers are subsections within elements
             let subsection_name = trimmed[5..].trim().to_string();
 
-            if reserved_subsections.contains(&subsection_name.as_str()) {
-                match subsection_name.as_str() {
-                    "Relations" => {
-                        in_relations_section = true;
-                        in_metadata_section = false;
-                    }
-                    "Metadata" => {
-                        in_metadata_section = true;
-                        in_relations_section = false;
-                    }
-                    _ => {
-                        in_relations_section = false;
-                        in_metadata_section = false;
-                    }
-                }
-            }
+            current_subsection = SubSection::from_str(&subsection_name);
 
-            if let Some(element) = &mut current_element {
+        } else if current_subsection == SubSection::Requirement ||  current_subsection == SubSection::Details {   
+            // Regular content
+            if let Some(element) = &mut current_element {         
                 element.add_content(&format!("{}\n", line));
-            }
-        } else if in_metadata_section {
+            }                      
+        } else if current_subsection == SubSection::Metadata {
             // Strictly allow only metadata lines (e.g., "* key: value")
             if !trimmed.starts_with("* ") {
-                in_metadata_section = false;
+                current_subsection = SubSection::Other;
             } else if let Some(element) = &mut current_element {
                 if let Some((key, value)) = utils::parse_metadata_line(trimmed) {
                     element.metadata.insert(key.clone(), value.clone());
@@ -121,14 +108,14 @@ pub fn parse_elements(file: &str, content: &str, file_path: &PathBuf,  specifica
                     errors.push(ReqFlowError::InvalidMetadataFormat(msg.clone()));
                     debug!("Error: {}", msg);    
                                     
-                    in_metadata_section = false; // Exit metadata section
+                    current_subsection = SubSection::Other; // Exit metadata section
                 }
             }        
-        } else if in_relations_section {
+        } else if current_subsection == SubSection::Relations {
         
             // Strictly allow only relation lines (e.g., "* derivedFrom: identifier")
             if !trimmed.starts_with("* ") {
-                in_relations_section = false;
+                current_subsection = SubSection::Other;
             } else if let Some(element) = &mut current_element {            
                 if let Ok((relation_type, (text, link))) = utils::parse_relation_line(trimmed) {
             
@@ -170,21 +157,18 @@ pub fn parse_elements(file: &str, content: &str, file_path: &PathBuf,  specifica
                     }
                 } else {
                     debug!("Invalid relation format, stopping relation parsing.");
-                    in_relations_section = false;  // Exit the relations section
+                    current_subsection = SubSection::Other;  // Exit the relations section
                 }
             }
             
-                        
-        } else {
-            // Regular content
-            if let Some(element) = &mut current_element {
-                element.add_content(&format!("{}\n", line));
-            }
+        } else if current_subsection == SubSection::Other{
+            // we do not parse other content right now            
         }
     }
 
     // Add last element if exists
-    if let Some(element) = current_element.take() {
+    if let Some(mut element) = current_element.take() {
+        element.freeze_content();
         elements.push(element);
     }
 

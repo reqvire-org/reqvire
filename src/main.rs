@@ -14,7 +14,6 @@ pub mod filesystem;
 pub mod diagrams;
 pub mod index_generator;
 pub mod reports;
-pub mod change_impact;
 
 
 use log::error;
@@ -42,9 +41,15 @@ fn main() {
     if std::env::var("RUST_LOG").is_err() {
         std::env::set_var("RUST_LOG", "info");
     }
-    env_logger::init();
 
     let args = Args::parse_args();
+    
+    if args.json{
+        std::env::set_var("RUST_LOG", "critical");
+    }
+    
+    env_logger::init();
+    
     let config = Config::load_from_args(&args);
 
     let mut model_manager = ModelManager::new();

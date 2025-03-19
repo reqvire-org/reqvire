@@ -1,14 +1,14 @@
 use clap::{Parser, CommandFactory};
 use std::path::PathBuf;
 use anyhow::Result;
-use log::{error, info};
+use log::{error, info,debug};
 use serde::Serialize;
 use crate::error::ReqFlowError;
 use crate::{html_export, linting, model::ModelManager};
 use crate::index_generator;
 use globset::GlobSet;
 use crate::reports;
-use crate::change_impact::ChangeImpactReport;
+use crate::utils;
 
 
 
@@ -139,7 +139,9 @@ pub fn handle_command(
         }
     }else{
   
-        let parse_result=model_manager.parse_and_validate(&specification_folder_path, &external_folders_path,excluded_filename_patterns);
+
+
+        let parse_result=model_manager.parse_and_validate(None, &specification_folder_path, &external_folders_path,excluded_filename_patterns);
 
         if args.validate {
             match parse_result {
@@ -175,7 +177,7 @@ pub fn handle_command(
             return Ok(0);
             
         }else if args.model_summary {
-            reports::print_registry_summary(&model_manager.element_registry);
+            reports::print_registry_summary(&model_manager.element_registry,args.json);
             return Ok(0);        
             
                           
@@ -196,16 +198,9 @@ pub fn handle_command(
             info!("{} markdown files converted to HTML", processed_count);
             return Ok(0);
         }else{
-            Args::print_help();        
-            let report = ChangeImpactReport::generate();
-            match report {
-            Ok(rep) => {
-                rep.print_pretty(false);
-            }
-            Err(e) => {
-                eprintln!("Failed to generate change impact report: {}", e);
-            }
-        }
+            Args::print_help();  
+            
+
         }
     
     }

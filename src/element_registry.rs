@@ -1,12 +1,13 @@
 use std::collections::HashMap;
-use crate::element::Element;
+use crate::element;
+use crate::relation;
 use crate::error::ReqFlowError;
 
 
 #[derive(Debug)]
 pub struct ElementRegistry {
     /// Map of full identifiers to elements
-    pub elements: HashMap<String, Element>
+    pub elements: HashMap<String, element::Element>
 }
 
 impl ElementRegistry {
@@ -18,7 +19,7 @@ impl ElementRegistry {
     }
 
     /// Registers an element, ensuring identifier uniqueness
-    pub fn register_element(&mut self, element: Element, _file_path: &str) -> Result<(), ReqFlowError> {
+    pub fn register_element(&mut self, element: element::Element, _file_path: &str) -> Result<(), ReqFlowError> {
    
         if self.elements.contains_key(&element.identifier) {
             return Err(ReqFlowError::DuplicateElement(element.identifier));
@@ -30,14 +31,14 @@ impl ElementRegistry {
     }
 
     /// Retrieves an element by its identifier
-    pub fn get_element(&self, identifier: &str) -> Result<&Element, ReqFlowError> {
+    pub fn get_element(&self, identifier: &str) -> Result<&element::Element, ReqFlowError> {
         self.elements
             .get(identifier)
             .ok_or_else(|| ReqFlowError::MissingElement(identifier.to_string()))
     }
 
     /// Retrieves all elements
-    pub fn get_all_elements(&self) -> Vec<&Element> {
+    pub fn get_all_elements(&self) -> Vec<&element::Element> {
         self.elements.values().collect()
     }
 
@@ -47,7 +48,7 @@ impl ElementRegistry {
     }
 
     /// Registers multiple elements at once
-    pub fn register_elements(&mut self, elements: Vec<Element>, file_path: &str) -> Vec<ReqFlowError> {
+    pub fn register_elements(&mut self, elements: Vec<element::Element>, file_path: &str) -> Vec<ReqFlowError> {
         let mut errors = vec![];
 
         for element in elements {
@@ -57,6 +58,22 @@ impl ElementRegistry {
         }
 
         errors
+    }
+
+        
+    /// Finds an element referenced by a relation.
+    /// Returns `Some(&Element)` if the relation's target is an internal identifier
+    /// that exists in the registry; otherwise returns `None`.
+    pub fn find_related_element(&self, relation: &relation::Relation) -> Option<&element::Element> {
+        match &relation.target.link {
+            relation::LinkType::Identifier(id) => self.elements.get(id),
+            relation::LinkType::ExternalUrl(_url) => None,
+        }
+    }
+        
+    /// Searches though the elements relations to calculate change impact
+    pub fn change_impact(&self, element: element::Element) -> bool {
+       true
     }
 
 }

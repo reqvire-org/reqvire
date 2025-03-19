@@ -102,7 +102,7 @@ fn add_element_to_diagram(
         external_folders
     )?;
     
-    let element_id = hash_identifier(&element.identifier);   
+    let element_id = utils::hash_identifier(&element.identifier);   
 
     if !included_elements.contains(&element.identifier) {
        included_elements.insert(element.identifier.clone());
@@ -130,7 +130,7 @@ fn add_element_to_diagram(
         let target_id = match &relation.target.link {
             LinkType::Identifier(target) => {            
                 
-                let target_id = hash_identifier(&target);               
+                let target_id = utils::hash_identifier(&target);               
 
                 let relative_target = utils::to_relative_identifier(
                     &target,
@@ -143,7 +143,7 @@ fn add_element_to_diagram(
                     included_elements.insert(target.clone());
                                  
   
-                    let class=match registry.get_element(target) {
+                    let class=match registry.get_element(&target) {
                         Ok(existing_element)=>{
                             match existing_element.element_type {
                                 ElementType::Requirement(RequirementType::User)  => "requirement",                    
@@ -164,12 +164,12 @@ fn add_element_to_diagram(
             },
             LinkType::ExternalUrl(url) => {
                 // Always add external URLs, regardless of `included_elements`
-                let target_id = hash_identifier(url);
+                let target_id = utils::hash_identifier(url);
                 diagram.push_str(&format!("  {}[\"{}\"];\n", target_id, label));
                 diagram.push_str(&format!("  class {} {};\n", target_id,"default"));
                 diagram.push_str(&format!("  click {} \"{}\";\n", target_id, url));
                 
-                hash_identifier(&url)
+                target_id
                 
             }
         };
@@ -209,12 +209,6 @@ fn get_relation_properties(relation_type: &str) -> RelationProperties {
 }
 
 
-/// Generates a fast and lightweight hash ID
-fn hash_identifier(identifier: &str) -> String {
-    let mut hasher = FxHasher::default();
-    hasher.write(identifier.as_bytes());
-    format!("{:x}", hasher.finish())[..10].to_string() // Truncate to 10 characters
-}
 /// Struct for relation properties
 struct RelationProperties {
     arrow: &'static str,
