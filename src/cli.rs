@@ -8,6 +8,8 @@ use crate::{html_export, linting, model::ModelManager};
 use crate::index_generator;
 use globset::GlobSet;
 use crate::reports;
+use crate::change_impact::ChangeImpactReport;
+
 
 
 #[derive(Parser, Debug)]
@@ -195,6 +197,15 @@ pub fn handle_command(
             return Ok(0);
         }else{
             Args::print_help();        
+            let report = ChangeImpactReport::generate();
+            match report {
+            Ok(rep) => {
+                rep.print_pretty(false);
+            }
+            Err(e) => {
+                eprintln!("Failed to generate change impact report: {}", e);
+            }
+        }
         }
     
     }

@@ -14,6 +14,7 @@ pub mod filesystem;
 pub mod diagrams;
 pub mod index_generator;
 pub mod reports;
+pub mod change_impact;
 
 
 use log::error;

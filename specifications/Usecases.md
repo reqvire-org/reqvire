@@ -1,39 +1,115 @@
-# ReqFlow use case
+# Usecase diagrams
 
 
-## Use Case Diagram
-```mermaid
-graph LR;
-  %% Graph styling
-  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
-  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
-  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
-  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+## ReqFlow usecase
 
-  d5b0f3d359["ReqFlow Tool"];
-  click d5b0f3d359 "Usecases.md#reqflow-tool";
-  class d5b0f3d359 requirement;
-  1df1330ea0["GitHub or Similar"];
-  click 1df1330ea0 "Usecases.md#github-or-similar";
-  class 1df1330ea0 requirement;
-  86fecce1d6["System of Interest (SOI)"];
-  click 86fecce1d6 "Usecases.md#system-of-interest-soi";
-  class 86fecce1d6 requirement;
-  2e9c51c95d["CI/CD System"];
-  click 2e9c51c95d "Usecases.md#ci/cd-system";
-  class 2e9c51c95d requirement;
-  42704f2447["Human Interaction"];
-  click 42704f2447 "Usecases.md#human-interaction";
-  class 42704f2447 requirement;
-  c8dea69e6b["External Systems"];
-  click c8dea69e6b "Usecases.md#external-systems";
-  class c8dea69e6b requirement;
-  e17b2dcca4["AI Agents in Development"];
-  click e17b2dcca4 "Usecases.md#ai-agents-in-development";
-  class e17b2dcca4 requirement;
-```
+
+## ReqFlow Tool Use Case Diagram
 
 The use case diagram below highlights the primary interactions between the ReqFlow Tool and its users, including developers, CI/CD systems, and other actors. It captures the high-level functional behaviors that the tool is designed to support, from managing requirements to automating tasks in Git workflows.
+
+```mermaid
+flowchart LR
+    subgraph "ReqFlowTool"
+        subgraph "Cli"
+            manageModel((Manage MBSE Model))
+            generateDiagrams((Generate Diagrams))
+            analiseRelations((Analyze Relations))
+            reports[Provide Reports]
+            validateStructure((Validate Structure))			
+            filesStructure[Filesystem Structure]
+            markdownSucture[Markdown Structure]
+            traceability((Generate Traceability Matrix))
+            handleDiffs((Trace Changes))        
+        end  
+
+        subgraph "ChatOps"
+            aiAgents((Provide AI Agents🤖))
+            aiSuggestions((Suggestions)) 
+            reviewSuggestions((Review Suggestions))                
+            applySuggestions((Apply Approved Suggestions))                
+        end
+                 
+    end
+
+    human[Human👤]
+    human -. build .-> model
+    human -. develop .-> developedSystem
+
+    subgraph "External Systems"
+        ciSystem[CI/CD System]
+        subgraph "GitHubOrSimilar"
+            hostedGitRepository[hosted Git Repository]
+        end
+    end
+
+    subgraph "System of Interest: SOI"
+        model[MBSE Model]
+        developedSystem["Developed System"]
+        subgraph "Git Repository<br>monorepo or multirepo"
+            gitRepository[Git Repository]
+        end
+
+    end
+
+    %% Human Interactions
+    human -. use CLI to .-> manageModel
+
+    human -. colaborate via .-> GitHubOrSimilar
+
+    ReqFlowTool -. read/write/get diffs .-> gitRepository
+    aiAgents -. PRs/issues/comment > colaborate via .-> GitHubOrSimilar
+ 
+    manageModel -. provide .-> validateStructure
+    validateStructure -. include .-> markdownSucture
+    validateStructure -. include .-> filesStructure  
+    validateStructure -. include .-> reports    
+
+    manageModel -. provide .-> traceability
+    manageModel -. provide .-> analiseRelations
+    analiseRelations -. include .-> reports      
+    manageModel -. provide .-> generateDiagrams
+    manageModel -. provide .-> handleDiffs
+
+    human -. interact via ChatOps .-> aiAgents    
+    aiAgents -. interact with via functions .-> manageModel    
+
+    aiAgents -. assist in development .-> developedSystem
+    aiAgents -. commit code changes .-> gitRepository
+
+    aiAgents -. assist .-> human
+    aiAgents -. provide .-> aiSuggestions
+    aiSuggestions -. with human in loop .-> reviewSuggestions
+    reviewSuggestions -. approval required .-> applySuggestions
+    applySuggestions -. commit into.-> gitRepository    
+
+
+    %% CI/CD and Git Systems
+    ciSystem -. trigger .-> validateStructure
+    ciSystem -. trigger .-> generateDiagrams
+    ciSystem -. trigger .-> traceability
+    ciSystem -. fail merges if invalid .-> GitHubOrSimilar
+    GitHubOrSimilar <-. sync .-> gitRepository
+
+    %% Relationships with SOI
+    model -- stored & versioned in --> gitRepository
+    developedSystem -- stored & versioned in --> gitRepository
+    developedSystem <-- implemented from --> model
+    model -- guides development of --> developedSystem
+
+    %% ReqFlow Interactions with SOI
+    handleDiffs -. include .-> reports    
+
+    %% SOI Feedback Loop
+    developedSystem -. feedback .-> model
+
+
+
+```
+
+## Explanation of ReqFlow Use Case Diagram
+
+This diagram outlines the core interactions, components, and workflows of the **ReqFlow** tool in the context of managing Model-Based Systems Engineering (MBSE) models, integrating with external systems, and supporting development activities for a System of Interest (SOI).
 
 
 ### ReqFlow Tool
@@ -64,9 +140,6 @@ The central component of the system, which facilitates various MBSE-related acti
  - With human in the loop workflow.
 - Apply Approved Suggestions: Commits approved changes to the model.
 
-
----
-
 ### AI Agents in Development
 
 ReqFlow's **AI Agents 🤖** are uniquely equipped with deep knowledge of the ReqFlow methodology and structure. 
@@ -82,9 +155,6 @@ Key capabilities include:
 - Development Assistance: AI Agents provide context-aware assistance to human developers, including debugging, refactoring, and optimization.
 
 
-
----
-
 ### System of Interest (SOI)
 
 The **System of Interest (SOI)** refers to the system which is under development.
@@ -98,14 +168,12 @@ It represents the primary focus of development and includes the following key el
   - This repository can be organized as a monorepo or a multirepo, depending on the project’s needs.
 
 The SOI serves as the centerpiece of the ReqFlow framework, linking specifications, development, and validation processes.
----
+
+
 
 ### External Systems
 
 ReqFlow interacts with external systems to enhance functionality and support development workflows.
-
-
----
 
 ### CI/CD System
 
@@ -113,18 +181,17 @@ ReqFlow provides tools and features that CI/CD systems, such as GitHub Actions, 
 
 These tools enable CI/CD systems to enforce PR merge rules, validate changes, and automate feedback processes, such as adding comments, creating issues, or reporting statuses. 
 
-
----
-
 ### GitHub or Similar
 
 ReqFlow integrates into existing agile and collaborative workflows by providing the necessary tools and scripts to support version control, change management, and traceability. 
 These features allow teams to seamlessly integrate MBSE practices into their development processes, enabling effective collaboration through GitHub or similar platforms.
 
-
----
-
 ### Human Interaction
+
+Humans use a ReqFlow tool :<_____FIX THIS LINE
+- Via CLI: Users interact with ReqFlow’s CLI to manage models and validate structures.
+- Via ChatOps: Users interact with AI agents to receive suggestions, review changes, and approve updates.
+- Collaboration: Users collaborate through GitHub or similar tools to manage repositories and track changes.
 
 Humans interact with ReqFlow tools to manage, refine, and validate MBSE models, as well as to collaborate effectively within development workflows:
 - Via CLI: Users leverage ReqFlow’s CLI to perform tasks such as managing models, generating diagrams, analyzing relationships, and validating structures.
@@ -133,26 +200,7 @@ Humans interact with ReqFlow tools to manage, refine, and validate MBSE models, 
 
 
 ## Workflows and Interactions
-```mermaid
-graph LR;
-  %% Graph styling
-  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
-  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
-  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
-  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  5ae5dd57e3["ReqFlow Interactions with Git"];
-  click 5ae5dd57e3 "Usecases.md#reqflow-interactions-with-git";
-  class 5ae5dd57e3 requirement;
-  6a81d11f3f["SOI Feedback Loop"];
-  click 6a81d11f3f "Usecases.md#soi-feedback-loop";
-  class 6a81d11f3f requirement;
-  51daee6ead["CI/CD Integration"];
-  click 51daee6ead "Usecases.md#ci/cd-integration";
-  class 51daee6ead requirement;
-```
-
----
 
 ### ReqFlow Interactions with Git
 
@@ -160,15 +208,9 @@ graph LR;
 - Changes, including approved AI suggestions, are prepared and committed through standard Git workflows.
 
 
-
----
-
 ### CI/CD Integration
 - CI/CD pipelines trigger validation, diagram generation, and traceability processes.
 - Invalid merges are prevented based on the validation results.
-
-
----
 
 ### SOI Feedback Loop
 - The Developed System provides feedback to the MBSE Model, enabling iterative refinement.
@@ -181,3 +223,6 @@ graph LR;
 - The ReqFlow CLI provides tools to validate, analyze, and generate artifacts from the model.
 - AI Agents assist humans by generating suggestions and automating repetitive tasks.
 - The **CI/CD System** ensures quality control and prevents invalid changes from being merged.
+
+
+
