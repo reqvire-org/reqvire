@@ -1,6 +1,6 @@
 [package]
 name = "reqflow"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 description = "An agile Model-Based Systems Engineering (MBSE) framework designed to integrate with Git workflows"
 license = "Apache-2.0"
