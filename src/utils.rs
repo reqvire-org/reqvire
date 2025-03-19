@@ -6,7 +6,8 @@ use walkdir::WalkDir;
 use crate::error::ReqFlowError;
 use globset::GlobSet;
 use regex::Regex;
-
+use rustc_hash::FxHasher;
+use std::hash::{Hasher};
 
 /// Checks if a file should be processed
 pub fn is_requirements_file_by_path(path: &Path, excluded_filename_patterns: &GlobSet) -> bool {
@@ -339,6 +340,20 @@ fn extract_markdown_link(input: &str) -> Option<(String, String)> {
         None
     }
 }
+
+
+/// Generates a fast and lightweight hash ID
+pub fn hash_identifier(identifier: &str) -> String {
+    let mut hasher = FxHasher::default();
+    hasher.write(identifier.as_bytes());
+    format!("{:x}", hasher.finish())[..10].to_string() // Truncate to 10 characters
+}
+pub fn hash_content(content: &str) -> String {
+    let mut hasher = FxHasher::default();
+    hasher.write(content.as_bytes());
+    format!("{:x}", hasher.finish()).to_string() 
+}
+
 
 
 #[cfg(test)]

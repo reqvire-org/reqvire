@@ -33,7 +33,9 @@ Links a child requirement to a parent requirement. Changes in the parent propaga
 Links a parent requirement to a child requirement. Changes in the parent propagate to the child.
 
 #### refine
-Links a child requirement refining a parent requirement. Changes in any requirement in the hierarchy propagate throughout the refinement chain.
+Links a child requirement to a parent requirement. Changes propagate bidirectionally:
+ * modifications in the parent requirement propagate to the child, and modifications in the child requirement propagate back to the parent.
+
 
 
 ---
@@ -46,7 +48,7 @@ These relations define how a requirement is satisfied by design, code, or archit
 Links a requirement to code, architecture, or specifications that satisfy it. Changes in the requirement propagate to the satisfying resource.
 
 #### satisfy
-Links a design artifact to the requirement it satisfies. Changes in the design artifact propagate to the requirement.
+Links a design artifact to the requirement it satisfies. Changes in the requirement propagate to the satisfying resource.
 
 
 ---
@@ -59,20 +61,37 @@ These relations define verification artifacts that confirm a requirement is met.
 Links a requirement to a document or test that verifies it. Changes in the requirement propagate to the verification artifact, requiring re-validation.
 
 #### verify
-Links a verification document to the requirement it verifies. Changes in the verification artifact may require changes in the requirement or test process.
+Links a verification document to the requirement it verifies. Changes in the requirement propagate to the verification artifact, requiring re-validation.
 
 
 ---
 
 ### Traceability and Non-Propagating Relations
 
-These relations establish soft traceability and do not propagate changes.
-
-#### tracedFrom
-Soft traceability relation to another requirement. No direct impact on change propagation.
+These relations establish soft traceability and do not propagate changes. It is omnidirectional.
 
 #### trace
 Soft traceability relation pointing to a source. No direct impact on change propagation.
+
+---
+
+## Relation Types and Change Propagation Rules table
+
+| Relation Type | Direction | Impact of Change                                          |
+|---------------|-----------|-----------------------------------------------------------|
+| **containedBy** | Child Req. →  Parent Req. | Changes in the parent propagate down to the child. |
+| **contain**     | Parent Req. → Child Req. | Changes in the parent propagate down to the child.|
+| **derivedFrom** | Child Req. → Parent Req. | Changes in the parent propagate down to the child. |
+| **derive**      | Parent Req. → Child Req.| Changes in the parent propagate down to the child. |
+| **refine**      | Child Req. → Parent Req.| Changes propagate bidirectionally. |
+| **satisfiedBy** | Requirement → Artifact | Changes in Requirement propagate down to the design, code, or implementation artifact. |
+| **satisfy**     | Artifact → Requirement | Changes in Requirement propagate down to the design, code, or implementation artifact. |
+| **verifiedBy**  | Requirement → Verification |  Changes in Requirement propagate down to the verification/test. |
+| **verifiy**     | Verification → Requirement  |  Changes in Requirement propagate down to the verification/test. |
+| **trace**       | Traceability (non-propagating) | No propagation, for documentation only. |
+
+---
+
 
 ## Change Propagation Mechanism
 
@@ -184,7 +203,7 @@ If Safety Requirement changes, the Overheat Shutdown Test must be reviewed for u
 
 ### Example of Multi-Level Change Propagation in Requirements
 
-The following analysis explains how a **change in the requirement that refine root requirement** propagates through multiple levels of related requirements, impacting their definitions, design artifacts, and verification processes.
+The following analysis explains how a **change in the requirement** that also  **refine** relation with the  root requirement propagates through multiple levels of related requirements, impacting their definitions, design artifacts, and verification processes.
 
 ---
 

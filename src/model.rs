@@ -7,13 +7,12 @@ use log::{debug};
 use crate::element::Element;
 use crate::element_registry::ElementRegistry;
 use crate::error::ReqFlowError;
-use crate::relation::LinkType;
-use crate::relation::{get_parent_relation_types, is_circular_dependency_relation};
+use crate::relation;
+use crate::relation::{get_parent_relation_types};
 use crate::element::ElementType;
 use crate::element::RequirementType;
 use crate::filesystem;
 use crate::diagrams;
-
 use regex::Regex;
 
 use crate::utils;
@@ -25,9 +24,6 @@ pub struct ModelManager {
     /// In-memory registry of elements
     pub element_registry: ElementRegistry,
 
-    /// Stores file content for validation
-    file_contents: HashMap<String, String>,
-
 }
 
 impl ModelManager {
@@ -36,49 +32,48 @@ impl ModelManager {
         // Initialize empty element registry
         let element_registry = ElementRegistry::new();
 
-        // Initialize empty file contents
-        let file_contents = HashMap::new();
-
         Self {
-            element_registry,
-            file_contents
+            element_registry
         }
     }
 
-    /// Parses and validates all Markdown files while building the registry.
-    /// Returns a list of validation errors.
+
     pub fn parse_and_validate(
         &mut self, 
+        git_commit_hash: Option<String>,
         specification_folder: &PathBuf, 
         external_folders: &[PathBuf],
         excluded_filename_patterns: &GlobSet
     ) -> Result<Vec<ReqFlowError>, ReqFlowError> {
-        debug!("Parsing and validating files in {:?}", specification_folder);
+    
         let mut errors = Vec::new();
-
-        let files = utils::scan_markdown_files(specification_folder, external_folders, excluded_filename_patterns);
+        
+        let files: Vec<PathBuf> = utils::scan_markdown_files(&specification_folder, &external_folders, excluded_filename_patterns)
+           .into_iter().map(|(path,_)| path).collect();
+           
         debug!("Found {} markdown files to update with diagrams", files.len());
 
-        for (path,_) in files {
-            match (path.file_name(), path.clone()) {
-                (Some(file_name), file_path) if path == path.clone() =>{
 
-                    debug!("Markdown File found: {}", file_name.to_string_lossy());
+        let file_iterator = filesystem::FileReaderIterator::new(files.to_vec());
+        for file_result in file_iterator {
+            match file_result {
+                Err(e) =>return Err(e),
+                Ok((path, file_name, file_content)) => {
+
+                    debug!("Markdown File found: {}", file_name);
 
                     let file_content = fs::read_to_string(&path)?;
-                    let relative_path = utils::get_relative_path(&path, specification_folder, external_folders)?;
-                    let relative_path_str = relative_path.to_string_lossy().to_string();
+                    let relative_path_str =utils::get_relative_path(&path, specification_folder, external_folders)?.to_string_lossy().to_string();
     
-                    self.file_contents.insert(relative_path_str.clone(), file_content.clone());
     
                     // Markdown Structure Validation
                     errors.extend(self.validate_markdown_structure(&file_content, &relative_path_str));
     
                     // Parse Elements
                     match parse_elements(
-                        &file_name.to_string_lossy(),
+                        &file_name,
                         &file_content,
-                        &file_path.to_path_buf(),
+                        &path,
                         specification_folder,
                         external_folders,
                     ) {
@@ -91,11 +86,6 @@ impl ModelManager {
                         }
                         Err(parse_errors) => errors.extend(parse_errors.into_iter()),
                     }
-                },
-                _ => {                
-                    errors.push(ReqFlowError::PathError(
-                        format!("File '{}' could not be processed.", path.to_string_lossy()),
-                    ));
                 }
             }
         }
@@ -109,9 +99,91 @@ impl ModelManager {
         
         Ok(errors)
     }
+    
 
-    /// Validates relations inside the `ElementRegistry`
-    fn validate_relations(&self, excluded_filename_patterns: &GlobSet) -> Result<Vec<ReqFlowError>, ReqFlowError> {
+
+    /// Validates relations inside the `ElementRegistry` and propagates missing opposite relations.
+    pub fn validate_relations(&mut self, excluded_filename_patterns: &GlobSet) -> Result<Vec<ReqFlowError>, ReqFlowError> {
+        log::debug!("Validating relations...");
+        let mut errors = Vec::new();
+        // Collect the missing opposite relations to add as (target_id, relation) pairs.
+        let mut relations_to_add: Vec<(String, relation::Relation)> = Vec::new();
+
+        // Collect element identifiers to avoid borrowing issues.
+        let element_ids: Vec<String> = self.element_registry.elements.keys().cloned().collect();
+
+        // First pass: iterate immutably to decide which opposite relations need to be added.
+        for source_id in &element_ids {
+            if let Some(source_element) = self.element_registry.elements.get(source_id) {
+                for relation in &source_element.relations {
+                    // Only process if the relation target is an Identifier.
+                    if let relation::LinkType::Identifier(ref target_id) = relation.target.link {
+                        // Skip validation if the identifier is not a markdown file.
+                        let md_regex = Regex::new(r"\.md(?:#|$)").unwrap();
+                        if !md_regex.is_match(target_id) {
+                            log::debug!("Skipping validation for non-markdown identifier: {}", target_id);
+                            continue;
+                        }
+                        // Skip validation if the identifier is in an excluded folder/file pattern.
+                        if excluded_filename_patterns.is_match(target_id) {
+                            log::debug!("Skipping validation for excluded identifier: {}", target_id);
+                            continue;
+                        }
+                        // Validate that the target element exists.
+                        if self.element_registry.get_element(target_id).is_err() {
+                            errors.push(ReqFlowError::MissingRelationTarget(
+                                format!("Element '{}' references missing target '{}'", source_element.identifier, target_id),
+                            ));
+                        } else {
+                            // If the target exists, check if the relation type has an opposite defined.
+                            if let Some(opposite_name) = relation.relation_type.opposite {
+                                // Check if the target element already has the opposite relation.
+                                if let Some(target_element) = self.element_registry.elements.get(target_id) {
+                                    let already_present = target_element.relations.iter().any(|r| {
+                                        if let relation::LinkType::Identifier(ref id) = r.target.link {
+                                            id == source_id && r.relation_type.name.eq_ignore_ascii_case(opposite_name)
+                                        } else {
+                                            false
+                                        }
+                                    });
+                                    if !already_present {
+                                        // Create the opposite relation using the helper.
+                                        if let Some(opposite_relation) = relation.to_opposite(&source_element.name, &source_element.identifier) {
+                                            relations_to_add.push((target_id.clone(), opposite_relation));
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        log::debug!("Skipping external target {}", relation.target.link.as_str());
+                    }
+                }
+            }
+        }
+
+        // Second pass: apply the collected missing opposite relations.
+        for (target_id, opposite_relation) in relations_to_add {
+            if let Some(target_element) = self.element_registry.elements.get_mut(&target_id) {
+                log::debug!(
+                    "Adding missing opposite relation: {} from '{}' to '{}'",
+                    opposite_relation.relation_type.name,
+                    target_id,
+                    target_element.identifier
+                );
+                target_element.relations.push(opposite_relation);
+            }
+        }
+
+        if errors.is_empty() {
+            log::debug!("No relation validation errors found.");
+        } else {
+            log::debug!("{} relation validation errors found.", errors.len());
+        }
+        Ok(errors)
+    }
+    
+    fn _validate_relations(&self, excluded_filename_patterns: &GlobSet) -> Result<Vec<ReqFlowError>, ReqFlowError> {
         debug!("Validating relations...");
         let mut errors = Vec::new();
 
@@ -120,7 +192,7 @@ impl ModelManager {
             for relation in &element.relations {            
             
                 // Only validate if the relation target is an Identifier
-                if let LinkType::Identifier(ref identifier) = relation.target.link {
+                if let relation::LinkType::Identifier(ref identifier) = relation.target.link {
 
                     // Skip validation if the identifier is not a markdown file.
                     let md_regex = Regex::new(r"\.md(?:#|$)").unwrap();
@@ -263,7 +335,8 @@ impl ModelManager {
     }    
 
     
-    /// Recursive function to check for circular dependencies, but only for Identifier links.
+    /// Recursively checks for circular dependencies in the element graph,
+    /// following only forward relations.
     fn check_circular_dependencies(
         &self,
         element: &Element,
@@ -272,36 +345,40 @@ impl ModelManager {
         errors: &mut Vec<ReqFlowError>,
     ) {
         let element_id = element.identifier.clone();
+
+        // If we've already fully processed this element, no need to check again.
         if visited.contains(&element_id) {
             return;
         }
 
-        if path.contains(&element_id) {
-            let cycle_start = path.iter().position(|id| id == &element_id).unwrap();
-            let cycle = path[cycle_start..].join(" -> ");
+        // If the current path already contains this element, we've found a cycle.
+        if let Some(pos) = path.iter().position(|id| id == &element_id) {
+            let cycle = path[pos..].join(" -> ");
             errors.push(ReqFlowError::ValidationError(
                 format!("Circular dependency detected: {}", cycle),
             ));
             return;
         }
 
+        // Add this element to the current traversal path.
         path.push(element_id.clone());
 
+        // Process only forward relations (ignore backward ones, which should have already been inserted).
         for relation in &element.relations {
-            // Only check relations that have an Identifier as the target
-            if let LinkType::Identifier(ref identifier) = relation.target.link {
-                if is_circular_dependency_relation(relation.relation_type.name) {
-                    if let Ok(target_element) = self.element_registry.get_element(identifier) {
+            if let relation::LinkType::Identifier(ref target_id) = relation.target.link {
+                // Only traverse forward relations.
+                if relation.relation_type.direction == relation::RelationDirection::Forward {
+                    if let Ok(target_element) = self.element_registry.get_element(target_id) {
                         self.check_circular_dependencies(target_element, visited, path, errors);
                     }
                 }
             }
         }
 
+        // Mark the current element as completely processed and remove it from the current path.
         visited.insert(element_id);
         path.pop();
     }
-    
   
 
     /// Processes diagram generation for markdown files in place (without writing to output).
@@ -545,41 +622,9 @@ More details.
         assert!(!errors.is_empty(), "Expected duplicate element/subsection errors");
     }
 
-    #[test]
-    fn test_parse_and_validate_no_errors() {
-        // Simulate a simple valid markdown file.
-        let md_content = r#"
-# Test Document
-
-### Element One
-Some content.
-
-#### Subsection A
-Details here.
-
-### Element Two
-Other content.
-
-#### Subsection B
-More details.
-"#;
-        let spec_folder = PathBuf::from("/specifications");
-        let external_folders: Vec<PathBuf> = vec![];
-        let mut builder = GlobSetBuilder::new();
-        builder.add(Glob::new("**").unwrap());
-        let globset = builder.build().unwrap();
-
-        let mut model_manager = ModelManager::new();
-        // Simulate file scanning by inserting our content into file_contents.
-        model_manager.file_contents.insert("Test Document.md".to_string(), md_content.to_string());
-
-        // Call parse_and_validate and expect no errors.
-        let result = model_manager.parse_and_validate(&spec_folder, &external_folders, &globset);
-        match result {
-            Ok(errs) => assert!(errs.is_empty(), "Expected no errors, got: {:?}", errs),
-            Err(e) => panic!("parse_and_validate failed: {:?}", e),
-        }
-    }
 }
+
+
+
 
 

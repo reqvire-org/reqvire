@@ -1,7 +1,7 @@
 use lazy_static::lazy_static;
 use std::collections::HashMap;
 use crate::error::ReqFlowError;
-
+use crate::element;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum RelationDirection {
@@ -41,22 +41,30 @@ lazy_static! {
             name: "derivedFrom", 
             direction: RelationDirection::Backward, 
             opposite: Some("derive"),
-            description: "Element is source for a derived element",
+            description: "Element is derived from another element",
         });
         m.insert("derive", RelationTypeInfo {
             name: "derive", 
             direction: RelationDirection::Forward, 
             opposite: Some("derivedFrom"),
-            description: "Element is derived from another element",
+            description: "Element is source for a derived element",
         });
         
         // Refine relation
         m.insert("refine", RelationTypeInfo {
             name: "refine", 
             direction: RelationDirection::Forward, 
-            opposite: None,
+            opposite: Some("refinedBy"),
             description: "Element refines a higher-level element",
         });
+        
+        // Refine relation
+        m.insert("refinedBy", RelationTypeInfo {
+            name: "refinedBy", 
+            direction: RelationDirection::Backward, 
+            opposite: Some("refine"),
+            description: "Element is source for a element refining it",
+        });        
         
         // Satisfy relations
         m.insert("satisfiedBy", RelationTypeInfo {
@@ -162,6 +170,26 @@ impl Relation {
         // Check if the link starts with any of these external protocols
         !external_protocols.iter().any(|&proto| link.starts_with(proto))
     } 
+    
+
+    /// Creates an opposite relation if possible for given target
+    pub fn to_opposite(&self, name: &str, identifier: &str) -> Option<Relation> {
+        if let Some(opposite_name) = self.relation_type.opposite {
+            if let Some(opposite_info) = RELATION_TYPES.get(opposite_name) {
+                Some(Relation {
+                    relation_type: opposite_info,
+                    target: RelationTarget {
+                        text: name.to_string(),
+                        link: LinkType::Identifier(identifier.to_string()),
+                    },
+                })
+            } else {
+                None
+            }
+        } else {
+            None
+        }
+    }   
 }
 
 /// Check if a relation type is supported according to the DSD
@@ -181,14 +209,6 @@ pub fn get_parent_relation_types() -> Vec<&'static str> {
         .filter(|(_, info)| info.direction == RelationDirection::Backward)
         .map(|(name, _)| *name)
         .collect()
-}
-
-/// Determines if a relation type should be checked for circular dependencies.
-pub fn is_circular_dependency_relation(relation_type: &str) -> bool {
-    match RELATION_TYPES.get(relation_type) {
-        Some(info) => matches!(info.name, "derivedFrom" | "dependsOn" | "refine" | "tracedFrom"),
-        None => false,
-    }
 }
 
 

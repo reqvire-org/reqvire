@@ -1,116 +1,71 @@
-use std::process::Command;
 use std::error::Error;
+use std::fs;
+use std::process::Command;
+use std::env;
 use serde::Serialize;
 use serde_json;
-use anyhow::Result;
+use globset::GlobSet;
+use crate::utils;
+use std::path::PathBuf;
 
-/// Represents a report detailing which files (and elements) were changed.
+/// Represents a change for a file: the file path, its content before the change,
+/// and its content after the change.
 #[derive(Debug, Serialize)]
-pub struct ChangeImpactReport {
-    /// List of files that changed according to `git diff`.
-    pub changed_files: Vec<String>,
-    /// List of changed Markdown files considered to have impacted elements.
-    pub impacted_elements: Vec<String>,
+pub struct FileChange {
+    pub file_path: String,
+    pub content: String,
 }
 
-impl ChangeImpactReport {
-    /// Generates the change impact report by invoking the `git diff` command.
-    ///
-    /// This implementation runs:
-    /// 
-    ///   git diff --name-only
-    /// 
-    /// to get a list of changed files and then marks all Markdown files (.md)
-    /// as potentially impacting elements. A production implementation might
-    /// re‑parse the Markdown diff to determine which elements (identified using
-    /// the rules from the specification documents) are changed.
-    pub fn generate() -> Result<Self, Box<dyn Error>> {
-        // Run the git diff command to get the list of changed files.
-        let output = Command::new("git")
-            .args(&["diff", "--name-only"])
-            .output()?;
             
-        if !output.status.success() {
-            let err = String::from_utf8_lossy(&output.stderr);
-            return Err(Box::new(std::io::Error::new(
-                std::io::ErrorKind::Other,
-                format!("git diff failed: {}", err),
-            )));
-        }
-        
-        // Collect changed file paths from the git diff output.
-        let stdout = String::from_utf8_lossy(&output.stdout);
-        let changed_files: Vec<String> = stdout
-            .lines()
-            .map(|s| s.to_string())
-            .filter(|s| !s.trim().is_empty())
-            .collect();
-        
-        // For Markdown files (ending with .md), assume that elements may be impacted.
-        let impacted_elements: Vec<String> = changed_files
-            .iter()
-            .filter(|file| file.ends_with(".md"))
-            .cloned()
-            .collect();
-        
-        Ok(ChangeImpactReport {
-            changed_files,
-            impacted_elements,
-        })
+pub fn generate_change_report(commit: &str,excluded_filename_patterns: &GlobSet) -> Result<ChangeReport, Box<dyn Error>> {
+    let changed_files = get_changed_files_from_git()?;
+    let mut file_changes = Vec::new();
+    for file in changed_files {
+        let before_content = get_file_at_commit(&file, commit)?;
+        file_changes.push(FileChange {
+            file_path: file,
+            content: before_content
+        });
     }
-
-    /// Prints the change impact report in a human-friendly format.
-    pub fn print_report(&self) {
-        println!("=== Change Impact Report ===");
-        println!("\nChanged Files:");
-        for file in &self.changed_files {
-            println!("  - {}", file);
-        }
-        println!("\nPotentially Impacted Elements (Markdown files):");
-        for file in &self.impacted_elements {
-            println!("  - {}", file);
-        }
-    }
-
-    /// Prints the report in a pretty manner.
-    ///
-    /// If `as_json` is true, the report is printed as pretty-printed JSON.
-    /// Otherwise, the human-friendly text format is used.
-    pub fn print_pretty(&self, as_json: bool) {
-        if as_json {
-            match serde_json::to_string_pretty(self) {
-                Ok(json_str) => println!("{}", json_str),
-                Err(e) => eprintln!("Failed to serialize report to JSON: {}", e),
-            }
-        } else {
-            self.print_report();
-        }
-    }
+    Ok(ChangeReport { file_changes: file_changes.into_iter().filter(|e| utils::is_requirements_file_by_path(&PathBuf::from(e.file_path.clone()), excluded_filename_patterns)).collect() })
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
 
-    #[test]
-    fn test_generate_report() {
-        // Note: In real tests, you may want to mock Command::new("git") to return a controlled output.
-        // For now, we only test that the function returns a report (or an error if no git repository is found).
-        let report = ChangeImpactReport::generate();
-        // Depending on the testing environment, this may fail if there is no git repo,
-        // so we simply check that the Result is handled.
-        match report {
-            Ok(rep) => {
-                // Print both formats for visual inspection.
-                println!("Human-friendly report:");
-                rep.print_pretty(false);
-                println!("\nJSON report:");
-                rep.print_pretty(true);
-            }
-            Err(e) => {
-                eprintln!("Failed to generate change impact report: {}", e);
-            }
-        }
+
+/// Retrieves the content of a file at a given commit (e.g. "HEAD~1").
+pub fn get_file_at_commit(file_path: &str, commit: &str) -> Result<String, Box<dyn Error>> {
+    let output = Command::new("git")
+        .args(&["show", &format!("{}:{}", commit, file_path)])
+        .output()?;
+    if !output.status.success() {
+        let err = String::from_utf8_lossy(&output.stderr);
+        return Err(Box::new(std::io::Error::new(
+            std::io::ErrorKind::Other,
+            format!("git show failed for {}: {}", file_path, err),
+        )));
     }
+    Ok(String::from_utf8_lossy(&output.stdout).into())
+}
+
+/// Returns a list of files that have changed (according to `git diff --name-only`).
+fn get_changed_files_from_git() -> Result<Vec<String>, Box<dyn Error>> {
+    let output = Command::new("git")
+        .args(&["diff", "--name-only"])
+        .output()?;
+    if !output.status.success() {
+        let err = String::from_utf8_lossy(&output.stderr);
+        return Err(Box::new(std::io::Error::new(
+            std::io::ErrorKind::Other,
+            format!("git diff failed: {}", err),
+        )));
+    }
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    let changed_files: Vec<String> = stdout
+        .lines()
+        .map(|s| s.trim().to_string())
+        // Only process Markdown files
+        .filter(|s| s.ends_with(".md"))
+        .collect();
+    Ok(changed_files)
 }
 
