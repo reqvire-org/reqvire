@@ -230,12 +230,12 @@ Identifiers are used in relations to reference files or specific elements within
 1. **Relation to a File**:
    ```markdown
    #### Relations
-  * satisfiedBy: [documents/specification.md](documents/specification.html)
+     * satisfiedBy: [documents/specification.md](documents/specification.html)
    ```
     
 2. **Relation to an Element**:
    ```markdown
    #### Relations
-  * dependsOn: [documents/specification.md/section one](documents/specification.html#section-one)
+     * dependsOn: [documents/specification.md/section one](documents/specification.html#section-one)
    ```
 
