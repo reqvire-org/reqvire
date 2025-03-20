@@ -316,14 +316,6 @@ As a **System Engineer**, I want to trace changes in the MBSE model to identify 
 
 ---
 
-### Generate Traceability Matrix
-As a **System Engineer**, I want ReqFlow to generate traceability matrices, so that I can maintain alignment between requirements and related system elements.
-
-#### Relations
-  * trace: [MOEs.md/MOE_UA](MOEs.md#moe_ua)
-
----
-
 ### Fostering Community Contributions
 As a **Contributor**, I want ReqFlow tools to be intuitive and well-documented, so that I can contribute effectively to the open-source project.
 

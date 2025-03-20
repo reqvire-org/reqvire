@@ -6,6 +6,10 @@ pub enum ReqFlowError {
     #[error("IO error: {0}")]
     IoError(#[from] std::io::Error),
 
+    #[error("Git Command error: {0}")]
+    GitCommandError(String),
+
+
     #[error("Invalid identifier: {0}")]
     InvalidIdentifier(String),
 

@@ -1,15 +1,14 @@
 use clap::{Parser, CommandFactory};
 use std::path::PathBuf;
 use anyhow::Result;
-use log::{error, info,debug};
+use log::{error, info};
 use serde::Serialize;
 use crate::error::ReqFlowError;
 use crate::{html_export, linting, model::ModelManager};
 use crate::index_generator;
 use globset::GlobSet;
 use crate::reports;
-use crate::utils;
-
+use crate::change_impact;
 
 
 #[derive(Parser, Debug)]
@@ -70,6 +69,16 @@ pub struct Args {
     /// Large Language Models understand and work with ReqFlow-based projects
     #[clap(long)]
     pub llm_context: bool,
+    
+    
+    /// Analise change impact and provides report
+    #[clap(long)]
+    pub change_impact: bool,
+    
+    /// Git commit hash to use when comparing models
+    #[clap(long, requires = "change_impact", default_value = "HEAD")]    
+    pub git_commit: String,
+        
 
 }
 
@@ -116,13 +125,15 @@ fn print_validation_results(validation_type: &str, errors: &[ReqFlowError], json
 
 pub fn handle_command(
     args: Args,
-    model_manager: &mut ModelManager, 
     specification_folder_path: &PathBuf,
     external_folders_path: &[PathBuf],    
     output_folder_path: &PathBuf,
     excluded_filename_patterns: &GlobSet,
     diagram_direction: &str
 ) -> Result<i32> {
+
+    let mut model_manager = ModelManager::new();
+
 
     // Handle LLM context
     if args.llm_context {
@@ -139,8 +150,6 @@ pub fn handle_command(
         }
     }else{
   
-
-
         let parse_result=model_manager.parse_and_validate(None, &specification_folder_path, &external_folders_path,excluded_filename_patterns);
 
         if args.validate {
@@ -180,7 +189,20 @@ pub fn handle_command(
             reports::print_registry_summary(&model_manager.element_registry,args.json);
             return Ok(0);        
             
-                          
+            
+        }else if args.change_impact {
+            
+            let mut refference_model_manager = ModelManager::new();      
+            let _not_interested=refference_model_manager.parse_and_validate(Some(&args.git_commit), &specification_folder_path, &external_folders_path,excluded_filename_patterns);
+
+                        
+            let report = change_impact::compute_change_impact(&model_manager.element_registry, &refference_model_manager.element_registry);
+            
+            report.print(args.json); 
+            
+            return Ok(0);
+            
+                                      
         }else if args.lint {
             linting::run_linting(&specification_folder_path, &external_folders_path,excluded_filename_patterns, args.dry_run)?;
             return Ok(0);
@@ -199,7 +221,6 @@ pub fn handle_command(
             return Ok(0);
         }else{
             Args::print_help();  
-            
 
         }
     

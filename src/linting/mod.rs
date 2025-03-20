@@ -27,7 +27,7 @@ pub fn run_linting(
     debug!("Starting linting process in {:?}", specification_folder);
     
     let mut lint_suggestions = Vec::new();
-    let files = utils::scan_markdown_files(specification_folder, external_folders, excluded_filename_patterns);
+    let files = utils::scan_markdown_files(None,specification_folder, external_folders, excluded_filename_patterns);
     debug!("Found {} markdown files to lint", files.len());
 
     for (file_path, _) in files {        

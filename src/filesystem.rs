@@ -2,34 +2,49 @@ use crate::error::ReqFlowError;
 use std::path::{Path,PathBuf};
 use std::fs;
 use std::vec::IntoIter;
-use std::io;
+use crate::git_commands;
 
-
-pub struct FileReaderIterator {
-    files: IntoIter<PathBuf>,
+pub struct FileReaderIterator<'a> {
+    git_commit_hash: Option<&'a str>,
+    files: IntoIter<(PathBuf,PathBuf)>,
 }
 
-impl FileReaderIterator {
-    pub fn new(files: Vec<PathBuf>) -> Self {
+impl<'a> FileReaderIterator<'a> {
+    pub fn new(git_commit_hash: Option<&'a str>, files: Vec<(PathBuf,PathBuf)>) -> Self {
         Self {
             files: files.into_iter(),
+            git_commit_hash: git_commit_hash,            
         }
     }
 }
 
-impl Iterator for FileReaderIterator {
+impl Iterator for FileReaderIterator<'_>{
     type Item = Result<(PathBuf, String, String), ReqFlowError>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        self.files.next().map(|file| {
+        self.files.next().map(|(file,folder)| {
             let filename_str = file.file_name()
                 .ok_or_else(|| ReqFlowError::PathError(format!("Problem reading file: {:?}", file)))?
                 .to_string_lossy()
                 .to_string();
-
-            fs::read_to_string(&file)
-                .map(|content| (file, filename_str, content))
-                .map_err(ReqFlowError::IoError)
+                
+            match self.git_commit_hash{
+                Some(commit)=>{                  
+                    match git_commands::get_file_at_commit(&file.to_string_lossy(), &folder, commit)  {
+                        Ok(content)=> {
+                            Ok((file, filename_str, content))
+                        },
+                        Err(e)=> {
+                            Err(e)                    
+                        }
+                    }
+                },
+                None=>{
+                    fs::read_to_string(&file)
+                    .map(|content| (file, filename_str, content))
+                    .map_err(ReqFlowError::IoError)
+                }            
+            }
         })
     }
 }

@@ -78,12 +78,11 @@ pub struct Element {
     pub element_type: ElementType,
     pub metadata: HashMap<String, String>,
     //
-    hash_identifier: String,
     // hash of content that is taken into impact change detection
-    hash_impact_content: String,
+    pub hash_impact_content: String,
     //
-    changed_since_commit: bool,
-    invalidated: bool
+    pub changed_since_commit: bool,
+    pub invalidated: bool
 }
 
 
@@ -98,7 +97,6 @@ impl Element {
             section: section.to_string(),
             relations: vec![],
             identifier: identifier.to_string(),
-            hash_identifier: utils::hash_identifier(&identifier),
             file_path: file_path.to_string(),
             element_type: element_type.unwrap_or(ElementType::Requirement(RequirementType::System)), 
             metadata: HashMap::new(),

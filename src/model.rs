@@ -1,6 +1,5 @@
 use anyhow::Result;
 use std::collections::{HashMap, HashSet};
-use std::fs;
 use std::path::{ PathBuf,Path};
 
 use log::{debug};
@@ -40,7 +39,7 @@ impl ModelManager {
 
     pub fn parse_and_validate(
         &mut self, 
-        git_commit_hash: Option<String>,
+        git_commit_hash: Option<&str>,
         specification_folder: &PathBuf, 
         external_folders: &[PathBuf],
         excluded_filename_patterns: &GlobSet
@@ -48,13 +47,13 @@ impl ModelManager {
     
         let mut errors = Vec::new();
         
-        let files: Vec<PathBuf> = utils::scan_markdown_files(&specification_folder, &external_folders, excluded_filename_patterns)
-           .into_iter().map(|(path,_)| path).collect();
+        let files = utils::scan_markdown_files(git_commit_hash, &specification_folder, &external_folders, excluded_filename_patterns);
+        //   .into_iter().map(|(path,_)| path).collect();
            
         debug!("Found {} markdown files to update with diagrams", files.len());
 
 
-        let file_iterator = filesystem::FileReaderIterator::new(files.to_vec());
+        let file_iterator = filesystem::FileReaderIterator::new(git_commit_hash,files.to_vec());
         for file_result in file_iterator {
             match file_result {
                 Err(e) =>return Err(e),
@@ -62,7 +61,6 @@ impl ModelManager {
 
                     debug!("Markdown File found: {}", file_name);
 
-                    let file_content = fs::read_to_string(&path)?;
                     let relative_path_str =utils::get_relative_path(&path, specification_folder, external_folders)?.to_string_lossy().to_string();
     
     
