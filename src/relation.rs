@@ -1,16 +1,16 @@
 use lazy_static::lazy_static;
 use std::collections::HashMap;
 use crate::error::ReqFlowError;
-use crate::element;
+use serde::Serialize;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub enum RelationDirection {
     Forward,
     Backward,
     Neutral,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct RelationTypeInfo {
     pub name: &'static str,
     pub direction: RelationDirection,
@@ -106,13 +106,13 @@ lazy_static! {
     };
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct RelationTarget {
     pub text: String,
     pub link: LinkType,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub enum LinkType {
     Identifier(String), // Internal reference, e.g., "some-identifier"
     ExternalUrl(String), // External URL, e.g., "https://example.com"
@@ -127,7 +127,10 @@ impl LinkType {
     }
 }
 
-#[derive(Debug, Clone)]
+
+
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct Relation {
     pub relation_type: &'static RelationTypeInfo,
     pub target: RelationTarget,
@@ -191,6 +194,8 @@ impl Relation {
         }
     }   
 }
+
+
 
 /// Check if a relation type is supported according to the DSD
 pub fn is_supported_relation_type(relation_type: &str) -> bool {

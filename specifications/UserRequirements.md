@@ -80,6 +80,7 @@ The system shall support a YAML-based configuration file that defines folder nam
 ---
 
 ### Configurable Specifications Folder
+
 The system shall allow users to configure the main specification folder through the configuration file, supporting flexible project organization.
 
 #### Relations
@@ -643,7 +644,8 @@ When requested the system shall generate reports summarizing the structure and r
 
 ---
 
-### Generate Structural Change Reports
+### Structural Change Reports
+
 The system shall generate detailed reports summarizing the impact of structural changes, including affected relationships and components.
 
 #### Relations
@@ -668,6 +670,7 @@ The system shall produce reports identifying User and Mission requirements that 
 ---
 
 ### Generate Summary Reports
+
 The system shall allow users to generate summary reports highlighting key metrics and statuses within the MBSE model.
 
 #### Relations
@@ -692,149 +695,80 @@ The system shall allow users to export generated reports in standard formats (e.
 ---
 
 ## Trace Changes in MBSE Model
-```mermaid
-graph LR;
-  %% Graph styling
-  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
-  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
-  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
-  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
-
-  c43ff279c1["AI Feedback on Structural Changes"];
-  click c43ff279c1 "UserRequirements.md#ai-feedback-on-structural-changes";
-  class c43ff279c1 requirement;
-  e8cb10f42e["Suggest Structural Updates"];
-  class e8cb10f42e requirement;
-  click e8cb10f42e "UserRequirements.md#suggest-structural-updates";
-  c43ff279c1 -.->|deriveReqT| e8cb10f42e;
-  91ebf7e73d["Tracing Structural Changes"];
-  click 91ebf7e73d "UserRequirements.md#tracing-structural-changes";
-  class 91ebf7e73d requirement;
-  36d8b2eb16["UserStories.md/Trace Changes in MBSE Model"];
-  class 36d8b2eb16 requirement;
-  click 36d8b2eb16 "UserStories.md#trace-changes-in-mbse-model";
-  91ebf7e73d ==>|refines| 36d8b2eb16;
-  e8cb10f42e ==>|refines| 36d8b2eb16;
-  c43ff279c1 -.->|deriveReqT| e8cb10f42e;
-```
 
 ---
 
 ### Tracing Structural Changes
+
 When tracing structural changes, the system shall analyze the MBSE model and diffs to identify affected components and generate a report of impacted elements and structures, so that the user can review the changes and decide on further actions.
 
 #### Relations
-  * refine: [UserStories.md/Trace Changes in MBSE Model](UserStories.md#trace-changes-in-mbse-model)
+  * derivedFrom: [UserStories.md/Trace Changes in MBSE Model](UserStories.md#trace-changes-in-mbse-model)
 
 ---
 
-### Suggest Structural Updates
-The system shall suggest updates to maintain structural consistency when changes are introduced to the MBSE model.
+### Traceability Matrix
+
+When requested the system shall generate traceability matrices, in Markdown format by default, and supporting different views.
+
+#### Details
+
+Requirements-to-Verification View:
+  * Maps each requirement to one or more verification activities, tests, or validation procedures. This helps track which requirements are verified and how.
+
+#### Info
+
+A matrix is a textual representation which is the most efficient way to convey numerous relationships within a compact space.
+
+Traceability matrices are commonly used in Model-Based Systems Engineering (MBSE) to track relationships between various system elements, 
+including requirements, designs, verifications, and tests, allowing to efficiently maintain alignment between requirements and their associated system elements. 
+
+One of their key uses is to manage the impact of changes, including identifying which verifications may be invalidated due to changes in requirements or system components.
 
 #### Relations
-  * refine: [UserStories.md/Trace Changes in MBSE Model](UserStories.md#trace-changes-in-mbse-model)
+  * containedBy: [UserStories.md/Trace Changes in MBSE Model](UserStories.md#trace-changes-in-mbse-model)
 
 ---
 
-### AI Feedback on Structural Changes
-When a report of impacted elements is fed into the AI agents' context, the system shall provide suggestions for propagating changes across the MBSE model and allow the user to approve or reject each suggestion, so that updates can be applied consistently and committed to the model after user validation.
+### Save matrices to designated files
+
+The system shall automatically save generated traceability matrices as a Markdown documents.
 
 #### Relations
-  * derivedFrom: [Suggest Structural Updates](#suggest-structural-updates)
+  * refine: [Traceability Matrix](#traceability-matrix)
 
 ---
 
-## Generate Traceability Matrix			
-```mermaid
-graph LR;
-  %% Graph styling
-  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
-  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
-  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
-  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+### Include Verification Checkboxes
 
-  273dcdad7a["Include Verification Checkboxes"];
-  click 273dcdad7a "UserRequirements.md#include-verification-checkboxes";
-  class 273dcdad7a requirement;
-  e4eb5bf7e5["UserStories.md/Generate Traceability Matrix"];
-  class e4eb5bf7e5 requirement;
-  click e4eb5bf7e5 "UserStories.md#generate-traceability-matrix";
-  273dcdad7a ==>|refines| e4eb5bf7e5;
-  4b7b432817["Export Traceability Matrix"];
-  click 4b7b432817 "UserRequirements.md#export-traceability-matrix";
-  class 4b7b432817 requirement;
-  4b7b432817 ==>|refines| e4eb5bf7e5;
-  c7a213987b["Markdown-Based Default Format"];
-  click c7a213987b "UserRequirements.md#markdown-based-default-format";
-  class c7a213987b requirement;
-  9fe409695e["Create Traceability Matrices"];
-  class 9fe409695e requirement;
-  click 9fe409695e "UserRequirements.md#create-traceability-matrices";
-  9fe409695e --o|contains| c7a213987b;
-  c4b025f6ac["Save matrices to designated files"];
-  click c4b025f6ac "UserRequirements.md#save-matrices-to-designated-files";
-  class c4b025f6ac requirement;
-  9fe409695e --o|contains| c4b025f6ac;
-  e867499409["Interactive Mermaid Diagrams"];
-  click e867499409 "UserRequirements.md#interactive-mermaid-diagrams";
-  class e867499409 requirement;
-  9fe409695e --o|contains| e867499409;
-  fc0d98c588["Support Relation-Based Views"];
-  click fc0d98c588 "UserRequirements.md#support-relation-based-views";
-  class fc0d98c588 requirement;
-  9fe409695e --o|contains| fc0d98c588;
-  442da629f6["Specification Design Document for Requirements Change Propagation"];
-  click 442da629f6 "UserRequirements.md#specification-design-document-for-requirements-change-propagation";
-  class 442da629f6 requirement;
-  36d8b2eb16["UserStories.md/Trace Changes in MBSE Model"];
-  class 36d8b2eb16 requirement;
-  click 36d8b2eb16 "UserStories.md#trace-changes-in-mbse-model";
-  442da629f6 ==>|refines| 36d8b2eb16;
-  33e6fb86b3["DesignSpecifications/RequirementsChangePropagation.md"];
-  class 33e6fb86b3 default;
-  click 33e6fb86b3 "DesignSpecifications/RequirementsChangePropagation.md";
-  33e6fb86b3 -->|satisfies| 442da629f6;
-  9fe409695e ==>|refines| e4eb5bf7e5;
-  9fe409695e --o|contains| c7a213987b;
-  9fe409695e --o|contains| c4b025f6ac;
-  9fe409695e --o|contains| e867499409;
-  9fe409695e --o|contains| fc0d98c588;
-  1521bb4ce2["Handle Affected Verifications on Model Changes"];
-  click 1521bb4ce2 "UserRequirements.md#handle-affected-verifications-on-model-changes";
-  class 1521bb4ce2 requirement;
-  1521bb4ce2 ==>|refines| e4eb5bf7e5;
-```
-
----
-
-### Create Traceability Matrices
-The system shall create a traceability matrices when requested by a user or as part of CI/CD actions.
+The system shall include checkboxes in the traceability matrix for each verification entry, allowing users to manually mark verification as completed.
 
 #### Relations
-  * refine: [UserStories.md/Generate Traceability Matrix](UserStories.md#generate-traceability-matrix)
+  * refine: [Traceability Matrix](#traceability-matrix)
 
 ---
 
-### Support Relation-Based Views
-The system shall generate traceability matrix views based on relations to requirements, such as:
-1. **VerifiedBy**: Mapping requirements to their verification methods.
-2. **SatisfiedBy**: Mapping system components to the requirements they satisfy.
-3. **TracedFrom**: Mapping requirements to their parent or related elements.
+### Export Traceability Matrix
+
+The system shall provide an option to export the traceability matrix in formats such as Excel or PDF for external sharing and analysis.
 
 #### Relations
-  * containedBy: [Create Traceability Matrices](#create-traceability-matrices)
+  * derivedFrom: [Traceability Matrix](#traceability-matrix)
 
 ---
 
 ### Interactive Mermaid Diagrams
+
 The system shall include Mermaid diagrams in the traceability matrix that provide interactive links to related elements in other documents, enabling navigation and exploration of dependencies.
 
 #### Details
+
 Diagrams must be broken into several diagrams using following logic:
  * requirements_file_name/'## paragraph name'
    * all requirements inside are 1 diagram
    * if requirements documents doesn't have '##' paragraphs then requirements file name is used only
    * external related resources box must be a link to actual resource
+
 Color code for rendering diagrams:
  * red for requirement
  * yellow for resources which satisfies requirement
@@ -842,56 +776,41 @@ Color code for rendering diagrams:
  * light blue for box representing another diagram/category with requirments where linked requirement or resource exist.
 
 #### Relations
-  * containedBy: [Create Traceability Matrices](#create-traceability-matrices)
+  * derivedFrom: [Traceability Matrix](#traceability-matrix)
 
 ---
 
-### Markdown-Based Default Format
-The system shall generate the traceability matrix in Markdown format by default, adhering to ReqFlow's markdown-first methodology.
-
-#### Relations
-  * containedBy: [Create Traceability Matrices](#create-traceability-matrices)
+## Change Tracing
 
 ---
 
-### Save matrices to designated files
-The system shall save the generated traceability matrices as a Markdown documents with Mermaid diagrams.
+### Change Impact Analysis
+
+When requested the system shall generate change impact report, in Markdown format by default and also supporting json output.
+
+#### Details
+
+Change Report:
+ * Overview of all the changes in the model and impact to related requirements and other system elements.
+
+Change Impact Analysis Report:
+  * When a requirement changes, the traceability helps identify:
+    * Which related requirements are affected by a change.
+    * Which verification procedures or test cases are impacted and potentially invalidated.
+    * Which other model elements might be affected.
 
 #### Relations
-  * containedBy: [Create Traceability Matrices](#create-traceability-matrices)
-
----
-
-### Include Verification Checkboxes
-The system shall include checkboxes in the traceability matrix for each verification entry, allowing users to manually mark verification as completed and commit the updated status.
-
-#### Relations
-  * refine: [UserStories.md/Generate Traceability Matrix](UserStories.md#generate-traceability-matrix)
-
----
-
-### Handle Affected Verifications on Model Changes
-The system shall uncheck verification checkboxes in the traceability matrix and save updates if a diff affects the related requirements or components, ensuring re-validation is required.
-
-#### Relations
-  * refine: [UserStories.md/Generate Traceability Matrix](UserStories.md#generate-traceability-matrix)
+  * containedBy: [UserStories.md/Trace Changes in MBSE Model](UserStories.md#trace-changes-in-mbse-model)
 
 ---
 
 ### Specification Design Document for Requirements Change Propagation
+
 The system **shall provide a Specification Design Document (DSD)** that defines how changes in requirements affect child requirements and verifications, ensuring traceability and controlled impact analysis.
 
 #### Relations
-  * refine: [UserStories.md/Trace Changes in MBSE Model](UserStories.md#trace-changes-in-mbse-model)
+  * refine: [Change Impact Analysis](#change-impact-analysis)
   * satisfiedBy: [DesignSpecifications/RequirementsChangePropagation.md](DesignSpecifications/RequirementsChangePropagation.md)
-
----
-
-### Export Traceability Matrix
-The system shall provide an option to export the traceability matrix in formats such as Excel or PDF for external sharing and analysis.
-
-#### Relations
-  * refine: [UserStories.md/Generate Traceability Matrix](UserStories.md#generate-traceability-matrix)
 
 ---
 
@@ -923,6 +842,7 @@ graph LR;
 ---
 
 ### Export HTML specifications
+
 The system shall export specifications into HTML format and save in designated output location.
 
 #### Relations

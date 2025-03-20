@@ -1,71 +1,161 @@
-use std::error::Error;
-use std::fs;
-use std::process::Command;
-use std::env;
+use std::collections::{ HashSet};
 use serde::Serialize;
-use serde_json;
-use globset::GlobSet;
-use crate::utils;
-use std::path::PathBuf;
 
-/// Represents a change for a file: the file path, its content before the change,
-/// and its content after the change.
-#[derive(Debug, Serialize)]
-pub struct FileChange {
-    pub file_path: String,
-    pub content: String,
+use crate::relation::{LinkType,Relation};
+use crate::element_registry::ElementRegistry;
+
+/// Report detailing changes between two registries.
+#[derive(Default, Debug, Serialize)]
+pub struct ChangeImpactReport {
+    /// Identifiers of elements present in the current registry but not in the reference.
+    pub added: Vec<String>,
+    /// Identifiers of elements present in the reference registry but not in the current.
+    pub removed: Vec<String>,
+    /// Identifiers of elements whose impactful content (hash) has changed.
+    pub changed: Vec<String>,
+    /// For elements present in both registries, the relation differences.
+    pub relation_diffs: Vec<RelationDiff>,
 }
 
-            
-pub fn generate_change_report(commit: &str,excluded_filename_patterns: &GlobSet) -> Result<ChangeReport, Box<dyn Error>> {
-    let changed_files = get_changed_files_from_git()?;
-    let mut file_changes = Vec::new();
-    for file in changed_files {
-        let before_content = get_file_at_commit(&file, commit)?;
-        file_changes.push(FileChange {
-            file_path: file,
-            content: before_content
-        });
-    }
-    Ok(ChangeReport { file_changes: file_changes.into_iter().filter(|e| utils::is_requirements_file_by_path(&PathBuf::from(e.file_path.clone()), excluded_filename_patterns)).collect() })
+/// Captures the relation differences for an element.
+#[derive(Default, Debug, Serialize)]
+pub struct RelationDiff {
+    pub element_id: String,
+    /// Relations present in the current element but not in the reference.
+    pub added: Vec<Relation>,
+    /// Relations present in the reference element but missing in the current.
+    pub removed: Vec<Relation>,
 }
 
+/// Computes the change impact by comparing two element registries.
+pub fn compute_change_impact(
+    current: &ElementRegistry,
+    reference: &ElementRegistry,
+) -> ChangeImpactReport {
+    let mut report = ChangeImpactReport::default();
 
+    // Create sets of element identifiers for both registries.
+    let current_ids: HashSet<&String> = current.elements.keys().collect();
+    let reference_ids: HashSet<&String> = reference.elements.keys().collect();
 
-/// Retrieves the content of a file at a given commit (e.g. "HEAD~1").
-pub fn get_file_at_commit(file_path: &str, commit: &str) -> Result<String, Box<dyn Error>> {
-    let output = Command::new("git")
-        .args(&["show", &format!("{}:{}", commit, file_path)])
-        .output()?;
-    if !output.status.success() {
-        let err = String::from_utf8_lossy(&output.stderr);
-        return Err(Box::new(std::io::Error::new(
-            std::io::ErrorKind::Other,
-            format!("git show failed for {}: {}", file_path, err),
-        )));
-    }
-    Ok(String::from_utf8_lossy(&output.stdout).into())
-}
-
-/// Returns a list of files that have changed (according to `git diff --name-only`).
-fn get_changed_files_from_git() -> Result<Vec<String>, Box<dyn Error>> {
-    let output = Command::new("git")
-        .args(&["diff", "--name-only"])
-        .output()?;
-    if !output.status.success() {
-        let err = String::from_utf8_lossy(&output.stderr);
-        return Err(Box::new(std::io::Error::new(
-            std::io::ErrorKind::Other,
-            format!("git diff failed: {}", err),
-        )));
-    }
-    let stdout = String::from_utf8_lossy(&output.stdout);
-    let changed_files: Vec<String> = stdout
-        .lines()
-        .map(|s| s.trim().to_string())
-        // Only process Markdown files
-        .filter(|s| s.ends_with(".md"))
+    // Identify added elements.
+    report.added = current_ids
+        .difference(&reference_ids)
+        .cloned()
+        .cloned()
         .collect();
-    Ok(changed_files)
+
+    // Identify removed elements.
+    report.removed = reference_ids
+        .difference(&current_ids)
+        .cloned()
+        .cloned()
+        .collect();
+
+    // For elements present in both, compare the impact hash and internal relations.
+    for id in current_ids.intersection(&reference_ids) {
+        let cur_elem = &current.elements[*id];
+        let ref_elem = &reference.elements[*id];
+
+        if cur_elem.hash_impact_content != ref_elem.hash_impact_content {
+            report.changed.push((*id).clone());
+        }
+
+        // Compute the set of internal relations only.
+        let cur_relations: HashSet<Relation> = cur_elem
+            .relations
+            .iter()
+            .filter(|r| matches!(r.target.link, LinkType::Identifier(_)))
+            .cloned()
+            .collect();
+        let ref_relations: HashSet<Relation> = ref_elem
+            .relations
+            .iter()
+            .filter(|r| matches!(r.target.link, LinkType::Identifier(_)))
+            .cloned()
+            .collect();
+
+        let added_relations: Vec<Relation> = cur_relations.difference(&ref_relations).cloned().collect();
+        let removed_relations: Vec<Relation> = ref_relations.difference(&cur_relations).cloned().collect();
+
+        if !added_relations.is_empty() || !removed_relations.is_empty() {
+            report.relation_diffs.push(RelationDiff {
+                element_id: (*id).clone(),
+                added: added_relations,
+                removed: removed_relations,
+            });
+        }
+    }
+
+    report
+}
+
+impl ChangeImpactReport {
+    /// Returns a human-readable plain text representation of the report.
+    pub fn to_text(&self) -> String {
+        let mut output = String::new();
+        output.push_str("Change Impact Report:\n\n");
+
+        output.push_str("Added Elements:\n");
+        for id in &self.added {
+            output.push_str(&format!("  - {}\n", id));
+        }
+        output.push_str("\n");
+
+        output.push_str("Removed Elements:\n");
+        for id in &self.removed {
+            output.push_str(&format!("  - {}\n", id));
+        }
+        output.push_str("\n");
+
+        output.push_str("Changed Elements:\n");
+        for id in &self.changed {
+            output.push_str(&format!("  - {}\n", id));
+        }
+        output.push_str("\n");
+
+        output.push_str("Relation Differences:\n");
+        for diff in &self.relation_diffs {
+            output.push_str(&format!(" Element: {}\n", diff.element_id));
+            if !diff.added.is_empty() {
+                output.push_str("  Added Relations:\n");
+                for rel in &diff.added {
+                    output.push_str(&format!(
+                        "    - {} -> {} ({})\n",
+                        rel.relation_type.name,
+                        rel.target.text,
+                        rel.target.link.as_str(),                        
+                    ));
+                }
+            }
+            if !diff.removed.is_empty() {
+                output.push_str("  Removed Relations:\n");
+                for rel in &diff.removed {
+                    output.push_str(&format!(
+                        "    - {} -> {} ({})\n",
+                        rel.relation_type.name,
+                        rel.target.text,
+                        rel.target.link.as_str(),                        
+                    ));
+                }
+            }
+            output.push_str("\n");
+        }
+        output
+    }
+
+    /// Returns a pretty-printed JSON string representation of the report.
+    pub fn to_json(&self) -> String {
+        serde_json::to_string_pretty(self).unwrap_or_else(|_| String::from("Error serializing report"))
+    }
+
+    /// Prints the report, either as JSON (if as_json is true) or as plain text.
+    pub fn print(&self, as_json: bool) {
+        if as_json {
+            println!("{}", self.to_json());
+        } else {
+            println!("{}", self.to_text());
+        }
+    }
 }
 

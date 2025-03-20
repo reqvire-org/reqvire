@@ -6,8 +6,6 @@ use std::path::PathBuf;
 use crate::utils;
 use log::debug;
 use crate::relation::LinkType;
-use rustc_hash::FxHasher;
-use std::hash::{Hasher};
 use crate::element::ElementType;
 use crate::element::RequirementType;
 

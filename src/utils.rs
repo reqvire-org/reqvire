@@ -1,4 +1,4 @@
-use anyhow::Result;
+        use anyhow::Result;
 use std::path::{Path, PathBuf};
 use pathdiff::diff_paths;
 use log::debug;
@@ -8,6 +8,8 @@ use globset::GlobSet;
 use regex::Regex;
 use rustc_hash::FxHasher;
 use std::hash::{Hasher};
+use crate::git_commands;
+
 
 /// Checks if a file should be processed
 pub fn is_requirements_file_by_path(path: &Path, excluded_filename_patterns: &GlobSet) -> bool {
@@ -45,29 +47,90 @@ pub fn is_in_specification_root(
 
 /// Scans the specification and external folders for markdown files, excluding files based on patterns.
 pub fn scan_markdown_files(
+    commit: Option<&str>,
     specification_folder: &PathBuf, 
     external_folders: &[PathBuf], 
     excluded_filename_patterns: &GlobSet
 ) -> Vec<(PathBuf,PathBuf)> {
+    match commit {
+        Some(commit_id) => {
+            scan_markdown_files_from_commit(
+                commit_id,
+                specification_folder,
+                external_folders,
+                excluded_filename_patterns,
+            )
+        }
+        None => {
+
+            let mut files = Vec::new();
+            
+            // Define all folders to scan
+            let all_folders: Vec<&PathBuf> = std::iter::once(specification_folder)
+                .chain(external_folders.iter())
+                .collect();
+
+            for folder in all_folders {
+                for entry in WalkDir::new(folder)
+                    .into_iter()
+                    .filter_map(Result::ok)
+                    .filter(|e| e.path().is_file() && e.path().extension().map_or(false, |ext| ext == "md"))
+                    .filter(|e| is_requirements_file_by_path(e.path(), excluded_filename_patterns))
+                {
+                    files.push((entry.path().to_path_buf(),folder.clone()));
+                }
+            }
+
+            debug!("Scanned {} markdown files.", files.len());
+            files
+        }
+    }
+}
+
+/// Scans the given Git commit for markdown files under the specified folders,
+/// excluding files based on provided patterns.
+/// 
+/// - `commit`: The Git commit (e.g. `"HEAD"`) where we want to look for files.
+pub fn scan_markdown_files_from_commit(
+    commit: &str,
+    specification_folder: &PathBuf,
+    external_folders: &[PathBuf],
+    excluded_filename_patterns: &GlobSet,
+) -> Vec<(PathBuf, PathBuf)> {
     let mut files = Vec::new();
-    
-    // Define all folders to scan
+
+    // Gather all folders to "scan" (from Git's perspective).
     let all_folders: Vec<&PathBuf> = std::iter::once(specification_folder)
         .chain(external_folders.iter())
         .collect();
 
+    // For each folder, we'll run `git ls-tree --name-only -r <commit>`
+    // and filter out paths that don't lie within that folder or don't match
+    // our markdown + exclusion patterns.
     for folder in all_folders {
-        for entry in WalkDir::new(folder)
-            .into_iter()
-            .filter_map(Result::ok)
-            .filter(|e| e.path().is_file() && e.path().extension().map_or(false, |ext| ext == "md"))
-            .filter(|e| is_requirements_file_by_path(e.path(), excluded_filename_patterns))
-        {
-            files.push((entry.path().to_path_buf(),folder.clone()));
-        }
+        let result = git_commands::ls_tree_commit_in_folder(&commit,&folder);
+        let documents_vec = match result {
+            Err(e) => {
+                //TODO: we need to return result with reqflow error here
+                eprintln!("Error: {}", e);
+                Vec::new()
+            } ,       
+            Ok(v) => v
+        };
+
+        let matching_paths = documents_vec
+        .into_iter() 
+        .map(|p| folder.join(p))             
+        .filter(|p| p.extension().map_or(false, |ext| ext == "md"))
+        .filter(|p| is_requirements_file_by_path(p, excluded_filename_patterns))
+        .map(|p| (p, folder.clone()))
+        .collect::<Vec<(PathBuf, PathBuf)>>();
+
+        
+        files.extend(matching_paths);        
+
     }
 
-    debug!("Scanned {} markdown files.", files.len());
     files
 }
 

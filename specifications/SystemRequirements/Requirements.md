@@ -155,17 +155,9 @@ The system shall detect and fix excess whitespace after element headers, subsect
 
 ---
 
-### Excess Newlines Linting Implementation
-The system shall detect and fix excess newlines after element headers, subsection headers to maintain consistent formatting across all requirements documents.
+### Incosistent Newlines Linting Implementation
 
-#### Relations
-  * derivedFrom: [UserRequirements.md/Format Consistency Enforcement](../UserRequirements.md#format-consistency-enforcement)
-  * satisfiedBy: [linting/whitespace.rs](../../src/linting/newlines.rs)
-
----
-
-### Inconsistent Newlines Linting Implementation
-The system shall identify instances where subsection headers lack proper spacing (a blank line before them) and add the necessary spacing to ensure consistent document structure.
+The system shall detect and fix excess or missing newlines before element headers, subsection headers to maintain consistent formatting across all requirements documents.
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Format Consistency Enforcement](../UserRequirements.md#format-consistency-enforcement)
@@ -174,6 +166,7 @@ The system shall identify instances where subsection headers lack proper spacing
 ---
 
 ### Missing Separators Linting Implementation
+
 The system shall detect consecutive element sections that lack a separator line (---) between them and insert the separator to maintain consistent visual separation in the documentation.
 
 #### Relations
@@ -182,12 +175,13 @@ The system shall detect consecutive element sections that lack a separator line 
 
 ---
 
-### Indentation Consistency Linting Implementation
-The system shall identify and fix inconsistent indentation and bullet types in relation lists, standardizing to a consistent format across all requirements documents.
+### Reserved Subsections Linting Implementation
+
+The system shall identify and fix inconsistent indentation and bullet types in relation lists and other reserved subsections, standardizing to a consistent format across all requirements documents.
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Format Consistency Enforcement](../UserRequirements.md#format-consistency-enforcement)
-  * satisfiedBy: [linting/indentation.rs](../../src/linting/indentation.rs)
+  * satisfiedBy: [linting/reserved_subsections.rs](../../src/linting/indentation.rs)
 
 ---
 
@@ -275,6 +269,7 @@ graph LR;
 The system shall implement configuration parameter to support processing requirements stored in external folders outside the main specifications directory structure, treating them as system requirements in diagram generation and validation.
 
 #### Details
+
 'paths.external_folders' parameter of type  Vec<String> defines additional external folders that contain system requirements and other files.
 These can be absolute paths or paths relative to the 'specifications' folder but must not be subfolders of 'specifications' folder.
 Empty list is allowed.
@@ -445,35 +440,33 @@ graph LR;
 
 ---
 
+### JSON Output Format
+
+The system shall provide different output results in machine-readable JSON format to facilitate integration with CI/CD pipelines and automated reporting tools.
+
+#### Relations
+  * derivedFrom: [UserRequirements.md/Enhanced Validation Error Reporting](../UserRequirements.md#enhanced-validation-error-reporting)
+  * satisfiedBy: [parser.rs](../../src/cli.rs)
+
+---
+
 ### Index Generator Implementation
-The system shall implement an IndexGenerator component that traverses the specifications directory structure and creates a hierarchical index.md file with links and summaries.
+
+The system shall implement an IndexGenerator component that traverses the specifications directory structure and creates a hierarchical README.md file with links to documents and elements.
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Generate Documentation Index](../UserRequirements.md#generate-documentation-index)
-  * satisfiedBy: [linting/index_generator.rs](../../src/linting/index_generator.rs)
-
----
-
-### Markdown Content Summary Extraction
-The system shall extract summaries from the first heading and paragraph of each document to include meaningful descriptions in the generated index.
-
-#### Relations
-  * containedBy: [Index Generator Implementation](#index-generator-implementation)
-  * satisfiedBy: [linting/index_generator.rs](../../src/linting/index_generator.rs)
-
----
-
-### Proper Link URL Generation
-The system shall generate URLs in the index file with both Markdown (.md) and HTML (.md) extensions, ensuring documentation navigation works in both formats.
-
-#### Relations
-  * containedBy: [Index Generator Implementation](#index-generator-implementation)
-  * satisfiedBy: [linting/index_generator.rs](../../src/linting/index_generator.rs)
+  * satisfiedBy: [index_generator.rs](../../src/index_generator.rs)
 
 ---
 
 ### HTML Navigation Enhancement 
-The system shall enhance the HTML generator to process index.md as a special file, adding navigation elements and ensuring it serves as the primary entry point.
+
+The system shall enhance the HTML generator to process README.md as a special file, adding navigation elements and ensuring it serves as the primary entry point.
+
+#### Details
+
+README.md file must be saved as index.html file when exported.
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Documentation Index HTML Integration](../UserRequirements.md#documentation-index-html-integration)
@@ -483,6 +476,7 @@ The system shall enhance the HTML generator to process index.md as a special fil
 ---
 
 ### LLM Context Command
+
 The system shall provide a command-line option `--llm-context` that outputs comprehensive contextual information about ReqFlow methodology, document structure, relation types, and CLI usage to help Large Language Models understand and work with ReqFlow-based projects.
 
 #### Relations
@@ -491,44 +485,18 @@ The system shall provide a command-line option `--llm-context` that outputs comp
 
 ---
 
-### JSON Validation Output Format
-The system shall provide validation results in machine-readable JSON format to facilitate integration with CI/CD pipelines and automated reporting tools.
-
-#### Relations
-  * derivedFrom: [UserRequirements.md/Enhanced Validation Error Reporting](../UserRequirements.md#enhanced-validation-error-reporting)
-  * satisfiedBy: [parser.rs](../../src/parser.rs)
-
----
-
-### Multiple Validation Modes Support
-The system shall support different validation modes (validate_markdown, validate_relations, validate_all) with configurable behaviors to accommodate different use cases.
-
-#### Relations
-  * derivedFrom: [UserRequirements.md/Enhanced Validation Error Reporting](../UserRequirements.md#enhanced-validation-error-reporting)
-  * satisfiedBy: [parser.rs](../../src/parser.rs)
-
----
-
 ### Interactive Mermaid Diagram Node Behavior
+
 The system shall implement interactive click behavior for Mermaid diagram nodes that redirects to the referenced element when clicked.
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Interactive Mermaid Diagrams](../UserRequirements.md#interactive-mermaid-diagrams)
-  * satisfiedBy: [html.rs](../../src/html.rs)
-  * satisfiedBy: [html_export.rs](../../src/html_export.rs)
-
----
-
-### Command Line Configuration Overrides
-The system shall allow command line arguments to override YAML configuration settings to provide flexibility without modifying configuration files.
-
-#### Relations
-  * derivedFrom: [UserRequirements.md/Project Configuration with YAML](../UserRequirements.md#project-configuration-with-yaml)
-  * satisfiedBy: [main.rs](../../src/main.rs)
+  * satisfiedBy: [html.rs](../../src/diagrams.rs)
 
 ---
 
 ### Unstructured Documents
+
 The system shall allow unstructured documents to be ignored during processing.
 TODO: add requirment that defines a config filter out patterns.
 
@@ -538,6 +506,7 @@ TODO: add requirment that defines a config filter out patterns.
 ---
 
 ### Relation Type Validation
+
 The system shall validate relation types against a defined vocabulary and provide clear error messages for unsupported relation types, including suggestions for the correct relation types.
 
 #### Relations
@@ -547,6 +516,7 @@ The system shall validate relation types against a defined vocabulary and provid
 ---
 
 ### Excluded File Relation Validation
+
 The system shall properly validate relations targeting files matching excluded filename patterns, enabling references to excluded files while still respecting their exclusion from processing and linting operations.
 
 #### Details
@@ -564,16 +534,8 @@ The validation process for excluded files:
 
 ---
 
-### Multi-Pass Linting Capability
-The system shall support multi-pass linting with a configurable iteration limit to ensure all interdependent formatting issues are resolved.
-
-#### Relations
-  * derivedFrom: [UserRequirements.md/Format Consistency Enforcement](../UserRequirements.md#format-consistency-enforcement)
-  * satisfiedBy: [linting/mod.rs](../../src/linting/mod.rs)
-
----
-
 ### HTML Export
+
 The system shall generate HTML output for all markdown files, not just requirements documents, to provide consistent representation of the entire model.
 
 #### Relations
@@ -583,6 +545,7 @@ The system shall generate HTML output for all markdown files, not just requireme
 ---
 
 ### Detailed Error Handling and Logging
+
 The system shall implement detailed error handling and logging throughout the application to facilitate troubleshooting and provide meaningful feedback.
 
 #### Relations
@@ -592,6 +555,7 @@ The system shall implement detailed error handling and logging throughout the ap
 ---
 
 ### File Content Caching for Performance
+
 The system shall cache file contents during processing to optimize performance for operations that require multiple passes through the same files.
 
 #### Relations
@@ -763,9 +727,11 @@ The system shall implement a visual differential rendering algorithm that compar
 ---
 
 ### SysML-Compatible Relationship Rendering
+
 The system shall implement a relationship rendering engine that adheres to SysML notation standards, defining specific arrow styles, line types, and visual properties for each relationship type to ensure diagram consistency and standards compliance.
 
 #### Details
+
 The visual representation and direction of relationships in diagrams aligns with the SysML specification. 
 Each relationship is represented using SysML standard notation with a specified arrow direction.
 derive (deriveReqT):
@@ -798,6 +764,7 @@ satisfy:
 - Notation: Solid arrow with an open arrowhead.  
 - Direction:  
   - Design / Model Element → Requirement  
+  
 **Summary Table**
 | Relationship | Notation | Arrow Direction |
 |-------------|---------|----------------|
@@ -831,7 +798,8 @@ The system shall implement a configurable storage mechanism for generated diagra
 
 ---
 
-## Traceability Matrix Generation
+## Change Tracing
+
 ```mermaid
 graph LR;
   %% Graph styling
@@ -899,63 +867,69 @@ graph LR;
 
 ---
 
-### Traceability Matrix Builder Implementation
-The system shall implement a traceability matrix builder component that extracts relationship data from the model, processes it according to configured parameters, and generates structured matrix representations showing connections between requirements and other elements.
+### Structural Change Analyzer
+
+The system shall implement a model change analyzer that identifies structural modifications between model versions, determines affected elements through relationship traversal, and categorizes impacts according to change propagation rules.
 
 #### Relations
-  * derivedFrom: [UserRequirements.md/Create Traceability Matrices](../UserRequirements.md#create-traceability-matrices)
-  * satisfiedBy: [model.rs](../../src/model.rs)
+  * derivedFrom: [UserRequirements.md/Tracing Structural Changes](../UserRequirements.md#tracing-structural-changes)
+  * satisfiedBy: [model.rs](../../src/change_impact.rs)  
 
 ---
 
-### Relation-Based Matrix View Generator
-The system shall implement specialized view generators for different relationship types (VerifiedBy, SatisfiedBy, TracedFrom), each producing a focused matrix view that filters and organizes data according to the specific relationship semantics.
+### CLI Change Impact Report Flag
+
+The system shall provide a change and impact report function, activated by the (--change_impact flag), which shall generate change impact report
 
 #### Relations
-  * derivedFrom: [UserRequirements.md/Support Relation-Based Views](../UserRequirements.md#support-relation-based-views)
-  * satisfiedBy: [model.rs](../../src/model.rs)
+  * derivedFrom: [Structural Change Analyzer](#structural-change-analyzer)
+  * satisfiedBy: [cli.rs](../../src/cli.rs)    
+
+---
+
+### CLI Git Commit Hash Flag
+
+The system shall provide a git commit hash flag  (--git_commit flag), to be used with ** CLI Change Impact Report Flag**.
+
+#### Relations
+  * derivedFrom: [CLI Change Impact Report Flag](#cli-change-impact-report-flag)
+  * satisfiedBy: [cli.rs](../../src/cli.rs)    
+
+---
+
+### Traceability Matrix Builder Implementation
+
+The system shall implement a traceability matrix builder component that extracts relationship data from the model, processes it according to configured parameters, and generates structured matrix representations showing connections between requirements and other elements.
+
+#### Relations
+  * derivedFrom: [UserRequirements.md/Traceability Matrix](../UserRequirements.md#traceability-matrix)
 
 ---
 
 ### Markdown Matrix Formatter
+
 The system shall implement a markdown formatter for traceability matrices that produces well-structured, readable markdown tables and diagrams conforming to the ReqFlow markdown-first methodology.
 
 #### Relations
-  * derivedFrom: [UserRequirements.md/Markdown-Based Default Format](../UserRequirements.md#markdown-based-default-format)
-  * satisfiedBy: [model.rs](../../src/model.rs)
+  * derivedFrom: [UserRequirements.md/Traceability Matrix](../UserRequirements.md#traceability-matrix)
 
 ---
 
 ### Matrix File Output Handler
+
 The system shall implement a file output handler for traceability matrices that saves generated content to designated locations with appropriate naming conventions, handles file conflicts, and maintains content consistency.
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Save matrices to designated files](../UserRequirements.md#save-matrices-to-designated-files)
-  * satisfiedBy: [model.rs](../../src/model.rs)
-
----
-
-### Verification Checkbox Implementation
-The system shall implement an interactive checkbox mechanism in HTML output that allows users to mark verification statuses, storing this data in a format that persists across report regenerations.
-
-#### Relations
-  * derivedFrom: [UserRequirements.md/Include Verification Checkboxes](../UserRequirements.md#include-verification-checkboxes)
 
 ---
 
 ### Matrix Export Format Handler
+
 The system shall implement export handlers for traceability matrices that convert the internal matrix representation to various external formats including Excel-compatible CSV/XLSX and PDF, preserving structural relationships and formatting.
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Export Traceability Matrix](../UserRequirements.md#export-traceability-matrix)
-
----
-
-### CI/CD Pipeline Integration Interface
-The system shall implement an interface compatible with common CI/CD platforms that allows automated generation and verification of traceability matrices as part of build and deployment processes.
-
-#### Relations
-  * derivedFrom: [UserRequirements.md/Support CI/CD Integration](../UserRequirements.md#support-ci/cd-integration)
 
 ---
 
@@ -1017,7 +991,7 @@ The system shall implement a markdown structure validator that enforces ReqFlow'
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Validate Markdown Structure](../UserRequirements.md#validate-markdown-structure)
-  * satisfiedBy: [parser.rs](../../src/model.rs)  
+  * satisfiedBy: [model.rs](../../src/model.rs)    
   * satisfiedBy: [parser.rs](../../src/parser.rs)
 
 ---
@@ -1036,7 +1010,7 @@ The system shall implement a consistency validator that verifies logical coheren
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Validate Internal Consistency](../UserRequirements.md#validate-internal-consistency)
-  * satisfiedBy: [parser.rs](../../src/model.rs)    
+  * satisfiedBy: [model.rs](../../src/model.rs)    
   * satisfiedBy: [parser.rs](../../src/parser.rs)
 
 ---
@@ -1046,8 +1020,8 @@ The system shall implement a specialized validator that analyzes dependencies ac
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Validate Cross-Component Dependencies](../UserRequirements.md#validate-cross-component-dependencies)
-  * satisfiedBy: [parser.rs](../../src/model.rs)    
-  * satisfiedBy: [model.rs](../../src/model.rs)
+  * satisfiedBy: [model.rs](../../src/model.rs)    
+  * satisfiedBy: [parser.rs](../../src/parser.rs)
 
 ---
 
@@ -1119,6 +1093,7 @@ graph LR;
 ---
 
 ### Model Summary Report Generator
+
 The system shall implement a summary report generator that  produces comprehensive summaries of model relationships, including key metrics, element counts by type and counts.
 
 #### Relations
@@ -1128,6 +1103,7 @@ The system shall implement a summary report generator that  produces comprehensi
 ---
 
 ### CLI Summary Report Flag
+
 The system shall provide a model summary report function, activated by the (--model-summary flag), which shall generate model summary report
 
 #### Relations
@@ -1136,15 +1112,8 @@ The system shall provide a model summary report function, activated by the (--mo
 
 ---
 
-### Structural Change Analysis Engine
-The system shall implement a change analysis engine that compares model versions to identify structural modifications, analyzes impact chains, and generates reports highlighting affected elements with severity classifications.
-
-#### Relations
-  * derivedFrom: [UserRequirements.md/Generate Structural Change Reports](../UserRequirements.md#generate-structural-change-reports)
-
----
-
 ### Validation Report Generator
+
 The system shall implement a validation report generator that compiles and formats validation results from all validators, providing a unified view of model quality with categorized issues, remediation suggestions, and compliance metrics.
 
 #### Relations
@@ -1177,44 +1146,4 @@ The system shall implement format conversion engines for reports that transform 
 
 ---
 
-## Change Tracing
-```mermaid
-graph LR;
-  %% Graph styling
-  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
-  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
-  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
-  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
-  918cc4a26d["Structural Change Analyzer"];
-  click 918cc4a26d "Requirements.md#structural-change-analyzer";
-  class 918cc4a26d requirement;
-  91ebf7e73d["UserRequirements.md/Tracing Structural Changes"];
-  class 91ebf7e73d requirement;
-  click 91ebf7e73d "../UserRequirements.md#tracing-structural-changes";
-  918cc4a26d -.->|deriveReqT| 91ebf7e73d;
-  21b263e7b2["Structural Update Recommender"];
-  click 21b263e7b2 "Requirements.md#structural-update-recommender";
-  class 21b263e7b2 requirement;
-  e8cb10f42e["UserRequirements.md/Suggest Structural Updates"];
-  class e8cb10f42e requirement;
-  click e8cb10f42e "../UserRequirements.md#suggest-structural-updates";
-  21b263e7b2 -.->|deriveReqT| e8cb10f42e;
-```
 
----
-
-### Structural Change Analyzer
-The system shall implement a model change analyzer that identifies structural modifications between model versions, determines affected elements through relationship traversal, and categorizes impacts according to change propagation rules.
-
-#### Relations
-  * derivedFrom: [UserRequirements.md/Tracing Structural Changes](../UserRequirements.md#tracing-structural-changes)
-
----
-
-### Structural Update Recommender
-The system shall implement a recommendation engine that analyzes model changes, identifies inconsistencies or incomplete modifications, and generates specific suggestions for structural updates to maintain model integrity.
-
-#### Relations
-  * derivedFrom: [UserRequirements.md/Suggest Structural Updates](../UserRequirements.md#suggest-structural-updates)
-
----

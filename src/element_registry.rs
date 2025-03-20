@@ -72,7 +72,7 @@ impl ElementRegistry {
     }
         
     /// Searches though the elements relations to calculate change impact
-    pub fn change_impact(&self, element: element::Element) -> bool {
+    pub fn change_impact(&self, _element: element::Element) -> bool {
        true
     }
 

@@ -14,28 +14,15 @@ pub mod filesystem;
 pub mod diagrams;
 pub mod index_generator;
 pub mod reports;
+pub mod git_commands;
+pub mod change_impact;
 
 
 use log::error;
-use crate::model::ModelManager;
 use crate::cli::handle_command;
 use crate::cli::Args;
 use crate::config::Config;
 
-/*
-#[path = "tests/general_tests.rs"]
-#[cfg(test)]
-mod general_tests;
-#[path = "tests/validation_tests.rs"]
-#[cfg(test)]
-mod validation_tests;
-#[path = "tests/config_tests.rs"]
-#[cfg(test)]
-mod config_tests;
-#[path = "tests/linting_tests.rs"]
-#[cfg(test)]
-mod linting_tests;
-*/
 
 fn main() {
     if std::env::var("RUST_LOG").is_err() {
@@ -52,13 +39,9 @@ fn main() {
     
     let config = Config::load_from_args(&args);
 
-    let mut model_manager = ModelManager::new();
-
-  
     // Run `handle_command` and get exit code
     let exit_code = handle_command(
         args, 
-        &mut model_manager, 
         &config.get_specification_folder(),
         &config.get_external_folders(), 
         &config.get_output_folder(), 

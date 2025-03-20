@@ -177,7 +177,7 @@ pub fn print_registry_summary_json(element_registry: &ElementRegistry) {
                         .relations
                         .iter()
                         .map(|relation| {
-                            let rel_type = relation.relation_type.name.clone();
+                            let rel_type = relation.relation_type.name;
                             let target = match &relation.target.link {
                                 LinkType::Identifier(target_id) => json!({
                                     "target": target_id,
