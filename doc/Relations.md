@@ -1,75 +1,112 @@
 # Relations in ReqFlow
 
 
-## ReqFlow relations
-
 In ReqFlow, element can be linked using the following types of relationships:
- * containedBy
- * contain
- * derivedFrom 
- * derive
- * refine
- * satisfiedBy
- * satisfy
- * verifiedBy
- * verify 
- * tracedFrom
+ * contain / containedBy
+ * derive / derivedFrom 
+ * refine / refinedBy
+ * satifsy / satisfiedBy
+ * verify / verifiedBy
  * trace 
   
 
-Relations in the markdown are expected to be in following format:
-```
-### <element name>
+## **refine** and **refinedBy** Relationship
 
-<Element text>
+### Purpose
+- Clarifies, details, or elaborates another element.
+- Typically connects elements across different abstraction levels or different modeling domains.
 
-#### Relations
- * verifiedBy: <element identifier>
- * contain: <element identifier>
- 
-``` 
+### Usage Scenarios
+- Connecting requirements to other system elements (blocks, activities, use cases) that clarify or provide more detail.
+- Refining higher-level abstract requirements with more specific, detailed requirements.
 
-There must be at least one relation if '#### Relations' exist under the  element text.
-
-### Element identifier
-
-Element identifier is like an URI which consist of path part and element name part:
- * specifications/Document.md/Element name
-
-
-Special case is if relation is inside same document then it is enough to put Element name only:
- * Element name
-
-## Relations types 
-
-### `contain`, `containedBy`, `derive` and `derivedBy`
-
-Both `contains` and `derives` relationships in SysML allow breaking down requirements, and their implementation may often look similar. However, the difference lies in the **modeling intent**:
-
-- **`contains`**: Groups **independent, standalone sub-requirements** under a broader parent requirement.
-- **`derives`**: Decomposes a **high-level requirement** into more specific, actionable requirements to show how the overall goal is achieved.
-
-The choice depends on how you want to structure and trace your requirements:
-- Use `contains` for **organizational grouping** eg. per feature sub-requirements.
-- Use `derives` for **breaking down abstract requirements into detailed ones**.
-
-While both relationships allow sub-requirements to be implemented independently, the clarity and traceability differ based on the intent of their relationship.
+### Allowed Elements
+- Source (refining): Typically specific system elements (requirements, blocks, activities, use cases, constraints, etc.).
+- Target (refined): Typically abstract or general elements (requirements, use cases, activities, interfaces, blocks).
 
 ---
 
-#### Practical Comparison
+## **derive** and **derivedFrom** Relationship
 
-| Aspect                  | **`contains`**                           | **`derives`**                           |
-|--------------------------|------------------------------------------|------------------------------------------|
-| **Purpose**             | Groups **independent sub-requirements** under a parent. | Decomposes a general requirement into **specific actionable requirements**. |
-| **Relationship**         | Parent is **loosely coupled** to sub-requirements. | Derived requirements are **traceable back** to the high-level requirement. |
-| **Dependency**           | No logical or contextual dependency implied. | Derived requirements **logically flow** from the parent. |
-| **Use Case**             | Organizing independent tasks or features. | Breaking down a general goal into specific system requirements. |
-| **Example**              | User management grouped under a parent. | SaaS subscription management decomposed into feature requirements. |
+### Purpose
+- Represents logical decomposition or derivation of one requirement into one or more sub-requirements.
+- Clearly indicates the logical relationship or decomposition within requirements.
+
+### Usage Scenarios
+- Explicit decomposition of high-level requirements into lower-level, detailed, derived requirements.
+
+### Allowed Elements
+- Requirements → Requirements only.
+
+### Example
+- *High-level Requirement:* "Vehicle shall ensure passenger safety."
+  - Derived Requirements:
+    - "Vehicle shall include airbags."
+    - "Vehicle shall pass crash-test standards."
 
 ---
 
-#### Examples
+## **contain** and **containedBy Relationship (Requirement Containment)
+
+### Purpose
+- Represents a hierarchical structure of requirements.
+- Indicates that one requirement directly contains sub-requirements as part of a structured hierarchy.
+
+### Usage Scenarios
+- Organizing requirements into structured groups or hierarchies (e.g., parent-child relationships).
+- Creating structured requirement trees or requirement specifications.
+
+### Allowed Elements
+- Requirements → Requirements (hierarchical containment only).
+
+---
+
+
+##  Quick Guidelines for Choosing Relationships
+
+- **refine**:  
+  Use when adding details or clarity between elements from different abstraction layers or domains (requirements ↔ design).
+
+- **derive**:  
+  Use explicitly within requirements to indicate logical decomposition or derivation.
+
+- **contain**:  
+  Use for structuring requirements hierarchically, grouping related requirements logically into a tree or structured form.
+
+
+
+##  Comparison Table
+
+| Aspect             | **refine** Relationship                               | **derive** Relationship                         | **contain** Relationship                           |
+|--------------------|-----------------------------------------------------|---------------------------------------------------|--------------------------------------------------|
+| Primary Use    | Clarification, elaboration, detailing               | Logical decomposition of requirements             | Hierarchical organization of requirements        |
+| Allowed Elements | Requirements ↔ Requirements or Requirements ↔ Design elements | Requirements ↔ Requirements only                  | Requirements ↔ Requirements only                 |
+| Directionality | Specific element → Abstract/general element         | Derived (lower-level) → Source (higher-level) requirement | Parent (higher-level) → Child (lower-level) requirement |
+| Modeling Level | Across abstraction or modeling views                | Within requirements logical decomposition         | Within requirement hierarchies (structure)       |
+
+---
+
+
+## Double Relations (**deriveReqt** and **contain**)
+
+It is valid and common in system modeling for a single requirement to have both **deriveReqt** and **contain** relationships simultaneously.
+
+### Typical scenario:
+- **deriveReqt:** Logical decomposition or derivation of requirements.
+- **contain:** Structural organization (hierarchical grouping).
+
+### Example:
+
+Requirement A ("Vehicle shall be safe.") 
+  ├── deriveReqt → Requirement B ("Vehicle shall pass crash-test standards.")
+  └── contain → Requirement C ("Passenger safety requirements.")
+  
+
+---
+     
+  
+
+## Examples
 
 **Contains**:
   * Parent requirement: **"The system shall support multiple user roles."**
@@ -160,25 +197,20 @@ requirementDiagram
 ---
 
 
+## **satisfy** and **satisfiedBy**
 
-#### `refine` and `refinedBy`
+These complementary relationships show how system design elements (e.g., block, activity, behavior) including code implementations fulfill or realize specific requirements.
 
-- **Definition**: A `refines` relationship is a dependency that describes how a model element (e.g., use case, activity diagram, or text) provides further detail or context to a requirement. It can also describe how a text-based requirement refines a model element, elaborating on its purpose or functionality.
+### Purpose
+- Indicates that a particular design element or code fulfills or meets a given requirement.
 
-- **Purpose**: Use `refines` to illustrate how a requirement or model element is **further detailed or elaborated** to make its meaning clearer. This is particularly useful for connecting requirements to modeling elements (like use cases, activity diagrams, or blocks) that provide implementation or operational context.
+### Typical Usage
+- Connecting design or implementation elements to the requirements they satisfy.
 
-- **When to Use**: Use `refines` when:
-  1. A requirement needs to be connected to a more detailed model element (e.g., activity diagrams, use cases, or state machines).
-  2. A text-based requirement refines a higher-level model element to provide more descriptive detail.
+### Allowed Elements
+- Blocks, Activities, Operations, Components, Code → Requirements
 
-
-In the reqflow, refine is used to refine user-stories with user-requirements.
-
-
-#### `satisfy` and `satisfiedBy`
-- **Definition**: Links a system element (e.g., block, behavior) to the requirement it fulfills.
-- **When to Use**: Use `satisfies` to trace the implementation of requirements to specific system elements.
-- **Example**: 
+### Example:
   - Requirement: "The system shall support user authentication."
   - System Element: `AuthenticationSubsystem`.
 
@@ -197,49 +229,46 @@ requirementDiagram
 ---
 
 
-### `verify` and `verifiedBy`
-- **Definition**: Links a test case to a requirement to indicate how the requirement is validated.
-- **When to Use**: Use `verifies` when you need to demonstrate or test that a requirement is met.
-- **Example**: A test case "Verify system can encrypt files with AES-256" verifies "The system shall encrypt all uploaded files."
+## **verify** and **verifiedBy**
+
+These two complementary relationships indicate how requirements are verified within a system model.
+
+### Purpose
+- Connects a test case (or verification element) to the requirement it verifies.
+- Indicates that a requirement is formally checked or proven by the associated verification method.
+
+### Typical Usage
+- Linking tests or verification methods directly to requirements.
+- Use **verify** when you need to demonstrate or test that a requirement is met.
+
+### Allowed Elements
+- Test Cases, Activities, Behaviors → Requirements
+
 
 ---
 
-### `trace` and `tracedFrom`
-- **Definition**: Establishes a generic relationship between requirements or between a requirement and a system element, without specifying a strict semantic meaning.
-- **When to Use**: Use `traces` when a relationship exists but doesn’t fit into the specific categories like `satisfies`, `verifies`, or `refines`.
-- **Example**: "The system shall notify users of critical events" traces to the behavior "CriticalNotificationBehavior."
+## **trace**
+
+In the **Reqflow** **trace** relation doesn't have direction and is not used when calculating change impact.
+It is **weak** relation used for general documentation and traceability.
+
+### Purpose
+- Establishes general-purpose traceability between model elements.
+- Indicates that there is some form of dependency or connection without explicitly defining its nature.
+
+### When to Use
+- When a specific traceability relationship (e.g., «deriveReqt», «refine») isn't appropriate or clear.
+- For linking elements across different abstraction levels or modeling domains to demonstrate general traceability.
+
+### Typical Scenarios
+- Tracing requirements back to stakeholders or source documents.
+- Linking implementation elements back to originating requirements.
+- Connecting design decisions or constraints to external references.
+
+### Allowed Elements
+- Any system element ↔ Any system element (very flexible).
 
 ---
-
-### Summary Table of Relationships
-
-| Relationship Type | Definition                                                                 | Typical Use Case                                               |
-|--------------------|---------------------------------------------------------------------------|----------------------------------------------------------------|
-| **`contains`**     | Groups independent, parallel sub-requirements under a broader requirement. | Organizational grouping of standalone features or tasks.       |
-| **`copies`**       | Creates a duplicate of an existing requirement for reuse while maintaining traceability to the original. | Reusing and adapting requirements in different contexts.       |
-| **`derives`**      | Breaks down a high-level requirement into more specific ones.             | Decomposing general goals into specific system requirements.   |
-| **`satisfies`**    | Links a system element (block, behavior) to the requirement it fulfills.  | Tracing system design elements to requirements.                |
-| **`verifies`**     | Links a test case to a requirement for validation.                        | Testing or demonstrating that a requirement is met.            |
-| **`refines`**      | Describes how a model element or set of elements further elaborates a requirement. | Detailing a requirement through use cases, activity diagrams, or textual elaboration. |
-| **`traces`**       | Establishes a general dependency or relationship.                        | Linking requirements to elements without strict semantics.      |
-
----
-
-### Conclusion
-
-SysML requirement relationships provide powerful ways to structure, trace, and validate system requirements. Choosing the correct relationship depends on the intent and context:
-
-- Use **`contains`** for grouping independent tasks.
-- Use **`copies`** for reusing requirements in different contexts while maintaining traceability.
-- Use **`derives`** for breaking down high-level requirements into specific actionable components.
-- Use **`satisfies`** to ensure system components fulfill requirements.
-- Use **`verifies`** to connect test cases for validation of requirements.
-- Use **`refines`** for providing additional detail or elaboration to a requirement.
-- Use **`traces`** for general-purpose, flexible dependency mapping.
-
-Each relationship ensures traceability and alignment between requirements and system design, facilitating clear communication and robust development processes.
-
-
 
 
 

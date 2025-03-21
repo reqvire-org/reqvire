@@ -136,7 +136,7 @@ pub fn scan_markdown_files_from_commit(
 
 
 /// Gets the relative path of a file
-pub fn get_relative_path(path: &Path, specification_folder: &Path, external_folders: &[PathBuf]) -> Result<PathBuf, ReqFlowError> {
+pub fn get_relative_path(path: &PathBuf, specification_folder: &Path, external_folders: &[PathBuf]) -> Result<PathBuf, ReqFlowError> {
     if let Ok(relative) = path.strip_prefix(specification_folder) {
         return Ok(relative.to_path_buf());
     }
