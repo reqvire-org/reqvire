@@ -2,6 +2,10 @@ use lazy_static::lazy_static;
 use std::collections::HashMap;
 use crate::error::ReqFlowError;
 use serde::Serialize;
+use std::cmp::Ordering;
+use std::hash::Hash;
+use std::hash::Hasher;
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub enum RelationDirection {
@@ -61,7 +65,7 @@ lazy_static! {
         // Refine relation
         m.insert("refinedBy", RelationTypeInfo {
             name: "refinedBy", 
-            direction: RelationDirection::Forward, 
+            direction: RelationDirection::Forward,
             opposite: Some("refine"),
             description: "A souce element being refined by other element.",
         });        
@@ -106,11 +110,38 @@ lazy_static! {
     };
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
+#[derive(Debug, Clone, Serialize)]
 pub struct RelationTarget {
     pub text: String,
     pub link: LinkType,
 }
+
+impl PartialEq for RelationTarget {
+    fn eq(&self, other: &Self) -> bool {
+        self.link.as_str() == other.link.as_str()
+    }
+}
+
+impl Eq for RelationTarget {}
+
+impl Ord for RelationTarget {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.link.as_str().cmp(&other.link.as_str())
+    }
+}
+
+impl PartialOrd for RelationTarget {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Hash for RelationTarget {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.link.as_str().hash(state);
+    }
+}
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub enum LinkType {
@@ -129,12 +160,48 @@ impl LinkType {
 
 
 
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
+#[derive(Debug, Clone, Serialize)]
 pub struct Relation {
     pub relation_type: &'static RelationTypeInfo,
     pub target: RelationTarget,
     pub is_opposite: bool
+}
+
+impl PartialEq for Relation {
+    fn eq(&self, other: &Self) -> bool {
+        self.relation_type.name == other.relation_type.name && self.target == other.target
+    }
+}
+
+impl Eq for Relation {}
+
+
+impl Ord for Relation {
+    fn cmp(&self, other: &Self) -> Ordering {
+        // Compare relation types by name first
+        let relation_cmp = self.relation_type.name.cmp(&other.relation_type.name);
+
+        // If relation types are equal, compare targets
+        if relation_cmp == Ordering::Equal {
+            self.target.cmp(&other.target)
+        } else {
+            relation_cmp
+        }
+    }
+}
+
+impl PartialOrd for Relation {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Hash for Relation {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.relation_type.name.hash(state);
+        self.target.hash(state);
+        self.is_opposite.hash(state);
+    }
 }
 
 impl Relation {
