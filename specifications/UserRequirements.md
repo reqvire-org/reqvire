@@ -318,7 +318,7 @@ The system shall provide comprehensive validation messages that include file pat
 ---
 
 ### Model Linting
-The system shall provide linting capabilities to identify and fix stylistic, formatting, and non-critical issues in MBSE models that don't affect functional integrity.
+The ssystem shall provide linting capabilities to identify and fix stylistic, formatting, and non-critical issues in MBSE models that don't affect functional integrity.
 
 #### Relations
   * refine: [UserStories.md/Validating Structures](UserStories.md#validating-structures)

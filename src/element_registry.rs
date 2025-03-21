@@ -85,7 +85,7 @@ impl ElementRegistry {
                                         }
                                     }
                                 },
-                                
+                                /*
                                 relation::RelationDirection::Backward => {
                                     if target_id == current_id {
                                         if !impacted.contains(&(elem.identifier.clone(), relation.relation_type.name.to_string())) {
@@ -94,8 +94,8 @@ impl ElementRegistry {
                                         }
                                     }
                                 },
-                                
-                                //relation::RelationDirection::Backward  => { /* Do nothing */ }
+                                */
+                                relation::RelationDirection::Backward  => { /* Do nothing */ }
                                 relation::RelationDirection::Neutral => { /* Do nothing */ }
                             }
                     }
