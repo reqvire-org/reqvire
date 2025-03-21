@@ -250,7 +250,7 @@ fn render_change_impact_tree(node: &PropagationNode, indent: usize) -> String {
     let pad = "  ".repeat(indent);
     // Render current node.
     if let Some(ref relation) = node.trigger_relation {
-        output.push_str(&format!("{}- * {}: ({})[{}] {}\n", 
+        output.push_str(&format!("{}- * {}: [{}]({}) {}\n", 
             pad, 
             relation,             
             node.element_name,             
@@ -258,7 +258,7 @@ fn render_change_impact_tree(node: &PropagationNode, indent: usize) -> String {
             if node.is_changed { " [changed]" } else { "" }
         ));
     } else {
-        output.push_str(&format!("{}- ({})[{}] {}\n", 
+        output.push_str(&format!("{}- [{}]({}) {}\n", 
             pad, 
             node.element_name, 
             node.element_id,             
