@@ -181,51 +181,7 @@ impl ModelManager {
         Ok(errors)
     }
     
-    fn _validate_relations(&self, excluded_filename_patterns: &GlobSet) -> Result<Vec<ReqFlowError>, ReqFlowError> {
-        debug!("Validating relations...");
-        let mut errors = Vec::new();
 
-        for element in self.element_registry.get_all_elements() {
-            
-            for relation in &element.relations {            
-            
-                // Only validate if the relation target is an Identifier
-                if let relation::LinkType::Identifier(ref identifier) = relation.target.link {
-
-                    // Skip validation if the identifier is not a markdown file.
-                    let md_regex = Regex::new(r"\.md(?:#|$)").unwrap();
-                    if !md_regex.is_match(identifier) {
-                       log::debug!("Skipping validation for non-markdown identifier: {}", identifier);
-                       continue;
-                    }
-            
-                    // Skip validation if the identifier is in an excluded folder/file pattern.
-                    if excluded_filename_patterns.is_match(identifier) {
-                        log::debug!("Skipping validation for excluded identifier: {}", identifier);
-                       continue;
-                    }
-                            
-                    // Validate: if the element is not found in the registry, add an error.
-                    if self.element_registry.get_element(identifier).is_err() {
-                        errors.push(ReqFlowError::MissingRelationTarget(
-                            format!("Element '{}' references missing target '{}'", element.identifier, identifier),
-                        ));
-                    }
-
-                }else{
-                    log::debug!("Skipping external target {}",relation.target.link.as_str());
-                }            
-            }
-        }
-
-        if errors.is_empty() {
-            debug!("No relation validation errors found.");
-        } else {
-            debug!("{} relation validation errors found.", errors.len());
-        }
-
-        Ok(errors)
-    }
 
     /// Validates cross-component dependencies for circular dependencies and missing links.
     fn validate_cross_component_dependencies(&self) -> Result<Vec<ReqFlowError>, ReqFlowError> {

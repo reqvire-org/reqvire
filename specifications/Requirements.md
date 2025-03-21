@@ -6,21 +6,21 @@ This file should be processed.
 
 ### Power Control Component
 
-Power control.
+Power control component.
 
-### CPU Manager
-
-CPU Manager.
+### CPU Manager Component
+ 
+CPU Manager component.
 
 
 ### Battery Manager Component
 
-Battery manager.
+Battery manager component.
 
 
 ### Network Manager Component
 
-Network manager.
+Network manager component.
 
 
 
@@ -28,14 +28,14 @@ Network manager.
 
 ### Power Saving Test
 
-Power saving.
+Power saving test.
 
 #### Metadata
   * type: verification
 
 ### CPU Throttling Test
 
-Cpu Throttling
+Cpu Throttling test.
 
 #### Metadata
   * type: verification
@@ -43,14 +43,14 @@ Cpu Throttling
 
 ### Screen Brightness Test
 
-Screen brightness.
+Screen brightness test.
 
 #### Metadata
   * type: verification
 
 ### Battery Saving Test
 
-Battery Saving.
+Battery Saving test.
 
 #### Metadata
   * type: verification
@@ -61,7 +61,7 @@ Battery Saving.
 
 ### System Power Management
 
-Main req.
+System Power Management text.
 
 ---
 
@@ -75,6 +75,8 @@ The system shall activate power-saving mode when the battery level drops below 2
   * verifiedBy: [test_cases/power_saving](#power-saving-test)
 
 ---
+
+
 
 ### CPU Power Reduction
 

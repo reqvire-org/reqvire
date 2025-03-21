@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use crate::relation::{Relation};
 use crate::utils;
+use serde::Serialize;
 
 
 #[derive(Debug, PartialEq)]
@@ -38,13 +39,13 @@ impl SubSection {
 
 
 
-#[derive(Debug, Clone, PartialEq, Eq)] 
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)] 
 pub enum RequirementType {
     System,
     User,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)] 
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)] 
 pub enum ElementType {
     Requirement(RequirementType),
     Verification,
@@ -66,7 +67,7 @@ impl ElementType {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub struct Element {
     pub name: String,
     pub content: String,

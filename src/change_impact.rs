@@ -1,27 +1,13 @@
-use std::collections::HashSet;
+use std::collections::{HashSet, BTreeSet};
 use serde::Serialize;
 use std::path::PathBuf;
 use crate::utils;
-use crate::relation::{Relation, RelationTarget, LinkType,needs_revalidation,needs_review};
+use crate::relation::{Relation, RelationTarget, LinkType, needs_revalidation, needs_review};
 use crate::error::ReqFlowError;
 use crate::element_registry;
 use difference::{Changeset, Difference};
 
-/// A node in the change impact tree.
-#[derive(Debug, Serialize)]
-pub struct PropagationNode {
-    pub element_id: String,
-    /// A summary of the element (e.g. its name).
-    pub element_name: String,
-    /// Optionally, a snippet of the element’s content.
-    pub element_content: Option<String>,
-    /// true if the element’s content has changed (or if it’s newly added)
-    pub is_changed: bool,
-    /// Which relation (by type) triggered this propagation.
-    pub trigger_relation: Option<String>,
-    /// Children in the propagation chain.
-    pub children: Vec<PropagationNode>,
-}
+
 
 /// Represents a simplified relation for reporting.
 #[derive(Debug, Clone, Serialize)]
@@ -37,8 +23,7 @@ pub struct AddedElement {
     pub element_id: String,
     pub new_content: String,
     pub added_relations: Vec<RelationSummary>,
-    /// The change impact tree for this element (wrapped under a dummy root).
-    pub change_impact_tree: PropagationNode,
+    pub change_impact_tree: element_registry::ElementNode,
 }
 
 /// Report for an element that has been removed (only in the reference registry).
@@ -58,8 +43,7 @@ pub struct ChangedElement {
     pub content_changed: bool,
     pub added_relations: Vec<RelationSummary>,
     pub removed_relations: Vec<RelationSummary>,
-    /// The change impact tree for this element (wrapped under a dummy root).
-    pub change_impact_tree: PropagationNode,
+    pub change_impact_tree: element_registry::ElementNode,
 }
 
 /// Report detailing changes between two registries.
@@ -161,17 +145,19 @@ impl<'a> ChangeImpactReport<'a> {
 
         report
     }
-
+    
     pub fn to_text(&self) -> String {
        let mut output = String::new();
        output.push_str("# Change Impact Report\n\n");
 
        // Added Elements section
-       output.push_str("## Added Elements\n\n");
+       if ! &self.added.is_empty(){
+           output.push_str("## Added Elements\n\n");
+       }
        for elem in &self.added {
            output.push_str(&format!("### Element: [{}]({})\n\n", elem.element_id, elem.element_id));
            output.push_str(&format!("#### New Content\n```\n{}\n```\n\n", elem.new_content));
-           if !elem.added_relations.is_empty() {
+           if !elem.added_relations.iter().filter(|rel| !rel.is_opposite).collect::<Vec::<_>>().is_empty() {
                output.push_str("#### Added Relations\n");                          
                for rel in &elem.added_relations {
                    if !rel.is_opposite {
@@ -180,17 +166,34 @@ impl<'a> ChangeImpactReport<'a> {
                }
                output.push_str("\n");               
            }
-           output.push_str("#### Change Impact Tree\n");
-           output.push_str(&format!("{}\n", render_change_impact_tree(&elem.change_impact_tree, 0)));
-           output.push_str("\n---\n\n");
 
+           let rendered_tree = render_change_impact_tree(&elem.change_impact_tree, 0);
+           if !rendered_tree.trim().is_empty() {
+               output.push_str("#### Change Impact Tree\n");
+               output.push_str(&rendered_tree);
+           }
+                      
+           output.push_str("\n---\n\n");
        }
 
        // Removed Elements section
-       output.push_str("## Removed Elements\n\n");
+       if ! &self.removed.is_empty(){
+           output.push_str("## Removed Elements\n\n");
+       }
+       
+
        for elem in &self.removed {
            output.push_str(&format!("### Element: [{}]({})\n\n", elem.element_id, elem.element_id));
            output.push_str(&format!("#### Removed Content\n```\n{}\n```\n\n", elem.old_content));
+           if !elem.removed_relations.iter().filter(|rel| !rel.is_opposite).collect::<Vec::<_>>().is_empty() {
+               output.push_str("#### Removed Relations\n");                          
+               for rel in &elem.removed_relations {
+                   if !rel.is_opposite {
+                       output.push_str(&format!("- **{}** -> [{}]({})\n", rel.relation_type, rel.target.text, rel.target.link.as_str()));
+                   }
+               }
+               output.push_str("\n");               
+           }           
            output.push_str("\n---\n\n");
        }
 
@@ -217,15 +220,18 @@ impl<'a> ChangeImpactReport<'a> {
                }
                output.push_str("\n");               
            }
-           output.push_str("#### Change Impact Tree\n");
-           output.push_str(&format!("{}\n", render_change_impact_tree(&elem.change_impact_tree, 0)));
+           
+           let rendered_tree = render_change_impact_tree(&elem.change_impact_tree, 0);
+           if !rendered_tree.trim().is_empty() {
+               output.push_str("#### Change Impact Tree\n");
+               output.push_str(&rendered_tree);
+           }
+           
            output.push_str("\n---\n\n");
        }
 
-
        output
     }
-
     pub fn to_text_pure(&self) -> String {
         // (Implementation similar to to_text, omitted for brevity.)
         String::new()
@@ -241,131 +247,35 @@ impl<'a> ChangeImpactReport<'a> {
         } else {
             println!("{}", self.to_relative_paths().to_text());
         }
-    }
+    }    
 }
 
-/// Render the change impact tree recursively with indentation.
-fn render_change_impact_tree(node: &PropagationNode, indent: usize) -> String {
-    let mut output = String::new();
-    let pad = "  ".repeat(indent);
-    // Render current node.
-    if let Some(ref relation) = node.trigger_relation {
-        let needs_rev_or_rew= if needs_revalidation(&relation){
-            "[revalidate needed]"    
-        }else if needs_review(&relation){    
-            "[review needed]"
-        }else{
-            ""
-        };
-        let changed_msg=if node.is_changed {
-            format!("{} {}"," [changed]",needs_rev_or_rew)
-        }else{
-            format!("{}",needs_rev_or_rew)    
-    
-        };    
-        output.push_str(&format!("{}- * {}: [{}]({}) {}\n", 
-            pad, 
-            relation,             
-            node.element_name,             
-            node.element_id, 
-            changed_msg
-        ));
-    } else {
-        output.push_str(&format!("{}- [{}]({}) {}\n", 
-            pad, 
-            node.element_name, 
-            node.element_id,             
-            if node.is_changed { " [changed]" } else { "" }
-        ));
-    }
-
-    /*
-    if let Some(ref content) = node.element_content {
-        let snippet = if content.len() > 80 { &content[..80] } else { content };
-        output.push_str(&format!("{}  > {}\n", pad, snippet));
-    }
-    */
-    // Render children.
-    for child in &node.children {
-        output.push_str(&render_change_impact_tree(child, indent + 1));
-    }
-    output
-}
-
-/// Helper to convert a PropagationNode to use relative paths.
-fn propagate_to_relative<F>(node: &PropagationNode, to_relative: &F) -> PropagationNode 
+/// Helper to convert an `ElementNode` to use relative paths.
+fn propagate_to_relative<F>(node: &element_registry::ElementNode, to_relative: &F) -> element_registry::ElementNode 
 where F: Fn(&str) -> String {
-    PropagationNode {
-        element_id: to_relative(&node.element_id),
-        element_name: node.element_name.clone(),
-        element_content: node.element_content.clone(),
-        is_changed: node.is_changed,
-        trigger_relation: node.trigger_relation.clone(),
-        children: node.children.iter().map(|child| propagate_to_relative(child, to_relative)).collect(),
-    }
-}
+     // Convert the element identifier to a relative path
+     let mut relative_element =node.element.clone();
+     relative_element.identifier= to_relative(&node.element.identifier);
 
-/// Converts a relation into a summarized representation.
-fn convert_relation_to_summary(rel: &Relation) -> RelationSummary {
-    RelationSummary {
-        relation_type: rel.relation_type.name.to_string(),
-        target: rel.target.clone(),
-        is_opposite: rel.is_opposite,
-    }
-}		
 
-/// This function uses `change_impact_with_relation` to obtain the flat list of
-/// impacted neighbors (with trigger relation), then recursively builds a tree.
-/// A visited set is used to prevent cycles.
-fn build_change_impact_tree(
-    registry: &element_registry::ElementRegistry,
-    reference: &element_registry::ElementRegistry,
-    root_id: &String,
-    visited: &mut HashSet<String>,
-) -> Vec<PropagationNode> {
-    // Use the new function to get impacted neighbors along with trigger relation.
-    let impacted = registry.change_impact_with_relation(
-        registry.elements.get(root_id).expect("Root element exists")
-    );
-    let mut children = Vec::new();
-    for (neighbor, trigger_relation) in impacted {
-        if !visited.contains(&neighbor) {
-            visited.insert(neighbor.clone());
-            let (element_name, element_content) = if let Some(e) = registry.elements.get(&neighbor) {
-                (e.name.clone(), Some(e.content.clone()))
-            } else {
-                (neighbor.clone(), None)
-            };
-            let child_changed = is_element_changed(&neighbor, registry, reference);
-            let sub_children = build_change_impact_tree(registry, reference, &neighbor, visited);
-            children.push(PropagationNode {
-                element_id: neighbor,
-                element_name,
-                element_content,
-                is_changed: child_changed,
-                trigger_relation: Some(trigger_relation),
-                children: sub_children,
-            });
+
+    // Recursively convert the child relations to relative paths
+    let relative_relations = node.relations.iter().map(|relation| {
+        let mut rel_relative_element = relation.element_node.element.clone();
+        rel_relative_element.identifier= to_relative(&relation.element_node.element.identifier);
+        
+
+        element_registry::RelationNode {
+            relation_trigger: relation.relation_trigger.clone(),
+            element_node: propagate_to_relative(&relation.element_node, to_relative)
         }
+    }).collect();
+
+    // Return the updated ElementNode with relative paths
+    element_registry::ElementNode {
+        element: relative_element,
+        relations: relative_relations,
     }
-    children
-}
-
-
-
-/// Determine whether an element with `id` is changed between the current and reference registries.
-fn is_element_changed(
-    id: &String,
-    current: &element_registry::ElementRegistry,
-    reference: &element_registry::ElementRegistry,
-) -> bool {
-    if let Some(cur_elem) = current.elements.get(id) {
-         if let Some(ref_elem) = reference.elements.get(id) {
-             return cur_elem.hash_impact_content != ref_elem.hash_impact_content;
-         }
-         return true; // Not present in reference => added
-    }
-    false
 }
 
 /// Generate a unified diff in a diff-highlighted markdown code fence.
@@ -401,6 +311,83 @@ fn generate_markdown_diff(old: &str, new: &str) -> String {
 }
 
 
+/// Render the change impact tree recursively with indentation.
+fn render_change_impact_tree(node: &element_registry::ElementNode, indent: usize) -> String {
+    let mut output = String::new();
+    let pad = "  ".repeat(indent);
+
+    // Determine the change message
+    let changed_msg = if node.element.invalidated {
+        "[changed]"
+    } else {
+        ""
+    };
+
+/*
+    // Render the current node
+    output.push_str(&format!(
+        "{}- [{}]({}) {}\n",
+        pad,
+        node.element.name,
+        node.element.identifier,
+        changed_msg
+    ));
+    */
+
+    // Recursively render relation nodes as children
+    for relation_node in &node.relations {
+        let needs_rev_or_rew = if needs_revalidation(&relation_node.relation_trigger) {
+            format!("{} [revalidate needed]",changed_msg)
+        } else if needs_review(&relation_node.relation_trigger) {
+            format!("{} [review needed]",changed_msg)
+        } else {
+            format!("{}",changed_msg)
+        };
+
+        output.push_str(&format!(
+            "{}  * {}: [{}]({}) {}\n",
+            pad,
+            relation_node.relation_trigger,
+            relation_node.element_node.element.name,
+            relation_node.element_node.element.identifier,
+            needs_rev_or_rew
+        ));
+
+        // Recursively render the child node from the relation node directly
+        let child_node = element_registry::ElementNode {
+            element: relation_node.element_node.element.clone(),
+            relations: relation_node.element_node.relations.clone()
+        };
+        output.push_str(&render_change_impact_tree(&child_node, indent + 2));
+    }
+
+    output
+}
+
+/// Converts a relation into a summarized representation.
+fn convert_relation_to_summary(rel: &Relation) -> RelationSummary {
+    RelationSummary {
+        relation_type: rel.relation_type.name.to_string(),
+        target: rel.target.clone(),
+        is_opposite: rel.is_opposite,
+    }
+}	
+
+
+/// Recursively marks nodes as invalidated if their element id is either newly added
+/// or its content has changed.
+fn mark_element_as_invalidated(
+    node: &mut element_registry::ElementNode,
+    added_ids: &HashSet<String>,
+    changed_ids: &HashSet<String>,
+) {
+    if added_ids.contains(&node.element.identifier) || changed_ids.contains(&node.element.identifier) {
+        node.element.invalidated = true;
+    }
+    for relation in &mut node.relations {
+        mark_element_as_invalidated(&mut relation.element_node, added_ids, changed_ids);
+    }
+}
 
 /// Computes the change impact report between two registries and builds the change impact trees
 /// using the registry’s propagation algorithm. Propagation is computed only for added elements
@@ -415,6 +402,27 @@ pub fn compute_change_impact<'a>(
 
     let current_ids: HashSet<&String> = current.elements.keys().collect();
     let reference_ids: HashSet<&String> = reference.elements.keys().collect();
+
+    // Compute the set of added element IDs (present only in current registry).
+    let added_ids: HashSet<String> = current_ids
+        .difference(&reference_ids)
+        .cloned()
+        .cloned()  
+        .collect();
+
+    // Compute the set of changed element IDs (present in both registries with changed content).
+    let changed_ids: HashSet<String> = current_ids
+        .intersection(&reference_ids)
+        .filter_map(|id| {
+            let cur_elem = &current.elements[*id];
+            let ref_elem = &reference.elements[*id];
+            if cur_elem.hash_impact_content != ref_elem.hash_impact_content {
+                Some((*id).clone())
+            } else {
+                None
+            }
+        })
+        .collect();
 
     // Process elements present in both registries.
     for id in current_ids.intersection(&reference_ids) {
@@ -439,17 +447,13 @@ pub fn compute_change_impact<'a>(
 
         let has_changed = content_changed || !added_relations.is_empty() || !removed_relations.is_empty();
         if has_changed {
-            let mut visited = HashSet::new();
+            let mut visited = BTreeSet::new();
             visited.insert((*id).clone());
-            let children = build_change_impact_tree(current, reference, *id, &mut visited);
-            let root_node = PropagationNode {
-                element_id: (*id).clone(),
-                element_name: cur_elem.name.clone(),
-                element_content: Some(cur_elem.content.clone()),
-                is_changed: content_changed,
-                trigger_relation: None,
-                children,
-            };
+            let mut change_impact_tree = current.build_change_impact_tree(current, (*id).to_string(), &mut visited);
+
+            // Mark nodes as invalidated if they are new or their content has changed.
+            mark_element_as_invalidated(&mut change_impact_tree, &added_ids, &changed_ids);
+            
             report.changed.push(ChangedElement {
                 element_id: (*id).clone(),
                 old_content: ref_elem.content.clone(),
@@ -457,7 +461,7 @@ pub fn compute_change_impact<'a>(
                 content_changed,
                 added_relations,
                 removed_relations,
-                change_impact_tree: root_node,
+                change_impact_tree,
             });
         }
     }
@@ -471,28 +475,22 @@ pub fn compute_change_impact<'a>(
             .cloned()
             .map(|rel: Relation| convert_relation_to_summary(&rel))
             .collect();
-        let mut visited = HashSet::new();
+        let mut visited = BTreeSet::new();
         visited.insert((*id).clone());
-        let children = build_change_impact_tree(current, reference, *id, &mut visited);
-        let root_node = PropagationNode {
-            element_id: (*id).clone(),
-            element_name: cur_elem.name.clone(),
-            element_content: Some(cur_elem.content.clone()),
-            is_changed: true,
-            trigger_relation: None,
-            children,
-        };
-
+        let mut change_impact_tree = current.build_change_impact_tree(current, (*id).to_string(), &mut visited);
         
+        // Mark nodes as invalidated if they are new or (if applicable) changed.
+        mark_element_as_invalidated(&mut change_impact_tree, &added_ids, &changed_ids);
+
         report.added.push(AddedElement {
             element_id: (*id).clone(),
             new_content: cur_elem.content.clone(),
             added_relations,
-            change_impact_tree: root_node,
+            change_impact_tree,
         });
     }
 
-    // Process removed elements (unchanged from before).
+    // Process removed elements (present only in reference registry).
     for id in reference_ids.difference(&current_ids) {
         let ref_elem = &reference.elements[*id];
         let removed_relations: Vec<_> = ref_elem
@@ -508,7 +506,6 @@ pub fn compute_change_impact<'a>(
         });
     }
 
-
-    
     Ok(report)
 }
+
