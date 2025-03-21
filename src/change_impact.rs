@@ -2,7 +2,7 @@ use std::collections::HashSet;
 use serde::Serialize;
 use std::path::PathBuf;
 use crate::utils;
-use crate::relation::{Relation, RelationTarget, LinkType};
+use crate::relation::{Relation, RelationTarget, LinkType,needs_revalidation,needs_review};
 use crate::error::ReqFlowError;
 use crate::element_registry;
 use difference::{Changeset, Difference};
@@ -250,12 +250,25 @@ fn render_change_impact_tree(node: &PropagationNode, indent: usize) -> String {
     let pad = "  ".repeat(indent);
     // Render current node.
     if let Some(ref relation) = node.trigger_relation {
+        let needs_rev_or_rew= if needs_revalidation(&relation){
+            "[revalidate needed]"    
+        }else if needs_review(&relation){    
+            "[review needed]"
+        }else{
+            ""
+        };
+        let changed_msg=if node.is_changed {
+            format!("{} {}"," [changed]",needs_rev_or_rew)
+        }else{
+            format!("{}",needs_rev_or_rew)    
+    
+        };    
         output.push_str(&format!("{}- * {}: [{}]({}) {}\n", 
             pad, 
             relation,             
             node.element_name,             
             node.element_id, 
-            if node.is_changed { " [changed]" } else { "" }
+            changed_msg
         ));
     } else {
         output.push_str(&format!("{}- [{}]({}) {}\n", 
@@ -265,6 +278,7 @@ fn render_change_impact_tree(node: &PropagationNode, indent: usize) -> String {
             if node.is_changed { " [changed]" } else { "" }
         ));
     }
+
     /*
     if let Some(ref content) = node.element_content {
         let snippet = if content.len() > 80 { &content[..80] } else { content };
