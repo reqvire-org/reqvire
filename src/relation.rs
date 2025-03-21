@@ -63,19 +63,19 @@ lazy_static! {
             name: "refinedBy", 
             direction: RelationDirection::Forward, 
             opposite: Some("refine"),
-            description: "Element is souce elemened being refined by other element.",
+            description: "A souce element being refined by other element.",
         });        
         
         // Satisfy relations
         m.insert("satisfiedBy", RelationTypeInfo {
             name: "satisfiedBy", 
-            direction: RelationDirection::Backward, 
+            direction: RelationDirection::Forward, 
             opposite: Some("satisfy"),
-            description: "Element is satisfied by another element",
+            description: "A souce element being satisfied by other element.",
         });
         m.insert("satisfy", RelationTypeInfo {
             name: "satisfy", 
-            direction: RelationDirection::Forward, 
+            direction: RelationDirection::Backward, 
             opposite: Some("satisfiedBy"),
             description: "Element satisfies another element",
         });
@@ -83,13 +83,13 @@ lazy_static! {
         // Verify relations
         m.insert("verifiedBy", RelationTypeInfo {
             name: "verifiedBy", 
-            direction: RelationDirection::Backward, 
+            direction: RelationDirection::Forward, 
             opposite: Some("verify"),
-            description: "Element is verified by another element",
+            description: "A souce element being verified by other element.",
         });
         m.insert("verify", RelationTypeInfo {
             name: "verify", 
-            direction: RelationDirection::Forward, 
+            direction: RelationDirection::Backward, 
             opposite: Some("verifiedBy"),
             description: "Element verifies another element",
         });
@@ -211,6 +211,23 @@ impl Relation {
 /// Check if a relation type is supported according to the DSD
 pub fn is_supported_relation_type(relation_type: &str) -> bool {
     RELATION_TYPES.contains_key(relation_type)
+}
+
+/// Check if revalidation is needed
+pub fn needs_revalidation(relation_type: &str) -> bool {
+    if RELATION_TYPES.contains_key(relation_type) {
+        relation_type == "verifiedBy"
+    } else {
+        false
+    }
+}
+/// Check if review is needed
+pub fn needs_review(relation_type: &str) -> bool {
+    if RELATION_TYPES.contains_key(relation_type) {
+        relation_type == "satisfiedBy"
+    } else {
+        false
+    }
 }
 
 /// Get the list of all supported relation types
