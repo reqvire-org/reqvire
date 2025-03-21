@@ -59,10 +59,15 @@ Battery Saving.
 
 ## Requirements
 
+### System Power Management
+
+Main req.
+
+---
 
 ### Power Saving Mode
 
-The system shall activate power-saving mode when the battery level drops below 20%.  
+The systsem shall activate power-saving mode when the battery level drops below 20%.  
 
 #### Relations
   * refine: [System Power Management](#system-power-management)
