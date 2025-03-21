@@ -48,7 +48,7 @@ graph LR;
 ---
 
 ### Coexistence of Structured and Unstructured Documents
-The system shall allow structured markdown and unstructured (eg., markdown, PDFs, DOCX, raw text) documents to coexist within the same MBSE model.
+The system shall allow structured markdown and unstructured. (eg., markdown, PDFs, DOCX, raw text) documents to coexist within the same MBSE model.
 
 #### Relations
   * refine: [UserStories.md/Managing MBSE Models](UserStories.md#managing-mbse-models)
@@ -57,14 +57,6 @@ The system shall allow structured markdown and unstructured (eg., markdown, PDFs
 
 ### Efficient Processing
 The system shall process structured documents and relations to extract model-relevant information efficiently.
-
-#### Relations
-  * refine: [UserStories.md/Managing MBSE Models](UserStories.md#managing-mbse-models)
-
----
-
-### Bootstrap model struture
-The system shall provide a command to automatically bootstrap a predefined directory and file structure for an MBSE model, ensuring compliance with ReqFlow methodology.
 
 #### Relations
   * refine: [UserStories.md/Managing MBSE Models](UserStories.md#managing-mbse-models)
@@ -375,7 +367,7 @@ The system shall provide linting capability to ensure consistent formatting in r
 The system shall generate an index.md file in the specifications root folder during linting that contains a structured summary of all specification documents and folders.
 
 #### Relations
-  * refine: [UserStories.md/Managing MBSE Models](UserStories.md#managing-mbse-models)
+  * derivedFrom: [UserStories.md/Managing MBSE Models](UserStories.md#managing-mbse-models)
 
 ---
 
@@ -850,8 +842,3 @@ The system shall export specifications into HTML format and save in designated o
 
 ---
 
-### Support CI/CD Integration
-The system shall integrate with CI/CD pipelines to generate or update traceability matrices as part of automated workflows.
-
-#### Relations
-  * refine: [UserStories.md/Automate Traceability Matrix](UserStories.md#generate-traceability-matrix)

@@ -194,15 +194,6 @@ The system shall display linting change suggestions in a git-style diff format, 
 
 ---
 
-### Automated Multiple Linting Passes 
-The system shall support automatic multiple linting passes with a configurable iteration limit to ensure all interdependent formatting issues are resolved without requiring multiple manual invocations.
-
-#### Relations
-  * refine: [Multi-Pass Linting Capability](#multi-pass-linting-capability)
-  * satisfiedBy: [linting/mod.rs](../../src/linting/mod.rs)
-
----
-
 ### Parallel Linting Processing
 The system shall implement parallel processing for linting operations when possible, leveraging multi-core capabilities to improve performance on large documentation sets.
 
@@ -221,26 +212,6 @@ The system shall respect configured excluded filename patterns when performing l
 
 ---
 
-### Index Generation During Linting
-The system shall generate or update an index.md file in the specifications root directory when linting is performed, creating a structured table of contents that links to all documentation files.
-
-#### Relations
-  * derivedFrom: [UserRequirements.md/Generate Documentation Index](../UserRequirements.md#generate-documentation-index)
-  * satisfiedBy: [linting/index_generator.rs](../../src/linting/index_generator.rs)
-
----
-
-### Directory Structure Processing
-The system shall parse the 'specifications' and 'external folders' directory structure using the configured paths from reqflow.yaml to identify documentation files and their hierarchical relationships.
-
-#### Details
-TODO: this needs to be more clear on what folders to walk
-
-#### Relations
-  * refine: [Index Generator Implementation](#index-generator-implementation)
-  * satisfiedBy: [linting/index_generator.rs](../../src/linting/index_generator.rs)
-
----
 
 ## Configuration
 ```mermaid
@@ -450,7 +421,7 @@ The system shall provide different output results in machine-readable JSON forma
 
 ---
 
-### Index Generator Implementation
+### Index Generation
 
 The system shall implement an IndexGenerator component that traverses the specifications directory structure and creates a hierarchical README.md file with links to documents and elements.
 
@@ -501,7 +472,7 @@ The system shall allow unstructured documents to be ignored during processing.
 TODO: add requirment that defines a config filter out patterns.
 
 #### Relations
-  * derivedFrom: [UserRequirements.md#Unstructured Documents](../UserRequirements.md#unstructured-documents)
+  * derivedFrom: [UserRequirements.md#Coexistence of Structured and Unstructured Documents](../UserRequirements.md#coexistence-of-structured-and-unstructured-documents)
 
 ---
 
@@ -592,13 +563,16 @@ graph LR;
 ---
 
 ### Requirements Processing
-The system shall find and process all requirements in  'external_folders' and it's subfolders' consistently and 'system requirements'.
+
+The system shall parse the 'specifications' and 'external folders' directory structure using the configured paths from reqflow.yaml to identify system elements files and their hierarchical relationships.
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Support for Distributed Requirements](../UserRequirements.md#support-for-distributed-requirements)
   * satisfiedBy: [model.rs](../../src/model.rs)
+  * satisfiedBy: [parser.rs](../../src/parser.rs)  
 
 ---
+
 
 ### Requirements Files Search and Detection
 The system shall identify and categorize files in the `specifications` and `external_folders` directories as **Stakeholder Needs Requirements**, **System Requirements**, or **Not a Requirements File** based on predefined rules.
@@ -987,6 +961,7 @@ graph LR;
 ---
 
 ### Markdown Structure Validator
+
 The system shall implement a markdown structure validator that enforces ReqFlow's requirements for header levels, element structure, relation formatting, and other markdown-specific syntax rules, reporting violations with line numbers and suggested fixes.
 
 #### Relations

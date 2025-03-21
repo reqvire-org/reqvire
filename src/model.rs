@@ -50,7 +50,7 @@ impl ModelManager {
         let files = utils::scan_markdown_files(git_commit_hash, &specification_folder, &external_folders, excluded_filename_patterns);
         //   .into_iter().map(|(path,_)| path).collect();
            
-        debug!("Found {} markdown files to update with diagrams", files.len());
+        debug!("Found {} markdown files.", files.len());
 
 
         let file_iterator = filesystem::FileReaderIterator::new(git_commit_hash,files.to_vec());

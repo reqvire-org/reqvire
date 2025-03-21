@@ -194,12 +194,12 @@ pub fn handle_command(
             
             let mut refference_model_manager = ModelManager::new();      
             let _not_interested=refference_model_manager.parse_and_validate(Some(&args.git_commit), &specification_folder_path, &external_folders_path,excluded_filename_patterns);
-
                         
-            let report = change_impact::compute_change_impact(&model_manager.element_registry, &refference_model_manager.element_registry);
-            
-            report.print(args.json); 
-            
+            match change_impact::compute_change_impact(&model_manager.element_registry, &refference_model_manager.element_registry,&specification_folder_path, &external_folders_path) {
+                Ok(report) => report.print(args.json),
+                Err(e) => eprintln!("❌ Failed to generate chage impact report {:?}", e),
+            }
+
             return Ok(0);
             
                                       

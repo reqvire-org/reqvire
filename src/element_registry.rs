@@ -3,6 +3,7 @@ use crate::element;
 use crate::relation;
 use crate::error::ReqFlowError;
 
+use std::collections::HashSet;
 
 #[derive(Debug)]
 pub struct ElementRegistry {
@@ -61,19 +62,47 @@ impl ElementRegistry {
     }
 
         
-    /// Finds an element referenced by a relation.
-    /// Returns `Some(&Element)` if the relation's target is an internal identifier
-    /// that exists in the registry; otherwise returns `None`.
-    pub fn find_related_element(&self, relation: &relation::Relation) -> Option<&element::Element> {
-        match &relation.target.link {
-            relation::LinkType::Identifier(id) => self.elements.get(id),
-            relation::LinkType::ExternalUrl(_url) => None,
+    // to return both the impacted element and the trigger relation.
+    pub fn change_impact_with_relation(&self, changed: &crate::element::Element) -> HashSet<(String, String)> {
+        let mut impacted = HashSet::new();
+        let mut worklist = Vec::new();
+
+        // Start with the changed element’s identifier (with no trigger at the root).
+        worklist.push((&changed.identifier, None));
+
+        while let Some((current_id, _prev_relation)) = worklist.pop() {
+            for (_id, elem) in &self.elements {
+                for relation in &elem.relations {
+                    if let relation::LinkType::Identifier(ref target_id) = relation.target.link {
+                            match relation.relation_type.direction {
+                                relation::RelationDirection::Forward => {
+                                    if &elem.identifier == current_id {
+                                        if !impacted.contains(&(target_id.clone(), relation.relation_type.name.to_string())) {
+                                            if self.elements.contains_key(target_id) {
+                                                impacted.insert((target_id.clone(), relation.relation_type.name.to_string()));
+                                                worklist.push((target_id, Some(relation.relation_type.name.to_string())));
+                                            }
+                                        }
+                                    }
+                                },
+                                
+                                relation::RelationDirection::Backward => {
+                                    if target_id == current_id {
+                                        if !impacted.contains(&(elem.identifier.clone(), relation.relation_type.name.to_string())) {
+                                            impacted.insert((elem.identifier.clone(), relation.relation_type.name.to_string()));
+                                            worklist.push((&elem.identifier, Some(relation.relation_type.name.to_string())));
+                                        }
+                                    }
+                                },
+                                
+                                //relation::RelationDirection::Backward  => { /* Do nothing */ }
+                                relation::RelationDirection::Neutral => { /* Do nothing */ }
+                            }
+                    }
+                }
+            }
         }
-    }
-        
-    /// Searches though the elements relations to calculate change impact
-    pub fn change_impact(&self, _element: element::Element) -> bool {
-       true
+        impacted
     }
 
 }

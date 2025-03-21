@@ -57,7 +57,7 @@ The verification test checks that ReqFlow correctly identifies and fixes excess 
 #### Relations
   * verify: [SystemRequirements/Requirements.md/Excess Whitespace Linting Implementation](../SystemRequirements/Requirements.md#excess-whitespace-linting-implementation)
   * verify: [SystemRequirements/Requirements.md/Dry Run Mode Implementation](../SystemRequirements/Requirements.md#dry-run-mode)
-  * trace: [tests/e2e-linting/test_whitespace_linting.sh](../../tests/e2e-linting/test_whitespace_linting.sh)
+  * trace: [tests/e2e-lint-expected/test.sh](../../tests/e2e-lint-expected/test.sh)
 
 ---
 
@@ -92,4 +92,4 @@ The verification test checks that ReqFlow correctly processes requirements in ex
 #### Relations
   * verify: [SystemRequirements/Requirements.md#External Folders Support](../SystemRequirements/Requirements.md#external-folders-support)
   * verify: [SystemRequirements/Requirements.md#Directory Structure Processing](../SystemRequirements/Requirements.md#directory-structure-processing)
-  * trace: [tests/e2e-external-folders/test_external_folders.sh](../../tests/e2e-external-folders/test_external_folders.sh)
+  * trace: [tests/test-external-folders/test.sh](../../test-external-folders/test.sh)

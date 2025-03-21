@@ -53,7 +53,7 @@ lazy_static! {
         // Refine relation
         m.insert("refine", RelationTypeInfo {
             name: "refine", 
-            direction: RelationDirection::Forward, 
+            direction: RelationDirection::Backward,
             opposite: Some("refinedBy"),
             description: "Element refines a higher-level element",
         });
@@ -61,9 +61,9 @@ lazy_static! {
         // Refine relation
         m.insert("refinedBy", RelationTypeInfo {
             name: "refinedBy", 
-            direction: RelationDirection::Backward, 
+            direction: RelationDirection::Forward, 
             opposite: Some("refine"),
-            description: "Element is source for a element refining it",
+            description: "Element is souce elemened being refined by other element.",
         });        
         
         // Satisfy relations
@@ -134,6 +134,7 @@ impl LinkType {
 pub struct Relation {
     pub relation_type: &'static RelationTypeInfo,
     pub target: RelationTarget,
+    pub is_opposite: bool
 }
 
 impl Relation {
@@ -144,7 +145,8 @@ impl Relation {
             .ok_or_else(|| ReqFlowError::UnsupportedRelationType(relation_type.to_string()))?;
         Ok(Self {
             relation_type: relation_info,
-            target: RelationTarget{text: text, link: link}
+            target: RelationTarget{text: text, link: link},
+            is_opposite: false,
         })
     }
     
@@ -156,6 +158,14 @@ impl Relation {
             LinkType::ExternalUrl(link.to_string())
         }
     }
+
+    pub fn update_target_identifier_link_url(&mut self, url: &str)  {
+        match self.target.link {
+            LinkType::Identifier(_) =>  self.target.link=LinkType::Identifier(url.to_string()),
+            _ =>{}
+        };  
+    }
+
 
     /// Determines whether the given string is a path reference (i.e., identifier).
     fn is_path_reference(link: &str) -> bool {
@@ -183,8 +193,9 @@ impl Relation {
                     relation_type: opposite_info,
                     target: RelationTarget {
                         text: name.to_string(),
-                        link: LinkType::Identifier(identifier.to_string()),
+                        link: LinkType::Identifier(identifier.to_string())
                     },
+                    is_opposite: true                    
                 })
             } else {
                 None
