@@ -14,83 +14,22 @@ Verification artifacts must be marked for revalidation to reflect changes.
 Automated tools should flag all impacted requirements for review.
 
 
-## Relation Types and Change Propagation Rules
+## Relation Types and Change Propagation
 
-### Parent-Child Relationship Impact
+The specific relation types, their directionality, and change propagation behaviors are defined in the [RelationTypesRegistry.md](RelationTypesRegistry.md) document, which serves as the single source of truth for all relation types in the system.
 
-These relations define hierarchical connections where changes to a parent requirement propagate to child requirements.
+This document focuses on the implementation and mechanics of change propagation, while the registry defines the specific behaviors for each relation type.
 
-#### containedBy
-Links a child requirement to a parent requirement. Changes in the parent propagate to the child.
+### Relation Categories for Change Propagation
 
-#### contain
-Links a parent requirement to a child requirement. Changes in the parent propagate to the child.
+For change propagation purposes, relations can be categorized into several groups:
 
-#### derivedFrom
-Links a child requirement to a parent requirement. Changes in the parent propagate to the child.
+1. **Hierarchical Relations** - Changes propagate from parent to child elements (containedBy, contain, derivedFrom, derive, refine, refinedBy)
+2. **Satisfaction Relations** - Changes to requirements affect implementations (satisfiedBy, satisfy)
+3. **Verification Relations** - Changes to requirements invalidate verifications (verifiedBy, verify)
+4. **Traceability Relations** - No change propagation, for documentation only (trace)
 
-#### derive
-Links a parent requirement to a child requirement. Changes in the parent propagate to the child.
-
-#### refine
-Links a child requirement to a parent requirement. Changes in the parent propagate to the child.
-
-#### refinedBy
-Links a parent requirement to a child requirement. Changes in the parent propagate to the child.
-
-
----
-
-### Requirement Satisfaction and Design Impact
-
-These relations define how a requirement is satisfied by design, code, or architecture.
-
-#### satisfiedBy
-Links a requirement to code, architecture, or specifications that satisfy it. Changes in the requirement propagate to the satisfying resource.
-
-#### satisfy
-Links a design artifact to the requirement it satisfies. Changes in the requirement propagate to the satisfying resource.
-
-
----
-
-### Verification and Validation Impact
-
-These relations define verification artifacts that confirm a requirement is met.
-
-#### verifiedBy
-Links a requirement to a document or test that verifies it. Changes in the requirement propagate to the verification artifact, requiring re-validation.
-
-#### verify
-Links a verification document to the requirement it verifies. Changes in the requirement propagate to the verification artifact, requiring re-validation.
-
-
----
-
-### Traceability and Non-Propagating Relations
-
-These relations establish soft traceability and do not propagate changes. It is omnidirectional.
-
-#### trace
-Soft traceability relation pointing to a source. No direct impact on change propagation.
-
----
-
-## Relation Types and Change Propagation Rules table
-
-| Relation Type | Direction | Impact of Change                                          |
-|---------------|-----------|-----------------------------------------------------------|
-| **containedBy** | Child Req. →  Parent Req. | Changes in the parent propagate down to the child. |
-| **contain**     | Parent Req. → Child Req. | Changes in the parent propagate down to the child.|
-| **derivedFrom** | Child Req. → Parent Req. | Changes in the parent propagate down to the child. |
-| **derive**      | Parent Req. → Child Req.| Changes in the parent propagate down to the child. |
-| **refine**      | Child Req. → Parent Req.| Changes propagate bidirectionally. |
-| **refinedBy**   | Parent Req. → Child Req. | Changes in the parent propagate down to the child.|
-| **satisfiedBy** | Requirement → Artifact | Changes in Requirement propagate down to the design, code, or implementation artifact. |
-| **satisfy**     | Artifact → Requirement | Changes in Requirement propagate down to the design, code, or implementation artifact. |
-| **verifiedBy**  | Requirement → Verification |  Changes in Requirement propagate down to the verification/test. |
-| **verifiy**     | Verification → Requirement  |  Changes in Requirement propagate down to the verification/test. |
-| **trace**       | Traceability (non-propagating) | No propagation, for documentation only. |
+See the [RelationTypesRegistry.md](RelationTypesRegistry.md) document for the complete definition of each relation type, including its directionality and change propagation behavior.
 
 ---
 
