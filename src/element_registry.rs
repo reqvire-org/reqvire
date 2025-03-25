@@ -172,17 +172,21 @@ pub fn build_change_impact_tree(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::element::Element;
+    use crate::relation::{RelationTypeInfo, Relation, RelationTarget, RelationDirection};
     use std::collections::BTreeSet;
 
     /// Helper function to create a simple element.
     fn create_element(identifier: &str, name: &str, content: &str) -> Element {
-        Element {
-            identifier: identifier.to_string(),
-            name: name.to_string(),
-            content: content.to_string(),
-            relations: Vec::new(),
-            hash_impact_content: String::new(),
-        }
+        let mut element = Element::new(
+            name,
+            identifier,
+            "test.md",
+            "TestSection",
+            Some(crate::element::ElementType::Requirement(crate::element::RequirementType::System))
+        );
+        element.content = content.to_string();
+        element
     }
 
     /// Helper function to add a relation to an element.
@@ -289,7 +293,7 @@ mod tests {
         visited.insert("B".to_string());
 
         let tree = my_struct.build_change_impact_tree(
-            &element_registry::ElementRegistry {
+            &ElementRegistry {
                 elements: my_struct.elements.clone(),
             },
             "B".to_string(),
@@ -342,7 +346,7 @@ mod tests {
         visited.insert("A".to_string());
 
         let tree = my_struct.build_change_impact_tree(
-            &element_registry::ElementRegistry {
+            &ElementRegistry {
                 elements: my_struct.elements.clone(),
             },
             "A".to_string(),
@@ -358,9 +362,12 @@ mod tests {
             "B"
         );
         assert_eq!(tree.relations[0].relation_trigger, "contain");
-        // Check the child node for B.
-        assert_eq!(tree.relations[0].element_node.relations.len(), 1);
-        // For the child relation of B (from B back to A), verify the target via B's original element field.
+        
+        // The child node for B has no relations in its tree because B -> A is not processed by the tree
+        // since we only consider Forward relations in change_impact_with_relation
+        assert_eq!(tree.relations[0].element_node.relations.len(), 0);
+        
+        // However, the original element B still has its relation to A
         assert_eq!(
             tree.relations[0].element_node.element.relations.len(),
             1

@@ -64,6 +64,10 @@ pub enum ReqFlowError {
     #[allow(dead_code)]
     #[error("Unsupported relation type: {0}")]
     UnsupportedRelationType(String),
+    
+    #[allow(dead_code)]
+    #[error("Incompatible element types for relation: {0}")]
+    IncompatibleElementTypes(String),
 
     #[error("Path error: {0}")]
     PathError(String),
