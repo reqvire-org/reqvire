@@ -160,18 +160,8 @@ Relations must follow a **structured reference format** to ensure clear traceabi
    - Allowed characters: `[a-zA-Z]`
    - Minimum length: **2 characters**  
    - Maximum length: **80 characters**  
-   - Must be one of the predefined, case-sensitive types:
-     - containedBy
-     - contain
-     - derivedFrom
-     - derive
-     - refine
-     - satisfiedBy
-     - satisfy
-     - verifiedBy
-     - verify
-     - tracedFrom
-     - trace
+   - Must be one of the predefined, case-sensitive types defined in the [RelationTypesRegistry.md](RelationTypesRegistry.md) document
+   - See the [RelationTypesRegistry.md](RelationTypesRegistry.md) for the complete list of supported relation types, their directionality, and change propagation behaviors
 
 #### 3. **Target Identifier**
    - Specifies the target of the relation.
