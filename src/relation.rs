@@ -318,6 +318,147 @@ pub fn get_parent_relation_types() -> Vec<&'static str> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::element::{ElementType, RequirementType};
 
+    #[test]
+    fn test_validate_relation_element_types_verify() {
+        let req_type = ElementType::Requirement(RequirementType::System);
+        let verification_type = ElementType::Verification;
+        
+        // verifiedBy: requirement -> verification
+        assert!(validate_relation_element_types("verifiedBy", &req_type, &verification_type));
+        // verify: verification -> requirement
+        assert!(validate_relation_element_types("verify", &verification_type, &req_type));
+        
+        // Invalid combinations
+        assert!(!validate_relation_element_types("verifiedBy", &verification_type, &req_type));
+        assert!(!validate_relation_element_types("verify", &req_type, &verification_type));
+    }
+
+    #[test]
+    fn test_validate_relation_element_types_satisfy() {
+        let req_type = ElementType::Requirement(RequirementType::System);
+        let impl_type = ElementType::Other("implementation".to_string());
+        
+        // satisfiedBy: requirement -> implementation
+        assert!(validate_relation_element_types("satisfiedBy", &req_type, &impl_type));
+        // satisfy: implementation -> requirement
+        assert!(validate_relation_element_types("satisfy", &impl_type, &req_type));
+        
+        // Invalid combinations
+        assert!(!validate_relation_element_types("satisfiedBy", &impl_type, &req_type));
+        assert!(!validate_relation_element_types("satisfy", &req_type, &impl_type));
+    }
+
+    #[test]
+    fn test_validate_relation_element_types_other() {
+        let req_type = ElementType::Requirement(RequirementType::System);
+        let other_type = ElementType::Other("sometype".to_string());
+        
+        // Other relation types should not be validated strictly
+        assert!(validate_relation_element_types("derive", &req_type, &other_type));
+        assert!(validate_relation_element_types("derivedFrom", &other_type, &req_type));
+        assert!(validate_relation_element_types("contain", &req_type, &other_type));
+        assert!(validate_relation_element_types("trace", &req_type, &other_type));
+    }
 }
 
+
+/// Validates if the element types are appropriate for a given relation type
+/// Returns true if the types are compatible, false otherwise
+pub fn validate_relation_element_types(
+    relation_type: &str,
+    source_type: &crate::element::ElementType,
+    target_type: &crate::element::ElementType
+) -> bool {
+    use crate::element::ElementType;
+    use crate::element::RequirementType;
+
+    match relation_type {
+        "verifiedBy" => {
+            // Source should be a requirement and target should be a verification
+            matches!(source_type, ElementType::Requirement(_)) && 
+            matches!(target_type, ElementType::Verification)
+        },
+        "verify" => {
+            // Source should be a verification and target should be a requirement
+            matches!(source_type, ElementType::Verification) && 
+            matches!(target_type, ElementType::Requirement(_))
+        },
+        "satisfiedBy" => {
+            // Source should be a requirement and target should be an implementation (or any element that can satisfy)
+            matches!(source_type, ElementType::Requirement(_)) && 
+            (match target_type {
+                ElementType::Other(impl_type) => impl_type.contains("implementation") || impl_type.contains("design"),
+                _ => false
+            })
+        },
+        "satisfy" => {
+            // Source should be an implementation and target should be a requirement
+            (match source_type {
+                ElementType::Other(impl_type) => impl_type.contains("implementation") || impl_type.contains("design"),
+                _ => false
+            }) && 
+            matches!(target_type, ElementType::Requirement(_))
+        },
+        // For other relation types, no specific element type validation
+        _ => true
+    }
+}
+
+/// Gets a detailed description of the expected element types for a relation
+pub fn get_relation_element_type_description(relation_type: &str) -> Option<String> {
+    match relation_type {
+        "verifiedBy" => Some("'verifiedBy' should connect a requirement to a verification element".to_string()),
+        "verify" => Some("'verify' should connect a verification element to a requirement".to_string()),
+        "satisfiedBy" => Some("'satisfiedBy' should connect a requirement to an implementation element".to_string()),
+        "satisfy" => Some("'satisfy' should connect an implementation element to a requirement".to_string()),
+        _ => None
+    }
+}
+
+/// Validates element types for a relation and returns an error if validation fails
+/// Returns None if validation passes or if the relation type doesn't have element type restrictions
+pub fn validate_and_get_element_type_error(
+    relation_type: &str,
+    source_element: &crate::element::Element,
+    target_element: &crate::element::Element
+) -> Option<crate::error::ReqFlowError> {
+    // Only validate relation types with element type restrictions
+    if let Some(expected_types) = get_relation_element_type_description(relation_type) {
+        // Check if the element types are compatible
+        let is_valid = validate_relation_element_types(
+            relation_type, 
+            &source_element.element_type, 
+            &target_element.element_type
+        );
+        
+        if !is_valid {
+            // For verifiedBy/verify relations, return errors
+            if relation_type == "verifiedBy" || relation_type == "verify" {
+                return Some(crate::error::ReqFlowError::IncompatibleElementTypes(
+                    format!("Relation '{}' from '{}' ({:?}) to '{}' ({:?}) has incompatible element types. {}",
+                        relation_type,
+                        source_element.identifier,
+                        source_element.element_type,
+                        target_element.identifier,
+                        target_element.element_type,
+                        expected_types
+                    )
+                ));
+            } else {
+                // For other relation types with type restrictions, log a warning
+                log::warn!("Relation '{}' from '{}' ({:?}) to '{}' ({:?}) may have incompatible element types. {}",
+                    relation_type,
+                    source_element.identifier,
+                    source_element.element_type,
+                    target_element.identifier,
+                    target_element.element_type,
+                    expected_types
+                );
+            }
+        }
+    }
+    
+    None
+}

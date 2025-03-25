@@ -132,11 +132,19 @@ impl ModelManager {
                             errors.push(ReqFlowError::MissingRelationTarget(
                                 format!("Element '{}' references missing target '{}'", source_element.identifier, target_id),
                             ));
-                        } else {
+                        } else {                                                  
                             // If the target exists, check if the relation type has an opposite defined.
                             if let Some(opposite_name) = relation.relation_type.opposite {
                                 // Check if the target element already has the opposite relation.
-                                if let Some(target_element) = self.element_registry.elements.get(target_id) {
+                                if let Some(target_element) = self.element_registry.elements.get(target_id) { 
+                                    // Validate element types for the relation                                                                        
+                                   if let Some(error) = relation::validate_and_get_element_type_error(
+                                       relation.relation_type.name, 
+                                       source_element, 
+                                       target_element
+                                    ){
+                                       errors.push(error);
+                                    };                                                                         
                                     let already_present = target_element.relations.iter().any(|r| {
                                         if let relation::LinkType::Identifier(ref id) = r.target.link {
                                             id == source_id && r.relation_type.name.eq_ignore_ascii_case(opposite_name)

@@ -10,17 +10,17 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  cea8390c33["Invalid Relation Types Test"];
-  click cea8390c33 "ValidationTests.md#invalid-relation-types-test";
-  class cea8390c33 verification;
+  d0187b8703["Duplicate Relations Test"];
+  click d0187b8703 "ValidationTests.md#duplicate-relations-test";
+  class d0187b8703 verification;
   bdfd9d65e4["SystemRequirements/Requirement.md/Detailed Error Handling and Logging"];
   class bdfd9d65e4 requirement;
   click bdfd9d65e4 "../SystemRequirements/Requirements.md#detailed-error-handling-and-logging";
-  cea8390c33 -->|verifies| bdfd9d65e4;
+  d0187b8703 -->|verifies| bdfd9d65e4;
   c86fd6ece7["tests/test-invalid-relations/test.sh"];
   class c86fd6ece7 default;
   click c86fd6ece7 "../../tests/test-invalid-relations/test.sh";
-  cea8390c33 -->|traces| c86fd6ece7;
+  d0187b8703 -->|traces| c86fd6ece7;
   47e4d671c1["Unsupported Relation Type Test"];
   click 47e4d671c1 "ValidationTests.md#unsupported-relation-type-test";
   class 47e4d671c1 verification;
@@ -28,16 +28,11 @@ graph LR;
   class 5870488e00 requirement;
   click 5870488e00 "../SystemRequirements/Requirements.md#relation-type-validation";
   47e4d671c1 -->|verifies| 5870488e00;
-  b598b28754["Invalid Relation Format Test"];
-  click b598b28754 "ValidationTests.md#invalid-relation-format-test";
-  class b598b28754 verification;
-  b598b28754 -->|verifies| bdfd9d65e4;
-  b598b28754 -->|traces| c86fd6ece7;
-  d0187b8703["Duplicate Relations Test"];
-  click d0187b8703 "ValidationTests.md#duplicate-relations-test";
-  class d0187b8703 verification;
-  d0187b8703 -->|verifies| bdfd9d65e4;
-  d0187b8703 -->|traces| c86fd6ece7;
+  cea8390c33["Invalid Relation Types Test"];
+  click cea8390c33 "ValidationTests.md#invalid-relation-types-test";
+  class cea8390c33 verification;
+  cea8390c33 -->|verifies| bdfd9d65e4;
+  cea8390c33 -->|traces| c86fd6ece7;
   5ee74702ae["Missing Relation Target Test"];
   click 5ee74702ae "ValidationTests.md#missing-relation-target-test";
   class 5ee74702ae verification;
@@ -46,6 +41,18 @@ graph LR;
   class 4f48cb5e3a default;
   click 4f48cb5e3a "../../tests/test-missing-targets/test.sh";
   5ee74702ae -->|traces| 4f48cb5e3a;
+  b598b28754["Invalid Relation Format Test"];
+  click b598b28754 "ValidationTests.md#invalid-relation-format-test";
+  class b598b28754 verification;
+  b598b28754 -->|verifies| bdfd9d65e4;
+  b598b28754 -->|traces| c86fd6ece7;
+  
+  e5f7a9b123["Element Type Validation Test"];
+  click e5f7a9b123 "ValidationTests.md#element-type-validation-test";
+  class e5f7a9b123 verification;
+  e5f7a9b123 -->|verifies| a2c6d8e540["SystemRequirements/Requirement.md/Relation Element Type Validator"];
+  class a2c6d8e540 requirement;
+  click a2c6d8e540 "../SystemRequirements/Requirements.md#relation-element-type-validator";
 ```
 
 ---
@@ -196,3 +203,42 @@ The verification test checks that ReqFlow correctly identifies and reports relat
 #### Relations
   * verify: [SystemRequirements/Requirement.md/Detailed Error Handling and Logging](../SystemRequirements/Requirements.md#detailed-error-handling-and-logging)
   * trace: [tests/test-missing-targets/test.sh](../../tests/test-missing-targets/test.sh)
+  
+---
+
+### Element Type Validation Test
+The verification test checks that ReqFlow correctly validates relation types against the element types they connect, ensuring that relations like verifiedBy/verify and satisfiedBy/satisfy connect appropriate element types.
+
+#### Metadata
+  * type: verification
+
+#### Acceptance Criteria
+- System should validate that verifiedBy/verify relations connect requirements and verification elements
+- System should validate that satisfiedBy/satisfy relations connect requirements and implementation elements
+- System should report validation errors for incompatible element types in relations
+- System should return success exit code (0) despite validation errors for element type incompatibilities
+
+#### Test Criteria
+- Command exits with success (zero) return code even when there are element type validation errors
+- Validation output contains specific error messages about incompatible element types for relations
+- Model processing continues despite element type validation errors
+
+#### Test Procedure
+1. Create a test fixture with the following scenarios:
+   - Requirement with verifiedBy relation to verification element (valid)
+   - Verification element with verify relation to requirement (valid)
+   - Requirement with verifiedBy relation to non-verification element (error but non-blocking)
+   - Verification element with verify relation to non-requirement element (error but non-blocking)
+   - Requirement with satisfiedBy relation to implementation element (valid)
+   - Implementation element with satisfy relation to requirement (valid)
+   - Other relation types connecting various element types (no validation)
+2. Run ReqFlow validation on the test fixture
+3. Verify that the validation reports errors for incompatible relation element types
+4. Verify that the command still completes successfully with exit code 0
+5. Verify that all other model processing continues despite the element type validation errors
+
+#### Implementation
+- Test will be implemented in `/tests/test-relation-element-validation/test.sh`
+
+#### Relations
+  * verify: [SystemRequirements/Requirement.md/Relation Element Type Validator](../SystemRequirements/Requirements.md#relation-element-type-validator)

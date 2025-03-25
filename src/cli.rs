@@ -271,6 +271,8 @@ mod tests {
             model_summary: false,
             validate: false,
             config: None, // No custom config file for the test
+            change_impact: false, // Add the missing field
+            git_commit: "HEAD".to_string(), // Add the missing field with default value
         };
 
 
@@ -286,15 +288,13 @@ mod tests {
             "**/index.md".to_string()
         ];
                         
-        // Create a mock model manager
-        let mut model_manager = ModelManager::new();
+        // No need to create a mock model manager - it's created inside handle_command
 
 
     
         // Run the handle_command function
         let result = handle_command(
             args,
-            &mut model_manager,
             &specification_folder_path,
             &external_folders_path,            
             &output_folder_path,
