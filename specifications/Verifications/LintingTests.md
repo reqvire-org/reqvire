@@ -18,13 +18,13 @@ graph LR;
   class 3f3d3f9ccb default;
   click 3f3d3f9ccb "../SystemRequirements/Requirements.md#excess-whitespace-linting-implementation";
   4cd0fe733f -->|verifies| 3f3d3f9ccb;
-  8f2198f681["SystemRequirements/Requirements.md/Dry Run Mode Implementation"];
+  8f2198f681["SystemRequirements/Requirements.md/Dry Run Mode"];
   class 8f2198f681 default;
   click 8f2198f681 "../SystemRequirements/Requirements.md#dry-run-mode";
   4cd0fe733f -->|verifies| 8f2198f681;
-  e349eadbaa["tests/e2e-linting/test_whitespace_linting.sh"];
+  e349eadbaa["tests/test-lint-expected/test.sh"];
   class e349eadbaa default;
-  click e349eadbaa "../../tests/e2e-linting/test_whitespace_linting.sh";
+  click e349eadbaa "../../tests/test-lint-expected/test.sh";
   4cd0fe733f -->|traces| e349eadbaa;
 ```
 
@@ -56,8 +56,8 @@ The verification test checks that ReqFlow correctly identifies and fixes excess 
 
 #### Relations
   * verify: [SystemRequirements/Requirements.md/Excess Whitespace Linting Implementation](../SystemRequirements/Requirements.md#excess-whitespace-linting-implementation)
-  * verify: [SystemRequirements/Requirements.md/Dry Run Mode Implementation](../SystemRequirements/Requirements.md#dry-run-mode)
-  * trace: [tests/e2e-lint-expected/test.sh](../../tests/e2e-lint-expected/test.sh)
+  * verify: [SystemRequirements/Requirements.md/Dry Run Mode](../SystemRequirements/Requirements.md#dry-run-mode)
+  * trace: [tests/test-lint-expected/test.sh](../../tests/test-lint-expected/test.sh)
 
 ---
 
@@ -91,5 +91,5 @@ The verification test checks that ReqFlow correctly processes requirements in ex
 
 #### Relations
   * verify: [SystemRequirements/Requirements.md#External Folders Support](../SystemRequirements/Requirements.md#external-folders-support)
-  * verify: [SystemRequirements/Requirements.md#Directory Structure Processing](../SystemRequirements/Requirements.md#directory-structure-processing)
-  * trace: [tests/test-external-folders/test.sh](../../test-external-folders/test.sh)
+  * verify: [SystemRequirements/Requirements.md#Requirements Processing](../SystemRequirements/Requirements.md#requirements-processing)
+  * trace: [tests/test-external-folders/test.sh](../../tests/test-external-folders/test.sh)
