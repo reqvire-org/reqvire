@@ -588,6 +588,7 @@ The process follows these steps to determine whether a file contains requirement
 6. **Root Folder Check**: If the file is located at the root of the `specifications` folder, it is categorized as a **Stakeholder Needs Requirements file**. Otherwise, it is categorized as a **System Requirements file**.
 
 #### Relations
+  * derivedFrom: [UserRequirements.md/Efficient Processing](../UserRequirements.md#efficient-processing)
   * satisfiedBy: [model.rs](../../src/model.rs)
 
 ---

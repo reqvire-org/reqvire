@@ -17,9 +17,9 @@ graph LR;
   class bdfd9d65e4 requirement;
   click bdfd9d65e4 "../SystemRequirements/Requirements.md#detailed-error-handling-and-logging";
   cea8390c33 -->|verifies| bdfd9d65e4;
-  376aa21c53["tests/e2e-validation/test_invalid_relations.sh"];
+  376aa21c53["tests/test-invalid-relations/test.sh"];
   class 376aa21c53 default;
-  click 376aa21c53 "../../tests/e2e-validation/test_invalid_relations.sh";
+  click 376aa21c53 "../../tests/test-invalid-relations/test.sh";
   cea8390c33 -->|traces| 376aa21c53;
   d0187b8703["Duplicate Relations Test"];
   click d0187b8703 "ValidationTests.md#duplicate-relations-test";
@@ -42,9 +42,9 @@ graph LR;
   click 5ee74702ae "ValidationTests.md#missing-relation-target-test";
   class 5ee74702ae verification;
   5ee74702ae -->|verifies| bdfd9d65e4;
-  62736884ad["tests/e2e-validation/test_missing_targets.sh"];
+  62736884ad["tests/test-missing-targets/test.sh"];
   class 62736884ad default;
-  click 62736884ad "../../tests/e2e-validation/test_missing_targets.sh";
+  click 62736884ad "../../tests/test-missing-targets/test.sh";
   5ee74702ae -->|traces| 62736884ad;
 ```
 
@@ -72,7 +72,7 @@ This verification test checks that ReqFlow correctly identifies and reports rela
 4. Verify that error messages suggest the correct relation types (e.g., "satisfiedBy", "derivedFrom")
 
 #### Implementation
-- Test will be implemented in `/tests/e2e-validation/test_unsupported_relations.sh`
+- Test will be implemented in `/tests/test-unsupported-relations/test.sh`
 
 #### Relations
   * verify: [SystemRequirements/Requirement.md/Relation Type Validation](../SystemRequirements/Requirements.md#relation-type-validation)
@@ -101,7 +101,7 @@ The verification test checks that ReqFlow correctly identifies and reports inval
 
 #### Relations
   * verify: [SystemRequirements/Requirement.md/Detailed Error Handling and Logging](../SystemRequirements/Requirements.md#detailed-error-handling-and-logging)
-  * trace: [tests/e2e-validation/test_invalid_relations.sh](../../tests/e2e-validation/test_invalid_relations.sh)
+  * trace: [tests/test-invalid-relations/test.sh](../../tests/test-invalid-relations/test.sh)
 
 ---
 
@@ -127,7 +127,7 @@ The verification test checks that ReqFlow correctly identifies and reports relat
 
 #### Relations
   * verify: [SystemRequirements/Requirement.md/Detailed Error Handling and Logging](../SystemRequirements/Requirements.md#detailed-error-handling-and-logging)
-  * trace: [tests/e2e-validation/test_invalid_relations.sh](../../tests/e2e-validation/test_invalid_relations.sh)
+  * trace: [tests/test-invalid-relations/test.sh](../../tests/test-invalid-relations/test.sh)
 
 ---
 
@@ -154,7 +154,7 @@ The verification test checks that ReqFlow correctly identifies and reports dupli
 
 #### Relations
   * verify: [SystemRequirements/Requirement.md/Detailed Error Handling and Logging](../SystemRequirements/Requirements.md#detailed-error-handling-and-logging)
-  * trace: [tests/e2e-validation/test_invalid_relations.sh](../../tests/e2e-validation/test_invalid_relations.sh)
+  * trace: [tests/test-invalid-relations/test.sh](../../tests/test-invalid-relations/test.sh)
 
 ---
 
@@ -190,9 +190,9 @@ The verification test checks that ReqFlow correctly identifies and reports relat
 5. Create a fixture with only valid relations and verify validation passes
 
 #### Implementation
-- Test is implemented in `/tests/e2e-validation/test_missing_targets.sh`
-- Test for valid targets is implemented in `/tests/e2e-validation/test_valid_relations.sh`
+- Test is implemented in `/tests/test-missing-targets/test.sh`
+- Test for valid targets is implemented in `/tests/test-valid-relations/test.sh`
 
 #### Relations
   * verify: [SystemRequirements/Requirement.md/Detailed Error Handling and Logging](../SystemRequirements/Requirements.md#detailed-error-handling-and-logging)
-  * trace: [tests/e2e-validation/test_missing_targets.sh](../../tests/e2e-validation/test_missing_targets.sh)
+  * trace: [tests/test-missing-targets/test.sh](../../tests/test-missing-targets/test.sh)
