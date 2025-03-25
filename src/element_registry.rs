@@ -127,7 +127,6 @@ pub fn build_change_impact_tree(
 ) -> ElementNode {
     // Fetch the current element
     let element = current.elements.get(&element_id).expect("Element not found").clone();
-    dbg!(&element.identifier);
 
     // Create an empty vector to hold relation nodes
     let mut relations = Vec::new();

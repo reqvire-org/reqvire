@@ -318,7 +318,7 @@ fn render_change_impact_tree(node: &element_registry::ElementNode, indent: usize
 
     // Determine the change message
     let changed_msg = if node.element.invalidated {
-        "[changed]"
+        ""//"[changed]"
     } else {
         ""
     };
@@ -373,21 +373,57 @@ fn convert_relation_to_summary(rel: &Relation) -> RelationSummary {
     }
 }	
 
+/// Recursively walks the ChangeImpactReport and marks elements as invalidated based on conditions.
+pub fn mark_report_elements_as_invalidated(report: &mut ChangeImpactReport) {
+    // Collect sets of added and changed elements for quick lookup.
+    let added_ids: HashSet<String> = report.added.iter()
+        .map(|added| added.element_id.clone())
+        .collect();
 
-/// Recursively marks nodes as invalidated if their element id is either newly added
-/// or its content has changed.
-fn mark_element_as_invalidated(
+    let changed_ids: HashSet<String> = report.changed.iter()
+        .filter(|changed| changed.content_changed)
+        .map(|changed| changed.element_id.clone())
+        .collect();
+
+    // Mark all added elements
+    for added_element in &mut report.added {
+        // Mark the root element of the added element as invalidated
+        added_element.change_impact_tree.element.invalidated = true;
+        // Recursively mark related nodes as invalidated based on sets
+        recursively_mark_related_elements(&mut added_element.change_impact_tree, &added_ids, &changed_ids);
+    }
+
+    // Mark changed elements if content_changed is true
+    for changed_element in &mut report.changed {
+        if changed_element.content_changed {
+            // Mark the root element of the changed element as invalidated
+            changed_element.change_impact_tree.element.invalidated = true;
+        }
+        // Recursively mark related nodes as invalidated based on sets
+        recursively_mark_related_elements(&mut changed_element.change_impact_tree, &added_ids, &changed_ids);
+    }
+}
+
+/// Recursively marks all related elements as invalidated if they are present in the added or changed sets.
+fn recursively_mark_related_elements(
     node: &mut element_registry::ElementNode,
     added_ids: &HashSet<String>,
     changed_ids: &HashSet<String>,
 ) {
-    if added_ids.contains(&node.element.identifier) || changed_ids.contains(&node.element.identifier) {
-        node.element.invalidated = true;
-    }
     for relation in &mut node.relations {
-        mark_element_as_invalidated(&mut relation.element_node, added_ids, changed_ids);
+        let child_node = &mut relation.element_node;
+
+        // Mark the child node as invalidated if it is in the added or changed set.
+        if added_ids.contains(&child_node.element.identifier) || changed_ids.contains(&child_node.element.identifier) {
+            child_node.element.invalidated = true;
+        }
+
+        // Recursively process child nodes
+        recursively_mark_related_elements(child_node, added_ids, changed_ids);
     }
 }
+
+
 
 /// Computes the change impact report between two registries and builds the change impact trees
 /// using the registry’s propagation algorithm. Propagation is computed only for added elements
@@ -403,26 +439,6 @@ pub fn compute_change_impact<'a>(
     let current_ids: HashSet<&String> = current.elements.keys().collect();
     let reference_ids: HashSet<&String> = reference.elements.keys().collect();
 
-    // Compute the set of added element IDs (present only in current registry).
-    let added_ids: HashSet<String> = current_ids
-        .difference(&reference_ids)
-        .cloned()
-        .cloned()  
-        .collect();
-
-    // Compute the set of changed element IDs (present in both registries with changed content).
-    let changed_ids: HashSet<String> = current_ids
-        .intersection(&reference_ids)
-        .filter_map(|id| {
-            let cur_elem = &current.elements[*id];
-            let ref_elem = &reference.elements[*id];
-            if cur_elem.hash_impact_content != ref_elem.hash_impact_content {
-                Some((*id).clone())
-            } else {
-                None
-            }
-        })
-        .collect();
 
     // Process elements present in both registries.
     for id in current_ids.intersection(&reference_ids) {
@@ -449,11 +465,9 @@ pub fn compute_change_impact<'a>(
         if has_changed {
             let mut visited = BTreeSet::new();
             visited.insert((*id).clone());
-            let mut change_impact_tree = current.build_change_impact_tree(current, (*id).to_string(), &mut visited);
+            let change_impact_tree = current.build_change_impact_tree(current, (*id).to_string(), &mut visited);
 
-            // Mark nodes as invalidated if they are new or their content has changed.
-            mark_element_as_invalidated(&mut change_impact_tree, &added_ids, &changed_ids);
-            
+                           
             report.changed.push(ChangedElement {
                 element_id: (*id).clone(),
                 old_content: ref_elem.content.clone(),
@@ -477,10 +491,7 @@ pub fn compute_change_impact<'a>(
             .collect();
         let mut visited = BTreeSet::new();
         visited.insert((*id).clone());
-        let mut change_impact_tree = current.build_change_impact_tree(current, (*id).to_string(), &mut visited);
-        
-        // Mark nodes as invalidated if they are new or (if applicable) changed.
-        mark_element_as_invalidated(&mut change_impact_tree, &added_ids, &changed_ids);
+        let change_impact_tree = current.build_change_impact_tree(current, (*id).to_string(), &mut visited);
 
         report.added.push(AddedElement {
             element_id: (*id).clone(),
@@ -506,6 +517,8 @@ pub fn compute_change_impact<'a>(
         });
     }
 
+    mark_report_elements_as_invalidated(&mut report);
+    
     Ok(report)
 }
 
