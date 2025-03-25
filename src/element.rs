@@ -71,7 +71,6 @@ impl ElementType {
 pub struct Element {
     pub name: String,
     pub content: String,
-    pub change_impact_hash: String,
     pub section: String,
     pub relations: Vec<Relation>,
     pub identifier: String,
@@ -94,7 +93,6 @@ impl Element {
             name: name.to_string(),
             content: "".to_string(),
             hash_impact_content: "".to_string(),
-            change_impact_hash: "".to_string(),
             section: section.to_string(),
             relations: vec![],
             identifier: identifier.to_string(),

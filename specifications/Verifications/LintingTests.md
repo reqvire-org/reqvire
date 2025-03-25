@@ -15,17 +15,17 @@ graph LR;
   click 4cd0fe733f "LintingTests.md#excess-whitespace-detection-and-correction";
   class 4cd0fe733f verification;
   3f3d3f9ccb["SystemRequirements/Requirements.md/Excess Whitespace Linting Implementation"];
-  class 3f3d3f9ccb default;
+  class 3f3d3f9ccb requirement;
   click 3f3d3f9ccb "../SystemRequirements/Requirements.md#excess-whitespace-linting-implementation";
   4cd0fe733f -->|verifies| 3f3d3f9ccb;
   8f2198f681["SystemRequirements/Requirements.md/Dry Run Mode"];
-  class 8f2198f681 default;
+  class 8f2198f681 requirement;
   click 8f2198f681 "../SystemRequirements/Requirements.md#dry-run-mode";
   4cd0fe733f -->|verifies| 8f2198f681;
-  e349eadbaa["tests/test-lint-expected/test.sh"];
-  class e349eadbaa default;
-  click e349eadbaa "../../tests/test-lint-expected/test.sh";
-  4cd0fe733f -->|traces| e349eadbaa;
+  3de539f546["tests/test-lint-expected/test.sh"];
+  class 3de539f546 default;
+  click 3de539f546 "../../tests/test-lint-expected/test.sh";
+  4cd0fe733f -->|traces| 3de539f546;
 ```
 
 ---
@@ -62,7 +62,30 @@ The verification test checks that ReqFlow correctly identifies and fixes excess 
 ---
 
 ## External Folders Tests
+```mermaid
+graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
+  97e9fdec98["External Folders Support Verification"];
+  click 97e9fdec98 "LintingTests.md#external-folders-support-verification";
+  class 97e9fdec98 verification;
+  d38ab4ad13["SystemRequirements/Requirements.md#External Folders Support"];
+  class d38ab4ad13 requirement;
+  click d38ab4ad13 "../SystemRequirements/Requirements.md#external-folders-support";
+  97e9fdec98 -->|verifies| d38ab4ad13;
+  99bed90a0d["SystemRequirements/Requirements.md#Requirements Processing"];
+  class 99bed90a0d requirement;
+  click 99bed90a0d "../SystemRequirements/Requirements.md#requirements-processing";
+  97e9fdec98 -->|verifies| 99bed90a0d;
+  a38888f271["tests/test-external-folders/test.sh"];
+  class a38888f271 default;
+  click a38888f271 "../../tests/test-external-folders/test.sh";
+  97e9fdec98 -->|traces| a38888f271;
+```
 ---
 
 ### External Folders Support Verification
