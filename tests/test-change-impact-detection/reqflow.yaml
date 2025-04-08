@@ -1,11 +1,15 @@
 
 paths:
   specifications_folder: "."
+  external_folders:
+    - ./software
+      
   output_folder: "output"
+  
   excluded_filename_patterns:
     - "**/Logical*.md"
     - "**/Physical*.md"
-    - "**/software/**.md"
+    - "**/software/*.md"
 
 style:
   theme: "light"

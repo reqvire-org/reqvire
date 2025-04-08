@@ -12,4 +12,17 @@ This is a system requirement.
   * type: requirement
 
 #### Relations
-  * derivedFrom: [../DesignSpecifications/ExcludedFile.md](../DesignSpecifications/ExcludedFile.md)
+  * satisfiedBy: [../DesignSpecifications/ExcludedFile.md](../DesignSpecifications/ExcludedFile.md)
+  
+---
+  
+### DM-001 Direct Message Sending
+
+Users must be able to send direct messages to other users.
+
+#### Metadata
+* type: requirement
+* priority: high
+
+#### Relations
+* satisfiedBy: [DesignSpecifications/DirectMessages.md](DesignSpecifications/DirectMessages.md)  

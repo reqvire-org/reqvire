@@ -394,6 +394,7 @@ fn parse_target(input: &str) -> (String, String) {
 
 /// Extracts text and link from a Markdown-style link if present.
 fn extract_markdown_link(input: &str) -> Option<(String, String)> {
+    let input = input.trim();
     let markdown_regex = Regex::new(r"^\[(.+?)\]\((.+?)\)$").unwrap();
     if let Some(captures) = markdown_regex.captures(input) {
         let text = captures.get(1)?.as_str().to_string();

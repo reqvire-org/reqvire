@@ -2,9 +2,11 @@ use std::collections::{HashSet, BTreeSet};
 use serde::Serialize;
 use std::path::PathBuf;
 use crate::utils;
-use crate::relation::{Relation, RelationTarget, LinkType, needs_revalidation, needs_review};
+use crate::relation::{Relation, RelationTarget, LinkType};
 use crate::error::ReqFlowError;
 use crate::element_registry;
+use crate::relation;
+use crate::element;
 use difference::{Changeset, Difference};
 
 
@@ -146,106 +148,113 @@ impl<'a> ChangeImpactReport<'a> {
         report
     }
     
-    pub fn to_text(&self) -> String {
-       let mut output = String::new();
-       output.push_str("# Change Impact Report\n\n");
+    /// Outputs the report as text with GitHub links included.
+    pub fn to_text(&self, base_url: &str, branch_or_commit: &str) -> String {
+        let mut output = String::new();
+        output.push_str("# Change Impact Report\n\n");
 
-       // Added Elements section
-       if ! &self.added.is_empty(){
-           output.push_str("## Added Elements\n\n");
-       }
-       for elem in &self.added {
-           output.push_str(&format!("### Element: [{}]({})\n\n", elem.element_id, elem.element_id));
-           output.push_str(&format!("#### New Content\n```\n{}\n```\n\n", elem.new_content));
-           if !elem.added_relations.iter().filter(|rel| !rel.is_opposite).collect::<Vec::<_>>().is_empty() {
-               output.push_str("#### Added Relations\n");                          
-               for rel in &elem.added_relations {
-                   if !rel.is_opposite {
-                       output.push_str(&format!("- **{}** -> [{}]({})\n", rel.relation_type, rel.target.text, rel.target.link.as_str()));
-                   }
-               }
-               output.push_str("\n");               
-           }
+        // Added Elements section
+        if !self.added.is_empty() {
+            output.push_str("## Added Elements\n\n");
+        }
+        for elem in &self.added {
+            // Insert a GitHub link using the base URL and branch/commit.
+            let element_url = format!("{}/blob/{}/{}", base_url, branch_or_commit, elem.element_id);
+            output.push_str(&format!("### Element: [{}]({})\n\n", elem.element_id, element_url));
+            output.push_str(&format!("#### New Content\n\n{}\n\n", elem.new_content));
+            if !elem.added_relations.is_empty() {
+                output.push_str("#### Added Relations\n");
+                for rel in &elem.added_relations {
+                    let target_url = match rel.target.link {
+                        LinkType::Identifier(ref id) => format!("{}/blob/{}/{}", base_url, branch_or_commit, id),
+                        _ => rel.target.link.as_str().to_string(),
+                    };
+                    output.push_str(&format!("- **{}** -> [{}]({})\n", rel.relation_type, rel.target.text, target_url));
+                }
+                output.push_str("\n");
+            }
+            let rendered_tree = render_change_impact_tree(&elem.change_impact_tree, 0, base_url, branch_or_commit);
+            if !rendered_tree.trim().is_empty() {
+                output.push_str("#### Change Impact Tree\n");
+                output.push_str(&rendered_tree);
+            }
+            output.push_str("\n---\n\n");
+        }
 
-           let rendered_tree = render_change_impact_tree(&elem.change_impact_tree, 0);
-           if !rendered_tree.trim().is_empty() {
-               output.push_str("#### Change Impact Tree\n");
-               output.push_str(&rendered_tree);
-           }
-                      
-           output.push_str("\n---\n\n");
-       }
+        // Removed Elements section
+        if !self.removed.is_empty() {
+            output.push_str("## Removed Elements\n\n");
+        }
+        for elem in &self.removed {
+            let element_url = format!("{}/blob/{}/{}", base_url, branch_or_commit, elem.element_id);
+            output.push_str(&format!("### Element: [{}]({})\n\n", elem.element_id, element_url));
+            output.push_str(&format!("#### Removed Content\n\n{}\n\n", elem.old_content));
+            if !elem.removed_relations.is_empty() {
+                output.push_str("#### Removed Relations\n");
+                for rel in &elem.removed_relations {
+                    let target_url = match rel.target.link {
+                        LinkType::Identifier(ref id) => format!("{}/blob/{}/{}", base_url, branch_or_commit, id),
+                        _ => rel.target.link.as_str().to_string(),
+                    };
+                    output.push_str(&format!("- **{}** -> [{}]({})\n", rel.relation_type, rel.target.text, target_url));
+                }
+                output.push_str("\n");
+            }
+            output.push_str("\n---\n\n");
+        }
 
-       // Removed Elements section
-       if ! &self.removed.is_empty(){
-           output.push_str("## Removed Elements\n\n");
-       }
-       
+        // Changed Elements section
+        if !self.changed.is_empty() {
+            output.push_str("## Changed Elements\n\n");
+        }
+        for elem in &self.changed {
+            let element_url = format!("{}/blob/{}/{}", base_url, branch_or_commit, elem.element_id);
+            output.push_str(&format!("### Element: [{}]({})\n\n", elem.element_id, element_url));
+            let markdown_diff = generate_markdown_diff(&elem.old_content, &elem.new_content);
+            output.push_str(&format!("{}\n", markdown_diff));
+            if !elem.added_relations.is_empty() {
+                output.push_str("#### Added Relations\n");
+                for rel in &elem.added_relations {
+                    let target_url = match rel.target.link {
+                        LinkType::Identifier(ref id) => format!("{}/blob/{}/{}", base_url, branch_or_commit, id),
+                        _ => rel.target.link.as_str().to_string(),
+                    };
+                    output.push_str(&format!("- **{}** -> [{}]({})\n", rel.relation_type, rel.target.text, target_url));
+                }
+                output.push_str("\n");
+            }
+            if !elem.removed_relations.is_empty() {
+                output.push_str("#### Removed Relations\n");
+                for rel in &elem.removed_relations {
+                    let target_url = match rel.target.link {
+                        LinkType::Identifier(ref id) => format!("{}/blob/{}/{}", base_url, branch_or_commit, id),
+                        _ => rel.target.link.as_str().to_string(),
+                    };
+                    output.push_str(&format!("- **{}** -> [{}]({})\n", rel.relation_type, rel.target.text, target_url));
+                }
+                output.push_str("\n");
+            }
+            let rendered_tree = render_change_impact_tree(&elem.change_impact_tree, 0, base_url, branch_or_commit);
+            if !rendered_tree.trim().is_empty() {
+                output.push_str("#### Change Impact Tree\n");
+                output.push_str(&rendered_tree);
+            }
+            output.push_str("\n---\n\n");
+        }
 
-       for elem in &self.removed {
-           output.push_str(&format!("### Element: [{}]({})\n\n", elem.element_id, elem.element_id));
-           output.push_str(&format!("#### Removed Content\n```\n{}\n```\n\n", elem.old_content));
-           if !elem.removed_relations.iter().filter(|rel| !rel.is_opposite).collect::<Vec::<_>>().is_empty() {
-               output.push_str("#### Removed Relations\n");                          
-               for rel in &elem.removed_relations {
-                   if !rel.is_opposite {
-                       output.push_str(&format!("- **{}** -> [{}]({})\n", rel.relation_type, rel.target.text, rel.target.link.as_str()));
-                   }
-               }
-               output.push_str("\n");               
-           }           
-           output.push_str("\n---\n\n");
-       }
-
-       // Changed Elements section
-       output.push_str("## Changed Elements\n\n");
-       for elem in &self.changed {
-           output.push_str(&format!("### Element: [{}]({})\n\n", elem.element_id, elem.element_id));
-           let markdown_diff = generate_markdown_diff(&elem.old_content, &elem.new_content);
-           output.push_str(&format!("{}\n", markdown_diff));
-           let added_relations: Vec<_> = elem.added_relations.iter().filter(|r| !r.is_opposite).cloned().collect();
-           let removed_relations: Vec<_> = elem.removed_relations.iter().filter(|r| !r.is_opposite).cloned().collect();
-           
-           if !added_relations.is_empty() {
-               output.push_str("#### Added Relations\n");
-               for rel in &added_relations {
-                   output.push_str(&format!("- **{}** -> [{}]({})\n", rel.relation_type, rel.target.text, rel.target.link.as_str()));
-               }
-               output.push_str("\n");               
-           }
-           if !removed_relations.is_empty()  {
-               output.push_str("#### Removed Relations\n");
-               for rel in &removed_relations {
-                   output.push_str(&format!("- **{}** -> [{}]({})\n", rel.relation_type, rel.target.text, rel.target.link.as_str()));
-               }
-               output.push_str("\n");               
-           }
-           
-           let rendered_tree = render_change_impact_tree(&elem.change_impact_tree, 0);
-           if !rendered_tree.trim().is_empty() {
-               output.push_str("#### Change Impact Tree\n");
-               output.push_str(&rendered_tree);
-           }
-           
-           output.push_str("\n---\n\n");
-       }
-
-       output
+        output
     }
-    pub fn to_text_pure(&self) -> String {
-        // (Implementation similar to to_text, omitted for brevity.)
-        String::new()
-    }
+    
 
     pub fn to_json(&self) -> String {
         serde_json::to_string_pretty(self).unwrap_or_else(|_| "Error serializing report".to_string())
     }
 
-    pub fn print(&self, as_json: bool) {
+    pub fn print(&self, base_url: &str, branch_or_commit: &str, as_json: bool) {
         if as_json {
             println!("{}", self.to_relative_paths().to_json());
         } else {
-            println!("{}", self.to_relative_paths().to_text());
+            println!("{}", self.to_relative_paths().to_text(base_url, branch_or_commit));
         }
     }    
 }
@@ -311,54 +320,32 @@ fn generate_markdown_diff(old: &str, new: &str) -> String {
 }
 
 
-/// Render the change impact tree recursively with indentation.
-fn render_change_impact_tree(node: &element_registry::ElementNode, indent: usize) -> String {
+/// Render the change impact tree recursively with GitHub links.
+fn render_change_impact_tree(
+    node: &element_registry::ElementNode,
+    indent: usize,
+    base_url: &str,
+    branch_or_commit: &str,
+) -> String {
     let mut output = String::new();
     let pad = "  ".repeat(indent);
 
-    // Determine the change message
-    let changed_msg = if node.element.invalidated {
-        ""//"[changed]"
-    } else {
-        ""
-    };
-
-/*
-    // Render the current node
-    output.push_str(&format!(
-        "{}- [{}]({}) {}\n",
-        pad,
-        node.element.name,
-        node.element.identifier,
-        changed_msg
-    ));
-    */
-
-    // Recursively render relation nodes as children
+    // Render the current node’s relations with GitHub links
     for relation_node in &node.relations {
-        let needs_rev_or_rew = if needs_revalidation(&relation_node.relation_trigger) {
-            format!("{} [revalidate needed]",changed_msg)
-        } else if needs_review(&relation_node.relation_trigger) {
-            format!("{} [review needed]",changed_msg)
-        } else {
-            format!("{}",changed_msg)
-        };
-
+        let element_url = format!("{}/blob/{}/{}", base_url, branch_or_commit, relation_node.element_node.element.identifier);
         output.push_str(&format!(
-            "{}  * {}: [{}]({}) {}\n",
+            "{}* {}: [{}]({})\n",
             pad,
             relation_node.relation_trigger,
             relation_node.element_node.element.name,
-            relation_node.element_node.element.identifier,
-            needs_rev_or_rew
+            element_url
         ));
-
-        // Recursively render the child node from the relation node directly
-        let child_node = element_registry::ElementNode {
-            element: relation_node.element_node.element.clone(),
-            relations: relation_node.element_node.relations.clone()
-        };
-        output.push_str(&render_change_impact_tree(&child_node, indent + 2));
+        output.push_str(&render_change_impact_tree(
+            &relation_node.element_node,
+            indent + 1,
+            base_url,
+            branch_or_commit,
+        ));
     }
 
     output
@@ -424,7 +411,79 @@ fn recursively_mark_related_elements(
 }
 
 
+/// Builds the change impact tree recursively using `ElementNode` and keeps only forward relations.
+pub fn build_change_impact_tree(
+    current: &element_registry::ElementRegistry,
+    element_id: String,
+    visited: &mut BTreeSet<String>,
+    fallback_name: Option<String>,
+) -> element_registry::ElementNode {
+    // Fetch the current element or generate a placeholder
+    let element = current
+        .elements
+        .get(&element_id)
+        .cloned()
+        .unwrap_or_else(|| {
+            let display_name = fallback_name.unwrap_or_else(|| "Missing Element".to_string());
 
+            let mut placeholder = element::Element::new(
+                &display_name,
+                &element_id,
+                "unknown",
+                "Placeholder",
+                None,
+            );
+            placeholder.content = "Element referenced but not found in registry".to_string();
+            placeholder
+        });
+
+    // Recursively collect forward-impacting relation nodes
+    let relations = current
+        .change_impact_with_relation(&element)
+        .into_iter()
+        .filter_map(|(impacted_id, rels)| {
+            // Skip cycles
+            if !visited.insert(impacted_id.clone()) {
+                return None;
+            }
+
+            // Use the text from the first relation as a fallback display name
+            let fallback_name = rels.first().map(|rel| rel.target.text.clone());
+
+            let child_node = build_change_impact_tree(
+                current,
+                impacted_id.clone(),
+                visited,
+                fallback_name,
+            );
+
+            // Only include forward relations
+            let forward_relations: Vec<_> = rels
+                .into_iter()
+                .filter(|rel| rel.relation_type.direction == relation::RelationDirection::Forward)
+                .map(|rel| element_registry::RelationNode {
+                    relation_trigger: rel.relation_type.name.to_string(),
+                    element_node: child_node.clone(),
+                })
+                .collect();
+
+            if forward_relations.is_empty() {
+                None
+            } else {
+                Some(forward_relations)
+            }
+        })
+        .flatten()
+        .collect();
+
+    element_registry::ElementNode {
+        element,
+        relations,
+    }
+}
+
+
+    
 /// Computes the change impact report between two registries and builds the change impact trees
 /// using the registry’s propagation algorithm. Propagation is computed only for added elements
 /// or for elements whose content has changed.
@@ -445,19 +504,18 @@ pub fn compute_change_impact<'a>(
         let cur_elem = &current.elements[*id];
         let ref_elem = &reference.elements[*id];
         let content_changed = cur_elem.hash_impact_content != ref_elem.hash_impact_content;
-        let cur_relations: HashSet<_> = cur_elem.relations.iter().cloned().collect();
-        let ref_relations: HashSet<_> = ref_elem.relations.iter().cloned().collect();
+        
+        let cur_relations: HashSet<_> = cur_elem.relations.iter().filter(|r| !r.is_opposite).cloned().collect();
+        let ref_relations: HashSet<_> = ref_elem.relations.iter().filter(|r| !r.is_opposite).cloned().collect();
 
         let added_relations: Vec<_> = cur_relations
             .difference(&ref_relations)
             .cloned()
-            .filter(|rel: &Relation| !rel.is_opposite)
             .map(|rel: Relation| convert_relation_to_summary(&rel))
             .collect();
         let removed_relations: Vec<_> = ref_relations
             .difference(&cur_relations)
             .cloned()
-            .filter(|rel: &Relation| !rel.is_opposite)
             .map(|rel: Relation| convert_relation_to_summary(&rel))
             .collect();
 
@@ -465,7 +523,7 @@ pub fn compute_change_impact<'a>(
         if has_changed {
             let mut visited = BTreeSet::new();
             visited.insert((*id).clone());
-            let change_impact_tree = current.build_change_impact_tree(current, (*id).to_string(), &mut visited);
+            let change_impact_tree = build_change_impact_tree(current, (*id).to_string(), &mut visited,None);
 
                            
             report.changed.push(ChangedElement {
@@ -491,7 +549,8 @@ pub fn compute_change_impact<'a>(
             .collect();
         let mut visited = BTreeSet::new();
         visited.insert((*id).clone());
-        let change_impact_tree = current.build_change_impact_tree(current, (*id).to_string(), &mut visited);
+
+        let change_impact_tree = build_change_impact_tree(current, (*id).to_string(), &mut visited, None);
 
         report.added.push(AddedElement {
             element_id: (*id).clone(),
@@ -522,3 +581,147 @@ pub fn compute_change_impact<'a>(
     Ok(report)
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::ElementRegistry;
+    use crate::element::Element;
+    use crate::relation::{RelationTypeInfo, Relation, RelationTarget, RelationDirection};
+    
+    /// Helper function to create a simple element.
+    fn create_element(identifier: &str, name: &str, content: &str) -> Element {
+        let mut element = Element::new(
+            name,
+            identifier,
+            "test.md",
+            "TestSection",
+            Some(crate::element::ElementType::Requirement(crate::element::RequirementType::System))
+        );
+        element.content = content.to_string();
+        element
+    }
+        
+    /// Helper function to add a relation to an element.
+    fn add_relation(element: &mut Element, relation_type: &'static RelationTypeInfo, target_id: &str) {
+        element.relations.push(Relation {
+            relation_type,
+            target: RelationTarget {
+                text: target_id.to_string(),
+                link: relation::LinkType::Identifier(target_id.to_string()),
+            },
+            is_opposite: false,
+        });
+    }
+        
+    #[test]
+    fn test_build_change_impact_tree() {
+        let mut my_struct = ElementRegistry::new();
+        let element_a = create_element("A", "Element A", "Content A");
+        let mut element_b = create_element("B", "Element B", "Content B");
+
+        // Define a forward relation from B to A.
+        add_relation(
+            &mut element_b,
+            &RelationTypeInfo {
+                name: "derive",
+                direction: RelationDirection::Forward,
+                opposite: Some("derivedFrom"),
+                description: "Element B derives from A",
+            },
+            "A",
+        );
+
+        my_struct.elements.insert("A".to_string(), element_a.clone());
+        my_struct.elements.insert("B".to_string(), element_b.clone());
+
+        let mut visited = BTreeSet::new();
+        visited.insert("B".to_string());
+
+        let tree = build_change_impact_tree(
+            &ElementRegistry {
+                elements: my_struct.elements.clone(),
+            },
+            "B".to_string(),
+            &mut visited,
+            None
+        );
+
+        assert_eq!(tree.element.identifier, "B");
+        assert_eq!(tree.relations.len(), 1);
+        // Access the child node via element_node.
+        assert_eq!(
+            tree.relations[0].element_node.element.identifier,
+            "A"
+        );
+        assert_eq!(tree.relations[0].relation_trigger, "derive");
+    }
+
+    #[test]
+    fn test_tree_with_cycle() {
+        let mut my_struct = ElementRegistry::new();
+        let mut element_a = create_element("A", "Element A", "Content A");
+        let mut element_b = create_element("B", "Element B", "Content B");
+
+        // Create a cycle: A -> B -> A.
+        add_relation(
+            &mut element_a,
+            &RelationTypeInfo {
+                name: "contain",
+                direction: RelationDirection::Forward,
+                opposite: Some("containedBy"),
+                description: "Element A contains B",
+            },
+            "B",
+        );
+
+        add_relation(
+            &mut element_b,
+            &RelationTypeInfo {
+                name: "derive",
+                direction: RelationDirection::Forward,
+                opposite: Some("derivedFrom"),
+                description: "Element B derives from A",
+            },
+            "A",
+        );
+
+        my_struct.elements.insert("A".to_string(), element_a.clone());
+        my_struct.elements.insert("B".to_string(), element_b.clone());
+
+        let mut visited = BTreeSet::new();
+        visited.insert("A".to_string());
+
+        let tree = build_change_impact_tree(
+            &ElementRegistry {
+                elements: my_struct.elements.clone(),
+            },
+            "A".to_string(),
+            &mut visited,
+            None
+        );
+
+        // Check that the cycle is correctly handled and not infinite.
+        assert_eq!(tree.element.identifier, "A");
+        assert_eq!(tree.relations.len(), 1);
+        // For the relation from A to B.
+        assert_eq!(
+            tree.relations[0].element_node.element.identifier,
+            "B"
+        );
+        assert_eq!(tree.relations[0].relation_trigger, "contain");
+        
+        // The child node for B has no relations in its tree because B -> A is not processed by the tree
+        // since we only consider Forward relations in change_impact_with_relation
+        assert_eq!(tree.relations[0].element_node.relations.len(), 0);
+        
+        // However, the original element B still has its relation to A
+        assert_eq!(
+            tree.relations[0].element_node.element.relations.len(),
+            1
+        );
+        assert_eq!(
+            tree.relations[0].element_node.element.relations[0].target.text,
+            "A"
+        );
+    }
+}

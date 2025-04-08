@@ -13,6 +13,9 @@ paths:
   # All markdown files in these folders are considered requirements (except those matching exclusion patterns)
   external_folders:
     - todo_specifications
+    - tests
+    - core
+    - cli
       
   # Glob patterns to exclude from requirements processing
   # These are patterns that shouldn't be considered requirements even if they're in specifications or external folders
@@ -22,6 +25,9 @@ paths:
     - "**/Physical*.md"
     - "**/TODO.md"
     - "**/DesignSpecifications/**"        
+    - "**/tests/**"    
+    - "**/core/**"    
+    - "**/cli/**"            
 
 style:
   # Theme for HTML output (default, dark, light)
