@@ -27,6 +27,14 @@ graph LR;
   class 503dda29a8 requirement;
   503dda29a8 -.->|deriveReqT| 33e6fb86b3;
   cc976e6bcd -->|satisfies| 503dda29a8;
+  401764f61b["Change Impact Relations Test"];
+  class 401764f61b requirement;
+  click 401764f61b "../Verifications/ChangeImpactTests.md#change-impact-relations-test";
+  401764f61b -->|verifies| 503dda29a8;
+  9102eb42eb["Change Impact Detection Test"];
+  class 9102eb42eb requirement;
+  click 9102eb42eb "../Verifications/ChangeImpactTests.md#change-impact-detection-test";
+  9102eb42eb -->|verifies| 503dda29a8;
   9d6f79f601["Change Impact Command Line Interface"];
   click 9d6f79f601 "ChangeImpactRequirements.md#change-impact-command-line-interface";
   class 9d6f79f601 requirement;
@@ -38,6 +46,8 @@ graph LR;
   class 11ffc4632a default;
   click 11ffc4632a "../../cli/src/cli.rs";
   11ffc4632a -->|satisfies| 9d6f79f601;
+  401764f61b -->|verifies| 9d6f79f601;
+  9102eb42eb -->|verifies| 9d6f79f601;
 ```
 
 ---
@@ -194,4 +204,3 @@ graph LR;
 ```
 
 ---
-
