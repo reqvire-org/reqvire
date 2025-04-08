@@ -39,9 +39,10 @@ jobs:
         run: |
           git fetch origin "${{ env.BASE_BRANCH }}"
 
-
       - name: Get Base Branch from PR using gh
         id: get_pr_base
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           BASE_BRANCH=$(gh pr view ${{ github.event.issue.number }} --json baseRefName --jq '.baseRefName')
           echo "Using base branch: $BASE_BRANCH"
