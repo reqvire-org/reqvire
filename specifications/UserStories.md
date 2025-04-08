@@ -212,6 +212,7 @@ graph LR;
 ---
 
 ### Managing MBSE Models
+
 As an **System Engineer**, I want to manage MBSE models effectively, so that I can ensure they align with project requirements and deliverable goals.
 
 #### Relations
@@ -220,7 +221,7 @@ As an **System Engineer**, I want to manage MBSE models effectively, so that I c
 ---
 
 ### Generate Diagrams
-As a **System Engineer**, I want to generate diagrams for different system viewpoints, so that I can communicate system architecture effectively and understand dependencies and impacts across the system.
+As a **System Engineer**, I want to generate diagrams for different system viewpoints so that I can communicate system architecture effectively and understand dependencies and impacts across the system.
 
 #### Relations
   * trace: [MOEs.md/MOE_UA](MOEs.md#moe_ua)
