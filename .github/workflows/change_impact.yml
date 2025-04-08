@@ -1,0 +1,60 @@
+name: ReqFlow Impact on PR Comment
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  run-change-impact:
+    if: |
+      github.event.issue.pull_request != null &&
+      contains(github.event.comment.body, '/reqflow impact')
+    runs-on: ubuntu-latest
+
+    permissions:
+      pull-requests: write
+      issues: write
+      contents: read
+
+    steps:
+      - name: Checkout PR source branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # needed for full commit history
+
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+
+      - name: Build reqflowcli from source
+        run: |
+          cargo build --release
+          cp target/release/reqflowcli ./reqflowcli
+
+      - name: Run ReqFlow Change Impact
+        id: run_reqflow
+        run: |
+          OUTPUT=$(./reqflowcli --change-impact 2>&1 || echo "⚠️ reqflowcli failed.")
+          echo "REQFLOW_OUTPUT<<EOF" >> $GITHUB_ENV
+          echo "$OUTPUT" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Comment on PR with result
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          body: |
+            🧠 **ReqFlow Change Impact Report**
+            Triggered by `${{ github.event.comment.user.login }}` via `/reqflow impact`.
+
+            <details>
+            <summary>Click to expand</summary>
+
+            ```
+            ${{ env.REQFLOW_OUTPUT }}
+            ```
+
+            </details>
+
