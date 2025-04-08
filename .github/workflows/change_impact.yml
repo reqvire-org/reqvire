@@ -77,15 +77,4 @@ jobs:
         with:
           issue-number: ${{ github.event.issue.number }}
           body: |
-            🧠 **ReqFlow Change Impact Report**
-            Triggered by `${{ github.event.comment.user.login }}` via `/reqflow impact`.
-
-            <details>
-            <summary>Click to expand</summary>
-
-            ```
             ${{ env.REQFLOW_OUTPUT }}
-            ```
-
-            </details>
-
