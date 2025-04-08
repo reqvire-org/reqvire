@@ -52,11 +52,6 @@ jobs:
           echo "Base commit: $BASE_COMMIT"
           echo "BASE_COMMIT=$BASE_COMMIT" >> $GITHUB_ENV
 
-      - name: Ensure we’re on the PR branch
-        run: |
-          git checkout ${{ github.event.issue.pull_request.head.ref }}
-          echo "Checked out PR branch: ${{ github.event.issue.pull_request.head.ref }}"
-
       - name: Build reqflowcli from source
         run: |
           cargo build --release
