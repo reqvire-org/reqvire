@@ -1,0 +1,36 @@
+[package]
+name = "reqflow-cli"
+version.workspace = true
+edition.workspace = true
+description.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "reqflow"
+path = "src/main.rs"
+
+[dependencies]
+reqflow = { workspace = true }
+
+# CLI
+clap = { workspace = true }
+
+# Logging
+log = { workspace = true }
+env_logger = { workspace = true }
+
+# Error handling
+anyhow = { workspace = true }
+
+# Serialization
+serde = { workspace = true }
+serde_json = { workspace = true }
+serde_yml = { workspace = true }
+
+# File handling
+globset = { workspace = true }
+
+[dev-dependencies]
+assert_fs = { workspace = true }
+predicates = { workspace = true }
+tempfile = { workspace = true }

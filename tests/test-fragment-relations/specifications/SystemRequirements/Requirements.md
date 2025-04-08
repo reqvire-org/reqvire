@@ -10,9 +10,8 @@ The notification system must be designed with reliability and fault tolerance in
 
 
 #### Relations
-  * satisfiedBy: NOTIF-IMPL-001 Notifications Publishing
-  * trace: [Reliable Requirements](#reliability-requirements)
-  * trace: [User Preferences](../BasicRequirements.md#user-req-001-notification-preferences)  
+  * refine: [Reliable Requirements](#reliability-requirements)
+  * derivedFrom: [User Preferences](../BasicRequirements.md#user-req-001-notification-preferences)  
 
 ---
 
@@ -24,9 +23,8 @@ The system should implement a reliable publishing mechanism for notifications.
 
 
 #### Relations
-  * trace: NOTIF-ARCH-001 Reliable and Fault Tolerant Architecture
-  * satisfiedBy: [Notifications Persistence](#notif-impl-003-notifications-persistence)
-  * trace: ../BasicRequirements.md#USER-REQ-002 Multi-channel Notifications
+  * refine: NOTIF-ARCH-001 Reliable and Fault Tolerant Architecture
+  * derivedFrom: ../BasicRequirements.md#USER-REQ-002 Multi-channel Notifications
 
 ---
 
@@ -36,9 +34,8 @@ The system should implement efficient delivery of notifications to recipients.
 
 
 #### Relations
-  * trace: NOTIF-ARCH-001 Reliable and Fault Tolerant Architecture
-  * satisfiedBy: [Notifications Persistence](#notif-impl-003-notifications-persistence)
-  * trace: [User Notification Grouping](../BasicRequirements.md#user-req-003-notification-grouping)
+  * refine: NOTIF-ARCH-001 Reliable and Fault Tolerant Architecture
+  * derivedFrom: [User Notification Grouping](../BasicRequirements.md#user-req-003-notification-grouping)
 
 ---
 
@@ -48,8 +45,8 @@ The system should store notifications for retrieval and audit purposes.
 
 #### Relations
   * trace: NOTIF-IMPL-001 Notifications Publishing
-  * satisfiedBy: NOTIF-IMPL-002 Notifications Delivery
-  * trace: [Notification Interaction](../BasicRequirements.md#user-ux-001-notification-interaction)
+  * refine: NOTIF-IMPL-002 Notifications Delivery
+  * derivedFrom: [Notification Interaction](../BasicRequirements.md#user-ux-001-notification-interaction)
 
 ---
 
@@ -59,4 +56,4 @@ The notification system must meet specific reliability requirements.
 
 
 #### Relations
-  * satisfiedBy: NOTIF-ARCH-001 Reliable and Fault Tolerant Architecture
+  * refine: NOTIF-ARCH-001 Reliable and Fault Tolerant Architecture

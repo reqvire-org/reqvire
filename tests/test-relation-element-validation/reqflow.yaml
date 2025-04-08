@@ -1,6 +1,0 @@
-paths:
-  specifications_folder: "."
-  output_folder: "output"
-  excluded_filename_patterns:
-    - "**/README.md"
-    - "**/index.md"

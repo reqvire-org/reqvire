@@ -86,6 +86,7 @@ graph LR;
   click a38888f271 "../../tests/test-external-folders/test.sh";
   97e9fdec98 -->|traces| a38888f271;
 ```
+
 ---
 
 ### External Folders Support Verification

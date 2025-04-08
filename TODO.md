@@ -137,13 +137,30 @@ This document outlines the remaining features and improvements needed for the Re
 
 ### 8. Relation Directionality Implementation
 
-**Remaining Tasks**:
-- [ ] Update the relation model in the code to explicitly model:
-  - [ ] Forward relations (source → target)
-  - [ ] Backward relations (target → source)
-- [ ] Add validation rules that ensure relations are properly used
-- [ ] Implement consistent change impact handling for all relation types
-- [ ] Add documentation comments in the code explaining directionality handling
+**Current Implementation Status**:
+The relation directionality is already partially implemented in the codebase. The relation model has `RelationDirection` enum with `Forward`, `Backward`, and `Neutral` values, and all relation types are defined in the `RELATION_TYPES` HashMap with their proper directionality.
+
+**Required Improvements**:
+
+1. **Update relation model documentation**:
+   - [ ] Add in-code documentation explaining each relation direction type
+   - [ ] Ensure all relation descriptions match the RelationTypesRegistry.md document
+   - [ ] Document the directional flow of change propagation for each relation type
+
+2. **Enhance validation rules**:
+   - [ ] Implement element type validation for relations (e.g., `verifiedBy` should connect a requirement to a verification element)
+   - [ ] Add validation rules for proper bidirectional relation usage
+   - [ ] Add checks to ensure relation usage matches the semantics in RelationTypesRegistry.md
+
+3. **Fix change impact handling**:
+   - [ ] Update change impact algorithm to properly process Backward relations (currently only processes Forward relations)
+   - [ ] Add special handling for Neutral relations like `trace`
+   - [ ] Fix directional traversal in `build_change_impact_tree` and `change_impact_with_relation` methods
+
+4. **Code implementation details**:
+   - [ ] Add detailed comments for relation directionality in `relation.rs`
+   - [ ] Add comprehensive unit tests for all relation direction types
+   - [ ] Add tests specifically for change propagation with different relation directions
 
 ### 9. Mismatch Between Design and Implementation
 

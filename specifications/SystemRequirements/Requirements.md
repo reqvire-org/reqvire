@@ -16,29 +16,33 @@ graph LR;
   class 81758bdb22 requirement;
   click 81758bdb22 "../UserRequirements.md#format-consistency-enforcement";
   3f3d3f9ccb -.->|deriveReqT| 81758bdb22;
-  defc3a45e2["linting/whitespace.rs"];
-  class defc3a45e2 default;
-  click defc3a45e2 "../../src/linting/whitespace.rs";
-  defc3a45e2 -->|satisfies| 3f3d3f9ccb;
+  bb06efd0b8["linting/whitespace.rs"];
+  class bb06efd0b8 default;
+  click bb06efd0b8 "../../core/src/linting/whitespace.rs";
+  bb06efd0b8 -->|satisfies| 3f3d3f9ccb;
   4cd0fe733f["Excess Whitespace Detection and Correction"];
   class 4cd0fe733f verification;
   click 4cd0fe733f "../Verifications/LintingTests.md#excess-whitespace-detection-and-correction";
   4cd0fe733f -->|verifies| 3f3d3f9ccb;
-  45770e9b31["File Pattern Exclusion for Linting"];
-  click 45770e9b31 "Requirements.md#file-pattern-exclusion-for-linting";
-  class 45770e9b31 requirement;
-  cc8128cae3["Configurable Filename Exclusion Patterns"];
-  class cc8128cae3 requirement;
-  click cc8128cae3 "Requirements.md#configurable-filename-exclusion-patterns";
-  45770e9b31 ==>|refines| cc8128cae3;
-  5962484230["utils.rs"];
-  class 5962484230 default;
-  click 5962484230 "../../src/utils.rs";
-  5962484230 -->|satisfies| 45770e9b31;
-  c5c85bedd1["Excluded File Relation Validation"];
-  class c5c85bedd1 requirement;
-  click c5c85bedd1 "Requirements.md#excluded-file-relation-validation";
-  45770e9b31 -->|relates to| c5c85bedd1;
+  63f1cd4974["Git-Style Diff Output for Linting"];
+  click 63f1cd4974 "Requirements.md#git-style-diff-output-for-linting";
+  class 63f1cd4974 requirement;
+  808b1863c8["UserRequirements.md/Linting Command Output"];
+  class 808b1863c8 requirement;
+  click 808b1863c8 "../UserRequirements.md#linting-command-output";
+  63f1cd4974 -.->|deriveReqT| 808b1863c8;
+  8b47697e4e["linting/mod.rs"];
+  class 8b47697e4e default;
+  click 8b47697e4e "../../core/src/linting/mod.rs";
+  8b47697e4e -->|satisfies| 63f1cd4974;
+  66aa36deca["Parallel Linting Processing"];
+  click 66aa36deca "Requirements.md#parallel-linting-processing";
+  class 66aa36deca requirement;
+  103ddb8dc3["UserRequirements.md/Model Linting"];
+  class 103ddb8dc3 requirement;
+  click 103ddb8dc3 "../UserRequirements.md#model-linting";
+  66aa36deca -.->|deriveReqT| 103ddb8dc3;
+  8b47697e4e -->|satisfies| 66aa36deca;
   fffbb22796["CLI Lint Flag"];
   click fffbb22796 "Requirements.md#cli-lint-flag";
   class fffbb22796 requirement;
@@ -46,10 +50,10 @@ graph LR;
   class 887a7d36ca requirement;
   click 887a7d36ca "../UserRequirements.md#linting-command";
   fffbb22796 -.->|deriveReqT| 887a7d36ca;
-  6b749da146["cli.rs"];
-  class 6b749da146 default;
-  click 6b749da146 "../../src/cli.rs";
-  6b749da146 -->|satisfies| fffbb22796;
+  11ffc4632a["cli.rs"];
+  class 11ffc4632a default;
+  click 11ffc4632a "../../cli/src/cli.rs";
+  11ffc4632a -->|satisfies| fffbb22796;
   8f2198f681["Dry Run Mode"];
   class 8f2198f681 requirement;
   click 8f2198f681 "Requirements.md#dry-run-mode";
@@ -58,48 +62,44 @@ graph LR;
   click dd0846393d "Requirements.md#missing-separators-linting-implementation";
   class dd0846393d requirement;
   dd0846393d -.->|deriveReqT| 81758bdb22;
-  b90e4bcdd6["linting/separators.rs"];
-  class b90e4bcdd6 default;
-  click b90e4bcdd6 "../../src/linting/separators.rs";
-  b90e4bcdd6 -->|satisfies| dd0846393d;
-  f98ae394db["Incosistent Newlines Linting Implementation"];
-  click f98ae394db "Requirements.md#incosistent-newlines-linting-implementation";
-  class f98ae394db requirement;
-  f98ae394db -.->|deriveReqT| 81758bdb22;
-  adb880afe2["linting/newlines.rs"];
-  class adb880afe2 default;
-  click adb880afe2 "../../src/linting/newlines.rs";
-  adb880afe2 -->|satisfies| f98ae394db;
+  9abe404e42["linting/separators.rs"];
+  class 9abe404e42 default;
+  click 9abe404e42 "../../core/src/linting/separators.rs";
+  9abe404e42 -->|satisfies| dd0846393d;
   193cd64638["Reserved Subsections Linting Implementation"];
   click 193cd64638 "Requirements.md#reserved-subsections-linting-implementation";
   class 193cd64638 requirement;
   193cd64638 -.->|deriveReqT| 81758bdb22;
-  5604a53ad3["linting/reserved_subsections.rs"];
-  class 5604a53ad3 default;
-  click 5604a53ad3 "../../src/linting/indentation.rs";
-  5604a53ad3 -->|satisfies| 193cd64638;
-  66aa36deca["Parallel Linting Processing"];
-  click 66aa36deca "Requirements.md#parallel-linting-processing";
-  class 66aa36deca requirement;
-  103ddb8dc3["UserRequirements.md/Model Linting"];
-  class 103ddb8dc3 requirement;
-  click 103ddb8dc3 "../UserRequirements.md#model-linting";
-  66aa36deca -.->|deriveReqT| 103ddb8dc3;
-  3c61a8f8d3["linting/mod.rs"];
-  class 3c61a8f8d3 default;
-  click 3c61a8f8d3 "../../src/linting/mod.rs";
-  3c61a8f8d3 -->|satisfies| 66aa36deca;
-  63f1cd4974["Git-Style Diff Output for Linting"];
-  click 63f1cd4974 "Requirements.md#git-style-diff-output-for-linting";
-  class 63f1cd4974 requirement;
-  808b1863c8["UserRequirements.md/Linting Command Output"];
-  class 808b1863c8 requirement;
-  click 808b1863c8 "../UserRequirements.md#linting-command-output";
-  63f1cd4974 -.->|deriveReqT| 808b1863c8;
-  3c61a8f8d3 -->|satisfies| 63f1cd4974;
+  3aaafb0eaf["linting/reserved_subsections.rs"];
+  class 3aaafb0eaf default;
+  click 3aaafb0eaf "../../core/src/linting/indentation.rs";
+  3aaafb0eaf -->|satisfies| 193cd64638;
   8f2198f681 -.->|deriveReqT| fffbb22796;
-  6b749da146 -->|satisfies| 8f2198f681;
+  11ffc4632a -->|satisfies| 8f2198f681;
   4cd0fe733f -->|verifies| 8f2198f681;
+  45770e9b31["File Pattern Exclusion for Linting"];
+  click 45770e9b31 "Requirements.md#file-pattern-exclusion-for-linting";
+  class 45770e9b31 requirement;
+  cc8128cae3["Configurable Filename Exclusion Patterns"];
+  class cc8128cae3 requirement;
+  click cc8128cae3 "Requirements.md#configurable-filename-exclusion-patterns";
+  45770e9b31 ==>|refines| cc8128cae3;
+  3189923c3f["utils.rs"];
+  class 3189923c3f default;
+  click 3189923c3f "../../core/src/utils.rs";
+  3189923c3f -->|satisfies| 45770e9b31;
+  c5c85bedd1["Excluded File Relation Validation"];
+  class c5c85bedd1 requirement;
+  click c5c85bedd1 "Requirements.md#excluded-file-relation-validation";
+  45770e9b31 -->|relates to| c5c85bedd1;
+  f98ae394db["Incosistent Newlines Linting Implementation"];
+  click f98ae394db "Requirements.md#incosistent-newlines-linting-implementation";
+  class f98ae394db requirement;
+  f98ae394db -.->|deriveReqT| 81758bdb22;
+  b52472a7cc["linting/newlines.rs"];
+  class b52472a7cc default;
+  click b52472a7cc "../../core/src/linting/newlines.rs";
+  b52472a7cc -->|satisfies| f98ae394db;
 ```
 
 ---
@@ -109,7 +109,7 @@ The system shall provide a linting function, activated by the (--lint flag), whi
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Linting Command Behavior](../UserRequirements.md#linting-command)
-  * satisfiedBy: [cli.rs](../../src/cli.rs)    
+  * satisfiedBy: [cli.rs](../../cli/src/cli.rs)    
 
 ---
 
@@ -121,7 +121,7 @@ The system shall provide a dry run mode (--dry-run flag) for linting that shows 
 
 #### Relations
   * derivedFrom: [CLI Lint Flag](#cli-lint-flag)
-  * satisfiedBy: [cli.rs](../../src/cli.rs)    
+  * satisfiedBy: [cli.rs](../../cli/src/cli.rs)    
 
 ---
 
@@ -130,7 +130,7 @@ The system shall detect and fix excess whitespace after element headers, subsect
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Format Consistency Enforcement](../UserRequirements.md#format-consistency-enforcement)
-  * satisfiedBy: [linting/whitespace.rs](../../src/linting/whitespace.rs)
+  * satisfiedBy: [linting/whitespace.rs](../../core/src/linting/whitespace.rs)
 
 ---
 
@@ -140,7 +140,7 @@ The system shall detect and fix excess or missing newlines before element header
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Format Consistency Enforcement](../UserRequirements.md#format-consistency-enforcement)
-  * satisfiedBy: [linting/newlines.rs](../../src/linting/newlines.rs)
+  * satisfiedBy: [linting/newlines.rs](../../core/src/linting/newlines.rs)
 
 ---
 
@@ -150,7 +150,7 @@ The system shall detect consecutive element sections that lack a separator line 
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Format Consistency Enforcement](../UserRequirements.md#format-consistency-enforcement)
-  * satisfiedBy: [linting/separators.rs](../../src/linting/separators.rs)
+  * satisfiedBy: [linting/separators.rs](../../core/src/linting/separators.rs)
 
 ---
 
@@ -160,7 +160,7 @@ The system shall identify and fix inconsistent indentation and bullet types in r
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Format Consistency Enforcement](../UserRequirements.md#format-consistency-enforcement)
-  * satisfiedBy: [linting/reserved_subsections.rs](../../src/linting/indentation.rs)
+  * satisfiedBy: [linting/reserved_subsections.rs](../../core/src/linting/indentation.rs)
 
 ---
 
@@ -169,7 +169,7 @@ The system shall display linting change suggestions in a git-style diff format, 
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Linting Command Output](../UserRequirements.md#linting-command-output)
-  * satisfiedBy: [linting/mod.rs](../../src/linting/mod.rs)
+  * satisfiedBy: [linting/mod.rs](../../core/src/linting/mod.rs)
 
 ---
 
@@ -178,7 +178,7 @@ The system shall implement parallel processing for linting operations when possi
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Model Linting](../UserRequirements.md#model-linting)
-  * satisfiedBy: [linting/mod.rs](../../src/linting/mod.rs)
+  * satisfiedBy: [linting/mod.rs](../../core/src/linting/mod.rs)
 
 ---
 
@@ -187,10 +187,9 @@ The system shall respect configured excluded filename patterns when performing l
 
 #### Relations
   * refine: [Configurable Filename Exclusion Patterns](#configurable-filename-exclusion-patterns)
-  * satisfiedBy: [utils.rs](../../src/utils.rs)
+  * satisfiedBy: [utils.rs](../../core/src/utils.rs)
 
 ---
-
 
 ## Configuration
 ```mermaid
@@ -208,10 +207,10 @@ graph LR;
   class e7286123b1 requirement;
   click e7286123b1 "../ManagingMbseModelsRequirements.md#support-for-distributed-requirements";
   d38ab4ad13 -.->|deriveReqT| e7286123b1;
-  5adb6eb451["config.rs"];
-  class 5adb6eb451 default;
-  click 5adb6eb451 "../../src/config.rs";
-  5adb6eb451 -->|satisfies| d38ab4ad13;
+  c87fb8d32a["config.rs"];
+  class c87fb8d32a default;
+  click c87fb8d32a "../../cli/src/config.rs";
+  c87fb8d32a -->|satisfies| d38ab4ad13;
   97e9fdec98["External Folders Support Verification"];
   class 97e9fdec98 verification;
   click 97e9fdec98 "../Verifications/LintingTests.md#external-folders-support-verification";
@@ -238,7 +237,7 @@ paths:
 
 #### Relations
   * derivedFrom: [ManagingMbseModelsRequirements.md/Support for Distributed Requirements](../ManagingMbseModelsRequirements.md#support-for-distributed-requirements)
-  * satisfiedBy: [config.rs](../../src/config.rs)
+  * satisfiedBy: [config.rs](../../cli/src/config.rs)
 
 ---
 
@@ -251,39 +250,21 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  5a1719a264["Unstructured Documents"];
-  click 5a1719a264 "Requirements.md#unstructured-documents";
-  class 5a1719a264 requirement;
-  daadd8e583["ManagingMbseModelsRequirements.md#Coexistence of Structured and Unstructured Documents"];
-  class daadd8e583 requirement;
-  click daadd8e583 "../ManagingMbseModelsRequirements.md#coexistence-of-structured-and-unstructured-documents";
-  5a1719a264 -.->|deriveReqT| daadd8e583;
-  98bd2bd6bd["File Content Caching for Performance"];
-  click 98bd2bd6bd "Requirements.md#file-content-caching-for-performance";
-  class 98bd2bd6bd requirement;
-  21e4eb87cb["../ManagingMbseModelsRequirements.md#Efficient Processing"];
-  class 21e4eb87cb requirement;
-  click 21e4eb87cb "../ManagingMbseModelsRequirements.md#efficient-processing";
-  98bd2bd6bd -.->|deriveReqT| 21e4eb87cb;
-  74b4dd6a32["model.rs"];
-  class 74b4dd6a32 default;
-  click 74b4dd6a32 "../../src/model.rs";
-  74b4dd6a32 -->|satisfies| 98bd2bd6bd;
-  5870488e00["Relation Type Validation"];
-  click 5870488e00 "Requirements.md#relation-type-validation";
-  class 5870488e00 requirement;
-  7cf5cf9900["UserRequirements.md/Enhanced Validation Error Reporting"];
+  bdfd9d65e4["Detailed Error Handling and Logging"];
+  click bdfd9d65e4 "Requirements.md#detailed-error-handling-and-logging";
+  class bdfd9d65e4 requirement;
+  7cf5cf9900["../UserRequirements.md#Enhanced Validation Error Reporting"];
   class 7cf5cf9900 requirement;
   click 7cf5cf9900 "../UserRequirements.md#enhanced-validation-error-reporting";
-  5870488e00 -.->|deriveReqT| 7cf5cf9900;
-  7f89a342b7["src/relation.rs"];
-  class 7f89a342b7 default;
-  click 7f89a342b7 "../../src/relation.rs";
-  7f89a342b7 -->|satisfies| 5870488e00;
-  47e4d671c1["Unsupported Relation Type Test"];
-  class 47e4d671c1 verification;
-  click 47e4d671c1 "../Verifications/ValidationTests.md#unsupported-relation-type-test";
-  47e4d671c1 -->|verifies| 5870488e00;
+  bdfd9d65e4 -.->|deriveReqT| 7cf5cf9900;
+  8cd8a561b4["src/error.rs"];
+  class 8cd8a561b4 default;
+  click 8cd8a561b4 "../../core/src/error.rs";
+  8cd8a561b4 -->|satisfies| bdfd9d65e4;
+  fbf9362574["Invalid Relations Test"];
+  class fbf9362574 verification;
+  click fbf9362574 "../Verifications/ValidationTests.md#invalid-relations-test";
+  fbf9362574 -->|verifies| bdfd9d65e4;
   86e0701b6c["HTML Navigation Enhancement"];
   click 86e0701b6c "Requirements.md#html-navigation-enhancement";
   class 86e0701b6c requirement;
@@ -291,33 +272,23 @@ graph LR;
   class e1c89b5d94 requirement;
   click e1c89b5d94 "../UserRequirements.md#documentation-index-html-integration";
   86e0701b6c -.->|deriveReqT| e1c89b5d94;
-  26182a4f81["html.rs"];
-  class 26182a4f81 default;
-  click 26182a4f81 "../../src/html.rs";
-  26182a4f81 -->|satisfies| 86e0701b6c;
-  b55a4dd946["html_export.rs"];
-  class b55a4dd946 default;
-  click b55a4dd946 "../../src/html_export.rs";
-  b55a4dd946 -->|satisfies| 86e0701b6c;
-  c8b6ccc187["HTML Export"];
-  click c8b6ccc187 "Requirements.md#html-export";
-  class c8b6ccc187 requirement;
-  72c7eda618["../UserRequirements.md/Export HTML specifications"];
-  class 72c7eda618 requirement;
-  click 72c7eda618 "../UserRequirements.md#export-html-specifications";
-  c8b6ccc187 -.->|deriveReqT| 72c7eda618;
-  b55a4dd946 -->|satisfies| c8b6ccc187;
-  8acd24c7c2["Index Generation"];
-  click 8acd24c7c2 "Requirements.md#index-generation";
-  class 8acd24c7c2 requirement;
-  f5b5eaeb28["UserRequirements.md/Generate Documentation Index"];
-  class f5b5eaeb28 requirement;
-  click f5b5eaeb28 "../UserRequirements.md#generate-documentation-index";
-  8acd24c7c2 -.->|deriveReqT| f5b5eaeb28;
-  68559a12f4["index_generator.rs"];
-  class 68559a12f4 default;
-  click 68559a12f4 "../../src/index_generator.rs";
-  68559a12f4 -->|satisfies| 8acd24c7c2;
+  c788e5b84f["html.rs"];
+  class c788e5b84f default;
+  click c788e5b84f "../../core/src/html.rs";
+  c788e5b84f -->|satisfies| 86e0701b6c;
+  8cb11d152f["html_export.rs"];
+  class 8cb11d152f default;
+  click 8cb11d152f "../../core/src/html_export.rs";
+  8cb11d152f -->|satisfies| 86e0701b6c;
+  5870488e00["Relation Type Validation"];
+  click 5870488e00 "Requirements.md#relation-type-validation";
+  class 5870488e00 requirement;
+  5870488e00 -.->|deriveReqT| 7cf5cf9900;
+  ed4f94bde9["src/relation.rs"];
+  class ed4f94bde9 default;
+  click ed4f94bde9 "../../core/src/relation.rs";
+  ed4f94bde9 -->|satisfies| 5870488e00;
+  fbf9362574 -->|verifies| 5870488e00;
   c5c85bedd1["Excluded File Relation Validation"];
   click c5c85bedd1 "Requirements.md#excluded-file-relation-validation";
   class c5c85bedd1 requirement;
@@ -325,53 +296,44 @@ graph LR;
   class 45770e9b31 requirement;
   click 45770e9b31 "Requirements.md#file-pattern-exclusion-for-linting";
   c5c85bedd1 ==>|refines| 45770e9b31;
-  c1dd54a249["src/parser.rs"];
-  class c1dd54a249 default;
-  click c1dd54a249 "../../src/parser.rs";
-  c1dd54a249 -->|satisfies| c5c85bedd1;
-  bdfd9d65e4["Detailed Error Handling and Logging"];
-  click bdfd9d65e4 "Requirements.md#detailed-error-handling-and-logging";
-  class bdfd9d65e4 requirement;
-  bdfd9d65e4 -.->|deriveReqT| 7cf5cf9900;
-  99af5c72de["src/error.rs"];
-  class 99af5c72de default;
-  click 99af5c72de "../../src/error.rs";
-  99af5c72de -->|satisfies| bdfd9d65e4;
-  cea8390c33["Invalid Relation Types Test"];
-  class cea8390c33 verification;
-  click cea8390c33 "../Verifications/ValidationTests.md#invalid-relation-types-test";
-  cea8390c33 -->|verifies| bdfd9d65e4;
-  b598b28754["Invalid Relation Format Test"];
-  class b598b28754 verification;
-  click b598b28754 "../Verifications/ValidationTests.md#invalid-relation-format-test";
-  b598b28754 -->|verifies| bdfd9d65e4;
-  d0187b8703["Duplicate Relations Test"];
-  class d0187b8703 verification;
-  click d0187b8703 "../Verifications/ValidationTests.md#duplicate-relations-test";
-  d0187b8703 -->|verifies| bdfd9d65e4;
-  5ee74702ae["Missing Relation Target Test"];
-  class 5ee74702ae verification;
-  click 5ee74702ae "../Verifications/ValidationTests.md#missing-relation-target-test";
-  5ee74702ae -->|verifies| bdfd9d65e4;
-  8ba9c7e059["LLM Context Command"];
-  click 8ba9c7e059 "Requirements.md#llm-context-command";
-  class 8ba9c7e059 requirement;
-  ec56dd665a["UserRequirements.md/Provide Actionable Model Improvement Suggestions"];
-  class ec56dd665a requirement;
-  click ec56dd665a "../UserRequirements.md#provide-actionable-model-improvement-suggestions";
-  8ba9c7e059 -.->|deriveReqT| ec56dd665a;
-  508bcd1e4a["main.rs"];
-  class 508bcd1e4a default;
-  click 508bcd1e4a "../../src/main.rs";
-  508bcd1e4a -->|satisfies| 8ba9c7e059;
+  3b1e87396c["src/parser.rs"];
+  class 3b1e87396c default;
+  click 3b1e87396c "../../core/src/parser.rs";
+  3b1e87396c -->|satisfies| c5c85bedd1;
   5ec6a2668b["JSON Output Format"];
   click 5ec6a2668b "Requirements.md#json-output-format";
   class 5ec6a2668b requirement;
   5ec6a2668b -.->|deriveReqT| 7cf5cf9900;
-  6b749da146["parser.rs"];
-  class 6b749da146 default;
-  click 6b749da146 "../../src/cli.rs";
-  6b749da146 -->|satisfies| 5ec6a2668b;
+  11ffc4632a["cli.rs"];
+  class 11ffc4632a default;
+  click 11ffc4632a "../../cli/src/cli.rs";
+  11ffc4632a -->|satisfies| 5ec6a2668b;
+  8acd24c7c2["Index Generation"];
+  click 8acd24c7c2 "Requirements.md#index-generation";
+  class 8acd24c7c2 requirement;
+  f5b5eaeb28["UserRequirements.md/Generate Documentation Index"];
+  class f5b5eaeb28 requirement;
+  click f5b5eaeb28 "../UserRequirements.md#generate-documentation-index";
+  8acd24c7c2 -.->|deriveReqT| f5b5eaeb28;
+  3ef6afafe2["index_generator.rs"];
+  class 3ef6afafe2 default;
+  click 3ef6afafe2 "../../core/src/index_generator.rs";
+  3ef6afafe2 -->|satisfies| 8acd24c7c2;
+  5a1719a264["Unstructured Documents"];
+  click 5a1719a264 "Requirements.md#unstructured-documents";
+  class 5a1719a264 requirement;
+  daadd8e583["ManagingMbseModelsRequirements.md#Coexistence of Structured and Unstructured Documents"];
+  class daadd8e583 requirement;
+  click daadd8e583 "../ManagingMbseModelsRequirements.md#coexistence-of-structured-and-unstructured-documents";
+  5a1719a264 -.->|deriveReqT| daadd8e583;
+  c8b6ccc187["HTML Export"];
+  click c8b6ccc187 "Requirements.md#html-export";
+  class c8b6ccc187 requirement;
+  72c7eda618["../UserRequirements.md/Export HTML specifications"];
+  class 72c7eda618 requirement;
+  click 72c7eda618 "../UserRequirements.md#export-html-specifications";
+  c8b6ccc187 -.->|deriveReqT| 72c7eda618;
+  8cb11d152f -->|satisfies| c8b6ccc187;
   7a8da8dfee["Interactive Mermaid Diagram Node Behavior"];
   click 7a8da8dfee "Requirements.md#interactive-mermaid-diagram-node-behavior";
   class 7a8da8dfee requirement;
@@ -379,10 +341,32 @@ graph LR;
   class e867499409 requirement;
   click e867499409 "../UserRequirements.md#interactive-mermaid-diagrams";
   7a8da8dfee -.->|deriveReqT| e867499409;
-  d9e753e4d8["html.rs"];
-  class d9e753e4d8 default;
-  click d9e753e4d8 "../../src/diagrams.rs";
-  d9e753e4d8 -->|satisfies| 7a8da8dfee;
+  d4240e2969["html.rs"];
+  class d4240e2969 default;
+  click d4240e2969 "../../core/src/diagrams.rs";
+  d4240e2969 -->|satisfies| 7a8da8dfee;
+  8ba9c7e059["LLM Context Command"];
+  click 8ba9c7e059 "Requirements.md#llm-context-command";
+  class 8ba9c7e059 requirement;
+  ec56dd665a["UserRequirements.md/Provide Actionable Model Improvement Suggestions"];
+  class ec56dd665a requirement;
+  click ec56dd665a "../UserRequirements.md#provide-actionable-model-improvement-suggestions";
+  8ba9c7e059 -.->|deriveReqT| ec56dd665a;
+  4a5edefd6e["main.rs"];
+  class 4a5edefd6e default;
+  click 4a5edefd6e "../../cli/src/main.rs";
+  4a5edefd6e -->|satisfies| 8ba9c7e059;
+  98bd2bd6bd["File Content Caching for Performance"];
+  click 98bd2bd6bd "Requirements.md#file-content-caching-for-performance";
+  class 98bd2bd6bd requirement;
+  21e4eb87cb["../ManagingMbseModelsRequirements.md#Efficient Processing"];
+  class 21e4eb87cb requirement;
+  click 21e4eb87cb "../ManagingMbseModelsRequirements.md#efficient-processing";
+  98bd2bd6bd -.->|deriveReqT| 21e4eb87cb;
+  6136c216c9["model.rs"];
+  class 6136c216c9 default;
+  click 6136c216c9 "../../core/src/model.rs";
+  6136c216c9 -->|satisfies| 98bd2bd6bd;
 ```
 
 ---
@@ -393,7 +377,7 @@ The system shall provide different output results in machine-readable JSON forma
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Enhanced Validation Error Reporting](../UserRequirements.md#enhanced-validation-error-reporting)
-  * satisfiedBy: [parser.rs](../../src/cli.rs)
+  * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
 
 ---
 
@@ -403,7 +387,7 @@ The system shall implement an IndexGenerator component that traverses the specif
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Generate Documentation Index](../UserRequirements.md#generate-documentation-index)
-  * satisfiedBy: [index_generator.rs](../../src/index_generator.rs)
+  * satisfiedBy: [index_generator.rs](../../core/src/index_generator.rs)
 
 ---
 
@@ -417,8 +401,8 @@ README.md file must be saved as index.html file when exported.
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Documentation Index HTML Integration](../UserRequirements.md#documentation-index-html-integration)
-  * satisfiedBy: [html.rs](../../src/html.rs)
-  * satisfiedBy: [html_export.rs](../../src/html_export.rs)
+  * satisfiedBy: [html.rs](../../core/src/html.rs)
+  * satisfiedBy: [html_export.rs](../../core/src/html_export.rs)
 
 ---
 
@@ -428,7 +412,7 @@ The system shall provide a command-line option `--llm-context` that outputs comp
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Provide Actionable Model Improvement Suggestions](../UserRequirements.md#provide-actionable-model-improvement-suggestions)
-  * satisfiedBy: [main.rs](../../src/main.rs)
+  * satisfiedBy: [main.rs](../../cli/src/main.rs)
 
 ---
 
@@ -438,7 +422,7 @@ The system shall implement interactive click behavior for Mermaid diagram nodes 
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Interactive Mermaid Diagrams](../UserRequirements.md#interactive-mermaid-diagrams)
-  * satisfiedBy: [html.rs](../../src/diagrams.rs)
+  * satisfiedBy: [html.rs](../../core/src/diagrams.rs)
 
 ---
 
@@ -458,7 +442,7 @@ The system shall validate relation types against a defined vocabulary and provid
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Enhanced Validation Error Reporting](../UserRequirements.md#enhanced-validation-error-reporting)
-  * satisfiedBy: [src/relation.rs](../../src/relation.rs)
+  * satisfiedBy: [src/relation.rs](../../core/src/relation.rs)
 
 ---
 
@@ -477,7 +461,7 @@ The validation process for excluded files:
 
 #### Relations
   * refine: [File Pattern Exclusion for Linting](#file-pattern-exclusion-for-linting)
-  * satisfiedBy: [src/parser.rs](../../src/parser.rs)
+  * satisfiedBy: [src/parser.rs](../../core/src/parser.rs)
 
 ---
 
@@ -487,7 +471,7 @@ The system shall generate HTML output for all markdown files, not just requireme
 
 #### Relations
   * derivedFrom: [../UserRequirements.md/Export HTML specifications](../UserRequirements.md#export-html-specifications)
-  * satisfiedBy: [html_export.rs](../../src/html_export.rs)
+  * satisfiedBy: [html_export.rs](../../core/src/html_export.rs)
 
 ---
 
@@ -497,7 +481,7 @@ The system shall implement detailed error handling and logging throughout the ap
 
 #### Relations
   * derivedFrom: [../UserRequirements.md#Enhanced Validation Error Reporting](../UserRequirements.md#enhanced-validation-error-reporting)
-  * satisfiedBy: [src/error.rs](../../src/error.rs)
+  * satisfiedBy: [src/error.rs](../../core/src/error.rs)
 
 ---
 
@@ -507,7 +491,7 @@ The system shall cache file contents during processing to optimize performance f
 
 #### Relations
   * derivedFrom: [../ManagingMbseModelsRequirements.md#Efficient Processing](../ManagingMbseModelsRequirements.md#efficient-processing)
-  * satisfiedBy: [model.rs](../../src/model.rs)
+  * satisfiedBy: [model.rs](../../core/src/model.rs)
 
 ---
 
@@ -527,10 +511,10 @@ graph LR;
   class 21e4eb87cb requirement;
   click 21e4eb87cb "../ManagingMbseModelsRequirements.md#efficient-processing";
   2737f2d770 -.->|deriveReqT| 21e4eb87cb;
-  74b4dd6a32["model.rs"];
-  class 74b4dd6a32 default;
-  click 74b4dd6a32 "../../src/model.rs";
-  74b4dd6a32 -->|satisfies| 2737f2d770;
+  6136c216c9["model.rs"];
+  class 6136c216c9 default;
+  click 6136c216c9 "../../core/src/model.rs";
+  6136c216c9 -->|satisfies| 2737f2d770;
   99bed90a0d["Requirements Processing"];
   click 99bed90a0d "Requirements.md#requirements-processing";
   class 99bed90a0d requirement;
@@ -538,11 +522,11 @@ graph LR;
   class e7286123b1 requirement;
   click e7286123b1 "../ManagingMbseModelsRequirements.md#support-for-distributed-requirements";
   99bed90a0d -.->|deriveReqT| e7286123b1;
-  74b4dd6a32 -->|satisfies| 99bed90a0d;
-  c1dd54a249["parser.rs"];
-  class c1dd54a249 default;
-  click c1dd54a249 "../../src/parser.rs";
-  c1dd54a249 -->|satisfies| 99bed90a0d;
+  6136c216c9 -->|satisfies| 99bed90a0d;
+  3b1e87396c["parser.rs"];
+  class 3b1e87396c default;
+  click 3b1e87396c "../../core/src/parser.rs";
+  3b1e87396c -->|satisfies| 99bed90a0d;
   97e9fdec98["External Folders Support Verification"];
   class 97e9fdec98 verification;
   click 97e9fdec98 "../Verifications/LintingTests.md#external-folders-support-verification";
@@ -557,11 +541,10 @@ The system shall parse the 'specifications' and 'external folders' directory str
 
 #### Relations
   * derivedFrom: [ManagingMbseModelsRequirements.md/Support for Distributed Requirements](../ManagingMbseModelsRequirements.md#support-for-distributed-requirements)
-  * satisfiedBy: [model.rs](../../src/model.rs)
-  * satisfiedBy: [parser.rs](../../src/parser.rs)  
+  * satisfiedBy: [model.rs](../../core/src/model.rs)
+  * satisfiedBy: [parser.rs](../../core/src/parser.rs)  
 
 ---
-
 
 ### Requirements Files Search and Detection
 The system shall identify and categorize files in the `specifications` and `external_folders` directories as **Stakeholder Needs Requirements**, **System Requirements**, or **Not a Requirements File** based on predefined rules.
@@ -578,7 +561,7 @@ The process follows these steps to determine whether a file contains requirement
 
 #### Relations
   * derivedFrom: [ManagingMbseModelsRequirements.md/Efficient Processing](../ManagingMbseModelsRequirements.md#efficient-processing)
-  * satisfiedBy: [model.rs](../../src/model.rs)
+  * satisfiedBy: [model.rs](../../core/src/model.rs)
 
 ---
 
@@ -591,25 +574,6 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  a7ec66314a["Mermaid Diagram Format Conversion"];
-  click a7ec66314a "Requirements.md#mermaid-diagram-format-conversion";
-  class a7ec66314a requirement;
-  10c00a1bd1["UserRequirements.md/Export Diagrams in Standard Formats"];
-  class 10c00a1bd1 requirement;
-  click 10c00a1bd1 "../UserRequirements.md#export-diagrams-in-standard-formats";
-  a7ec66314a -.->|deriveReqT| 10c00a1bd1;
-  d9e753e4d8["diagrams.rs"];
-  class d9e753e4d8 default;
-  click d9e753e4d8 "../../src/diagrams.rs";
-  d9e753e4d8 -->|satisfies| a7ec66314a;
-  c826c1ee7c["SysML-Compatible Relationship Rendering"];
-  click c826c1ee7c "Requirements.md#sysml-compatible-relationship-rendering";
-  class c826c1ee7c requirement;
-  a6a8362836["UserRequirements.md/Visualize Model Relationships"];
-  class a6a8362836 requirement;
-  click a6a8362836 "../UserRequirements.md#visualize-model-relationships";
-  c826c1ee7c -.->|deriveReqT| a6a8362836;
-  d9e753e4d8 -->|satisfies| c826c1ee7c;
   191d27287e["Diagram Storage Path Configuration"];
   click 191d27287e "Requirements.md#diagram-storage-path-configuration";
   class 191d27287e requirement;
@@ -617,17 +581,10 @@ graph LR;
   class aee397f35b requirement;
   click aee397f35b "../UserRequirements.md#store-automated-diagrams-in-designated-locations";
   191d27287e -.->|deriveReqT| aee397f35b;
-  74b4dd6a32["model.rs"];
-  class 74b4dd6a32 default;
-  click 74b4dd6a32 "../../src/model.rs";
-  74b4dd6a32 -->|satisfies| 191d27287e;
-  1414e7f889["Relationship Type Filter Implementation"];
-  click 1414e7f889 "Requirements.md#relationship-type-filter-implementation";
-  class 1414e7f889 requirement;
-  30d97803eb["UserRequirements.md/Filter Relationships by Type"];
-  class 30d97803eb requirement;
-  click 30d97803eb "../UserRequirements.md#filter-relationships-by-type";
-  1414e7f889 -.->|deriveReqT| 30d97803eb;
+  6136c216c9["model.rs"];
+  class 6136c216c9 default;
+  click 6136c216c9 "../../core/src/model.rs";
+  6136c216c9 -->|satisfies| 191d27287e;
   9860815d52["Visual Differential Rendering"];
   click 9860815d52 "Requirements.md#visual-differential-rendering";
   class 9860815d52 requirement;
@@ -635,6 +592,17 @@ graph LR;
   class fd7388e379 requirement;
   click fd7388e379 "../UserRequirements.md#highlight-changes-in-diagrams";
   9860815d52 -.->|deriveReqT| fd7388e379;
+  c826c1ee7c["SysML-Compatible Relationship Rendering"];
+  click c826c1ee7c "Requirements.md#sysml-compatible-relationship-rendering";
+  class c826c1ee7c requirement;
+  a6a8362836["UserRequirements.md/Visualize Model Relationships"];
+  class a6a8362836 requirement;
+  click a6a8362836 "../UserRequirements.md#visualize-model-relationships";
+  c826c1ee7c -.->|deriveReqT| a6a8362836;
+  d4240e2969["diagrams.rs"];
+  class d4240e2969 default;
+  click d4240e2969 "../../core/src/diagrams.rs";
+  d4240e2969 -->|satisfies| c826c1ee7c;
   cc8128cae3["Configurable Filename Exclusion Patterns"];
   click cc8128cae3 "Requirements.md#configurable-filename-exclusion-patterns";
   class cc8128cae3 requirement;
@@ -642,14 +610,29 @@ graph LR;
   class ce24dbacb9 requirement;
   click ce24dbacb9 "../ManagingMbseModelsRequirements.md#project-configuration-with-yaml";
   cc8128cae3 -.->|deriveReqT| ce24dbacb9;
-  5adb6eb451["config.rs"];
-  class 5adb6eb451 default;
-  click 5adb6eb451 "../../src/config.rs";
-  5adb6eb451 -->|satisfies| cc8128cae3;
+  c87fb8d32a["config.rs"];
+  class c87fb8d32a default;
+  click c87fb8d32a "../../cli/src/config.rs";
+  c87fb8d32a -->|satisfies| cc8128cae3;
   45770e9b31["File Pattern Exclusion for Linting"];
   class 45770e9b31 requirement;
   click 45770e9b31 "Requirements.md#file-pattern-exclusion-for-linting";
   cc8128cae3 -->|relates to| 45770e9b31;
+  1414e7f889["Relationship Type Filter Implementation"];
+  click 1414e7f889 "Requirements.md#relationship-type-filter-implementation";
+  class 1414e7f889 requirement;
+  30d97803eb["UserRequirements.md/Filter Relationships by Type"];
+  class 30d97803eb requirement;
+  click 30d97803eb "../UserRequirements.md#filter-relationships-by-type";
+  1414e7f889 -.->|deriveReqT| 30d97803eb;
+  a7ec66314a["Mermaid Diagram Format Conversion"];
+  click a7ec66314a "Requirements.md#mermaid-diagram-format-conversion";
+  class a7ec66314a requirement;
+  10c00a1bd1["UserRequirements.md/Export Diagrams in Standard Formats"];
+  class 10c00a1bd1 requirement;
+  click 10c00a1bd1 "../UserRequirements.md#export-diagrams-in-standard-formats";
+  a7ec66314a -.->|deriveReqT| 10c00a1bd1;
+  d4240e2969 -->|satisfies| a7ec66314a;
 ```
 - **Stakeholder Needs Requirements File**: Files located in the root of the `specifications` folder and meeting all conditions.
 - **System Requirements File**: Files found in external folders or subfolders within `specifications`.
@@ -674,7 +657,7 @@ paths:
 
 #### Relations
   * derivedFrom: [ManagingMbseModelsRequirements.md/Project Configuration with YAML](../ManagingMbseModelsRequirements.md#project-configuration-with-yaml)
-  * satisfiedBy: [config.rs](../../src/config.rs)
+  * satisfiedBy: [config.rs](../../cli/src/config.rs)
 
 ---
 
@@ -683,7 +666,7 @@ The system shall implement an export functionality that converts Mermaid diagram
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Export Diagrams in Standard Formats](../UserRequirements.md#export-diagrams-in-standard-formats)
-  * satisfiedBy: [diagrams.rs](../../src/diagrams.rs)
+  * satisfiedBy: [diagrams.rs](../../core/src/diagrams.rs)
 
 ---
 
@@ -746,7 +729,7 @@ satisfy:
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Visualize Model Relationships](../UserRequirements.md#visualize-model-relationships)
-  * satisfiedBy: [diagrams.rs](../../src/diagrams.rs)
+  * satisfiedBy: [diagrams.rs](../../core/src/diagrams.rs)
 
 ---
 
@@ -763,7 +746,7 @@ The system shall implement a configurable storage mechanism for generated diagra
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Store Automated Diagrams in Designated Locations](../UserRequirements.md#store-automated-diagrams-in-designated-locations)
-  * satisfiedBy: [model.rs](../../src/model.rs)
+  * satisfiedBy: [model.rs](../../core/src/model.rs)
 
 ---
 
@@ -776,46 +759,28 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  918cc4a26d["Structural Change Analyzer"];
-  click 918cc4a26d "Requirements.md#structural-change-analyzer";
-  class 918cc4a26d requirement;
-  91ebf7e73d["UserRequirements.md/Tracing Structural Changes"];
-  class 91ebf7e73d requirement;
-  click 91ebf7e73d "../UserRequirements.md#tracing-structural-changes";
-  918cc4a26d -.->|deriveReqT| 91ebf7e73d;
-  501c373c2d["model.rs"];
-  class 501c373c2d default;
-  click 501c373c2d "../../src/change_impact.rs";
-  501c373c2d -->|satisfies| 918cc4a26d;
-  665b7456c9["CLI Change Impact Report Flag"];
-  class 665b7456c9 requirement;
-  click 665b7456c9 "Requirements.md#cli-change-impact-report-flag";
-  665b7456c9 -.->|deriveReqT| 918cc4a26d;
-  b8b4018461["CLI Git Commit Hash Flag"];
-  click b8b4018461 "Requirements.md#cli-git-commit-hash-flag";
-  class b8b4018461 requirement;
-  b8b4018461 -.->|deriveReqT| 665b7456c9;
-  6b749da146["cli.rs"];
-  class 6b749da146 default;
-  click 6b749da146 "../../src/cli.rs";
-  6b749da146 -->|satisfies| b8b4018461;
-  665b7456c9 -.->|deriveReqT| 918cc4a26d;
-  6b749da146 -->|satisfies| 665b7456c9;
-  b8b4018461 -.->|deriveReqT| 665b7456c9;
-  d7e5fbf806["Markdown Matrix Formatter"];
-  click d7e5fbf806 "Requirements.md#markdown-matrix-formatter";
-  class d7e5fbf806 requirement;
+  5eca866a03["Traceability Matrix Builder Implementation"];
+  click 5eca866a03 "Requirements.md#traceability-matrix-builder-implementation";
+  class 5eca866a03 requirement;
   ba40352f8e["UserRequirements.md/Traceability Matrix"];
   class ba40352f8e requirement;
   click ba40352f8e "../UserRequirements.md#traceability-matrix";
+  5eca866a03 -.->|deriveReqT| ba40352f8e;
+  d7e5fbf806["Markdown Matrix Formatter"];
+  click d7e5fbf806 "Requirements.md#markdown-matrix-formatter";
+  class d7e5fbf806 requirement;
   d7e5fbf806 -.->|deriveReqT| ba40352f8e;
-  8897111f9b["Matrix Export Format Handler"];
-  click 8897111f9b "Requirements.md#matrix-export-format-handler";
-  class 8897111f9b requirement;
-  4b7b432817["UserRequirements.md/Export Traceability Matrix"];
-  class 4b7b432817 requirement;
-  click 4b7b432817 "../UserRequirements.md#export-traceability-matrix";
-  8897111f9b -.->|deriveReqT| 4b7b432817;
+  b8b4018461["CLI Git Commit Hash Flag"];
+  click b8b4018461 "Requirements.md#cli-git-commit-hash-flag";
+  class b8b4018461 requirement;
+  665b7456c9["CLI Change Impact Report Flag"];
+  class 665b7456c9 requirement;
+  click 665b7456c9 "Requirements.md#cli-change-impact-report-flag";
+  b8b4018461 -.->|deriveReqT| 665b7456c9;
+  11ffc4632a["cli.rs"];
+  class 11ffc4632a default;
+  click 11ffc4632a "../../cli/src/cli.rs";
+  11ffc4632a -->|satisfies| b8b4018461;
   83a2343e97["Matrix File Output Handler"];
   click 83a2343e97 "Requirements.md#matrix-file-output-handler";
   class 83a2343e97 requirement;
@@ -823,10 +788,32 @@ graph LR;
   class c4b025f6ac requirement;
   click c4b025f6ac "../UserRequirements.md#save-matrices-to-designated-files";
   83a2343e97 -.->|deriveReqT| c4b025f6ac;
-  5eca866a03["Traceability Matrix Builder Implementation"];
-  click 5eca866a03 "Requirements.md#traceability-matrix-builder-implementation";
-  class 5eca866a03 requirement;
-  5eca866a03 -.->|deriveReqT| ba40352f8e;
+  8897111f9b["Matrix Export Format Handler"];
+  click 8897111f9b "Requirements.md#matrix-export-format-handler";
+  class 8897111f9b requirement;
+  4b7b432817["UserRequirements.md/Export Traceability Matrix"];
+  class 4b7b432817 requirement;
+  click 4b7b432817 "../UserRequirements.md#export-traceability-matrix";
+  8897111f9b -.->|deriveReqT| 4b7b432817;
+  918cc4a26d["Structural Change Analyzer"];
+  class 918cc4a26d requirement;
+  click 918cc4a26d "Requirements.md#structural-change-analyzer";
+  665b7456c9 -.->|deriveReqT| 918cc4a26d;
+  11ffc4632a -->|satisfies| 665b7456c9;
+  b8b4018461 -.->|deriveReqT| 665b7456c9;
+  9d6f79f601["Change Impact Command Line Interface"];
+  class 9d6f79f601 requirement;
+  click 9d6f79f601 "ChangeImpactRequirements.md#change-impact-command-line-interface";
+  9d6f79f601 -.->|deriveReqT| 665b7456c9;
+  91ebf7e73d["UserRequirements.md/Tracing Structural Changes"];
+  class 91ebf7e73d requirement;
+  click 91ebf7e73d "../UserRequirements.md#tracing-structural-changes";
+  918cc4a26d -.->|deriveReqT| 91ebf7e73d;
+  cc976e6bcd["model.rs"];
+  class cc976e6bcd default;
+  click cc976e6bcd "../../core/src/change_impact.rs";
+  cc976e6bcd -->|satisfies| 918cc4a26d;
+  665b7456c9 -.->|deriveReqT| 918cc4a26d;
 ```
 
 ---
@@ -837,7 +824,7 @@ The system shall implement a model change analyzer that identifies structural mo
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Tracing Structural Changes](../UserRequirements.md#tracing-structural-changes)
-  * satisfiedBy: [model.rs](../../src/change_impact.rs)  
+  * satisfiedBy: [model.rs](../../core/src/change_impact.rs)  
 
 ---
 
@@ -847,7 +834,7 @@ The system shall provide a change and impact report function, activated by the (
 
 #### Relations
   * derivedFrom: [Structural Change Analyzer](#structural-change-analyzer)
-  * satisfiedBy: [cli.rs](../../src/cli.rs)    
+  * satisfiedBy: [cli.rs](../../cli/src/cli.rs)    
 
 ---
 
@@ -857,7 +844,7 @@ The system shall provide a git commit hash flag  (--git_commit flag), to be used
 
 #### Relations
   * derivedFrom: [CLI Change Impact Report Flag](#cli-change-impact-report-flag)
-  * satisfiedBy: [cli.rs](../../src/cli.rs)    
+  * satisfiedBy: [cli.rs](../../cli/src/cli.rs)    
 
 ---
 
@@ -906,21 +893,17 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  c7d88aff4e["Cross-Component Dependency Validator"];
-  click c7d88aff4e "Requirements.md#cross-component-dependency-validator";
-  class c7d88aff4e requirement;
-  6e40bf9f83["UserRequirements.md/Validate Cross-Component Dependencies"];
-  class 6e40bf9f83 requirement;
-  click 6e40bf9f83 "../UserRequirements.md#validate-cross-component-dependencies";
-  c7d88aff4e -.->|deriveReqT| 6e40bf9f83;
-  74b4dd6a32["model.rs"];
-  class 74b4dd6a32 default;
-  click 74b4dd6a32 "../../src/model.rs";
-  74b4dd6a32 -->|satisfies| c7d88aff4e;
-  c1dd54a249["parser.rs"];
-  class c1dd54a249 default;
-  click c1dd54a249 "../../src/parser.rs";
-  c1dd54a249 -->|satisfies| c7d88aff4e;
+  212d1317cd["Relation Element Type Validator"];
+  click 212d1317cd "Requirements.md#relation-element-type-validator";
+  class 212d1317cd requirement;
+  9890e1ca49["DesignSpecifications/RelationTypesRegistry.md"];
+  class 9890e1ca49 default;
+  click 9890e1ca49 "../DesignSpecifications/RelationTypesRegistry.md";
+  212d1317cd -.->|deriveReqT| 9890e1ca49;
+  fbf9362574["Invalid Relations Test"];
+  class fbf9362574 verification;
+  click fbf9362574 "../Verifications/ValidationTests.md#invalid-relations-test";
+  fbf9362574 -->|verifies| 212d1317cd;
   887db62e0f["Markdown Structure Validator"];
   click 887db62e0f "Requirements.md#markdown-structure-validator";
   class 887db62e0f requirement;
@@ -928,8 +911,23 @@ graph LR;
   class 7b1772417b requirement;
   click 7b1772417b "../UserRequirements.md#validate-markdown-structure";
   887db62e0f -.->|deriveReqT| 7b1772417b;
-  74b4dd6a32 -->|satisfies| 887db62e0f;
-  c1dd54a249 -->|satisfies| 887db62e0f;
+  6136c216c9["model.rs"];
+  class 6136c216c9 default;
+  click 6136c216c9 "../../core/src/model.rs";
+  6136c216c9 -->|satisfies| 887db62e0f;
+  3b1e87396c["parser.rs"];
+  class 3b1e87396c default;
+  click 3b1e87396c "../../core/src/parser.rs";
+  3b1e87396c -->|satisfies| 887db62e0f;
+  c7d88aff4e["Cross-Component Dependency Validator"];
+  click c7d88aff4e "Requirements.md#cross-component-dependency-validator";
+  class c7d88aff4e requirement;
+  6e40bf9f83["UserRequirements.md/Validate Cross-Component Dependencies"];
+  class 6e40bf9f83 requirement;
+  click 6e40bf9f83 "../UserRequirements.md#validate-cross-component-dependencies";
+  c7d88aff4e -.->|deriveReqT| 6e40bf9f83;
+  6136c216c9 -->|satisfies| c7d88aff4e;
+  3b1e87396c -->|satisfies| c7d88aff4e;
   ec201a112c["Filesystem Structure Validator"];
   click ec201a112c "Requirements.md#filesystem-structure-validator";
   class ec201a112c requirement;
@@ -937,7 +935,7 @@ graph LR;
   class d834cc4bc9 requirement;
   click d834cc4bc9 "../UserRequirements.md#validate-filesystem-structure";
   ec201a112c -.->|deriveReqT| d834cc4bc9;
-  74b4dd6a32 -->|satisfies| ec201a112c;
+  6136c216c9 -->|satisfies| ec201a112c;
   1c2e7c81f9["Internal Consistency Validator"];
   click 1c2e7c81f9 "Requirements.md#internal-consistency-validator";
   class 1c2e7c81f9 requirement;
@@ -945,8 +943,8 @@ graph LR;
   class 9e524ac696 requirement;
   click 9e524ac696 "../UserRequirements.md#validate-internal-consistency";
   1c2e7c81f9 -.->|deriveReqT| 9e524ac696;
-  74b4dd6a32 -->|satisfies| 1c2e7c81f9;
-  c1dd54a249 -->|satisfies| 1c2e7c81f9;
+  6136c216c9 -->|satisfies| 1c2e7c81f9;
+  3b1e87396c -->|satisfies| 1c2e7c81f9;
 ```
 
 ---
@@ -957,8 +955,8 @@ The system shall implement a markdown structure validator that enforces ReqFlow'
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Validate Markdown Structure](../UserRequirements.md#validate-markdown-structure)
-  * satisfiedBy: [model.rs](../../src/model.rs)    
-  * satisfiedBy: [parser.rs](../../src/parser.rs)
+  * satisfiedBy: [model.rs](../../core/src/model.rs)    
+  * satisfiedBy: [parser.rs](../../core/src/parser.rs)
 
 ---
 
@@ -967,7 +965,7 @@ The system shall implement a validator that checks the organization of files and
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Validate Filesystem Structure](../UserRequirements.md#validate-filesystem-structure)
-  * satisfiedBy: [model.rs](../../src/model.rs)
+  * satisfiedBy: [model.rs](../../core/src/model.rs)
 
 ---
 
@@ -976,8 +974,8 @@ The system shall implement a consistency validator that verifies logical coheren
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Validate Internal Consistency](../UserRequirements.md#validate-internal-consistency)
-  * satisfiedBy: [model.rs](../../src/model.rs)    
-  * satisfiedBy: [parser.rs](../../src/parser.rs)
+  * satisfiedBy: [model.rs](../../core/src/model.rs)    
+  * satisfiedBy: [parser.rs](../../core/src/parser.rs)
 
 ---
 
@@ -986,8 +984,22 @@ The system shall implement a specialized validator that analyzes dependencies ac
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Validate Cross-Component Dependencies](../UserRequirements.md#validate-cross-component-dependencies)
-  * satisfiedBy: [model.rs](../../src/model.rs)    
-  * satisfiedBy: [parser.rs](../../src/parser.rs)
+  * satisfiedBy: [model.rs](../../core/src/model.rs)    
+  * satisfiedBy: [parser.rs](../../core/src/parser.rs)
+
+---
+
+### Relation Element Type Validator
+The system shall implement validation that verifies relation endpoints have appropriate element types based on the relation type.
+
+#### Details
+- For `verifiedBy`/`verify` relations, validate that one endpoint is a requirement element and the other is a verification element
+- For `satisfiedBy`/`satisfy` relations, validate that one endpoint is a requirement element and the other is an implementation element
+- Relations should only connect elements of appropriate types based on the RelationTypesRegistry definition
+- Warnings should be issued when relation endpoints have incompatible element types
+
+#### Relations
+  * derivedFrom: [DesignSpecifications/RelationTypesRegistry.md](../../specifications/DesignSpecifications/RelationTypesRegistry.md)
 
 ---
 
@@ -1000,24 +1012,6 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  143766be8c["Validation Report Generator"];
-  click 143766be8c "Requirements.md#validation-report-generator";
-  class 143766be8c requirement;
-  482c757913["UserRequirements.md/Provide Validation Reports"];
-  class 482c757913 requirement;
-  click 482c757913 "../UserRequirements.md#provide-validation-reports";
-  143766be8c -.->|deriveReqT| 482c757913;
-  74b4dd6a32["model.rs"];
-  class 74b4dd6a32 default;
-  click 74b4dd6a32 "../../src/model.rs";
-  74b4dd6a32 -->|satisfies| 143766be8c;
-  2ccb7e5510["Report Export Formatter"];
-  click 2ccb7e5510 "Requirements.md#report-export-formatter";
-  class 2ccb7e5510 requirement;
-  2afa7f3a20["UserRequirements.md/Export Reports to Standard Formats"];
-  class 2afa7f3a20 requirement;
-  click 2afa7f3a20 "../UserRequirements.md#export-reports-to-standard-formats";
-  2ccb7e5510 -.->|deriveReqT| 2afa7f3a20;
   57cbef16c5["Dependency Report Generator"];
   click 57cbef16c5 "Requirements.md#dependency-report-generator";
   class 57cbef16c5 requirement;
@@ -1025,17 +1019,6 @@ graph LR;
   class 812d42f453 requirement;
   click 812d42f453 "../UserRequirements.md#generate-dependency-reports";
   57cbef16c5 -.->|deriveReqT| 812d42f453;
-  6f86272134["CLI Summary Report Flag"];
-  click 6f86272134 "Requirements.md#cli-summary-report-flag";
-  class 6f86272134 requirement;
-  cccd4e46e2["Model Summary Report Generator"];
-  class cccd4e46e2 requirement;
-  click cccd4e46e2 "Requirements.md#model-summary-report-generator";
-  6f86272134 ==>|refines| cccd4e46e2;
-  6b749da146["cli.rs"];
-  class 6b749da146 default;
-  click 6b749da146 "../../src/cli.rs";
-  6b749da146 -->|satisfies| 6f86272134;
   d842bc0e30["Verification Gap Analyzer"];
   click d842bc0e30 "Requirements.md#verification-gap-analyzer";
   class d842bc0e30 requirement;
@@ -1043,15 +1026,44 @@ graph LR;
   class d0e9e8d143 requirement;
   click d0e9e8d143 "../UserRequirements.md#generate-verifications-reports";
   d842bc0e30 -.->|deriveReqT| d0e9e8d143;
+  6f86272134["CLI Summary Report Flag"];
+  click 6f86272134 "Requirements.md#cli-summary-report-flag";
+  class 6f86272134 requirement;
+  cccd4e46e2["Model Summary Report Generator"];
+  class cccd4e46e2 requirement;
+  click cccd4e46e2 "Requirements.md#model-summary-report-generator";
+  6f86272134 ==>|refines| cccd4e46e2;
+  11ffc4632a["cli.rs"];
+  class 11ffc4632a default;
+  click 11ffc4632a "../../cli/src/cli.rs";
+  11ffc4632a -->|satisfies| 6f86272134;
   b342220e0d["UserRequirements.md/Model Structure and Summaries"];
   class b342220e0d requirement;
   click b342220e0d "../UserRequirements.md#model-structure-and-summaries";
   cccd4e46e2 -.->|deriveReqT| b342220e0d;
-  92beeed745["model.rs"];
-  class 92beeed745 default;
-  click 92beeed745 "../../src/reports.rs";
-  92beeed745 -->|satisfies| cccd4e46e2;
+  6292255058["model.rs"];
+  class 6292255058 default;
+  click 6292255058 "../../core/src/reports.rs";
+  6292255058 -->|satisfies| cccd4e46e2;
   cccd4e46e2 -->|relates to| 6f86272134;
+  143766be8c["Validation Report Generator"];
+  click 143766be8c "Requirements.md#validation-report-generator";
+  class 143766be8c requirement;
+  482c757913["UserRequirements.md/Provide Validation Reports"];
+  class 482c757913 requirement;
+  click 482c757913 "../UserRequirements.md#provide-validation-reports";
+  143766be8c -.->|deriveReqT| 482c757913;
+  6136c216c9["model.rs"];
+  class 6136c216c9 default;
+  click 6136c216c9 "../../core/src/model.rs";
+  6136c216c9 -->|satisfies| 143766be8c;
+  2ccb7e5510["Report Export Formatter"];
+  click 2ccb7e5510 "Requirements.md#report-export-formatter";
+  class 2ccb7e5510 requirement;
+  2afa7f3a20["UserRequirements.md/Export Reports to Standard Formats"];
+  class 2afa7f3a20 requirement;
+  click 2afa7f3a20 "../UserRequirements.md#export-reports-to-standard-formats";
+  2ccb7e5510 -.->|deriveReqT| 2afa7f3a20;
 ```
 
 ---
@@ -1062,7 +1074,7 @@ The system shall implement a summary report generator that  produces comprehensi
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Model Structure and Summaries](../UserRequirements.md#model-structure-and-summaries)
-  * satisfiedBy: [model.rs](../../src/reports.rs)
+  * satisfiedBy: [model.rs](../../core/src/reports.rs)
 
 ---
 
@@ -1072,7 +1084,7 @@ The system shall provide a model summary report function, activated by the (--mo
 
 #### Relations
   * refine: [Model Summary Report Generator](#model-summary-report-generator)
-  * satisfiedBy: [cli.rs](../../src/cli.rs)    
+  * satisfiedBy: [cli.rs](../../cli/src/cli.rs)    
 
 ---
 
@@ -1082,7 +1094,7 @@ The system shall implement a validation report generator that compiles and forma
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Provide Validation Reports](../UserRequirements.md#provide-validation-reports)
-  * satisfiedBy: [model.rs](../../src/model.rs)
+  * satisfiedBy: [model.rs](../../core/src/model.rs)
 
 ---
 

@@ -4,7 +4,6 @@ paths:
   excluded_filename_patterns:
     - "**/Logical*.md"
     - "**/Physical*.md"
-    - "Sample*"
 
 style:
   theme: "light"
