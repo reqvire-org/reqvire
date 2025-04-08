@@ -48,16 +48,19 @@ jobs:
       - name: Compute merge base commit
         id: base_commit
         run: |
-          BASE_BRANCH=${{ github.event.pull_request.base.ref }}
-          BASE_COMMIT=$(git merge-base origin/$BASE_BRANCH HEAD)
+          BASE_COMMIT=$(git merge-base origin/$GITHUB_BASE_REF)
           echo "Base commit: $BASE_COMMIT"
           echo "BASE_COMMIT=$BASE_COMMIT" >> $GITHUB_ENV
-    
-      - name: Run ReqFlow
-        run: |
-          ./reqflowcli --change-impact --git-commit "$BASE_COMMIT"
-         
 
+      - name: Run ReqFlow Change Impact against PR base
+        id: run_reqflow
+        run: |
+          OUTPUT=$(./reqflow --change-impact --git-commit "$BASE_COMMIT" 2>&1 || echo "⚠️ reqflow failed.")
+          echo "REQFLOW_OUTPUT<<EOF" >> $GITHUB_ENV
+          echo "$OUTPUT" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+    
+    
       - name: Comment on PR with result
         uses: peter-evans/create-or-update-comment@v3
         with:
