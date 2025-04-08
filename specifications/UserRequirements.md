@@ -847,6 +847,7 @@ Diagrams must be broken into several diagrams using following logic:
    * if requirements documents doesn't have '##' paragraphs then requirements file name is used only
    * external related resources box must be a link to actual resource
 
+
 Color code for rendering diagrams:
  * red for requirement
  * yellow for resources which satisfies requirement
