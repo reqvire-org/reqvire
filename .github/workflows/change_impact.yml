@@ -62,6 +62,7 @@ jobs:
       - name: Run ReqFlow Change Impact against PR base
         id: run_reqflow
         run: |
+          mkdir output
           OUTPUT=$(./reqflow --change-impact --git-commit "$BASE_COMMIT" 2>&1 || echo "⚠️ reqflow failed.")
           echo "REQFLOW_OUTPUT<<EOF" >> $GITHUB_ENV
           echo "$OUTPUT" >> $GITHUB_ENV
