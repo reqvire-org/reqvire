@@ -24,22 +24,24 @@ jobs:
           comment-id: ${{ github.event.comment.id }}
           reactions: '+1'
           
+      - name: Get PR Head Ref using gh
+        id: get_pr_head
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          HEAD_REF=$(gh pr view ${{ github.event.issue.number }} --json headRefName --jq '.headRefName')
+          echo "Using PR head ref: $HEAD_REF"
+          echo "HEAD_REF=$HEAD_REF" >> $GITHUB_ENV
+              
       - name: Checkout PR source branch
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.issue.pull_request.head.ref }}
+          ref: ${{ env.HEAD_REF }}
           fetch-depth: 0  # needed for full commit history
               
       - name: Show current commit
         run: |
-          echo "Current HEAD: $(git rev-parse HEAD)"
-              
-
-      - name: Install Rust toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          override: true
+          echo "Current HEAD: $(git rev-parse HEAD)"              
 
       - name: Get Base Branch from PR using gh
         id: get_pr_base
@@ -67,6 +69,13 @@ jobs:
         run: |
           echo "Current HEAD: $(git rev-parse HEAD)"
               
+         
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+
               
       - name: Build reqflowcli from source
         run: |
