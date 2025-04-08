@@ -23,11 +23,13 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           comment-id: ${{ github.event.comment.id }}
           reactions: '+1'
-              
+          
       - name: Checkout PR source branch
         uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.issue.pull_request.head.ref }}
           fetch-depth: 0  # needed for full commit history
+              
 
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
@@ -52,10 +54,7 @@ jobs:
           echo "Base commit: $BASE_COMMIT"
           echo "BASE_COMMIT=$BASE_COMMIT" >> $GITHUB_ENV
 
-      - name: Ensure we’re on the PR branch
-        run: |
-          git checkout ${{ github.event.issue.pull_request.head.ref }}
-          echo "Checked out PR branch: ${{ github.event.issue.pull_request.head.ref }}"
+
 
       - name: Build reqflowcli from source
         run: |
