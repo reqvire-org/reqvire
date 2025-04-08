@@ -35,17 +35,22 @@ jobs:
           toolchain: stable
           override: true
 
-      - name: Fetch base branch
-        run: |
-          git fetch origin "${{ env.BASE_BRANCH }}"
-
-
       - name: Get Base Branch from PR using gh
         id: get_pr_base
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           BASE_BRANCH=$(gh pr view ${{ github.event.issue.number }} --json baseRefName --jq '.baseRefName')
           echo "Using base branch: $BASE_BRANCH"
           echo "BASE_BRANCH=$BASE_BRANCH" >> $GITHUB_ENV
+          
+      - name: Compute merge base commit
+        id: base_commit
+        run: |
+          git fetch origin "$BASE_BRANCH"
+          BASE_COMMIT=$(git merge-base origin/"$BASE_BRANCH" HEAD)
+          echo "Base commit: $BASE_COMMIT"
+          echo "BASE_COMMIT=$BASE_COMMIT" >> $GITHUB_ENV
 
       - name: Ensure we’re on the PR branch
         run: |
@@ -57,9 +62,11 @@ jobs:
           cargo build --release
           cp target/release/reqflow ./reqflow
 
+
       - name: Run ReqFlow Change Impact against PR base
         id: run_reqflow
         run: |
+          mkdir output
           OUTPUT=$(./reqflow --change-impact --git-commit "$BASE_COMMIT" 2>&1 || echo "⚠️ reqflow failed.")
           echo "REQFLOW_OUTPUT<<EOF" >> $GITHUB_ENV
           echo "$OUTPUT" >> $GITHUB_ENV
@@ -70,15 +77,4 @@ jobs:
         with:
           issue-number: ${{ github.event.issue.number }}
           body: |
-            🧠 **ReqFlow Change Impact Report**
-            Triggered by `${{ github.event.comment.user.login }}` via `/reqflow impact`.
-
-            <details>
-            <summary>Click to expand</summary>
-
-            ```
             ${{ env.REQFLOW_OUTPUT }}
-            ```
-
-            </details>
-
