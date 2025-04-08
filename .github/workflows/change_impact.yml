@@ -17,6 +17,13 @@ jobs:
       contents: read
 
     steps:
+      - name: React to trigger comment with
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          comment-id: ${{ github.event.comment.id }}
+          reactions: '+1'
+              
       - name: Checkout PR source branch
         uses: actions/checkout@v4
         with:
@@ -31,15 +38,20 @@ jobs:
       - name: Build reqflowcli from source
         run: |
           cargo build --release
-          cp target/release/reqflowcli ./reqflowcli
+          cp target/release/reqflow ./reqflow
 
-      - name: Run ReqFlow Change Impact
+      - name: Run ReqFlow Change Impact against PR base
         id: run_reqflow
         run: |
-          OUTPUT=$(./reqflowcli --change-impact 2>&1 || echo "⚠️ reqflowcli failed.")
+          BASE_COMMIT=$(git merge-base origin/${{ github.event.pull_request.base.ref }} HEAD)
+          echo "Using base commit: $BASE_COMMIT"
+    
+          OUTPUT=$(./reqflow --change-impact --git-commit "$BASE_COMMIT" 2>&1 || echo "⚠️ reqflow failed.")
+    
           echo "REQFLOW_OUTPUT<<EOF" >> $GITHUB_ENV
           echo "$OUTPUT" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
+         
 
       - name: Comment on PR with result
         uses: peter-evans/create-or-update-comment@v3
