@@ -40,17 +40,22 @@ jobs:
           cargo build --release
           cp target/release/reqflow ./reqflow
 
-      - name: Run ReqFlow Change Impact against PR base
-        id: run_reqflow
+
+      - name: Fetch base branch
         run: |
-          BASE_COMMIT=$(git merge-base origin/${{ github.event.pull_request.base.ref }} HEAD)
-          echo "Using base commit: $BASE_COMMIT"
+          git fetch origin ${{ github.event.pull_request.base.ref }}
+
+      - name: Compute merge base commit
+        id: base_commit
+        run: |
+          BASE_BRANCH=${{ github.event.pull_request.base.ref }}
+          BASE_COMMIT=$(git merge-base origin/$BASE_BRANCH HEAD)
+          echo "Base commit: $BASE_COMMIT"
+          echo "BASE_COMMIT=$BASE_COMMIT" >> $GITHUB_ENV
     
-          OUTPUT=$(./reqflow --change-impact --git-commit "$BASE_COMMIT" 2>&1 || echo "⚠️ reqflow failed.")
-    
-          echo "REQFLOW_OUTPUT<<EOF" >> $GITHUB_ENV
-          echo "$OUTPUT" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+      - name: Run ReqFlow
+        run: |
+          ./reqflowcli --change-impact --git-commit "$BASE_COMMIT"
          
 
       - name: Comment on PR with result
