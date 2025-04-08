@@ -35,19 +35,27 @@ jobs:
           toolchain: stable
           override: true
 
+      - name: Fetch base branch
+        run: |
+          git fetch origin "${{ env.BASE_BRANCH }}"
+
+
+      - name: Get Base Branch from PR using gh
+        id: get_pr_base
+        run: |
+          BASE_BRANCH=$(gh pr view ${{ github.event.issue.number }} --json baseRefName --jq '.baseRefName')
+          echo "Using base branch: $BASE_BRANCH"
+          echo "BASE_BRANCH=$BASE_BRANCH" >> $GITHUB_ENV
+
+      - name: Ensure we’re on the PR branch
+        run: |
+          git checkout ${{ github.event.issue.pull_request.head.ref }}
+          echo "Checked out PR branch: ${{ github.event.issue.pull_request.head.ref }}"
+
       - name: Build reqflowcli from source
         run: |
           cargo build --release
           cp target/release/reqflow ./reqflow
-
-      - name: Compute merge base commit
-        id: base_commit
-        run: |
-          BASE_BRANCH=${GITHUB_BASE_REF:-${{ github.event.issue.pull_request.base.ref }}}
-          git fetch origin "$BASE_BRANCH"
-          BASE_COMMIT=$(git merge-base origin/"$BASE_BRANCH" HEAD)
-          echo "Base commit: $BASE_COMMIT"
-          echo "BASE_COMMIT=$BASE_COMMIT" >> $GITHUB_ENV
 
       - name: Run ReqFlow Change Impact against PR base
         id: run_reqflow
@@ -56,8 +64,7 @@ jobs:
           echo "REQFLOW_OUTPUT<<EOF" >> $GITHUB_ENV
           echo "$OUTPUT" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
-    
-    
+           
       - name: Comment on PR with result
         uses: peter-evans/create-or-update-comment@v3
         with:
