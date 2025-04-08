@@ -11,17 +11,17 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  b0c9a72e5d["Diagram Generation Test"];
-  click b0c9a72e5d "DiagramsTests.md#diagram-generation-test";
-  class b0c9a72e5d verification;
+  b95c73d7b3["Diagram Generation Test"];
+  click b95c73d7b3 "DiagramsTests.md#diagram-generation-test";
+  class b95c73d7b3 verification;
   81f9235ded["UserRequirements.md/Automate Diagram Generation"];
   class 81f9235ded requirement;
   click 81f9235ded "../UserRequirements.md#automate-diagram-generation";
-  b0c9a72e5d -->|verifies| 81f9235ded;
-  cf0026c2fe["UserStories.md/Generate Diagrams"];
-  class cf0026c2fe requirement;
-  click cf0026c2fe "../UserStories.md#generate-diagrams";
-  b0c9a72e5d -->|verifies| cf0026c2fe;
+  b95c73d7b3 -->|verifies| 81f9235ded;
+  2dd8375bf8["tests/test-diagram-generation/test.sh"];
+  class 2dd8375bf8 default;
+  click 2dd8375bf8 "../../tests/test-diagram-generation/test.sh";
+  b95c73d7b3 -->|traces| 2dd8375bf8;
 ```
 
 ---

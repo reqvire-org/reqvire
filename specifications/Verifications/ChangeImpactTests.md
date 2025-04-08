@@ -3,7 +3,36 @@
 This document verifies the requirements for ReqFlow's change impact tracing functionality.
 
 ## Change Impact Tracing Verification
+```mermaid
+graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
+  401764f61b["Change Impact Relations Test"];
+  click 401764f61b "ChangeImpactTests.md#change-impact-relations-test";
+  class 401764f61b requirement;
+  503dda29a8["SystemRequirements/ChangeImpactRequirements.md#change-impact-detection-algorithm"];
+  class 503dda29a8 requirement;
+  click 503dda29a8 "../SystemRequirements/ChangeImpactRequirements.md#change-impact-detection-algorithm";
+  401764f61b -->|verifies| 503dda29a8;
+  9d6f79f601["SystemRequirements/ChangeImpactRequirements.md#change-impact-command-line-interface"];
+  class 9d6f79f601 requirement;
+  click 9d6f79f601 "../SystemRequirements/ChangeImpactRequirements.md#change-impact-command-line-interface";
+  401764f61b -->|verifies| 9d6f79f601;
+  524acc7470["tests/test-change-impact-detection/test.sh"];
+  class 524acc7470 default;
+  click 524acc7470 "../../tests/test-change-impact-detection/test.sh";
+  401764f61b -->|traces| 524acc7470;
+  9102eb42eb["Change Impact Detection Test"];
+  click 9102eb42eb "ChangeImpactTests.md#change-impact-detection-test";
+  class 9102eb42eb requirement;
+  9102eb42eb -->|verifies| 503dda29a8;
+  9102eb42eb -->|verifies| 9d6f79f601;
+  9102eb42eb -->|traces| 524acc7470;
+```
 ---
 
 ### Change Impact Detection Test
