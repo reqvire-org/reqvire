@@ -1,11 +1,18 @@
-[package]
-name = "reqflow"
+[workspace]
+members = [
+    "core",
+    "cli",
+]
+resolver = "2"
+
+[workspace.package]
 version = "0.2.1"
 edition = "2021"
-description = "An agile Model-Based Systems Engineering (MBSE) framework designed to integrate with Git workflows"
 license = "Apache-2.0"
+authors = []
+description = "An agile Model-Based Systems Engineering (MBSE) framework designed to integrate with Git workflows"
 
-[dependencies]
+[workspace.dependencies]
 clap = { version = "4.4", features = ["derive"] }
 pulldown-cmark = "0.9"
 regex = "1.9"
@@ -26,9 +33,9 @@ termcolor = "1.4"
 globset = "0.4.16"
 rustc-hash = "1.1"
 difference = "2.0"
+reqflow = { path = "core" }
 
-
-[dev-dependencies]
+# Dev dependencies
 assert_fs = "1.0"
 predicates = "3.0"
 tempfile = "3.8"

@@ -1,0 +1,44 @@
+[package]
+name = "reqflow"
+version.workspace = true
+edition.workspace = true
+description.workspace = true
+license.workspace = true
+
+[dependencies]
+# Parsing and content manipulation
+pulldown-cmark = { workspace = true }
+regex = { workspace = true }
+lazy_static = { workspace = true }
+difference = { workspace = true }
+
+# Path handling
+camino = { workspace = true }
+pathdiff = { workspace = true }
+walkdir = { workspace = true }
+globset = { workspace = true }
+
+# HTML generation
+maud = { workspace = true }
+
+# Error handling
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+log = { workspace = true }
+
+# Serialization
+serde = { workspace = true }
+serde_json = { workspace = true }
+serde_yml = { workspace = true }
+
+# Performance
+rayon = { workspace = true }
+rustc-hash = { workspace = true }
+
+# Terminal output
+termcolor = { workspace = true }
+
+[dev-dependencies]
+assert_fs = { workspace = true }
+predicates = { workspace = true }
+tempfile = { workspace = true }

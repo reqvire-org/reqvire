@@ -71,7 +71,7 @@ The systsem shall activate power-saving mode when the battery level drops below 
 
 #### Relations
   * refine: [System Power Management](#system-power-management)
-  * satisfiedBy: [software/power_control.md](#power-control)
+  * satisfiedBy: [software/power_control.md](software/power_control.md)
   * verifiedBy: [test_cases/power_saving](#power-saving)
 
 ---
@@ -82,7 +82,7 @@ The system shall reduce CPU frequency by 30% in power-saving mode.
 
 #### Relations
   * derivedFrom: [Power Saving Mode](#power-saving-mode)
-  * satisfiedBy: [firmware/cpu_manager.md](#cpu-manager)
+  * satisfiedBy: [software/cpu_manager.md](software/cpu_manager.md)
   * verifiedBy: [test_cases/cpu_throttling](#cpu-throttling)
 
 ---
@@ -103,7 +103,7 @@ The system shall disable non-essential background services when battery levels d
 
 #### Relations
   * derivedFrom: [System Power Management](#system-power-management)
-  * satisfiedBy: [software/battery_manager.md](#battery-manager)
+  * satisfiedBy: [software/battery_manager.md](software/battery_manager.md)
   * verifiedBy: [test_cases/battery_saving](#battery-saving)
 
 ---

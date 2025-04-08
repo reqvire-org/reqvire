@@ -1,2 +1,4 @@
 paths:
-  specifications_folder: "."
+  specifications_folder: "./specifications"
+  excluded_filename_patterns:
+    - "**/DesignSpecifications/**/*.md"

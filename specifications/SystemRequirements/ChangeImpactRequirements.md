@@ -11,16 +11,36 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  fc8de570b1["Change Impact Command Line Interface"];
-  click fc8de570b1 "Requirements-ChangeImpact.md#change-impact-command-line-interface";
-  class fc8de570b1 requirement;
-  db2c5c302e["Change Impact Detection Algorithm"];
-  click db2c5c302e "Requirements-ChangeImpact.md#change-impact-detection-algorithm";
-  class db2c5c302e requirement;
-  6547987b2b["Change Impact Visualization"];
-  click 6547987b2b "Requirements-ChangeImpact.md#change-impact-visualization";
-  class 6547987b2b requirement;
+  9e4af55877["Change Impact Visualization"];
+  click 9e4af55877 "ChangeImpactRequirements.md#change-impact-visualization";
+  class 9e4af55877 requirement;
+  33e6fb86b3["DesignSpecifications/RequirementsChangePropagation.md"];
+  class 33e6fb86b3 default;
+  click 33e6fb86b3 "../DesignSpecifications/RequirementsChangePropagation.md";
+  9e4af55877 -.->|deriveReqT| 33e6fb86b3;
+  cc976e6bcd["../../core/src/change_impact.rs"];
+  class cc976e6bcd default;
+  click cc976e6bcd "../../core/src/change_impact.rs";
+  cc976e6bcd -->|satisfies| 9e4af55877;
+  503dda29a8["Change Impact Detection Algorithm"];
+  click 503dda29a8 "ChangeImpactRequirements.md#change-impact-detection-algorithm";
+  class 503dda29a8 requirement;
+  503dda29a8 -.->|deriveReqT| 33e6fb86b3;
+  cc976e6bcd -->|satisfies| 503dda29a8;
+  9d6f79f601["Change Impact Command Line Interface"];
+  click 9d6f79f601 "ChangeImpactRequirements.md#change-impact-command-line-interface";
+  class 9d6f79f601 requirement;
+  665b7456c9["CLI Change Impact Report Flag"];
+  class 665b7456c9 requirement;
+  click 665b7456c9 "Requirements.md#cli-change-impact-report-flag";
+  9d6f79f601 -.->|deriveReqT| 665b7456c9;
+  11ffc4632a["../../cli/src/cli.rs"];
+  class 11ffc4632a default;
+  click 11ffc4632a "../../cli/src/cli.rs";
+  11ffc4632a -->|satisfies| 9d6f79f601;
 ```
+
+---
 
 ### Change Impact Detection Algorithm
 
@@ -63,8 +83,8 @@ The algorithm shall consist of the following steps:
    - Support incremental impact analysis for large models
 
 #### Relations
-- derivedFrom: [DesignSpecifications/RequirementsChangePropagation.md](../../specifications/DesignSpecifications/RequirementsChangePropagation.md)
-- satisfiedBy: [../../src/change_impact.rs](../../src/change_impact.rs)
+  * derivedFrom: [DesignSpecifications/RequirementsChangePropagation.md](../../specifications/DesignSpecifications/RequirementsChangePropagation.md)
+  * satisfiedBy: [../../core/src/change_impact.rs](../../core/src/change_impact.rs)
 
 ---
 
@@ -103,8 +123,8 @@ The visualization shall include:
    - Generate overall change impact assessment
 
 #### Relations
-- derivedFrom: [DesignSpecifications/RequirementsChangePropagation.md](../../specifications/DesignSpecifications/RequirementsChangePropagation.md)
-- satisfiedBy: [../../src/change_impact.rs](../../src/change_impact.rs)
+  * derivedFrom: [DesignSpecifications/RequirementsChangePropagation.md](../../specifications/DesignSpecifications/RequirementsChangePropagation.md)
+  * satisfiedBy: [../../core/src/change_impact.rs](../../core/src/change_impact.rs)
 
 ---
 
@@ -141,8 +161,8 @@ The CLI shall support the following functionality:
    - Allow scripting of analysis operations
 
 #### Relations
-- derivedFrom: [CLI Change Impact Report Flag](../SystemRequirements/Requirements.md#cli-change-impact-report-flag)
-- satisfiedBy: [../../src/cli.rs](../../src/cli.rs)
+  * derivedFrom: [CLI Change Impact Report Flag](../SystemRequirements/Requirements.md#cli-change-impact-report-flag)
+  * satisfiedBy: [../../cli/src/cli.rs](../../cli/src/cli.rs)
 
 ---
 
@@ -155,13 +175,26 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  1240515701["End-to-End Change Impact Tests"];
-  click 1240515701 "Requirements-ChangeImpact.md#end-to-end-change-impact-tests";
-  class 1240515701 requirement;
-  3f7bf750a1["Relation Type Impact Tests"];
-  click 3f7bf750a1 "Requirements-ChangeImpact.md#relation-type-impact-tests";
-  class 3f7bf750a1 requirement;
+  9257bdbe19["End-to-End Change Impact Tests"];
+  click 9257bdbe19 "ChangeImpactRequirements.md#end-to-end-change-impact-tests";
+  class 9257bdbe19 requirement;
+  33e6fb86b3["DesignSpecifications/RequirementsChangePropagation.md"];
+  class 33e6fb86b3 default;
+  click 33e6fb86b3 "../DesignSpecifications/RequirementsChangePropagation.md";
+  9257bdbe19 -.->|deriveReqT| 33e6fb86b3;
+  524acc7470["tests/test-change-impact-detection/test.sh"];
+  class 524acc7470 default;
+  click 524acc7470 "../../tests/test-change-impact-detection/test.sh";
+  524acc7470 -->|verifies| 9257bdbe19;
+  a4d4b4ced7["Relation Type Impact Tests"];
+  click a4d4b4ced7 "ChangeImpactRequirements.md#relation-type-impact-tests";
+  class a4d4b4ced7 requirement;
+  a4d4b4ced7 -.->|deriveReqT| 33e6fb86b3;
+  524acc7470 -->|verifies| a4d4b4ced7;
 ```
+
+---
+
 ### Relation Type Impact Tests
 
 The system shall include comprehensive test cases that verify proper change propagation for each relation type.
@@ -191,8 +224,8 @@ Tests shall verify:
    - Clear reporting of circular dependency patterns
 
 #### Relations
-- derivedFrom: [DesignSpecifications/RequirementsChangePropagation.md](../../specifications/DesignSpecifications/RequirementsChangePropagation.md)
-- verifiedBy: [tests/test-change-impact-detection/test.sh](../../tests/test-change-impact-detection/test.sh)
+  * derivedFrom: [DesignSpecifications/RequirementsChangePropagation.md](../../specifications/DesignSpecifications/RequirementsChangePropagation.md)
+  * verifiedBy: [tests/test-change-impact-detection/test.sh](../../tests/test-change-impact-detection/test.sh)
 
 ---
 
@@ -225,5 +258,5 @@ End-to-end tests shall verify:
    - Ensure optimizations work correctly
 
 #### Relations
-- derivedFrom: [DesignSpecifications/RequirementsChangePropagation.md](../../specifications/DesignSpecifications/RequirementsChangePropagation.md)
-- verifiedBy: [tests/test-change-impact-detection/test.sh](../../tests/test-change-impact-detection/test.sh)
+  * derivedFrom: [DesignSpecifications/RequirementsChangePropagation.md](../../specifications/DesignSpecifications/RequirementsChangePropagation.md)
+  * verifiedBy: [tests/test-change-impact-detection/test.sh](../../tests/test-change-impact-detection/test.sh)
