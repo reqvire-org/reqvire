@@ -24,6 +24,9 @@ jobs:
           comment-id: ${{ github.event.comment.id }}
           reactions: '+1'
           
+      - name: Checkout PR source branch
+        uses: actions/checkout@v4
+                    
       - name: Get PR Head Ref using gh
         id: get_pr_head
         env:
