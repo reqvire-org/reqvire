@@ -42,10 +42,6 @@ jobs:
           ref: ${{ env.HEAD_REF }}
           fetch-depth: 0  # needed for full commit history
               
-      - name: Show current commit
-        run: |
-          echo "Current HEAD: $(git rev-parse HEAD)"              
-
       - name: Get Base Branch from PR using gh
         id: get_pr_base
         env:
@@ -66,12 +62,6 @@ jobs:
       - name: Ensure PR branch remains checked out
         run: |
           git checkout ${{ github.event.issue.pull_request.head.ref }}
-          echo "Checked out branch: $(git rev-parse HEAD)"
-
-      - name: Show current commit
-        run: |
-          echo "Current HEAD: $(git rev-parse HEAD)"
-              
          
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
