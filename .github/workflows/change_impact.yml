@@ -54,7 +54,10 @@ jobs:
           echo "Base commit: $BASE_COMMIT"
           echo "BASE_COMMIT=$BASE_COMMIT" >> $GITHUB_ENV
 
-
+      - name: Ensure PR branch remains checked out
+        run: |
+          git checkout ${{ github.event.issue.pull_request.head.ref }}
+          echo "Checked out branch: $(git rev-parse HEAD)"
 
       - name: Build reqflowcli from source
         run: |
