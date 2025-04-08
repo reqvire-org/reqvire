@@ -30,6 +30,10 @@ jobs:
           ref: ${{ github.event.issue.pull_request.head.ref }}
           fetch-depth: 0  # needed for full commit history
               
+      - name: Show current commit
+        run: |
+          echo "Current HEAD: $(git rev-parse HEAD)"
+              
 
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
@@ -59,6 +63,11 @@ jobs:
           git checkout ${{ github.event.issue.pull_request.head.ref }}
           echo "Checked out branch: $(git rev-parse HEAD)"
 
+      - name: Show current commit
+        run: |
+          echo "Current HEAD: $(git rev-parse HEAD)"
+              
+              
       - name: Build reqflowcli from source
         run: |
           cargo build --release
