@@ -84,8 +84,11 @@ impl ElementRegistry {
 
         
     /// To return both the impacted element and the trigger relation.
-    pub fn change_impact_with_relation(&self, changed: &crate::element::Element) -> BTreeMap<String, BTreeSet<String>> {
-        let mut impacted: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
+    pub fn change_impact_with_relation(
+        &self,
+        changed: &element::Element,
+    ) -> BTreeMap<String, BTreeSet<relation::Relation>> {
+        let mut impacted: BTreeMap<String, BTreeSet<relation::Relation>> = BTreeMap::new();
         let mut worklist = VecDeque::new();
 
         // Start with the changed element’s identifier (with no trigger at the root).
@@ -98,11 +101,11 @@ impl ElementRegistry {
                         // Ensure we only consider Forward relations
                         if relation.relation_type.direction == relation::RelationDirection::Forward {
                             if &elem.identifier == current_id {
-                                // Insert the impacted element with the relation name into the map
+                                // Insert the impacted element with the full relation object into the map
                                 impacted
                                     .entry(target_id.clone())
                                     .or_insert_with(BTreeSet::new)
-                                    .insert(relation.relation_type.name.to_string());
+                                    .insert(relation.clone());
 
                                 // Add to worklist if not already impacted
                                 if !impacted.contains_key(target_id) {
@@ -118,54 +121,6 @@ impl ElementRegistry {
         impacted
     }
 
-    /// Builds the change impact tree recursively using `ElementNode` and keep only forward relations
-pub fn build_change_impact_tree(
-    &self,
-    current: &ElementRegistry,
-    element_id: String,
-    visited: &mut BTreeSet<String>,
-) -> ElementNode {
-    // Fetch the current element
-    let element = current.elements.get(&element_id).expect("Element not found").clone();
-
-    // Create an empty vector to hold relation nodes
-    let mut relations = Vec::new();
-
-    // Get impacted elements using the change impact analysis function
-    let impacted_map = self.change_impact_with_relation(&element);
-
-    for (impacted_id, relation_triggers) in impacted_map {
-        // Skip if the relation was already visited to prevent cycles
-        if !visited.insert(impacted_id.clone()) {
-            continue;
-        }
-
-        // Recursively build the child node
-        let child_node = self.build_change_impact_tree(current, impacted_id.clone(), visited);
-
-        // Create a RelationNode object with the trigger relation, filtering only forward relations
-        for trigger in relation_triggers {
-            // Fetch the relation type from the static map
-            if let Some(relation_type_info) = crate::relation::RELATION_TYPES.get(trigger.as_str()) {
-                // Only include Forward relations
-                if relation_type_info.direction == crate::relation::RelationDirection::Forward {
-                    let relation_node = RelationNode {
-                        relation_trigger: trigger.clone(),
-                        element_node: child_node.clone(),
-
-                    };
-                    relations.push(relation_node);
-                }
-            }
-        }
-    }
-
-    // Construct and return the ElementNode
-    ElementNode {
-        element,
-        relations,
-    }
-}
 }
 
 
@@ -207,17 +162,22 @@ mod tests {
         let element_a = create_element("A", "Element A", "Content A");
         let mut element_b = create_element("B", "Element B", "Content B");
 
-        // Define a forward relation from B to A.
-        add_relation(
-            &mut element_b,
-            &RelationTypeInfo {
+        // Define a forward relation from B to A.       
+        let rel = Relation {
+            relation_type: &RelationTypeInfo {
                 name: "derive",
                 direction: RelationDirection::Forward,
                 opposite: Some("derivedFrom"),
                 description: "Element B derives from A",
             },
-            "A",
-        );
+            target: RelationTarget {
+                text: "A".to_string(),
+                link: relation::LinkType::Identifier("A".to_string()),
+            },
+            is_opposite: false,
+        };
+        element_b.relations.push(rel.clone());
+                
 
         my_struct.elements.insert("A".to_string(), element_a.clone());
         my_struct.elements.insert("B".to_string(), element_b.clone());
@@ -225,7 +185,7 @@ mod tests {
         let impact = my_struct.change_impact_with_relation(&element_b);
         assert_eq!(impact.len(), 1);
         assert!(impact.contains_key("A"));
-        assert!(impact.get("A").unwrap().contains("derive"));
+        assert!(impact.get("A").unwrap().contains(&rel));
     }
 
     #[test]
@@ -236,27 +196,35 @@ mod tests {
         let mut element_c = create_element("C", "Element C", "Content C");
 
         // Add multiple relations.
-        add_relation(
-            &mut element_b,
-            &RelationTypeInfo {
+        let rela = Relation {
+            relation_type: &RelationTypeInfo {
                 name: "contain",
                 direction: RelationDirection::Forward,
                 opposite: Some("containedBy"),
                 description: "Element B contains A",
             },
-            "A",
-        );
-
-        add_relation(
-            &mut element_c,
-            &RelationTypeInfo {
+            target: RelationTarget {
+                text: "A".to_string(),
+                link: relation::LinkType::Identifier("A".to_string()),
+            },
+            is_opposite: false,
+        };
+        element_b.relations.push(rela.clone());
+              
+        let relb = Relation {
+            relation_type: &RelationTypeInfo {
                 name: "derive",
                 direction: RelationDirection::Forward,
                 opposite: Some("derivedFrom"),
                 description: "Element C derives from B",
             },
-            "B",
-        );
+            target: RelationTarget {
+                text: "B".to_string(),
+                link: relation::LinkType::Identifier("B".to_string()),
+            },
+            is_opposite: false,
+        };   
+        element_c.relations.push(relb.clone());             
 
         my_struct.elements.insert("A".to_string(), element_a.clone());
         my_struct.elements.insert("B".to_string(), element_b.clone());
@@ -265,118 +233,10 @@ mod tests {
         let impact = my_struct.change_impact_with_relation(&element_c);
         assert_eq!(impact.len(), 1);
         assert!(impact.contains_key("B"));
-        assert!(impact.get("B").unwrap().contains("derive"));
+        assert!(impact.get("B").unwrap().contains(&relb));
     }
 
-    #[test]
-    fn test_build_change_impact_tree() {
-        let mut my_struct = ElementRegistry::new();
-        let element_a = create_element("A", "Element A", "Content A");
-        let mut element_b = create_element("B", "Element B", "Content B");
 
-        // Define a forward relation from B to A.
-        add_relation(
-            &mut element_b,
-            &RelationTypeInfo {
-                name: "derive",
-                direction: RelationDirection::Forward,
-                opposite: Some("derivedFrom"),
-                description: "Element B derives from A",
-            },
-            "A",
-        );
-
-        my_struct.elements.insert("A".to_string(), element_a.clone());
-        my_struct.elements.insert("B".to_string(), element_b.clone());
-
-        let mut visited = BTreeSet::new();
-        visited.insert("B".to_string());
-
-        let tree = my_struct.build_change_impact_tree(
-            &ElementRegistry {
-                elements: my_struct.elements.clone(),
-            },
-            "B".to_string(),
-            &mut visited,
-        );
-
-        assert_eq!(tree.element.identifier, "B");
-        assert_eq!(tree.relations.len(), 1);
-        // Access the child node via element_node.
-        assert_eq!(
-            tree.relations[0].element_node.element.identifier,
-            "A"
-        );
-        assert_eq!(tree.relations[0].relation_trigger, "derive");
-    }
-
-    #[test]
-    fn test_tree_with_cycle() {
-        let mut my_struct = ElementRegistry::new();
-        let mut element_a = create_element("A", "Element A", "Content A");
-        let mut element_b = create_element("B", "Element B", "Content B");
-
-        // Create a cycle: A -> B -> A.
-        add_relation(
-            &mut element_a,
-            &RelationTypeInfo {
-                name: "contain",
-                direction: RelationDirection::Forward,
-                opposite: Some("containedBy"),
-                description: "Element A contains B",
-            },
-            "B",
-        );
-
-        add_relation(
-            &mut element_b,
-            &RelationTypeInfo {
-                name: "derive",
-                direction: RelationDirection::Forward,
-                opposite: Some("derivedFrom"),
-                description: "Element B derives from A",
-            },
-            "A",
-        );
-
-        my_struct.elements.insert("A".to_string(), element_a.clone());
-        my_struct.elements.insert("B".to_string(), element_b.clone());
-
-        let mut visited = BTreeSet::new();
-        visited.insert("A".to_string());
-
-        let tree = my_struct.build_change_impact_tree(
-            &ElementRegistry {
-                elements: my_struct.elements.clone(),
-            },
-            "A".to_string(),
-            &mut visited,
-        );
-
-        // Check that the cycle is correctly handled and not infinite.
-        assert_eq!(tree.element.identifier, "A");
-        assert_eq!(tree.relations.len(), 1);
-        // For the relation from A to B.
-        assert_eq!(
-            tree.relations[0].element_node.element.identifier,
-            "B"
-        );
-        assert_eq!(tree.relations[0].relation_trigger, "contain");
-        
-        // The child node for B has no relations in its tree because B -> A is not processed by the tree
-        // since we only consider Forward relations in change_impact_with_relation
-        assert_eq!(tree.relations[0].element_node.relations.len(), 0);
-        
-        // However, the original element B still has its relation to A
-        assert_eq!(
-            tree.relations[0].element_node.element.relations.len(),
-            1
-        );
-        assert_eq!(
-            tree.relations[0].element_node.element.relations[0].target.text,
-            "A"
-        );
-    }
 }
 
 

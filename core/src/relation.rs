@@ -255,22 +255,26 @@ impl Relation {
     /// Creates an opposite relation if possible for given target
     pub fn to_opposite(&self, name: &str, identifier: &str) -> Option<Relation> {
         if let Some(opposite_name) = self.relation_type.opposite {
-            if let Some(opposite_info) = RELATION_TYPES.get(opposite_name) {
-                Some(Relation {
-                    relation_type: opposite_info,
-                    target: RelationTarget {
-                        text: name.to_string(),
-                        link: LinkType::Identifier(identifier.to_string())
-                    },
-                    is_opposite: true                    
-                })
-            } else {
-                None
+            match RELATION_TYPES.get(opposite_name) {
+                Some(opposite_info) => {
+                    Some(Relation {
+                        relation_type: opposite_info,
+                        target: RelationTarget {
+                            text: name.to_string(),
+                            link: LinkType::Identifier(identifier.to_string()),
+                        },
+                        is_opposite: true,
+                    })
+                }
+                None => {
+                    None
+                }
             }
         } else {
             None
         }
-    }   
+    }
+
 }
 
 

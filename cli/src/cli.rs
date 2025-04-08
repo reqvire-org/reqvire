@@ -9,6 +9,7 @@ use reqflow::index_generator;
 use globset::GlobSet;
 use reqflow::reports;
 use reqflow::change_impact;
+use reqflow::git_commands;
 
 
 #[derive(Parser, Debug)]
@@ -195,10 +196,14 @@ pub fn handle_command(
             let mut refference_model_manager = ModelManager::new();      
             let _not_interested=refference_model_manager.parse_and_validate(Some(&args.git_commit), &specification_folder_path, &external_folders_path,excluded_filename_patterns);
                         
-            dbg!("{}", &model_manager.element_registry);
-            dbg!("{}", &refference_model_manager.element_registry);            
+            //dbg!("{}", &model_manager.element_registry);
+            //dbg!("{}", &refference_model_manager.element_registry);            
             match change_impact::compute_change_impact(&model_manager.element_registry, &refference_model_manager.element_registry,&specification_folder_path, &external_folders_path) {
-                Ok(report) => report.print(args.json),
+                Ok(report) => {
+                    let hash = git_commands::get_commit_hash()?;
+                    let base_url = git_commands::get_repository_base_url()?;                    
+                    report.print(&base_url, &hash, args.json)
+                },
                 Err(e) => eprintln!("❌ Failed to generate chage impact report {:?}", e),
             }
 

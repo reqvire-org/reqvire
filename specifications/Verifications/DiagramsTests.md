@@ -24,6 +24,8 @@ graph LR;
   b0c9a72e5d -->|verifies| cf0026c2fe;
 ```
 
+---
+
 ### Diagram Generation Test
 
 This test verifies that the system can automatically generate and embed mermaid diagrams in requirements documents.

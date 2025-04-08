@@ -6,21 +6,132 @@
 # - System should properly construct change impact report after changes in requirements
 #
 # Test Criteria:
-# - Command exits with success (0) return code
-# - Output shows expected change impact report
-# TODO: we need to see how to test this really
+# - Command exits with success (0) return code 
+# - Change impact report shows correct relationships between elements
+# - Default commit is HEAD when --git-commit is not provided
 
-exit 0
+# Create a unique temporary directory
+TMP_DIR=$(mktemp -d -t reqflow-change-impact-XXXXXX)
+
+cp "${TEST_DIR}/Requirements.md" "${TMP_DIR}/"
+cp "${TEST_DIR}/reqflow.yaml" "${TMP_DIR}/"
+cp -r "${TEST_DIR}/software" "${TMP_DIR}/"
+mkdir -p "${TMP_DIR}/output"
 
 
-OUTPUT=$(cd "$TEST_DIR" && "$REQFLOW_BIN" --config "${TEST_DIR}/reqflow.yaml" --change-impact 2>&1)
+# Create simple git repository to test changes
+cd "${TMP_DIR}"
+git init > /dev/null 2>&1
+git config --local user.email "test@example.com" > /dev/null 2>&1 
+git config --local user.name "Test User" > /dev/null 2>&1
+git remote add origin 'https://dummy.example.com/dummy-repo.git'  > /dev/null 2>&1
+git add Requirements.md > /dev/null 2>&1
+git commit -m "Initial commit" > /dev/null 2>&1
+
+# Modify requirements after commit
+sed -i 's/The systsem shall activate power-saving mode when the battery level drops below 20%./The systsem shall activate power-saving mode when the battery level drops below 30%./g' "${TMP_DIR}/Requirements.md"
+
+# Test 1: Run change impact detection with default commit (HEAD)
+OUTPUT=$(cd "${TMP_DIR}" && "${REQFLOW_BIN}" --config "${TMP_DIR}/reqflow.yaml" --change-impact 2>&1)
 EXIT_CODE=$?
 
 printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
 
-GOTTEN_CONTENT=$(awk '/# [^:]+:/' "${TEST_DIR}/test_results.log")
-GOTTEN_CONTENT=$(echo "$OUTPUT" | jq .errors[0] | sed -r 's/"//g')
+
+# Write output to log file for debugging in temporary directory 
+printf "%s\n" "$OUTPUT" > "${TMP_DIR}/test_results_default.log"
 
 
+# Check exit code
+if [ $EXIT_CODE -ne 0 ]; then
+    echo "❌ FAILED: Change impact detection with default commit failed with exit code $EXIT_CODE"
+    rm -rf "${TMP_DIR}"
+    exit 1
+fi
 
+
+# Test 0b: Check that at least one blob URL is present in raw output
+if ! echo "$OUTPUT" | grep -qE 'https://[^ )]+/blob/[a-f0-9]{7,40}/'; then
+    echo "❌ FAILED: Expected at least one blob URL (GitHub-style) in the report, but none was found."
+    rm -rf "${TMP_DIR}"
+    exit 1
+fi
+# Extract only the important parts (excluding timestamp and path-specific lines)
+GOTTEN_CONTENT=$(echo "$OUTPUT" | grep -v "INFO  reqflow::config" | grep -v "Warning: Element")
+SANITIZED_OUTPUT=$(echo "$GOTTEN_CONTENT" | sed -E 's#https://[^ )]+/blob/[a-f0-9]{7,40}/##g')
+
+# The expected content with blank lines matching actual output
+EXPECTED_CONTENT='# Change Impact Report
+
+## Changed Elements
+
+### Element: [Requirements.md#power-saving-mode](Requirements.md#power-saving-mode)
+
+```diff
+-The systsem shall activate power-saving mode when the battery level drops below 20%.  
++The systsem shall activate power-saving mode when the battery level drops below 30%.  
+```
+#### Change Impact Tree
+* derive: [CPU Power Reduction](Requirements.md#cpu-power-reduction)
+  * verifiedBy: [CPU Throttling](Requirements.md#cpu-throttling)
+  * satisfiedBy: [software/cpu_manager.txt](software/cpu_manager.txt)
+* verifiedBy: [Power Saving](Requirements.md#power-saving)
+* derive: [Screen Brightness Adjustment](Requirements.md#screen-brightness-adjustment)
+  * verifiedBy: [Screen Brightness](Requirements.md#screen-brightness)
+* satisfiedBy: [software/power_control.txt](software/power_control.txt)
+
+---'
+
+
+# Test 1: Verify that change impact report shows correct relationships between elements
+if ! diff <(echo "$EXPECTED_CONTENT") <(echo "$SANITIZED_OUTPUT") > /dev/null; then
+  echo "❌ FAILED: Extracted content not matching expected content."
+  diff -u <(echo "$EXPECTED_CONTENT") <(echo "$SANITIZED_OUTPUT")
+  rm -rf "${TMP_DIR}"
+  exit 1
+fi
+
+# Test 2: Verify that change impact detection works with specified commit
+# Use HEAD as the explicit commit
+OUTPUT=$(cd "${TMP_DIR}" && "${REQFLOW_BIN}" --config "${TMP_DIR}/reqflow.yaml" --change-impact --git-commit HEAD 2>&1)
+EXIT_CODE=$?
+
+# Write output to log file for debugging in temporary directory
+printf "%s\n" "$OUTPUT" > "${TMP_DIR}/test_results_explicit.log"
+
+# Check exit code
+if [ $EXIT_CODE -ne 0 ]; then
+    echo "❌ FAILED: Change impact detection with explicit commit failed with exit code $EXIT_CODE"
+    rm -rf "${TMP_DIR}"
+    exit 1
+fi
+
+# Test 3: Verify JSON output format for change impact detection
+OUTPUT=$(cd "${TMP_DIR}" && "${REQFLOW_BIN}" --config "${TMP_DIR}/reqflow.yaml" --change-impact --json 2>&1)
+EXIT_CODE=$?
+
+# Write output to log file for debugging in temporary directory
+printf "%s\n" "$OUTPUT" > "${TMP_DIR}/test_results_json.log"
+
+# Check exit code
+if [ $EXIT_CODE -ne 0 ]; then
+    echo "❌ FAILED: Change impact detection with JSON output failed with exit code $EXIT_CODE"
+    rm -rf "${TMP_DIR}"
+    exit 1
+fi
+
+# Skip warnings and find the actual JSON content
+JSON_OUTPUT=$(echo "$OUTPUT" | grep -v "Warning:" | grep -A 1000 "^{")
+printf "%s\n" "$JSON_OUTPUT" > "${TMP_DIR}/test_results_json_clean.log"
+
+# Verify JSON format by testing with jq
+if ! echo "$JSON_OUTPUT" | jq . >/dev/null 2>&1; then
+    echo "❌ FAILED: Output is not valid JSON"
+    rm -rf "${TMP_DIR}"
+    exit 1
+fi
+
+
+# Clean up temporary directory
+rm -rf "${TMP_DIR}"
 exit 0

@@ -3,6 +3,65 @@ use anyhow::Result;
 use crate::error::ReqFlowError;
 use std::path::PathBuf;
 
+/// Retrieves the repository base URL (HTTPS format) from Git remote configuration.
+pub fn get_repository_base_url() -> Result<String, ReqFlowError> {
+    // Fetch the repository URL from git configuration
+    let output = Command::new("git")
+        .args(&["config", "--get", "remote.origin.url"])
+        .output()?;
+
+    if !output.status.success() {
+        let err = String::from_utf8_lossy(&output.stderr);
+        return Err(ReqFlowError::GitCommandError(format!("Failed to get repository URL: {}", err)));
+    }
+
+    let url = String::from_utf8_lossy(&output.stdout).trim().to_string();
+
+    if url.is_empty() {
+        return Err(ReqFlowError::GitCommandError("Repository URL is empty or not set".to_string()));
+    }
+
+    let base_url = if url.starts_with("git@") {
+        // Convert SSH URL to HTTPS (git@github.com:owner/repo.git -> https://github.com/owner/repo)
+        let ssh_to_https = url
+            .trim_start_matches("git@")
+            .replace(':', "/")
+            .trim_end_matches(".git")
+            .to_string();
+        format!("https://{}", ssh_to_https)
+    } else if url.starts_with("https://") {
+        // HTTPS URLs (https://github.com/owner/repo.git -> https://github.com/owner/repo)
+        url.trim_end_matches(".git").to_string()
+    } else {
+        return Err(ReqFlowError::GitCommandError(format!(
+            "Unsupported remote URL format: {}", url
+        )));
+    };
+
+    Ok(base_url)
+}
+
+
+/// Retrieves the current commit hash from the repository.
+pub fn get_commit_hash() -> Result<String,ReqFlowError> {
+    // Run the git command to get the current commit hash
+    let output = Command::new("git")
+        .args(&["rev-parse", "HEAD"])
+        .output()?;
+    if !output.status.success() {
+        let err = String::from_utf8_lossy(&output.stderr);
+        return Err(ReqFlowError::GitCommandError(format!("Failed to get current commit hash: {}", err)));
+    }
+
+    // Convert the output to a string and trim any newline or whitespace
+    let hash = String::from_utf8_lossy(&output.stdout).trim().to_string();
+    if hash.is_empty() {
+        return Err(ReqFlowError::GitCommandError("Commit hash is empty".to_string()));
+    }
+
+    Ok(hash)
+}
+
 /// Retrieves the content of a file at a given commit (e.g. "HEAD~1").
 pub fn get_file_at_commit(file_path: &str,folder:&PathBuf, commit: &str) -> Result<String, ReqFlowError> {
 
@@ -115,3 +174,5 @@ pub fn ls_tree_commit_in_folder(commit: &str, folder: &PathBuf) -> Result<Vec<St
 
     Ok(files)
 }
+
+
