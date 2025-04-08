@@ -35,10 +35,6 @@ jobs:
           toolchain: stable
           override: true
 
-      - name: Fetch base branch
-        run: |
-          git fetch origin "${{ env.BASE_BRANCH }}"
-
       - name: Get Base Branch from PR using gh
         id: get_pr_base
         env:
@@ -47,6 +43,14 @@ jobs:
           BASE_BRANCH=$(gh pr view ${{ github.event.issue.number }} --json baseRefName --jq '.baseRefName')
           echo "Using base branch: $BASE_BRANCH"
           echo "BASE_BRANCH=$BASE_BRANCH" >> $GITHUB_ENV
+          
+      - name: Compute merge base commit
+        id: base_commit
+        run: |
+          git fetch origin "$BASE_BRANCH"
+          BASE_COMMIT=$(git merge-base origin/"$BASE_BRANCH" HEAD)
+          echo "Base commit: $BASE_COMMIT"
+          echo "BASE_COMMIT=$BASE_COMMIT" >> $GITHUB_ENV
 
       - name: Ensure we’re on the PR branch
         run: |
