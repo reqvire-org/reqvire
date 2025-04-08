@@ -82,6 +82,7 @@ The system shall allow users to export generated diagrams in standard formats (e
 ---
 
 ### Highlight Changes in Diagrams
+
 The system shall provide an option to highlight changes made to the model in the generated diagrams for better traceability.
 
 #### Relations
