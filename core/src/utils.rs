@@ -548,7 +548,24 @@ mod tests {
 
         for (identifier, in_document, expected) in test_cases {
             let result = normalize_identifier(identifier, &in_document, &config_with_externals.get_specification_folder(),&config_with_externals.get_external_folders());
-            assert_eq!(result.unwrap(), temp_path.join(expected).to_string_lossy(), "Failed for identifier: {}", identifier);
+            
+            // Doing canon because of macos tmp path symlinks, question is if code should work if we are adjusting tests??
+            let expected_path = temp_path.join(expected);
+            let expected_path_canon = expected_path.canonicalize().unwrap();
+            let expected_canon = expected_path_canon.to_string_lossy();
+
+            let result_str = result.unwrap(); // assuming it's a String
+            let result_path = std::fs::canonicalize(&result_str).unwrap();
+            let result_canon = result_path.to_string_lossy();
+    
+            assert_eq!(
+                &result_canon,
+                &expected_canon,
+                "Failed for identifier: {}",
+                identifier
+            );
+
+
         }
         
     
