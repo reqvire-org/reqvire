@@ -116,6 +116,7 @@ pub fn find_git_repo_root(absolute_folder_path: &PathBuf) -> Result<String, ReqF
 }
 
 /// Retrieves the repository root folder
+/*
 pub fn get_repository_root(file_path: &str,folder:&str, commit: &str) -> Result<String, ReqFlowError> {
     println!("{}", &format!("{}:{}", commit, file_path));
     let output = Command::new("git")
@@ -127,6 +128,22 @@ pub fn get_repository_root(file_path: &str,folder:&str, commit: &str) -> Result<
         return Err(ReqFlowError::GitCommandError(format!("git show failed for {}: {}", file_path, err)));
     }
     Ok(String::from_utf8_lossy(&output.stdout).into())
+}
+
+*/
+pub fn repository_root() -> Result<PathBuf, ReqFlowError> {
+    let output = Command::new("git")
+        .args(&["rev-parse", "--show-toplevel"])
+        .output()?;
+
+    if !output.status.success() {
+        return Err(ReqFlowError::GitCommandError(
+            "git failed to find repository root".to_string(),
+        ));
+    }
+
+    let path_str = String::from_utf8_lossy(&output.stdout).trim().to_string();
+    Ok(PathBuf::from(path_str))
 }
 
 /// Returns a list of files that have changed (according to `git diff --name-only`).

@@ -8,7 +8,8 @@ use crate::element_registry;
 use crate::relation;
 use crate::element;
 use difference::{Changeset, Difference};
-
+use std::path::Path;
+use serde_json::{json, Value};
 
 
 /// Represents a simplified relation for reporting.
@@ -18,6 +19,20 @@ pub struct RelationSummary {
     pub target: RelationTarget,
     pub is_opposite: bool,
 }
+
+impl RelationSummary {
+    pub fn to_repo_url(&self, repo_root: &Path, base_url: &str, commit: &str) -> Option<String> {
+        match &self.target.link {
+            LinkType::Identifier(id) => {
+                let path = PathBuf::from(id);
+                let relative = path.strip_prefix(repo_root).ok()?;
+                Some(format!("{}/blob/{}/{}", base_url, commit, relative.to_string_lossy()))
+            }
+            _ => None,
+        }
+    }
+}
+
 
 /// Report for an element that is newly added (only in the current registry).
 #[derive(Debug, Serialize)]
@@ -37,7 +52,7 @@ pub struct RemovedElement {
 }
 
 /// Report for an element that exists in both registries but has differences.
-#[derive(Debug, Serialize)]
+#[derive(Debug,Serialize)]
 pub struct ChangedElement {
     pub element_id: String,
     pub old_content: String,
@@ -47,6 +62,15 @@ pub struct ChangedElement {
     pub removed_relations: Vec<RelationSummary>,
     pub change_impact_tree: element_registry::ElementNode,
 }
+
+impl ChangedElement {
+    pub fn to_repo_url(&self, repo_root: &Path, base_url: &str, commit: &str) -> String {
+        let path = PathBuf::from(&self.element_id);
+        let relative = path.strip_prefix(repo_root).unwrap_or(&path);
+        format!("{}/blob/{}/{}", base_url, commit, relative.to_string_lossy())
+    }
+}
+
 
 /// Report detailing changes between two registries.
 #[derive(Debug, Serialize)]
@@ -58,23 +82,27 @@ pub struct ChangeImpactReport<'a> {
     specification_folder: &'a PathBuf,
     #[serde(skip_serializing)]
     external_folders: &'a [PathBuf],
+    #[serde(skip_serializing)]    
+    repo_root: &'a PathBuf
 }
 
 impl<'a> ChangeImpactReport<'a> {
-    pub fn new(specification_folder: &'a PathBuf, external_folders: &'a [PathBuf]) -> Self {
+    pub fn new(repo_root: &'a PathBuf, specification_folder: &'a PathBuf, external_folders: &'a [PathBuf]) -> Self {
         Self {
             added: Vec::new(),
             removed: Vec::new(),
             changed: Vec::new(),
             specification_folder,
             external_folders,
+            repo_root
         }
     }
 
+    
     fn to_relative_paths(&self) -> ChangeImpactReport<'a> {
-        let mut report = ChangeImpactReport::new(self.specification_folder, self.external_folders);
+        let mut report = ChangeImpactReport::new(self.repo_root, self.specification_folder, self.external_folders);
         let to_relative = |path: &str| {
-            utils::get_relative_path(&PathBuf::from(path), self.specification_folder, self.external_folders)
+            utils::get_relative_path_from_root(&PathBuf::from(path), &self.repo_root)
                 .map(|p| p.to_string_lossy().to_string())
                 .unwrap_or_else(|err| {
                     eprintln!("Error converting path {}: {}", path, err);
@@ -148,8 +176,114 @@ impl<'a> ChangeImpactReport<'a> {
         report
     }
     
+    /// Outputs the report as json with GitHub links included.    
+    pub fn to_json(
+        &self,
+        base_url: &str,
+        git_commit: &str,
+        previous_git_commit: &str,
+    ) -> serde_json::Value {
+        let added: Vec<_> = self.added.iter().map(|elem| {
+            let element_url = format!("{}/blob/{}/{}", base_url, git_commit, elem.element_id);
+
+            let added_relations: Vec<_> = elem.added_relations.iter().map(|rel| {
+                let target_url = match rel.target.link {
+                    LinkType::Identifier(ref id) => format!("{}/blob/{}/{}", base_url, git_commit, id),
+                    _ => rel.target.link.as_str().to_string(),
+                };
+
+                json!({
+                    "relation_type": rel.relation_type,
+                    "target_text": rel.target.text,
+                    "target_url": target_url
+                })
+            }).collect();
+
+            let impact_tree = render_change_impact_tree_json(&elem.change_impact_tree, base_url, git_commit);
+
+            json!({
+                "element_id": element_url,
+                "new_content": elem.new_content,
+                "added_relations": added_relations,
+                "change_impact_tree": impact_tree
+            })
+        }).collect();
+
+        let removed: Vec<_> = self.removed.iter().map(|elem| {
+            let element_url = format!("{}/blob/{}/{}", base_url, previous_git_commit, elem.element_id);
+
+            let removed_relations: Vec<_> = elem.removed_relations.iter().map(|rel| {
+                let target_url = match rel.target.link {
+                    LinkType::Identifier(ref id) => format!("{}/blob/{}/{}", base_url, previous_git_commit, id),
+                    _ => rel.target.link.as_str().to_string(),
+                };
+
+                json!({
+                    "relation_type": rel.relation_type,
+                    "target_text": rel.target.text,
+                    "target_url": target_url
+                })
+            }).collect();
+
+            json!({
+                "element_id": element_url,
+                "repo_url": element_url,
+                "old_content": elem.old_content,
+                "removed_relations": removed_relations
+            })
+        }).collect();
+
+        let changed: Vec<_> = self.changed.iter().map(|elem| {
+            let element_url = format!("{}/blob/{}/{}", base_url, git_commit, elem.element_id);
+
+            let added_relations: Vec<_> = elem.added_relations.iter().map(|rel| {
+                let target_url = match rel.target.link {
+                    LinkType::Identifier(ref id) => format!("{}/blob/{}/{}", base_url, git_commit, id),
+                    _ => rel.target.link.as_str().to_string(),
+                };
+
+                json!({
+                    "relation_type": rel.relation_type,
+                    "target_text": rel.target.text,
+                    "target_url": target_url
+                })
+            }).collect();
+
+            let removed_relations: Vec<_> = elem.removed_relations.iter().map(|rel| {
+                let target_url = match rel.target.link {
+                    LinkType::Identifier(ref id) => format!("{}/blob/{}/{}", base_url, previous_git_commit, id),
+                    _ => rel.target.link.as_str().to_string(),
+                };
+
+                json!({
+                    "relation_type": rel.relation_type,
+                    "target_text": rel.target.text,
+                    "target_url": target_url
+                })
+            }).collect();
+    
+            let impact_tree = render_change_impact_tree_json(&elem.change_impact_tree, base_url, git_commit);
+
+            json!({
+                "element_id": element_url,
+                "old_content": elem.old_content,
+                "new_content": elem.new_content,
+                "content_changed": elem.content_changed,
+                "added_relations": added_relations,
+                "removed_relations": removed_relations,
+                "change_impact_tree": impact_tree
+            })
+        }).collect();
+
+        json!({
+            "added": added,
+            "removed": removed,
+            "changed": changed
+        })
+    }
+
     /// Outputs the report as text with GitHub links included.
-    pub fn to_text(&self, base_url: &str, branch_or_commit: &str) -> String {
+    pub fn to_text(&self, base_url: &str, git_commit: &str, previous_git_commit: &str) -> String {
         let mut output = String::new();
         output.push_str("# Change Impact Report\n\n");
 
@@ -159,21 +293,21 @@ impl<'a> ChangeImpactReport<'a> {
         }
         for elem in &self.added {
             // Insert a GitHub link using the base URL and branch/commit.
-            let element_url = format!("{}/blob/{}/{}", base_url, branch_or_commit, elem.element_id);
+            let element_url = format!("{}/blob/{}/{}", base_url, git_commit, elem.element_id);
             output.push_str(&format!("### Element: [{}]({})\n\n", elem.element_id, element_url));
             output.push_str(&format!("#### New Content\n\n{}\n\n", elem.new_content));
             if !elem.added_relations.is_empty() {
                 output.push_str("#### Added Relations\n");
                 for rel in &elem.added_relations {
                     let target_url = match rel.target.link {
-                        LinkType::Identifier(ref id) => format!("{}/blob/{}/{}", base_url, branch_or_commit, id),
+                        LinkType::Identifier(ref id) => format!("{}/blob/{}/{}", base_url, git_commit, id),
                         _ => rel.target.link.as_str().to_string(),
                     };
                     output.push_str(&format!("- **{}** -> [{}]({})\n", rel.relation_type, rel.target.text, target_url));
                 }
                 output.push_str("\n");
             }
-            let rendered_tree = render_change_impact_tree(&elem.change_impact_tree, 0, base_url, branch_or_commit);
+            let rendered_tree = render_change_impact_tree(&elem.change_impact_tree, 0, base_url, git_commit);
             if !rendered_tree.trim().is_empty() {
                 output.push_str("#### Change Impact Tree\n");
                 output.push_str(&rendered_tree);
@@ -186,14 +320,14 @@ impl<'a> ChangeImpactReport<'a> {
             output.push_str("## Removed Elements\n\n");
         }
         for elem in &self.removed {
-            let element_url = format!("{}/blob/{}/{}", base_url, branch_or_commit, elem.element_id);
+            let element_url = format!("{}/blob/{}/{}", base_url, previous_git_commit, elem.element_id);
             output.push_str(&format!("### Element: [{}]({})\n\n", elem.element_id, element_url));
             output.push_str(&format!("#### Removed Content\n\n{}\n\n", elem.old_content));
             if !elem.removed_relations.is_empty() {
                 output.push_str("#### Removed Relations\n");
                 for rel in &elem.removed_relations {
                     let target_url = match rel.target.link {
-                        LinkType::Identifier(ref id) => format!("{}/blob/{}/{}", base_url, branch_or_commit, id),
+                        LinkType::Identifier(ref id) => format!("{}/blob/{}/{}", base_url, previous_git_commit, id),
                         _ => rel.target.link.as_str().to_string(),
                     };
                     output.push_str(&format!("- **{}** -> [{}]({})\n", rel.relation_type, rel.target.text, target_url));
@@ -208,7 +342,7 @@ impl<'a> ChangeImpactReport<'a> {
             output.push_str("## Changed Elements\n\n");
         }
         for elem in &self.changed {
-            let element_url = format!("{}/blob/{}/{}", base_url, branch_or_commit, elem.element_id);
+            let element_url = format!("{}/blob/{}/{}", base_url, git_commit, elem.element_id);
             output.push_str(&format!("### Element: [{}]({})\n\n", elem.element_id, element_url));
             let markdown_diff = generate_markdown_diff(&elem.old_content, &elem.new_content);
             output.push_str(&format!("{}\n", markdown_diff));
@@ -216,7 +350,7 @@ impl<'a> ChangeImpactReport<'a> {
                 output.push_str("#### Added Relations\n");
                 for rel in &elem.added_relations {
                     let target_url = match rel.target.link {
-                        LinkType::Identifier(ref id) => format!("{}/blob/{}/{}", base_url, branch_or_commit, id),
+                        LinkType::Identifier(ref id) => format!("{}/blob/{}/{}", base_url, git_commit, id),
                         _ => rel.target.link.as_str().to_string(),
                     };
                     output.push_str(&format!("- **{}** -> [{}]({})\n", rel.relation_type, rel.target.text, target_url));
@@ -227,14 +361,14 @@ impl<'a> ChangeImpactReport<'a> {
                 output.push_str("#### Removed Relations\n");
                 for rel in &elem.removed_relations {
                     let target_url = match rel.target.link {
-                        LinkType::Identifier(ref id) => format!("{}/blob/{}/{}", base_url, branch_or_commit, id),
+                        LinkType::Identifier(ref id) => format!("{}/blob/{}/{}", base_url, previous_git_commit, id),
                         _ => rel.target.link.as_str().to_string(),
                     };
                     output.push_str(&format!("- **{}** -> [{}]({})\n", rel.relation_type, rel.target.text, target_url));
                 }
                 output.push_str("\n");
             }
-            let rendered_tree = render_change_impact_tree(&elem.change_impact_tree, 0, base_url, branch_or_commit);
+            let rendered_tree = render_change_impact_tree(&elem.change_impact_tree, 0, base_url, git_commit);
             if !rendered_tree.trim().is_empty() {
                 output.push_str("#### Change Impact Tree\n");
                 output.push_str(&rendered_tree);
@@ -245,16 +379,12 @@ impl<'a> ChangeImpactReport<'a> {
         output
     }
     
-
-    pub fn to_json(&self) -> String {
-        serde_json::to_string_pretty(self).unwrap_or_else(|_| "Error serializing report".to_string())
-    }
-
-    pub fn print(&self, base_url: &str, branch_or_commit: &str, as_json: bool) {
+    pub fn print(&self, base_url: &str, git_commit: &str,  previous_git_commit: &str, as_json: bool) {
+        let report_with_relative_paths=self.to_relative_paths();
         if as_json {
-            println!("{}", self.to_relative_paths().to_json());
+            println!("{}",serde_json::to_string_pretty(&report_with_relative_paths.to_json(base_url, git_commit, previous_git_commit)).unwrap());
         } else {
-            println!("{}", self.to_relative_paths().to_text(base_url, branch_or_commit));
+            println!("{}", report_with_relative_paths.to_text(base_url, git_commit, previous_git_commit));
         }
     }    
 }
@@ -325,14 +455,14 @@ fn render_change_impact_tree(
     node: &element_registry::ElementNode,
     indent: usize,
     base_url: &str,
-    branch_or_commit: &str,
+    git_commit: &str,
 ) -> String {
     let mut output = String::new();
     let pad = "  ".repeat(indent);
 
     // Render the current node’s relations with GitHub links
     for relation_node in &node.relations {
-        let element_url = format!("{}/blob/{}/{}", base_url, branch_or_commit, relation_node.element_node.element.identifier);
+        let element_url = format!("{}/blob/{}/{}", base_url, git_commit, relation_node.element_node.element.identifier);
         output.push_str(&format!(
             "{}* {}: [{}]({})\n",
             pad,
@@ -344,11 +474,43 @@ fn render_change_impact_tree(
             &relation_node.element_node,
             indent + 1,
             base_url,
-            branch_or_commit,
+            git_commit,
         ));
     }
 
     output
+}
+/// Render the change impact tree recursively as structured JSON with GitHub URLs.
+fn render_change_impact_tree_json(
+    node: &element_registry::ElementNode,
+    base_url: &str,
+    git_commit: &str,
+) -> Vec<Value> {
+    node.relations.iter().map(|relation_node| {
+        let child = &relation_node.element_node;
+
+        // Construct the GitHub URL using the base URL and commit hash for the identifier
+        let github_url = format!("{}/blob/{}/{}", base_url, git_commit, &child.element.identifier);
+
+        // Render the nested relations in the JSON structure
+        let nested_relations = render_change_impact_tree_json(child, base_url, git_commit);
+
+        // Map the relation_trigger as a key and its nested element info as the value
+        let mut relation_obj = serde_json::Map::new();
+        relation_obj.insert(
+            relation_node.relation_trigger.clone(),
+            json!({
+                "name": child.element.name,
+                "identifier": github_url,
+                "element_type": format!("{:?}", child.element.element_type),
+                "invalidated": child.element.invalidated,
+                "relations": nested_relations
+            })
+        );
+
+        // Return the relation in the desired format
+        json!(relation_obj)
+    }).collect()
 }
 
 /// Converts a relation into a summarized representation.
@@ -446,6 +608,7 @@ pub fn build_change_impact_tree(
             if !visited.insert(impacted_id.clone()) {
                 return None;
             }
+     
 
             // Use the text from the first relation as a fallback display name
             let fallback_name = rels.first().map(|rel| rel.target.text.clone());
@@ -490,10 +653,11 @@ pub fn build_change_impact_tree(
 pub fn compute_change_impact<'a>(
     current: &'a element_registry::ElementRegistry,
     reference: &'a element_registry::ElementRegistry,
+    repo_root: &'a PathBuf,    
     specification_folder: &'a PathBuf,
     external_folders: &'a [PathBuf],
 ) -> Result<ChangeImpactReport<'a>, ReqFlowError> {
-    let mut report = ChangeImpactReport::new(specification_folder, external_folders);
+    let mut report = ChangeImpactReport::new(repo_root, specification_folder, external_folders);
 
     let current_ids: HashSet<&String> = current.elements.keys().collect();
     let reference_ids: HashSet<&String> = reference.elements.keys().collect();

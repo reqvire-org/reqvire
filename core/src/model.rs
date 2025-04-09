@@ -157,6 +157,9 @@ impl ModelManager {
         for source_id in &element_ids {
             if let Some(source_element) = self.element_registry.elements.get(source_id) {
                 for relation in &source_element.relations {
+                    if relation.is_opposite{
+                        continue;
+                    }
                     if let relation::LinkType::Identifier(ref target_id) = relation.target.link {
                         if !md_regex.is_match(target_id) {
                             log::debug!("Skipping non-markdown target: {}", target_id);
