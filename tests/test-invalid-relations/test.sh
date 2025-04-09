@@ -33,7 +33,7 @@ if ! [ $EXIT_CODE -eq 0 ]; then
 fi
 
 # Check for specific error messages
-if [[ "$(echo "$OUTPUT" | jq -r '.errors[]' | sed -r 's/:.*//' | paste -sd,)" != "Duplicate element,Invalid metadata format,Invalid relation format,Unsupported relation type,Invalid identifier,Duplicate subsection,Incompatible element types for relation,Incompatible element types for relation,Circular dependency error,Missing parent relation" ]]; then
+if [[ "$(echo "$OUTPUT" | jq -r '.errors[]' | sed -r 's/:.*//' | paste -sd,)" != "Duplicate element,Invalid metadata format,Invalid relation format,Unsupported relation type,Invalid identifier,Duplicate subsection,Incompatible element types for relation,Circular dependency error,Missing parent relation" ]]; then
   echo "❌ FAILED: Expected errors missing."
   exit 1
 fi

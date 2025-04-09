@@ -11,21 +11,16 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  9e4af55877["Change Impact Visualization"];
-  click 9e4af55877 "ChangeImpactRequirements.md#change-impact-visualization";
-  class 9e4af55877 requirement;
-  33e6fb86b3["DesignSpecifications/RequirementsChangePropagation.md"];
-  class 33e6fb86b3 default;
-  click 33e6fb86b3 "../DesignSpecifications/RequirementsChangePropagation.md";
-  9e4af55877 -.->|deriveReqT| 33e6fb86b3;
-  cc976e6bcd["../../core/src/change_impact.rs"];
-  class cc976e6bcd default;
-  click cc976e6bcd "../../core/src/change_impact.rs";
-  cc976e6bcd -->|satisfies| 9e4af55877;
   503dda29a8["Change Impact Detection Algorithm"];
   click 503dda29a8 "ChangeImpactRequirements.md#change-impact-detection-algorithm";
   class 503dda29a8 requirement;
+  33e6fb86b3["DesignSpecifications/RequirementsChangePropagation.md"];
+  class 33e6fb86b3 default;
+  click 33e6fb86b3 "../DesignSpecifications/RequirementsChangePropagation.md";
   503dda29a8 -.->|deriveReqT| 33e6fb86b3;
+  cc976e6bcd["../../core/src/change_impact.rs"];
+  class cc976e6bcd default;
+  click cc976e6bcd "../../core/src/change_impact.rs";
   cc976e6bcd -->|satisfies| 503dda29a8;
   401764f61b["Change Impact Relations Test"];
   class 401764f61b requirement;
@@ -48,6 +43,11 @@ graph LR;
   11ffc4632a -->|satisfies| 9d6f79f601;
   401764f61b -->|verifies| 9d6f79f601;
   9102eb42eb -->|verifies| 9d6f79f601;
+  9e4af55877["Change Impact Visualization"];
+  click 9e4af55877 "ChangeImpactRequirements.md#change-impact-visualization";
+  class 9e4af55877 requirement;
+  9e4af55877 -.->|deriveReqT| 33e6fb86b3;
+  cc976e6bcd -->|satisfies| 9e4af55877;
 ```
 
 ---

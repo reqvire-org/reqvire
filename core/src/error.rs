@@ -80,4 +80,7 @@ pub enum ReqFlowError {
     #[error("Linting error: {0}")]    
     LintError(String),  
     
+    #[error("{0}")]    
+    ProcessError(String),      
+    
 }

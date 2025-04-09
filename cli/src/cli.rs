@@ -1,7 +1,7 @@
 use clap::{Parser, CommandFactory};
 use std::path::PathBuf;
 use anyhow::Result;
-use log::{error, info};
+use log::{info};
 use serde::Serialize;
 use reqflow::error::ReqFlowError;
 use reqflow::{html_export, linting, ModelManager};
@@ -99,22 +99,18 @@ impl Args {
 /// Structure for JSON output of validation results
 #[derive(Serialize)]
 struct ValidationResult {
-    validation_type: String,
-    errors: Vec<String>,
-    fixed: bool, // Kept for API compatibility but always false now
+    errors: Vec<String>
 }
 
 /// Helper function to print validation results
-fn print_validation_results(validation_type: &str, errors: &[ReqFlowError], json_output: bool) {
+fn print_validation_results(errors: &[ReqFlowError], json_output: bool) {
     if json_output {
         let json_result = ValidationResult {
-            validation_type: validation_type.to_string(),
             errors: errors.iter().map(|e| e.to_string()).collect(),
-            fixed: false,
         };
         println!("{}", serde_json::to_string_pretty(&json_result).unwrap());
     } else {
-        println!("\n❌ {} validation failed with {} error(s):", validation_type, errors.len());
+        println!("\n❌ {} validation failed with error(s):", errors.len());
         println!("");        
         for (i, error) in errors.iter().enumerate() {
             println!("  {}. {}", i + 1, error);
@@ -131,7 +127,7 @@ pub fn handle_command(
     output_folder_path: &PathBuf,
     excluded_filename_patterns: &GlobSet,
     diagram_direction: &str
-) -> Result<i32> {
+) -> Result<i32,ReqFlowError> {
 
     let mut model_manager = ModelManager::new();
 
@@ -144,22 +140,22 @@ pub fn handle_command(
                 Args::print_help();
                 return Ok(0);
             }
-            Err(e) => {
-                error!("Error reading LLM context file: {}", e);
-                return Err(anyhow::anyhow!("Failed to read LLM context file"));
+            Err(_e) => {
+                return Err(ReqFlowError::ProcessError("❌ Failed to read LLM context file".to_string()));
             }
         }
     }else{
   
         let parse_result=model_manager.parse_and_validate(None, &specification_folder_path, &external_folders_path,excluded_filename_patterns);
 
+                
         if args.validate {
             match parse_result {
                 Ok(errors) => {
                     if errors.is_empty() {
                         println!("✅ Validation completed successfully with no errors.");
                     } else {
-                        print_validation_results("Validation Summary", &errors, args.json);
+                        print_validation_results(&errors, args.json);
                     }
                     return Ok(0);
                 }
@@ -170,12 +166,16 @@ pub fn handle_command(
             }  
         }else if args.generate_index {
             info!("Generating index.....");
-            match index_generator::generate_readme_index(&model_manager.element_registry, &specification_folder_path,&external_folders_path){
-                Ok(_index_content) => {},
-                Err(e) => eprintln!("❌ Failed to generate README.md: {:?}", e),
-            }
-            return Ok(0);        
-            
+
+            let _index_context = index_generator::generate_readme_index(
+                &model_manager.element_registry, 
+                &specification_folder_path,
+                &external_folders_path
+            ).map_err(|e| {
+                ReqFlowError::ProcessError(format!("❌ Failed to generate README.md: {:?}", e))
+            })?;
+
+            return Ok(0);
                                             
         }else if args.generate_diagrams {
             info!("Generating mermaid diagrams in {:?}", specification_folder_path);
@@ -193,20 +193,33 @@ pub fn handle_command(
             
         }else if args.change_impact {
             
+            let current_commit = git_commands::get_commit_hash().map_err(|_| {
+                ReqFlowError::ProcessError("❌ Failed to retrieve the current commit hash.".to_string())
+            })?;
+
+            let repo_root = git_commands::repository_root().map_err(|_| {
+                ReqFlowError::ProcessError("❌ Failed to determine repository root.".to_string())
+            })?;
+
+            let base_url = git_commands::get_repository_base_url().map_err(|_| {
+                ReqFlowError::ProcessError("❌ Failed to determine repository base url.".to_string())
+            })?;
+
+            
             let mut refference_model_manager = ModelManager::new();      
             let _not_interested=refference_model_manager.parse_and_validate(Some(&args.git_commit), &specification_folder_path, &external_folders_path,excluded_filename_patterns);
-                        
-            //dbg!("{}", &model_manager.element_registry);
-            //dbg!("{}", &refference_model_manager.element_registry);            
-            match change_impact::compute_change_impact(&model_manager.element_registry, &refference_model_manager.element_registry,&specification_folder_path, &external_folders_path) {
-                Ok(report) => {
-                    let hash = git_commands::get_commit_hash()?;
-                    let base_url = git_commands::get_repository_base_url()?;                    
-                    report.print(&base_url, &hash, args.json)
-                },
-                Err(e) => eprintln!("❌ Failed to generate chage impact report {:?}", e),
-            }
-
+                                    
+            let report=change_impact::compute_change_impact(
+                &model_manager.element_registry, 
+                &refference_model_manager.element_registry,
+                &repo_root,
+                &specification_folder_path, 
+                &external_folders_path
+            )
+            .map_err(|e| ReqFlowError::ProcessError(format!("❌ Failed to generate change impact report: {:?}", e)))?;
+            
+            report.print(&base_url, &current_commit, &args.git_commit, args.json);
+                
             return Ok(0);
             
                                       
@@ -216,12 +229,10 @@ pub fn handle_command(
             
             
         }else if args.generate_matrix {
-            std::fs::create_dir_all(output_folder_path)?;
-            //model_manager.generate_traceability_matrix(specification_folder_path, output_folder_path)?;
-            info!("Traceability matrix saved to {:?}", output_folder_path);
+            info!("Not implemented yet");
             return Ok(0);
             
-            
+           
         } else if args.html {
             let processed_count = html_export::export_markdown_to_html(specification_folder_path,&external_folders_path, output_folder_path)?;
             info!("{} markdown files converted to HTML", processed_count);

@@ -152,6 +152,16 @@ pub fn get_relative_path(path: &PathBuf, specification_folder: &Path, external_f
 }
 
 
+pub fn get_relative_path_from_root(path: &PathBuf, root: &PathBuf) -> Result<PathBuf, ReqFlowError> {
+    path.strip_prefix(root)
+        .map(PathBuf::from)
+        .map_err(|_| ReqFlowError::PathError(format!(
+            "Failed to compute relative path from given root: {}",
+            path.display()
+        )))
+}
+
+
 /// Splits an identifier into (file_part, Option(fragment)) following these rules:
 /// - If the identifier starts with '#' then it is treated as a fragment-only reference 
 ///   (file_part is empty, and the fragment is the whole identifier without the leading '#').

@@ -31,7 +31,7 @@ fn main() {
         &config.style.diagram_direction
      )
         .unwrap_or_else(|e| {
-            error!("Execution failed: {}", e);
+            error!("{}", e);
             1 // Return exit code 1 in case of an error
         });
 
