@@ -17,7 +17,7 @@ EXIT_CODE=$?
 printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 
 
-if echo "$OUTPUT" | grep -q "Validation Summary validation failed with 3 error(s):"; then
+if echo "$OUTPUT" | grep -q "3 validation failed with error(s):"; then
     # Worked
     exit 0
 else

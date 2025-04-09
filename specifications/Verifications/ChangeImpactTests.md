@@ -39,6 +39,9 @@ graph LR;
 
 This test verifies that the system correctly implements change impact detection, including proper default handling of the git commit parameter.
 
+#### Metadata
+  * type: verification
+  
 #### Acceptance Criteria
 - System correctly detects changes between different versions of requirements
 - System properly constructs a change impact report based on relationships between elements
@@ -61,6 +64,10 @@ This test verifies that the system correctly implements change impact detection,
 ### Change Impact Relations Test
 
 This test verifies that the system correctly handles different relation types when calculating change impact.
+
+#### Metadata
+  * type: verification
+
 
 #### Acceptance Criteria
 - System correctly propagates changes through different relation types
