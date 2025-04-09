@@ -6,10 +6,11 @@ members = [
 resolver = "2"
 
 [workspace.package]
-version = "0.2.1"
+version = "0.2.2"
 edition = "2021"
+rust-version = "1.86"
 license = "Apache-2.0"
-authors = []
+authors = ["Ilija Ljubicic"]
 description = "An agile Model-Based Systems Engineering (MBSE) framework designed to integrate with Git workflows"
 
 [workspace.dependencies]

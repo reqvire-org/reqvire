@@ -37,10 +37,14 @@ jobs:
             else
               cargo build --release --target=x86_64-apple-darwin
             fi
+          elif [[ "$RUNNER_OS" == "Linux" ]]; then
+            rustup target add x86_64-unknown-linux-musl
+            cargo build --release --target=x86_64-unknown-linux-musl
           else
-            cargo build --release
+            echo "Unsupported platform"
+            exit 1
           fi
-
+    
       - name: Rename Binary for OS
         shell: bash
         run: |
