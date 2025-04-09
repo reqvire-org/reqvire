@@ -1,37 +1,17 @@
-# Set default version increment (major, minor, or patch)
-VERSION_INCREMENT ?= patch
+CARGO_TOML := Cargo.toml
 
-CARGO_TOML = Cargo.toml
+# Extract version from Cargo.toml
+define get_version
+$(shell grep -m1 '^version' $(CARGO_TOML) | sed 's/.*"\(.*\)".*/\1/')
+endef
 
-VERSION_FILE = version.tmp
+.PHONY: create_tag
 
-bump_version:
-	@echo "Bumping version in Cargo.toml"
-	# Bump version using cargo-release or manually (patch, minor, or major)
-	cargo release $(VERSION_INCREMENT) --no-publish --no-verify
-
-	# Get the new version from the Cargo.toml
-	NEW_VERSION=$(shell grep -oP 'version\s*=\s*"\K[0-9\.]+' $(CARGO_TOML))
-
-	# Display new version
-	@echo "New version: $(NEW_VERSION)"
-
-# Create a Git tag based on the bumped version
-create_tag: bump_version
-	@echo "Creating Git tag for version $(NEW_VERSION)"
-	git tag -a v$(NEW_VERSION) -m "Release version v$(NEW_VERSION)"
-	git push origin v$(NEW_VERSION)
-
-# Default target to bump the version and create a tag for patch
-release_patch: bump_patch create_tag
-	@echo "Release created with version $(NEW_VERSION) and tag v$(NEW_VERSION)"
-
-# Default target to bump the version and create a tag for minor
-release_minor: bump_minor create_tag
-	@echo "Release created with version $(NEW_VERSION) and tag v$(NEW_VERSION)"
-
-# Default target to bump the version and create a tag for major
-release_major: bump_major create_tag
-	@echo "Release created with version $(NEW_VERSION) and tag v$(NEW_VERSION)"
+create_tag:
+	@echo "Creating tag..."
+	$(eval VERSION := $(call get_version))
+	@echo "New version: $(VERSION)"
+	git tag -a v$(VERSION) -m "Release version v$(VERSION)"
+	git push origin v$(VERSION)
 
 
