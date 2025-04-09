@@ -1,16 +1,20 @@
 [package]
-name = "reqflow-cli"
+name = "cli"
 version.workspace = true
 edition.workspace = true
 description.workspace = true
 license.workspace = true
+authors.workspace = true
+repository.workspace = true
+homepage.workspace = true
+documentation.workspace = true
 
 [[bin]]
 name = "reqflow"
 path = "src/main.rs"
 
 [dependencies]
-reqflow = { workspace = true }
+reqflow = { workspace = true, version.workspace = true  }
 
 # CLI
 clap = { workspace = true }
