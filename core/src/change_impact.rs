@@ -17,6 +17,8 @@ use serde_json::{json, Value};
 pub struct RelationSummary {
     pub relation_type: String,
     pub target: RelationTarget,
+    pub target_changed: bool,    
+    #[serde(skip_serializing)]        
     pub is_opposite: bool,
 }
 
@@ -38,6 +40,7 @@ impl RelationSummary {
 #[derive(Debug, Serialize)]
 pub struct AddedElement {
     pub element_id: String,
+    pub name: String,
     pub new_content: String,
     pub added_relations: Vec<RelationSummary>,
     pub change_impact_tree: element_registry::ElementNode,
@@ -47,14 +50,22 @@ pub struct AddedElement {
 #[derive(Debug, Serialize)]
 pub struct RemovedElement {
     pub element_id: String,
+    pub name: String,
     pub old_content: String,
     pub removed_relations: Vec<RelationSummary>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct InvalidatedVerification {
+    pub element_id: String,    
+    pub name: String,
 }
 
 /// Report for an element that exists in both registries but has differences.
 #[derive(Debug,Serialize)]
 pub struct ChangedElement {
     pub element_id: String,
+    pub name: String,    
     pub old_content: String,
     pub new_content: String,
     pub content_changed: bool,
@@ -78,6 +89,7 @@ pub struct ChangeImpactReport<'a> {
     pub added: Vec<AddedElement>,
     pub removed: Vec<RemovedElement>,
     pub changed: Vec<ChangedElement>,
+    pub invalidated_verifications: Vec<InvalidatedVerification>,    
     #[serde(skip_serializing)]
     specification_folder: &'a PathBuf,
     #[serde(skip_serializing)]
@@ -92,13 +104,15 @@ impl<'a> ChangeImpactReport<'a> {
             added: Vec::new(),
             removed: Vec::new(),
             changed: Vec::new(),
+            invalidated_verifications: Vec::new(),
             specification_folder,
             external_folders,
             repo_root
         }
     }
 
-    
+
+   
     fn to_relative_paths(&self) -> ChangeImpactReport<'a> {
         let mut report = ChangeImpactReport::new(self.repo_root, self.specification_folder, self.external_folders);
         let to_relative = |path: &str| {
@@ -112,9 +126,11 @@ impl<'a> ChangeImpactReport<'a> {
 
         report.added = self.added.iter().map(|elem| AddedElement {
             element_id: to_relative(&elem.element_id),
+            name: elem.name.clone(),
             new_content: elem.new_content.clone(),
             added_relations: elem.added_relations.iter().map(|rel| RelationSummary {
                 relation_type: rel.relation_type.clone(),
+                target_changed: false,
                 target: RelationTarget {
                     text: rel.target.text.clone(),
                     link: match rel.target.link {
@@ -129,9 +145,11 @@ impl<'a> ChangeImpactReport<'a> {
 
         report.removed = self.removed.iter().map(|elem| RemovedElement {
             element_id: to_relative(&elem.element_id),
+            name: elem.name.clone(),
             old_content: elem.old_content.clone(),
             removed_relations: elem.removed_relations.iter().map(|rel| RelationSummary {
                 relation_type: rel.relation_type.clone(),
+                target_changed: false,                
                 target: RelationTarget {
                     text: rel.target.text.clone(),
                     link: match rel.target.link {
@@ -145,11 +163,13 @@ impl<'a> ChangeImpactReport<'a> {
 
         report.changed = self.changed.iter().map(|elem| ChangedElement {
             element_id: to_relative(&elem.element_id),
+            name: elem.name.clone(),            
             old_content: elem.old_content.clone(),
             new_content: elem.new_content.clone(),
             content_changed: elem.content_changed,
-            added_relations: elem.added_relations.iter().map(|rel| RelationSummary {
+            added_relations: elem.added_relations.iter().map(|rel| RelationSummary {           
                 relation_type: rel.relation_type.clone(),
+                target_changed: false,                
                 target: RelationTarget {
                     text: rel.target.text.clone(),
                     link: match rel.target.link {
@@ -161,6 +181,7 @@ impl<'a> ChangeImpactReport<'a> {
             }).collect(),
             removed_relations: elem.removed_relations.iter().map(|rel| RelationSummary {
                 relation_type: rel.relation_type.clone(),
+                target_changed: false,                
                 target: RelationTarget {
                     text: rel.target.text.clone(),
                     link: match rel.target.link {
@@ -173,6 +194,15 @@ impl<'a> ChangeImpactReport<'a> {
             change_impact_tree: propagate_to_relative(&elem.change_impact_tree, &to_relative),
         }).collect();
 
+
+        report.invalidated_verifications = self.invalidated_verifications
+        .iter()
+        .map(|v| InvalidatedVerification {
+            element_id: to_relative(&v.element_id),
+            name: v.name.clone(),
+        })
+        .collect();
+    
         report
     }
     
@@ -183,6 +213,8 @@ impl<'a> ChangeImpactReport<'a> {
         git_commit: &str,
         previous_git_commit: &str,
     ) -> serde_json::Value {
+    
+        
         let added: Vec<_> = self.added.iter().map(|elem| {
             let element_url = format!("{}/blob/{}/{}", base_url, git_commit, elem.element_id);
 
@@ -194,6 +226,7 @@ impl<'a> ChangeImpactReport<'a> {
 
                 json!({
                     "relation_type": rel.relation_type,
+                    "target_changed": rel.target_changed,                    
                     "target_text": rel.target.text,
                     "target_url": target_url
                 })
@@ -220,6 +253,7 @@ impl<'a> ChangeImpactReport<'a> {
 
                 json!({
                     "relation_type": rel.relation_type,
+                    "target_changed": rel.target_changed,                                        
                     "target_text": rel.target.text,
                     "target_url": target_url
                 })
@@ -227,7 +261,6 @@ impl<'a> ChangeImpactReport<'a> {
 
             json!({
                 "element_id": element_url,
-                "repo_url": element_url,
                 "old_content": elem.old_content,
                 "removed_relations": removed_relations
             })
@@ -244,6 +277,7 @@ impl<'a> ChangeImpactReport<'a> {
 
                 json!({
                     "relation_type": rel.relation_type,
+                    "target_changed": rel.target_changed,                                        
                     "target_text": rel.target.text,
                     "target_url": target_url
                 })
@@ -257,6 +291,7 @@ impl<'a> ChangeImpactReport<'a> {
 
                 json!({
                     "relation_type": rel.relation_type,
+                    "target_changed": rel.target_changed,                                        
                     "target_text": rel.target.text,
                     "target_url": target_url
                 })
@@ -275,106 +310,95 @@ impl<'a> ChangeImpactReport<'a> {
             })
         }).collect();
 
+ 
+        let invalidated_verifications: Vec<_> = self.invalidated_verifications.iter().map(|invalidated_ver| {
+            let target_url = format!("{}/blob/{}/{}", base_url, git_commit, invalidated_ver.element_id);
+            json!({
+                "target_text": invalidated_ver.name,
+                "target_url": target_url
+            })
+        }).collect();
+
         json!({
             "added": added,
             "removed": removed,
-            "changed": changed
+            "changed": changed,
+            "invalidated_verifications": invalidated_verifications
         })
     }
 
     /// Outputs the report as text with GitHub links included.
     pub fn to_text(&self, base_url: &str, git_commit: &str, previous_git_commit: &str) -> String {
         let mut output = String::new();
-        output.push_str("# Change Impact Report\n\n");
+        output.push_str("## Change Impact Report\n\n");
 
-        // Added Elements section
-        if !self.added.is_empty() {
-            output.push_str("## Added Elements\n\n");
-        }
-        for elem in &self.added {
-            // Insert a GitHub link using the base URL and branch/commit.
-            let element_url = format!("{}/blob/{}/{}", base_url, git_commit, elem.element_id);
-            output.push_str(&format!("### Element: [{}]({})\n\n", elem.element_id, element_url));
-            output.push_str(&format!("#### New Content\n\n{}\n\n", elem.new_content));
-            if !elem.added_relations.is_empty() {
-                output.push_str("#### Added Relations\n");
-                for rel in &elem.added_relations {
-                    let target_url = match rel.target.link {
-                        LinkType::Identifier(ref id) => format!("{}/blob/{}/{}", base_url, git_commit, id),
-                        _ => rel.target.link.as_str().to_string(),
-                    };
-                    output.push_str(&format!("- **{}** -> [{}]({})\n", rel.relation_type, rel.target.text, target_url));
-                }
-                output.push_str("\n");
-            }
-            let rendered_tree = render_change_impact_tree(&elem.change_impact_tree, 0, base_url, git_commit);
-            if !rendered_tree.trim().is_empty() {
-                output.push_str("#### Change Impact Tree\n");
-                output.push_str(&rendered_tree);
-            }
-            output.push_str("\n---\n\n");
-        }
 
         // Removed Elements section
         if !self.removed.is_empty() {
-            output.push_str("## Removed Elements\n\n");
+            output.push_str("### Removed Elements\n\n");
         }
+        
         for elem in &self.removed {
             let element_url = format!("{}/blob/{}/{}", base_url, previous_git_commit, elem.element_id);
-            output.push_str(&format!("### Element: [{}]({})\n\n", elem.element_id, element_url));
-            output.push_str(&format!("#### Removed Content\n\n{}\n\n", elem.old_content));
-            if !elem.removed_relations.is_empty() {
-                output.push_str("#### Removed Relations\n");
-                for rel in &elem.removed_relations {
-                    let target_url = match rel.target.link {
-                        LinkType::Identifier(ref id) => format!("{}/blob/{}/{}", base_url, previous_git_commit, id),
-                        _ => rel.target.link.as_str().to_string(),
-                    };
-                    output.push_str(&format!("- **{}** -> [{}]({})\n", rel.relation_type, rel.target.text, target_url));
-                }
-                output.push_str("\n");
-            }
-            output.push_str("\n---\n\n");
+            output.push_str("* ");
+            output.push_str(&format!(
+                "[{}]({})\n",
+                elem.name, element_url
+            ));                    
         }
+        output.push_str("\n---\n\n");                
 
+        // Added Elements section
+        if !self.added.is_empty() {
+            output.push_str("### New Elements\n\n");
+        }
+        
+        for elem in &self.added {
+            let element_url = format!("{}/blob/{}/{}", base_url, previous_git_commit, elem.element_id);
+            output.push_str("* ");
+            output.push_str(&format!(
+                "[{}]({})\n",
+                elem.name, element_url
+            ));
+            let rendered_tree = render_change_impact_tree(&elem.change_impact_tree, 2, base_url, git_commit);
+            if !rendered_tree.trim().is_empty() {
+                output.push_str(&rendered_tree);
+                output.push_str("\n\n");                                                
+            }
+        }
+        output.push_str("\n---\n\n");          
+        
         // Changed Elements section
         if !self.changed.is_empty() {
-            output.push_str("## Changed Elements\n\n");
+            output.push_str("### Changed Elements</summary>\n\n");            
         }
         for elem in &self.changed {
-            let element_url = format!("{}/blob/{}/{}", base_url, git_commit, elem.element_id);
-            output.push_str(&format!("### Element: [{}]({})\n\n", elem.element_id, element_url));
-            let markdown_diff = generate_markdown_diff(&elem.old_content, &elem.new_content);
-            output.push_str(&format!("{}\n", markdown_diff));
-            if !elem.added_relations.is_empty() {
-                output.push_str("#### Added Relations\n");
-                for rel in &elem.added_relations {
-                    let target_url = match rel.target.link {
-                        LinkType::Identifier(ref id) => format!("{}/blob/{}/{}", base_url, git_commit, id),
-                        _ => rel.target.link.as_str().to_string(),
-                    };
-                    output.push_str(&format!("- **{}** -> [{}]({})\n", rel.relation_type, rel.target.text, target_url));
-                }
-                output.push_str("\n");
-            }
-            if !elem.removed_relations.is_empty() {
-                output.push_str("#### Removed Relations\n");
-                for rel in &elem.removed_relations {
-                    let target_url = match rel.target.link {
-                        LinkType::Identifier(ref id) => format!("{}/blob/{}/{}", base_url, previous_git_commit, id),
-                        _ => rel.target.link.as_str().to_string(),
-                    };
-                    output.push_str(&format!("- **{}** -> [{}]({})\n", rel.relation_type, rel.target.text, target_url));
-                }
-                output.push_str("\n");
-            }
-            let rendered_tree = render_change_impact_tree(&elem.change_impact_tree, 0, base_url, git_commit);
+            let element_url = format!("{}/blob/{}/{}", base_url, previous_git_commit, elem.element_id);
+            output.push_str("* ");
+            output.push_str(&format!(
+                "[{}]({})\n",
+                elem.name, element_url
+            ));
+            let rendered_tree = render_change_impact_tree(&elem.change_impact_tree, 2, base_url, git_commit);
             if !rendered_tree.trim().is_empty() {
-                output.push_str("#### Change Impact Tree\n");
+                //let markdown_diff = generate_markdown_diff(&elem.old_content, &elem.new_content);
+                //output.push_str(&format!("{}\n", markdown_diff));                
                 output.push_str(&rendered_tree);
+                output.push_str("\n\n");                                                
             }
-            output.push_str("\n---\n\n");
         }
+        output.push_str("\n---\n\n");          
+            
+        
+        // Invalidated Verifications Section
+        if !self.invalidated_verifications.is_empty() {
+            output.push_str("## Invalidated Verifications\n\n");
+            for invalidated_ver in &self.invalidated_verifications {
+                let target_url = format!("{}/blob/{}/{}", base_url, git_commit, invalidated_ver.element_id);
+                output.push_str(&format!("- [ ] [{}]({})\n", invalidated_ver.name, target_url));
+            }
+            output.push_str("\n");
+        }        
 
         output
     }
@@ -418,7 +442,7 @@ where F: Fn(&str) -> String {
 }
 
 /// Generate a unified diff in a diff-highlighted markdown code fence.
-fn generate_markdown_diff(old: &str, new: &str) -> String {
+fn _generate_markdown_diff(old: &str, new: &str) -> String {
     let changeset = Changeset::new(old, new, "\n");
     let mut diff_output = String::new();
     for diff in changeset.diffs {
@@ -460,16 +484,21 @@ fn render_change_impact_tree(
     let mut output = String::new();
     let pad = "  ".repeat(indent);
 
-    // Render the current node’s relations with GitHub links
     for relation_node in &node.relations {
-        let element_url = format!("{}/blob/{}/{}", base_url, git_commit, relation_node.element_node.element.identifier);
+        let target = &relation_node.element_node.element;
+        let element_url = format!("{}/blob/{}/{}", base_url, git_commit, target.identifier);
+
+        let change_icon = if target.changed_since_commit { " ⚠️" } else { "" };
+
         output.push_str(&format!(
-            "{}* {}: [{}]({})\n",
+            "{}* {} -> [{}]({}){}\n",
             pad,
             relation_node.relation_trigger,
-            relation_node.element_node.element.name,
-            element_url
+            target.name,
+            element_url,
+            change_icon
         ));
+
         output.push_str(&render_change_impact_tree(
             &relation_node.element_node,
             indent + 1,
@@ -503,7 +532,6 @@ fn render_change_impact_tree_json(
                 "name": child.element.name,
                 "identifier": github_url,
                 "element_type": format!("{:?}", child.element.element_type),
-                "invalidated": child.element.invalidated,
                 "relations": nested_relations
             })
         );
@@ -517,60 +545,12 @@ fn render_change_impact_tree_json(
 fn convert_relation_to_summary(rel: &Relation) -> RelationSummary {
     RelationSummary {
         relation_type: rel.relation_type.name.to_string(),
+        target_changed: false,
         target: rel.target.clone(),
         is_opposite: rel.is_opposite,
     }
 }	
 
-/// Recursively walks the ChangeImpactReport and marks elements as invalidated based on conditions.
-pub fn mark_report_elements_as_invalidated(report: &mut ChangeImpactReport) {
-    // Collect sets of added and changed elements for quick lookup.
-    let added_ids: HashSet<String> = report.added.iter()
-        .map(|added| added.element_id.clone())
-        .collect();
-
-    let changed_ids: HashSet<String> = report.changed.iter()
-        .filter(|changed| changed.content_changed)
-        .map(|changed| changed.element_id.clone())
-        .collect();
-
-    // Mark all added elements
-    for added_element in &mut report.added {
-        // Mark the root element of the added element as invalidated
-        added_element.change_impact_tree.element.invalidated = true;
-        // Recursively mark related nodes as invalidated based on sets
-        recursively_mark_related_elements(&mut added_element.change_impact_tree, &added_ids, &changed_ids);
-    }
-
-    // Mark changed elements if content_changed is true
-    for changed_element in &mut report.changed {
-        if changed_element.content_changed {
-            // Mark the root element of the changed element as invalidated
-            changed_element.change_impact_tree.element.invalidated = true;
-        }
-        // Recursively mark related nodes as invalidated based on sets
-        recursively_mark_related_elements(&mut changed_element.change_impact_tree, &added_ids, &changed_ids);
-    }
-}
-
-/// Recursively marks all related elements as invalidated if they are present in the added or changed sets.
-fn recursively_mark_related_elements(
-    node: &mut element_registry::ElementNode,
-    added_ids: &HashSet<String>,
-    changed_ids: &HashSet<String>,
-) {
-    for relation in &mut node.relations {
-        let child_node = &mut relation.element_node;
-
-        // Mark the child node as invalidated if it is in the added or changed set.
-        if added_ids.contains(&child_node.element.identifier) || changed_ids.contains(&child_node.element.identifier) {
-            child_node.element.invalidated = true;
-        }
-
-        // Recursively process child nodes
-        recursively_mark_related_elements(child_node, added_ids, changed_ids);
-    }
-}
 
 
 /// Builds the change impact tree recursively using `ElementNode` and keeps only forward relations.
@@ -645,8 +625,52 @@ pub fn build_change_impact_tree(
     }
 }
 
+fn collect_verification_elements_from_impact_tree(
+    node: &element_registry::ElementNode,
+) -> Vec<InvalidatedVerification> {
+    let mut collected = Vec::new();
+    let mut seen = HashSet::new();
 
-    
+    fn walk(
+        node: &element_registry::ElementNode,
+        seen: &mut HashSet<String>,
+        collected: &mut Vec<InvalidatedVerification>,
+    ) {
+        if let element::ElementType::Verification = node.element.element_type {
+            let id = node.element.identifier.clone();
+            if seen.insert(id.clone()) {
+                collected.push(InvalidatedVerification {
+                    element_id: id,
+                    name: node.element.name.clone(),
+                });
+            }
+        }
+
+        for rel in &node.relations {
+            walk(&rel.element_node, seen, collected);
+        }
+    }
+
+    walk(node, &mut seen, &mut collected);
+    collected
+}
+
+fn propagate_changed_flags(
+    node: &mut element_registry::ElementNode,
+    changed_ids: &HashSet<String>,
+) {
+    for relation in &mut node.relations {
+        let child = &mut relation.element_node;
+
+        if changed_ids.contains(&child.element.identifier) {
+            child.element.changed_since_commit = true;
+        }
+
+        // Recurse further down the tree
+        propagate_changed_flags(child, changed_ids);
+    }
+}
+
 /// Computes the change impact report between two registries and builds the change impact trees
 /// using the registry’s propagation algorithm. Propagation is computed only for added elements
 /// or for elements whose content has changed.
@@ -692,6 +716,7 @@ pub fn compute_change_impact<'a>(
                            
             report.changed.push(ChangedElement {
                 element_id: (*id).clone(),
+                name: cur_elem.name.clone(),
                 old_content: ref_elem.content.clone(),
                 new_content: cur_elem.content.clone(),
                 content_changed,
@@ -718,6 +743,7 @@ pub fn compute_change_impact<'a>(
 
         report.added.push(AddedElement {
             element_id: (*id).clone(),
+            name: cur_elem.name.clone(),
             new_content: cur_elem.content.clone(),
             added_relations,
             change_impact_tree,
@@ -735,13 +761,42 @@ pub fn compute_change_impact<'a>(
             .collect();
         report.removed.push(RemovedElement {
             element_id: (*id).clone(),
+            name: ref_elem.name.clone(),
             old_content: ref_elem.content.clone(),
             removed_relations,
         });
     }
 
-    mark_report_elements_as_invalidated(&mut report);
+
+    let content_changed_ids: HashSet<String> = report.changed
+        .iter()
+        .filter(|e| e.content_changed)
+        .map(|e| e.element_id.clone())
+        .collect();
+
+    for changed in &mut report.changed {
+        propagate_changed_flags(&mut changed.change_impact_tree, &content_changed_ids);
+    }
+    for added in &mut report.added {
+        propagate_changed_flags(&mut added.change_impact_tree, &content_changed_ids);
+    }    
+      
+                
+    // Gather a list of all invalidated verifications from changed and added change impache trees
+    let from_added = report
+        .added.iter()
+        .flat_map(|elem| collect_verification_elements_from_impact_tree(&elem.change_impact_tree));
+
+    let from_changed = report
+        .changed.iter()
+        .flat_map(|elem| collect_verification_elements_from_impact_tree(&elem.change_impact_tree));
+
+    let mut inv_ver: Vec<_>=from_added.chain(from_changed).collect();
+    inv_ver.sort_by_key(|v| v.element_id.clone());
+    inv_ver.dedup_by_key(|v| v.element_id.clone());
+    report.invalidated_verifications =inv_ver;
     
+   
     Ok(report)
 }
 

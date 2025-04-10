@@ -104,7 +104,8 @@ The system shall provide visual representations of relationships within the MBSE
 ---
 
 ### Automate Diagram Generation
-When requested the system shall automatically generate diagrams and save them to the required locations of the model, so that the diagrams are always accessible and up-to-date.
+
+When requested, the system shall automatically generate diagrams and save them to the required locations of the model, so that the diagrams are always accessible and up-to-date.
 
 #### Relations
   * derivedFrom: [Visualize Model Relationships](#visualize-model-relationships)
@@ -446,129 +447,6 @@ The system shall generate detailed change logs for pull requests, summarizing mo
 
 #### Relations
   * refine: [UserStories.md/Integrate with GitHub Workflows](UserStories.md#integrate-with-github-workflows)
-
----
-
-## AI-Driven Code Suggestions
-```mermaid
-graph LR;
-  %% Graph styling
-  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
-  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
-  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
-  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
-
-  e19f1380d9["Analyze Code for Alignment ---> Needs more work"];
-  click e19f1380d9 "UserRequirements.md#analyze-code-for-alignment---->-needs-more-work";
-  class e19f1380d9 requirement;
-  a4657fca5a["UserStories.md/AI-Driven Code Suggestions"];
-  class a4657fca5a requirement;
-  click a4657fca5a "UserStories.md#ai-driven-code-suggestions";
-  e19f1380d9 ==>|refines| a4657fca5a;
-  c6d300e51a["Highlight Potential Code-Model Conflicts --> also too advanced for now"];
-  click c6d300e51a "UserRequirements.md#highlight-potential-code-model-conflicts--->-also-too-advanced-for-now";
-  class c6d300e51a requirement;
-  c6d300e51a ==>|refines| a4657fca5a;
-  71ba0e325e["Suggest Refactoring for MBSE Consistency  ---> Needs more work"];
-  click 71ba0e325e "UserRequirements.md#suggest-refactoring-for-mbse-consistency----->-needs-more-work";
-  class 71ba0e325e requirement;
-  71ba0e325e ==>|refines| a4657fca5a;
-```
-
----
-
-### Analyze Code for Alignment ---> Needs more work
-The system shall allow AI agents to analyze code and identify deviations from the MBSE model.
-
-#### Relations
-  * refine: [UserStories.md/AI-Driven Code Suggestions](UserStories.md#ai-driven-code-suggestions)
-
----
-
-### Suggest Refactoring for MBSE Consistency  ---> Needs more work
-The system shall enable AI agents to suggest refactoring opportunities to ensure code consistency with the MBSE model.
-
-#### Relations
-  * refine: [UserStories.md/AI-Driven Code Suggestions](UserStories.md#ai-driven-code-suggestions)
-
----
-
-### Highlight Potential Code-Model Conflicts --> also too advanced for now
-The system shall allow AI agents to highlight potential conflicts between code and the MBSE model, providing recommendations for resolution.
-
-#### Relations
-  * refine: [UserStories.md/AI-Driven Code Suggestions](UserStories.md#ai-driven-code-suggestions)
-
----
-
-## AI-Driven Model Suggestions
-```mermaid
-graph LR;
-  %% Graph styling
-  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
-  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
-  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
-  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
-
-  ec56dd665a["Provide Actionable Model Improvement Suggestions"];
-  click ec56dd665a "UserRequirements.md#provide-actionable-model-improvement-suggestions";
-  class ec56dd665a requirement;
-  6912d98267["UserStories.md/AI-Driven Model Suggestions"];
-  class 6912d98267 requirement;
-  click 6912d98267 "UserStories.md#ai-driven-model-suggestions";
-  ec56dd665a ==>|refines| 6912d98267;
-  8ba9c7e059["LLM Context Command"];
-  class 8ba9c7e059 requirement;
-  click 8ba9c7e059 "SystemRequirements/Requirements.md#llm-context-command";
-  8ba9c7e059 -.->|deriveReqT| ec56dd665a;
-  a8f00c5619["Recommend Missing Components"];
-  class a8f00c5619 requirement;
-  click a8f00c5619 "UserRequirements.md#recommend-missing-components";
-  ec56dd665a -->|relates to| a8f00c5619;
-  72e13dc549["Suggest Refinements to Model Relationships"];
-  class 72e13dc549 requirement;
-  click 72e13dc549 "UserRequirements.md#suggest-refinements-to-model-relationships";
-  ec56dd665a -->|relates to| 72e13dc549;
-  44c87c93a4["Propose Validation Fixes"];
-  class 44c87c93a4 requirement;
-  click 44c87c93a4 "UserRequirements.md#propose-validation-fixes";
-  ec56dd665a -->|relates to| 44c87c93a4;
-  a8f00c5619 ==>|refines| ec56dd665a;
-  72e13dc549 ==>|refines| ec56dd665a;
-  44c87c93a4 ==>|refines| ec56dd665a;
-```
-
----
-
-### Provide Actionable Model Improvement Suggestions
-The system shall enable AI agents to provide actionable suggestions for improving the MBSE model based on system performance data, design inconsistencies, and project requirements.
-
-#### Relations
-  * refine: [UserStories.md/AI-Driven Model Suggestions](UserStories.md#ai-driven-model-suggestions)
-
----
-
-### Suggest Refinements to Model Relationships
-The system shall enable AI agents to suggest refinements to relationships within the MBSE model to improve consistency and traceability.
-
-#### Relations
-  * refine: [Provide Actionable Model Improvement Suggestions](#provide-actionable-model-improvement-suggestions)
-
----
-
-### Recommend Missing Components
-The system shall allow AI agents to recommend missing components or elements based on gaps in the MBSE model.
-
-#### Relations
-  * refine: [Provide Actionable Model Improvement Suggestions](#provide-actionable-model-improvement-suggestions)
-
----
-
-### Propose Validation Fixes
-The system shall enable AI agents to propose fixes for validation errors in the MBSE model.
-
-#### Relations
-  * refine: [Provide Actionable Model Improvement Suggestions](#provide-actionable-model-improvement-suggestions)
 
 ---
 
@@ -950,3 +828,19 @@ The system shall export specifications into HTML format and save in designated o
   * derivedFrom: [UserStories.md/Export Specifications](UserStories.md#export-specifications)
 
 ---
+
+
+## AI-Driven Model Suggestions
+
+
+---
+
+### AI Agent Context
+
+The system shall provide needed context for AI agents to understand how to use reqflow and methodology.
+
+#### Relations
+  * refine: [AI-Driven Model Suggestions](UserStories.md#ai-driven-model-suggestions)
+
+---
+
