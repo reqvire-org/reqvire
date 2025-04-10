@@ -852,9 +852,15 @@ mod tests {
         
         
         // Test absolute path that does not match any provided folders
+        // 
         let unmatched_path = "/some/other/path/spec.yaml".to_string();
         let result = to_relative_identifier(&unmatched_path, &base_path, &specifications_folder, &external_folders)
             .expect("Should return absolute path when no match is found");
-        assert_eq!(result, "../../../../some/other/path/spec.yaml", "Failed unmatched absolute path check");
+
+        // Dynamically compute the expected path (resutl must be a path relative to a base_path)
+        let expected = pathdiff::diff_paths(&unmatched_path, &base_path)
+            .expect("Failed to compute relative path");
+
+        assert_eq!(result, expected.to_string_lossy(), "Failed unmatched absolute path check");            
     }    
 }
