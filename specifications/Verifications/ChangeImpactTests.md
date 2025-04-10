@@ -13,7 +13,7 @@ graph LR;
 
   401764f61b["Change Impact Relations Test"];
   click 401764f61b "ChangeImpactTests.md#change-impact-relations-test";
-  class 401764f61b requirement;
+  class 401764f61b verification;
   503dda29a8["SystemRequirements/ChangeImpactRequirements.md#change-impact-detection-algorithm"];
   class 503dda29a8 requirement;
   click 503dda29a8 "../SystemRequirements/ChangeImpactRequirements.md#change-impact-detection-algorithm";
@@ -28,11 +28,12 @@ graph LR;
   401764f61b -->|traces| 524acc7470;
   9102eb42eb["Change Impact Detection Test"];
   click 9102eb42eb "ChangeImpactTests.md#change-impact-detection-test";
-  class 9102eb42eb requirement;
+  class 9102eb42eb verification;
   9102eb42eb -->|verifies| 503dda29a8;
   9102eb42eb -->|verifies| 9d6f79f601;
   9102eb42eb -->|traces| 524acc7470;
 ```
+
 ---
 
 ### Change Impact Detection Test
@@ -41,7 +42,7 @@ This test verifies that the system correctly implements change impact detection,
 
 #### Metadata
   * type: verification
-  
+
 #### Acceptance Criteria
 - System correctly detects changes between different versions of requirements
 - System properly constructs a change impact report based on relationships between elements
@@ -67,7 +68,6 @@ This test verifies that the system correctly handles different relation types wh
 
 #### Metadata
   * type: verification
-
 
 #### Acceptance Criteria
 - System correctly propagates changes through different relation types
