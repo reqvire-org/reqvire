@@ -54,7 +54,7 @@ This test verifies that the system can automatically generate and embed mermaid 
 
 #### Metadata
   * type: verification
-  
+
 #### Relations
   * verify: [UserRequirements.md/Automate Diagram Generation](../UserRequirements.md#automate-diagram-generation)
   * trace: [tests/test-diagram-generation/test.sh](../../tests/test-diagram-generation/test.sh)
