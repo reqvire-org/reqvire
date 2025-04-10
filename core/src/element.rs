@@ -83,7 +83,6 @@ pub struct Element {
     pub hash_impact_content: String,
     //
     pub changed_since_commit: bool,
-    pub invalidated: bool
 }
 
 
@@ -101,7 +100,6 @@ impl Element {
             element_type: element_type.unwrap_or(ElementType::Requirement(RequirementType::System)), 
             metadata: HashMap::new(),
             changed_since_commit: false,
-            invalidated: false
         }
     }
 

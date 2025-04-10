@@ -411,7 +411,7 @@ README.md file must be saved as index.html file when exported.
 The system shall provide a command-line option `--llm-context` that outputs comprehensive contextual information about ReqFlow methodology, document structure, relation types, and CLI usage to help Large Language Models understand and work with ReqFlow-based projects.
 
 #### Relations
-  * derivedFrom: [UserRequirements.md/Provide Actionable Model Improvement Suggestions](../UserRequirements.md#provide-actionable-model-improvement-suggestions)
+  * derivedFrom: [UserRequirements.md/AI Agent Context](../UserRequirements.md#ai-agent-context)
   * satisfiedBy: [main.rs](../../cli/src/main.rs)
 
 ---

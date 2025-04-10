@@ -221,7 +221,7 @@ As an **System Engineer**, I want to manage MBSE models effectively, so that I c
 ---
 
 ### Generate Diagrams
-As a **System Engineer**, I want to generate diagrams for different system viewpoints so that I can communicate system architecture effectively and understand dependencies and impacts across the system.
+As a **System Engineer**, I want to generate diagrams for different system viewpoints, so that I can communicate system architecture effectively and understand dependencies and impacts across the system.
 
 #### Relations
   * trace: [MOEs.md/MOE_UA](MOEs.md#moe_ua)
@@ -257,14 +257,6 @@ As a **Contributor**, I want ReqFlow to integrate seamlessly with GitHub workflo
 
 #### Relations
   * trace: [MOEs.md/MOE_CE](MOEs.md#moe_ce)
-
----
-
-### AI-Driven Code Suggestions
-As a **Developer**, I want AI agents to provide actionable suggestions for code improvements, so that I can accelerate development tasks.
-
-#### Relations
-  * trace: [MOEs.md/MOE_UA](MOEs.md#moe_ua)
 
 ---
 
