@@ -52,10 +52,7 @@ impl Default for PathsConfig {
             output_folder: "output".to_string(),
             external_folders: Vec::new(),
             excluded_filename_patterns: vec![
-                "**/README*.md".to_string(), 
-                "**/index.md".to_string(),
-                // Exclude design specifications folder by pattern instead of dedicated parameter
-                "**/DesignSpecifications/**/*.md".to_string()
+                "**/README.md".to_string()
             ],
             base_path: env::current_dir().expect("Failed to get current directory"),            
         }
@@ -111,7 +108,20 @@ impl Config {
     
     /// Builds a GlobSet from the excluded filename patterns
     pub fn get_excluded_filename_patterns_glob_set(&self) -> GlobSet {
+        let default_excluded_patterns= vec![
+                "**/README.md".to_string(),
+        ];
         let mut builder = GlobSetBuilder::new();
+        
+        // Add default patterns
+        for pattern in default_excluded_patterns {
+            if let Ok(glob) = Glob::new(&pattern) {
+                builder.add(glob);
+            } else {
+                warn!("Invalid default glob pattern: {}", pattern);
+            }
+        }
+            
         for pattern in &self.paths.excluded_filename_patterns {
             if let Ok(glob) = Glob::new(pattern.as_str()) {
                 builder.add(glob);
@@ -355,7 +365,7 @@ mod config_tests {
  
         assert_eq!(config.paths.specifications_folder, "specifications");
         assert_eq!(config.paths.output_folder, "output");
-        assert!(config.paths.excluded_filename_patterns.contains(&"**/DesignSpecifications/**/*.md".to_string()));
+        assert!(config.paths.excluded_filename_patterns.contains(&"**/README.md".to_string()));
         
 
         

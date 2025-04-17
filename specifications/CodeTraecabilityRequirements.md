@@ -9,13 +9,6 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  e74d8ff4f7["Slash style comment"];
-  click e74d8ff4f7 "CodeTraecabilityRequirements.md#slash-style-comment";
-  class e74d8ff4f7 requirement;
-  9b11c134e5["Comment Style by File Extension"];
-  class 9b11c134e5 requirement;
-  click 9b11c134e5 "CodeTraecabilityRequirements.md#comment-style-by-file-extension";
-  9b11c134e5 --o|contains| e74d8ff4f7;
   1e5a561e29["Validating Traceability Format"];
   click 1e5a561e29 "CodeTraecabilityRequirements.md#validating-traceability-format";
   class 1e5a561e29 requirement;
@@ -23,43 +16,50 @@ graph LR;
   class bb213f1c85 requirement;
   click bb213f1c85 "CodeTraecabilityRequirements.md#traceability-format";
   1e5a561e29 ==>|refines| bb213f1c85;
-  a5580908b7["XML style comment"];
-  click a5580908b7 "CodeTraecabilityRequirements.md#xml-style-comment";
-  class a5580908b7 requirement;
-  9b11c134e5 --o|contains| a5580908b7;
-  56c1e18c90["CSS style comment"];
-  click 56c1e18c90 "CodeTraecabilityRequirements.md#css-style-comment";
-  class 56c1e18c90 requirement;
-  9b11c134e5 --o|contains| 56c1e18c90;
-  9b11c134e5 ==>|refines| bb213f1c85;
-  9b11c134e5 --o|contains| e74d8ff4f7;
-  9b11c134e5 --o|contains| a5580908b7;
-  9b11c134e5 --o|contains| 56c1e18c90;
   663b780162["SQL style comment"];
-  class 663b780162 requirement;
   click 663b780162 "CodeTraecabilityRequirements.md#sql-style-comment";
+  class 663b780162 requirement;
+  9b11c134e5["Comment Style by File Extension"];
+  class 9b11c134e5 requirement;
+  click 9b11c134e5 "CodeTraecabilityRequirements.md#comment-style-by-file-extension";
   9b11c134e5 --o|contains| 663b780162;
   26b4eb60f9["Dash style comment"];
-  class 26b4eb60f9 requirement;
   click 26b4eb60f9 "CodeTraecabilityRequirements.md#dash-style-comment";
+  class 26b4eb60f9 requirement;
   9b11c134e5 --o|contains| 26b4eb60f9;
   e5b00bf82f["BAT style comment"];
-  class e5b00bf82f requirement;
   click e5b00bf82f "CodeTraecabilityRequirements.md#bat-style-comment";
+  class e5b00bf82f requirement;
   9b11c134e5 --o|contains| e5b00bf82f;
+  e74d8ff4f7["Slash style comment"];
+  click e74d8ff4f7 "CodeTraecabilityRequirements.md#slash-style-comment";
+  class e74d8ff4f7 requirement;
+  9b11c134e5 --o|contains| e74d8ff4f7;
+  9b11c134e5 ==>|refines| bb213f1c85;
   9b11c134e5 --o|contains| 663b780162;
   9b11c134e5 --o|contains| 26b4eb60f9;
+  9b11c134e5 --o|contains| e5b00bf82f;
+  9b11c134e5 --o|contains| e74d8ff4f7;
+  a5580908b7["XML style comment"];
+  class a5580908b7 requirement;
+  click a5580908b7 "CodeTraecabilityRequirements.md#xml-style-comment";
+  9b11c134e5 --o|contains| a5580908b7;
+  56c1e18c90["CSS style comment"];
+  class 56c1e18c90 requirement;
+  click 56c1e18c90 "CodeTraecabilityRequirements.md#css-style-comment";
+  9b11c134e5 --o|contains| 56c1e18c90;
+  9b11c134e5 --o|contains| a5580908b7;
   1fc4e44d5f["../specifications/UserRequirements#Code Traceability"];
   class 1fc4e44d5f requirement;
   click 1fc4e44d5f "../specifications/UserRequirements.md#code-traceability";
   bb213f1c85 ==>|refines| 1fc4e44d5f;
   bb213f1c85 -->|relates to| 1e5a561e29;
   bb213f1c85 -->|relates to| 9b11c134e5;
-  9b11c134e5 --o|contains| e5b00bf82f;
+  9b11c134e5 --o|contains| 56c1e18c90;
 ```
 TODO:
- * check how to related validation requirement
  * this comes with config param to define code folder locations (special case as external foders but for the code) 
+ * this is not implemented yet !!
 
 ---
 
@@ -88,8 +88,6 @@ Where:
 ---
 
 ### Validating Traceability Format
-
-
 
 
 While processing traceability in code, the system shall ensure that each `[reqflow::...] START` tag has a corresponding `[reqflow::...] END` tag.

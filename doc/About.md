@@ -28,8 +28,7 @@ A **model** in ReqFlow is a collection of structured Markdown files that capture
 4. **Traceability Links**: Relationships between requirements, design elements, and test cases.
 5. **Diagrams**: Representations of architecture, behaviors, and dependencies (generated automatically via Mermaid diagrams).
 6. **Use Cases**: Descriptions of user interactions with the system, specifying scenarios, inputs, and expected outcomes. Use cases help clarify functional requirements and provide context for design and validation.
-7. **Design Specification Documents (DSDs)**: High-level specification documents that outline the system design to ensure alignment with requirements and constraints.
-8. **Test Case Definitions**: Detailed definitions of test cases linked to specific user and mission requirements and system behaviors. These test cases ensure the system functions as intended and provide traceability from design and requirements to validation activities.
+8. **Verifications Definitions**: Detailed definitions of verifications linked to specific user and mission requirements and system behaviors. These verifications ensure the system functions as intended and provide traceability from design and requirements to validation activities.
 
 
 ---
@@ -82,12 +81,6 @@ ReqFlow tools, if integrated into CI/CD pipelines of Git-like workflows and proc
 ---
 
 In summary, a **ReqFlow model** is a structured set of Markdown files stored and managed in a Git repository, with support for traceability, automation, and collaboration through modern Git workflows and tools.
-
-
-## Pillars of the ReqFlow
-
-TODO: Write which are pillars of ReqFlow 
-
 
 
 ## Mapping to ISO/IEC/IEEE 15288
