@@ -10,13 +10,6 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  cc8c3af529["Align with Industry Standards"];
-  click cc8c3af529 "MissionRequirements.md#align-with-industry-standards";
-  class cc8c3af529 requirement;
-  b3f57e49f7["MOEs.md/MOE_CE"];
-  class b3f57e49f7 requirement;
-  click b3f57e49f7 "MOEs.md#moe_ce";
-  cc8c3af529 -.->|deriveReqT| b3f57e49f7;
   3796077916["Promote Automation and Efficiency"];
   click 3796077916 "MissionRequirements.md#promote-automation-and-efficiency";
   class 3796077916 requirement;
@@ -24,6 +17,13 @@ graph LR;
   class f6237e49f7 requirement;
   click f6237e49f7 "MOEs.md#moe_ua";
   3796077916 -.->|deriveReqT| f6237e49f7;
+  cc8c3af529["Align with Industry Standards"];
+  click cc8c3af529 "MissionRequirements.md#align-with-industry-standards";
+  class cc8c3af529 requirement;
+  b3f57e49f7["MOEs.md/MOE_CE"];
+  class b3f57e49f7 requirement;
+  click b3f57e49f7 "MOEs.md#moe_ce";
+  cc8c3af529 -.->|deriveReqT| b3f57e49f7;
 ```
 
 ---
