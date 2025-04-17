@@ -10,9 +10,25 @@ However, it does not impose a specific syntax for expressing the content of requ
 Structured syntaxes like **EARS (Easy Approach to Requirements Syntax)** are encouraged to improve clarity and consistency, but their use is not required.
 
 
+### Requirement Types
+
+There are 2 types of requirements:
+ * user requirement
+ * system requirement
+ 
+The main difference is that `user requirement` doesn't need to have parent relation while `system requirement` must have one.
+
+All requirments documents in the root of `specifications` folder are assumed to be user requirements unless a type is specified in the metadata subsection.
+Same holds true for all the requirements in `external folders` and specifications subfolders.
+ 
+ 
+### How to define requirement 
+
+Requirements are defined in the markdown documents as 'elements'. Refer to TODO: add link to document.
+
 ### Requirements document format
  
-Requirements are organizied within requirements documents: a markdow document with specific format.
+Requirements are organized within requirements documents: a markdow document with specific format.
 
 
 ```
@@ -25,8 +41,8 @@ Requirements are organizied within requirements documents: a markdow document wi
 The system shall provide a login interface that allows users to authenticate using a username and password.
 
 Relations:
- * tracedFrom: specifications/UserStories.md/authentication
- * verifiedBy: specifications/tests.md/testLogin
+ * trace: UserStories.md#authentication
+ * verifiedBy: tests.md#testlogin
 
 ## Other group
 
@@ -72,7 +88,7 @@ Example:
 The system shall provide a login interface that allows users to authenticate using a username and password.
 
 Relations:
- * tracedFrom: specifications/UserStories.md/Authentication
+ * derivedFrom: UserStories.md#authentication
 
 
 ### Password Recovery
@@ -80,12 +96,12 @@ Relations:
 The system shall provide a mechanism for users to recover forgotten passwords.
 
 #### Relations
- * tracedFrom: specifications/UserStories.md/Security
- * verifiedBy: specifications/tests.md/testPasswordRecovery
+ * refine: UserStories.md#security
+ * verifiedBy: tests.md#testpasswordrecovery
   
 #### Metadata
- * Priority: High
- * Criticality: Moderate
+ * priority: high
+ * criticality: moderate
 
 #### Some other additional context
 
@@ -114,7 +130,7 @@ Relations used for the requirements are a subset of relations that exist in the 
  * refine
  * satisfiedBy 
  * verifiedBy
- * tracedFrom
+ * trace
 
 Relations foher the requirements are mandatory: at least 1 relation to parent object must exist.
 The parent objects depends on type of requirement and is explained further down.
@@ -126,8 +142,8 @@ The **#### Metadata** section is optional and provides additional key-value pair
 
 The keys and values are expressed as bullet points. Accepted key-value pairs include:
 
-- **Priority**: High | Medium | Low
-- **Criticality**: High | Moderate | Low
+- **priority**: high | medium | low
+- **criticality**: high | moderate | low
 
 
 Expected markdow:
@@ -135,6 +151,11 @@ Expected markdow:
 #### Metadata
   * Key: value
 ```
+
+Reserved key is `type` which can hold following values:
+ * verification
+ * requirement
+ * user_requirement
 
 #### Additional context section
 

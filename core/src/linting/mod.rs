@@ -42,32 +42,31 @@ pub fn run_linting(
           //  indentation::find_inconsistent_indentation,
         ];
 
-        let mut file_content = fs::read_to_string(&file_path)?;
+        let original_content = fs::read_to_string(&file_path)?;
+        let file_content_for_linting = remove_details_blocks(&original_content);
 
         for lint_rule in linting_rules {
-            // Read file content.
-            let mut suggestions = lint_rule(&file_content, &file_path);
+            let mut suggestions = lint_rule(&file_content_for_linting, &file_path);
 
             if suggestions.is_empty() {
-                continue; // No issues found in this rule, move to the next rule
+                continue;
             }
 
             if dry_run {
                 lint_suggestions.extend(suggestions);
             } else {
-                // Sort suggestions by line_number descending so that fixes are applied from bottom to top
                 suggestions.sort_by(|a, b| b.line_number.unwrap_or(0).cmp(&a.line_number.unwrap_or(0)));
- 
-                let mut new_file_content=file_content.clone();
+
+                // IMPORTANT: Apply fixes to original content
+                let mut new_file_content = original_content.clone();
                 for suggestion in &suggestions {
                     new_file_content = apply_fix(&new_file_content, suggestion);
-                    println!("✅ Applied fix: {} to {}", suggestion.description, file_path.display());  
-                }    
-                file_content=new_file_content.clone();
-                fs::write(&file_path, &file_content)?;                                                                                                                              
+                    println!("✅ Applied fix: {} to {}", suggestion.description, file_path.display());
+                }
 
+                // Overwrite with actual, corrected version (preserving <details>)
+                fs::write(&file_path, &new_file_content)?;
             }
-
         }
     }
     
@@ -143,6 +142,32 @@ fn remove_lines(content: &str, lines_to_remove: &[usize]) -> String {
     }
 
     lines.join("\n") + "\n" // Preserve trailing newline
+}
+
+fn remove_details_blocks(content: &str) -> String {
+    let mut in_details = false;
+    let mut output = Vec::new();
+
+    for line in content.lines() {
+        let trimmed = line.trim_start();
+
+        if trimmed.starts_with("<details") {
+            in_details = true;
+        }
+
+        if !in_details {
+            output.push(line.to_string());
+        } else {
+            // Optionally preserve line count for accurate diffs:
+            output.push("<!-- skipped details -->".to_string());
+        }
+
+        if trimmed.starts_with("</details>") {
+            in_details = false;
+        }
+    }
+
+    output.join("\n")
 }
 
 /// Represents a lint suggestion (like a warning) that can be fixed automatically
@@ -537,6 +562,56 @@ mod tests {
         let result = run_linting(&temp_dir.path().to_path_buf(), &[], &excluded_patterns, true);
 
         assert!(result.is_ok(), "Linting should run without errors");
+
     }
+    /// Test: Remove content within <details> blocks
+    #[test]
+    fn test_remove_details_blocks() {
+        let input = r#"
+### Some Element
+
+Intro content.
+
+### Details
+<details>
+<summary>More</summary>
+
+### Should not be parsed as requirement
+
+This is not requirement.
+
+#### Relations
+Broken relation which is not relation.
+
+</details>
+
+After details.
+"#;
+
+        let expected = r#"
+### Some Element
+
+Intro content.
+
+### Details
+<!-- skipped details -->
+<!-- skipped details -->
+<!-- skipped details -->
+<!-- skipped details -->
+<!-- skipped details -->
+<!-- skipped details -->
+<!-- skipped details -->
+<!-- skipped details -->
+<!-- skipped details -->
+<!-- skipped details -->
+<!-- skipped details -->
+
+After details.
+"#;
+
+        let result = remove_details_blocks(input);
+
+        assert_eq!(result.trim(), expected.trim());
+    }    
 }
 

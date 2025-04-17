@@ -1,24 +1,18 @@
 # ReqFlow
 
-**ReqFlow** is an **AI-driven framework for system modeling and project specifications**, designed to seamlessly integrate with modern agile development workflows. While it currently focuses on **requirements, specifications, and traceability**, its vision extends far beyond—evolving into a fully **AI-powered Model-Based Systems Engineering (MBSE) framework**, where **AI assistance and automation** play a central role in designing, analyzing, and implementing system architectures.
+**ReqFlow** is a **framework for system modeling and project specifications**, designed to seamlessly integrate with modern agile development workflows and AI tools. While it currently focuses on **requirements, specifications, and traceability**, its vision extends far beyond—evolving into a fully **AI-powered Model-Based Systems Engineering (MBSE) framework**, where **AI assistance and automation** play a central role in designing, analyzing, and implementing system architectures.
 
 It’s built for **product managers, architects, developers, and AI assistants** to collaborate effectively, keeping system models and requirements in sync with real-world implementation.  
 
-Unlike traditional MBSE tools, ReqFlow is **lightweight, Git-native, and practical**—inspired by **MBSE and SysML**, but without the complexity that slows teams down. It integrates **AI-powered automation, LLM-driven analysis, and version control**, making it easy to track, refine, and evolve system models as projects grow.  
-
-Built around **Git workflows**, ReqFlow ensures that **system models remain traceable, versioned, and actionable**, evolving naturally alongside development. It provides a **structured yet flexible approach** to system modeling, specifications, and requirements management, helping teams move fast without losing control.  
-
-More than just a framework, ReqFlow introduces a **methodology** that redefines how teams approach **requirements, system modeling, and AI-assisted development**.  
-
+Unlike traditional MBSE tools, ReqFlow is **lightweight, Git-native, and practical** - inspired by **MBSE and SysML**, but without the complexity that slows teams down. 
 By adopting **semi-structured conventions**, ReqFlow bridges the gap between **formal modeling and agile documentation**, enabling **automation and AI-driven workflows** without the overhead of traditional modeling tools.  
 
 ---
 
 ## Why ReqFlow?
 
-ReqFlow is a Git-native, AI-driven **procces, toolset, and language** for modern requirements and system modeling. It integrates **automation, structured documentation, and AI-driven assistance**, ensuring that specifications remain **actionable, traceable, and aligned with development**.  
+ReqFlow is a Git-native, AI-enabled **procces, toolset, and language** for modern requirements and system modeling. 
 
-- **AI-Driven Development & Collaboration** – Enhancing teamwork through AI-Driven requirement authoring, architecture analysis, code generation, validation, and impact analysis.
 - **Git-Native** – Embeds directly into Git workflows, ensuring requirements evolve alongside code with full traceability and version control.  
 - **Agile & Lightweight** – Uses Markdown-based artifacts for a balance of human readability and machine processability, making collaboration seamless.  
 - **Automation-Ready** – Supports traceability, impact analysis, validation, and diagram generation, reducing manual effort while improving consistency.  
@@ -27,16 +21,15 @@ ReqFlow is a Git-native, AI-driven **procces, toolset, and language** for modern
 - **Traceability & Impact Awareness** – Links every requirement, specification, and decision to ensure full versioning and impact analysis.  
 - **Seamless Development Integration** – Connects requirements to issues, pull requests, and test cases, ensuring real-world alignment.  
 - **Automated Documentation & Visualization** – Generates diagrams, traceability matrices, and structured reports for enhanced visibility.  
-- **Structured, Machine-Readable Documentation** – Uses Markdown-based conventions inspired by SysML, ensuring specifications are both human-friendly and AI-processable.  
 - **Diagram Generation & Relationship Mapping** – Supports structured linking and MermaidJS to visualize dependencies and improve clarity.  
+- **AI-enabled Development & Collaboration** – Enhancing teamwork through AI-enabled requirement authoring, architecture analysis, code generation, validation, and impact analysis.
 
-By embedding these capabilities into Git workflows, ReqFlow ensures that requirements, specifications, and their dependencies remain **structured, versioned, and continuously evolving** alongside development.  
 
 ---
 
 ## Get Started
 
-For detailed information about **how to use ReqFlow**, including the **tooling, methodology, and AI-powered workflows**, visit the [documentation](./doc/README.md).
+For detailed information about **how to use ReqFlow** visit the [documentation](./doc/README.md).
 
 
 ### Installation
@@ -96,39 +89,6 @@ To set up ReqFlow, follow these steps:
    ```bash
    reqflow --version
    ```
-
-### Quick Start
-
-Once you have ReqFlow installed, you can start using it with your project:
-
-1. **Initialize ReqFlow in Your Project**
-   ```bash
-   reqflow init
-   ```
-   This creates a basic ReqFlow structure with example requirements
-
-2. **Validate Your Requirements**
-   ```bash
-   reqflow validate specifications/
-   ```
-
-3. **Generate Documentation**
-   ```bash
-   reqflow specifications/ output/ --html
-   ```
-
-4. **Lint and Format Requirements**
-   ```bash
-   reqflow --lint specifications/
-   ```
-
-5. **Generate Index and Diagrams**
-   ```bash
-   reqflow --lint specifications/ --generate-diagrams
-   ```
-
-For detailed usage instructions, refer to the [User Guide](doc/user_guide.md).
-
 
 ## Contributing
 

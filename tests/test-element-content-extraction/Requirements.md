@@ -108,7 +108,31 @@ REQ 7 Details.
   * type: requirement
 
 
-    
+
+### REQ 8
+
+Requirement with main text and relations details with <details> element that should not break parsing and validation.
+
+  
+#### Details
+
+<details>
+### REQ 8
+
+Nested requirement which should not be processed as requirement.
+
+
+#### Relations
+  * derivedFrom: #req-0
+
+        
+</details>
+
+
+#### Relations
+  * derivedFrom: #req-0
+
+        
       
   
     

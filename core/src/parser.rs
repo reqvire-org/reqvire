@@ -20,6 +20,8 @@ pub fn parse_elements(
     let mut seen_identifiers = HashSet::new();
     let mut skip_current_element = false;
     let mut seen_subsections = HashSet::new();
+    let mut in_details_block = false; 
+
 
     let mut current_subsection = SubSection::Other("".to_string());
     let mut current_section_name = "Requirements";
@@ -27,7 +29,21 @@ pub fn parse_elements(
     for (line_num, line) in content.lines().enumerate() {
         let trimmed = line.trim();
 
-        if trimmed == "---" {
+
+        if in_details_block {
+            if !skip_current_element {
+                if let Some(element) = &mut current_element {
+                    element.add_content(&format!("{}\n", line));
+                }
+            }
+        
+            if trimmed.starts_with("</details>") {
+                in_details_block = false;
+            }
+        
+            continue; // Skip any further processing while in <details>        
+
+        }else if trimmed == "---" {
             current_subsection = SubSection::Other("".to_string());
 
         } else if trimmed.starts_with("## ") {
@@ -144,6 +160,17 @@ pub fn parse_elements(
         } else if (current_subsection == SubSection::Requirement || current_subsection == SubSection::Details)
             && !skip_current_element
         {
+            if let Some(element) = &mut current_element {
+                if trimmed.starts_with("<details") {
+                    in_details_block = true;
+                }
+        
+                element.add_content(&format!("{}\n", line));
+
+            }
+
+        } else if in_details_block && !skip_current_element {
+            // Still inside <details> block under 'Details' subsection
             if let Some(element) = &mut current_element {
                 element.add_content(&format!("{}\n", line));
             }

@@ -11,43 +11,43 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  9d6f79f601["Change Impact Command Line Interface"];
-  click 9d6f79f601 "ChangeImpactRequirements.md#change-impact-command-line-interface";
-  class 9d6f79f601 requirement;
-  665b7456c9["CLI Change Impact Report Flag"];
-  class 665b7456c9 requirement;
-  click 665b7456c9 "Requirements.md#cli-change-impact-report-flag";
-  9d6f79f601 -.->|deriveReqT| 665b7456c9;
-  11ffc4632a["../../cli/src/cli.rs"];
-  class 11ffc4632a default;
-  click 11ffc4632a "../../cli/src/cli.rs";
-  11ffc4632a -->|satisfies| 9d6f79f601;
-  401764f61b["Change Impact Relations Test"];
-  class 401764f61b verification;
-  click 401764f61b "../Verifications/ChangeImpactTests.md#change-impact-relations-test";
-  401764f61b -->|verifies| 9d6f79f601;
-  9102eb42eb["Change Impact Detection Test"];
-  class 9102eb42eb verification;
-  click 9102eb42eb "../Verifications/ChangeImpactTests.md#change-impact-detection-test";
-  9102eb42eb -->|verifies| 9d6f79f601;
-  9e4af55877["Change Impact Visualization"];
-  click 9e4af55877 "ChangeImpactRequirements.md#change-impact-visualization";
-  class 9e4af55877 requirement;
-  33e6fb86b3["DesignSpecifications/RequirementsChangePropagation.md"];
-  class 33e6fb86b3 default;
-  click 33e6fb86b3 "../DesignSpecifications/RequirementsChangePropagation.md";
-  9e4af55877 -.->|deriveReqT| 33e6fb86b3;
+  d17b0775f4["Change Impact Detection Algorithm"];
+  click d17b0775f4 "ChangeImpactPropagation.md#change-impact-detection-algorithm";
+  class d17b0775f4 requirement;
+  745439d5fc["../SpecificationsRequirements.md#requirements-change-propagation"];
+  class 745439d5fc requirement;
+  click 745439d5fc "../SpecificationsRequirements.md#requirements-change-propagation";
+  d17b0775f4 -.->|deriveReqT| 745439d5fc;
   cc976e6bcd["../../core/src/change_impact.rs"];
   class cc976e6bcd default;
   click cc976e6bcd "../../core/src/change_impact.rs";
-  cc976e6bcd -->|satisfies| 9e4af55877;
-  503dda29a8["Change Impact Detection Algorithm"];
-  click 503dda29a8 "ChangeImpactRequirements.md#change-impact-detection-algorithm";
-  class 503dda29a8 requirement;
-  503dda29a8 -.->|deriveReqT| 33e6fb86b3;
-  cc976e6bcd -->|satisfies| 503dda29a8;
-  401764f61b -->|verifies| 503dda29a8;
-  9102eb42eb -->|verifies| 503dda29a8;
+  cc976e6bcd -->|satisfies| d17b0775f4;
+  9102eb42eb["Change Impact Detection Test"];
+  class 9102eb42eb verification;
+  click 9102eb42eb "../Verifications/ChangeImpactTests.md#change-impact-detection-test";
+  9102eb42eb -->|verifies| d17b0775f4;
+  401764f61b["Change Impact Relations Test"];
+  class 401764f61b verification;
+  click 401764f61b "../Verifications/ChangeImpactTests.md#change-impact-relations-test";
+  401764f61b -->|verifies| d17b0775f4;
+  6e747b7f03["Change Impact Command Line Interface"];
+  click 6e747b7f03 "ChangeImpactPropagation.md#change-impact-command-line-interface";
+  class 6e747b7f03 requirement;
+  665b7456c9["CLI Change Impact Report Flag"];
+  class 665b7456c9 requirement;
+  click 665b7456c9 "Requirements.md#cli-change-impact-report-flag";
+  6e747b7f03 -.->|deriveReqT| 665b7456c9;
+  11ffc4632a["../../cli/src/cli.rs"];
+  class 11ffc4632a default;
+  click 11ffc4632a "../../cli/src/cli.rs";
+  11ffc4632a -->|satisfies| 6e747b7f03;
+  9102eb42eb -->|verifies| 6e747b7f03;
+  401764f61b -->|verifies| 6e747b7f03;
+  c23729cc55["Change Impact Visualization"];
+  click c23729cc55 "ChangeImpactPropagation.md#change-impact-visualization";
+  class c23729cc55 requirement;
+  c23729cc55 -.->|deriveReqT| 745439d5fc;
+  cc976e6bcd -->|satisfies| c23729cc55;
 ```
 
 ---
@@ -93,7 +93,7 @@ The algorithm shall consist of the following steps:
    - Support incremental impact analysis for large models
 
 #### Relations
-  * derivedFrom: [DesignSpecifications/RequirementsChangePropagation.md](../../specifications/DesignSpecifications/RequirementsChangePropagation.md)
+  * derivedFrom: [../SpecificationsRequirements.md#requirements-change-propagation](../SpecificationsRequirements.md#requirements-change-propagation)  
   * satisfiedBy: [../../core/src/change_impact.rs](../../core/src/change_impact.rs)
 
 ---
@@ -133,7 +133,7 @@ The visualization shall include:
    - Generate overall change impact assessment
 
 #### Relations
-  * derivedFrom: [DesignSpecifications/RequirementsChangePropagation.md](../../specifications/DesignSpecifications/RequirementsChangePropagation.md)
+  * derivedFrom: [../SpecificationsRequirements.md#requirements-change-propagation](../SpecificationsRequirements.md#requirements-change-propagation)  
   * satisfiedBy: [../../core/src/change_impact.rs](../../core/src/change_impact.rs)
 
 ---
@@ -173,34 +173,5 @@ The CLI shall support the following functionality:
 #### Relations
   * derivedFrom: [CLI Change Impact Report Flag](../SystemRequirements/Requirements.md#cli-change-impact-report-flag)
   * satisfiedBy: [../../cli/src/cli.rs](../../cli/src/cli.rs)
-
----
-
-## Change Impact Test Requirements
-```mermaid
-graph LR;
-  %% Graph styling
-  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
-  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
-  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
-  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
-
-  9257bdbe19["End-to-End Change Impact Tests"];
-  click 9257bdbe19 "ChangeImpactRequirements.md#end-to-end-change-impact-tests";
-  class 9257bdbe19 requirement;
-  33e6fb86b3["DesignSpecifications/RequirementsChangePropagation.md"];
-  class 33e6fb86b3 default;
-  click 33e6fb86b3 "../DesignSpecifications/RequirementsChangePropagation.md";
-  9257bdbe19 -.->|deriveReqT| 33e6fb86b3;
-  524acc7470["tests/test-change-impact-detection/test.sh"];
-  class 524acc7470 default;
-  click 524acc7470 "../../tests/test-change-impact-detection/test.sh";
-  524acc7470 -->|verifies| 9257bdbe19;
-  a4d4b4ced7["Relation Type Impact Tests"];
-  click a4d4b4ced7 "ChangeImpactRequirements.md#relation-type-impact-tests";
-  class a4d4b4ced7 requirement;
-  a4d4b4ced7 -.->|deriveReqT| 33e6fb86b3;
-  524acc7470 -->|verifies| a4d4b4ced7;
-```
 
 ---

@@ -11,27 +11,27 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  401764f61b["Change Impact Relations Test"];
-  click 401764f61b "ChangeImpactTests.md#change-impact-relations-test";
-  class 401764f61b verification;
-  503dda29a8["SystemRequirements/ChangeImpactRequirements.md#change-impact-detection-algorithm"];
-  class 503dda29a8 requirement;
-  click 503dda29a8 "../SystemRequirements/ChangeImpactRequirements.md#change-impact-detection-algorithm";
-  401764f61b -->|verifies| 503dda29a8;
-  9d6f79f601["SystemRequirements/ChangeImpactRequirements.md#change-impact-command-line-interface"];
-  class 9d6f79f601 requirement;
-  click 9d6f79f601 "../SystemRequirements/ChangeImpactRequirements.md#change-impact-command-line-interface";
-  401764f61b -->|verifies| 9d6f79f601;
-  524acc7470["tests/test-change-impact-detection/test.sh"];
-  class 524acc7470 default;
-  click 524acc7470 "../../tests/test-change-impact-detection/test.sh";
-  401764f61b -->|traces| 524acc7470;
   9102eb42eb["Change Impact Detection Test"];
   click 9102eb42eb "ChangeImpactTests.md#change-impact-detection-test";
   class 9102eb42eb verification;
-  9102eb42eb -->|verifies| 503dda29a8;
-  9102eb42eb -->|verifies| 9d6f79f601;
+  d17b0775f4["SystemRequirements/ChangeImpactPropagation.md#requirements-change Propagation"];
+  class d17b0775f4 requirement;
+  click d17b0775f4 "../SystemRequirements/ChangeImpactPropagation.md#change-impact-detection-algorithm";
+  9102eb42eb -->|verifies| d17b0775f4;
+  6e747b7f03["SystemRequirements/ChangeImpactPropagation.md#change-impact-command-line-interface"];
+  class 6e747b7f03 requirement;
+  click 6e747b7f03 "../SystemRequirements/ChangeImpactPropagation.md#change-impact-command-line-interface";
+  9102eb42eb -->|verifies| 6e747b7f03;
+  524acc7470["tests/test-change-impact-detection/test.sh"];
+  class 524acc7470 default;
+  click 524acc7470 "../../tests/test-change-impact-detection/test.sh";
   9102eb42eb -->|traces| 524acc7470;
+  401764f61b["Change Impact Relations Test"];
+  click 401764f61b "ChangeImpactTests.md#change-impact-relations-test";
+  class 401764f61b verification;
+  401764f61b -->|verifies| d17b0775f4;
+  401764f61b -->|verifies| 6e747b7f03;
+  401764f61b -->|traces| 524acc7470;
 ```
 
 ---
@@ -56,8 +56,8 @@ This test verifies that the system correctly implements change impact detection,
 - Both explicit and implicit git commit parameters work properly
 
 #### Relations
-  * verify: [SystemRequirements/ChangeImpactRequirements.md#change-impact-detection-algorithm](../SystemRequirements/ChangeImpactRequirements.md#change-impact-detection-algorithm)
-  * verify: [SystemRequirements/ChangeImpactRequirements.md#change-impact-command-line-interface](../SystemRequirements/ChangeImpactRequirements.md#change-impact-command-line-interface)
+  * verify: [SystemRequirements/ChangeImpactPropagation.md#requirements-change Propagation](../SystemRequirements/ChangeImpactPropagation.md#change-impact-detection-algorithm)
+  * verify: [SystemRequirements/ChangeImpactPropagation.md#change-impact-command-line-interface](../SystemRequirements/ChangeImpactPropagation.md#change-impact-command-line-interface)
   * trace: [tests/test-change-impact-detection/test.sh](../../tests/test-change-impact-detection/test.sh)
 
 ---
@@ -82,6 +82,6 @@ This test verifies that the system correctly handles different relation types wh
 - System correctly handles circular dependencies in relation chains
 
 #### Relations
-  * verify: [SystemRequirements/ChangeImpactRequirements.md#change-impact-detection-algorithm](../SystemRequirements/ChangeImpactRequirements.md#change-impact-detection-algorithm)
-  * verify: [SystemRequirements/ChangeImpactRequirements.md#change-impact-command-line-interface](../SystemRequirements/ChangeImpactRequirements.md#change-impact-command-line-interface) 
+  * verify: [SystemRequirements/ChangeImpactPropagation.md#change-impact-detection-algorithm](../SystemRequirements/ChangeImpactPropagation.md#change-impact-detection-algorithm)
+  * verify: [SystemRequirements/ChangeImpactPropagation.md#change-impact-command-line-interface](../SystemRequirements/ChangeImpactPropagation.md#change-impact-command-line-interface) 
   * trace: [tests/test-change-impact-detection/test.sh](../../tests/test-change-impact-detection/test.sh)

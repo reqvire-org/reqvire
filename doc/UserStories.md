@@ -4,17 +4,13 @@ Each user story represents a high-level user need and is linked to specific meas
 
 User stories are a key part of the user needs definition process and follow the definition of use cases. They serve as an entry point for defining user requirements, which refine user stories and group them into structures that facilitate the development of logical architecture diagrams.
 
-A **user story** must have at least one `tracedFrom` relation linking it to a specific MOE. This ensures alignment with the project's objectives and stakeholder expectations.
+A **user story** relates to a specific MOE with the `traced` relation.
 
-User stories are expected to be documented in the `specifications/UserStories.md` file.
+User stories follow the same format as requirements; the only difference lies in the writing style.
 
 ---
 
-## User Stories Document Format and User Story Format
-
-The user story document organizes stories into logical groups under grouping titles. Each user story includes a descriptive title, a structured text description, and relations to MOEs.
-
-### Expected Document Format:
+### Suggested Document Format:
 
 ```markdown
 # Document Title
@@ -28,5 +24,5 @@ Here one may explain which personas, actions and values are going to be used in 
 As [persona], I want to [action], so that I can [value].
 
 #### Relations
- * tracedFrom: MOEs.md/MOE_CR
+ * traced: MOEs.md/MOE_CR
 
