@@ -34,6 +34,8 @@ pub fn run_linting(
     );
     debug!("Found {} markdown files to lint", files.len());
 
+    let mut total_suggestions = 0;
+
     for (file_path, _) in files {
         let original_content = fs::read_to_string(&file_path)?;
         let mut modified_content = original_content.clone();
@@ -93,20 +95,27 @@ pub fn run_linting(
             fs::write(&file_path, &modified_content)?;
         }
 
-        // dry‐run report
+        // dry‐run report        
         if dry_run {
-            if all_suggestions.is_empty() {
-                println!("✅ No linting issues found.");
-            } else {
+            total_suggestions += all_suggestions.len();        
+            
+            if !all_suggestions.is_empty() {
                 for suggestion in &all_suggestions {
                     let _ = suggestion.print_colorized_diff();
                 }
-                println!("⚠️ Found {} linting issues:", all_suggestions.len());
-                println!("Run without --dry-run to apply fixes.");
+                println!("⚠️ Found {} linting issues in {}:", 
+                         all_suggestions.len(), file_path.display());
+                println!("Run without --dry-run to apply fixes.\n");
             }
         }
     }
 
+    // overall dry‑run summary
+    if dry_run && total_suggestions == 0 {
+        println!("✅ No linting issues found in any files.");
+    }
+ 
+ 
     Ok(())
 }
 
