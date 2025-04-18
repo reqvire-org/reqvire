@@ -1,0 +1,192 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Requirements-with-custom-mermaid</title>
+    
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa;
+    color: #333;
+}
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+.content {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+h1 {
+    color: #333;
+    border-bottom: 2px solid #eaecef;
+    padding-bottom: 10px;
+    margin-top: 0;
+}
+h2 {
+    color: #333;
+    border-bottom: 1px solid #eaecef;
+    padding-bottom: 5px;
+}
+h3 {
+    color: #1a6fb7;
+    margin-top: 25px;
+}
+h4 {
+    color: #555;
+    font-weight: 600;
+}
+a {
+    color: #0366d6;
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 20px 0;
+}
+table, th, td {
+    border: 1px solid #dfe2e5;
+}
+th, td {
+    padding: 8px 12px;
+    text-align: left;
+}
+th {
+    background-color: #f6f8fa;
+}
+code {
+    background: #f6f8fa;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 90%;
+}
+pre {
+    background: #f6f8fa;
+    border-radius: 3px;
+    padding: 16px;
+    overflow: auto;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+}
+blockquote {
+    margin: 0;
+    padding: 0 15px;
+    color: #777;
+    border-left: 4px solid #dfe2e5;
+}
+.mermaid {
+    margin: 20px 0;
+    text-align: center;
+}
+</style>
+
+    <!-- Enhanced mermaid configuration for ReqFlow diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'neutral',
+            maxTextSize: 90000,
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            securityLevel: 'loose'
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="content">
+            <h1 id="test-requirements-with-custom-mermaid">Test Requirements with Custom Mermaid</h1>
+<p>This is a requirements document specifically created for testing diagram generation.</p>
+<h2 id="section-1">Section 1</h2>
+<div class="mermaid">graph TD;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+
+  d94b2c1859[&quot;Element 2&quot;];
+  click d94b2c1859 &quot;Requirements-with-custom-mermaid.html#element-2&quot;;
+  class d94b2c1859 requirement;
+  2ac7edcf81[&quot;Element 1&quot;];
+  click 2ac7edcf81 &quot;Requirements-with-custom-mermaid.html#element-1&quot;;
+  class 2ac7edcf81 requirement;
+  87ce6a6132[&quot;Element 3&quot;];
+  class 87ce6a6132 requirement;
+  click 87ce6a6132 &quot;Requirements-with-custom-mermaid.html#element-3&quot;;
+  2ac7edcf81 --&gt;|verifies| 87ce6a6132;
+</div>
+<h3 id="element-1">Element 1</h3>
+<p>This is a test element with relations.</p>
+<h4>Relations</h4>
+<ul>
+<li>satisfies: <a href="#element-2">Element 2</a></li>
+<li>verifies: <a href="#element-3">Element 3</a></li>
+</ul>
+<h3 id="element-2">Element 2</h3>
+<p>This is another test element with relations.</p>
+<h4>Relations</h4>
+<ul>
+<li>tracedFrom: <a href="#element-1">Element 1</a></li>
+</ul>
+<h2 id="custom-mermaid-diagram-section">Custom Mermaid Diagram Section</h2>
+<p>This section contains a custom mermaid diagram that should not be removed:</p>
+<div class="mermaid">flowchart TD
+    A[Start] --&gt; B{Is it?}
+    B -- Yes --&gt; C[OK]
+    C --&gt; D[Rethink]
+    D --&gt; B
+    B -- No --&gt; E[End]
+</div>
+<h2 id="section-2">Section 2</h2>
+<div class="mermaid">graph TD;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+
+  3651a8aa0b[&quot;Element 4&quot;];
+  click 3651a8aa0b &quot;Requirements-with-custom-mermaid.html#element-4&quot;;
+  class 3651a8aa0b requirement;
+  87ce6a6132[&quot;Element 3&quot;];
+  click 87ce6a6132 &quot;Requirements-with-custom-mermaid.html#element-3&quot;;
+  class 87ce6a6132 requirement;
+  2ac7edcf81[&quot;Element 1&quot;];
+  class 2ac7edcf81 requirement;
+  click 2ac7edcf81 &quot;Requirements-with-custom-mermaid.html#element-1&quot;;
+  2ac7edcf81 --&gt;|verifies| 87ce6a6132;
+</div>
+<h3 id="element-3">Element 3</h3>
+<p>This is a third test element.</p>
+<h4>Relations</h4>
+<ul>
+<li>verifiedBy: <a href="#element-1">Element 1</a></li>
+</ul>
+<h3 id="element-4">Element 4</h3>
+<p>This is a fourth test element with no relations.</p>
+
+        </div>
+    </div>
+</body>
+</html>

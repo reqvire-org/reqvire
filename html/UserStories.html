@@ -1,0 +1,257 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UserStories</title>
+    
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa;
+    color: #333;
+}
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+.content {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+h1 {
+    color: #333;
+    border-bottom: 2px solid #eaecef;
+    padding-bottom: 10px;
+    margin-top: 0;
+}
+h2 {
+    color: #333;
+    border-bottom: 1px solid #eaecef;
+    padding-bottom: 5px;
+}
+h3 {
+    color: #1a6fb7;
+    margin-top: 25px;
+}
+h4 {
+    color: #555;
+    font-weight: 600;
+}
+a {
+    color: #0366d6;
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 20px 0;
+}
+table, th, td {
+    border: 1px solid #dfe2e5;
+}
+th, td {
+    padding: 8px 12px;
+    text-align: left;
+}
+th {
+    background-color: #f6f8fa;
+}
+code {
+    background: #f6f8fa;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 90%;
+}
+pre {
+    background: #f6f8fa;
+    border-radius: 3px;
+    padding: 16px;
+    overflow: auto;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+}
+blockquote {
+    margin: 0;
+    padding: 0 15px;
+    color: #777;
+    border-left: 4px solid #dfe2e5;
+}
+.mermaid {
+    margin: 20px 0;
+    text-align: center;
+}
+</style>
+
+    <!-- Enhanced mermaid configuration for ReqFlow diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'neutral',
+            maxTextSize: 90000,
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            securityLevel: 'loose'
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="content">
+            <h1 id="user-stories">User stories</h1>
+<h2 id="personas">Personas</h2>
+<ol>
+<li>System Engineer: Focused on managing system models, ensuring alignment with project requirements, and validating structures.</li>
+<li>SOI Developer: Implements features and makes system changes based on MBSE models, ensuring consistency between design and code.</li>
+<li>Contributor: An external community member contributing to ReqFlow by improving models, creating features, or providing feedback.</li>
+<li>Manager: Oversees the MBSE processes, tracks progress, ensures alignment with objectives, and generates reports for decision-making.</li>
+</ol>
+<hr />
+<h2 id="user-stories">User Stories</h2>
+<div class="mermaid">graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+
+  fe32882ee273e24d[&quot;Provide Reports&quot;];
+  click fe32882ee273e24d &quot;UserStories.html#provide-reports&quot;;
+  class fe32882ee273e24d requirement;
+  b3f57e49f7494c0e[&quot;MOEs.md/MOE_CE&quot;];
+  class b3f57e49f7494c0e requirement;
+  click b3f57e49f7494c0e &quot;MOEs.html#moe_ce&quot;;
+  fe32882ee273e24d -.-&gt;|trace| b3f57e49f7494c0e;
+  2b35b7b37d52d4e6[&quot;AI-Assisted MBSE Model Management&quot;];
+  click 2b35b7b37d52d4e6 &quot;UserStories.html#ai-assisted-mbse-model-management&quot;;
+  class 2b35b7b37d52d4e6 requirement;
+  852dea6cfecb47f5[&quot;#Managing MBSE Models&quot;];
+  class 852dea6cfecb47f5 requirement;
+  click 852dea6cfecb47f5 &quot;UserStories.html#managing-mbse-models&quot;;
+  2b35b7b37d52d4e6 --&gt;|refines| 852dea6cfecb47f5;
+  36d8b2eb16113a7f[&quot;Trace Changes in MBSE Model&quot;];
+  click 36d8b2eb16113a7f &quot;UserStories.html#trace-changes-in-mbse-model&quot;;
+  class 36d8b2eb16113a7f requirement;
+  f6237e49f7494c0e[&quot;MOEs.md/MOE_UA&quot;];
+  class f6237e49f7494c0e requirement;
+  click f6237e49f7494c0e &quot;MOEs.html#moe_ua&quot;;
+  36d8b2eb16113a7f -.-&gt;|trace| f6237e49f7494c0e;
+  100197ce818804[&quot;Export Specifications&quot;];
+  click 100197ce818804 &quot;UserStories.html#export-specifications&quot;;
+  class 100197ce818804 requirement;
+  100197ce818804 -.-&gt;|trace| f6237e49f7494c0e;
+  a60d88b6e2cb3842[&quot;Validating Structures&quot;];
+  click a60d88b6e2cb3842 &quot;UserStories.html#validating-structures&quot;;
+  class a60d88b6e2cb3842 requirement;
+  a60d88b6e2cb3842 -.-&gt;|trace| f6237e49f7494c0e;
+  ba120b7cafc5435f[&quot;Integrate with GitHub Workflows&quot;];
+  click ba120b7cafc5435f &quot;UserStories.html#integrate-with-github-workflows&quot;;
+  class ba120b7cafc5435f requirement;
+  ba120b7cafc5435f -.-&gt;|trace| b3f57e49f7494c0e;
+  cf0026c2feeb1e0f[&quot;Generate Diagrams&quot;];
+  click cf0026c2feeb1e0f &quot;UserStories.html#generate-diagrams&quot;;
+  class cf0026c2feeb1e0f requirement;
+  cf0026c2feeb1e0f -.-&gt;|trace| f6237e49f7494c0e;
+  de2d3516cd5ef91d[&quot;Aligning Design with Code&quot;];
+  click de2d3516cd5ef91d &quot;UserStories.html#aligning-design-with-code&quot;;
+  class de2d3516cd5ef91d requirement;
+  de2d3516cd5ef91d -.-&gt;|trace| f6237e49f7494c0e;
+  852dea6cfecb47f5 -.-&gt;|trace| f6237e49f7494c0e;
+  cdc9a9c9087e707f[&quot;Fostering Community Contributions&quot;];
+  click cdc9a9c9087e707f &quot;UserStories.html#fostering-community-contributions&quot;;
+  class cdc9a9c9087e707f requirement;
+  cdc9a9c9087e707f -.-&gt;|trace| b3f57e49f7494c0e;
+</div>
+<hr />
+<h3 id="managing-mbse-models">Managing MBSE Models</h3>
+<p>As an <strong>System Engineer</strong>, I want to manage MBSE models effectively, so that I can ensure they align with project requirements and deliverable goals.</p>
+<h4>Relations</h4>
+<ul>
+<li>trace: <a href="MOEs.html#moe_ua">MOEs.md/MOE_UA</a></li>
+</ul>
+<hr />
+<h3 id="ai-assisted-mbse-model-management">AI-Assisted MBSE Model Management</h3>
+<p>As a <strong>Systems Engineer</strong>, I want to efficiently manage MBSE models using AI-powered tools and LLM-based assistants.</p>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="#managing-mbse-models">#Managing MBSE Models</a></li>
+</ul>
+<hr />
+<h3 id="generate-diagrams">Generate Diagrams</h3>
+<p>As a <strong>System Engineer</strong>, I want to generate diagrams for different system viewpoints, so that I can communicate system architecture effectively and understand dependencies and impacts across the system.</p>
+<h4>Relations</h4>
+<ul>
+<li>trace: <a href="MOEs.html#moe_ua">MOEs.md/MOE_UA</a></li>
+</ul>
+<hr />
+<h3 id="export-specifications">Export Specifications</h3>
+<p>As a <strong>Manager</strong>, I want to export specifications into diferent formats including HTML, so that I can communicate system architecture effectively.</p>
+<h4>Relations</h4>
+<ul>
+<li>trace: <a href="MOEs.html#moe_ua">MOEs.md/MOE_UA</a></li>
+</ul>
+<hr />
+<h3 id="aligning-design-with-code">Aligning Design with Code</h3>
+<p>As a <strong>Developer</strong>, I want to align code with MBSE models, so that implementation remains consistent with design specifications.</p>
+<h4>Relations</h4>
+<ul>
+<li>trace: <a href="MOEs.html#moe_ua">MOEs.md/MOE_UA</a></li>
+</ul>
+<hr />
+<h3 id="validating-structures">Validating Structures</h3>
+<p>As an <strong>System Engineer</strong>, I want to validate the structure of MBSE models, so that I can ensure compliance with organizational and project standards.</p>
+<h4>Relations</h4>
+<ul>
+<li>trace: <a href="MOEs.html#moe_ua">MOEs.md/MOE_UA</a></li>
+</ul>
+<hr />
+<h3 id="integrate-with-github-workflows">Integrate with GitHub Workflows</h3>
+<p>As a <strong>Contributor</strong>, I want ReqFlow to integrate seamlessly with GitHub workflows, so that I can collaborate on updates and manage contributions effectively.</p>
+<h4>Relations</h4>
+<ul>
+<li>trace: <a href="MOEs.html#moe_ce">MOEs.md/MOE_CE</a></li>
+</ul>
+<hr />
+<h3 id="provide-reports">Provide Reports</h3>
+<p>As a <strong>Manager</strong>, I want to generate structured reports based on the MBSE model, so that I can track progress and ensure alignment with organizational objectives.</p>
+<h4>Relations</h4>
+<ul>
+<li>trace: <a href="MOEs.html#moe_ce">MOEs.md/MOE_CE</a></li>
+</ul>
+<hr />
+<h3 id="trace-changes-in-mbse-model">Trace Changes in MBSE Model</h3>
+<p>As a <strong>System Engineer</strong>, I want to trace changes in the MBSE model to identify affected components and ensure all updates are consistent across the system.</p>
+<h4>Relations</h4>
+<ul>
+<li>trace: <a href="MOEs.html#moe_ua">MOEs.md/MOE_UA</a></li>
+</ul>
+<hr />
+<h3 id="fostering-community-contributions">Fostering Community Contributions</h3>
+<p>As a <strong>Contributor</strong>, I want ReqFlow tools to be intuitive and well-documented, so that I can contribute effectively to the open-source project.</p>
+<h4>Relations</h4>
+<ul>
+<li>trace: <a href="MOEs.html#moe_ce">MOEs.md/MOE_CE</a></li>
+</ul>
+<hr />
+
+        </div>
+    </div>
+</body>
+</html>

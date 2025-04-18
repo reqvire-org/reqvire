@@ -3,7 +3,8 @@ use pulldown_cmark::{html, Options, Parser};
 use crate::error::ReqFlowError;
 use std::path::PathBuf;
 use lazy_static::lazy_static;
-use regex::Regex;
+use regex::{Regex, Captures};
+
 
 /// Embedded CSS styles for HTML output
 pub const EMBEDDED_STYLES: &str = r#"
@@ -197,7 +198,7 @@ pub fn process_mermaid_diagrams(
     _file_path: &PathBuf,
     html_content: &str,
     specification_folder: &PathBuf,
-    external_folders: &[PathBuf],
+    _external_folders: &[PathBuf],
 ) -> String {
 
     lazy_static! {
@@ -229,6 +230,7 @@ pub fn process_mermaid_diagrams(
                 // Perform a simple string replacement.
                 modified_filename = modified_filename.replace(&needle, &replacement);       
         }     
+        /*
         for ext in external_folders {
             if let Some(ext_name) = ext.file_name().and_then(|s| s.to_str()) {
                 // Construct the needle as "../EXTERNAL_FOLDER_NAME/"
@@ -239,6 +241,7 @@ pub fn process_mermaid_diagrams(
                 modified_filename = modified_filename.replace(&needle, &replacement);
             }
         }
+        */
 
         modified_filename=modified_filename.replace(".md", ".html");
 
@@ -249,92 +252,89 @@ pub fn process_mermaid_diagrams(
       }).to_string()
 }
 
+// Helper function: If a link contains a pattern like "../SPECIFICATION_FOLDER_NAME/",
+// remove the preceding "SPECIFICATION_FOLDER_NAME" so that it becomes "../".       
+fn fix_link_path(link: &str, specification_folder: &PathBuf, _external_folders: &[std::path::PathBuf]) -> String {
+    let mut fixed = link.to_string();
+
+    if let Some(spec_name) = specification_folder.file_name().and_then(|s| s.to_str()) {
+        let needle = format!("/{}/", spec_name);
+        // Define the replacement (i.e. without the preceding "../")
+        let replacement = "/";
+        // A simple string-level replacement.
+        fixed = fixed.replace(&needle, &replacement);
+    }
+    /*
+    else{
+          
+        for ext in external_folders {
+            if let Some(ext_name) = ext.file_name().and_then(|s| s.to_str()) {
+                // Define the needle we're looking for:
+                let needle = format!("../{}/", ext_name);
+                // Define the replacement (i.e. without the preceding "../")
+                let replacement = format!("/{}/", ext_name);
+                // A simple string-level replacement.
+                fixed = fixed.replace(&needle, &replacement);
+            }
+        }
+    }
+    */
+    fixed
+}
 /// Convert all markdown links from .md to .html for HTML output
 /// Pre-processes markdown content to convert all markdown links with .md extension to .html 
 /// This is used to ensure all links in the generated HTML point to HTML files
 fn convert_markdown_links_to_html(
     _file_path: &PathBuf,
-    markdown_content: &str, 
+    markdown_content: &str,
     specification_folder: &PathBuf,
-    external_folders: &[PathBuf],   
+    external_folders: &[PathBuf],
 ) -> String {
-    use regex::Regex;
-    
-    lazy_static::lazy_static! {
-        // Match markdown links with hash fragments: [text](url.md#fragment)
-        static ref MD_LINK_WITH_HASH_REGEX: Regex = Regex::new(r"(\]\()([^#)]+)\.md(#[^)]+)(\))").unwrap();
-        
-        // Match markdown links: [text](url.md) or [text](path/to/url.md) - including with parent directory references (../../)
-        // This pattern also handles links in relation sections like: * satisfiedBy: [link](path.md)
-        static ref MD_LINK_REGEX: Regex = Regex::new(r"(\]\()([^#)]+)\.md(\))").unwrap();
-        
-        // Match link text that refers to .md files: [path/to/file.md]
-        static ref MD_LINK_TEXT_REGEX: Regex = Regex::new(r"\[([^]]+)\.md\]").unwrap();
+    lazy_static! {
+        // 1) [text](../path/to/file.md#fragment)
+        static ref MD_LINK_WITH_HASH_REGEX: Regex =
+            Regex::new(r"(\]\()((?:\.\./)*)([^#)]+)\.md(#[^)]+)(\))").unwrap();
+
+        // 2) [text](../path/to/file.md)
+        static ref MD_LINK_REGEX: Regex =
+            Regex::new(r"(\]\()((?:\.\./)*)([^#)]+)\.md(\))").unwrap();
+
+        // 3) bare link text [foo.md]
+        static ref MD_LINK_TEXT_REGEX: Regex =
+            Regex::new(r"\[([^]]+)\.md\]").unwrap();
     }
 
-    // Helper function: If a link contains a pattern like "../SPECIFICATION_FOLDER_NAME/",
-    // remove the preceding "SPECIFICATION_FOLDER_NAME" so that it becomes "../".       
-    // If a link contains a pattern like "../EXTERNAL_FOLDER_NAME/",
-    // remove the preceding "../" so that it becomes "/EXTERNAL_FOLDER_NAME/".
-    fn fix_link_path(link: &str, specification_folder: &PathBuf, external_folders: &[std::path::PathBuf]) -> String {
-        let mut fixed = link.to_string();
-        
-        if let Some(spec_name) = specification_folder.file_name().and_then(|s| s.to_str()) {
-            let needle = format!("/{}/", spec_name);
-            // Define the replacement (i.e. without the preceding "../")
-            let replacement = "/";
-            // A simple string-level replacement.
-            fixed = fixed.replace(&needle, &replacement);
-        }else{
-                  
-            for ext in external_folders {
-                if let Some(ext_name) = ext.file_name().and_then(|s| s.to_str()) {
-                    // Define the needle we're looking for:
-                    let needle = format!("../{}/", ext_name);
-                    // Define the replacement (i.e. without the preceding "../")
-                    let replacement = format!("/{}/", ext_name);
-                    // A simple string-level replacement.
-                    fixed = fixed.replace(&needle, &replacement);
-                }
-            }
-        }
-        fixed
-    }
-    
-    
-    // Process links with hash fragments.
-    let content = MD_LINK_WITH_HASH_REGEX.replace_all(markdown_content, |caps: &regex::Captures| {
-        let prefix   = &caps[1];  // the literal "](" starting the URL
-        let link     = &caps[2];  // the link path (without .md)
-        let fragment = &caps[3];  // the hash fragment, e.g. "#section"
-        let suffix   = &caps[4];  // the closing ")"
-        
-        let fixed_link = fix_link_path(link, specification_folder, external_folders);
-        format!("{}{}.html{}{}", prefix, fixed_link, fragment, suffix)
-    });
-    
-    // Process links without hash fragments.
-    let content = MD_LINK_REGEX.replace_all(&content, |caps: &regex::Captures| {
-        let prefix = &caps[1];
-        let link   = &caps[2];
-        let suffix = &caps[3];
-        
-        let fixed_link = fix_link_path(link, specification_folder, external_folders);
-        format!("{}{}.html{}", prefix, fixed_link, suffix)
+    // 1) Links with a fragment
+    let content = MD_LINK_WITH_HASH_REGEX.replace_all(markdown_content, |caps: &Captures| {
+        let before   = &caps[1]; // "]("
+        let parents  = &caps[2]; // e.g. "../../"
+        let path     = &caps[3]; // "path/to/file"
+        let fragment = &caps[4]; // "#section"
+        let close    = &caps[5]; // ")"
+
+        // apply your existing folder‑name rewrites only to the path portion
+        let fixed_path = fix_link_path(path, specification_folder, external_folders);
+        format!("{}{}{}.html{}{}", before, parents, fixed_path, fragment, close)
     });
 
-    // Convert link text that contains .md to use .html instead
-    // This is useful for links in relation sections where the display text should also be updated
-    // Example: * satisfiedBy: [DesignSpecifications/DirectMessages.md](DesignSpecifications/DirectMessages.md)
-    let content = MD_LINK_TEXT_REGEX.replace_all(&content, |caps: &regex::Captures| {
-        let path = &caps[1]; // path/to/file part without the .md
-        
-        // Replace .md with .html in the link text
-        format!("[{}.html]", path)
+    // 2) Links without a fragment
+    let content = MD_LINK_REGEX.replace_all(&content, |caps: &Captures| {
+        let before  = &caps[1]; // "]("
+        let parents = &caps[2]; // "../"*
+        let path    = &caps[3]; // "foo/bar"
+        let close   = &caps[4]; // ")"
+
+        let fixed_path = fix_link_path(path, specification_folder, external_folders);
+        format!("{}{}{}.html{}", before, parents, fixed_path, close)
     });
 
-  
-    content.to_string()
+    // 3) Bare link text (no URL): [foo.md] → [foo.html]
+    let content = MD_LINK_TEXT_REGEX.replace_all(&content, |caps: &Captures| {
+        let text = &caps[1];
+        format!("[{}.html]", text)
+    });
+
+    content.into_owned()
 }
 
 #[cfg(test)]

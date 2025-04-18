@@ -1,0 +1,324 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChangeImpactPropagation</title>
+    
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa;
+    color: #333;
+}
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+.content {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+h1 {
+    color: #333;
+    border-bottom: 2px solid #eaecef;
+    padding-bottom: 10px;
+    margin-top: 0;
+}
+h2 {
+    color: #333;
+    border-bottom: 1px solid #eaecef;
+    padding-bottom: 5px;
+}
+h3 {
+    color: #1a6fb7;
+    margin-top: 25px;
+}
+h4 {
+    color: #555;
+    font-weight: 600;
+}
+a {
+    color: #0366d6;
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 20px 0;
+}
+table, th, td {
+    border: 1px solid #dfe2e5;
+}
+th, td {
+    padding: 8px 12px;
+    text-align: left;
+}
+th {
+    background-color: #f6f8fa;
+}
+code {
+    background: #f6f8fa;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 90%;
+}
+pre {
+    background: #f6f8fa;
+    border-radius: 3px;
+    padding: 16px;
+    overflow: auto;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+}
+blockquote {
+    margin: 0;
+    padding: 0 15px;
+    color: #777;
+    border-left: 4px solid #dfe2e5;
+}
+.mermaid {
+    margin: 20px 0;
+    text-align: center;
+}
+</style>
+
+    <!-- Enhanced mermaid configuration for ReqFlow diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'neutral',
+            maxTextSize: 90000,
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            securityLevel: 'loose'
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="content">
+            <h1 id="change-impact-detection-system-requirements">Change Impact Detection System Requirements</h1>
+<p>This document defines the detailed requirements for the change impact detection algorithm and visualization in ReqFlow. It provides the technical specifications for implementing the concepts described in the Design Specification Document for Requirements Change Impact Propagation.</p>
+<h2 id="change-impact-detection-components">Change Impact Detection Components</h2>
+<div class="mermaid">graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+
+  d17b0775f448b19b[&quot;Change Impact Detection Algorithm&quot;];
+  click d17b0775f448b19b &quot;ChangeImpactPropagation.html#change-impact-detection-algorithm&quot;;
+  class d17b0775f448b19b requirement;
+  745439d5fc0154d1[&quot;../SpecificationsRequirements.md#requirements-change-propagation&quot;];
+  class 745439d5fc0154d1 requirement;
+  click 745439d5fc0154d1 &quot;../SpecificationsRequirements.html#requirements-change-propagation&quot;;
+  d17b0775f448b19b -.-&gt;|deriveReqT| 745439d5fc0154d1;
+  cc976e6bcded86e7[&quot;../../core/src/change_impact.rs&quot;];
+  class cc976e6bcded86e7 default;
+  click cc976e6bcded86e7 &quot;../../core/src/change_impact.rs&quot;;
+  cc976e6bcded86e7 --&gt;|satisfies| d17b0775f448b19b;
+  c23729cc550de84b[&quot;Change Impact Visualization&quot;];
+  click c23729cc550de84b &quot;ChangeImpactPropagation.html#change-impact-visualization&quot;;
+  class c23729cc550de84b requirement;
+  c23729cc550de84b -.-&gt;|deriveReqT| 745439d5fc0154d1;
+  cc976e6bcded86e7 --&gt;|satisfies| c23729cc550de84b;
+  6e747b7f03732873[&quot;Change Impact Command Line Interface&quot;];
+  click 6e747b7f03732873 &quot;ChangeImpactPropagation.html#change-impact-command-line-interface&quot;;
+  class 6e747b7f03732873 requirement;
+  665b7456c9b61ded[&quot;CLI Change Impact Report Flag&quot;];
+  class 665b7456c9b61ded requirement;
+  click 665b7456c9b61ded &quot;Requirements.html#cli-change-impact-report-flag&quot;;
+  6e747b7f03732873 -.-&gt;|deriveReqT| 665b7456c9b61ded;
+  11ffc4632afd7c4c[&quot;../../cli/src/cli.rs&quot;];
+  class 11ffc4632afd7c4c default;
+  click 11ffc4632afd7c4c &quot;../../cli/src/cli.rs&quot;;
+  11ffc4632afd7c4c --&gt;|satisfies| 6e747b7f03732873;
+</div>
+<hr />
+<h3 id="change-impact-detection-algorithm">Change Impact Detection Algorithm</h3>
+<p>The system shall implement a requirement change detection algorithm that identifies changes between versions of the model and determines their impact through relationship traversal.</p>
+<h4>Details</h4>
+<p>The algorithm shall consist of the following steps:</p>
+<ol>
+<li>
+<p><strong>Diff Analysis</strong>:</p>
+<ul>
+<li>Compare the current state of a requirement with its previous state</li>
+<li>Identify structural changes (additions, deletions, modifications)</li>
+<li>Generate a ChangeSet representing all detected changes</li>
+<li>Associate changes with specific elements in the model</li>
+</ul>
+</li>
+<li>
+<p><strong>Impact Determination</strong>:</p>
+<ul>
+<li>For each changed element, identify all relations from the element</li>
+<li>Apply relation-specific propagation rules as defined in RelationTypesRegistry.md</li>
+<li>Consider the relation direction and change impact direction for each relation</li>
+<li>Build an impact tree representing the propagation of changes</li>
+</ul>
+</li>
+<li>
+<p><strong>Recursive Traversal</strong>:</p>
+<ul>
+<li>Perform a depth-first traversal of relationships</li>
+<li>Create a directed acyclic graph (DAG) of change impact</li>
+<li>Handle circular dependencies by preventing infinite recursion</li>
+<li>Track visited nodes to prevent duplicate processing</li>
+</ul>
+</li>
+<li>
+<p><strong>Impact Classification</strong>:</p>
+<ul>
+<li>Assign impact severity levels based on relation types</li>
+<li>Classify changes as:
+<ul>
+<li>Direct: Changes to the element itself</li>
+<li>Indirect: Changes propagated from related elements</li>
+<li>Potential: Changes that might affect an element based on semantic analysis</li>
+</ul>
+</li>
+<li>Calculate aggregated impact scores for each affected element</li>
+</ul>
+</li>
+<li>
+<p><strong>Performance Optimization</strong>:</p>
+<ul>
+<li>Implement caching of traversal results</li>
+<li>Use parallel processing for independent branches of the impact tree</li>
+<li>Apply pruning techniques to limit traversal depth when appropriate</li>
+<li>Support incremental impact analysis for large models</li>
+</ul>
+</li>
+</ol>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../SpecificationsRequirements.html#requirements-change-propagation">../SpecificationsRequirements.md#requirements-change-propagation</a></li>
+<li>satisfiedBy: <a href="../../core/src/change_impact.rs">../../core/src/change_impact.rs</a></li>
+</ul>
+<hr />
+<h3 id="change-impact-visualization">Change Impact Visualization</h3>
+<p>The system shall provide visual representations of change impact to help users understand the scope and implications of changes.</p>
+<h4>Details</h4>
+<p>The visualization shall include:</p>
+<ol>
+<li>
+<p><strong>Tree View</strong>:</p>
+<ul>
+<li>Display a hierarchical tree of affected elements</li>
+<li>Group elements by impact type (direct, indirect, potential)</li>
+<li>Show relation types between elements</li>
+<li>Support collapsing/expanding nodes for better navigation</li>
+</ul>
+</li>
+<li>
+<p><strong>Color Coding</strong>:</p>
+<ul>
+<li>Use consistent color scheme for impact types:
+<ul>
+<li>Direct impacts: Red</li>
+<li>Indirect impacts: Yellow</li>
+<li>Potential impacts: Blue</li>
+</ul>
+</li>
+<li>Indicate relation types with different line styles</li>
+<li>Highlight newly introduced or removed relationships</li>
+</ul>
+</li>
+<li>
+<p><strong>Interactive Elements</strong>:</p>
+<ul>
+<li>Allow clicking on elements to focus the view</li>
+<li>Provide filtering options for relation types</li>
+<li>Support search functionality within impact results</li>
+<li>Enable toggling between different visualization modes</li>
+</ul>
+</li>
+<li>
+<p><strong>Summary Statistics</strong>:</p>
+<ul>
+<li>Display counts of affected elements by type</li>
+<li>Show metrics for impact breadth and depth</li>
+<li>Calculate change propagation fan-out metrics</li>
+<li>Generate overall change impact assessment</li>
+</ul>
+</li>
+</ol>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../SpecificationsRequirements.html#requirements-change-propagation">../SpecificationsRequirements.md#requirements-change-propagation</a></li>
+<li>satisfiedBy: <a href="../../core/src/change_impact.rs">../../core/src/change_impact.rs</a></li>
+</ul>
+<hr />
+<h3 id="change-impact-command-line-interface">Change Impact Command Line Interface</h3>
+<p>The system shall provide a command-line interface for initiating change impact analysis and controlling output formats.</p>
+<h4>Details</h4>
+<p>The CLI shall support the following functionality:</p>
+<ol>
+<li>
+<p><strong>Analysis Invocation</strong>:</p>
+<ul>
+<li>Support analyzing changes between git commits</li>
+<li>Enable specifying elements to analyze by ID or pattern</li>
+<li>Allow limiting analysis to specific relation types</li>
+<li>Support depth limitations for large models</li>
+</ul>
+</li>
+<li>
+<p><strong>Output Formats</strong>:</p>
+<ul>
+<li>Generate formatted text reports</li>
+<li>Produce JSON-structured impact data</li>
+<li>Create Mermaid diagrams of impact trees</li>
+<li>Integrate with HTML report generation</li>
+</ul>
+</li>
+<li>
+<p><strong>Filtering Options</strong>:</p>
+<ul>
+<li>Filter by element types (requirement, verification, etc.)</li>
+<li>Filter by relation types</li>
+<li>Filter by impact severity</li>
+<li>Support inclusion/exclusion patterns</li>
+</ul>
+</li>
+<li>
+<p><strong>Integration Points</strong>:</p>
+<ul>
+<li>Support integration with CI/CD pipelines</li>
+<li>Enable calling from external systems via API</li>
+<li>Support webhook triggers for automated analysis</li>
+<li>Allow scripting of analysis operations</li>
+</ul>
+</li>
+</ol>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../SystemRequirements/Requirements.html#cli-change-impact-report-flag">CLI Change Impact Report Flag</a></li>
+<li>satisfiedBy: <a href="../../cli/src/cli.rs">../../cli/src/cli.rs</a></li>
+</ul>
+<hr />
+
+        </div>
+    </div>
+</body>
+</html>

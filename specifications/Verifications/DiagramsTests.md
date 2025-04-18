@@ -11,17 +11,17 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  b95c73d7b3["Diagram Generation Test"];
-  click b95c73d7b3 "DiagramsTests.md#diagram-generation-test";
-  class b95c73d7b3 verification;
-  81f9235ded["UserRequirements.md/Automate Diagram Generation"];
-  class 81f9235ded requirement;
-  click 81f9235ded "../UserRequirements.md#automate-diagram-generation";
-  b95c73d7b3 -->|verifies| 81f9235ded;
-  2dd8375bf8["tests/test-diagram-generation/test.sh"];
-  class 2dd8375bf8 default;
-  click 2dd8375bf8 "../../tests/test-diagram-generation/test.sh";
-  b95c73d7b3 -->|traces| 2dd8375bf8;
+  b95c73d7b3c5e7ac["Diagram Generation Test"];
+  click b95c73d7b3c5e7ac "DiagramsTests.md#diagram-generation-test";
+  class b95c73d7b3c5e7ac verification;
+  81f9235dedaea6a9["UserRequirements.md/Automate Diagram Generation"];
+  class 81f9235dedaea6a9 requirement;
+  click 81f9235dedaea6a9 "../UserRequirements.md#automate-diagram-generation";
+  b95c73d7b3c5e7ac -.->|verifies| 81f9235dedaea6a9;
+  2dd8375bf8ece1f6["tests/test-diagram-generation/test.sh"];
+  class 2dd8375bf8ece1f6 default;
+  click 2dd8375bf8ece1f6 "../../tests/test-diagram-generation/test.sh";
+  b95c73d7b3c5e7ac -.->|trace| 2dd8375bf8ece1f6;
 ```
 
 ---

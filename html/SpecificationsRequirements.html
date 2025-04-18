@@ -1,0 +1,988 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpecificationsRequirements</title>
+    
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa;
+    color: #333;
+}
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+.content {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+h1 {
+    color: #333;
+    border-bottom: 2px solid #eaecef;
+    padding-bottom: 10px;
+    margin-top: 0;
+}
+h2 {
+    color: #333;
+    border-bottom: 1px solid #eaecef;
+    padding-bottom: 5px;
+}
+h3 {
+    color: #1a6fb7;
+    margin-top: 25px;
+}
+h4 {
+    color: #555;
+    font-weight: 600;
+}
+a {
+    color: #0366d6;
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 20px 0;
+}
+table, th, td {
+    border: 1px solid #dfe2e5;
+}
+th, td {
+    padding: 8px 12px;
+    text-align: left;
+}
+th {
+    background-color: #f6f8fa;
+}
+code {
+    background: #f6f8fa;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 90%;
+}
+pre {
+    background: #f6f8fa;
+    border-radius: 3px;
+    padding: 16px;
+    overflow: auto;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+}
+blockquote {
+    margin: 0;
+    padding: 0 15px;
+    color: #777;
+    border-left: 4px solid #dfe2e5;
+}
+.mermaid {
+    margin: 20px 0;
+    text-align: center;
+}
+</style>
+
+    <!-- Enhanced mermaid configuration for ReqFlow diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'neutral',
+            maxTextSize: 90000,
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            securityLevel: 'loose'
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="content">
+            <h1 id="user-requirements">User Requirements</h1>
+<h2 id="specifications-requirements">Specifications Requirements</h2>
+<div class="mermaid">graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+
+  6aaac2f0e7cbdd79[&quot;Identifiers in Relations Specifications&quot;];
+  click 6aaac2f0e7cbdd79 &quot;SpecificationsRequirements.html#identifiers-in-relations-specifications&quot;;
+  class 6aaac2f0e7cbdd79 requirement;
+  852dea6cfecb47f5[&quot;UserStories.md#Managing MBSE Models&quot;];
+  class 852dea6cfecb47f5 requirement;
+  click 852dea6cfecb47f5 &quot;UserStories.html#managing-mbse-models&quot;;
+  6aaac2f0e7cbdd79 -.-&gt;|deriveReqT| 852dea6cfecb47f5;
+  ed4f94bde93b51b2[&quot;../core/src/relation.rs&quot;];
+  class ed4f94bde93b51b2 default;
+  click ed4f94bde93b51b2 &quot;../core/src/relation.rs&quot;;
+  ed4f94bde93b51b2 --&gt;|satisfies| 6aaac2f0e7cbdd79;
+  a34d9281a02c6839[&quot;Relation Types Specifications&quot;];
+  click a34d9281a02c6839 &quot;SpecificationsRequirements.html#relation-types-specifications&quot;;
+  class a34d9281a02c6839 requirement;
+  a34d9281a02c6839 -.-&gt;|deriveReqT| 852dea6cfecb47f5;
+  ed4f94bde93b51b2 --&gt;|satisfies| a34d9281a02c6839;
+  745439d5fc0154d1[&quot;Requirements Change Propagation&quot;];
+  click 745439d5fc0154d1 &quot;SpecificationsRequirements.html#requirements-change-propagation&quot;;
+  class 745439d5fc0154d1 requirement;
+  bae5edae940ba590[&quot;UserRequirements.md#Change Impact Analysis&quot;];
+  class bae5edae940ba590 requirement;
+  click bae5edae940ba590 &quot;UserRequirements.html#change-impact-analysis&quot;;
+  745439d5fc0154d1 --&gt;|refines| bae5edae940ba590;
+  a713f5dfb952f300[&quot;Structure of System Markdown Documents Specifications&quot;];
+  click a713f5dfb952f300 &quot;SpecificationsRequirements.html#structure-of-system-markdown-documents-specifications&quot;;
+  class a713f5dfb952f300 requirement;
+  a713f5dfb952f300 -.-&gt;|deriveReqT| 852dea6cfecb47f5;
+  ed4f94bde93b51b2 --&gt;|satisfies| a713f5dfb952f300;
+  ae04238be665702[&quot;../core/src/element.rs&quot;];
+  class ae04238be665702 default;
+  click ae04238be665702 &quot;../core/src/element.rs&quot;;
+  ae04238be665702 --&gt;|satisfies| a713f5dfb952f300;
+  22aa80bf7aa9080a[&quot;../core/src/subsection.rs&quot;];
+  class 22aa80bf7aa9080a default;
+  click 22aa80bf7aa9080a &quot;../core/src/subsection.rs&quot;;
+  22aa80bf7aa9080a --&gt;|satisfies| a713f5dfb952f300;
+  3b1e87396caf6495[&quot;../core/src/parser.rs&quot;];
+  class 3b1e87396caf6495 default;
+  click 3b1e87396caf6495 &quot;../core/src/parser.rs&quot;;
+  3b1e87396caf6495 --&gt;|satisfies| a713f5dfb952f300;
+  6136c216c9f80165[&quot;../core/src/model.rs&quot;];
+  class 6136c216c9f80165 default;
+  click 6136c216c9f80165 &quot;../core/src/model.rs&quot;;
+  6136c216c9f80165 --&gt;|satisfies| a713f5dfb952f300;
+  cd62f772322b35e0[&quot;Structure and Addressing in Markdown Documents Specifications&quot;];
+  click cd62f772322b35e0 &quot;SpecificationsRequirements.html#structure-and-addressing-in-markdown-documents-specifications&quot;;
+  class cd62f772322b35e0 requirement;
+  cd62f772322b35e0 -.-&gt;|deriveReqT| 852dea6cfecb47f5;
+  ed4f94bde93b51b2 --&gt;|satisfies| cd62f772322b35e0;
+  3b1e87396caf6495 --&gt;|satisfies| cd62f772322b35e0;
+  22aa80bf7aa9080a --&gt;|satisfies| cd62f772322b35e0;
+  22aa80bf7aa9080a --&gt;|satisfies| cd62f772322b35e0;
+  ea610a0c2ac6b265[&quot;Structure of Markdown Documents Specifications&quot;];
+  click ea610a0c2ac6b265 &quot;SpecificationsRequirements.html#structure-of-markdown-documents-specifications&quot;;
+  class ea610a0c2ac6b265 requirement;
+  ea610a0c2ac6b265 -.-&gt;|deriveReqT| 852dea6cfecb47f5;
+  ed4f94bde93b51b2 --&gt;|satisfies| ea610a0c2ac6b265;
+  22aa80bf7aa9080a --&gt;|satisfies| ea610a0c2ac6b265;
+  ae04238be665702 --&gt;|satisfies| ea610a0c2ac6b265;
+</div>
+<hr />
+<h3 id="requirements-change-propagation">Requirements Change Propagation</h3>
+<p>When a requirement is changed, the system shall propagate the change through related requirements, verification artifacts, and design elements according to relation type definitions and propagation rules.</p>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="UserRequirements.html#change-impact-analysis">UserRequirements.md#Change Impact Analysis</a></li>
+</ul>
+<h4>Details</h4>
+<details>
+<summary>View Full Specification</summary>
+<h2 id="change-impact-propagation-in-requirements">Change Impact Propagation in Requirements</h2>
+<p>Requirements are interconnected through relations, and changes to a requirement may affect related requirements, verification methods, design specifications, or software components.</p>
+<p>Changes propagate based on the relation type, which determines the impact direction and scope.</p>
+<p>Changes to high-level requirements cascade down to implementation.
+Verification artifacts must be marked for revalidation to reflect changes.
+Automated tools should flag all impacted requirements for review.</p>
+<h2 id="relation-types-and-change-propagation">Relation Types and Change Propagation</h2>
+<p>The specific relation types, their directionality, and change propagation behaviors are defined in the <a href="RelationTypesRegistry.html">RelationTypesRegistry.html</a> document, which serves as the single source of truth for all relation types in the system.</p>
+<p>This document focuses on the implementation and mechanics of change propagation, while the registry defines the specific behaviors for each relation type.</p>
+<h3 id="relation-categories-for-change-propagation">Relation Categories for Change Propagation</h3>
+<p>For change propagation purposes, relations can be categorized into several groups:</p>
+<ol>
+<li><strong>Hierarchical Relations</strong> - Changes propagate from parent to child elements (containedBy, contain, derivedFrom, derive, refine, refinedBy)</li>
+<li><strong>Satisfaction Relations</strong> - Changes to requirements affect implementations (satisfiedBy, satisfy)</li>
+<li><strong>Verification Relations</strong> - Changes to requirements invalidate verifications (verifiedBy, verify)</li>
+<li><strong>Traceability Relations</strong> - No change propagation, for documentation only (trace)</li>
+</ol>
+<p>See the <a href="RelationTypesRegistry.html">RelationTypesRegistry.html</a> document for the complete definition of each relation type, including its directionality and change propagation behavior.</p>
+<hr />
+<h2 id="change-propagation-mechanism">Change Propagation Mechanism</h2>
+<p>When a requirement changes, impact analysis must be conducted based on its relations. The following mechanism ensures traceability and controlled updates.</p>
+<ul>
+<li>Identify Impacted Relations
+<ul>
+<li>When a requirement is modified, check its Relations subsection to identify linked elements.</li>
+</ul>
+</li>
+<li>Determine Change Propagation Scope
+<ul>
+<li>Apply the rules in Relation Types and Change Propagation Rules to assess whether the change affects child requirements, design artifacts, verification, or other linked documents.</li>
+</ul>
+</li>
+<li>Invalidate Affected Elements
+<ul>
+<li>If a related element is impacted, flag it for review.</li>
+<li>Example: If a requirement verified by a test changes, the test must be reviewed.</li>
+</ul>
+</li>
+<li>Require Re-validation or Re-design
+<ul>
+<li>If changes affect satisfaction (e.g., code or architecture), update the relevant design.</li>
+<li>If changes affect verification, update test cases or validation documents.</li>
+</ul>
+</li>
+<li>If a change results in a requirement being merged, split, or removed, update its Relations to maintain traceability.</li>
+</ul>
+<h2 id="examples-of-change-propagation">Examples of Change Propagation</h2>
+<h3 id="parent-child-requirement-change">Parent-Child Requirement Change</h3>
+<pre><code class="language-markdown">
+---
+
+### Parent Requirement
+This requirement defines a high-level system constraint.
+
+#### Relations
+  * contain: [Child Requirement](#child-requirement)
+
+
+---
+
+### Child Requirement
+This requirement defines additional functionality.
+
+#### Relations
+  * containedBy: [Parent Requirement](#parent-requirement)
+  
+</code></pre>
+<p>If Parent Requirement changes, Child Requirement must be reviewed and updated.</p>
+<hr />
+<h3 id="requirement-satisfied-by-a-design-specification">Requirement Satisfied by a Design Specification</h3>
+<pre><code class="language-markdown">
+---
+
+### Functional Requirement
+The system shall process transactions within 500ms.
+
+#### Relations
+  * satisfiedBy: [architecture/system_design.md/Performance Constraints](architecture/system_design.html#performance-constraints)
+</code></pre>
+<p>If Functional Requirement changes, Performance Constraints in the architecture document must be updated.</p>
+<hr />
+<h3 id="requirement-verified-by-a-test">Requirement Verified by a Test</h3>
+<pre><code>
+---
+
+### Safety Requirement
+The system shall shut down if temperature exceeds 100°C.
+
+#### Relations
+  * verifiedBy: [test_cases/safety_verification.md/Overheat Shutdown Test](test_cases/safety_verification.html#overheat-shutdown-test)
+
+</code></pre>
+<p>If Safety Requirement changes, the Overheat Shutdown Test must be reviewed for update and executed again for verification.</p>
+<hr />
+<h3 id="example-of-multi-level-change-propagation-in-requirements">Example of Multi-Level Change Propagation in Requirements</h3>
+<p>The following analysis explains how a <strong>change in the requirement</strong>  propagates through multiple levels of related requirements, impacting their definitions, design artifacts, and verification processes.</p>
+<hr />
+<pre><code>### Root Requirement: System Power Management
+
+The system shall implement power-saving mechanisms to optimize battery usage.  
+
+---
+
+### Power Saving Mode
+
+The system shall activate power-saving mode when the battery level drops below 20%.  
+
+#### Relations
+  * refine: [System Power Management](#system-power-management)
+  * satisfiedBy: [software/power_control.html](software/power_control.html)
+  * verifiedBy: [test_cases/power_saving.html](test_cases/power_saving.html)
+
+---
+
+### CPU Power Reduction
+
+The system shall reduce CPU frequency by 30% in power-saving mode.  
+
+#### Relations
+  * derivedFrom: [Power Saving Mode](#power-saving-mode)
+  * satisfiedBy: [firmware/cpu_manager.html](firmware/cpu_manager.html)
+  * verifiedBy: [test_cases/cpu_throttling.html](test_cases/cpu_throttling.html)
+
+---
+
+### Screen Brightness Adjustment
+
+The system shall reduce screen brightness by 40% in power-saving mode.  
+
+#### Relations
+  * derivedFrom: [Power Saving Mode](#power-saving-mode)
+  * verifiedBy: [test_cases/screen_brightness.html](test_cases/screen_brightness.html)
+
+---
+
+### Battery Optimization
+
+The system shall disable non-essential background services when battery levels drop below 15%.  
+
+#### Relations
+  * derivedFrom: [System Power Management](#system-power-management)
+  * satisfiedBy: [software/battery_manager.html](software/battery_manager.html)
+  * verifiedBy: [test_cases/battery_saving.html](test_cases/battery_saving.html)
+
+---
+
+### Network Power Optimization
+The system shall reduce network polling frequency when battery levels drop below 15%.  
+
+#### Relations
+  * derivedFrom: [Battery Optimization](#battery-optimization)
+  * satisfiedBy: [software/network_manager.html](software/network_manager.html)
+</code></pre>
+<p><strong>Power Saving Mode</strong> requirment has been changed to:
+&gt;The system shall activate power-saving mode when the battery level drops below 30%.</p>
+<p>Change Propagation Flow:</p>
+<ol>
+<li>A <strong>change</strong> in <strong>Power Saving Mode</strong> flows <strong>downward</strong> to <strong>CPU Power Reduction</strong> because it is <strong>derivedFrom</strong> it.</li>
+<li>A <strong>change</strong> in <strong>Power Saving Mode</strong> flows <strong>downward</strong> to <strong>Screen Brightness Adjustment</strong> because it is <strong>derivedFrom</strong> it.</li>
+<li>Additionally, all <strong>satisfiedBy</strong> and <strong>verifiedBy</strong> relations from affected requirements must be reviewed:
+<ul>
+<li><strong>Power Saving Mode</strong> → <strong>software/power_control.md</strong> (implementation) &amp; <strong>test_cases/power_saving.md</strong> (verification).</li>
+<li><strong>CPU Power Reduction</strong> → <strong>firmware/cpu_manager.md</strong> (implementation) &amp; <strong>test_cases/cpu_throttling.md</strong> (verification).</li>
+<li><strong>Screen Brightness Adjustment</strong> → <strong>[test_cases/screen_brightness.md</strong> (verification).</li>
+</ul>
+</li>
+</ol>
+<p>Mermaid diagram showing relations:</p>
+<div class="mermaid">flowchart TD;
+    %% Define Classes
+    classDef requirement fill:#D0E0FF,stroke:#0066FF,stroke-width:2px;
+    classDef implementation fill:#DFFFD0,stroke:#009900,stroke-width:2px;
+    classDef verification fill:#FFF7B3,stroke:#CC9900,stroke-width:2px;
+
+    %% Requirements Hierarchy
+    A[System Power Management]:::requirement
+    B[Power Saving Mode]:::requirement --&gt;|refine| A
+    C[CPU Power Reduction]:::requirement --&gt;|derivedFrom| B
+    D[Screen Brightness Adjustment]:::requirement --&gt;|derivedFrom| B
+    E[Battery Optimization]:::requirement --&gt;|derivedFrom| A
+    G[Network Power Optimization]:::requirement --&gt;|derivedFrom| E
+
+    %% Implementations (Satisfied By)
+    B --&gt;|satisfiedBy| SB1[software/power_control.html]:::implementation
+    C --&gt;|satisfiedBy| SB2[firmware/cpu_manager.html]:::implementation
+    E --&gt;|satisfiedBy| SB3[software/battery_manager.html]:::implementation
+    G --&gt;|satisfiedBy| SB4[software/network_manager.html]:::implementation
+
+    %% Verifications (Verified By)
+    B --&gt;|verifiedBy| VB1[test_cases/power_saving.html]:::verification
+    C --&gt;|verifiedBy| VB2[test_cases/cpu_throttling.html]:::verification
+    D --&gt;|verifiedBy| VB3[test_cases/screen_brightness.html]:::verification
+    E --&gt;|verifiedBy| VB4[test_cases/battery_saving.html]:::verification
+</div>
+<p>Legend:</p>
+<ul>
+<li><strong>🟦 Requirements (Blue)</strong> → Directly from your provided requirements.</li>
+<li><strong>🟩 Implementations (Green)</strong> → Only <strong>satisfiedBy</strong> links</li>
+<li><strong>🟨 Verifications (Yellow)</strong> → Only <strong>verifiedBy</strong> links</li>
+</ul>
+<p>Change propagation flow diagram:</p>
+<div class="mermaid">flowchart TD;
+    %% Define Classes
+    classDef requirement fill:#D0E0FF,stroke:#0066FF,stroke-width:2px;
+    classDef implementation fill:#DFFFD0,stroke:#009900,stroke-width:2px;
+    classDef verification fill:#FFF7B3,stroke:#CC9900,stroke-width:2px;
+    classDef changed fill:#FFDD57,stroke:#FF7700,stroke-width:2px;
+    classDef impacted fill:#FFAAAA,stroke:#FF0000,stroke-width:2px;
+    classDef validate fill:#E0D0FF,stroke:#6600CC,stroke-width:2px;
+
+    %% Change Propagation Paths
+    B[Power Saving Mode]
+    B --&gt;|Impacts| A[CPU Power Reduction]:::impacted
+    B --&gt;|Impacts| D[Screen Brightness Adjustment]:::impacted
+
+    %% Impact on Implementation (Code / Design)
+    B --&gt;|Requires Update| SB1[software/power_control.html]:::implementation
+    A --&gt;|Requires Update| SB2[firmware/cpu_manager.html]:::implementation
+
+
+    %% Impact on Verification (Test Cases)
+    B --&gt;|Revalidate + Maybe Requires Update| VB1[test_cases/power_saving.html]:::verification
+    D --&gt;|Revalidate + Maybe Requires Update| VB3[test_cases/screen_brightness.html]:::verification
+    A --&gt;|Revalidate + Maybe Requires Update| VB4[test_cases/cpu_throttling.html]:::verification
+    
+
+    %% Arrange Classes
+    class C changed;
+    class A,B,D,E,G impacted;
+    class SB1,SB2,SB3,SB4 implementation;
+    class VB1,VB2,VB3,VB4 verification;
+    class V validate;
+
+
+</div>
+</details>
+<hr />
+<h3 id="relation-types-specifications">Relation Types Specifications</h3>
+<p>The system shall implement relations following clearly defined specifications for types and behaviors.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="UserStories.html#managing-mbse-models">UserStories.md#Managing MBSE Models</a></li>
+<li>satisfiedBy: <a href="../core/src/relation.rs">../core/src/relation.rs</a></li>
+</ul>
+<h4>Details</h4>
+<details>
+<summary>View Full Specification</summary>
+<h2 id="relation-type-definition">Relation Type Definition</h2>
+<p>A relation type in ReqFlow:</p>
+<ul>
+<li>Defines a semantic connection between elements</li>
+<li>Specifies the directionality of the relationship</li>
+<li>Determines change propagation behavior</li>
+<li>May have an opposite/inverse relation type</li>
+</ul>
+<h2 id="core-concepts">Core Concepts</h2>
+<h3 id="directionality">Directionality</h3>
+<p>Relations have three possible directionality patterns:</p>
+<ol>
+<li>
+<p><strong>Forward</strong> - The relation flows from the source element to the target element </p>
+<ul>
+<li>Example: <code>contain</code> points from a parent to a child element</li>
+</ul>
+</li>
+<li>
+<p><strong>Backward</strong> - The relation flows from the target element to the source element</p>
+<ul>
+<li>Example: <code>derivedFrom</code> points from a child back to its parent element</li>
+</ul>
+</li>
+<li>
+<p><strong>Neutral</strong> - The relation has no inherent direction</p>
+<ul>
+<li>Example: <code>trace</code> simply indicates a relationship without directionality</li>
+</ul>
+</li>
+</ol>
+<h3 id="change-propagation">Change Propagation</h3>
+<p>The direction of change propagation is not always the same as relation directionality:</p>
+<ul>
+<li>In hierarchical relationships, changes propagate downward from parents to children</li>
+<li>Some relations like <code>verifiedBy</code> specifically trigger invalidation rather than just change propagation </li>
+</ul>
+<h2 id="comprehensive-relation-type-table">Comprehensive Relation Type Table</h2>
+<table><thead><tr><th>Relation Type</th><th>Direction</th><th>Opposite Type</th><th>Change Propagation</th><th>Description</th></tr></thead><tbody>
+<tr><td><strong>containedBy</strong></td><td>Backward</td><td>contain</td><td>Parent → Child</td><td>Links a child element to its containing parent element</td></tr>
+<tr><td><strong>contain</strong></td><td>Forward</td><td>containedBy</td><td>Parent → Child</td><td>Links a parent element to the child elements it contains</td></tr>
+<tr><td><strong>derivedFrom</strong></td><td>Backward</td><td>derive</td><td>Parent → Child</td><td>Links a child element to the parent element it is derived from</td></tr>
+<tr><td><strong>derive</strong></td><td>Forward</td><td>derivedFrom</td><td>Parent → Child</td><td>Links a parent element to child elements derived from it</td></tr>
+<tr><td><strong>refine</strong></td><td>Backward</td><td>refinedBy</td><td>Parent → Child</td><td>Links a child element to a parent element it refines with more detail</td></tr>
+<tr><td><strong>refinedBy</strong></td><td>Forward</td><td>refine</td><td>Parent → Child</td><td>Links a parent element to child elements that refine it</td></tr>
+<tr><td><strong>satisfiedBy</strong></td><td>Forward</td><td>satisfy</td><td>Requirement → Implementation</td><td>Links a requirement to elements that satisfy it</td></tr>
+<tr><td><strong>satisfy</strong></td><td>Backward</td><td>satisfiedBy</td><td>Requirement → Implementation</td><td>Links an implementation to the requirement it satisfies</td></tr>
+<tr><td><strong>verifiedBy</strong></td><td>Forward</td><td>verify</td><td>Requirement → Verification</td><td>Links a requirement to verification artifacts</td></tr>
+<tr><td><strong>verify</strong></td><td>Backward</td><td>verifiedBy</td><td>Requirement → Verification</td><td>Links a verification artifact to the requirement it verifies</td></tr>
+<tr><td><strong>trace</strong></td><td>Neutral</td><td>None</td><td>None (Documentation)</td><td>Establishes a trace relationship without change propagation</td></tr>
+</tbody></table>
+<h2 id="relation-categories">Relation Categories</h2>
+<p>Relations are grouped into logical categories based on their semantic meaning:</p>
+<h3 id="1.-parent-child-hierarchical-relations">1. Parent-Child Hierarchical Relations</h3>
+<p>These relations define hierarchical structures within the model:</p>
+<ul>
+<li><strong>containedBy/contain</strong>: Physical or logical containment hierarchy</li>
+<li><strong>derivedFrom/derive</strong>: Derivation of elements from higher-level elements</li>
+<li><strong>refine/refinedBy</strong>: Refinement relationships adding more detail</li>
+</ul>
+<h3 id="2.-satisfaction-relations">2. Satisfaction Relations</h3>
+<p>These relations connect requirements to implementations:</p>
+<ul>
+<li><strong>satisfiedBy/satisfy</strong>: Links requirements to design, code, or architectural elements</li>
+</ul>
+<h3 id="3.-verification-relations">3. Verification Relations</h3>
+<p>These relations connect requirements to verification elements:</p>
+<ul>
+<li><strong>verifiedBy/verify</strong>: Links requirements to tests, validations, or other verification artifacts</li>
+</ul>
+<h3 id="4.-traceability-relations">4. Traceability Relations</h3>
+<p>These relations establish lightweight connections for documentation:</p>
+<ul>
+<li><strong>trace</strong>: Simple non-directional traceability without strong semantic meaning or change propagation</li>
+</ul>
+<h2 id="change-impact-rules">Change Impact Rules</h2>
+<p>When an element changes, the impact propagates according to these rules:</p>
+<ol>
+<li>
+<p><strong>Hierarchical Changes</strong>:</p>
+<ul>
+<li>Changes to parent elements propagate to all children</li>
+<li>This includes containment, derivation, and refinement relationships</li>
+</ul>
+</li>
+<li>
+<p><strong>Requirement Changes</strong>:</p>
+<ul>
+<li>Changes to requirements propagate to all satisfying implementations</li>
+<li>Changes to requirements invalidate all verifications</li>
+</ul>
+</li>
+<li>
+<p><strong>Implementation Changes</strong>:</p>
+<ul>
+<li>Changes to implementations rarely propagate upward to requirements</li>
+<li>Implementations should be updated to maintain satisfaction</li>
+</ul>
+</li>
+<li>
+<p><strong>Verification Changes</strong>:</p>
+<ul>
+<li>Changes to verification artifacts generally don’t propagate</li>
+<li>Verification updates may be needed after requirement changes</li>
+</ul>
+</li>
+<li>
+<p><strong>Trace Relationships</strong>:</p>
+<ul>
+<li>Changes do not propagate through trace relationships</li>
+<li>Trace relationships are used for documentation and discovery purposes only</li>
+</ul>
+</li>
+</ol>
+</details>
+<hr />
+<h3 id="structure-and-addressing-in-markdown-documents-specifications">Structure and Addressing in Markdown Documents Specifications</h3>
+<p>The system shall implement semi-structured markdown format specifications that defines the structure, rules, and usage of <strong>Elements</strong>, <strong>Relations</strong>, and <strong>Identifiers</strong> in Markdown (<code>.md</code>) documents. </p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="UserStories.html#managing-mbse-models">UserStories.md#Managing MBSE Models</a></li>
+<li>satisfiedBy: <a href="../core/src/relation.rs">../core/src/element.rs</a></li>
+<li>satisfiedBy: <a href="../core/src/parser.rs">../core/src/parser.rs</a></li>
+<li>satisfiedBy: <a href="../core/src/subsection.rs">../core/src/subsection.rs</a></li>
+<li>satisfiedBy: <a href="../core/src/subsection.rs">../core/src/relation.rs</a></li>
+</ul>
+<h4>Details</h4>
+<hr />
+<h3 id="structure-of-system-markdown-documents-specifications">Structure of System Markdown Documents Specifications</h3>
+<p>The system shall implement a structure of markdown documents representing system elements following clearly defined specifications.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="UserStories.html#managing-mbse-models">UserStories.md#Managing MBSE Models</a></li>
+<li>satisfiedBy: <a href="../core/src/relation.rs">../core/src/relation.rs</a></li>
+<li>satisfiedBy: <a href="../core/src/element.rs">../core/src/element.rs</a></li>
+<li>satisfiedBy: <a href="../core/src/subsection.rs">../core/src/subsection.rs</a></li>
+<li>satisfiedBy: <a href="../core/src/parser.rs">../core/src/parser.rs</a></li>
+<li>satisfiedBy: <a href="../core/src/model.rs">../core/src/model.rs</a></li>
+</ul>
+<h4>Details</h4>
+<hr />
+<h3 id="identifiers-in-relations-specifications">Identifiers in Relations Specifications</h3>
+<p>The system shall implement  <strong>Identifiers</strong> and <strong>Relations</strong> following clearly defined specifications to ensure consistency, validity, and efficient querying and manipulation of these entities.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="UserStories.html#managing-mbse-models">UserStories.md#Managing MBSE Models</a></li>
+<li>satisfiedBy: <a href="../core/src/relation.rs">../core/src/relation.rs</a></li>
+</ul>
+<h4>Details</h4>
+<hr />
+<h3 id="structure-of-markdown-documents-specifications">Structure of Markdown Documents Specifications</h3>
+<p>The system shall implement the structure, rules, and usage of <strong>Sections</strong>, <strong>Elements</strong>, <strong>Subsections</strong>, <strong>Relations</strong>, and <strong>Identifiers</strong> in Markdown (<code>.md</code>) documents following clearly defined specifications.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="UserStories.html#managing-mbse-models">UserStories.md#Managing MBSE Models</a></li>
+<li>satisfiedBy: <a href="../core/src/relation.rs">../core/src/relation.rs</a></li>
+<li>satisfiedBy: <a href="../core/src/subsection.rs">../core/src/subsection.rs</a></li>
+<li>satisfiedBy: <a href="../core/src/element.rs">../core/src/element.rs</a></li>
+</ul>
+<h4>Details</h4>
+<details>
+<summary>View Full Specification</summary>
+<h2 id="sections-in-markdown-documents">Sections in Markdown Documents</h2>
+<p>A <strong>Section</strong> is used for grouping of similar requirements for easier management and visualizations. It starts with a <code>##</code> header and includes all system elements under that header until the next header of the same or higher hierarchy.</p>
+<h2 id="elements-in-markdown-documents">Elements in Markdown Documents</h2>
+<p>An <strong>Element</strong> is a uniquely identifiable system element within a Markdown document. It starts with a <code>###</code> header and includes all content under that header until the next header of the same or higher hierarchy.</p>
+<h3 id="structure-of-an-element">Structure of an Element</h3>
+<ol>
+<li><strong>Element Header</strong></li>
+</ol>
+<ul>
+<li>The <code>###</code> header defines the start of an element.</li>
+<li>The text of the <code>###</code> header serves as the <strong>element name</strong>.</li>
+<li>The element name must be unique within the same document to ensure unambiguous references.</li>
+</ul>
+<ol start="2">
+<li><strong>Element Content</strong></li>
+</ol>
+<ul>
+<li>The element includes all content under the <code>###</code> header until:
+<ul>
+<li>The next <code>###</code> header, or</li>
+<li>A higher-level header (<code>##</code>, <code>#</code>), or</li>
+<li>The end of the document.</li>
+</ul>
+</li>
+<li>The content can include:
+<ul>
+<li>Text</li>
+<li>Subheaders (e.g., <code>####</code>)</li>
+<li>Bullet points, code blocks, tables, etc.</li>
+</ul>
+</li>
+</ul>
+<h2 id="rules-for-elements">Rules for Elements</h2>
+<ol>
+<li>
+<p><strong>Header Format</strong>:</p>
+<ul>
+<li>An element must start with a 3 <code>###</code> header.</li>
+<li>The <code>###</code> header text must not be empty.</li>
+</ul>
+</li>
+<li>
+<p><strong>Uniqueness</strong>:</p>
+<ul>
+<li>Element names must be unique within the same file.</li>
+</ul>
+</li>
+<li>
+<p><strong>Nested Subheaders</strong>:</p>
+<ul>
+<li>Subheaders within an element defined with 4 header (e.g., <code>####</code>) are part of the same element and do not create new elements.</li>
+</ul>
+</li>
+<li>
+<p><strong>No Overlapping Content</strong>:</p>
+<ul>
+<li>Content in an element belongs exclusively to that element and cannot overlap with another.</li>
+</ul>
+</li>
+</ol>
+<h3 id="examples-of-elements">Examples of Elements</h3>
+<p>Single Element:</p>
+<pre><code class="language-markdown">
+
+### My Element
+
+This is the content of My Element.
+
+#### Subsection
+Additional details about My Element.
+</code></pre>
+<p>Multiple Elements:</p>
+<pre><code>
+
+### Element One
+
+This is the content of Element One.
+
+
+
+### Element Two
+
+This is the content of Element Two.
+</code></pre>
+<p>Nested Subheaders:</p>
+<pre><code>
+
+### Main Element
+This is the main element content.
+
+#### Subsection
+Details about the subsection.
+
+#### Another Subsection
+More details about another subsection.
+</code></pre>
+<h3 id="invalid-cases">Invalid Cases</h3>
+<p>Element headers empty:</p>
+<pre><code>###
+</code></pre>
+<p>Headers not unique within the same document:</p>
+<pre><code>
+
+
+
+### Duplicate
+Content of the first duplicate.
+
+
+
+### Duplicate
+Content of the second duplicate.
+</code></pre>
+<h2 id="identifiers-in-markddown-documents">Identifiers in Markddown Documents</h2>
+<p>An <strong>identifier</strong> consists of a path following a filename with an extension (e.g., <code>file.md</code>) and optionally an <strong>element</strong> name (fragment).</p>
+<p>Every <strong>element</strong> in the system has unique identifier that depends on document it appears in, path of the document, and element name (fragment).</p>
+<h3 id="path-resolution-rules">Path Resolution Rules</h3>
+<ul>
+<li>If an identifier <strong>starts with <code>/&lt;specficiation_folder&gt;/</code></strong>, it is considered relative to the <strong>specifications folder</strong>.</li>
+<li>If an identifier <strong>starts with <code>/&lt;external_folder&gt;/</code></strong>, it is considered relative to the <strong>external folder</strong>.</li>
+<li>If an identifier <strong>does not start with <code>/</code></strong>, it is considered <strong>relative</strong> to the path of the document in which it appears.</li>
+<li>If an identifier <strong>starts with <code>/</code></strong>, it is considered absolute path that is preserved during normalizations.</li>
+</ul>
+<p>Each <strong>identifier</strong> must uniquely reference either:</p>
+<ul>
+<li>A <strong>file</strong>, or</li>
+<li>An <strong>element within a file</strong>.</li>
+</ul>
+<h4>Path Resolution Examples</h4>
+<p>Assuming the <strong><specifications> folder</strong> is <code>project</code> and a file exists at <code>/path/to/project/documents/File1.md</code>:</p>
+<table><thead><tr><th>Identifier</th><th>Resolves to</th></tr></thead><tbody>
+<tr><td><code>File2.md</code></td><td><code>/path/to/project/documents/File2.md</code></td></tr>
+<tr><td><code>subfolder/File3.md</code></td><td><code>/path/to/project/documents/subfolder/File3.md</code></td></tr>
+<tr><td><code>../File4.md</code></td><td><code>/path/to/project/File4.md</code></td></tr>
+<tr><td><code>../../somefolder/File4.md</code></td><td><code>/path/to/somefolder/File4.md</code></td></tr>
+<tr><td><code>/project/File4.md</code></td><td><code>/path/to/project/File4.md</code></td></tr>
+</tbody></table>
+<hr />
+<p>The same rule is applied when normalazing <strong>&lt;external_folder&gt; folder</strong> .</p>
+<hr />
+<h3 id="identifier-form-variations-and-examples">Identifier Form Variations and Examples</h3>
+<p>System recognises 2 kinds of identifier that may appear in documents and relations:</p>
+<ul>
+<li>Simple identifiers</li>
+<li>GitHub-style Markdown Link Identifiers</li>
+</ul>
+<p>Both Simple identifier and link part of GitHub-style markdown identifier can be etiher internal internal paths or external links (eg. starting with known scheme eg. https://)</p>
+<p>When parsing identifiers, both styles are nomarlized into the same form used internally by the system.</p>
+<p>As part of normailization process, element names are converted to <strong>GitHub-style anchor link</strong> fragments which are internal identifer representations:</p>
+<ul>
+<li>Convert to <strong>lowercase</strong>.</li>
+<li>Replace <strong>spaces with hyphens (<code>-</code>)</strong>.</li>
+<li>Remove <strong>disallowed characters</strong>.</li>
+<li>Remove <strong>leading and trailing whitespace</strong>.</li>
+</ul>
+<h4>1. Simple Identifiers</h4>
+<p>Plain file or element references, following the path resolution rules.</p>
+<p>Examples (<specifications> folder is some path):</p>
+<ul>
+<li>File only identifier found in the document ‘<specifications>/path/to/document.md’</li>
+</ul>
+<pre><code>file.md
+</code></pre>
+<ul>
+<li>
+<p>Normalized to ‘<specifications>/path/to/file.md’</p>
+</li>
+<li>
+<p>File with an element fragment in the document ‘<specifications>/path/to/document.md’:</p>
+</li>
+</ul>
+<pre><code>file.md#element name
+</code></pre>
+<ul>
+<li>
+<p>Normalized to ‘<specifications>/path/to/file.md#element-name’</p>
+</li>
+<li>
+<p>Relative path with an element fragment in the document ‘<specifications>/path/to/document.md’:</p>
+</li>
+</ul>
+<pre><code>../relative_path/file.md#element name
+</code></pre>
+<ul>
+<li>
+<p>Normalized to ‘<specifications>/path/file.md#element-name’</p>
+</li>
+<li>
+<p>Element name fragment only (within the same file) in the document ‘<specifications>/path/to/document.md’:</p>
+</li>
+</ul>
+<pre><code>#element name
+</code></pre>
+<ul>
+<li>
+<p>Normalized to ‘<specifications>/path/to/document.md#element-name’</p>
+</li>
+<li>
+<p>Relative path with the element fragment with special characters in the document ‘<specifications>/path/to/document.md’::</p>
+</li>
+</ul>
+<pre><code>path/file.md#My Element (Draft)
+</code></pre>
+<ul>
+<li>
+<p>Normalized to ‘<specifications>/path/to/path/file.md##my-element-draft’</p>
+</li>
+<li>
+<p>Absolute path starting with the ‘specifications’ <specification> folder with the element fragment in any document:</p>
+</li>
+</ul>
+<pre><code>/specifications/path/file.md#Elements
+</code></pre>
+<ul>
+<li>Normalized to ‘<specifications>/path/file.md#elements’</li>
+</ul>
+<h4>2. GitHub-style Markdown Link Identifiers</h4>
+<p>A valid GitHub-style Markdown link to a file or a fragment within a file.
+Identifier is considered the <strong>link</strong> part of the markdown link: everything inside ‘(identifier)’.</p>
+<p>Once link part is obtained from GitHub-style Markdown link, it is following same rules for normalization as <strong>simple identifiers</strong>. </p>
+<p>Examples:</p>
+<ul>
+<li>File link in ‘<specifications>/path/to/document.md’:</li>
+</ul>
+<pre><code>[Specification](documents/specification.html)
+</code></pre>
+<ul>
+<li>
+<p>Normalized to ‘<specifications>/path/to/path/documents/specification.md’</p>
+</li>
+<li>
+<p>Fragment link in ‘<specifications>/path/to/document.md’:  :</p>
+</li>
+</ul>
+<pre><code>[My Element](documents/specification.html#my-element)
+</code></pre>
+<ul>
+<li>Normalized to ‘<specifications>/path/to/path/documents/specification.md#my-element’</li>
+</ul>
+<hr />
+<h2 id="relations-in-markdown-documents">Relations in Markdown Documents</h2>
+<p>The <code>#### Relations</code> subsection specifies associations between elements, files, or other resources, forming the logical and dependency structure of the model.</p>
+<p>The <code>#### Relations</code> subsection:</p>
+<ul>
+<li>Is a dedicated part of an <strong>element</strong> section in Markdown document.</li>
+<li>Starts with the <code>#### Relations</code> header.</li>
+<li>Contains a list of relations in a specific format.</li>
+</ul>
+<p>The <code>#### Relations</code> subsection must be located within an element chunk.
+Each element chunk can have at most one <code>#### Relations</code> subsection.</p>
+<p>The <code>#### Relations</code> header marks the beginning of the subsection.</p>
+<p>The <code>#### Relations</code> subsection must appear directly within an element  chunk.
+It must follow the <code>###</code> header of the parent element and any preceding content.</p>
+<h3 id="relation-structure">Relation Structure</h3>
+<ul>
+<li>Relation entries are listed as bullet points (<code>*</code>), with <strong>two spaces</strong> (<code>  *</code>) of indentation.</li>
+</ul>
+<h4>1. <strong>Relation Format</strong></h4>
+<ul>
+<li>Relations follow this format:
+<pre><code>* relationType: **identifier**
+</code></pre>
+</li>
+<li>Example:
+<pre><code>* dependsOn: [Element2](#element2)
+</code></pre>
+</li>
+</ul>
+<h4>2. <strong>Relation Type</strong></h4>
+<ul>
+<li>Specifies the type of the relationship.</li>
+<li>Allowed characters: <code>[a-zA-Z]</code></li>
+<li>Minimum length: <strong>2 characters</strong></li>
+<li>Maximum length: <strong>80 characters</strong></li>
+<li>Must be one of the predefined, case-sensitive types defined in the <a href="RelationTypesRegistry.html">RelationTypesRegistry.html</a> document</li>
+<li>See the <a href="RelationTypesRegistry.html">RelationTypesRegistry.html</a> for the complete list of supported relation types, their directionality, and change propagation behaviors</li>
+</ul>
+<h4>3. <strong>Target Identifier</strong></h4>
+<ul>
+<li>Specifies the target of the relation.</li>
+<li>Must be a valid <strong>Simple Identifier</strong> or <strong>Git Valid Markdown Link Identifier</strong> as defined in this document.</li>
+</ul>
+<hr />
+<h3>Examples of <code>#### Relations</code></h3>
+<h4>1. <strong>Simple Relations</strong></h4>
+<pre><code class="language-markdown">
+
+### My Element
+This is the content of My Element.
+
+#### Relations
+  * dependsOn: [Element2](#element2)
+  * relatedTo: [path/to/anotherFile.md/Section3](path/to/anotherFile.html#section3)
+  * uses: [file.html](file.html)
+</code></pre>
+<h4>2. <strong>Relations with Special Characters</strong></h4>
+<pre><code class="language-markdown">
+
+### API v2.0
+Details about API version 2.0.
+
+#### Relations
+  * satisfies: [documents/specification.md#API: v2.0](documents/specification.html#api-v20)
+
+</code></pre>
+<h4>3. <strong>Relation to an Element in the Same File</strong></h4>
+<p>If the referenced element exists within the same file, the identifier can be a fragment only.</p>
+<pre><code class="language-markdown">
+#### Relations
+  * extends: [Another Section](#another-section)
+</code></pre>
+<h4>4. <strong>Relative Path Relations</strong></h4>
+<p>If the referenced file is located in a subfolder relative to the current document, use a relative path.</p>
+<pre><code class="language-markdown">
+#### Relations
+  * refines: [subfolder/details.md#refined-section](subfolder/details.html#refined-section)
+
+</code></pre>
+<h4>5. <strong>Absolute Path Relations</strong></h4>
+<p>If the reference starts with /, it points to a file or element relative to the root specifications folder.</p>
+<pre><code class="language-markdown">
+#### Relations
+  * verifiedBy: [/specifications.md#verification-steps](/specifications.html#verification-steps)
+
+</code></pre>
+<p>Duplicate relation entries within the same <code>#### Relations</code> subsection are not allowed.</p>
+<h3>Examples of <code>#### Relations</code></h3>
+<p>Simple Relations:</p>
+<pre><code class="language-markdown">
+
+### My Element
+This is the content of My Element.
+
+#### Relations
+  * derivedFrom: [Element2](#element2)
+  * trace: [path/to/anotherFile.md/Section3](path/to/anotherFile.html#section3)
+  * uses: [file.html](file.html)
+</code></pre>
+<p>Relations with Special Characters:</p>
+<pre><code>
+
+### Complex Element
+This is the content of a complex element.
+
+#### Relations
+  * derivedFrom: [Element (Alpha &amp; Beta)](#element-(alpha-&amp;-beta))
+  * trace: [path/to/special File.md/Section (Draft)](path/to/special File.html#section-(draft))
+</code></pre>
+<p>Invalid Entries:</p>
+<pre><code>
+
+### Invalid Relations Example
+This element contains invalid relation entries.
+
+#### Relations
+  * derivedFrom: [Element2](#element2)
+* InvalidEntry
+* : MissingRelationType
+  * trace: [path/to/file.html](path/to/file.html)
+</code></pre>
+<h2 id="identifier-usage-in-relations">Identifier Usage in Relations</h2>
+<p>Identifiers are used in relations to reference files or specific elements within files. Examples:</p>
+<ol>
+<li>
+<p><strong>Relation to a File</strong>:</p>
+<pre><code class="language-markdown">#### Relations
+  * satisfiedBy: [documents/specification.html](documents/specification.html)
+</code></pre>
+</li>
+<li>
+<p><strong>Relation to an Element</strong>:</p>
+<pre><code class="language-markdown">#### Relations
+  * derivedFrom: [documents/specification.md/section one](documents/specification.html#section-one)
+</code></pre>
+</li>
+</ol>
+</details>
+<hr />
+
+        </div>
+    </div>
+</body>
+</html>

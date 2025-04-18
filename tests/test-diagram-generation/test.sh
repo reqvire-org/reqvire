@@ -30,7 +30,6 @@ mkdir -p "$TEST_DIR/backup"
 cp -r "$TEST_DIR/specifications" "$TEST_DIR/backup/"
 
 # Run reqflow to generate diagrams
-echo "Running reqflow with --generate-diagrams flag..."
 OUTPUT=$(cd "$TEST_DIR" && "$REQFLOW_BIN" --config "$TEST_DIR/reqflow.yaml" --generate-diagrams 2>&1)
 EXIT_CODE=$?
 
@@ -73,7 +72,6 @@ for file in "${FILES_TO_CHECK[@]}"; do
     continue
   fi
   
-  echo "✅ File contains mermaid diagram: $file"
   
   # For files with diagrams, check if they contain expected elements
   case "$file" in
@@ -110,11 +108,43 @@ if [ $FAILED_CHECKS -gt 0 ]; then
   exit 1
 fi
 
-# Perform a specific check for relationships in diagrams
-if ! grep -q -- "-->|verifies|" "$TEST_DIR/specifications/Requirements.md"; then
+
+# Perform a specific check for relationships in diagrams and if rendered with right arrow
+if ! grep -q -- "-.->|verifies|" "$TEST_DIR/specifications/Requirements.md"; then
   echo "❌ FAILED: Missing relationships in Requirements.md diagram"
   exit 1
 fi
+
+# Perform a specific check for relationships in diagrams and if rendered with right arrow
+if ! grep -q -- "-.->|trace|" "$TEST_DIR/specifications/Requirements.md"; then
+  echo "❌ FAILED: Missing relationships in Requirements.md diagram"
+  exit 1
+fi
+
+# Perform a specific check for relationships in diagrams and if rendered with right arrow
+if ! grep -q -- "-->|refines|" "$TEST_DIR/specifications/Requirements.md"; then
+  echo "❌ FAILED: Missing relationships in Requirements.md diagram"
+  exit 1
+fi
+
+# Perform a specific check for relationships in diagrams and if rendered with right arrow
+if ! grep -q -- "--o|contains" "$TEST_DIR/specifications/Requirements.md"; then
+  echo "❌ FAILED: Missing relationships in Requirements.md diagram"
+  exit 1
+fi
+
+# Perform a specific check for relationships in diagrams and if rendered with right arrow
+if ! grep -q -- "-.->|deriveReqT" "$TEST_DIR/specifications/Requirements.md"; then
+  echo "❌ FAILED: Missing relationships in Requirements.md diagram"
+  exit 1
+fi
+
+# Perform a specific check for relationships in diagrams and if rendered with right arrow
+if ! grep -q -- "-->|satisfies|" "$TEST_DIR/specifications/Requirements.md"; then
+  echo "❌ FAILED: Missing relationships in Requirements.md diagram"
+  exit 1
+fi
+  
 
 echo "✅ All diagram generation tests PASSED"
 exit 0
