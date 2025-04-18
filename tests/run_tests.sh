@@ -31,7 +31,7 @@ run_test_case() {
     local test_name="$(basename $test_folder)"
     local results_dir="$TMP_DIR/tests/${test_name}_results"
     
-    mkdir -p results_dir
+    mkdir -p $results_dir
 
     echo "🔹  Running test ${test_name}"
     

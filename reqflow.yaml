@@ -6,7 +6,7 @@ paths:
   specifications_folder: "specifications"
   
   # Default output folder
-  output_folder: "output"
+  output_folder: "html"
   
   # Additional external folders that contain system requirements and other files
   # These can be absolute paths or paths relative to the input folder

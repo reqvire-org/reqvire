@@ -1,0 +1,1133 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Requirements</title>
+    
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa;
+    color: #333;
+}
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+.content {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+h1 {
+    color: #333;
+    border-bottom: 2px solid #eaecef;
+    padding-bottom: 10px;
+    margin-top: 0;
+}
+h2 {
+    color: #333;
+    border-bottom: 1px solid #eaecef;
+    padding-bottom: 5px;
+}
+h3 {
+    color: #1a6fb7;
+    margin-top: 25px;
+}
+h4 {
+    color: #555;
+    font-weight: 600;
+}
+a {
+    color: #0366d6;
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 20px 0;
+}
+table, th, td {
+    border: 1px solid #dfe2e5;
+}
+th, td {
+    padding: 8px 12px;
+    text-align: left;
+}
+th {
+    background-color: #f6f8fa;
+}
+code {
+    background: #f6f8fa;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 90%;
+}
+pre {
+    background: #f6f8fa;
+    border-radius: 3px;
+    padding: 16px;
+    overflow: auto;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+}
+blockquote {
+    margin: 0;
+    padding: 0 15px;
+    color: #777;
+    border-left: 4px solid #dfe2e5;
+}
+.mermaid {
+    margin: 20px 0;
+    text-align: center;
+}
+</style>
+
+    <!-- Enhanced mermaid configuration for ReqFlow diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'neutral',
+            maxTextSize: 90000,
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            securityLevel: 'loose'
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="content">
+            <h1 id="system-requirements">System Requirements</h1>
+<h2 id="linting">Linting</h2>
+<div class="mermaid">graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+
+  3f3d3f9ccb15029a[&quot;Excess Whitespace Linting Implementation&quot;];
+  click 3f3d3f9ccb15029a &quot;Requirements.html#excess-whitespace-linting-implementation&quot;;
+  class 3f3d3f9ccb15029a requirement;
+  81758bdb22a3329d[&quot;UserRequirements.md/Format Consistency Enforcement&quot;];
+  class 81758bdb22a3329d requirement;
+  click 81758bdb22a3329d &quot;../UserRequirements.html#format-consistency-enforcement&quot;;
+  3f3d3f9ccb15029a -.-&gt;|deriveReqT| 81758bdb22a3329d;
+  bb06efd0b85636ec[&quot;linting/whitespace.rs&quot;];
+  class bb06efd0b85636ec default;
+  click bb06efd0b85636ec &quot;../../core/src/linting/whitespace.rs&quot;;
+  bb06efd0b85636ec --&gt;|satisfies| 3f3d3f9ccb15029a;
+  8f2198f681f63fea[&quot;Dry Run Mode&quot;];
+  click 8f2198f681f63fea &quot;Requirements.html#dry-run-mode&quot;;
+  class 8f2198f681f63fea requirement;
+  fffbb227966be4f2[&quot;CLI Lint Flag&quot;];
+  class fffbb227966be4f2 requirement;
+  click fffbb227966be4f2 &quot;Requirements.html#cli-lint-flag&quot;;
+  8f2198f681f63fea -.-&gt;|deriveReqT| fffbb227966be4f2;
+  11ffc4632afd7c4c[&quot;cli.rs&quot;];
+  class 11ffc4632afd7c4c default;
+  click 11ffc4632afd7c4c &quot;../../cli/src/cli.rs&quot;;
+  11ffc4632afd7c4c --&gt;|satisfies| 8f2198f681f63fea;
+  66aa36deca421516[&quot;Parallel Linting Processing&quot;];
+  click 66aa36deca421516 &quot;Requirements.html#parallel-linting-processing&quot;;
+  class 66aa36deca421516 requirement;
+  103ddb8dc3242215[&quot;UserRequirements.md/Model Linting&quot;];
+  class 103ddb8dc3242215 requirement;
+  click 103ddb8dc3242215 &quot;../UserRequirements.html#model-linting&quot;;
+  66aa36deca421516 -.-&gt;|deriveReqT| 103ddb8dc3242215;
+  8b47697e4e9fce62[&quot;linting/mod.rs&quot;];
+  class 8b47697e4e9fce62 default;
+  click 8b47697e4e9fce62 &quot;../../core/src/linting/mod.rs&quot;;
+  8b47697e4e9fce62 --&gt;|satisfies| 66aa36deca421516;
+  887a7d36caacab2b[&quot;UserRequirements.md/Linting Command Behavior&quot;];
+  class 887a7d36caacab2b requirement;
+  click 887a7d36caacab2b &quot;../UserRequirements.html#linting-command&quot;;
+  fffbb227966be4f2 -.-&gt;|deriveReqT| 887a7d36caacab2b;
+  11ffc4632afd7c4c --&gt;|satisfies| fffbb227966be4f2;
+  193cd6463891423e[&quot;Reserved Subsections Linting Implementation&quot;];
+  click 193cd6463891423e &quot;Requirements.html#reserved-subsections-linting-implementation&quot;;
+  class 193cd6463891423e requirement;
+  193cd6463891423e -.-&gt;|deriveReqT| 81758bdb22a3329d;
+  3aaafb0eaf60961c[&quot;linting/reserved_subsections.rs&quot;];
+  class 3aaafb0eaf60961c default;
+  click 3aaafb0eaf60961c &quot;../../core/src/linting/indentation.rs&quot;;
+  3aaafb0eaf60961c --&gt;|satisfies| 193cd6463891423e;
+  45770e9b319d3819[&quot;File Pattern Exclusion for Linting&quot;];
+  click 45770e9b319d3819 &quot;Requirements.html#file-pattern-exclusion-for-linting&quot;;
+  class 45770e9b319d3819 requirement;
+  cc8128cae305b29d[&quot;Configurable Filename Exclusion Patterns&quot;];
+  class cc8128cae305b29d requirement;
+  click cc8128cae305b29d &quot;Requirements.html#configurable-filename-exclusion-patterns&quot;;
+  45770e9b319d3819 --&gt;|refines| cc8128cae305b29d;
+  3189923c3f5e2124[&quot;utils.rs&quot;];
+  class 3189923c3f5e2124 default;
+  click 3189923c3f5e2124 &quot;../../core/src/utils.rs&quot;;
+  3189923c3f5e2124 --&gt;|satisfies| 45770e9b319d3819;
+  f98ae394dbbde42c[&quot;Incosistent Newlines Linting Implementation&quot;];
+  click f98ae394dbbde42c &quot;Requirements.html#incosistent-newlines-linting-implementation&quot;;
+  class f98ae394dbbde42c requirement;
+  f98ae394dbbde42c -.-&gt;|deriveReqT| 81758bdb22a3329d;
+  b52472a7ccc9c395[&quot;linting/newlines.rs&quot;];
+  class b52472a7ccc9c395 default;
+  click b52472a7ccc9c395 &quot;../../core/src/linting/newlines.rs&quot;;
+  b52472a7ccc9c395 --&gt;|satisfies| f98ae394dbbde42c;
+  63f1cd4974cbf62[&quot;Git-Style Diff Output for Linting&quot;];
+  click 63f1cd4974cbf62 &quot;Requirements.html#git-style-diff-output-for-linting&quot;;
+  class 63f1cd4974cbf62 requirement;
+  808b1863c88b26c4[&quot;UserRequirements.md/Linting Command Output&quot;];
+  class 808b1863c88b26c4 requirement;
+  click 808b1863c88b26c4 &quot;../UserRequirements.html#linting-command-output&quot;;
+  63f1cd4974cbf62 -.-&gt;|deriveReqT| 808b1863c88b26c4;
+  8b47697e4e9fce62 --&gt;|satisfies| 63f1cd4974cbf62;
+  dd0846393d037337[&quot;Missing Separators Linting Implementation&quot;];
+  click dd0846393d037337 &quot;Requirements.html#missing-separators-linting-implementation&quot;;
+  class dd0846393d037337 requirement;
+  dd0846393d037337 -.-&gt;|deriveReqT| 81758bdb22a3329d;
+  9abe404e42ed3086[&quot;linting/separators.rs&quot;];
+  class 9abe404e42ed3086 default;
+  click 9abe404e42ed3086 &quot;../../core/src/linting/separators.rs&quot;;
+  9abe404e42ed3086 --&gt;|satisfies| dd0846393d037337;
+</div>
+<hr />
+<h3 id="cli-lint-flag">CLI Lint Flag</h3>
+<p>The system shall provide a linting function, activated by the (–lint flag), which shall execute the linting process upon user request.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../UserRequirements.html#linting-command">UserRequirements.md/Linting Command Behavior</a></li>
+<li>satisfiedBy: <a href="../../cli/src/cli.rs">cli.rs</a></li>
+</ul>
+<hr />
+<h3 id="dry-run-mode">Dry Run Mode</h3>
+<p>The system shall provide a dry run mode (–dry-run flag) for linting that shows the suggested changes without applying them, allowing users to review modifications before committing to them.</p>
+<h4>Details</h4>
+<p>–dry-run flag works in tandem with the main lint command flag and cannot be used standalone.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#cli-lint-flag">CLI Lint Flag</a></li>
+<li>satisfiedBy: <a href="../../cli/src/cli.rs">cli.rs</a></li>
+</ul>
+<hr />
+<h3 id="excess-whitespace-linting-implementation">Excess Whitespace Linting Implementation</h3>
+<p>The system shall detect and fix excess whitespace after element headers, subsection headers, and relation identifiers to maintain consistent formatting across all requirements documents.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../UserRequirements.html#format-consistency-enforcement">UserRequirements.md/Format Consistency Enforcement</a></li>
+<li>satisfiedBy: <a href="../../core/src/linting/whitespace.rs">linting/whitespace.rs</a></li>
+</ul>
+<hr />
+<h3 id="incosistent-newlines-linting-implementation">Incosistent Newlines Linting Implementation</h3>
+<p>The system shall detect and fix excess or missing newlines before element headers, subsection headers to maintain consistent formatting across all requirements documents.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../UserRequirements.html#format-consistency-enforcement">UserRequirements.md/Format Consistency Enforcement</a></li>
+<li>satisfiedBy: <a href="../../core/src/linting/newlines.rs">linting/newlines.rs</a></li>
+</ul>
+<hr />
+<h3 id="missing-separators-linting-implementation">Missing Separators Linting Implementation</h3>
+<p>The system shall detect consecutive element sections that lack a separator line (—) between them and insert the separator to maintain consistent visual separation in the documentation.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../UserRequirements.html#format-consistency-enforcement">UserRequirements.md/Format Consistency Enforcement</a></li>
+<li>satisfiedBy: <a href="../../core/src/linting/separators.rs">linting/separators.rs</a></li>
+</ul>
+<hr />
+<h3 id="reserved-subsections-linting-implementation">Reserved Subsections Linting Implementation</h3>
+<p>The system shall identify and fix inconsistent indentation and bullet types in relation lists and other reserved subsections, standardizing to a consistent format across all requirements documents.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../UserRequirements.html#format-consistency-enforcement">UserRequirements.md/Format Consistency Enforcement</a></li>
+<li>satisfiedBy: <a href="../../core/src/linting/indentation.rs">linting/reserved_subsections.rs</a></li>
+</ul>
+<hr />
+<h3 id="git-style-diff-output-for-linting">Git-Style Diff Output for Linting</h3>
+<p>The system shall display linting change suggestions in a git-style diff format, color-coded when possible, to clearly show what modifications will be or have been made to the documents.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../UserRequirements.html#linting-command-output">UserRequirements.md/Linting Command Output</a></li>
+<li>satisfiedBy: <a href="../../core/src/linting/mod.rs">linting/mod.rs</a></li>
+</ul>
+<hr />
+<h3 id="parallel-linting-processing">Parallel Linting Processing</h3>
+<p>The system shall implement parallel processing for linting operations when possible, leveraging multi-core capabilities to improve performance on large documentation sets.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../UserRequirements.html#model-linting">UserRequirements.md/Model Linting</a></li>
+<li>satisfiedBy: <a href="../../core/src/linting/mod.rs">linting/mod.rs</a></li>
+</ul>
+<hr />
+<h3 id="file-pattern-exclusion-for-linting">File Pattern Exclusion for Linting</h3>
+<p>The system shall respect configured excluded filename patterns when performing linting operations, ensuring that files intentionally excluded from processing do not receive inappropriate linting suggestions.</p>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="#configurable-filename-exclusion-patterns">Configurable Filename Exclusion Patterns</a></li>
+<li>satisfiedBy: <a href="../../core/src/utils.rs">utils.rs</a></li>
+</ul>
+<hr />
+<h2 id="configuration">Configuration</h2>
+<div class="mermaid">graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+
+  d38ab4ad139183d3[&quot;External Folders Support&quot;];
+  click d38ab4ad139183d3 &quot;Requirements.html#external-folders-support&quot;;
+  class d38ab4ad139183d3 requirement;
+  e7286123b1b97862[&quot;ManagingMbseModelsRequirements.md/Support for Distributed Requirements&quot;];
+  class e7286123b1b97862 requirement;
+  click e7286123b1b97862 &quot;../ManagingMbseModelsRequirements.html#support-for-distributed-requirements&quot;;
+  d38ab4ad139183d3 -.-&gt;|deriveReqT| e7286123b1b97862;
+  c87fb8d32afb10bb[&quot;config.rs&quot;];
+  class c87fb8d32afb10bb default;
+  click c87fb8d32afb10bb &quot;../../cli/src/config.rs&quot;;
+  c87fb8d32afb10bb --&gt;|satisfies| d38ab4ad139183d3;
+</div>
+<hr />
+<h3 id="external-folders-support">External Folders Support</h3>
+<p>The system shall implement configuration parameter to support processing requirements stored in external folders outside the main specifications directory structure, treating them as system requirements in diagram generation and validation.</p>
+<h4>Details</h4>
+<p>‘paths.external_folders’ parameter of type  Vec<String> defines additional external folders that contain system requirements and other files.
+These can be absolute paths or paths relative to the ‘specifications’ folder but must not be subfolders of ‘specifications’ folder.
+Empty list is allowed.
+All markdown files in these folders are considered <strong>system requirements</strong> (except those matching exclusion patterns).</p>
+<pre><code class="language-reqflow.yaml">paths:
+  external_folders:
+    - /path/to/folder1
+    - ../../folder2 
+</code></pre>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../ManagingMbseModelsRequirements.html#support-for-distributed-requirements">ManagingMbseModelsRequirements.md/Support for Distributed Requirements</a></li>
+<li>satisfiedBy: <a href="../../cli/src/config.rs">config.rs</a></li>
+</ul>
+<hr />
+<h2 id="cli">CLI</h2>
+<div class="mermaid">graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+
+  c5c85bedd1cf11e6[&quot;Excluded File Relation Validation&quot;];
+  click c5c85bedd1cf11e6 &quot;Requirements.html#excluded-file-relation-validation&quot;;
+  class c5c85bedd1cf11e6 requirement;
+  45770e9b319d3819[&quot;File Pattern Exclusion for Linting&quot;];
+  class 45770e9b319d3819 requirement;
+  click 45770e9b319d3819 &quot;Requirements.html#file-pattern-exclusion-for-linting&quot;;
+  c5c85bedd1cf11e6 --&gt;|refines| 45770e9b319d3819;
+  3b1e87396caf6495[&quot;src/parser.rs&quot;];
+  class 3b1e87396caf6495 default;
+  click 3b1e87396caf6495 &quot;../../core/src/parser.rs&quot;;
+  3b1e87396caf6495 --&gt;|satisfies| c5c85bedd1cf11e6;
+  8ba9c7e059799274[&quot;LLM Context Command&quot;];
+  click 8ba9c7e059799274 &quot;Requirements.html#llm-context-command&quot;;
+  class 8ba9c7e059799274 requirement;
+  5a6fc253c51845b6[&quot;UserRequirements.md/AI Agent Context&quot;];
+  class 5a6fc253c51845b6 requirement;
+  click 5a6fc253c51845b6 &quot;../UserRequirements.html#ai-agent-context&quot;;
+  8ba9c7e059799274 -.-&gt;|deriveReqT| 5a6fc253c51845b6;
+  4a5edefd6e054300[&quot;main.rs&quot;];
+  class 4a5edefd6e054300 default;
+  click 4a5edefd6e054300 &quot;../../cli/src/main.rs&quot;;
+  4a5edefd6e054300 --&gt;|satisfies| 8ba9c7e059799274;
+  8acd24c7c228637b[&quot;Index Generation&quot;];
+  click 8acd24c7c228637b &quot;Requirements.html#index-generation&quot;;
+  class 8acd24c7c228637b requirement;
+  f5b5eaeb28c5a7b1[&quot;UserRequirements.md/Generate Documentation Index&quot;];
+  class f5b5eaeb28c5a7b1 requirement;
+  click f5b5eaeb28c5a7b1 &quot;../UserRequirements.html#generate-documentation-index&quot;;
+  8acd24c7c228637b -.-&gt;|deriveReqT| f5b5eaeb28c5a7b1;
+  3ef6afafe29becbc[&quot;index_generator.rs&quot;];
+  class 3ef6afafe29becbc default;
+  click 3ef6afafe29becbc &quot;../../core/src/index_generator.rs&quot;;
+  3ef6afafe29becbc --&gt;|satisfies| 8acd24c7c228637b;
+  86e0701b6ce7de0b[&quot;HTML Navigation Enhancement&quot;];
+  click 86e0701b6ce7de0b &quot;Requirements.html#html-navigation-enhancement&quot;;
+  class 86e0701b6ce7de0b requirement;
+  e1c89b5d94837122[&quot;UserRequirements.md/Documentation Index HTML Integration&quot;];
+  class e1c89b5d94837122 requirement;
+  click e1c89b5d94837122 &quot;../UserRequirements.html#documentation-index-html-integration&quot;;
+  86e0701b6ce7de0b -.-&gt;|deriveReqT| e1c89b5d94837122;
+  c788e5b84faa2ae3[&quot;html.rs&quot;];
+  class c788e5b84faa2ae3 default;
+  click c788e5b84faa2ae3 &quot;../../core/src/html.rs&quot;;
+  c788e5b84faa2ae3 --&gt;|satisfies| 86e0701b6ce7de0b;
+  8cb11d152f3b9d2d[&quot;html_export.rs&quot;];
+  class 8cb11d152f3b9d2d default;
+  click 8cb11d152f3b9d2d &quot;../../core/src/html_export.rs&quot;;
+  8cb11d152f3b9d2d --&gt;|satisfies| 86e0701b6ce7de0b;
+  98bd2bd6bdf5bf97[&quot;File Content Caching for Performance&quot;];
+  click 98bd2bd6bdf5bf97 &quot;Requirements.html#file-content-caching-for-performance&quot;;
+  class 98bd2bd6bdf5bf97 requirement;
+  21e4eb87cb55ea5e[&quot;../ManagingMbseModelsRequirements.md#Efficient Processing&quot;];
+  class 21e4eb87cb55ea5e requirement;
+  click 21e4eb87cb55ea5e &quot;../ManagingMbseModelsRequirements.html#efficient-processing&quot;;
+  98bd2bd6bdf5bf97 -.-&gt;|deriveReqT| 21e4eb87cb55ea5e;
+  6136c216c9f80165[&quot;model.rs&quot;];
+  class 6136c216c9f80165 default;
+  click 6136c216c9f80165 &quot;../../core/src/model.rs&quot;;
+  6136c216c9f80165 --&gt;|satisfies| 98bd2bd6bdf5bf97;
+  c8b6ccc187b0a27e[&quot;HTML Export&quot;];
+  click c8b6ccc187b0a27e &quot;Requirements.html#html-export&quot;;
+  class c8b6ccc187b0a27e requirement;
+  72c7eda6183f0893[&quot;../UserRequirements.md/Export HTML specifications&quot;];
+  class 72c7eda6183f0893 requirement;
+  click 72c7eda6183f0893 &quot;../UserRequirements.html#export-html-specifications&quot;;
+  c8b6ccc187b0a27e -.-&gt;|deriveReqT| 72c7eda6183f0893;
+  8cb11d152f3b9d2d --&gt;|satisfies| c8b6ccc187b0a27e;
+  5a1719a2649b9922[&quot;Unstructured Documents&quot;];
+  click 5a1719a2649b9922 &quot;Requirements.html#unstructured-documents&quot;;
+  class 5a1719a2649b9922 requirement;
+  daadd8e583647e4f[&quot;ManagingMbseModelsRequirements.md#Coexistence of Structured and Unstructured Documents&quot;];
+  class daadd8e583647e4f requirement;
+  click daadd8e583647e4f &quot;../ManagingMbseModelsRequirements.html#coexistence-of-structured-and-unstructured-documents&quot;;
+  5a1719a2649b9922 -.-&gt;|deriveReqT| daadd8e583647e4f;
+  bdfd9d65e46117e7[&quot;Detailed Error Handling and Logging&quot;];
+  click bdfd9d65e46117e7 &quot;Requirements.html#detailed-error-handling-and-logging&quot;;
+  class bdfd9d65e46117e7 requirement;
+  7cf5cf9900076be6[&quot;../UserRequirements.md#Enhanced Validation Error Reporting&quot;];
+  class 7cf5cf9900076be6 requirement;
+  click 7cf5cf9900076be6 &quot;../UserRequirements.html#enhanced-validation-error-reporting&quot;;
+  bdfd9d65e46117e7 -.-&gt;|deriveReqT| 7cf5cf9900076be6;
+  8cd8a561b4c440e3[&quot;src/error.rs&quot;];
+  class 8cd8a561b4c440e3 default;
+  click 8cd8a561b4c440e3 &quot;../../core/src/error.rs&quot;;
+  8cd8a561b4c440e3 --&gt;|satisfies| bdfd9d65e46117e7;
+  5ec6a2668bddf0e[&quot;JSON Output Format&quot;];
+  click 5ec6a2668bddf0e &quot;Requirements.html#json-output-format&quot;;
+  class 5ec6a2668bddf0e requirement;
+  5ec6a2668bddf0e -.-&gt;|deriveReqT| 7cf5cf9900076be6;
+  11ffc4632afd7c4c[&quot;cli.rs&quot;];
+  class 11ffc4632afd7c4c default;
+  click 11ffc4632afd7c4c &quot;../../cli/src/cli.rs&quot;;
+  11ffc4632afd7c4c --&gt;|satisfies| 5ec6a2668bddf0e;
+  7a8da8dfee910932[&quot;Interactive Mermaid Diagram Node Behavior&quot;];
+  click 7a8da8dfee910932 &quot;Requirements.html#interactive-mermaid-diagram-node-behavior&quot;;
+  class 7a8da8dfee910932 requirement;
+  e867499409ae347a[&quot;UserRequirements.md/Interactive Mermaid Diagrams&quot;];
+  class e867499409ae347a requirement;
+  click e867499409ae347a &quot;../UserRequirements.html#interactive-mermaid-diagrams&quot;;
+  7a8da8dfee910932 -.-&gt;|deriveReqT| e867499409ae347a;
+  d4240e29691d4b88[&quot;html.rs&quot;];
+  class d4240e29691d4b88 default;
+  click d4240e29691d4b88 &quot;../../core/src/diagrams.rs&quot;;
+  d4240e29691d4b88 --&gt;|satisfies| 7a8da8dfee910932;
+  5870488e00ee4f36[&quot;Relation Type Validation&quot;];
+  click 5870488e00ee4f36 &quot;Requirements.html#relation-type-validation&quot;;
+  class 5870488e00ee4f36 requirement;
+  5870488e00ee4f36 -.-&gt;|deriveReqT| 7cf5cf9900076be6;
+  ed4f94bde93b51b2[&quot;src/relation.rs&quot;];
+  class ed4f94bde93b51b2 default;
+  click ed4f94bde93b51b2 &quot;../../core/src/relation.rs&quot;;
+  ed4f94bde93b51b2 --&gt;|satisfies| 5870488e00ee4f36;
+</div>
+<hr />
+<h3 id="json-output-format">JSON Output Format</h3>
+<p>The system shall provide different output results in machine-readable JSON format to facilitate integration with CI/CD pipelines and automated reporting tools.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../UserRequirements.html#enhanced-validation-error-reporting">UserRequirements.md/Enhanced Validation Error Reporting</a></li>
+<li>satisfiedBy: <a href="../../cli/src/cli.rs">cli.rs</a></li>
+</ul>
+<hr />
+<h3 id="index-generation">Index Generation</h3>
+<p>The system shall implement an IndexGenerator component that traverses the specifications directory structure and creates a hierarchical README.md file with links to documents and elements.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../UserRequirements.html#generate-documentation-index">UserRequirements.md/Generate Documentation Index</a></li>
+<li>satisfiedBy: <a href="../../core/src/index_generator.rs">index_generator.rs</a></li>
+</ul>
+<hr />
+<h3 id="html-navigation-enhancement">HTML Navigation Enhancement</h3>
+<p>The system shall enhance the HTML generator to process README.md as a special file, adding navigation elements and ensuring it serves as the primary entry point.</p>
+<h4>Details</h4>
+<p>README.md file must be saved as index.html file when exported.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../UserRequirements.html#documentation-index-html-integration">UserRequirements.md/Documentation Index HTML Integration</a></li>
+<li>satisfiedBy: <a href="../../core/src/html.rs">html.rs</a></li>
+<li>satisfiedBy: <a href="../../core/src/html_export.rs">html_export.rs</a></li>
+</ul>
+<hr />
+<h3 id="llm-context-command">LLM Context Command</h3>
+<p>The system shall provide a command-line option <code>--llm-context</code> that outputs comprehensive contextual information about ReqFlow methodology, document structure, relation types, and CLI usage to help Large Language Models understand and work with ReqFlow-based projects.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../UserRequirements.html#ai-agent-context">UserRequirements.md/AI Agent Context</a></li>
+<li>satisfiedBy: <a href="../../cli/src/main.rs">main.rs</a></li>
+</ul>
+<hr />
+<h3 id="interactive-mermaid-diagram-node-behavior">Interactive Mermaid Diagram Node Behavior</h3>
+<p>The system shall implement interactive click behavior for Mermaid diagram nodes that redirects to the referenced element when clicked.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../UserRequirements.html#interactive-mermaid-diagrams">UserRequirements.md/Interactive Mermaid Diagrams</a></li>
+<li>satisfiedBy: <a href="../../core/src/diagrams.rs">html.rs</a></li>
+</ul>
+<hr />
+<h3 id="unstructured-documents">Unstructured Documents</h3>
+<p>The system shall allow unstructured documents to be ignored during processing.
+TODO: add requirment that defines a config filter out patterns.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../ManagingMbseModelsRequirements.html#coexistence-of-structured-and-unstructured-documents">ManagingMbseModelsRequirements.md#Coexistence of Structured and Unstructured Documents</a></li>
+</ul>
+<hr />
+<h3 id="relation-type-validation">Relation Type Validation</h3>
+<p>The system shall validate relation types against a defined vocabulary and provide clear error messages for unsupported relation types, including suggestions for the correct relation types.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../UserRequirements.html#enhanced-validation-error-reporting">UserRequirements.md/Enhanced Validation Error Reporting</a></li>
+<li>satisfiedBy: <a href="../../core/src/relation.rs">src/relation.rs</a></li>
+</ul>
+<hr />
+<h3 id="excluded-file-relation-validation">Excluded File Relation Validation</h3>
+<p>The system shall properly validate relations targeting files matching excluded filename patterns, enabling references to excluded files while still respecting their exclusion from processing and linting operations.</p>
+<h4>Details</h4>
+<p>The validation process for excluded files:</p>
+<ol>
+<li>Files matching excluded patterns are registered in the element registry for relation validation only</li>
+<li>Internal elements within excluded files are not processed or validated</li>
+</ol>
+<h4>Todo</h4>
+<ul>
+<li>derivedFrom: <a href="#configurable-filename-exclusion-patterns">Configurable Filename Exclusion Patterns</a> </li>
+<li>refine: <a href="#file-pattern-exclusion-for-linting">File Pattern Exclusion for Linting</a></li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="#file-pattern-exclusion-for-linting">File Pattern Exclusion for Linting</a></li>
+<li>satisfiedBy: <a href="../../core/src/parser.rs">src/parser.rs</a></li>
+</ul>
+<hr />
+<h3 id="html-export">HTML Export</h3>
+<p>The system shall generate HTML output for all markdown files, not just requirements documents, to provide consistent representation of the entire model.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../UserRequirements.html#export-html-specifications">../UserRequirements.md/Export HTML specifications</a></li>
+<li>satisfiedBy: <a href="../../core/src/html_export.rs">html_export.rs</a></li>
+</ul>
+<hr />
+<h3 id="detailed-error-handling-and-logging">Detailed Error Handling and Logging</h3>
+<p>The system shall implement detailed error handling and logging throughout the application to facilitate troubleshooting and provide meaningful feedback.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../UserRequirements.html#enhanced-validation-error-reporting">../UserRequirements.md#Enhanced Validation Error Reporting</a></li>
+<li>satisfiedBy: <a href="../../core/src/error.rs">src/error.rs</a></li>
+</ul>
+<hr />
+<h3 id="file-content-caching-for-performance">File Content Caching for Performance</h3>
+<p>The system shall cache file contents during processing to optimize performance for operations that require multiple passes through the same files.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../ManagingMbseModelsRequirements.html#efficient-processing">../ManagingMbseModelsRequirements.md#Efficient Processing</a></li>
+<li>satisfiedBy: <a href="../../core/src/model.rs">model.rs</a></li>
+</ul>
+<hr />
+<h2 id="logic">Logic</h2>
+<div class="mermaid">graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+
+  99bed90a0d96a1d2[&quot;Requirements Processing&quot;];
+  click 99bed90a0d96a1d2 &quot;Requirements.html#requirements-processing&quot;;
+  class 99bed90a0d96a1d2 requirement;
+  e7286123b1b97862[&quot;ManagingMbseModelsRequirements.md/Support for Distributed Requirements&quot;];
+  class e7286123b1b97862 requirement;
+  click e7286123b1b97862 &quot;../ManagingMbseModelsRequirements.html#support-for-distributed-requirements&quot;;
+  99bed90a0d96a1d2 -.-&gt;|deriveReqT| e7286123b1b97862;
+  6136c216c9f80165[&quot;model.rs&quot;];
+  class 6136c216c9f80165 default;
+  click 6136c216c9f80165 &quot;../../core/src/model.rs&quot;;
+  6136c216c9f80165 --&gt;|satisfies| 99bed90a0d96a1d2;
+  3b1e87396caf6495[&quot;parser.rs&quot;];
+  class 3b1e87396caf6495 default;
+  click 3b1e87396caf6495 &quot;../../core/src/parser.rs&quot;;
+  3b1e87396caf6495 --&gt;|satisfies| 99bed90a0d96a1d2;
+  2737f2d770aa0757[&quot;Requirements Files Search and Detection&quot;];
+  click 2737f2d770aa0757 &quot;Requirements.html#requirements-files-search-and-detection&quot;;
+  class 2737f2d770aa0757 requirement;
+  21e4eb87cb55ea5e[&quot;ManagingMbseModelsRequirements.md/Efficient Processing&quot;];
+  class 21e4eb87cb55ea5e requirement;
+  click 21e4eb87cb55ea5e &quot;../ManagingMbseModelsRequirements.html#efficient-processing&quot;;
+  2737f2d770aa0757 -.-&gt;|deriveReqT| 21e4eb87cb55ea5e;
+  6136c216c9f80165 --&gt;|satisfies| 2737f2d770aa0757;
+</div>
+<hr />
+<h3 id="requirements-processing">Requirements Processing</h3>
+<p>The system shall parse the ‘specifications’ and ‘external folders’ directory structure using the configured paths from reqflow.yaml to identify system elements files and their hierarchical relationships.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../ManagingMbseModelsRequirements.html#support-for-distributed-requirements">ManagingMbseModelsRequirements.md/Support for Distributed Requirements</a></li>
+<li>satisfiedBy: <a href="../../core/src/model.rs">model.rs</a></li>
+<li>satisfiedBy: <a href="../../core/src/parser.rs">parser.rs</a></li>
+</ul>
+<hr />
+<h3 id="requirements-files-search-and-detection">Requirements Files Search and Detection</h3>
+<p>The system shall identify and categorize files in the <code>specifications</code> and <code>external_folders</code> directories as <strong>Stakeholder Needs Requirements</strong>, <strong>System Requirements</strong>, or <strong>Not a Requirements File</strong> based on predefined rules.</p>
+<h4>Details</h4>
+<p>Identification Process:
+The process follows these steps to determine whether a file contains requirements and, if so, whether it falls under <strong>Stakeholder Needs Requirements</strong> or <strong>System Requirements</strong>:</p>
+<ol>
+<li><strong>File Selection</strong>: The process scans all files in the <code>specifications</code> folder (including subfolders) and <code>external_folders</code>.</li>
+<li><strong>Excluded Patterns Check</strong>: If a file matches any excluded patterns, it is marked as <strong>not a requirements file</strong>.</li>
+<li><strong>File Extension Check</strong>: If the file does not have a <code>.md</code> extension, it is marked as <strong>not a requirements file</strong>.</li>
+<li><strong>Design Folder Check</strong>: If the file is located in a folder defined by the <code>design_specifications_folder</code> configuration, it is marked as <strong>not a requirements file</strong>.</li>
+<li><strong>External Folder Check</strong>: If the file is found in an external folder (or any of its subfolders), it is categorized as a <strong>System Requirements file</strong>.</li>
+<li><strong>Root Folder Check</strong>: If the file is located at the root of the <code>specifications</code> folder, it is categorized as a <strong>Stakeholder Needs Requirements file</strong>. Otherwise, it is categorized as a <strong>System Requirements file</strong>.</li>
+</ol>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../ManagingMbseModelsRequirements.html#efficient-processing">ManagingMbseModelsRequirements.md/Efficient Processing</a></li>
+<li>satisfiedBy: <a href="../../core/src/model.rs">model.rs</a></li>
+</ul>
+<hr />
+<h2 id="categorization-outcomes">Categorization Outcomes</h2>
+<div class="mermaid">graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+
+  a7ec66314a62423b[&quot;Mermaid Diagram Format Conversion&quot;];
+  click a7ec66314a62423b &quot;Requirements.html#mermaid-diagram-format-conversion&quot;;
+  class a7ec66314a62423b requirement;
+  10c00a1bd12fefa5[&quot;UserRequirements.md/Export Diagrams in Standard Formats&quot;];
+  class 10c00a1bd12fefa5 requirement;
+  click 10c00a1bd12fefa5 &quot;../UserRequirements.html#export-diagrams-in-standard-formats&quot;;
+  a7ec66314a62423b -.-&gt;|deriveReqT| 10c00a1bd12fefa5;
+  d4240e29691d4b88[&quot;diagrams.rs&quot;];
+  class d4240e29691d4b88 default;
+  click d4240e29691d4b88 &quot;../../core/src/diagrams.rs&quot;;
+  d4240e29691d4b88 --&gt;|satisfies| a7ec66314a62423b;
+  1414e7f8890f2939[&quot;Relationship Type Filter Implementation&quot;];
+  click 1414e7f8890f2939 &quot;Requirements.html#relationship-type-filter-implementation&quot;;
+  class 1414e7f8890f2939 requirement;
+  30d97803eba68a13[&quot;UserRequirements.md/Filter Relationships by Type&quot;];
+  class 30d97803eba68a13 requirement;
+  click 30d97803eba68a13 &quot;../UserRequirements.html#filter-relationships-by-type&quot;;
+  1414e7f8890f2939 -.-&gt;|deriveReqT| 30d97803eba68a13;
+  9860815d52cb0fbb[&quot;Visual Differential Rendering&quot;];
+  click 9860815d52cb0fbb &quot;Requirements.html#visual-differential-rendering&quot;;
+  class 9860815d52cb0fbb requirement;
+  fd7388e379372d7b[&quot;UserRequirements.md/Highlight Changes in Diagrams&quot;];
+  class fd7388e379372d7b requirement;
+  click fd7388e379372d7b &quot;../UserRequirements.html#highlight-changes-in-diagrams&quot;;
+  9860815d52cb0fbb -.-&gt;|deriveReqT| fd7388e379372d7b;
+  c826c1ee7c93bf6b[&quot;SysML-Compatible Relationship Rendering&quot;];
+  click c826c1ee7c93bf6b &quot;Requirements.html#sysml-compatible-relationship-rendering&quot;;
+  class c826c1ee7c93bf6b requirement;
+  a6a836283607bf45[&quot;UserRequirements.md/Visualize Model Relationships&quot;];
+  class a6a836283607bf45 requirement;
+  click a6a836283607bf45 &quot;../UserRequirements.html#visualize-model-relationships&quot;;
+  c826c1ee7c93bf6b -.-&gt;|deriveReqT| a6a836283607bf45;
+  d4240e29691d4b88 --&gt;|satisfies| c826c1ee7c93bf6b;
+  191d27287e362df2[&quot;Diagram Storage Path Configuration&quot;];
+  click 191d27287e362df2 &quot;Requirements.html#diagram-storage-path-configuration&quot;;
+  class 191d27287e362df2 requirement;
+  aee397f35b867556[&quot;UserRequirements.md/Store Automated Diagrams in Designated Locations&quot;];
+  class aee397f35b867556 requirement;
+  click aee397f35b867556 &quot;../UserRequirements.html#store-automated-diagrams-in-designated-locations&quot;;
+  191d27287e362df2 -.-&gt;|deriveReqT| aee397f35b867556;
+  6136c216c9f80165[&quot;model.rs&quot;];
+  class 6136c216c9f80165 default;
+  click 6136c216c9f80165 &quot;../../core/src/model.rs&quot;;
+  6136c216c9f80165 --&gt;|satisfies| 191d27287e362df2;
+  cc8128cae305b29d[&quot;Configurable Filename Exclusion Patterns&quot;];
+  click cc8128cae305b29d &quot;Requirements.html#configurable-filename-exclusion-patterns&quot;;
+  class cc8128cae305b29d requirement;
+  ce24dbacb9646f3b[&quot;ManagingMbseModelsRequirements.md/Project Configuration with YAML&quot;];
+  class ce24dbacb9646f3b requirement;
+  click ce24dbacb9646f3b &quot;../ManagingMbseModelsRequirements.html#project-configuration-with-yaml&quot;;
+  cc8128cae305b29d -.-&gt;|deriveReqT| ce24dbacb9646f3b;
+  c87fb8d32afb10bb[&quot;config.rs&quot;];
+  class c87fb8d32afb10bb default;
+  click c87fb8d32afb10bb &quot;../../cli/src/config.rs&quot;;
+  c87fb8d32afb10bb --&gt;|satisfies| cc8128cae305b29d;
+</div>
+<ul>
+<li><strong>Stakeholder Needs Requirements File</strong>: Files located in the root of the <code>specifications</code> folder and meeting all conditions.</li>
+<li><strong>System Requirements File</strong>: Files found in external folders or subfolders within <code>specifications</code>.</li>
+<li><strong>Not a Requirements File</strong>: Files that match exclusion patterns, do not have a <code>.md</code> extension, or are in the design folder.</li>
+</ul>
+<hr />
+<h3 id="configurable-filename-exclusion-patterns">Configurable Filename Exclusion Patterns</h3>
+<p>The system shall support configurable glob patterns to exclude specific files from requirement processing, regardless if they are located in specifications or external folders.</p>
+<h4>Details</h4>
+<pre><code class="language-reqflow.yaml">paths:
+
+  # Glob patterns to exclude from requirements processing
+
+  # These are patterns that shouldn't be considered requirements even if they're in specifications or external folders
+  excluded_filename_patterns:
+    - &quot;**/Logical*.md&quot;
+    - &quot;**/Physical*.md&quot;    
+</code></pre>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../ManagingMbseModelsRequirements.html#project-configuration-with-yaml">ManagingMbseModelsRequirements.md/Project Configuration with YAML</a></li>
+<li>satisfiedBy: <a href="../../cli/src/config.rs">config.rs</a></li>
+</ul>
+<hr />
+<h3 id="mermaid-diagram-format-conversion">Mermaid Diagram Format Conversion</h3>
+<p>The system shall implement an export functionality that converts Mermaid diagram syntax to standard image formats (PNG, SVG) using external rendering tools or APIs, with configurable resolution and quality settings.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../UserRequirements.html#export-diagrams-in-standard-formats">UserRequirements.md/Export Diagrams in Standard Formats</a></li>
+<li>satisfiedBy: <a href="../../core/src/diagrams.rs">diagrams.rs</a></li>
+</ul>
+<hr />
+<h3 id="visual-differential-rendering">Visual Differential Rendering</h3>
+<p>The system shall implement a visual differential rendering algorithm that compares the current and previous versions of a diagram, visually highlighting elements that have been added, modified, or removed using distinct color coding and graphical indicators.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../UserRequirements.html#highlight-changes-in-diagrams">UserRequirements.md/Highlight Changes in Diagrams</a></li>
+</ul>
+<hr />
+<h3 id="sysml-compatible-relationship-rendering">SysML-Compatible Relationship Rendering</h3>
+<p>The system shall implement a relationship rendering engine that adheres to SysML notation standards, defining specific arrow styles, line types, and visual properties for each relationship type to ensure diagram consistency and standards compliance.</p>
+<h4>Details</h4>
+<p>The visual representation and direction of relationships in diagrams aligns with the SysML specification. 
+Each relationship is represented using SysML standard notation with a specified arrow direction.
+derive (deriveReqT):</p>
+<ul>
+<li>Definition: Indicates that a requirement is derived from a higher-level requirement.</li>
+<li>Notation: Dashed arrow with an open arrowhead.</li>
+<li>Direction:
+<ul>
+<li>Derived Requirement → Source Requirement<br />
+contains:</li>
+</ul>
+</li>
+<li>Definition: Represents an element containing another element.</li>
+<li>Notation: Solid arrow with no arrowhead.</li>
+<li>Direction:
+<ul>
+<li>Container Element → Contained Element<br />
+refine:</li>
+</ul>
+</li>
+<li>Definition: Indicates that an element provides further detail or enhancement of another element.</li>
+<li>Notation: Dashed arrow with an open arrowhead.</li>
+<li>Direction:
+<ul>
+<li>Refining Element → Refined Element<br />
+verify:</li>
+</ul>
+</li>
+<li>Definition: Represents verification of a requirement by a test case or other verification element.</li>
+<li>Notation: Dashed arrow with an open arrowhead.</li>
+<li>Direction:
+<ul>
+<li>Verification Element (Test Case, Analysis, Inspection, Demonstration) → Requirement<br />
+trace:</li>
+</ul>
+</li>
+<li>Definition: Shows a general traceability relationship between elements without implying derivation or refinement.</li>
+<li>Notation: Dashed arrow with an open arrowhead.</li>
+<li>Direction:
+<ul>
+<li>Dependent Element → Source Element<br />
+satisfy:</li>
+</ul>
+</li>
+<li>Definition: Indicates that a design or model element satisfies a requirement.</li>
+<li>Notation: Solid arrow with an open arrowhead.</li>
+<li>Direction:
+<ul>
+<li>Design / Model Element → Requirement</li>
+</ul>
+</li>
+</ul>
+<p><strong>Summary Table</strong>
+| Relation        | Stereotype                  | Line style            | Arrowhead               | Semantic direction                          |
+|—————–|—————————–|———————–|———————––|–––––––––––––––––––––– |
+| <strong>deriveReqT</strong>  | «deriveReqt»                | dashed dependency     | open (hollow) arrowhead | Derived Requirement → Source Requirement   |
+| <strong>satisfy</strong>     | «satisfy»                   | solid dependency      | open (hollow) arrowhead | Design/Model Element → Requirement          |
+| <strong>verify</strong>      | «verify»                    | dashed dependency     | open (hollow) arrowhead | Verification Element → Requirement          |
+| <strong>refine</strong>      | «refine»                    | solid dependency      | open (hollow) arrowhead | Refining Element → Refined Element          |
+| <strong>trace</strong>       | «trace»                     | dashed dependency     | open (hollow) arrowhead | Dependent Element → Source Element          |
+| <strong>containment</strong> | «contain» / «containedBy»¹  | composite association | filled (black) diamond  | Container Element → Contained Element       |</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../UserRequirements.html#visualize-model-relationships">UserRequirements.md/Visualize Model Relationships</a></li>
+<li>satisfiedBy: <a href="../../core/src/diagrams.rs">diagrams.rs</a></li>
+</ul>
+<hr />
+<h3 id="relationship-type-filter-implementation">Relationship Type Filter Implementation</h3>
+<p>The system shall implement filtering capabilities in the diagram generation logic that allow selective inclusion or exclusion of relationship types through command-line arguments and configuration settings, supporting regex patterns for complex filtering rules.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../UserRequirements.html#filter-relationships-by-type">UserRequirements.md/Filter Relationships by Type</a></li>
+</ul>
+<hr />
+<h3 id="diagram-storage-path-configuration">Diagram Storage Path Configuration</h3>
+<p>The system shall implement a configurable storage mechanism for generated diagrams that uses a combination of YAML configuration settings and command-line overrides to determine storage paths, file naming patterns, and versioning strategies.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../UserRequirements.html#store-automated-diagrams-in-designated-locations">UserRequirements.md/Store Automated Diagrams in Designated Locations</a></li>
+<li>satisfiedBy: <a href="../../core/src/model.rs">model.rs</a></li>
+</ul>
+<hr />
+<h2 id="change-tracing">Change Tracing</h2>
+<div class="mermaid">graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+
+  918cc4a26d642f30[&quot;Structural Change Analyzer&quot;];
+  click 918cc4a26d642f30 &quot;Requirements.html#structural-change-analyzer&quot;;
+  class 918cc4a26d642f30 requirement;
+  91ebf7e73d5ac081[&quot;UserRequirements.md/Tracing Structural Changes&quot;];
+  class 91ebf7e73d5ac081 requirement;
+  click 91ebf7e73d5ac081 &quot;../UserRequirements.html#tracing-structural-changes&quot;;
+  918cc4a26d642f30 -.-&gt;|deriveReqT| 91ebf7e73d5ac081;
+  cc976e6bcded86e7[&quot;model.rs&quot;];
+  class cc976e6bcded86e7 default;
+  click cc976e6bcded86e7 &quot;../../core/src/change_impact.rs&quot;;
+  cc976e6bcded86e7 --&gt;|satisfies| 918cc4a26d642f30;
+  83a2343e97857828[&quot;Matrix File Output Handler&quot;];
+  click 83a2343e97857828 &quot;Requirements.html#matrix-file-output-handler&quot;;
+  class 83a2343e97857828 requirement;
+  c4b025f6ac8438c7[&quot;UserRequirements.md/Save matrices to designated files&quot;];
+  class c4b025f6ac8438c7 requirement;
+  click c4b025f6ac8438c7 &quot;../UserRequirements.html#save-matrices-to-designated-files&quot;;
+  83a2343e97857828 -.-&gt;|deriveReqT| c4b025f6ac8438c7;
+  5eca866a0338e0fe[&quot;Traceability Matrix Builder Implementation&quot;];
+  click 5eca866a0338e0fe &quot;Requirements.html#traceability-matrix-builder-implementation&quot;;
+  class 5eca866a0338e0fe requirement;
+  ba40352f8e72c125[&quot;UserRequirements.md/Traceability Matrix&quot;];
+  class ba40352f8e72c125 requirement;
+  click ba40352f8e72c125 &quot;../UserRequirements.html#traceability-matrix&quot;;
+  5eca866a0338e0fe -.-&gt;|deriveReqT| ba40352f8e72c125;
+  665b7456c9b61ded[&quot;CLI Change Impact Report Flag&quot;];
+  click 665b7456c9b61ded &quot;Requirements.html#cli-change-impact-report-flag&quot;;
+  class 665b7456c9b61ded requirement;
+  665b7456c9b61ded -.-&gt;|deriveReqT| 918cc4a26d642f30;
+  11ffc4632afd7c4c[&quot;cli.rs&quot;];
+  class 11ffc4632afd7c4c default;
+  click 11ffc4632afd7c4c &quot;../../cli/src/cli.rs&quot;;
+  11ffc4632afd7c4c --&gt;|satisfies| 665b7456c9b61ded;
+  b8b40184613535c1[&quot;CLI Git Commit Hash Flag&quot;];
+  click b8b40184613535c1 &quot;Requirements.html#cli-git-commit-hash-flag&quot;;
+  class b8b40184613535c1 requirement;
+  b8b40184613535c1 -.-&gt;|deriveReqT| 665b7456c9b61ded;
+  11ffc4632afd7c4c --&gt;|satisfies| b8b40184613535c1;
+  8897111f9b3656ce[&quot;Matrix Export Format Handler&quot;];
+  click 8897111f9b3656ce &quot;Requirements.html#matrix-export-format-handler&quot;;
+  class 8897111f9b3656ce requirement;
+  4b7b4328173caada[&quot;UserRequirements.md/Export Traceability Matrix&quot;];
+  class 4b7b4328173caada requirement;
+  click 4b7b4328173caada &quot;../UserRequirements.html#export-traceability-matrix&quot;;
+  8897111f9b3656ce -.-&gt;|deriveReqT| 4b7b4328173caada;
+  d7e5fbf806d650d9[&quot;Markdown Matrix Formatter&quot;];
+  click d7e5fbf806d650d9 &quot;Requirements.html#markdown-matrix-formatter&quot;;
+  class d7e5fbf806d650d9 requirement;
+  d7e5fbf806d650d9 -.-&gt;|deriveReqT| ba40352f8e72c125;
+</div>
+<hr />
+<h3 id="structural-change-analyzer">Structural Change Analyzer</h3>
+<p>The system shall implement a model change analyzer that identifies structural modifications between model versions, determines affected elements through relationship traversal, and categorizes impacts according to change propagation rules.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../UserRequirements.html#tracing-structural-changes">UserRequirements.md/Tracing Structural Changes</a></li>
+<li>satisfiedBy: <a href="../../core/src/change_impact.rs">model.rs</a></li>
+</ul>
+<hr />
+<h3 id="cli-change-impact-report-flag">CLI Change Impact Report Flag</h3>
+<p>The system shall provide a change and impact report function, activated by the (–change_impact flag), which shall generate change impact report</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#structural-change-analyzer">Structural Change Analyzer</a></li>
+<li>satisfiedBy: <a href="../../cli/src/cli.rs">cli.rs</a></li>
+</ul>
+<hr />
+<h3 id="cli-git-commit-hash-flag">CLI Git Commit Hash Flag</h3>
+<p>The system shall provide a git commit hash flag  (–git_commit flag), to be used with ** CLI Change Impact Report Flag**.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#cli-change-impact-report-flag">CLI Change Impact Report Flag</a></li>
+<li>satisfiedBy: <a href="../../cli/src/cli.rs">cli.rs</a></li>
+</ul>
+<hr />
+<h3 id="traceability-matrix-builder-implementation">Traceability Matrix Builder Implementation</h3>
+<p>The system shall implement a traceability matrix builder component that extracts relationship data from the model, processes it according to configured parameters, and generates structured matrix representations showing connections between requirements and other elements.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../UserRequirements.html#traceability-matrix">UserRequirements.md/Traceability Matrix</a></li>
+</ul>
+<hr />
+<h3 id="markdown-matrix-formatter">Markdown Matrix Formatter</h3>
+<p>The system shall implement a markdown formatter for traceability matrices that produces well-structured, readable markdown tables and diagrams conforming to the ReqFlow markdown-first methodology.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../UserRequirements.html#traceability-matrix">UserRequirements.md/Traceability Matrix</a></li>
+</ul>
+<hr />
+<h3 id="matrix-file-output-handler">Matrix File Output Handler</h3>
+<p>The system shall implement a file output handler for traceability matrices that saves generated content to designated locations with appropriate naming conventions, handles file conflicts, and maintains content consistency.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../UserRequirements.html#save-matrices-to-designated-files">UserRequirements.md/Save matrices to designated files</a></li>
+</ul>
+<hr />
+<h3 id="matrix-export-format-handler">Matrix Export Format Handler</h3>
+<p>The system shall implement export handlers for traceability matrices that convert the internal matrix representation to various external formats including Excel-compatible CSV/XLSX and PDF, preserving structural relationships and formatting.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../UserRequirements.html#export-traceability-matrix">UserRequirements.md/Export Traceability Matrix</a></li>
+</ul>
+<hr />
+<h2 id="validation-capabilities">Validation Capabilities</h2>
+<div class="mermaid">graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+
+  212d1317cd2b25fc[&quot;Relation Element Type Validator&quot;];
+  click 212d1317cd2b25fc &quot;Requirements.html#relation-element-type-validator&quot;;
+  class 212d1317cd2b25fc requirement;
+  e587d63764466914[&quot;../UserRequirements.md#Validate Relation Types&quot;];
+  class e587d63764466914 requirement;
+  click e587d63764466914 &quot;../UserRequirements.html#validate-relation-types&quot;;
+  212d1317cd2b25fc -.-&gt;|deriveReqT| e587d63764466914;
+  a34d9281a02c6839[&quot;../SpecificationsRequirements.md#Relation Types Specifications&quot;];
+  class a34d9281a02c6839 requirement;
+  click a34d9281a02c6839 &quot;../SpecificationsRequirements.html#relation-types-specifications&quot;;
+  212d1317cd2b25fc -.-&gt;|deriveReqT| a34d9281a02c6839;
+  6136c216c9f80165[&quot;model.rs&quot;];
+  class 6136c216c9f80165 default;
+  click 6136c216c9f80165 &quot;../../core/src/model.rs&quot;;
+  6136c216c9f80165 --&gt;|satisfies| 212d1317cd2b25fc;
+  3b1e87396caf6495[&quot;parser.rs&quot;];
+  class 3b1e87396caf6495 default;
+  click 3b1e87396caf6495 &quot;../../core/src/parser.rs&quot;;
+  3b1e87396caf6495 --&gt;|satisfies| 212d1317cd2b25fc;
+  887db62e0fb2818d[&quot;Markdown Structure Validator&quot;];
+  click 887db62e0fb2818d &quot;Requirements.html#markdown-structure-validator&quot;;
+  class 887db62e0fb2818d requirement;
+  7b1772417b3ad5e[&quot;UserRequirements.md/Validate Markdown Structure&quot;];
+  class 7b1772417b3ad5e requirement;
+  click 7b1772417b3ad5e &quot;../UserRequirements.html#validate-markdown-structure&quot;;
+  887db62e0fb2818d -.-&gt;|deriveReqT| 7b1772417b3ad5e;
+  6136c216c9f80165 --&gt;|satisfies| 887db62e0fb2818d;
+  3b1e87396caf6495 --&gt;|satisfies| 887db62e0fb2818d;
+  c7d88aff4ec97281[&quot;Cross-Component Dependency Validator&quot;];
+  click c7d88aff4ec97281 &quot;Requirements.html#cross-component-dependency-validator&quot;;
+  class c7d88aff4ec97281 requirement;
+  6e40bf9f83a718fa[&quot;UserRequirements.md/Validate Cross-Component Dependencies&quot;];
+  class 6e40bf9f83a718fa requirement;
+  click 6e40bf9f83a718fa &quot;../UserRequirements.html#validate-cross-component-dependencies&quot;;
+  c7d88aff4ec97281 -.-&gt;|deriveReqT| 6e40bf9f83a718fa;
+  6136c216c9f80165 --&gt;|satisfies| c7d88aff4ec97281;
+  3b1e87396caf6495 --&gt;|satisfies| c7d88aff4ec97281;
+  1c2e7c81f9f01e10[&quot;Internal Consistency Validator&quot;];
+  click 1c2e7c81f9f01e10 &quot;Requirements.html#internal-consistency-validator&quot;;
+  class 1c2e7c81f9f01e10 requirement;
+  9e524ac696c43a26[&quot;UserRequirements.md/Validate Internal Consistency&quot;];
+  class 9e524ac696c43a26 requirement;
+  click 9e524ac696c43a26 &quot;../UserRequirements.html#validate-internal-consistency&quot;;
+  1c2e7c81f9f01e10 -.-&gt;|deriveReqT| 9e524ac696c43a26;
+  6136c216c9f80165 --&gt;|satisfies| 1c2e7c81f9f01e10;
+  3b1e87396caf6495 --&gt;|satisfies| 1c2e7c81f9f01e10;
+  ec201a112c9de469[&quot;Filesystem Structure Validator&quot;];
+  click ec201a112c9de469 &quot;Requirements.html#filesystem-structure-validator&quot;;
+  class ec201a112c9de469 requirement;
+  d834cc4bc9dbb07c[&quot;UserRequirements.md/Validate Filesystem Structure&quot;];
+  class d834cc4bc9dbb07c requirement;
+  click d834cc4bc9dbb07c &quot;../UserRequirements.html#validate-filesystem-structure&quot;;
+  ec201a112c9de469 -.-&gt;|deriveReqT| d834cc4bc9dbb07c;
+  6136c216c9f80165 --&gt;|satisfies| ec201a112c9de469;
+</div>
+<hr />
+<h3 id="markdown-structure-validator">Markdown Structure Validator</h3>
+<p>The system shall implement a markdown structure validator that enforces ReqFlow’s requirements for header levels, element structure, relation formatting, and other markdown-specific syntax rules, reporting violations with line numbers and suggested fixes.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../UserRequirements.html#validate-markdown-structure">UserRequirements.md/Validate Markdown Structure</a></li>
+<li>satisfiedBy: <a href="../../core/src/model.rs">model.rs</a></li>
+<li>satisfiedBy: <a href="../../core/src/parser.rs">parser.rs</a></li>
+</ul>
+<hr />
+<h3 id="filesystem-structure-validator">Filesystem Structure Validator</h3>
+<p>The system shall implement a validator that checks the organization of files and directories against the expected ReqFlow project structure, verifying required folders exist and files are appropriately placed according to configuration settings.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../UserRequirements.html#validate-filesystem-structure">UserRequirements.md/Validate Filesystem Structure</a></li>
+<li>satisfiedBy: <a href="../../core/src/model.rs">model.rs</a></li>
+</ul>
+<hr />
+<h3 id="internal-consistency-validator">Internal Consistency Validator</h3>
+<p>The system shall implement a consistency validator that verifies logical coherence within the model, including checking for circular dependencies, orphaned elements, and inconsistent relationship patterns, with detailed error reporting.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../UserRequirements.html#validate-internal-consistency">UserRequirements.md/Validate Internal Consistency</a></li>
+<li>satisfiedBy: <a href="../../core/src/model.rs">model.rs</a></li>
+<li>satisfiedBy: <a href="../../core/src/parser.rs">parser.rs</a></li>
+</ul>
+<hr />
+<h3 id="cross-component-dependency-validator">Cross-Component Dependency Validator</h3>
+<p>The system shall implement a specialized validator that analyzes dependencies across different model components, ensuring proper alignment between architectural layers, requirement levels, and verification elements.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../UserRequirements.html#validate-cross-component-dependencies">UserRequirements.md/Validate Cross-Component Dependencies</a></li>
+<li>satisfiedBy: <a href="../../core/src/model.rs">model.rs</a></li>
+<li>satisfiedBy: <a href="../../core/src/parser.rs">parser.rs</a></li>
+</ul>
+<hr />
+<h3 id="relation-element-type-validator">Relation Element Type Validator</h3>
+<p>The system shall implement validation that verifies relation endpoints have appropriate element types based on the relation type.</p>
+<h4>Details</h4>
+<ul>
+<li>For <code>verifiedBy</code>/<code>verify</code> relations, validate that one endpoint is a requirement element and the other is a verification element</li>
+<li>For <code>satisfiedBy</code>/<code>satisfy</code> relations, validate that one endpoint is a requirement element and the other is an implementation element</li>
+<li>Relations should only connect elements of appropriate types based on the RelationTypesRegistry definition</li>
+<li>Warnings should be issued when relation endpoints have incompatible element types</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../UserRequirements.html#validate-relation-types">../UserRequirements.md#Validate Relation Types</a></li>
+<li>derivedFrom: <a href="../SpecificationsRequirements.html#relation-types-specifications">../SpecificationsRequirements.md#Relation Types Specifications</a></li>
+<li>satisfiedBy: <a href="../../core/src/model.rs">model.rs</a></li>
+<li>satisfiedBy: <a href="../../core/src/parser.rs">parser.rs</a></li>
+</ul>
+<hr />
+<h2 id="reporting-features">Reporting Features</h2>
+<div class="mermaid">graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+
+  6f86272134897867[&quot;CLI Summary Report Flag&quot;];
+  click 6f86272134897867 &quot;Requirements.html#cli-summary-report-flag&quot;;
+  class 6f86272134897867 requirement;
+  cccd4e46e2b3239a[&quot;Model Summary Report Generator&quot;];
+  class cccd4e46e2b3239a requirement;
+  click cccd4e46e2b3239a &quot;Requirements.html#model-summary-report-generator&quot;;
+  6f86272134897867 --&gt;|refines| cccd4e46e2b3239a;
+  11ffc4632afd7c4c[&quot;cli.rs&quot;];
+  class 11ffc4632afd7c4c default;
+  click 11ffc4632afd7c4c &quot;../../cli/src/cli.rs&quot;;
+  11ffc4632afd7c4c --&gt;|satisfies| 6f86272134897867;
+  143766be8cc41384[&quot;Validation Report Generator&quot;];
+  click 143766be8cc41384 &quot;Requirements.html#validation-report-generator&quot;;
+  class 143766be8cc41384 requirement;
+  482c757913204fb8[&quot;UserRequirements.md/Provide Validation Reports&quot;];
+  class 482c757913204fb8 requirement;
+  click 482c757913204fb8 &quot;../UserRequirements.html#provide-validation-reports&quot;;
+  143766be8cc41384 -.-&gt;|deriveReqT| 482c757913204fb8;
+  6136c216c9f80165[&quot;model.rs&quot;];
+  class 6136c216c9f80165 default;
+  click 6136c216c9f80165 &quot;../../core/src/model.rs&quot;;
+  6136c216c9f80165 --&gt;|satisfies| 143766be8cc41384;
+  2ccb7e551054d40a[&quot;Report Export Formatter&quot;];
+  click 2ccb7e551054d40a &quot;Requirements.html#report-export-formatter&quot;;
+  class 2ccb7e551054d40a requirement;
+  2afa7f3a206a61b7[&quot;UserRequirements.md/Export Reports to Standard Formats&quot;];
+  class 2afa7f3a206a61b7 requirement;
+  click 2afa7f3a206a61b7 &quot;../UserRequirements.html#export-reports-to-standard-formats&quot;;
+  2ccb7e551054d40a -.-&gt;|deriveReqT| 2afa7f3a206a61b7;
+  57cbef16c5d7a81d[&quot;Dependency Report Generator&quot;];
+  click 57cbef16c5d7a81d &quot;Requirements.html#dependency-report-generator&quot;;
+  class 57cbef16c5d7a81d requirement;
+  812d42f453051272[&quot;UserRequirements.md/Generate Dependency Reports&quot;];
+  class 812d42f453051272 requirement;
+  click 812d42f453051272 &quot;../UserRequirements.html#generate-dependency-reports&quot;;
+  57cbef16c5d7a81d -.-&gt;|deriveReqT| 812d42f453051272;
+  d842bc0e30a46408[&quot;Verification Gap Analyzer&quot;];
+  click d842bc0e30a46408 &quot;Requirements.html#verification-gap-analyzer&quot;;
+  class d842bc0e30a46408 requirement;
+  d0e9e8d143493413[&quot;UserRequirements.md/Generate Verifications Reports&quot;];
+  class d0e9e8d143493413 requirement;
+  click d0e9e8d143493413 &quot;../UserRequirements.html#generate-verifications-reports&quot;;
+  d842bc0e30a46408 -.-&gt;|deriveReqT| d0e9e8d143493413;
+  b342220e0dc8751d[&quot;UserRequirements.md/Model Structure and Summaries&quot;];
+  class b342220e0dc8751d requirement;
+  click b342220e0dc8751d &quot;../UserRequirements.html#model-structure-and-summaries&quot;;
+  cccd4e46e2b3239a -.-&gt;|deriveReqT| b342220e0dc8751d;
+  6292255058880ee6[&quot;model.rs&quot;];
+  class 6292255058880ee6 default;
+  click 6292255058880ee6 &quot;../../core/src/reports.rs&quot;;
+  6292255058880ee6 --&gt;|satisfies| cccd4e46e2b3239a;
+</div>
+<hr />
+<h3 id="model-summary-report-generator">Model Summary Report Generator</h3>
+<p>The system shall implement a summary report generator that  produces comprehensive summaries of model relationships, including key metrics, element counts by type and counts.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../UserRequirements.html#model-structure-and-summaries">UserRequirements.md/Model Structure and Summaries</a></li>
+<li>satisfiedBy: <a href="../../core/src/reports.rs">model.rs</a></li>
+</ul>
+<hr />
+<h3 id="cli-summary-report-flag">CLI Summary Report Flag</h3>
+<p>The system shall provide a model summary report function, activated by the (–model-summary flag), which shall generate model summary report</p>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="#model-summary-report-generator">Model Summary Report Generator</a></li>
+<li>satisfiedBy: <a href="../../cli/src/cli.rs">cli.rs</a></li>
+</ul>
+<hr />
+<h3 id="validation-report-generator">Validation Report Generator</h3>
+<p>The system shall implement a validation report generator that compiles and formats validation results from all validators, providing a unified view of model quality with categorized issues, remediation suggestions, and compliance metrics.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../UserRequirements.html#provide-validation-reports">UserRequirements.md/Provide Validation Reports</a></li>
+<li>satisfiedBy: <a href="../../core/src/model.rs">model.rs</a></li>
+</ul>
+<hr />
+<h3 id="verification-gap-analyzer">Verification Gap Analyzer</h3>
+<p>The system shall implement a verification gap analyzer that identifies requirements lacking verification relationships, assesses verification coverage across the model, and produces reports highlighting verification deficiencies.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../UserRequirements.html#generate-verifications-reports">UserRequirements.md/Generate Verifications Reports</a></li>
+</ul>
+<hr />
+<h3 id="dependency-report-generator">Dependency Report Generator</h3>
+<p>The system shall implement a dependency report generator that analyzes and visualizes complex dependency chains within the model, highlighting critical paths, dependency clusters, and potential bottlenecks with impact assessments.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../UserRequirements.html#generate-dependency-reports">UserRequirements.md/Generate Dependency Reports</a></li>
+</ul>
+<hr />
+<h3 id="report-export-formatter">Report Export Formatter</h3>
+<p>The system shall implement format conversion engines for reports that transform internal report representations to standardized external formats including PDF, Excel, and HTML, preserving structural information and visual elements.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../UserRequirements.html#export-reports-to-standard-formats">UserRequirements.md/Export Reports to Standard Formats</a></li>
+</ul>
+<hr />
+
+        </div>
+    </div>
+</body>
+</html>

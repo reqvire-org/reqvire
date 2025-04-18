@@ -1,0 +1,243 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Requirements</title>
+    
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa;
+    color: #333;
+}
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+.content {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+h1 {
+    color: #333;
+    border-bottom: 2px solid #eaecef;
+    padding-bottom: 10px;
+    margin-top: 0;
+}
+h2 {
+    color: #333;
+    border-bottom: 1px solid #eaecef;
+    padding-bottom: 5px;
+}
+h3 {
+    color: #1a6fb7;
+    margin-top: 25px;
+}
+h4 {
+    color: #555;
+    font-weight: 600;
+}
+a {
+    color: #0366d6;
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 20px 0;
+}
+table, th, td {
+    border: 1px solid #dfe2e5;
+}
+th, td {
+    padding: 8px 12px;
+    text-align: left;
+}
+th {
+    background-color: #f6f8fa;
+}
+code {
+    background: #f6f8fa;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 90%;
+}
+pre {
+    background: #f6f8fa;
+    border-radius: 3px;
+    padding: 16px;
+    overflow: auto;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+}
+blockquote {
+    margin: 0;
+    padding: 0 15px;
+    color: #777;
+    border-left: 4px solid #dfe2e5;
+}
+.mermaid {
+    margin: 20px 0;
+    text-align: center;
+}
+</style>
+
+    <!-- Enhanced mermaid configuration for ReqFlow diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'neutral',
+            maxTextSize: 90000,
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            securityLevel: 'loose'
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="content">
+            <h1 id="test-requirements-with-invalid-relations">Test Requirements with Invalid Relations</h1>
+<p>This document contains requirements with intentional relation errors for testing validation.</p>
+<h2 id="requirements">Requirements</h2>
+<h3 id="valid-requirement">Valid Requirement</h3>
+<p>This is a valid requirement with proper relation types.</p>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="../UserRequirements.html#valid-user-requirement">../UserRequirements.md/Valid User Requirement</a></li>
+<li>satisfiedBy: <a href="ValidImplementation.txt">ValidImplementation.txt</a></li>
+</ul>
+<hr />
+<h3 id="valid-requirement">Valid Requirement</h3>
+<p>Duplicated element name. It will report also duplicate subsesction, something to fix later.</p>
+<h4>Relations</h4>
+<ul>
+<li>refine: #Valid Requirement</li>
+</ul>
+<hr />
+<h3 id="requirement-with-invalid-metadata-format">Requirement with invalid Metadata format</h3>
+<p>This requirement has invalid metadata format</p>
+<h4>Metadata</h4>
+<p>This is not ok.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: #Valid Requirement</li>
+</ul>
+<hr />
+<h3 id="another-requirement-with-invalid-metadata-format">Another requirement with invalid Metadata format</h3>
+<p>This another requirement has invalid metadata format</p>
+<h4>Metadata</h4>
+<ul>
+<li>nottype: something</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: #Valid Requirement</li>
+</ul>
+<hr />
+<h3 id="requirement-with-invalid-relation-format">Requirement with invalid Relation format</h3>
+<p>This requirement has invalid relations format and should </p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: #Valid Requirement
+This is not ok.</li>
+</ul>
+<hr />
+<h3 id="system-requirement-with-missing-parent-relation">System Requirement with Missing Parent Relation</h3>
+<p>This system requirement is missing parent relation.</p>
+<hr />
+<h3 id="requirement-with-invalid-relation-type">Requirement with Invalid Relation Type</h3>
+<p>This requirement has an invalid relation type with a typo.</p>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="../UserRequirements.html#valid-user-requirement">../UserRequirements.md/Valid User Requirement</a></li>
+<li>satisfiedBBy: <a href="ValidImplementation.txt">ValidImplementation.txt</a></li>
+</ul>
+<hr />
+<h3 id="requirement-with-duplicate-relations">Requirement with Duplicate Relations</h3>
+<p>This requirement has duplicate relations.</p>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="../UserRequirements.html#valid-user-requirement">../UserRequirements.md/Valid User Requirement</a></li>
+<li>satisfiedBy: <a href="ValidImplementation.txt">ValidImplementation.txt</a></li>
+<li>satisfiedBy: <a href="ValidImplementation.txt">ValidImplementation.txt</a></li>
+</ul>
+<hr />
+<h3 id="requirement-with-missing-target">Requirement with Missing Target</h3>
+<p>This requirement has a relation to a non-existent element.</p>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="../UserRequirements.html#valid-user-requirement">../UserRequirements.md/Valid User Requirement</a></li>
+<li>satisfiedBy: <a href="NonExistentElement.html#missing-element">NonExistentElement.md/Missing Element</a></li>
+</ul>
+<hr />
+<h3 id="requirement-with-incompactible-element">Requirement with Incompactible element</h3>
+<p>This requirement has incompactible element in relation, satisfiedBy cannot point to other requiremet.</p>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="../UserRequirements.html#valid-user-requirement">../UserRequirements.md/Valid User Requirement</a></li>
+<li>satisfiedBy: #Requirement with invalid relation type</li>
+</ul>
+<hr />
+<h3 id="requirement-with-circular-dependencies-a">Requirement with Circular dependencies A</h3>
+<p>This requirement has circular dependency</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: #Requirement with Circular dependencies C</li>
+</ul>
+<hr />
+<h3 id="requirement-with-circular-dependencies-b">Requirement with Circular dependencies B</h3>
+<p>This requirement has circular dependency</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: #Requirement with Circular dependencies A</li>
+</ul>
+<hr />
+<h3 id="requirement-with-circular-dependencies-c">Requirement with Circular dependencies C</h3>
+<p>This requirement has circular dependency</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: #Requirement with Circular dependencies B</li>
+</ul>
+<hr />
+<h3 id="requirement-with-invalid-target">Requirement with invalid target</h3>
+<p>This should be validated as invalid target because # is missing.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: Valid Requirement</li>
+</ul>
+<hr />
+<h3 id="requirement-with-duplicate-subsection">Requirement with Duplicate Subsection</h3>
+<p>This requirement has duplicate subsection.</p>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="../UserRequirements.html#valid-user-requirement">../UserRequirements.md/Valid User Requirement</a></li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="../UserRequirements.html#valid-user-requirement">../UserRequirements.md/Valid User Requirement</a></li>
+</ul>
+<hr />
+
+        </div>
+    </div>
+</body>
+</html>

@@ -11,21 +11,21 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  4cd0fe733f["Excess Whitespace Detection and Correction"];
-  click 4cd0fe733f "LintingTests.md#excess-whitespace-detection-and-correction";
-  class 4cd0fe733f verification;
-  3f3d3f9ccb["SystemRequirements/Requirements.md/Excess Whitespace Linting Implementation"];
-  class 3f3d3f9ccb requirement;
-  click 3f3d3f9ccb "../SystemRequirements/Requirements.md#excess-whitespace-linting-implementation";
-  4cd0fe733f -->|verifies| 3f3d3f9ccb;
-  8f2198f681["SystemRequirements/Requirements.md/Dry Run Mode"];
-  class 8f2198f681 requirement;
-  click 8f2198f681 "../SystemRequirements/Requirements.md#dry-run-mode";
-  4cd0fe733f -->|verifies| 8f2198f681;
-  3de539f546["tests/test-lint-expected/test.sh"];
-  class 3de539f546 default;
-  click 3de539f546 "../../tests/test-lint-expected/test.sh";
-  4cd0fe733f -->|traces| 3de539f546;
+  4cd0fe733f182d5c["Excess Whitespace Detection and Correction"];
+  click 4cd0fe733f182d5c "LintingTests.md#excess-whitespace-detection-and-correction";
+  class 4cd0fe733f182d5c verification;
+  3f3d3f9ccb15029a["SystemRequirements/Requirements.md/Excess Whitespace Linting Implementation"];
+  class 3f3d3f9ccb15029a requirement;
+  click 3f3d3f9ccb15029a "../SystemRequirements/Requirements.md#excess-whitespace-linting-implementation";
+  4cd0fe733f182d5c -.->|verifies| 3f3d3f9ccb15029a;
+  8f2198f681f63fea["SystemRequirements/Requirements.md/Dry Run Mode"];
+  class 8f2198f681f63fea requirement;
+  click 8f2198f681f63fea "../SystemRequirements/Requirements.md#dry-run-mode";
+  4cd0fe733f182d5c -.->|verifies| 8f2198f681f63fea;
+  3de539f546654b01["tests/test-lint-expected/test.sh"];
+  class 3de539f546654b01 default;
+  click 3de539f546654b01 "../../tests/test-lint-expected/test.sh";
+  4cd0fe733f182d5c -.->|trace| 3de539f546654b01;
 ```
 
 ---
@@ -70,21 +70,21 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  97e9fdec98["External Folders Support Verification"];
-  click 97e9fdec98 "LintingTests.md#external-folders-support-verification";
-  class 97e9fdec98 verification;
-  d38ab4ad13["SystemRequirements/Requirements.md#External Folders Support"];
-  class d38ab4ad13 requirement;
-  click d38ab4ad13 "../SystemRequirements/Requirements.md#external-folders-support";
-  97e9fdec98 -->|verifies| d38ab4ad13;
-  99bed90a0d["SystemRequirements/Requirements.md#Requirements Processing"];
-  class 99bed90a0d requirement;
-  click 99bed90a0d "../SystemRequirements/Requirements.md#requirements-processing";
-  97e9fdec98 -->|verifies| 99bed90a0d;
-  a38888f271["tests/test-external-folders/test.sh"];
-  class a38888f271 default;
-  click a38888f271 "../../tests/test-external-folders/test.sh";
-  97e9fdec98 -->|traces| a38888f271;
+  97e9fdec98b5f3e5["External Folders Support Verification"];
+  click 97e9fdec98b5f3e5 "LintingTests.md#external-folders-support-verification";
+  class 97e9fdec98b5f3e5 verification;
+  d38ab4ad139183d3["SystemRequirements/Requirements.md#External Folders Support"];
+  class d38ab4ad139183d3 requirement;
+  click d38ab4ad139183d3 "../SystemRequirements/Requirements.md#external-folders-support";
+  97e9fdec98b5f3e5 -.->|verifies| d38ab4ad139183d3;
+  99bed90a0d96a1d2["SystemRequirements/Requirements.md#Requirements Processing"];
+  class 99bed90a0d96a1d2 requirement;
+  click 99bed90a0d96a1d2 "../SystemRequirements/Requirements.md#requirements-processing";
+  97e9fdec98b5f3e5 -.->|verifies| 99bed90a0d96a1d2;
+  a38888f27160e7fa["tests/test-external-folders/test.sh"];
+  class a38888f27160e7fa default;
+  click a38888f27160e7fa "../../tests/test-external-folders/test.sh";
+  97e9fdec98b5f3e5 -.->|trace| a38888f27160e7fa;
 ```
 
 ---

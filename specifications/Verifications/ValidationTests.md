@@ -11,25 +11,25 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  fbf9362574["Invalid Relations Test"];
-  click fbf9362574 "ValidationTests.md#invalid-relations-test";
-  class fbf9362574 verification;
-  bdfd9d65e4["SystemRequirements/Requirement.md/Detailed Error Handling and Logging"];
-  class bdfd9d65e4 requirement;
-  click bdfd9d65e4 "../SystemRequirements/Requirements.md#detailed-error-handling-and-logging";
-  fbf9362574 -->|verifies| bdfd9d65e4;
-  5870488e00["SystemRequirements/Requirement.md/Relation Type Validation"];
-  class 5870488e00 requirement;
-  click 5870488e00 "../SystemRequirements/Requirements.md#relation-type-validation";
-  fbf9362574 -->|verifies| 5870488e00;
-  212d1317cd["SystemRequirements/Requirement.md/Relation Element Type Validator"];
-  class 212d1317cd requirement;
-  click 212d1317cd "../SystemRequirements/Requirements.md#relation-element-type-validator";
-  fbf9362574 -->|verifies| 212d1317cd;
-  c86fd6ece7["tests/test-invalid-relations/test.sh"];
-  class c86fd6ece7 default;
-  click c86fd6ece7 "../../tests/test-invalid-relations/test.sh";
-  fbf9362574 -->|traces| c86fd6ece7;
+  fbf9362574b057dd["Invalid Relations Test"];
+  click fbf9362574b057dd "ValidationTests.md#invalid-relations-test";
+  class fbf9362574b057dd verification;
+  bdfd9d65e46117e7["SystemRequirements/Requirement.md/Detailed Error Handling and Logging"];
+  class bdfd9d65e46117e7 requirement;
+  click bdfd9d65e46117e7 "../SystemRequirements/Requirements.md#detailed-error-handling-and-logging";
+  fbf9362574b057dd -.->|verifies| bdfd9d65e46117e7;
+  5870488e00ee4f36["SystemRequirements/Requirement.md/Relation Type Validation"];
+  class 5870488e00ee4f36 requirement;
+  click 5870488e00ee4f36 "../SystemRequirements/Requirements.md#relation-type-validation";
+  fbf9362574b057dd -.->|verifies| 5870488e00ee4f36;
+  212d1317cd2b25fc["SystemRequirements/Requirement.md/Relation Element Type Validator"];
+  class 212d1317cd2b25fc requirement;
+  click 212d1317cd2b25fc "../SystemRequirements/Requirements.md#relation-element-type-validator";
+  fbf9362574b057dd -.->|verifies| 212d1317cd2b25fc;
+  c86fd6ece7a8668a["tests/test-invalid-relations/test.sh"];
+  class c86fd6ece7a8668a default;
+  click c86fd6ece7a8668a "../../tests/test-invalid-relations/test.sh";
+  fbf9362574b057dd -.->|trace| c86fd6ece7a8668a;
 ```
 
 ---

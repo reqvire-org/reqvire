@@ -20,6 +20,8 @@ pub struct RelationTypeInfo {
     pub direction: RelationDirection,
     pub opposite: Option<&'static str>,
     pub description: &'static str,
+    pub arrow: &'static str,
+    pub label: &'static str,    
 }
 
 lazy_static! {
@@ -32,12 +34,17 @@ lazy_static! {
             direction: RelationDirection::Backward, 
             opposite: Some("contain"),
             description: "Element is contained by another element",
+            arrow: "--o",
+            label: "contains",              
+           
         });
         m.insert("contain", RelationTypeInfo {
             name: "contain", 
             direction: RelationDirection::Forward, 
             opposite: Some("containedBy"),
             description: "Element contains another element",
+            arrow: "--o",
+            label: "contains",             
         });
         
         // Derive relations
@@ -46,12 +53,16 @@ lazy_static! {
             direction: RelationDirection::Backward, 
             opposite: Some("derive"),
             description: "Element is derived from another element",
+            arrow: "-.->",
+            label: "deriveReqT",            
         });
         m.insert("derive", RelationTypeInfo {
             name: "derive", 
             direction: RelationDirection::Forward, 
             opposite: Some("derivedFrom"),
             description: "Element is source for a derived element",
+            arrow: "-.->",
+            label: "deriveReqT",            
         });
         
         // Refine relation
@@ -60,6 +71,8 @@ lazy_static! {
             direction: RelationDirection::Backward,
             opposite: Some("refinedBy"),
             description: "Element refines a higher-level element",
+            arrow: "-->",
+            label: "refines",     
         });
         
         // Refine relation
@@ -68,6 +81,8 @@ lazy_static! {
             direction: RelationDirection::Forward,
             opposite: Some("refine"),
             description: "A souce element being refined by other element.",
+            arrow: "-->",
+            label: "refines",              
         });        
         
         // Satisfy relations
@@ -76,12 +91,16 @@ lazy_static! {
             direction: RelationDirection::Forward, 
             opposite: Some("satisfy"),
             description: "A souce element being satisfied by other element.",
+            arrow: "-->",
+            label: "satisfies",              
         });
         m.insert("satisfy", RelationTypeInfo {
             name: "satisfy", 
             direction: RelationDirection::Backward, 
             opposite: Some("satisfiedBy"),
             description: "Element satisfies another element",
+            arrow: "-->",
+            label: "satisfies",             
         });
         
         // Verify relations
@@ -90,12 +109,16 @@ lazy_static! {
             direction: RelationDirection::Forward, 
             opposite: Some("verify"),
             description: "A souce element being verified by other element.",
+            arrow: "-.->",
+            label: "verifies",            
         });
         m.insert("verify", RelationTypeInfo {
             name: "verify", 
             direction: RelationDirection::Backward, 
             opposite: Some("verifiedBy"),
             description: "Element verifies another element",
+            arrow: "-.->",
+            label: "verifies",            
         });
         
         // Trace relations
@@ -104,6 +127,8 @@ lazy_static! {
             direction: RelationDirection::Neutral, 
             opposite: None,
             description: "Element is related to another element in a non-directional way",
+            arrow: "-.->",
+            label: "trace",              
         });
 
         m

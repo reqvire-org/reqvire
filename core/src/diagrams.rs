@@ -5,7 +5,7 @@ use crate::error::ReqFlowError;
 use std::path::PathBuf;
 use crate::utils;
 use log::debug;
-use crate::relation::LinkType;
+use crate::relation;
 use crate::element::ElementType;
 use crate::element::RequirementType;
 
@@ -124,9 +124,12 @@ fn add_element_to_diagram(
 
 
     for relation in &element.relations {
+        if !relation.is_opposite {
+        
+        
         let label = relation.target.text.clone();
         let target_id = match &relation.target.link {
-            LinkType::Identifier(target) => {            
+            relation::LinkType::Identifier(target) => {            
                 
                 let target_id = utils::hash_identifier(&target);               
 
@@ -160,7 +163,7 @@ fn add_element_to_diagram(
                 }
                 target_id
             },
-            LinkType::ExternalUrl(url) => {
+            relation::LinkType::ExternalUrl(url) => {
                 // Always add external URLs, regardless of `included_elements`
                 let target_id = utils::hash_identifier(url);
                 diagram.push_str(&format!("  {}[\"{}\"];\n", target_id, label));
@@ -173,46 +176,31 @@ fn add_element_to_diagram(
         };
 
 
-        let properties = get_relation_properties(relation.relation_type.name);
-        let (from_id, to_id) = if properties.reverse_direction {
-            (target_id.clone(), element_id.clone())
-        } else {
-            (element_id.clone(), target_id.clone())
-        };
+        if let Some(info) = relation::RELATION_TYPES.get(relation.relation_type.name) {
+            // pick from/to based on semantic direction
+            let (from_id, to_id) = match info.direction {
+                relation::RelationDirection::Forward => (target_id.clone(), element_id.clone()),
+                _                           => (element_id.clone(), target_id.clone()),
+            };
 
-        diagram.push_str(&format!("  {} {}|{}| {};\n", from_id, properties.arrow, properties.label, to_id));
+            diagram.push_str(&format!(
+                "  {} {}|{}| {};\n",
+                from_id,
+                info.arrow,
+                info.label,
+                to_id,
+            ));
+        } else {
+            // fallback: unknown relation
+            diagram.push_str(&format!(
+                "  {} -->|relates to| {};\n",
+                element_id, target_id,
+            ));
+        }
+        }
     }
 
     Ok(())
 }
-
-
-
-/// Returns relation properties (arrow, label, direction)
-fn get_relation_properties(relation_type: &str) -> RelationProperties {
-    match relation_type {
-        "verifiedBy" => RelationProperties { arrow: "-->", label: "verifies", reverse_direction: true },
-        "satisfiedBy" => RelationProperties { arrow: "-->", label: "satisfies", reverse_direction: true },
-        "derivedFrom" => RelationProperties { arrow: "-.->", label: "deriveReqT", reverse_direction: false },
-        "tracedFrom" => RelationProperties { arrow: "-->", label: "traces", reverse_direction: true },
-        "containedBy" => RelationProperties { arrow: "--o", label: "contains", reverse_direction: true },
-        "verify" => RelationProperties { arrow: "-->", label: "verifies", reverse_direction: false },
-        "satisfy" => RelationProperties { arrow: "-->", label: "satisfies", reverse_direction: false },
-        "derive" => RelationProperties { arrow: "-.->", label: "deriveReqT", reverse_direction: true },
-        "refine" => RelationProperties { arrow: "==>", label: "refines", reverse_direction: false },
-        "trace" => RelationProperties { arrow: "-->", label: "traces", reverse_direction: false },
-        "contain" => RelationProperties { arrow: "--o", label: "contains", reverse_direction: false },
-        _ => RelationProperties { arrow: "-->", label: "relates to", reverse_direction: false },
-    }
-}
-
-
-/// Struct for relation properties
-struct RelationProperties {
-    arrow: &'static str,
-    label: &'static str,
-    reverse_direction: bool,
-}
-
 
 

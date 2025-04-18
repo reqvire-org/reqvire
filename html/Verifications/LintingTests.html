@@ -1,0 +1,239 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LintingTests</title>
+    
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa;
+    color: #333;
+}
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+.content {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+h1 {
+    color: #333;
+    border-bottom: 2px solid #eaecef;
+    padding-bottom: 10px;
+    margin-top: 0;
+}
+h2 {
+    color: #333;
+    border-bottom: 1px solid #eaecef;
+    padding-bottom: 5px;
+}
+h3 {
+    color: #1a6fb7;
+    margin-top: 25px;
+}
+h4 {
+    color: #555;
+    font-weight: 600;
+}
+a {
+    color: #0366d6;
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 20px 0;
+}
+table, th, td {
+    border: 1px solid #dfe2e5;
+}
+th, td {
+    padding: 8px 12px;
+    text-align: left;
+}
+th {
+    background-color: #f6f8fa;
+}
+code {
+    background: #f6f8fa;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 90%;
+}
+pre {
+    background: #f6f8fa;
+    border-radius: 3px;
+    padding: 16px;
+    overflow: auto;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+}
+blockquote {
+    margin: 0;
+    padding: 0 15px;
+    color: #777;
+    border-left: 4px solid #dfe2e5;
+}
+.mermaid {
+    margin: 20px 0;
+    text-align: center;
+}
+</style>
+
+    <!-- Enhanced mermaid configuration for ReqFlow diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'neutral',
+            maxTextSize: 90000,
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            securityLevel: 'loose'
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="content">
+            <h1 id="linting-tests">Linting Tests</h1>
+<p>This document verifies the requirements for ReqFlow’s linting functionality.</p>
+<h2 id="whitespace-linting-tests">Whitespace Linting Tests</h2>
+<div class="mermaid">graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+
+  4cd0fe733f182d5c[&quot;Excess Whitespace Detection and Correction&quot;];
+  click 4cd0fe733f182d5c &quot;LintingTests.html#excess-whitespace-detection-and-correction&quot;;
+  class 4cd0fe733f182d5c verification;
+  3f3d3f9ccb15029a[&quot;SystemRequirements/Requirements.md/Excess Whitespace Linting Implementation&quot;];
+  class 3f3d3f9ccb15029a requirement;
+  click 3f3d3f9ccb15029a &quot;../SystemRequirements/Requirements.html#excess-whitespace-linting-implementation&quot;;
+  4cd0fe733f182d5c -.-&gt;|verifies| 3f3d3f9ccb15029a;
+  8f2198f681f63fea[&quot;SystemRequirements/Requirements.md/Dry Run Mode&quot;];
+  class 8f2198f681f63fea requirement;
+  click 8f2198f681f63fea &quot;../SystemRequirements/Requirements.html#dry-run-mode&quot;;
+  4cd0fe733f182d5c -.-&gt;|verifies| 8f2198f681f63fea;
+  3de539f546654b01[&quot;tests/test-lint-expected/test.sh&quot;];
+  class 3de539f546654b01 default;
+  click 3de539f546654b01 &quot;../../tests/test-lint-expected/test.sh&quot;;
+  4cd0fe733f182d5c -.-&gt;|trace| 3de539f546654b01;
+</div>
+<hr />
+<h3 id="excess-whitespace-detection-and-correction">Excess Whitespace Detection and Correction</h3>
+<p>The verification test checks that ReqFlow correctly identifies and fixes excess whitespace after headers.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: verification</li>
+</ul>
+<h4>Acceptance Criteria</h4>
+<ul>
+<li>System should detect excess whitespace after headers</li>
+<li>System should fix excess whitespace in linting mode</li>
+<li>The output should show before/after changes</li>
+</ul>
+<h4>Test Criteria</h4>
+<ul>
+<li>Command exits with success (0) return code</li>
+<li>Output shows whitespace being fixed</li>
+<li>Output should contain diff-style formatting</li>
+</ul>
+<h4>Test Procedure</h4>
+<ol>
+<li>Create a test fixture in <code>/tests/fixtures/test-lint-headers/</code> with excess whitespace after headers</li>
+<li>Run ReqFlow linting in dry-run mode to check detection</li>
+<li>Verify that excess whitespace is reported</li>
+<li>Run ReqFlow linting in normal mode to apply fixes</li>
+<li>Verify that the whitespace has been corrected in the output files</li>
+</ol>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../SystemRequirements/Requirements.html#excess-whitespace-linting-implementation">SystemRequirements/Requirements.md/Excess Whitespace Linting Implementation</a></li>
+<li>verify: <a href="../SystemRequirements/Requirements.html#dry-run-mode">SystemRequirements/Requirements.md/Dry Run Mode</a></li>
+<li>trace: <a href="../../tests/test-lint-expected/test.sh">tests/test-lint-expected/test.sh</a></li>
+</ul>
+<hr />
+<h2 id="external-folders-tests">External Folders Tests</h2>
+<div class="mermaid">graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+
+  97e9fdec98b5f3e5[&quot;External Folders Support Verification&quot;];
+  click 97e9fdec98b5f3e5 &quot;LintingTests.html#external-folders-support-verification&quot;;
+  class 97e9fdec98b5f3e5 verification;
+  d38ab4ad139183d3[&quot;SystemRequirements/Requirements.md#External Folders Support&quot;];
+  class d38ab4ad139183d3 requirement;
+  click d38ab4ad139183d3 &quot;../SystemRequirements/Requirements.html#external-folders-support&quot;;
+  97e9fdec98b5f3e5 -.-&gt;|verifies| d38ab4ad139183d3;
+  99bed90a0d96a1d2[&quot;SystemRequirements/Requirements.md#Requirements Processing&quot;];
+  class 99bed90a0d96a1d2 requirement;
+  click 99bed90a0d96a1d2 &quot;../SystemRequirements/Requirements.html#requirements-processing&quot;;
+  97e9fdec98b5f3e5 -.-&gt;|verifies| 99bed90a0d96a1d2;
+  a38888f27160e7fa[&quot;tests/test-external-folders/test.sh&quot;];
+  class a38888f27160e7fa default;
+  click a38888f27160e7fa &quot;../../tests/test-external-folders/test.sh&quot;;
+  97e9fdec98b5f3e5 -.-&gt;|trace| a38888f27160e7fa;
+</div>
+<hr />
+<h3 id="external-folders-support-verification">External Folders Support Verification</h3>
+<p>The verification test checks that ReqFlow correctly processes requirements in external folders.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: verification</li>
+</ul>
+<h4>Acceptance Criteria</h4>
+<ul>
+<li>System should process requirements in external folders</li>
+<li>System should treat external requirements as system requirements</li>
+<li>User Requirements in external folders should cause validation errors</li>
+</ul>
+<h4>Test Criteria</h4>
+<ul>
+<li>Validation succeeds with proper external folder setup</li>
+<li>Validation fails when external folder contains user requirements</li>
+<li>Diagram generation includes external folder requirements</li>
+</ul>
+<h4>Test Procedure</h4>
+<ol>
+<li>Set up test fixtures in <code>/tests/fixtures/test-external-folders/</code> with external folders configuration</li>
+<li>Run ReqFlow with invalid setup (user requirements in external folder)</li>
+<li>Verify that validation reports the appropriate error</li>
+<li>Run ReqFlow with valid setup (only system requirements in external folder)</li>
+<li>Verify that validation succeeds and requirements are properly processed</li>
+</ol>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../SystemRequirements/Requirements.html#external-folders-support">SystemRequirements/Requirements.md#External Folders Support</a></li>
+<li>verify: <a href="../SystemRequirements/Requirements.html#requirements-processing">SystemRequirements/Requirements.md#Requirements Processing</a></li>
+<li>trace: <a href="../../tests/test-external-folders/test.sh">tests/test-external-folders/test.sh</a></li>
+</ul>
+
+        </div>
+    </div>
+</body>
+</html>
