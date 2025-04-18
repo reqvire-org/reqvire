@@ -57,7 +57,7 @@ REQ 6:Requirement with main text and relations and metadata and details differen
 
 REQ 7:Requirement with main text and relations and metadata and details different order (C). REQ 7 Details.
 
-REQ 8:Requirement with main text and relations details with <details> element that should not break parsing and validation.    <details>"
+REQ 8:Requirement with main text and relations details with <details> element that should not break parsing and validation.    <details> ### REQ 8 Nested requirement which should not be processed as requirement. #### Relations   * derivedFrom: #req-0          </details>"
 
 
 

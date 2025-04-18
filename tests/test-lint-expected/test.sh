@@ -21,7 +21,6 @@ EXIT_CODE=$?
 
 printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
 
-#echo "$OUTPUT"
 
 ISSUES=$(awk '/# [^:]+:/' "${TEST_DIR}/test_results.log")
 ISSUE_COUNTS=$(echo "$ISSUES" | awk -F': ' '{counts[$1]++} END {for (type in counts) print counts[type], type}')
@@ -29,7 +28,7 @@ ISSUE_COUNTS=$(echo "$ISSUES" | awk -F': ' '{counts[$1]++} END {for (type in cou
 EXPECTED_ISSUES=$(cat <<EOF
 1 # Nonlink identifier
 1 # Inconsistent reserved subsections
-3 # Inconsistent newlines
+2 # Inconsistent newlines
 2 # Excess whitespace
 1 # Missing separator
 EOF
@@ -78,9 +77,27 @@ Content
 
 More content
 
+#### Details
+
+<details>
+### This must be ignored
+
+Yes
+
+### End this
+
+Yes
+
+
+
+
+
+#### Relations
+* derivedFrom: #do-not-change
+</details>
+
 
 ---
-
 
 ### Requirement
  
@@ -95,7 +112,6 @@ More content
 ### New Requirement
  
 Other stuff."
-
 
 
 # Remove ANSI color codes

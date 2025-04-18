@@ -19,71 +19,97 @@ pub mod reserved_subsections;
 pub mod nonlink_identifiers;
 
 pub fn run_linting(
-    specification_folder: &PathBuf, 
-    external_folders: &[PathBuf], 
-    excluded_filename_patterns: &GlobSet, 
-    dry_run: bool
+    specification_folder: &PathBuf,
+    external_folders: &[PathBuf],
+    excluded_filename_patterns: &GlobSet,
+    dry_run: bool,
 ) -> Result<(), ReqFlowError> {
     debug!("Starting linting process in {:?}", specification_folder);
-    
-    let mut lint_suggestions = Vec::new();
-    let files = utils::scan_markdown_files(None,specification_folder, external_folders, excluded_filename_patterns);
+
+    let files = utils::scan_markdown_files(
+        None,
+        specification_folder,
+        external_folders,
+        excluded_filename_patterns,
+    );
     debug!("Found {} markdown files to lint", files.len());
 
-    for (file_path, _) in files {        
-        // Apply each linting rule separately, saving the file after each. (order matters).
-        let linting_rules: Vec<fn(&str, &Path) -> Vec<LintSuggestion>> = vec![
-            reserved_subsections::fix_reserved_subsections,                
+    for (file_path, _) in files {
+        let original_content = fs::read_to_string(&file_path)?;
+        let mut modified_content = original_content.clone();
+
+        // ── PHASE 1: STRUCTURAL ──
+        let structural_rules: Vec<fn(&str, &Path) -> Vec<LintSuggestion>> = vec![
+            // pick whatever order you like now—either nonlink→reserved or reserved→nonlink
+            nonlink_identifiers::find_nonlink_identifiers,
+            reserved_subsections::fix_reserved_subsections,
             absolute_links::find_absolute_links,
-            nonlink_identifiers::find_nonlink_identifiers,            
             whitespace::find_excess_whitespace,
-            newlines::find_inconsistent_newlines,            
-            separators::find_missing_separators,                                                            
-          //  indentation::find_inconsistent_indentation,
+            separators::find_missing_separators,
         ];
 
-        let original_content = fs::read_to_string(&file_path)?;
-        let file_content_for_linting = remove_details_blocks(&original_content);
+        let mut all_suggestions = Vec::new();
+        for rule in structural_rules {
+            let mut suggestions = rule(&remove_details_blocks(&modified_content), &file_path);
 
-        for lint_rule in linting_rules {
-            let mut suggestions = lint_rule(&file_content_for_linting, &file_path);
-
-            if suggestions.is_empty() {
-                continue;
-            }
-
-            if dry_run {
-                lint_suggestions.extend(suggestions);
-            } else {
-                suggestions.sort_by(|a, b| b.line_number.unwrap_or(0).cmp(&a.line_number.unwrap_or(0)));
-
-                // IMPORTANT: Apply fixes to original content
-                let mut new_file_content = original_content.clone();
+            if !dry_run {
+                suggestions.sort_by(|a, b| {
+                    b.line_number.unwrap_or(0).cmp(&a.line_number.unwrap_or(0))
+                });
                 for suggestion in &suggestions {
-                    new_file_content = apply_fix(&new_file_content, suggestion);
-                    println!("✅ Applied fix: {} to {}", suggestion.description, file_path.display());
+                    modified_content = apply_fix(&modified_content, suggestion);
+                    println!(
+                        "✅ Applied fix: {} to {}",
+                        suggestion.description,
+                        file_path.display()
+                    );
                 }
+            }
 
-                // Overwrite with actual, corrected version (preserving <details>)
-                fs::write(&file_path, &new_file_content)?;
-            }
+            all_suggestions.append(&mut suggestions);
         }
-    }
-    
-    if dry_run {
-        if lint_suggestions.is_empty() {
-            println!("✅ No linting issues found.");
-        } else {
-            for suggestion in &lint_suggestions {
-                let _ = suggestion.print_colorized_diff();
+
+        // ── PHASE 2: SPACING ──
+        let mut spacing_suggestions =
+            newlines::find_inconsistent_newlines(&modified_content, &file_path);
+        if !dry_run {
+            spacing_suggestions.sort_by(|a, b| {
+                b.line_number.unwrap_or(0).cmp(&a.line_number.unwrap_or(0))
+            });
+            for suggestion in &spacing_suggestions {
+                modified_content = apply_fix(&modified_content, suggestion);
+                println!(
+                    "✅ Applied spacing fix: {} to {}",
+                    suggestion.description,
+                    file_path.display()
+                );
             }
-            println!("⚠️ Found {} linting issues:", lint_suggestions.len());             
-            println!("Run without --dry-run to apply fixes.");
+        } else {
+            all_suggestions.append(&mut spacing_suggestions);
+        }
+
+        // write out if changed
+        if !dry_run && modified_content != original_content {
+            fs::write(&file_path, &modified_content)?;
+        }
+
+        // dry‐run report
+        if dry_run {
+            if all_suggestions.is_empty() {
+                println!("✅ No linting issues found.");
+            } else {
+                for suggestion in &all_suggestions {
+                    let _ = suggestion.print_colorized_diff();
+                }
+                println!("⚠️ Found {} linting issues:", all_suggestions.len());
+                println!("Run without --dry-run to apply fixes.");
+            }
         }
     }
 
     Ok(())
 }
+
 
 /// Applies a single lint fix to the given content.
 fn apply_fix(content: &str, suggestion: &LintSuggestion) -> String {

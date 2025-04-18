@@ -2,118 +2,131 @@ use std::path::Path;
 use regex::Regex;
 use lazy_static::lazy_static;
 use crate::linting::{LintSuggestion, LintType, LintFix};
-/// Ensures exactly one blank line before each heading (##, ###, ####) or horizontal rule (`---`).
-pub fn find_inconsistent_newlines(content: &str, file_path: &Path) -> Vec<LintSuggestion> {
+
+/// Ensures exactly one blank line before each heading (##, ###, ####) or horizontal rule (`---`),
+/// but ignores any such lines inside <details>…</details> blocks.
+pub fn find_inconsistent_newlines(
+    content: &str,
+    file_path: &Path,
+) -> Vec<LintSuggestion> {
     lazy_static! {
-        // Combine your old heading check with an `---` check in a single pattern.
-        // This pattern means: start of line, then either exactly `---` or `##+ some text`.
-        // Adjust if you also want # or other heading forms.
+        // Trigger on either '---' or any ##/###/#### heading
         static ref TRIGGER_REGEX: Regex = Regex::new(r"^(---|#{2,4}\s+.+)$").unwrap();
+        static ref DETAILS_OPEN: Regex  = Regex::new(r"(?i)<details[^>]*>").unwrap();
+        static ref DETAILS_CLOSE: Regex = Regex::new(r"(?i)</details>").unwrap();
     }
 
-    // Keep your existing required blank lines
-    let required_blank_lines = 1;
     let lines: Vec<&str> = content.lines().collect();
     let mut suggestions = Vec::new();
 
+    // Phase 0: record all <details>…</details> intervals
+    let mut details_ranges = Vec::new();
+    let mut in_details = false;
+    let mut start_idx = 0;
+    for (i, raw) in lines.iter().enumerate() {
+        let t = raw.trim();
+        if !in_details && DETAILS_OPEN.is_match(t) {
+            in_details = true;
+            start_idx = i;
+        }
+        if in_details && DETAILS_CLOSE.is_match(t) {
+            // record only the interior lines [start_idx+1 .. i)
+            if start_idx + 1 < i {
+                details_ranges.push((start_idx+1)..i);
+            }
+            in_details = false;
+        }        
+    }
+    let in_details_block = |idx: usize| {
+        details_ranges.iter().any(|r| r.contains(&idx))
+    };
+
+    let required = 1;
+
     for i in 0..lines.len() {
-        // If we're at line 0, there's no line above. Typically skip or handle differently
+        // skip any lines inside details blocks
+        if in_details_block(i) {
+            continue;
+        }
         if i == 0 {
             continue;
         }
-        let current_line = lines[i];
+        let trimmed = lines[i].trim();
+        if !TRIGGER_REGEX.is_match(trimmed) {
+            continue;
+        }
 
-        // Check if line is "### heading" OR "---"
-        if TRIGGER_REGEX.is_match(current_line.trim()) {
-            // We now enforce exactly one blank line above `i`.
-            // Count how many consecutive blank lines are immediately above `i`.
-            let mut blank_count = 0;
-            let mut j = i;
-            while j > 0 {
-                if lines[j - 1].trim().is_empty() {
-                    blank_count += 1;
-                    j -= 1;
-                } else {
-                    break;
-                }
+        // collect all *outside‑details* blank lines immediately above i
+        let mut blank_idxs = Vec::new();
+        let mut k = i;
+        while k > 0 {
+            let above = k - 1;
+            if in_details_block(above) {
+                // skip over the detail region
+                k = above;
+                continue;
             }
+            if lines[above].trim().is_empty() {
+                blank_idxs.push(above);
+                k = above;
+                continue;
+            }
+            break;
+        }
 
-            match blank_count.cmp(&required_blank_lines) {
-                // ============================================
-                // 0 blank lines => Insert the missing one
-                // ============================================
-                std::cmp::Ordering::Less => {
-                    let needed = required_blank_lines - blank_count;
+        match blank_idxs.len().cmp(&required) {
+            std::cmp::Ordering::Less => {
+                let need = required - blank_idxs.len();
+                suggestions.push(LintSuggestion::new(
+                    LintType::InconsistentNewlines,
+                    file_path.to_path_buf(),
+                    Some(i + 1),
+                    format!("Missing blank line(s) before '{}'. Need {}.", trimmed, required),
+                    LintFix::InsertAt {
+                        line: i,
+                        new_content: "\n".repeat(need),
+                    },
+                ));
+            }
+            std::cmp::Ordering::Equal => {
+                // exactly one: check for trailing spaces
+                let idx = blank_idxs[0];
+                if !lines[idx].is_empty() {
                     suggestions.push(LintSuggestion::new(
                         LintType::InconsistentNewlines,
                         file_path.to_path_buf(),
-                        Some(i + 1),
+                        Some(idx + 1),
                         format!(
-                            "Missing blank line(s) before '{}'. Need {}.",
-                            current_line.trim(),
-                            required_blank_lines
+                            "Blank line above '{}' contains trailing spaces. Replacing with a truly empty line.",
+                            trimmed
                         ),
-                        LintFix::InsertAt {
-                            line: i,
-                            new_content: "\n".repeat(needed),
+                        LintFix::ReplaceLine {
+                            line: idx,
+                            new_content: "".to_string(),
                         },
                     ));
                 }
-
-                // ============================================
-                // Exactly 1 blank line => Maybe fix trailing spaces
-                // ============================================
-                std::cmp::Ordering::Equal => {
-                    // If there's exactly 1 blank line, see if it has trailing spaces
-                    let blank_line_index = i - 1;
-                    let actual_line = lines[blank_line_index];
-                    if !actual_line.is_empty() {
-                        // Means there's some whitespace
-                        suggestions.push(LintSuggestion::new(
-                            LintType::InconsistentNewlines,
-                            file_path.to_path_buf(),
-                            Some(blank_line_index + 1),
-                            format!(
-                                "Blank line above '{}' contains trailing spaces. Replacing with a truly empty line.",
-                                current_line.trim()
-                            ),
-                            LintFix::ReplaceLine {
-                                line: blank_line_index,
-                                new_content: "".to_string(),
-                            }
-                        ));
-                    }
-                }
-
-                // ============================================
-                // More than 1 => remove extras
-                // ============================================
-                std::cmp::Ordering::Greater => {
-
-
-                    // We keep the *topmost* blank line, remove the rest
-                    let remove_start = j + 1; // j is the index of the first blank line, keep that
-                    let remove_end = j + blank_count; 
-                    let remove_lines: Vec<usize> = (remove_start..remove_end).collect();
-
-                    suggestions.push(LintSuggestion::new(
-                        LintType::InconsistentNewlines,
-                        file_path.to_path_buf(),
-                        Some(i + 1),
-                        format!(
-                            "Excess blank lines before '{}'. Expected {}.",
-                            current_line.trim(),
-                            required_blank_lines
-                        ),
-                        LintFix::RemoveLines { lines: remove_lines },
-                    ));
-                }
+            }
+            std::cmp::Ordering::Greater => {
+                // keep only the topmost blank line, remove the rest
+                let mut to_remove = blank_idxs.clone();
+                to_remove.sort_unstable();     // ascending
+                // leave to_remove[0], drop the rest:
+                let extra = to_remove.into_iter().skip(1).collect();
+                suggestions.push(LintSuggestion::new(
+                    LintType::InconsistentNewlines,
+                    file_path.to_path_buf(),
+                    Some(i + 1),
+                    format!("Excess blank lines before '{}'. Expected {}.", trimmed, required),
+                    LintFix::RemoveLines { lines: extra },
+                ));
             }
         }
     }
 
     suggestions
 }
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -121,18 +134,17 @@ mod tests {
 
     #[test]
     fn test_missing_blank_line_before_header() {
-        // In this test the header "## Second Header" is immediately preceded by content.
         let content = r#"# Test Document
 Content preceding header.
 ## Second Header
 More content.
 "#;
-        let file_path = PathBuf::from("test.md");
-        let suggestions = find_inconsistent_newlines(content, &file_path);
-        // Expect one suggestion for the missing blank line before "## Second Header".
-
-        assert_eq!(suggestions.len(), 1);
-        assert!(suggestions[0].description.contains("Missing blank line(s) before '## Second Header'. Need 1."));
+        let path = PathBuf::from("test.md");
+        let s = find_inconsistent_newlines(content, &path);
+        assert_eq!(s.len(), 1);
+        assert!(s[0]
+            .description
+            .contains("Missing blank line(s) before '## Second Header'. Need 1."));
     }
 
     #[test]
@@ -144,17 +156,16 @@ Some content.
 ## Second Header
 More content.
 "#;
-        let file_path = PathBuf::from("test.md");
-        let suggestions = find_inconsistent_newlines(content, &file_path);
-        // Expect one suggestion for excess blank lines before "## Second Header".
-        assert_eq!(suggestions.len(), 1);
-        println!("{}",&suggestions[0].description);
-        assert!(suggestions[0].description.contains("Excess blank lines before '## Second Header'. Expected 1."));
+        let path = PathBuf::from("test.md");
+        let s = find_inconsistent_newlines(content, &path);
+        assert_eq!(s.len(), 1);
+        assert!(s[0]
+            .description
+            .contains("Excess blank lines before '## Second Header'. Expected 1."));
     }
 
     #[test]
     fn test_no_issue_with_consistent_blank_line_before_header() {
-        // Here, every header is preceded by exactly one blank line.
         let content = r#"# Test Document
 
 Content here.
@@ -163,10 +174,31 @@ Content here.
 
 More content.
 "#;
-        let file_path = PathBuf::from("test.md");
-        let suggestions = find_inconsistent_newlines(content, &file_path);
-        // There should be no suggestions when formatting is correct.
-        assert_eq!(suggestions.len(), 0);
+        let path = PathBuf::from("test.md");
+        let s = find_inconsistent_newlines(content, &path);
+        assert_eq!(s.len(), 0);
+    }
+
+    #[test]
+    fn test_ignore_headings_inside_details() {
+        let content = r#"# Doc
+
+<details>
+<summary>More</summary>
+
+## Hidden
+No blank-line warning here.
+</details>
+
+
+## Visible
+Needs a blank line before.
+"#;
+        let path = PathBuf::from("test.md");
+        let s = find_inconsistent_newlines(content, &path);
+        // Should only report for "## Visible", not "## Hidden"
+        assert!(s.iter().all(|x| !x.description.contains("Hidden")));
+        assert!(s.iter().any(|x| x.description.contains("Visible")));
     }
 }
 

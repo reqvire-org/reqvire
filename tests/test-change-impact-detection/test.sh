@@ -37,7 +37,6 @@ EXIT_CODE=$?
 
 printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
 
-
 # Write output to log file for debugging in temporary directory 
 printf "%s\n" "$OUTPUT" > "${TMP_DIR}/test_results_default.log"
 
@@ -59,28 +58,29 @@ fi
 # Extract only the important parts (excluding timestamp and path-specific lines)
 GOTTEN_CONTENT=$(echo "$OUTPUT" | grep -v "INFO  reqflow::config" | grep -v "Warning: Element")
 SANITIZED_OUTPUT=$(echo "$GOTTEN_CONTENT" | sed -E 's#https://[^ )]+/blob/[a-f0-9]{7,40}/##g')
-
 # The expected content with blank lines matching actual output
-EXPECTED_CONTENT='# Change Impact Report
+EXPECTED_CONTENT='## Change Impact Report
 
-## Changed Elements
+### Changed Elements
 
-### Element: [Requirements.md#power-saving-mode](Requirements.md#power-saving-mode)
+* [Power Saving Mode](Requirements.md#power-saving-mode)
+    * derive -> [CPU Power Reduction](Requirements.md#cpu-power-reduction)
+      * verifiedBy -> [CPU Throttling](Requirements.md#cpu-throttling)
+      * satisfiedBy -> [software/cpu_manager.txt](software/cpu_manager.txt)
+    * verifiedBy -> [Power Saving](Requirements.md#power-saving)
+    * derive -> [Screen Brightness Adjustment](Requirements.md#screen-brightness-adjustment)
+      * verifiedBy -> [Screen Brightness](Requirements.md#screen-brightness)
+    * satisfiedBy -> [software/power_control.txt](software/power_control.txt)
 
-```diff
--The systsem shall activate power-saving mode when the battery level drops below 20%.  
-+The systsem shall activate power-saving mode when the battery level drops below 30%.  
-```
-#### Change Impact Tree
-* derive: [CPU Power Reduction](Requirements.md#cpu-power-reduction)
-  * verifiedBy: [CPU Throttling](Requirements.md#cpu-throttling)
-  * satisfiedBy: [software/cpu_manager.txt](software/cpu_manager.txt)
-* verifiedBy: [Power Saving](Requirements.md#power-saving)
-* derive: [Screen Brightness Adjustment](Requirements.md#screen-brightness-adjustment)
-  * verifiedBy: [Screen Brightness](Requirements.md#screen-brightness)
-* satisfiedBy: [software/power_control.txt](software/power_control.txt)
 
----'
+
+---
+
+## Invalidated Verifications
+
+- [ ] [CPU Throttling](Requirements.md#cpu-throttling)
+- [ ] [Power Saving](Requirements.md#power-saving)
+- [ ] [Screen Brightness](Requirements.md#screen-brightness)'
 
 
 # Test 1: Verify that change impact report shows correct relationships between elements
