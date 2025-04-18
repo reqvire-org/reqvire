@@ -4,90 +4,82 @@ use lazy_static::lazy_static;
 use crate::linting::{LintSuggestion, LintType, LintFix};
 
 
-/// Fixes reserved subsection headers (level‑4) with names "Relations", "Metadata", or "Properties".
-/// Immediately after "#### (Relations|Metadata|Properties)", removes any blank lines
-/// and enforces a bullet line that starts with `"  * "`. Also ensures there's exactly
-/// one space after a colon (e.g. `key:[stuff]` → `key: [stuff]`).
+/// Fixes level‑4 reserved subsections named Relations, Metadata, or Properties.
+/// It merges the header + any intervening blank lines + the bullet line
+/// into one block, replacing it with:
+/// ```text
+/// #### HeaderName
+///   * key: rest
+/// ```
+/// preserving whatever “rest” was (link, text, etc.).
 pub fn fix_reserved_subsections(content: &str, file_path: &Path) -> Vec<LintSuggestion> {
     lazy_static! {
-        // This pattern matches "#### (Relations|Metadata|Properties)" line (case-insensitive),
-        // plus any subsequent blank lines (`\n*`) in multiline mode.
-        static ref RESERVED_HEADER_REGEX: Regex = Regex::new(
-            r"(?im)^(####\s*(?i:(Relations|Metadata|Properties))\s*)\n*"
-        ).unwrap();
-
-        // For ensuring exactly one space after a colon, we match a colon
-        // followed by a non-whitespace char ([^\s]) and capture it.
-        // We'll do a replacement with `": $1"`.
+        // Match "#### Relations" (or Metadata|Properties) plus any number of \n after it
+        static ref RESERVED_HEADER_REGEX: Regex =
+            Regex::new(r"(?m)^####\s*(?:Relations|Metadata|Properties)\s*\n*")
+                .unwrap();
+        // For tightening up "key:[foo]" → "key: [foo]"
         static ref AFTER_COLON_RE: Regex = Regex::new(r":([^\s])").unwrap();
+        // To strip off whatever bullet marker was there
+        static ref BULLET_PREFIX_RE: Regex = Regex::new(r"^\s*\*?\s*").unwrap();
     }
 
     let mut suggestions = Vec::new();
-
-    // We'll split into lines so we can identify line indices more easily
     let all_lines: Vec<&str> = content.lines().collect();
 
-    // For each match in top-to-bottom
-    for mat_caps in RESERVED_HEADER_REGEX.captures_iter(content) {
-        let header_line = mat_caps.get(1).unwrap().as_str(); 
-        // e.g. "#### Relations"
+    for mat in RESERVED_HEADER_REGEX.find_iter(content) {
+        // Figure out which line index this match starts on
+        let header_start = mat.start();
+        let header_idx = content[..header_start].lines().count();
 
-        // Entire matched block (header + blank lines).
-        let mat = mat_caps.get(0).unwrap();
-
-
-        // 1) Find line index of the header by counting lines up to `mat.start()`.
-        let start_index = mat.start();
-        let header_line_index = content[..start_index].lines().count(); 
-
-        // 2) Find the next non-empty line index after `header_line_index`
-        let mut bullet_line_index = header_line_index + 1;
-        while bullet_line_index < all_lines.len() && all_lines[bullet_line_index].trim().is_empty() {
-            bullet_line_index += 1;
-        }
-        if bullet_line_index >= all_lines.len() {
-            // No bullet line at all. We skip or optionally add a default bullet fix
+        // Guard against a weird match at the very end
+        if header_idx >= all_lines.len() {
             continue;
         }
 
-        let bullet_line_text = all_lines[bullet_line_index];
+        let header_line = all_lines[header_idx].trim_end();
 
-        // 3) Force the bullet line to start with "  * " and ensure colons have a space after them.
-        // a) Remove leading whitespace and optional "*"
-        let bullet_marker_re = Regex::new(r"^\s*\*?\s*").unwrap();
-        let bullet_stripped = bullet_marker_re.replace(bullet_line_text, "");
+        // Now find the first non‑blank line after the header
+        let mut bullet_idx = header_idx + 1;
+        while bullet_idx < all_lines.len() && all_lines[bullet_idx].trim().is_empty() {
+            bullet_idx += 1;
+        }
+        if bullet_idx >= all_lines.len() {
+            // no bullet to fix
+            continue;
+        }
+        let bullet_line = all_lines[bullet_idx];
 
-        // b) Ensure exactly one space after colons
-        //    e.g. "derivedFrom:[Billing]" => "derivedFrom: [Billing]"
-        let bullet_colon_spaced = AFTER_COLON_RE.replace_all(&bullet_stripped, ": $1");
+        // Build the corrected bullet
+        let stripped = BULLET_PREFIX_RE.replace(bullet_line, "");
+        let spaced  = AFTER_COLON_RE.replace_all(&stripped, ": $1");
+        let fixed_bullet = format!("  * {}", spaced);
 
-        // c) Prepend "  * "
-        let fixed_bullet_line = format!("  * {}", bullet_colon_spaced);
-
-        // If bullet is already correct & no blank lines, skip
-        let bullet_ok = bullet_line_text.starts_with("  * ")
-            && bullet_line_text.contains(": ")
-            && bullet_line_index == header_line_index + 1;
-        if bullet_ok {
+        // If it was already exactly "  * key: rest" on the very next line, skip
+        let already_ok = bullet_line.starts_with("  * ")
+            && bullet_line.contains(": ")
+            && bullet_idx == header_idx + 1;
+        if already_ok {
             continue;
         }
 
-        // 4) We build a single fix that merges [header..bullet] block
-        //    into "header_line + \n + fixed_bullet_line"
-        // We gather from header_line_index..=bullet_line_index inclusive
-        let block_to_replace = all_lines[header_line_index..=bullet_line_index].join("\n");
-        let replacement = format!("{}\n{}", header_line.trim_end(), fixed_bullet_line);
+        // Prepare the single ReplacePattern:
+        //  - pattern = all_lines[header_idx..=bullet_idx].join("\n")
+        //  - replacement = header_line + "\n" + fixed_bullet
+        let block = all_lines[header_idx..=bullet_idx].join("\n");
+        let replacement = format!("{}\n{}", header_line, fixed_bullet);
 
         suggestions.push(LintSuggestion::new(
             LintType::InconsistentReservedSubsections,
             file_path.to_path_buf(),
-            None,
+            Some(bullet_idx + 1),
             format!(
-                "Reserved subsection header '{}' should be followed by a bullet starting with \"  * \" and one space after colons.",
-                header_line.trim()
+                "Reserved subsection header '{}' should be followed by a bullet \
+                 starting with \"  * \" and one space after colons.",
+                header_line
             ),
             LintFix::ReplacePattern {
-                pattern: block_to_replace,
+                pattern: block,
                 replacement,
             },
         ));
@@ -95,6 +87,7 @@ pub fn fix_reserved_subsections(content: &str, file_path: &Path) -> Vec<LintSugg
 
     suggestions
 }
+
 
 #[cfg(test)]
 mod tests {
