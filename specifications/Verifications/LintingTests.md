@@ -117,3 +117,91 @@ The verification test checks that ReqFlow correctly processes requirements in ex
   * verify: [SystemRequirements/Requirements.md#External Folders Support](../SystemRequirements/Requirements.md#external-folders-support)
   * verify: [SystemRequirements/Requirements.md#Requirements Processing](../SystemRequirements/Requirements.md#requirements-processing)
   * trace: [tests/test-external-folders/test.sh](../../tests/test-external-folders/test.sh)
+
+---
+
+## Excluded Patterns Tests
+```mermaid
+graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+
+  excluded_patterns_verification["Excluded Patterns Verification"];
+  click excluded_patterns_verification "LintingTests.md#excluded-patterns-verification";
+  class excluded_patterns_verification verification;
+  excluded_patterns_requirement["SystemRequirements/Requirements.md#Configurable Filename Exclusion Patterns"];
+  class excluded_patterns_requirement requirement;
+  click excluded_patterns_requirement "../SystemRequirements/Requirements.md#configurable-filename-exclusion-patterns";
+  excluded_patterns_verification -.->|verifies| excluded_patterns_requirement;
+  excluded_patterns_test["tests/test-excluded-patterns/test.sh"];
+  class excluded_patterns_test default;
+  click excluded_patterns_test "../../tests/test-excluded-patterns/test.sh";
+  excluded_patterns_verification -.->|trace| excluded_patterns_test;
+```
+
+---
+
+### Excluded Patterns Verification
+
+This test verifies that the system correctly handles excluded filename patterns in configuration.
+
+#### Metadata
+  * type: verification
+
+#### Details
+
+##### Acceptance Criteria
+- Files matching excluded_filename_patterns should not be processed for validation
+- Files matching excluded_filename_patterns should only be tracked for relation targets
+- Only relations TO excluded files should be valid, not relations FROM excluded files
+
+##### Test Criteria
+- Command should not validate elements within files matching excluded patterns
+- Elements in excluded files should not be in registry for direct access
+- Only the file itself should be in the registry for relation validation
+
+##### Test Procedure
+1. Create configuration with excluded_filename_patterns set
+2. Create test fixtures with files matching and not matching excluded patterns
+3. Run ReqFlow validation on the test fixtures
+4. Verify that excluded files are not processed for validation
+5. Verify that relations to excluded files are still considered valid
+
+#### Relations
+  * verify: [SystemRequirements/Requirements.md#Configurable Filename Exclusion Patterns](../SystemRequirements/Requirements.md#configurable-filename-exclusion-patterns)
+  * verify: [SystemRequirements/Requirements.md#File Pattern Exclusion for Linting](../SystemRequirements/Requirements.md#file-pattern-exclusion-for-linting)
+  * trace: [tests/test-excluded-patterns/test.sh](../../tests/test-excluded-patterns/test.sh)
+
+---
+
+### Excluded Linting Verification
+
+This test verifies that the system's linting functionality correctly respects excluded filename patterns.
+
+#### Metadata
+  * type: verification
+
+#### Details
+
+##### Acceptance Criteria
+- Files matching excluded_filename_patterns should not be linted
+- ReqFlow should skip linting checks on excluded files
+
+##### Test Criteria
+- Command should not lint files matching excluded patterns
+- Linting output should not include issues from excluded files
+
+##### Test Procedure
+1. Create configuration with excluded_filename_patterns set
+2. Create test fixtures with files matching and not matching excluded patterns
+3. Run ReqFlow linting on the test fixtures
+4. Verify that excluded files are not included in linting output
+5. Verify that no linting errors are reported for excluded files
+
+#### Relations
+  * verify: [SystemRequirements/Requirements.md#Configurable Filename Exclusion Patterns](../SystemRequirements/Requirements.md#configurable-filename-exclusion-patterns)
+  * verify: [SystemRequirements/Requirements.md#File Pattern Exclusion for Linting](../SystemRequirements/Requirements.md#file-pattern-exclusion-for-linting)
+  * trace: [tests/test-excluded-linting/test.sh](../../tests/test-excluded-linting/test.sh)

@@ -37,12 +37,16 @@ This test verifies that the system can automatically generate and embed mermaid 
 - System should create diagrams that represent relationships between elements
 - System should preserve any existing custom mermaid diagrams in the documents
 - System should update automatically generated diagrams when requirements change
+- System should properly visualize all relationship types (verifies, trace, refines, contains, derives, satisfies, etc.)
+- System should render relationships with appropriate arrows and formatting
 
 ##### Test Criteria
 - Command exits with success (0) return code
 - Modified files contain the expected mermaid diagrams
 - Custom mermaid diagrams are preserved 
 - Diagram content accurately reflects the relationships defined in the requirements
+- All relationship types are correctly visualized with proper arrows and labels (verifies, trace, refines, contains, derives, satisfies)
+- Special relationship types like "deriveReqT" are properly rendered
 
 ##### Test Procedure
 1. Create test fixtures in `/tests/test-diagram-generation/` with requirements containing various elements and relationships
