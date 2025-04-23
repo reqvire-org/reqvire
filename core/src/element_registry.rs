@@ -169,6 +169,8 @@ mod tests {
                 direction: RelationDirection::Forward,
                 opposite: Some("derivedFrom"),
                 description: "Element B derives from A",
+                arrow: "-->",
+                label: "label"
             },
             target: RelationTarget {
                 text: "A".to_string(),
@@ -202,6 +204,8 @@ mod tests {
                 direction: RelationDirection::Forward,
                 opposite: Some("containedBy"),
                 description: "Element B contains A",
+                arrow: "-->",
+                label: "label"                
             },
             target: RelationTarget {
                 text: "A".to_string(),
@@ -217,6 +221,8 @@ mod tests {
                 direction: RelationDirection::Forward,
                 opposite: Some("derivedFrom"),
                 description: "Element C derives from B",
+                arrow: "-->",
+                label: "label"                
             },
             target: RelationTarget {
                 text: "B".to_string(),
