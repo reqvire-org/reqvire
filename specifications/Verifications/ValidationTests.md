@@ -30,6 +30,22 @@ graph LR;
   class c86fd6ece7a8668a default;
   click c86fd6ece7a8668a "../../tests/test-invalid-relations/test.sh";
   fbf9362574b057dd -.->|trace| c86fd6ece7a8668a;
+  
+  fragment_relations_test["Same-File Fragment Relations Test"];
+  click fragment_relations_test "ValidationTests.md#same-file-fragment-relations-test";
+  class fragment_relations_test verification;
+  frag_req_validation["SystemRequirements/Requirements.md#Relation Type Validation"];
+  class frag_req_validation requirement;
+  click frag_req_validation "../SystemRequirements/Requirements.md#relation-type-validation";
+  fragment_relations_test -.->|verifies| frag_req_validation;
+  frag_req_processing["SystemRequirements/Requirements.md#Requirements Processing"];
+  class frag_req_processing requirement;
+  click frag_req_processing "../SystemRequirements/Requirements.md#requirements-processing";
+  fragment_relations_test -.->|verifies| frag_req_processing;
+  frag_test_script["tests/test-fragment-relations/test.sh"];
+  class frag_test_script default;
+  click frag_test_script "../../tests/test-fragment-relations/test.sh";
+  fragment_relations_test -.->|trace| frag_test_script;
 ```
 
 ---
@@ -41,12 +57,14 @@ The verification test checks that ReqFlow correctly identifies and reports inval
 #### Metadata
   * type: verification
 
-#### Acceptance Criteria
+#### Details
+
+##### Acceptance Criteria
 - System should detect and report invalid relation types (typos, etc.)
 - System should detect and report relations to non-existent targets
 - System should detect and report if system requirement is missing parent relation
 - System should detect and report if there is circular dependency in requirements
-- System should detect and report if relation type has incompactible element
+- System should detect and report if relation type has incompatible element
 - System should detect and report invalid metadata subsection format
 - System should detect and report duplicate relations in Relations subsection
 - System should detect and report duplicate elements
@@ -68,5 +86,37 @@ The verification test checks that ReqFlow correctly identifies and reports inval
   * verify: [SystemRequirements/Requirement.md/Relation Type Validation](../SystemRequirements/Requirements.md#relation-type-validation)  
   * verify: [SystemRequirements/Requirement.md/Relation Element Type Validator](../SystemRequirements/Requirements.md#relation-element-type-validator)  
   * trace: [tests/test-invalid-relations/test.sh](../../tests/test-invalid-relations/test.sh)
+
+---
+
+### Same-File Fragment Relations Test
+
+This test verifies that ReqFlow correctly handles and validates relations to fragments within the same file.
+
+#### Metadata
+  * type: verification
+
+#### Details
+
+##### Acceptance Criteria
+- System should correctly validate relations to fragments within the same file
+- System should not report errors for valid fragment references
+- System should handle both fragment-only references like "#fragment-id" and proper element IDs
+
+##### Test Criteria
+- Command exits with success (zero) return code
+- No error output about missing relation targets when using #fragment references
+- Successful validation message is displayed
+
+##### Test Procedure
+1. Create test fixtures with requirements containing fragment-only references
+2. Run ReqFlow validation on the test fixtures
+3. Verify that validation succeeds with no errors reported
+4. Verify that fragments referenced by proper element ID are correctly validated
+
+#### Relations
+  * verify: [SystemRequirements/Requirements.md#Relation Type Validation](../SystemRequirements/Requirements.md#relation-type-validation)
+  * verify: [SystemRequirements/Requirements.md#Requirements Processing](../SystemRequirements/Requirements.md#requirements-processing)
+  * trace: [tests/test-fragment-relations/test.sh](../../tests/test-fragment-relations/test.sh)
 
 ---
