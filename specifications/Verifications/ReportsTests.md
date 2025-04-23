@@ -11,21 +11,28 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  summary_report_verification["CLI Summary Report Flag Test"];
-  click summary_report_verification "ReportsTests.md#cli-summary-report-flag-test";
-  class summary_report_verification verification;
-  summary_report_req["SystemRequirements/Requirements.md#cli-summary-report-flag"];
-  class summary_report_req requirement;
-  click summary_report_req "../SystemRequirements/Requirements.md#cli-summary-report-flag";
-  summary_report_verification -.->|verifies| summary_report_req;
-  
-  index_generation_test["Index Generation Test"];
-  click index_generation_test "ReportsTests.md#index-generation-test";
-  class index_generation_test verification;
-  index_generation_req["SystemRequirements/Requirements.md#index-generation"];
-  class index_generation_req requirement;
-  click index_generation_req "../SystemRequirements/Requirements.md#index-generation";
-  index_generation_test -.->|verifies| index_generation_req;
+  ecd45710776293b["Index Generation Test"];
+  click ecd45710776293b "ReportsTests.md#index-generation-test";
+  class ecd45710776293b verification;
+  8acd24c7c228637b["SystemRequirements/Requirements.md#index-generation"];
+  class 8acd24c7c228637b requirement;
+  click 8acd24c7c228637b "../SystemRequirements/Requirements.md#index-generation";
+  ecd45710776293b -.->|verifies| 8acd24c7c228637b;
+  473af2ecdcda99a5["tests/test-index-generation/test.sh"];
+  class 473af2ecdcda99a5 default;
+  click 473af2ecdcda99a5 "../../tests/test-index-generation/test.sh";
+  ecd45710776293b -.->|trace| 473af2ecdcda99a5;
+  5ec920981cff81d1["CLI Summary Report Flag Test"];
+  click 5ec920981cff81d1 "ReportsTests.md#cli-summary-report-flag-test";
+  class 5ec920981cff81d1 verification;
+  6f86272134897867["SystemRequirements/Requirements.md#cli-summary-report-flag"];
+  class 6f86272134897867 requirement;
+  click 6f86272134897867 "../SystemRequirements/Requirements.md#cli-summary-report-flag";
+  5ec920981cff81d1 -.->|verifies| 6f86272134897867;
+  e0e585775432dd67["tests/test-element-content-extraction/test.sh"];
+  class e0e585775432dd67 default;
+  click e0e585775432dd67 "../../tests/test-element-content-extraction/test.sh";
+  5ec920981cff81d1 -.->|trace| e0e585775432dd67;
 ```
 
 ---

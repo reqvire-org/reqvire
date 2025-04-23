@@ -11,25 +11,28 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  html_export_verification["HTML Export Verification"];
-  click html_export_verification "MiscVerifications.md#html-export-verification";
-  class html_export_verification verification;
-  html_export_req["UserRequirements.md/Export HTML specifications"];
-  class html_export_req requirement;
-  click html_export_req "../UserRequirements.md#export-html-specifications";
-  html_export_verification -.->|verifies| html_export_req;
-  html_export_test["tests/test-html-export/test.sh"];
-  class html_export_test default;
-  click html_export_test "../../tests/test-html-export/test.sh";
-  html_export_verification -.->|trace| html_export_test;
-  
-  ai_context_verification["AI Agent Context Verification"];
-  click ai_context_verification "MiscVerifications.md#ai-agent-context-verification";
-  class ai_context_verification verification;
-  ai_context_req["UserRequirements.md/AI Agent Context"];
-  class ai_context_req requirement;
-  click ai_context_req "../UserRequirements.md#ai-agent-context";
-  ai_context_verification -.->|verifies| ai_context_req;
+  6bd2df9ca8d5cccd["AI Agent Context Verification"];
+  click 6bd2df9ca8d5cccd "MiscVerifications.md#ai-agent-context-verification";
+  class 6bd2df9ca8d5cccd verification;
+  5a6fc253c51845b6["UserRequirements.md/AI Agent Context"];
+  class 5a6fc253c51845b6 requirement;
+  click 5a6fc253c51845b6 "../UserRequirements.md#ai-agent-context";
+  6bd2df9ca8d5cccd -.->|verifies| 5a6fc253c51845b6;
+  24a5739f743c3d7b["tests/test-ai-agent-context/test.sh"];
+  class 24a5739f743c3d7b default;
+  click 24a5739f743c3d7b "../../tests/test-ai-agent-context/test.sh";
+  6bd2df9ca8d5cccd -.->|trace| 24a5739f743c3d7b;
+  b05794ec6e9b813a["HTML Export Verification"];
+  click b05794ec6e9b813a "MiscVerifications.md#html-export-verification";
+  class b05794ec6e9b813a verification;
+  72c7eda6183f0893["UserRequirements.md/Export HTML specifications"];
+  class 72c7eda6183f0893 requirement;
+  click 72c7eda6183f0893 "../UserRequirements.md#export-html-specifications";
+  b05794ec6e9b813a -.->|verifies| 72c7eda6183f0893;
+  7766b8055bc4c657["tests/test-html-export/test.sh"];
+  class 7766b8055bc4c657 default;
+  click 7766b8055bc4c657 "../../tests/test-html-export/test.sh";
+  b05794ec6e9b813a -.->|trace| 7766b8055bc4c657;
 ```
 
 ---

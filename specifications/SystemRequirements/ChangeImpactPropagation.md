@@ -11,22 +11,6 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  d17b0775f448b19b["Change Impact Detection Algorithm"];
-  click d17b0775f448b19b "ChangeImpactPropagation.md#change-impact-detection-algorithm";
-  class d17b0775f448b19b requirement;
-  745439d5fc0154d1["../SpecificationsRequirements.md#requirements-change-propagation"];
-  class 745439d5fc0154d1 requirement;
-  click 745439d5fc0154d1 "../SpecificationsRequirements.md#requirements-change-propagation";
-  d17b0775f448b19b -.->|deriveReqT| 745439d5fc0154d1;
-  cc976e6bcded86e7["../../core/src/change_impact.rs"];
-  class cc976e6bcded86e7 default;
-  click cc976e6bcded86e7 "../../core/src/change_impact.rs";
-  cc976e6bcded86e7 -->|satisfies| d17b0775f448b19b;
-  c23729cc550de84b["Change Impact Visualization"];
-  click c23729cc550de84b "ChangeImpactPropagation.md#change-impact-visualization";
-  class c23729cc550de84b requirement;
-  c23729cc550de84b -.->|deriveReqT| 745439d5fc0154d1;
-  cc976e6bcded86e7 -->|satisfies| c23729cc550de84b;
   6e747b7f03732873["Change Impact Command Line Interface"];
   click 6e747b7f03732873 "ChangeImpactPropagation.md#change-impact-command-line-interface";
   class 6e747b7f03732873 requirement;
@@ -38,6 +22,22 @@ graph LR;
   class 11ffc4632afd7c4c default;
   click 11ffc4632afd7c4c "../../cli/src/cli.rs";
   11ffc4632afd7c4c -->|satisfies| 6e747b7f03732873;
+  c23729cc550de84b["Change Impact Visualization"];
+  click c23729cc550de84b "ChangeImpactPropagation.md#change-impact-visualization";
+  class c23729cc550de84b requirement;
+  745439d5fc0154d1["../SpecificationsRequirements.md#requirements-change-propagation"];
+  class 745439d5fc0154d1 requirement;
+  click 745439d5fc0154d1 "../SpecificationsRequirements.md#requirements-change-propagation";
+  c23729cc550de84b -.->|deriveReqT| 745439d5fc0154d1;
+  cc976e6bcded86e7["../../core/src/change_impact.rs"];
+  class cc976e6bcded86e7 default;
+  click cc976e6bcded86e7 "../../core/src/change_impact.rs";
+  cc976e6bcded86e7 -->|satisfies| c23729cc550de84b;
+  d17b0775f448b19b["Change Impact Detection Algorithm"];
+  click d17b0775f448b19b "ChangeImpactPropagation.md#change-impact-detection-algorithm";
+  class d17b0775f448b19b requirement;
+  d17b0775f448b19b -.->|deriveReqT| 745439d5fc0154d1;
+  cc976e6bcded86e7 -->|satisfies| d17b0775f448b19b;
 ```
 
 ---

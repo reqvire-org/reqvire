@@ -9,12 +9,12 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  f6237e49f7494c0e["MOE_UA"];
-  click f6237e49f7494c0e "MOEs.md#moe_ua";
-  class f6237e49f7494c0e requirement;
   b3f57e49f7494c0e["MOE_CE"];
   click b3f57e49f7494c0e "MOEs.md#moe_ce";
   class b3f57e49f7494c0e requirement;
+  f6237e49f7494c0e["MOE_UA"];
+  click f6237e49f7494c0e "MOEs.md#moe_ua";
+  class f6237e49f7494c0e requirement;
 ```
 
 

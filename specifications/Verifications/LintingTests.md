@@ -26,42 +26,38 @@ graph LR;
   class 3de539f546654b01 default;
   click 3de539f546654b01 "../../tests/test-lint-expected/test.sh";
   4cd0fe733f182d5c -.->|trace| 3de539f546654b01;
-  
-  linting_command_verification["Linting Command Verification"];
-  click linting_command_verification "LintingTests.md#linting-command-verification";
-  class linting_command_verification verification;
-  linting_command_req["UserRequirements.md/Linting Command"];
-  class linting_command_req requirement;
-  click linting_command_req "../UserRequirements.md#linting-command";
-  linting_command_verification -.->|verifies| linting_command_req;
-  linting_command_verification -.->|trace| 3de539f546654b01;
-  
-  format_consistency_verification["Format Consistency Verification"];
-  click format_consistency_verification "LintingTests.md#format-consistency-verification";
-  class format_consistency_verification verification;
-  format_consistency_req["UserRequirements.md/Format Consistency Enforcement"];
-  class format_consistency_req requirement;
-  click format_consistency_req "../UserRequirements.md#format-consistency-enforcement";
-  format_consistency_verification -.->|verifies| format_consistency_req;
-  format_consistency_verification -.->|trace| 3de539f546654b01;
-  
-  model_linting_verification["Model Linting Verification"];
-  click model_linting_verification "LintingTests.md#model-linting-verification";
-  class model_linting_verification verification;
-  model_linting_req["UserRequirements.md/Model Linting"];
-  class model_linting_req requirement;
-  click model_linting_req "../UserRequirements.md#model-linting";
-  model_linting_verification -.->|verifies| model_linting_req;
-  model_linting_verification -.->|trace| 3de539f546654b01;
-  
-  cli_lint_verification["CLI Lint Flag Test"];
-  click cli_lint_verification "LintingTests.md#cli-lint-flag-test";
-  class cli_lint_verification verification;
-  cli_lint_req["SystemRequirements/Requirements.md#cli-lint-flag"];
-  class cli_lint_req requirement;
-  click cli_lint_req "../SystemRequirements/Requirements.md#cli-lint-flag";
-  cli_lint_verification -.->|verifies| cli_lint_req;
-  cli_lint_verification -.->|trace| 3de539f546654b01;
+  746b65fa854bc876["CLI Lint Flag Test"];
+  click 746b65fa854bc876 "LintingTests.md#cli-lint-flag-test";
+  class 746b65fa854bc876 verification;
+  fffbb227966be4f2["SystemRequirements/Requirements.md#cli-lint-flag"];
+  class fffbb227966be4f2 requirement;
+  click fffbb227966be4f2 "../SystemRequirements/Requirements.md#cli-lint-flag";
+  746b65fa854bc876 -.->|verifies| fffbb227966be4f2;
+  746b65fa854bc876 -.->|trace| 3de539f546654b01;
+  3bbd3815f37ee9ae["Linting Command Verification"];
+  click 3bbd3815f37ee9ae "LintingTests.md#linting-command-verification";
+  class 3bbd3815f37ee9ae verification;
+  887a7d36caacab2b["UserRequirements.md/Linting Command"];
+  class 887a7d36caacab2b requirement;
+  click 887a7d36caacab2b "../UserRequirements.md#linting-command";
+  3bbd3815f37ee9ae -.->|verifies| 887a7d36caacab2b;
+  3bbd3815f37ee9ae -.->|trace| 3de539f546654b01;
+  d941947fb524f8c7["Model Linting Verification"];
+  click d941947fb524f8c7 "LintingTests.md#model-linting-verification";
+  class d941947fb524f8c7 verification;
+  103ddb8dc3242215["UserRequirements.md/Model Linting"];
+  class 103ddb8dc3242215 requirement;
+  click 103ddb8dc3242215 "../UserRequirements.md#model-linting";
+  d941947fb524f8c7 -.->|verifies| 103ddb8dc3242215;
+  d941947fb524f8c7 -.->|trace| 3de539f546654b01;
+  80dbe2ea823992bc["Format Consistency Verification"];
+  click 80dbe2ea823992bc "LintingTests.md#format-consistency-verification";
+  class 80dbe2ea823992bc verification;
+  81758bdb22a3329d["UserRequirements.md/Format Consistency Enforcement"];
+  class 81758bdb22a3329d requirement;
+  click 81758bdb22a3329d "../UserRequirements.md#format-consistency-enforcement";
+  80dbe2ea823992bc -.->|verifies| 81758bdb22a3329d;
+  80dbe2ea823992bc -.->|trace| 3de539f546654b01;
 ```
 
 ---
@@ -286,17 +282,30 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  excluded_patterns_verification["Excluded Patterns Verification"];
-  click excluded_patterns_verification "LintingTests.md#excluded-patterns-verification";
-  class excluded_patterns_verification verification;
-  excluded_patterns_requirement["SystemRequirements/Requirements.md#Configurable Filename Exclusion Patterns"];
-  class excluded_patterns_requirement requirement;
-  click excluded_patterns_requirement "../SystemRequirements/Requirements.md#configurable-filename-exclusion-patterns";
-  excluded_patterns_verification -.->|verifies| excluded_patterns_requirement;
-  excluded_patterns_test["tests/test-excluded-patterns/test.sh"];
-  class excluded_patterns_test default;
-  click excluded_patterns_test "../../tests/test-excluded-patterns/test.sh";
-  excluded_patterns_verification -.->|trace| excluded_patterns_test;
+  be641c88c635747f["Excluded Patterns Verification"];
+  click be641c88c635747f "LintingTests.md#excluded-patterns-verification";
+  class be641c88c635747f verification;
+  cc8128cae305b29d["SystemRequirements/Requirements.md#Configurable Filename Exclusion Patterns"];
+  class cc8128cae305b29d requirement;
+  click cc8128cae305b29d "../SystemRequirements/Requirements.md#configurable-filename-exclusion-patterns";
+  be641c88c635747f -.->|verifies| cc8128cae305b29d;
+  45770e9b319d3819["SystemRequirements/Requirements.md#File Pattern Exclusion for Linting"];
+  class 45770e9b319d3819 requirement;
+  click 45770e9b319d3819 "../SystemRequirements/Requirements.md#file-pattern-exclusion-for-linting";
+  be641c88c635747f -.->|verifies| 45770e9b319d3819;
+  79ca606f26bdd145["tests/test-excluded-patterns/test.sh"];
+  class 79ca606f26bdd145 default;
+  click 79ca606f26bdd145 "../../tests/test-excluded-patterns/test.sh";
+  be641c88c635747f -.->|trace| 79ca606f26bdd145;
+  4c4775ba9ffce94["Excluded Linting Verification"];
+  click 4c4775ba9ffce94 "LintingTests.md#excluded-linting-verification";
+  class 4c4775ba9ffce94 verification;
+  4c4775ba9ffce94 -.->|verifies| cc8128cae305b29d;
+  4c4775ba9ffce94 -.->|verifies| 45770e9b319d3819;
+  b28a9ed0b063b190["tests/test-excluded-linting/test.sh"];
+  class b28a9ed0b063b190 default;
+  click b28a9ed0b063b190 "../../tests/test-excluded-linting/test.sh";
+  4c4775ba9ffce94 -.->|trace| b28a9ed0b063b190;
 ```
 
 ---
