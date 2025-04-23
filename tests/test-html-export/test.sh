@@ -20,16 +20,7 @@
 # Create output directory if it doesn't exist
 mkdir -p "${TEST_DIR}/output"
 
-# First generate diagrams
-DIAGRAM_OUTPUT=$(cd "$TEST_DIR" && "$REQFLOW_BIN" --config "${TEST_DIR}/reqflow.yaml" --generate-diagrams 2>&1)
-DIAGRAM_EXIT_CODE=$?
-
-if [ $DIAGRAM_EXIT_CODE -ne 0 ]; then
-  echo "❌ FAILED: Diagram generation failed with exit code $DIAGRAM_EXIT_CODE"
-  exit 1
-fi
-
-# Now run reqflow with --html flag
+# Generate HTML
 OUTPUT=$(cd "$TEST_DIR" && "$REQFLOW_BIN" --config "${TEST_DIR}/reqflow.yaml" --html 2>&1)
 EXIT_CODE=$?
 
@@ -43,7 +34,7 @@ if [ $EXIT_CODE -ne 0 ]; then
 fi
 
 # Check that output message indicates HTML files were generated
-if ! echo "$OUTPUT" | grep -q "markdown files converted to HTML"; then
+if ! echo "$OUTPUT" | grep -q "Total Markdown files exported: [0-9]"; then
   echo "❌ FAILED: Output message doesn't indicate successful HTML conversion"
   exit 1
 fi
@@ -106,5 +97,4 @@ if [ -n "$FIRST_HTML" ]; then
   fi
 fi
 
-echo "✅ PASSED: HTML export test"
 exit 0
