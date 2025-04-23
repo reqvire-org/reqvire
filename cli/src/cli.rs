@@ -134,16 +134,11 @@ pub fn handle_command(
 
     // Handle LLM context
     if args.llm_context {
-        match std::fs::read_to_string("src/llm_context.md") {
-            Ok(content) => {
-                println!("{}", content);
-                Args::print_help();
-                return Ok(0);
-            }
-            Err(_e) => {
-                return Err(ReqFlowError::ProcessError("❌ Failed to read LLM context file".to_string()));
-            }
-        }
+        // Include the LLM context content directly in the binary
+        let llm_context = include_str!("llm_context.md");
+        println!("{}", llm_context);
+        Args::print_help();
+        return Ok(0);
     }else{
   
         let parse_result=model_manager.parse_and_validate(None, &specification_folder_path, &external_folders_path,excluded_filename_patterns);

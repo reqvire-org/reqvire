@@ -82,10 +82,13 @@ This test verifies that the system provides necessary context for AI agents to u
 - Command output is properly formatted for AI consumption
 
 ##### Test Procedure
-TODO: write test procedure
+1. Run ReqFlow with the `--llm-context` flag to generate the AI context
+2. Verify that the output contains essential ReqFlow concepts (Requirements, Relations, Verification, Metadata)
+3. Verify that the output is properly formatted in markdown with headers
+4. Verify that the command returns a successful exit code
 
 #### Relations
   * verify: [UserRequirements.md/AI Agent Context](../UserRequirements.md#ai-agent-context)
-  * trace: TODO
+  * trace: [tests/test-ai-agent-context/test.sh](../../tests/test-ai-agent-context/test.sh)
 
 ---
