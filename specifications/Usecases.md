@@ -21,20 +21,20 @@ flowchart LR
             markdownSucture[Markdown Structure]
             traceability((Generate Traceability Matrix))
             handleDiffs((Trace Changes))        
-        end  
-
-        subgraph "ChatOps"
-            aiAgents((Provide AI Agents🤖))
-            aiSuggestions((Suggestions)) 
-            reviewSuggestions((Review Suggestions))                
-            applySuggestions((Apply Approved Suggestions))                
-        end
-                 
+        end                   
     end
 
     human[Human👤]
     human -. build .-> model
     human -. develop .-> developedSystem
+
+
+    subgraph "AI tools"
+       aiAgents((AI Agents🤖))
+       aiSuggestions((Suggestions)) 
+       reviewSuggestions((Review Suggestions))                
+       applySuggestions((Apply Approved Suggestions))                
+    end    
 
     subgraph "External Systems"
         ciSystem[CI/CD System]
@@ -71,8 +71,7 @@ flowchart LR
     manageModel -. provide .-> generateDiagrams
     manageModel -. provide .-> handleDiffs
 
-    human -. interact via ChatOps .-> aiAgents    
-    aiAgents -. interact with via functions .-> manageModel    
+    aiAgents -. uses MCP to .-> manageModel    
 
     aiAgents -. assist in development .-> developedSystem
     aiAgents -. commit code changes .-> gitRepository
@@ -105,6 +104,7 @@ flowchart LR
 
 
 
+
 ```
 
 ## Explanation of ReqFlow Use Case Diagram
@@ -132,27 +132,14 @@ The central component of the system, which facilitates various MBSE-related acti
   - This ensures that all affected components are flagged for review or updates.
 
 
-#### ChatOps
+#### AI Agents
 - **AI Agents 🤖**: Provides intelligent assistance for model management and collaboration.
  - It is deeply embed into ReqFlow methodology model and have a knowledge required for deep assistance.
 - Suggestions: Offers AI-generated recommendations or improvements.
 - Review Suggestions: Enables human review and approval of AI-generated suggestions.
  - With human in the loop workflow.
 - Apply Approved Suggestions: Commits approved changes to the model.
-
-### AI Agents in Development
-
-ReqFlow's **AI Agents 🤖** are uniquely equipped with deep knowledge of the ReqFlow methodology and structure. 
-This enables them to follow and adhere to ReqFlow's AI-ready MBSE processes while developing code and performing other development tasks. 
-Their development activities are fully aligned with the methodology, ensuring that all changes are consistent with the structured requirements and system models.
-
-
-They can also work on the **Developed System**, performing tasks similar to human developers.
-Key capabilities include:
-- Process-Driven Development: AI Agents are guided by ReqFlow's MBSE methodology, ensuring that all code development follows established processes and adheres to the structured requirements and traceability model.
-- Code Changes: AI Agents can suggest and implement changes directly in the codebase, ensuring alignment with the MBSE model and specifications.
-- Automated Commitments: AI Agents can commit approved code changes directly to the Git repository, following project workflows and standards.
-- Development Assistance: AI Agents provide context-aware assistance to human developers, including debugging, refactoring, and optimization.
+- Can be any AI tools/agentic system capable using MCP
 
 
 ### System of Interest (SOI)
@@ -188,14 +175,9 @@ These features allow teams to seamlessly integrate MBSE practices into their dev
 
 ### Human Interaction
 
-Humans use a ReqFlow tool :<_____FIX THIS LINE
-- Via CLI: Users interact with ReqFlow’s CLI to manage models and validate structures.
-- Via ChatOps: Users interact with AI agents to receive suggestions, review changes, and approve updates.
-- Collaboration: Users collaborate through GitHub or similar tools to manage repositories and track changes.
-
 Humans interact with ReqFlow tools to manage, refine, and validate MBSE models, as well as to collaborate effectively within development workflows:
 - Via CLI: Users leverage ReqFlow’s CLI to perform tasks such as managing models, generating diagrams, analyzing relationships, and validating structures.
-- Via ChatOps: Users interact with AI agents through chat-based tools to receive intelligent suggestions, review potential improvements, and approve changes, ensuring a human-in-the-loop approach.
+- Via AI Agents: Users interact with AI agents through MCP server to receive intelligent suggestions, review potential improvements, and approve changes, ensuring a human-in-the-loop approach.
 - Collaboration: Users integrate ReqFlow into agile workflows by collaborating through GitHub or similar platforms to manage repositories, track changes, and maintain traceability.
 
 

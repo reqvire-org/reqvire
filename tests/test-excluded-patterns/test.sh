@@ -32,7 +32,7 @@ if echo "$OUTPUT" | grep -q "Missing relation target"; then
 fi
 
 # There should also be no elements from excluded files in the registry
-OUTPUT=$(cd "$TEST_DIR" && "$REQFLOW_BIN" --config "${TEST_DIR}/reqflow.yaml"  --model-summary | grep -n 'Element:')
+OUTPUT=$(cd "$TEST_DIR" && "$REQFLOW_BIN" --config "${TEST_DIR}/reqflow.yaml" 2>&1  --model-summary | grep -n 'Element:')
 
 if echo "$OUTPUT" | grep -q "DesignSpecifications"; then
   echo "FAILED: Elements from excluded files are being processed"

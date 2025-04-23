@@ -141,7 +141,7 @@ This test verifies that the system correctly handles different relation types wh
   * verify: [SystemRequirements/ChangeImpactPropagation.md#change-impact-detection-algorithm](../SystemRequirements/ChangeImpactPropagation.md#change-impact-detection-algorithm)
   * verify: [SystemRequirements/ChangeImpactPropagation.md#change-impact-command-line-interface](../SystemRequirements/ChangeImpactPropagation.md#change-impact-command-line-interface) 
   * trace: [tests/test-change-impact-detection/test.sh](../../tests/test-change-impact-detection/test.sh)
-  
+
 ---
 
 ### CLI Git Commit Hash Flag Test

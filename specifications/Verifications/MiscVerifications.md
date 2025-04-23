@@ -18,9 +18,9 @@ graph LR;
   class html_export_req requirement;
   click html_export_req "../UserRequirements.md#export-html-specifications";
   html_export_verification -.->|verifies| html_export_req;
-  html_export_test["tests/test-diagram-generation/test.sh"];
+  html_export_test["tests/test-html-export/test.sh"];
   class html_export_test default;
-  click html_export_test "../../tests/test-diagram-generation/test.sh";
+  click html_export_test "../../tests/test-html-export/test.sh";
   html_export_verification -.->|trace| html_export_test;
   
   ai_context_verification["AI Agent Context Verification"];

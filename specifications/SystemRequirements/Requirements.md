@@ -700,9 +700,6 @@ satisfy:
 | **trace**       | «trace»                     | dashed dependency     | open (hollow) arrowhead | Dependent Element → Source Element          |
 | **containment** | «contain» / «containedBy»¹  | composite association | filled (black) diamond  | Container Element → Contained Element       |
 
-
-
-
 #### Relations
   * derivedFrom: [UserRequirements.md/Visualize Model Relationships](../UserRequirements.md#visualize-model-relationships)
   * satisfiedBy: [diagrams.rs](../../core/src/diagrams.rs)
