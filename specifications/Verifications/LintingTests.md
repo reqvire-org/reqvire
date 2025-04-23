@@ -53,6 +53,15 @@ graph LR;
   click model_linting_req "../UserRequirements.md#model-linting";
   model_linting_verification -.->|verifies| model_linting_req;
   model_linting_verification -.->|trace| 3de539f546654b01;
+  
+  cli_lint_verification["CLI Lint Flag Test"];
+  click cli_lint_verification "LintingTests.md#cli-lint-flag-test";
+  class cli_lint_verification verification;
+  cli_lint_req["SystemRequirements/Requirements.md#cli-lint-flag"];
+  class cli_lint_req requirement;
+  click cli_lint_req "../SystemRequirements/Requirements.md#cli-lint-flag";
+  cli_lint_verification -.->|verifies| cli_lint_req;
+  cli_lint_verification -.->|trace| 3de539f546654b01;
 ```
 
 ---
@@ -171,6 +180,40 @@ TODO: write test procedure
 
 #### Relations
   * verify: [UserRequirements.md/Model Linting](../UserRequirements.md#model-linting)
+  * trace: [tests/test-lint-expected/test.sh](../../tests/test-lint-expected/test.sh)
+
+---
+
+### CLI Lint Flag Test
+
+This test verifies that the system provides a linting function activated by the --lint flag.
+
+#### Metadata
+  * type: verification
+
+#### Details
+
+##### Acceptance Criteria
+- System shall provide a --lint flag in CLI
+- Flag shall activate the linting process
+- Linting shall execute upon user request
+- Process shall apply fixes by default
+
+##### Test Criteria
+- Command with --lint flag runs successfully
+- Linting process is executed on target files
+- Linting issues are identified and fixed
+- Changes are applied to files
+
+##### Test Procedure
+1. Create test fixtures with known linting issues (excess whitespace, inconsistent newlines, etc.)
+2. Run ReqFlow with --lint flag on the test fixtures
+3. Verify that linting process is executed and files are modified
+4. Compare output files with expected fixed versions
+5. Run with --lint --dry-run and verify that issues are identified but files aren't changed
+
+#### Relations
+  * verify: [SystemRequirements/Requirements.md#cli-lint-flag](../SystemRequirements/Requirements.md#cli-lint-flag)
   * trace: [tests/test-lint-expected/test.sh](../../tests/test-lint-expected/test.sh)
 
 ---

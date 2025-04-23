@@ -72,6 +72,15 @@ graph LR;
   click structural_change_req "../UserRequirements.md#tracing-structural-changes";
   structural_change_verification -.->|verifies| structural_change_req;
   structural_change_verification -.->|trace| 524acc7470b3e5ca;
+  
+  git_commit_hash_test["CLI Git Commit Hash Flag Test"];
+  click git_commit_hash_test "ChangeImpactTests.md#cli-git-commit-hash-flag-test";
+  class git_commit_hash_test verification;
+  git_commit_hash_req["SystemRequirements/Requirements.md#cli-git-commit-hash-flag"];
+  class git_commit_hash_req requirement;
+  click git_commit_hash_req "../SystemRequirements/Requirements.md#cli-git-commit-hash-flag";
+  git_commit_hash_test -.->|verifies| git_commit_hash_req;
+  git_commit_hash_test -.->|trace| 524acc7470b3e5ca;
 ```
 
 ---
@@ -133,6 +142,42 @@ This test verifies that the system correctly handles different relation types wh
   * verify: [SystemRequirements/ChangeImpactPropagation.md#change-impact-command-line-interface](../SystemRequirements/ChangeImpactPropagation.md#change-impact-command-line-interface) 
   * trace: [tests/test-change-impact-detection/test.sh](../../tests/test-change-impact-detection/test.sh)
   
+---
+
+### CLI Git Commit Hash Flag Test
+
+This test verifies that the system properly handles the git commit hash flag for change impact analysis.
+
+#### Metadata
+  * type: verification
+
+#### Details
+
+##### Acceptance Criteria
+- System shall support --git-commit flag for change impact analysis
+- System shall use specified commit hash as base for comparison
+- System shall default to HEAD when flag is not specified
+- System shall handle relative commit references (HEAD~1, etc.)
+
+##### Test Criteria
+- Command with explicit --git-commit flag runs successfully
+- Command without flag defaults to HEAD commit
+- Relative commit references are correctly resolved
+- Invalid commit references are reported appropriately
+- Change impact analysis correctly uses specified commit as baseline
+
+##### Test Procedure
+1. Create test fixtures with git repository containing multiple commits
+2. Run ReqFlow with --change-impact --git-commit=HEAD~1
+3. Verify that the specified commit is used as baseline
+4. Run ReqFlow with --change-impact (no git-commit flag)
+5. Verify that HEAD is used as default baseline
+6. Run with invalid commit reference and verify appropriate error
+
+#### Relations
+  * verify: [SystemRequirements/Requirements.md#cli-git-commit-hash-flag](../SystemRequirements/Requirements.md#cli-git-commit-hash-flag)
+  * trace: [tests/test-change-impact-detection/test.sh](../../tests/test-change-impact-detection/test.sh)
+
 ---
 
 ### Element Content Extraction Test

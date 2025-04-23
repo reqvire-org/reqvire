@@ -85,6 +85,48 @@ graph LR;
   click cross_component_req "../UserRequirements.md#validate-cross-component-dependencies";
   cross_component_verification -.->|verifies| cross_component_req;
   cross_component_verification -.->|trace| c86fd6ece7a8668a;
+  
+  json_output_verification["JSON Output Format Test"];
+  click json_output_verification "ValidationTests.md#json-output-format-test";
+  class json_output_verification verification;
+  json_output_req["SystemRequirements/Requirements.md#json-output-format"];
+  class json_output_req requirement;
+  click json_output_req "../SystemRequirements/Requirements.md#json-output-format";
+  json_output_verification -.->|verifies| json_output_req;
+  json_output_verification -.->|trace| c86fd6ece7a8668a;
+  
+  files_search_verification["Requirements Files Search and Detection Test"];
+  click files_search_verification "ValidationTests.md#requirements-files-search-and-detection-test";
+  class files_search_verification verification;
+  files_search_req["SystemRequirements/Requirements.md#requirements-files-search-and-detection"];
+  class files_search_req requirement;
+  click files_search_req "../SystemRequirements/Requirements.md#requirements-files-search-and-detection";
+  files_search_verification -.->|verifies| files_search_req;
+  excl_patterns_test["tests/test-excluded-patterns/test.sh"];
+  class excl_patterns_test default;
+  click excl_patterns_test "../../tests/test-excluded-patterns/test.sh";
+  files_search_verification -.->|trace| excl_patterns_test;
+  
+  unstructured_docs_verification["Unstructured Documents Test"];
+  click unstructured_docs_verification "ValidationTests.md#unstructured-documents-test";
+  class unstructured_docs_verification verification;
+  unstructured_docs_req["SystemRequirements/Requirements.md#unstructured-documents"];
+  class unstructured_docs_req requirement;
+  click unstructured_docs_req "../SystemRequirements/Requirements.md#unstructured-documents";
+  unstructured_docs_verification -.->|verifies| unstructured_docs_req;
+  valid_rel_test["tests/test-valid-relations/test.sh"];
+  class valid_rel_test default;
+  click valid_rel_test "../../tests/test-valid-relations/test.sh";
+  unstructured_docs_verification -.->|trace| valid_rel_test;
+  
+  excluded_file_relation_verification["Excluded File Relation Validation Test"];
+  click excluded_file_relation_verification "ValidationTests.md#excluded-file-relation-validation-test";
+  class excluded_file_relation_verification verification;
+  excluded_file_relation_req["SystemRequirements/Requirements.md#excluded-file-relation-validation"];
+  class excluded_file_relation_req requirement;
+  click excluded_file_relation_req "../SystemRequirements/Requirements.md#excluded-file-relation-validation";
+  excluded_file_relation_verification -.->|verifies| excluded_file_relation_req;
+  excluded_file_relation_verification -.->|trace| excl_patterns_test;
 ```
 
 ---
@@ -270,6 +312,155 @@ TODO: write test procedure
 #### Relations
   * verify: [UserRequirements.md/Validate Cross-Component Dependencies](../UserRequirements.md#validate-cross-component-dependencies)
   * trace: [tests/test-invalid-relations/test.sh](../../tests/test-invalid-relations/test.sh)
+
+---
+
+### JSON Output Format Test
+
+This test verifies that the system properly implements JSON output formatting for validation and other commands.
+
+#### Metadata
+  * type: verification
+
+#### Details
+
+##### Acceptance Criteria
+- System shall support --json flag for validation commands
+- JSON output shall be properly formatted according to a consistent schema
+- JSON structure shall be parsable and machine-readable
+- All relevant validation data shall be included in the output
+
+##### Test Criteria
+- Commands with --json flag produce valid JSON
+- JSON output can be parsed without errors
+- Output structure matches expected schema
+- All validation errors are properly represented in JSON format
+
+##### Test Procedure
+1. Create test fixtures with known validation issues
+2. Run ReqFlow with --validate --json flag on the test fixtures
+3. Verify that output is valid JSON by parsing it
+4. Confirm all validation errors are represented in the JSON output
+5. Verify that JSON structure is consistent across different validation scenarios
+
+#### Relations
+  * verify: [SystemRequirements/Requirements.md#json-output-format](../SystemRequirements/Requirements.md#json-output-format)
+  * trace: [tests/test-invalid-relations/test.sh](../../tests/test-invalid-relations/test.sh)
+
+---
+
+### Requirements Files Search and Detection Test
+
+This test verifies that the system correctly searches for and detects requirements files according to specified patterns and configurations.
+
+#### Metadata
+  * type: verification
+
+#### Details
+
+##### Acceptance Criteria
+- System shall find all requirements files in project structure based on configuration
+- System shall respect excluded file patterns defined in configuration
+- System shall handle nested directory structures correctly
+- System shall correctly identify and categorize different file types
+- System shall process both specifications and external folders
+
+##### Test Criteria
+- All expected requirements files are identified
+- Files matching exclusion patterns are skipped
+- Nested directories are correctly traversed
+- Both specifications and external folders are processed
+- Non-markdown files are handled appropriately
+
+##### Test Procedure
+1. Create test fixtures with various directory structures including:
+   - Files in different levels of nesting
+   - Files matching exclusion patterns
+   - Files in both specifications and external folders
+2. Configure ReqFlow with specific pattern rules
+3. Run ReqFlow on the test fixtures
+4. Verify that all expected files are found and processed
+5. Verify that excluded files are correctly skipped
+6. Verify correct handling of nested directories
+
+#### Relations
+  * verify: [SystemRequirements/Requirements.md#requirements-files-search-and-detection](../SystemRequirements/Requirements.md#requirements-files-search-and-detection)
+  * trace: [tests/test-excluded-patterns/test.sh](../../tests/test-excluded-patterns/test.sh)
+
+---
+
+### Unstructured Documents Test
+
+This test verifies that the system correctly handles unstructured documents for relation targets.
+
+#### Metadata
+  * type: verification
+
+#### Details
+
+##### Acceptance Criteria
+- System shall allow referencing unstructured documents (text files, code files)
+- System shall not attempt to parse unstructured documents as requirements
+- System shall validate that referenced unstructured documents exist
+- System shall not report validation errors for valid references to unstructured documents
+
+##### Test Criteria
+- Relations referencing unstructured documents are treated as valid
+- No attempt is made to extract elements from unstructured documents
+- Validation succeeds when referenced unstructured documents exist
+- Validation fails when referenced unstructured documents don't exist
+
+##### Test Procedure
+1. Create test fixtures with:
+   - Requirements referencing unstructured documents (.txt, .cpp files)
+   - Valid references to existing unstructured documents
+   - Invalid references to non-existent unstructured documents
+2. Run ReqFlow validation on the test fixtures
+3. Verify that valid references to unstructured documents are accepted
+4. Verify that invalid references to non-existent files are reported
+5. Verify that unstructured documents are not parsed for elements
+
+#### Relations
+  * verify: [SystemRequirements/Requirements.md#unstructured-documents](../SystemRequirements/Requirements.md#unstructured-documents)
+  * trace: [tests/test-valid-relations/test.sh](../../tests/test-valid-relations/test.sh)
+
+---
+
+### Excluded File Relation Validation Test
+
+This test verifies that the system correctly validates relations to excluded files.
+
+#### Metadata
+  * type: verification
+
+#### Details
+
+##### Acceptance Criteria
+- System shall validate existence of excluded files referenced in relations
+- System shall not parse excluded files for elements
+- System shall allow relations TO excluded files but not FROM excluded files
+- System shall apply exclusion patterns based on configuration
+
+##### Test Criteria
+- Relations to excluded files are treated as valid if files exist
+- Relations from excluded files are not processed
+- Excluded files are not parsed for elements
+- Files matching exclusion patterns are correctly identified
+
+##### Test Procedure
+1. Create test fixtures with:
+   - Files matching exclusion patterns
+   - Requirements referencing excluded files
+   - Requirements referenced by excluded files (should be ignored)
+2. Configure ReqFlow with specific exclusion patterns
+3. Run ReqFlow validation on the test fixtures
+4. Verify that relations to excluded files are validated for file existence
+5. Verify that excluded files are not parsed for elements
+6. Verify that relations from excluded files are not processed
+
+#### Relations
+  * verify: [SystemRequirements/Requirements.md#excluded-file-relation-validation](../SystemRequirements/Requirements.md#excluded-file-relation-validation)
+  * trace: [tests/test-excluded-patterns/test.sh](../../tests/test-excluded-patterns/test.sh)
 
 ---
 
