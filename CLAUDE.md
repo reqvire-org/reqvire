@@ -11,11 +11,11 @@ ReqFlow is an AI-driven framework for system modeling and requirements managemen
 - **Linting**: Modular system for validating and fixing markdown formatting issues
 
 ## Command Line Usage
-- Initialize ReqFlow: `reqflow init`
-- Validate requirements: `reqflow validate specifications/`
-- Generate HTML: `reqflow specifications/ output/ --html`
-- Lint requirements: `reqflow --lint specifications/`
-- Generate diagrams: `reqflow --lint specifications/ --generate-diagrams`
+- Validate requirements: `reqflow --validate`
+- Generate HTML: `reqflow --html`
+- Lint requirements: `reqflow --lint --dry-run`
+- Generate diagrams: `reqflow --generate-diagrams`
+- Show Change Impact: `reqflow --change-impact --git-comit=HEAD~1`
 
 ## Build and Test Commands
 - Build: `cargo build`
@@ -25,18 +25,10 @@ ReqFlow is an AI-driven framework for system modeling and requirements managemen
 - Lint: `cargo clippy -- -D warnings`
 - Format: `cargo fmt`
 
-## Dependencies
-- Markdown parsing: `pulldown-cmark`  
-- HTML generation: `maud`
-- Path handling: `camino`
-- Command line: `clap` with derive feature
-- Regex: `regex`
 
 ## Key File Locations
-- Configuration example: `reqflow.yml.example`
-- Design specifications: `specifications/DesignSpecifications/`
-- Test fixtures: `test-fixtures/`
-- E2E tests: `tests/e2e-*/`
+- Requirements and Specifications: `specifications/**/*.md`
+- E2E tests: `tests/*/`
 
 ## Code Style Guidelines
 - Follow Rust standard naming conventions

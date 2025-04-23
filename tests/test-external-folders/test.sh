@@ -7,7 +7,7 @@ EXIT_CODE=$?
 printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
 
 
-if [[ $status -ne 0 ]]; then
+if [[ $EXIT_CODE -ne 0 ]]; then
     exit $EXIT_CODE
 fi
 
