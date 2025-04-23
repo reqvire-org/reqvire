@@ -28,7 +28,6 @@ if [ $EXIT_CODE -ne 0 ]; then
   exit 1
 fi
 
-
 # Verify that successful validation message is displayed
 if ! echo "$OUTPUT" | grep -q "Validation completed successfully with no errors."; then
   echo "FAILED: Missing success message for relation validation"

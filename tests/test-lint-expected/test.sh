@@ -3,14 +3,13 @@
 # Test: Whitespace Linting Functionality
 # --------------------------------------
 # Acceptance Criteria:
-# - System should detect excess whitespace after headers
-# - System should fix excess whitespace in linting mode
-# - The output should show before/after changes
+# - The dry-run output should show before/after changes with specific expected lint commands to be applied
+# - The lint should apply expected fixes
 #
 # Test Criteria:
 # - Command exits with success (0) return code
-# - Output shows whitespace being fixed
-# - Output should contain diff-style formatting
+# - Dry-run Output should contain diff-style formatting
+# - The lint should apply expected fixes and produce expected output
 #
 
 
