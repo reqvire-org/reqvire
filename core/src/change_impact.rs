@@ -856,6 +856,8 @@ mod tests {
                 direction: RelationDirection::Forward,
                 opposite: Some("derivedFrom"),
                 description: "Element B derives from A",
+                arrow: "-->",
+                label: "label"
             },
             "A",
         );
@@ -899,6 +901,8 @@ mod tests {
                 direction: RelationDirection::Forward,
                 opposite: Some("containedBy"),
                 description: "Element A contains B",
+                arrow: "-->",
+                label: "label"                
             },
             "B",
         );
@@ -910,6 +914,8 @@ mod tests {
                 direction: RelationDirection::Forward,
                 opposite: Some("derivedFrom"),
                 description: "Element B derives from A",
+                arrow: "-->",
+                label: "label"                
             },
             "A",
         );
