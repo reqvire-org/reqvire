@@ -2,7 +2,7 @@
 
 This document verifies the requirements for ReqFlow's linting functionality.
 
-## Whitespace Linting Tests
+## Linting Functionality Tests
 ```mermaid
 graph LR;
   %% Graph styling
@@ -26,6 +26,33 @@ graph LR;
   class 3de539f546654b01 default;
   click 3de539f546654b01 "../../tests/test-lint-expected/test.sh";
   4cd0fe733f182d5c -.->|trace| 3de539f546654b01;
+  
+  linting_command_verification["Linting Command Verification"];
+  click linting_command_verification "LintingTests.md#linting-command-verification";
+  class linting_command_verification verification;
+  linting_command_req["UserRequirements.md/Linting Command"];
+  class linting_command_req requirement;
+  click linting_command_req "../UserRequirements.md#linting-command";
+  linting_command_verification -.->|verifies| linting_command_req;
+  linting_command_verification -.->|trace| 3de539f546654b01;
+  
+  format_consistency_verification["Format Consistency Verification"];
+  click format_consistency_verification "LintingTests.md#format-consistency-verification";
+  class format_consistency_verification verification;
+  format_consistency_req["UserRequirements.md/Format Consistency Enforcement"];
+  class format_consistency_req requirement;
+  click format_consistency_req "../UserRequirements.md#format-consistency-enforcement";
+  format_consistency_verification -.->|verifies| format_consistency_req;
+  format_consistency_verification -.->|trace| 3de539f546654b01;
+  
+  model_linting_verification["Model Linting Verification"];
+  click model_linting_verification "LintingTests.md#model-linting-verification";
+  class model_linting_verification verification;
+  model_linting_req["UserRequirements.md/Model Linting"];
+  class model_linting_req requirement;
+  click model_linting_req "../UserRequirements.md#model-linting";
+  model_linting_verification -.->|verifies| model_linting_req;
+  model_linting_verification -.->|trace| 3de539f546654b01;
 ```
 
 ---
@@ -57,6 +84,93 @@ The verification test checks that ReqFlow correctly identifies and fixes excess 
 #### Relations
   * verify: [SystemRequirements/Requirements.md/Excess Whitespace Linting Implementation](../SystemRequirements/Requirements.md#excess-whitespace-linting-implementation)
   * verify: [SystemRequirements/Requirements.md/Dry Run Mode](../SystemRequirements/Requirements.md#dry-run-mode)
+  * trace: [tests/test-lint-expected/test.sh](../../tests/test-lint-expected/test.sh)
+
+---
+
+### Linting Command Verification
+
+This test verifies that the system properly implements the linting command functionality with both automatic fix and preview options.
+
+#### Metadata
+  * type: verification
+
+#### Details
+
+##### Acceptance Criteria
+- System should provide a linting command that can automatically apply fixes
+- System should offer a preview option to show changes without applying them
+- Linting command should be activated via the --lint flag
+- Dry run mode should be activated via the --dry-run flag
+
+##### Test Criteria
+- Command exits with success (0) return code
+- Linting fixes are properly applied in normal mode
+- Changes are only displayed but not applied in dry-run mode
+- The command provides clear output about what changes would be or have been made
+
+##### Test Procedure
+TODO: write test procedure
+
+#### Relations
+  * verify: [UserRequirements.md/Linting Command](../UserRequirements.md#linting-command)
+  * trace: [tests/test-lint-expected/test.sh](../../tests/test-lint-expected/test.sh)
+
+---
+
+### Format Consistency Verification
+
+This test verifies that the system properly enforces consistent formatting in requirements documents.
+
+#### Metadata
+  * type: verification
+
+#### Details
+
+##### Acceptance Criteria
+- System should detect and fix excess whitespace after element names and relation identifiers
+- System should normalize to exactly two newlines before subsections
+- System should automatically insert separator lines between elements if not present
+- System should ensure consistent indentation in relation lists
+
+##### Test Criteria
+- Command exits with success (0) return code
+- Formatting issues are detected and fixed according to the standards
+- The fixed documents maintain proper structure and content
+
+##### Test Procedure
+TODO: write test procedure
+
+#### Relations
+  * verify: [UserRequirements.md/Format Consistency Enforcement](../UserRequirements.md#format-consistency-enforcement)
+  * trace: [tests/test-lint-expected/test.sh](../../tests/test-lint-expected/test.sh)
+
+---
+
+### Model Linting Verification
+
+This test verifies that the system provides linting capabilities to identify and fix stylistic and non-critical issues in MBSE models.
+
+#### Metadata
+  * type: verification
+
+#### Details
+
+##### Acceptance Criteria
+- System should identify stylistic and formatting issues in MBSE models
+- System should fix non-critical issues without affecting functional integrity
+- System should provide clear reporting of the issues it identifies
+
+##### Test Criteria
+- Command exits with success (0) return code
+- Linting identifies all expected issue types across test files
+- Fixes are appropriately applied without breaking model structure
+
+##### Test Procedure
+TODO: write test procedure
+
+#### Relations
+  * verify: [UserRequirements.md/Model Linting](../UserRequirements.md#model-linting)
   * trace: [tests/test-lint-expected/test.sh](../../tests/test-lint-expected/test.sh)
 
 ---
