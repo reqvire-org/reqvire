@@ -54,11 +54,17 @@ This test verifies that the system exports specifications into HTML format and s
 - HTML content preserves the structure and information from the source files
 
 ##### Test Procedure
-TODO: write test procedure
+1. Prepare test fixtures with Markdown files containing links to other documents
+2. Ensure there's a README.md file to test conversion to index.html
+3. Run ReqFlow with the --html flag
+4. Verify that HTML files are generated for all Markdown files
+5. Verify that README.md is converted to index.html
+6. Verify that links use .html extension instead of .md
+7. Verify that structure and content are preserved in the HTML files
 
 #### Relations
   * verify: [UserRequirements.md/Export HTML specifications](../UserRequirements.md#export-html-specifications)
-  * trace: [tests/test-diagram-generation/test.sh](../../tests/test-diagram-generation/test.sh)
+  * trace: [tests/test-html-export/test.sh](../../tests/test-html-export/test.sh)
 
 ---
 
