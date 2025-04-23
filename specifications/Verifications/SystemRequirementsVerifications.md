@@ -330,26 +330,23 @@ This test verifies that the system correctly generates an index document with li
 #### Details
 
 ##### Acceptance Criteria
-- System shall generate index.md in the root folder
-- Index shall contain links to all specification documents
-- Index shall be properly structured with sections
-- Index shall include brief summaries of each document
-- Index shall be generated in HTML when html output is requested
+- System shall generate README.md in the specifications folder
+- README.md shall contain links to all specification documents
+- README.md shall be properly structured with sections
+- README.md shall include brief summaries of each document
 
 ##### Test Criteria
 - Command with --generate-index flag runs successfully
-- Index file is created in the expected location
-- Index contains links to all specification documents
-- Index structure follows expected format
-- HTML index is created when --html flag is also used
+- README.md file is created in the specifications folder
+- README.md contains links to all specification documents
+- README.md structure follows expected format
 
 ##### Test Procedure
 1. Create test fixtures with multiple specification documents in various folders
 2. Run ReqFlow with --generate-index flag
-3. Verify that index.md is created in the root folder
-4. Verify that index contains links to all specification documents
+3. Verify that README.md is created in the specifications folder
+4. Verify that README.md contains links to all specification documents
 5. Verify that document structure and summaries are included
-6. Run ReqFlow with --generate-index --html and verify HTML index is generated
 
 #### Relations
   * verify: [SystemRequirements/Requirements.md#index-generation](../SystemRequirements/Requirements.md#index-generation)
