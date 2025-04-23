@@ -45,6 +45,33 @@ graph LR;
   class extraction_test_script default;
   click extraction_test_script "../../tests/test-element-content-extraction/test.sh";
   element_extraction_test -.->|trace| extraction_test_script;
+  
+  change_impact_verification["Change Impact Analysis Verification"];
+  click change_impact_verification "ChangeImpactTests.md#change-impact-analysis-verification";
+  class change_impact_verification verification;
+  change_impact_req["UserRequirements.md/Change Impact Analysis"];
+  class change_impact_req requirement;
+  click change_impact_req "../UserRequirements.md#change-impact-analysis";
+  change_impact_verification -.->|verifies| change_impact_req;
+  change_impact_verification -.->|trace| 524acc7470b3e5ca;
+  
+  traceability_matrix_verification["Traceability Matrix Verification"];
+  click traceability_matrix_verification "ChangeImpactTests.md#traceability-matrix-verification";
+  class traceability_matrix_verification verification;
+  traceability_matrix_req["UserRequirements.md/Traceability Matrix"];
+  class traceability_matrix_req requirement;
+  click traceability_matrix_req "../UserRequirements.md#traceability-matrix";
+  traceability_matrix_verification -.->|verifies| traceability_matrix_req;
+  traceability_matrix_verification -.->|trace| 524acc7470b3e5ca;
+  
+  structural_change_verification["Structural Change Reports Verification"];
+  click structural_change_verification "ChangeImpactTests.md#structural-change-reports-verification";
+  class structural_change_verification verification;
+  structural_change_req["UserRequirements.md/Tracing Structural Changes"];
+  class structural_change_req requirement;
+  click structural_change_req "../UserRequirements.md#tracing-structural-changes";
+  structural_change_verification -.->|verifies| structural_change_req;
+  structural_change_verification -.->|trace| 524acc7470b3e5ca;
 ```
 
 ---
@@ -138,3 +165,89 @@ This test verifies that the system correctly extracts element content for change
   * verify: [SystemRequirements/ChangeImpactPropagation.md#change-impact-detection-algorithm](../SystemRequirements/ChangeImpactPropagation.md#change-impact-detection-algorithm)
   * verify: [SystemRequirements/Requirements.md#Requirements Processing](../SystemRequirements/Requirements.md#requirements-processing)
   * trace: [tests/test-element-content-extraction/test.sh](../../tests/test-element-content-extraction/test.sh)
+
+---
+
+### Change Impact Analysis Verification
+
+This test verifies that the system generates change impact reports when requested.
+
+#### Metadata
+  * type: verification
+
+#### Details
+
+##### Acceptance Criteria
+- System should generate change impact reports in Markdown format
+- System should support JSON output for change impact reports
+- Reports should include an overview of model changes and their impact
+
+##### Test Criteria
+- Command exits with success (0) return code
+- Reports contain expected impact information
+- Both Markdown and JSON formats are properly supported
+
+##### Test Procedure
+TODO: write test procedure
+
+#### Relations
+  * verify: [UserRequirements.md/Change Impact Analysis](../UserRequirements.md#change-impact-analysis)
+  * trace: [tests/test-change-impact-detection/test.sh](../../tests/test-change-impact-detection/test.sh)
+
+---
+
+### Traceability Matrix Verification
+
+This test verifies that the system generates traceability matrices in Markdown format.
+
+#### Metadata
+  * type: verification
+
+#### Details
+
+##### Acceptance Criteria
+- System should generate traceability matrices in Markdown format
+- Matrices should support different views (Requirements-to-Verification, etc.)
+- Matrices should efficiently represent relationships between elements
+
+##### Test Criteria
+- Command exits with success (0) return code
+- Generated matrices contain expected relationship information
+- Different matrix views are properly supported
+
+##### Test Procedure
+TODO: write test procedure
+
+#### Relations
+  * verify: [UserRequirements.md/Traceability Matrix](../UserRequirements.md#traceability-matrix)
+  * trace: [tests/test-change-impact-detection/test.sh](../../tests/test-change-impact-detection/test.sh)
+
+---
+
+### Structural Change Reports Verification
+
+This test verifies that the system analyzes and reports on structural changes in the MBSE model.
+
+#### Metadata
+  * type: verification
+
+#### Details
+
+##### Acceptance Criteria
+- System should analyze structural changes in the MBSE model
+- System should identify affected components through relationship traversal
+- System should generate reports of impacted elements and structures
+
+##### Test Criteria
+- Command exits with success (0) return code
+- Change reports correctly identify affected elements
+- Relationship traversal properly determines impact propagation
+
+##### Test Procedure
+TODO: write test procedure
+
+#### Relations
+  * verify: [UserRequirements.md/Tracing Structural Changes](../UserRequirements.md#tracing-structural-changes)
+  * trace: [tests/test-change-impact-detection/test.sh](../../tests/test-change-impact-detection/test.sh)
+
+---
