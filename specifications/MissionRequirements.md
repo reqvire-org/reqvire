@@ -11,18 +11,18 @@ graph LR;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
   cc8c3af529fef9f2["Align with Industry Standards"];
-  click cc8c3af529fef9f2 "MissionRequirements.md#align-with-industry-standards";
+  click cc8c3af529fef9f2 "https://github.com/ilijaljubicic/ReqFlow/blob/a94231473c9a4a56fe21608ebd13787e0cc3f2dc/specifications/MissionRequirements.md#align-with-industry-standards";
   class cc8c3af529fef9f2 requirement;
   b3f57e49f7494c0e["MOEs.md/MOE_CE"];
   class b3f57e49f7494c0e requirement;
-  click b3f57e49f7494c0e "MOEs.md#moe_ce";
+  click b3f57e49f7494c0e "https://github.com/ilijaljubicic/ReqFlow/blob/a94231473c9a4a56fe21608ebd13787e0cc3f2dc/specifications/MOEs.md#moe_ce";
   cc8c3af529fef9f2 -.->|deriveReqT| b3f57e49f7494c0e;
   37960779163a9fc8["Promote Automation and Efficiency"];
-  click 37960779163a9fc8 "MissionRequirements.md#promote-automation-and-efficiency";
+  click 37960779163a9fc8 "https://github.com/ilijaljubicic/ReqFlow/blob/a94231473c9a4a56fe21608ebd13787e0cc3f2dc/specifications/MissionRequirements.md#promote-automation-and-efficiency";
   class 37960779163a9fc8 requirement;
   f6237e49f7494c0e["MOEs.md/MOE_UA"];
   class f6237e49f7494c0e requirement;
-  click f6237e49f7494c0e "MOEs.md#moe_ua";
+  click f6237e49f7494c0e "https://github.com/ilijaljubicic/ReqFlow/blob/a94231473c9a4a56fe21608ebd13787e0cc3f2dc/specifications/MOEs.md#moe_ua";
   37960779163a9fc8 -.->|deriveReqT| f6237e49f7494c0e;
 ```
 
