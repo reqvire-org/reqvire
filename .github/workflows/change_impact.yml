@@ -5,12 +5,15 @@ on:
     types: [created]
 
 jobs:
-  run-change-impact:
+  run-reqflow:
     if: |
       github.event.issue.pull_request != null &&
-      contains(github.event.comment.body, '/reqflow impact')
+      (
+        contains(github.event.comment.body, '/reqflow impact') ||
+        contains(github.event.comment.body, '/reqflow traces')
+      )
     runs-on: ubuntu-latest
-
+    
     permissions:
       pull-requests: write
       issues: write
@@ -76,18 +79,20 @@ jobs:
           cp target/release/reqflow ./reqflow
 
 
-      - name: Run ReqFlow Change Impact against PR base
-        id: run_reqflow
+      - name: Run ReqFlow Impact (if triggered)
+        if: contains(github.event.comment.body, '/reqflow impact')
+        id: run_impact
         run: |
-          mkdir output
-          OUTPUT=$(./reqflow --change-impact --git-commit "$BASE_COMMIT" 2>&1 || echo "⚠️ reqflow failed.")
+          OUTPUT=$(./reqflow --change-impact --git-commit "$BASE_COMMIT" 2>&1 || echo "⚠️ reqflow impact failed.")
           echo "REQFLOW_OUTPUT<<EOF" >> $GITHUB_ENV
           echo "$OUTPUT" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
-           
-      - name: Comment on PR with result
-        uses: peter-evans/create-or-update-comment@v3
-        with:
-          issue-number: ${{ github.event.issue.number }}
-          body: |
-            ${{ env.REQFLOW_OUTPUT }}
+
+      - name: Run ReqFlow Traces (if triggered)
+        if: contains(github.event.comment.body, '/reqflow traces')
+        id: run_traces
+        run: |
+          OUTPUT=$(./reqflow --traces --output-format markdown 2>&1 || echo "⚠️ reqflow traces failed.")
+          echo "REQFLOW_OUTPUT<<EOF" >> $GITHUB_ENV
+          echo "$OUTPUT" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV

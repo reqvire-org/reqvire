@@ -1,26 +1,29 @@
-# ReqFlow Configuration
-
-general:
-  # Enable verbose output
-  verbose: false
-
-paths:
-  # Path to the specifications folder (can be set via command line argument)
+  # Path to the specifications folder
   specifications_folder: "specifications"
   
-  
-  # Folder name for design specifications (relative to specifications_folder)
-  design_specifications_folder_name: "DesignSpecifications"
-  
-  # Default output folder (can be set via command line argument)
+  # Default output folder for exported html specifications
   output_folder: "output"
   
   # Additional external folders that contain system requirements and other files
   # These can be absolute paths or paths relative to the input folder
-  # External folders can only contain SystemRequirements, not User or Mission Requirements
-  # external_folders:
-  #   - "../other-project/specifications"
-  #   - "/mnt/shared/team-requirements"
+  # All markdown files in these folders are considered requirements (except those matching exclusion patterns)
+  external_folders:
+    - todo_specifications
+    - tests
+    - core
+    - cli
+      
+  # Glob patterns to exclude from requirements processing
+  # These are patterns that shouldn't be considered requirements even if they're in specifications or external folders
+  excluded_filename_patterns:
+    - "Usecases.md"
+    - "**/Logical*.md"
+    - "**/Physical*.md"
+    - "**/TODO.md"
+    - "**/DesignSpecifications/**"        
+    - "**/tests/**"    
+    - "**/core/**"    
+    - "**/cli/**"            
 
 style:
   # Theme for HTML output (default, dark, light)
@@ -31,3 +34,7 @@ style:
   
   # Optional path to custom CSS file
   # custom_css: "path/to/custom.css"
+  
+  # Diagram direction (TD for top-down, LR for left-to-right)
+  diagram_direction: "LR"
+  

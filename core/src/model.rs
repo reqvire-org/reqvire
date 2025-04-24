@@ -162,7 +162,7 @@ impl ModelManager {
                     }
                     if let relation::LinkType::Identifier(ref target_id) = relation.target.link {
                         if !md_regex.is_match(target_id) {
-                            log::debug!("Skipping non-markdown target: {}", target_id);
+                            log::debug!("Skipping non-markdown target: {}", target_id);                        
                             continue;
                         }
 

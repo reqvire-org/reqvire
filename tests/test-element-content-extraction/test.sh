@@ -8,7 +8,7 @@
 #
 # Test Criteria:
 # - Command exits with success (0) return code
-# - Output shows expecte content for each element
+# - Output shows expected content for each element
 #
 
 
@@ -38,7 +38,7 @@ GOTTEN_CONTENT=$(echo "$OUTPUT" | jq -r '
 GOTTEN_CONTENT=$(printf "\n%s" "$GOTTEN_CONTENT")
 
 
-EXPECTED_CONTENT='
+EXPECTED_CONTENT="
 REQ 0:Root requirement for relations to work.
 
 REQ 1:This is simple requirement with main text only.
@@ -55,7 +55,9 @@ REQ 5:Requirement with main text and relations and metadata and details differen
 
 REQ 6:Requirement with main text and relations and metadata and details different order (B). REQ 6 Details.
 
-REQ 7:Requirement with main text and relations and metadata and details different order (C). REQ 7 Details.'
+REQ 7:Requirement with main text and relations and metadata and details different order (C). REQ 7 Details.
+
+REQ 8:Requirement with main text and relations details with <details> element that should not break parsing and validation.    <details> ### REQ 8 Nested requirement which should not be processed as requirement. #### Relations   * derivedFrom: #req-0          </details>"
 
 
 

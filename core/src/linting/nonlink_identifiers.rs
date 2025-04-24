@@ -29,9 +29,9 @@ pub fn find_nonlink_identifiers(content: &str, file_path: &Path) -> Vec<LintSugg
     //  - id: captures the identifier (the rest of the line, non-greedy).
     //  - end: trailing whitespace.
     let pattern = format!(
-        r"(?m)^(?P<begin>\s*\*\s+(?P<relation>(?:{}))\s*:\s*)(?P<id>.+?)(?P<end>\s*)$",
+        r"(?m)^(?P<begin>\s*\*\s*(?P<relation>(?:{}))\s*:\s*)(?P<id>.+?)(?P<end>\s*)$",
         supported
-    );
+    ); 
     let relation_regex = Regex::new(&pattern).unwrap();
 
     // This regex matches a markdown link, e.g. "[text](target)"
@@ -83,7 +83,8 @@ pub fn find_nonlink_identifiers(content: &str, file_path: &Path) -> Vec<LintSugg
         let link_text = format!("[{}]({})", display_text, normalized);
 
         // Build the replacement by preserving the captured begin and end.
-        let replacement = format!("{}{}{}", begin, link_text, end);
+        let replacement = format!("{} {}{}", begin.trim_end(), link_text, end);
+
 
         // The entire matched line (including leading/trailing whitespace).
         let entire_match = caps.get(0).unwrap().as_str();
@@ -218,6 +219,20 @@ mod tests {
         // Expect zero suggestions
         assert_eq!(suggestions.len(), 0);
     }
+    
+    #[test]
+    fn test_missing_space_after_colon() {
+        let content = "* refine:#Element Header";
+        let file_path = PathBuf::from("test.md");
+
+        let suggestions = find_nonlink_identifiers(content, &file_path);
+        assert_eq!(suggestions.len(), 1);
+
+        if let LintFix::ReplacePattern { pattern, replacement } = &suggestions[0].fix {
+            assert_eq!(pattern, "* refine:#Element Header");
+            assert_eq!(replacement, "* refine: [Element Header](#element-header)");
+        }
+    }    
 }
 
 

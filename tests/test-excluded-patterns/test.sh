@@ -17,20 +17,24 @@ OUTPUT=$(cd "$TEST_DIR" && "$REQFLOW_BIN" --config "${TEST_DIR}/reqflow.yaml"  -
 EXIT_CODE=$?
 
 
+
 printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
 
+if [[ $EXIT_CODE -ne 0 ]]; then
+    exit $EXIT_CODE
+fi
+
+
 # There should be no errors about excluded file relations being invalid
-if echo "$OUTPUT" | grep -q "Missing relation target.*DesignSpecifications/ExcludedFile.md"; then
+if echo "$OUTPUT" | grep -q "Missing relation target"; then
   echo "FAILED: Relation to excluded file was incorrectly reported as invalid"
   exit 1
 fi
 
 # There should also be no elements from excluded files in the registry
-# Check this by looking for validation of relations FROM excluded files
-# This is trickier to test without having access to the internal registry
-# We'll use a heuristic: if the relation from DSD-001 is validated, it means 
-# the element was processed, which is incorrect
-if echo "$OUTPUT" | grep -q "DSD-001"; then
+OUTPUT=$(cd "$TEST_DIR" && "$REQFLOW_BIN" --config "${TEST_DIR}/reqflow.yaml" 2>&1  --model-summary | grep -n 'Element:')
+
+if echo "$OUTPUT" | grep -q "DesignSpecifications"; then
   echo "FAILED: Elements from excluded files are being processed"
   exit 1
 fi

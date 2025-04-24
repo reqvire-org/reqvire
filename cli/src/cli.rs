@@ -10,7 +10,7 @@ use globset::GlobSet;
 use reqflow::reports;
 use reqflow::change_impact;
 use reqflow::git_commands;
-
+use reqflow::matrix_generator;
 
 #[derive(Parser, Debug)]
 #[clap(author,version, about = "Reqflow MBSE model management tool", long_about = None)]
@@ -29,10 +29,15 @@ pub struct Args {
     #[clap(long, requires = "lint")]
     pub dry_run: bool,
     
-    /// Generate traceability matrix without processing other files
-    /// Creates a matrix showing relationships between elements in the model
+    /// Generate traceability information without processing other files
+    /// Creates matrices and reports showing relationships between elements in the model
     #[clap(long)]
-    pub generate_matrix: bool,
+    pub traces: bool,
+    
+    /// Output traceability matrix as SVG without hyperlinks and with full element names
+    /// Cannot be used with --json
+    #[clap(long, requires = "traces", conflicts_with = "json")]
+    pub svg: bool,
     
     /// Output validation results in JSON format
     /// Useful for CI/CD pipelines and automation
@@ -134,16 +139,11 @@ pub fn handle_command(
 
     // Handle LLM context
     if args.llm_context {
-        match std::fs::read_to_string("src/llm_context.md") {
-            Ok(content) => {
-                println!("{}", content);
-                Args::print_help();
-                return Ok(0);
-            }
-            Err(_e) => {
-                return Err(ReqFlowError::ProcessError("❌ Failed to read LLM context file".to_string()));
-            }
-        }
+        // Include the LLM context content directly in the binary
+        let llm_context = include_str!("llm_context.md");
+        println!("{}", llm_context);
+        Args::print_help();
+        return Ok(0);
     }else{
   
         let parse_result=model_manager.parse_and_validate(None, &specification_folder_path, &external_folders_path,excluded_filename_patterns);
@@ -228,8 +228,22 @@ pub fn handle_command(
             return Ok(0);
             
             
-        }else if args.generate_matrix {
-            info!("Not implemented yet");
+        }else if args.traces {
+            let matrix_config = matrix_generator::MatrixConfig::default();
+            
+            let matrix_output = reqflow::matrix_generator::generate_matrix(
+                &model_manager.element_registry,
+                &matrix_config,
+                if args.json {
+                    matrix_generator::MatrixFormat::Json
+                } else if args.svg {
+                    matrix_generator::MatrixFormat::Svg
+                } else {
+                    matrix_generator::MatrixFormat::Markdown
+                },                
+            );
+            
+            println!("{}", matrix_output);
             return Ok(0);
             
            
@@ -281,7 +295,8 @@ mod tests {
             lint: false,
             dry_run: false,
             json: false,
-            generate_matrix: false,
+            svg: false,
+            traces: false,
             generate_diagrams: false,
             generate_index: false,
             model_summary: false,

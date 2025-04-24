@@ -1,0 +1,348 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TreacibilityMatrix</title>
+    
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa;
+    color: #333;
+}
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+.content {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+h1 {
+    color: #333;
+    border-bottom: 2px solid #eaecef;
+    padding-bottom: 10px;
+    margin-top: 0;
+}
+h2 {
+    color: #333;
+    border-bottom: 1px solid #eaecef;
+    padding-bottom: 5px;
+}
+h3 {
+    color: #1a6fb7;
+    margin-top: 25px;
+}
+h4 {
+    color: #555;
+    font-weight: 600;
+}
+a {
+    color: #0366d6;
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 20px 0;
+}
+table, th, td {
+    border: 1px solid #dfe2e5;
+}
+th, td {
+    padding: 8px 12px;
+    text-align: left;
+}
+th {
+    background-color: #f6f8fa;
+}
+code {
+    background: #f6f8fa;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 90%;
+}
+pre {
+    background: #f6f8fa;
+    border-radius: 3px;
+    padding: 16px;
+    overflow: auto;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+}
+blockquote {
+    margin: 0;
+    padding: 0 15px;
+    color: #777;
+    border-left: 4px solid #dfe2e5;
+}
+.mermaid {
+    margin: 20px 0;
+    text-align: center;
+}
+</style>
+
+    <!-- Enhanced mermaid configuration for ReqFlow diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'neutral',
+            maxTextSize: 90000,
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            securityLevel: 'loose'
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="content">
+            <h1 id="treacibility-matrix-verifications">Treacibility Matrix Verifications</h1>
+<p>This document contains treacibility matrix related verification tests.</p>
+<h2 id="traceability-matrix-verifications">Traceability Matrix Verifications</h2>
+<div class="mermaid">graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+
+  462edeec749b84ff[&quot;CLI Traces Flag Test&quot;];
+  click 462edeec749b84ff &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/Verifications/TreacibilityMatrix.html#cli-traces-flag-test&quot;;
+  class 462edeec749b84ff verification;
+  438a74e06c98c101[&quot;SystemRequirements/Requirements.md/CLI Traces Flag&quot;];
+  class 438a74e06c98c101 requirement;
+  click 438a74e06c98c101 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#cli-traces-flag&quot;;
+  462edeec749b84ff -.-&gt;|verifies| 438a74e06c98c101;
+  aff73dbcfd69f934[&quot;tests/test-matrix-generation/test.sh&quot;];
+  class aff73dbcfd69f934 default;
+  click aff73dbcfd69f934 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/tests/test-matrix-generation/test.sh&quot;;
+  462edeec749b84ff -.-&gt;|trace| aff73dbcfd69f934;
+  8068778416bcd8a2[&quot;Traceability Matrix Generation Test&quot;];
+  click 8068778416bcd8a2 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/Verifications/TreacibilityMatrix.html#traceability-matrix-generation-test&quot;;
+  class 8068778416bcd8a2 verification;
+  5eca866a0338e0fe[&quot;SystemRequirements/Requirements.md/Traceability Matrix Builder Implementation&quot;];
+  class 5eca866a0338e0fe requirement;
+  click 5eca866a0338e0fe &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#traceability-matrix-builder-implementation&quot;;
+  8068778416bcd8a2 -.-&gt;|verifies| 5eca866a0338e0fe;
+  8068778416bcd8a2 -.-&gt;|trace| aff73dbcfd69f934;
+  8014a4337e7a9647[&quot;JSON Matrix Output Test&quot;];
+  click 8014a4337e7a9647 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/Verifications/TreacibilityMatrix.html#json-matrix-output-test&quot;;
+  class 8014a4337e7a9647 verification;
+  d7e5fbf806d650d9[&quot;SystemRequirements/Requirements.md/Markdown Matrix Formatter&quot;];
+  class d7e5fbf806d650d9 requirement;
+  click d7e5fbf806d650d9 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#markdown-matrix-formatter&quot;;
+  8014a4337e7a9647 -.-&gt;|verifies| d7e5fbf806d650d9;
+  8014a4337e7a9647 -.-&gt;|trace| aff73dbcfd69f934;
+  3428f775a68e0b22[&quot;Hierarchical Matrix Format Test&quot;];
+  click 3428f775a68e0b22 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/Verifications/TreacibilityMatrix.html#hierarchical-matrix-format-test&quot;;
+  class 3428f775a68e0b22 verification;
+  3428f775a68e0b22 -.-&gt;|verifies| 5eca866a0338e0fe;
+  3428f775a68e0b22 -.-&gt;|trace| aff73dbcfd69f934;
+  7d354a1a2d95e7df[&quot;SVG Matrix Output Test&quot;];
+  click 7d354a1a2d95e7df &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/Verifications/TreacibilityMatrix.html#svg-matrix-output-test&quot;;
+  class 7d354a1a2d95e7df verification;
+  1ffba11189b9b4c8[&quot;SystemRequirements/Requirements.md/CLI Traces SVG Flag&quot;];
+  class 1ffba11189b9b4c8 requirement;
+  click 1ffba11189b9b4c8 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#cli-traces-svg-flag&quot;;
+  7d354a1a2d95e7df -.-&gt;|verifies| 1ffba11189b9b4c8;
+  7d354a1a2d95e7df -.-&gt;|trace| aff73dbcfd69f934;
+</div>
+<hr />
+<h3 id="traceability-matrix-generation-test">Traceability Matrix Generation Test</h3>
+<p>This test verifies that the system can generate a traceability matrix that accurately displays relationships between requirements and other elements.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: verification</li>
+</ul>
+<h4>Details</h4>
+<h5>Acceptance Criteria</h5>
+<ul>
+<li>System should generate a traceability matrix showing relationships between requirements and verification elements</li>
+<li>Matrix should organize requirements in a hierarchical structure</li>
+<li>Matrix should indicate verification status for each requirement</li>
+<li>Matrix should show relationships between requirements and verification elements</li>
+</ul>
+<h5>Test Criteria</h5>
+<ul>
+<li>Command returns success (0) exit code</li>
+<li>Output contains a properly formatted matrix with requirements and verification elements</li>
+<li>Matrix includes hierarchy indicators for parent-child relationships</li>
+<li>Matrix includes verification status indicators (✅/❌)</li>
+<li>Matrix follows the specified format with proper table structure</li>
+</ul>
+<h5>Test Procedure</h5>
+<ol>
+<li>Run ReqFlow with the <code>--traces</code> flag</li>
+<li>Verify the output contains a properly formatted markdown table</li>
+<li>Check for the presence of hierarchy indicators (↳, __↳, etc.)</li>
+<li>Verify the presence of verification status indicators (✅/❌)</li>
+<li>Check that requirement elements are organized by root requirements</li>
+<li>Verify that table structure is properly formatted with headers and separators</li>
+</ol>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../SystemRequirements/Requirements.html#traceability-matrix-builder-implementation">SystemRequirements/Requirements.md/Traceability Matrix Builder Implementation</a></li>
+<li>trace: <a href="../../tests/test-matrix-generation/test.sh">tests/test-matrix-generation/test.sh</a></li>
+</ul>
+<hr />
+<h3 id="cli-traces-flag-test">CLI Traces Flag Test</h3>
+<p>This test verifies that the system provides a command-line flag for generating traceability matrices.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: verification</li>
+</ul>
+<h4>Details</h4>
+<h5>Acceptance Criteria</h5>
+<ul>
+<li>System should provide a <code>--traces</code> flag for generating traceability matrices</li>
+<li>Command should execute without errors when the flag is used</li>
+<li>Output should be a properly formatted traceability matrix</li>
+</ul>
+<h5>Test Criteria</h5>
+<ul>
+<li>Command with <code>--traces</code> flag returns success (0) exit code</li>
+<li>Command produces the expected traceability matrix output</li>
+<li>Help text includes documentation for the <code>--traces</code> flag</li>
+</ul>
+<h5>Test Procedure</h5>
+<ol>
+<li>Run ReqFlow with the <code>--traces</code> flag</li>
+<li>Verify the command executes without errors</li>
+<li>Verify that a traceability matrix is generated in markdown format</li>
+<li>Check that the command’s help text includes information about the <code>--traces</code> flag</li>
+</ol>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../SystemRequirements/Requirements.html#cli-traces-flag">SystemRequirements/Requirements.md/CLI Traces Flag</a></li>
+<li>trace: <a href="../../tests/test-matrix-generation/test.sh">tests/test-matrix-generation/test.sh</a></li>
+</ul>
+<hr />
+<h3 id="svg-matrix-output-test">SVG Matrix Output Test</h3>
+<p>This test verifies that the system can generate an SVG representation of the traceability matrix.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: verification</li>
+</ul>
+<h4>Details</h4>
+<h5>Acceptance Criteria</h5>
+<ul>
+<li>System should generate an SVG version of the traceability matrix when requested</li>
+<li>SVG should display full element names without truncation</li>
+<li>SVG should maintain hierarchical structure from the markdown matrix</li>
+<li>SVG should use appropriate visual indicators for verification status</li>
+</ul>
+<h5>Test Criteria</h5>
+<ul>
+<li>Command with <code>--traces --svg</code> flags returns success (0) exit code</li>
+<li>Output is a valid SVG document</li>
+<li>Element names are displayed in full without truncation</li>
+<li>Hierarchical structure is preserved with visual indicators</li>
+<li>Verification status is clearly indicated</li>
+</ul>
+<h5>Test Procedure</h5>
+<ol>
+<li>Run ReqFlow with the <code>--traces --svg</code> flags</li>
+<li>Verify that a valid SVG document is generated</li>
+<li>Check that the SVG includes full element names without truncation</li>
+<li>Verify that hierarchical structure is preserved with appropriate indentation</li>
+<li>Check that verification status is indicated with visual symbols</li>
+<li>Verify that column widths are dynamically sized based on content</li>
+</ol>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../SystemRequirements/Requirements.html#cli-traces-svg-flag">SystemRequirements/Requirements.md/CLI Traces SVG Flag</a></li>
+<li>trace: <a href="../../tests/test-matrix-generation/test.sh">tests/test-matrix-generation/test.sh</a></li>
+</ul>
+<hr />
+<h3 id="hierarchical-matrix-format-test">Hierarchical Matrix Format Test</h3>
+<p>This test verifies that the traceability matrix properly represents the hierarchical relationships between requirements.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: verification</li>
+</ul>
+<h4>Details</h4>
+<h5>Acceptance Criteria</h5>
+<ul>
+<li>Matrix should organize requirements in a hierarchical structure</li>
+<li>Parent-child relationships should be visually indicated with indentation</li>
+<li>Requirements should be grouped by root requirements</li>
+</ul>
+<h5>Test Criteria</h5>
+<ul>
+<li>Matrix output contains hierarchical organization</li>
+<li>Parent-child relationships are visually indicated with proper indentation</li>
+<li>Requirements are grouped by their root requirements</li>
+</ul>
+<h5>Test Procedure</h5>
+<ol>
+<li>Run ReqFlow with the <code>--traces</code> flag</li>
+<li>Verify that requirements are organized hierarchically</li>
+<li>Check that child requirements are indented with appropriate symbols</li>
+<li>Verify that requirements are grouped by their root requirements</li>
+<li>Confirm that indentation levels reflect the actual hierarchy in the model</li>
+</ol>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../SystemRequirements/Requirements.html#traceability-matrix-builder-implementation">SystemRequirements/Requirements.md/Traceability Matrix Builder Implementation</a></li>
+<li>trace: <a href="../../tests/test-matrix-generation/test.sh">tests/test-matrix-generation/test.sh</a></li>
+</ul>
+<hr />
+<h3 id="json-matrix-output-test">JSON Matrix Output Test</h3>
+<p>This test verifies that the system can export the traceability matrix in a structured JSON format.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: verification</li>
+</ul>
+<h4>Details</h4>
+<h5>Acceptance Criteria</h5>
+<ul>
+<li>System should generate a JSON representation of the traceability matrix when requested</li>
+<li>JSON should include all information from the markdown matrix</li>
+<li>JSON should preserve hierarchical relationships</li>
+<li>JSON should use relative paths for element identifiers</li>
+</ul>
+<h5>Test Criteria</h5>
+<ul>
+<li>Command with <code>--traces --json</code> flags returns success (0) exit code</li>
+<li>Output is valid JSON with required sections</li>
+<li>Hierarchical relationships are preserved in the JSON structure</li>
+<li>Element identifiers use relative paths</li>
+</ul>
+<h5>Test Procedure</h5>
+<ol>
+<li>Run ReqFlow with the <code>--traces --json</code> flags</li>
+<li>Verify that valid JSON is generated</li>
+<li>Check that the JSON includes all required sections (metadata, sources, targets, matrix, verificationStatus)</li>
+<li>Verify that hierarchical relationships are preserved</li>
+<li>Check that element identifiers use relative paths from the repository root</li>
+</ol>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../SystemRequirements/Requirements.html#markdown-matrix-formatter">SystemRequirements/Requirements.md/Markdown Matrix Formatter</a></li>
+<li>trace: <a href="../../tests/test-matrix-generation/test.sh">tests/test-matrix-generation/test.sh</a></li>
+</ul>
+<hr />
+
+        </div>
+    </div>
+</body>
+</html>

@@ -7,7 +7,6 @@ Welcome to the **ReqFlow** documentation! This folder contains all the informati
 - [About](./About.md)
   - [ReqFlow MBSE Methodology](./About.md#reqflow-mbse-methodology)
   - [ReqFlow Model](./About.md#reqflow-model)
-  - [Pillars of the ReqFlow](./About.md#pillars-of-the-reqflow)
   - [Mapping to ISO/IEC/IEEE 15288](./About.md#mapping-to-isoiecieee-15288)
 - ReqFlow spec
   - [MOEs](./MOEs.md)
@@ -25,16 +24,6 @@ Welcome to the **ReqFlow** documentation! This folder contains all the informati
 
 ---
 
-## How to Use This Documentation
-
-Each section in the Table of Contents links to a markdown file that provides detailed information on the respective topic. Subsections are grouped into folders for better organization.
-
-- Start with the [About](./About.md) for an overview.
-- Follow the [Getting Started](./getting-started.md) guide for installation and setup instructions.
-- Check out the [FAQ](./faq.md) for common questions and answers.
-- Learn how to contribute to the project in [Contributing](./contributing.md).
-
----
 
 ## Feedback and Support
 

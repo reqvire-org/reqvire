@@ -18,8 +18,24 @@ Content
 
 More content
 
+#### Details
+
+<details>
+### This must be ignored
+
+Yes
+
+### End this
+
+Yes
 
 
+
+
+
+#### Relations
+* derivedFrom: #do-not-change
+</details>
 
 ### Requirement
  

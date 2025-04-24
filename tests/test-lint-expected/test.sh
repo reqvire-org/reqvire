@@ -3,14 +3,13 @@
 # Test: Whitespace Linting Functionality
 # --------------------------------------
 # Acceptance Criteria:
-# - System should detect excess whitespace after headers
-# - System should fix excess whitespace in linting mode
-# - The output should show before/after changes
+# - The dry-run output should show before/after changes with specific expected lint commands to be applied
+# - The lint should apply expected fixes
 #
 # Test Criteria:
 # - Command exits with success (0) return code
-# - Output shows whitespace being fixed
-# - Output should contain diff-style formatting
+# - Dry-run Output should contain diff-style formatting
+# - The lint should apply expected fixes and produce expected output
 #
 
 
@@ -21,7 +20,6 @@ EXIT_CODE=$?
 
 printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
 
-#echo "$OUTPUT"
 
 ISSUES=$(awk '/# [^:]+:/' "${TEST_DIR}/test_results.log")
 ISSUE_COUNTS=$(echo "$ISSUES" | awk -F': ' '{counts[$1]++} END {for (type in counts) print counts[type], type}')
@@ -29,7 +27,7 @@ ISSUE_COUNTS=$(echo "$ISSUES" | awk -F': ' '{counts[$1]++} END {for (type in cou
 EXPECTED_ISSUES=$(cat <<EOF
 1 # Nonlink identifier
 1 # Inconsistent reserved subsections
-3 # Inconsistent newlines
+2 # Inconsistent newlines
 2 # Excess whitespace
 1 # Missing separator
 EOF
@@ -78,9 +76,27 @@ Content
 
 More content
 
+#### Details
+
+<details>
+### This must be ignored
+
+Yes
+
+### End this
+
+Yes
+
+
+
+
+
+#### Relations
+* derivedFrom: #do-not-change
+</details>
+
 
 ---
-
 
 ### Requirement
  
@@ -95,7 +111,6 @@ More content
 ### New Requirement
  
 Other stuff."
-
 
 
 # Remove ANSI color codes

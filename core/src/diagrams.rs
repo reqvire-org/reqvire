@@ -5,9 +5,10 @@ use crate::error::ReqFlowError;
 use std::path::PathBuf;
 use crate::utils;
 use log::debug;
-use crate::relation::LinkType;
+use crate::relation;
 use crate::element::ElementType;
 use crate::element::RequirementType;
+use crate::git_commands;
 
 /// Generates diagrams grouped by `file_path` and `section`
 pub fn generate_diagrams_by_section(
@@ -52,7 +53,21 @@ fn generate_section_diagram(
     specification_folder: &PathBuf, 
     external_folders: &[PathBuf],      
 ) -> Result<String, ReqFlowError> {
-
+    // Get Git repository information for creating proper links
+    let repo_root = match git_commands::repository_root() {
+        Ok(root) => root,
+        Err(_) => PathBuf::from(""),
+    };
+    
+    let base_url = match git_commands::get_repository_base_url() {
+        Ok(url) => url,
+        Err(_) => String::from(""),
+    };
+    
+    let commit_hash = match git_commands::get_commit_hash() {
+        Ok(hash) => hash,
+        Err(_) => String::from("HEAD"),
+    };
 
     // Get diagram direction from config (TD or LR)
     let mut diagram = String::from(format!("```mermaid\ngraph {};\n", direction));
@@ -67,9 +82,19 @@ fn generate_section_diagram(
     let mut included_elements = HashSet::new();
 
     for element in elements {
-        add_element_to_diagram(registry, &mut diagram, element, &mut included_elements, file_path,specification_folder,external_folders)?;
+        add_element_to_diagram(
+            registry, 
+            &mut diagram, 
+            element, 
+            &mut included_elements, 
+            file_path,
+            specification_folder,
+            external_folders,
+            &repo_root,
+            &base_url,
+            &commit_hash
+        )?;
     }
-
 
     diagram.push_str("```");
 
@@ -84,7 +109,10 @@ fn add_element_to_diagram(
     included_elements: &mut HashSet<String>,
     file_path: &str,
     specification_folder: &PathBuf, 
-    external_folders: &[PathBuf],  
+    external_folders: &[PathBuf],
+    repo_root: &PathBuf,
+    base_url: &str,
+    commit_hash: &str
 ) -> Result<(), ReqFlowError> {
 
     // Convert file path to its parent directory (returns PathBuf)
@@ -93,12 +121,31 @@ fn add_element_to_diagram(
         .map(|p| p.to_path_buf()) 
         .unwrap_or_else(|| PathBuf::from("."));
 
-    let relative_target=utils::to_relative_identifier(
+    // Create a stable GitHub link for the element if we have the git info
+    let has_git_info = !base_url.is_empty() && !commit_hash.is_empty() && !repo_root.as_os_str().is_empty();
+    
+    // Get HTML-style relative ID for local navigation
+    let relative_target = utils::to_relative_identifier(
         &element.identifier.clone(),
         &base_dir,
         specification_folder,
         external_folders
     )?;
+    
+    // Get a GitHub link if we have git info
+    let git_link = if has_git_info {
+        // Get repository-relative path
+        let relative_id = match utils::get_relative_path_from_root(&PathBuf::from(&element.identifier), &repo_root) {
+            Ok(rel_path) => rel_path.to_string_lossy().to_string(),
+            Err(_) => element.identifier.clone(),
+        };
+        
+        // Create a git link for the element
+        format!("{}/blob/{}/{}", base_url, commit_hash, relative_id)
+    } else {
+        // Fall back to the relative link for local navigation
+        relative_target.clone()
+    };
     
     let element_id = utils::hash_identifier(&element.identifier);   
 
@@ -110,57 +157,81 @@ fn add_element_to_diagram(
        let class=match &element.element_type {
            ElementType::Requirement(RequirementType::User)  => "requirement",                    
            ElementType::Requirement(RequirementType::System) =>"requirement",
-           ElementType::Verification =>"verification",           
+           ElementType::Verification(_) =>"verification",           
            _ => "default"
        };
            
                   
+       // Add the element node
        diagram.push_str(&format!("  {}[\"{}\"];\n", element_id, label));
-       diagram.push_str(&format!("  click {} \"{}\";\n", element_id, relative_target));
        
-       diagram.push_str(&format!("  class {} {};\n", element_id,class));
+       // Use GitHub link if available, otherwise fall back to local link
+       let click_target = if has_git_info { git_link } else { relative_target };
+       diagram.push_str(&format!("  click {} \"{}\";\n", element_id, click_target));
+       
+       diagram.push_str(&format!("  class {} {};\n", element_id, class));
     }
 
 
 
     for relation in &element.relations {
+        if !relation.is_opposite {
+        
+        
         let label = relation.target.text.clone();
         let target_id = match &relation.target.link {
-            LinkType::Identifier(target) => {            
+            relation::LinkType::Identifier(target) => {            
                 
                 let target_id = utils::hash_identifier(&target);               
 
+                // Get HTML-style relative ID for local navigation
                 let relative_target = utils::to_relative_identifier(
                     &target,
                     &base_dir,
                     specification_folder,
                     external_folders
-                )?;           
-            
+                )?;
+                
+                // Get a GitHub link if we have git info
+                let git_link = if has_git_info {
+                    // Get repository-relative path
+                    let relative_id = match utils::get_relative_path_from_root(&PathBuf::from(target), &repo_root) {
+                        Ok(rel_path) => rel_path.to_string_lossy().to_string(),
+                        Err(_) => target.clone(),
+                    };
+                    
+                    // Create a git link for the target element
+                    format!("{}/blob/{}/{}", base_url, commit_hash, relative_id)
+                } else {
+                    // Fall back to the relative link for local navigation
+                    relative_target.clone()
+                };
+                
                 if !included_elements.contains(target) {
                     included_elements.insert(target.clone());
                                  
-  
-                    let class=match registry.get_element(&target) {
+                    let class = match registry.get_element(&target) {
                         Ok(existing_element)=>{
                             match existing_element.element_type {
                                 ElementType::Requirement(RequirementType::User)  => "requirement",                    
-                                ElementType::Requirement(RequirementType::System) =>"requirement",
-                                ElementType::Verification =>"verification",           
+                                ElementType::Requirement(RequirementType::System) => "requirement",
+                                ElementType::Verification(_) => "verification",           
                                 _ => "default"                    
                              }
                         },
                         _ => "default"
-                    
                     };
                                                                
                     diagram.push_str(&format!("  {}[\"{}\"];\n", target_id, label));
-                    diagram.push_str(&format!("  class {} {};\n", target_id,class));                    
-                    diagram.push_str(&format!("  click {} \"{}\";\n", target_id, relative_target));
+                    diagram.push_str(&format!("  class {} {};\n", target_id, class));                    
+                    
+                    // Use GitHub link if available, otherwise fall back to local link
+                    let click_target = if has_git_info { git_link } else { relative_target };
+                    diagram.push_str(&format!("  click {} \"{}\";\n", target_id, click_target));
                 }
                 target_id
             },
-            LinkType::ExternalUrl(url) => {
+            relation::LinkType::ExternalUrl(url) => {
                 // Always add external URLs, regardless of `included_elements`
                 let target_id = utils::hash_identifier(url);
                 diagram.push_str(&format!("  {}[\"{}\"];\n", target_id, label));
@@ -173,46 +244,31 @@ fn add_element_to_diagram(
         };
 
 
-        let properties = get_relation_properties(relation.relation_type.name);
-        let (from_id, to_id) = if properties.reverse_direction {
-            (target_id.clone(), element_id.clone())
-        } else {
-            (element_id.clone(), target_id.clone())
-        };
+        if let Some(info) = relation::RELATION_TYPES.get(relation.relation_type.name) {
+            // pick from/to based on semantic direction
+            let (from_id, to_id) = match info.direction {
+                relation::RelationDirection::Forward => (target_id.clone(), element_id.clone()),
+                _                           => (element_id.clone(), target_id.clone()),
+            };
 
-        diagram.push_str(&format!("  {} {}|{}| {};\n", from_id, properties.arrow, properties.label, to_id));
+            diagram.push_str(&format!(
+                "  {} {}|{}| {};\n",
+                from_id,
+                info.arrow,
+                info.label,
+                to_id,
+            ));
+        } else {
+            // fallback: unknown relation
+            diagram.push_str(&format!(
+                "  {} -->|relates to| {};\n",
+                element_id, target_id,
+            ));
+        }
+        }
     }
 
     Ok(())
 }
-
-
-
-/// Returns relation properties (arrow, label, direction)
-fn get_relation_properties(relation_type: &str) -> RelationProperties {
-    match relation_type {
-        "verifiedBy" => RelationProperties { arrow: "-->", label: "verifies", reverse_direction: true },
-        "satisfiedBy" => RelationProperties { arrow: "-->", label: "satisfies", reverse_direction: true },
-        "derivedFrom" => RelationProperties { arrow: "-.->", label: "deriveReqT", reverse_direction: false },
-        "tracedFrom" => RelationProperties { arrow: "-->", label: "traces", reverse_direction: true },
-        "containedBy" => RelationProperties { arrow: "--o", label: "contains", reverse_direction: true },
-        "verify" => RelationProperties { arrow: "-->", label: "verifies", reverse_direction: false },
-        "satisfy" => RelationProperties { arrow: "-->", label: "satisfies", reverse_direction: false },
-        "derive" => RelationProperties { arrow: "-.->", label: "deriveReqT", reverse_direction: true },
-        "refine" => RelationProperties { arrow: "==>", label: "refines", reverse_direction: false },
-        "trace" => RelationProperties { arrow: "-->", label: "traces", reverse_direction: false },
-        "contain" => RelationProperties { arrow: "--o", label: "contains", reverse_direction: false },
-        _ => RelationProperties { arrow: "-->", label: "relates to", reverse_direction: false },
-    }
-}
-
-
-/// Struct for relation properties
-struct RelationProperties {
-    arrow: &'static str,
-    label: &'static str,
-    reverse_direction: bool,
-}
-
 
 

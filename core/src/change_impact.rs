@@ -346,7 +346,9 @@ impl<'a> ChangeImpactReport<'a> {
                 elem.name, element_url
             ));                    
         }
-        output.push_str("\n---\n\n");                
+        if !self.removed.is_empty() {        
+            output.push_str("\n---\n\n");                
+        }
 
         // Added Elements section
         if !self.added.is_empty() {
@@ -354,7 +356,7 @@ impl<'a> ChangeImpactReport<'a> {
         }
         
         for elem in &self.added {
-            let element_url = format!("{}/blob/{}/{}", base_url, previous_git_commit, elem.element_id);
+            let element_url = format!("{}/blob/{}/{}", base_url, git_commit, elem.element_id);
             output.push_str("* ");
             output.push_str(&format!(
                 "[{}]({})\n",
@@ -366,14 +368,16 @@ impl<'a> ChangeImpactReport<'a> {
                 output.push_str("\n\n");                                                
             }
         }
-        output.push_str("\n---\n\n");          
+        if !self.added.is_empty() {
+            output.push_str("\n---\n\n");          
+        }
         
         // Changed Elements section
         if !self.changed.is_empty() {
-            output.push_str("### Changed Elements</summary>\n\n");            
+            output.push_str("### Changed Elements\n\n");            
         }
         for elem in &self.changed {
-            let element_url = format!("{}/blob/{}/{}", base_url, previous_git_commit, elem.element_id);
+            let element_url = format!("{}/blob/{}/{}", base_url, git_commit, elem.element_id);
             output.push_str("* ");
             output.push_str(&format!(
                 "[{}]({})\n",
@@ -387,7 +391,9 @@ impl<'a> ChangeImpactReport<'a> {
                 output.push_str("\n\n");                                                
             }
         }
-        output.push_str("\n---\n\n");          
+        if !self.changed.is_empty() {        
+            output.push_str("\n---\n\n");          
+        }
             
         
         // Invalidated Verifications Section
@@ -398,7 +404,11 @@ impl<'a> ChangeImpactReport<'a> {
                 output.push_str(&format!("- [ ] [{}]({})\n", invalidated_ver.name, target_url));
             }
             output.push_str("\n");
-        }        
+        }   
+        
+        if self.removed.is_empty() && self.added.is_empty() && self.changed.is_empty() {
+            output.push_str("\nNothing to report...\n");        
+        }
 
         output
     }
@@ -636,7 +646,7 @@ fn collect_verification_elements_from_impact_tree(
         seen: &mut HashSet<String>,
         collected: &mut Vec<InvalidatedVerification>,
     ) {
-        if let element::ElementType::Verification = node.element.element_type {
+        if let element::ElementType::Verification(_) = node.element.element_type {
             let id = node.element.identifier.clone();
             if seen.insert(id.clone()) {
                 collected.push(InvalidatedVerification {
@@ -846,6 +856,8 @@ mod tests {
                 direction: RelationDirection::Forward,
                 opposite: Some("derivedFrom"),
                 description: "Element B derives from A",
+                arrow: "-->",
+                label: "label"
             },
             "A",
         );
@@ -889,6 +901,8 @@ mod tests {
                 direction: RelationDirection::Forward,
                 opposite: Some("containedBy"),
                 description: "Element A contains B",
+                arrow: "-->",
+                label: "label"                
             },
             "B",
         );
@@ -900,6 +914,8 @@ mod tests {
                 direction: RelationDirection::Forward,
                 opposite: Some("derivedFrom"),
                 description: "Element B derives from A",
+                arrow: "-->",
+                label: "label"                
             },
             "A",
         );

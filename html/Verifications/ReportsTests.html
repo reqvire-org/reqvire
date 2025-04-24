@@ -1,0 +1,227 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ReportsTests</title>
+    
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa;
+    color: #333;
+}
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+.content {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+h1 {
+    color: #333;
+    border-bottom: 2px solid #eaecef;
+    padding-bottom: 10px;
+    margin-top: 0;
+}
+h2 {
+    color: #333;
+    border-bottom: 1px solid #eaecef;
+    padding-bottom: 5px;
+}
+h3 {
+    color: #1a6fb7;
+    margin-top: 25px;
+}
+h4 {
+    color: #555;
+    font-weight: 600;
+}
+a {
+    color: #0366d6;
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 20px 0;
+}
+table, th, td {
+    border: 1px solid #dfe2e5;
+}
+th, td {
+    padding: 8px 12px;
+    text-align: left;
+}
+th {
+    background-color: #f6f8fa;
+}
+code {
+    background: #f6f8fa;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 90%;
+}
+pre {
+    background: #f6f8fa;
+    border-radius: 3px;
+    padding: 16px;
+    overflow: auto;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+}
+blockquote {
+    margin: 0;
+    padding: 0 15px;
+    color: #777;
+    border-left: 4px solid #dfe2e5;
+}
+.mermaid {
+    margin: 20px 0;
+    text-align: center;
+}
+</style>
+
+    <!-- Enhanced mermaid configuration for ReqFlow diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'neutral',
+            maxTextSize: 90000,
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            securityLevel: 'loose'
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="content">
+            <h1 id="report-generation-tests">Report Generation Tests</h1>
+<p>This document contains verification tests for ReqFlow’s report generation capabilities.</p>
+<h2 id="report-generation-tests">Report Generation Tests</h2>
+<div class="mermaid">graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+
+  ecd45710776293b[&quot;Index Generation Test&quot;];
+  click ecd45710776293b &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/Verifications/ReportsTests.html#index-generation-test&quot;;
+  class ecd45710776293b verification;
+  8acd24c7c228637b[&quot;SystemRequirements/Requirements.md#index-generation&quot;];
+  class 8acd24c7c228637b requirement;
+  click 8acd24c7c228637b &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#index-generation&quot;;
+  ecd45710776293b -.-&gt;|verifies| 8acd24c7c228637b;
+  473af2ecdcda99a5[&quot;tests/test-index-generation/test.sh&quot;];
+  class 473af2ecdcda99a5 default;
+  click 473af2ecdcda99a5 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/tests/test-index-generation/test.sh&quot;;
+  ecd45710776293b -.-&gt;|trace| 473af2ecdcda99a5;
+  5ec920981cff81d1[&quot;CLI Summary Report Flag Test&quot;];
+  click 5ec920981cff81d1 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/Verifications/ReportsTests.html#cli-summary-report-flag-test&quot;;
+  class 5ec920981cff81d1 verification;
+  6f86272134897867[&quot;SystemRequirements/Requirements.md#cli-summary-report-flag&quot;];
+  class 6f86272134897867 requirement;
+  click 6f86272134897867 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#cli-summary-report-flag&quot;;
+  5ec920981cff81d1 -.-&gt;|verifies| 6f86272134897867;
+  e0e585775432dd67[&quot;tests/test-element-content-extraction/test.sh&quot;];
+  class e0e585775432dd67 default;
+  click e0e585775432dd67 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/tests/test-element-content-extraction/test.sh&quot;;
+  5ec920981cff81d1 -.-&gt;|trace| e0e585775432dd67;
+</div>
+<hr />
+<h3 id="cli-summary-report-flag-test">CLI Summary Report Flag Test</h3>
+<p>This test verifies that the system provides a CLI flag for generating summary reports of model structure and relationships.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: verification</li>
+</ul>
+<h4>Details</h4>
+<h5>Acceptance Criteria</h5>
+<ul>
+<li>System shall provide a –model-summary flag</li>
+<li>Flag shall activate the summary report generation</li>
+<li>Report shall include model structure information</li>
+<li>Report shall include relationship counts and types</li>
+</ul>
+<h5>Test Criteria</h5>
+<ul>
+<li>Command with –model-summary flag runs successfully</li>
+<li>Summary report is generated with expected sections</li>
+<li>Report includes counts of element types</li>
+<li>Report includes information about relationship types and counts</li>
+<li>Elements are organized by file and section</li>
+</ul>
+<h5>Test Procedure</h5>
+<ol>
+<li>Create test fixtures with various elements and relationship types</li>
+<li>Run ReqFlow with –model-summary flag on the test fixtures</li>
+<li>Verify that summary report is generated with expected format</li>
+<li>Confirm that all element types and counts are accurately reported</li>
+<li>Verify that relationship information is correctly represented</li>
+</ol>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../SystemRequirements/Requirements.html#cli-summary-report-flag">SystemRequirements/Requirements.md#cli-summary-report-flag</a></li>
+<li>trace: <a href="../../tests/test-element-content-extraction/test.sh">tests/test-element-content-extraction/test.sh</a></li>
+</ul>
+<hr />
+<h3 id="index-generation-test">Index Generation Test</h3>
+<p>This test verifies that the system correctly generates an index document with links and summaries to all specification documents.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: verification</li>
+</ul>
+<h4>Details</h4>
+<h5>Acceptance Criteria</h5>
+<ul>
+<li>System shall generate README.md in the specifications folder</li>
+<li>README.md shall contain links to all specification documents</li>
+<li>README.md shall be properly structured with sections</li>
+<li>README.md shall include brief summaries of each document</li>
+</ul>
+<h5>Test Criteria</h5>
+<ul>
+<li>Command with –generate-index flag runs successfully</li>
+<li>README.md file is created in the specifications folder</li>
+<li>README.md contains links to all specification documents</li>
+<li>README.md structure follows expected format</li>
+</ul>
+<h5>Test Procedure</h5>
+<ol>
+<li>Create test fixtures with multiple specification documents in various folders</li>
+<li>Run ReqFlow with –generate-index flag</li>
+<li>Verify that README.md is created in the specifications folder</li>
+<li>Verify that README.md contains links to all specification documents</li>
+<li>Verify that document structure and summaries are included</li>
+</ol>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../SystemRequirements/Requirements.html#index-generation">SystemRequirements/Requirements.md#index-generation</a></li>
+<li>trace: <a href="../../tests/test-index-generation/test.sh">tests/test-index-generation/test.sh</a></li>
+</ul>
+<hr />
+
+        </div>
+    </div>
+</body>
+</html>

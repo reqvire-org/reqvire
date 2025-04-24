@@ -3,15 +3,15 @@
 # Test: Validation of Invalid Relation Types and Formats
 # ----------------------------------------------------
 # Acceptance Criteria:
-# - System should detect and report invalid relation types (typos, etc.)
-# - System should detect and report relations to non-existent targets
-# - System should detect and report if system requirement is missing parent relation
-# - System should detect and report if there is circular dependency in requirements
-# - System should detect and report if relation type has incompactible element
-# - System should detect and report invalid metadata subsection format
-# - System should detect and report duplicate relations in Relations subsection
-# - System should detect and report duplicate elements
-# - System should detect and report duplicate subsections
+# - System should detect and report Duplicate element
+# - System should detect and report Invalid metadata format
+# - System should detect and report Invalid relation format
+# - System should detect and report Unsupported relation type
+# - System should detect and report Invalid identifier
+# - System should detect and report Duplicate subsection
+# - System should detect and report Incompatible element types for relation
+# - System should detect and report Circular dependency error
+# - System should detect and report Missing parent relation"
 #
 # Test Criteria:
 # - Command exits with 0 error code but outputs expected validation errors

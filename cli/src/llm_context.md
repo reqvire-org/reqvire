@@ -136,7 +136,7 @@ The ReqFlow CLI tool provides various operations:
   - `cargo run --  --html`
 
 - **Matrix Generation**: Create traceability matrices
-  - `cargo run --  --generate_matrix`
+  - `cargo run --  --traces`
 
 - **Diagram Generation**: Create Mermaid diagrams from requirements
   - `cargo run -- --generate_diagrams`

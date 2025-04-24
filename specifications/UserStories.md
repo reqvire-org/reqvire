@@ -17,180 +17,52 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  cdc9a9c908["Fostering Community Contributions"];
-  click cdc9a9c908 "UserStories.md#fostering-community-contributions";
-  class cdc9a9c908 requirement;
-  b3f57e49f7["MOEs.md/MOE_CE"];
-  class b3f57e49f7 requirement;
-  click b3f57e49f7 "MOEs.md#moe_ce";
-  cdc9a9c908 -->|traces| b3f57e49f7;
-  cf0026c2fe["Generate Diagrams"];
-  click cf0026c2fe "UserStories.md#generate-diagrams";
-  class cf0026c2fe requirement;
-  f6237e49f7["MOEs.md/MOE_UA"];
-  class f6237e49f7 requirement;
-  click f6237e49f7 "MOEs.md#moe_ua";
-  cf0026c2fe -->|traces| f6237e49f7;
-  aee397f35b["Store Automated Diagrams in Designated Locations"];
-  class aee397f35b requirement;
-  click aee397f35b "UserRequirements.md#store-automated-diagrams-in-designated-locations";
-  cf0026c2fe -->|relates to| aee397f35b;
-  a6a8362836["Visualize Model Relationships"];
-  class a6a8362836 requirement;
-  click a6a8362836 "UserRequirements.md#visualize-model-relationships";
-  cf0026c2fe -->|relates to| a6a8362836;
-  fd7388e379["Highlight Changes in Diagrams"];
-  class fd7388e379 requirement;
-  click fd7388e379 "UserRequirements.md#highlight-changes-in-diagrams";
-  cf0026c2fe -->|relates to| fd7388e379;
-  30d97803eb["Filter Relationships by Type"];
-  class 30d97803eb requirement;
-  click 30d97803eb "UserRequirements.md#filter-relationships-by-type";
-  cf0026c2fe -->|relates to| 30d97803eb;
-  10c00a1bd1["Export Diagrams in Standard Formats"];
-  class 10c00a1bd1 requirement;
-  click 10c00a1bd1 "UserRequirements.md#export-diagrams-in-standard-formats";
-  cf0026c2fe --o|contains| 10c00a1bd1;
-  30053341d8["Select Custom Diagram Viewpoints"];
-  class 30053341d8 requirement;
-  click 30053341d8 "UserRequirements.md#select-custom-diagram-viewpoints";
-  cf0026c2fe -->|relates to| 30053341d8;
-  de2d3516cd["Aligning Design with Code"];
-  click de2d3516cd "UserStories.md#aligning-design-with-code";
-  class de2d3516cd requirement;
-  de2d3516cd -->|traces| f6237e49f7;
-  1fc4e44d5f["Code Traceability"];
-  class 1fc4e44d5f requirement;
-  click 1fc4e44d5f "UserRequirements.md#code-traceability";
-  de2d3516cd -->|relates to| 1fc4e44d5f;
-  5922f3ef03["Suggest Code Refactoring"];
-  class 5922f3ef03 requirement;
-  click 5922f3ef03 "UserRequirements.md#suggest-code-refactoring";
-  de2d3516cd -->|relates to| 5922f3ef03;
-  100197ce81["Export Specifications"];
-  click 100197ce81 "UserStories.md#export-specifications";
-  class 100197ce81 requirement;
-  100197ce81 -->|traces| f6237e49f7;
-  72c7eda618["Export HTML specifications"];
-  class 72c7eda618 requirement;
-  click 72c7eda618 "UserRequirements.md#export-html-specifications";
-  72c7eda618 -.->|deriveReqT| 100197ce81;
-  ba120b7caf["Integrate with GitHub Workflows"];
-  click ba120b7caf "UserStories.md#integrate-with-github-workflows";
-  class ba120b7caf requirement;
-  ba120b7caf -->|traces| b3f57e49f7;
-  68454e6166["Automate Pull Request Validations"];
-  class 68454e6166 requirement;
-  click 68454e6166 "UserRequirements.md#automate-pull-request-validations";
-  ba120b7caf -->|relates to| 68454e6166;
-  b2a387077d["Generate Change Logs for Pull Requests"];
-  class b2a387077d requirement;
-  click b2a387077d "UserRequirements.md#generate-change-logs-for-pull-requests";
-  ba120b7caf -->|relates to| b2a387077d;
-  fe32882ee2["Provide Reports"];
-  click fe32882ee2 "UserStories.md#provide-reports";
-  class fe32882ee2 requirement;
-  fe32882ee2 -->|traces| b3f57e49f7;
-  2afa7f3a20["Export Reports to Standard Formats"];
-  class 2afa7f3a20 requirement;
-  click 2afa7f3a20 "UserRequirements.md#export-reports-to-standard-formats";
-  fe32882ee2 -->|relates to| 2afa7f3a20;
-  812d42f453["Generate Dependency Reports"];
-  class 812d42f453 requirement;
-  click 812d42f453 "UserRequirements.md#generate-dependency-reports";
-  fe32882ee2 -->|relates to| 812d42f453;
-  482c757913["Provide Validation Reports"];
-  class 482c757913 requirement;
-  click 482c757913 "UserRequirements.md#provide-validation-reports";
-  fe32882ee2 -->|relates to| 482c757913;
-  d0e9e8d143["Generate Verifications Reports"];
-  class d0e9e8d143 requirement;
-  click d0e9e8d143 "UserRequirements.md#generate-verifications-reports";
-  fe32882ee2 -->|relates to| d0e9e8d143;
-  f8e7625d29["Model Reports"];
-  class f8e7625d29 requirement;
-  click f8e7625d29 "UserRequirements.md#model-reports";
-  fe32882ee2 -->|relates to| f8e7625d29;
-  596c459d31["Generate Summary Reports"];
-  class 596c459d31 requirement;
-  click 596c459d31 "UserRequirements.md#generate-summary-reports";
-  fe32882ee2 -->|relates to| 596c459d31;
-  36d8b2eb16["Trace Changes in MBSE Model"];
-  click 36d8b2eb16 "UserStories.md#trace-changes-in-mbse-model";
-  class 36d8b2eb16 requirement;
-  36d8b2eb16 -->|traces| f6237e49f7;
-  91ebf7e73d["Tracing Structural Changes"];
-  class 91ebf7e73d requirement;
-  click 91ebf7e73d "UserRequirements.md#tracing-structural-changes";
-  91ebf7e73d -.->|deriveReqT| 36d8b2eb16;
-  ba40352f8e["Traceability Matrix"];
-  class ba40352f8e requirement;
-  click ba40352f8e "UserRequirements.md#traceability-matrix";
-  36d8b2eb16 --o|contains| ba40352f8e;
-  bae5edae94["Change Impact Analysis"];
-  class bae5edae94 requirement;
-  click bae5edae94 "UserRequirements.md#change-impact-analysis";
-  36d8b2eb16 --o|contains| bae5edae94;
-  a60d88b6e2["Validating Structures"];
-  click a60d88b6e2 "UserStories.md#validating-structures";
-  class a60d88b6e2 requirement;
-  a60d88b6e2 -->|traces| f6237e49f7;
-  6e40bf9f83["Validate Cross-Component Dependencies"];
-  class 6e40bf9f83 requirement;
-  click 6e40bf9f83 "UserRequirements.md#validate-cross-component-dependencies";
-  a60d88b6e2 -->|relates to| 6e40bf9f83;
-  7cf5cf9900["Enhanced Validation Error Reporting"];
-  class 7cf5cf9900 requirement;
-  click 7cf5cf9900 "UserRequirements.md#enhanced-validation-error-reporting";
-  a60d88b6e2 -->|relates to| 7cf5cf9900;
-  9e524ac696["Validate Internal Consistency"];
-  class 9e524ac696 requirement;
-  click 9e524ac696 "UserRequirements.md#validate-internal-consistency";
-  a60d88b6e2 -->|relates to| 9e524ac696;
-  7b1772417b["Validate Markdown Structure"];
-  class 7b1772417b requirement;
-  click 7b1772417b "UserRequirements.md#validate-markdown-structure";
-  a60d88b6e2 -->|relates to| 7b1772417b;
-  d834cc4bc9["Validate Filesystem Structure"];
-  class d834cc4bc9 requirement;
-  click d834cc4bc9 "UserRequirements.md#validate-filesystem-structure";
-  a60d88b6e2 -->|relates to| d834cc4bc9;
-  103ddb8dc3["Model Linting"];
-  class 103ddb8dc3 requirement;
-  click 103ddb8dc3 "UserRequirements.md#model-linting";
-  a60d88b6e2 -->|relates to| 103ddb8dc3;
-  6912d98267["AI-Driven Model Suggestions"];
-  click 6912d98267 "UserStories.md#ai-driven-model-suggestions";
-  class 6912d98267 requirement;
-  6912d98267 -->|traces| f6237e49f7;
-  5a6fc253c5["AI Agent Context"];
-  class 5a6fc253c5 requirement;
-  click 5a6fc253c5 "UserRequirements.md#ai-agent-context";
-  6912d98267 -->|relates to| 5a6fc253c5;
-  852dea6cfe["Managing MBSE Models"];
-  click 852dea6cfe "UserStories.md#managing-mbse-models";
-  class 852dea6cfe requirement;
-  852dea6cfe -->|traces| f6237e49f7;
-  daadd8e583["Coexistence of Structured and Unstructured Documents"];
-  class daadd8e583 requirement;
-  click daadd8e583 "ManagingMbseModelsRequirements.md#coexistence-of-structured-and-unstructured-documents";
-  852dea6cfe -->|relates to| daadd8e583;
-  f5b5eaeb28["Generate Documentation Index"];
-  class f5b5eaeb28 requirement;
-  click f5b5eaeb28 "UserRequirements.md#generate-documentation-index";
-  f5b5eaeb28 -.->|deriveReqT| 852dea6cfe;
-  96bbd81f5c["Bootstrap Model Structure"];
-  class 96bbd81f5c requirement;
-  click 96bbd81f5c "ManagingMbseModelsRequirements.md#bootstrap-model-structure";
-  852dea6cfe -->|relates to| 96bbd81f5c;
-  ce24dbacb9["Project Configuration with YAML"];
-  class ce24dbacb9 requirement;
-  click ce24dbacb9 "ManagingMbseModelsRequirements.md#project-configuration-with-yaml";
-  852dea6cfe -->|relates to| ce24dbacb9;
-  21e4eb87cb["Efficient Processing"];
-  class 21e4eb87cb requirement;
-  click 21e4eb87cb "ManagingMbseModelsRequirements.md#efficient-processing";
-  852dea6cfe -->|relates to| 21e4eb87cb;
+  fe32882ee273e24d["Provide Reports"];
+  click fe32882ee273e24d "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserStories.md#provide-reports";
+  class fe32882ee273e24d requirement;
+  b3f57e49f7494c0e["MOEs.md/MOE_CE"];
+  class b3f57e49f7494c0e requirement;
+  click b3f57e49f7494c0e "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/MOEs.md#moe_ce";
+  fe32882ee273e24d -.->|trace| b3f57e49f7494c0e;
+  de2d3516cd5ef91d["Aligning Design with Code"];
+  click de2d3516cd5ef91d "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserStories.md#aligning-design-with-code";
+  class de2d3516cd5ef91d requirement;
+  f6237e49f7494c0e["MOEs.md/MOE_UA"];
+  class f6237e49f7494c0e requirement;
+  click f6237e49f7494c0e "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/MOEs.md#moe_ua";
+  de2d3516cd5ef91d -.->|trace| f6237e49f7494c0e;
+  ba120b7cafc5435f["Integrate with GitHub Workflows"];
+  click ba120b7cafc5435f "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserStories.md#integrate-with-github-workflows";
+  class ba120b7cafc5435f requirement;
+  ba120b7cafc5435f -.->|trace| b3f57e49f7494c0e;
+  36d8b2eb16113a7f["Trace Changes in MBSE Model"];
+  click 36d8b2eb16113a7f "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserStories.md#trace-changes-in-mbse-model";
+  class 36d8b2eb16113a7f requirement;
+  36d8b2eb16113a7f -.->|trace| f6237e49f7494c0e;
+  100197ce818804["Export Specifications"];
+  click 100197ce818804 "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserStories.md#export-specifications";
+  class 100197ce818804 requirement;
+  100197ce818804 -.->|trace| f6237e49f7494c0e;
+  cf0026c2feeb1e0f["Generate Diagrams"];
+  click cf0026c2feeb1e0f "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserStories.md#generate-diagrams";
+  class cf0026c2feeb1e0f requirement;
+  cf0026c2feeb1e0f -.->|trace| f6237e49f7494c0e;
+  852dea6cfecb47f5["Managing MBSE Models"];
+  click 852dea6cfecb47f5 "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserStories.md#managing-mbse-models";
+  class 852dea6cfecb47f5 requirement;
+  852dea6cfecb47f5 -.->|trace| f6237e49f7494c0e;
+  a60d88b6e2cb3842["Validating Structures"];
+  click a60d88b6e2cb3842 "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserStories.md#validating-structures";
+  class a60d88b6e2cb3842 requirement;
+  a60d88b6e2cb3842 -.->|trace| f6237e49f7494c0e;
+  cdc9a9c9087e707f["Fostering Community Contributions"];
+  click cdc9a9c9087e707f "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserStories.md#fostering-community-contributions";
+  class cdc9a9c9087e707f requirement;
+  cdc9a9c9087e707f -.->|trace| b3f57e49f7494c0e;
+  2b35b7b37d52d4e6["AI-Assisted MBSE Model Management"];
+  click 2b35b7b37d52d4e6 "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserStories.md#ai-assisted-mbse-model-management";
+  class 2b35b7b37d52d4e6 requirement;
+  2b35b7b37d52d4e6 -->|refines| 852dea6cfecb47f5;
 ```
 
 ---
@@ -201,6 +73,15 @@ As an **System Engineer**, I want to manage MBSE models effectively, so that I c
 
 #### Relations
   * trace: [MOEs.md/MOE_UA](MOEs.md#moe_ua)
+
+---
+
+### AI-Assisted MBSE Model Management
+
+As a **Systems Engineer**, I want to efficiently manage MBSE models using AI-powered tools and LLM-based assistants.
+
+#### Relations
+  * refine: [#Managing MBSE Models](#managing-mbse-models)
 
 ---
 
@@ -244,15 +125,6 @@ As a **Contributor**, I want ReqFlow to integrate seamlessly with GitHub workflo
 
 ---
 
-### AI-Driven Model Suggestions
-		
-As a **System Engineer**, I want AI agents to provide actionable suggestions for model improvements, so that I can refine the system design and maintain alignment with project requirements.
-
-#### Relations
-  * trace: [MOEs.md/MOE_UA](MOEs.md#moe_ua)
-
----
-
 ### Provide Reports
 As a **Manager**, I want to generate structured reports based on the MBSE model, so that I can track progress and ensure alignment with organizational objectives.
 
@@ -274,3 +146,5 @@ As a **Contributor**, I want ReqFlow tools to be intuitive and well-documented, 
 
 #### Relations
   * trace: [MOEs.md/MOE_CE](MOEs.md#moe_ce)
+
+---

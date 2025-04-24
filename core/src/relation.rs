@@ -20,6 +20,8 @@ pub struct RelationTypeInfo {
     pub direction: RelationDirection,
     pub opposite: Option<&'static str>,
     pub description: &'static str,
+    pub arrow: &'static str,
+    pub label: &'static str,    
 }
 
 lazy_static! {
@@ -32,12 +34,17 @@ lazy_static! {
             direction: RelationDirection::Backward, 
             opposite: Some("contain"),
             description: "Element is contained by another element",
+            arrow: "--o",
+            label: "contains",              
+           
         });
         m.insert("contain", RelationTypeInfo {
             name: "contain", 
             direction: RelationDirection::Forward, 
             opposite: Some("containedBy"),
             description: "Element contains another element",
+            arrow: "--o",
+            label: "contains",             
         });
         
         // Derive relations
@@ -46,12 +53,16 @@ lazy_static! {
             direction: RelationDirection::Backward, 
             opposite: Some("derive"),
             description: "Element is derived from another element",
+            arrow: "-.->",
+            label: "deriveReqT",            
         });
         m.insert("derive", RelationTypeInfo {
             name: "derive", 
             direction: RelationDirection::Forward, 
             opposite: Some("derivedFrom"),
             description: "Element is source for a derived element",
+            arrow: "-.->",
+            label: "deriveReqT",            
         });
         
         // Refine relation
@@ -60,6 +71,8 @@ lazy_static! {
             direction: RelationDirection::Backward,
             opposite: Some("refinedBy"),
             description: "Element refines a higher-level element",
+            arrow: "-->",
+            label: "refines",     
         });
         
         // Refine relation
@@ -68,6 +81,8 @@ lazy_static! {
             direction: RelationDirection::Forward,
             opposite: Some("refine"),
             description: "A souce element being refined by other element.",
+            arrow: "-->",
+            label: "refines",              
         });        
         
         // Satisfy relations
@@ -76,12 +91,16 @@ lazy_static! {
             direction: RelationDirection::Forward, 
             opposite: Some("satisfy"),
             description: "A souce element being satisfied by other element.",
+            arrow: "-->",
+            label: "satisfies",              
         });
         m.insert("satisfy", RelationTypeInfo {
             name: "satisfy", 
             direction: RelationDirection::Backward, 
             opposite: Some("satisfiedBy"),
             description: "Element satisfies another element",
+            arrow: "-->",
+            label: "satisfies",             
         });
         
         // Verify relations
@@ -90,12 +109,16 @@ lazy_static! {
             direction: RelationDirection::Forward, 
             opposite: Some("verify"),
             description: "A souce element being verified by other element.",
+            arrow: "-.->",
+            label: "verifies",            
         });
         m.insert("verify", RelationTypeInfo {
             name: "verify", 
             direction: RelationDirection::Backward, 
             opposite: Some("verifiedBy"),
             description: "Element verifies another element",
+            arrow: "-.->",
+            label: "verifies",            
         });
         
         // Trace relations
@@ -104,6 +127,8 @@ lazy_static! {
             direction: RelationDirection::Neutral, 
             opposite: None,
             description: "Element is related to another element in a non-directional way",
+            arrow: "-.->",
+            label: "trace",              
         });
 
         m
@@ -327,7 +352,7 @@ mod tests {
     #[test]
     fn test_validate_relation_element_types_verify() {
         let req_type = ElementType::Requirement(RequirementType::System);
-        let verification_type = ElementType::Verification;
+        let verification_type = ElementType::Verification(crate::element::VerificationType::Test);
         
         // verifiedBy: requirement -> verification
         assert!(validate_relation_element_types("verifiedBy", &req_type, &verification_type));
@@ -381,11 +406,11 @@ pub fn validate_relation_element_types(
         "verifiedBy" => {
             // Source should be a requirement and target should be a verification
             matches!(source_type, ElementType::Requirement(_)) && 
-            matches!(target_type, ElementType::Verification)
+            matches!(target_type, ElementType::Verification(_))
         },
         "verify" => {
             // Source should be a verification and target should be a requirement
-            matches!(source_type, ElementType::Verification) && 
+            matches!(source_type, ElementType::Verification(_)) && 
             matches!(target_type, ElementType::Requirement(_))
         },
         "satisfiedBy" => {

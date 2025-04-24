@@ -19,72 +19,106 @@ pub mod reserved_subsections;
 pub mod nonlink_identifiers;
 
 pub fn run_linting(
-    specification_folder: &PathBuf, 
-    external_folders: &[PathBuf], 
-    excluded_filename_patterns: &GlobSet, 
-    dry_run: bool
+    specification_folder: &PathBuf,
+    external_folders: &[PathBuf],
+    excluded_filename_patterns: &GlobSet,
+    dry_run: bool,
 ) -> Result<(), ReqFlowError> {
     debug!("Starting linting process in {:?}", specification_folder);
-    
-    let mut lint_suggestions = Vec::new();
-    let files = utils::scan_markdown_files(None,specification_folder, external_folders, excluded_filename_patterns);
+
+    let files = utils::scan_markdown_files(
+        None,
+        specification_folder,
+        external_folders,
+        excluded_filename_patterns,
+    );
     debug!("Found {} markdown files to lint", files.len());
 
-    for (file_path, _) in files {        
-        // Apply each linting rule separately, saving the file after each. (order matters).
-        let linting_rules: Vec<fn(&str, &Path) -> Vec<LintSuggestion>> = vec![
-            reserved_subsections::fix_reserved_subsections,                
+    let mut total_suggestions = 0;
+
+    for (file_path, _) in files {
+        let original_content = fs::read_to_string(&file_path)?;
+        let mut modified_content = original_content.clone();
+
+        // ── PHASE 1: STRUCTURAL ──
+        let structural_rules: Vec<fn(&str, &Path) -> Vec<LintSuggestion>> = vec![
+            // pick whatever order you like now—either nonlink→reserved or reserved→nonlink
+            nonlink_identifiers::find_nonlink_identifiers,
+            reserved_subsections::fix_reserved_subsections,
             absolute_links::find_absolute_links,
-            nonlink_identifiers::find_nonlink_identifiers,            
             whitespace::find_excess_whitespace,
-            newlines::find_inconsistent_newlines,            
-            separators::find_missing_separators,                                                            
-          //  indentation::find_inconsistent_indentation,
+            separators::find_missing_separators,
         ];
 
-        let mut file_content = fs::read_to_string(&file_path)?;
+        let mut all_suggestions = Vec::new();
+        for rule in structural_rules {
+            let mut suggestions = rule(&remove_details_blocks(&modified_content), &file_path);
 
-        for lint_rule in linting_rules {
-            // Read file content.
-            let mut suggestions = lint_rule(&file_content, &file_path);
-
-            if suggestions.is_empty() {
-                continue; // No issues found in this rule, move to the next rule
-            }
-
-            if dry_run {
-                lint_suggestions.extend(suggestions);
-            } else {
-                // Sort suggestions by line_number descending so that fixes are applied from bottom to top
-                suggestions.sort_by(|a, b| b.line_number.unwrap_or(0).cmp(&a.line_number.unwrap_or(0)));
- 
-                let mut new_file_content=file_content.clone();
+            if !dry_run {
+                suggestions.sort_by(|a, b| {
+                    b.line_number.unwrap_or(0).cmp(&a.line_number.unwrap_or(0))
+                });
                 for suggestion in &suggestions {
-                    new_file_content = apply_fix(&new_file_content, suggestion);
-                    println!("✅ Applied fix: {} to {}", suggestion.description, file_path.display());  
-                }    
-                file_content=new_file_content.clone();
-                fs::write(&file_path, &file_content)?;                                                                                                                              
-
+                    modified_content = apply_fix(&modified_content, suggestion);
+                    println!(
+                        "✅ Applied fix: {} to {}",
+                        suggestion.description,
+                        file_path.display()
+                    );
+                }
             }
 
+            all_suggestions.append(&mut suggestions);
         }
-    }
-    
-    if dry_run {
-        if lint_suggestions.is_empty() {
-            println!("✅ No linting issues found.");
+
+        // ── PHASE 2: SPACING ──
+        let mut spacing_suggestions =
+            newlines::find_inconsistent_newlines(&modified_content, &file_path);
+        if !dry_run {
+            spacing_suggestions.sort_by(|a, b| {
+                b.line_number.unwrap_or(0).cmp(&a.line_number.unwrap_or(0))
+            });
+            for suggestion in &spacing_suggestions {
+                modified_content = apply_fix(&modified_content, suggestion);
+                println!(
+                    "✅ Applied spacing fix: {} to {}",
+                    suggestion.description,
+                    file_path.display()
+                );
+            }
         } else {
-            for suggestion in &lint_suggestions {
-                let _ = suggestion.print_colorized_diff();
+            all_suggestions.append(&mut spacing_suggestions);
+        }
+
+        // write out if changed
+        if !dry_run && modified_content != original_content {
+            fs::write(&file_path, &modified_content)?;
+        }
+
+        // dry‐run report        
+        if dry_run {
+            total_suggestions += all_suggestions.len();        
+            
+            if !all_suggestions.is_empty() {
+                for suggestion in &all_suggestions {
+                    let _ = suggestion.print_colorized_diff();
+                }
+                println!("⚠️ Found {} linting issues in {}:", 
+                         all_suggestions.len(), file_path.display());
+                println!("Run without --dry-run to apply fixes.\n");
             }
-            println!("⚠️ Found {} linting issues:", lint_suggestions.len());             
-            println!("Run without --dry-run to apply fixes.");
         }
     }
 
+    // overall dry‑run summary
+    if dry_run && total_suggestions == 0 {
+        println!("✅ No linting issues found in any files.");
+    }
+ 
+ 
     Ok(())
 }
+
 
 /// Applies a single lint fix to the given content.
 fn apply_fix(content: &str, suggestion: &LintSuggestion) -> String {
@@ -143,6 +177,32 @@ fn remove_lines(content: &str, lines_to_remove: &[usize]) -> String {
     }
 
     lines.join("\n") + "\n" // Preserve trailing newline
+}
+
+fn remove_details_blocks(content: &str) -> String {
+    let mut in_details = false;
+    let mut output = Vec::new();
+
+    for line in content.lines() {
+        let trimmed = line.trim_start();
+
+        if trimmed.starts_with("<details") {
+            in_details = true;
+        }
+
+        if !in_details {
+            output.push(line.to_string());
+        } else {
+            // Optionally preserve line count for accurate diffs:
+            output.push("<!-- skipped details -->".to_string());
+        }
+
+        if trimmed.starts_with("</details>") {
+            in_details = false;
+        }
+    }
+
+    output.join("\n")
 }
 
 /// Represents a lint suggestion (like a warning) that can be fixed automatically
@@ -537,6 +597,56 @@ mod tests {
         let result = run_linting(&temp_dir.path().to_path_buf(), &[], &excluded_patterns, true);
 
         assert!(result.is_ok(), "Linting should run without errors");
+
     }
+    /// Test: Remove content within <details> blocks
+    #[test]
+    fn test_remove_details_blocks() {
+        let input = r#"
+### Some Element
+
+Intro content.
+
+### Details
+<details>
+<summary>More</summary>
+
+### Should not be parsed as requirement
+
+This is not requirement.
+
+#### Relations
+Broken relation which is not relation.
+
+</details>
+
+After details.
+"#;
+
+        let expected = r#"
+### Some Element
+
+Intro content.
+
+### Details
+<!-- skipped details -->
+<!-- skipped details -->
+<!-- skipped details -->
+<!-- skipped details -->
+<!-- skipped details -->
+<!-- skipped details -->
+<!-- skipped details -->
+<!-- skipped details -->
+<!-- skipped details -->
+<!-- skipped details -->
+<!-- skipped details -->
+
+After details.
+"#;
+
+        let result = remove_details_blocks(input);
+
+        assert_eq!(result.trim(), expected.trim());
+    }    
 }
 

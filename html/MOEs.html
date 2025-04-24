@@ -1,0 +1,172 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MOEs</title>
+    
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa;
+    color: #333;
+}
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+.content {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+h1 {
+    color: #333;
+    border-bottom: 2px solid #eaecef;
+    padding-bottom: 10px;
+    margin-top: 0;
+}
+h2 {
+    color: #333;
+    border-bottom: 1px solid #eaecef;
+    padding-bottom: 5px;
+}
+h3 {
+    color: #1a6fb7;
+    margin-top: 25px;
+}
+h4 {
+    color: #555;
+    font-weight: 600;
+}
+a {
+    color: #0366d6;
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 20px 0;
+}
+table, th, td {
+    border: 1px solid #dfe2e5;
+}
+th, td {
+    padding: 8px 12px;
+    text-align: left;
+}
+th {
+    background-color: #f6f8fa;
+}
+code {
+    background: #f6f8fa;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 90%;
+}
+pre {
+    background: #f6f8fa;
+    border-radius: 3px;
+    padding: 16px;
+    overflow: auto;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+}
+blockquote {
+    margin: 0;
+    padding: 0 15px;
+    color: #777;
+    border-left: 4px solid #dfe2e5;
+}
+.mermaid {
+    margin: 20px 0;
+    text-align: center;
+}
+</style>
+
+    <!-- Enhanced mermaid configuration for ReqFlow diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'neutral',
+            maxTextSize: 90000,
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            securityLevel: 'loose'
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="content">
+            <h1 id="moes">MOEs</h1>
+<h2 id="measures-of-effectiveness-(moes)-and-key-performance-parameters-(kpps)">Measures of Effectiveness (MOEs) and Key Performance Parameters (KPPs)</h2>
+<div class="mermaid">graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+
+  b3f57e49f7494c0e[&quot;MOE_CE&quot;];
+  click b3f57e49f7494c0e &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/MOEs.html#moe_ce&quot;;
+  class b3f57e49f7494c0e requirement;
+  f6237e49f7494c0e[&quot;MOE_UA&quot;];
+  click f6237e49f7494c0e &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/MOEs.html#moe_ua&quot;;
+  class f6237e49f7494c0e requirement;
+</div>
+<p>The <strong>MOEs</strong> and <strong>KPPs</strong> for <strong>ReqFlow</strong> are designed to evaluate how effectively the methodology, toolset, and language deliver value to users and stakeholders. 
+These metrics emphasize outcomes such as user adoption, operational efficiency, and community engagement, ensuring that ReqFlow aligns with the needs of its open-source ecosystem.</p>
+<hr />
+<h3 id="moe_ua">MOE_UA</h3>
+<p><strong>Increase User Adoption</strong></p>
+<ul>
+<li>Goal: Drive adoption of ReqFlow within the open-source and engineering communities.</li>
+<li>Metric: User Adoption Rate (UA)</li>
+<li>Metric Calculation:
+<blockquote>
+<p>UA = (Number of new projects using ReqFlow / Total projects surveyed) × 100.</p>
+</blockquote>
+</li>
+<li>Target Period: 1 year</li>
+<li>Target Window: 3 months</li>
+<li>Target Statement: Achieve a user adoption rate of X% within the first year.</li>
+<li>Objective: Expand ReqFlow’s reach and influence in MBSE practices.</li>
+</ul>
+<hr />
+<h3 id="moe_ce">MOE_CE</h3>
+<p><strong>Boost Community Engagement</strong></p>
+<ul>
+<li>Goal: Foster an active and collaborative open-source community around ReqFlow.</li>
+<li>Metric: Contributor Engagement (CE)</li>
+<li>Metric Calculation:
+<blockquote>
+<p>CE = (Number of active contributors / Total repository members) × 100.</p>
+</blockquote>
+</li>
+<li>Target Period: 6 months</li>
+<li>Target Window: Monthly metric values averaged over the target period.</li>
+<li>Target Statement: Increase CE by X% over 6 months.</li>
+<li>Objective: Encourage contributions, feedback, and community involvement in the project’s growth.</li>
+</ul>
+
+        </div>
+    </div>
+</body>
+</html>

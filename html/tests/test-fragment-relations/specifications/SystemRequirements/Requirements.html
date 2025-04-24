@@ -1,0 +1,165 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Requirements</title>
+    
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa;
+    color: #333;
+}
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+.content {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+h1 {
+    color: #333;
+    border-bottom: 2px solid #eaecef;
+    padding-bottom: 10px;
+    margin-top: 0;
+}
+h2 {
+    color: #333;
+    border-bottom: 1px solid #eaecef;
+    padding-bottom: 5px;
+}
+h3 {
+    color: #1a6fb7;
+    margin-top: 25px;
+}
+h4 {
+    color: #555;
+    font-weight: 600;
+}
+a {
+    color: #0366d6;
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 20px 0;
+}
+table, th, td {
+    border: 1px solid #dfe2e5;
+}
+th, td {
+    padding: 8px 12px;
+    text-align: left;
+}
+th {
+    background-color: #f6f8fa;
+}
+code {
+    background: #f6f8fa;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 90%;
+}
+pre {
+    background: #f6f8fa;
+    border-radius: 3px;
+    padding: 16px;
+    overflow: auto;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+}
+blockquote {
+    margin: 0;
+    padding: 0 15px;
+    color: #777;
+    border-left: 4px solid #dfe2e5;
+}
+.mermaid {
+    margin: 20px 0;
+    text-align: center;
+}
+</style>
+
+    <!-- Enhanced mermaid configuration for ReqFlow diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'neutral',
+            maxTextSize: 90000,
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            securityLevel: 'loose'
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="content">
+            <h1 id="notification-system-requirements">Notification System Requirements</h1>
+<p>This document contains the requirements for the notification system, including cases with same-file fragment references.</p>
+<h2 id="architecture-overview">Architecture Overview</h2>
+<h3 id="notif-arch-001-reliable-and-fault-tolerant-architecture">NOTIF-ARCH-001 Reliable and Fault Tolerant Architecture</h3>
+<p>The notification system must be designed with reliability and fault tolerance in mind.</p>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="#reliability-requirements">Reliable Requirements</a></li>
+<li>derivedFrom: <a href="../BasicRequirements.html#user-req-001-notification-preferences">User Preferences</a></li>
+</ul>
+<hr />
+<h2 id="implementation-details">Implementation Details</h2>
+<h3 id="notif-impl-001-notifications-publishing">NOTIF-IMPL-001 Notifications Publishing</h3>
+<p>The system should implement a reliable publishing mechanism for notifications.</p>
+<h4>Relations</h4>
+<ul>
+<li>refine: NOTIF-ARCH-001 Reliable and Fault Tolerant Architecture</li>
+<li>derivedFrom: ../BasicRequirements.md#USER-REQ-002 Multi-channel Notifications</li>
+</ul>
+<hr />
+<h3 id="notif-impl-002-notifications-delivery">NOTIF-IMPL-002 Notifications Delivery</h3>
+<p>The system should implement efficient delivery of notifications to recipients.</p>
+<h4>Relations</h4>
+<ul>
+<li>refine: NOTIF-ARCH-001 Reliable and Fault Tolerant Architecture</li>
+<li>derivedFrom: <a href="../BasicRequirements.html#user-req-003-notification-grouping">User Notification Grouping</a></li>
+</ul>
+<hr />
+<h3 id="notif-impl-003-notifications-persistence">NOTIF-IMPL-003 Notifications Persistence</h3>
+<p>The system should store notifications for retrieval and audit purposes.</p>
+<h4>Relations</h4>
+<ul>
+<li>trace: NOTIF-IMPL-001 Notifications Publishing</li>
+<li>refine: NOTIF-IMPL-002 Notifications Delivery</li>
+<li>derivedFrom: <a href="../BasicRequirements.html#user-ux-001-notification-interaction">Notification Interaction</a></li>
+</ul>
+<hr />
+<h3 id="reliability-requirements">Reliability Requirements</h3>
+<p>The notification system must meet specific reliability requirements.</p>
+<h4>Relations</h4>
+<ul>
+<li>refine: NOTIF-ARCH-001 Reliable and Fault Tolerant Architecture</li>
+</ul>
+
+        </div>
+    </div>
+</body>
+</html>

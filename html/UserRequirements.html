@@ -1,0 +1,697 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UserRequirements</title>
+    
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa;
+    color: #333;
+}
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+.content {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+h1 {
+    color: #333;
+    border-bottom: 2px solid #eaecef;
+    padding-bottom: 10px;
+    margin-top: 0;
+}
+h2 {
+    color: #333;
+    border-bottom: 1px solid #eaecef;
+    padding-bottom: 5px;
+}
+h3 {
+    color: #1a6fb7;
+    margin-top: 25px;
+}
+h4 {
+    color: #555;
+    font-weight: 600;
+}
+a {
+    color: #0366d6;
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 20px 0;
+}
+table, th, td {
+    border: 1px solid #dfe2e5;
+}
+th, td {
+    padding: 8px 12px;
+    text-align: left;
+}
+th {
+    background-color: #f6f8fa;
+}
+code {
+    background: #f6f8fa;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 90%;
+}
+pre {
+    background: #f6f8fa;
+    border-radius: 3px;
+    padding: 16px;
+    overflow: auto;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+}
+blockquote {
+    margin: 0;
+    padding: 0 15px;
+    color: #777;
+    border-left: 4px solid #dfe2e5;
+}
+.mermaid {
+    margin: 20px 0;
+    text-align: center;
+}
+</style>
+
+    <!-- Enhanced mermaid configuration for ReqFlow diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'neutral',
+            maxTextSize: 90000,
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            securityLevel: 'loose'
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="content">
+            <h1 id="user-requirements">User Requirements</h1>
+<h2 id="generate-diagrams">Generate Diagrams</h2>
+<div class="mermaid">graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+
+  aee397f35b867556[&quot;Store Automated Diagrams in Designated Locations&quot;];
+  click aee397f35b867556 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#store-automated-diagrams-in-designated-locations&quot;;
+  class aee397f35b867556 requirement;
+  cf0026c2feeb1e0f[&quot;UserStories.md/Generate Diagrams&quot;];
+  class cf0026c2feeb1e0f requirement;
+  click cf0026c2feeb1e0f &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserStories.html#generate-diagrams&quot;;
+  aee397f35b867556 --&gt;|refines| cf0026c2feeb1e0f;
+  30053341d874971a[&quot;Select Custom Diagram Viewpoints&quot;];
+  click 30053341d874971a &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#select-custom-diagram-viewpoints&quot;;
+  class 30053341d874971a requirement;
+  30053341d874971a --&gt;|refines| cf0026c2feeb1e0f;
+  10c00a1bd12fefa5[&quot;Export Diagrams in Standard Formats&quot;];
+  click 10c00a1bd12fefa5 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#export-diagrams-in-standard-formats&quot;;
+  class 10c00a1bd12fefa5 requirement;
+  10c00a1bd12fefa5 --o|contains| cf0026c2feeb1e0f;
+  a6a836283607bf45[&quot;Visualize Model Relationships&quot;];
+  click a6a836283607bf45 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#visualize-model-relationships&quot;;
+  class a6a836283607bf45 requirement;
+  a6a836283607bf45 --&gt;|refines| cf0026c2feeb1e0f;
+  30d97803eba68a13[&quot;Filter Relationships by Type&quot;];
+  click 30d97803eba68a13 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#filter-relationships-by-type&quot;;
+  class 30d97803eba68a13 requirement;
+  30d97803eba68a13 --&gt;|refines| cf0026c2feeb1e0f;
+  81f9235dedaea6a9[&quot;Automate Diagram Generation&quot;];
+  click 81f9235dedaea6a9 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#automate-diagram-generation&quot;;
+  class 81f9235dedaea6a9 requirement;
+  81f9235dedaea6a9 -.-&gt;|deriveReqT| a6a836283607bf45;
+  fd7388e379372d7b[&quot;Highlight Changes in Diagrams&quot;];
+  click fd7388e379372d7b &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#highlight-changes-in-diagrams&quot;;
+  class fd7388e379372d7b requirement;
+  fd7388e379372d7b --&gt;|refines| cf0026c2feeb1e0f;
+</div>
+<hr />
+<h3 id="select-custom-diagram-viewpoints">Select Custom Diagram Viewpoints</h3>
+<p>The system shall allow users to select custom viewpoints for diagrams, tailored to specific stakeholder needs.</p>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="UserStories.html#generate-diagrams">UserStories.md/Generate Diagrams</a></li>
+</ul>
+<hr />
+<h3 id="export-diagrams-in-standard-formats">Export Diagrams in Standard Formats</h3>
+<p>The system shall allow users to export generated diagrams in standard formats (e.g., PNG, SVG, PDF) for easy sharing and presentation.</p>
+<h4>Relations</h4>
+<ul>
+<li>containedBy: <a href="UserStories.html#generate-diagrams">UserStories.md/Generate Diagrams</a></li>
+</ul>
+<hr />
+<h3 id="highlight-changes-in-diagrams">Highlight Changes in Diagrams</h3>
+<p>The system shall provide an option to highlight changes made to the model in the generated diagrams for better traceability.</p>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="UserStories.html#generate-diagrams">UserStories.md/Generate Diagrams</a></li>
+</ul>
+<hr />
+<h3 id="visualize-model-relationships">Visualize Model Relationships</h3>
+<p>The system shall provide visual representations of relationships within the MBSE model in the diagrams, enabling users to understand dependencies and their impact.</p>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="UserStories.html#generate-diagrams">UserStories.md/Generate Diagrams</a></li>
+</ul>
+<hr />
+<h3 id="automate-diagram-generation">Automate Diagram Generation</h3>
+<p>When requested, the system shall automatically generate diagrams and save them to the required locations of the model, so that the diagrams are always accessible and up-to-date.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#visualize-model-relationships">Visualize Model Relationships</a></li>
+</ul>
+<hr />
+<h3 id="filter-relationships-by-type">Filter Relationships by Type</h3>
+<p>The system shall allow users to filter relationships in the MBSE model by type, such as dependency, refinement, or verification when generating diagrams.</p>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="UserStories.html#generate-diagrams">UserStories.md/Generate Diagrams</a></li>
+</ul>
+<hr />
+<h3 id="store-automated-diagrams-in-designated-locations">Store Automated Diagrams in Designated Locations</h3>
+<p>The system shall store automatically generated diagrams in pre-configured locations in the model repository.</p>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="UserStories.html#generate-diagrams">UserStories.md/Generate Diagrams</a></li>
+</ul>
+<hr />
+<h2 id="aligning-design-with-code">Aligning Design with Code</h2>
+<div class="mermaid">graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+
+  1fc4e44d5fd988a6[&quot;Code Traceability&quot;];
+  click 1fc4e44d5fd988a6 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#code-traceability&quot;;
+  class 1fc4e44d5fd988a6 requirement;
+  de2d3516cd5ef91d[&quot;UserStories.md/Aligning Design with Code&quot;];
+  class de2d3516cd5ef91d requirement;
+  click de2d3516cd5ef91d &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserStories.html#aligning-design-with-code&quot;;
+  1fc4e44d5fd988a6 --&gt;|refines| de2d3516cd5ef91d;
+  5922f3ef031b5fea[&quot;Suggest Code Refactoring&quot;];
+  click 5922f3ef031b5fea &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#suggest-code-refactoring&quot;;
+  class 5922f3ef031b5fea requirement;
+  5922f3ef031b5fea --&gt;|refines| de2d3516cd5ef91d;
+</div>
+<hr />
+<h3 id="code-traceability">Code Traceability</h3>
+<p>The system shall support code traceability by using structured comments to link code implementations to corresponding requirements in the MBSE model.</p>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="UserStories.html#aligning-design-with-code">UserStories.md/Aligning Design with Code</a></li>
+</ul>
+<hr />
+<h3 id="suggest-code-refactoring">Suggest Code Refactoring</h3>
+<p>The system shall suggest code refactoring opportunities to better align with the structure and relationships in the MBSE model.</p>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="UserStories.html#aligning-design-with-code">UserStories.md/Aligning Design with Code</a></li>
+</ul>
+<hr />
+<h2 id="validating-structures">Validating Structures</h2>
+<div class="mermaid">graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+
+  7b1772417b3ad5e[&quot;Validate Markdown Structure&quot;];
+  click 7b1772417b3ad5e &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#validate-markdown-structure&quot;;
+  class 7b1772417b3ad5e requirement;
+  a60d88b6e2cb3842[&quot;UserStories.md/Validating Structures&quot;];
+  class a60d88b6e2cb3842 requirement;
+  click a60d88b6e2cb3842 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserStories.html#validating-structures&quot;;
+  7b1772417b3ad5e --&gt;|refines| a60d88b6e2cb3842;
+  d834cc4bc9dbb07c[&quot;Validate Filesystem Structure&quot;];
+  click d834cc4bc9dbb07c &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#validate-filesystem-structure&quot;;
+  class d834cc4bc9dbb07c requirement;
+  d834cc4bc9dbb07c --&gt;|refines| a60d88b6e2cb3842;
+  f5b5eaeb28c5a7b1[&quot;Generate Documentation Index&quot;];
+  click f5b5eaeb28c5a7b1 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#generate-documentation-index&quot;;
+  class f5b5eaeb28c5a7b1 requirement;
+  852dea6cfecb47f5[&quot;UserStories.md/Managing MBSE Models&quot;];
+  class 852dea6cfecb47f5 requirement;
+  click 852dea6cfecb47f5 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserStories.html#managing-mbse-models&quot;;
+  f5b5eaeb28c5a7b1 -.-&gt;|deriveReqT| 852dea6cfecb47f5;
+  103ddb8dc3242215[&quot;Model Linting&quot;];
+  click 103ddb8dc3242215 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#model-linting&quot;;
+  class 103ddb8dc3242215 requirement;
+  103ddb8dc3242215 --&gt;|refines| a60d88b6e2cb3842;
+  808b1863c88b26c4[&quot;Linting Command Output&quot;];
+  click 808b1863c88b26c4 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#linting-command-output&quot;;
+  class 808b1863c88b26c4 requirement;
+  887a7d36caacab2b[&quot;Linting Command&quot;];
+  class 887a7d36caacab2b requirement;
+  click 887a7d36caacab2b &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#linting-command&quot;;
+  808b1863c88b26c4 --&gt;|refines| 887a7d36caacab2b;
+  e587d63764466914[&quot;Validate Relation Types&quot;];
+  click e587d63764466914 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#validate-relation-types&quot;;
+  class e587d63764466914 requirement;
+  e587d63764466914 --&gt;|refines| a60d88b6e2cb3842;
+  85f6854a4607b76b[&quot;Replace Absolute Links with Relative Links&quot;];
+  click 85f6854a4607b76b &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#replace-absolute-links-with-relative-links&quot;;
+  class 85f6854a4607b76b requirement;
+  85f6854a4607b76b --o|contains| 103ddb8dc3242215;
+  e1c89b5d94837122[&quot;Documentation Index HTML Integration&quot;];
+  click e1c89b5d94837122 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#documentation-index-html-integration&quot;;
+  class e1c89b5d94837122 requirement;
+  e1c89b5d94837122 --&gt;|refines| f5b5eaeb28c5a7b1;
+  81758bdb22a3329d[&quot;Format Consistency Enforcement&quot;];
+  click 81758bdb22a3329d &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#format-consistency-enforcement&quot;;
+  class 81758bdb22a3329d requirement;
+  81758bdb22a3329d --o|contains| 103ddb8dc3242215;
+  9e524ac696c43a26[&quot;Validate Internal Consistency&quot;];
+  click 9e524ac696c43a26 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#validate-internal-consistency&quot;;
+  class 9e524ac696c43a26 requirement;
+  9e524ac696c43a26 --&gt;|refines| a60d88b6e2cb3842;
+  6e40bf9f83a718fa[&quot;Validate Cross-Component Dependencies&quot;];
+  click 6e40bf9f83a718fa &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#validate-cross-component-dependencies&quot;;
+  class 6e40bf9f83a718fa requirement;
+  6e40bf9f83a718fa --&gt;|refines| a60d88b6e2cb3842;
+  7cf5cf9900076be6[&quot;Enhanced Validation Error Reporting&quot;];
+  click 7cf5cf9900076be6 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#enhanced-validation-error-reporting&quot;;
+  class 7cf5cf9900076be6 requirement;
+  7cf5cf9900076be6 --&gt;|refines| a60d88b6e2cb3842;
+  887a7d36caacab2b --o|contains| 103ddb8dc3242215;
+</div>
+<hr />
+<h3 id="enhanced-validation-error-reporting">Enhanced Validation Error Reporting</h3>
+<p>The system shall provide comprehensive validation messages that include file paths and line numbers when available, to help users quickly locate and fix model integrity and structure issues in their MBSE specifications.</p>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="UserStories.html#validating-structures">UserStories.md/Validating Structures</a></li>
+</ul>
+<hr />
+<h3 id="model-linting">Model Linting</h3>
+<p>The ssystem shall provide linting capabilities to identify and fix stylistic, formatting, and non-critical issues in MBSE models that don’t affect functional integrity.</p>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="UserStories.html#validating-structures">UserStories.md/Validating Structures</a></li>
+</ul>
+<hr />
+<h3 id="linting-command">Linting Command</h3>
+<p>The system shall provide a linting command that by default automatically applies fixes to stylistic and non-critical formatting issues, while offering option to preview changes without applying them.</p>
+<h4>Relations</h4>
+<ul>
+<li>containedBy: <a href="#model-linting">Model Linting</a></li>
+</ul>
+<hr />
+<h3 id="linting-command-output">Linting Command Output</h3>
+<p>The system shall display linting changes suggestion in similar manner as git diffs.</p>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="#linting-command">Linting Command</a></li>
+</ul>
+<hr />
+<h3 id="replace-absolute-links-with-relative-links">Replace Absolute Links with Relative Links</h3>
+<p>The system shall replace absolute links with relative links, where applicable and contextually appropriate, to conform to repository standards and enhance portability.</p>
+<h4>Relations</h4>
+<ul>
+<li>containedBy: <a href="#model-linting">Model Linting</a></li>
+</ul>
+<hr />
+<h3 id="format-consistency-enforcement">Format Consistency Enforcement</h3>
+<p>The system shall provide linting capability to ensure consistent formatting in requirements documents.</p>
+<h4>Details</h4>
+<ul>
+<li>Trimming excess whitespace after element names and relation identifiers</li>
+<li>Normalizing to exactly two newlines before subsections (e.g., “#### Details”)</li>
+<li>Automatically inserting separator lines (“—”) between elements if not already present</li>
+<li>Ensuring consistent indentation in relation lists</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>containedBy: <a href="#model-linting">Model Linting</a></li>
+</ul>
+<hr />
+<h3 id="generate-documentation-index">Generate Documentation Index</h3>
+<p>The system shall generate an index.md file in the specifications root folder during linting that contains a structured summary of all specification documents and folders.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="UserStories.html#managing-mbse-models">UserStories.md/Managing MBSE Models</a></li>
+</ul>
+<hr />
+<h3 id="documentation-index-html-integration">Documentation Index HTML Integration</h3>
+<p>The index.md file shall be converted to index.md when HTML output is generated, serving as the primary entry point for HTML documentation.</p>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="#generate-documentation-index">Generate Documentation Index</a></li>
+</ul>
+<hr />
+<h3 id="validate-markdown-structure">Validate Markdown Structure</h3>
+<p>The system shall validate the Markdown structure of MBSE documentation to ensure compliance with formatting standards.</p>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="UserStories.html#validating-structures">UserStories.md/Validating Structures</a></li>
+</ul>
+<hr />
+<h3 id="validate-filesystem-structure">Validate Filesystem Structure</h3>
+<p>The system shall validate the organization of files and folders in the repository to ensure consistency with the MBSE methodology.</p>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="UserStories.html#validating-structures">UserStories.md/Validating Structures</a></li>
+</ul>
+<hr />
+<h3 id="validate-internal-consistency">Validate Internal Consistency</h3>
+<p>The system shall check the internal consistency of the MBSE model, ensuring that relationships and elements align correctly.</p>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="UserStories.html#validating-structures">UserStories.md/Validating Structures</a></li>
+</ul>
+<hr />
+<h3 id="validate-cross-component-dependencies">Validate Cross-Component Dependencies</h3>
+<p>The system shall validate dependencies across different components of the MBSE model to identify mismatches or gaps.</p>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="UserStories.html#validating-structures">UserStories.md/Validating Structures</a></li>
+</ul>
+<hr />
+<h3 id="validate-relation-types">Validate Relation Types</h3>
+<p>The system shall validate relation types and allow only supported types.</p>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="UserStories.html#validating-structures">UserStories.md/Validating Structures</a></li>
+</ul>
+<hr />
+<h2 id="integrate-with-github-workflows">Integrate with GitHub Workflows</h2>
+<div class="mermaid">graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+
+  b2a387077d97cf24[&quot;Generate Change Logs for Pull Requests&quot;];
+  click b2a387077d97cf24 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#generate-change-logs-for-pull-requests&quot;;
+  class b2a387077d97cf24 requirement;
+  ba120b7cafc5435f[&quot;UserStories.md/Integrate with GitHub Workflows&quot;];
+  class ba120b7cafc5435f requirement;
+  click ba120b7cafc5435f &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserStories.html#integrate-with-github-workflows&quot;;
+  b2a387077d97cf24 --&gt;|refines| ba120b7cafc5435f;
+  68454e6166703319[&quot;Automate Pull Request Validations&quot;];
+  click 68454e6166703319 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#automate-pull-request-validations&quot;;
+  class 68454e6166703319 requirement;
+  68454e6166703319 --&gt;|refines| ba120b7cafc5435f;
+</div>
+<hr />
+<h3 id="automate-pull-request-validations">Automate Pull Request Validations</h3>
+<p>The system shall automate validations of pull requests in the GitHub workflow to ensure model consistency before merging.</p>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="UserStories.html#integrate-with-github-workflows">UserStories.md/Integrate with GitHub Workflows</a></li>
+</ul>
+<hr />
+<h3 id="generate-change-logs-for-pull-requests">Generate Change Logs for Pull Requests</h3>
+<p>The system shall generate detailed change logs for pull requests, summarizing modifications to the MBSE model and related components.</p>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="UserStories.html#integrate-with-github-workflows">UserStories.md/Integrate with GitHub Workflows</a></li>
+</ul>
+<hr />
+<h2 id="provide-reports">Provide Reports</h2>
+<div class="mermaid">graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+
+  f8e7625d29ff6e01[&quot;Model Reports&quot;];
+  click f8e7625d29ff6e01 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#model-reports&quot;;
+  class f8e7625d29ff6e01 requirement;
+  fe32882ee273e24d[&quot;UserStories.md/Provide Reports&quot;];
+  class fe32882ee273e24d requirement;
+  click fe32882ee273e24d &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserStories.html#provide-reports&quot;;
+  f8e7625d29ff6e01 --&gt;|refines| fe32882ee273e24d;
+  482c757913204fb8[&quot;Provide Validation Reports&quot;];
+  click 482c757913204fb8 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#provide-validation-reports&quot;;
+  class 482c757913204fb8 requirement;
+  482c757913204fb8 --&gt;|refines| fe32882ee273e24d;
+  b342220e0dc8751d[&quot;Model Structure and Summaries&quot;];
+  click b342220e0dc8751d &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#model-structure-and-summaries&quot;;
+  class b342220e0dc8751d requirement;
+  b342220e0dc8751d -.-&gt;|deriveReqT| f8e7625d29ff6e01;
+  32850509a034b0ee[&quot;Structural Change Reports&quot;];
+  click 32850509a034b0ee &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#structural-change-reports&quot;;
+  class 32850509a034b0ee requirement;
+  32850509a034b0ee -.-&gt;|deriveReqT| f8e7625d29ff6e01;
+  596c459d31db2976[&quot;Generate Summary Reports&quot;];
+  click 596c459d31db2976 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#generate-summary-reports&quot;;
+  class 596c459d31db2976 requirement;
+  596c459d31db2976 --&gt;|refines| fe32882ee273e24d;
+</div>
+<hr />
+<h3 id="model-reports">Model Reports</h3>
+<p>When requested the system shall provide human readable MBSE model reports.</p>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="UserStories.html#provide-reports">UserStories.md/Provide Reports</a></li>
+</ul>
+<hr />
+<h3 id="model-structure-and-summaries">Model Structure and Summaries</h3>
+<p>When requested the system shall generate reports summarizing the structure and relationships in the MBSE model, including counts and types of connections.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#model-reports">Model Reports</a></li>
+</ul>
+<hr />
+<h3 id="structural-change-reports">Structural Change Reports</h3>
+<p>The system shall generate detailed reports summarizing the impact of structural changes, including affected relationships and components.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#model-reports">Model Reports</a></li>
+</ul>
+<hr />
+<h3 id="provide-validation-reports">Provide Validation Reports</h3>
+<p>The system shall generate detailed validation reports, highlighting any inconsistencies or errors in the MBSE model structure.</p>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="UserStories.html#provide-reports">UserStories.md/Provide Reports</a></li>
+</ul>
+<hr />
+<h3 id="generate-summary-reports">Generate Summary Reports</h3>
+<p>The system shall allow users to generate summary reports highlighting key metrics and statuses within the MBSE model.</p>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="UserStories.html#provide-reports">UserStories.md/Provide Reports</a></li>
+</ul>
+<hr />
+<h2 id="trace-changes-in-mbse-model">Trace Changes in MBSE Model</h2>
+<div class="mermaid">graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+
+  4b7b4328173caada[&quot;Export Traceability Matrix&quot;];
+  click 4b7b4328173caada &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#export-traceability-matrix&quot;;
+  class 4b7b4328173caada requirement;
+  ba40352f8e72c125[&quot;Traceability Matrix&quot;];
+  class ba40352f8e72c125 requirement;
+  click ba40352f8e72c125 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#traceability-matrix&quot;;
+  4b7b4328173caada -.-&gt;|deriveReqT| ba40352f8e72c125;
+  e867499409ae347a[&quot;Interactive Mermaid Diagrams&quot;];
+  click e867499409ae347a &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#interactive-mermaid-diagrams&quot;;
+  class e867499409ae347a requirement;
+  e867499409ae347a -.-&gt;|deriveReqT| ba40352f8e72c125;
+  273dcdad7a4c7b9a[&quot;Include Verification Checkboxes&quot;];
+  click 273dcdad7a4c7b9a &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#include-verification-checkboxes&quot;;
+  class 273dcdad7a4c7b9a requirement;
+  273dcdad7a4c7b9a --&gt;|refines| ba40352f8e72c125;
+  36d8b2eb16113a7f[&quot;UserStories.md/Trace Changes in MBSE Model&quot;];
+  class 36d8b2eb16113a7f requirement;
+  click 36d8b2eb16113a7f &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserStories.html#trace-changes-in-mbse-model&quot;;
+  ba40352f8e72c125 --o|contains| 36d8b2eb16113a7f;
+  91ebf7e73d5ac081[&quot;Tracing Structural Changes&quot;];
+  click 91ebf7e73d5ac081 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#tracing-structural-changes&quot;;
+  class 91ebf7e73d5ac081 requirement;
+  91ebf7e73d5ac081 -.-&gt;|deriveReqT| 36d8b2eb16113a7f;
+</div>
+<hr />
+<h3 id="tracing-structural-changes">Tracing Structural Changes</h3>
+<p>When tracing structural changes, the system shall analyze the MBSE model and diffs to identify affected components and generate a report of impacted elements and structures, so that the user can review the changes and decide on further actions.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="UserStories.html#trace-changes-in-mbse-model">UserStories.md/Trace Changes in MBSE Model</a></li>
+</ul>
+<hr />
+<h3 id="traceability-matrix">Traceability Matrix</h3>
+<p>When requested the system shall generate traceability matrices, in Markdown format by default, and supporting different views.</p>
+<h4>Details</h4>
+<p>Requirements-to-Verification View:</p>
+<ul>
+<li>Maps each requirement to one or more verification activities, tests, or validation procedures. This helps track which requirements are verified and how.</li>
+</ul>
+<h4>Info</h4>
+<p>A matrix is a textual representation which is the most efficient way to convey numerous relationships within a compact space.</p>
+<h4>Relations</h4>
+<ul>
+<li>containedBy: <a href="UserStories.html#trace-changes-in-mbse-model">UserStories.md/Trace Changes in MBSE Model</a></li>
+</ul>
+<hr />
+<h3 id="include-verification-checkboxes">Include Verification Checkboxes</h3>
+<p>The system shall include checkboxes in the traceability matrix for each verification entry, allowing users to manually mark verification as completed.</p>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="#traceability-matrix">Traceability Matrix</a></li>
+</ul>
+<hr />
+<h3 id="export-traceability-matrix">Export Traceability Matrix</h3>
+<p>The system shall provide an option to export the traceability matrix in formats such as Excel or PDF for external sharing and analysis.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#traceability-matrix">Traceability Matrix</a></li>
+</ul>
+<hr />
+<h3 id="interactive-mermaid-diagrams">Interactive Mermaid Diagrams</h3>
+<p>The system shall include Mermaid diagrams in the traceability matrix that provide interactive links to related elements in other documents, enabling navigation and exploration of dependencies.</p>
+<h4>Details</h4>
+<p>Diagrams must be broken into several diagrams using following logic:</p>
+<ul>
+<li>requirements_file_name/‘## paragraph name’
+<ul>
+<li>all requirements inside are 1 diagram</li>
+<li>if requirements documents doesn’t have ‘##’ paragraphs then requirements file name is used only</li>
+<li>external related resources box must be a link to actual resource</li>
+</ul>
+</li>
+</ul>
+<p>Color code for rendering diagrams:</p>
+<ul>
+<li>red for requirement</li>
+<li>yellow for resources which satisfies requirement</li>
+<li>green for verifiction which verifies requirement</li>
+<li>light blue for box representing another diagram/category with requirments where linked requirement or resource exist.</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#traceability-matrix">Traceability Matrix</a></li>
+</ul>
+<hr />
+<h2 id="exporting-specifications">Exporting Specifications</h2>
+<div class="mermaid">graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+
+  72c7eda6183f0893[&quot;Export HTML specifications&quot;];
+  click 72c7eda6183f0893 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#export-html-specifications&quot;;
+  class 72c7eda6183f0893 requirement;
+  100197ce818804[&quot;UserStories.md/Export Specifications&quot;];
+  class 100197ce818804 requirement;
+  click 100197ce818804 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserStories.html#export-specifications&quot;;
+  72c7eda6183f0893 -.-&gt;|deriveReqT| 100197ce818804;
+</div>
+<hr />
+<h3 id="export-html-specifications">Export HTML specifications</h3>
+<p>The system shall export specifications into HTML format and save in designated output location.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="UserStories.html#export-specifications">UserStories.md/Export Specifications</a></li>
+</ul>
+<hr />
+<h2 id="ai-driven-model-suggestions">AI-Driven Model Suggestions</h2>
+<div class="mermaid">graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+
+  5a6fc253c51845b6[&quot;AI Agent Context&quot;];
+  click 5a6fc253c51845b6 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#ai-agent-context&quot;;
+  class 5a6fc253c51845b6 requirement;
+  2b35b7b37d52d4e6[&quot;UserStories.md#AI-Assisted MBSE Model Management&quot;];
+  class 2b35b7b37d52d4e6 requirement;
+  click 2b35b7b37d52d4e6 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserStories.html#ai-assisted-mbse-model-management&quot;;
+  5a6fc253c51845b6 --&gt;|refines| 2b35b7b37d52d4e6;
+</div>
+<hr />
+<h3 id="ai-agent-context">AI Agent Context</h3>
+<p>The system shall provide needed context for AI agents to understand how to use reqflow and methodology.</p>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="UserStories.html#ai-assisted-mbse-model-management">UserStories.md#AI-Assisted MBSE Model Management</a></li>
+</ul>
+<hr />
+<h2 id="trace-changes">Trace Changes</h2>
+<div class="mermaid">graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+
+  bae5edae940ba590[&quot;Change Impact Analysis&quot;];
+  click bae5edae940ba590 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#change-impact-analysis&quot;;
+  class bae5edae940ba590 requirement;
+  36d8b2eb16113a7f[&quot;UserStories.md/Trace Changes in MBSE Model&quot;];
+  class 36d8b2eb16113a7f requirement;
+  click 36d8b2eb16113a7f &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserStories.html#trace-changes-in-mbse-model&quot;;
+  bae5edae940ba590 --o|contains| 36d8b2eb16113a7f;
+</div>
+<hr />
+<h3 id="change-impact-analysis">Change Impact Analysis</h3>
+<p>When requested the system shall generate change impact report, in Markdown format by default and also supporting json output.</p>
+<h4>Details</h4>
+<p>Change Report:</p>
+<ul>
+<li>Overview of all the changes in the model and impact to related requirements and other system elements.</li>
+</ul>
+<p>Change Impact Analysis Report:</p>
+<ul>
+<li>When a requirement changes, the traceability helps identify:
+<ul>
+<li>Which related requirements are affected by a change.</li>
+<li>Which verification procedures or test cases are impacted and potentially invalidated.</li>
+<li>Which other model elements might be affected.</li>
+</ul>
+</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>containedBy: <a href="UserStories.html#trace-changes-in-mbse-model">UserStories.md/Trace Changes in MBSE Model</a></li>
+</ul>
+<hr />
+
+        </div>
+    </div>
+</body>
+</html>

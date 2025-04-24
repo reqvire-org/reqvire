@@ -420,7 +420,7 @@ fn extract_markdown_link(input: &str) -> Option<(String, String)> {
 pub fn hash_identifier(identifier: &str) -> String {
     let mut hasher = FxHasher::default();
     hasher.write(identifier.as_bytes());
-    format!("{:x}", hasher.finish())[..10].to_string() // Truncate to 10 characters
+    format!("{:x}", hasher.finish()).to_string() 
 }
 pub fn hash_content(content: &str) -> String {
     let mut hasher = FxHasher::default();

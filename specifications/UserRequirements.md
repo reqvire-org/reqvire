@@ -9,62 +9,37 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  81f9235ded["Automate Diagram Generation"];
-  click 81f9235ded "UserRequirements.md#automate-diagram-generation";
-  class 81f9235ded requirement;
-  a6a8362836["Visualize Model Relationships"];
-  class a6a8362836 requirement;
-  click a6a8362836 "UserRequirements.md#visualize-model-relationships";
-  81f9235ded -.->|deriveReqT| a6a8362836;
-  b95c73d7b3["Diagram Generation Test"];
-  class b95c73d7b3 verification;
-  click b95c73d7b3 "Verifications/DiagramsTests.md#diagram-generation-test";
-  b95c73d7b3 -->|verifies| 81f9235ded;
-  aee397f35b["Store Automated Diagrams in Designated Locations"];
-  click aee397f35b "UserRequirements.md#store-automated-diagrams-in-designated-locations";
-  class aee397f35b requirement;
-  cf0026c2fe["UserStories.md/Generate Diagrams"];
-  class cf0026c2fe requirement;
-  click cf0026c2fe "UserStories.md#generate-diagrams";
-  aee397f35b ==>|refines| cf0026c2fe;
-  191d27287e["Diagram Storage Path Configuration"];
-  class 191d27287e requirement;
-  click 191d27287e "SystemRequirements/Requirements.md#diagram-storage-path-configuration";
-  191d27287e -.->|deriveReqT| aee397f35b;
-  a6a8362836 ==>|refines| cf0026c2fe;
-  81f9235ded -.->|deriveReqT| a6a8362836;
-  c826c1ee7c["SysML-Compatible Relationship Rendering"];
-  class c826c1ee7c requirement;
-  click c826c1ee7c "SystemRequirements/Requirements.md#sysml-compatible-relationship-rendering";
-  c826c1ee7c -.->|deriveReqT| a6a8362836;
-  fd7388e379["Highlight Changes in Diagrams"];
-  click fd7388e379 "UserRequirements.md#highlight-changes-in-diagrams";
-  class fd7388e379 requirement;
-  fd7388e379 ==>|refines| cf0026c2fe;
-  9860815d52["Visual Differential Rendering"];
-  class 9860815d52 requirement;
-  click 9860815d52 "SystemRequirements/Requirements.md#visual-differential-rendering";
-  9860815d52 -.->|deriveReqT| fd7388e379;
-  30d97803eb["Filter Relationships by Type"];
-  click 30d97803eb "UserRequirements.md#filter-relationships-by-type";
-  class 30d97803eb requirement;
-  30d97803eb ==>|refines| cf0026c2fe;
-  1414e7f889["Relationship Type Filter Implementation"];
-  class 1414e7f889 requirement;
-  click 1414e7f889 "SystemRequirements/Requirements.md#relationship-type-filter-implementation";
-  1414e7f889 -.->|deriveReqT| 30d97803eb;
-  10c00a1bd1["Export Diagrams in Standard Formats"];
-  click 10c00a1bd1 "UserRequirements.md#export-diagrams-in-standard-formats";
-  class 10c00a1bd1 requirement;
-  cf0026c2fe --o|contains| 10c00a1bd1;
-  a7ec66314a["Mermaid Diagram Format Conversion"];
-  class a7ec66314a requirement;
-  click a7ec66314a "SystemRequirements/Requirements.md#mermaid-diagram-format-conversion";
-  a7ec66314a -.->|deriveReqT| 10c00a1bd1;
-  30053341d8["Select Custom Diagram Viewpoints"];
-  click 30053341d8 "UserRequirements.md#select-custom-diagram-viewpoints";
-  class 30053341d8 requirement;
-  30053341d8 ==>|refines| cf0026c2fe;
+  a6a836283607bf45["Visualize Model Relationships"];
+  click a6a836283607bf45 "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserRequirements.md#visualize-model-relationships";
+  class a6a836283607bf45 requirement;
+  cf0026c2feeb1e0f["UserStories.md/Generate Diagrams"];
+  class cf0026c2feeb1e0f requirement;
+  click cf0026c2feeb1e0f "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserStories.md#generate-diagrams";
+  a6a836283607bf45 -->|refines| cf0026c2feeb1e0f;
+  fd7388e379372d7b["Highlight Changes in Diagrams"];
+  click fd7388e379372d7b "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserRequirements.md#highlight-changes-in-diagrams";
+  class fd7388e379372d7b requirement;
+  fd7388e379372d7b -->|refines| cf0026c2feeb1e0f;
+  10c00a1bd12fefa5["Export Diagrams in Standard Formats"];
+  click 10c00a1bd12fefa5 "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserRequirements.md#export-diagrams-in-standard-formats";
+  class 10c00a1bd12fefa5 requirement;
+  10c00a1bd12fefa5 --o|contains| cf0026c2feeb1e0f;
+  30d97803eba68a13["Filter Relationships by Type"];
+  click 30d97803eba68a13 "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserRequirements.md#filter-relationships-by-type";
+  class 30d97803eba68a13 requirement;
+  30d97803eba68a13 -->|refines| cf0026c2feeb1e0f;
+  81f9235dedaea6a9["Automate Diagram Generation"];
+  click 81f9235dedaea6a9 "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserRequirements.md#automate-diagram-generation";
+  class 81f9235dedaea6a9 requirement;
+  81f9235dedaea6a9 -.->|deriveReqT| a6a836283607bf45;
+  aee397f35b867556["Store Automated Diagrams in Designated Locations"];
+  click aee397f35b867556 "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserRequirements.md#store-automated-diagrams-in-designated-locations";
+  class aee397f35b867556 requirement;
+  aee397f35b867556 -->|refines| cf0026c2feeb1e0f;
+  30053341d874971a["Select Custom Diagram Viewpoints"];
+  click 30053341d874971a "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserRequirements.md#select-custom-diagram-viewpoints";
+  class 30053341d874971a requirement;
+  30053341d874971a -->|refines| cf0026c2feeb1e0f;
 ```
 
 ---
@@ -137,21 +112,17 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  1fc4e44d5f["Code Traceability"];
-  click 1fc4e44d5f "UserRequirements.md#code-traceability";
-  class 1fc4e44d5f requirement;
-  de2d3516cd["UserStories.md/Aligning Design with Code"];
-  class de2d3516cd requirement;
-  click de2d3516cd "UserStories.md#aligning-design-with-code";
-  1fc4e44d5f ==>|refines| de2d3516cd;
-  bb213f1c85["Traceability Format"];
-  class bb213f1c85 requirement;
-  click bb213f1c85 "../todo_specifications/CodeTraecabilityRequirements.md#traceability-format";
-  1fc4e44d5f -->|relates to| bb213f1c85;
-  5922f3ef03["Suggest Code Refactoring"];
-  click 5922f3ef03 "UserRequirements.md#suggest-code-refactoring";
-  class 5922f3ef03 requirement;
-  5922f3ef03 ==>|refines| de2d3516cd;
+  5922f3ef031b5fea["Suggest Code Refactoring"];
+  click 5922f3ef031b5fea "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserRequirements.md#suggest-code-refactoring";
+  class 5922f3ef031b5fea requirement;
+  de2d3516cd5ef91d["UserStories.md/Aligning Design with Code"];
+  class de2d3516cd5ef91d requirement;
+  click de2d3516cd5ef91d "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserStories.md#aligning-design-with-code";
+  5922f3ef031b5fea -->|refines| de2d3516cd5ef91d;
+  1fc4e44d5fd988a6["Code Traceability"];
+  click 1fc4e44d5fd988a6 "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserRequirements.md#code-traceability";
+  class 1fc4e44d5fd988a6 requirement;
+  1fc4e44d5fd988a6 -->|refines| de2d3516cd5ef91d;
 ```
 
 ---
@@ -181,129 +152,64 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  887a7d36ca["Linting Command"];
-  click 887a7d36ca "UserRequirements.md#linting-command";
-  class 887a7d36ca requirement;
-  103ddb8dc3["Model Linting"];
-  class 103ddb8dc3 requirement;
-  click 103ddb8dc3 "UserRequirements.md#model-linting";
-  103ddb8dc3 --o|contains| 887a7d36ca;
-  808b1863c8["Linting Command Output"];
-  class 808b1863c8 requirement;
-  click 808b1863c8 "UserRequirements.md#linting-command-output";
-  887a7d36ca -->|relates to| 808b1863c8;
-  fffbb22796["CLI Lint Flag"];
-  class fffbb22796 requirement;
-  click fffbb22796 "SystemRequirements/Requirements.md#cli-lint-flag";
-  fffbb22796 -.->|deriveReqT| 887a7d36ca;
-  f5b5eaeb28["Generate Documentation Index"];
-  click f5b5eaeb28 "UserRequirements.md#generate-documentation-index";
-  class f5b5eaeb28 requirement;
-  852dea6cfe["UserStories.md/Managing MBSE Models"];
-  class 852dea6cfe requirement;
-  click 852dea6cfe "UserStories.md#managing-mbse-models";
-  f5b5eaeb28 -.->|deriveReqT| 852dea6cfe;
-  e1c89b5d94["Documentation Index HTML Integration"];
-  class e1c89b5d94 requirement;
-  click e1c89b5d94 "UserRequirements.md#documentation-index-html-integration";
-  f5b5eaeb28 -->|relates to| e1c89b5d94;
-  8acd24c7c2["Index Generation"];
-  class 8acd24c7c2 requirement;
-  click 8acd24c7c2 "SystemRequirements/Requirements.md#index-generation";
-  8acd24c7c2 -.->|deriveReqT| f5b5eaeb28;
-  6e40bf9f83["Validate Cross-Component Dependencies"];
-  click 6e40bf9f83 "UserRequirements.md#validate-cross-component-dependencies";
-  class 6e40bf9f83 requirement;
-  a60d88b6e2["UserStories.md/Validating Structures"];
-  class a60d88b6e2 requirement;
-  click a60d88b6e2 "UserStories.md#validating-structures";
-  6e40bf9f83 ==>|refines| a60d88b6e2;
-  c7d88aff4e["Cross-Component Dependency Validator"];
-  class c7d88aff4e requirement;
-  click c7d88aff4e "SystemRequirements/Requirements.md#cross-component-dependency-validator";
-  c7d88aff4e -.->|deriveReqT| 6e40bf9f83;
-  808b1863c8 ==>|refines| 887a7d36ca;
-  63f1cd4974["Git-Style Diff Output for Linting"];
-  class 63f1cd4974 requirement;
-  click 63f1cd4974 "SystemRequirements/Requirements.md#git-style-diff-output-for-linting";
-  63f1cd4974 -.->|deriveReqT| 808b1863c8;
-  81758bdb22["Format Consistency Enforcement"];
-  click 81758bdb22 "UserRequirements.md#format-consistency-enforcement";
-  class 81758bdb22 requirement;
-  103ddb8dc3 --o|contains| 81758bdb22;
-  f98ae394db["Incosistent Newlines Linting Implementation"];
-  class f98ae394db requirement;
-  click f98ae394db "SystemRequirements/Requirements.md#incosistent-newlines-linting-implementation";
-  f98ae394db -.->|deriveReqT| 81758bdb22;
-  dd0846393d["Missing Separators Linting Implementation"];
-  class dd0846393d requirement;
-  click dd0846393d "SystemRequirements/Requirements.md#missing-separators-linting-implementation";
-  dd0846393d -.->|deriveReqT| 81758bdb22;
-  3f3d3f9ccb["Excess Whitespace Linting Implementation"];
-  class 3f3d3f9ccb requirement;
-  click 3f3d3f9ccb "SystemRequirements/Requirements.md#excess-whitespace-linting-implementation";
-  3f3d3f9ccb -.->|deriveReqT| 81758bdb22;
-  193cd64638["Reserved Subsections Linting Implementation"];
-  class 193cd64638 requirement;
-  click 193cd64638 "SystemRequirements/Requirements.md#reserved-subsections-linting-implementation";
-  193cd64638 -.->|deriveReqT| 81758bdb22;
-  e1c89b5d94 ==>|refines| f5b5eaeb28;
-  86e0701b6c["HTML Navigation Enhancement"];
-  class 86e0701b6c requirement;
-  click 86e0701b6c "SystemRequirements/Requirements.md#html-navigation-enhancement";
-  86e0701b6c -.->|deriveReqT| e1c89b5d94;
-  7cf5cf9900["Enhanced Validation Error Reporting"];
-  click 7cf5cf9900 "UserRequirements.md#enhanced-validation-error-reporting";
-  class 7cf5cf9900 requirement;
-  7cf5cf9900 ==>|refines| a60d88b6e2;
-  5870488e00["Relation Type Validation"];
-  class 5870488e00 requirement;
-  click 5870488e00 "SystemRequirements/Requirements.md#relation-type-validation";
-  5870488e00 -.->|deriveReqT| 7cf5cf9900;
-  bdfd9d65e4["Detailed Error Handling and Logging"];
-  class bdfd9d65e4 requirement;
-  click bdfd9d65e4 "SystemRequirements/Requirements.md#detailed-error-handling-and-logging";
-  bdfd9d65e4 -.->|deriveReqT| 7cf5cf9900;
-  5ec6a2668b["JSON Output Format"];
-  class 5ec6a2668b requirement;
-  click 5ec6a2668b "SystemRequirements/Requirements.md#json-output-format";
-  5ec6a2668b -.->|deriveReqT| 7cf5cf9900;
-  9e524ac696["Validate Internal Consistency"];
-  click 9e524ac696 "UserRequirements.md#validate-internal-consistency";
-  class 9e524ac696 requirement;
-  9e524ac696 ==>|refines| a60d88b6e2;
-  1c2e7c81f9["Internal Consistency Validator"];
-  class 1c2e7c81f9 requirement;
-  click 1c2e7c81f9 "SystemRequirements/Requirements.md#internal-consistency-validator";
-  1c2e7c81f9 -.->|deriveReqT| 9e524ac696;
-  7b1772417b["Validate Markdown Structure"];
-  click 7b1772417b "UserRequirements.md#validate-markdown-structure";
-  class 7b1772417b requirement;
-  7b1772417b ==>|refines| a60d88b6e2;
-  887db62e0f["Markdown Structure Validator"];
-  class 887db62e0f requirement;
-  click 887db62e0f "SystemRequirements/Requirements.md#markdown-structure-validator";
-  887db62e0f -.->|deriveReqT| 7b1772417b;
-  85f6854a46["Replace Absolute Links with Relative Links"];
-  click 85f6854a46 "UserRequirements.md#replace-absolute-links-with-relative-links";
-  class 85f6854a46 requirement;
-  103ddb8dc3 --o|contains| 85f6854a46;
-  d834cc4bc9["Validate Filesystem Structure"];
-  click d834cc4bc9 "UserRequirements.md#validate-filesystem-structure";
-  class d834cc4bc9 requirement;
-  d834cc4bc9 ==>|refines| a60d88b6e2;
-  ec201a112c["Filesystem Structure Validator"];
-  class ec201a112c requirement;
-  click ec201a112c "SystemRequirements/Requirements.md#filesystem-structure-validator";
-  ec201a112c -.->|deriveReqT| d834cc4bc9;
-  103ddb8dc3 ==>|refines| a60d88b6e2;
-  103ddb8dc3 --o|contains| 887a7d36ca;
-  66aa36deca["Parallel Linting Processing"];
-  class 66aa36deca requirement;
-  click 66aa36deca "SystemRequirements/Requirements.md#parallel-linting-processing";
-  66aa36deca -.->|deriveReqT| 103ddb8dc3;
-  103ddb8dc3 --o|contains| 81758bdb22;
-  103ddb8dc3 --o|contains| 85f6854a46;
+  9e524ac696c43a26["Validate Internal Consistency"];
+  click 9e524ac696c43a26 "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserRequirements.md#validate-internal-consistency";
+  class 9e524ac696c43a26 requirement;
+  a60d88b6e2cb3842["UserStories.md/Validating Structures"];
+  class a60d88b6e2cb3842 requirement;
+  click a60d88b6e2cb3842 "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserStories.md#validating-structures";
+  9e524ac696c43a26 -->|refines| a60d88b6e2cb3842;
+  7b1772417b3ad5e["Validate Markdown Structure"];
+  click 7b1772417b3ad5e "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserRequirements.md#validate-markdown-structure";
+  class 7b1772417b3ad5e requirement;
+  7b1772417b3ad5e -->|refines| a60d88b6e2cb3842;
+  887a7d36caacab2b["Linting Command"];
+  click 887a7d36caacab2b "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserRequirements.md#linting-command";
+  class 887a7d36caacab2b requirement;
+  103ddb8dc3242215["Model Linting"];
+  class 103ddb8dc3242215 requirement;
+  click 103ddb8dc3242215 "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserRequirements.md#model-linting";
+  887a7d36caacab2b --o|contains| 103ddb8dc3242215;
+  6e40bf9f83a718fa["Validate Cross-Component Dependencies"];
+  click 6e40bf9f83a718fa "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserRequirements.md#validate-cross-component-dependencies";
+  class 6e40bf9f83a718fa requirement;
+  6e40bf9f83a718fa -->|refines| a60d88b6e2cb3842;
+  81758bdb22a3329d["Format Consistency Enforcement"];
+  click 81758bdb22a3329d "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserRequirements.md#format-consistency-enforcement";
+  class 81758bdb22a3329d requirement;
+  81758bdb22a3329d --o|contains| 103ddb8dc3242215;
+  f5b5eaeb28c5a7b1["Generate Documentation Index"];
+  click f5b5eaeb28c5a7b1 "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserRequirements.md#generate-documentation-index";
+  class f5b5eaeb28c5a7b1 requirement;
+  852dea6cfecb47f5["UserStories.md/Managing MBSE Models"];
+  class 852dea6cfecb47f5 requirement;
+  click 852dea6cfecb47f5 "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserStories.md#managing-mbse-models";
+  f5b5eaeb28c5a7b1 -.->|deriveReqT| 852dea6cfecb47f5;
+  7cf5cf9900076be6["Enhanced Validation Error Reporting"];
+  click 7cf5cf9900076be6 "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserRequirements.md#enhanced-validation-error-reporting";
+  class 7cf5cf9900076be6 requirement;
+  7cf5cf9900076be6 -->|refines| a60d88b6e2cb3842;
+  103ddb8dc3242215 -->|refines| a60d88b6e2cb3842;
+  d834cc4bc9dbb07c["Validate Filesystem Structure"];
+  click d834cc4bc9dbb07c "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserRequirements.md#validate-filesystem-structure";
+  class d834cc4bc9dbb07c requirement;
+  d834cc4bc9dbb07c -->|refines| a60d88b6e2cb3842;
+  808b1863c88b26c4["Linting Command Output"];
+  click 808b1863c88b26c4 "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserRequirements.md#linting-command-output";
+  class 808b1863c88b26c4 requirement;
+  808b1863c88b26c4 -->|refines| 887a7d36caacab2b;
+  e1c89b5d94837122["Documentation Index HTML Integration"];
+  click e1c89b5d94837122 "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserRequirements.md#documentation-index-html-integration";
+  class e1c89b5d94837122 requirement;
+  e1c89b5d94837122 -->|refines| f5b5eaeb28c5a7b1;
+  85f6854a4607b76b["Replace Absolute Links with Relative Links"];
+  click 85f6854a4607b76b "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserRequirements.md#replace-absolute-links-with-relative-links";
+  class 85f6854a4607b76b requirement;
+  85f6854a4607b76b --o|contains| 103ddb8dc3242215;
+  e587d63764466914["Validate Relation Types"];
+  click e587d63764466914 "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserRequirements.md#validate-relation-types";
+  class e587d63764466914 requirement;
+  e587d63764466914 -->|refines| a60d88b6e2cb3842;
 ```
 
 ---
@@ -410,6 +316,15 @@ The system shall validate dependencies across different components of the MBSE m
 
 ---
 
+### Validate Relation Types
+
+The system shall validate relation types and allow only supported types.
+
+#### Relations
+  * refine: [UserStories.md/Validating Structures](UserStories.md#validating-structures)
+
+---
+
 ## Integrate with GitHub Workflows
 ```mermaid
 graph LR;
@@ -419,17 +334,17 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  68454e6166["Automate Pull Request Validations"];
-  click 68454e6166 "UserRequirements.md#automate-pull-request-validations";
-  class 68454e6166 requirement;
-  ba120b7caf["UserStories.md/Integrate with GitHub Workflows"];
-  class ba120b7caf requirement;
-  click ba120b7caf "UserStories.md#integrate-with-github-workflows";
-  68454e6166 ==>|refines| ba120b7caf;
-  b2a387077d["Generate Change Logs for Pull Requests"];
-  click b2a387077d "UserRequirements.md#generate-change-logs-for-pull-requests";
-  class b2a387077d requirement;
-  b2a387077d ==>|refines| ba120b7caf;
+  b2a387077d97cf24["Generate Change Logs for Pull Requests"];
+  click b2a387077d97cf24 "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserRequirements.md#generate-change-logs-for-pull-requests";
+  class b2a387077d97cf24 requirement;
+  ba120b7cafc5435f["UserStories.md/Integrate with GitHub Workflows"];
+  class ba120b7cafc5435f requirement;
+  click ba120b7cafc5435f "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserStories.md#integrate-with-github-workflows";
+  b2a387077d97cf24 -->|refines| ba120b7cafc5435f;
+  68454e6166703319["Automate Pull Request Validations"];
+  click 68454e6166703319 "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserRequirements.md#automate-pull-request-validations";
+  class 68454e6166703319 requirement;
+  68454e6166703319 -->|refines| ba120b7cafc5435f;
 ```
 
 ---
@@ -459,63 +374,29 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  2afa7f3a20["Export Reports to Standard Formats"];
-  click 2afa7f3a20 "UserRequirements.md#export-reports-to-standard-formats";
-  class 2afa7f3a20 requirement;
-  fe32882ee2["UserStories.md/Provide Reports"];
-  class fe32882ee2 requirement;
-  click fe32882ee2 "UserStories.md#provide-reports";
-  2afa7f3a20 ==>|refines| fe32882ee2;
-  2ccb7e5510["Report Export Formatter"];
-  class 2ccb7e5510 requirement;
-  click 2ccb7e5510 "SystemRequirements/Requirements.md#report-export-formatter";
-  2ccb7e5510 -.->|deriveReqT| 2afa7f3a20;
-  b342220e0d["Model Structure and Summaries"];
-  click b342220e0d "UserRequirements.md#model-structure-and-summaries";
-  class b342220e0d requirement;
-  f8e7625d29["Model Reports"];
-  class f8e7625d29 requirement;
-  click f8e7625d29 "UserRequirements.md#model-reports";
-  b342220e0d -.->|deriveReqT| f8e7625d29;
-  cccd4e46e2["Model Summary Report Generator"];
-  class cccd4e46e2 requirement;
-  click cccd4e46e2 "SystemRequirements/Requirements.md#model-summary-report-generator";
-  cccd4e46e2 -.->|deriveReqT| b342220e0d;
-  812d42f453["Generate Dependency Reports"];
-  click 812d42f453 "UserRequirements.md#generate-dependency-reports";
-  class 812d42f453 requirement;
-  812d42f453 ==>|refines| fe32882ee2;
-  57cbef16c5["Dependency Report Generator"];
-  class 57cbef16c5 requirement;
-  click 57cbef16c5 "SystemRequirements/Requirements.md#dependency-report-generator";
-  57cbef16c5 -.->|deriveReqT| 812d42f453;
-  482c757913["Provide Validation Reports"];
-  click 482c757913 "UserRequirements.md#provide-validation-reports";
-  class 482c757913 requirement;
-  482c757913 ==>|refines| fe32882ee2;
-  143766be8c["Validation Report Generator"];
-  class 143766be8c requirement;
-  click 143766be8c "SystemRequirements/Requirements.md#validation-report-generator";
-  143766be8c -.->|deriveReqT| 482c757913;
-  d0e9e8d143["Generate Verifications Reports"];
-  click d0e9e8d143 "UserRequirements.md#generate-verifications-reports";
-  class d0e9e8d143 requirement;
-  d0e9e8d143 ==>|refines| fe32882ee2;
-  d842bc0e30["Verification Gap Analyzer"];
-  class d842bc0e30 requirement;
-  click d842bc0e30 "SystemRequirements/Requirements.md#verification-gap-analyzer";
-  d842bc0e30 -.->|deriveReqT| d0e9e8d143;
-  f8e7625d29 ==>|refines| fe32882ee2;
-  b342220e0d -.->|deriveReqT| f8e7625d29;
-  32850509a0["Structural Change Reports"];
-  class 32850509a0 requirement;
-  click 32850509a0 "UserRequirements.md#structural-change-reports";
-  32850509a0 -.->|deriveReqT| f8e7625d29;
-  32850509a0 -.->|deriveReqT| f8e7625d29;
-  596c459d31["Generate Summary Reports"];
-  click 596c459d31 "UserRequirements.md#generate-summary-reports";
-  class 596c459d31 requirement;
-  596c459d31 ==>|refines| fe32882ee2;
+  f8e7625d29ff6e01["Model Reports"];
+  click f8e7625d29ff6e01 "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserRequirements.md#model-reports";
+  class f8e7625d29ff6e01 requirement;
+  fe32882ee273e24d["UserStories.md/Provide Reports"];
+  class fe32882ee273e24d requirement;
+  click fe32882ee273e24d "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserStories.md#provide-reports";
+  f8e7625d29ff6e01 -->|refines| fe32882ee273e24d;
+  b342220e0dc8751d["Model Structure and Summaries"];
+  click b342220e0dc8751d "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserRequirements.md#model-structure-and-summaries";
+  class b342220e0dc8751d requirement;
+  b342220e0dc8751d -.->|deriveReqT| f8e7625d29ff6e01;
+  482c757913204fb8["Provide Validation Reports"];
+  click 482c757913204fb8 "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserRequirements.md#provide-validation-reports";
+  class 482c757913204fb8 requirement;
+  482c757913204fb8 -->|refines| fe32882ee273e24d;
+  32850509a034b0ee["Structural Change Reports"];
+  click 32850509a034b0ee "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserRequirements.md#structural-change-reports";
+  class 32850509a034b0ee requirement;
+  32850509a034b0ee -.->|deriveReqT| f8e7625d29ff6e01;
+  596c459d31db2976["Generate Summary Reports"];
+  click 596c459d31db2976 "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserRequirements.md#generate-summary-reports";
+  class 596c459d31db2976 requirement;
+  596c459d31db2976 -->|refines| fe32882ee273e24d;
 ```
 
 ---
@@ -553,33 +434,9 @@ The system shall generate detailed validation reports, highlighting any inconsis
 
 ---
 
-### Generate Verifications Reports
-The system shall produce reports identifying User and Mission requirements that lack a verifiedBy relationship.
-
-#### Relations
-  * refine: [UserStories.md/Provide Reports](UserStories.md#provide-reports)
-
----
-
 ### Generate Summary Reports
 
 The system shall allow users to generate summary reports highlighting key metrics and statuses within the MBSE model.
-
-#### Relations
-  * refine: [UserStories.md/Provide Reports](UserStories.md#provide-reports)
-
----
-
-### Generate Dependency Reports
-The system shall generate reports summarizing dependencies between requirements, components, and test cases in the MBSE model.
-
-#### Relations
-  * refine: [UserStories.md/Provide Reports](UserStories.md#provide-reports)
-
----
-
-### Export Reports to Standard Formats
-The system shall allow users to export generated reports in standard formats (e.g., PDF, Excel) for external sharing.
 
 #### Relations
   * refine: [UserStories.md/Provide Reports](UserStories.md#provide-reports)
@@ -595,61 +452,29 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  c4b025f6ac["Save matrices to designated files"];
-  click c4b025f6ac "UserRequirements.md#save-matrices-to-designated-files";
-  class c4b025f6ac requirement;
-  ba40352f8e["Traceability Matrix"];
-  class ba40352f8e requirement;
-  click ba40352f8e "UserRequirements.md#traceability-matrix";
-  c4b025f6ac ==>|refines| ba40352f8e;
-  83a2343e97["Matrix File Output Handler"];
-  class 83a2343e97 requirement;
-  click 83a2343e97 "SystemRequirements/Requirements.md#matrix-file-output-handler";
-  83a2343e97 -.->|deriveReqT| c4b025f6ac;
-  91ebf7e73d["Tracing Structural Changes"];
-  click 91ebf7e73d "UserRequirements.md#tracing-structural-changes";
-  class 91ebf7e73d requirement;
-  36d8b2eb16["UserStories.md/Trace Changes in MBSE Model"];
-  class 36d8b2eb16 requirement;
-  click 36d8b2eb16 "UserStories.md#trace-changes-in-mbse-model";
-  91ebf7e73d -.->|deriveReqT| 36d8b2eb16;
-  918cc4a26d["Structural Change Analyzer"];
-  class 918cc4a26d requirement;
-  click 918cc4a26d "SystemRequirements/Requirements.md#structural-change-analyzer";
-  918cc4a26d -.->|deriveReqT| 91ebf7e73d;
-  4b7b432817["Export Traceability Matrix"];
-  click 4b7b432817 "UserRequirements.md#export-traceability-matrix";
-  class 4b7b432817 requirement;
-  4b7b432817 -.->|deriveReqT| ba40352f8e;
-  8897111f9b["Matrix Export Format Handler"];
-  class 8897111f9b requirement;
-  click 8897111f9b "SystemRequirements/Requirements.md#matrix-export-format-handler";
-  8897111f9b -.->|deriveReqT| 4b7b432817;
-  36d8b2eb16 --o|contains| ba40352f8e;
-  ba40352f8e -->|relates to| c4b025f6ac;
-  4b7b432817 -.->|deriveReqT| ba40352f8e;
-  5eca866a03["Traceability Matrix Builder Implementation"];
-  class 5eca866a03 requirement;
-  click 5eca866a03 "SystemRequirements/Requirements.md#traceability-matrix-builder-implementation";
-  5eca866a03 -.->|deriveReqT| ba40352f8e;
-  d7e5fbf806["Markdown Matrix Formatter"];
-  class d7e5fbf806 requirement;
-  click d7e5fbf806 "SystemRequirements/Requirements.md#markdown-matrix-formatter";
-  d7e5fbf806 -.->|deriveReqT| ba40352f8e;
-  e867499409["Interactive Mermaid Diagrams"];
-  class e867499409 requirement;
-  click e867499409 "UserRequirements.md#interactive-mermaid-diagrams";
-  e867499409 -.->|deriveReqT| ba40352f8e;
-  273dcdad7a["Include Verification Checkboxes"];
-  class 273dcdad7a requirement;
-  click 273dcdad7a "UserRequirements.md#include-verification-checkboxes";
-  ba40352f8e -->|relates to| 273dcdad7a;
-  e867499409 -.->|deriveReqT| ba40352f8e;
-  7a8da8dfee["Interactive Mermaid Diagram Node Behavior"];
-  class 7a8da8dfee requirement;
-  click 7a8da8dfee "SystemRequirements/Requirements.md#interactive-mermaid-diagram-node-behavior";
-  7a8da8dfee -.->|deriveReqT| e867499409;
-  273dcdad7a ==>|refines| ba40352f8e;
+  e867499409ae347a["Interactive Mermaid Diagrams"];
+  click e867499409ae347a "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserRequirements.md#interactive-mermaid-diagrams";
+  class e867499409ae347a requirement;
+  ba40352f8e72c125["Traceability Matrix"];
+  class ba40352f8e72c125 requirement;
+  click ba40352f8e72c125 "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserRequirements.md#traceability-matrix";
+  e867499409ae347a -.->|deriveReqT| ba40352f8e72c125;
+  273dcdad7a4c7b9a["Include Verification Checkboxes"];
+  click 273dcdad7a4c7b9a "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserRequirements.md#include-verification-checkboxes";
+  class 273dcdad7a4c7b9a requirement;
+  273dcdad7a4c7b9a -->|refines| ba40352f8e72c125;
+  36d8b2eb16113a7f["UserStories.md/Trace Changes in MBSE Model"];
+  class 36d8b2eb16113a7f requirement;
+  click 36d8b2eb16113a7f "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserStories.md#trace-changes-in-mbse-model";
+  ba40352f8e72c125 --o|contains| 36d8b2eb16113a7f;
+  4b7b4328173caada["Export Traceability Matrix"];
+  click 4b7b4328173caada "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserRequirements.md#export-traceability-matrix";
+  class 4b7b4328173caada requirement;
+  4b7b4328173caada -.->|deriveReqT| ba40352f8e72c125;
+  91ebf7e73d5ac081["Tracing Structural Changes"];
+  click 91ebf7e73d5ac081 "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserRequirements.md#tracing-structural-changes";
+  class 91ebf7e73d5ac081 requirement;
+  91ebf7e73d5ac081 -.->|deriveReqT| 36d8b2eb16113a7f;
 ```
 
 ---
@@ -676,22 +501,8 @@ Requirements-to-Verification View:
 
 A matrix is a textual representation which is the most efficient way to convey numerous relationships within a compact space.
 
-Traceability matrices are commonly used in Model-Based Systems Engineering (MBSE) to track relationships between various system elements, 
-including requirements, designs, verifications, and tests, allowing to efficiently maintain alignment between requirements and their associated system elements. 
-
-One of their key uses is to manage the impact of changes, including identifying which verifications may be invalidated due to changes in requirements or system components.
-
 #### Relations
   * containedBy: [UserStories.md/Trace Changes in MBSE Model](UserStories.md#trace-changes-in-mbse-model)
-
----
-
-### Save matrices to designated files
-
-The system shall automatically save generated traceability matrices as a Markdown documents.
-
-#### Relations
-  * refine: [Traceability Matrix](#traceability-matrix)
 
 ---
 
@@ -737,65 +548,6 @@ Color code for rendering diagrams:
 
 ---
 
-## Change Tracing
-```mermaid
-graph LR;
-  %% Graph styling
-  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
-  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
-  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
-  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
-
-  442da629f6["Specification Design Document for Requirements Change Propagation"];
-  click 442da629f6 "UserRequirements.md#specification-design-document-for-requirements-change-propagation";
-  class 442da629f6 requirement;
-  bae5edae94["Change Impact Analysis"];
-  class bae5edae94 requirement;
-  click bae5edae94 "UserRequirements.md#change-impact-analysis";
-  442da629f6 ==>|refines| bae5edae94;
-  33e6fb86b3["DesignSpecifications/RequirementsChangePropagation.md"];
-  class 33e6fb86b3 default;
-  click 33e6fb86b3 "DesignSpecifications/RequirementsChangePropagation.md";
-  33e6fb86b3 -->|satisfies| 442da629f6;
-  36d8b2eb16["UserStories.md/Trace Changes in MBSE Model"];
-  class 36d8b2eb16 requirement;
-  click 36d8b2eb16 "UserStories.md#trace-changes-in-mbse-model";
-  36d8b2eb16 --o|contains| bae5edae94;
-  bae5edae94 -->|relates to| 442da629f6;
-```
-
----
-
-### Change Impact Analysis
-
-When requested the system shall generate change impact report, in Markdown format by default and also supporting json output.
-
-#### Details
-
-Change Report:
- * Overview of all the changes in the model and impact to related requirements and other system elements.
-
-Change Impact Analysis Report:
-  * When a requirement changes, the traceability helps identify:
-    * Which related requirements are affected by a change.
-    * Which verification procedures or test cases are impacted and potentially invalidated.
-    * Which other model elements might be affected.
-
-#### Relations
-  * containedBy: [UserStories.md/Trace Changes in MBSE Model](UserStories.md#trace-changes-in-mbse-model)
-
----
-
-### Specification Design Document for Requirements Change Propagation
-
-The system **shall provide a Specification Design Document (DSD)** that defines how changes in requirements affect child requirements and verifications, ensuring traceability and controlled impact analysis.
-
-#### Relations
-  * refine: [Change Impact Analysis](#change-impact-analysis)
-  * satisfiedBy: [DesignSpecifications/RequirementsChangePropagation.md](DesignSpecifications/RequirementsChangePropagation.md)
-
----
-
 ## Exporting Specifications
 ```mermaid
 graph LR;
@@ -805,17 +557,13 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  72c7eda618["Export HTML specifications"];
-  click 72c7eda618 "UserRequirements.md#export-html-specifications";
-  class 72c7eda618 requirement;
-  100197ce81["UserStories.md/Export Specifications"];
-  class 100197ce81 requirement;
-  click 100197ce81 "UserStories.md#export-specifications";
-  72c7eda618 -.->|deriveReqT| 100197ce81;
-  c8b6ccc187["HTML Export"];
-  class c8b6ccc187 requirement;
-  click c8b6ccc187 "SystemRequirements/Requirements.md#html-export";
-  c8b6ccc187 -.->|deriveReqT| 72c7eda618;
+  72c7eda6183f0893["Export HTML specifications"];
+  click 72c7eda6183f0893 "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserRequirements.md#export-html-specifications";
+  class 72c7eda6183f0893 requirement;
+  100197ce818804["UserStories.md/Export Specifications"];
+  class 100197ce818804 requirement;
+  click 100197ce818804 "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserStories.md#export-specifications";
+  72c7eda6183f0893 -.->|deriveReqT| 100197ce818804;
 ```
 
 ---
@@ -838,17 +586,13 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  5a6fc253c5["AI Agent Context"];
-  click 5a6fc253c5 "UserRequirements.md#ai-agent-context";
-  class 5a6fc253c5 requirement;
-  6912d98267["AI-Driven Model Suggestions"];
-  class 6912d98267 requirement;
-  click 6912d98267 "UserStories.md#ai-driven-model-suggestions";
-  5a6fc253c5 ==>|refines| 6912d98267;
-  8ba9c7e059["LLM Context Command"];
-  class 8ba9c7e059 requirement;
-  click 8ba9c7e059 "SystemRequirements/Requirements.md#llm-context-command";
-  8ba9c7e059 -.->|deriveReqT| 5a6fc253c5;
+  5a6fc253c51845b6["AI Agent Context"];
+  click 5a6fc253c51845b6 "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserRequirements.md#ai-agent-context";
+  class 5a6fc253c51845b6 requirement;
+  2b35b7b37d52d4e6["UserStories.md#AI-Assisted MBSE Model Management"];
+  class 2b35b7b37d52d4e6 requirement;
+  click 2b35b7b37d52d4e6 "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserStories.md#ai-assisted-mbse-model-management";
+  5a6fc253c51845b6 -->|refines| 2b35b7b37d52d4e6;
 ```
 
 ---
@@ -858,6 +602,46 @@ graph LR;
 The system shall provide needed context for AI agents to understand how to use reqflow and methodology.
 
 #### Relations
-  * refine: [AI-Driven Model Suggestions](UserStories.md#ai-driven-model-suggestions)
+  * refine: [UserStories.md#AI-Assisted MBSE Model Management](UserStories.md#ai-assisted-mbse-model-management)
+
+---
+
+## Trace Changes
+```mermaid
+graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+
+  bae5edae940ba590["Change Impact Analysis"];
+  click bae5edae940ba590 "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserRequirements.md#change-impact-analysis";
+  class bae5edae940ba590 requirement;
+  36d8b2eb16113a7f["UserStories.md/Trace Changes in MBSE Model"];
+  class 36d8b2eb16113a7f requirement;
+  click 36d8b2eb16113a7f "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/UserStories.md#trace-changes-in-mbse-model";
+  bae5edae940ba590 --o|contains| 36d8b2eb16113a7f;
+```
+
+---
+
+### Change Impact Analysis
+
+When requested the system shall generate change impact report, in Markdown format by default and also supporting json output.
+
+#### Details
+
+Change Report:
+ * Overview of all the changes in the model and impact to related requirements and other system elements.
+
+Change Impact Analysis Report:
+  * When a requirement changes, the traceability helps identify:
+    * Which related requirements are affected by a change.
+    * Which verification procedures or test cases are impacted and potentially invalidated.
+    * Which other model elements might be affected.
+
+#### Relations
+  * containedBy: [UserStories.md/Trace Changes in MBSE Model](UserStories.md#trace-changes-in-mbse-model)
 
 ---
