@@ -29,14 +29,14 @@ pub struct Args {
     #[clap(long, requires = "lint")]
     pub dry_run: bool,
     
-    /// Generate traceability matrix without processing other files
-    /// Creates a matrix showing relationships between elements in the model
+    /// Generate traceability information without processing other files
+    /// Creates matrices and reports showing relationships between elements in the model
     #[clap(long)]
-    pub generate_matrix: bool,
+    pub traces: bool,
     
     /// Output traceability matrix as SVG without hyperlinks and with full element names
     /// Cannot be used with --json
-    #[clap(long, requires = "generate_matrix", conflicts_with = "json")]
+    #[clap(long, requires = "traces", conflicts_with = "json")]
     pub svg: bool,
     
     /// Output validation results in JSON format
@@ -228,7 +228,7 @@ pub fn handle_command(
             return Ok(0);
             
             
-        }else if args.generate_matrix {
+        }else if args.traces {
             let matrix_config = reqflow::matrix_generator::MatrixConfig {
                 source_type: reqflow::element::ElementType::Requirement(reqflow::element::RequirementType::System),
                 target_type: reqflow::element::ElementType::Verification,
@@ -300,7 +300,7 @@ mod tests {
             dry_run: false,
             json: false,
             svg: false,
-            generate_matrix: false,
+            traces: false,
             generate_diagrams: false,
             generate_index: false,
             model_summary: false,

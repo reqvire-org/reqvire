@@ -173,7 +173,7 @@ Track relationships between requirements using traceability features.
 ### Generate Traceability Matrix
 
 ```bash
-reqflow --generate-matrix
+reqflow --traces
 ```
 
 This generates a traceability matrix showing relationships between requirements.
