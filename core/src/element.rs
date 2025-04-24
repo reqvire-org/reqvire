@@ -47,9 +47,18 @@ pub enum RequirementType {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)] 
+pub enum VerificationType {
+    Default, 
+    Test,
+    Analysis,
+    Inspection,
+    Demonstration,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)] 
 pub enum ElementType {
     Requirement(RequirementType),
-    Verification,
+    Verification(VerificationType),
     File,
     Other(String),
 }
@@ -61,7 +70,14 @@ impl ElementType {
         match value.to_lowercase().as_str() {
             "user_requirement" => ElementType::Requirement(RequirementType::User),
             "requirement" => ElementType::Requirement(RequirementType::System),
-            "verification" => ElementType::Verification,
+            
+            // Different verification types
+            "verification" => ElementType::Verification(VerificationType::Test),
+            "test-verification" => ElementType::Verification(VerificationType::Test),
+            "analysis-verification" => ElementType::Verification(VerificationType::Analysis),
+            "inspection-verification" => ElementType::Verification(VerificationType::Inspection),
+            "demonstration-verification" => ElementType::Verification(VerificationType::Demonstration),
+            
             "file" => ElementType::File,
             other => ElementType::Other(other.to_string()),
         }
@@ -140,4 +156,3 @@ impl Element {
      
     
 }
-

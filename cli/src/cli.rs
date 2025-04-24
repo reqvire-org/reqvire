@@ -231,7 +231,8 @@ pub fn handle_command(
         }else if args.traces {
             let matrix_config = reqflow::matrix_generator::MatrixConfig {
                 source_type: reqflow::element::ElementType::Requirement(reqflow::element::RequirementType::System),
-                target_type: reqflow::element::ElementType::Verification,
+                // Use a type pattern that matches any verification type for matrices
+                target_type: reqflow::element::ElementType::Verification(reqflow::element::VerificationType::Default),
                 relation_types: vec!["verifiedBy"],
                 format: if args.json {
                     reqflow::matrix_generator::MatrixFormat::Json

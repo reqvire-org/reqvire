@@ -157,7 +157,7 @@ fn add_element_to_diagram(
        let class=match &element.element_type {
            ElementType::Requirement(RequirementType::User)  => "requirement",                    
            ElementType::Requirement(RequirementType::System) =>"requirement",
-           ElementType::Verification =>"verification",           
+           ElementType::Verification(_) =>"verification",           
            _ => "default"
        };
            
@@ -215,7 +215,7 @@ fn add_element_to_diagram(
                             match existing_element.element_type {
                                 ElementType::Requirement(RequirementType::User)  => "requirement",                    
                                 ElementType::Requirement(RequirementType::System) => "requirement",
-                                ElementType::Verification => "verification",           
+                                ElementType::Verification(_) => "verification",           
                                 _ => "default"                    
                              }
                         },

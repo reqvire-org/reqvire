@@ -120,6 +120,7 @@ For more details, refer to the [Contributing Guide](./doc/CONTRIBUTING.md).
 
 ## ReqFlow specifications traecability matrix 
 
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg width="12136" height="4900" viewBox="0 0 12136 4900" xmlns="http://www.w3.org/2000/svg">
 <text x="10" y="20" font-family="Arial" font-size="18" font-weight="bold">Traceability Matrix</text>
 <g>

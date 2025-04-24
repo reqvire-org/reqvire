@@ -131,20 +131,20 @@ blockquote {
             markdownSucture[Markdown Structure]
             traceability((Generate Traceability Matrix))
             handleDiffs((Trace Changes))        
-        end  
-
-        subgraph &quot;ChatOps&quot;
-            aiAgents((Provide AI Agents🤖))
-            aiSuggestions((Suggestions)) 
-            reviewSuggestions((Review Suggestions))                
-            applySuggestions((Apply Approved Suggestions))                
-        end
-                 
+        end                   
     end
 
     human[Human👤]
     human -. build .-&gt; model
     human -. develop .-&gt; developedSystem
+
+
+    subgraph &quot;AI tools&quot;
+       aiAgents((AI Agents🤖))
+       aiSuggestions((Suggestions)) 
+       reviewSuggestions((Review Suggestions))                
+       applySuggestions((Apply Approved Suggestions))                
+    end    
 
     subgraph &quot;External Systems&quot;
         ciSystem[CI/CD System]
@@ -181,8 +181,7 @@ blockquote {
     manageModel -. provide .-&gt; generateDiagrams
     manageModel -. provide .-&gt; handleDiffs
 
-    human -. interact via ChatOps .-&gt; aiAgents    
-    aiAgents -. interact with via functions .-&gt; manageModel    
+    aiAgents -. uses MCP to .-&gt; manageModel    
 
     aiAgents -. assist in development .-&gt; developedSystem
     aiAgents -. commit code changes .-&gt; gitRepository
@@ -215,6 +214,7 @@ blockquote {
 
 
 
+
 </div>
 <h2 id="explanation-of-reqflow-use-case-diagram">Explanation of ReqFlow Use Case Diagram</h2>
 <p>This diagram outlines the core interactions, components, and workflows of the <strong>ReqFlow</strong> tool in the context of managing Model-Based Systems Engineering (MBSE) models, integrating with external systems, and supporting development activities for a System of Interest (SOI).</p>
@@ -242,7 +242,7 @@ blockquote {
 </ul>
 </li>
 </ul>
-<h4>ChatOps</h4>
+<h4>AI Agents</h4>
 <ul>
 <li><strong>AI Agents 🤖</strong>: Provides intelligent assistance for model management and collaboration.</li>
 <li>It is deeply embed into ReqFlow methodology model and have a knowledge required for deep assistance.</li>
@@ -250,18 +250,7 @@ blockquote {
 <li>Review Suggestions: Enables human review and approval of AI-generated suggestions.</li>
 <li>With human in the loop workflow.</li>
 <li>Apply Approved Suggestions: Commits approved changes to the model.</li>
-</ul>
-<h3 id="ai-agents-in-development">AI Agents in Development</h3>
-<p>ReqFlow’s <strong>AI Agents 🤖</strong> are uniquely equipped with deep knowledge of the ReqFlow methodology and structure. 
-This enables them to follow and adhere to ReqFlow’s AI-ready MBSE processes while developing code and performing other development tasks. 
-Their development activities are fully aligned with the methodology, ensuring that all changes are consistent with the structured requirements and system models.</p>
-<p>They can also work on the <strong>Developed System</strong>, performing tasks similar to human developers.
-Key capabilities include:</p>
-<ul>
-<li>Process-Driven Development: AI Agents are guided by ReqFlow’s MBSE methodology, ensuring that all code development follows established processes and adheres to the structured requirements and traceability model.</li>
-<li>Code Changes: AI Agents can suggest and implement changes directly in the codebase, ensuring alignment with the MBSE model and specifications.</li>
-<li>Automated Commitments: AI Agents can commit approved code changes directly to the Git repository, following project workflows and standards.</li>
-<li>Development Assistance: AI Agents provide context-aware assistance to human developers, including debugging, refactoring, and optimization.</li>
+<li>Can be any AI tools/agentic system capable using MCP</li>
 </ul>
 <h3 id="system-of-interest-(soi)">System of Interest (SOI)</h3>
 <p>The <strong>System of Interest (SOI)</strong> refers to the system which is under development.</p>
@@ -293,16 +282,10 @@ Key capabilities include:</p>
 <p>ReqFlow integrates into existing agile and collaborative workflows by providing the necessary tools and scripts to support version control, change management, and traceability. 
 These features allow teams to seamlessly integrate MBSE practices into their development processes, enabling effective collaboration through GitHub or similar platforms.</p>
 <h3 id="human-interaction">Human Interaction</h3>
-<p>Humans use a ReqFlow tool :&lt;_____FIX THIS LINE</p>
-<ul>
-<li>Via CLI: Users interact with ReqFlow’s CLI to manage models and validate structures.</li>
-<li>Via ChatOps: Users interact with AI agents to receive suggestions, review changes, and approve updates.</li>
-<li>Collaboration: Users collaborate through GitHub or similar tools to manage repositories and track changes.</li>
-</ul>
 <p>Humans interact with ReqFlow tools to manage, refine, and validate MBSE models, as well as to collaborate effectively within development workflows:</p>
 <ul>
 <li>Via CLI: Users leverage ReqFlow’s CLI to perform tasks such as managing models, generating diagrams, analyzing relationships, and validating structures.</li>
-<li>Via ChatOps: Users interact with AI agents through chat-based tools to receive intelligent suggestions, review potential improvements, and approve changes, ensuring a human-in-the-loop approach.</li>
+<li>Via AI Agents: Users interact with AI agents through MCP server to receive intelligent suggestions, review potential improvements, and approve changes, ensuring a human-in-the-loop approach.</li>
 <li>Collaboration: Users integrate ReqFlow into agile workflows by collaborating through GitHub or similar platforms to manage repositories, track changes, and maintain traceability.</li>
 </ul>
 <h2 id="workflows-and-interactions">Workflows and Interactions</h2>

@@ -124,65 +124,70 @@ blockquote {
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  6aaac2f0e7cbdd79[&quot;Identifiers in Relations Specifications&quot;];
-  click 6aaac2f0e7cbdd79 &quot;SpecificationsRequirements.html#identifiers-in-relations-specifications&quot;;
-  class 6aaac2f0e7cbdd79 requirement;
+  c8a94e8023f1c7be[&quot;Verification Element Types Specifications&quot;];
+  click c8a94e8023f1c7be &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SpecificationsRequirements.html#verification-element-types-specifications&quot;;
+  class c8a94e8023f1c7be requirement;
   852dea6cfecb47f5[&quot;UserStories.md#Managing MBSE Models&quot;];
   class 852dea6cfecb47f5 requirement;
-  click 852dea6cfecb47f5 &quot;UserStories.html#managing-mbse-models&quot;;
-  6aaac2f0e7cbdd79 -.-&gt;|deriveReqT| 852dea6cfecb47f5;
+  click 852dea6cfecb47f5 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserStories.html#managing-mbse-models&quot;;
+  c8a94e8023f1c7be -.-&gt;|deriveReqT| 852dea6cfecb47f5;
+  ae04238be665702[&quot;../core/src/element.rs&quot;];
+  class ae04238be665702 default;
+  click ae04238be665702 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/core/src/element.rs&quot;;
+  ae04238be665702 --&gt;|satisfies| c8a94e8023f1c7be;
+  ea610a0c2ac6b265[&quot;Structure of Markdown Documents Specifications&quot;];
+  click ea610a0c2ac6b265 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SpecificationsRequirements.html#structure-of-markdown-documents-specifications&quot;;
+  class ea610a0c2ac6b265 requirement;
+  ea610a0c2ac6b265 -.-&gt;|deriveReqT| 852dea6cfecb47f5;
   ed4f94bde93b51b2[&quot;../core/src/relation.rs&quot;];
   class ed4f94bde93b51b2 default;
-  click ed4f94bde93b51b2 &quot;../core/src/relation.rs&quot;;
-  ed4f94bde93b51b2 --&gt;|satisfies| 6aaac2f0e7cbdd79;
-  a34d9281a02c6839[&quot;Relation Types Specifications&quot;];
-  click a34d9281a02c6839 &quot;SpecificationsRequirements.html#relation-types-specifications&quot;;
-  class a34d9281a02c6839 requirement;
-  a34d9281a02c6839 -.-&gt;|deriveReqT| 852dea6cfecb47f5;
-  ed4f94bde93b51b2 --&gt;|satisfies| a34d9281a02c6839;
+  click ed4f94bde93b51b2 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/core/src/relation.rs&quot;;
+  ed4f94bde93b51b2 --&gt;|satisfies| ea610a0c2ac6b265;
+  22aa80bf7aa9080a[&quot;../core/src/subsection.rs&quot;];
+  class 22aa80bf7aa9080a default;
+  click 22aa80bf7aa9080a &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/core/src/subsection.rs&quot;;
+  22aa80bf7aa9080a --&gt;|satisfies| ea610a0c2ac6b265;
+  ae04238be665702 --&gt;|satisfies| ea610a0c2ac6b265;
   745439d5fc0154d1[&quot;Requirements Change Propagation&quot;];
-  click 745439d5fc0154d1 &quot;SpecificationsRequirements.html#requirements-change-propagation&quot;;
+  click 745439d5fc0154d1 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SpecificationsRequirements.html#requirements-change-propagation&quot;;
   class 745439d5fc0154d1 requirement;
   bae5edae940ba590[&quot;UserRequirements.md#Change Impact Analysis&quot;];
   class bae5edae940ba590 requirement;
-  click bae5edae940ba590 &quot;UserRequirements.html#change-impact-analysis&quot;;
+  click bae5edae940ba590 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#change-impact-analysis&quot;;
   745439d5fc0154d1 --&gt;|refines| bae5edae940ba590;
-  a713f5dfb952f300[&quot;Structure of System Markdown Documents Specifications&quot;];
-  click a713f5dfb952f300 &quot;SpecificationsRequirements.html#structure-of-system-markdown-documents-specifications&quot;;
-  class a713f5dfb952f300 requirement;
-  a713f5dfb952f300 -.-&gt;|deriveReqT| 852dea6cfecb47f5;
-  ed4f94bde93b51b2 --&gt;|satisfies| a713f5dfb952f300;
-  ae04238be665702[&quot;../core/src/element.rs&quot;];
-  class ae04238be665702 default;
-  click ae04238be665702 &quot;../core/src/element.rs&quot;;
-  ae04238be665702 --&gt;|satisfies| a713f5dfb952f300;
-  22aa80bf7aa9080a[&quot;../core/src/subsection.rs&quot;];
-  class 22aa80bf7aa9080a default;
-  click 22aa80bf7aa9080a &quot;../core/src/subsection.rs&quot;;
-  22aa80bf7aa9080a --&gt;|satisfies| a713f5dfb952f300;
-  3b1e87396caf6495[&quot;../core/src/parser.rs&quot;];
-  class 3b1e87396caf6495 default;
-  click 3b1e87396caf6495 &quot;../core/src/parser.rs&quot;;
-  3b1e87396caf6495 --&gt;|satisfies| a713f5dfb952f300;
-  6136c216c9f80165[&quot;../core/src/model.rs&quot;];
-  class 6136c216c9f80165 default;
-  click 6136c216c9f80165 &quot;../core/src/model.rs&quot;;
-  6136c216c9f80165 --&gt;|satisfies| a713f5dfb952f300;
   cd62f772322b35e0[&quot;Structure and Addressing in Markdown Documents Specifications&quot;];
-  click cd62f772322b35e0 &quot;SpecificationsRequirements.html#structure-and-addressing-in-markdown-documents-specifications&quot;;
+  click cd62f772322b35e0 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SpecificationsRequirements.html#structure-and-addressing-in-markdown-documents-specifications&quot;;
   class cd62f772322b35e0 requirement;
   cd62f772322b35e0 -.-&gt;|deriveReqT| 852dea6cfecb47f5;
   ed4f94bde93b51b2 --&gt;|satisfies| cd62f772322b35e0;
+  3b1e87396caf6495[&quot;../core/src/parser.rs&quot;];
+  class 3b1e87396caf6495 default;
+  click 3b1e87396caf6495 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/core/src/parser.rs&quot;;
   3b1e87396caf6495 --&gt;|satisfies| cd62f772322b35e0;
   22aa80bf7aa9080a --&gt;|satisfies| cd62f772322b35e0;
   22aa80bf7aa9080a --&gt;|satisfies| cd62f772322b35e0;
-  ea610a0c2ac6b265[&quot;Structure of Markdown Documents Specifications&quot;];
-  click ea610a0c2ac6b265 &quot;SpecificationsRequirements.html#structure-of-markdown-documents-specifications&quot;;
-  class ea610a0c2ac6b265 requirement;
-  ea610a0c2ac6b265 -.-&gt;|deriveReqT| 852dea6cfecb47f5;
-  ed4f94bde93b51b2 --&gt;|satisfies| ea610a0c2ac6b265;
-  22aa80bf7aa9080a --&gt;|satisfies| ea610a0c2ac6b265;
-  ae04238be665702 --&gt;|satisfies| ea610a0c2ac6b265;
+  a34d9281a02c6839[&quot;Relation Types Specifications&quot;];
+  click a34d9281a02c6839 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SpecificationsRequirements.html#relation-types-specifications&quot;;
+  class a34d9281a02c6839 requirement;
+  a34d9281a02c6839 -.-&gt;|deriveReqT| 852dea6cfecb47f5;
+  ed4f94bde93b51b2 --&gt;|satisfies| a34d9281a02c6839;
+  6aaac2f0e7cbdd79[&quot;Identifiers in Relations Specifications&quot;];
+  click 6aaac2f0e7cbdd79 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SpecificationsRequirements.html#identifiers-in-relations-specifications&quot;;
+  class 6aaac2f0e7cbdd79 requirement;
+  6aaac2f0e7cbdd79 -.-&gt;|deriveReqT| 852dea6cfecb47f5;
+  ed4f94bde93b51b2 --&gt;|satisfies| 6aaac2f0e7cbdd79;
+  a713f5dfb952f300[&quot;Structure of System Markdown Documents Specifications&quot;];
+  click a713f5dfb952f300 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SpecificationsRequirements.html#structure-of-system-markdown-documents-specifications&quot;;
+  class a713f5dfb952f300 requirement;
+  a713f5dfb952f300 -.-&gt;|deriveReqT| 852dea6cfecb47f5;
+  ed4f94bde93b51b2 --&gt;|satisfies| a713f5dfb952f300;
+  ae04238be665702 --&gt;|satisfies| a713f5dfb952f300;
+  22aa80bf7aa9080a --&gt;|satisfies| a713f5dfb952f300;
+  3b1e87396caf6495 --&gt;|satisfies| a713f5dfb952f300;
+  6136c216c9f80165[&quot;../core/src/model.rs&quot;];
+  class 6136c216c9f80165 default;
+  click 6136c216c9f80165 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/core/src/model.rs&quot;;
+  6136c216c9f80165 --&gt;|satisfies| a713f5dfb952f300;
 </div>
 <hr />
 <h3 id="requirements-change-propagation">Requirements Change Propagation</h3>
@@ -979,6 +984,92 @@ This element contains invalid relation entries.
 </code></pre>
 </li>
 </ol>
+</details>
+<hr />
+<hr />
+<h3 id="verification-element-types-specifications">Verification Element Types Specifications</h3>
+<p>The system shall support different types of verification elements that define the verification method used to verify requirements.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="UserStories.html#managing-mbse-models">UserStories.md#Managing MBSE Models</a></li>
+<li>satisfiedBy: <a href="../core/src/element.rs">../core/src/element.rs</a></li>
+</ul>
+<h4>Details</h4>
+<details>
+<summary>View Full Specification</summary>
+<h2 id="verification-element-types">Verification Element Types</h2>
+<p>Verification elements in ReqFlow can be categorized by type to specify the verification method used. The type of verification is specified in the Metadata subsection using the <code>type</code> key.</p>
+<h3 id="verification-type-categories">Verification Type Categories</h3>
+<p>The following verification types are supported:</p>
+<ol>
+<li>
+<p><strong>Default Verification Type</strong></p>
+<ul>
+<li><code>verification</code> - Verification through testing (equivalent to <code>test-verification</code>)</li>
+</ul>
+</li>
+<li>
+<p><strong>Specific Verification Types</strong></p>
+<ul>
+<li><code>test-verification</code> - Explicit verification through testing with documented test procedures</li>
+<li><code>analysis-verification</code> - Verification through formal analysis of documentation or code</li>
+<li><code>inspection-verification</code> - Verification through formal inspection or review</li>
+<li><code>demonstration-verification</code> - Verification through demonstration in a realistic environment</li>
+</ul>
+</li>
+</ol>
+<h3 id="standard-verification-methods">Standard Verification Methods</h3>
+<p>These verification types align with standard systems engineering verification methods:</p>
+<ul>
+<li><strong>Test</strong>: Verification through formal testing according to documented test procedures with expected outcomes</li>
+<li><strong>Analysis</strong>: Verification through systematic analysis of artifacts without physical testing</li>
+<li><strong>Inspection</strong>: Verification through examination of documentation, code, or physical components</li>
+<li><strong>Demonstration</strong>: Verification through showing functionality in an operational-like environment</li>
+</ul>
+<h3 id="example-usage-in-markdown">Example Usage in Markdown</h3>
+<pre><code class="language-markdown">### Automated Diagram Generation Verification
+
+This verification validates that diagrams are automatically generated when requested.
+
+#### Metadata
+  * type: demonstration-verification
+
+#### Details
+Test procedure: [...]
+
+#### Relations
+  * verify: [requirements.md#automatic-diagram-generation](requirements.html#automatic-diagram-generation)
+</code></pre>
+<h3 id="verification-type-selection-criteria">Verification Type Selection Criteria</h3>
+<p>The appropriate verification type should be selected based on the nature of the requirement:</p>
+<ul>
+<li><strong>Test</strong>: Verification through formal testing according to documented test procedures with expected outcomes</li>
+<li><strong>Analysis</strong>: Verification through systematic analysis of artifacts without physical testing</li>
+<li><strong>Inspection</strong>: Verification through examination of documentation, code, or physical components</li>
+<li><strong>Demonstration</strong>: Verification through showing functionality in an operational-like environment</li>
+</ul>
+<h3 id="example-usage-in-markdown">Example Usage in Markdown</h3>
+<pre><code class="language-markdown">### Automated Diagram Generation Verification
+
+This verification validates that diagrams are automatically generated when requested.
+
+#### Metadata
+  * type: demonstration-verification
+
+#### Details
+Test procedure: [...]
+
+#### Relations
+  * verify: [requirements.md#automatic-diagram-generation](requirements.html#automatic-diagram-generation)
+</code></pre>
+<h3 id="verification-type-selection-criteria">Verification Type Selection Criteria</h3>
+<p>The appropriate verification type should be selected based on the nature of the requirement:</p>
+<ul>
+<li><strong>Test-verification</strong>: Used when formal test procedures with expected outcomes are required</li>
+<li><strong>Analysis-verification</strong>: Used when requirements can be verified through analysis of documentation or code</li>
+<li><strong>Inspection-verification</strong>: Used when requirements can be verified through review of artifacts</li>
+<li><strong>Demonstration-verification</strong>: Used when requirements can be verified by demonstrating functionality</li>
+</ul>
 </details>
 <hr />
 

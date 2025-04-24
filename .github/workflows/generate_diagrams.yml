@@ -1,0 +1,63 @@
+name: Generate Diagrams and Traces SVG on PR Merge
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+
+jobs:
+  generate-diagrams:
+    if: github.event.pull_request.merged == true
+    name: Generate and Commit Diagrams
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write  # Required to commit to the repository
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          ref: main  # Checkout the main branch
+          fetch-depth: 0  # Get full history for proper Git operations
+      
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+      
+      - name: Cache Cargo dependencies
+        uses: Swatinem/rust-cache@v2
+      
+      - name: Build ReqFlow
+        run: |
+          cargo build --release
+          cp target/release/reqflow ./reqflow
+      
+      - name: Configure Git
+        run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "actions@github.com"
+      
+      - name: Generate Diagrams
+        run: |
+          ./reqflow --generate-diagrams
+      
+      - name: Generate traces svg
+        run: |
+          ./reqflow --traces --svg > specifications/matrix.svg
+                
+      - name: Check for Changes
+        id: check_changes
+        run: |
+          if [[ -n "$(git status --porcelain)" ]]; then
+            echo "HAS_CHANGES=true" >> $GITHUB_ENV
+          else
+            echo "HAS_CHANGES=false" >> $GITHUB_ENV
+          fi
+      
+      - name: Commit and Push Changes
+        if: env.HAS_CHANGES == 'true'
+        run: |
+          git add -A
+          git commit -m "Auto-generate diagrams after PR merge to main"
+          git push origin main

@@ -31,7 +31,7 @@ impl Default for MatrixConfig {
     fn default() -> Self {
         MatrixConfig {
             source_type: ElementType::Requirement(crate::element::RequirementType::System),
-            target_type: ElementType::Verification,
+            target_type: ElementType::Verification(crate::element::VerificationType::Test),
             relation_types: vec!["verifiedBy"],
             format: MatrixFormat::Markdown,
         }
@@ -136,8 +136,13 @@ pub fn generate_matrix(
 /// Checks if an element type matches the specified type
 fn matches_element_type(element_type: &ElementType, target_type: &ElementType) -> bool {
     match (element_type, target_type) {
+        // Any requirement matches any requirement in the matrix
         (ElementType::Requirement(_), ElementType::Requirement(_)) => true,
-        (ElementType::Verification, ElementType::Verification) => true,
+        
+        // Any verification type matches any verification type in the matrix
+        (ElementType::Verification(_), ElementType::Verification(_)) => true,
+        
+        // Exact match for file and other types
         (ElementType::File, ElementType::File) => true,
         (ElementType::Other(a), ElementType::Other(b)) => a == b,
         _ => false,

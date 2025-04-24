@@ -352,7 +352,7 @@ mod tests {
     #[test]
     fn test_validate_relation_element_types_verify() {
         let req_type = ElementType::Requirement(RequirementType::System);
-        let verification_type = ElementType::Verification;
+        let verification_type = ElementType::Verification(crate::element::VerificationType::Test);
         
         // verifiedBy: requirement -> verification
         assert!(validate_relation_element_types("verifiedBy", &req_type, &verification_type));
@@ -406,11 +406,11 @@ pub fn validate_relation_element_types(
         "verifiedBy" => {
             // Source should be a requirement and target should be a verification
             matches!(source_type, ElementType::Requirement(_)) && 
-            matches!(target_type, ElementType::Verification)
+            matches!(target_type, ElementType::Verification(_))
         },
         "verify" => {
             // Source should be a verification and target should be a requirement
-            matches!(source_type, ElementType::Verification) && 
+            matches!(source_type, ElementType::Verification(_)) && 
             matches!(target_type, ElementType::Requirement(_))
         },
         "satisfiedBy" => {
