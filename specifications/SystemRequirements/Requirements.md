@@ -786,6 +786,16 @@ The system shall provide a git commit hash flag  (--git_commit flag), to be used
 
 ---
 
+### CLI Traces Flag
+
+The system shall provide a traceability matrix generation function, activated by the (--traces flag), which shall generate a traceability matrix showing the relationships between requirements and verification elements.
+
+#### Relations
+  * derivedFrom: [UserRequirements.md/Traceability Matrix](../UserRequirements.md#traceability-matrix)
+  * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
+
+---
+
 ### Traceability Matrix Builder Implementation
 
 The system shall implement a traceability matrix builder component that extracts relationship data from the model, processes it according to configured parameters, and generates structured matrix representations showing connections between requirements and other elements.
@@ -827,14 +837,14 @@ The system shall implement a markdown formatter for traceability matrices that p
 
 ---
 
-### CLI Matrix SVG Flag
+### CLI Traces SVG Flag
 
 The system shall provide an SVG output option for traceability matrices, activated by the (--svg flag), which shall generate a simplified SVG representation of the matrix that can be viewed directly or embedded in documents.
 
 #### Details
 
 The SVG output of the matrix shall have the following characteristics:
-- It shall only be available when the --generate-matrix flag is used
+- It shall only be available when the --traces flag is used
 - It cannot be used together with the --json flag (they are mutually exclusive)
 - It shall display full element names instead of truncated names with ellipses
 - It shall dynamically adjust column widths based on the maximum element name length to ensure all text is readable
@@ -844,7 +854,7 @@ The SVG output of the matrix shall have the following characteristics:
 - The output shall be in a self-contained SVG format suitable for embedding in other documents
 
 #### Relations
-  * derivedFrom: [Traceability Matrix Builder Implementation](#traceability-matrix-builder-implementation)
+  * derivedFrom: [CLI Traces Flag](#cli-traces-flag)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
 
 ---
