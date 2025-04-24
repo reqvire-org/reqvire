@@ -34,6 +34,11 @@ pub struct Args {
     #[clap(long)]
     pub generate_matrix: bool,
     
+    /// Output traceability matrix as SVG without hyperlinks and with full element names
+    /// Cannot be used with --json
+    #[clap(long, requires = "generate_matrix", conflicts_with = "json")]
+    pub svg: bool,
+    
     /// Output validation results in JSON format
     /// Useful for CI/CD pipelines and automation
     #[clap(long)]
@@ -224,7 +229,25 @@ pub fn handle_command(
             
             
         }else if args.generate_matrix {
-            info!("Not implemented yet");
+            let matrix_config = reqflow::matrix_generator::MatrixConfig {
+                source_type: reqflow::element::ElementType::Requirement(reqflow::element::RequirementType::System),
+                target_type: reqflow::element::ElementType::Verification,
+                relation_types: vec!["verifiedBy"],
+                format: if args.json {
+                    reqflow::matrix_generator::MatrixFormat::Json
+                } else if args.svg {
+                    reqflow::matrix_generator::MatrixFormat::Svg
+                } else {
+                    reqflow::matrix_generator::MatrixFormat::Markdown
+                },
+            };
+            
+            let matrix_output = reqflow::matrix_generator::generate_matrix(
+                &model_manager.element_registry,
+                &matrix_config
+            );
+            
+            println!("{}", matrix_output);
             return Ok(0);
             
            
@@ -276,6 +299,7 @@ mod tests {
             lint: false,
             dry_run: false,
             json: false,
+            svg: false,
             generate_matrix: false,
             generate_diagrams: false,
             generate_index: false,

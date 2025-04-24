@@ -12,6 +12,7 @@ use crate::utils;
 pub enum MatrixFormat {
     Markdown,
     Json,
+    Svg,
 }
 
 /// Configuration for the traceability matrix
@@ -124,6 +125,11 @@ pub fn generate_matrix(
             &base_url,
             &commit_hash,
         ),
+        MatrixFormat::Svg => generate_svg_matrix(
+            &matrix_data,
+            &source_elements,
+            &target_elements,
+        ),
     }
 }
 
@@ -219,9 +225,9 @@ fn generate_markdown_matrix(
     
     // Add legend
     output.push_str("## Legend\n\n");
-    output.push_str("- ✓ (in 'Verified' column): Requirement is verified by at least one verification element\n");
+    output.push_str("- ✅ (in 'Verified' column): Requirement is verified by at least one verification element\n");
     output.push_str("- ❌ (in 'Verified' column): Requirement is not verified by any verification element\n");
-    output.push_str("- ✓ (in element columns): Direct relationship exists between requirement and verification\n");
+    output.push_str("- ✅ (in element columns): Direct relationship exists between requirement and verification\n");
     
     output
 }
@@ -374,7 +380,7 @@ fn generate_matrix_table(
         // Add verification status column
         let is_verified = matrix_data.get(source_id).map_or(false, |targets| !targets.is_empty());
         if is_verified {
-            output.push_str(" ✓ |"); // Checkmark if verified by at least one element
+            output.push_str(" ✅ |"); // Green checkmark if verified by at least one element
         } else {
             output.push_str(" ❌ |"); // X mark if not verified
         }
@@ -383,7 +389,7 @@ fn generate_matrix_table(
         for target in &relevant_targets {
             let target_id = &target.identifier;
             if matrix_data.get(source_id).map_or(false, |targets| targets.contains(target_id)) {
-                output.push_str(" ✓ |"); // Checkmark for relationship exists
+                output.push_str(" ✅ |"); // Green checkmark for relationship exists
             } else {
                 output.push_str("   |"); // Empty cell
             }
@@ -493,7 +499,7 @@ fn generate_json_matrix(
         
         let source_url = format!("{}/blob/{}/{}", base_url, commit_hash, relative_id);
         json!({
-            "id": e.identifier,
+            "id": relative_id,
             "name": e.name,
             "hierarchy_level": level,
             "type": format!("{:?}", e.element_type),
@@ -511,36 +517,69 @@ fn generate_json_matrix(
         
         let target_url = format!("{}/blob/{}/{}", base_url, commit_hash, relative_id);
         json!({
-            "id": e.identifier,
+            "id": relative_id,
             "name": e.name,
             "type": format!("{:?}", e.element_type),
             "url": target_url,
         })
     }).collect::<Vec<Value>>();
     
-    // Create matrix section with relationships
+    // Create matrix section with relationships using relative paths
     let matrix = matrix_data.iter().map(|(source_id, target_ids)| {
-        (source_id.clone(), json!(target_ids.iter().cloned().collect::<Vec<String>>()))
+        // Convert source ID to relative path
+        let rel_source_id = match utils::get_relative_path_from_root(&PathBuf::from(source_id), &repo_root) {
+            Ok(rel_path) => rel_path.to_string_lossy().to_string(),
+            Err(_) => source_id.clone(),
+        };
+        
+        // Convert all target IDs to relative paths
+        let rel_target_ids: Vec<String> = target_ids.iter().map(|target_id| {
+            match utils::get_relative_path_from_root(&PathBuf::from(target_id), &repo_root) {
+                Ok(rel_path) => rel_path.to_string_lossy().to_string(),
+                Err(_) => target_id.clone(),
+            }
+        }).collect();
+        
+        (rel_source_id, json!(rel_target_ids))
     }).collect::<HashMap<String, Value>>();
     
-    // Create verification status section
+    // Create verification status section with relative IDs
     let verification_status = source_elements.iter().map(|e| {
         let is_verified = matrix_data.get(&e.identifier).map_or(false, |targets| !targets.is_empty());
-        (e.identifier.clone(), json!(is_verified))
+        
+        // Convert to relative path
+        let rel_id = match utils::get_relative_path_from_root(&PathBuf::from(&e.identifier), &repo_root) {
+            Ok(rel_path) => rel_path.to_string_lossy().to_string(),
+            Err(_) => e.identifier.clone(),
+        };
+        
+        (rel_id, json!(is_verified))
     }).collect::<HashMap<String, Value>>();
     
     // Get requirements grouped by root requirements
     let requirements_by_root = registry.get_requirements_by_root();
     
-    // Create a groups section mapping root requirements to their children
+    // Create a groups section mapping root requirements to their children using relative paths
     let mut groups = serde_json::Map::new();
     
     for (root_id, elements) in &requirements_by_root {
+        // Convert root ID to relative path
+        let rel_root_id = match utils::get_relative_path_from_root(&PathBuf::from(root_id), &repo_root) {
+            Ok(rel_path) => rel_path.to_string_lossy().to_string(),
+            Err(_) => root_id.clone(),
+        };
+        
+        // Convert all element IDs to relative paths
         let element_ids: Vec<String> = elements.iter()
-            .map(|e| e.identifier.clone())
+            .map(|e| {
+                match utils::get_relative_path_from_root(&PathBuf::from(&e.identifier), &repo_root) {
+                    Ok(rel_path) => rel_path.to_string_lossy().to_string(),
+                    Err(_) => e.identifier.clone(),
+                }
+            })
             .collect();
         
-        groups.insert(root_id.clone(), json!(element_ids));
+        groups.insert(rel_root_id, json!(element_ids));
     }
     
     // Combine all sections
@@ -573,5 +612,278 @@ fn get_short_element_name(element: &Element) -> String {
             element.name.clone()
         }
     }
+}
+
+/// Generates an SVG representation of the traceability matrix
+fn generate_svg_matrix(
+    matrix_data: &HashMap<String, HashSet<String>>,
+    source_elements: &[&Element],
+    target_elements: &[&Element],
+) -> String {
+    // SVG constants for styling
+    const CELL_HEIGHT: i32 = 40;
+    const HEADER_HEIGHT: i32 = 60;
+    const FONT_SIZE: i32 = 14;
+    const PADDING: i32 = 10;
+    const MIN_CELL_WIDTH: i32 = 200;
+    // Width per character (approximate for proportional fonts)
+    const CHAR_WIDTH: i32 = 8;
+    
+    // Colors
+    const HEADER_FILL: &str = "#f0f0f0";
+    const CELL_FILL: &str = "#ffffff";
+    const BORDER_COLOR: &str = "#d0d0d0";
+    const TEXT_COLOR: &str = "#333333";
+    const VERIFIED_COLOR: &str = "#4CAF50";
+    const UNVERIFIED_COLOR: &str = "#F44336";
+    
+    // Begin SVG
+    let mut svg = String::new();
+    svg.push_str("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n");
+    
+    // Organize source elements by hierarchy (similar to markdown output)
+    let mut hierarchical_elements = Vec::new();
+    let mut parent_to_children: HashMap<String, Vec<&Element>> = HashMap::new();
+    let parent_relation_types = crate::relation::get_parent_relation_types();
+    
+    // Identify parent-child relationships
+    for source in source_elements {
+        let mut has_parent = false;
+        for relation in &source.relations {
+            if parent_relation_types.contains(&relation.relation_type.name) {
+                if let LinkType::Identifier(parent_id) = &relation.target.link {
+                    parent_to_children.entry(parent_id.clone())
+                        .or_insert_with(Vec::new)
+                        .push(source);
+                    has_parent = true;
+                    break;
+                }
+            }
+        }
+        
+        if !has_parent {
+            hierarchical_elements.push((source, 0));
+        }
+    }
+    
+    // Function to recursively add children with proper indentation levels
+    fn add_children_svg<'a>(
+        element: &'a Element,
+        level: usize, 
+        result: &mut Vec<(&'a Element, usize)>,
+        parent_to_children: &HashMap<String, Vec<&'a Element>>
+    ) {
+        result.push((element, level));
+        
+        if let Some(children) = parent_to_children.get(&element.identifier) {
+            let mut sorted_children = children.to_vec();
+            sorted_children.sort_by(|a, b| a.name.cmp(&b.name));
+            
+            for child in sorted_children {
+                add_children_svg(child, level + 1, result, parent_to_children);
+            }
+        }
+    }
+    
+    // Sort the top-level elements by name for consistency
+    let mut sorted_roots = hierarchical_elements.clone();
+    sorted_roots.sort_by(|(a, _), (b, _)| a.name.cmp(&b.name));
+    
+    let mut sorted_hierarchical = Vec::new();
+    for (element, level) in sorted_roots {
+        add_children_svg(element, level, &mut sorted_hierarchical, &parent_to_children);
+    }
+    
+    // Filter relevant target elements 
+    let relevant_targets: Vec<&Element> = target_elements.iter()
+        .filter(|target| {
+            sorted_hierarchical.iter().any(|(source, _)| {
+                matrix_data.get(&source.identifier)
+                    .map_or(false, |targets| targets.contains(&target.identifier))
+            })
+        })
+        .cloned()
+        .collect();
+    
+    // Calculate optimal column widths based on element name lengths
+    // For requirement column, find the longest requirement name including indentation
+    let mut req_column_width = MIN_CELL_WIDTH;
+    for (source, indent_level) in &sorted_hierarchical {
+        // Calculate indentation text length
+        let indent_length = match *indent_level {
+            0 => 0,
+            1 => 2, // "↳ " = 2 chars
+            2 => 4, // "__↳ " = 4 chars
+            3 => 6, // "____↳ " = 6 chars
+            _ => 8, // "______↳ " = 8 chars
+        };
+        
+        // Calculate total length including indentation
+        let total_length = indent_length + source.name.len() as i32;
+        let needed_width = total_length * CHAR_WIDTH + PADDING * 2;
+        
+        if needed_width > req_column_width {
+            req_column_width = needed_width;
+        }
+    }
+    
+    // For target columns, find the longest verification name
+    let mut target_column_width = MIN_CELL_WIDTH;
+    for target in &relevant_targets {
+        let needed_width = target.name.len() as i32 * CHAR_WIDTH + PADDING * 2;
+        if needed_width > target_column_width {
+            target_column_width = needed_width;
+        }
+    }
+    
+    // Verified column can be narrower since it only contains checkmarks
+    let verified_column_width = 80; // Narrower width for the verified column
+    
+    // Calculate SVG dimensions
+    let width = req_column_width + verified_column_width + (target_column_width * relevant_targets.len() as i32);
+    let height = HEADER_HEIGHT + (CELL_HEIGHT * sorted_hierarchical.len() as i32) + PADDING * 4; // Extra padding for legend
+    
+    svg.push_str(&format!(
+        "<svg width=\"{}\" height=\"{}\" viewBox=\"0 0 {} {}\" xmlns=\"http://www.w3.org/2000/svg\">\n",
+        width, height, width, height
+    ));
+    
+    // Add title
+    svg.push_str(&format!(
+        "<text x=\"{}\" y=\"{}\" font-family=\"Arial\" font-size=\"{}\" font-weight=\"bold\">{}</text>\n",
+        PADDING, PADDING * 2, FONT_SIZE + 4, "Traceability Matrix"
+    ));
+    
+    // Add header row
+    svg.push_str("<g>\n"); // Header group
+    
+    // Requirement column header
+    svg.push_str(&format!(
+        "<rect x=\"0\" y=\"{}\" width=\"{}\" height=\"{}\" fill=\"{}\" stroke=\"{}\" />\n",
+        HEADER_HEIGHT - CELL_HEIGHT, req_column_width, CELL_HEIGHT, HEADER_FILL, BORDER_COLOR
+    ));
+    svg.push_str(&format!(
+        "<text x=\"{}\" y=\"{}\" font-family=\"Arial\" font-size=\"{}\" font-weight=\"bold\">{}</text>\n",
+        PADDING, HEADER_HEIGHT - CELL_HEIGHT/2 + FONT_SIZE/2, FONT_SIZE, "Requirement"
+    ));
+    
+    // Verified column header
+    let verified_x = req_column_width;
+    svg.push_str(&format!(
+        "<rect x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" fill=\"{}\" stroke=\"{}\" />\n",
+        verified_x, HEADER_HEIGHT - CELL_HEIGHT, verified_column_width, CELL_HEIGHT, HEADER_FILL, BORDER_COLOR
+    ));
+    svg.push_str(&format!(
+        "<text x=\"{}\" y=\"{}\" font-family=\"Arial\" font-size=\"{}\" font-weight=\"bold\">{}</text>\n",
+        verified_x + PADDING, HEADER_HEIGHT - CELL_HEIGHT/2 + FONT_SIZE/2, FONT_SIZE, "Verified"
+    ));
+    
+    // Target columns headers
+    for (i, target) in relevant_targets.iter().enumerate() {
+        let x = req_column_width + verified_column_width + (i as i32 * target_column_width);
+        svg.push_str(&format!(
+            "<rect x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" fill=\"{}\" stroke=\"{}\" />\n",
+            x, HEADER_HEIGHT - CELL_HEIGHT, target_column_width, CELL_HEIGHT, HEADER_FILL, BORDER_COLOR
+        ));
+        
+        // Use the full name for target elements in SVG
+        svg.push_str(&format!(
+            "<text x=\"{}\" y=\"{}\" font-family=\"Arial\" font-size=\"{}\" font-weight=\"bold\">{}</text>\n",
+            x + PADDING, HEADER_HEIGHT - CELL_HEIGHT/2 + FONT_SIZE/2, FONT_SIZE, target.name
+        ));
+    }
+    svg.push_str("</g>\n");
+    
+    // Add data rows
+    for (row_idx, (source, indent_level)) in sorted_hierarchical.iter().enumerate() {
+        let y = HEADER_HEIGHT + (row_idx as i32 * CELL_HEIGHT);
+        let source_id = &source.identifier;
+        
+        // Requirement cell
+        svg.push_str(&format!(
+            "<rect x=\"0\" y=\"{}\" width=\"{}\" height=\"{}\" fill=\"{}\" stroke=\"{}\" />\n",
+            y, req_column_width, CELL_HEIGHT, CELL_FILL, BORDER_COLOR
+        ));
+        
+        // Create indentation string for hierarchy
+        let indent_text = match *indent_level {
+            0 => "",
+            1 => "↳ ",
+            2 => "__↳ ",
+            3 => "____↳ ",
+            _ => "______↳ ",
+        };
+        
+        // Display the full element name (no truncation in SVG)
+        svg.push_str(&format!(
+            "<text x=\"{}\" y=\"{}\" font-family=\"Arial\" font-size=\"{}\" fill=\"{}\">{}{}</text>\n",
+            PADDING, y + CELL_HEIGHT/2 + FONT_SIZE/2, FONT_SIZE, TEXT_COLOR, indent_text, source.name
+        ));
+        
+        // Verified status cell
+        let verified_x = req_column_width;
+        svg.push_str(&format!(
+            "<rect x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" fill=\"{}\" stroke=\"{}\" />\n",
+            verified_x, y, verified_column_width, CELL_HEIGHT, CELL_FILL, BORDER_COLOR
+        ));
+        
+        // Add verification status
+        let is_verified = matrix_data.get(source_id).map_or(false, |targets| !targets.is_empty());
+        if is_verified {
+            // Green checkmark for verified
+            svg.push_str(&format!(
+                "<text x=\"{}\" y=\"{}\" font-family=\"Arial\" font-size=\"{}\" fill=\"{}\">{}</text>\n",
+                verified_x + PADDING, y + CELL_HEIGHT/2 + FONT_SIZE/2, FONT_SIZE + 2, VERIFIED_COLOR, "✅"
+            ));
+        } else {
+            // Red X for not verified
+            svg.push_str(&format!(
+                "<text x=\"{}\" y=\"{}\" font-family=\"Arial\" font-size=\"{}\" fill=\"{}\">{}</text>\n",
+                verified_x + PADDING, y + CELL_HEIGHT/2 + FONT_SIZE/2, FONT_SIZE + 2, UNVERIFIED_COLOR, "❌"
+            ));
+        }
+        
+        // Relationship cells for targets
+        for (i, target) in relevant_targets.iter().enumerate() {
+            let x = req_column_width + verified_column_width + (i as i32 * target_column_width);
+            
+            svg.push_str(&format!(
+                "<rect x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" fill=\"{}\" stroke=\"{}\" />\n",
+                x, y, target_column_width, CELL_HEIGHT, CELL_FILL, BORDER_COLOR
+            ));
+            
+            let target_id = &target.identifier;
+            if matrix_data.get(source_id).map_or(false, |targets| targets.contains(target_id)) {
+                // Green checkmark for relationship
+                svg.push_str(&format!(
+                    "<text x=\"{}\" y=\"{}\" font-family=\"Arial\" font-size=\"{}\" fill=\"{}\">{}</text>\n",
+                    x + PADDING, y + CELL_HEIGHT/2 + FONT_SIZE/2, FONT_SIZE + 2, VERIFIED_COLOR, "✅"
+                ));
+            }
+        }
+    }
+    
+    // Add legend
+    let legend_y = HEADER_HEIGHT + (sorted_hierarchical.len() as i32 * CELL_HEIGHT) + PADDING * 2;
+    
+    svg.push_str(&format!(
+        "<text x=\"{}\" y=\"{}\" font-family=\"Arial\" font-size=\"{}\" font-weight=\"bold\">{}</text>\n",
+        PADDING, legend_y, FONT_SIZE + 2, "Legend:"
+    ));
+    
+    svg.push_str(&format!(
+        "<text x=\"{}\" y=\"{}\" font-family=\"Arial\" font-size=\"{}\" fill=\"{}\">{}</text>\n",
+        PADDING, legend_y + FONT_SIZE + PADDING, FONT_SIZE, TEXT_COLOR, "✅ - Element is verified or relationship exists"
+    ));
+    
+    svg.push_str(&format!(
+        "<text x=\"{}\" y=\"{}\" font-family=\"Arial\" font-size=\"{}\" fill=\"{}\">{}</text>\n",
+        PADDING, legend_y + (FONT_SIZE + PADDING) * 2, FONT_SIZE, TEXT_COLOR, "❌ - Element is not verified"
+    ));
+    
+    // Close SVG
+    svg.push_str("</svg>\n");
+    
+    svg
 }
 

@@ -417,35 +417,6 @@ TODO: add requirment that defines a config filter out patterns.
 
 ---
 
-### Relation Type Validation
-
-The system shall validate relation types against a defined vocabulary and provide clear error messages for unsupported relation types, including suggestions for the correct relation types.
-
-#### Relations
-  * derivedFrom: [UserRequirements.md/Enhanced Validation Error Reporting](../UserRequirements.md#enhanced-validation-error-reporting)
-  * satisfiedBy: [src/relation.rs](../../core/src/relation.rs)
-
----
-
-### Excluded File Relation Validation
-
-The system shall properly validate relations targeting files matching excluded filename patterns, enabling references to excluded files while still respecting their exclusion from processing and linting operations.
-
-#### Details
-The validation process for excluded files:
-1. Files matching excluded patterns are registered in the element registry for relation validation only
-2. Internal elements within excluded files are not processed or validated
-
-#### Todo
-  * derivedFrom: [Configurable Filename Exclusion Patterns](#configurable-filename-exclusion-patterns) 
-  * refine: [File Pattern Exclusion for Linting](#file-pattern-exclusion-for-linting)
-
-#### Relations
-  * refine: [File Pattern Exclusion for Linting](#file-pattern-exclusion-for-linting)
-  * satisfiedBy: [src/parser.rs](../../core/src/parser.rs)
-
----
-
 ### HTML Export
 
 The system shall generate HTML output for all markdown files, not just requirements documents, to provide consistent representation of the entire model.
@@ -819,37 +790,65 @@ The system shall provide a git commit hash flag  (--git_commit flag), to be used
 
 The system shall implement a traceability matrix builder component that extracts relationship data from the model, processes it according to configured parameters, and generates structured matrix representations showing connections between requirements and other elements.
 
+#### Details
+
+The traceability matrix shall be organized into multiple tables, with one table per root requirement (requirements without parents). This organization improves readability by grouping related requirements together.
+
+Each table shall have the following structure:
+- The first column shows the requirement name as a markdown link to its location in the git repository using the current commit hash
+- Requirements shall be displayed in a hierarchical structure with parent-child relationships clearly indicated
+- Child requirements shall be indented to show their relationship to parent requirements using arrow and underscore characters:
+  - Level 1 (direct children): "↳ " (right arrow followed by a space)
+  - Level 2 (grandchildren): "__↳ " (two underscores, then arrow and space)
+  - Level 3 (great-grandchildren): "____↳ " (four underscores, then arrow and space)
+  - Deeper levels: "______↳ " (six underscores, then arrow and space)
+- The second column shows the verification status with a green checkmark "✅" if verified by at least one verification element, or "❌" if not verified
+- The subsequent columns represent individual verification elements that verify requirements in this group, with each element name displayed as a markdown link to its location in the git repository
+- Each row represents a requirement within the group
+- Cell intersections show the relationship between requirements and verifications with a green checkmark "✅" where a relationship exists or empty where no relationship exists
+- The matrix shall be rendered as a markdown table for human readability
+- The JSON format shall be available for machine processing with all identifiers relative to the repository root
+
+The links in the matrix shall use the git repository URL with the current commit hash to ensure that links remain stable even as the repository evolves. The format shall be similar to that used in the change impact report.
+
 #### Relations
   * derivedFrom: [UserRequirements.md/Traceability Matrix](../UserRequirements.md#traceability-matrix)
+  * satisfiedBy: [matrix_generator.rs](../../core/src/matrix_generator.rs)
 
 ---
 
 ### Markdown Matrix Formatter
 
-The system shall implement a markdown formatter for traceability matrices that produces well-structured, readable markdown tables and diagrams conforming to the ReqFlow markdown-first methodology.
+The system shall implement a markdown formatter for traceability matrices that produces well-structured, readable markdown tables conforming to the ReqFlow markdown-first methodology.
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Traceability Matrix](../UserRequirements.md#traceability-matrix)
+  * satisfiedBy: [matrix_generator.rs](../../core/src/matrix_generator.rs)
 
 ---
 
-### Matrix File Output Handler
+### CLI Matrix SVG Flag
 
-The system shall implement a file output handler for traceability matrices that saves generated content to designated locations with appropriate naming conventions, handles file conflicts, and maintains content consistency.
+The system shall provide an SVG output option for traceability matrices, activated by the (--svg flag), which shall generate a simplified SVG representation of the matrix that can be viewed directly or embedded in documents.
+
+#### Details
+
+The SVG output of the matrix shall have the following characteristics:
+- It shall only be available when the --generate-matrix flag is used
+- It cannot be used together with the --json flag (they are mutually exclusive)
+- It shall display full element names instead of truncated names with ellipses
+- It shall dynamically adjust column widths based on the maximum element name length to ensure all text is readable
+- It shall not include hyperlinks to elements in the git repository
+- It shall maintain the same hierarchical structure as the markdown version
+- It shall use the same visual indicators for verification status and relationships
+- The output shall be in a self-contained SVG format suitable for embedding in other documents
 
 #### Relations
-  * derivedFrom: [UserRequirements.md/Save matrices to designated files](../UserRequirements.md#save-matrices-to-designated-files)
+  * derivedFrom: [Traceability Matrix Builder Implementation](#traceability-matrix-builder-implementation)
+  * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
 
 ---
 
-### Matrix Export Format Handler
-
-The system shall implement export handlers for traceability matrices that convert the internal matrix representation to various external formats including Excel-compatible CSV/XLSX and PDF, preserving structural relationships and formatting.
-
-#### Relations
-  * derivedFrom: [UserRequirements.md/Export Traceability Matrix](../UserRequirements.md#export-traceability-matrix)
-
----
 
 ## Validation Capabilities
 ```mermaid
@@ -976,6 +975,36 @@ The system shall implement validation that verifies relation endpoints have appr
 
 ---
 
+### Relation Type Validation
+
+The system shall validate relation types against a defined vocabulary and provide clear error messages for unsupported relation types, including suggestions for the correct relation types.
+
+#### Relations
+  * derivedFrom: [UserRequirements.md/Enhanced Validation Error Reporting](../UserRequirements.md#enhanced-validation-error-reporting)
+  * satisfiedBy: [src/relation.rs](../../core/src/relation.rs)
+
+---
+
+### Excluded File Relation Validation
+
+The system shall properly validate relations targeting files matching excluded filename patterns, enabling references to excluded files while still respecting their exclusion from processing and linting operations.
+
+#### Details
+The validation process for excluded files:
+1. Files matching excluded patterns are registered in the element registry for relation validation only
+2. Internal elements within excluded files are not processed or validated
+
+#### Todo
+  * derivedFrom: [Configurable Filename Exclusion Patterns](#configurable-filename-exclusion-patterns) 
+  * refine: [File Pattern Exclusion for Linting](#file-pattern-exclusion-for-linting)
+
+#### Relations
+  * refine: [File Pattern Exclusion for Linting](#file-pattern-exclusion-for-linting)
+  * satisfiedBy: [src/parser.rs](../../core/src/parser.rs)
+
+---
+
+
 ## Reporting Features
 ```mermaid
 graph LR;
@@ -1070,26 +1099,3 @@ The system shall implement a validation report generator that compiles and forma
 
 ---
 
-### Verification Gap Analyzer
-The system shall implement a verification gap analyzer that identifies requirements lacking verification relationships, assesses verification coverage across the model, and produces reports highlighting verification deficiencies.
-
-#### Relations
-  * derivedFrom: [UserRequirements.md/Generate Verifications Reports](../UserRequirements.md#generate-verifications-reports)
-
----
-
-### Dependency Report Generator
-The system shall implement a dependency report generator that analyzes and visualizes complex dependency chains within the model, highlighting critical paths, dependency clusters, and potential bottlenecks with impact assessments.
-
-#### Relations
-  * derivedFrom: [UserRequirements.md/Generate Dependency Reports](../UserRequirements.md#generate-dependency-reports)
-
----
-
-### Report Export Formatter
-The system shall implement format conversion engines for reports that transform internal report representations to standardized external formats including PDF, Excel, and HTML, preserving structural information and visual elements.
-
-#### Relations
-  * derivedFrom: [UserRequirements.md/Export Reports to Standard Formats](../UserRequirements.md#export-reports-to-standard-formats)
-
----
