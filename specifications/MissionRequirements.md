@@ -10,20 +10,20 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  cc8c3af529fef9f2["Align with Industry Standards"];
-  click cc8c3af529fef9f2 "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/MissionRequirements.md#align-with-industry-standards";
-  class cc8c3af529fef9f2 requirement;
-  b3f57e49f7494c0e["MOEs.md/MOE_CE"];
-  class b3f57e49f7494c0e requirement;
-  click b3f57e49f7494c0e "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/MOEs.md#moe_ce";
-  cc8c3af529fef9f2 -.->|deriveReqT| b3f57e49f7494c0e;
-  37960779163a9fc8["Promote Automation and Efficiency"];
-  click 37960779163a9fc8 "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/MissionRequirements.md#promote-automation-and-efficiency";
-  class 37960779163a9fc8 requirement;
-  f6237e49f7494c0e["MOEs.md/MOE_UA"];
-  class f6237e49f7494c0e requirement;
-  click f6237e49f7494c0e "https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/specifications/MOEs.md#moe_ua";
-  37960779163a9fc8 -.->|deriveReqT| f6237e49f7494c0e;
+  f4d2c697be0f9733["Promote Automation and Efficiency"];
+  click f4d2c697be0f9733 "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/specifications/MissionRequirements.md#promote-automation-and-efficiency";
+  class f4d2c697be0f9733 requirement;
+  5d0b88381f707008["MOEs.md/MOE_UA"];
+  class 5d0b88381f707008 requirement;
+  click 5d0b88381f707008 "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/specifications/MOEs.md#moe_ua";
+  f4d2c697be0f9733 -.->|deriveReqT| 5d0b88381f707008;
+  64c3bd3606b9c679["Align with Industry Standards"];
+  click 64c3bd3606b9c679 "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/specifications/MissionRequirements.md#align-with-industry-standards";
+  class 64c3bd3606b9c679 requirement;
+  34ccc009ec6ea573["MOEs.md/MOE_CE"];
+  class 34ccc009ec6ea573 requirement;
+  click 34ccc009ec6ea573 "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/specifications/MOEs.md#moe_ce";
+  64c3bd3606b9c679 -.->|deriveReqT| 34ccc009ec6ea573;
 ```
 
 ---
