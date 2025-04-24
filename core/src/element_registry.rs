@@ -87,7 +87,7 @@ impl ElementRegistry {
         self.elements.values()
             .filter(|e| match &e.element_type {
                 element::ElementType::Requirement(_) if element_type_str == "requirement" => true,
-                element::ElementType::Verification if element_type_str == "verification" => true,
+                element::ElementType::Verification(_) if element_type_str == "verification" => true,
                 element::ElementType::File if element_type_str == "file" => true,
                 element::ElementType::Other(ref t) if t == element_type_str => true,
                 _ => false,

@@ -646,7 +646,7 @@ fn collect_verification_elements_from_impact_tree(
         seen: &mut HashSet<String>,
         collected: &mut Vec<InvalidatedVerification>,
     ) {
-        if let element::ElementType::Verification = node.element.element_type {
+        if let element::ElementType::Verification(_) = node.element.element_type {
             let id = node.element.identifier.clone();
             if seen.insert(id.clone()) {
                 collected.push(InvalidatedVerification {

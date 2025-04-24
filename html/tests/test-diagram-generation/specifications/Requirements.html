@@ -118,24 +118,6 @@ blockquote {
             <h1 id="test-requirements">Test Requirements</h1>
 <p>This is a requirements document specifically created for testing diagram generation.</p>
 <h2 id="section-1">Section 1</h2>
-<div class="mermaid">graph TD;
-  %% Graph styling
-  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
-  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
-  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
-  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
-
-  a82e88f971[&quot;Element 1&quot;];
-  click a82e88f971 &quot;Requirements.html#element-1&quot;;
-  class a82e88f971 requirement;
-  535058b234[&quot;Element 3&quot;];
-  class 535058b234 requirement;
-  click 535058b234 &quot;Requirements.html#element-3&quot;;
-  a82e88f971 --&gt;|verifies| 535058b234;
-  56b1c7424a[&quot;Element 2&quot;];
-  click 56b1c7424a &quot;Requirements.html#element-2&quot;;
-  class 56b1c7424a requirement;
-</div>
 <h3 id="element-1">Element 1</h3>
 <p>This is a test element with relations.</p>
 <h4>Relations</h4>
@@ -150,32 +132,26 @@ blockquote {
 <li>tracedFrom: <a href="#element-1">Element 1</a></li>
 </ul>
 <h2 id="section-2">Section 2</h2>
-<div class="mermaid">graph TD;
-  %% Graph styling
-  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
-  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
-  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
-  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
-
-  535058b234[&quot;Element 3&quot;];
-  click 535058b234 &quot;Requirements.html#element-3&quot;;
-  class 535058b234 requirement;
-  a82e88f971[&quot;Element 1&quot;];
-  class a82e88f971 requirement;
-  click a82e88f971 &quot;Requirements.html#element-1&quot;;
-  a82e88f971 --&gt;|verifies| 535058b234;
-  3f9e518d35[&quot;Element 4&quot;];
-  click 3f9e518d35 &quot;Requirements.html#element-4&quot;;
-  class 3f9e518d35 requirement;
-</div>
 <h3 id="element-3">Element 3</h3>
 <p>This is a third test element.</p>
 <h4>Relations</h4>
 <ul>
 <li>verifiedBy: <a href="#element-1">Element 1</a></li>
+<li>refine: <a href="#element-1">Element 1</a></li>
+<li>derivedFrom: <a href="#element-1">Element 1</a></li>
 </ul>
 <h3 id="element-4">Element 4</h3>
 <p>This is a fourth test element with no relations.</p>
+<h3 id="element-5">Element 5</h3>
+<p>This is a fith test element.</p>
+<h4>Relations</h4>
+<ul>
+<li>containedBy: <a href="#element-3">Element 1</a></li>
+<li>trace: <a href="#element-1">Element 1</a></li>
+<li>satisfiedBy: <a href="#element-6">Element 1</a></li>
+</ul>
+<h3 id="element-6">Element 6</h3>
+<p>This is a sixth test element.</p>
 
         </div>
     </div>
