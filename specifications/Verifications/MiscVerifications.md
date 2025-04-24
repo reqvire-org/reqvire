@@ -35,6 +35,8 @@ graph LR;
   b05794ec6e9b813a -.->|trace| 7766b8055bc4c657;
 ```
 
+---
+
 ## Traceability Matrix Verifications
 ```mermaid
 graph LR;
@@ -44,51 +46,60 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  4a53bcc2a6e80f46["Traceability Matrix Generation Test"];
-  click 4a53bcc2a6e80f46 "MiscVerifications.md#traceability-matrix-generation-test";
-  class 4a53bcc2a6e80f46 verification;
-  5eca866a0338e0fe["SystemRequirements/Requirements.md/Traceability Matrix Builder Implementation"];
-  class 5eca866a0338e0fe requirement;
-  click 5eca866a0338e0fe "../SystemRequirements/Requirements.md#traceability-matrix-builder-implementation";
-  4a53bcc2a6e80f46 -.->|verifies| 5eca866a0338e0fe;
-  
-  a4f6bb87d4f9c782["CLI Traces Flag Test"];
-  click a4f6bb87d4f9c782 "MiscVerifications.md#cli-traces-flag-test";
-  class a4f6bb87d4f9c782 verification;
-  ff654d9a7a5b21e3["SystemRequirements/Requirements.md/CLI Traces Flag"];
-  class ff654d9a7a5b21e3 requirement;
-  click ff654d9a7a5b21e3 "../SystemRequirements/Requirements.md#cli-traces-flag";
-  a4f6bb87d4f9c782 -.->|verifies| ff654d9a7a5b21e3;
-  
-  e23c7bb59348d17c["SVG Matrix Output Test"];
-  click e23c7bb59348d17c "MiscVerifications.md#svg-matrix-output-test";
-  class e23c7bb59348d17c verification;
-  c78fe2cb8a93d4e5["SystemRequirements/Requirements.md/CLI Traces SVG Flag"];
-  class c78fe2cb8a93d4e5 requirement;
-  click c78fe2cb8a93d4e5 "../SystemRequirements/Requirements.md#cli-traces-svg-flag";
-  e23c7bb59348d17c -.->|verifies| c78fe2cb8a93d4e5;
-  
-  f76c8a9bcd34e215["Hierarchical Matrix Format Test"];
-  click f76c8a9bcd34e215 "MiscVerifications.md#hierarchical-matrix-format-test";
-  class f76c8a9bcd34e215 verification;
-  f76c8a9bcd34e215 -.->|verifies| 5eca866a0338e0fe;
-  
-  c89f5db6a1e7423f["JSON Matrix Output Test"];
-  click c89f5db6a1e7423f "MiscVerifications.md#json-matrix-output-test";
-  class c89f5db6a1e7423f verification;
+  34594bb38e38ff3e["JSON Matrix Output Test"];
+  click 34594bb38e38ff3e "https://github.com/ilijaljubicic/ReqFlow/blob/a94231473c9a4a56fe21608ebd13787e0cc3f2dc/specifications/Verifications/MiscVerifications.md#json-matrix-output-test";
+  class 34594bb38e38ff3e verification;
   d7e5fbf806d650d9["SystemRequirements/Requirements.md/Markdown Matrix Formatter"];
   class d7e5fbf806d650d9 requirement;
-  click d7e5fbf806d650d9 "../SystemRequirements/Requirements.md#markdown-matrix-formatter";
-  c89f5db6a1e7423f -.->|verifies| d7e5fbf806d650d9;
-  
-  835f2db97c4e3a26["tests/test-matrix-generation.sh"];
-  class 835f2db97c4e3a26 default;
-  click 835f2db97c4e3a26 "../../tests/test-matrix-generation.sh";
-  4a53bcc2a6e80f46 -.->|trace| 835f2db97c4e3a26;
-  a4f6bb87d4f9c782 -.->|trace| 835f2db97c4e3a26;
-  e23c7bb59348d17c -.->|trace| 835f2db97c4e3a26;
-  f76c8a9bcd34e215 -.->|trace| 835f2db97c4e3a26;
-  c89f5db6a1e7423f -.->|trace| 835f2db97c4e3a26;
+  click d7e5fbf806d650d9 "https://github.com/ilijaljubicic/ReqFlow/blob/a94231473c9a4a56fe21608ebd13787e0cc3f2dc/specifications/SystemRequirements/Requirements.md#markdown-matrix-formatter";
+  34594bb38e38ff3e -.->|verifies| d7e5fbf806d650d9;
+  6bd2df9ca8d5cccd["AI Agent Context Verification"];
+  click 6bd2df9ca8d5cccd "https://github.com/ilijaljubicic/ReqFlow/blob/a94231473c9a4a56fe21608ebd13787e0cc3f2dc/specifications/Verifications/MiscVerifications.md#ai-agent-context-verification";
+  class 6bd2df9ca8d5cccd verification;
+  5a6fc253c51845b6["UserRequirements.md/AI Agent Context"];
+  class 5a6fc253c51845b6 requirement;
+  click 5a6fc253c51845b6 "https://github.com/ilijaljubicic/ReqFlow/blob/a94231473c9a4a56fe21608ebd13787e0cc3f2dc/specifications/UserRequirements.md#ai-agent-context";
+  6bd2df9ca8d5cccd -.->|verifies| 5a6fc253c51845b6;
+  24a5739f743c3d7b["tests/test-ai-agent-context/test.sh"];
+  class 24a5739f743c3d7b default;
+  click 24a5739f743c3d7b "https://github.com/ilijaljubicic/ReqFlow/blob/a94231473c9a4a56fe21608ebd13787e0cc3f2dc/tests/test-ai-agent-context/test.sh";
+  6bd2df9ca8d5cccd -.->|trace| 24a5739f743c3d7b;
+  cb7941d54639d5bf["CLI Traces Flag Test"];
+  click cb7941d54639d5bf "https://github.com/ilijaljubicic/ReqFlow/blob/a94231473c9a4a56fe21608ebd13787e0cc3f2dc/specifications/Verifications/MiscVerifications.md#cli-traces-flag-test";
+  class cb7941d54639d5bf verification;
+  438a74e06c98c101["SystemRequirements/Requirements.md/CLI Traces Flag"];
+  class 438a74e06c98c101 requirement;
+  click 438a74e06c98c101 "https://github.com/ilijaljubicic/ReqFlow/blob/a94231473c9a4a56fe21608ebd13787e0cc3f2dc/specifications/SystemRequirements/Requirements.md#cli-traces-flag";
+  cb7941d54639d5bf -.->|verifies| 438a74e06c98c101;
+  3c88c6ea8acd69bb["Hierarchical Matrix Format Test"];
+  click 3c88c6ea8acd69bb "https://github.com/ilijaljubicic/ReqFlow/blob/a94231473c9a4a56fe21608ebd13787e0cc3f2dc/specifications/Verifications/MiscVerifications.md#hierarchical-matrix-format-test";
+  class 3c88c6ea8acd69bb verification;
+  5eca866a0338e0fe["SystemRequirements/Requirements.md/Traceability Matrix Builder Implementation"];
+  class 5eca866a0338e0fe requirement;
+  click 5eca866a0338e0fe "https://github.com/ilijaljubicic/ReqFlow/blob/a94231473c9a4a56fe21608ebd13787e0cc3f2dc/specifications/SystemRequirements/Requirements.md#traceability-matrix-builder-implementation";
+  3c88c6ea8acd69bb -.->|verifies| 5eca866a0338e0fe;
+  9ec6cda059c96c36["Traceability Matrix Generation Test"];
+  click 9ec6cda059c96c36 "https://github.com/ilijaljubicic/ReqFlow/blob/a94231473c9a4a56fe21608ebd13787e0cc3f2dc/specifications/Verifications/MiscVerifications.md#traceability-matrix-generation-test";
+  class 9ec6cda059c96c36 verification;
+  9ec6cda059c96c36 -.->|verifies| 5eca866a0338e0fe;
+  3f9051bf25520f68["SVG Matrix Output Test"];
+  click 3f9051bf25520f68 "https://github.com/ilijaljubicic/ReqFlow/blob/a94231473c9a4a56fe21608ebd13787e0cc3f2dc/specifications/Verifications/MiscVerifications.md#svg-matrix-output-test";
+  class 3f9051bf25520f68 verification;
+  1ffba11189b9b4c8["SystemRequirements/Requirements.md/CLI Traces SVG Flag"];
+  class 1ffba11189b9b4c8 requirement;
+  click 1ffba11189b9b4c8 "https://github.com/ilijaljubicic/ReqFlow/blob/a94231473c9a4a56fe21608ebd13787e0cc3f2dc/specifications/SystemRequirements/Requirements.md#cli-traces-svg-flag";
+  3f9051bf25520f68 -.->|verifies| 1ffba11189b9b4c8;
+  b05794ec6e9b813a["HTML Export Verification"];
+  click b05794ec6e9b813a "https://github.com/ilijaljubicic/ReqFlow/blob/a94231473c9a4a56fe21608ebd13787e0cc3f2dc/specifications/Verifications/MiscVerifications.md#html-export-verification";
+  class b05794ec6e9b813a verification;
+  72c7eda6183f0893["UserRequirements.md/Export HTML specifications"];
+  class 72c7eda6183f0893 requirement;
+  click 72c7eda6183f0893 "https://github.com/ilijaljubicic/ReqFlow/blob/a94231473c9a4a56fe21608ebd13787e0cc3f2dc/specifications/UserRequirements.md#export-html-specifications";
+  b05794ec6e9b813a -.->|verifies| 72c7eda6183f0893;
+  7766b8055bc4c657["tests/test-html-export/test.sh"];
+  class 7766b8055bc4c657 default;
+  click 7766b8055bc4c657 "https://github.com/ilijaljubicic/ReqFlow/blob/a94231473c9a4a56fe21608ebd13787e0cc3f2dc/tests/test-html-export/test.sh";
+  b05794ec6e9b813a -.->|trace| 7766b8055bc4c657;
 ```
 
 ---

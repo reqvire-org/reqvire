@@ -10,10 +10,10 @@ graph LR;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
   b3f57e49f7494c0e["MOE_CE"];
-  click b3f57e49f7494c0e "MOEs.md#moe_ce";
+  click b3f57e49f7494c0e "https://github.com/ilijaljubicic/ReqFlow/blob/a94231473c9a4a56fe21608ebd13787e0cc3f2dc/specifications/MOEs.md#moe_ce";
   class b3f57e49f7494c0e requirement;
   f6237e49f7494c0e["MOE_UA"];
-  click f6237e49f7494c0e "MOEs.md#moe_ua";
+  click f6237e49f7494c0e "https://github.com/ilijaljubicic/ReqFlow/blob/a94231473c9a4a56fe21608ebd13787e0cc3f2dc/specifications/MOEs.md#moe_ua";
   class f6237e49f7494c0e requirement;
 ```
 

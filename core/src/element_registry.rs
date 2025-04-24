@@ -81,6 +81,102 @@ impl ElementRegistry {
 
         errors
     }
+    
+    /// Gets all elements of a specific type
+    pub fn get_elements_by_type(&self, element_type_str: &str) -> Vec<&element::Element> {
+        self.elements.values()
+            .filter(|e| match &e.element_type {
+                element::ElementType::Requirement(_) if element_type_str == "requirement" => true,
+                element::ElementType::Verification if element_type_str == "verification" => true,
+                element::ElementType::File if element_type_str == "file" => true,
+                element::ElementType::Other(ref t) if t == element_type_str => true,
+                _ => false,
+            })
+            .collect()
+    }
+    
+    /// Gets all root requirements (requirements that don't have any parent relations)
+    pub fn get_root_requirements(&self) -> Vec<&element::Element> {
+        let parent_relation_types = relation::get_parent_relation_types();
+        
+        self.elements.values()
+            .filter(|e| match e.element_type {
+                element::ElementType::Requirement(_) => true,
+                _ => false,
+            })
+            .filter(|e| {
+                // Check if it doesn't have any parent relations
+                !e.relations.iter().any(|r| 
+                    parent_relation_types.contains(&r.relation_type.name)
+                )
+            })
+            .collect()
+    }
+    
+    /// Gets all requirements grouped by root requirements
+    /// Returns a map where keys are root requirement IDs and values are the requirements in that group
+    pub fn get_requirements_by_root(&self) -> HashMap<String, Vec<&element::Element>> {
+        let mut result = HashMap::new();
+        let root_requirements = self.get_root_requirements();
+        
+        // Add each root as its own group initially
+        for root in &root_requirements {
+            result.insert(root.identifier.clone(), vec![*root]);
+        }
+        
+        // If no root requirements found, return empty map
+        if root_requirements.is_empty() {
+            return result;
+        }
+        
+        // For any non-root requirement, find its root parent
+        for element in self.elements.values() {
+            // Check if this element is a root requirement
+            let is_root = root_requirements.iter().any(|root| root.identifier == element.identifier);
+            if is_root {
+                continue; // Skip root requirements as they're already included
+            }
+            
+            if let element::ElementType::Requirement(_) = element.element_type {
+                // Find which root is the parent of this requirement
+                for root in &root_requirements {
+                    if self.is_child_of(element, root) {
+                        result.entry(root.identifier.clone())
+                            .or_insert_with(Vec::new)
+                            .push(element);
+                        break;
+                    }
+                }
+            }
+        }
+        
+        result
+    }
+    
+    /// Checks if an element is a child of another element through parent relation types
+    fn is_child_of(&self, potential_child: &element::Element, potential_parent: &element::Element) -> bool {
+        let parent_relation_types = relation::get_parent_relation_types();
+        
+        // Direct relation check
+        for relation in &potential_child.relations {
+            if parent_relation_types.contains(&relation.relation_type.name) {
+                if let relation::LinkType::Identifier(ref target_id) = relation.target.link {
+                    if target_id == &potential_parent.identifier {
+                        return true;
+                    }
+                    
+                    // Recursive check through the target of this relation
+                    if let Ok(intermediate) = self.get_element(target_id) {
+                        if self.is_child_of(intermediate, potential_parent) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        
+        false
+    }
 
         
     /// To return both the impacted element and the trigger relation.

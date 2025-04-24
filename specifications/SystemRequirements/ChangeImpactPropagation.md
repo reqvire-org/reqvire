@@ -12,32 +12,32 @@ graph LR;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
   6e747b7f03732873["Change Impact Command Line Interface"];
-  click 6e747b7f03732873 "ChangeImpactPropagation.md#change-impact-command-line-interface";
+  click 6e747b7f03732873 "https://github.com/ilijaljubicic/ReqFlow/blob/a94231473c9a4a56fe21608ebd13787e0cc3f2dc/specifications/SystemRequirements/ChangeImpactPropagation.md#change-impact-command-line-interface";
   class 6e747b7f03732873 requirement;
   665b7456c9b61ded["CLI Change Impact Report Flag"];
   class 665b7456c9b61ded requirement;
-  click 665b7456c9b61ded "Requirements.md#cli-change-impact-report-flag";
+  click 665b7456c9b61ded "https://github.com/ilijaljubicic/ReqFlow/blob/a94231473c9a4a56fe21608ebd13787e0cc3f2dc/specifications/SystemRequirements/Requirements.md#cli-change-impact-report-flag";
   6e747b7f03732873 -.->|deriveReqT| 665b7456c9b61ded;
   11ffc4632afd7c4c["../../cli/src/cli.rs"];
   class 11ffc4632afd7c4c default;
-  click 11ffc4632afd7c4c "../../cli/src/cli.rs";
+  click 11ffc4632afd7c4c "https://github.com/ilijaljubicic/ReqFlow/blob/a94231473c9a4a56fe21608ebd13787e0cc3f2dc/cli/src/cli.rs";
   11ffc4632afd7c4c -->|satisfies| 6e747b7f03732873;
-  c23729cc550de84b["Change Impact Visualization"];
-  click c23729cc550de84b "ChangeImpactPropagation.md#change-impact-visualization";
-  class c23729cc550de84b requirement;
+  d17b0775f448b19b["Change Impact Detection Algorithm"];
+  click d17b0775f448b19b "https://github.com/ilijaljubicic/ReqFlow/blob/a94231473c9a4a56fe21608ebd13787e0cc3f2dc/specifications/SystemRequirements/ChangeImpactPropagation.md#change-impact-detection-algorithm";
+  class d17b0775f448b19b requirement;
   745439d5fc0154d1["../SpecificationsRequirements.md#requirements-change-propagation"];
   class 745439d5fc0154d1 requirement;
-  click 745439d5fc0154d1 "../SpecificationsRequirements.md#requirements-change-propagation";
-  c23729cc550de84b -.->|deriveReqT| 745439d5fc0154d1;
+  click 745439d5fc0154d1 "https://github.com/ilijaljubicic/ReqFlow/blob/a94231473c9a4a56fe21608ebd13787e0cc3f2dc/specifications/SpecificationsRequirements.md#requirements-change-propagation";
+  d17b0775f448b19b -.->|deriveReqT| 745439d5fc0154d1;
   cc976e6bcded86e7["../../core/src/change_impact.rs"];
   class cc976e6bcded86e7 default;
-  click cc976e6bcded86e7 "../../core/src/change_impact.rs";
-  cc976e6bcded86e7 -->|satisfies| c23729cc550de84b;
-  d17b0775f448b19b["Change Impact Detection Algorithm"];
-  click d17b0775f448b19b "ChangeImpactPropagation.md#change-impact-detection-algorithm";
-  class d17b0775f448b19b requirement;
-  d17b0775f448b19b -.->|deriveReqT| 745439d5fc0154d1;
+  click cc976e6bcded86e7 "https://github.com/ilijaljubicic/ReqFlow/blob/a94231473c9a4a56fe21608ebd13787e0cc3f2dc/core/src/change_impact.rs";
   cc976e6bcded86e7 -->|satisfies| d17b0775f448b19b;
+  c23729cc550de84b["Change Impact Visualization"];
+  click c23729cc550de84b "https://github.com/ilijaljubicic/ReqFlow/blob/a94231473c9a4a56fe21608ebd13787e0cc3f2dc/specifications/SystemRequirements/ChangeImpactPropagation.md#change-impact-visualization";
+  class c23729cc550de84b requirement;
+  c23729cc550de84b -.->|deriveReqT| 745439d5fc0154d1;
+  cc976e6bcded86e7 -->|satisfies| c23729cc550de84b;
 ```
 
 ---
