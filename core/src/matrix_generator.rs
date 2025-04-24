@@ -603,5 +603,117 @@ fn get_short_element_name(element: &Element) -> String {
     }
 }
 
- 
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::element::{Element, ElementType, RequirementType, VerificationType};
+    use crate::relation::{Relation, RelationTarget, RelationTypeInfo, RelationDirection};
+    use crate::element_registry::ElementRegistry;
+    use crate::relation::LinkType;
+    use crate::matrix_generator::{generate_matrix, MatrixConfig, MatrixFormat};
+
+    fn create_mock_registry() -> ElementRegistry {
+        let mut registry = ElementRegistry::new();
+
+
+        let relation_type = RELATION_TYPES.get("verifiedBy").unwrap();
+        let relation = Relation {
+            relation_type,
+            target: RelationTarget {
+                text: "".to_string(),
+                link: LinkType::Identifier("tests/TEST-001".to_string()),
+            },
+            is_opposite: false,
+        };
+
+       // Helper: default metadata
+       let empty_metadata: HashMap<String, String> = HashMap::new();
+
+
+        // Create requirement elements
+        let req1 = Element {
+            identifier: "reqs/REQ-001".to_string(),
+            name: "System Requirement 1".to_string(),
+            element_type: ElementType::Requirement(RequirementType::System),
+            section: "".to_string(),
+            metadata: empty_metadata.clone(),
+            hash_impact_content: "".to_string(),
+            changed_since_commit: false,
+            content: "Requirement content 1".to_string(),
+            file_path: "reqs/REQ-001".to_string(),
+            relations: vec![],
+        };
+
+        let req2 = Element {
+            identifier: "reqs/REQ-002".to_string(),
+            name: "User Requirement 2".to_string(),
+            element_type: ElementType::Requirement(RequirementType::User),
+            section: "".to_string(),
+            metadata: empty_metadata.clone(),
+            hash_impact_content: "".to_string(),
+            changed_since_commit: false,
+            content: "Requirement content 2".to_string(),
+            file_path: "reqs/REQ-002".to_string(),
+            relations: vec![],
+        };
+
+        // Create verification element
+        let ver1 = Element {
+            identifier: "tests/TEST-001".to_string(),
+            name: "Test Case 1".to_string(),
+            element_type: ElementType::Verification(VerificationType::Test),
+            section: "".to_string(),
+            metadata: empty_metadata.clone(),
+            hash_impact_content: "".to_string(),
+            changed_since_commit: false,
+            content: "Test case content".to_string(),
+            file_path: "tests/TEST-001".to_string(),
+            relations: vec![],
+        };
+
+        // Add relation from req1 to ver1
+        let mut req1_with_rel = req1.clone();
+        req1_with_rel.relations.push(Relation {
+            relation_type: &relation_type,
+            target: RelationTarget {
+                link: LinkType::Identifier("tests/TEST-001".to_string()),
+                text: "".to_string(),
+            },
+            is_opposite: false,
+        });
+
+        // Register elements with the registry
+        registry.register_element(req1_with_rel, "reqs/REQ-001").unwrap();
+        registry.register_element(req2, "reqs/REQ-002").unwrap();
+        registry.register_element(ver1, "tests/TEST-001").unwrap();
+
+        registry
+    }
+
+    #[test]
+    fn test_generate_markdown_matrix() {
+        let registry = create_mock_registry();
+        let config = MatrixConfig::default();
+        let output = generate_matrix(&registry, &config, MatrixFormat::Markdown);
+
+        assert!(output.contains("Traceability Matrix"));
+        assert!(output.contains("REQ-001"));
+        assert!(output.contains("REQ-002"));
+        assert!(output.contains("Test Case 1"));
+        assert!(output.contains("✔️")); // Relation mark
+    }
+
+    #[test]
+    fn test_generate_json_matrix() {
+        let registry = create_mock_registry();
+        let config = MatrixConfig::default();
+        let output = generate_matrix(&registry, &config, MatrixFormat::Json);
+
+        let json_output: serde_json::Value = serde_json::from_str(&output).unwrap();
+        assert!(json_output["metadata"].is_object());
+        assert_eq!(json_output["sources"].as_array().unwrap().len(), 2);
+        assert_eq!(json_output["targets"].as_array().unwrap().len(), 1);
+    }
+}
+
 

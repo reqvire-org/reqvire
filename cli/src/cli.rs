@@ -10,7 +10,7 @@ use globset::GlobSet;
 use reqflow::reports;
 use reqflow::change_impact;
 use reqflow::git_commands;
-
+use reqflow::matrix_generator;
 
 #[derive(Parser, Debug)]
 #[clap(author,version, about = "Reqflow MBSE model management tool", long_about = None)]
@@ -229,23 +229,18 @@ pub fn handle_command(
             
             
         }else if args.traces {
-            let matrix_config = reqflow::matrix_generator::MatrixConfig {
-                source_type: reqflow::element::ElementType::Requirement(reqflow::element::RequirementType::System),
-                // Use a type pattern that matches any verification type for matrices
-                target_type: reqflow::element::ElementType::Verification(reqflow::element::VerificationType::Default),
-                relation_types: vec!["verifiedBy"],
-                format: if args.json {
-                    reqflow::matrix_generator::MatrixFormat::Json
-                } else if args.svg {
-                    reqflow::matrix_generator::MatrixFormat::Svg
-                } else {
-                    reqflow::matrix_generator::MatrixFormat::Markdown
-                },
-            };
+            let matrix_config = matrix_generator::MatrixConfig::default();
             
             let matrix_output = reqflow::matrix_generator::generate_matrix(
                 &model_manager.element_registry,
-                &matrix_config
+                &matrix_config,
+                if args.json {
+                    matrix_generator::MatrixFormat::Json
+                } else if args.svg {
+                    matrix_generator::MatrixFormat::Svg
+                } else {
+                    matrix_generator::MatrixFormat::Markdown
+                },                
             );
             
             println!("{}", matrix_output);
