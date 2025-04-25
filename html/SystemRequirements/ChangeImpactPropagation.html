@@ -96,7 +96,7 @@ blockquote {
 }
 </style>
 
-    <!-- Enhanced mermaid configuration for ReqFlow diagrams -->
+    <!-- Enhanced mermaid configuration for Reqvire diagrams -->
     <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
     <script>
         mermaid.initialize({ 
@@ -116,7 +116,7 @@ blockquote {
     <div class="container">
         <div class="content">
             <h1 id="change-impact-detection-system-requirements">Change Impact Detection System Requirements</h1>
-<p>This document defines the detailed requirements for the change impact detection algorithm and visualization in ReqFlow. It provides the technical specifications for implementing the concepts described in the Design Specification Document for Requirements Change Impact Propagation.</p>
+<p>This document defines the detailed requirements for the change impact detection algorithm and visualization in Reqvire. It provides the technical specifications for implementing the concepts described in the Design Specification Document for Requirements Change Impact Propagation.</p>
 <h2 id="change-impact-detection-components">Change Impact Detection Components</h2>
 <div class="mermaid">graph LR;
   %% Graph styling
@@ -125,33 +125,33 @@ blockquote {
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  d17b0775f448b19b[&quot;Change Impact Detection Algorithm&quot;];
-  click d17b0775f448b19b &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/ChangeImpactPropagation.html#change-impact-detection-algorithm&quot;;
-  class d17b0775f448b19b requirement;
-  745439d5fc0154d1[&quot;../SpecificationsRequirements.md#requirements-change-propagation&quot;];
-  class 745439d5fc0154d1 requirement;
-  click 745439d5fc0154d1 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SpecificationsRequirements.html#requirements-change-propagation&quot;;
-  d17b0775f448b19b -.-&gt;|deriveReqT| 745439d5fc0154d1;
-  cc976e6bcded86e7[&quot;../../core/src/change_impact.rs&quot;];
-  class cc976e6bcded86e7 default;
-  click cc976e6bcded86e7 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/core/src/change_impact.rs&quot;;
-  cc976e6bcded86e7 --&gt;|satisfies| d17b0775f448b19b;
-  6e747b7f03732873[&quot;Change Impact Command Line Interface&quot;];
-  click 6e747b7f03732873 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/ChangeImpactPropagation.html#change-impact-command-line-interface&quot;;
-  class 6e747b7f03732873 requirement;
-  665b7456c9b61ded[&quot;CLI Change Impact Report Flag&quot;];
-  class 665b7456c9b61ded requirement;
-  click 665b7456c9b61ded &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#cli-change-impact-report-flag&quot;;
-  6e747b7f03732873 -.-&gt;|deriveReqT| 665b7456c9b61ded;
-  11ffc4632afd7c4c[&quot;../../cli/src/cli.rs&quot;];
-  class 11ffc4632afd7c4c default;
-  click 11ffc4632afd7c4c &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/cli/src/cli.rs&quot;;
-  11ffc4632afd7c4c --&gt;|satisfies| 6e747b7f03732873;
-  c23729cc550de84b[&quot;Change Impact Visualization&quot;];
-  click c23729cc550de84b &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/ChangeImpactPropagation.html#change-impact-visualization&quot;;
-  class c23729cc550de84b requirement;
-  c23729cc550de84b -.-&gt;|deriveReqT| 745439d5fc0154d1;
-  cc976e6bcded86e7 --&gt;|satisfies| c23729cc550de84b;
+  9e9a08e1333fd31[&quot;Change Impact Visualization&quot;];
+  click 9e9a08e1333fd31 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/ChangeImpactPropagation.html#change-impact-visualization&quot;;
+  class 9e9a08e1333fd31 requirement;
+  2d15970eff910dc2[&quot;../SpecificationsRequirements.md#requirements-change-propagation&quot;];
+  class 2d15970eff910dc2 requirement;
+  click 2d15970eff910dc2 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SpecificationsRequirements.html#requirements-change-propagation&quot;;
+  9e9a08e1333fd31 -.-&gt;|deriveReqT| 2d15970eff910dc2;
+  3a36b9f74d4d889b[&quot;../../core/src/change_impact.rs&quot;];
+  class 3a36b9f74d4d889b default;
+  click 3a36b9f74d4d889b &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/core/src/change_impact.rs&quot;;
+  3a36b9f74d4d889b --&gt;|satisfies| 9e9a08e1333fd31;
+  7cc5e857c8078367[&quot;Change Impact Command Line Interface&quot;];
+  click 7cc5e857c8078367 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/ChangeImpactPropagation.html#change-impact-command-line-interface&quot;;
+  class 7cc5e857c8078367 requirement;
+  9a465de9fd86cbf3[&quot;CLI Change Impact Report Flag&quot;];
+  class 9a465de9fd86cbf3 requirement;
+  click 9a465de9fd86cbf3 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#cli-change-impact-report-flag&quot;;
+  7cc5e857c8078367 -.-&gt;|deriveReqT| 9a465de9fd86cbf3;
+  5fe26772336463bc[&quot;../../cli/src/cli.rs&quot;];
+  class 5fe26772336463bc default;
+  click 5fe26772336463bc &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/cli/src/cli.rs&quot;;
+  5fe26772336463bc --&gt;|satisfies| 7cc5e857c8078367;
+  9967e71248da3061[&quot;Change Impact Detection Algorithm&quot;];
+  click 9967e71248da3061 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/ChangeImpactPropagation.html#change-impact-detection-algorithm&quot;;
+  class 9967e71248da3061 requirement;
+  9967e71248da3061 -.-&gt;|deriveReqT| 2d15970eff910dc2;
+  3a36b9f74d4d889b --&gt;|satisfies| 9967e71248da3061;
 </div>
 <hr />
 <h3 id="change-impact-detection-algorithm">Change Impact Detection Algorithm</h3>

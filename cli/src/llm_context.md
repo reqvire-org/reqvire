@@ -1,10 +1,10 @@
-# ReqFlow for LLM Context
+# Reqvire for LLM Context
 
-This document provides essential context for Large Language Models (LLMs) to understand and work effectively with ReqFlow-based specifications and requirements management.
+This document provides essential context for Large Language Models (LLMs) to understand and work effectively with Reqvire-based specifications and requirements management.
 
-## What is ReqFlow?
+## What is Reqvire?
 
-ReqFlow is a methodology and toolset for Model-Based Systems Engineering (MBSE) that uses Markdown as the primary format for requirements documentation and traceability. It enables:
+Reqvire is a methodology and toolset for Model-Based Systems Engineering (MBSE) that uses Markdown as the primary format for requirements documentation and traceability. It enables:
 
 - Requirements management in human-readable Markdown
 - Relationship tracing between requirements and other artifacts
@@ -18,7 +18,7 @@ ReqFlow is a methodology and toolset for Model-Based Systems Engineering (MBSE) 
 
 ### Elements
 
-- An **Element** is the fundamental unit in ReqFlow, defined by a `###` header in Markdown
+- An **Element** is the fundamental unit in Reqvire, defined by a `###` header in Markdown
 - Elements must have unique names within a document
 - Element content includes everything under the header until the next element or end of document
 - Example:
@@ -77,7 +77,7 @@ ReqFlow is a methodology and toolset for Model-Based Systems Engineering (MBSE) 
 
 ## Document Structure
 
-A typical ReqFlow document follows this structure:
+A typical Reqvire document follows this structure:
 
 1. **Document title** (`# Title`)
 2. **Optional overview sections** (`## Section`)
@@ -118,9 +118,9 @@ The system shall implement capability Y.
 Additional details about Requirement Two implementation.
 ```
 
-## ReqFlow CLI Operations
+## Reqvire CLI Operations
 
-The ReqFlow CLI tool provides various operations:
+The Reqvire CLI tool provides various operations:
 
 - **Validation**: Check structure and relationships for errors
   - `cargo run -- validate`
@@ -146,7 +146,7 @@ The ReqFlow CLI tool provides various operations:
 
 ## Configuration Options
 
-ReqFlow supports configuration via YAML files:
+Reqvire supports configuration via YAML files:
 
 ```yaml
 general:
@@ -166,7 +166,7 @@ validation:
 
 ## Change Impact Analysis
 
-ReqFlow analyzes how changes propagate through the requirement hierarchy:
+Reqvire analyzes how changes propagate through the requirement hierarchy:
 
 - **Upward Propagation**: Changes flow up to parent/dependent elements
   - Affected by: derivedFrom, containedBy relations
@@ -185,7 +185,7 @@ ReqFlow analyzes how changes propagate through the requirement hierarchy:
 
 ## Diagrams and Visualization
 
-ReqFlow generates Mermaid diagrams to visualize requirement relationships:
+Reqvire generates Mermaid diagrams to visualize requirement relationships:
 
 - **Node Types**:
   - Red nodes: Requirements
@@ -207,7 +207,7 @@ graph TD
 
 ## Validation and Linting
 
-ReqFlow performs multiple types of validation and linting:
+Reqvire performs multiple types of validation and linting:
 
 ### Validation (Structural Errors)
 - Unique element names within documents
@@ -224,7 +224,7 @@ ReqFlow performs multiple types of validation and linting:
 - Inserting separator lines between elements
 - Ensuring consistent indentation in relation lists
 
-## Best Practices for Working with ReqFlow
+## Best Practices for Working with Reqvire
 
 1. **Element Naming**:
    - Make names unique and descriptive
@@ -250,7 +250,7 @@ ReqFlow performs multiple types of validation and linting:
    - Review impacted elements when making changes
    - Update verification artifacts when requirements change
 
-## Tips for LLMs Working with ReqFlow
+## Tips for LLMs Working with Reqvire
 
 1. When creating requirements, always follow the exact format shown above
 

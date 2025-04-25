@@ -5,7 +5,7 @@ use std::path::{ PathBuf,Path};
 use log::{debug};
 use crate::element::Element;
 use crate::element_registry::ElementRegistry;
-use crate::error::ReqFlowError;
+use crate::error::ReqvireError;
 use crate::relation;
 use crate::relation::{get_parent_relation_types};
 use crate::element::ElementType;
@@ -43,7 +43,7 @@ impl ModelManager {
         specification_folder: &PathBuf, 
         external_folders: &[PathBuf],
         excluded_filename_patterns: &GlobSet
-    ) -> Result<Vec<ReqFlowError>, ReqFlowError> {
+    ) -> Result<Vec<ReqvireError>, ReqvireError> {
     
         let mut errors = Vec::new();
         
@@ -148,7 +148,7 @@ impl ModelManager {
 
    
     /// Validates relations for target existence and element type compatibility.
-    fn validate_relations(&self, excluded_filename_patterns: &GlobSet) -> Result<Vec<ReqFlowError>, ReqFlowError> {
+    fn validate_relations(&self, excluded_filename_patterns: &GlobSet) -> Result<Vec<ReqvireError>, ReqvireError> {
         log::debug!("Running relation validation...");
         let mut errors = Vec::new();
         let element_ids: Vec<String> = self.element_registry.elements.keys().cloned().collect();
@@ -173,8 +173,8 @@ impl ModelManager {
 
                         match self.element_registry.get_element(target_id) {
                             Err(_) => {
-                                // TODO: refactor this, it cannot really happen as it would be caught in parser with ReqFlowError::InvalidIdentifier
-                                errors.push(ReqFlowError::MissingRelationTarget(
+                                // TODO: refactor this, it cannot really happen as it would be caught in parser with ReqvireError::InvalidIdentifier
+                                errors.push(ReqvireError::MissingRelationTarget(
                                     format!("Element '{}' references missing target '{}'", source_element.identifier, target_id),
                                 ));
                             }
@@ -205,7 +205,7 @@ impl ModelManager {
         relation_type: &str,
         source_element: &crate::element::Element,
         target_element: &crate::element::Element
-    ) -> Option<crate::error::ReqFlowError> {
+    ) -> Option<crate::error::ReqvireError> {
         // Only validate relation types with element type restrictions
         if let Some(expected_types) = relation::get_relation_element_type_description(relation_type) {
             // Check if the element types are compatible
@@ -216,7 +216,7 @@ impl ModelManager {
             );
         
             if !is_valid {
-                return Some(crate::error::ReqFlowError::IncompatibleElementTypes(
+                return Some(crate::error::ReqvireError::IncompatibleElementTypes(
                     format!("Relation '{}' from '{}' ({:?}) to '{}' ({:?}) has incompatible element types. {}",
                         relation_type,
                         source_element.identifier,
@@ -233,7 +233,7 @@ impl ModelManager {
     }
     
     /// Validates cross-component dependencies for circular dependencies and missing links.
-    fn validate_cross_component_dependencies(&self) -> Result<Vec<ReqFlowError>, ReqFlowError> {
+    fn validate_cross_component_dependencies(&self) -> Result<Vec<ReqvireError>, ReqvireError> {
         debug!("Validating cross-component dependencies...");
         let mut errors = Vec::new();
         let mut visited = HashSet::new();
@@ -260,7 +260,7 @@ impl ModelManager {
                             .any(|r| valid_parent_relations.contains(&r.relation_type.name));
 
                         if !has_parent_relation {
-                            errors.push(ReqFlowError::MissingParentRelation(
+                            errors.push(ReqvireError::MissingParentRelation(
                                 format!("File {}: Element '{}' has no parent relation (needs one of: {:?})", element_file,element.name, valid_parent_relations),
                             ));
                     
@@ -290,7 +290,7 @@ impl ModelManager {
         element: &Element,
         visited: &mut HashSet<String>,
         path: &mut Vec<String>,
-        errors: &mut Vec<ReqFlowError>,
+        errors: &mut Vec<ReqvireError>,
     ) {
         let element_id = element.identifier.clone();
 
@@ -302,7 +302,7 @@ impl ModelManager {
         // If the current path already contains this element, we've found a cycle.
         if let Some(pos) = path.iter().position(|id| id == &element_id) {
             let cycle = path[pos..].join(" -> ");
-            errors.push(ReqFlowError::CircularDependencyError(
+            errors.push(ReqvireError::CircularDependencyError(
                 format!("{}", cycle),
             ));
             return;
@@ -335,7 +335,7 @@ impl ModelManager {
         specification_folder: &PathBuf, 
         external_folders: &[PathBuf],        
         diagram_direction: &str
-    ) -> Result<(), ReqFlowError> {
+    ) -> Result<(), ReqvireError> {
         
         // Generate diagrams by section
         let diagrams = diagrams::generate_diagrams_by_section(&self.element_registry, diagram_direction, specification_folder, external_folders)?;
@@ -443,7 +443,7 @@ mod tests {
     use super::*;
     use std::path::PathBuf;
     use globset::{Glob, GlobSet, GlobSetBuilder};
-    use crate::error::ReqFlowError;
+    use crate::error::ReqvireError;
     use crate::element_registry::ElementRegistry;
     use crate::linting::LintFix;
     // Dummy implementation of utils::normalize_fragment for testing.

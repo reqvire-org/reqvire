@@ -11,46 +11,46 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  be60a8af7372ee0a["Traceability Matrix Generation Test"];
-  click be60a8af7372ee0a "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/specifications/Verifications/TreacibilityMatrix.md#traceability-matrix-generation-test";
-  class be60a8af7372ee0a verification;
-  6c01a7a878176f8e["SystemRequirements/Requirements.md/Traceability Matrix Builder Implementation"];
-  class 6c01a7a878176f8e requirement;
-  click 6c01a7a878176f8e "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/specifications/SystemRequirements/Requirements.md#traceability-matrix-builder-implementation";
-  be60a8af7372ee0a -.->|verifies| 6c01a7a878176f8e;
-  8181b96245658ae6["tests/test-matrix-generation/test.sh"];
-  class 8181b96245658ae6 default;
-  click 8181b96245658ae6 "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/tests/test-matrix-generation/test.sh";
-  be60a8af7372ee0a -.->|trace| 8181b96245658ae6;
-  249c48bdb655f789["SVG Matrix Output Test"];
-  click 249c48bdb655f789 "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/specifications/Verifications/TreacibilityMatrix.md#svg-matrix-output-test";
-  class 249c48bdb655f789 verification;
-  3900a99fdbd871ae["SystemRequirements/Requirements.md/CLI Traces SVG Flag"];
-  class 3900a99fdbd871ae requirement;
-  click 3900a99fdbd871ae "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/specifications/SystemRequirements/Requirements.md#cli-traces-svg-flag";
-  249c48bdb655f789 -.->|verifies| 3900a99fdbd871ae;
-  249c48bdb655f789 -.->|trace| 8181b96245658ae6;
-  14181eb60a73ef7c["Hierarchical Matrix Format Test"];
-  click 14181eb60a73ef7c "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/specifications/Verifications/TreacibilityMatrix.md#hierarchical-matrix-format-test";
-  class 14181eb60a73ef7c verification;
-  14181eb60a73ef7c -.->|verifies| 6c01a7a878176f8e;
-  14181eb60a73ef7c -.->|trace| 8181b96245658ae6;
-  7582e06e915deadc["JSON Matrix Output Test"];
-  click 7582e06e915deadc "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/specifications/Verifications/TreacibilityMatrix.md#json-matrix-output-test";
-  class 7582e06e915deadc verification;
-  6deadc5fd3fd1500["SystemRequirements/Requirements.md/Markdown Matrix Formatter"];
-  class 6deadc5fd3fd1500 requirement;
-  click 6deadc5fd3fd1500 "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/specifications/SystemRequirements/Requirements.md#markdown-matrix-formatter";
-  7582e06e915deadc -.->|verifies| 6deadc5fd3fd1500;
-  7582e06e915deadc -.->|trace| 8181b96245658ae6;
-  b34b1cd71d53a29["CLI Traces Flag Test"];
-  click b34b1cd71d53a29 "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/specifications/Verifications/TreacibilityMatrix.md#cli-traces-flag-test";
-  class b34b1cd71d53a29 verification;
-  99fe584a54368e2c["SystemRequirements/Requirements.md/CLI Traces Flag"];
-  class 99fe584a54368e2c requirement;
-  click 99fe584a54368e2c "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/specifications/SystemRequirements/Requirements.md#cli-traces-flag";
-  b34b1cd71d53a29 -.->|verifies| 99fe584a54368e2c;
-  b34b1cd71d53a29 -.->|trace| 8181b96245658ae6;
+  65bd55d10ced4a8b["CLI Traces Flag Test"];
+  click 65bd55d10ced4a8b "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/specifications/Verifications/TreacibilityMatrix.md#cli-traces-flag-test";
+  class 65bd55d10ced4a8b verification;
+  7a56a2d0b94cbc94["SystemRequirements/Requirements.md/CLI Traces Flag"];
+  class 7a56a2d0b94cbc94 requirement;
+  click 7a56a2d0b94cbc94 "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/specifications/SystemRequirements/Requirements.md#cli-traces-flag";
+  65bd55d10ced4a8b -.->|verifies| 7a56a2d0b94cbc94;
+  988a07cc071682f["tests/test-matrix-generation/test.sh"];
+  class 988a07cc071682f default;
+  click 988a07cc071682f "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/tests/test-matrix-generation/test.sh";
+  65bd55d10ced4a8b -.->|trace| 988a07cc071682f;
+  b5e175e55675e4e0["SVG Matrix Output Test"];
+  click b5e175e55675e4e0 "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/specifications/Verifications/TreacibilityMatrix.md#svg-matrix-output-test";
+  class b5e175e55675e4e0 verification;
+  dae7b02b70487825["SystemRequirements/Requirements.md/CLI Traces SVG Flag"];
+  class dae7b02b70487825 requirement;
+  click dae7b02b70487825 "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/specifications/SystemRequirements/Requirements.md#cli-traces-svg-flag";
+  b5e175e55675e4e0 -.->|verifies| dae7b02b70487825;
+  b5e175e55675e4e0 -.->|trace| 988a07cc071682f;
+  27f70f564e0e2fd4["Hierarchical Matrix Format Test"];
+  click 27f70f564e0e2fd4 "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/specifications/Verifications/TreacibilityMatrix.md#hierarchical-matrix-format-test";
+  class 27f70f564e0e2fd4 verification;
+  c82329bbc603aed3["SystemRequirements/Requirements.md/Traceability Matrix Builder Implementation"];
+  class c82329bbc603aed3 requirement;
+  click c82329bbc603aed3 "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/specifications/SystemRequirements/Requirements.md#traceability-matrix-builder-implementation";
+  27f70f564e0e2fd4 -.->|verifies| c82329bbc603aed3;
+  27f70f564e0e2fd4 -.->|trace| 988a07cc071682f;
+  f0c169a208a18a21["Traceability Matrix Generation Test"];
+  click f0c169a208a18a21 "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/specifications/Verifications/TreacibilityMatrix.md#traceability-matrix-generation-test";
+  class f0c169a208a18a21 verification;
+  f0c169a208a18a21 -.->|verifies| c82329bbc603aed3;
+  f0c169a208a18a21 -.->|trace| 988a07cc071682f;
+  507095e89d9991de["JSON Matrix Output Test"];
+  click 507095e89d9991de "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/specifications/Verifications/TreacibilityMatrix.md#json-matrix-output-test";
+  class 507095e89d9991de verification;
+  a06aa9bb2311c8b3["SystemRequirements/Requirements.md/Markdown Matrix Formatter"];
+  class a06aa9bb2311c8b3 requirement;
+  click a06aa9bb2311c8b3 "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/specifications/SystemRequirements/Requirements.md#markdown-matrix-formatter";
+  507095e89d9991de -.->|verifies| a06aa9bb2311c8b3;
+  507095e89d9991de -.->|trace| 988a07cc071682f;
 ```
 
 ---
@@ -78,7 +78,7 @@ This test verifies that the system can generate a traceability matrix that accur
 - Matrix follows the specified format with proper table structure
 
 ##### Test Procedure
-1. Run ReqFlow with the `--traces` flag
+1. Run Reqvire with the `--traces` flag
 2. Verify the output contains a properly formatted markdown table
 3. Check for the presence of hierarchy indicators (↳, __↳, etc.)
 4. Verify the presence of verification status indicators (✅/❌)
@@ -111,7 +111,7 @@ This test verifies that the system provides a command-line flag for generating t
 - Help text includes documentation for the `--traces` flag
 
 ##### Test Procedure
-1. Run ReqFlow with the `--traces` flag
+1. Run Reqvire with the `--traces` flag
 2. Verify the command executes without errors
 3. Verify that a traceability matrix is generated in markdown format
 4. Check that the command's help text includes information about the `--traces` flag
@@ -145,7 +145,7 @@ This test verifies that the system can generate an SVG representation of the tra
 - Verification status is clearly indicated
 
 ##### Test Procedure
-1. Run ReqFlow with the `--traces --svg` flags
+1. Run Reqvire with the `--traces --svg` flags
 2. Verify that a valid SVG document is generated
 3. Check that the SVG includes full element names without truncation
 4. Verify that hierarchical structure is preserved with appropriate indentation
@@ -178,7 +178,7 @@ This test verifies that the traceability matrix properly represents the hierarch
 - Requirements are grouped by their root requirements
 
 ##### Test Procedure
-1. Run ReqFlow with the `--traces` flag
+1. Run Reqvire with the `--traces` flag
 2. Verify that requirements are organized hierarchically
 3. Check that child requirements are indented with appropriate symbols
 4. Verify that requirements are grouped by their root requirements
@@ -212,7 +212,7 @@ This test verifies that the system can export the traceability matrix in a struc
 - Element identifiers use relative paths
 
 ##### Test Procedure
-1. Run ReqFlow with the `--traces --json` flags
+1. Run Reqvire with the `--traces --json` flags
 2. Verify that valid JSON is generated
 3. Check that the JSON includes all required sections (metadata, sources, targets, matrix, verificationStatus)
 4. Verify that hierarchical relationships are preserved

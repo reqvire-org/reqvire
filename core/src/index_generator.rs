@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use crate::element_registry::ElementRegistry;
 use crate::element::Element;
 use crate::filesystem::write_file; 
-use crate::error::ReqFlowError;
+use crate::error::ReqvireError;
 use crate::utils;
 
 
@@ -12,7 +12,7 @@ pub fn generate_readme_index(
     registry: &ElementRegistry,
     specification_folder: &PathBuf,
     external_folders: &[PathBuf],        
-) -> Result<String, ReqFlowError> {
+) -> Result<String, ReqvireError> {
     let mut readme_content = String::from("# Specification Index\n\n");
 
     // Group elements by file and section

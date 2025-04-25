@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 use std::env;
 use globset::{Glob, GlobSet, GlobSetBuilder};
  
-/// Configuration settings for the ReqFlow application
+/// Configuration settings for the Reqvire application
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Config {
     #[serde(default)]
@@ -163,10 +163,10 @@ impl Config {
     /// Find and load the configuration file
     pub fn load() -> Self {
         let config_paths = [
-            "reqflow.yml",
-            "reqflow.yaml",
-            ".reqflow.yaml",
-            ".reqflow.yml",                                    
+            "reqvire.yml",
+            "reqvire.yaml",
+            ".reqvire.yaml",
+            ".reqvire.yml",                                    
         ];
         
         let mut config = None;
@@ -306,7 +306,7 @@ blockquote {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{title}</title>
     {styles}
-    <!-- Enhanced mermaid configuration for ReqFlow diagrams -->
+    <!-- Enhanced mermaid configuration for Reqvire diagrams -->
     <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
     <script>
         mermaid.initialize({ 
@@ -367,7 +367,7 @@ mod config_tests {
     fn test_load_from_yaml() {
         // Create a temporary directory for our test config
         let temp_dir = tempdir().unwrap();
-        let config_path = temp_dir.path().join("reqflow.yml");
+        let config_path = temp_dir.path().join("reqvire.yml");
         
         // Create a test YAML configuration
         let yaml_content = r#"

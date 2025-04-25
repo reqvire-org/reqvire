@@ -18,8 +18,8 @@
 # Create output directory if it doesn't exist
 mkdir -p "${TEST_DIR}/output"
 
-# Run reqflow with --generate-index flag
-OUTPUT=$(cd "$TEST_DIR" && "$REQFLOW_BIN" --config "${TEST_DIR}/reqflow.yaml" --generate-index 2>&1)
+# Run reqvire with --generate-index flag
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" --generate-index 2>&1)
 EXIT_CODE=$?
 
 # Save output for inspection

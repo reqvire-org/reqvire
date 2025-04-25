@@ -96,7 +96,7 @@ blockquote {
 }
 </style>
 
-    <!-- Enhanced mermaid configuration for ReqFlow diagrams -->
+    <!-- Enhanced mermaid configuration for Reqvire diagrams -->
     <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
     <script>
         mermaid.initialize({ 
@@ -116,7 +116,7 @@ blockquote {
     <div class="container">
         <div class="content">
             <h1 id="diagram-tests">Diagram Tests</h1>
-<p>This document verifies the requirements for ReqFlow’s diagram generation functionality.</p>
+<p>This document verifies the requirements for Reqvire’s diagram generation functionality.</p>
 <h2 id="diagram-generation-tests">Diagram Generation Tests</h2>
 <div class="mermaid">graph LR;
   %% Graph styling
@@ -125,68 +125,68 @@ blockquote {
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  de2dada38a93e772[&quot;Highlight Changes in Diagrams Verification&quot;];
-  click de2dada38a93e772 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/Verifications/DiagramsTests.html#highlight-changes-in-diagrams-verification&quot;;
-  class de2dada38a93e772 verification;
-  fd7388e379372d7b[&quot;UserRequirements.md/Highlight Changes in Diagrams&quot;];
-  class fd7388e379372d7b requirement;
-  click fd7388e379372d7b &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#highlight-changes-in-diagrams&quot;;
-  de2dada38a93e772 -.-&gt;|verifies| fd7388e379372d7b;
-  2dd8375bf8ece1f6[&quot;tests/test-diagram-generation/test.sh&quot;];
-  class 2dd8375bf8ece1f6 default;
-  click 2dd8375bf8ece1f6 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/tests/test-diagram-generation/test.sh&quot;;
-  de2dada38a93e772 -.-&gt;|trace| 2dd8375bf8ece1f6;
-  732c08823f3f7056[&quot;Filter Relationships by Type Verification&quot;];
-  click 732c08823f3f7056 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/Verifications/DiagramsTests.html#filter-relationships-by-type-verification&quot;;
-  class 732c08823f3f7056 verification;
-  30d97803eba68a13[&quot;UserRequirements.md/Filter Relationships by Type&quot;];
-  class 30d97803eba68a13 requirement;
-  click 30d97803eba68a13 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#filter-relationships-by-type&quot;;
-  732c08823f3f7056 -.-&gt;|verifies| 30d97803eba68a13;
-  732c08823f3f7056 -.-&gt;|trace| 2dd8375bf8ece1f6;
-  2f7223b3574da08d[&quot;Diagram Storage Verification&quot;];
-  click 2f7223b3574da08d &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/Verifications/DiagramsTests.html#diagram-storage-verification&quot;;
-  class 2f7223b3574da08d verification;
-  aee397f35b867556[&quot;UserRequirements.md/Store Automated Diagrams in Designated Locations&quot;];
-  class aee397f35b867556 requirement;
-  click aee397f35b867556 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#store-automated-diagrams-in-designated-locations&quot;;
-  2f7223b3574da08d -.-&gt;|verifies| aee397f35b867556;
-  2f7223b3574da08d -.-&gt;|trace| 2dd8375bf8ece1f6;
-  b59eae4e310ddae5[&quot;Export Diagrams Verification&quot;];
-  click b59eae4e310ddae5 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/Verifications/DiagramsTests.html#export-diagrams-verification&quot;;
-  class b59eae4e310ddae5 verification;
-  10c00a1bd12fefa5[&quot;UserRequirements.md/Export Diagrams in Standard Formats&quot;];
-  class 10c00a1bd12fefa5 requirement;
-  click 10c00a1bd12fefa5 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#export-diagrams-in-standard-formats&quot;;
-  b59eae4e310ddae5 -.-&gt;|verifies| 10c00a1bd12fefa5;
-  b59eae4e310ddae5 -.-&gt;|trace| 2dd8375bf8ece1f6;
-  edfca08d368123d1[&quot;Visualize Model Relationships Verification&quot;];
-  click edfca08d368123d1 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/Verifications/DiagramsTests.html#visualize-model-relationships-verification&quot;;
-  class edfca08d368123d1 verification;
-  a6a836283607bf45[&quot;UserRequirements.md/Visualize Model Relationships&quot;];
-  class a6a836283607bf45 requirement;
-  click a6a836283607bf45 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#visualize-model-relationships&quot;;
-  edfca08d368123d1 -.-&gt;|verifies| a6a836283607bf45;
-  edfca08d368123d1 -.-&gt;|trace| 2dd8375bf8ece1f6;
-  3721164cd8a1ab90[&quot;Automated Diagram Generation on PR Merge Verification&quot;];
-  click 3721164cd8a1ab90 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/Verifications/DiagramsTests.html#automated-diagram-generation-on-pr-merge-verification&quot;;
-  class 3721164cd8a1ab90 verification;
-  f2a7d0df128bcf98[&quot;SystemRequirements/Requirements.md/Automated Diagram Generation on PR Merge&quot;];
-  class f2a7d0df128bcf98 requirement;
-  click f2a7d0df128bcf98 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#automated-diagram-generation-on-pr-merge&quot;;
-  3721164cd8a1ab90 -.-&gt;|verifies| f2a7d0df128bcf98;
-  d062860f47933799[&quot;.github/workflows/generate_diagrams.yml&quot;];
-  class d062860f47933799 default;
-  click d062860f47933799 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/.github/workflows/generate_diagrams.yml&quot;;
-  3721164cd8a1ab90 -.-&gt;|trace| d062860f47933799;
-  b95c73d7b3c5e7ac[&quot;Diagram Generation Test&quot;];
-  click b95c73d7b3c5e7ac &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/Verifications/DiagramsTests.html#diagram-generation-test&quot;;
-  class b95c73d7b3c5e7ac verification;
-  81f9235dedaea6a9[&quot;UserRequirements.md/Automate Diagram Generation&quot;];
-  class 81f9235dedaea6a9 requirement;
-  click 81f9235dedaea6a9 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#automate-diagram-generation&quot;;
-  b95c73d7b3c5e7ac -.-&gt;|verifies| 81f9235dedaea6a9;
-  b95c73d7b3c5e7ac -.-&gt;|trace| 2dd8375bf8ece1f6;
+  e680d84fe87126e9[&quot;Export Diagrams Verification&quot;];
+  click e680d84fe87126e9 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/Verifications/DiagramsTests.html#export-diagrams-verification&quot;;
+  class e680d84fe87126e9 verification;
+  ff7932724ee600f1[&quot;UserRequirements.md/Export Diagrams in Standard Formats&quot;];
+  class ff7932724ee600f1 requirement;
+  click ff7932724ee600f1 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/UserRequirements.html#export-diagrams-in-standard-formats&quot;;
+  e680d84fe87126e9 -.-&gt;|verifies| ff7932724ee600f1;
+  b296432506bb8be[&quot;tests/test-diagram-generation/test.sh&quot;];
+  class b296432506bb8be default;
+  click b296432506bb8be &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/tests/test-diagram-generation/test.sh&quot;;
+  e680d84fe87126e9 -.-&gt;|trace| b296432506bb8be;
+  f2df5cda6c7588de[&quot;Filter Relationships by Type Verification&quot;];
+  click f2df5cda6c7588de &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/Verifications/DiagramsTests.html#filter-relationships-by-type-verification&quot;;
+  class f2df5cda6c7588de verification;
+  f3450185979ff229[&quot;UserRequirements.md/Filter Relationships by Type&quot;];
+  class f3450185979ff229 requirement;
+  click f3450185979ff229 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/UserRequirements.html#filter-relationships-by-type&quot;;
+  f2df5cda6c7588de -.-&gt;|verifies| f3450185979ff229;
+  f2df5cda6c7588de -.-&gt;|trace| b296432506bb8be;
+  bc88dca7d6d0492a[&quot;Diagram Storage Verification&quot;];
+  click bc88dca7d6d0492a &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/Verifications/DiagramsTests.html#diagram-storage-verification&quot;;
+  class bc88dca7d6d0492a verification;
+  9276544d5ee17790[&quot;UserRequirements.md/Store Automated Diagrams in Designated Locations&quot;];
+  class 9276544d5ee17790 requirement;
+  click 9276544d5ee17790 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/UserRequirements.html#store-automated-diagrams-in-designated-locations&quot;;
+  bc88dca7d6d0492a -.-&gt;|verifies| 9276544d5ee17790;
+  bc88dca7d6d0492a -.-&gt;|trace| b296432506bb8be;
+  6723e1748fa33d08[&quot;Automated Diagram Generation on PR Merge Verification&quot;];
+  click 6723e1748fa33d08 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/Verifications/DiagramsTests.html#automated-diagram-generation-on-pr-merge-verification&quot;;
+  class 6723e1748fa33d08 verification;
+  273cce972e603178[&quot;SystemRequirements/Requirements.md/Automated Diagram Generation on PR Merge&quot;];
+  class 273cce972e603178 requirement;
+  click 273cce972e603178 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#automated-diagram-generation-on-pr-merge&quot;;
+  6723e1748fa33d08 -.-&gt;|verifies| 273cce972e603178;
+  6699836c9fa45af6[&quot;.github/workflows/generate_diagrams.yml&quot;];
+  class 6699836c9fa45af6 default;
+  click 6699836c9fa45af6 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/.github/workflows/generate_diagrams.yml&quot;;
+  6723e1748fa33d08 -.-&gt;|trace| 6699836c9fa45af6;
+  a8e581a16079b6a8[&quot;Diagram Generation Test&quot;];
+  click a8e581a16079b6a8 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/Verifications/DiagramsTests.html#diagram-generation-test&quot;;
+  class a8e581a16079b6a8 verification;
+  4d4dad9ce307fade[&quot;UserRequirements.md/Automate Diagram Generation&quot;];
+  class 4d4dad9ce307fade requirement;
+  click 4d4dad9ce307fade &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/UserRequirements.html#automate-diagram-generation&quot;;
+  a8e581a16079b6a8 -.-&gt;|verifies| 4d4dad9ce307fade;
+  a8e581a16079b6a8 -.-&gt;|trace| b296432506bb8be;
+  d11becf56f36d005[&quot;Visualize Model Relationships Verification&quot;];
+  click d11becf56f36d005 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/Verifications/DiagramsTests.html#visualize-model-relationships-verification&quot;;
+  class d11becf56f36d005 verification;
+  e98d18ae3a41815a[&quot;UserRequirements.md/Visualize Model Relationships&quot;];
+  class e98d18ae3a41815a requirement;
+  click e98d18ae3a41815a &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/UserRequirements.html#visualize-model-relationships&quot;;
+  d11becf56f36d005 -.-&gt;|verifies| e98d18ae3a41815a;
+  d11becf56f36d005 -.-&gt;|trace| b296432506bb8be;
+  327e94cd7ded2a7a[&quot;Highlight Changes in Diagrams Verification&quot;];
+  click 327e94cd7ded2a7a &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/Verifications/DiagramsTests.html#highlight-changes-in-diagrams-verification&quot;;
+  class 327e94cd7ded2a7a verification;
+  efa8bb8c8484bb40[&quot;UserRequirements.md/Highlight Changes in Diagrams&quot;];
+  class efa8bb8c8484bb40 requirement;
+  click efa8bb8c8484bb40 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/UserRequirements.html#highlight-changes-in-diagrams&quot;;
+  327e94cd7ded2a7a -.-&gt;|verifies| efa8bb8c8484bb40;
+  327e94cd7ded2a7a -.-&gt;|trace| b296432506bb8be;
 </div>
 <hr />
 <h3 id="diagram-generation-test">Diagram Generation Test</h3>
@@ -218,7 +218,7 @@ blockquote {
 <ol>
 <li>Create test fixtures in <code>/tests/test-diagram-generation/</code> with requirements containing various elements and relationships</li>
 <li>Create test fixtures that include custom mermaid diagrams to test preservation</li>
-<li>Run ReqFlow with the <code>--generate-diagrams</code> flag on the test fixtures</li>
+<li>Run Reqvire with the <code>--generate-diagrams</code> flag on the test fixtures</li>
 <li>Verify that mermaid diagrams are generated at the beginning of each file</li>
 <li>Verify that existing custom mermaid diagrams are preserved</li>
 <li>Verify diagram content accurately shows elements and relationships</li>

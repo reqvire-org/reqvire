@@ -1,6 +1,6 @@
 use anyhow::Result;
 use pulldown_cmark::{html, Options, Parser};
-use crate::error::ReqFlowError;
+use crate::error::ReqvireError;
 use std::path::PathBuf;
 use lazy_static::lazy_static;
 use regex::{Regex, Captures};
@@ -108,7 +108,7 @@ pub const HTML_TEMPLATE: &str = r#"
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{title}</title>
     {styles}
-    <!-- Enhanced mermaid configuration for ReqFlow diagrams -->
+    <!-- Enhanced mermaid configuration for Reqvire diagrams -->
     <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
     <script>
         mermaid.initialize({ 
@@ -141,7 +141,7 @@ pub fn convert_to_html(
     title: &str,
     specification_folder: &PathBuf,
     external_folders: &[PathBuf],   
-) -> Result<String, ReqFlowError> {
+) -> Result<String, ReqvireError> {
     // First, convert all Markdown links to use .html extension
     let markdown_content_with_html_links = convert_markdown_links_to_html(file_path,markdown_content,specification_folder,external_folders);
     
@@ -151,7 +151,7 @@ pub fn convert_to_html(
     options.insert(Options::ENABLE_FOOTNOTES);
     options.insert(Options::ENABLE_STRIKETHROUGH);
     options.insert(Options::ENABLE_TASKLISTS);
-    // These are important for ReqFlow diagrams and code blocks
+    // These are important for Reqvire diagrams and code blocks
     options.insert(Options::ENABLE_HEADING_ATTRIBUTES);
     options.insert(Options::ENABLE_SMART_PUNCTUATION);
     

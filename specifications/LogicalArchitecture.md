@@ -1,6 +1,6 @@
-# Logical Architecture for ReqFlow
+# Logical Architecture for Reqvire
 
-The Logical Architecture for ReqFlow defines the high-level functional organization of the tool, focusing on the main components that deliver its core functionalities. This architecture serves as the foundation for further refinement into physical architecture and system requirements.
+The Logical Architecture for Reqvire defines the high-level functional organization of the tool, focusing on the main components that deliver its core functionalities. This architecture serves as the foundation for further refinement into physical architecture and system requirements.
 
 ```mermaid
 classDiagram
@@ -128,7 +128,7 @@ classDiagram
 
 #### Integrations
   - The Integrations factiliates agile workflows while adhering to MBSE methodologies.
-  - It manages the connection between the ReqFlow tool and external systems like GitHub and CI/CD tools, ensuring that both human users and AI agents collaborate seamlessly in an agile environment.
+  - It manages the connection between the Reqvire tool and external systems like GitHub and CI/CD tools, ensuring that both human users and AI agents collaborate seamlessly in an agile environment.
   - This component facilitates smooth synchronization of model changes, pull request management, automated testing, and deployment, all while ensuring the integrity of the MBSE model and system development process.
 
 #### GitHubIntegration

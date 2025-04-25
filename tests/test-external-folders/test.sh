@@ -1,6 +1,6 @@
 #!/bin/bash
 
-OUTPUT=$(cd "$TEST_DIR" && "$REQFLOW_BIN" --config "${TEST_DIR}/reqflow-valid.yaml"  --validate 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire-valid.yaml"  --validate 2>&1)
 EXIT_CODE=$?
 
 
@@ -11,7 +11,7 @@ if [[ $EXIT_CODE -ne 0 ]]; then
     exit $EXIT_CODE
 fi
 
-OUTPUT=$(cd "$TEST_DIR" && "$REQFLOW_BIN" --config "${TEST_DIR}/reqflow-invalid.yaml"  --validate 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire-invalid.yaml"  --validate 2>&1)
 EXIT_CODE=$?
 
 printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"

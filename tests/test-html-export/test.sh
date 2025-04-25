@@ -21,7 +21,7 @@
 mkdir -p "${TEST_DIR}/output"
 
 # Generate HTML
-OUTPUT=$(cd "$TEST_DIR" && "$REQFLOW_BIN" --config "${TEST_DIR}/reqflow.yaml" --html 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" --html 2>&1)
 EXIT_CODE=$?
 
 # Save output for inspection

@@ -96,7 +96,7 @@ blockquote {
 }
 </style>
 
-    <!-- Enhanced mermaid configuration for ReqFlow diagrams -->
+    <!-- Enhanced mermaid configuration for Reqvire diagrams -->
     <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
     <script>
         mermaid.initialize({ 
@@ -116,7 +116,7 @@ blockquote {
     <div class="container">
         <div class="content">
             <h1 id="validation-tests">Validation Tests</h1>
-<p>This document verifies the requirements for ReqFlow’s validation functionality.</p>
+<p>This document verifies the requirements for Reqvire’s validation functionality.</p>
 <h2 id="relation-validation-tests">Relation Validation Tests</h2>
 <div class="mermaid">graph LR;
   %% Graph styling
@@ -125,95 +125,95 @@ blockquote {
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  81fcf8160ea0df81[&quot;Same-File Fragment Relations Test&quot;];
-  click 81fcf8160ea0df81 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/Verifications/ValidationTests.html#same-file-fragment-relations-test&quot;;
-  class 81fcf8160ea0df81 verification;
-  5870488e00ee4f36[&quot;SystemRequirements/Requirements.md#Relation Type Validation&quot;];
-  class 5870488e00ee4f36 requirement;
-  click 5870488e00ee4f36 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#relation-type-validation&quot;;
-  81fcf8160ea0df81 -.-&gt;|verifies| 5870488e00ee4f36;
-  99bed90a0d96a1d2[&quot;SystemRequirements/Requirements.md#Requirements Processing&quot;];
-  class 99bed90a0d96a1d2 requirement;
-  click 99bed90a0d96a1d2 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#requirements-processing&quot;;
-  81fcf8160ea0df81 -.-&gt;|verifies| 99bed90a0d96a1d2;
-  378d6845d49fb198[&quot;tests/test-fragment-relations/test.sh&quot;];
-  class 378d6845d49fb198 default;
-  click 378d6845d49fb198 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/tests/test-fragment-relations/test.sh&quot;;
-  81fcf8160ea0df81 -.-&gt;|trace| 378d6845d49fb198;
-  a137be8592e82aff[&quot;Requirements Files Search and Detection Test&quot;];
-  click a137be8592e82aff &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/Verifications/ValidationTests.html#requirements-files-search-and-detection-test&quot;;
-  class a137be8592e82aff verification;
-  2737f2d770aa0757[&quot;SystemRequirements/Requirements.md#requirements-files-search-and-detection&quot;];
-  class 2737f2d770aa0757 requirement;
-  click 2737f2d770aa0757 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#requirements-files-search-and-detection&quot;;
-  a137be8592e82aff -.-&gt;|verifies| 2737f2d770aa0757;
-  79ca606f26bdd145[&quot;tests/test-excluded-patterns/test.sh&quot;];
-  class 79ca606f26bdd145 default;
-  click 79ca606f26bdd145 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/tests/test-excluded-patterns/test.sh&quot;;
-  a137be8592e82aff -.-&gt;|trace| 79ca606f26bdd145;
-  adacd7f753c51b26[&quot;Unstructured Documents Test&quot;];
-  click adacd7f753c51b26 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/Verifications/ValidationTests.html#unstructured-documents-test&quot;;
-  class adacd7f753c51b26 verification;
-  5a1719a2649b9922[&quot;SystemRequirements/Requirements.md#unstructured-documents&quot;];
-  class 5a1719a2649b9922 requirement;
-  click 5a1719a2649b9922 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#unstructured-documents&quot;;
-  adacd7f753c51b26 -.-&gt;|verifies| 5a1719a2649b9922;
-  eb7d924dd7a53c67[&quot;tests/test-valid-relations/test.sh&quot;];
-  class eb7d924dd7a53c67 default;
-  click eb7d924dd7a53c67 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/tests/test-valid-relations/test.sh&quot;;
-  adacd7f753c51b26 -.-&gt;|trace| eb7d924dd7a53c67;
-  ca085e075bbce0cc[&quot;Excluded File Relation Validation Test&quot;];
-  click ca085e075bbce0cc &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/Verifications/ValidationTests.html#excluded-file-relation-validation-test&quot;;
-  class ca085e075bbce0cc verification;
-  c5c85bedd1cf11e6[&quot;SystemRequirements/Requirements.md#excluded-file-relation-validation&quot;];
-  class c5c85bedd1cf11e6 requirement;
-  click c5c85bedd1cf11e6 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#excluded-file-relation-validation&quot;;
-  ca085e075bbce0cc -.-&gt;|verifies| c5c85bedd1cf11e6;
-  ca085e075bbce0cc -.-&gt;|trace| 79ca606f26bdd145;
-  fbf9362574b057dd[&quot;Invalid Relations Test&quot;];
-  click fbf9362574b057dd &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/Verifications/ValidationTests.html#invalid-relations-test&quot;;
-  class fbf9362574b057dd verification;
-  bdfd9d65e46117e7[&quot;SystemRequirements/Requirement.md/Detailed Error Handling and Logging&quot;];
-  class bdfd9d65e46117e7 requirement;
-  click bdfd9d65e46117e7 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#detailed-error-handling-and-logging&quot;;
-  fbf9362574b057dd -.-&gt;|verifies| bdfd9d65e46117e7;
-  fbf9362574b057dd -.-&gt;|verifies| 5870488e00ee4f36;
-  212d1317cd2b25fc[&quot;SystemRequirements/Requirement.md/Relation Element Type Validator&quot;];
-  class 212d1317cd2b25fc requirement;
-  click 212d1317cd2b25fc &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#relation-element-type-validator&quot;;
-  fbf9362574b057dd -.-&gt;|verifies| 212d1317cd2b25fc;
-  7b1772417b3ad5e[&quot;UserRequirements.md/Validate Markdown Structure&quot;];
-  class 7b1772417b3ad5e requirement;
-  click 7b1772417b3ad5e &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#validate-markdown-structure&quot;;
-  fbf9362574b057dd -.-&gt;|verifies| 7b1772417b3ad5e;
-  9e524ac696c43a26[&quot;UserRequirements.md/Validate Internal Consistency&quot;];
-  class 9e524ac696c43a26 requirement;
-  click 9e524ac696c43a26 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#validate-internal-consistency&quot;;
-  fbf9362574b057dd -.-&gt;|verifies| 9e524ac696c43a26;
-  6e40bf9f83a718fa[&quot;UserRequirements.md/Validate Cross-Component Dependencies&quot;];
-  class 6e40bf9f83a718fa requirement;
-  click 6e40bf9f83a718fa &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#validate-cross-component-dependencies&quot;;
-  fbf9362574b057dd -.-&gt;|verifies| 6e40bf9f83a718fa;
-  482c757913204fb8[&quot;UserRequirements.md/Provide Validation Reports&quot;];
-  class 482c757913204fb8 requirement;
-  click 482c757913204fb8 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#provide-validation-reports&quot;;
-  fbf9362574b057dd -.-&gt;|verifies| 482c757913204fb8;
-  c86fd6ece7a8668a[&quot;tests/test-invalid-relations/test.sh&quot;];
-  class c86fd6ece7a8668a default;
-  click c86fd6ece7a8668a &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/tests/test-invalid-relations/test.sh&quot;;
-  fbf9362574b057dd -.-&gt;|trace| c86fd6ece7a8668a;
-  20da68187f546235[&quot;JSON Output Format Test&quot;];
-  click 20da68187f546235 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/Verifications/ValidationTests.html#json-output-format-test&quot;;
-  class 20da68187f546235 verification;
-  5ec6a2668bddf0e[&quot;SystemRequirements/Requirements.md#json-output-format&quot;];
-  class 5ec6a2668bddf0e requirement;
-  click 5ec6a2668bddf0e &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#json-output-format&quot;;
-  20da68187f546235 -.-&gt;|verifies| 5ec6a2668bddf0e;
-  20da68187f546235 -.-&gt;|trace| c86fd6ece7a8668a;
+  3c58f74cf3262214[&quot;JSON Output Format Test&quot;];
+  click 3c58f74cf3262214 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/Verifications/ValidationTests.html#json-output-format-test&quot;;
+  class 3c58f74cf3262214 verification;
+  34955d64b2f2498a[&quot;SystemRequirements/Requirements.md#json-output-format&quot;];
+  class 34955d64b2f2498a requirement;
+  click 34955d64b2f2498a &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#json-output-format&quot;;
+  3c58f74cf3262214 -.-&gt;|verifies| 34955d64b2f2498a;
+  dcd79d89b13530ad[&quot;tests/test-invalid-relations/test.sh&quot;];
+  class dcd79d89b13530ad default;
+  click dcd79d89b13530ad &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/tests/test-invalid-relations/test.sh&quot;;
+  3c58f74cf3262214 -.-&gt;|trace| dcd79d89b13530ad;
+  38657421ae86147b[&quot;Same-File Fragment Relations Test&quot;];
+  click 38657421ae86147b &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/Verifications/ValidationTests.html#same-file-fragment-relations-test&quot;;
+  class 38657421ae86147b verification;
+  5c3a18f061fe0b18[&quot;SystemRequirements/Requirements.md#Relation Type Validation&quot;];
+  class 5c3a18f061fe0b18 requirement;
+  click 5c3a18f061fe0b18 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#relation-type-validation&quot;;
+  38657421ae86147b -.-&gt;|verifies| 5c3a18f061fe0b18;
+  c6d19363284e9125[&quot;SystemRequirements/Requirements.md#Requirements Processing&quot;];
+  class c6d19363284e9125 requirement;
+  click c6d19363284e9125 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#requirements-processing&quot;;
+  38657421ae86147b -.-&gt;|verifies| c6d19363284e9125;
+  a2e0677ef3715c69[&quot;tests/test-fragment-relations/test.sh&quot;];
+  class a2e0677ef3715c69 default;
+  click a2e0677ef3715c69 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/tests/test-fragment-relations/test.sh&quot;;
+  38657421ae86147b -.-&gt;|trace| a2e0677ef3715c69;
+  61d27174e5644f8a[&quot;Unstructured Documents Test&quot;];
+  click 61d27174e5644f8a &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/Verifications/ValidationTests.html#unstructured-documents-test&quot;;
+  class 61d27174e5644f8a verification;
+  d6a1fbde09883ed0[&quot;SystemRequirements/Requirements.md#unstructured-documents&quot;];
+  class d6a1fbde09883ed0 requirement;
+  click d6a1fbde09883ed0 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#unstructured-documents&quot;;
+  61d27174e5644f8a -.-&gt;|verifies| d6a1fbde09883ed0;
+  ee8eb987af1999ea[&quot;tests/test-valid-relations/test.sh&quot;];
+  class ee8eb987af1999ea default;
+  click ee8eb987af1999ea &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/tests/test-valid-relations/test.sh&quot;;
+  61d27174e5644f8a -.-&gt;|trace| ee8eb987af1999ea;
+  e7ae85330d65ed2f[&quot;Excluded File Relation Validation Test&quot;];
+  click e7ae85330d65ed2f &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/Verifications/ValidationTests.html#excluded-file-relation-validation-test&quot;;
+  class e7ae85330d65ed2f verification;
+  44b70517dea81a26[&quot;SystemRequirements/Requirements.md#excluded-file-relation-validation&quot;];
+  class 44b70517dea81a26 requirement;
+  click 44b70517dea81a26 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#excluded-file-relation-validation&quot;;
+  e7ae85330d65ed2f -.-&gt;|verifies| 44b70517dea81a26;
+  85cb273f062c3eec[&quot;tests/test-excluded-patterns/test.sh&quot;];
+  class 85cb273f062c3eec default;
+  click 85cb273f062c3eec &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/tests/test-excluded-patterns/test.sh&quot;;
+  e7ae85330d65ed2f -.-&gt;|trace| 85cb273f062c3eec;
+  cf6ed9d8f0fe7cb6[&quot;Requirements Files Search and Detection Test&quot;];
+  click cf6ed9d8f0fe7cb6 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/Verifications/ValidationTests.html#requirements-files-search-and-detection-test&quot;;
+  class cf6ed9d8f0fe7cb6 verification;
+  734ff30870a0bde0[&quot;SystemRequirements/Requirements.md#requirements-files-search-and-detection&quot;];
+  class 734ff30870a0bde0 requirement;
+  click 734ff30870a0bde0 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#requirements-files-search-and-detection&quot;;
+  cf6ed9d8f0fe7cb6 -.-&gt;|verifies| 734ff30870a0bde0;
+  cf6ed9d8f0fe7cb6 -.-&gt;|trace| 85cb273f062c3eec;
+  7e0adaeae461083c[&quot;Invalid Relations Test&quot;];
+  click 7e0adaeae461083c &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/Verifications/ValidationTests.html#invalid-relations-test&quot;;
+  class 7e0adaeae461083c verification;
+  d0ab992050899c65[&quot;SystemRequirements/Requirement.md/Detailed Error Handling and Logging&quot;];
+  class d0ab992050899c65 requirement;
+  click d0ab992050899c65 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#detailed-error-handling-and-logging&quot;;
+  7e0adaeae461083c -.-&gt;|verifies| d0ab992050899c65;
+  7e0adaeae461083c -.-&gt;|verifies| 5c3a18f061fe0b18;
+  27a77338e4f9304c[&quot;SystemRequirements/Requirement.md/Relation Element Type Validator&quot;];
+  class 27a77338e4f9304c requirement;
+  click 27a77338e4f9304c &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#relation-element-type-validator&quot;;
+  7e0adaeae461083c -.-&gt;|verifies| 27a77338e4f9304c;
+  b6ee889a6a1ac979[&quot;UserRequirements.md/Validate Markdown Structure&quot;];
+  class b6ee889a6a1ac979 requirement;
+  click b6ee889a6a1ac979 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/UserRequirements.html#validate-markdown-structure&quot;;
+  7e0adaeae461083c -.-&gt;|verifies| b6ee889a6a1ac979;
+  944bd4459db32d65[&quot;UserRequirements.md/Validate Internal Consistency&quot;];
+  class 944bd4459db32d65 requirement;
+  click 944bd4459db32d65 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/UserRequirements.html#validate-internal-consistency&quot;;
+  7e0adaeae461083c -.-&gt;|verifies| 944bd4459db32d65;
+  a830c3c9ac9cf1a9[&quot;UserRequirements.md/Validate Cross-Component Dependencies&quot;];
+  class a830c3c9ac9cf1a9 requirement;
+  click a830c3c9ac9cf1a9 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/UserRequirements.html#validate-cross-component-dependencies&quot;;
+  7e0adaeae461083c -.-&gt;|verifies| a830c3c9ac9cf1a9;
+  e1f6859d4a4ea65b[&quot;UserRequirements.md/Provide Validation Reports&quot;];
+  class e1f6859d4a4ea65b requirement;
+  click e1f6859d4a4ea65b &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/UserRequirements.html#provide-validation-reports&quot;;
+  7e0adaeae461083c -.-&gt;|verifies| e1f6859d4a4ea65b;
+  7e0adaeae461083c -.-&gt;|trace| dcd79d89b13530ad;
 </div>
 <hr />
 <h3 id="invalid-relations-test">Invalid Relations Test</h3>
-<p>The verification test checks that ReqFlow correctly identifies and reports invalid relations of different kinds and provide validation report with expected details.</p>
+<p>The verification test checks that Reqvire correctly identifies and reports invalid relations of different kinds and provide validation report with expected details.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: verification</li>
@@ -240,7 +240,7 @@ blockquote {
 <h4>Test Procedure</h4>
 <ol>
 <li>Create a test fixture in <code>/tests/fixtures/test-invalid-relations/</code> with requirements containing invalid relation types</li>
-<li>Run ReqFlow validation on the test fixture</li>
+<li>Run Reqvire validation on the test fixture</li>
 <li>Verify that the validation reports an error for the invalid relation types</li>
 <li>Verify that error messages contain details about the specific typos found</li>
 </ol>
@@ -257,7 +257,7 @@ blockquote {
 </ul>
 <hr />
 <h3 id="same-file-fragment-relations-test">Same-File Fragment Relations Test</h3>
-<p>This test verifies that ReqFlow correctly handles and validates relations to fragments within the same file.</p>
+<p>This test verifies that Reqvire correctly handles and validates relations to fragments within the same file.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: verification</li>
@@ -278,7 +278,7 @@ blockquote {
 <h5>Test Procedure</h5>
 <ol>
 <li>Create test fixtures with requirements containing fragment-only references</li>
-<li>Run ReqFlow validation on the test fixtures</li>
+<li>Run Reqvire validation on the test fixtures</li>
 <li>Verify that validation succeeds with no errors reported</li>
 <li>Verify that fragments referenced by proper element ID are correctly validated</li>
 </ol>
@@ -313,7 +313,7 @@ blockquote {
 <h5>Test Procedure</h5>
 <ol>
 <li>Create test fixtures with known validation issues</li>
-<li>Run ReqFlow with –validate –json flag on the test fixtures</li>
+<li>Run Reqvire with –validate –json flag on the test fixtures</li>
 <li>Verify that output is valid JSON by parsing it</li>
 <li>Confirm all validation errors are represented in the JSON output</li>
 <li>Verify that JSON structure is consistent across different validation scenarios</li>
@@ -356,8 +356,8 @@ blockquote {
 <li>Files in both specifications and external folders</li>
 </ul>
 </li>
-<li>Configure ReqFlow with specific pattern rules</li>
-<li>Run ReqFlow on the test fixtures</li>
+<li>Configure Reqvire with specific pattern rules</li>
+<li>Run Reqvire on the test fixtures</li>
 <li>Verify that all expected files are found and processed</li>
 <li>Verify that excluded files are correctly skipped</li>
 <li>Verify correct handling of nested directories</li>
@@ -398,7 +398,7 @@ blockquote {
 <li>Invalid references to non-existent unstructured documents</li>
 </ul>
 </li>
-<li>Run ReqFlow validation on the test fixtures</li>
+<li>Run Reqvire validation on the test fixtures</li>
 <li>Verify that valid references to unstructured documents are accepted</li>
 <li>Verify that invalid references to non-existent files are reported</li>
 <li>Verify that unstructured documents are not parsed for elements</li>
@@ -439,8 +439,8 @@ blockquote {
 <li>Requirements referenced by excluded files (should be ignored)</li>
 </ul>
 </li>
-<li>Configure ReqFlow with specific exclusion patterns</li>
-<li>Run ReqFlow validation on the test fixtures</li>
+<li>Configure Reqvire with specific exclusion patterns</li>
+<li>Run Reqvire validation on the test fixtures</li>
 <li>Verify that relations to excluded files are validated for file existence</li>
 <li>Verify that excluded files are not parsed for elements</li>
 <li>Verify that relations from excluded files are not processed</li>

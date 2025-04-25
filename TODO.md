@@ -1,6 +1,6 @@
-# ReqFlow Implementation TODO List
+# Reqvire Implementation TODO List
 
-This document outlines the remaining features and improvements needed for the ReqFlow project based on the defined requirements and design specifications.
+This document outlines the remaining features and improvements needed for the Reqvire project based on the defined requirements and design specifications.
 
 ## Core Features
 

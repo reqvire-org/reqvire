@@ -1,7 +1,7 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 use crate::html;
-use crate::error::ReqFlowError;
+use crate::error::ReqvireError;
 use crate::utils;
 
 
@@ -10,7 +10,7 @@ pub fn export_markdown_to_html(
     specification_folder: &PathBuf,
     external_folders: &[PathBuf],
     output_folder: &Path,
-) -> Result<usize, ReqFlowError> {
+) -> Result<usize, ReqvireError> {
 
     // Clean the output folder: if it exists, remove it, then re-create it.
     if output_folder.exists() {
@@ -39,7 +39,7 @@ fn process_markdown_folder(
     specification_folder: &PathBuf,
     external_folders: &[PathBuf],    
     output_folder: &Path,
-) -> Result<usize, ReqFlowError> {
+) -> Result<usize, ReqvireError> {
     let mut count = 0;
 
     for entry in fs::read_dir(folder)? {
@@ -67,13 +67,13 @@ fn export_file_to_html(
     specification_folder: &PathBuf,
     external_folders: &[PathBuf],    
     output_folder: &Path,
-) -> Result<(), ReqFlowError> {
+) -> Result<(), ReqvireError> {
     // Read the markdown content
     let content = fs::read_to_string(file_path)?;
 
     // Get the file name for the titleconvert_to_html
     let file_name = file_path.file_name()
-        .ok_or_else(|| ReqFlowError::PathError("Invalid file path".to_string()))?
+        .ok_or_else(|| ReqvireError::PathError("Invalid file path".to_string()))?
         .to_string_lossy();
     
     let title = file_name.replace(".md", "");

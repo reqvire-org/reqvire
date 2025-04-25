@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use crate::element;
 use crate::relation;
-use crate::error::ReqFlowError;
+use crate::error::ReqvireError;
 
 use std::collections::BTreeSet;
 use std::collections::VecDeque;
@@ -41,10 +41,10 @@ impl ElementRegistry {
     }
 
     /// Registers an element, ensuring identifier uniqueness
-    pub fn register_element(&mut self, element: element::Element, _file_path: &str) -> Result<(), ReqFlowError> {
+    pub fn register_element(&mut self, element: element::Element, _file_path: &str) -> Result<(), ReqvireError> {
    
         if self.elements.contains_key(&element.identifier) {
-            return Err(ReqFlowError::DuplicateElement(element.identifier));
+            return Err(ReqvireError::DuplicateElement(element.identifier));
         }
 
         let identifier=element.identifier.clone();
@@ -53,10 +53,10 @@ impl ElementRegistry {
     }
 
     /// Retrieves an element by its identifier
-    pub fn get_element(&self, identifier: &str) -> Result<&element::Element, ReqFlowError> {
+    pub fn get_element(&self, identifier: &str) -> Result<&element::Element, ReqvireError> {
         self.elements
             .get(identifier)
-            .ok_or_else(|| ReqFlowError::MissingElement(identifier.to_string()))
+            .ok_or_else(|| ReqvireError::MissingElement(identifier.to_string()))
     }
 
     /// Retrieves all elements
@@ -70,7 +70,7 @@ impl ElementRegistry {
     }
 
     /// Registers multiple elements at once
-    pub fn register_elements(&mut self, elements: Vec<element::Element>, file_path: &str) -> Vec<ReqFlowError> {
+    pub fn register_elements(&mut self, elements: Vec<element::Element>, file_path: &str) -> Vec<ReqvireError> {
         let mut errors = vec![];
 
         for element in elements {

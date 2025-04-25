@@ -3,8 +3,8 @@ set +e
 
 # Global Variables
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REQFLOW_BIN="${REQFLOW_BIN:-$(pwd)/target/debug/reqflow}"
-TMP_DIR="$(mktemp -d -t reqflow-e2e-XXXXXX)"
+REQVIRE_BIN="${REQVIRE_BIN:-$(pwd)/target/debug/reqvire}"
+TMP_DIR="$(mktemp -d -t reqvire-e2e-XXXXXX)"
 
 FIXTURES_DIR="$ROOT_DIR/"
 mkdir -p "$FIXTURES_DIR"
@@ -21,7 +21,7 @@ trap cleanup EXIT
 echo "📂 Copying tests..."
 cp -r "$FIXTURES_DIR" "$TMP_DIR/"
 
-echo "🚀 ReqFlow binary: $REQFLOW_BIN"
+echo "🚀 Reqvire binary: $REQVIRE_BIN"
 echo "🗂 Temporary directory: $TMP_DIR"
 
 # Function to run a single test case
@@ -35,7 +35,7 @@ run_test_case() {
 
     echo "🔹  Running test ${test_name}"
     
-    TEST_DIR="$TMP_DIR/tests/$test_name" REQFLOW_BIN="$REQFLOW_BIN" bash "$test_folder/test.sh"    
+    TEST_DIR="$TMP_DIR/tests/$test_name" REQVIRE_BIN="$REQVIRE_BIN" bash "$test_folder/test.sh"    
     local status=$?
     
     if [ $status -eq 0 ]; then

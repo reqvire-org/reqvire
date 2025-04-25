@@ -9,54 +9,54 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  fc5be549cefb3c18["Relation Types and behaviors"];
-  click fc5be549cefb3c18 "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/specifications/SpecificationsRequirements.md#relation-types-and-behaviors";
-  class fc5be549cefb3c18 requirement;
-  a469d82e490f4e4["UserStories.md#Managing MBSE Models"];
-  class a469d82e490f4e4 requirement;
-  click a469d82e490f4e4 "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/specifications/UserStories.md#managing-mbse-models";
-  fc5be549cefb3c18 -.->|deriveReqT| a469d82e490f4e4;
-  79753a9e8064fc6f["../core/src/relation.rs"];
-  class 79753a9e8064fc6f default;
-  click 79753a9e8064fc6f "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/core/src/relation.rs";
-  79753a9e8064fc6f -->|satisfies| fc5be549cefb3c18;
-  aac88a0aeb96f1fc["Structure and Addressing in Markdown Documents"];
-  click aac88a0aeb96f1fc "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/specifications/SpecificationsRequirements.md#structure-and-addressing-in-markdown-documents";
-  class aac88a0aeb96f1fc requirement;
-  aac88a0aeb96f1fc -.->|deriveReqT| a469d82e490f4e4;
-  47d766a3c4f31cec["Identifiers and Relations"];
-  click 47d766a3c4f31cec "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/specifications/SpecificationsRequirements.md#identifiers-and-relations";
-  class 47d766a3c4f31cec requirement;
-  47d766a3c4f31cec -->|refines| aac88a0aeb96f1fc;
-  79753a9e8064fc6f -->|satisfies| 47d766a3c4f31cec;
-  9330746134f07478["Requirements Change Propagation"];
-  click 9330746134f07478 "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/specifications/SpecificationsRequirements.md#requirements-change-propagation";
-  class 9330746134f07478 requirement;
-  52aac80b9a806080["UserRequirements.md#Change Impact Analysis"];
-  class 52aac80b9a806080 requirement;
-  click 52aac80b9a806080 "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/specifications/UserRequirements.md#change-impact-analysis";
-  9330746134f07478 -->|refines| 52aac80b9a806080;
-  dac5cca652a2f48["Structure of Markdown Documents"];
-  click dac5cca652a2f48 "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/specifications/SpecificationsRequirements.md#structure-of-markdown-documents";
-  class dac5cca652a2f48 requirement;
-  dac5cca652a2f48 -->|refines| aac88a0aeb96f1fc;
-  79753a9e8064fc6f -->|satisfies| dac5cca652a2f48;
-  dffa0f8008aada59["../core/src/element.rs"];
-  class dffa0f8008aada59 default;
-  click dffa0f8008aada59 "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/core/src/element.rs";
-  dffa0f8008aada59 -->|satisfies| dac5cca652a2f48;
-  725e4fe2fc5d8372["../core/src/subsection.rs"];
-  class 725e4fe2fc5d8372 default;
-  click 725e4fe2fc5d8372 "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/core/src/subsection.rs";
-  725e4fe2fc5d8372 -->|satisfies| dac5cca652a2f48;
-  f92be9685a777557["../core/src/parser.rs"];
-  class f92be9685a777557 default;
-  click f92be9685a777557 "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/core/src/parser.rs";
-  f92be9685a777557 -->|satisfies| dac5cca652a2f48;
-  9efd257c4e6a45f9["../core/src/model.rs"];
-  class 9efd257c4e6a45f9 default;
-  click 9efd257c4e6a45f9 "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/core/src/model.rs";
-  9efd257c4e6a45f9 -->|satisfies| dac5cca652a2f48;
+  42623d37cb96d447["Structure and Addressing in Markdown Documents"];
+  click 42623d37cb96d447 "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/specifications/SpecificationsRequirements.md#structure-and-addressing-in-markdown-documents";
+  class 42623d37cb96d447 requirement;
+  1902659ed14c4615["UserStories.md#Managing MBSE Models"];
+  class 1902659ed14c4615 requirement;
+  click 1902659ed14c4615 "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/specifications/UserStories.md#managing-mbse-models";
+  42623d37cb96d447 -.->|deriveReqT| 1902659ed14c4615;
+  a2c3e78d2963e98["Structure of Markdown Documents"];
+  click a2c3e78d2963e98 "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/specifications/SpecificationsRequirements.md#structure-of-markdown-documents";
+  class a2c3e78d2963e98 requirement;
+  a2c3e78d2963e98 -->|refines| 42623d37cb96d447;
+  a5d081e55d4f6501["../core/src/relation.rs"];
+  class a5d081e55d4f6501 default;
+  click a5d081e55d4f6501 "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/core/src/relation.rs";
+  a5d081e55d4f6501 -->|satisfies| a2c3e78d2963e98;
+  c1267163bffca360["../core/src/element.rs"];
+  class c1267163bffca360 default;
+  click c1267163bffca360 "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/core/src/element.rs";
+  c1267163bffca360 -->|satisfies| a2c3e78d2963e98;
+  64c8cfac9e2e6b8["../core/src/subsection.rs"];
+  class 64c8cfac9e2e6b8 default;
+  click 64c8cfac9e2e6b8 "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/core/src/subsection.rs";
+  64c8cfac9e2e6b8 -->|satisfies| a2c3e78d2963e98;
+  8af498811b4b1f17["../core/src/parser.rs"];
+  class 8af498811b4b1f17 default;
+  click 8af498811b4b1f17 "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/core/src/parser.rs";
+  8af498811b4b1f17 -->|satisfies| a2c3e78d2963e98;
+  2671722513a08b18["../core/src/model.rs"];
+  class 2671722513a08b18 default;
+  click 2671722513a08b18 "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/core/src/model.rs";
+  2671722513a08b18 -->|satisfies| a2c3e78d2963e98;
+  6b4e50ab2251059a["Identifiers and Relations"];
+  click 6b4e50ab2251059a "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/specifications/SpecificationsRequirements.md#identifiers-and-relations";
+  class 6b4e50ab2251059a requirement;
+  6b4e50ab2251059a -->|refines| 42623d37cb96d447;
+  a5d081e55d4f6501 -->|satisfies| 6b4e50ab2251059a;
+  2d15970eff910dc2["Requirements Change Propagation"];
+  click 2d15970eff910dc2 "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/specifications/SpecificationsRequirements.md#requirements-change-propagation";
+  class 2d15970eff910dc2 requirement;
+  6f4efc192ae34938["UserRequirements.md#Change Impact Analysis"];
+  class 6f4efc192ae34938 requirement;
+  click 6f4efc192ae34938 "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/specifications/UserRequirements.md#change-impact-analysis";
+  2d15970eff910dc2 -->|refines| 6f4efc192ae34938;
+  b2e7c7fada8a1e2d["Relation Types and behaviors"];
+  click b2e7c7fada8a1e2d "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/specifications/SpecificationsRequirements.md#relation-types-and-behaviors";
+  class b2e7c7fada8a1e2d requirement;
+  b2e7c7fada8a1e2d -.->|deriveReqT| 1902659ed14c4615;
+  a5d081e55d4f6501 -->|satisfies| b2e7c7fada8a1e2d;
 ```
 
 ---
@@ -1042,7 +1042,7 @@ The system shall implement relations following clearly defined specifications fo
 
 ## Relation Type Definition
 
-A relation type in ReqFlow:
+A relation type in Reqvire:
 - Defines a semantic connection between elements
 - Specifies the directionality of the relationship
 - Determines change propagation behavior

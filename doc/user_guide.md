@@ -1,6 +1,6 @@
-# ReqFlow User Guide
+# Reqvire User Guide
 
-This user guide provides detailed instructions on how to use ReqFlow effectively.
+This user guide provides detailed instructions on how to use Reqvire effectively.
 
 ## Table of Contents
 
@@ -16,14 +16,14 @@ This user guide provides detailed instructions on how to use ReqFlow effectively
 
 ## Basic Commands
 
-ReqFlow offers several core commands for managing your requirements:
+Reqvire offers several core commands for managing your requirements:
 
 ### Help
 
 View the available commands and options:
 
 ```bash
-reqflow --help
+reqvire --help
 ```
 
 ### Version
@@ -31,32 +31,32 @@ reqflow --help
 Display the current version:
 
 ```bash
-reqflow --version
+reqvire --version
 ```
 
 ## Configuration
 
-ReqFlow uses a YAML configuration file to customize its behavior.
+Reqvire uses a YAML configuration file to customize its behavior.
 
 ### Default Configuration File
 
-By default, ReqFlow looks for configuration in the following files (in order):
-- `reqflow.yaml`
-- `reqflow.yml`
-- `.reqflow.yaml`
-- `.reqflow.yml`
+By default, Reqvire looks for configuration in the following files (in order):
+- `reqvire.yaml`
+- `reqvire.yml`
+- `.reqvire.yaml`
+- `.reqvire.yml`
 
 ### Custom Configuration
 
 To use a custom configuration file:
 
 ```bash
-reqflow -c path/to/custom-config.yaml
+reqvire -c path/to/custom-config.yaml
 ```
 
 ### Configuration Options
 
-Here's an example of a ReqFlow configuration file:
+Here's an example of a Reqvire configuration file:
 
 ```yaml
   # Path to the specifications folder
@@ -103,11 +103,11 @@ style:
 
 ## Working with Requirements
 
-ReqFlow is designed to work with a structured requirements hierarchy in Markdown files.
+Reqvire is designed to work with a structured requirements hierarchy in Markdown files.
 
 ### Folder Structure
 
-A typical ReqFlow project structure looks like this:
+A typical Reqvire project structure looks like this:
 
 ```
 project/
@@ -116,7 +116,7 @@ project/
 │   ├── MissionRequirements.md
 │   ├── SystemRequirements/
 │       └── Requirements.md
-└── reqflow.yaml
+└── reqvire.yaml
 ```
 
 ### Requirements and general Markdown files format
@@ -129,7 +129,7 @@ Read specifications in [../specifications/SpecificationsRequirements.md](../spec
 Performs comprehensive validation:
 
 ```bash
-reqflow --validate
+reqvire --validate
 ```
 
 ## Linting
@@ -143,7 +143,7 @@ Sometimes it is requred to run linting several times to converged to clean docum
 Apply automatic fixes to formatting issues:
 
 ```bash
-reqflow --lint
+reqvire --lint
 ```
 
 ### Dry Run
@@ -151,17 +151,17 @@ reqflow --lint
 Preview linting changes without applying them:
 
 ```bash
-reqflow --lint --dry-run
+reqvire --lint --dry-run
 ```
 
 ## Generating Documentation
 
-ReqFlow can generate HTML documentation from your Markdown files.
+Reqvire can generate HTML documentation from your Markdown files.
 
 ### Convert to HTML
 
 ```bash
-reqflow --html
+reqvire --html
 ```
 
 This creates HTML files with navigation, properly formatted requirements, and interactive diagrams.
@@ -173,33 +173,33 @@ Track relationships between requirements using traceability features.
 ### Generate Traceability Matrix
 
 ```bash
-reqflow --traces
+reqvire --traces
 ```
 
 This generates a traceability matrix showing relationships between requirements.
 
 ## Diagrams
 
-ReqFlow can automatically generate diagrams from your requirements model.
+Reqvire can automatically generate diagrams from your requirements model.
 
 ### Generate Diagrams
 
 ```bash
-reqflow --generate-diagrams
+reqvire --generate-diagrams
 ```
 
 This creates Mermaid diagrams within your requirements files.
 
 ## LLM Context Documentation
 
-ReqFlow provides comprehensive documentation for Large Language Models (LLMs) to understand the project structure.
+Reqvire provides comprehensive documentation for Large Language Models (LLMs) to understand the project structure.
 
 ### Generate LLM Context
 
 ```bash
-reqflow --llm-context
+reqvire --llm-context
 ```
 
-This outputs detailed information about ReqFlow methodology, document structure, and syntax conventions, helping LLMs work effectively with your requirements.
+This outputs detailed information about Reqvire methodology, document structure, and syntax conventions, helping LLMs work effectively with your requirements.
 
 ### TODO: add change impact and other important commands 

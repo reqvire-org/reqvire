@@ -1,27 +1,27 @@
-# ReqFlow MBSE Methodology 
+# Reqvire MBSE Methodology 
 
-ReqFlow is an optimized **MBSE methodology** designed to integrate directly into **Git workflows** and its seamless integration with tools and services like **Git**, **GitHub**, **GitLab**. 
+Reqvire is an optimized **MBSE methodology** designed to integrate directly into **Git workflows** and its seamless integration with tools and services like **Git**, **GitHub**, **GitLab**. 
 It employs a file-based approach where requirements and system design are stored as **Markdown files** within the project repository. This allows teams to manage system models alongside their code, using familiar processes such as **branches**, **pull requests (PRs)**, **issues**, and **reviews**, commonly supported by platforms like **GitHub**, **GitLab**, and **Bitbucket**. 
 
-This tight integration ensures version control for all design and model changes, enabling full traceability. ReqFlow supports an **Agile MBSE approach**, making it particularly well-suited for **software product development**, where iterative design, collaboration, and continuous integration are critical. It is intuitive and familiar to developers, engineers, and product managers, aligning with workflows they are already accustomed to.
+This tight integration ensures version control for all design and model changes, enabling full traceability. Reqvire supports an **Agile MBSE approach**, making it particularly well-suited for **software product development**, where iterative design, collaboration, and continuous integration are critical. It is intuitive and familiar to developers, engineers, and product managers, aligning with workflows they are already accustomed to.
 
-ReqFlow is **opinionated**, requiring semi-structured Markdown files that follow specific conventions. This structure enables **GitHub Actions** and similar CI/CD tools to automate tasks such as generating diagrams, creating **traceability matrices**, and linking requirements to tasks, issues, pull requests, and test cases, while keeping the model simple and easy to use in the targeted environment.
-
-
-The **ReqFlow language** is a subset of **SysML**, inspired by systems engineering practices, with adjustments in visuals and syntax to integrate seamlessly into **Markdown Mermaid diagrams**, enabling lightweight yet powerful modeling. By narrowing the scope to a focused subset of methodologies, ReqFlow simplifies requirements management while retaining robust capabilities, making it particularly accessible to programmers, product managers, and tech teams—especially those working on **software, cloud, and tech products**.
-
-Moreover, being Markdown-oriented makes ReqFlow highly **AI-friendly**. Large Language Models (LLMs) can easily parse and interpret the structured Markdown, facilitating integration with modern AI tooling for tasks such as **automated consistency checks**, **traceability analysis**, and **intelligent assistance in system design**.
+Reqvire is **opinionated**, requiring semi-structured Markdown files that follow specific conventions. This structure enables **GitHub Actions** and similar CI/CD tools to automate tasks such as generating diagrams, creating **traceability matrices**, and linking requirements to tasks, issues, pull requests, and test cases, while keeping the model simple and easy to use in the targeted environment.
 
 
-## ReqFlow model
+The **Reqvire language** is a subset of **SysML**, inspired by systems engineering practices, with adjustments in visuals and syntax to integrate seamlessly into **Markdown Mermaid diagrams**, enabling lightweight yet powerful modeling. By narrowing the scope to a focused subset of methodologies, Reqvire simplifies requirements management while retaining robust capabilities, making it particularly accessible to programmers, product managers, and tech teams—especially those working on **software, cloud, and tech products**.
 
-In **ReqFlow**, a **model** represents the structured, interconnected set of artifacts that define the **system of interest**, including its requirements, architecture, behaviors, constraints, and relationships. The model is designed to be lightweight, Markdown-based, and highly compatible with Git workflows, making it intuitive for developers, engineers, and product managers.
+Moreover, being Markdown-oriented makes Reqvire highly **AI-friendly**. Large Language Models (LLMs) can easily parse and interpret the structured Markdown, facilitating integration with modern AI tooling for tasks such as **automated consistency checks**, **traceability analysis**, and **intelligent assistance in system design**.
+
+
+## Reqvire model
+
+In **Reqvire**, a **model** represents the structured, interconnected set of artifacts that define the **system of interest**, including its requirements, architecture, behaviors, constraints, and relationships. The model is designed to be lightweight, Markdown-based, and highly compatible with Git workflows, making it intuitive for developers, engineers, and product managers.
 
 ---
 
-### **What is a 'Model' in ReqFlow?**
+### **What is a 'Model' in Reqvire?**
 
-A **model** in ReqFlow is a collection of structured Markdown files that capture:
+A **model** in Reqvire is a collection of structured Markdown files that capture:
 1. **Requirements**: Stakeholder needs (user stories, user and mission requirements), system requirements, and constraints.
 2. **System Structure**: Breakdown of components, modules, and their relationships.
 3. **Behaviors**: Functional flows, state transitions, and operational processes.
@@ -33,7 +33,7 @@ A **model** in ReqFlow is a collection of structured Markdown files that capture
 
 ---
 
-### **How is the Model Stored in ReqFlow?**
+### **How is the Model Stored in Reqvire?**
 
 #### **1. File-Based Storage (Markdown)**
 - The entire model is stored as a set of **Markdown files** in a Git repository.
@@ -43,7 +43,7 @@ A **model** in ReqFlow is a collection of structured Markdown files that capture
   - Diagrams: Specified using **Mermaid syntax** within the Markdown.  
   - Traceability: Embedded as links or tags within Markdown content.
 
-Important to understand about ReqFlow is that diagrams are automatically generated by ReqFlow tooling, taking structure from Markdown files and creating diagrams and connections while making items in diagrams links to the actual content in the Markdown files. This way, diagrams become a way to navigate the model. Also, diagrams can be committed directly into relevant documents in the CI/CD pipelines and as part of PRs, which makes automated diagrams artifacts and documentation itself but automated.
+Important to understand about Reqvire is that diagrams are automatically generated by Reqvire tooling, taking structure from Markdown files and creating diagrams and connections while making items in diagrams links to the actual content in the Markdown files. This way, diagrams become a way to navigate the model. Also, diagrams can be committed directly into relevant documents in the CI/CD pipelines and as part of PRs, which makes automated diagrams artifacts and documentation itself but automated.
 
 #### **2. Git Repository Integration**
 - The model is **natively version-controlled** as part of a Git repository, enabling:
@@ -60,11 +60,11 @@ Important to understand about ReqFlow is that diagrams are automatically generat
   - Changes are validated as part of the Git workflow before merging into the main branch.
   - Diagrams and documentation can also be viewed directly in GitHub or similar systems/tools/browsers.
   
-ReqFlow tools, if integrated into CI/CD pipelines of Git-like workflows and processes, can trace diffs (changes in design, requirements, etc.) and trace through to connections to produce invalidation reports for test cases and summaries. These summaries can be used for downstream tasks and for easier understanding of what has changed in the system, which tests need to be re-done, and what changes need to be implemented downstream (architecture, specifications, software, functionality, etc.).
+Reqvire tools, if integrated into CI/CD pipelines of Git-like workflows and processes, can trace diffs (changes in design, requirements, etc.) and trace through to connections to produce invalidation reports for test cases and summaries. These summaries can be used for downstream tasks and for easier understanding of what has changed in the system, which tests need to be re-done, and what changes need to be implemented downstream (architecture, specifications, software, functionality, etc.).
 
 ---
 
-### **Key Features of Model Storage in ReqFlow**
+### **Key Features of Model Storage in Reqvire**
 1. **Version Control**:
    - Every aspect of the model is stored in text format, making it inherently version-controlled.
    - Branching and merging allow parallel development of system designs.
@@ -80,12 +80,12 @@ ReqFlow tools, if integrated into CI/CD pipelines of Git-like workflows and proc
 
 ---
 
-In summary, a **ReqFlow model** is a structured set of Markdown files stored and managed in a Git repository, with support for traceability, automation, and collaboration through modern Git workflows and tools.
+In summary, a **Reqvire model** is a structured set of Markdown files stored and managed in a Git repository, with support for traceability, automation, and collaboration through modern Git workflows and tools.
 
 
 ## Mapping to ISO/IEC/IEEE 15288
 
-The **ReqFlow methodology**, a model-based systems engineering (MBSE) approach, aligns closely with the processes defined in **ISO/IEC/IEEE 15288** but organizes and emphasizes them according to its structured model-driven workflow. Drawing inspiration and best practices from methodologies such as **Arcadia**, **MBSE Grid**, **OOSEM**, **OPM**, and others, ReqFlow integrates key principles to provide a comprehensive framework for managing system requirements and architecture.
+The **Reqvire methodology**, a model-based systems engineering (MBSE) approach, aligns closely with the processes defined in **ISO/IEC/IEEE 15288** but organizes and emphasizes them according to its structured model-driven workflow. Drawing inspiration and best practices from methodologies such as **Arcadia**, **MBSE Grid**, **OOSEM**, **OPM**, and others, Reqvire integrates key principles to provide a comprehensive framework for managing system requirements and architecture.
 
 
 ---

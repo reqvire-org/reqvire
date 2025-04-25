@@ -3,7 +3,7 @@ use serde::Serialize;
 use std::path::PathBuf;
 use crate::utils;
 use crate::relation::{Relation, RelationTarget, LinkType};
-use crate::error::ReqFlowError;
+use crate::error::ReqvireError;
 use crate::element_registry;
 use crate::relation;
 use crate::element;
@@ -690,7 +690,7 @@ pub fn compute_change_impact<'a>(
     repo_root: &'a PathBuf,    
     specification_folder: &'a PathBuf,
     external_folders: &'a [PathBuf],
-) -> Result<ChangeImpactReport<'a>, ReqFlowError> {
+) -> Result<ChangeImpactReport<'a>, ReqvireError> {
     let mut report = ChangeImpactReport::new(repo_root, specification_folder, external_folders);
 
     let current_ids: HashSet<&String> = current.elements.keys().collect();

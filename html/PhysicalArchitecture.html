@@ -96,7 +96,7 @@ blockquote {
 }
 </style>
 
-    <!-- Enhanced mermaid configuration for ReqFlow diagrams -->
+    <!-- Enhanced mermaid configuration for Reqvire diagrams -->
     <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
     <script>
         mermaid.initialize({ 
@@ -115,15 +115,15 @@ blockquote {
 <body>
     <div class="container">
         <div class="content">
-            <h1 id="physical-architecture-for-reqflow">Physical Architecture for ReqFlow</h1>
-<p>The Physical Architecture represents the concrete systems, services, and components that implement the functionality of ReqFlow. It defines the deployment-level structure of the tool, detailing how various components interact.</p>
+            <h1 id="physical-architecture-for-reqvire">Physical Architecture for Reqvire</h1>
+<p>The Physical Architecture represents the concrete systems, services, and components that implement the functionality of Reqvire. It defines the deployment-level structure of the tool, detailing how various components interact.</p>
 <h2 id="architecture-diagram">Architecture Diagram</h2>
 <div class="mermaid">classDiagram
-    class ReqFlow {
+    class Reqvire {
         &lt;&lt;system&gt;&gt;
     }
 
-    class ReqFlowTool {
+    class ReqvireTool {
         &lt;&lt;subsystem&gt;&gt;
     }
 
@@ -168,18 +168,18 @@ blockquote {
 
  
     %% Hierarchical Relationships
-    ReqFlow --&gt; ReqFlowTool
-    ReqFlow --&gt; Integrations
+    Reqvire --&gt; ReqvireTool
+    Reqvire --&gt; Integrations
     
 
-    ReqFlowTool --&gt; UserInterface
-    ReqFlowTool --&gt; Storage
+    ReqvireTool --&gt; UserInterface
+    ReqvireTool --&gt; Storage
 
     UserInterface--&gt; CLI
     UserInterface--&gt; ChatOps    
 
-    ReqFlowTool --&gt; ModelManagement
-    ReqFlowTool --&gt; ValidationAndReporting
+    ReqvireTool --&gt; ModelManagement
+    ReqvireTool --&gt; ValidationAndReporting
 
     Integrations --&gt; GitHubIntegration
     Integrations --&gt; CICDIntegration
@@ -191,10 +191,10 @@ blockquote {
 <p>Logical to physical architecture mapping:</p>
 <div class="mermaid">graph TD
     %% Root System
-    ReqFlow[&quot;ReqFlow (system)&quot;]
+    Reqvire[&quot;Reqvire (system)&quot;]
 
-    %% Subsystems under ReqFlow
-    subgraph ReqFlowTool[&quot;ReqFlowTool (subsystem)&quot;]
+    %% Subsystems under Reqvire
+    subgraph ReqvireTool[&quot;ReqvireTool (subsystem)&quot;]
         UserInterface[&quot;UserInterface (component)&quot;]
         ModelManagement[&quot;ModelManagement (component)&quot;]
         ValidationAndReporting[&quot;ValidationAndReporting (component)&quot;]
@@ -217,14 +217,14 @@ blockquote {
     SystemOfInterest[&quot;SystemOfInterest (system)&quot;]
 
     %% Hierarchical Structure
-    ReqFlow --&gt; ReqFlowTool
-    ReqFlow --&gt; Integrations
-    ReqFlow --&gt; AIWorkflows
+    Reqvire --&gt; ReqvireTool
+    Reqvire --&gt; Integrations
+    Reqvire --&gt; AIWorkflows
 
-    ReqFlowTool --&gt; UserInterface
-    ReqFlowTool --&gt; ModelManagement
-    ReqFlowTool --&gt; ValidationAndReporting
-    ReqFlowTool --&gt; Storage
+    ReqvireTool --&gt; UserInterface
+    ReqvireTool --&gt; ModelManagement
+    ReqvireTool --&gt; ValidationAndReporting
+    ReqvireTool --&gt; Storage
 
     UserInterface --&gt; CLI[&quot;CLI (component)&quot;]
     UserInterface --&gt; ChatOps[&quot;ChatOps (component)&quot;]

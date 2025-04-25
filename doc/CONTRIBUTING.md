@@ -1,6 +1,6 @@
-# Contributing to ReqFlow
+# Contributing to Reqvire
 
-Thank you for your interest in contributing to ReqFlow! We welcome contributions from the community and appreciate your efforts to make this project better. This document outlines the terms and guidelines for contributing to the project.
+Thank you for your interest in contributing to Reqvire! We welcome contributions from the community and appreciate your efforts to make this project better. This document outlines the terms and guidelines for contributing to the project.
 
 ---
 
@@ -10,10 +10,10 @@ Thank you for your interest in contributing to ReqFlow! We welcome contributions
 By participating in this project, you agree to adhere to our [Code of Conduct](./code_of_conduct.md). Please ensure that your behavior fosters a positive and respectful environment.
 
 ### 2. Licensing of Contributions
-By contributing to ReqFlow, you agree that your contributions will be licensed under the **Apache License 2.0**. This ensures consistency with the project’s license and allows the broader community to benefit from your work.
+By contributing to Reqvire, you agree that your contributions will be licensed under the **Apache License 2.0**. This ensures consistency with the project’s license and allows the broader community to benefit from your work.
 
 ### 3. Submitting Issues
-- Before submitting an issue, search the [issue tracker](https://github.com/ilijaljubicic/ReqFlow/issues) to ensure it hasn’t been reported already.
+- Before submitting an issue, search the [issue tracker](https://github.com/ilijaljubicic/Reqvire/issues) to ensure it hasn’t been reported already.
 - If your issue is new, please provide as much detail as possible, including:
   - Steps to reproduce (if applicable)
   - Expected behavior
@@ -62,4 +62,4 @@ If you need help with your contribution, feel free to:
 - Review the [README.md](./README.md) and [documentation](./doc/).
 - Open an issue to request clarification or additional resources.
 
-Thank you for helping to make ReqFlow better!
+Thank you for helping to make Reqvire better!

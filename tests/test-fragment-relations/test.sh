@@ -15,7 +15,7 @@
 # - Tests fragments referenced by proper element ID
 
 
-OUTPUT=$(cd "$TEST_DIR" && "$REQFLOW_BIN" --config "${TEST_DIR}/reqflow.yaml"  --validate --json 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml"  --validate --json 2>&1)
 EXIT_CODE=$?
 
 

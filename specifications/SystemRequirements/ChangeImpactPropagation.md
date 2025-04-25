@@ -1,6 +1,6 @@
 # Change Impact Detection System Requirements
 
-This document defines the detailed requirements for the change impact detection algorithm and visualization in ReqFlow. It provides the technical specifications for implementing the concepts described in the Design Specification Document for Requirements Change Impact Propagation.
+This document defines the detailed requirements for the change impact detection algorithm and visualization in Reqvire. It provides the technical specifications for implementing the concepts described in the Design Specification Document for Requirements Change Impact Propagation.
 
 ## Change Impact Detection Components
 ```mermaid
@@ -11,33 +11,33 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  75403d710ba5793e["Change Impact Command Line Interface"];
-  click 75403d710ba5793e "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/specifications/SystemRequirements/ChangeImpactPropagation.md#change-impact-command-line-interface";
-  class 75403d710ba5793e requirement;
-  98cbeaac067febd5["CLI Change Impact Report Flag"];
-  class 98cbeaac067febd5 requirement;
-  click 98cbeaac067febd5 "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/specifications/SystemRequirements/Requirements.md#cli-change-impact-report-flag";
-  75403d710ba5793e -.->|deriveReqT| 98cbeaac067febd5;
-  b2b6ff676ff5d2cc["../../cli/src/cli.rs"];
-  class b2b6ff676ff5d2cc default;
-  click b2b6ff676ff5d2cc "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/cli/src/cli.rs";
-  b2b6ff676ff5d2cc -->|satisfies| 75403d710ba5793e;
-  5520915d7ac5a52f["Change Impact Visualization"];
-  click 5520915d7ac5a52f "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/specifications/SystemRequirements/ChangeImpactPropagation.md#change-impact-visualization";
-  class 5520915d7ac5a52f requirement;
-  9330746134f07478["../SpecificationsRequirements.md#requirements-change-propagation"];
-  class 9330746134f07478 requirement;
-  click 9330746134f07478 "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/specifications/SpecificationsRequirements.md#requirements-change-propagation";
-  5520915d7ac5a52f -.->|deriveReqT| 9330746134f07478;
-  a2b02da80c17b86f["../../core/src/change_impact.rs"];
-  class a2b02da80c17b86f default;
-  click a2b02da80c17b86f "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/core/src/change_impact.rs";
-  a2b02da80c17b86f -->|satisfies| 5520915d7ac5a52f;
-  b6dcdc95b5e8f272["Change Impact Detection Algorithm"];
-  click b6dcdc95b5e8f272 "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/specifications/SystemRequirements/ChangeImpactPropagation.md#change-impact-detection-algorithm";
-  class b6dcdc95b5e8f272 requirement;
-  b6dcdc95b5e8f272 -.->|deriveReqT| 9330746134f07478;
-  a2b02da80c17b86f -->|satisfies| b6dcdc95b5e8f272;
+  9e9a08e1333fd31["Change Impact Visualization"];
+  click 9e9a08e1333fd31 "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/specifications/SystemRequirements/ChangeImpactPropagation.md#change-impact-visualization";
+  class 9e9a08e1333fd31 requirement;
+  2d15970eff910dc2["../SpecificationsRequirements.md#requirements-change-propagation"];
+  class 2d15970eff910dc2 requirement;
+  click 2d15970eff910dc2 "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/specifications/SpecificationsRequirements.md#requirements-change-propagation";
+  9e9a08e1333fd31 -.->|deriveReqT| 2d15970eff910dc2;
+  3a36b9f74d4d889b["../../core/src/change_impact.rs"];
+  class 3a36b9f74d4d889b default;
+  click 3a36b9f74d4d889b "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/core/src/change_impact.rs";
+  3a36b9f74d4d889b -->|satisfies| 9e9a08e1333fd31;
+  7cc5e857c8078367["Change Impact Command Line Interface"];
+  click 7cc5e857c8078367 "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/specifications/SystemRequirements/ChangeImpactPropagation.md#change-impact-command-line-interface";
+  class 7cc5e857c8078367 requirement;
+  9a465de9fd86cbf3["CLI Change Impact Report Flag"];
+  class 9a465de9fd86cbf3 requirement;
+  click 9a465de9fd86cbf3 "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/specifications/SystemRequirements/Requirements.md#cli-change-impact-report-flag";
+  7cc5e857c8078367 -.->|deriveReqT| 9a465de9fd86cbf3;
+  5fe26772336463bc["../../cli/src/cli.rs"];
+  class 5fe26772336463bc default;
+  click 5fe26772336463bc "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/cli/src/cli.rs";
+  5fe26772336463bc -->|satisfies| 7cc5e857c8078367;
+  9967e71248da3061["Change Impact Detection Algorithm"];
+  click 9967e71248da3061 "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/specifications/SystemRequirements/ChangeImpactPropagation.md#change-impact-detection-algorithm";
+  class 9967e71248da3061 requirement;
+  9967e71248da3061 -.->|deriveReqT| 2d15970eff910dc2;
+  3a36b9f74d4d889b -->|satisfies| 9967e71248da3061;
 ```
 
 ---

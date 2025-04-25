@@ -96,7 +96,7 @@ blockquote {
 }
 </style>
 
-    <!-- Enhanced mermaid configuration for ReqFlow diagrams -->
+    <!-- Enhanced mermaid configuration for Reqvire diagrams -->
     <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
     <script>
         mermaid.initialize({ 
@@ -115,10 +115,10 @@ blockquote {
 <body>
     <div class="container">
         <div class="content">
-            <h1 id="reqflow-for-llm-context">ReqFlow for LLM Context</h1>
-<p>This document provides essential context for Large Language Models (LLMs) to understand and work effectively with ReqFlow-based specifications and requirements management.</p>
-<h2 id="what-is-reqflow?">What is ReqFlow?</h2>
-<p>ReqFlow is a methodology and toolset for Model-Based Systems Engineering (MBSE) that uses Markdown as the primary format for requirements documentation and traceability. It enables:</p>
+            <h1 id="reqvire-for-llm-context">Reqvire for LLM Context</h1>
+<p>This document provides essential context for Large Language Models (LLMs) to understand and work effectively with Reqvire-based specifications and requirements management.</p>
+<h2 id="what-is-reqvire?">What is Reqvire?</h2>
+<p>Reqvire is a methodology and toolset for Model-Based Systems Engineering (MBSE) that uses Markdown as the primary format for requirements documentation and traceability. It enables:</p>
 <ul>
 <li>Requirements management in human-readable Markdown</li>
 <li>Relationship tracing between requirements and other artifacts</li>
@@ -131,7 +131,7 @@ blockquote {
 <h2 id="core-concepts">Core Concepts</h2>
 <h3 id="elements">Elements</h3>
 <ul>
-<li>An <strong>Element</strong> is the fundamental unit in ReqFlow, defined by a <code>###</code> header in Markdown</li>
+<li>An <strong>Element</strong> is the fundamental unit in Reqvire, defined by a <code>###</code> header in Markdown</li>
 <li>Elements must have unique names within a document</li>
 <li>Element content includes everything under the header until the next element or end of document</li>
 <li>Example:
@@ -198,7 +198,7 @@ This is the requirement text that describes what the system must do.
 </li>
 </ul>
 <h2 id="document-structure">Document Structure</h2>
-<p>A typical ReqFlow document follows this structure:</p>
+<p>A typical Reqvire document follows this structure:</p>
 <ol>
 <li><strong>Document title</strong> (<code># Title</code>)</li>
 <li><strong>Optional overview sections</strong> (<code>## Section</code>)</li>
@@ -240,8 +240,8 @@ The system shall implement capability Y.
 
 Additional details about Requirement Two implementation.
 </code></pre>
-<h2 id="reqflow-cli-operations">ReqFlow CLI Operations</h2>
-<p>The ReqFlow CLI tool provides various operations:</p>
+<h2 id="reqvire-cli-operations">Reqvire CLI Operations</h2>
+<p>The Reqvire CLI tool provides various operations:</p>
 <ul>
 <li>
 <p><strong>Validation</strong>: Check structure and relationships for errors</p>
@@ -285,7 +285,7 @@ Additional details about Requirement Two implementation.
 </li>
 </ul>
 <h2 id="configuration-options">Configuration Options</h2>
-<p>ReqFlow supports configuration via YAML files:</p>
+<p>Reqvire supports configuration via YAML files:</p>
 <pre><code class="language-yaml">general:
   html_output: true
   verbose: false
@@ -301,7 +301,7 @@ validation:
   validate_cross_components: true
 </code></pre>
 <h2 id="change-impact-analysis">Change Impact Analysis</h2>
-<p>ReqFlow analyzes how changes propagate through the requirement hierarchy:</p>
+<p>Reqvire analyzes how changes propagate through the requirement hierarchy:</p>
 <ul>
 <li>
 <p><strong>Upward Propagation</strong>: Changes flow up to parent/dependent elements</p>
@@ -335,7 +335,7 @@ validation:
 </li>
 </ul>
 <h2 id="diagrams-and-visualization">Diagrams and Visualization</h2>
-<p>ReqFlow generates Mermaid diagrams to visualize requirement relationships:</p>
+<p>Reqvire generates Mermaid diagrams to visualize requirement relationships:</p>
 <ul>
 <li>
 <p><strong>Node Types</strong>:</p>
@@ -361,7 +361,7 @@ validation:
     Req2 --&gt; Test1[&quot;Test Case 1&quot;]
 </div>
 <h2 id="validation-and-linting">Validation and Linting</h2>
-<p>ReqFlow performs multiple types of validation and linting:</p>
+<p>Reqvire performs multiple types of validation and linting:</p>
 <h3 id="validation-(structural-errors)">Validation (Structural Errors)</h3>
 <ul>
 <li>Unique element names within documents</li>
@@ -379,7 +379,7 @@ validation:
 <li>Inserting separator lines between elements</li>
 <li>Ensuring consistent indentation in relation lists</li>
 </ul>
-<h2 id="best-practices-for-working-with-reqflow">Best Practices for Working with ReqFlow</h2>
+<h2 id="best-practices-for-working-with-reqvire">Best Practices for Working with Reqvire</h2>
 <ol>
 <li>
 <p><strong>Element Naming</strong>:</p>
@@ -421,7 +421,7 @@ validation:
 </ul>
 </li>
 </ol>
-<h2 id="tips-for-llms-working-with-reqflow">Tips for LLMs Working with ReqFlow</h2>
+<h2 id="tips-for-llms-working-with-reqvire">Tips for LLMs Working with Reqvire</h2>
 <ol>
 <li>
 <p>When creating requirements, always follow the exact format shown above</p>

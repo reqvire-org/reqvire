@@ -50,15 +50,15 @@ jobs:
         run: |
           mkdir -p artifacts
           if [[ "$RUNNER_OS" == "Linux" ]]; then
-            mv target/release/reqflow artifacts/reqflow-linux
+            mv target/release/reqvire artifacts/reqvire-linux
           elif [[ "$RUNNER_OS" == "macOS" ]]; then
             if [[ "$(uname -m)" == "arm64" ]]; then
-              mv target/aarch64-apple-darwin/release/reqflow artifacts/reqflow-macos-arm64
+              mv target/aarch64-apple-darwin/release/reqvire artifacts/reqvire-macos-arm64
             else
-              mv target/x86_64-apple-darwin/release/reqflow artifacts/reqflow-macos-x86_64
+              mv target/x86_64-apple-darwin/release/reqvire artifacts/reqvire-macos-x86_64
             fi
           elif [[ "$RUNNER_OS" == "Windows" ]]; then
-            mv target/release/reqflow.exe artifacts/reqflow-windows.exe
+            mv target/release/reqvire.exe artifacts/reqvire-windows.exe
           fi
 
       - name: Debug List Built Binaries

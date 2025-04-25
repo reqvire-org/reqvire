@@ -1,0 +1,3 @@
+paths:
+  specifications_folder: "specifications"
+  output_folder: "./output"

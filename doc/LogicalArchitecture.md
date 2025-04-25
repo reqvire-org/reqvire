@@ -6,7 +6,7 @@ The **Logical Architecture** represents the high-level structure of a system, fo
 
 The primary purpose of the logical architecture is to define the high-level functional organization of the system, focusing on what the system must do and how its components interact conceptually, without specifying implementation details.
 
-Additionally, in ReqFlow methodology, the logical architecture plays a critical role in:
+Additionally, in Reqvire methodology, the logical architecture plays a critical role in:
   * Foundation for Physical Architecture: Logical architecture establishes the conceptual framework for developing the physical architecture, where main systems, subsystems, and their interconnections are defined.
   * Organizing System Requirements: System requirements are systematically grouped into subfolders aligned with the main systems and subsystems outlined in the physical architecture.
   * High-Level Conceptualization: Logical architecture enables teams to visualize and understand the system's structure and interactions at a high level before advancing to detailed physical design and requirements breakdown.
@@ -25,7 +25,7 @@ For example:
 - A requirement like "The system shall allow users to sign in via email" is initially part of the **logical component** `IdentityManagement`, transitions to the **physical subsystem** `AuthenticationService`, and is subsequently placed in the corresponding system requirements folder.
 - "The system shall provide metrics for deployments" begins in the **logical component** `DeploymentInsights`, maps to a **physical subsystem** such as `MetricsService`, and is organized under its related requirements folder.
 
-This structure ensures that the **ReqFlow methodology** remains clear, scalable, and effectively aligns logical and physical organization with system requirements.
+This structure ensures that the **Reqvire methodology** remains clear, scalable, and effectively aligns logical and physical organization with system requirements.
 
 
 

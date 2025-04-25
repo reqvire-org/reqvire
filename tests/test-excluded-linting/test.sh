@@ -4,14 +4,14 @@
 # ------------------------------------------------------------
 # Acceptance Criteria:
 # - Files matching excluded_filename_patterns should not be linted
-# - ReqFlow should skip linting checks on excluded files
+# - Reqvire should skip linting checks on excluded files
 #
 # Test Criteria:
 # - Command should not lint files matching excluded patterns
 # - Linting output should not include issues from excluded files
 
 
-OUTPUT=$(cd "$TEST_DIR" && "$REQFLOW_BIN" --config "${TEST_DIR}/reqflow.yaml"  --lint 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml"  --lint 2>&1)
 EXIT_CODE=$?
 
 printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"

@@ -96,7 +96,7 @@ blockquote {
 }
 </style>
 
-    <!-- Enhanced mermaid configuration for ReqFlow diagrams -->
+    <!-- Enhanced mermaid configuration for Reqvire diagrams -->
     <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
     <script>
         mermaid.initialize({ 
@@ -124,87 +124,87 @@ blockquote {
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  66aa36deca421516[&quot;Parallel Linting Processing&quot;];
-  click 66aa36deca421516 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#parallel-linting-processing&quot;;
-  class 66aa36deca421516 requirement;
-  103ddb8dc3242215[&quot;UserRequirements.md/Model Linting&quot;];
-  class 103ddb8dc3242215 requirement;
-  click 103ddb8dc3242215 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#model-linting&quot;;
-  66aa36deca421516 -.-&gt;|deriveReqT| 103ddb8dc3242215;
-  8b47697e4e9fce62[&quot;linting/mod.rs&quot;];
-  class 8b47697e4e9fce62 default;
-  click 8b47697e4e9fce62 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/core/src/linting/mod.rs&quot;;
-  8b47697e4e9fce62 --&gt;|satisfies| 66aa36deca421516;
-  45770e9b319d3819[&quot;File Pattern Exclusion for Linting&quot;];
-  click 45770e9b319d3819 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#file-pattern-exclusion-for-linting&quot;;
-  class 45770e9b319d3819 requirement;
-  cc8128cae305b29d[&quot;Configurable Filename Exclusion Patterns&quot;];
-  class cc8128cae305b29d requirement;
-  click cc8128cae305b29d &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#configurable-filename-exclusion-patterns&quot;;
-  45770e9b319d3819 --&gt;|refines| cc8128cae305b29d;
-  3189923c3f5e2124[&quot;utils.rs&quot;];
-  class 3189923c3f5e2124 default;
-  click 3189923c3f5e2124 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/core/src/utils.rs&quot;;
-  3189923c3f5e2124 --&gt;|satisfies| 45770e9b319d3819;
-  193cd6463891423e[&quot;Reserved Subsections Linting Implementation&quot;];
-  click 193cd6463891423e &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#reserved-subsections-linting-implementation&quot;;
-  class 193cd6463891423e requirement;
-  81758bdb22a3329d[&quot;UserRequirements.md/Format Consistency Enforcement&quot;];
-  class 81758bdb22a3329d requirement;
-  click 81758bdb22a3329d &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#format-consistency-enforcement&quot;;
-  193cd6463891423e -.-&gt;|deriveReqT| 81758bdb22a3329d;
-  3aaafb0eaf60961c[&quot;linting/reserved_subsections.rs&quot;];
-  class 3aaafb0eaf60961c default;
-  click 3aaafb0eaf60961c &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/core/src/linting/indentation.rs&quot;;
-  3aaafb0eaf60961c --&gt;|satisfies| 193cd6463891423e;
-  3f3d3f9ccb15029a[&quot;Excess Whitespace Linting Implementation&quot;];
-  click 3f3d3f9ccb15029a &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#excess-whitespace-linting-implementation&quot;;
-  class 3f3d3f9ccb15029a requirement;
-  3f3d3f9ccb15029a -.-&gt;|deriveReqT| 81758bdb22a3329d;
-  bb06efd0b85636ec[&quot;linting/whitespace.rs&quot;];
-  class bb06efd0b85636ec default;
-  click bb06efd0b85636ec &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/core/src/linting/whitespace.rs&quot;;
-  bb06efd0b85636ec --&gt;|satisfies| 3f3d3f9ccb15029a;
-  f98ae394dbbde42c[&quot;Incosistent Newlines Linting Implementation&quot;];
-  click f98ae394dbbde42c &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#incosistent-newlines-linting-implementation&quot;;
-  class f98ae394dbbde42c requirement;
-  f98ae394dbbde42c -.-&gt;|deriveReqT| 81758bdb22a3329d;
-  b52472a7ccc9c395[&quot;linting/newlines.rs&quot;];
-  class b52472a7ccc9c395 default;
-  click b52472a7ccc9c395 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/core/src/linting/newlines.rs&quot;;
-  b52472a7ccc9c395 --&gt;|satisfies| f98ae394dbbde42c;
-  8f2198f681f63fea[&quot;Dry Run Mode&quot;];
-  click 8f2198f681f63fea &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#dry-run-mode&quot;;
-  class 8f2198f681f63fea requirement;
-  fffbb227966be4f2[&quot;CLI Lint Flag&quot;];
-  class fffbb227966be4f2 requirement;
-  click fffbb227966be4f2 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#cli-lint-flag&quot;;
-  8f2198f681f63fea -.-&gt;|deriveReqT| fffbb227966be4f2;
-  11ffc4632afd7c4c[&quot;cli.rs&quot;];
-  class 11ffc4632afd7c4c default;
-  click 11ffc4632afd7c4c &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/cli/src/cli.rs&quot;;
-  11ffc4632afd7c4c --&gt;|satisfies| 8f2198f681f63fea;
-  63f1cd4974cbf62[&quot;Git-Style Diff Output for Linting&quot;];
-  click 63f1cd4974cbf62 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#git-style-diff-output-for-linting&quot;;
-  class 63f1cd4974cbf62 requirement;
-  808b1863c88b26c4[&quot;UserRequirements.md/Linting Command Output&quot;];
-  class 808b1863c88b26c4 requirement;
-  click 808b1863c88b26c4 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#linting-command-output&quot;;
-  63f1cd4974cbf62 -.-&gt;|deriveReqT| 808b1863c88b26c4;
-  8b47697e4e9fce62 --&gt;|satisfies| 63f1cd4974cbf62;
-  dd0846393d037337[&quot;Missing Separators Linting Implementation&quot;];
-  click dd0846393d037337 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#missing-separators-linting-implementation&quot;;
-  class dd0846393d037337 requirement;
-  dd0846393d037337 -.-&gt;|deriveReqT| 81758bdb22a3329d;
-  9abe404e42ed3086[&quot;linting/separators.rs&quot;];
-  class 9abe404e42ed3086 default;
-  click 9abe404e42ed3086 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/core/src/linting/separators.rs&quot;;
-  9abe404e42ed3086 --&gt;|satisfies| dd0846393d037337;
-  887a7d36caacab2b[&quot;UserRequirements.md/Linting Command Behavior&quot;];
-  class 887a7d36caacab2b requirement;
-  click 887a7d36caacab2b &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#linting-command&quot;;
-  fffbb227966be4f2 -.-&gt;|deriveReqT| 887a7d36caacab2b;
-  11ffc4632afd7c4c --&gt;|satisfies| fffbb227966be4f2;
+  75640c8e8822d1e7[&quot;Parallel Linting Processing&quot;];
+  click 75640c8e8822d1e7 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#parallel-linting-processing&quot;;
+  class 75640c8e8822d1e7 requirement;
+  36d76b90ace3a564[&quot;UserRequirements.md/Model Linting&quot;];
+  class 36d76b90ace3a564 requirement;
+  click 36d76b90ace3a564 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/UserRequirements.html#model-linting&quot;;
+  75640c8e8822d1e7 -.-&gt;|deriveReqT| 36d76b90ace3a564;
+  2d48fe5f748f81e4[&quot;linting/mod.rs&quot;];
+  class 2d48fe5f748f81e4 default;
+  click 2d48fe5f748f81e4 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/core/src/linting/mod.rs&quot;;
+  2d48fe5f748f81e4 --&gt;|satisfies| 75640c8e8822d1e7;
+  4efdafe79ef3057[&quot;Reserved Subsections Linting Implementation&quot;];
+  click 4efdafe79ef3057 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#reserved-subsections-linting-implementation&quot;;
+  class 4efdafe79ef3057 requirement;
+  43bbec4721cc6a68[&quot;UserRequirements.md/Format Consistency Enforcement&quot;];
+  class 43bbec4721cc6a68 requirement;
+  click 43bbec4721cc6a68 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/UserRequirements.html#format-consistency-enforcement&quot;;
+  4efdafe79ef3057 -.-&gt;|deriveReqT| 43bbec4721cc6a68;
+  f3496fe5f8d186a4[&quot;linting/reserved_subsections.rs&quot;];
+  class f3496fe5f8d186a4 default;
+  click f3496fe5f8d186a4 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/core/src/linting/indentation.rs&quot;;
+  f3496fe5f8d186a4 --&gt;|satisfies| 4efdafe79ef3057;
+  470a0057ca1c964[&quot;File Pattern Exclusion for Linting&quot;];
+  click 470a0057ca1c964 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#file-pattern-exclusion-for-linting&quot;;
+  class 470a0057ca1c964 requirement;
+  6f822bdd8c71c7c8[&quot;Configurable Filename Exclusion Patterns&quot;];
+  class 6f822bdd8c71c7c8 requirement;
+  click 6f822bdd8c71c7c8 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#configurable-filename-exclusion-patterns&quot;;
+  470a0057ca1c964 --&gt;|refines| 6f822bdd8c71c7c8;
+  6cc937ff9e3a6b59[&quot;utils.rs&quot;];
+  class 6cc937ff9e3a6b59 default;
+  click 6cc937ff9e3a6b59 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/core/src/utils.rs&quot;;
+  6cc937ff9e3a6b59 --&gt;|satisfies| 470a0057ca1c964;
+  c080457c84fad54c[&quot;Dry Run Mode&quot;];
+  click c080457c84fad54c &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#dry-run-mode&quot;;
+  class c080457c84fad54c requirement;
+  cb01ebe750839cf7[&quot;CLI Lint Flag&quot;];
+  class cb01ebe750839cf7 requirement;
+  click cb01ebe750839cf7 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#cli-lint-flag&quot;;
+  c080457c84fad54c -.-&gt;|deriveReqT| cb01ebe750839cf7;
+  5fe26772336463bc[&quot;cli.rs&quot;];
+  class 5fe26772336463bc default;
+  click 5fe26772336463bc &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/cli/src/cli.rs&quot;;
+  5fe26772336463bc --&gt;|satisfies| c080457c84fad54c;
+  f1de164cd9ee3fd[&quot;UserRequirements.md/Linting Command Behavior&quot;];
+  class f1de164cd9ee3fd requirement;
+  click f1de164cd9ee3fd &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/UserRequirements.html#linting-command&quot;;
+  cb01ebe750839cf7 -.-&gt;|deriveReqT| f1de164cd9ee3fd;
+  5fe26772336463bc --&gt;|satisfies| cb01ebe750839cf7;
+  db7b9709bced7f7e[&quot;Missing Separators Linting Implementation&quot;];
+  click db7b9709bced7f7e &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#missing-separators-linting-implementation&quot;;
+  class db7b9709bced7f7e requirement;
+  db7b9709bced7f7e -.-&gt;|deriveReqT| 43bbec4721cc6a68;
+  277f2d41101b4374[&quot;linting/separators.rs&quot;];
+  class 277f2d41101b4374 default;
+  click 277f2d41101b4374 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/core/src/linting/separators.rs&quot;;
+  277f2d41101b4374 --&gt;|satisfies| db7b9709bced7f7e;
+  5833165793ba0498[&quot;Git-Style Diff Output for Linting&quot;];
+  click 5833165793ba0498 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#git-style-diff-output-for-linting&quot;;
+  class 5833165793ba0498 requirement;
+  5862305273e75e10[&quot;UserRequirements.md/Linting Command Output&quot;];
+  class 5862305273e75e10 requirement;
+  click 5862305273e75e10 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/UserRequirements.html#linting-command-output&quot;;
+  5833165793ba0498 -.-&gt;|deriveReqT| 5862305273e75e10;
+  2d48fe5f748f81e4 --&gt;|satisfies| 5833165793ba0498;
+  acb338a79cfa8b2d[&quot;Incosistent Newlines Linting Implementation&quot;];
+  click acb338a79cfa8b2d &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#incosistent-newlines-linting-implementation&quot;;
+  class acb338a79cfa8b2d requirement;
+  acb338a79cfa8b2d -.-&gt;|deriveReqT| 43bbec4721cc6a68;
+  96c9e48a25e4de33[&quot;linting/newlines.rs&quot;];
+  class 96c9e48a25e4de33 default;
+  click 96c9e48a25e4de33 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/core/src/linting/newlines.rs&quot;;
+  96c9e48a25e4de33 --&gt;|satisfies| acb338a79cfa8b2d;
+  87548b2599ea86c2[&quot;Excess Whitespace Linting Implementation&quot;];
+  click 87548b2599ea86c2 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#excess-whitespace-linting-implementation&quot;;
+  class 87548b2599ea86c2 requirement;
+  87548b2599ea86c2 -.-&gt;|deriveReqT| 43bbec4721cc6a68;
+  839419873727313d[&quot;linting/whitespace.rs&quot;];
+  class 839419873727313d default;
+  click 839419873727313d &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/core/src/linting/whitespace.rs&quot;;
+  839419873727313d --&gt;|satisfies| 87548b2599ea86c2;
 </div>
 <hr />
 <h3 id="cli-lint-flag">CLI Lint Flag</h3>
@@ -289,17 +289,17 @@ blockquote {
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  d38ab4ad139183d3[&quot;External Folders Support&quot;];
-  click d38ab4ad139183d3 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#external-folders-support&quot;;
-  class d38ab4ad139183d3 requirement;
-  e7286123b1b97862[&quot;ManagingMbseModelsRequirements.md/Support for Distributed Requirements&quot;];
-  class e7286123b1b97862 requirement;
-  click e7286123b1b97862 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/ManagingMbseModelsRequirements.html#support-for-distributed-requirements&quot;;
-  d38ab4ad139183d3 -.-&gt;|deriveReqT| e7286123b1b97862;
-  c87fb8d32afb10bb[&quot;config.rs&quot;];
-  class c87fb8d32afb10bb default;
-  click c87fb8d32afb10bb &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/cli/src/config.rs&quot;;
-  c87fb8d32afb10bb --&gt;|satisfies| d38ab4ad139183d3;
+  13158cbf874bcf08[&quot;External Folders Support&quot;];
+  click 13158cbf874bcf08 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#external-folders-support&quot;;
+  class 13158cbf874bcf08 requirement;
+  1355222227e76540[&quot;ManagingMbseModelsRequirements.md/Support for Distributed Requirements&quot;];
+  class 1355222227e76540 requirement;
+  click 1355222227e76540 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/ManagingMbseModelsRequirements.html#support-for-distributed-requirements&quot;;
+  13158cbf874bcf08 -.-&gt;|deriveReqT| 1355222227e76540;
+  72abc04ae358293a[&quot;config.rs&quot;];
+  class 72abc04ae358293a default;
+  click 72abc04ae358293a &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/cli/src/config.rs&quot;;
+  72abc04ae358293a --&gt;|satisfies| 13158cbf874bcf08;
 </div>
 <hr />
 <h3 id="external-folders-support">External Folders Support</h3>
@@ -309,7 +309,7 @@ blockquote {
 These can be absolute paths or paths relative to the ‘specifications’ folder but must not be subfolders of ‘specifications’ folder.
 Empty list is allowed.
 All markdown files in these folders are considered <strong>system requirements</strong> (except those matching exclusion patterns).</p>
-<pre><code class="language-reqflow.yaml">paths:
+<pre><code class="language-reqvire.yaml">paths:
   external_folders:
     - /path/to/folder1
     - ../../folder2 
@@ -328,99 +328,99 @@ All markdown files in these folders are considered <strong>system requirements</
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  bdfd9d65e46117e7[&quot;Detailed Error Handling and Logging&quot;];
-  click bdfd9d65e46117e7 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#detailed-error-handling-and-logging&quot;;
-  class bdfd9d65e46117e7 requirement;
-  7cf5cf9900076be6[&quot;../UserRequirements.md#Enhanced Validation Error Reporting&quot;];
-  class 7cf5cf9900076be6 requirement;
-  click 7cf5cf9900076be6 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#enhanced-validation-error-reporting&quot;;
-  bdfd9d65e46117e7 -.-&gt;|deriveReqT| 7cf5cf9900076be6;
-  8cd8a561b4c440e3[&quot;src/error.rs&quot;];
-  class 8cd8a561b4c440e3 default;
-  click 8cd8a561b4c440e3 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/core/src/error.rs&quot;;
-  8cd8a561b4c440e3 --&gt;|satisfies| bdfd9d65e46117e7;
-  8ba9c7e059799274[&quot;LLM Context Command&quot;];
-  click 8ba9c7e059799274 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#llm-context-command&quot;;
-  class 8ba9c7e059799274 requirement;
-  5a6fc253c51845b6[&quot;UserRequirements.md/AI Agent Context&quot;];
-  class 5a6fc253c51845b6 requirement;
-  click 5a6fc253c51845b6 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#ai-agent-context&quot;;
-  8ba9c7e059799274 -.-&gt;|deriveReqT| 5a6fc253c51845b6;
-  4a5edefd6e054300[&quot;main.rs&quot;];
-  class 4a5edefd6e054300 default;
-  click 4a5edefd6e054300 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/cli/src/main.rs&quot;;
-  4a5edefd6e054300 --&gt;|satisfies| 8ba9c7e059799274;
-  5ec6a2668bddf0e[&quot;JSON Output Format&quot;];
-  click 5ec6a2668bddf0e &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#json-output-format&quot;;
-  class 5ec6a2668bddf0e requirement;
-  5ec6a2668bddf0e -.-&gt;|deriveReqT| 7cf5cf9900076be6;
-  11ffc4632afd7c4c[&quot;cli.rs&quot;];
-  class 11ffc4632afd7c4c default;
-  click 11ffc4632afd7c4c &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/cli/src/cli.rs&quot;;
-  11ffc4632afd7c4c --&gt;|satisfies| 5ec6a2668bddf0e;
-  8acd24c7c228637b[&quot;Index Generation&quot;];
-  click 8acd24c7c228637b &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#index-generation&quot;;
-  class 8acd24c7c228637b requirement;
-  f5b5eaeb28c5a7b1[&quot;UserRequirements.md/Generate Documentation Index&quot;];
-  class f5b5eaeb28c5a7b1 requirement;
-  click f5b5eaeb28c5a7b1 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#generate-documentation-index&quot;;
-  8acd24c7c228637b -.-&gt;|deriveReqT| f5b5eaeb28c5a7b1;
-  3ef6afafe29becbc[&quot;index_generator.rs&quot;];
-  class 3ef6afafe29becbc default;
-  click 3ef6afafe29becbc &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/core/src/index_generator.rs&quot;;
-  3ef6afafe29becbc --&gt;|satisfies| 8acd24c7c228637b;
-  98bd2bd6bdf5bf97[&quot;File Content Caching for Performance&quot;];
-  click 98bd2bd6bdf5bf97 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#file-content-caching-for-performance&quot;;
-  class 98bd2bd6bdf5bf97 requirement;
-  21e4eb87cb55ea5e[&quot;../ManagingMbseModelsRequirements.md#Efficient Processing&quot;];
-  class 21e4eb87cb55ea5e requirement;
-  click 21e4eb87cb55ea5e &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/ManagingMbseModelsRequirements.html#efficient-processing&quot;;
-  98bd2bd6bdf5bf97 -.-&gt;|deriveReqT| 21e4eb87cb55ea5e;
-  6136c216c9f80165[&quot;model.rs&quot;];
-  class 6136c216c9f80165 default;
-  click 6136c216c9f80165 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/core/src/model.rs&quot;;
-  6136c216c9f80165 --&gt;|satisfies| 98bd2bd6bdf5bf97;
-  86e0701b6ce7de0b[&quot;HTML Navigation Enhancement&quot;];
-  click 86e0701b6ce7de0b &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#html-navigation-enhancement&quot;;
-  class 86e0701b6ce7de0b requirement;
-  e1c89b5d94837122[&quot;UserRequirements.md/Documentation Index HTML Integration&quot;];
-  class e1c89b5d94837122 requirement;
-  click e1c89b5d94837122 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#documentation-index-html-integration&quot;;
-  86e0701b6ce7de0b -.-&gt;|deriveReqT| e1c89b5d94837122;
-  c788e5b84faa2ae3[&quot;html.rs&quot;];
-  class c788e5b84faa2ae3 default;
-  click c788e5b84faa2ae3 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/core/src/html.rs&quot;;
-  c788e5b84faa2ae3 --&gt;|satisfies| 86e0701b6ce7de0b;
-  8cb11d152f3b9d2d[&quot;html_export.rs&quot;];
-  class 8cb11d152f3b9d2d default;
-  click 8cb11d152f3b9d2d &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/core/src/html_export.rs&quot;;
-  8cb11d152f3b9d2d --&gt;|satisfies| 86e0701b6ce7de0b;
-  7a8da8dfee910932[&quot;Interactive Mermaid Diagram Node Behavior&quot;];
-  click 7a8da8dfee910932 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#interactive-mermaid-diagram-node-behavior&quot;;
-  class 7a8da8dfee910932 requirement;
-  e867499409ae347a[&quot;UserRequirements.md/Interactive Mermaid Diagrams&quot;];
-  class e867499409ae347a requirement;
-  click e867499409ae347a &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#interactive-mermaid-diagrams&quot;;
-  7a8da8dfee910932 -.-&gt;|deriveReqT| e867499409ae347a;
-  d4240e29691d4b88[&quot;html.rs&quot;];
-  class d4240e29691d4b88 default;
-  click d4240e29691d4b88 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/core/src/diagrams.rs&quot;;
-  d4240e29691d4b88 --&gt;|satisfies| 7a8da8dfee910932;
-  c8b6ccc187b0a27e[&quot;HTML Export&quot;];
-  click c8b6ccc187b0a27e &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#html-export&quot;;
-  class c8b6ccc187b0a27e requirement;
-  72c7eda6183f0893[&quot;../UserRequirements.md/Export HTML specifications&quot;];
-  class 72c7eda6183f0893 requirement;
-  click 72c7eda6183f0893 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#export-html-specifications&quot;;
-  c8b6ccc187b0a27e -.-&gt;|deriveReqT| 72c7eda6183f0893;
-  8cb11d152f3b9d2d --&gt;|satisfies| c8b6ccc187b0a27e;
-  5a1719a2649b9922[&quot;Unstructured Documents&quot;];
-  click 5a1719a2649b9922 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#unstructured-documents&quot;;
-  class 5a1719a2649b9922 requirement;
-  daadd8e583647e4f[&quot;ManagingMbseModelsRequirements.md#Coexistence of Structured and Unstructured Documents&quot;];
-  class daadd8e583647e4f requirement;
-  click daadd8e583647e4f &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/ManagingMbseModelsRequirements.html#coexistence-of-structured-and-unstructured-documents&quot;;
-  5a1719a2649b9922 -.-&gt;|deriveReqT| daadd8e583647e4f;
+  34955d64b2f2498a[&quot;JSON Output Format&quot;];
+  click 34955d64b2f2498a &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#json-output-format&quot;;
+  class 34955d64b2f2498a requirement;
+  20193d4c951bb5d8[&quot;UserRequirements.md/Enhanced Validation Error Reporting&quot;];
+  class 20193d4c951bb5d8 requirement;
+  click 20193d4c951bb5d8 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/UserRequirements.html#enhanced-validation-error-reporting&quot;;
+  34955d64b2f2498a -.-&gt;|deriveReqT| 20193d4c951bb5d8;
+  5fe26772336463bc[&quot;cli.rs&quot;];
+  class 5fe26772336463bc default;
+  click 5fe26772336463bc &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/cli/src/cli.rs&quot;;
+  5fe26772336463bc --&gt;|satisfies| 34955d64b2f2498a;
+  d0ab992050899c65[&quot;Detailed Error Handling and Logging&quot;];
+  click d0ab992050899c65 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#detailed-error-handling-and-logging&quot;;
+  class d0ab992050899c65 requirement;
+  d0ab992050899c65 -.-&gt;|deriveReqT| 20193d4c951bb5d8;
+  7d8c02914ff6562f[&quot;src/error.rs&quot;];
+  class 7d8c02914ff6562f default;
+  click 7d8c02914ff6562f &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/core/src/error.rs&quot;;
+  7d8c02914ff6562f --&gt;|satisfies| d0ab992050899c65;
+  6fda52e049427373[&quot;File Content Caching for Performance&quot;];
+  click 6fda52e049427373 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#file-content-caching-for-performance&quot;;
+  class 6fda52e049427373 requirement;
+  b6c8faf2d138c14a[&quot;../ManagingMbseModelsRequirements.md#Efficient Processing&quot;];
+  class b6c8faf2d138c14a requirement;
+  click b6c8faf2d138c14a &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/ManagingMbseModelsRequirements.html#efficient-processing&quot;;
+  6fda52e049427373 -.-&gt;|deriveReqT| b6c8faf2d138c14a;
+  2671722513a08b18[&quot;model.rs&quot;];
+  class 2671722513a08b18 default;
+  click 2671722513a08b18 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/core/src/model.rs&quot;;
+  2671722513a08b18 --&gt;|satisfies| 6fda52e049427373;
+  9bd5bfd010597a61[&quot;LLM Context Command&quot;];
+  click 9bd5bfd010597a61 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#llm-context-command&quot;;
+  class 9bd5bfd010597a61 requirement;
+  c5fffc3cd9f22134[&quot;UserRequirements.md/AI Agent Context&quot;];
+  class c5fffc3cd9f22134 requirement;
+  click c5fffc3cd9f22134 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/UserRequirements.html#ai-agent-context&quot;;
+  9bd5bfd010597a61 -.-&gt;|deriveReqT| c5fffc3cd9f22134;
+  f6af4e23e0321ea9[&quot;main.rs&quot;];
+  class f6af4e23e0321ea9 default;
+  click f6af4e23e0321ea9 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/cli/src/main.rs&quot;;
+  f6af4e23e0321ea9 --&gt;|satisfies| 9bd5bfd010597a61;
+  e0125fd451efef8b[&quot;HTML Export&quot;];
+  click e0125fd451efef8b &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#html-export&quot;;
+  class e0125fd451efef8b requirement;
+  6424b4fd0b132482[&quot;../UserRequirements.md/Export HTML specifications&quot;];
+  class 6424b4fd0b132482 requirement;
+  click 6424b4fd0b132482 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/UserRequirements.html#export-html-specifications&quot;;
+  e0125fd451efef8b -.-&gt;|deriveReqT| 6424b4fd0b132482;
+  263d4f4f6c5b0e15[&quot;html_export.rs&quot;];
+  class 263d4f4f6c5b0e15 default;
+  click 263d4f4f6c5b0e15 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/core/src/html_export.rs&quot;;
+  263d4f4f6c5b0e15 --&gt;|satisfies| e0125fd451efef8b;
+  d0f717482d447c04[&quot;Interactive Mermaid Diagram Node Behavior&quot;];
+  click d0f717482d447c04 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#interactive-mermaid-diagram-node-behavior&quot;;
+  class d0f717482d447c04 requirement;
+  33a6290c04810f44[&quot;UserRequirements.md/Interactive Mermaid Diagrams&quot;];
+  class 33a6290c04810f44 requirement;
+  click 33a6290c04810f44 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/UserRequirements.html#interactive-mermaid-diagrams&quot;;
+  d0f717482d447c04 -.-&gt;|deriveReqT| 33a6290c04810f44;
+  e29a97d68903e7bb[&quot;html.rs&quot;];
+  class e29a97d68903e7bb default;
+  click e29a97d68903e7bb &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/core/src/diagrams.rs&quot;;
+  e29a97d68903e7bb --&gt;|satisfies| d0f717482d447c04;
+  eae22c5060352d6f[&quot;HTML Navigation Enhancement&quot;];
+  click eae22c5060352d6f &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#html-navigation-enhancement&quot;;
+  class eae22c5060352d6f requirement;
+  3197771fa6f58185[&quot;UserRequirements.md/Documentation Index HTML Integration&quot;];
+  class 3197771fa6f58185 requirement;
+  click 3197771fa6f58185 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/UserRequirements.html#documentation-index-html-integration&quot;;
+  eae22c5060352d6f -.-&gt;|deriveReqT| 3197771fa6f58185;
+  49d2748b5e210381[&quot;html.rs&quot;];
+  class 49d2748b5e210381 default;
+  click 49d2748b5e210381 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/core/src/html.rs&quot;;
+  49d2748b5e210381 --&gt;|satisfies| eae22c5060352d6f;
+  263d4f4f6c5b0e15 --&gt;|satisfies| eae22c5060352d6f;
+  d6a1fbde09883ed0[&quot;Unstructured Documents&quot;];
+  click d6a1fbde09883ed0 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#unstructured-documents&quot;;
+  class d6a1fbde09883ed0 requirement;
+  a67f325ec6416b1d[&quot;ManagingMbseModelsRequirements.md#Coexistence of Structured and Unstructured Documents&quot;];
+  class a67f325ec6416b1d requirement;
+  click a67f325ec6416b1d &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/ManagingMbseModelsRequirements.html#coexistence-of-structured-and-unstructured-documents&quot;;
+  d6a1fbde09883ed0 -.-&gt;|deriveReqT| a67f325ec6416b1d;
+  ca07c1345af51729[&quot;Index Generation&quot;];
+  click ca07c1345af51729 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#index-generation&quot;;
+  class ca07c1345af51729 requirement;
+  a0f45824211bff87[&quot;UserRequirements.md/Generate Documentation Index&quot;];
+  class a0f45824211bff87 requirement;
+  click a0f45824211bff87 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/UserRequirements.html#generate-documentation-index&quot;;
+  ca07c1345af51729 -.-&gt;|deriveReqT| a0f45824211bff87;
+  770285ae87065aa3[&quot;index_generator.rs&quot;];
+  class 770285ae87065aa3 default;
+  click 770285ae87065aa3 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/core/src/index_generator.rs&quot;;
+  770285ae87065aa3 --&gt;|satisfies| ca07c1345af51729;
 </div>
 <hr />
 <h3 id="json-output-format">JSON Output Format</h3>
@@ -451,7 +451,7 @@ All markdown files in these folders are considered <strong>system requirements</
 </ul>
 <hr />
 <h3 id="llm-context-command">LLM Context Command</h3>
-<p>The system shall provide a command-line option <code>--llm-context</code> that outputs comprehensive contextual information about ReqFlow methodology, document structure, relation types, and CLI usage to help Large Language Models understand and work with ReqFlow-based projects.</p>
+<p>The system shall provide a command-line option <code>--llm-context</code> that outputs comprehensive contextual information about Reqvire methodology, document structure, relation types, and CLI usage to help Large Language Models understand and work with Reqvire-based projects.</p>
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="../UserRequirements.html#ai-agent-context">UserRequirements.md/AI Agent Context</a></li>
@@ -515,33 +515,33 @@ TODO: add requirment that defines a config filter out patterns.</p>
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  99bed90a0d96a1d2[&quot;Requirements Processing&quot;];
-  click 99bed90a0d96a1d2 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#requirements-processing&quot;;
-  class 99bed90a0d96a1d2 requirement;
-  e7286123b1b97862[&quot;ManagingMbseModelsRequirements.md/Support for Distributed Requirements&quot;];
-  class e7286123b1b97862 requirement;
-  click e7286123b1b97862 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/ManagingMbseModelsRequirements.html#support-for-distributed-requirements&quot;;
-  99bed90a0d96a1d2 -.-&gt;|deriveReqT| e7286123b1b97862;
-  6136c216c9f80165[&quot;model.rs&quot;];
-  class 6136c216c9f80165 default;
-  click 6136c216c9f80165 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/core/src/model.rs&quot;;
-  6136c216c9f80165 --&gt;|satisfies| 99bed90a0d96a1d2;
-  3b1e87396caf6495[&quot;parser.rs&quot;];
-  class 3b1e87396caf6495 default;
-  click 3b1e87396caf6495 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/core/src/parser.rs&quot;;
-  3b1e87396caf6495 --&gt;|satisfies| 99bed90a0d96a1d2;
-  2737f2d770aa0757[&quot;Requirements Files Search and Detection&quot;];
-  click 2737f2d770aa0757 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#requirements-files-search-and-detection&quot;;
-  class 2737f2d770aa0757 requirement;
-  21e4eb87cb55ea5e[&quot;ManagingMbseModelsRequirements.md/Efficient Processing&quot;];
-  class 21e4eb87cb55ea5e requirement;
-  click 21e4eb87cb55ea5e &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/ManagingMbseModelsRequirements.html#efficient-processing&quot;;
-  2737f2d770aa0757 -.-&gt;|deriveReqT| 21e4eb87cb55ea5e;
-  6136c216c9f80165 --&gt;|satisfies| 2737f2d770aa0757;
+  c6d19363284e9125[&quot;Requirements Processing&quot;];
+  click c6d19363284e9125 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#requirements-processing&quot;;
+  class c6d19363284e9125 requirement;
+  1355222227e76540[&quot;ManagingMbseModelsRequirements.md/Support for Distributed Requirements&quot;];
+  class 1355222227e76540 requirement;
+  click 1355222227e76540 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/ManagingMbseModelsRequirements.html#support-for-distributed-requirements&quot;;
+  c6d19363284e9125 -.-&gt;|deriveReqT| 1355222227e76540;
+  2671722513a08b18[&quot;model.rs&quot;];
+  class 2671722513a08b18 default;
+  click 2671722513a08b18 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/core/src/model.rs&quot;;
+  2671722513a08b18 --&gt;|satisfies| c6d19363284e9125;
+  8af498811b4b1f17[&quot;parser.rs&quot;];
+  class 8af498811b4b1f17 default;
+  click 8af498811b4b1f17 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/core/src/parser.rs&quot;;
+  8af498811b4b1f17 --&gt;|satisfies| c6d19363284e9125;
+  734ff30870a0bde0[&quot;Requirements Files Search and Detection&quot;];
+  click 734ff30870a0bde0 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#requirements-files-search-and-detection&quot;;
+  class 734ff30870a0bde0 requirement;
+  b6c8faf2d138c14a[&quot;ManagingMbseModelsRequirements.md/Efficient Processing&quot;];
+  class b6c8faf2d138c14a requirement;
+  click b6c8faf2d138c14a &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/ManagingMbseModelsRequirements.html#efficient-processing&quot;;
+  734ff30870a0bde0 -.-&gt;|deriveReqT| b6c8faf2d138c14a;
+  2671722513a08b18 --&gt;|satisfies| 734ff30870a0bde0;
 </div>
 <hr />
 <h3 id="requirements-processing">Requirements Processing</h3>
-<p>The system shall parse the ‘specifications’ and ‘external folders’ directory structure using the configured paths from reqflow.yaml to identify system elements files and their hierarchical relationships.</p>
+<p>The system shall parse the ‘specifications’ and ‘external folders’ directory structure using the configured paths from reqvire.yaml to identify system elements files and their hierarchical relationships.</p>
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="../ManagingMbseModelsRequirements.html#support-for-distributed-requirements">ManagingMbseModelsRequirements.md/Support for Distributed Requirements</a></li>
@@ -576,76 +576,76 @@ The process follows these steps to determine whether a file contains requirement
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  9860815d52cb0fbb[&quot;Visual Differential Rendering&quot;];
-  click 9860815d52cb0fbb &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#visual-differential-rendering&quot;;
-  class 9860815d52cb0fbb requirement;
-  fd7388e379372d7b[&quot;UserRequirements.md/Highlight Changes in Diagrams&quot;];
-  class fd7388e379372d7b requirement;
-  click fd7388e379372d7b &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#highlight-changes-in-diagrams&quot;;
-  9860815d52cb0fbb -.-&gt;|deriveReqT| fd7388e379372d7b;
-  c826c1ee7c93bf6b[&quot;SysML-Compatible Relationship Rendering&quot;];
-  click c826c1ee7c93bf6b &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#sysml-compatible-relationship-rendering&quot;;
-  class c826c1ee7c93bf6b requirement;
-  a6a836283607bf45[&quot;UserRequirements.md/Visualize Model Relationships&quot;];
-  class a6a836283607bf45 requirement;
-  click a6a836283607bf45 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#visualize-model-relationships&quot;;
-  c826c1ee7c93bf6b -.-&gt;|deriveReqT| a6a836283607bf45;
-  d4240e29691d4b88[&quot;diagrams.rs&quot;];
-  class d4240e29691d4b88 default;
-  click d4240e29691d4b88 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/core/src/diagrams.rs&quot;;
-  d4240e29691d4b88 --&gt;|satisfies| c826c1ee7c93bf6b;
-  191d27287e362df2[&quot;Diagram Storage Path Configuration&quot;];
-  click 191d27287e362df2 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#diagram-storage-path-configuration&quot;;
-  class 191d27287e362df2 requirement;
-  aee397f35b867556[&quot;UserRequirements.md/Store Automated Diagrams in Designated Locations&quot;];
-  class aee397f35b867556 requirement;
-  click aee397f35b867556 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#store-automated-diagrams-in-designated-locations&quot;;
-  191d27287e362df2 -.-&gt;|deriveReqT| aee397f35b867556;
-  6136c216c9f80165[&quot;model.rs&quot;];
-  class 6136c216c9f80165 default;
-  click 6136c216c9f80165 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/core/src/model.rs&quot;;
-  6136c216c9f80165 --&gt;|satisfies| 191d27287e362df2;
-  cc8128cae305b29d[&quot;Configurable Filename Exclusion Patterns&quot;];
-  click cc8128cae305b29d &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#configurable-filename-exclusion-patterns&quot;;
-  class cc8128cae305b29d requirement;
-  ce24dbacb9646f3b[&quot;ManagingMbseModelsRequirements.md/Project Configuration with YAML&quot;];
-  class ce24dbacb9646f3b requirement;
-  click ce24dbacb9646f3b &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/ManagingMbseModelsRequirements.html#project-configuration-with-yaml&quot;;
-  cc8128cae305b29d -.-&gt;|deriveReqT| ce24dbacb9646f3b;
-  c87fb8d32afb10bb[&quot;config.rs&quot;];
-  class c87fb8d32afb10bb default;
-  click c87fb8d32afb10bb &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/cli/src/config.rs&quot;;
-  c87fb8d32afb10bb --&gt;|satisfies| cc8128cae305b29d;
-  f2a7d0df128bcf98[&quot;Automated Diagram Generation on PR Merge&quot;];
-  click f2a7d0df128bcf98 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#automated-diagram-generation-on-pr-merge&quot;;
-  class f2a7d0df128bcf98 requirement;
-  81f9235dedaea6a9[&quot;UserRequirements.md/Automate Diagram Generation&quot;];
-  class 81f9235dedaea6a9 requirement;
-  click 81f9235dedaea6a9 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#automate-diagram-generation&quot;;
-  f2a7d0df128bcf98 -.-&gt;|deriveReqT| 81f9235dedaea6a9;
-  68454e6166703319[&quot;UserRequirements.md/Automate Pull Request Validations&quot;];
-  class 68454e6166703319 requirement;
-  click 68454e6166703319 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#automate-pull-request-validations&quot;;
-  f2a7d0df128bcf98 -.-&gt;|deriveReqT| 68454e6166703319;
-  d062860f47933799[&quot;generate_diagrams.yml&quot;];
-  class d062860f47933799 default;
-  click d062860f47933799 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/.github/workflows/generate_diagrams.yml&quot;;
-  d062860f47933799 --&gt;|satisfies| f2a7d0df128bcf98;
-  1414e7f8890f2939[&quot;Relationship Type Filter Implementation&quot;];
-  click 1414e7f8890f2939 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#relationship-type-filter-implementation&quot;;
-  class 1414e7f8890f2939 requirement;
-  30d97803eba68a13[&quot;UserRequirements.md/Filter Relationships by Type&quot;];
-  class 30d97803eba68a13 requirement;
-  click 30d97803eba68a13 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#filter-relationships-by-type&quot;;
-  1414e7f8890f2939 -.-&gt;|deriveReqT| 30d97803eba68a13;
-  a7ec66314a62423b[&quot;Mermaid Diagram Format Conversion&quot;];
-  click a7ec66314a62423b &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#mermaid-diagram-format-conversion&quot;;
-  class a7ec66314a62423b requirement;
-  10c00a1bd12fefa5[&quot;UserRequirements.md/Export Diagrams in Standard Formats&quot;];
-  class 10c00a1bd12fefa5 requirement;
-  click 10c00a1bd12fefa5 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#export-diagrams-in-standard-formats&quot;;
-  a7ec66314a62423b -.-&gt;|deriveReqT| 10c00a1bd12fefa5;
-  d4240e29691d4b88 --&gt;|satisfies| a7ec66314a62423b;
+  c35d39c7f9e6808b[&quot;Diagram Storage Path Configuration&quot;];
+  click c35d39c7f9e6808b &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#diagram-storage-path-configuration&quot;;
+  class c35d39c7f9e6808b requirement;
+  9276544d5ee17790[&quot;UserRequirements.md/Store Automated Diagrams in Designated Locations&quot;];
+  class 9276544d5ee17790 requirement;
+  click 9276544d5ee17790 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/UserRequirements.html#store-automated-diagrams-in-designated-locations&quot;;
+  c35d39c7f9e6808b -.-&gt;|deriveReqT| 9276544d5ee17790;
+  2671722513a08b18[&quot;model.rs&quot;];
+  class 2671722513a08b18 default;
+  click 2671722513a08b18 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/core/src/model.rs&quot;;
+  2671722513a08b18 --&gt;|satisfies| c35d39c7f9e6808b;
+  5c774c80f071101f[&quot;Relationship Type Filter Implementation&quot;];
+  click 5c774c80f071101f &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#relationship-type-filter-implementation&quot;;
+  class 5c774c80f071101f requirement;
+  f3450185979ff229[&quot;UserRequirements.md/Filter Relationships by Type&quot;];
+  class f3450185979ff229 requirement;
+  click f3450185979ff229 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/UserRequirements.html#filter-relationships-by-type&quot;;
+  5c774c80f071101f -.-&gt;|deriveReqT| f3450185979ff229;
+  6f822bdd8c71c7c8[&quot;Configurable Filename Exclusion Patterns&quot;];
+  click 6f822bdd8c71c7c8 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#configurable-filename-exclusion-patterns&quot;;
+  class 6f822bdd8c71c7c8 requirement;
+  fbe7e0d3b82611ef[&quot;ManagingMbseModelsRequirements.md/Project Configuration with YAML&quot;];
+  class fbe7e0d3b82611ef requirement;
+  click fbe7e0d3b82611ef &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/ManagingMbseModelsRequirements.html#project-configuration-with-yaml&quot;;
+  6f822bdd8c71c7c8 -.-&gt;|deriveReqT| fbe7e0d3b82611ef;
+  72abc04ae358293a[&quot;config.rs&quot;];
+  class 72abc04ae358293a default;
+  click 72abc04ae358293a &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/cli/src/config.rs&quot;;
+  72abc04ae358293a --&gt;|satisfies| 6f822bdd8c71c7c8;
+  1d5464f20f10765e[&quot;Mermaid Diagram Format Conversion&quot;];
+  click 1d5464f20f10765e &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#mermaid-diagram-format-conversion&quot;;
+  class 1d5464f20f10765e requirement;
+  ff7932724ee600f1[&quot;UserRequirements.md/Export Diagrams in Standard Formats&quot;];
+  class ff7932724ee600f1 requirement;
+  click ff7932724ee600f1 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/UserRequirements.html#export-diagrams-in-standard-formats&quot;;
+  1d5464f20f10765e -.-&gt;|deriveReqT| ff7932724ee600f1;
+  e29a97d68903e7bb[&quot;diagrams.rs&quot;];
+  class e29a97d68903e7bb default;
+  click e29a97d68903e7bb &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/core/src/diagrams.rs&quot;;
+  e29a97d68903e7bb --&gt;|satisfies| 1d5464f20f10765e;
+  273cce972e603178[&quot;Automated Diagram Generation on PR Merge&quot;];
+  click 273cce972e603178 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#automated-diagram-generation-on-pr-merge&quot;;
+  class 273cce972e603178 requirement;
+  4d4dad9ce307fade[&quot;UserRequirements.md/Automate Diagram Generation&quot;];
+  class 4d4dad9ce307fade requirement;
+  click 4d4dad9ce307fade &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/UserRequirements.html#automate-diagram-generation&quot;;
+  273cce972e603178 -.-&gt;|deriveReqT| 4d4dad9ce307fade;
+  323a6281f4383168[&quot;UserRequirements.md/Automate Pull Request Validations&quot;];
+  class 323a6281f4383168 requirement;
+  click 323a6281f4383168 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/UserRequirements.html#automate-pull-request-validations&quot;;
+  273cce972e603178 -.-&gt;|deriveReqT| 323a6281f4383168;
+  6699836c9fa45af6[&quot;generate_diagrams.yml&quot;];
+  class 6699836c9fa45af6 default;
+  click 6699836c9fa45af6 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/.github/workflows/generate_diagrams.yml&quot;;
+  6699836c9fa45af6 --&gt;|satisfies| 273cce972e603178;
+  4512593c8e0cc8ae[&quot;Visual Differential Rendering&quot;];
+  click 4512593c8e0cc8ae &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#visual-differential-rendering&quot;;
+  class 4512593c8e0cc8ae requirement;
+  efa8bb8c8484bb40[&quot;UserRequirements.md/Highlight Changes in Diagrams&quot;];
+  class efa8bb8c8484bb40 requirement;
+  click efa8bb8c8484bb40 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/UserRequirements.html#highlight-changes-in-diagrams&quot;;
+  4512593c8e0cc8ae -.-&gt;|deriveReqT| efa8bb8c8484bb40;
+  b7e7ff82d313249[&quot;SysML-Compatible Relationship Rendering&quot;];
+  click b7e7ff82d313249 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#sysml-compatible-relationship-rendering&quot;;
+  class b7e7ff82d313249 requirement;
+  e98d18ae3a41815a[&quot;UserRequirements.md/Visualize Model Relationships&quot;];
+  class e98d18ae3a41815a requirement;
+  click e98d18ae3a41815a &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/UserRequirements.html#visualize-model-relationships&quot;;
+  b7e7ff82d313249 -.-&gt;|deriveReqT| e98d18ae3a41815a;
+  e29a97d68903e7bb --&gt;|satisfies| b7e7ff82d313249;
 </div>
 <ul>
 <li><strong>Stakeholder Needs Requirements File</strong>: Files located in the root of the <code>specifications</code> folder and meeting all conditions.</li>
@@ -660,7 +660,7 @@ The process follows these steps to determine whether a file contains requirement
 <ul>
 <li>Be triggered only when a pull request is merged to the main branch (not on PR creation or updates)</li>
 <li>Check out the latest code from the main branch post-merge</li>
-<li>Build the ReqFlow tool from source</li>
+<li>Build the Reqvire tool from source</li>
 <li>Run the diagram generation process using the <code>--generate-diagrams</code> flag</li>
 <li>Generate a traceability matrix SVG using the <code>--traces --svg</code> flags</li>
 <li>Check if any diagrams or matrix files have been added or modified</li>
@@ -678,7 +678,7 @@ The process follows these steps to determine whether a file contains requirement
 <h3 id="configurable-filename-exclusion-patterns">Configurable Filename Exclusion Patterns</h3>
 <p>The system shall support configurable glob patterns to exclude specific files from requirement processing, regardless if they are located in specifications or external folders.</p>
 <h4>Details</h4>
-<pre><code class="language-reqflow.yaml">paths:
+<pre><code class="language-reqvire.yaml">paths:
 
   # Glob patterns to exclude from requirements processing
 
@@ -801,56 +801,56 @@ satisfy:</li>
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  1ffba11189b9b4c8[&quot;CLI Traces SVG Flag&quot;];
-  click 1ffba11189b9b4c8 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#cli-traces-svg-flag&quot;;
-  class 1ffba11189b9b4c8 requirement;
-  438a74e06c98c101[&quot;CLI Traces Flag&quot;];
-  class 438a74e06c98c101 requirement;
-  click 438a74e06c98c101 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#cli-traces-flag&quot;;
-  1ffba11189b9b4c8 -.-&gt;|deriveReqT| 438a74e06c98c101;
-  11ffc4632afd7c4c[&quot;cli.rs&quot;];
-  class 11ffc4632afd7c4c default;
-  click 11ffc4632afd7c4c &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/cli/src/cli.rs&quot;;
-  11ffc4632afd7c4c --&gt;|satisfies| 1ffba11189b9b4c8;
-  665b7456c9b61ded[&quot;CLI Change Impact Report Flag&quot;];
-  click 665b7456c9b61ded &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#cli-change-impact-report-flag&quot;;
-  class 665b7456c9b61ded requirement;
-  918cc4a26d642f30[&quot;Structural Change Analyzer&quot;];
-  class 918cc4a26d642f30 requirement;
-  click 918cc4a26d642f30 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#structural-change-analyzer&quot;;
-  665b7456c9b61ded -.-&gt;|deriveReqT| 918cc4a26d642f30;
-  11ffc4632afd7c4c --&gt;|satisfies| 665b7456c9b61ded;
-  b8b40184613535c1[&quot;CLI Git Commit Hash Flag&quot;];
-  click b8b40184613535c1 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#cli-git-commit-hash-flag&quot;;
-  class b8b40184613535c1 requirement;
-  b8b40184613535c1 -.-&gt;|deriveReqT| 665b7456c9b61ded;
-  11ffc4632afd7c4c --&gt;|satisfies| b8b40184613535c1;
-  d7e5fbf806d650d9[&quot;Markdown Matrix Formatter&quot;];
-  click d7e5fbf806d650d9 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#markdown-matrix-formatter&quot;;
-  class d7e5fbf806d650d9 requirement;
-  ba40352f8e72c125[&quot;UserRequirements.md/Traceability Matrix&quot;];
-  class ba40352f8e72c125 requirement;
-  click ba40352f8e72c125 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#traceability-matrix&quot;;
-  d7e5fbf806d650d9 -.-&gt;|deriveReqT| ba40352f8e72c125;
-  48ddeb303b98f1b4[&quot;matrix_generator.rs&quot;];
-  class 48ddeb303b98f1b4 default;
-  click 48ddeb303b98f1b4 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/core/src/matrix_generator.rs&quot;;
-  48ddeb303b98f1b4 --&gt;|satisfies| d7e5fbf806d650d9;
-  91ebf7e73d5ac081[&quot;UserRequirements.md/Tracing Structural Changes&quot;];
-  class 91ebf7e73d5ac081 requirement;
-  click 91ebf7e73d5ac081 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#tracing-structural-changes&quot;;
-  918cc4a26d642f30 -.-&gt;|deriveReqT| 91ebf7e73d5ac081;
-  cc976e6bcded86e7[&quot;model.rs&quot;];
-  class cc976e6bcded86e7 default;
-  click cc976e6bcded86e7 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/core/src/change_impact.rs&quot;;
-  cc976e6bcded86e7 --&gt;|satisfies| 918cc4a26d642f30;
-  438a74e06c98c101 -.-&gt;|deriveReqT| ba40352f8e72c125;
-  11ffc4632afd7c4c --&gt;|satisfies| 438a74e06c98c101;
-  5eca866a0338e0fe[&quot;Traceability Matrix Builder Implementation&quot;];
-  click 5eca866a0338e0fe &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#traceability-matrix-builder-implementation&quot;;
-  class 5eca866a0338e0fe requirement;
-  5eca866a0338e0fe -.-&gt;|deriveReqT| ba40352f8e72c125;
-  48ddeb303b98f1b4 --&gt;|satisfies| 5eca866a0338e0fe;
+  7a56a2d0b94cbc94[&quot;CLI Traces Flag&quot;];
+  click 7a56a2d0b94cbc94 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#cli-traces-flag&quot;;
+  class 7a56a2d0b94cbc94 requirement;
+  681cda683cd3fa2a[&quot;UserRequirements.md/Traceability Matrix&quot;];
+  class 681cda683cd3fa2a requirement;
+  click 681cda683cd3fa2a &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/UserRequirements.html#traceability-matrix&quot;;
+  7a56a2d0b94cbc94 -.-&gt;|deriveReqT| 681cda683cd3fa2a;
+  5fe26772336463bc[&quot;cli.rs&quot;];
+  class 5fe26772336463bc default;
+  click 5fe26772336463bc &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/cli/src/cli.rs&quot;;
+  5fe26772336463bc --&gt;|satisfies| 7a56a2d0b94cbc94;
+  dae7b02b70487825[&quot;CLI Traces SVG Flag&quot;];
+  click dae7b02b70487825 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#cli-traces-svg-flag&quot;;
+  class dae7b02b70487825 requirement;
+  dae7b02b70487825 -.-&gt;|deriveReqT| 7a56a2d0b94cbc94;
+  5fe26772336463bc --&gt;|satisfies| dae7b02b70487825;
+  9a465de9fd86cbf3[&quot;CLI Change Impact Report Flag&quot;];
+  click 9a465de9fd86cbf3 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#cli-change-impact-report-flag&quot;;
+  class 9a465de9fd86cbf3 requirement;
+  8911202d5ac22fa9[&quot;Structural Change Analyzer&quot;];
+  class 8911202d5ac22fa9 requirement;
+  click 8911202d5ac22fa9 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#structural-change-analyzer&quot;;
+  9a465de9fd86cbf3 -.-&gt;|deriveReqT| 8911202d5ac22fa9;
+  5fe26772336463bc --&gt;|satisfies| 9a465de9fd86cbf3;
+  7d76667e6a943402[&quot;CLI Git Commit Hash Flag&quot;];
+  click 7d76667e6a943402 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#cli-git-commit-hash-flag&quot;;
+  class 7d76667e6a943402 requirement;
+  7d76667e6a943402 -.-&gt;|deriveReqT| 9a465de9fd86cbf3;
+  5fe26772336463bc --&gt;|satisfies| 7d76667e6a943402;
+  4dc854c91f0e4c8d[&quot;UserRequirements.md/Tracing Structural Changes&quot;];
+  class 4dc854c91f0e4c8d requirement;
+  click 4dc854c91f0e4c8d &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/UserRequirements.html#tracing-structural-changes&quot;;
+  8911202d5ac22fa9 -.-&gt;|deriveReqT| 4dc854c91f0e4c8d;
+  3a36b9f74d4d889b[&quot;model.rs&quot;];
+  class 3a36b9f74d4d889b default;
+  click 3a36b9f74d4d889b &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/core/src/change_impact.rs&quot;;
+  3a36b9f74d4d889b --&gt;|satisfies| 8911202d5ac22fa9;
+  c82329bbc603aed3[&quot;Traceability Matrix Builder Implementation&quot;];
+  click c82329bbc603aed3 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#traceability-matrix-builder-implementation&quot;;
+  class c82329bbc603aed3 requirement;
+  c82329bbc603aed3 -.-&gt;|deriveReqT| 681cda683cd3fa2a;
+  9f97df7988362b9[&quot;matrix_generator.rs&quot;];
+  class 9f97df7988362b9 default;
+  click 9f97df7988362b9 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/core/src/matrix_generator.rs&quot;;
+  9f97df7988362b9 --&gt;|satisfies| c82329bbc603aed3;
+  a06aa9bb2311c8b3[&quot;Markdown Matrix Formatter&quot;];
+  click a06aa9bb2311c8b3 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#markdown-matrix-formatter&quot;;
+  class a06aa9bb2311c8b3 requirement;
+  a06aa9bb2311c8b3 -.-&gt;|deriveReqT| 681cda683cd3fa2a;
+  9f97df7988362b9 --&gt;|satisfies| a06aa9bb2311c8b3;
 </div>
 <hr />
 <h3 id="structural-change-analyzer">Structural Change Analyzer</h3>
@@ -916,7 +916,7 @@ satisfy:</li>
 </ul>
 <hr />
 <h3 id="markdown-matrix-formatter">Markdown Matrix Formatter</h3>
-<p>The system shall implement a markdown formatter for traceability matrices that produces well-structured, readable markdown tables conforming to the ReqFlow markdown-first methodology.</p>
+<p>The system shall implement a markdown formatter for traceability matrices that produces well-structured, readable markdown tables conforming to the Reqvire markdown-first methodology.</p>
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="../UserRequirements.html#traceability-matrix">UserRequirements.md/Traceability Matrix</a></li>
@@ -951,83 +951,83 @@ satisfy:</li>
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  c5c85bedd1cf11e6[&quot;Excluded File Relation Validation&quot;];
-  click c5c85bedd1cf11e6 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#excluded-file-relation-validation&quot;;
-  class c5c85bedd1cf11e6 requirement;
-  45770e9b319d3819[&quot;File Pattern Exclusion for Linting&quot;];
-  class 45770e9b319d3819 requirement;
-  click 45770e9b319d3819 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#file-pattern-exclusion-for-linting&quot;;
-  c5c85bedd1cf11e6 --&gt;|refines| 45770e9b319d3819;
-  3b1e87396caf6495[&quot;src/parser.rs&quot;];
-  class 3b1e87396caf6495 default;
-  click 3b1e87396caf6495 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/core/src/parser.rs&quot;;
-  3b1e87396caf6495 --&gt;|satisfies| c5c85bedd1cf11e6;
-  212d1317cd2b25fc[&quot;Relation Element Type Validator&quot;];
-  click 212d1317cd2b25fc &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#relation-element-type-validator&quot;;
-  class 212d1317cd2b25fc requirement;
-  e587d63764466914[&quot;../UserRequirements.md#Validate Relation Types&quot;];
-  class e587d63764466914 requirement;
-  click e587d63764466914 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#validate-relation-types&quot;;
-  212d1317cd2b25fc -.-&gt;|deriveReqT| e587d63764466914;
-  a34d9281a02c6839[&quot;../SpecificationsRequirements.md#Relation Types Specifications&quot;];
-  class a34d9281a02c6839 requirement;
-  click a34d9281a02c6839 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SpecificationsRequirements.html#relation-types-specifications&quot;;
-  212d1317cd2b25fc -.-&gt;|deriveReqT| a34d9281a02c6839;
-  6136c216c9f80165[&quot;model.rs&quot;];
-  class 6136c216c9f80165 default;
-  click 6136c216c9f80165 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/core/src/model.rs&quot;;
-  6136c216c9f80165 --&gt;|satisfies| 212d1317cd2b25fc;
-  3b1e87396caf6495 --&gt;|satisfies| 212d1317cd2b25fc;
-  ec201a112c9de469[&quot;Filesystem Structure Validator&quot;];
-  click ec201a112c9de469 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#filesystem-structure-validator&quot;;
-  class ec201a112c9de469 requirement;
-  d834cc4bc9dbb07c[&quot;UserRequirements.md/Validate Filesystem Structure&quot;];
-  class d834cc4bc9dbb07c requirement;
-  click d834cc4bc9dbb07c &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#validate-filesystem-structure&quot;;
-  ec201a112c9de469 -.-&gt;|deriveReqT| d834cc4bc9dbb07c;
-  6136c216c9f80165 --&gt;|satisfies| ec201a112c9de469;
-  c7d88aff4ec97281[&quot;Cross-Component Dependency Validator&quot;];
-  click c7d88aff4ec97281 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#cross-component-dependency-validator&quot;;
-  class c7d88aff4ec97281 requirement;
-  6e40bf9f83a718fa[&quot;UserRequirements.md/Validate Cross-Component Dependencies&quot;];
-  class 6e40bf9f83a718fa requirement;
-  click 6e40bf9f83a718fa &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#validate-cross-component-dependencies&quot;;
-  c7d88aff4ec97281 -.-&gt;|deriveReqT| 6e40bf9f83a718fa;
-  6136c216c9f80165 --&gt;|satisfies| c7d88aff4ec97281;
-  3b1e87396caf6495 --&gt;|satisfies| c7d88aff4ec97281;
-  1c2e7c81f9f01e10[&quot;Internal Consistency Validator&quot;];
-  click 1c2e7c81f9f01e10 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#internal-consistency-validator&quot;;
-  class 1c2e7c81f9f01e10 requirement;
-  9e524ac696c43a26[&quot;UserRequirements.md/Validate Internal Consistency&quot;];
-  class 9e524ac696c43a26 requirement;
-  click 9e524ac696c43a26 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#validate-internal-consistency&quot;;
-  1c2e7c81f9f01e10 -.-&gt;|deriveReqT| 9e524ac696c43a26;
-  6136c216c9f80165 --&gt;|satisfies| 1c2e7c81f9f01e10;
-  3b1e87396caf6495 --&gt;|satisfies| 1c2e7c81f9f01e10;
-  5870488e00ee4f36[&quot;Relation Type Validation&quot;];
-  click 5870488e00ee4f36 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#relation-type-validation&quot;;
-  class 5870488e00ee4f36 requirement;
-  7cf5cf9900076be6[&quot;UserRequirements.md/Enhanced Validation Error Reporting&quot;];
-  class 7cf5cf9900076be6 requirement;
-  click 7cf5cf9900076be6 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#enhanced-validation-error-reporting&quot;;
-  5870488e00ee4f36 -.-&gt;|deriveReqT| 7cf5cf9900076be6;
-  ed4f94bde93b51b2[&quot;src/relation.rs&quot;];
-  class ed4f94bde93b51b2 default;
-  click ed4f94bde93b51b2 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/core/src/relation.rs&quot;;
-  ed4f94bde93b51b2 --&gt;|satisfies| 5870488e00ee4f36;
-  887db62e0fb2818d[&quot;Markdown Structure Validator&quot;];
-  click 887db62e0fb2818d &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#markdown-structure-validator&quot;;
-  class 887db62e0fb2818d requirement;
-  7b1772417b3ad5e[&quot;UserRequirements.md/Validate Markdown Structure&quot;];
-  class 7b1772417b3ad5e requirement;
-  click 7b1772417b3ad5e &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#validate-markdown-structure&quot;;
-  887db62e0fb2818d -.-&gt;|deriveReqT| 7b1772417b3ad5e;
-  6136c216c9f80165 --&gt;|satisfies| 887db62e0fb2818d;
-  3b1e87396caf6495 --&gt;|satisfies| 887db62e0fb2818d;
+  5c3a18f061fe0b18[&quot;Relation Type Validation&quot;];
+  click 5c3a18f061fe0b18 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#relation-type-validation&quot;;
+  class 5c3a18f061fe0b18 requirement;
+  20193d4c951bb5d8[&quot;UserRequirements.md/Enhanced Validation Error Reporting&quot;];
+  class 20193d4c951bb5d8 requirement;
+  click 20193d4c951bb5d8 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/UserRequirements.html#enhanced-validation-error-reporting&quot;;
+  5c3a18f061fe0b18 -.-&gt;|deriveReqT| 20193d4c951bb5d8;
+  a5d081e55d4f6501[&quot;src/relation.rs&quot;];
+  class a5d081e55d4f6501 default;
+  click a5d081e55d4f6501 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/core/src/relation.rs&quot;;
+  a5d081e55d4f6501 --&gt;|satisfies| 5c3a18f061fe0b18;
+  7a9ea38f16ddc722[&quot;Internal Consistency Validator&quot;];
+  click 7a9ea38f16ddc722 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#internal-consistency-validator&quot;;
+  class 7a9ea38f16ddc722 requirement;
+  944bd4459db32d65[&quot;UserRequirements.md/Validate Internal Consistency&quot;];
+  class 944bd4459db32d65 requirement;
+  click 944bd4459db32d65 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/UserRequirements.html#validate-internal-consistency&quot;;
+  7a9ea38f16ddc722 -.-&gt;|deriveReqT| 944bd4459db32d65;
+  2671722513a08b18[&quot;model.rs&quot;];
+  class 2671722513a08b18 default;
+  click 2671722513a08b18 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/core/src/model.rs&quot;;
+  2671722513a08b18 --&gt;|satisfies| 7a9ea38f16ddc722;
+  8af498811b4b1f17[&quot;parser.rs&quot;];
+  class 8af498811b4b1f17 default;
+  click 8af498811b4b1f17 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/core/src/parser.rs&quot;;
+  8af498811b4b1f17 --&gt;|satisfies| 7a9ea38f16ddc722;
+  44b70517dea81a26[&quot;Excluded File Relation Validation&quot;];
+  click 44b70517dea81a26 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#excluded-file-relation-validation&quot;;
+  class 44b70517dea81a26 requirement;
+  470a0057ca1c964[&quot;File Pattern Exclusion for Linting&quot;];
+  class 470a0057ca1c964 requirement;
+  click 470a0057ca1c964 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#file-pattern-exclusion-for-linting&quot;;
+  44b70517dea81a26 --&gt;|refines| 470a0057ca1c964;
+  8af498811b4b1f17 --&gt;|satisfies| 44b70517dea81a26;
+  89f96731acd18db6[&quot;Filesystem Structure Validator&quot;];
+  click 89f96731acd18db6 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#filesystem-structure-validator&quot;;
+  class 89f96731acd18db6 requirement;
+  b92914a9715d4d36[&quot;UserRequirements.md/Validate Filesystem Structure&quot;];
+  class b92914a9715d4d36 requirement;
+  click b92914a9715d4d36 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/UserRequirements.html#validate-filesystem-structure&quot;;
+  89f96731acd18db6 -.-&gt;|deriveReqT| b92914a9715d4d36;
+  2671722513a08b18 --&gt;|satisfies| 89f96731acd18db6;
+  fcd840339c79fec2[&quot;Markdown Structure Validator&quot;];
+  click fcd840339c79fec2 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#markdown-structure-validator&quot;;
+  class fcd840339c79fec2 requirement;
+  b6ee889a6a1ac979[&quot;UserRequirements.md/Validate Markdown Structure&quot;];
+  class b6ee889a6a1ac979 requirement;
+  click b6ee889a6a1ac979 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/UserRequirements.html#validate-markdown-structure&quot;;
+  fcd840339c79fec2 -.-&gt;|deriveReqT| b6ee889a6a1ac979;
+  2671722513a08b18 --&gt;|satisfies| fcd840339c79fec2;
+  8af498811b4b1f17 --&gt;|satisfies| fcd840339c79fec2;
+  52720669fca1a6fd[&quot;Cross-Component Dependency Validator&quot;];
+  click 52720669fca1a6fd &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#cross-component-dependency-validator&quot;;
+  class 52720669fca1a6fd requirement;
+  a830c3c9ac9cf1a9[&quot;UserRequirements.md/Validate Cross-Component Dependencies&quot;];
+  class a830c3c9ac9cf1a9 requirement;
+  click a830c3c9ac9cf1a9 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/UserRequirements.html#validate-cross-component-dependencies&quot;;
+  52720669fca1a6fd -.-&gt;|deriveReqT| a830c3c9ac9cf1a9;
+  2671722513a08b18 --&gt;|satisfies| 52720669fca1a6fd;
+  8af498811b4b1f17 --&gt;|satisfies| 52720669fca1a6fd;
+  27a77338e4f9304c[&quot;Relation Element Type Validator&quot;];
+  click 27a77338e4f9304c &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#relation-element-type-validator&quot;;
+  class 27a77338e4f9304c requirement;
+  46eca65b8a17dbc5[&quot;../UserRequirements.md#Validate Relation Types&quot;];
+  class 46eca65b8a17dbc5 requirement;
+  click 46eca65b8a17dbc5 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/UserRequirements.html#validate-relation-types&quot;;
+  27a77338e4f9304c -.-&gt;|deriveReqT| 46eca65b8a17dbc5;
+  b2e7c7fada8a1e2d[&quot;../SpecificationsRequirements.md#Relation Types And Behaviors&quot;];
+  class b2e7c7fada8a1e2d requirement;
+  click b2e7c7fada8a1e2d &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SpecificationsRequirements.html#relation-types-and-behaviors&quot;;
+  27a77338e4f9304c -.-&gt;|deriveReqT| b2e7c7fada8a1e2d;
+  2671722513a08b18 --&gt;|satisfies| 27a77338e4f9304c;
+  8af498811b4b1f17 --&gt;|satisfies| 27a77338e4f9304c;
 </div>
 <hr />
 <h3 id="markdown-structure-validator">Markdown Structure Validator</h3>
-<p>The system shall implement a markdown structure validator that enforces ReqFlow’s requirements for header levels, element structure, relation formatting, and other markdown-specific syntax rules, reporting violations with line numbers and suggested fixes.</p>
+<p>The system shall implement a markdown structure validator that enforces Reqvire’s requirements for header levels, element structure, relation formatting, and other markdown-specific syntax rules, reporting violations with line numbers and suggested fixes.</p>
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="../UserRequirements.html#validate-markdown-structure">UserRequirements.md/Validate Markdown Structure</a></li>
@@ -1036,7 +1036,7 @@ satisfy:</li>
 </ul>
 <hr />
 <h3 id="filesystem-structure-validator">Filesystem Structure Validator</h3>
-<p>The system shall implement a validator that checks the organization of files and directories against the expected ReqFlow project structure, verifying required folders exist and files are appropriately placed according to configuration settings.</p>
+<p>The system shall implement a validator that checks the organization of files and directories against the expected Reqvire project structure, verifying required folders exist and files are appropriately placed according to configuration settings.</p>
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="../UserRequirements.html#validate-filesystem-structure">UserRequirements.md/Validate Filesystem Structure</a></li>
@@ -1073,7 +1073,7 @@ satisfy:</li>
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="../UserRequirements.html#validate-relation-types">../UserRequirements.md#Validate Relation Types</a></li>
-<li>derivedFrom: <a href="../SpecificationsRequirements.html#relation-types-specifications">../SpecificationsRequirements.md#Relation Types Specifications</a></li>
+<li>derivedFrom: <a href="../SpecificationsRequirements.html#relation-types-and-behaviors">../SpecificationsRequirements.md#Relation Types And Behaviors</a></li>
 <li>satisfiedBy: <a href="../../core/src/model.rs">model.rs</a></li>
 <li>satisfiedBy: <a href="../../core/src/parser.rs">parser.rs</a></li>
 </ul>
@@ -1113,36 +1113,36 @@ satisfy:</li>
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  143766be8cc41384[&quot;Validation Report Generator&quot;];
-  click 143766be8cc41384 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#validation-report-generator&quot;;
-  class 143766be8cc41384 requirement;
-  482c757913204fb8[&quot;UserRequirements.md/Provide Validation Reports&quot;];
-  class 482c757913204fb8 requirement;
-  click 482c757913204fb8 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#provide-validation-reports&quot;;
-  143766be8cc41384 -.-&gt;|deriveReqT| 482c757913204fb8;
-  6136c216c9f80165[&quot;model.rs&quot;];
-  class 6136c216c9f80165 default;
-  click 6136c216c9f80165 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/core/src/model.rs&quot;;
-  6136c216c9f80165 --&gt;|satisfies| 143766be8cc41384;
-  6f86272134897867[&quot;CLI Summary Report Flag&quot;];
-  click 6f86272134897867 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#cli-summary-report-flag&quot;;
-  class 6f86272134897867 requirement;
-  cccd4e46e2b3239a[&quot;Model Summary Report Generator&quot;];
-  class cccd4e46e2b3239a requirement;
-  click cccd4e46e2b3239a &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#model-summary-report-generator&quot;;
-  6f86272134897867 --&gt;|refines| cccd4e46e2b3239a;
-  11ffc4632afd7c4c[&quot;cli.rs&quot;];
-  class 11ffc4632afd7c4c default;
-  click 11ffc4632afd7c4c &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/cli/src/cli.rs&quot;;
-  11ffc4632afd7c4c --&gt;|satisfies| 6f86272134897867;
-  b342220e0dc8751d[&quot;UserRequirements.md/Model Structure and Summaries&quot;];
-  class b342220e0dc8751d requirement;
-  click b342220e0dc8751d &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#model-structure-and-summaries&quot;;
-  cccd4e46e2b3239a -.-&gt;|deriveReqT| b342220e0dc8751d;
-  6292255058880ee6[&quot;model.rs&quot;];
-  class 6292255058880ee6 default;
-  click 6292255058880ee6 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/core/src/reports.rs&quot;;
-  6292255058880ee6 --&gt;|satisfies| cccd4e46e2b3239a;
+  a3d8f2cd99b2d548[&quot;CLI Summary Report Flag&quot;];
+  click a3d8f2cd99b2d548 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#cli-summary-report-flag&quot;;
+  class a3d8f2cd99b2d548 requirement;
+  a11c0dbb7acf27ea[&quot;Model Summary Report Generator&quot;];
+  class a11c0dbb7acf27ea requirement;
+  click a11c0dbb7acf27ea &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#model-summary-report-generator&quot;;
+  a3d8f2cd99b2d548 --&gt;|refines| a11c0dbb7acf27ea;
+  5fe26772336463bc[&quot;cli.rs&quot;];
+  class 5fe26772336463bc default;
+  click 5fe26772336463bc &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/cli/src/cli.rs&quot;;
+  5fe26772336463bc --&gt;|satisfies| a3d8f2cd99b2d548;
+  bbe607150e40021c[&quot;Validation Report Generator&quot;];
+  click bbe607150e40021c &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#validation-report-generator&quot;;
+  class bbe607150e40021c requirement;
+  e1f6859d4a4ea65b[&quot;UserRequirements.md/Provide Validation Reports&quot;];
+  class e1f6859d4a4ea65b requirement;
+  click e1f6859d4a4ea65b &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/UserRequirements.html#provide-validation-reports&quot;;
+  bbe607150e40021c -.-&gt;|deriveReqT| e1f6859d4a4ea65b;
+  2671722513a08b18[&quot;model.rs&quot;];
+  class 2671722513a08b18 default;
+  click 2671722513a08b18 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/core/src/model.rs&quot;;
+  2671722513a08b18 --&gt;|satisfies| bbe607150e40021c;
+  9774a66acb48024c[&quot;UserRequirements.md/Model Structure and Summaries&quot;];
+  class 9774a66acb48024c requirement;
+  click 9774a66acb48024c &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/UserRequirements.html#model-structure-and-summaries&quot;;
+  a11c0dbb7acf27ea -.-&gt;|deriveReqT| 9774a66acb48024c;
+  e07a26f0a7c1e1db[&quot;model.rs&quot;];
+  class e07a26f0a7c1e1db default;
+  click e07a26f0a7c1e1db &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/core/src/reports.rs&quot;;
+  e07a26f0a7c1e1db --&gt;|satisfies| a11c0dbb7acf27ea;
 </div>
 <hr />
 <h3 id="model-summary-report-generator">Model Summary Report Generator</h3>

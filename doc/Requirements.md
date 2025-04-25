@@ -1,11 +1,11 @@
-# Requirements in ReqFlow
+# Requirements in Reqvire
 
 ## What Are Requirements?
 
-In ReqFlow, a requirement represents a stakeholder's need, system capability, or constraint that the system must fulfill. 
+In Reqvire, a requirement represents a stakeholder's need, system capability, or constraint that the system must fulfill. 
 Requirements define **what the system must do** (functional requirements) and **how well it must perform** (non-functional requirements), serving as the foundation for system design, development, and verification.
 
-ReqFlow mandates a specific format for organizing and presenting requirements to ensure consistency across the project. 
+Reqvire mandates a specific format for organizing and presenting requirements to ensure consistency across the project. 
 However, it does not impose a specific syntax for expressing the content of requirements, offering flexibility to tailor expressions based on the project's needs and the team's preferences. 
 Structured syntaxes like **EARS (Easy Approach to Requirements Syntax)** are encouraged to improve clarity and consistency, but their use is not required.
 
@@ -124,7 +124,7 @@ The Requirement Text describes the specific functionality, constraint, or need i
 
 The **"#### Relations** section documents links between this requirement and other system elements,requirements, specifications, or validation methods.
 
-Relations used for the requirements are a subset of relations that exist in the **Reqflow**:
+Relations used for the requirements are a subset of relations that exist in the **Reqvire**:
  * containedBy
  * derivedFrom 
  * refine
@@ -170,9 +170,9 @@ Markdown valid text which cannot have headers less than ####
 
 ```
 
-## Structure of Requirements in ReqFlow
+## Structure of Requirements in Reqvire
 
-The diagram below demonstrates how requirements, their relationships, and hierarchical structures are organized within the **ReqFlow methodology**. 
+The diagram below demonstrates how requirements, their relationships, and hierarchical structures are organized within the **Reqvire methodology**. 
 It showcases the connection between stakeholder needs, user requirements, mission requirements, system requirements, and their links to test cases, specification documents, and other system elements.
 
 ```mermaid
@@ -268,7 +268,7 @@ end
 
 ```
 
-Requirements in ReqFlow are divided into three main categories:
+Requirements in Reqvire are divided into three main categories:
  * User Requirements
  * Mission Requirements
  * System Requirements
@@ -327,7 +327,7 @@ Each `Requirements.md` file contains requirements specific to the subsystem or c
 
 ## Requirements Diagrams
 
-mermaid's requirementsDiagram which is based on SysML is not that flexible in regards to picking colors and making links for docRefs thefor ReqFlow uses graphTD diagram for the time being.
+mermaid's requirementsDiagram which is based on SysML is not that flexible in regards to picking colors and making links for docRefs thefor Reqvire uses graphTD diagram for the time being.
 
 
 

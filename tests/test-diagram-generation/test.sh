@@ -13,8 +13,8 @@
 # - Custom diagrams are preserved
 # - Generated diagrams have proper content and relationships
 
-# Create a reqflow.yaml configuration
-cat > "$TEST_DIR/reqflow.yaml" << EOF
+# Create a reqvire.yaml configuration
+cat > "$TEST_DIR/reqvire.yaml" << EOF
 paths:
   specifications_folder: "specifications"
   output_folder: "output"
@@ -29,8 +29,8 @@ EOF
 mkdir -p "$TEST_DIR/backup"
 cp -r "$TEST_DIR/specifications" "$TEST_DIR/backup/"
 
-# Run reqflow to generate diagrams
-OUTPUT=$(cd "$TEST_DIR" && "$REQFLOW_BIN" --config "$TEST_DIR/reqflow.yaml" --generate-diagrams 2>&1)
+# Run reqvire to generate diagrams
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "$TEST_DIR/reqvire.yaml" --generate-diagrams 2>&1)
 EXIT_CODE=$?
 
 # Save output to log

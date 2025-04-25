@@ -23,4 +23,4 @@ pub use crate::model::ModelManager;
 pub use crate::element_registry::ElementRegistry;
 pub use crate::element::Element;
 pub use crate::relation::Relation;
-pub use crate::error::ReqFlowError;
+pub use crate::error::ReqvireError;

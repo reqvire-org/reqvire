@@ -4,7 +4,7 @@
 # ----------------------------------------------------
 # Acceptance Criteria:
 # - System should provide comprehensive context for AI agents
-# - Context should include information about ReqFlow usage and methodology
+# - Context should include information about Reqvire usage and methodology
 # - Context should be accessible via a dedicated command
 #
 # Test Criteria:
@@ -16,8 +16,8 @@
 # Create output directory if it doesn't exist
 mkdir -p "${TEST_DIR}/output"
 
-# Run reqflow with --ai-context flag to generate AI context
-OUTPUT=$(cd "$TEST_DIR" && "$REQFLOW_BIN" --config "${TEST_DIR}/reqflow.yaml" --llm-context 2>&1)
+# Run reqvire with --ai-context flag to generate AI context
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" --llm-context 2>&1)
 EXIT_CODE=$?
 
 printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
@@ -28,7 +28,7 @@ if [ $EXIT_CODE -ne 0 ]; then
   exit 1
 fi
 
-# Check that output contains essential ReqFlow concepts
+# Check that output contains essential Reqvire concepts
 if ! echo "$OUTPUT" | grep -q "Requirements"; then
   echo "❌ FAILED: AI context missing information about Requirements"
   exit 1

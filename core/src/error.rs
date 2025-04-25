@@ -1,8 +1,8 @@
 use thiserror::Error;
 
-/// Custom error types for the ReqFlow application
+/// Custom error types for the Reqvire application
 #[derive(Error, Debug)]
-pub enum ReqFlowError {
+pub enum ReqvireError {
     #[error("IO error: {0}")]
     IoError(#[from] std::io::Error),
 

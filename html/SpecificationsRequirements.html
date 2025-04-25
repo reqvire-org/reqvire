@@ -96,7 +96,7 @@ blockquote {
 }
 </style>
 
-    <!-- Enhanced mermaid configuration for ReqFlow diagrams -->
+    <!-- Enhanced mermaid configuration for Reqvire diagrams -->
     <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
     <script>
         mermaid.initialize({ 
@@ -124,70 +124,54 @@ blockquote {
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  c8a94e8023f1c7be[&quot;Verification Element Types Specifications&quot;];
-  click c8a94e8023f1c7be &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SpecificationsRequirements.html#verification-element-types-specifications&quot;;
-  class c8a94e8023f1c7be requirement;
-  852dea6cfecb47f5[&quot;UserStories.md#Managing MBSE Models&quot;];
-  class 852dea6cfecb47f5 requirement;
-  click 852dea6cfecb47f5 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserStories.html#managing-mbse-models&quot;;
-  c8a94e8023f1c7be -.-&gt;|deriveReqT| 852dea6cfecb47f5;
-  ae04238be665702[&quot;../core/src/element.rs&quot;];
-  class ae04238be665702 default;
-  click ae04238be665702 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/core/src/element.rs&quot;;
-  ae04238be665702 --&gt;|satisfies| c8a94e8023f1c7be;
-  ea610a0c2ac6b265[&quot;Structure of Markdown Documents Specifications&quot;];
-  click ea610a0c2ac6b265 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SpecificationsRequirements.html#structure-of-markdown-documents-specifications&quot;;
-  class ea610a0c2ac6b265 requirement;
-  ea610a0c2ac6b265 -.-&gt;|deriveReqT| 852dea6cfecb47f5;
-  ed4f94bde93b51b2[&quot;../core/src/relation.rs&quot;];
-  class ed4f94bde93b51b2 default;
-  click ed4f94bde93b51b2 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/core/src/relation.rs&quot;;
-  ed4f94bde93b51b2 --&gt;|satisfies| ea610a0c2ac6b265;
-  22aa80bf7aa9080a[&quot;../core/src/subsection.rs&quot;];
-  class 22aa80bf7aa9080a default;
-  click 22aa80bf7aa9080a &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/core/src/subsection.rs&quot;;
-  22aa80bf7aa9080a --&gt;|satisfies| ea610a0c2ac6b265;
-  ae04238be665702 --&gt;|satisfies| ea610a0c2ac6b265;
-  745439d5fc0154d1[&quot;Requirements Change Propagation&quot;];
-  click 745439d5fc0154d1 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SpecificationsRequirements.html#requirements-change-propagation&quot;;
-  class 745439d5fc0154d1 requirement;
-  bae5edae940ba590[&quot;UserRequirements.md#Change Impact Analysis&quot;];
-  class bae5edae940ba590 requirement;
-  click bae5edae940ba590 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#change-impact-analysis&quot;;
-  745439d5fc0154d1 --&gt;|refines| bae5edae940ba590;
-  cd62f772322b35e0[&quot;Structure and Addressing in Markdown Documents Specifications&quot;];
-  click cd62f772322b35e0 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SpecificationsRequirements.html#structure-and-addressing-in-markdown-documents-specifications&quot;;
-  class cd62f772322b35e0 requirement;
-  cd62f772322b35e0 -.-&gt;|deriveReqT| 852dea6cfecb47f5;
-  ed4f94bde93b51b2 --&gt;|satisfies| cd62f772322b35e0;
-  3b1e87396caf6495[&quot;../core/src/parser.rs&quot;];
-  class 3b1e87396caf6495 default;
-  click 3b1e87396caf6495 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/core/src/parser.rs&quot;;
-  3b1e87396caf6495 --&gt;|satisfies| cd62f772322b35e0;
-  22aa80bf7aa9080a --&gt;|satisfies| cd62f772322b35e0;
-  22aa80bf7aa9080a --&gt;|satisfies| cd62f772322b35e0;
-  a34d9281a02c6839[&quot;Relation Types Specifications&quot;];
-  click a34d9281a02c6839 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SpecificationsRequirements.html#relation-types-specifications&quot;;
-  class a34d9281a02c6839 requirement;
-  a34d9281a02c6839 -.-&gt;|deriveReqT| 852dea6cfecb47f5;
-  ed4f94bde93b51b2 --&gt;|satisfies| a34d9281a02c6839;
-  6aaac2f0e7cbdd79[&quot;Identifiers in Relations Specifications&quot;];
-  click 6aaac2f0e7cbdd79 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SpecificationsRequirements.html#identifiers-in-relations-specifications&quot;;
-  class 6aaac2f0e7cbdd79 requirement;
-  6aaac2f0e7cbdd79 -.-&gt;|deriveReqT| 852dea6cfecb47f5;
-  ed4f94bde93b51b2 --&gt;|satisfies| 6aaac2f0e7cbdd79;
-  a713f5dfb952f300[&quot;Structure of System Markdown Documents Specifications&quot;];
-  click a713f5dfb952f300 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SpecificationsRequirements.html#structure-of-system-markdown-documents-specifications&quot;;
-  class a713f5dfb952f300 requirement;
-  a713f5dfb952f300 -.-&gt;|deriveReqT| 852dea6cfecb47f5;
-  ed4f94bde93b51b2 --&gt;|satisfies| a713f5dfb952f300;
-  ae04238be665702 --&gt;|satisfies| a713f5dfb952f300;
-  22aa80bf7aa9080a --&gt;|satisfies| a713f5dfb952f300;
-  3b1e87396caf6495 --&gt;|satisfies| a713f5dfb952f300;
-  6136c216c9f80165[&quot;../core/src/model.rs&quot;];
-  class 6136c216c9f80165 default;
-  click 6136c216c9f80165 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/core/src/model.rs&quot;;
-  6136c216c9f80165 --&gt;|satisfies| a713f5dfb952f300;
+  42623d37cb96d447[&quot;Structure and Addressing in Markdown Documents&quot;];
+  click 42623d37cb96d447 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SpecificationsRequirements.html#structure-and-addressing-in-markdown-documents&quot;;
+  class 42623d37cb96d447 requirement;
+  1902659ed14c4615[&quot;UserStories.md#Managing MBSE Models&quot;];
+  class 1902659ed14c4615 requirement;
+  click 1902659ed14c4615 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/UserStories.html#managing-mbse-models&quot;;
+  42623d37cb96d447 -.-&gt;|deriveReqT| 1902659ed14c4615;
+  a2c3e78d2963e98[&quot;Structure of Markdown Documents&quot;];
+  click a2c3e78d2963e98 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SpecificationsRequirements.html#structure-of-markdown-documents&quot;;
+  class a2c3e78d2963e98 requirement;
+  a2c3e78d2963e98 --&gt;|refines| 42623d37cb96d447;
+  a5d081e55d4f6501[&quot;../core/src/relation.rs&quot;];
+  class a5d081e55d4f6501 default;
+  click a5d081e55d4f6501 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/core/src/relation.rs&quot;;
+  a5d081e55d4f6501 --&gt;|satisfies| a2c3e78d2963e98;
+  c1267163bffca360[&quot;../core/src/element.rs&quot;];
+  class c1267163bffca360 default;
+  click c1267163bffca360 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/core/src/element.rs&quot;;
+  c1267163bffca360 --&gt;|satisfies| a2c3e78d2963e98;
+  64c8cfac9e2e6b8[&quot;../core/src/subsection.rs&quot;];
+  class 64c8cfac9e2e6b8 default;
+  click 64c8cfac9e2e6b8 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/core/src/subsection.rs&quot;;
+  64c8cfac9e2e6b8 --&gt;|satisfies| a2c3e78d2963e98;
+  8af498811b4b1f17[&quot;../core/src/parser.rs&quot;];
+  class 8af498811b4b1f17 default;
+  click 8af498811b4b1f17 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/core/src/parser.rs&quot;;
+  8af498811b4b1f17 --&gt;|satisfies| a2c3e78d2963e98;
+  2671722513a08b18[&quot;../core/src/model.rs&quot;];
+  class 2671722513a08b18 default;
+  click 2671722513a08b18 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/core/src/model.rs&quot;;
+  2671722513a08b18 --&gt;|satisfies| a2c3e78d2963e98;
+  6b4e50ab2251059a[&quot;Identifiers and Relations&quot;];
+  click 6b4e50ab2251059a &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SpecificationsRequirements.html#identifiers-and-relations&quot;;
+  class 6b4e50ab2251059a requirement;
+  6b4e50ab2251059a --&gt;|refines| 42623d37cb96d447;
+  a5d081e55d4f6501 --&gt;|satisfies| 6b4e50ab2251059a;
+  2d15970eff910dc2[&quot;Requirements Change Propagation&quot;];
+  click 2d15970eff910dc2 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SpecificationsRequirements.html#requirements-change-propagation&quot;;
+  class 2d15970eff910dc2 requirement;
+  6f4efc192ae34938[&quot;UserRequirements.md#Change Impact Analysis&quot;];
+  class 6f4efc192ae34938 requirement;
+  click 6f4efc192ae34938 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/UserRequirements.html#change-impact-analysis&quot;;
+  2d15970eff910dc2 --&gt;|refines| 6f4efc192ae34938;
+  b2e7c7fada8a1e2d[&quot;Relation Types and behaviors&quot;];
+  click b2e7c7fada8a1e2d &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SpecificationsRequirements.html#relation-types-and-behaviors&quot;;
+  class b2e7c7fada8a1e2d requirement;
+  b2e7c7fada8a1e2d -.-&gt;|deriveReqT| 1902659ed14c4615;
+  a5d081e55d4f6501 --&gt;|satisfies| b2e7c7fada8a1e2d;
 </div>
 <hr />
 <h3 id="requirements-change-propagation">Requirements Change Propagation</h3>
@@ -436,174 +420,23 @@ The system shall reduce network polling frequency when battery levels drop below
 </div>
 </details>
 <hr />
-<h3 id="relation-types-specifications">Relation Types Specifications</h3>
-<p>The system shall implement relations following clearly defined specifications for types and behaviors.</p>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="UserStories.html#managing-mbse-models">UserStories.md#Managing MBSE Models</a></li>
-<li>satisfiedBy: <a href="../core/src/relation.rs">../core/src/relation.rs</a></li>
-</ul>
-<h4>Details</h4>
-<details>
-<summary>View Full Specification</summary>
-<h2 id="relation-type-definition">Relation Type Definition</h2>
-<p>A relation type in ReqFlow:</p>
-<ul>
-<li>Defines a semantic connection between elements</li>
-<li>Specifies the directionality of the relationship</li>
-<li>Determines change propagation behavior</li>
-<li>May have an opposite/inverse relation type</li>
-</ul>
-<h2 id="core-concepts">Core Concepts</h2>
-<h3 id="directionality">Directionality</h3>
-<p>Relations have three possible directionality patterns:</p>
-<ol>
-<li>
-<p><strong>Forward</strong> - The relation flows from the source element to the target element </p>
-<ul>
-<li>Example: <code>contain</code> points from a parent to a child element</li>
-</ul>
-</li>
-<li>
-<p><strong>Backward</strong> - The relation flows from the target element to the source element</p>
-<ul>
-<li>Example: <code>derivedFrom</code> points from a child back to its parent element</li>
-</ul>
-</li>
-<li>
-<p><strong>Neutral</strong> - The relation has no inherent direction</p>
-<ul>
-<li>Example: <code>trace</code> simply indicates a relationship without directionality</li>
-</ul>
-</li>
-</ol>
-<h3 id="change-propagation">Change Propagation</h3>
-<p>The direction of change propagation is not always the same as relation directionality:</p>
-<ul>
-<li>In hierarchical relationships, changes propagate downward from parents to children</li>
-<li>Some relations like <code>verifiedBy</code> specifically trigger invalidation rather than just change propagation </li>
-</ul>
-<h2 id="comprehensive-relation-type-table">Comprehensive Relation Type Table</h2>
-<table><thead><tr><th>Relation Type</th><th>Direction</th><th>Opposite Type</th><th>Change Propagation</th><th>Description</th></tr></thead><tbody>
-<tr><td><strong>containedBy</strong></td><td>Backward</td><td>contain</td><td>Parent → Child</td><td>Links a child element to its containing parent element</td></tr>
-<tr><td><strong>contain</strong></td><td>Forward</td><td>containedBy</td><td>Parent → Child</td><td>Links a parent element to the child elements it contains</td></tr>
-<tr><td><strong>derivedFrom</strong></td><td>Backward</td><td>derive</td><td>Parent → Child</td><td>Links a child element to the parent element it is derived from</td></tr>
-<tr><td><strong>derive</strong></td><td>Forward</td><td>derivedFrom</td><td>Parent → Child</td><td>Links a parent element to child elements derived from it</td></tr>
-<tr><td><strong>refine</strong></td><td>Backward</td><td>refinedBy</td><td>Parent → Child</td><td>Links a child element to a parent element it refines with more detail</td></tr>
-<tr><td><strong>refinedBy</strong></td><td>Forward</td><td>refine</td><td>Parent → Child</td><td>Links a parent element to child elements that refine it</td></tr>
-<tr><td><strong>satisfiedBy</strong></td><td>Forward</td><td>satisfy</td><td>Requirement → Implementation</td><td>Links a requirement to elements that satisfy it</td></tr>
-<tr><td><strong>satisfy</strong></td><td>Backward</td><td>satisfiedBy</td><td>Requirement → Implementation</td><td>Links an implementation to the requirement it satisfies</td></tr>
-<tr><td><strong>verifiedBy</strong></td><td>Forward</td><td>verify</td><td>Requirement → Verification</td><td>Links a requirement to verification artifacts</td></tr>
-<tr><td><strong>verify</strong></td><td>Backward</td><td>verifiedBy</td><td>Requirement → Verification</td><td>Links a verification artifact to the requirement it verifies</td></tr>
-<tr><td><strong>trace</strong></td><td>Neutral</td><td>None</td><td>None (Documentation)</td><td>Establishes a trace relationship without change propagation</td></tr>
-</tbody></table>
-<h2 id="relation-categories">Relation Categories</h2>
-<p>Relations are grouped into logical categories based on their semantic meaning:</p>
-<h3 id="1.-parent-child-hierarchical-relations">1. Parent-Child Hierarchical Relations</h3>
-<p>These relations define hierarchical structures within the model:</p>
-<ul>
-<li><strong>containedBy/contain</strong>: Physical or logical containment hierarchy</li>
-<li><strong>derivedFrom/derive</strong>: Derivation of elements from higher-level elements</li>
-<li><strong>refine/refinedBy</strong>: Refinement relationships adding more detail</li>
-</ul>
-<h3 id="2.-satisfaction-relations">2. Satisfaction Relations</h3>
-<p>These relations connect requirements to implementations:</p>
-<ul>
-<li><strong>satisfiedBy/satisfy</strong>: Links requirements to design, code, or architectural elements</li>
-</ul>
-<h3 id="3.-verification-relations">3. Verification Relations</h3>
-<p>These relations connect requirements to verification elements:</p>
-<ul>
-<li><strong>verifiedBy/verify</strong>: Links requirements to tests, validations, or other verification artifacts</li>
-</ul>
-<h3 id="4.-traceability-relations">4. Traceability Relations</h3>
-<p>These relations establish lightweight connections for documentation:</p>
-<ul>
-<li><strong>trace</strong>: Simple non-directional traceability without strong semantic meaning or change propagation</li>
-</ul>
-<h2 id="change-impact-rules">Change Impact Rules</h2>
-<p>When an element changes, the impact propagates according to these rules:</p>
-<ol>
-<li>
-<p><strong>Hierarchical Changes</strong>:</p>
-<ul>
-<li>Changes to parent elements propagate to all children</li>
-<li>This includes containment, derivation, and refinement relationships</li>
-</ul>
-</li>
-<li>
-<p><strong>Requirement Changes</strong>:</p>
-<ul>
-<li>Changes to requirements propagate to all satisfying implementations</li>
-<li>Changes to requirements invalidate all verifications</li>
-</ul>
-</li>
-<li>
-<p><strong>Implementation Changes</strong>:</p>
-<ul>
-<li>Changes to implementations rarely propagate upward to requirements</li>
-<li>Implementations should be updated to maintain satisfaction</li>
-</ul>
-</li>
-<li>
-<p><strong>Verification Changes</strong>:</p>
-<ul>
-<li>Changes to verification artifacts generally don’t propagate</li>
-<li>Verification updates may be needed after requirement changes</li>
-</ul>
-</li>
-<li>
-<p><strong>Trace Relationships</strong>:</p>
-<ul>
-<li>Changes do not propagate through trace relationships</li>
-<li>Trace relationships are used for documentation and discovery purposes only</li>
-</ul>
-</li>
-</ol>
-</details>
-<hr />
-<h3 id="structure-and-addressing-in-markdown-documents-specifications">Structure and Addressing in Markdown Documents Specifications</h3>
+<h3 id="structure-and-addressing-in-markdown-documents">Structure and Addressing in Markdown Documents</h3>
 <p>The system shall implement semi-structured markdown format specifications that defines the structure, rules, and usage of <strong>Elements</strong>, <strong>Relations</strong>, and <strong>Identifiers</strong> in Markdown (<code>.md</code>) documents. </p>
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="UserStories.html#managing-mbse-models">UserStories.md#Managing MBSE Models</a></li>
-<li>satisfiedBy: <a href="../core/src/relation.rs">../core/src/element.rs</a></li>
-<li>satisfiedBy: <a href="../core/src/parser.rs">../core/src/parser.rs</a></li>
-<li>satisfiedBy: <a href="../core/src/subsection.rs">../core/src/subsection.rs</a></li>
-<li>satisfiedBy: <a href="../core/src/subsection.rs">../core/src/relation.rs</a></li>
 </ul>
-<h4>Details</h4>
 <hr />
-<h3 id="structure-of-system-markdown-documents-specifications">Structure of System Markdown Documents Specifications</h3>
-<p>The system shall implement a structure of markdown documents representing system elements following clearly defined specifications.</p>
+<h3 id="structure-of-markdown-documents">Structure of Markdown Documents</h3>
+<p>The system shall implement the structure, rules, and usage of <strong>Sections</strong>, <strong>Elements</strong>, <strong>Subsections</strong>, <strong>Relations</strong>, and <strong>Identifiers</strong> in Markdown (<code>.md</code>) documents following clearly defined specifications.</p>
 <h4>Relations</h4>
 <ul>
-<li>derivedFrom: <a href="UserStories.html#managing-mbse-models">UserStories.md#Managing MBSE Models</a></li>
+<li>refine: <a href="#structure-and-addressing-in-markdown-documents">Structure And Addressing in Markdown documents</a></li>
 <li>satisfiedBy: <a href="../core/src/relation.rs">../core/src/relation.rs</a></li>
 <li>satisfiedBy: <a href="../core/src/element.rs">../core/src/element.rs</a></li>
 <li>satisfiedBy: <a href="../core/src/subsection.rs">../core/src/subsection.rs</a></li>
 <li>satisfiedBy: <a href="../core/src/parser.rs">../core/src/parser.rs</a></li>
 <li>satisfiedBy: <a href="../core/src/model.rs">../core/src/model.rs</a></li>
-</ul>
-<h4>Details</h4>
-<hr />
-<h3 id="identifiers-in-relations-specifications">Identifiers in Relations Specifications</h3>
-<p>The system shall implement  <strong>Identifiers</strong> and <strong>Relations</strong> following clearly defined specifications to ensure consistency, validity, and efficient querying and manipulation of these entities.</p>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="UserStories.html#managing-mbse-models">UserStories.md#Managing MBSE Models</a></li>
-<li>satisfiedBy: <a href="../core/src/relation.rs">../core/src/relation.rs</a></li>
-</ul>
-<h4>Details</h4>
-<hr />
-<h3 id="structure-of-markdown-documents-specifications">Structure of Markdown Documents Specifications</h3>
-<p>The system shall implement the structure, rules, and usage of <strong>Sections</strong>, <strong>Elements</strong>, <strong>Subsections</strong>, <strong>Relations</strong>, and <strong>Identifiers</strong> in Markdown (<code>.md</code>) documents following clearly defined specifications.</p>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="UserStories.html#managing-mbse-models">UserStories.md#Managing MBSE Models</a></li>
-<li>satisfiedBy: <a href="../core/src/relation.rs">../core/src/relation.rs</a></li>
-<li>satisfiedBy: <a href="../core/src/subsection.rs">../core/src/subsection.rs</a></li>
-<li>satisfiedBy: <a href="../core/src/element.rs">../core/src/element.rs</a></li>
 </ul>
 <h4>Details</h4>
 <details>
@@ -721,7 +554,266 @@ Content of the first duplicate.
 ### Duplicate
 Content of the second duplicate.
 </code></pre>
-<h2 id="identifiers-in-markddown-documents">Identifiers in Markddown Documents</h2>
+<h2 id="sections-in-markdown-documents">Sections in Markdown Documents</h2>
+<p>A <strong>Section</strong> is used for grouping of similar requirements for easier management and visualizations. It starts with a <code>##</code> header and includes all system elements under that header until the next header of the same or higher hierarchy.</p>
+<h2 id="elements-in-markdown-documents">Elements in Markdown Documents</h2>
+<p>An <strong>Element</strong> is a uniquely identifiable system element within a Markdown document. It starts with a <code>###</code> header and includes all content under that header until the next header of the same or higher hierarchy.</p>
+<h3 id="structure-of-an-element">Structure of an Element</h3>
+<ol>
+<li><strong>Element Header</strong></li>
+</ol>
+<ul>
+<li>The <code>###</code> header defines the start of an element.</li>
+<li>The text of the <code>###</code> header serves as the <strong>element name</strong>.</li>
+<li>The element name must be unique within the same document to ensure unambiguous references.</li>
+</ul>
+<ol start="2">
+<li><strong>Element Content</strong></li>
+</ol>
+<ul>
+<li>The element includes all content under the <code>###</code> header until:
+<ul>
+<li>The next <code>###</code> header, or</li>
+<li>A higher-level header (<code>##</code>, <code>#</code>), or</li>
+<li>The end of the document.</li>
+</ul>
+</li>
+<li>The content can include:
+<ul>
+<li>Text</li>
+<li>Subheaders (e.g., <code>####</code>)</li>
+<li>Bullet points, code blocks, tables, etc.</li>
+</ul>
+</li>
+</ul>
+<h2 id="rules-for-elements">Rules for Elements</h2>
+<ol>
+<li>
+<p><strong>Header Format</strong>:</p>
+<ul>
+<li>An element must start with a 3 <code>###</code> header.</li>
+<li>The <code>###</code> header text must not be empty.</li>
+</ul>
+</li>
+<li>
+<p><strong>Uniqueness</strong>:</p>
+<ul>
+<li>Element names must be unique within the same file.</li>
+</ul>
+</li>
+<li>
+<p><strong>Nested Subheaders</strong>:</p>
+<ul>
+<li>Subheaders within an element defined with 4 header (e.g., <code>####</code>) are part of the same element and do not create new elements.</li>
+</ul>
+</li>
+<li>
+<p><strong>No Overlapping Content</strong>:</p>
+<ul>
+<li>Content in an element belongs exclusively to that element and cannot overlap with another.</li>
+</ul>
+</li>
+</ol>
+<h3 id="examples-of-elements">Examples of Elements</h3>
+<p>Single Element:</p>
+<pre><code class="language-markdown">
+
+### My Element
+
+This is the content of My Element.
+
+#### Subsection
+Additional details about My Element.
+</code></pre>
+<p>Multiple Elements:</p>
+<pre><code>
+
+### Element One
+
+This is the content of Element One.
+
+
+
+### Element Two
+
+This is the content of Element Two.
+</code></pre>
+<p>Nested Subheaders:</p>
+<pre><code>
+
+### Main Element
+This is the main element content.
+
+#### Subsection
+Details about the subsection.
+
+#### Another Subsection
+More details about another subsection.
+</code></pre>
+<h3 id="invalid-cases">Invalid Cases</h3>
+<p>Element headers empty:</p>
+<pre><code>###
+</code></pre>
+<p>Headers not unique within the same document:</p>
+<pre><code>
+### Duplicate
+Content of the first duplicate.
+
+
+### Duplicate
+Content of the second duplicate.
+</code></pre>
+<h2 id="subsections-in-markdown-documents">Subsections in Markdown documents</h2>
+<p>An element may contain different <strong>Subsections</strong>, some of which are strictly defined, while others allow free-form content.</p>
+<ul>
+<li><strong>Reserved Subsections</strong>: These subsections follow a predefined structure.</li>
+<li><strong>Other Subsections</strong>: These allow additional descriptive or supporting information.</li>
+</ul>
+<p>Subsections starts with the <code>#### Subsection Name</code> and ends either with new element or next subsection.
+Subsection must be located <strong>within an element chunk</strong>.</p>
+<p>The <code>#### </code> header marks the beginning of the subsection.
+It must appear directly within an element chunk, <strong>following</strong> the <code>###</code> header of the parent element and any preceding content, including previous subsections.
+Each element chunk can have <strong>at most one</strong> <code>#### SubsectionName</code> subsection where ‘SubsectionName’ is a unique name of the subsection within an element.</p>
+<p>The reserved subsections are:</p>
+<ul>
+<li>Relations</li>
+<li>Details</li>
+<li>Properties</li>
+<li>Metadata</li>
+</ul>
+<p>Those have defines structure that must be followed.</p>
+<h3 id="details-subsection">Details Subsection</h3>
+<p>Must be defined with a level 4 header: <code>#### Details</code>.</p>
+<p>When parsing <code>#### Details</code> subsections, any markdown headers or elements within <details>…</details> tags are skipped.</p>
+<p>The <strong>#### Details</strong> subsection within an element provides additional information directly related to the main requirement text.</p>
+<ul>
+<li>Content within the <strong>Details</strong> subsection is considered an <strong>extension of the requirement text</strong>.</li>
+<li>Any statements in the <strong>Details</strong> subsection hold the same validity as the main requirement text.</li>
+</ul>
+<h3 id="relations-subsection">Relations Subsection</h3>
+<p>Must be defined with a level 4 header: <code>#### Relations</code>.</p>
+<p>Duplicate relation entries within the same <code>#### Relations</code> subsection are not allowed.</p>
+<h3 id="metadata-subsection">Metadata Subsection</h3>
+<p>Must be defined with a level 4 header: <code>#### Metadata</code>.</p>
+<p>The metadata section of an element follows these rules:</p>
+<ol>
+<li>Contains properties in list format: <code>* property_name: property_value</code></li>
+<li>Property entries are listed as bullet points (<code>*</code>), with <strong>two spaces</strong> (<code>  *</code>) of indentation followed by property_name + ’: ’ + property_value.</li>
+<li>May include any custom properties, not just <code>type</code></li>
+</ol>
+<h4>Reserved Properties</h4>
+<p>The following properties have special meaning:</p>
+<ul>
+<li>
+<p><code>type</code>: Defines the element type</p>
+</li>
+<li>
+<p>Additional reserved properties may be defined in future releases</p>
+</li>
+</ul>
+<h4>Supported Element Types</h4>
+<p>Element types are identified through a reserved “type” metadata property. The following types are supported:</p>
+<ol>
+<li><strong>requirement</strong>: System requirment</li>
+<li><strong>user-requirement</strong>: User requirement</li>
+<li><strong>verification</strong>: For verification tests and validation procedures</li>
+<li><strong>test-verification</strong>: For verification tests and validation procedures</li>
+<li><strong>analysis-verification</strong>: For verification tests and validation procedures</li>
+<li><strong>inspection-verification</strong>: For verification tests and validation procedures</li>
+<li><strong>demonstration-verification</strong>: For verification tests and validation procedures</li>
+<li><strong>other</strong>: Custom element types defined by users</li>
+</ol>
+<h4>Type Determination</h4>
+<p>The type of an element is determined through the following process:</p>
+<ol>
+<li>If a <code>#### Metadata</code> subsection exists and includes a <code>type</code> property, use that value</li>
+<li>If no type is specified, default to <code>user-requirement</code>, if document is in the root of <code>specifications</code> folder, otherwise to <code>requirement</code> type.</li>
+<li>Future versions may add more built-in types as needed</li>
+</ol>
+<h4>Example Metadata Section</h4>
+<pre><code class="language-markdown">
+### My Element
+
+This is a verification element.
+
+#### Metadata
+  * type: verification
+  * priority: high
+  * owner: team-a
+
+#### Relations
+* verifies: [Some Requirement](#some-requirement)
+</code></pre>
+<pre><code class="language-markdown">
+### My Element
+
+This is a verification element.
+
+#### Details
+
+Some details.
+
+#### Metadata
+  * type: verification
+  * priority: high
+  * owner: team-a
+
+#### Relations
+  * verifies: [Some Requirement](#some-requirement)
+</code></pre>
+<h4>Verification Type Categories</h4>
+<p>The following verification types are supported:</p>
+<ol>
+<li>
+<p><strong>Default Verification Type</strong></p>
+<ul>
+<li><code>verification</code> - Verification through testing (equivalent to <code>test-verification</code>)</li>
+</ul>
+</li>
+<li>
+<p><strong>Specific Verification Types</strong></p>
+<ul>
+<li><code>test-verification</code> - Explicit verification through testing with documented test procedures</li>
+<li><code>analysis-verification</code> - Verification through formal analysis of documentation or code</li>
+<li><code>inspection-verification</code> - Verification through formal inspection or review</li>
+<li><code>demonstration-verification</code> - Verification through demonstration in a realistic environment</li>
+</ul>
+</li>
+</ol>
+<p>These verification types align with standard systems engineering verification methods:</p>
+<ul>
+<li><strong>Test</strong>: Verification through formal testing according to documented test procedures with expected outcomes</li>
+<li><strong>Analysis</strong>: Verification through systematic analysis of artifacts without physical testing</li>
+<li><strong>Inspection</strong>: Verification through examination of documentation, code, or physical components</li>
+<li><strong>Demonstration</strong>: Verification through showing functionality in an operational-like environment</li>
+</ul>
+<p>The appropriate verification type should be selected based on the nature of the requirement:</p>
+<ul>
+<li><strong>Test</strong>: Verification through formal testing according to documented test procedures with expected outcomes</li>
+<li><strong>Analysis</strong>: Verification through systematic analysis of artifacts without physical testing</li>
+<li><strong>Inspection</strong>: Verification through examination of documentation, code, or physical components</li>
+<li><strong>Demonstration</strong>: Verification through showing functionality in an operational-like environment</li>
+</ul>
+<p>The appropriate verification type should be selected based on the nature of the requirement:</p>
+<ul>
+<li><strong>Test-verification</strong>: Used when formal test procedures with expected outcomes are required</li>
+<li><strong>Analysis-verification</strong>: Used when requirements can be verified through analysis of documentation or code</li>
+<li><strong>Inspection-verification</strong>: Used when requirements can be verified through review of artifacts</li>
+<li><strong>Demonstration-verification</strong>: Used when requirements can be verified by demonstrating functionality</li>
+</ul>
+</details>
+<hr />
+<h3 id="identifiers-and-relations">Identifiers and Relations</h3>
+<p>The system shall implement  <strong>Identifiers</strong> and <strong>Relations</strong> following clearly defined specifications to ensure consistency, validity, and efficient querying and manipulation of these entities.</p>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="#structure-and-addressing-in-markdown-documents">Structure And Addressing in Markdown documents</a></li>
+<li>satisfiedBy: <a href="../core/src/relation.rs">../core/src/relation.rs</a></li>
+</ul>
+<h4>Details</h4>
+<details>
+<summary>View Full Specification</summary>
+<h2 id="identifiers-in-markdown-documents">Identifiers in Markdown Documents</h2>
 <p>An <strong>identifier</strong> consists of a path following a filename with an extension (e.g., <code>file.md</code>) and optionally an <strong>element</strong> name (fragment).</p>
 <p>Every <strong>element</strong> in the system has unique identifier that depends on document it appears in, path of the document, and element name (fragment).</p>
 <h3 id="path-resolution-rules">Path Resolution Rules</h3>
@@ -865,7 +957,7 @@ It must follow the <code>###</code> header of the parent element and any precedi
 <ul>
 <li>Relation entries are listed as bullet points (<code>*</code>), with <strong>two spaces</strong> (<code>  *</code>) of indentation.</li>
 </ul>
-<h4>1. <strong>Relation Format</strong></h4>
+<h4><strong>Relation Format</strong></h4>
 <ul>
 <li>Relations follow this format:
 <pre><code>* relationType: **identifier**
@@ -876,16 +968,15 @@ It must follow the <code>###</code> header of the parent element and any precedi
 </code></pre>
 </li>
 </ul>
-<h4>2. <strong>Relation Type</strong></h4>
+<h4><strong>Relation Type</strong></h4>
 <ul>
 <li>Specifies the type of the relationship.</li>
 <li>Allowed characters: <code>[a-zA-Z]</code></li>
 <li>Minimum length: <strong>2 characters</strong></li>
 <li>Maximum length: <strong>80 characters</strong></li>
-<li>Must be one of the predefined, case-sensitive types defined in the <a href="RelationTypesRegistry.html">RelationTypesRegistry.html</a> document</li>
-<li>See the <a href="RelationTypesRegistry.html">RelationTypesRegistry.html</a> for the complete list of supported relation types, their directionality, and change propagation behaviors</li>
+<li>Must be one of the predefined, case-sensitive types</li>
 </ul>
-<h4>3. <strong>Target Identifier</strong></h4>
+<h4><strong>Target Identifier</strong></h4>
 <ul>
 <li>Specifies the target of the relation.</li>
 <li>Must be a valid <strong>Simple Identifier</strong> or <strong>Git Valid Markdown Link Identifier</strong> as defined in this document.</li>
@@ -933,33 +1024,8 @@ Details about API version 2.0.
   * verifiedBy: [/specifications.md#verification-steps](/specifications.html#verification-steps)
 
 </code></pre>
-<p>Duplicate relation entries within the same <code>#### Relations</code> subsection are not allowed.</p>
-<h3>Examples of <code>#### Relations</code></h3>
-<p>Simple Relations:</p>
+<h4>6. <strong>Invalid Relations Example</strong></h4>
 <pre><code class="language-markdown">
-
-### My Element
-This is the content of My Element.
-
-#### Relations
-  * derivedFrom: [Element2](#element2)
-  * trace: [path/to/anotherFile.md/Section3](path/to/anotherFile.html#section3)
-  * uses: [file.html](file.html)
-</code></pre>
-<p>Relations with Special Characters:</p>
-<pre><code>
-
-### Complex Element
-This is the content of a complex element.
-
-#### Relations
-  * derivedFrom: [Element (Alpha &amp; Beta)](#element-(alpha-&amp;-beta))
-  * trace: [path/to/special File.md/Section (Draft)](path/to/special File.html#section-(draft))
-</code></pre>
-<p>Invalid Entries:</p>
-<pre><code>
-
-### Invalid Relations Example
 This element contains invalid relation entries.
 
 #### Relations
@@ -984,92 +1050,141 @@ This element contains invalid relation entries.
 </code></pre>
 </li>
 </ol>
+<h2 id="valiation-rules-(todo:-add-mising-rules)">Valiation rules (TODO: add mising rules)</h2>
+<p>The system must validate relation usage according to these rules:</p>
+<ul>
+<li>Only the relation types defined in this registry are allowed</li>
+<li>Relations should connect elements of appropriate types (TODO: append spec with rules).</li>
+<li>Circular dependencies should be detected and reported</li>
+<li>Duplicate relation entries of same type and target are not allowed.</li>
+</ul>
 </details>
 <hr />
 <hr />
-<h3 id="verification-element-types-specifications">Verification Element Types Specifications</h3>
-<p>The system shall support different types of verification elements that define the verification method used to verify requirements.</p>
+<h3 id="relation-types-and-behaviors">Relation Types and behaviors</h3>
+<p>The system shall implement relations following clearly defined specifications for types and behaviors.</p>
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="UserStories.html#managing-mbse-models">UserStories.md#Managing MBSE Models</a></li>
-<li>satisfiedBy: <a href="../core/src/element.rs">../core/src/element.rs</a></li>
+<li>satisfiedBy: <a href="../core/src/relation.rs">../core/src/relation.rs</a></li>
 </ul>
 <h4>Details</h4>
 <details>
 <summary>View Full Specification</summary>
-<h2 id="verification-element-types">Verification Element Types</h2>
-<p>Verification elements in ReqFlow can be categorized by type to specify the verification method used. The type of verification is specified in the Metadata subsection using the <code>type</code> key.</p>
-<h3 id="verification-type-categories">Verification Type Categories</h3>
-<p>The following verification types are supported:</p>
+<h2 id="relation-type-definition">Relation Type Definition</h2>
+<p>A relation type in Reqvire:</p>
+<ul>
+<li>Defines a semantic connection between elements</li>
+<li>Specifies the directionality of the relationship</li>
+<li>Determines change propagation behavior</li>
+<li>May have an opposite/inverse relation type</li>
+</ul>
+<h2 id="core-concepts">Core Concepts</h2>
+<h3 id="directionality">Directionality</h3>
+<p>Relations have three possible directionality patterns:</p>
 <ol>
 <li>
-<p><strong>Default Verification Type</strong></p>
+<p><strong>Forward</strong> - The relation flows from the source element to the target element </p>
 <ul>
-<li><code>verification</code> - Verification through testing (equivalent to <code>test-verification</code>)</li>
+<li>Example: <code>contain</code> points from a parent to a child element</li>
 </ul>
 </li>
 <li>
-<p><strong>Specific Verification Types</strong></p>
+<p><strong>Backward</strong> - The relation flows from the target element to the source element</p>
 <ul>
-<li><code>test-verification</code> - Explicit verification through testing with documented test procedures</li>
-<li><code>analysis-verification</code> - Verification through formal analysis of documentation or code</li>
-<li><code>inspection-verification</code> - Verification through formal inspection or review</li>
-<li><code>demonstration-verification</code> - Verification through demonstration in a realistic environment</li>
+<li>Example: <code>derivedFrom</code> points from a child back to its parent element</li>
+</ul>
+</li>
+<li>
+<p><strong>Neutral</strong> - The relation has no inherent direction</p>
+<ul>
+<li>Example: <code>trace</code> simply indicates a relationship without directionality</li>
 </ul>
 </li>
 </ol>
-<h3 id="standard-verification-methods">Standard Verification Methods</h3>
-<p>These verification types align with standard systems engineering verification methods:</p>
+<h3 id="change-propagation">Change Propagation</h3>
+<p>The direction of change propagation is not always the same as relation directionality:</p>
 <ul>
-<li><strong>Test</strong>: Verification through formal testing according to documented test procedures with expected outcomes</li>
-<li><strong>Analysis</strong>: Verification through systematic analysis of artifacts without physical testing</li>
-<li><strong>Inspection</strong>: Verification through examination of documentation, code, or physical components</li>
-<li><strong>Demonstration</strong>: Verification through showing functionality in an operational-like environment</li>
+<li>In hierarchical relationships, changes propagate downward from parents to children</li>
+<li>Some relations like <code>verifiedBy</code> specifically trigger invalidation rather than just change propagation </li>
 </ul>
-<h3 id="example-usage-in-markdown">Example Usage in Markdown</h3>
-<pre><code class="language-markdown">### Automated Diagram Generation Verification
-
-This verification validates that diagrams are automatically generated when requested.
-
-#### Metadata
-  * type: demonstration-verification
-
-#### Details
-Test procedure: [...]
-
-#### Relations
-  * verify: [requirements.md#automatic-diagram-generation](requirements.html#automatic-diagram-generation)
-</code></pre>
-<h3 id="verification-type-selection-criteria">Verification Type Selection Criteria</h3>
-<p>The appropriate verification type should be selected based on the nature of the requirement:</p>
+<h2 id="comprehensive-relation-type-table">Comprehensive Relation Type Table</h2>
+<table><thead><tr><th>Relation Type</th><th>Direction</th><th>Opposite Type</th><th>Change Propagation</th><th>Description</th></tr></thead><tbody>
+<tr><td><strong>containedBy</strong></td><td>Backward</td><td>contain</td><td>Parent → Child</td><td>Links a child element to its containing parent element</td></tr>
+<tr><td><strong>contain</strong></td><td>Forward</td><td>containedBy</td><td>Parent → Child</td><td>Links a parent element to the child elements it contains</td></tr>
+<tr><td><strong>derivedFrom</strong></td><td>Backward</td><td>derive</td><td>Parent → Child</td><td>Links a child element to the parent element it is derived from</td></tr>
+<tr><td><strong>derive</strong></td><td>Forward</td><td>derivedFrom</td><td>Parent → Child</td><td>Links a parent element to child elements derived from it</td></tr>
+<tr><td><strong>refine</strong></td><td>Backward</td><td>refinedBy</td><td>Parent → Child</td><td>Links a child element to a parent element it refines with more detail</td></tr>
+<tr><td><strong>refinedBy</strong></td><td>Forward</td><td>refine</td><td>Parent → Child</td><td>Links a parent element to child elements that refine it</td></tr>
+<tr><td><strong>satisfiedBy</strong></td><td>Forward</td><td>satisfy</td><td>Requirement → Implementation</td><td>Links a requirement to elements that satisfy it</td></tr>
+<tr><td><strong>satisfy</strong></td><td>Backward</td><td>satisfiedBy</td><td>Requirement → Implementation</td><td>Links an implementation to the requirement it satisfies</td></tr>
+<tr><td><strong>verifiedBy</strong></td><td>Forward</td><td>verify</td><td>Requirement → Verification</td><td>Links a requirement to verification artifacts</td></tr>
+<tr><td><strong>verify</strong></td><td>Backward</td><td>verifiedBy</td><td>Requirement → Verification</td><td>Links a verification artifact to the requirement it verifies</td></tr>
+<tr><td><strong>trace</strong></td><td>Neutral</td><td>None</td><td>None (Documentation)</td><td>Establishes a trace relationship without change propagation</td></tr>
+</tbody></table>
+<h2 id="relation-categories">Relation Categories</h2>
+<p>Relations are grouped into logical categories based on their semantic meaning:</p>
+<h3 id="1.-parent-child-hierarchical-relations">1. Parent-Child Hierarchical Relations</h3>
+<p>These relations define hierarchical structures within the model:</p>
 <ul>
-<li><strong>Test</strong>: Verification through formal testing according to documented test procedures with expected outcomes</li>
-<li><strong>Analysis</strong>: Verification through systematic analysis of artifacts without physical testing</li>
-<li><strong>Inspection</strong>: Verification through examination of documentation, code, or physical components</li>
-<li><strong>Demonstration</strong>: Verification through showing functionality in an operational-like environment</li>
+<li><strong>containedBy/contain</strong>: Physical or logical containment hierarchy</li>
+<li><strong>derivedFrom/derive</strong>: Derivation of elements from higher-level elements</li>
+<li><strong>refine/refinedBy</strong>: Refinement relationships adding more detail</li>
 </ul>
-<h3 id="example-usage-in-markdown">Example Usage in Markdown</h3>
-<pre><code class="language-markdown">### Automated Diagram Generation Verification
-
-This verification validates that diagrams are automatically generated when requested.
-
-#### Metadata
-  * type: demonstration-verification
-
-#### Details
-Test procedure: [...]
-
-#### Relations
-  * verify: [requirements.md#automatic-diagram-generation](requirements.html#automatic-diagram-generation)
-</code></pre>
-<h3 id="verification-type-selection-criteria">Verification Type Selection Criteria</h3>
-<p>The appropriate verification type should be selected based on the nature of the requirement:</p>
+<h3 id="2.-satisfaction-relations">2. Satisfaction Relations</h3>
+<p>These relations connect requirements to implementations:</p>
 <ul>
-<li><strong>Test-verification</strong>: Used when formal test procedures with expected outcomes are required</li>
-<li><strong>Analysis-verification</strong>: Used when requirements can be verified through analysis of documentation or code</li>
-<li><strong>Inspection-verification</strong>: Used when requirements can be verified through review of artifacts</li>
-<li><strong>Demonstration-verification</strong>: Used when requirements can be verified by demonstrating functionality</li>
+<li><strong>satisfiedBy/satisfy</strong>: Links requirements to design, code, or architectural elements</li>
 </ul>
+<h3 id="3.-verification-relations">3. Verification Relations</h3>
+<p>These relations connect requirements to verification elements:</p>
+<ul>
+<li><strong>verifiedBy/verify</strong>: Links requirements to tests, validations, or other verification artifacts</li>
+</ul>
+<h3 id="4.-traceability-relations">4. Traceability Relations</h3>
+<p>These relations establish lightweight connections for documentation:</p>
+<ul>
+<li><strong>trace</strong>: Simple non-directional traceability without strong semantic meaning or change propagation</li>
+</ul>
+<h2 id="change-impact-rules">Change Impact Rules</h2>
+<p>When an element changes, the impact propagates according to these rules:</p>
+<ol>
+<li>
+<p><strong>Hierarchical Changes</strong>:</p>
+<ul>
+<li>Changes to parent elements propagate to all children</li>
+<li>This includes containment, derivation, and refinement relationships</li>
+</ul>
+</li>
+<li>
+<p><strong>Requirement Changes</strong>:</p>
+<ul>
+<li>Changes to requirements propagate to all satisfying implementations</li>
+<li>Changes to requirements invalidate all verifications</li>
+</ul>
+</li>
+<li>
+<p><strong>Implementation Changes</strong>:</p>
+<ul>
+<li>Changes to implementations rarely propagate upward to requirements</li>
+<li>Implementations should be updated to maintain satisfaction</li>
+</ul>
+</li>
+<li>
+<p><strong>Verification Changes</strong>:</p>
+<ul>
+<li>Changes to verification artifacts generally don’t propagate</li>
+<li>Verification updates may be needed after requirement changes</li>
+</ul>
+</li>
+<li>
+<p><strong>Trace Relationships</strong>:</p>
+<ul>
+<li>Changes do not propagate through trace relationships</li>
+<li>Trace relationships are used for documentation and discovery purposes only</li>
+</ul>
+</li>
+</ol>
 </details>
 <hr />
 

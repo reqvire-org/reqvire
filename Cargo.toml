@@ -12,9 +12,9 @@ rust-version = "1.86"
 license = "Apache-2.0"
 authors = ["Ilija Ljubicic <iliya.ljubicic@gmail.com>"]
 description = "An agile Model-Based Systems Engineering (MBSE) framework designed to integrate with Git workflows"
-repository = "https://github.com/ilijaljubicic/ReqFlow"
-homepage = "https://github.com/ilijaljubicic/ReqFlow"
-documentation = "https://github.com/ilijaljubicic/ReqFlow#readme"
+repository = "https://github.com/ilijaljubicic/Reqvire"
+homepage = "https://github.com/ilijaljubicic/Reqvire"
+documentation = "https://github.com/ilijaljubicic/Reqvire#readme"
 
 [workspace.dependencies]
 clap = { version = "4.4", features = ["derive"] }
@@ -37,7 +37,7 @@ termcolor = "1.4"
 globset = "0.4.16"
 rustc-hash = "1.1"
 difference = "2.0"
-reqflow = { path = "core" }
+reqvire = { path = "core" }
 
 # Dev dependencies
 assert_fs = "1.0"

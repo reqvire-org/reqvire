@@ -9,12 +9,12 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  34ccc009ec6ea573["MOE_CE"];
-  click 34ccc009ec6ea573 "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/specifications/MOEs.md#moe_ce";
-  class 34ccc009ec6ea573 requirement;
-  5d0b88381f707008["MOE_UA"];
-  click 5d0b88381f707008 "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/specifications/MOEs.md#moe_ua";
-  class 5d0b88381f707008 requirement;
+  bd8b46053261f1d0["MOE_UA"];
+  click bd8b46053261f1d0 "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/specifications/MOEs.md#moe_ua";
+  class bd8b46053261f1d0 requirement;
+  a7b946053261f1d0["MOE_CE"];
+  click a7b946053261f1d0 "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/specifications/MOEs.md#moe_ce";
+  class a7b946053261f1d0 requirement;
 ```
 
 
@@ -32,27 +32,27 @@ graph LR;
 
 
 
-The **MOEs** and **KPPs** for **ReqFlow** are designed to evaluate how effectively the methodology, toolset, and language deliver value to users and stakeholders. 
-These metrics emphasize outcomes such as user adoption, operational efficiency, and community engagement, ensuring that ReqFlow aligns with the needs of its open-source ecosystem.
+The **MOEs** and **KPPs** for **Reqvire** are designed to evaluate how effectively the methodology, toolset, and language deliver value to users and stakeholders. 
+These metrics emphasize outcomes such as user adoption, operational efficiency, and community engagement, ensuring that Reqvire aligns with the needs of its open-source ecosystem.
 
 ---
 
 ### MOE_UA
 **Increase User Adoption**
-- Goal: Drive adoption of ReqFlow within the open-source and engineering communities.
+- Goal: Drive adoption of Reqvire within the open-source and engineering communities.
 - Metric: User Adoption Rate (UA)
 - Metric Calculation:  
-  > UA = (Number of new projects using ReqFlow / Total projects surveyed) × 100.
+  > UA = (Number of new projects using Reqvire / Total projects surveyed) × 100.
 - Target Period: 1 year
 - Target Window: 3 months
 - Target Statement: Achieve a user adoption rate of X% within the first year.
-- Objective: Expand ReqFlow’s reach and influence in MBSE practices.
+- Objective: Expand Reqvire’s reach and influence in MBSE practices.
 
 ---
 
 ### MOE_CE
 **Boost Community Engagement**
-- Goal: Foster an active and collaborative open-source community around ReqFlow.
+- Goal: Foster an active and collaborative open-source community around Reqvire.
 - Metric: Contributor Engagement (CE)
 - Metric Calculation:  
   > CE = (Number of active contributors / Total repository members) × 100.

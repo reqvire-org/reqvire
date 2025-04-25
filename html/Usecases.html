@@ -96,7 +96,7 @@ blockquote {
 }
 </style>
 
-    <!-- Enhanced mermaid configuration for ReqFlow diagrams -->
+    <!-- Enhanced mermaid configuration for Reqvire diagrams -->
     <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
     <script>
         mermaid.initialize({ 
@@ -116,11 +116,11 @@ blockquote {
     <div class="container">
         <div class="content">
             <h1 id="usecase-diagrams">Usecase diagrams</h1>
-<h2 id="reqflow-usecase">ReqFlow usecase</h2>
-<h2 id="reqflow-tool-use-case-diagram">ReqFlow Tool Use Case Diagram</h2>
-<p>The use case diagram below highlights the primary interactions between the ReqFlow Tool and its users, including developers, CI/CD systems, and other actors. It captures the high-level functional behaviors that the tool is designed to support, from managing requirements to automating tasks in Git workflows.</p>
+<h2 id="reqvire-usecase">Reqvire usecase</h2>
+<h2 id="reqvire-tool-use-case-diagram">Reqvire Tool Use Case Diagram</h2>
+<p>The use case diagram below highlights the primary interactions between the Reqvire Tool and its users, including developers, CI/CD systems, and other actors. It captures the high-level functional behaviors that the tool is designed to support, from managing requirements to automating tasks in Git workflows.</p>
 <div class="mermaid">flowchart LR
-    subgraph &quot;ReqFlowTool&quot;
+    subgraph &quot;ReqvireTool&quot;
         subgraph &quot;Cli&quot;
             manageModel((Manage MBSE Model))
             generateDiagrams((Generate Diagrams))
@@ -167,7 +167,7 @@ blockquote {
 
     human -. colaborate via .-&gt; GitHubOrSimilar
 
-    ReqFlowTool -. read/write/get diffs .-&gt; gitRepository
+    ReqvireTool -. read/write/get diffs .-&gt; gitRepository
     aiAgents -. PRs/issues/comment &gt; colaborate via .-&gt; GitHubOrSimilar
  
     manageModel -. provide .-&gt; validateStructure
@@ -206,7 +206,7 @@ blockquote {
     developedSystem &lt;-- implemented from --&gt; model
     model -- guides development of --&gt; developedSystem
 
-    %% ReqFlow Interactions with SOI
+    %% Reqvire Interactions with SOI
     handleDiffs -. include .-&gt; reports    
 
     %% SOI Feedback Loop
@@ -216,9 +216,9 @@ blockquote {
 
 
 </div>
-<h2 id="explanation-of-reqflow-use-case-diagram">Explanation of ReqFlow Use Case Diagram</h2>
-<p>This diagram outlines the core interactions, components, and workflows of the <strong>ReqFlow</strong> tool in the context of managing Model-Based Systems Engineering (MBSE) models, integrating with external systems, and supporting development activities for a System of Interest (SOI).</p>
-<h3 id="reqflow-tool">ReqFlow Tool</h3>
+<h2 id="explanation-of-reqvire-use-case-diagram">Explanation of Reqvire Use Case Diagram</h2>
+<p>This diagram outlines the core interactions, components, and workflows of the <strong>Reqvire</strong> tool in the context of managing Model-Based Systems Engineering (MBSE) models, integrating with external systems, and supporting development activities for a System of Interest (SOI).</p>
+<h3 id="reqvire-tool">Reqvire Tool</h3>
 <p>The central component of the system, which facilitates various MBSE-related activities. It consists of two primary submodules:</p>
 <h4>Cli (Command Line Interface)</h4>
 <ul>
@@ -245,7 +245,7 @@ blockquote {
 <h4>AI Agents</h4>
 <ul>
 <li><strong>AI Agents 🤖</strong>: Provides intelligent assistance for model management and collaboration.</li>
-<li>It is deeply embed into ReqFlow methodology model and have a knowledge required for deep assistance.</li>
+<li>It is deeply embed into Reqvire methodology model and have a knowledge required for deep assistance.</li>
 <li>Suggestions: Offers AI-generated recommendations or improvements.</li>
 <li>Review Suggestions: Enables human review and approval of AI-generated suggestions.</li>
 <li>With human in the loop workflow.</li>
@@ -256,7 +256,7 @@ blockquote {
 <p>The <strong>System of Interest (SOI)</strong> refers to the system which is under development.</p>
 <p>It represents the primary focus of development and includes the following key elements:</p>
 <ul>
-<li>MBSE Model: The structured system specification and design documentation created and managed using ReqFlow. 
+<li>MBSE Model: The structured system specification and design documentation created and managed using Reqvire. 
 <ul>
 <li>This model defines the requirements, architecture, and traceability necessary for developing the SOI.</li>
 </ul>
@@ -272,26 +272,26 @@ blockquote {
 </ul>
 </li>
 </ul>
-<p>The SOI serves as the centerpiece of the ReqFlow framework, linking specifications, development, and validation processes.</p>
+<p>The SOI serves as the centerpiece of the Reqvire framework, linking specifications, development, and validation processes.</p>
 <h3 id="external-systems">External Systems</h3>
-<p>ReqFlow interacts with external systems to enhance functionality and support development workflows.</p>
+<p>Reqvire interacts with external systems to enhance functionality and support development workflows.</p>
 <h3 id="ci/cd-system">CI/CD System</h3>
-<p>ReqFlow provides tools and features that CI/CD systems, such as GitHub Actions, can utilize to perform tasks like validation, diagram generation, and traceability matrix creation. </p>
+<p>Reqvire provides tools and features that CI/CD systems, such as GitHub Actions, can utilize to perform tasks like validation, diagram generation, and traceability matrix creation. </p>
 <p>These tools enable CI/CD systems to enforce PR merge rules, validate changes, and automate feedback processes, such as adding comments, creating issues, or reporting statuses. </p>
 <h3 id="github-or-similar">GitHub or Similar</h3>
-<p>ReqFlow integrates into existing agile and collaborative workflows by providing the necessary tools and scripts to support version control, change management, and traceability. 
+<p>Reqvire integrates into existing agile and collaborative workflows by providing the necessary tools and scripts to support version control, change management, and traceability. 
 These features allow teams to seamlessly integrate MBSE practices into their development processes, enabling effective collaboration through GitHub or similar platforms.</p>
 <h3 id="human-interaction">Human Interaction</h3>
-<p>Humans interact with ReqFlow tools to manage, refine, and validate MBSE models, as well as to collaborate effectively within development workflows:</p>
+<p>Humans interact with Reqvire tools to manage, refine, and validate MBSE models, as well as to collaborate effectively within development workflows:</p>
 <ul>
-<li>Via CLI: Users leverage ReqFlow’s CLI to perform tasks such as managing models, generating diagrams, analyzing relationships, and validating structures.</li>
+<li>Via CLI: Users leverage Reqvire’s CLI to perform tasks such as managing models, generating diagrams, analyzing relationships, and validating structures.</li>
 <li>Via AI Agents: Users interact with AI agents through MCP server to receive intelligent suggestions, review potential improvements, and approve changes, ensuring a human-in-the-loop approach.</li>
-<li>Collaboration: Users integrate ReqFlow into agile workflows by collaborating through GitHub or similar platforms to manage repositories, track changes, and maintain traceability.</li>
+<li>Collaboration: Users integrate Reqvire into agile workflows by collaborating through GitHub or similar platforms to manage repositories, track changes, and maintain traceability.</li>
 </ul>
 <h2 id="workflows-and-interactions">Workflows and Interactions</h2>
-<h3 id="reqflow-interactions-with-git">ReqFlow Interactions with Git</h3>
+<h3 id="reqvire-interactions-with-git">Reqvire Interactions with Git</h3>
 <ul>
-<li>ReqFlow uses Git repositories to store and version the MBSE model and developed system.</li>
+<li>Reqvire uses Git repositories to store and version the MBSE model and developed system.</li>
 <li>Changes, including approved AI suggestions, are prepared and committed through standard Git workflows.</li>
 </ul>
 <h3 id="ci/cd-integration">CI/CD Integration</h3>
@@ -307,7 +307,7 @@ These features allow teams to seamlessly integrate MBSE practices into their dev
 <h2 id="key-relationships">Key Relationships</h2>
 <ul>
 <li>The MBSE Model is implemented into the Developed System, which is stored and versioned in the Git repository.</li>
-<li>The ReqFlow CLI provides tools to validate, analyze, and generate artifacts from the model.</li>
+<li>The Reqvire CLI provides tools to validate, analyze, and generate artifacts from the model.</li>
 <li>AI Agents assist humans by generating suggestions and automating repetitive tasks.</li>
 <li>The <strong>CI/CD System</strong> ensures quality control and prevents invalid changes from being merged.</li>
 </ul>

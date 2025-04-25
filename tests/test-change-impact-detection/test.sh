@@ -11,10 +11,10 @@
 # - Default commit is HEAD when --git-commit is not provided
 
 # Create a unique temporary directory
-TMP_DIR=$(mktemp -d -t reqflow-change-impact-XXXXXX)
+TMP_DIR=$(mktemp -d -t reqvire-change-impact-XXXXXX)
 
 cp "${TEST_DIR}/Requirements.md" "${TMP_DIR}/"
-cp "${TEST_DIR}/reqflow.yaml" "${TMP_DIR}/"
+cp "${TEST_DIR}/reqvire.yaml" "${TMP_DIR}/"
 cp -r "${TEST_DIR}/software" "${TMP_DIR}/"
 mkdir -p "${TMP_DIR}/output"
 
@@ -32,7 +32,7 @@ git commit -m "Initial commit" > /dev/null 2>&1
 sed -i 's/The systsem shall activate power-saving mode when the battery level drops below 20%./The systsem shall activate power-saving mode when the battery level drops below 30%./g' "${TMP_DIR}/Requirements.md"
 
 # Test 1: Run change impact detection with default commit (HEAD)
-OUTPUT=$(cd "${TMP_DIR}" && "${REQFLOW_BIN}" --config "${TMP_DIR}/reqflow.yaml" --change-impact 2>&1)
+OUTPUT=$(cd "${TMP_DIR}" && "${REQVIRE_BIN}" --config "${TMP_DIR}/reqvire.yaml" --change-impact 2>&1)
 EXIT_CODE=$?
 
 printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
@@ -56,7 +56,7 @@ if ! echo "$OUTPUT" | grep -qE 'https://[^ )]+/blob/[a-f0-9]{7,40}/'; then
     exit 1
 fi
 # Extract only the important parts (excluding timestamp and path-specific lines)
-GOTTEN_CONTENT=$(echo "$OUTPUT" | grep -v "INFO  reqflow::config" | grep -v "Warning: Element")
+GOTTEN_CONTENT=$(echo "$OUTPUT" | grep -v "INFO  reqvire::config" | grep -v "Warning: Element")
 SANITIZED_OUTPUT=$(echo "$GOTTEN_CONTENT" | sed -E 's#https://[^ )]+/blob/[a-f0-9]{7,40}/##g')
 # The expected content with blank lines matching actual output
 EXPECTED_CONTENT='## Change Impact Report
@@ -93,7 +93,7 @@ fi
 
 # Test 2: Verify that change impact detection works with specified commit
 # Use HEAD as the explicit commit
-OUTPUT=$(cd "${TMP_DIR}" && "${REQFLOW_BIN}" --config "${TMP_DIR}/reqflow.yaml" --change-impact --git-commit HEAD 2>&1)
+OUTPUT=$(cd "${TMP_DIR}" && "${REQVIRE_BIN}" --config "${TMP_DIR}/reqvire.yaml" --change-impact --git-commit HEAD 2>&1)
 EXIT_CODE=$?
 
 # Write output to log file for debugging in temporary directory
@@ -107,7 +107,7 @@ if [ $EXIT_CODE -ne 0 ]; then
 fi
 
 # Test 3: Verify JSON output format for change impact detection
-OUTPUT=$(cd "${TMP_DIR}" && "${REQFLOW_BIN}" --config "${TMP_DIR}/reqflow.yaml" --change-impact --json 2>&1)
+OUTPUT=$(cd "${TMP_DIR}" && "${REQVIRE_BIN}" --config "${TMP_DIR}/reqvire.yaml" --change-impact --json 2>&1)
 EXIT_CODE=$?
 
 # Write output to log file for debugging in temporary directory

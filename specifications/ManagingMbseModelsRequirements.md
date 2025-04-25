@@ -9,37 +9,37 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  aac74edfeb367501["Efficient Processing"];
-  click aac74edfeb367501 "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/specifications/ManagingMbseModelsRequirements.md#efficient-processing";
-  class aac74edfeb367501 requirement;
-  a469d82e490f4e4["UserStories.md/Managing MBSE Models"];
-  class a469d82e490f4e4 requirement;
-  click a469d82e490f4e4 "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/specifications/UserStories.md#managing-mbse-models";
-  aac74edfeb367501 -->|refines| a469d82e490f4e4;
-  afba6897082c7c6a["Project Configuration with YAML"];
-  click afba6897082c7c6a "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/specifications/ManagingMbseModelsRequirements.md#project-configuration-with-yaml";
-  class afba6897082c7c6a requirement;
-  afba6897082c7c6a -->|refines| a469d82e490f4e4;
-  ecc3a81573b50a5c["Configurable External Folders"];
-  click ecc3a81573b50a5c "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/specifications/ManagingMbseModelsRequirements.md#configurable-external-folders";
-  class ecc3a81573b50a5c requirement;
-  fe433967471bc04f["Support for Distributed Requirements"];
-  class fe433967471bc04f requirement;
-  click fe433967471bc04f "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/specifications/ManagingMbseModelsRequirements.md#support-for-distributed-requirements";
-  ecc3a81573b50a5c -->|refines| fe433967471bc04f;
-  2a1b2c862241398["Configurable Specifications Folder"];
-  click 2a1b2c862241398 "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/specifications/ManagingMbseModelsRequirements.md#configurable-specifications-folder";
-  class 2a1b2c862241398 requirement;
-  2a1b2c862241398 -.->|deriveReqT| afba6897082c7c6a;
-  fe433967471bc04f -.->|deriveReqT| afba6897082c7c6a;
-  ab0a6601a5fb42c8["Coexistence of Structured and Unstructured Documents"];
-  click ab0a6601a5fb42c8 "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/specifications/ManagingMbseModelsRequirements.md#coexistence-of-structured-and-unstructured-documents";
-  class ab0a6601a5fb42c8 requirement;
-  ab0a6601a5fb42c8 -->|refines| a469d82e490f4e4;
-  20b88aa91dd68c24["Bootstrap Model Structure"];
-  click 20b88aa91dd68c24 "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/specifications/ManagingMbseModelsRequirements.md#bootstrap-model-structure";
-  class 20b88aa91dd68c24 requirement;
-  20b88aa91dd68c24 -->|refines| a469d82e490f4e4;
+  1355222227e76540["Support for Distributed Requirements"];
+  click 1355222227e76540 "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/specifications/ManagingMbseModelsRequirements.md#support-for-distributed-requirements";
+  class 1355222227e76540 requirement;
+  fbe7e0d3b82611ef["Project Configuration with YAML"];
+  class fbe7e0d3b82611ef requirement;
+  click fbe7e0d3b82611ef "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/specifications/ManagingMbseModelsRequirements.md#project-configuration-with-yaml";
+  1355222227e76540 -.->|deriveReqT| fbe7e0d3b82611ef;
+  1902659ed14c4615["UserStories.md/Managing MBSE Models"];
+  class 1902659ed14c4615 requirement;
+  click 1902659ed14c4615 "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/specifications/UserStories.md#managing-mbse-models";
+  fbe7e0d3b82611ef -->|refines| 1902659ed14c4615;
+  f645de527a1eb977["Configurable External Folders"];
+  click f645de527a1eb977 "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/specifications/ManagingMbseModelsRequirements.md#configurable-external-folders";
+  class f645de527a1eb977 requirement;
+  f645de527a1eb977 -->|refines| 1355222227e76540;
+  a67f325ec6416b1d["Coexistence of Structured and Unstructured Documents"];
+  click a67f325ec6416b1d "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/specifications/ManagingMbseModelsRequirements.md#coexistence-of-structured-and-unstructured-documents";
+  class a67f325ec6416b1d requirement;
+  a67f325ec6416b1d -->|refines| 1902659ed14c4615;
+  cfe4bd1a448c3930["Configurable Specifications Folder"];
+  click cfe4bd1a448c3930 "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/specifications/ManagingMbseModelsRequirements.md#configurable-specifications-folder";
+  class cfe4bd1a448c3930 requirement;
+  cfe4bd1a448c3930 -.->|deriveReqT| fbe7e0d3b82611ef;
+  6c00ff29cf036776["Bootstrap Model Structure"];
+  click 6c00ff29cf036776 "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/specifications/ManagingMbseModelsRequirements.md#bootstrap-model-structure";
+  class 6c00ff29cf036776 requirement;
+  6c00ff29cf036776 -->|refines| 1902659ed14c4615;
+  b6c8faf2d138c14a["Efficient Processing"];
+  click b6c8faf2d138c14a "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/specifications/ManagingMbseModelsRequirements.md#efficient-processing";
+  class b6c8faf2d138c14a requirement;
+  b6c8faf2d138c14a -->|refines| 1902659ed14c4615;
 ```
 
 ---
@@ -61,7 +61,7 @@ The system shall process structured documents and relations to extract model-rel
 ---
 
 ### Project Configuration with YAML
-The system shall support a YAML-based configuration file that defines folder names and structures to be used by the ReqFlow tool when processing model artifacts.
+The system shall support a YAML-based configuration file that defines folder names and structures to be used by the Reqvire tool when processing model artifacts.
 
 #### Relations
   * refine: [UserStories.md/Managing MBSE Models](UserStories.md#managing-mbse-models)

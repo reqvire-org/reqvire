@@ -1,18 +1,18 @@
-# ReqFlow Configuration Guide
+# Reqvire Configuration Guide
 
-ReqFlow supports customization through a YAML configuration file. This file allows you to specify folder names, style settings, and other options to customize the tool for your project's specific needs.
+Reqvire supports customization through a YAML configuration file. This file allows you to specify folder names, style settings, and other options to customize the tool for your project's specific needs.
 
 ## Configuration File Locations
 
-ReqFlow will look for a configuration file in the following locations (in order):
+Reqvire will look for a configuration file in the following locations (in order):
 
 1. The path specified with `--config` or `-c` command line option
-2. `reqflow.yml` in the current directory
-3. `reqflow.yaml` in the current directory
-4. `.reqflow.yml` in the current directory
-5. `.reqflow.yaml` in the current directory
-6. `.config/reqflow.yml` in the current directory
-7. `.config/reqflow.yaml` in the current directory
+2. `reqvire.yml` in the current directory
+3. `reqvire.yaml` in the current directory
+4. `.reqvire.yml` in the current directory
+5. `.reqvire.yaml` in the current directory
+6. `.config/reqvire.yml` in the current directory
+7. `.config/reqvire.yaml` in the current directory
 
 If no configuration file is found, default settings will be used.
 
@@ -91,7 +91,7 @@ style:
 
 ## External Folders
 
-The `external_folders` configuration option allows you to include system requirements from other repositories or different directory structures in your ReqFlow processing:
+The `external_folders` configuration option allows you to include system requirements from other repositories or different directory structures in your Reqvire processing:
 
 ```yaml
 paths:
@@ -131,10 +131,10 @@ Key points about excluded filename patterns:
 With the configuration file in place, the command line arguments for input and output folders become optional:
 
 ```
-reqflow [INPUT_FOLDER] [OUTPUT_FOLDER] [OPTIONS]
+reqvire [INPUT_FOLDER] [OUTPUT_FOLDER] [OPTIONS]
 ```
 
-If the input folder or output folder is not provided on the command line, ReqFlow will use the values from the configuration file.
+If the input folder or output folder is not provided on the command line, Reqvire will use the values from the configuration file.
 
 ## Command Line Override
 
@@ -142,22 +142,22 @@ Command line arguments take precedence over configuration file settings. For exa
 
 ## Example Configuration
 
-The repository includes an example configuration file at `reqflow.yml.example`. Copy this file to one of the supported locations and modify it as needed.
+The repository includes an example configuration file at `reqvire.yml.example`. Copy this file to one of the supported locations and modify it as needed.
 
 ```bash
 # Copy the example configuration to your project
-cp /path/to/reqflow.yml.example ./reqflow.yml
+cp /path/to/reqvire.yml.example ./reqvire.yml
 
 # Edit the configuration file
-nano reqflow.yml
+nano reqvire.yml
 ```
 
 ## Using with CI/CD
 
-When using ReqFlow in CI/CD pipelines, you can either:
+When using Reqvire in CI/CD pipelines, you can either:
 
-1. Include a reqflow.yml file in your repository
+1. Include a reqvire.yml file in your repository
 2. Pass a configuration file explicitly using the `--config` option
 3. Override specific settings using command line arguments
 
-This flexibility makes it easy to adapt ReqFlow to various CI/CD environments and workflows.
+This flexibility makes it easy to adapt Reqvire to various CI/CD environments and workflows.

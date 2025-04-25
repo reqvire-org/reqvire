@@ -232,7 +232,7 @@ This is system requirement 1.
 	  theme: "default"
 	  max_width: 1200
 	"#;
-	    temp.child("reqflow.yml").write_str(config_content).unwrap();
+	    temp.child("reqvire.yml").write_str(config_content).unwrap();
 	    
 	    // Set up model manager with diagram generation enabled
 	    let mut config = Config::default();

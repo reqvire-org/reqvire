@@ -1,10 +1,10 @@
 use std::process::Command;
 use anyhow::Result;
-use crate::error::ReqFlowError;
+use crate::error::ReqvireError;
 use std::path::PathBuf;
 
 /// Retrieves the repository base URL (HTTPS format) from Git remote configuration.
-pub fn get_repository_base_url() -> Result<String, ReqFlowError> {
+pub fn get_repository_base_url() -> Result<String, ReqvireError> {
     // Fetch the repository URL from git configuration
     let output = Command::new("git")
         .args(&["config", "--get", "remote.origin.url"])
@@ -12,13 +12,13 @@ pub fn get_repository_base_url() -> Result<String, ReqFlowError> {
 
     if !output.status.success() {
         let err = String::from_utf8_lossy(&output.stderr);
-        return Err(ReqFlowError::GitCommandError(format!("Failed to get repository URL: {}", err)));
+        return Err(ReqvireError::GitCommandError(format!("Failed to get repository URL: {}", err)));
     }
 
     let url = String::from_utf8_lossy(&output.stdout).trim().to_string();
 
     if url.is_empty() {
-        return Err(ReqFlowError::GitCommandError("Repository URL is empty or not set".to_string()));
+        return Err(ReqvireError::GitCommandError("Repository URL is empty or not set".to_string()));
     }
 
     let base_url = if url.starts_with("git@") {
@@ -33,7 +33,7 @@ pub fn get_repository_base_url() -> Result<String, ReqFlowError> {
         // HTTPS URLs (https://github.com/owner/repo.git -> https://github.com/owner/repo)
         url.trim_end_matches(".git").to_string()
     } else {
-        return Err(ReqFlowError::GitCommandError(format!(
+        return Err(ReqvireError::GitCommandError(format!(
             "Unsupported remote URL format: {}", url
         )));
     };
@@ -43,27 +43,27 @@ pub fn get_repository_base_url() -> Result<String, ReqFlowError> {
 
 
 /// Retrieves the current commit hash from the repository.
-pub fn get_commit_hash() -> Result<String,ReqFlowError> {
+pub fn get_commit_hash() -> Result<String,ReqvireError> {
     // Run the git command to get the current commit hash
     let output = Command::new("git")
         .args(&["rev-parse", "HEAD"])
         .output()?;
     if !output.status.success() {
         let err = String::from_utf8_lossy(&output.stderr);
-        return Err(ReqFlowError::GitCommandError(format!("Failed to get current commit hash: {}", err)));
+        return Err(ReqvireError::GitCommandError(format!("Failed to get current commit hash: {}", err)));
     }
 
     // Convert the output to a string and trim any newline or whitespace
     let hash = String::from_utf8_lossy(&output.stdout).trim().to_string();
     if hash.is_empty() {
-        return Err(ReqFlowError::GitCommandError("Commit hash is empty".to_string()));
+        return Err(ReqvireError::GitCommandError("Commit hash is empty".to_string()));
     }
 
     Ok(hash)
 }
 
 /// Retrieves the content of a file at a given commit (e.g. "HEAD~1").
-pub fn get_file_at_commit(file_path: &str,folder:&PathBuf, commit: &str) -> Result<String, ReqFlowError> {
+pub fn get_file_at_commit(file_path: &str,folder:&PathBuf, commit: &str) -> Result<String, ReqvireError> {
 
     let folder_path = PathBuf::from(folder);
     // Find the Git root for the given folder
@@ -77,17 +77,17 @@ pub fn get_file_at_commit(file_path: &str,folder:&PathBuf, commit: &str) -> Resu
                   .output()?;
               if !output.status.success() {
                   let err = String::from_utf8_lossy(&output.stderr);
-                  return Err(ReqFlowError::GitCommandError(format!("git show failed for {}: {}", file_path, err)));
+                  return Err(ReqvireError::GitCommandError(format!("git show failed for {}: {}", file_path, err)));
               }
               Ok(String::from_utf8_lossy(&output.stdout).into())
             
         },
-        None => Err(ReqFlowError::PathError(format!("Problem extracting git relative path: {} for root {}",&file_path, &git_root)))
+        None => Err(ReqvireError::PathError(format!("Problem extracting git relative path: {} for root {}",&file_path, &git_root)))
     }
 }
 
 /// Finds the Git repository root for a given absolute folder path.
-pub fn find_git_repo_root(absolute_folder_path: &PathBuf) -> Result<String, ReqFlowError> {
+pub fn find_git_repo_root(absolute_folder_path: &PathBuf) -> Result<String, ReqvireError> {
     let output = Command::new("git")
         .arg("rev-parse")
         .arg("--show-toplevel")
@@ -101,13 +101,13 @@ pub fn find_git_repo_root(absolute_folder_path: &PathBuf) -> Result<String, ReqF
         }
         Ok(output) => {
             let err = String::from_utf8_lossy(&output.stderr).trim().to_string();
-            Err(ReqFlowError::GitCommandError(format!(
+            Err(ReqvireError::GitCommandError(format!(
                 "git rev-parse failed to get repository root for {}: {}",
                 absolute_folder_path.to_string_lossy(),
                 err
             )))
         }
-        Err(err) => Err(ReqFlowError::GitCommandError(format!(
+        Err(err) => Err(ReqvireError::GitCommandError(format!(
             "Failed to execute git rev-parse for {}: {}",
             absolute_folder_path.to_string_lossy(),
             err
@@ -117,7 +117,7 @@ pub fn find_git_repo_root(absolute_folder_path: &PathBuf) -> Result<String, ReqF
 
 /// Retrieves the repository root folder
 /*
-pub fn get_repository_root(file_path: &str,folder:&str, commit: &str) -> Result<String, ReqFlowError> {
+pub fn get_repository_root(file_path: &str,folder:&str, commit: &str) -> Result<String, ReqvireError> {
     println!("{}", &format!("{}:{}", commit, file_path));
     let output = Command::new("git")
         .args(&["show", &format!("{}:{}", commit, file_path)])
@@ -125,19 +125,19 @@ pub fn get_repository_root(file_path: &str,folder:&str, commit: &str) -> Result<
         .output()?;
     if !output.status.success() {
         let err = String::from_utf8_lossy(&output.stderr);
-        return Err(ReqFlowError::GitCommandError(format!("git show failed for {}: {}", file_path, err)));
+        return Err(ReqvireError::GitCommandError(format!("git show failed for {}: {}", file_path, err)));
     }
     Ok(String::from_utf8_lossy(&output.stdout).into())
 }
 
 */
-pub fn repository_root() -> Result<PathBuf, ReqFlowError> {
+pub fn repository_root() -> Result<PathBuf, ReqvireError> {
     let output = Command::new("git")
         .args(&["rev-parse", "--show-toplevel"])
         .output()?;
 
     if !output.status.success() {
-        return Err(ReqFlowError::GitCommandError(
+        return Err(ReqvireError::GitCommandError(
             "git failed to find repository root".to_string(),
         ));
     }
@@ -148,13 +148,13 @@ pub fn repository_root() -> Result<PathBuf, ReqFlowError> {
 
 /// Returns a list of files that have changed (according to `git diff --name-only`).
 #[allow(dead_code)]
-fn get_changed_files_from_git() -> Result<Vec<String>, ReqFlowError> {
+fn get_changed_files_from_git() -> Result<Vec<String>, ReqvireError> {
     let output = Command::new("git")
         .args(&["diff", "--name-only"])
         .output()?;
     if !output.status.success() {
         let err = String::from_utf8_lossy(&output.stderr);
-        return Err(ReqFlowError::GitCommandError(format!("git diff failed: {}", err)));        
+        return Err(ReqvireError::GitCommandError(format!("git diff failed: {}", err)));        
     }
     let stdout = String::from_utf8_lossy(&output.stdout);
     let changed_files: Vec<String> = stdout
@@ -169,7 +169,7 @@ fn get_changed_files_from_git() -> Result<Vec<String>, ReqFlowError> {
 
 /// Lists files in `commit` by running `git ls-tree --name-only -r <commit>`
 /// with `folder` as the current directory. Returns a list of file paths.
-pub fn ls_tree_commit_in_folder(commit: &str, folder: &PathBuf) -> Result<Vec<String>,ReqFlowError> {
+pub fn ls_tree_commit_in_folder(commit: &str, folder: &PathBuf) -> Result<Vec<String>,ReqvireError> {
     let output = Command::new("git")
         .args(&["ls-tree", "--name-only", "-r", commit])
         .current_dir(folder)
@@ -178,7 +178,7 @@ pub fn ls_tree_commit_in_folder(commit: &str, folder: &PathBuf) -> Result<Vec<St
     if !output.status.success() {
         // Convert stderr to string for error context
         let stderr_str = String::from_utf8_lossy(&output.stderr);
-        return Err(ReqFlowError::GitCommandError(format!("git ls-tree failed (commit = {}, folder = {:?}): {}", commit, folder, stderr_str)));        
+        return Err(ReqvireError::GitCommandError(format!("git ls-tree failed (commit = {}, folder = {:?}): {}", commit, folder, stderr_str)));        
 
     }
 

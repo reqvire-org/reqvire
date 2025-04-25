@@ -10,11 +10,11 @@ homepage.workspace = true
 documentation.workspace = true
 
 [[bin]]
-name = "reqflow"
+name = "reqvire"
 path = "src/main.rs"
 
 [dependencies]
-reqflow = { workspace = true, version.workspace = true  }
+reqvire = { workspace = true, version.workspace = true  }
 
 # CLI
 clap = { workspace = true }

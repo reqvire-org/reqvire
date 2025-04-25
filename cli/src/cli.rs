@@ -3,17 +3,17 @@ use std::path::PathBuf;
 use anyhow::Result;
 use log::{info};
 use serde::Serialize;
-use reqflow::error::ReqFlowError;
-use reqflow::{html_export, linting, ModelManager};
-use reqflow::index_generator;
+use reqvire::error::ReqvireError;
+use reqvire::{html_export, linting, ModelManager};
+use reqvire::index_generator;
 use globset::GlobSet;
-use reqflow::reports;
-use reqflow::change_impact;
-use reqflow::git_commands;
-use reqflow::matrix_generator;
+use reqvire::reports;
+use reqvire::change_impact;
+use reqvire::git_commands;
+use reqvire::matrix_generator;
 
 #[derive(Parser, Debug)]
-#[clap(author,version, about = "Reqflow MBSE model management tool", long_about = None)]
+#[clap(author,version, about = "Reqvire MBSE model management tool", long_about = None)]
 pub struct Args {
 
     /// Convert Markdown to HTML with embedded styles
@@ -64,15 +64,15 @@ pub struct Args {
         
       
     /// Path to a custom configuration file (YAML format)
-    /// If not provided, the system will look for reqflow.yml, reqflow.yaml, 
-    /// .reqflow.yml, or .reqflow.yaml in the current directory
+    /// If not provided, the system will look for reqvire.yml, reqvire.yaml, 
+    /// .reqvire.yml, or .reqvire.yaml in the current directory
     #[clap(long, short = 'c')]
     pub config: Option<PathBuf>,
     
     /// Output LLM context document
-    /// Generates a comprehensive context document with information about ReqFlow
+    /// Generates a comprehensive context document with information about Reqvire
     /// methodology, document structure, relation types, and CLI usage to help
-    /// Large Language Models understand and work with ReqFlow-based projects
+    /// Large Language Models understand and work with Reqvire-based projects
     #[clap(long)]
     pub llm_context: bool,
     
@@ -108,7 +108,7 @@ struct ValidationResult {
 }
 
 /// Helper function to print validation results
-fn print_validation_results(errors: &[ReqFlowError], json_output: bool) {
+fn print_validation_results(errors: &[ReqvireError], json_output: bool) {
     if json_output {
         let json_result = ValidationResult {
             errors: errors.iter().map(|e| e.to_string()).collect(),
@@ -132,7 +132,7 @@ pub fn handle_command(
     output_folder_path: &PathBuf,
     excluded_filename_patterns: &GlobSet,
     diagram_direction: &str
-) -> Result<i32,ReqFlowError> {
+) -> Result<i32,ReqvireError> {
 
     let mut model_manager = ModelManager::new();
 
@@ -172,7 +172,7 @@ pub fn handle_command(
                 &specification_folder_path,
                 &external_folders_path
             ).map_err(|e| {
-                ReqFlowError::ProcessError(format!("❌ Failed to generate README.md: {:?}", e))
+                ReqvireError::ProcessError(format!("❌ Failed to generate README.md: {:?}", e))
             })?;
 
             return Ok(0);
@@ -194,15 +194,15 @@ pub fn handle_command(
         }else if args.change_impact {
             
             let current_commit = git_commands::get_commit_hash().map_err(|_| {
-                ReqFlowError::ProcessError("❌ Failed to retrieve the current commit hash.".to_string())
+                ReqvireError::ProcessError("❌ Failed to retrieve the current commit hash.".to_string())
             })?;
 
             let repo_root = git_commands::repository_root().map_err(|_| {
-                ReqFlowError::ProcessError("❌ Failed to determine repository root.".to_string())
+                ReqvireError::ProcessError("❌ Failed to determine repository root.".to_string())
             })?;
 
             let base_url = git_commands::get_repository_base_url().map_err(|_| {
-                ReqFlowError::ProcessError("❌ Failed to determine repository base url.".to_string())
+                ReqvireError::ProcessError("❌ Failed to determine repository base url.".to_string())
             })?;
 
             
@@ -216,7 +216,7 @@ pub fn handle_command(
                 &specification_folder_path, 
                 &external_folders_path
             )
-            .map_err(|e| ReqFlowError::ProcessError(format!("❌ Failed to generate change impact report: {:?}", e)))?;
+            .map_err(|e| ReqvireError::ProcessError(format!("❌ Failed to generate change impact report: {:?}", e)))?;
             
             report.print(&base_url, &current_commit, &args.git_commit, args.json);
                 
@@ -231,7 +231,7 @@ pub fn handle_command(
         }else if args.traces {
             let matrix_config = matrix_generator::MatrixConfig::default();
             
-            let matrix_output = reqflow::matrix_generator::generate_matrix(
+            let matrix_output = reqvire::matrix_generator::generate_matrix(
                 &model_manager.element_registry,
                 &matrix_config,
                 if args.json {
@@ -282,7 +282,7 @@ mod tests {
 
     #[test]
     fn test_cli_parsing() {
-        let args = Args::parse_from(&["reqflow", "--html"]);
+        let args = Args::parse_from(&["reqvire", "--html"]);
         assert!(args.html);
     }
     

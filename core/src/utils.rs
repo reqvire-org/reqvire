@@ -3,7 +3,7 @@ use std::path::{Path, PathBuf};
 use pathdiff::diff_paths;
 use log::debug;
 use walkdir::WalkDir;
-use crate::error::ReqFlowError;
+use crate::error::ReqvireError;
 use globset::GlobSet;
 use regex::Regex;
 use rustc_hash::FxHasher;
@@ -111,7 +111,7 @@ pub fn scan_markdown_files_from_commit(
         let result = git_commands::ls_tree_commit_in_folder(&commit,&folder);
         let documents_vec = match result {
             Err(e) => {
-                //TODO: we need to return result with reqflow error here
+                //TODO: we need to return result with reqvire error here
                 eprintln!("Error: {}", e);
                 Vec::new()
             } ,       
@@ -136,7 +136,7 @@ pub fn scan_markdown_files_from_commit(
 
 
 /// Gets the relative path of a file
-pub fn get_relative_path(path: &PathBuf, specification_folder: &Path, external_folders: &[PathBuf]) -> Result<PathBuf, ReqFlowError> {
+pub fn get_relative_path(path: &PathBuf, specification_folder: &Path, external_folders: &[PathBuf]) -> Result<PathBuf, ReqvireError> {
     if let Ok(relative) = path.strip_prefix(specification_folder) {
         return Ok(relative.to_path_buf());
     }
@@ -145,17 +145,17 @@ pub fn get_relative_path(path: &PathBuf, specification_folder: &Path, external_f
             return Ok(relative.to_path_buf());
         }
     }
-    Err(ReqFlowError::PathError(format!(
+    Err(ReqvireError::PathError(format!(
         "Failed to determine relative path: {}",
         path.display()
     )))
 }
 
 
-pub fn get_relative_path_from_root(path: &PathBuf, root: &PathBuf) -> Result<PathBuf, ReqFlowError> {
+pub fn get_relative_path_from_root(path: &PathBuf, root: &PathBuf) -> Result<PathBuf, ReqvireError> {
     path.strip_prefix(root)
         .map(PathBuf::from)
-        .map_err(|_| ReqFlowError::PathError(format!(
+        .map_err(|_| ReqvireError::PathError(format!(
             "Failed to compute relative path from given root: {}",
             path.display()
         )))
@@ -204,7 +204,7 @@ pub fn normalize_identifier(
     base_path: &PathBuf,
     specifications_folder: &PathBuf, 
     external_folders: &[PathBuf]
-) -> Result<String, ReqFlowError> {
+) -> Result<String, ReqvireError> {
 
     let (path, fragment_opt) = extract_path_and_fragment(identifier);
 
@@ -238,7 +238,7 @@ pub fn normalize_path(
     base_path: &PathBuf, 
     specifications_folder: &PathBuf, 
     external_folders: &[PathBuf]
-) -> Result<String, ReqFlowError> {
+) -> Result<String, ReqvireError> {
    
     let path =Path::new(path_str);
 
@@ -282,7 +282,7 @@ pub fn normalize_path(
     let canonical_path = match absolute_path.canonicalize() {
         Ok(path) => path,
         Err(e) => {
-            return Err(ReqFlowError::PathError(format!(
+            return Err(ReqvireError::PathError(format!(
                 "Failed to normalize path'{}': {}",
                 absolute_path.to_string_lossy(), e
             )))
@@ -304,7 +304,7 @@ pub fn to_relative_identifier(
     base_path: &PathBuf,
     specifications_folder: &PathBuf,
     external_folders: &[PathBuf],
-) -> Result<String, ReqFlowError> {
+) -> Result<String, ReqvireError> {
 
     let (normalized_path, fragment_opt) = extract_path_and_fragment(normalized_identifier);
     let normalized_path = Path::new(normalized_path);
@@ -378,14 +378,14 @@ pub fn parse_metadata_line(line: &str) -> Option<(String, String)> {
 
 
 
-pub fn parse_relation_line(line: &str) -> Result<(String, (String, String)), ReqFlowError> {
+pub fn parse_relation_line(line: &str) -> Result<(String, (String, String)), ReqvireError> {
     let parts: Vec<&str> = line.splitn(2, ':').map(|s| s.trim()).collect();
     if parts.len() == 2 {
         let relation_type = parts[0].trim_start_matches("* ").trim().to_string(); // Remove unwanted prefix
         let target = parse_target(parts[1]); // Parse target
         Ok((relation_type, target))
     } else {
-        Err(ReqFlowError::InvalidRelationFormat(format!("Invalid relation format: '{}'", line)))
+        Err(ReqvireError::InvalidRelationFormat(format!("Invalid relation format: '{}'", line)))
     }
 }
 

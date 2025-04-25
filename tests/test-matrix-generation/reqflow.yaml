@@ -1,5 +1,0 @@
-paths:
-  specifications_folder: "./specifications"
-  
-  # Default output folder
-  output_folder: "output"    

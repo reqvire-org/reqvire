@@ -1,6 +1,6 @@
 use lazy_static::lazy_static;
 use std::collections::HashMap;
-use crate::error::ReqFlowError;
+use crate::error::ReqvireError;
 use serde::Serialize;
 use std::cmp::Ordering;
 use std::hash::Hash;
@@ -230,11 +230,11 @@ impl Hash for Relation {
 }
 
 impl Relation {
-    pub fn new(relation_type: &str, text: String, normalized_target: &str) -> Result<Self, ReqFlowError> {   
+    pub fn new(relation_type: &str, text: String, normalized_target: &str) -> Result<Self, ReqvireError> {   
         let link=Self::parse_link_type(normalized_target);
                
         let relation_info = RELATION_TYPES.get(relation_type)
-            .ok_or_else(|| ReqFlowError::UnsupportedRelationType(relation_type.to_string()))?;
+            .ok_or_else(|| ReqvireError::UnsupportedRelationType(relation_type.to_string()))?;
         Ok(Self {
             relation_type: relation_info,
             target: RelationTarget{text: text, link: link},

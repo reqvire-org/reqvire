@@ -1,6 +1,6 @@
 use crate::element::{Element, SubSection, ElementType, RequirementType};
 use crate::relation::Relation;
-use crate::error::ReqFlowError;
+use crate::error::ReqvireError;
 use crate::utils;
 use log::debug;
 use std::collections::HashSet;
@@ -13,7 +13,7 @@ pub fn parse_elements(
     file_path: &PathBuf,
     specifications_folder: &PathBuf,
     external_folders_refs: &[PathBuf],
-) -> (Vec<Element>, Vec<ReqFlowError>) {
+) -> (Vec<Element>, Vec<ReqvireError>) {
     let mut elements = Vec::new();
     let mut current_element: Option<Element> = None;
     let mut errors = Vec::new();
@@ -83,7 +83,7 @@ pub fn parse_elements(
                                     file_path.display(),
                                     line_num + 1
                                 );
-                                errors.push(ReqFlowError::DuplicateElement(msg.clone()));
+                                errors.push(ReqvireError::DuplicateElement(msg.clone()));
                                 debug!("Error: {}", msg);
                                 skip_current_element = true;
                             } else {
@@ -116,7 +116,7 @@ pub fn parse_elements(
                                 file_path.display(),
                                 line_num + 1
                             );
-                            errors.push(ReqFlowError::InvalidIdentifier(msg.clone()));
+                            errors.push(ReqvireError::InvalidIdentifier(msg.clone()));
                             debug!("Error: {}", msg);
                             skip_current_element = true;
                         }
@@ -130,7 +130,7 @@ pub fn parse_elements(
                         file_path.display(),
                         line_num + 1
                     );
-                    errors.push(ReqFlowError::InvalidIdentifier(msg.clone()));
+                    errors.push(ReqvireError::InvalidIdentifier(msg.clone()));
                     debug!("Error: {}", msg);
                     skip_current_element = true;
                 }
@@ -148,7 +148,7 @@ pub fn parse_elements(
                         file_path.display(),
                         line_num + 1
                     );
-                    errors.push(ReqFlowError::DuplicateSubsection(msg.clone()));
+                    errors.push(ReqvireError::DuplicateSubsection(msg.clone()));
                     debug!("Error: {}", msg);
                 } else {
                     seen_subsections.insert(subsection.clone());
@@ -191,7 +191,7 @@ pub fn parse_elements(
                         "Element '{}' has invalid metadata format: '{}' (file: {}, line {})",
                         element.name, trimmed, file, line_num + 1
                     );
-                    errors.push(ReqFlowError::InvalidMetadataFormat(msg.clone()));
+                    errors.push(ReqvireError::InvalidMetadataFormat(msg.clone()));
                     debug!("Error: {}", msg);
                     current_subsection = SubSection::Other("".to_string());
                 }
@@ -226,7 +226,7 @@ pub fn parse_elements(
                                                         "'{}' in element '{}': (file: {}, line {})",
                                                         relation_type, element.name, file, line_num + 1
                                                     );
-                                                    errors.push(ReqFlowError::UnsupportedRelationType(msg.clone()));
+                                                    errors.push(ReqvireError::UnsupportedRelationType(msg.clone()));
                                                     debug!("Error: {}", msg);
                                                 }
                                             }
@@ -236,7 +236,7 @@ pub fn parse_elements(
                                                 "Failed to normalize identifier for '{}': {} (file: {}, line {})",
                                                 element.name, e, file, line_num + 1
                                             );
-                                            errors.push(ReqFlowError::InvalidIdentifier(msg.clone()));
+                                            errors.push(ReqvireError::InvalidIdentifier(msg.clone()));
                                             debug!("Error: {}", msg);
                                         }
                                     }
@@ -249,7 +249,7 @@ pub fn parse_elements(
                                         file_path.display(),
                                         line_num + 1
                                     );
-                                    errors.push(ReqFlowError::InvalidIdentifier(msg.clone()));
+                                    errors.push(ReqvireError::InvalidIdentifier(msg.clone()));
                                     debug!("Error: {}", msg);
                                 }
                             }
@@ -259,7 +259,7 @@ pub fn parse_elements(
                                 "Element '{}' has invalid relation format: '{}'. (file: {}, line {})",
                                 element.name, trimmed, file, line_num + 1
                             );
-                            errors.push(ReqFlowError::UnsupportedRelationType(msg.clone()));
+                            errors.push(ReqvireError::UnsupportedRelationType(msg.clone()));
                             debug!("Error: {}", msg);
                         }
                     }
@@ -270,7 +270,7 @@ pub fn parse_elements(
                         "Element '{}' has invalid relations format: '{}' (file: {}, line {})",
                         element.name, trimmed, file, line_num + 1
                     );
-                    errors.push(ReqFlowError::InvalidRelationFormat(msg.clone()));
+                    errors.push(ReqvireError::InvalidRelationFormat(msg.clone()));
                     debug!("Error: {}", msg);
                     current_subsection = SubSection::Other("".to_string());
                 }

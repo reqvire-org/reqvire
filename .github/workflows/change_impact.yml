@@ -1,16 +1,16 @@
-name: ReqFlow Impact on PR Comment
+name: Reqvire Impact on PR Comment
 
 on:
   issue_comment:
     types: [created]
 
 jobs:
-  run-reqflow:
+  run-reqvire:
     if: |
       github.event.issue.pull_request != null &&
       (
-        contains(github.event.comment.body, '/reqflow impact') ||
-        contains(github.event.comment.body, '/reqflow traces')
+        contains(github.event.comment.body, '/reqvire impact') ||
+        contains(github.event.comment.body, '/reqvire traces')
       )
     runs-on: ubuntu-latest
     
@@ -73,26 +73,26 @@ jobs:
           override: true
 
               
-      - name: Build reqflowcli from source
+      - name: Build reqvirecli from source
         run: |
           cargo build --release
-          cp target/release/reqflow ./reqflow
+          cp target/release/reqvire ./reqvire
 
 
-      - name: Run ReqFlow Impact (if triggered)
-        if: contains(github.event.comment.body, '/reqflow impact')
+      - name: Run Reqvire Impact (if triggered)
+        if: contains(github.event.comment.body, '/reqvire impact')
         id: run_impact
         run: |
-          OUTPUT=$(./reqflow --change-impact --git-commit "$BASE_COMMIT" 2>&1 || echo "⚠️ reqflow impact failed.")
-          echo "REQFLOW_OUTPUT<<EOF" >> $GITHUB_ENV
+          OUTPUT=$(./reqvire --change-impact --git-commit "$BASE_COMMIT" 2>&1 || echo "⚠️ reqvire impact failed.")
+          echo "REQVIRE_OUTPUT<<EOF" >> $GITHUB_ENV
           echo "$OUTPUT" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
-      - name: Run ReqFlow Traces (if triggered)
-        if: contains(github.event.comment.body, '/reqflow traces')
+      - name: Run Reqvire Traces (if triggered)
+        if: contains(github.event.comment.body, '/reqvire traces')
         id: run_traces
         run: |
-          OUTPUT=$(./reqflow --traces --output-format markdown 2>&1 || echo "⚠️ reqflow traces failed.")
-          echo "REQFLOW_OUTPUT<<EOF" >> $GITHUB_ENV
+          OUTPUT=$(./reqvire --traces --output-format markdown 2>&1 || echo "⚠️ reqvire traces failed.")
+          echo "REQVIRE_OUTPUT<<EOF" >> $GITHUB_ENV
           echo "$OUTPUT" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV

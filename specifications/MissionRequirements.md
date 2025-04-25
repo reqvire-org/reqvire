@@ -10,20 +10,20 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  f4d2c697be0f9733["Promote Automation and Efficiency"];
-  click f4d2c697be0f9733 "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/specifications/MissionRequirements.md#promote-automation-and-efficiency";
-  class f4d2c697be0f9733 requirement;
-  5d0b88381f707008["MOEs.md/MOE_UA"];
-  class 5d0b88381f707008 requirement;
-  click 5d0b88381f707008 "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/specifications/MOEs.md#moe_ua";
-  f4d2c697be0f9733 -.->|deriveReqT| 5d0b88381f707008;
-  64c3bd3606b9c679["Align with Industry Standards"];
-  click 64c3bd3606b9c679 "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/specifications/MissionRequirements.md#align-with-industry-standards";
-  class 64c3bd3606b9c679 requirement;
-  34ccc009ec6ea573["MOEs.md/MOE_CE"];
-  class 34ccc009ec6ea573 requirement;
-  click 34ccc009ec6ea573 "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/specifications/MOEs.md#moe_ce";
-  64c3bd3606b9c679 -.->|deriveReqT| 34ccc009ec6ea573;
+  b4b8445e969465f9["Align with Industry Standards"];
+  click b4b8445e969465f9 "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/specifications/MissionRequirements.md#align-with-industry-standards";
+  class b4b8445e969465f9 requirement;
+  a7b946053261f1d0["MOEs.md/MOE_CE"];
+  class a7b946053261f1d0 requirement;
+  click a7b946053261f1d0 "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/specifications/MOEs.md#moe_ce";
+  b4b8445e969465f9 -.->|deriveReqT| a7b946053261f1d0;
+  639818a4d3b671bb["Promote Automation and Efficiency"];
+  click 639818a4d3b671bb "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/specifications/MissionRequirements.md#promote-automation-and-efficiency";
+  class 639818a4d3b671bb requirement;
+  bd8b46053261f1d0["MOEs.md/MOE_UA"];
+  class bd8b46053261f1d0 requirement;
+  click bd8b46053261f1d0 "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/specifications/MOEs.md#moe_ua";
+  639818a4d3b671bb -.->|deriveReqT| bd8b46053261f1d0;
 ```
 
 ---

@@ -1,17 +1,17 @@
-# ReqFlow
+# Reqvire
 
-**ReqFlow** is a **framework for system modeling and project specifications**, designed to seamlessly integrate with modern agile development workflows and AI tools. While it currently focuses on **requirements, specifications, and traceability**, its vision extends far beyond—evolving into a fully **AI-powered Model-Based Systems Engineering (MBSE) framework**, where **AI assistance and automation** play a central role in designing, analyzing, and implementing system architectures.
+**Reqvire** is a **framework for system modeling and project specifications**, designed to seamlessly integrate with modern agile development workflows and AI tools. While it currently focuses on **requirements, specifications, and traceability**, its vision extends far beyond—evolving into a fully **AI-powered Model-Based Systems Engineering (MBSE) framework**, where **AI assistance and automation** play a central role in designing, analyzing, and implementing system architectures.
 
 It’s built for **product managers, architects, developers, and AI assistants** to collaborate effectively, keeping system models and requirements in sync with real-world implementation.  
 
-Unlike traditional MBSE tools, ReqFlow is **lightweight, Git-native, and practical** - inspired by **MBSE and SysML**, but without the complexity that slows teams down. 
-By adopting **semi-structured conventions**, ReqFlow bridges the gap between **formal modeling and agile documentation**, enabling **automation and AI-driven workflows** without the overhead of traditional modeling tools.  
+Unlike traditional MBSE tools, Reqvire is **lightweight, Git-native, and practical** - inspired by **MBSE and SysML**, but without the complexity that slows teams down. 
+By adopting **semi-structured conventions**, Reqvire bridges the gap between **formal modeling and agile documentation**, enabling **automation and AI-driven workflows** without the overhead of traditional modeling tools.  
 
 ---
 
-## Why ReqFlow?
+## Why Reqvire?
 
-ReqFlow is a Git-native, AI-enabled **procces, toolset, and language** for modern requirements and system modeling. 
+Reqvire is a Git-native, AI-enabled **procces, toolset, and language** for modern requirements and system modeling. 
 
 - **Git-Native** – Embeds directly into Git workflows, ensuring requirements evolve alongside code with full traceability and version control.  
 - **Agile & Lightweight** – Uses Markdown-based artifacts for a balance of human readability and machine processability, making collaboration seamless.  
@@ -29,12 +29,12 @@ ReqFlow is a Git-native, AI-enabled **procces, toolset, and language** for moder
 
 ## Get Started
 
-For detailed information about **how to use ReqFlow** visit the [documentation](./doc/README.md).
+For detailed information about **how to use Reqvire** visit the [documentation](./doc/README.md).
 
 
 ### Installation
 
-To set up ReqFlow, follow these steps:
+To set up Reqvire, follow these steps:
 
 #### From Source (Linux and macOS)
 
@@ -50,13 +50,13 @@ To set up ReqFlow, follow these steps:
      cargo --version
      ```
 
-2. **Clone the ReqFlow Repository**
+2. **Clone the Reqvire Repository**
    ```bash
-   git clone https://github.com/reqflow/reqflow.git
-   cd reqflow
+   git clone https://github.com/reqvire/reqvire.git
+   cd reqvire
    ```
 
-3. **Build ReqFlow**
+3. **Build Reqvire**
    ```bash
    cargo build --release
    ```
@@ -65,34 +65,34 @@ To set up ReqFlow, follow these steps:
    ```bash
    cargo install --path .
    ```
-   This will install the binary to `~/.cargo/bin/reqflow`
+   This will install the binary to `~/.cargo/bin/reqvire`
 
 #### Using Pre-built Binaries
 
 1. **Download the Latest Release**
-   - Visit the [Releases page](https://github.com/reqflow/reqflow/releases) on GitHub
+   - Visit the [Releases page](https://github.com/reqvire/reqvire/releases) on GitHub
    - Download the appropriate binary for your platform:
-     - Linux: `reqflow-linux-x86_64.tar.gz`
-     - macOS: `reqflow-macos-x86_64.tar.gz` or `reqflow-macos-arm64.tar.gz` (for Apple Silicon)
+     - Linux: `reqvire-linux-x86_64.tar.gz`
+     - macOS: `reqvire-macos-x86_64.tar.gz` or `reqvire-macos-arm64.tar.gz` (for Apple Silicon)
 
 2. **Extract the Binary**
    ```bash
-   tar -xzf reqflow-<platform>.tar.gz
+   tar -xzf reqvire-<platform>.tar.gz
    ```
 
 3. **Move to a Directory in Your PATH**
    ```bash
-   sudo mv reqflow /usr/local/bin/
+   sudo mv reqvire /usr/local/bin/
    ```
 
 4. **Verify the Installation**
    ```bash
-   reqflow --version
+   reqvire --version
    ```
 
 ## Contributing
 
-We welcome contributions to ReqFlow! Whether it's improving the methodology, enhancing the tools, or refining the language, your input is valuable. Here's how to contribute:
+We welcome contributions to Reqvire! Whether it's improving the methodology, enhancing the tools, or refining the language, your input is valuable. Here's how to contribute:
 
 1. **Read the Contribution Guidelines**:
    - Start by reviewing our [Contribution Guidelines](./doc/CONTRIBUTING.md) to understand the process and expectations.

@@ -1,7 +1,7 @@
-# Relations in ReqFlow
+# Relations in Reqvire
 
 
-In ReqFlow, element can be linked using the following types of relationships:
+In Reqvire, element can be linked using the following types of relationships:
  * contain / containedBy
  * derive / derivedFrom 
  * refine / refinedBy
@@ -249,7 +249,7 @@ These two complementary relationships indicate how requirements are verified wit
 
 ## **trace**
 
-In the **Reqflow** **trace** relation doesn't have direction and is not used when calculating change impact.
+In the **Reqvire** **trace** relation doesn't have direction and is not used when calculating change impact.
 It is **weak** relation used for general documentation and traceability.
 
 ### Purpose

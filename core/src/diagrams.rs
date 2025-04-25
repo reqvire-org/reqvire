@@ -1,7 +1,7 @@
 use std::collections::{HashMap, HashSet};
 use crate::element::Element;
 use crate::element_registry::ElementRegistry;
-use crate::error::ReqFlowError;
+use crate::error::ReqvireError;
 use std::path::PathBuf;
 use crate::utils;
 use log::debug;
@@ -16,7 +16,7 @@ pub fn generate_diagrams_by_section(
     direction: & str,        
     specification_folder: &PathBuf, 
     external_folders: &[PathBuf],        
-) -> Result<HashMap<String, String>, ReqFlowError> {
+) -> Result<HashMap<String, String>, ReqvireError> {
     let mut diagrams: HashMap<String, String> = HashMap::new();
 
     // Group elements by (file_path, section)
@@ -52,7 +52,7 @@ fn generate_section_diagram(
     direction: & str,
     specification_folder: &PathBuf, 
     external_folders: &[PathBuf],      
-) -> Result<String, ReqFlowError> {
+) -> Result<String, ReqvireError> {
     // Get Git repository information for creating proper links
     let repo_root = match git_commands::repository_root() {
         Ok(root) => root,
@@ -113,7 +113,7 @@ fn add_element_to_diagram(
     repo_root: &PathBuf,
     base_url: &str,
     commit_hash: &str
-) -> Result<(), ReqFlowError> {
+) -> Result<(), ReqvireError> {
 
     // Convert file path to its parent directory (returns PathBuf)
     let base_dir = PathBuf::from(file_path)

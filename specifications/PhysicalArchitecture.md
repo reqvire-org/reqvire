@@ -1,6 +1,6 @@
-# Physical Architecture for ReqFlow
+# Physical Architecture for Reqvire
 
-The Physical Architecture represents the concrete systems, services, and components that implement the functionality of ReqFlow. It defines the deployment-level structure of the tool, detailing how various components interact.
+The Physical Architecture represents the concrete systems, services, and components that implement the functionality of Reqvire. It defines the deployment-level structure of the tool, detailing how various components interact.
 
 
 ## Architecture Diagram
@@ -8,11 +8,11 @@ The Physical Architecture represents the concrete systems, services, and compone
 
 ```mermaid
 classDiagram
-    class ReqFlow {
+    class Reqvire {
         <<system>>
     }
 
-    class ReqFlowTool {
+    class ReqvireTool {
         <<subsystem>>
     }
 
@@ -57,18 +57,18 @@ classDiagram
 
  
     %% Hierarchical Relationships
-    ReqFlow --> ReqFlowTool
-    ReqFlow --> Integrations
+    Reqvire --> ReqvireTool
+    Reqvire --> Integrations
     
 
-    ReqFlowTool --> UserInterface
-    ReqFlowTool --> Storage
+    ReqvireTool --> UserInterface
+    ReqvireTool --> Storage
 
     UserInterface--> CLI
     UserInterface--> ChatOps    
 
-    ReqFlowTool --> ModelManagement
-    ReqFlowTool --> ValidationAndReporting
+    ReqvireTool --> ModelManagement
+    ReqvireTool --> ValidationAndReporting
 
     Integrations --> GitHubIntegration
     Integrations --> CICDIntegration
@@ -82,10 +82,10 @@ Logical to physical architecture mapping:
 ```mermaid
 graph TD
     %% Root System
-    ReqFlow["ReqFlow (system)"]
+    Reqvire["Reqvire (system)"]
 
-    %% Subsystems under ReqFlow
-    subgraph ReqFlowTool["ReqFlowTool (subsystem)"]
+    %% Subsystems under Reqvire
+    subgraph ReqvireTool["ReqvireTool (subsystem)"]
         UserInterface["UserInterface (component)"]
         ModelManagement["ModelManagement (component)"]
         ValidationAndReporting["ValidationAndReporting (component)"]
@@ -108,14 +108,14 @@ graph TD
     SystemOfInterest["SystemOfInterest (system)"]
 
     %% Hierarchical Structure
-    ReqFlow --> ReqFlowTool
-    ReqFlow --> Integrations
-    ReqFlow --> AIWorkflows
+    Reqvire --> ReqvireTool
+    Reqvire --> Integrations
+    Reqvire --> AIWorkflows
 
-    ReqFlowTool --> UserInterface
-    ReqFlowTool --> ModelManagement
-    ReqFlowTool --> ValidationAndReporting
-    ReqFlowTool --> Storage
+    ReqvireTool --> UserInterface
+    ReqvireTool --> ModelManagement
+    ReqvireTool --> ValidationAndReporting
+    ReqvireTool --> Storage
 
     UserInterface --> CLI["CLI (component)"]
     UserInterface --> ChatOps["ChatOps (component)"]

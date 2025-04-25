@@ -5,7 +5,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use log::debug;
 use globset::GlobSet;
-use crate::error::ReqFlowError;
+use crate::error::ReqvireError;
 use crate::utils;
 
 
@@ -23,7 +23,7 @@ pub fn run_linting(
     external_folders: &[PathBuf],
     excluded_filename_patterns: &GlobSet,
     dry_run: bool,
-) -> Result<(), ReqFlowError> {
+) -> Result<(), ReqvireError> {
     debug!("Starting linting process in {:?}", specification_folder);
 
     let files = utils::scan_markdown_files(

@@ -96,7 +96,7 @@ blockquote {
 }
 </style>
 
-    <!-- Enhanced mermaid configuration for ReqFlow diagrams -->
+    <!-- Enhanced mermaid configuration for Reqvire diagrams -->
     <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
     <script>
         mermaid.initialize({ 
@@ -125,28 +125,28 @@ blockquote {
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  45bda45c2056783a[&quot;HTML Export Verification&quot;];
-  click 45bda45c2056783a &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/Verifications/Misc.html#html-export-verification&quot;;
-  class 45bda45c2056783a verification;
-  72c7eda6183f0893[&quot;UserRequirements.md/Export HTML specifications&quot;];
-  class 72c7eda6183f0893 requirement;
-  click 72c7eda6183f0893 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#export-html-specifications&quot;;
-  45bda45c2056783a -.-&gt;|verifies| 72c7eda6183f0893;
-  7766b8055bc4c657[&quot;tests/test-html-export/test.sh&quot;];
-  class 7766b8055bc4c657 default;
-  click 7766b8055bc4c657 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/tests/test-html-export/test.sh&quot;;
-  45bda45c2056783a -.-&gt;|trace| 7766b8055bc4c657;
-  4cd014e47746303f[&quot;AI Agent Context Verification&quot;];
-  click 4cd014e47746303f &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/Verifications/Misc.html#ai-agent-context-verification&quot;;
-  class 4cd014e47746303f verification;
-  5a6fc253c51845b6[&quot;UserRequirements.md/AI Agent Context&quot;];
-  class 5a6fc253c51845b6 requirement;
-  click 5a6fc253c51845b6 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#ai-agent-context&quot;;
-  4cd014e47746303f -.-&gt;|verifies| 5a6fc253c51845b6;
-  24a5739f743c3d7b[&quot;tests/test-ai-agent-context/test.sh&quot;];
-  class 24a5739f743c3d7b default;
-  click 24a5739f743c3d7b &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/tests/test-ai-agent-context/test.sh&quot;;
-  4cd014e47746303f -.-&gt;|trace| 24a5739f743c3d7b;
+  8d1839785fa3e85f[&quot;AI Agent Context Verification&quot;];
+  click 8d1839785fa3e85f &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/Verifications/Misc.html#ai-agent-context-verification&quot;;
+  class 8d1839785fa3e85f verification;
+  c5fffc3cd9f22134[&quot;UserRequirements.md/AI Agent Context&quot;];
+  class c5fffc3cd9f22134 requirement;
+  click c5fffc3cd9f22134 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/UserRequirements.html#ai-agent-context&quot;;
+  8d1839785fa3e85f -.-&gt;|verifies| c5fffc3cd9f22134;
+  79f1e8bcdc9255fb[&quot;tests/test-ai-agent-context/test.sh&quot;];
+  class 79f1e8bcdc9255fb default;
+  click 79f1e8bcdc9255fb &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/tests/test-ai-agent-context/test.sh&quot;;
+  8d1839785fa3e85f -.-&gt;|trace| 79f1e8bcdc9255fb;
+  bc50e797577ffd51[&quot;HTML Export Verification&quot;];
+  click bc50e797577ffd51 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/Verifications/Misc.html#html-export-verification&quot;;
+  class bc50e797577ffd51 verification;
+  6424b4fd0b132482[&quot;UserRequirements.md/Export HTML specifications&quot;];
+  class 6424b4fd0b132482 requirement;
+  click 6424b4fd0b132482 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/UserRequirements.html#export-html-specifications&quot;;
+  bc50e797577ffd51 -.-&gt;|verifies| 6424b4fd0b132482;
+  82700fdf287e5702[&quot;tests/test-html-export/test.sh&quot;];
+  class 82700fdf287e5702 default;
+  click 82700fdf287e5702 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/tests/test-html-export/test.sh&quot;;
+  bc50e797577ffd51 -.-&gt;|trace| 82700fdf287e5702;
 </div>
 <hr />
 <h3 id="html-export-verification">HTML Export Verification</h3>
@@ -172,7 +172,7 @@ blockquote {
 <ol>
 <li>Prepare test fixtures with Markdown files containing links to other documents</li>
 <li>Ensure there’s a README.md file to test conversion to index.html</li>
-<li>Run ReqFlow with the –html flag</li>
+<li>Run Reqvire with the –html flag</li>
 <li>Verify that HTML files are generated for all Markdown files</li>
 <li>Verify that README.md is converted to index.html</li>
 <li>Verify that links use .html extension instead of .md</li>
@@ -185,7 +185,7 @@ blockquote {
 </ul>
 <hr />
 <h3 id="ai-agent-context-verification">AI Agent Context Verification</h3>
-<p>This test verifies that the system provides necessary context for AI agents to understand how to use ReqFlow and its methodology.</p>
+<p>This test verifies that the system provides necessary context for AI agents to understand how to use Reqvire and its methodology.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: verification</li>
@@ -194,7 +194,7 @@ blockquote {
 <h5>Acceptance Criteria</h5>
 <ul>
 <li>System should provide comprehensive context for AI agents</li>
-<li>Context should include information about ReqFlow usage and methodology</li>
+<li>Context should include information about Reqvire usage and methodology</li>
 <li>Context should be accessible via a dedicated command</li>
 </ul>
 <h5>Test Criteria</h5>
@@ -205,8 +205,8 @@ blockquote {
 </ul>
 <h5>Test Procedure</h5>
 <ol>
-<li>Run ReqFlow with the <code>--llm-context</code> flag to generate the AI context</li>
-<li>Verify that the output contains essential ReqFlow concepts (Requirements, Relations, Verification, Metadata)</li>
+<li>Run Reqvire with the <code>--llm-context</code> flag to generate the AI context</li>
+<li>Verify that the output contains essential Reqvire concepts (Requirements, Relations, Verification, Metadata)</li>
 <li>Verify that the output is properly formatted in markdown with headers</li>
 <li>Verify that the command returns a successful exit code</li>
 </ol>

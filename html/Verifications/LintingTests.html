@@ -96,7 +96,7 @@ blockquote {
 }
 </style>
 
-    <!-- Enhanced mermaid configuration for ReqFlow diagrams -->
+    <!-- Enhanced mermaid configuration for Reqvire diagrams -->
     <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
     <script>
         mermaid.initialize({ 
@@ -116,7 +116,7 @@ blockquote {
     <div class="container">
         <div class="content">
             <h1 id="linting-tests">Linting Tests</h1>
-<p>This document verifies the requirements for ReqFlow’s linting functionality.</p>
+<p>This document verifies the requirements for Reqvire’s linting functionality.</p>
 <h2 id="linting-functionality-tests">Linting Functionality Tests</h2>
 <div class="mermaid">graph LR;
   %% Graph styling
@@ -125,57 +125,57 @@ blockquote {
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  4cd0fe733f182d5c[&quot;Excess Whitespace Detection and Correction&quot;];
-  click 4cd0fe733f182d5c &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/Verifications/LintingTests.html#excess-whitespace-detection-and-correction&quot;;
-  class 4cd0fe733f182d5c verification;
-  3f3d3f9ccb15029a[&quot;SystemRequirements/Requirements.md/Excess Whitespace Linting Implementation&quot;];
-  class 3f3d3f9ccb15029a requirement;
-  click 3f3d3f9ccb15029a &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#excess-whitespace-linting-implementation&quot;;
-  4cd0fe733f182d5c -.-&gt;|verifies| 3f3d3f9ccb15029a;
-  8f2198f681f63fea[&quot;SystemRequirements/Requirements.md/Dry Run Mode&quot;];
-  class 8f2198f681f63fea requirement;
-  click 8f2198f681f63fea &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#dry-run-mode&quot;;
-  4cd0fe733f182d5c -.-&gt;|verifies| 8f2198f681f63fea;
-  3de539f546654b01[&quot;tests/test-lint-expected/test.sh&quot;];
-  class 3de539f546654b01 default;
-  click 3de539f546654b01 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/tests/test-lint-expected/test.sh&quot;;
-  4cd0fe733f182d5c -.-&gt;|trace| 3de539f546654b01;
-  80dbe2ea823992bc[&quot;Format Consistency Verification&quot;];
-  click 80dbe2ea823992bc &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/Verifications/LintingTests.html#format-consistency-verification&quot;;
-  class 80dbe2ea823992bc verification;
-  81758bdb22a3329d[&quot;UserRequirements.md/Format Consistency Enforcement&quot;];
-  class 81758bdb22a3329d requirement;
-  click 81758bdb22a3329d &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#format-consistency-enforcement&quot;;
-  80dbe2ea823992bc -.-&gt;|verifies| 81758bdb22a3329d;
-  80dbe2ea823992bc -.-&gt;|trace| 3de539f546654b01;
-  3bbd3815f37ee9ae[&quot;Linting Command Verification&quot;];
-  click 3bbd3815f37ee9ae &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/Verifications/LintingTests.html#linting-command-verification&quot;;
-  class 3bbd3815f37ee9ae verification;
-  887a7d36caacab2b[&quot;UserRequirements.md/Linting Command&quot;];
-  class 887a7d36caacab2b requirement;
-  click 887a7d36caacab2b &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#linting-command&quot;;
-  3bbd3815f37ee9ae -.-&gt;|verifies| 887a7d36caacab2b;
-  3bbd3815f37ee9ae -.-&gt;|trace| 3de539f546654b01;
-  746b65fa854bc876[&quot;CLI Lint Flag Test&quot;];
-  click 746b65fa854bc876 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/Verifications/LintingTests.html#cli-lint-flag-test&quot;;
-  class 746b65fa854bc876 verification;
-  fffbb227966be4f2[&quot;SystemRequirements/Requirements.md#cli-lint-flag&quot;];
-  class fffbb227966be4f2 requirement;
-  click fffbb227966be4f2 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#cli-lint-flag&quot;;
-  746b65fa854bc876 -.-&gt;|verifies| fffbb227966be4f2;
-  746b65fa854bc876 -.-&gt;|trace| 3de539f546654b01;
-  d941947fb524f8c7[&quot;Model Linting Verification&quot;];
-  click d941947fb524f8c7 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/Verifications/LintingTests.html#model-linting-verification&quot;;
-  class d941947fb524f8c7 verification;
-  103ddb8dc3242215[&quot;UserRequirements.md/Model Linting&quot;];
-  class 103ddb8dc3242215 requirement;
-  click 103ddb8dc3242215 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/UserRequirements.html#model-linting&quot;;
-  d941947fb524f8c7 -.-&gt;|verifies| 103ddb8dc3242215;
-  d941947fb524f8c7 -.-&gt;|trace| 3de539f546654b01;
+  139eaf174bc54d54[&quot;Excess Whitespace Detection and Correction&quot;];
+  click 139eaf174bc54d54 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/Verifications/LintingTests.html#excess-whitespace-detection-and-correction&quot;;
+  class 139eaf174bc54d54 verification;
+  87548b2599ea86c2[&quot;SystemRequirements/Requirements.md/Excess Whitespace Linting Implementation&quot;];
+  class 87548b2599ea86c2 requirement;
+  click 87548b2599ea86c2 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#excess-whitespace-linting-implementation&quot;;
+  139eaf174bc54d54 -.-&gt;|verifies| 87548b2599ea86c2;
+  c080457c84fad54c[&quot;SystemRequirements/Requirements.md/Dry Run Mode&quot;];
+  class c080457c84fad54c requirement;
+  click c080457c84fad54c &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#dry-run-mode&quot;;
+  139eaf174bc54d54 -.-&gt;|verifies| c080457c84fad54c;
+  b23d704cd1d9d920[&quot;tests/test-lint-expected/test.sh&quot;];
+  class b23d704cd1d9d920 default;
+  click b23d704cd1d9d920 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/tests/test-lint-expected/test.sh&quot;;
+  139eaf174bc54d54 -.-&gt;|trace| b23d704cd1d9d920;
+  fc5452f530d165ac[&quot;Format Consistency Verification&quot;];
+  click fc5452f530d165ac &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/Verifications/LintingTests.html#format-consistency-verification&quot;;
+  class fc5452f530d165ac verification;
+  43bbec4721cc6a68[&quot;UserRequirements.md/Format Consistency Enforcement&quot;];
+  class 43bbec4721cc6a68 requirement;
+  click 43bbec4721cc6a68 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/UserRequirements.html#format-consistency-enforcement&quot;;
+  fc5452f530d165ac -.-&gt;|verifies| 43bbec4721cc6a68;
+  fc5452f530d165ac -.-&gt;|trace| b23d704cd1d9d920;
+  4259d3ea5b362216[&quot;Model Linting Verification&quot;];
+  click 4259d3ea5b362216 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/Verifications/LintingTests.html#model-linting-verification&quot;;
+  class 4259d3ea5b362216 verification;
+  36d76b90ace3a564[&quot;UserRequirements.md/Model Linting&quot;];
+  class 36d76b90ace3a564 requirement;
+  click 36d76b90ace3a564 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/UserRequirements.html#model-linting&quot;;
+  4259d3ea5b362216 -.-&gt;|verifies| 36d76b90ace3a564;
+  4259d3ea5b362216 -.-&gt;|trace| b23d704cd1d9d920;
+  1b44eade541aaf22[&quot;CLI Lint Flag Test&quot;];
+  click 1b44eade541aaf22 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/Verifications/LintingTests.html#cli-lint-flag-test&quot;;
+  class 1b44eade541aaf22 verification;
+  cb01ebe750839cf7[&quot;SystemRequirements/Requirements.md#cli-lint-flag&quot;];
+  class cb01ebe750839cf7 requirement;
+  click cb01ebe750839cf7 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#cli-lint-flag&quot;;
+  1b44eade541aaf22 -.-&gt;|verifies| cb01ebe750839cf7;
+  1b44eade541aaf22 -.-&gt;|trace| b23d704cd1d9d920;
+  40175f2aac49899b[&quot;Linting Command Verification&quot;];
+  click 40175f2aac49899b &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/Verifications/LintingTests.html#linting-command-verification&quot;;
+  class 40175f2aac49899b verification;
+  f1de164cd9ee3fd[&quot;UserRequirements.md/Linting Command&quot;];
+  class f1de164cd9ee3fd requirement;
+  click f1de164cd9ee3fd &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/UserRequirements.html#linting-command&quot;;
+  40175f2aac49899b -.-&gt;|verifies| f1de164cd9ee3fd;
+  40175f2aac49899b -.-&gt;|trace| b23d704cd1d9d920;
 </div>
 <hr />
 <h3 id="excess-whitespace-detection-and-correction">Excess Whitespace Detection and Correction</h3>
-<p>The verification test checks that ReqFlow correctly identifies and fixes excess whitespace after headers.</p>
+<p>The verification test checks that Reqvire correctly identifies and fixes excess whitespace after headers.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: verification</li>
@@ -195,9 +195,9 @@ blockquote {
 <h4>Test Procedure</h4>
 <ol>
 <li>Create a test fixture in <code>/tests/fixtures/test-lint-headers/</code> with excess whitespace after headers</li>
-<li>Run ReqFlow linting in dry-run mode to check detection</li>
+<li>Run Reqvire linting in dry-run mode to check detection</li>
 <li>Verify that excess whitespace is reported</li>
-<li>Run ReqFlow linting in normal mode to apply fixes</li>
+<li>Run Reqvire linting in normal mode to apply fixes</li>
 <li>Verify that the whitespace has been corrected in the output files</li>
 </ol>
 <h4>Relations</h4>
@@ -315,7 +315,7 @@ blockquote {
 <h5>Test Procedure</h5>
 <ol>
 <li>Create test fixtures with known linting issues (excess whitespace, inconsistent newlines, etc.)</li>
-<li>Run ReqFlow with –lint flag on the test fixtures</li>
+<li>Run Reqvire with –lint flag on the test fixtures</li>
 <li>Verify that linting process is executed and files are modified</li>
 <li>Compare output files with expected fixed versions</li>
 <li>Run with –lint –dry-run and verify that issues are identified but files aren’t changed</li>
@@ -334,25 +334,25 @@ blockquote {
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  97e9fdec98b5f3e5[&quot;External Folders Support Verification&quot;];
-  click 97e9fdec98b5f3e5 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/Verifications/LintingTests.html#external-folders-support-verification&quot;;
-  class 97e9fdec98b5f3e5 verification;
-  d38ab4ad139183d3[&quot;SystemRequirements/Requirements.md#External Folders Support&quot;];
-  class d38ab4ad139183d3 requirement;
-  click d38ab4ad139183d3 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#external-folders-support&quot;;
-  97e9fdec98b5f3e5 -.-&gt;|verifies| d38ab4ad139183d3;
-  99bed90a0d96a1d2[&quot;SystemRequirements/Requirements.md#Requirements Processing&quot;];
-  class 99bed90a0d96a1d2 requirement;
-  click 99bed90a0d96a1d2 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#requirements-processing&quot;;
-  97e9fdec98b5f3e5 -.-&gt;|verifies| 99bed90a0d96a1d2;
-  a38888f27160e7fa[&quot;tests/test-external-folders/test.sh&quot;];
-  class a38888f27160e7fa default;
-  click a38888f27160e7fa &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/tests/test-external-folders/test.sh&quot;;
-  97e9fdec98b5f3e5 -.-&gt;|trace| a38888f27160e7fa;
+  a4b152862e57ff46[&quot;External Folders Support Verification&quot;];
+  click a4b152862e57ff46 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/Verifications/LintingTests.html#external-folders-support-verification&quot;;
+  class a4b152862e57ff46 verification;
+  13158cbf874bcf08[&quot;SystemRequirements/Requirements.md#External Folders Support&quot;];
+  class 13158cbf874bcf08 requirement;
+  click 13158cbf874bcf08 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#external-folders-support&quot;;
+  a4b152862e57ff46 -.-&gt;|verifies| 13158cbf874bcf08;
+  c6d19363284e9125[&quot;SystemRequirements/Requirements.md#Requirements Processing&quot;];
+  class c6d19363284e9125 requirement;
+  click c6d19363284e9125 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#requirements-processing&quot;;
+  a4b152862e57ff46 -.-&gt;|verifies| c6d19363284e9125;
+  7cb082e55f1a635c[&quot;tests/test-external-folders/test.sh&quot;];
+  class 7cb082e55f1a635c default;
+  click 7cb082e55f1a635c &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/tests/test-external-folders/test.sh&quot;;
+  a4b152862e57ff46 -.-&gt;|trace| 7cb082e55f1a635c;
 </div>
 <hr />
 <h3 id="external-folders-support-verification">External Folders Support Verification</h3>
-<p>The verification test checks that ReqFlow correctly processes requirements in external folders.</p>
+<p>The verification test checks that Reqvire correctly processes requirements in external folders.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: verification</li>
@@ -372,9 +372,9 @@ blockquote {
 <h4>Test Procedure</h4>
 <ol>
 <li>Set up test fixtures in <code>/tests/fixtures/test-external-folders/</code> with external folders configuration</li>
-<li>Run ReqFlow with invalid setup (user requirements in external folder)</li>
+<li>Run Reqvire with invalid setup (user requirements in external folder)</li>
 <li>Verify that validation reports the appropriate error</li>
-<li>Run ReqFlow with valid setup (only system requirements in external folder)</li>
+<li>Run Reqvire with valid setup (only system requirements in external folder)</li>
 <li>Verify that validation succeeds and requirements are properly processed</li>
 </ol>
 <h4>Relations</h4>
@@ -392,30 +392,30 @@ blockquote {
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  4c4775ba9ffce94[&quot;Excluded Linting Verification&quot;];
-  click 4c4775ba9ffce94 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/Verifications/LintingTests.html#excluded-linting-verification&quot;;
-  class 4c4775ba9ffce94 verification;
-  cc8128cae305b29d[&quot;SystemRequirements/Requirements.md#Configurable Filename Exclusion Patterns&quot;];
-  class cc8128cae305b29d requirement;
-  click cc8128cae305b29d &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#configurable-filename-exclusion-patterns&quot;;
-  4c4775ba9ffce94 -.-&gt;|verifies| cc8128cae305b29d;
-  45770e9b319d3819[&quot;SystemRequirements/Requirements.md#File Pattern Exclusion for Linting&quot;];
-  class 45770e9b319d3819 requirement;
-  click 45770e9b319d3819 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/SystemRequirements/Requirements.html#file-pattern-exclusion-for-linting&quot;;
-  4c4775ba9ffce94 -.-&gt;|verifies| 45770e9b319d3819;
-  b28a9ed0b063b190[&quot;tests/test-excluded-linting/test.sh&quot;];
-  class b28a9ed0b063b190 default;
-  click b28a9ed0b063b190 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/tests/test-excluded-linting/test.sh&quot;;
-  4c4775ba9ffce94 -.-&gt;|trace| b28a9ed0b063b190;
-  be641c88c635747f[&quot;Excluded Patterns Verification&quot;];
-  click be641c88c635747f &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/Verifications/LintingTests.html#excluded-patterns-verification&quot;;
-  class be641c88c635747f verification;
-  be641c88c635747f -.-&gt;|verifies| cc8128cae305b29d;
-  be641c88c635747f -.-&gt;|verifies| 45770e9b319d3819;
-  79ca606f26bdd145[&quot;tests/test-excluded-patterns/test.sh&quot;];
-  class 79ca606f26bdd145 default;
-  click 79ca606f26bdd145 &quot;https://github.com/ilijaljubicic/ReqFlow/blob/29a17f176519a28e973567d4102beb95f41075ed/tests/test-excluded-patterns/test.sh&quot;;
-  be641c88c635747f -.-&gt;|trace| 79ca606f26bdd145;
+  e3ab80a0d12f75d6[&quot;Excluded Linting Verification&quot;];
+  click e3ab80a0d12f75d6 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/Verifications/LintingTests.html#excluded-linting-verification&quot;;
+  class e3ab80a0d12f75d6 verification;
+  6f822bdd8c71c7c8[&quot;SystemRequirements/Requirements.md#Configurable Filename Exclusion Patterns&quot;];
+  class 6f822bdd8c71c7c8 requirement;
+  click 6f822bdd8c71c7c8 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#configurable-filename-exclusion-patterns&quot;;
+  e3ab80a0d12f75d6 -.-&gt;|verifies| 6f822bdd8c71c7c8;
+  470a0057ca1c964[&quot;SystemRequirements/Requirements.md#File Pattern Exclusion for Linting&quot;];
+  class 470a0057ca1c964 requirement;
+  click 470a0057ca1c964 &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/SystemRequirements/Requirements.html#file-pattern-exclusion-for-linting&quot;;
+  e3ab80a0d12f75d6 -.-&gt;|verifies| 470a0057ca1c964;
+  5b2ea254f66b026c[&quot;tests/test-excluded-linting/test.sh&quot;];
+  class 5b2ea254f66b026c default;
+  click 5b2ea254f66b026c &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/tests/test-excluded-linting/test.sh&quot;;
+  e3ab80a0d12f75d6 -.-&gt;|trace| 5b2ea254f66b026c;
+  9d941b13781421dc[&quot;Excluded Patterns Verification&quot;];
+  click 9d941b13781421dc &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/Verifications/LintingTests.html#excluded-patterns-verification&quot;;
+  class 9d941b13781421dc verification;
+  9d941b13781421dc -.-&gt;|verifies| 6f822bdd8c71c7c8;
+  9d941b13781421dc -.-&gt;|verifies| 470a0057ca1c964;
+  85cb273f062c3eec[&quot;tests/test-excluded-patterns/test.sh&quot;];
+  class 85cb273f062c3eec default;
+  click 85cb273f062c3eec &quot;https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/tests/test-excluded-patterns/test.sh&quot;;
+  9d941b13781421dc -.-&gt;|trace| 85cb273f062c3eec;
 </div>
 <hr />
 <h3 id="excluded-patterns-verification">Excluded Patterns Verification</h3>
@@ -441,7 +441,7 @@ blockquote {
 <ol>
 <li>Create configuration with excluded_filename_patterns set</li>
 <li>Create test fixtures with files matching and not matching excluded patterns</li>
-<li>Run ReqFlow validation on the test fixtures</li>
+<li>Run Reqvire validation on the test fixtures</li>
 <li>Verify that excluded files are not processed for validation</li>
 <li>Verify that relations to excluded files are still considered valid</li>
 </ol>
@@ -462,7 +462,7 @@ blockquote {
 <h5>Acceptance Criteria</h5>
 <ul>
 <li>Files matching excluded_filename_patterns should not be linted</li>
-<li>ReqFlow should skip linting checks on excluded files</li>
+<li>Reqvire should skip linting checks on excluded files</li>
 </ul>
 <h5>Test Criteria</h5>
 <ul>
@@ -473,7 +473,7 @@ blockquote {
 <ol>
 <li>Create configuration with excluded_filename_patterns set</li>
 <li>Create test fixtures with files matching and not matching excluded patterns</li>
-<li>Run ReqFlow linting on the test fixtures</li>
+<li>Run Reqvire linting on the test fixtures</li>
 <li>Verify that excluded files are not included in linting output</li>
 <li>Verify that no linting errors are reported for excluded files</li>
 </ol>

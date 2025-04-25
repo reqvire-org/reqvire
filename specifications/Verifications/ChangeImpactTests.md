@@ -1,6 +1,6 @@
 # Change Impact Tests
 
-This document verifies the requirements for ReqFlow's change impact tracing functionality.
+This document verifies the requirements for Reqvire's change impact tracing functionality.
 
 ## Change Impact Tracing Verification
 ```mermaid
@@ -11,71 +11,71 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  5c3e28e702ebd6b2["Traceability Matrix Verification"];
-  click 5c3e28e702ebd6b2 "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/specifications/Verifications/ChangeImpactTests.md#traceability-matrix-verification";
-  class 5c3e28e702ebd6b2 verification;
-  25ad41b0b912092b["UserRequirements.md/Traceability Matrix"];
-  class 25ad41b0b912092b requirement;
-  click 25ad41b0b912092b "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/specifications/UserRequirements.md#traceability-matrix";
-  5c3e28e702ebd6b2 -.->|verifies| 25ad41b0b912092b;
-  c46d067d93f972bc["tests/test-change-impact-detection/test.sh"];
-  class c46d067d93f972bc default;
-  click c46d067d93f972bc "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/tests/test-change-impact-detection/test.sh";
-  5c3e28e702ebd6b2 -.->|trace| c46d067d93f972bc;
-  847954159345f3a4["CLI Git Commit Hash Flag Test"];
-  click 847954159345f3a4 "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/specifications/Verifications/ChangeImpactTests.md#cli-git-commit-hash-flag-test";
-  class 847954159345f3a4 verification;
-  c71f1cc579bb4db["SystemRequirements/Requirements.md#cli-git-commit-hash-flag"];
-  class c71f1cc579bb4db requirement;
-  click c71f1cc579bb4db "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/specifications/SystemRequirements/Requirements.md#cli-git-commit-hash-flag";
-  847954159345f3a4 -.->|verifies| c71f1cc579bb4db;
-  847954159345f3a4 -.->|trace| c46d067d93f972bc;
-  d06fce8d063fd3d1["Element Content Extraction Test"];
-  click d06fce8d063fd3d1 "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/specifications/Verifications/ChangeImpactTests.md#element-content-extraction-test";
-  class d06fce8d063fd3d1 verification;
-  b6dcdc95b5e8f272["SystemRequirements/ChangeImpactPropagation.md#change-impact-detection-algorithm"];
-  class b6dcdc95b5e8f272 requirement;
-  click b6dcdc95b5e8f272 "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/specifications/SystemRequirements/ChangeImpactPropagation.md#change-impact-detection-algorithm";
-  d06fce8d063fd3d1 -.->|verifies| b6dcdc95b5e8f272;
-  6aeba4bf990bc9e4["SystemRequirements/Requirements.md#Requirements Processing"];
-  class 6aeba4bf990bc9e4 requirement;
-  click 6aeba4bf990bc9e4 "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/specifications/SystemRequirements/Requirements.md#requirements-processing";
-  d06fce8d063fd3d1 -.->|verifies| 6aeba4bf990bc9e4;
-  4de1c5f9aeb25f86["tests/test-element-content-extraction/test.sh"];
-  class 4de1c5f9aeb25f86 default;
-  click 4de1c5f9aeb25f86 "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/tests/test-element-content-extraction/test.sh";
-  d06fce8d063fd3d1 -.->|trace| 4de1c5f9aeb25f86;
-  317567e3530952b1["Structural Change Reports Verification"];
-  click 317567e3530952b1 "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/specifications/Verifications/ChangeImpactTests.md#structural-change-reports-verification";
-  class 317567e3530952b1 verification;
-  e42698fdbbf344aa["UserRequirements.md/Tracing Structural Changes"];
-  class e42698fdbbf344aa requirement;
-  click e42698fdbbf344aa "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/specifications/UserRequirements.md#tracing-structural-changes";
-  317567e3530952b1 -.->|verifies| e42698fdbbf344aa;
-  317567e3530952b1 -.->|trace| c46d067d93f972bc;
-  fc17fb0d86285ae1["Change Impact Analysis Verification"];
-  click fc17fb0d86285ae1 "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/specifications/Verifications/ChangeImpactTests.md#change-impact-analysis-verification";
-  class fc17fb0d86285ae1 verification;
-  52aac80b9a806080["UserRequirements.md/Change Impact Analysis"];
-  class 52aac80b9a806080 requirement;
-  click 52aac80b9a806080 "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/specifications/UserRequirements.md#change-impact-analysis";
-  fc17fb0d86285ae1 -.->|verifies| 52aac80b9a806080;
-  fc17fb0d86285ae1 -.->|trace| c46d067d93f972bc;
-  650026bd69216e2e["Change Impact Relations Test"];
-  click 650026bd69216e2e "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/specifications/Verifications/ChangeImpactTests.md#change-impact-relations-test";
-  class 650026bd69216e2e verification;
-  650026bd69216e2e -.->|verifies| b6dcdc95b5e8f272;
-  75403d710ba5793e["SystemRequirements/ChangeImpactPropagation.md#change-impact-command-line-interface"];
-  class 75403d710ba5793e requirement;
-  click 75403d710ba5793e "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/specifications/SystemRequirements/ChangeImpactPropagation.md#change-impact-command-line-interface";
-  650026bd69216e2e -.->|verifies| 75403d710ba5793e;
-  650026bd69216e2e -.->|trace| c46d067d93f972bc;
-  1d07eeb17bd1b96f["Change Impact Detection Test"];
-  click 1d07eeb17bd1b96f "https://github.com/ilijaljubicic/ReqFlow/blob/73d5ae1d93adea71fdf4cc508be4d1ae09be068f/specifications/Verifications/ChangeImpactTests.md#change-impact-detection-test";
-  class 1d07eeb17bd1b96f verification;
-  1d07eeb17bd1b96f -.->|verifies| b6dcdc95b5e8f272;
-  1d07eeb17bd1b96f -.->|verifies| 75403d710ba5793e;
-  1d07eeb17bd1b96f -.->|trace| c46d067d93f972bc;
+  1c7aa5662fc4c31["Element Content Extraction Test"];
+  click 1c7aa5662fc4c31 "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/specifications/Verifications/ChangeImpactTests.md#element-content-extraction-test";
+  class 1c7aa5662fc4c31 verification;
+  9967e71248da3061["SystemRequirements/ChangeImpactPropagation.md#change-impact-detection-algorithm"];
+  class 9967e71248da3061 requirement;
+  click 9967e71248da3061 "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/specifications/SystemRequirements/ChangeImpactPropagation.md#change-impact-detection-algorithm";
+  1c7aa5662fc4c31 -.->|verifies| 9967e71248da3061;
+  c6d19363284e9125["SystemRequirements/Requirements.md#Requirements Processing"];
+  class c6d19363284e9125 requirement;
+  click c6d19363284e9125 "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/specifications/SystemRequirements/Requirements.md#requirements-processing";
+  1c7aa5662fc4c31 -.->|verifies| c6d19363284e9125;
+  890802c6addd8829["tests/test-element-content-extraction/test.sh"];
+  class 890802c6addd8829 default;
+  click 890802c6addd8829 "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/tests/test-element-content-extraction/test.sh";
+  1c7aa5662fc4c31 -.->|trace| 890802c6addd8829;
+  5bf242d222f9fc08["Change Impact Detection Test"];
+  click 5bf242d222f9fc08 "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/specifications/Verifications/ChangeImpactTests.md#change-impact-detection-test";
+  class 5bf242d222f9fc08 verification;
+  5bf242d222f9fc08 -.->|verifies| 9967e71248da3061;
+  7cc5e857c8078367["SystemRequirements/ChangeImpactPropagation.md#change-impact-command-line-interface"];
+  class 7cc5e857c8078367 requirement;
+  click 7cc5e857c8078367 "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/specifications/SystemRequirements/ChangeImpactPropagation.md#change-impact-command-line-interface";
+  5bf242d222f9fc08 -.->|verifies| 7cc5e857c8078367;
+  369b7fc504ca66ba["tests/test-change-impact-detection/test.sh"];
+  class 369b7fc504ca66ba default;
+  click 369b7fc504ca66ba "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/tests/test-change-impact-detection/test.sh";
+  5bf242d222f9fc08 -.->|trace| 369b7fc504ca66ba;
+  7156f2b65aa302ca["Traceability Matrix Verification"];
+  click 7156f2b65aa302ca "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/specifications/Verifications/ChangeImpactTests.md#traceability-matrix-verification";
+  class 7156f2b65aa302ca verification;
+  681cda683cd3fa2a["UserRequirements.md/Traceability Matrix"];
+  class 681cda683cd3fa2a requirement;
+  click 681cda683cd3fa2a "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/specifications/UserRequirements.md#traceability-matrix";
+  7156f2b65aa302ca -.->|verifies| 681cda683cd3fa2a;
+  7156f2b65aa302ca -.->|trace| 369b7fc504ca66ba;
+  c9892202d1906367["Structural Change Reports Verification"];
+  click c9892202d1906367 "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/specifications/Verifications/ChangeImpactTests.md#structural-change-reports-verification";
+  class c9892202d1906367 verification;
+  4dc854c91f0e4c8d["UserRequirements.md/Tracing Structural Changes"];
+  class 4dc854c91f0e4c8d requirement;
+  click 4dc854c91f0e4c8d "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/specifications/UserRequirements.md#tracing-structural-changes";
+  c9892202d1906367 -.->|verifies| 4dc854c91f0e4c8d;
+  c9892202d1906367 -.->|trace| 369b7fc504ca66ba;
+  386e7d5a9c90fa8["CLI Git Commit Hash Flag Test"];
+  click 386e7d5a9c90fa8 "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/specifications/Verifications/ChangeImpactTests.md#cli-git-commit-hash-flag-test";
+  class 386e7d5a9c90fa8 verification;
+  7d76667e6a943402["SystemRequirements/Requirements.md#cli-git-commit-hash-flag"];
+  class 7d76667e6a943402 requirement;
+  click 7d76667e6a943402 "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/specifications/SystemRequirements/Requirements.md#cli-git-commit-hash-flag";
+  386e7d5a9c90fa8 -.->|verifies| 7d76667e6a943402;
+  386e7d5a9c90fa8 -.->|trace| 369b7fc504ca66ba;
+  b8372dd5907469d1["Change Impact Relations Test"];
+  click b8372dd5907469d1 "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/specifications/Verifications/ChangeImpactTests.md#change-impact-relations-test";
+  class b8372dd5907469d1 verification;
+  b8372dd5907469d1 -.->|verifies| 9967e71248da3061;
+  b8372dd5907469d1 -.->|verifies| 7cc5e857c8078367;
+  b8372dd5907469d1 -.->|trace| 369b7fc504ca66ba;
+  aad08e3aad7ec4b4["Change Impact Analysis Verification"];
+  click aad08e3aad7ec4b4 "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/specifications/Verifications/ChangeImpactTests.md#change-impact-analysis-verification";
+  class aad08e3aad7ec4b4 verification;
+  6f4efc192ae34938["UserRequirements.md/Change Impact Analysis"];
+  class 6f4efc192ae34938 requirement;
+  click 6f4efc192ae34938 "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/specifications/UserRequirements.md#change-impact-analysis";
+  aad08e3aad7ec4b4 -.->|verifies| 6f4efc192ae34938;
+  aad08e3aad7ec4b4 -.->|trace| 369b7fc504ca66ba;
 ```
 
 ---
@@ -163,9 +163,9 @@ This test verifies that the system properly handles the git commit hash flag for
 
 ##### Test Procedure
 1. Create test fixtures with git repository containing multiple commits
-2. Run ReqFlow with --change-impact --git-commit=HEAD~1
+2. Run Reqvire with --change-impact --git-commit=HEAD~1
 3. Verify that the specified commit is used as baseline
-4. Run ReqFlow with --change-impact (no git-commit flag)
+4. Run Reqvire with --change-impact (no git-commit flag)
 5. Verify that HEAD is used as default baseline
 6. Run with invalid commit reference and verify appropriate error
 
@@ -197,7 +197,7 @@ This test verifies that the system correctly extracts element content for change
 
 ##### Test Procedure
 1. Create test fixtures with requirements containing various combinations of subsections
-2. Run ReqFlow model summary on the test fixtures
+2. Run Reqvire model summary on the test fixtures
 3. Verify that extracted content matches expected content for each element
 4. Verify that content from Details subsection is properly included
 
