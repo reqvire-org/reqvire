@@ -8,7 +8,6 @@
   # These can be absolute paths or paths relative to the input folder
   # All markdown files in these folders are considered requirements (except those matching exclusion patterns)
   external_folders:
-    - todo_specifications
     - tests
     - core
     - cli
@@ -20,7 +19,6 @@
     - "**/Logical*.md"
     - "**/Physical*.md"
     - "**/TODO.md"
-    - "**/DesignSpecifications/**"        
     - "**/tests/**"    
     - "**/core/**"    
     - "**/cli/**"            

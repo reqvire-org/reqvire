@@ -97,6 +97,37 @@ curl -fsSL https://raw.githubusercontent.com/ilijaljubicic/Reqvire/main/scripts/
    reqvire --version
    ```
     
+### Configuration
+
+Create `reqflow.yaml` in the root of the git repo with following minimal content:
+```
+  # Path to the specifications folder
+  specifications_folder: "specifications"
+  
+  # Default output folder for exported html specifications
+  output_folder: "html"
+  
+  # Additional external folders that contain system requirements and other files
+  # These can be absolute paths or paths relative to the input folder
+  # All markdown files in these folders are considered requirements (except those matching exclusion patterns)
+  external_folders:
+    - tests
+    - core
+    - cli
+      
+  # Glob patterns to exclude from requirements processing
+  # These are patterns that shouldn't be considered requirements even if they're in specifications or external folders
+  excluded_filename_patterns:
+    - "Usecases.md"
+    - "**/Logical*.md"
+    - "**/Physical*.md"
+    - "**/TODO.md"  
+```
+
+Create `output` directory.
+
+
+    
 ## Contributing
 
 We welcome contributions to Reqvire! Whether it's improving the methodology, enhancing the tools, or refining the language, your input is valuable.
