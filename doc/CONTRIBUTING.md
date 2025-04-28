@@ -10,7 +10,11 @@ Thank you for your interest in contributing to Reqvire! We welcome contributions
 By participating in this project, you agree to adhere to our [Code of Conduct](./code_of_conduct.md). Please ensure that your behavior fosters a positive and respectful environment.
 
 ### 2. Licensing of Contributions
-By contributing to Reqvire, you agree that your contributions will be licensed under the **Apache License 2.0**. This ensures consistency with the project’s license and allows the broader community to benefit from your work.
+
+By contributing to Reqvire, you agree that your contributions will be licensed under the **Apache License 2.0**, in line with the project’s current license.
+
+Additionally, by accepting the **Contributor License Agreement (CLA)**, you grant the project maintainers the flexibility to relicense your contributions in the future if needed. This ensures consistency, legal clarity, and allows the project to grow and adapt over time.
+
 
 ### 3. Submitting Issues
 - Before submitting an issue, search the [issue tracker](https://github.com/ilijaljubicic/Reqvire/issues) to ensure it hasn’t been reported already.
@@ -50,11 +54,14 @@ By contributing to Reqvire, you agree that your contributions will be licensed u
 
 ## Contributor Agreement
 
-By submitting a contribution, you certify that:
-- The contribution is your own original work or that you have the right to submit it.
-- You grant the project maintainers the right to use, modify, and distribute your contribution as part of the project under the Apache License 2.0.
+All contributors are required to accept the **Contributor License Agreement (CLA)** before their pull requests can be merged. The CLA ensures that:
 
----
+- The contribution is your own original work or that you have the right to submit it.
+- You grant the project maintainers the right to use, modify, distribute, and relicense your contribution under any license, including open-source and proprietary licenses.
+
+The CLA process is **automated** through a GitHub pull request comment. When you open a PR, the CLA bot will prompt you to review and accept the agreement.
+
+For more details, see the [CLA.md](./CLA.md).
 
 ## Getting Help
 

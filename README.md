@@ -179,3 +179,20 @@ To maintain **consistency**, **traceability**, and **quality** in Reqvire, we fo
 
 For more details, refer to the [Contributing Guide](./doc/CONTRIBUTING.md).
 
+
+## Credits
+
+**Reqvire** is an open-source project created and maintained by [Ilija Ljubicic](https://github.com/ilijaljubicic). 
+
+### Special Thanks:
+
+- [Juanjo Andres](https://github.com/juanjoandres)  
+  For valuable contributions to testing and in in shaping Reqvire's direction, especially in the early phases of Reqvire's development.
+
+- [GrapheneDB](https://www.graphenedb.com/)  
+  For **partial sponsorship** and for being the **first user** of Reqvire. Their support helped shape the tool's early direction.
+
+## License
+
+Licensed under the [Apache2 License](LICENSE).
+
