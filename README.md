@@ -40,7 +40,7 @@ To set up Reqvire, follow these steps:
 
 Run the following command in your terminal:
 ```
-curl -fsSL https://raw.githubusercontent.com/ilijaljubicic/Reqvire/main/scripts/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/Reqvire/reqvire/main/scripts/install.sh | bash
 ```
 
 #### From Source (Linux and macOS Apple Silicon)
@@ -77,7 +77,7 @@ curl -fsSL https://raw.githubusercontent.com/ilijaljubicic/Reqvire/main/scripts/
 #### Using Pre-built Binaries
 
 1. **Download the Latest Release**
-   - Visit the [Releases page](https://github.com/reqvire/reqvire/releases) on GitHub
+   - Visit the [Releases page](https://github.com/Reqvire/reqvire/releases) on GitHub
    - Download the appropriate binary for your platform:
      - Linux: `reqvire-linux-x86_64.tar.gz`
      - macOS: `reqvire-macos-arm64.tar.gz` 

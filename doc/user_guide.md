@@ -256,7 +256,7 @@ Reqvire includes several GitHub Actions workflows that can be used in your repos
 
 ```yaml
 - name: Install Reqvire
-  run: curl -fsSL https://raw.githubusercontent.com/ilijaljubicic/Reqvire/main/scripts/install.sh | bash
+  run: curl -fsSL https://raw.githubusercontent.com/Reqvire/reqvire/main/scripts/install.sh | bash
 ```
 
 #### PR Validation
@@ -283,7 +283,7 @@ jobs:
         uses: actions/checkout@v4
         
       - name: Install Reqvire
-        run: curl -fsSL https://raw.githubusercontent.com/ilijaljubicic/Reqvire/main/scripts/install.sh | bash
+        run: curl -fsSL https://raw.githubusercontent.com/Reqvire/reqvire/main/scripts/install.sh | bash
         
       - name: Validate Requirements and Generate Report
         run: |
@@ -326,7 +326,7 @@ jobs:
           ref: main
       
       - name: Install Reqvire
-        run: curl -fsSL https://raw.githubusercontent.com/ilijaljubicic/Reqvire/main/scripts/install.sh | bash
+        run: curl -fsSL https://raw.githubusercontent.com/Reqvire/reqvire/main/scripts/install.sh | bash
       
       - name: Generate Diagrams
         run: reqvire --generate-diagrams
@@ -384,7 +384,7 @@ jobs:
           fetch-depth: 0
       
       - name: Install Reqvire
-        run: curl -fsSL https://raw.githubusercontent.com/ilijaljubicic/Reqvire/main/scripts/install.sh | bash
+        run: curl -fsSL https://raw.githubusercontent.com/Reqvire/reqvire/main/scripts/install.sh | bash
       
       - name: Run Reqvire Impact
         if: contains(github.event.comment.body, '/reqvire impact')
