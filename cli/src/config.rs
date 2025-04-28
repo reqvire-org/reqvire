@@ -6,7 +6,9 @@ use std::path::PathBuf;
 use serde::{Deserialize, Serialize};
 use std::env;
 use globset::{Glob, GlobSet, GlobSetBuilder};
- 
+use std::process;
+
+
 /// Configuration settings for the Reqvire application
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Config {
@@ -88,20 +90,29 @@ impl Config {
 
     pub fn get_external_folders(&self) -> Vec<PathBuf> {
         self.paths.external_folders.iter()
-        .map(|folder| {
-            let path = self.paths.base_path.join(folder.clone());
-            path.canonicalize().expect(&format!("FATAL: Failed to resolve external folder {:?}", path)).clone()
-        })
-        .collect::<Vec<PathBuf>>()
-    }   
+            .map(|folder| {
+                let path = self.paths.base_path.join(folder);
+                path.canonicalize().unwrap_or_else(|e| {
+                    eprintln!("ERROR: Failed to resolve external folder at {:?}: {}", path, e);
+                    process::exit(1);
+                })
+            })
+            .collect()
+    }    
     pub fn get_specification_folder(&self) -> std::path::PathBuf {
         let path = self.paths.base_path.join(self.paths.specifications_folder.clone());
-        path.canonicalize().expect(&format!("FATAL: Failed to resolve external folder {:?}", path)).clone()
+        path.canonicalize().unwrap_or_else(|e| {
+            eprintln!("ERROR: Failed to resolve specifications folder at {:?}: {}", path, e);
+            process::exit(1);
+        })        
     }   
 
     pub fn get_output_folder(&self) -> std::path::PathBuf {
         let path = self.paths.base_path.join(self.paths.output_folder.clone());
-        path.canonicalize().expect(&format!("FATAL: Failed to resolve external folder {:?}", path)).clone()
+        path.canonicalize().unwrap_or_else(|e| {
+            eprintln!("ERROR: Failed to resolve output folder at {:?}: {}", path, e);
+            process::exit(1);
+        }) 
     }   
     
     /// Builds a GlobSet from the excluded filename patterns
