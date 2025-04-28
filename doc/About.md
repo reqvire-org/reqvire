@@ -1,16 +1,52 @@
 # Reqvire MBSE Methodology 
 
-Reqvire is an optimized **MBSE methodology** designed to integrate directly into **Git workflows** and its seamless integration with tools and services like **Git**, **GitHub**, **GitLab**. 
-It employs a file-based approach where requirements and system design are stored as **Markdown files** within the project repository. This allows teams to manage system models alongside their code, using familiar processes such as **branches**, **pull requests (PRs)**, **issues**, and **reviews**, commonly supported by platforms like **GitHub**, **GitLab**, and **Bitbucket**. 
+## Overview
 
-This tight integration ensures version control for all design and model changes, enabling full traceability. Reqvire supports an **Agile MBSE approach**, making it particularly well-suited for **software product development**, where iterative design, collaboration, and continuous integration are critical. It is intuitive and familiar to developers, engineers, and product managers, aligning with workflows they are already accustomed to.
+Reqvire is an optimized **Model-Based Systems Engineering (MBSE) methodology** designed to integrate directly into **Git workflows**. It provides seamless integration with tools and services like **Git**, **GitHub**, and **GitLab**, bringing systems engineering practices into modern software development processes.
 
-Reqvire is **opinionated**, requiring semi-structured Markdown files that follow specific conventions. This structure enables **GitHub Actions** and similar CI/CD tools to automate tasks such as generating diagrams, creating **traceability matrices**, and linking requirements to tasks, issues, pull requests, and test cases, while keeping the model simple and easy to use in the targeted environment.
+## Key Principles
 
+### Git-Native Requirements Management
 
-The **Reqvire language** is a subset of **SysML**, inspired by systems engineering practices, with adjustments in visuals and syntax to integrate seamlessly into **Markdown Mermaid diagrams**, enabling lightweight yet powerful modeling. By narrowing the scope to a focused subset of methodologies, Reqvire simplifies requirements management while retaining robust capabilities, making it particularly accessible to programmers, product managers, and tech teams—especially those working on **software, cloud, and tech products**.
+Reqvire employs a file-based approach where requirements and system design are stored as **Markdown files** within the project repository. This allows teams to manage system models alongside their code, using familiar processes:
+- **Branches** for parallel development of features and requirements
+- **Pull requests (PRs)** for reviewing model changes
+- **Issues** for tracking work and defects
+- **Reviews** for ensuring quality and consistency
 
-Moreover, being Markdown-oriented makes Reqvire highly **AI-friendly**. Large Language Models (LLMs) can easily parse and interpret the structured Markdown, facilitating integration with modern AI tooling for tasks such as **automated consistency checks**, **traceability analysis**, and **intelligent assistance in system design**.
+These processes are supported by platforms like **GitHub**, **GitLab**, and **Bitbucket**, making Reqvire accessible to teams already using these tools.
+
+### Traceability & Version Control
+
+This tight integration ensures version control for all design and model changes, enabling full traceability. Every change to a requirement, architecture element, or design decision is tracked with the same rigor as code changes.
+
+### Agile MBSE Approach
+
+Reqvire supports an **Agile MBSE approach**, making it particularly well-suited for **software product development**, where iterative design, collaboration, and continuous integration are critical. It is intuitive and familiar to developers, engineers, and product managers, aligning with workflows they are already accustomed to.
+
+### Structured Markdown
+
+Reqvire is **opinionated**, requiring semi-structured Markdown files that follow specific conventions. This structure enables:
+- **GitHub Actions** and similar CI/CD tools to automate tasks
+- Generating diagrams directly from requirements
+- Creating **traceability matrices** automatically
+- Linking requirements to tasks, issues, pull requests, and test cases
+
+The structured approach keeps the model simple and easy to use in the targeted environment while providing powerful capabilities.
+
+### Simplified Modeling Language
+
+The **Reqvire language** is a subset of **SysML**, inspired by systems engineering practices, with adjustments in visuals and syntax to integrate seamlessly into **Markdown Mermaid diagrams**. This enables lightweight yet powerful modeling.
+
+By narrowing the scope to a focused subset of methodologies, Reqvire simplifies requirements management while retaining robust capabilities, making it particularly accessible to programmers, product managers, and tech teams—especially those working on **software, cloud, and tech products**.
+
+### AI-Friendly Documentation
+
+Being Markdown-oriented makes Reqvire highly **AI-friendly**. Large Language Models (LLMs) can easily parse and interpret the structured Markdown, facilitating integration with modern AI tooling for tasks such as:
+- **Automated consistency checks**
+- **Traceability analysis**
+- **Intelligent assistance in system design**
+- **Requirement validation and verification**
 
 
 ## Reqvire model
@@ -43,7 +79,7 @@ A **model** in Reqvire is a collection of structured Markdown files that capture
   - Diagrams: Specified using **Mermaid syntax** within the Markdown.  
   - Traceability: Embedded as links or tags within Markdown content.
 
-Important to understand about Reqvire is that diagrams are automatically generated by Reqvire tooling, taking structure from Markdown files and creating diagrams and connections while making items in diagrams links to the actual content in the Markdown files. This way, diagrams become a way to navigate the model. Also, diagrams can be committed directly into relevant documents in the CI/CD pipelines and as part of PRs, which makes automated diagrams artifacts and documentation itself but automated.
+Important to understand about Reqvire is that diagrams, treacability matrices and change impact reports are automatically generated by Reqvire tooling, taking structure from Markdown files and creating diagrams and connections while making items in diagrams links to the actual content in the Markdown files. This way, diagrams become a way to navigate the model. Also, diagrams can be committed directly into relevant documents in the CI/CD pipelines and as part of PRs, which makes automated diagrams artifacts and documentation itself but automated.
 
 #### **2. Git Repository Integration**
 - The model is **natively version-controlled** as part of a Git repository, enabling:
@@ -76,7 +112,7 @@ Reqvire tools, if integrated into CI/CD pipelines of Git-like workflows and proc
    - Markdown files are simple enough for humans to edit yet structured enough for automation tools to parse and process.
 
 4. **AI-Friendly**:
-   - The use of Markdown makes the model highly compatible with **AI tools**, allowing Large Language Models (LLMs) to interpret and assist with system design tasks, such as consistency checks or requirements analysis.
+   - The use of Markdown and it's structure makes the model highly compatible with **AI tools**, allowing Large Language Models (LLMs) to interpret and assist with system design tasks, such as consistency checks or requirements analysis.
 
 ---
 

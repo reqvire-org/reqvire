@@ -13,6 +13,9 @@ This user guide provides detailed instructions on how to use Reqvire effectively
 - [Traceability](#traceability)
 - [Diagrams](#diagrams)
 - [LLM Context Documentation](#llm-context-documentation)
+- [GitHub Integration](#github-integration)
+  - [GitHub Actions](#github-actions)
+  - [GitHub Issue Comment Commands](#github-issue-comment-commands)
 
 ## Basic Commands
 
@@ -65,11 +68,10 @@ Here's an example of a Reqvire configuration file:
   # Default output folder for exported html specifications
   output_folder: "output"
   
-  # Additional external folders that contain system requirements and other files
-  # These can be absolute paths or paths relative to the input folder
-  # All markdown files in these folders are considered requirements (except those matching exclusion patterns)
+  # Additional external folders that contain system requirements, code sources, and other files
+  # These are relative paths to the input folder (git root)
+  # All markdown files in these folders are considered system requirements (except those matching exclusion patterns)
   external_folders:
-    - todo_specifications
     - tests
     - core
     - cli
@@ -81,7 +83,6 @@ Here's an example of a Reqvire configuration file:
     - "**/Logical*.md"
     - "**/Physical*.md"
     - "**/TODO.md"
-    - "**/DesignSpecifications/**"        
     - "**/tests/**"    
     - "**/core/**"    
     - "**/cli/**"            
@@ -154,6 +155,60 @@ Preview linting changes without applying them:
 reqvire --lint --dry-run
 ```
 
+## Traceability
+
+Track relationships between requirements using traceability features.
+
+### Generate Traceability Matrix
+
+```bash
+reqvire --traces
+```
+
+This generates a traceability matrix showing relationships between requirements in Markdown format by default.
+
+#### Output Format Options
+
+You can specify different output formats for the traceability matrix:
+
+```bash
+# Generate traceability matrix in Markdown format (default)
+reqvire --traces
+
+# Generate traceability matrix in JSON format
+reqvire --traces --json
+
+# Generate traceability matrix in SVG format
+reqvire --traces --svg > matrix.svg
+```
+
+The SVG format produces a visual representation that can be included in documentation or viewed directly in a browser.
+
+## Change Impact Report
+
+Generates change impact report comparing current git HEAD with a previous commit.
+
+### Generate Change Impact Report
+
+```bash
+reqvire --change-impact
+```
+
+This generates a report showing how changes affect related requirements. By default, it compares with HEAD~1 (the previous commit).
+
+#### Options
+
+```bash
+# Use default comparison with HEAD~1
+reqvire --change-impact
+
+# Compare with a specific commit (hash or reference)
+reqvire --change-impact --git-commit=a1b2c3d4
+
+# Output in JSON format for integration with other tools
+reqvire --change-impact --json
+```
+
 ## Generating Documentation
 
 Reqvire can generate HTML documentation from your Markdown files.
@@ -166,17 +221,6 @@ reqvire --html
 
 This creates HTML files with navigation, properly formatted requirements, and interactive diagrams.
 
-## Traceability
-
-Track relationships between requirements using traceability features.
-
-### Generate Traceability Matrix
-
-```bash
-reqvire --traces
-```
-
-This generates a traceability matrix showing relationships between requirements.
 
 ## Diagrams
 
@@ -202,4 +246,160 @@ reqvire --llm-context
 
 This outputs detailed information about Reqvire methodology, document structure, and syntax conventions, helping LLMs work effectively with your requirements.
 
-### TODO: add change impact and other important commands 
+## GitHub Integration
+
+Reqvire integrates with GitHub workflows to automate various tasks and provide additional functionality during pull requests and regular development.
+
+### GitHub Actions
+
+Reqvire includes several GitHub Actions workflows that can be used in your repository. You can easily install Reqvire in any GitHub Actions workflow using this oneliner:
+
+```yaml
+- name: Install Reqvire
+  run: curl -fsSL https://raw.githubusercontent.com/ilijaljubicic/Reqvire/main/scripts/install.sh | bash
+```
+
+#### PR Validation
+
+The PR validation workflow runs automatically on every pull request to validate your requirements model:
+
+```yaml
+name: Validate Requirements on PR
+
+on:
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened]  # Trigger on PR creation, updates, and reopening
+
+
+jobs:
+  validate:
+    name: Validate Requirements
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        
+      - name: Install Reqvire
+        run: curl -fsSL https://raw.githubusercontent.com/ilijaljubicic/Reqvire/main/scripts/install.sh | bash
+        
+      - name: Validate Requirements and Generate Report
+        run: |
+          mkdir -p reports
+          reqvire --validate | tee reports/validation_report.txt
+
+      - name: Upload Validation Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: reqvire-validation-report
+          path: reports/validation_report.txt
+```
+
+#### Automated Diagram Generation
+
+This workflow automatically generates and commits updated diagrams when pull requests are merged to the main branch:
+
+```yaml
+name: Generate Diagrams on PR Merge
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+
+jobs:
+  generate-diagrams:
+    if: github.event.pull_request.merged == true
+    name: Generate and Commit Diagrams
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+      
+      - name: Install Reqvire
+        run: curl -fsSL https://raw.githubusercontent.com/ilijaljubicic/Reqvire/main/scripts/install.sh | bash
+      
+      - name: Generate Diagrams
+        run: reqvire --generate-diagrams
+      
+      - name: Generate Traces SVG
+        run: reqvire --traces --svg > specifications/matrix.svg
+      
+      - name: Commit Changes
+        run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+          git add -A
+          git diff --staged --quiet || git commit -m "Auto-generate diagrams after PR merge"
+          git push
+```
+
+### GitHub Issue Comment Commands
+
+Reqvire supports command-driven operations through GitHub issue comments. These commands can be used in pull request discussions to trigger specific Reqvire operations.
+
+#### Available Commands
+
+| Command | Description |
+|---------|-------------|
+| `/reqvire impact` | Triggers change impact analysis |
+
+#### Setup Example
+
+Here's how to set up the comment commands in your workflow:
+
+```yaml
+name: Reqvire PR Commands
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  run-reqvire:
+    if: |
+      github.event.issue.pull_request != null &&
+      (
+        contains(github.event.comment.body, '/reqvire impact')
+      )
+    runs-on: ubuntu-latest
+    
+    permissions:
+      pull-requests: write
+      contents: read
+    
+    steps:
+      - name: Checkout PR Branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Install Reqvire
+        run: curl -fsSL https://raw.githubusercontent.com/ilijaljubicic/Reqvire/main/scripts/install.sh | bash
+      
+      - name: Run Reqvire Impact
+        if: contains(github.event.comment.body, '/reqvire impact')
+        run: |
+          # Get base commit
+          BASE_COMMIT=$(git merge-base origin/main HEAD)
+          
+          # Run impact analysis
+          REPORT=$(reqvire --change-impact --git-commit "$BASE_COMMIT")
+          
+          # Post comment with report
+          gh pr comment ${{ github.event.issue.number }} --body "$REPORT"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}    
+```
+
+These commands provide valuable insights during the pull request review process, helping reviewers understand the impact of changes on the requirements model.
+

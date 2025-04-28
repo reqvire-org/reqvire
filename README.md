@@ -36,7 +36,14 @@ For detailed information about **how to use Reqvire** visit the [documentation](
 
 To set up Reqvire, follow these steps:
 
-#### From Source (Linux and macOS)
+#### Run install script (Linux and macOS)
+
+Run the following command in your terminal:
+```
+curl -fsSL https://raw.githubusercontent.com/ilijaljubicic/Reqvire/main/scripts/install.sh | bash
+```
+
+#### From Source (Linux and macOS Apple Silicon)
 
 1. **Install Rust and Cargo**
    - Install Rust using rustup:
@@ -73,7 +80,7 @@ To set up Reqvire, follow these steps:
    - Visit the [Releases page](https://github.com/reqvire/reqvire/releases) on GitHub
    - Download the appropriate binary for your platform:
      - Linux: `reqvire-linux-x86_64.tar.gz`
-     - macOS: `reqvire-macos-x86_64.tar.gz` or `reqvire-macos-arm64.tar.gz` (for Apple Silicon)
+     - macOS: `reqvire-macos-arm64.tar.gz` 
 
 2. **Extract the Binary**
    ```bash
@@ -89,13 +96,17 @@ To set up Reqvire, follow these steps:
    ```bash
    reqvire --version
    ```
-
+    
 ## Contributing
 
-We welcome contributions to Reqvire! Whether it's improving the methodology, enhancing the tools, or refining the language, your input is valuable. Here's how to contribute:
+We welcome contributions to Reqvire! Whether it's improving the methodology, enhancing the tools, or refining the language, your input is valuable.
+
+To maintain **consistency**, **traceability**, and **quality** in Reqvire, we follow a strict **contribution discipline** that ensures the system model, tests, and verifications evolve alongside the code.
+
+### Contribution Workflow
 
 1. **Read the Contribution Guidelines**:
-   - Start by reviewing our [Contribution Guidelines](./doc/CONTRIBUTING.md) to understand the process and expectations.
+   - Begin by reviewing our [Contribution Guidelines](./doc/CONTRIBUTING.md) for details on processes, coding standards, and expectations.
 
 2. **Fork the Repository**:
    - Create your own copy of the repository by forking it.
@@ -106,15 +117,34 @@ We welcome contributions to Reqvire! Whether it's improving the methodology, enh
      git checkout -b feature/your-feature-name
      ```
 
-4. **Test Your Changes**:
-   - Ensure that your changes are fully tested and do not break existing functionality.
+4. **Maintain Requirements, Tests, and Verifications**:
+   - **Update or create requirements**:
+     - For any **new code**, **feature**, or **change** in the codebase, always **create new requirements** or **update existing ones** to reflect those changes.
+     - Requirements should be added in the appropriate **User Requirements** or **System Requirements** folders, following the Reqvire methodology.
+     - Requirments must be approved before code can be implemented or existing functionality changed
+   - **Add or update end-to-end (E2E) tests**:
+     - If your changes introduce **new functionality** or modify existing behavior that is not covered by tests, ensure to **add E2E tests** in the `tests/` directory.
+     - Tests must validate the **expected behavior** of your feature or change.
+   - **Update verifications**:
+     - For every **new requirement** or **E2E test**, create or update the corresponding **verification cases** in the `specifications/verificationCases/` directory.
+     - Verifications ensure that **requirements** are linked to **tests**, and all features are properly validated.
 
-5. **Submit a Pull Request**:
-   - Once your changes are ready, submit a pull request with a clear and detailed description of what you've implemented or fixed.
+5. **Test Your Changes**:
+   - Run **Reqvire validation** locally to ensure your requirements and verifications are consistent:
+     ```bash
+     reqvire --validate
+     ```
+   - Ensure that your code passes **all tests** and that **no existing functionality breaks**.
 
-6. **Collaborate**:
-   - Be responsive to feedback and collaborate with the maintainers to get your pull request merged.
+6. **Submit a Pull Request (PR)**:
+   - Once your changes are ready, submit a pull request with a **clear and detailed description** of what you've implemented or fixed.
+   - Include a summary of:
+     - **Change impact report if requirements were updated**
+     - **New or updated tests**
+     - **New or updated verifications**
+
+7. **Collaborate and Iterate**:
+   - Engage with maintainers, respond to feedback, and collaborate to refine your PR until it's ready to be merged.
 
 For more details, refer to the [Contributing Guide](./doc/CONTRIBUTING.md).
-
 

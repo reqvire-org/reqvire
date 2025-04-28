@@ -1,179 +1,66 @@
 # Requirements in Reqvire
 
-## What Are Requirements?
+## Conceptual Overview
 
-In Reqvire, a requirement represents a stakeholder's need, system capability, or constraint that the system must fulfill. 
-Requirements define **what the system must do** (functional requirements) and **how well it must perform** (non-functional requirements), serving as the foundation for system design, development, and verification.
+In Reqvire, a **requirement** represents a stakeholder's need, system capability, or constraint that the system must fulfill. Requirements define:
 
-Reqvire mandates a specific format for organizing and presenting requirements to ensure consistency across the project. 
-However, it does not impose a specific syntax for expressing the content of requirements, offering flexibility to tailor expressions based on the project's needs and the team's preferences. 
-Structured syntaxes like **EARS (Easy Approach to Requirements Syntax)** are encouraged to improve clarity and consistency, but their use is not required.
+- **What** the system must do (*functional requirements*)
+- **How well** the system must perform (*non-functional requirements*)
 
+These requirements serve as the foundation for system design, development, and verification.
 
-### Requirement Types
+Reqvire enforces a **consistent structure** for organizing and presenting requirements across the project. However, it does **not impose a specific syntax** for how the content of requirements is written. This provides flexibility for teams to tailor requirement expressions based on project context.
 
-There are 2 types of requirements:
- * user requirement
- * system requirement
- 
-The main difference is that `user requirement` doesn't need to have parent relation while `system requirement` must have one.
+The use of structured syntaxes like **EARS (Easy Approach to Requirements Syntax)** is encouraged to enhance clarity and consistency but is **not mandatory**.
 
-All requirments documents in the root of `specifications` folder are assumed to be user requirements unless a type is specified in the metadata subsection.
-Same holds true for all the requirements in `external folders` and specifications subfolders.
- 
- 
-### How to define requirement 
+For detailed specifications on document structure and formatting, refer to: [Specifications](../specifications/SpecificationsRequirements.md).
 
-Requirements are defined in the markdown documents as 'elements'. Refer to TODO: add link to document.
 
-### Requirements document format
- 
-Requirements are organized within requirements documents: a markdow document with specific format.
+## Requirement Types and Classification
 
+Reqvire organizes requirements into **two main categories**:
 
-```
-# Document title
+- **User Requirements**  
+  (includes Stakeholder Needs, Mission Requirements, User Stories, and other WHAT-focused requirements)
 
-## Grouping Title: User Interface Requirements
+- **System Requirements**  
+  (detailed technical and functional specifications describing HOW the system will fulfill user needs)
 
-### Requirement Title: Login Functionality
+This structure supports a **progressive refinement** approach, ensuring traceability from high-level stakeholder expectations down to technical implementation.
 
-The system shall provide a login interface that allows users to authenticate using a username and password.
+---
 
-Relations:
- * trace: UserStories.md#authentication
- * verifiedBy: tests.md#testlogin
+## User Requirements
 
-## Other group
+**User requirements** represent **stakeholder needs**, **mission objectives**, **user expectations**, and **WHAT-focused requirements**. These describe *what* the system must do from an external point of view, without specifying technical implementation details.
 
-### Requirement 4
+User requirements include:
 
-### Requirement 5
+- **Stakeholder needs**: High-level expressions of expectations from users, customers, operators, and regulatory bodies.
+- **Mission requirements**: Enterprise-level objectives the system must support. Each mission requirement should be linked to at least one **Measure of Effectiveness (MOE)** to ensure its success is measurable.
+- **User stories**: Informal narratives that describe system interactions or functionalities from a user's perspective.
+- **WHAT-focused requirements**: Formalized requirements that define system capabilities, behaviors, or constraints without dictating the solution approach.
 
-### Requirement 6
+User requirements serve as the **foundation for system design**, ensuring that all stakeholder concerns and operational goals are captured before technical development begins.
 
-```
 
 
-#### Document title
+## System Requirements
 
-The **Document Title** provides a descriptive name for the entire requirements document. 
-It identifies the scope or subject of the requirements contained within and is placed at the very beginning of the file.
+**System requirements** specify **HOW** the system will fulfill the user and mission requirements. They define detailed **technical** and **functional** specifications, covering:
 
-Expected Markdown:
+- System behaviors
+- Performance criteria
+- Interfaces and data flows
+- Design and regulatory constraints
 
-```
-# <Descriptive Title for the Document>
-```
+System requirements are derived from user requirements and are structured to map directly to **subsystems** or **components** of the overall system, ensuring **modularity** and **traceability**.
 
-#### Grouping Title
+## Diagram summary
 
-Each group of related requirements is introduced by a **Grouping Title**. This serves as a high-level categorization or organizational header for the set of requirements.
-
-Expected Markdown:
-
-```
-## <Descriptive Title for the Group>
-
-```
-
-
-### Requirements format
-
-
-Example:
-```
-### Login Functionality
-
-The system shall provide a login interface that allows users to authenticate using a username and password.
-
-Relations:
- * derivedFrom: UserStories.md#authentication
-
-
-### Password Recovery
-
-The system shall provide a mechanism for users to recover forgotten passwords.
-
-#### Relations
- * refine: UserStories.md#security
- * verifiedBy: tests.md#testpasswordrecovery
-  
-#### Metadata
- * priority: high
- * criticality: moderate
-
-#### Some other additional context
-
-```
-
-#### Requirement Name
-
-Each individual requirement is identified with a Requirement Name. This provides a brief and descriptive name for the requirement and must be unique within a document itself.
-
-```
-### <Requirement name>
-
-```
-
-#### Requirement Text
-
-The Requirement Text describes the specific functionality, constraint, or need in detail. This is the main body of the requirement.
-
-#### Relations
-
-The **"#### Relations** section documents links between this requirement and other system elements,requirements, specifications, or validation methods.
-
-Relations used for the requirements are a subset of relations that exist in the **Reqvire**:
- * containedBy
- * derivedFrom 
- * refine
- * satisfiedBy 
- * verifiedBy
- * trace
-
-Relations foher the requirements are mandatory: at least 1 relation to parent object must exist.
-The parent objects depends on type of requirement and is explained further down.
-
-
-#### Metadata
-
-The **#### Metadata** section is optional and provides additional key-value pair details about the requirement. These details help define attributes or characteristics of the requirement.
-
-The keys and values are expressed as bullet points. Accepted key-value pairs include:
-
-- **priority**: high | medium | low
-- **criticality**: high | moderate | low
-
-
-Expected markdow:
-```
-#### Metadata
-  * Key: value
-```
-
-Reserved key is `type` which can hold following values:
- * verification
- * requirement
- * user_requirement
-
-#### Additional context section
-
-The Additional Context Section is optional and allows for any supplementary information that might be relevant or useful for understanding the requirement. It provides flexibility to include detailed explanations, clarifications, or related information.
-
-Content in this section should follow valid Markdown syntax and cannot include headers with a level less than ####.
-Expected markdow:
-```
-#### <A section title>
-
-Markdown valid text which cannot have headers less than ####
-
-```
-
-## Structure of Requirements in Reqvire
 
 The diagram below demonstrates how requirements, their relationships, and hierarchical structures are organized within the **Reqvire methodology**. 
-It showcases the connection between stakeholder needs, user requirements, mission requirements, system requirements, and their links to test cases, specification documents, and other system elements.
+It showcases the connection between stakeholder needs, user requirements, mission requirements, system requirements, and their links to verifications, specification documents, and other system elements.
 
 ```mermaid
 graph TD
@@ -199,9 +86,9 @@ graph TD
             style REQ_OAUTH font-color:#000000,fill:#FFCCCC,stroke:#FF0000,stroke-width:2px;
 
 
-            %% Test Case (verifies)
-            TestPasswordStrength["Test Case: Password Strength Validation"]
-            style TestPasswordStrength fill:#CCFFCC,stroke:#008000,stroke-width:2px;
+            %% Verifications (verifies)
+            VerifyPasswordStrength["Verification: Password Strength Validation"]
+            style VerifyPasswordStrength fill:#CCFFCC,stroke:#008000,stroke-width:2px;
 
         end 
 
@@ -251,11 +138,11 @@ graph TD
     REQ_AUTH -.->|contains| REQ_OAUTH
 
 
-    TestPasswordStrength -.->|verify| REQ_PASSWORD
+    VerifyPasswordStrength -.->|verify| REQ_PASSWORD
 
 
     %% Click Actions
-    click TestPasswordStrength href "https://example.com/docs/test-case-222" "Test Case Documentation"
+    click VerifyPasswordStrength href "https://example.com/docs/test-case-222" "Test Case Documentation"
     click USER_STORY_PASSWORD href "https://example.com/docs/user-story-password-login" "User Story Documentation"
     click USER_STORY_OAUTH href "https://example.com/docs/user-story-google-login" "User Story Documentation"
     click AuthenticationSubsystem href "https://example.com/docs/authentication-subsystem" "Subsystem Documentation"
@@ -268,66 +155,10 @@ end
 
 ```
 
-Requirements in Reqvire are divided into three main categories:
- * User Requirements
- * Mission Requirements
- * System Requirements
+## Visual Representation
 
-  
-### User Requirements
+Reqvire automatically generates visual representations of requirements and their relationships using Mermaid diagrams. For more information on diagrams, see the [User Guide](./user_guide.md#diagrams) and [Specifications](../specifications/SpecificationsRequirements.md).
 
-User requirements describe the specific functionalities and capabilities that users expect from the system. They focus on *what* the system must provide to fulfill user needs, improve user experience, and achieve business objectives as well as capture specific needs of end-users.
-
-User requirements are directly related to user story: they **refine** user story.
-
-User requirements are expected to be documented in the `specifications/UserRequirement.md` file.
-
-
-### Mission Requirements
-
-Mission and System Requirements are expected to be documented in the `specifications/MissionRequirement.md` file.
-
-These requirements represent the high-level mission / enterprise  objectives, needs and measures of effectiveness, that a system must fulfill to align with the strategic goals of the organization and satisfy stakeholder expectations. 
-
-**mission requirement** must at least have a relation to specific MOE.
-
-User requirements are expected to be documented in the `specifications/MissionRequirement.md` file.
-
-### System  Requirements
-
-System requirements define the detailed technical and functional specifications that the system must meet to fulfill the user and mission requirements. They describe *how* the system will achieve the objectives set by the user and mission requirements.
-
-System requirements are structured to map to specific subsystems or components of the overall system. Each subsystem or component has its own dedicated folder in the `specifications/systemRequirements` directory, ensuring modularity and clarity.
-
-#### Organization and File Structure
-
-1. **Location**: System requirements must be documented in the `specifications/systemRequirements` directory.
-2. **Subfolders**: Each subsystem has its own subfolder. Subfolders can nest further into sub-subsystems as needed.
-3. **File Name**: Each folder must contain exactly one `Requirements.md` file, where the requirements for that specific subsystem are documented.
-
-#### Traceability
-
-System requirements must trace back to their respective user and mission requirements to ensure alignment with user needs and mission objectives. Traceability is documented through relations like `tracedFrom` and `verifiedBy`.
-
-#### Expected File Structure for System Requirements
-
-- **Top-Level File**: 
-  - `specifications/systemRequirements/Requirements.md` – Contains high-level system requirements that apply to the overall system.
-- **Subsystem Folders**:
-  - `specifications/systemRequirements/<subsystem>/Requirements.md`
-  - Subsystems can have nested folders, as shown:
-    ```plaintext
-    specifications/systemRequirements/subsystem/subsubsystem/Requirements.md
-    specifications/systemRequirements/othersubsystem/subsystem/Requirements.md
-    ```
-
-Each `Requirements.md` file contains requirements specific to the subsystem or component it corresponds to.
-
-
-
-## Requirements Diagrams
-
-mermaid's requirementsDiagram which is based on SysML is not that flexible in regards to picking colors and making links for docRefs thefor Reqvire uses graphTD diagram for the time being.
 
 
 
