@@ -11,8 +11,8 @@ OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
 # Detect ARCH
 ARCH="$(uname -m)"
 case "$ARCH" in
-  x86_64) ARCH="amd64" ;;
-  arm64|aarch64) ARCH="arm64" ;;
+  x86_64) ARCH="" ;;
+  arm64|aarch64) ARCH="-arm64" ;;
   *) echo "Unsupported architecture: $ARCH"; exit 1 ;;
 esac
 
@@ -35,7 +35,7 @@ if [ "$VERSION" == "latest" ]; then
   VERSION=$(curl -fsSL "https://api.github.com/repos/$REPO/releases/latest" | grep -oP '"tag_name": "\K(.*)(?=")')
 fi
 
-BINARY_NAME="reqvire-${OS}-${ARCH}"
+BINARY_NAME="reqvire-${OS}${ARCH}"
 DOWNLOAD_URL="https://github.com/${REPO}/releases/download/${VERSION}/${BINARY_NAME}"
 
 echo "Downloading $BINARY_NAME version $VERSION from $DOWNLOAD_URL"
