@@ -23,3 +23,24 @@ jobs:
       - name: Run Tests
         run: cargo test --verbose
 
+  validate:
+    name: Validate Requirements
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        
+      - name: Install Reqvire
+        run: curl -fsSL https://raw.githubusercontent.com/ilijaljubicic/Reqvire/main/scripts/install.sh | bash
+        
+      - name: Validate Requirements and Generate Report
+        run: |
+          mkdir -p reports
+          reqvire --validate | tee reports/validation_report.txt
+
+      - name: Upload Validation Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: reqvire-validation-report
+          path: reports/validation_report.txt
