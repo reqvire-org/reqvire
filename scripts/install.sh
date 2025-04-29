@@ -16,6 +16,7 @@ case "$ARCH" in
   *) echo "Unsupported architecture: $ARCH"; exit 1 ;;
 esac
 
+
 # Set default INSTALL_DIR
 if [ -z "$INSTALL_DIR" ]; then
   if [ "$OS" = "darwin" ]; then
