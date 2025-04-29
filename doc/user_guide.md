@@ -466,7 +466,7 @@ jobs:
         if: contains(github.event.comment.body, '/reqvire traces')
         id: run_traces
         run: |
-          OUTPUT=$(reqvire --traces --output-format markdown 2>&1 || echo "⚠️ reqvire traces failed.")
+          OUTPUT=$(reqvire --traces || echo "⚠️ reqvire traces failed.")
           echo "REQVIRE_OUTPUT<<EOF" >> $GITHUB_ENV
           echo "$OUTPUT" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
