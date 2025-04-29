@@ -50,7 +50,7 @@ jobs:
         run: |
           mkdir -p artifacts
           if [[ "$RUNNER_OS" == "Linux" ]]; then
-            mv target/x86_64-unknown-linux-musl/release/reqvire artifacts/reqvire-linux
+            mv target/x86_64-unknown-linux-musl/release/reqvire artifacts/reqvire-linux-x86_64
           elif [[ "$RUNNER_OS" == "macOS" ]]; then
             if [[ "$(uname -m)" == "arm64" ]]; then
               mv target/aarch64-apple-darwin/release/reqvire artifacts/reqvire-darwin-arm64
