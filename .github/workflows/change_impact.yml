@@ -19,6 +19,7 @@ jobs:
       issues: write
       contents: read
 
+
     steps:
       - name: React to trigger comment with
         uses: peter-evans/create-or-update-comment@v3
@@ -96,3 +97,10 @@ jobs:
           echo "REQVIRE_OUTPUT<<EOF" >> $GITHUB_ENV
           echo "$OUTPUT" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
+
+      - name: Comment on PR with result
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          body: |
+            ${{ env.REQVIRE_OUTPUT }}          

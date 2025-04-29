@@ -302,7 +302,7 @@ jobs:
 This workflow automatically generates and commits updated diagrams when pull requests are merged to the main branch:
 
 ```yaml
-name: Generate Diagrams on PR Merge
+name: Generate Diagrams and Traces SVG on PR Merge
 
 on:
   pull_request:
@@ -317,30 +317,47 @@ jobs:
     runs-on: ubuntu-latest
     
     permissions:
-      contents: write
+      contents: write  # Required to commit to the repository
     
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
-          ref: main
+          ref: main  # Checkout the default branch (change if needed)
+          fetch-depth: 0  # Get full history for proper Git operations
+      
       
       - name: Install Reqvire
         run: curl -fsSL https://raw.githubusercontent.com/Reqvire/reqvire/main/scripts/install.sh | bash
-      
-      - name: Generate Diagrams
-        run: reqvire --generate-diagrams
-      
-      - name: Generate Traces SVG
-        run: reqvire --traces --svg > specifications/matrix.svg
-      
-      - name: Commit Changes
+            
+      - name: Configure Git
         run: |
           git config --global user.name "GitHub Action"
-          git config --global user.email "action@github.com"
+          git config --global user.email "actions@github.com"
+      
+      - name: Generate Diagrams
+        run: |
+          reqvire --generate-diagrams
+      
+      - name: Generate traces svg
+        run: |
+          reqvire --traces --svg > specifications/matrix.svg
+                
+      - name: Check for Changes
+        id: check_changes
+        run: |
+          if [[ -n "$(git status --porcelain)" ]]; then
+            echo "HAS_CHANGES=true" >> $GITHUB_ENV
+          else
+            echo "HAS_CHANGES=false" >> $GITHUB_ENV
+          fi
+      
+      - name: Commit and Push Changes
+        if: env.HAS_CHANGES == 'true'
+        run: |
           git add -A
-          git diff --staged --quiet || git commit -m "Auto-generate diagrams after PR merge"
-          git push
+          git commit -m "Auto-generate diagrams after PR merge to main"
+          git push origin main # Change if needed
 ```
 
 ### GitHub Issue Comment Commands
@@ -369,13 +386,16 @@ jobs:
     if: |
       github.event.issue.pull_request != null &&
       (
-        contains(github.event.comment.body, '/reqvire impact')
+        contains(github.event.comment.body, '/reqvire impact') ||
+        contains(github.event.comment.body, '/reqvire traces')
       )
     runs-on: ubuntu-latest
-    
+       
     permissions:
       pull-requests: write
+      issues: write
       contents: read
+      
     
     steps:
       - name: Checkout PR Branch
@@ -383,22 +403,80 @@ jobs:
         with:
           fetch-depth: 0
       
+      - name: React to trigger comment with
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          comment-id: ${{ github.event.comment.id }}
+          reactions: '+1'
+          
+      - name: Checkout PR source branch
+        uses: actions/checkout@v4
+                    
+      - name: Get PR Head Ref using gh
+        id: get_pr_head
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          HEAD_REF=$(gh pr view ${{ github.event.issue.number }} --json headRefName --jq '.headRefName')
+          echo "Using PR head ref: $HEAD_REF"
+          echo "HEAD_REF=$HEAD_REF" >> $GITHUB_ENV
+              
+      - name: Checkout PR source branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.HEAD_REF }}
+          fetch-depth: 0  # needed for full commit history
+              
+      - name: Get Base Branch from PR using gh
+        id: get_pr_base
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BASE_BRANCH=$(gh pr view ${{ github.event.issue.number }} --json baseRefName --jq '.baseRefName')
+          echo "Using base branch: $BASE_BRANCH"
+          echo "BASE_BRANCH=$BASE_BRANCH" >> $GITHUB_ENV
+          
+      - name: Compute merge base commit
+        id: base_commit
+        run: |
+          git fetch origin "$BASE_BRANCH"
+          BASE_COMMIT=$(git merge-base origin/"$BASE_BRANCH" HEAD)
+          echo "Base commit: $BASE_COMMIT"
+          echo "BASE_COMMIT=$BASE_COMMIT" >> $GITHUB_ENV
+
+      - name: Ensure PR branch remains checked out
+        run: |
+          git checkout ${{ github.event.issue.pull_request.head.ref }}
+         
+                          
       - name: Install Reqvire
         run: curl -fsSL https://raw.githubusercontent.com/Reqvire/reqvire/main/scripts/install.sh | bash
       
-      - name: Run Reqvire Impact
+      - name: Run Reqvire Impact (if triggered)
         if: contains(github.event.comment.body, '/reqvire impact')
+        id: run_impact
         run: |
-          # Get base commit
-          BASE_COMMIT=$(git merge-base origin/main HEAD)
+          OUTPUT=$(reqvire --change-impact --git-commit "$BASE_COMMIT" 2>&1 || echo "⚠️ reqvire impact failed.")
+          echo "REQVIRE_OUTPUT<<EOF" >> $GITHUB_ENV
+          echo "$OUTPUT" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Run Reqvire Traces (if triggered)
+        if: contains(github.event.comment.body, '/reqvire traces')
+        id: run_traces
+        run: |
+          OUTPUT=$(reqvire --traces --output-format markdown 2>&1 || echo "⚠️ reqvire traces failed.")
+          echo "REQVIRE_OUTPUT<<EOF" >> $GITHUB_ENV
+          echo "$OUTPUT" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
           
-          # Run impact analysis
-          REPORT=$(reqvire --change-impact --git-commit "$BASE_COMMIT")
-          
-          # Post comment with report
-          gh pr comment ${{ github.event.issue.number }} --body "$REPORT"
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}    
+      - name: Comment on PR with result
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          body: |
+            ${{ env.REQVIRE_OUTPUT }}            
 ```
 
 These commands provide valuable insights during the pull request review process, helping reviewers understand the impact of changes on the requirements model.
