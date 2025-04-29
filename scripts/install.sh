@@ -2,7 +2,7 @@
 
 set -e
 
-REPO="ilijaljubicic/Reqvire"
+REPO="Reqvire/reqvire"
 VERSION="${VERSION:-latest}"
 
 # Detect OS
@@ -32,7 +32,7 @@ fi
 
 # Handle VERSION
 if [ "$VERSION" == "latest" ]; then
-  VERSION=$(curl -fsSL "https://api.github.com/repos/$REPO/releases/latest" | grep -oP '"tag_name": "\K(.*)(?=")')
+  VERSION=$(curl -fsSL "https://api.github.com/repos/$REPO/releases/latest" | sed -n 's/.*"tag_name": "\(.*\)".*/\1/p')
 fi
 
 BINARY_NAME="reqvire-${OS}${ARCH}"
