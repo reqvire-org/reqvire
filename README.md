@@ -1,11 +1,18 @@
 # Reqvire
 
-**Reqvire** is a **framework for system modeling and project specifications**, designed to seamlessly integrate with modern agile development workflows and AI tools. While it currently focuses on **requirements, specifications, and traceability**, its vision extends far beyond—evolving into a fully **AI-powered Model-Based Systems Engineering (MBSE) framework**, where **AI assistance and automation** play a central role in designing, analyzing, and implementing system architectures.
+**Reqvire** is a **tool for system modeling, project specifications**, designed to be a practical, lightweight implementation of the **Reqvire methodology**—a modern approach to agile systems engineering that embraces AI, automation, and Git-native workflows.
 
-It’s built for **product managers, architects, developers, and AI assistants** to collaborate effectively, keeping system models and requirements in sync with real-world implementation.  
+This tool focuses on managing **requirements, specifications, and traceability** in a way that supports real-world agile development, while laying the foundation for a broader **AI-powered Model-Based Systems Engineering (MBSE) framework**. With Reqvire, **agile workflows, AI assistance, and automation** become integral to designing, analyzing, and evolving system architectures.
 
-Unlike traditional MBSE tools, Reqvire is **lightweight, Git-native, and practical** - inspired by **MBSE and SysML**, but without the complexity that slows teams down. 
-By adopting **semi-structured conventions**, Reqvire bridges the gap between **formal modeling and agile documentation**, enabling **automation and AI-driven workflows** without the overhead of traditional modeling tools.  
+It’s built for **product managers, architects, developers, and AI copilots** to collaborate effectively—ensuring that system models, requirements, and implementation stay in sync.
+
+Unlike traditional MBSE tools, Reqvire is:
+
+- **Lightweight**
+- **Text-based and Git-native**
+- **Inspired by MBSE and SysML**, without the heavyweight complexity
+
+By using **semi-structured modeling conventions**, Reqvire bridges the gap between **formal modeling** and **agile documentation**, enabling powerful automation and AI-driven workflows—without imposing the overhead of traditional modeling environments.
 
 ---
 <sub>Figure 1: Example Diagram (click image to browse requirements)</sub>
