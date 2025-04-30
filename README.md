@@ -1,6 +1,6 @@
 # Reqvire
 
-**Reqvire** is a **tool for system modeling, project specifications**, designed to be a practical, lightweight implementation of the **Reqvire methodology**—a modern approach to agile systems engineering that embraces AI, automation, and Git-native workflows.
+**Reqvire** is a **tool for system modeling and project specifications**, designed to be a practical, lightweight implementation of the **Reqvire methodology**—a modern approach to agile systems engineering that embraces AI, automation, and Git-native workflows.
 
 This tool focuses on managing **requirements, specifications, and traceability** in a way that supports real-world agile development, while laying the foundation for a broader **AI-powered Model-Based Systems Engineering (MBSE) framework**. With Reqvire, **agile workflows, AI assistance, and automation** become integral to designing, analyzing, and evolving system architectures.
 
