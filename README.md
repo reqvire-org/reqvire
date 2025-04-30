@@ -4,8 +4,6 @@
 
 This tool focuses on managing **requirements, specifications, and traceability** in a way that supports real-world agile development, while laying the foundation for a broader **AI-powered Model-Based Systems Engineering (MBSE) framework**. With Reqvire, **agile workflows, AI assistance, and automation** become integral to designing, analyzing, and evolving system architectures.
 
-It’s built for **product managers, architects, developers, and AI copilots** to collaborate effectively—ensuring that system models, requirements, and implementation stay in sync.
-
 Unlike traditional MBSE tools, Reqvire is:
 
 - **Lightweight**
@@ -21,8 +19,6 @@ By using **semi-structured modeling conventions**, Reqvire bridges the gap betwe
 ---
 
 ## Why Reqvire?
-
-Reqvire is a Git-native, AI-enabled **procces, toolset, and language** for modern requirements and system modeling. 
 
 - **Git-Native** – Embeds directly into Git workflows, ensuring requirements evolve alongside code with full traceability and version control.  
 - **Agile & Lightweight** – Uses Markdown-based artifacts for a balance of human readability and machine processability, making collaboration seamless.  
