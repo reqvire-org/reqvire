@@ -8,7 +8,7 @@ Unlike traditional MBSE tools, Reqvire is **lightweight, Git-native, and practic
 By adopting **semi-structured conventions**, Reqvire bridges the gap between **formal modeling and agile documentation**, enabling **automation and AI-driven workflows** without the overhead of traditional modeling tools.  
 
 ---
-<sub>Figure 1: Example Diagram (click image to see requirements)</sub>
+<sub>Figure 1: Example Diagram (click image to browse requirements)</sub>
 [![Example Diagram](doc/diagram_1.png)](specifications/SpecificationsRequirements.md#specifications-requirements)
 
 ---
@@ -31,7 +31,8 @@ Reqvire is a Git-native, AI-enabled **procces, toolset, and language** for moder
 
 ---
 
-<sub>Figure 2: Example Change Impact Report (click image to see requirements)</sub>
+<sub>Figure 2: Example Change Impact Report (click image to read specifications)</sub>
+
 [![Example Change Impact Report](doc/change_impact_report_pr.png)](specifications/SpecificationsRequirements.md#requirements-change-propagation)
 
 ---
