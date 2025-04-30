@@ -9,6 +9,10 @@ By adopting **semi-structured conventions**, Reqvire bridges the gap between **f
 
 ---
 
+![Example Diagram](doc/diagram_1.png)
+
+---
+
 ## Why Reqvire?
 
 Reqvire is a Git-native, AI-enabled **procces, toolset, and language** for modern requirements and system modeling. 
