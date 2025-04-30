@@ -9,7 +9,7 @@ By adopting **semi-structured conventions**, Reqvire bridges the gap between **f
 
 ---
 
-![Example Diagram](doc/diagram_1.png)
+[![Example Diagram](doc/diagram_1.png)](specifications/SpecificationsRequirements.md#specifications-requirements)
 
 ---
 
@@ -28,6 +28,10 @@ Reqvire is a Git-native, AI-enabled **procces, toolset, and language** for moder
 - **Diagram Generation & Relationship Mapping** – Supports structured linking and MermaidJS to visualize dependencies and improve clarity.  
 - **AI-enabled Development & Collaboration** – Enhancing teamwork through AI-enabled requirement authoring, architecture analysis, code generation, validation, and impact analysis.
 
+
+---
+
+[![Example Change Impact Report](doc/change_impact_report_pr.png)](specifications/SpecificationsRequirements.md#requirements-change-propagation)
 
 ---
 
