@@ -79,10 +79,9 @@ jobs:
       - name: Upload Built Binaries as Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: binaries-${{ matrix.os }}
           path: |
             artifacts/*.zip
-            artifacts/*.tar.gz
+            artifacts/*.tar.gz       
       
   release:
     name: Create GitHub Release and Upload Binaries
