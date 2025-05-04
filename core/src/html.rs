@@ -4,6 +4,9 @@ use crate::error::ReqvireError;
 use std::path::PathBuf;
 use lazy_static::lazy_static;
 use regex::{Regex, Captures};
+use pathdiff::diff_paths;
+use std::path::Path;
+
 
 
 /// Embedded CSS styles for HTML output
@@ -163,7 +166,8 @@ pub fn convert_to_html(
     let html_with_anchors = add_anchor_ids(&html_output);
     
     // Process mermaid diagrams for proper rendering
-    let html_with_mermaid = process_mermaid_diagrams(file_path, &html_with_anchors, specification_folder, external_folders );
+    let html_with_mermaid = process_mermaid_diagrams(file_path, &html_with_anchors);
+
     
     // Insert into HTML template
     let html_document = HTML_TEMPLATE
@@ -192,103 +196,76 @@ fn add_anchor_ids(html_content: &str) -> String {
         .to_string()
 }
 
-/// Process Mermaid diagrams to ensure links point to the correct `.html` files.
-/// Uses `to_relative_identifier` to correctly resolve paths.
+/// Rewrite every `<pre><code class="language-mermaid">…</code></pre>`
+/// into `<div class="mermaid">…</div>`, and convert all
+/// `click … "https://github.com/…/blob/…/foo/bar.md#L10"`
+/// into the correct relative `foo/bar.html#L10` from wherever
+/// this file lives.
 pub fn process_mermaid_diagrams(
-    _file_path: &PathBuf,
-    html_content: &str,
-    specification_folder: &PathBuf,
-    _external_folders: &[PathBuf],
+    file_path: &Path,      // e.g. "docs/subdir/chapter1.md"
+    html_content: &str,    // the rendered HTML
 ) -> String {
-
     lazy_static! {
-        static ref MERMAID_REGEX: Regex = Regex::new(r#"<pre><code class="language-mermaid">([\s\S]*?)</code></pre>"#).unwrap();
-        
-        static ref MERMAID_CLICK_REGEX: Regex = Regex::new(
-            r#"(click\s+\S+\s+&quot;)([^&\#"]+\.[a-zA-Z0-9]+)((?:#[^&"]*)?&quot;)"#
+        /// 1) Find each mermaid code‐block
+        static ref MERMAID_BLOCK: Regex = Regex::new(
+            r#"<pre><code class="language-mermaid">([\s\S]*?)</code></pre>"#
+        ).unwrap();
+
+        /// 2) Inside it, find every GitHub-blob link to an .md
+        static ref CLICK_LINK: Regex = Regex::new(
+            // (1) “click A ”
+            // (2) repo‐relative path to .md
+            // (3) optional #anchor
+            r#"(click\s+\S+\s+&quot;)https://github\.com/[^/]+/[^/]+/blob/[^/]+/([^&"]+?\.md)(#[^&"]*)?&quot;"#
         ).unwrap();
     }
 
+    // directory containing the current file
+    let current_dir = file_path.parent().unwrap_or(Path::new("."));
 
+    MERMAID_BLOCK
+        .replace_all(html_content, |caps: &regex::Captures| {
+            let inner = &caps[1];
 
-    MERMAID_REGEX.replace_all(html_content, |caps: &regex::Captures| {
-        let diagram_content = &caps[1];        // Convert Markdown links inside Mermaid diagrams to correct HTML paths
-        
-        let fixed_content = MERMAID_CLICK_REGEX.replace_all(diagram_content, |caps: &regex::Captures| {
-        let prefix = &caps[1];   // "click ID "
-        let full_filename = caps[2].to_string(); // Extracted full filename with extension
-        let fragment = &caps[3]; // Optional hash fragment (e.g., `#section"`)
+            // rewrite each click‐link inside the block
+            let fixed = CLICK_LINK.replace_all(inner, |c: &regex::Captures| {
+                let prefix = &c[1];               // e.g. `click A &quot;`
+                let md_path = &c[2];              // e.g. `specs/Details.md`
+                let anchor = c.get(3).map_or("", |m| m.as_str());
 
+                // repo‐relative HTML target
+                let target_html: PathBuf = PathBuf::from(md_path)
+                    .with_extension("html");
 
-        let mut modified_filename = full_filename.to_string();
+                // compute path from our file → that HTML
+                let rel = diff_paths(&target_html, current_dir)
+                    .unwrap_or_else(|| target_html.clone());
 
-        if let Some(spec_name) = specification_folder.file_name().and_then(|s| s.to_str()) {
-                // Construct the needle as "/SPECIFICATION_FOLDER_NAME/"
-                let needle = format!("/{}/", spec_name);
-                // And the replacement is simply "/"
-                let replacement = format!("/");
-                // Perform a simple string replacement.
-                modified_filename = modified_filename.replace(&needle, &replacement);       
-        }     
-        /*
-        for ext in external_folders {
-            if let Some(ext_name) = ext.file_name().and_then(|s| s.to_str()) {
-                // Construct the needle as "../EXTERNAL_FOLDER_NAME/"
-                let needle = format!("../{}/", ext_name);
-                // And the replacement is simply "EXTERNAL_FOLDER_NAME/"
-                let replacement = format!("{}/", ext_name);
-                // Perform a simple string replacement.
-                modified_filename = modified_filename.replace(&needle, &replacement);
-            }
-        }
-        */
+                let link = rel.to_string_lossy();
+                format!(
+                    r#"{prefix}{link}{anchor}&quot;"#,
+                    prefix = prefix,
+                    link   = link,
+                    anchor = anchor,
+                )
+            });
 
-        modified_filename=modified_filename.replace(".md", ".html");
-
-        format!("{}{}{}", prefix,  modified_filename, fragment)
-      });
-
-      format!(r#"<div class="mermaid">{}</div>"#, fixed_content)
-      }).to_string()
+            // swap <pre><code>…</code></pre> → <div class="mermaid">…</div>
+            format!(r#"<div class="mermaid">{}</div>"#, fixed)
+        })
+        .to_string()
 }
 
-// Helper function: If a link contains a pattern like "../SPECIFICATION_FOLDER_NAME/",
-// remove the preceding "SPECIFICATION_FOLDER_NAME" so that it becomes "../".       
-fn fix_link_path(link: &str, specification_folder: &PathBuf, _external_folders: &[std::path::PathBuf]) -> String {
-    let mut fixed = link.to_string();
 
-    if let Some(spec_name) = specification_folder.file_name().and_then(|s| s.to_str()) {
-        let needle = format!("/{}/", spec_name);
-        // Define the replacement (i.e. without the preceding "../")
-        let replacement = "/";
-        // A simple string-level replacement.
-        fixed = fixed.replace(&needle, &replacement);
-    }
-    /*
-    else{
-          
-        for ext in external_folders {
-            if let Some(ext_name) = ext.file_name().and_then(|s| s.to_str()) {
-                // Define the needle we're looking for:
-                let needle = format!("../{}/", ext_name);
-                // Define the replacement (i.e. without the preceding "../")
-                let replacement = format!("/{}/", ext_name);
-                // A simple string-level replacement.
-                fixed = fixed.replace(&needle, &replacement);
-            }
-        }
-    }
-    */
-    fixed
-}
+
 /// Convert all markdown links from .md to .html for HTML output
 /// Pre-processes markdown content to convert all markdown links with .md extension to .html 
 /// This is used to ensure all links in the generated HTML point to HTML files
 fn convert_markdown_links_to_html(
     _file_path: &PathBuf,
     markdown_content: &str,
-    specification_folder: &PathBuf,
-    external_folders: &[PathBuf],
+    _specification_folder: &PathBuf,
+    _external_folders: &[PathBuf],
 ) -> String {
     lazy_static! {
         // 1) [text](../path/to/file.md#fragment)
@@ -313,8 +290,7 @@ fn convert_markdown_links_to_html(
         let close    = &caps[5]; // ")"
 
         // apply your existing folder‑name rewrites only to the path portion
-        let fixed_path = fix_link_path(path, specification_folder, external_folders);
-        format!("{}{}{}.html{}{}", before, parents, fixed_path, fragment, close)
+        format!("{}{}{}.html{}{}", before, parents, path, fragment, close)
     });
 
     // 2) Links without a fragment
@@ -324,8 +300,7 @@ fn convert_markdown_links_to_html(
         let path    = &caps[3]; // "foo/bar"
         let close   = &caps[4]; // ")"
 
-        let fixed_path = fix_link_path(path, specification_folder, external_folders);
-        format!("{}{}{}.html{}", before, parents, fixed_path, close)
+        format!("{}{}{}.html{}", before, parents, path, close)
     });
 
     // 3) Bare link text (no URL): [foo.md] → [foo.html]
@@ -381,29 +356,25 @@ mod tests {
         assert!(html.contains("DesignSpecifications/DirectMessages.html"));
     }
     
-    #[test]
-    fn test_process_mermaid_diagrams_with_parent_paths() {
-        // Test with mermaid diagrams containing parent directory references.
+    #[test]    
+    fn test_mermaid_click_links_preserve_rs_files() {
         let html_with_mermaid = r#"<pre><code class="language-mermaid">
-graph TD;
-    A[Start] --> B[End];
-    click A &quot;../../path/to/file.md#section&quot;;
-    click B &quot;../another/file.md&quot;;
-</code></pre>"#;
-        
-        let file_path = &PathBuf::from("dummy.md");
-        // For testing, use a specification folder and external folder that do not affect these links.
-        let specification_folder = &PathBuf::from("DesignSpecifications");
-        let external_folders: Vec<PathBuf> = vec![PathBuf::from("external")];
+    graph TD;
+        click A &quot;https://github.com/user/repo/blob/main/specs/Reqs.md#id1&quot;;
+        click B &quot;https://github.com/user/repo/blob/main/src/main.rs&quot;;
+    </code></pre>"#;
 
-        let processed = process_mermaid_diagrams(file_path, html_with_mermaid, specification_folder, &external_folders);
-        
-        // Check that original .md links are not present.
-        assert!(!processed.contains("../../path/to/file.md#section"));
-        assert!(!processed.contains("../another/file.md"));
-        
-        // Check that they're converted to .html.
-        assert!(processed.contains("../../path/to/file.html#section"));
-        assert!(processed.contains("../another/file.html"));
+        let file_path = PathBuf::from("specs/diagrams/example.md");
+
+        let processed = process_mermaid_diagrams(&file_path, html_with_mermaid);
+
+
+
+        //  .md is replaced with .html
+        assert!(processed.contains("../Reqs.html#id1"));
+        // .rs remains untouched
+        assert!(processed.contains("https://github.com/user/repo/blob/main/src/main.rs"));
+        // original .md link is gone
+        assert!(!processed.contains("Reqs.md#id1"));
     }
 }

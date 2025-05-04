@@ -5,16 +5,8 @@ Welcome to the **Reqvire** documentation! This folder contains all the informati
 ## Table of Contents
 
 - [About](./About.md)
-  - [Reqvire MBSE Methodology](./About.md#reqvire-mbse-methodology)
-  - [Reqvire Model](./About.md#reqvire-model)
-  - [Mapping to ISO/IEC/IEEE 15288](./About.md#mapping-to-isoiecieee-15288)
-  - [BlackBox Process](./BlackboxProccess.md)
-  - [MOEs](./MOEs.md)
-  - [UseCases](./Usecases.md)
-  - [User Stories](./UserStories.md)
   - [Requirements](./Requirements.md)
   - [Verifications](./Verifications.md)    
-  - [Architectures](./Architectures.md)  
 - Reqvire Tool Documentation  
   - [Specifications](../specifications/README.md)
   - [User Guide](./user_guide.md)

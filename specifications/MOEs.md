@@ -9,12 +9,12 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  bd8b46053261f1d0["MOE_UA"];
-  click bd8b46053261f1d0 "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/specifications/MOEs.md#moe_ua";
-  class bd8b46053261f1d0 requirement;
-  a7b946053261f1d0["MOE_CE"];
-  click a7b946053261f1d0 "https://github.com/ilijaljubicic/Reqvire/blob/8a68ca1eab81bac7964085e47777a0a92447c6a5/specifications/MOEs.md#moe_ce";
-  class a7b946053261f1d0 requirement;
+  ac59f565725d5e41["MOE_CE"];
+  click ac59f565725d5e41 "https://github.com/Reqvire/reqvire/blob/f18e52f9f88c64f67a79abc4e93eb74b3ec22615/specifications/MOEs.md#moe_ce";
+  class ac59f565725d5e41 requirement;
+  6c33f565725d5e41["MOE_UA"];
+  click 6c33f565725d5e41 "https://github.com/Reqvire/reqvire/blob/f18e52f9f88c64f67a79abc4e93eb74b3ec22615/specifications/MOEs.md#moe_ua";
+  class 6c33f565725d5e41 requirement;
 ```
 
 

@@ -71,7 +71,7 @@ flowchart LR
     manageModel -. provide .-> generateDiagrams
     manageModel -. provide .-> handleDiffs
 
-    aiAgents -. uses MCP to .-> manageModel    
+    aiAgents -. have access to .-> manageModel    
 
     aiAgents -. assist in development .-> developedSystem
     aiAgents -. commit code changes .-> gitRepository
@@ -131,17 +131,6 @@ The central component of the system, which facilitates various MBSE-related acti
   - Tracks elements such as verifications, that may require invalidation based on detected changes. 
   - This ensures that all affected components are flagged for review or updates.
 
-
-#### AI Agents
-- **AI Agents 🤖**: Provides intelligent assistance for model management and collaboration.
- - It is deeply embed into Reqvire methodology model and have a knowledge required for deep assistance.
-- Suggestions: Offers AI-generated recommendations or improvements.
-- Review Suggestions: Enables human review and approval of AI-generated suggestions.
- - With human in the loop workflow.
-- Apply Approved Suggestions: Commits approved changes to the model.
-- Can be any AI tools/agentic system capable using MCP
-
-
 ### System of Interest (SOI)
 
 The **System of Interest (SOI)** refers to the system which is under development.
@@ -177,7 +166,7 @@ These features allow teams to seamlessly integrate MBSE practices into their dev
 
 Humans interact with Reqvire tools to manage, refine, and validate MBSE models, as well as to collaborate effectively within development workflows:
 - Via CLI: Users leverage Reqvire’s CLI to perform tasks such as managing models, generating diagrams, analyzing relationships, and validating structures.
-- Via AI Agents: Users interact with AI agents through MCP server to receive intelligent suggestions, review potential improvements, and approve changes, ensuring a human-in-the-loop approach.
+- Via AI Agents: Users interact with AI agents to receive intelligent suggestions, review potential improvements, and approve changes, ensuring a human-in-the-loop approach.
 - Collaboration: Users integrate Reqvire into agile workflows by collaborating through GitHub or similar platforms to manage repositories, track changes, and maintain traceability.
 
 

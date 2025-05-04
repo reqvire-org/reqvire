@@ -1,8 +1,8 @@
-# Reqvire
+# reqvire
 
-**Reqvire** is a lightweight, Git-native tool for system modeling, **requirements management**, and agile project specifications, designed to support real-world development with automation, **AI assistance**, and full **traceability**.
+**reqvire** is a lightweight, Git-native tool for system modeling, **requirements management**, and agile project specifications, designed to support real-world development with automation, **AI assistance**, and full **traceability**.
 
-By using **semi-structured makrdown** documents, Reqvire bridges the gap between formal modeling and agile documentation—enabling AI-assisted **requirements management**, **project specification**, **architecture design**, and even **code generation**, all without the overhead of traditional modeling environments.
+By using **semi-structured makrdown** documents, reqvire bridges the gap between formal modeling and agile documentation—enabling AI-assisted **requirements management**, **project specification**, **architecture design**, and even **code generation**, all without the overhead of traditional modeling environments.
 
 
 ---
@@ -11,7 +11,7 @@ By using **semi-structured makrdown** documents, Reqvire bridges the gap between
 
 ---
 
-## Why Reqvire?
+## Why reqvire?
 
 - **Git-Native Workflow** – Requirements, specifications, and traceability artifacts live alongside code with full version control and collaboration via Git.
 - **Agile & Human-Friendly** – Uses Markdown-based, semi-structured documents that are both readable and AI friendly.
@@ -33,12 +33,13 @@ By using **semi-structured makrdown** documents, Reqvire bridges the gap between
 
 ## Get Started
 
-For detailed information about **how to use Reqvire** visit the [documentation](./doc/README.md).
+For detailed information about **how to use reqvire** visit the [documentation](./doc/README.md).
 
+To understand the use case of **reqvire**, see the [use case diagram](./specifications/Usecases.md).
 
 ### Installation
 
-To set up Reqvire, follow these steps:
+To set up reqvire, follow these steps:
 
 #### Run install script (Linux and macOS)
 
@@ -61,7 +62,7 @@ curl -fsSL https://raw.githubusercontent.com/Reqvire/reqvire/main/scripts/instal
      cargo --version
      ```
 
-2. **Clone the Reqvire Repository**
+2. **Clone the reqvire Repository**
    ```bash
    git clone https://github.com/Reqvire/reqvire.git
    cd reqvire
@@ -141,7 +142,7 @@ Create `output` directory.
     
 ## Contributing
 
-We welcome contributions to **Reqvire**! Whether you're improving the tooling, refining specifications, enhancing test cases, or shaping modeling conventions, your input is highly valued.
+We welcome contributions to **reqvire**! Whether you're improving the tooling, refining specifications, enhancing test cases, or shaping modeling conventions, your input is highly valued.
 
 To maintain **consistency**, **traceability**, and **quality** in **reqvire**, we follow a strict **contribution discipline** that ensures the system model, tests, and verifications evolve alongside the code.
 
@@ -172,7 +173,7 @@ To maintain **consistency**, **traceability**, and **quality** in **reqvire**, w
      - Verifications ensure that **requirements** are linked to **tests**, and all features are properly validated.
 
 5. **Test Your Changes**:
-   - Run **Reqvire validation** locally to ensure your requirements and verifications are consistent:
+   - Run **reqvire validation** locally to ensure your requirements and verifications are consistent:
      ```bash
      reqvire --validate
      ```
@@ -198,10 +199,10 @@ For more details, refer to the [Contributing Guide](./doc/CONTRIBUTING.md).
 ### Special Thanks:
 
 - [Juanjo Andres](https://github.com/juanjoandres)  
-  For valuable contributions to testing and in in shaping Reqvire's direction, especially in the early phases of Reqvire's development.
+  For valuable contributions to testing and in in shaping reqvire's direction, especially in the early phases of reqvire's development.
 
 - [GrapheneDB](https://www.graphenedb.com/)  
-  For **partial sponsorship** and for being the **first user** of Reqvire. Their support helped shape the tool's early direction.
+  For **partial sponsorship** and for being the **first user** of reqvire. Their support helped shape the tool's early direction.
 
 ## License
 

@@ -2,7 +2,6 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use crate::html;
 use crate::error::ReqvireError;
-use crate::utils;
 
 
 /// Exports all markdown files to HTML without any processing or filtering
@@ -11,22 +10,40 @@ pub fn export_markdown_to_html(
     external_folders: &[PathBuf],
     output_folder: &Path,
 ) -> Result<usize, ReqvireError> {
-
-    // Clean the output folder: if it exists, remove it, then re-create it.
+    // Clean output folder
     if output_folder.exists() {
         fs::remove_dir_all(output_folder)?;
     }
     fs::create_dir_all(output_folder)?;
 
-
     let mut processed_count = 0;
 
-    // Process the main specification folder
-    processed_count += process_markdown_folder(specification_folder, specification_folder,external_folders, output_folder)?;
+    // 1. Process the main specification folder
+    if let Some(spec_name) = specification_folder.file_name() {
+        let spec_output = output_folder.join(spec_name);
+        processed_count += process_markdown_folder(
+            specification_folder,
+            specification_folder,
+            external_folders,
+            &spec_output,
+        )?;
+    } else {
+        return Err(ReqvireError::PathError("Invalid specification folder name".to_string()));
+    }
 
-    // Process each external folder
+    // 2. Process external folders
     for folder in external_folders {
-        processed_count += process_markdown_folder(folder, specification_folder,external_folders, output_folder)?;
+        if let Some(ext_name) = folder.file_name() {
+            let ext_output = output_folder.join(ext_name);
+            processed_count += process_markdown_folder(
+                folder,
+                specification_folder,
+                external_folders,
+                &ext_output,
+            )?;
+        } else {
+            return Err(ReqvireError::PathError("Invalid external folder name".to_string()));
+        }
     }
 
     println!("✅ Total Markdown files exported: {}", processed_count);
@@ -65,71 +82,66 @@ fn process_markdown_folder(
 fn export_file_to_html(
     file_path: &Path,
     specification_folder: &PathBuf,
-    external_folders: &[PathBuf],    
+    external_folders: &[PathBuf],
     output_folder: &Path,
 ) -> Result<(), ReqvireError> {
-    // Read the markdown content
     let content = fs::read_to_string(file_path)?;
-
-    // Get the file name for the titleconvert_to_html
-    let file_name = file_path.file_name()
+    let file_name = file_path
+        .file_name()
         .ok_or_else(|| ReqvireError::PathError("Invalid file path".to_string()))?
         .to_string_lossy();
-    
     let title = file_name.replace(".md", "");
 
-    // Convert Markdown to HTML
-    let html_content = html::convert_to_html(&file_path.to_path_buf(), &content, &title, specification_folder, external_folders)?;
+    let html_content = html::convert_to_html(
+        &file_path.to_path_buf(),
+        &content,
+        &title,
+        specification_folder,
+        external_folders,
+    )?;
 
-    // Determine the relative path
-    let file=file_path.to_string_lossy().to_owned();
-    
-    let relative_path = utils::to_relative_identifier(&file, specification_folder,specification_folder,external_folders)?;
-
-    let mut html_path = output_folder.join(&relative_path);
-
-    //  Determine if the file is in `specification_folder`
-    if file_path.starts_with(specification_folder) {
-        if let Ok(relative) = file_path.strip_prefix(specification_folder) {
-            html_path = output_folder.join(relative);
+    // Determine where to place the output
+    let mut html_path: PathBuf = {
+        // Try specification folder
+        if let Ok(rel_path) = file_path.strip_prefix(specification_folder) {
+            output_folder.join(rel_path)
         }
-    } else {
-        //  Handle external files: Compute the correct relative path
-        for external_folder in external_folders {
-            if file_path.starts_with(external_folder) {
-                if let Ok(relative) = file_path.strip_prefix(external_folder) {
-                    let external_folder_name = external_folder.file_name()
-                        .map(|name| name.to_string_lossy().to_string())
-                        .unwrap_or("external".to_string()); // Default fallback
-
-                    html_path = output_folder.join(external_folder_name).join(relative);
-                    break;
-                }
+        // Try external folders
+        else if let Some((external_folder_name, rel_path)) = external_folders.iter().find_map(|folder| {
+            if let Ok(rel) = file_path.strip_prefix(folder) {
+                folder.file_name().map(|n| (n.to_string_lossy().to_string(), rel.to_path_buf()))
+            } else {
+                None
             }
+        }) {
+            output_folder.join(external_folder_name).join(rel_path)
         }
-    }
-    
-    // Special Case: Rename `README.md` to `index.html`
+        // Fallback — flat export with just filename
+        else {
+            output_folder.join(file_name.to_string())
+        }
+    };
+
+    // Special handling: README.md
     if file_name == "README.md" {
         if file_path.parent() == Some(specification_folder) {
-            html_path.set_file_name("index.html"); // Root README.md → index.html
+            html_path.set_file_name("index.html");
         } else {
-            html_path.set_file_name("README.html"); // Subfolder README.md → README.html
+            html_path.set_file_name("README.html");
         }
     } else {
         html_path.set_extension("html");
     }
 
-    // Ensure the parent directory exists
     if let Some(parent) = html_path.parent() {
         fs::create_dir_all(parent)?;
     }
 
-    // Write the converted HTML file
     fs::write(&html_path, html_content)?;
-
     println!("✅ Exported: {} -> {}", file_path.display(), html_path.display());
 
     Ok(())
 }
+
+
 
