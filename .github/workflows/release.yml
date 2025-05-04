@@ -12,10 +12,10 @@ jobs:
   build:
     name: Build Rust Binaries on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
-
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, macos-13] 
+        os: [ubuntu-latest, macos-latest, macos-13]
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -29,80 +29,67 @@ jobs:
       - name: Run Tests
         run: cargo test --verbose
 
-      - name: Build Binary
+      - name: Build & Package
+        shell: bash
         run: |
+          # build release for this platform
           if [[ "$RUNNER_OS" == "macOS" ]]; then
             if [[ "$(uname -m)" == "arm64" ]]; then
-              cargo build --release --target=aarch64-apple-darwin
+              cargo build --release --target aarch64-apple-darwin
+              BIN=target/aarch64-apple-darwin/release/reqvire
+              OUT=artifacts/reqvire-darwin-arm64
             else
-              cargo build --release --target=x86_64-apple-darwin
+              cargo build --release --target x86_64-apple-darwin
+              BIN=target/x86_64-apple-darwin/release/reqvire
+              OUT=artifacts/reqvire-darwin-x86_64
             fi
           elif [[ "$RUNNER_OS" == "Linux" ]]; then
             rustup target add x86_64-unknown-linux-musl
-            cargo build --release --target=x86_64-unknown-linux-musl
+            cargo build --release --target x86_64-unknown-linux-musl
+            BIN=target/x86_64-unknown-linux-musl/release/reqvire
+            OUT=artifacts/reqvire-linux-x86_64
           else
-            echo "Unsupported platform"
+            echo "Unsupported OS: $RUNNER_OS"
             exit 1
           fi
-    
-      - name: Rename Binary for OS
-        shell: bash
-        run: |
+
           mkdir -p artifacts
-          if [[ "$RUNNER_OS" == "Linux" ]]; then
-            mv target/x86_64-unknown-linux-musl/release/reqvire artifacts/reqvire-linux-x86_64
-          elif [[ "$RUNNER_OS" == "macOS" ]]; then
-            if [[ "$(uname -m)" == "arm64" ]]; then
-              mv target/aarch64-apple-darwin/release/reqvire artifacts/reqvire-darwin-arm64
-            else
-              mv target/x86_64-apple-darwin/release/reqvire artifacts/reqvire-darwin-x86_64
-            fi
-          elif [[ "$RUNNER_OS" == "Windows" ]]; then
-            mv target/release/reqvire.exe artifacts/reqvire-windows.exe
+          # put the binary at a known name…
+          cp "$BIN" "$OUT"
+          # …then archive it
+          if [[ "$OUT" == *.exe ]]; then
+            zip "${OUT%.exe}.zip" "$OUT"
+          else
+            tar -czf "${OUT}.tar.gz" "$OUT"
           fi
 
-      - name: Debug List Built Binaries
-        run: ls -R artifacts  # Verify that files exist before upload
-
-      - name: Package Binaries
-        shell: bash
-        run: |
-          cd artifacts
-          for file in *; do
-            if [[ "$file" == *.exe ]]; then
-              zip "${file%.exe}.zip" "$file"
-            else
-              tar -czf "$file.tar.gz" "$file"
-            fi
-          done
-    
-      - name: Upload Built Binaries as Artifacts
+      - name: Upload Archives
         uses: actions/upload-artifact@v4
         with:
+          name: binaries-${{ matrix.os }}
           path: |
             artifacts/*.zip
-            artifacts/*.tar.gz       
-      
-  release:
-    name: Create GitHub Release and Upload Binaries
-    needs: build  # Runs after all builds finish
+            artifacts/*.tar.gz
+ 
+   release:
+    name: Create GitHub Release
+    needs: build
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-
-      - name: Download All Built Binaries
+      - name: Download All Archives
         uses: actions/download-artifact@v4
         with:
-          name: binaries
+          # <- no name: so it pulls down every `binaries-*` artifact
           path: artifacts
-    
-      - name: Debug List Downloaded Binaries
-        run: ls -R artifacts  # Debugging step to verify files exist
 
-      - name: Create GitHub Release and Upload Binaries
+      - name: List what we got
+        run: ls -R artifacts
+
+      - name: Create GitHub Release and Attach Archives
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ github.ref_name }}
@@ -110,7 +97,11 @@ jobs:
           body: "Automated release of ${{ github.ref_name }}"
           draft: false
           prerelease: false
-          files: artifacts/*  # Match all OS binaries
+          # only the archives get pushed
+          files: |
+            artifacts/*.zip
+            artifacts/*.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 
