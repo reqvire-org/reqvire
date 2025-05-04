@@ -1,16 +1,16 @@
-name: Rust Release
+name: Reqvire Release
 
 on:
   push:
     tags:
-      - "v*"  # Runs when pushing a tag like v0.1.0
+      - "v*"  # e.g. v0.1.0
 
 permissions:
-  contents: write  # Required to create releases
+  contents: write  # needed to push a Release
 
 jobs:
   build:
-    name: Build Rust Binaries on ${{ matrix.os }}
+    name: Build & Package on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -24,44 +24,55 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Cache Cargo dependencies
-        uses: Swatinem/rust-cache@v2                
+        uses: Swatinem/rust-cache@v2
 
       - name: Run Tests
         run: cargo test --verbose
 
-      - name: Build & Package
-        shell: bash
+      - name: Build Binary
         run: |
-          # build release for this platform
           if [[ "$RUNNER_OS" == "macOS" ]]; then
             if [[ "$(uname -m)" == "arm64" ]]; then
               cargo build --release --target aarch64-apple-darwin
-              BIN=target/aarch64-apple-darwin/release/reqvire
-              OUT=artifacts/reqvire-darwin-arm64
             else
               cargo build --release --target x86_64-apple-darwin
-              BIN=target/x86_64-apple-darwin/release/reqvire
-              OUT=artifacts/reqvire-darwin-x86_64
             fi
           elif [[ "$RUNNER_OS" == "Linux" ]]; then
             rustup target add x86_64-unknown-linux-musl
             cargo build --release --target x86_64-unknown-linux-musl
-            BIN=target/x86_64-unknown-linux-musl/release/reqvire
-            OUT=artifacts/reqvire-linux-x86_64
           else
-            echo "Unsupported OS: $RUNNER_OS"
+            echo "Unsupported platform: $RUNNER_OS"
             exit 1
           fi
 
+      - name: Rename Binary for OS
+        shell: bash
+        run: |
           mkdir -p artifacts
-          # put the binary at a known name…
-          cp "$BIN" "$OUT"
-          # …then archive it
-          if [[ "$OUT" == *.exe ]]; then
-            zip "${OUT%.exe}.zip" "$OUT"
-          else
-            tar -czf "${OUT}.tar.gz" "$OUT"
+          if [[ "$RUNNER_OS" == "Linux" ]]; then
+            mv target/x86_64-unknown-linux-musl/release/reqvire artifacts/reqvire-linux-x86_64
+          elif [[ "$RUNNER_OS" == "macOS" ]]; then
+            if [[ "$(uname -m)" == "arm64" ]]; then
+              mv target/aarch64-apple-darwin/release/reqvire artifacts/reqvire-darwin-arm64
+            else
+              mv target/x86_64-apple-darwin/release/reqvire artifacts/reqvire-darwin-x86_64
+            fi
           fi
+
+      - name: Debug List Built Binaries
+        run: ls -R artifacts
+
+      - name: Package Archives
+        shell: bash
+        run: |
+          cd artifacts
+          for file in *; do
+            if [[ "$file" == *.exe ]]; then
+              zip "${file%.exe}.zip" "$file"
+            else
+              tar -czf "${file}.tar.gz" "$file"
+            fi
+          done
 
       - name: Upload Archives
         uses: actions/upload-artifact@v4
@@ -70,9 +81,9 @@ jobs:
           path: |
             artifacts/*.zip
             artifacts/*.tar.gz
- 
-   release:
-    name: Create GitHub Release
+
+  release:
+    name: Create Release & Attach Archives
     needs: build
     runs-on: ubuntu-latest
 
@@ -83,13 +94,14 @@ jobs:
       - name: Download All Archives
         uses: actions/download-artifact@v4
         with:
-          # <- no name: so it pulls down every `binaries-*` artifact
+          pattern: binaries-*         # fetch every per-OS artifact
+          merge-multiple: true        # put them all into one folder :contentReference[oaicite:1]{index=1}
           path: artifacts
 
-      - name: List what we got
+      - name: Debug List Downloaded Archives
         run: ls -R artifacts
 
-      - name: Create GitHub Release and Attach Archives
+      - name: Create GitHub Release and Upload Archives
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ github.ref_name }}
@@ -97,11 +109,9 @@ jobs:
           body: "Automated release of ${{ github.ref_name }}"
           draft: false
           prerelease: false
-          # only the archives get pushed
           files: |
             artifacts/*.zip
             artifacts/*.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
 
