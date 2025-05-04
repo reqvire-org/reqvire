@@ -1,18 +1,6 @@
-# Reqvire for LLM Context
+# Reqvire
 
-This document provides essential context for Large Language Models (LLMs) to understand and work effectively with Reqvire-based specifications and requirements management.
-
-## What is Reqvire?
-
-Reqvire is a methodology and toolset for Model-Based Systems Engineering (MBSE) that uses Markdown as the primary format for requirements documentation and traceability. It enables:
-
-- Requirements management in human-readable Markdown
-- Relationship tracing between requirements and other artifacts
-- Automated validation of document structure and relationships
-- Diagram generation from requirements
-- Change impact analysis and propagation
-- HTML generation with navigable links
-- Traceability matrix generation
+**Reqvire** is a tool and structured Markdown format for modeling system of interest requirements, architecture, and traceability.
 
 ## Core Concepts
 
@@ -120,68 +108,30 @@ Additional details about Requirement Two implementation.
 
 ## Reqvire CLI Operations
 
-The Reqvire CLI tool provides various operations:
+The Reqvire CLI tool provides various operations including:
+- `--lint` : Enable linting to find potential improvements (non-blocking) By default, fixes will be applied automatically.
+- `--dry-run`: When linting, only show suggestions without applying fixes.
+- `--traces`: Generate traceability information without processing other files Creates matrices and reports showing relationships between elements in the model.
+- `--validate`: Validate model.
+- `--json`: Output validation results in JSON format Useful for CI/CD pipelines and automation.
+- `--generate-diagrams`: Generate mermaid diagrams in markdown files showing requirements relationships. The diagrams will be placed at the top of each requirements document.
+- `--model-summary`:  Output model registry and summary, also supports json output.
+- `--change-impact`:  Change Impact Analysis Report.
+- `--git-commit`: Git commit hash to use when comparing models for the change impact report (default: HEAD).
 
-- **Validation**: Check structure and relationships for errors
-  - `cargo run -- validate`
-  - `cargo run -- --validate_markdown` (structure only)
-  - `cargo run -- --validate_relations` (relations only)
-  - `cargo run -- --validate_all` (comprehensive validation)
-
-- **Linting**: Automatically fix formatting issues
-  - `cargo run -- --lint` (apply fixes)
-  - `cargo run -- --lint --dry-run` (suggest fixes without applying)
-
-- **HTML Generation**: Convert markdown to browsable HTML with linkable elements
-  - `cargo run --  --html`
-
-- **Matrix Generation**: Create traceability matrices
-  - `cargo run --  --traces`
-
-- **Diagram Generation**: Create Mermaid diagrams from requirements
-  - `cargo run -- --generate_diagrams`
-
-- **JSON Output**: Machine-readable validation results
-  - `cargo run -- --validate_all --json`
-
-## Configuration Options
-
-Reqvire supports configuration via YAML files:
-
-```yaml
-general:
-  html_output: true
-  verbose: false
-  
-paths:
-  specifications_folder: "specifications"
-  system_requirements_folder: "SystemRequirements"
-  design_specifications_folder: "DesignSpecifications"
-  
-validation:
-  validate_markdown: true
-  validate_relations: true
-  validate_cross_components: true
-```
 
 ## Change Impact Analysis
 
 Reqvire analyzes how changes propagate through the requirement hierarchy:
 
-- **Upward Propagation**: Changes flow up to parent/dependent elements
-  - Affected by: derivedFrom, containedBy relations
-  
 - **Downward Propagation**: Changes flow down to child/derived elements
-  - Affected by: derive, contain relations
-  
-- **Bidirectional Impact**: Changes affect both directions
-  - Affected by: refine relations
+  - Affected by: refine, derive, contain relations
   
 - **Implementation Impact**: Changes require implementation updates
-  - Affected by: satisfiedBy relations
+  - Affected by: satisfied relations
   
 - **Verification Impact**: Changes require revalidation
-  - Affected by: verifiedBy relations
+  - Affected by: verified relations
 
 ## Diagrams and Visualization
 

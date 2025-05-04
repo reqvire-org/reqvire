@@ -27,6 +27,5 @@ Reqvire categorizes verification into two primary levels:
 - **Subsystem/Component-level Verification**:  
   Verifies that individual **system requirements** and **subsystems** meet their specifications. This includes unit tests, component-level analysis, and hardware/software integration tests.
 
-Both levels ensure **progressive verification** throughout the system development lifecycle.
 
 

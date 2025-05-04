@@ -1,16 +1,9 @@
 # Reqvire
 
-**Reqvire** is a **tool for system modeling and project specifications**, designed to be a practical, lightweight implementation of the **Reqvire methodology**—a modern approach to agile systems engineering that embraces AI, automation, and Git-native workflows.
+**Reqvire** is a lightweight, Git-native tool for system modeling, **requirements management**, and agile project specifications, designed to support real-world development with automation, **AI assistance**, and full **traceability**.
 
-This tool focuses on managing **requirements, specifications, and traceability** in a way that supports real-world agile development, while laying the foundation for a broader **AI-powered Model-Based Systems Engineering (MBSE) framework**. With Reqvire, **agile workflows, AI assistance, and automation** become integral to designing, analyzing, and evolving system architectures.
+By using **semi-structured makrdown** documents, Reqvire bridges the gap between formal modeling and agile documentation—enabling AI-assisted **requirements management**, **project specification**, **architecture design**, and even **code generation**, all without the overhead of traditional modeling environments.
 
-Unlike traditional MBSE tools, Reqvire is:
-
-- **Lightweight**
-- **Text-based and Git-native**
-- **Inspired by MBSE and SysML**, without the heavyweight complexity
-
-By using **semi-structured modeling conventions**, Reqvire bridges the gap between **formal modeling** and **agile documentation**, enabling powerful automation and AI-driven workflows—without imposing the overhead of traditional modeling environments.
 
 ---
 <sub>Figure 1: Example Diagram (click image to browse requirements)</sub>
@@ -20,17 +13,15 @@ By using **semi-structured modeling conventions**, Reqvire bridges the gap betwe
 
 ## Why Reqvire?
 
-- **Git-Native** – Embeds directly into Git workflows, ensuring requirements evolve alongside code with full traceability and version control.  
-- **Agile & Lightweight** – Uses Markdown-based artifacts for a balance of human readability and machine processability, making collaboration seamless.  
-- **Automation-Ready** – Supports traceability, impact analysis, validation, and diagram generation, reducing manual effort while improving consistency.  
-- **Extensible & Integrable** – Works with GitHub, GitLab, CI/CD pipelines, and AI-driven development tools, enabling automation and continuous refinement.  
-- **MBSE-Inspired, Not MBSE-Exclusive** – Draws from Model-Based Systems Engineering (MBSE) and SysML but is tailored for modern, software-driven teams, avoiding unnecessary complexity.  
-- **Traceability & Impact Awareness** – Links every requirement, specification, and decision to ensure full versioning and impact analysis.  
-- **Seamless Development Integration** – Connects requirements to issues, pull requests, and test cases, ensuring real-world alignment.  
-- **Automated Documentation & Visualization** – Generates diagrams, traceability matrices, and structured reports for enhanced visibility.  
-- **Diagram Generation & Relationship Mapping** – Supports structured linking and MermaidJS to visualize dependencies and improve clarity.  
-- **AI-enabled Development & Collaboration** – Enhancing teamwork through AI-enabled requirement authoring, architecture analysis, code generation, validation, and impact analysis.
-
+- **Git-Native Workflow** – Requirements, specifications, and traceability artifacts live alongside code with full version control and collaboration via Git.
+- **Agile & Human-Friendly** – Uses Markdown-based, semi-structured documents that are both readable and AI friendly.
+- **Automation-Ready** – Supports traceability, impact analysis, validation, and documentation generation to reduce manual effort and enforce consistency.
+- **Flexible Integration** – Seamlessly connects with GitHub, GitLab, CI/CD pipelines, and AI-driven tools to support continuous delivery and refinement.
+- **MBSE-Inspired, Agile-Optimized** – Combines the rigor of Model-Based Systems Engineering with the speed and simplicity demanded by modern software teams.
+- **Traceability & Impact Awareness** – Every change, decision, and dependency is trackable—enabling confident change management and system evolution.
+- **Built for Developer Workflows** – Links directly to issues, pull requests, and test cases, keeping specifications aligned with real development activity.
+- **Visual Modeling & Reporting** – Automatically generates diagrams, traceability matrices, and structured reports using tools like MermaidJS.
+- **AI-Augmented Engineering** – Assists with requirement authoring, architecture analysis, validation, and code generation to boost both quality and velocity.
 
 ---
 
@@ -56,12 +47,12 @@ Run the following command in your terminal:
 curl -fsSL https://raw.githubusercontent.com/Reqvire/reqvire/main/scripts/install.sh | bash
 ```
 
-#### From Source (Linux and macOS Apple Silicon)
+#### From Source (Linux and macOS)
 
 1. **Install Rust and Cargo**
    - Install Rust using rustup:
      ```bash
-     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+     curl -sSf https://sh.rustup.rs | sh
      ```
    - Follow the on-screen prompts to complete the installation
    - Verify the installation:
@@ -72,11 +63,11 @@ curl -fsSL https://raw.githubusercontent.com/Reqvire/reqvire/main/scripts/instal
 
 2. **Clone the Reqvire Repository**
    ```bash
-   git clone https://github.com/reqvire/reqvire.git
+   git clone https://github.com/Reqvire/reqvire.git
    cd reqvire
    ```
 
-3. **Build Reqvire**
+3. **Build reqvire**
    ```bash
    cargo build --release
    ```
@@ -93,7 +84,8 @@ curl -fsSL https://raw.githubusercontent.com/Reqvire/reqvire/main/scripts/instal
    - Visit the [Releases page](https://github.com/Reqvire/reqvire/releases) on GitHub
    - Download the appropriate binary for your platform:
      - Linux: `reqvire-linux-x86_64.tar.gz`
-     - macOS: `reqvire-macos-arm64.tar.gz` 
+     - macOS (Apple Silicon): `reqvire-darwin-arm64.tar.gz`
+     - macOS: `reqvire-darwin-x86_64.tar.gz`       
 
 2. **Extract the Binary**
    ```bash
@@ -101,10 +93,16 @@ curl -fsSL https://raw.githubusercontent.com/Reqvire/reqvire/main/scripts/instal
    ```
 
 3. **Move to a Directory in Your PATH**
+   For most Linux and Intel-based macOS systems:
    ```bash
    sudo mv reqvire /usr/local/bin/
-   ```
-
+   ````
+   
+    For Apple Silicon (M1/M2) macOS:
+    ```bash
+    sudo mv reqvire /opt/homebrew/bin/   
+    ```
+    
 4. **Verify the Installation**
    ```bash
    reqvire --version
@@ -112,7 +110,7 @@ curl -fsSL https://raw.githubusercontent.com/Reqvire/reqvire/main/scripts/instal
     
 ### Configuration
 
-Create `reqflow.yaml` in the root of the git repo with following minimal content:
+Create `reqvire.yaml` in the root of the git repo with following minimal content:
 ```
   # Path to the specifications folder
   specifications_folder: "specifications"
@@ -121,8 +119,8 @@ Create `reqflow.yaml` in the root of the git repo with following minimal content
   output_folder: "html"
   
   # Additional external folders that contain system requirements and other files
-  # These can be absolute paths or paths relative to the input folder
-  # All markdown files in these folders are considered requirements (except those matching exclusion patterns)
+  # Usually source folders relative to the repository root.
+  # All markdown files in these folders are considered sytsem requirements (except those matching exclusion patterns)
   external_folders:
     - tests
     - core
@@ -143,9 +141,9 @@ Create `output` directory.
     
 ## Contributing
 
-We welcome contributions to Reqvire! Whether it's improving the methodology, enhancing the tools, or refining the language, your input is valuable.
+We welcome contributions to **Reqvire**! Whether you're improving the tooling, refining specifications, enhancing test cases, or shaping modeling conventions, your input is highly valued.
 
-To maintain **consistency**, **traceability**, and **quality** in Reqvire, we follow a strict **contribution discipline** that ensures the system model, tests, and verifications evolve alongside the code.
+To maintain **consistency**, **traceability**, and **quality** in **reqvire**, we follow a strict **contribution discipline** that ensures the system model, tests, and verifications evolve alongside the code.
 
 ### Contribution Workflow
 
@@ -195,7 +193,7 @@ For more details, refer to the [Contributing Guide](./doc/CONTRIBUTING.md).
 
 ## Credits
 
-**Reqvire** is an open-source project created and maintained by [Ilija Ljubicic](https://github.com/ilijaljubicic). 
+**reqvire** is an open-source project created and maintained by [Ilija Ljubicic](https://github.com/ilijaljubicic). 
 
 ### Special Thanks:
 
@@ -207,5 +205,5 @@ For more details, refer to the [Contributing Guide](./doc/CONTRIBUTING.md).
 
 ## License
 
-Licensed under the [Apache2 License](LICENSE).
+Licensed under the [Apache 2.0 License](LICENSE).
 

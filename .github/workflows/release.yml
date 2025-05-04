@@ -64,12 +64,26 @@ jobs:
       - name: Debug List Built Binaries
         run: ls -R artifacts  # Verify that files exist before upload
 
+      - name: Package Binaries
+        shell: bash
+        run: |
+          cd artifacts
+          for file in *; do
+            if [[ "$file" == *.exe ]]; then
+              zip "${file%.exe}.zip" "$file"
+            else
+              tar -czf "$file.tar.gz" "$file"
+            fi
+          done
+    
       - name: Upload Built Binaries as Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: binaries-${{ matrix.os }}
-          path: artifacts/*
-
+          path: |
+            artifacts/*.zip
+            artifacts/*.tar.gz
+      
   release:
     name: Create GitHub Release and Upload Binaries
     needs: build  # Runs after all builds finish
@@ -79,12 +93,13 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+
       - name: Download All Built Binaries
         uses: actions/download-artifact@v4
         with:
-          pattern: binaries-*  # Match all OS binaries
+          name: binaries
           path: artifacts
-
+    
       - name: Debug List Downloaded Binaries
         run: ls -R artifacts  # Debugging step to verify files exist
 
@@ -96,7 +111,7 @@ jobs:
           body: "Automated release of ${{ github.ref_name }}"
           draft: false
           prerelease: false
-          files: artifacts/binaries-*/*  # Match all OS binaries
+          files: artifacts/*  # Match all OS binaries
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
