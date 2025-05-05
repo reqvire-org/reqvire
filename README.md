@@ -2,7 +2,7 @@
 
 **reqvire** is a lightweight, Git-native tool for system modeling, **requirements management**, and agile project specifications, designed to support real-world development with automation, **AI assistance**, and full **traceability**.
 
-By using **semi-structured makrdown** documents, reqvire bridges the gap between formal modeling and agile documentation—enabling AI-assisted **requirements management**, **project specification**, **architecture design**, and even **code generation**, all without the overhead of traditional modeling environments.
+By using **semi-structured markdown** documents, reqvire bridges the gap between formal modeling and agile docs, unlocking AI-assisted requirements, architecture design and even code generation in a single, version-controlled workflow.
 
 
 ---
