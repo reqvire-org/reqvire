@@ -116,6 +116,14 @@ The Reqvire CLI tool provides various operations including:
 - `--json`: Output validation results in JSON format Useful for CI/CD pipelines and automation.
 - `--generate-diagrams`: Generate mermaid diagrams in markdown files showing requirements relationships. The diagrams will be placed at the top of each requirements document.
 - `--model-summary`:  Output model registry and summary, also supports json output.
+  - By file path: ` --model-summary  --filter-file="src/**/*Reqs.md"`
+  - By name: ` --model-summary  --filter-name=".*safety.*"`
+  - By section: ` --model-summary  --filter-section="System*"`
+  - By type: ` --model-summary  --filter-type="system-requirement"` (exact match)
+  - By content: ` --model-summary  --filter-content="MUST"`
+  - Not verified: ` --model-summary  --filter-is-not-verified`
+  - Not satisfied: ` --model-summary  --filter-is-not-satisfied`
+  - Combined: ` --model-summary --filter-file="src/**/*Reqs.md" --filter-section="System*" --filter-is-not-verified`  
 - `--change-impact`:  Change Impact Analysis Report.
 - `--git-commit`: Git commit hash to use when comparing models for the change impact report (default: HEAD).
 
