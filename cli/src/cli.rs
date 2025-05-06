@@ -398,6 +398,13 @@ mod tests {
             generate_diagrams: false,
             generate_index: false,
             model_summary: false,
+            filter_file: None,
+            filter_section: None,
+            filter_type: None,
+            filter_name: None,             
+            filter_content: None,
+            filter_is_not_verified:false,
+            filter_is_not_satisfied:false,                    
             validate: false,
             config: None, // No custom config file for the test
             change_impact: false, // Add the missing field
