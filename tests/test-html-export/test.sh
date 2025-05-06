@@ -58,7 +58,7 @@ if [ $HTML_FILE_COUNT -lt $MD_FILE_COUNT ]; then
 fi
 
 # Check if README.md was converted to index.html
-if [ -f "${TEST_DIR}/specifications/README.md" ] && [ ! -f "${TEST_DIR}/output/index.html" ]; then
+if [ -f "${TEST_DIR}/specifications/README.md" ] && [ ! -f "${TEST_DIR}/output/specifications/index.html" ]; then
   echo "❌ FAILED: README.md was not converted to index.html"
   exit 1
 fi

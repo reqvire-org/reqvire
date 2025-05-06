@@ -1110,6 +1110,9 @@ graph LR;
 
 The system shall implement a summary report generator that  produces comprehensive summaries of model relationships, including key metrics, element counts by type and counts.
 
+#### Details
+
+The summary report must include 
 #### Relations
   * derivedFrom: [UserRequirements.md/Model Structure and Summaries](../UserRequirements.md#model-structure-and-summaries)
   * satisfiedBy: [model.rs](../../core/src/reports.rs)
@@ -1123,6 +1126,78 @@ The system shall provide a model summary report function, activated by the (--mo
 #### Relations
   * refine: [Model Summary Report Generator](#model-summary-report-generator)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)    
+
+---
+
+### Filter Elements by Name with Regex
+
+When the user invokes Reqvire with the `--model-summary` flag and supplies `--filter-name-regex <REGEX>`, the system shall include only those elements whose name matches the regular expression `<REGEX>` in the generated model summary report.
+
+#### Relations
+  * satisfiedBy: [../../core/src/reports.rs](../../core/src/reports.rs)
+  * satisfiedBy: [../../cli/src/cli.rs](../../cli/src/cli.rs)  
+  * derivedFrom: [Model Summary Report Generator](#model-summary-report-generator)
+  * containedBy: [CLI Summary Report Flag](#cli-summary-report-flag)  
+  * verifiedBy: [../Verifications/ReportsTests.md#model-summary-tests](../Verifications/ReportsTests.md#model-summary-tests)
+
+### Handle Invalid Name-Regex Patterns
+
+Where the user provides an invalid regular expression to `--filter-name-regex`,  
+the system shall return a `ReqvireError::InvalidRegex` error showing the faulty pattern and exit without producing a summary.
+
+#### Relations
+  * satisfiedBy: [../../core/src/reports.rs](../../core/src/reports.rs)
+  * satisfiedBy: [../../cli/src/cli.rs](../../cli/src/cli.rs)    
+  * derivedFrom: [Model Summary Report Generator](#model-summary-report-generator)
+  * containedBy: [CLI Summary Report Flag](#cli-summary-report-flag)  
+  * verifiedBy: [../Verifications/ReportsTests.md#model-summary-tests](../Verifications/ReportsTests.md#model-summary-tests)  
+
+### Compile Name-Regex Before Filtering
+
+The system shall parse and compile the regular expression supplied to `--filter-name-regex` before applying any filters to elements.
+
+#### Relations
+  * satisfiedBy: [../../core/src/reports.rs](../../core/src/reports.rs)
+  * satisfiedBy: [../../cli/src/cli.rs](../../cli/src/cli.rs)  
+  * derivedFrom: [Model Summary Report Generator](#model-summary-report-generator)
+  * containedBy: [CLI Summary Report Flag](#cli-summary-report-flag)  
+  * verifiedBy: [../Verifications/ReportsTests.md#model-summary-tests](../Verifications/ReportsTests.md#model-summary-tests)  
+
+### Apply Name-Regex Filter to Element Names
+
+The system shall test the compiled regex against each element’s `name` attribute and exclude any element whose name does not match.
+
+#### Relations
+  * satisfiedBy: [../../core/src/reports.rs](../../core/src/reports.rs)
+  * satisfiedBy: [../../cli/src/cli.rs](../../cli/src/cli.rs)
+  * derivedFrom: [Model Summary Report Generator](#model-summary-report-generator)
+  * containedBy: [CLI Summary Report Flag](#cli-summary-report-flag)  
+  * verifiedBy: [../Verifications/ReportsTests.md#model-summary-tests](../Verifications/ReportsTests.md#model-summary-tests)  
+  
+
+### Enforce Model-Summary Requirement for Name-Regex
+
+Where the user does not include `--model-summary`,  
+the system shall reject any use of `--filter-name-regex` and display a help message indicating that it requires `--model-summary`.
+
+#### Relations
+  * satisfiedBy: [../../core/src/reports.rs](../../core/src/reports.rs)
+  * satisfiedBy: [../../cli/src/cli.rs](../../cli/src/cli.rs) 
+  * derivedFrom: [Model Summary Report Generator](#model-summary-report-generator)
+  * containedBy: [CLI Summary Report Flag](#cli-summary-report-flag)  
+  * verifiedBy: [../Verifications/ReportsTests.md#model-summary-tests](../Verifications/ReportsTests.md#model-summary-tests)  
+
+### Display Name-Regex Option in Help
+
+When the user requests help (`--help` or `-h`),  
+the system shall list `--filter-name-regex <REGEX>` under the MODEL SUMMARY FILTERS heading, including its description and its dependency on `--model-summary`.
+
+#### Relations
+  * satisfiedBy: [../../core/src/reports.rs](../../core/src/reports.rs)
+  * satisfiedBy: [../../cli/src/cli.rs](../../cli/src/cli.rs) 
+  * derivedFrom: [Model Summary Report Generator](#model-summary-report-generator)
+  * containedBy: [CLI Summary Report Flag](#cli-summary-report-flag)  
+  * verifiedBy: [../Verifications/ReportsTests.md#model-summary-tests](../Verifications/ReportsTests.md#model-summary-tests)  
 
 ---
 

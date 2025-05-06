@@ -1,4 +1,4 @@
-use clap::{Parser, CommandFactory};
+use clap::{ArgGroup, Parser, CommandFactory};
 use std::path::PathBuf;
 use anyhow::Result;
 use log::{info};
@@ -11,9 +11,32 @@ use reqvire::reports;
 use reqvire::change_impact;
 use reqvire::git_commands;
 use reqvire::matrix_generator;
+use reqvire::reports::Filters;
+
 
 #[derive(Parser, Debug)]
-#[clap(author,version, about = "Reqvire MBSE model management tool", long_about = None)]
+#[clap(
+    author,
+    version, 
+    about = "Reqvire requirements & treacibility management tool", 
+    long_about = None,
+    name = "reqvire",
+    // Any of the filters requires --model-summary
+    group(
+        ArgGroup::new("filters")
+            .args(&[
+                "filter_file",
+                "filter_section",
+                "filter_type",
+                "filter_name",                
+                "filter_content",
+                "filter_is_not_verified",
+                "filter_is_not_satisfied",
+            ])
+            .requires("model_summary")
+            .multiple(true)            
+    )
+)]
 pub struct Args {
 
     /// Convert Markdown to HTML with embedded styles
@@ -53,7 +76,6 @@ pub struct Args {
     #[clap(long)]
     pub generate_diagrams: bool,
     
-            
     /// Generate index document with links and summaries to all documents
     #[clap(long)]
     pub generate_index: bool,
@@ -62,7 +84,71 @@ pub struct Args {
     #[clap(long)]
     pub model_summary: bool,
         
-      
+    /// Only include files whose path matches this glob pattern
+    /// e.g. `src/**/*Reqs.md`
+    #[clap(
+        long,
+        value_name = "GLOB",
+        requires = "model_summary",
+        help_heading = "MODEL SUMMARY FILTERS"
+    )]
+    pub filter_file: Option<String>,
+
+    /// Only include elements whose name matches this regular expression
+    #[clap(
+        long,
+        value_name = "REGEX",
+        requires = "model_summary",
+        help_heading = "MODEL SUMMARY FILTERS"
+    )]
+    pub filter_name: Option<String>,
+    
+    /// Only include sections whose name matches this glob pattern
+    /// e.g. `System requirement*`
+    #[clap(
+        long,
+        value_name = "GLOB",
+        requires = "model_summary",
+        help_heading = "MODEL SUMMARY FILTERS"
+    )]
+    pub filter_section: Option<String>,
+
+    /// Only include elements of the given type
+    /// e.g. `user-requirement`, `system-requirement`, `verification`, `file`, or other custom type
+    #[clap(
+        long,
+        value_name = "TYPE",
+        requires = "model_summary",
+        help_heading = "MODEL SUMMARY FILTERS"
+    )]
+    pub filter_type: Option<String>,
+
+    /// Only include elements whose content matches this regular expression
+    #[clap(
+        long,
+        value_name = "REGEX",
+        requires = "model_summary",
+        help_heading = "MODEL SUMMARY FILTERS"
+    )]
+    pub filter_content: Option<String>,
+
+    /// Only include requirements that have at least one “verifiedBy” relation
+    #[clap(
+        long,
+        requires = "model_summary",
+        help_heading = "MODEL SUMMARY FILTERS"
+    )]
+    pub filter_is_not_verified: bool,
+
+    /// Only include requirements that have at least one “satisfiedBy” relation
+    #[clap(
+        long,
+        requires = "model_summary",
+        help_heading = "MODEL SUMMARY FILTERS"
+    )]
+    pub filter_is_not_satisfied: bool,
+                
+                      
     /// Path to a custom configuration file (YAML format)
     /// If not provided, the system will look for reqvire.yml, reqvire.yaml, 
     /// .reqvire.yml, or .reqvire.yaml in the current directory
@@ -187,7 +273,19 @@ pub fn handle_command(
             return Ok(0);
             
         }else if args.model_summary {
-            reports::print_registry_summary(&model_manager.element_registry,args.json);
+            let filters = Filters::new(
+                args.filter_file.as_deref(),
+                args.filter_name.as_deref(),
+                args.filter_section.as_deref(),
+                args.filter_type.as_deref(),
+                args.filter_content.as_deref(),
+                args.filter_is_not_verified,
+                args.filter_is_not_satisfied,
+            ).map_err(|e| {
+                ReqvireError::ProcessError(format!("❌ Failed to construct filters: {}", e))
+            })?;
+            
+            reports::print_registry_summary(&model_manager.element_registry,args.json, &filters);
             return Ok(0);        
             
             

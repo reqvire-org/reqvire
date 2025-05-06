@@ -8,13 +8,13 @@ use crate::config::Config;
 
 fn main() {
     if std::env::var("RUST_LOG").is_err() {
-        std::env::set_var("RUST_LOG", "info");
+        std::env::set_var("RUST_LOG", "error");
     }
 
     let args = Args::parse_args();
     
     if args.json {
-        std::env::set_var("RUST_LOG", "critical");
+        std::env::set_var("RUST_LOG", "error");
     }
     
     env_logger::init();

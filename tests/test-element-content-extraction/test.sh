@@ -23,7 +23,7 @@ printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
 GOTTEN_CONTENT=$(awk '/# [^:]+:/' "${TEST_DIR}/test_results.log")
 GOTTEN_CONTENT=$(echo "$OUTPUT" | jq -r '
   [
-    .model_summary.files
+    .files
     | .. 
     | objects 
     | select(.content != null)

@@ -341,7 +341,15 @@ pub fn get_parent_relation_types() -> Vec<&'static str> {
 }
 
 
+/// Returns whether the relation is a verification-related type
+pub fn is_verification_relation(rtype: &RelationTypeInfo) -> bool {
+    matches!(rtype.name, "verifiedBy" | "verify")
+}
 
+/// Returns whether the relation is a satisfaction-related type
+pub fn is_satisfaction_relation(rtype: &RelationTypeInfo) -> bool {
+    matches!(rtype.name, "satisfiedBy" | "satisfy")
+}
 
 
 #[cfg(test)]
