@@ -11,28 +11,28 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  3c6410e3387503c0["AI Agent Context Verification"];
-  click 3c6410e3387503c0 "https://github.com/Reqvire/reqvire/blob/b8c43d2689b933838bf1838d8a4cdf3393c9014f/specifications/Verifications/Misc.md#ai-agent-context-verification";
-  class 3c6410e3387503c0 verification;
-  7fd9156eac77c270["UserRequirements.md/AI Agent Context"];
-  class 7fd9156eac77c270 requirement;
-  click 7fd9156eac77c270 "https://github.com/Reqvire/reqvire/blob/b8c43d2689b933838bf1838d8a4cdf3393c9014f/specifications/UserRequirements.md#ai-agent-context";
-  3c6410e3387503c0 -.->|verifies| 7fd9156eac77c270;
-  6dc663bb31c3eb65["tests/test-ai-agent-context/test.sh"];
-  class 6dc663bb31c3eb65 default;
-  click 6dc663bb31c3eb65 "https://github.com/Reqvire/reqvire/blob/b8c43d2689b933838bf1838d8a4cdf3393c9014f/tests/test-ai-agent-context/test.sh";
-  3c6410e3387503c0 -.->|trace| 6dc663bb31c3eb65;
   ee855bb5e5d1f05b["HTML Export Verification"];
-  click ee855bb5e5d1f05b "https://github.com/Reqvire/reqvire/blob/b8c43d2689b933838bf1838d8a4cdf3393c9014f/specifications/Verifications/Misc.md#html-export-verification";
+  click ee855bb5e5d1f05b "https://github.com/Reqvire/reqvire/blob/92e82ef235559b4819fd85d700024b79b452d8e3/specifications/Verifications/Misc.md#html-export-verification";
   class ee855bb5e5d1f05b verification;
   d9686a154fe87b2["UserRequirements.md/Export HTML specifications"];
   class d9686a154fe87b2 requirement;
-  click d9686a154fe87b2 "https://github.com/Reqvire/reqvire/blob/b8c43d2689b933838bf1838d8a4cdf3393c9014f/specifications/UserRequirements.md#export-html-specifications";
+  click d9686a154fe87b2 "https://github.com/Reqvire/reqvire/blob/92e82ef235559b4819fd85d700024b79b452d8e3/specifications/UserRequirements.md#export-html-specifications";
   ee855bb5e5d1f05b -.->|verifies| d9686a154fe87b2;
   ca710f5a0e5dfc5d["tests/test-html-export/test.sh"];
   class ca710f5a0e5dfc5d default;
-  click ca710f5a0e5dfc5d "https://github.com/Reqvire/reqvire/blob/b8c43d2689b933838bf1838d8a4cdf3393c9014f/tests/test-html-export/test.sh";
+  click ca710f5a0e5dfc5d "https://github.com/Reqvire/reqvire/blob/92e82ef235559b4819fd85d700024b79b452d8e3/tests/test-html-export/test.sh";
   ee855bb5e5d1f05b -.->|trace| ca710f5a0e5dfc5d;
+  3c6410e3387503c0["AI Agent Context Verification"];
+  click 3c6410e3387503c0 "https://github.com/Reqvire/reqvire/blob/92e82ef235559b4819fd85d700024b79b452d8e3/specifications/Verifications/Misc.md#ai-agent-context-verification";
+  class 3c6410e3387503c0 verification;
+  7fd9156eac77c270["UserRequirements.md/AI Agent Context"];
+  class 7fd9156eac77c270 requirement;
+  click 7fd9156eac77c270 "https://github.com/Reqvire/reqvire/blob/92e82ef235559b4819fd85d700024b79b452d8e3/specifications/UserRequirements.md#ai-agent-context";
+  3c6410e3387503c0 -.->|verifies| 7fd9156eac77c270;
+  6dc663bb31c3eb65["tests/test-ai-agent-context/test.sh"];
+  class 6dc663bb31c3eb65 default;
+  click 6dc663bb31c3eb65 "https://github.com/Reqvire/reqvire/blob/92e82ef235559b4819fd85d700024b79b452d8e3/tests/test-ai-agent-context/test.sh";
+  3c6410e3387503c0 -.->|trace| 6dc663bb31c3eb65;
 ```
 
 ---
