@@ -219,13 +219,14 @@ fn build_summary(
                 }
 
                     
-                let vcount = elem.relations.iter()
-                    .filter(|r| relation::is_verification_relation(r.relation_type))
-                    .count();
-
-                let scount = elem.relations.iter()
-                    .filter(|r| relation::is_satisfaction_relation(r.relation_type))
-                    .count();
+                let (mut vcount, mut scount) = (0, 0);
+                for r in &elem.relations {
+                    if relation::is_verification_relation(r.relation_type) {
+                        vcount += 1;
+                    } else if relation::is_satisfaction_relation(r.relation_type) {
+                        scount += 1;
+                    }
+                }
                         
                 if vcount == 0 {
                     counters.requirements_not_verified += 1;
