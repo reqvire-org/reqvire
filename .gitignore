@@ -12,8 +12,6 @@ Cargo.lock
 *.iml
 .DS_Store
 
-# Generated output
-/html/
 *.bak
 
 CLAUDE.md

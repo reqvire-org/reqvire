@@ -74,6 +74,9 @@ pub enum ReqvireError {
     #[error("Invalid regex: {0}")]
     InvalidRegex(String),
     
+    #[error("Invalid glob pattern: {0}")]
+    InvalidGlob(String),
+        
     #[error("Initialization error: {0}")]
     InitializationError(String),
     
@@ -81,6 +84,8 @@ pub enum ReqvireError {
     LintError(String),  
     
     #[error("{0}")]    
-    ProcessError(String),      
+    ProcessError(String),  
+    
+
     
 }

@@ -65,10 +65,32 @@ pub enum ElementType {
 
 
 impl ElementType {
+    /// Returns the metadata key corresponding to this ElementType,
+    /// e.g. "user_requirement", "analysis-verification", or the
+    /// raw string for Other.
+    pub fn as_str(&self) -> &str {
+        match self {
+            ElementType::Requirement(req) => match req {
+                RequirementType::User   => "user-requirement",
+                RequirementType::System => "requirement",
+            },
+            ElementType::Verification(ver) => match ver {
+                VerificationType::Default          => "verification",            
+                VerificationType::Test          => "verification",
+                VerificationType::Analysis      => "analysis-verification",
+                VerificationType::Inspection    => "inspection-verification",
+                VerificationType::Demonstration => "demonstration-verification",
+            },
+            ElementType::File => "file",
+            ElementType::Other(s) => s.as_str(),
+        }
+    }
+
+    
     /// Parses a string into an ElementType
     pub fn from_metadata(value: &str) -> Self {
         match value.to_lowercase().as_str() {
-            "user_requirement" => ElementType::Requirement(RequirementType::User),
+            "user-requirement" => ElementType::Requirement(RequirementType::User),
             "requirement" => ElementType::Requirement(RequirementType::System),
             
             // Different verification types
