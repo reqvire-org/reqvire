@@ -11,24 +11,24 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  ecd5cbbaddffb824["Model Summary Tests"];
-  click ecd5cbbaddffb824 "https://github.com/Reqvire/reqvire/blob/92e82ef235559b4819fd85d700024b79b452d8e3/specifications/Verifications/ReportsTests.md#model-summary-tests";
-  class ecd5cbbaddffb824 verification;
-  ed42c8b28f021de0["tests/test-model-summary-reports/test.sh"];
-  class ed42c8b28f021de0 default;
-  click ed42c8b28f021de0 "https://github.com/Reqvire/reqvire/blob/92e82ef235559b4819fd85d700024b79b452d8e3/tests/test-model-summary-reports/test.sh";
-  ecd5cbbaddffb824 -.->|trace| ed42c8b28f021de0;
   62274e8cf8493254["Index Generation Test"];
-  click 62274e8cf8493254 "https://github.com/Reqvire/reqvire/blob/92e82ef235559b4819fd85d700024b79b452d8e3/specifications/Verifications/ReportsTests.md#index-generation-test";
+  click 62274e8cf8493254 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/Verifications/ReportsTests.md#index-generation-test";
   class 62274e8cf8493254 verification;
   3b4bfa0725509a0e["SystemRequirements/Requirements.md#index-generation"];
   class 3b4bfa0725509a0e requirement;
-  click 3b4bfa0725509a0e "https://github.com/Reqvire/reqvire/blob/92e82ef235559b4819fd85d700024b79b452d8e3/specifications/SystemRequirements/Requirements.md#index-generation";
+  click 3b4bfa0725509a0e "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/SystemRequirements/Requirements.md#index-generation";
   62274e8cf8493254 -.->|verifies| 3b4bfa0725509a0e;
   9c89c7cfe5f93c50["tests/test-index-generation/test.sh"];
   class 9c89c7cfe5f93c50 default;
-  click 9c89c7cfe5f93c50 "https://github.com/Reqvire/reqvire/blob/92e82ef235559b4819fd85d700024b79b452d8e3/tests/test-index-generation/test.sh";
-  62274e8cf8493254 -.->|trace| 9c89c7cfe5f93c50;
+  click 9c89c7cfe5f93c50 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/tests/test-index-generation/test.sh";
+  9c89c7cfe5f93c50 -->|satisfies| 62274e8cf8493254;
+  ecd5cbbaddffb824["Model Summary Tests"];
+  click ecd5cbbaddffb824 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/Verifications/ReportsTests.md#model-summary-tests";
+  class ecd5cbbaddffb824 verification;
+  ed42c8b28f021de0["tests/test-model-summary-reports/test.sh"];
+  class ed42c8b28f021de0 default;
+  click ed42c8b28f021de0 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/tests/test-model-summary-reports/test.sh";
+  ed42c8b28f021de0 -->|satisfies| ecd5cbbaddffb824;
 ```
 
 ---
@@ -54,16 +54,9 @@ This test verifies that the system correctly generates an index document with li
 - README.md contains links to all specification documents
 - README.md structure follows expected format
 
-##### Test Procedure
-1. Create test fixtures with multiple specification documents in various folders
-2. Run Reqvire with --generate-index flag
-3. Verify that README.md is created in the specifications folder
-4. Verify that README.md contains links to all specification documents
-5. Verify that document structure and summaries are included
-
 #### Relations
   * verify: [SystemRequirements/Requirements.md#index-generation](../SystemRequirements/Requirements.md#index-generation)
-  * trace: [tests/test-index-generation/test.sh](../../tests/test-index-generation/test.sh)
+  * satisfiedBy: [tests/test-index-generation/test.sh](../../tests/test-index-generation/test.sh)
 
 ---
 
@@ -135,6 +128,6 @@ This test verifies that the system provides a CLI flag and functionality for gen
    - stderr indicates `requires --model-summary`  
 
 #### Relations
-  * trace: [tests/test-model-summary-reports/test.sh](../../tests/test-model-summary-reports/test.sh)
+  * satisfiedBy: [tests/test-model-summary-reports/test.sh](../../tests/test-model-summary-reports/test.sh)
 
 ---

@@ -11,68 +11,68 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  fff74265828e19b3["Export Diagrams Verification"];
-  click fff74265828e19b3 "https://github.com/Reqvire/reqvire/blob/92e82ef235559b4819fd85d700024b79b452d8e3/specifications/Verifications/DiagramsTests.md#export-diagrams-verification";
-  class fff74265828e19b3 verification;
-  a0274ca0625d8493["UserRequirements.md/Export Diagrams in Standard Formats"];
-  class a0274ca0625d8493 requirement;
-  click a0274ca0625d8493 "https://github.com/Reqvire/reqvire/blob/92e82ef235559b4819fd85d700024b79b452d8e3/specifications/UserRequirements.md#export-diagrams-in-standard-formats";
-  fff74265828e19b3 -.->|verifies| a0274ca0625d8493;
-  b73eaac7c0353fcb["tests/test-diagram-generation/test.sh"];
-  class b73eaac7c0353fcb default;
-  click b73eaac7c0353fcb "https://github.com/Reqvire/reqvire/blob/92e82ef235559b4819fd85d700024b79b452d8e3/tests/test-diagram-generation/test.sh";
-  fff74265828e19b3 -.->|trace| b73eaac7c0353fcb;
-  44dc4128c7ea74d2["Automated Diagram Generation on PR Merge Verification"];
-  click 44dc4128c7ea74d2 "https://github.com/Reqvire/reqvire/blob/92e82ef235559b4819fd85d700024b79b452d8e3/specifications/Verifications/DiagramsTests.md#automated-diagram-generation-on-pr-merge-verification";
-  class 44dc4128c7ea74d2 verification;
-  793154acc336992c["SystemRequirements/Requirements.md/Automated Diagram Generation on PR Merge"];
-  class 793154acc336992c requirement;
-  click 793154acc336992c "https://github.com/Reqvire/reqvire/blob/92e82ef235559b4819fd85d700024b79b452d8e3/specifications/SystemRequirements/Requirements.md#automated-diagram-generation-on-pr-merge";
-  44dc4128c7ea74d2 -.->|verifies| 793154acc336992c;
-  fdd29f919065644d[".github/workflows/generate_diagrams.yml"];
-  class fdd29f919065644d default;
-  click fdd29f919065644d "https://github.com/Reqvire/reqvire/blob/92e82ef235559b4819fd85d700024b79b452d8e3/.github/workflows/generate_diagrams.yml";
-  44dc4128c7ea74d2 -.->|trace| fdd29f919065644d;
-  494a61d80d3cb287["Highlight Changes in Diagrams Verification"];
-  click 494a61d80d3cb287 "https://github.com/Reqvire/reqvire/blob/92e82ef235559b4819fd85d700024b79b452d8e3/specifications/Verifications/DiagramsTests.md#highlight-changes-in-diagrams-verification";
-  class 494a61d80d3cb287 verification;
-  ac914f743d73674e["UserRequirements.md/Highlight Changes in Diagrams"];
-  class ac914f743d73674e requirement;
-  click ac914f743d73674e "https://github.com/Reqvire/reqvire/blob/92e82ef235559b4819fd85d700024b79b452d8e3/specifications/UserRequirements.md#highlight-changes-in-diagrams";
-  494a61d80d3cb287 -.->|verifies| ac914f743d73674e;
-  494a61d80d3cb287 -.->|trace| b73eaac7c0353fcb;
-  2c4c9bdcf9ede0fd["Visualize Model Relationships Verification"];
-  click 2c4c9bdcf9ede0fd "https://github.com/Reqvire/reqvire/blob/92e82ef235559b4819fd85d700024b79b452d8e3/specifications/Verifications/DiagramsTests.md#visualize-model-relationships-verification";
-  class 2c4c9bdcf9ede0fd verification;
-  eed0b020b6ddeae1["UserRequirements.md/Visualize Model Relationships"];
-  class eed0b020b6ddeae1 requirement;
-  click eed0b020b6ddeae1 "https://github.com/Reqvire/reqvire/blob/92e82ef235559b4819fd85d700024b79b452d8e3/specifications/UserRequirements.md#visualize-model-relationships";
-  2c4c9bdcf9ede0fd -.->|verifies| eed0b020b6ddeae1;
-  2c4c9bdcf9ede0fd -.->|trace| b73eaac7c0353fcb;
   e4a47f6f403fd4ff["Diagram Generation Test"];
-  click e4a47f6f403fd4ff "https://github.com/Reqvire/reqvire/blob/92e82ef235559b4819fd85d700024b79b452d8e3/specifications/Verifications/DiagramsTests.md#diagram-generation-test";
+  click e4a47f6f403fd4ff "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/Verifications/DiagramsTests.md#diagram-generation-test";
   class e4a47f6f403fd4ff verification;
   c522cf4c404bdc24["UserRequirements.md/Automate Diagram Generation"];
   class c522cf4c404bdc24 requirement;
-  click c522cf4c404bdc24 "https://github.com/Reqvire/reqvire/blob/92e82ef235559b4819fd85d700024b79b452d8e3/specifications/UserRequirements.md#automate-diagram-generation";
+  click c522cf4c404bdc24 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserRequirements.md#automate-diagram-generation";
   e4a47f6f403fd4ff -.->|verifies| c522cf4c404bdc24;
-  e4a47f6f403fd4ff -.->|trace| b73eaac7c0353fcb;
+  b73eaac7c0353fcb["tests/test-diagram-generation/test.sh"];
+  class b73eaac7c0353fcb default;
+  click b73eaac7c0353fcb "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/tests/test-diagram-generation/test.sh";
+  b73eaac7c0353fcb -->|satisfies| e4a47f6f403fd4ff;
+  494a61d80d3cb287["Highlight Changes in Diagrams Verification"];
+  click 494a61d80d3cb287 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/Verifications/DiagramsTests.md#highlight-changes-in-diagrams-verification";
+  class 494a61d80d3cb287 verification;
+  ac914f743d73674e["UserRequirements.md/Highlight Changes in Diagrams"];
+  class ac914f743d73674e requirement;
+  click ac914f743d73674e "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserRequirements.md#highlight-changes-in-diagrams";
+  494a61d80d3cb287 -.->|verifies| ac914f743d73674e;
+  b73eaac7c0353fcb -->|satisfies| 494a61d80d3cb287;
+  44dc4128c7ea74d2["Automated Diagram Generation on PR Merge Verification"];
+  click 44dc4128c7ea74d2 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/Verifications/DiagramsTests.md#automated-diagram-generation-on-pr-merge-verification";
+  class 44dc4128c7ea74d2 verification;
+  793154acc336992c["SystemRequirements/Requirements.md/Automated Diagram Generation on PR Merge"];
+  class 793154acc336992c requirement;
+  click 793154acc336992c "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/SystemRequirements/Requirements.md#automated-diagram-generation-on-pr-merge";
+  44dc4128c7ea74d2 -.->|verifies| 793154acc336992c;
+  fdd29f919065644d[".github/workflows/generate_diagrams.yml"];
+  class fdd29f919065644d default;
+  click fdd29f919065644d "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/.github/workflows/generate_diagrams.yml";
+  fdd29f919065644d -->|satisfies| 44dc4128c7ea74d2;
   35f25ed1c49ab87a["Diagram Storage Verification"];
-  click 35f25ed1c49ab87a "https://github.com/Reqvire/reqvire/blob/92e82ef235559b4819fd85d700024b79b452d8e3/specifications/Verifications/DiagramsTests.md#diagram-storage-verification";
+  click 35f25ed1c49ab87a "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/Verifications/DiagramsTests.md#diagram-storage-verification";
   class 35f25ed1c49ab87a verification;
   89097c1311055b72["UserRequirements.md/Store Automated Diagrams in Designated Locations"];
   class 89097c1311055b72 requirement;
-  click 89097c1311055b72 "https://github.com/Reqvire/reqvire/blob/92e82ef235559b4819fd85d700024b79b452d8e3/specifications/UserRequirements.md#store-automated-diagrams-in-designated-locations";
+  click 89097c1311055b72 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserRequirements.md#store-automated-diagrams-in-designated-locations";
   35f25ed1c49ab87a -.->|verifies| 89097c1311055b72;
-  35f25ed1c49ab87a -.->|trace| b73eaac7c0353fcb;
+  b73eaac7c0353fcb -->|satisfies| 35f25ed1c49ab87a;
+  fff74265828e19b3["Export Diagrams Verification"];
+  click fff74265828e19b3 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/Verifications/DiagramsTests.md#export-diagrams-verification";
+  class fff74265828e19b3 verification;
+  a0274ca0625d8493["UserRequirements.md/Export Diagrams in Standard Formats"];
+  class a0274ca0625d8493 requirement;
+  click a0274ca0625d8493 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserRequirements.md#export-diagrams-in-standard-formats";
+  fff74265828e19b3 -.->|verifies| a0274ca0625d8493;
+  b73eaac7c0353fcb -->|satisfies| fff74265828e19b3;
+  2c4c9bdcf9ede0fd["Visualize Model Relationships Verification"];
+  click 2c4c9bdcf9ede0fd "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/Verifications/DiagramsTests.md#visualize-model-relationships-verification";
+  class 2c4c9bdcf9ede0fd verification;
+  eed0b020b6ddeae1["UserRequirements.md/Visualize Model Relationships"];
+  class eed0b020b6ddeae1 requirement;
+  click eed0b020b6ddeae1 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserRequirements.md#visualize-model-relationships";
+  2c4c9bdcf9ede0fd -.->|verifies| eed0b020b6ddeae1;
+  b73eaac7c0353fcb -->|satisfies| 2c4c9bdcf9ede0fd;
   7fd405bfa560fe5c["Filter Relationships by Type Verification"];
-  click 7fd405bfa560fe5c "https://github.com/Reqvire/reqvire/blob/92e82ef235559b4819fd85d700024b79b452d8e3/specifications/Verifications/DiagramsTests.md#filter-relationships-by-type-verification";
+  click 7fd405bfa560fe5c "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/Verifications/DiagramsTests.md#filter-relationships-by-type-verification";
   class 7fd405bfa560fe5c verification;
   66e9d8186acafd13["UserRequirements.md/Filter Relationships by Type"];
   class 66e9d8186acafd13 requirement;
-  click 66e9d8186acafd13 "https://github.com/Reqvire/reqvire/blob/92e82ef235559b4819fd85d700024b79b452d8e3/specifications/UserRequirements.md#filter-relationships-by-type";
+  click 66e9d8186acafd13 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserRequirements.md#filter-relationships-by-type";
   7fd405bfa560fe5c -.->|verifies| 66e9d8186acafd13;
-  7fd405bfa560fe5c -.->|trace| b73eaac7c0353fcb;
+  b73eaac7c0353fcb -->|satisfies| 7fd405bfa560fe5c;
 ```
 
 ---
@@ -102,17 +102,9 @@ This test verifies that the system can automatically generate and embed mermaid 
 - All relationship types are correctly visualized with proper arrows and labels (verifies, trace, refines, contains, derives, satisfies)
 - Special relationship types like "deriveReqT" are properly rendered
 
-##### Test Procedure
-1. Create test fixtures in `/tests/test-diagram-generation/` with requirements containing various elements and relationships
-2. Create test fixtures that include custom mermaid diagrams to test preservation
-3. Run Reqvire with the `--generate-diagrams` flag on the test fixtures
-4. Verify that mermaid diagrams are generated at the beginning of each file
-5. Verify that existing custom mermaid diagrams are preserved
-6. Verify diagram content accurately shows elements and relationships
-
 #### Relations
   * verify: [UserRequirements.md/Automate Diagram Generation](../UserRequirements.md#automate-diagram-generation)
-  * trace: [tests/test-diagram-generation/test.sh](../../tests/test-diagram-generation/test.sh)
+  * satisfiedBy: [tests/test-diagram-generation/test.sh](../../tests/test-diagram-generation/test.sh)
 
 ---
 
@@ -136,12 +128,9 @@ This test verifies that the system provides visual representations of relationsh
 - Relationships are visually differentiated based on their type
 - Element dependencies are clearly displayed in the diagrams
 
-##### Test Procedure
-TODO: write test procedure
-
 #### Relations
   * verify: [UserRequirements.md/Visualize Model Relationships](../UserRequirements.md#visualize-model-relationships)
-  * trace: [tests/test-diagram-generation/test.sh](../../tests/test-diagram-generation/test.sh)
+  * satisfiedBy: [tests/test-diagram-generation/test.sh](../../tests/test-diagram-generation/test.sh)
 
 ---
 
@@ -164,12 +153,9 @@ This test verifies that the system allows users to filter relationships in diagr
 - Filtering options are correctly applied to diagram generation
 - Filtered diagrams contain only the specified relationship types
 
-##### Test Procedure
-TODO: write test procedure
-
 #### Relations
   * verify: [UserRequirements.md/Filter Relationships by Type](../UserRequirements.md#filter-relationships-by-type)
-  * trace: [tests/test-diagram-generation/test.sh](../../tests/test-diagram-generation/test.sh)
+  * satisfiedBy: [tests/test-diagram-generation/test.sh](../../tests/test-diagram-generation/test.sh)
 
 ---
 
@@ -192,12 +178,9 @@ This test verifies that the system properly stores automatically generated diagr
 - Diagrams are saved to the expected pre-configured locations
 - Diagram files are properly formatted and accessible
 
-##### Test Procedure
-TODO: write test procedure
-
 #### Relations
   * verify: [UserRequirements.md/Store Automated Diagrams in Designated Locations](../UserRequirements.md#store-automated-diagrams-in-designated-locations)
-  * trace: [tests/test-diagram-generation/test.sh](../../tests/test-diagram-generation/test.sh)
+  * satisfiedBy: [tests/test-diagram-generation/test.sh](../../tests/test-diagram-generation/test.sh)
 
 ---
 
@@ -220,12 +203,9 @@ This test verifies that the system allows users to export generated diagrams in 
 - Diagrams are exported in the requested format
 - Exported files contain the expected diagram content
 
-##### Test Procedure
-TODO: write test procedure
-
 #### Relations
   * verify: [UserRequirements.md/Export Diagrams in Standard Formats](../UserRequirements.md#export-diagrams-in-standard-formats)
-  * trace: [tests/test-diagram-generation/test.sh](../../tests/test-diagram-generation/test.sh)
+  * satisfiedBy: [tests/test-diagram-generation/test.sh](../../tests/test-diagram-generation/test.sh)
 
 ---
 
@@ -241,19 +221,16 @@ This test verifies that the system provides an option to highlight changes made 
 ##### Acceptance Criteria
 - System should highlight changes in the model when generating diagrams
 - Highlighting should visually differentiate added, modified, and removed elements
-- Change highlighting should be optional and user-configurable
+- Change highlighting should be optional and user-configurable		
 
 ##### Test Criteria
 - Command exits with success (0) return code
 - Changes in the model are visually highlighted in the diagrams
 - Different types of changes have distinct visual indicators
 
-##### Test Procedure
-TODO: write test procedure
-
 #### Relations
   * verify: [UserRequirements.md/Highlight Changes in Diagrams](../UserRequirements.md#highlight-changes-in-diagrams)
-  * trace: [tests/test-diagram-generation/test.sh](../../tests/test-diagram-generation/test.sh)
+  * satisfiedBy: [tests/test-diagram-generation/test.sh](../../tests/test-diagram-generation/test.sh)
 
 ---
 
@@ -280,17 +257,8 @@ This test verifies that the system automatically generates and updates diagrams 
 - Workflow commits and pushes changes back to the main branch
 - Commit message is informative and standardized
 
-##### Test Procedure
-1. Create a test branch with modifications to requirements
-2. Create a PR from the test branch to main
-3. Merge the PR to trigger the workflow
-4. Verify the workflow runs successfully
-5. Verify diagrams are updated and committed to the main branch
-6. Verify the traceability matrix SVG is generated and committed
-7. Verify the commit message follows the expected format
-
 #### Relations
   * verify: [SystemRequirements/Requirements.md/Automated Diagram Generation on PR Merge](../SystemRequirements/Requirements.md#automated-diagram-generation-on-pr-merge)
-  * trace: [.github/workflows/generate_diagrams.yml](../../.github/workflows/generate_diagrams.yml)
+  * satisfiedBy: [.github/workflows/generate_diagrams.yml](../../.github/workflows/generate_diagrams.yml)
 
 ---
