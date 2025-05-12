@@ -7,6 +7,8 @@ use crate::relation;
 use globset::{Glob, GlobMatcher};
 use regex::Regex;
 
+
+
 pub struct Filters {
     file_glob:    Option<GlobMatcher>,
     name_re:      Option<Regex>,
@@ -180,20 +182,34 @@ struct GlobalCounters {
     requirements_not_satisfied: usize,
 }
 
+pub enum SummaryOutputFormat {
+    Text,
+    Json,
+    Cypher,
+}
+
 pub fn print_registry_summary(
     registry: &ElementRegistry,
-    as_json: bool,
+    output_format: SummaryOutputFormat,
     filters: &Filters,
 ) {
     let summary = build_summary(registry, filters);
-    if as_json {
-        let text = serde_json::to_string_pretty(&summary)
-            .expect("failed to serialize summary");
-        println!("{}", text);
-    } else {
-        print_summary_text(&summary);
+
+    match output_format {
+        SummaryOutputFormat::Text => print_summary_text(&summary),
+        SummaryOutputFormat::Json => {
+            let text = serde_json::to_string_pretty(&summary)
+                .expect("failed to serialize summary");
+            println!("{}", text);
+        }
+        SummaryOutputFormat::Cypher => {
+            let cypher_output = print_summary_cypher(&summary);
+            println!("{}", cypher_output);
+        }
     }
 }
+
+
 
 fn build_summary(
     registry: &ElementRegistry,
@@ -249,8 +265,8 @@ fn build_summary(
             _ => (0, 0),
         };
 
-        // Build a Vec<RelationSummary> rather than raw JSON values
         let rels: Vec<RelationSummary> = elem.relations.iter()
+            .filter(|relation| relation.relation_type.direction == relation::RelationDirection::Forward)        
             .map(|relation| {
                 let (tgt, lt) = match &relation.target.link {
                     relation::LinkType::Identifier(id)   => (id.clone(), "Identifier".to_string()),
@@ -289,6 +305,68 @@ fn build_summary(
         global_counters: counters,
     }
 }
+
+fn print_summary_cypher(summary: &Summary) -> String {
+    let mut cypher_statements = Vec::new();
+
+    // Create nodes
+    for (file, fsum) in &summary.files {
+        for (section, ssum) in &fsum.sections {
+            for e in &ssum.elements {
+                let props = vec![
+                    format!("id: \"{}\"", escape(&e.identifier)),
+                    format!("name: \"{}\"", escape(&e.name)),
+                    format!("file: \"{}\"", escape(file)),
+                    format!("section: \"{}\"", escape(section)),
+                    format!("element_type: \"{}\"", e.element_type),
+                    format!("content: \"{}\"", escape(&e.content)),
+                ];
+
+                let node = format!("CREATE (:Element:{} {{ {} }});",
+                    e.element_type.replace("-", "_"), // label
+                    props.join(", ")
+                );
+
+                cypher_statements.push(node);
+            }
+        }
+    }
+
+    // Create relationships
+    for fsum in summary.files.values() {
+        for ssum in fsum.sections.values() {
+            for e in &ssum.elements {
+                for rel in &e.relations {
+                    let rel_type = rel.relation_type.to_uppercase();
+                    let rel_label = format!(
+                        "[:{} {{type: \"{}\"}}]",
+                        rel_type, rel.target.link_type
+                    );
+
+                    let relationship = format!(
+                        "MATCH (a:Element {{id: \"{}\"}}), (b:Element {{id: \"{}\"}}) CREATE (a)-{}->(b);",
+                        escape(&e.identifier),
+                        escape(&rel.target.target),
+                        rel_label
+                    );
+
+                    cypher_statements.push(relationship);
+                }
+            }
+        }
+    }
+
+    cypher_statements.join("\n")
+}
+
+fn escape(s: &str) -> String {
+    s.replace('\\', "\\\\")      // Escape backslashes
+     .replace('"', "\\\"")       // Escape double quotes
+     .replace('\n', "\\n")       // Escape newlines
+     .replace('\r', "")          // Remove carriage returns
+     .replace("```", "~~~")      // Replace triple-backtick code blocks
+}
+
 fn print_summary_text(summary: &Summary) {
     println!("--- MBSE Model summary ---");
     for (file, fsum) in &summary.files {

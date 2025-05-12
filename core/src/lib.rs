@@ -15,7 +15,6 @@ pub mod reports;
 pub mod git_commands;
 pub mod change_impact;
 pub mod subsection;
-pub mod graph_export;
 pub mod matrix_generator;
 
 // Re-export commonly used modules

@@ -333,16 +333,6 @@ graph LR;
 
 ---
 
-### JSON Output Format
-
-The system shall provide different output results in machine-readable JSON format to facilitate integration with CI/CD pipelines and automated reporting tools.
-
-#### Relations
-  * derivedFrom: [UserRequirements.md/Enhanced Validation Error Reporting](../UserRequirements.md#enhanced-validation-error-reporting)
-  * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
-
----
-
 ### Index Generation
 
 The system shall implement an IndexGenerator component that traverses the specifications directory structure and creates a hierarchical README.md file with links to documents and elements.
@@ -801,6 +791,10 @@ The system shall implement a model change analyzer that identifies structural mo
 
 The system shall provide a change and impact report function, activated by the (--change_impact flag), which shall generate change impact report
 
+#### Details
+
+Must support `--json` flag to output json formated string.
+
 #### Relations
   * derivedFrom: [Structural Change Analyzer](#structural-change-analyzer)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)    
@@ -820,6 +814,10 @@ The system shall provide a git commit hash flag  (--git_commit flag), to be used
 ### CLI Traces Flag
 
 The system shall provide a traceability matrix generation function, activated by the (--traces flag), which shall generate a traceability matrix showing the relationships between requirements and verification elements.
+
+#### Details
+
+Must support `--json` and `--svg` flags to output either json formated string or svg vector image.
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Traceability Matrix](../UserRequirements.md#traceability-matrix)
@@ -1139,9 +1137,12 @@ The summary report must include
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Model Structure and Summaries](../UserRequirements.md#model-structure-and-summaries)
+  * containedBy: [Cypher Output Format](#cypher-output-format)
+  * containedBy: [Json Output Format](#json-output-format)
   * satisfiedBy: [model.rs](../../core/src/reports.rs)
 
 ---
+
 
 ### Model Summary Fine Grained Filtering
 
@@ -1250,7 +1251,7 @@ The filtering system **must support the following filters**, which may be active
 
 **Match Target:** `Element.relations`
 
-**Behavior:** If enabled, any element with one or more verification-related relations must be excluded.
+**Behavior:** When enabled, any element with one or more verification-related relations must be excluded.
 
 ---
 
@@ -1262,7 +1263,7 @@ The filtering system **must support the following filters**, which may be active
 
 **Match Target:** `Element.relations`
 
-**Behavior:** If enabled, any element with one or more satisfaction-related relations must be excluded.
+**Behavior:** when enabled, any element with one or more satisfaction-related relations must be excluded.
 
 ---
 
@@ -1330,10 +1331,10 @@ The system shall provide a model summary report function, activated by the (--mo
 #### Details
 
 Model summary CLI command:
-- `--model-summary`:  Output model registry and summary, also supports json output.
+- `--model-summary`:  Output model registry and summary, also supports json and cypher output.
 
 All filters require --model-summary to be present. They can be combined:
-- `--model-summary`:  Output model registry and summary, also supports json output.
+- `--model-summary`:  Output model registry and summary, also supports json and cypher output.
   - By file path: ` --model-summary  --filter-file="src/**/*Reqs.md"`
   - By name: ` --model-summary  --filter-name=".*safety.*"`
   - By section: ` --model-summary  --filter-section="System*"`
@@ -1341,6 +1342,10 @@ All filters require --model-summary to be present. They can be combined:
   - By content: ` --model-summary  --filter-content="MUST"`
   - Not verified: ` --model-summary  --filter-is-not-verified`
   - Not satisfied: ` --model-summary  --filter-is-not-satisfied`
+
+Must support `--json` and `--cypher` flags to output either json formated string or valid Cyper queries that when executed in graph database produce valid grapjh of a system model.
+
+
 
 #### Relations
   * refine: [Model Summary Report Generator](#model-summary-report-generator)

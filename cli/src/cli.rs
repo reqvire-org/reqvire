@@ -39,7 +39,7 @@ use reqvire::reports::Filters;
 )]
 pub struct Args {
 
-    /// Convert Markdown to HTML with embedded styles
+    /// Convert Markdown to HTML with embedded styles and save to output location
     #[clap(long)]
     pub html: bool,
        
@@ -70,7 +70,7 @@ pub struct Args {
     /// Validate model
     #[clap(long)]
     pub validate: bool,
-            
+                       
     /// Generate mermaid diagrams in markdown files showing requirements relationships
     /// The diagrams will be placed at the top of each requirements document
     #[clap(long)]
@@ -83,6 +83,7 @@ pub struct Args {
     /// Output model registry and summary
     #[clap(long)]
     pub model_summary: bool,
+
         
     /// Only include files whose path matches this glob pattern
     /// e.g. `src/**/*Reqs.md`
@@ -148,6 +149,10 @@ pub struct Args {
     )]
     pub filter_is_not_satisfied: bool,
                 
+    /// Output traceability matrix as SVG without hyperlinks and with full element names
+    /// Cannot be used with --json
+    #[clap(long, hide = true, requires = "model_summary", conflicts_with_all = &["json", "svg"])]
+    pub cypher: bool,                
                       
     /// Path to a custom configuration file (YAML format)
     /// If not provided, the system will look for reqvire.yml, reqvire.yaml, 
@@ -285,7 +290,16 @@ pub fn handle_command(
                 ReqvireError::ProcessError(format!("❌ Failed to construct filters: {}", e))
             })?;
             
-            reports::print_registry_summary(&model_manager.element_registry,args.json, &filters);
+            let output_format = if args.cypher {
+                reports::SummaryOutputFormat::Cypher
+            } else if args.json {
+                reports::SummaryOutputFormat::Json
+            } else {
+                reports::SummaryOutputFormat::Text
+            };
+
+            
+            reports::print_registry_summary(&model_manager.element_registry,output_format, &filters);
             return Ok(0);        
             
             
@@ -393,6 +407,7 @@ mod tests {
             lint: false,
             dry_run: false,
             json: false,
+            cypher: false,
             svg: false,
             traces: false,
             generate_diagrams: false,

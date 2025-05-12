@@ -410,7 +410,7 @@ When requested the system shall provide human readable MBSE model reports.
 ---
 
 ### Model Structure and Summaries
-When requested the system shall generate reports summarizing the structure and relationships in the MBSE model, including counts and types of connections.
+When requested the system shall generate reports summarizing the structure and relationships in the MBSE model, including counts and types of connections also supporting json and cypher output.
 
 #### Relations
   * derivedFrom: [Model Reports](#model-reports)
@@ -599,7 +599,7 @@ graph LR;
 
 ### AI Agent Context
 
-The system shall provide needed context for AI agents to understand how to use reqvire and methodology.
+The system shall provide needed context for AI agents to understand how to use reqvire and help with model suggestions.
 
 #### Relations
   * refine: [UserStories.md#AI-Assisted MBSE Model Management](UserStories.md#ai-assisted-mbse-model-management)

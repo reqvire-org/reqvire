@@ -1,6 +1,6 @@
-# Change Impact Detection System Requirements
+# Change Impact Detection
 
-This document defines the detailed requirements for the change impact detection algorithm and visualization in Reqvire. It provides the technical specifications for implementing the concepts described in the Design Specification Document for Requirements Change Impact Propagation.
+This document defines the detailed requirements for the change impact detection algorithm and visualization in Reqvire. 
 
 ## Change Impact Detection Components
 ```mermaid
@@ -76,7 +76,7 @@ The algorithm shall consist of the following steps:
      - Potential: Changes that might affect an element based on semantic analysis
    - Calculate aggregated impact scores for each affected element
 
-5. **Performance Optimization**:
+6. **Performance Optimization**:
    - Implement caching of traversal results
    - Use parallel processing for independent branches of the impact tree
    - Apply pruning techniques to limit traversal depth when appropriate
@@ -112,9 +112,6 @@ The visualization shall include:
 
 3. **Interactive Elements**:
    - Allow clicking on elements to focus the view
-   - Provide filtering options for relation types
-   - Support search functionality within impact results
-   - Enable toggling between different visualization modes
 
 4. **Summary Statistics**:
    - Display counts of affected elements by type
@@ -148,13 +145,7 @@ The CLI shall support the following functionality:
    - Create Mermaid diagrams of impact trees
    - Integrate with HTML report generation
 
-3. **Filtering Options**:
-   - Filter by element types (requirement, verification, etc.)
-   - Filter by relation types
-   - Filter by impact severity
-   - Support inclusion/exclusion patterns
-
-4. **Integration Points**:
+3. **Integration Points**:
    - Support integration with CI/CD pipelines
    - Enable calling from external systems via API
    - Support webhook triggers for automated analysis
