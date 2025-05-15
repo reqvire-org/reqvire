@@ -9,7 +9,7 @@ This document contains requirements with intentional relation errors for testing
 This is a valid requirement with proper relation types.
 
 #### Relations
-  * refine: [../UserRequirements.md/Valid User Requirement](../UserRequirements.md#valid-user-requirement)
+  * containedBy: [../UserRequirements.md/Valid User Requirement](../UserRequirements.md#valid-user-requirement)
   * satisfiedBy: [ValidImplementation.txt](ValidImplementation.txt)
 
 ---
@@ -70,7 +70,7 @@ This system requirement is missing parent relation.
 This requirement has an invalid relation type with a typo.
 
 #### Relations
-  * refine: [../UserRequirements.md/Valid User Requirement](../UserRequirements.md#valid-user-requirement)
+  * containedBy: [../UserRequirements.md/Valid User Requirement](../UserRequirements.md#valid-user-requirement)
   * satisfiedBBy: [ValidImplementation.txt](ValidImplementation.txt)
 
 ---
@@ -81,7 +81,7 @@ This requirement has an invalid relation type with a typo.
 This requirement has duplicate relations.
 
 #### Relations
-  * refine: [../UserRequirements.md/Valid User Requirement](../UserRequirements.md#valid-user-requirement)
+  * containedBy: [../UserRequirements.md/Valid User Requirement](../UserRequirements.md#valid-user-requirement)
   * satisfiedBy: [ValidImplementation.txt](ValidImplementation.txt)
   * satisfiedBy: [ValidImplementation.txt](ValidImplementation.txt)
 
@@ -92,7 +92,7 @@ This requirement has duplicate relations.
 This requirement has a relation to a non-existent element.
 
 #### Relations
-  * refine: [../UserRequirements.md/Valid User Requirement](../UserRequirements.md#valid-user-requirement)
+  * containedBy: [../UserRequirements.md/Valid User Requirement](../UserRequirements.md#valid-user-requirement)
   * satisfiedBy: [NonExistentElement.md/Missing Element](NonExistentElement.md#missing-element)
 ---
 
@@ -101,7 +101,7 @@ This requirement has a relation to a non-existent element.
 This requirement has incompactible element in relation, satisfiedBy cannot point to other requiremet.
 
 #### Relations
-  * refine: [../UserRequirements.md/Valid User Requirement](../UserRequirements.md#valid-user-requirement)
+  * containedBy: [../UserRequirements.md/Valid User Requirement](../UserRequirements.md#valid-user-requirement)
   * satisfiedBy: #Requirement with invalid relation type
 
 ---
@@ -147,9 +147,9 @@ This should be validated as invalid target because # is missing.
 This requirement has duplicate subsection.
 
 #### Relations
-  * refine: [../UserRequirements.md/Valid User Requirement](../UserRequirements.md#valid-user-requirement)
+  * containedBy: [../UserRequirements.md/Valid User Requirement](../UserRequirements.md#valid-user-requirement)
 
 #### Relations
-  * refine: [../UserRequirements.md/Valid User Requirement](../UserRequirements.md#valid-user-requirement)
+  * containedBy: [../UserRequirements.md/Valid User Requirement](../UserRequirements.md#valid-user-requirement)
 
 ---

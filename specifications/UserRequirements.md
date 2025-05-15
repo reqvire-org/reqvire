@@ -9,37 +9,37 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  ac914f743d73674e["Highlight Changes in Diagrams"];
-  click ac914f743d73674e "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserRequirements.md#highlight-changes-in-diagrams";
-  class ac914f743d73674e requirement;
+  89097c1311055b72["Store Automated Diagrams in Designated Locations"];
+  click 89097c1311055b72 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/UserRequirements.md#store-automated-diagrams-in-designated-locations";
+  class 89097c1311055b72 requirement;
   694c4bb24b10f0c7["UserStories.md/Generate Diagrams"];
   class 694c4bb24b10f0c7 requirement;
-  click 694c4bb24b10f0c7 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserStories.md#generate-diagrams";
-  ac914f743d73674e -->|refines| 694c4bb24b10f0c7;
-  aa6a73dcebdfbc0d["Select Custom Diagram Viewpoints"];
-  click aa6a73dcebdfbc0d "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserRequirements.md#select-custom-diagram-viewpoints";
-  class aa6a73dcebdfbc0d requirement;
-  aa6a73dcebdfbc0d -->|refines| 694c4bb24b10f0c7;
-  eed0b020b6ddeae1["Visualize Model Relationships"];
-  click eed0b020b6ddeae1 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserRequirements.md#visualize-model-relationships";
-  class eed0b020b6ddeae1 requirement;
-  eed0b020b6ddeae1 -->|refines| 694c4bb24b10f0c7;
-  89097c1311055b72["Store Automated Diagrams in Designated Locations"];
-  click 89097c1311055b72 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserRequirements.md#store-automated-diagrams-in-designated-locations";
-  class 89097c1311055b72 requirement;
-  89097c1311055b72 -->|refines| 694c4bb24b10f0c7;
-  c522cf4c404bdc24["Automate Diagram Generation"];
-  click c522cf4c404bdc24 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserRequirements.md#automate-diagram-generation";
-  class c522cf4c404bdc24 requirement;
-  c522cf4c404bdc24 -.->|deriveReqT| eed0b020b6ddeae1;
-  66e9d8186acafd13["Filter Relationships by Type"];
-  click 66e9d8186acafd13 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserRequirements.md#filter-relationships-by-type";
-  class 66e9d8186acafd13 requirement;
-  66e9d8186acafd13 -->|refines| 694c4bb24b10f0c7;
+  click 694c4bb24b10f0c7 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/UserStories.md#generate-diagrams";
+  694c4bb24b10f0c7 -->|refines| 89097c1311055b72;
   a0274ca0625d8493["Export Diagrams in Standard Formats"];
-  click a0274ca0625d8493 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserRequirements.md#export-diagrams-in-standard-formats";
+  click a0274ca0625d8493 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/UserRequirements.md#export-diagrams-in-standard-formats";
   class a0274ca0625d8493 requirement;
   a0274ca0625d8493 --o|contains| 694c4bb24b10f0c7;
+  ac914f743d73674e["Highlight Changes in Diagrams"];
+  click ac914f743d73674e "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/UserRequirements.md#highlight-changes-in-diagrams";
+  class ac914f743d73674e requirement;
+  694c4bb24b10f0c7 -->|refines| ac914f743d73674e;
+  66e9d8186acafd13["Filter Relationships by Type"];
+  click 66e9d8186acafd13 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/UserRequirements.md#filter-relationships-by-type";
+  class 66e9d8186acafd13 requirement;
+  694c4bb24b10f0c7 -->|refines| 66e9d8186acafd13;
+  eed0b020b6ddeae1["Visualize Model Relationships"];
+  click eed0b020b6ddeae1 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/UserRequirements.md#visualize-model-relationships";
+  class eed0b020b6ddeae1 requirement;
+  694c4bb24b10f0c7 -->|refines| eed0b020b6ddeae1;
+  c522cf4c404bdc24["Automate Diagram Generation"];
+  click c522cf4c404bdc24 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/UserRequirements.md#automate-diagram-generation";
+  class c522cf4c404bdc24 requirement;
+  c522cf4c404bdc24 -.->|deriveReqT| eed0b020b6ddeae1;
+  aa6a73dcebdfbc0d["Select Custom Diagram Viewpoints"];
+  click aa6a73dcebdfbc0d "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/UserRequirements.md#select-custom-diagram-viewpoints";
+  class aa6a73dcebdfbc0d requirement;
+  694c4bb24b10f0c7 -->|refines| aa6a73dcebdfbc0d;
 ```
 
 ---
@@ -113,16 +113,16 @@ graph LR;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
   43dbd0667720212c["Suggest Code Refactoring"];
-  click 43dbd0667720212c "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserRequirements.md#suggest-code-refactoring";
+  click 43dbd0667720212c "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/UserRequirements.md#suggest-code-refactoring";
   class 43dbd0667720212c requirement;
   a9bc74070fc71e6d["UserStories.md/Aligning Design with Code"];
   class a9bc74070fc71e6d requirement;
-  click a9bc74070fc71e6d "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserStories.md#aligning-design-with-code";
-  43dbd0667720212c -->|refines| a9bc74070fc71e6d;
+  click a9bc74070fc71e6d "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/UserStories.md#aligning-design-with-code";
+  a9bc74070fc71e6d -->|refines| 43dbd0667720212c;
   8c02a4fb740392b["Code Traceability"];
-  click 8c02a4fb740392b "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserRequirements.md#code-traceability";
+  click 8c02a4fb740392b "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/UserRequirements.md#code-traceability";
   class 8c02a4fb740392b requirement;
-  8c02a4fb740392b -->|refines| a9bc74070fc71e6d;
+  a9bc74070fc71e6d -->|refines| 8c02a4fb740392b;
 ```
 
 ---
@@ -152,64 +152,64 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  62c066a5aad4dafe["Linting Command Output"];
-  click 62c066a5aad4dafe "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserRequirements.md#linting-command-output";
-  class 62c066a5aad4dafe requirement;
-  28b0f9fa78937e61["Linting Command"];
-  class 28b0f9fa78937e61 requirement;
-  click 28b0f9fa78937e61 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserRequirements.md#linting-command";
-  62c066a5aad4dafe -->|refines| 28b0f9fa78937e61;
+  1ddbeea0cf8eaad5["Format Consistency Enforcement"];
+  click 1ddbeea0cf8eaad5 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/UserRequirements.md#format-consistency-enforcement";
+  class 1ddbeea0cf8eaad5 requirement;
   84c4dc11e82e8638["Model Linting"];
   class 84c4dc11e82e8638 requirement;
-  click 84c4dc11e82e8638 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserRequirements.md#model-linting";
-  28b0f9fa78937e61 --o|contains| 84c4dc11e82e8638;
-  229bb675bac39dc9["Replace Absolute Links with Relative Links"];
-  click 229bb675bac39dc9 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserRequirements.md#replace-absolute-links-with-relative-links";
-  class 229bb675bac39dc9 requirement;
-  229bb675bac39dc9 --o|contains| 84c4dc11e82e8638;
-  ee05a46627b568b7["Validate Cross-Component Dependencies"];
-  click ee05a46627b568b7 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserRequirements.md#validate-cross-component-dependencies";
-  class ee05a46627b568b7 requirement;
+  click 84c4dc11e82e8638 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/UserRequirements.md#model-linting";
+  1ddbeea0cf8eaad5 --o|contains| 84c4dc11e82e8638;
+  3d2fe0b05ff9c8e3["Enhanced Validation Error Reporting"];
+  click 3d2fe0b05ff9c8e3 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/UserRequirements.md#enhanced-validation-error-reporting";
+  class 3d2fe0b05ff9c8e3 requirement;
   a0f9571f6563d9d3["UserStories.md/Validating Structures"];
   class a0f9571f6563d9d3 requirement;
-  click a0f9571f6563d9d3 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserStories.md#validating-structures";
-  ee05a46627b568b7 -->|refines| a0f9571f6563d9d3;
-  f9182ad2999d989c["Validate Internal Consistency"];
-  click f9182ad2999d989c "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserRequirements.md#validate-internal-consistency";
-  class f9182ad2999d989c requirement;
-  f9182ad2999d989c -->|refines| a0f9571f6563d9d3;
-  1ddbeea0cf8eaad5["Format Consistency Enforcement"];
-  click 1ddbeea0cf8eaad5 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserRequirements.md#format-consistency-enforcement";
-  class 1ddbeea0cf8eaad5 requirement;
-  1ddbeea0cf8eaad5 --o|contains| 84c4dc11e82e8638;
-  8a3ca9461643d887["Validate Relation Types"];
-  click 8a3ca9461643d887 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserRequirements.md#validate-relation-types";
-  class 8a3ca9461643d887 requirement;
-  8a3ca9461643d887 -->|refines| a0f9571f6563d9d3;
+  click a0f9571f6563d9d3 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/UserStories.md#validating-structures";
+  a0f9571f6563d9d3 -->|refines| 3d2fe0b05ff9c8e3;
+  c390b990a63def2a["Validate Filesystem Structure"];
+  click c390b990a63def2a "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/UserRequirements.md#validate-filesystem-structure";
+  class c390b990a63def2a requirement;
+  a0f9571f6563d9d3 -->|refines| c390b990a63def2a;
+  229bb675bac39dc9["Replace Absolute Links with Relative Links"];
+  click 229bb675bac39dc9 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/UserRequirements.md#replace-absolute-links-with-relative-links";
+  class 229bb675bac39dc9 requirement;
+  229bb675bac39dc9 --o|contains| 84c4dc11e82e8638;
   b5146db7aedfd66["Documentation Index HTML Integration"];
-  click b5146db7aedfd66 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserRequirements.md#documentation-index-html-integration";
+  click b5146db7aedfd66 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/UserRequirements.md#documentation-index-html-integration";
   class b5146db7aedfd66 requirement;
   9019be8bfdc22b35["Generate Documentation Index"];
   class 9019be8bfdc22b35 requirement;
-  click 9019be8bfdc22b35 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserRequirements.md#generate-documentation-index";
-  b5146db7aedfd66 -->|refines| 9019be8bfdc22b35;
-  7ec3cb7f400a2e8d["Validate Markdown Structure"];
-  click 7ec3cb7f400a2e8d "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserRequirements.md#validate-markdown-structure";
-  class 7ec3cb7f400a2e8d requirement;
-  7ec3cb7f400a2e8d -->|refines| a0f9571f6563d9d3;
-  3d2fe0b05ff9c8e3["Enhanced Validation Error Reporting"];
-  click 3d2fe0b05ff9c8e3 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserRequirements.md#enhanced-validation-error-reporting";
-  class 3d2fe0b05ff9c8e3 requirement;
-  3d2fe0b05ff9c8e3 -->|refines| a0f9571f6563d9d3;
+  click 9019be8bfdc22b35 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/UserRequirements.md#generate-documentation-index";
+  9019be8bfdc22b35 -->|refines| b5146db7aedfd66;
   c75ac8fa29479ca5["UserStories.md/Managing MBSE Models"];
   class c75ac8fa29479ca5 requirement;
-  click c75ac8fa29479ca5 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserStories.md#managing-mbse-models";
+  click c75ac8fa29479ca5 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/UserStories.md#managing-mbse-models";
   9019be8bfdc22b35 -.->|deriveReqT| c75ac8fa29479ca5;
-  84c4dc11e82e8638 -->|refines| a0f9571f6563d9d3;
-  c390b990a63def2a["Validate Filesystem Structure"];
-  click c390b990a63def2a "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserRequirements.md#validate-filesystem-structure";
-  class c390b990a63def2a requirement;
-  c390b990a63def2a -->|refines| a0f9571f6563d9d3;
+  28b0f9fa78937e61["Linting Command"];
+  click 28b0f9fa78937e61 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/UserRequirements.md#linting-command";
+  class 28b0f9fa78937e61 requirement;
+  28b0f9fa78937e61 --o|contains| 84c4dc11e82e8638;
+  f9182ad2999d989c["Validate Internal Consistency"];
+  click f9182ad2999d989c "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/UserRequirements.md#validate-internal-consistency";
+  class f9182ad2999d989c requirement;
+  a0f9571f6563d9d3 -->|refines| f9182ad2999d989c;
+  ee05a46627b568b7["Validate Cross-Component Dependencies"];
+  click ee05a46627b568b7 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/UserRequirements.md#validate-cross-component-dependencies";
+  class ee05a46627b568b7 requirement;
+  a0f9571f6563d9d3 -->|refines| ee05a46627b568b7;
+  62c066a5aad4dafe["Linting Command Output"];
+  click 62c066a5aad4dafe "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/UserRequirements.md#linting-command-output";
+  class 62c066a5aad4dafe requirement;
+  28b0f9fa78937e61 -->|refines| 62c066a5aad4dafe;
+  8a3ca9461643d887["Validate Relation Types"];
+  click 8a3ca9461643d887 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/UserRequirements.md#validate-relation-types";
+  class 8a3ca9461643d887 requirement;
+  a0f9571f6563d9d3 -->|refines| 8a3ca9461643d887;
+  7ec3cb7f400a2e8d["Validate Markdown Structure"];
+  click 7ec3cb7f400a2e8d "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/UserRequirements.md#validate-markdown-structure";
+  class 7ec3cb7f400a2e8d requirement;
+  a0f9571f6563d9d3 -->|refines| 7ec3cb7f400a2e8d;
+  a0f9571f6563d9d3 -->|refines| 84c4dc11e82e8638;
 ```
 
 ---
@@ -334,17 +334,17 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  efa1cab60b058344["Generate Change Logs for Pull Requests"];
-  click efa1cab60b058344 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserRequirements.md#generate-change-logs-for-pull-requests";
-  class efa1cab60b058344 requirement;
+  b41f362e18fb2449["Automate Pull Request Validations"];
+  click b41f362e18fb2449 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/UserRequirements.md#automate-pull-request-validations";
+  class b41f362e18fb2449 requirement;
   1563f8454019c887["UserStories.md/Integrate with GitHub Workflows"];
   class 1563f8454019c887 requirement;
-  click 1563f8454019c887 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserStories.md#integrate-with-github-workflows";
-  efa1cab60b058344 -->|refines| 1563f8454019c887;
-  b41f362e18fb2449["Automate Pull Request Validations"];
-  click b41f362e18fb2449 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserRequirements.md#automate-pull-request-validations";
-  class b41f362e18fb2449 requirement;
-  b41f362e18fb2449 -->|refines| 1563f8454019c887;
+  click 1563f8454019c887 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/UserStories.md#integrate-with-github-workflows";
+  1563f8454019c887 -->|refines| b41f362e18fb2449;
+  efa1cab60b058344["Generate Change Logs for Pull Requests"];
+  click efa1cab60b058344 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/UserRequirements.md#generate-change-logs-for-pull-requests";
+  class efa1cab60b058344 requirement;
+  1563f8454019c887 -->|refines| efa1cab60b058344;
 ```
 
 ---
@@ -375,28 +375,28 @@ graph LR;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
   98d3f01fb666c41f["Model Reports"];
-  click 98d3f01fb666c41f "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserRequirements.md#model-reports";
+  click 98d3f01fb666c41f "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/UserRequirements.md#model-reports";
   class 98d3f01fb666c41f requirement;
   9cb6618c17d19a11["UserStories.md/Provide Reports"];
   class 9cb6618c17d19a11 requirement;
-  click 9cb6618c17d19a11 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserStories.md#provide-reports";
-  98d3f01fb666c41f -->|refines| 9cb6618c17d19a11;
-  6572e9cc4d78415a["Structural Change Reports"];
-  click 6572e9cc4d78415a "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserRequirements.md#structural-change-reports";
-  class 6572e9cc4d78415a requirement;
-  6572e9cc4d78415a -.->|deriveReqT| 98d3f01fb666c41f;
+  click 9cb6618c17d19a11 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/UserStories.md#provide-reports";
+  9cb6618c17d19a11 -->|refines| 98d3f01fb666c41f;
+  2d3cfde19fc6bb79["Provide Validation Reports"];
+  click 2d3cfde19fc6bb79 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/UserRequirements.md#provide-validation-reports";
+  class 2d3cfde19fc6bb79 requirement;
+  9cb6618c17d19a11 -->|refines| 2d3cfde19fc6bb79;
+  db41436c9a771e21["Generate Summary Reports"];
+  click db41436c9a771e21 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/UserRequirements.md#generate-summary-reports";
+  class db41436c9a771e21 requirement;
+  9cb6618c17d19a11 -->|refines| db41436c9a771e21;
   40de7485b25294["Model Structure and Summaries"];
-  click 40de7485b25294 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserRequirements.md#model-structure-and-summaries";
+  click 40de7485b25294 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/UserRequirements.md#model-structure-and-summaries";
   class 40de7485b25294 requirement;
   40de7485b25294 -.->|deriveReqT| 98d3f01fb666c41f;
-  2d3cfde19fc6bb79["Provide Validation Reports"];
-  click 2d3cfde19fc6bb79 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserRequirements.md#provide-validation-reports";
-  class 2d3cfde19fc6bb79 requirement;
-  2d3cfde19fc6bb79 -->|refines| 9cb6618c17d19a11;
-  db41436c9a771e21["Generate Summary Reports"];
-  click db41436c9a771e21 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserRequirements.md#generate-summary-reports";
-  class db41436c9a771e21 requirement;
-  db41436c9a771e21 -->|refines| 9cb6618c17d19a11;
+  6572e9cc4d78415a["Structural Change Reports"];
+  click 6572e9cc4d78415a "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/UserRequirements.md#structural-change-reports";
+  class 6572e9cc4d78415a requirement;
+  6572e9cc4d78415a -.->|deriveReqT| 98d3f01fb666c41f;
 ```
 
 ---
@@ -410,6 +410,7 @@ When requested the system shall provide human readable MBSE model reports.
 ---
 
 ### Model Structure and Summaries
+
 When requested the system shall generate reports summarizing the structure and relationships in the MBSE model, including counts and types of connections also supporting json and cypher output.
 
 #### Relations
@@ -452,29 +453,29 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  b8997351b6f34048["Interactive Mermaid Diagrams"];
-  click b8997351b6f34048 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserRequirements.md#interactive-mermaid-diagrams";
-  class b8997351b6f34048 requirement;
+  4bedae4112e254b["Include Verification Checkboxes"];
+  click 4bedae4112e254b "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/UserRequirements.md#include-verification-checkboxes";
+  class 4bedae4112e254b requirement;
   c5b8a7944b6943e2["Traceability Matrix"];
   class c5b8a7944b6943e2 requirement;
-  click c5b8a7944b6943e2 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserRequirements.md#traceability-matrix";
+  click c5b8a7944b6943e2 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/UserRequirements.md#traceability-matrix";
+  c5b8a7944b6943e2 -->|refines| 4bedae4112e254b;
+  b8997351b6f34048["Interactive Mermaid Diagrams"];
+  click b8997351b6f34048 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/UserRequirements.md#interactive-mermaid-diagrams";
+  class b8997351b6f34048 requirement;
   b8997351b6f34048 -.->|deriveReqT| c5b8a7944b6943e2;
+  9b9c33c7182d6eeb["Tracing Structural Changes"];
+  click 9b9c33c7182d6eeb "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/UserRequirements.md#tracing-structural-changes";
+  class 9b9c33c7182d6eeb requirement;
   2591b90e1fb90daa["UserStories.md/Trace Changes in MBSE Model"];
   class 2591b90e1fb90daa requirement;
-  click 2591b90e1fb90daa "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserStories.md#trace-changes-in-mbse-model";
-  c5b8a7944b6943e2 --o|contains| 2591b90e1fb90daa;
-  9b9c33c7182d6eeb["Tracing Structural Changes"];
-  click 9b9c33c7182d6eeb "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserRequirements.md#tracing-structural-changes";
-  class 9b9c33c7182d6eeb requirement;
+  click 2591b90e1fb90daa "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/UserStories.md#trace-changes-in-mbse-model";
   9b9c33c7182d6eeb -.->|deriveReqT| 2591b90e1fb90daa;
+  c5b8a7944b6943e2 --o|contains| 2591b90e1fb90daa;
   92ab92840dee10a5["Export Traceability Matrix"];
-  click 92ab92840dee10a5 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserRequirements.md#export-traceability-matrix";
+  click 92ab92840dee10a5 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/UserRequirements.md#export-traceability-matrix";
   class 92ab92840dee10a5 requirement;
   92ab92840dee10a5 -.->|deriveReqT| c5b8a7944b6943e2;
-  4bedae4112e254b["Include Verification Checkboxes"];
-  click 4bedae4112e254b "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserRequirements.md#include-verification-checkboxes";
-  class 4bedae4112e254b requirement;
-  4bedae4112e254b -->|refines| c5b8a7944b6943e2;
 ```
 
 ---
@@ -558,11 +559,11 @@ graph LR;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
   d9686a154fe87b2["Export HTML specifications"];
-  click d9686a154fe87b2 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserRequirements.md#export-html-specifications";
+  click d9686a154fe87b2 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/UserRequirements.md#export-html-specifications";
   class d9686a154fe87b2 requirement;
   3bb2096c4648e3ff["UserStories.md/Export Specifications"];
   class 3bb2096c4648e3ff requirement;
-  click 3bb2096c4648e3ff "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserStories.md#export-specifications";
+  click 3bb2096c4648e3ff "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/UserStories.md#export-specifications";
   d9686a154fe87b2 -.->|deriveReqT| 3bb2096c4648e3ff;
 ```
 
@@ -587,12 +588,12 @@ graph LR;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
   7fd9156eac77c270["AI Agent Context"];
-  click 7fd9156eac77c270 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserRequirements.md#ai-agent-context";
+  click 7fd9156eac77c270 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/UserRequirements.md#ai-agent-context";
   class 7fd9156eac77c270 requirement;
   8fc677b7413bb247["UserStories.md#AI-Assisted MBSE Model Management"];
   class 8fc677b7413bb247 requirement;
-  click 8fc677b7413bb247 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserStories.md#ai-assisted-mbse-model-management";
-  7fd9156eac77c270 -->|refines| 8fc677b7413bb247;
+  click 8fc677b7413bb247 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/UserStories.md#ai-assisted-mbse-model-management";
+  8fc677b7413bb247 -->|refines| 7fd9156eac77c270;
 ```
 
 ---
@@ -616,11 +617,11 @@ graph LR;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
   c699ef8d6d1f99d1["Change Impact Analysis"];
-  click c699ef8d6d1f99d1 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserRequirements.md#change-impact-analysis";
+  click c699ef8d6d1f99d1 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/UserRequirements.md#change-impact-analysis";
   class c699ef8d6d1f99d1 requirement;
   2591b90e1fb90daa["UserStories.md/Trace Changes in MBSE Model"];
   class 2591b90e1fb90daa requirement;
-  click 2591b90e1fb90daa "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserStories.md#trace-changes-in-mbse-model";
+  click 2591b90e1fb90daa "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/UserStories.md#trace-changes-in-mbse-model";
   c699ef8d6d1f99d1 --o|contains| 2591b90e1fb90daa;
 ```
 

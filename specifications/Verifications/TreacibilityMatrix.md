@@ -12,43 +12,43 @@ graph LR;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
   f4d7d0e53abef947["Hierarchical Matrix Format Test"];
-  click f4d7d0e53abef947 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/Verifications/TreacibilityMatrix.md#hierarchical-matrix-format-test";
+  click f4d7d0e53abef947 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/Verifications/TreacibilityMatrix.md#hierarchical-matrix-format-test";
   class f4d7d0e53abef947 verification;
   a8066f495e5ed5dd["SystemRequirements/Requirements.md/Traceability Matrix Builder Implementation"];
   class a8066f495e5ed5dd requirement;
-  click a8066f495e5ed5dd "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/SystemRequirements/Requirements.md#traceability-matrix-builder-implementation";
+  click a8066f495e5ed5dd "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/SystemRequirements/Requirements.md#traceability-matrix-builder-implementation";
   f4d7d0e53abef947 -.->|verifies| a8066f495e5ed5dd;
   1da67df379ec30a7["tests/test-matrix-generation/test.sh"];
   class 1da67df379ec30a7 default;
-  click 1da67df379ec30a7 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/tests/test-matrix-generation/test.sh";
+  click 1da67df379ec30a7 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/tests/test-matrix-generation/test.sh";
   1da67df379ec30a7 -->|satisfies| f4d7d0e53abef947;
   8d84c50488d5a478["JSON Matrix Output Test"];
-  click 8d84c50488d5a478 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/Verifications/TreacibilityMatrix.md#json-matrix-output-test";
+  click 8d84c50488d5a478 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/Verifications/TreacibilityMatrix.md#json-matrix-output-test";
   class 8d84c50488d5a478 verification;
   3b2f98c43f1ed3bb["SystemRequirements/Requirements.md/Markdown Matrix Formatter"];
   class 3b2f98c43f1ed3bb requirement;
-  click 3b2f98c43f1ed3bb "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/SystemRequirements/Requirements.md#markdown-matrix-formatter";
+  click 3b2f98c43f1ed3bb "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/SystemRequirements/Requirements.md#markdown-matrix-formatter";
   8d84c50488d5a478 -.->|verifies| 3b2f98c43f1ed3bb;
   1da67df379ec30a7 -->|satisfies| 8d84c50488d5a478;
   1c94ff3648305a2e["SVG Matrix Output Test"];
-  click 1c94ff3648305a2e "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/Verifications/TreacibilityMatrix.md#svg-matrix-output-test";
+  click 1c94ff3648305a2e "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/Verifications/TreacibilityMatrix.md#svg-matrix-output-test";
   class 1c94ff3648305a2e verification;
   a0943a440707d910["SystemRequirements/Requirements.md/CLI Traces SVG Flag"];
   class a0943a440707d910 requirement;
-  click a0943a440707d910 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/SystemRequirements/Requirements.md#cli-traces-svg-flag";
+  click a0943a440707d910 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/SystemRequirements/Requirements.md#cli-traces-svg-flag";
   1c94ff3648305a2e -.->|verifies| a0943a440707d910;
   1da67df379ec30a7 -->|satisfies| 1c94ff3648305a2e;
   50c150f0e22806d["Traceability Matrix Generation Test"];
-  click 50c150f0e22806d "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/Verifications/TreacibilityMatrix.md#traceability-matrix-generation-test";
+  click 50c150f0e22806d "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/Verifications/TreacibilityMatrix.md#traceability-matrix-generation-test";
   class 50c150f0e22806d verification;
   50c150f0e22806d -.->|verifies| a8066f495e5ed5dd;
   1da67df379ec30a7 -->|satisfies| 50c150f0e22806d;
   b7104ba5d6e919aa["CLI Traces Flag Test"];
-  click b7104ba5d6e919aa "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/Verifications/TreacibilityMatrix.md#cli-traces-flag-test";
+  click b7104ba5d6e919aa "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/Verifications/TreacibilityMatrix.md#cli-traces-flag-test";
   class b7104ba5d6e919aa verification;
   cdab2d3174ce86a9["SystemRequirements/Requirements.md/CLI Traces Flag"];
   class cdab2d3174ce86a9 requirement;
-  click cdab2d3174ce86a9 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/SystemRequirements/Requirements.md#cli-traces-flag";
+  click cdab2d3174ce86a9 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/SystemRequirements/Requirements.md#cli-traces-flag";
   b7104ba5d6e919aa -.->|verifies| cdab2d3174ce86a9;
   1da67df379ec30a7 -->|satisfies| b7104ba5d6e919aa;
 ```
@@ -76,7 +76,6 @@ This test verifies that the system can generate a traceability matrix that accur
 - Matrix includes hierarchy indicators for parent-child relationships
 - Matrix includes verification status indicators (✅/❌)
 - Matrix follows the specified format with proper table structure
-
 
 #### Relations
   * verify: [SystemRequirements/Requirements.md/Traceability Matrix Builder Implementation](../SystemRequirements/Requirements.md#traceability-matrix-builder-implementation)

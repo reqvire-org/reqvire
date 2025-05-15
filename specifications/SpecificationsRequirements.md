@@ -9,54 +9,54 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  a9d2746640af5d30["Structure and Addressing in Markdown Documents"];
-  click a9d2746640af5d30 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/SpecificationsRequirements.md#structure-and-addressing-in-markdown-documents";
+  11082285c19e9df["Structure of Markdown Documents"];
+  click 11082285c19e9df "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/SpecificationsRequirements.md#structure-of-markdown-documents";
+  class 11082285c19e9df requirement;
+  a9d2746640af5d30["Structure And Addressing in Markdown documents"];
   class a9d2746640af5d30 requirement;
-  c75ac8fa29479ca5["UserStories.md#Managing MBSE Models"];
-  class c75ac8fa29479ca5 requirement;
-  click c75ac8fa29479ca5 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserStories.md#managing-mbse-models";
-  a9d2746640af5d30 -.->|deriveReqT| c75ac8fa29479ca5;
-  34ac784ed0e00552["Identifiers and Relations"];
-  click 34ac784ed0e00552 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/SpecificationsRequirements.md#identifiers-and-relations";
-  class 34ac784ed0e00552 requirement;
-  34ac784ed0e00552 -->|refines| a9d2746640af5d30;
+  click a9d2746640af5d30 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/SpecificationsRequirements.md#structure-and-addressing-in-markdown-documents";
+  a9d2746640af5d30 -->|refines| 11082285c19e9df;
   a01a924ab0c27629["../core/src/relation.rs"];
   class a01a924ab0c27629 default;
-  click a01a924ab0c27629 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/core/src/relation.rs";
-  a01a924ab0c27629 -->|satisfies| 34ac784ed0e00552;
-  29eb679eef252d12["Relation Types and behaviors"];
-  click 29eb679eef252d12 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/SpecificationsRequirements.md#relation-types-and-behaviors";
-  class 29eb679eef252d12 requirement;
-  29eb679eef252d12 -.->|deriveReqT| c75ac8fa29479ca5;
-  a01a924ab0c27629 -->|satisfies| 29eb679eef252d12;
-  11082285c19e9df["Structure of Markdown Documents"];
-  click 11082285c19e9df "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/SpecificationsRequirements.md#structure-of-markdown-documents";
-  class 11082285c19e9df requirement;
-  11082285c19e9df -->|refines| a9d2746640af5d30;
+  click a01a924ab0c27629 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/core/src/relation.rs";
   a01a924ab0c27629 -->|satisfies| 11082285c19e9df;
   3e5e5aa2d6181644["../core/src/element.rs"];
   class 3e5e5aa2d6181644 default;
-  click 3e5e5aa2d6181644 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/core/src/element.rs";
+  click 3e5e5aa2d6181644 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/core/src/element.rs";
   3e5e5aa2d6181644 -->|satisfies| 11082285c19e9df;
   aaf2fdce0a90bd2c["../core/src/subsection.rs"];
   class aaf2fdce0a90bd2c default;
-  click aaf2fdce0a90bd2c "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/core/src/subsection.rs";
+  click aaf2fdce0a90bd2c "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/core/src/subsection.rs";
   aaf2fdce0a90bd2c -->|satisfies| 11082285c19e9df;
   dfd639447d711d62["../core/src/parser.rs"];
   class dfd639447d711d62 default;
-  click dfd639447d711d62 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/core/src/parser.rs";
+  click dfd639447d711d62 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/core/src/parser.rs";
   dfd639447d711d62 -->|satisfies| 11082285c19e9df;
   36fd2b1e82621caf["../core/src/model.rs"];
   class 36fd2b1e82621caf default;
-  click 36fd2b1e82621caf "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/core/src/model.rs";
+  click 36fd2b1e82621caf "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/core/src/model.rs";
   36fd2b1e82621caf -->|satisfies| 11082285c19e9df;
+  29eb679eef252d12["Relation Types and behaviors"];
+  click 29eb679eef252d12 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/SpecificationsRequirements.md#relation-types-and-behaviors";
+  class 29eb679eef252d12 requirement;
+  c75ac8fa29479ca5["UserStories.md#Managing MBSE Models"];
+  class c75ac8fa29479ca5 requirement;
+  click c75ac8fa29479ca5 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/UserStories.md#managing-mbse-models";
+  29eb679eef252d12 -.->|deriveReqT| c75ac8fa29479ca5;
+  a01a924ab0c27629 -->|satisfies| 29eb679eef252d12;
   d914e938be7e0abf["Requirements Change Propagation"];
-  click d914e938be7e0abf "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/SpecificationsRequirements.md#requirements-change-propagation";
+  click d914e938be7e0abf "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/SpecificationsRequirements.md#requirements-change-propagation";
   class d914e938be7e0abf requirement;
   c699ef8d6d1f99d1["UserRequirements.md#Change Impact Analysis"];
   class c699ef8d6d1f99d1 requirement;
-  click c699ef8d6d1f99d1 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserRequirements.md#change-impact-analysis";
-  d914e938be7e0abf -->|refines| c699ef8d6d1f99d1;
+  click c699ef8d6d1f99d1 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/UserRequirements.md#change-impact-analysis";
+  c699ef8d6d1f99d1 -->|refines| d914e938be7e0abf;
+  34ac784ed0e00552["Identifiers and Relations"];
+  click 34ac784ed0e00552 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/SpecificationsRequirements.md#identifiers-and-relations";
+  class 34ac784ed0e00552 requirement;
+  a9d2746640af5d30 -->|refines| 34ac784ed0e00552;
+  a01a924ab0c27629 -->|satisfies| 34ac784ed0e00552;
+  a9d2746640af5d30 -.->|deriveReqT| c75ac8fa29479ca5;
 ```
 
 ---
@@ -211,7 +211,7 @@ The system shall implement power-saving mechanisms to optimize battery usage.
 The system shall activate power-saving mode when the battery level drops below 20%.  
 
 #### Relations
-  * refine: [System Power Management](#system-power-management)
+  * refinedBy: [System Power Management](#system-power-management)
   * satisfiedBy: [software/power_control.md](software/power_control.md)
   * verifiedBy: [test_cases/power_saving.md](test_cases/power_saving.md)
 
@@ -1078,8 +1078,8 @@ The direction of change propagation is not always the same as relation direction
 | **contain** | Forward | containedBy | Parent → Child | Links a parent element to the child elements it contains |
 | **derivedFrom** | Backward | derive | Parent → Child | Links a child element to the parent element it is derived from |
 | **derive** | Forward | derivedFrom | Parent → Child | Links a parent element to child elements derived from it |
-| **refine** | Backward | refinedBy | Parent → Child | Links a child element to a parent element it refines with more detail |
-| **refinedBy** | Forward | refine | Parent → Child | Links a parent element to child elements that refine it |
+| **refine** | Forward | refinedBy | Parent → Child | Links a parent element to a child element it refines with more detail |
+| **refinedBy** | Backward | refine | Parent → Child | Links a child element to parent elements that refines it |
 | **satisfiedBy** | Forward | satisfy | Requirement → Implementation | Links a requirement to elements that satisfy it |
 | **satisfy** | Backward | satisfiedBy | Requirement → Implementation | Links an implementation to the requirement it satisfies |
 | **verifiedBy** | Forward | verify | Requirement → Verification | Links a requirement to verification artifacts |

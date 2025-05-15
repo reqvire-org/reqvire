@@ -70,7 +70,7 @@ Main req.
 The systsem shall activate power-saving mode when the battery level drops below 20%.  
 
 #### Relations
-  * refine: [System Power Management](#system-power-management)
+  * containedBy: [System Power Management](#system-power-management)
   * satisfiedBy: [software/power_control.txt](software/power_control.txt)
   * verifiedBy: [test_cases/power_saving](#power-saving)
 

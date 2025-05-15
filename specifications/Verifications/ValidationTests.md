@@ -11,91 +11,91 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  5bf3bc3f9637ec2c["Requirements Files Search and Detection Test"];
-  click 5bf3bc3f9637ec2c "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/Verifications/ValidationTests.md#requirements-files-search-and-detection-test";
-  class 5bf3bc3f9637ec2c verification;
-  33b15634cbc8d029["SystemRequirements/Requirements.md#requirements-files-search-and-detection"];
-  class 33b15634cbc8d029 requirement;
-  click 33b15634cbc8d029 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/SystemRequirements/Requirements.md#requirements-files-search-and-detection";
-  5bf3bc3f9637ec2c -.->|verifies| 33b15634cbc8d029;
-  ec11a68aa5b4bdc1["tests/test-excluded-patterns/test.sh"];
-  class ec11a68aa5b4bdc1 default;
-  click ec11a68aa5b4bdc1 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/tests/test-excluded-patterns/test.sh";
-  ec11a68aa5b4bdc1 -->|satisfies| 5bf3bc3f9637ec2c;
-  19bbc820b0234421["Excluded File Relation Validation Test"];
-  click 19bbc820b0234421 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/Verifications/ValidationTests.md#excluded-file-relation-validation-test";
-  class 19bbc820b0234421 verification;
-  3871ef72a30780e5["SystemRequirements/Requirements.md#excluded-file-relation-validation"];
-  class 3871ef72a30780e5 requirement;
-  click 3871ef72a30780e5 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/SystemRequirements/Requirements.md#excluded-file-relation-validation";
-  19bbc820b0234421 -.->|verifies| 3871ef72a30780e5;
-  ec11a68aa5b4bdc1 -->|satisfies| 19bbc820b0234421;
-  ec87ed0e04fcf5c6["JSON Output Format Test"];
-  click ec87ed0e04fcf5c6 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/Verifications/ValidationTests.md#json-output-format-test";
-  class ec87ed0e04fcf5c6 verification;
-  bf6c9ff8abbc637b["SystemRequirements/Requirements.md#json-output-format"];
-  class bf6c9ff8abbc637b requirement;
-  click bf6c9ff8abbc637b "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/SystemRequirements/Requirements.md#json-output-format";
-  ec87ed0e04fcf5c6 -.->|verifies| bf6c9ff8abbc637b;
-  36d2b2cb50297425["tests/test-invalid-relations/test.sh"];
-  class 36d2b2cb50297425 default;
-  click 36d2b2cb50297425 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/tests/test-invalid-relations/test.sh";
-  36d2b2cb50297425 -->|satisfies| ec87ed0e04fcf5c6;
-  51427eae92058e14["Same-File Fragment Relations Test"];
-  click 51427eae92058e14 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/Verifications/ValidationTests.md#same-file-fragment-relations-test";
-  class 51427eae92058e14 verification;
-  bff4e3e834a9ffcc["SystemRequirements/Requirements.md#Relation Type Validation"];
-  class bff4e3e834a9ffcc requirement;
-  click bff4e3e834a9ffcc "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/SystemRequirements/Requirements.md#relation-type-validation";
-  51427eae92058e14 -.->|verifies| bff4e3e834a9ffcc;
-  f24f11691f55af62["SystemRequirements/Requirements.md#Requirements Processing"];
-  class f24f11691f55af62 requirement;
-  click f24f11691f55af62 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/SystemRequirements/Requirements.md#requirements-processing";
-  51427eae92058e14 -.->|verifies| f24f11691f55af62;
-  a4c8929dc751b4b1["tests/test-fragment-relations/test.sh"];
-  class a4c8929dc751b4b1 default;
-  click a4c8929dc751b4b1 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/tests/test-fragment-relations/test.sh";
-  a4c8929dc751b4b1 -->|satisfies| 51427eae92058e14;
   94776cf061319810["Unstructured Documents Test"];
-  click 94776cf061319810 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/Verifications/ValidationTests.md#unstructured-documents-test";
+  click 94776cf061319810 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/Verifications/ValidationTests.md#unstructured-documents-test";
   class 94776cf061319810 verification;
   3f1abb8fd2d7c9c2["SystemRequirements/Requirements.md#unstructured-documents"];
   class 3f1abb8fd2d7c9c2 requirement;
-  click 3f1abb8fd2d7c9c2 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/SystemRequirements/Requirements.md#unstructured-documents";
+  click 3f1abb8fd2d7c9c2 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/SystemRequirements/Requirements.md#unstructured-documents";
   94776cf061319810 -.->|verifies| 3f1abb8fd2d7c9c2;
   7cf643f1c1578783["tests/test-valid-relations/test.sh"];
   class 7cf643f1c1578783 default;
-  click 7cf643f1c1578783 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/tests/test-valid-relations/test.sh";
+  click 7cf643f1c1578783 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/tests/test-valid-relations/test.sh";
   7cf643f1c1578783 -->|satisfies| 94776cf061319810;
+  5bf3bc3f9637ec2c["Requirements Files Search and Detection Test"];
+  click 5bf3bc3f9637ec2c "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/Verifications/ValidationTests.md#requirements-files-search-and-detection-test";
+  class 5bf3bc3f9637ec2c verification;
+  33b15634cbc8d029["SystemRequirements/Requirements.md#requirements-files-search-and-detection"];
+  class 33b15634cbc8d029 requirement;
+  click 33b15634cbc8d029 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/SystemRequirements/Requirements.md#requirements-files-search-and-detection";
+  5bf3bc3f9637ec2c -.->|verifies| 33b15634cbc8d029;
+  ec11a68aa5b4bdc1["tests/test-excluded-patterns/test.sh"];
+  class ec11a68aa5b4bdc1 default;
+  click ec11a68aa5b4bdc1 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/tests/test-excluded-patterns/test.sh";
+  ec11a68aa5b4bdc1 -->|satisfies| 5bf3bc3f9637ec2c;
+  ec87ed0e04fcf5c6["JSON Output Format Test"];
+  click ec87ed0e04fcf5c6 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/Verifications/ValidationTests.md#json-output-format-test";
+  class ec87ed0e04fcf5c6 verification;
+  40de7485b25294["../UserRequirements.md#model-structure-and-summaries"];
+  class 40de7485b25294 requirement;
+  click 40de7485b25294 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/UserRequirements.md#model-structure-and-summaries";
+  ec87ed0e04fcf5c6 -.->|verifies| 40de7485b25294;
+  36d2b2cb50297425["tests/test-invalid-relations/test.sh"];
+  class 36d2b2cb50297425 default;
+  click 36d2b2cb50297425 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/tests/test-invalid-relations/test.sh";
+  36d2b2cb50297425 -->|satisfies| ec87ed0e04fcf5c6;
   a24c2f4208509008["Invalid Relations Test"];
-  click a24c2f4208509008 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/Verifications/ValidationTests.md#invalid-relations-test";
+  click a24c2f4208509008 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/Verifications/ValidationTests.md#invalid-relations-test";
   class a24c2f4208509008 verification;
   d72f6096b9a5dd8e["SystemRequirements/Requirement.md/Detailed Error Handling and Logging"];
   class d72f6096b9a5dd8e requirement;
-  click d72f6096b9a5dd8e "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/SystemRequirements/Requirements.md#detailed-error-handling-and-logging";
+  click d72f6096b9a5dd8e "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/SystemRequirements/Requirements.md#detailed-error-handling-and-logging";
   a24c2f4208509008 -.->|verifies| d72f6096b9a5dd8e;
+  bff4e3e834a9ffcc["SystemRequirements/Requirement.md/Relation Type Validation"];
+  class bff4e3e834a9ffcc requirement;
+  click bff4e3e834a9ffcc "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/SystemRequirements/Requirements.md#relation-type-validation";
   a24c2f4208509008 -.->|verifies| bff4e3e834a9ffcc;
   774d12db509b4a55["SystemRequirements/Requirement.md/Relation Element Type Validator"];
   class 774d12db509b4a55 requirement;
-  click 774d12db509b4a55 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/SystemRequirements/Requirements.md#relation-element-type-validator";
+  click 774d12db509b4a55 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/SystemRequirements/Requirements.md#relation-element-type-validator";
   a24c2f4208509008 -.->|verifies| 774d12db509b4a55;
   7ec3cb7f400a2e8d["UserRequirements.md/Validate Markdown Structure"];
   class 7ec3cb7f400a2e8d requirement;
-  click 7ec3cb7f400a2e8d "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserRequirements.md#validate-markdown-structure";
+  click 7ec3cb7f400a2e8d "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/UserRequirements.md#validate-markdown-structure";
   a24c2f4208509008 -.->|verifies| 7ec3cb7f400a2e8d;
   f9182ad2999d989c["UserRequirements.md/Validate Internal Consistency"];
   class f9182ad2999d989c requirement;
-  click f9182ad2999d989c "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserRequirements.md#validate-internal-consistency";
+  click f9182ad2999d989c "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/UserRequirements.md#validate-internal-consistency";
   a24c2f4208509008 -.->|verifies| f9182ad2999d989c;
   ee05a46627b568b7["UserRequirements.md/Validate Cross-Component Dependencies"];
   class ee05a46627b568b7 requirement;
-  click ee05a46627b568b7 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserRequirements.md#validate-cross-component-dependencies";
+  click ee05a46627b568b7 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/UserRequirements.md#validate-cross-component-dependencies";
   a24c2f4208509008 -.->|verifies| ee05a46627b568b7;
   2d3cfde19fc6bb79["UserRequirements.md/Provide Validation Reports"];
   class 2d3cfde19fc6bb79 requirement;
-  click 2d3cfde19fc6bb79 "https://github.com/Reqvire/reqvire/blob/30536324899084e88969175e3613c971ffa6e108/specifications/UserRequirements.md#provide-validation-reports";
+  click 2d3cfde19fc6bb79 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/UserRequirements.md#provide-validation-reports";
   a24c2f4208509008 -.->|verifies| 2d3cfde19fc6bb79;
   36d2b2cb50297425 -->|satisfies| a24c2f4208509008;
+  19bbc820b0234421["Excluded File Relation Validation Test"];
+  click 19bbc820b0234421 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/Verifications/ValidationTests.md#excluded-file-relation-validation-test";
+  class 19bbc820b0234421 verification;
+  3871ef72a30780e5["SystemRequirements/Requirements.md#excluded-file-relation-validation"];
+  class 3871ef72a30780e5 requirement;
+  click 3871ef72a30780e5 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/SystemRequirements/Requirements.md#excluded-file-relation-validation";
+  19bbc820b0234421 -.->|verifies| 3871ef72a30780e5;
+  ec11a68aa5b4bdc1 -->|satisfies| 19bbc820b0234421;
+  51427eae92058e14["Same-File Fragment Relations Test"];
+  click 51427eae92058e14 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/Verifications/ValidationTests.md#same-file-fragment-relations-test";
+  class 51427eae92058e14 verification;
+  51427eae92058e14 -.->|verifies| bff4e3e834a9ffcc;
+  f24f11691f55af62["SystemRequirements/Requirements.md#Requirements Processing"];
+  class f24f11691f55af62 requirement;
+  click f24f11691f55af62 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/SystemRequirements/Requirements.md#requirements-processing";
+  51427eae92058e14 -.->|verifies| f24f11691f55af62;
+  a4c8929dc751b4b1["tests/test-fragment-relations/test.sh"];
+  class a4c8929dc751b4b1 default;
+  click a4c8929dc751b4b1 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/tests/test-fragment-relations/test.sh";
+  a4c8929dc751b4b1 -->|satisfies| 51427eae92058e14;
 ```
 
 ---
@@ -156,7 +156,6 @@ This test verifies that Reqvire correctly handles and validates relations to fra
 - No error output about missing relation targets when using #fragment references
 - Successful validation message is displayed
 
-
 #### Relations
   * verify: [SystemRequirements/Requirements.md#Relation Type Validation](../SystemRequirements/Requirements.md#relation-type-validation)
   * verify: [SystemRequirements/Requirements.md#Requirements Processing](../SystemRequirements/Requirements.md#requirements-processing)
@@ -185,9 +184,8 @@ This test verifies that the system properly implements JSON output formatting fo
 - Output structure matches expected schema
 - All validation errors are properly represented in JSON format
 
-
 #### Relations
-  * verify: [SystemRequirements/Requirements.md#json-output-format](../SystemRequirements/Requirements.md#json-output-format)
+  * verify: [../UserRequirements.md#model-structure-and-summaries](../UserRequirements.md#model-structure-and-summaries)
   * satisfiedBy: [tests/test-invalid-relations/test.sh](../../tests/test-invalid-relations/test.sh)
 
 ---
@@ -215,7 +213,6 @@ This test verifies that the system correctly searches for and detects requiremen
 - Both specifications and external folders are processed
 - Non-markdown files are handled appropriately
 
-
 #### Relations
   * verify: [SystemRequirements/Requirements.md#requirements-files-search-and-detection](../SystemRequirements/Requirements.md#requirements-files-search-and-detection)
   * satisfiedBy: [tests/test-excluded-patterns/test.sh](../../tests/test-excluded-patterns/test.sh)
@@ -242,7 +239,6 @@ This test verifies that the system correctly handles unstructured documents for 
 - No attempt is made to extract elements from unstructured documents
 - Validation succeeds when referenced unstructured documents exist
 - Validation fails when referenced unstructured documents don't exist
-
 
 #### Relations
   * verify: [SystemRequirements/Requirements.md#unstructured-documents](../SystemRequirements/Requirements.md#unstructured-documents)

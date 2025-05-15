@@ -68,7 +68,7 @@ lazy_static! {
         // Refine relation
         m.insert("refine", RelationTypeInfo {
             name: "refine", 
-            direction: RelationDirection::Backward,
+            direction: RelationDirection::Forward,
             opposite: Some("refinedBy"),
             description: "Element refines a higher-level element",
             arrow: "-->",
@@ -78,7 +78,7 @@ lazy_static! {
         // Refine relation
         m.insert("refinedBy", RelationTypeInfo {
             name: "refinedBy", 
-            direction: RelationDirection::Forward,
+            direction: RelationDirection::Backward,
             opposite: Some("refine"),
             description: "A souce element being refined by other element.",
             arrow: "-->",
