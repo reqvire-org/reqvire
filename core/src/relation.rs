@@ -18,6 +18,7 @@ pub enum RelationDirection {
 pub struct RelationTypeInfo {
     pub name: &'static str,
     pub direction: RelationDirection,
+    pub ontological_direction: RelationDirection,    
     pub opposite: Option<&'static str>,
     pub description: &'static str,
     pub arrow: &'static str,
@@ -32,6 +33,7 @@ lazy_static! {
         m.insert("containedBy", RelationTypeInfo {
             name: "containedBy", 
             direction: RelationDirection::Backward, 
+            ontological_direction: RelationDirection::Backward,             
             opposite: Some("contain"),
             description: "Element is contained by another element",
             arrow: "--o",
@@ -41,6 +43,7 @@ lazy_static! {
         m.insert("contain", RelationTypeInfo {
             name: "contain", 
             direction: RelationDirection::Forward, 
+            ontological_direction: RelationDirection::Forward,                         
             opposite: Some("containedBy"),
             description: "Element contains another element",
             arrow: "--o",
@@ -51,6 +54,7 @@ lazy_static! {
         m.insert("derivedFrom", RelationTypeInfo {
             name: "derivedFrom", 
             direction: RelationDirection::Backward, 
+            ontological_direction: RelationDirection::Backward,            
             opposite: Some("derive"),
             description: "Element is derived from another element",
             arrow: "-.->",
@@ -59,6 +63,7 @@ lazy_static! {
         m.insert("derive", RelationTypeInfo {
             name: "derive", 
             direction: RelationDirection::Forward, 
+            ontological_direction: RelationDirection::Forward,            
             opposite: Some("derivedFrom"),
             description: "Element is source for a derived element",
             arrow: "-.->",
@@ -69,6 +74,7 @@ lazy_static! {
         m.insert("refine", RelationTypeInfo {
             name: "refine", 
             direction: RelationDirection::Forward,
+            ontological_direction: RelationDirection::Backward,                        
             opposite: Some("refinedBy"),
             description: "Element refines a higher-level element",
             arrow: "-->",
@@ -79,6 +85,7 @@ lazy_static! {
         m.insert("refinedBy", RelationTypeInfo {
             name: "refinedBy", 
             direction: RelationDirection::Backward,
+            ontological_direction: RelationDirection::Forward,            
             opposite: Some("refine"),
             description: "A souce element being refined by other element.",
             arrow: "-->",
@@ -89,6 +96,7 @@ lazy_static! {
         m.insert("satisfiedBy", RelationTypeInfo {
             name: "satisfiedBy", 
             direction: RelationDirection::Forward, 
+            ontological_direction: RelationDirection::Backward,            
             opposite: Some("satisfy"),
             description: "A souce element being satisfied by other element.",
             arrow: "-->",
@@ -97,6 +105,7 @@ lazy_static! {
         m.insert("satisfy", RelationTypeInfo {
             name: "satisfy", 
             direction: RelationDirection::Backward, 
+            ontological_direction: RelationDirection::Forward,            
             opposite: Some("satisfiedBy"),
             description: "Element satisfies another element",
             arrow: "-->",
@@ -107,6 +116,7 @@ lazy_static! {
         m.insert("verifiedBy", RelationTypeInfo {
             name: "verifiedBy", 
             direction: RelationDirection::Forward, 
+            ontological_direction: RelationDirection::Backward,            
             opposite: Some("verify"),
             description: "A souce element being verified by other element.",
             arrow: "-.->",
@@ -115,6 +125,7 @@ lazy_static! {
         m.insert("verify", RelationTypeInfo {
             name: "verify", 
             direction: RelationDirection::Backward, 
+            ontological_direction: RelationDirection::Forward,            
             opposite: Some("verifiedBy"),
             description: "Element verifies another element",
             arrow: "-.->",
@@ -125,6 +136,7 @@ lazy_static! {
         m.insert("trace", RelationTypeInfo {
             name: "trace", 
             direction: RelationDirection::Neutral, 
+            ontological_direction: RelationDirection::Neutral,            
             opposite: None,
             description: "Element is related to another element in a non-directional way",
             arrow: "-.->",
@@ -340,6 +352,14 @@ pub fn get_parent_relation_types() -> Vec<&'static str> {
         .collect()
 }
 
+/// Get the list of valid parent relation types (ontological hierarchical relationships).
+pub fn get_ontological_parent_relation_types() -> Vec<&'static str> {
+    RELATION_TYPES
+        .iter()
+        .filter(|(_, info)| info.ontological_direction == RelationDirection::Backward)
+        .map(|(name, _)| *name)
+        .collect()
+}
 
 /// Returns whether the relation is a verification-related type
 pub fn is_verification_relation(rtype: &RelationTypeInfo) -> bool {

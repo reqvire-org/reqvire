@@ -211,7 +211,7 @@ The system shall implement power-saving mechanisms to optimize battery usage.
 The system shall activate power-saving mode when the battery level drops below 20%.  
 
 #### Relations
-  * refinedBy: [System Power Management](#system-power-management)
+  * derivedFrom: [System Power Management](#system-power-management)
   * satisfiedBy: [software/power_control.md](software/power_control.md)
   * verifiedBy: [test_cases/power_saving.md](test_cases/power_saving.md)
 
@@ -358,7 +358,7 @@ The system shall implement semi-structured markdown format specifications that d
 The system shall implement the structure, rules, and usage of **Sections**, **Elements**, **Subsections**, **Relations**, and **Identifiers** in Markdown (`.md`) documents following clearly defined specifications.
 
 #### Relations
-  * refine: [Structure And Addressing in Markdown documents](#structure-and-addressing-in-markdown-documents)
+  * derivedFrom: [Structure And Addressing in Markdown documents](#structure-and-addressing-in-markdown-documents)
   * satisfiedBy: [../core/src/relation.rs](../core/src/relation.rs)
   * satisfiedBy: [../core/src/element.rs](../core/src/element.rs)
   * satisfiedBy: [../core/src/subsection.rs](../core/src/subsection.rs)      
@@ -742,7 +742,7 @@ The appropriate verification type should be selected based on the nature of the 
 The system shall implement  **Identifiers** and **Relations** following clearly defined specifications to ensure consistency, validity, and efficient querying and manipulation of these entities.
 
 #### Relations
-  * refine: [Structure And Addressing in Markdown documents](#structure-and-addressing-in-markdown-documents)
+  * derivedFrom: [Structure And Addressing in Markdown documents](#structure-and-addressing-in-markdown-documents)
   * satisfiedBy: [../core/src/relation.rs](../core/src/relation.rs)
 
 #### Details
@@ -966,7 +966,7 @@ If the referenced file is located in a subfolder relative to the current documen
 ```markdown
 
 #### Relations
-  * refines: [subfolder/details.md#refined-section](subfolder/details.html#refined-section)
+  * derive: [subfolder/details.md#refined-section](subfolder/details.html#refined-section)
 
 ```
 
@@ -1097,6 +1097,9 @@ These relations define hierarchical structures within the model:
 - **containedBy/contain**: Physical or logical containment hierarchy
 - **derivedFrom/derive**: Derivation of elements from higher-level elements
 - **refine/refinedBy**: Refinement relationships adding more detail
+
+Bear in mind that **refine/refinedBy** is counter intuitive because parent-child hierarchical relation is oposite from actual hierarchy of requirements: eg. lower level system requirement is parent to higher level user requirement if it `refines` it while in the same time, user requirement is parent in terms of model's ontological hierarchy.
+That is why `refine` relation is considered as `parent` relation in terms of validating having parent requriements.
 
 ### 2. Satisfaction Relations
 

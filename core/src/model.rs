@@ -7,7 +7,7 @@ use crate::element::Element;
 use crate::element_registry::ElementRegistry;
 use crate::error::ReqvireError;
 use crate::relation;
-use crate::relation::{get_parent_relation_types};
+use crate::relation::{get_ontological_parent_relation_types};
 use crate::element::ElementType;
 use crate::element::RequirementType;
 use crate::filesystem;
@@ -245,7 +245,7 @@ impl ModelManager {
         }
 
         // Check for missing parent relations
-        let valid_parent_relations = get_parent_relation_types();
+        let valid_parent_relations = get_ontological_parent_relation_types();
         for element in self.element_registry.get_all_elements() {
         
             let element_file= &element.file_path;
