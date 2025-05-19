@@ -10,10 +10,10 @@ graph LR;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
   6c33f565725d5e41["MOE_UA"];
-  click 6c33f565725d5e41 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/MOEs.md#moe_ua";
+  click 6c33f565725d5e41 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/MOEs.md#moe_ua";
   class 6c33f565725d5e41 requirement;
   ac59f565725d5e41["MOE_CE"];
-  click ac59f565725d5e41 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/MOEs.md#moe_ce";
+  click ac59f565725d5e41 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/MOEs.md#moe_ce";
   class ac59f565725d5e41 requirement;
 ```
 

@@ -854,7 +854,6 @@ mod tests {
             &RelationTypeInfo {
                 name: "derive",
                 direction: RelationDirection::Forward,
-                ontological_direction: RelationDirection::Forward,                
                 opposite: Some("derivedFrom"),
                 description: "Element B derives from A",
                 arrow: "-->",
@@ -900,7 +899,6 @@ mod tests {
             &RelationTypeInfo {
                 name: "contain",
                 direction: RelationDirection::Forward,
-                ontological_direction: RelationDirection::Forward,                                
                 opposite: Some("containedBy"),
                 description: "Element A contains B",
                 arrow: "-->",
@@ -914,7 +912,6 @@ mod tests {
             &RelationTypeInfo {
                 name: "derive",
                 direction: RelationDirection::Forward,
-                ontological_direction: RelationDirection::Forward,                                
                 opposite: Some("derivedFrom"),
                 description: "Element B derives from A",
                 arrow: "-->",

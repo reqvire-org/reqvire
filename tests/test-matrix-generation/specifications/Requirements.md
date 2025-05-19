@@ -40,7 +40,7 @@ This is a first-level child requirement that has a parent.
 This requirement should appear indented under Root Requirement Alpha in the matrix.
 
 #### Relations
-  * derivedFrom: [Requirements.md/Root Requirement Alpha](Requirements.md#root-requirement-alpha)
+  * refine: [Requirements.md/Root Requirement Alpha](Requirements.md#root-requirement-alpha)
   * verifiedBy: [Verifications.md/Verification Alpha](Verifications.md#verification-alpha)
 
 ---

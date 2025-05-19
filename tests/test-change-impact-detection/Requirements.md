@@ -61,7 +61,7 @@ Battery Saving.
 
 ### System Power Management
 
-Main req.
+The system shall implement power-saving mechanisms to optimize battery usage.
 
 ---
 
@@ -70,7 +70,7 @@ Main req.
 The systsem shall activate power-saving mode when the battery level drops below 20%.  
 
 #### Relations
-  * containedBy: [System Power Management](#system-power-management)
+  * derivedFrom: [System Power Management](#system-power-management)
   * satisfiedBy: [software/power_control.txt](software/power_control.txt)
   * verifiedBy: [test_cases/power_saving](#power-saving)
 

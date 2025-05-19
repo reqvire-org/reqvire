@@ -9,54 +9,54 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  11082285c19e9df["Structure of Markdown Documents"];
-  click 11082285c19e9df "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/SpecificationsRequirements.md#structure-of-markdown-documents";
-  class 11082285c19e9df requirement;
-  a9d2746640af5d30["Structure And Addressing in Markdown documents"];
-  class a9d2746640af5d30 requirement;
-  click a9d2746640af5d30 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/SpecificationsRequirements.md#structure-and-addressing-in-markdown-documents";
-  a9d2746640af5d30 -->|refines| 11082285c19e9df;
-  a01a924ab0c27629["../core/src/relation.rs"];
-  class a01a924ab0c27629 default;
-  click a01a924ab0c27629 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/core/src/relation.rs";
-  a01a924ab0c27629 -->|satisfies| 11082285c19e9df;
-  3e5e5aa2d6181644["../core/src/element.rs"];
-  class 3e5e5aa2d6181644 default;
-  click 3e5e5aa2d6181644 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/core/src/element.rs";
-  3e5e5aa2d6181644 -->|satisfies| 11082285c19e9df;
-  aaf2fdce0a90bd2c["../core/src/subsection.rs"];
-  class aaf2fdce0a90bd2c default;
-  click aaf2fdce0a90bd2c "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/core/src/subsection.rs";
-  aaf2fdce0a90bd2c -->|satisfies| 11082285c19e9df;
-  dfd639447d711d62["../core/src/parser.rs"];
-  class dfd639447d711d62 default;
-  click dfd639447d711d62 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/core/src/parser.rs";
-  dfd639447d711d62 -->|satisfies| 11082285c19e9df;
-  36fd2b1e82621caf["../core/src/model.rs"];
-  class 36fd2b1e82621caf default;
-  click 36fd2b1e82621caf "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/core/src/model.rs";
-  36fd2b1e82621caf -->|satisfies| 11082285c19e9df;
   29eb679eef252d12["Relation Types and behaviors"];
-  click 29eb679eef252d12 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/SpecificationsRequirements.md#relation-types-and-behaviors";
+  click 29eb679eef252d12 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SpecificationsRequirements.md#relation-types-and-behaviors";
   class 29eb679eef252d12 requirement;
   c75ac8fa29479ca5["UserStories.md#Managing MBSE Models"];
   class c75ac8fa29479ca5 requirement;
-  click c75ac8fa29479ca5 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/UserStories.md#managing-mbse-models";
+  click c75ac8fa29479ca5 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserStories.md#managing-mbse-models";
   29eb679eef252d12 -.->|deriveReqT| c75ac8fa29479ca5;
+  a01a924ab0c27629["../core/src/relation.rs"];
+  class a01a924ab0c27629 default;
+  click a01a924ab0c27629 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/core/src/relation.rs";
   a01a924ab0c27629 -->|satisfies| 29eb679eef252d12;
+  a9d2746640af5d30["Structure and Addressing in Markdown Documents"];
+  click a9d2746640af5d30 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SpecificationsRequirements.md#structure-and-addressing-in-markdown-documents";
+  class a9d2746640af5d30 requirement;
+  a9d2746640af5d30 -.->|deriveReqT| c75ac8fa29479ca5;
   d914e938be7e0abf["Requirements Change Propagation"];
-  click d914e938be7e0abf "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/SpecificationsRequirements.md#requirements-change-propagation";
+  click d914e938be7e0abf "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SpecificationsRequirements.md#requirements-change-propagation";
   class d914e938be7e0abf requirement;
   c699ef8d6d1f99d1["UserRequirements.md#Change Impact Analysis"];
   class c699ef8d6d1f99d1 requirement;
-  click c699ef8d6d1f99d1 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/UserRequirements.md#change-impact-analysis";
-  c699ef8d6d1f99d1 -->|refines| d914e938be7e0abf;
+  click c699ef8d6d1f99d1 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#change-impact-analysis";
+  d914e938be7e0abf -->|refines| c699ef8d6d1f99d1;
   34ac784ed0e00552["Identifiers and Relations"];
-  click 34ac784ed0e00552 "https://github.com/Reqvire/reqvire/blob/667635d4628fed400323f7df3689af2dbc2ad666/specifications/SpecificationsRequirements.md#identifiers-and-relations";
+  click 34ac784ed0e00552 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SpecificationsRequirements.md#identifiers-and-relations";
   class 34ac784ed0e00552 requirement;
-  a9d2746640af5d30 -->|refines| 34ac784ed0e00552;
+  34ac784ed0e00552 -.->|deriveReqT| a9d2746640af5d30;
   a01a924ab0c27629 -->|satisfies| 34ac784ed0e00552;
-  a9d2746640af5d30 -.->|deriveReqT| c75ac8fa29479ca5;
+  11082285c19e9df["Structure of Markdown Documents"];
+  click 11082285c19e9df "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SpecificationsRequirements.md#structure-of-markdown-documents";
+  class 11082285c19e9df requirement;
+  11082285c19e9df -.->|deriveReqT| a9d2746640af5d30;
+  a01a924ab0c27629 -->|satisfies| 11082285c19e9df;
+  3e5e5aa2d6181644["../core/src/element.rs"];
+  class 3e5e5aa2d6181644 default;
+  click 3e5e5aa2d6181644 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/core/src/element.rs";
+  3e5e5aa2d6181644 -->|satisfies| 11082285c19e9df;
+  aaf2fdce0a90bd2c["../core/src/subsection.rs"];
+  class aaf2fdce0a90bd2c default;
+  click aaf2fdce0a90bd2c "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/core/src/subsection.rs";
+  aaf2fdce0a90bd2c -->|satisfies| 11082285c19e9df;
+  dfd639447d711d62["../core/src/parser.rs"];
+  class dfd639447d711d62 default;
+  click dfd639447d711d62 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/core/src/parser.rs";
+  dfd639447d711d62 -->|satisfies| 11082285c19e9df;
+  36fd2b1e82621caf["../core/src/model.rs"];
+  class 36fd2b1e82621caf default;
+  click 36fd2b1e82621caf "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/core/src/model.rs";
+  36fd2b1e82621caf -->|satisfies| 11082285c19e9df;
 ```
 
 ---
@@ -85,23 +85,14 @@ Changes to high-level requirements cascade down to implementation.
 Verification artifacts must be marked for revalidation to reflect changes.
 Automated tools should flag all impacted requirements for review.
 
-
-## Relation Types and Change Propagation
-
-The specific relation types, their directionality, and change propagation behaviors are defined in the [RelationTypesRegistry.md](RelationTypesRegistry.md) document, which serves as the single source of truth for all relation types in the system.
-
-This document focuses on the implementation and mechanics of change propagation, while the registry defines the specific behaviors for each relation type.
-
 ### Relation Categories for Change Propagation
 
 For change propagation purposes, relations can be categorized into several groups:
 
-1. **Hierarchical Relations** - Changes propagate from parent to child elements (containedBy, contain, derivedFrom, derive, refine, refinedBy)
-2. **Satisfaction Relations** - Changes to requirements affect implementations (satisfiedBy, satisfy)
-3. **Verification Relations** - Changes to requirements invalidate verifications (verifiedBy, verify)
+1. **Hierarchical Relations** - Changes propagate from parent to child elements (contain, derivedFrom, refinedBy)
+2. **Satisfaction Relations** - Changes to requirements affect implementations (satisfiedBy)
+3. **Verification Relations** - Changes to requirements invalidate verifications (verifiedBy)
 4. **Traceability Relations** - No change propagation, for documentation only (trace)
-
-See the [RelationTypesRegistry.md](RelationTypesRegistry.md) document for the complete definition of each relation type, including its directionality and change propagation behavior.
 
 ---
 
@@ -144,9 +135,6 @@ This requirement defines a high-level system constraint.
 ### Child Requirement
 This requirement defines additional functionality.
 
-#### Relations
-  * containedBy: [Parent Requirement](#parent-requirement)
-  
 ```
 
 If Parent Requirement changes, Child Requirement must be reviewed and updated.
@@ -161,6 +149,7 @@ If Parent Requirement changes, Child Requirement must be reviewed and updated.
 ---
 
 ### Functional Requirement
+
 The system shall process transactions within 500ms.
 
 #### Relations
@@ -180,6 +169,7 @@ If Functional Requirement changes, Performance Constraints in the architecture d
 ---
 
 ### Safety Requirement
+
 The system shall shut down if temperature exceeds 100°C.
 
 #### Relations
@@ -211,7 +201,7 @@ The system shall implement power-saving mechanisms to optimize battery usage.
 The system shall activate power-saving mode when the battery level drops below 20%.  
 
 #### Relations
-  * derivedFrom: [System Power Management](#system-power-management)
+  * deriveFrom: [System Power Management](#system-power-management)
   * satisfiedBy: [software/power_control.md](software/power_control.md)
   * verifiedBy: [test_cases/power_saving.md](test_cases/power_saving.md)
 
@@ -222,7 +212,7 @@ The system shall activate power-saving mode when the battery level drops below 2
 The system shall reduce CPU frequency by 30% in power-saving mode.  
 
 #### Relations
-  * derivedFrom: [Power Saving Mode](#power-saving-mode)
+  * deriveFrom: [Power Saving Mode](#power-saving-mode)
   * satisfiedBy: [firmware/cpu_manager.md](firmware/cpu_manager.md)
   * verifiedBy: [test_cases/cpu_throttling.md](test_cases/cpu_throttling.md)
 
@@ -233,7 +223,7 @@ The system shall reduce CPU frequency by 30% in power-saving mode.
 The system shall reduce screen brightness by 40% in power-saving mode.  
 
 #### Relations
-  * derivedFrom: [Power Saving Mode](#power-saving-mode)
+  * deriveFrom: [Power Saving Mode](#power-saving-mode)
   * verifiedBy: [test_cases/screen_brightness.md](test_cases/screen_brightness.md)
 
 ---
@@ -243,7 +233,7 @@ The system shall reduce screen brightness by 40% in power-saving mode.
 The system shall disable non-essential background services when battery levels drop below 15%.  
 
 #### Relations
-  * derivedFrom: [System Power Management](#system-power-management)
+  * deriveFrom: [System Power Management](#system-power-management)
   * satisfiedBy: [software/battery_manager.md](software/battery_manager.md)
   * verifiedBy: [test_cases/battery_saving.md](test_cases/battery_saving.md)
 
@@ -253,7 +243,7 @@ The system shall disable non-essential background services when battery levels d
 The system shall reduce network polling frequency when battery levels drop below 15%.  
 
 #### Relations
-  * derivedFrom: [Battery Optimization](#battery-optimization)
+  * deriveFrom: [Battery Optimization](#battery-optimization)
   * satisfiedBy: [software/network_manager.md](software/network_manager.md)
 ```
 
@@ -262,8 +252,8 @@ The system shall reduce network polling frequency when battery levels drop below
 
 
 Change Propagation Flow:
-1. A **change** in **Power Saving Mode** flows **downward** to **CPU Power Reduction** because it is **derivedFrom** it.
-2. A **change** in **Power Saving Mode** flows **downward** to **Screen Brightness Adjustment** because it is **derivedFrom** it.    
+1. A **change** in **Power Saving Mode** flows **downward** to **CPU Power Reduction**.
+2. A **change** in **Power Saving Mode** flows **downward** to **Screen Brightness Adjustment**.
 3. Additionally, all **satisfiedBy** and **verifiedBy** relations from affected requirements must be reviewed:
    - **Power Saving Mode** → **software/power_control.md** (implementation) & **test_cases/power_saving.md** (verification).  
    - **CPU Power Reduction** → **firmware/cpu_manager.md** (implementation) & **test_cases/cpu_throttling.md** (verification).  
@@ -280,11 +270,11 @@ flowchart TD;
 
     %% Requirements Hierarchy
     A[System Power Management]:::requirement
-    B[Power Saving Mode]:::requirement -->|refine| A
-    C[CPU Power Reduction]:::requirement -->|derivedFrom| B
-    D[Screen Brightness Adjustment]:::requirement -->|derivedFrom| B
-    E[Battery Optimization]:::requirement -->|derivedFrom| A
-    G[Network Power Optimization]:::requirement -->|derivedFrom| E
+    A -->|deriveReqt| B[Power Saving Mode]:::requirement
+    B -->|deriveReqt| C[CPU Power Reduction]:::requirement
+    B -->|deriveReqt| D[Screen Brightness Adjustment]:::requirement
+    A -->|deriveReqt| E[Battery Optimization]:::requirement 
+    E -->|deriveReqt| G[Network Power Optimization]:::requirement
 
     %% Implementations (Satisfied By)
     B -->|satisfiedBy| SB1[software/power_control.md]:::implementation
@@ -340,6 +330,7 @@ flowchart TD;
 
 
 ```
+
 </details>
 
 ---
@@ -1063,13 +1054,6 @@ Relations have three possible directionality patterns:
 3. **Neutral** - The relation has no inherent direction
    - Example: `trace` simply indicates a relationship without directionality
 
-### Change Propagation
-
-The direction of change propagation is not always the same as relation directionality:
-
-- In hierarchical relationships, changes propagate downward from parents to children
-- Some relations like `verifiedBy` specifically trigger invalidation rather than just change propagation 
-
 ## Comprehensive Relation Type Table
 
 | Relation Type | Direction | Opposite Type | Change Propagation | Description |
@@ -1078,8 +1062,8 @@ The direction of change propagation is not always the same as relation direction
 | **contain** | Forward | containedBy | Parent → Child | Links a parent element to the child elements it contains |
 | **derivedFrom** | Backward | derive | Parent → Child | Links a child element to the parent element it is derived from |
 | **derive** | Forward | derivedFrom | Parent → Child | Links a parent element to child elements derived from it |
-| **refine** | Forward | refinedBy | Parent → Child | Links a parent element to a child element it refines with more detail |
-| **refinedBy** | Backward | refine | Parent → Child | Links a child element to parent elements that refines it |
+| **refine** | Forward | refinedBy | Parent → Child | Links a child element to parent elements that refines it |
+| **refinedBy** | Backward | refine | Parent → Child | Links a parent element to a child element it refines it with more details  |
 | **satisfiedBy** | Forward | satisfy | Requirement → Implementation | Links a requirement to elements that satisfy it |
 | **satisfy** | Backward | satisfiedBy | Requirement → Implementation | Links an implementation to the requirement it satisfies |
 | **verifiedBy** | Forward | verify | Requirement → Verification | Links a requirement to verification artifacts |
@@ -1097,9 +1081,6 @@ These relations define hierarchical structures within the model:
 - **containedBy/contain**: Physical or logical containment hierarchy
 - **derivedFrom/derive**: Derivation of elements from higher-level elements
 - **refine/refinedBy**: Refinement relationships adding more detail
-
-Bear in mind that **refine/refinedBy** is counter intuitive because parent-child hierarchical relation is oposite from actual hierarchy of requirements: eg. lower level system requirement is parent to higher level user requirement if it `refines` it while in the same time, user requirement is parent in terms of model's ontological hierarchy.
-That is why `refine` relation is considered as `parent` relation in terms of validating having parent requriements.
 
 ### 2. Satisfaction Relations
 

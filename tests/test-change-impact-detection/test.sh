@@ -58,6 +58,7 @@ fi
 # Extract only the important parts (excluding timestamp and path-specific lines)
 GOTTEN_CONTENT=$(echo "$OUTPUT" | grep -v "INFO  reqvire::config" | grep -v "Warning: Element")
 SANITIZED_OUTPUT=$(echo "$GOTTEN_CONTENT" | sed -E 's#https://[^ )]+/blob/[a-f0-9]{7,40}/##g')
+
 # The expected content with blank lines matching actual output
 EXPECTED_CONTENT='## Change Impact Report
 
