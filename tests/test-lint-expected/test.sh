@@ -13,6 +13,9 @@
 #
 
 
+pushd "$TEST_DIR" > /dev/null 2>&1
+git init > /dev/null 2>&1
+popd > /dev/null 2>&1
 
 
 OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml"  --lint --dry-run 2>&1)

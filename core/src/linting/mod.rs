@@ -19,24 +19,22 @@ pub mod reserved_subsections;
 pub mod nonlink_identifiers;
 
 pub fn run_linting(
-    specification_folder: &PathBuf,
-    external_folders: &[PathBuf],
     excluded_filename_patterns: &GlobSet,
     dry_run: bool,
+    subdirectory: Option<&str>,
 ) -> Result<(), ReqvireError> {
-    debug!("Starting linting process in {:?}", specification_folder);
+    debug!("Starting linting process...");
 
     let files = utils::scan_markdown_files(
         None,
-        specification_folder,
-        external_folders,
         excluded_filename_patterns,
+        subdirectory
     );
     debug!("Found {} markdown files to lint", files.len());
 
     let mut total_suggestions = 0;
 
-    for (file_path, _) in files {
+    for file_path in files {
         let original_content = fs::read_to_string(&file_path)?;
         let mut modified_content = original_content.clone();
 
@@ -583,9 +581,10 @@ mod tests {
         assert_eq!(result, "Hello\nRust\n");
     }
 
-    /// Test: Running Linting with Dry Run Mode
+    /// Test: Running Linting with Dry Run Mode on a specific directory
     #[test]
     fn test_run_linting_dry_run() {
+        // Create a temporary directory for the test
         let temp_dir = tempfile::tempdir().unwrap();
         let test_file_path = temp_dir.path().join("test.md");
 
@@ -593,11 +592,15 @@ mod tests {
         let test_content = "## Test Header\n\n \nThis is a test file.\n";
         fs::write(&test_file_path, test_content).unwrap();
 
+        // Use the absolute path to the temporary directory
+        let temp_dir_str = temp_dir.path().to_string_lossy().to_string();
+        
         let excluded_patterns = GlobSetBuilder::new().build().unwrap();
-        let result = run_linting(&temp_dir.path().to_path_buf(), &[], &excluded_patterns, true);
+        
+        // Run linting ONLY on the temporary directory
+        let result = run_linting(&excluded_patterns, true, Some(&temp_dir_str));
 
         assert!(result.is_ok(), "Linting should run without errors");
-
     }
     /// Test: Remove content within <details> blocks
     #[test]

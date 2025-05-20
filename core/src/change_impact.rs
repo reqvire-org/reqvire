@@ -90,23 +90,17 @@ pub struct ChangeImpactReport<'a> {
     pub removed: Vec<RemovedElement>,
     pub changed: Vec<ChangedElement>,
     pub invalidated_verifications: Vec<InvalidatedVerification>,    
-    #[serde(skip_serializing)]
-    specification_folder: &'a PathBuf,
-    #[serde(skip_serializing)]
-    external_folders: &'a [PathBuf],
     #[serde(skip_serializing)]    
     repo_root: &'a PathBuf
 }
 
 impl<'a> ChangeImpactReport<'a> {
-    pub fn new(repo_root: &'a PathBuf, specification_folder: &'a PathBuf, external_folders: &'a [PathBuf]) -> Self {
+    pub fn new(repo_root: &'a PathBuf) -> Self {
         Self {
             added: Vec::new(),
             removed: Vec::new(),
             changed: Vec::new(),
             invalidated_verifications: Vec::new(),
-            specification_folder,
-            external_folders,
             repo_root
         }
     }
@@ -114,7 +108,7 @@ impl<'a> ChangeImpactReport<'a> {
 
    
     fn to_relative_paths(&self) -> ChangeImpactReport<'a> {
-        let mut report = ChangeImpactReport::new(self.repo_root, self.specification_folder, self.external_folders);
+        let mut report = ChangeImpactReport::new(self.repo_root);
         let to_relative = |path: &str| {
             utils::get_relative_path_from_root(&PathBuf::from(path), &self.repo_root)
                 .map(|p| p.to_string_lossy().to_string())
@@ -687,11 +681,9 @@ fn propagate_changed_flags(
 pub fn compute_change_impact<'a>(
     current: &'a element_registry::ElementRegistry,
     reference: &'a element_registry::ElementRegistry,
-    repo_root: &'a PathBuf,    
-    specification_folder: &'a PathBuf,
-    external_folders: &'a [PathBuf],
+    repo_root: &'a PathBuf
 ) -> Result<ChangeImpactReport<'a>, ReqvireError> {
-    let mut report = ChangeImpactReport::new(repo_root, specification_folder, external_folders);
+    let mut report = ChangeImpactReport::new(repo_root);
 
     let current_ids: HashSet<&String> = current.elements.keys().collect();
     let reference_ids: HashSet<&String> = reference.elements.keys().collect();

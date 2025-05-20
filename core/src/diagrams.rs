@@ -13,9 +13,7 @@ use crate::git_commands;
 /// Generates diagrams grouped by `file_path` and `section`
 pub fn generate_diagrams_by_section(
     registry: &ElementRegistry,
-    direction: & str,        
-    specification_folder: &PathBuf, 
-    external_folders: &[PathBuf],        
+    direction: &str
 ) -> Result<HashMap<String, String>, ReqvireError> {
     let mut diagrams: HashMap<String, String> = HashMap::new();
 
@@ -35,7 +33,7 @@ pub fn generate_diagrams_by_section(
     for ((file_path, section), section_elements) in grouped_elements {
         debug!("Generating diagram for file: {}, section: {}", file_path, section);
 
-        let diagram = generate_section_diagram(registry, &section, &section_elements, &file_path, direction, specification_folder, external_folders)?;
+        let diagram = generate_section_diagram(registry, &section, &section_elements, &file_path, direction)?;
         let diagram_key = format!("{}::{}", file_path, section);
         diagrams.insert(diagram_key, diagram);
     }
@@ -49,9 +47,7 @@ fn generate_section_diagram(
     _section: &str,
     elements: &[&Element],
     file_path: &str,
-    direction: & str,
-    specification_folder: &PathBuf, 
-    external_folders: &[PathBuf],      
+    direction: &str
 ) -> Result<String, ReqvireError> {
     // Get Git repository information for creating proper links
     let repo_root = match git_commands::repository_root() {
@@ -88,8 +84,6 @@ fn generate_section_diagram(
             element, 
             &mut included_elements, 
             file_path,
-            specification_folder,
-            external_folders,
             &repo_root,
             &base_url,
             &commit_hash
@@ -108,11 +102,9 @@ fn add_element_to_diagram(
     element: &Element,
     included_elements: &mut HashSet<String>,
     file_path: &str,
-    specification_folder: &PathBuf, 
-    external_folders: &[PathBuf],
-    repo_root: &PathBuf,
-    base_url: &str,
-    commit_hash: &str
+    _repo_root: &PathBuf,
+    _base_url: &str,
+    _commit_hash: &str
 ) -> Result<(), ReqvireError> {
 
     // Convert file path to its parent directory (returns PathBuf)
@@ -120,20 +112,19 @@ fn add_element_to_diagram(
         .parent()
         .map(|p| p.to_path_buf()) 
         .unwrap_or_else(|| PathBuf::from("."));
-
-    // Create a stable GitHub link for the element if we have the git info
-    let has_git_info = !base_url.is_empty() && !commit_hash.is_empty() && !repo_root.as_os_str().is_empty();
-    
+ 
     // Get HTML-style relative ID for local navigation
     let relative_target = utils::to_relative_identifier(
         &element.identifier.clone(),
-        &base_dir,
-        specification_folder,
-        external_folders
+        &base_dir
     )?;
-    
+
+    /*
+    // Create a stable GitHub link for the element if we have the git info
+    let has_git_info = !base_url.is_empty() && !commit_hash.is_empty() && !repo_root.as_os_str().is_empty();
+       
     // Get a GitHub link if we have git info
-    let git_link = if has_git_info {
+    let click_target = if has_git_info {
         // Get repository-relative path
         let relative_id = match utils::get_relative_path_from_root(&PathBuf::from(&element.identifier), &repo_root) {
             Ok(rel_path) => rel_path.to_string_lossy().to_string(),
@@ -146,6 +137,9 @@ fn add_element_to_diagram(
         // Fall back to the relative link for local navigation
         relative_target.clone()
     };
+    */
+    
+    let click_target = relative_target;
     
     let element_id = utils::hash_identifier(&element.identifier);   
 
@@ -164,9 +158,7 @@ fn add_element_to_diagram(
                   
        // Add the element node
        diagram.push_str(&format!("  {}[\"{}\"];\n", element_id, label));
-       
-       // Use GitHub link if available, otherwise fall back to local link
-       let click_target = if has_git_info { git_link } else { relative_target };
+
        diagram.push_str(&format!("  click {} \"{}\";\n", element_id, click_target));
        
        diagram.push_str(&format!("  class {} {};\n", element_id, class));
@@ -187,11 +179,10 @@ fn add_element_to_diagram(
                 // Get HTML-style relative ID for local navigation
                 let relative_target = utils::to_relative_identifier(
                     &target,
-                    &base_dir,
-                    specification_folder,
-                    external_folders
+                    &base_dir
                 )?;
                 
+                /*
                 // Get a GitHub link if we have git info
                 let git_link = if has_git_info {
                     // Get repository-relative path
@@ -206,6 +197,9 @@ fn add_element_to_diagram(
                     // Fall back to the relative link for local navigation
                     relative_target.clone()
                 };
+                */
+                
+                let click_target =relative_target;
                 
                 if !included_elements.contains(target) {
                     included_elements.insert(target.clone());
@@ -225,8 +219,6 @@ fn add_element_to_diagram(
                     diagram.push_str(&format!("  {}[\"{}\"];\n", target_id, label));
                     diagram.push_str(&format!("  class {} {};\n", target_id, class));                    
                     
-                    // Use GitHub link if available, otherwise fall back to local link
-                    let click_target = if has_git_info { git_link } else { relative_target };
                     diagram.push_str(&format!("  click {} \"{}\";\n", target_id, click_target));
                 }
                 target_id

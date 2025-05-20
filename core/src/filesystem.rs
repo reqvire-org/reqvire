@@ -6,11 +6,11 @@ use crate::git_commands;
 
 pub struct FileReaderIterator<'a> {
     git_commit_hash: Option<&'a str>,
-    files: IntoIter<(PathBuf,PathBuf)>,
+    files: IntoIter<PathBuf>,
 }
 
 impl<'a> FileReaderIterator<'a> {
-    pub fn new(git_commit_hash: Option<&'a str>, files: Vec<(PathBuf,PathBuf)>) -> Self {
+    pub fn new(git_commit_hash: Option<&'a str>, files: Vec<PathBuf>) -> Self {
         Self {
             files: files.into_iter(),
             git_commit_hash: git_commit_hash,            
@@ -22,15 +22,23 @@ impl Iterator for FileReaderIterator<'_>{
     type Item = Result<(PathBuf, String, String), ReqvireError>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        self.files.next().map(|(file,folder)| {
+        self.files.next().map(|file| {
             let filename_str = file.file_name()
                 .ok_or_else(|| ReqvireError::PathError(format!("Problem reading file: {:?}", file)))?
                 .to_string_lossy()
                 .to_string();
                 
             match self.git_commit_hash{
-                Some(commit)=>{                  
-                    match git_commands::get_file_at_commit(&file.to_string_lossy(), &folder, commit)  {
+                Some(commit)=>{
+                    // Get git root directory
+                    let git_root = match git_commands::get_git_root_dir() {
+                        Ok(dir) => dir,
+                        Err(_) => {
+                            return Err(ReqvireError::GitCommandError("Failed to get git root directory".to_string()));
+                        }
+                    };
+                
+                    match git_commands::get_file_at_commit(&file.to_string_lossy(), &git_root, commit) {
                         Ok(content)=> {
                             Ok((file, filename_str, content))
                         },

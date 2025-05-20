@@ -11,24 +11,24 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  ecd5cbbaddffb824["Model Summary Tests"];
-  click ecd5cbbaddffb824 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/Verifications/ReportsTests.md#model-summary-tests";
-  class ecd5cbbaddffb824 verification;
-  ed42c8b28f021de0["tests/test-model-summary-reports/test.sh"];
-  class ed42c8b28f021de0 default;
-  click ed42c8b28f021de0 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/tests/test-model-summary-reports/test.sh";
-  ed42c8b28f021de0 -->|satisfies| ecd5cbbaddffb824;
   62274e8cf8493254["Index Generation Test"];
-  click 62274e8cf8493254 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/Verifications/ReportsTests.md#index-generation-test";
+  click 62274e8cf8493254 "ReportsTests.md#index-generation-test";
   class 62274e8cf8493254 verification;
   3b4bfa0725509a0e["SystemRequirements/Requirements.md#index-generation"];
   class 3b4bfa0725509a0e requirement;
-  click 3b4bfa0725509a0e "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SystemRequirements/Requirements.md#index-generation";
+  click 3b4bfa0725509a0e "../SystemRequirements/Requirements.md#index-generation";
   62274e8cf8493254 -.->|verifies| 3b4bfa0725509a0e;
   9c89c7cfe5f93c50["tests/test-index-generation/test.sh"];
   class 9c89c7cfe5f93c50 default;
-  click 9c89c7cfe5f93c50 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/tests/test-index-generation/test.sh";
+  click 9c89c7cfe5f93c50 "../../tests/test-index-generation/test.sh";
   9c89c7cfe5f93c50 -->|satisfies| 62274e8cf8493254;
+  ecd5cbbaddffb824["Model Summary Tests"];
+  click ecd5cbbaddffb824 "ReportsTests.md#model-summary-tests";
+  class ecd5cbbaddffb824 verification;
+  ed42c8b28f021de0["tests/test-model-summary-reports/test.sh"];
+  class ed42c8b28f021de0 default;
+  click ed42c8b28f021de0 "../../tests/test-model-summary-reports/test.sh";
+  ed42c8b28f021de0 -->|satisfies| ecd5cbbaddffb824;
 ```
 
 ---

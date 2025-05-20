@@ -1,4 +1,4 @@
-# System Requiremeame rets
+# System Requirements
 
 ## Linting    
 ```mermaid
@@ -9,89 +9,88 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  48e8a0b4b18111c4["File Pattern Exclusion for Linting"];
-  click 48e8a0b4b18111c4 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SystemRequirements/Requirements.md#file-pattern-exclusion-for-linting";
-  class 48e8a0b4b18111c4 requirement;
-  4bf74699f40f4a76["Configurable Filename Exclusion Patterns"];
-  class 4bf74699f40f4a76 requirement;
-  click 4bf74699f40f4a76 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SystemRequirements/Requirements.md#configurable-filename-exclusion-patterns";
-  48e8a0b4b18111c4 -.->|deriveReqT| 4bf74699f40f4a76;
-  85989fd7bb727157["utils.rs"];
-  class 85989fd7bb727157 default;
-  click 85989fd7bb727157 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/core/src/utils.rs";
-  85989fd7bb727157 -->|satisfies| 48e8a0b4b18111c4;
+  f540b21f7eced636["Missing Separators Linting Implementation"];
+  click f540b21f7eced636 "Requirements.md#missing-separators-linting-implementation";
+  class f540b21f7eced636 requirement;
+  1ddbeea0cf8eaad5["UserRequirements.md/Format Consistency Enforcement"];
+  class 1ddbeea0cf8eaad5 requirement;
+  click 1ddbeea0cf8eaad5 "../UserRequirements.md#format-consistency-enforcement";
+  f540b21f7eced636 -.->|deriveReqT| 1ddbeea0cf8eaad5;
+  45e2af09e602182a["linting/separators.rs"];
+  class 45e2af09e602182a default;
+  click 45e2af09e602182a "../../core/src/linting/separators.rs";
+  45e2af09e602182a -->|satisfies| f540b21f7eced636;
+  c87ad8ce58149089["Parallel Linting Processing"];
+  click c87ad8ce58149089 "Requirements.md#parallel-linting-processing";
+  class c87ad8ce58149089 requirement;
+  84c4dc11e82e8638["UserRequirements.md/Model Linting"];
+  class 84c4dc11e82e8638 requirement;
+  click 84c4dc11e82e8638 "../UserRequirements.md#model-linting";
+  c87ad8ce58149089 -.->|deriveReqT| 84c4dc11e82e8638;
+  3e39cdcf485c5250["linting/mod.rs"];
+  class 3e39cdcf485c5250 default;
+  click 3e39cdcf485c5250 "../../core/src/linting/mod.rs";
+  3e39cdcf485c5250 -->|satisfies| c87ad8ce58149089;
   3f235c1000d5347f["CLI Lint Flag"];
-  click 3f235c1000d5347f "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SystemRequirements/Requirements.md#cli-lint-flag";
+  click 3f235c1000d5347f "Requirements.md#cli-lint-flag";
   class 3f235c1000d5347f requirement;
   28b0f9fa78937e61["UserRequirements.md/Linting Command Behavior"];
   class 28b0f9fa78937e61 requirement;
-  click 28b0f9fa78937e61 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#linting-command";
+  click 28b0f9fa78937e61 "../UserRequirements.md#linting-command";
   3f235c1000d5347f -.->|deriveReqT| 28b0f9fa78937e61;
   2f21d2133dbfd205["cli.rs"];
   class 2f21d2133dbfd205 default;
-  click 2f21d2133dbfd205 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/cli/src/cli.rs";
+  click 2f21d2133dbfd205 "../../cli/src/cli.rs";
   2f21d2133dbfd205 -->|satisfies| 3f235c1000d5347f;
   e42a0715e74ccd66["Incosistent Newlines Linting Implementation"];
-  click e42a0715e74ccd66 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SystemRequirements/Requirements.md#incosistent-newlines-linting-implementation";
+  click e42a0715e74ccd66 "Requirements.md#incosistent-newlines-linting-implementation";
   class e42a0715e74ccd66 requirement;
-  1ddbeea0cf8eaad5["UserRequirements.md/Format Consistency Enforcement"];
-  class 1ddbeea0cf8eaad5 requirement;
-  click 1ddbeea0cf8eaad5 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#format-consistency-enforcement";
   e42a0715e74ccd66 -.->|deriveReqT| 1ddbeea0cf8eaad5;
   411d20097517505a["linting/newlines.rs"];
   class 411d20097517505a default;
-  click 411d20097517505a "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/core/src/linting/newlines.rs";
+  click 411d20097517505a "../../core/src/linting/newlines.rs";
   411d20097517505a -->|satisfies| e42a0715e74ccd66;
+  48e8a0b4b18111c4["File Pattern Exclusion for Linting"];
+  click 48e8a0b4b18111c4 "Requirements.md#file-pattern-exclusion-for-linting";
+  class 48e8a0b4b18111c4 requirement;
+  be5c69c33c5a4cf6["Ignoring Unstructured Documents"];
+  class be5c69c33c5a4cf6 requirement;
+  click be5c69c33c5a4cf6 "Requirements.md#ignoring-unstructured-documents";
+  48e8a0b4b18111c4 -.->|deriveReqT| be5c69c33c5a4cf6;
+  85989fd7bb727157["utils.rs"];
+  class 85989fd7bb727157 default;
+  click 85989fd7bb727157 "../../core/src/utils.rs";
+  85989fd7bb727157 -->|satisfies| 48e8a0b4b18111c4;
+  d21b16b30de7350d["Dry Run Mode"];
+  click d21b16b30de7350d "Requirements.md#dry-run-mode";
+  class d21b16b30de7350d requirement;
+  d21b16b30de7350d -.->|deriveReqT| 3f235c1000d5347f;
+  2f21d2133dbfd205 -->|satisfies| d21b16b30de7350d;
   56174a2a92eb637["Reserved Subsections Linting Implementation"];
-  click 56174a2a92eb637 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SystemRequirements/Requirements.md#reserved-subsections-linting-implementation";
+  click 56174a2a92eb637 "Requirements.md#reserved-subsections-linting-implementation";
   class 56174a2a92eb637 requirement;
   56174a2a92eb637 -.->|deriveReqT| 1ddbeea0cf8eaad5;
   8c7c2481d50c628c["linting/reserved_subsections.rs"];
   class 8c7c2481d50c628c default;
-  click 8c7c2481d50c628c "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/core/src/linting/indentation.rs";
+  click 8c7c2481d50c628c "../../core/src/linting/indentation.rs";
   8c7c2481d50c628c -->|satisfies| 56174a2a92eb637;
   7c2ad2603d27c318["Git-Style Diff Output for Linting"];
-  click 7c2ad2603d27c318 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SystemRequirements/Requirements.md#git-style-diff-output-for-linting";
+  click 7c2ad2603d27c318 "Requirements.md#git-style-diff-output-for-linting";
   class 7c2ad2603d27c318 requirement;
   62c066a5aad4dafe["UserRequirements.md/Linting Command Output"];
   class 62c066a5aad4dafe requirement;
-  click 62c066a5aad4dafe "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#linting-command-output";
+  click 62c066a5aad4dafe "../UserRequirements.md#linting-command-output";
   7c2ad2603d27c318 -.->|deriveReqT| 62c066a5aad4dafe;
-  3e39cdcf485c5250["linting/mod.rs"];
-  class 3e39cdcf485c5250 default;
-  click 3e39cdcf485c5250 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/core/src/linting/mod.rs";
   3e39cdcf485c5250 -->|satisfies| 7c2ad2603d27c318;
-  f540b21f7eced636["Missing Separators Linting Implementation"];
-  click f540b21f7eced636 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SystemRequirements/Requirements.md#missing-separators-linting-implementation";
-  class f540b21f7eced636 requirement;
-  f540b21f7eced636 -.->|deriveReqT| 1ddbeea0cf8eaad5;
-  45e2af09e602182a["linting/separators.rs"];
-  class 45e2af09e602182a default;
-  click 45e2af09e602182a "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/core/src/linting/separators.rs";
-  45e2af09e602182a -->|satisfies| f540b21f7eced636;
-  d21b16b30de7350d["Dry Run Mode"];
-  click d21b16b30de7350d "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SystemRequirements/Requirements.md#dry-run-mode";
-  class d21b16b30de7350d requirement;
-  d21b16b30de7350d -.->|deriveReqT| 3f235c1000d5347f;
-  2f21d2133dbfd205 -->|satisfies| d21b16b30de7350d;
   ab8dfb01e717d34["Excess Whitespace Linting Implementation"];
-  click ab8dfb01e717d34 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SystemRequirements/Requirements.md#excess-whitespace-linting-implementation";
+  click ab8dfb01e717d34 "Requirements.md#excess-whitespace-linting-implementation";
   class ab8dfb01e717d34 requirement;
   ab8dfb01e717d34 -.->|deriveReqT| 1ddbeea0cf8eaad5;
   fd5178bf78bae55c["linting/whitespace.rs"];
   class fd5178bf78bae55c default;
-  click fd5178bf78bae55c "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/core/src/linting/whitespace.rs";
+  click fd5178bf78bae55c "../../core/src/linting/whitespace.rs";
   fd5178bf78bae55c -->|satisfies| ab8dfb01e717d34;
-  c87ad8ce58149089["Parallel Linting Processing"];
-  click c87ad8ce58149089 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SystemRequirements/Requirements.md#parallel-linting-processing";
-  class c87ad8ce58149089 requirement;
-  84c4dc11e82e8638["UserRequirements.md/Model Linting"];
-  class 84c4dc11e82e8638 requirement;
-  click 84c4dc11e82e8638 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#model-linting";
-  c87ad8ce58149089 -.->|deriveReqT| 84c4dc11e82e8638;
-  3e39cdcf485c5250 -->|satisfies| c87ad8ce58149089;
 ```
-
 ---
 
 ### CLI Lint Flag
@@ -176,7 +175,7 @@ The system shall implement parallel processing for linting operations when possi
 The system shall respect configured excluded filename patterns when performing linting operations, ensuring that files intentionally excluded from processing do not receive inappropriate linting suggestions.
 
 #### Relations
-  * derivedFrom: [Configurable Filename Exclusion Patterns](#configurable-filename-exclusion-patterns)
+  * derivedFrom: [Ignoring Unstructured Documents](#ignoring-unstructured-documents) 
   * satisfiedBy: [utils.rs](../../core/src/utils.rs)
 
 ---
@@ -190,40 +189,97 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  66080aef4185b07d["External Folders Support"];
-  click 66080aef4185b07d "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SystemRequirements/Requirements.md#external-folders-support";
-  class 66080aef4185b07d requirement;
-  c4d5865187c53ce6["ManagingMbseModelsRequirements.md/Support for Distributed Requirements"];
-  class c4d5865187c53ce6 requirement;
-  click c4d5865187c53ce6 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/ManagingMbseModelsRequirements.md#support-for-distributed-requirements";
-  66080aef4185b07d -.->|deriveReqT| c4d5865187c53ce6;
+  4c79bf4ceda6e23f["User Requirement Root Folders Support"];
+  click 4c79bf4ceda6e23f "Requirements.md#user-requirement-root-folders-support";
+  class 4c79bf4ceda6e23f requirement;
+  82d6413dc779c791["ManagingMbseModelsRequirements.md#Configurable User Requirements Root Folder"];
+  class 82d6413dc779c791 requirement;
+  click 82d6413dc779c791 "../ManagingMbseModelsRequirements.md#configurable-user-requirements-root-folder";
+  4c79bf4ceda6e23f -.->|deriveReqT| 82d6413dc779c791;
   d89f4b0d2edaac20["config.rs"];
   class d89f4b0d2edaac20 default;
-  click d89f4b0d2edaac20 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/cli/src/config.rs";
-  d89f4b0d2edaac20 -->|satisfies| 66080aef4185b07d;
+  click d89f4b0d2edaac20 "../../cli/src/config.rs";
+  d89f4b0d2edaac20 -->|satisfies| 4c79bf4ceda6e23f;
+  6ccd085f7c76afca["Subdirectory Processing Flag"];
+  click 6ccd085f7c76afca "Requirements.md#subdirectory-processing-flag";
+  class 6ccd085f7c76afca requirement;
+  b3ef0fb91572bcf0["ManagingMbseModelsRequirements.md/Project Configuration with YAML"];
+  class b3ef0fb91572bcf0 requirement;
+  click b3ef0fb91572bcf0 "../ManagingMbseModelsRequirements.md#project-configuration-with-yaml";
+  6ccd085f7c76afca -.->|deriveReqT| b3ef0fb91572bcf0;
+  2f21d2133dbfd205["cli.rs"];
+  class 2f21d2133dbfd205 default;
+  click 2f21d2133dbfd205 "../../cli/src/cli.rs";
+  2f21d2133dbfd205 -->|satisfies| 6ccd085f7c76afca;
+  be5c69c33c5a4cf6["Ignoring Unstructured Documents"];
+  click be5c69c33c5a4cf6 "Requirements.md#ignoring-unstructured-documents";
+  class be5c69c33c5a4cf6 requirement;
+  be5c69c33c5a4cf6 -.->|deriveReqT| b3ef0fb91572bcf0;
+  da5831ca85881025["ManagingMbseModelsRequirements.md#Coexistence of Structured and Unstructured Documents"];
+  class da5831ca85881025 requirement;
+  click da5831ca85881025 "../ManagingMbseModelsRequirements.md#coexistence-of-structured-and-unstructured-documents";
+  be5c69c33c5a4cf6 -.->|deriveReqT| da5831ca85881025;
+  d89f4b0d2edaac20 -->|satisfies| be5c69c33c5a4cf6;
 ```
-
 ---
 
-### External Folders Support
-The system shall implement configuration parameter to support processing requirements stored in external folders outside the main specifications directory structure, treating them as system requirements in diagram generation and validation.
+### User Requirement Root Folders Support
+
+The system shall implement configuration parameter that would specify a single folder path, relative to the Git repository root, that is designated as the primary location for user requirements.
 
 #### Details
 
-'paths.external_folders' parameter of type  Vec<String> defines additional external folders that contain system requirements and other files.
-These can be absolute paths or paths relative to the 'specifications' folder but must not be subfolders of 'specifications' folder.
-Empty list is allowed.
-All markdown files in these folders are considered **system requirements** (except those matching exclusion patterns).
+'paths.user_requirements_root_folder' parameter of type  String defines default folder for the user-requirements.
+
+All elements in markdown files (except those matching exclusion patterns) in root of this folders are considered **user requirements** unless explicitly set as other element type in the metadata.
+
+#### Relations
+  * derivedFrom: [ManagingMbseModelsRequirements.md#Configurable User Requirements Root Folder](../ManagingMbseModelsRequirements.md#configurable-user-requirements-root-folder)
+  * satisfiedBy: [config.rs](../../cli/src/config.rs)
+
+---
+
+### Ignoring Unstructured Documents
+
+The system shall support configurable glob patterns to exclude specific files from requirement processing.
+
+#### Details
 ```reqvire.yaml
 paths:
-  external_folders:
-    - /path/to/folder1
-    - ../../folder2 
+
+  # Glob patterns to exclude from structured documents processing
+  excluded_filename_patterns:
+    - "**/Logical*.md"
+    - "**/Physical*.md"    
 ```
 
 #### Relations
-  * derivedFrom: [ManagingMbseModelsRequirements.md/Support for Distributed Requirements](../ManagingMbseModelsRequirements.md#support-for-distributed-requirements)
+  * derivedFrom: [ManagingMbseModelsRequirements.md/Project Configuration with YAML](../ManagingMbseModelsRequirements.md#project-configuration-with-yaml)
+  * derivedFrom: [ManagingMbseModelsRequirements.md#Coexistence of Structured and Unstructured Documents](../ManagingMbseModelsRequirements.md#coexistence-of-structured-and-unstructured-documents)
   * satisfiedBy: [config.rs](../../cli/src/config.rs)
+
+---
+
+### Subdirectory Processing Flag
+
+The system shall provide a flag (--subdirectory) that allows processing only files within a specific subdirectory relative to the git repository root, enabling focused analysis and improved performance when working with large repositories.
+
+#### Details
+
+The subdirectory flag is designed to limit the scope of processing to a specific subdirectory, which is especially useful in large repositories with many requirements files. This flag allows users to:
+
+1. Process only files within the specified subdirectory and its nested folders
+2. Generate reports, diagrams, and validations based on the limited scope
+3. Improve performance by reducing the number of files that need to be processed
+
+The flag takes a path that is relative to the git repository root and should be used as follows:
+```
+reqvire --subdirectory="specifications/Verifications" --validate
+```
+
+#### Relations
+  * derivedFrom: [ManagingMbseModelsRequirements.md/Project Configuration with YAML](../ManagingMbseModelsRequirements.md#project-configuration-with-yaml)
+  * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
 
 ---
 
@@ -236,98 +292,93 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  a2b1d4ec64cbd441["HTML Export"];
-  click a2b1d4ec64cbd441 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SystemRequirements/Requirements.md#html-export";
+  1fa02ea7ed4b2adb["Export Related System Elements"];
+  click 1fa02ea7ed4b2adb "Requirements.md#export-related-system-elements";
+  class 1fa02ea7ed4b2adb requirement;
+  a2b1d4ec64cbd441["#HTML Export"];
   class a2b1d4ec64cbd441 requirement;
-  d9686a154fe87b2["../UserRequirements.md/Export HTML specifications"];
-  class d9686a154fe87b2 requirement;
-  click d9686a154fe87b2 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#export-html-specifications";
-  a2b1d4ec64cbd441 -.->|deriveReqT| d9686a154fe87b2;
+  click a2b1d4ec64cbd441 "Requirements.md#html-export";
+  1fa02ea7ed4b2adb -->|refines| a2b1d4ec64cbd441;
   5dbf1a3141d3defb["html_export.rs"];
   class 5dbf1a3141d3defb default;
-  click 5dbf1a3141d3defb "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/core/src/html_export.rs";
+  click 5dbf1a3141d3defb "../../core/src/html_export.rs";
+  5dbf1a3141d3defb -->|satisfies| 1fa02ea7ed4b2adb;
+  d9686a154fe87b2["../UserRequirements.md/Export HTML specifications"];
+  class d9686a154fe87b2 requirement;
+  click d9686a154fe87b2 "../UserRequirements.md#export-html-specifications";
+  a2b1d4ec64cbd441 -.->|deriveReqT| d9686a154fe87b2;
   5dbf1a3141d3defb -->|satisfies| a2b1d4ec64cbd441;
-  d72f6096b9a5dd8e["Detailed Error Handling and Logging"];
-  click d72f6096b9a5dd8e "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SystemRequirements/Requirements.md#detailed-error-handling-and-logging";
-  class d72f6096b9a5dd8e requirement;
-  3d2fe0b05ff9c8e3["../UserRequirements.md#Enhanced Validation Error Reporting"];
-  class 3d2fe0b05ff9c8e3 requirement;
-  click 3d2fe0b05ff9c8e3 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#enhanced-validation-error-reporting";
-  d72f6096b9a5dd8e -.->|deriveReqT| 3d2fe0b05ff9c8e3;
-  af1374ae222fbd72["src/error.rs"];
-  class af1374ae222fbd72 default;
-  click af1374ae222fbd72 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/core/src/error.rs";
-  af1374ae222fbd72 -->|satisfies| d72f6096b9a5dd8e;
-  1550bb73b8029cb["HTML Navigation Enhancement"];
-  click 1550bb73b8029cb "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SystemRequirements/Requirements.md#html-navigation-enhancement";
-  class 1550bb73b8029cb requirement;
-  b5146db7aedfd66["UserRequirements.md/Documentation Index HTML Integration"];
-  class b5146db7aedfd66 requirement;
-  click b5146db7aedfd66 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#documentation-index-html-integration";
-  1550bb73b8029cb -.->|deriveReqT| b5146db7aedfd66;
-  59e3b5b3087497da["html.rs"];
-  class 59e3b5b3087497da default;
-  click 59e3b5b3087497da "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/core/src/html.rs";
-  59e3b5b3087497da -->|satisfies| 1550bb73b8029cb;
-  5dbf1a3141d3defb -->|satisfies| 1550bb73b8029cb;
-  3b4bfa0725509a0e["Index Generation"];
-  click 3b4bfa0725509a0e "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SystemRequirements/Requirements.md#index-generation";
-  class 3b4bfa0725509a0e requirement;
-  9019be8bfdc22b35["UserRequirements.md/Generate Documentation Index"];
-  class 9019be8bfdc22b35 requirement;
-  click 9019be8bfdc22b35 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#generate-documentation-index";
-  3b4bfa0725509a0e -.->|deriveReqT| 9019be8bfdc22b35;
-  3461f4a59371fd45["index_generator.rs"];
-  class 3461f4a59371fd45 default;
-  click 3461f4a59371fd45 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/core/src/index_generator.rs";
-  3461f4a59371fd45 -->|satisfies| 3b4bfa0725509a0e;
   a17b8052345712d7["Interactive Mermaid Diagram Node Behavior"];
-  click a17b8052345712d7 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SystemRequirements/Requirements.md#interactive-mermaid-diagram-node-behavior";
+  click a17b8052345712d7 "Requirements.md#interactive-mermaid-diagram-node-behavior";
   class a17b8052345712d7 requirement;
   b8997351b6f34048["UserRequirements.md/Interactive Mermaid Diagrams"];
   class b8997351b6f34048 requirement;
-  click b8997351b6f34048 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#interactive-mermaid-diagrams";
+  click b8997351b6f34048 "../UserRequirements.md#interactive-mermaid-diagrams";
   a17b8052345712d7 -.->|deriveReqT| b8997351b6f34048;
   95f7dce6aff47396["html.rs"];
   class 95f7dce6aff47396 default;
-  click 95f7dce6aff47396 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/core/src/diagrams.rs";
+  click 95f7dce6aff47396 "../../core/src/diagrams.rs";
   95f7dce6aff47396 -->|satisfies| a17b8052345712d7;
-  ea45d7ea45c8ee7e["File Content Caching for Performance"];
-  click ea45d7ea45c8ee7e "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SystemRequirements/Requirements.md#file-content-caching-for-performance";
-  class ea45d7ea45c8ee7e requirement;
-  386d7b145d008870["../ManagingMbseModelsRequirements.md#Efficient Processing"];
-  class 386d7b145d008870 requirement;
-  click 386d7b145d008870 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/ManagingMbseModelsRequirements.md#efficient-processing";
-  ea45d7ea45c8ee7e -.->|deriveReqT| 386d7b145d008870;
-  36fd2b1e82621caf["model.rs"];
-  class 36fd2b1e82621caf default;
-  click 36fd2b1e82621caf "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/core/src/model.rs";
-  36fd2b1e82621caf -->|satisfies| ea45d7ea45c8ee7e;
+  3b4bfa0725509a0e["Index Generation"];
+  click 3b4bfa0725509a0e "Requirements.md#index-generation";
+  class 3b4bfa0725509a0e requirement;
+  9019be8bfdc22b35["UserRequirements.md/Generate Documentation Index"];
+  class 9019be8bfdc22b35 requirement;
+  click 9019be8bfdc22b35 "../UserRequirements.md#generate-documentation-index";
+  3b4bfa0725509a0e -.->|deriveReqT| 9019be8bfdc22b35;
+  3461f4a59371fd45["index_generator.rs"];
+  class 3461f4a59371fd45 default;
+  click 3461f4a59371fd45 "../../core/src/index_generator.rs";
+  3461f4a59371fd45 -->|satisfies| 3b4bfa0725509a0e;
+  d72f6096b9a5dd8e["Detailed Error Handling and Logging"];
+  click d72f6096b9a5dd8e "Requirements.md#detailed-error-handling-and-logging";
+  class d72f6096b9a5dd8e requirement;
+  3d2fe0b05ff9c8e3["../UserRequirements.md#Enhanced Validation Error Reporting"];
+  class 3d2fe0b05ff9c8e3 requirement;
+  click 3d2fe0b05ff9c8e3 "../UserRequirements.md#enhanced-validation-error-reporting";
+  d72f6096b9a5dd8e -.->|deriveReqT| 3d2fe0b05ff9c8e3;
+  af1374ae222fbd72["src/error.rs"];
+  class af1374ae222fbd72 default;
+  click af1374ae222fbd72 "../../core/src/error.rs";
+  af1374ae222fbd72 -->|satisfies| d72f6096b9a5dd8e;
+  1550bb73b8029cb["HTML Navigation Enhancement"];
+  click 1550bb73b8029cb "Requirements.md#html-navigation-enhancement";
+  class 1550bb73b8029cb requirement;
+  b5146db7aedfd66["UserRequirements.md/Documentation Index HTML Integration"];
+  class b5146db7aedfd66 requirement;
+  click b5146db7aedfd66 "../UserRequirements.md#documentation-index-html-integration";
+  1550bb73b8029cb -.->|deriveReqT| b5146db7aedfd66;
+  59e3b5b3087497da["html.rs"];
+  class 59e3b5b3087497da default;
+  click 59e3b5b3087497da "../../core/src/html.rs";
+  59e3b5b3087497da -->|satisfies| 1550bb73b8029cb;
+  5dbf1a3141d3defb -->|satisfies| 1550bb73b8029cb;
   d177913fffd1ed11["LLM Context Command"];
-  click d177913fffd1ed11 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SystemRequirements/Requirements.md#llm-context-command";
+  click d177913fffd1ed11 "Requirements.md#llm-context-command";
   class d177913fffd1ed11 requirement;
   7fd9156eac77c270["UserRequirements.md/AI Agent Context"];
   class 7fd9156eac77c270 requirement;
-  click 7fd9156eac77c270 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#ai-agent-context";
+  click 7fd9156eac77c270 "../UserRequirements.md#ai-agent-context";
   d177913fffd1ed11 -.->|deriveReqT| 7fd9156eac77c270;
   615a0f4ad2620118["main.rs"];
   class 615a0f4ad2620118 default;
-  click 615a0f4ad2620118 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/cli/src/main.rs";
+  click 615a0f4ad2620118 "../../cli/src/main.rs";
   615a0f4ad2620118 -->|satisfies| d177913fffd1ed11;
-  3f1abb8fd2d7c9c2["Unstructured Documents"];
-  click 3f1abb8fd2d7c9c2 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SystemRequirements/Requirements.md#unstructured-documents";
-  class 3f1abb8fd2d7c9c2 requirement;
-  da5831ca85881025["ManagingMbseModelsRequirements.md#Coexistence of Structured and Unstructured Documents"];
-  class da5831ca85881025 requirement;
-  click da5831ca85881025 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/ManagingMbseModelsRequirements.md#coexistence-of-structured-and-unstructured-documents";
-  3f1abb8fd2d7c9c2 -.->|deriveReqT| da5831ca85881025;
 ```
-
 ---
 
 ### Index Generation
 
-The system shall implement an IndexGenerator component that traverses the specifications directory structure and creates a hierarchical README.md file with links to documents and elements.
+The system shall implement an IndexGenerator component that traverses the specifications directory structure and creates a hierarchical SpecificationIndex.md file with links to documents and elements in the repository root.
+
+#### Details
+
+The index generator shall:
+1. Traverse all specifications and documents in the model
+2. Group elements by file and section
+3. Create a hierarchical index with links to documents and elements
+4. Generate summary statistics including total files, sections, and elements
+5. Write the index as SpecificationIndex.md to the repository root, not the output folder
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Generate Documentation Index](../UserRequirements.md#generate-documentation-index)
@@ -337,11 +388,11 @@ The system shall implement an IndexGenerator component that traverses the specif
 
 ### HTML Navigation Enhancement 
 
-The system shall enhance the HTML generator to process README.md as a special file, adding navigation elements and ensuring it serves as the primary entry point.
+The system shall enhance the HTML generator to process SpecificationIndex.md as a special file, adding navigation elements and ensuring it serves as the primary entry point.
 
 #### Details
 
-README.md file must be saved as index.html file when exported.
+SpecificationIndex.md file must be saved as index.html file when exported to the HTML output directory.
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Documentation Index HTML Integration](../UserRequirements.md#documentation-index-html-integration)
@@ -379,16 +430,6 @@ When generating diagram node links, the system shall:
 
 ---
 
-### Unstructured Documents
-
-The system shall allow unstructured documents to be ignored during processing.
-TODO: add requirment that defines a config filter out patterns.
-
-#### Relations
-  * derivedFrom: [ManagingMbseModelsRequirements.md#Coexistence of Structured and Unstructured Documents](../ManagingMbseModelsRequirements.md#coexistence-of-structured-and-unstructured-documents)
-
----
-
 ### HTML Export
 
 The system shall generate HTML output for all markdown files, not just requirements documents, to provide consistent representation of the entire model.
@@ -396,6 +437,18 @@ The system shall generate HTML output for all markdown files, not just requireme
 #### Relations
   * derivedFrom: [../UserRequirements.md/Export HTML specifications](../UserRequirements.md#export-html-specifications)
   * satisfiedBy: [html_export.rs](../../core/src/html_export.rs)
+  * satisfiedBy: [html.rs](../../core/src/export.rs)  
+
+---
+
+### Export Related System Elements
+
+The system shall ensure that any related system elements are also copied into output folder to ensure consistency of exported model.
+
+#### Relations
+  * refine: [#HTML Export](#html-export)
+  * satisfiedBy: [html_export.rs](../../core/src/html_export.rs)
+  * satisfiedBy: [html.rs](../../core/src/export.rs)  
 
 ---
 
@@ -409,16 +462,6 @@ The system shall implement detailed error handling and logging throughout the ap
 
 ---
 
-### File Content Caching for Performance
-
-The system shall cache file contents during processing to optimize performance for operations that require multiple passes through the same files.
-
-#### Relations
-  * derivedFrom: [../ManagingMbseModelsRequirements.md#Efficient Processing](../ManagingMbseModelsRequirements.md#efficient-processing)
-  * satisfiedBy: [model.rs](../../core/src/model.rs)
-
----
-
 ## Logic
 ```mermaid
 graph LR;
@@ -428,146 +471,115 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  33b15634cbc8d029["Requirements Files Search and Detection"];
-  click 33b15634cbc8d029 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SystemRequirements/Requirements.md#requirements-files-search-and-detection";
-  class 33b15634cbc8d029 requirement;
-  386d7b145d008870["ManagingMbseModelsRequirements.md/Efficient Processing"];
-  class 386d7b145d008870 requirement;
-  click 386d7b145d008870 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/ManagingMbseModelsRequirements.md#efficient-processing";
-  33b15634cbc8d029 -.->|deriveReqT| 386d7b145d008870;
+  5071808e4276f33a["SysML-Compatible Relationship Rendering"];
+  click 5071808e4276f33a "Requirements.md#sysml-compatible-relationship-rendering";
+  class 5071808e4276f33a requirement;
+  eed0b020b6ddeae1["UserRequirements.md/Visualize Model Relationships"];
+  class eed0b020b6ddeae1 requirement;
+  click eed0b020b6ddeae1 "../UserRequirements.md#visualize-model-relationships";
+  5071808e4276f33a -.->|deriveReqT| eed0b020b6ddeae1;
+  95f7dce6aff47396["diagrams.rs"];
+  class 95f7dce6aff47396 default;
+  click 95f7dce6aff47396 "../../core/src/diagrams.rs";
+  95f7dce6aff47396 -->|satisfies| 5071808e4276f33a;
+  bd72564894314bf6["Relationship Type Filter Implementation"];
+  click bd72564894314bf6 "Requirements.md#relationship-type-filter-implementation";
+  class bd72564894314bf6 requirement;
+  66e9d8186acafd13["UserRequirements.md/Filter Relationships by Type"];
+  class 66e9d8186acafd13 requirement;
+  click 66e9d8186acafd13 "../UserRequirements.md#filter-relationships-by-type";
+  bd72564894314bf6 -.->|deriveReqT| 66e9d8186acafd13;
+  b8208c9b1d6a312a["Mermaid Diagram Format Conversion"];
+  click b8208c9b1d6a312a "Requirements.md#mermaid-diagram-format-conversion";
+  class b8208c9b1d6a312a requirement;
+  a0274ca0625d8493["UserRequirements.md/Export Diagrams in Standard Formats"];
+  class a0274ca0625d8493 requirement;
+  click a0274ca0625d8493 "../UserRequirements.md#export-diagrams-in-standard-formats";
+  b8208c9b1d6a312a -.->|deriveReqT| a0274ca0625d8493;
+  95f7dce6aff47396 -->|satisfies| b8208c9b1d6a312a;
+  d812c13722abb71d["Visual Differential Rendering"];
+  click d812c13722abb71d "Requirements.md#visual-differential-rendering";
+  class d812c13722abb71d requirement;
+  ac914f743d73674e["UserRequirements.md/Highlight Changes in Diagrams"];
+  class ac914f743d73674e requirement;
+  click ac914f743d73674e "../UserRequirements.md#highlight-changes-in-diagrams";
+  d812c13722abb71d -.->|deriveReqT| ac914f743d73674e;
+  793154acc336992c["Automated Diagram Generation on PR Merge"];
+  click 793154acc336992c "Requirements.md#automated-diagram-generation-on-pr-merge";
+  class 793154acc336992c requirement;
+  c522cf4c404bdc24["UserRequirements.md/Automate Diagram Generation"];
+  class c522cf4c404bdc24 requirement;
+  click c522cf4c404bdc24 "../UserRequirements.md#automate-diagram-generation";
+  793154acc336992c -.->|deriveReqT| c522cf4c404bdc24;
+  b41f362e18fb2449["UserRequirements.md/Automate Pull Request Validations"];
+  class b41f362e18fb2449 requirement;
+  click b41f362e18fb2449 "../UserRequirements.md#automate-pull-request-validations";
+  793154acc336992c -.->|deriveReqT| b41f362e18fb2449;
+  fdd29f919065644d["generate_diagrams.yml"];
+  class fdd29f919065644d default;
+  click fdd29f919065644d "../../.github/workflows/generate_diagrams.yml";
+  fdd29f919065644d -->|satisfies| 793154acc336992c;
+  cb1ad39c7552a3cd["Diagram Storage Path Configuration"];
+  click cb1ad39c7552a3cd "Requirements.md#diagram-storage-path-configuration";
+  class cb1ad39c7552a3cd requirement;
+  89097c1311055b72["UserRequirements.md/Store Automated Diagrams in Designated Locations"];
+  class 89097c1311055b72 requirement;
+  click 89097c1311055b72 "../UserRequirements.md#store-automated-diagrams-in-designated-locations";
+  cb1ad39c7552a3cd -.->|deriveReqT| 89097c1311055b72;
   36fd2b1e82621caf["model.rs"];
   class 36fd2b1e82621caf default;
-  click 36fd2b1e82621caf "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/core/src/model.rs";
-  36fd2b1e82621caf -->|satisfies| 33b15634cbc8d029;
+  click 36fd2b1e82621caf "../../core/src/model.rs";
+  36fd2b1e82621caf -->|satisfies| cb1ad39c7552a3cd;
+  480cb73e8bcb0786["Structured Markdown Files Search and Detection"];
+  click 480cb73e8bcb0786 "Requirements.md#structured-markdown-files-search-and-detection";
+  class 480cb73e8bcb0786 requirement;
   f24f11691f55af62["Requirements Processing"];
-  click f24f11691f55af62 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SystemRequirements/Requirements.md#requirements-processing";
   class f24f11691f55af62 requirement;
-  c4d5865187c53ce6["ManagingMbseModelsRequirements.md/Support for Distributed Requirements"];
-  class c4d5865187c53ce6 requirement;
-  click c4d5865187c53ce6 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/ManagingMbseModelsRequirements.md#support-for-distributed-requirements";
-  f24f11691f55af62 -.->|deriveReqT| c4d5865187c53ce6;
+  click f24f11691f55af62 "Requirements.md#requirements-processing";
+  480cb73e8bcb0786 -.->|deriveReqT| f24f11691f55af62;
+  36fd2b1e82621caf -->|satisfies| 480cb73e8bcb0786;
+  4c79bf4ceda6e23f["User Requirement Root Folders Support"];
+  class 4c79bf4ceda6e23f requirement;
+  click 4c79bf4ceda6e23f "Requirements.md#user-requirement-root-folders-support";
+  f24f11691f55af62 -.->|deriveReqT| 4c79bf4ceda6e23f;
+  be5c69c33c5a4cf6["Ignoring Unstructured Documents"];
+  class be5c69c33c5a4cf6 requirement;
+  click be5c69c33c5a4cf6 "Requirements.md#ignoring-unstructured-documents";
+  f24f11691f55af62 -.->|deriveReqT| be5c69c33c5a4cf6;
   36fd2b1e82621caf -->|satisfies| f24f11691f55af62;
   dfd639447d711d62["parser.rs"];
   class dfd639447d711d62 default;
-  click dfd639447d711d62 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/core/src/parser.rs";
+  click dfd639447d711d62 "../../core/src/parser.rs";
   dfd639447d711d62 -->|satisfies| f24f11691f55af62;
 ```
-
 ---
 
 ### Requirements Processing
 
-The system shall parse the 'specifications' and 'external folders' directory structure using the configured paths from reqvire.yaml to identify system elements files and their hierarchical relationships.
+The system shall parse the files in all folders and subfolders from the root of git repository which are not explicitly excluded using the configuration from reqvire.yaml.
 
 #### Relations
-  * derivedFrom: [ManagingMbseModelsRequirements.md/Support for Distributed Requirements](../ManagingMbseModelsRequirements.md#support-for-distributed-requirements)
+  * derivedFrom: [User Requirement Root Folders Support](#user-requirement-root-folders-support)
+  * derivedFrom: [Ignoring Unstructured Documents](#ignoring-unstructured-documents)  
   * satisfiedBy: [model.rs](../../core/src/model.rs)
   * satisfiedBy: [parser.rs](../../core/src/parser.rs)  
 
 ---
 
-### Requirements Files Search and Detection
-The system shall identify and categorize files in the `specifications` and `external_folders` directories as **Stakeholder Needs Requirements**, **System Requirements**, or **Not a Requirements File** based on predefined rules.
+### Structured Markdown Files Search and Detection
+
+The system shall identify all structured markdown documents available for processing in all directories and sub-directories of the git repository root based on predefined rules.
 
 #### Details
+
 Identification Process:
-The process follows these steps to determine whether a file contains requirements and, if so, whether it falls under **Stakeholder Needs Requirements** or **System Requirements**:
-1. **File Selection**: The process scans all files in the `specifications` folder (including subfolders) and `external_folders`.
-2. **Excluded Patterns Check**: If a file matches any excluded patterns, it is marked as **not a requirements file**.
-3. **File Extension Check**: If the file does not have a `.md` extension, it is marked as **not a requirements file**.
-4. **Design Folder Check**: If the file is located in a folder defined by the `design_specifications_folder` configuration, it is marked as **not a requirements file**.
-5. **External Folder Check**: If the file is found in an external folder (or any of its subfolders), it is categorized as a **System Requirements file**.
-6. **Root Folder Check**: If the file is located at the root of the `specifications` folder, it is categorized as a **Stakeholder Needs Requirements file**. Otherwise, it is categorized as a **System Requirements file**.
+1. **File Selection**: The process scans all files in the the git repository root and all sub folders.
+2. **Excluded Patterns Check**: If a file matches any excluded patterns, it is marked as **not a structured document file**.
+3. **File Extension Check**: If the file does not have a `.md` extension, it is marked as **not a structured document file**.
 
 #### Relations
-  * derivedFrom: [ManagingMbseModelsRequirements.md/Efficient Processing](../ManagingMbseModelsRequirements.md#efficient-processing)
+  * derivedFrom: [Requirements Processing](#requirements-processing)
   * satisfiedBy: [model.rs](../../core/src/model.rs)
-
----
-
-## Categorization Outcomes
-```mermaid
-graph LR;
-  %% Graph styling
-  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
-  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
-  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
-  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
-
-  4bf74699f40f4a76["Configurable Filename Exclusion Patterns"];
-  click 4bf74699f40f4a76 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SystemRequirements/Requirements.md#configurable-filename-exclusion-patterns";
-  class 4bf74699f40f4a76 requirement;
-  b3ef0fb91572bcf0["ManagingMbseModelsRequirements.md/Project Configuration with YAML"];
-  class b3ef0fb91572bcf0 requirement;
-  click b3ef0fb91572bcf0 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/ManagingMbseModelsRequirements.md#project-configuration-with-yaml";
-  4bf74699f40f4a76 -.->|deriveReqT| b3ef0fb91572bcf0;
-  d89f4b0d2edaac20["config.rs"];
-  class d89f4b0d2edaac20 default;
-  click d89f4b0d2edaac20 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/cli/src/config.rs";
-  d89f4b0d2edaac20 -->|satisfies| 4bf74699f40f4a76;
-  b8208c9b1d6a312a["Mermaid Diagram Format Conversion"];
-  click b8208c9b1d6a312a "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SystemRequirements/Requirements.md#mermaid-diagram-format-conversion";
-  class b8208c9b1d6a312a requirement;
-  a0274ca0625d8493["UserRequirements.md/Export Diagrams in Standard Formats"];
-  class a0274ca0625d8493 requirement;
-  click a0274ca0625d8493 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#export-diagrams-in-standard-formats";
-  b8208c9b1d6a312a -.->|deriveReqT| a0274ca0625d8493;
-  95f7dce6aff47396["diagrams.rs"];
-  class 95f7dce6aff47396 default;
-  click 95f7dce6aff47396 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/core/src/diagrams.rs";
-  95f7dce6aff47396 -->|satisfies| b8208c9b1d6a312a;
-  793154acc336992c["Automated Diagram Generation on PR Merge"];
-  click 793154acc336992c "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SystemRequirements/Requirements.md#automated-diagram-generation-on-pr-merge";
-  class 793154acc336992c requirement;
-  c522cf4c404bdc24["UserRequirements.md/Automate Diagram Generation"];
-  class c522cf4c404bdc24 requirement;
-  click c522cf4c404bdc24 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#automate-diagram-generation";
-  793154acc336992c -.->|deriveReqT| c522cf4c404bdc24;
-  b41f362e18fb2449["UserRequirements.md/Automate Pull Request Validations"];
-  class b41f362e18fb2449 requirement;
-  click b41f362e18fb2449 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#automate-pull-request-validations";
-  793154acc336992c -.->|deriveReqT| b41f362e18fb2449;
-  fdd29f919065644d["generate_diagrams.yml"];
-  class fdd29f919065644d default;
-  click fdd29f919065644d "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/.github/workflows/generate_diagrams.yml";
-  fdd29f919065644d -->|satisfies| 793154acc336992c;
-  d812c13722abb71d["Visual Differential Rendering"];
-  click d812c13722abb71d "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SystemRequirements/Requirements.md#visual-differential-rendering";
-  class d812c13722abb71d requirement;
-  ac914f743d73674e["UserRequirements.md/Highlight Changes in Diagrams"];
-  class ac914f743d73674e requirement;
-  click ac914f743d73674e "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#highlight-changes-in-diagrams";
-  d812c13722abb71d -.->|deriveReqT| ac914f743d73674e;
-  cb1ad39c7552a3cd["Diagram Storage Path Configuration"];
-  click cb1ad39c7552a3cd "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SystemRequirements/Requirements.md#diagram-storage-path-configuration";
-  class cb1ad39c7552a3cd requirement;
-  89097c1311055b72["UserRequirements.md/Store Automated Diagrams in Designated Locations"];
-  class 89097c1311055b72 requirement;
-  click 89097c1311055b72 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#store-automated-diagrams-in-designated-locations";
-  cb1ad39c7552a3cd -.->|deriveReqT| 89097c1311055b72;
-  36fd2b1e82621caf["model.rs"];
-  class 36fd2b1e82621caf default;
-  click 36fd2b1e82621caf "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/core/src/model.rs";
-  36fd2b1e82621caf -->|satisfies| cb1ad39c7552a3cd;
-  bd72564894314bf6["Relationship Type Filter Implementation"];
-  click bd72564894314bf6 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SystemRequirements/Requirements.md#relationship-type-filter-implementation";
-  class bd72564894314bf6 requirement;
-  66e9d8186acafd13["UserRequirements.md/Filter Relationships by Type"];
-  class 66e9d8186acafd13 requirement;
-  click 66e9d8186acafd13 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#filter-relationships-by-type";
-  bd72564894314bf6 -.->|deriveReqT| 66e9d8186acafd13;
-  5071808e4276f33a["SysML-Compatible Relationship Rendering"];
-  click 5071808e4276f33a "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SystemRequirements/Requirements.md#sysml-compatible-relationship-rendering";
-  class 5071808e4276f33a requirement;
-  eed0b020b6ddeae1["UserRequirements.md/Visualize Model Relationships"];
-  class eed0b020b6ddeae1 requirement;
-  click eed0b020b6ddeae1 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#visualize-model-relationships";
-  5071808e4276f33a -.->|deriveReqT| eed0b020b6ddeae1;
-  95f7dce6aff47396 -->|satisfies| 5071808e4276f33a;
-```
-- **Stakeholder Needs Requirements File**: Files located in the root of the `specifications` folder and meeting all conditions.
-- **System Requirements File**: Files found in external folders or subfolders within `specifications`.
-- **Not a Requirements File**: Files that match exclusion patterns, do not have a `.md` extension, or are in the design folder.
 
 ---
 
@@ -593,27 +605,6 @@ This ensures that the Mermaid diagrams in the repository are always up-to-date a
   * derivedFrom: [UserRequirements.md/Automate Diagram Generation](../UserRequirements.md#automate-diagram-generation)
   * derivedFrom: [UserRequirements.md/Automate Pull Request Validations](../UserRequirements.md#automate-pull-request-validations)
   * satisfiedBy: [generate_diagrams.yml](../../.github/workflows/generate_diagrams.yml)
-
----
-
-### Configurable Filename Exclusion Patterns
-The system shall support configurable glob patterns to exclude specific files from requirement processing, regardless if they are located in specifications or external folders.
-
-#### Details
-```reqvire.yaml
-paths:
-
-  # Glob patterns to exclude from requirements processing
-
-  # These are patterns that shouldn't be considered requirements even if they're in specifications or external folders
-  excluded_filename_patterns:
-    - "**/Logical*.md"
-    - "**/Physical*.md"    
-```
-
-#### Relations
-  * derivedFrom: [ManagingMbseModelsRequirements.md/Project Configuration with YAML](../ManagingMbseModelsRequirements.md#project-configuration-with-yaml)
-  * satisfiedBy: [config.rs](../../cli/src/config.rs)
 
 ---
 
@@ -706,7 +697,7 @@ The system shall implement a configurable storage mechanism for generated diagra
 
 ---
 
-## Change Tracing
+## Change Impact Analisys
 ```mermaid
 graph LR;
   %% Graph styling
@@ -715,58 +706,57 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  48e08ff33bc860c5["Structural Change Analyzer"];
-  click 48e08ff33bc860c5 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SystemRequirements/Requirements.md#structural-change-analyzer";
-  class 48e08ff33bc860c5 requirement;
-  9b9c33c7182d6eeb["UserRequirements.md/Tracing Structural Changes"];
-  class 9b9c33c7182d6eeb requirement;
-  click 9b9c33c7182d6eeb "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#tracing-structural-changes";
-  48e08ff33bc860c5 -.->|deriveReqT| 9b9c33c7182d6eeb;
-  76acbdfdc0fba01e["model.rs"];
-  class 76acbdfdc0fba01e default;
-  click 76acbdfdc0fba01e "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/core/src/change_impact.rs";
-  76acbdfdc0fba01e -->|satisfies| 48e08ff33bc860c5;
   c020978403254f09["CLI Change Impact Report Flag"];
-  click c020978403254f09 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SystemRequirements/Requirements.md#cli-change-impact-report-flag";
+  click c020978403254f09 "Requirements.md#cli-change-impact-report-flag";
   class c020978403254f09 requirement;
+  48e08ff33bc860c5["Structural Change Analyzer"];
+  class 48e08ff33bc860c5 requirement;
+  click 48e08ff33bc860c5 "Requirements.md#structural-change-analyzer";
   c020978403254f09 -.->|deriveReqT| 48e08ff33bc860c5;
   2f21d2133dbfd205["cli.rs"];
   class 2f21d2133dbfd205 default;
-  click 2f21d2133dbfd205 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/cli/src/cli.rs";
+  click 2f21d2133dbfd205 "../../cli/src/cli.rs";
   2f21d2133dbfd205 -->|satisfies| c020978403254f09;
-  a8066f495e5ed5dd["Traceability Matrix Builder Implementation"];
-  click a8066f495e5ed5dd "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SystemRequirements/Requirements.md#traceability-matrix-builder-implementation";
-  class a8066f495e5ed5dd requirement;
+  3b2f98c43f1ed3bb["Markdown Matrix Formatter"];
+  click 3b2f98c43f1ed3bb "Requirements.md#markdown-matrix-formatter";
+  class 3b2f98c43f1ed3bb requirement;
   c5b8a7944b6943e2["UserRequirements.md/Traceability Matrix"];
   class c5b8a7944b6943e2 requirement;
-  click c5b8a7944b6943e2 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#traceability-matrix";
-  a8066f495e5ed5dd -.->|deriveReqT| c5b8a7944b6943e2;
+  click c5b8a7944b6943e2 "../UserRequirements.md#traceability-matrix";
+  3b2f98c43f1ed3bb -.->|deriveReqT| c5b8a7944b6943e2;
   4966ff561112ec56["matrix_generator.rs"];
   class 4966ff561112ec56 default;
-  click 4966ff561112ec56 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/core/src/matrix_generator.rs";
-  4966ff561112ec56 -->|satisfies| a8066f495e5ed5dd;
+  click 4966ff561112ec56 "../../core/src/matrix_generator.rs";
+  4966ff561112ec56 -->|satisfies| 3b2f98c43f1ed3bb;
+  a0943a440707d910["CLI Traces SVG Flag"];
+  click a0943a440707d910 "Requirements.md#cli-traces-svg-flag";
+  class a0943a440707d910 requirement;
   cdab2d3174ce86a9["CLI Traces Flag"];
-  click cdab2d3174ce86a9 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SystemRequirements/Requirements.md#cli-traces-flag";
   class cdab2d3174ce86a9 requirement;
-  cdab2d3174ce86a9 -.->|deriveReqT| c5b8a7944b6943e2;
-  2f21d2133dbfd205 -->|satisfies| cdab2d3174ce86a9;
+  click cdab2d3174ce86a9 "Requirements.md#cli-traces-flag";
+  a0943a440707d910 -.->|deriveReqT| cdab2d3174ce86a9;
+  2f21d2133dbfd205 -->|satisfies| a0943a440707d910;
+  a8066f495e5ed5dd["Traceability Matrix Builder Implementation"];
+  click a8066f495e5ed5dd "Requirements.md#traceability-matrix-builder-implementation";
+  class a8066f495e5ed5dd requirement;
+  a8066f495e5ed5dd -.->|deriveReqT| c5b8a7944b6943e2;
+  4966ff561112ec56 -->|satisfies| a8066f495e5ed5dd;
   79259d512a5c44a6["CLI Git Commit Hash Flag"];
-  click 79259d512a5c44a6 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SystemRequirements/Requirements.md#cli-git-commit-hash-flag";
+  click 79259d512a5c44a6 "Requirements.md#cli-git-commit-hash-flag";
   class 79259d512a5c44a6 requirement;
   79259d512a5c44a6 -.->|deriveReqT| c020978403254f09;
   2f21d2133dbfd205 -->|satisfies| 79259d512a5c44a6;
-  3b2f98c43f1ed3bb["Markdown Matrix Formatter"];
-  click 3b2f98c43f1ed3bb "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SystemRequirements/Requirements.md#markdown-matrix-formatter";
-  class 3b2f98c43f1ed3bb requirement;
-  3b2f98c43f1ed3bb -.->|deriveReqT| c5b8a7944b6943e2;
-  4966ff561112ec56 -->|satisfies| 3b2f98c43f1ed3bb;
-  a0943a440707d910["CLI Traces SVG Flag"];
-  click a0943a440707d910 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SystemRequirements/Requirements.md#cli-traces-svg-flag";
-  class a0943a440707d910 requirement;
-  a0943a440707d910 -.->|deriveReqT| cdab2d3174ce86a9;
-  2f21d2133dbfd205 -->|satisfies| a0943a440707d910;
+  9b9c33c7182d6eeb["UserRequirements.md/Tracing Structural Changes"];
+  class 9b9c33c7182d6eeb requirement;
+  click 9b9c33c7182d6eeb "../UserRequirements.md#tracing-structural-changes";
+  48e08ff33bc860c5 -.->|deriveReqT| 9b9c33c7182d6eeb;
+  76acbdfdc0fba01e["model.rs"];
+  class 76acbdfdc0fba01e default;
+  click 76acbdfdc0fba01e "../../core/src/change_impact.rs";
+  76acbdfdc0fba01e -->|satisfies| 48e08ff33bc860c5;
+  cdab2d3174ce86a9 -.->|deriveReqT| c5b8a7944b6943e2;
+  2f21d2133dbfd205 -->|satisfies| cdab2d3174ce86a9;
 ```
-
 ---
 
 ### Structural Change Analyzer
@@ -889,85 +879,76 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  3871ef72a30780e5["Excluded File Relation Validation"];
-  click 3871ef72a30780e5 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SystemRequirements/Requirements.md#excluded-file-relation-validation";
-  class 3871ef72a30780e5 requirement;
-  4bf74699f40f4a76["Configurable Filename Exclusion Patterns"];
-  class 4bf74699f40f4a76 requirement;
-  click 4bf74699f40f4a76 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SystemRequirements/Requirements.md#configurable-filename-exclusion-patterns";
-  3871ef72a30780e5 -.->|deriveReqT| 4bf74699f40f4a76;
-  48e8a0b4b18111c4["File Pattern Exclusion for Linting"];
-  class 48e8a0b4b18111c4 requirement;
-  click 48e8a0b4b18111c4 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SystemRequirements/Requirements.md#file-pattern-exclusion-for-linting";
-  3871ef72a30780e5 --o|contains| 48e8a0b4b18111c4;
-  dfd639447d711d62["src/parser.rs"];
-  class dfd639447d711d62 default;
-  click dfd639447d711d62 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/core/src/parser.rs";
-  dfd639447d711d62 -->|satisfies| 3871ef72a30780e5;
-  eb3ba1b7474d0e60["Internal Consistency Validator"];
-  click eb3ba1b7474d0e60 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SystemRequirements/Requirements.md#internal-consistency-validator";
-  class eb3ba1b7474d0e60 requirement;
-  f9182ad2999d989c["UserRequirements.md/Validate Internal Consistency"];
-  class f9182ad2999d989c requirement;
-  click f9182ad2999d989c "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#validate-internal-consistency";
-  eb3ba1b7474d0e60 -.->|deriveReqT| f9182ad2999d989c;
-  36fd2b1e82621caf["model.rs"];
-  class 36fd2b1e82621caf default;
-  click 36fd2b1e82621caf "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/core/src/model.rs";
-  36fd2b1e82621caf -->|satisfies| eb3ba1b7474d0e60;
-  dfd639447d711d62 -->|satisfies| eb3ba1b7474d0e60;
-  d4722c13c32cf9e0["Markdown Structure Validator"];
-  click d4722c13c32cf9e0 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SystemRequirements/Requirements.md#markdown-structure-validator";
-  class d4722c13c32cf9e0 requirement;
-  7ec3cb7f400a2e8d["UserRequirements.md/Validate Markdown Structure"];
-  class 7ec3cb7f400a2e8d requirement;
-  click 7ec3cb7f400a2e8d "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#validate-markdown-structure";
-  d4722c13c32cf9e0 -.->|deriveReqT| 7ec3cb7f400a2e8d;
-  36fd2b1e82621caf -->|satisfies| d4722c13c32cf9e0;
-  dfd639447d711d62 -->|satisfies| d4722c13c32cf9e0;
-  bff4e3e834a9ffcc["Relation Type Validation"];
-  click bff4e3e834a9ffcc "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SystemRequirements/Requirements.md#relation-type-validation";
-  class bff4e3e834a9ffcc requirement;
-  3d2fe0b05ff9c8e3["UserRequirements.md/Enhanced Validation Error Reporting"];
-  class 3d2fe0b05ff9c8e3 requirement;
-  click 3d2fe0b05ff9c8e3 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#enhanced-validation-error-reporting";
-  bff4e3e834a9ffcc -.->|deriveReqT| 3d2fe0b05ff9c8e3;
-  a01a924ab0c27629["src/relation.rs"];
-  class a01a924ab0c27629 default;
-  click a01a924ab0c27629 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/core/src/relation.rs";
-  a01a924ab0c27629 -->|satisfies| bff4e3e834a9ffcc;
-  774d12db509b4a55["Relation Element Type Validator"];
-  click 774d12db509b4a55 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SystemRequirements/Requirements.md#relation-element-type-validator";
-  class 774d12db509b4a55 requirement;
-  8a3ca9461643d887["../UserRequirements.md#Validate Relation Types"];
-  class 8a3ca9461643d887 requirement;
-  click 8a3ca9461643d887 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#validate-relation-types";
-  774d12db509b4a55 -.->|deriveReqT| 8a3ca9461643d887;
-  29eb679eef252d12["../SpecificationsRequirements.md#Relation Types And Behaviors"];
-  class 29eb679eef252d12 requirement;
-  click 29eb679eef252d12 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SpecificationsRequirements.md#relation-types-and-behaviors";
-  774d12db509b4a55 -.->|deriveReqT| 29eb679eef252d12;
-  36fd2b1e82621caf -->|satisfies| 774d12db509b4a55;
-  dfd639447d711d62 -->|satisfies| 774d12db509b4a55;
-  7b53d332f5da95a["Filesystem Structure Validator"];
-  click 7b53d332f5da95a "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SystemRequirements/Requirements.md#filesystem-structure-validator";
-  class 7b53d332f5da95a requirement;
-  c390b990a63def2a["UserRequirements.md/Validate Filesystem Structure"];
-  class c390b990a63def2a requirement;
-  click c390b990a63def2a "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#validate-filesystem-structure";
-  7b53d332f5da95a -.->|deriveReqT| c390b990a63def2a;
-  36fd2b1e82621caf -->|satisfies| 7b53d332f5da95a;
   df781ba215f4d187["Cross-Component Dependency Validator"];
-  click df781ba215f4d187 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SystemRequirements/Requirements.md#cross-component-dependency-validator";
+  click df781ba215f4d187 "Requirements.md#cross-component-dependency-validator";
   class df781ba215f4d187 requirement;
   ee05a46627b568b7["UserRequirements.md/Validate Cross-Component Dependencies"];
   class ee05a46627b568b7 requirement;
-  click ee05a46627b568b7 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#validate-cross-component-dependencies";
+  click ee05a46627b568b7 "../UserRequirements.md#validate-cross-component-dependencies";
   df781ba215f4d187 -.->|deriveReqT| ee05a46627b568b7;
+  36fd2b1e82621caf["model.rs"];
+  class 36fd2b1e82621caf default;
+  click 36fd2b1e82621caf "../../core/src/model.rs";
   36fd2b1e82621caf -->|satisfies| df781ba215f4d187;
+  dfd639447d711d62["parser.rs"];
+  class dfd639447d711d62 default;
+  click dfd639447d711d62 "../../core/src/parser.rs";
   dfd639447d711d62 -->|satisfies| df781ba215f4d187;
+  3871ef72a30780e5["Excluded File Relation Validation"];
+  click 3871ef72a30780e5 "Requirements.md#excluded-file-relation-validation";
+  class 3871ef72a30780e5 requirement;
+  be5c69c33c5a4cf6["Ignoring Unstructured Documents"];
+  class be5c69c33c5a4cf6 requirement;
+  click be5c69c33c5a4cf6 "Requirements.md#ignoring-unstructured-documents";
+  3871ef72a30780e5 -.->|deriveReqT| be5c69c33c5a4cf6;
+  48e8a0b4b18111c4["File Pattern Exclusion for Linting"];
+  class 48e8a0b4b18111c4 requirement;
+  click 48e8a0b4b18111c4 "Requirements.md#file-pattern-exclusion-for-linting";
+  3871ef72a30780e5 --o|contains| 48e8a0b4b18111c4;
+  dfd639447d711d62 -->|satisfies| 3871ef72a30780e5;
+  d4722c13c32cf9e0["Markdown Structure Validator"];
+  click d4722c13c32cf9e0 "Requirements.md#markdown-structure-validator";
+  class d4722c13c32cf9e0 requirement;
+  7ec3cb7f400a2e8d["UserRequirements.md/Validate Markdown Structure"];
+  class 7ec3cb7f400a2e8d requirement;
+  click 7ec3cb7f400a2e8d "../UserRequirements.md#validate-markdown-structure";
+  d4722c13c32cf9e0 -.->|deriveReqT| 7ec3cb7f400a2e8d;
+  36fd2b1e82621caf -->|satisfies| d4722c13c32cf9e0;
+  dfd639447d711d62 -->|satisfies| d4722c13c32cf9e0;
+  774d12db509b4a55["Relation Element Type Validator"];
+  click 774d12db509b4a55 "Requirements.md#relation-element-type-validator";
+  class 774d12db509b4a55 requirement;
+  8a3ca9461643d887["../UserRequirements.md#Validate Relation Types"];
+  class 8a3ca9461643d887 requirement;
+  click 8a3ca9461643d887 "../UserRequirements.md#validate-relation-types";
+  774d12db509b4a55 -.->|deriveReqT| 8a3ca9461643d887;
+  29eb679eef252d12["../SpecificationsRequirements.md#Relation Types And Behaviors"];
+  class 29eb679eef252d12 requirement;
+  click 29eb679eef252d12 "../SpecificationsRequirements.md#relation-types-and-behaviors";
+  774d12db509b4a55 -.->|deriveReqT| 29eb679eef252d12;
+  36fd2b1e82621caf -->|satisfies| 774d12db509b4a55;
+  dfd639447d711d62 -->|satisfies| 774d12db509b4a55;
+  bff4e3e834a9ffcc["Relation Type Validation"];
+  click bff4e3e834a9ffcc "Requirements.md#relation-type-validation";
+  class bff4e3e834a9ffcc requirement;
+  3d2fe0b05ff9c8e3["UserRequirements.md/Enhanced Validation Error Reporting"];
+  class 3d2fe0b05ff9c8e3 requirement;
+  click 3d2fe0b05ff9c8e3 "../UserRequirements.md#enhanced-validation-error-reporting";
+  bff4e3e834a9ffcc -.->|deriveReqT| 3d2fe0b05ff9c8e3;
+  a01a924ab0c27629["src/relation.rs"];
+  class a01a924ab0c27629 default;
+  click a01a924ab0c27629 "../../core/src/relation.rs";
+  a01a924ab0c27629 -->|satisfies| bff4e3e834a9ffcc;
+  eb3ba1b7474d0e60["Internal Consistency Validator"];
+  click eb3ba1b7474d0e60 "Requirements.md#internal-consistency-validator";
+  class eb3ba1b7474d0e60 requirement;
+  f9182ad2999d989c["UserRequirements.md/Validate Internal Consistency"];
+  class f9182ad2999d989c requirement;
+  click f9182ad2999d989c "../UserRequirements.md#validate-internal-consistency";
+  eb3ba1b7474d0e60 -.->|deriveReqT| f9182ad2999d989c;
+  36fd2b1e82621caf -->|satisfies| eb3ba1b7474d0e60;
+  dfd639447d711d62 -->|satisfies| eb3ba1b7474d0e60;
 ```
-
 ---
 
 ### Markdown Structure Validator
@@ -978,15 +959,6 @@ The system shall implement a markdown structure validator that enforces Reqvire'
   * derivedFrom: [UserRequirements.md/Validate Markdown Structure](../UserRequirements.md#validate-markdown-structure)
   * satisfiedBy: [model.rs](../../core/src/model.rs)    
   * satisfiedBy: [parser.rs](../../core/src/parser.rs)
-
----
-
-### Filesystem Structure Validator
-The system shall implement a validator that checks the organization of files and directories against the expected Reqvire project structure, verifying required folders exist and files are appropriately placed according to configuration settings.
-
-#### Relations
-  * derivedFrom: [UserRequirements.md/Validate Filesystem Structure](../UserRequirements.md#validate-filesystem-structure)
-  * satisfiedBy: [model.rs](../../core/src/model.rs)
 
 ---
 
@@ -1048,7 +1020,7 @@ The validation process for excluded files:
 2. Internal elements within excluded files are not processed or validated
 
 #### Relations
-  * derivedFrom: [Configurable Filename Exclusion Patterns](#configurable-filename-exclusion-patterns) 
+  * derivedFrom: [Ignoring Unstructured Documents](#ignoring-unstructured-documents) 
   * containedBy: [File Pattern Exclusion for Linting](#file-pattern-exclusion-for-linting)
   * satisfiedBy: [src/parser.rs](../../core/src/parser.rs)
 
@@ -1064,59 +1036,58 @@ graph LR;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
   a862f56b69bd5819["Handle Invalid Regex Filter Patterns"];
-  click a862f56b69bd5819 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SystemRequirements/Requirements.md#handle-invalid-regex-filter-patterns";
+  click a862f56b69bd5819 "Requirements.md#handle-invalid-regex-filter-patterns";
   class a862f56b69bd5819 requirement;
   2f21d2133dbfd205["../../cli/src/cli.rs"];
   class 2f21d2133dbfd205 default;
-  click 2f21d2133dbfd205 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/cli/src/cli.rs";
+  click 2f21d2133dbfd205 "../../cli/src/cli.rs";
   2f21d2133dbfd205 -->|satisfies| a862f56b69bd5819;
   197dc113759da19b["CLI Summary Report Command"];
   class 197dc113759da19b requirement;
-  click 197dc113759da19b "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SystemRequirements/Requirements.md#cli-summary-report-command";
+  click 197dc113759da19b "Requirements.md#cli-summary-report-command";
   a862f56b69bd5819 --o|contains| 197dc113759da19b;
   ecd5cbbaddffb824["../Verifications/ReportsTests.md#model-summary-tests"];
   class ecd5cbbaddffb824 verification;
-  click ecd5cbbaddffb824 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/Verifications/ReportsTests.md#model-summary-tests";
+  click ecd5cbbaddffb824 "../Verifications/ReportsTests.md#model-summary-tests";
   ecd5cbbaddffb824 -.->|verifies| a862f56b69bd5819;
   ce120a0d16cf2475["Model Summary Report Generator"];
-  click ce120a0d16cf2475 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SystemRequirements/Requirements.md#model-summary-report-generator";
   class ce120a0d16cf2475 requirement;
+  click ce120a0d16cf2475 "Requirements.md#model-summary-report-generator";
+  197dc113759da19b -.->|deriveReqT| ce120a0d16cf2475;
+  2f21d2133dbfd205 -->|satisfies| 197dc113759da19b;
   40de7485b25294["UserRequirements.md/Model Structure and Summaries"];
   class 40de7485b25294 requirement;
-  click 40de7485b25294 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#model-structure-and-summaries";
+  click 40de7485b25294 "../UserRequirements.md#model-structure-and-summaries";
   ce120a0d16cf2475 -.->|deriveReqT| 40de7485b25294;
   11a8fc49a87327fe["model.rs"];
   class 11a8fc49a87327fe default;
-  click 11a8fc49a87327fe "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/core/src/reports.rs";
+  click 11a8fc49a87327fe "../../core/src/reports.rs";
   11a8fc49a87327fe -->|satisfies| ce120a0d16cf2475;
-  ae7920e4b52a5854["Display Name-Regex Option in Help"];
-  click ae7920e4b52a5854 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SystemRequirements/Requirements.md#display-name-regex-option-in-help";
-  class ae7920e4b52a5854 requirement;
-  2f21d2133dbfd205 -->|satisfies| ae7920e4b52a5854;
-  ae7920e4b52a5854 -.->|deriveReqT| 197dc113759da19b;
-  ecd5cbbaddffb824 -.->|verifies| ae7920e4b52a5854;
   90e16b61e174ace5["Model Summary Fine Grained Filtering"];
-  click 90e16b61e174ace5 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SystemRequirements/Requirements.md#model-summary-fine-grained-filtering";
+  click 90e16b61e174ace5 "Requirements.md#model-summary-fine-grained-filtering";
   class 90e16b61e174ace5 requirement;
   11a8fc49a87327fe -->|satisfies| 90e16b61e174ace5;
   2f21d2133dbfd205 -->|satisfies| 90e16b61e174ace5;
   90e16b61e174ace5 -.->|deriveReqT| ce120a0d16cf2475;
   ecd5cbbaddffb824 -.->|verifies| 90e16b61e174ace5;
-  197dc113759da19b -.->|deriveReqT| ce120a0d16cf2475;
-  2f21d2133dbfd205 -->|satisfies| 197dc113759da19b;
+  ae7920e4b52a5854["Display Name-Regex Option in Help"];
+  click ae7920e4b52a5854 "Requirements.md#display-name-regex-option-in-help";
+  class ae7920e4b52a5854 requirement;
+  2f21d2133dbfd205 -->|satisfies| ae7920e4b52a5854;
+  ae7920e4b52a5854 -.->|deriveReqT| 197dc113759da19b;
+  ecd5cbbaddffb824 -.->|verifies| ae7920e4b52a5854;
   d376638ec1fbd6e9["Validation Report Generator"];
-  click d376638ec1fbd6e9 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SystemRequirements/Requirements.md#validation-report-generator";
+  click d376638ec1fbd6e9 "Requirements.md#validation-report-generator";
   class d376638ec1fbd6e9 requirement;
   2d3cfde19fc6bb79["UserRequirements.md/Provide Validation Reports"];
   class 2d3cfde19fc6bb79 requirement;
-  click 2d3cfde19fc6bb79 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#provide-validation-reports";
+  click 2d3cfde19fc6bb79 "../UserRequirements.md#provide-validation-reports";
   d376638ec1fbd6e9 -.->|deriveReqT| 2d3cfde19fc6bb79;
   36fd2b1e82621caf["model.rs"];
   class 36fd2b1e82621caf default;
-  click 36fd2b1e82621caf "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/core/src/model.rs";
+  click 36fd2b1e82621caf "../../core/src/model.rs";
   36fd2b1e82621caf -->|satisfies| d376638ec1fbd6e9;
 ```
-
 ---
 
 ### Model Summary Report Generator

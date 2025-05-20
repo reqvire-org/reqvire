@@ -4,7 +4,6 @@ use crate::error::ReqvireError;
 use std::path::PathBuf;
 use lazy_static::lazy_static;
 use regex::{Regex, Captures};
-use pathdiff::diff_paths;
 use std::path::Path;
 
 
@@ -142,11 +141,10 @@ pub fn convert_to_html(
     file_path: &PathBuf,
     markdown_content: &str, 
     title: &str,
-    specification_folder: &PathBuf,
-    external_folders: &[PathBuf],   
+    base_folder: &PathBuf
 ) -> Result<String, ReqvireError> {
     // First, convert all Markdown links to use .html extension
-    let markdown_content_with_html_links = convert_markdown_links_to_html(file_path,markdown_content,specification_folder,external_folders);
+    let markdown_content_with_html_links = convert_markdown_links_to_html(file_path, markdown_content, base_folder);
     
     // Parse the markdown content to HTML
     let mut options = Options::empty();
@@ -197,12 +195,10 @@ fn add_anchor_ids(html_content: &str) -> String {
 }
 
 /// Rewrite every `<pre><code class="language-mermaid">…</code></pre>`
-/// into `<div class="mermaid">…</div>`, and convert all
-/// `click … "https://github.com/…/blob/…/foo/bar.md#L10"`
-/// into the correct relative `foo/bar.html#L10` from wherever
-/// this file lives.
+/// into `<div class="mermaid">…</div>` and convert relative links from .md to .html
+/// GitHub blob links are preserved as-is (keeping the .md extension)
 pub fn process_mermaid_diagrams(
-    file_path: &Path,      // e.g. "docs/subdir/chapter1.md"
+    _file_path: &Path,     // Used to determine if we're in a specifications folder
     html_content: &str,    // the rendered HTML
 ) -> String {
     lazy_static! {
@@ -210,50 +206,41 @@ pub fn process_mermaid_diagrams(
         static ref MERMAID_BLOCK: Regex = Regex::new(
             r#"<pre><code class="language-mermaid">([\s\S]*?)</code></pre>"#
         ).unwrap();
-
-        /// 2) Inside it, find every GitHub-blob link to an .md
-        static ref CLICK_LINK: Regex = Regex::new(
-            // (1) “click A ”
-            // (2) repo‐relative path to .md
-            // (3) optional #anchor
-            r#"(click\s+\S+\s+&quot;)https://github\.com/[^/]+/[^/]+/blob/[^/]+/([^&"]+?\.md)(#[^&"]*)?&quot;"#
+        
+        /// 2) Find all .md links, we'll filter GitHub links in the replacement code
+        static ref MD_LINK: Regex = Regex::new(
+            // Matches "click X &quot;path/file.md#fragment&quot;"
+            r#"(click\s+\S+\s+&quot;)([^&"]*?)\.md(#[^&"]*)?(&quot;)"#
         ).unwrap();
     }
-
-    // directory containing the current file
-    let current_dir = file_path.parent().unwrap_or(Path::new("."));
-
-    MERMAID_BLOCK
+    
+    // Process mermaid blocks
+    let mermaid_processed = MERMAID_BLOCK
         .replace_all(html_content, |caps: &regex::Captures| {
             let inner = &caps[1];
-
-            // rewrite each click‐link inside the block
-            let fixed = CLICK_LINK.replace_all(inner, |c: &regex::Captures| {
-                let prefix = &c[1];               // e.g. `click A &quot;`
-                let md_path = &c[2];              // e.g. `specs/Details.md`
+            
+            // Handle .md links, but preserve GitHub blob links
+            let fixed = MD_LINK.replace_all(inner, |c: &regex::Captures| {
+                let prefix = &c[1];          // click X &quot;
+                let path = &c[2];            // path/to/file
                 let anchor = c.get(3).map_or("", |m| m.as_str());
-
-                // repo‐relative HTML target
-                let target_html: PathBuf = PathBuf::from(md_path)
-                    .with_extension("html");
-
-                // compute path from our file → that HTML
-                let rel = diff_paths(&target_html, current_dir)
-                    .unwrap_or_else(|| target_html.clone());
-
-                let link = rel.to_string_lossy();
-                format!(
-                    r#"{prefix}{link}{anchor}&quot;"#,
-                    prefix = prefix,
-                    link   = link,
-                    anchor = anchor,
-                )
+                let suffix = &c[4];          // &quot;
+                
+                // Check if this is a GitHub URL - if so, preserve the .md extension
+                if path.starts_with("https://github.com") {
+                    format!("{}{}.md{}{}", prefix, path, anchor, suffix)
+                } else {
+                    // Otherwise convert to .html
+                    format!("{}{}.html{}{}", prefix, path, anchor, suffix)
+                }
             });
 
             // swap <pre><code>…</code></pre> → <div class="mermaid">…</div>
             format!(r#"<div class="mermaid">{}</div>"#, fixed)
         })
-        .to_string()
+        .to_string();
+    
+    mermaid_processed
 }
 
 
@@ -264,8 +251,7 @@ pub fn process_mermaid_diagrams(
 fn convert_markdown_links_to_html(
     _file_path: &PathBuf,
     markdown_content: &str,
-    _specification_folder: &PathBuf,
-    _external_folders: &[PathBuf],
+    _base_folder: &PathBuf
 ) -> String {
     lazy_static! {
         // 1) [text](../path/to/file.md#fragment)
@@ -331,11 +317,9 @@ mod tests {
         // Dummy file path.
         let file_path = &PathBuf::from("dummy.md");
         // Use "DesignSpecifications" as the specification folder.
-        let specification_folder = &PathBuf::from("./");
-        // Provide an external folder that does not interfere with these links.
-        let external_folders: Vec<PathBuf> = vec![PathBuf::from("external")];
+        let base_folder = &PathBuf::from("./");
 
-        let html = convert_markdown_links_to_html(file_path, markdown, specification_folder, &external_folders);
+        let html = convert_markdown_links_to_html(file_path, markdown, base_folder);
         println!("Converted HTML: {}", html);
         
         // Check that no link still contains ".md".
@@ -365,16 +349,74 @@ mod tests {
     </code></pre>"#;
 
         let file_path = PathBuf::from("specs/diagrams/example.md");
-
         let processed = process_mermaid_diagrams(&file_path, html_with_mermaid);
 
-
-
-        //  .md is replaced with .html
-        assert!(processed.contains("../Reqs.html#id1"));
-        // .rs remains untouched
+        // GitHub blob links are preserved with .md extension
+        assert!(processed.contains("https://github.com/user/repo/blob/main/specs/Reqs.md#id1"));
+        // .rs links remain untouched
         assert!(processed.contains("https://github.com/user/repo/blob/main/src/main.rs"));
+    }
+    
+    #[test]
+    fn test_direct_markdown_links_in_mermaid() {
+        let html_with_mermaid = r#"<pre><code class="language-mermaid">
+    graph TD;
+        click A &quot;specs/Reqs.md#id1&quot;;
+        click B &quot;src/main.rs&quot;;
+    </code></pre>"#;
+
+        let file_path = PathBuf::from("specs/diagrams/example.md");
+        let processed = process_mermaid_diagrams(&file_path, html_with_mermaid);
+
+        // Regular .md links are converted to .html
+        assert!(processed.contains("specs/Reqs.html#id1"));
+        // Other files remain untouched
+        assert!(processed.contains("src/main.rs"));
         // original .md link is gone
-        assert!(!processed.contains("Reqs.md#id1"));
+        assert!(!processed.contains("specs/Reqs.md#id1"));
+    }
+    
+    #[test]
+    fn test_parent_directory_links_in_mermaid() {
+        let html_with_mermaid = r#"<pre><code class="language-mermaid">
+    graph TD;
+        click A &quot;../parent/Reqs.md#id1&quot;;
+        click B &quot;../../grandparent/Reqs.md#id1&quot;;
+    </code></pre>"#;
+
+        let file_path = PathBuf::from("specs/diagrams/example.md");
+        let processed = process_mermaid_diagrams(&file_path, html_with_mermaid);
+
+        // Parent directories are preserved
+        assert!(processed.contains("../parent/Reqs.html#id1"));
+        assert!(processed.contains("../../grandparent/Reqs.html#id1"));
+        
+        // Original .md links are gone
+        assert!(!processed.contains("../parent/Reqs.md#id1"));
+        assert!(!processed.contains("../../grandparent/Reqs.md#id1"));
+    }
+    
+    #[test]
+    fn test_mermaid_links_without_fragments() {
+        let html_with_mermaid = r#"<pre><code class="language-mermaid">
+    graph TD;
+        click A &quot;specs/Reqs.md&quot;;
+        click B &quot;../parent/Reqs.md&quot;;
+        click C &quot;https://github.com/user/repo/blob/main/specs/Reqs.md&quot;;
+    </code></pre>"#;
+
+        let file_path = PathBuf::from("specs/diagrams/example.md");
+        let processed = process_mermaid_diagrams(&file_path, html_with_mermaid);
+
+        // Regular .md links are converted to .html
+        assert!(processed.contains("specs/Reqs.html"));
+        assert!(processed.contains("../parent/Reqs.html"));
+        
+        // GitHub blob links are preserved with the .md extension
+        assert!(processed.contains("https://github.com/user/repo/blob/main/specs/Reqs.md"));
+        
+        // Original regular .md links are gone
+        assert!(!processed.contains("click A &quot;specs/Reqs.md"));
+        assert!(!processed.contains("click B &quot;../parent/Reqs.md"));
     }
 }

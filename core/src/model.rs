@@ -40,20 +40,18 @@ impl ModelManager {
     pub fn parse_and_validate(
         &mut self, 
         git_commit_hash: Option<&str>,
-        specification_folder: &PathBuf, 
-        external_folders: &[PathBuf],
+        user_requirements_root_folder: &Option<PathBuf>,
         excluded_filename_patterns: &GlobSet
     ) -> Result<Vec<ReqvireError>, ReqvireError> {
     
         let mut errors = Vec::new();
         
-        let files = utils::scan_markdown_files(git_commit_hash, &specification_folder, &external_folders, excluded_filename_patterns);
-        //   .into_iter().map(|(path,_)| path).collect();
+        let files = utils::scan_markdown_files(git_commit_hash, excluded_filename_patterns, None);
            
         debug!("Found {} markdown files.", files.len());
 
 
-        let file_iterator = filesystem::FileReaderIterator::new(git_commit_hash,files.to_vec());
+        let file_iterator = filesystem::FileReaderIterator::new(git_commit_hash, files);
         for file_result in file_iterator {
             match file_result {
                 Err(e) =>return Err(e),
@@ -61,15 +59,14 @@ impl ModelManager {
 
                     debug!("Markdown File found: {}", file_name);
 
-                    let relative_path_str =utils::get_relative_path(&path, specification_folder, external_folders)?.to_string_lossy().to_string();
+                    let relative_path_str = utils::get_relative_path(&path)?.to_string_lossy().to_string();
     
                     // Parse Elements    
                     let (elements, parse_errors) = parser::parse_elements(
                         &file_name,
                         &file_content,
                         &path,
-                        specification_folder,
-                        external_folders,
+                        user_requirements_root_folder,
                     );
 
                     // Collect parse-time errors
@@ -332,13 +329,11 @@ impl ModelManager {
     /// Used when the `--generate-diagrams` flag is set.
     pub fn process_diagrams(
         &mut self,
-        specification_folder: &PathBuf, 
-        external_folders: &[PathBuf],        
         diagram_direction: &str
     ) -> Result<(), ReqvireError> {
         
         // Generate diagrams by section
-        let diagrams = diagrams::generate_diagrams_by_section(&self.element_registry, diagram_direction, specification_folder, external_folders)?;
+        let diagrams = diagrams::generate_diagrams_by_section(&self.element_registry, diagram_direction)?;
 
         // Group diagrams by file path
         let mut files_to_update: HashMap<String, Vec<(&str, &String)>> = HashMap::new();

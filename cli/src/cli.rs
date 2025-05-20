@@ -175,7 +175,10 @@ pub struct Args {
     /// Git commit hash to use when comparing models
     #[clap(long, requires = "change_impact", default_value = "HEAD")]    
     pub git_commit: String,
-        
+    
+        /// Process only files within a specific subdirectory relative to git root (hidden flag for testing)
+    #[clap(long, hide = true)]
+    pub subdirectory: Option<String>,
 
 }
 
@@ -218,11 +221,10 @@ fn print_validation_results(errors: &[ReqvireError], json_output: bool) {
 
 pub fn handle_command(
     args: Args,
-    specification_folder_path: &PathBuf,
-    external_folders_path: &[PathBuf],    
     output_folder_path: &PathBuf,
     excluded_filename_patterns: &GlobSet,
-    diagram_direction: &str
+    diagram_direction: &str,
+    user_requirements_root_folder: &Option<PathBuf>
 ) -> Result<i32,ReqvireError> {
 
     let mut model_manager = ModelManager::new();
@@ -237,7 +239,11 @@ pub fn handle_command(
         return Ok(0);
     }else{
   
-        let parse_result=model_manager.parse_and_validate(None, &specification_folder_path, &external_folders_path,excluded_filename_patterns);
+        let parse_result = model_manager.parse_and_validate(
+            None, 
+            user_requirements_root_folder,
+            excluded_filename_patterns
+        );
 
                 
         if args.validate {
@@ -260,8 +266,7 @@ pub fn handle_command(
 
             let _index_context = index_generator::generate_readme_index(
                 &model_manager.element_registry, 
-                &specification_folder_path,
-                &external_folders_path
+                &output_folder_path
             ).map_err(|e| {
                 ReqvireError::ProcessError(format!("❌ Failed to generate README.md: {:?}", e))
             })?;
@@ -269,10 +274,10 @@ pub fn handle_command(
             return Ok(0);
                                             
         }else if args.generate_diagrams {
-            info!("Generating mermaid diagrams in {:?}", specification_folder_path);
+            info!("Generating mermaid diagrams");
             // Only collect identifiers and process files to add diagrams
             // Skip validation checks for diagram generation mode
-            model_manager.process_diagrams(&specification_folder_path, &external_folders_path, diagram_direction)?;
+            model_manager.process_diagrams(diagram_direction)?;
        
             info!("Requirements diagrams updated in source files");
             return Ok(0);
@@ -319,14 +324,12 @@ pub fn handle_command(
 
             
             let mut refference_model_manager = ModelManager::new();      
-            let _not_interested=refference_model_manager.parse_and_validate(Some(&args.git_commit), &specification_folder_path, &external_folders_path,excluded_filename_patterns);
+            let _not_interested=refference_model_manager.parse_and_validate(Some(&args.git_commit), user_requirements_root_folder, excluded_filename_patterns);
                                     
             let report=change_impact::compute_change_impact(
                 &model_manager.element_registry, 
                 &refference_model_manager.element_registry,
-                &repo_root,
-                &specification_folder_path, 
-                &external_folders_path
+                &repo_root
             )
             .map_err(|e| ReqvireError::ProcessError(format!("❌ Failed to generate change impact report: {:?}", e)))?;
             
@@ -336,7 +339,7 @@ pub fn handle_command(
             
                                       
         }else if args.lint {
-            linting::run_linting(&specification_folder_path, &external_folders_path,excluded_filename_patterns, args.dry_run)?;
+            linting::run_linting(excluded_filename_patterns, args.dry_run, args.subdirectory.as_deref())?;
             return Ok(0);
             
             
@@ -360,7 +363,7 @@ pub fn handle_command(
             
            
         } else if args.html {
-            let processed_count = html_export::export_markdown_to_html(specification_folder_path,&external_folders_path, output_folder_path)?;
+            let processed_count = html_export::export_markdown_to_html(output_folder_path)?;
             info!("{} markdown files converted to HTML", processed_count);
             return Ok(0);
         }else{
@@ -423,7 +426,8 @@ mod tests {
             validate: false,
             config: None, // No custom config file for the test
             change_impact: false, // Add the missing field
-            git_commit: "HEAD".to_string(), // Add the missing field with default value
+            git_commit: "HEAD".to_string(), // Add the missing field
+            subdirectory: None
         };
 
 
@@ -444,13 +448,13 @@ mod tests {
 
     
         // Run the handle_command function
+        let user_requirements_root = None;
         let result = handle_command(
             args,
-            &specification_folder_path,
-            &external_folders_path,            
             &output_folder_path,
             &build_glob_set(&excluded_filename_patterns),
             "TD",
+            &user_requirements_root
         );
 
         // Assert that it runs without error
