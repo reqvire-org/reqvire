@@ -34,13 +34,13 @@
 
 ### Key Relation Types
 
-- **refine**: Further elaborates another element (bidirectional impact)
+- **refinedBy/refine**: Further elaborates another element (bidirectional impact)
 - **verifiedBy/verify**: Links to verification methods or tests
 - **derivedFrom/derive**: Source and derived requirements (upward impact)
 - **containedBy/contain**: Parent-child relationships (hierarchical)
 - **satisfiedBy/satisfy**: Implementation relationships (implementation artifacts)
-- **tracedFrom/trace**: General traceability without specific semantics
-- **dependsOn/enable**: Dependency relationships (directional)
+- **trace**: General traceability without specific semantics
+
 
 ### Identifiers
 
