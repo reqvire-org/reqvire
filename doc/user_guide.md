@@ -90,6 +90,8 @@ style:
   # Diagram direction (TD for top-down, LR for left-to-right)
   diagram_direction: "LR"
   
+  # If diagrams click links should be blobs to work from GitHub console
+  diagrams_with_blobs: false  
 ```
 
 ## Working with Requirements
