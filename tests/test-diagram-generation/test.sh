@@ -16,7 +16,6 @@
 # Create a reqvire.yaml configuration
 cat > "$TEST_DIR/reqvire.yaml" << EOF
 paths:
-  specifications_folder: "specifications"
   output_folder: "output"
   excluded_filename_patterns: []
 style:

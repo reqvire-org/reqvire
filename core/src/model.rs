@@ -329,11 +329,12 @@ impl ModelManager {
     /// Used when the `--generate-diagrams` flag is set.
     pub fn process_diagrams(
         &mut self,
-        diagram_direction: &str
+        diagram_direction: &str,
+        diagrams_with_blobs: bool,
     ) -> Result<(), ReqvireError> {
         
         // Generate diagrams by section
-        let diagrams = diagrams::generate_diagrams_by_section(&self.element_registry, diagram_direction)?;
+        let diagrams = diagrams::generate_diagrams_by_section(&self.element_registry, diagram_direction, diagrams_with_blobs)?;
 
         // Group diagrams by file path
         let mut files_to_update: HashMap<String, Vec<(&str, &String)>> = HashMap::new();

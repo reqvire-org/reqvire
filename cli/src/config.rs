@@ -40,7 +40,10 @@ pub struct StyleConfig {
     pub custom_css: Option<String>,
     #[serde(default = "default_diagram_direction")]
     pub diagram_direction: String,
+    #[serde(default = "default_diagrams_with_blobs")]    
+    pub diagrams_with_blobs: bool,    
 }
+
 
 
 
@@ -62,6 +65,12 @@ fn default_diagram_direction() -> String {
     "TD".to_string()  // Default to top-down layout
 }
 
+// Default diagrams with blobs
+fn default_diagrams_with_blobs() -> bool {
+   false
+}
+
+
 impl Default for StyleConfig {
     fn default() -> Self {
         Self {
@@ -69,6 +78,7 @@ impl Default for StyleConfig {
             max_width: 1200,
             custom_css: None,
             diagram_direction: default_diagram_direction(),
+            diagrams_with_blobs: false
         }
     }
 }

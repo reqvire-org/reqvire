@@ -27,6 +27,7 @@ fn main() {
         &config.get_output_folder(), 
         &config.get_excluded_filename_patterns_glob_set(),
         &config.style.diagram_direction,
+        config.style.diagrams_with_blobs,
         &config.get_user_requirements_root_folder()
      )
         .unwrap_or_else(|e| {

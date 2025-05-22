@@ -32,19 +32,6 @@ pub fn is_excluded_by_patterns(path: &Path, excluded_filename_patterns: &GlobSet
 }
 
 
-pub fn is_in_specification_root(
-    file_folder: &PathBuf,     
-    specifications_folder: &PathBuf, 
-) -> bool {
-    let canonical_file_folder = file_folder.canonicalize().ok();
-    let canonical_specifications_folder = specifications_folder.canonicalize().ok();
-
-    match (canonical_file_folder, canonical_specifications_folder) {
-        (Some(file), Some(spec)) => file == spec,
-        _ => false,
-    }
-}
-
 pub fn is_in_user_requirements_root(
     file_folder: &PathBuf,
     user_requirements_root_folder: &Option<PathBuf>,
@@ -192,15 +179,6 @@ pub fn get_relative_path(path: &PathBuf) -> Result<PathBuf, ReqvireError> {
 }
 
 
-pub fn get_relative_path_from_root(path: &PathBuf, root: &PathBuf) -> Result<PathBuf, ReqvireError> {
-    path.strip_prefix(root)
-        .map(PathBuf::from)
-        .map_err(|_| ReqvireError::PathError(format!(
-            "Failed to compute relative path from given root: {}",
-            path.display()
-        )))
-}
-
 
 /// Splits an identifier into (file_part, Option(fragment)) following these rules:
 /// - If the identifier starts with '#' then it is treated as a fragment-only reference 
@@ -303,7 +281,16 @@ pub fn normalize_path(
         }
     };
     
-    let normalized_path = canonical_path.to_string_lossy().to_string();
+    // And now make it relative to git repository root
+    let normalized_path = match get_relative_path(&canonical_path) {
+        Ok(path) => path.to_string_lossy().to_string(),
+        Err(e) => {
+            return Err(ReqvireError::PathError(format!(
+                "Failed to convert to relative path'{}': {}",
+                canonical_path.to_string_lossy(), e
+            )))
+        }
+    };
     return Ok(normalized_path);
 }
 
@@ -427,16 +414,16 @@ mod tests {
     use std::fs;
     use std::path::{ PathBuf};
     use tempfile::TempDir;
-    
+    use std::process::Command;
+     
+        
     // Mock Config structure for tests
     struct MockConfig {
         pub paths: MockPaths,
     }
     
     struct MockPaths {
-        pub specifications_folder: String,
-        pub external_folders: Vec<String>,
-        pub base_path: PathBuf,
+        pub user_requirements_root_folder: String,
         pub excluded_filename_patterns: Vec<String>,
     }
     
@@ -444,23 +431,13 @@ mod tests {
         fn default() -> Self {
             Self {
                 paths: MockPaths {
-                    specifications_folder: "specifications".to_string(),
-                    external_folders: Vec::new(),
-                    base_path: std::env::current_dir().expect("Failed to get current directory"),
+                    user_requirements_root_folder: "specifications".to_string(),
                     excluded_filename_patterns: Vec::new(),
                 }
             }
         }
         
-        fn get_specification_folder(&self) -> PathBuf {
-            self.paths.base_path.join(&self.paths.specifications_folder)
-        }
-        
-        fn get_external_folders(&self) -> Vec<PathBuf> {
-            self.paths.external_folders.iter()
-                .map(|f| self.paths.base_path.join(f))
-                .collect()
-        }
+
         
         fn get_excluded_filename_patterns_glob_set(&self) -> globset::GlobSet {
             let mut builder = globset::GlobSetBuilder::new();
@@ -498,15 +475,20 @@ mod tests {
     #[test]
     fn test_normalize_identifier() {
         // Create a temporary directory
-        let temp_dir = TempDir::new().expect("Failed to create temp dir");
-        let temp_path = temp_dir.path(); // Get the base path
-        
-        let base_path = temp_path.to_path_buf();
-                    
+        let temp_dir = TempDir::new().expect("Failed to create temp dir");       
+        let temp_path = temp_dir.path(); // Get the base path        
+              
+        std::env::set_current_dir(&temp_path).expect("Failed to change current directory");
+                 
+        // Initialize Git in that temp dir
+        Command::new("git")
+            .arg("init")
+            .current_dir(&temp_path)
+            .output()
+            .expect("Failed to initialize git repo");
+                                    
         let mut config_with_externals = MockConfig::default();
-        config_with_externals.paths.external_folders = vec!["./external".to_string()];        
-        config_with_externals.paths.specifications_folder = "./specifications".to_string();
-        config_with_externals.paths.base_path = base_path;               
+        config_with_externals.paths.user_requirements_root_folder = "./specifications".to_string();
                        
                 
         let doc1=temp_path.join("specifications/documents/");
@@ -579,9 +561,7 @@ mod tests {
      
         // Configure external folders for these tests
         let mut config_with_externals = MockConfig::default();
-        config_with_externals.paths.external_folders = vec!["external_repo".to_string()];        
-        config_with_externals.paths.specifications_folder = "specifications".to_string();
-        config_with_externals.paths.base_path = PathBuf::from("");                 
+        config_with_externals.paths.user_requirements_root_folder = "specifications".to_string();
     
         config_with_externals.paths.excluded_filename_patterns=vec![
             "**/README*.md".to_string(),
@@ -648,9 +628,7 @@ mod tests {
 
         // Configure external folders for these tests
         let mut config_with_externals = MockConfig::default();
-        config_with_externals.paths.external_folders = vec!["external_repo".to_string()];
-        config_with_externals.paths.base_path = PathBuf::from("");         
-        config_with_externals.paths.specifications_folder = "specifications".to_string();
+        config_with_externals.paths.user_requirements_root_folder = "specifications".to_string();
     
         config_with_externals.paths.excluded_filename_patterns=vec![
             "**/README*.md".to_string(),

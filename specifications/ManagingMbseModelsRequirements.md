@@ -9,35 +9,36 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  da5831ca85881025["Coexistence of Structured and Unstructured Documents"];
-  click da5831ca85881025 "ManagingMbseModelsRequirements.md#coexistence-of-structured-and-unstructured-documents";
-  class da5831ca85881025 requirement;
-  c75ac8fa29479ca5["UserStories.md/Managing MBSE Models"];
-  class c75ac8fa29479ca5 requirement;
-  click c75ac8fa29479ca5 "UserStories.md#managing-mbse-models";
-  da5831ca85881025 -.->|deriveReqT| c75ac8fa29479ca5;
-  82d6413dc779c791["Configurable User Requirements Root Folder"];
-  click 82d6413dc779c791 "ManagingMbseModelsRequirements.md#configurable-user-requirements-root-folder";
-  class 82d6413dc779c791 requirement;
-  b3ef0fb91572bcf0["Project Configuration with YAML"];
-  class b3ef0fb91572bcf0 requirement;
-  click b3ef0fb91572bcf0 "ManagingMbseModelsRequirements.md#project-configuration-with-yaml";
-  82d6413dc779c791 -.->|deriveReqT| b3ef0fb91572bcf0;
-  103e5403ec1d2f3c["Default Requirement Type Assignment"];
-  click 103e5403ec1d2f3c "ManagingMbseModelsRequirements.md#default-requirement-type-assignment";
-  class 103e5403ec1d2f3c requirement;
-  103e5403ec1d2f3c -->|refines| 82d6413dc779c791;
-  b3ef0fb91572bcf0 -.->|deriveReqT| c75ac8fa29479ca5;
-  b166738857fe340f["Git Repository as Project Root"];
-  class b166738857fe340f requirement;
-  click b166738857fe340f "ManagingMbseModelsRequirements.md#git-repository-as-project-root";
-  b3ef0fb91572bcf0 -->|refines| b166738857fe340f;
-  386d7b145d008870["Efficient Processing"];
-  click 386d7b145d008870 "ManagingMbseModelsRequirements.md#efficient-processing";
-  class 386d7b145d008870 requirement;
-  386d7b145d008870 -.->|deriveReqT| c75ac8fa29479ca5;
-  b166738857fe340f -.->|deriveReqT| c75ac8fa29479ca5;
+  d9354ef2eca0f2d0["Configurable User Requirements Root Folder"];
+  click d9354ef2eca0f2d0 "specifications/ManagingMbseModelsRequirements.md#configurable-user-requirements-root-folder#configurable-user-requirements-root-folder";
+  class d9354ef2eca0f2d0 requirement;
+  16b4b380c917deb1["Project Configuration with YAML"];
+  class 16b4b380c917deb1 requirement;
+  click 16b4b380c917deb1 "specifications/ManagingMbseModelsRequirements.md#project-configuration-with-yaml#project-configuration-with-yaml";
+  d9354ef2eca0f2d0 -.->|deriveReqT| 16b4b380c917deb1;
+  649d72765b13e14f["Git Repository as Project Root"];
+  click 649d72765b13e14f "specifications/ManagingMbseModelsRequirements.md#git-repository-as-project-root#git-repository-as-project-root";
+  class 649d72765b13e14f requirement;
+  e61b7c1baa89bfc6["UserStories.md/Managing MBSE Models"];
+  class e61b7c1baa89bfc6 requirement;
+  click e61b7c1baa89bfc6 "specifications/UserStories.md#managing-mbse-models#managing-mbse-models";
+  649d72765b13e14f -.->|deriveReqT| e61b7c1baa89bfc6;
+  c9cc6878a73bb951["Default Requirement Type Assignment"];
+  click c9cc6878a73bb951 "specifications/ManagingMbseModelsRequirements.md#default-requirement-type-assignment#default-requirement-type-assignment";
+  class c9cc6878a73bb951 requirement;
+  c9cc6878a73bb951 -->|refines| d9354ef2eca0f2d0;
+  d193d11c43776bec["Efficient Processing"];
+  click d193d11c43776bec "specifications/ManagingMbseModelsRequirements.md#efficient-processing#efficient-processing";
+  class d193d11c43776bec requirement;
+  d193d11c43776bec -.->|deriveReqT| e61b7c1baa89bfc6;
+  f0d721424636370e["Coexistence of Structured and Unstructured Documents"];
+  click f0d721424636370e "specifications/ManagingMbseModelsRequirements.md#coexistence-of-structured-and-unstructured-documents#coexistence-of-structured-and-unstructured-documents";
+  class f0d721424636370e requirement;
+  f0d721424636370e -.->|deriveReqT| e61b7c1baa89bfc6;
+  16b4b380c917deb1 -.->|deriveReqT| e61b7c1baa89bfc6;
+  16b4b380c917deb1 -->|refines| 649d72765b13e14f;
 ```
+
 ---
 
 ### Coexistence of Structured and Unstructured Documents

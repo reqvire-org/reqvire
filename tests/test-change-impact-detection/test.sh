@@ -18,7 +18,6 @@ cp "${TEST_DIR}/reqvire.yaml" "${TMP_DIR}/"
 cp -r "${TEST_DIR}/software" "${TMP_DIR}/"
 mkdir -p "${TMP_DIR}/output"
 
-
 # Create simple git repository to test changes
 cd "${TMP_DIR}"
 git init > /dev/null 2>&1
@@ -27,6 +26,7 @@ git config --local user.name "Test User" > /dev/null 2>&1
 git remote add origin 'https://dummy.example.com/dummy-repo.git'  > /dev/null 2>&1
 git add Requirements.md > /dev/null 2>&1
 git commit -m "Initial commit" > /dev/null 2>&1
+
 
 # Modify requirements after commit
 sed -i 's/The systsem shall activate power-saving mode when the battery level drops below 20%./The systsem shall activate power-saving mode when the battery level drops below 30%./g' "${TMP_DIR}/Requirements.md"

@@ -9,54 +9,60 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  29eb679eef252d12["Relation Types and behaviors"];
-  click 29eb679eef252d12 "SpecificationsRequirements.md#relation-types-and-behaviors";
-  class 29eb679eef252d12 requirement;
-  c75ac8fa29479ca5["UserStories.md#Managing MBSE Models"];
-  class c75ac8fa29479ca5 requirement;
-  click c75ac8fa29479ca5 "UserStories.md#managing-mbse-models";
-  29eb679eef252d12 -.->|deriveReqT| c75ac8fa29479ca5;
-  a01a924ab0c27629["../core/src/relation.rs"];
-  class a01a924ab0c27629 default;
-  click a01a924ab0c27629 "../core/src/relation.rs";
-  a01a924ab0c27629 -->|satisfies| 29eb679eef252d12;
-  a9d2746640af5d30["Structure and Addressing in Markdown Documents"];
-  click a9d2746640af5d30 "SpecificationsRequirements.md#structure-and-addressing-in-markdown-documents";
-  class a9d2746640af5d30 requirement;
-  a9d2746640af5d30 -.->|deriveReqT| c75ac8fa29479ca5;
-  11082285c19e9df["Structure of Markdown Documents"];
-  click 11082285c19e9df "SpecificationsRequirements.md#structure-of-markdown-documents";
-  class 11082285c19e9df requirement;
-  11082285c19e9df -.->|deriveReqT| a9d2746640af5d30;
-  a01a924ab0c27629 -->|satisfies| 11082285c19e9df;
-  3e5e5aa2d6181644["../core/src/element.rs"];
-  class 3e5e5aa2d6181644 default;
-  click 3e5e5aa2d6181644 "../core/src/element.rs";
-  3e5e5aa2d6181644 -->|satisfies| 11082285c19e9df;
-  aaf2fdce0a90bd2c["../core/src/subsection.rs"];
-  class aaf2fdce0a90bd2c default;
-  click aaf2fdce0a90bd2c "../core/src/subsection.rs";
-  aaf2fdce0a90bd2c -->|satisfies| 11082285c19e9df;
-  dfd639447d711d62["../core/src/parser.rs"];
-  class dfd639447d711d62 default;
-  click dfd639447d711d62 "../core/src/parser.rs";
-  dfd639447d711d62 -->|satisfies| 11082285c19e9df;
-  36fd2b1e82621caf["../core/src/model.rs"];
-  class 36fd2b1e82621caf default;
-  click 36fd2b1e82621caf "../core/src/model.rs";
-  36fd2b1e82621caf -->|satisfies| 11082285c19e9df;
-  34ac784ed0e00552["Identifiers and Relations"];
-  click 34ac784ed0e00552 "SpecificationsRequirements.md#identifiers-and-relations";
-  class 34ac784ed0e00552 requirement;
-  34ac784ed0e00552 -.->|deriveReqT| a9d2746640af5d30;
-  a01a924ab0c27629 -->|satisfies| 34ac784ed0e00552;
-  d914e938be7e0abf["Requirements Change Propagation"];
-  click d914e938be7e0abf "SpecificationsRequirements.md#requirements-change-propagation";
-  class d914e938be7e0abf requirement;
-  c699ef8d6d1f99d1["UserRequirements.md#Change Impact Analysis"];
-  class c699ef8d6d1f99d1 requirement;
-  click c699ef8d6d1f99d1 "UserRequirements.md#change-impact-analysis";
-  d914e938be7e0abf -->|refines| c699ef8d6d1f99d1;
+  b49d890e0bbe0a83["Structure of Markdown Documents"];
+  click b49d890e0bbe0a83 "specifications/SpecificationsRequirements.md#structure-of-markdown-documents#structure-of-markdown-documents";
+  class b49d890e0bbe0a83 requirement;
+  ade67c27bc5d3bbd["Structure And Addressing in Markdown documents"];
+  class ade67c27bc5d3bbd requirement;
+  click ade67c27bc5d3bbd "specifications/SpecificationsRequirements.md#structure-and-addressing-in-markdown-documents#structure-and-addressing-in-markdown-documents";
+  b49d890e0bbe0a83 -.->|deriveReqT| ade67c27bc5d3bbd;
+  cd2d5dab49985ca2["UserStories.md#ai-assisted-mbse-model-management"];
+  class cd2d5dab49985ca2 requirement;
+  click cd2d5dab49985ca2 "specifications/UserStories.md#ai-assisted-mbse-model-management#ai-assisted-mbse-model-management";
+  b49d890e0bbe0a83 -.->|deriveReqT| cd2d5dab49985ca2;
+  9450d4313f47ef36["../core/src/relation.rs"];
+  class 9450d4313f47ef36 default;
+  click 9450d4313f47ef36 "core/src/relation.rs";
+  9450d4313f47ef36 -->|satisfies| b49d890e0bbe0a83;
+  a814c4935e1a0449["../core/src/element.rs"];
+  class a814c4935e1a0449 default;
+  click a814c4935e1a0449 "core/src/element.rs";
+  a814c4935e1a0449 -->|satisfies| b49d890e0bbe0a83;
+  398003c91b6b2cde["../core/src/subsection.rs"];
+  class 398003c91b6b2cde default;
+  click 398003c91b6b2cde "core/src/subsection.rs";
+  398003c91b6b2cde -->|satisfies| b49d890e0bbe0a83;
+  f22d93285fcd7664["../core/src/parser.rs"];
+  class f22d93285fcd7664 default;
+  click f22d93285fcd7664 "core/src/parser.rs";
+  f22d93285fcd7664 -->|satisfies| b49d890e0bbe0a83;
+  d50a859650933e55["../core/src/model.rs"];
+  class d50a859650933e55 default;
+  click d50a859650933e55 "core/src/model.rs";
+  d50a859650933e55 -->|satisfies| b49d890e0bbe0a83;
+  2054606d7574a553["Requirements Change Propagation"];
+  click 2054606d7574a553 "specifications/SpecificationsRequirements.md#requirements-change-propagation#requirements-change-propagation";
+  class 2054606d7574a553 requirement;
+  9933cac5853a8584["UserRequirements.md#Change Impact Analysis"];
+  class 9933cac5853a8584 requirement;
+  click 9933cac5853a8584 "specifications/UserRequirements.md#change-impact-analysis#change-impact-analysis";
+  2054606d7574a553 -->|refines| 9933cac5853a8584;
+  e61b7c1baa89bfc6["UserStories.md#Managing MBSE Models"];
+  class e61b7c1baa89bfc6 requirement;
+  click e61b7c1baa89bfc6 "specifications/UserStories.md#managing-mbse-models#managing-mbse-models";
+  ade67c27bc5d3bbd -.->|deriveReqT| e61b7c1baa89bfc6;
+  816c1e0b1de4dc53["Identifiers and Relations"];
+  click 816c1e0b1de4dc53 "specifications/SpecificationsRequirements.md#identifiers-and-relations#identifiers-and-relations";
+  class 816c1e0b1de4dc53 requirement;
+  816c1e0b1de4dc53 -.->|deriveReqT| ade67c27bc5d3bbd;
+  816c1e0b1de4dc53 -.->|deriveReqT| cd2d5dab49985ca2;
+  9450d4313f47ef36 -->|satisfies| 816c1e0b1de4dc53;
+  551906d5c51d91d9["Relation Types and behaviors"];
+  click 551906d5c51d91d9 "specifications/SpecificationsRequirements.md#relation-types-and-behaviors#relation-types-and-behaviors";
+  class 551906d5c51d91d9 requirement;
+  551906d5c51d91d9 -.->|deriveReqT| e61b7c1baa89bfc6;
+  551906d5c51d91d9 -.->|deriveReqT| cd2d5dab49985ca2;
+  9450d4313f47ef36 -->|satisfies| 551906d5c51d91d9;
 ```
 
 ---
@@ -349,7 +355,8 @@ The system shall implement semi-structured markdown format specifications that d
 The system shall implement the structure, rules, and usage of **Sections**, **Elements**, **Subsections**, **Relations**, and **Identifiers** in Markdown (`.md`) documents following clearly defined specifications.
 
 #### Relations
-  * derivedFrom: [Structure And Addressing in Markdown documents](#structure-and-addressing-in-markdown-documents)
+  * derivedFrom: [Structure And Addressing in Markdown documents](#structure-and-addressing-in-markdown-documents)  
+  * derivedFrom: [UserStories.md#ai-assisted-mbse-model-management](UserStories.md#ai-assisted-mbse-model-management)
   * satisfiedBy: [../core/src/relation.rs](../core/src/relation.rs)
   * satisfiedBy: [../core/src/element.rs](../core/src/element.rs)
   * satisfiedBy: [../core/src/subsection.rs](../core/src/subsection.rs)      
@@ -734,6 +741,7 @@ The system shall implement  **Identifiers** and **Relations** following clearly 
 
 #### Relations
   * derivedFrom: [Structure And Addressing in Markdown documents](#structure-and-addressing-in-markdown-documents)
+  * derivedFrom: [UserStories.md#ai-assisted-mbse-model-management](UserStories.md#ai-assisted-mbse-model-management)  
   * satisfiedBy: [../core/src/relation.rs](../core/src/relation.rs)
 
 #### Details
@@ -1023,6 +1031,7 @@ The system shall implement relations following clearly defined specifications fo
 
 #### Relations
   * derivedFrom: [UserStories.md#Managing MBSE Models](UserStories.md#managing-mbse-models)
+  * derivedFrom: [UserStories.md#ai-assisted-mbse-model-management](UserStories.md#ai-assisted-mbse-model-management)  
   * satisfiedBy: [../core/src/relation.rs](../core/src/relation.rs)
 
 #### Details

@@ -12,7 +12,6 @@ This user guide provides detailed instructions on how to use Reqvire effectively
 - [Generating Documentation](#generating-documentation)
 - [Traceability](#traceability)
 - [Diagrams](#diagrams)
-- [LLM Context Documentation](#llm-context-documentation)
 - [GitHub Integration](#github-integration)
   - [GitHub Actions](#github-actions)
   - [GitHub Issue Comment Commands](#github-issue-comment-commands)
@@ -62,22 +61,13 @@ reqvire -c path/to/custom-config.yaml
 Here's an example of a Reqvire configuration file:
 
 ```yaml
-  # Path to the specifications folder
-  specifications_folder: "specifications"
+  # Path to the user requirements root folder
+  user_requirements_root_folder: "specifications"
   
   # Default output folder for exported html specifications
   output_folder: "output"
-  
-  # Additional external folders that contain system requirements, code sources, and other files
-  # These are relative paths to the input folder (git root)
-  # All markdown files in these folders are considered system requirements (except those matching exclusion patterns)
-  external_folders:
-    - tests
-    - core
-    - cli
-      
+       
   # Glob patterns to exclude from requirements processing
-  # These are patterns that shouldn't be considered requirements even if they're in specifications or external folders
   excluded_filename_patterns:
     - "Usecases.md"
     - "**/Logical*.md"
@@ -234,17 +224,6 @@ reqvire --generate-diagrams
 
 This creates Mermaid diagrams within your requirements files.
 
-## LLM Context Documentation
-
-Reqvire provides comprehensive documentation for Large Language Models (LLMs) to understand the project structure.
-
-### Generate LLM Context
-
-```bash
-reqvire --llm-context
-```
-
-This outputs detailed information about Reqvire methodology, document structure, and syntax conventions, helping LLMs work effectively with your requirements.
 
 ## GitHub Integration
 

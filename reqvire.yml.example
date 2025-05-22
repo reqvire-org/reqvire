@@ -5,7 +5,6 @@
   output_folder: "html"
        
   # Glob patterns to exclude from requirements processing
-  # These are patterns that shouldn't be considered requirements even if they're in specifications or external folders
   excluded_filename_patterns:
     - "Usecases.md"
     - "**/Logical*.md"
@@ -27,4 +26,7 @@ style:
   
   # Diagram direction (TD for top-down, LR for left-to-right)
   diagram_direction: "LR"
+  
+  # If diagrams click links should be blobs to work from GitHub console
+  diagrams_with_blobs: false
   

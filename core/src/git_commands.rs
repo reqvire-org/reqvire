@@ -115,23 +115,8 @@ pub fn find_git_repo_root(absolute_folder_path: &PathBuf) -> Result<String, Reqv
     }
 }
 
-/// Retrieves the repository root folder
-/*
-pub fn get_repository_root(file_path: &str,folder:&str, commit: &str) -> Result<String, ReqvireError> {
-    println!("{}", &format!("{}:{}", commit, file_path));
-    let output = Command::new("git")
-        .args(&["show", &format!("{}:{}", commit, file_path)])
-        .current_dir(folder)        
-        .output()?;
-    if !output.status.success() {
-        let err = String::from_utf8_lossy(&output.stderr);
-        return Err(ReqvireError::GitCommandError(format!("git show failed for {}: {}", file_path, err)));
-    }
-    Ok(String::from_utf8_lossy(&output.stdout).into())
-}
-
-*/
-pub fn repository_root() -> Result<PathBuf, ReqvireError> {
+/// Returns the Git repository root directory
+pub fn get_git_root_dir() -> Result<PathBuf, ReqvireError> {
     let output = Command::new("git")
         .args(&["rev-parse", "--show-toplevel"])
         .output()?;
@@ -144,11 +129,6 @@ pub fn repository_root() -> Result<PathBuf, ReqvireError> {
 
     let path_str = String::from_utf8_lossy(&output.stdout).trim().to_string();
     Ok(PathBuf::from(path_str))
-}
-
-/// Returns the Git repository root directory
-pub fn get_git_root_dir() -> Result<PathBuf, ReqvireError> {
-    repository_root()
 }
 
 /// Lists all files in a commit by running `git ls-tree --name-only -r <commit>`
