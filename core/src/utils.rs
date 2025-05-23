@@ -484,12 +484,6 @@ mod tests {
     }
     
     #[test]
-    #[cfg(target_os = "macos")]    
-    fn test_to_relative_identifier_with_github_fragments() { /* do something */ }
-    
-    #[test]
-    #[cfg(target_os = "linux")]
-    #[cfg(target_os = "win32")]
     #[serial]    
     fn test_to_relative_identifier_with_github_fragments() {
         git_commands::clear_git_cache();

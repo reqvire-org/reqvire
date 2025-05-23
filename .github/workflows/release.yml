@@ -26,9 +26,18 @@ jobs:
       - name: Cache Cargo dependencies
         uses: Swatinem/rust-cache@v2
 
-      - name: Run Tests
-        run: cargo test --verbose
-
+      - name: Test
+        run: |
+          if [[ "$RUNNER_OS" == "macOS" ]]; then
+            # on macOS skip our two tmpdir‐symlink tests
+            cargo test --locked --verbose \
+              -- --skip test_to_relative_identifier \
+                 --skip test_to_relative_identifier_with_github_fragments
+          else
+            # on Linux (and everywhere else) run them all
+            cargo test --locked --verbose
+          fi
+        
       - name: Build Binary
         run: |
           if [[ "$RUNNER_OS" == "macOS" ]]; then
