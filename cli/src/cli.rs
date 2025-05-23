@@ -4,10 +4,12 @@ use anyhow::Result;
 use log::{info};
 use serde::Serialize;
 use reqvire::error::ReqvireError;
-use reqvire::{html_export, linting, ModelManager};
+use reqvire::{linting, ModelManager};
 use reqvire::index_generator;
 use globset::GlobSet;
 use reqvire::reports;
+use reqvire::diagrams;
+use reqvire::export;
 use reqvire::change_impact;
 use reqvire::git_commands;
 use reqvire::matrix_generator;
@@ -257,7 +259,7 @@ pub fn handle_command(
        info!("Generating mermaid diagrams");
         // Only collect identifiers and process files to add diagrams
         // Skip validation checks for diagram generation mode
-        model_manager.process_diagrams(diagram_direction,diagrams_with_blobs)?;
+        diagrams::process_diagrams(&model_manager.element_registry,diagram_direction,diagrams_with_blobs)?;
        
         info!("Requirements diagrams updated in source files");
         return Ok(0);
@@ -335,8 +337,9 @@ pub fn handle_command(
             
            
     } else if args.html {
-        let processed_count = html_export::export_markdown_to_html(output_folder_path)?;
-        info!("{} markdown files converted to HTML", processed_count);
+        let processed_count = export::export_model(&model_manager.element_registry, output_folder_path)?;
+        info!("{} markdown files converted to HTML", processed_count);   
+        
         return Ok(0);
     }else{
         Args::print_help();  
@@ -424,6 +427,7 @@ mod tests {
             &output_folder_path,
             &build_glob_set(&excluded_filename_patterns),
             "TD",
+            false,
             &user_requirements_root
         );
 

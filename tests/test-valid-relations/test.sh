@@ -11,8 +11,23 @@
 # - No error output about missing relation targets
 #
 
+# Create a unique temporary directory
+TMP_DIR=$(mktemp -d -t reqvire-change-impact-XXXXXX)
+cp -a "${TEST_DIR}/." "${TMP_DIR}/"
+mkdir -p "${TMP_DIR}/output"
 
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --subdirectory tests/test-valid-relations --config "${TEST_DIR}/reqvire.yaml" --validate --json 2>&1)
+# Create simple git repository to test changes
+cd "${TMP_DIR}"
+git init > /dev/null 2>&1
+git config --local user.email "test@example.com" > /dev/null 2>&1 
+git config --local user.name "Test User" > /dev/null 2>&1
+git remote add origin 'https://dummy.example.com/dummy-repo.git'  > /dev/null 2>&1
+git add Requirements.md > /dev/null 2>&1
+git commit -m "Initial commit" > /dev/null 2>&1
+
+
+
+OUTPUT=$(cd "$TMP_DIR" && "$REQVIRE_BIN" --config "${TMP_DIR}/reqvire.yaml" --validate --json 2>&1)
 EXIT_CODE=$?
 
 printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
@@ -33,5 +48,4 @@ if ! echo "$OUTPUT" | grep -q "Validation completed successfully with no errors.
   exit 1
 fi
 
-echo "SUCCESS: All valid relation targets were correctly validated"
 exit 0

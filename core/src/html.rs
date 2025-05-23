@@ -143,36 +143,38 @@ pub fn convert_to_html(
     title: &str,
     base_folder: &PathBuf
 ) -> Result<String, ReqvireError> {
-    // First, convert all Markdown links to use .html extension
-    let markdown_content_with_html_links = convert_markdown_links_to_html(file_path, markdown_content, base_folder);
-    
-    // Parse the markdown content to HTML
+    // 1. Extract Mermaid blocks before link conversion
+    let (markdown_without_mermaid, mermaid_blocks) = extract_mermaid_blocks(markdown_content);
+
+    // 2. Convert .md links to .html — safely
+    let markdown_html_ready = convert_markdown_links_to_html(file_path, &markdown_without_mermaid, base_folder);
+
+    // 3. Restore Mermaid blocks (untouched by md → html rewrite)
+    let markdown_final = restore_mermaid_blocks(&markdown_html_ready, &mermaid_blocks);
+
+    // 4. Convert Markdown to HTML
     let mut options = Options::empty();
     options.insert(Options::ENABLE_TABLES);
     options.insert(Options::ENABLE_FOOTNOTES);
     options.insert(Options::ENABLE_STRIKETHROUGH);
     options.insert(Options::ENABLE_TASKLISTS);
-    // These are important for Reqvire diagrams and code blocks
     options.insert(Options::ENABLE_HEADING_ATTRIBUTES);
     options.insert(Options::ENABLE_SMART_PUNCTUATION);
-    
-    let parser = Parser::new_ext(&markdown_content_with_html_links, options);
+
+    let parser = Parser::new_ext(&markdown_final, options);
     let mut html_output = String::new();
     html::push_html(&mut html_output, parser);
-    
-    // Process headers to add IDs for anchors
+
+    // 5. Process anchor IDs, Mermaid blocks
     let html_with_anchors = add_anchor_ids(&html_output);
-    
-    // Process mermaid diagrams for proper rendering
     let html_with_mermaid = process_mermaid_diagrams(file_path, &html_with_anchors);
 
-    
-    // Insert into HTML template
+    // 6. Final output
     let html_document = HTML_TEMPLATE
         .replace("{title}", title)
         .replace("{styles}", EMBEDDED_STYLES)
         .replace("{content}", &html_with_mermaid);
-    
+
     Ok(html_document)
 }
 
@@ -245,6 +247,39 @@ pub fn process_mermaid_diagrams(
 
 
 
+use std::collections::HashMap;
+
+/// Extracts Mermaid blocks and replaces them with placeholders
+fn extract_mermaid_blocks(markdown: &str) -> (String, HashMap<String, String>) {
+    lazy_static! {
+        static ref MERMAID_BLOCK: Regex = Regex::new(
+            r"(?s)(?P<full>```mermaid\s+(?P<code>.*?)```)"
+        ).unwrap();
+    }
+
+    let mut map = HashMap::new();
+    let mut counter = 0;
+    let result = MERMAID_BLOCK.replace_all(markdown, |caps: &Captures| {
+        let full_block = &caps["full"];
+        let placeholder = format!("{{{{MERMAID_BLOCK_{}}}}}", counter);
+        map.insert(placeholder.clone(), full_block.to_string());
+        counter += 1;
+        placeholder
+    });
+
+    (result.into_owned(), map)
+}
+
+/// Replaces placeholders back with the original Mermaid blocks
+fn restore_mermaid_blocks(content: &str, blocks: &HashMap<String, String>) -> String {
+    let mut result = content.to_string();
+    for (key, value) in blocks {
+        result = result.replace(key, value);
+    }
+    result
+}
+
+
 /// Convert all markdown links from .md to .html for HTML output
 /// Pre-processes markdown content to convert all markdown links with .md extension to .html 
 /// This is used to ensure all links in the generated HTML point to HTML files
@@ -312,6 +347,8 @@ mod tests {
 - [Multiple Parents](../../grandparent.md)
 - [Element in Parent](../other.md#element)
 - [Element with Hash](../something.md#header)
+- [MarkdownFile](../something.md)
+- [File](../something.rs)
 - * satisfiedBy: [DesignSpecifications/DirectMessages.md](DesignSpecifications/DirectMessages.md)
 "#;
         // Dummy file path.
@@ -328,6 +365,7 @@ mod tests {
         assert!(!html.contains("../../grandparent.md"));
         assert!(!html.contains("../other.md#element"));
         assert!(!html.contains("../something.md#header"));
+        assert!(!html.contains("../something.md"));                    
         assert!(!html.contains("DesignSpecifications/DirectMessages.md"));
         
         // Check that links are converted to .html.
@@ -336,6 +374,8 @@ mod tests {
         assert!(html.contains("../../grandparent.html"));
         assert!(html.contains("../other.html#element"));
         assert!(html.contains("../something.html#header"));
+        assert!(html.contains("../something.html"));
+        assert!(html.contains("../something.rs"));         
         // Specification folder links remain intact.
         assert!(html.contains("DesignSpecifications/DirectMessages.html"));
     }
@@ -362,7 +402,7 @@ mod tests {
         let html_with_mermaid = r#"<pre><code class="language-mermaid">
     graph TD;
         click A &quot;specs/Reqs.md#id1&quot;;
-        click B &quot;src/main.rs&quot;;
+        click B &quot;../../src/main.rs&quot;;
     </code></pre>"#;
 
         let file_path = PathBuf::from("specs/diagrams/example.md");
@@ -371,7 +411,7 @@ mod tests {
         // Regular .md links are converted to .html
         assert!(processed.contains("specs/Reqs.html#id1"));
         // Other files remain untouched
-        assert!(processed.contains("src/main.rs"));
+        assert!(processed.contains("../../src/main.rs"));
         // original .md link is gone
         assert!(!processed.contains("specs/Reqs.md#id1"));
     }
@@ -382,6 +422,7 @@ mod tests {
     graph TD;
         click A &quot;../parent/Reqs.md#id1&quot;;
         click B &quot;../../grandparent/Reqs.md#id1&quot;;
+        click B &quot;../../grandparent/Reqs.rs&quot;;        
     </code></pre>"#;
 
         let file_path = PathBuf::from("specs/diagrams/example.md");
@@ -390,10 +431,12 @@ mod tests {
         // Parent directories are preserved
         assert!(processed.contains("../parent/Reqs.html#id1"));
         assert!(processed.contains("../../grandparent/Reqs.html#id1"));
-        
+        assert!(processed.contains("../../grandparent/Reqs.rs"));        
+                
         // Original .md links are gone
         assert!(!processed.contains("../parent/Reqs.md#id1"));
         assert!(!processed.contains("../../grandparent/Reqs.md#id1"));
+
     }
     
     #[test]

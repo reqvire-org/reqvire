@@ -1,46 +1,15 @@
 use std::fs;
-use std::path::{Path};
+use std::path::{PathBuf,Path};
 use crate::html;
 use crate::error::ReqvireError;
-use crate::git_commands;
 use walkdir::WalkDir;
-use std::io::Write;
 
-
-fn prepare_output_folder(output_folder: &Path) -> std::io::Result<()> {
-    // Clean output folder
-    if output_folder.exists() {
-        fs::remove_dir_all(output_folder)?;
-    }
-    fs::create_dir_all(output_folder)?;
-
-    // Create a .gitignore file that ignores everything except itself
-    let gitignore_path = output_folder.join(".gitignore");
-    let mut file = fs::File::create(gitignore_path)?;
-    writeln!(
-        file,
-        "*\n!.gitignore"
-    )?;
-
-    Ok(())
-}
 
 /// Exports all markdown files to HTML without any processing or filtering
 pub fn export_markdown_to_html(
+    base_dir: &PathBuf,
     output_folder: &Path,
 ) -> Result<usize, ReqvireError> {
-    // Try to get repository root as base directory
-    let base_dir = match git_commands::get_git_root_dir() {
-        Ok(git_root) => git_root,
-        Err(_) => {
-            // If Git repository root can't be found, use the current working directory
-            std::env::current_dir()
-                .map_err(|e| ReqvireError::PathError(format!("Failed to get current directory: {}", e)))?
-        }
-    };
-    
-    // prepare output folder
-    prepare_output_folder(&output_folder)?;
 
     let mut processed_count = 0;
 

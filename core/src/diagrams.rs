@@ -9,6 +9,8 @@ use crate::relation;
 use crate::element::ElementType;
 use crate::element::RequirementType;
 use crate::git_commands;
+use crate::filesystem;
+use std::path::Path;
 
 /// Generates diagrams grouped by `file_path` and `section`
 pub fn generate_diagrams_by_section(
@@ -117,10 +119,11 @@ fn add_element_to_diagram(
         .map(|p| p.to_path_buf()) 
         .unwrap_or_else(|| PathBuf::from("."));
  
-    // Get HTML-style relative ID for local navigation
+    // Get relative ID for local navigation
     let relative_target = utils::to_relative_identifier(
         &element.identifier.clone(),
-        &base_dir
+        &base_dir,
+        false
     )?;
 
 
@@ -157,11 +160,9 @@ fn add_element_to_diagram(
            
                   
        // Add the element node
-       diagram.push_str(&format!("  {}[\"{}\"];\n", element_id, label));
-
-       diagram.push_str(&format!("  click {} \"{}\";\n", element_id, click_target));
-       
+       diagram.push_str(&format!("  {}[\"{}\"];\n", element_id, label));      
        diagram.push_str(&format!("  class {} {};\n", element_id, class));
+       diagram.push_str(&format!("  click {} \"{}\";\n", element_id, click_target));       
     }
 
 
@@ -176,10 +177,11 @@ fn add_element_to_diagram(
                 
                 let target_id = utils::hash_identifier(&target);               
 
-                // Get HTML-style relative ID for local navigation
+                // Get relative ID for local navigation
                 let relative_target = utils::to_relative_identifier(
                     &target,
-                    &base_dir
+                    &base_dir,
+                    false
                 )?;
                 
            
@@ -216,8 +218,7 @@ fn add_element_to_diagram(
                                                                
                     diagram.push_str(&format!("  {}[\"{}\"];\n", target_id, label));
                     diagram.push_str(&format!("  class {} {};\n", target_id, class));                    
-                    
-                    diagram.push_str(&format!("  click {} \"{}\";\n", target_id, click_target));
+                    diagram.push_str(&format!("  click {} \"{}\";\n", target_id, click_target));                    
                 }
                 target_id
             },
@@ -228,9 +229,42 @@ fn add_element_to_diagram(
                 diagram.push_str(&format!("  class {} {};\n", target_id,"default"));
                 diagram.push_str(&format!("  click {} \"{}\";\n", target_id, url));
                 
-                target_id
+                target_id               
+            },
+            relation::LinkType::InternalPath(path) => {
+                // Get relative ID for local navigation
+                let relative_target = utils::to_relative_identifier(
+                    &path.to_string_lossy().into_owned(),
+                    &base_dir,
+                    false
+                )?;
                 
-            }
+           
+                // Get a GitHub link if we have git info
+                let click_target = if diagrams_with_blobs &&  has_git_info {
+                    // Get repository-relative path
+                    let relative_id = match utils::get_relative_path(&path) {
+                        Ok(rel_path) => rel_path.to_string_lossy().to_string(),
+                        Err(_) => path.to_string_lossy().to_string()
+                    };
+                    
+                    // Create a git link for the target element
+                    format!("{}/blob/{}/{}", base_url, commit_hash, relative_id)
+                } else {
+                    // Fall back to the relative link for local navigation
+                    relative_target.clone()
+                };
+            
+                // Always add internal paths, regardless of `included_elements`
+                let cow = path.to_string_lossy();
+                let path_str = cow.as_ref();
+                let target_id = utils::hash_identifier(path_str);
+                diagram.push_str(&format!("  {}[\"{}\"];\n", target_id, label));
+                diagram.push_str(&format!("  class {} {};\n", target_id,"default"));
+                diagram.push_str(&format!("  click {} \"{}\";\n", target_id, click_target));
+                
+                target_id               
+            }            
         };
 
 
@@ -262,3 +296,108 @@ fn add_element_to_diagram(
 }
 
 
+/// Processes diagram generation for markdown files in place (without writing to output).
+/// Used when the `--generate-diagrams` flag is set.
+pub fn process_diagrams(
+    registry: &ElementRegistry,
+    diagram_direction: &str,
+    diagrams_with_blobs: bool,    
+    ) -> Result<(), ReqvireError> {
+
+    // Generate diagrams by section
+    let diagrams = generate_diagrams_by_section(&registry, diagram_direction, diagrams_with_blobs)?;
+
+    // Group diagrams by file path
+    let mut files_to_update: HashMap<String, Vec<(&str, &String)>> = HashMap::new();
+
+    for (file_section_key, new_diagram) in &diagrams {
+        let parts: Vec<&str> = file_section_key.split("::").collect();
+        if parts.len() != 2 {
+            continue; // Skip invalid entries
+        }
+        let file_path = parts[0];
+        let section = parts[1];
+    
+        files_to_update
+            .entry(file_path.to_string())
+            .or_insert_with(Vec::new)
+            .push((section, new_diagram));
+    }
+
+    // Process each file
+    for (file_path, section_diagrams) in files_to_update {
+        let file_path_obj = Path::new(&file_path);
+
+        // Read file content
+        let mut file_content = match filesystem::read_file(file_path_obj) {
+            Ok(content) => content,
+            Err(e) => {
+                log::error!("Failed to read file '{}': {}", file_path, e);
+                continue;
+            }
+        };
+
+        // Replace diagrams for all sections in this file
+        for (section, new_diagram) in section_diagrams {              
+            file_content = replace_section_diagram(&file_content, section, new_diagram);
+        }
+
+        // Write updated content back if modified
+        if let Err(e) = filesystem::write_file(file_path_obj, &file_content) {
+            log::error!("Failed to write updated diagrams to '{}': {}", file_path, e);
+        } else {
+            println!("Updated diagrams in '{}'", file_path);
+        }
+    }
+
+    Ok(())
+}
+
+/// Replaces the old diagram in a specific section of a markdown file.
+///
+/// - `content`: The original file content.
+/// - `section`: The section name where the diagram should be replaced.
+/// - `new_diagram`: The newly generated Mermaid diagram.
+///
+/// Returns the modified file content as a `String`.
+fn replace_section_diagram(content: &str, section: &str, new_diagram: &str) -> String {
+    let section_header = format!("## {}", section);
+    let mermaid_block_start = "```mermaid";
+    let mermaid_block_end = "```";
+
+    let mut new_lines = Vec::new();
+    let mut lines = content.lines().peekable();
+    while let Some(line) = lines.next() {
+        if line.trim() == section_header {
+            // Found the target section header.
+            new_lines.push(line.to_string());
+            // Insert the new diagram immediately after the header.
+            new_lines.push(new_diagram.to_string());
+            // Skip any blank lines immediately after the header.
+            while let Some(&next_line) = lines.peek() {
+                if next_line.trim().is_empty() {
+                    lines.next();
+                } else {
+                    break;
+                }
+            }
+            // If the next non-empty line starts a Mermaid block, skip it.
+            if let Some(&next_line) = lines.peek() {
+                if next_line.trim().starts_with(mermaid_block_start) {
+                    // Skip the mermaid block: first skip the start marker.
+                    lines.next();
+                    // Then skip lines until the end marker is found.
+                    while let Some(l) = lines.next() {
+                        if l.trim().starts_with(mermaid_block_end) {
+                            break;
+                        }
+                    }
+                }
+            }
+            // Continue with the rest of the file.
+            } else {
+                new_lines.push(line.to_string());
+        }
+    }
+    new_lines.join("\n")
+}

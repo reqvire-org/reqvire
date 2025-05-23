@@ -1,4 +1,4 @@
-        use anyhow::Result;
+use anyhow::Result;
 use std::path::{Path, PathBuf};
 use pathdiff::diff_paths;
 use log::debug;
@@ -217,118 +217,129 @@ pub fn normalize_fragment(fragment: &str) -> String{
         .replace(['(', ')', ',', ':'], "") // Remove disallowed characters
 }
 
-pub fn normalize_identifier(
-    identifier: &str,
-    base_path: &PathBuf
-) -> Result<String, ReqvireError> {
-
-    let (path, fragment_opt) = extract_path_and_fragment(identifier);
-
-    
-    let result = match normalize_path(path, base_path) {
-        Ok(normalized_path) => {     
-            // Normalize element name into GitHub-style fragment
-            if let Some(fragment) = fragment_opt {
-                let normalized_fragment = normalize_fragment(&fragment);                
-                Ok(format!("{}#{}", normalized_path, normalized_fragment))            
-            } else {
-                Ok(normalized_path)
-            }            
-        },
-        Err(e) => Err(e)
-    };
-    
-    result
-
-}
-
 
 /// List of known external URL schemes
-const EXTERNAL_SCHEMES: &[&str] = &[
+pub const EXTERNAL_SCHEMES: &[&str] = &[
     "http://", "https://", "ftp://", "file://", "mailto:", "ssh://", "git://", "data:",
 ];
 
-/// Normalize a file path relative to the git repository root
-pub fn normalize_path(
-    path_str: &str, 
-    base_path: &PathBuf
+pub fn normalize_identifier(
+    identifier: &str,
+    base_path: &PathBuf,
 ) -> Result<String, ReqvireError> {
-   
-    let path = Path::new(path_str);
+    // 0) Extract the path and any trailing fragment
+    let (path_part, fragment_opt) = extract_path_and_fragment(identifier);
 
-    // Check if the path is an external URL and return it as-is
-    if EXTERNAL_SCHEMES.iter().any(|&scheme| path_str.starts_with(scheme)) {
-        debug!("Skipping normalization for external URL: {}", path_str);
-        return Ok(path_str.to_string());
+    // 1) Passthrough external URIs
+    const EXTERNAL_SCHEMES: [&str; 3] = ["http://", "https://", "file://"];
+    if EXTERNAL_SCHEMES.iter().any(|scheme| path_part.starts_with(scheme)) {
+        return Ok(identifier.to_string());
     }
 
-    // If the path is already absolute, return it
-    if path.is_absolute() {
-        return Ok(path_str.to_string());
-    }
-
-    // Convert relative path to absolute
-    let absolute_path = PathBuf::from(base_path).join(path_str);
-
-    // Explicitly canonicalize the path and handle any errors.
-    let canonical_path = match absolute_path.canonicalize() {
-        Ok(path) => path,
-        Err(e) => {
-            return Err(ReqvireError::PathError(format!(
-                "Failed to normalize path'{}': {}",
-                absolute_path.to_string_lossy(), e
-            )))
+    // 2) Build the absolute path to work with
+    let full_path = {
+        let p = Path::new(path_part);
+        if p.is_absolute() {
+            p.canonicalize()
+             .map_err(|e| ReqvireError::PathError(format!(
+                 "Failed to canonicalize absolute `{}`: {}",
+                 p.display(), e
+             )))?
+        } else {
+            base_path.join(p)
+                .canonicalize()
+                .map_err(|e| ReqvireError::PathError(format!(
+                    "Failed to canonicalize `{}`: {}",
+                    base_path.join(p).display(), e
+                )))?
         }
+    };
+
+    // 3) Find & canonicalize the Git root
+    let git_root = crate::git_commands::get_git_root_dir()
+        .map_err(|e| ReqvireError::PathError(format!("Failed to get git root: {}", e)))?
+        .canonicalize()
+        .map_err(|e| ReqvireError::PathError(format!(
+            "Failed to canonicalize git root: {}",
+            e
+        )))?;
+
+    // 4) Strip the Git‐root prefix
+    let rel = full_path
+        .strip_prefix(&git_root)
+        .map_err(|_| ReqvireError::PathError(format!(
+            "`{}` is not inside git root `{}`",
+            full_path.display(),
+            git_root.display()
+        )))?
+        .to_string_lossy()
+        .into_owned();
+
+    // 5) Re-attach the fragment, if present    
+    let full = match fragment_opt {
+        Some(frag) => {
+            let fragment=normalize_fragment(&frag);
+            format!("{}#{}", rel, fragment)
+        }
+        None => rel,
     };
     
-    // And now make it relative to git repository root
-    let normalized_path = match get_relative_path(&canonical_path) {
-        Ok(path) => path.to_string_lossy().to_string(),
-        Err(e) => {
-            return Err(ReqvireError::PathError(format!(
-                "Failed to convert to relative path'{}': {}",
-                canonical_path.to_string_lossy(), e
-            )))
-        }
-    };
-    return Ok(normalized_path);
+    Ok(full)
 }
 
 
-/// Converts a normalized identifier back to a relative path identifier
-/// depending on the location of `base_path` and the git repository root
+
 pub fn to_relative_identifier(
-    normalized_identifier: &str,
-    base_path: &PathBuf
+    identifier: &str,
+    base_path: &PathBuf,
+    should_normalize_fragment: bool,
 ) -> Result<String, ReqvireError> {
+    let (path, fragment_opt) = extract_path_and_fragment(identifier);
 
-    let (normalized_path, fragment_opt) = extract_path_and_fragment(normalized_identifier);
-    let normalized_path = Path::new(normalized_path);
-
-    // Check if the path is an external URL, return as is
-    if EXTERNAL_SCHEMES.iter().any(|&scheme| normalized_identifier.starts_with(scheme)) {
-        debug!("Skipping denormalization for external URL: {}", normalized_identifier);
-        return Ok(normalized_identifier.to_string());
+    if EXTERNAL_SCHEMES.iter().any(|&scheme| identifier.starts_with(scheme)) {
+        return Ok(identifier.to_string());
     }
 
-    // Compute relative path based on `base_path`
-    if let Some(relative_path) = diff_paths(normalized_path, base_path) {
-        let relative_identifier = relative_path.to_string_lossy().into_owned();
-        return Ok(append_fragment(&relative_identifier, fragment_opt));
-    }
+    let path_obj = Path::new(path);
 
-    // If all else fails, return absolute path
-    Ok(append_fragment(&normalized_identifier.to_string(), fragment_opt))
+    let git_root = crate::git_commands::get_git_root_dir()
+        .map_err(|e| ReqvireError::PathError(format!("Failed to get git root: {}", e)))?;
+
+    let stripped = if path_obj.is_absolute() {
+        path.trim_start_matches('/')
+    } else {
+        path
+    };
+
+    let resolved_path=git_root.join(stripped);
+    
+    let canonical_path = resolved_path.canonicalize().ok();
+    let canonical_base = base_path.canonicalize().ok();
+   
+    let relative = if let (Some(normalized), Some(base)) = (canonical_path, canonical_base) {
+        diff_paths(&normalized, &base).map(|p| p.to_string_lossy().into_owned())
+    } else {
+
+        None
+    };
+
+    let base = relative.unwrap_or_else(|| path.to_string());
+
+    let full = match fragment_opt {
+        Some(frag) => {
+            let fragment = if should_normalize_fragment {
+                normalize_fragment(&frag)
+            } else {
+                frag.to_string()
+            };
+            format!("{}#{}", base, fragment)
+        }
+        None => base,
+    };
+
+    Ok(full)
 }
 
-
-/// Helper function to append a fragment (e.g., `#section-name`) to a path if it exists.
-fn append_fragment(path: &str, fragment_opt: Option<&str>) -> String {
-    match fragment_opt {
-        Some(fragment) => format!("{}#{}", path, fragment),
-        None => path.to_string(),
-    }
-}
 
 /// Parses a metadata line and extracts a (key, value) pair if valid.
 /// Expected format: `* key: value` or `- key: value`
@@ -415,6 +426,8 @@ mod tests {
     use std::path::{ PathBuf};
     use tempfile::TempDir;
     use std::process::Command;
+    use git_commands;
+    use serial_test::serial;
      
         
     // Mock Config structure for tests
@@ -450,7 +463,6 @@ mod tests {
         }
     }
     
-    
     #[test]
     fn test_extract_path_and_fragment() {
         let test_cases = vec![
@@ -471,90 +483,110 @@ mod tests {
         }
     }
 
-    
     #[test]
-    fn test_normalize_identifier() {
-        // Create a temporary directory
-        let temp_dir = TempDir::new().expect("Failed to create temp dir");       
-        let temp_path = temp_dir.path(); // Get the base path        
-              
-        std::env::set_current_dir(&temp_path).expect("Failed to change current directory");
-                 
-        // Initialize Git in that temp dir
+    #[serial]    
+    fn test_to_relative_identifier_with_github_fragments() {
+        git_commands::clear_git_cache();
+        
+        use crate::utils::normalize_identifier;
+
+        let temp_dir = TempDir::new().expect("Failed to create temp dir");
+        let temp_path = temp_dir.path();
+
+        std::env::set_current_dir(&temp_path)
+            .expect("Failed to set current directory");
+
+        // Initialize Git repository
         Command::new("git")
             .arg("init")
             .current_dir(&temp_path)
             .output()
             .expect("Failed to initialize git repo");
-                                    
-        let mut config_with_externals = MockConfig::default();
-        config_with_externals.paths.user_requirements_root_folder = "./specifications".to_string();
-                       
-                
-        let doc1=temp_path.join("specifications/documents/");
-                
-        // Define test cases with expected real paths
-        let root_file=&temp_path.join("File5.md").to_string_lossy().into_owned();
-        // Test cases with only relative paths to avoid permission issues
+
+        let base_path = temp_path.join("specifications/documents/");
+        fs::create_dir_all(&base_path).expect("Failed to create base path");
+
+        let file_path = temp_path.join("File4.md");
+        fs::create_dir_all(file_path.parent().unwrap()).unwrap();
+        fs::write(&file_path, "dummy").expect("Failed to create File4.md");
+        assert!(file_path.exists(), "File4.md should exist");
+
+        // Test cases: (identifier, base_path, expected result with GitHub-style fragment)
         let test_cases = vec![
-            // Relative paths within the temp directory
-            ("File1.md", doc1.to_path_buf().clone(), "specifications/documents/File1.md"),        
-            ("File2.md", doc1.to_path_buf().clone(), "specifications/documents/File2.md"),
-            ("subfolder/File3.md", doc1.to_path_buf().clone(), "specifications/documents/subfolder/File3.md"),
-            ("../File4.md", doc1.to_path_buf().clone(), "specifications/File4.md"),
-            
-            // Other paths
-            ("../../somefolder/File4.md", doc1.to_path_buf().clone(), "somefolder/File4.md"),
-            (&root_file, doc1.to_path_buf().clone(), "File5.md"),
-            
-            // Fragments - only with relative paths
-            ("File1.md#Some Fragment", doc1.to_path_buf().clone(), "specifications/documents/File1.md#some-fragment"),
-        ];  
-        
-        for (_, _, file_path) in &test_cases {
-            let full_file_path = temp_path.join(file_path);
-        
-            if let Some(parent) = full_file_path.parent() {
-                fs::create_dir_all(parent).expect("Failed to create directories");
+        (
+            "File1.md#Some Fragment",
+            &base_path,
+            "File1.md#some-fragment",
+        ),
+        (
+            "/File4.md#Title: Example",
+            &base_path,
+            "../../File4.md#title-example",
+        ),
+        (
+            "/some/other/File4.md",
+            &base_path,
+            "../../some/other/File4.md",
+        ),                
+        (
+            "README.md#Installation (Windows)",
+            &base_path,
+            "README.md#installation-windows",
+        ),
+        ];
+
+        for (identifier, base_path, expected_result) in test_cases {
+            // Prepare the file that the identifier points to
+            let (path, _) = crate::utils::extract_path_and_fragment(identifier);
+            let full_path = if Path::new(path).is_absolute() {
+                temp_path.join(path.trim_start_matches('/'))
+            } else {
+                base_path.join(path)
+            };
+
+            if let Some(parent) = full_path.parent() {
+                fs::create_dir_all(parent).unwrap();
             }
-            fs::write(&full_file_path, "Test content").expect("Failed to create test file");
-        }
 
-        for (identifier, in_document, expected) in test_cases {
-            let result = normalize_identifier(identifier, &in_document);
-            
-            // Doing canon because of macos tmp path symlinks, question is if code should work if we are adjusting tests??
-            let expected_path = temp_path.join(expected);
-            let expected = expected_path.to_string_lossy().to_string();
+            fs::write(&full_path, "test").unwrap();
 
-            let result_str = result.unwrap(); // assuming it's a String
-            
-            // Instead of comparing canonicalized paths which may fail, compare relative paths
-            let result_rel = Path::new(&result_str)
-                .strip_prefix(temp_path)
-                .unwrap_or(Path::new(&result_str))
-                .to_string_lossy();
-                
-            let expected_rel = Path::new(&expected_path)
-                .strip_prefix(temp_path)
-                .unwrap_or(Path::new(&expected_path))
-                .to_string_lossy();
-    
+            let result = to_relative_identifier(identifier, base_path,true)
+                .expect("Failed to to relative identifier");
+
             assert_eq!(
-                &result_rel,
-                &expected_rel,
-                "Failed for identifier: {}",
+                result,
+                expected_result,
+                "Expected GitHub-style normalized result for '{}'",
                 identifier
             );
-
-
         }
-        
-    
     }
+   
+    #[test]
+    fn test_to_relative_identifier_external_links() {
+        use crate::utils::normalize_identifier;
 
+        let dummy_path = std::env::temp_dir(); // Doesn't matter for external links
 
- 
+        let test_cases = vec![
+            "https://example.com/doc.md#Section",
+            "http://example.org/readme.md",
+            "ftp://files.example.com/archive.zip",
+            "mailto:user@example.com",
+            "file:///usr/share/docs/manual.md",
+        ];
+
+        for identifier in test_cases {
+            let result = to_relative_identifier(identifier, &dummy_path,true)
+                .expect("Should return external URL unchanged");
+            assert_eq!(
+                result, identifier,
+                "External link was modified unexpectedly: {}",
+                identifier
+            );
+        }
+    }   
+    
     // Test the is_requirements_file_by_path function
     #[test]
     fn test_is_requirements_file_by_path() {
@@ -756,89 +788,64 @@ mod tests {
         }
     }
     
-    #[test]
-    fn test_to_relative_identifier() {
 
+    #[test]
+    #[serial]    
+    fn test_to_relative_identifier() {
+        git_commands::clear_git_cache();
+        
         let temp_spec_folder = TempDir::new().expect("Failed to create temp dir");
         let specifications_folder = temp_spec_folder.path().to_path_buf();
 
-        let spec_folder_name = specifications_folder.file_name()
-            .and_then(|name| name.to_str()) 
-            .unwrap_or("<unknown>");
+        // Set working directory to temp folder
+        std::env::set_current_dir(&specifications_folder)
+            .expect("Failed to change current directory");
 
+        // Initialize Git in temp directory
+        Command::new("git")
+            .arg("init")
+            .current_dir(&specifications_folder)
+            .output()
+            .expect("Failed to initialize git repo");
 
-        let temp_external_folder =  TempDir::new().expect("Failed to create temp dir");
-        let external_folder = temp_external_folder.path().to_path_buf();
-        let external_folders = vec![external_folder.clone()];
-        
-        
         let base_path = specifications_folder.join("in/side/");
-        let base_path_in_ext = external_folder.join("in/side/");
+        fs::create_dir_all(&base_path).expect("Failed to create base path");
 
+        // Create subfolder target file
+        let subfolder_path = specifications_folder.join("subfolder");
+        fs::create_dir_all(&subfolder_path).expect("Failed to create subfolder");
+        fs::write(subfolder_path.join("file.yaml"), "test")
+            .expect("Failed to create file.yaml in subfolder");
 
-        // Test external URL (should be returned as-is)
+        // Create a file in the same folder as specifications_folder
+        let same_folder_file = specifications_folder.join("file.yaml");
+        fs::write(&same_folder_file, "same-level")
+            .expect("Failed to create file.yaml in specifications_folder");
+
+        // 1. External URL should be returned unchanged
         let external_url = "http://example.com/path/to/spec";
-        let result = to_relative_identifier(external_url, &base_path)
+        let result = to_relative_identifier(external_url, &base_path, false)
             .expect("Should return external URL as-is");
         assert_eq!(result, external_url, "Failed external URL check");
 
-        // Test path inside specifications_folder
-        /*
-            When specification folder is "/tmp/spec/" and indentifier is "/tmp/spec/subfolder/file.yaml"
-            then for the base_path "/tmp/spec/in/side/":
-                * relative identifier must be relative reference from base_path: "../../subfolder/file.yaml"
+        // 2. Absolute identifier path resolved relative to Git root
+        let spec_identifier = "/subfolder/file.yaml";
+        let result = to_relative_identifier(&spec_identifier, &base_path, false)
+            .expect("Should return relative path inside specifications folder");
+        assert_eq!(
+            result,
+            "../../subfolder/file.yaml",
+            "Failed Git-root-based absolute path check"
+        );
+
+        // 3. Same-folder file path
+        let spec_identifier = "/file.yaml";
                 
-            Same functionality applies when identifier path and base_path are inside external folder
-        
-        */
-        let spec_path = specifications_folder.join("subfolder/file.yaml");
-        let spec_identifier = spec_path.to_string_lossy().to_string();
-        let result = to_relative_identifier(&spec_identifier, &base_path)
-            .expect("Should return relative path inside specifications folder");
-        assert_eq!(result, "../../subfolder/file.yaml", "Failed specifications folder check");
+        let result =
+            to_relative_identifier(&spec_identifier, &specifications_folder, false)
+                .expect("Should return relative path inside specifications folder");
+        assert_eq!(result, "file.yaml", "Failed same-folder file check");
 
-        // Test path in same folder as specification folder
-        let spec_path = specifications_folder.join("file.yaml");
-        let spec_identifier = spec_path.to_string_lossy().to_string();
-        let result = to_relative_identifier(&spec_identifier, &specifications_folder)
-            .expect("Should return relative path inside specifications folder");
-        assert_eq!(result, "file.yaml", "Failed specifications folder check");
-
-
-        // Test path inside external_folders        
-        let external_path = external_folder.join("external_spec.yaml");
-        let external_identifier = external_path.to_string_lossy().to_string();
-       
-        let result = to_relative_identifier(&external_identifier, &base_path_in_ext)
-            .expect("Should return relative path inside external folders");
-        assert_eq!(result, "../../external_spec.yaml", "Failed external folder check");
-
-
-        // Test path inside external_folders with identifer in specification folder      
-        /*
-            When external folder is "/tmp/external/" and indentifier is pointing to file in specification folder "/tmp/spec/subfolder/file.yaml"
-            then for the base_path in external folder  "/tmp/external/in/side/":
-                * relative identifier must be relative reference from base_path: "../../../spec/subfolder/file.yaml"
-                
-        */
-        let spec_path = specifications_folder.join("subfolder/file.yaml");
-        let spec_identifier = spec_path.to_string_lossy().to_string();
-        
-        let result = to_relative_identifier(&spec_identifier, &base_path_in_ext)
-            .expect("Should return relative path inside specifications folder");
-        assert_eq!(result, format!("../../../{}/subfolder/file.yaml",spec_folder_name), "Failed specifications folder check");
-        
-        
-        // Test absolute path that does not match any provided folders
-        // 
-        let unmatched_path = "/some/other/path/spec.yaml".to_string();
-        let result = to_relative_identifier(&unmatched_path, &base_path)
-            .expect("Should return absolute path when no match is found");
-
-        // Dynamically compute the expected path (resutl must be a path relative to a base_path)
-        let expected = pathdiff::diff_paths(&unmatched_path, &base_path)
-            .expect("Failed to compute relative path");
-
-        assert_eq!(result, expected.to_string_lossy(), "Failed unmatched absolute path check");            
-    }    
+   
+    }
 }

@@ -9,13 +9,10 @@
 # - JSON Matrix Output
 # - Hierarchical Matrix Format
 
-# Create output directory if it doesn't exist
-mkdir -p "${TEST_DIR}/output"
-
 # Test 1: Generate markdown traceability matrix
 
 MATRIX_MD="${TEST_DIR}/output/matrix.md"
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --subdirectory tests/test-matrix-generation --config "${TEST_DIR}/reqvire.yaml" --traces 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" --traces 2>&1)
 EXIT_CODE=$?
 
 # Save all test outputs to log file
@@ -28,8 +25,6 @@ if [ $EXIT_CODE -ne 0 ]; then
   exit 1
 fi
 
-# Verify markdown output format and content
-echo "Verifying markdown output..."
 # Check for required headers
 if ! grep -q "# Traceability Matrix" "$MATRIX_MD"; then
   echo "❌ FAILED: Missing main title in markdown output"
@@ -85,7 +80,7 @@ fi
 
 # Test 2: Generate JSON traceability matrix
 MATRIX_JSON="${TEST_DIR}/output/matrix.json"
-JSON_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --subdirectory tests/test-matrix-generation --config "${TEST_DIR}/reqvire.yaml" --traces --json 2>&1)
+JSON_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" --traces --json 2>&1)
 EXIT_CODE=$?
 
 # Add JSON output to log
@@ -137,7 +132,7 @@ fi
 
 # Test 3: Generate SVG traceability matrix
 MATRIX_SVG="${TEST_DIR}/output/matrix.svg"
-SVG_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --subdirectory tests/test-matrix-generation --config "${TEST_DIR}/reqvire.yaml" --traces --svg 2>&1)
+SVG_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" --traces --svg 2>&1)
 EXIT_CODE=$?
 
 # Add SVG output to log
@@ -164,7 +159,7 @@ fi
 
 
 # Test 4: Check for conflicts
-CONFLICT_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --subdirectory tests/test-matrix-generation --config "${TEST_DIR}/reqvire.yaml" --traces --json --svg 2>&1)
+CONFLICT_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN"  --config "${TEST_DIR}/reqvire.yaml" --traces --json --svg 2>&1)
 EXIT_CODE=$?
 
 # Add conflict output to log

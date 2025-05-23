@@ -22,9 +22,6 @@
 # - Paths should not have duplicated folder names (e.g., specifications/specifications)
 #
 
-# Create output directory if it doesn't exist
-mkdir -p "${TEST_DIR}/output"
-
 # Generate HTML
 OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --subdirectory tests/test-html-export --config "${TEST_DIR}/reqvire.yaml" --html 2>&1)
 EXIT_CODE=$?
@@ -112,16 +109,13 @@ if [ -n "$FIRST_HTML" ]; then
         exit 1
       fi
       
-      echo "✓ Basic mermaid click link validation passed"
     fi
     
-    echo "✓ HTML file link format validation passed"
   fi
   
   # Specifically check the MixedLinkTypes.html file for proper conversion of different link types
   MIXED_LINKS_HTML=$(find "${TEST_DIR}/output" -name "MixedLinkTypes.html" | head -n 1)
   if [ -n "$MIXED_LINKS_HTML" ]; then
-    echo "🔍 Testing different mermaid link formats in MixedLinkTypes.html..."
     
     # Extract the exact content of the mermaid diagram for analysis
     MERMAID_CONTENT=$(cat "$MIXED_LINKS_HTML" | grep -A 50 '<div class="mermaid">' | grep -B 50 '</div>' | grep -v '<div class="mermaid">' | grep -v '</div>')
@@ -180,9 +174,7 @@ if [ -n "$FIRST_HTML" ]; then
     
     # Clean up temp file
     rm -f "$TEMP_MERMAID_FILE"
-    
-    echo "✓ Comprehensive mermaid link validation passed with exact path matching"
-    
+        
     # Check for duplicated folder names in paths
     if grep -q "specifications/specifications" "$MIXED_LINKS_HTML"; then
       echo "❌ FAILED: Found duplicated folder names (specifications/specifications) in paths"

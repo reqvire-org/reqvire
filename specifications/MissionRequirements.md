@@ -10,20 +10,20 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  b74eec7ed767e7c["Align with Industry Standards"];
-  click b74eec7ed767e7c "specifications/MissionRequirements.md#align-with-industry-standards#align-with-industry-standards";
-  class b74eec7ed767e7c requirement;
-  e9ad540a6411a0fc["MOEs.md/MOE_CE"];
-  class e9ad540a6411a0fc requirement;
-  click e9ad540a6411a0fc "specifications/MOEs.md#moe_ce#moe_ce";
-  b74eec7ed767e7c -.->|deriveReqT| e9ad540a6411a0fc;
   80166c5161b33956["Promote Automation and Efficiency"];
-  click 80166c5161b33956 "specifications/MissionRequirements.md#promote-automation-and-efficiency#promote-automation-and-efficiency";
   class 80166c5161b33956 requirement;
+  click 80166c5161b33956 "MissionRequirements.md#promote-automation-and-efficiency";
   2c5f30f14e792200["MOEs.md/MOE_UA"];
   class 2c5f30f14e792200 requirement;
-  click 2c5f30f14e792200 "specifications/MOEs.md#moe_ua#moe_ua";
+  click 2c5f30f14e792200 "MOEs.md#moe_ua";
   80166c5161b33956 -.->|deriveReqT| 2c5f30f14e792200;
+  b74eec7ed767e7c["Align with Industry Standards"];
+  class b74eec7ed767e7c requirement;
+  click b74eec7ed767e7c "MissionRequirements.md#align-with-industry-standards";
+  e9ad540a6411a0fc["MOEs.md/MOE_CE"];
+  class e9ad540a6411a0fc requirement;
+  click e9ad540a6411a0fc "MOEs.md#moe_ce";
+  b74eec7ed767e7c -.->|deriveReqT| e9ad540a6411a0fc;
 ```
 
 ---

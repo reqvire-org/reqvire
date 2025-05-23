@@ -11,24 +11,24 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
+  76ae69270700044b["Model Summary Tests"];
+  class 76ae69270700044b verification;
+  click 76ae69270700044b "ReportsTests.md#model-summary-tests";
+  7b75340700b95177["tests/test-model-summary-reports/test.sh"];
+  class 7b75340700b95177 default;
+  click 7b75340700b95177 "../../tests/test-model-summary-reports/test.sh";
+  7b75340700b95177 -->|satisfies| 76ae69270700044b;
   3108f29b131412a3["Index Generation Test"];
-  click 3108f29b131412a3 "specifications/Verifications/ReportsTests.md#index-generation-test#index-generation-test";
   class 3108f29b131412a3 verification;
+  click 3108f29b131412a3 "ReportsTests.md#index-generation-test";
   a21995894299effb["SystemRequirements/Requirements.md#index-generation"];
   class a21995894299effb requirement;
-  click a21995894299effb "specifications/SystemRequirements/Requirements.md#index-generation#index-generation";
+  click a21995894299effb "../SystemRequirements/Requirements.md#index-generation";
   3108f29b131412a3 -.->|verifies| a21995894299effb;
   1123809d5f501bf1["tests/test-index-generation/test.sh"];
   class 1123809d5f501bf1 default;
-  click 1123809d5f501bf1 "tests/test-index-generation/test.sh";
+  click 1123809d5f501bf1 "../../tests/test-index-generation/test.sh";
   1123809d5f501bf1 -->|satisfies| 3108f29b131412a3;
-  76ae69270700044b["Model Summary Tests"];
-  click 76ae69270700044b "specifications/Verifications/ReportsTests.md#model-summary-tests#model-summary-tests";
-  class 76ae69270700044b verification;
-  7b75340700b95177["tests/test-model-summary-reports/test.sh"];
-  class 7b75340700b95177 default;
-  click 7b75340700b95177 "tests/test-model-summary-reports/test.sh";
-  7b75340700b95177 -->|satisfies| 76ae69270700044b;
 ```
 
 ---

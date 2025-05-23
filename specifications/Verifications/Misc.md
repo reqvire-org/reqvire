@@ -12,15 +12,15 @@ graph LR;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
   14ef985b9a43174e["HTML Export Verification"];
-  click 14ef985b9a43174e "specifications/Verifications/Misc.md#html-export-verification#html-export-verification";
   class 14ef985b9a43174e verification;
+  click 14ef985b9a43174e "Misc.md#html-export-verification";
   a4c40962cac85d0c["UserRequirements.md/Export HTML specifications"];
   class a4c40962cac85d0c requirement;
-  click a4c40962cac85d0c "specifications/UserRequirements.md#export-html-specifications#export-html-specifications";
+  click a4c40962cac85d0c "../UserRequirements.md#export-html-specifications";
   14ef985b9a43174e -.->|verifies| a4c40962cac85d0c;
   8899a52ea9866d8b["tests/test-html-export/test.sh"];
   class 8899a52ea9866d8b default;
-  click 8899a52ea9866d8b "tests/test-html-export/test.sh";
+  click 8899a52ea9866d8b "../../tests/test-html-export/test.sh";
   8899a52ea9866d8b -->|satisfies| 14ef985b9a43174e;
 ```
 

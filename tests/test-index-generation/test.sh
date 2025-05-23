@@ -57,5 +57,4 @@ if [ ! -s "${TEST_DIR}/SpecificationIndex.md" ]; then
   exit 1
 fi
 
-echo "✅ PASSED: Index generation test"
 exit 0

@@ -27,6 +27,9 @@ impl RelationSummary {
                 let path = PathBuf::from(id);
                 Some(format!("{}/blob/{}/{}", base_url, commit, path.to_string_lossy()))
             }
+            LinkType::InternalPath(path) => {
+                Some(format!("{}/blob/{}/{}", base_url, commit, path.to_string_lossy()))
+            }            
             _ => None,
         }
     }
@@ -113,6 +116,7 @@ impl ChangeImpactReport {
             let added_relations: Vec<_> = elem.added_relations.iter().map(|rel| {
                 let target_url = match rel.target.link {
                     LinkType::Identifier(ref id) => format!("{}/blob/{}/{}", base_url, git_commit, id),
+                    LinkType::InternalPath(ref path) => format!("{}/blob/{}/{}", base_url, previous_git_commit, path.display()),                                        
                     _ => rel.target.link.as_str().to_string(),
                 };
 
@@ -140,6 +144,7 @@ impl ChangeImpactReport {
             let removed_relations: Vec<_> = elem.removed_relations.iter().map(|rel| {
                 let target_url = match rel.target.link {
                     LinkType::Identifier(ref id) => format!("{}/blob/{}/{}", base_url, previous_git_commit, id),
+                    LinkType::InternalPath(ref path) => format!("{}/blob/{}/{}", base_url, previous_git_commit, path.display()),                    
                     _ => rel.target.link.as_str().to_string(),
                 };
 
@@ -164,6 +169,7 @@ impl ChangeImpactReport {
             let added_relations: Vec<_> = elem.added_relations.iter().map(|rel| {
                 let target_url = match rel.target.link {
                     LinkType::Identifier(ref id) => format!("{}/blob/{}/{}", base_url, git_commit, id),
+                    LinkType::InternalPath(ref path) => format!("{}/blob/{}/{}", base_url, previous_git_commit, path.display()),                                        
                     _ => rel.target.link.as_str().to_string(),
                 };
 
@@ -178,6 +184,7 @@ impl ChangeImpactReport {
             let removed_relations: Vec<_> = elem.removed_relations.iter().map(|rel| {
                 let target_url = match rel.target.link {
                     LinkType::Identifier(ref id) => format!("{}/blob/{}/{}", base_url, previous_git_commit, id),
+                    LinkType::InternalPath(ref path) => format!("{}/blob/{}/{}", base_url, previous_git_commit, path.display()),                                        
                     _ => rel.target.link.as_str().to_string(),
                 };
 

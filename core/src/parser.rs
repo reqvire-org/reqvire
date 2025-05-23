@@ -73,11 +73,21 @@ pub fn parse_elements(
                         &file_folder.to_path_buf()
                     ) {
                         Ok(identifier) => {
+                        
+                            let relative_file = match utils::get_relative_path(&file_path) {
+                                Ok(path) => path,
+                                Err(err) => {                                   
+                                    debug!("Error: {}", &err);
+                                    skip_current_element = true;                                
+                                    errors.push(err); 
+                                    continue;
+                                }
+                            };
                             if seen_identifiers.contains(&identifier) {
                                 let msg = format!(
                                     "'{}' already seen (file: {}, line {})",
                                     element_name,
-                                    file_path.display(),
+                                    relative_file.display(),
                                     line_num + 1
                                 );
                                 errors.push(ReqvireError::DuplicateElement(msg.clone()));
@@ -95,7 +105,7 @@ pub fn parse_elements(
                                 current_element = Some(Element::new(
                                     &element_name,
                                     &identifier,
-                                    &file_path.to_string_lossy(),
+                                    &relative_file.to_string_lossy(),
                                     &current_section_name,
                                     Some(element_type),
                                 ));
