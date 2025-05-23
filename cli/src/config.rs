@@ -24,14 +24,12 @@ pub struct Config {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct PathsConfig {
-    pub specifications_folder: String,
     pub output_folder: String,
     #[serde(default)]
-    pub external_folders: Vec<String>,
-    #[serde(default)]
     pub excluded_filename_patterns: Vec<String>,
-    /// Base path where the tool is running (default: current working directory)
-    #[serde(skip)]  // Skip serialization (hidden in config files)
+    #[serde(default)]
+    pub user_requirements_root_folder: String,
+    #[serde(skip)]
     pub base_path: PathBuf,             
 }
 
@@ -42,7 +40,10 @@ pub struct StyleConfig {
     pub custom_css: Option<String>,
     #[serde(default = "default_diagram_direction")]
     pub diagram_direction: String,
+    #[serde(default = "default_diagrams_with_blobs")]    
+    pub diagrams_with_blobs: bool,    
 }
+
 
 
 
@@ -50,10 +51,9 @@ impl Default for PathsConfig {
     fn default() -> Self {
     
         Self {
-            specifications_folder: "specifications".to_string(),
             output_folder: "output".to_string(),
-            external_folders: Vec::new(),
             excluded_filename_patterns: vec![],
+            user_requirements_root_folder: "".to_string(),
             base_path: env::current_dir().expect("Failed to get current directory"),            
         }
     }
@@ -65,6 +65,12 @@ fn default_diagram_direction() -> String {
     "TD".to_string()  // Default to top-down layout
 }
 
+// Default diagrams with blobs
+fn default_diagrams_with_blobs() -> bool {
+   false
+}
+
+
 impl Default for StyleConfig {
     fn default() -> Self {
         Self {
@@ -72,6 +78,7 @@ impl Default for StyleConfig {
             max_width: 1200,
             custom_css: None,
             diagram_direction: default_diagram_direction(),
+            diagrams_with_blobs: false
         }
     }
 }
@@ -88,24 +95,20 @@ impl Default for Config {
 
 impl Config {    
 
-    pub fn get_external_folders(&self) -> Vec<PathBuf> {
-        self.paths.external_folders.iter()
-            .map(|folder| {
-                let path = self.paths.base_path.join(folder);
-                path.canonicalize().unwrap_or_else(|e| {
-                    eprintln!("ERROR: Failed to resolve external folder at {:?}: {}", path, e);
-                    process::exit(1);
-                })
-            })
-            .collect()
-    }    
-    pub fn get_specification_folder(&self) -> std::path::PathBuf {
-        let path = self.paths.base_path.join(self.paths.specifications_folder.clone());
-        path.canonicalize().unwrap_or_else(|e| {
-            eprintln!("ERROR: Failed to resolve specifications folder at {:?}: {}", path, e);
-            process::exit(1);
-        })        
-    }   
+    pub fn get_user_requirements_root_folder(&self) -> Option<std::path::PathBuf> {
+        if self.paths.user_requirements_root_folder.is_empty() {
+            return None;
+        }
+        
+        let path = self.paths.base_path.join(self.paths.user_requirements_root_folder.clone());
+        match path.canonicalize() {
+            Ok(p) => Some(p),
+            Err(e) => {
+                eprintln!("ERROR: Failed to resolve user requirements root folder at {:?}: {}", path, e);
+                process::exit(1);
+            }
+        }
+    }
 
     pub fn get_output_folder(&self) -> std::path::PathBuf {
         let path = self.paths.base_path.join(self.paths.output_folder.clone());
@@ -359,8 +362,8 @@ mod config_tests {
         let config = Config::default();
         
  
-        assert_eq!(config.paths.specifications_folder, "specifications");
         assert_eq!(config.paths.output_folder, "output");
+        assert_eq!(config.paths.user_requirements_root_folder, "");
         
         let globset = config.get_excluded_filename_patterns_glob_set();
         assert!(globset.is_match(Path::new("specifications/README.md")));
@@ -386,11 +389,11 @@ general:
   verbose: true
 
 paths:
-  specifications_folder: "docs"
   output_folder: "generated"
   excluded_filename_patterns:
     - "**/README*.md"
     - "**/Design/**/*.md"
+  user_requirements_root_folder: "specifications"
 
 style:
   theme: "dark"
@@ -405,8 +408,8 @@ style:
         let config = Config::from_file(&config_path).unwrap();
         
         
-        assert_eq!(config.paths.specifications_folder, "docs");
         assert_eq!(config.paths.output_folder, "generated");
+        assert_eq!(config.paths.user_requirements_root_folder, "specifications");
         assert!(config.paths.excluded_filename_patterns.contains(&"**/README*.md".to_string()));
         assert!(config.paths.excluded_filename_patterns.contains(&"**/Design/**/*.md".to_string()));
         

@@ -9,94 +9,99 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  b3ef0fb91572bcf0["Project Configuration with YAML"];
-  click b3ef0fb91572bcf0 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/ManagingMbseModelsRequirements.md#project-configuration-with-yaml";
-  class b3ef0fb91572bcf0 requirement;
-  c75ac8fa29479ca5["UserStories.md/Managing MBSE Models"];
-  class c75ac8fa29479ca5 requirement;
-  click c75ac8fa29479ca5 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserStories.md#managing-mbse-models";
-  b3ef0fb91572bcf0 -->|refines| c75ac8fa29479ca5;
-  fa4727bd969c48f8["Bootstrap Model Structure"];
-  click fa4727bd969c48f8 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/ManagingMbseModelsRequirements.md#bootstrap-model-structure";
-  class fa4727bd969c48f8 requirement;
-  fa4727bd969c48f8 -->|refines| c75ac8fa29479ca5;
-  c4d5865187c53ce6["Support for Distributed Requirements"];
-  click c4d5865187c53ce6 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/ManagingMbseModelsRequirements.md#support-for-distributed-requirements";
-  class c4d5865187c53ce6 requirement;
-  c4d5865187c53ce6 -.->|deriveReqT| b3ef0fb91572bcf0;
-  da5831ca85881025["Coexistence of Structured and Unstructured Documents"];
-  click da5831ca85881025 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/ManagingMbseModelsRequirements.md#coexistence-of-structured-and-unstructured-documents";
-  class da5831ca85881025 requirement;
-  da5831ca85881025 -->|refines| c75ac8fa29479ca5;
-  87e38ccb52188638["Configurable Specifications Folder"];
-  click 87e38ccb52188638 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/ManagingMbseModelsRequirements.md#configurable-specifications-folder";
-  class 87e38ccb52188638 requirement;
-  87e38ccb52188638 -.->|deriveReqT| b3ef0fb91572bcf0;
-  386d7b145d008870["Efficient Processing"];
-  click 386d7b145d008870 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/ManagingMbseModelsRequirements.md#efficient-processing";
-  class 386d7b145d008870 requirement;
-  386d7b145d008870 -->|refines| c75ac8fa29479ca5;
-  b9c9d1bf19e76fc["Configurable External Folders"];
-  click b9c9d1bf19e76fc "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/ManagingMbseModelsRequirements.md#configurable-external-folders";
-  class b9c9d1bf19e76fc requirement;
-  b9c9d1bf19e76fc -->|refines| c4d5865187c53ce6;
+  d193d11c43776bec["Efficient Processing"];
+  class d193d11c43776bec requirement;
+  click d193d11c43776bec "ManagingMbseModelsRequirements.md#efficient-processing";
+  e61b7c1baa89bfc6["UserStories.md/Managing MBSE Models"];
+  class e61b7c1baa89bfc6 requirement;
+  click e61b7c1baa89bfc6 "UserStories.md#managing-mbse-models";
+  d193d11c43776bec -.->|deriveReqT| e61b7c1baa89bfc6;
+  c9cc6878a73bb951["Default Requirement Type Assignment"];
+  class c9cc6878a73bb951 requirement;
+  click c9cc6878a73bb951 "ManagingMbseModelsRequirements.md#default-requirement-type-assignment";
+  d9354ef2eca0f2d0["Configurable User Requirements Root Folder"];
+  class d9354ef2eca0f2d0 requirement;
+  click d9354ef2eca0f2d0 "ManagingMbseModelsRequirements.md#configurable-user-requirements-root-folder";
+  c9cc6878a73bb951 -->|refines| d9354ef2eca0f2d0;
+  649d72765b13e14f["Git Repository as Project Root"];
+  class 649d72765b13e14f requirement;
+  click 649d72765b13e14f "ManagingMbseModelsRequirements.md#git-repository-as-project-root";
+  649d72765b13e14f -.->|deriveReqT| e61b7c1baa89bfc6;
+  16b4b380c917deb1["Project Configuration with YAML"];
+  class 16b4b380c917deb1 requirement;
+  click 16b4b380c917deb1 "ManagingMbseModelsRequirements.md#project-configuration-with-yaml";
+  16b4b380c917deb1 -.->|deriveReqT| e61b7c1baa89bfc6;
+  16b4b380c917deb1 -->|refines| 649d72765b13e14f;
+  f0d721424636370e["Coexistence of Structured and Unstructured Documents"];
+  class f0d721424636370e requirement;
+  click f0d721424636370e "ManagingMbseModelsRequirements.md#coexistence-of-structured-and-unstructured-documents";
+  f0d721424636370e -.->|deriveReqT| e61b7c1baa89bfc6;
+  d9354ef2eca0f2d0 -.->|deriveReqT| 16b4b380c917deb1;
 ```
 
 ---
 
 ### Coexistence of Structured and Unstructured Documents
+
 The system shall allow structured markdown and unstructured. (eg., markdown, PDFs, DOCX, raw text) documents to coexist within the same MBSE model.
 
 #### Relations
-  * refine: [UserStories.md/Managing MBSE Models](UserStories.md#managing-mbse-models)
+  * derivedFrom: [UserStories.md/Managing MBSE Models](UserStories.md#managing-mbse-models)
 
 ---
 
 ### Efficient Processing
+
 The system shall process structured documents and relations to extract model-relevant information efficiently.
 
 #### Relations
-  * refine: [UserStories.md/Managing MBSE Models](UserStories.md#managing-mbse-models)
+  * derivedFrom: [UserStories.md/Managing MBSE Models](UserStories.md#managing-mbse-models)
+
+---
+
+### Git Repository as Project Root
+
+The system shall treat the **root directory of the Git repository as the project's base** for all file and folder references, streamlining configuration and promoting a self-contained project structure.
+
+#### Details
+
+All paths specified in the Reqvire configuration will be resolved relative to the Git repository root.
+
+#### Relations
+  * derivedFrom: [UserStories.md/Managing MBSE Models](UserStories.md#managing-mbse-models)
 
 ---
 
 ### Project Configuration with YAML
-The system shall support a YAML-based configuration file that defines folder names and structures to be used by the Reqvire tool when processing model artifacts.
+
+The system shall support a **YAML-based configuration file** that defines folder names and structures to be used by the tool when processing model artifacts, **relative to the Git repository root**.
 
 #### Relations
-  * refine: [UserStories.md/Managing MBSE Models](UserStories.md#managing-mbse-models)
+  * derivedFrom: [UserStories.md/Managing MBSE Models](UserStories.md#managing-mbse-models)
+   * refine: [Git Repository as Project Root](#git-repository-as-project-root)
 
 ---
 
-### Configurable Specifications Folder
+### Configurable User Requirements Root Folder
 
-The system shall allow users to configure the main specification folder through the configuration file, supporting flexible project organization.
+The system shall allow users to configure a specific **root folder within the Git repository**, designated exclusively for **user requirements**.
+
+#### Details
+
+This folder will be specified in the `reqvire.yaml` configuration.
 
 #### Relations
   * derivedFrom: [Project Configuration with YAML](#project-configuration-with-yaml)
 
 ---
 
-### Support for Distributed Requirements
-The system shall support referencing folders that may exist in different repositories through configuration, allowing for distributed requirements management across multiple repositories.
+### Default Requirement Type Assignment
+
+The system shall automatically assign a **default type to requirements** if not explicitly specified in their `metadata`, based on their location:
+* Requirements found directly within the designated "Configurable User Requirements Root Folder" (and not in its sub-folders) shall be assigned `user-requirements` type.
+* Requirements found in any other folder or sub-folder within the Git repository (including sub-folders of the user requirements root) shall be assigned `system-requirements` type.
 
 #### Relations
-  * derivedFrom: [Project Configuration with YAML](#project-configuration-with-yaml)
-
----
-
-### Configurable External Folders
-The system shall allow users to configure the External folders through the configuration file.
-
-#### Relations
-  * refine: [Support for Distributed Requirements](#support-for-distributed-requirements)
-
----
-
-### Bootstrap Model Structure
-The system shall provide a command to bootstrap a basic model structure with sample templates for common element types.
-
-#### Relations
-  * refine: [UserStories.md/Managing MBSE Models](UserStories.md#managing-mbse-models)
+  * refine: [Configurable User Requirements Root Folder](#configurable-user-requirements-root-folder)
 
 ---

@@ -11,8 +11,7 @@ pub fn parse_elements(
     file: &str,
     content: &str,
     file_path: &PathBuf,
-    specifications_folder: &PathBuf,
-    external_folders_refs: &[PathBuf],
+    user_requirements_root_folder: &Option<PathBuf>,
 ) -> (Vec<Element>, Vec<ReqvireError>) {
     let mut elements = Vec::new();
     let mut current_element: Option<Element> = None;
@@ -71,16 +70,24 @@ pub fn parse_elements(
 
                     match utils::normalize_identifier(
                         &identifier,
-                        &file_folder.to_path_buf(),
-                        specifications_folder,
-                        external_folders_refs,
+                        &file_folder.to_path_buf()
                     ) {
                         Ok(identifier) => {
+                        
+                            let relative_file = match utils::get_relative_path(&file_path) {
+                                Ok(path) => path,
+                                Err(err) => {                                   
+                                    debug!("Error: {}", &err);
+                                    skip_current_element = true;                                
+                                    errors.push(err); 
+                                    continue;
+                                }
+                            };
                             if seen_identifiers.contains(&identifier) {
                                 let msg = format!(
                                     "'{}' already seen (file: {}, line {})",
                                     element_name,
-                                    file_path.display(),
+                                    relative_file.display(),
                                     line_num + 1
                                 );
                                 errors.push(ReqvireError::DuplicateElement(msg.clone()));
@@ -89,10 +96,7 @@ pub fn parse_elements(
                             } else {
                                 seen_identifiers.insert(identifier.clone());
 
-                                let element_type = if utils::is_in_specification_root(
-                                    &file_folder.to_path_buf(),
-                                    specifications_folder,
-                                ) {
+                                let element_type = if utils::is_in_user_requirements_root(&file_folder.to_path_buf(), user_requirements_root_folder) {
                                     ElementType::Requirement(RequirementType::User)
                                 } else {
                                     ElementType::Requirement(RequirementType::System)
@@ -101,7 +105,7 @@ pub fn parse_elements(
                                 current_element = Some(Element::new(
                                     &element_name,
                                     &identifier,
-                                    &file_path.to_string_lossy(),
+                                    &relative_file.to_string_lossy(),
                                     &current_section_name,
                                     Some(element_type),
                                 ));
@@ -212,9 +216,7 @@ pub fn parse_elements(
                                 Some(file_folder) => {
                                     match utils::normalize_identifier(
                                         &final_link,
-                                        &file_folder.to_path_buf(),
-                                        specifications_folder,
-                                        external_folders_refs,
+                                        &file_folder.to_path_buf()
                                     ) {
                                         Ok(normalized_target) => {
                                             match Relation::new(&relation_type, text, &normalized_target) {

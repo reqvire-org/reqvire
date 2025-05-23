@@ -15,3 +15,6 @@ Cargo.lock
 *.bak
 
 CLAUDE.md
+codefetch
+.codefetchignore
+codefetch.config.mjs

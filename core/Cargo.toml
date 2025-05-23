@@ -41,7 +41,11 @@ rustc-hash = { workspace = true }
 # Terminal output
 termcolor = { workspace = true }
 
+once_cell =  { workspace = true }
+
 [dev-dependencies]
 assert_fs = { workspace = true }
 predicates = { workspace = true }
 tempfile = { workspace = true }
+serial_test = { workspace = true }
+

@@ -9,9 +9,6 @@
 # - JSON Matrix Output
 # - Hierarchical Matrix Format
 
-# Create output directory if it doesn't exist
-mkdir -p "${TEST_DIR}/output"
-
 # Test 1: Generate markdown traceability matrix
 
 MATRIX_MD="${TEST_DIR}/output/matrix.md"
@@ -28,8 +25,6 @@ if [ $EXIT_CODE -ne 0 ]; then
   exit 1
 fi
 
-# Verify markdown output format and content
-echo "Verifying markdown output..."
 # Check for required headers
 if ! grep -q "# Traceability Matrix" "$MATRIX_MD"; then
   echo "❌ FAILED: Missing main title in markdown output"
@@ -164,7 +159,7 @@ fi
 
 
 # Test 4: Check for conflicts
-CONFLICT_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" --traces --json --svg 2>&1)
+CONFLICT_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN"  --config "${TEST_DIR}/reqvire.yaml" --traces --json --svg 2>&1)
 EXIT_CODE=$?
 
 # Add conflict output to log

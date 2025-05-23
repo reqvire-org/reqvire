@@ -1,4 +1,4 @@
-        use anyhow::Result;
+use anyhow::Result;
 use std::path::{Path, PathBuf};
 use pathdiff::diff_paths;
 use log::debug;
@@ -32,53 +32,79 @@ pub fn is_excluded_by_patterns(path: &Path, excluded_filename_patterns: &GlobSet
 }
 
 
-pub fn is_in_specification_root(
-    file_folder: &PathBuf,     
-    specifications_folder: &PathBuf, 
+pub fn is_in_user_requirements_root(
+    file_folder: &PathBuf,
+    user_requirements_root_folder: &Option<PathBuf>,
 ) -> bool {
-    let canonical_file_folder = file_folder.canonicalize().ok();
-    let canonical_specifications_folder = specifications_folder.canonicalize().ok();
+    if let Some(user_req_folder) = user_requirements_root_folder {
+        if user_req_folder.as_os_str().is_empty() {
+            return false;
+        }
+        
+        let canonical_file_folder = file_folder.canonicalize().ok();
+        let canonical_user_req_folder = user_req_folder.canonicalize().ok();
 
-    match (canonical_file_folder, canonical_specifications_folder) {
-        (Some(file), Some(spec)) => file == spec,
-        _ => false,
+        match (canonical_file_folder, canonical_user_req_folder) {
+            (Some(file), Some(user_req)) => file == user_req,
+            _ => false,
+        }
+    } else {
+        false
     }
 }
 
-/// Scans the specification and external folders for markdown files, excluding files based on patterns.
+/// Scans the git root folder for markdown files, excluding files based on patterns.
+/// 
+/// # Arguments
+/// 
+/// * `commit` - Optional commit ID to scan files from a specific commit
+/// * `excluded_filename_patterns` - Glob patterns for files to exclude
+/// * `subdirectory` - Optional subdirectory relative to git root to scan (instead of scanning the entire repository)
+/// 
+/// # Returns
+/// 
+/// A vector of paths to the markdown files found
 pub fn scan_markdown_files(
     commit: Option<&str>,
-    specification_folder: &PathBuf, 
-    external_folders: &[PathBuf], 
-    excluded_filename_patterns: &GlobSet
-) -> Vec<(PathBuf,PathBuf)> {
+    excluded_filename_patterns: &GlobSet,
+    subdirectory: Option<&str>
+) -> Vec<PathBuf> {
     match commit {
         Some(commit_id) => {
             scan_markdown_files_from_commit(
                 commit_id,
-                specification_folder,
-                external_folders,
                 excluded_filename_patterns,
+                subdirectory
             )
         }
         None => {
-
             let mut files = Vec::new();
             
-            // Define all folders to scan
-            let all_folders: Vec<&PathBuf> = std::iter::once(specification_folder)
-                .chain(external_folders.iter())
-                .collect();
-
-            for folder in all_folders {
-                for entry in WalkDir::new(folder)
-                    .into_iter()
-                    .filter_map(Result::ok)
-                    .filter(|e| e.path().is_file() && e.path().extension().map_or(false, |ext| ext == "md"))
-                    .filter(|e| is_requirements_file_by_path(e.path(), excluded_filename_patterns))
-                {
-                    files.push((entry.path().to_path_buf(),folder.clone()));
+            // Get git root directory
+            let git_root = match git_commands::get_git_root_dir() {
+                Ok(dir) => dir,
+                Err(_) => {
+                    debug!("Not in a git repository, using current directory");
+                    std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."))
                 }
+            };
+            
+            // Determine scan directory (git root or subdirectory within git root)
+            let scan_dir = match subdirectory {
+                Some(subdir) => git_root.join(subdir),
+                None => git_root
+            };
+            
+            debug!("Scanning for markdown files in: {}", scan_dir.display());
+            
+            // Scan all markdown files in the repository or specified subdirectory
+            for entry in WalkDir::new(&scan_dir)
+                .into_iter()
+                .filter_map(Result::ok)
+                .filter(|e| e.path().is_file() && e.path().extension().map_or(false, |ext| ext == "md"))
+                .filter(|e| is_requirements_file_by_path(e.path(), excluded_filename_patterns))
+            {
+                files.push(entry.path().to_path_buf());
             }
 
             debug!("Scanned {} markdown files.", files.len());
@@ -87,79 +113,71 @@ pub fn scan_markdown_files(
     }
 }
 
-/// Scans the given Git commit for markdown files under the specified folders,
+/// Scans the given Git commit for markdown files,
 /// excluding files based on provided patterns.
 /// 
 /// - `commit`: The Git commit (e.g. `"HEAD"`) where we want to look for files.
+/// - `excluded_filename_patterns`: Glob patterns for files to exclude
+/// - `subdirectory`: Optional subdirectory relative to git root to scan (ignored in this function currently)
 pub fn scan_markdown_files_from_commit(
     commit: &str,
-    specification_folder: &PathBuf,
-    external_folders: &[PathBuf],
     excluded_filename_patterns: &GlobSet,
-) -> Vec<(PathBuf, PathBuf)> {
+    _subdirectory: Option<&str>,
+) -> Vec<PathBuf> {
     let mut files = Vec::new();
 
-    // Gather all folders to "scan" (from Git's perspective).
-    let all_folders: Vec<&PathBuf> = std::iter::once(specification_folder)
-        .chain(external_folders.iter())
-        .collect();
+    // Get git root directory
+    let git_root = match git_commands::get_git_root_dir() {
+        Ok(dir) => dir,
+        Err(_) => {
+            debug!("Not in a git repository, using current directory");
+            std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."))
+        }
+    };
 
-    // For each folder, we'll run `git ls-tree --name-only -r <commit>`
-    // and filter out paths that don't lie within that folder or don't match
-    // our markdown + exclusion patterns.
-    for folder in all_folders {
-        let result = git_commands::ls_tree_commit_in_folder(&commit,&folder);
-        let documents_vec = match result {
-            Err(e) => {
-                //TODO: we need to return result with reqvire error here
-                eprintln!("Error: {}", e);
-                Vec::new()
-            } ,       
-            Ok(v) => v
-        };
+    // Run git ls-tree command to get all files in the commit
+    let result = git_commands::ls_tree_commit(&commit);
+    let documents_vec = match result {
+        Err(e) => {
+            eprintln!("Error listing files in commit: {}", e);
+            Vec::new()
+        },       
+        Ok(v) => v
+    };
 
-        let matching_paths = documents_vec
+    let matching_paths = documents_vec
         .into_iter() 
-        .map(|p| folder.join(p))             
+        .map(|p| git_root.join(p))             
         .filter(|p| p.extension().map_or(false, |ext| ext == "md"))
         .filter(|p| is_requirements_file_by_path(p, excluded_filename_patterns))
-        .map(|p| (p, folder.clone()))
-        .collect::<Vec<(PathBuf, PathBuf)>>();
+        .collect::<Vec<PathBuf>>();
 
-        
-        files.extend(matching_paths);        
-
-    }
+    files.extend(matching_paths);
 
     files
 }
 
 
-/// Gets the relative path of a file
-pub fn get_relative_path(path: &PathBuf, specification_folder: &Path, external_folders: &[PathBuf]) -> Result<PathBuf, ReqvireError> {
-    if let Ok(relative) = path.strip_prefix(specification_folder) {
+/// Gets the relative path of a file from the git repository root
+pub fn get_relative_path(path: &PathBuf) -> Result<PathBuf, ReqvireError> {
+    let git_root = match git_commands::get_git_root_dir() {
+        Ok(dir) => dir,
+        Err(_) => {
+            debug!("Not in a git repository, using current directory");
+            std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."))
+        }
+    };
+    
+    if let Ok(relative) = path.strip_prefix(&git_root) {
         return Ok(relative.to_path_buf());
     }
-    for ext in external_folders {
-        if let Ok(relative) = path.strip_prefix(ext) {
-            return Ok(relative.to_path_buf());
-        }
-    }
+    
     Err(ReqvireError::PathError(format!(
         "Failed to determine relative path: {}",
         path.display()
     )))
 }
 
-
-pub fn get_relative_path_from_root(path: &PathBuf, root: &PathBuf) -> Result<PathBuf, ReqvireError> {
-    path.strip_prefix(root)
-        .map(PathBuf::from)
-        .map_err(|_| ReqvireError::PathError(format!(
-            "Failed to compute relative path from given root: {}",
-            path.display()
-        )))
-}
 
 
 /// Splits an identifier into (file_part, Option(fragment)) following these rules:
@@ -199,158 +217,129 @@ pub fn normalize_fragment(fragment: &str) -> String{
         .replace(['(', ')', ',', ':'], "") // Remove disallowed characters
 }
 
-pub fn normalize_identifier(
-    identifier: &str,
-    base_path: &PathBuf,
-    specifications_folder: &PathBuf, 
-    external_folders: &[PathBuf]
-) -> Result<String, ReqvireError> {
-
-    let (path, fragment_opt) = extract_path_and_fragment(identifier);
-
-    
-    let result=match normalize_path(path, base_path, specifications_folder, external_folders){
-        Ok(normalized_path) => {     
-            // Normalize element name into GitHub-style fragment
-            if let Some(fragment) = fragment_opt{
-                let normalized_fragment =normalize_fragment(&fragment);                
-                Ok(format!("{}#{}", normalized_path, normalized_fragment))            
-            }else{
-                Ok(normalized_path)
-            }            
-        },
-        Err(e) => Err(e)
-    };
-    
-    result
-
-}
-
 
 /// List of known external URL schemes
-const EXTERNAL_SCHEMES: &[&str] = &[
+pub const EXTERNAL_SCHEMES: &[&str] = &[
     "http://", "https://", "ftp://", "file://", "mailto:", "ssh://", "git://", "data:",
 ];
 
-/// Normalize a file path according to the `specifications_folder` and `external_folders`
-pub fn normalize_path(
-    path_str: &str, 
-    base_path: &PathBuf, 
-    specifications_folder: &PathBuf, 
-    external_folders: &[PathBuf]
+pub fn normalize_identifier(
+    identifier: &str,
+    base_path: &PathBuf,
 ) -> Result<String, ReqvireError> {
-   
-    let path =Path::new(path_str);
+    // 0) Extract the path and any trailing fragment
+    let (path_part, fragment_opt) = extract_path_and_fragment(identifier);
 
-    // Check if the path is an external URL and return it as-is
-    if EXTERNAL_SCHEMES.iter().any(|&scheme| path_str.starts_with(scheme)) {
-        debug!("Skipping normalization for external URL: {}", path_str);
-        return Ok(path_str.to_string());
+    // 1) Passthrough external URIs
+    const EXTERNAL_SCHEMES: [&str; 3] = ["http://", "https://", "file://"];
+    if EXTERNAL_SCHEMES.iter().any(|scheme| path_part.starts_with(scheme)) {
+        return Ok(identifier.to_string());
     }
 
-    // If the path is already absolute, return it but normalize if needed
-    if path.is_absolute() {
-            
-        if let Some(spec_folder_name) = specifications_folder.file_name() {
-            let spec_folder_str = spec_folder_name.to_string_lossy();        
-            if path_str.starts_with(&format!("/{}", spec_folder_str)) {
-                // Remove leading slash and join with specifications_folder
-                let full_path = specifications_folder.parent().unwrap().join(path_str.trim_start_matches('/'));
-                return Ok(full_path.to_string_lossy().into_owned());
-            } 
-        }
-       
-        for external_folder in external_folders {
-            if let Some(ext_folder_name) = external_folder.file_name() {
-                let ext_folder_str = ext_folder_name.to_string_lossy();
-                if path_str.starts_with(&format!("/{}", ext_folder_str)) {
-                    // Remove leading slash and join with specifications_folder
-                    let full_path = external_folder.parent().unwrap().join(path_str.trim_start_matches('/'));
-                    return Ok(full_path.to_string_lossy().into_owned());
-                
-                }
-            }
-        }
-
-        return Ok(path_str.to_string());
-    }
-
-    // Convert relative path to absolute
-    let absolute_path = PathBuf::from(base_path).join(path_str);
-
-    // Explicitly canonicalize the path and handle any errors.
-    let canonical_path = match absolute_path.canonicalize() {
-        Ok(path) => path,
-        Err(e) => {
-            return Err(ReqvireError::PathError(format!(
-                "Failed to normalize path'{}': {}",
-                absolute_path.to_string_lossy(), e
-            )))
+    // 2) Build the absolute path to work with
+    let full_path = {
+        let p = Path::new(path_part);
+        if p.is_absolute() {
+            p.canonicalize()
+             .map_err(|e| ReqvireError::PathError(format!(
+                 "Failed to canonicalize absolute `{}`: {}",
+                 p.display(), e
+             )))?
+        } else {
+            base_path.join(p)
+                .canonicalize()
+                .map_err(|e| ReqvireError::PathError(format!(
+                    "Failed to canonicalize `{}`: {}",
+                    base_path.join(p).display(), e
+                )))?
         }
     };
-    
-    
-    let normalized_path = canonical_path.to_string_lossy().to_string();
-    return Ok(normalized_path);
 
+    // 3) Find & canonicalize the Git root
+    let git_root = crate::git_commands::get_git_root_dir()
+        .map_err(|e| ReqvireError::PathError(format!("Failed to get git root: {}", e)))?
+        .canonicalize()
+        .map_err(|e| ReqvireError::PathError(format!(
+            "Failed to canonicalize git root: {}",
+            e
+        )))?;
+
+    // 4) Strip the Git‐root prefix
+    let rel = full_path
+        .strip_prefix(&git_root)
+        .map_err(|_| ReqvireError::PathError(format!(
+            "`{}` is not inside git root `{}`",
+            full_path.display(),
+            git_root.display()
+        )))?
+        .to_string_lossy()
+        .into_owned();
+
+    // 5) Re-attach the fragment, if present    
+    let full = match fragment_opt {
+        Some(frag) => {
+            let fragment=normalize_fragment(&frag);
+            format!("{}#{}", rel, fragment)
+        }
+        None => rel,
+    };
+    
+    Ok(full)
 }
 
 
-/// Converts a normalized identifier back to a relative path identifier
-/// depending on the location of `base_path` and its relation to 
-/// `specifications_folder` and `external_folders`.
+
 pub fn to_relative_identifier(
-    normalized_identifier: &str,
+    identifier: &str,
     base_path: &PathBuf,
-    specifications_folder: &PathBuf,
-    external_folders: &[PathBuf],
+    should_normalize_fragment: bool,
 ) -> Result<String, ReqvireError> {
+    let (path, fragment_opt) = extract_path_and_fragment(identifier);
 
-    let (normalized_path, fragment_opt) = extract_path_and_fragment(normalized_identifier);
-    let normalized_path = Path::new(normalized_path);
-
-    // Check if the path is an external URL, return as is
-    if EXTERNAL_SCHEMES.iter().any(|&scheme| normalized_identifier.starts_with(scheme)) {
-        debug!("Skipping denormalization for external URL: {}", normalized_identifier);
-        return Ok(normalized_identifier.to_string());
+    if EXTERNAL_SCHEMES.iter().any(|&scheme| identifier.starts_with(scheme)) {
+        return Ok(identifier.to_string());
     }
 
-    // Compute relative path if inside `specifications_folder`
-    if normalized_path.starts_with(specifications_folder) {
-        if let Some(relative_path) = diff_paths(normalized_path, base_path) {
-            let relative_identifier = relative_path.to_string_lossy().into_owned();
-            return Ok(append_fragment(&relative_identifier, fragment_opt));
+    let path_obj = Path::new(path);
+
+    let git_root = crate::git_commands::get_git_root_dir()
+        .map_err(|e| ReqvireError::PathError(format!("Failed to get git root: {}", e)))?;
+
+    let stripped = if path_obj.is_absolute() {
+        path.trim_start_matches('/')
+    } else {
+        path
+    };
+
+    let resolved_path=git_root.join(stripped);
+    
+    let canonical_path = resolved_path.canonicalize().ok();
+    let canonical_base = base_path.canonicalize().ok();
+   
+    let relative = if let (Some(normalized), Some(base)) = (canonical_path, canonical_base) {
+        diff_paths(&normalized, &base).map(|p| p.to_string_lossy().into_owned())
+    } else {
+
+        None
+    };
+
+    let base = relative.unwrap_or_else(|| path.to_string());
+
+    let full = match fragment_opt {
+        Some(frag) => {
+            let fragment = if should_normalize_fragment {
+                normalize_fragment(&frag)
+            } else {
+                frag.to_string()
+            };
+            format!("{}#{}", base, fragment)
         }
-    }
+        None => base,
+    };
 
-    // Compute relative path if inside `external_folders`
-    for external_folder in external_folders {
-        if normalized_path.starts_with(external_folder) {
-            if let Some(relative_path) = diff_paths(normalized_path, base_path) {
-                let relative_identifier = relative_path.to_string_lossy().into_owned();
-                return Ok(append_fragment(&relative_identifier, fragment_opt));
-            }
-        }
-    }
-
-    // Compute relative path based on `base_path`
-    if let Some(relative_path) = diff_paths(normalized_path, base_path) {
-        let relative_identifier = relative_path.to_string_lossy().into_owned();
-        return Ok(append_fragment(&relative_identifier, fragment_opt));
-    }
-
-    // If all else fails, return absolute path
-    Ok(append_fragment(&normalized_identifier.to_string(), fragment_opt))
+    Ok(full)
 }
 
-
-/// Helper function to append a fragment (e.g., `#section-name`) to a path if it exists.
-fn append_fragment(path: &str, fragment_opt: Option<&str>) -> String {
-    match fragment_opt {
-        Some(fragment) => format!("{}#{}", path, fragment),
-        None => path.to_string(),
-    }
-}
 
 /// Parses a metadata line and extracts a (key, value) pair if valid.
 /// Expected format: `* key: value` or `- key: value`
@@ -436,16 +425,18 @@ mod tests {
     use std::fs;
     use std::path::{ PathBuf};
     use tempfile::TempDir;
-    
+    use std::process::Command;
+    use git_commands;
+    use serial_test::serial;
+     
+        
     // Mock Config structure for tests
     struct MockConfig {
         pub paths: MockPaths,
     }
     
     struct MockPaths {
-        pub specifications_folder: String,
-        pub external_folders: Vec<String>,
-        pub base_path: PathBuf,
+        pub user_requirements_root_folder: String,
         pub excluded_filename_patterns: Vec<String>,
     }
     
@@ -453,23 +444,13 @@ mod tests {
         fn default() -> Self {
             Self {
                 paths: MockPaths {
-                    specifications_folder: "specifications".to_string(),
-                    external_folders: Vec::new(),
-                    base_path: std::env::current_dir().expect("Failed to get current directory"),
+                    user_requirements_root_folder: "specifications".to_string(),
                     excluded_filename_patterns: Vec::new(),
                 }
             }
         }
         
-        fn get_specification_folder(&self) -> PathBuf {
-            self.paths.base_path.join(&self.paths.specifications_folder)
-        }
-        
-        fn get_external_folders(&self) -> Vec<PathBuf> {
-            self.paths.external_folders.iter()
-                .map(|f| self.paths.base_path.join(f))
-                .collect()
-        }
+
         
         fn get_excluded_filename_patterns_glob_set(&self) -> globset::GlobSet {
             let mut builder = globset::GlobSetBuilder::new();
@@ -481,7 +462,6 @@ mod tests {
             builder.build().expect("Failed to build glob set")
         }
     }
-    
     
     #[test]
     fn test_extract_path_and_fragment() {
@@ -503,85 +483,117 @@ mod tests {
         }
     }
 
-    
     #[test]
-    fn test_normalize_identifier() {
-        // Create a temporary directory
+    #[serial]    
+    fn test_to_relative_identifier_with_github_fragments() {
+        git_commands::clear_git_cache();
+        
+        use crate::utils::normalize_identifier;
+
         let temp_dir = TempDir::new().expect("Failed to create temp dir");
-        let temp_path = temp_dir.path(); // Get the base path
-        
-        let base_path = temp_path.to_path_buf();
-                    
-        let mut config_with_externals = MockConfig::default();
-        config_with_externals.paths.external_folders = vec!["./external".to_string()];        
-        config_with_externals.paths.specifications_folder = "./specifications".to_string();
-        config_with_externals.paths.base_path = base_path;               
-                       
-                
-        let doc1=temp_path.join("specifications/documents/");
-                
-        // Define test cases with expected real paths
-        let root_file=&temp_path.join("File5.md").to_string_lossy().into_owned();
+        let temp_path = temp_dir.path();
+
+        std::env::set_current_dir(&temp_path)
+            .expect("Failed to set current directory");
+
+        // Initialize Git repository
+        Command::new("git")
+            .arg("init")
+            .current_dir(&temp_path)
+            .output()
+            .expect("Failed to initialize git repo");
+
+        let base_path = temp_path.join("specifications/documents/");
+        fs::create_dir_all(&base_path).expect("Failed to create base path");
+
+        let file_path = temp_path.join("File4.md");
+        fs::create_dir_all(file_path.parent().unwrap()).unwrap();
+        fs::write(&file_path, "dummy").expect("Failed to create File4.md");
+        assert!(file_path.exists(), "File4.md should exist");
+
+        // Test cases: (identifier, base_path, expected result with GitHub-style fragment)
         let test_cases = vec![
-            ("File1.md", doc1.to_path_buf().clone(), "specifications/documents/File1.md"),        
-            ("File2.md", doc1.to_path_buf().clone(), "specifications/documents/File2.md"),
-            ("/specifications/documents/File2.md", doc1.to_path_buf().clone(), "specifications/documents/File2.md"),            
-            ("subfolder/File3.md", doc1.to_path_buf().clone(), "specifications/documents/subfolder/File3.md"),
-            ("../File4.md", doc1.to_path_buf().clone(), "specifications/File4.md"),
-            ("../../somefolder/File4.md",doc1.to_path_buf().clone(), "somefolder/File4.md"),
-            ("/external/somefolder/File4.md",doc1.to_path_buf().clone(), "external/somefolder/File4.md"),
-            (&root_file, doc1.to_path_buf().clone(), "File5.md"),
-            //end with fragments
-            ("File1.md#Some Fragment", doc1.to_path_buf().clone(), "specifications/documents/File1.md#some-fragment"),                    
-            ("/specifications/documents/File2.md#Some Test", doc1.to_path_buf().clone(), "specifications/documents/File2.md#some-test"),                        
-            
-        ];  
-        
-        for (_, _, file_path) in &test_cases {
-            let full_file_path = temp_path.join(file_path);
-        
-            if let Some(parent) = full_file_path.parent() {
-                fs::create_dir_all(parent).expect("Failed to create directories");
+        (
+            "File1.md#Some Fragment",
+            &base_path,
+            "File1.md#some-fragment",
+        ),
+        (
+            "/File4.md#Title: Example",
+            &base_path,
+            "../../File4.md#title-example",
+        ),
+        (
+            "/some/other/File4.md",
+            &base_path,
+            "../../some/other/File4.md",
+        ),                
+        (
+            "README.md#Installation (Windows)",
+            &base_path,
+            "README.md#installation-windows",
+        ),
+        ];
+
+        for (identifier, base_path, expected_result) in test_cases {
+            // Prepare the file that the identifier points to
+            let (path, _) = crate::utils::extract_path_and_fragment(identifier);
+            let full_path = if Path::new(path).is_absolute() {
+                temp_path.join(path.trim_start_matches('/'))
+            } else {
+                base_path.join(path)
+            };
+
+            if let Some(parent) = full_path.parent() {
+                fs::create_dir_all(parent).unwrap();
             }
-            fs::write(&full_file_path, "Test content").expect("Failed to create test file");
-        }
 
-        for (identifier, in_document, expected) in test_cases {
-            let result = normalize_identifier(identifier, &in_document, &config_with_externals.get_specification_folder(),&config_with_externals.get_external_folders());
-            
-            // Doing canon because of macos tmp path symlinks, question is if code should work if we are adjusting tests??
-            let expected_path = temp_path.join(expected);
-            let expected_path_canon = expected_path.canonicalize().unwrap();
-            let expected_canon = expected_path_canon.to_string_lossy();
+            fs::write(&full_path, "test").unwrap();
 
-            let result_str = result.unwrap(); // assuming it's a String
-            let result_path = std::fs::canonicalize(&result_str).unwrap();
-            let result_canon = result_path.to_string_lossy();
-    
+            let result = to_relative_identifier(identifier, base_path,true)
+                .expect("Failed to to relative identifier");
+
             assert_eq!(
-                &result_canon,
-                &expected_canon,
-                "Failed for identifier: {}",
+                result,
+                expected_result,
+                "Expected GitHub-style normalized result for '{}'",
                 identifier
             );
-
-
         }
-        
-    
     }
+   
+    #[test]
+    fn test_to_relative_identifier_external_links() {
+        use crate::utils::normalize_identifier;
 
+        let dummy_path = std::env::temp_dir(); // Doesn't matter for external links
 
- 
+        let test_cases = vec![
+            "https://example.com/doc.md#Section",
+            "http://example.org/readme.md",
+            "ftp://files.example.com/archive.zip",
+            "mailto:user@example.com",
+            "file:///usr/share/docs/manual.md",
+        ];
+
+        for identifier in test_cases {
+            let result = to_relative_identifier(identifier, &dummy_path,true)
+                .expect("Should return external URL unchanged");
+            assert_eq!(
+                result, identifier,
+                "External link was modified unexpectedly: {}",
+                identifier
+            );
+        }
+    }   
+    
     // Test the is_requirements_file_by_path function
     #[test]
     fn test_is_requirements_file_by_path() {
      
         // Configure external folders for these tests
         let mut config_with_externals = MockConfig::default();
-        config_with_externals.paths.external_folders = vec!["external_repo".to_string()];        
-        config_with_externals.paths.specifications_folder = "specifications".to_string();
-        config_with_externals.paths.base_path = PathBuf::from("");                 
+        config_with_externals.paths.user_requirements_root_folder = "specifications".to_string();
     
         config_with_externals.paths.excluded_filename_patterns=vec![
             "**/README*.md".to_string(),
@@ -648,9 +660,7 @@ mod tests {
 
         // Configure external folders for these tests
         let mut config_with_externals = MockConfig::default();
-        config_with_externals.paths.external_folders = vec!["external_repo".to_string()];
-        config_with_externals.paths.base_path = PathBuf::from("");         
-        config_with_externals.paths.specifications_folder = "specifications".to_string();
+        config_with_externals.paths.user_requirements_root_folder = "specifications".to_string();
     
         config_with_externals.paths.excluded_filename_patterns=vec![
             "**/README*.md".to_string(),
@@ -778,89 +788,64 @@ mod tests {
         }
     }
     
-    #[test]
-    fn test_to_relative_identifier() {
 
+    #[test]
+    #[serial]    
+    fn test_to_relative_identifier() {
+        git_commands::clear_git_cache();
+        
         let temp_spec_folder = TempDir::new().expect("Failed to create temp dir");
         let specifications_folder = temp_spec_folder.path().to_path_buf();
 
-        let spec_folder_name = specifications_folder.file_name()
-            .and_then(|name| name.to_str()) 
-            .unwrap_or("<unknown>");
+        // Set working directory to temp folder
+        std::env::set_current_dir(&specifications_folder)
+            .expect("Failed to change current directory");
 
+        // Initialize Git in temp directory
+        Command::new("git")
+            .arg("init")
+            .current_dir(&specifications_folder)
+            .output()
+            .expect("Failed to initialize git repo");
 
-        let temp_external_folder =  TempDir::new().expect("Failed to create temp dir");
-        let external_folder = temp_external_folder.path().to_path_buf();
-        let external_folders = vec![external_folder.clone()];
-        
-        
         let base_path = specifications_folder.join("in/side/");
-        let base_path_in_ext = external_folder.join("in/side/");
+        fs::create_dir_all(&base_path).expect("Failed to create base path");
 
+        // Create subfolder target file
+        let subfolder_path = specifications_folder.join("subfolder");
+        fs::create_dir_all(&subfolder_path).expect("Failed to create subfolder");
+        fs::write(subfolder_path.join("file.yaml"), "test")
+            .expect("Failed to create file.yaml in subfolder");
 
-        // Test external URL (should be returned as-is)
+        // Create a file in the same folder as specifications_folder
+        let same_folder_file = specifications_folder.join("file.yaml");
+        fs::write(&same_folder_file, "same-level")
+            .expect("Failed to create file.yaml in specifications_folder");
+
+        // 1. External URL should be returned unchanged
         let external_url = "http://example.com/path/to/spec";
-        let result = to_relative_identifier(external_url, &base_path, &specifications_folder, &external_folders)
+        let result = to_relative_identifier(external_url, &base_path, false)
             .expect("Should return external URL as-is");
         assert_eq!(result, external_url, "Failed external URL check");
 
-        // Test path inside specifications_folder
-        /*
-            When specification folder is "/tmp/spec/" and indentifier is "/tmp/spec/subfolder/file.yaml"
-            then for the base_path "/tmp/spec/in/side/":
-                * relative identifier must be relative reference from base_path: "../../subfolder/file.yaml"
+        // 2. Absolute identifier path resolved relative to Git root
+        let spec_identifier = "/subfolder/file.yaml";
+        let result = to_relative_identifier(&spec_identifier, &base_path, false)
+            .expect("Should return relative path inside specifications folder");
+        assert_eq!(
+            result,
+            "../../subfolder/file.yaml",
+            "Failed Git-root-based absolute path check"
+        );
+
+        // 3. Same-folder file path
+        let spec_identifier = "/file.yaml";
                 
-            Same functionality applies when identifier path and base_path are inside external folder
-        
-        */
-        let spec_path = specifications_folder.join("subfolder/file.yaml");
-        let spec_identifier = spec_path.to_string_lossy().to_string();
-        let result = to_relative_identifier(&spec_identifier, &base_path, &specifications_folder, &external_folders)
-            .expect("Should return relative path inside specifications folder");
-        assert_eq!(result, "../../subfolder/file.yaml", "Failed specifications folder check");
+        let result =
+            to_relative_identifier(&spec_identifier, &specifications_folder, false)
+                .expect("Should return relative path inside specifications folder");
+        assert_eq!(result, "file.yaml", "Failed same-folder file check");
 
-        // Test path in same folder as specification folder
-        let spec_path = specifications_folder.join("file.yaml");
-        let spec_identifier = spec_path.to_string_lossy().to_string();
-        let result = to_relative_identifier(&spec_identifier, &specifications_folder, &specifications_folder, &external_folders)
-            .expect("Should return relative path inside specifications folder");
-        assert_eq!(result, "file.yaml", "Failed specifications folder check");
-
-
-        // Test path inside external_folders        
-        let external_path = external_folder.join("external_spec.yaml");
-        let external_identifier = external_path.to_string_lossy().to_string();
-       
-        let result = to_relative_identifier(&external_identifier, &base_path_in_ext, &specifications_folder, &external_folders)
-            .expect("Should return relative path inside external folders");
-        assert_eq!(result, "../../external_spec.yaml", "Failed external folder check");
-
-
-        // Test path inside external_folders with identifer in specification folder      
-        /*
-            When external folder is "/tmp/external/" and indentifier is pointing to file in specification folder "/tmp/spec/subfolder/file.yaml"
-            then for the base_path in external folder  "/tmp/external/in/side/":
-                * relative identifier must be relative reference from base_path: "../../../spec/subfolder/file.yaml"
-                
-        */
-        let spec_path = specifications_folder.join("subfolder/file.yaml");
-        let spec_identifier = spec_path.to_string_lossy().to_string();
-        
-        let result = to_relative_identifier(&spec_identifier, &base_path_in_ext, &specifications_folder, &external_folders)
-            .expect("Should return relative path inside specifications folder");
-        assert_eq!(result, format!("../../../{}/subfolder/file.yaml",spec_folder_name), "Failed specifications folder check");
-        
-        
-        // Test absolute path that does not match any provided folders
-        // 
-        let unmatched_path = "/some/other/path/spec.yaml".to_string();
-        let result = to_relative_identifier(&unmatched_path, &base_path, &specifications_folder, &external_folders)
-            .expect("Should return absolute path when no match is found");
-
-        // Dynamically compute the expected path (resutl must be a path relative to a base_path)
-        let expected = pathdiff::diff_paths(&unmatched_path, &base_path)
-            .expect("Failed to compute relative path");
-
-        assert_eq!(result, expected.to_string_lossy(), "Failed unmatched absolute path check");            
-    }    
+   
+    }
 }

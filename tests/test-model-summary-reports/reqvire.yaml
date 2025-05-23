@@ -1,6 +1,6 @@
 
 paths:
-  specifications_folder: "./specifications"
+  user_requirements_root_folder: "./specifications"
   external_folders:
       
   output_folder: "output"

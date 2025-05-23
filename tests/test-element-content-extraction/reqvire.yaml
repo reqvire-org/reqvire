@@ -1,6 +1,6 @@
 
 paths:
-  specifications_folder: "."
+  user_requirements_root_folder: "."
   output_folder: "output"
   excluded_filename_patterns:
     - "**/Logical*.md"

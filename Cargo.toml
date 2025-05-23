@@ -38,8 +38,12 @@ globset = "0.4.16"
 rustc-hash = "1.1"
 difference = "2.0"
 reqvire = { path = "core" }
+once_cell = "1.19"
 
-# Dev dependencies
-assert_fs = "1.0"
-predicates = "3.0"
-tempfile = "3.8"
+
+# dev dependencies
+assert_fs   = "1.0"
+predicates  = "3.0"
+tempfile    = "3.8"
+serial_test = "0.5"
+

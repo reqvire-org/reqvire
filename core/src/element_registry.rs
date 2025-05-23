@@ -6,7 +6,8 @@ use crate::error::ReqvireError;
 use std::collections::BTreeSet;
 use std::collections::VecDeque;
 use std::collections::BTreeMap;
-
+use std::collections::HashSet;
+use std::path::PathBuf;
 use serde::Serialize;
 
 
@@ -178,38 +179,54 @@ impl ElementRegistry {
         false
     }
 
-        
+    /// Returns all relation targets that:
+    /// - Refer to internal paths
+    pub fn get_internal_path_targets(&self) -> HashSet<PathBuf> {
+        let mut local_files = HashSet::new();
+
+        for element in self.elements.values() {
+            for rel in &element.relations {
+                if let relation::LinkType::InternalPath(ref path) = rel.target.link {
+                    local_files.insert(path.clone());
+                }
+            }
+        }
+
+        local_files
+    }
+            
     /// To return both the impacted element and the trigger relation.
     pub fn change_impact_with_relation(
         &self,
         changed: &element::Element,
     ) -> BTreeMap<String, BTreeSet<relation::Relation>> {
         let mut impacted: BTreeMap<String, BTreeSet<relation::Relation>> = BTreeMap::new();
-        let mut worklist = VecDeque::new();
+        let mut worklist: VecDeque<(String, Option<String>)> = VecDeque::new();
 
         // Start with the changed element’s identifier (with no trigger at the root).
-        worklist.push_back((&changed.identifier, None));
+        worklist.push_back((changed.identifier.clone(), None));
 
         while let Some((current_id, _prev_relation)) = worklist.pop_front() {
             for (_id, elem) in &self.elements {
-                for relation in &elem.relations {
-                    if let relation::LinkType::Identifier(ref target_id) = relation.target.link {
-                        // Ensure we only consider Forward relations
+                for relation in &elem.relations {                     
+                    
+                    if matches!(relation.target.link, relation::LinkType::Identifier(_) | relation::LinkType::InternalPath(_)) {
+                        let target_key = relation.target.link.as_str().to_string();
+
                         if relation.relation_type.direction == relation::RelationDirection::Forward {
-                            if &elem.identifier == current_id {
-                                // Insert the impacted element with the full relation object into the map
+                            if elem.identifier == current_id {
                                 impacted
-                                    .entry(target_id.clone())
+                                    .entry(target_key.clone())
                                     .or_insert_with(BTreeSet::new)
                                     .insert(relation.clone());
 
-                                // Add to worklist if not already impacted
-                                if !impacted.contains_key(target_id) {
-                                    worklist.push_back((target_id, Some(relation.relation_type.name.to_string())));
+                                if !impacted.contains_key(&target_key) {
+                                    let cloned_key = target_key.clone();
+                                    worklist.push_back((cloned_key, Some(relation.relation_type.name.to_string())));
                                 }
                             }
                         }
-                    }
+                    }                
                 }
             }
         }

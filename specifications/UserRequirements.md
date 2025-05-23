@@ -9,97 +9,37 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  eed0b020b6ddeae1["Visualize Model Relationships"];
-  click eed0b020b6ddeae1 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#visualize-model-relationships";
-  class eed0b020b6ddeae1 requirement;
-  694c4bb24b10f0c7["UserStories.md/Generate Diagrams"];
-  class 694c4bb24b10f0c7 requirement;
-  click 694c4bb24b10f0c7 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserStories.md#generate-diagrams";
-  eed0b020b6ddeae1 -->|refines| 694c4bb24b10f0c7;
-  a0274ca0625d8493["Export Diagrams in Standard Formats"];
-  click a0274ca0625d8493 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#export-diagrams-in-standard-formats";
-  class a0274ca0625d8493 requirement;
-  a0274ca0625d8493 --o|contains| 694c4bb24b10f0c7;
-  aa6a73dcebdfbc0d["Select Custom Diagram Viewpoints"];
-  click aa6a73dcebdfbc0d "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#select-custom-diagram-viewpoints";
-  class aa6a73dcebdfbc0d requirement;
-  aa6a73dcebdfbc0d -->|refines| 694c4bb24b10f0c7;
-  ac914f743d73674e["Highlight Changes in Diagrams"];
-  click ac914f743d73674e "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#highlight-changes-in-diagrams";
-  class ac914f743d73674e requirement;
-  ac914f743d73674e -->|refines| 694c4bb24b10f0c7;
-  89097c1311055b72["Store Automated Diagrams in Designated Locations"];
-  click 89097c1311055b72 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#store-automated-diagrams-in-designated-locations";
-  class 89097c1311055b72 requirement;
-  89097c1311055b72 -->|refines| 694c4bb24b10f0c7;
-  c522cf4c404bdc24["Automate Diagram Generation"];
-  click c522cf4c404bdc24 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#automate-diagram-generation";
-  class c522cf4c404bdc24 requirement;
-  c522cf4c404bdc24 -.->|deriveReqT| eed0b020b6ddeae1;
-  66e9d8186acafd13["Filter Relationships by Type"];
-  click 66e9d8186acafd13 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#filter-relationships-by-type";
-  class 66e9d8186acafd13 requirement;
-  66e9d8186acafd13 -->|refines| 694c4bb24b10f0c7;
+  eedf6d6d3d2354d9["Interactive Mermaid Diagrams"];
+  class eedf6d6d3d2354d9 requirement;
+  click eedf6d6d3d2354d9 "UserRequirements.md#interactive-mermaid-diagrams";
+  37a5b8e199a838f["UserStories.md/Generate Diagrams"];
+  class 37a5b8e199a838f requirement;
+  click 37a5b8e199a838f "UserStories.md#generate-diagrams";
+  eedf6d6d3d2354d9 -.->|deriveReqT| 37a5b8e199a838f;
 ```
 
 ---
 
-### Select Custom Diagram Viewpoints
+### Interactive Mermaid Diagrams
 
-The system shall allow users to select custom viewpoints for diagrams, tailored to specific stakeholder needs.
+The system shall produce visual representations of relationships within the MBSE model in the form of Mermaid diagrams, enabling users to explore relations and understand dependencies and their impact.
 
-#### Relations
-  * refine: [UserStories.md/Generate Diagrams](UserStories.md#generate-diagrams)
+#### Details
 
----
+Diagrams must be broken into several diagrams using following logic:
+ * requirements_file_name/'## section name'
+   * all requirements inside are 1 diagram
+   * if requirements documents doesn't have '##' paragraphs then requirements file name is used only
+   * external related resources box must be a link to actual resource
 
-### Export Diagrams in Standard Formats
-The system shall allow users to export generated diagrams in standard formats (e.g., PNG, SVG, PDF) for easy sharing and presentation.
-
-#### Relations
-  * containedBy: [UserStories.md/Generate Diagrams](UserStories.md#generate-diagrams)
-
----
-
-### Highlight Changes in Diagrams
-
-The system shall provide an option to highlight changes made to the model in the generated diagrams for better traceability.
+Color code for rendering diagrams:
+ * red for requirement
+ * yellow for resources which satisfies requirement
+ * green for verifiction which verifies requirement
+ * light blue for box representing another diagram/category with requirments where linked requirement or resource exist.
 
 #### Relations
-  * refine: [UserStories.md/Generate Diagrams](UserStories.md#generate-diagrams)
-
----
-
-### Visualize Model Relationships
-The system shall provide visual representations of relationships within the MBSE model in the diagrams, enabling users to understand dependencies and their impact.
-
-#### Relations
-  * refine: [UserStories.md/Generate Diagrams](UserStories.md#generate-diagrams)
-
----
-
-### Automate Diagram Generation
-
-When requested, the system shall automatically generate diagrams and save them to the required locations of the model, so that the diagrams are always accessible and up-to-date.
-
-#### Relations
-  * derivedFrom: [Visualize Model Relationships](#visualize-model-relationships)
-
----
-
-### Filter Relationships by Type
-The system shall allow users to filter relationships in the MBSE model by type, such as dependency, refinement, or verification when generating diagrams.
-
-#### Relations
-  * refine: [UserStories.md/Generate Diagrams](UserStories.md#generate-diagrams)
-
----
-
-### Store Automated Diagrams in Designated Locations
-The system shall store automatically generated diagrams in pre-configured locations in the model repository.
-
-#### Relations
-  * refine: [UserStories.md/Generate Diagrams](UserStories.md#generate-diagrams)
+  * derivedFrom: [UserStories.md/Generate Diagrams](UserStories.md#generate-diagrams)
 
 ---
 
@@ -112,17 +52,17 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  43dbd0667720212c["Suggest Code Refactoring"];
-  click 43dbd0667720212c "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#suggest-code-refactoring";
-  class 43dbd0667720212c requirement;
-  a9bc74070fc71e6d["UserStories.md/Aligning Design with Code"];
-  class a9bc74070fc71e6d requirement;
-  click a9bc74070fc71e6d "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserStories.md#aligning-design-with-code";
-  43dbd0667720212c -->|refines| a9bc74070fc71e6d;
-  8c02a4fb740392b["Code Traceability"];
-  click 8c02a4fb740392b "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#code-traceability";
-  class 8c02a4fb740392b requirement;
-  8c02a4fb740392b -->|refines| a9bc74070fc71e6d;
+  26ca72b617aff229["Code Traceability"];
+  class 26ca72b617aff229 requirement;
+  click 26ca72b617aff229 "UserRequirements.md#code-traceability";
+  855a1b3061c7bcdd["UserStories.md/Aligning Design with Code"];
+  class 855a1b3061c7bcdd requirement;
+  click 855a1b3061c7bcdd "UserStories.md#aligning-design-with-code";
+  26ca72b617aff229 -->|refines| 855a1b3061c7bcdd;
+  398641ced77f628c["Suggest Code Refactoring"];
+  class 398641ced77f628c requirement;
+  click 398641ced77f628c "UserRequirements.md#suggest-code-refactoring";
+  398641ced77f628c -->|refines| 855a1b3061c7bcdd;
 ```
 
 ---
@@ -152,64 +92,64 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  1ddbeea0cf8eaad5["Format Consistency Enforcement"];
-  click 1ddbeea0cf8eaad5 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#format-consistency-enforcement";
-  class 1ddbeea0cf8eaad5 requirement;
-  84c4dc11e82e8638["Model Linting"];
-  class 84c4dc11e82e8638 requirement;
-  click 84c4dc11e82e8638 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#model-linting";
-  1ddbeea0cf8eaad5 --o|contains| 84c4dc11e82e8638;
-  229bb675bac39dc9["Replace Absolute Links with Relative Links"];
-  click 229bb675bac39dc9 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#replace-absolute-links-with-relative-links";
-  class 229bb675bac39dc9 requirement;
-  229bb675bac39dc9 --o|contains| 84c4dc11e82e8638;
-  62c066a5aad4dafe["Linting Command Output"];
-  click 62c066a5aad4dafe "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#linting-command-output";
-  class 62c066a5aad4dafe requirement;
-  28b0f9fa78937e61["Linting Command"];
-  class 28b0f9fa78937e61 requirement;
-  click 28b0f9fa78937e61 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#linting-command";
-  62c066a5aad4dafe -->|refines| 28b0f9fa78937e61;
-  7ec3cb7f400a2e8d["Validate Markdown Structure"];
-  click 7ec3cb7f400a2e8d "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#validate-markdown-structure";
-  class 7ec3cb7f400a2e8d requirement;
-  a0f9571f6563d9d3["UserStories.md/Validating Structures"];
-  class a0f9571f6563d9d3 requirement;
-  click a0f9571f6563d9d3 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserStories.md#validating-structures";
-  7ec3cb7f400a2e8d -->|refines| a0f9571f6563d9d3;
-  b5146db7aedfd66["Documentation Index HTML Integration"];
-  click b5146db7aedfd66 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#documentation-index-html-integration";
-  class b5146db7aedfd66 requirement;
-  9019be8bfdc22b35["Generate Documentation Index"];
-  class 9019be8bfdc22b35 requirement;
-  click 9019be8bfdc22b35 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#generate-documentation-index";
-  b5146db7aedfd66 -->|refines| 9019be8bfdc22b35;
-  c75ac8fa29479ca5["UserStories.md/Managing MBSE Models"];
-  class c75ac8fa29479ca5 requirement;
-  click c75ac8fa29479ca5 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserStories.md#managing-mbse-models";
-  9019be8bfdc22b35 -.->|deriveReqT| c75ac8fa29479ca5;
-  c390b990a63def2a["Validate Filesystem Structure"];
-  click c390b990a63def2a "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#validate-filesystem-structure";
-  class c390b990a63def2a requirement;
-  c390b990a63def2a -->|refines| a0f9571f6563d9d3;
-  28b0f9fa78937e61 --o|contains| 84c4dc11e82e8638;
-  ee05a46627b568b7["Validate Cross-Component Dependencies"];
-  click ee05a46627b568b7 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#validate-cross-component-dependencies";
-  class ee05a46627b568b7 requirement;
-  ee05a46627b568b7 -->|refines| a0f9571f6563d9d3;
-  8a3ca9461643d887["Validate Relation Types"];
-  click 8a3ca9461643d887 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#validate-relation-types";
-  class 8a3ca9461643d887 requirement;
-  8a3ca9461643d887 -->|refines| a0f9571f6563d9d3;
-  3d2fe0b05ff9c8e3["Enhanced Validation Error Reporting"];
-  click 3d2fe0b05ff9c8e3 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#enhanced-validation-error-reporting";
-  class 3d2fe0b05ff9c8e3 requirement;
-  3d2fe0b05ff9c8e3 -->|refines| a0f9571f6563d9d3;
-  84c4dc11e82e8638 -->|refines| a0f9571f6563d9d3;
-  f9182ad2999d989c["Validate Internal Consistency"];
-  click f9182ad2999d989c "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#validate-internal-consistency";
-  class f9182ad2999d989c requirement;
-  f9182ad2999d989c -->|refines| a0f9571f6563d9d3;
+  3bd9d29239564eeb["Validate Cross-Component Dependencies"];
+  class 3bd9d29239564eeb requirement;
+  click 3bd9d29239564eeb "UserRequirements.md#validate-cross-component-dependencies";
+  113748a94885138d["UserStories.md/Validating Structures"];
+  class 113748a94885138d requirement;
+  click 113748a94885138d "UserStories.md#validating-structures";
+  3bd9d29239564eeb -->|refines| 113748a94885138d;
+  7305c1d6f7f1e2b2["Model Linting"];
+  class 7305c1d6f7f1e2b2 requirement;
+  click 7305c1d6f7f1e2b2 "UserRequirements.md#model-linting";
+  7305c1d6f7f1e2b2 -->|refines| 113748a94885138d;
+  c2b6c74b77726ad9["Generate Documentation Index"];
+  class c2b6c74b77726ad9 requirement;
+  click c2b6c74b77726ad9 "UserRequirements.md#generate-documentation-index";
+  e61b7c1baa89bfc6["UserStories.md/Managing MBSE Models"];
+  class e61b7c1baa89bfc6 requirement;
+  click e61b7c1baa89bfc6 "UserStories.md#managing-mbse-models";
+  c2b6c74b77726ad9 -.->|deriveReqT| e61b7c1baa89bfc6;
+  974ccf933675ef44["Format Consistency Enforcement"];
+  class 974ccf933675ef44 requirement;
+  click 974ccf933675ef44 "UserRequirements.md#format-consistency-enforcement";
+  974ccf933675ef44 --o|contains| 7305c1d6f7f1e2b2;
+  c50887ce89be280a["Validate Internal Consistency"];
+  class c50887ce89be280a requirement;
+  click c50887ce89be280a "UserRequirements.md#validate-internal-consistency";
+  c50887ce89be280a -->|refines| 113748a94885138d;
+  8dfe33c28555e80a["Replace Absolute Links with Relative Links"];
+  class 8dfe33c28555e80a requirement;
+  click 8dfe33c28555e80a "UserRequirements.md#replace-absolute-links-with-relative-links";
+  8dfe33c28555e80a --o|contains| 7305c1d6f7f1e2b2;
+  ec10e748b5e9516e["Linting Command Output"];
+  class ec10e748b5e9516e requirement;
+  click ec10e748b5e9516e "UserRequirements.md#linting-command-output";
+  a51179cda67cf9f2["Linting Command"];
+  class a51179cda67cf9f2 requirement;
+  click a51179cda67cf9f2 "UserRequirements.md#linting-command";
+  ec10e748b5e9516e -->|refines| a51179cda67cf9f2;
+  3b10b8811daaed67["Enhanced Validation Error Reporting"];
+  class 3b10b8811daaed67 requirement;
+  click 3b10b8811daaed67 "UserRequirements.md#enhanced-validation-error-reporting";
+  3b10b8811daaed67 -->|refines| 113748a94885138d;
+  f25cbfbca6d6d92e["Validate Relation Types"];
+  class f25cbfbca6d6d92e requirement;
+  click f25cbfbca6d6d92e "UserRequirements.md#validate-relation-types";
+  f25cbfbca6d6d92e -->|refines| 113748a94885138d;
+  5c482dc763b4133a["Validate Filesystem Structure"];
+  class 5c482dc763b4133a requirement;
+  click 5c482dc763b4133a "UserRequirements.md#validate-filesystem-structure";
+  5c482dc763b4133a -->|refines| 113748a94885138d;
+  586b073cd97908da["Validate Markdown Structure"];
+  class 586b073cd97908da requirement;
+  click 586b073cd97908da "UserRequirements.md#validate-markdown-structure";
+  586b073cd97908da -->|refines| 113748a94885138d;
+  84b3d0502132adb5["Documentation Index HTML Integration"];
+  class 84b3d0502132adb5 requirement;
+  click 84b3d0502132adb5 "UserRequirements.md#documentation-index-html-integration";
+  84b3d0502132adb5 -->|refines| c2b6c74b77726ad9;
+  a51179cda67cf9f2 --o|contains| 7305c1d6f7f1e2b2;
 ```
 
 ---
@@ -269,7 +209,7 @@ The system shall provide linting capability to ensure consistent formatting in r
 ---
 
 ### Generate Documentation Index
-The system shall generate an index.md file in the specifications root folder during linting that contains a structured summary of all specification documents and folders.
+The system shall generate a SpecificationIndex.md file in the repository root that contains a structured summary of all specification documents and folders.
 
 #### Relations
   * derivedFrom: [UserStories.md/Managing MBSE Models](UserStories.md#managing-mbse-models)
@@ -277,7 +217,7 @@ The system shall generate an index.md file in the specifications root folder dur
 ---
 
 ### Documentation Index HTML Integration
-The index.md file shall be converted to index.md when HTML output is generated, serving as the primary entry point for HTML documentation.
+The SpecificationIndex.md file shall be converted to index.html when HTML output is generated, serving as the primary entry point for HTML documentation.
 
 #### Relations
   * refine: [Generate Documentation Index](#generate-documentation-index)
@@ -334,17 +274,21 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  efa1cab60b058344["Generate Change Logs for Pull Requests"];
-  click efa1cab60b058344 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#generate-change-logs-for-pull-requests";
-  class efa1cab60b058344 requirement;
-  1563f8454019c887["UserStories.md/Integrate with GitHub Workflows"];
-  class 1563f8454019c887 requirement;
-  click 1563f8454019c887 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserStories.md#integrate-with-github-workflows";
-  efa1cab60b058344 -->|refines| 1563f8454019c887;
-  b41f362e18fb2449["Automate Pull Request Validations"];
-  click b41f362e18fb2449 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#automate-pull-request-validations";
-  class b41f362e18fb2449 requirement;
-  b41f362e18fb2449 -->|refines| 1563f8454019c887;
+  15f2f511b2399406["Automate Pull Request Validations"];
+  class 15f2f511b2399406 requirement;
+  click 15f2f511b2399406 "UserRequirements.md#automate-pull-request-validations";
+  98eaeddc27f99e11["UserStories.md/Integrate with GitHub Workflows"];
+  class 98eaeddc27f99e11 requirement;
+  click 98eaeddc27f99e11 "UserStories.md#integrate-with-github-workflows";
+  15f2f511b2399406 -->|refines| 98eaeddc27f99e11;
+  672b444a568468b8["Generate Change Logs for Pull Requests"];
+  class 672b444a568468b8 requirement;
+  click 672b444a568468b8 "UserRequirements.md#generate-change-logs-for-pull-requests";
+  672b444a568468b8 -->|refines| 98eaeddc27f99e11;
+  98a581084d5542fa["Automate Diagram Generation"];
+  class 98a581084d5542fa requirement;
+  click 98a581084d5542fa "UserRequirements.md#automate-diagram-generation";
+  98a581084d5542fa -->|refines| 98eaeddc27f99e11;
 ```
 
 ---
@@ -365,6 +309,15 @@ The system shall generate detailed change logs for pull requests, summarizing mo
 
 ---
 
+### Automate Diagram Generation
+
+The system shall automate generation of diagrams in the GitHub workflow on PR merge event, so that the diagrams are always accessible and up-to-date.
+
+#### Relations
+  * refine: [UserStories.md/Integrate with GitHub Workflows](UserStories.md#integrate-with-github-workflows)
+
+---
+
 ## Provide Reports
 ```mermaid
 graph LR;
@@ -374,29 +327,29 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  40de7485b25294["Model Structure and Summaries"];
-  click 40de7485b25294 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#model-structure-and-summaries";
-  class 40de7485b25294 requirement;
-  98d3f01fb666c41f["Model Reports"];
-  class 98d3f01fb666c41f requirement;
-  click 98d3f01fb666c41f "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#model-reports";
-  40de7485b25294 -.->|deriveReqT| 98d3f01fb666c41f;
-  db41436c9a771e21["Generate Summary Reports"];
-  click db41436c9a771e21 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#generate-summary-reports";
-  class db41436c9a771e21 requirement;
-  9cb6618c17d19a11["UserStories.md/Provide Reports"];
-  class 9cb6618c17d19a11 requirement;
-  click 9cb6618c17d19a11 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserStories.md#provide-reports";
-  db41436c9a771e21 -->|refines| 9cb6618c17d19a11;
-  98d3f01fb666c41f -->|refines| 9cb6618c17d19a11;
-  2d3cfde19fc6bb79["Provide Validation Reports"];
-  click 2d3cfde19fc6bb79 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#provide-validation-reports";
-  class 2d3cfde19fc6bb79 requirement;
-  2d3cfde19fc6bb79 -->|refines| 9cb6618c17d19a11;
-  6572e9cc4d78415a["Structural Change Reports"];
-  click 6572e9cc4d78415a "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#structural-change-reports";
-  class 6572e9cc4d78415a requirement;
-  6572e9cc4d78415a -.->|deriveReqT| 98d3f01fb666c41f;
+  b5c9876f83e7d0ce["Generate Summary Reports"];
+  class b5c9876f83e7d0ce requirement;
+  click b5c9876f83e7d0ce "UserRequirements.md#generate-summary-reports";
+  91a0adb0b4d959c4["UserStories.md/Provide Reports"];
+  class 91a0adb0b4d959c4 requirement;
+  click 91a0adb0b4d959c4 "UserStories.md#provide-reports";
+  b5c9876f83e7d0ce -->|refines| 91a0adb0b4d959c4;
+  ad6f7a2d41d80a38["Model Structure and Summaries"];
+  class ad6f7a2d41d80a38 requirement;
+  click ad6f7a2d41d80a38 "UserRequirements.md#model-structure-and-summaries";
+  70701096d332c0b2["Model Reports"];
+  class 70701096d332c0b2 requirement;
+  click 70701096d332c0b2 "UserRequirements.md#model-reports";
+  ad6f7a2d41d80a38 -.->|deriveReqT| 70701096d332c0b2;
+  ed31b6bed1cde2f8["Provide Validation Reports"];
+  class ed31b6bed1cde2f8 requirement;
+  click ed31b6bed1cde2f8 "UserRequirements.md#provide-validation-reports";
+  ed31b6bed1cde2f8 -->|refines| 91a0adb0b4d959c4;
+  70701096d332c0b2 -->|refines| 91a0adb0b4d959c4;
+  1908501a80db5c46["Structural Change Reports"];
+  class 1908501a80db5c46 requirement;
+  click 1908501a80db5c46 "UserRequirements.md#structural-change-reports";
+  1908501a80db5c46 -.->|deriveReqT| 70701096d332c0b2;
 ```
 
 ---
@@ -453,29 +406,25 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  92ab92840dee10a5["Export Traceability Matrix"];
-  click 92ab92840dee10a5 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#export-traceability-matrix";
-  class 92ab92840dee10a5 requirement;
-  c5b8a7944b6943e2["Traceability Matrix"];
-  class c5b8a7944b6943e2 requirement;
-  click c5b8a7944b6943e2 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#traceability-matrix";
-  92ab92840dee10a5 -.->|deriveReqT| c5b8a7944b6943e2;
-  b8997351b6f34048["Interactive Mermaid Diagrams"];
-  click b8997351b6f34048 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#interactive-mermaid-diagrams";
-  class b8997351b6f34048 requirement;
-  b8997351b6f34048 -.->|deriveReqT| c5b8a7944b6943e2;
-  2591b90e1fb90daa["UserStories.md/Trace Changes in MBSE Model"];
-  class 2591b90e1fb90daa requirement;
-  click 2591b90e1fb90daa "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserStories.md#trace-changes-in-mbse-model";
-  c5b8a7944b6943e2 --o|contains| 2591b90e1fb90daa;
-  4bedae4112e254b["Include Verification Checkboxes"];
-  click 4bedae4112e254b "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#include-verification-checkboxes";
-  class 4bedae4112e254b requirement;
-  4bedae4112e254b -->|refines| c5b8a7944b6943e2;
-  9b9c33c7182d6eeb["Tracing Structural Changes"];
-  click 9b9c33c7182d6eeb "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#tracing-structural-changes";
-  class 9b9c33c7182d6eeb requirement;
-  9b9c33c7182d6eeb -.->|deriveReqT| 2591b90e1fb90daa;
+  4e30ea0930dc9c26["Traceability Matrix"];
+  class 4e30ea0930dc9c26 requirement;
+  click 4e30ea0930dc9c26 "UserRequirements.md#traceability-matrix";
+  5ef9c8ae19a9f55a["UserStories.md/Trace Changes in MBSE Model"];
+  class 5ef9c8ae19a9f55a requirement;
+  click 5ef9c8ae19a9f55a "UserStories.md#trace-changes-in-mbse-model";
+  4e30ea0930dc9c26 --o|contains| 5ef9c8ae19a9f55a;
+  7de9a55d6102af23["Export Traceability Matrix"];
+  class 7de9a55d6102af23 requirement;
+  click 7de9a55d6102af23 "UserRequirements.md#export-traceability-matrix";
+  7de9a55d6102af23 -.->|deriveReqT| 4e30ea0930dc9c26;
+  6d32b919c82784b7["Include Verification Checkboxes"];
+  class 6d32b919c82784b7 requirement;
+  click 6d32b919c82784b7 "UserRequirements.md#include-verification-checkboxes";
+  6d32b919c82784b7 -->|refines| 4e30ea0930dc9c26;
+  d7b7b13a5b8d96e1["Tracing Structural Changes"];
+  class d7b7b13a5b8d96e1 requirement;
+  click d7b7b13a5b8d96e1 "UserRequirements.md#tracing-structural-changes";
+  d7b7b13a5b8d96e1 -.->|deriveReqT| 5ef9c8ae19a9f55a;
 ```
 
 ---
@@ -525,30 +474,6 @@ The system shall provide an option to export the traceability matrix in formats 
 
 ---
 
-### Interactive Mermaid Diagrams
-
-The system shall include Mermaid diagrams in the traceability matrix that provide interactive links to related elements in other documents, enabling navigation and exploration of dependencies.
-
-#### Details
-
-Diagrams must be broken into several diagrams using following logic:
- * requirements_file_name/'## paragraph name'
-   * all requirements inside are 1 diagram
-   * if requirements documents doesn't have '##' paragraphs then requirements file name is used only
-   * external related resources box must be a link to actual resource
-
-
-Color code for rendering diagrams:
- * red for requirement
- * yellow for resources which satisfies requirement
- * green for verifiction which verifies requirement
- * light blue for box representing another diagram/category with requirments where linked requirement or resource exist.
-
-#### Relations
-  * derivedFrom: [Traceability Matrix](#traceability-matrix)
-
----
-
 ## Exporting Specifications
 ```mermaid
 graph LR;
@@ -558,13 +483,13 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  d9686a154fe87b2["Export HTML specifications"];
-  click d9686a154fe87b2 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#export-html-specifications";
-  class d9686a154fe87b2 requirement;
-  3bb2096c4648e3ff["UserStories.md/Export Specifications"];
-  class 3bb2096c4648e3ff requirement;
-  click 3bb2096c4648e3ff "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserStories.md#export-specifications";
-  d9686a154fe87b2 -.->|deriveReqT| 3bb2096c4648e3ff;
+  a4c40962cac85d0c["Export HTML specifications"];
+  class a4c40962cac85d0c requirement;
+  click a4c40962cac85d0c "UserRequirements.md#export-html-specifications";
+  b3b899678f557ee9["UserStories.md/Export Specifications"];
+  class b3b899678f557ee9 requirement;
+  click b3b899678f557ee9 "UserStories.md#export-specifications";
+  a4c40962cac85d0c -.->|deriveReqT| b3b899678f557ee9;
 ```
 
 ---
@@ -578,35 +503,6 @@ The system shall export specifications into HTML format and save in designated o
 
 ---
 
-## AI-Driven Model Suggestions
-```mermaid
-graph LR;
-  %% Graph styling
-  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
-  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
-  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
-  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
-
-  7fd9156eac77c270["AI Agent Context"];
-  click 7fd9156eac77c270 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#ai-agent-context";
-  class 7fd9156eac77c270 requirement;
-  8fc677b7413bb247["UserStories.md#AI-Assisted MBSE Model Management"];
-  class 8fc677b7413bb247 requirement;
-  click 8fc677b7413bb247 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserStories.md#ai-assisted-mbse-model-management";
-  7fd9156eac77c270 -->|refines| 8fc677b7413bb247;
-```
-
----
-
-### AI Agent Context
-
-The system shall provide needed context for AI agents to understand how to use reqvire and help with model suggestions.
-
-#### Relations
-  * refine: [UserStories.md#AI-Assisted MBSE Model Management](UserStories.md#ai-assisted-mbse-model-management)
-
----
-
 ## Trace Changes
 ```mermaid
 graph LR;
@@ -616,13 +512,13 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  c699ef8d6d1f99d1["Change Impact Analysis"];
-  click c699ef8d6d1f99d1 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#change-impact-analysis";
-  class c699ef8d6d1f99d1 requirement;
-  2591b90e1fb90daa["UserStories.md/Trace Changes in MBSE Model"];
-  class 2591b90e1fb90daa requirement;
-  click 2591b90e1fb90daa "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserStories.md#trace-changes-in-mbse-model";
-  c699ef8d6d1f99d1 --o|contains| 2591b90e1fb90daa;
+  9933cac5853a8584["Change Impact Analysis"];
+  class 9933cac5853a8584 requirement;
+  click 9933cac5853a8584 "UserRequirements.md#change-impact-analysis";
+  5ef9c8ae19a9f55a["UserStories.md/Trace Changes in MBSE Model"];
+  class 5ef9c8ae19a9f55a requirement;
+  click 5ef9c8ae19a9f55a "UserStories.md#trace-changes-in-mbse-model";
+  9933cac5853a8584 --o|contains| 5ef9c8ae19a9f55a;
 ```
 
 ---

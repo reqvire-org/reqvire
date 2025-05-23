@@ -1,14 +1,12 @@
 use std::collections::{HashSet, BTreeSet};
 use serde::Serialize;
 use std::path::PathBuf;
-use crate::utils;
 use crate::relation::{Relation, RelationTarget, LinkType};
 use crate::error::ReqvireError;
 use crate::element_registry;
 use crate::relation;
 use crate::element;
 use difference::{Changeset, Difference};
-use std::path::Path;
 use serde_json::{json, Value};
 
 
@@ -23,13 +21,15 @@ pub struct RelationSummary {
 }
 
 impl RelationSummary {
-    pub fn to_repo_url(&self, repo_root: &Path, base_url: &str, commit: &str) -> Option<String> {
+    pub fn to_repo_url(&self, base_url: &str, commit: &str) -> Option<String> {
         match &self.target.link {
             LinkType::Identifier(id) => {
                 let path = PathBuf::from(id);
-                let relative = path.strip_prefix(repo_root).ok()?;
-                Some(format!("{}/blob/{}/{}", base_url, commit, relative.to_string_lossy()))
+                Some(format!("{}/blob/{}/{}", base_url, commit, path.to_string_lossy()))
             }
+            LinkType::InternalPath(path) => {
+                Some(format!("{}/blob/{}/{}", base_url, commit, path.to_string_lossy()))
+            }            
             _ => None,
         }
     }
@@ -75,135 +75,30 @@ pub struct ChangedElement {
 }
 
 impl ChangedElement {
-    pub fn to_repo_url(&self, repo_root: &Path, base_url: &str, commit: &str) -> String {
+    pub fn to_repo_url(&self, base_url: &str, commit: &str) -> String {
         let path = PathBuf::from(&self.element_id);
-        let relative = path.strip_prefix(repo_root).unwrap_or(&path);
-        format!("{}/blob/{}/{}", base_url, commit, relative.to_string_lossy())
+        format!("{}/blob/{}/{}", base_url, commit, path.to_string_lossy())
     }
 }
 
 
 /// Report detailing changes between two registries.
 #[derive(Debug, Serialize)]
-pub struct ChangeImpactReport<'a> {
+pub struct ChangeImpactReport {
     pub added: Vec<AddedElement>,
     pub removed: Vec<RemovedElement>,
     pub changed: Vec<ChangedElement>,
     pub invalidated_verifications: Vec<InvalidatedVerification>,    
-    #[serde(skip_serializing)]
-    specification_folder: &'a PathBuf,
-    #[serde(skip_serializing)]
-    external_folders: &'a [PathBuf],
-    #[serde(skip_serializing)]    
-    repo_root: &'a PathBuf
 }
 
-impl<'a> ChangeImpactReport<'a> {
-    pub fn new(repo_root: &'a PathBuf, specification_folder: &'a PathBuf, external_folders: &'a [PathBuf]) -> Self {
+impl ChangeImpactReport {
+    pub fn new() -> Self {
         Self {
             added: Vec::new(),
             removed: Vec::new(),
             changed: Vec::new(),
             invalidated_verifications: Vec::new(),
-            specification_folder,
-            external_folders,
-            repo_root
         }
-    }
-
-
-   
-    fn to_relative_paths(&self) -> ChangeImpactReport<'a> {
-        let mut report = ChangeImpactReport::new(self.repo_root, self.specification_folder, self.external_folders);
-        let to_relative = |path: &str| {
-            utils::get_relative_path_from_root(&PathBuf::from(path), &self.repo_root)
-                .map(|p| p.to_string_lossy().to_string())
-                .unwrap_or_else(|err| {
-                    eprintln!("Error converting path {}: {}", path, err);
-                    "FAILED".to_string()
-                })
-        };
-
-        report.added = self.added.iter().map(|elem| AddedElement {
-            element_id: to_relative(&elem.element_id),
-            name: elem.name.clone(),
-            new_content: elem.new_content.clone(),
-            added_relations: elem.added_relations.iter().map(|rel| RelationSummary {
-                relation_type: rel.relation_type.clone(),
-                target_changed: false,
-                target: RelationTarget {
-                    text: rel.target.text.clone(),
-                    link: match rel.target.link {
-                        LinkType::Identifier(_) => LinkType::Identifier(to_relative(rel.target.link.as_str())),
-                        _ => rel.target.link.clone(),
-                    },
-                },
-                is_opposite: rel.is_opposite,
-            }).collect(),
-            change_impact_tree: propagate_to_relative(&elem.change_impact_tree, &to_relative),
-        }).collect();
-
-        report.removed = self.removed.iter().map(|elem| RemovedElement {
-            element_id: to_relative(&elem.element_id),
-            name: elem.name.clone(),
-            old_content: elem.old_content.clone(),
-            removed_relations: elem.removed_relations.iter().map(|rel| RelationSummary {
-                relation_type: rel.relation_type.clone(),
-                target_changed: false,                
-                target: RelationTarget {
-                    text: rel.target.text.clone(),
-                    link: match rel.target.link {
-                        LinkType::Identifier(_) => LinkType::Identifier(to_relative(rel.target.link.as_str())),
-                        _ => rel.target.link.clone(),
-                    },
-                },
-                is_opposite: rel.is_opposite,
-            }).collect(),
-        }).collect();
-
-        report.changed = self.changed.iter().map(|elem| ChangedElement {
-            element_id: to_relative(&elem.element_id),
-            name: elem.name.clone(),            
-            old_content: elem.old_content.clone(),
-            new_content: elem.new_content.clone(),
-            content_changed: elem.content_changed,
-            added_relations: elem.added_relations.iter().map(|rel| RelationSummary {           
-                relation_type: rel.relation_type.clone(),
-                target_changed: false,                
-                target: RelationTarget {
-                    text: rel.target.text.clone(),
-                    link: match rel.target.link {
-                        LinkType::Identifier(_) => LinkType::Identifier(to_relative(rel.target.link.as_str())),
-                        _ => rel.target.link.clone(),
-                    },
-                },
-                is_opposite: rel.is_opposite,
-            }).collect(),
-            removed_relations: elem.removed_relations.iter().map(|rel| RelationSummary {
-                relation_type: rel.relation_type.clone(),
-                target_changed: false,                
-                target: RelationTarget {
-                    text: rel.target.text.clone(),
-                    link: match rel.target.link {
-                        LinkType::Identifier(_) => LinkType::Identifier(to_relative(rel.target.link.as_str())),
-                        _ => rel.target.link.clone(),
-                    },
-                },
-                is_opposite: rel.is_opposite,
-            }).collect(),
-            change_impact_tree: propagate_to_relative(&elem.change_impact_tree, &to_relative),
-        }).collect();
-
-
-        report.invalidated_verifications = self.invalidated_verifications
-        .iter()
-        .map(|v| InvalidatedVerification {
-            element_id: to_relative(&v.element_id),
-            name: v.name.clone(),
-        })
-        .collect();
-    
-        report
     }
     
     /// Outputs the report as json with GitHub links included.    
@@ -221,6 +116,7 @@ impl<'a> ChangeImpactReport<'a> {
             let added_relations: Vec<_> = elem.added_relations.iter().map(|rel| {
                 let target_url = match rel.target.link {
                     LinkType::Identifier(ref id) => format!("{}/blob/{}/{}", base_url, git_commit, id),
+                    LinkType::InternalPath(ref path) => format!("{}/blob/{}/{}", base_url, previous_git_commit, path.display()),                                        
                     _ => rel.target.link.as_str().to_string(),
                 };
 
@@ -248,6 +144,7 @@ impl<'a> ChangeImpactReport<'a> {
             let removed_relations: Vec<_> = elem.removed_relations.iter().map(|rel| {
                 let target_url = match rel.target.link {
                     LinkType::Identifier(ref id) => format!("{}/blob/{}/{}", base_url, previous_git_commit, id),
+                    LinkType::InternalPath(ref path) => format!("{}/blob/{}/{}", base_url, previous_git_commit, path.display()),                    
                     _ => rel.target.link.as_str().to_string(),
                 };
 
@@ -272,6 +169,7 @@ impl<'a> ChangeImpactReport<'a> {
             let added_relations: Vec<_> = elem.added_relations.iter().map(|rel| {
                 let target_url = match rel.target.link {
                     LinkType::Identifier(ref id) => format!("{}/blob/{}/{}", base_url, git_commit, id),
+                    LinkType::InternalPath(ref path) => format!("{}/blob/{}/{}", base_url, previous_git_commit, path.display()),                                        
                     _ => rel.target.link.as_str().to_string(),
                 };
 
@@ -286,6 +184,7 @@ impl<'a> ChangeImpactReport<'a> {
             let removed_relations: Vec<_> = elem.removed_relations.iter().map(|rel| {
                 let target_url = match rel.target.link {
                     LinkType::Identifier(ref id) => format!("{}/blob/{}/{}", base_url, previous_git_commit, id),
+                    LinkType::InternalPath(ref path) => format!("{}/blob/{}/{}", base_url, previous_git_commit, path.display()),                                        
                     _ => rel.target.link.as_str().to_string(),
                 };
 
@@ -414,42 +313,14 @@ impl<'a> ChangeImpactReport<'a> {
     }
     
     pub fn print(&self, base_url: &str, git_commit: &str,  previous_git_commit: &str, as_json: bool) {
-        let report_with_relative_paths=self.to_relative_paths();
         if as_json {
-            println!("{}",serde_json::to_string_pretty(&report_with_relative_paths.to_json(base_url, git_commit, previous_git_commit)).unwrap());
+            println!("{}",serde_json::to_string_pretty(&self.to_json(base_url, git_commit, previous_git_commit)).unwrap());
         } else {
-            println!("{}", report_with_relative_paths.to_text(base_url, git_commit, previous_git_commit));
+            println!("{}", self.to_text(base_url, git_commit, previous_git_commit));
         }
     }    
 }
 
-/// Helper to convert an `ElementNode` to use relative paths.
-fn propagate_to_relative<F>(node: &element_registry::ElementNode, to_relative: &F) -> element_registry::ElementNode 
-where F: Fn(&str) -> String {
-     // Convert the element identifier to a relative path
-     let mut relative_element =node.element.clone();
-     relative_element.identifier= to_relative(&node.element.identifier);
-
-
-
-    // Recursively convert the child relations to relative paths
-    let relative_relations = node.relations.iter().map(|relation| {
-        let mut rel_relative_element = relation.element_node.element.clone();
-        rel_relative_element.identifier= to_relative(&relation.element_node.element.identifier);
-        
-
-        element_registry::RelationNode {
-            relation_trigger: relation.relation_trigger.clone(),
-            element_node: propagate_to_relative(&relation.element_node, to_relative)
-        }
-    }).collect();
-
-    // Return the updated ElementNode with relative paths
-    element_registry::ElementNode {
-        element: relative_element,
-        relations: relative_relations,
-    }
-}
 
 /// Generate a unified diff in a diff-highlighted markdown code fence.
 fn _generate_markdown_diff(old: &str, new: &str) -> String {
@@ -684,14 +555,11 @@ fn propagate_changed_flags(
 /// Computes the change impact report between two registries and builds the change impact trees
 /// using the registry’s propagation algorithm. Propagation is computed only for added elements
 /// or for elements whose content has changed.
-pub fn compute_change_impact<'a>(
-    current: &'a element_registry::ElementRegistry,
-    reference: &'a element_registry::ElementRegistry,
-    repo_root: &'a PathBuf,    
-    specification_folder: &'a PathBuf,
-    external_folders: &'a [PathBuf],
-) -> Result<ChangeImpactReport<'a>, ReqvireError> {
-    let mut report = ChangeImpactReport::new(repo_root, specification_folder, external_folders);
+pub fn compute_change_impact(
+    current: &element_registry::ElementRegistry,
+    reference: &element_registry::ElementRegistry,
+) -> Result<ChangeImpactReport, ReqvireError> {
+    let mut report = ChangeImpactReport::new();
 
     let current_ids: HashSet<&String> = current.elements.keys().collect();
     let reference_ids: HashSet<&String> = reference.elements.keys().collect();

@@ -58,7 +58,6 @@ flowchart LR
     human -. colaborate via .-> GitHubOrSimilar
 
     ReqvireTool -. read/write/get diffs .-> gitRepository
-    aiAgents -. PRs/issues/comment > colaborate via .-> GitHubOrSimilar
  
     manageModel -. provide .-> validateStructure
     validateStructure -. include .-> markdownSucture

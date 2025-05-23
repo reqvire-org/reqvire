@@ -9,54 +9,66 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  29eb679eef252d12["Relation Types and behaviors"];
-  click 29eb679eef252d12 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SpecificationsRequirements.md#relation-types-and-behaviors";
-  class 29eb679eef252d12 requirement;
-  c75ac8fa29479ca5["UserStories.md#Managing MBSE Models"];
-  class c75ac8fa29479ca5 requirement;
-  click c75ac8fa29479ca5 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserStories.md#managing-mbse-models";
-  29eb679eef252d12 -.->|deriveReqT| c75ac8fa29479ca5;
-  a01a924ab0c27629["../core/src/relation.rs"];
-  class a01a924ab0c27629 default;
-  click a01a924ab0c27629 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/core/src/relation.rs";
-  a01a924ab0c27629 -->|satisfies| 29eb679eef252d12;
-  a9d2746640af5d30["Structure and Addressing in Markdown Documents"];
-  click a9d2746640af5d30 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SpecificationsRequirements.md#structure-and-addressing-in-markdown-documents";
-  class a9d2746640af5d30 requirement;
-  a9d2746640af5d30 -.->|deriveReqT| c75ac8fa29479ca5;
-  d914e938be7e0abf["Requirements Change Propagation"];
-  click d914e938be7e0abf "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SpecificationsRequirements.md#requirements-change-propagation";
-  class d914e938be7e0abf requirement;
-  c699ef8d6d1f99d1["UserRequirements.md#Change Impact Analysis"];
-  class c699ef8d6d1f99d1 requirement;
-  click c699ef8d6d1f99d1 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/UserRequirements.md#change-impact-analysis";
-  d914e938be7e0abf -->|refines| c699ef8d6d1f99d1;
-  34ac784ed0e00552["Identifiers and Relations"];
-  click 34ac784ed0e00552 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SpecificationsRequirements.md#identifiers-and-relations";
-  class 34ac784ed0e00552 requirement;
-  34ac784ed0e00552 -.->|deriveReqT| a9d2746640af5d30;
-  a01a924ab0c27629 -->|satisfies| 34ac784ed0e00552;
-  11082285c19e9df["Structure of Markdown Documents"];
-  click 11082285c19e9df "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/specifications/SpecificationsRequirements.md#structure-of-markdown-documents";
-  class 11082285c19e9df requirement;
-  11082285c19e9df -.->|deriveReqT| a9d2746640af5d30;
-  a01a924ab0c27629 -->|satisfies| 11082285c19e9df;
-  3e5e5aa2d6181644["../core/src/element.rs"];
-  class 3e5e5aa2d6181644 default;
-  click 3e5e5aa2d6181644 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/core/src/element.rs";
-  3e5e5aa2d6181644 -->|satisfies| 11082285c19e9df;
-  aaf2fdce0a90bd2c["../core/src/subsection.rs"];
-  class aaf2fdce0a90bd2c default;
-  click aaf2fdce0a90bd2c "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/core/src/subsection.rs";
-  aaf2fdce0a90bd2c -->|satisfies| 11082285c19e9df;
-  dfd639447d711d62["../core/src/parser.rs"];
-  class dfd639447d711d62 default;
-  click dfd639447d711d62 "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/core/src/parser.rs";
-  dfd639447d711d62 -->|satisfies| 11082285c19e9df;
-  36fd2b1e82621caf["../core/src/model.rs"];
-  class 36fd2b1e82621caf default;
-  click 36fd2b1e82621caf "https://github.com/Reqvire/reqvire/blob/ad88ba6b828e94c93382866fefd058c011c1ac60/core/src/model.rs";
-  36fd2b1e82621caf -->|satisfies| 11082285c19e9df;
+  ade67c27bc5d3bbd["Structure and Addressing in Markdown Documents"];
+  class ade67c27bc5d3bbd requirement;
+  click ade67c27bc5d3bbd "SpecificationsRequirements.md#structure-and-addressing-in-markdown-documents";
+  e61b7c1baa89bfc6["UserStories.md#Managing MBSE Models"];
+  class e61b7c1baa89bfc6 requirement;
+  click e61b7c1baa89bfc6 "UserStories.md#managing-mbse-models";
+  ade67c27bc5d3bbd -.->|deriveReqT| e61b7c1baa89bfc6;
+  b49d890e0bbe0a83["Structure of Markdown Documents"];
+  class b49d890e0bbe0a83 requirement;
+  click b49d890e0bbe0a83 "SpecificationsRequirements.md#structure-of-markdown-documents";
+  b49d890e0bbe0a83 -.->|deriveReqT| ade67c27bc5d3bbd;
+  cd2d5dab49985ca2["UserStories.md#ai-assisted-mbse-model-management"];
+  class cd2d5dab49985ca2 requirement;
+  click cd2d5dab49985ca2 "UserStories.md#ai-assisted-mbse-model-management";
+  b49d890e0bbe0a83 -.->|deriveReqT| cd2d5dab49985ca2;
+  9450d4313f47ef36["../core/src/relation.rs"];
+  class 9450d4313f47ef36 default;
+  click 9450d4313f47ef36 "../core/src/relation.rs";
+  9450d4313f47ef36 -->|satisfies| b49d890e0bbe0a83;
+  a814c4935e1a0449["../core/src/element.rs"];
+  class a814c4935e1a0449 default;
+  click a814c4935e1a0449 "../core/src/element.rs";
+  a814c4935e1a0449 -->|satisfies| b49d890e0bbe0a83;
+  398003c91b6b2cde["../core/src/subsection.rs"];
+  class 398003c91b6b2cde default;
+  click 398003c91b6b2cde "../core/src/subsection.rs";
+  398003c91b6b2cde -->|satisfies| b49d890e0bbe0a83;
+  f22d93285fcd7664["../core/src/parser.rs"];
+  class f22d93285fcd7664 default;
+  click f22d93285fcd7664 "../core/src/parser.rs";
+  f22d93285fcd7664 -->|satisfies| b49d890e0bbe0a83;
+  d50a859650933e55["../core/src/model.rs"];
+  class d50a859650933e55 default;
+  click d50a859650933e55 "../core/src/model.rs";
+  d50a859650933e55 -->|satisfies| b49d890e0bbe0a83;
+  816c1e0b1de4dc53["Identifiers and Relations"];
+  class 816c1e0b1de4dc53 requirement;
+  click 816c1e0b1de4dc53 "SpecificationsRequirements.md#identifiers-and-relations";
+  816c1e0b1de4dc53 -.->|deriveReqT| ade67c27bc5d3bbd;
+  816c1e0b1de4dc53 -.->|deriveReqT| cd2d5dab49985ca2;
+  9450d4313f47ef36["../core/src/relation.rs"];
+  class 9450d4313f47ef36 default;
+  click 9450d4313f47ef36 "../core/src/relation.rs";
+  9450d4313f47ef36 -->|satisfies| 816c1e0b1de4dc53;
+  551906d5c51d91d9["Relation Types and behaviors"];
+  class 551906d5c51d91d9 requirement;
+  click 551906d5c51d91d9 "SpecificationsRequirements.md#relation-types-and-behaviors";
+  551906d5c51d91d9 -.->|deriveReqT| e61b7c1baa89bfc6;
+  551906d5c51d91d9 -.->|deriveReqT| cd2d5dab49985ca2;
+  9450d4313f47ef36["../core/src/relation.rs"];
+  class 9450d4313f47ef36 default;
+  click 9450d4313f47ef36 "../core/src/relation.rs";
+  9450d4313f47ef36 -->|satisfies| 551906d5c51d91d9;
+  2054606d7574a553["Requirements Change Propagation"];
+  class 2054606d7574a553 requirement;
+  click 2054606d7574a553 "SpecificationsRequirements.md#requirements-change-propagation";
+  9933cac5853a8584["UserRequirements.md#Change Impact Analysis"];
+  class 9933cac5853a8584 requirement;
+  click 9933cac5853a8584 "UserRequirements.md#change-impact-analysis";
+  2054606d7574a553 -->|refines| 9933cac5853a8584;
 ```
 
 ---
@@ -349,7 +361,8 @@ The system shall implement semi-structured markdown format specifications that d
 The system shall implement the structure, rules, and usage of **Sections**, **Elements**, **Subsections**, **Relations**, and **Identifiers** in Markdown (`.md`) documents following clearly defined specifications.
 
 #### Relations
-  * derivedFrom: [Structure And Addressing in Markdown documents](#structure-and-addressing-in-markdown-documents)
+  * derivedFrom: [Structure And Addressing in Markdown documents](#structure-and-addressing-in-markdown-documents)  
+  * derivedFrom: [UserStories.md#ai-assisted-mbse-model-management](UserStories.md#ai-assisted-mbse-model-management)
   * satisfiedBy: [../core/src/relation.rs](../core/src/relation.rs)
   * satisfiedBy: [../core/src/element.rs](../core/src/element.rs)
   * satisfiedBy: [../core/src/subsection.rs](../core/src/subsection.rs)      
@@ -734,6 +747,7 @@ The system shall implement  **Identifiers** and **Relations** following clearly 
 
 #### Relations
   * derivedFrom: [Structure And Addressing in Markdown documents](#structure-and-addressing-in-markdown-documents)
+  * derivedFrom: [UserStories.md#ai-assisted-mbse-model-management](UserStories.md#ai-assisted-mbse-model-management)  
   * satisfiedBy: [../core/src/relation.rs](../core/src/relation.rs)
 
 #### Details
@@ -743,40 +757,46 @@ The system shall implement  **Identifiers** and **Relations** following clearly 
 
 ## Identifiers in Markdown Documents
 
-An **identifier** consists of a path following a filename with an extension (e.g., `file.md`) and optionally an **element** name (fragment).  
+An **identifier** consists of a path following a filename with an extension (e.g., `file.md`) and optionally  **element** name (fragment).  
 
 Every **element** in the system has unique identifier that depends on document it appears in, path of the document, and element name (fragment).
 
+## Identifier in markdown document can be of several types
 
-### Path Resolution Rules
+-**Identifier**
+  - An internal system element reference represented as a string identifier.
+  - **Example**: `"some-identifier"`
+- **ExternalUrl**
+  - An external URL represented as a string.
+  - **Example**: `"https://example.com"`
+- **InternalPath**
+  - An internal filesystem file path
+  - **Example**: `"../core/src/diagrams.rs"`
+  
+  
+### Identifier Path Resolution Rules
 
-- If an identifier **starts with `/<specficiation_folder>/`**, it is considered relative to the **specifications folder**.
-- If an identifier **starts with `/<external_folder>/`**, it is considered relative to the **external folder**.
+- If an identifier **starts with `/`**, it is considered relative to the **git repository root folder**.
 - If an identifier **does not start with `/`**, it is considered **relative** to the path of the document in which it appears.
-- If an identifier **starts with `/`**, it is considered absolute path that is preserved during normalizations.
 
 Each **identifier** must uniquely reference either:
   - A **file**, or
   - An **element within a file**.
 
-#### Path Resolution Examples
+#### Identifier Path Resolution Examples
 
-Assuming the **<specifications> folder** is `project` and a file exists at `/path/to/project/documents/File1.md`:
+Assuming the **<git repository root> folder** is `project` and a file exists at `/path/to/project/documents/File1.md`:
 
-| Identifier | Resolves to |
-|------------|------------|
-| `File2.md` | `/path/to/project/documents/File2.md` |
-| `subfolder/File3.md` | `/path/to/project/documents/subfolder/File3.md` |
-| `../File4.md` | `/path/to/project/File4.md` |
-| `../../somefolder/File4.md` | `/path/to/somefolder/File4.md` |
-| `/project/File4.md` | `/path/to/project/File4.md` |
-
----
-
-The same rule is applied when normalazing **<external_folder> folder** .
+| Identifier | Resolves to | Type  |
+|------------|------------|-----------|
+| `File2.md` | `project/documents/File2.md` | InternalPath |
+| `subfolder/File3.md` | `project/documents/subfolder/File3.md` | InternalPath |
+| `../File4.md` | `project/File4.md` | InternalPath |
+| `/project/File4.md` | `project/File4.md` | InternalPath |
+| `https://example.com` | `https://example.com` | ExternalUrl |
+| `../Requirments#element-name` | `project/Requirments#element-name` | Identifier |
 
 ---
-
 
 ### Identifier Form Variations and Examples
 
@@ -802,45 +822,45 @@ As part of normailization process, element names are converted to **GitHub-style
 Plain file or element references, following the path resolution rules.
 
 
-Examples (<specifications> folder is some path):
+Examples:
 
-- File only identifier found in the document '<specifications>/path/to/document.md'
+- File only identifier found in the document '<git repository root>/path/to/document.md'
 ```
 file.md
 ```
-  - Normalized to '<specifications>/path/to/file.md'
+  - Normalized to '<git repository root>/path/to/file.md'
 
-- File with an element fragment in the document '<specifications>/path/to/document.md':  
+- File with an element fragment in the document '<git repository root>/path/to/document.md':  
 ```
 file.md#element name
 ```
-  - Normalized to '<specifications>/path/to/file.md#element-name'
+  - Normalized to '<git repository root>/path/to/file.md#element-name'
 
-- Relative path with an element fragment in the document '<specifications>/path/to/document.md':  
+- Relative path with an element fragment in the document '<git repository root>/path/to/document.md':  
 ```
 ../relative_path/file.md#element name
 ```
-  - Normalized to '<specifications>/path/file.md#element-name'
+  - Normalized to '<git repository root>/path/file.md#element-name'
 
-- Element name fragment only (within the same file) in the document '<specifications>/path/to/document.md':  
+- Element name fragment only (within the same file) in the document '<git repository root>/path/to/document.md':  
 ```
 #element name
 ```
-  - Normalized to '<specifications>/path/to/document.md#element-name'
+  - Normalized to '<git repository root>/path/to/document.md#element-name'
   
   
-- Relative path with the element fragment with special characters in the document '<specifications>/path/to/document.md'::  
+- Relative path with the element fragment with special characters in the document '<git repository root>/path/to/document.md':
 ```
 path/file.md#My Element (Draft)
 ```
-  - Normalized to '<specifications>/path/to/path/file.md##my-element-draft'
+  - Normalized to '<git repository root>/path/to/path/file.md##my-element-draft'
   
 
-- Absolute path starting with the 'specifications' <specification> folder with the element fragment in any document:
+- Absolute path with the element fragment in any document:
 ```
-/specifications/path/file.md#Elements
+/path/file.md#Elements
 ```
-  - Normalized to '<specifications>/path/file.md#elements'
+  - Normalized to '<git repository root>/path/file.md#elements'
   
        
 #### 2. GitHub-style Markdown Link Identifiers
@@ -852,17 +872,17 @@ Once link part is obtained from GitHub-style Markdown link, it is following same
    
 Examples:
 
-- File link in '<specifications>/path/to/document.md':  
+- File link in '<git repository root>/path/to/document.md':  
 ```
 [Specification](documents/specification.md)
 ```
-  - Normalized to '<specifications>/path/to/path/documents/specification.md'
+  - Normalized to '<git repository root>/path/to/path/documents/specification.md'
 
-- Fragment link in '<specifications>/path/to/document.md':  :  
+- Fragment link in '<git repository root>/path/to/document.md':  :  
 ```
 [My Element](documents/specification.md#my-element)
 ```
-  - Normalized to '<specifications>/path/to/path/documents/specification.md#my-element'
+  - Normalized to '<git repository root>/path/to/path/documents/specification.md#my-element'
 
 ---
 
@@ -963,7 +983,7 @@ If the referenced file is located in a subfolder relative to the current documen
 
 #### 5. **Absolute Path Relations**
 
-If the reference starts with /, it points to a file or element relative to the root specifications folder.
+If the reference starts with /, it points to a file or element relative to the git repository root folder.
 
 ```markdown
 
@@ -1023,6 +1043,7 @@ The system shall implement relations following clearly defined specifications fo
 
 #### Relations
   * derivedFrom: [UserStories.md#Managing MBSE Models](UserStories.md#managing-mbse-models)
+  * derivedFrom: [UserStories.md#ai-assisted-mbse-model-management](UserStories.md#ai-assisted-mbse-model-management)  
   * satisfiedBy: [../core/src/relation.rs](../core/src/relation.rs)
 
 #### Details

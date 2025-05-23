@@ -9,13 +9,14 @@ use crate::relation;
 use crate::element::ElementType;
 use crate::element::RequirementType;
 use crate::git_commands;
+use crate::filesystem;
+use std::path::Path;
 
 /// Generates diagrams grouped by `file_path` and `section`
 pub fn generate_diagrams_by_section(
     registry: &ElementRegistry,
-    direction: & str,        
-    specification_folder: &PathBuf, 
-    external_folders: &[PathBuf],        
+    direction: &str,
+    diagrams_with_blobs: bool,    
 ) -> Result<HashMap<String, String>, ReqvireError> {
     let mut diagrams: HashMap<String, String> = HashMap::new();
 
@@ -35,7 +36,7 @@ pub fn generate_diagrams_by_section(
     for ((file_path, section), section_elements) in grouped_elements {
         debug!("Generating diagram for file: {}, section: {}", file_path, section);
 
-        let diagram = generate_section_diagram(registry, &section, &section_elements, &file_path, direction, specification_folder, external_folders)?;
+        let diagram = generate_section_diagram(registry, &section, &section_elements, &file_path, direction, diagrams_with_blobs)?;
         let diagram_key = format!("{}::{}", file_path, section);
         diagrams.insert(diagram_key, diagram);
     }
@@ -49,12 +50,11 @@ fn generate_section_diagram(
     _section: &str,
     elements: &[&Element],
     file_path: &str,
-    direction: & str,
-    specification_folder: &PathBuf, 
-    external_folders: &[PathBuf],      
+    direction: &str,
+    diagrams_with_blobs: bool
 ) -> Result<String, ReqvireError> {
     // Get Git repository information for creating proper links
-    let repo_root = match git_commands::repository_root() {
+    let repo_root = match git_commands::get_git_root_dir() {
         Ok(root) => root,
         Err(_) => PathBuf::from(""),
     };
@@ -88,11 +88,10 @@ fn generate_section_diagram(
             element, 
             &mut included_elements, 
             file_path,
-            specification_folder,
-            external_folders,
+            diagrams_with_blobs,           
             &repo_root,
             &base_url,
-            &commit_hash
+            &commit_hash,
         )?;
     }
 
@@ -108,11 +107,10 @@ fn add_element_to_diagram(
     element: &Element,
     included_elements: &mut HashSet<String>,
     file_path: &str,
-    specification_folder: &PathBuf, 
-    external_folders: &[PathBuf],
+    diagrams_with_blobs: bool,  
     repo_root: &PathBuf,
     base_url: &str,
-    commit_hash: &str
+    commit_hash: &str,
 ) -> Result<(), ReqvireError> {
 
     // Convert file path to its parent directory (returns PathBuf)
@@ -120,22 +118,21 @@ fn add_element_to_diagram(
         .parent()
         .map(|p| p.to_path_buf()) 
         .unwrap_or_else(|| PathBuf::from("."));
-
-    // Create a stable GitHub link for the element if we have the git info
-    let has_git_info = !base_url.is_empty() && !commit_hash.is_empty() && !repo_root.as_os_str().is_empty();
-    
-    // Get HTML-style relative ID for local navigation
+ 
+    // Get relative ID for local navigation
     let relative_target = utils::to_relative_identifier(
         &element.identifier.clone(),
         &base_dir,
-        specification_folder,
-        external_folders
+        false
     )?;
-    
-    // Get a GitHub link if we have git info
-    let git_link = if has_git_info {
+
+
+    // Create a stable GitHub link for the element if we have the git info and diagrams should be with blobs
+    let has_git_info = !base_url.is_empty() && !commit_hash.is_empty() && !repo_root.as_os_str().is_empty();
+       
+    let click_target = if diagrams_with_blobs && has_git_info {
         // Get repository-relative path
-        let relative_id = match utils::get_relative_path_from_root(&PathBuf::from(&element.identifier), &repo_root) {
+        let relative_id = match utils::get_relative_path(&PathBuf::from(&element.identifier)) {
             Ok(rel_path) => rel_path.to_string_lossy().to_string(),
             Err(_) => element.identifier.clone(),
         };
@@ -145,8 +142,8 @@ fn add_element_to_diagram(
     } else {
         // Fall back to the relative link for local navigation
         relative_target.clone()
-    };
-    
+    };    
+        
     let element_id = utils::hash_identifier(&element.identifier);   
 
     if !included_elements.contains(&element.identifier) {
@@ -163,13 +160,9 @@ fn add_element_to_diagram(
            
                   
        // Add the element node
-       diagram.push_str(&format!("  {}[\"{}\"];\n", element_id, label));
-       
-       // Use GitHub link if available, otherwise fall back to local link
-       let click_target = if has_git_info { git_link } else { relative_target };
-       diagram.push_str(&format!("  click {} \"{}\";\n", element_id, click_target));
-       
+       diagram.push_str(&format!("  {}[\"{}\"];\n", element_id, label));      
        diagram.push_str(&format!("  class {} {};\n", element_id, class));
+       diagram.push_str(&format!("  click {} \"{}\";\n", element_id, click_target));       
     }
 
 
@@ -184,18 +177,18 @@ fn add_element_to_diagram(
                 
                 let target_id = utils::hash_identifier(&target);               
 
-                // Get HTML-style relative ID for local navigation
+                // Get relative ID for local navigation
                 let relative_target = utils::to_relative_identifier(
                     &target,
                     &base_dir,
-                    specification_folder,
-                    external_folders
+                    false
                 )?;
                 
+           
                 // Get a GitHub link if we have git info
-                let git_link = if has_git_info {
+                let click_target = if diagrams_with_blobs &&  has_git_info {
                     // Get repository-relative path
-                    let relative_id = match utils::get_relative_path_from_root(&PathBuf::from(target), &repo_root) {
+                    let relative_id = match utils::get_relative_path(&PathBuf::from(target)) {
                         Ok(rel_path) => rel_path.to_string_lossy().to_string(),
                         Err(_) => target.clone(),
                     };
@@ -206,6 +199,7 @@ fn add_element_to_diagram(
                     // Fall back to the relative link for local navigation
                     relative_target.clone()
                 };
+                             
                 
                 if !included_elements.contains(target) {
                     included_elements.insert(target.clone());
@@ -224,10 +218,7 @@ fn add_element_to_diagram(
                                                                
                     diagram.push_str(&format!("  {}[\"{}\"];\n", target_id, label));
                     diagram.push_str(&format!("  class {} {};\n", target_id, class));                    
-                    
-                    // Use GitHub link if available, otherwise fall back to local link
-                    let click_target = if has_git_info { git_link } else { relative_target };
-                    diagram.push_str(&format!("  click {} \"{}\";\n", target_id, click_target));
+                    diagram.push_str(&format!("  click {} \"{}\";\n", target_id, click_target));                    
                 }
                 target_id
             },
@@ -238,9 +229,42 @@ fn add_element_to_diagram(
                 diagram.push_str(&format!("  class {} {};\n", target_id,"default"));
                 diagram.push_str(&format!("  click {} \"{}\";\n", target_id, url));
                 
-                target_id
+                target_id               
+            },
+            relation::LinkType::InternalPath(path) => {
+                // Get relative ID for local navigation
+                let relative_target = utils::to_relative_identifier(
+                    &path.to_string_lossy().into_owned(),
+                    &base_dir,
+                    false
+                )?;
                 
-            }
+           
+                // Get a GitHub link if we have git info
+                let click_target = if diagrams_with_blobs &&  has_git_info {
+                    // Get repository-relative path
+                    let relative_id = match utils::get_relative_path(&path) {
+                        Ok(rel_path) => rel_path.to_string_lossy().to_string(),
+                        Err(_) => path.to_string_lossy().to_string()
+                    };
+                    
+                    // Create a git link for the target element
+                    format!("{}/blob/{}/{}", base_url, commit_hash, relative_id)
+                } else {
+                    // Fall back to the relative link for local navigation
+                    relative_target.clone()
+                };
+            
+                // Always add internal paths, regardless of `included_elements`
+                let cow = path.to_string_lossy();
+                let path_str = cow.as_ref();
+                let target_id = utils::hash_identifier(path_str);
+                diagram.push_str(&format!("  {}[\"{}\"];\n", target_id, label));
+                diagram.push_str(&format!("  class {} {};\n", target_id,"default"));
+                diagram.push_str(&format!("  click {} \"{}\";\n", target_id, click_target));
+                
+                target_id               
+            }            
         };
 
 
@@ -272,3 +296,108 @@ fn add_element_to_diagram(
 }
 
 
+/// Processes diagram generation for markdown files in place (without writing to output).
+/// Used when the `--generate-diagrams` flag is set.
+pub fn process_diagrams(
+    registry: &ElementRegistry,
+    diagram_direction: &str,
+    diagrams_with_blobs: bool,    
+    ) -> Result<(), ReqvireError> {
+
+    // Generate diagrams by section
+    let diagrams = generate_diagrams_by_section(&registry, diagram_direction, diagrams_with_blobs)?;
+
+    // Group diagrams by file path
+    let mut files_to_update: HashMap<String, Vec<(&str, &String)>> = HashMap::new();
+
+    for (file_section_key, new_diagram) in &diagrams {
+        let parts: Vec<&str> = file_section_key.split("::").collect();
+        if parts.len() != 2 {
+            continue; // Skip invalid entries
+        }
+        let file_path = parts[0];
+        let section = parts[1];
+    
+        files_to_update
+            .entry(file_path.to_string())
+            .or_insert_with(Vec::new)
+            .push((section, new_diagram));
+    }
+
+    // Process each file
+    for (file_path, section_diagrams) in files_to_update {
+        let file_path_obj = Path::new(&file_path);
+
+        // Read file content
+        let mut file_content = match filesystem::read_file(file_path_obj) {
+            Ok(content) => content,
+            Err(e) => {
+                log::error!("Failed to read file '{}': {}", file_path, e);
+                continue;
+            }
+        };
+
+        // Replace diagrams for all sections in this file
+        for (section, new_diagram) in section_diagrams {              
+            file_content = replace_section_diagram(&file_content, section, new_diagram);
+        }
+
+        // Write updated content back if modified
+        if let Err(e) = filesystem::write_file(file_path_obj, &file_content) {
+            log::error!("Failed to write updated diagrams to '{}': {}", file_path, e);
+        } else {
+            println!("Updated diagrams in '{}'", file_path);
+        }
+    }
+
+    Ok(())
+}
+
+/// Replaces the old diagram in a specific section of a markdown file.
+///
+/// - `content`: The original file content.
+/// - `section`: The section name where the diagram should be replaced.
+/// - `new_diagram`: The newly generated Mermaid diagram.
+///
+/// Returns the modified file content as a `String`.
+fn replace_section_diagram(content: &str, section: &str, new_diagram: &str) -> String {
+    let section_header = format!("## {}", section);
+    let mermaid_block_start = "```mermaid";
+    let mermaid_block_end = "```";
+
+    let mut new_lines = Vec::new();
+    let mut lines = content.lines().peekable();
+    while let Some(line) = lines.next() {
+        if line.trim() == section_header {
+            // Found the target section header.
+            new_lines.push(line.to_string());
+            // Insert the new diagram immediately after the header.
+            new_lines.push(new_diagram.to_string());
+            // Skip any blank lines immediately after the header.
+            while let Some(&next_line) = lines.peek() {
+                if next_line.trim().is_empty() {
+                    lines.next();
+                } else {
+                    break;
+                }
+            }
+            // If the next non-empty line starts a Mermaid block, skip it.
+            if let Some(&next_line) = lines.peek() {
+                if next_line.trim().starts_with(mermaid_block_start) {
+                    // Skip the mermaid block: first skip the start marker.
+                    lines.next();
+                    // Then skip lines until the end marker is found.
+                    while let Some(l) = lines.next() {
+                        if l.trim().starts_with(mermaid_block_end) {
+                            break;
+                        }
+                    }
+                }
+            }
+            // Continue with the rest of the file.
+            } else {
+                new_lines.push(line.to_string());
+        }
+    }
+    new_lines.join("\n")
+}

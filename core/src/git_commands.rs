@@ -2,9 +2,33 @@ use std::process::Command;
 use anyhow::Result;
 use crate::error::ReqvireError;
 use std::path::PathBuf;
+use once_cell::sync::Lazy;
+use std::sync::Mutex;
+use std::collections::HashMap;
+
+
+static REPO_URL: Lazy<Mutex<Option<String>>> = Lazy::new(|| Mutex::new(None));
+static COMMIT_HASH: Lazy<Mutex<Option<String>>> = Lazy::new(|| Mutex::new(None));
+static GIT_ROOT_DIR: Lazy<Mutex<Option<PathBuf>>> = Lazy::new(|| Mutex::new(None));
+static GIT_ROOT_CACHE: Lazy<Mutex<HashMap<PathBuf, String>>> = Lazy::new(|| Mutex::new(HashMap::new()));
+
+#[cfg(test)]
+pub fn clear_git_cache() {
+    REPO_URL.lock().unwrap().take();
+    COMMIT_HASH.lock().unwrap().take();
+    GIT_ROOT_DIR.lock().unwrap().take();
+    GIT_ROOT_CACHE.lock().unwrap().clear();
+    
+}
 
 /// Retrieves the repository base URL (HTTPS format) from Git remote configuration.
 pub fn get_repository_base_url() -> Result<String, ReqvireError> {
+
+    let mut cached = REPO_URL.lock().unwrap();
+    if let Some(ref url) = *cached {
+        return Ok(url.clone());
+    }
+    
     // Fetch the repository URL from git configuration
     let output = Command::new("git")
         .args(&["config", "--get", "remote.origin.url"])
@@ -38,12 +62,19 @@ pub fn get_repository_base_url() -> Result<String, ReqvireError> {
         )));
     };
 
+    *cached = Some(base_url.clone());
+
     Ok(base_url)
 }
 
 
 /// Retrieves the current commit hash from the repository.
 pub fn get_commit_hash() -> Result<String,ReqvireError> {
+    let mut cached = COMMIT_HASH.lock().unwrap();
+    if let Some(ref hash) = *cached {
+        return Ok(hash.clone());
+    }
+    
     // Run the git command to get the current commit hash
     let output = Command::new("git")
         .args(&["rev-parse", "HEAD"])
@@ -58,6 +89,8 @@ pub fn get_commit_hash() -> Result<String,ReqvireError> {
     if hash.is_empty() {
         return Err(ReqvireError::GitCommandError("Commit hash is empty".to_string()));
     }
+
+    *cached = Some(hash.clone());
 
     Ok(hash)
 }
@@ -88,6 +121,12 @@ pub fn get_file_at_commit(file_path: &str,folder:&PathBuf, commit: &str) -> Resu
 
 /// Finds the Git repository root for a given absolute folder path.
 pub fn find_git_repo_root(absolute_folder_path: &PathBuf) -> Result<String, ReqvireError> {
+
+    let mut cache = GIT_ROOT_CACHE.lock().unwrap();
+    if let Some(cached_root) = cache.get(absolute_folder_path) {
+        return Ok(cached_root.clone());
+    }
+
     let output = Command::new("git")
         .arg("rev-parse")
         .arg("--show-toplevel")
@@ -97,6 +136,7 @@ pub fn find_git_repo_root(absolute_folder_path: &PathBuf) -> Result<String, Reqv
     match output {
         Ok(output) if output.status.success() => {
             let root = String::from_utf8_lossy(&output.stdout).trim().to_string();
+            cache.insert(absolute_folder_path.clone(), root.clone());
             Ok(root)
         }
         Ok(output) => {
@@ -115,23 +155,14 @@ pub fn find_git_repo_root(absolute_folder_path: &PathBuf) -> Result<String, Reqv
     }
 }
 
-/// Retrieves the repository root folder
-/*
-pub fn get_repository_root(file_path: &str,folder:&str, commit: &str) -> Result<String, ReqvireError> {
-    println!("{}", &format!("{}:{}", commit, file_path));
-    let output = Command::new("git")
-        .args(&["show", &format!("{}:{}", commit, file_path)])
-        .current_dir(folder)        
-        .output()?;
-    if !output.status.success() {
-        let err = String::from_utf8_lossy(&output.stderr);
-        return Err(ReqvireError::GitCommandError(format!("git show failed for {}: {}", file_path, err)));
-    }
-    Ok(String::from_utf8_lossy(&output.stdout).into())
-}
+/// Returns the Git repository root directory
+pub fn get_git_root_dir() -> Result<PathBuf, ReqvireError> {
 
-*/
-pub fn repository_root() -> Result<PathBuf, ReqvireError> {
+    let mut cached = GIT_ROOT_DIR.lock().unwrap();
+    if let Some(ref path) = *cached {
+        return Ok(path.clone());
+    }
+
     let output = Command::new("git")
         .args(&["rev-parse", "--show-toplevel"])
         .output()?;
@@ -141,9 +172,38 @@ pub fn repository_root() -> Result<PathBuf, ReqvireError> {
             "git failed to find repository root".to_string(),
         ));
     }
-
     let path_str = String::from_utf8_lossy(&output.stdout).trim().to_string();
-    Ok(PathBuf::from(path_str))
+    let path = PathBuf::from(path_str);
+    *cached = Some(path.clone());
+    Ok(path)
+}
+
+/// Lists all files in a commit by running `git ls-tree --name-only -r <commit>`
+/// from the git repository root. Returns a list of file paths.
+pub fn ls_tree_commit(commit: &str) -> Result<Vec<String>, ReqvireError> {
+    let git_root = get_git_root_dir()?;
+    
+    let output = Command::new("git")
+        .args(&["ls-tree", "--name-only", "-r", commit])
+        .current_dir(&git_root)
+        .output()?;
+
+    if !output.status.success() {
+        let stderr_str = String::from_utf8_lossy(&output.stderr);
+        return Err(ReqvireError::GitCommandError(format!(
+            "git ls-tree failed (commit = {}): {}", 
+            commit, stderr_str
+        )));
+    }
+
+    // Convert stdout lines into a Vec<String>
+    let stdout_str = String::from_utf8_lossy(&output.stdout);
+    let files = stdout_str
+        .lines()
+        .map(|line| line.to_string())
+        .collect::<Vec<String>>();
+
+    Ok(files)
 }
 
 /// Returns a list of files that have changed (according to `git diff --name-only`).

@@ -2,24 +2,17 @@
 
 
 paths:
-  # Path to the specifications folder
-  specifications_folder: "specifications"
+  # Path to the user requirements root folder
+  user_requirements_root_folder: "specifications"
   
   # Default output folder
   output_folder: "html"
   
-  # Additional external folders that contain system requirements and other files
-  # These can be absolute paths or paths relative to the input folder
-  # All markdown files in these folders are considered requirements (except those matching exclusion patterns)
-  external_folders:
-    - tests
-    - core
-    - cli
-      
   # Glob patterns to exclude from requirements processing
-  # These are patterns that shouldn't be considered requirements even if they're in specifications or external folders
   excluded_filename_patterns:
     - "Usecases.md"
+    - "CLAUDE.md"
+    - "codefetch/**"
     - "**/Logical*.md"
     - "**/Physical*.md"
     - "**/TODO.md"
@@ -27,6 +20,8 @@ paths:
     - "**/tests/**"    
     - "**/core/**"    
     - "**/cli/**"            
+    - "**/doc/**"
+    - "**/html/**"    
 
 style:
   # Theme for HTML output (default, dark, light)
@@ -40,3 +35,6 @@ style:
   
   # Diagram direction (TD for top-down, LR for left-to-right)
   diagram_direction: "LR"
+
+  # If diagrams click links should be blobs to work from GitHub console
+  diagrams_with_blobs: false  

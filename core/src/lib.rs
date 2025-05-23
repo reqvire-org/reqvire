@@ -6,6 +6,7 @@ pub mod error;
 pub mod utils;
 pub mod parser;
 pub mod html_export;
+pub mod export;
 pub mod linting;
 pub mod html;
 pub mod filesystem;

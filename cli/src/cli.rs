@@ -4,10 +4,12 @@ use anyhow::Result;
 use log::{info};
 use serde::Serialize;
 use reqvire::error::ReqvireError;
-use reqvire::{html_export, linting, ModelManager};
+use reqvire::{linting, ModelManager};
 use reqvire::index_generator;
 use globset::GlobSet;
 use reqvire::reports;
+use reqvire::diagrams;
+use reqvire::export;
 use reqvire::change_impact;
 use reqvire::git_commands;
 use reqvire::matrix_generator;
@@ -160,14 +162,6 @@ pub struct Args {
     #[clap(long, short = 'c')]
     pub config: Option<PathBuf>,
     
-    /// Output LLM context document
-    /// Generates a comprehensive context document with information about Reqvire
-    /// methodology, document structure, relation types, and CLI usage to help
-    /// Large Language Models understand and work with Reqvire-based projects
-    #[clap(long)]
-    pub llm_context: bool,
-    
-    
     /// Analise change impact and provides report
     #[clap(long)]
     pub change_impact: bool,
@@ -175,7 +169,10 @@ pub struct Args {
     /// Git commit hash to use when comparing models
     #[clap(long, requires = "change_impact", default_value = "HEAD")]    
     pub git_commit: String,
-        
+    
+        /// Process only files within a specific subdirectory relative to git root (hidden flag for testing)
+    #[clap(long, hide = true)]
+    pub subdirectory: Option<String>,
 
 }
 
@@ -218,157 +215,137 @@ fn print_validation_results(errors: &[ReqvireError], json_output: bool) {
 
 pub fn handle_command(
     args: Args,
-    specification_folder_path: &PathBuf,
-    external_folders_path: &[PathBuf],    
     output_folder_path: &PathBuf,
     excluded_filename_patterns: &GlobSet,
-    diagram_direction: &str
+    diagram_direction: &str,
+    diagrams_with_blobs: bool,
+    user_requirements_root_folder: &Option<PathBuf>
 ) -> Result<i32,ReqvireError> {
-
+                        
     let mut model_manager = ModelManager::new();
-
-
-    // Handle LLM context
-    if args.llm_context {
-        // Include the LLM context content directly in the binary
-        let llm_context = include_str!("llm_context.md");
-        println!("{}", llm_context);
-        Args::print_help();
-        return Ok(0);
-    }else{
-  
-        let parse_result=model_manager.parse_and_validate(None, &specification_folder_path, &external_folders_path,excluded_filename_patterns);
-
-                
-        if args.validate {
-            match parse_result {
-                Ok(errors) => {
-                    if errors.is_empty() {
-                        println!("✅ Validation completed successfully with no errors.");
-                    } else {
-                        print_validation_results(&errors, args.json);
-                    }
-                    return Ok(0);
+    let parse_result = model_manager.parse_and_validate(
+        None, 
+        user_requirements_root_folder,
+        excluded_filename_patterns
+    );
+              
+    if args.validate {
+        match parse_result {
+            Ok(errors) => {
+                if errors.is_empty() {
+                    println!("✅ Validation completed successfully with no errors.");
+                } else {
+                    print_validation_results(&errors, args.json);
                 }
-                Err(e) => {
-                    eprintln!("❌ Validation failed: {}", e);
-                    return Ok(0);
-                }
-            }  
-        }else if args.generate_index {
-            info!("Generating index.....");
-
-            let _index_context = index_generator::generate_readme_index(
-                &model_manager.element_registry, 
-                &specification_folder_path,
-                &external_folders_path
+                return Ok(0);
+            }
+            Err(e) => {
+                eprintln!("❌ Validation failed: {}", e);
+                return Ok(0);
+            }
+        }  
+    }else if args.generate_index {
+        info!("Generating index.....");
+        let _index_context = index_generator::generate_readme_index(
+            &model_manager.element_registry, 
+                &output_folder_path
             ).map_err(|e| {
                 ReqvireError::ProcessError(format!("❌ Failed to generate README.md: {:?}", e))
             })?;
 
-            return Ok(0);
+        return Ok(0);
                                             
-        }else if args.generate_diagrams {
-            info!("Generating mermaid diagrams in {:?}", specification_folder_path);
-            // Only collect identifiers and process files to add diagrams
-            // Skip validation checks for diagram generation mode
-            model_manager.process_diagrams(&specification_folder_path, &external_folders_path, diagram_direction)?;
+    }else if args.generate_diagrams {
+       info!("Generating mermaid diagrams");
+        // Only collect identifiers and process files to add diagrams
+        // Skip validation checks for diagram generation mode
+        diagrams::process_diagrams(&model_manager.element_registry,diagram_direction,diagrams_with_blobs)?;
        
-            info!("Requirements diagrams updated in source files");
-            return Ok(0);
+        info!("Requirements diagrams updated in source files");
+        return Ok(0);
             
-        }else if args.model_summary {
-            let filters = Filters::new(
-                args.filter_file.as_deref(),
-                args.filter_name.as_deref(),
-                args.filter_section.as_deref(),
-                args.filter_type.as_deref(),
-                args.filter_content.as_deref(),
-                args.filter_is_not_verified,
-                args.filter_is_not_satisfied,
-            ).map_err(|e| {
-                ReqvireError::ProcessError(format!("❌ Failed to construct filters: {}", e))
-            })?;
+    }else if args.model_summary {
+        let filters = Filters::new(
+            args.filter_file.as_deref(),
+            args.filter_name.as_deref(),
+            args.filter_section.as_deref(),
+            args.filter_type.as_deref(),
+            args.filter_content.as_deref(),
+            args.filter_is_not_verified,
+            args.filter_is_not_satisfied,
+        ).map_err(|e| {
+            ReqvireError::ProcessError(format!("❌ Failed to construct filters: {}", e))
+        })?;
+        
+        let output_format = if args.cypher {
+            reports::SummaryOutputFormat::Cypher
+        } else if args.json {
+            reports::SummaryOutputFormat::Json
+        } else {
+            reports::SummaryOutputFormat::Text
+        };
+           
+        reports::print_registry_summary(&model_manager.element_registry,output_format, &filters);
+        return Ok(0);        
+        
             
-            let output_format = if args.cypher {
-                reports::SummaryOutputFormat::Cypher
-            } else if args.json {
-                reports::SummaryOutputFormat::Json
-            } else {
-                reports::SummaryOutputFormat::Text
-            };
+    }else if args.change_impact {
+         
+        let base_url = git_commands::get_repository_base_url().map_err(|_| {
+            ReqvireError::ProcessError("❌ Failed to determine repository base url.".to_string())
+        })?;
 
+        let current_commit = git_commands::get_commit_hash().map_err(|_| {
+            ReqvireError::ProcessError("❌ Failed to retrieve the current commit hash.".to_string())
+        })?;
+             
+        let mut refference_model_manager = ModelManager::new();      
+        let _not_interested=refference_model_manager.parse_and_validate(Some(&args.git_commit), user_requirements_root_folder, excluded_filename_patterns);
+                                
+        let report=change_impact::compute_change_impact(
+            &model_manager.element_registry, 
+            &refference_model_manager.element_registry
+        )
+        .map_err(|e| ReqvireError::ProcessError(format!("❌ Failed to generate change impact report: {:?}", e)))?;
+         
+        report.print(&base_url, &current_commit, &args.git_commit, args.json);
             
-            reports::print_registry_summary(&model_manager.element_registry,output_format, &filters);
-            return Ok(0);        
-            
-            
-        }else if args.change_impact {
-            
-            let current_commit = git_commands::get_commit_hash().map_err(|_| {
-                ReqvireError::ProcessError("❌ Failed to retrieve the current commit hash.".to_string())
-            })?;
-
-            let repo_root = git_commands::repository_root().map_err(|_| {
-                ReqvireError::ProcessError("❌ Failed to determine repository root.".to_string())
-            })?;
-
-            let base_url = git_commands::get_repository_base_url().map_err(|_| {
-                ReqvireError::ProcessError("❌ Failed to determine repository base url.".to_string())
-            })?;
-
-            
-            let mut refference_model_manager = ModelManager::new();      
-            let _not_interested=refference_model_manager.parse_and_validate(Some(&args.git_commit), &specification_folder_path, &external_folders_path,excluded_filename_patterns);
-                                    
-            let report=change_impact::compute_change_impact(
-                &model_manager.element_registry, 
-                &refference_model_manager.element_registry,
-                &repo_root,
-                &specification_folder_path, 
-                &external_folders_path
-            )
-            .map_err(|e| ReqvireError::ProcessError(format!("❌ Failed to generate change impact report: {:?}", e)))?;
-            
-            report.print(&base_url, &current_commit, &args.git_commit, args.json);
-                
-            return Ok(0);
-            
+        return Ok(0);
+         
                                       
-        }else if args.lint {
-            linting::run_linting(&specification_folder_path, &external_folders_path,excluded_filename_patterns, args.dry_run)?;
-            return Ok(0);
+    }else if args.lint {
+        linting::run_linting(excluded_filename_patterns, args.dry_run, args.subdirectory.as_deref())?;
+        return Ok(0);
+                  
+    }else if args.traces {
+        let matrix_config = matrix_generator::MatrixConfig::default();
             
+        let matrix_output = reqvire::matrix_generator::generate_matrix(
+            &model_manager.element_registry,
+            &matrix_config,
+            if args.json {
+                matrix_generator::MatrixFormat::Json
+            } else if args.svg {
+                matrix_generator::MatrixFormat::Svg
+            } else {
+                matrix_generator::MatrixFormat::Markdown
+            },                
+        );
             
-        }else if args.traces {
-            let matrix_config = matrix_generator::MatrixConfig::default();
-            
-            let matrix_output = reqvire::matrix_generator::generate_matrix(
-                &model_manager.element_registry,
-                &matrix_config,
-                if args.json {
-                    matrix_generator::MatrixFormat::Json
-                } else if args.svg {
-                    matrix_generator::MatrixFormat::Svg
-                } else {
-                    matrix_generator::MatrixFormat::Markdown
-                },                
-            );
-            
-            println!("{}", matrix_output);
-            return Ok(0);
+        println!("{}", matrix_output);
+        return Ok(0);
             
            
-        } else if args.html {
-            let processed_count = html_export::export_markdown_to_html(specification_folder_path,&external_folders_path, output_folder_path)?;
-            info!("{} markdown files converted to HTML", processed_count);
-            return Ok(0);
-        }else{
-            Args::print_help();  
+    } else if args.html {
+        let processed_count = export::export_model(&model_manager.element_registry, output_folder_path)?;
+        info!("{} markdown files converted to HTML", processed_count);   
+        
+        return Ok(0);
+    }else{
+        Args::print_help();  
 
-        }
-    
     }
+    
     Ok(1)
 }
 
@@ -402,7 +379,6 @@ mod tests {
     fn test_handle_command() {
         // Mock CLI arguments
         let args = Args {
-            llm_context: false,
             html: false,
             lint: false,
             dry_run: false,
@@ -423,7 +399,8 @@ mod tests {
             validate: false,
             config: None, // No custom config file for the test
             change_impact: false, // Add the missing field
-            git_commit: "HEAD".to_string(), // Add the missing field with default value
+            git_commit: "HEAD".to_string(), // Add the missing field
+            subdirectory: None
         };
 
 
@@ -444,13 +421,14 @@ mod tests {
 
     
         // Run the handle_command function
+        let user_requirements_root = None;
         let result = handle_command(
             args,
-            &specification_folder_path,
-            &external_folders_path,            
             &output_folder_path,
             &build_glob_set(&excluded_filename_patterns),
             "TD",
+            false,
+            &user_requirements_root
         );
 
         // Assert that it runs without error

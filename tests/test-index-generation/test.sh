@@ -18,8 +18,12 @@
 # Create output directory if it doesn't exist
 mkdir -p "${TEST_DIR}/output"
 
+pushd "$TEST_DIR" > /dev/null 2>&1
+git init > /dev/null 2>&1
+popd > /dev/null 2>&1
+
 # Run reqvire with --generate-index flag
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" --generate-index 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --subdirectory tests/test-index-generation --config "${TEST_DIR}/reqvire.yaml" --generate-index 2>&1)
 EXIT_CODE=$?
 
 # Save output for inspection
@@ -31,15 +35,15 @@ if [ $EXIT_CODE -ne 0 ]; then
   exit 1
 fi
 
-# Check that README.md was generated (the index file is named README.md, not index.md)
-if [ ! -f "${TEST_DIR}/specifications/README.md" ]; then
-  echo "❌ FAILED: README.md not generated"
+# Check that SpecificationIndex.md was generated (the index file is named SpecificationIndex.md, not index.md)
+if [ ! -f "${TEST_DIR}/SpecificationIndex.md" ]; then
+  echo "❌ FAILED: SpecificationIndex.md not generated"
   exit 1
 fi
 
 # Verify index contains links to all specification documents
-DOCUMENT_COUNT=$(find "${TEST_DIR}/specifications" -name "*.md" | grep -v "README.md" | wc -l)
-LINK_COUNT=$(grep -c "\[.*\](.*\.md)" "${TEST_DIR}/specifications/README.md")
+DOCUMENT_COUNT=$(find "${TEST_DIR}" -name "*.md" | grep -v "SpecificationIndex.md" | wc -l)
+LINK_COUNT=$(grep -c "\[.*\](.*\.md)" "${TEST_DIR}/SpecificationIndex.md")
 
 if [ $LINK_COUNT -lt $DOCUMENT_COUNT ]; then
   echo "❌ FAILED: Index does not contain links to all documents (found $LINK_COUNT links, expected at least $DOCUMENT_COUNT)"
@@ -48,10 +52,9 @@ fi
 
 # We don't need to test HTML output as it's not part of the current functionality
 # Just ensure the README.md was properly generated with content
-if [ ! -s "${TEST_DIR}/specifications/README.md" ]; then
-  echo "❌ FAILED: README.md is empty or not properly generated"
+if [ ! -s "${TEST_DIR}/SpecificationIndex.md" ]; then
+  echo "❌ FAILED: SpecificationIndex.md is empty or not properly generated"
   exit 1
 fi
 
-echo "✅ PASSED: Index generation test"
 exit 0

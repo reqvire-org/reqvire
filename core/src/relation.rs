@@ -5,6 +5,8 @@ use serde::Serialize;
 use std::cmp::Ordering;
 use std::hash::Hash;
 use std::hash::Hasher;
+use crate::utils::EXTERNAL_SCHEMES;
+use std::path::PathBuf;
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
@@ -172,6 +174,7 @@ impl Hash for RelationTarget {
 pub enum LinkType {
     Identifier(String), // Internal reference, e.g., "some-identifier"
     ExternalUrl(String), // External URL, e.g., "https://example.com"
+    InternalPath(PathBuf), // Internal Path, e.g., "../core/src/digrams.rs"    
 }
 impl LinkType {
     /// Converts `LinkType` into a string representation.
@@ -179,6 +182,8 @@ impl LinkType {
         match self {
             LinkType::Identifier(id) => id,
             LinkType::ExternalUrl(url) => url,
+            LinkType::InternalPath(path) =>  path.to_str()
+                    .expect(&format!("InternalPath is not valid UTF-8: {:?}", path))
         }
     }
 }
@@ -242,14 +247,16 @@ impl Relation {
         })
     }
     
-    /// Determines if the link should be treated as an identifier or an external URL.
+    /// Determines if the link should be treated as an identifier, internal path or an external URL.
     fn parse_link_type(link: &str) -> LinkType {
-        if Self::is_path_reference(link) {
+        if EXTERNAL_SCHEMES.iter().any(|scheme| link.starts_with(scheme)) {
+            LinkType::ExternalUrl(link.to_string())
+        } else if link.contains('#') {
             LinkType::Identifier(link.to_string())
         } else {
-            LinkType::ExternalUrl(link.to_string())
+            LinkType::InternalPath(PathBuf::from(link))
         }
-    }
+    }    
 
     pub fn update_target_identifier_link_url(&mut self, url: &str)  {
         match self.target.link {
@@ -258,24 +265,6 @@ impl Relation {
         };  
     }
 
-
-    /// Determines whether the given string is a path reference (i.e., identifier).
-    fn is_path_reference(link: &str) -> bool {
-        // Common external protocols used in documentation and software
-        let external_protocols = [
-            "http://", "https://", // Web
-            "file://",  // Local file paths
-            "ftp://",   // FTP links
-            "mailto:",  // Email links
-            "ssh://",   // SSH links
-            "git://",   // Git repository links
-            "data:",    // Data URIs
-        ];
-
-        // Check if the link starts with any of these external protocols
-        !external_protocols.iter().any(|&proto| link.starts_with(proto))
-    } 
-    
 
     /// Creates an opposite relation if possible for given target
     pub fn to_opposite(&self, name: &str, identifier: &str) -> Option<Relation> {

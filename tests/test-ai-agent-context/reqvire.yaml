@@ -1,7 +1,0 @@
-paths:
-  specifications_folder: "./specifications"
-  output_folder: "output"
-
-style:
-  theme: "light"
-  max_width: 1200

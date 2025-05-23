@@ -1,6 +1,6 @@
 
 paths:
-  specifications_folder: "."
+  user_requirements_root_folder: "."
   external_folders:
     - ./software
       
@@ -14,4 +14,3 @@ paths:
 style:
   theme: "light"
   max_width: 1200
-

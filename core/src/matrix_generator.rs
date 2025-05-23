@@ -1,13 +1,11 @@
 // traceability_matrix.rs
 
 use std::collections::{HashMap, HashSet};
-use std::path::{Path, PathBuf};
 use serde_json::{json};
 use crate::element_registry::ElementRegistry;
 use crate::element::{Element, ElementType};
 use crate::relation::{LinkType, RELATION_TYPES};
 use crate::git_commands;
-use crate::utils;
 use crate::element;
 
 /// Enum to specify the matrix format
@@ -52,7 +50,6 @@ pub fn generate_matrix(
     format: MatrixFormat,    
 ) -> String {
     // Retrieve Git repository information
-    let repo_root = git_commands::repository_root().unwrap_or_else(|_| PathBuf::from(""));
     let base_url = git_commands::get_repository_base_url().unwrap_or_default();
     let commit_hash = git_commands::get_commit_hash().unwrap_or_else(|_| String::from("HEAD"));
 
@@ -100,7 +97,6 @@ pub fn generate_matrix(
             &target_elements,
             &config.relation_types,
             &registry,
-            &repo_root,
             &base_url,
             &commit_hash,
         ),
@@ -109,7 +105,6 @@ pub fn generate_matrix(
             &source_elements,
             &target_elements,
             &config.relation_types,
-            &repo_root,
             &base_url,
             &commit_hash,
         ),
@@ -127,7 +122,6 @@ fn generate_matrix_table(
     source_elements: &[&Element],
     matrix_data: &HashMap<String, HashSet<String>>,
     output: &mut String,
-    repo_root: &PathBuf,
     base_url: &str,
     commit_hash: &str,
 ) {
@@ -152,11 +146,7 @@ fn generate_matrix_table(
     output.push_str("| Requirement | Verified |");
     for target in &relevant_targets {
         let short_name = get_short_element_name(target);
-        let relative_id = utils::get_relative_path_from_root(&PathBuf::from(&target.identifier), repo_root)
-            .unwrap_or_else(|_| PathBuf::from(&target.identifier))
-            .to_string_lossy()
-            .to_string();
-        let target_url = format!("{}/blob/{}/{}", base_url, commit_hash, relative_id);
+        let target_url = format!("{}/blob/{}/{}", base_url, commit_hash, &target.identifier);
         output.push_str(&format!(" [{}]({}) |", short_name, target_url));
     }
     output.push_str("\n|");
@@ -213,10 +203,6 @@ fn generate_matrix_table(
     for (source, level) in sorted_hierarchy {
         let source_id = &source.identifier;
         let short_name = get_short_element_name(source);
-        let relative_id = utils::get_relative_path_from_root(&PathBuf::from(source_id), repo_root)
-            .unwrap_or_else(|_| PathBuf::from(source_id))
-            .to_string_lossy()
-            .to_string();
         let indentation = match level {
             0 => "",
             1 => "↳ ",
@@ -224,7 +210,7 @@ fn generate_matrix_table(
             3 => "____↳ ",
             _ => "______↳ ",
         };
-        let source_url = format!("{}/blob/{}/{}", base_url, commit_hash, relative_id);
+        let source_url = format!("{}/blob/{}/{}", base_url, commit_hash, source_id);
         output.push_str(&format!("| [{}{}]({}) |", indentation, short_name, source_url));
 
         let is_verified = matrix_data.get(source_id).map_or(false, |targets| !targets.is_empty());
@@ -250,7 +236,6 @@ fn generate_markdown_matrix(
     target_elements: &[&Element],
     relation_types: &[&str],
     registry: &ElementRegistry,
-    repo_root: &PathBuf,
     base_url: &str,
     commit_hash: &str,
 ) -> String {
@@ -285,7 +270,6 @@ fn generate_markdown_matrix(
             source_elements,
             matrix_data,
             &mut output,
-            repo_root,
             base_url,
             commit_hash,
         );
@@ -302,7 +286,6 @@ fn generate_markdown_matrix(
                         group_elements,
                         matrix_data,
                         &mut output,
-                        repo_root,
                         base_url,
                         commit_hash,
                     );
@@ -328,7 +311,6 @@ fn generate_json_matrix(
     source_elements: &[&Element],
     target_elements: &[&Element],
     relation_types: &[&str],
-    repo_root: &Path,
     base_url: &str,
     commit_hash: &str,
 ) -> String {
@@ -340,47 +322,25 @@ fn generate_json_matrix(
 
     // Collect sources
     let sources = source_elements.iter().map(|e| {
-        let rel_path = utils::get_relative_path_from_root(&PathBuf::from(&e.identifier), &repo_root.to_path_buf())
-            .unwrap_or_else(|_| PathBuf::from(&e.identifier))
-            .to_string_lossy()
-            .to_string();
-        let url = format!("{}/blob/{}/{}", base_url, commit_hash, rel_path);
-        json!({"id": rel_path, "name": e.name, "url": url})
+        let url = format!("{}/blob/{}/{}", base_url, commit_hash, &e.identifier);
+        json!({"id": &e.identifier, "name": e.name, "url": url})
     }).collect::<Vec<_>>();
 
     // Collect targets
     let targets = target_elements.iter().map(|e| {
-        let rel_path = utils::get_relative_path_from_root(&PathBuf::from(&e.identifier), &repo_root.to_path_buf())
-            .unwrap_or_else(|_| PathBuf::from(&e.identifier))
-            .to_string_lossy()
-            .to_string();
-        let url = format!("{}/blob/{}/{}", base_url, commit_hash, rel_path);
-        json!({"id": rel_path, "name": e.name, "url": url})
+        let url = format!("{}/blob/{}/{}", base_url, commit_hash, &e.identifier);
+        json!({"id": &e.identifier, "name": e.name, "url": url})
     }).collect::<Vec<_>>();
 
     // Collect matrix data
     let matrix = matrix_data.iter().map(|(source_id, targets)| {
-        let rel_source_id = utils::get_relative_path_from_root(&PathBuf::from(source_id), &repo_root.to_path_buf())
-            .unwrap_or_else(|_| PathBuf::from(source_id))
-            .to_string_lossy()
-            .to_string();
-        let rel_targets = targets.iter().map(|target_id| {
-            utils::get_relative_path_from_root(&PathBuf::from(target_id), &repo_root.to_path_buf())
-                .unwrap_or_else(|_| PathBuf::from(target_id))
-                .to_string_lossy()
-                .to_string()
-        }).collect::<Vec<_>>();
-        (rel_source_id, rel_targets)
+        (source_id, targets)
     }).collect::<HashMap<_, _>>();
 
     // Create verification status for each requirement
     let verification_status = source_elements.iter().map(|e| {
-        let source_id = utils::get_relative_path_from_root(&PathBuf::from(&e.identifier), &repo_root.to_path_buf())
-            .unwrap_or_else(|_| PathBuf::from(&e.identifier))
-            .to_string_lossy()
-            .to_string();
         let is_verified = matrix_data.get(&e.identifier).map_or(false, |targets| !targets.is_empty());
-        (source_id, is_verified)
+        (&e.identifier, is_verified)
     }).collect::<HashMap<_, _>>();
 
     let output = json!({
