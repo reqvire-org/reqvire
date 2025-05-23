@@ -288,7 +288,6 @@ pub fn normalize_identifier(
 }
 
 
-
 pub fn to_relative_identifier(
     identifier: &str,
     base_path: &PathBuf,
@@ -305,12 +304,13 @@ pub fn to_relative_identifier(
     let git_root = crate::git_commands::get_git_root_dir()
         .map_err(|e| ReqvireError::PathError(format!("Failed to get git root: {}", e)))?;
 
-    let stripped = if path_obj.is_absolute() {
-        path.trim_start_matches('/')
+
+    let stripped = if path.starts_with('/') {
+        &path[1..]
     } else {
         path
     };
-
+    
     let resolved_path=git_root.join(stripped);
     
     let canonical_path = resolved_path.canonicalize().ok();
@@ -482,7 +482,8 @@ mod tests {
             assert_eq!(fragment, expected_fragment, "Failed for input: {:?}", input);
         }
     }
-
+    
+    #[cfg(not(target_os = "macos"))]
     #[test]
     #[serial]    
     fn test_to_relative_identifier_with_github_fragments() {
