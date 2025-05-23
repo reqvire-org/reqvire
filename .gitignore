@@ -4,7 +4,6 @@ tmpdoc
 # Rust-specific ignores
 /target/
 **/*.rs.bk
-Cargo.lock
 
 # IDE files
 .idea/
