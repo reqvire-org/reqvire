@@ -6,13 +6,13 @@
        
   # Glob patterns to exclude from requirements processing
   excluded_filename_patterns:
-    - "Usecases.md"
+    - "SpecificationIndex.md"
     - "**/Logical*.md"
     - "**/Physical*.md"
     - "**/TODO.md"
-    - "**/tests/**"    
-    - "**/core/**"    
-    - "**/cli/**"            
+    - "**/doc/**"
+    - "**/html/**"    
+    - "*/.github/**"           
 
 style:
   # Theme for HTML output (default, dark, light)

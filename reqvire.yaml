@@ -12,6 +12,7 @@ paths:
   excluded_filename_patterns:
     - "Usecases.md"
     - "CLAUDE.md"
+    - "SpecificationIndex.md"
     - "codefetch/**"
     - "**/Logical*.md"
     - "**/Physical*.md"
@@ -22,6 +23,7 @@ paths:
     - "**/cli/**"            
     - "**/doc/**"
     - "**/html/**"    
+    - "*/.github/**"    
 
 style:
   # Theme for HTML output (default, dark, light)

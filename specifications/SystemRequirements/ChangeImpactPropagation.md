@@ -11,17 +11,6 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  c8d1020a3844532d["Change Impact Detection Algorithm"];
-  class c8d1020a3844532d requirement;
-  click c8d1020a3844532d "ChangeImpactPropagation.md#change-impact-detection-algorithm";
-  2054606d7574a553["../SpecificationsRequirements.md#requirements-change-propagation"];
-  class 2054606d7574a553 requirement;
-  click 2054606d7574a553 "../SpecificationsRequirements.md#requirements-change-propagation";
-  c8d1020a3844532d -.->|deriveReqT| 2054606d7574a553;
-  4b89dbed94c08c3e["../../core/src/change_impact.rs"];
-  class 4b89dbed94c08c3e default;
-  click 4b89dbed94c08c3e "../../core/src/change_impact.rs";
-  4b89dbed94c08c3e -->|satisfies| c8d1020a3844532d;
   37a75398bd174177["Change Impact Command Line Interface"];
   class 37a75398bd174177 requirement;
   click 37a75398bd174177 "ChangeImpactPropagation.md#change-impact-command-line-interface";
@@ -36,11 +25,22 @@ graph LR;
   4ba519ed09b81863["Change Impact Visualization"];
   class 4ba519ed09b81863 requirement;
   click 4ba519ed09b81863 "ChangeImpactPropagation.md#change-impact-visualization";
+  2054606d7574a553["../SpecificationsRequirements.md#requirements-change-propagation"];
+  class 2054606d7574a553 requirement;
+  click 2054606d7574a553 "../SpecificationsRequirements.md#requirements-change-propagation";
   4ba519ed09b81863 -.->|deriveReqT| 2054606d7574a553;
   4b89dbed94c08c3e["../../core/src/change_impact.rs"];
   class 4b89dbed94c08c3e default;
   click 4b89dbed94c08c3e "../../core/src/change_impact.rs";
   4b89dbed94c08c3e -->|satisfies| 4ba519ed09b81863;
+  c8d1020a3844532d["Change Impact Detection Algorithm"];
+  class c8d1020a3844532d requirement;
+  click c8d1020a3844532d "ChangeImpactPropagation.md#change-impact-detection-algorithm";
+  c8d1020a3844532d -.->|deriveReqT| 2054606d7574a553;
+  4b89dbed94c08c3e["../../core/src/change_impact.rs"];
+  class 4b89dbed94c08c3e default;
+  click 4b89dbed94c08c3e "../../core/src/change_impact.rs";
+  4b89dbed94c08c3e -->|satisfies| c8d1020a3844532d;
 ```
 
 ---
