@@ -378,30 +378,6 @@ LINT OPTIONS:
 
 ---
 
-### Subdirectory Processing Option
-
-The system shall provide an option (--subdirectory) that allows processing only files within a specific subdirectory relative to the git repository root, enabling focused analysis and improved performance when working with large repositories.
-
-#### Details
-
-The subdirectory flag is designed to limit the scope of processing to a specific subdirectory, which is especially useful in large repositories with many requirements files. This flag allows users to:
-
-1. Process only files within the specified subdirectory and its nested folders
-2. Generate reports, diagrams, and validations based on the limited scope
-3. Improve performance by reducing the number of files that need to be processed
-
-The flag takes a path that is relative to the git repository root and should be used as follows:
-```
-reqvire --subdirectory="specifications/Verifications" validate
-```
-
-#### Relations
-  * derivedFrom: [ManagingMbseModelsRequirements.md/Project Configuration with YAML](../ManagingMbseModelsRequirements.md#project-configuration-with-yaml)
-  * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
-  * containedBy: [CLI Interface Structure](#cli-interface-structure)  
-
----
-
 ### Lint Command
 
 The system shall provide a linting function, activated by the (lint command), which shall execute the linting process upon user request.
@@ -569,6 +545,33 @@ The system shall parse the files in all folders and subfolders from the root of 
   * derivedFrom: [Ignoring Unstructured Documents](#ignoring-unstructured-documents)  
   * satisfiedBy: [model.rs](../../core/src/model.rs)
   * satisfiedBy: [parser.rs](../../core/src/parser.rs)  
+
+---
+
+
+### Subdirectory Processing Option
+
+The system shall automatically detect when it is run from a subdirectory of a git repository and process only files within that subdirectory, enabling focused analysis and improved performance when working with large repositories.
+
+#### Details
+
+The subdirectory auto-detection is designed to limit the scope of processing to the current working directory when it is a subdirectory of the git root, which is especially useful in large repositories with many requirements files. This behavior allows users to:
+
+1. Process only files within the current directory and its nested folders when run from a subdirectory
+2. Generate reports, diagrams, and validations based on the limited scope
+3. Improve performance by reducing the number of files that need to be processed
+4. Work intuitively without needing to specify additional flags
+
+When run from the git root, the system processes all files. When run from a subdirectory, it automatically limits scope to that subdirectory:
+```
+cd specifications/Verifications
+reqvire validate  # Only processes files in Verifications directory
+```
+
+#### Relations
+  * derivedFrom: [ManagingMbseModelsRequirements.md/Project Configuration with YAML](../ManagingMbseModelsRequirements.md#project-configuration-with-yaml)
+  * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
+  * containedBy: [CLI Interface Structure](#cli-interface-structure)  
 
 ---
 

@@ -21,14 +21,12 @@ pub mod nonlink_identifiers;
 pub fn run_linting(
     excluded_filename_patterns: &GlobSet,
     dry_run: bool,
-    subdirectory: Option<&str>,
 ) -> Result<(), ReqvireError> {
     debug!("Starting linting process...");
 
     let files = utils::scan_markdown_files(
         None,
-        excluded_filename_patterns,
-        subdirectory
+        excluded_filename_patterns
     );
     debug!("Found {} markdown files to lint", files.len());
 
@@ -598,7 +596,7 @@ mod tests {
         let excluded_patterns = GlobSetBuilder::new().build().unwrap();
         
         // Run linting ONLY on the temporary directory
-        let result = run_linting(&excluded_patterns, true, Some(&temp_dir_str));
+        let result = run_linting(&excluded_patterns, true);
 
         assert!(result.is_ok(), "Linting should run without errors");
     }

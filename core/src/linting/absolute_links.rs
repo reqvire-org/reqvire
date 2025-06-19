@@ -131,7 +131,6 @@ Some text
 
         // Step 4: Run the actual logic
         let suggestions = find_absolute_links(content, &test_file_path);
-        dbg!("{}",&suggestions);
 
         // Step 5: Validate suggestions
         assert_eq!(suggestions.len(), 2);

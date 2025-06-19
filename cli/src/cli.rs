@@ -34,9 +34,6 @@ pub struct Args {
     #[clap(long, short = 'c', global = true)]
     pub config: Option<PathBuf>,
     
-    /// Process only files within a specific subdirectory relative to git root (hidden flag for testing)
-    #[clap(long, hide = true, global = true)]
-    pub subdirectory: Option<String>,
 }
 
 #[derive(Subcommand, Debug)]
@@ -370,7 +367,7 @@ pub fn handle_command(
             return Ok(0);
         },
         Some(Commands::Lint { dry_run, json: _ }) => {
-            linting::run_linting(excluded_filename_patterns, dry_run, args.subdirectory.as_deref())?;
+            linting::run_linting(excluded_filename_patterns, dry_run)?;
             return Ok(0);
         },
         Some(Commands::Traces { json, svg }) => {
@@ -437,7 +434,6 @@ mod tests {
         let args = Args {
             command: Some(Commands::Html { output: "html".to_string() }),
             config: None,
-            subdirectory: None
         };
 
         // Define test input paths

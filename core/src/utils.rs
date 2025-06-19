@@ -54,12 +54,12 @@ pub fn is_in_user_requirements_root(
 }
 
 /// Scans the git root folder for markdown files, excluding files based on patterns.
+/// If the current working directory is a subfolder of the git root, only scans within that subfolder.
 /// 
 /// # Arguments
 /// 
 /// * `commit` - Optional commit ID to scan files from a specific commit
 /// * `excluded_filename_patterns` - Glob patterns for files to exclude
-/// * `subdirectory` - Optional subdirectory relative to git root to scan (instead of scanning the entire repository)
 /// 
 /// # Returns
 /// 
@@ -67,14 +67,12 @@ pub fn is_in_user_requirements_root(
 pub fn scan_markdown_files(
     commit: Option<&str>,
     excluded_filename_patterns: &GlobSet,
-    subdirectory: Option<&str>
 ) -> Vec<PathBuf> {
     match commit {
         Some(commit_id) => {
             scan_markdown_files_from_commit(
                 commit_id,
-                excluded_filename_patterns,
-                subdirectory
+                excluded_filename_patterns
             )
         }
         None => {
@@ -89,10 +87,15 @@ pub fn scan_markdown_files(
                 }
             };
             
-            // Determine scan directory (git root or subdirectory within git root)
-            let scan_dir = match subdirectory {
-                Some(subdir) => git_root.join(subdir),
-                None => git_root
+            // Get current working directory
+            let current_dir = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
+            
+            // Determine scan directory - if current directory is within git root but not at git root,
+            // scan only within the current directory subtree
+            let scan_dir = if current_dir.starts_with(&git_root) && current_dir != git_root {
+                current_dir
+            } else {
+                git_root
             };
             
             debug!("Scanning for markdown files in: {}", scan_dir.display());
@@ -118,11 +121,9 @@ pub fn scan_markdown_files(
 /// 
 /// - `commit`: The Git commit (e.g. `"HEAD"`) where we want to look for files.
 /// - `excluded_filename_patterns`: Glob patterns for files to exclude
-/// - `subdirectory`: Optional subdirectory relative to git root to scan (ignored in this function currently)
 pub fn scan_markdown_files_from_commit(
     commit: &str,
     excluded_filename_patterns: &GlobSet,
-    _subdirectory: Option<&str>,
 ) -> Vec<PathBuf> {
     let mut files = Vec::new();
 
@@ -240,18 +241,41 @@ pub fn normalize_identifier(
     let full_path = {
         let p = Path::new(path_part);
         if p.is_absolute() {
-            p.canonicalize()
-             .map_err(|e| ReqvireError::PathError(format!(
-                 "Failed to canonicalize absolute `{}`: {}",
-                 p.display(), e
-             )))?
+            // For absolute paths, use them directly without canonicalization
+            // This allows cross-references to work even when files don't exist
+            p.to_path_buf()
         } else {
-            base_path.join(p)
-                .canonicalize()
-                .map_err(|e| ReqvireError::PathError(format!(
-                    "Failed to canonicalize `{}`: {}",
-                    base_path.join(p).display(), e
-                )))?
+            let joined_path = base_path.join(p);
+            // Try to canonicalize relative path, fall back to logical path resolution if it fails
+            match joined_path.canonicalize() {
+                Ok(canonical) => canonical,
+                Err(_) => {
+                    // If canonicalization fails (e.g., file doesn't exist or is outside subdirectory),
+                    // resolve the path logically by normalizing . and .. components
+                    let mut resolved_path = base_path.clone();
+                    
+                    // Process the relative path components
+                    for component in p.components() {
+                        match component {
+                            std::path::Component::Normal(_) => {
+                                resolved_path.push(component);
+                            }
+                            std::path::Component::ParentDir => {
+                                resolved_path.pop();
+                            }
+                            std::path::Component::CurDir => {
+                                // Skip current directory references
+                            }
+                            _ => {
+                                // Handle other component types (like RootDir, Prefix)
+                                resolved_path.push(component);
+                            }
+                        }
+                    }
+                    
+                    resolved_path
+                }
+            }
         }
     };
 

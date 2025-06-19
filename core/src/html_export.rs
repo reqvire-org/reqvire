@@ -2,21 +2,47 @@ use std::fs;
 use std::path::{PathBuf,Path};
 use crate::html;
 use crate::error::ReqvireError;
+use crate::git_commands;
 use walkdir::WalkDir;
+use log::debug;
 
 
 /// Exports all markdown files to HTML without any processing or filtering
+/// Uses auto-detection logic: if current directory is a subfolder of git root, 
+/// only process files within that subfolder
 pub fn export_markdown_to_html(
-    base_dir: &PathBuf,
+    _base_dir: &PathBuf,
     output_folder: &Path,
 ) -> Result<usize, ReqvireError> {
 
     let mut processed_count = 0;
 
-    // Process all markdown files in the repository
+    // Get git root directory
+    let git_root = match git_commands::get_git_root_dir() {
+        Ok(dir) => dir,
+        Err(_) => {
+            debug!("Not in a git repository, using current directory");
+            std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."))
+        }
+    };
+    
+    // Get current working directory
+    let current_dir = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
+    
+    // Determine scan directory - if current directory is within git root but not at git root,
+    // scan only within the current directory subtree
+    let scan_dir = if current_dir.starts_with(&git_root) && current_dir != git_root {
+        current_dir
+    } else {
+        git_root.clone()
+    };
+    
+    debug!("HTML export scanning for markdown files in: {}", scan_dir.display());
+
+    // Process all markdown files in the determined directory
     processed_count += process_markdown_files(
-        &base_dir,
-        &base_dir,
+        &scan_dir,
+        &git_root,
         output_folder,
     )?;
 
@@ -26,7 +52,7 @@ pub fn export_markdown_to_html(
 
 /// Processes all markdown files in a directory and converts them to HTML
 fn process_markdown_files(
-    root_folder: &Path,
+    scan_folder: &Path,
     base_folder: &Path,
     output_folder: &Path,
 ) -> Result<usize, ReqvireError> {
@@ -34,10 +60,10 @@ fn process_markdown_files(
     let mut all_files = Vec::new();
     
     // Process SpecificationIndex.md first to ensure it becomes index.html
-    let spec_index_path = base_folder.join("SpecificationIndex.md");
+    let spec_index_path = scan_folder.join("SpecificationIndex.md");
     
     // Process all files using WalkDir
-    for entry in WalkDir::new(root_folder)
+    for entry in WalkDir::new(scan_folder)
         .into_iter()
         .filter_map(Result::ok)
         .filter(|e| e.path().is_file() && e.path().extension().map_or(false, |ext| ext == "md"))
@@ -47,7 +73,7 @@ fn process_markdown_files(
         
         // Process SpecificationIndex.md first if it exists
         if file_path == spec_index_path {
-            export_file_to_html(&file_path, base_folder, output_folder)?;
+            export_file_to_html(&file_path, scan_folder, base_folder, output_folder)?;
             count += 1;
         } else {
             all_files.push(file_path);
@@ -56,7 +82,7 @@ fn process_markdown_files(
     
     // Process all other Markdown files
     for file_path in all_files {
-        export_file_to_html(&file_path, base_folder, output_folder)?;
+        export_file_to_html(&file_path, scan_folder, base_folder, output_folder)?;
         count += 1;
     }
 
@@ -67,6 +93,7 @@ fn process_markdown_files(
 /// If the file is `SpecificationIndex.md`, it is renamed to `index.html`.
 fn export_file_to_html(
     file_path: &Path,
+    scan_folder: &Path,
     base_folder: &Path,
     output_folder: &Path,
 ) -> Result<(), ReqvireError> {
@@ -77,8 +104,8 @@ fn export_file_to_html(
         .to_string_lossy();
     let title = file_name.replace(".md", "");
 
-    // Get the relative path for link resolution
-    let rel_path = file_path.strip_prefix(base_folder)
+    // Get the relative path for output directory structure - strip scan folder prefix
+    let rel_path = file_path.strip_prefix(scan_folder)
         .map_err(|_| ReqvireError::PathError(format!("Failed to determine relative path for {}", file_path.display())))?;
     
     // Pass the file's path and base folder to convert_to_html 

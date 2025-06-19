@@ -23,7 +23,7 @@ git init > /dev/null 2>&1
 popd > /dev/null 2>&1
 
 # Run reqvire with generate-index flag
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --subdirectory tests/test-index-generation --config "${TEST_DIR}/reqvire.yaml" generate-index 2>&1)
+OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" generate-index 2>&1)
 EXIT_CODE=$?
 
 # Save output for inspection

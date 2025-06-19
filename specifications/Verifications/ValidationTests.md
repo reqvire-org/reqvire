@@ -274,7 +274,7 @@ graph LR;
 
 ### Subdirectory Processing Verification
 
-This test verifies that the system correctly processes only files within a specified subdirectory when using the --subdirectory flag.
+This test verifies that the system correctly processes only files within the current directory when run from a subfolder of a git repository.
 
 #### Metadata
   * type: verification
@@ -282,19 +282,19 @@ This test verifies that the system correctly processes only files within a speci
 #### Details
 
 ##### Acceptance Criteria
-- System shall process only files within the specified subdirectory when --subdirectory flag is used
+- System shall process only files within the current directory when run from a subfolder
 - System shall handle identifier normalization correctly within subdirectory context  
-- System shall validate cross-references correctly even when they point outside subdirectory
+- System shall validate cross-references correctly even when they point outside current directory
 - System shall work with validate, model-summary, html, lint, and traces commands
-- System shall ignore files outside the specified subdirectory
+- System shall ignore files outside the current directory scope
 - System shall provide meaningful error messages for invalid cross-references
 
 ##### Test Criteria
-- Commands with --subdirectory flag process only files within specified subdirectory
-- Files outside subdirectory are not included in processing or output
+- Commands run from subdirectory process only files within that subdirectory
+- Files outside the current directory are not included in processing or output
 - Identifier normalization works correctly for paths within subdirectory
-- Cross-references to files outside subdirectory are handled gracefully
-- All major commands (validate, model-summary, html, lint, traces) work with --subdirectory
+- Cross-references to files outside current directory are handled gracefully
+- All major commands (validate, model-summary, html, lint, traces) work from subdirectories
 - Commands exit with success (0) return code when subdirectory processing works correctly
 - Error messages are clear when identifier normalization fails for cross-references
 
