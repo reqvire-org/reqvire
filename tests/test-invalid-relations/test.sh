@@ -33,8 +33,8 @@ if ! [ $EXIT_CODE -eq 0 ]; then
 fi
 
 # Check for specific error messages - comprehensive validation now detects more error types
-EXPECTED_ERRORS="Duplicate element,Invalid metadata format,Invalid relation format,Unsupported relation type,Duplicate subsection,Missing relation target,Incompatible element types for relation,Circular dependency error,Missing parent relation"
-ACTUAL_ERRORS="$(echo "$OUTPUT" | jq -r '.errors[]' | sed -r 's/:.*//' | paste -sd,)"
+EXPECTED_ERRORS="Circular dependency error,Duplicate element,Duplicate subsection,Incompatible element types for relation,Invalid metadata format,Invalid relation format,Missing parent relation,Missing relation target,Unsupported relation type"
+ACTUAL_ERRORS="$(echo "$OUTPUT" | jq -r '.errors[]' | sed -r 's/:.*//' | sort | paste -sd,)"
 
 if [[ "$ACTUAL_ERRORS" != "$EXPECTED_ERRORS" ]]; then
   echo "❌ FAILED: Expected errors missing."

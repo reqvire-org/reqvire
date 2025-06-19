@@ -29,7 +29,6 @@ git add . > /dev/null 2>&1
 git commit -m "Initial test structure" > /dev/null 2>&1
 
 # Test 1: Validate from submodule directory - should focus only on submodule
-echo "Testing validate command from submodule directory..."
 OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" validate 2>&1)
 EXIT_CODE=$?
 
@@ -50,7 +49,6 @@ if echo "$OUTPUT" | grep -q "File specifications/MainRequirements.md"; then
 fi
 
 # Test 2: Model summary from submodule directory
-echo "Testing model-summary command from submodule directory..."
 OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" model-summary 2>&1)
 EXIT_CODE=$?
 
@@ -77,7 +75,6 @@ if ! echo "$OUTPUT" | grep -q "Submodule Requirement One"; then
 fi
 
 # Test 3: HTML export from submodule directory
-echo "Testing HTML export from submodule directory..."
 OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" html --output subdirectory-html 2>&1)
 EXIT_CODE=$?
 
@@ -101,7 +98,6 @@ if [ ! -f "${TMP_DIR}/project-root/submodule/subdirectory-html/specifications/Su
 fi
 
 # Test 4: Lint from submodule directory
-echo "Testing lint command from submodule directory..."
 OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" lint --dry-run 2>&1)
 EXIT_CODE=$?
 
@@ -114,7 +110,6 @@ if [ $EXIT_CODE -ne 0 ]; then
 fi
 
 # Test 5: Traces from submodule directory
-echo "Testing traces command from submodule directory..."
 OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" traces 2>&1)
 EXIT_CODE=$?
 
