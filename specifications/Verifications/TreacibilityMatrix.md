@@ -11,47 +11,17 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  5a25cf6244f4f44["Hierarchical Matrix Format Test"];
-  class 5a25cf6244f4f44 verification;
-  click 5a25cf6244f4f44 "TreacibilityMatrix.md#hierarchical-matrix-format-test";
-  b55d8517cd3e58["SystemRequirements/Requirements.md/Traceability Matrix Builder Implementation"];
-  class b55d8517cd3e58 requirement;
-  click b55d8517cd3e58 "../SystemRequirements/Requirements.md#traceability-matrix-builder-implementation";
-  5a25cf6244f4f44 -.->|verifies| b55d8517cd3e58;
-  8aec4f4d071ac12c["tests/test-matrix-generation/test.sh"];
-  class 8aec4f4d071ac12c default;
-  click 8aec4f4d071ac12c "../../tests/test-matrix-generation/test.sh";
-  8aec4f4d071ac12c -->|satisfies| 5a25cf6244f4f44;
-  50c290277850dd17["JSON Matrix Output Test"];
-  class 50c290277850dd17 verification;
-  click 50c290277850dd17 "TreacibilityMatrix.md#json-matrix-output-test";
-  1b7491b67a792bc9["SystemRequirements/Requirements.md/Markdown Matrix Formatter"];
-  class 1b7491b67a792bc9 requirement;
-  click 1b7491b67a792bc9 "../SystemRequirements/Requirements.md#markdown-matrix-formatter";
-  50c290277850dd17 -.->|verifies| 1b7491b67a792bc9;
-  8aec4f4d071ac12c["tests/test-matrix-generation/test.sh"];
-  class 8aec4f4d071ac12c default;
-  click 8aec4f4d071ac12c "../../tests/test-matrix-generation/test.sh";
-  8aec4f4d071ac12c -->|satisfies| 50c290277850dd17;
   7f6c7f917ed529ae["CLI Traces Flag Test"];
   class 7f6c7f917ed529ae verification;
   click 7f6c7f917ed529ae "TreacibilityMatrix.md#cli-traces-flag-test";
-  cb36e164a6ea70ff["SystemRequirements/Requirements.md/CLI Traces Flag"];
-  class cb36e164a6ea70ff requirement;
-  click cb36e164a6ea70ff "../SystemRequirements/Requirements.md#cli-traces-flag";
-  7f6c7f917ed529ae -.->|verifies| cb36e164a6ea70ff;
+  5bfc0d5fd7bba25["SystemRequirements/Requirements.md/CLI Traces Command"];
+  class 5bfc0d5fd7bba25 requirement;
+  click 5bfc0d5fd7bba25 "../SystemRequirements/Requirements.md#cli-traces-command";
+  7f6c7f917ed529ae -.->|verifies| 5bfc0d5fd7bba25;
   8aec4f4d071ac12c["tests/test-matrix-generation/test.sh"];
   class 8aec4f4d071ac12c default;
   click 8aec4f4d071ac12c "../../tests/test-matrix-generation/test.sh";
   8aec4f4d071ac12c -->|satisfies| 7f6c7f917ed529ae;
-  aa85c85e7c41d899["Traceability Matrix Generation Test"];
-  class aa85c85e7c41d899 verification;
-  click aa85c85e7c41d899 "TreacibilityMatrix.md#traceability-matrix-generation-test";
-  aa85c85e7c41d899 -.->|verifies| b55d8517cd3e58;
-  8aec4f4d071ac12c["tests/test-matrix-generation/test.sh"];
-  class 8aec4f4d071ac12c default;
-  click 8aec4f4d071ac12c "../../tests/test-matrix-generation/test.sh";
-  8aec4f4d071ac12c -->|satisfies| aa85c85e7c41d899;
   62b41611d85d4161["SVG Matrix Output Test"];
   class 62b41611d85d4161 verification;
   click 62b41611d85d4161 "TreacibilityMatrix.md#svg-matrix-output-test";
@@ -63,6 +33,36 @@ graph LR;
   class 8aec4f4d071ac12c default;
   click 8aec4f4d071ac12c "../../tests/test-matrix-generation/test.sh";
   8aec4f4d071ac12c -->|satisfies| 62b41611d85d4161;
+  50c290277850dd17["JSON Matrix Output Test"];
+  class 50c290277850dd17 verification;
+  click 50c290277850dd17 "TreacibilityMatrix.md#json-matrix-output-test";
+  1b7491b67a792bc9["SystemRequirements/Requirements.md/Markdown Matrix Formatter"];
+  class 1b7491b67a792bc9 requirement;
+  click 1b7491b67a792bc9 "../SystemRequirements/Requirements.md#markdown-matrix-formatter";
+  50c290277850dd17 -.->|verifies| 1b7491b67a792bc9;
+  8aec4f4d071ac12c["tests/test-matrix-generation/test.sh"];
+  class 8aec4f4d071ac12c default;
+  click 8aec4f4d071ac12c "../../tests/test-matrix-generation/test.sh";
+  8aec4f4d071ac12c -->|satisfies| 50c290277850dd17;
+  aa85c85e7c41d899["Traceability Matrix Generation Test"];
+  class aa85c85e7c41d899 verification;
+  click aa85c85e7c41d899 "TreacibilityMatrix.md#traceability-matrix-generation-test";
+  b55d8517cd3e58["SystemRequirements/Requirements.md/Traceability Matrix Builder Implementation"];
+  class b55d8517cd3e58 requirement;
+  click b55d8517cd3e58 "../SystemRequirements/Requirements.md#traceability-matrix-builder-implementation";
+  aa85c85e7c41d899 -.->|verifies| b55d8517cd3e58;
+  8aec4f4d071ac12c["tests/test-matrix-generation/test.sh"];
+  class 8aec4f4d071ac12c default;
+  click 8aec4f4d071ac12c "../../tests/test-matrix-generation/test.sh";
+  8aec4f4d071ac12c -->|satisfies| aa85c85e7c41d899;
+  5a25cf6244f4f44["Hierarchical Matrix Format Test"];
+  class 5a25cf6244f4f44 verification;
+  click 5a25cf6244f4f44 "TreacibilityMatrix.md#hierarchical-matrix-format-test";
+  5a25cf6244f4f44 -.->|verifies| b55d8517cd3e58;
+  8aec4f4d071ac12c["tests/test-matrix-generation/test.sh"];
+  class 8aec4f4d071ac12c default;
+  click 8aec4f4d071ac12c "../../tests/test-matrix-generation/test.sh";
+  8aec4f4d071ac12c -->|satisfies| 5a25cf6244f4f44;
 ```
 
 ---
@@ -115,7 +115,7 @@ This test verifies that the system provides a command-line flag for generating t
 - Help text includes documentation for the `--traces` flag
 
 #### Relations
-  * verify: [SystemRequirements/Requirements.md/CLI Traces Flag](../SystemRequirements/Requirements.md#cli-traces-flag)
+  * verify: [SystemRequirements/Requirements.md/CLI Traces Command](../SystemRequirements/Requirements.md#cli-traces-command)
   * satisfiedBy: [tests/test-matrix-generation/test.sh](../../tests/test-matrix-generation/test.sh)
 
 ---

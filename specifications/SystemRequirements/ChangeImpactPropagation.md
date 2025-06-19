@@ -14,10 +14,10 @@ graph LR;
   37a75398bd174177["Change Impact Command Line Interface"];
   class 37a75398bd174177 requirement;
   click 37a75398bd174177 "ChangeImpactPropagation.md#change-impact-command-line-interface";
-  d62e8e714c37d1ad["CLI Change Impact Report Flag"];
-  class d62e8e714c37d1ad requirement;
-  click d62e8e714c37d1ad "Requirements.md#cli-change-impact-report-flag";
-  37a75398bd174177 -.->|deriveReqT| d62e8e714c37d1ad;
+  4c9ae0a2fb751ce6["CLI Change Impact Report Command"];
+  class 4c9ae0a2fb751ce6 requirement;
+  click 4c9ae0a2fb751ce6 "Requirements.md#cli-change-impact-report-command";
+  37a75398bd174177 -.->|deriveReqT| 4c9ae0a2fb751ce6;
   80defdd4cbc7ee18["../../cli/src/cli.rs"];
   class 80defdd4cbc7ee18 default;
   click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
@@ -155,7 +155,7 @@ The CLI shall support the following functionality:
    - Allow scripting of analysis operations
 
 #### Relations
-  * derivedFrom: [CLI Change Impact Report Flag](../SystemRequirements/Requirements.md#cli-change-impact-report-flag)
+  * derivedFrom: [CLI Change Impact Report Command](../SystemRequirements/Requirements.md#cli-change-impact-report-command)
   * satisfiedBy: [../../cli/src/cli.rs](../../cli/src/cli.rs)
 
 ---

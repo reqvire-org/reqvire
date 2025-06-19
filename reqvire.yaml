@@ -5,9 +5,6 @@ paths:
   # Path to the user requirements root folder
   user_requirements_root_folder: "specifications"
   
-  # Default output folder
-  output_folder: "html"
-  
   # Glob patterns to exclude from requirements processing
   excluded_filename_patterns:
     - "Usecases.md"

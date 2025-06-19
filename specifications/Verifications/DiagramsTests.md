@@ -11,6 +11,17 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
+  f8849dfe948d04fa["Automated Diagram Generation on PR Merge Verification"];
+  class f8849dfe948d04fa verification;
+  click f8849dfe948d04fa "DiagramsTests.md#automated-diagram-generation-on-pr-merge-verification";
+  3e3df7ad427a88fa["SystemRequirements/Requirements.md/Automated Diagram Generation on PR Merge"];
+  class 3e3df7ad427a88fa requirement;
+  click 3e3df7ad427a88fa "../SystemRequirements/Requirements.md#automated-diagram-generation-on-pr-merge";
+  f8849dfe948d04fa -.->|verifies| 3e3df7ad427a88fa;
+  98af8a1cf9c86822[".github/workflows/generate_diagrams.yml"];
+  class 98af8a1cf9c86822 default;
+  click 98af8a1cf9c86822 "../../.github/workflows/generate_diagrams.yml";
+  98af8a1cf9c86822 -->|satisfies| f8849dfe948d04fa;
   2d2cf67bb8070da8["Diagram Generation Test"];
   class 2d2cf67bb8070da8 verification;
   click 2d2cf67bb8070da8 "DiagramsTests.md#diagram-generation-test";
@@ -30,17 +41,6 @@ graph LR;
   class 3df49fd1a91c3db7 default;
   click 3df49fd1a91c3db7 "../../tests/test-diagram-generation/test.sh";
   3df49fd1a91c3db7 -->|satisfies| de8ab093f22a5cd7;
-  f8849dfe948d04fa["Automated Diagram Generation on PR Merge Verification"];
-  class f8849dfe948d04fa verification;
-  click f8849dfe948d04fa "DiagramsTests.md#automated-diagram-generation-on-pr-merge-verification";
-  3e3df7ad427a88fa["SystemRequirements/Requirements.md/Automated Diagram Generation on PR Merge"];
-  class 3e3df7ad427a88fa requirement;
-  click 3e3df7ad427a88fa "../SystemRequirements/Requirements.md#automated-diagram-generation-on-pr-merge";
-  f8849dfe948d04fa -.->|verifies| 3e3df7ad427a88fa;
-  98af8a1cf9c86822[".github/workflows/generate_diagrams.yml"];
-  class 98af8a1cf9c86822 default;
-  click 98af8a1cf9c86822 "../../.github/workflows/generate_diagrams.yml";
-  98af8a1cf9c86822 -->|satisfies| f8849dfe948d04fa;
 ```
 
 ---
