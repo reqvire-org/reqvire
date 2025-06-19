@@ -527,17 +527,6 @@ graph LR;
 
 When requested the system shall generate change impact report, in Markdown format by default and also supporting json output.
 
-#### Details
-
-Change Report:
- * Overview of all the changes in the model and impact to related requirements and other system elements.
-
-Change Impact Analysis Report:
-  * When a requirement changes, the traceability helps identify:
-    * Which related requirements are affected by a change.
-    * Which verification procedures or test cases are impacted and potentially invalidated.
-    * Which other model elements might be affected.
-
 #### Relations
   * containedBy: [UserStories.md/Trace Changes in MBSE Model](UserStories.md#trace-changes-in-mbse-model)
 

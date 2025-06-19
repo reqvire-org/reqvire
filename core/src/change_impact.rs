@@ -555,6 +555,69 @@ fn propagate_changed_flags(
 /// Computes the change impact report between two registries and builds the change impact trees
 /// using the registry’s propagation algorithm. Propagation is computed only for added elements
 /// or for elements whose content has changed.
+/// Applies smart filtering logic to eliminate redundant new elements from the report.
+/// New elements that are already referenced in relations of other new elements are filtered out
+/// to reduce clutter and focus on primary changes.
+fn apply_smart_filtering(
+    report: &mut ChangeImpactReport,
+    _current: &element_registry::ElementRegistry,
+) {
+    // Collect all new element IDs for quick lookup
+    let new_element_ids: HashSet<String> = report.added.iter()
+        .map(|elem| elem.element_id.clone())
+        .collect();
+    
+    // Collect new element IDs that are referenced in relations of other new elements
+    let mut referenced_new_elements = HashSet::new();
+    
+    // Check references in added elements' relations
+    for added_elem in &report.added {
+        for relation in &added_elem.added_relations {
+            if let LinkType::Identifier(target_id) = &relation.target.link {
+                if new_element_ids.contains(target_id) {
+                    referenced_new_elements.insert(target_id.clone());
+                }
+            }
+        }
+    }
+    
+    // Check references in changed elements' relations
+    for changed_elem in &mut report.changed {
+        for relation in &changed_elem.added_relations {
+            if let LinkType::Identifier(target_id) = &relation.target.link {
+                if new_element_ids.contains(target_id) {
+                    referenced_new_elements.insert(target_id.clone());
+                }
+            }
+        }
+        
+        // Mark new elements in relations with "(new)" suffix
+        mark_new_elements_in_relations(&mut changed_elem.added_relations, &new_element_ids);
+    }
+    
+    // Mark new elements in relations of remaining added elements
+    for added_elem in &mut report.added {
+        mark_new_elements_in_relations(&mut added_elem.added_relations, &new_element_ids);
+    }
+    
+    // Filter out referenced new elements from the added list
+    report.added.retain(|elem| !referenced_new_elements.contains(&elem.element_id));
+}
+
+/// Marks relations that target new elements with "(new)" suffix in the target text
+fn mark_new_elements_in_relations(relations: &mut Vec<RelationSummary>, new_element_ids: &HashSet<String>) {
+    for relation in relations {
+        if let LinkType::Identifier(target_id) = &relation.target.link {
+            if new_element_ids.contains(target_id) {
+                // Only add "(new)" if it's not already there
+                if !relation.target.text.ends_with(" (new)") {
+                    relation.target.text = format!("{} (new)", relation.target.text);
+                }
+            }
+        }
+    }
+}
+
 pub fn compute_change_impact(
     current: &element_registry::ElementRegistry,
     reference: &element_registry::ElementRegistry,
@@ -674,6 +737,8 @@ pub fn compute_change_impact(
     inv_ver.dedup_by_key(|v| v.element_id.clone());
     report.invalidated_verifications =inv_ver;
     
+    // Apply smart filtering to eliminate redundant new elements
+    apply_smart_filtering(&mut report, current);
    
     Ok(report)
 }
