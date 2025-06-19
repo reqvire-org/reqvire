@@ -526,17 +526,86 @@ graph LR;
 ### Change Impact Analysis
 
 When requested the system shall generate change impact report, in Markdown format by default and also supporting json output.
-
 #### Details
 
-Change Report:
- * Overview of all the changes in the model and impact to related requirements and other system elements.
 
-Change Impact Analysis Report:
-  * When a requirement changes, the traceability helps identify:
-    * Which related requirements are affected by a change.
-    * Which verification procedures or test cases are impacted and potentially invalidated.
-    * Which other model elements might be affected.
+<details>
+<summary>View Full Specification</summary>
+
+## Change Report Overview
+
+The system provides comprehensive analysis of model changes with intelligent filtering to focus on primary changes and their relationships.
+The report shall intelligently filter duplicate information to focus on primary changes and their relationships.
+
+## Change Impact Analysis Report
+
+When a requirement changes, the traceability helps identify:
+* Which related requirements are affected by a change
+* Which verification procedures or test cases are impacted and potentially invalidated  
+* Which other model elements might be affected
+
+## Smart Filtering Logic
+
+### Primary Change Detection
+The report distinguishes between:
+- **Primary changes**: Elements that are modified, added, or removed as the main focus of the change
+- **Secondary changes**: Elements that appear in relations of primary changes
+
+### Filtering Rules
+
+1. **Eliminate Redundant New Elements**
+   - If a new element is referenced in the relations of another new element, do not show it separately in the "New Elements" section
+   - This prevents duplicate entries where the same new element appears both as a standalone item and as a relation target
+
+2. **Show Only Independent New Elements**
+   - New elements should only appear in their own section if they are not already covered by relationships from other new elements
+   - This ensures each new element is reported exactly once in the most relevant context
+
+3. **Relation Context Marking**
+   - When displaying relations, optionally mark elements that are new with "(new)" suffix
+   - This provides context about which relation targets are also new without duplicating information
+   - Example: `* refines: New Requirement Name (new)`
+
+4. **Hierarchical Organization**
+   - Present changes in order of importance: modified elements first, then independent new elements, then removed elements
+   - Group related changes together to show impact chains clearly
+
+### Example Filtering Scenario
+
+**Before Filtering:**
+```
+New Elements:
+- Element A (new)
+- Element B (new)  
+- Element C (new)
+
+Modified Elements:
+- Element X
+  Relations:
+  * refines: Element A
+  * verifiedBy: Element B
+```
+
+**After Filtering:**
+```
+Modified Elements:
+- Element X  
+  Relations:
+  * refines: Element A (new)
+  * verifiedBy: Element B (new)
+
+New Elements:
+- Element C (new)
+```
+
+### Benefits
+
+- **Reduced Clutter**: Eliminates redundant information that appears in multiple places
+- **Improved Focus**: Readers can quickly identify primary changes without scanning duplicate entries
+- **Clear Context**: New elements are shown in their most relevant relationship context
+- **Better Readability**: Reports are more concise while maintaining complete information
+
+</details>
 
 #### Relations
   * containedBy: [UserStories.md/Trace Changes in MBSE Model](UserStories.md#trace-changes-in-mbse-model)
