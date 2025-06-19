@@ -100,26 +100,6 @@ graph LR;
 
 ---
 
-### CLI Lint Flag
-The system shall provide a linting function, activated by the (--lint flag), which shall execute the linting process upon user request.
-
-#### Relations
-  * derivedFrom: [UserRequirements.md/Linting Command Behavior](../UserRequirements.md#linting-command)
-  * satisfiedBy: [cli.rs](../../cli/src/cli.rs)    
-
----
-
-### Dry Run Mode
-The system shall provide a dry run mode (--dry-run flag) for linting that shows the suggested changes without applying them, allowing users to review modifications before committing to them.
-
-#### Details
---dry-run flag works in tandem with the main lint command flag and cannot be used standalone.
-
-#### Relations
-  * derivedFrom: [CLI Lint Flag](#cli-lint-flag)
-  * satisfiedBy: [cli.rs](../../cli/src/cli.rs)    
-
----
 
 ### Excess Whitespace Linting Implementation
 The system shall detect and fix excess whitespace after element headers, subsection headers, and relation identifiers to maintain consistent formatting across all requirements documents.
@@ -271,28 +251,7 @@ paths:
 
 ---
 
-### Subdirectory Processing Flag
 
-The system shall provide a flag (--subdirectory) that allows processing only files within a specific subdirectory relative to the git repository root, enabling focused analysis and improved performance when working with large repositories.
-
-#### Details
-
-The subdirectory flag is designed to limit the scope of processing to a specific subdirectory, which is especially useful in large repositories with many requirements files. This flag allows users to:
-
-1. Process only files within the specified subdirectory and its nested folders
-2. Generate reports, diagrams, and validations based on the limited scope
-3. Improve performance by reducing the number of files that need to be processed
-
-The flag takes a path that is relative to the git repository root and should be used as follows:
-```
-reqvire --subdirectory="specifications/Verifications" --validate
-```
-
-#### Relations
-  * derivedFrom: [ManagingMbseModelsRequirements.md/Project Configuration with YAML](../ManagingMbseModelsRequirements.md#project-configuration-with-yaml)
-  * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
-
----
 
 ## CLI
 ```mermaid
@@ -371,9 +330,85 @@ graph LR;
 
 ---
 
+
+### CLI Interface Structure
+
+The CLI interface shall implement the clear `[OPTIONS] <COMMAND> [COMMAND OPTIONS]` structure.
+
+#### Details
+
+The CLI must display all commands and options and command's options flattened in the main help output which must also be a default commnad:
+```
+Reqvire requirements & treacibility management tool
+
+Usage: reqvire [OPTIONS] <COMMAND> [COMMAND OPTIONS]
+
+Commands:
+  lint               Enable linting to find potential improvements (non-blocking) By default, fixes will be applied automatically
+  validate           Validate model
+  help               Print this message or the help of the given subcommand(s)
+
+Options:
+  -c, --config <CONFIG>    Path to a custom configuration file (YAML format) If not provided, the system will look for reqvire.yml, reqvire.yaml, .reqvire.yml, or .reqvire.yaml in the current directory
+  -h, --help               Print help
+  -V, --version            Print version
+
+LINT OPTIONS:
+      --dry-run  When linting, only show suggestions without applying fixes
+      --json  Output results in JSON format
+```
+
+#### Realations
+  * derivedFrom: [../UserRequirements.md/CLI interface](../UserRequirements.md#cli-interface)
+  * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
+  
+---
+
+
+### Subdirectory Processing Option
+
+The system shall provide an option (--subdirectory) that allows processing only files within a specific subdirectory relative to the git repository root, enabling focused analysis and improved performance when working with large repositories.
+
+#### Details
+
+The subdirectory flag is designed to limit the scope of processing to a specific subdirectory, which is especially useful in large repositories with many requirements files. This flag allows users to:
+
+1. Process only files within the specified subdirectory and its nested folders
+2. Generate reports, diagrams, and validations based on the limited scope
+3. Improve performance by reducing the number of files that need to be processed
+
+The flag takes a path that is relative to the git repository root and should be used as follows:
+```
+reqvire --subdirectory="specifications/Verifications" validate
+```
+
+#### Relations
+  * derivedFrom: [ManagingMbseModelsRequirements.md/Project Configuration with YAML](../ManagingMbseModelsRequirements.md#project-configuration-with-yaml)
+  * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
+  * containedBy: [CLI Interface Structure](#cli-interface-structure)  
+
+---
+
+### Lint Command
+
+The system shall provide a linting function, activated by the (lint command), which shall execute the linting process upon user request.
+
+#### Details
+ 
+`lint` command must provide a dry run mode (--dry-run option flag) for linting that shows the suggested changes without applying them, allowing users to review modifications before committing to them:
+  - --dry-run flag works in tandem with the main lint command flag and cannot be used standalone.
+
+
+#### Relations
+  * derivedFrom: [UserRequirements.md/Linting Command Behavior](../UserRequirements.md#linting-command)
+  * containedBy: [CLI Interface Structure](#cli-interface-structure)    
+  * satisfiedBy: [cli.rs](../../cli/src/cli.rs)    
+
+---
+
 ### Index Generation
 
-The system shall implement an IndexGenerator component that traverses the specifications directory structure and creates a hierarchical SpecificationIndex.md file with links to documents and elements in the repository root.
+The system shall implement an IndexGenerator component activated by the (generate-index command),  that traverses the specifications directory structure and creates a hierarchical SpecificationIndex.md file with links to documents and elements in the repository root.
 
 #### Details
 
@@ -386,7 +421,9 @@ The index generator shall:
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Generate Documentation Index](../UserRequirements.md#generate-documentation-index)
+  * containedBy: [CLI Interface Structure](#cli-interface-structure)    
   * satisfiedBy: [index_generator.rs](../../core/src/index_generator.rs)
+  * satisfiedBy: [cli.rs](../../cli/src/cli.rs)      
 
 ---
 
@@ -407,13 +444,14 @@ SpecificationIndex.md file must be saved as index.html file when exported to the
 
 ### HTML Export
 
-The system shall generate HTML output for all markdown files, not just requirements documents, to provide consistent representation of the entire model.
+The system shall generate HTML output ( activated by html command) for all markdown files, not just requirements documents, to provide consistent representation of the entire model.
 
 #### Relations
   * derivedFrom: [../UserRequirements.md/Export HTML specifications](../UserRequirements.md#export-html-specifications)
+  * containedBy: [CLI Interface Structure](#cli-interface-structure)    
   * satisfiedBy: [html_export.rs](../../core/src/html_export.rs)
   * satisfiedBy: [html.rs](../../core/src/html.rs)  
-
+  * satisfiedBy: [cli.rs](../../cli/src/cli.rs)      
 ---
 
 ### Export Related System Elements
@@ -697,40 +735,43 @@ The system shall implement a model change analyzer that identifies structural mo
 
 ---
 
-### CLI Change Impact Report Flag
+### CLI Change Impact Report Command
 
-The system shall provide a change and impact report function, activated by the (--change_impact flag), which shall generate change impact report
+The system shall provide a change and impact report function, activated by the (change-impact command), which shall generate change impact report
 
 #### Details
 
-Must support `--json` flag to output json formated string.
+Must support `--json` option flag to output json formated string.
 
 #### Relations
   * derivedFrom: [Structural Change Analyzer](#structural-change-analyzer)
+  * containedBy: [CLI Interface Structure](#cli-interface-structure)    
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)    
 
 ---
 
 ### CLI Git Commit Hash Flag
 
-The system shall provide a git commit hash flag  (--git_commit flag), to be used with ** CLI Change Impact Report Flag**.
+The system shall provide a git commit hash flag  (--git_commit command option flag), to be used with ** CLI Change Impact Report Flag**.
 
 #### Relations
   * derivedFrom: [CLI Change Impact Report Flag](#cli-change-impact-report-flag)
+  * containedBy: [CLI Interface Structure](#cli-interface-structure)      
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)    
 
 ---
 
-### CLI Traces Flag
+### CLI Traces Command
 
-The system shall provide a traceability matrix generation function, activated by the (--traces flag), which shall generate a traceability matrix showing the relationships between requirements and verification elements.
+The system shall provide a traceability matrix generation function, activated by the (traces command), which shall generate a traceability matrix showing the relationships between requirements and verification elements.
 
 #### Details
 
-Must support `--json` and `--svg` flags to output either json formated string or svg vector image.
+Must support `--json` and `--svg` command options flags to output either json formated string or svg vector image.
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Traceability Matrix](../UserRequirements.md#traceability-matrix)
+  * containedBy: [CLI Interface Structure](#cli-interface-structure)      
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
 
 ---
@@ -778,13 +819,13 @@ The system shall implement a markdown formatter for traceability matrices that p
 
 ### CLI Traces SVG Flag
 
-The system shall provide an SVG output option for traceability matrices, activated by the (--svg flag), which shall generate a simplified SVG representation of the matrix that can be viewed directly or embedded in documents.
+The system shall provide an SVG output option for traceability matrices, activated by the (--svg command option flag), which shall generate a simplified SVG representation of the matrix that can be viewed directly or embedded in documents.
 
 #### Details
 
 The SVG output of the matrix shall have the following characteristics:
-- It shall only be available when the --traces flag is used
-- It cannot be used together with the --json flag (they are mutually exclusive)
+- It shall only be available when the `traces` command is used
+- It cannot be used together with the --json command option flag (they are mutually exclusive)
 - It shall display full element names instead of truncated names with ellipses
 - It shall dynamically adjust column widths based on the maximum element name length to ensure all text is readable
 - It shall not include hyperlinks to elements in the git repository
@@ -1249,15 +1290,15 @@ The filtering system must evaluate filters with minimal passes over element data
 
 ### CLI Summary Report Command
 
-The system shall provide a model summary report function, activated by the (--model-summary flag), which shall generate model summary report with ability to be passed several filters.
+The system shall provide a model summary report function, activated by the (model-summary command), which shall generate model summary report with ability to be passed several filters.
 
 #### Details
 
 Model summary CLI command:
-- `--model-summary`:  Output model registry and summary, also supports json and cypher output.
+- `model-summary`:  Output model registry and summary, also supports json and cypher output.
 
-All filters require --model-summary to be present. They can be combined:
-- `--model-summary`:  Output model registry and summary, also supports json and cypher output.
+All filters require `model-summary` to be present. They can be combined:
+- `model-summary`:  Output model registry and summary, also supports json and cypher output.
   - By file path: ` --model-summary  --filter-file="src/**/*Reqs.md"`
   - By name: ` --model-summary  --filter-name=".*safety.*"`
   - By section: ` --model-summary  --filter-section="System*"`
@@ -1270,13 +1311,14 @@ Must support `--json` and `--cypher` flags to output either json formated string
 
 #### Relations
   * derivedFrom: [Model Summary Report Generator](#model-summary-report-generator)
+  * containedBy: [CLI Interface Structure](#cli-interface-structure)        
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)    
 
 ---
 
 ### Handle Invalid Regex Filter Patterns
 
-When the user invokes Reqvire with the `--model-summary` and where invalid regular expression to regex based filters are provided the system shall return an error showing the faulty pattern and exit without producing a summary.
+When the user invokes Reqvire with the `model-summary` and where invalid regular expression to regex based filters are provided the system shall return an error showing the faulty pattern and exit without producing a summary.
 
 #### Relations
   * satisfiedBy: [../../cli/src/cli.rs](../../cli/src/cli.rs)    
@@ -1291,7 +1333,7 @@ When the user requests help (`--help` or `-h`), the system shall list module sum
 
 #### Relations
   * satisfiedBy: [../../cli/src/cli.rs](../../cli/src/cli.rs) 
-  * derivedFrom: [CLI Summary Report Command](#cli-summary-report-command)  
+  * derivedFrom: [CLI Summary Report Command](#cli-summary-report-command) 
   * verifiedBy: [../Verifications/ReportsTests.md#model-summary-tests](../Verifications/ReportsTests.md#model-summary-tests)  
 
 ---
@@ -1362,10 +1404,11 @@ When requested, the system shall automatically generate diagrams and save them t
 
 ### CLI Generate Diagrams Flag
 
-The system shall provide a diagrams generation function, activated by the (--generate-diagrams flag), which shall generate interactive mermaid diagrams.
+The system shall provide a diagrams generation function, activated by the (generate-diagrams command), which shall generate interactive mermaid diagrams.
 
 #### Relations
   * refine: [Diagram Generation](#diagram-generation)
+  * containedBy: [CLI Interface Structure](#cli-interface-structure)          
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
 
 ---

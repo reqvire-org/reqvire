@@ -26,7 +26,7 @@ use reqvire::reports::Filters;
 )]
 pub struct Args {
     #[clap(subcommand)]
-    pub command: Option<Commands>,
+    pub command: Commands,
     
     /// Path to a custom configuration file (YAML format)
     /// If not provided, the system will look for reqvire.yml, reqvire.yaml, 
@@ -44,24 +44,27 @@ pub enum Commands {
     /// Convert Markdown to HTML with embedded styles and save to output location
     Html,
     
-    /// Enable linting to find potential improvements (non-blocking)
-    /// By default, fixes will be applied automatically  
+    /// Enable linting to find potential improvements (non-blocking) By default, fixes will be applied automatically
+    #[clap(override_help = "Enable linting to find potential improvements (non-blocking) By default, fixes will be applied automatically\n\nLINT OPTIONS:\n      --dry-run  When linting, only show suggestions without applying fixes\n      --json     Output results in JSON format")]
     Lint {
         /// When linting, only show suggestions without applying fixes
-        #[clap(long)]
+        #[clap(long, help_heading = "LINT OPTIONS")]
         dry_run: bool,
+        
+        /// Output results in JSON format
+        #[clap(long, help_heading = "LINT OPTIONS")]
+        json: bool,
     },
     
-    /// Generate traceability information without processing other files
-    /// Creates matrices and reports showing relationships between elements in the model
+    /// Generate traceability information without processing other files Creates matrices and reports showing relationships between elements in the model
+    #[clap(override_help = "Generate traceability information without processing other files Creates matrices and reports showing relationships between elements in the model\n\nTRACES OPTIONS:\n      --svg   Output traceability matrix as SVG without hyperlinks and with full element names Cannot be used with --json\n      --json  Output results in JSON format")]
     Traces {
-        /// Output traceability matrix as SVG without hyperlinks and with full element names
-        /// Cannot be used with --json
-        #[clap(long, conflicts_with = "json")]
+        /// Output traceability matrix as SVG without hyperlinks and with full element names Cannot be used with --json
+        #[clap(long, conflicts_with = "json", help_heading = "TRACES OPTIONS")]
         svg: bool,
         
         /// Output results in JSON format
-        #[clap(long)]
+        #[clap(long, help_heading = "TRACES OPTIONS")]
         json: bool,
     },
 
@@ -72,65 +75,62 @@ pub enum Commands {
         json: bool,
     },
                        
-    /// Generate mermaid diagrams in markdown files showing requirements relationships
-    /// The diagrams will be placed at the top of each requirements document
+    /// Generate mermaid diagrams in markdown files showing requirements relationships The diagrams will be placed at the top of each requirements document
     GenerateDiagrams,
     
     /// Generate index document with links and summaries to all documents
     GenerateIndex,
 
     /// Output model registry and summary
+    #[clap(override_help = "Output model registry and summary\n\nMODEL SUMMARY OPTIONS:\n      --json                        Output results in JSON format\n      --filter-file <GLOB>          Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`\n      --filter-name <REGEX>         Only include elements whose name matches this regular expression\n      --filter-section <GLOB>       Only include sections whose name matches this glob pattern e.g. `System requirement*`\n      --filter-type <TYPE>          Only include elements of the given type e.g. `user-requirement`, `system-requirement`, `verification`, `file`, or other custom type\n      --filter-content <REGEX>      Only include elements whose content matches this regular expression\n      --filter-is-not-verified      Only include requirements that have at least one \"verifiedBy\" relation\n      --filter-is-not-satisfied     Only include requirements that have at least one \"satisfiedBy\" relation")]
     ModelSummary {
         /// Output results in JSON format
-        #[clap(long)]
+        #[clap(long, help_heading = "MODEL SUMMARY OPTIONS")]
         json: bool,
         
-        /// Only include files whose path matches this glob pattern
-        /// e.g. `src/**/*Reqs.md`
-        #[clap(long, value_name = "GLOB")]
+        /// Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`
+        #[clap(long, value_name = "GLOB", help_heading = "MODEL SUMMARY OPTIONS")]
         filter_file: Option<String>,
 
         /// Only include elements whose name matches this regular expression
-        #[clap(long, value_name = "REGEX")]
+        #[clap(long, value_name = "REGEX", help_heading = "MODEL SUMMARY OPTIONS")]
         filter_name: Option<String>,
         
-        /// Only include sections whose name matches this glob pattern
-        /// e.g. `System requirement*`
-        #[clap(long, value_name = "GLOB")]
+        /// Only include sections whose name matches this glob pattern e.g. `System requirement*`
+        #[clap(long, value_name = "GLOB", help_heading = "MODEL SUMMARY OPTIONS")]
         filter_section: Option<String>,
 
-        /// Only include elements of the given type
-        /// e.g. `user-requirement`, `system-requirement`, `verification`, `file`, or other custom type
-        #[clap(long, value_name = "TYPE")]
+        /// Only include elements of the given type e.g. `user-requirement`, `system-requirement`, `verification`, `file`, or other custom type
+        #[clap(long, value_name = "TYPE", help_heading = "MODEL SUMMARY OPTIONS")]
         filter_type: Option<String>,
 
         /// Only include elements whose content matches this regular expression
-        #[clap(long, value_name = "REGEX")]
+        #[clap(long, value_name = "REGEX", help_heading = "MODEL SUMMARY OPTIONS")]
         filter_content: Option<String>,
 
         /// Only include requirements that have at least one "verifiedBy" relation
-        #[clap(long)]
+        #[clap(long, help_heading = "MODEL SUMMARY OPTIONS")]
         filter_is_not_verified: bool,
 
         /// Only include requirements that have at least one "satisfiedBy" relation
-        #[clap(long)]
+        #[clap(long, help_heading = "MODEL SUMMARY OPTIONS")]
         filter_is_not_satisfied: bool,
                         
-        /// Output traceability matrix as SVG without hyperlinks and with full element names
-        /// Cannot be used with --json
-        #[clap(long, hide = true, conflicts_with_all = &["json"])]
+        /// Output traceability matrix as SVG without hyperlinks and with full element names Cannot be used with --json
+        #[clap(long, hide = true, conflicts_with_all = &["json"], help_heading = "MODEL SUMMARY OPTIONS")]
         cypher: bool,
     },
     
     /// Analise change impact and provides report
+    #[clap(override_help = "Analise change impact and provides report\n\nCHANGE IMPACT OPTIONS:\n      --git-commit <GIT_COMMIT>  Git commit hash to use when comparing models [default: HEAD]\n      --json                     Output results in JSON format")]
     ChangeImpact {
-        /// Output results in JSON format
-        #[clap(long)]
-        json: bool,
-        
         /// Git commit hash to use when comparing models
-        #[clap(long, default_value = "HEAD")]    
+        #[clap(long, default_value = "HEAD", help_heading = "CHANGE IMPACT OPTIONS")]    
         git_commit: String,
+        
+        /// Output results in JSON format
+        #[clap(long, help_heading = "CHANGE IMPACT OPTIONS")]
+        json: bool,
     }
 }
 
@@ -188,7 +188,7 @@ pub fn handle_command(
     );
     
     match args.command {
-        Some(Commands::Validate { json }) => {
+        Commands::Validate { json } => {
             match parse_result {
                 Ok(errors) => {
                     if errors.is_empty() {
@@ -204,7 +204,7 @@ pub fn handle_command(
                 }
             }  
         },
-        Some(Commands::GenerateIndex) => {
+        Commands::GenerateIndex => {
             info!("Generating index.....");
             let _index_context = index_generator::generate_readme_index(
                 &model_manager.element_registry, 
@@ -215,7 +215,7 @@ pub fn handle_command(
 
             return Ok(0);
         },
-        Some(Commands::GenerateDiagrams) => {
+        Commands::GenerateDiagrams => {
             info!("Generating mermaid diagrams");
             // Only collect identifiers and process files to add diagrams
             // Skip validation checks for diagram generation mode
@@ -224,7 +224,7 @@ pub fn handle_command(
             info!("Requirements diagrams updated in source files");
             return Ok(0);
         },
-        Some(Commands::ModelSummary { 
+        Commands::ModelSummary { 
             json, 
             cypher,
             filter_file,
@@ -234,7 +234,7 @@ pub fn handle_command(
             filter_content,
             filter_is_not_verified,
             filter_is_not_satisfied 
-        }) => {
+        } => {
             let filters = Filters::new(
                 filter_file.as_deref(),
                 filter_name.as_deref(),
@@ -258,7 +258,7 @@ pub fn handle_command(
             reports::print_registry_summary(&model_manager.element_registry,output_format, &filters);
             return Ok(0);        
         },
-        Some(Commands::ChangeImpact { json, git_commit }) => {
+        Commands::ChangeImpact { json, git_commit } => {
             let base_url = git_commands::get_repository_base_url().map_err(|_| {
                 ReqvireError::ProcessError("❌ Failed to determine repository base url.".to_string())
             })?;
@@ -280,11 +280,11 @@ pub fn handle_command(
                 
             return Ok(0);
         },
-        Some(Commands::Lint { dry_run }) => {
+        Commands::Lint { dry_run, json } => {
             linting::run_linting(excluded_filename_patterns, dry_run, args.subdirectory.as_deref())?;
             return Ok(0);
         },
-        Some(Commands::Traces { json, svg }) => {
+        Commands::Traces { json, svg } => {
             let matrix_config = matrix_generator::MatrixConfig::default();
                 
             let matrix_output = reqvire::matrix_generator::generate_matrix(
@@ -302,15 +302,11 @@ pub fn handle_command(
             println!("{}", matrix_output);
             return Ok(0);
         },
-        Some(Commands::Html) => {
+        Commands::Html => {
             let processed_count = export::export_model(&model_manager.element_registry, output_folder_path)?;
             info!("{} markdown files converted to HTML", processed_count);   
             
             return Ok(0);
-        },
-        None => {
-            Args::print_help();  
-            return Ok(1);
         }
     }
 }
@@ -336,16 +332,16 @@ mod tests {
     }
 
     #[test]
-    fn test_cli_parsing() {
+    fn test_cli_parsing_subcommand() {
         let args = Args::parse_from(&["reqvire", "html"]);
-        assert!(matches!(args.command, Some(Commands::Html)));
+        assert!(matches!(args.command, Commands::Html));
     }
     
     #[test]
     fn test_handle_command() {
         // Mock CLI arguments
         let args = Args {
-            command: None,
+            command: Commands::Html,
             config: None,
             subdirectory: None
         };

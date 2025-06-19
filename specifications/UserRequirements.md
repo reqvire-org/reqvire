@@ -178,7 +178,7 @@ The system shall provide a linting command that by default automatically applies
 
 ---
 
-### Linting Command Output
+### Linting Output
 The system shall display linting changes suggestion in similar manner as git diffs.
 
 #### Relations
@@ -540,5 +540,16 @@ Change Impact Analysis Report:
 
 #### Relations
   * containedBy: [UserStories.md/Trace Changes in MBSE Model](UserStories.md#trace-changes-in-mbse-model)
+
+---
+
+## Interfaces
+
+### CLI interface
+
+The system shall provide command line interface (CLI) to faciliate model management.
+
+#### Relations
+  * derivedFrom: [UserStories.md/Managing MBSE Models](UserStories.md#managing-mbse-models)
 
 ---
