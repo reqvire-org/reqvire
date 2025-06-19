@@ -11,7 +11,7 @@ paths:
   # Glob patterns to exclude from requirements processing
   excluded_filename_patterns:
     - "Usecases.md"
-    - "CLAUDE.md"
+    - "**/CLAUDE.md"
     - "SpecificationIndex.md"
     - "codefetch/**"
     - "**/Logical*.md"

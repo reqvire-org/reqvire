@@ -444,7 +444,13 @@ SpecificationIndex.md file must be saved as index.html file when exported to the
 
 ### HTML Export
 
-The system shall generate HTML output ( activated by html command) for all markdown files, not just requirements documents, to provide consistent representation of the entire model.
+The system shall generate HTML output ( activated by `html` command) for all markdown files, not just requirements documents, to provide consistent representation of the entire model.
+
+#### Details
+
+The system must accept `--output` command option flag for knowing where to export files. The default value must be 'html' folder:
+ - folder will be created if not existing
+ - .gitignore file must be added into the folder that ignores all files except .gitignore (itself)
 
 #### Relations
   * derivedFrom: [../UserRequirements.md/Export HTML specifications](../UserRequirements.md#export-html-specifications)

@@ -42,7 +42,11 @@ pub struct Args {
 #[derive(Subcommand, Debug)]
 pub enum Commands {
     /// Convert Markdown to HTML with embedded styles and save to output location
-    Html,
+    Html {
+        /// Output directory for HTML files
+        #[clap(long, short = 'o', default_value = "html")]
+        output: String,
+    },
     
     /// Enable linting to find potential improvements (non-blocking) By default, fixes will be applied automatically
     #[clap(override_help = "Enable linting to find potential improvements (non-blocking) By default, fixes will be applied automatically\n\nLINT OPTIONS:\n      --dry-run  When linting, only show suggestions without applying fixes\n      --json     Output results in JSON format")]
@@ -387,8 +391,9 @@ pub fn handle_command(
             println!("{}", matrix_output);
             return Ok(0);
         },
-        Some(Commands::Html) => {
-            let processed_count = export::export_model(&model_manager.element_registry, output_folder_path)?;
+        Some(Commands::Html { output }) => {
+            let html_output_path = PathBuf::from(output);
+            let processed_count = export::export_model(&model_manager.element_registry, &html_output_path)?;
             info!("{} markdown files converted to HTML", processed_count);   
             
             return Ok(0);
@@ -423,14 +428,14 @@ mod tests {
     #[test]
     fn test_cli_parsing_subcommand() {
         let args = Args::parse_from(&["reqvire", "html"]);
-        assert!(matches!(args.command, Some(Commands::Html)));
+        assert!(matches!(args.command, Some(Commands::Html { output: _ })));
     }
     
     #[test]
     fn test_handle_command() {
         // Mock CLI arguments
         let args = Args {
-            command: Some(Commands::Html),
+            command: Some(Commands::Html { output: "html".to_string() }),
             config: None,
             subdirectory: None
         };
