@@ -10,7 +10,7 @@ use crate::git_commands;
 /// Generates a SpecificationsIndex.md index from the existing element registry
 pub fn generate_readme_index(
     registry: &ElementRegistry, 
-    output_folder: &PathBuf
+    _output_folder: &PathBuf
 ) -> Result<String, ReqvireError> {
     let mut index_content = String::from("# Specification Index\n\n");
 
