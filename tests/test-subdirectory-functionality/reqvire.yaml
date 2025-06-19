@@ -1,0 +1,12 @@
+general:
+  verbose: false
+
+paths:
+  excluded_filename_patterns:
+    - "**/README*.md"
+    - "**/index.md"
+
+style:
+  theme: "default"
+  max_width: 1200
+  diagram_direction: "TD"
