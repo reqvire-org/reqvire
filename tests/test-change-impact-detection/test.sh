@@ -14,7 +14,7 @@
 sed -i 's/The systsem shall activate power-saving mode when the battery level drops below 20%./The systsem shall activate power-saving mode when the battery level drops below 30%./g' "${TEST_DIR}/Requirements.md"
 
 # Test 1: Run change impact detection with default commit (HEAD)
-OUTPUT=$(cd "${TEST_DIR}" && "${REQVIRE_BIN}" --config "${TEST_DIR}/reqvire.yaml" --change-impact 2>&1)
+OUTPUT=$(cd "${TEST_DIR}" && "${REQVIRE_BIN}" --config "${TEST_DIR}/reqvire.yaml" change-impact 2>&1)
 EXIT_CODE=$?
 
 printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
@@ -76,7 +76,7 @@ fi
 
 # Test 2: Verify that change impact detection works with specified commit
 # Use HEAD as the explicit commit
-OUTPUT=$(cd "${TEST_DIR}" && "${REQVIRE_BIN}" --config "${TEST_DIR}/reqvire.yaml" --change-impact --git-commit HEAD 2>&1)
+OUTPUT=$(cd "${TEST_DIR}" && "${REQVIRE_BIN}" --config "${TEST_DIR}/reqvire.yaml" change-impact --git-commit HEAD 2>&1)
 EXIT_CODE=$?
 
 # Write output to log file for debugging in temporary directory
@@ -90,7 +90,7 @@ if [ $EXIT_CODE -ne 0 ]; then
 fi
 
 # Test 3: Verify JSON output format for change impact detection
-OUTPUT=$(cd "${TEST_DIR}" && "${REQVIRE_BIN}" --config "${TEST_DIR}/reqvire.yaml" --change-impact --json 2>&1)
+OUTPUT=$(cd "${TEST_DIR}" && "${REQVIRE_BIN}" --config "${TEST_DIR}/reqvire.yaml" change-impact --json 2>&1)
 EXIT_CODE=$?
 
 # Write output to log file for debugging in temporary directory

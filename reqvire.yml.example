@@ -1,18 +1,15 @@
   # Path to the user requirements root folder
   user_requirements_root_folder: "specifications"
-
-  # Default output folder for exported html specifications
-  output_folder: "html"
        
   # Glob patterns to exclude from requirements processing
   excluded_filename_patterns:
-    - "Usecases.md"
+    - "SpecificationIndex.md"
     - "**/Logical*.md"
     - "**/Physical*.md"
     - "**/TODO.md"
-    - "**/tests/**"    
-    - "**/core/**"    
-    - "**/cli/**"            
+    - "**/doc/**"
+    - "**/html/**"    
+    - "*/.github/**"           
 
 style:
   # Theme for HTML output (default, dark, light)

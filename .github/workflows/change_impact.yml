@@ -84,7 +84,7 @@ jobs:
         if: contains(github.event.comment.body, '/reqvire impact')
         id: run_impact
         run: |
-          OUTPUT=$(./reqvire --change-impact --git-commit "$BASE_COMMIT" 2>&1 || echo "⚠️ reqvire impact failed.")
+          OUTPUT=$(./reqvire change-impact --git-commit "$BASE_COMMIT" 2>&1 || echo "⚠️ reqvire impact failed.")
           echo "REQVIRE_OUTPUT<<EOF" >> $GITHUB_ENV
           echo "$OUTPUT" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
@@ -93,7 +93,7 @@ jobs:
         if: contains(github.event.comment.body, '/reqvire traces')
         id: run_traces
         run: |
-          OUTPUT=$(./reqvire --traces --output-format markdown 2>&1 || echo "⚠️ reqvire traces failed.")
+          OUTPUT=$(./reqvire traces 2>&1 || echo "⚠️ reqvire traces failed.")
           echo "REQVIRE_OUTPUT<<EOF" >> $GITHUB_ENV
           echo "$OUTPUT" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV

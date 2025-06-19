@@ -21,14 +21,12 @@ pub mod nonlink_identifiers;
 pub fn run_linting(
     excluded_filename_patterns: &GlobSet,
     dry_run: bool,
-    subdirectory: Option<&str>,
 ) -> Result<(), ReqvireError> {
     debug!("Starting linting process...");
 
     let files = utils::scan_markdown_files(
         None,
-        excluded_filename_patterns,
-        subdirectory
+        excluded_filename_patterns
     );
     debug!("Found {} markdown files to lint", files.len());
 
@@ -581,26 +579,62 @@ mod tests {
         assert_eq!(result, "Hello\nRust\n");
     }
 
-    /// Test: Running Linting with Dry Run Mode on a specific directory
+    /// Test: Running Linting with Dry Run Mode on created test files
     #[test]
+    #[serial_test::serial]
     fn test_run_linting_dry_run() {
+        use std::process::Command;
+        
+        // Save current working directory
+        let original_dir = std::env::current_dir().unwrap();
+        
         // Create a temporary directory for the test
         let temp_dir = tempfile::tempdir().unwrap();
-        let test_file_path = temp_dir.path().join("test.md");
+        let temp_path = temp_dir.path();
+        
+        // Change to temp directory
+        std::env::set_current_dir(temp_path).unwrap();
+        
+        // Initialize git repo in temp directory
+        Command::new("git")
+            .args(&["init"])
+            .current_dir(temp_path)
+            .output()
+            .expect("Failed to initialize git repo");
+            
+        Command::new("git")
+            .args(&["config", "user.email", "test@example.com"])
+            .current_dir(temp_path)
+            .output()
+            .expect("Failed to set git config");
+            
+        Command::new("git")
+            .args(&["config", "user.name", "Test User"])
+            .current_dir(temp_path)
+            .output()
+            .expect("Failed to set git config");
 
         // Create a markdown file with intentional linting issues
+        let test_file_path = temp_path.join("test.md");
         let test_content = "## Test Header\n\n \nThis is a test file.\n";
         fs::write(&test_file_path, test_content).unwrap();
-
-        // Use the absolute path to the temporary directory
-        let temp_dir_str = temp_dir.path().to_string_lossy().to_string();
         
+        // Add file to git so it gets scanned
+        Command::new("git")
+            .args(&["add", "test.md"])
+            .current_dir(temp_path)
+            .output()
+            .expect("Failed to add file to git");
+
         let excluded_patterns = GlobSetBuilder::new().build().unwrap();
         
-        // Run linting ONLY on the temporary directory
-        let result = run_linting(&excluded_patterns, true, Some(&temp_dir_str));
+        // Run linting - now it will only scan the temp directory
+        let result = run_linting(&excluded_patterns, true);
 
-        assert!(result.is_ok(), "Linting should run without errors");
+        // Restore original working directory
+        std::env::set_current_dir(original_dir).unwrap();
+
+        assert!(result.is_ok(), "Linting should run without errors on test files");
     }
     /// Test: Remove content within <details> blocks
     #[test]

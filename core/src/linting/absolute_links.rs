@@ -94,7 +94,11 @@ mod tests {
     }
 
     #[test]
+    #[serial_test::serial]
     fn test_find_absolute_links() {
+        // Save current working directory
+        let original_dir = std::env::current_dir().unwrap();
+        
         let temp_dir = tempdir().expect("Failed to create temp directory");
         let temp_path = temp_dir.path();
 
@@ -131,7 +135,6 @@ Some text
 
         // Step 4: Run the actual logic
         let suggestions = find_absolute_links(content, &test_file_path);
-        dbg!("{}",&suggestions);
 
         // Step 5: Validate suggestions
         assert_eq!(suggestions.len(), 2);
@@ -142,6 +145,9 @@ Some text
         assert_eq!(suggestions[1].suggestion_type, LintType::AbsoluteLink);
         assert_eq!(suggestions[1].line_number, Some(10));
         assert!(suggestions[1].description.contains("another one"));
+        
+        // Restore original working directory
+        std::env::set_current_dir(original_dir).unwrap();
     }
 }
 

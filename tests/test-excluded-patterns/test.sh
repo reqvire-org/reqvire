@@ -13,7 +13,7 @@
 # - Only the file itself should be in the registry for relation validation
 
 
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --subdirectory tests/test-excluded-patterns --config "${TEST_DIR}/reqvire.yaml"  --validate 2>&1)
+OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" validate 2>&1)
 EXIT_CODE=$?
 
 
@@ -32,7 +32,7 @@ if echo "$OUTPUT" | grep -q "Missing relation target"; then
 fi
 
 # There should also be no elements from excluded files in the registry
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --subdirectory tests/test-excluded-patterns --config "${TEST_DIR}/reqvire.yaml" 2>&1  --model-summary | grep -n 'Element:')
+OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary 2>&1 | grep -n 'Element:')
 
 if echo "$OUTPUT" | grep -q "DesignSpecifications"; then
   echo "FAILED: Elements from excluded files are being processed"

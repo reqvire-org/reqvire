@@ -64,9 +64,6 @@ Here's an example of a Reqvire configuration file:
   # Path to the user requirements root folder
   user_requirements_root_folder: "specifications"
   
-  # Default output folder for exported html specifications
-  output_folder: "output"
-       
   # Glob patterns to exclude from requirements processing
   excluded_filename_patterns:
     - "Usecases.md"
@@ -122,7 +119,7 @@ Read specifications in [../specifications/SpecificationsRequirements.md](../spec
 Performs comprehensive validation:
 
 ```bash
-reqvire --validate
+reqvire validate
 ```
 
 ## Linting
@@ -136,7 +133,7 @@ Sometimes it is requred to run linting several times to converged to clean docum
 Apply automatic fixes to formatting issues:
 
 ```bash
-reqvire --lint
+reqvire lint
 ```
 
 ### Dry Run
@@ -144,7 +141,7 @@ reqvire --lint
 Preview linting changes without applying them:
 
 ```bash
-reqvire --lint --dry-run
+reqvire lint --dry-run
 ```
 
 ## Traceability
@@ -154,7 +151,7 @@ Track relationships between requirements using traceability features.
 ### Generate Traceability Matrix
 
 ```bash
-reqvire --traces
+reqvire traces
 ```
 
 This generates a traceability matrix showing relationships between requirements in Markdown format by default.
@@ -165,13 +162,13 @@ You can specify different output formats for the traceability matrix:
 
 ```bash
 # Generate traceability matrix in Markdown format (default)
-reqvire --traces
+reqvire traces
 
 # Generate traceability matrix in JSON format
-reqvire --traces --json
+reqvire traces --json
 
 # Generate traceability matrix in SVG format
-reqvire --traces --svg > matrix.svg
+reqvire traces --svg > matrix.svg
 ```
 
 The SVG format produces a visual representation that can be included in documentation or viewed directly in a browser.
@@ -183,7 +180,7 @@ Generates change impact report comparing current git HEAD with a previous commit
 ### Generate Change Impact Report
 
 ```bash
-reqvire --change-impact
+reqvire change-impact
 ```
 
 This generates a report showing how changes affect related requirements. By default, it compares with HEAD~1 (the previous commit).
@@ -192,13 +189,13 @@ This generates a report showing how changes affect related requirements. By defa
 
 ```bash
 # Use default comparison with HEAD~1
-reqvire --change-impact
+reqvire change-impact
 
 # Compare with a specific commit (hash or reference)
-reqvire --change-impact --git-commit=a1b2c3d4
+reqvire change-impact --git-commit=a1b2c3d4
 
 # Output in JSON format for integration with other tools
-reqvire --change-impact --json
+reqvire change-impact --json
 ```
 
 ## Generating Documentation
@@ -208,7 +205,7 @@ Reqvire can generate HTML documentation from your Markdown files.
 ### Convert to HTML
 
 ```bash
-reqvire --html
+reqvire html --output output_folder
 ```
 
 This creates HTML files with navigation, properly formatted requirements, and interactive diagrams.
@@ -221,7 +218,7 @@ Reqvire can automatically generate diagrams from your requirements model.
 ### Generate Diagrams
 
 ```bash
-reqvire --generate-diagrams
+reqvire generate-diagrams
 ```
 
 This creates Mermaid diagrams within your requirements files.
@@ -269,7 +266,7 @@ jobs:
       - name: Validate Requirements and Generate Report
         run: |
           mkdir -p reports
-          reqvire --validate | tee reports/validation_report.txt
+          reqvire validate | tee reports/validation_report.txt
 
       - name: Upload Validation Report
         uses: actions/upload-artifact@v4
@@ -318,11 +315,11 @@ jobs:
       
       - name: Generate Diagrams
         run: |
-          reqvire --generate-diagrams
+          reqvire generate-diagrams
       
       - name: Generate traces svg
         run: |
-          reqvire --traces --svg > specifications/matrix.svg
+          reqvire traces --svg > specifications/matrix.svg
                 
       - name: Check for Changes
         id: check_changes
@@ -438,7 +435,7 @@ jobs:
         if: contains(github.event.comment.body, '/reqvire impact')
         id: run_impact
         run: |
-          OUTPUT=$(reqvire --change-impact --git-commit "$BASE_COMMIT" 2>&1 || echo "⚠️ reqvire impact failed.")
+          OUTPUT=$(reqvire change-impact --git-commit "$BASE_COMMIT" 2>&1 || echo "⚠️ reqvire impact failed.")
           echo "REQVIRE_OUTPUT<<EOF" >> $GITHUB_ENV
           echo "$OUTPUT" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
@@ -447,7 +444,7 @@ jobs:
         if: contains(github.event.comment.body, '/reqvire traces')
         id: run_traces
         run: |
-          OUTPUT=$(reqvire --traces || echo "⚠️ reqvire traces failed.")
+          OUTPUT=$(reqvire traces || echo "⚠️ reqvire traces failed.")
           echo "REQVIRE_OUTPUT<<EOF" >> $GITHUB_ENV
           echo "$OUTPUT" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV

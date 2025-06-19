@@ -23,7 +23,7 @@
 #
 
 # Generate HTML
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --subdirectory tests/test-html-export --config "${TEST_DIR}/reqvire.yaml" --html 2>&1)
+OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" html --output output 2>&1)
 EXIT_CODE=$?
 
 # Save output for inspection

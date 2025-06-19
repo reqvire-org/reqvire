@@ -1,4 +1,4 @@
-use clap::{ArgGroup, Parser, CommandFactory};
+use clap::{Parser, Subcommand, CommandFactory};
 use std::path::PathBuf;
 use anyhow::Result;
 use log::{info};
@@ -22,169 +22,213 @@ use reqvire::reports::Filters;
     version, 
     about = "Reqvire requirements & treacibility management tool", 
     long_about = None,
-    name = "reqvire",
-    // Any of the filters requires --model-summary
-    group(
-        ArgGroup::new("filters")
-            .args(&[
-                "filter_file",
-                "filter_section",
-                "filter_type",
-                "filter_name",                
-                "filter_content",
-                "filter_is_not_verified",
-                "filter_is_not_satisfied",
-            ])
-            .requires("model_summary")
-            .multiple(true)            
-    )
+    name = "reqvire"
 )]
 pub struct Args {
-
-    /// Convert Markdown to HTML with embedded styles and save to output location
-    #[clap(long)]
-    pub html: bool,
-       
-    /// Enable linting to find potential improvements (non-blocking)
-    /// By default, fixes will be applied automatically
-    #[clap(long)]
-    pub lint: bool,
+    #[clap(subcommand)]
+    pub command: Option<Commands>,
     
-    /// When linting, only show suggestions without applying fixes
-    #[clap(long, requires = "lint")]
-    pub dry_run: bool,
-    
-    /// Generate traceability information without processing other files
-    /// Creates matrices and reports showing relationships between elements in the model
-    #[clap(long)]
-    pub traces: bool,
-    
-    /// Output traceability matrix as SVG without hyperlinks and with full element names
-    /// Cannot be used with --json
-    #[clap(long, requires = "traces", conflicts_with = "json")]
-    pub svg: bool,
-    
-    /// Output validation results in JSON format
-    /// Useful for CI/CD pipelines and automation
-    #[clap(long)]
-    pub json: bool,
-
-    /// Validate model
-    #[clap(long)]
-    pub validate: bool,
-                       
-    /// Generate mermaid diagrams in markdown files showing requirements relationships
-    /// The diagrams will be placed at the top of each requirements document
-    #[clap(long)]
-    pub generate_diagrams: bool,
-    
-    /// Generate index document with links and summaries to all documents
-    #[clap(long)]
-    pub generate_index: bool,
-
-    /// Output model registry and summary
-    #[clap(long)]
-    pub model_summary: bool,
-
-        
-    /// Only include files whose path matches this glob pattern
-    /// e.g. `src/**/*Reqs.md`
-    #[clap(
-        long,
-        value_name = "GLOB",
-        requires = "model_summary",
-        help_heading = "MODEL SUMMARY FILTERS"
-    )]
-    pub filter_file: Option<String>,
-
-    /// Only include elements whose name matches this regular expression
-    #[clap(
-        long,
-        value_name = "REGEX",
-        requires = "model_summary",
-        help_heading = "MODEL SUMMARY FILTERS"
-    )]
-    pub filter_name: Option<String>,
-    
-    /// Only include sections whose name matches this glob pattern
-    /// e.g. `System requirement*`
-    #[clap(
-        long,
-        value_name = "GLOB",
-        requires = "model_summary",
-        help_heading = "MODEL SUMMARY FILTERS"
-    )]
-    pub filter_section: Option<String>,
-
-    /// Only include elements of the given type
-    /// e.g. `user-requirement`, `system-requirement`, `verification`, `file`, or other custom type
-    #[clap(
-        long,
-        value_name = "TYPE",
-        requires = "model_summary",
-        help_heading = "MODEL SUMMARY FILTERS"
-    )]
-    pub filter_type: Option<String>,
-
-    /// Only include elements whose content matches this regular expression
-    #[clap(
-        long,
-        value_name = "REGEX",
-        requires = "model_summary",
-        help_heading = "MODEL SUMMARY FILTERS"
-    )]
-    pub filter_content: Option<String>,
-
-    /// Only include requirements that have at least one “verifiedBy” relation
-    #[clap(
-        long,
-        requires = "model_summary",
-        help_heading = "MODEL SUMMARY FILTERS"
-    )]
-    pub filter_is_not_verified: bool,
-
-    /// Only include requirements that have at least one “satisfiedBy” relation
-    #[clap(
-        long,
-        requires = "model_summary",
-        help_heading = "MODEL SUMMARY FILTERS"
-    )]
-    pub filter_is_not_satisfied: bool,
-                
-    /// Output traceability matrix as SVG without hyperlinks and with full element names
-    /// Cannot be used with --json
-    #[clap(long, hide = true, requires = "model_summary", conflicts_with_all = &["json", "svg"])]
-    pub cypher: bool,                
-                      
     /// Path to a custom configuration file (YAML format)
     /// If not provided, the system will look for reqvire.yml, reqvire.yaml, 
     /// .reqvire.yml, or .reqvire.yaml in the current directory
-    #[clap(long, short = 'c')]
+    #[clap(long, short = 'c', global = true)]
     pub config: Option<PathBuf>,
     
-    /// Analise change impact and provides report
-    #[clap(long)]
-    pub change_impact: bool,
-    
-    /// Git commit hash to use when comparing models
-    #[clap(long, requires = "change_impact", default_value = "HEAD")]    
-    pub git_commit: String,
-    
-        /// Process only files within a specific subdirectory relative to git root (hidden flag for testing)
-    #[clap(long, hide = true)]
-    pub subdirectory: Option<String>,
+}
 
+#[derive(Subcommand, Debug)]
+pub enum Commands {
+    /// Convert Markdown to HTML with embedded styles and save to output location
+    Html {
+        /// Output directory for HTML files
+        #[clap(long, short = 'o', default_value = "html")]
+        output: String,
+    },
+    
+    /// Enable linting to find potential improvements (non-blocking) By default, fixes will be applied automatically
+    #[clap(override_help = "Enable linting to find potential improvements (non-blocking) By default, fixes will be applied automatically\n\nLINT OPTIONS:\n      --dry-run  When linting, only show suggestions without applying fixes\n      --json     Output results in JSON format")]
+    Lint {
+        /// When linting, only show suggestions without applying fixes
+        #[clap(long, help_heading = "LINT OPTIONS")]
+        dry_run: bool,
+        
+        /// Output results in JSON format
+        #[clap(long, help_heading = "LINT OPTIONS")]
+        json: bool,
+    },
+    
+    /// Generate traceability information without processing other files Creates matrices and reports showing relationships between elements in the model
+    #[clap(override_help = "Generate traceability information without processing other files Creates matrices and reports showing relationships between elements in the model\n\nTRACES OPTIONS:\n      --svg   Output traceability matrix as SVG without hyperlinks and with full element names Cannot be used with --json\n      --json  Output results in JSON format")]
+    Traces {
+        /// Output traceability matrix as SVG without hyperlinks and with full element names Cannot be used with --json
+        #[clap(long, conflicts_with = "json", help_heading = "TRACES OPTIONS")]
+        svg: bool,
+        
+        /// Output results in JSON format
+        #[clap(long, help_heading = "TRACES OPTIONS")]
+        json: bool,
+    },
+
+    /// Validate model
+    Validate {
+        /// Output results in JSON format
+        #[clap(long)]
+        json: bool,
+    },
+                       
+    /// Generate mermaid diagrams in markdown files showing requirements relationships The diagrams will be placed at the top of each requirements document
+    GenerateDiagrams,
+    
+    /// Generate index document with links and summaries to all documents
+    GenerateIndex,
+
+    /// Output model registry and summary
+    #[clap(override_help = "Output model registry and summary\n\nMODEL SUMMARY OPTIONS:\n      --json                        Output results in JSON format\n      --filter-file <GLOB>          Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`\n      --filter-name <REGEX>         Only include elements whose name matches this regular expression\n      --filter-section <GLOB>       Only include sections whose name matches this glob pattern e.g. `System requirement*`\n      --filter-type <TYPE>          Only include elements of the given type e.g. `user-requirement`, `system-requirement`, `verification`, `file`, or other custom type\n      --filter-content <REGEX>      Only include elements whose content matches this regular expression\n      --filter-is-not-verified      Only include requirements that have at least one \"verifiedBy\" relation\n      --filter-is-not-satisfied     Only include requirements that have at least one \"satisfiedBy\" relation")]
+    ModelSummary {
+        /// Output results in JSON format
+        #[clap(long, help_heading = "MODEL SUMMARY OPTIONS")]
+        json: bool,
+        
+        /// Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`
+        #[clap(long, value_name = "GLOB", help_heading = "MODEL SUMMARY OPTIONS")]
+        filter_file: Option<String>,
+
+        /// Only include elements whose name matches this regular expression
+        #[clap(long, value_name = "REGEX", help_heading = "MODEL SUMMARY OPTIONS")]
+        filter_name: Option<String>,
+        
+        /// Only include sections whose name matches this glob pattern e.g. `System requirement*`
+        #[clap(long, value_name = "GLOB", help_heading = "MODEL SUMMARY OPTIONS")]
+        filter_section: Option<String>,
+
+        /// Only include elements of the given type e.g. `user-requirement`, `system-requirement`, `verification`, `file`, or other custom type
+        #[clap(long, value_name = "TYPE", help_heading = "MODEL SUMMARY OPTIONS")]
+        filter_type: Option<String>,
+
+        /// Only include elements whose content matches this regular expression
+        #[clap(long, value_name = "REGEX", help_heading = "MODEL SUMMARY OPTIONS")]
+        filter_content: Option<String>,
+
+        /// Only include requirements that have at least one "verifiedBy" relation
+        #[clap(long, help_heading = "MODEL SUMMARY OPTIONS")]
+        filter_is_not_verified: bool,
+
+        /// Only include requirements that have at least one "satisfiedBy" relation
+        #[clap(long, help_heading = "MODEL SUMMARY OPTIONS")]
+        filter_is_not_satisfied: bool,
+                        
+        /// Output traceability matrix as SVG without hyperlinks and with full element names Cannot be used with --json
+        #[clap(long, hide = true, conflicts_with_all = &["json"], help_heading = "MODEL SUMMARY OPTIONS")]
+        cypher: bool,
+    },
+    
+    /// Analise change impact and provides report
+    #[clap(override_help = "Analise change impact and provides report\n\nCHANGE IMPACT OPTIONS:\n      --git-commit <GIT_COMMIT>  Git commit hash to use when comparing models [default: HEAD]\n      --json                     Output results in JSON format")]
+    ChangeImpact {
+        /// Git commit hash to use when comparing models
+        #[clap(long, default_value = "HEAD", help_heading = "CHANGE IMPACT OPTIONS")]    
+        git_commit: String,
+        
+        /// Output results in JSON format
+        #[clap(long, help_heading = "CHANGE IMPACT OPTIONS")]
+        json: bool,
+    }
 }
 
 impl Args {
     pub fn parse_args() -> Self {
+        // Check if help was requested before parsing
+        let args: Vec<String> = std::env::args().collect();
+        if args.len() > 1 && (args[1] == "--help" || args[1] == "-h" || args[1] == "help") {
+            let cmd = Args::command();
+            print_custom_help(&cmd);
+            std::process::exit(0);
+        }
         Args::parse()
     }
 
     pub fn print_help() {
-        let mut cmd = Args::command();
-        cmd.print_help().unwrap();
-        println!();
+        let cmd = Args::command();
+        print_custom_help(&cmd);
+    }
+}
+
+fn print_custom_help(cmd: &clap::Command) {
+    // Print basic info
+    if let Some(about) = cmd.get_about() {
+        println!("{}", about);
+    }
+    println!();
+    
+    println!("Usage: {} [OPTIONS] <COMMAND> [COMMAND OPTIONS]", cmd.get_name());
+    println!();
+    
+    // Print commands
+    println!("Commands:");
+    for subcommand in cmd.get_subcommands() {
+        let name = subcommand.get_name();
+        let about = subcommand.get_about().map(|s| s.to_string()).unwrap_or_default();
+        println!("  {:<17} {}", name, about);
+    }
+    println!("  help               Print this message or the help of the given subcommand(s)");
+    println!();
+    
+    // Print global options
+    println!("Options:");
+    for arg in cmd.get_arguments() {
+        if arg.is_global_set() {
+            let long = arg.get_long().map(|l| format!("--{}", l)).unwrap_or_default();
+            let short = arg.get_short().map(|s| format!("-{}, ", s)).unwrap_or_default();
+            let value_name = if arg.get_action().takes_values() {
+                let value = arg.get_value_names()
+                    .and_then(|v| v.get(0))
+                    .map(|s| s.to_string())
+                    .unwrap_or_else(|| "VALUE".to_string());
+                format!(" <{}>", value)
+            } else {
+                String::new()
+            };
+            let help = arg.get_help().map(|s| s.to_string()).unwrap_or_default();
+            let option_part = format!("{}{}{}", short, long, value_name);
+            println!("  {:<25} {}", option_part, help);
+        }
+    }
+    println!("  -h, --help               Print help");
+    println!("  -V, --version            Print version");
+    println!();
+    
+    // Print command-specific options organized by command
+    for subcommand in cmd.get_subcommands() {
+        let mut has_options = false;
+        let mut options = Vec::new();
+        
+        for arg in subcommand.get_arguments() {
+            if !arg.is_global_set() {
+                has_options = true;
+                let long = arg.get_long().map(|l| format!("--{}", l)).unwrap_or_default();
+                let value_name = if arg.get_action().takes_values() {
+                    let value = arg.get_value_names()
+                        .and_then(|v| v.get(0))
+                        .map(|s| s.to_string())
+                        .unwrap_or_else(|| "VALUE".to_string());
+                    format!(" <{}>", value)
+                } else {
+                    String::new()
+                };
+                let help = arg.get_help().map(|s| s.to_string()).unwrap_or_default();
+                let option_part = format!("{}{}", long, value_name);
+                options.push(format!("      {:<25} {}", option_part, help));
+            }
+        }
+        
+        if has_options {
+            let command_name = subcommand.get_name().to_uppercase().replace("-", " ");
+            println!("{} OPTIONS:", command_name);
+            for option in options {
+                println!("{}", option);
+            }
+            println!();
+        }
     }
 }
 
@@ -215,7 +259,6 @@ fn print_validation_results(errors: &[ReqvireError], json_output: bool) {
 
 pub fn handle_command(
     args: Args,
-    output_folder_path: &PathBuf,
     excluded_filename_patterns: &GlobSet,
     diagram_direction: &str,
     diagrams_with_blobs: bool,
@@ -228,125 +271,135 @@ pub fn handle_command(
         user_requirements_root_folder,
         excluded_filename_patterns
     );
-              
-    if args.validate {
-        match parse_result {
-            Ok(errors) => {
-                if errors.is_empty() {
-                    println!("✅ Validation completed successfully with no errors.");
-                } else {
-                    print_validation_results(&errors, args.json);
+    
+    match args.command {
+        Some(Commands::Validate { json }) => {
+            match parse_result {
+                Ok(errors) => {
+                    if errors.is_empty() {
+                        println!("✅ Validation completed successfully with no errors.");
+                    } else {
+                        print_validation_results(&errors, json);
+                    }
+                    return Ok(0);
                 }
-                return Ok(0);
-            }
-            Err(e) => {
-                eprintln!("❌ Validation failed: {}", e);
-                return Ok(0);
-            }
-        }  
-    }else if args.generate_index {
-        info!("Generating index.....");
-        let _index_context = index_generator::generate_readme_index(
-            &model_manager.element_registry, 
-                &output_folder_path
+                Err(e) => {
+                    eprintln!("❌ Validation failed: {}", e);
+                    return Ok(0);
+                }
+            }  
+        },
+        Some(Commands::GenerateIndex) => {
+            info!("Generating index.....");
+            let index_output_path = PathBuf::from("output");
+            let _index_context = index_generator::generate_readme_index(
+                &model_manager.element_registry, 
+                    &index_output_path
+                ).map_err(|e| {
+                    ReqvireError::ProcessError(format!("❌ Failed to generate README.md: {:?}", e))
+                })?;
+
+            return Ok(0);
+        },
+        Some(Commands::GenerateDiagrams) => {
+            info!("Generating mermaid diagrams");
+            // Only collect identifiers and process files to add diagrams
+            // Skip validation checks for diagram generation mode
+            diagrams::process_diagrams(&model_manager.element_registry,diagram_direction,diagrams_with_blobs)?;
+           
+            info!("Requirements diagrams updated in source files");
+            return Ok(0);
+        },
+        Some(Commands::ModelSummary { 
+            json, 
+            cypher,
+            filter_file,
+            filter_name,
+            filter_section,
+            filter_type,
+            filter_content,
+            filter_is_not_verified,
+            filter_is_not_satisfied 
+        }) => {
+            let filters = Filters::new(
+                filter_file.as_deref(),
+                filter_name.as_deref(),
+                filter_section.as_deref(),
+                filter_type.as_deref(),
+                filter_content.as_deref(),
+                filter_is_not_verified,
+                filter_is_not_satisfied,
             ).map_err(|e| {
-                ReqvireError::ProcessError(format!("❌ Failed to generate README.md: {:?}", e))
+                ReqvireError::ProcessError(format!("❌ Failed to construct filters: {}", e))
+            })?;
+            
+            let output_format = if cypher {
+                reports::SummaryOutputFormat::Cypher
+            } else if json {
+                reports::SummaryOutputFormat::Json
+            } else {
+                reports::SummaryOutputFormat::Text
+            };
+               
+            reports::print_registry_summary(&model_manager.element_registry,output_format, &filters);
+            return Ok(0);        
+        },
+        Some(Commands::ChangeImpact { json, git_commit }) => {
+            let base_url = git_commands::get_repository_base_url().map_err(|_| {
+                ReqvireError::ProcessError("❌ Failed to determine repository base url.".to_string())
             })?;
 
-        return Ok(0);
-                                            
-    }else if args.generate_diagrams {
-       info!("Generating mermaid diagrams");
-        // Only collect identifiers and process files to add diagrams
-        // Skip validation checks for diagram generation mode
-        diagrams::process_diagrams(&model_manager.element_registry,diagram_direction,diagrams_with_blobs)?;
-       
-        info!("Requirements diagrams updated in source files");
-        return Ok(0);
-            
-    }else if args.model_summary {
-        let filters = Filters::new(
-            args.filter_file.as_deref(),
-            args.filter_name.as_deref(),
-            args.filter_section.as_deref(),
-            args.filter_type.as_deref(),
-            args.filter_content.as_deref(),
-            args.filter_is_not_verified,
-            args.filter_is_not_satisfied,
-        ).map_err(|e| {
-            ReqvireError::ProcessError(format!("❌ Failed to construct filters: {}", e))
-        })?;
-        
-        let output_format = if args.cypher {
-            reports::SummaryOutputFormat::Cypher
-        } else if args.json {
-            reports::SummaryOutputFormat::Json
-        } else {
-            reports::SummaryOutputFormat::Text
-        };
-           
-        reports::print_registry_summary(&model_manager.element_registry,output_format, &filters);
-        return Ok(0);        
-        
-            
-    }else if args.change_impact {
-         
-        let base_url = git_commands::get_repository_base_url().map_err(|_| {
-            ReqvireError::ProcessError("❌ Failed to determine repository base url.".to_string())
-        })?;
-
-        let current_commit = git_commands::get_commit_hash().map_err(|_| {
-            ReqvireError::ProcessError("❌ Failed to retrieve the current commit hash.".to_string())
-        })?;
+            let current_commit = git_commands::get_commit_hash().map_err(|_| {
+                ReqvireError::ProcessError("❌ Failed to retrieve the current commit hash.".to_string())
+            })?;
+                 
+            let mut refference_model_manager = ModelManager::new();      
+            let _not_interested=refference_model_manager.parse_and_validate(Some(&git_commit), user_requirements_root_folder, excluded_filename_patterns);
+                                    
+            let report=change_impact::compute_change_impact(
+                &model_manager.element_registry, 
+                &refference_model_manager.element_registry
+            )
+            .map_err(|e| ReqvireError::ProcessError(format!("❌ Failed to generate change impact report: {:?}", e)))?;
              
-        let mut refference_model_manager = ModelManager::new();      
-        let _not_interested=refference_model_manager.parse_and_validate(Some(&args.git_commit), user_requirements_root_folder, excluded_filename_patterns);
-                                
-        let report=change_impact::compute_change_impact(
-            &model_manager.element_registry, 
-            &refference_model_manager.element_registry
-        )
-        .map_err(|e| ReqvireError::ProcessError(format!("❌ Failed to generate change impact report: {:?}", e)))?;
-         
-        report.print(&base_url, &current_commit, &args.git_commit, args.json);
+            report.print(&base_url, &current_commit, &git_commit, json);
+                
+            return Ok(0);
+        },
+        Some(Commands::Lint { dry_run, json: _ }) => {
+            linting::run_linting(excluded_filename_patterns, dry_run)?;
+            return Ok(0);
+        },
+        Some(Commands::Traces { json, svg }) => {
+            let matrix_config = matrix_generator::MatrixConfig::default();
+                
+            let matrix_output = reqvire::matrix_generator::generate_matrix(
+                &model_manager.element_registry,
+                &matrix_config,
+                if json {
+                    matrix_generator::MatrixFormat::Json
+                } else if svg {
+                    matrix_generator::MatrixFormat::Svg
+                } else {
+                    matrix_generator::MatrixFormat::Markdown
+                },                
+            );
+                
+            println!("{}", matrix_output);
+            return Ok(0);
+        },
+        Some(Commands::Html { output }) => {
+            let html_output_path = PathBuf::from(output);
+            let processed_count = export::export_model(&model_manager.element_registry, &html_output_path)?;
+            info!("{} markdown files converted to HTML", processed_count);   
             
-        return Ok(0);
-         
-                                      
-    }else if args.lint {
-        linting::run_linting(excluded_filename_patterns, args.dry_run, args.subdirectory.as_deref())?;
-        return Ok(0);
-                  
-    }else if args.traces {
-        let matrix_config = matrix_generator::MatrixConfig::default();
-            
-        let matrix_output = reqvire::matrix_generator::generate_matrix(
-            &model_manager.element_registry,
-            &matrix_config,
-            if args.json {
-                matrix_generator::MatrixFormat::Json
-            } else if args.svg {
-                matrix_generator::MatrixFormat::Svg
-            } else {
-                matrix_generator::MatrixFormat::Markdown
-            },                
-        );
-            
-        println!("{}", matrix_output);
-        return Ok(0);
-            
-           
-    } else if args.html {
-        let processed_count = export::export_model(&model_manager.element_registry, output_folder_path)?;
-        info!("{} markdown files converted to HTML", processed_count);   
-        
-        return Ok(0);
-    }else{
-        Args::print_help();  
-
+            return Ok(0);
+        },
+        None => {
+            Args::print_help();
+            return Ok(0);
+        }
     }
-    
-    Ok(1)
 }
 
 
@@ -370,44 +423,20 @@ mod tests {
     }
 
     #[test]
-    fn test_cli_parsing() {
-        let args = Args::parse_from(&["reqvire", "--html"]);
-        assert!(args.html);
+    fn test_cli_parsing_subcommand() {
+        let args = Args::parse_from(&["reqvire", "html"]);
+        assert!(matches!(args.command, Some(Commands::Html { output: _ })));
     }
     
     #[test]
     fn test_handle_command() {
         // Mock CLI arguments
         let args = Args {
-            html: false,
-            lint: false,
-            dry_run: false,
-            json: false,
-            cypher: false,
-            svg: false,
-            traces: false,
-            generate_diagrams: false,
-            generate_index: false,
-            model_summary: false,
-            filter_file: None,
-            filter_section: None,
-            filter_type: None,
-            filter_name: None,             
-            filter_content: None,
-            filter_is_not_verified:false,
-            filter_is_not_satisfied:false,                    
-            validate: false,
-            config: None, // No custom config file for the test
-            change_impact: false, // Add the missing field
-            git_commit: "HEAD".to_string(), // Add the missing field
-            subdirectory: None
+            command: Some(Commands::Html { output: "html".to_string() }),
+            config: None,
         };
 
-
-        // Define test input and output pathse
-        let specification_folder_path = PathBuf::from("test/specifications");
-        let output_folder_path = PathBuf::from("test/output");
-        let external_folders_path = vec![PathBuf::from("test/external")];
+        // Define test input paths
         
         let excluded_filename_patterns=vec![
             "**/README*.md".to_string(),
@@ -416,15 +445,10 @@ mod tests {
             "**/index.md".to_string()
         ];
                         
-        // No need to create a mock model manager - it's created inside handle_command
-
-
-    
         // Run the handle_command function
         let user_requirements_root = None;
         let result = handle_command(
             args,
-            &output_folder_path,
             &build_glob_set(&excluded_filename_patterns),
             "TD",
             false,
