@@ -24,7 +24,6 @@ pub struct Config {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct PathsConfig {
-    pub output_folder: String,
     #[serde(default)]
     pub excluded_filename_patterns: Vec<String>,
     #[serde(default)]
@@ -51,7 +50,6 @@ impl Default for PathsConfig {
     fn default() -> Self {
     
         Self {
-            output_folder: "output".to_string(),
             excluded_filename_patterns: vec![],
             user_requirements_root_folder: "".to_string(),
             base_path: env::current_dir().expect("Failed to get current directory"),            
@@ -110,13 +108,7 @@ impl Config {
         }
     }
 
-    pub fn get_output_folder(&self) -> std::path::PathBuf {
-        let path = self.paths.base_path.join(self.paths.output_folder.clone());
-        path.canonicalize().unwrap_or_else(|e| {
-            eprintln!("ERROR: Failed to resolve output folder at {:?}: {}", path, e);
-            process::exit(1);
-        }) 
-    }   
+   
     
     /// Builds a GlobSet from the excluded filename patterns
     pub fn get_excluded_filename_patterns_glob_set(&self) -> GlobSet {
@@ -362,7 +354,6 @@ mod config_tests {
         let config = Config::default();
         
  
-        assert_eq!(config.paths.output_folder, "output");
         assert_eq!(config.paths.user_requirements_root_folder, "");
         
         let globset = config.get_excluded_filename_patterns_glob_set();
@@ -389,7 +380,6 @@ general:
   verbose: true
 
 paths:
-  output_folder: "generated"
   excluded_filename_patterns:
     - "**/README*.md"
     - "**/Design/**/*.md"
@@ -408,7 +398,6 @@ style:
         let config = Config::from_file(&config_path).unwrap();
         
         
-        assert_eq!(config.paths.output_folder, "generated");
         assert_eq!(config.paths.user_requirements_root_folder, "specifications");
         assert!(config.paths.excluded_filename_patterns.contains(&"**/README*.md".to_string()));
         assert!(config.paths.excluded_filename_patterns.contains(&"**/Design/**/*.md".to_string()));

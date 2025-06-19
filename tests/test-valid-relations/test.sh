@@ -27,7 +27,7 @@ git commit -m "Initial commit" > /dev/null 2>&1
 
 
 
-OUTPUT=$(cd "$TMP_DIR" && "$REQVIRE_BIN" --config "${TMP_DIR}/reqvire.yaml" --validate --json 2>&1)
+OUTPUT=$(cd "$TMP_DIR" && "$REQVIRE_BIN" --config "${TMP_DIR}/reqvire.yaml" validate --json 2>&1)
 EXIT_CODE=$?
 
 printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"

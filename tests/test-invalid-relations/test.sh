@@ -20,7 +20,7 @@
 
 
 
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --subdirectory tests/test-invalid-relations --config "${TEST_DIR}/reqvire.yaml"  --validate --json 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --subdirectory tests/test-invalid-relations --config "${TEST_DIR}/reqvire.yaml"  validate --json 2>&1)
 EXIT_CODE=$?
 
 

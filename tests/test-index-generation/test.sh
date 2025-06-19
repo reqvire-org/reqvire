@@ -9,10 +9,10 @@
 # - Index shall include brief summaries of each document
 #
 # Test Criteria:
-# - Command with --generate-index flag runs successfully
+# - Command with generate-index flag runs successfully
 # - Index file is created in the expected location
 # - Index contains links to all specification documents
-# - HTML index is created when --html flag is also used
+# - HTML index is created when html --output output flag is also used
 #
 
 # Create output directory if it doesn't exist
@@ -22,8 +22,8 @@ pushd "$TEST_DIR" > /dev/null 2>&1
 git init > /dev/null 2>&1
 popd > /dev/null 2>&1
 
-# Run reqvire with --generate-index flag
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --subdirectory tests/test-index-generation --config "${TEST_DIR}/reqvire.yaml" --generate-index 2>&1)
+# Run reqvire with generate-index flag
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --subdirectory tests/test-index-generation --config "${TEST_DIR}/reqvire.yaml" generate-index 2>&1)
 EXIT_CODE=$?
 
 # Save output for inspection

@@ -262,7 +262,6 @@ fn print_validation_results(errors: &[ReqvireError], json_output: bool) {
 
 pub fn handle_command(
     args: Args,
-    output_folder_path: &PathBuf,
     excluded_filename_patterns: &GlobSet,
     diagram_direction: &str,
     diagrams_with_blobs: bool,
@@ -295,9 +294,10 @@ pub fn handle_command(
         },
         Some(Commands::GenerateIndex) => {
             info!("Generating index.....");
+            let index_output_path = PathBuf::from("output");
             let _index_context = index_generator::generate_readme_index(
                 &model_manager.element_registry, 
-                    &output_folder_path
+                    &index_output_path
                 ).map_err(|e| {
                     ReqvireError::ProcessError(format!("❌ Failed to generate README.md: {:?}", e))
                 })?;
@@ -440,8 +440,7 @@ mod tests {
             subdirectory: None
         };
 
-        // Define test input and output pathse
-        let output_folder_path = PathBuf::from("test/output");
+        // Define test input paths
         
         let excluded_filename_patterns=vec![
             "**/README*.md".to_string(),
@@ -454,7 +453,6 @@ mod tests {
         let user_requirements_root = None;
         let result = handle_command(
             args,
-            &output_folder_path,
             &build_glob_set(&excluded_filename_patterns),
             "TD",
             false,

@@ -13,7 +13,7 @@
 #
 
 
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml"  --lint --dry-run 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml"  lint --dry-run 2>&1)
 EXIT_CODE=$?
 
 printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
@@ -50,7 +50,7 @@ if ! diff -wB <(echo "$ISSUE_COUNTS" | sort) <(echo "$EXPECTED_ISSUES" | sort) >
 fi
 
 # Run linting with changes applied
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml"  --lint 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml"  lint 2>&1)
 EXIT_CODE=$?
 
 

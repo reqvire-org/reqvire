@@ -34,7 +34,6 @@ fn main() {
     // Run `handle_command` and get exit code
     let exit_code = handle_command(
         args,
-        &config.get_output_folder(), 
         &config.get_excluded_filename_patterns_glob_set(),
         &config.style.diagram_direction,
         config.style.diagrams_with_blobs,
