@@ -70,16 +70,17 @@ pub fn generate_readme_index(
         total_files, total_sections, total_elements
     ));
 
-    // Get the repository root path for writing the index file
-    let repo_root = match git_commands::get_git_root_dir() {
-        Ok(root) => root,
-        Err(_) => {
-            // Fallback to the output folder if git root is not available
-            output_folder.clone()
-        }
-    };
+    // Determine where to write the index file
+    let git_root = git_commands::get_git_root_dir().unwrap_or_else(|_| PathBuf::from("."));
+    let current_dir = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
     
-    let output_path = repo_root.join("SpecificationIndex.md");
+    // If running from a subdirectory, write index in current directory
+    // Otherwise, write to git root (original behavior)
+    let output_path = if current_dir.starts_with(&git_root) && current_dir != git_root {
+        current_dir.join("SpecificationIndex.md")
+    } else {
+        git_root.join("SpecificationIndex.md")
+    };
     
     // If writing fails, return an error immediately
     if let Err(e) = write_file(&output_path, index_content.as_bytes()) {

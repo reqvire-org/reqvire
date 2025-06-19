@@ -121,4 +121,55 @@ if [ $EXIT_CODE -ne 0 ]; then
   exit 1
 fi
 
+# Test 6: Generate diagrams from submodule directory
+OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" generate-diagrams 2>&1)
+EXIT_CODE=$?
+
+printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
+
+if [ $EXIT_CODE -ne 0 ]; then
+  echo "❌ FAILED: Generate diagrams from submodule directory failed with exit code $EXIT_CODE"
+  echo "Output: $OUTPUT"
+  exit 1
+fi
+
+# Check that diagrams were only generated for submodule files
+# The generate-diagrams command should only process files in the current subdirectory
+if echo "$OUTPUT" | grep -q "specifications/MainRequirements.md"; then
+  echo "❌ FAILED: Generate diagrams processed main requirements when it should only process submodule"
+  echo "Output: $OUTPUT"
+  exit 1
+fi
+
+# Test 7: Generate index from submodule directory
+OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" generate-index 2>&1)
+EXIT_CODE=$?
+
+printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
+
+if [ $EXIT_CODE -ne 0 ]; then
+  echo "❌ FAILED: Generate index from submodule directory failed with exit code $EXIT_CODE"
+  echo "Output: $OUTPUT"
+  exit 1
+fi
+
+# Check that index generation only processed submodule files
+# The generate-index command should only process files in the current subdirectory
+if echo "$OUTPUT" | grep -q "specifications/MainRequirements.md"; then
+  echo "❌ FAILED: Generate index processed main requirements when it should only process submodule"
+  echo "Output: $OUTPUT"
+  exit 1
+fi
+
+# Check that index was generated in the submodule directory, not repo root
+if [ -f "${TMP_DIR}/project-root/SpecificationIndex.md" ]; then
+  echo "❌ FAILED: Generate index created file in repo root instead of submodule directory"
+  exit 1
+fi
+
+if [ ! -f "${TMP_DIR}/project-root/submodule/SpecificationIndex.md" ]; then
+  echo "❌ FAILED: Generate index did not create file in submodule directory"
+  exit 1
+fi
+
 exit 0
