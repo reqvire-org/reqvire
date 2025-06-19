@@ -37,7 +37,7 @@ jobs:
       - name: Validate Requirements and Generate Report
         run: |
           mkdir -p reports
-          reqvire --validate | tee reports/validation_report.txt
+          reqvire validate | tee reports/validation_report.txt
 
       - name: Upload Validation Report
         uses: actions/upload-artifact@v4

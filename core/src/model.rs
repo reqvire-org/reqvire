@@ -45,7 +45,7 @@ impl ModelManager {
     
         let mut errors = Vec::new();
         
-        let files = utils::scan_markdown_files(git_commit_hash, excluded_filename_patterns, None);
+        let files = utils::scan_markdown_files(git_commit_hash, excluded_filename_patterns);
            
         debug!("Found {} markdown files.", files.len());
 

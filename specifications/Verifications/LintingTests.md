@@ -11,54 +11,6 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  a8037b2df81f02be["Linting Command Verification"];
-  class a8037b2df81f02be verification;
-  click a8037b2df81f02be "LintingTests.md#linting-command-verification";
-  a51179cda67cf9f2["UserRequirements.md/Linting Command"];
-  class a51179cda67cf9f2 requirement;
-  click a51179cda67cf9f2 "../UserRequirements.md#linting-command";
-  a8037b2df81f02be -.->|verifies| a51179cda67cf9f2;
-  a606311f33e42901["tests/test-lint-expected/test.sh"];
-  class a606311f33e42901 default;
-  click a606311f33e42901 "../../tests/test-lint-expected/test.sh";
-  a606311f33e42901 -->|satisfies| a8037b2df81f02be;
-  37dbb69e504fec9d["Excess Whitespace Detection and Correction"];
-  class 37dbb69e504fec9d verification;
-  click 37dbb69e504fec9d "LintingTests.md#excess-whitespace-detection-and-correction";
-  9f473f6e0b993cac["SystemRequirements/Requirements.md/Excess Whitespace Linting Implementation"];
-  class 9f473f6e0b993cac requirement;
-  click 9f473f6e0b993cac "../SystemRequirements/Requirements.md#excess-whitespace-linting-implementation";
-  37dbb69e504fec9d -.->|verifies| 9f473f6e0b993cac;
-  e4ccc71cd6ef4e9e["SystemRequirements/Requirements.md/Dry Run Mode"];
-  class e4ccc71cd6ef4e9e requirement;
-  click e4ccc71cd6ef4e9e "../SystemRequirements/Requirements.md#dry-run-mode";
-  37dbb69e504fec9d -.->|verifies| e4ccc71cd6ef4e9e;
-  a606311f33e42901["tests/test-lint-expected/test.sh"];
-  class a606311f33e42901 default;
-  click a606311f33e42901 "../../tests/test-lint-expected/test.sh";
-  a606311f33e42901 -->|satisfies| 37dbb69e504fec9d;
-  b8bfbd5ccf026b31["Format Consistency Verification"];
-  class b8bfbd5ccf026b31 verification;
-  click b8bfbd5ccf026b31 "LintingTests.md#format-consistency-verification";
-  974ccf933675ef44["UserRequirements.md/Format Consistency Enforcement"];
-  class 974ccf933675ef44 requirement;
-  click 974ccf933675ef44 "../UserRequirements.md#format-consistency-enforcement";
-  b8bfbd5ccf026b31 -.->|verifies| 974ccf933675ef44;
-  a606311f33e42901["tests/test-lint-expected/test.sh"];
-  class a606311f33e42901 default;
-  click a606311f33e42901 "../../tests/test-lint-expected/test.sh";
-  a606311f33e42901 -->|satisfies| b8bfbd5ccf026b31;
-  706dca24b7cc1eb8["CLI Lint Flag Test"];
-  class 706dca24b7cc1eb8 verification;
-  click 706dca24b7cc1eb8 "LintingTests.md#cli-lint-flag-test";
-  7d3a6a25db09c1b2["SystemRequirements/Requirements.md#cli-lint-flag"];
-  class 7d3a6a25db09c1b2 requirement;
-  click 7d3a6a25db09c1b2 "../SystemRequirements/Requirements.md#cli-lint-flag";
-  706dca24b7cc1eb8 -.->|verifies| 7d3a6a25db09c1b2;
-  a606311f33e42901["tests/test-lint-expected/test.sh"];
-  class a606311f33e42901 default;
-  click a606311f33e42901 "../../tests/test-lint-expected/test.sh";
-  a606311f33e42901 -->|satisfies| 706dca24b7cc1eb8;
   6481e4ca8c4d6920["Model Linting Verification"];
   class 6481e4ca8c4d6920 verification;
   click 6481e4ca8c4d6920 "LintingTests.md#model-linting-verification";
@@ -70,6 +22,51 @@ graph LR;
   class a606311f33e42901 default;
   click a606311f33e42901 "../../tests/test-lint-expected/test.sh";
   a606311f33e42901 -->|satisfies| 6481e4ca8c4d6920;
+  b8bfbd5ccf026b31["Format Consistency Verification"];
+  class b8bfbd5ccf026b31 verification;
+  click b8bfbd5ccf026b31 "LintingTests.md#format-consistency-verification";
+  974ccf933675ef44["UserRequirements.md/Format Consistency Enforcement"];
+  class 974ccf933675ef44 requirement;
+  click 974ccf933675ef44 "../UserRequirements.md#format-consistency-enforcement";
+  b8bfbd5ccf026b31 -.->|verifies| 974ccf933675ef44;
+  a606311f33e42901["tests/test-lint-expected/test.sh"];
+  class a606311f33e42901 default;
+  click a606311f33e42901 "../../tests/test-lint-expected/test.sh";
+  a606311f33e42901 -->|satisfies| b8bfbd5ccf026b31;
+  37dbb69e504fec9d["Excess Whitespace Detection and Correction"];
+  class 37dbb69e504fec9d verification;
+  click 37dbb69e504fec9d "LintingTests.md#excess-whitespace-detection-and-correction";
+  9f473f6e0b993cac["SystemRequirements/Requirements.md/Excess Whitespace Linting Implementation"];
+  class 9f473f6e0b993cac requirement;
+  click 9f473f6e0b993cac "../SystemRequirements/Requirements.md#excess-whitespace-linting-implementation";
+  37dbb69e504fec9d -.->|verifies| 9f473f6e0b993cac;
+  deaec107945edbed["SystemRequirements/Requirements.md/Lint Command"];
+  class deaec107945edbed requirement;
+  click deaec107945edbed "../SystemRequirements/Requirements.md#lint-command";
+  37dbb69e504fec9d -.->|verifies| deaec107945edbed;
+  a606311f33e42901["tests/test-lint-expected/test.sh"];
+  class a606311f33e42901 default;
+  click a606311f33e42901 "../../tests/test-lint-expected/test.sh";
+  a606311f33e42901 -->|satisfies| 37dbb69e504fec9d;
+  a8037b2df81f02be["Linting Command Verification"];
+  class a8037b2df81f02be verification;
+  click a8037b2df81f02be "LintingTests.md#linting-command-verification";
+  a51179cda67cf9f2["UserRequirements.md/Linting Command"];
+  class a51179cda67cf9f2 requirement;
+  click a51179cda67cf9f2 "../UserRequirements.md#linting-command";
+  a8037b2df81f02be -.->|verifies| a51179cda67cf9f2;
+  a606311f33e42901["tests/test-lint-expected/test.sh"];
+  class a606311f33e42901 default;
+  click a606311f33e42901 "../../tests/test-lint-expected/test.sh";
+  a606311f33e42901 -->|satisfies| a8037b2df81f02be;
+  706dca24b7cc1eb8["CLI Lint Flag Test"];
+  class 706dca24b7cc1eb8 verification;
+  click 706dca24b7cc1eb8 "LintingTests.md#cli-lint-flag-test";
+  706dca24b7cc1eb8 -.->|verifies| deaec107945edbed;
+  a606311f33e42901["tests/test-lint-expected/test.sh"];
+  class a606311f33e42901 default;
+  click a606311f33e42901 "../../tests/test-lint-expected/test.sh";
+  a606311f33e42901 -->|satisfies| 706dca24b7cc1eb8;
 ```
 
 ---
@@ -93,7 +90,7 @@ The verification test checks that Reqvire correctly identifies and fixes excess 
 
 #### Relations
   * verify: [SystemRequirements/Requirements.md/Excess Whitespace Linting Implementation](../SystemRequirements/Requirements.md#excess-whitespace-linting-implementation)
-  * verify: [SystemRequirements/Requirements.md/Dry Run Mode](../SystemRequirements/Requirements.md#dry-run-mode)
+  * verify: [SystemRequirements/Requirements.md/Lint Command](../SystemRequirements/Requirements.md#lint-command)
   * satisfiedBy: [tests/test-lint-expected/test.sh](../../tests/test-lint-expected/test.sh)
 
 ---
@@ -198,7 +195,7 @@ This test verifies that the system provides a linting function activated by the 
 - Changes are applied to files
 
 #### Relations
-  * verify: [SystemRequirements/Requirements.md#cli-lint-flag](../SystemRequirements/Requirements.md#cli-lint-flag)
+  * verify: [SystemRequirements/Requirements.md#lint-command](../SystemRequirements/Requirements.md#lint-command)
   * satisfiedBy: [tests/test-lint-expected/test.sh](../../tests/test-lint-expected/test.sh)
 
 ---
@@ -240,30 +237,30 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  71b5a1d5e278aa8e["Excluded Linting Verification"];
-  class 71b5a1d5e278aa8e verification;
-  click 71b5a1d5e278aa8e "LintingTests.md#excluded-linting-verification";
-  be83c2991e9535c7["SystemRequirements/Requirements.md#ignoring-unstructured-documents"];
-  class be83c2991e9535c7 requirement;
-  click be83c2991e9535c7 "../SystemRequirements/Requirements.md#ignoring-unstructured-documents";
-  71b5a1d5e278aa8e -.->|verifies| be83c2991e9535c7;
-  bef37c31db69b66a["SystemRequirements/Requirements.md#File Pattern Exclusion for Linting"];
-  class bef37c31db69b66a requirement;
-  click bef37c31db69b66a "../SystemRequirements/Requirements.md#file-pattern-exclusion-for-linting";
-  71b5a1d5e278aa8e -.->|verifies| bef37c31db69b66a;
-  de8bc63ebb2a09e7["tests/test-excluded-linting/test.sh"];
-  class de8bc63ebb2a09e7 default;
-  click de8bc63ebb2a09e7 "../../tests/test-excluded-linting/test.sh";
-  de8bc63ebb2a09e7 -->|satisfies| 71b5a1d5e278aa8e;
   590a4cc1c558992f["Excluded Patterns Verification"];
   class 590a4cc1c558992f verification;
   click 590a4cc1c558992f "LintingTests.md#excluded-patterns-verification";
+  be83c2991e9535c7["SystemRequirements/Requirements.md#ignoring-unstructured-documents"];
+  class be83c2991e9535c7 requirement;
+  click be83c2991e9535c7 "../SystemRequirements/Requirements.md#ignoring-unstructured-documents";
   590a4cc1c558992f -.->|verifies| be83c2991e9535c7;
+  bef37c31db69b66a["SystemRequirements/Requirements.md#File Pattern Exclusion for Linting"];
+  class bef37c31db69b66a requirement;
+  click bef37c31db69b66a "../SystemRequirements/Requirements.md#file-pattern-exclusion-for-linting";
   590a4cc1c558992f -.->|verifies| bef37c31db69b66a;
   a29e69e90fa71f39["tests/test-excluded-patterns/test.sh"];
   class a29e69e90fa71f39 default;
   click a29e69e90fa71f39 "../../tests/test-excluded-patterns/test.sh";
   a29e69e90fa71f39 -->|satisfies| 590a4cc1c558992f;
+  71b5a1d5e278aa8e["Excluded Linting Verification"];
+  class 71b5a1d5e278aa8e verification;
+  click 71b5a1d5e278aa8e "LintingTests.md#excluded-linting-verification";
+  71b5a1d5e278aa8e -.->|verifies| be83c2991e9535c7;
+  71b5a1d5e278aa8e -.->|verifies| bef37c31db69b66a;
+  de8bc63ebb2a09e7["tests/test-excluded-linting/test.sh"];
+  class de8bc63ebb2a09e7 default;
+  click de8bc63ebb2a09e7 "../../tests/test-excluded-linting/test.sh";
+  de8bc63ebb2a09e7 -->|satisfies| 71b5a1d5e278aa8e;
 ```
 
 ---

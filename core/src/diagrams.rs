@@ -324,15 +324,25 @@ pub fn process_diagrams(
             .push((section, new_diagram));
     }
 
+    // Get git root for resolving relative paths
+    let git_root = match git_commands::get_git_root_dir() {
+        Ok(root) => root,
+        Err(_) => {
+            log::error!("Not in a git repository, using current directory");
+            std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."))
+        }
+    };
+
     // Process each file
     for (file_path, section_diagrams) in files_to_update {
-        let file_path_obj = Path::new(&file_path);
+        // Resolve file path relative to git root, not current directory
+        let absolute_file_path = git_root.join(&file_path);
 
         // Read file content
-        let mut file_content = match filesystem::read_file(file_path_obj) {
+        let mut file_content = match filesystem::read_file(&absolute_file_path) {
             Ok(content) => content,
             Err(e) => {
-                log::error!("Failed to read file '{}': {}", file_path, e);
+                log::error!("Failed to read file '{}': {}", absolute_file_path.display(), e);
                 continue;
             }
         };
@@ -343,8 +353,8 @@ pub fn process_diagrams(
         }
 
         // Write updated content back if modified
-        if let Err(e) = filesystem::write_file(file_path_obj, &file_content) {
-            log::error!("Failed to write updated diagrams to '{}': {}", file_path, e);
+        if let Err(e) = filesystem::write_file(&absolute_file_path, &file_content) {
+            log::error!("Failed to write updated diagrams to '{}': {}", absolute_file_path.display(), e);
         } else {
             println!("Updated diagrams in '{}'", file_path);
         }

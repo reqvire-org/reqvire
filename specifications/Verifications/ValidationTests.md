@@ -11,54 +11,6 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  526fb26c223ad188["Unstructured Documents Test"];
-  class 526fb26c223ad188 verification;
-  click 526fb26c223ad188 "ValidationTests.md#unstructured-documents-test";
-  929c6c204cb3fedb["SystemRequirements/Requirements.md#Excluded File Relation Validation"];
-  class 929c6c204cb3fedb requirement;
-  click 929c6c204cb3fedb "../SystemRequirements/Requirements.md#excluded-file-relation-validation";
-  526fb26c223ad188 -.->|verifies| 929c6c204cb3fedb;
-  b91bd280b4e9971["tests/test-valid-relations/test.sh"];
-  class b91bd280b4e9971 default;
-  click b91bd280b4e9971 "../../tests/test-valid-relations/test.sh";
-  b91bd280b4e9971 -->|satisfies| 526fb26c223ad188;
-  184bc01c18f5506f["Requirements Files Search and Detection Test"];
-  class 184bc01c18f5506f verification;
-  click 184bc01c18f5506f "ValidationTests.md#requirements-files-search-and-detection-test";
-  66582f9b6bdde6c4["SystemRequirements/Requirements.md#structured-markdown-files-search-and-detection"];
-  class 66582f9b6bdde6c4 requirement;
-  click 66582f9b6bdde6c4 "../SystemRequirements/Requirements.md#structured-markdown-files-search-and-detection";
-  184bc01c18f5506f -.->|verifies| 66582f9b6bdde6c4;
-  a29e69e90fa71f39["tests/test-excluded-patterns/test.sh"];
-  class a29e69e90fa71f39 default;
-  click a29e69e90fa71f39 "../../tests/test-excluded-patterns/test.sh";
-  a29e69e90fa71f39 -->|satisfies| 184bc01c18f5506f;
-  6ca2ff1567644e78["Same-File Fragment Relations Test"];
-  class 6ca2ff1567644e78 verification;
-  click 6ca2ff1567644e78 "ValidationTests.md#same-file-fragment-relations-test";
-  db64a3e25646a37f["SystemRequirements/Requirements.md#Relation Type Validation"];
-  class db64a3e25646a37f requirement;
-  click db64a3e25646a37f "../SystemRequirements/Requirements.md#relation-type-validation";
-  6ca2ff1567644e78 -.->|verifies| db64a3e25646a37f;
-  bed8d0948b3e5ccd["SystemRequirements/Requirements.md#Requirements Processing"];
-  class bed8d0948b3e5ccd requirement;
-  click bed8d0948b3e5ccd "../SystemRequirements/Requirements.md#requirements-processing";
-  6ca2ff1567644e78 -.->|verifies| bed8d0948b3e5ccd;
-  789c690d63402d63["tests/test-fragment-relations/test.sh"];
-  class 789c690d63402d63 default;
-  click 789c690d63402d63 "../../tests/test-fragment-relations/test.sh";
-  789c690d63402d63 -->|satisfies| 6ca2ff1567644e78;
-  9a53e9c00918fd02["JSON Output Format Test"];
-  class 9a53e9c00918fd02 verification;
-  click 9a53e9c00918fd02 "ValidationTests.md#json-output-format-test";
-  ad6f7a2d41d80a38["../UserRequirements.md#model-structure-and-summaries"];
-  class ad6f7a2d41d80a38 requirement;
-  click ad6f7a2d41d80a38 "../UserRequirements.md#model-structure-and-summaries";
-  9a53e9c00918fd02 -.->|verifies| ad6f7a2d41d80a38;
-  8b8c9b79dcbe085e["tests/test-invalid-relations/test.sh"];
-  class 8b8c9b79dcbe085e default;
-  click 8b8c9b79dcbe085e "../../tests/test-invalid-relations/test.sh";
-  8b8c9b79dcbe085e -->|satisfies| 9a53e9c00918fd02;
   e37dc7f46d75d46["Invalid Relations Test"];
   class e37dc7f46d75d46 verification;
   click e37dc7f46d75d46 "ValidationTests.md#invalid-relations-test";
@@ -66,6 +18,9 @@ graph LR;
   class 4ecd49d71920c1fc requirement;
   click 4ecd49d71920c1fc "../SystemRequirements/Requirements.md#detailed-error-handling-and-logging";
   e37dc7f46d75d46 -.->|verifies| 4ecd49d71920c1fc;
+  db64a3e25646a37f["SystemRequirements/Requirement.md/Relation Type Validation"];
+  class db64a3e25646a37f requirement;
+  click db64a3e25646a37f "../SystemRequirements/Requirements.md#relation-type-validation";
   e37dc7f46d75d46 -.->|verifies| db64a3e25646a37f;
   dc7a9bb1bbebc57f["SystemRequirements/Requirement.md/Relation Element Type Validator"];
   class dc7a9bb1bbebc57f requirement;
@@ -91,6 +46,51 @@ graph LR;
   class 8b8c9b79dcbe085e default;
   click 8b8c9b79dcbe085e "../../tests/test-invalid-relations/test.sh";
   8b8c9b79dcbe085e -->|satisfies| e37dc7f46d75d46;
+  526fb26c223ad188["Unstructured Documents Test"];
+  class 526fb26c223ad188 verification;
+  click 526fb26c223ad188 "ValidationTests.md#unstructured-documents-test";
+  929c6c204cb3fedb["SystemRequirements/Requirements.md#Excluded File Relation Validation"];
+  class 929c6c204cb3fedb requirement;
+  click 929c6c204cb3fedb "../SystemRequirements/Requirements.md#excluded-file-relation-validation";
+  526fb26c223ad188 -.->|verifies| 929c6c204cb3fedb;
+  b91bd280b4e9971["tests/test-valid-relations/test.sh"];
+  class b91bd280b4e9971 default;
+  click b91bd280b4e9971 "../../tests/test-valid-relations/test.sh";
+  b91bd280b4e9971 -->|satisfies| 526fb26c223ad188;
+  184bc01c18f5506f["Requirements Files Search and Detection Test"];
+  class 184bc01c18f5506f verification;
+  click 184bc01c18f5506f "ValidationTests.md#requirements-files-search-and-detection-test";
+  66582f9b6bdde6c4["SystemRequirements/Requirements.md#structured-markdown-files-search-and-detection"];
+  class 66582f9b6bdde6c4 requirement;
+  click 66582f9b6bdde6c4 "../SystemRequirements/Requirements.md#structured-markdown-files-search-and-detection";
+  184bc01c18f5506f -.->|verifies| 66582f9b6bdde6c4;
+  a29e69e90fa71f39["tests/test-excluded-patterns/test.sh"];
+  class a29e69e90fa71f39 default;
+  click a29e69e90fa71f39 "../../tests/test-excluded-patterns/test.sh";
+  a29e69e90fa71f39 -->|satisfies| 184bc01c18f5506f;
+  6ca2ff1567644e78["Same-File Fragment Relations Test"];
+  class 6ca2ff1567644e78 verification;
+  click 6ca2ff1567644e78 "ValidationTests.md#same-file-fragment-relations-test";
+  6ca2ff1567644e78 -.->|verifies| db64a3e25646a37f;
+  bed8d0948b3e5ccd["SystemRequirements/Requirements.md#Requirements Processing"];
+  class bed8d0948b3e5ccd requirement;
+  click bed8d0948b3e5ccd "../SystemRequirements/Requirements.md#requirements-processing";
+  6ca2ff1567644e78 -.->|verifies| bed8d0948b3e5ccd;
+  789c690d63402d63["tests/test-fragment-relations/test.sh"];
+  class 789c690d63402d63 default;
+  click 789c690d63402d63 "../../tests/test-fragment-relations/test.sh";
+  789c690d63402d63 -->|satisfies| 6ca2ff1567644e78;
+  9a53e9c00918fd02["JSON Output Format Test"];
+  class 9a53e9c00918fd02 verification;
+  click 9a53e9c00918fd02 "ValidationTests.md#json-output-format-test";
+  ad6f7a2d41d80a38["../UserRequirements.md#model-structure-and-summaries"];
+  class ad6f7a2d41d80a38 requirement;
+  click ad6f7a2d41d80a38 "../UserRequirements.md#model-structure-and-summaries";
+  9a53e9c00918fd02 -.->|verifies| ad6f7a2d41d80a38;
+  8b8c9b79dcbe085e["tests/test-invalid-relations/test.sh"];
+  class 8b8c9b79dcbe085e default;
+  click 8b8c9b79dcbe085e "../../tests/test-invalid-relations/test.sh";
+  8b8c9b79dcbe085e -->|satisfies| 9a53e9c00918fd02;
 ```
 
 ---
@@ -269,5 +269,37 @@ graph LR;
   c4332134ea225a0e -.->|verifies| 482c757913204fb8;
   c4332134ea225a0e -.->|trace| c86fd6ece7a8668a;
 ```
+
+---
+
+### Subdirectory Processing Verification
+
+This test verifies that the system correctly processes only files within the current directory when run from a subfolder of a git repository.
+
+#### Metadata
+  * type: verification
+
+#### Details
+
+##### Acceptance Criteria
+- System shall process only files within the current directory when run from a subfolder
+- System shall handle identifier normalization correctly within subdirectory context  
+- System shall validate cross-references correctly even when they point outside current directory
+- System shall work with validate, model-summary, html, lint, and traces commands
+- System shall ignore files outside the current directory scope
+- System shall provide meaningful error messages for invalid cross-references
+
+##### Test Criteria
+- Commands run from subdirectory process only files within that subdirectory
+- Files outside the current directory are not included in processing or output
+- Identifier normalization works correctly for paths within subdirectory
+- Cross-references to files outside current directory are handled gracefully
+- All major commands (validate, model-summary, html, lint, traces) work from subdirectories
+- Commands exit with success (0) return code when subdirectory processing works correctly
+- Error messages are clear when identifier normalization fails for cross-references
+
+#### Relations
+  * verify: [SystemRequirements/Requirements.md/Subdirectory Processing Option](../SystemRequirements/Requirements.md#subdirectory-processing-option)
+  * satisfiedBy: [tests/test-subdirectory-functionality/test.sh](../../tests/test-subdirectory-functionality/test.sh)
 
 ---

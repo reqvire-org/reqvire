@@ -13,7 +13,17 @@ fn main() {
 
     let args = Args::parse_args();
     
-    if args.json {
+    // Check if any command uses JSON output to suppress logs
+    let uses_json = match &args.command {
+        Some(cli::Commands::Validate { json }) => *json,
+        Some(cli::Commands::Traces { json, .. }) => *json,
+        Some(cli::Commands::ModelSummary { json, .. }) => *json,
+        Some(cli::Commands::ChangeImpact { json, .. }) => *json,
+        Some(cli::Commands::Lint { json, .. }) => *json,
+        _ => false,
+    };
+    
+    if uses_json {
         std::env::set_var("RUST_LOG", "error");
     }
     
@@ -24,7 +34,6 @@ fn main() {
     // Run `handle_command` and get exit code
     let exit_code = handle_command(
         args,
-        &config.get_output_folder(), 
         &config.get_excluded_filename_patterns_glob_set(),
         &config.style.diagram_direction,
         config.style.diagrams_with_blobs,

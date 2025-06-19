@@ -4,10 +4,10 @@ set -euo pipefail
 # Test: Model Summary JSON and Filters Validation (with text checks)
 # ------------------------------------------------------------------
 # Acceptance Criteria:
-# - `reqvire --model-summary --json` emits valid JSON with a top-level "files" key
-# - `reqvire --model-summary` prints a text summary beginning with `--- MBSE Model summary ---`
-# - Each filter flag when used with `--model-summary --json` or `--model-summary` correctly restricts output
-# - Using any filter flag without `--model-summary` fails appropriately
+# - `reqvire model-summary --json` emits valid JSON with a top-level "files" key
+# - `reqvire model-summary` prints a text summary beginning with `--- MBSE Model summary ---`
+# - Each filter flag when used with `model-summary --json` or `model-summary` correctly restricts output
+# - Using any filter flag without `model-summary` fails appropriately
 # - Invalid regex on name/content filters fails with `Invalid regex`
 #
 # Test Criteria:
@@ -18,7 +18,7 @@ set -euo pipefail
 # - Incorrect usage exits non-zero with proper error message
 
 # 1) No filters: base JSON summary
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" --model-summary --json 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary --json 2>&1)
 printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
 EXIT_JSON=$?
 if [ $EXIT_JSON -ne 0 ]; then
@@ -40,7 +40,7 @@ fi
 
 
 # 2) No filters: base text summary
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" --model-summary 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary 2>&1)
 printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
 EXIT_TEXT=$?
 if [ $EXIT_TEXT -ne 0 ]; then
@@ -78,7 +78,7 @@ done
 
 
 # 3) --filter-file=Requirements.md
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" --model-summary --json --filter-file="specifications/Requirements.md")
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary --json --filter-file="specifications/Requirements.md")
 
 printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
 if [ "$(echo "$OUTPUT" | jq '.files | length')" -ne 1 ]; then
@@ -87,7 +87,7 @@ if [ "$(echo "$OUTPUT" | jq '.files | length')" -ne 1 ]; then
 fi
 
 
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN"  --config "${TEST_DIR}/reqvire.yaml" --model-summary --filter-file="specifications/Requirements.md")
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN"  --config "${TEST_DIR}/reqvire.yaml" model-summary --filter-file="specifications/Requirements.md")
 
 printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
 count=$(grep -c -- '^📂 File:' <<<"$OUTPUT")
@@ -97,7 +97,7 @@ if (( count != 1 )); then
 fi
 
 # 4) --filter-section=Requirements
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN"  --config "${TEST_DIR}/reqvire.yaml" --model-summary --json --filter-section="Requirements*")
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN"  --config "${TEST_DIR}/reqvire.yaml" model-summary --json --filter-section="Requirements*")
 printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
 
 COUNT_SEC_REQ=$(
@@ -121,7 +121,7 @@ if [ "$COUNT_SEC_REQ" -ne 4 ]; then
   exit 1
 fi
 
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" --model-summary --filter-section="Requirements A")
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary --filter-section="Requirements A")
 
 printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
 
@@ -144,13 +144,13 @@ fi
 
 
 # 5) --filter-type=user-requirement
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" --model-summary --json --filter-type="user-requirement")
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary --json --filter-type="user-requirement")
 printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
 if [ "$(echo "$OUTPUT" | jq '.global_counters.total_elements')" -ne 3 ]; then
   echo "FAILED: --filter-type=user-requirement JSON should yield 3 elements"
   exit 1
 fi
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN"  --config "${TEST_DIR}/reqvire.yaml" --model-summary --filter-type="user-requirement")
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN"  --config "${TEST_DIR}/reqvire.yaml" model-summary --filter-type="user-requirement")
 printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
 if [ "$(grep -c '🔹 Element:' <<< "$OUTPUT")" -ne 3 ]; then
   echo "FAILED: --filter-type=user-requirement text should yield 3 elements"
@@ -159,13 +159,13 @@ fi
 
 
 # 6) --filter-type=verification
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" --model-summary --json --filter-type="verification")
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary --json --filter-type="verification")
 printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
 if [ "$(echo "$OUTPUT" | jq '.global_counters.total_elements')" -ne 1 ]; then
   echo "FAILED: --filter-type=verification JSON should yield 1 element"
   exit 1
 fi
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" --model-summary --filter-type="verification")
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary --filter-type="verification")
 printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
 if [ "$(grep -c '🔹 Element:' <<< "$OUTPUT")" -ne 1 ]; then
   echo "FAILED: --filter-type=verification text should yield 1 element"
@@ -174,13 +174,13 @@ fi
 
 
 # 7) --filter-name-regex="^Requirement with Valid Standard"
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" --model-summary --json --filter-name="^Requirement with Valid Standard")
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary --json --filter-name="^Requirement with Valid Standard")
 printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
 if [ "$(echo "$OUTPUT" | jq '.global_counters.total_elements')" -ne 1 ]; then
   echo "FAILED: --filter-name-regex JSON should yield 1 element"
   exit 1
 fi
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" --model-summary --filter-name="^Requirement with Valid Standard")
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary --filter-name="^Requirement with Valid Standard")
 printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
 if [ "$(grep -c '🔹 Element:' <<< "$OUTPUT")" -ne 1 ]; then
   echo "FAILED: --filter-name-regex text should yield 1 element"
@@ -189,13 +189,13 @@ fi
 
 
 # 8) --filter-content="subsection"
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" --model-summary --json --filter-content="subsection")
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary --json --filter-content="subsection")
 printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
 if [ "$(echo "$OUTPUT" | jq '.global_counters.total_elements')" -ne 1 ]; then
   echo "FAILED: --filter-content JSON should yield 1 element"
   exit 1
 fi
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" --model-summary --filter-content="subsection")
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary --filter-content="subsection")
 printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
 if [ "$(grep -c '🔹 Element:' <<< "$OUTPUT")" -ne 1 ]; then
   echo "FAILED: --filter-content text should yield 1 element"
@@ -204,7 +204,7 @@ fi
 
 
 # 9) --filter-is-verified
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" --model-summary --json --filter-is-not-verified)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary --json --filter-is-not-verified)
 printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
 
 if [ "$(echo "$OUTPUT" | jq '.global_counters.requirements_not_verified')" -ne 2 ]; then
@@ -212,7 +212,7 @@ if [ "$(echo "$OUTPUT" | jq '.global_counters.requirements_not_verified')" -ne 2
   exit 1
 fi
 
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" --model-summary --filter-is-not-verified)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary --filter-is-not-verified)
 printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
 if ! grep -q "Requirements not verified: 2" <<< "$OUTPUT"; then
   echo "FAILED: Expected 'Requirements not verified: 2' but got:"
@@ -222,13 +222,13 @@ fi
 
 
 # 10) --filter-is-satisfied
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" --model-summary --json --filter-is-not-satisfied)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary --json --filter-is-not-satisfied)
 printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
 if [ "$(echo "$OUTPUT" | jq '.global_counters.requirements_not_satisfied')" -ne 1 ]; then
   echo "FAILED: --filter-is-not-satisfied JSON should yield 3 elements"
   exit 1
 fi
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" --model-summary --filter-is-not-satisfied)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary --filter-is-not-satisfied)
 printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
 if ! grep -q "Requirements not satisfied: 1" <<< "$OUTPUT"; then
   echo "FAILED: Expected 'Requirements not satisfied: 1' but got:"
@@ -238,7 +238,7 @@ fi
 
 
 # 11) Combination: user-requirement + is-satisfied
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" --model-summary --json \
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary --json \
            --filter-type="user-requirement" --filter-is-not-satisfied)
 printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"           
 if [ "$(echo "$OUTPUT" | jq '.global_counters.total_elements')" -ne 1 ]; then
@@ -248,7 +248,7 @@ fi
 
 
            
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" --model-summary \
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary \
            --filter-type="user-requirement" --filter-is-not-satisfied)
 printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"           
 if [ "$(grep -c '🔹 Element:' <<< "$OUTPUT")" -ne 1 ]; then
@@ -263,7 +263,7 @@ OUTPUT=""
 CODE=0
 
 # Capture output and exit code separately
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" --model-summary  --filter-name="***" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary  --filter-name="***" 2>&1)
 CODE=$?
 printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
 set -e
@@ -279,7 +279,7 @@ OUTPUT=""
 CODE=0
 
 # Capture output and exit code separately
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" --model-summary  --json --filter-name="***" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary  --json --filter-name="***" 2>&1)
 CODE=$?
 set -e
 
@@ -289,7 +289,7 @@ if [ $CODE -ne 1 ] || ! grep -q "Invalid regex" <<< "$OUTPUT"; then
   exit 1
 fi
 
-# 13) filter without --model-summary
+# 13) filter without model-summary
 set +e
 OUTPUT=""
 CODE=0
@@ -301,8 +301,8 @@ set -e
 printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
 
 
-if [ $CODE -ne 2 ]  || ! grep -qi "Usage: reqvire --model-summary" <<< "$OUTPUT"; then
-  echo "FAILED: filter without --model-summary did not error"
+if [ $CODE -ne 2 ]  || ! grep -qi "unexpected argument.*--filter-file.*found" <<< "$OUTPUT"; then
+  echo "FAILED: filter without model-summary did not error"
   exit 1
 fi
 
