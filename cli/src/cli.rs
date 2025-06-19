@@ -26,7 +26,7 @@ use reqvire::reports::Filters;
 )]
 pub struct Args {
     #[clap(subcommand)]
-    pub command: Commands,
+    pub command: Option<Commands>,
     
     /// Path to a custom configuration file (YAML format)
     /// If not provided, the system will look for reqvire.yml, reqvire.yaml, 
@@ -136,13 +136,96 @@ pub enum Commands {
 
 impl Args {
     pub fn parse_args() -> Self {
+        // Check if help was requested before parsing
+        let args: Vec<String> = std::env::args().collect();
+        if args.len() > 1 && (args[1] == "--help" || args[1] == "-h" || args[1] == "help") {
+            let cmd = Args::command();
+            print_custom_help(&cmd);
+            std::process::exit(0);
+        }
         Args::parse()
     }
 
     pub fn print_help() {
-        let mut cmd = Args::command();
-        cmd.print_help().unwrap();
-        println!();
+        let cmd = Args::command();
+        print_custom_help(&cmd);
+    }
+}
+
+fn print_custom_help(cmd: &clap::Command) {
+    // Print basic info
+    if let Some(about) = cmd.get_about() {
+        println!("{}", about);
+    }
+    println!();
+    
+    println!("Usage: {} [OPTIONS] <COMMAND> [COMMAND OPTIONS]", cmd.get_name());
+    println!();
+    
+    // Print commands
+    println!("Commands:");
+    for subcommand in cmd.get_subcommands() {
+        let name = subcommand.get_name();
+        let about = subcommand.get_about().map(|s| s.to_string()).unwrap_or_default();
+        println!("  {:<17} {}", name, about);
+    }
+    println!("  help               Print this message or the help of the given subcommand(s)");
+    println!();
+    
+    // Print global options
+    println!("Options:");
+    for arg in cmd.get_arguments() {
+        if arg.is_global_set() {
+            let long = arg.get_long().map(|l| format!("--{}", l)).unwrap_or_default();
+            let short = arg.get_short().map(|s| format!("-{}, ", s)).unwrap_or_default();
+            let value_name = if arg.get_action().takes_values() {
+                let value = arg.get_value_names()
+                    .and_then(|v| v.get(0))
+                    .map(|s| s.to_string())
+                    .unwrap_or_else(|| "VALUE".to_string());
+                format!(" <{}>", value)
+            } else {
+                String::new()
+            };
+            let help = arg.get_help().map(|s| s.to_string()).unwrap_or_default();
+            println!("  {}{}{:<20} {}", short, long, value_name, help);
+        }
+    }
+    println!("  -h, --help               Print help");
+    println!("  -V, --version            Print version");
+    println!();
+    
+    // Print command-specific options organized by command
+    for subcommand in cmd.get_subcommands() {
+        let mut has_options = false;
+        let mut options = Vec::new();
+        
+        for arg in subcommand.get_arguments() {
+            if !arg.is_global_set() {
+                has_options = true;
+                let long = arg.get_long().map(|l| format!("--{}", l)).unwrap_or_default();
+                let value_name = if arg.get_action().takes_values() {
+                    let value = arg.get_value_names()
+                        .and_then(|v| v.get(0))
+                        .map(|s| s.to_string())
+                        .unwrap_or_else(|| "VALUE".to_string());
+                    format!(" <{}>", value)
+                } else {
+                    String::new()
+                };
+                let help = arg.get_help().map(|s| s.to_string()).unwrap_or_default();
+                options.push(format!("      {}{:<20} {}", long, value_name, help));
+            }
+        }
+        
+        if has_options {
+            let command_name = subcommand.get_name().to_uppercase().replace("-", " ");
+            println!("{} OPTIONS:", command_name);
+            for option in options {
+                println!("{}", option);
+            }
+            println!();
+        }
     }
 }
 
@@ -188,7 +271,7 @@ pub fn handle_command(
     );
     
     match args.command {
-        Commands::Validate { json } => {
+        Some(Commands::Validate { json }) => {
             match parse_result {
                 Ok(errors) => {
                     if errors.is_empty() {
@@ -204,7 +287,7 @@ pub fn handle_command(
                 }
             }  
         },
-        Commands::GenerateIndex => {
+        Some(Commands::GenerateIndex) => {
             info!("Generating index.....");
             let _index_context = index_generator::generate_readme_index(
                 &model_manager.element_registry, 
@@ -215,7 +298,7 @@ pub fn handle_command(
 
             return Ok(0);
         },
-        Commands::GenerateDiagrams => {
+        Some(Commands::GenerateDiagrams) => {
             info!("Generating mermaid diagrams");
             // Only collect identifiers and process files to add diagrams
             // Skip validation checks for diagram generation mode
@@ -224,7 +307,7 @@ pub fn handle_command(
             info!("Requirements diagrams updated in source files");
             return Ok(0);
         },
-        Commands::ModelSummary { 
+        Some(Commands::ModelSummary { 
             json, 
             cypher,
             filter_file,
@@ -234,7 +317,7 @@ pub fn handle_command(
             filter_content,
             filter_is_not_verified,
             filter_is_not_satisfied 
-        } => {
+        }) => {
             let filters = Filters::new(
                 filter_file.as_deref(),
                 filter_name.as_deref(),
@@ -258,7 +341,7 @@ pub fn handle_command(
             reports::print_registry_summary(&model_manager.element_registry,output_format, &filters);
             return Ok(0);        
         },
-        Commands::ChangeImpact { json, git_commit } => {
+        Some(Commands::ChangeImpact { json, git_commit }) => {
             let base_url = git_commands::get_repository_base_url().map_err(|_| {
                 ReqvireError::ProcessError("❌ Failed to determine repository base url.".to_string())
             })?;
@@ -280,11 +363,11 @@ pub fn handle_command(
                 
             return Ok(0);
         },
-        Commands::Lint { dry_run, json } => {
+        Some(Commands::Lint { dry_run, json: _ }) => {
             linting::run_linting(excluded_filename_patterns, dry_run, args.subdirectory.as_deref())?;
             return Ok(0);
         },
-        Commands::Traces { json, svg } => {
+        Some(Commands::Traces { json, svg }) => {
             let matrix_config = matrix_generator::MatrixConfig::default();
                 
             let matrix_output = reqvire::matrix_generator::generate_matrix(
@@ -302,10 +385,14 @@ pub fn handle_command(
             println!("{}", matrix_output);
             return Ok(0);
         },
-        Commands::Html => {
+        Some(Commands::Html) => {
             let processed_count = export::export_model(&model_manager.element_registry, output_folder_path)?;
             info!("{} markdown files converted to HTML", processed_count);   
             
+            return Ok(0);
+        },
+        None => {
+            Args::print_help();
             return Ok(0);
         }
     }
@@ -334,14 +421,14 @@ mod tests {
     #[test]
     fn test_cli_parsing_subcommand() {
         let args = Args::parse_from(&["reqvire", "html"]);
-        assert!(matches!(args.command, Commands::Html));
+        assert!(matches!(args.command, Some(Commands::Html)));
     }
     
     #[test]
     fn test_handle_command() {
         // Mock CLI arguments
         let args = Args {
-            command: Commands::Html,
+            command: Some(Commands::Html),
             config: None,
             subdirectory: None
         };

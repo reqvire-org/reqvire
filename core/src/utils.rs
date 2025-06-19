@@ -299,7 +299,6 @@ pub fn to_relative_identifier(
         return Ok(identifier.to_string());
     }
 
-    let path_obj = Path::new(path);
 
     let git_root = crate::git_commands::get_git_root_dir()
         .map_err(|e| ReqvireError::PathError(format!("Failed to get git root: {}", e)))?;
