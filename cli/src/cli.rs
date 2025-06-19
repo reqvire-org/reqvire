@@ -188,7 +188,8 @@ fn print_custom_help(cmd: &clap::Command) {
                 String::new()
             };
             let help = arg.get_help().map(|s| s.to_string()).unwrap_or_default();
-            println!("  {}{}{:<20} {}", short, long, value_name, help);
+            let option_part = format!("{}{}{}", short, long, value_name);
+            println!("  {:<25} {}", option_part, help);
         }
     }
     println!("  -h, --help               Print help");
@@ -214,7 +215,8 @@ fn print_custom_help(cmd: &clap::Command) {
                     String::new()
                 };
                 let help = arg.get_help().map(|s| s.to_string()).unwrap_or_default();
-                options.push(format!("      {}{:<20} {}", long, value_name, help));
+                let option_part = format!("{}{}", long, value_name);
+                options.push(format!("      {:<25} {}", option_part, help));
             }
         }
         
