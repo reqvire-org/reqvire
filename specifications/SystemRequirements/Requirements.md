@@ -548,7 +548,6 @@ The system shall parse the files in all folders and subfolders from the root of 
 
 ---
 
-
 ### Subdirectory Processing Option
 
 The system shall automatically detect when it is run from a subdirectory of a git repository and process only files within that subdirectory, enabling focused analysis and improved performance when working with large repositories.
