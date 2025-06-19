@@ -41,6 +41,15 @@ graph LR;
   class 4b89dbed94c08c3e default;
   click 4b89dbed94c08c3e "../../core/src/change_impact.rs";
   4b89dbed94c08c3e -->|satisfies| c8d1020a3844532d;
+  d5f8a3c2e9b17456["Smart Filtering for Change Impact Reports"];
+  class d5f8a3c2e9b17456 requirement;
+  click d5f8a3c2e9b17456 "ChangeImpactPropagation.md#smart-filtering-for-change-impact-reports";
+  9933cac5853a8584["../UserRequirements.md#change-impact-analysis"];
+  class 9933cac5853a8584 requirement;
+  click 9933cac5853a8584 "../UserRequirements.md#change-impact-analysis";
+  d5f8a3c2e9b17456 -.->|deriveReqT| 9933cac5853a8584;
+  d5f8a3c2e9b17456 -.->|deriveReqT| 2054606d7574a553;
+  4b89dbed94c08c3e -->|satisfies| d5f8a3c2e9b17456;
 ```
 
 ---
@@ -124,6 +133,75 @@ The visualization shall include:
 
 #### Relations
   * derivedFrom: [../SpecificationsRequirements.md#requirements-change-propagation](../SpecificationsRequirements.md#requirements-change-propagation)  
+  * satisfiedBy: [../../core/src/change_impact.rs](../../core/src/change_impact.rs)
+
+---
+
+### Smart Filtering for Change Impact Reports
+
+The system shall implement intelligent filtering logic to eliminate redundant information from change impact reports and focus on primary changes and their relationships.
+
+#### Details
+
+<details>
+<summary>View Full Specification</summary>
+
+
+The smart filtering shall implement the following logic:
+
+1. **Primary Change Detection**:
+   - Distinguish between primary changes (elements that are modified, added, or removed as the main focus) and secondary changes (elements that appear in relations of primary changes)
+   - Filter out new elements that are already referenced in the relations of other new elements to prevent duplicate entries
+
+2. **Filtering Rules**:
+   - **Eliminate Redundant New Elements**: If a new element is referenced in the relations of another new element, do not show it separately in the "New Elements" section
+   - **Show Only Independent New Elements**: New elements should only appear in their own section if they are not already covered by relationships from other new elements
+   - **Relation Context Marking**: When displaying relations, optionally mark elements that are new with "(new)" suffix to provide context about which relation targets are also new without duplicating information
+
+3. **Hierarchical Organization**:
+   - Present changes in order of importance: modified elements first, then independent new elements, then removed elements
+   - Group related changes together to show impact chains clearly
+   - Maintain complete traceability while reducing visual clutter
+
+4. **Benefits**:
+   - **Reduced Clutter**: Eliminates redundant information that appears in multiple places
+   - **Improved Focus**: Readers can quickly identify primary changes without scanning duplicate entries
+   - **Clear Context**: New elements are shown in their most relevant relationship context
+   - **Better Readability**: Reports are more concise while maintaining complete information
+
+#### Example
+
+**Before Smart Filtering:**
+```
+New Elements:
+- Element A (new)
+- Element B (new)  
+- Element C (new)
+
+Modified Elements:
+- Element X
+  Relations:
+  * refines: Element A
+  * verifiedBy: Element B
+```
+
+**After Smart Filtering:**
+```
+Modified Elements:
+- Element X  
+  Relations:
+  * refines: Element A (new)
+  * verifiedBy: Element B (new)
+
+New Elements:
+- Element C (new)
+```
+
+</details>
+
+#### Relations
+  * derivedFrom: [../UserRequirements.md#change-impact-analysis](../UserRequirements.md#change-impact-analysis)
+  * derivedFrom: [../SpecificationsRequirements.md#requirements-change-propagation](../SpecificationsRequirements.md#requirements-change-propagation)
   * satisfiedBy: [../../core/src/change_impact.rs](../../core/src/change_impact.rs)
 
 ---

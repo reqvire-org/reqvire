@@ -125,7 +125,6 @@ When a requirement changes, impact analysis must be conducted based on its relat
   - If changes affect verification, update test cases or validation documents.
 - If a change results in a requirement being merged, split, or removed, update its Relations to maintain traceability.
 
-
 ## Examples of Change Propagation
 
 
