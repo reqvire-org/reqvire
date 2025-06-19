@@ -10,7 +10,6 @@ use crate::element::ElementType;
 use crate::element::RequirementType;
 use crate::git_commands;
 use crate::filesystem;
-use std::path::Path;
 
 /// Generates diagrams grouped by `file_path` and `section`
 pub fn generate_diagrams_by_section(

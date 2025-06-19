@@ -151,43 +151,53 @@ The smart filtering shall implement the following logic:
 
 1. **Primary Change Detection**:
    - Distinguish between primary changes (elements that are modified, added, or removed as the main focus) and secondary changes (elements that appear in relations of primary changes)
-   - Filter out new elements that are already referenced in the relations of other new elements to prevent duplicate entries
+   - Filter out elements that are already referenced in the relations of other elements to prevent duplicate entries
+   - Apply filtering to both new-to-new and changed-to-changed element relationships
 
-2. **Filtering Rules**:
-   - **Eliminate Redundant New Elements**: If a new element is referenced in the relations of another new element, do not show it separately in the "New Elements" section
-   - **Show Only Independent New Elements**: New elements should only appear in their own section if they are not already covered by relationships from other new elements
-   - **Relation Context Marking**: When displaying relations, optionally mark elements that are new with "(new)" suffix to provide context about which relation targets are also new without duplicating information
+2. **Comprehensive Filtering Rules**:
+   - **Eliminate Redundant New Elements**: If a new element is referenced in the relations of another new or changed element, do not show it separately in the "New Elements" section
+   - **Eliminate Redundant Changed Elements**: If a changed element is referenced in the relations of another changed element, do not show it separately in the "Changed Elements" section  
+   - **Show Only Independent Elements**: Elements should only appear in their own section if they are not already covered by relationships from other elements in the same report
+   - **Relation Context Marking**: When displaying relations, mark elements that are new with "(new)" suffix and changed elements with "⚠️" symbol to provide context about the status of relation targets
 
-3. **Hierarchical Organization**:
+3. **Cross-Category Filtering**:
+   - Apply filtering across all categories (new, changed, removed)
+   - A changed element referenced by another changed element should not appear as standalone
+   - A new element referenced by a changed element should not appear as standalone
+   - Preserve the most informative context for each filtered element
+
+4. **Hierarchical Organization**:
    - Present changes in order of importance: modified elements first, then independent new elements, then removed elements
    - Group related changes together to show impact chains clearly
    - Maintain complete traceability while reducing visual clutter
 
-4. **Benefits**:
+5. **Benefits**:
    - **Reduced Clutter**: Eliminates redundant information that appears in multiple places
    - **Improved Focus**: Readers can quickly identify primary changes without scanning duplicate entries
-   - **Clear Context**: New elements are shown in their most relevant relationship context
+   - **Clear Context**: Elements are shown in their most relevant relationship context
    - **Better Readability**: Reports are more concise while maintaining complete information
 
-#### Example
+#### Enhanced Filtering Examples
 
-**Before Smart Filtering:**
+**Example 1: New Element Filtering**
+
+Before Smart Filtering:
 ```
 New Elements:
 - Element A (new)
 - Element B (new)  
 - Element C (new)
 
-Modified Elements:
+Changed Elements:
 - Element X
   Relations:
   * refines: Element A
   * verifiedBy: Element B
 ```
 
-**After Smart Filtering:**
+After Smart Filtering:
 ```
-Modified Elements:
+Changed Elements:
 - Element X  
   Relations:
   * refines: Element A (new)
@@ -195,6 +205,47 @@ Modified Elements:
 
 New Elements:
 - Element C (new)
+```
+
+**Example 2: Changed Element Filtering**
+
+Before Smart Filtering:
+```
+Changed Elements:
+- Power Saving Mode (changed)
+  Relations:
+  * verifiedBy: Power Saving
+- Power Saving (changed)
+```
+
+After Smart Filtering:
+```
+Changed Elements:
+- Power Saving Mode (changed)
+  Relations:
+  * verifiedBy: Power Saving ⚠️
+```
+
+**Example 3: Cross-Category Filtering**
+
+Before Smart Filtering:
+```
+New Elements:
+- New Verification (new)
+
+Changed Elements:
+- Updated Requirement (changed)
+  Relations:
+  * verifiedBy: New Verification
+- New Verification (new)
+```
+
+After Smart Filtering:
+```
+Changed Elements:
+- Updated Requirement (changed)
+  Relations:
+  * verifiedBy: New Verification (new)
 ```
 
 </details>

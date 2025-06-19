@@ -14,7 +14,7 @@ name = "reqvire"
 path = "src/main.rs"
 
 [dependencies]
-reqvire = { workspace = true, version.workspace = true  }
+reqvire = { workspace = true }
 
 # CLI
 clap = { workspace = true }

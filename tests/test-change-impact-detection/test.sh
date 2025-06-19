@@ -13,6 +13,10 @@
 # Modify requirements after commit
 sed -i 's/The systsem shall activate power-saving mode when the battery level drops below 20%./The systsem shall activate power-saving mode when the battery level drops below 30%./g' "${TEST_DIR}/Requirements.md"
 
+sed -i 's/Power saving./Power saving.../g' "${TEST_DIR}/Requirements.md"
+
+
+
 # Test 1: Run change impact detection with default commit (HEAD)
 OUTPUT=$(cd "${TEST_DIR}" && "${REQVIRE_BIN}" --config "${TEST_DIR}/reqvire.yaml" change-impact 2>&1)
 EXIT_CODE=$?
@@ -42,6 +46,8 @@ GOTTEN_CONTENT=$(echo "$OUTPUT" | grep -v "INFO  reqvire::config" | grep -v "War
 SANITIZED_OUTPUT=$(echo "$GOTTEN_CONTENT" | sed -E 's#https://[^ )]+/blob/[a-f0-9]{7,40}/##g')
 
 # The expected content with blank lines matching actual output
+# Note: "Power Saving" is filtered out from standalone changed elements by enhanced smart filtering
+# since it appears in the change impact tree of "Power Saving Mode" with ⚠️ symbol
 EXPECTED_CONTENT='## Change Impact Report
 
 ### Changed Elements
@@ -50,7 +56,7 @@ EXPECTED_CONTENT='## Change Impact Report
     * derive -> [CPU Power Reduction](Requirements.md#cpu-power-reduction)
       * verifiedBy -> [CPU Throttling](Requirements.md#cpu-throttling)
       * satisfiedBy -> [software/cpu_manager.txt](software/cpu_manager.txt)
-    * verifiedBy -> [Power Saving](Requirements.md#power-saving)
+    * verifiedBy -> [Power Saving](Requirements.md#power-saving) ⚠️
     * derive -> [Screen Brightness Adjustment](Requirements.md#screen-brightness-adjustment)
       * verifiedBy -> [Screen Brightness](Requirements.md#screen-brightness)
     * satisfiedBy -> [software/power_control.txt](software/power_control.txt)

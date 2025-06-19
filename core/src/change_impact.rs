@@ -562,46 +562,64 @@ fn apply_smart_filtering(
     report: &mut ChangeImpactReport,
     _current: &element_registry::ElementRegistry,
 ) {
-    // Collect all new element IDs for quick lookup
+    // Collect all element IDs for different categories
     let new_element_ids: HashSet<String> = report.added.iter()
         .map(|elem| elem.element_id.clone())
         .collect();
+        
+    let changed_element_ids: HashSet<String> = report.changed.iter()
+        .map(|elem| elem.element_id.clone())
+        .collect();
     
-    // Collect new element IDs that are referenced in relations of other new elements
+    // Collect element IDs that are referenced in relations of other elements
     let mut referenced_new_elements = HashSet::new();
+    let mut referenced_changed_elements = HashSet::new();
     
-    // Check references in added elements' relations
+    // Check references in added elements' relations and change impact trees
     for added_elem in &report.added {
         for relation in &added_elem.added_relations {
             if let LinkType::Identifier(target_id) = &relation.target.link {
                 if new_element_ids.contains(target_id) {
                     referenced_new_elements.insert(target_id.clone());
                 }
+                if changed_element_ids.contains(target_id) {
+                    referenced_changed_elements.insert(target_id.clone());
+                }
             }
         }
+        // Also check the change impact tree
+        collect_referenced_elements_from_tree(&added_elem.change_impact_tree, &new_element_ids, &changed_element_ids, &mut referenced_new_elements, &mut referenced_changed_elements);
     }
     
-    // Check references in changed elements' relations
+    // Check references in changed elements' relations and change impact trees  
     for changed_elem in &mut report.changed {
         for relation in &changed_elem.added_relations {
             if let LinkType::Identifier(target_id) = &relation.target.link {
                 if new_element_ids.contains(target_id) {
                     referenced_new_elements.insert(target_id.clone());
                 }
+                if changed_element_ids.contains(target_id) {
+                    referenced_changed_elements.insert(target_id.clone());
+                }
             }
         }
+        // Also check the change impact tree
+        collect_referenced_elements_from_tree(&changed_elem.change_impact_tree, &new_element_ids, &changed_element_ids, &mut referenced_new_elements, &mut referenced_changed_elements);
         
-        // Mark new elements in relations with "(new)" suffix
+        // Mark new and changed elements in relations
         mark_new_elements_in_relations(&mut changed_elem.added_relations, &new_element_ids);
+        mark_changed_elements_in_relations(&mut changed_elem.added_relations, &changed_element_ids);
     }
     
-    // Mark new elements in relations of remaining added elements
+    // Mark elements in relations of remaining added elements
     for added_elem in &mut report.added {
         mark_new_elements_in_relations(&mut added_elem.added_relations, &new_element_ids);
+        mark_changed_elements_in_relations(&mut added_elem.added_relations, &changed_element_ids);
     }
     
-    // Filter out referenced new elements from the added list
+    // Filter out referenced elements from their respective lists
     report.added.retain(|elem| !referenced_new_elements.contains(&elem.element_id));
+    report.changed.retain(|elem| !referenced_changed_elements.contains(&elem.element_id));
 }
 
 /// Marks relations that target new elements with "(new)" suffix in the target text
@@ -615,6 +633,50 @@ fn mark_new_elements_in_relations(relations: &mut Vec<RelationSummary>, new_elem
                 }
             }
         }
+    }
+}
+
+/// Marks relations that target changed elements with "⚠️" suffix in the target text
+fn mark_changed_elements_in_relations(relations: &mut Vec<RelationSummary>, changed_element_ids: &HashSet<String>) {
+    for relation in relations {
+        if let LinkType::Identifier(target_id) = &relation.target.link {
+            if changed_element_ids.contains(target_id) {
+                // Only add "⚠️" if it's not already there
+                if !relation.target.text.ends_with(" ⚠️") {
+                    relation.target.text = format!("{} ⚠️", relation.target.text);
+                }
+            }
+        }
+    }
+}
+
+
+/// Recursively collects element IDs referenced in change impact trees
+fn collect_referenced_elements_from_tree(
+    node: &element_registry::ElementNode,
+    new_element_ids: &HashSet<String>,
+    changed_element_ids: &HashSet<String>,
+    referenced_new_elements: &mut HashSet<String>,
+    referenced_changed_elements: &mut HashSet<String>,
+) {
+    for relation_node in &node.relations {
+        let target_id = &relation_node.element_node.element.identifier;
+        
+        if new_element_ids.contains(target_id) {
+            referenced_new_elements.insert(target_id.clone());
+        }
+        if changed_element_ids.contains(target_id) {
+            referenced_changed_elements.insert(target_id.clone());
+        }
+        
+        // Recursively check child nodes
+        collect_referenced_elements_from_tree(
+            &relation_node.element_node,
+            new_element_ids,
+            changed_element_ids,
+            referenced_new_elements,
+            referenced_changed_elements,
+        );
     }
 }
 
@@ -708,18 +770,18 @@ pub fn compute_change_impact(
         });
     }
 
-
-    let content_changed_ids: HashSet<String> = report.changed
-        .iter()
-        .filter(|e| e.content_changed)
-        .map(|e| e.element_id.clone())
+    // Collect all changed element IDs to propagate change flags in impact trees
+    let changed_element_ids: HashSet<String> = report.changed.iter()
+        .map(|elem| elem.element_id.clone())
         .collect();
 
+    // Use changed_element_ids (all changed elements) instead of content_changed_ids
+    // to ensure change impact trees show ⚠️ for all changed elements, not just content changes
     for changed in &mut report.changed {
-        propagate_changed_flags(&mut changed.change_impact_tree, &content_changed_ids);
+        propagate_changed_flags(&mut changed.change_impact_tree, &changed_element_ids);
     }
     for added in &mut report.added {
-        propagate_changed_flags(&mut added.change_impact_tree, &content_changed_ids);
+        propagate_changed_flags(&mut added.change_impact_tree, &changed_element_ids);
     }    
       
                 
