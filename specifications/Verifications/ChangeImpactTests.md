@@ -97,7 +97,7 @@ graph LR;
 
 ### Change Impact Detection Test
 
-This test verifies that the system correctly implements change impact detection, including proper default handling of the git commit parameter.
+This test verifies that the system correctly implements change impact detection, including proper default handling of the git commit parameter and smart filtering.
 
 #### Metadata
   * type: verification
@@ -109,11 +109,13 @@ This test verifies that the system correctly implements change impact detection,
 - System properly constructs a change impact report based on relationships between elements
 - Default git commit is HEAD when --git-commit parameter is not provided
 - System provides output in both human-readable text and JSON formats
+- Smart filtering removes redundant elements that appear in other elements' relations
 
 ##### Test Criteria
 - Command exits with success (0) return code
 - Change impact report shows expected elements
 - Change impact report shows correct relationships between elements
+- Changed elements referenced in other changed elements' relations are filtered out (e.g., "Power Saving" filtered when referenced by "Power Saving Mode")
 - Output format matches requested format (text or JSON)
 - Both explicit and implicit git commit parameters work properly
 - JSON output is valid and contains all necessary information
@@ -122,6 +124,7 @@ This test verifies that the system correctly implements change impact detection,
 #### Relations
   * verify: [SystemRequirements/ChangeImpactPropagation.md#change-impact-detection-algorithm](../SystemRequirements/ChangeImpactPropagation.md#change-impact-detection-algorithm)
   * verify: [SystemRequirements/ChangeImpactPropagation.md#change-impact-command-line-interface](../SystemRequirements/ChangeImpactPropagation.md#change-impact-command-line-interface)
+  * verify: [SystemRequirements/ChangeImpactPropagation.md#smart-filtering-for-change-impact-reports](../SystemRequirements/ChangeImpactPropagation.md#smart-filtering-for-change-impact-reports)
   * trace: [tests/test-change-impact-detection/test.sh](../../tests/test-change-impact-detection/test.sh)
 
 ---
@@ -304,5 +307,39 @@ TODO: write test procedure
 #### Relations
   * verify: [UserRequirements.md/Tracing Structural Changes](../UserRequirements.md#tracing-structural-changes)
   * trace: [tests/test-change-impact-detection/test.sh](../../tests/test-change-impact-detection/test.sh)
+
+---
+
+### Change Impact Smart Filtering Test
+
+This test verifies that the smart filtering correctly handles new elements in change impact reports, filtering child elements while showing parent elements.
+
+#### Metadata
+  * type: test-verification
+
+#### Details
+
+##### Acceptance Criteria
+- New parent elements appear in the "New Elements" section
+- New child elements (with parent relationships to other new elements) are filtered out
+- Filtered child elements are shown in parent's relations with "(new)" marker
+- Verification elements that are not children remain in the report
+
+##### Test Criteria
+- When adding a parent and child requirement together, only parent appears in "New Elements"
+- When adding a requirement and its verification, both appear (verification is not a child)
+- Child elements are visible in the parent's change impact tree with appropriate markers
+
+##### Test Procedure
+1. Create test repository with existing requirements
+2. Add new parent requirement with derive relation to new child requirement
+3. Add new child requirement with derivedFrom relation to parent
+4. Run change impact detection
+5. Verify only parent appears in "New Elements" section
+6. Verify child appears in parent's relations with "(new)" marker
+
+#### Relations
+  * verify: [SystemRequirements/ChangeImpactPropagation.md#smart-filtering-for-change-impact-reports](../SystemRequirements/ChangeImpactPropagation.md#smart-filtering-for-change-impact-reports)
+  * trace: [tests/test-change-impact-smart-filtering/test.sh](../../tests/test-change-impact-smart-filtering/test.sh)
 
 ---
