@@ -20,6 +20,7 @@ fn main() {
         Some(cli::Commands::ModelSummary { json, .. }) => *json,
         Some(cli::Commands::ChangeImpact { json, .. }) => *json,
         Some(cli::Commands::Lint { json, .. }) => *json,
+        Some(cli::Commands::CoverageReport { json }) => *json,
         _ => false,
     };
     

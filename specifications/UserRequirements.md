@@ -397,6 +397,29 @@ The system shall allow users to generate summary reports highlighting key metric
 
 ---
 
+### Verification Coverage Report
+
+The system shall generate verification coverage reports showing the percentage and details of satisfied and unsatisfied verifications, including breakdowns by file, section, and verification type.
+
+#### Details
+
+The verification coverage report shall provide:
+- Total count of verifications with breakdown by verification type (test, analysis, inspection, demonstration)
+- Count and percentage of satisfied verifications (those with satisfiedBy relations pointing to existing artifacts)
+- Count and percentage of unsatisfied verifications
+- Detailed list of satisfied verifications grouped by file and section
+- Detailed list of unsatisfied verifications
+- Output in both human-readable text and machine-readable JSON formats
+
+The report helps track verification completeness and identify gaps in test coverage, supporting quality assurance and compliance activities.
+
+#### Relations
+  * refine: [UserStories.md/Provide Reports](UserStories.md#provide-reports)
+  * derivedFrom: [Generate Summary Reports](#generate-summary-reports)
+  * verifiedBy: [Verifications/ReportsTests.md#Verification Coverage Report Test](Verifications/ReportsTests.md#verification-coverage-report-test)
+
+---
+
 ## Trace Changes in MBSE Model
 ```mermaid
 graph LR;

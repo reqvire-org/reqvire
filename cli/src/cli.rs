@@ -132,6 +132,13 @@ pub enum Commands {
         /// Output results in JSON format
         #[clap(long, help_heading = "CHANGE IMPACT OPTIONS")]
         json: bool,
+    },
+    
+    /// Output verification coverage report
+    CoverageReport {
+        /// Output results in JSON format
+        #[clap(long)]
+        json: bool,
     }
 }
 
@@ -393,6 +400,11 @@ pub fn handle_command(
             let processed_count = export::export_model(&model_manager.element_registry, &html_output_path)?;
             info!("{} markdown files converted to HTML", processed_count);   
             
+            return Ok(0);
+        },
+        Some(Commands::CoverageReport { json }) => {
+            let coverage_report = reports::generate_coverage_report(&model_manager.element_registry);
+            coverage_report.print(json);
             return Ok(0);
         },
         None => {

@@ -1379,6 +1379,53 @@ The system shall implement a validation report generator that compiles and forma
 
 ---
 
+### Verification Coverage Report Generator
+
+The system shall provide a verification coverage report generator that analyzes verification elements and their satisfaction status to produce coverage metrics and detailed reports.
+
+#### Details
+
+The coverage report generator must:
+- Identify all verification elements (type: "verification") in the model
+- Determine satisfaction status based on presence of satisfiedBy relations
+- Calculate coverage percentage (satisfied/total * 100)
+- Group verifications by file and section for organization
+- Support both human-readable text and machine-readable JSON output formats
+
+The report structure shall include:
+- Summary section with total counts and percentages
+- Satisfied verifications section grouped by file
+- Unsatisfied verifications section with details
+
+#### Relations
+  * derivedFrom: [UserRequirements.md/Verification Coverage Report](../UserRequirements.md#verification-coverage-report)
+  * derivedFrom: [Model Summary Report Generator](#model-summary-report-generator)
+  * verifiedBy: [../Verifications/ReportsTests.md#Verification Coverage Report Test](../Verifications/ReportsTests.md#verification-coverage-report-test)
+
+---
+
+### CLI Coverage Report Command
+
+The system shall provide a command-line interface command `coverage-report` that generates verification coverage reports.
+
+#### Details
+
+The command shall:
+- Be invoked as `reqvire coverage-report`
+- Support `--json` flag for JSON output format
+- Default to human-readable text output when JSON flag is not present
+- Exit with status code 0 on success
+- Exit with non-zero status code on errors
+
+Command output shall be written to stdout for easy redirection to files.
+
+#### Relations
+  * derivedFrom: [Verification Coverage Report Generator](#verification-coverage-report-generator)
+  * derivedFrom: [CLI Summary Report Command](#cli-summary-report-command)
+  * verifiedBy: [../Verifications/ReportsTests.md#Verification Coverage Report Test](../Verifications/ReportsTests.md#verification-coverage-report-test)
+
+---
+
 ## Diagrams
 ```mermaid
 graph LR;
