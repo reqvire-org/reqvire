@@ -8,7 +8,7 @@ on:
 
 jobs:
   generate-diagrams:
-    if: github.event.pull_request.merged == true
+    if: github.event.pull_request.merged == true && !startsWith(github.event.pull_request.head.ref, 'release/')
     name: Generate and Commit Diagrams
     runs-on: ubuntu-latest
     
