@@ -18,6 +18,13 @@ graph LR;
   class 7b75340700b95177 default;
   click 7b75340700b95177 "../../tests/test-model-summary-reports/test.sh";
   7b75340700b95177 -->|satisfies| 76ae69270700044b;
+  349f5e874cf22d98["Verification Coverage Report Test"];
+  class 349f5e874cf22d98 verification;
+  click 349f5e874cf22d98 "ReportsTests.md#verification-coverage-report-test";
+  7099e5b2f8a08808["tests/test-coverage-report/test.sh"];
+  class 7099e5b2f8a08808 default;
+  click 7099e5b2f8a08808 "../../tests/test-coverage-report/test.sh";
+  7099e5b2f8a08808 -->|satisfies| 349f5e874cf22d98;
   3108f29b131412a3["Index Generation Test"];
   class 3108f29b131412a3 verification;
   click 3108f29b131412a3 "ReportsTests.md#index-generation-test";
@@ -29,9 +36,6 @@ graph LR;
   class 1123809d5f501bf1 default;
   click 1123809d5f501bf1 "../../tests/test-index-generation/test.sh";
   1123809d5f501bf1 -->|satisfies| 3108f29b131412a3;
-  cc8f4d2e1a9b5748["Verification Coverage Report Test"];
-  class cc8f4d2e1a9b5748 verification;
-  click cc8f4d2e1a9b5748 "ReportsTests.md#verification-coverage-report-test";
 ```
 
 ---

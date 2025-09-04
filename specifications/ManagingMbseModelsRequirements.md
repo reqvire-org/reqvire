@@ -16,13 +16,6 @@ graph LR;
   class e61b7c1baa89bfc6 requirement;
   click e61b7c1baa89bfc6 "UserStories.md#managing-mbse-models";
   d193d11c43776bec -.->|deriveReqT| e61b7c1baa89bfc6;
-  d9354ef2eca0f2d0["Configurable User Requirements Root Folder"];
-  class d9354ef2eca0f2d0 requirement;
-  click d9354ef2eca0f2d0 "ManagingMbseModelsRequirements.md#configurable-user-requirements-root-folder";
-  16b4b380c917deb1["Project Configuration with YAML"];
-  class 16b4b380c917deb1 requirement;
-  click 16b4b380c917deb1 "ManagingMbseModelsRequirements.md#project-configuration-with-yaml";
-  d9354ef2eca0f2d0 -.->|deriveReqT| 16b4b380c917deb1;
   649d72765b13e14f["Git Repository as Project Root"];
   class 649d72765b13e14f requirement;
   click 649d72765b13e14f "ManagingMbseModelsRequirements.md#git-repository-as-project-root";
@@ -30,13 +23,20 @@ graph LR;
   c9cc6878a73bb951["Default Requirement Type Assignment"];
   class c9cc6878a73bb951 requirement;
   click c9cc6878a73bb951 "ManagingMbseModelsRequirements.md#default-requirement-type-assignment";
+  d9354ef2eca0f2d0["Configurable User Requirements Root Folder"];
+  class d9354ef2eca0f2d0 requirement;
+  click d9354ef2eca0f2d0 "ManagingMbseModelsRequirements.md#configurable-user-requirements-root-folder";
   c9cc6878a73bb951 -->|refines| d9354ef2eca0f2d0;
-  16b4b380c917deb1 -.->|deriveReqT| e61b7c1baa89bfc6;
-  16b4b380c917deb1 -->|refines| 649d72765b13e14f;
   f0d721424636370e["Coexistence of Structured and Unstructured Documents"];
   class f0d721424636370e requirement;
   click f0d721424636370e "ManagingMbseModelsRequirements.md#coexistence-of-structured-and-unstructured-documents";
   f0d721424636370e -.->|deriveReqT| e61b7c1baa89bfc6;
+  16b4b380c917deb1["Project Configuration with YAML"];
+  class 16b4b380c917deb1 requirement;
+  click 16b4b380c917deb1 "ManagingMbseModelsRequirements.md#project-configuration-with-yaml";
+  d9354ef2eca0f2d0 -.->|deriveReqT| 16b4b380c917deb1;
+  16b4b380c917deb1 -.->|deriveReqT| e61b7c1baa89bfc6;
+  16b4b380c917deb1 -->|refines| 649d72765b13e14f;
 ```
 
 ---
