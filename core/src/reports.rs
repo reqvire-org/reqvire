@@ -409,3 +409,186 @@ fn print_summary_text(summary: &Summary) {
     println!("Requirements not verified: {}", c.requirements_not_verified);
     println!("Requirements not satisfied: {}", c.requirements_not_satisfied);
 }
+
+#[derive(Serialize)]
+pub struct CoverageReport {
+    summary: CoverageSummary,
+    satisfied_verifications: VerificationsByFile,
+    unsatisfied_verifications: VerificationsByFile,
+}
+
+#[derive(Serialize)]
+struct CoverageSummary {
+    total_verifications: usize,
+    total_satisfied: usize,
+    total_unsatisfied: usize,
+    coverage_percentage: f64,
+    verification_types: VerificationTypeCounts,
+}
+
+#[derive(Serialize)]
+struct VerificationTypeCounts {
+    test: usize,
+    analysis: usize,
+    inspection: usize,
+    demonstration: usize,
+}
+
+#[derive(Serialize)]
+struct VerificationsByFile {
+    files: HashMap<String, Vec<VerificationDetails>>,
+}
+
+#[derive(Serialize)]
+struct VerificationDetails {
+    identifier: String,
+    name: String,
+    section: String,
+    verification_type: String,
+    satisfied_by: Vec<String>,
+}
+
+impl CoverageReport {
+    pub fn print(&self, json_output: bool) {
+        if json_output {
+            println!("{}", serde_json::to_string_pretty(&self).unwrap());
+        } else {
+            self.print_text();
+        }
+    }
+
+    fn print_text(&self) {
+        println!("=== Verification Coverage Report ===\n");
+        
+        // Summary
+        println!("Summary:");
+        println!("  Total Verifications: {}", self.summary.total_verifications);
+        println!("  Satisfied: {} ({:.1}%)", self.summary.total_satisfied, self.summary.coverage_percentage);
+        println!("  Unsatisfied: {}", self.summary.total_unsatisfied);
+        println!();
+        
+        println!("Verification Types:");
+        println!("  Test: {}", self.summary.verification_types.test);
+        println!("  Analysis: {}", self.summary.verification_types.analysis);
+        println!("  Inspection: {}", self.summary.verification_types.inspection);
+        println!("  Demonstration: {}", self.summary.verification_types.demonstration);
+        println!();
+        
+        // Satisfied verifications
+        if !self.satisfied_verifications.files.is_empty() {
+            println!("Satisfied Verifications:");
+            for (file, verifications) in &self.satisfied_verifications.files {
+                println!("  📂 {}", file);
+                for verification in verifications {
+                    println!("    ✅ {} ({})", verification.name, verification.verification_type);
+                    if !verification.satisfied_by.is_empty() {
+                        println!("       Satisfied by: {}", verification.satisfied_by.join(", "));
+                    }
+                }
+                println!();
+            }
+        }
+        
+        // Unsatisfied verifications
+        if !self.unsatisfied_verifications.files.is_empty() {
+            println!("Unsatisfied Verifications:");
+            for (file, verifications) in &self.unsatisfied_verifications.files {
+                println!("  📂 {}", file);
+                for verification in verifications {
+                    println!("    ❌ {} ({})", verification.name, verification.verification_type);
+                }
+                println!();
+            }
+        }
+    }
+}
+
+pub fn generate_coverage_report(registry: &ElementRegistry) -> CoverageReport {
+    let mut total_verifications = 0;
+    let mut total_satisfied = 0;
+    let mut verification_types = VerificationTypeCounts {
+        test: 0,
+        analysis: 0,
+        inspection: 0,
+        demonstration: 0,
+    };
+    
+    let mut satisfied_files: HashMap<String, Vec<VerificationDetails>> = HashMap::new();
+    let mut unsatisfied_files: HashMap<String, Vec<VerificationDetails>> = HashMap::new();
+    
+    // Analyze all verification elements
+    for element in registry.elements.values() {
+        if let element::ElementType::Verification(verification_type) = &element.element_type {
+            total_verifications += 1;
+            
+            // Count by verification type
+            match verification_type {
+                element::VerificationType::Default | element::VerificationType::Test => {
+                    verification_types.test += 1;
+                }
+                element::VerificationType::Analysis => {
+                    verification_types.analysis += 1;
+                }
+                element::VerificationType::Inspection => {
+                    verification_types.inspection += 1;
+                }
+                element::VerificationType::Demonstration => {
+                    verification_types.demonstration += 1;
+                }
+            }
+            
+            // Check if verification is satisfied (has satisfiedBy relations)
+            let satisfied_by: Vec<String> = element.relations.iter()
+                .filter(|r| relation::is_satisfaction_relation(r.relation_type))
+                .map(|r| match &r.target.link {
+                    relation::LinkType::Identifier(id) => id.clone(),
+                    relation::LinkType::ExternalUrl(url) => url.clone(),
+                    relation::LinkType::InternalPath(path) => path.to_string_lossy().to_string(),
+                })
+                .collect();
+            
+            let verification_details = VerificationDetails {
+                identifier: element.identifier.clone(),
+                name: element.name.clone(),
+                section: element.section.clone(),
+                verification_type: element.element_type.as_str().to_string(),
+                satisfied_by: satisfied_by.clone(),
+            };
+            
+            if satisfied_by.is_empty() {
+                // Unsatisfied
+                unsatisfied_files.entry(element.file_path.clone())
+                    .or_insert_with(Vec::new)
+                    .push(verification_details);
+            } else {
+                // Satisfied
+                total_satisfied += 1;
+                satisfied_files.entry(element.file_path.clone())
+                    .or_insert_with(Vec::new)
+                    .push(verification_details);
+            }
+        }
+    }
+    
+    let coverage_percentage = if total_verifications > 0 {
+        (total_satisfied as f64 / total_verifications as f64) * 100.0
+    } else {
+        0.0
+    };
+    
+    CoverageReport {
+        summary: CoverageSummary {
+            total_verifications,
+            total_satisfied,
+            total_unsatisfied: total_verifications - total_satisfied,
+            coverage_percentage,
+            verification_types,
+        },
+        satisfied_verifications: VerificationsByFile {
+            files: satisfied_files,
+        },
+        unsatisfied_verifications: VerificationsByFile {
+            files: unsatisfied_files,
+        },
+    }
+}

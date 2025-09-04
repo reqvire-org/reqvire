@@ -18,6 +18,13 @@ graph LR;
   class 7b75340700b95177 default;
   click 7b75340700b95177 "../../tests/test-model-summary-reports/test.sh";
   7b75340700b95177 -->|satisfies| 76ae69270700044b;
+  349f5e874cf22d98["Verification Coverage Report Test"];
+  class 349f5e874cf22d98 verification;
+  click 349f5e874cf22d98 "ReportsTests.md#verification-coverage-report-test";
+  7099e5b2f8a08808["tests/test-coverage-report/test.sh"];
+  class 7099e5b2f8a08808 default;
+  click 7099e5b2f8a08808 "../../tests/test-coverage-report/test.sh";
+  7099e5b2f8a08808 -->|satisfies| 349f5e874cf22d98;
   3108f29b131412a3["Index Generation Test"];
   class 3108f29b131412a3 verification;
   click 3108f29b131412a3 "ReportsTests.md#index-generation-test";
@@ -129,5 +136,55 @@ This test verifies that the system provides a CLI flag and functionality for gen
 
 #### Relations
   * satisfiedBy: [tests/test-model-summary-reports/test.sh](../../tests/test-model-summary-reports/test.sh)
+
+---
+
+### Verification Coverage Report Test
+
+This test verifies that the system correctly generates verification coverage reports showing the percentage and details of satisfied and unsatisfied verifications.
+
+#### Metadata
+  * type: verification
+
+#### Details
+
+##### Acceptance Criteria
+- System shall provide a CLI command `coverage-report` that generates coverage reports
+- Command shall support `--json` flag for JSON output format
+- Coverage report shall include summary section with total counts and percentages
+- Coverage report shall show breakdown by verification type (test, analysis, inspection, demonstration)
+- Coverage report shall list satisfied verifications grouped by file and section
+- Coverage report shall list unsatisfied verifications with details
+- JSON output shall be valid and machine-readable
+- Text output shall be human-readable with clear formatting
+
+##### Test Criteria
+
+1. **Basic Coverage Report**
+   Command: `reqvire coverage-report`
+   - exits code **0**
+   - output contains `=== Verification Coverage Report ===`
+   - output contains `Summary:` section with total counts
+   - output contains `Verification Types:` breakdown
+   - output contains coverage percentage calculation
+   - satisfied verifications are marked with ✅
+   - unsatisfied verifications are marked with ❌
+
+2. **JSON Coverage Report**
+   Command: `reqvire coverage-report --json`
+   - exits code **0**
+   - output parses as valid JSON
+   - JSON contains `summary` object with required fields
+   - JSON contains `satisfied_verifications` and `unsatisfied_verifications` sections
+   - verification details include identifier, name, section, type, and satisfied_by relations
+
+3. **Coverage Calculation**
+   - Coverage percentage calculated as (satisfied/total * 100)
+   - Verification types correctly categorized
+   - Satisfied verifications have non-empty `satisfied_by` relations
+   - Unsatisfied verifications have empty `satisfied_by` relations
+
+#### Relations
+  * satisfiedBy: [tests/test-coverage-report/test.sh](../../tests/test-coverage-report/test.sh)
 
 ---

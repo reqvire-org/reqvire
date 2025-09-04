@@ -20,7 +20,8 @@ paths:
     - "**/cli/**"            
     - "**/doc/**"
     - "**/html/**"    
-    - "*/.github/**"    
+    - "*/.github/**"
+    - "**/.claude/**"    
 
 style:
   # Theme for HTML output (default, dark, light)

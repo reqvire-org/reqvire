@@ -1,0 +1,12 @@
+paths:
+  user_requirements_root_folder: "./specifications"
+  external_folders:
+      
+  output_folder: "output"
+  
+  excluded_filename_patterns:
+    - "**/DesignSpecifications/*.md"
+
+style:
+  theme: "light"
+  max_width: 1200
