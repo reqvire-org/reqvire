@@ -47,17 +47,35 @@ prepare-release:
 	cargo test
 	@echo "Release preparation complete for version $(VERSION)"
 
-# Complete release process
-release: prepare-release
+# Prepare version update (on feature branch)
+version-commit: prepare-release
 	@echo "Committing version changes..."
 	$(eval VERSION := $(call get_version))
+	$(eval BRANCH := $(shell git branch --show-current))
 	git add Cargo.toml Cargo.lock
 	git commit -m "Update version to $(VERSION)"
-	@echo "Creating and pushing tag..."
-	git tag -a v$(VERSION) -m "Release version v$(VERSION)"
-	git push origin main
-	git push origin v$(VERSION)
-	@echo "Release v$(VERSION) completed!"
+	git push origin $(BRANCH)
+	@echo "✅ Version $(VERSION) committed to branch $(BRANCH)"
+	@echo "📝 Next steps:"
+	@echo "   1. Create PR: $(BRANCH) → main"
+	@echo "   2. Merge PR to get version into main"
+	@echo "   3. Run 'make release' to trigger auto-tagging"
+
+# Release: merge main into release branch (triggers auto-tag)
+release:
+	@echo "Releasing from main to release branch..."
+	$(eval VERSION := $(call get_version))
+	@echo "Current version: $(VERSION)"
+	@echo "Switching to release branch and pulling main..."
+	git checkout release
+	git pull origin release
+	git merge main --no-ff -m "Release version $(VERSION)"
+	git push origin release
+	@echo "✅ Main merged into release branch"
+	@echo "🚀 GitHub Action will now automatically:"
+	@echo "   1. Create tag v$(VERSION)"
+	@echo "   2. Trigger release workflow"
+	@echo "   3. Build and publish binaries"
 
 create_tag:
 	@echo "Creating tag..."
