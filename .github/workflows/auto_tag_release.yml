@@ -3,7 +3,7 @@ name: Auto Tag Release
 on:
   push:
     branches:
-      - release
+      - releases
 
 permissions:
   contents: write  # needed to create and push tags
@@ -17,7 +17,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
-          ref: release  # Checkout the release branch
+          ref: releases  # Checkout the releases branch
           fetch-depth: 0  # Fetch full history for tagging
           
       - name: Extract version from Cargo.toml
@@ -46,12 +46,12 @@ jobs:
           TAG="v${{ steps.version.outputs.version }}"
           COMMIT_SHA="${{ github.sha }}"
           
-          echo "Creating tag $TAG for release branch commit ${COMMIT_SHA:0:7}"
+          echo "Creating tag $TAG for releases branch commit ${COMMIT_SHA:0:7}"
           
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           
-          git tag -a "$TAG" -m "Release version $TAG (auto-tagged from release branch)"
+          git tag -a "$TAG" -m "Release version $TAG (auto-tagged from releases branch)"
           git push origin "$TAG"
           
           echo "✅ Tag $TAG created and pushed successfully"

@@ -61,18 +61,18 @@ version-commit: prepare-release
 	@echo "   2. Merge PR to get version into main"
 	@echo "   3. Run 'make release' to trigger auto-tagging"
 
-# Release: merge main into release branch (triggers auto-tag)
+# Release: merge main into releases branch (triggers auto-tag)
 release:
-	@echo "Releasing from main to release branch..."
+	@echo "Releasing from main to releases branch..."
 	$(eval VERSION := $(call get_version))
 	@echo "Current version: $(VERSION)"
-	@echo "Switching to release branch and pulling main..."
-	git checkout release
-	git pull origin release
+	@echo "Switching to releases branch and pulling main..."
+	git checkout releases
+	git pull origin releases
 	git merge main --no-ff -m "Release version $(VERSION)"
-	git push origin release
-	@echo "✅ Main merged into release branch"
-	@echo "🚀 GitHub Action will now automatically:"
+	git push origin releases
+	@echo "Main merged into releases branch"
+	@echo "GitHub Action will now automatically:"
 	@echo "   1. Create tag v$(VERSION)"
 	@echo "   2. Trigger release workflow"
 	@echo "   3. Build and publish binaries"
@@ -82,14 +82,14 @@ release-tag:
 	@echo "Manual tag creation (backup method)..."
 	$(eval VERSION := $(call get_version))
 	$(eval BRANCH := $(shell git branch --show-current))
-	@if [ "$(BRANCH)" != "release" ]; then \
-		echo "ERROR: Tags should be created from release branch. Current branch: $(BRANCH)"; \
-		echo "Switch to release: git checkout release"; \
+	@if [ "$(BRANCH)" != "releases" ]; then \
+		echo "ERROR: Tags should be created from releases branch. Current branch: $(BRANCH)"; \
+		echo "Switch to releases: git checkout releases"; \
 		exit 1; \
 	fi
 	git tag -a v$(VERSION) -m "Release version v$(VERSION)"
 	git push origin v$(VERSION)
-	@echo "Release v$(VERSION) tagged and pushed from release!"
+	@echo "Release v$(VERSION) tagged and pushed from releases!"
 
 create_tag:
 	@echo "Creating tag..."
