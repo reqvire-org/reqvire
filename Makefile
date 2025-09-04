@@ -77,6 +77,20 @@ release:
 	@echo "   2. Trigger release workflow"
 	@echo "   3. Build and publish binaries"
 
+# Manual tag creation (backup method)
+release-tag:
+	@echo "Manual tag creation (backup method)..."
+	$(eval VERSION := $(call get_version))
+	$(eval BRANCH := $(shell git branch --show-current))
+	@if [ "$(BRANCH)" != "release" ]; then \
+		echo "ERROR: Tags should be created from release branch. Current branch: $(BRANCH)"; \
+		echo "Switch to release: git checkout release"; \
+		exit 1; \
+	fi
+	git tag -a v$(VERSION) -m "Release version v$(VERSION)"
+	git push origin v$(VERSION)
+	@echo "Release v$(VERSION) tagged and pushed from release!"
+
 create_tag:
 	@echo "Creating tag..."
 	$(eval VERSION := $(call get_version))
