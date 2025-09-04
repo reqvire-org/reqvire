@@ -13,7 +13,6 @@ tmpdoc
 
 *.bak
 
-CLAUDE.md
 codefetch
 .codefetchignore
 codefetch.config.mjs
