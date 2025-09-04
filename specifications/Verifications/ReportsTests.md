@@ -180,4 +180,7 @@ This test verifies that the system correctly generates verification coverage rep
    - Satisfied verifications have non-empty `satisfied_by` relations
    - Unsatisfied verifications have empty `satisfied_by` relations
 
+#### Relations
+  * satisfiedBy: [tests/test-coverage-report/test.sh](../../tests/test-coverage-report/test.sh)
+
 ---

@@ -166,8 +166,6 @@ if [ "$VERIFICATION_INVALIDATED" -ne 1 ]; then
     exit 1
 fi
 
-echo "✅ PASSED: JSON output correctly applies smart filtering (1 new element: parent only)"
-
 # Clean up
 rm -rf "${TEST_DIR}"
 exit 0
