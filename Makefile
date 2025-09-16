@@ -61,21 +61,31 @@ version-commit: prepare-release
 	@echo "   2. Merge PR to get version into main"
 	@echo "   3. Run 'make release' to trigger auto-tagging"
 
-# Release: merge main into releases branch (triggers auto-tag)
+# Release: create tag directly from main (simplified workflow)
 release:
-	@echo "Releasing from main to releases branch..."
+	@echo "Creating release from main branch..."
 	$(eval VERSION := $(call get_version))
-	@echo "Current version: $(VERSION)"
-	@echo "Switching to releases branch and pulling main..."
-	git checkout releases
-	git pull origin releases
-	git merge main --no-ff -m "Release version $(VERSION)"
-	git push origin releases
-	@echo "Main merged into releases branch"
-	@echo "GitHub Action will now automatically:"
-	@echo "   1. Create tag v$(VERSION)"
-	@echo "   2. Trigger release workflow"
-	@echo "   3. Build and publish binaries"
+	$(eval CURRENT_BRANCH := $(shell git branch --show-current))
+	@if [ "$(CURRENT_BRANCH)" != "main" ]; then \
+		echo "ERROR: Release must be run from main branch. Current branch: $(CURRENT_BRANCH)"; \
+		echo "Switch to main: git checkout main && git pull origin main"; \
+		exit 1; \
+	fi
+	@echo "Checking if working directory is clean..."
+	@if ! git diff-index --quiet HEAD --; then \
+		echo "ERROR: Working directory has uncommitted changes. Please commit or stash them."; \
+		exit 1; \
+	fi
+	@echo "Verifying version $(VERSION) is ready for release..."
+	@echo "Building and testing to ensure stability..."
+	cargo build --release
+	cargo test
+	@echo "Creating release tag v$(VERSION)..."
+	git tag -a v$(VERSION) -m "Release version v$(VERSION)"
+	git push origin v$(VERSION)
+	@echo "✅ Release v$(VERSION) completed!"
+	@echo "🚀 GitHub Actions will build and publish the release"
+	@echo "📝 View release: https://github.com/Reqvire/reqvire/releases/tag/v$(VERSION)"
 
 # Manual tag creation (backup method)
 release-tag:

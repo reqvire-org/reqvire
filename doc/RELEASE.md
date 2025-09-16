@@ -1,13 +1,13 @@
 # Release Process
 
-This document outlines the automated release process for Reqvire, including version management, automated tagging, and binary distribution.
+This document outlines the simplified release process for Reqvire, including version management and automated binary distribution.
 
-## Automated Release Workflow
+## Simplified Release Workflow
 
-The release process follows a structured Git workflow with automated tagging and CI/CD integration:
+The release process is streamlined into a simple Git workflow:
 
 ```
-Feature Branch → Main Branch (via PR) → Release Branch → Auto-Tag → Release
+Feature Branch → Main Branch (via PR) → Tag from Main → GitHub Actions Release
 ```
 
 ## Step-by-Step Release Process
@@ -49,36 +49,32 @@ gh pr create --base main --head release/v0.3.1 \
 
 **Review and merge the PR** to bring the new version into the main branch.
 
-### 3. Trigger Automated Release
+### 3. Create Release
 
-After the PR is merged, trigger the automated release:
+After the PR is merged, create the release directly from main:
 
 ```bash
 # Switch to main and get latest
 git checkout main
 git pull origin main
 
-# Trigger automated release
+# Create release tag
 make release
 ```
 
 **What `make release` does:**
-- Switches to `release` branch
-- Pulls latest `release` branch  
-- Merges `main` into `release` with no-fast-forward
-- Pushes to `release` branch
-- **Triggers GitHub Action for auto-tagging**
+- Verifies you're on main branch with clean working directory
+- Builds and tests the project to ensure stability
+- Creates git tag `v<version>` from main
+- Pushes tag to GitHub
+- **Triggers GitHub Actions for automated release**
 
 ### 4. Automated Steps (GitHub Actions)
 
-When code is pushed to the `release` branch, GitHub Actions automatically:
+When a tag is pushed, GitHub Actions automatically:
 
-1. **Auto-Tag Workflow** (`.github/workflows/auto_tag_release.yml`):
-   - Extracts version from `Cargo.toml`
-   - Creates git tag `v<version>` 
-   - Pushes tag to trigger release workflow
-
-2. **Release Workflow** (`.github/workflows/release.yml`):
+1. **Release Workflow** (`.github/workflows/release.yml`):
+   - Triggered by tag push (e.g., `v0.3.4`)
    - Builds binaries for multiple platforms (Linux, macOS)
    - Runs comprehensive tests
    - Creates GitHub Release with binaries attached
@@ -92,7 +88,7 @@ When code is pushed to the `release` branch, GitHub Actions automatically:
 | `make update-minor` | Increment minor version (0.3.0 → 0.4.0) |
 | `make update-major` | Increment major version (0.3.0 → 1.0.0) |
 | `make version-commit` | Commit version changes on feature branch |
-| `make release` | Merge main → release (triggers auto-tag) |
+| `make release` | Create tag directly from main (triggers release) |
 | `make prepare-release` | Update Cargo.lock, build, test (standalone) |
 | `make create_tag` | Manual tag creation (backup method) |
 
