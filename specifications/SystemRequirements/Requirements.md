@@ -1009,15 +1009,16 @@ The system shall implement validation that verifies relation endpoints have appr
 
 #### Details
 - For `verifiedBy`/`verify` relations, validate that one endpoint is a requirement element and the other is a verification element
-- For `satisfiedBy`/`satisfy` relations, validate that one endpoint is a requirement element and the other is an implementation element
+- For `satisfiedBy`/`satisfy` relations, validate that one endpoint is a requirement or verification element and the other is an implementation element
 - Relations should only connect elements of appropriate types based on the RelationTypesRegistry definition
 - Warnings should be issued when relation endpoints have incompatible element types
 
 #### Relations
   * derivedFrom: [../UserRequirements.md#Validate Relation Types](../UserRequirements.md#validate-relation-types)
-  * derivedFrom: [../SpecificationsRequirements.md#Relation Types And Behaviors](../SpecificationsRequirements.md#relation-types-and-behaviors)  
-  * satisfiedBy: [model.rs](../../core/src/model.rs)    
+  * derivedFrom: [../SpecificationsRequirements.md#Relation Types And Behaviors](../SpecificationsRequirements.md#relation-types-and-behaviors)
+  * satisfiedBy: [model.rs](../../core/src/model.rs)
   * satisfiedBy: [parser.rs](../../core/src/parser.rs)
+  * verifiedBy: [../../specifications/Verifications/ValidationTests.md#Invalid Relations Test](../../specifications/Verifications/ValidationTests.md#invalid-relations-test)
 
 ---
 
