@@ -1,8 +1,48 @@
-# reqvire
+# Reqvire
 
-**reqvire** is a lightweight, Git-native tool for system modeling, **requirements management**, and agile project specifications, designed to support real-world development with automation, **AI assistance**, and full **traceability**.
+<div align="center">
 
-By using **semi-structured markdown** documents, reqvire bridges the gap between formal modeling and agile docs, unlocking AI-assisted requirements, architecture design and even code generation in a single, version-controlled workflow.
+![Reqvire Logo](doc/diagram_1.png)
+
+**The AI-Native Requirements Platform for Modern Engineering Teams**
+
+[![Build Status](https://img.shields.io/github/actions/workflow/status/Reqvire/reqvire/pr.yml?branch=main&style=flat-square&logo=github)](https://github.com/Reqvire/reqvire/actions)
+[![Latest Release](https://img.shields.io/github/v/release/Reqvire/reqvire?style=flat-square&logo=github&color=blue)](https://github.com/Reqvire/reqvire/releases)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=flat-square)](https://opensource.org/licenses/Apache-2.0)
+[![Rust](https://img.shields.io/badge/Built%20with-Rust-orange?style=flat-square&logo=rust)](https://www.rust-lang.org/)
+
+[![GitHub Stars](https://img.shields.io/github/stars/Reqvire/reqvire?style=flat-square&logo=github&color=yellow)](https://github.com/Reqvire/reqvire/stargazers)
+[![GitHub Forks](https://img.shields.io/github/forks/Reqvire/reqvire?style=flat-square&logo=github&color=blue)](https://github.com/Reqvire/reqvire/network)
+[![Contributors](https://img.shields.io/github/contributors/Reqvire/reqvire?style=flat-square&logo=github&color=green)](https://github.com/Reqvire/reqvire/graphs/contributors)
+
+[📖 **Documentation**](./doc/README.md) • [🚀 **Quick Start**](#get-started) • [💬 **Community**](https://github.com/Reqvire/reqvire/discussions) • [🐛 **Report Bug**](https://github.com/Reqvire/reqvire/issues/new?template=bug_report.yml)
+
+</div>
+
+---
+
+## What is Reqvire?
+
+**Reqvire** transforms how engineering teams manage requirements by bringing them into the **Git workflow** with **AI-native** markdown documents. No more requirements living in separate tools—everything lives alongside your code with full version control, automated traceability, and seamless CI/CD integration.
+
+```bash
+# Requirements as Code - it's that simple
+reqvire validate
+reqvire generate-diagrams
+reqvire change-impact --git-commit=HEAD~1
+```
+
+### **Requirements as Code**
+Write requirements in **structured Markdown** that's both human-readable and AI-friendly. Version control everything with Git.
+
+### **AI-First Engineering**  
+Built from day one for **Large Language Models**. Your requirements become the perfect context for AI-assisted development.
+
+### **Automated Traceability**
+Every requirement automatically traces to code, tests, and architecture. Change impact analysis with every commit.
+
+### **Zero Context Switch**
+Requirements, code, and documentation in one repository. Review requirement changes like code changes.
 
 
 ---
@@ -31,11 +71,85 @@ By using **semi-structured markdown** documents, reqvire bridges the gap between
 
 ---
 
+## Why Choose Reqvire?
+
+<table>
+<tr>
+<th>Challenge</th>
+<th>Traditional Tools</th>
+<th>Reqvire Solution</th>
+</tr>
+<tr>
+<td><strong>Requirements live in separate tools</strong></td>
+<td>Jira, Confluence, Word docs</td>
+<td> Requirements live with your code</td>
+</tr>
+<tr>
+<td><strong>Manual traceability maintenance</strong></td>
+<td>Spreadsheets, manual linking</td>
+<td> Automated traceability & change impact</td>
+</tr>
+<tr>
+<td><strong>AI tools can't understand requirements</strong></td>
+<td>Proprietary formats, PDFs</td>
+<td> AI-native structured markdown</td>
+</tr>
+<tr>
+<td><strong>Requirements changes break things</strong></td>
+<td>Hope and manual checking</td>
+<td> Automated impact analysis</td>
+</tr>
+<tr>
+<td><strong>Complex enterprise tools</strong></td>
+<td>Months of setup, expensive licenses</td>
+<td> 5-minute setup, open source</td>
+</tr>
+<tr>
+<td><strong>No version control for requirements</strong></td>
+<td>Document versions, email chains</td>
+<td>📝 Git-native with full history</td>
+</tr>
+</table>
+
+### Perfect for These Teams
+
+- **DevOps & System Engineers** building compliant, traceable systems
+- **System Architects** managing complex requirements hierarchies  
+- **AI Engineers** needing requirements as LLM context
+- **Compliance Teams** requiring automated traceability matrices
+- **Technical Writers** wanting markdown-based documentation workflows
+
+---
+
 ## Get Started
 
-For detailed information about **how to use reqvire** visit the [documentation](./doc/README.md).
+> **"Reqvire transformed how we handle requirements. Finally, everything lives with our code!"**  
+> — Engineering Team at GrapheneDB (First production user)
 
-To understand the use case of **reqvire**, see the [use case diagram](./specifications/Usecases.md).
+### Quick Start (5 minutes)
+
+```bash
+# 1. Install Reqvire
+curl -fsSL https://raw.githubusercontent.com/Reqvire/reqvire/main/scripts/install.sh | bash
+
+# 2. Create your first project
+mkdir my-project && cd my-project
+git init
+
+# 3. Initialize Reqvire
+echo "specifications_folder: specifications" > reqvire.yaml
+mkdir specifications
+
+# 4. Write your first requirement
+echo "### User Authentication
+The system shall authenticate users via OAuth2." > specifications/requirements.md
+
+# 5. Validate and generate diagrams
+reqvire validate
+reqvire generate-diagrams
+```
+
+**[Full Documentation](./doc/README.md)** • 📋 **[Use Cases](./specifications/Usecases.md)** • 🎥 **[Demo Video](#)** (coming soon)
 
 ### Installation
 
@@ -113,27 +227,33 @@ curl -fsSL https://raw.githubusercontent.com/Reqvire/reqvire/main/scripts/instal
 
 Create `reqvire.yaml` in the root of the git repo with following minimal content:
 ```
-  # Path to the specifications folder
-  specifications_folder: "specifications"
+paths:
+
+  # Path to the user requirements root folder
+  user_requirements_root_folder: "specifications"
   
-  # Default output folder for exported html specifications
-  output_folder: "html"
-  
-  # Additional external folders that contain system requirements and other files
-  # Usually source folders relative to the repository root.
-  # All markdown files in these folders are considered sytsem requirements (except those matching exclusion patterns)
-  external_folders:
-    - tests
-    - core
-    - cli
-      
   # Glob patterns to exclude from requirements processing
-  # These are patterns that shouldn't be considered requirements even if they're in specifications or external folders
   excluded_filename_patterns:
     - "Usecases.md"
     - "**/Logical*.md"
     - "**/Physical*.md"
     - "**/TODO.md"  
+    
+style:
+  # Theme for HTML output (default, dark, light)
+  theme: "default"
+  
+  # Maximum width for HTML output
+  max_width: 1200
+  
+  # Optional path to custom CSS file
+  # custom_css: "path/to/custom.css"
+  
+  # Diagram direction (TD for top-down, LR for left-to-right)
+  diagram_direction: "LR"
+
+  # If diagrams click links should be blobs to work from GitHub console
+  diagrams_with_blobs: false      
 ```
 
 Create `output` directory.
@@ -142,9 +262,17 @@ Create `output` directory.
     
 ## Contributing
 
-We welcome contributions to **reqvire**! Whether you're improving the tooling, refining specifications, enhancing test cases, or shaping modeling conventions, your input is highly valued.
+We welcome contributions to **Reqvire**! Whether you're improving the tooling, refining specifications, enhancing test cases, or shaping modeling conventions, your input is highly valued.
 
-To maintain **consistency**, **traceability**, and **quality** in **reqvire**, we follow a strict **contribution discipline** that ensures the system model, tests, and verifications evolve alongside the code.
+### Quick Contribution Links
+- **[Report a Bug](https://github.com/Reqvire/reqvire/issues/new?template=bug_report.yml)**
+- **[Request a Feature](https://github.com/Reqvire/reqvire/issues/new?template=feature_request.yml)**
+- **[Ask a Question](https://github.com/Reqvire/reqvire/discussions)**
+- **[Improve Documentation](./doc/CONTRIBUTING.md)**
+
+### Contribution Discipline
+
+To maintain **consistency**, **traceability**, and **quality** in **Reqvire**, we follow a strict **contribution discipline** that ensures the system model, tests, and verifications evolve alongside the code.
 
 ### Contribution Workflow
 
@@ -163,15 +291,14 @@ To maintain **consistency**, **traceability**, and **quality** in **reqvire**, w
 4. **Maintain Requirements, Tests, and Verifications**:
    - **Update or create requirements**:
      - For any **new code**, **feature**, or **change** in the codebase, always **create new requirements** or **update existing ones** to reflect those changes.
-     - Requirements should be added in the appropriate **User Requirements** or **System Requirements** folders, following the Reqvire methodology.
+     - Requirements should be added in the appropriate **User Requirements** or **System Requirements** folders.
      - Requirments must be approved before code can be implemented or existing functionality changed
+   - **Update verifications**:
+     - For every **new requirement** or **E2E test**, create or update the corresponding **verification cases** in the `specifications/verifications/` directory.
+     - Verifications ensure that **requirements** are linked to **tests**, and all features are properly validated.     
    - **Add or update end-to-end (E2E) tests**:
      - If your changes introduce **new functionality** or modify existing behavior that is not covered by tests, ensure to **add E2E tests** in the `tests/` directory.
      - Tests must validate the **expected behavior** of your feature or change.
-   - **Update verifications**:
-     - For every **new requirement** or **E2E test**, create or update the corresponding **verification cases** in the `specifications/verificationCases/` directory.
-     - Verifications ensure that **requirements** are linked to **tests**, and all features are properly validated.
-
 5. **Test Your Changes**:
    - Run **reqvire validation** locally to ensure your requirements and verifications are consistent:
      ```bash
@@ -204,7 +331,29 @@ For more details, refer to the [Contributing Guide](./doc/CONTRIBUTING.md).
 - [GrapheneDB](https://www.graphenedb.com/)  
   For **partial sponsorship** and for being the **first user** of reqvire. Their support helped shape the tool's early direction.
 
+## What's Next?
+
+### Join Our Growing Community
+- ⭐ **Star us** on GitHub to stay updated
+- 💬 **Join discussions** to share your use cases  
+- 📝 **Contribute** to make Reqvire even better
+- 🐦 **Follow updates** on our blog and social media
+
+---
+
 ## License
 
 Licensed under the [Apache 2.0 License](LICENSE).
+
+---
+
+<div align="center">
+
+**Built with ❤️ by the Reqvire Community**
+
+[🏠 Website](#) • [📖 Docs](./doc/README.md) • [💬 Community](https://github.com/Reqvire/reqvire/discussions) • [🐛 Issues](https://github.com/Reqvire/reqvire/issues)
+
+⭐ **Star us on GitHub** — it helps more than you know!
+
+</div>
 

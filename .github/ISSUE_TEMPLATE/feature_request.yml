@@ -1,0 +1,117 @@
+name: 🚀 Feature Request
+description: Suggest a new feature or enhancement for Reqvire
+title: "[Feature]: "
+labels: ["enhancement", "triage"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a new feature! Please provide as much detail as possible to help us understand your request.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: 🎯 Problem Statement
+      description: What problem does this feature solve? What use case are you trying to address?
+      placeholder: |
+        I'm always frustrated when...
+        As a [user type], I need to...
+        Currently, there's no way to...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: 💡 Proposed Solution
+      description: A clear and concise description of what you want to happen.
+      placeholder: I would like Reqvire to...
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: 🔄 Alternatives Considered
+      description: Describe any alternative solutions or features you've considered.
+      placeholder: |
+        Alternative 1: ...
+        Alternative 2: ...
+        I considered using X but...
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: 📊 Priority Level
+      description: How important is this feature for your workflow?
+      options:
+        - "Critical - Blocks my work"
+        - "High - Would significantly improve my workflow"
+        - "Medium - Nice to have improvement"
+        - "Low - Minor convenience"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: 🏷️ Feature Category
+      description: Which area of Reqvire does this feature relate to?
+      options:
+        - "CLI Commands"
+        - "Requirements Management"
+        - "Traceability & Relations"
+        - "Validation & Linting"
+        - "Diagram Generation"
+        - "GitHub Integration"
+        - "AI/LLM Features"
+        - "Documentation"
+        - "Performance"
+        - "Other"
+    validations:
+      required: true
+
+  - type: textarea
+    id: mockup
+    attributes:
+      label: 🎨 Mockup/Example
+      description: If applicable, provide examples, mockups, or code snippets showing how this feature would work.
+      render: markdown
+      placeholder: |
+        ```bash
+        reqvire new-command --option value
+        ```
+        or describe the UI/workflow...
+
+  - type: textarea
+    id: impact
+    attributes:
+      label: 📈 Expected Impact
+      description: How would this feature benefit the Reqvire community?
+      placeholder: |
+        This would help users to...
+        This addresses the common problem of...
+        This would make it easier to...
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: 📎 Additional Context
+      description: Add any other context, screenshots, or references about the feature request.
+      placeholder: Links to similar tools, research papers, standards, etc.
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: 📋 Checklist
+      description: Please confirm the following
+      options:
+        - label: I have searched existing issues and feature requests to avoid duplicates
+          required: true
+        - label: This feature aligns with Reqvire's core mission of Git-native requirements management
+          required: true
+        - label: I'm willing to help with testing this feature once implemented
+          required: false
+        - label: I'm interested in contributing to the implementation
+          required: false

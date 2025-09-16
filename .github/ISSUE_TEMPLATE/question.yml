@@ -1,0 +1,95 @@
+name: ❓ Question or Help
+description: Ask a question about using Reqvire or get help with your setup
+title: "[Question]: "
+labels: ["question", "help wanted"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Have a question about using Reqvire? Need help with your setup? We're here to help!
+        
+        **💡 Tip**: Check the [documentation](../doc/README.md) and [user guide](../doc/user_guide.md) first - your answer might already be there!
+
+  - type: textarea
+    id: question
+    attributes:
+      label: ❓ Your Question
+      description: What would you like to know about Reqvire?
+      placeholder: |
+        How do I...?
+        What's the best way to...?
+        I'm trying to understand...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: 🏷️ Question Category
+      description: What area does your question relate to?
+      options:
+        - "Getting Started"
+        - "Installation & Setup"
+        - "Requirements Management"
+        - "Markdown Syntax"
+        - "Relations & Traceability"
+        - "Validation & Linting"
+        - "Diagrams & Visualization"
+        - "GitHub Integration"
+        - "CI/CD Integration"
+        - "AI/LLM Integration"
+        - "Best Practices"
+        - "Troubleshooting"
+        - "Other"
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: 🖥️ Context
+      description: Please provide context about your setup, what you're trying to achieve, or what you've already tried.
+      placeholder: |
+        - I'm working on: [project type, team size, etc.]
+        - I've already tried: [what you've attempted]
+        - My setup: [OS, Reqvire version, etc.]
+        - Goal: [what you're trying to accomplish]
+
+  - type: textarea
+    id: examples
+    attributes:
+      label: 📝 Examples or Code
+      description: If relevant, provide examples of your requirements, configuration, or commands you've tried.
+      render: markdown
+      placeholder: |
+        ```yaml
+        # reqvire.yaml
+        specifications_folder: "specs"
+        ```
+        
+        ```bash
+        reqvire validate
+        ```
+
+  - type: textarea
+    id: research
+    attributes:
+      label: 📚 What I've Already Checked
+      description: Help us help you faster by letting us know what you've already looked at.
+      placeholder: |
+        - [ ] Documentation
+        - [ ] User Guide
+        - [ ] Existing GitHub issues
+        - [ ] Examples in the repository
+        - [ ] Community discussions
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: 📋 Checklist
+      options:
+        - label: I have searched existing issues and discussions for similar questions
+          required: true
+        - label: I have checked the documentation and user guide
+          required: true
