@@ -763,13 +763,16 @@ Every **element** in the system has unique identifier that depends on document i
 ## Identifier in markdown document can be of several types
 
 -**Identifier**
-  - An internal system element reference represented as a string identifier.
-  - **Example**: `"some-identifier"`
+  - An internal system element reference with fragment, pointing to specific elements within markdown documents.
+  - Used for element-to-element relations (e.g., `derivedFrom`, `verifiedBy`, `verify`)
+  - **Example**: `"file.md#element-name"`
 - **ExternalUrl**
   - An external URL represented as a string.
+  - Used for references to external resources
   - **Example**: `"https://example.com"`
 - **InternalPath**
-  - An internal filesystem file path
+  - An internal filesystem file path without fragment, pointing to implementation files.
+  - Used for satisfaction and traceability relations (e.g., `satisfiedBy`, `satisfy`, `trace`)
   - **Example**: `"../core/src/diagrams.rs"`
   
   
@@ -1021,13 +1024,16 @@ Identifiers are used in relations to reference files or specific elements within
    ```
    
 
-## Valiation rules (TODO: add mising rules)
+## Validation rules
 
 The system must validate relation usage according to these rules:
 - Only the relation types defined in this registry are allowed
-- Relations should connect elements of appropriate types (TODO: append spec with rules).
+- Relations should connect elements of appropriate types
 - Circular dependencies should be detected and reported
-- Duplicate relation entries of same type and target are not allowed.
+- Duplicate relation entries of same type and target are not allowed
+- **Identifier** targets (with fragments) must reference existing elements in markdown documents
+- **InternalPath** targets (without fragments) must reference existing files in the filesystem
+- **ExternalUrl** targets are not validated for existence
       
 
 </details>

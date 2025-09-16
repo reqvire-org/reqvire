@@ -148,7 +148,6 @@ impl ModelManager {
         log::debug!("Running relation validation...");
         let mut errors = Vec::new();
         let element_ids: Vec<String> = self.element_registry.elements.keys().cloned().collect();
-        let md_regex = Regex::new(r"\.md(?:#|$)").unwrap();
 
         for source_id in &element_ids {
             if let Some(source_element) = self.element_registry.elements.get(source_id) {
@@ -156,34 +155,45 @@ impl ModelManager {
                     if relation.is_opposite{
                         continue;
                     }
-                    if let relation::LinkType::Identifier(ref target_id) = relation.target.link {
-                        if !md_regex.is_match(target_id) {
-                            log::debug!("Skipping non-markdown target: {}", target_id);                        
-                            continue;
-                        }
 
-                        if excluded_filename_patterns.is_match(target_id) {
-                            log::debug!("Skipping excluded target: {}", target_id);
-                            continue;
-                        }
-
-                        match self.element_registry.get_element(target_id) {
-                            Err(_) => {
-                                // TODO: refactor this, it cannot really happen as it would be caught in parser with ReqvireError::InvalidIdentifier
-                                errors.push(ReqvireError::MissingRelationTarget(
-                                    format!("Element '{}' references missing target '{}'", source_element.identifier, target_id),
-                                ));
+                    match &relation.target.link {
+                        relation::LinkType::Identifier(ref target_id) => {
+                            // Only skip excluded targets, don't filter by file type
+                            if excluded_filename_patterns.is_match(target_id) {
+                                log::debug!("Skipping excluded target: {}", target_id);
+                                continue;
                             }
-                            Ok(target_element) => {
 
-                                if let Some(error) = self.validate_element_types(
-                                    relation.relation_type.name,
-                                    source_element,
-                                    target_element,
-                                ) {
-                                    errors.push(error);
+                            match self.element_registry.get_element(target_id) {
+                                Err(_) => {
+                                    errors.push(ReqvireError::MissingRelationTarget(
+                                        format!("Element '{}' references missing target '{}'", source_element.identifier, target_id),
+                                    ));
+                                }
+                                Ok(target_element) => {
+                                    if let Some(error) = self.validate_element_types(
+                                        relation.relation_type.name,
+                                        source_element,
+                                        target_element,
+                                    ) {
+                                        errors.push(error);
+                                    }
                                 }
                             }
+                        }
+                        relation::LinkType::InternalPath(ref file_path) => {
+                            // Validate file existence for InternalPath targets
+                            if !file_path.exists() {
+                                errors.push(ReqvireError::MissingRelationTarget(
+                                    format!("Element '{}' references missing target '{}'",
+                                        source_element.identifier,
+                                        file_path.to_string_lossy()),
+                                ));
+                            }
+                        }
+                        relation::LinkType::ExternalUrl(_) => {
+                            // Skip validation for external URLs as per specification
+                            log::debug!("Skipping external URL validation");
                         }
                     }
                 }
