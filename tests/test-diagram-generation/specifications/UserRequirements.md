@@ -57,7 +57,7 @@ graph TD;
 First performance requirement.
 
 #### Relations
-  * tracedFrom: [UI Element 1](#ui-element-1)
+  * trace: [UI Element 1](#ui-element-1)
 
 ### Performance Element 2
 

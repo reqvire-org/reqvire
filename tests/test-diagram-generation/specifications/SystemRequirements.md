@@ -25,15 +25,15 @@ graph TD;
 First system requirement.
 
 #### Relations
-  * satisfies: [UserRequirements.md/UI Element 1](UserRequirements.html#ui-element-1)
-  * verifies: [System Element 3](#system-element-3)
+  * satisfy: [UserRequirements.md/UI Element 1](UserRequirements.html#ui-element-1)
+  * verify: [System Element 3](#system-element-3)
 
 ### System Element 2
 
 Second system requirement.
 
 #### Relations
-  * satisfies: [UserRequirements.md/UI Element 2](UserRequirements.html#ui-element-2)
+  * satisfy: [UserRequirements.md/UI Element 2](UserRequirements.html#ui-element-2)
 
 ## Security Requirements
 ```mermaid
@@ -73,5 +73,5 @@ System security requirement.
 Another system security requirement.
 
 #### Relations
-  * tracedFrom: [System Element 1](#system-element-1)
+  * trace: [System Element 1](#system-element-1)
   * verifiedBy: [System Verification Test 2](#system-verification-test-2)
