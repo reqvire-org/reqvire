@@ -80,18 +80,58 @@ fn generate_section_diagram(
 
     let mut included_elements = HashSet::new();
 
+    // First, add all elements in the current section
     for element in elements {
         add_element_to_diagram(
-            registry, 
-            &mut diagram, 
-            element, 
-            &mut included_elements, 
+            registry,
+            &mut diagram,
+            element,
+            &mut included_elements,
             file_path,
-            diagrams_with_blobs,           
+            diagrams_with_blobs,
             &repo_root,
             &base_url,
             &commit_hash,
         )?;
+    }
+
+    // Then, find parent elements from other sections that have Forward relations pointing to elements in this section
+    let section_element_identifiers: HashSet<String> = elements.iter()
+        .map(|e| e.identifier.clone())
+        .collect();
+
+    for element in registry.get_all_elements() {
+        // Skip elements already in this section
+        if section_element_identifiers.contains(&element.identifier) {
+            continue;
+        }
+
+        // Check if this element has Forward relations pointing to any element in the current section
+        let has_forward_relation_to_section = element.relations.iter().any(|relation| {
+            // Only consider Forward relations
+            if let Some(info) = relation::RELATION_TYPES.get(relation.relation_type.name) {
+                if info.direction == relation::RelationDirection::Forward {
+                    if let relation::LinkType::Identifier(target_id) = &relation.target.link {
+                        return section_element_identifiers.contains(target_id);
+                    }
+                }
+            }
+            false
+        });
+
+        if has_forward_relation_to_section {
+            add_element_to_diagram(
+                registry,
+                &mut diagram,
+                element,
+                &mut included_elements,
+                file_path,
+                diagrams_with_blobs,
+                &repo_root,
+                &base_url,
+                &commit_hash,
+            )?;
+        }
     }
 
     diagram.push_str("```");
@@ -167,7 +207,15 @@ fn add_element_to_diagram(
 
 
     for relation in &element.relations {
-        if !relation.is_opposite {
+        // Only render forward relations to prevent duplicate arrows
+        if let Some(info) = relation::RELATION_TYPES.get(relation.relation_type.name) {
+            if info.direction != relation::RelationDirection::Forward {
+                continue;
+            }
+        } else {
+            // Skip unknown relation types
+            continue;
+        }
         
         
         let label = relation.target.text.clone();
@@ -268,10 +316,10 @@ fn add_element_to_diagram(
 
 
         if let Some(info) = relation::RELATION_TYPES.get(relation.relation_type.name) {
-            // pick from/to based on semantic direction
-            let (from_id, to_id) = match info.direction {
-                relation::RelationDirection::Forward => (target_id.clone(), element_id.clone()),
-                _                           => (element_id.clone(), target_id.clone()),
+            // Use the arrow_direction field to determine visual arrow flow
+            let (from_id, to_id) = match info.arrow_direction {
+                relation::ArrowDirection::ElementToTarget => (element_id.clone(), target_id.clone()),
+                relation::ArrowDirection::TargetToElement => (target_id.clone(), element_id.clone()),
             };
 
             diagram.push_str(&format!(
@@ -281,13 +329,6 @@ fn add_element_to_diagram(
                 info.label,
                 to_id,
             ));
-        } else {
-            // fallback: unknown relation
-            diagram.push_str(&format!(
-                "  {} -->|relates to| {};\n",
-                element_id, target_id,
-            ));
-        }
         }
     }
 

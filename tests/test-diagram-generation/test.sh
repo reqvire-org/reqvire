@@ -29,6 +29,16 @@ EOF
 mkdir -p "$TEST_DIR/backup"
 cp -r "$TEST_DIR/specifications" "$TEST_DIR/backup/"
 
+# First validate that all test data is valid before attempting diagram generation
+VALIDATION_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "$TEST_DIR/reqvire.yaml" validate 2>&1)
+VALIDATION_EXIT_CODE=$?
+
+if [ $VALIDATION_EXIT_CODE -ne 0 ]; then
+  echo "❌ FAILED: Test data validation failed. Fix test data before running diagram generation:"
+  echo "$VALIDATION_OUTPUT"
+  exit 1
+fi
+
 # Run reqvire to generate diagrams
 OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "$TEST_DIR/reqvire.yaml" generate-diagrams 2>&1)
 EXIT_CODE=$?
@@ -110,7 +120,7 @@ fi
 
 
 # Perform a specific check for relationships in diagrams and if rendered with right arrow
-if ! grep -q -- "-.->|verifies|" "$TEST_DIR/specifications/Requirements.md"; then
+if ! grep -q -- "-.->|verifiedBy|" "$TEST_DIR/specifications/Requirements.md"; then
   echo "❌ FAILED: Missing relationships in Requirements.md diagram"
   exit 1
 fi
@@ -122,7 +132,7 @@ if ! grep -q -- "-.->|trace|" "$TEST_DIR/specifications/Requirements.md"; then
 fi
 
 # Perform a specific check for relationships in diagrams and if rendered with right arrow
-if ! grep -q -- "-->|refines|" "$TEST_DIR/specifications/Requirements.md"; then
+if ! grep -q -- "-->|refinedBy|" "$TEST_DIR/specifications/Requirements.md"; then
   echo "❌ FAILED: Missing relationships in Requirements.md diagram"
   exit 1
 fi
@@ -140,7 +150,7 @@ if ! grep -q -- "-.->|deriveReqT" "$TEST_DIR/specifications/Requirements.md"; th
 fi
 
 # Perform a specific check for relationships in diagrams and if rendered with right arrow
-if ! grep -q -- "-->|satisfies|" "$TEST_DIR/specifications/Requirements.md"; then
+if ! grep -q -- "-->|satisfiedBy|" "$TEST_DIR/specifications/Requirements.md"; then
   echo "❌ FAILED: Missing relationships in Requirements.md diagram"
   exit 1
 fi
