@@ -57,6 +57,7 @@ pub struct RemovedElement {
 pub struct InvalidatedVerification {
     pub element_id: String,
     pub name: String,
+    pub content: String,
 }
 
 /// Report for an element that exists in both registries but has differences.
@@ -198,7 +199,8 @@ impl ChangeImpactReport {
             let target_url = format!("{}/blob/{}/{}", base_url, git_commit, invalidated_ver.element_id);
             json!({
                 "target_text": invalidated_ver.name,
-                "target_url": target_url
+                "target_url": target_url,
+                "content": invalidated_ver.content
             })
         }).collect();
         json!({
@@ -488,6 +490,7 @@ fn collect_verification_elements_from_impact_tree(
                 collected.push(InvalidatedVerification {
                     element_id: id,
                     name: node.element.name.clone(),
+                    content: node.element.content.clone(),
                 });
             }
         }
