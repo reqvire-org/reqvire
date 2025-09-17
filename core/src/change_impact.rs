@@ -679,7 +679,7 @@ mod tests {
     use super::*;
     use crate::ElementRegistry;
     use crate::element::Element;
-    use crate::relation::{RelationTypeInfo, Relation, RelationTarget, RelationDirection};
+    use crate::relation::{RelationTypeInfo, Relation, RelationTarget, RelationDirection, ArrowDirection};
    
     /// Helper function to create a simple element.
     fn create_element(identifier: &str, name: &str, content: &str) -> Element {
@@ -720,7 +720,8 @@ mod tests {
                 opposite: Some("derivedFrom"),
                 description: "Element B derives from A",
                 arrow: "-->",
-                label: "label"
+                label: "label",
+                arrow_direction: ArrowDirection::ElementToTarget,
             },
             "A",
         );
@@ -759,7 +760,8 @@ mod tests {
                 opposite: Some("containedBy"),
                 description: "Element A contains B",
                 arrow: "-->",
-                label: "label"
+                label: "label",
+                arrow_direction: ArrowDirection::ElementToTarget,
             },
             "B",
         );
@@ -771,7 +773,8 @@ mod tests {
                 opposite: Some("derivedFrom"),
                 description: "Element B derives from A",
                 arrow: "-->",
-                label: "label"
+                label: "label",
+                arrow_direction: ArrowDirection::ElementToTarget,
             },
             "A",
         );
@@ -825,7 +828,8 @@ mod tests {
                 opposite: Some("derivedFrom"),
                 description: "Parent derives child",
                 arrow: "-->",
-                label: "derive"
+                label: "derive",
+                arrow_direction: ArrowDirection::ElementToTarget,
             },
             target: RelationTarget {
                 text: "Child Requirement".to_string(),
@@ -840,7 +844,8 @@ mod tests {
                 opposite: Some("verify"),
                 description: "Verified by test",
                 arrow: "-->",
-                label: "verifiedBy"
+                label: "verifiedBy",
+                arrow_direction: ArrowDirection::ElementToTarget,
             },
             target: RelationTarget {
                 text: "Parent Verification".to_string(),
@@ -858,7 +863,8 @@ mod tests {
                 opposite: Some("derive"),
                 description: "Child derived from parent",
                 arrow: "<--",
-                label: "derivedFrom"
+                label: "derivedFrom",
+                arrow_direction: ArrowDirection::TargetToElement,
             },
             target: RelationTarget {
                 text: "Parent Requirement".to_string(),
@@ -883,7 +889,8 @@ mod tests {
                 opposite: Some("verifiedBy"),
                 description: "Verifies requirement",
                 arrow: "<--",
-                label: "verify"
+                label: "verify",
+                arrow_direction: ArrowDirection::TargetToElement,
             },
             target: RelationTarget {
                 text: "Parent Requirement".to_string(),
@@ -927,7 +934,8 @@ mod tests {
                 opposite: Some("verify"),
                 description: "Verified by test",
                 arrow: "-->",
-                label: "verifiedBy"
+                label: "verifiedBy",
+                arrow_direction: ArrowDirection::ElementToTarget,
             },
             target: RelationTarget {
                 text: "New Verification".to_string(),
@@ -952,7 +960,8 @@ mod tests {
                 opposite: Some("verifiedBy"),
                 description: "Verifies requirement",
                 arrow: "<--",
-                label: "verify"
+                label: "verify",
+                arrow_direction: ArrowDirection::TargetToElement,
             },
             target: RelationTarget {
                 text: "New Requirement".to_string(),

@@ -11,36 +11,56 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  f8849dfe948d04fa["Automated Diagram Generation on PR Merge Verification"];
-  class f8849dfe948d04fa verification;
-  click f8849dfe948d04fa "DiagramsTests.md#automated-diagram-generation-on-pr-merge-verification";
-  3e3df7ad427a88fa["SystemRequirements/Requirements.md/Automated Diagram Generation on PR Merge"];
-  class 3e3df7ad427a88fa requirement;
-  click 3e3df7ad427a88fa "../SystemRequirements/Requirements.md#automated-diagram-generation-on-pr-merge";
-  f8849dfe948d04fa -.->|verifies| 3e3df7ad427a88fa;
-  98af8a1cf9c86822[".github/workflows/generate_diagrams.yml"];
-  class 98af8a1cf9c86822 default;
-  click 98af8a1cf9c86822 "../../.github/workflows/generate_diagrams.yml";
-  98af8a1cf9c86822 -->|satisfies| f8849dfe948d04fa;
   de8ab093f22a5cd7["Visualize Model Relationships Verification"];
   class de8ab093f22a5cd7 verification;
   click de8ab093f22a5cd7 "DiagramsTests.md#visualize-model-relationships-verification";
-  98a581084d5542fa["UserRequirements.md/Automate Diagram Generation"];
-  class 98a581084d5542fa requirement;
-  click 98a581084d5542fa "../UserRequirements.md#automate-diagram-generation";
-  de8ab093f22a5cd7 -.->|verifies| 98a581084d5542fa;
   3df49fd1a91c3db7["tests/test-diagram-generation/test.sh"];
   class 3df49fd1a91c3db7 default;
   click 3df49fd1a91c3db7 "../../tests/test-diagram-generation/test.sh";
-  3df49fd1a91c3db7 -->|satisfies| de8ab093f22a5cd7;
+  de8ab093f22a5cd7 -->|satisfiedBy| 3df49fd1a91c3db7;
   2d2cf67bb8070da8["Diagram Generation Test"];
   class 2d2cf67bb8070da8 verification;
   click 2d2cf67bb8070da8 "DiagramsTests.md#diagram-generation-test";
-  2d2cf67bb8070da8 -.->|verifies| 98a581084d5542fa;
   3df49fd1a91c3db7["tests/test-diagram-generation/test.sh"];
   class 3df49fd1a91c3db7 default;
   click 3df49fd1a91c3db7 "../../tests/test-diagram-generation/test.sh";
-  3df49fd1a91c3db7 -->|satisfies| 2d2cf67bb8070da8;
+  2d2cf67bb8070da8 -->|satisfiedBy| 3df49fd1a91c3db7;
+  ba2fd3fb7c42cdb3["Diagram Relation Filtering Verification"];
+  class ba2fd3fb7c42cdb3 verification;
+  click ba2fd3fb7c42cdb3 "DiagramsTests.md#diagram-relation-filtering-verification";
+  f6a73030d877fc0f["tests/test-diagram-filtering/test.sh"];
+  class f6a73030d877fc0f default;
+  click f6a73030d877fc0f "../../tests/test-diagram-filtering/test.sh";
+  ba2fd3fb7c42cdb3 -->|satisfiedBy| f6a73030d877fc0f;
+  f8849dfe948d04fa["Automated Diagram Generation on PR Merge Verification"];
+  class f8849dfe948d04fa verification;
+  click f8849dfe948d04fa "DiagramsTests.md#automated-diagram-generation-on-pr-merge-verification";
+  98af8a1cf9c86822[".github/workflows/generate_diagrams.yml"];
+  class 98af8a1cf9c86822 default;
+  click 98af8a1cf9c86822 "../../.github/workflows/generate_diagrams.yml";
+  f8849dfe948d04fa -->|satisfiedBy| 98af8a1cf9c86822;
+  7f86e99e7804366a["Diagram Relation Filtering"];
+  class 7f86e99e7804366a requirement;
+  click 7f86e99e7804366a "../SystemRequirements/Requirements.md#diagram-relation-filtering";
+  dad7eeb932afdb92["diagrams.rs"];
+  class dad7eeb932afdb92 default;
+  click dad7eeb932afdb92 "../../core/src/diagrams.rs";
+  7f86e99e7804366a -->|satisfiedBy| dad7eeb932afdb92;
+  7f86e99e7804366a -.->|verifiedBy| ba2fd3fb7c42cdb3;
+  98a581084d5542fa["Automate Diagram Generation"];
+  class 98a581084d5542fa requirement;
+  click 98a581084d5542fa "../UserRequirements.md#automate-diagram-generation";
+  98a581084d5542fa -.->|verifiedBy| de8ab093f22a5cd7;
+  98a581084d5542fa -.->|verifiedBy| 2d2cf67bb8070da8;
+  3e3df7ad427a88fa["Automated Diagram Generation on PR Merge"];
+  class 3e3df7ad427a88fa requirement;
+  click 3e3df7ad427a88fa "../SystemRequirements/Requirements.md#automated-diagram-generation-on-pr-merge";
+  98a581084d5542fa -.->|deriveReqT| 3e3df7ad427a88fa;
+  98af8a1cf9c86822["generate_diagrams.yml"];
+  class 98af8a1cf9c86822 default;
+  click 98af8a1cf9c86822 "../../.github/workflows/generate_diagrams.yml";
+  3e3df7ad427a88fa -->|satisfiedBy| 98af8a1cf9c86822;
+  3e3df7ad427a88fa -.->|verifiedBy| f8849dfe948d04fa;
 ```
 
 ---
@@ -128,5 +148,34 @@ This test verifies that the system automatically generates and updates diagrams 
 #### Relations
   * verify: [SystemRequirements/Requirements.md/Automated Diagram Generation on PR Merge](../SystemRequirements/Requirements.md#automated-diagram-generation-on-pr-merge)
   * satisfiedBy: [.github/workflows/generate_diagrams.yml](../../.github/workflows/generate_diagrams.yml)
+
+---
+
+### Diagram Relation Filtering Verification
+
+This test verifies that the system correctly filters relations in diagram generation to render only forward relations while ensuring complete element hierarchy representation.
+
+#### Metadata
+  * type: test-verification
+
+#### Details
+
+##### Acceptance Criteria
+- System should render only forward relations to prevent duplicate arrows for bidirectional relationships
+- System should include parent elements in diagrams even when they belong to different sections
+- System should apply direction-based rendering according to relation type registry
+- Generated diagrams should not contain both forward and backward relations for the same logical relationship
+
+##### Test Criteria
+- Command exits with success (0) return code
+- Diagrams contain only forward relations (e.g., `contain` but not `containedBy`)
+- Bidirectional relationships appear as single arrows in their forward direction
+- Parent elements are included when child elements are in the section
+- No duplicate arrows exist for the same logical relationship
+- Arrow directions follow the semantic direction defined in relation type registry
+
+#### Relations
+  * verify: [SystemRequirements/Requirements.md/Diagram Relation Filtering](../SystemRequirements/Requirements.md#diagram-relation-filtering)
+  * satisfiedBy: [tests/test-diagram-filtering/test.sh](../../tests/test-diagram-filtering/test.sh)
 
 ---

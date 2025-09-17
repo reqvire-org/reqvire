@@ -9,16 +9,22 @@ This is a requirements document specifically created for testing diagram generat
 
 This is a test element with relations.
 
+#### Metadata
+  * type: verification
+
 #### Relations
-  * satisfies: [Element 2](#element-2)
-  * verifies: [Element 3](#element-3)
+  * verify: [Element 3](#element-3)
 
 ### Element 2
 
 This is another test element with relations.
 
+#### Metadata
+  * type: implementation
+
 #### Relations
-  * tracedFrom: [Element 1](#element-1)
+  * satisfy: [Element 3](#element-3)
+  * trace: [Element 1](#element-1)
 
 ## Section 2
 
@@ -30,8 +36,8 @@ This is a third test element.
 
 #### Relations
   * verifiedBy: [Element 1](#element-1)
-  * refine: [Element 1](#element-1)
-  * derivedFrom: [Element 1](#element-1)
+  * refinedBy: [Element 1](#element-1)
+  * derive: [Element 1](#element-1)
 
 ### Element 4
 
@@ -39,16 +45,19 @@ This is a fourth test element with no relations.
 
 ### Element 5
 
-This is a fith test element.
+This is a fifth test element.
 
 #### Relations
-  * containedBy: [Element 1](#element-3)
+  * containedBy: [Element 6](#element-6)
   * trace: [Element 1](#element-1)
-  * satisfiedBy: [Element 1](#element-6)  
+  * satisfiedBy: [Element 2](#element-2)  
 
 
 ### Element 6
 
 This is a sixth test element.
+
+#### Relations
+  * contain: [Element 5](#element-5)
 
 
