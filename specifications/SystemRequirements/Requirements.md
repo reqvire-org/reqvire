@@ -2074,6 +2074,7 @@ When requested, the system shall remove all generated diagrams from the model by
 #### Relations
   * derivedFrom: [UserRequirements.md/Remove Generated Diagrams](../UserRequirements.md#remove-generated-diagrams)
   * satisfiedBy: [diagrams.rs](../../core/src/diagrams.rs)
+  * verifiedBy: [Verifications/DiagramsTests.md/Remove Generated Diagrams Verification](../Verifications/DiagramsTests.md#remove-generated-diagrams-verification)
 
 ---
 

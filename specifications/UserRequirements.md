@@ -61,6 +61,7 @@ The system shall provide functionality to remove all generated Mermaid diagrams 
 
 #### Relations
   * derivedFrom: [UserStories.md/Generate Diagrams](UserStories.md#generate-diagrams)
+  * verifiedBy: [Verifications/DiagramsTests.md/Remove Generated Diagrams Verification](Verifications/DiagramsTests.md#remove-generated-diagrams-verification)
 
 ---
 
