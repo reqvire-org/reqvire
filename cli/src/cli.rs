@@ -78,7 +78,10 @@ pub enum Commands {
                        
     /// Generate mermaid diagrams in markdown files showing requirements relationships The diagrams will be placed at the top of each requirements document
     GenerateDiagrams,
-    
+
+    /// Remove all generated mermaid diagrams from markdown files
+    RemoveDiagrams,
+
     /// Generate index document with links and summaries to all documents
     GenerateIndex,
 
@@ -313,8 +316,14 @@ pub fn handle_command(
             // Only collect identifiers and process files to add diagrams
             // Skip validation checks for diagram generation mode
             diagrams::process_diagrams(&model_manager.element_registry,diagram_direction,diagrams_with_blobs)?;
-           
+
             info!("Requirements diagrams updated in source files");
+            return Ok(0);
+        },
+        Some(Commands::RemoveDiagrams) => {
+            info!("Removing generated mermaid diagrams");
+            diagrams::remove_diagrams(&model_manager.element_registry)?;
+            info!("Generated diagrams removed from source files");
             return Ok(0);
         },
         Some(Commands::ModelSummary { 

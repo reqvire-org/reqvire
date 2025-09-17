@@ -451,3 +451,112 @@ fn replace_section_diagram(content: &str, section: &str, new_diagram: &str) -> S
     }
     new_lines.join("\n")
 }
+
+/// Remove all generated mermaid diagrams from markdown files
+/// Follows the same pattern as process_diagrams but removes instead of replacing
+pub fn remove_diagrams(registry: &ElementRegistry) -> Result<(), ReqvireError> {
+    // Group elements by (file_path, section) - same as in generate_diagrams_by_section
+    let mut grouped_elements: HashMap<(String, String), Vec<&Element>> = HashMap::new();
+
+    let elements = registry.get_all_elements();
+
+    for element in elements {
+        grouped_elements
+            .entry((element.file_path.clone(), element.section.clone()))
+            .or_insert_with(Vec::new)
+            .push(element);
+    }
+
+    // Group sections by file path - same pattern as in process_diagrams
+    let mut files_to_update: HashMap<String, Vec<String>> = HashMap::new();
+
+    for (file_path, section) in grouped_elements.keys() {
+        files_to_update
+            .entry(file_path.clone())
+            .or_insert_with(Vec::new)
+            .push(section.clone());
+    }
+
+    // Get git root for resolving relative paths
+    let git_root = match git_commands::get_git_root_dir() {
+        Ok(root) => root,
+        Err(_) => {
+            log::error!("Not in a git repository, using current directory");
+            std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."))
+        }
+    };
+
+    // Process each file
+    for (file_path, sections) in files_to_update {
+        // Resolve file path relative to git root, not current directory
+        let absolute_file_path = git_root.join(&file_path);
+
+        // Read file content
+        let mut file_content = match filesystem::read_file(&absolute_file_path) {
+            Ok(content) => content,
+            Err(e) => {
+                log::error!("Failed to read file '{}': {}", absolute_file_path.display(), e);
+                continue;
+            }
+        };
+
+        // Remove diagrams for all sections in this file
+        for section in sections {
+            file_content = remove_section_diagram(&file_content, &section);
+        }
+
+        // Write updated content back if modified
+        if let Err(e) = filesystem::write_file(&absolute_file_path, &file_content) {
+            log::error!("Failed to write updated file '{}': {}", absolute_file_path.display(), e);
+        } else {
+            println!("Removed diagrams from '{}'", file_path);
+        }
+    }
+
+    Ok(())
+}
+
+
+/// Removes the diagram from a specific section of a markdown file.
+/// Similar to replace_section_diagram but only removes without adding a new diagram.
+fn remove_section_diagram(content: &str, section: &str) -> String {
+    let section_header = format!("## {}", section);
+    let mermaid_block_start = "```mermaid";
+    let mermaid_block_end = "```";
+
+    let mut new_lines = Vec::new();
+    let mut lines = content.lines().peekable();
+
+    while let Some(line) = lines.next() {
+        if line.trim() == section_header {
+            // Found the target section header.
+            new_lines.push(line.to_string());
+            // Skip any blank lines immediately after the header.
+            while let Some(&next_line) = lines.peek() {
+                if next_line.trim().is_empty() {
+                    lines.next();
+                } else {
+                    break;
+                }
+            }
+            // If the next non-empty line starts a Mermaid block, skip it.
+            if let Some(&next_line) = lines.peek() {
+                if next_line.trim().starts_with(mermaid_block_start) {
+                    // Skip the mermaid block: first skip the start marker.
+                    lines.next();
+                    // Then skip lines until the end marker is found.
+                    while let Some(l) = lines.next() {
+                        if l.trim().starts_with(mermaid_block_end) {
+                            break;
+                        }
+                    }
+                }
+            }
+            // Continue with the rest of the file.
+        } else {
+            new_lines.push(line.to_string());
+        }
+    }
+
+    new_lines.join("\n")
+}

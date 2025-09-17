@@ -24,6 +24,10 @@ graph LR;
   click 2c5f30f14e792200 "MOEs.md#moe_ua";
   37a5b8e199a838f -.->|trace| 2c5f30f14e792200;
   37a5b8e199a838f -.->|deriveReqT| eedf6d6d3d2354d9;
+  c8d5e4f8a9b3c2e1["Remove Generated Diagrams"];
+  class c8d5e4f8a9b3c2e1 requirement;
+  click c8d5e4f8a9b3c2e1 "UserRequirements.md#remove-generated-diagrams";
+  37a5b8e199a838f -.->|deriveReqT| c8d5e4f8a9b3c2e1;
 ```
 
 ---
@@ -48,6 +52,16 @@ Color code for rendering diagrams:
 
 #### Relations
   * derivedFrom: [UserStories.md/Generate Diagrams](UserStories.md#generate-diagrams)
+
+---
+
+### Remove Generated Diagrams
+
+The system shall provide functionality to remove all generated Mermaid diagrams from the model, allowing users to clean up generated artifacts when needed.
+
+#### Relations
+  * derivedFrom: [UserStories.md/Generate Diagrams](UserStories.md#generate-diagrams)
+  * verifiedBy: [Verifications/DiagramsTests.md/Remove Generated Diagrams Verification](Verifications/DiagramsTests.md#remove-generated-diagrams-verification)
 
 ---
 

@@ -32,6 +32,13 @@ graph LR;
   class f6a73030d877fc0f default;
   click f6a73030d877fc0f "../../tests/test-diagram-filtering/test.sh";
   ba2fd3fb7c42cdb3 -->|satisfiedBy| f6a73030d877fc0f;
+  d4e5f6a7b8c9d0e1["Remove Generated Diagrams Verification"];
+  class d4e5f6a7b8c9d0e1 verification;
+  click d4e5f6a7b8c9d0e1 "DiagramsTests.md#remove-generated-diagrams-verification";
+  a1b2c3d4e5f6g7h8["tests/test-remove-diagrams/test.sh"];
+  class a1b2c3d4e5f6g7h8 default;
+  click a1b2c3d4e5f6g7h8 "../../tests/test-remove-diagrams/test.sh";
+  d4e5f6a7b8c9d0e1 -->|satisfiedBy| a1b2c3d4e5f6g7h8;
   f8849dfe948d04fa["Automated Diagram Generation on PR Merge Verification"];
   class f8849dfe948d04fa verification;
   click f8849dfe948d04fa "DiagramsTests.md#automated-diagram-generation-on-pr-merge-verification";
@@ -177,5 +184,38 @@ This test verifies that the system correctly filters relations in diagram genera
 #### Relations
   * verify: [SystemRequirements/Requirements.md/Diagram Relation Filtering](../SystemRequirements/Requirements.md#diagram-relation-filtering)
   * satisfiedBy: [tests/test-diagram-filtering/test.sh](../../tests/test-diagram-filtering/test.sh)
+
+---
+
+### Remove Generated Diagrams Verification
+
+This test verifies that the system can remove all generated mermaid diagrams while preserving custom user-created diagrams and respecting file exclusion patterns.
+
+#### Metadata
+  * type: test-verification
+
+#### Details
+
+##### Acceptance Criteria
+- System should remove all auto-generated mermaid diagrams that appear immediately after section headers
+- System should preserve custom mermaid diagrams that appear in other locations within the document
+- System should respect exclusion patterns defined in reqvire.yaml configuration
+- System should handle files with multiple diagrams correctly
+- System should work on files without any diagrams
+- System should maintain file structure and content except for diagram removal
+
+##### Test Criteria
+- Command exits with success (0) return code
+- Generated diagrams are removed from files (diagrams immediately after ## Section headers)
+- Custom diagrams are preserved (diagrams in other locations)
+- Files matching exclusion patterns are not processed for diagram removal
+- File structure remains intact except for diagram removal
+- Element text and relationships are preserved
+- Section headers and element headers are preserved
+
+#### Relations
+  * verify: [UserRequirements.md/Remove Generated Diagrams](../UserRequirements.md#remove-generated-diagrams)
+  * verify: [SystemRequirements/Requirements.md/Diagram Removal](../SystemRequirements/Requirements.md#diagram-removal)
+  * satisfiedBy: [tests/test-remove-diagrams/test.sh](../../tests/test-remove-diagrams/test.sh)
 
 ---
