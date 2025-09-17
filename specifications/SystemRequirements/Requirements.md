@@ -2021,6 +2021,16 @@ graph LR;
   class 5deb63503bdf77c requirement;
   click 5deb63503bdf77c "Requirements.md#html-export";
   8f22faacdb454b23 --o|contains| 5deb63503bdf77c;
+  a9b8c7d6e5f4g3h2["CLI Remove Diagrams Flag"];
+  class a9b8c7d6e5f4g3h2 requirement;
+  click a9b8c7d6e5f4g3h2 "Requirements.md#cli-remove-diagrams-flag";
+  8f22faacdb454b23 --o|contains| a9b8c7d6e5f4g3h2;
+  a9b8c7d6e5f4g3h2 -->|satisfiedBy| 80defdd4cbc7ee18;
+  b1c2d3e4f5g6h7i8["Diagram Removal"];
+  class b1c2d3e4f5g6h7i8 requirement;
+  click b1c2d3e4f5g6h7i8 "Requirements.md#diagram-removal";
+  b1c2d3e4f5g6h7i8 -->|satisfiedBy| dad7eeb932afdb92;
+  a9b8c7d6e5f4g3h2 -.->|refines| b1c2d3e4f5g6h7i8;
 ```
 
 ---
@@ -2043,6 +2053,27 @@ The system shall provide a diagrams generation function, activated by the (gener
   * refine: [Diagram Generation](#diagram-generation)
   * containedBy: [CLI Interface Structure](#cli-interface-structure)          
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
+
+---
+
+### CLI Remove Diagrams Flag
+
+The system shall provide a diagram removal function, activated by the remove-diagrams command, which shall remove all generated mermaid diagrams from the model.
+
+#### Relations
+  * refine: [Diagram Removal](#diagram-removal)
+  * containedBy: [CLI Interface Structure](#cli-interface-structure)
+  * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
+
+---
+
+### Diagram Removal
+
+When requested, the system shall remove all generated diagrams from the model by locating and deleting all mermaid code blocks that were automatically generated.
+
+#### Relations
+  * derivedFrom: [UserRequirements.md/Remove Generated Diagrams](../UserRequirements.md#remove-generated-diagrams)
+  * satisfiedBy: [diagrams.rs](../../core/src/diagrams.rs)
 
 ---
 
