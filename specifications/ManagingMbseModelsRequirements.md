@@ -1,7 +1,80 @@
 # MBSE Models Requirements
 
 ## Managing MBSE Models
+```mermaid
+graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
+  c9cc6878a73bb951["Default Requirement Type Assignment"];
+  class c9cc6878a73bb951 requirement;
+  click c9cc6878a73bb951 "ManagingMbseModelsRequirements.md#default-requirement-type-assignment";
+  16b4b380c917deb1["Project Configuration with YAML"];
+  class 16b4b380c917deb1 requirement;
+  click 16b4b380c917deb1 "ManagingMbseModelsRequirements.md#project-configuration-with-yaml";
+  be83c2991e9535c7["Ignoring Unstructured Documents"];
+  class be83c2991e9535c7 requirement;
+  click be83c2991e9535c7 "SystemRequirements/Requirements.md#ignoring-unstructured-documents";
+  16b4b380c917deb1 -.->|deriveReqT| be83c2991e9535c7;
+  d9354ef2eca0f2d0["Configurable User Requirements Root Folder"];
+  class d9354ef2eca0f2d0 requirement;
+  click d9354ef2eca0f2d0 "ManagingMbseModelsRequirements.md#configurable-user-requirements-root-folder";
+  16b4b380c917deb1 -.->|deriveReqT| d9354ef2eca0f2d0;
+  7bdf935ec6d8effe["Subdirectory Processing Option"];
+  class 7bdf935ec6d8effe requirement;
+  click 7bdf935ec6d8effe "SystemRequirements/Requirements.md#subdirectory-processing-option";
+  16b4b380c917deb1 -.->|deriveReqT| 7bdf935ec6d8effe;
+  d9354ef2eca0f2d0 -->|refinedBy| c9cc6878a73bb951;
+  a9d6e2569d5acd60["User Requirement Root Folders Support"];
+  class a9d6e2569d5acd60 requirement;
+  click a9d6e2569d5acd60 "SystemRequirements/Requirements.md#user-requirement-root-folders-support";
+  d9354ef2eca0f2d0 -.->|deriveReqT| a9d6e2569d5acd60;
+  f0d721424636370e["Coexistence of Structured and Unstructured Documents"];
+  class f0d721424636370e requirement;
+  click f0d721424636370e "ManagingMbseModelsRequirements.md#coexistence-of-structured-and-unstructured-documents";
+  f0d721424636370e -.->|deriveReqT| be83c2991e9535c7;
+  649d72765b13e14f["Git Repository as Project Root"];
+  class 649d72765b13e14f requirement;
+  click 649d72765b13e14f "ManagingMbseModelsRequirements.md#git-repository-as-project-root";
+  649d72765b13e14f -->|refinedBy| 16b4b380c917deb1;
+  d193d11c43776bec["Efficient Processing"];
+  class d193d11c43776bec requirement;
+  click d193d11c43776bec "ManagingMbseModelsRequirements.md#efficient-processing";
+  e61b7c1baa89bfc6["Managing MBSE Models"];
+  class e61b7c1baa89bfc6 requirement;
+  click e61b7c1baa89bfc6 "UserStories.md#managing-mbse-models";
+  2c5f30f14e792200["MOEs.md/MOE_UA"];
+  class 2c5f30f14e792200 requirement;
+  click 2c5f30f14e792200 "MOEs.md#moe_ua";
+  e61b7c1baa89bfc6 -.->|trace| 2c5f30f14e792200;
+  e61b7c1baa89bfc6 -.->|deriveReqT| 16b4b380c917deb1;
+  ade67c27bc5d3bbd["Structure and Addressing in Markdown Documents"];
+  class ade67c27bc5d3bbd requirement;
+  click ade67c27bc5d3bbd "SpecificationsRequirements.md#structure-and-addressing-in-markdown-documents";
+  e61b7c1baa89bfc6 -.->|deriveReqT| ade67c27bc5d3bbd;
+  551906d5c51d91d9["Relation Types and behaviors"];
+  class 551906d5c51d91d9 requirement;
+  click 551906d5c51d91d9 "SpecificationsRequirements.md#relation-types-and-behaviors";
+  e61b7c1baa89bfc6 -.->|deriveReqT| 551906d5c51d91d9;
+  e61b7c1baa89bfc6 -.->|deriveReqT| f0d721424636370e;
+  e61b7c1baa89bfc6 -.->|deriveReqT| 649d72765b13e14f;
+  cd2d5dab49985ca2["AI-Assisted MBSE Model Management"];
+  class cd2d5dab49985ca2 requirement;
+  click cd2d5dab49985ca2 "UserStories.md#ai-assisted-mbse-model-management";
+  e61b7c1baa89bfc6 -->|refinedBy| cd2d5dab49985ca2;
+  e61b7c1baa89bfc6 -.->|deriveReqT| d193d11c43776bec;
+  f28849d46c19af44["CLI interface"];
+  class f28849d46c19af44 requirement;
+  click f28849d46c19af44 "UserRequirements.md#cli-interface";
+  e61b7c1baa89bfc6 -.->|deriveReqT| f28849d46c19af44;
+  c2b6c74b77726ad9["Generate Documentation Index"];
+  class c2b6c74b77726ad9 requirement;
+  click c2b6c74b77726ad9 "UserRequirements.md#generate-documentation-index";
+  e61b7c1baa89bfc6 -.->|deriveReqT| c2b6c74b77726ad9;
+```
 ---
 
 ### Coexistence of Structured and Unstructured Documents

@@ -3,7 +3,30 @@
 This document contains miscellaneous verification tests that don't fit into the other verification categories.
 
 ## Export and Context Verifications
+```mermaid
+graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
+  14ef985b9a43174e["HTML Export Verification"];
+  class 14ef985b9a43174e verification;
+  click 14ef985b9a43174e "Misc.md#html-export-verification";
+  8899a52ea9866d8b["tests/test-html-export/test.sh"];
+  class 8899a52ea9866d8b default;
+  click 8899a52ea9866d8b "../../tests/test-html-export/test.sh";
+  14ef985b9a43174e -->|satisfiedBy| 8899a52ea9866d8b;
+  a4c40962cac85d0c["Export HTML specifications"];
+  class a4c40962cac85d0c requirement;
+  click a4c40962cac85d0c "../UserRequirements.md#export-html-specifications";
+  a4c40962cac85d0c -.->|verifiedBy| 14ef985b9a43174e;
+  5deb63503bdf77c["HTML Export"];
+  class 5deb63503bdf77c requirement;
+  click 5deb63503bdf77c "../SystemRequirements/Requirements.md#html-export";
+  a4c40962cac85d0c -.->|deriveReqT| 5deb63503bdf77c;
+```
 ---
 
 ### HTML Export Verification

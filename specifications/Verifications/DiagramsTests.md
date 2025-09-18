@@ -3,7 +3,89 @@
 This document verifies the requirements for Reqvire's diagram generation functionality.
 
 ## Diagram Generation Tests
+```mermaid
+graph LR;
+  %% Graph styling
+  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
+  6a6973ecb2f20ee3["Remove Generated Diagrams Verification"];
+  class 6a6973ecb2f20ee3 verification;
+  click 6a6973ecb2f20ee3 "DiagramsTests.md#remove-generated-diagrams-verification";
+  af81a7b6d75c2363["tests/test-remove-diagrams/test.sh"];
+  class af81a7b6d75c2363 default;
+  click af81a7b6d75c2363 "../../tests/test-remove-diagrams/test.sh";
+  6a6973ecb2f20ee3 -->|satisfiedBy| af81a7b6d75c2363;
+  2d2cf67bb8070da8["Diagram Generation Test"];
+  class 2d2cf67bb8070da8 verification;
+  click 2d2cf67bb8070da8 "DiagramsTests.md#diagram-generation-test";
+  3df49fd1a91c3db7["tests/test-diagram-generation/test.sh"];
+  class 3df49fd1a91c3db7 default;
+  click 3df49fd1a91c3db7 "../../tests/test-diagram-generation/test.sh";
+  2d2cf67bb8070da8 -->|satisfiedBy| 3df49fd1a91c3db7;
+  f8849dfe948d04fa["Automated Diagram Generation on PR Merge Verification"];
+  class f8849dfe948d04fa verification;
+  click f8849dfe948d04fa "DiagramsTests.md#automated-diagram-generation-on-pr-merge-verification";
+  98af8a1cf9c86822[".github/workflows/generate_diagrams.yml"];
+  class 98af8a1cf9c86822 default;
+  click 98af8a1cf9c86822 "../../.github/workflows/generate_diagrams.yml";
+  f8849dfe948d04fa -->|satisfiedBy| 98af8a1cf9c86822;
+  ba2fd3fb7c42cdb3["Diagram Relation Filtering Verification"];
+  class ba2fd3fb7c42cdb3 verification;
+  click ba2fd3fb7c42cdb3 "DiagramsTests.md#diagram-relation-filtering-verification";
+  f6a73030d877fc0f["tests/test-diagram-filtering/test.sh"];
+  class f6a73030d877fc0f default;
+  click f6a73030d877fc0f "../../tests/test-diagram-filtering/test.sh";
+  ba2fd3fb7c42cdb3 -->|satisfiedBy| f6a73030d877fc0f;
+  de8ab093f22a5cd7["Visualize Model Relationships Verification"];
+  class de8ab093f22a5cd7 verification;
+  click de8ab093f22a5cd7 "DiagramsTests.md#visualize-model-relationships-verification";
+  3df49fd1a91c3db7["tests/test-diagram-generation/test.sh"];
+  class 3df49fd1a91c3db7 default;
+  click 3df49fd1a91c3db7 "../../tests/test-diagram-generation/test.sh";
+  de8ab093f22a5cd7 -->|satisfiedBy| 3df49fd1a91c3db7;
+  98a581084d5542fa["Automate Diagram Generation"];
+  class 98a581084d5542fa requirement;
+  click 98a581084d5542fa "../UserRequirements.md#automate-diagram-generation";
+  98a581084d5542fa -.->|verifiedBy| 2d2cf67bb8070da8;
+  3e3df7ad427a88fa["Automated Diagram Generation on PR Merge"];
+  class 3e3df7ad427a88fa requirement;
+  click 3e3df7ad427a88fa "../SystemRequirements/Requirements.md#automated-diagram-generation-on-pr-merge";
+  98a581084d5542fa -.->|deriveReqT| 3e3df7ad427a88fa;
+  98a581084d5542fa -.->|verifiedBy| de8ab093f22a5cd7;
+  8b2dd3bb2c44db94["Remove Generated Diagrams"];
+  class 8b2dd3bb2c44db94 requirement;
+  click 8b2dd3bb2c44db94 "../UserRequirements.md#remove-generated-diagrams";
+  8b2dd3bb2c44db94 -.->|verifiedBy| 6a6973ecb2f20ee3;
+  4ec753faad5a75f7["Diagram Removal"];
+  class 4ec753faad5a75f7 requirement;
+  click 4ec753faad5a75f7 "../SystemRequirements/Requirements.md#diagram-removal";
+  8b2dd3bb2c44db94 -.->|deriveReqT| 4ec753faad5a75f7;
+  98af8a1cf9c86822["generate_diagrams.yml"];
+  class 98af8a1cf9c86822 default;
+  click 98af8a1cf9c86822 "../../.github/workflows/generate_diagrams.yml";
+  3e3df7ad427a88fa -->|satisfiedBy| 98af8a1cf9c86822;
+  3e3df7ad427a88fa -.->|verifiedBy| f8849dfe948d04fa;
+  7f86e99e7804366a["Diagram Relation Filtering"];
+  class 7f86e99e7804366a requirement;
+  click 7f86e99e7804366a "../SystemRequirements/Requirements.md#diagram-relation-filtering";
+  dad7eeb932afdb92["diagrams.rs"];
+  class dad7eeb932afdb92 default;
+  click dad7eeb932afdb92 "../../core/src/diagrams.rs";
+  7f86e99e7804366a -->|satisfiedBy| dad7eeb932afdb92;
+  7f86e99e7804366a -.->|verifiedBy| ba2fd3fb7c42cdb3;
+  dad7eeb932afdb92["diagrams.rs"];
+  class dad7eeb932afdb92 default;
+  click dad7eeb932afdb92 "../../core/src/diagrams.rs";
+  4ec753faad5a75f7 -->|satisfiedBy| dad7eeb932afdb92;
+  4ec753faad5a75f7 -.->|verifiedBy| 6a6973ecb2f20ee3;
+  749eaee85cfd0a43["CLI Remove Diagrams Flag"];
+  class 749eaee85cfd0a43 requirement;
+  click 749eaee85cfd0a43 "../SystemRequirements/Requirements.md#cli-remove-diagrams-flag";
+  4ec753faad5a75f7 -->|refinedBy| 749eaee85cfd0a43;
+```
 ---
 
 ### Diagram Generation Test
