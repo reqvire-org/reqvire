@@ -17,6 +17,7 @@ pub mod git_commands;
 pub mod change_impact;
 pub mod subsection;
 pub mod matrix_generator;
+pub mod graph_registry;
 
 // Re-export commonly used modules
 pub use crate::model::ModelManager;
@@ -24,3 +25,4 @@ pub use crate::element_registry::ElementRegistry;
 pub use crate::element::Element;
 pub use crate::relation::Relation;
 pub use crate::error::ReqvireError;
+pub use crate::graph_registry::GraphRegistry;

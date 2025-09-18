@@ -342,26 +342,8 @@ impl ModelManager {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use std::path::PathBuf;
-    use globset::{Glob, GlobSet, GlobSetBuilder};
-    use crate::error::ReqvireError;
-    use crate::element_registry::ElementRegistry;
     use crate::linting::LintFix;
-    // Dummy implementation of utils::normalize_fragment for testing.
-    mod utils {
-        pub fn normalize_fragment(fragment: &str) -> String {
-            // For testing, simply lowercase and replace spaces with hyphens.
-            fragment.to_lowercase().replace(' ', "-")
-        }
-    }
-
-    // Dummy implementation of get_supported_relation_types in crate::relation
-    mod relation {
-        pub fn get_supported_relation_types() -> Vec<&'static str> {
-            vec!["derivedFrom", "satisfiedBy", "tracedFrom", "containedBy"]
-        }
-    }
 
     #[test]
     fn test_extract_path_and_fragment() {

@@ -577,7 +577,7 @@ mod tests {
 
 
         let relation_type = RELATION_TYPES.get("verifiedBy").unwrap();
-        let relation = Relation {
+        let _relation = Relation {
             relation_type,
             target: RelationTarget {
                 text: "".to_string(),

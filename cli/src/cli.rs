@@ -14,6 +14,9 @@ use reqvire::change_impact;
 use reqvire::git_commands;
 use reqvire::matrix_generator;
 use reqvire::reports::Filters;
+use reqvire::GraphRegistry;
+use std::collections::HashMap;
+use std::path::Path;
 
 
 #[derive(Parser, Debug)]
@@ -142,7 +145,11 @@ pub enum Commands {
         /// Output results in JSON format
         #[clap(long)]
         json: bool,
-    }
+    },
+
+    /// Interactive shell for GraphRegistry operations (undocumented)
+    #[clap(hide = true)]
+    Shell,
 }
 
 impl Args {
@@ -416,6 +423,10 @@ pub fn handle_command(
             coverage_report.print(json);
             return Ok(0);
         },
+        Some(Commands::Shell) => {
+            run_shell(&model_manager)?;
+            return Ok(0);
+        },
         None => {
             Args::print_help();
             return Ok(0);
@@ -423,11 +434,363 @@ pub fn handle_command(
     }
 }
 
+fn run_shell(model_manager: &ModelManager) -> Result<(), ReqvireError> {
+    use std::io::{self, Write};
+
+    println!("Reqvire Interactive Shell");
+    println!("Type 'help' for available commands, 'exit' to quit");
+    println!();
+
+    // Create a mutable graph registry from the model manager
+    let mut graph_registry = GraphRegistry::from_registry(&model_manager.element_registry);
+
+    loop {
+        print!("reqvire> ");
+        io::stdout().flush().unwrap();
+
+        let mut input = String::new();
+        match io::stdin().read_line(&mut input) {
+            Ok(_) => {
+                let input = input.trim();
+                if input.is_empty() {
+                    continue;
+                }
+
+                match input {
+                    "exit" | "quit" => {
+                        println!("Goodbye!");
+                        break;
+                    }
+                    "help" => {
+                        print_shell_help();
+                    }
+                    _ => {
+                        if let Err(e) = process_shell_command(&mut graph_registry, input) {
+                            eprintln!("Error: {}", e);
+                        }
+                    }
+                }
+            }
+            Err(error) => {
+                eprintln!("Error reading input: {}", error);
+                break;
+            }
+        }
+    }
+
+    Ok(())
+}
+
+fn print_shell_help() {
+    println!("Available commands:");
+    println!("  help                                        - Show this help message");
+    println!("  exit, quit                                  - Exit the shell");
+    println!("  list-elements [filter]                     - List all elements or filter by pattern");
+    println!("  show-element <element_id>                  - Show detailed information about an element");
+    println!("  move-element <element_id> <file> <section> - Move element to existing location");
+    println!("  create-section <file> <section>            - Create new section in existing file");
+    println!("  create-file <file> <section>               - Create new file with section");
+    println!("  list-locations                             - Show all available file/section locations");
+    println!("  get-move-impact <element_id>               - Show elements affected by moving an element");
+    println!("  impact-tree <element_id>                   - Show change impact tree for an element");
+    println!("  flush <output_dir>                         - Flush all changes to directory");
+    println!("  flush-files <file1,file2,...> <output_dir> - Flush specific files to directory");
+    println!("  stats                                       - Show registry statistics");
+    println!();
+    println!("  Dynamic Graph Management:");
+    println!("  add-element <id> <name> <file> [section]   - Add new element to graph");
+    println!("  remove-element <element_id>                - Remove element from graph");
+    println!("  add-relation <source> <target> <type>      - Add relation between elements");
+    println!("  remove-relation <source> <target> <type>   - Remove relation between elements");
+    println!("  graph-stats                                 - Show graph statistics");
+    println!();
+}
+
+fn process_shell_command(graph_registry: &mut GraphRegistry, command: &str) -> Result<(), ReqvireError> {
+    let parts: Vec<&str> = command.split_whitespace().collect();
+    if parts.is_empty() {
+        return Ok(());
+    }
+
+    match parts[0] {
+        "list-elements" => {
+            let filter = parts.get(1).unwrap_or(&"");
+            let elements = graph_registry.get_all_elements();
+            let filtered: Vec<_> = if filter.is_empty() {
+                elements
+            } else {
+                elements.into_iter()
+                    .filter(|elem| elem.identifier.contains(filter) || elem.name.contains(filter))
+                    .collect()
+            };
+
+            println!("Found {} elements:", filtered.len());
+            for element in filtered {
+                println!("  {} ({:?}): {}", element.identifier, element.element_type, element.name);
+            }
+        }
+        "show-element" => {
+            if parts.len() < 2 {
+                return Err(ReqvireError::ProcessError("Usage: show-element <element_id>".to_string()));
+            }
+            let element_id = parts[1];
+            if let Some(element) = graph_registry.get_element(element_id) {
+                println!("Element ID: {}", element.identifier);
+                println!("Name: {}", element.name);
+                println!("Type: {:?}", element.element_type);
+                println!("File: {}", element.file_path);
+                println!("Section: {}", element.section);
+                println!("Content: {}", element.content);
+                if !element.relations.is_empty() {
+                    println!("Relations:");
+                    for relation in &element.relations {
+                        println!("  {} -> {}", relation.relation_type.name, relation.target.text);
+                    }
+                }
+            } else {
+                println!("Element '{}' not found", element_id);
+            }
+        }
+        "move-element" => {
+            if parts.len() < 4 {
+                return Err(ReqvireError::ProcessError("Usage: move-element <element_id> <file> <section>".to_string()));
+            }
+            let element_id = parts[1];
+            let file_path = parts[2];
+            let section = parts[3];
+
+            graph_registry.move_element_to_location(element_id, file_path, section)?;
+            println!("Element '{}' moved to {}#{}", element_id, file_path, section);
+        }
+        "create-section" => {
+            if parts.len() < 3 {
+                return Err(ReqvireError::ProcessError("Usage: create-section <file> <section>".to_string()));
+            }
+            let file_path = parts[1];
+            let section = parts[2];
+
+            graph_registry.create_virtual_section(file_path, section)?;
+            println!("Virtual section '{}' created in file '{}'", section, file_path);
+        }
+        "create-file" => {
+            if parts.len() < 3 {
+                return Err(ReqvireError::ProcessError("Usage: create-file <file> <section>".to_string()));
+            }
+            let file_path = parts[1];
+            let section = parts[2];
+
+            graph_registry.create_virtual_file(file_path, section)?;
+            println!("Virtual file '{}' created with section '{}'", file_path, section);
+        }
+        "list-locations" => {
+            let locations = graph_registry.get_available_locations();
+            println!("Available locations:");
+            for (file, section) in locations {
+                println!("  {}#{}", file, section);
+            }
+        }
+        "get-move-impact" => {
+            if parts.len() < 2 {
+                return Err(ReqvireError::ProcessError("Usage: get-move-impact <element_id>".to_string()));
+            }
+            let element_id = parts[1];
+            let impact = graph_registry.get_move_impact(element_id);
+            if impact.is_empty() {
+                println!("No elements would be affected by moving '{}'", element_id);
+            } else {
+                println!("Elements affected by moving '{}': {}", element_id, impact.join(", "));
+            }
+        }
+        "impact-tree" => {
+            if parts.len() < 2 {
+                return Err(ReqvireError::ProcessError("Usage: impact-tree <element_id>".to_string()));
+            }
+            let element_id = parts[1];
+
+            // Check if element exists
+            if graph_registry.get_element(element_id).is_none() {
+                println!("Element '{}' not found", element_id);
+                return Ok(());
+            }
+
+            println!("Change Impact Tree for element '{}':", element_id);
+            let impact_tree = graph_registry.get_impact_tree(element_id);
+            print_impact_tree(&impact_tree, 0);
+        }
+        "flush" => {
+            if parts.len() < 2 {
+                return Err(ReqvireError::ProcessError("Usage: flush <output_dir>".to_string()));
+            }
+            let output_dir = Path::new(parts[1]);
+
+            let (md_count, file_count) = graph_registry.flush_to_directory(output_dir)?;
+            println!("Flushed {} markdown files and {} other files to '{}'", md_count, file_count, output_dir.display());
+        }
+        "flush-files" => {
+            if parts.len() < 3 {
+                return Err(ReqvireError::ProcessError("Usage: flush-files <file1,file2,...> <output_dir>".to_string()));
+            }
+            let file_list = parts[1];
+            let output_dir = Path::new(parts[2]);
+
+            let file_paths: Vec<String> = file_list.split(',').map(|s| s.trim().to_string()).collect();
+            let (md_count, file_count) = graph_registry.flush_files_to_directory(&file_paths, output_dir)?;
+            println!("Flushed {} markdown files and {} other files to '{}'", md_count, file_count, output_dir.display());
+        }
+        "stats" => {
+            let elements = graph_registry.get_all_elements();
+            let mut type_counts = HashMap::new();
+            for element in &elements {
+                let type_str = format!("{:?}", element.element_type);
+                *type_counts.entry(type_str).or_insert(0) += 1;
+            }
+
+            println!("Registry Statistics:");
+            println!("  Total elements: {}", elements.len());
+            println!("  By type:");
+            for (element_type, count) in &type_counts {
+                println!("    {}: {}", element_type, count);
+            }
+
+            let total_relations: usize = elements.iter().map(|e| e.relations.len()).sum();
+            println!("  Total relations: {}", total_relations);
+        }
+        "add-element" => {
+            if parts.len() < 4 {
+                return Err(ReqvireError::ProcessError("Usage: add-element <element_id> <element_name> <file_path> [section]".to_string()));
+            }
+            let element_id = parts[1];
+            let element_name = parts[2];
+            let file_path = parts[3];
+            let section = parts.get(4).map_or("Main", |v| v);
+
+            let element = reqvire::element::Element::new(
+                element_name,
+                element_id,
+                file_path,
+                section,
+                None,
+            );
+
+            match graph_registry.add_element(element) {
+                Ok(()) => println!("Successfully added element '{}'", element_id),
+                Err(e) => println!("Failed to add element '{}': {}", element_id, e),
+            }
+        }
+        "remove-element" => {
+            if parts.len() < 2 {
+                return Err(ReqvireError::ProcessError("Usage: remove-element <element_id>".to_string()));
+            }
+            let element_id = parts[1];
+
+            match graph_registry.remove_element(element_id) {
+                Ok(()) => println!("Successfully removed element '{}'", element_id),
+                Err(e) => println!("Failed to remove element '{}': {}", element_id, e),
+            }
+        }
+        "add-relation" => {
+            if parts.len() < 4 {
+                return Err(ReqvireError::ProcessError("Usage: add-relation <source_id> <target_id> <relation_type>".to_string()));
+            }
+            let source_id = parts[1];
+            let target_id = parts[2];
+            let relation_type = parts[3];
+
+            match graph_registry.add_relation(source_id, target_id, relation_type) {
+                Ok(()) => println!("Successfully added relation '{}' from '{}' to '{}'", relation_type, source_id, target_id),
+                Err(e) => println!("Failed to add relation: {}", e),
+            }
+        }
+        "remove-relation" => {
+            if parts.len() < 4 {
+                return Err(ReqvireError::ProcessError("Usage: remove-relation <source_id> <target_id> <relation_type>".to_string()));
+            }
+            let source_id = parts[1];
+            let target_id = parts[2];
+            let relation_type = parts[3];
+
+            match graph_registry.remove_relation(source_id, target_id, relation_type) {
+                Ok(()) => println!("Successfully removed relation '{}' from '{}' to '{}'", relation_type, source_id, target_id),
+                Err(e) => println!("Failed to remove relation: {}", e),
+            }
+        }
+        "list-relations" => {
+            if parts.len() < 2 {
+                return Err(ReqvireError::ProcessError("Usage: list-relations <element_id>".to_string()));
+            }
+            let element_id = parts[1];
+
+            match graph_registry.list_relations(element_id) {
+                Ok(relations) => {
+                    if relations.is_empty() {
+                        println!("Element '{}' has no relations", element_id);
+                    } else {
+                        println!("Relations for element '{}':", element_id);
+                        for (relation_type, target_id) in relations {
+                            println!("  {} -> {}", relation_type, target_id);
+                        }
+                    }
+                }
+                Err(e) => println!("Failed to list relations: {}", e),
+            }
+        }
+        "graph-stats" => {
+            let (element_count, relation_count) = graph_registry.get_graph_stats();
+            println!("Graph Statistics:");
+            println!("  Elements: {}", element_count);
+            println!("  Relations: {}", relation_count);
+            println!("  Average relations per element: {:.2}",
+                     if element_count > 0 { relation_count as f64 / element_count as f64 } else { 0.0 });
+        }
+        _ => {
+            println!("Unknown command: '{}'. Type 'help' for available commands.", parts[0]);
+        }
+    }
+
+    Ok(())
+}
+
+fn print_impact_tree(node: &reqvire::element_registry::ElementNode, depth: usize) {
+    let indent = "  ".repeat(depth);
+    let element = &node.element;
+
+    // Print current element with impact propagation info
+    if depth == 0 {
+        println!("{}📍 {} ({})", indent, element.identifier, element.name);
+    } else {
+        println!("{}└─ {} ({})", indent, element.identifier, element.name);
+    }
+
+    // Print element details
+    println!("{}   Type: {:?}", indent, element.element_type);
+    println!("{}   Location: {}#{}", indent, element.file_path, element.section);
+
+    // Print relations that caused this impact
+    if !node.relations.is_empty() {
+        println!("{}   Impacts through:", indent);
+        for relation_node in &node.relations {
+            println!("{}     {} -> {}",
+                indent,
+                relation_node.relation_trigger,
+                relation_node.element_node.element.identifier
+            );
+        }
+        println!();
+
+        // Recursively print impacted elements
+        for relation_node in &node.relations {
+            print_impact_tree(&relation_node.element_node, depth + 1);
+        }
+    } else if depth > 0 {
+        println!("{}   (No further impacts)", indent);
+        println!();
+    }
+}
+
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::path::PathBuf;
     use globset::{Glob, GlobSet, GlobSetBuilder};
 
 
