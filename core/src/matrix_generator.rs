@@ -567,7 +567,7 @@ fn get_short_element_name(element: &Element) -> String {
 mod tests {
     use super::*;
     use crate::element::{Element, ElementType, RequirementType, VerificationType};
-    use crate::relation::{Relation, RelationTarget, RelationTypeInfo, RelationDirection};
+    use crate::relation::{Relation, RelationTarget};
     use crate::element_registry::ElementRegistry;
     use crate::relation::LinkType;
     use crate::matrix_generator::{generate_matrix, MatrixConfig, MatrixFormat};
@@ -577,13 +577,13 @@ mod tests {
 
 
         let relation_type = RELATION_TYPES.get("verifiedBy").unwrap();
-        let relation = Relation {
+        let _relation = Relation {
             relation_type,
             target: RelationTarget {
                 text: "".to_string(),
                 link: LinkType::Identifier("tests/TEST-001".to_string()),
             },
-            is_opposite: false,
+            user_created: true,
         };
 
        // Helper: default metadata
@@ -639,7 +639,7 @@ mod tests {
                 link: LinkType::Identifier("tests/TEST-001".to_string()),
                 text: "".to_string(),
             },
-            is_opposite: false,
+            user_created: true,
         });
 
         // Register elements with the registry

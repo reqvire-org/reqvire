@@ -4,11 +4,12 @@
 # --------------------------------------
 # Acceptance Criteria:
 # - System should properly extract Requirement body for change impact detection
-# - Requirement body is consiting of normalized main text and content from '#### Details subsection'
+# - Requirement body consists of normalized main text and content from '#### Details' subsection
+# - Details subsections should include the '#### Details' header in the extracted content
 #
 # Test Criteria:
 # - Command exits with success (0) return code
-# - Output shows expected content for each element
+# - Output shows expected content for each element including Details headers
 #
 
 # First validate that all test data is valid before attempting content extraction
@@ -50,21 +51,21 @@ REQ 0:Root requirement for relations to work.
 
 REQ 1:This is simple requirement with main text only.
 
-REQ 1A:This is simple requirement with main text and details. REQ 1A details.
+REQ 1A:This is simple requirement with main text and details. #### Details REQ 1A details.
 
 REQ 2:Requirement with main text and relations.
 
 REQ 3:Requirement with main text and relations and metadata.
 
-REQ 4:Requirement with main text and relations and metadata and details. REQ 4 Details.
+REQ 4:Requirement with main text and relations and metadata and details. #### Details REQ 4 Details.
 
-REQ 5:Requirement with main text and relations and metadata and details different order (A). REQ 5 Details.
+REQ 5:Requirement with main text and relations and metadata and details different order (A). #### Details REQ 5 Details.
 
-REQ 6:Requirement with main text and relations and metadata and details different order (B). REQ 6 Details.
+REQ 6:Requirement with main text and relations and metadata and details different order (B). #### Details REQ 6 Details.
 
-REQ 7:Requirement with main text and relations and metadata and details different order (C). REQ 7 Details.
+REQ 7:Requirement with main text and relations and metadata and details different order (C). #### Details REQ 7 Details.
 
-REQ 8:Requirement with main text and relations details with <details> element that should not break parsing and validation.    <details> ### REQ 8 Nested requirement which should not be processed as requirement. #### Relations   * derivedFrom: #req-0          </details>"
+REQ 8:Requirement with main text and relations details with <details> element that should not break parsing and validation.    #### Details <details> ### REQ 8 Nested requirement which should not be processed as requirement. #### Relations   * derivedFrom: #req-0          </details>"
 
 
 

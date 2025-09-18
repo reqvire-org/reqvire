@@ -8,14 +8,6 @@ use std::hash::Hasher;
 use crate::utils::EXTERNAL_SCHEMES;
 use std::path::PathBuf;
 
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
-pub enum RelationDirection {
-    Forward,
-    Backward,
-    Neutral,
-}
-
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub enum ArrowDirection {
     ElementToTarget,    // element → target
@@ -25,7 +17,6 @@ pub enum ArrowDirection {
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct RelationTypeInfo {
     pub name: &'static str,
-    pub direction: RelationDirection,
     pub opposite: Option<&'static str>,
     pub description: &'static str,
     pub arrow: &'static str,
@@ -40,7 +31,6 @@ lazy_static! {
         // Containment relations
         m.insert("containedBy", RelationTypeInfo {
             name: "containedBy",
-            direction: RelationDirection::Backward,
             opposite: Some("contain"),
             description: "Element is contained by another element",
             arrow: "--o",
@@ -49,7 +39,6 @@ lazy_static! {
         });
         m.insert("contain", RelationTypeInfo {
             name: "contain",
-            direction: RelationDirection::Forward,
             opposite: Some("containedBy"),
             description: "Element contains another element",
             arrow: "--o",
@@ -60,7 +49,6 @@ lazy_static! {
         // Derive relations
         m.insert("derivedFrom", RelationTypeInfo {
             name: "derivedFrom",
-            direction: RelationDirection::Backward,
             opposite: Some("derive"),
             description: "Element is derived from another element",
             arrow: "-.->",
@@ -69,7 +57,6 @@ lazy_static! {
         });
         m.insert("derive", RelationTypeInfo {
             name: "derive",
-            direction: RelationDirection::Forward,
             opposite: Some("derivedFrom"),
             description: "Element is source for a derived element",
             arrow: "-.->",
@@ -80,7 +67,6 @@ lazy_static! {
         // Refine relation
         m.insert("refine", RelationTypeInfo {
             name: "refine",
-            direction: RelationDirection::Backward,
             opposite: Some("refinedBy"),
             description: "Element refines a higher-level element",
             arrow: "-->",
@@ -91,7 +77,6 @@ lazy_static! {
         // Refine relation
         m.insert("refinedBy", RelationTypeInfo {
             name: "refinedBy",
-            direction: RelationDirection::Forward,
             opposite: Some("refine"),
             description: "A souce element being refined by other element.",
             arrow: "-->",
@@ -102,7 +87,6 @@ lazy_static! {
         // Satisfy relations
         m.insert("satisfiedBy", RelationTypeInfo {
             name: "satisfiedBy",
-            direction: RelationDirection::Forward,
             opposite: Some("satisfy"),
             description: "A souce element being satisfied by other element.",
             arrow: "-->",
@@ -111,7 +95,6 @@ lazy_static! {
         });
         m.insert("satisfy", RelationTypeInfo {
             name: "satisfy",
-            direction: RelationDirection::Backward,
             opposite: Some("satisfiedBy"),
             description: "Element satisfies another element",
             arrow: "-->",
@@ -122,7 +105,6 @@ lazy_static! {
         // Verify relations
         m.insert("verifiedBy", RelationTypeInfo {
             name: "verifiedBy",
-            direction: RelationDirection::Forward,
             opposite: Some("verify"),
             description: "A souce element being verified by other element.",
             arrow: "-.->",
@@ -131,7 +113,6 @@ lazy_static! {
         });
         m.insert("verify", RelationTypeInfo {
             name: "verify",
-            direction: RelationDirection::Backward,
             opposite: Some("verifiedBy"),
             description: "Element verifies another element",
             arrow: "-.->",
@@ -142,7 +123,6 @@ lazy_static! {
         // Trace relations
         m.insert("trace", RelationTypeInfo {
             name: "trace",
-            direction: RelationDirection::Forward,
             opposite: None,
             description: "Element is related to another element in a non-directional way",
             arrow: "-.->",
@@ -153,6 +133,27 @@ lazy_static! {
         m
     };
 }
+
+/// Relations to show in diagrams (one from each pair to avoid duplicates)
+/// These are typically the "forward" relations from the old direction system
+pub const DIAGRAM_RELATIONS: &[&str] = &[
+    "contain",       // Not containedBy
+    "derive",        // Not derivedFrom
+    "refinedBy",     // Not refine
+    "satisfiedBy",   // Not satisfy
+    "verifiedBy",    // Not verify
+    "trace"
+];
+
+/// Relations that propagate changes in impact analysis
+/// When these relations exist, changes to the source affect the target
+pub const IMPACT_PROPAGATION_RELATIONS: &[&str] = &[
+    "contain",       // Parent changes affect children
+    "derive",        // Source changes affect derived elements
+    "refinedBy",     // Base changes affect refinements
+    "satisfiedBy",   // Requirement changes affect implementations
+    "verifiedBy",    // Requirement changes invalidate verifications
+];
 
 #[derive(Debug, Clone, Serialize)]
 pub struct RelationTarget {
@@ -211,7 +212,7 @@ impl LinkType {
 pub struct Relation {
     pub relation_type: &'static RelationTypeInfo,
     pub target: RelationTarget,
-    pub is_opposite: bool
+    pub user_created: bool
 }
 
 impl PartialEq for Relation {
@@ -247,7 +248,7 @@ impl Hash for Relation {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.relation_type.name.hash(state);
         self.target.hash(state);
-        self.is_opposite.hash(state);
+        self.user_created.hash(state);
     }
 }
 
@@ -260,7 +261,7 @@ impl Relation {
         Ok(Self {
             relation_type: relation_info,
             target: RelationTarget{text: text, link: link},
-            is_opposite: false,
+            user_created: true,  // Relations created via parsing are user-created
         })
     }
     
@@ -294,7 +295,7 @@ impl Relation {
                             text: name.to_string(),
                             link: LinkType::Identifier(identifier.to_string()),
                         },
-                        is_opposite: true,
+                        user_created: false,  // Auto-generated opposite relations are not user-created
                     })
                 }
                 None => {
@@ -338,12 +339,9 @@ pub fn get_supported_relation_types() -> Vec<&'static str> {
 }
 
 /// Get the list of valid parent relation types (hierarchical relationships).
+/// These are typically the "backward" pointing relations that refer to parent elements.
 pub fn get_parent_relation_types() -> Vec<&'static str> {
-    RELATION_TYPES
-        .iter()
-        .filter(|(_, info)| info.direction == RelationDirection::Backward)
-        .map(|(name, _)| *name)
-        .collect()
+    vec!["containedBy", "derivedFrom", "refine", "satisfy", "verify"]
 }
 
 

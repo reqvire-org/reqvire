@@ -83,9 +83,20 @@ pub enum ReqvireError {
     #[error("Linting error: {0}")]    
     LintError(String),  
     
-    #[error("{0}")]    
-    ProcessError(String),  
-    
+    #[error("{0}")]
+    ProcessError(String),
 
-    
+    #[allow(dead_code)]
+    #[error("Element move error: {0}")]
+    ElementMoveError(String),
+
+    #[allow(dead_code)]
+    #[error("Location not found: {0}")]
+    LocationNotFound(String),
+
+    #[allow(dead_code)]
+    #[error("Location already exists: {0}")]
+    LocationAlreadyExists(String),
+
+
 }

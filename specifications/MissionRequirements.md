@@ -25,7 +25,6 @@ graph LR;
   click e9ad540a6411a0fc "MOEs.md#moe_ce";
   e9ad540a6411a0fc -.->|deriveReqT| b74eec7ed767e7c;
 ```
-
 ---
 
 ### Align with Industry Standards

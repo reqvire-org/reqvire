@@ -27,7 +27,6 @@ graph LR;
   click 5deb63503bdf77c "../SystemRequirements/Requirements.md#html-export";
   a4c40962cac85d0c -.->|deriveReqT| 5deb63503bdf77c;
 ```
-
 ---
 
 ### HTML Export Verification
