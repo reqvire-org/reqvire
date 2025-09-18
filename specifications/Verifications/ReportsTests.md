@@ -139,6 +139,7 @@ This test verifies that the system provides a CLI flag and functionality for gen
 - Supplying multiple filters in combination yields the intersection of their individual results.
 - Running any filter flag **without** `--model-summary` fails with a non-zero exit code and a help message indicating the dependency.
 - Supplying an invalid regex to `--filter-name-regex` or `--filter-content` fails with a non-zero exit code and displays a `ReqvireError::InvalidRegex` message.
+- Model summary report must include all relations for each element, showing both explicit relations and their opposite relations (e.g., if a requirement has `verifiedBy`, the verification element should show `verify`; if a verification has `verify`, the requirement should show `verifiedBy`).
 
 ##### Test Criteria
 
@@ -179,10 +180,17 @@ This test verifies that the system provides a CLI flag and functionality for gen
    - exits non-zero  
    - stderr contains `Invalid regex`  
 
-6. **Filter without model-summary**  
-   Command: `reqvire --filter-file="*.md"`  
-   - exits non-zero  
-   - stderr indicates `requires --model-summary`  
+6. **Filter without model-summary**
+   Command: `reqvire --filter-file="*.md"`
+   - exits non-zero
+   - stderr indicates `requires --model-summary`
+
+7. **Relations coverage**
+   Command: `reqvire --model-summary --json`
+   - For any requirement with `verifiedBy` relations, verify that the target verification elements show corresponding `verify` relations pointing back to the requirement
+   - For any verification with `verify` relations, verify that the target requirement elements show corresponding `verifiedBy` relations pointing back to the verification
+   - Same pattern applies to other relation pairs: `satisfiedBy`/`satisfy`, `containedBy`/`contain`, `derivedFrom`/`derive`, `refine`/`refinedBy`
+   - Both JSON and text outputs must show complete bidirectional relationship information
 
 #### Relations
   * satisfiedBy: [tests/test-model-summary-reports/test.sh](../../tests/test-model-summary-reports/test.sh)
