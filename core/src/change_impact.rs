@@ -16,7 +16,7 @@ pub struct RelationSummary {
     pub target: RelationTarget,
     pub target_changed: bool,
     #[serde(skip_serializing)]
-    pub is_opposite: bool,
+    pub user_created: bool,
 }
 
 impl RelationSummary {
@@ -405,7 +405,7 @@ fn convert_relation_to_summary(rel: &Relation) -> RelationSummary {
         relation_type: rel.relation_type.name.to_string(),
         target_changed: false,
         target: rel.target.clone(),
-        is_opposite: rel.is_opposite,
+        user_created: rel.user_created,
     }
 }
 
@@ -451,10 +451,10 @@ pub fn build_change_impact_tree(
                 visited,
                 fallback_name,
             );
-            // Only include forward relations
+            // Only include relations that propagate changes
             let forward_relations: Vec<_> = rels
                 .into_iter()
-                .filter(|rel| rel.relation_type.direction == relation::RelationDirection::Forward)
+                .filter(|rel| relation::IMPACT_PROPAGATION_RELATIONS.contains(&rel.relation_type.name))
                 .map(|rel| element_registry::RelationNode {
                     relation_trigger: rel.relation_type.name.to_string(),
                     element_node: child_node.clone(),
@@ -573,8 +573,13 @@ pub fn compute_change_impact(
         let ref_elem = &reference.elements[*id];
         let content_changed = cur_elem.hash_impact_content != ref_elem.hash_impact_content;
        
-        let cur_relations: HashSet<_> = cur_elem.relations.iter().filter(|r| !r.is_opposite).cloned().collect();
-        let ref_relations: HashSet<_> = ref_elem.relations.iter().filter(|r| !r.is_opposite).cloned().collect();
+        // Only track changes to relations that propagate impact according to specifications
+        let cur_relations: HashSet<_> = cur_elem.relations.iter()
+            .filter(|r| relation::IMPACT_PROPAGATION_RELATIONS.contains(&r.relation_type.name))
+            .cloned().collect();
+        let ref_relations: HashSet<_> = ref_elem.relations.iter()
+            .filter(|r| relation::IMPACT_PROPAGATION_RELATIONS.contains(&r.relation_type.name))
+            .cloned().collect();
         let added_relations: Vec<_> = cur_relations
             .difference(&ref_relations)
             .cloned()
@@ -609,7 +614,7 @@ pub fn compute_change_impact(
         let added_relations: Vec<_> = cur_elem
             .relations
             .iter()
-            .filter(|r| !r.is_opposite)
+            .filter(|r| relation::IMPACT_PROPAGATION_RELATIONS.contains(&r.relation_type.name))
             .cloned()
             .map(|rel: Relation| convert_relation_to_summary(&rel))
             .collect();
@@ -682,7 +687,7 @@ mod tests {
     use super::*;
     use crate::ElementRegistry;
     use crate::element::Element;
-    use crate::relation::{RelationTypeInfo, Relation, RelationTarget, RelationDirection, ArrowDirection};
+    use crate::relation::{RelationTypeInfo, Relation, RelationTarget, ArrowDirection};
    
     /// Helper function to create a simple element.
     fn create_element(identifier: &str, name: &str, content: &str) -> Element {
@@ -705,7 +710,7 @@ mod tests {
                 text: target_id.to_string(),
                 link: relation::LinkType::Identifier(target_id.to_string()),
             },
-            is_opposite: false,
+            user_created: true,
         });
     }
        
@@ -719,7 +724,6 @@ mod tests {
             &mut element_b,
             &RelationTypeInfo {
                 name: "derive",
-                direction: RelationDirection::Forward,
                 opposite: Some("derivedFrom"),
                 description: "Element B derives from A",
                 arrow: "-->",
@@ -759,7 +763,6 @@ mod tests {
             &mut element_a,
             &RelationTypeInfo {
                 name: "contain",
-                direction: RelationDirection::Forward,
                 opposite: Some("containedBy"),
                 description: "Element A contains B",
                 arrow: "-->",
@@ -772,7 +775,6 @@ mod tests {
             &mut element_b,
             &RelationTypeInfo {
                 name: "derive",
-                direction: RelationDirection::Forward,
                 opposite: Some("derivedFrom"),
                 description: "Element B derives from A",
                 arrow: "-->",
@@ -827,7 +829,6 @@ mod tests {
         parent_req.relations.push(Relation {
             relation_type: &RelationTypeInfo {
                 name: "derive",
-                direction: RelationDirection::Forward,
                 opposite: Some("derivedFrom"),
                 description: "Parent derives child",
                 arrow: "-->",
@@ -838,12 +839,11 @@ mod tests {
                 text: "Child Requirement".to_string(),
                 link: LinkType::Identifier("req1.md#child-requirement".to_string()),
             },
-            is_opposite: false,
+            user_created: true,
         });
         parent_req.relations.push(Relation {
             relation_type: &RelationTypeInfo {
                 name: "verifiedBy",
-                direction: RelationDirection::Forward,
                 opposite: Some("verify"),
                 description: "Verified by test",
                 arrow: "-->",
@@ -854,7 +854,7 @@ mod tests {
                 text: "Parent Verification".to_string(),
                 link: LinkType::Identifier("verify.md#parent-verification".to_string()),
             },
-            is_opposite: false,
+            user_created: true,
         });
        
         // Create child requirement with backward relation
@@ -862,7 +862,6 @@ mod tests {
         child_req.relations.push(Relation {
             relation_type: &RelationTypeInfo {
                 name: "derivedFrom",
-                direction: RelationDirection::Backward,
                 opposite: Some("derive"),
                 description: "Child derived from parent",
                 arrow: "<--",
@@ -873,7 +872,7 @@ mod tests {
                 text: "Parent Requirement".to_string(),
                 link: LinkType::Identifier("req1.md#parent-requirement".to_string()),
             },
-            is_opposite: true,  // Fixed: Set to true for opposite/backward
+            user_created: false,  // Auto-generated opposite relations
         });
        
         // Create a verification with backward relation
@@ -888,7 +887,6 @@ mod tests {
         verification.relations.push(Relation {
             relation_type: &RelationTypeInfo {
                 name: "verify",
-                direction: RelationDirection::Backward,
                 opposite: Some("verifiedBy"),
                 description: "Verifies requirement",
                 arrow: "<--",
@@ -899,7 +897,7 @@ mod tests {
                 text: "Parent Requirement".to_string(),
                 link: LinkType::Identifier("req1.md#parent-requirement".to_string()),
             },
-            is_opposite: true,  // Fixed: Set to true for opposite/backward
+            user_created: false,  // Auto-generated opposite relations
         });
        
         current_registry.elements.insert("req1.md#parent-requirement".to_string(), parent_req);
@@ -933,7 +931,6 @@ mod tests {
         requirement.relations.push(Relation {
             relation_type: &RelationTypeInfo {
                 name: "verifiedBy",
-                direction: RelationDirection::Forward,
                 opposite: Some("verify"),
                 description: "Verified by test",
                 arrow: "-->",
@@ -944,7 +941,7 @@ mod tests {
                 text: "New Verification".to_string(),
                 link: LinkType::Identifier("verify.md#new-verification".to_string()),
             },
-            is_opposite: false,
+            user_created: true,
         });
        
         // Create verification with verify relation to requirement
@@ -959,7 +956,6 @@ mod tests {
         verification.relations.push(Relation {
             relation_type: &RelationTypeInfo {
                 name: "verify",
-                direction: RelationDirection::Backward,
                 opposite: Some("verifiedBy"),
                 description: "Verifies requirement",
                 arrow: "<--",
@@ -970,7 +966,7 @@ mod tests {
                 text: "New Requirement".to_string(),
                 link: LinkType::Identifier("req.md#new-requirement".to_string()),
             },
-            is_opposite: true,  // Fixed: Set to true for opposite/backward
+            user_created: false,  // Auto-generated opposite relations
         });
        
         current_registry.elements.insert("req.md#new-requirement".to_string(), requirement);

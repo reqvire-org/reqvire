@@ -29,8 +29,8 @@ impl GraphRegistry {
             let mut relation_nodes = Vec::new();
             for relation in &node.element.relations {
                 if let LinkType::Identifier(ref target_id) = relation.target.link {
-                    // Only handle valid forward links
-                    if relation.relation_type.direction == RelationDirection::Forward {
+                    // Only handle relations that propagate impact
+                    if relation::IMPACT_PROPAGATION_RELATIONS.contains(&relation.relation_type.name) {
                         if let Some(target_node) = nodes.get(target_id) {
                             relation_nodes.push(RelationNode {
                                 relation_trigger: relation.relation_type.name.to_string(),
@@ -143,7 +143,7 @@ mod tests {
                 text: to_id.to_string(),
                 link: LinkType::Identifier(to_id.to_string()),
             },
-            is_opposite: false,
+            user_created: true,
         });
     }
 

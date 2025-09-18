@@ -213,7 +213,8 @@ impl ElementRegistry {
                     if matches!(relation.target.link, relation::LinkType::Identifier(_) | relation::LinkType::InternalPath(_)) {
                         let target_key = relation.target.link.as_str().to_string();
 
-                        if relation.relation_type.direction == relation::RelationDirection::Forward {
+                        // Only propagate through relations that should cause impact
+                        if relation::IMPACT_PROPAGATION_RELATIONS.contains(&relation.relation_type.name) {
                             if elem.identifier == current_id {
                                 impacted
                                     .entry(target_key.clone())

@@ -21,11 +21,11 @@ graph LR;
   a4c40962cac85d0c["Export HTML specifications"];
   class a4c40962cac85d0c requirement;
   click a4c40962cac85d0c "../UserRequirements.md#export-html-specifications";
-  a4c40962cac85d0c -.->|verifiedBy| 14ef985b9a43174e;
   5deb63503bdf77c["HTML Export"];
   class 5deb63503bdf77c requirement;
   click 5deb63503bdf77c "../SystemRequirements/Requirements.md#html-export";
   a4c40962cac85d0c -.->|deriveReqT| 5deb63503bdf77c;
+  a4c40962cac85d0c -.->|verifiedBy| 14ef985b9a43174e;
 ```
 
 ---

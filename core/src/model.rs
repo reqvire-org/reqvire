@@ -152,7 +152,9 @@ impl ModelManager {
         for source_id in &element_ids {
             if let Some(source_element) = self.element_registry.elements.get(source_id) {
                 for relation in &source_element.relations {
-                    if relation.is_opposite{
+                    // Only process user-created relations to avoid infinite loops
+                    // Auto-generated opposite relations are handled by the opposite creation logic
+                    if !relation.user_created {
                         continue;
                     }
 
@@ -317,11 +319,12 @@ impl ModelManager {
         // Add this element to the current traversal path.
         path.push(element_id.clone());
 
-        // Process only forward relations (ignore backward ones, which should have already been inserted).
+        // Process only relations that could form cycles (hierarchical relations)
         for relation in &element.relations {
             if let relation::LinkType::Identifier(ref target_id) = relation.target.link {
-                // Only traverse forward relations.
-                if relation.relation_type.direction == relation::RelationDirection::Forward {
+                // Only traverse relations that could create circular dependencies
+                // These are typically hierarchical relations that establish parent-child relationships
+                if relation::IMPACT_PROPAGATION_RELATIONS.contains(&relation.relation_type.name) {
                     if let Ok(target_element) = self.element_registry.get_element(target_id) {
                         self.check_circular_dependencies(target_element, visited, path, errors);
                     }

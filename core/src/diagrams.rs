@@ -106,14 +106,12 @@ fn generate_section_diagram(
             continue;
         }
 
-        // Check if this element has Forward relations pointing to any element in the current section
+        // Check if this element has diagram relations pointing to any element in the current section
         let has_forward_relation_to_section = element.relations.iter().any(|relation| {
-            // Only consider Forward relations
-            if let Some(info) = relation::RELATION_TYPES.get(relation.relation_type.name) {
-                if info.direction == relation::RelationDirection::Forward {
-                    if let relation::LinkType::Identifier(target_id) = &relation.target.link {
-                        return section_element_identifiers.contains(target_id);
-                    }
+            // Only consider relations that should be shown in diagrams
+            if relation::DIAGRAM_RELATIONS.contains(&relation.relation_type.name) {
+                if let relation::LinkType::Identifier(target_id) = &relation.target.link {
+                    return section_element_identifiers.contains(target_id);
                 }
             }
             false
@@ -207,13 +205,8 @@ fn add_element_to_diagram(
 
 
     for relation in &element.relations {
-        // Only render forward relations to prevent duplicate arrows
-        if let Some(info) = relation::RELATION_TYPES.get(relation.relation_type.name) {
-            if info.direction != relation::RelationDirection::Forward {
-                continue;
-            }
-        } else {
-            // Skip unknown relation types
+        // Only render relations that should be shown in diagrams (to prevent duplicate arrows)
+        if !relation::DIAGRAM_RELATIONS.contains(&relation.relation_type.name) {
             continue;
         }
         
