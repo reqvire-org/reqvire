@@ -322,27 +322,27 @@ The system shall provide comprehensive validation messages that include file pat
 
 ---
 
-### Model Linting
-The ssystem shall provide linting capabilities to identify and fix stylistic, formatting, and non-critical issues in MBSE models that don't affect functional integrity.
+### Model Formatting
+The system shall provide formatting capabilities to normalize and standardize MBSE models for consistency and readability.
 
 #### Relations
   * refine: [UserStories.md/Validating Structures](UserStories.md#validating-structures)
 
 ---
 
-### Linting Command
-The system shall provide a linting command that by default automatically applies fixes to stylistic and non-critical formatting issues, while offering option to preview changes without applying them.
+### Formatting Command
+The system shall provide a formatting command that by default automatically applies normalization to requirements files, while offering option to preview changes without applying them.
 
 #### Relations
-  * containedBy: [Model Linting](#model-linting)
+  * containedBy: [Model Formatting](#model-formatting)
 
 ---
 
-### Linting Output
-The system shall display linting changes suggestion in similar manner as git diffs.
+### Formatting Output
+The system shall display formatting changes suggestion in similar manner as git diffs.
 
 #### Relations
-  * refine: [Linting Command](#linting-command)
+  * refine: [Formatting Command](#formatting-command)
 
 ---
 
@@ -350,7 +350,7 @@ The system shall display linting changes suggestion in similar manner as git dif
 The system shall replace absolute links with relative links, where applicable and contextually appropriate, to conform to repository standards and enhance portability.
 
 #### Relations
-  * containedBy: [Model Linting](#model-linting)
+  * containedBy: [Model Formatting](#model-formatting)
 
 ---
 
@@ -364,7 +364,7 @@ The system shall provide linting capability to ensure consistent formatting in r
   * Ensuring consistent indentation in relation lists
 
 #### Relations
-  * containedBy: [Model Linting](#model-linting)
+  * containedBy: [Model Formatting](#model-formatting)
 
 ---
 
@@ -621,21 +621,13 @@ The system shall generate detailed validation reports, highlighting any inconsis
 
 #### Details
 
-Validation shall be performed automatically when any command requires the parsed model, eliminating the need for a separate validation command. Commands that operate on raw files (html, lint) shall skip validation to allow operation on potentially invalid documents.
+Validation shall be performed automatically when any command requires the parsed model, eliminating the need for a separate validation command. Commands that operate on raw files shall skip validation to allow operation on potentially invalid documents.
 
 #### Relations
   * refine: [UserStories.md/Provide Reports](UserStories.md#provide-reports)
 
 ---
 
-### Generate Summary Reports
-
-The system shall allow users to generate summary reports highlighting key metrics and statuses within the MBSE model.
-
-#### Relations
-  * refine: [UserStories.md/Provide Reports](UserStories.md#provide-reports)
-
----
 
 ### Verification Coverage Report
 
@@ -654,8 +646,7 @@ The verification coverage report shall provide:
 The report helps track verification completeness and identify gaps in test coverage, supporting quality assurance and compliance activities.
 
 #### Relations
-  * refine: [UserStories.md/Provide Reports](UserStories.md#provide-reports)
-  * derivedFrom: [Generate Summary Reports](#generate-summary-reports)
+  * refine: [Model reports](#model-reports)
   * verifiedBy: [Verifications/ReportsTests.md#Verification Coverage Report Test](Verifications/ReportsTests.md#verification-coverage-report-test)
 
 ---
@@ -740,12 +731,11 @@ When requested the system shall generate traceability matrices, in Markdown form
 
 #### Details
 
+A matrix is a textual representation which is the most efficient way to convey numerous relationships within a compact space.
+
 Requirements-to-Verification View:
   * Maps each requirement to one or more verification activities, tests, or validation procedures. This helps track which requirements are verified and how.
 
-#### Info
-
-A matrix is a textual representation which is the most efficient way to convey numerous relationships within a compact space.
 
 #### Relations
   * containedBy: [UserStories.md/Trace Changes in MBSE Model](UserStories.md#trace-changes-in-mbse-model)

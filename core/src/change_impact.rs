@@ -441,7 +441,7 @@ pub fn build_change_impact_tree(
             if !visited.insert(impacted_id.clone()) {
                 return None;
             }
-    
+
             // Use the text from the first relation as a fallback display name
             let fallback_name = rels.first().map(|rel| rel.target.text.clone());
             let child_node = build_change_impact_tree(

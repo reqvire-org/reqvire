@@ -492,7 +492,7 @@ Reqvire requirements & treacibility management tool
 Usage: reqvire [OPTIONS] <COMMAND> [COMMAND OPTIONS]
 
 Commands:
-  lint               Enable linting to find potential improvements (non-blocking) By default, fixes will be applied automatically
+  format             Format and normalize requirements files (non-blocking) By default, changes will be applied automatically
   validate           Validate model
   help               Print this message or the help of the given subcommand(s)
 
@@ -512,14 +512,14 @@ LINT OPTIONS:
 
 ---
 
-### Lint Command
+### Format Command
 
-The system shall provide a linting function, activated by the (lint command), which shall execute the linting process upon user request.
+The system shall provide a formatting function, activated by the (format command), which shall execute the formatting process upon user request.
 
 #### Details
- 
-`lint` command must provide a dry run mode (--dry-run option flag) for linting that shows the suggested changes without applying them, allowing users to review modifications before committing to them:
-  - --dry-run flag works in tandem with the main lint command flag and cannot be used standalone.
+
+`format` command must provide a dry run mode (--dry-run option flag) for formatting that shows the suggested changes without applying them, allowing users to review modifications before committing to them:
+  - --dry-run flag works in tandem with the main format command flag and cannot be used standalone.
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Linting Command Behavior](../UserRequirements.md#linting-command)

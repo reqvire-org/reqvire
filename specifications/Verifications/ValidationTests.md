@@ -253,7 +253,7 @@ This test verifies that Reqvire correctly handles and validates relations to fra
 
 ### JSON Output Format Test
 
-This test verifies that the system properly implements JSON output formatting for validation and other commands.
+This test verifies that the system properly implements JSON output formatting for various commands that require it.
 
 #### Metadata
   * type: verification
@@ -261,20 +261,15 @@ This test verifies that the system properly implements JSON output formatting fo
 #### Details
 
 ##### Acceptance Criteria
-- System shall support --json flag for validation commands
+- System shall support --json flag for various commands
 - JSON output shall be properly formatted according to a consistent schema
 - JSON structure shall be parsable and machine-readable
-- All relevant validation data shall be included in the output
 
 ##### Test Criteria
 - Commands with --json flag produce valid JSON
 - JSON output can be parsed without errors
 - Output structure matches expected schema
-- All validation errors are properly represented in JSON format
 
-#### Relations
-  * verify: [../UserRequirements.md#model-structure-and-summaries](../UserRequirements.md#model-structure-and-summaries)
-  * satisfiedBy: [tests/test-invalid-relations/test.sh](../../tests/test-invalid-relations/test.sh)
 
 ---
 

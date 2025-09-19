@@ -268,6 +268,17 @@ fn print_validation_results(errors: &[ReqvireError], json_output: bool) {
     }
 }
 
+fn wants_json(args: &Args) -> bool {
+    match &args.command {
+        Some(Commands::Lint { json, .. }) => *json,
+        Some(Commands::Traces { json, .. }) => *json,
+        Some(Commands::ModelSummary { json, .. }) => *json,
+        Some(Commands::ChangeImpact { json, .. }) => *json,
+        Some(Commands::CoverageReport { json }) => *json,
+        _ => false,
+    }
+}
+
 pub fn handle_command(
     args: Args,
     excluded_filename_patterns: &GlobSet,
@@ -283,10 +294,13 @@ pub fn handle_command(
         excluded_filename_patterns
     );
 
+    let json_output = wants_json(&args);
+
+
     // Handle validation failures for all commands
     match &parse_result {
         Err(ReqvireError::ValidationError(errors)) => {
-            print_validation_results(errors, false);
+            print_validation_results(errors, json_output);
             return Ok(1);
         }
         Err(e) => {
