@@ -11,10 +11,6 @@ This is a root requirement for testing purposes.
 #### Metadata
   * type: user-requirement
 
-#### Relations
-  * derive: [Element 2](#element-2)
-  * derive: [Element 3](#element-3)
-
 ### Element 1
 
 This is a test element with relations.
@@ -24,7 +20,6 @@ This is a test element with relations.
 
 #### Relations
   * verify: [Element 3](#element-3)
-  * refinedBy: [Element 2](#element-2)
 
 ### Element 2
 
@@ -33,7 +28,6 @@ This is another test element with relations.
 #### Relations
   * trace: [Element 1](#element-1)
   * derivedFrom: [Root Requirement](#root-requirement)
-  * refine: [Element 1](#element-1)
 
 ## Section 2
 

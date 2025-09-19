@@ -1,5 +1,5 @@
 use crate::element;
-use crate::element_registry::ElementRegistry;
+use crate::graph_registry::GraphRegistry;
 use serde::Serialize;
 use std::collections::HashMap;
 use crate::error::ReqvireError;
@@ -196,7 +196,7 @@ pub enum SummaryOutputFormat {
 }
 
 pub fn print_registry_summary(
-    registry: &ElementRegistry,
+    registry: &GraphRegistry,
     output_format: SummaryOutputFormat,
     filters: &Filters,
 ) {
@@ -219,13 +219,13 @@ pub fn print_registry_summary(
 
 
 fn build_summary(
-    registry: &ElementRegistry,
+    registry: &GraphRegistry,
     filters: &Filters,
 ) -> Summary {
     let mut files: HashMap<String, FileSummary> = HashMap::new();
     let mut counters = GlobalCounters::default();
 
-    for elem in registry.elements.values() {
+    for elem in registry.get_all_elements() {
         // Apply filters
         if !filters.matches(elem) {
             continue;
@@ -326,7 +326,7 @@ fn build_summary(
         // Get section content and calculate counts
         for (section_name, section_summary) in &mut file_summary.sections {
             // Get section content
-            let section_key = crate::element_registry::SectionKey::new(
+            let section_key = crate::graph_registry::SectionKey::new(
                 file_path.clone(),
                 section_name.clone()
             );
@@ -577,7 +577,7 @@ impl CoverageReport {
     }
 }
 
-pub fn generate_coverage_report(registry: &ElementRegistry) -> CoverageReport {
+pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
     let mut total_verifications = 0;
     let mut total_satisfied = 0;
     let mut verification_types = VerificationTypeCounts {
@@ -591,7 +591,7 @@ pub fn generate_coverage_report(registry: &ElementRegistry) -> CoverageReport {
     let mut unsatisfied_files: HashMap<String, Vec<VerificationDetails>> = HashMap::new();
     
     // Analyze all verification elements
-    for element in registry.elements.values() {
+    for element in registry.get_all_elements() {
         if let element::ElementType::Verification(verification_type) = &element.element_type {
             total_verifications += 1;
             

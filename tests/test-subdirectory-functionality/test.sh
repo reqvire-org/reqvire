@@ -28,31 +28,11 @@ git remote add origin 'https://dummy.example.com/dummy-repo.git' > /dev/null 2>&
 git add . > /dev/null 2>&1
 git commit -m "Initial test structure" > /dev/null 2>&1
 
-# Test 1: Validate from submodule directory - should focus only on submodule
-OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" validate 2>&1)
-EXIT_CODE=$?
-
-printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results_validate.log"
-
-if [ $EXIT_CODE -ne 0 ]; then
-  echo "❌ FAILED: Validate from submodule directory failed with exit code $EXIT_CODE"
-  echo "Output: $OUTPUT"
-  exit 1
-fi
-
-# Check that validation only processed submodule files (files under 'submodule/' path)
-# The output should not contain file paths outside the submodule directory for processed files
-if echo "$OUTPUT" | grep -q "File specifications/MainRequirements.md"; then
-  echo "❌ FAILED: Validation processed main requirements when it should only process submodule"
-  echo "Output: $OUTPUT"
-  exit 1
-fi
-
-# Test 2: Model summary from submodule directory
+# Test 1: Model summary from submodule directory - should focus only on submodule
 OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" model-summary 2>&1)
 EXIT_CODE=$?
 
-printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results_model_summary.log"
+printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results_validate.log"
 
 if [ $EXIT_CODE -ne 0 ]; then
   echo "❌ FAILED: Model summary from submodule directory failed with exit code $EXIT_CODE"
@@ -60,9 +40,10 @@ if [ $EXIT_CODE -ne 0 ]; then
   exit 1
 fi
 
-# Check that model summary shows only submodule elements
+# Check that model summary only processed submodule files (files under 'submodule/' path)
+# The output should not contain file paths outside the submodule directory for processed files
 if echo "$OUTPUT" | grep -q "Main Requirement One"; then
-  echo "❌ FAILED: Model summary included main requirements when it should only process submodule"
+  echo "❌ FAILED: Model summary processed main requirements when it should only process submodule"
   echo "Output: $OUTPUT"
   exit 1
 fi
@@ -74,7 +55,7 @@ if ! echo "$OUTPUT" | grep -q "Submodule Requirement One"; then
   exit 1
 fi
 
-# Test 3: HTML export from submodule directory
+# Test 2: HTML export from submodule directory
 OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" html --output subdirectory-html 2>&1)
 EXIT_CODE=$?
 

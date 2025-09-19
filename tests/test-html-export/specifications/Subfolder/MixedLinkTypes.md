@@ -35,11 +35,11 @@ graph LR;
   click req6 "https://github.com/user/repo/blob/main/specifications/TestRequirements.md";
   class req6 requirement;
   
-  req1 -.->|linkedTo| req2;
-  req2 -.->|linkedTo| req3;
-  req3 -.->|linkedTo| req4;
-  req4 -.->|linkedTo| req5;
-  req5 -.->|linkedTo| req6;
+  req1 -.->|trace| req2;
+  req2 -.->|trace| req3;
+  req3 -.->|trace| req4;
+  req4 -.->|trace| req5;
+  req5 -.->|trace| req6;
 ```
 
 ### Direct Path Link Test
@@ -47,7 +47,7 @@ graph LR;
 This test verifies direct path links in mermaid diagrams.
 
 #### Relations
-  * linkedTo: [TestRequirements.md#test-requirement-1](../TestRequirements.md#test-requirement-1)
+  * trace: [TestRequirements.md#test-requirement-1](../TestRequirements.md#test-requirement-1)
 
 ---
 
@@ -56,6 +56,6 @@ This test verifies direct path links in mermaid diagrams.
 This test verifies GitHub URL style links in mermaid diagrams.
 
 #### Relations
-  * linkedTo: [GitHub Link](https://github.com/user/repo/blob/main/specifications/TestRequirements.md#test-requirement-1)
+  * trace: [GitHub Link](https://github.com/user/repo/blob/main/specifications/TestRequirements.md#test-requirement-1)
 
 ---

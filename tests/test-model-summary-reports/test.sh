@@ -21,16 +21,6 @@ set -euo pipefail
 # - Relations coverage: bidirectional relationships are shown (verifiedBy/verify, refine/refinedBy, derivedFrom/derive, etc.)
 # - Filtered relations coverage: relations to filtered-out elements are preserved in both directions
 
-# First validate that all test data is valid before attempting model summary
-VALIDATION_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "$TEST_DIR/reqvire.yaml" validate 2>&1)
-VALIDATION_EXIT_CODE=$?
-
-if [ $VALIDATION_EXIT_CODE -ne 0 ]; then
-  echo "❌ FAILED: Test data validation failed. Fix test data before running model summary:"
-  echo "$VALIDATION_OUTPUT"
-  exit 1
-fi
-
 # 1) No filters: base JSON summary
 OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary --json 2>&1)
 printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"

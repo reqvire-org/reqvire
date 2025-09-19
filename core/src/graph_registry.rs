@@ -1,13 +1,68 @@
-use std::collections::{HashMap, BTreeSet, HashSet};
+use std::collections::{HashMap, BTreeSet, HashSet, BTreeMap};
 use std::fs;
 use std::path::{Path, PathBuf};
 use log::{debug, warn};
+use serde::Serialize;
 
-use crate::relation::{self, LinkType};
-use crate::element_registry::{ElementNode, RelationNode, ElementRegistry, Page, Section, SectionKey};
-use crate::element::Element;
+use crate::relation::{self, LinkType, get_parent_relation_types};
+use crate::element::{Element, ElementType, RequirementType};
 use crate::error::ReqvireError;
 use crate::git_commands;
+use globset::GlobSet;
+use regex::Regex;
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
+pub struct SectionKey {
+    pub file_path: String,
+    pub section_name: String,
+}
+
+impl SectionKey {
+    pub fn new(file_path: String, section_name: String) -> Self {
+        Self {
+            file_path,
+            section_name,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct Page {
+    pub frontmatter_content: String,
+}
+
+impl Page {
+    pub fn new(frontmatter_content: String) -> Self {
+        Self {
+            frontmatter_content,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct Section {
+    pub content: String,
+}
+
+impl Section {
+    pub fn new(content: String) -> Self {
+        Self {
+            content,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct RelationNode {
+    pub relation_trigger: String,
+    pub element_node: ElementNode,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct ElementNode {
+    pub element: Element,
+    pub relations: Vec<RelationNode>,
+}
 
 #[derive(Debug)]
 pub struct GraphRegistry {
@@ -17,47 +72,327 @@ pub struct GraphRegistry {
 }
 
 impl GraphRegistry {
-    pub fn from_registry(registry: &ElementRegistry) -> Self {
-        let mut nodes: HashMap<String, ElementNode> = HashMap::new();
+    /// Creates a new empty GraphRegistry
+    pub fn new() -> Self {
+        Self {
+            nodes: HashMap::new(),
+            pages: HashMap::new(),
+            sections: HashMap::new(),
+        }
+    }
 
-        // Clone all elements into ElementNodes first
-        for (id, element) in &registry.elements {
-            nodes.insert(
-                id.clone(),
-                ElementNode {
-                    element: element.clone(),
-                    relations: Vec::new(),
-                },
-            );
+    /// Registers a page with content
+    pub fn register_page(&mut self, file_path: String, page_content: String) {
+        self.pages.insert(file_path, Page::new(page_content));
+    }
+
+    /// Registers a section with content
+    pub fn register_section(&mut self, file_path: String, section_name: String, section_content: String) {
+        let section_key = SectionKey::new(file_path, section_name);
+        self.sections.insert(section_key, Section::new(section_content));
+    }
+
+    /// Registers an element with local validation
+    pub fn register_element(&mut self, element: Element, _file_path: &str) -> Result<(), ReqvireError> {
+        let element_id = element.identifier.clone();
+
+        if self.nodes.contains_key(&element_id) {
+            return Err(ReqvireError::DuplicateElement(element_id));
         }
 
-        // Now resolve relations and build the graph structure
-        for (id, node) in nodes.clone() {
+        self.nodes.insert(element_id, ElementNode {
+            element,
+            relations: Vec::new(),
+        });
+
+        Ok(())
+    }
+
+    /// Build relations and validate graph structure
+    pub fn build_relations(&mut self, excluded_filename_patterns: &GlobSet) -> Result<Vec<ReqvireError>, ReqvireError> {
+        debug!("GraphRegistry: Building relations and validating graph structure");
+
+        // First build the relation graph
+        self.build_relation_graph();
+
+        // Add missing opposites
+        self.propagate_missing_opposites(excluded_filename_patterns);
+
+        // Validate relations
+        let mut errors = self.validate_relations(excluded_filename_patterns)?;
+
+        // Validate cross-component dependencies
+        errors.extend(self.validate_cross_component_dependencies()?);
+
+        Ok(errors)
+    }
+
+    /// Build the relation graph structure
+    fn build_relation_graph(&mut self) {
+        let element_ids: Vec<String> = self.nodes.keys().cloned().collect();
+
+        for source_id in &element_ids {
             let mut relation_nodes = Vec::new();
-            for relation in &node.element.relations {
-                if let LinkType::Identifier(ref target_id) = relation.target.link {
-                    // Only handle relations that propagate impact
-                    if relation::IMPACT_PROPAGATION_RELATIONS.contains(&relation.relation_type.name) {
-                        if let Some(target_node) = nodes.get(target_id) {
-                            relation_nodes.push(RelationNode {
-                                relation_trigger: relation.relation_type.name.to_string(),
-                                element_node: target_node.clone(),
-                            });
+
+            if let Some(source_node) = self.nodes.get(source_id) {
+                for relation in &source_node.element.relations {
+                    if let LinkType::Identifier(ref target_id) = relation.target.link {
+                        // Only handle relations that propagate impact
+                        if relation::IMPACT_PROPAGATION_RELATIONS.contains(&relation.relation_type.name) {
+                            if let Some(target_node) = self.nodes.get(target_id) {
+                                relation_nodes.push(RelationNode {
+                                    relation_trigger: relation.relation_type.name.to_string(),
+                                    element_node: target_node.clone(),
+                                });
+                            }
                         }
                     }
                 }
             }
 
-            if let Some(entry) = nodes.get_mut(&id) {
+            if let Some(entry) = self.nodes.get_mut(source_id) {
                 entry.relations = relation_nodes;
             }
         }
+    }
 
-        Self {
-            nodes,
-            pages: registry.pages.clone(),
-            sections: registry.sections.clone(),
+    /// Adds missing opposite relations into the registry (does not return errors).
+    fn propagate_missing_opposites(&mut self, excluded_filename_patterns: &GlobSet) {
+        log::debug!("Propagating missing opposite relations...");
+        let mut to_add: Vec<(String, crate::relation::Relation)> = Vec::new();
+        let element_ids: Vec<String> = self.nodes.keys().cloned().collect();
+        let md_regex = Regex::new(r"\.md(?:#|$)").unwrap();
+
+        for source_id in &element_ids {
+            if let Some(source_node) = self.nodes.get(source_id) {
+                for relation in &source_node.element.relations {
+                    if let crate::relation::LinkType::Identifier(ref target_id) = relation.target.link {
+                        if !md_regex.is_match(target_id) || excluded_filename_patterns.is_match(target_id) {
+                            continue;
+                        }
+
+                        if let Some(opposite_name) = relation.relation_type.opposite {
+                            if let Some(target_node) = self.nodes.get(target_id) {
+                                let already_present = target_node.element.relations.iter().any(|r| {
+                                    matches!(&r.target.link, crate::relation::LinkType::Identifier(id) if id == source_id)
+                                        && r.relation_type.name.eq_ignore_ascii_case(opposite_name)
+                                });
+
+                                if !already_present {
+                                    if let Some(opposite_relation) =
+                                        relation.to_opposite(&source_node.element.name, &source_node.element.identifier)
+                                    {
+                                        to_add.push((target_id.clone(), opposite_relation));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
+
+        // Apply mutations
+        for (target_id, relation) in to_add {
+            if let Some(target_node) = self.nodes.get_mut(&target_id) {
+                target_node.element.relations.push(relation);
+                log::debug!("Added opposite relation to '{}'", target_id);
+            }
+        }
+    }
+
+    /// Validates relations for target existence and element type compatibility.
+    fn validate_relations(&self, excluded_filename_patterns: &GlobSet) -> Result<Vec<ReqvireError>, ReqvireError> {
+        log::debug!("Running relation validation...");
+        let mut errors = Vec::new();
+        let element_ids: Vec<String> = self.nodes.keys().cloned().collect();
+
+        for source_id in &element_ids {
+            if let Some(source_node) = self.nodes.get(source_id) {
+                for relation in &source_node.element.relations {
+                    // Only process user-created relations to avoid infinite loops
+                    if !relation.user_created {
+                        continue;
+                    }
+
+                    match &relation.target.link {
+                        crate::relation::LinkType::Identifier(ref target_id) => {
+                            if excluded_filename_patterns.is_match(target_id) {
+                                log::debug!("Skipping excluded target: {}", target_id);
+                                continue;
+                            }
+
+                            match self.get_element(target_id) {
+                                None => {
+                                    errors.push(ReqvireError::MissingRelationTarget(
+                                        format!("Element '{}' references missing target '{}'", source_node.element.identifier, target_id),
+                                    ));
+                                }
+                                Some(target_element) => {
+                                    if let Some(error) = self.validate_element_types(
+                                        relation.relation_type.name,
+                                        &source_node.element,
+                                        target_element,
+                                    ) {
+                                        errors.push(error);
+                                    }
+                                }
+                            }
+                        }
+                        crate::relation::LinkType::InternalPath(ref file_path) => {
+                            // Validate file existence for InternalPath targets
+                            if !file_path.exists() {
+                                errors.push(ReqvireError::MissingRelationTarget(
+                                    format!("Element '{}' references missing target '{}'",
+                                        source_node.element.identifier,
+                                        file_path.to_string_lossy()),
+                                ));
+                            }
+                        }
+                        crate::relation::LinkType::ExternalUrl(_) => {
+                            // Skip validation for external URLs as per specification
+                            log::debug!("Skipping external URL validation");
+                        }
+                    }
+                }
+            }
+        }
+
+        Ok(errors)
+    }
+
+    /// Validates element types for a relation and returns an error if validation fails
+    fn validate_element_types(
+        &self,
+        relation_type: &str,
+        source_element: &Element,
+        target_element: &Element
+    ) -> Option<ReqvireError> {
+        // Only validate relation types with element type restrictions
+        if let Some(expected_types) = crate::relation::get_relation_element_type_description(relation_type) {
+            // Check if the element types are compatible
+            let is_valid = crate::relation::validate_relation_element_types(
+                relation_type,
+                &source_element.element_type,
+                &target_element.element_type
+            );
+
+            if !is_valid {
+                return Some(ReqvireError::IncompatibleElementTypes(
+                    format!("Relation '{}' from '{}' ({:?}) to '{}' ({:?}) has incompatible element types. {}",
+                        relation_type,
+                        source_element.identifier,
+                        source_element.element_type,
+                        target_element.identifier,
+                        target_element.element_type,
+                        expected_types
+                    )
+                ));
+            }
+        }
+
+        None
+    }
+
+    /// Validates cross-component dependencies for circular dependencies and missing links.
+    fn validate_cross_component_dependencies(&self) -> Result<Vec<ReqvireError>, ReqvireError> {
+        debug!("Validating cross-component dependencies...");
+        let mut errors = Vec::new();
+        let mut visited = HashSet::new();
+
+        // Check for circular dependencies - but be less strict about what constitutes a cycle
+        for element_node in self.nodes.values() {
+            let mut path = Vec::new();
+            self.check_circular_dependencies(&element_node.element, &mut visited, &mut path, &mut errors);
+        }
+
+        // Check for missing parent relations
+        let valid_parent_relations = get_parent_relation_types();
+        for element_node in self.nodes.values() {
+            let element = &element_node.element;
+            let element_file = &element.file_path;
+
+            // Important: Only system requirements needs parent
+            if let ElementType::Requirement(req_type) = &element.element_type {
+                match req_type {
+                    RequirementType::User => continue,
+                    RequirementType::System => {
+                        let has_parent_relation = element.relations.iter()
+                            .any(|r| valid_parent_relations.contains(&r.relation_type.name));
+
+                        if !has_parent_relation {
+                            errors.push(ReqvireError::MissingParentRelation(
+                                format!("File {}: Element '{}' has no parent relation (needs one of: {:?})", element_file, element.name, valid_parent_relations),
+                            ));
+                        }
+                    }
+                }
+            }
+        }
+
+        if errors.is_empty() {
+            debug!("No cross-component dependency validation errors found.");
+        } else {
+            debug!("{} cross-component validation errors found.", errors.len());
+        }
+
+        Ok(errors)
+    }
+
+    /// Check for circular dependencies using relation metadata to traverse in canonical direction
+    fn check_circular_dependencies(
+        &self,
+        element: &Element,
+        visited: &mut HashSet<String>,
+        path: &mut Vec<String>,
+        errors: &mut Vec<ReqvireError>,
+    ) {
+        let element_id = element.identifier.clone();
+
+        // If we've already fully processed this element, no need to check again.
+        if visited.contains(&element_id) {
+            return;
+        }
+
+        // If the current path already contains this element, we've found a cycle.
+        if let Some(pos) = path.iter().position(|id| id == &element_id) {
+            let cycle = path[pos..].join(" -> ");
+            let full_cycle = format!("{} -> {}", cycle, element_id);
+            errors.push(ReqvireError::CircularDependencyError(
+                format!("Circular dependency error: {}", full_cycle),
+            ));
+            return;
+        }
+
+        // Add this element to the current traversal path.
+        path.push(element_id.clone());
+
+        // Traverse relations using their metadata to determine canonical direction
+        for relation in &element.relations {
+            if let crate::relation::LinkType::Identifier(ref target_id) = relation.target.link {
+                // Use relation metadata to traverse in canonical direction only
+                let should_traverse = if let Some(_opposite) = relation.relation_type.opposite {
+                    // For bidirectional relations, only traverse in one canonical direction
+                    // to avoid detecting the same logical cycle twice
+                    // Traverse if this relation type is "lexicographically smaller" than its opposite
+                    // or if this is the primary direction for this relation type
+                    relation.relation_type.name < relation.relation_type.opposite.unwrap_or("")
+                } else {
+                    // For unidirectional relations, always traverse
+                    true
+                };
+
+                if should_traverse {
+                    if let Some(target_element) = self.get_element(target_id) {
+                        self.check_circular_dependencies(target_element, visited, path, errors);
+                    }
+                }
+            }
+        }
+
+        // Mark the current element as completely processed and remove it from the current path.
+        visited.insert(element_id);
+        path.pop();
     }
 
     /// Updates an element's identifier and rewires all incoming relations
@@ -366,6 +701,53 @@ impl GraphRegistry {
     /// Gets all elements as a vector
     pub fn get_all_elements(&self) -> Vec<&Element> {
         self.nodes.values().map(|node| &node.element).collect()
+    }
+
+    /// Collects all InternalPath targets from element relations
+    pub fn get_internal_path_targets(&self) -> HashSet<PathBuf> {
+        self.collect_internal_path_targets()
+    }
+
+    /// Gets requirements grouped by root folder
+    pub fn get_requirements_by_root(&self) -> BTreeMap<String, Vec<&Element>> {
+        let mut requirements_by_root = BTreeMap::new();
+
+        for element in self.get_all_elements() {
+            // Extract root folder from file path
+            let root_folder = if let Some(slash_pos) = element.file_path.find('/') {
+                element.file_path[..slash_pos].to_string()
+            } else {
+                "root".to_string()
+            };
+
+            requirements_by_root
+                .entry(root_folder)
+                .or_insert_with(Vec::new)
+                .push(element);
+        }
+
+        requirements_by_root
+    }
+
+    /// Change impact analysis with relation information
+    pub fn change_impact_with_relation(&self, element: &Element) -> Vec<(String, Vec<crate::relation::Relation>)> {
+        if let Some(node) = self.nodes.get(&element.identifier) {
+            // Group original relations by target ID
+            let mut relations_by_target: std::collections::HashMap<String, Vec<crate::relation::Relation>> = std::collections::HashMap::new();
+
+            for relation in &node.element.relations {
+                if let crate::relation::LinkType::Identifier(ref target_id) = relation.target.link {
+                    relations_by_target
+                        .entry(target_id.clone())
+                        .or_insert_with(Vec::new)
+                        .push(relation.clone());
+                }
+            }
+
+            relations_by_target.into_iter().collect()
+        } else {
+            Vec::new()
+        }
     }
 
     /// Gets a specific element by ID
@@ -923,7 +1305,6 @@ mod tests {
     use super::*;
     use crate::element::{Element, ElementType, RequirementType};
     use crate::relation::{Relation, RelationTarget, LinkType, RELATION_TYPES};
-    use crate::element_registry::ElementRegistry;
 
     fn make_element(id: &str, name: &str) -> Element {
         let mut element = Element::new(
@@ -952,7 +1333,7 @@ mod tests {
 
     #[test]
     fn test_graph_from_registry_resolves_forward_links() {
-        let mut registry = ElementRegistry::new();
+        let mut registry = GraphRegistry::new();
         let mut a = make_element("A", "Element A");
         let b = make_element("B", "Element B");
 
@@ -961,7 +1342,8 @@ mod tests {
         registry.register_element(a.clone(), "file.md").unwrap();
         registry.register_element(b.clone(), "file.md").unwrap();
 
-        let graph = GraphRegistry::from_registry(&registry);
+        let mut graph = registry;
+        graph.build_relation_graph();
 
         let a_node = graph.nodes.get("A").unwrap();
         assert_eq!(a_node.relations.len(), 1);
@@ -971,7 +1353,7 @@ mod tests {
 
     #[test]
     fn test_update_identifier_updates_links_and_graph() {
-        let mut registry = ElementRegistry::new();
+        let mut registry = GraphRegistry::new();
         let mut a = make_element("A", "Element A");
         let b = make_element("B", "Element B");
 
@@ -980,7 +1362,8 @@ mod tests {
         registry.register_element(a.clone(), "file.md").unwrap();
         registry.register_element(b.clone(), "file.md").unwrap();
 
-        let mut graph = GraphRegistry::from_registry(&registry);
+        let mut graph = registry;
+        graph.build_relation_graph();
         graph.update_identifier("B", "B_NEW");
 
         // B should no longer exist, B_NEW should
@@ -995,7 +1378,7 @@ mod tests {
 
     #[test]
     fn test_get_impact_tree_traverses_correctly() {
-        let mut registry = ElementRegistry::new();
+        let mut registry = GraphRegistry::new();
         let mut a = make_element("A", "Element A");
         let mut b = make_element("B", "Element B");
         let c = make_element("C", "Element C");
@@ -1007,7 +1390,8 @@ mod tests {
         registry.register_element(b.clone(), "file.md").unwrap();
         registry.register_element(c.clone(), "file.md").unwrap();
 
-        let graph = GraphRegistry::from_registry(&registry);
+        let mut graph = registry;
+        graph.build_relation_graph();
         let tree = graph.get_impact_tree("A");
 
         assert_eq!(tree.element.identifier, "A");
@@ -1021,7 +1405,7 @@ mod tests {
 
     #[test]
     fn test_cycle_is_handled_gracefully() {
-        let mut registry = ElementRegistry::new();
+        let mut registry = GraphRegistry::new();
         let mut a = make_element("A", "Element A");
         let mut b = make_element("B", "Element B");
 
@@ -1032,7 +1416,8 @@ mod tests {
         registry.register_element(a.clone(), "file.md").unwrap();
         registry.register_element(b.clone(), "file.md").unwrap();
 
-        let graph = GraphRegistry::from_registry(&registry);
+        let mut graph = registry;
+        graph.build_relation_graph();
         let tree = graph.get_impact_tree("A");
 
         assert_eq!(tree.element.identifier, "A");
@@ -1045,7 +1430,7 @@ mod tests {
 
     #[test]
     fn test_move_element_to_existing_location() {
-        let mut registry = ElementRegistry::new();
+        let mut registry = GraphRegistry::new();
 
         // Create elements in different locations
         let mut a = make_element("A", "Element A");
@@ -1061,7 +1446,7 @@ mod tests {
         registry.register_element(a.clone(), "file1.md").unwrap();
         registry.register_element(b.clone(), "file2.md").unwrap();
 
-        let mut graph = GraphRegistry::from_registry(&registry);
+        let mut graph = registry;
 
         // Move A to B's location
         let result = graph.move_element_to_location("A", "file2.md", "Section2");
@@ -1075,11 +1460,11 @@ mod tests {
 
     #[test]
     fn test_move_element_to_nonexistent_location() {
-        let mut registry = ElementRegistry::new();
+        let mut registry = GraphRegistry::new();
         let a = make_element("A", "Element A");
 
         registry.register_element(a.clone(), "file.md").unwrap();
-        let mut graph = GraphRegistry::from_registry(&registry);
+        let mut graph = registry;
 
         // Try to move to non-existent location
         let result = graph.move_element_to_location("A", "nonexistent.md", "NonexistentSection");
@@ -1089,7 +1474,7 @@ mod tests {
 
     #[test]
     fn test_get_available_locations() {
-        let mut registry = ElementRegistry::new();
+        let mut registry = GraphRegistry::new();
 
         let mut a = make_element("A", "Element A");
         a.file_path = "file1.md".to_string();
@@ -1107,7 +1492,7 @@ mod tests {
         registry.register_element(b.clone(), "file2.md").unwrap();
         registry.register_element(c.clone(), "file1.md").unwrap();
 
-        let graph = GraphRegistry::from_registry(&registry);
+        let graph = registry;
         let locations = graph.get_available_locations();
 
         // Should only have 2 unique locations
@@ -1118,7 +1503,7 @@ mod tests {
 
     #[test]
     fn test_get_move_impact() {
-        let mut registry = ElementRegistry::new();
+        let mut registry = GraphRegistry::new();
         let a = make_element("A", "Element A");
         let mut b = make_element("B", "Element B");
         let mut c = make_element("C", "Element C");
@@ -1131,7 +1516,7 @@ mod tests {
         registry.register_element(b.clone(), "file.md").unwrap();
         registry.register_element(c.clone(), "file.md").unwrap();
 
-        let graph = GraphRegistry::from_registry(&registry);
+        let graph = registry;
         let impact = graph.get_move_impact("A");
 
         // Both B and C should be affected by moving A
@@ -1142,13 +1527,13 @@ mod tests {
 
     #[test]
     fn test_move_element_to_new_section() {
-        let mut registry = ElementRegistry::new();
+        let mut registry = GraphRegistry::new();
         let mut a = make_element("A", "Element A");
         a.file_path = "file1.md".to_string();
         a.section = "Section1".to_string();
 
         registry.register_element(a.clone(), "file1.md").unwrap();
-        let mut graph = GraphRegistry::from_registry(&registry);
+        let mut graph = registry;
 
         // Move A to a new section in the same file
         let result = graph.move_element_to_new_section("A", "file1.md", "NewSection");
@@ -1162,11 +1547,11 @@ mod tests {
 
     #[test]
     fn test_move_element_to_new_file() {
-        let mut registry = ElementRegistry::new();
+        let mut registry = GraphRegistry::new();
         let a = make_element("A", "Element A");
 
         registry.register_element(a.clone(), "file.md").unwrap();
-        let mut graph = GraphRegistry::from_registry(&registry);
+        let mut graph = registry;
 
         // Move A to a new file with new section
         let result = graph.move_element_to_new_file("A", "new_file.md", "NewSection");
@@ -1180,11 +1565,11 @@ mod tests {
 
     #[test]
     fn test_add_section_to_existing_file() {
-        let mut registry = ElementRegistry::new();
+        let mut registry = GraphRegistry::new();
         let a = make_element("A", "Element A");
 
         registry.register_element(a.clone(), "file.md").unwrap();
-        let mut graph = GraphRegistry::from_registry(&registry);
+        let mut graph = registry;
 
         // Add a new section to existing file
         let result = graph.add_section_to_file("file.md", "NewSection");
@@ -1198,12 +1583,12 @@ mod tests {
 
     #[test]
     fn test_add_file_location() {
-        let mut registry = ElementRegistry::new();
+        let mut registry = GraphRegistry::new();
         let mut a = make_element("A", "Element A");
         a.file_path = "existing.md".to_string();
 
         registry.register_element(a.clone(), "existing.md").unwrap();
-        let mut graph = GraphRegistry::from_registry(&registry);
+        let mut graph = registry;
 
         // Add a new file location
         let result = graph.add_file_location("new_file.md", "Section1");
@@ -1217,7 +1602,7 @@ mod tests {
 
     #[test]
     fn test_move_element_updates_relation_identifiers() {
-        let mut registry = ElementRegistry::new();
+        let mut registry = GraphRegistry::new();
 
         // Create elements A, B, C
         let mut a = make_element("A", "Element A");
@@ -1240,7 +1625,8 @@ mod tests {
         registry.register_element(b.clone(), "file1.md").unwrap();
         registry.register_element(c.clone(), "file2.md").unwrap();
 
-        let mut graph = GraphRegistry::from_registry(&registry);
+        let mut graph = registry;
+        graph.build_relation_graph();
 
         // Verify initial relations exist
         let b_relations = graph.list_relations("B").unwrap();
@@ -1282,7 +1668,7 @@ mod tests {
 
     #[test]
     fn test_move_element_updates_identifiers_in_flushed_markdown() {
-        let mut registry = ElementRegistry::new();
+        let mut registry = GraphRegistry::new();
 
         // Create elements A, B where B references A
         let mut a = make_element("A", "Element A");
@@ -1299,7 +1685,7 @@ mod tests {
         registry.register_element(a.clone(), "file1.md").unwrap();
         registry.register_element(b.clone(), "file1.md").unwrap();
 
-        let mut graph = GraphRegistry::from_registry(&registry);
+        let mut graph = registry;
 
         // Move A to a different file
         let result = graph.move_element_to_new_file("A", "file2.md", "Section2");
@@ -1345,7 +1731,7 @@ mod tests {
 
     #[test]
     fn test_moved_element_relations_update_paths() {
-        let mut registry = ElementRegistry::new();
+        let mut registry = GraphRegistry::new();
 
         // Create elements A, B, C where A has relations to both B and C
         let mut a = make_element("A", "Element A");
@@ -1368,7 +1754,7 @@ mod tests {
         registry.register_element(b.clone(), "file2.md").unwrap();
         registry.register_element(c.clone(), "file1.md").unwrap();
 
-        let mut graph = GraphRegistry::from_registry(&registry);
+        let mut graph = registry;
 
         // Check A's initial relations in markdown
         let a_element_initial = graph.nodes.get("A").unwrap().element.clone();
@@ -1419,7 +1805,7 @@ mod tests {
         use std::fs;
         use tempfile::TempDir;
 
-        let mut registry = ElementRegistry::new();
+        let mut registry = GraphRegistry::new();
 
         // Create elements in different files with cross-file relations
         let mut a = make_element("ElementA", "Element A Description");
@@ -1446,7 +1832,7 @@ mod tests {
         registry.register_element(b.clone(), "file2.md").unwrap();
         registry.register_element(c.clone(), "file1.md").unwrap();
 
-        let mut graph = GraphRegistry::from_registry(&registry);
+        let mut graph = registry;
 
         // Move ElementB to file3.md to create more cross-file relations
         let result = graph.move_element_to_new_file("ElementB", "file3.md", "Section3");
@@ -1522,11 +1908,11 @@ mod tests {
 
     #[test]
     fn test_move_to_new_section_nonexistent_file() {
-        let mut registry = ElementRegistry::new();
+        let mut registry = GraphRegistry::new();
         let a = make_element("A", "Element A");
 
         registry.register_element(a.clone(), "file.md").unwrap();
-        let mut graph = GraphRegistry::from_registry(&registry);
+        let mut graph = registry;
 
         // Try to move to new section in non-existent file (should fail)
         let result = graph.move_element_to_new_section("A", "nonexistent.md", "NewSection");
@@ -1539,7 +1925,7 @@ mod tests {
         use std::fs;
         use tempfile::TempDir;
 
-        let mut registry = ElementRegistry::new();
+        let mut registry = GraphRegistry::new();
 
         // Create an element
         let mut a = make_element("ElementA", "Element A Description");
@@ -1552,7 +1938,7 @@ mod tests {
         let page = Page::new("This is page frontmatter content.\n\nMore page content here.".to_string());
         registry.pages.insert("test_file.md".to_string(), page);
 
-        let graph = GraphRegistry::from_registry(&registry);
+        let graph = registry;
 
         // Create temp directory for flush output
         let temp_dir = TempDir::new().unwrap();
@@ -1594,7 +1980,7 @@ mod tests {
         use std::fs;
         use tempfile::TempDir;
 
-        let mut registry = ElementRegistry::new();
+        let mut registry = GraphRegistry::new();
 
         // Create an element
         let mut a = make_element("ElementA", "Element A Description");
@@ -1611,7 +1997,7 @@ mod tests {
         let section = Section::new("This is section content.\n\nSection description here.".to_string());
         registry.sections.insert(section_key, section);
 
-        let graph = GraphRegistry::from_registry(&registry);
+        let graph = registry;
 
         // Create temp directory for flush output
         let temp_dir = TempDir::new().unwrap();
@@ -1648,7 +2034,7 @@ mod tests {
         use std::fs;
         use tempfile::TempDir;
 
-        let mut registry = ElementRegistry::new();
+        let mut registry = GraphRegistry::new();
 
         // Create elements in multiple sections
         let mut a = make_element("ElementA", "Element A Description");
@@ -1681,7 +2067,7 @@ mod tests {
         let section2 = Section::new("Section 2 content.".to_string());
         registry.sections.insert(section2_key, section2);
 
-        let graph = GraphRegistry::from_registry(&registry);
+        let graph = registry;
 
         // Create temp directory for flush output
         let temp_dir = TempDir::new().unwrap();
@@ -1730,7 +2116,7 @@ mod tests {
         use std::fs;
         use tempfile::TempDir;
 
-        let mut registry = ElementRegistry::new();
+        let mut registry = GraphRegistry::new();
 
         // Create an element
         let mut a = make_element("ElementA", "Element A Description");
@@ -1751,7 +2137,7 @@ mod tests {
         let section = Section::new("".to_string()); // empty string
         registry.sections.insert(section_key, section);
 
-        let graph = GraphRegistry::from_registry(&registry);
+        let graph = registry;
 
         // Create temp directory for flush output
         let temp_dir = TempDir::new().unwrap();
@@ -1780,7 +2166,7 @@ mod tests {
         use std::fs;
         use tempfile::TempDir;
 
-        let mut registry = ElementRegistry::new();
+        let mut registry = GraphRegistry::new();
 
         // Create an element in MOEs.md
         let mut a = make_element("ElementA", "Element A Description");
@@ -1793,7 +2179,7 @@ mod tests {
         let page = Page::new("# MOEs\n\nThis is the MOEs page content.".to_string());
         registry.pages.insert("MOEs.md".to_string(), page);
 
-        let graph = GraphRegistry::from_registry(&registry);
+        let graph = registry;
 
         // Create temp directory for flush output
         let temp_dir = TempDir::new().unwrap();
@@ -1825,7 +2211,7 @@ mod tests {
         use std::fs;
         use tempfile::TempDir;
 
-        let mut registry = ElementRegistry::new();
+        let mut registry = GraphRegistry::new();
 
         // Create an element
         let mut a = make_element("ElementA", "Element A Description");
@@ -1838,7 +2224,7 @@ mod tests {
         let page = Page::new("This is page content without a header.\n\nMore content here.".to_string());
         registry.pages.insert("test_file.md".to_string(), page);
 
-        let graph = GraphRegistry::from_registry(&registry);
+        let graph = registry;
 
         // Create temp directory for flush output
         let temp_dir = TempDir::new().unwrap();

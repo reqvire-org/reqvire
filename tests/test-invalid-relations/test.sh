@@ -20,14 +20,14 @@
 
 
 
-OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" validate --json 2>&1)
+OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary --json 2>&1)
 EXIT_CODE=$?
 
 
 printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
 
-# Verify exit code indicates doesn't indicate error 
-if ! [ $EXIT_CODE -eq 0 ]; then
+# Verify exit code indicates validation failure (non-zero)
+if [ $EXIT_CODE -eq 0 ]; then
   echo "❌ FAILED: Validation should have failed but returned success (0)"
   exit 1
 fi
