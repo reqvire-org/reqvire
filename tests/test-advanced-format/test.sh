@@ -95,6 +95,19 @@ if ! grep -q "$EXPECTED_USER_REQ_METADATA" UserStories.md; then
     exit 1
 fi
 
+# Test 3.6: Check that consecutive separators are normalized to single separator
+# Look for any case where a separator is immediately followed by another separator
+if grep -A 1 "^---$" UserStories.md | grep -A 1 "^$" | grep -q "^---$"; then
+    echo "FAIL: Consecutive separators not normalized to single separator"
+    exit 1
+fi
+
+# Test 3.7: Check that relation indentation is normalized to 2 spaces
+if grep -q "^\\* " UserStories.md; then
+    echo "FAIL: Relations not properly indented with 2 spaces"
+    exit 1
+fi
+
 # Test 4: Verify no additional changes needed (idempotent behavior)
 "$REQVIRE" format --dry-run > no_changes_output.txt 2>&1
 NO_CHANGES_EXIT_CODE=$?
@@ -124,6 +137,28 @@ fi
 if ! grep -q "\-" dry_run_clean.txt; then
     echo "FAIL: Dry run output missing - removal markers"
     exit 1
+fi
+
+# Test 6: Verify line numbering is sequential and consistent
+# Extract line numbers from diff output and check for proper sequencing
+DIFF_LINE_NUMBERS=$(grep -E "^  [0-9]+" dry_run_clean.txt | sed 's/^  *//' | sed 's/ .*//' | tr '\n' ' ')
+
+# Check that we have some line numbers
+if [ -z "$DIFF_LINE_NUMBERS" ]; then
+    echo "FAIL: No line numbers found in diff output"
+    exit 1
+fi
+
+# For each file section, verify line numbers make sense
+# Look for patterns like: X + Y + Z where Z > Y > X (for additions)
+# or where removed lines don't break the sequence of final file positions
+if grep -A 20 "UserStories.md" dry_run_clean.txt | grep -E "^  [0-9]+ \+" | head -2 | tail -1 | grep -q "019"; then
+    # After adding lines 17,18,19, the next context line should be ~19 or higher
+    NEXT_CONTEXT=$(grep -A 25 "UserStories.md" dry_run_clean.txt | grep -E "^  [0-9]+     " | head -1 | sed 's/^  *//' | sed 's/ .*//')
+    if [ "$NEXT_CONTEXT" -lt 19 ]; then
+        echo "FAIL: Line numbering not sequential - expected line $NEXT_CONTEXT to be >= 19 after additions"
+        exit 1
+    fi
 fi
 
 # Clean up: Restore original files for next run

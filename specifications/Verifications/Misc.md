@@ -67,6 +67,8 @@ This test verifies the format command requirements from SystemRequirements and U
 - System shall trim excess whitespace from lines
 - System shall normalize line endings consistently
 - System shall insert proper separators between elements
+- System shall normalize consecutive separators to single separators
+- System shall normalize relation indentation to proper 2-space format
 - System shall format relation links with human-readable names
 - System shall clean up file references to show filename only for implementation files
 
@@ -77,6 +79,9 @@ This test verifies the format command requirements from SystemRequirements and U
 - System shall use colors to distinguish additions (green) and removals (red)
 - System shall group changes by file with clear separators
 - System shall only show lines that have changes, omitting unchanged content
+- System shall provide context lines before and after changes for better readability
+- System shall maintain sequential line numbering that reflects final file positions
+- System shall ensure line number continuity throughout diff output
 
 **Relation Link Enhancement:**
 - System shall convert simple identifiers (non-markdown format) to proper markdown link format
@@ -104,6 +109,8 @@ This test verifies the format command requirements from SystemRequirements and U
    - Line references include consistent number width
    - Trailing whitespace removal is visualized
    - Color coding distinguishes addition/removal changes
+   - Context lines provide readable context around changes
+   - Line numbering maintains sequential continuity reflecting final file positions
 
 4. **Relation link quality**
    - Simple identifiers are converted to proper markdown link format
@@ -116,7 +123,15 @@ This test verifies the format command requirements from SystemRequirements and U
 5. **Formatting consistency**
    - Excess whitespace is trimmed appropriately
    - Separators are inserted correctly between elements
+   - Consecutive separators are normalized to single separators
+   - Relation indentation is normalized to proper 2-space format
    - Line endings are normalized
+
+6. **Line numbering accuracy**
+   - Line numbers in diff output are sequential and consistent
+   - Context lines maintain proper numbering continuity
+   - Added lines show correct position in final file
+   - Line numbering reflects final file structure accurately
 
 #### Relations
   * verify: [SystemRequirements/Requirements.md/Format Command](../SystemRequirements/Requirements.md#format-command)

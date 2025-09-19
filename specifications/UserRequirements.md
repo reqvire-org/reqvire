@@ -105,7 +105,11 @@ The system shall provide linting capability to ensure consistent formatting in r
   * Trimming excess whitespace after element names and relation identifiers
   * Normalizing to exactly two newlines before subsections (e.g., "#### Details")
   * Automatically inserting separator lines ("---") between elements if not already present
-  * Ensuring consistent indentation in relation lists
+  * Normalizing consecutive separators to single separators
+  * Ensuring consistent indentation in relation lists (2-space format)
+  * Normalizing relation entries to proper 2-space indentation format
+  * Displaying changes with sequential line numbering that reflects final file positions
+  * Providing context lines with proper line number continuity
 
 #### Relations
   * containedBy: [Model Formatting](#model-formatting)

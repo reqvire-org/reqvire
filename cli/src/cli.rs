@@ -410,10 +410,13 @@ pub fn handle_command(
                             match line.color.as_str() {
                                 "green" => println!("  \x1b[32m{} {}\x1b[0m", line.prefix, line.content),
                                 "red" => println!("  \x1b[31m{} {}\x1b[0m", line.prefix, line.content),
+                                "context" => println!("  \x1b[37m{} {}\x1b[0m", line.prefix, line.content),
                                 "separator" => println!(""),
                                 _ => println!("  {} {}", line.prefix, line.content),
                             }
                         }
+                        println!();
+                        println!();
                         println!();
                     }
                     println!("Run without --dry-run to apply these changes.");

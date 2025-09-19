@@ -874,10 +874,6 @@ impl GraphRegistry {
         internal_paths
     }
 
-    /// Converts an element back to markdown format
-    fn element_to_markdown(&self, element: &Element) -> String {
-        self.element_to_markdown_with_context(element, &element.file_path)
-    }
 
     fn element_to_markdown_with_context(&self, element: &Element, _current_file: &str) -> String {
         let mut markdown = String::new();
@@ -1402,26 +1398,73 @@ impl GraphRegistry {
         let max_line_num = std::cmp::max(max_current_lines, max_new_lines);
         let width = max_line_num.to_string().len();
 
-        let mut current_line_num = 1;
+        let mut old_line_num = 1;
         let mut new_line_num = 1;
         let mut previous_was_change = false;
 
-        for diff in changeset.diffs {
+        let context_lines = 3; // Number of context lines to show before and after changes
+
+        for (i, diff) in changeset.diffs.iter().enumerate() {
             match diff {
                 Difference::Same(text) => {
-                    // Skip same lines, just update line numbers
-                    let line_count = text.lines().count();
-                    current_line_num += line_count;
-                    new_line_num += line_count;
+                    let lines: Vec<&str> = text.lines().collect();
+                    let line_count = lines.len();
 
-                    // Add separator if previous was a change and this is a large gap
-                    if previous_was_change && line_count > 3 {
+                    // Determine if we should show context lines
+                    let next_has_change = changeset.diffs.get(i + 1).map_or(false, |d| !matches!(d, Difference::Same(_)));
+                    let show_context = previous_was_change || next_has_change;
+
+                    if show_context && line_count > 0 {
+                        // Show context lines
+                        let start_lines = if previous_was_change {
+                            std::cmp::min(context_lines, line_count)
+                        } else {
+                            0
+                        };
+                        let end_lines = if next_has_change {
+                            std::cmp::min(context_lines, line_count.saturating_sub(start_lines))
+                        } else {
+                            0
+                        };
+
+                        // Show leading context (after a change)
+                        for line_idx in 0..start_lines {
+                            diff_lines.push(DiffLine {
+                                prefix: format!("{:0width$}", new_line_num + line_idx, width = width),
+                                content: format!("    {}", lines[line_idx]),
+                                color: "context".to_string(),
+                            });
+                        }
+
+                        // Show separator if there's a gap in the middle
+                        if line_count > start_lines + end_lines && (start_lines > 0 || end_lines > 0) {
+                            diff_lines.push(DiffLine {
+                                prefix: "".to_string(),
+                                content: "".to_string(),
+                                color: "separator".to_string(),
+                            });
+                        }
+
+                        // Show trailing context (before a change)
+                        let start_end_lines = line_count.saturating_sub(end_lines);
+                        for line_idx in start_end_lines..line_count {
+                            diff_lines.push(DiffLine {
+                                prefix: format!("{:0width$}", new_line_num + line_idx, width = width),
+                                content: format!("    {}", lines[line_idx]),
+                                color: "context".to_string(),
+                            });
+                        }
+                    } else if previous_was_change && line_count > context_lines {
+                        // Add separator if previous was a change and this is a large gap
                         diff_lines.push(DiffLine {
-                            prefix: "...".to_string(),
+                            prefix: "".to_string(),
                             content: "".to_string(),
                             color: "separator".to_string(),
                         });
                     }
+
+                    old_line_num += line_count;
+                    new_line_num += line_count;
                     previous_was_change = false;
                 }
                 Difference::Add(text) => {
@@ -1446,11 +1489,12 @@ impl GraphRegistry {
                             line.to_string()
                         };
                         diff_lines.push(DiffLine {
-                            prefix: format!("{:0width$}", current_line_num, width = width),
+                            prefix: format!("{:0width$}", new_line_num, width = width),
                             content: format!("-   {}", visible_line),
                             color: "red".to_string(),
                         });
-                        current_line_num += 1;
+                        old_line_num += 1;
+                        // Don't increment new_line_num for removed lines - they don't exist in new file
                     }
                     previous_was_change = true;
                 }

@@ -18,7 +18,7 @@ As an **System Engineer**, I want to manage MBSE models effectively, so that I c
 
 #### Relations
   * trace: [MOEs.md#moe_ua](/MOEs.md#moe_ua)
-  * derive: [SystemRequirements/Requirements.md#requirements-processing](/SystemRequirements/Requirements.md#requirements-processing)
+* derive: [SystemRequirements/Requirements.md#requirements-processing](/SystemRequirements/Requirements.md#requirements-processing)
 
 ### Generate Diagrams
 As a **System Engineer**, I want to generate diagrams for different system viewpoints, so that I can communicate system architecture effectively and understand dependencies and impacts across the system.
@@ -28,3 +28,6 @@ As a **System Engineer**, I want to generate diagrams for different system viewp
 
 #### Relations
   * trace: [MOEs.md#moe_ua](/MOEs.md#moe_ua)
+
+---
+---
