@@ -4,7 +4,7 @@ use std::path::{Path, PathBuf};
 use log::{debug, warn};
 
 use crate::relation::{self, LinkType};
-use crate::element_registry::{ElementNode, RelationNode, ElementRegistry};
+use crate::element_registry::{ElementNode, RelationNode, ElementRegistry, Page, Section, SectionKey};
 use crate::element::Element;
 use crate::error::ReqvireError;
 use crate::git_commands;
@@ -12,6 +12,8 @@ use crate::git_commands;
 #[derive(Debug)]
 pub struct GraphRegistry {
     pub nodes: HashMap<String, ElementNode>,
+    pub pages: HashMap<String, Page>,
+    pub sections: HashMap<SectionKey, Section>,
 }
 
 impl GraphRegistry {
@@ -51,7 +53,11 @@ impl GraphRegistry {
             }
         }
 
-        Self { nodes }
+        Self {
+            nodes,
+            pages: registry.pages.clone(),
+            sections: registry.sections.clone(),
+        }
     }
 
     /// Updates an element's identifier and rewires all incoming relations
@@ -519,8 +525,32 @@ impl GraphRegistry {
             .replace('_', " ")
             .replace('-', " ");
 
-        // Add file header
-        markdown.push_str(&format!("# {}\n\n", file_title));
+        // Check if page content already has a header to avoid duplication
+        let mut has_page_header = false;
+        if let Some(page) = self.pages.get(file_path) {
+            if !page.frontmatter_content.trim().is_empty() {
+                // Check if page content starts with a header (# at beginning of line)
+                if page.frontmatter_content.trim_start().starts_with('#') {
+                    has_page_header = true;
+                }
+            }
+        }
+
+        // Add file header only if page content doesn't already have one
+        if !has_page_header {
+            markdown.push_str(&format!("# {}\n\n", file_title));
+        }
+
+        // Add page content if available
+        if let Some(page) = self.pages.get(file_path) {
+            if !page.frontmatter_content.trim().is_empty() {
+                markdown.push_str(&page.frontmatter_content);
+                if !page.frontmatter_content.ends_with('\n') {
+                    markdown.push('\n');
+                }
+                markdown.push('\n');
+            }
+        }
 
         // Sort sections by name for consistent output
         let mut sorted_sections: Vec<_> = sections.iter().collect();
@@ -529,6 +559,21 @@ impl GraphRegistry {
         for (section_name, elements) in sorted_sections {
             if !section_name.is_empty() && section_name != "Default" {
                 markdown.push_str(&format!("## {}\n\n", section_name));
+            }
+
+            // Add section content if available
+            let section_key = SectionKey {
+                file_path: file_path.to_string(),
+                section_name: section_name.clone(),
+            };
+            if let Some(section) = self.sections.get(&section_key) {
+                if !section.content.trim().is_empty() {
+                    markdown.push_str(&section.content);
+                    if !section.content.ends_with('\n') {
+                        markdown.push('\n');
+                    }
+                    markdown.push('\n');
+                }
             }
 
             // Add elements in this section
@@ -1487,5 +1532,342 @@ mod tests {
         let result = graph.move_element_to_new_section("A", "nonexistent.md", "NewSection");
         assert!(result.is_err());
         assert!(result.unwrap_err().to_string().contains("does not exist in the graph"));
+    }
+
+    #[test]
+    fn test_flush_includes_page_content() {
+        use std::fs;
+        use tempfile::TempDir;
+
+        let mut registry = ElementRegistry::new();
+
+        // Create an element
+        let mut a = make_element("ElementA", "Element A Description");
+        a.file_path = "test_file.md".to_string();
+        a.section = "Section1".to_string();
+
+        registry.register_element(a.clone(), "test_file.md").unwrap();
+
+        // Add page content
+        let page = Page::new("This is page frontmatter content.\n\nMore page content here.".to_string());
+        registry.pages.insert("test_file.md".to_string(), page);
+
+        let graph = GraphRegistry::from_registry(&registry);
+
+        // Create temp directory for flush output
+        let temp_dir = TempDir::new().unwrap();
+        let output_path = temp_dir.path();
+
+        // Flush the graph to markdown files
+        let result = graph.flush_to_directory(output_path);
+        assert!(result.is_ok());
+
+        // Read the generated markdown file
+        let file_content = fs::read_to_string(output_path.join("test_file.md")).unwrap();
+
+        println!("=== Generated file content ===");
+        println!("{}", file_content);
+
+        // Verify file header is present
+        assert!(file_content.starts_with("# test file\n\n"));
+
+        // Verify page content is included after header and before sections
+        assert!(file_content.contains("This is page frontmatter content."));
+        assert!(file_content.contains("More page content here."));
+
+        // Verify element is still present
+        assert!(file_content.contains("### Element A Description"));
+
+        // Verify order: header, page content, section, element
+        let header_pos = file_content.find("# test file").unwrap();
+        let page_content_pos = file_content.find("This is page frontmatter content.").unwrap();
+        let section_pos = file_content.find("## Section1").unwrap();
+        let element_pos = file_content.find("### Element A Description").unwrap();
+
+        assert!(header_pos < page_content_pos);
+        assert!(page_content_pos < section_pos);
+        assert!(section_pos < element_pos);
+    }
+
+    #[test]
+    fn test_flush_includes_section_content() {
+        use std::fs;
+        use tempfile::TempDir;
+
+        let mut registry = ElementRegistry::new();
+
+        // Create an element
+        let mut a = make_element("ElementA", "Element A Description");
+        a.file_path = "test_file.md".to_string();
+        a.section = "Section1".to_string();
+
+        registry.register_element(a.clone(), "test_file.md").unwrap();
+
+        // Add section content
+        let section_key = SectionKey {
+            file_path: "test_file.md".to_string(),
+            section_name: "Section1".to_string(),
+        };
+        let section = Section::new("This is section content.\n\nSection description here.".to_string());
+        registry.sections.insert(section_key, section);
+
+        let graph = GraphRegistry::from_registry(&registry);
+
+        // Create temp directory for flush output
+        let temp_dir = TempDir::new().unwrap();
+        let output_path = temp_dir.path();
+
+        // Flush the graph to markdown files
+        let result = graph.flush_to_directory(output_path);
+        assert!(result.is_ok());
+
+        // Read the generated markdown file
+        let file_content = fs::read_to_string(output_path.join("test_file.md")).unwrap();
+
+        println!("=== Generated file content ===");
+        println!("{}", file_content);
+
+        // Verify section content is included after section header and before elements
+        assert!(file_content.contains("This is section content."));
+        assert!(file_content.contains("Section description here."));
+
+        // Verify element is still present
+        assert!(file_content.contains("### Element A Description"));
+
+        // Verify order: section header, section content, element
+        let section_header_pos = file_content.find("## Section1").unwrap();
+        let section_content_pos = file_content.find("This is section content.").unwrap();
+        let element_pos = file_content.find("### Element A Description").unwrap();
+
+        assert!(section_header_pos < section_content_pos);
+        assert!(section_content_pos < element_pos);
+    }
+
+    #[test]
+    fn test_flush_includes_both_page_and_section_content() {
+        use std::fs;
+        use tempfile::TempDir;
+
+        let mut registry = ElementRegistry::new();
+
+        // Create elements in multiple sections
+        let mut a = make_element("ElementA", "Element A Description");
+        a.file_path = "test_file.md".to_string();
+        a.section = "Section1".to_string();
+
+        let mut b = make_element("ElementB", "Element B Description");
+        b.file_path = "test_file.md".to_string();
+        b.section = "Section2".to_string();
+
+        registry.register_element(a.clone(), "test_file.md").unwrap();
+        registry.register_element(b.clone(), "test_file.md").unwrap();
+
+        // Add page content
+        let page = Page::new("Page frontmatter content.".to_string());
+        registry.pages.insert("test_file.md".to_string(), page);
+
+        // Add section content for both sections
+        let section1_key = SectionKey {
+            file_path: "test_file.md".to_string(),
+            section_name: "Section1".to_string(),
+        };
+        let section1 = Section::new("Section 1 content.".to_string());
+        registry.sections.insert(section1_key, section1);
+
+        let section2_key = SectionKey {
+            file_path: "test_file.md".to_string(),
+            section_name: "Section2".to_string(),
+        };
+        let section2 = Section::new("Section 2 content.".to_string());
+        registry.sections.insert(section2_key, section2);
+
+        let graph = GraphRegistry::from_registry(&registry);
+
+        // Create temp directory for flush output
+        let temp_dir = TempDir::new().unwrap();
+        let output_path = temp_dir.path();
+
+        // Flush the graph to markdown files
+        let result = graph.flush_to_directory(output_path);
+        assert!(result.is_ok());
+
+        // Read the generated markdown file
+        let file_content = fs::read_to_string(output_path.join("test_file.md")).unwrap();
+
+        println!("=== Generated file content ===");
+        println!("{}", file_content);
+
+        // Verify all content is present
+        assert!(file_content.contains("Page frontmatter content."));
+        assert!(file_content.contains("Section 1 content."));
+        assert!(file_content.contains("Section 2 content."));
+        assert!(file_content.contains("### Element A Description"));
+        assert!(file_content.contains("### Element B Description"));
+
+        // Verify proper ordering
+        let page_pos = file_content.find("Page frontmatter content.").unwrap();
+        let section1_header_pos = file_content.find("## Section1").unwrap();
+        let section1_content_pos = file_content.find("Section 1 content.").unwrap();
+        let element_a_pos = file_content.find("### Element A Description").unwrap();
+        let section2_header_pos = file_content.find("## Section2").unwrap();
+        let section2_content_pos = file_content.find("Section 2 content.").unwrap();
+        let element_b_pos = file_content.find("### Element B Description").unwrap();
+
+        // Page content should come first
+        assert!(page_pos < section1_header_pos);
+
+        // Section 1: header, content, element
+        assert!(section1_header_pos < section1_content_pos);
+        assert!(section1_content_pos < element_a_pos);
+
+        // Section 2: header, content, element
+        assert!(section2_header_pos < section2_content_pos);
+        assert!(section2_content_pos < element_b_pos);
+    }
+
+    #[test]
+    fn test_flush_handles_empty_page_and_section_content() {
+        use std::fs;
+        use tempfile::TempDir;
+
+        let mut registry = ElementRegistry::new();
+
+        // Create an element
+        let mut a = make_element("ElementA", "Element A Description");
+        a.file_path = "test_file.md".to_string();
+        a.section = "Section1".to_string();
+
+        registry.register_element(a.clone(), "test_file.md").unwrap();
+
+        // Add empty page content (should be skipped)
+        let page = Page::new("   \n\t  \n  ".to_string()); // only whitespace
+        registry.pages.insert("test_file.md".to_string(), page);
+
+        // Add empty section content (should be skipped)
+        let section_key = SectionKey {
+            file_path: "test_file.md".to_string(),
+            section_name: "Section1".to_string(),
+        };
+        let section = Section::new("".to_string()); // empty string
+        registry.sections.insert(section_key, section);
+
+        let graph = GraphRegistry::from_registry(&registry);
+
+        // Create temp directory for flush output
+        let temp_dir = TempDir::new().unwrap();
+        let output_path = temp_dir.path();
+
+        // Flush the graph to markdown files
+        let result = graph.flush_to_directory(output_path);
+        assert!(result.is_ok());
+
+        // Read the generated markdown file
+        let file_content = fs::read_to_string(output_path.join("test_file.md")).unwrap();
+
+        println!("=== Generated file content ===");
+        println!("{}", file_content);
+
+        // Verify that empty/whitespace-only content is not included
+        // The file should go directly from header to section header to element
+        assert!(file_content.starts_with("# test file\n\n## Section1\n\n### Element A Description"));
+
+        // Verify element is still present
+        assert!(file_content.contains("### Element A Description"));
+    }
+
+    #[test]
+    fn test_flush_detects_duplicate_headers_in_page_content() {
+        use std::fs;
+        use tempfile::TempDir;
+
+        let mut registry = ElementRegistry::new();
+
+        // Create an element in MOEs.md
+        let mut a = make_element("ElementA", "Element A Description");
+        a.file_path = "MOEs.md".to_string();
+        a.section = "Section1".to_string();
+
+        registry.register_element(a.clone(), "MOEs.md").unwrap();
+
+        // Add page content that contains a header matching the file title
+        let page = Page::new("# MOEs\n\nThis is the MOEs page content.".to_string());
+        registry.pages.insert("MOEs.md".to_string(), page);
+
+        let graph = GraphRegistry::from_registry(&registry);
+
+        // Create temp directory for flush output
+        let temp_dir = TempDir::new().unwrap();
+        let output_path = temp_dir.path();
+
+        // Flush the graph to markdown files
+        let result = graph.flush_to_directory(output_path);
+        assert!(result.is_ok());
+
+        // Read the generated markdown file
+        let file_content = fs::read_to_string(output_path.join("MOEs.md")).unwrap();
+
+        println!("=== Generated file content with potential duplicate header ===");
+        println!("{}", file_content);
+
+        // Count occurrences of "# MOEs" - should be 1, not 2
+        let header_count = file_content.matches("# MOEs").count();
+        println!("Header count: {}", header_count);
+
+        // Should have only one header now that auto-generation is skipped when page content has header
+        assert_eq!(header_count, 1, "Should have only one '# MOEs' header, but found {}", header_count);
+
+        // Verify the content starts with the page header (not auto-generated)
+        assert!(file_content.starts_with("# MOEs\n\nThis is the MOEs page content."));
+    }
+
+    #[test]
+    fn test_flush_generates_header_when_page_content_has_no_header() {
+        use std::fs;
+        use tempfile::TempDir;
+
+        let mut registry = ElementRegistry::new();
+
+        // Create an element
+        let mut a = make_element("ElementA", "Element A Description");
+        a.file_path = "test_file.md".to_string();
+        a.section = "Section1".to_string();
+
+        registry.register_element(a.clone(), "test_file.md").unwrap();
+
+        // Add page content WITHOUT a header
+        let page = Page::new("This is page content without a header.\n\nMore content here.".to_string());
+        registry.pages.insert("test_file.md".to_string(), page);
+
+        let graph = GraphRegistry::from_registry(&registry);
+
+        // Create temp directory for flush output
+        let temp_dir = TempDir::new().unwrap();
+        let output_path = temp_dir.path();
+
+        // Flush the graph to markdown files
+        let result = graph.flush_to_directory(output_path);
+        assert!(result.is_ok());
+
+        // Read the generated markdown file
+        let file_content = fs::read_to_string(output_path.join("test_file.md")).unwrap();
+
+        println!("=== Generated file content with auto-generated header ===");
+        println!("{}", file_content);
+
+        // Should have auto-generated header since page content doesn't have one
+        assert!(file_content.starts_with("# test file\n\n"));
+
+        // Should contain page content after the auto-generated header
+        assert!(file_content.contains("This is page content without a header."));
+
+        // Verify order: auto-generated header, page content, section, element
+        let header_pos = file_content.find("# test file").unwrap();
+        let page_content_pos = file_content.find("This is page content without a header.").unwrap();
+        let section_pos = file_content.find("## Section1").unwrap();
+        let element_pos = file_content.find("### Element A Description").unwrap();
+
+        assert!(header_pos < page_content_pos);
+        assert!(page_content_pos < section_pos);
+        assert!(section_pos < element_pos);
     }
 }

@@ -10,6 +10,46 @@ use std::collections::HashSet;
 use std::path::PathBuf;
 use serde::Serialize;
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
+pub struct SectionKey {
+    pub file_path: String,
+    pub section_name: String,
+}
+
+impl SectionKey {
+    pub fn new(file_path: String, section_name: String) -> Self {
+        Self {
+            file_path,
+            section_name,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct Page {
+    pub frontmatter_content: String,
+}
+
+impl Page {
+    pub fn new(frontmatter_content: String) -> Self {
+        Self {
+            frontmatter_content,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct Section {
+    pub content: String,
+}
+
+impl Section {
+    pub fn new(content: String) -> Self {
+        Self {
+            content,
+        }
+    }
+}
 
 /// A node for tree relation
 
@@ -30,7 +70,11 @@ pub struct ElementNode {
 #[derive(Debug)]
 pub struct ElementRegistry {
     /// Map of full identifiers to elements
-    pub elements: HashMap<String, element::Element>
+    pub elements: HashMap<String, element::Element>,
+    /// Map of file paths to page data
+    pub pages: HashMap<String, Page>,
+    /// Map of section keys to section data
+    pub sections: HashMap<SectionKey, Section>,
 }
 
 impl ElementRegistry {
@@ -38,6 +82,8 @@ impl ElementRegistry {
     pub fn new() -> Self {
         Self {
             elements: HashMap::new(),
+            pages: HashMap::new(),
+            sections: HashMap::new(),
         }
     }
 

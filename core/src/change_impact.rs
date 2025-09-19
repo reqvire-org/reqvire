@@ -739,6 +739,8 @@ mod tests {
         let tree = build_change_impact_tree(
             &ElementRegistry {
                 elements: my_struct.elements.clone(),
+                pages: std::collections::HashMap::new(),
+                sections: std::collections::HashMap::new(),
             },
             "B".to_string(),
             &mut visited,
@@ -790,6 +792,8 @@ mod tests {
         let tree = build_change_impact_tree(
             &ElementRegistry {
                 elements: my_struct.elements.clone(),
+                pages: std::collections::HashMap::new(),
+                sections: std::collections::HashMap::new(),
             },
             "A".to_string(),
             &mut visited,

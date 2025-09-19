@@ -59,14 +59,32 @@ impl ModelManager {
                     debug!("Markdown File found: {}", file_name);
 
                     let relative_path_str = utils::get_relative_path(&path)?.to_string_lossy().to_string();
-    
-                    // Parse Elements    
-                    let (elements, parse_errors) = parser::parse_elements(
+
+                    // Parse Elements, page content, and section content
+                    let (elements, parse_errors, page_content, sections) = parser::parse_elements(
                         &file_name,
                         &file_content,
                         &path,
                         user_requirements_root_folder,
                     );
+
+                    // Store page content
+                    if !page_content.is_empty() {
+                        let page = crate::element_registry::Page::new(page_content);
+                        self.element_registry.pages.insert(relative_path_str.clone(), page);
+                    }
+
+                    // Store section content
+                    for (section_name, section_content) in sections {
+                        if !section_content.is_empty() {
+                            let section = crate::element_registry::Section::new(section_content);
+                            let section_key = crate::element_registry::SectionKey::new(
+                                relative_path_str.clone(),
+                                section_name
+                            );
+                            self.element_registry.sections.insert(section_key, section);
+                        }
+                    }
 
                     // Collect parse-time errors
                     errors.extend(parse_errors);
