@@ -14,7 +14,7 @@ graph LR;
 
   a8037b2df81f02be["Formatting Command Verification"];
   class a8037b2df81f02be verification;
-  click a8037b2df81f02be "LintingTests.md#linting-command-verification";
+  click a8037b2df81f02be "LintingTests.md#formatting-command-verification";
   a606311f33e42901["tests/test-lint-expected/test.sh"];
   class a606311f33e42901 default;
   click a606311f33e42901 "../../tests/test-lint-expected/test.sh";
@@ -35,7 +35,7 @@ graph LR;
   b8bfbd5ccf026b31 -->|satisfiedBy| a606311f33e42901;
   6481e4ca8c4d6920["Model Formatting Verification"];
   class 6481e4ca8c4d6920 verification;
-  click 6481e4ca8c4d6920 "LintingTests.md#model-linting-verification";
+  click 6481e4ca8c4d6920 "LintingTests.md#model-formatting-verification";
   a606311f33e42901["tests/test-lint-expected/test.sh"];
   class a606311f33e42901 default;
   click a606311f33e42901 "../../tests/test-lint-expected/test.sh";
@@ -74,19 +74,19 @@ graph LR;
   974ccf933675ef44 -.->|verifiedBy| b8bfbd5ccf026b31;
   a51179cda67cf9f2["Linting Command"];
   class a51179cda67cf9f2 requirement;
-  click a51179cda67cf9f2 "../UserRequirements.md#linting-command";
+  click a51179cda67cf9f2 "../UserRequirements.md#formatting-command";
   26fdf88d16b09109["Linting Output"];
   class 26fdf88d16b09109 requirement;
-  click 26fdf88d16b09109 "../UserRequirements.md#linting-output";
+  click 26fdf88d16b09109 "../UserRequirements.md#formatting-output";
   a51179cda67cf9f2 -->|refinedBy| 26fdf88d16b09109;
   a51179cda67cf9f2 -.->|verifiedBy| a8037b2df81f02be;
   deaec107945edbed["Lint Command"];
   class deaec107945edbed requirement;
-  click deaec107945edbed "../SystemRequirements/Requirements.md#lint-command";
+  click deaec107945edbed "../SystemRequirements/Requirements.md#format-command";
   a51179cda67cf9f2 -.->|deriveReqT| deaec107945edbed;
   7305c1d6f7f1e2b2["Model Linting"];
   class 7305c1d6f7f1e2b2 requirement;
-  click 7305c1d6f7f1e2b2 "../UserRequirements.md#model-linting";
+  click 7305c1d6f7f1e2b2 "../UserRequirements.md#model-formatting";
   7305c1d6f7f1e2b2 --o|contains| 974ccf933675ef44;
   8dfe33c28555e80a["Replace Absolute Links with Relative Links"];
   class 8dfe33c28555e80a requirement;
@@ -127,7 +127,7 @@ The verification test checks that Reqvire correctly identifies and fixes excess 
 
 #### Relations
   * verify: [SystemRequirements/Requirements.md/Excess Whitespace Linting Implementation](../SystemRequirements/Requirements.md#excess-whitespace-linting-implementation)
-  * verify: [SystemRequirements/Requirements.md/Lint Command](../SystemRequirements/Requirements.md#lint-command)
+  * verify: [SystemRequirements/Requirements.md/Lint Command](../SystemRequirements/Requirements.md#format-command)
   * satisfiedBy: [tests/test-lint-expected/test.sh](../../tests/test-lint-expected/test.sh)
 
 ---
@@ -154,7 +154,7 @@ This test verifies that the system properly implements the linting command funct
 - The command provides clear output about what changes would be or have been made
 
 #### Relations
-  * verify: [UserRequirements.md/Linting Command](../UserRequirements.md#linting-command)
+  * verify: [UserRequirements.md/Linting Command](../UserRequirements.md#formatting-command)
   * satisfiedBy: [tests/test-lint-expected/test.sh](../../tests/test-lint-expected/test.sh)
 
 ---
@@ -205,7 +205,7 @@ This test verifies that the system provides linting capabilities to identify and
 - Fixes are appropriately applied without breaking model structure
 
 #### Relations
-  * verify: [UserRequirements.md/Model Linting](../UserRequirements.md#model-linting)
+  * verify: [UserRequirements.md/Model Linting](../UserRequirements.md#model-formatting)
   * satisfiedBy: [tests/test-lint-expected/test.sh](../../tests/test-lint-expected/test.sh)
 
 ---
@@ -232,7 +232,7 @@ This test verifies that the system provides a linting function activated by the 
 - Changes are applied to files
 
 #### Relations
-  * verify: [SystemRequirements/Requirements.md#lint-command](../SystemRequirements/Requirements.md#lint-command)
+  * verify: [SystemRequirements/Requirements.md#format-command](../SystemRequirements/Requirements.md#format-command)
   * satisfiedBy: [tests/test-lint-expected/test.sh](../../tests/test-lint-expected/test.sh)
 
 ---

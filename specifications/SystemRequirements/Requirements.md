@@ -77,7 +77,7 @@ graph LR;
   bef37c31db69b66a -.->|verifiedBy| 71b5a1d5e278aa8e;
   26fdf88d16b09109["Linting Output"];
   class 26fdf88d16b09109 requirement;
-  click 26fdf88d16b09109 "../UserRequirements.md#linting-output";
+  click 26fdf88d16b09109 "../UserRequirements.md#formatting-output";
   26fdf88d16b09109 -.->|deriveReqT| b7dd9db7a1290b97;
   974ccf933675ef44["Format Consistency Enforcement"];
   class 974ccf933675ef44 requirement;
@@ -107,7 +107,7 @@ graph LR;
   be83c2991e9535c7 -.->|deriveReqT| bed8d0948b3e5ccd;
   7305c1d6f7f1e2b2["Model Linting"];
   class 7305c1d6f7f1e2b2 requirement;
-  click 7305c1d6f7f1e2b2 "../UserRequirements.md#model-linting";
+  click 7305c1d6f7f1e2b2 "../UserRequirements.md#model-formatting";
   7305c1d6f7f1e2b2 --o|contains| 974ccf933675ef44;
   8dfe33c28555e80a["Replace Absolute Links with Relative Links"];
   class 8dfe33c28555e80a requirement;
@@ -116,11 +116,11 @@ graph LR;
   7305c1d6f7f1e2b2 -.->|deriveReqT| 47401bd64e231632;
   a51179cda67cf9f2["Linting Command"];
   class a51179cda67cf9f2 requirement;
-  click a51179cda67cf9f2 "../UserRequirements.md#linting-command";
+  click a51179cda67cf9f2 "../UserRequirements.md#formatting-command";
   7305c1d6f7f1e2b2 --o|contains| a51179cda67cf9f2;
   6481e4ca8c4d6920["Model Linting Verification"];
   class 6481e4ca8c4d6920 verification;
-  click 6481e4ca8c4d6920 "../Verifications/LintingTests.md#model-linting-verification";
+  click 6481e4ca8c4d6920 "../Verifications/LintingTests.md#model-formatting-verification";
   7305c1d6f7f1e2b2 -.->|verifiedBy| 6481e4ca8c4d6920;
 ```
 
@@ -169,7 +169,7 @@ The system shall identify and fix inconsistent indentation and bullet types in r
 The system shall display linting change suggestions in a git-style diff format, color-coded when possible, to clearly show what modifications will be or have been made to the documents.
 
 #### Relations
-  * derivedFrom: [UserRequirements.md/Linting Output](../UserRequirements.md#linting-output)
+  * derivedFrom: [UserRequirements.md/Linting Output](../UserRequirements.md#formatting-output)
   * satisfiedBy: [linting/mod.rs](../../core/src/linting/mod.rs)
 
 ---
@@ -178,7 +178,7 @@ The system shall display linting change suggestions in a git-style diff format, 
 The system shall implement parallel processing for linting operations when possible, leveraging multi-core capabilities to improve performance on large documentation sets.
 
 #### Relations
-  * derivedFrom: [UserRequirements.md/Model Linting](../UserRequirements.md#model-linting)
+  * derivedFrom: [UserRequirements.md/Model Linting](../UserRequirements.md#model-formatting)
   * satisfiedBy: [linting/mod.rs](../../core/src/linting/mod.rs)
 
 ---
@@ -393,7 +393,7 @@ graph LR;
   8f22faacdb454b23 --o|contains| 6c40e66699ba40dd;
   deaec107945edbed["Lint Command"];
   class deaec107945edbed requirement;
-  click deaec107945edbed "Requirements.md#lint-command";
+  click deaec107945edbed "Requirements.md#format-command";
   8f22faacdb454b23 --o|contains| deaec107945edbed;
   749eaee85cfd0a43["CLI Remove Diagrams Flag"];
   class 749eaee85cfd0a43 requirement;
@@ -460,14 +460,14 @@ graph LR;
   84b3d0502132adb5 -.->|deriveReqT| c1851df0c89e80f8;
   a51179cda67cf9f2["Linting Command"];
   class a51179cda67cf9f2 requirement;
-  click a51179cda67cf9f2 "../UserRequirements.md#linting-command";
+  click a51179cda67cf9f2 "../UserRequirements.md#formatting-command";
   26fdf88d16b09109["Linting Output"];
   class 26fdf88d16b09109 requirement;
-  click 26fdf88d16b09109 "../UserRequirements.md#linting-output";
+  click 26fdf88d16b09109 "../UserRequirements.md#formatting-output";
   a51179cda67cf9f2 -->|refinedBy| 26fdf88d16b09109;
   a8037b2df81f02be["Linting Command Verification"];
   class a8037b2df81f02be verification;
-  click a8037b2df81f02be "../Verifications/LintingTests.md#linting-command-verification";
+  click a8037b2df81f02be "../Verifications/LintingTests.md#formatting-command-verification";
   a51179cda67cf9f2 -.->|verifiedBy| a8037b2df81f02be;
   a51179cda67cf9f2 -.->|deriveReqT| deaec107945edbed;
   c2b6c74b77726ad9["Generate Documentation Index"];
@@ -523,7 +523,7 @@ The system shall provide a formatting function, activated by the (format command
   - --json flag outputs validation errors in JSON format if model loading fails
 
 #### Relations
-  * derivedFrom: [UserRequirements.md/Linting Command Behavior](../UserRequirements.md#linting-command)
+  * derivedFrom: [UserRequirements.md/Linting Command Behavior](../UserRequirements.md#formatting-command)
   * containedBy: [CLI Interface Structure](#cli-interface-structure)    
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)    
 
@@ -798,7 +798,7 @@ graph LR;
   8f22faacdb454b23 --o|contains| 6c40e66699ba40dd;
   deaec107945edbed["Lint Command"];
   class deaec107945edbed requirement;
-  click deaec107945edbed "Requirements.md#lint-command";
+  click deaec107945edbed "Requirements.md#format-command";
   8f22faacdb454b23 --o|contains| deaec107945edbed;
   749eaee85cfd0a43["CLI Remove Diagrams Flag"];
   class 749eaee85cfd0a43 requirement;
@@ -1179,7 +1179,7 @@ graph LR;
   8f22faacdb454b23 --o|contains| 6c40e66699ba40dd;
   deaec107945edbed["Lint Command"];
   class deaec107945edbed requirement;
-  click deaec107945edbed "Requirements.md#lint-command";
+  click deaec107945edbed "Requirements.md#format-command";
   8f22faacdb454b23 --o|contains| deaec107945edbed;
   749eaee85cfd0a43["CLI Remove Diagrams Flag"];
   class 749eaee85cfd0a43 requirement;
@@ -1674,7 +1674,7 @@ graph LR;
   8f22faacdb454b23 --o|contains| 6c40e66699ba40dd;
   deaec107945edbed["Lint Command"];
   class deaec107945edbed requirement;
-  click deaec107945edbed "Requirements.md#lint-command";
+  click deaec107945edbed "Requirements.md#format-command";
   8f22faacdb454b23 --o|contains| deaec107945edbed;
   749eaee85cfd0a43["CLI Remove Diagrams Flag"];
   class 749eaee85cfd0a43 requirement;
@@ -2159,7 +2159,7 @@ graph LR;
   8f22faacdb454b23 --o|contains| 6c40e66699ba40dd;
   deaec107945edbed["Lint Command"];
   class deaec107945edbed requirement;
-  click deaec107945edbed "Requirements.md#lint-command";
+  click deaec107945edbed "Requirements.md#format-command";
   8f22faacdb454b23 --o|contains| deaec107945edbed;
   8f22faacdb454b23 --o|contains| 749eaee85cfd0a43;
   5bfc0d5fd7bba25["CLI Traces Command"];

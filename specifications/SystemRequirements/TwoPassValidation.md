@@ -104,7 +104,7 @@ graph LR;
   8f22faacdb454b23 --o|contains| 6c40e66699ba40dd;
   deaec107945edbed["Lint Command"];
   class deaec107945edbed requirement;
-  click deaec107945edbed "Requirements.md#lint-command";
+  click deaec107945edbed "Requirements.md#format-command";
   8f22faacdb454b23 --o|contains| deaec107945edbed;
   749eaee85cfd0a43["CLI Remove Diagrams Flag"];
   class 749eaee85cfd0a43 requirement;

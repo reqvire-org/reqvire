@@ -51,7 +51,7 @@ graph LR;
   113748a94885138d -->|refinedBy| 5c482dc763b4133a;
   7305c1d6f7f1e2b2["Model Linting"];
   class 7305c1d6f7f1e2b2 requirement;
-  click 7305c1d6f7f1e2b2 "UserRequirements.md#model-linting";
+  click 7305c1d6f7f1e2b2 "UserRequirements.md#model-formatting";
   113748a94885138d -->|refinedBy| 7305c1d6f7f1e2b2;
   91a0adb0b4d959c4["Provide Reports"];
   class 91a0adb0b4d959c4 requirement;

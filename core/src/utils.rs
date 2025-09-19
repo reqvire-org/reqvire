@@ -403,15 +403,66 @@ pub fn parse_relation_line(line: &str) -> Result<(String, (String, String)), Req
 
 
 /// Parses a given string and creates a RelationTarget based on rules.
+/// Applies automatic normalization during parsing:
+/// - Converts non-link identifiers to proper markdown links with display text
+/// - Normalizes absolute paths to relative paths
 fn parse_target(input: &str) -> (String, String) {
     // 1. Check if the input is a Markdown-style link: `[text](link)`
     if let Some((text, link)) = extract_markdown_link(input) {
-        return (text,link)
+        // Apply path normalization if the link is an absolute path
+        let normalized_link = normalize_link_path(&link);
+        return (text, normalized_link)
     }
 
-    // 2. If it's a simple identifier-style link (link only), use link as text also.
-    (input.to_string(),input.to_string())
+    // 2. Convert non-link identifier to proper markdown link
+    let (display_text, normalized_link) = normalize_nonlink_identifier(input);
+    (display_text, normalized_link)
+}
 
+/// Normalizes absolute paths in links to relative paths
+fn normalize_link_path(link: &str) -> String {
+    // If it's an absolute path starting with '/', try to convert to relative
+    if link.starts_with('/') {
+        // For now, just remove the leading '/' as a simple normalization
+        // TODO: Implement proper relative path conversion when file context is available
+        link.trim_start_matches('/').to_string()
+    } else {
+        link.to_string()
+    }
+}
+
+/// Converts a non-link identifier to a proper markdown link with display text
+fn normalize_nonlink_identifier(input: &str) -> (String, String) {
+    let input = input.trim();
+
+    // Split the identifier into file part and optional fragment
+    let (file_part, fragment_opt) = extract_path_and_fragment(input);
+
+    // Normalize the fragment if present
+    let normalized_link = if let Some(frag) = fragment_opt {
+        let norm_frag = normalize_fragment(&frag);
+        if file_part.is_empty() {
+            // For fragment-only references, always include a leading '#' in the target
+            format!("#{}", norm_frag)
+        } else {
+            format!("{}#{}", file_part, norm_frag)
+        }
+    } else {
+        file_part.to_string()
+    };
+
+    // For display text: if it's a fragment-only reference, display it without the leading '#'
+    let display_text = if file_part.is_empty() {
+        if input.starts_with('#') {
+            input.trim_start_matches('#').to_string()
+        } else {
+            input.to_string()
+        }
+    } else {
+        input.to_string()
+    };
+
+    (display_text, normalized_link)
 }
 
 /// Extracts text and link from a Markdown-style link if present.
