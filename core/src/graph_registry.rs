@@ -42,12 +42,21 @@ impl Page {
 #[derive(Debug, Clone, Serialize)]
 pub struct Section {
     pub content: String,
+    pub section_order: usize,
 }
 
 impl Section {
     pub fn new(content: String) -> Self {
         Self {
             content,
+            section_order: 0, // Will be set when section is added
+        }
+    }
+
+    pub fn new_with_order(content: String, section_order: usize) -> Self {
+        Self {
+            content,
+            section_order,
         }
     }
 }
@@ -62,6 +71,26 @@ pub struct RelationNode {
 pub struct ElementNode {
     pub element: Element,
     pub relations: Vec<RelationNode>,
+}
+
+#[derive(Debug, Clone)]
+pub struct FormatResult {
+    pub files_changed: usize,
+    pub diffs: Vec<FileDiff>,
+    pub dry_run: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct FileDiff {
+    pub file_path: String,
+    pub lines: Vec<DiffLine>,
+}
+
+#[derive(Debug, Clone)]
+pub struct DiffLine {
+    pub prefix: String,
+    pub content: String,
+    pub color: String,
 }
 
 #[derive(Debug)]
@@ -90,6 +119,12 @@ impl GraphRegistry {
     pub fn register_section(&mut self, file_path: String, section_name: String, section_content: String) {
         let section_key = SectionKey::new(file_path, section_name);
         self.sections.insert(section_key, Section::new(section_content));
+    }
+
+    /// Registers a section with content and order
+    pub fn register_section_with_order(&mut self, file_path: String, section_name: String, section_content: String, section_order: usize) {
+        let section_key = SectionKey::new(file_path, section_name);
+        self.sections.insert(section_key, Section::new_with_order(section_content, section_order));
     }
 
     /// Registers an element with local validation
@@ -841,6 +876,10 @@ impl GraphRegistry {
 
     /// Converts an element back to markdown format
     fn element_to_markdown(&self, element: &Element) -> String {
+        self.element_to_markdown_with_context(element, &element.file_path)
+    }
+
+    fn element_to_markdown_with_context(&self, element: &Element, _current_file: &str) -> String {
         let mut markdown = String::new();
 
         // Add the element header
@@ -848,11 +887,10 @@ impl GraphRegistry {
 
         // Add the element content
         if !element.content.trim().is_empty() {
-            markdown.push_str(&element.content);
-            if !element.content.ends_with('\n') {
-                markdown.push('\n');
-            }
-            markdown.push('\n');
+            let trimmed_content = element.content.trim_end();
+            markdown.push_str(trimmed_content);
+            // Always add two newlines after content to ensure blank line before subsections
+            markdown.push_str("\n\n");
         }
 
         // Add metadata subsection if there are custom metadata
@@ -861,7 +899,12 @@ impl GraphRegistry {
             .collect();
         custom_metadata.sort_by_key(|(key, _)| *key);
 
-        if !custom_metadata.is_empty() || element.element_type.as_str() != "requirement" {
+        // Only add metadata section if there are custom metadata or non-default type
+        // Default types: "requirement" and "user-requirement"
+        let has_non_default_type = element.element_type.as_str() != "requirement" &&
+                                   element.element_type.as_str() != "user-requirement";
+
+        if !custom_metadata.is_empty() || has_non_default_type {
             markdown.push_str("#### Metadata\n");
 
             // Add type metadata
@@ -871,46 +914,99 @@ impl GraphRegistry {
             for (key, value) in custom_metadata {
                 markdown.push_str(&format!("  * {}: {}\n", key, value));
             }
-            markdown.push('\n');
+            markdown.push_str("\n\n");
         }
 
-        // Add relations subsection if there are relations
-        if !element.relations.is_empty() {
+        // Add relations subsection if there are user-created relations
+        let user_relations: Vec<_> = element.relations.iter().filter(|r| r.user_created).collect();
+        if !user_relations.is_empty() {
             markdown.push_str("#### Relations\n");
-            for relation in &element.relations {
+            for relation in user_relations {
                 // Format relation target based on type
+                // Format as proper markdown link using element name when possible
                 let target_text = match &relation.target.link {
+                    LinkType::ExternalUrl(_) => {
+                        // For external URLs, use the text as-is (might already be a full URL)
+                        relation.target.text.clone()
+                    },
                     LinkType::Identifier(target_id) => {
-                        // Extract file and fragment from the identifier
-                        if let Some(fragment_pos) = target_id.find('#') {
-                            let file_part = &target_id[..fragment_pos];
-                            let fragment = &target_id[fragment_pos + 1..];
-
-                            // Look up the target element in the graph to get its display name
-                            let display_name = if let Some(target_node) = self.nodes.get(fragment) {
-                                target_node.element.name.clone()
-                            } else {
-                                // Fallback: convert fragment to title case
-                                fragment.replace('-', " ")
-                                    .split_whitespace()
-                                    .map(|word| {
-                                        let mut chars = word.chars();
-                                        match chars.next() {
-                                            None => String::new(),
-                                            Some(first) => first.to_uppercase().collect::<String>() + chars.as_str(),
-                                        }
-                                    })
-                                    .collect::<Vec<String>>()
-                                    .join(" ")
-                            };
-
-                            format!("[{}]({}#{})", display_name, file_part, fragment)
+                        // Extract fragment to look up the target element
+                        let fragment = if let Some(fragment_pos) = target_id.find('#') {
+                            &target_id[fragment_pos + 1..]
                         } else {
-                            // Handle case where there's no fragment (file-only reference)
-                            format!("[{}]({})", target_id, target_id)
+                            target_id
+                        };
+
+                        // Use actual element name if available, otherwise fallback to fragment conversion
+                        let display_name = if let Some(target_node) = self.nodes.get(target_id) {
+                            target_node.element.name.clone()
+                        } else {
+                            // Fallback: convert fragment to title case
+                            fragment.replace('-', " ")
+                                .split_whitespace()
+                                .map(|word| {
+                                    let mut chars = word.chars();
+                                    match chars.next() {
+                                        None => String::new(),
+                                        Some(first) => first.to_uppercase().collect::<String>() + chars.as_str(),
+                                    }
+                                })
+                                .collect::<Vec<String>>()
+                                .join(" ")
+                        };
+
+                        // Check if target is in the same file
+                        let target_file = if let Some(file_pos) = target_id.find('#') {
+                            &target_id[..file_pos]
+                        } else {
+                            target_id
+                        };
+
+                        // Get current file path for comparison
+                        let current_file_path = std::path::PathBuf::from(_current_file);
+                        let current_file_str = _current_file;
+
+                        // If target is in the same file, use just the fragment
+                        if target_file.is_empty() || target_file == current_file_str ||
+                           target_id.starts_with('#') {
+                            format!("[{}](#{})", display_name, fragment)
+                        } else {
+                            // Make the link relative using just the folder of the current file
+                            let current_folder = current_file_path.parent()
+                                .unwrap_or_else(|| std::path::Path::new("."))
+                                .to_path_buf();
+
+                            let relative_link = crate::utils::to_relative_identifier(
+                                relation.target.link.as_str(),
+                                &current_folder,
+                                false
+                            ).unwrap_or_else(|_| relation.target.link.as_str().to_string());
+
+                            format!("[{}]({})", display_name, relative_link)
                         }
                     },
-                    LinkType::InternalPath(_) | LinkType::ExternalUrl(_) => relation.target.text.clone(),
+                    LinkType::InternalPath(path) => {
+                        // For InternalPath, use the filename as display text and full relative path as link
+                        let path_str = path.to_str().unwrap_or("invalid_path");
+                        let display_name = std::path::Path::new(path_str)
+                            .file_name()
+                            .and_then(|name| name.to_str())
+                            .unwrap_or(path_str);
+
+                        // Make the path relative using just the folder of the current file
+                        let current_file_path = std::path::PathBuf::from(_current_file);
+                        let current_folder = current_file_path.parent()
+                            .unwrap_or_else(|| std::path::Path::new("."))
+                            .to_path_buf();
+
+                        let relative_link = crate::utils::to_relative_identifier(
+                            relation.target.link.as_str(),
+                            &current_folder,
+                            false
+                        ).unwrap_or_else(|_| relation.target.link.as_str().to_string());
+
+                        format!("[{}]({})", display_name, relative_link)
+                    }
                 };
 
                 markdown.push_str(&format!("  * {}: {}\n",
@@ -944,10 +1040,10 @@ impl GraphRegistry {
                 .push(element);
         }
 
-        // Sort elements within each section by name for consistent output
+        // Sort elements within each section by their original order index
         for file_map in file_sections.values_mut() {
             for elements in file_map.values_mut() {
-                elements.sort_by(|a, b| a.name.cmp(&b.name));
+                elements.sort_by_key(|element| element.section_order_index);
             }
         }
 
@@ -993,9 +1089,27 @@ impl GraphRegistry {
             }
         }
 
-        // Sort sections by name for consistent output
-        let mut sorted_sections: Vec<_> = sections.iter().collect();
-        sorted_sections.sort_by_key(|(section_name, _)| *section_name);
+        // Get all sections for this file (including those without elements)
+        let mut all_sections: HashMap<String, Vec<&Element>> = sections.clone();
+
+        // Add sections without elements from the sections registry
+        for (section_key, _) in &self.sections {
+            if section_key.file_path == file_path {
+                all_sections.entry(section_key.section_name.clone()).or_insert_with(Vec::new);
+            }
+        }
+
+        // Sort sections by their original order (section_order)
+        let mut sorted_sections: Vec<_> = all_sections.iter().collect();
+        sorted_sections.sort_by_key(|(section_name, _)| {
+            let section_key = SectionKey {
+                file_path: file_path.to_string(),
+                section_name: (*section_name).clone(),
+            };
+            self.sections.get(&section_key)
+                .map(|section| section.section_order)
+                .unwrap_or(usize::MAX) // Put sections without order at the end
+        });
 
         for (section_name, elements) in sorted_sections {
             if !section_name.is_empty() && section_name != "Default" {
@@ -1007,19 +1121,34 @@ impl GraphRegistry {
                 file_path: file_path.to_string(),
                 section_name: section_name.clone(),
             };
-            if let Some(section) = self.sections.get(&section_key) {
+            let has_section_content = if let Some(section) = self.sections.get(&section_key) {
                 if !section.content.trim().is_empty() {
                     markdown.push_str(&section.content);
                     if !section.content.ends_with('\n') {
                         markdown.push('\n');
                     }
                     markdown.push('\n');
+                    true
+                } else {
+                    false
                 }
-            }
+            } else {
+                false
+            };
 
             // Add elements in this section
-            for element in elements {
-                markdown.push_str(&self.element_to_markdown(element));
+            for (i, element) in elements.iter().enumerate() {
+                // Add separator before each element
+                // - Always before 2nd, 3rd, etc. elements (i > 0)
+                // - Before first element if there was section content
+                if i > 0 || has_section_content {
+                    markdown.push_str("---\n\n");
+                }
+                markdown.push_str(&self.element_to_markdown_with_context(element, file_path));
+            }
+
+            // Add final separator after the last element in the section (if there were any elements)
+            if !elements.is_empty() {
                 markdown.push_str("---\n\n");
             }
         }
@@ -1182,6 +1311,157 @@ impl GraphRegistry {
                    markdown_files_written, internal_files_copied, output_dir.display());
 
         Ok((markdown_files_written, internal_files_copied))
+    }
+
+    /// Format files in place with optional dry-run to show diffs
+    /// Uses current working directory as base (respects subdirectory operations)
+    pub fn format_files(&self, dry_run: bool) -> Result<FormatResult, ReqvireError> {
+        let base_dir = std::env::current_dir()
+            .map_err(|e| ReqvireError::PathError(format!("Failed to get current directory: {}", e)))?;
+
+        let grouped_elements = self.group_elements_by_location();
+        let mut files_changed = 0;
+        let mut files_with_diffs = Vec::new();
+
+        for (file_path, sections) in grouped_elements {
+            // Generate the new markdown content for this file
+            let mut new_content = self.generate_file_markdown(&file_path, &sections);
+
+            // Apply linting rules to ensure consistent formatting
+            new_content = self.apply_formatting_rules(&new_content, &file_path);
+
+            // Construct the full file path relative to current directory
+            let full_file_path = base_dir.join(&file_path);
+
+            // Read current content if file exists
+            let current_content = if full_file_path.exists() {
+                fs::read_to_string(&full_file_path)
+                    .map_err(|e| ReqvireError::IoError(e))?
+            } else {
+                String::new() // File doesn't exist, treat as empty
+            };
+
+            // Check if content has changed
+            if current_content != new_content {
+                files_changed += 1;
+
+                if dry_run {
+                    // Generate and store diff
+                    let diff = self.generate_file_diff(&file_path, &current_content, &new_content);
+                    files_with_diffs.push(diff);
+                } else {
+                    // Create parent directories if needed
+                    if let Some(parent_dir) = full_file_path.parent() {
+                        fs::create_dir_all(parent_dir)
+                            .map_err(|e| ReqvireError::IoError(e))?;
+                    }
+
+                    // Write the new content
+                    fs::write(&full_file_path, new_content)
+                        .map_err(|e| ReqvireError::IoError(e))?;
+
+                    debug!("Formatted {} with {} elements",
+                        file_path, sections.values().map(|v| v.len()).sum::<usize>());
+                }
+            }
+        }
+
+        Ok(FormatResult {
+            files_changed,
+            diffs: if dry_run { files_with_diffs } else { Vec::new() },
+            dry_run,
+        })
+    }
+
+    /// Apply basic formatting rules to generated markdown content
+    fn apply_formatting_rules(&self, content: &str, _file_path: &str) -> String {
+        // Since we're generating from the model, we only need basic cleanup
+        // of content that comes from original files (element content, page content, section content)
+
+        // Trim extra whitespace at both beginning and end of the content and ensure proper file ending
+        let mut formatted = content.trim().to_string();
+
+        // Ensure file ends with exactly one newline
+        if !formatted.is_empty() {
+            formatted.push('\n');
+        }
+
+        formatted
+    }
+
+
+    /// Generate a diff showing changes between current and new content
+    fn generate_file_diff(&self, file_path: &str, current: &str, new: &str) -> FileDiff {
+        use difference::{Difference, Changeset};
+
+        let changeset = Changeset::new(current, new, "\n");
+        let mut diff_lines = Vec::new();
+
+        // Calculate max line numbers to determine padding width
+        let max_current_lines = current.lines().count();
+        let max_new_lines = new.lines().count();
+        let max_line_num = std::cmp::max(max_current_lines, max_new_lines);
+        let width = max_line_num.to_string().len();
+
+        let mut current_line_num = 1;
+        let mut new_line_num = 1;
+        let mut previous_was_change = false;
+
+        for diff in changeset.diffs {
+            match diff {
+                Difference::Same(text) => {
+                    // Skip same lines, just update line numbers
+                    let line_count = text.lines().count();
+                    current_line_num += line_count;
+                    new_line_num += line_count;
+
+                    // Add separator if previous was a change and this is a large gap
+                    if previous_was_change && line_count > 3 {
+                        diff_lines.push(DiffLine {
+                            prefix: "...".to_string(),
+                            content: "".to_string(),
+                            color: "separator".to_string(),
+                        });
+                    }
+                    previous_was_change = false;
+                }
+                Difference::Add(text) => {
+                    for line in text.lines() {
+                        diff_lines.push(DiffLine {
+                            prefix: format!("{:0width$}", new_line_num, width = width),
+                            content: format!("+   {}", line),
+                            color: "green".to_string(),
+                        });
+                        new_line_num += 1;
+                    }
+                    previous_was_change = true;
+                }
+                Difference::Rem(text) => {
+                    for line in text.lines() {
+                        // Only show special characters for trailing whitespace
+                        let visible_line = if line.ends_with(' ') || line.ends_with('\t') {
+                            let trimmed = line.trim_end();
+                            let trailing = &line[trimmed.len()..];
+                            format!("{}{}", trimmed, trailing.replace(' ', "·").replace('\t', "→"))
+                        } else {
+                            line.to_string()
+                        };
+                        diff_lines.push(DiffLine {
+                            prefix: format!("{:0width$}", current_line_num, width = width),
+                            content: format!("-   {}", visible_line),
+                            color: "red".to_string(),
+                        });
+                        current_line_num += 1;
+                    }
+                    previous_was_change = true;
+                }
+            }
+        }
+
+        FileDiff {
+            file_path: file_path.to_string(),
+            lines: diff_lines,
+        }
     }
 
     // Dynamic graph manipulation methods

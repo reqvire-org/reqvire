@@ -54,7 +54,7 @@ pub fn parse_elements(
     content: &str,
     file_path: &PathBuf,
     user_requirements_root_folder: &Option<PathBuf>,
-) -> (Vec<Element>, Vec<ReqvireError>, String, Vec<(String, String)>) {
+) -> (Vec<Element>, Vec<ReqvireError>, String, Vec<(String, String, usize)>) {
     let mut elements = Vec::new();
     let mut current_element: Option<Element> = None;
     let mut errors = Vec::new();
@@ -72,6 +72,13 @@ pub fn parse_elements(
     let mut current_section_content = String::new();
     let mut found_first_section = false;
     let mut sections = Vec::new();
+
+    // Section order tracking
+    let mut section_element_counter: std::collections::HashMap<String, usize> = std::collections::HashMap::new();
+    let mut section_order_counter = 0;
+
+    // Initialize the default section order
+    section_element_counter.insert(current_section_name.to_string(), 0);
 
     for (line_num, line) in content.lines().enumerate() {
         let trimmed = line.trim();
@@ -97,9 +104,13 @@ pub fn parse_elements(
             // Save previous section content if this isn't the first section
             if found_first_section {
                 let cleaned_content = remove_generated_diagrams(&current_section_content);
-                if !cleaned_content.trim().is_empty() {
-                    sections.push((current_section_name.to_string(), cleaned_content.trim().to_string()));
-                }
+                // Always save the section, even if it has no content, to preserve order
+                sections.push((current_section_name.to_string(), cleaned_content.trim().to_string(), section_order_counter));
+                // Increment section order after saving the previous section
+                section_order_counter += 1;
+            } else {
+                // For the first section, set the initial order
+                section_order_counter = 0;
             }
 
             // Start new section
@@ -107,6 +118,9 @@ pub fn parse_elements(
             current_section_content.clear();
             found_first_section = true;
             current_subsection = SubSection::Other("".to_string());
+
+            // Reset element counter for new section
+            section_element_counter.insert(current_section_name.to_string(), 0);
 
         } else if trimmed.starts_with("### ") {
             current_subsection = SubSection::Requirement;
@@ -161,13 +175,20 @@ pub fn parse_elements(
                                     ElementType::Requirement(RequirementType::System)
                                 };
 
-                                current_element = Some(Element::new(
+                                let mut new_element = Element::new(
                                     &element_name,
                                     &identifier,
                                     &relative_file.to_string_lossy(),
                                     &current_section_name,
                                     Some(element_type),
-                                ));
+                                );
+
+                                // Set section order index
+                                let current_index = section_element_counter.get(current_section_name).unwrap_or(&0);
+                                new_element.section_order_index = *current_index;
+                                section_element_counter.insert(current_section_name.to_string(), current_index + 1);
+
+                                current_element = Some(new_element);
                                 debug!("Found element: {}", element_name);
                             }
                         }
@@ -369,9 +390,8 @@ pub fn parse_elements(
     // Save final section content
     if found_first_section {
         let cleaned_content = remove_generated_diagrams(&current_section_content);
-        if !cleaned_content.trim().is_empty() {
-            sections.push((current_section_name.to_string(), cleaned_content.trim().to_string()));
-        }
+        // Always save the final section, even if it has no content, to preserve order
+        sections.push((current_section_name.to_string(), cleaned_content.trim().to_string(), section_order_counter));
     }
 
     // Clean page content

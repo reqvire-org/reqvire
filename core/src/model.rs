@@ -101,11 +101,12 @@ impl ModelManager {
                     self.graph_registry.register_page(relative_path_str.clone(), page_content);
 
                     // Register section content
-                    for (section_name, section_content) in sections {
-                        self.graph_registry.register_section(
+                    for (section_name, section_content, section_order) in sections {
+                        self.graph_registry.register_section_with_order(
                             relative_path_str.clone(),
                             section_name,
-                            section_content
+                            section_content,
+                            section_order
                         );
                     }
 

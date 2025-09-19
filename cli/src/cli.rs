@@ -4,7 +4,7 @@ use anyhow::Result;
 use log::{info};
 use serde::Serialize;
 use reqvire::error::ReqvireError;
-use reqvire::{linting, ModelManager};
+use reqvire::ModelManager;
 use reqvire::index_generator;
 use globset::GlobSet;
 use reqvire::reports;
@@ -48,15 +48,15 @@ pub enum Commands {
         output: String,
     },
     
-    /// Enable linting to find potential improvements (non-blocking) By default, fixes will be applied automatically
-    #[clap(override_help = "Enable linting to find potential improvements (non-blocking) By default, fixes will be applied automatically\n\nLINT OPTIONS:\n      --dry-run  When linting, only show suggestions without applying fixes\n      --json     Output results in JSON format")]
-    Lint {
-        /// When linting, only show suggestions without applying fixes
-        #[clap(long, help_heading = "LINT OPTIONS")]
+    /// Format markdown files by applying automatic normalization and stylistic fixes
+    #[clap(override_help = "Format markdown files by applying automatic normalization and stylistic fixes\n\nFORMAT OPTIONS:\n      --dry-run  Show differences without applying changes\n      --json     Output results in JSON format")]
+    Format {
+        /// Show differences without applying changes
+        #[clap(long, help_heading = "FORMAT OPTIONS")]
         dry_run: bool,
-        
+
         /// Output results in JSON format
-        #[clap(long, help_heading = "LINT OPTIONS")]
+        #[clap(long, help_heading = "FORMAT OPTIONS")]
         json: bool,
     },
     
@@ -270,7 +270,7 @@ fn print_validation_results(errors: &[ReqvireError], json_output: bool) {
 
 fn wants_json(args: &Args) -> bool {
     match &args.command {
-        Some(Commands::Lint { json, .. }) => *json,
+        Some(Commands::Format { json, .. }) => *json,
         Some(Commands::Traces { json, .. }) => *json,
         Some(Commands::ModelSummary { json, .. }) => *json,
         Some(Commands::ChangeImpact { json, .. }) => *json,
@@ -396,8 +396,38 @@ pub fn handle_command(
                 
             return Ok(0);
         },
-        Some(Commands::Lint { dry_run, json: _ }) => {
-            linting::run_linting(excluded_filename_patterns, dry_run)?;
+        Some(Commands::Format { dry_run, json: _ }) => {
+            let format_result = model_manager.graph_registry.format_files(dry_run)?;
+
+            if dry_run {
+                if format_result.diffs.is_empty() {
+                    println!("No formatting changes needed.");
+                } else {
+                    println!("Found {} file(s) with formatting changes:\n", format_result.diffs.len());
+                    for file_diff in &format_result.diffs {
+                        println!("📄 {}", file_diff.file_path);
+                        for line in &file_diff.lines {
+                            match line.color.as_str() {
+                                "green" => println!("  \x1b[32m{} {}\x1b[0m", line.prefix, line.content),
+                                "red" => println!("  \x1b[31m{} {}\x1b[0m", line.prefix, line.content),
+                                "separator" => println!(""),
+                                _ => println!("  {} {}", line.prefix, line.content),
+                            }
+                        }
+                        println!();
+                    }
+                    println!("Run without --dry-run to apply these changes.");
+                }
+            } else {
+                if format_result.files_changed == 0 {
+                    println!("No files needed formatting.");
+                } else {
+                    println!("Formatted {} file(s):", format_result.files_changed);
+                    for file_diff in &format_result.diffs {
+                        println!("  ✅ {}", file_diff.file_path);
+                    }
+                }
+            }
             return Ok(0);
         },
         Some(Commands::Traces { json, svg }) => {
