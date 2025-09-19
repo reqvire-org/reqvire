@@ -175,6 +175,8 @@ if ! grep -q -- "-->|satisfiedBy|" "$TEST_DIR/specifications/Requirements.md"; t
   echo "❌ FAILED: Missing relationships in Requirements.md diagram"
   exit 1
 fi
-  
+
+# Clean up backup directory
+rm -rf "$TEST_DIR/backup"
 
 exit 0

@@ -155,4 +155,7 @@ if ! grep -q "Another Ignored Diagram" "$TEST_DIR/specifications/IgnoredFile.md"
   exit 1
 fi
 
+# Clean up backup directory
+rm -rf "$TEST_DIR/backup"
+
 exit 0

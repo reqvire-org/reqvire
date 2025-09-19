@@ -139,4 +139,7 @@ if [ $FAILED_CHECKS -gt 0 ]; then
   exit 1
 fi
 
+# Clean up backup directory
+rm -rf "$TEST_DIR/backup"
+
 exit 0
