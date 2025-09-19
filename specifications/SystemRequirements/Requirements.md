@@ -846,22 +846,26 @@ The system shall parse the files in all folders and subfolders from the root of 
 
 ### Subdirectory Processing Option
 
-The system shall automatically detect when it is run from a subdirectory of a git repository and process only files within that subdirectory, enabling focused analysis and improved performance when working with large repositories.
+The system shall automatically detect when it is run from a subdirectory of a git repository and process only files within that subdirectory.
 
 #### Details
 
-The subdirectory auto-detection is designed to limit the scope of processing to the current working directory when it is a subdirectory of the git root, which is especially useful in large repositories with many requirements files. This behavior allows users to:
-
-1. Process only files within the current directory and its nested folders when run from a subdirectory
-2. Generate reports, diagrams, and validations based on the limited scope
-3. Improve performance by reducing the number of files that need to be processed
-4. Work intuitively without needing to specify additional flags
+The subdirectory auto-detection is designed to limit the scope of processing to the current working directory when it is a subdirectory of the git root.
 
 When run from the git root, the system processes all files. When run from a subdirectory, it automatically limits scope to that subdirectory:
 ```
 cd specifications/Verifications
 reqvire model-summary  # Only processes files in Verifications directory (with automatic validation)
 ```
+
+The system shall validate references when processing from a subdirectory and generate validation errors for any references to elements or files outside the current subdirectory scope. This includes:
+
+1. **Parent Directory Reference Validation**: Any relation that references an element or file outside the current subdirectory scope shall be reported as a missing relation target error
+2. **Scope Boundary Enforcement**: References using relative paths (e.g., `../ParentFile.md#element`) that escape the subdirectory shall result in missing relation target errors when the referenced elements cannot be found
+3. **Absolute Path Validation**: Absolute paths that point outside the subdirectory scope shall generate missing relation target errors
+4. **Error Reporting**: Missing relation target errors shall clearly identify the unreachable reference due to subdirectory scope limitations
+
+This validation ensures that subdirectory processing maintains logical boundaries and prevents architectural inconsistencies by reporting parent directory references as missing targets.
 
 #### Relations
   * derivedFrom: [ManagingMbseModelsRequirements.md/Project Configuration with YAML](../ManagingMbseModelsRequirements.md#project-configuration-with-yaml)
