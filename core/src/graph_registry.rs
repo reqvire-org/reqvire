@@ -787,16 +787,20 @@ impl GraphRegistry {
     /// Change impact analysis with relation information
     pub fn change_impact_with_relation(&self, element: &Element) -> Vec<(String, Vec<crate::relation::Relation>)> {
         if let Some(node) = self.nodes.get(&element.identifier) {
-            // Group original relations by target ID
-            let mut relations_by_target: std::collections::HashMap<String, Vec<crate::relation::Relation>> = std::collections::HashMap::new();
+            // Group original relations by target ID using BTreeMap for deterministic ordering
+            let mut relations_by_target: std::collections::BTreeMap<String, Vec<crate::relation::Relation>> = std::collections::BTreeMap::new();
 
             for relation in &node.element.relations {
-                if let crate::relation::LinkType::Identifier(ref target_id) = relation.target.link {
-                    relations_by_target
-                        .entry(target_id.clone())
-                        .or_insert_with(Vec::new)
-                        .push(relation.clone());
-                }
+                let target_id = match &relation.target.link {
+                    crate::relation::LinkType::Identifier(ref target_id) => target_id.clone(),
+                    crate::relation::LinkType::InternalPath(ref path) => path.to_string_lossy().to_string(),
+                    crate::relation::LinkType::ExternalUrl(_) => continue, // Skip external URLs for change impact
+                };
+
+                relations_by_target
+                    .entry(target_id)
+                    .or_insert_with(Vec::new)
+                    .push(relation.clone());
             }
 
             relations_by_target.into_iter().collect()
