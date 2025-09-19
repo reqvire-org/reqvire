@@ -900,9 +900,8 @@ impl GraphRegistry {
         custom_metadata.sort_by_key(|(key, _)| *key);
 
         // Only add metadata section if there are custom metadata or non-default type
-        // Default types: "requirement" and "user-requirement"
-        let has_non_default_type = element.element_type.as_str() != "requirement" &&
-                                   element.element_type.as_str() != "user-requirement";
+        // Default type is only "requirement" - user-requirement should always be explicit
+        let has_non_default_type = element.element_type.as_str() != "requirement";
 
         if !custom_metadata.is_empty() || has_non_default_type {
             markdown.push_str("#### Metadata\n");

@@ -75,14 +75,14 @@ if [ ! -f "${TMP_DIR}/project-root/submodule/subdirectory-html/specifications/Su
   exit 1
 fi
 
-# Test 3: Lint from submodule directory
-OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" lint --dry-run 2>&1)
+# Test 3: Format from submodule directory
+OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" format --dry-run 2>&1)
 EXIT_CODE=$?
 
 printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
 
 if [ $EXIT_CODE -ne 0 ]; then
-  echo "❌ FAILED: Lint from submodule directory failed with exit code $EXIT_CODE"
+  echo "❌ FAILED: Format from submodule directory failed with exit code $EXIT_CODE"
   echo "Output: $OUTPUT"
   exit 1
 fi
