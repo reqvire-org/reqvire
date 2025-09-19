@@ -170,6 +170,9 @@ The validation process shall be split into two distinct passes:
 **Pass 1: Element Collection and Local Validation**
 - Parse all markdown files
 - Extract elements with metadata
+- Apply automatic semantic normalization during parsing:
+  - Convert non-link identifiers to proper markdown links with display text
+  - Normalize absolute paths to relative paths for portable references
 - Perform local validation (element uniqueness, identifier format, metadata syntax)
 - Store elements in ElementRegistry
 - Defer relation validation to Pass 2

@@ -520,6 +520,7 @@ The system shall provide a formatting function, activated by the (format command
 
 `format` command must provide a dry run mode (--dry-run option flag) for formatting that shows the suggested changes without applying them, allowing users to review modifications before committing to them:
   - --dry-run flag works in tandem with the main format command flag and cannot be used standalone.
+  - --json flag outputs validation errors in JSON format if model loading fails
 
 #### Relations
   * derivedFrom: [UserRequirements.md/Linting Command Behavior](../UserRequirements.md#linting-command)
