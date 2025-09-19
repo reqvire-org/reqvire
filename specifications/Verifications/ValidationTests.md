@@ -172,7 +172,7 @@ graph LR;
 
 ### Invalid Relations Test
 
-The verification test checks that Reqvire correctly identifies and reports invalid relations of different kinds and provide validation report with expected details.
+The verification test checks that Reqvire correctly identifies and reports invalid relations using the two-pass validation architecture, separating parsing errors (Pass 1) from relation validation errors (Pass 2).
 
 #### Metadata
   * type: verification
@@ -180,35 +180,46 @@ The verification test checks that Reqvire correctly identifies and reports inval
 #### Details
 
 ##### Acceptance Criteria
+
+**Pass 1 Validation Errors (Element Collection and Local Validation):**
+- System should detect and report duplicate elements in the same document
+- System should detect and report invalid metadata subsection format
+- System should detect and report invalid relation format syntax
 - System should detect and report invalid relation types (typos, etc.)
+- System should detect and report duplicate subsections within elements
+- Pass 1 errors should prevent Pass 2 from executing
+
+**Pass 2 Validation Errors (Graph Construction and Relation Validation):**
 - System should detect and report relations to non-existent targets
 - System should detect and report requirement elements with satisfiedBy relations pointing to non-existing local files
 - System should detect and report verification elements with satisfiedBy relations pointing to non-existing local files
 - System should detect and report requirement elements with verifiedBy relations pointing to non-existing verification elements
-- System should allow requirement elements with satisfiedBy relations pointing to existing implementation files
-- System should allow verification elements with satisfiedBy relations pointing to existing test scripts
 - System should detect and report requirement elements with satisfiedBy relations pointing to other requirement elements (incompatible types)
 - System should detect and report verification elements with satisfiedBy relations pointing to other verification elements (incompatible types)
 - System should detect and report if system requirement is missing parent relation
 - System should detect and report if there is circular dependency in requirements
-- System should detect and report if relation type has incompatible element
-- System should detect and report invalid metadata subsection format
-- System should detect and report duplicate relations in Relations subsection
-- System should detect and report duplicate elements
-- System should detect and report duplicate subsections
+- Pass 2 validation should only execute when Pass 1 completes without errors
+
+**General Requirements:**
+- System should allow requirement elements with satisfiedBy relations pointing to existing implementation files
+- System should allow verification elements with satisfiedBy relations pointing to existing test scripts
 - System should report clear error messages with details about the invalid format
+- Two separate test scenarios should validate Pass 1 and Pass 2 errors independently
 
 #### Test Criteria
-- Command exits with 0 error code but outputs expected validation errors
-- Error output contains specific error messages for each type of invalid relation
+- Pass 1 test: Command exits with non-zero error code and outputs expected parsing/format validation errors
+- Pass 2 test: Command exits with non-zero error code and outputs expected relation validation errors
+- Error output contains specific error messages for each type of validation error in the appropriate pass
 
 #### Relations
-  * verify: [SystemRequirements/Requirement.md/Detailed Error Handling and Logging](../SystemRequirements/Requirements.md#detailed-error-handling-and-logging)
-  * verify: [SystemRequirements/Requirement.md/Relation Type Validation](../SystemRequirements/Requirements.md#relation-type-validation)  
-  * verify: [SystemRequirements/Requirement.md/Relation Element Type Validator](../SystemRequirements/Requirements.md#relation-element-type-validator)  
-  * verify: [UserRequirements.md/Validate Markdown Structure](../UserRequirements.md#validate-markdown-structure)  
+  * verify: [SystemRequirements/TwoPassValidation.md/Two-Pass Validation Strategy](../SystemRequirements/TwoPassValidation.md#two-pass-validation-strategy)
+  * verify: [SystemRequirements/TwoPassValidation.md/Validation Error Handling](../SystemRequirements/TwoPassValidation.md#validation-error-handling)
+  * verify: [SystemRequirements/Requirements.md/Detailed Error Handling and Logging](../SystemRequirements/Requirements.md#detailed-error-handling-and-logging)
+  * verify: [SystemRequirements/Requirements.md/Relation Type Validation](../SystemRequirements/Requirements.md#relation-type-validation)
+  * verify: [SystemRequirements/Requirements.md/Relation Element Type Validator](../SystemRequirements/Requirements.md#relation-element-type-validator)
+  * verify: [UserRequirements.md/Validate Markdown Structure](../UserRequirements.md#validate-markdown-structure)
   * verify: [UserRequirements.md/Validate Internal Consistency](../UserRequirements.md#validate-internal-consistency)
-  * verify: [UserRequirements.md/Validate Cross-Component Dependencies](../UserRequirements.md#validate-cross-component-dependencies)      
+  * verify: [UserRequirements.md/Validate Cross-Component Dependencies](../UserRequirements.md#validate-cross-component-dependencies)
   * verify: [UserRequirements.md/Provide Validation Reports](../UserRequirements.md#provide-validation-reports)  
   * satisfiedBy: [tests/test-invalid-relations/test.sh](../../tests/test-invalid-relations/test.sh)
 
