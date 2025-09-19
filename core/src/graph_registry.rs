@@ -711,22 +711,77 @@ impl GraphRegistry {
     /// Gets requirements grouped by root folder
     pub fn get_requirements_by_root(&self) -> BTreeMap<String, Vec<&Element>> {
         let mut requirements_by_root = BTreeMap::new();
+        let parent_relation_types = ["containedBy", "derivedFrom", "refine", "satisfy", "verify"];
 
-        for element in self.get_all_elements() {
-            // Extract root folder from file path
-            let root_folder = if let Some(slash_pos) = element.file_path.find('/') {
-                element.file_path[..slash_pos].to_string()
-            } else {
-                "root".to_string()
-            };
+        let all_elements = self.get_all_elements();
 
-            requirements_by_root
-                .entry(root_folder)
-                .or_insert_with(Vec::new)
-                .push(element);
+        // Find root elements (elements without parent relations)
+        let root_elements: Vec<&Element> = all_elements.iter()
+            .filter(|element| {
+                !element.relations.iter().any(|rel| {
+                    parent_relation_types.contains(&rel.relation_type.name)
+                })
+            })
+            .copied()
+            .collect();
+
+        // For each root element, find all its descendants recursively
+        for root_element in &root_elements {
+            let mut descendants = vec![*root_element];
+            self.collect_descendants(&all_elements, &mut descendants);
+            requirements_by_root.insert(root_element.name.clone(), descendants);
+        }
+
+        // If no root elements found, group by file path as fallback
+        if requirements_by_root.is_empty() {
+            for element in &all_elements {
+                let root_folder = if let Some(slash_pos) = element.file_path.find('/') {
+                    element.file_path[..slash_pos].to_string()
+                } else {
+                    "root".to_string()
+                };
+                requirements_by_root
+                    .entry(root_folder)
+                    .or_insert_with(Vec::new)
+                    .push(*element);
+            }
         }
 
         requirements_by_root
+    }
+
+    /// Recursively collect all descendants of the elements already in descendants
+    fn collect_descendants<'a>(&self, all_elements: &[&'a Element], descendants: &mut Vec<&'a Element>) {
+        let mut found_new = true;
+
+        while found_new {
+            found_new = false;
+            let descendants_len = descendants.len();
+
+            for element in all_elements {
+                // Skip if already collected
+                if descendants.iter().any(|d| d.identifier == element.identifier) {
+                    continue;
+                }
+
+                // Check if this element has a parent relation pointing to any element in descendants
+                let has_parent_in_descendants = element.relations.iter().any(|rel| {
+                    matches!(&rel.target.link, crate::relation::LinkType::Identifier(target_id)
+                        if descendants.iter().any(|d| d.identifier == *target_id)
+                        && ["containedBy", "derivedFrom", "refine", "satisfy", "verify"].contains(&rel.relation_type.name))
+                });
+
+                if has_parent_in_descendants {
+                    descendants.push(*element);
+                    found_new = true;
+                }
+            }
+
+            // If we didn't find any new descendants, break to avoid infinite loop
+            if descendants.len() == descendants_len {
+                break;
+            }
+        }
     }
 
     /// Change impact analysis with relation information
