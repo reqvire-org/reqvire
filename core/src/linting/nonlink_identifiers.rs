@@ -110,7 +110,7 @@ pub fn find_nonlink_identifiers(content: &str, file_path: &Path) -> Vec<LintSugg
 mod tests {
     use super::*;
     use std::path::PathBuf;
-    use crate::linting::{LintFix, LintSuggestion, LintType};
+    use crate::linting::LintFix;
     // For demonstration, we can define a dummy "normalize_fragment" in test scope
     // or rely on the real crate::utils::normalize_fragment if available
 

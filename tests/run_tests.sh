@@ -36,7 +36,7 @@ run_test_case() {
     git config --local user.email "test@example.com" > /dev/null 2>&1 
     git config --local user.name "Test User" > /dev/null 2>&1
     git remote add origin 'https://dummy.example.com/dummy-repo.git'  > /dev/null 2>&1
-    git add Requirements.md > /dev/null 2>&1
+    git add . > /dev/null 2>&1
     git commit -m "Initial commit" > /dev/null 2>&1
     popd  > /dev/null 2>&1
     

@@ -468,7 +468,6 @@ mod tests {
     use super::*;
     use std::fs;
     use std::path::PathBuf;
-    use globset::GlobSetBuilder;
 
     /// Helper function to create a test file path
     fn test_file_path() -> PathBuf {
@@ -581,33 +580,26 @@ mod tests {
 
     /// Test: Running Linting with Dry Run Mode on created test files
     #[test]
-    #[serial_test::serial]
     fn test_run_linting_dry_run() {
         use std::process::Command;
-        
-        // Save current working directory
-        let original_dir = std::env::current_dir().unwrap();
-        
+
         // Create a temporary directory for the test
         let temp_dir = tempfile::tempdir().unwrap();
         let temp_path = temp_dir.path();
-        
-        // Change to temp directory
-        std::env::set_current_dir(temp_path).unwrap();
-        
-        // Initialize git repo in temp directory
+
+        // Initialize git repo in temp directory (without changing working dir)
         Command::new("git")
             .args(&["init"])
             .current_dir(temp_path)
             .output()
             .expect("Failed to initialize git repo");
-            
+
         Command::new("git")
             .args(&["config", "user.email", "test@example.com"])
             .current_dir(temp_path)
             .output()
             .expect("Failed to set git config");
-            
+
         Command::new("git")
             .args(&["config", "user.name", "Test User"])
             .current_dir(temp_path)
@@ -616,9 +608,9 @@ mod tests {
 
         // Create a markdown file with intentional linting issues
         let test_file_path = temp_path.join("test.md");
-        let test_content = "## Test Header\n\n \nThis is a test file.\n";
+        let test_content = "## Test Header\n\n  \n\n### Element 1\nContent here.\n### Element 2\nMore content.";
         fs::write(&test_file_path, test_content).unwrap();
-        
+
         // Add file to git so it gets scanned
         Command::new("git")
             .args(&["add", "test.md"])
@@ -626,15 +618,29 @@ mod tests {
             .output()
             .expect("Failed to add file to git");
 
-        let excluded_patterns = GlobSetBuilder::new().build().unwrap();
-        
-        // Run linting - now it will only scan the temp directory
-        let result = run_linting(&excluded_patterns, true);
+        // Test linting functionality in isolation by directly testing file processing
+        // instead of calling run_linting which scans from current working directory
+        let original_content = fs::read_to_string(&test_file_path).unwrap();
+        let mut suggestions = Vec::new();
 
-        // Restore original working directory
-        std::env::set_current_dir(original_dir).unwrap();
+        // Test individual linting modules on the test file
+        suggestions.extend(newlines::find_inconsistent_newlines(&original_content, &test_file_path));
+        suggestions.extend(separators::find_missing_separators(&original_content, &test_file_path));
+        suggestions.extend(whitespace::find_excess_whitespace(&original_content, &test_file_path));
+        suggestions.extend(indentation::find_inconsistent_indentation(&original_content, &test_file_path));
+        suggestions.extend(nonlink_identifiers::find_nonlink_identifiers(&original_content, &test_file_path));
+        suggestions.extend(absolute_links::find_absolute_links(&original_content, &test_file_path));
+        suggestions.extend(reserved_subsections::fix_reserved_subsections(&original_content, &test_file_path));
 
-        assert!(result.is_ok(), "Linting should run without errors on test files");
+        // Verify that linting detected issues (the test content has intentional problems)
+        // The test content should have missing separators between elements
+        assert!(!suggestions.is_empty(), "Linting should detect issues in test content with missing separators");
+
+        // Verify suggestions can be formatted without errors
+        for suggestion in &suggestions {
+            let formatted = suggestion.format_diff();
+            assert!(!formatted.is_empty(), "Each suggestion should have non-empty formatting");
+        }
     }
     /// Test: Remove content within <details> blocks
     #[test]
