@@ -939,7 +939,10 @@ impl GraphRegistry {
                         };
 
                         // Use actual element name if available, otherwise fallback to fragment conversion
+                        // First try to lookup by full target_id, then by fragment only
                         let display_name = if let Some(target_node) = self.nodes.get(target_id) {
+                            target_node.element.name.clone()
+                        } else if let Some(target_node) = self.nodes.get(fragment) {
                             target_node.element.name.clone()
                         } else {
                             // Fallback: convert fragment to title case
