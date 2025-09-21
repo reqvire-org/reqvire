@@ -608,6 +608,7 @@ mod tests {
             content: "Requirement content 1".to_string(),
             file_path: "reqs/REQ-001".to_string(),
             relations: vec![],
+            section_order_index: 0,
         };
 
         let req2 = Element {
@@ -621,6 +622,7 @@ mod tests {
             content: "Requirement content 2".to_string(),
             file_path: "reqs/REQ-002".to_string(),
             relations: vec![],
+            section_order_index: 1,
         };
 
         // Create verification element
@@ -635,6 +637,7 @@ mod tests {
             content: "Test case content".to_string(),
             file_path: "tests/TEST-001".to_string(),
             relations: vec![],
+            section_order_index: 0,
         };
 
         // Add relation from req1 to ver1

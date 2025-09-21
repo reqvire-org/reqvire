@@ -15,6 +15,8 @@ use reqvire::git_commands;
 use reqvire::matrix_generator;
 use reqvire::reports::Filters;
 use reqvire::GraphRegistry;
+use reqvire::graph_registry::{Page, Section};
+use reqvire::element::Element;
 use std::collections::HashMap;
 use std::path::Path;
 
@@ -144,6 +146,10 @@ pub enum Commands {
     /// Interactive shell for GraphRegistry operations (undocumented)
     #[clap(hide = true)]
     Shell,
+
+    /// Single output stream for all pages, sections, and requirements (undocumented)
+    #[clap(hide = true)]
+    Sout,
 }
 
 impl Args {
@@ -467,11 +473,103 @@ pub fn handle_command(
             run_shell(&mut model_manager)?;
             return Ok(0);
         },
+        Some(Commands::Sout) => {
+            run_sout(&model_manager.graph_registry)?;
+            return Ok(0);
+        },
         None => {
             Args::print_help();
             return Ok(0);
         }
     }
+}
+
+fn run_sout(graph_registry: &GraphRegistry) -> Result<(), ReqvireError> {
+    use std::collections::BTreeMap;
+
+    // Collect all file paths from pages, sections, and elements
+    let mut file_map: BTreeMap<String, (Option<&Page>, Vec<&Section>, Vec<&Element>)> = BTreeMap::new();
+
+    // Collect pages
+    for (file_path, page) in &graph_registry.pages {
+        file_map.entry(file_path.clone()).or_default().0 = Some(page);
+    }
+
+    // Collect sections grouped by file
+    for (section_key, section) in &graph_registry.sections {
+        file_map.entry(section_key.file_path.clone()).or_default().1.push(section);
+    }
+
+    // Collect elements grouped by file
+    for element_node in graph_registry.nodes.values() {
+        let element = &element_node.element;
+        file_map.entry(element.file_path.clone()).or_default().2.push(element);
+    }
+
+    // Output content for each file in sorted order
+    for (file_path, (page, mut sections, mut elements)) in file_map {
+        println!("📄 {}", file_path);
+        println!();
+
+        // Output page content if exists
+        if let Some(page) = page {
+            if !page.frontmatter_content.trim().is_empty() {
+                println!("{}", page.frontmatter_content);
+                println!();
+            }
+        }
+
+        // Sort sections by section_order
+        sections.sort_by_key(|s| s.section_order);
+
+        // Output sections
+        for section in sections {
+            if !section.content.trim().is_empty() {
+                println!("{}", section.content);
+                println!();
+            }
+        }
+
+        // Sort elements by section_order_index for consistent ordering
+        elements.sort_by_key(|e| e.section_order_index);
+
+        // Output elements
+        for element in elements {
+            println!("### {}", element.name);
+            println!();
+            if !element.content.trim().is_empty() {
+                println!("{}", element.content);
+                println!();
+            }
+
+            // Output metadata if exists
+            if !element.metadata.is_empty() {
+                println!("#### Metadata");
+                for (key, value) in &element.metadata {
+                    println!("  * {}: {}", key, value);
+                }
+                println!();
+            }
+
+            // Output relations if exists
+            if !element.relations.is_empty() {
+                println!("#### Relations");
+                for relation in &element.relations {
+                    println!("  * {}: [{}]({})", relation.relation_type.name, relation.target.text, relation.target.link.as_str());
+                }
+                println!();
+            }
+
+            println!("---");
+            println!();
+        }
+
+        // Add separator between files
+        println!();
+        println!();
+    }
+
+    Ok(())
 }
 
 fn run_shell(model_manager: &mut ModelManager) -> Result<(), ReqvireError> {

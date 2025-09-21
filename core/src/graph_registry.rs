@@ -1117,6 +1117,7 @@ impl GraphRegistry {
 
         for (section_name, elements) in sorted_sections {
             if !section_name.is_empty() && section_name != "Default" {
+                debug!("Adding section header: '## {}' with 2 newlines", section_name);
                 markdown.push_str(&format!("## {}\n\n", section_name));
             }
 
@@ -1127,6 +1128,7 @@ impl GraphRegistry {
             };
             let has_section_content = if let Some(section) = self.sections.get(&section_key) {
                 if !section.content.trim().is_empty() {
+                    markdown.push('\n'); // Add blank line after section header
                     markdown.push_str(&section.content);
                     if !section.content.ends_with('\n') {
                         markdown.push('\n');
@@ -1139,6 +1141,8 @@ impl GraphRegistry {
             } else {
                 false
             };
+
+            // Section header with format "## {}\n\n" already provides correct spacing for elements
 
             // Add elements in this section
             for (i, element) in elements.iter().enumerate() {
@@ -1350,9 +1354,13 @@ impl GraphRegistry {
                 files_changed += 1;
 
                 if dry_run {
+
                     // Generate and store diff
                     let diff = self.generate_file_diff(&file_path, &current_content, &new_content);
-                    files_with_diffs.push(diff);
+                    // Only add non-empty diffs
+                    if !diff.lines.is_empty() {
+                        files_with_diffs.push(diff);
+                    }
                 } else {
                     // Create parent directories if needed
                     if let Some(parent_dir) = full_file_path.parent() {
@@ -1399,6 +1407,17 @@ impl GraphRegistry {
         use difference::{Difference, Changeset};
 
         let changeset = Changeset::new(current, new, "\n");
+
+        // Check if there are any actual changes (additions or removals)
+        let has_changes = changeset.diffs.iter().any(|diff| !matches!(diff, Difference::Same(_)));
+        if !has_changes {
+            // No actual changes, return empty diff
+            return FileDiff {
+                file_path: file_path.to_string(),
+                lines: Vec::new(),
+            };
+        }
+
         let mut diff_lines = Vec::new();
 
         // Calculate max line numbers to determine padding width
@@ -1415,14 +1434,22 @@ impl GraphRegistry {
         for (i, diff) in changeset.diffs.iter().enumerate() {
             match diff {
                 Difference::Same(text) => {
-                    let lines: Vec<&str> = text.lines().collect();
-                    let line_count = lines.len();
+                    let lines: Vec<&str> = text.split('\n').collect();
+                    let line_count = if lines.last() == Some(&"") { lines.len() - 1 } else { lines.len() };
 
                     // Determine if we should show context lines
                     let next_has_change = changeset.diffs.get(i + 1).map_or(false, |d| !matches!(d, Difference::Same(_)));
                     let show_context = previous_was_change || next_has_change;
 
-                    if show_context && line_count > 0 {
+                    // Special case: handle empty Same sections (blank lines)
+                    if text.is_empty() && show_context {
+                        diff_lines.push(DiffLine {
+                            prefix: format!("{:0width$}", new_line_num, width = width),
+                            content: "    ".to_string(),
+                            color: "context".to_string(),
+                        });
+                        new_line_num += 1;
+                    } else if show_context && line_count > 0 {
                         // Show context lines
                         let start_lines = if previous_was_change {
                             std::cmp::min(context_lines, line_count)
@@ -1437,11 +1464,13 @@ impl GraphRegistry {
 
                         // Show leading context (after a change)
                         for line_idx in 0..start_lines {
-                            diff_lines.push(DiffLine {
-                                prefix: format!("{:0width$}", new_line_num + line_idx, width = width),
-                                content: format!("    {}", lines[line_idx]),
-                                color: "context".to_string(),
-                            });
+                            if line_idx < lines.len() && !(line_idx == lines.len() - 1 && lines[line_idx].is_empty()) {
+                                diff_lines.push(DiffLine {
+                                    prefix: format!("{:0width$}", new_line_num + line_idx, width = width),
+                                    content: format!("    {}", lines[line_idx]),
+                                    color: "context".to_string(),
+                                });
+                            }
                         }
 
                         // Show separator if there's a gap in the middle
@@ -1456,11 +1485,13 @@ impl GraphRegistry {
                         // Show trailing context (before a change)
                         let start_end_lines = line_count.saturating_sub(end_lines);
                         for line_idx in start_end_lines..line_count {
-                            diff_lines.push(DiffLine {
-                                prefix: format!("{:0width$}", new_line_num + line_idx, width = width),
-                                content: format!("    {}", lines[line_idx]),
-                                color: "context".to_string(),
-                            });
+                            if line_idx < lines.len() && !(line_idx == lines.len() - 1 && lines[line_idx].is_empty()) {
+                                diff_lines.push(DiffLine {
+                                    prefix: format!("{:0width$}", new_line_num + line_idx, width = width),
+                                    content: format!("    {}", lines[line_idx]),
+                                    color: "context".to_string(),
+                                });
+                            }
                         }
                     } else if previous_was_change && line_count > context_lines {
                         // Add separator if previous was a change and this is a large gap
@@ -1475,31 +1506,75 @@ impl GraphRegistry {
                     previous_was_change = false;
                 }
                 Difference::Add(text) => {
-                    for line in text.lines() {
+                    // Handle both regular text and empty lines
+                    if text.is_empty() {
+                        // This is an added empty line
                         diff_lines.push(DiffLine {
                             prefix: format!("{:0width$}", new_line_num, width = width),
-                            content: format!("+   {}", line),
+                            content: "+   ".to_string(),
                             color: "green".to_string(),
                         });
                         new_line_num += 1;
+                    } else {
+                        // Split text by lines and handle each line
+                        let lines: Vec<&str> = text.split('\n').collect();
+                        for (line_idx, line) in lines.iter().enumerate() {
+                            // For all lines except potentially the last one
+                            if line_idx < lines.len() - 1 || !line.is_empty() {
+                                diff_lines.push(DiffLine {
+                                    prefix: format!("{:0width$}", new_line_num, width = width),
+                                    content: format!("+   {}", line),
+                                    color: "green".to_string(),
+                                });
+                                new_line_num += 1;
+                            }
+                        }
                     }
                     previous_was_change = true;
                 }
                 Difference::Rem(text) => {
-                    for line in text.lines() {
-                        // Only show special characters for trailing whitespace
-                        let visible_line = if line.ends_with(' ') || line.ends_with('\t') {
-                            let trimmed = line.trim_end();
-                            let trailing = &line[trimmed.len()..];
-                            format!("{}{}", trimmed, trailing.replace(' ', "·").replace('\t', "→"))
-                        } else {
-                            line.to_string()
-                        };
+                    // Handle both regular text and empty lines
+                    if text.is_empty() {
+                        // This is a removed empty line
                         diff_lines.push(DiffLine {
                             prefix: format!("{:0width$}", new_line_num, width = width),
-                            content: format!("-   {}", visible_line),
+                            content: "-   ".to_string(),
                             color: "red".to_string(),
                         });
+
+                        // Special case: if this is a blank line removal and the next diff is Same,
+                        // add a context line to show the remaining blank line
+                        if let Some(next_diff) = changeset.diffs.get(i + 1) {
+                            if matches!(next_diff, Difference::Same(_)) {
+                                diff_lines.push(DiffLine {
+                                    prefix: format!("{:0width$}", new_line_num, width = width),
+                                    content: "    ".to_string(),
+                                    color: "context".to_string(),
+                                });
+                                new_line_num += 1;
+                            }
+                        }
+                        // Don't increment new_line_num for the removed line itself
+                    } else {
+                        // Split text by lines and handle each line
+                        let lines: Vec<&str> = text.split('\n').collect();
+                        for (line_idx, line) in lines.iter().enumerate() {
+                            if line_idx < lines.len() - 1 || !line.is_empty() {
+                                // Only show special characters for trailing whitespace
+                                let visible_line = if line.ends_with(' ') || line.ends_with('\t') {
+                                    let trimmed = line.trim_end();
+                                    let trailing = &line[trimmed.len()..];
+                                    format!("{}{}", trimmed, trailing.replace(' ', "·").replace('\t', "→"))
+                                } else {
+                                    line.to_string()
+                                };
+                                diff_lines.push(DiffLine {
+                                    prefix: format!("{:0width$}", new_line_num, width = width),
+                                    content: format!("-   {}", visible_line),
+                                    color: "red".to_string(),
+                                });
+                            }
+                        }
                         // Don't increment new_line_num for removed lines - they don't exist in new file
                     }
                     previous_was_change = true;
@@ -2050,8 +2125,6 @@ mod tests {
         assert!(graph.get_element(b_target).is_some(), "B's relation target '{}' should exist in graph", b_target);
         assert!(graph.get_element(c_target).is_some(), "C's relation target '{}' should exist in graph", c_target);
 
-        println!("B relations after move: {:?}", b_relations_after);
-        println!("C relations after move: {:?}", c_relations_after);
     }
 
     #[test]
@@ -2079,20 +2152,7 @@ mod tests {
         let result = graph.move_element_to_new_file("A", "file2.md", "Section2");
         assert!(result.is_ok());
 
-        // Now let's check what would be written to markdown when flushed
-        // First, let's see what B's relation looks like in the markdown
-        let b_node = graph.nodes.get("B").unwrap();
-
         // Check B's original relations in the element
-        println!("B's original relations from element:");
-        for relation in &b_node.element.relations {
-            println!("  {} -> {}", relation.relation_type.name,
-                    match &relation.target.link {
-                        crate::relation::LinkType::Identifier(id) => id.clone(),
-                        crate::relation::LinkType::InternalPath(path) => path.to_string_lossy().to_string(),
-                        crate::relation::LinkType::ExternalUrl(url) => url.clone(),
-                    });
-        }
 
         // The issue: B's element still has a relation pointing to "A"
         // But A is now in file2.md, so the relation should be "file2.md#A" if it's a cross-file reference

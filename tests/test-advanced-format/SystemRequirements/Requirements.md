@@ -22,3 +22,18 @@ The system shall implement a two-pass validation architecture for comprehensive 
 #### Relations
   * derivedFrom: #requirements-processing
   * satisfiedBy: ../core/src/graph_registry.rs
+
+---
+
+### Path Resolution Testing
+
+This requirement tests various absolute path conversions from a subfolder.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [../UserStories.md#managing-mbse-models](/UserStories.md#managing-mbse-models)
+  * trace: [../MOEs.md#moe_ua](/MOEs.md#moe_ua)
+  * verifiedBy: [../Verifications/Tests.md#format-test](/Verifications/Tests.md#format-test)
+  * satisfiedBy: /core/src/parser.rs

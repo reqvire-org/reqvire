@@ -24,3 +24,16 @@ This test verifies validation capabilities.
 
 #### Relations
   * verify: ../SystemRequirements/Requirements.md#validation-framework
+
+---
+
+### Absolute Path Verification
+
+This verification uses absolute paths to rs files.
+
+#### Metadata
+  * type: verification
+
+#### Relations
+  * verify: [../SystemRequirements/Requirements.md#path-resolution-testing](/SystemRequirements/Requirements.md#path-resolution-testing)
+  * satisfiedBy: /core/src/element.rs

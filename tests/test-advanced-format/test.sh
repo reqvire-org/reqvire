@@ -3,27 +3,24 @@
 # Test: Format Command Requirements Verification
 # This test verifies the format command requirements from SystemRequirements and UserRequirements
 
-set -e
+#set -e
 
 # Use the test directory provided by run_tests.sh
 cd "$TEST_DIR"
 
-# Copy original files to backup, then work on originals
-# This ensures clean state for each test run
-cp UserStories.md UserStories.md.original
-cp -r SystemRequirements SystemRequirements.original
-cp -r Verifications Verifications.original
-cp MOEs.md MOEs.md.original
+# No need to backup files - we're already in a temporary directory
 
 # Use the reqvire binary provided by test runner
 REQVIRE="$REQVIRE_BIN"
 
 # Test 1: Requirement - System shall provide format command and dry-run functionality
+echo "Starting test..." > test_results.log
 "$REQVIRE" format --dry-run > dry_run_output.txt 2>&1
 DRY_RUN_EXIT_CODE=$?
 
 if [ $DRY_RUN_EXIT_CODE -ne 0 ]; then
-    echo "FAIL: Format command failed with exit code $DRY_RUN_EXIT_CODE"
+    echo "FAIL: Format command failed with exit code $DRY_RUN_EXIT_CODE" >> test_results.log
+    cat dry_run_output.txt >> test_results.log
     exit 1
 fi
 
@@ -35,8 +32,20 @@ EXPECTED_LINK_CONVERSION="\[MOE_UA\](MOEs.md#moe_ua)"
 EXPECTED_SIMPLE_ID_CONVERSION="\[Requirements Processing\](SystemRequirements/Requirements.md#requirements-processing)"
 EXPECTED_SEPARATOR_ADDITION="\+.*---"
 
+# Test absolute path conversion from subfolder to root
+EXPECTED_SUBFOLDER_TO_ROOT="\[Managing MBSE Models\](../UserStories.md#managing-mbse-models)"
+# Test absolute path conversion from subfolder to another subfolder
+EXPECTED_SUBFOLDER_TO_SUBFOLDER="\[Format Test\](../Verifications/Tests.md#format-test)"
+# Test absolute path conversion to internal file (from SystemRequirements subfolder)
+EXPECTED_ABSOLUTE_INTERNAL_PATH="../core/src/parser.rs"
+# Test absolute path from verification in subfolder to rs file (from Verifications subfolder)
+EXPECTED_VERIFICATION_ABSOLUTE_PATH="../core/src/element.rs"
+
 if ! grep -q "$EXPECTED_LINK_CONVERSION" dry_run_clean.txt; then
-    echo "FAIL: Dry run does not show absolute link conversion to relative"
+    echo "FAIL: Dry run does not show absolute link conversion to relative" >> test_results.log
+    echo "Expected: $EXPECTED_LINK_CONVERSION" >> test_results.log
+    echo "Dry run output:" >> test_results.log
+    cat dry_run_clean.txt >> test_results.log
     exit 1
 fi
 
@@ -47,6 +56,26 @@ fi
 
 if ! grep -q "$EXPECTED_SEPARATOR_ADDITION" dry_run_clean.txt; then
     echo "FAIL: Dry run does not show separator addition"
+    exit 1
+fi
+
+if ! grep -q "$EXPECTED_SUBFOLDER_TO_ROOT" dry_run_clean.txt; then
+    echo "FAIL: Dry run does not show absolute path conversion from subfolder to root"
+    exit 1
+fi
+
+if ! grep -q "$EXPECTED_SUBFOLDER_TO_SUBFOLDER" dry_run_clean.txt; then
+    echo "FAIL: Dry run does not show absolute path conversion from subfolder to subfolder"
+    exit 1
+fi
+
+if ! grep -q "$EXPECTED_ABSOLUTE_INTERNAL_PATH" dry_run_clean.txt; then
+    echo "FAIL: Dry run does not show absolute internal path conversion"
+    exit 1
+fi
+
+if ! grep -q "$EXPECTED_VERIFICATION_ABSOLUTE_PATH" dry_run_clean.txt; then
+    echo "FAIL: Dry run does not show verification absolute path conversion"
     exit 1
 fi
 
@@ -78,6 +107,34 @@ fi
 # Test 3.3: Check that separators were added where missing
 if ! grep -A 4 "derive: \[Requirements Processing\]" UserStories.md | grep -q "^---$"; then
     echo "FAIL: Element separators not added"
+    exit 1
+fi
+
+# Test 3.3a: Check absolute path conversions in subfolders were applied
+EXPECTED_SUBFOLDER_TO_ROOT_APPLIED="\[Managing MBSE Models\](../UserStories.md#managing-mbse-models)"
+if ! grep -q "$EXPECTED_SUBFOLDER_TO_ROOT_APPLIED" SystemRequirements/Requirements.md; then
+    echo "FAIL: Absolute path from subfolder to root not converted correctly"
+    exit 1
+fi
+
+# Test 3.3b: Check subfolder to subfolder path conversions
+EXPECTED_SUBFOLDER_TO_SUBFOLDER_APPLIED="\[Format Test\](../Verifications/Tests.md#format-test)"
+if ! grep -q "$EXPECTED_SUBFOLDER_TO_SUBFOLDER_APPLIED" SystemRequirements/Requirements.md; then
+    echo "FAIL: Absolute path from subfolder to subfolder not converted correctly"
+    exit 1
+fi
+
+# Test 3.3c: Check absolute internal path conversions
+EXPECTED_ABSOLUTE_INTERNAL_PATH_APPLIED="../core/src/parser.rs"
+if ! grep -q "$EXPECTED_ABSOLUTE_INTERNAL_PATH_APPLIED" SystemRequirements/Requirements.md; then
+    echo "FAIL: Absolute internal path not converted correctly"
+    exit 1
+fi
+
+# Test 3.3d: Check verification absolute path conversions
+EXPECTED_VERIFICATION_ABSOLUTE_PATH_APPLIED="../core/src/element.rs"
+if ! grep -q "$EXPECTED_VERIFICATION_ABSOLUTE_PATH_APPLIED" Verifications/Tests.md; then
+    echo "FAIL: Verification absolute path not converted correctly"
     exit 1
 fi
 
@@ -161,8 +218,4 @@ if grep -A 20 "UserStories.md" dry_run_clean.txt | grep -E "^  [0-9]+ \+" | head
     fi
 fi
 
-# Clean up: Restore original files for next run
-mv UserStories.md.original UserStories.md
-mv SystemRequirements.original SystemRequirements
-mv Verifications.original Verifications
-mv MOEs.md.original MOEs.md
+# No cleanup needed - temporary directory will be deleted
