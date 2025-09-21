@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![Reqvire Logo](doc/logo.png)
+<img src="doc/logo.png" alt="Reqvire Logo" width="200">
 
 **The AI-Native Requirements As A Code framework for Modern Engineering Teams**
 
