@@ -13,19 +13,18 @@ graph LR;
   b74eec7ed767e7c["Align with Industry Standards"];
   class b74eec7ed767e7c requirement;
   click b74eec7ed767e7c "MissionRequirements.md#align-with-industry-standards";
-  e9ad540a6411a0fc["MOEs.md/MOE_CE"];
-  class e9ad540a6411a0fc requirement;
-  click e9ad540a6411a0fc "MOEs.md#moe_ce";
-  b74eec7ed767e7c -.->|deriveReqT| e9ad540a6411a0fc;
   80166c5161b33956["Promote Automation and Efficiency"];
   class 80166c5161b33956 requirement;
   click 80166c5161b33956 "MissionRequirements.md#promote-automation-and-efficiency";
-  2c5f30f14e792200["MOEs.md/MOE_UA"];
+  2c5f30f14e792200["MOE_UA"];
   class 2c5f30f14e792200 requirement;
   click 2c5f30f14e792200 "MOEs.md#moe_ua";
-  80166c5161b33956 -.->|deriveReqT| 2c5f30f14e792200;
+  2c5f30f14e792200 -.->|deriveReqT| 80166c5161b33956;
+  e9ad540a6411a0fc["MOE_CE"];
+  class e9ad540a6411a0fc requirement;
+  click e9ad540a6411a0fc "MOEs.md#moe_ce";
+  e9ad540a6411a0fc -.->|deriveReqT| b74eec7ed767e7c;
 ```
-
 ---
 
 ### Align with Industry Standards

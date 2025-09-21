@@ -266,12 +266,11 @@ fn build_summary(
         };
 
         let rels: Vec<RelationSummary> = elem.relations.iter()
-            .filter(|relation| relation.relation_type.direction == relation::RelationDirection::Forward)        
             .map(|relation| {
                 let (tgt, lt) = match &relation.target.link {
                     relation::LinkType::Identifier(id)   => (id.clone(), "identifier".to_string()),
                     relation::LinkType::ExternalUrl(url) => (url.clone(), "external-url".to_string()),
-                    relation::LinkType::InternalPath(path) => (path.to_string_lossy().to_string(), "internal-path".to_string()),                    
+                    relation::LinkType::InternalPath(path) => (path.to_string_lossy().to_string(), "internal-path".to_string()),
                 };
                 RelationSummary {
                     relation_type: relation.relation_type.name.to_string(),

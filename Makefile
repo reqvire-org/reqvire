@@ -10,7 +10,7 @@ define update_version
 	sed -i 's/^version = ".*"/version = "$(1)"/' $(CARGO_TOML)
 endef
 
-.PHONY: create_tag update-patch update-minor update-major prepare-release release
+.PHONY: create_tag update-patch update-minor update-major prepare-release release release-patch release-minor release-major
 
 # Version update targets
 update-patch:
@@ -61,18 +61,31 @@ version-commit: prepare-release
 	@echo "   2. Merge PR to get version into main"
 	@echo "   3. Run 'make release' to trigger auto-tagging"
 
-# Complete release process
-release: prepare-release
-	@echo "Creating release..."
+# Release: create tag directly from main (simplified workflow)
+release:
+	@echo "Creating release from main branch..."
 	$(eval VERSION := $(call get_version))
-	$(eval BRANCH := $(shell git branch --show-current))
-	git add Cargo.toml Cargo.lock
-	git commit -m "Release version $(VERSION)"
+	$(eval CURRENT_BRANCH := $(shell git branch --show-current))
+	@if [ "$(CURRENT_BRANCH)" != "main" ]; then \
+		echo "ERROR: Release must be run from main branch. Current branch: $(CURRENT_BRANCH)"; \
+		echo "Switch to main: git checkout main && git pull origin main"; \
+		exit 1; \
+	fi
+	@echo "Checking if working directory is clean..."
+	@if ! git diff-index --quiet HEAD --; then \
+		echo "ERROR: Working directory has uncommitted changes. Please commit or stash them."; \
+		exit 1; \
+	fi
+	@echo "Verifying version $(VERSION) is ready for release..."
+	@echo "Building and testing to ensure stability..."
+	cargo build --release
+	cargo test
+	@echo "Creating release tag v$(VERSION)..."
 	git tag -a v$(VERSION) -m "Release version v$(VERSION)"
-	git push origin $(BRANCH)
 	git push origin v$(VERSION)
-	@echo "Release v$(VERSION) completed!"
-	@echo "GitHub Actions will build and publish the release"
+	@echo "✅ Release v$(VERSION) completed!"
+	@echo "🚀 GitHub Actions will build and publish the release"
+	@echo "📝 View release: https://github.com/Reqvire/reqvire/releases/tag/v$(VERSION)"
 
 # Manual tag creation (backup method)
 release-tag:
@@ -94,5 +107,84 @@ create_tag:
 	@echo "New version: $(VERSION)"
 	git tag -a v$(VERSION) -m "Release version v$(VERSION)"
 	git push origin v$(VERSION)
+
+# Automated release preparation (creates branch, updates version, commits, creates PR)
+release-patch:
+	@echo "🚀 Starting automated patch release process..."
+	$(eval CURRENT_VERSION := $(call get_version))
+	$(eval NEW_VERSION := $(shell echo $(CURRENT_VERSION) | awk -F. '{$$3=$$3+1} 1' OFS=.))
+	$(eval BRANCH_NAME := release/v$(NEW_VERSION))
+	@echo "Creating release branch: $(BRANCH_NAME)"
+	git checkout -b $(BRANCH_NAME)
+	@echo "Updating version from $(CURRENT_VERSION) to $(NEW_VERSION)..."
+	$(call update_version,$(NEW_VERSION))
+	@$(MAKE) version-commit
+	@echo "Creating pull request..."
+	@if command -v gh >/dev/null 2>&1; then \
+		gh pr create --base main --head $(BRANCH_NAME) \
+			--title "Update version to v$(NEW_VERSION)" \
+			--body "Automated version bump for release v$(NEW_VERSION)"; \
+		echo "✅ Pull request created successfully!"; \
+		echo "📝 Next steps:"; \
+		echo "   1. Review and merge the PR"; \
+		echo "   2. Run 'git checkout main && git pull origin main'"; \
+		echo "   3. Run 'make release' to create the tag and trigger automated release"; \
+	else \
+		echo "⚠️  GitHub CLI (gh) not found. Please create PR manually:"; \
+		echo "   Branch: $(BRANCH_NAME) → main"; \
+		echo "   Title: Update version to v$(NEW_VERSION)"; \
+	fi
+
+release-minor:
+	@echo "🚀 Starting automated minor release process..."
+	$(eval CURRENT_VERSION := $(call get_version))
+	$(eval NEW_VERSION := $(shell echo $(CURRENT_VERSION) | awk -F. '{$$2=$$2+1; $$3=0} 1' OFS=.))
+	$(eval BRANCH_NAME := release/v$(NEW_VERSION))
+	@echo "Creating release branch: $(BRANCH_NAME)"
+	git checkout -b $(BRANCH_NAME)
+	@echo "Updating version from $(CURRENT_VERSION) to $(NEW_VERSION)..."
+	$(call update_version,$(NEW_VERSION))
+	@$(MAKE) version-commit
+	@echo "Creating pull request..."
+	@if command -v gh >/dev/null 2>&1; then \
+		gh pr create --base main --head $(BRANCH_NAME) \
+			--title "Update version to v$(NEW_VERSION)" \
+			--body "Automated version bump for release v$(NEW_VERSION)"; \
+		echo "✅ Pull request created successfully!"; \
+		echo "📝 Next steps:"; \
+		echo "   1. Review and merge the PR"; \
+		echo "   2. Run 'git checkout main && git pull origin main'"; \
+		echo "   3. Run 'make release' to create the tag and trigger automated release"; \
+	else \
+		echo "⚠️  GitHub CLI (gh) not found. Please create PR manually:"; \
+		echo "   Branch: $(BRANCH_NAME) → main"; \
+		echo "   Title: Update version to v$(NEW_VERSION)"; \
+	fi
+
+release-major:
+	@echo "🚀 Starting automated major release process..."
+	$(eval CURRENT_VERSION := $(call get_version))
+	$(eval NEW_VERSION := $(shell echo $(CURRENT_VERSION) | awk -F. '{$$1=$$1+1; $$2=0; $$3=0} 1' OFS=.))
+	$(eval BRANCH_NAME := release/v$(NEW_VERSION))
+	@echo "Creating release branch: $(BRANCH_NAME)"
+	git checkout -b $(BRANCH_NAME)
+	@echo "Updating version from $(CURRENT_VERSION) to $(NEW_VERSION)..."
+	$(call update_version,$(NEW_VERSION))
+	@$(MAKE) version-commit
+	@echo "Creating pull request..."
+	@if command -v gh >/dev/null 2>&1; then \
+		gh pr create --base main --head $(BRANCH_NAME) \
+			--title "Update version to v$(NEW_VERSION)" \
+			--body "Automated version bump for release v$(NEW_VERSION)"; \
+		echo "✅ Pull request created successfully!"; \
+		echo "📝 Next steps:"; \
+		echo "   1. Review and merge the PR"; \
+		echo "   2. Run 'git checkout main && git pull origin main'"; \
+		echo "   3. Run 'make release' to create the tag and trigger automated release"; \
+	else \
+		echo "⚠️  GitHub CLI (gh) not found. Please create PR manually:"; \
+		echo "   Branch: $(BRANCH_NAME) → main"; \
+		echo "   Title: Update version to v$(NEW_VERSION)"; \
+	fi
 
 

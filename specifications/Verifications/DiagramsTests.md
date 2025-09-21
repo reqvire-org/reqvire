@@ -11,38 +11,81 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
+  6a6973ecb2f20ee3["Remove Generated Diagrams Verification"];
+  class 6a6973ecb2f20ee3 verification;
+  click 6a6973ecb2f20ee3 "DiagramsTests.md#remove-generated-diagrams-verification";
+  af81a7b6d75c2363["tests/test-remove-diagrams/test.sh"];
+  class af81a7b6d75c2363 default;
+  click af81a7b6d75c2363 "../../tests/test-remove-diagrams/test.sh";
+  6a6973ecb2f20ee3 -->|satisfiedBy| af81a7b6d75c2363;
   2d2cf67bb8070da8["Diagram Generation Test"];
   class 2d2cf67bb8070da8 verification;
   click 2d2cf67bb8070da8 "DiagramsTests.md#diagram-generation-test";
-  98a581084d5542fa["UserRequirements.md/Automate Diagram Generation"];
-  class 98a581084d5542fa requirement;
-  click 98a581084d5542fa "../UserRequirements.md#automate-diagram-generation";
-  2d2cf67bb8070da8 -.->|verifies| 98a581084d5542fa;
   3df49fd1a91c3db7["tests/test-diagram-generation/test.sh"];
   class 3df49fd1a91c3db7 default;
   click 3df49fd1a91c3db7 "../../tests/test-diagram-generation/test.sh";
-  3df49fd1a91c3db7 -->|satisfies| 2d2cf67bb8070da8;
-  de8ab093f22a5cd7["Visualize Model Relationships Verification"];
-  class de8ab093f22a5cd7 verification;
-  click de8ab093f22a5cd7 "DiagramsTests.md#visualize-model-relationships-verification";
-  de8ab093f22a5cd7 -.->|verifies| 98a581084d5542fa;
-  3df49fd1a91c3db7["tests/test-diagram-generation/test.sh"];
-  class 3df49fd1a91c3db7 default;
-  click 3df49fd1a91c3db7 "../../tests/test-diagram-generation/test.sh";
-  3df49fd1a91c3db7 -->|satisfies| de8ab093f22a5cd7;
+  2d2cf67bb8070da8 -->|satisfiedBy| 3df49fd1a91c3db7;
   f8849dfe948d04fa["Automated Diagram Generation on PR Merge Verification"];
   class f8849dfe948d04fa verification;
   click f8849dfe948d04fa "DiagramsTests.md#automated-diagram-generation-on-pr-merge-verification";
-  3e3df7ad427a88fa["SystemRequirements/Requirements.md/Automated Diagram Generation on PR Merge"];
-  class 3e3df7ad427a88fa requirement;
-  click 3e3df7ad427a88fa "../SystemRequirements/Requirements.md#automated-diagram-generation-on-pr-merge";
-  f8849dfe948d04fa -.->|verifies| 3e3df7ad427a88fa;
   98af8a1cf9c86822[".github/workflows/generate_diagrams.yml"];
   class 98af8a1cf9c86822 default;
   click 98af8a1cf9c86822 "../../.github/workflows/generate_diagrams.yml";
-  98af8a1cf9c86822 -->|satisfies| f8849dfe948d04fa;
+  f8849dfe948d04fa -->|satisfiedBy| 98af8a1cf9c86822;
+  ba2fd3fb7c42cdb3["Diagram Relation Filtering Verification"];
+  class ba2fd3fb7c42cdb3 verification;
+  click ba2fd3fb7c42cdb3 "DiagramsTests.md#diagram-relation-filtering-verification";
+  f6a73030d877fc0f["tests/test-diagram-filtering/test.sh"];
+  class f6a73030d877fc0f default;
+  click f6a73030d877fc0f "../../tests/test-diagram-filtering/test.sh";
+  ba2fd3fb7c42cdb3 -->|satisfiedBy| f6a73030d877fc0f;
+  de8ab093f22a5cd7["Visualize Model Relationships Verification"];
+  class de8ab093f22a5cd7 verification;
+  click de8ab093f22a5cd7 "DiagramsTests.md#visualize-model-relationships-verification";
+  3df49fd1a91c3db7["tests/test-diagram-generation/test.sh"];
+  class 3df49fd1a91c3db7 default;
+  click 3df49fd1a91c3db7 "../../tests/test-diagram-generation/test.sh";
+  de8ab093f22a5cd7 -->|satisfiedBy| 3df49fd1a91c3db7;
+  98a581084d5542fa["Automate Diagram Generation"];
+  class 98a581084d5542fa requirement;
+  click 98a581084d5542fa "../UserRequirements.md#automate-diagram-generation";
+  98a581084d5542fa -.->|verifiedBy| 2d2cf67bb8070da8;
+  3e3df7ad427a88fa["Automated Diagram Generation on PR Merge"];
+  class 3e3df7ad427a88fa requirement;
+  click 3e3df7ad427a88fa "../SystemRequirements/Requirements.md#automated-diagram-generation-on-pr-merge";
+  98a581084d5542fa -.->|deriveReqT| 3e3df7ad427a88fa;
+  98a581084d5542fa -.->|verifiedBy| de8ab093f22a5cd7;
+  8b2dd3bb2c44db94["Remove Generated Diagrams"];
+  class 8b2dd3bb2c44db94 requirement;
+  click 8b2dd3bb2c44db94 "../UserRequirements.md#remove-generated-diagrams";
+  8b2dd3bb2c44db94 -.->|verifiedBy| 6a6973ecb2f20ee3;
+  4ec753faad5a75f7["Diagram Removal"];
+  class 4ec753faad5a75f7 requirement;
+  click 4ec753faad5a75f7 "../SystemRequirements/Requirements.md#diagram-removal";
+  8b2dd3bb2c44db94 -.->|deriveReqT| 4ec753faad5a75f7;
+  98af8a1cf9c86822["generate_diagrams.yml"];
+  class 98af8a1cf9c86822 default;
+  click 98af8a1cf9c86822 "../../.github/workflows/generate_diagrams.yml";
+  3e3df7ad427a88fa -->|satisfiedBy| 98af8a1cf9c86822;
+  3e3df7ad427a88fa -.->|verifiedBy| f8849dfe948d04fa;
+  7f86e99e7804366a["Diagram Relation Filtering"];
+  class 7f86e99e7804366a requirement;
+  click 7f86e99e7804366a "../SystemRequirements/Requirements.md#diagram-relation-filtering";
+  dad7eeb932afdb92["diagrams.rs"];
+  class dad7eeb932afdb92 default;
+  click dad7eeb932afdb92 "../../core/src/diagrams.rs";
+  7f86e99e7804366a -->|satisfiedBy| dad7eeb932afdb92;
+  7f86e99e7804366a -.->|verifiedBy| ba2fd3fb7c42cdb3;
+  dad7eeb932afdb92["diagrams.rs"];
+  class dad7eeb932afdb92 default;
+  click dad7eeb932afdb92 "../../core/src/diagrams.rs";
+  4ec753faad5a75f7 -->|satisfiedBy| dad7eeb932afdb92;
+  4ec753faad5a75f7 -.->|verifiedBy| 6a6973ecb2f20ee3;
+  749eaee85cfd0a43["CLI Remove Diagrams Flag"];
+  class 749eaee85cfd0a43 requirement;
+  click 749eaee85cfd0a43 "../SystemRequirements/Requirements.md#cli-remove-diagrams-flag";
+  4ec753faad5a75f7 -->|refinedBy| 749eaee85cfd0a43;
 ```
-
 ---
 
 ### Diagram Generation Test
@@ -128,5 +171,67 @@ This test verifies that the system automatically generates and updates diagrams 
 #### Relations
   * verify: [SystemRequirements/Requirements.md/Automated Diagram Generation on PR Merge](../SystemRequirements/Requirements.md#automated-diagram-generation-on-pr-merge)
   * satisfiedBy: [.github/workflows/generate_diagrams.yml](../../.github/workflows/generate_diagrams.yml)
+
+---
+
+### Diagram Relation Filtering Verification
+
+This test verifies that the system correctly filters relations in diagram generation to render only forward relations while ensuring complete element hierarchy representation.
+
+#### Metadata
+  * type: test-verification
+
+#### Details
+
+##### Acceptance Criteria
+- System should render only relations from DIAGRAM_RELATIONS list to prevent duplicate arrows for bidirectional relationships
+- System should include parent elements in diagrams even when they belong to different sections
+- System should apply list-based rendering according to DIAGRAM_RELATIONS specification
+- Generated diagrams should not contain both relations from opposite pairs for the same logical relationship
+
+##### Test Criteria
+- Command exits with success (0) return code
+- Diagrams contain only relations specified in DIAGRAM_RELATIONS (e.g., `contain` but not `containedBy`)
+- Bidirectional relationships appear as single arrows using the relation specified in DIAGRAM_RELATIONS
+- Parent elements are included when child elements are in the section
+- No duplicate arrows exist for the same logical relationship
+- Arrow rendering follows the DIAGRAM_RELATIONS list specification
+
+#### Relations
+  * verify: [SystemRequirements/Requirements.md/Diagram Relation Filtering](../SystemRequirements/Requirements.md#diagram-relation-filtering)
+  * satisfiedBy: [tests/test-diagram-filtering/test.sh](../../tests/test-diagram-filtering/test.sh)
+
+---
+
+### Remove Generated Diagrams Verification
+
+This test verifies that the system can remove all generated mermaid diagrams while preserving custom user-created diagrams and respecting file exclusion patterns.
+
+#### Metadata
+  * type: test-verification
+
+#### Details
+
+##### Acceptance Criteria
+- System should remove all auto-generated mermaid diagrams that appear immediately after section headers
+- System should preserve custom mermaid diagrams that appear in other locations within the document
+- System should respect exclusion patterns defined in reqvire.yaml configuration
+- System should handle files with multiple diagrams correctly
+- System should work on files without any diagrams
+- System should maintain file structure and content except for diagram removal
+
+##### Test Criteria
+- Command exits with success (0) return code
+- Generated diagrams are removed from files (diagrams immediately after ## Section headers)
+- Custom diagrams are preserved (diagrams in other locations)
+- Files matching exclusion patterns are not processed for diagram removal
+- File structure remains intact except for diagram removal
+- Element text and relationships are preserved
+- Section headers and element headers are preserved
+
+#### Relations
+  * verify: [UserRequirements.md/Remove Generated Diagrams](../UserRequirements.md#remove-generated-diagrams)
+  * verify: [SystemRequirements/Requirements.md/Diagram Removal](../SystemRequirements/Requirements.md#diagram-removal)
+  * satisfiedBy: [tests/test-remove-diagrams/test.sh](../../tests/test-remove-diagrams/test.sh)
 
 ---

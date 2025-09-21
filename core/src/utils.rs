@@ -511,7 +511,6 @@ mod tests {
     fn test_to_relative_identifier_with_github_fragments() {
         git_commands::clear_git_cache();
         
-        use crate::utils::normalize_identifier;
 
         let temp_dir = TempDir::new().expect("Failed to create temp dir");
         let temp_path = temp_dir.path();
@@ -587,7 +586,6 @@ mod tests {
    
     #[test]
     fn test_to_relative_identifier_external_links() {
-        use crate::utils::normalize_identifier;
 
         let dummy_path = std::env::temp_dir(); // Doesn't matter for external links
 
@@ -799,15 +797,7 @@ mod tests {
             let (text, link) = parse_target(input);
             assert_eq!(text, expected_text, "Failed on input: {}", input);
 
-            match (&link, &expected_link) {
-                (actual, expected) => {
-                    assert_eq!(actual, expected, "Failed on Identifier input: {}", input);
-                }
-                (actual, expected) => {
-                    assert_eq!(actual, expected, "Failed on External URL input: {}", input);
-                }
-                _ => panic!("Mismatch for input: {}. Expected: {:?}, Got: {:?}", input, expected_link, link),
-            }
+            assert_eq!(link, expected_link, "Failed on input: {}", input);
         }
     }
     

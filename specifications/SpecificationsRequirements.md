@@ -9,68 +9,121 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  551906d5c51d91d9["Relation Types and behaviors"];
-  class 551906d5c51d91d9 requirement;
-  click 551906d5c51d91d9 "SpecificationsRequirements.md#relation-types-and-behaviors";
-  e61b7c1baa89bfc6["UserStories.md#Managing MBSE Models"];
-  class e61b7c1baa89bfc6 requirement;
-  click e61b7c1baa89bfc6 "UserStories.md#managing-mbse-models";
-  551906d5c51d91d9 -.->|deriveReqT| e61b7c1baa89bfc6;
-  cd2d5dab49985ca2["UserStories.md#ai-assisted-mbse-model-management"];
-  class cd2d5dab49985ca2 requirement;
-  click cd2d5dab49985ca2 "UserStories.md#ai-assisted-mbse-model-management";
-  551906d5c51d91d9 -.->|deriveReqT| cd2d5dab49985ca2;
-  9450d4313f47ef36["../core/src/relation.rs"];
-  class 9450d4313f47ef36 default;
-  click 9450d4313f47ef36 "../core/src/relation.rs";
-  9450d4313f47ef36 -->|satisfies| 551906d5c51d91d9;
-  ade67c27bc5d3bbd["Structure and Addressing in Markdown Documents"];
-  class ade67c27bc5d3bbd requirement;
-  click ade67c27bc5d3bbd "SpecificationsRequirements.md#structure-and-addressing-in-markdown-documents";
-  ade67c27bc5d3bbd -.->|deriveReqT| e61b7c1baa89bfc6;
-  b49d890e0bbe0a83["Structure of Markdown Documents"];
-  class b49d890e0bbe0a83 requirement;
-  click b49d890e0bbe0a83 "SpecificationsRequirements.md#structure-of-markdown-documents";
-  b49d890e0bbe0a83 -.->|deriveReqT| ade67c27bc5d3bbd;
-  b49d890e0bbe0a83 -.->|deriveReqT| cd2d5dab49985ca2;
-  9450d4313f47ef36["../core/src/relation.rs"];
-  class 9450d4313f47ef36 default;
-  click 9450d4313f47ef36 "../core/src/relation.rs";
-  9450d4313f47ef36 -->|satisfies| b49d890e0bbe0a83;
-  a814c4935e1a0449["../core/src/element.rs"];
-  class a814c4935e1a0449 default;
-  click a814c4935e1a0449 "../core/src/element.rs";
-  a814c4935e1a0449 -->|satisfies| b49d890e0bbe0a83;
-  398003c91b6b2cde["../core/src/subsection.rs"];
-  class 398003c91b6b2cde default;
-  click 398003c91b6b2cde "../core/src/subsection.rs";
-  398003c91b6b2cde -->|satisfies| b49d890e0bbe0a83;
-  f22d93285fcd7664["../core/src/parser.rs"];
-  class f22d93285fcd7664 default;
-  click f22d93285fcd7664 "../core/src/parser.rs";
-  f22d93285fcd7664 -->|satisfies| b49d890e0bbe0a83;
-  d50a859650933e55["../core/src/model.rs"];
-  class d50a859650933e55 default;
-  click d50a859650933e55 "../core/src/model.rs";
-  d50a859650933e55 -->|satisfies| b49d890e0bbe0a83;
   816c1e0b1de4dc53["Identifiers and Relations"];
   class 816c1e0b1de4dc53 requirement;
   click 816c1e0b1de4dc53 "SpecificationsRequirements.md#identifiers-and-relations";
-  816c1e0b1de4dc53 -.->|deriveReqT| ade67c27bc5d3bbd;
-  816c1e0b1de4dc53 -.->|deriveReqT| cd2d5dab49985ca2;
   9450d4313f47ef36["../core/src/relation.rs"];
   class 9450d4313f47ef36 default;
   click 9450d4313f47ef36 "../core/src/relation.rs";
-  9450d4313f47ef36 -->|satisfies| 816c1e0b1de4dc53;
+  816c1e0b1de4dc53 -->|satisfiedBy| 9450d4313f47ef36;
+  ade67c27bc5d3bbd["Structure and Addressing in Markdown Documents"];
+  class ade67c27bc5d3bbd requirement;
+  click ade67c27bc5d3bbd "SpecificationsRequirements.md#structure-and-addressing-in-markdown-documents";
+  ade67c27bc5d3bbd -.->|deriveReqT| 816c1e0b1de4dc53;
+  b49d890e0bbe0a83["Structure of Markdown Documents"];
+  class b49d890e0bbe0a83 requirement;
+  click b49d890e0bbe0a83 "SpecificationsRequirements.md#structure-of-markdown-documents";
+  ade67c27bc5d3bbd -.->|deriveReqT| b49d890e0bbe0a83;
+  9450d4313f47ef36["../core/src/relation.rs"];
+  class 9450d4313f47ef36 default;
+  click 9450d4313f47ef36 "../core/src/relation.rs";
+  b49d890e0bbe0a83 -->|satisfiedBy| 9450d4313f47ef36;
+  a814c4935e1a0449["../core/src/element.rs"];
+  class a814c4935e1a0449 default;
+  click a814c4935e1a0449 "../core/src/element.rs";
+  b49d890e0bbe0a83 -->|satisfiedBy| a814c4935e1a0449;
+  398003c91b6b2cde["../core/src/subsection.rs"];
+  class 398003c91b6b2cde default;
+  click 398003c91b6b2cde "../core/src/subsection.rs";
+  b49d890e0bbe0a83 -->|satisfiedBy| 398003c91b6b2cde;
+  f22d93285fcd7664["../core/src/parser.rs"];
+  class f22d93285fcd7664 default;
+  click f22d93285fcd7664 "../core/src/parser.rs";
+  b49d890e0bbe0a83 -->|satisfiedBy| f22d93285fcd7664;
+  d50a859650933e55["../core/src/model.rs"];
+  class d50a859650933e55 default;
+  click d50a859650933e55 "../core/src/model.rs";
+  b49d890e0bbe0a83 -->|satisfiedBy| d50a859650933e55;
+  551906d5c51d91d9["Relation Types and behaviors"];
+  class 551906d5c51d91d9 requirement;
+  click 551906d5c51d91d9 "SpecificationsRequirements.md#relation-types-and-behaviors";
+  9450d4313f47ef36["../core/src/relation.rs"];
+  class 9450d4313f47ef36 default;
+  click 9450d4313f47ef36 "../core/src/relation.rs";
+  551906d5c51d91d9 -->|satisfiedBy| 9450d4313f47ef36;
+  dc7a9bb1bbebc57f["Relation Element Type Validator"];
+  class dc7a9bb1bbebc57f requirement;
+  click dc7a9bb1bbebc57f "SystemRequirements/Requirements.md#relation-element-type-validator";
+  551906d5c51d91d9 -.->|deriveReqT| dc7a9bb1bbebc57f;
+  7f86e99e7804366a["Diagram Relation Filtering"];
+  class 7f86e99e7804366a requirement;
+  click 7f86e99e7804366a "SystemRequirements/Requirements.md#diagram-relation-filtering";
+  551906d5c51d91d9 -.->|deriveReqT| 7f86e99e7804366a;
   2054606d7574a553["Requirements Change Propagation"];
   class 2054606d7574a553 requirement;
   click 2054606d7574a553 "SpecificationsRequirements.md#requirements-change-propagation";
-  9933cac5853a8584["UserRequirements.md#Change Impact Analysis"];
+  4ba519ed09b81863["Change Impact Visualization"];
+  class 4ba519ed09b81863 requirement;
+  click 4ba519ed09b81863 "SystemRequirements/ChangeImpactPropagation.md#change-impact-visualization";
+  2054606d7574a553 -.->|deriveReqT| 4ba519ed09b81863;
+  c8d1020a3844532d["Change Impact Detection Algorithm"];
+  class c8d1020a3844532d requirement;
+  click c8d1020a3844532d "SystemRequirements/ChangeImpactPropagation.md#change-impact-detection-algorithm";
+  2054606d7574a553 -.->|deriveReqT| c8d1020a3844532d;
+  ced028f36159c967["Smart Filtering for Change Impact Reports"];
+  class ced028f36159c967 requirement;
+  click ced028f36159c967 "SystemRequirements/ChangeImpactPropagation.md#smart-filtering-for-change-impact-reports";
+  2054606d7574a553 -.->|deriveReqT| ced028f36159c967;
+  e61b7c1baa89bfc6["Managing MBSE Models"];
+  class e61b7c1baa89bfc6 requirement;
+  click e61b7c1baa89bfc6 "UserStories.md#managing-mbse-models";
+  2c5f30f14e792200["MOEs.md/MOE_UA"];
+  class 2c5f30f14e792200 requirement;
+  click 2c5f30f14e792200 "MOEs.md#moe_ua";
+  e61b7c1baa89bfc6 -.->|trace| 2c5f30f14e792200;
+  16b4b380c917deb1["Project Configuration with YAML"];
+  class 16b4b380c917deb1 requirement;
+  click 16b4b380c917deb1 "ManagingMbseModelsRequirements.md#project-configuration-with-yaml";
+  e61b7c1baa89bfc6 -.->|deriveReqT| 16b4b380c917deb1;
+  e61b7c1baa89bfc6 -.->|deriveReqT| ade67c27bc5d3bbd;
+  e61b7c1baa89bfc6 -.->|deriveReqT| 551906d5c51d91d9;
+  f0d721424636370e["Coexistence of Structured and Unstructured Documents"];
+  class f0d721424636370e requirement;
+  click f0d721424636370e "ManagingMbseModelsRequirements.md#coexistence-of-structured-and-unstructured-documents";
+  e61b7c1baa89bfc6 -.->|deriveReqT| f0d721424636370e;
+  649d72765b13e14f["Git Repository as Project Root"];
+  class 649d72765b13e14f requirement;
+  click 649d72765b13e14f "ManagingMbseModelsRequirements.md#git-repository-as-project-root";
+  e61b7c1baa89bfc6 -.->|deriveReqT| 649d72765b13e14f;
+  cd2d5dab49985ca2["AI-Assisted MBSE Model Management"];
+  class cd2d5dab49985ca2 requirement;
+  click cd2d5dab49985ca2 "UserStories.md#ai-assisted-mbse-model-management";
+  e61b7c1baa89bfc6 -->|refinedBy| cd2d5dab49985ca2;
+  d193d11c43776bec["Efficient Processing"];
+  class d193d11c43776bec requirement;
+  click d193d11c43776bec "ManagingMbseModelsRequirements.md#efficient-processing";
+  e61b7c1baa89bfc6 -.->|deriveReqT| d193d11c43776bec;
+  f28849d46c19af44["CLI interface"];
+  class f28849d46c19af44 requirement;
+  click f28849d46c19af44 "UserRequirements.md#cli-interface";
+  e61b7c1baa89bfc6 -.->|deriveReqT| f28849d46c19af44;
+  c2b6c74b77726ad9["Generate Documentation Index"];
+  class c2b6c74b77726ad9 requirement;
+  click c2b6c74b77726ad9 "UserRequirements.md#generate-documentation-index";
+  e61b7c1baa89bfc6 -.->|deriveReqT| c2b6c74b77726ad9;
+  cd2d5dab49985ca2 -.->|deriveReqT| 816c1e0b1de4dc53;
+  cd2d5dab49985ca2 -.->|deriveReqT| b49d890e0bbe0a83;
+  cd2d5dab49985ca2 -.->|deriveReqT| 551906d5c51d91d9;
+  9933cac5853a8584["Change Impact Analysis"];
   class 9933cac5853a8584 requirement;
   click 9933cac5853a8584 "UserRequirements.md#change-impact-analysis";
-  2054606d7574a553 -->|refines| 9933cac5853a8584;
+  b72d56e7e360fe6c["Change Impact Analysis Verification"];
+  class b72d56e7e360fe6c verification;
+  click b72d56e7e360fe6c "Verifications/ChangeImpactTests.md#change-impact-analysis-verification";
+  9933cac5853a8584 -.->|verifiedBy| b72d56e7e360fe6c;
+  9933cac5853a8584 -.->|deriveReqT| ced028f36159c967;
+  9933cac5853a8584 -->|refinedBy| 2054606d7574a553;
 ```
-
 ---
 
 ### Requirements Change Propagation
@@ -763,13 +816,16 @@ Every **element** in the system has unique identifier that depends on document i
 ## Identifier in markdown document can be of several types
 
 -**Identifier**
-  - An internal system element reference represented as a string identifier.
-  - **Example**: `"some-identifier"`
+  - An internal system element reference with fragment, pointing to specific elements within markdown documents.
+  - Used for element-to-element relations (e.g., `derivedFrom`, `verifiedBy`, `verify`)
+  - **Example**: `"file.md#element-name"`
 - **ExternalUrl**
   - An external URL represented as a string.
+  - Used for references to external resources
   - **Example**: `"https://example.com"`
 - **InternalPath**
-  - An internal filesystem file path
+  - An internal filesystem file path without fragment, pointing to implementation files.
+  - Used for satisfaction and traceability relations (e.g., `satisfiedBy`, `satisfy`, `trace`)
   - **Example**: `"../core/src/diagrams.rs"`
   
   
@@ -1021,13 +1077,16 @@ Identifiers are used in relations to reference files or specific elements within
    ```
    
 
-## Valiation rules (TODO: add mising rules)
+## Validation rules
 
 The system must validate relation usage according to these rules:
 - Only the relation types defined in this registry are allowed
-- Relations should connect elements of appropriate types (TODO: append spec with rules).
+- Relations should connect elements of appropriate types
 - Circular dependencies should be detected and reported
-- Duplicate relation entries of same type and target are not allowed.
+- Duplicate relation entries of same type and target are not allowed
+- **Identifier** targets (with fragments) must reference existing elements in markdown documents
+- **InternalPath** targets (without fragments) must reference existing files in the filesystem
+- **ExternalUrl** targets are not validated for existence
       
 
 </details>
@@ -1061,34 +1120,33 @@ A relation type in Reqvire:
 
 ## Core Concepts
 
-### Directionality
+### Relation Usage Categories
 
-Relations have three possible directionality patterns:
+Relations are categorized by their usage in different system functions:
 
-1. **Forward** - The relation flows from the source element to the target element 
-   - Example: `contain` points from a parent to a child element
-   
-2. **Backward** - The relation flows from the target element to the source element
-   - Example: `derivedFrom` points from a child back to its parent element
-   
-3. **Neutral** - The relation has no inherent direction
-   - Example: `trace` simply indicates a relationship without directionality
+1. **Diagram Rendering** - Relations that are rendered in visual diagrams to avoid duplicate arrows
+   - Only one relation from each opposite pair is shown (e.g., `contain` but not `containedBy`)
+   - Defined in DIAGRAM_RELATIONS list: `contain`, `derive`, `refinedBy`, `satisfiedBy`, `verifiedBy`, `trace`
+
+2. **Change Propagation** - Relations through which changes propagate to dependent elements
+   - When an element changes, impact flows through these relation types
+   - Defined in IMPACT_PROPAGATION_RELATIONS list: `contain`, `derive`, `refinedBy`, `satisfiedBy`, `verifiedBy`
 
 ## Comprehensive Relation Type Table
 
-| Relation Type | Direction | Opposite Type | Change Propagation | Description |
-|---------------|-----------|---------------|-------------------|-------------|
-| **containedBy** | Backward | contain | Parent → Child | Links a child element to its containing parent element |
-| **contain** | Forward | containedBy | Parent → Child | Links a parent element to the child elements it contains |
-| **derivedFrom** | Backward | derive | Parent → Child | Links a child element to the parent element it is derived from |
-| **derive** | Forward | derivedFrom | Parent → Child | Links a parent element to child elements derived from it |
-| **refine** | Forward | refinedBy | Parent → Child | Links a child element to parent elements that refines it |
-| **refinedBy** | Backward | refine | Parent → Child | Links a parent element to a child element it refines it with more details  |
-| **satisfiedBy** | Forward | satisfy | Requirement → Implementation | Links a requirement to elements that satisfy it |
-| **satisfy** | Backward | satisfiedBy | Requirement → Implementation | Links an implementation to the requirement it satisfies |
-| **verifiedBy** | Forward | verify | Requirement → Verification | Links a requirement to verification artifacts |
-| **verify** | Backward | verifiedBy | Requirement → Verification | Links a verification artifact to the requirement it verifies |
-| **trace** | Neutral | None | None (Documentation) | Establishes a trace relationship without change propagation |
+| Relation Type | Opposite Type | Diagram Rendering | Change Propagation | Description |
+|---------------|---------------|-------------------|-------------------|-------------|
+| **containedBy** | contain | No | No | Links a child element to its containing parent element |
+| **contain** | containedBy | Yes | Yes | Links a parent element to the child elements it contains |
+| **derivedFrom** | derive | No | No | Links a child element to the parent element it is derived from |
+| **derive** | derivedFrom | Yes | Yes | Links a parent element to child elements derived from it |
+| **refine** | refinedBy | No | No | Links a child element to parent elements that it refines |
+| **refinedBy** | refine | Yes | Yes | Links a parent element to a child element that refines it with more details |
+| **satisfiedBy** | satisfy | Yes | Yes | Links a requirement to elements that satisfy it |
+| **satisfy** | satisfiedBy | No | No | Links an implementation to the requirement it satisfies |
+| **verifiedBy** | verify | Yes | Yes | Links a requirement to verification artifacts |
+| **verify** | verifiedBy | No | No | Links a verification artifact to the requirement it verifies |
+| **trace** | None | Yes | No | Establishes a trace relationship without change propagation |
 
 ## Relation Categories
 

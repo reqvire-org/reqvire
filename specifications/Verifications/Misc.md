@@ -14,16 +14,19 @@ graph LR;
   14ef985b9a43174e["HTML Export Verification"];
   class 14ef985b9a43174e verification;
   click 14ef985b9a43174e "Misc.md#html-export-verification";
-  a4c40962cac85d0c["UserRequirements.md/Export HTML specifications"];
-  class a4c40962cac85d0c requirement;
-  click a4c40962cac85d0c "../UserRequirements.md#export-html-specifications";
-  14ef985b9a43174e -.->|verifies| a4c40962cac85d0c;
   8899a52ea9866d8b["tests/test-html-export/test.sh"];
   class 8899a52ea9866d8b default;
   click 8899a52ea9866d8b "../../tests/test-html-export/test.sh";
-  8899a52ea9866d8b -->|satisfies| 14ef985b9a43174e;
+  14ef985b9a43174e -->|satisfiedBy| 8899a52ea9866d8b;
+  a4c40962cac85d0c["Export HTML specifications"];
+  class a4c40962cac85d0c requirement;
+  click a4c40962cac85d0c "../UserRequirements.md#export-html-specifications";
+  a4c40962cac85d0c -.->|verifiedBy| 14ef985b9a43174e;
+  5deb63503bdf77c["HTML Export"];
+  class 5deb63503bdf77c requirement;
+  click 5deb63503bdf77c "../SystemRequirements/Requirements.md#html-export";
+  a4c40962cac85d0c -.->|deriveReqT| 5deb63503bdf77c;
 ```
-
 ---
 
 ### HTML Export Verification

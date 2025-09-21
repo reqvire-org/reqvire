@@ -29,15 +29,15 @@ graph TD;
 This is a test element with relations.
 
 #### Relations
-  * satisfies: [Element 2](#element-2)
-  * verifies: [Element 3](#element-3)
+  * satisfy: [Element 2](#element-2)
+  * verify: [Element 3](#element-3)
 
 ### Element 2
 
 This is another test element with relations.
 
 #### Relations
-  * tracedFrom: [Element 1](#element-1)
+  * trace: [Element 1](#element-1)
 
 ## Custom Mermaid Diagram Section
 

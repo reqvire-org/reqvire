@@ -148,42 +148,54 @@ impl ModelManager {
         log::debug!("Running relation validation...");
         let mut errors = Vec::new();
         let element_ids: Vec<String> = self.element_registry.elements.keys().cloned().collect();
-        let md_regex = Regex::new(r"\.md(?:#|$)").unwrap();
 
         for source_id in &element_ids {
             if let Some(source_element) = self.element_registry.elements.get(source_id) {
                 for relation in &source_element.relations {
-                    if relation.is_opposite{
+                    // Only process user-created relations to avoid infinite loops
+                    // Auto-generated opposite relations are handled by the opposite creation logic
+                    if !relation.user_created {
                         continue;
                     }
-                    if let relation::LinkType::Identifier(ref target_id) = relation.target.link {
-                        if !md_regex.is_match(target_id) {
-                            log::debug!("Skipping non-markdown target: {}", target_id);                        
-                            continue;
-                        }
 
-                        if excluded_filename_patterns.is_match(target_id) {
-                            log::debug!("Skipping excluded target: {}", target_id);
-                            continue;
-                        }
-
-                        match self.element_registry.get_element(target_id) {
-                            Err(_) => {
-                                // TODO: refactor this, it cannot really happen as it would be caught in parser with ReqvireError::InvalidIdentifier
-                                errors.push(ReqvireError::MissingRelationTarget(
-                                    format!("Element '{}' references missing target '{}'", source_element.identifier, target_id),
-                                ));
+                    match &relation.target.link {
+                        relation::LinkType::Identifier(ref target_id) => {
+                            // Only skip excluded targets, don't filter by file type
+                            if excluded_filename_patterns.is_match(target_id) {
+                                log::debug!("Skipping excluded target: {}", target_id);
+                                continue;
                             }
-                            Ok(target_element) => {
 
-                                if let Some(error) = self.validate_element_types(
-                                    relation.relation_type.name,
-                                    source_element,
-                                    target_element,
-                                ) {
-                                    errors.push(error);
+                            match self.element_registry.get_element(target_id) {
+                                Err(_) => {
+                                    errors.push(ReqvireError::MissingRelationTarget(
+                                        format!("Element '{}' references missing target '{}'", source_element.identifier, target_id),
+                                    ));
+                                }
+                                Ok(target_element) => {
+                                    if let Some(error) = self.validate_element_types(
+                                        relation.relation_type.name,
+                                        source_element,
+                                        target_element,
+                                    ) {
+                                        errors.push(error);
+                                    }
                                 }
                             }
+                        }
+                        relation::LinkType::InternalPath(ref file_path) => {
+                            // Validate file existence for InternalPath targets
+                            if !file_path.exists() {
+                                errors.push(ReqvireError::MissingRelationTarget(
+                                    format!("Element '{}' references missing target '{}'",
+                                        source_element.identifier,
+                                        file_path.to_string_lossy()),
+                                ));
+                            }
+                        }
+                        relation::LinkType::ExternalUrl(_) => {
+                            // Skip validation for external URLs as per specification
+                            log::debug!("Skipping external URL validation");
                         }
                     }
                 }
@@ -307,11 +319,12 @@ impl ModelManager {
         // Add this element to the current traversal path.
         path.push(element_id.clone());
 
-        // Process only forward relations (ignore backward ones, which should have already been inserted).
+        // Process only relations that could form cycles (hierarchical relations)
         for relation in &element.relations {
             if let relation::LinkType::Identifier(ref target_id) = relation.target.link {
-                // Only traverse forward relations.
-                if relation.relation_type.direction == relation::RelationDirection::Forward {
+                // Only traverse relations that could create circular dependencies
+                // These are typically hierarchical relations that establish parent-child relationships
+                if relation::IMPACT_PROPAGATION_RELATIONS.contains(&relation.relation_type.name) {
                     if let Ok(target_element) = self.element_registry.get_element(target_id) {
                         self.check_circular_dependencies(target_element, visited, path, errors);
                     }
@@ -329,26 +342,8 @@ impl ModelManager {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use std::path::PathBuf;
-    use globset::{Glob, GlobSet, GlobSetBuilder};
-    use crate::error::ReqvireError;
-    use crate::element_registry::ElementRegistry;
     use crate::linting::LintFix;
-    // Dummy implementation of utils::normalize_fragment for testing.
-    mod utils {
-        pub fn normalize_fragment(fragment: &str) -> String {
-            // For testing, simply lowercase and replace spaces with hyphens.
-            fragment.to_lowercase().replace(' ', "-")
-        }
-    }
-
-    // Dummy implementation of get_supported_relation_types in crate::relation
-    mod relation {
-        pub fn get_supported_relation_types() -> Vec<&'static str> {
-            vec!["derivedFrom", "satisfiedBy", "tracedFrom", "containedBy"]
-        }
-    }
 
     #[test]
     fn test_extract_path_and_fragment() {

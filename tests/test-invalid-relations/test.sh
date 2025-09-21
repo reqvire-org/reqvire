@@ -32,14 +32,44 @@ if ! [ $EXIT_CODE -eq 0 ]; then
   exit 1
 fi
 
-# Check for specific error messages - comprehensive validation now detects more error types
-EXPECTED_ERRORS="Circular dependency error,Duplicate element,Duplicate subsection,Incompatible element types for relation,Invalid metadata format,Invalid relation format,Missing parent relation,Missing relation target,Unsupported relation type"
-ACTUAL_ERRORS="$(echo "$OUTPUT" | jq -r '.errors[]' | sed -r 's/:.*//' | sort | paste -sd,)"
+# Check for specific error messages - be explicit about what we expect vs get
 
-if [[ "$ACTUAL_ERRORS" != "$EXPECTED_ERRORS" ]]; then
-  echo "❌ FAILED: Expected errors missing."
-  echo "Expected: $EXPECTED_ERRORS"
-  echo "Actual:   $ACTUAL_ERRORS"
+# Define specific errors we expect to see
+EXPECTED_ERRORS=(
+  "Circular dependency error:"
+  "Duplicate element:"
+  "Duplicate subsection:"
+  "Invalid metadata format:"
+  "Invalid relation format:"
+  "Missing parent relation:"
+  "Unsupported relation type:"
+  # Incompatible element types - we expect 3 instances
+  "Incompatible.*requirement-with-incompactible-element.*Requirement.*requirement-with-invalid-relation-type.*Requirement"
+  "Incompatible.*requirement-satisfiedby-requirement-invalid.*Requirement.*valid-requirement.*Requirement"
+  "Incompatible.*verification-satisfiedby-verification-invalid.*Verification.*valid-verification-with-correct-satisfiedby.*Verification"
+  # Missing relation targets - we expect 4 instances
+  "Missing.*requirement-with-missing-target.*NonExistentElement.md#missing-element"
+  "Missing.*requirement-with-missing-verifiedby-target.*NonExistentVerification.md#missing-verification"
+  "Missing.*verification-with-missing-satisfiedby-target.*non-existing-test-script.sh"
+  "Missing.*requirement-with-missing-satisfiedby-file.*non-existing-implementation.py"
+)
+
+MISSING_ERRORS=()
+
+for expected in "${EXPECTED_ERRORS[@]}"; do
+  if ! echo "$OUTPUT" | grep -q "$expected"; then
+    MISSING_ERRORS+=("❌ MISSING: $expected")
+  fi
+done
+
+if [ ${#MISSING_ERRORS[@]} -gt 0 ]; then
+  echo "❌ FAILED: Missing expected validation errors!"
+  for missing in "${MISSING_ERRORS[@]}"; do
+    echo "$missing"
+  done
+  echo ""
+  echo "ACTUAL ERRORS:"
+  echo "$OUTPUT" | jq -r '.errors[]'
   exit 1
 fi
 

@@ -62,7 +62,6 @@ pub fn find_absolute_links(content: &str, file_path: &Path) -> Vec<LintSuggestio
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::path::PathBuf;
     use tempfile::tempdir;
     use std::fs;
     use std::process::Command;

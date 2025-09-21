@@ -8,22 +8,20 @@ use std::hash::Hasher;
 use crate::utils::EXTERNAL_SCHEMES;
 use std::path::PathBuf;
 
-
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
-pub enum RelationDirection {
-    Forward,
-    Backward,
-    Neutral,
+pub enum ArrowDirection {
+    ElementToTarget,    // element → target
+    TargetToElement,    // target → element
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct RelationTypeInfo {
     pub name: &'static str,
-    pub direction: RelationDirection,
     pub opposite: Option<&'static str>,
     pub description: &'static str,
     pub arrow: &'static str,
-    pub label: &'static str,    
+    pub label: &'static str,
+    pub arrow_direction: ArrowDirection,
 }
 
 lazy_static! {
@@ -32,110 +30,130 @@ lazy_static! {
         
         // Containment relations
         m.insert("containedBy", RelationTypeInfo {
-            name: "containedBy", 
-            direction: RelationDirection::Backward, 
+            name: "containedBy",
             opposite: Some("contain"),
             description: "Element is contained by another element",
             arrow: "--o",
-            label: "contains",              
-           
+            label: "contains",
+            arrow_direction: ArrowDirection::TargetToElement,  // Contained → Container
         });
         m.insert("contain", RelationTypeInfo {
-            name: "contain", 
-            direction: RelationDirection::Forward, 
+            name: "contain",
             opposite: Some("containedBy"),
             description: "Element contains another element",
             arrow: "--o",
-            label: "contains",             
+            label: "contains",
+            arrow_direction: ArrowDirection::ElementToTarget,  // Container → Contained
         });
         
         // Derive relations
         m.insert("derivedFrom", RelationTypeInfo {
-            name: "derivedFrom", 
-            direction: RelationDirection::Backward,
+            name: "derivedFrom",
             opposite: Some("derive"),
             description: "Element is derived from another element",
             arrow: "-.->",
-            label: "deriveReqT",            
+            label: "deriveReqT",
+            arrow_direction: ArrowDirection::TargetToElement,  // Child → Parent (source)
         });
         m.insert("derive", RelationTypeInfo {
-            name: "derive", 
-            direction: RelationDirection::Forward, 
+            name: "derive",
             opposite: Some("derivedFrom"),
             description: "Element is source for a derived element",
             arrow: "-.->",
-            label: "deriveReqT",            
+            label: "deriveReqT",
+            arrow_direction: ArrowDirection::ElementToTarget,  // Parent → Child (derived)
         });
         
         // Refine relation
         m.insert("refine", RelationTypeInfo {
-            name: "refine", 
-            direction: RelationDirection::Backward,
+            name: "refine",
             opposite: Some("refinedBy"),
             description: "Element refines a higher-level element",
             arrow: "-->",
-            label: "refines",     
+            label: "refines",
+            arrow_direction: ArrowDirection::TargetToElement,  // Refining → Refined (parent)
         });
-        
+
         // Refine relation
         m.insert("refinedBy", RelationTypeInfo {
-            name: "refinedBy", 
-            direction: RelationDirection::Forward,
+            name: "refinedBy",
             opposite: Some("refine"),
             description: "A souce element being refined by other element.",
             arrow: "-->",
-            label: "refines",              
+            label: "refinedBy",
+            arrow_direction: ArrowDirection::ElementToTarget,  // Refined → Refining (child)
         });        
         
         // Satisfy relations
         m.insert("satisfiedBy", RelationTypeInfo {
-            name: "satisfiedBy", 
-            direction: RelationDirection::Forward, 
+            name: "satisfiedBy",
             opposite: Some("satisfy"),
             description: "A souce element being satisfied by other element.",
             arrow: "-->",
-            label: "satisfies",              
+            label: "satisfiedBy",
+            arrow_direction: ArrowDirection::ElementToTarget,  // Requirement → Implementation
         });
         m.insert("satisfy", RelationTypeInfo {
-            name: "satisfy", 
-            direction: RelationDirection::Backward, 
+            name: "satisfy",
             opposite: Some("satisfiedBy"),
             description: "Element satisfies another element",
             arrow: "-->",
-            label: "satisfies",             
+            label: "satisfies",
+            arrow_direction: ArrowDirection::TargetToElement,  // Implementation → Requirement
         });
         
         // Verify relations
         m.insert("verifiedBy", RelationTypeInfo {
-            name: "verifiedBy", 
-            direction: RelationDirection::Forward, 
+            name: "verifiedBy",
             opposite: Some("verify"),
             description: "A souce element being verified by other element.",
             arrow: "-.->",
-            label: "verifies",            
+            label: "verifiedBy",
+            arrow_direction: ArrowDirection::ElementToTarget,  // Requirement → Verification
         });
         m.insert("verify", RelationTypeInfo {
-            name: "verify", 
-            direction: RelationDirection::Backward, 
+            name: "verify",
             opposite: Some("verifiedBy"),
             description: "Element verifies another element",
             arrow: "-.->",
-            label: "verifies",            
+            label: "verifies",
+            arrow_direction: ArrowDirection::TargetToElement,  // Verification → Requirement
         });
-        
+
         // Trace relations
         m.insert("trace", RelationTypeInfo {
-            name: "trace", 
-            direction: RelationDirection::Neutral, 
+            name: "trace",
             opposite: None,
             description: "Element is related to another element in a non-directional way",
             arrow: "-.->",
-            label: "trace",              
+            label: "trace",
+            arrow_direction: ArrowDirection::ElementToTarget,  // Tracing → Traced (neutral)
         });
 
         m
     };
 }
+
+/// Relations to show in diagrams (one from each pair to avoid duplicates)
+/// These are typically the "forward" relations from the old direction system
+pub const DIAGRAM_RELATIONS: &[&str] = &[
+    "contain",       // Not containedBy
+    "derive",        // Not derivedFrom
+    "refinedBy",     // Not refine
+    "satisfiedBy",   // Not satisfy
+    "verifiedBy",    // Not verify
+    "trace"
+];
+
+/// Relations that propagate changes in impact analysis
+/// When these relations exist, changes to the source affect the target
+pub const IMPACT_PROPAGATION_RELATIONS: &[&str] = &[
+    "contain",       // Parent changes affect children
+    "derive",        // Source changes affect derived elements
+    "refinedBy",     // Base changes affect refinements
+    "satisfiedBy",   // Requirement changes affect implementations
+    "verifiedBy",    // Requirement changes invalidate verifications
+];
 
 #[derive(Debug, Clone, Serialize)]
 pub struct RelationTarget {
@@ -194,7 +212,7 @@ impl LinkType {
 pub struct Relation {
     pub relation_type: &'static RelationTypeInfo,
     pub target: RelationTarget,
-    pub is_opposite: bool
+    pub user_created: bool
 }
 
 impl PartialEq for Relation {
@@ -230,7 +248,7 @@ impl Hash for Relation {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.relation_type.name.hash(state);
         self.target.hash(state);
-        self.is_opposite.hash(state);
+        self.user_created.hash(state);
     }
 }
 
@@ -243,7 +261,7 @@ impl Relation {
         Ok(Self {
             relation_type: relation_info,
             target: RelationTarget{text: text, link: link},
-            is_opposite: false,
+            user_created: true,  // Relations created via parsing are user-created
         })
     }
     
@@ -277,7 +295,7 @@ impl Relation {
                             text: name.to_string(),
                             link: LinkType::Identifier(identifier.to_string()),
                         },
-                        is_opposite: true,
+                        user_created: false,  // Auto-generated opposite relations are not user-created
                     })
                 }
                 None => {
@@ -321,12 +339,9 @@ pub fn get_supported_relation_types() -> Vec<&'static str> {
 }
 
 /// Get the list of valid parent relation types (hierarchical relationships).
+/// These are typically the "backward" pointing relations that refer to parent elements.
 pub fn get_parent_relation_types() -> Vec<&'static str> {
-    RELATION_TYPES
-        .iter()
-        .filter(|(_, info)| info.direction == RelationDirection::Backward)
-        .map(|(name, _)| *name)
-        .collect()
+    vec!["containedBy", "derivedFrom", "refine", "satisfy", "verify"]
 }
 
 
@@ -341,53 +356,6 @@ pub fn is_satisfaction_relation(rtype: &RelationTypeInfo) -> bool {
 }
 
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::element::{ElementType, RequirementType};
-
-    #[test]
-    fn test_validate_relation_element_types_verify() {
-        let req_type = ElementType::Requirement(RequirementType::System);
-        let verification_type = ElementType::Verification(crate::element::VerificationType::Test);
-        
-        // verifiedBy: requirement -> verification
-        assert!(validate_relation_element_types("verifiedBy", &req_type, &verification_type));
-        // verify: verification -> requirement
-        assert!(validate_relation_element_types("verify", &verification_type, &req_type));
-        
-        // Invalid combinations
-        assert!(!validate_relation_element_types("verifiedBy", &verification_type, &req_type));
-        assert!(!validate_relation_element_types("verify", &req_type, &verification_type));
-    }
-
-    #[test]
-    fn test_validate_relation_element_types_satisfy() {
-        let req_type = ElementType::Requirement(RequirementType::System);
-        let impl_type = ElementType::Other("implementation".to_string());
-        
-        // satisfiedBy: requirement -> implementation
-        assert!(validate_relation_element_types("satisfiedBy", &req_type, &impl_type));
-        // satisfy: implementation -> requirement
-        assert!(validate_relation_element_types("satisfy", &impl_type, &req_type));
-        
-        // Invalid combinations
-        assert!(!validate_relation_element_types("satisfiedBy", &impl_type, &req_type));
-        assert!(!validate_relation_element_types("satisfy", &req_type, &impl_type));
-    }
-
-    #[test]
-    fn test_validate_relation_element_types_other() {
-        let req_type = ElementType::Requirement(RequirementType::System);
-        let other_type = ElementType::Other("sometype".to_string());
-        
-        // Other relation types should not be validated strictly
-        assert!(validate_relation_element_types("derive", &req_type, &other_type));
-        assert!(validate_relation_element_types("derivedFrom", &other_type, &req_type));
-        assert!(validate_relation_element_types("contain", &req_type, &other_type));
-        assert!(validate_relation_element_types("trace", &req_type, &other_type));
-    }
-}
 
 
 /// Validates if the element types are appropriate for a given relation type

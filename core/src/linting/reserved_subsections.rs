@@ -129,7 +129,7 @@ mod tests {
         // We expect a suggestion because there is a blank line and the bullet does not start with "  * ".
         assert_eq!(suggestions.len(), 1);
         let fix = &suggestions[0].fix;
-        if let LintFix::ReplacePattern { pattern, replacement } = fix {
+        if let LintFix::ReplacePattern { pattern: _, replacement } = fix {
             // The replacement should have the header, a newline, then a bullet line starting with "  * ".
             assert!(replacement.starts_with("#### Relations\n  * "));
         } else {
