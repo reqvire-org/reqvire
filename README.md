@@ -1,6 +1,6 @@
-# Reqvire
-
 <div align="center">
+
+# Reqvire
 
 <img src="doc/logo.png" alt="Reqvire Logo" width="200">
 
