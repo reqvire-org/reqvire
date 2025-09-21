@@ -224,6 +224,58 @@ pub const EXTERNAL_SCHEMES: &[&str] = &[
     "http://", "https://", "ftp://", "file://", "mailto:", "ssh://", "git://", "data:",
 ];
 
+/// Unified path resolution function that handles git-root-relative paths consistently
+///
+/// Rules:
+/// - Paths starting with '/' are treated as relative to git repository root
+/// - Other paths are treated as relative to base_path
+/// - External URLs are passed through unchanged
+fn resolve_path_to_absolute(path_part: &str, base_path: &PathBuf) -> Result<PathBuf, ReqvireError> {
+    // Check for external URLs first
+    if EXTERNAL_SCHEMES.iter().any(|scheme| path_part.starts_with(scheme)) {
+        return Err(ReqvireError::PathError("External URLs should not be resolved as paths".to_string()));
+    }
+
+    let p = Path::new(path_part);
+
+
+    if p.is_absolute() {
+        // For paths starting with '/', treat them as relative to git root
+        let git_root = crate::git_commands::get_git_root_dir()
+            .map_err(|e| ReqvireError::PathError(format!("Failed to get git root: {}", e)))?;
+        let relative_part = p.strip_prefix("/").unwrap_or(p);
+        Ok(git_root.join(relative_part))
+    } else {
+        // For relative paths, resolve relative to base_path
+        let joined_path = base_path.join(p);
+        // Try to canonicalize, fall back to logical resolution if it fails
+        match joined_path.canonicalize() {
+            Ok(canonical) => Ok(canonical),
+            Err(_) => {
+                // Logical path resolution for non-existent files
+                let mut resolved_path = base_path.clone();
+                for component in p.components() {
+                    match component {
+                        std::path::Component::Normal(_) => {
+                            resolved_path.push(component);
+                        }
+                        std::path::Component::ParentDir => {
+                            resolved_path.pop();
+                        }
+                        std::path::Component::CurDir => {
+                            // Skip current directory references
+                        }
+                        _ => {
+                            resolved_path.push(component);
+                        }
+                    }
+                }
+                Ok(resolved_path)
+            }
+        }
+    }
+}
+
 pub fn normalize_identifier(
     identifier: &str,
     base_path: &PathBuf,
@@ -232,54 +284,14 @@ pub fn normalize_identifier(
     let (path_part, fragment_opt) = extract_path_and_fragment(identifier);
 
     // 1) Passthrough external URIs
-    const EXTERNAL_SCHEMES: [&str; 3] = ["http://", "https://", "file://"];
     if EXTERNAL_SCHEMES.iter().any(|scheme| path_part.starts_with(scheme)) {
         return Ok(identifier.to_string());
     }
 
-    // 2) Build the absolute path to work with
-    let full_path = {
-        let p = Path::new(path_part);
-        if p.is_absolute() {
-            // For absolute paths, use them directly without canonicalization
-            // This allows cross-references to work even when files don't exist
-            p.to_path_buf()
-        } else {
-            let joined_path = base_path.join(p);
-            // Try to canonicalize relative path, fall back to logical path resolution if it fails
-            match joined_path.canonicalize() {
-                Ok(canonical) => canonical,
-                Err(_) => {
-                    // If canonicalization fails (e.g., file doesn't exist or is outside subdirectory),
-                    // resolve the path logically by normalizing . and .. components
-                    let mut resolved_path = base_path.clone();
-                    
-                    // Process the relative path components
-                    for component in p.components() {
-                        match component {
-                            std::path::Component::Normal(_) => {
-                                resolved_path.push(component);
-                            }
-                            std::path::Component::ParentDir => {
-                                resolved_path.pop();
-                            }
-                            std::path::Component::CurDir => {
-                                // Skip current directory references
-                            }
-                            _ => {
-                                // Handle other component types (like RootDir, Prefix)
-                                resolved_path.push(component);
-                            }
-                        }
-                    }
-                    
-                    resolved_path
-                }
-            }
-        }
-    };
+    // 2) Use unified path resolution
+    let full_path = resolve_path_to_absolute(path_part, base_path)?;
 
-    // 3) Find & canonicalize the Git root
+    // 3) Get git root for normalization
     let git_root = crate::git_commands::get_git_root_dir()
         .map_err(|e| ReqvireError::PathError(format!("Failed to get git root: {}", e)))?
         .canonicalize()
@@ -288,7 +300,7 @@ pub fn normalize_identifier(
             e
         )))?;
 
-    // 4) Strip the Git‐root prefix
+    // 4) Strip the Git‐root prefix to get relative path
     let rel = full_path
         .strip_prefix(&git_root)
         .map_err(|_| ReqvireError::PathError(format!(
@@ -299,16 +311,16 @@ pub fn normalize_identifier(
         .to_string_lossy()
         .into_owned();
 
-    // 5) Re-attach the fragment, if present    
-    let full = match fragment_opt {
+    // 5) Re-attach the fragment, if present
+    let final_result = match fragment_opt {
         Some(frag) => {
-            let fragment=normalize_fragment(&frag);
+            let fragment = normalize_fragment(&frag);
             format!("{}#{}", rel, fragment)
         }
         None => rel,
     };
-    
-    Ok(full)
+
+    Ok(final_result)
 }
 
 
@@ -403,15 +415,53 @@ pub fn parse_relation_line(line: &str) -> Result<(String, (String, String)), Req
 
 
 /// Parses a given string and creates a RelationTarget based on rules.
+/// Applies automatic normalization during parsing:
+/// - Converts non-link identifiers to proper markdown links with display text
 fn parse_target(input: &str) -> (String, String) {
     // 1. Check if the input is a Markdown-style link: `[text](link)`
     if let Some((text, link)) = extract_markdown_link(input) {
-        return (text,link)
+        // Path resolution happens later in normalize_identifier
+        return (text, link)
     }
 
-    // 2. If it's a simple identifier-style link (link only), use link as text also.
-    (input.to_string(),input.to_string())
+    // 2. Convert non-link identifier to proper markdown link
+    let (display_text, normalized_link) = normalize_nonlink_identifier(input);
+    (display_text, normalized_link)
+}
 
+
+/// Converts a non-link identifier to a proper markdown link with display text
+fn normalize_nonlink_identifier(input: &str) -> (String, String) {
+    let input = input.trim();
+
+    // Split the identifier into file part and optional fragment
+    let (file_part, fragment_opt) = extract_path_and_fragment(input);
+
+    // Normalize the fragment if present
+    let normalized_link = if let Some(frag) = fragment_opt {
+        let norm_frag = normalize_fragment(&frag);
+        if file_part.is_empty() {
+            // For fragment-only references, always include a leading '#' in the target
+            format!("#{}", norm_frag)
+        } else {
+            format!("{}#{}", file_part, norm_frag)
+        }
+    } else {
+        file_part.to_string()
+    };
+
+    // For display text: if it's a fragment-only reference, display it without the leading '#'
+    let display_text = if file_part.is_empty() {
+        if input.starts_with('#') {
+            input.trim_start_matches('#').to_string()
+        } else {
+            input.to_string()
+        }
+    } else {
+        input.to_string()
+    };
+
+    (display_text, normalized_link)
 }
 
 /// Extracts text and link from a Markdown-style link if present.
@@ -766,7 +816,7 @@ mod tests {
             ("https://github.com/user/repo", "https://github.com/user/repo", "https://github.com/user/repo"),
 
             // Plain Internal Identifier
-            ("some-identifier", "some-identifier", "some-identifier"),
+            ("some-identifier", "some-identifier", "#some-identifier"),
 
             // File URL (External)
             ("file:///usr/local/docs.txt", "file:///usr/local/docs.txt", "file:///usr/local/docs.txt"),
@@ -859,6 +909,54 @@ mod tests {
                 .expect("Should return relative path inside specifications folder");
         assert_eq!(result, "file.yaml", "Failed same-folder file check");
 
-   
+
     }
 }
+
+/// Diagram utility functions for consistent filtering across the codebase
+
+/// Constant marker used to identify auto-generated diagrams
+pub const REQVIRE_AUTOGENERATED_DIAGRAM_MARKER: &str = "REQVIRE-AUTOGENERATED-DIAGRAM";
+
+
+/// Removes only auto-generated mermaid diagrams from content
+/// Preserves user-created diagrams by checking for the auto-generation marker
+pub fn remove_autogenerated_diagrams(content: &str) -> String {
+    let mut result = String::new();
+    let mut lines = content.lines();
+
+    while let Some(line) = lines.next() {
+        if line.trim().starts_with("```mermaid") {
+            // Collect the entire mermaid block to check if it's auto-generated
+            let mut block_lines = vec![line];
+            let mut is_auto_generated = false;
+
+            // Read until the closing ```
+            while let Some(block_line) = lines.next() {
+                block_lines.push(block_line);
+
+                if block_line.contains(REQVIRE_AUTOGENERATED_DIAGRAM_MARKER) {
+                    is_auto_generated = true;
+                }
+
+                if block_line.trim() == "```" {
+                    break;
+                }
+            }
+
+            // Only include the block if it's NOT auto-generated (preserve user diagrams)
+            if !is_auto_generated {
+                for block_line in block_lines {
+                    result.push_str(block_line);
+                    result.push('\n');
+                }
+            }
+        } else {
+            result.push_str(line);
+            result.push('\n');
+        }
+    }
+
+    result
+}
+

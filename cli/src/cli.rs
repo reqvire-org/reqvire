@@ -4,7 +4,7 @@ use anyhow::Result;
 use log::{info};
 use serde::Serialize;
 use reqvire::error::ReqvireError;
-use reqvire::{linting, ModelManager};
+use reqvire::ModelManager;
 use reqvire::index_generator;
 use globset::GlobSet;
 use reqvire::reports;
@@ -15,6 +15,8 @@ use reqvire::git_commands;
 use reqvire::matrix_generator;
 use reqvire::reports::Filters;
 use reqvire::GraphRegistry;
+use reqvire::graph_registry::{Page, Section};
+use reqvire::element::Element;
 use std::collections::HashMap;
 use std::path::Path;
 
@@ -48,15 +50,15 @@ pub enum Commands {
         output: String,
     },
     
-    /// Enable linting to find potential improvements (non-blocking) By default, fixes will be applied automatically
-    #[clap(override_help = "Enable linting to find potential improvements (non-blocking) By default, fixes will be applied automatically\n\nLINT OPTIONS:\n      --dry-run  When linting, only show suggestions without applying fixes\n      --json     Output results in JSON format")]
-    Lint {
-        /// When linting, only show suggestions without applying fixes
-        #[clap(long, help_heading = "LINT OPTIONS")]
+    /// Format markdown files by applying automatic normalization and stylistic fixes
+    #[clap(override_help = "Format markdown files by applying automatic normalization and stylistic fixes\n\nFORMAT OPTIONS:\n      --dry-run  Show differences without applying changes\n      --json     Output results in JSON format")]
+    Format {
+        /// Show differences without applying changes
+        #[clap(long, help_heading = "FORMAT OPTIONS")]
         dry_run: bool,
-        
+
         /// Output results in JSON format
-        #[clap(long, help_heading = "LINT OPTIONS")]
+        #[clap(long, help_heading = "FORMAT OPTIONS")]
         json: bool,
     },
     
@@ -72,12 +74,6 @@ pub enum Commands {
         json: bool,
     },
 
-    /// Validate model
-    Validate {
-        /// Output results in JSON format
-        #[clap(long)]
-        json: bool,
-    },
                        
     /// Generate mermaid diagrams in markdown files showing requirements relationships The diagrams will be placed at the top of each requirements document
     GenerateDiagrams,
@@ -150,6 +146,10 @@ pub enum Commands {
     /// Interactive shell for GraphRegistry operations (undocumented)
     #[clap(hide = true)]
     Shell,
+
+    /// Single output stream for all pages, sections, and requirements (undocumented)
+    #[clap(hide = true)]
+    Sout,
 }
 
 impl Args {
@@ -274,6 +274,17 @@ fn print_validation_results(errors: &[ReqvireError], json_output: bool) {
     }
 }
 
+fn wants_json(args: &Args) -> bool {
+    match &args.command {
+        Some(Commands::Format { json, .. }) => *json,
+        Some(Commands::Traces { json, .. }) => *json,
+        Some(Commands::ModelSummary { json, .. }) => *json,
+        Some(Commands::ChangeImpact { json, .. }) => *json,
+        Some(Commands::CoverageReport { json }) => *json,
+        _ => false,
+    }
+}
+
 pub fn handle_command(
     args: Args,
     excluded_filename_patterns: &GlobSet,
@@ -288,29 +299,31 @@ pub fn handle_command(
         user_requirements_root_folder,
         excluded_filename_patterns
     );
-    
+
+    let json_output = wants_json(&args);
+
+
+    // Handle validation failures for all commands
+    match &parse_result {
+        Err(ReqvireError::ValidationError(errors)) => {
+            print_validation_results(errors, json_output);
+            return Ok(1);
+        }
+        Err(e) => {
+            eprintln!("❌ Parsing failed: {}", e);
+            return Ok(1);
+        }
+        Ok(_) => {
+            // No validation errors, proceed with command
+        }
+    }
+
     match args.command {
-        Some(Commands::Validate { json }) => {
-            match parse_result {
-                Ok(errors) => {
-                    if errors.is_empty() {
-                        println!("✅ Validation completed successfully with no errors.");
-                    } else {
-                        print_validation_results(&errors, json);
-                    }
-                    return Ok(0);
-                }
-                Err(e) => {
-                    eprintln!("❌ Validation failed: {}", e);
-                    return Ok(0);
-                }
-            }  
-        },
         Some(Commands::GenerateIndex) => {
             info!("Generating index.....");
             let index_output_path = PathBuf::from("output");
             let _index_context = index_generator::generate_readme_index(
-                &model_manager.element_registry, 
+                &model_manager.graph_registry, 
                     &index_output_path
                 ).map_err(|e| {
                     ReqvireError::ProcessError(format!("❌ Failed to generate README.md: {:?}", e))
@@ -322,19 +335,19 @@ pub fn handle_command(
             info!("Generating mermaid diagrams");
             // Only collect identifiers and process files to add diagrams
             // Skip validation checks for diagram generation mode
-            diagrams::process_diagrams(&model_manager.element_registry,diagram_direction,diagrams_with_blobs)?;
+            diagrams::process_diagrams(&model_manager.graph_registry,diagram_direction,diagrams_with_blobs)?;
 
             info!("Requirements diagrams updated in source files");
             return Ok(0);
         },
         Some(Commands::RemoveDiagrams) => {
             info!("Removing generated mermaid diagrams");
-            diagrams::remove_diagrams(&model_manager.element_registry)?;
+            diagrams::remove_diagrams(&model_manager.graph_registry)?;
             info!("Generated diagrams removed from source files");
             return Ok(0);
         },
-        Some(Commands::ModelSummary { 
-            json, 
+        Some(Commands::ModelSummary {
+            json,
             cypher,
             filter_file,
             filter_name,
@@ -342,7 +355,7 @@ pub fn handle_command(
             filter_type,
             filter_content,
             filter_is_not_verified,
-            filter_is_not_satisfied 
+            filter_is_not_satisfied
         }) => {
             let filters = Filters::new(
                 filter_file.as_deref(),
@@ -364,7 +377,7 @@ pub fn handle_command(
                 reports::SummaryOutputFormat::Text
             };
                
-            reports::print_registry_summary(&model_manager.element_registry,output_format, &filters);
+            reports::print_registry_summary(&model_manager.graph_registry,output_format, &filters);
             return Ok(0);        
         },
         Some(Commands::ChangeImpact { json, git_commit }) => {
@@ -380,8 +393,8 @@ pub fn handle_command(
             let _not_interested=refference_model_manager.parse_and_validate(Some(&git_commit), user_requirements_root_folder, excluded_filename_patterns);
                                     
             let report=change_impact::compute_change_impact(
-                &model_manager.element_registry, 
-                &refference_model_manager.element_registry
+                &model_manager.graph_registry, 
+                &refference_model_manager.graph_registry
             )
             .map_err(|e| ReqvireError::ProcessError(format!("❌ Failed to generate change impact report: {:?}", e)))?;
              
@@ -389,15 +402,48 @@ pub fn handle_command(
                 
             return Ok(0);
         },
-        Some(Commands::Lint { dry_run, json: _ }) => {
-            linting::run_linting(excluded_filename_patterns, dry_run)?;
+        Some(Commands::Format { dry_run, json: _ }) => {
+            let format_result = model_manager.graph_registry.format_files(dry_run)?;
+
+            if dry_run {
+                if format_result.diffs.is_empty() {
+                    println!("No formatting changes needed.");
+                } else {
+                    println!("Found {} file(s) with formatting changes:\n", format_result.diffs.len());
+                    for file_diff in &format_result.diffs {
+                        println!("📄 {}", file_diff.file_path);
+                        for line in &file_diff.lines {
+                            match line.color.as_str() {
+                                "green" => println!("  \x1b[32m{} {}\x1b[0m", line.prefix, line.content),
+                                "red" => println!("  \x1b[31m{} {}\x1b[0m", line.prefix, line.content),
+                                "context" => println!("  \x1b[37m{} {}\x1b[0m", line.prefix, line.content),
+                                "separator" => println!(""),
+                                _ => println!("  {} {}", line.prefix, line.content),
+                            }
+                        }
+                        println!();
+                        println!();
+                        println!();
+                    }
+                    println!("Run without --dry-run to apply these changes.");
+                }
+            } else {
+                if format_result.files_changed == 0 {
+                    println!("No files needed formatting.");
+                } else {
+                    println!("Formatted {} file(s):", format_result.files_changed);
+                    for file_diff in &format_result.diffs {
+                        println!("  ✅ {}", file_diff.file_path);
+                    }
+                }
+            }
             return Ok(0);
         },
         Some(Commands::Traces { json, svg }) => {
             let matrix_config = matrix_generator::MatrixConfig::default();
                 
             let matrix_output = reqvire::matrix_generator::generate_matrix(
-                &model_manager.element_registry,
+                &model_manager.graph_registry,
                 &matrix_config,
                 if json {
                     matrix_generator::MatrixFormat::Json
@@ -413,18 +459,22 @@ pub fn handle_command(
         },
         Some(Commands::Html { output }) => {
             let html_output_path = PathBuf::from(output);
-            let processed_count = export::export_model(&model_manager.element_registry, &html_output_path)?;
+            let processed_count = export::export_model(&model_manager.graph_registry, &html_output_path)?;
             info!("{} markdown files converted to HTML", processed_count);   
             
             return Ok(0);
         },
         Some(Commands::CoverageReport { json }) => {
-            let coverage_report = reports::generate_coverage_report(&model_manager.element_registry);
+            let coverage_report = reports::generate_coverage_report(&model_manager.graph_registry);
             coverage_report.print(json);
             return Ok(0);
         },
         Some(Commands::Shell) => {
-            run_shell(&model_manager)?;
+            run_shell(&mut model_manager)?;
+            return Ok(0);
+        },
+        Some(Commands::Sout) => {
+            run_sout(&model_manager.graph_registry)?;
             return Ok(0);
         },
         None => {
@@ -434,15 +484,103 @@ pub fn handle_command(
     }
 }
 
-fn run_shell(model_manager: &ModelManager) -> Result<(), ReqvireError> {
+fn run_sout(graph_registry: &GraphRegistry) -> Result<(), ReqvireError> {
+    use std::collections::BTreeMap;
+
+    // Collect all file paths from pages, sections, and elements
+    let mut file_map: BTreeMap<String, (Option<&Page>, Vec<&Section>, Vec<&Element>)> = BTreeMap::new();
+
+    // Collect pages
+    for (file_path, page) in &graph_registry.pages {
+        file_map.entry(file_path.clone()).or_default().0 = Some(page);
+    }
+
+    // Collect sections grouped by file
+    for (section_key, section) in &graph_registry.sections {
+        file_map.entry(section_key.file_path.clone()).or_default().1.push(section);
+    }
+
+    // Collect elements grouped by file
+    for element_node in graph_registry.nodes.values() {
+        let element = &element_node.element;
+        file_map.entry(element.file_path.clone()).or_default().2.push(element);
+    }
+
+    // Output content for each file in sorted order
+    for (file_path, (page, mut sections, mut elements)) in file_map {
+        println!("📄 {}", file_path);
+        println!();
+
+        // Output page content if exists
+        if let Some(page) = page {
+            if !page.frontmatter_content.trim().is_empty() {
+                println!("{}", page.frontmatter_content);
+                println!();
+            }
+        }
+
+        // Sort sections by section_order
+        sections.sort_by_key(|s| s.section_order);
+
+        // Output sections
+        for section in sections {
+            if !section.content.trim().is_empty() {
+                println!("{}", section.content);
+                println!();
+            }
+        }
+
+        // Sort elements by section_order_index for consistent ordering
+        elements.sort_by_key(|e| e.section_order_index);
+
+        // Output elements
+        for element in elements {
+            println!("### {}", element.name);
+            println!();
+            if !element.content.trim().is_empty() {
+                println!("{}", element.content);
+                println!();
+            }
+
+            // Output metadata if exists
+            if !element.metadata.is_empty() {
+                println!("#### Metadata");
+                for (key, value) in &element.metadata {
+                    println!("  * {}: {}", key, value);
+                }
+                println!();
+            }
+
+            // Output relations if exists
+            if !element.relations.is_empty() {
+                println!("#### Relations");
+                for relation in &element.relations {
+                    println!("  * {}: [{}]({})", relation.relation_type.name, relation.target.text, relation.target.link.as_str());
+                }
+                println!();
+            }
+
+            println!("---");
+            println!();
+        }
+
+        // Add separator between files
+        println!();
+        println!();
+    }
+
+    Ok(())
+}
+
+fn run_shell(model_manager: &mut ModelManager) -> Result<(), ReqvireError> {
     use std::io::{self, Write};
 
     println!("Reqvire Interactive Shell");
     println!("Type 'help' for available commands, 'exit' to quit");
     println!();
 
-    // Create a mutable graph registry from the model manager
-    let mut graph_registry = GraphRegistry::from_registry(&model_manager.element_registry);
+    // Use the existing graph registry from the model manager
+    let graph_registry = &mut model_manager.graph_registry;
 
     loop {
         print!("reqvire> ");
@@ -465,7 +603,7 @@ fn run_shell(model_manager: &ModelManager) -> Result<(), ReqvireError> {
                         print_shell_help();
                     }
                     _ => {
-                        if let Err(e) = process_shell_command(&mut graph_registry, input) {
+                        if let Err(e) = process_shell_command(graph_registry, input) {
                             eprintln!("Error: {}", e);
                         }
                     }
@@ -750,7 +888,7 @@ fn process_shell_command(graph_registry: &mut GraphRegistry, command: &str) -> R
     Ok(())
 }
 
-fn print_impact_tree(node: &reqvire::element_registry::ElementNode, depth: usize) {
+fn print_impact_tree(node: &reqvire::graph_registry::ElementNode, depth: usize) {
     let indent = "  ".repeat(depth);
     let element = &node.element;
 

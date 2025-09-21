@@ -1,0 +1,16 @@
+
+❌ 6 validation failed with error(s):
+
+  1. Invalid identifier: Failed to normalize identifier for 'Path Resolution Testing': Path error: `/core/src/parser.rs` is not inside git root `/mnt/Radni/reqvire` (file: Requirements.md, line 39)
+
+  2. Invalid identifier: Failed to normalize identifier for 'Path Resolution Testing': Path error: `/core/src/parser.rs` is not inside git root `/mnt/Radni/reqvire` (file: Requirements.md, line 39)
+
+  3. Invalid identifier: Failed to normalize identifier for 'Absolute Path Verification': Path error: `/core/src/element.rs` is not inside git root `/mnt/Radni/reqvire` (file: Tests.md, line 39)
+
+  4. Invalid identifier: Failed to normalize identifier for 'Path Resolution Testing': Path error: `/core/src/parser.rs` is not inside git root `/mnt/Radni/reqvire` (file: Requirements.md, line 39)
+
+  5. Invalid identifier: Failed to normalize identifier for 'Absolute Path Verification': Path error: `/core/src/element.rs` is not inside git root `/mnt/Radni/reqvire` (file: Tests.md, line 39)
+
+  6. Invalid identifier: Failed to normalize identifier for 'Absolute Path Verification': Path error: `/core/src/element.rs` is not inside git root `/mnt/Radni/reqvire` (file: Tests.md, line 39)
+
+
