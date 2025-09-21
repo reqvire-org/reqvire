@@ -224,6 +224,58 @@ pub const EXTERNAL_SCHEMES: &[&str] = &[
     "http://", "https://", "ftp://", "file://", "mailto:", "ssh://", "git://", "data:",
 ];
 
+/// Unified path resolution function that handles git-root-relative paths consistently
+///
+/// Rules:
+/// - Paths starting with '/' are treated as relative to git repository root
+/// - Other paths are treated as relative to base_path
+/// - External URLs are passed through unchanged
+fn resolve_path_to_absolute(path_part: &str, base_path: &PathBuf) -> Result<PathBuf, ReqvireError> {
+    // Check for external URLs first
+    if EXTERNAL_SCHEMES.iter().any(|scheme| path_part.starts_with(scheme)) {
+        return Err(ReqvireError::PathError("External URLs should not be resolved as paths".to_string()));
+    }
+
+    let p = Path::new(path_part);
+
+
+    if p.is_absolute() {
+        // For paths starting with '/', treat them as relative to git root
+        let git_root = crate::git_commands::get_git_root_dir()
+            .map_err(|e| ReqvireError::PathError(format!("Failed to get git root: {}", e)))?;
+        let relative_part = p.strip_prefix("/").unwrap_or(p);
+        Ok(git_root.join(relative_part))
+    } else {
+        // For relative paths, resolve relative to base_path
+        let joined_path = base_path.join(p);
+        // Try to canonicalize, fall back to logical resolution if it fails
+        match joined_path.canonicalize() {
+            Ok(canonical) => Ok(canonical),
+            Err(_) => {
+                // Logical path resolution for non-existent files
+                let mut resolved_path = base_path.clone();
+                for component in p.components() {
+                    match component {
+                        std::path::Component::Normal(_) => {
+                            resolved_path.push(component);
+                        }
+                        std::path::Component::ParentDir => {
+                            resolved_path.pop();
+                        }
+                        std::path::Component::CurDir => {
+                            // Skip current directory references
+                        }
+                        _ => {
+                            resolved_path.push(component);
+                        }
+                    }
+                }
+                Ok(resolved_path)
+            }
+        }
+    }
+}
+
 pub fn normalize_identifier(
     identifier: &str,
     base_path: &PathBuf,
@@ -232,54 +284,14 @@ pub fn normalize_identifier(
     let (path_part, fragment_opt) = extract_path_and_fragment(identifier);
 
     // 1) Passthrough external URIs
-    const EXTERNAL_SCHEMES: [&str; 3] = ["http://", "https://", "file://"];
     if EXTERNAL_SCHEMES.iter().any(|scheme| path_part.starts_with(scheme)) {
         return Ok(identifier.to_string());
     }
 
-    // 2) Build the absolute path to work with
-    let full_path = {
-        let p = Path::new(path_part);
-        if p.is_absolute() {
-            // For absolute paths, use them directly without canonicalization
-            // This allows cross-references to work even when files don't exist
-            p.to_path_buf()
-        } else {
-            let joined_path = base_path.join(p);
-            // Try to canonicalize relative path, fall back to logical path resolution if it fails
-            match joined_path.canonicalize() {
-                Ok(canonical) => canonical,
-                Err(_) => {
-                    // If canonicalization fails (e.g., file doesn't exist or is outside subdirectory),
-                    // resolve the path logically by normalizing . and .. components
-                    let mut resolved_path = base_path.clone();
-                    
-                    // Process the relative path components
-                    for component in p.components() {
-                        match component {
-                            std::path::Component::Normal(_) => {
-                                resolved_path.push(component);
-                            }
-                            std::path::Component::ParentDir => {
-                                resolved_path.pop();
-                            }
-                            std::path::Component::CurDir => {
-                                // Skip current directory references
-                            }
-                            _ => {
-                                // Handle other component types (like RootDir, Prefix)
-                                resolved_path.push(component);
-                            }
-                        }
-                    }
-                    
-                    resolved_path
-                }
-            }
-        }
-    };
+    // 2) Use unified path resolution
+    let full_path = resolve_path_to_absolute(path_part, base_path)?;
 
-    // 3) Find & canonicalize the Git root
+    // 3) Get git root for normalization
     let git_root = crate::git_commands::get_git_root_dir()
         .map_err(|e| ReqvireError::PathError(format!("Failed to get git root: {}", e)))?
         .canonicalize()
@@ -288,7 +300,7 @@ pub fn normalize_identifier(
             e
         )))?;
 
-    // 4) Strip the Git‐root prefix
+    // 4) Strip the Git‐root prefix to get relative path
     let rel = full_path
         .strip_prefix(&git_root)
         .map_err(|_| ReqvireError::PathError(format!(
@@ -299,16 +311,16 @@ pub fn normalize_identifier(
         .to_string_lossy()
         .into_owned();
 
-    // 5) Re-attach the fragment, if present    
-    let full = match fragment_opt {
+    // 5) Re-attach the fragment, if present
+    let final_result = match fragment_opt {
         Some(frag) => {
-            let fragment=normalize_fragment(&frag);
+            let fragment = normalize_fragment(&frag);
             format!("{}#{}", rel, fragment)
         }
         None => rel,
     };
-    
-    Ok(full)
+
+    Ok(final_result)
 }
 
 
@@ -405,13 +417,11 @@ pub fn parse_relation_line(line: &str) -> Result<(String, (String, String)), Req
 /// Parses a given string and creates a RelationTarget based on rules.
 /// Applies automatic normalization during parsing:
 /// - Converts non-link identifiers to proper markdown links with display text
-/// - Normalizes absolute paths to relative paths
 fn parse_target(input: &str) -> (String, String) {
     // 1. Check if the input is a Markdown-style link: `[text](link)`
     if let Some((text, link)) = extract_markdown_link(input) {
-        // Apply path normalization if the link is an absolute path
-        let normalized_link = normalize_link_path(&link);
-        return (text, normalized_link)
+        // Path resolution happens later in normalize_identifier
+        return (text, link)
     }
 
     // 2. Convert non-link identifier to proper markdown link
@@ -419,17 +429,6 @@ fn parse_target(input: &str) -> (String, String) {
     (display_text, normalized_link)
 }
 
-/// Normalizes absolute paths in links to relative paths
-fn normalize_link_path(link: &str) -> String {
-    // If it's an absolute path starting with '/', try to convert to relative
-    if link.starts_with('/') {
-        // For now, just remove the leading '/' as a simple normalization
-        // TODO: Implement proper relative path conversion when file context is available
-        link.trim_start_matches('/').to_string()
-    } else {
-        link.to_string()
-    }
-}
 
 /// Converts a non-link identifier to a proper markdown link with display text
 fn normalize_nonlink_identifier(input: &str) -> (String, String) {
@@ -817,7 +816,7 @@ mod tests {
             ("https://github.com/user/repo", "https://github.com/user/repo", "https://github.com/user/repo"),
 
             // Plain Internal Identifier
-            ("some-identifier", "some-identifier", "some-identifier"),
+            ("some-identifier", "some-identifier", "#some-identifier"),
 
             // File URL (External)
             ("file:///usr/local/docs.txt", "file:///usr/local/docs.txt", "file:///usr/local/docs.txt"),

@@ -276,7 +276,13 @@ impl GraphRegistry {
                         }
                         crate::relation::LinkType::InternalPath(ref file_path) => {
                             // Validate file existence for InternalPath targets
-                            if !file_path.exists() {
+                            // InternalPath contains normalized paths from normalize_identifier which are git-root-relative
+                            let git_root = match crate::git_commands::get_git_root_dir() {
+                                Ok(root) => root,
+                                Err(_) => std::env::current_dir().unwrap_or_else(|_| PathBuf::from(".")),
+                            };
+                            let absolute_path = git_root.join(file_path);
+                            if !absolute_path.exists() {
                                 errors.push(ReqvireError::MissingRelationTarget(
                                     format!("Element '{}' references missing target '{}'",
                                         source_node.element.identifier,
@@ -1398,7 +1404,6 @@ impl GraphRegistry {
         let max_line_num = std::cmp::max(max_current_lines, max_new_lines);
         let width = max_line_num.to_string().len();
 
-        let mut old_line_num = 1;
         let mut new_line_num = 1;
         let mut previous_was_change = false;
 
@@ -1463,7 +1468,6 @@ impl GraphRegistry {
                         });
                     }
 
-                    old_line_num += line_count;
                     new_line_num += line_count;
                     previous_was_change = false;
                 }
@@ -1493,7 +1497,6 @@ impl GraphRegistry {
                             content: format!("-   {}", visible_line),
                             color: "red".to_string(),
                         });
-                        old_line_num += 1;
                         // Don't increment new_line_num for removed lines - they don't exist in new file
                     }
                     previous_was_change = true;
@@ -2101,7 +2104,7 @@ mod tests {
 
         // Let's check what the markdown would look like:
         let b_element = graph.nodes.get("B").unwrap().element.clone();
-        let b_markdown = graph.element_to_markdown(&b_element);
+        let b_markdown = graph.element_to_markdown_with_context(&b_element, "file1.md");
         println!("B's markdown after A is moved:");
         println!("{}", b_markdown);
 
@@ -2140,7 +2143,7 @@ mod tests {
 
         // Check A's initial relations in markdown
         let a_element_initial = graph.nodes.get("A").unwrap().element.clone();
-        let a_markdown_initial = graph.element_to_markdown(&a_element_initial);
+        let a_markdown_initial = graph.element_to_markdown_with_context(&a_element_initial, "file1.md");
         println!("A's initial markdown (in file1.md):");
         println!("{}", a_markdown_initial);
 
@@ -2153,7 +2156,7 @@ mod tests {
 
         // Check A's relations after the move
         let a_element_moved = graph.nodes.get("A").unwrap().element.clone();
-        let a_markdown_moved = graph.element_to_markdown(&a_element_moved);
+        let a_markdown_moved = graph.element_to_markdown_with_context(&a_element_moved, "file3.md");
         println!("A's markdown after move to file3.md:");
         println!("{}", a_markdown_moved);
 
