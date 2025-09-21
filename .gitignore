@@ -1,6 +1,10 @@
 tmpspec
 tmpdoc
 
+# Generated files in html directory (but keep directory structure)
+html/**/*
+!html/**/.gitkeep
+
 # Rust-specific ignores
 /target/
 **/*.rs.bk

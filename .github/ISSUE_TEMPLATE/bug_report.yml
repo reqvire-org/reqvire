@@ -92,11 +92,6 @@ body:
     id: terms
     attributes:
       label: 📋 Checklist
-      description: Please confirm the following
       options:
         - label: I have searched existing issues to avoid duplicates
           required: true
-        - label: I have provided all the requested information
-          required: true
-        - label: I have tested this with the latest version of Reqvire
-          required: false
