@@ -4,7 +4,7 @@ use std::path::{Path, PathBuf};
 use log::{debug, warn};
 use serde::Serialize;
 
-use crate::relation::{self, LinkType, get_parent_relation_types};
+use crate::relation::{self, LinkType, get_parent_relation_types, IMPACT_PROPAGATION_RELATIONS};
 use crate::element::{Element, ElementType, RequirementType};
 use crate::error::ReqvireError;
 use crate::git_commands;
@@ -460,7 +460,13 @@ impl GraphRegistry {
 
         // Traverse relations using their metadata to determine canonical direction
         for relation in &element.relations {
-            if let crate::relation::LinkType::Identifier(ref target_id) = relation.target.link {
+            if let LinkType::Identifier(ref target_id) = relation.target.link {
+                // Skip relations that don't participate in dependency propagation (like trace and backward relations)
+                // Only traverse relations that are in IMPACT_PROPAGATION_RELATIONS for cycle detection
+                if !IMPACT_PROPAGATION_RELATIONS.contains(&relation.relation_type.name) {
+                    continue;
+                }
+
                 // Use relation metadata to traverse in canonical direction only
                 let should_traverse = if let Some(_opposite) = relation.relation_type.opposite {
                     // For bidirectional relations, only traverse in one canonical direction
