@@ -167,6 +167,7 @@ The visualization shall include:
 #### Relations
   * derivedFrom: [Requirements Change Propagation](../SpecificationsRequirements.md#requirements-change-propagation)
   * satisfiedBy: [change_impact.rs](../../core/src/change_impact.rs)
+  * verifiedBy: [Change Impact Detection Test](../Verifications/ChangeImpactTests.md#change-impact-detection-test)
 
 ---
 
