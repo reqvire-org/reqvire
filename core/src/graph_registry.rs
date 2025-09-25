@@ -156,6 +156,9 @@ impl GraphRegistry {
         // Validate relations
         let mut errors = self.validate_relations(excluded_filename_patterns)?;
 
+        // Validate non-test-verification satisfiedBy relations
+        errors.extend(self.validate_non_test_verification_satisfied_by()?);
+
         // Validate cross-component dependencies
         errors.extend(self.validate_cross_component_dependencies()?);
 
@@ -333,6 +336,53 @@ impl GraphRegistry {
         }
 
         None
+    }
+
+    /// Validates that only test-verification elements can have satisfiedBy relations
+    /// Returns a list of validation errors for non-test-verification elements with satisfiedBy
+    fn validate_non_test_verification_satisfied_by(&self) -> Result<Vec<ReqvireError>, ReqvireError> {
+        log::debug!("Validating non-test-verification satisfiedBy relations...");
+        let mut errors = Vec::new();
+
+        for element_node in self.nodes.values() {
+            let element = &element_node.element;
+
+            // Check if element has satisfiedBy relations
+            let has_satisfied_by = element.relations.iter().any(|relation| {
+                relation.relation_type.name == "satisfiedBy" && relation.user_created
+            });
+
+            if has_satisfied_by {
+                // Check if the element is a non-test-verification
+                match &element.element_type {
+                    crate::element::ElementType::Verification(verification_type) => {
+                        // Allow only test-verification (Default and Test types) to have satisfiedBy
+                        match verification_type {
+                            crate::element::VerificationType::Analysis |
+                            crate::element::VerificationType::Inspection |
+                            crate::element::VerificationType::Demonstration => {
+                                errors.push(ReqvireError::IncompatibleElementTypes(
+                                    format!("Non-test-verification element with satisfiedBy relation: '{}' (type: {:?}) cannot have satisfiedBy relations. Only test-verification elements may use satisfiedBy.",
+                                        element.identifier,
+                                        verification_type
+                                    )
+                                ));
+                            }
+                            crate::element::VerificationType::Default |
+                            crate::element::VerificationType::Test => {
+                                // These are valid - test verifications can have satisfiedBy
+                            }
+                        }
+                    }
+                    _ => {
+                        // Requirements and other elements can have satisfiedBy relations
+                        // This is valid behavior
+                    }
+                }
+            }
+        }
+
+        Ok(errors)
     }
 
     /// Validates cross-component dependencies for circular dependencies and missing links.

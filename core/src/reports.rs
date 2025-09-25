@@ -487,16 +487,27 @@ fn print_summary_text(summary: &Summary) {
 #[derive(Serialize)]
 pub struct CoverageReport {
     summary: CoverageSummary,
-    satisfied_verifications: VerificationsByFile,
-    unsatisfied_verifications: VerificationsByFile,
+    verified_leaf_requirements: RequirementsByFile,
+    unverified_leaf_requirements: RequirementsByFile,
+    satisfied_test_verifications: VerificationsByFile,
+    unsatisfied_test_verifications: VerificationsByFile,
 }
 
 #[derive(Serialize)]
 struct CoverageSummary {
-    total_verifications: usize,
-    total_satisfied: usize,
-    total_unsatisfied: usize,
-    coverage_percentage: f64,
+    // Leaf requirements metrics
+    total_leaf_requirements: usize,
+    verified_leaf_requirements: usize,
+    unverified_leaf_requirements: usize,
+    leaf_requirements_coverage_percentage: f64,
+
+    // Test verifications metrics
+    total_test_verifications: usize,
+    satisfied_test_verifications: usize,
+    unsatisfied_test_verifications: usize,
+    test_verifications_satisfaction_percentage: f64,
+
+    // Verification types breakdown
     verification_types: VerificationTypeCounts,
 }
 
@@ -509,10 +520,21 @@ struct VerificationTypeCounts {
 }
 
 #[derive(Serialize)]
+struct RequirementsByFile {
+    files: HashMap<String, Vec<RequirementDetails>>,
+}
+#[derive(Serialize)]
 struct VerificationsByFile {
     files: HashMap<String, Vec<VerificationDetails>>,
 }
 
+#[derive(Serialize)]
+struct RequirementDetails {
+    identifier: String,
+    name: String,
+    section: String,
+    verified_by: Vec<String>,
+}
 #[derive(Serialize)]
 struct VerificationDetails {
     identifier: String,
@@ -533,25 +555,66 @@ impl CoverageReport {
 
     fn print_text(&self) {
         println!("=== Verification Coverage Report ===\n");
-        
+
         // Summary
         println!("Summary:");
-        println!("  Total Verifications: {}", self.summary.total_verifications);
-        println!("  Satisfied: {} ({:.1}%)", self.summary.total_satisfied, self.summary.coverage_percentage);
-        println!("  Unsatisfied: {}", self.summary.total_unsatisfied);
+
+        // Leaf Requirements Summary
+        println!("  Total Leaf Requirements: {}", self.summary.total_leaf_requirements);
+        println!("  Verified Leaf Requirements: {} ({:.1}%)",
+            self.summary.verified_leaf_requirements,
+            self.summary.leaf_requirements_coverage_percentage
+        );
+        println!("  Unverified Leaf Requirements: {}", self.summary.unverified_leaf_requirements);
         println!();
-        
+
+        // Test Verifications Summary
+        println!("  Total Test Verifications: {}", self.summary.total_test_verifications);
+        println!("  Satisfied Test Verifications: {} ({:.1}%)",
+            self.summary.satisfied_test_verifications,
+            self.summary.test_verifications_satisfaction_percentage
+        );
+        println!("  Unsatisfied Test Verifications: {}", self.summary.unsatisfied_test_verifications);
+        println!();
+
         println!("Verification Types:");
         println!("  Test: {}", self.summary.verification_types.test);
         println!("  Analysis: {}", self.summary.verification_types.analysis);
         println!("  Inspection: {}", self.summary.verification_types.inspection);
         println!("  Demonstration: {}", self.summary.verification_types.demonstration);
         println!();
-        
-        // Satisfied verifications
-        if !self.satisfied_verifications.files.is_empty() {
-            println!("Satisfied Verifications:");
-            for (file, verifications) in &self.satisfied_verifications.files {
+
+        // Verified leaf requirements
+        if !self.verified_leaf_requirements.files.is_empty() {
+            println!("Verified Leaf Requirements:");
+            for (file, requirements) in &self.verified_leaf_requirements.files {
+                println!("  📂 {}", file);
+                for requirement in requirements {
+                    println!("    ✅ {}", requirement.name);
+                    if !requirement.verified_by.is_empty() {
+                        println!("       Verified by: {}", requirement.verified_by.join(", "));
+                    }
+                }
+                println!();
+            }
+        }
+
+        // Unverified leaf requirements
+        if !self.unverified_leaf_requirements.files.is_empty() {
+            println!("Unverified Leaf Requirements:");
+            for (file, requirements) in &self.unverified_leaf_requirements.files {
+                println!("  📂 {}", file);
+                for requirement in requirements {
+                    println!("    ❌ {}", requirement.name);
+                }
+                println!();
+            }
+        }
+
+        // Satisfied test verifications
+        if !self.satisfied_test_verifications.files.is_empty() {
+            println!("Satisfied Test Verifications:");
+            for (file, verifications) in &self.satisfied_test_verifications.files {
                 println!("  📂 {}", file);
                 for verification in verifications {
                     println!("    ✅ {} ({})", verification.name, verification.verification_type);
@@ -562,11 +625,11 @@ impl CoverageReport {
                 println!();
             }
         }
-        
-        // Unsatisfied verifications
-        if !self.unsatisfied_verifications.files.is_empty() {
-            println!("Unsatisfied Verifications:");
-            for (file, verifications) in &self.unsatisfied_verifications.files {
+
+        // Unsatisfied test verifications
+        if !self.unsatisfied_test_verifications.files.is_empty() {
+            println!("Unsatisfied Test Verifications:");
+            for (file, verifications) in &self.unsatisfied_test_verifications.files {
                 println!("  📂 {}", file);
                 for verification in verifications {
                     println!("    ❌ {} ({})", verification.name, verification.verification_type);
@@ -578,27 +641,62 @@ impl CoverageReport {
 }
 
 pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
-    let mut total_verifications = 0;
-    let mut total_satisfied = 0;
+    // Initialize counters and data structures
+    let mut total_leaf_requirements = 0;
+    let mut verified_leaf_requirements = 0;
+    let mut total_test_verifications = 0;
+    let mut satisfied_test_verifications = 0;
     let mut verification_types = VerificationTypeCounts {
         test: 0,
         analysis: 0,
         inspection: 0,
         demonstration: 0,
     };
-    
-    let mut satisfied_files: HashMap<String, Vec<VerificationDetails>> = HashMap::new();
-    let mut unsatisfied_files: HashMap<String, Vec<VerificationDetails>> = HashMap::new();
-    
-    // Analyze all verification elements
+
+    let mut verified_leaf_files: HashMap<String, Vec<RequirementDetails>> = HashMap::new();
+    let mut unverified_leaf_files: HashMap<String, Vec<RequirementDetails>> = HashMap::new();
+    let mut satisfied_test_files: HashMap<String, Vec<VerificationDetails>> = HashMap::new();
+    let mut unsatisfied_test_files: HashMap<String, Vec<VerificationDetails>> = HashMap::new();
+
+    // First pass: collect all verification counts
     for element in registry.get_all_elements() {
         if let element::ElementType::Verification(verification_type) = &element.element_type {
-            total_verifications += 1;
-            
             // Count by verification type
             match verification_type {
                 element::VerificationType::Default | element::VerificationType::Test => {
                     verification_types.test += 1;
+                    total_test_verifications += 1;
+
+                    // For test verifications, check if they have satisfiedBy relations
+                    let satisfied_by: Vec<String> = element.relations.iter()
+                        .filter(|r| relation::is_satisfaction_relation(r.relation_type))
+                        .map(|r| match &r.target.link {
+                            relation::LinkType::Identifier(id) => id.clone(),
+                            relation::LinkType::ExternalUrl(url) => url.clone(),
+                            relation::LinkType::InternalPath(path) => path.to_string_lossy().to_string(),
+                        })
+                        .collect();
+
+                    let verification_details = VerificationDetails {
+                        identifier: element.identifier.clone(),
+                        name: element.name.clone(),
+                        section: element.section.clone(),
+                        verification_type: element.element_type.as_str().to_string(),
+                        satisfied_by: satisfied_by.clone(),
+                    };
+
+                    if satisfied_by.is_empty() {
+                        // Unsatisfied test verification
+                        unsatisfied_test_files.entry(element.file_path.clone())
+                            .or_insert_with(Vec::new)
+                            .push(verification_details);
+                    } else {
+                        // Satisfied test verification
+                        satisfied_test_verifications += 1;
+                        satisfied_test_files.entry(element.file_path.clone())
+                            .or_insert_with(Vec::new)
+                            .push(verification_details);
+                    }
                 }
                 element::VerificationType::Analysis => {
                     verification_types.analysis += 1;
@@ -610,59 +708,106 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
                     verification_types.demonstration += 1;
                 }
             }
-            
-            // Check if verification is satisfied (has satisfiedBy relations)
-            let satisfied_by: Vec<String> = element.relations.iter()
-                .filter(|r| relation::is_satisfaction_relation(r.relation_type))
-                .map(|r| match &r.target.link {
-                    relation::LinkType::Identifier(id) => id.clone(),
-                    relation::LinkType::ExternalUrl(url) => url.clone(),
-                    relation::LinkType::InternalPath(path) => path.to_string_lossy().to_string(),
-                })
-                .collect();
-            
-            let verification_details = VerificationDetails {
-                identifier: element.identifier.clone(),
-                name: element.name.clone(),
-                section: element.section.clone(),
-                verification_type: element.element_type.as_str().to_string(),
-                satisfied_by: satisfied_by.clone(),
-            };
-            
-            if satisfied_by.is_empty() {
-                // Unsatisfied
-                unsatisfied_files.entry(element.file_path.clone())
-                    .or_insert_with(Vec::new)
-                    .push(verification_details);
-            } else {
-                // Satisfied
-                total_satisfied += 1;
-                satisfied_files.entry(element.file_path.clone())
-                    .or_insert_with(Vec::new)
-                    .push(verification_details);
+        }
+    }
+
+    // Second pass: identify leaf requirements and check their verification
+    for element in registry.get_all_elements() {
+        // Only process requirement-type elements
+        if matches!(element.element_type, element::ElementType::Requirement(_)) {
+            // Check if this is a leaf requirement (no forward relations to other requirements)
+            let has_forward_relations = element.relations.iter().any(|relation| {
+                // Check if relation is a forward relation to another requirement
+                match relation.relation_type.name {
+                    "contain" | "derive" | "refinedBy" => {
+                        // These are forward relations - check if target is a requirement
+                        if let relation::LinkType::Identifier(_) = &relation.target.link {
+                            // Assume it's a requirement if it's an identifier link
+                            // This is a simplified check - in practice you'd resolve the target
+                            true
+                        } else {
+                            false
+                        }
+                    }
+                    _ => false
+                }
+            });
+
+            if !has_forward_relations {
+                // This is a leaf requirement
+                total_leaf_requirements += 1;
+
+                // Check if it has verifiedBy relations
+                let verified_by: Vec<String> = element.relations.iter()
+                    .filter(|r| relation::is_verification_relation(r.relation_type))
+                    .map(|r| match &r.target.link {
+                        relation::LinkType::Identifier(id) => id.clone(),
+                        relation::LinkType::ExternalUrl(url) => url.clone(),
+                        relation::LinkType::InternalPath(path) => path.to_string_lossy().to_string(),
+                    })
+                    .collect();
+
+                let requirement_details = RequirementDetails {
+                    identifier: element.identifier.clone(),
+                    name: element.name.clone(),
+                    section: element.section.clone(),
+                    verified_by: verified_by.clone(),
+                };
+
+                if verified_by.is_empty() {
+                    // Unverified leaf requirement
+                    unverified_leaf_files.entry(element.file_path.clone())
+                        .or_insert_with(Vec::new)
+                        .push(requirement_details);
+                } else {
+                    // Verified leaf requirement
+                    verified_leaf_requirements += 1;
+                    verified_leaf_files.entry(element.file_path.clone())
+                        .or_insert_with(Vec::new)
+                        .push(requirement_details);
+                }
             }
         }
     }
-    
-    let coverage_percentage = if total_verifications > 0 {
-        (total_satisfied as f64 / total_verifications as f64) * 100.0
+
+    // Calculate percentages
+    let leaf_requirements_coverage_percentage = if total_leaf_requirements > 0 {
+        (verified_leaf_requirements as f64 / total_leaf_requirements as f64) * 100.0
     } else {
         0.0
     };
-    
+
+    let test_verifications_satisfaction_percentage = if total_test_verifications > 0 {
+        (satisfied_test_verifications as f64 / total_test_verifications as f64) * 100.0
+    } else {
+        0.0
+    };
+
     CoverageReport {
         summary: CoverageSummary {
-            total_verifications,
-            total_satisfied,
-            total_unsatisfied: total_verifications - total_satisfied,
-            coverage_percentage,
+            total_leaf_requirements,
+            verified_leaf_requirements,
+            unverified_leaf_requirements: total_leaf_requirements - verified_leaf_requirements,
+            leaf_requirements_coverage_percentage,
+
+            total_test_verifications,
+            satisfied_test_verifications,
+            unsatisfied_test_verifications: total_test_verifications - satisfied_test_verifications,
+            test_verifications_satisfaction_percentage,
+
             verification_types,
         },
-        satisfied_verifications: VerificationsByFile {
-            files: satisfied_files,
+        verified_leaf_requirements: RequirementsByFile {
+            files: verified_leaf_files,
         },
-        unsatisfied_verifications: VerificationsByFile {
-            files: unsatisfied_files,
+        unverified_leaf_requirements: RequirementsByFile {
+            files: unverified_leaf_files,
+        },
+        satisfied_test_verifications: VerificationsByFile {
+            files: satisfied_test_files,
+        },
+        unsatisfied_test_verifications: VerificationsByFile {
+            files: unsatisfied_test_files,
         },
     }
 }

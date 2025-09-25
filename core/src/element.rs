@@ -75,8 +75,8 @@ impl ElementType {
                 RequirementType::System => "requirement",
             },
             ElementType::Verification(ver) => match ver {
-                VerificationType::Default       => "verification",            
-                VerificationType::Test          => "verification",
+                VerificationType::Default       => "test-verification",
+                VerificationType::Test          => "test-verification",
                 VerificationType::Analysis      => "analysis-verification",
                 VerificationType::Inspection    => "inspection-verification",
                 VerificationType::Demonstration => "demonstration-verification",

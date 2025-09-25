@@ -189,7 +189,7 @@ This test verifies that the system automatically generates and updates diagrams 
 - Commit message is informative and standardized
 
 #### Metadata
-  * type: demonstration-verification
+  * type: test-verification
 
 
 #### Relations
