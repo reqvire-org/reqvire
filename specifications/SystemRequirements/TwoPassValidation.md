@@ -272,5 +272,6 @@ The GraphRegistry shall be constructed from the ElementRegistry after Pass 1 com
   * derivedFrom: [Requirements Processing](Requirements.md#requirements-processing)
   * satisfiedBy: [graph_registry.rs](../../core/src/graph_registry.rs)
   * satisfiedBy: [model.rs](../../core/src/model.rs)
+  * verifiedBy: [Requirements Files Search and Detection Test](../Verifications/ValidationTests.md#requirements-files-search-and-detection-test)
 
 ---

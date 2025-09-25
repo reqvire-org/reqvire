@@ -1422,6 +1422,7 @@ The system shall implement a markdown structure validator that enforces Reqvire'
   * derivedFrom: [Validate Markdown Structure](../UserRequirements.md#validate-markdown-structure)
   * satisfiedBy: [model.rs](../../core/src/model.rs)
   * satisfiedBy: [parser.rs](../../core/src/parser.rs)
+  * verifiedBy: [Invalid Relations Test](../Verifications/ValidationTests.md#invalid-relations-test)
 
 ---
 
@@ -1433,6 +1434,7 @@ The system shall implement a consistency validator that verifies logical coheren
   * derivedFrom: [Validate Internal Consistency](../UserRequirements.md#validate-internal-consistency)
   * satisfiedBy: [model.rs](../../core/src/model.rs)
   * satisfiedBy: [parser.rs](../../core/src/parser.rs)
+  * verifiedBy: [Invalid Relations Test](../Verifications/ValidationTests.md#invalid-relations-test)
 
 ---
 
@@ -1444,6 +1446,7 @@ The system shall implement a specialized validator that analyzes dependencies ac
   * derivedFrom: [Validate Cross-Component Dependencies](../UserRequirements.md#validate-cross-component-dependencies)
   * satisfiedBy: [model.rs](../../core/src/model.rs)
   * satisfiedBy: [parser.rs](../../core/src/parser.rs)
+  * verifiedBy: [Invalid Relations Test](../Verifications/ValidationTests.md#invalid-relations-test)
 
 ---
 
