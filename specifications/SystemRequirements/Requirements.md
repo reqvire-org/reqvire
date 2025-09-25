@@ -114,6 +114,7 @@ The system shall detect and fix excess whitespace after element headers, subsect
 #### Relations
   * derivedFrom: [Format Consistency Enforcement](../UserRequirements.md#format-consistency-enforcement)
   * satisfiedBy: [whitespace.rs](../../core/src/linting/whitespace.rs)
+  * verifiedBy: [Format Command Requirements Verification](../Verifications/Misc.md#format-command-requirements-verification)
 
 ---
 
@@ -124,6 +125,7 @@ The system shall detect and fix excess or missing newlines before element header
 #### Relations
   * derivedFrom: [Format Consistency Enforcement](../UserRequirements.md#format-consistency-enforcement)
   * satisfiedBy: [newlines.rs](../../core/src/linting/newlines.rs)
+  * verifiedBy: [Format Command Requirements Verification](../Verifications/Misc.md#format-command-requirements-verification)
 
 ---
 
@@ -134,6 +136,7 @@ The system shall detect consecutive element sections that lack a separator line 
 #### Relations
   * derivedFrom: [Format Consistency Enforcement](../UserRequirements.md#format-consistency-enforcement)
   * satisfiedBy: [separators.rs](../../core/src/linting/separators.rs)
+  * verifiedBy: [Format Command Requirements Verification](../Verifications/Misc.md#format-command-requirements-verification)
 
 ---
 
@@ -144,6 +147,7 @@ The system shall identify and fix inconsistent indentation and bullet types in r
 #### Relations
   * derivedFrom: [Format Consistency Enforcement](../UserRequirements.md#format-consistency-enforcement)
   * satisfiedBy: [indentation.rs](../../core/src/linting/indentation.rs)
+  * verifiedBy: [Format Command Requirements Verification](../Verifications/Misc.md#format-command-requirements-verification)
 
 ---
 
@@ -154,6 +158,7 @@ The system shall display linting change suggestions in a git-style diff format, 
 #### Relations
   * derivedFrom: [Formatting Output](../UserRequirements.md#formatting-output)
   * satisfiedBy: [mod.rs](../../core/src/linting/mod.rs)
+  * verifiedBy: [Format Command Requirements Verification](../Verifications/Misc.md#format-command-requirements-verification)
 
 ---
 
@@ -164,6 +169,7 @@ The system shall implement parallel processing for linting operations when possi
 #### Relations
   * derivedFrom: [Model Formatting](../UserRequirements.md#model-formatting)
   * satisfiedBy: [mod.rs](../../core/src/linting/mod.rs)
+  * verifiedBy: [Format Command Requirements Verification](../Verifications/Misc.md#format-command-requirements-verification)
 
 ---
 
@@ -525,6 +531,7 @@ SpecificationIndex.md file must be saved as index.html file when exported to the
   * derivedFrom: [Documentation Index HTML Integration](../UserRequirements.md#documentation-index-html-integration)
   * satisfiedBy: [html.rs](../../core/src/html.rs)
   * satisfiedBy: [html_export.rs](../../core/src/html_export.rs)
+  * verifiedBy: [HTML Export Verification](../Verifications/Misc.md#html-export-verification)
 
 ---
 
@@ -2155,6 +2162,7 @@ The system shall provide a diagrams generation function, activated by the (gener
   * refine: [Diagram Generation](#diagram-generation)
   * containedBy: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
+  * verifiedBy: [Diagram Generation Test](../Verifications/DiagramsTests.md#diagram-generation-test)
 
 ---
 
@@ -2166,6 +2174,7 @@ The system shall provide a diagram removal function, activated by the remove-dia
   * refine: [Diagram Removal](#diagram-removal)
   * containedBy: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
+  * verifiedBy: [Remove Generated Diagrams Verification](../Verifications/DiagramsTests.md#remove-generated-diagrams-verification)
 
 ---
 

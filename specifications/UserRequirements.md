@@ -415,6 +415,7 @@ The system shall generate a SpecificationIndex.md file in the repository root th
 
 #### Relations
   * derivedFrom: [Managing MBSE Models](UserStories.md#managing-mbse-models)
+  * verifiedBy: [Index Generation Test](Verifications/ReportsTests.md#index-generation-test)
 
 ---
 
@@ -428,6 +429,7 @@ The SpecificationIndex.md file shall be converted to index.html when HTML output
 
 #### Relations
   * refine: [Generate Documentation Index](#generate-documentation-index)
+  * verifiedBy: [HTML Export Verification](Verifications/Misc.md#html-export-verification)
 
 ---
 
