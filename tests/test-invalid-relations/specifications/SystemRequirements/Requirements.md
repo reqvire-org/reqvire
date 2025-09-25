@@ -192,7 +192,7 @@ This requirement correctly uses satisfiedBy pointing to an existing implementati
 This verification correctly uses satisfiedBy pointing to an existing test script.
 
 #### Metadata
-  * type: verification
+  * type: test-verification
 
 #### Relations
   * verify: [Valid Requirement](#valid-requirement)
@@ -215,7 +215,7 @@ This requirement incorrectly uses satisfiedBy pointing to another requirement (s
 This verification incorrectly uses satisfiedBy pointing to another verification (should fail).
 
 #### Metadata
-  * type: verification
+  * type: test-verification
 
 #### Relations
   * verify: [Valid Requirement](#valid-requirement)
@@ -230,5 +230,44 @@ This requirement has a satisfiedBy relation pointing to a non-existing file.
 #### Relations
   * containedBy: [../UserRequirements.md/Valid User Requirement](../UserRequirements.md#valid-user-requirement)
   * satisfiedBy: [non-existing-implementation.py](non-existing-implementation.py)
+
+---
+
+### Analysis Verification with Invalid SatisfiedBy
+
+This analysis verification incorrectly has a satisfiedBy relation (should fail - only test-verification may have satisfiedBy).
+
+#### Metadata
+  * type: analysis-verification
+
+#### Relations
+  * verify: [Valid Requirement](#valid-requirement)
+  * satisfiedBy: [analysis-document.md](analysis-document.md)
+
+---
+
+### Inspection Verification with Invalid SatisfiedBy
+
+This inspection verification incorrectly has a satisfiedBy relation (should fail - only test-verification may have satisfiedBy).
+
+#### Metadata
+  * type: inspection-verification
+
+#### Relations
+  * verify: [Valid Requirement](#valid-requirement)
+  * satisfiedBy: [inspection-checklist.md](inspection-checklist.md)
+
+---
+
+### Demonstration Verification with Invalid SatisfiedBy
+
+This demonstration verification incorrectly has a satisfiedBy relation (should fail - only test-verification may have satisfiedBy).
+
+#### Metadata
+  * type: demonstration-verification
+
+#### Relations
+  * verify: [Valid Requirement](#valid-requirement)
+  * satisfiedBy: [demo-script.sh](demo-script.sh)
 
 ---

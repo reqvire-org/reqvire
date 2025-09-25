@@ -1446,7 +1446,9 @@ The system shall implement validation that verifies relation endpoints have appr
 
 #### Details
 - For `verifiedBy`/`verify` relations, validate that one endpoint is a requirement element and the other is a verification element
-- For `satisfiedBy`/`satisfy` relations, validate that one endpoint is a requirement or verification element and the other is an implementation element
+- For `satisfiedBy`/`satisfy` relations, validate that one endpoint is a requirement or test-verification element and the other is an implementation element
+- For verification elements with `satisfiedBy` relations, validate that only test-verification elements may use satisfiedBy (other verification types should not have satisfiedBy relations)
+- `trace` relations are always allowed for any verification type
 - Relations should only connect elements of appropriate types based on the RelationTypesRegistry definition
 - Warnings should be issued when relation endpoints have incompatible element types
 
@@ -1922,21 +1924,26 @@ The system shall implement a validation report generator that compiles and forma
 
 ### Verification Coverage Report Generator
 
-The system shall provide a verification coverage report generator that analyzes verification elements and their satisfaction status to produce coverage metrics and detailed reports.
+The system shall provide a verification coverage report generator that analyzes leaf requirements verification status and test-verification satisfaction status to produce coverage metrics and detailed reports.
 
 #### Details
 
 The coverage report generator must:
-- Identify all verification elements (type: "verification") in the model
-- Determine satisfaction status based on presence of satisfiedBy relations
-- Calculate coverage percentage (satisfied/total * 100)
-- Group verifications by file and section for organization
+- Identify all leaf requirements (requirements without forward relations to other requirements) in the model
+- Determine leaf requirement verification status based on presence of verifiedBy relations
+- Identify all test-verification elements in the model
+- Determine test-verification satisfaction status based on presence of satisfiedBy relations
+- Calculate coverage percentages: (verified_leaf_requirements/total_leaf_requirements * 100) and (satisfied_test_verifications/total_test_verifications * 100)
+- Group results by file and section for organization
 - Support both human-readable text and machine-readable JSON output formats
 
 The report structure shall include:
-- Summary section with total counts and percentages
-- Satisfied verifications section grouped by file
-- Unsatisfied verifications section with details
+- Summary section with leaf requirements and test-verification counts and percentages
+- Verified leaf requirements section grouped by file and section
+- Unverified leaf requirements section with details (flagged for attention)
+- Satisfied test-verification elements section grouped by file and section
+- Unsatisfied test-verification elements section with details (flagged for attention)
+- Analysis, inspection, and demonstration verification elements are considered satisfied by default
 
 #### Relations
   * derivedFrom: [Verification Coverage Report](../UserRequirements.md#verification-coverage-report)

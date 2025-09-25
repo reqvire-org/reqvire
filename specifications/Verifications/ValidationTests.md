@@ -197,13 +197,14 @@ This verification test checks that Reqvire correctly identifies and reports inva
 - System should detect and report requirement elements with verifiedBy relations pointing to non-existing verification elements
 - System should detect and report requirement elements with satisfiedBy relations pointing to other requirement elements (incompatible types)
 - System should detect and report verification elements with satisfiedBy relations pointing to other verification elements (incompatible types)
+- System should detect and report non-test-verification elements with satisfiedBy relations (only test-verification may use satisfiedBy, trace is always allowed)
 - System should detect and report if system requirement is missing parent relation
 - System should detect and report if there is circular dependency in requirements
 - Pass 2 validation should only execute when Pass 1 completes without errors
 
 **General Requirements:**
 - System should allow requirement elements with satisfiedBy relations pointing to existing implementation files
-- System should allow verification elements with satisfiedBy relations pointing to existing test scripts
+- System should allow test-verification elements with satisfiedBy relations pointing to existing test scripts
 - System should report clear error messages with details about the invalid format
 - Two separate test scenarios should validate Pass 1 and Pass 2 errors independently
 

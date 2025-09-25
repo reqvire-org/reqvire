@@ -67,6 +67,7 @@ EXPECTED_PASS2_ERRORS=(
   "Missing relation target:"
   "Incompatible element types for relation:"
   "Circular dependency error:"
+  "Non-test-verification element with satisfiedBy relation:"
 )
 
 MISSING_PASS2_ERRORS=()

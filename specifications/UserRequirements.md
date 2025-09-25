@@ -718,19 +718,29 @@ Validation shall be performed automatically when any command requires the parsed
 
 ### Verification Coverage Report
 
-The system shall generate verification coverage reports showing the percentage and details of satisfied and unsatisfied verifications, including breakdowns by file, section, and verification type.
+The system shall generate verification coverage reports focusing on leaf requirements (requirements that do not have forward relations to any other requirement), showing the percentage and details of verified and unverified leaf requirements, including breakdowns by file, section, and verification type.
 
 #### Details
 
 The verification coverage report shall provide:
-- Total count of verifications with breakdown by verification type (test, analysis, inspection, demonstration)
-- Count and percentage of satisfied verifications (those with satisfiedBy relations pointing to existing artifacts)
-- Count and percentage of unsatisfied verifications
-- Detailed list of satisfied verifications grouped by file and section
-- Detailed list of unsatisfied verifications
+- Total count of leaf requirements with breakdown by requirement type
+- Count and percentage of verified leaf requirements (those with verifiedBy relations pointing to existing verification artifacts)
+- Count and percentage of unverified leaf requirements
+- Total count of verification artifacts with breakdown by verification type (test, analysis, inspection, demonstration)
+- Count and percentage of satisfied test-verification artifacts (those with satisfiedBy relations pointing to existing test implementations)
+- Detailed list of verified leaf requirements grouped by file and section
+- Detailed list of unverified leaf requirements with impact analysis
 - Output in both human-readable text and machine-readable JSON formats
 
-The report helps track verification completeness and identify gaps in test coverage, supporting quality assurance and compliance activities.
+The report helps track verification completeness and identify gaps in requirement verification coverage, supporting quality assurance and compliance activities.
+
+**Coverage Philosophy:**
+- **Leaf requirements** (requirements that don't derive other requirements) MUST be verified
+- **Parent/intermediate requirements** MAY be verified but it's not a hard requirement as they might be covered in verification of leaf requirements
+- One verification may verify multiple leaf requirements (N:1 relationship)
+- The change impact analysis system propagates changes from parent requirements down to leaf requirements and their verifications
+- System engineers/architects are responsible for ensuring verification scopes are broad enough to cover parent requirements when there's no dedicated parent verification
+- AI systems can help create comprehensive verification scopes and prevent verification overlap
 
 #### Metadata
   * type: user-requirement

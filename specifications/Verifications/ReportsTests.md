@@ -219,17 +219,20 @@ This test verifies that the system provides a CLI flag and functionality for gen
 
 ### Verification Coverage Report Test
 
-This test verifies that the system correctly generates verification coverage reports showing the percentage and details of satisfied and unsatisfied verifications.
+This test verifies that the system correctly generates verification coverage reports focusing on leaf requirements and showing the percentage and details of satisfied and unsatisfied test-verification elements.
 
 #### Details
 
 ##### Acceptance Criteria
-- System shall provide a CLI command `coverage-report` that generates coverage reports
+- System shall provide a CLI command `coverage-report` that generates coverage reports focusing on leaf requirements
 - Command shall support `--json` flag for JSON output format
-- Coverage report shall include summary section with total counts and percentages
+- Coverage report shall include summary section with total counts and percentages for leaf requirements
 - Coverage report shall show breakdown by verification type (test, analysis, inspection, demonstration)
-- Coverage report shall list satisfied verifications grouped by file and section
-- Coverage report shall list unsatisfied verifications with details
+- Coverage report shall list verified leaf requirements grouped by file and section
+- Coverage report shall list unverified leaf requirements with details
+- Coverage report shall list satisfied test-verification elements (those with satisfiedBy relations)
+- Coverage report shall list unsatisfied test-verification elements (those without satisfiedBy relations)
+- Non-test-verification elements (analysis, inspection, demonstration) are considered satisfied by default (no satisfiedBy required)
 - JSON output shall be valid and machine-readable
 - Text output shall be human-readable with clear formatting
 
@@ -239,25 +242,30 @@ This test verifies that the system correctly generates verification coverage rep
    Command: `reqvire coverage-report`
    - exits code **0**
    - output contains `=== Verification Coverage Report ===`
-   - output contains `Summary:` section with total counts
+   - output contains `Summary:` section with leaf requirements counts and percentages
    - output contains `Verification Types:` breakdown
-   - output contains coverage percentage calculation
-   - satisfied verifications are marked with ✅
-   - unsatisfied verifications are marked with ❌
+   - output contains coverage percentage calculation for leaf requirements
+   - verified leaf requirements are marked with ✅
+   - unverified leaf requirements are marked with ❌
+   - satisfied test-verification elements are marked with ✅
+   - unsatisfied test-verification elements are marked with ❌
 
 2. **JSON Coverage Report**
    Command: `reqvire coverage-report --json`
    - exits code **0**
    - output parses as valid JSON
-   - JSON contains `summary` object with required fields
-   - JSON contains `satisfied_verifications` and `unsatisfied_verifications` sections
-   - verification details include identifier, name, section, type, and satisfied_by relations
+   - JSON contains `summary` object with leaf requirements counts and percentages
+   - JSON contains `verified_leaf_requirements` and `unverified_leaf_requirements` sections
+   - JSON contains `satisfied_test_verifications` and `unsatisfied_test_verifications` sections
+   - verification details include identifier, name, section, type, and satisfied_by relations (for test-verification only)
 
 3. **Coverage Calculation**
-   - Coverage percentage calculated as (satisfied/total * 100)
+   - Leaf requirements coverage percentage calculated as (verified_leaf_requirements/total_leaf_requirements * 100)
+   - Test-verification satisfaction percentage calculated as (satisfied_test_verifications/total_test_verifications * 100)
    - Verification types correctly categorized
-   - Satisfied verifications have non-empty `satisfied_by` relations
-   - Unsatisfied verifications have empty `satisfied_by` relations
+   - Test-verification elements without satisfiedBy relations are flagged as unsatisfied
+   - Test-verification elements with valid satisfiedBy relations are considered satisfied
+   - Analysis, inspection, and demonstration verifications are considered satisfied by default (no satisfiedBy evaluation)
 
 #### Metadata
   * type: verification

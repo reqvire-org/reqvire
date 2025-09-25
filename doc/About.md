@@ -58,7 +58,7 @@ By understanding relationships in architecture files, AI can detect inconsistent
 AI tools can automatically trace which tests or requirements are impacted by changes, flag affected downstream areas, and summarize model diffs for engineering teams.
 
 #### 4. Test Coverage Assistance
-Based on requirements and use cases, AI can recommend missing test scenarios, generate test case outlines, and flag unverified requirements.
+Based on requirements and use cases, AI can recommend missing test scenarios and create verifications based on test criteria extracted from requirements chain.
 
 #### 5. Code Generation Assistance
 
@@ -91,7 +91,7 @@ Reqvire automatically parses structured Markdown to generate:
 - **Traceability matrices** linking requirements to architecture, verifications, and tests
 - **Impact reports** showing what was changed, and what it affects
 - **Requirement flow diagrams** visualizing hierarchical relationships and derivations
-- **Verification coverage maps** showing which requirements are verified and how
+- **Verification coverage maps** showing which leaf requirements are verified and how
 - **Change propagation analysis** identifying all downstream effects of modifications
 - **Compliance matrices** mapping requirements to standards, regulations, or policies
 - **Model summary reports** providing overview statistics and health metrics
