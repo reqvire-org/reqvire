@@ -6,9 +6,11 @@ This guide helps you write and maintain specifications in Reqvire's requirements
 ## Key Specification Files
 - **SpecificationsRequirements.md**: Defines the structure and rules for all specifications
 - **UserRequirements.md**: High-level user needs and requirements
+- **UserStories.md**: User stories and scenarios describing system usage
+- **Usecases.md**: Detailed use cases and user interactions
 - **MissionRequirements.md**: Mission-level objectives and goals
-- **SystemRequirements/*.md**: Detailed system requirements
-- **Verifications/**: Folder containing verification specifications for requirements
+- **SystemRequirements/**/*.md**: Detailed system requirements
+- **Verifications/**/*.md: Folder containing verification specifications for requirements
 - **LogicalArchitecture.md**: System's logical architecture and components
 - **PhysicalArchitecture.md**: System's physical architecture and deployment
 

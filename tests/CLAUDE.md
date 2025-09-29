@@ -31,10 +31,9 @@ Each test is a directory containing:
 test-feature-name/
 ├── test.sh                    # Test execution script (REQUIRED)
 ├── reqvire.yaml              # Configuration file (optional)
-├── specifications/           # Test markdown files
-│   ├── Requirements.md      # Test requirements
-│   └── Verifications/       # Test verifications
-└── temp/                    # Working directory for outputs
+└── specifications/           # Test markdown files
+    ├── Requirements.md      # Test requirements
+    └── Verifications/       # Test verifications
 ```
 
 ### Available Tests
@@ -330,6 +329,7 @@ cat tests/test-feature-name/test.sh
 8. **Git Setup**: Tests run in temporary git repositories
 9. **Cleanup**: Test runner handles cleanup automatically
 10. **Fast Execution**: Keep tests efficient for CI/CD pipelines
+11. **Silent Success**: Never add debug or echo outputs except for failure messages - tests should be silent on success
 
 ## Adding New Tests
 
