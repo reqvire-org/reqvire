@@ -1,0 +1,5 @@
+paths:
+  output_folder: "./output"
+  excluded_filename_patterns:
+    - "external/**/*.md"  # Should exclude files in external/ folder from git root
+    - "build/**/*.md"     # Should exclude files in build/ folder from git root

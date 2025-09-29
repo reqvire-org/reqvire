@@ -23,7 +23,22 @@ pub fn is_requirements_file_by_path(path: &Path, excluded_filename_patterns: &Gl
 pub fn is_excluded_by_patterns(path: &Path, excluded_filename_patterns: &GlobSet) -> bool {
     let filename = path.file_name().and_then(|s| s.to_str()).unwrap_or("");
 
-    if excluded_filename_patterns.is_match(path) || excluded_filename_patterns.is_match(filename) {
+    // Convert absolute path to relative path from git root for pattern matching
+    // This ensures patterns like "external/**/*.md" work correctly regardless of working directory
+    let relative_path = match get_relative_path(&path.to_path_buf()) {
+        Ok(rel_path) => rel_path,
+        Err(_) => {
+            // If we can't get relative path, fall back to original behavior
+            debug!("Failed to get relative path for '{}', falling back to absolute path matching", path.display());
+            if excluded_filename_patterns.is_match(path) || excluded_filename_patterns.is_match(filename) {
+                debug!("File '{}' is excluded due to matching a glob pattern.", filename);
+                return true;
+            }
+            return false;
+        }
+    };
+
+    if excluded_filename_patterns.is_match(&relative_path) || excluded_filename_patterns.is_match(filename) {
         debug!("File '{}' is excluded due to matching a glob pattern.", filename);
         return true;
     }
