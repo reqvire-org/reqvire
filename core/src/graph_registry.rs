@@ -1409,15 +1409,14 @@ impl GraphRegistry {
             if current_content != new_content {
                 files_changed += 1;
 
-                if dry_run {
+                // Generate and store diff for both dry-run and actual formatting
+                let diff = self.generate_file_diff(&file_path, &current_content, &new_content);
+                // Only add non-empty diffs
+                if !diff.lines.is_empty() {
+                    files_with_diffs.push(diff);
+                }
 
-                    // Generate and store diff
-                    let diff = self.generate_file_diff(&file_path, &current_content, &new_content);
-                    // Only add non-empty diffs
-                    if !diff.lines.is_empty() {
-                        files_with_diffs.push(diff);
-                    }
-                } else {
+                if !dry_run {
                     // Create parent directories if needed
                     if let Some(parent_dir) = full_file_path.parent() {
                         fs::create_dir_all(parent_dir)
@@ -1436,7 +1435,7 @@ impl GraphRegistry {
 
         Ok(FormatResult {
             files_changed,
-            diffs: if dry_run { files_with_diffs } else { Vec::new() },
+            diffs: files_with_diffs, // Always include diffs for both dry-run and actual formatting
             dry_run,
         })
     }

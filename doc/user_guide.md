@@ -273,7 +273,7 @@ jobs:
         continue-on-error: true
         run: |
           mkdir -p reports
-          reqvire generate-summary | tee reports/validation_report.txt
+          reqvire validate | tee reports/validation_report.txt
 
       - name: Upload Validation Report if validation failed
         if: failure()

@@ -1,16 +1,17 @@
 #!/bin/bash
 
-# Test: Two-Pass Validation of Invalid Relations
-# -----------------------------------------------
-# This test validates the two-pass validation architecture:
+# Test: Two-Pass Validation of Invalid Relations using Validate Command
+# -------------------------------------------------------------------
+# This test validates the two-pass validation architecture using the validate command:
 # - Pass 1: Element collection and local validation (parsing/format errors)
 # - Pass 2: Graph construction and relation validation (relation errors)
+# - Validate Command: Tests the validate command functionality with valid and invalid models
 #
-# The test runs two separate scenarios to validate each pass independently.
+# The test runs separate scenarios to validate each pass independently using the validate command.
 
 # Test 1: Pass 1 Errors (Parsing/Format Issues)
 
-OUTPUT_PASS1=$(cd "${TEST_DIR}/pass1-errors" && "$REQVIRE_BIN" model-summary 2>&1)
+OUTPUT_PASS1=$(cd "${TEST_DIR}/pass1-errors" && "$REQVIRE_BIN" validate 2>&1)
 EXIT_CODE_PASS1=$?
 
 printf "%s\n" "$OUTPUT_PASS1" > "${TEST_DIR}/test_results_pass1.log"
@@ -51,7 +52,7 @@ fi
 
 # Test 2: Pass 2 Errors (Relation Validation Issues)
 
-OUTPUT_PASS2=$(cd "${TEST_DIR}/pass2-errors" && "$REQVIRE_BIN" model-summary 2>&1)
+OUTPUT_PASS2=$(cd "${TEST_DIR}/pass2-errors" && "$REQVIRE_BIN" validate 2>&1)
 EXIT_CODE_PASS2=$?
 
 printf "%s\n" "$OUTPUT_PASS2" > "${TEST_DIR}/test_results_pass2.log"
@@ -89,5 +90,125 @@ if [ ${#MISSING_PASS2_ERRORS[@]} -gt 0 ]; then
   exit 1
 fi
 
+# Test 3: Validate Command Tests
+
+# Test 3.1: Validate command on valid model (create a simple valid model in the current test)
+# Create a simple valid model for testing
+mkdir -p "${TEST_DIR}/valid-test/specifications"
+cat > "${TEST_DIR}/valid-test/specifications/ValidRequirements.md" << 'EOF'
+# Valid Test Requirements
+
+## Valid Requirement
+
+This is a valid requirement.
+
+#### Metadata
+  * type: user-requirement
+EOF
+
+cd "${TEST_DIR}/valid-test"
+OUTPUT_VALID=$("$REQVIRE_BIN" validate 2>&1)
+EXIT_CODE_VALID=$?
+
+if [ $EXIT_CODE_VALID -ne 0 ]; then
+  echo "❌ FAILED: Validate command should succeed on valid model but exited with code $EXIT_CODE_VALID"
+  echo "Output: $OUTPUT_VALID"
+  exit 1
+fi
+
+if ! echo "$OUTPUT_VALID" | grep -q "No validation issues found"; then
+  echo "❌ FAILED: Validate command should output 'No validation issues found' for valid model"
+  echo "Actual output: $OUTPUT_VALID"
+  exit 1
+fi
+
+# Test 3.2: Validate command with --json on valid model
+# Test 3.2: Validate command with --json flag on valid model
+OUTPUT_VALID_JSON=$("$REQVIRE_BIN" validate --json 2>&1)
+EXIT_CODE_VALID_JSON=$?
+
+if [ $EXIT_CODE_VALID_JSON -ne 0 ]; then
+  echo "❌ FAILED: Validate command with --json should succeed on valid model but exited with code $EXIT_CODE_VALID_JSON"
+  echo "Output: $OUTPUT_VALID_JSON"
+  exit 1
+fi
+
+# Check if output is valid JSON
+if ! echo "$OUTPUT_VALID_JSON" | python3 -m json.tool > /dev/null 2>&1; then
+  echo "❌ FAILED: Validate command --json output is not valid JSON"
+  echo "Output: $OUTPUT_VALID_JSON"
+  exit 1
+fi
+
+# Test 3.3: Validate command on invalid model (Pass 1 errors)
+# Test 3.3: Validate command on invalid model (Pass 1 errors)
+cd "${TEST_DIR}/pass1-errors"
+OUTPUT_VALIDATE_PASS1=$("$REQVIRE_BIN" validate 2>&1)
+EXIT_CODE_VALIDATE_PASS1=$?
+
+# Validate command should exit with non-zero code for invalid model
+if [ $EXIT_CODE_VALIDATE_PASS1 -eq 0 ]; then
+  echo "❌ FAILED: Validate command should fail on invalid model but returned success (0)"
+  echo "Output: $OUTPUT_VALIDATE_PASS1"
+  exit 1
+fi
+
+# Check that validate command reports the expected validation errors
+for expected in "${EXPECTED_PASS1_ERRORS[@]}"; do
+  if ! echo "$OUTPUT_VALIDATE_PASS1" | grep -q "$expected"; then
+    echo "❌ FAILED: Validate command missing expected Pass 1 error: $expected"
+    echo "Output: $OUTPUT_VALIDATE_PASS1"
+    exit 1
+  fi
+done
+
+# Test 3.4: Validate command on invalid model (Pass 2 errors)
+# Test 3.4: Validate command on invalid model (Pass 2 errors)
+cd "${TEST_DIR}/pass2-errors"
+OUTPUT_VALIDATE_PASS2=$("$REQVIRE_BIN" validate 2>&1)
+EXIT_CODE_VALIDATE_PASS2=$?
+
+# Validate command should exit with non-zero code for invalid model
+if [ $EXIT_CODE_VALIDATE_PASS2 -eq 0 ]; then
+  echo "❌ FAILED: Validate command should fail on invalid model but returned success (0)"
+  echo "Output: $OUTPUT_VALIDATE_PASS2"
+  exit 1
+fi
+
+# Check that validate command reports the expected validation errors
+for expected in "${EXPECTED_PASS2_ERRORS[@]}"; do
+  if ! echo "$OUTPUT_VALIDATE_PASS2" | grep -q "$expected"; then
+    echo "❌ FAILED: Validate command missing expected Pass 2 error: $expected"
+    echo "Output: $OUTPUT_VALIDATE_PASS2"
+    exit 1
+  fi
+done
+
+# Test 3.5: Verify validate command does not modify files
+# Test 3.5: Verify validate command does not modify files
+cd "${TEST_DIR}/valid-test"
+
+# Get hash of a file before validation
+if [ -f "specifications/ValidRequirements.md" ]; then
+  BEFORE_HASH=$(sha256sum "specifications/ValidRequirements.md")
+else
+  echo "❌ FAILED: Test file specifications/ValidRequirements.md not found"
+  exit 1
+fi
+
+# Run validate command
+"$REQVIRE_BIN" validate > /dev/null 2>&1
+
+# Get hash after validation
+AFTER_HASH=$(sha256sum "specifications/ValidRequirements.md")
+
+if [ "$BEFORE_HASH" != "$AFTER_HASH" ]; then
+  echo "❌ FAILED: Validate command modified files during validation"
+  echo "Before: $BEFORE_HASH"
+  echo "After: $AFTER_HASH"
+  exit 1
+fi
+
+echo "✅ All validate command tests passed!"
 
 exit 0

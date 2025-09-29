@@ -61,6 +61,14 @@ pub enum Commands {
         #[clap(long, help_heading = "FORMAT OPTIONS")]
         json: bool,
     },
+
+    /// Validate model
+    #[clap(override_help = "Validate model\n\nVALIDATION OPTIONS:\n      --json     Output results in JSON format")]
+    Validate {
+        /// Output results in JSON format
+        #[clap(long, help_heading = "VALIDATION OPTIONS")]
+        json: bool,
+    },
     
     /// Generate traceability information without processing other files Creates matrices and reports showing relationships between elements in the model
     #[clap(override_help = "Generate traceability information without processing other files Creates matrices and reports showing relationships between elements in the model\n\nTRACES OPTIONS:\n      --svg   Output traceability matrix as SVG without hyperlinks and with full element names Cannot be used with --json\n      --json  Output results in JSON format")]
@@ -85,7 +93,7 @@ pub enum Commands {
     GenerateIndex,
 
     /// Output model registry and summary
-    #[clap(override_help = "Output model registry and summary\n\nMODEL SUMMARY OPTIONS:\n      --json                        Output results in JSON format\n      --filter-file <GLOB>          Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`\n      --filter-name <REGEX>         Only include elements whose name matches this regular expression\n      --filter-section <GLOB>       Only include sections whose name matches this glob pattern e.g. `System requirement*`\n      --filter-type <TYPE>          Only include elements of the given type e.g. `user-requirement`, `system-requirement`, `verification`, `file`, or other custom type\n      --filter-content <REGEX>      Only include elements whose content matches this regular expression\n      --filter-is-not-verified      Only include requirements that have at least one \"verifiedBy\" relation\n      --filter-is-not-satisfied     Only include requirements that have at least one \"satisfiedBy\" relation")]
+    #[clap(override_help = "Output model registry and summary\n\nMODEL SUMMARY OPTIONS:\n      --json                        Output results in JSON format\n      --filter-file <GLOB>          Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`\n      --filter-name <REGEX>         Only include elements whose name matches this regular expression\n      --filter-section <GLOB>       Only include sections whose name matches this glob pattern e.g. `System requirement*`\n      --filter-type <TYPE>          Only include elements of the given type e.g. `user-requirement`, `system-requirement`, `verification`, `file`, or other custom type\n      --filter-content <REGEX>      Only include elements whose content matches this regular expression\n      --filter-is-not-verified      Only include requirements that do NOT have any \"verifiedBy\" relations\n      --filter-is-not-satisfied     Only include requirements that do NOT have any \"satisfiedBy\" relations")]
     ModelSummary {
         /// Output results in JSON format
         #[clap(long, help_heading = "MODEL SUMMARY OPTIONS")]
@@ -111,11 +119,11 @@ pub enum Commands {
         #[clap(long, value_name = "REGEX", help_heading = "MODEL SUMMARY OPTIONS")]
         filter_content: Option<String>,
 
-        /// Only include requirements that have at least one "verifiedBy" relation
+        /// Only include requirements that do NOT have any "verifiedBy" relations
         #[clap(long, help_heading = "MODEL SUMMARY OPTIONS")]
         filter_is_not_verified: bool,
 
-        /// Only include requirements that have at least one "satisfiedBy" relation
+        /// Only include requirements that do NOT have any "satisfiedBy" relations
         #[clap(long, help_heading = "MODEL SUMMARY OPTIONS")]
         filter_is_not_satisfied: bool,
                         
@@ -277,6 +285,7 @@ fn print_validation_results(errors: &[ReqvireError], json_output: bool) {
 fn wants_json(args: &Args) -> bool {
     match &args.command {
         Some(Commands::Format { json, .. }) => *json,
+        Some(Commands::Validate { json }) => *json,
         Some(Commands::Traces { json, .. }) => *json,
         Some(Commands::ModelSummary { json, .. }) => *json,
         Some(Commands::ChangeImpact { json, .. }) => *json,
@@ -302,15 +311,21 @@ pub fn handle_command(
 
     let json_output = wants_json(&args);
 
-
-    // Handle validation failures for all commands
+    // Handle validation failures for all commands (including validate)
     match &parse_result {
         Err(ReqvireError::ValidationError(errors)) => {
             print_validation_results(errors, json_output);
             return Ok(1);
         }
         Err(e) => {
-            eprintln!("❌ Parsing failed: {}", e);
+            if json_output {
+                let json_result = ValidationResult {
+                    errors: vec![e.to_string()],
+                };
+                println!("{}", serde_json::to_string_pretty(&json_result).unwrap());
+            } else {
+                eprintln!("❌ Parsing failed: {}", e);
+            }
             return Ok(1);
         }
         Ok(_) => {
@@ -319,6 +334,18 @@ pub fn handle_command(
     }
 
     match args.command {
+        Some(Commands::Validate { json }) => {
+            // For validate command, if we get here it means no validation errors
+            if json {
+                let json_result = ValidationResult {
+                    errors: vec![],
+                };
+                println!("{}", serde_json::to_string_pretty(&json_result).unwrap());
+            } else {
+                println!("✅ No validation issues found");
+            }
+            return Ok(0);
+        },
         Some(Commands::GenerateIndex) => {
             info!("Generating index.....");
             let index_output_path = PathBuf::from("output");
@@ -402,10 +429,29 @@ pub fn handle_command(
                 
             return Ok(0);
         },
-        Some(Commands::Format { dry_run, json: _ }) => {
+        Some(Commands::Format { dry_run, json }) => {
             let format_result = model_manager.graph_registry.format_files(dry_run)?;
 
-            if dry_run {
+            if json {
+                // JSON output for both dry-run and actual formatting
+                let json_result = serde_json::json!({
+                    "dry_run": dry_run,
+                    "files_changed": format_result.files_changed,
+                    "diffs": format_result.diffs.iter().map(|file_diff| {
+                        serde_json::json!({
+                            "file_path": file_diff.file_path,
+                            "lines": file_diff.lines.iter().map(|line| {
+                                serde_json::json!({
+                                    "prefix": line.prefix,
+                                    "content": line.content,
+                                    "color": line.color
+                                })
+                            }).collect::<Vec<_>>()
+                        })
+                    }).collect::<Vec<_>>()
+                });
+                println!("{}", serde_json::to_string_pretty(&json_result).unwrap());
+            } else if dry_run {
                 if format_result.diffs.is_empty() {
                     println!("No formatting changes needed.");
                 } else {
@@ -428,12 +474,23 @@ pub fn handle_command(
                     println!("Run without --dry-run to apply these changes.");
                 }
             } else {
+                // Actual formatting - show diffs when changes are applied
                 if format_result.files_changed == 0 {
                     println!("No files needed formatting.");
                 } else {
-                    println!("Formatted {} file(s):", format_result.files_changed);
+                    println!("Formatted {} file(s):\n", format_result.files_changed);
                     for file_diff in &format_result.diffs {
-                        println!("  ✅ {}", file_diff.file_path);
+                        println!("📄 {}", file_diff.file_path);
+                        for line in &file_diff.lines {
+                            match line.color.as_str() {
+                                "green" => println!("  \x1b[32m{} {}\x1b[0m", line.prefix, line.content),
+                                "red" => println!("  \x1b[31m{} {}\x1b[0m", line.prefix, line.content),
+                                "context" => println!("  \x1b[37m{} {}\x1b[0m", line.prefix, line.content),
+                                "separator" => println!(""),
+                                _ => println!("  {} {}", line.prefix, line.content),
+                            }
+                        }
+                        println!();
                     }
                 }
             }

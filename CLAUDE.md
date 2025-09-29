@@ -26,6 +26,8 @@ This guide is split into domain-specific guides for better organization:
 - Generate HTML documentation: `./target/debug/reqvire html`
 - Format requirements (preview only): `./target/debug/reqvire format --dry-run`
 - Apply formatting: `./target/debug/reqvire format`
+- Validate model: `./target/debug/reqvire validate`
+- Validate model (JSON output): `./target/debug/reqvire validate --json`
 - Generate diagrams: `./target/debug/reqvire generate-diagrams`
 - Generate model summary: `./target/debug/reqvire model-summary --json > /tmp/model-summary.json`
 

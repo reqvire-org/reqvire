@@ -88,6 +88,23 @@ if [ $FORMAT_EXIT_CODE -ne 0 ]; then
     exit 1
 fi
 
+# Test 2.1: Verify that format command shows diff output when applying changes
+# If files were changed, we should see diff output; if no changes, we should see "No files needed formatting"
+if [ $FORMAT_EXIT_CODE -eq 0 ]; then
+    if grep -q "Formatted [0-9]* file(s)" format_output.txt; then
+        # Changes were made - should show diff output
+        if ! grep -q "UserStories.md\|SystemRequirements\|Verifications" format_output.txt; then
+            echo "FAIL: Format command should show file names when applying changes"
+            cat format_output.txt
+            exit 1
+        fi
+    elif ! grep -q "No files needed formatting" format_output.txt; then
+        echo "FAIL: Format command should indicate if no formatting was needed"
+        cat format_output.txt
+        exit 1
+    fi
+fi
+
 # Test 3: Verify expected changes were applied with exact content matching
 
 # Test 3.1: Check that absolute links were converted to relative
@@ -216,6 +233,24 @@ if grep -A 20 "UserStories.md" dry_run_clean.txt | grep -E "^  [0-9]+ \+" | head
         echo "FAIL: Line numbering not sequential - expected line $NEXT_CONTEXT to be >= 19 after additions"
         exit 1
     fi
+fi
+
+# Test 7: Test JSON output functionality
+# Run format with --json flag on current files to test JSON output
+"$REQVIRE" format --dry-run --json > json_format_output.txt 2>&1
+JSON_FORMAT_EXIT_CODE=$?
+
+if [ $JSON_FORMAT_EXIT_CODE -ne 0 ]; then
+    echo "FAIL: Format command with --json flag failed with exit code $JSON_FORMAT_EXIT_CODE"
+    exit 1
+fi
+
+# Check if output is valid JSON
+if ! python3 -m json.tool < json_format_output.txt > /dev/null 2>&1; then
+    echo "FAIL: Format command --json output is not valid JSON"
+    echo "Output:"
+    cat json_format_output.txt
+    exit 1
 fi
 
 # No cleanup needed - temporary directory will be deleted
