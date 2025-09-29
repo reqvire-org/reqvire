@@ -90,5 +90,4 @@ if ! echo "$OUTPUT_ROOT" | grep -q "Sub Test Requirement"; then
 fi
 
 printf "%s\n" "✅ All tests passed" >> "${TEST_DIR}/test_results.log"
-echo "✅ Excluded patterns relative path resolution tests passed"
 exit 0

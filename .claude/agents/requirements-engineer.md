@@ -202,6 +202,9 @@ reqvire validate [--json]
 # Generate model summary with filters
 reqvire model-summary [filters] [--json]
 
+# Generate sections summary (files/sections only, no elements)
+reqvire sections-summary [filters] [--json]
+
 # Analyze change impact
 reqvire change-impact --git-commit=<commit> [--json]
 
@@ -236,6 +239,9 @@ reqvire validate --json > /tmp/validation.json
 
 # Filtered model summary
 reqvire model-summary --filter-type="requirement" --filter-is-not-verified --json
+
+# Sections overview (without individual elements)
+reqvire sections-summary --filter-file="specifications/*.md" --json
 
 # Change impact analysis
 reqvire change-impact --git-commit=HEAD~1 --json > /tmp/impact.json

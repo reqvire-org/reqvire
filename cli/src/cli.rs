@@ -13,7 +13,7 @@ use reqvire::export;
 use reqvire::change_impact;
 use reqvire::git_commands;
 use reqvire::matrix_generator;
-use reqvire::reports::Filters;
+use reqvire::sections_summary;
 use reqvire::GraphRegistry;
 use reqvire::graph_registry::{Page, Section};
 use reqvire::element::Element;
@@ -149,6 +149,26 @@ pub enum Commands {
         /// Output results in JSON format
         #[clap(long)]
         json: bool,
+    },
+
+    /// Output sections summary showing files, section names, and section content without individual elements
+    #[clap(override_help = "Output sections summary showing files, section names, and section content without individual elements\n\nSECTIONS SUMMARY OPTIONS:\n      --json                        Output results in JSON format\n      --filter-file <GLOB>          Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`\n      --filter-section <GLOB>       Only include sections whose name matches this glob pattern e.g. `System requirement*`\n      --filter-content <REGEX>      Only include sections whose content matches this regular expression")]
+    SectionsSummary {
+        /// Output results in JSON format
+        #[clap(long, help_heading = "SECTIONS SUMMARY OPTIONS")]
+        json: bool,
+
+        /// Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`
+        #[clap(long, value_name = "GLOB", help_heading = "SECTIONS SUMMARY OPTIONS")]
+        filter_file: Option<String>,
+
+        /// Only include sections whose name matches this glob pattern e.g. `System requirement*`
+        #[clap(long, value_name = "GLOB", help_heading = "SECTIONS SUMMARY OPTIONS")]
+        filter_section: Option<String>,
+
+        /// Only include sections whose content matches this regular expression
+        #[clap(long, value_name = "REGEX", help_heading = "SECTIONS SUMMARY OPTIONS")]
+        filter_content: Option<String>,
     },
 
     /// Interactive shell for GraphRegistry operations (undocumented)
@@ -290,6 +310,7 @@ fn wants_json(args: &Args) -> bool {
         Some(Commands::ModelSummary { json, .. }) => *json,
         Some(Commands::ChangeImpact { json, .. }) => *json,
         Some(Commands::CoverageReport { json }) => *json,
+        Some(Commands::SectionsSummary { json, .. }) => *json,
         _ => false,
     }
 }
@@ -384,7 +405,7 @@ pub fn handle_command(
             filter_is_not_verified,
             filter_is_not_satisfied
         }) => {
-            let filters = Filters::new(
+            let filters = reports::Filters::new(
                 filter_file.as_deref(),
                 filter_name.as_deref(),
                 filter_section.as_deref(),
@@ -395,7 +416,7 @@ pub fn handle_command(
             ).map_err(|e| {
                 ReqvireError::ProcessError(format!("❌ Failed to construct filters: {}", e))
             })?;
-            
+
             let output_format = if cypher {
                 reports::SummaryOutputFormat::Cypher
             } else if json {
@@ -403,7 +424,7 @@ pub fn handle_command(
             } else {
                 reports::SummaryOutputFormat::Text
             };
-               
+
             reports::print_registry_summary(&model_manager.graph_registry,output_format, &filters);
             return Ok(0);        
         },
@@ -524,6 +545,24 @@ pub fn handle_command(
         Some(Commands::CoverageReport { json }) => {
             let coverage_report = reports::generate_coverage_report(&model_manager.graph_registry);
             coverage_report.print(json);
+            return Ok(0);
+        },
+        Some(Commands::SectionsSummary {
+            json,
+            filter_file,
+            filter_section,
+            filter_content
+        }) => {
+            let filters = sections_summary::SectionsFilters::new(
+                filter_file.as_deref(),
+                filter_section.as_deref(),
+                filter_content.as_deref(),
+            ).map_err(|e| {
+                eprintln!("{}", e);
+                std::process::exit(1);
+            }).unwrap();
+
+            sections_summary::print_sections_summary(&model_manager.graph_registry, json, &filters);
             return Ok(0);
         },
         Some(Commands::Shell) => {

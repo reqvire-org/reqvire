@@ -209,6 +209,5 @@ if [ "$BEFORE_HASH" != "$AFTER_HASH" ]; then
   exit 1
 fi
 
-echo "✅ All validate command tests passed!"
 
 exit 0
