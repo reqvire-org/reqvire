@@ -260,7 +260,6 @@ fn generate_file_diff(file_path: &str, current: &str, new: &str) -> FileDiff {
             },
             Difference::Rem(text) => {
                 previous_was_change = true;
-                let line_count = text.split('\n').count();
                 for line in text.split('\n') {
                     // For blank lines, use the special character to indicate they're being removed
                     let content = if line.is_empty() {
@@ -273,11 +272,8 @@ fn generate_file_diff(file_path: &str, current: &str, new: &str) -> FileDiff {
                         content,
                         color: "red".to_string(),
                     });
+                    // Don't increment new_line_num - removed lines don't exist in new file
                 }
-                // Don't increment new_line_num for removals as they don't exist in new content
-                // However, we need to account for line count if this causes confusion
-                // For now, removal line numbers show where they were in the NEW content perspective
-                new_line_num += line_count;
             },
         }
     }
