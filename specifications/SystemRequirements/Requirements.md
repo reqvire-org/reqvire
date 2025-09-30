@@ -541,11 +541,11 @@ Additional behavior:
 
 ### Document Structure Normalization
 
-The system shall normalize document structure during formatting by adding missing page headers and section headers to ensure all documents follow a consistent hierarchical structure.
+When parsing documents, the system shall normalize document by adding missing page headers and section headers to ensure all documents follow a consistent hierarchical structure.
 
 #### Details
 
-When formatting documents, the system shall:
+When parsing  documents, the system shall:
 - Add a level 1 page header based on the filename when document lacks a page header (does not start with `# `)
 - Add a default section header `## Requirements` when elements exist without an explicit section header
 - Preserve existing page headers when present (starting with `# `)
@@ -571,12 +571,22 @@ When formatting documents, the system shall:
 
 ### Validate Command
 
-The system shall provide a validation command that executes model validation and reports any issues found, without performing any formatting or modification operations.
+The system shall provide a validation command that executes model validation and reports any issues found.
 
 #### Details
 
 `validate` command shall:
-  - Execute the same validation logic as performed during the format command
+  - Execute two-pass validation strategy:
+    * **Pass 1: Element Collection and Local Validation**
+      - Parse all markdown files
+      - Extract elements with metadata
+      - Perform local validation (element uniqueness, identifier format, metadata syntax)
+      - Report errors if found
+    * **Pass 2: Graph Construction and Relation Validation**
+      - Build GraphRegistry from collected elements
+      - Validate all relations (target existence, type compatibility)
+      - Perform cross-component validation
+      - Report errors if found
   - Print all validation issues found in the model
   - Output a success message "No validation issues found" when the model is valid
   - Support --json flag to output validation results in JSON format
@@ -584,6 +594,7 @@ The system shall provide a validation command that executes model validation and
 #### Relations
   * derivedFrom: [Provide Validation Reports](../UserRequirements.md#provide-validation-reports)
   * derivedFrom: [Enhanced Validation Error Reporting](../UserRequirements.md#enhanced-validation-error-reporting)
+  * derivedFrom: [Two-Pass Validation Strategy](TwoPassValidation.md#two-pass-validation-strategy)
   * containedBy: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
 
