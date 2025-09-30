@@ -481,11 +481,35 @@ pub fn handle_command(
                         println!("📄 {}", file_diff.file_path);
                         for line in &file_diff.lines {
                             match line.color.as_str() {
-                                "green" => println!("  \x1b[32m{} {}\x1b[0m", line.prefix, line.content),
-                                "red" => println!("  \x1b[31m{} {}\x1b[0m", line.prefix, line.content),
-                                "context" => println!("  \x1b[37m{} {}\x1b[0m", line.prefix, line.content),
+                                "green" => {
+                                    if line.content.is_empty() {
+                                        println!("  \x1b[32m{}\x1b[0m", line.prefix)
+                                    } else {
+                                        println!("  \x1b[32m{} {}\x1b[0m", line.prefix, line.content)
+                                    }
+                                },
+                                "red" => {
+                                    if line.content.is_empty() {
+                                        println!("  \x1b[31m{}\x1b[0m", line.prefix)
+                                    } else {
+                                        println!("  \x1b[31m{} {}\x1b[0m", line.prefix, line.content)
+                                    }
+                                },
+                                "context" => {
+                                    if line.content.is_empty() {
+                                        println!("  \x1b[37m{}\x1b[0m", line.prefix)
+                                    } else {
+                                        println!("  \x1b[37m{} {}\x1b[0m", line.prefix, line.content)
+                                    }
+                                },
                                 "separator" => println!(""),
-                                _ => println!("  {} {}", line.prefix, line.content),
+                                _ => {
+                                    if line.content.is_empty() {
+                                        println!("  {}", line.prefix)
+                                    } else {
+                                        println!("  {} {}", line.prefix, line.content)
+                                    }
+                                },
                             }
                         }
                         println!();
@@ -504,11 +528,35 @@ pub fn handle_command(
                         println!("📄 {}", file_diff.file_path);
                         for line in &file_diff.lines {
                             match line.color.as_str() {
-                                "green" => println!("  \x1b[32m{} {}\x1b[0m", line.prefix, line.content),
-                                "red" => println!("  \x1b[31m{} {}\x1b[0m", line.prefix, line.content),
-                                "context" => println!("  \x1b[37m{} {}\x1b[0m", line.prefix, line.content),
+                                "green" => {
+                                    if line.content.is_empty() {
+                                        println!("  \x1b[32m{}\x1b[0m", line.prefix)
+                                    } else {
+                                        println!("  \x1b[32m{} {}\x1b[0m", line.prefix, line.content)
+                                    }
+                                },
+                                "red" => {
+                                    if line.content.is_empty() {
+                                        println!("  \x1b[31m{}\x1b[0m", line.prefix)
+                                    } else {
+                                        println!("  \x1b[31m{} {}\x1b[0m", line.prefix, line.content)
+                                    }
+                                },
+                                "context" => {
+                                    if line.content.is_empty() {
+                                        println!("  \x1b[37m{}\x1b[0m", line.prefix)
+                                    } else {
+                                        println!("  \x1b[37m{} {}\x1b[0m", line.prefix, line.content)
+                                    }
+                                },
                                 "separator" => println!(""),
-                                _ => println!("  {} {}", line.prefix, line.content),
+                                _ => {
+                                    if line.content.is_empty() {
+                                        println!("  {}", line.prefix)
+                                    } else {
+                                        println!("  {} {}", line.prefix, line.content)
+                                    }
+                                },
                             }
                         }
                         println!();

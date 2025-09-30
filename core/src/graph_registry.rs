@@ -1556,13 +1556,18 @@ impl GraphRegistry {
                     if text.is_empty() && show_context {
                         diff_lines.push(DiffLine {
                             prefix: format!("{:0width$}", new_line_num, width = width),
-                            content: "    ".to_string(),
+                            content: "".to_string(),
                             color: "context".to_string(),
                         });
                         new_line_num += 1;
                     } else if show_context && line_count > 0 {
                         // Show context lines
-                        let start_lines = if previous_was_change {
+                        // When before first change, show leading context as if it were trailing context
+                        let start_lines = if !previous_was_change && next_has_change {
+                            // Before first change: show enough leading lines to fill context
+                            // This ensures file headers are visible in diff
+                            std::cmp::min(context_lines, line_count)
+                        } else if previous_was_change {
                             std::cmp::min(context_lines, line_count)
                         } else {
                             0
@@ -1577,7 +1582,7 @@ impl GraphRegistry {
                         for line_idx in 0..start_lines {
                             if line_idx < lines.len() {
                                 let content = if lines[line_idx].is_empty() {
-                                    "    ".to_string()
+                                    "".to_string()
                                 } else {
                                     format!("    {}", lines[line_idx])
                                 };
@@ -1611,7 +1616,7 @@ impl GraphRegistry {
                                 if !is_last_blank || next_is_removal {
                                     // Show all non-blanks, and trailing blanks if they precede a removal
                                     let content = if is_blank {
-                                        "    ".to_string()
+                                        "".to_string()
                                     } else {
                                         format!("    {}", lines[line_idx])
                                     };
@@ -1643,7 +1648,7 @@ impl GraphRegistry {
                         // This is an added empty line
                         diff_lines.push(DiffLine {
                             prefix: format!("{:0width$}", new_line_num, width = width),
-                            content: "+   ".to_string(),
+                            content: "+   ␤".to_string(),
                             color: "green".to_string(),
                         });
                         new_line_num += 1;
@@ -1653,9 +1658,14 @@ impl GraphRegistry {
                         for (line_idx, line) in lines.iter().enumerate() {
                             // For all lines except potentially the last one
                             if line_idx < lines.len() - 1 || !line.is_empty() {
+                                let content = if line.is_empty() {
+                                    "+   ␤".to_string()
+                                } else {
+                                    format!("+   {}", line)
+                                };
                                 diff_lines.push(DiffLine {
                                     prefix: format!("{:0width$}", new_line_num, width = width),
-                                    content: format!("+   {}", line),
+                                    content,
                                     color: "green".to_string(),
                                 });
                                 new_line_num += 1;
@@ -1670,7 +1680,7 @@ impl GraphRegistry {
                         // This is a removed empty line
                         diff_lines.push(DiffLine {
                             prefix: format!("{:0width$}", new_line_num, width = width),
-                            content: "-   ".to_string(),
+                            content: "-   ␤".to_string(),
                             color: "red".to_string(),
                         });
 
@@ -1680,7 +1690,7 @@ impl GraphRegistry {
                             if matches!(next_diff, Difference::Same(_)) {
                                 diff_lines.push(DiffLine {
                                     prefix: format!("{:0width$}", new_line_num, width = width),
-                                    content: "    ".to_string(),
+                                    content: "".to_string(),
                                     color: "context".to_string(),
                                 });
                                 new_line_num += 1;
@@ -1692,17 +1702,23 @@ impl GraphRegistry {
                         let lines: Vec<&str> = text.split('\n').collect();
                         for (line_idx, line) in lines.iter().enumerate() {
                             if line_idx < lines.len() - 1 || !line.is_empty() {
-                                // Only show special characters for trailing whitespace
-                                let visible_line = if line.ends_with(' ') || line.ends_with('\t') {
-                                    let trimmed = line.trim_end();
-                                    let trailing = &line[trimmed.len()..];
-                                    format!("{}{}", trimmed, trailing.replace(' ', "·").replace('\t', "→"))
+                                // Check if line is empty (blank line)
+                                let content = if line.is_empty() {
+                                    "-   ␤".to_string()
                                 } else {
-                                    line.to_string()
+                                    // Only show special characters for trailing whitespace
+                                    let visible_line = if line.ends_with(' ') || line.ends_with('\t') {
+                                        let trimmed = line.trim_end();
+                                        let trailing = &line[trimmed.len()..];
+                                        format!("{}{}", trimmed, trailing.replace(' ', "·").replace('\t', "→"))
+                                    } else {
+                                        line.to_string()
+                                    };
+                                    format!("-   {}", visible_line)
                                 };
                                 diff_lines.push(DiffLine {
                                     prefix: format!("{:0width$}", new_line_num, width = width),
-                                    content: format!("-   {}", visible_line),
+                                    content,
                                     color: "red".to_string(),
                                 });
                             }
