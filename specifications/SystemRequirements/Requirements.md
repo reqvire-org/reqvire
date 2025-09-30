@@ -539,6 +539,36 @@ Additional behavior:
 
 ---
 
+### Document Structure Normalization
+
+The system shall normalize document structure during formatting by adding missing page headers and section headers to ensure all documents follow a consistent hierarchical structure.
+
+#### Details
+
+When formatting documents, the system shall:
+- Add a level 1 page header based on the filename when document lacks a page header (does not start with `# `)
+- Add a default section header `## Requirements` when elements exist without an explicit section header
+- Preserve existing page headers when present (starting with `# `)
+- Preserve existing section headers when present (starting with `## `)
+- Correctly distinguish between level 1 headers (`# `) and level 2 or deeper headers (`##`, `###`)
+
+**Default Header Names:**
+- Page header: Derived from filename (e.g., "User Requirements" from "UserRequirements.md")
+- Section header: "Requirements" (the default section name used by parser)
+
+**Normalization Rules:**
+1. If document starts with `###` element (no `#` and no `##`): Add both page header and section header
+2. If document starts with `#` then `###` (no `##`): Add section header only
+3. If document starts with `##` (no `#`): Add page header only
+4. If document has both `#` and `##`: No header additions needed
+
+#### Relations
+  * derivedFrom: [Format Consistency Enforcement](../UserRequirements.md#format-consistency-enforcement)
+  * satisfiedBy: [graph_registry.rs](../../core/src/graph_registry.rs)
+  * satisfiedBy: [parser.rs](../../core/src/parser.rs)
+
+---
+
 ### Validate Command
 
 The system shall provide a validation command that executes model validation and reports any issues found, without performing any formatting or modification operations.

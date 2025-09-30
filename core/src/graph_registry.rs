@@ -1174,18 +1174,19 @@ impl GraphRegistry {
             .replace('_', " ")
             .replace('-', " ");
 
-        // Check if page content already has a header to avoid duplication
+        // Check if page content already has a level 1 header to avoid duplication
         let mut has_page_header = false;
         if let Some(page) = self.pages.get(file_path) {
             if !page.frontmatter_content.trim().is_empty() {
-                // Check if page content starts with a header (# at beginning of line)
-                if page.frontmatter_content.trim_start().starts_with('#') {
+                let trimmed = page.frontmatter_content.trim_start();
+                // Check if page content starts with a level 1 header (# followed by space, not ##)
+                if trimmed.starts_with("# ") || (trimmed.starts_with('#') && trimmed.len() > 1 && !trimmed.chars().nth(1).unwrap().is_ascii_punctuation()) {
                     has_page_header = true;
                 }
             }
         }
 
-        // Add file header only if page content doesn't already have one
+        // Add file header only if page content doesn't already have a level 1 header
         if !has_page_header {
             markdown.push_str(&format!("# {}\n\n", file_title));
         }
@@ -1224,7 +1225,9 @@ impl GraphRegistry {
         });
 
         for (section_name, elements) in sorted_sections {
-            if !section_name.is_empty() && section_name != "Default" {
+            // Skip empty section names, but always output section headers including "Requirements"
+            // "Requirements" is the default section name used by parser when no ## header is present
+            if !section_name.is_empty() {
                 debug!("Adding section header: '## {}' with 2 newlines", section_name);
                 markdown.push_str(&format!("## {}\n\n", section_name));
             }

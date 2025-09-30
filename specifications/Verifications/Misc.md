@@ -227,9 +227,19 @@ This test verifies the format command requirements from SystemRequirements and U
 - System shall format relation links with human-readable names
 - System shall clean up file references to show filename only for implementation files
 
+**Document Structure Normalization:**
+- System shall add level 1 page header (based on filename) when document lacks page header
+- System shall add `## Requirements` section header when elements exist without section header
+- System shall preserve existing page headers (starting with `# `)
+- System shall preserve existing section headers (starting with `## `)
+- System shall correctly distinguish level 1 headers from level 2+ headers
+
 **Change Preview Quality:**
 - System shall show file identification clearly in change output
 - System shall display line references with consistent width based on maximum line number
+
+**Known Limitations:**
+- Diff output may not correctly display blank line additions in all cases (blank lines shown with ␤ character may have incorrect line numbering or positioning)
 - System shall visualize trailing whitespace removal with special characters
 - System shall use colors to distinguish additions (green) and removals (red)
 - System shall group changes by file with clear separators
@@ -296,6 +306,7 @@ This test verifies the format command requirements from SystemRequirements and U
 
 #### Relations
   * verify: [Format Command](../SystemRequirements/Requirements.md#format-command)
+  * verify: [Document Structure Normalization](../SystemRequirements/Requirements.md#document-structure-normalization)
   * verify: [Model Formatting](../UserRequirements.md#model-formatting)
   * verify: [Format Consistency Enforcement](../UserRequirements.md#format-consistency-enforcement)
   * verify: [Formatting Output](../UserRequirements.md#formatting-output)

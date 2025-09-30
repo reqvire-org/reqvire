@@ -1,4 +1,4 @@
-Found 4 file(s) with formatting changes:
+Found 7 file(s) with formatting changes:
 
 📄 MOEs.md
   01     # Measures of Effectiveness
@@ -73,6 +73,36 @@ Found 4 file(s) with formatting changes:
   31 -     * trace: [../MOEs.md#moe_ua](/MOEs.md#moe_ua)
   31 -     * verifiedBy: [../Verifications/Tests.md#format-test](/Verifications/Tests.md#format-test)
   31 -     * satisfiedBy: /core/src/parser.rs
+
+
+
+📄 TestNoHeaders.md
+  01 +   # TestNoHeaders
+  02 +   ␤
+  03 +   ## Requirements
+  04     ### Element Without Section
+  05
+  06     This element has no page header and no section header.
+
+
+
+
+📄 TestNoPageHeader.md
+  01 +   # TestNoPageHeader
+  02     ## Test Section
+  03
+  04     ### Element Alpha
+
+
+
+
+📄 TestNoSectionHeader.md
+  01     # TestNoSectionHeader
+  02 +   ## Requirements
+  03     ### Element One
+  04
+  05     This file has page header but no section header.
+
 
 
 

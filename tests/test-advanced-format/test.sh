@@ -322,4 +322,35 @@ if ! python3 -m json.tool < json_format_output.txt > /dev/null 2>&1; then
     exit 1
 fi
 
+# Test 8: Document Structure Normalization - Missing Headers
+# Test 8.1: File with no page header and no section header
+if [ -f expected_TestNoHeaders.md ]; then
+    if ! diff -u expected_TestNoHeaders.md TestNoHeaders.md > /dev/null; then
+        echo "FAIL: TestNoHeaders.md does not match expected output (headers not added correctly)"
+        echo "Differences:"
+        diff -u expected_TestNoHeaders.md TestNoHeaders.md | head -30
+        exit 1
+    fi
+fi
+
+# Test 8.2: File with page header but no section header
+if [ -f expected_TestNoSectionHeader.md ]; then
+    if ! diff -u expected_TestNoSectionHeader.md TestNoSectionHeader.md > /dev/null; then
+        echo "FAIL: TestNoSectionHeader.md does not match expected output (section header not added)"
+        echo "Differences:"
+        diff -u expected_TestNoSectionHeader.md TestNoSectionHeader.md | head -30
+        exit 1
+    fi
+fi
+
+# Test 8.3: File with section header but no page header
+if [ -f expected_TestNoPageHeader.md ]; then
+    if ! diff -u expected_TestNoPageHeader.md TestNoPageHeader.md > /dev/null; then
+        echo "FAIL: TestNoPageHeader.md does not match expected output (page header not added)"
+        echo "Differences:"
+        diff -u expected_TestNoPageHeader.md TestNoPageHeader.md | head -30
+        exit 1
+    fi
+fi
+
 # No cleanup needed - temporary directory will be deleted

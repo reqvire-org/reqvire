@@ -109,8 +109,18 @@ pub fn parse_elements(
                 // Increment section order after saving the previous section
                 section_order_counter += 1;
             } else {
-                // For the first section, set the initial order
-                section_order_counter = 0;
+                // First ## section encountered - check if default section has elements
+                let default_section_count = section_element_counter.get(current_section_name).unwrap_or(&0);
+                if *default_section_count > 0 {
+                    // Save the default "Requirements" section with order 0 only if it has elements
+                    let cleaned_content = remove_generated_diagrams(&current_section_content);
+                    sections.push((current_section_name.to_string(), cleaned_content.trim().to_string(), 0));
+                    // Next section will have order 1
+                    section_order_counter = 1;
+                } else {
+                    // No elements in default section, first ## section gets order 0
+                    section_order_counter = 0;
+                }
             }
 
             // Start new section

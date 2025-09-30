@@ -189,8 +189,30 @@ fi
 FIRST_FILE_ORDERS=$(echo "$OUTPUT" | jq -r '[.sections[] | select(.file == "specifications/Requirements.md") | .section_order] | @csv')
 if [ "$FIRST_FILE_ORDERS" != "0,1" ]; then
   echo "❌ FAILED: Section order should be preserved within each file, got: $FIRST_FILE_ORDERS"
+  echo "$OUTPUT"
   exit 1
 fi
 
+# Test 8: Auto-injected Requirements section
+# Verify that when elements appear before first ## section, a default "Requirements" section is created
+EARLY_ELEMENT_SECTIONS=$(echo "$OUTPUT" | jq -r '[.sections[] | select(.file == "specifications/EarlyElement.md") | .name] | @csv')
+if ! echo "$EARLY_ELEMENT_SECTIONS" | grep -q "Requirements"; then
+  echo "❌ FAILED: Auto-injected Requirements section not found in EarlyElement.md, got: $EARLY_ELEMENT_SECTIONS"
+  exit 1
+fi
+
+# Verify Requirements section has order 0
+EARLY_REQUIREMENTS_ORDER=$(echo "$OUTPUT" | jq -r '.sections[] | select(.file == "specifications/EarlyElement.md" and .name == "Requirements") | .section_order')
+if [ "$EARLY_REQUIREMENTS_ORDER" != "0" ]; then
+  echo "❌ FAILED: Auto-injected Requirements section should have order 0, got: $EARLY_REQUIREMENTS_ORDER"
+  exit 1
+fi
+
+# Verify First Explicit Section has order 1
+EARLY_FIRST_SECTION_ORDER=$(echo "$OUTPUT" | jq -r '.sections[] | select(.file == "specifications/EarlyElement.md" and .name == "First Explicit Section") | .section_order')
+if [ "$EARLY_FIRST_SECTION_ORDER" != "1" ]; then
+  echo "❌ FAILED: First Explicit Section should have order 1, got: $EARLY_FIRST_SECTION_ORDER"
+  exit 1
+fi
 
 exit 0
