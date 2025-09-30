@@ -87,3 +87,15 @@ Content line 3.
 Detail content here.
 
 ---
+
+### External URL Preservation Test
+
+This element tests that external URLs in relations are preserved exactly as written.
+
+#### Metadata
+  * type: user-requirement
+
+#### Relations
+  * satisfiedBy: [PlansAndPricing](https://docs.google.com/spreadsheets/d/1YgO2THkvPQEtvoP2c4JU6q8Fx4K9rWJ9V5bhpGvo7DI/edit?gid=203583324#gid=203583324)
+
+---

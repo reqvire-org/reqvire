@@ -960,9 +960,9 @@ impl GraphRegistry {
                 // Format relation target based on type
                 // Format as proper markdown link using element name when possible
                 let target_text = match &relation.target.link {
-                    LinkType::ExternalUrl(_) => {
-                        // For external URLs, use the text as-is (might already be a full URL)
-                        relation.target.text.clone()
+                    LinkType::ExternalUrl(url) => {
+                        // For external URLs, preserve the original markdown link format
+                        format!("[{}]({})", relation.target.text, url)
                     },
                     LinkType::Identifier(target_id) => {
                         // Extract fragment to look up the target element

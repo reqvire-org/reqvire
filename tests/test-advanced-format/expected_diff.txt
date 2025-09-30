@@ -114,98 +114,106 @@ Found 7 file(s) with formatting changes:
 
 
 📄 UserStories.md
-  01     # User Stories
-  02
-  03     ## Personas
-  04 +   ␤
-  05 +   ␤
-  06     1. System Engineer: Focused on managing system models, ensuring alignment with project requirements, and validating structures.
-  07     2. SOI Developer: Implements features and makes system changes based on MBSE models, ensuring consistency between design and code.
-  08     3. Contributor: An external community member contributing to Reqvire by improving models, creating features, or providing feedback.
-  09     4. Manager: Oversees the MBSE processes, tracks progress, ensures alignment with objectives, and generates reports for decision-making.
-  10 -   ␤
-  10     ## User Stories
-  11
-  12     ### Managing MBSE Models
+  001     # User Stories
+  002
+  003     ## Personas
+  004 +   ␤
+  005 +   ␤
+  006     1. System Engineer: Focused on managing system models, ensuring alignment with project requirements, and validating structures.
+  007     2. SOI Developer: Implements features and makes system changes based on MBSE models, ensuring consistency between design and code.
+  008     3. Contributor: An external community member contributing to Reqvire by improving models, creating features, or providing feedback.
+  009     4. Manager: Oversees the MBSE processes, tracks progress, ensures alignment with objectives, and generates reports for decision-making.
+  010 -   ␤
+  010     ## User Stories
+  011
+  012     ### Managing MBSE Models
 
-  17       * type: user-requirement
-  18
-  19     #### Relations
-  20 -     * trace: [MOEs.md#moe_ua](/MOEs.md#moe_ua)
-  20 -   * derive: [SystemRequirements/Requirements.md#requirements-processing](/SystemRequirements/Requirements.md#requirements-processing)
-  20 +     * trace: [MOE_UA](MOEs.md#moe_ua)
-  21 +     * derive: [Requirements Processing](SystemRequirements/Requirements.md#requirements-processing)
-  22 +   ---
-  23
-  24     ### Generate Diagrams
-  25 +   ␤
-  26     As a **System Engineer**, I want to generate diagrams for different system viewpoints, so that I can communicate system architecture effectively and understand dependencies and impacts across the system.
-  27
-  28     #### Metadata
-  29       * type: user-requirement
-  30
-  31     #### Relations
-  32 -     * trace: [MOEs.md#moe_ua](/MOEs.md#moe_ua)
-  32 -   ␤
-  32 +     * trace: [MOE_UA](MOEs.md#moe_ua)
-  33     ---
-  34
-  35     ### Missing Blank Line Test
-  36 +   ␤
-  37     This element has content but no blank line before metadata.
-  38 +   ␤
-  39     #### Metadata
-  40       * type: user-requirement
-  41 -   ␤
-  41     ---
-  42
-  43     ### Metadata Repositioning Test
-  44
-  45     Verify that metadata repositioning maintains blank line spacing.
-  46 -   #### Metadata
-  46 -     * type: verification
-  46 -     * status: implemented
-  46 -   ␤
-  46     #### Details
-  47 -   ␤
-  47     This test verifies that when metadata is repositioned from early position to end position, a blank line is properly added before the metadata section.
-  48
-  49     ##### Acceptance Criteria
-  50 -   ␤
-  50       * [ ] Metadata is moved to end position
-  51       * [ ] Blank line exists before metadata after repositioning
-  52       * [ ] Content structure is preserved
-  53 +   #### Metadata
-  54 +     * type: test-verification
-  55 +     * status: implemented
-  56     ---
-  57
-  58     ### Details Block Formatting Test
+  017       * type: user-requirement
+  018
+  019     #### Relations
+  020 -     * trace: [MOEs.md#moe_ua](/MOEs.md#moe_ua)
+  020 -   * derive: [SystemRequirements/Requirements.md#requirements-processing](/SystemRequirements/Requirements.md#requirements-processing)
+  020 +     * trace: [MOE_UA](MOEs.md#moe_ua)
+  021 +     * derive: [Requirements Processing](SystemRequirements/Requirements.md#requirements-processing)
+  022 +   ---
+  023
+  024     ### Generate Diagrams
+  025 +   ␤
+  026     As a **System Engineer**, I want to generate diagrams for different system viewpoints, so that I can communicate system architecture effectively and understand dependencies and impacts across the system.
+  027
+  028     #### Metadata
+  029       * type: user-requirement
+  030
+  031     #### Relations
+  032 -     * trace: [MOEs.md#moe_ua](/MOEs.md#moe_ua)
+  032 -   ␤
+  032 +     * trace: [MOE_UA](MOEs.md#moe_ua)
+  033     ---
+  034
+  035     ### Missing Blank Line Test
+  036 +   ␤
+  037     This element has content but no blank line before metadata.
+  038 +   ␤
+  039     #### Metadata
+  040       * type: user-requirement
+  041 -   ␤
+  041     ---
+  042
+  043     ### Metadata Repositioning Test
+  044
+  045     Verify that metadata repositioning maintains blank line spacing.
+  046 -   #### Metadata
+  046 -     * type: verification
+  046 -     * status: implemented
+  046 -   ␤
+  046     #### Details
+  047 -   ␤
+  047     This test verifies that when metadata is repositioned from early position to end position, a blank line is properly added before the metadata section.
+  048
+  049     ##### Acceptance Criteria
+  050 -   ␤
+  050       * [ ] Metadata is moved to end position
+  051       * [ ] Blank line exists before metadata after repositioning
+  052       * [ ] Content structure is preserved
+  053 +   #### Metadata
+  054 +     * type: test-verification
+  055 +     * status: implemented
+  056     ---
+  057
+  058     ### Details Block Formatting Test
 
-  66     ####Another Header Without Space
-  67     More content that should remain untouched.
-  68     </details>
-  69 +   ␤
-  70     #### Metadata
-  71       * type: user-requirement
-  72 -   ␤
-  72     ---
-  73
-  74     ### Exact Blank Line Count Test
+  066     ####Another Header Without Space
+  067     More content that should remain untouched.
+  068     </details>
+  069 +   ␤
+  070     #### Metadata
+  071       * type: user-requirement
+  072 -   ␤
+  072     ---
+  073
+  074     ### Exact Blank Line Count Test
 
-  77     Content line 1.
-  78     Content line 2.
-  79     Content line 3.
-  80 -   #### Metadata
-  80 -     * type: verification
-  80 -     * status: implemented
-  80 +   ␤
-  81     #### Details
-  82     Detail content here.
-  83 +   #### Metadata
-  84 +     * type: test-verification
-  85 +     * status: implemented
-  86     ---
+  077     Content line 1.
+  078     Content line 2.
+  079     Content line 3.
+  080 -   #### Metadata
+  080 -     * type: verification
+  080 -     * status: implemented
+  080 +   ␤
+  081     #### Details
+  082     Detail content here.
+  083 +   #### Metadata
+  084 +     * type: test-verification
+  085 +     * status: implemented
+  086     ---
+  087
+  088     ### External URL Preservation Test
+
+  094
+  095     #### Relations
+  096       * satisfiedBy: [PlansAndPricing](https://docs.google.com/spreadsheets/d/1YgO2THkvPQEtvoP2c4JU6q8Fx4K9rWJ9V5bhpGvo7DI/edit?gid=203583324#gid=203583324)
+  097 -   ␤
+  097     ---
 
 
 
