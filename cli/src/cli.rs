@@ -17,6 +17,7 @@ use reqvire::sections_summary;
 use reqvire::GraphRegistry;
 use reqvire::graph_registry::{Page, Section};
 use reqvire::element::Element;
+use reqvire::format::{format_files, render_diff, render_diff_json};
 use std::collections::HashMap;
 use std::path::Path;
 
@@ -451,117 +452,12 @@ pub fn handle_command(
             return Ok(0);
         },
         Some(Commands::Format { dry_run, json }) => {
-            let format_result = model_manager.graph_registry.format_files(dry_run)?;
+            let format_result = format_files(&model_manager.graph_registry, dry_run)?;
 
             if json {
-                // JSON output for both dry-run and actual formatting
-                let json_result = serde_json::json!({
-                    "dry_run": dry_run,
-                    "files_changed": format_result.files_changed,
-                    "diffs": format_result.diffs.iter().map(|file_diff| {
-                        serde_json::json!({
-                            "file_path": file_diff.file_path,
-                            "lines": file_diff.lines.iter().map(|line| {
-                                serde_json::json!({
-                                    "prefix": line.prefix,
-                                    "content": line.content,
-                                    "color": line.color
-                                })
-                            }).collect::<Vec<_>>()
-                        })
-                    }).collect::<Vec<_>>()
-                });
-                println!("{}", serde_json::to_string_pretty(&json_result).unwrap());
-            } else if dry_run {
-                if format_result.diffs.is_empty() {
-                    println!("No formatting changes needed.");
-                } else {
-                    println!("Found {} file(s) with formatting changes:\n", format_result.diffs.len());
-                    for file_diff in &format_result.diffs {
-                        println!("📄 {}", file_diff.file_path);
-                        for line in &file_diff.lines {
-                            match line.color.as_str() {
-                                "green" => {
-                                    if line.content.is_empty() {
-                                        println!("  \x1b[32m{}\x1b[0m", line.prefix)
-                                    } else {
-                                        println!("  \x1b[32m{} {}\x1b[0m", line.prefix, line.content)
-                                    }
-                                },
-                                "red" => {
-                                    if line.content.is_empty() {
-                                        println!("  \x1b[31m{}\x1b[0m", line.prefix)
-                                    } else {
-                                        println!("  \x1b[31m{} {}\x1b[0m", line.prefix, line.content)
-                                    }
-                                },
-                                "context" => {
-                                    if line.content.is_empty() {
-                                        println!("  \x1b[37m{}\x1b[0m", line.prefix)
-                                    } else {
-                                        println!("  \x1b[37m{} {}\x1b[0m", line.prefix, line.content)
-                                    }
-                                },
-                                "separator" => println!(""),
-                                _ => {
-                                    if line.content.is_empty() {
-                                        println!("  {}", line.prefix)
-                                    } else {
-                                        println!("  {} {}", line.prefix, line.content)
-                                    }
-                                },
-                            }
-                        }
-                        println!();
-                        println!();
-                        println!();
-                    }
-                    println!("Run without --dry-run to apply these changes.");
-                }
+                println!("{}", render_diff_json(&format_result));
             } else {
-                // Actual formatting - show diffs when changes are applied
-                if format_result.files_changed == 0 {
-                    println!("No files needed formatting.");
-                } else {
-                    println!("Formatted {} file(s):\n", format_result.files_changed);
-                    for file_diff in &format_result.diffs {
-                        println!("📄 {}", file_diff.file_path);
-                        for line in &file_diff.lines {
-                            match line.color.as_str() {
-                                "green" => {
-                                    if line.content.is_empty() {
-                                        println!("  \x1b[32m{}\x1b[0m", line.prefix)
-                                    } else {
-                                        println!("  \x1b[32m{} {}\x1b[0m", line.prefix, line.content)
-                                    }
-                                },
-                                "red" => {
-                                    if line.content.is_empty() {
-                                        println!("  \x1b[31m{}\x1b[0m", line.prefix)
-                                    } else {
-                                        println!("  \x1b[31m{} {}\x1b[0m", line.prefix, line.content)
-                                    }
-                                },
-                                "context" => {
-                                    if line.content.is_empty() {
-                                        println!("  \x1b[37m{}\x1b[0m", line.prefix)
-                                    } else {
-                                        println!("  \x1b[37m{} {}\x1b[0m", line.prefix, line.content)
-                                    }
-                                },
-                                "separator" => println!(""),
-                                _ => {
-                                    if line.content.is_empty() {
-                                        println!("  {}", line.prefix)
-                                    } else {
-                                        println!("  {} {}", line.prefix, line.content)
-                                    }
-                                },
-                            }
-                        }
-                        println!();
-                    }
-                }
+                render_diff(&format_result);
             }
             return Ok(0);
         },

@@ -17,6 +17,7 @@ pub mod change_impact;
 pub mod subsection;
 pub mod matrix_generator;
 pub mod graph_registry;
+pub mod format;
 
 // Re-export commonly used modules
 pub use crate::model::ModelManager;

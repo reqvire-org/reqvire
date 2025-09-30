@@ -15,7 +15,7 @@ graph LR;
   click 9f473f6e0b993cac "Requirements.md#excess-whitespace-linting-implementation";
   63a0f5a33e87fcee["whitespace.rs"];
   class 63a0f5a33e87fcee default;
-  click 63a0f5a33e87fcee "../../core/src/linting/whitespace.rs";
+  click 63a0f5a33e87fcee "../../core/src/format.rs";
   9f473f6e0b993cac -->|satisfiedBy| 63a0f5a33e87fcee;
   735766802775ec41["Format Command Requirements Verification"];
   class 735766802775ec41 verification;
@@ -26,7 +26,7 @@ graph LR;
   click 7d44a9de72f2ed11 "Requirements.md#incosistent-newlines-linting-implementation";
   aab06119b34eec74["newlines.rs"];
   class aab06119b34eec74 default;
-  click aab06119b34eec74 "../../core/src/linting/newlines.rs";
+  click aab06119b34eec74 "../../core/src/format.rs";
   7d44a9de72f2ed11 -->|satisfiedBy| aab06119b34eec74;
   7d44a9de72f2ed11 -.->|verifiedBy| 735766802775ec41;
   47401bd64e231632["Parallel Linting Processing"];
@@ -34,7 +34,7 @@ graph LR;
   click 47401bd64e231632 "Requirements.md#parallel-linting-processing";
   c418c3775592f201["mod.rs"];
   class c418c3775592f201 default;
-  click c418c3775592f201 "../../core/src/linting/mod.rs";
+  click c418c3775592f201 "../../core/src/format.rs";
   47401bd64e231632 -->|satisfiedBy| c418c3775592f201;
   47401bd64e231632 -.->|verifiedBy| 735766802775ec41;
   bef37c31db69b66a["File Pattern Exclusion for Linting"];
@@ -53,7 +53,7 @@ graph LR;
   click 719bf8b75772947d "Requirements.md#missing-separators-linting-implementation";
   9cbd45fe044171ec["separators.rs"];
   class 9cbd45fe044171ec default;
-  click 9cbd45fe044171ec "../../core/src/linting/separators.rs";
+  click 9cbd45fe044171ec "../../core/src/format.rs";
   719bf8b75772947d -->|satisfiedBy| 9cbd45fe044171ec;
   719bf8b75772947d -.->|verifiedBy| 735766802775ec41;
   b7dd9db7a1290b97["Git-Style Diff Output for Linting"];
@@ -61,7 +61,7 @@ graph LR;
   click b7dd9db7a1290b97 "Requirements.md#git-style-diff-output-for-linting";
   c418c3775592f201["mod.rs"];
   class c418c3775592f201 default;
-  click c418c3775592f201 "../../core/src/linting/mod.rs";
+  click c418c3775592f201 "../../core/src/format.rs";
   b7dd9db7a1290b97 -->|satisfiedBy| c418c3775592f201;
   b7dd9db7a1290b97 -.->|verifiedBy| 735766802775ec41;
   a7bd845c64d1685e["Reserved Subsections Linting Implementation"];
@@ -69,7 +69,7 @@ graph LR;
   click a7bd845c64d1685e "Requirements.md#reserved-subsections-linting-implementation";
   4ef2e0c1cdbc35ab["indentation.rs"];
   class 4ef2e0c1cdbc35ab default;
-  click 4ef2e0c1cdbc35ab "../../core/src/linting/indentation.rs";
+  click 4ef2e0c1cdbc35ab "../../core/src/format.rs";
   a7bd845c64d1685e -->|satisfiedBy| 4ef2e0c1cdbc35ab;
   a7bd845c64d1685e -.->|verifiedBy| 735766802775ec41;
   974ccf933675ef44["Format Consistency Enforcement"];
@@ -119,7 +119,7 @@ The system shall detect and fix excess whitespace after element headers, subsect
 
 #### Relations
   * derivedFrom: [Format Consistency Enforcement](../UserRequirements.md#format-consistency-enforcement)
-  * satisfiedBy: [whitespace.rs](../../core/src/linting/whitespace.rs)
+  * satisfiedBy: [whitespace.rs](../../core/src/format.rs)
   * verifiedBy: [Format Command Requirements Verification](../Verifications/Misc.md#format-command-requirements-verification)
 
 ---
@@ -130,7 +130,7 @@ The system shall detect and fix excess or missing newlines before element header
 
 #### Relations
   * derivedFrom: [Format Consistency Enforcement](../UserRequirements.md#format-consistency-enforcement)
-  * satisfiedBy: [newlines.rs](../../core/src/linting/newlines.rs)
+  * satisfiedBy: [newlines.rs](../../core/src/format.rs)
   * verifiedBy: [Format Command Requirements Verification](../Verifications/Misc.md#format-command-requirements-verification)
 
 ---
@@ -141,7 +141,7 @@ The system shall detect consecutive element sections that lack a separator line 
 
 #### Relations
   * derivedFrom: [Format Consistency Enforcement](../UserRequirements.md#format-consistency-enforcement)
-  * satisfiedBy: [separators.rs](../../core/src/linting/separators.rs)
+  * satisfiedBy: [separators.rs](../../core/src/format.rs)
   * verifiedBy: [Format Command Requirements Verification](../Verifications/Misc.md#format-command-requirements-verification)
 
 ---
@@ -152,7 +152,7 @@ The system shall identify and fix inconsistent indentation and bullet types in r
 
 #### Relations
   * derivedFrom: [Format Consistency Enforcement](../UserRequirements.md#format-consistency-enforcement)
-  * satisfiedBy: [indentation.rs](../../core/src/linting/indentation.rs)
+  * satisfiedBy: [indentation.rs](../../core/src/format.rs)
   * verifiedBy: [Format Command Requirements Verification](../Verifications/Misc.md#format-command-requirements-verification)
 
 ---
@@ -163,7 +163,7 @@ The system shall display linting change suggestions in a git-style diff format, 
 
 #### Relations
   * derivedFrom: [Formatting Output](../UserRequirements.md#formatting-output)
-  * satisfiedBy: [mod.rs](../../core/src/linting/mod.rs)
+  * satisfiedBy: [format.rs](../../core/src/format.rs)
   * verifiedBy: [Format Command Requirements Verification](../Verifications/Misc.md#format-command-requirements-verification)
 
 ---
@@ -174,7 +174,7 @@ The system shall implement parallel processing for linting operations when possi
 
 #### Relations
   * derivedFrom: [Model Formatting](../UserRequirements.md#model-formatting)
-  * satisfiedBy: [mod.rs](../../core/src/linting/mod.rs)
+  * satisfiedBy: [mod.rs](../../core/src/format.rs)
   * verifiedBy: [Format Command Requirements Verification](../Verifications/Misc.md#format-command-requirements-verification)
 
 ---
