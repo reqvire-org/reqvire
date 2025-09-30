@@ -1123,7 +1123,7 @@ impl GraphRegistry {
             }
         }
 
-        // Trim end and ensure exactly one trailing newline for proper spacing before separator
+        // Trim end
         let trimmed = result.trim_end();
         if trimmed.is_empty() {
             String::new()
