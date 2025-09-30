@@ -1,0 +1,270 @@
+Found 7 file(s) with formatting changes:
+
+📄 MOEs.md
+  01     # Measures of Effectiveness
+  02
+  03     ## User Adoption
+  04 -   ---
+  04
+  05     ### MOE_UA
+  06 +   ␤
+  07     User adoption measure.
+  08
+  09     #### Metadata
+  10       * type: user-requirement
+  11 +   ---
+  12
+  13     ## Cost Effectiveness
+  14 -   ---
+  14
+  15     ### MOE_CE
+  16 +   ␤
+  17     Cost effectiveness measure.
+  18
+  19     #### Metadata
+  20       * type: user-requirement
+  21 +   ---
+  22 +   ␤
+
+
+
+📄 SystemRequirements/Requirements.md
+  01     # System Requirements
+  02
+  03     ## Processing
+  04
+  05     ### Requirements Processing
+  06 +   ␤
+  07     The system shall parse the files in all folders and subfolders from the root of git repository.
+  08 -   #### Metadata
+  08 -     * type: requirement
+  08 -   ␤
+  08     #### Relations
+  09 -     * derivedFrom: ../UserStories.md#managing-mbse-models
+  09 -     * satisfiedBy: ../core/src/model.rs
+  09 +     * derivedFrom: [Managing MBSE Models](../UserStories.md#managing-mbse-models)
+  10 +     * satisfiedBy: [model.rs](../core/src/model.rs)
+  11 +   ---
+  12
+  13     ### Validation Framework
+  14
+  15     The system shall implement a two-pass validation architecture for comprehensive error detection.
+  16 -   #### Metadata
+  16 -     * type: requirement
+  16 -   ␤
+  16     #### Relations
+  17 -     * derivedFrom: #requirements-processing
+  17 -     * satisfiedBy: ../core/src/graph_registry.rs
+  17 -   ␤
+  17 +     * derivedFrom: [Requirements Processing](#requirements-processing)
+  18 +     * satisfiedBy: [graph_registry.rs](../core/src/graph_registry.rs)
+  19     ---
+  20
+  21     ### Path Resolution Testing
+  22
+  23     This requirement tests various absolute path conversions from a subfolder.
+  24 -   #### Metadata
+  24 -     * type: requirement
+  24 +   #### Relations
+  25 +     * derivedFrom: [Managing MBSE Models](../UserStories.md#managing-mbse-models)
+  26 +     * trace: [MOE_UA](../MOEs.md#moe_ua)
+  27 +     * verifiedBy: [Format Test](../Verifications/Tests.md#format-test)
+  28 +     * satisfiedBy: [parser.rs](../core/src/parser.rs)
+  29 +   ---
+  30
+  31 -   #### Relations
+  31 -     * derivedFrom: [../UserStories.md#managing-mbse-models](/UserStories.md#managing-mbse-models)
+  31 -     * trace: [../MOEs.md#moe_ua](/MOEs.md#moe_ua)
+  31 -     * verifiedBy: [../Verifications/Tests.md#format-test](/Verifications/Tests.md#format-test)
+  31 -     * satisfiedBy: /core/src/parser.rs
+
+
+
+📄 TestNoHeaders.md
+  01 +   # TestNoHeaders
+  02 +   ␤
+  03 +   ## Requirements
+  04 +   ␤
+  05     ### Element Without Section
+  06
+  07     This element has no page header and no section header.
+
+
+
+
+📄 TestNoPageHeader.md
+  01 +   # TestNoPageHeader
+  02 +   ␤
+  03     ## Test Section
+  04
+  05     ### Element Alpha
+
+
+
+
+📄 TestNoSectionHeader.md
+  01     # TestNoSectionHeader
+  02 +   ## Requirements
+  03 +   ␤
+  04     ### Element One
+  05
+  06     This file has page header but no section header.
+
+
+
+
+📄 UserStories.md
+  01     # User Stories
+  02
+  03     ## Personas
+  04 +   ␤
+  05 +   ␤
+  06     1. System Engineer: Focused on managing system models, ensuring alignment with project requirements, and validating structures.
+  07     2. SOI Developer: Implements features and makes system changes based on MBSE models, ensuring consistency between design and code.
+  08     3. Contributor: An external community member contributing to Reqvire by improving models, creating features, or providing feedback.
+  09     4. Manager: Oversees the MBSE processes, tracks progress, ensures alignment with objectives, and generates reports for decision-making.
+  10 -   ␤
+  10     ## User Stories
+  11
+  12     ### Managing MBSE Models
+
+  17       * type: user-requirement
+  18
+  19     #### Relations
+  20 -     * trace: [MOEs.md#moe_ua](/MOEs.md#moe_ua)
+  20 -   * derive: [SystemRequirements/Requirements.md#requirements-processing](/SystemRequirements/Requirements.md#requirements-processing)
+  20 +     * trace: [MOE_UA](MOEs.md#moe_ua)
+  21 +     * derive: [Requirements Processing](SystemRequirements/Requirements.md#requirements-processing)
+  22 +   ---
+  23
+  24     ### Generate Diagrams
+  25 +   ␤
+  26     As a **System Engineer**, I want to generate diagrams for different system viewpoints, so that I can communicate system architecture effectively and understand dependencies and impacts across the system.
+  27
+  28     #### Metadata
+  29       * type: user-requirement
+  30
+  31     #### Relations
+  32 -     * trace: [MOEs.md#moe_ua](/MOEs.md#moe_ua)
+  32 -   ␤
+  32 +     * trace: [MOE_UA](MOEs.md#moe_ua)
+  33     ---
+  34
+  35     ### Missing Blank Line Test
+  36 +   ␤
+  37     This element has content but no blank line before metadata.
+  38 +   ␤
+  39     #### Metadata
+  40       * type: user-requirement
+  41 -   ␤
+  41     ---
+  42
+  43     ### Metadata Repositioning Test
+  44
+  45     Verify that metadata repositioning maintains blank line spacing.
+  46 -   #### Metadata
+  46 -     * type: verification
+  46 -     * status: implemented
+  46 -   ␤
+  46     #### Details
+  47 -   ␤
+  47     This test verifies that when metadata is repositioned from early position to end position, a blank line is properly added before the metadata section.
+  48
+  49     ##### Acceptance Criteria
+  50 -   ␤
+  50       * [ ] Metadata is moved to end position
+  51       * [ ] Blank line exists before metadata after repositioning
+  52       * [ ] Content structure is preserved
+  53 +   #### Metadata
+  54 +     * type: test-verification
+  55 +     * status: implemented
+  56     ---
+  57
+  58     ### Details Block Formatting Test
+
+  66     ####Another Header Without Space
+  67     More content that should remain untouched.
+  68     </details>
+  69 +   ␤
+  70     #### Metadata
+  71       * type: user-requirement
+  72 -   ␤
+  72     ---
+  73
+  74     ### Exact Blank Line Count Test
+
+  77     Content line 1.
+  78     Content line 2.
+  79     Content line 3.
+  80 -   #### Metadata
+  80 -     * type: verification
+  80 -     * status: implemented
+  80 +   ␤
+  81     #### Details
+  82     Detail content here.
+  83 +   #### Metadata
+  84 +     * type: test-verification
+  85 +     * status: implemented
+  86     ---
+
+
+
+📄 Verifications/Tests.md
+  01     # Verification Tests
+  02
+  03     This document contains various test cases.
+  04
+  05     ## Test Categories
+  06 +   ␤
+  07 +   ␤
+  08     Some introduction text here.
+  09 +   ---
+  10 +   ␤
+  11     ### Format Test
+  12 +   ␤
+  13     This test verifies formatting capabilities.
+  14
+  15     #### Metadata
+  16 -     * type: verification
+  16 +     * type: test-verification
+  17
+  18     #### Relations
+  19 -     * verify: ../SystemRequirements/Requirements.md#requirements-processing
+  19 -     * satisfiedBy: ../tests/test-format/test.sh
+  19 +     * verify: [Requirements Processing](../SystemRequirements/Requirements.md#requirements-processing)
+  20 +     * satisfiedBy: [test.sh](../tests/test-format/test.sh)
+  21 +   ---
+  22
+  23     ### Validation Test
+  24
+  25     This test verifies validation capabilities.
+  26
+  27     #### Metadata
+  28 -     * type: verification
+  28 +     * type: test-verification
+  29
+  30     #### Relations
+  31 -     * verify: ../SystemRequirements/Requirements.md#validation-framework
+  31 -   ␤
+  31 +     * verify: [Validation Framework](../SystemRequirements/Requirements.md#validation-framework)
+  32     ---
+  33
+  34     ### Absolute Path Verification
+
+  36     This verification uses absolute paths to rs files.
+  37
+  38     #### Metadata
+  39 -     * type: verification
+  39 +     * type: test-verification
+  40
+  41     #### Relations
+  42 -     * verify: [../SystemRequirements/Requirements.md#path-resolution-testing](/SystemRequirements/Requirements.md#path-resolution-testing)
+  42 -     * satisfiedBy: /core/src/element.rs
+  42 +     * verify: [Path Resolution Testing](../SystemRequirements/Requirements.md#path-resolution-testing)
+  43 +     * satisfiedBy: [element.rs](../core/src/element.rs)
+  44 +   ---
+  45
+
+
+
+Run without --dry-run to apply these changes.

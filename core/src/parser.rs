@@ -109,8 +109,18 @@ pub fn parse_elements(
                 // Increment section order after saving the previous section
                 section_order_counter += 1;
             } else {
-                // For the first section, set the initial order
-                section_order_counter = 0;
+                // First ## section encountered - check if default section has elements
+                let default_section_count = section_element_counter.get(current_section_name).unwrap_or(&0);
+                if *default_section_count > 0 {
+                    // Save the default "Requirements" section with order 0 only if it has elements
+                    let cleaned_content = remove_generated_diagrams(&current_section_content);
+                    sections.push((current_section_name.to_string(), cleaned_content.trim().to_string(), 0));
+                    // Next section will have order 1
+                    section_order_counter = 1;
+                } else {
+                    // No elements in default section, first ## section gets order 0
+                    section_order_counter = 0;
+                }
             }
 
             // Start new section
@@ -220,6 +230,17 @@ pub fn parse_elements(
                 }
             }
 
+        } else if trimmed.starts_with("#####") && current_element.is_some() && current_subsection != SubSection::Details && !skip_current_element {
+            // Level 5+ headers are only allowed inside Details subsection
+            let msg = format!(
+                "Invalid header level in element '{}': Level 5+ headers (#####+) can only appear inside '#### Details' subsection (file: {}, line {})",
+                current_element.as_ref().unwrap().name,
+                file_path.display(),
+                line_num + 1
+            );
+            errors.push(ReqvireError::InvalidMarkdownStructure(msg.clone()));
+            debug!("Error: {}", msg);
+
         } else if trimmed.starts_with("#### ") && current_element.is_some() {
             let subsection = SubSection::from_str(&trimmed[5..].trim());
 
@@ -242,7 +263,7 @@ pub fn parse_elements(
             // If transitioning to Details subsection, add the header to content
             if subsection == SubSection::Details && !skip_current_element {
                 if let Some(element) = &mut current_element {
-                    element.add_content("#### Details\n");
+                    element.add_content("\n#### Details\n");
                 }
             }
 

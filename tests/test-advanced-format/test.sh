@@ -28,6 +28,16 @@ fi
 # Remove ANSI color codes for easier text matching
 sed 's/\x1b\[[0-9;]*m//g' dry_run_output.txt > dry_run_clean.txt
 
+# Test 1.2: Compare diff output with expected diff file (file order is now deterministic)
+if [ -f expected_diff.txt ]; then
+    if ! diff -u expected_diff.txt dry_run_clean.txt > /dev/null; then
+        echo "FAIL: Diff output does not match expected diff output"
+        echo "Differences (first 80 lines):"
+        diff -u expected_diff.txt dry_run_clean.txt | head -80
+        exit 1
+    fi
+fi
+
 EXPECTED_LINK_CONVERSION="\[MOE_UA\](MOEs.md#moe_ua)"
 EXPECTED_SIMPLE_ID_CONVERSION="\[Requirements Processing\](SystemRequirements/Requirements.md#requirements-processing)"
 EXPECTED_SEPARATOR_ADDITION="\+.*---"
@@ -86,6 +96,23 @@ FORMAT_EXIT_CODE=$?
 if [ $FORMAT_EXIT_CODE -ne 0 ]; then
     echo "FAIL: Format command execution failed with exit code $FORMAT_EXIT_CODE"
     exit 1
+fi
+
+# Test 2.1: Verify that format command shows diff output when applying changes
+# If files were changed, we should see diff output; if no changes, we should see "No files needed formatting"
+if [ $FORMAT_EXIT_CODE -eq 0 ]; then
+    if grep -q "Formatted [0-9]* file(s)" format_output.txt; then
+        # Changes were made - should show diff output
+        if ! grep -q "UserStories.md\|SystemRequirements\|Verifications" format_output.txt; then
+            echo "FAIL: Format command should show file names when applying changes"
+            cat format_output.txt
+            exit 1
+        fi
+    elif ! grep -q "No files needed formatting" format_output.txt; then
+        echo "FAIL: Format command should indicate if no formatting was needed"
+        cat format_output.txt
+        exit 1
+    fi
 fi
 
 # Test 3: Verify expected changes were applied with exact content matching
@@ -165,6 +192,73 @@ if grep -q "^\\* " UserStories.md; then
     exit 1
 fi
 
+# Test 3.8: Check that blank line is added before metadata when missing
+# The test element "Missing Blank Line Test" should have a blank line added before #### Metadata
+if ! grep -A 2 "This element has content but no blank line before metadata." UserStories.md | grep -q "^$"; then
+    echo "FAIL: Blank line not added before metadata section"
+    echo "Content around the test element:"
+    grep -A 3 -B 1 "Missing Blank Line Test" UserStories.md
+    exit 1
+fi
+
+# Test 3.9: Check that blank line is added before repositioned metadata
+# The test element "Metadata Repositioning Test" has metadata early, then Details/Acceptance Criteria
+# After formatting, metadata should be at the end with a blank line before it
+# Extract just the "Metadata Repositioning Test" element and check for blank line before #### Metadata
+if ! awk '/^### Metadata Repositioning Test$/,/^---$/' UserStories.md | grep -B 1 "^#### Metadata$" | head -1 | grep -q "^$"; then
+    echo "FAIL: Blank line not added before repositioned metadata section"
+    echo "Content around the test element:"
+    grep -A 20 "Metadata Repositioning Test" UserStories.md
+    exit 1
+fi
+
+# Test 3.10: Check that content inside <details> blocks is not formatted
+# The element "Details Block Formatting Test" has improperly formatted headers inside <details>
+# After formatting, content inside <details> should remain unchanged
+if ! grep -A 10 "Details Block Formatting Test" UserStories.md | grep -q "####Another Header Without Space"; then
+    echo "FAIL: Content inside <details> block was incorrectly formatted"
+    echo "Content around the test element:"
+    grep -A 15 "Details Block Formatting Test" UserStories.md
+    exit 1
+fi
+
+# Test 3.11: Verify complete formatted file matches expected output
+# Compare entire UserStories.md file with expected output
+if [ -f expected_UserStories.md ]; then
+    if ! diff -u expected_UserStories.md UserStories.md > /dev/null; then
+        echo "FAIL: UserStories.md does not match expected output"
+        echo "Differences:"
+        diff -u expected_UserStories.md UserStories.md | head -50
+        exit 1
+    fi
+else
+    # Fallback to line count if expected file doesn't exist
+    EXPECTED_USERSTORIES_LINES=90
+    ACTUAL_USERSTORIES_LINES=$(wc -l < UserStories.md)
+    if [ "$ACTUAL_USERSTORIES_LINES" -ne "$EXPECTED_USERSTORIES_LINES" ]; then
+        echo "FAIL: UserStories.md line count mismatch. Expected $EXPECTED_USERSTORIES_LINES, got $ACTUAL_USERSTORIES_LINES"
+        exit 1
+    fi
+fi
+
+# Compare entire MOEs.md file with expected output
+if [ -f expected_MOEs.md ]; then
+    if ! diff -u expected_MOEs.md MOEs.md > /dev/null; then
+        echo "FAIL: MOEs.md does not match expected output"
+        echo "Differences:"
+        diff -u expected_MOEs.md MOEs.md | head -30
+        exit 1
+    fi
+else
+    # Fallback to line count
+    EXPECTED_MOES_LINES=21
+    ACTUAL_MOES_LINES=$(wc -l < MOEs.md)
+    if [ "$ACTUAL_MOES_LINES" -ne "$EXPECTED_MOES_LINES" ]; then
+        echo "FAIL: MOEs.md line count mismatch. Expected $EXPECTED_MOES_LINES, got $ACTUAL_MOES_LINES"
+        exit 1
+    fi
+fi
+
 # Test 4: Verify no additional changes needed (idempotent behavior)
 "$REQVIRE" format --dry-run > no_changes_output.txt 2>&1
 NO_CHANGES_EXIT_CODE=$?
@@ -206,14 +300,55 @@ if [ -z "$DIFF_LINE_NUMBERS" ]; then
     exit 1
 fi
 
-# For each file section, verify line numbers make sense
-# Look for patterns like: X + Y + Z where Z > Y > X (for additions)
-# or where removed lines don't break the sequence of final file positions
-if grep -A 20 "UserStories.md" dry_run_clean.txt | grep -E "^  [0-9]+ \+" | head -2 | tail -1 | grep -q "019"; then
-    # After adding lines 17,18,19, the next context line should be ~19 or higher
-    NEXT_CONTEXT=$(grep -A 25 "UserStories.md" dry_run_clean.txt | grep -E "^  [0-9]+     " | head -1 | sed 's/^  *//' | sed 's/ .*//')
-    if [ "$NEXT_CONTEXT" -lt 19 ]; then
-        echo "FAIL: Line numbering not sequential - expected line $NEXT_CONTEXT to be >= 19 after additions"
+# Test 6.1: Line number verification is now handled by expected_diff.txt comparison
+# The expected_diff.txt file captures the exact line numbers in the diff output
+# Any changes to line numbering will be caught by the diff comparison in Test 1.2
+
+# Test 7: Test JSON output functionality
+# Run format with --json flag on current files to test JSON output
+"$REQVIRE" format --dry-run --json > json_format_output.txt 2>&1
+JSON_FORMAT_EXIT_CODE=$?
+
+if [ $JSON_FORMAT_EXIT_CODE -ne 0 ]; then
+    echo "FAIL: Format command with --json flag failed with exit code $JSON_FORMAT_EXIT_CODE"
+    exit 1
+fi
+
+# Check if output is valid JSON
+if ! python3 -m json.tool < json_format_output.txt > /dev/null 2>&1; then
+    echo "FAIL: Format command --json output is not valid JSON"
+    echo "Output:"
+    cat json_format_output.txt
+    exit 1
+fi
+
+# Test 8: Document Structure Normalization - Missing Headers
+# Test 8.1: File with no page header and no section header
+if [ -f expected_TestNoHeaders.md ]; then
+    if ! diff -u expected_TestNoHeaders.md TestNoHeaders.md > /dev/null; then
+        echo "FAIL: TestNoHeaders.md does not match expected output (headers not added correctly)"
+        echo "Differences:"
+        diff -u expected_TestNoHeaders.md TestNoHeaders.md | head -30
+        exit 1
+    fi
+fi
+
+# Test 8.2: File with page header but no section header
+if [ -f expected_TestNoSectionHeader.md ]; then
+    if ! diff -u expected_TestNoSectionHeader.md TestNoSectionHeader.md > /dev/null; then
+        echo "FAIL: TestNoSectionHeader.md does not match expected output (section header not added)"
+        echo "Differences:"
+        diff -u expected_TestNoSectionHeader.md TestNoSectionHeader.md | head -30
+        exit 1
+    fi
+fi
+
+# Test 8.3: File with section header but no page header
+if [ -f expected_TestNoPageHeader.md ]; then
+    if ! diff -u expected_TestNoPageHeader.md TestNoPageHeader.md > /dev/null; then
+        echo "FAIL: TestNoPageHeader.md does not match expected output (page header not added)"
+        echo "Differences:"
+        diff -u expected_TestNoPageHeader.md TestNoPageHeader.md | head -30
         exit 1
     fi
 fi

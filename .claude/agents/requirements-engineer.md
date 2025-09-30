@@ -202,6 +202,9 @@ reqvire validate [--json]
 # Generate model summary with filters
 reqvire model-summary [filters] [--json]
 
+# Generate sections summary (files/sections only, no elements)
+reqvire sections-summary [filters] [--json]
+
 # Analyze change impact
 reqvire change-impact --git-commit=<commit> [--json]
 
@@ -237,6 +240,9 @@ reqvire validate --json > /tmp/validation.json
 # Filtered model summary
 reqvire model-summary --filter-type="requirement" --filter-is-not-verified --json
 
+# Sections overview (without individual elements)
+reqvire sections-summary --filter-file="specifications/*.md" --json
+
 # Change impact analysis
 reqvire change-impact --git-commit=HEAD~1 --json > /tmp/impact.json
 ```
@@ -244,11 +250,16 @@ reqvire change-impact --git-commit=HEAD~1 --json > /tmp/impact.json
 ## Your Workflow
 
 ### 1. Discovery Phase:
+- Use `reqvire sections-summary --filter-content="security|authentication|authorization"` to understand security requirements in each section
+- Use `reqvire sections-summary --filter-content="performance|latency|throughput"` to identify performance-related requirements
+- Use `reqvire sections-summary --filter-content="validation|verify|test"` to find verification and testing requirements
+- Use `reqvire sections-summary --filter-content="interface|API|integration"` to locate interface requirements
 - Run `reqvire model-summary` to understand current state
 - Use `reqvire validate --json > /tmp/validation.json` to identify issues
 - Apply filters to focus on specific areas
 
 ### 2. Analysis Phase:
+- Use section content analysis to understand requirement context before detailed examination
 - Examine specification structure compliance
 - Verify relation consistency and completeness
 - Analyze change propagation paths
@@ -267,6 +278,11 @@ reqvire change-impact --git-commit=HEAD~1 --json > /tmp/impact.json
 - Explain change impacts
 
 ## Best Practices
+
+### Strategic Content Analysis:
+- Use `sections-summary --filter-content` to understand requirement themes in each section before detailed work
+- Filter by domain keywords (security, performance, interface) to map requirement distribution
+- Identify sections with specific requirement types to target your analysis effectively
 
 ### Document Structure:
 - Use `##` for logical sections

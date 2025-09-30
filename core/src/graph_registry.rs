@@ -4,7 +4,7 @@ use std::path::{Path, PathBuf};
 use log::{debug, warn};
 use serde::Serialize;
 
-use crate::relation::{self, LinkType, get_parent_relation_types};
+use crate::relation::{self, LinkType, get_parent_relation_types, IMPACT_PROPAGATION_RELATIONS};
 use crate::element::{Element, ElementType, RequirementType};
 use crate::error::ReqvireError;
 use crate::git_commands;
@@ -73,26 +73,6 @@ pub struct ElementNode {
     pub relations: Vec<RelationNode>,
 }
 
-#[derive(Debug, Clone)]
-pub struct FormatResult {
-    pub files_changed: usize,
-    pub diffs: Vec<FileDiff>,
-    pub dry_run: bool,
-}
-
-#[derive(Debug, Clone)]
-pub struct FileDiff {
-    pub file_path: String,
-    pub lines: Vec<DiffLine>,
-}
-
-#[derive(Debug, Clone)]
-pub struct DiffLine {
-    pub prefix: String,
-    pub content: String,
-    pub color: String,
-}
-
 #[derive(Debug)]
 pub struct GraphRegistry {
     pub nodes: HashMap<String, ElementNode>,
@@ -155,6 +135,9 @@ impl GraphRegistry {
 
         // Validate relations
         let mut errors = self.validate_relations(excluded_filename_patterns)?;
+
+        // Validate non-test-verification satisfiedBy relations
+        errors.extend(self.validate_non_test_verification_satisfied_by()?);
 
         // Validate cross-component dependencies
         errors.extend(self.validate_cross_component_dependencies()?);
@@ -335,6 +318,53 @@ impl GraphRegistry {
         None
     }
 
+    /// Validates that only test-verification elements can have satisfiedBy relations
+    /// Returns a list of validation errors for non-test-verification elements with satisfiedBy
+    fn validate_non_test_verification_satisfied_by(&self) -> Result<Vec<ReqvireError>, ReqvireError> {
+        log::debug!("Validating non-test-verification satisfiedBy relations...");
+        let mut errors = Vec::new();
+
+        for element_node in self.nodes.values() {
+            let element = &element_node.element;
+
+            // Check if element has satisfiedBy relations
+            let has_satisfied_by = element.relations.iter().any(|relation| {
+                relation.relation_type.name == "satisfiedBy" && relation.user_created
+            });
+
+            if has_satisfied_by {
+                // Check if the element is a non-test-verification
+                match &element.element_type {
+                    crate::element::ElementType::Verification(verification_type) => {
+                        // Allow only test-verification (Default and Test types) to have satisfiedBy
+                        match verification_type {
+                            crate::element::VerificationType::Analysis |
+                            crate::element::VerificationType::Inspection |
+                            crate::element::VerificationType::Demonstration => {
+                                errors.push(ReqvireError::IncompatibleElementTypes(
+                                    format!("Non-test-verification element with satisfiedBy relation: '{}' (type: {:?}) cannot have satisfiedBy relations. Only test-verification elements may use satisfiedBy.",
+                                        element.identifier,
+                                        verification_type
+                                    )
+                                ));
+                            }
+                            crate::element::VerificationType::Default |
+                            crate::element::VerificationType::Test => {
+                                // These are valid - test verifications can have satisfiedBy
+                            }
+                        }
+                    }
+                    _ => {
+                        // Requirements and other elements can have satisfiedBy relations
+                        // This is valid behavior
+                    }
+                }
+            }
+        }
+
+        Ok(errors)
+    }
+
     /// Validates cross-component dependencies for circular dependencies and missing links.
     fn validate_cross_component_dependencies(&self) -> Result<Vec<ReqvireError>, ReqvireError> {
         debug!("Validating cross-component dependencies...");
@@ -410,7 +440,13 @@ impl GraphRegistry {
 
         // Traverse relations using their metadata to determine canonical direction
         for relation in &element.relations {
-            if let crate::relation::LinkType::Identifier(ref target_id) = relation.target.link {
+            if let LinkType::Identifier(ref target_id) = relation.target.link {
+                // Skip relations that don't participate in dependency propagation (like trace and backward relations)
+                // Only traverse relations that are in IMPACT_PROPAGATION_RELATIONS for cycle detection
+                if !IMPACT_PROPAGATION_RELATIONS.contains(&relation.relation_type.name) {
+                    continue;
+                }
+
                 // Use relation metadata to traverse in canonical direction only
                 let should_traverse = if let Some(_opposite) = relation.relation_type.opposite {
                     // For bidirectional relations, only traverse in one canonical direction
@@ -889,10 +925,8 @@ impl GraphRegistry {
 
         // Add the element content
         if !element.content.trim().is_empty() {
-            let trimmed_content = element.content.trim_end();
-            markdown.push_str(trimmed_content);
-            // Always add two newlines after content to ensure blank line before subsections
-            markdown.push_str("\n\n");
+            markdown.push_str(element.content.trim_end());
+            markdown.push_str("\n");
         }
 
         // Add metadata subsection if there are custom metadata
@@ -915,7 +949,7 @@ impl GraphRegistry {
             for (key, value) in custom_metadata {
                 markdown.push_str(&format!("  * {}: {}\n", key, value));
             }
-            markdown.push_str("\n\n");
+            markdown.push_str("\n");
         }
 
         // Add relations subsection if there are user-created relations
@@ -1018,14 +1052,68 @@ impl GraphRegistry {
                     target_text
                 ));
             }
-            markdown.push('\n');
+            markdown.push_str("\n");
         }
 
-        markdown
+        // Apply generic formatting to ensure exactly one blank line before all #### headers
+        Self::ensure_blank_lines_before_subsections(&markdown)
+    }
+
+    /// Ensures every #### header has exactly one blank line before it (skips content inside <details> blocks)
+    /// and removes blank lines immediately after #### headers
+    fn ensure_blank_lines_before_subsections(content: &str) -> String {
+        let mut result = String::new();
+        let mut in_details = false;
+
+        for line in content.lines() {
+            let trimmed_line = line.trim_start().to_lowercase();
+
+            // Track <details> blocks
+            if trimmed_line.starts_with("<details") {
+                in_details = true;
+            }
+
+            // Add blank line before #### headers (if not in <details>)
+            if !in_details && line.trim_start().starts_with("####") {
+                // Remove any trailing newlines
+                while result.ends_with('\n') {
+                    result.pop();
+                }
+                if !result.is_empty() {
+                    result.push_str("\n\n");
+                }
+            }
+
+            // Skip blank lines immediately after #### headers
+            if !in_details && line.trim().is_empty() {
+                // Check if the previous line was a #### header
+                let prev_line_is_header = result.lines().last()
+                    .map_or(false, |l| l.trim_start().starts_with("####"));
+                if prev_line_is_header {
+                    continue;
+                }
+            }
+
+            result.push_str(line);
+            result.push('\n');
+
+            // Track end of <details> blocks
+            if trimmed_line.starts_with("</details>") {
+                in_details = false;
+            }
+        }
+
+        // Trim end
+        let trimmed = result.trim_end();
+        if trimmed.is_empty() {
+            String::new()
+        } else {
+            format!("{}\n", trimmed)
+        }
     }
 
     /// Groups elements by their file path and section
-    fn group_elements_by_location(&self) -> HashMap<String, HashMap<String, Vec<&Element>>> {
+    pub fn group_elements_by_location(&self) -> HashMap<String, HashMap<String, Vec<&Element>>> {
         let mut file_sections: HashMap<String, HashMap<String, Vec<&Element>>> = HashMap::new();
 
         for node in self.nodes.values() {
@@ -1055,7 +1143,7 @@ impl GraphRegistry {
     }
 
     /// Generates markdown content for a file
-    fn generate_file_markdown(&self, file_path: &str, sections: &HashMap<String, Vec<&Element>>) -> String {
+    pub fn generate_file_markdown(&self, file_path: &str, sections: &HashMap<String, Vec<&Element>>) -> String {
         let mut markdown = String::new();
 
         // Get file title from file path (remove extension and path)
@@ -1066,18 +1154,19 @@ impl GraphRegistry {
             .replace('_', " ")
             .replace('-', " ");
 
-        // Check if page content already has a header to avoid duplication
+        // Check if page content already has a level 1 header to avoid duplication
         let mut has_page_header = false;
         if let Some(page) = self.pages.get(file_path) {
             if !page.frontmatter_content.trim().is_empty() {
-                // Check if page content starts with a header (# at beginning of line)
-                if page.frontmatter_content.trim_start().starts_with('#') {
+                let trimmed = page.frontmatter_content.trim_start();
+                // Check if page content starts with a level 1 header (# followed by space, not ##)
+                if trimmed.starts_with("# ") || (trimmed.starts_with('#') && trimmed.len() > 1 && !trimmed.chars().nth(1).unwrap().is_ascii_punctuation()) {
                     has_page_header = true;
                 }
             }
         }
 
-        // Add file header only if page content doesn't already have one
+        // Add file header only if page content doesn't already have a level 1 header
         if !has_page_header {
             markdown.push_str(&format!("# {}\n\n", file_title));
         }
@@ -1116,7 +1205,9 @@ impl GraphRegistry {
         });
 
         for (section_name, elements) in sorted_sections {
-            if !section_name.is_empty() && section_name != "Default" {
+            // Skip empty section names, but always output section headers including "Requirements"
+            // "Requirements" is the default section name used by parser when no ## header is present
+            if !section_name.is_empty() {
                 debug!("Adding section header: '## {}' with 2 newlines", section_name);
                 markdown.push_str(&format!("## {}\n\n", section_name));
             }
@@ -1321,272 +1412,6 @@ impl GraphRegistry {
         Ok((markdown_files_written, internal_files_copied))
     }
 
-    /// Format files in place with optional dry-run to show diffs
-    /// Uses current working directory as base (respects subdirectory operations)
-    pub fn format_files(&self, dry_run: bool) -> Result<FormatResult, ReqvireError> {
-        let base_dir = std::env::current_dir()
-            .map_err(|e| ReqvireError::PathError(format!("Failed to get current directory: {}", e)))?;
-
-        let grouped_elements = self.group_elements_by_location();
-        let mut files_changed = 0;
-        let mut files_with_diffs = Vec::new();
-
-        for (file_path, sections) in grouped_elements {
-            // Generate the new markdown content for this file
-            let mut new_content = self.generate_file_markdown(&file_path, &sections);
-
-            // Apply linting rules to ensure consistent formatting
-            new_content = self.apply_formatting_rules(&new_content, &file_path);
-
-            // Construct the full file path relative to current directory
-            let full_file_path = base_dir.join(&file_path);
-
-            // Read current content if file exists
-            let current_content = if full_file_path.exists() {
-                fs::read_to_string(&full_file_path)
-                    .map_err(|e| ReqvireError::IoError(e))?
-            } else {
-                String::new() // File doesn't exist, treat as empty
-            };
-
-            // Check if content has changed
-            if current_content != new_content {
-                files_changed += 1;
-
-                if dry_run {
-
-                    // Generate and store diff
-                    let diff = self.generate_file_diff(&file_path, &current_content, &new_content);
-                    // Only add non-empty diffs
-                    if !diff.lines.is_empty() {
-                        files_with_diffs.push(diff);
-                    }
-                } else {
-                    // Create parent directories if needed
-                    if let Some(parent_dir) = full_file_path.parent() {
-                        fs::create_dir_all(parent_dir)
-                            .map_err(|e| ReqvireError::IoError(e))?;
-                    }
-
-                    // Write the new content
-                    fs::write(&full_file_path, new_content)
-                        .map_err(|e| ReqvireError::IoError(e))?;
-
-                    debug!("Formatted {} with {} elements",
-                        file_path, sections.values().map(|v| v.len()).sum::<usize>());
-                }
-            }
-        }
-
-        Ok(FormatResult {
-            files_changed,
-            diffs: if dry_run { files_with_diffs } else { Vec::new() },
-            dry_run,
-        })
-    }
-
-    /// Apply basic formatting rules to generated markdown content
-    fn apply_formatting_rules(&self, content: &str, _file_path: &str) -> String {
-        // Since we're generating from the model, we only need basic cleanup
-        // of content that comes from original files (element content, page content, section content)
-
-        // Trim extra whitespace at both beginning and end of the content and ensure proper file ending
-        let mut formatted = content.trim().to_string();
-
-        // Ensure file ends with exactly one newline
-        if !formatted.is_empty() {
-            formatted.push('\n');
-        }
-
-        formatted
-    }
-
-
-    /// Generate a diff showing changes between current and new content
-    fn generate_file_diff(&self, file_path: &str, current: &str, new: &str) -> FileDiff {
-        use difference::{Difference, Changeset};
-
-        let changeset = Changeset::new(current, new, "\n");
-
-        // Check if there are any actual changes (additions or removals)
-        let has_changes = changeset.diffs.iter().any(|diff| !matches!(diff, Difference::Same(_)));
-        if !has_changes {
-            // No actual changes, return empty diff
-            return FileDiff {
-                file_path: file_path.to_string(),
-                lines: Vec::new(),
-            };
-        }
-
-        let mut diff_lines = Vec::new();
-
-        // Calculate max line numbers to determine padding width
-        let max_current_lines = current.lines().count();
-        let max_new_lines = new.lines().count();
-        let max_line_num = std::cmp::max(max_current_lines, max_new_lines);
-        let width = max_line_num.to_string().len();
-
-        let mut new_line_num = 1;
-        let mut previous_was_change = false;
-
-        let context_lines = 3; // Number of context lines to show before and after changes
-
-        for (i, diff) in changeset.diffs.iter().enumerate() {
-            match diff {
-                Difference::Same(text) => {
-                    let lines: Vec<&str> = text.split('\n').collect();
-                    let line_count = if lines.last() == Some(&"") { lines.len() - 1 } else { lines.len() };
-
-                    // Determine if we should show context lines
-                    let next_has_change = changeset.diffs.get(i + 1).map_or(false, |d| !matches!(d, Difference::Same(_)));
-                    let show_context = previous_was_change || next_has_change;
-
-                    // Special case: handle empty Same sections (blank lines)
-                    if text.is_empty() && show_context {
-                        diff_lines.push(DiffLine {
-                            prefix: format!("{:0width$}", new_line_num, width = width),
-                            content: "    ".to_string(),
-                            color: "context".to_string(),
-                        });
-                        new_line_num += 1;
-                    } else if show_context && line_count > 0 {
-                        // Show context lines
-                        let start_lines = if previous_was_change {
-                            std::cmp::min(context_lines, line_count)
-                        } else {
-                            0
-                        };
-                        let end_lines = if next_has_change {
-                            std::cmp::min(context_lines, line_count.saturating_sub(start_lines))
-                        } else {
-                            0
-                        };
-
-                        // Show leading context (after a change)
-                        for line_idx in 0..start_lines {
-                            if line_idx < lines.len() && !(line_idx == lines.len() - 1 && lines[line_idx].is_empty()) {
-                                diff_lines.push(DiffLine {
-                                    prefix: format!("{:0width$}", new_line_num + line_idx, width = width),
-                                    content: format!("    {}", lines[line_idx]),
-                                    color: "context".to_string(),
-                                });
-                            }
-                        }
-
-                        // Show separator if there's a gap in the middle
-                        if line_count > start_lines + end_lines && (start_lines > 0 || end_lines > 0) {
-                            diff_lines.push(DiffLine {
-                                prefix: "".to_string(),
-                                content: "".to_string(),
-                                color: "separator".to_string(),
-                            });
-                        }
-
-                        // Show trailing context (before a change)
-                        let start_end_lines = line_count.saturating_sub(end_lines);
-                        for line_idx in start_end_lines..line_count {
-                            if line_idx < lines.len() && !(line_idx == lines.len() - 1 && lines[line_idx].is_empty()) {
-                                diff_lines.push(DiffLine {
-                                    prefix: format!("{:0width$}", new_line_num + line_idx, width = width),
-                                    content: format!("    {}", lines[line_idx]),
-                                    color: "context".to_string(),
-                                });
-                            }
-                        }
-                    } else if previous_was_change && line_count > context_lines {
-                        // Add separator if previous was a change and this is a large gap
-                        diff_lines.push(DiffLine {
-                            prefix: "".to_string(),
-                            content: "".to_string(),
-                            color: "separator".to_string(),
-                        });
-                    }
-
-                    new_line_num += line_count;
-                    previous_was_change = false;
-                }
-                Difference::Add(text) => {
-                    // Handle both regular text and empty lines
-                    if text.is_empty() {
-                        // This is an added empty line
-                        diff_lines.push(DiffLine {
-                            prefix: format!("{:0width$}", new_line_num, width = width),
-                            content: "+   ".to_string(),
-                            color: "green".to_string(),
-                        });
-                        new_line_num += 1;
-                    } else {
-                        // Split text by lines and handle each line
-                        let lines: Vec<&str> = text.split('\n').collect();
-                        for (line_idx, line) in lines.iter().enumerate() {
-                            // For all lines except potentially the last one
-                            if line_idx < lines.len() - 1 || !line.is_empty() {
-                                diff_lines.push(DiffLine {
-                                    prefix: format!("{:0width$}", new_line_num, width = width),
-                                    content: format!("+   {}", line),
-                                    color: "green".to_string(),
-                                });
-                                new_line_num += 1;
-                            }
-                        }
-                    }
-                    previous_was_change = true;
-                }
-                Difference::Rem(text) => {
-                    // Handle both regular text and empty lines
-                    if text.is_empty() {
-                        // This is a removed empty line
-                        diff_lines.push(DiffLine {
-                            prefix: format!("{:0width$}", new_line_num, width = width),
-                            content: "-   ".to_string(),
-                            color: "red".to_string(),
-                        });
-
-                        // Special case: if this is a blank line removal and the next diff is Same,
-                        // add a context line to show the remaining blank line
-                        if let Some(next_diff) = changeset.diffs.get(i + 1) {
-                            if matches!(next_diff, Difference::Same(_)) {
-                                diff_lines.push(DiffLine {
-                                    prefix: format!("{:0width$}", new_line_num, width = width),
-                                    content: "    ".to_string(),
-                                    color: "context".to_string(),
-                                });
-                                new_line_num += 1;
-                            }
-                        }
-                        // Don't increment new_line_num for the removed line itself
-                    } else {
-                        // Split text by lines and handle each line
-                        let lines: Vec<&str> = text.split('\n').collect();
-                        for (line_idx, line) in lines.iter().enumerate() {
-                            if line_idx < lines.len() - 1 || !line.is_empty() {
-                                // Only show special characters for trailing whitespace
-                                let visible_line = if line.ends_with(' ') || line.ends_with('\t') {
-                                    let trimmed = line.trim_end();
-                                    let trailing = &line[trimmed.len()..];
-                                    format!("{}{}", trimmed, trailing.replace(' ', "·").replace('\t', "→"))
-                                } else {
-                                    line.to_string()
-                                };
-                                diff_lines.push(DiffLine {
-                                    prefix: format!("{:0width$}", new_line_num, width = width),
-                                    content: format!("-   {}", visible_line),
-                                    color: "red".to_string(),
-                                });
-                            }
-                        }
-                        // Don't increment new_line_num for removed lines - they don't exist in new file
-                    }
-                    previous_was_change = true;
-                }
-            }
-        }
-
-        FileDiff {
-            file_path: file_path.to_string(),
-            lines: diff_lines,
-        }
-    }
 
     // Dynamic graph manipulation methods
 

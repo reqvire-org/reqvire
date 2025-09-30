@@ -30,4 +30,60 @@ As a **System Engineer**, I want to generate diagrams for different system viewp
   * trace: [MOEs.md#moe_ua](/MOEs.md#moe_ua)
 
 ---
+
+### Missing Blank Line Test
+This element has content but no blank line before metadata.
+#### Metadata
+  * type: user-requirement
+
+---
+
+### Metadata Repositioning Test
+
+Verify that metadata repositioning maintains blank line spacing.
+
+#### Metadata
+  * type: verification
+  * status: implemented
+
+#### Details
+
+This test verifies that when metadata is repositioned from early position to end position, a blank line is properly added before the metadata section.
+
+##### Acceptance Criteria
+
+  * [ ] Metadata is moved to end position
+  * [ ] Blank line exists before metadata after repositioning
+  * [ ] Content structure is preserved
+
+---
+
+### Details Block Formatting Test
+
+Element with details block that should not be formatted.
+<details>
+<summary>Click to expand</summary>
+
+#### This Should Not Get Blank Line
+Content inside details block.
+####Another Header Without Space
+More content that should remain untouched.
+</details>
+#### Metadata
+  * type: user-requirement
+
+---
+
+### Exact Blank Line Count Test
+
+Test that exactly one blank line is added before Metadata when repositioned.
+Content line 1.
+Content line 2.
+Content line 3.
+#### Metadata
+  * type: verification
+  * status: implemented
+#### Details
+Detail content here.
+
 ---

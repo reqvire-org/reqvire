@@ -13,10 +13,11 @@ use reqvire::export;
 use reqvire::change_impact;
 use reqvire::git_commands;
 use reqvire::matrix_generator;
-use reqvire::reports::Filters;
+use reqvire::sections_summary;
 use reqvire::GraphRegistry;
 use reqvire::graph_registry::{Page, Section};
 use reqvire::element::Element;
+use reqvire::format::{format_files, render_diff, render_diff_json};
 use std::collections::HashMap;
 use std::path::Path;
 
@@ -61,6 +62,14 @@ pub enum Commands {
         #[clap(long, help_heading = "FORMAT OPTIONS")]
         json: bool,
     },
+
+    /// Validate model
+    #[clap(override_help = "Validate model\n\nVALIDATION OPTIONS:\n      --json     Output results in JSON format")]
+    Validate {
+        /// Output results in JSON format
+        #[clap(long, help_heading = "VALIDATION OPTIONS")]
+        json: bool,
+    },
     
     /// Generate traceability information without processing other files Creates matrices and reports showing relationships between elements in the model
     #[clap(override_help = "Generate traceability information without processing other files Creates matrices and reports showing relationships between elements in the model\n\nTRACES OPTIONS:\n      --svg   Output traceability matrix as SVG without hyperlinks and with full element names Cannot be used with --json\n      --json  Output results in JSON format")]
@@ -85,7 +94,7 @@ pub enum Commands {
     GenerateIndex,
 
     /// Output model registry and summary
-    #[clap(override_help = "Output model registry and summary\n\nMODEL SUMMARY OPTIONS:\n      --json                        Output results in JSON format\n      --filter-file <GLOB>          Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`\n      --filter-name <REGEX>         Only include elements whose name matches this regular expression\n      --filter-section <GLOB>       Only include sections whose name matches this glob pattern e.g. `System requirement*`\n      --filter-type <TYPE>          Only include elements of the given type e.g. `user-requirement`, `system-requirement`, `verification`, `file`, or other custom type\n      --filter-content <REGEX>      Only include elements whose content matches this regular expression\n      --filter-is-not-verified      Only include requirements that have at least one \"verifiedBy\" relation\n      --filter-is-not-satisfied     Only include requirements that have at least one \"satisfiedBy\" relation")]
+    #[clap(override_help = "Output model registry and summary\n\nMODEL SUMMARY OPTIONS:\n      --json                        Output results in JSON format\n      --filter-file <GLOB>          Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`\n      --filter-name <REGEX>         Only include elements whose name matches this regular expression\n      --filter-section <GLOB>       Only include sections whose name matches this glob pattern e.g. `System requirement*`\n      --filter-type <TYPE>          Only include elements of the given type e.g. `user-requirement`, `system-requirement`, `verification`, `file`, or other custom type\n      --filter-content <REGEX>      Only include elements whose content matches this regular expression\n      --filter-is-not-verified      Only include requirements that do NOT have any \"verifiedBy\" relations\n      --filter-is-not-satisfied     Only include requirements that do NOT have any \"satisfiedBy\" relations")]
     ModelSummary {
         /// Output results in JSON format
         #[clap(long, help_heading = "MODEL SUMMARY OPTIONS")]
@@ -111,11 +120,11 @@ pub enum Commands {
         #[clap(long, value_name = "REGEX", help_heading = "MODEL SUMMARY OPTIONS")]
         filter_content: Option<String>,
 
-        /// Only include requirements that have at least one "verifiedBy" relation
+        /// Only include requirements that do NOT have any "verifiedBy" relations
         #[clap(long, help_heading = "MODEL SUMMARY OPTIONS")]
         filter_is_not_verified: bool,
 
-        /// Only include requirements that have at least one "satisfiedBy" relation
+        /// Only include requirements that do NOT have any "satisfiedBy" relations
         #[clap(long, help_heading = "MODEL SUMMARY OPTIONS")]
         filter_is_not_satisfied: bool,
                         
@@ -141,6 +150,26 @@ pub enum Commands {
         /// Output results in JSON format
         #[clap(long)]
         json: bool,
+    },
+
+    /// Output sections summary showing files, section names, and section content without individual elements
+    #[clap(override_help = "Output sections summary showing files, section names, and section content without individual elements\n\nSECTIONS SUMMARY OPTIONS:\n      --json                        Output results in JSON format\n      --filter-file <GLOB>          Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`\n      --filter-section <GLOB>       Only include sections whose name matches this glob pattern e.g. `System requirement*`\n      --filter-content <REGEX>      Only include sections whose content matches this regular expression")]
+    SectionsSummary {
+        /// Output results in JSON format
+        #[clap(long, help_heading = "SECTIONS SUMMARY OPTIONS")]
+        json: bool,
+
+        /// Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`
+        #[clap(long, value_name = "GLOB", help_heading = "SECTIONS SUMMARY OPTIONS")]
+        filter_file: Option<String>,
+
+        /// Only include sections whose name matches this glob pattern e.g. `System requirement*`
+        #[clap(long, value_name = "GLOB", help_heading = "SECTIONS SUMMARY OPTIONS")]
+        filter_section: Option<String>,
+
+        /// Only include sections whose content matches this regular expression
+        #[clap(long, value_name = "REGEX", help_heading = "SECTIONS SUMMARY OPTIONS")]
+        filter_content: Option<String>,
     },
 
     /// Interactive shell for GraphRegistry operations (undocumented)
@@ -277,10 +306,12 @@ fn print_validation_results(errors: &[ReqvireError], json_output: bool) {
 fn wants_json(args: &Args) -> bool {
     match &args.command {
         Some(Commands::Format { json, .. }) => *json,
+        Some(Commands::Validate { json }) => *json,
         Some(Commands::Traces { json, .. }) => *json,
         Some(Commands::ModelSummary { json, .. }) => *json,
         Some(Commands::ChangeImpact { json, .. }) => *json,
         Some(Commands::CoverageReport { json }) => *json,
+        Some(Commands::SectionsSummary { json, .. }) => *json,
         _ => false,
     }
 }
@@ -302,15 +333,21 @@ pub fn handle_command(
 
     let json_output = wants_json(&args);
 
-
-    // Handle validation failures for all commands
+    // Handle validation failures for all commands (including validate)
     match &parse_result {
         Err(ReqvireError::ValidationError(errors)) => {
             print_validation_results(errors, json_output);
             return Ok(1);
         }
         Err(e) => {
-            eprintln!("❌ Parsing failed: {}", e);
+            if json_output {
+                let json_result = ValidationResult {
+                    errors: vec![e.to_string()],
+                };
+                println!("{}", serde_json::to_string_pretty(&json_result).unwrap());
+            } else {
+                eprintln!("❌ Parsing failed: {}", e);
+            }
             return Ok(1);
         }
         Ok(_) => {
@@ -319,6 +356,18 @@ pub fn handle_command(
     }
 
     match args.command {
+        Some(Commands::Validate { json }) => {
+            // For validate command, if we get here it means no validation errors
+            if json {
+                let json_result = ValidationResult {
+                    errors: vec![],
+                };
+                println!("{}", serde_json::to_string_pretty(&json_result).unwrap());
+            } else {
+                println!("✅ No validation issues found");
+            }
+            return Ok(0);
+        },
         Some(Commands::GenerateIndex) => {
             info!("Generating index.....");
             let index_output_path = PathBuf::from("output");
@@ -357,7 +406,7 @@ pub fn handle_command(
             filter_is_not_verified,
             filter_is_not_satisfied
         }) => {
-            let filters = Filters::new(
+            let filters = reports::Filters::new(
                 filter_file.as_deref(),
                 filter_name.as_deref(),
                 filter_section.as_deref(),
@@ -368,7 +417,7 @@ pub fn handle_command(
             ).map_err(|e| {
                 ReqvireError::ProcessError(format!("❌ Failed to construct filters: {}", e))
             })?;
-            
+
             let output_format = if cypher {
                 reports::SummaryOutputFormat::Cypher
             } else if json {
@@ -376,7 +425,7 @@ pub fn handle_command(
             } else {
                 reports::SummaryOutputFormat::Text
             };
-               
+
             reports::print_registry_summary(&model_manager.graph_registry,output_format, &filters);
             return Ok(0);        
         },
@@ -402,40 +451,13 @@ pub fn handle_command(
                 
             return Ok(0);
         },
-        Some(Commands::Format { dry_run, json: _ }) => {
-            let format_result = model_manager.graph_registry.format_files(dry_run)?;
+        Some(Commands::Format { dry_run, json }) => {
+            let format_result = format_files(&model_manager.graph_registry, dry_run)?;
 
-            if dry_run {
-                if format_result.diffs.is_empty() {
-                    println!("No formatting changes needed.");
-                } else {
-                    println!("Found {} file(s) with formatting changes:\n", format_result.diffs.len());
-                    for file_diff in &format_result.diffs {
-                        println!("📄 {}", file_diff.file_path);
-                        for line in &file_diff.lines {
-                            match line.color.as_str() {
-                                "green" => println!("  \x1b[32m{} {}\x1b[0m", line.prefix, line.content),
-                                "red" => println!("  \x1b[31m{} {}\x1b[0m", line.prefix, line.content),
-                                "context" => println!("  \x1b[37m{} {}\x1b[0m", line.prefix, line.content),
-                                "separator" => println!(""),
-                                _ => println!("  {} {}", line.prefix, line.content),
-                            }
-                        }
-                        println!();
-                        println!();
-                        println!();
-                    }
-                    println!("Run without --dry-run to apply these changes.");
-                }
+            if json {
+                println!("{}", render_diff_json(&format_result));
             } else {
-                if format_result.files_changed == 0 {
-                    println!("No files needed formatting.");
-                } else {
-                    println!("Formatted {} file(s):", format_result.files_changed);
-                    for file_diff in &format_result.diffs {
-                        println!("  ✅ {}", file_diff.file_path);
-                    }
-                }
+                render_diff(&format_result);
             }
             return Ok(0);
         },
@@ -467,6 +489,24 @@ pub fn handle_command(
         Some(Commands::CoverageReport { json }) => {
             let coverage_report = reports::generate_coverage_report(&model_manager.graph_registry);
             coverage_report.print(json);
+            return Ok(0);
+        },
+        Some(Commands::SectionsSummary {
+            json,
+            filter_file,
+            filter_section,
+            filter_content
+        }) => {
+            let filters = sections_summary::SectionsFilters::new(
+                filter_file.as_deref(),
+                filter_section.as_deref(),
+                filter_content.as_deref(),
+            ).map_err(|e| {
+                eprintln!("{}", e);
+                std::process::exit(1);
+            }).unwrap();
+
+            sections_summary::print_sections_summary(&model_manager.graph_registry, json, &filters);
             return Ok(0);
         },
         Some(Commands::Shell) => {

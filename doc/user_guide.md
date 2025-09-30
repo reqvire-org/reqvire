@@ -11,6 +11,8 @@ This user guide provides detailed instructions on how to use Reqvire effectively
 - [Linting](#linting)
 - [Generating Documentation](#generating-documentation)
 - [Traceability](#traceability)
+- [Sections Summary](#sections-summary)
+- [Change Impact Report](#change-impact-report)
 - [Diagrams](#diagrams)
 - [GitHub Integration](#github-integration)
   - [GitHub Actions](#github-actions)
@@ -170,6 +172,46 @@ reqvire traces --svg > matrix.svg
 
 The SVG format produces a visual representation that can be included in documentation or viewed directly in a browser.
 
+## Sections Summary
+
+Generate a summary of file sections and their content without individual elements.
+
+### Generate Sections Summary
+
+```bash
+reqvire sections-summary
+```
+
+This generates a summary showing files, sections, and section content without listing individual requirements or verifications.
+
+#### Output Format Options
+
+```bash
+# Generate sections summary in text format (default)
+reqvire sections-summary
+
+# Generate sections summary in JSON format
+reqvire sections-summary --json
+```
+
+#### Filtering Options
+
+You can filter the output using various criteria:
+
+```bash
+# Filter by file pattern
+reqvire sections-summary --filter-file="specifications/*.md"
+
+# Filter by section name pattern
+reqvire sections-summary --filter-section="System*"
+
+# Filter by content containing specific text
+reqvire sections-summary --filter-content="MUST"
+
+# Combine multiple filters
+reqvire sections-summary --filter-file="specifications/*.md" --filter-section="System*" --json
+```
+
 ## Change Impact Report
 
 Generates change impact report comparing current git HEAD with a previous commit.
@@ -273,7 +315,7 @@ jobs:
         continue-on-error: true
         run: |
           mkdir -p reports
-          reqvire generate-summary | tee reports/validation_report.txt
+          reqvire validate | tee reports/validation_report.txt
 
       - name: Upload Validation Report if validation failed
         if: failure()

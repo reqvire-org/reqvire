@@ -12,13 +12,13 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  6a6973ecb2f20ee3["Remove Generated Diagrams Verification"];
-  class 6a6973ecb2f20ee3 verification;
-  click 6a6973ecb2f20ee3 "DiagramsTests.md#remove-generated-diagrams-verification";
-  af81a7b6d75c2363["test.sh"];
-  class af81a7b6d75c2363 default;
-  click af81a7b6d75c2363 "../../tests/test-remove-diagrams/test.sh";
-  6a6973ecb2f20ee3 -->|satisfiedBy| af81a7b6d75c2363;
+  de8ab093f22a5cd7["Visualize Model Relationships Verification"];
+  class de8ab093f22a5cd7 verification;
+  click de8ab093f22a5cd7 "DiagramsTests.md#visualize-model-relationships-verification";
+  3df49fd1a91c3db7["test.sh"];
+  class 3df49fd1a91c3db7 default;
+  click 3df49fd1a91c3db7 "../../tests/test-diagram-generation/test.sh";
+  de8ab093f22a5cd7 -->|satisfiedBy| 3df49fd1a91c3db7;
   f8849dfe948d04fa["Automated Diagram Generation on PR Merge Verification"];
   class f8849dfe948d04fa verification;
   click f8849dfe948d04fa "DiagramsTests.md#automated-diagram-generation-on-pr-merge-verification";
@@ -33,13 +33,6 @@ graph LR;
   class f6a73030d877fc0f default;
   click f6a73030d877fc0f "../../tests/test-diagram-filtering/test.sh";
   ba2fd3fb7c42cdb3 -->|satisfiedBy| f6a73030d877fc0f;
-  de8ab093f22a5cd7["Visualize Model Relationships Verification"];
-  class de8ab093f22a5cd7 verification;
-  click de8ab093f22a5cd7 "DiagramsTests.md#visualize-model-relationships-verification";
-  3df49fd1a91c3db7["test.sh"];
-  class 3df49fd1a91c3db7 default;
-  click 3df49fd1a91c3db7 "../../tests/test-diagram-generation/test.sh";
-  de8ab093f22a5cd7 -->|satisfiedBy| 3df49fd1a91c3db7;
   2d2cf67bb8070da8["Diagram Generation Test"];
   class 2d2cf67bb8070da8 verification;
   click 2d2cf67bb8070da8 "DiagramsTests.md#diagram-generation-test";
@@ -47,15 +40,46 @@ graph LR;
   class 3df49fd1a91c3db7 default;
   click 3df49fd1a91c3db7 "../../tests/test-diagram-generation/test.sh";
   2d2cf67bb8070da8 -->|satisfiedBy| 3df49fd1a91c3db7;
+  6a6973ecb2f20ee3["Remove Generated Diagrams Verification"];
+  class 6a6973ecb2f20ee3 verification;
+  click 6a6973ecb2f20ee3 "DiagramsTests.md#remove-generated-diagrams-verification";
+  af81a7b6d75c2363["test.sh"];
+  class af81a7b6d75c2363 default;
+  click af81a7b6d75c2363 "../../tests/test-remove-diagrams/test.sh";
+  6a6973ecb2f20ee3 -->|satisfiedBy| af81a7b6d75c2363;
+  eedf6d6d3d2354d9["Interactive Mermaid Diagrams"];
+  class eedf6d6d3d2354d9 requirement;
+  click eedf6d6d3d2354d9 "../UserRequirements.md#interactive-mermaid-diagrams";
+  e9aee7d9477f4abe["Diagram Generation"];
+  class e9aee7d9477f4abe requirement;
+  click e9aee7d9477f4abe "../SystemRequirements/Requirements.md#diagram-generation";
+  eedf6d6d3d2354d9 -.->|deriveReqT| e9aee7d9477f4abe;
+  eedf6d6d3d2354d9 -.->|verifiedBy| 2d2cf67bb8070da8;
   98a581084d5542fa["Automate Diagram Generation"];
   class 98a581084d5542fa requirement;
   click 98a581084d5542fa "../UserRequirements.md#automate-diagram-generation";
+  98a581084d5542fa -.->|verifiedBy| de8ab093f22a5cd7;
+  98a581084d5542fa -.->|verifiedBy| 2d2cf67bb8070da8;
   3e3df7ad427a88fa["Automated Diagram Generation on PR Merge"];
   class 3e3df7ad427a88fa requirement;
   click 3e3df7ad427a88fa "../SystemRequirements/Requirements.md#automated-diagram-generation-on-pr-merge";
   98a581084d5542fa -.->|deriveReqT| 3e3df7ad427a88fa;
-  98a581084d5542fa -.->|verifiedBy| de8ab093f22a5cd7;
-  98a581084d5542fa -.->|verifiedBy| 2d2cf67bb8070da8;
+  7223dec8fe51900f["CLI Generate Diagrams Flag"];
+  class 7223dec8fe51900f requirement;
+  click 7223dec8fe51900f "../SystemRequirements/Requirements.md#cli-generate-diagrams-flag";
+  80defdd4cbc7ee18["cli.rs"];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
+  7223dec8fe51900f -->|satisfiedBy| 80defdd4cbc7ee18;
+  7223dec8fe51900f -.->|verifiedBy| 2d2cf67bb8070da8;
+  749eaee85cfd0a43["CLI Remove Diagrams Flag"];
+  class 749eaee85cfd0a43 requirement;
+  click 749eaee85cfd0a43 "../SystemRequirements/Requirements.md#cli-remove-diagrams-flag";
+  80defdd4cbc7ee18["cli.rs"];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
+  749eaee85cfd0a43 -->|satisfiedBy| 80defdd4cbc7ee18;
+  749eaee85cfd0a43 -.->|verifiedBy| 6a6973ecb2f20ee3;
   4ec753faad5a75f7["Diagram Removal"];
   class 4ec753faad5a75f7 requirement;
   click 4ec753faad5a75f7 "../SystemRequirements/Requirements.md#diagram-removal";
@@ -64,27 +88,7 @@ graph LR;
   click dad7eeb932afdb92 "../../core/src/diagrams.rs";
   4ec753faad5a75f7 -->|satisfiedBy| dad7eeb932afdb92;
   4ec753faad5a75f7 -.->|verifiedBy| 6a6973ecb2f20ee3;
-  749eaee85cfd0a43["CLI Remove Diagrams Flag"];
-  class 749eaee85cfd0a43 requirement;
-  click 749eaee85cfd0a43 "../SystemRequirements/Requirements.md#cli-remove-diagrams-flag";
   4ec753faad5a75f7 -->|refinedBy| 749eaee85cfd0a43;
-  9b586a1e348ad25f["Auto-Generated Diagram Identification"];
-  class 9b586a1e348ad25f requirement;
-  click 9b586a1e348ad25f "../SystemRequirements/Requirements.md#auto-generated-diagram-identification";
-  dad7eeb932afdb92["diagrams.rs"];
-  class dad7eeb932afdb92 default;
-  click dad7eeb932afdb92 "../../core/src/diagrams.rs";
-  9b586a1e348ad25f -->|satisfiedBy| dad7eeb932afdb92;
-  ce2625feec883e55["utils.rs"];
-  class ce2625feec883e55 default;
-  click ce2625feec883e55 "../../core/src/utils.rs";
-  9b586a1e348ad25f -->|satisfiedBy| ce2625feec883e55;
-  f22d93285fcd7664["parser.rs"];
-  class f22d93285fcd7664 default;
-  click f22d93285fcd7664 "../../core/src/parser.rs";
-  9b586a1e348ad25f -->|satisfiedBy| f22d93285fcd7664;
-  9b586a1e348ad25f -.->|verifiedBy| 2d2cf67bb8070da8;
-  9b586a1e348ad25f -.->|verifiedBy| 6a6973ecb2f20ee3;
   98af8a1cf9c86822["generate_diagrams.yml"];
   class 98af8a1cf9c86822 default;
   click 98af8a1cf9c86822 "../../.github/workflows/generate_diagrams.yml";
@@ -103,6 +107,23 @@ graph LR;
   click dad7eeb932afdb92 "../../core/src/diagrams.rs";
   7f86e99e7804366a -->|satisfiedBy| dad7eeb932afdb92;
   7f86e99e7804366a -.->|verifiedBy| ba2fd3fb7c42cdb3;
+  9b586a1e348ad25f["Auto-Generated Diagram Identification"];
+  class 9b586a1e348ad25f requirement;
+  click 9b586a1e348ad25f "../SystemRequirements/Requirements.md#auto-generated-diagram-identification";
+  dad7eeb932afdb92["diagrams.rs"];
+  class dad7eeb932afdb92 default;
+  click dad7eeb932afdb92 "../../core/src/diagrams.rs";
+  9b586a1e348ad25f -->|satisfiedBy| dad7eeb932afdb92;
+  ce2625feec883e55["utils.rs"];
+  class ce2625feec883e55 default;
+  click ce2625feec883e55 "../../core/src/utils.rs";
+  9b586a1e348ad25f -->|satisfiedBy| ce2625feec883e55;
+  f22d93285fcd7664["parser.rs"];
+  class f22d93285fcd7664 default;
+  click f22d93285fcd7664 "../../core/src/parser.rs";
+  9b586a1e348ad25f -->|satisfiedBy| f22d93285fcd7664;
+  9b586a1e348ad25f -.->|verifiedBy| 2d2cf67bb8070da8;
+  9b586a1e348ad25f -.->|verifiedBy| 6a6973ecb2f20ee3;
 ```
 ### Diagram Generation Test
 
@@ -131,11 +152,12 @@ This test verifies that the system can automatically generate and embed mermaid 
 - Marker appears as a mermaid comment within the diagram block
 
 #### Metadata
-  * type: verification
+  * type: test-verification
 
 
 #### Relations
   * verify: [Automate Diagram Generation](../UserRequirements.md#automate-diagram-generation)
+  * verify: [Interactive Mermaid Diagrams](../UserRequirements.md#interactive-mermaid-diagrams)
   * verify: [Auto-Generated Diagram Identification](../SystemRequirements/Requirements.md#auto-generated-diagram-identification)
   * satisfiedBy: [test.sh](../../tests/test-diagram-generation/test.sh)
 
@@ -159,7 +181,7 @@ This test verifies that the system provides visual representations of relationsh
 - Element dependencies are clearly displayed in the diagrams
 
 #### Metadata
-  * type: verification
+  * type: test-verification
 
 
 #### Relations
@@ -189,7 +211,7 @@ This test verifies that the system automatically generates and updates diagrams 
 - Commit message is informative and standardized
 
 #### Metadata
-  * type: demonstration-verification
+  * type: test-verification
 
 
 #### Relations
@@ -219,7 +241,7 @@ This test verifies that the system correctly filters relations in diagram genera
 - Arrow rendering follows the DIAGRAM_RELATIONS list specification
 
 #### Metadata
-  * type: verification
+  * type: test-verification
 
 
 #### Relations
@@ -255,7 +277,7 @@ This test verifies that the system can remove all generated mermaid diagrams whi
 - Mixed files with both auto-generated (marked) and custom (unmarked) diagrams handle removal correctly
 
 #### Metadata
-  * type: verification
+  * type: test-verification
 
 
 #### Relations

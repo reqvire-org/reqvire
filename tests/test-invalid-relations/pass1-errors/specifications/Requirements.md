@@ -77,3 +77,19 @@ This requirement has duplicate subsection.
   * satisfiedBy: [ValidImplementation.txt](ValidImplementation.txt)
 
 ---
+
+### Requirement with Invalid Header Structure
+
+This requirement has a level 5 header before reserved subsections.
+
+##### This is invalid - level 5 header before Metadata
+
+Level 5+ headers can only appear inside Details subsection.
+
+#### Metadata
+  * type: user-requirement
+
+#### Relations
+  * derivedFrom: [Valid Requirement](#valid-requirement)
+
+---

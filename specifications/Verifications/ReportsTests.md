@@ -12,6 +12,13 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
+  9bf743e946ad83ea["Sections Summary Tests"];
+  class 9bf743e946ad83ea verification;
+  click 9bf743e946ad83ea "ReportsTests.md#sections-summary-tests";
+  bf32ae8da9b17852["test.sh"];
+  class bf32ae8da9b17852 default;
+  click bf32ae8da9b17852 "../../tests/test-sections-summary/test.sh";
+  9bf743e946ad83ea -->|satisfiedBy| bf32ae8da9b17852;
   349f5e874cf22d98["Verification Coverage Report Test"];
   class 349f5e874cf22d98 verification;
   click 349f5e874cf22d98 "ReportsTests.md#verification-coverage-report-test";
@@ -19,13 +26,6 @@ graph LR;
   class 7099e5b2f8a08808 default;
   click 7099e5b2f8a08808 "../../tests/test-coverage-report/test.sh";
   349f5e874cf22d98 -->|satisfiedBy| 7099e5b2f8a08808;
-  76ae69270700044b["Model Summary Tests"];
-  class 76ae69270700044b verification;
-  click 76ae69270700044b "ReportsTests.md#model-summary-tests";
-  7b75340700b95177["test.sh"];
-  class 7b75340700b95177 default;
-  click 7b75340700b95177 "../../tests/test-model-summary-reports/test.sh";
-  76ae69270700044b -->|satisfiedBy| 7b75340700b95177;
   3108f29b131412a3["Index Generation Test"];
   class 3108f29b131412a3 verification;
   click 3108f29b131412a3 "ReportsTests.md#index-generation-test";
@@ -33,14 +33,58 @@ graph LR;
   class 1123809d5f501bf1 default;
   click 1123809d5f501bf1 "../../tests/test-index-generation/test.sh";
   3108f29b131412a3 -->|satisfiedBy| 1123809d5f501bf1;
-  2f5273c3b5655b33["Verification Coverage Report Generator"];
-  class 2f5273c3b5655b33 requirement;
-  click 2f5273c3b5655b33 "../SystemRequirements/Requirements.md#verification-coverage-report-generator";
-  2f5273c3b5655b33 -.->|verifiedBy| 349f5e874cf22d98;
+  76ae69270700044b["Model Summary Tests"];
+  class 76ae69270700044b verification;
+  click 76ae69270700044b "ReportsTests.md#model-summary-tests";
+  7b75340700b95177["test.sh"];
+  class 7b75340700b95177 default;
+  click 7b75340700b95177 "../../tests/test-model-summary-reports/test.sh";
+  76ae69270700044b -->|satisfiedBy| 7b75340700b95177;
+  b50359102e04bf09["CLI Sections Summary Command"];
+  class b50359102e04bf09 requirement;
+  click b50359102e04bf09 "../SystemRequirements/Requirements.md#cli-sections-summary-command";
+  80defdd4cbc7ee18["cli.rs"];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
+  b50359102e04bf09 -->|satisfiedBy| 80defdd4cbc7ee18;
+  994f165ff784760d["sections_summary.rs"];
+  class 994f165ff784760d default;
+  click 994f165ff784760d "../../core/src/sections_summary.rs";
+  b50359102e04bf09 -->|satisfiedBy| 994f165ff784760d;
+  b50359102e04bf09 -.->|verifiedBy| 9bf743e946ad83ea;
+  a3ed678951ce89ea["Sections Summary Report Generator"];
+  class a3ed678951ce89ea requirement;
+  click a3ed678951ce89ea "../SystemRequirements/Requirements.md#sections-summary-report-generator";
+  994f165ff784760d["sections_summary.rs"];
+  class 994f165ff784760d default;
+  click 994f165ff784760d "../../core/src/sections_summary.rs";
+  a3ed678951ce89ea -->|satisfiedBy| 994f165ff784760d;
+  a3ed678951ce89ea -.->|verifiedBy| 9bf743e946ad83ea;
+  a3ed678951ce89ea -.->|deriveReqT| b50359102e04bf09;
+  40ff89d68c242f45["Handle Invalid Regex Filter Patterns"];
+  class 40ff89d68c242f45 requirement;
+  click 40ff89d68c242f45 "../SystemRequirements/Requirements.md#handle-invalid-regex-filter-patterns";
+  80defdd4cbc7ee18["cli.rs"];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
+  40ff89d68c242f45 -->|satisfiedBy| 80defdd4cbc7ee18;
+  40ff89d68c242f45 -.->|verifiedBy| 76ae69270700044b;
   3540af61a4cc1984["CLI Coverage Report Command"];
   class 3540af61a4cc1984 requirement;
   click 3540af61a4cc1984 "../SystemRequirements/Requirements.md#cli-coverage-report-command";
-  2f5273c3b5655b33 -.->|deriveReqT| 3540af61a4cc1984;
+  3540af61a4cc1984 -.->|verifiedBy| 349f5e874cf22d98;
+  c2b6c74b77726ad9["Generate Documentation Index"];
+  class c2b6c74b77726ad9 requirement;
+  click c2b6c74b77726ad9 "../UserRequirements.md#generate-documentation-index";
+  c2b6c74b77726ad9 -.->|verifiedBy| 3108f29b131412a3;
+  84b3d0502132adb5["Documentation Index HTML Integration"];
+  class 84b3d0502132adb5 requirement;
+  click 84b3d0502132adb5 "../UserRequirements.md#documentation-index-html-integration";
+  c2b6c74b77726ad9 -->|refinedBy| 84b3d0502132adb5;
+  a21995894299effb["Index Generation"];
+  class a21995894299effb requirement;
+  click a21995894299effb "../SystemRequirements/Requirements.md#index-generation";
+  c2b6c74b77726ad9 -.->|deriveReqT| a21995894299effb;
   73db87f73ef4c5a2["Model Summary Fine Grained Filtering"];
   class 73db87f73ef4c5a2 requirement;
   click 73db87f73ef4c5a2 "../SystemRequirements/Requirements.md#model-summary-fine-grained-filtering";
@@ -53,15 +97,44 @@ graph LR;
   click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
   73db87f73ef4c5a2 -->|satisfiedBy| 80defdd4cbc7ee18;
   73db87f73ef4c5a2 -.->|verifiedBy| 76ae69270700044b;
-  3540af61a4cc1984 -.->|verifiedBy| 349f5e874cf22d98;
   f7a606aa79ba438["Verification Coverage Report"];
   class f7a606aa79ba438 requirement;
   click f7a606aa79ba438 "../UserRequirements.md#verification-coverage-report";
   f7a606aa79ba438 -.->|verifiedBy| 349f5e874cf22d98;
+  2f5273c3b5655b33["Verification Coverage Report Generator"];
+  class 2f5273c3b5655b33 requirement;
+  click 2f5273c3b5655b33 "../SystemRequirements/Requirements.md#verification-coverage-report-generator";
   f7a606aa79ba438 -.->|deriveReqT| 2f5273c3b5655b33;
-  a21995894299effb["Index Generation"];
-  class a21995894299effb requirement;
-  click a21995894299effb "../SystemRequirements/Requirements.md#index-generation";
+  5a07afd22db51c40["CLI Summary Report Command"];
+  class 5a07afd22db51c40 requirement;
+  click 5a07afd22db51c40 "../SystemRequirements/Requirements.md#cli-summary-report-command";
+  80defdd4cbc7ee18["cli.rs"];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
+  5a07afd22db51c40 -->|satisfiedBy| 80defdd4cbc7ee18;
+  5a07afd22db51c40 -.->|deriveReqT| a3ed678951ce89ea;
+  5a07afd22db51c40 --o|contains| 40ff89d68c242f45;
+  5a07afd22db51c40 -.->|deriveReqT| 3540af61a4cc1984;
+  5a07afd22db51c40 -.->|verifiedBy| 76ae69270700044b;
+  8cafc3875f5e4938["Display Name-Regex Option in Help"];
+  class 8cafc3875f5e4938 requirement;
+  click 8cafc3875f5e4938 "../SystemRequirements/Requirements.md#display-name-regex-option-in-help";
+  5a07afd22db51c40 -.->|deriveReqT| 8cafc3875f5e4938;
+  ad6f7a2d41d80a38["Model Structure and Summaries"];
+  class ad6f7a2d41d80a38 requirement;
+  click ad6f7a2d41d80a38 "../UserRequirements.md#model-structure-and-summaries";
+  ad6f7a2d41d80a38 -.->|verifiedBy| 76ae69270700044b;
+  b882613af131f35f["Model Summary Report Generator"];
+  class b882613af131f35f requirement;
+  click b882613af131f35f "../SystemRequirements/Requirements.md#model-summary-report-generator";
+  ad6f7a2d41d80a38 -.->|deriveReqT| b882613af131f35f;
+  80defdd4cbc7ee18["cli.rs"];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
+  8cafc3875f5e4938 -->|satisfiedBy| 80defdd4cbc7ee18;
+  8cafc3875f5e4938 -.->|verifiedBy| 76ae69270700044b;
+  2f5273c3b5655b33 -.->|verifiedBy| 349f5e874cf22d98;
+  2f5273c3b5655b33 -.->|deriveReqT| 3540af61a4cc1984;
   1a173441705701a0["index_generator.rs"];
   class 1a173441705701a0 default;
   click 1a173441705701a0 "../../core/src/index_generator.rs";
@@ -71,22 +144,6 @@ graph LR;
   click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
   a21995894299effb -->|satisfiedBy| 80defdd4cbc7ee18;
   a21995894299effb -.->|verifiedBy| 3108f29b131412a3;
-  40ff89d68c242f45["Handle Invalid Regex Filter Patterns"];
-  class 40ff89d68c242f45 requirement;
-  click 40ff89d68c242f45 "../SystemRequirements/Requirements.md#handle-invalid-regex-filter-patterns";
-  80defdd4cbc7ee18["cli.rs"];
-  class 80defdd4cbc7ee18 default;
-  click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
-  40ff89d68c242f45 -->|satisfiedBy| 80defdd4cbc7ee18;
-  40ff89d68c242f45 -.->|verifiedBy| 76ae69270700044b;
-  8cafc3875f5e4938["Display Name-Regex Option in Help"];
-  class 8cafc3875f5e4938 requirement;
-  click 8cafc3875f5e4938 "../SystemRequirements/Requirements.md#display-name-regex-option-in-help";
-  80defdd4cbc7ee18["cli.rs"];
-  class 80defdd4cbc7ee18 default;
-  click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
-  8cafc3875f5e4938 -->|satisfiedBy| 80defdd4cbc7ee18;
-  8cafc3875f5e4938 -.->|verifiedBy| 76ae69270700044b;
 ```
 ### Index Generation Test
 
@@ -107,7 +164,7 @@ This test verifies that the system correctly generates an index document with li
 - README.md structure follows expected format
 
 #### Metadata
-  * type: verification
+  * type: test-verification
 
 
 #### Relations
@@ -209,27 +266,32 @@ This test verifies that the system provides a CLI flag and functionality for gen
    - Global summary must include counts for total files, sections, and elements
 
 #### Metadata
-  * type: verification
+  * type: test-verification
 
 
 #### Relations
+  * verify: [Model Structure and Summaries](../UserRequirements.md#model-structure-and-summaries)
+  * verify: [CLI Summary Report Command](../SystemRequirements/Requirements.md#cli-summary-report-command)
   * satisfiedBy: [test.sh](../../tests/test-model-summary-reports/test.sh)
 
 ---
 
 ### Verification Coverage Report Test
 
-This test verifies that the system correctly generates verification coverage reports showing the percentage and details of satisfied and unsatisfied verifications.
+This test verifies that the system correctly generates verification coverage reports focusing on leaf requirements and showing the percentage and details of satisfied and unsatisfied test-verification elements.
 
 #### Details
 
 ##### Acceptance Criteria
-- System shall provide a CLI command `coverage-report` that generates coverage reports
+- System shall provide a CLI command `coverage-report` that generates coverage reports focusing on leaf requirements
 - Command shall support `--json` flag for JSON output format
-- Coverage report shall include summary section with total counts and percentages
+- Coverage report shall include summary section with total counts and percentages for leaf requirements
 - Coverage report shall show breakdown by verification type (test, analysis, inspection, demonstration)
-- Coverage report shall list satisfied verifications grouped by file and section
-- Coverage report shall list unsatisfied verifications with details
+- Coverage report shall list verified leaf requirements grouped by file and section
+- Coverage report shall list unverified leaf requirements with details
+- Coverage report shall list satisfied test-verification elements (those with satisfiedBy relations)
+- Coverage report shall list unsatisfied test-verification elements (those without satisfiedBy relations)
+- Non-test-verification elements (analysis, inspection, demonstration) are considered satisfied by default (no satisfiedBy required)
 - JSON output shall be valid and machine-readable
 - Text output shall be human-readable with clear formatting
 
@@ -239,31 +301,92 @@ This test verifies that the system correctly generates verification coverage rep
    Command: `reqvire coverage-report`
    - exits code **0**
    - output contains `=== Verification Coverage Report ===`
-   - output contains `Summary:` section with total counts
+   - output contains `Summary:` section with leaf requirements counts and percentages
    - output contains `Verification Types:` breakdown
-   - output contains coverage percentage calculation
-   - satisfied verifications are marked with ✅
-   - unsatisfied verifications are marked with ❌
+   - output contains coverage percentage calculation for leaf requirements
+   - verified leaf requirements are marked with ✅
+   - unverified leaf requirements are marked with ❌
+   - satisfied test-verification elements are marked with ✅
+   - unsatisfied test-verification elements are marked with ❌
 
 2. **JSON Coverage Report**
    Command: `reqvire coverage-report --json`
    - exits code **0**
    - output parses as valid JSON
-   - JSON contains `summary` object with required fields
-   - JSON contains `satisfied_verifications` and `unsatisfied_verifications` sections
-   - verification details include identifier, name, section, type, and satisfied_by relations
+   - JSON contains `summary` object with leaf requirements counts and percentages
+   - JSON contains `verified_leaf_requirements` and `unverified_leaf_requirements` sections
+   - JSON contains `satisfied_test_verifications` and `unsatisfied_test_verifications` sections
+   - verification details include identifier, name, section, type, and satisfied_by relations (for test-verification only)
 
 3. **Coverage Calculation**
-   - Coverage percentage calculated as (satisfied/total * 100)
+   - Leaf requirements coverage percentage calculated as (verified_leaf_requirements/total_leaf_requirements * 100)
+   - Test-verification satisfaction percentage calculated as (satisfied_test_verifications/total_test_verifications * 100)
    - Verification types correctly categorized
-   - Satisfied verifications have non-empty `satisfied_by` relations
-   - Unsatisfied verifications have empty `satisfied_by` relations
+   - Test-verification elements without satisfiedBy relations are flagged as unsatisfied
+   - Test-verification elements with valid satisfiedBy relations are considered satisfied
+   - Analysis, inspection, and demonstration verifications are considered satisfied by default (no satisfiedBy evaluation)
 
 #### Metadata
-  * type: verification
+  * type: test-verification
 
 
 #### Relations
   * satisfiedBy: [test.sh](../../tests/test-coverage-report/test.sh)
+
+---
+
+### Sections Summary Tests
+
+This test verifies that the system provides sections-summary command functionality for generating focused reports of file and section structure without individual elements.
+
+#### Details
+
+##### Acceptance Criteria
+- Running `reqvire sections-summary --json` produces a valid, pretty-printed JSON summary with sections information.
+- Running `reqvire sections-summary` (no `--json`) prints a human-readable text summary showing files and sections.
+- Both JSON and text outputs include file paths, section names, section order indices, and section content.
+- Section order indices preserve the original document structure and enable reconstruction.
+- Individual elements (requirements, verifications) are excluded from the output.
+- When filter flags are supplied, only sections matching **all** specified filters appear in both outputs.
+- Command supports filtering by file path (glob), section name (glob), and section content (regex).
+- JSON output includes section order information for document structure reconstruction.
+
+##### Test Criteria
+
+1. **Base JSON sections summary**
+   Command: `reqvire sections-summary --json`
+   - exits code **0**
+   - output parses under `jq`
+   - `.files` contains file path keys
+   - Each file contains sections with `name`, `content`, and `section_order` fields
+   - No individual elements are included in the output
+
+2. **Base text sections summary**
+   Command: `reqvire sections-summary`
+   - exits code **0**
+   - output shows file paths and section information
+   - sections are ordered by their `section_order` index
+   - section content is displayed but individual elements are not
+
+3. **Section filtering**
+   For each filter flag, run both JSON and text modes:
+   - `--filter-file="Requirements.md"` (glob pattern)
+   - `--filter-section="Requirements*"` (glob pattern)
+   - `--filter-content="system"` (regex pattern)
+   - Each filter produces subset of sections matching criteria
+   - Filters work independently and in combination
+
+4. **Section order preservation**
+   - JSON output includes `section_order` field for each section
+   - Text output displays sections in document order
+   - Order indices enable reconstruction of original document structure
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [CLI Sections Summary Command](../SystemRequirements/Requirements.md#cli-sections-summary-command)
+  * verify: [Sections Summary Report Generator](../SystemRequirements/Requirements.md#sections-summary-report-generator)
+  * satisfiedBy: [test.sh](../../tests/test-sections-summary/test.sh)
 
 ---
