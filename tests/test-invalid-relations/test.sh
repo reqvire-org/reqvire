@@ -29,6 +29,7 @@ EXPECTED_PASS1_ERRORS=(
   "Invalid relation format:"
   "Unsupported relation type:"
   "Duplicate subsection:"
+  "Invalid header level in element"
 )
 
 MISSING_PASS1_ERRORS=()
@@ -101,6 +102,25 @@ cat > "${TEST_DIR}/valid-test/specifications/ValidRequirements.md" << 'EOF'
 ## Valid Requirement
 
 This is a valid requirement.
+
+#### Metadata
+  * type: user-requirement
+
+---
+
+### Requirement with Valid Header Structure in Details
+
+This requirement correctly uses level 5 headers inside Details subsection.
+
+#### Details
+
+##### This is valid - level 5 header inside Details
+
+Level 5+ headers are allowed inside Details subsection.
+
+###### Level 6 is also OK here
+
+Content with multiple header levels.
 
 #### Metadata
   * type: user-requirement

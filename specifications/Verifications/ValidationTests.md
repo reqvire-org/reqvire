@@ -405,6 +405,37 @@ This test verifies that the system correctly validates relations to excluded fil
 
 ---
 
+### Invalid Header Structure Test
+
+This test verifies that Reqvire correctly detects and reports invalid header structures in elements, specifically level 5+ headers appearing outside of Details subsections.
+
+#### Details
+
+##### Acceptance Criteria
+- System SHALL detect level 5+ headers (`#####`) appearing before reserved subsections (`#### Metadata`, `#### Relations`, `#### Details`)
+- System SHALL allow level 5+ headers only within `#### Details` subsection
+- System SHALL provide clear error messages indicating the invalid header structure with file and line number
+- Error message SHALL specify that level 5+ headers can only appear inside Details subsection
+- Validation SHALL fail when invalid header structure is detected
+
+##### Test Criteria
+- Command exits with non-zero error code when invalid header structure is found
+- Error output contains specific error message about invalid header level
+- Error message includes element name, file path, and line number
+- Valid elements with level 5+ headers inside Details subsection pass validation
+- Elements with level 5+ headers before reserved subsections fail validation
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [Markdown Structure Validator](../SystemRequirements/Requirements.md#markdown-structure-validator)
+  * verify: [Validate Markdown Structure](../UserRequirements.md#validate-markdown-structure)
+  * verify: [Structure of Markdown Documents](../SpecificationsRequirements.md#structure-of-markdown-documents)
+  * satisfiedBy: [test.sh](../../tests/test-invalid-relations/test.sh)
+
+---
+
 ## Validation Report Tests
 ```mermaid
 graph LR;

@@ -220,6 +220,17 @@ pub fn parse_elements(
                 }
             }
 
+        } else if trimmed.starts_with("#####") && current_element.is_some() && current_subsection != SubSection::Details && !skip_current_element {
+            // Level 5+ headers are only allowed inside Details subsection
+            let msg = format!(
+                "Invalid header level in element '{}': Level 5+ headers (#####+) can only appear inside '#### Details' subsection (file: {}, line {})",
+                current_element.as_ref().unwrap().name,
+                file_path.display(),
+                line_num + 1
+            );
+            errors.push(ReqvireError::InvalidMarkdownStructure(msg.clone()));
+            debug!("Error: {}", msg);
+
         } else if trimmed.starts_with("#### ") && current_element.is_some() {
             let subsection = SubSection::from_str(&trimmed[5..].trim());
 
