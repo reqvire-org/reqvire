@@ -13,7 +13,7 @@ This guide is split into domain-specific guides for better organization:
 
 ## Building and Running Reqvire
 
-### Basic Commands
+### Basic cargo Commands
 - Build: `cargo build`
 - Run with HTML output: `cargo run -- specifications output --html`
 - Run specific commands: `cargo run -- format` or `./target/debug/reqvire format`
@@ -22,15 +22,20 @@ This guide is split into domain-specific guides for better organization:
 - Lint: `cargo clippy -- -D warnings`
 - Format: `cargo fmt`
 
-### Core Commands
-- Generate HTML documentation: `./target/debug/reqvire html`
-- Format requirements (preview only): `./target/debug/reqvire format --dry-run`
-- Apply formatting: `./target/debug/reqvire format`
-- Validate model: `./target/debug/reqvire validate`
-- Validate model (JSON output): `./target/debug/reqvire validate --json`
-- Generate diagrams: `./target/debug/reqvire generate-diagrams`
-- Generate model summary: `./target/debug/reqvire model-summary --json > /tmp/model-summary.json`
-- Generate sections summary: `./target/debug/reqvire sections-summary --json > /tmp/sections-summary.json`
+### Basic Reqvire Commands
+- **Validate sructure**: `./target/debug/reqvire validate --json > /tmp/validation.json`
+- **Format requirements (preview only)**: `./target/debug/reqvire format --dry-run`
+- **Apply formating fixes**: `./target/debug/reqvire format`
+- **Generate diagrams**: `./target/debug/reqvire generate-diagrams`
+- **Generate index document**: `./target/debug/reqvire generate-index`
+- **Generate model summary**: `./target/debug/reqvire model-summary`
+- **Generate model summary (JSON)**: `./target/debug/reqvire model-summary --json > /tmp/model-summary.json`
+- **Generate section summary**: `./target/debug/reqvire sections-summary`
+- **Generate section summary (JSON)**: `./target/debug/reqvire sections-summary --json > /tmp/model-summary.json`
+- **Generate HTML documentation**: `./target/debug/reqvire html --output <OUTPUT_DIR>`
+- **Analyze change impact**: `./target/debug/reqvire change-impact --git-commit=<COMMIT_HASH>`
+- **Analyze change impact (JSON)**: `./target/debug/reqvire change-impact --git-commit=HEAD~1 --json > /tmp/impact.json`
+
 
 ### Filtering Options
 
@@ -44,13 +49,15 @@ This guide is split into domain-specific guides for better organization:
 | Not verified | `--filter-is-not-verified` | Show only unverified requirements |
 | Not satisfied | `--filter-is-not-satisfied` | Show only unsatisfied requirements |
 
-### Examples
-- Human-readable output: `./target/debug/reqvire model-summary`
-- JSON output with filter: `./target/debug/reqvire model-summary --json --filter-type="system-requirement"`
-- Multiple filters: `./target/debug/reqvire model-summary --filter-file="src/**/*Reqs.md" --filter-section="System*" --filter-is-not-verified`
-- Sections summary: `./target/debug/reqvire sections-summary --filter-file="specifications/*.md" --filter-section="System*"`
-- Show change impact: `./target/debug/reqvire change-impact --git-commit=HEAD~1 --json > /tmp/impact.json`
-- Generate traceability matrix: `./target/debug/reqvire traces --json > /tmp/traces.json`
+### Key File Locations
+- Core specifications structure: [SpecificationsRequirements.md](specifications/SpecificationsRequirements.md)
+- User requirements: [UserRequirements.md](specifications/UserRequirements.md)
+- Mission requirements: [MissionRequirements.md](specifications/MissionRequirements.md)
+- System requirements: [SystemRequirements/Requirements.md](specifications/SystemRequirements/Requirements.md)
+- Verification specifications: [Verifications folder](specifications/Verifications)
+- Relationship types: [Relation Types and Behaviors](specifications/SpecificationsRequirements.md#relation-types-and-behaviors)
+- Architecture documentation: [LogicalArchitecture.md](specifications/LogicalArchitecture.md) and [PhysicalArchitecture.md](specifications/PhysicalArchitecture.md)
+
 
 ## Core Architecture
 
@@ -60,7 +67,7 @@ This guide is split into domain-specific guides for better organization:
 - **Element**: Represents MBSE model elements (requirements, verifications)
 - **Relation**: Represents connections between elements
 - **Parser**: Processes Markdown to extract elements and relations
-- **Linting**: Validates and fixes markdown formatting issues
+- **Formating**: Validates and fixes markdown formatting issues
 - **ChangeImpact**: Analyzes how changes propagate through the model
 - **MatrixGenerator**: Creates traceability matrices
 - **DiagramGenerator**: Creates Mermaid diagrams from relationships
@@ -80,7 +87,6 @@ core/src/
 ├── reports.rs             # Report generation
 ├── utils.rs               # Utility functions
 ├── error.rs               # Error handling
-├── linting/               # Markdown linting and formatting
 └── tests/                 # Unit tests
 
 cli/src/
@@ -108,15 +114,6 @@ cli/src/
 - Use Result with custom error types for error handling
 - Document all public APIs with rustdoc
 - Organize code in modules by functionality
-
-### Key File Locations
-- Core specifications structure: [SpecificationsRequirements.md](specifications/SpecificationsRequirements.md)
-- User requirements: [UserRequirements.md](specifications/UserRequirements.md)
-- Mission requirements: [MissionRequirements.md](specifications/MissionRequirements.md)
-- System requirements: [SystemRequirements/Requirements.md](specifications/SystemRequirements/Requirements.md)
-- Verification specifications: [Verifications folder](specifications/Verifications)
-- Relationship types: [Relation Types and Behaviors](specifications/SpecificationsRequirements.md#relation-types-and-behaviors)
-- Architecture documentation: [LogicalArchitecture.md](specifications/LogicalArchitecture.md) and [PhysicalArchitecture.md](specifications/PhysicalArchitecture.md)
 
 ## Important Notes
 

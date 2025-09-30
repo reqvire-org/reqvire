@@ -242,7 +242,7 @@ pub fn parse_elements(
             // If transitioning to Details subsection, add the header to content
             if subsection == SubSection::Details && !skip_current_element {
                 if let Some(element) = &mut current_element {
-                    element.add_content("#### Details\n");
+                    element.add_content("\n#### Details\n");
                 }
             }
 

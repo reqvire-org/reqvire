@@ -945,10 +945,8 @@ impl GraphRegistry {
 
         // Add the element content
         if !element.content.trim().is_empty() {
-            let trimmed_content = element.content.trim_end();
-            markdown.push_str(trimmed_content);
-            // Always add two newlines after content to ensure blank line before subsections
-            markdown.push_str("\n\n");
+            markdown.push_str(element.content.trim_end());
+            markdown.push_str("\n");
         }
 
         // Add metadata subsection if there are custom metadata
@@ -971,7 +969,7 @@ impl GraphRegistry {
             for (key, value) in custom_metadata {
                 markdown.push_str(&format!("  * {}: {}\n", key, value));
             }
-            markdown.push_str("\n\n");
+            markdown.push_str("\n");
         }
 
         // Add relations subsection if there are user-created relations
@@ -1074,10 +1072,64 @@ impl GraphRegistry {
                     target_text
                 ));
             }
-            markdown.push('\n');
+            markdown.push_str("\n");
         }
 
-        markdown
+        // Apply generic formatting to ensure exactly one blank line before all #### headers
+        Self::ensure_blank_lines_before_subsections(&markdown)
+    }
+
+    /// Ensures every #### header has exactly one blank line before it (skips content inside <details> blocks)
+    /// and removes blank lines immediately after #### headers
+    fn ensure_blank_lines_before_subsections(content: &str) -> String {
+        let mut result = String::new();
+        let mut in_details = false;
+
+        for line in content.lines() {
+            let trimmed_line = line.trim_start().to_lowercase();
+
+            // Track <details> blocks
+            if trimmed_line.starts_with("<details") {
+                in_details = true;
+            }
+
+            // Add blank line before #### headers (if not in <details>)
+            if !in_details && line.trim_start().starts_with("####") {
+                // Remove any trailing newlines
+                while result.ends_with('\n') {
+                    result.pop();
+                }
+                if !result.is_empty() {
+                    result.push_str("\n\n");
+                }
+            }
+
+            // Skip blank lines immediately after #### headers
+            if !in_details && line.trim().is_empty() {
+                // Check if the previous line was a #### header
+                let prev_line_is_header = result.lines().last()
+                    .map_or(false, |l| l.trim_start().starts_with("####"));
+                if prev_line_is_header {
+                    continue;
+                }
+            }
+
+            result.push_str(line);
+            result.push('\n');
+
+            // Track end of <details> blocks
+            if trimmed_line.starts_with("</details>") {
+                in_details = false;
+            }
+        }
+
+        // Trim end and ensure exactly one trailing newline for proper spacing before separator
+        let trimmed = result.trim_end();
+        if trimmed.is_empty() {
+            String::new()
+        } else {
+            format!("{}\n", trimmed)
+        }
     }
 
     /// Groups elements by their file path and section
@@ -1387,7 +1439,11 @@ impl GraphRegistry {
         let mut files_changed = 0;
         let mut files_with_diffs = Vec::new();
 
-        for (file_path, sections) in grouped_elements {
+        // Sort file paths alphabetically for deterministic order
+        let mut sorted_files: Vec<_> = grouped_elements.into_iter().collect();
+        sorted_files.sort_by(|a, b| a.0.cmp(&b.0));
+
+        for (file_path, sections) in sorted_files {
             // Generate the new markdown content for this file
             let mut new_content = self.generate_file_markdown(&file_path, &sections);
 
@@ -1519,10 +1575,15 @@ impl GraphRegistry {
 
                         // Show leading context (after a change)
                         for line_idx in 0..start_lines {
-                            if line_idx < lines.len() && !(line_idx == lines.len() - 1 && lines[line_idx].is_empty()) {
+                            if line_idx < lines.len() {
+                                let content = if lines[line_idx].is_empty() {
+                                    "    ".to_string()
+                                } else {
+                                    format!("    {}", lines[line_idx])
+                                };
                                 diff_lines.push(DiffLine {
                                     prefix: format!("{:0width$}", new_line_num + line_idx, width = width),
-                                    content: format!("    {}", lines[line_idx]),
+                                    content,
                                     color: "context".to_string(),
                                 });
                             }
@@ -1538,14 +1599,30 @@ impl GraphRegistry {
                         }
 
                         // Show trailing context (before a change)
+                        let next_is_removal = changeset.diffs.get(i + 1)
+                            .map_or(false, |d| matches!(d, Difference::Rem(_)));
                         let start_end_lines = line_count.saturating_sub(end_lines);
                         for line_idx in start_end_lines..line_count {
-                            if line_idx < lines.len() && !(line_idx == lines.len() - 1 && lines[line_idx].is_empty()) {
-                                diff_lines.push(DiffLine {
-                                    prefix: format!("{:0width$}", new_line_num + line_idx, width = width),
-                                    content: format!("    {}", lines[line_idx]),
-                                    color: "context".to_string(),
-                                });
+                            if line_idx < lines.len() {
+                                let line_number = new_line_num + line_idx;
+                                let is_blank = lines[line_idx].is_empty();
+                                let is_last_blank = line_idx == lines.len() - 1 && is_blank;
+
+                                if !is_last_blank || next_is_removal {
+                                    // Show all non-blanks, and trailing blanks if they precede a removal
+                                    let content = if is_blank {
+                                        "    ".to_string()
+                                    } else {
+                                        format!("    {}", lines[line_idx])
+                                    };
+                                    diff_lines.push(DiffLine {
+                                        prefix: format!("{:0width$}", line_number, width = width),
+                                        content,
+                                        color: "context".to_string(),
+                                    });
+                                }
+                                // Note: if we skip rendering a blank line, line numbering is still preserved
+                                // via new_line_num += line_count at the end of Same processing
                             }
                         }
                     } else if previous_was_change && line_count > context_lines {

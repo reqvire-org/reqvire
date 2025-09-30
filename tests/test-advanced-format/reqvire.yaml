@@ -1,3 +1,7 @@
 default_types:
   specifications: user-requirement
   other: requirement
+
+paths:
+  excluded_filename_patterns:
+    - "expected_*.md"

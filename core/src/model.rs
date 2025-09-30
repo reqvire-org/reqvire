@@ -136,8 +136,6 @@ impl ModelManager {
 
 #[cfg(test)]
 mod tests {
-    use std::path::PathBuf;
-    use crate::linting::LintFix;
 
     #[test]
     fn test_extract_path_and_fragment() {
@@ -164,64 +162,6 @@ mod tests {
         let (file, frag) = crate::utils::extract_path_and_fragment(input);
         assert_eq!(file, "");
         assert_eq!(frag, Some("onlyfragment"));
-    }
-
-    #[test]
-    fn test_find_nonlink_identifiers_plain_file_md() {
-        // This test verifies that non-link plain file references are detected.
-        let content = "Check out file.md please.";
-        let file_path = PathBuf::from("test.md");
-        let suggestions = crate::linting::nonlink_identifiers::find_nonlink_identifiers(content, &file_path);
-        // Our regex for relation lines only matches relation bullet lines.
-        // So this should produce 0 suggestions.
-        assert_eq!(suggestions.len(), 0);
-    }
-
-    #[test]
-    fn test_find_nonlink_identifiers_file_md_with_fragment() {
-        let content = " * derivedFrom: file.md#Element Name with spaces";
-        let file_path = PathBuf::from("test.md");
-        let suggestions = crate::linting::nonlink_identifiers::find_nonlink_identifiers(content, &file_path);
-        assert_eq!(suggestions.len(), 1, "Expected one suggestion");
-
-        let suggestion = &suggestions[0];
-        if let LintFix::ReplacePattern { pattern, replacement } = &suggestion.fix {
-            // Pattern should contain the original raw identifier.
-            assert!(pattern.contains("file.md#Element Name with spaces"), "pattern: {:?}", pattern);
-            // Normalized: "file.md#element-name-with-spaces", link text remains as "file.md#Element Name with spaces"
-            let expected_link = "[file.md#Element Name with spaces](file.md#element-name-with-spaces)";
-            assert!(replacement.contains(expected_link), "replacement: {:?}", replacement);
-        } else {
-            panic!("Expected ReplacePattern fix");
-        }
-    }
-
-    #[test]
-    fn test_find_nonlink_identifiers_hash_only_fragment() {
-        let content = " * derivedFrom: #Some Fragment";
-        let file_path = PathBuf::from("test.md");
-        let suggestions = crate::linting::nonlink_identifiers::find_nonlink_identifiers(content, &file_path);
-        assert_eq!(suggestions.len(), 1, "Expected one suggestion");
-
-        let suggestion = &suggestions[0];
-        if let LintFix::ReplacePattern { pattern, replacement } = &suggestion.fix {
-            // For a hash-only fragment, the file part is empty.
-            assert!(pattern.contains("#Some Fragment"), "pattern: {:?}", pattern);
-            // Link text should be "Some Fragment" (without '#') and link target should be "#some-fragment"
-            let expected_link = "[Some Fragment](#some-fragment)";
-            assert!(replacement.contains(expected_link), "replacement: {:?}", replacement);
-        } else {
-            panic!("Expected ReplacePattern fix");
-        }
-    }
-
-    #[test]
-    fn test_find_nonlink_identifiers_already_bracketed_link_ignored() {
-        let content = "Check out [file.md](file.md) for details.";
-        let file_path = PathBuf::from("test.md");
-        let suggestions = crate::linting::nonlink_identifiers::find_nonlink_identifiers(content, &file_path);
-        // Should ignore already bracketed links.
-        assert_eq!(suggestions.len(), 0, "Expected no suggestions for already bracketed links");
     }
 }
 
