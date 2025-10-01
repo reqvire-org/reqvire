@@ -6,11 +6,11 @@
 
 **The AI-Native Requirements As A Code framework for Modern Engineering Teams**
 
-[![Latest Release](https://img.shields.io/github/v/release/Reqvire/reqvire?style=flat-square&logo=github&color=blue)](https://github.com/Reqvire/reqvire/releases)
+[![Latest Release](https://img.shields.io/github/v/release/Reqvire/reqvire?style=flat-square&logo=github&color=blue)](https://github.com/reqvire-org/reqvire/releases)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=flat-square)](https://opensource.org/licenses/Apache-2.0)
 [![Rust](https://img.shields.io/badge/Built%20with-Rust-orange?style=flat-square&logo=rust)](https://www.rust-lang.org/)
 
-[📖 **Documentation**](./doc/README.md) • [🚀 **Quick Start**](#get-started) • [💬 **Community**](https://github.com/Reqvire/reqvire/discussions) • [🐛 **Report Bug**](https://github.com/Reqvire/reqvire/issues/new?template=bug_report.yml)
+[📖 **Documentation**](https://www.reqvire.orh) • [🚀 **Quick Start**](#get-started) • [💬 **Community**](https://github.com/reqvire-org/reqvire/discussions) • [🐛 **Report Bug**](https://github.com/reqvire-org/reqvire/issues/new?template=bug_report.yml)
 
 </div>
 
@@ -145,7 +145,7 @@ Reqvire is designed for automation. In typical Git-based workflows, you can:
 
 Run the following command in your terminal:
 ```
-curl -fsSL https://raw.githubusercontent.com/Reqvire/reqvire/main/scripts/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/reqvire-org/reqvire/main/scripts/install.sh | bash
 ```
 
 ### Quick Start
@@ -196,7 +196,7 @@ mkdir output
 
 2. **Clone the reqvire Repository**
    ```bash
-   git clone https://github.com/Reqvire/reqvire.git
+   git clone https://github.com/reqvire-org/reqvire.git
    cd reqvire
    ```
 
@@ -214,7 +214,7 @@ mkdir output
 #### Using Pre-built Binaries
 
 1. **Download the Latest Release**
-   - Visit the [Releases page](https://github.com/Reqvire/reqvire/releases) on GitHub
+   - Visit the [Releases page](https://github.com/reqvire-org/reqvire/releases) on GitHub
    - Download the appropriate binary for your platform:
      - Linux: `reqvire-linux-x86_64.tar.gz`
      - macOS (Apple Silicon): `reqvire-darwin-arm64.tar.gz`
@@ -248,9 +248,9 @@ mkdir output
 We welcome contributions to **Reqvire**! Whether you're improving the tooling, refining specifications, enhancing test cases, or shaping modeling conventions, your input is highly valued.
 
 ### Quick Contribution Links
-- **[Report a Bug](https://github.com/Reqvire/reqvire/issues/new?template=bug_report.yml)**
-- **[Request a Feature](https://github.com/Reqvire/reqvire/issues/new?template=feature_request.yml)**
-- **[Ask a Question](https://github.com/Reqvire/reqvire/discussions)**
+- **[Report a Bug](https://github.com/reqvire-org/reqvire/issues/new?template=bug_report.yml)**
+- **[Request a Feature](https://github.com/reqvire-org/reqvire/issues/new?template=feature_request.yml)**
+- **[Ask a Question](https://github.com/reqvire-org/reqvire/discussions)**
 - **[Improve Documentation](./doc/CONTRIBUTING.md)**
 
 ### Contribution Discipline
@@ -335,7 +335,7 @@ Licensed under the [Apache 2.0 License](LICENSE).
 
 **Built with ❤️ by the Reqvire Community**
 
-[🏠 Website](#) • [📖 Docs](./doc/README.md) • [💬 Community](https://github.com/Reqvire/reqvire/discussions) • [🐛 Issues](https://github.com/Reqvire/reqvire/issues)
+[🏠 Website](#) • [📖 Docs](./doc/README.md) • [💬 Community](https://github.com/reqvire-org/reqvire/discussions) • [🐛 Issues](https://github.com/reqvire-org/reqvire/issues)
 
 ⭐ **Star us on GitHub** — it helps more than you know!
 
