@@ -26,7 +26,7 @@ lazy_static! {
             name: "containedBy",
             opposite: Some("contain"),
             description: "Element is contained by another element",
-            arrow: "o--",
+            arrow: "-->",
             label: "containedBy",
         });
         m.insert("contain", RelationTypeInfo {
