@@ -34,7 +34,7 @@ lazy_static! {
             opposite: Some("contain"),
             description: "Element is contained by another element",
             arrow: "--o",
-            label: "contains",
+            label: "containedBy",
             arrow_direction: ArrowDirection::TargetToElement,  // Contained → Container
         });
         m.insert("contain", RelationTypeInfo {
@@ -52,7 +52,7 @@ lazy_static! {
             opposite: Some("derive"),
             description: "Element is derived from another element",
             arrow: "-.->",
-            label: "deriveReqT",
+            label: "deriveFrom",
             arrow_direction: ArrowDirection::TargetToElement,  // Child → Parent (source)
         });
         m.insert("derive", RelationTypeInfo {
@@ -109,7 +109,7 @@ lazy_static! {
             description: "A souce element being verified by other element.",
             arrow: "-.->",
             label: "verifiedBy",
-            arrow_direction: ArrowDirection::ElementToTarget,  // Requirement → Verification
+            arrow_direction: ArrowDirection::TargetToElement,  // Requirement → Verification
         });
         m.insert("verify", RelationTypeInfo {
             name: "verify",
@@ -117,7 +117,7 @@ lazy_static! {
             description: "Element verifies another element",
             arrow: "-.->",
             label: "verifies",
-            arrow_direction: ArrowDirection::TargetToElement,  // Verification → Requirement
+            arrow_direction: ArrowDirection::ElementToTarget,  // Verification → Requirement
         });
 
         // Trace relations
@@ -154,6 +154,18 @@ pub const IMPACT_PROPAGATION_RELATIONS: &[&str] = &[
     "satisfiedBy",   // Requirement changes affect implementations
     "verifiedBy",    // Requirement changes invalidate verifications
 ];
+
+
+/// Relation type for verification
+pub const VERIFY_RELATION: &str = "verify";
+
+/// Relations that trace verification propagation in verification traces
+pub const VERIFICATION_TRACES_RELATIONS: &[&str] = &[
+    "containedBy",
+    "derivedFrom",
+    "refine",
+];
+
 
 #[derive(Debug, Clone, Serialize)]
 pub struct RelationTarget {

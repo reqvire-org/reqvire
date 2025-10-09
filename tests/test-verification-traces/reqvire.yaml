@@ -5,3 +5,4 @@ paths:
     - "**/actual_output.*"
 style:
   theme: "default"
+  max_width: 1200

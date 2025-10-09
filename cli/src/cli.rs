@@ -14,6 +14,7 @@ use reqvire::change_impact;
 use reqvire::git_commands;
 use reqvire::matrix_generator;
 use reqvire::sections_summary;
+use reqvire::verification_trace;
 use reqvire::GraphRegistry;
 use reqvire::graph_registry::{Page, Section};
 use reqvire::element::Element;
@@ -77,13 +78,32 @@ pub enum Commands {
         /// Output traceability matrix as SVG without hyperlinks and with full element names Cannot be used with --json
         #[clap(long, conflicts_with = "json", help_heading = "TRACES OPTIONS")]
         svg: bool,
-        
+
         /// Output results in JSON format
         #[clap(long, help_heading = "TRACES OPTIONS")]
         json: bool,
     },
 
-                       
+    /// Generate verification traceability traces showing upward paths from verifications to root requirements
+    #[clap(override_help = "Generate verification traceability traces showing upward paths from verifications to root requirements\n\nVERIFICATION TRACES OPTIONS:\n      --json                      Output results in JSON format\n      --filter-id <ID>            Only include verification with this specific identifier\n      --filter-name <REGEX>       Only include verifications whose name matches this regular expression\n      --filter-type <TYPE>        Only include verifications of the given type e.g. `test-verification`, `analysis-verification`")]
+    VerificationTraces {
+        /// Output results in JSON format
+        #[clap(long, help_heading = "VERIFICATION TRACES OPTIONS")]
+        json: bool,
+
+        /// Only include verification with this specific identifier
+        #[clap(long, value_name = "ID", help_heading = "VERIFICATION TRACES OPTIONS")]
+        filter_id: Option<String>,
+
+        /// Only include verifications whose name matches this regular expression
+        #[clap(long, value_name = "REGEX", help_heading = "VERIFICATION TRACES OPTIONS")]
+        filter_name: Option<String>,
+
+        /// Only include verifications of the given type e.g. `test-verification`, `analysis-verification`
+        #[clap(long, value_name = "TYPE", help_heading = "VERIFICATION TRACES OPTIONS")]
+        filter_type: Option<String>,
+    },
+
     /// Generate mermaid diagrams in markdown files showing requirements relationships The diagrams will be placed at the top of each requirements document
     GenerateDiagrams,
 
@@ -308,6 +328,7 @@ fn wants_json(args: &Args) -> bool {
         Some(Commands::Format { json, .. }) => *json,
         Some(Commands::Validate { json }) => *json,
         Some(Commands::Traces { json, .. }) => *json,
+        Some(Commands::VerificationTraces { json, .. }) => *json,
         Some(Commands::ModelSummary { json, .. }) => *json,
         Some(Commands::ChangeImpact { json, .. }) => *json,
         Some(Commands::CoverageReport { json }) => *json,
@@ -463,7 +484,7 @@ pub fn handle_command(
         },
         Some(Commands::Traces { json, svg }) => {
             let matrix_config = matrix_generator::MatrixConfig::default();
-                
+
             let matrix_output = reqvire::matrix_generator::generate_matrix(
                 &model_manager.graph_registry,
                 &matrix_config,
@@ -473,10 +494,45 @@ pub fn handle_command(
                     matrix_generator::MatrixFormat::Svg
                 } else {
                     matrix_generator::MatrixFormat::Markdown
-                },                
+                },
             );
-                
+
             println!("{}", matrix_output);
+            return Ok(0);
+        },
+        Some(Commands::VerificationTraces {
+            json,
+            filter_id,
+            filter_name,
+            filter_type
+        }) => {
+            // Generate verification traces report
+            let generator = verification_trace::VerificationTraceGenerator::new(
+                &model_manager.graph_registry
+            );
+
+            let mut report = generator.generate();
+
+            // Apply filters
+            if filter_id.is_some() || filter_name.is_some() || filter_type.is_some() {
+                report = verification_trace::apply_filters(
+                    report,
+                    filter_id.as_deref(),
+                    filter_name.as_deref(),
+                    filter_type.as_deref(),
+                )?;
+            }
+
+            // Output the report
+            if json {
+                let json_output = serde_json::to_string_pretty(&report)
+                    .map_err(|e| ReqvireError::ProcessError(format!("Failed to serialize report: {}", e)))?;
+                println!("{}", json_output);
+            } else {
+                let markdown_output = generator.generate_markdown(&report);
+                println!("{}", markdown_output);
+            }
+
             return Ok(0);
         },
         Some(Commands::Html { output }) => {
