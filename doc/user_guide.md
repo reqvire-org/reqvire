@@ -11,6 +11,7 @@ This user guide provides detailed instructions on how to use Reqvire effectively
 - [Linting](#linting)
 - [Generating Documentation](#generating-documentation)
 - [Traceability](#traceability)
+- [Verification Traces](#verification-traces)
 - [Sections Summary](#sections-summary)
 - [Change Impact Report](#change-impact-report)
 - [Diagrams](#diagrams)
@@ -171,6 +172,59 @@ reqvire traces --svg > matrix.svg
 ```
 
 The SVG format produces a visual representation that can be included in documentation or viewed directly in a browser.
+
+## Verification Traces
+
+Generate upward traceability traces showing how verifications trace back to root requirements through parent relations.
+
+### Generate Verification Traces
+
+```bash
+reqvire verification-traces
+```
+
+This generates a report with Mermaid diagrams showing each verification and its complete upward trace tree to root requirements.
+
+#### Output Format Options
+
+```bash
+# Generate verification traces in Markdown format with Mermaid diagrams (default)
+reqvire verification-traces
+
+# Generate verification traces in JSON format for programmatic analysis
+reqvire verification-traces --json
+```
+
+#### Filtering Options
+
+You can filter the output to specific verifications:
+
+```bash
+# Filter by specific verification identifier
+reqvire verification-traces --filter-id="specifications/Verifications/Tests.md#oauth-flow-test"
+
+# Filter by verification name pattern (regex)
+reqvire verification-traces --filter-name=".*Coverage.*"
+
+# Filter by verification type
+reqvire verification-traces --filter-type="test-verification"
+
+# Combine multiple filters (AND logic)
+reqvire verification-traces --filter-type="test-verification" --filter-name=".*Test"
+```
+
+#### When to Use
+
+Use `verification-traces` when you need to:
+- **Review verification coverage**: See which requirements are verified and through what paths
+- **Understand verification scope**: Identify all requirements covered by a specific verification
+- **Analyze upward traceability**: Trace from verification elements up to root requirements
+- **Generate verification documentation**: Create reports showing verification relationships
+
+Use `traces` (traceability matrix) when you need:
+- **Full bidirectional traceability**: See all relationships between all elements
+- **Matrix view**: Visualize which requirements verify which other requirements
+- **Complete model overview**: See the entire traceability landscape
 
 ## Sections Summary
 

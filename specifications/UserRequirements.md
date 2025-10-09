@@ -349,6 +349,9 @@ The report helps track verification completeness and identify gaps in requiremen
 
 The system shall provide upward traceability visualization from verifications to root requirements, showing the complete requirement hierarchy and indicating which requirements are directly verified.
 
+#### Details
+**Used for identifying redundant verifications**: When a verification directly verifies both a leaf requirement and its parent requirement, this creates a redundant relation that adds noise into the model and may be removed from the parent - verifying the leaf requirement is sufficient since it traces upward to the parent. This keeps verification placement at the most specific level.
+
 #### Metadata
   * type: user-requirement
 

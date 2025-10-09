@@ -108,17 +108,31 @@ When updating tests due to functionality changes:
    ```bash
    # Human-readable report with percentages, satisfied/unsatisfied breakdown
    ./target/debug/reqvire coverage-report
-   
+
    # JSON format for detailed analysis
    ./target/debug/reqvire coverage-report --json > /tmp/coverage.json
-   
+
    # Extract specific information from JSON
    jq '.summary' /tmp/coverage.json                    # Coverage summary
    jq '.unsatisfied_verifications' /tmp/coverage.json  # Verifications needing tests
    jq '.satisfied_verifications' /tmp/coverage.json    # Verifications with tests
    ```
 
-2. **Validate model after implementation:**
+2. **Analyze verification trace trees to optimize verification placement:**
+   ```bash
+   # Generate upward trace trees from verifications to root requirements
+   ./target/debug/reqvire verification-traces
+
+   # JSON format for programmatic analysis
+   ./target/debug/reqvire verification-traces --json > /tmp/verification-traces.json
+
+   # Filter to specific verification for detailed analysis
+   ./target/debug/reqvire verification-traces --filter-id="<verification-id>"
+   ```
+
+   **Used for identifying redundant verifications**: When a verification directly verifies both a leaf requirement and its parent requirement, this creates a redundant relation that adds noise into the model and may be removed from the parent - verifying the leaf requirement is sufficient since it traces upward to the parent. This keeps verification placement at the most specific level.
+
+3. **Validate model after implementation:**
    ```bash
    # Ensure no validation errors
    ./target/debug/reqvire validate
