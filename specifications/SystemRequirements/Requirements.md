@@ -2159,6 +2159,51 @@ The report structure shall include:
 
 ---
 
+### Verification Trace Builder
+
+The system shall provide functionality to build upward trace trees from verification elements by traversing all upward parent relations to reach root requirements, merging all paths into a single tree structure with marked directly-verified requirements.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Verification Upward Traceability](../UserRequirements.md#verification-upward-traceability)
+
+---
+
+### Verification Traces CLI Command
+
+The system shall implement a `verification-traces` CLI command that generates and outputs upward trace trees for verification elements in Markdown format with embedded Mermaid diagrams by default, and in JSON format when --json flag is provided.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Verification Trace Builder](#verification-trace-builder)
+
+---
+
+### Verification Traces Filter Options
+
+The system shall support filtering verification traces by verification ID, name pattern, and verification type to allow users to generate traces for specific subsets of verifications.
+
+#### Details
+
+The following filter options shall be supported:
+- `--verification-id=<id>`: Generate trace for a specific verification element by its full identifier
+- `--filter-name=<regex>`: Filter verifications by name using regular expression matching
+- `--filter-type=<type>`: Filter by verification type (test-verification, analysis-verification, inspection-verification, demonstration-verification)
+
+Filters shall be combinable, and when multiple filters are specified, only verifications matching ALL filter criteria shall be included in the output.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Verification Traces CLI Command](#verification-traces-cli-command)
+
+---
+
 ### CLI Sections Summary Command
 
 The system shall provide a command-line interface command `sections-summary` that generates sections summary reports with filtering capabilities.

@@ -1,4 +1,8 @@
 #!/bin/bash
+set -euo pipefail
+
+# Create log file immediately to ensure it exists for runner
+echo "Starting test..." > "${TEST_DIR}/test_results.log"
 
 # Test: Change Impact Detection
 # --------------------------------------
@@ -23,18 +27,23 @@ sed -i 's/Power saving./Power saving.../g' "${TEST_DIR}/Requirements.md"
 
 
 # Test 1: Run change impact detection with default commit (HEAD)
+echo "Running: reqvire change-impact" >> "${TEST_DIR}/test_results.log"
+set +e
 OUTPUT=$(cd "${TEST_DIR}" && "${REQVIRE_BIN}" --config "${TEST_DIR}/reqvire.yaml" change-impact 2>&1)
 EXIT_CODE=$?
+set -e
 
-printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 
-# Write output to log file for debugging in temporary directory 
+# Write output to log file for debugging in temporary directory
 printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results_default.log"
 
 
 # Check exit code
 if [ $EXIT_CODE -ne 0 ]; then
     echo "❌ FAILED: Change impact detection with default commit failed with exit code $EXIT_CODE"
+    echo "$OUTPUT"
     rm -rf "${TEST_DIR}"
     exit 1
 fi
@@ -87,8 +96,14 @@ fi
 
 # Test 2: Verify that change impact detection works with specified commit
 # Use HEAD as the explicit commit
+echo "Running: reqvire change-impact --git-commit HEAD" >> "${TEST_DIR}/test_results.log"
+set +e
 OUTPUT=$(cd "${TEST_DIR}" && "${REQVIRE_BIN}" --config "${TEST_DIR}/reqvire.yaml" change-impact --git-commit HEAD 2>&1)
 EXIT_CODE=$?
+set -e
+
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 
 # Write output to log file for debugging in temporary directory
 printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results_explicit.log"
@@ -96,13 +111,20 @@ printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results_explicit.log"
 # Check exit code
 if [ $EXIT_CODE -ne 0 ]; then
     echo "❌ FAILED: Change impact detection with explicit commit failed with exit code $EXIT_CODE"
+    echo "$OUTPUT"
     rm -rf "${TEST_DIR}"
     exit 1
 fi
 
 # Test 3: Verify JSON output format for change impact detection
+echo "Running: reqvire change-impact --json" >> "${TEST_DIR}/test_results.log"
+set +e
 OUTPUT=$(cd "${TEST_DIR}" && "${REQVIRE_BIN}" --config "${TEST_DIR}/reqvire.yaml" change-impact --json 2>&1)
 EXIT_CODE=$?
+set -e
+
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 
 # Write output to log file for debugging in temporary directory
 printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results_json.log"
@@ -110,6 +132,7 @@ printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results_json.log"
 # Check exit code
 if [ $EXIT_CODE -ne 0 ]; then
     echo "❌ FAILED: Change impact detection with JSON output failed with exit code $EXIT_CODE"
+    echo "$OUTPUT"
     rm -rf "${TEST_DIR}"
     exit 1
 fi

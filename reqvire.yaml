@@ -23,6 +23,7 @@ paths:
     - ".github/**"
     - ".claude/**"    
     - "target/**"
+    - "Plan.md"
 
 style:
   # Theme for HTML output (default, dark, light)

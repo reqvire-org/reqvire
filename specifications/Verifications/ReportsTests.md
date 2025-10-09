@@ -390,3 +390,80 @@ This test verifies that the system provides sections-summary command functionali
   * satisfiedBy: [test.sh](../../tests/test-sections-summary/test.sh)
 
 ---
+
+### Verification Traces Filter Options Test
+
+This test verifies that the verification-traces command filter options work correctly when generating upward trace trees from verification elements to root requirements.
+
+#### Details
+
+##### Acceptance Criteria
+- System shall provide CLI command `verification-traces` that generates upward trace trees from verifications
+- Command shall output to stdout in Markdown format with embedded Mermaid diagrams by default
+- Command shall support `--json` flag for structured JSON output without diagrams
+- Mermaid diagrams shall show verification element as root with arrows following relation semantics
+- Directly verified requirements shall be marked/highlighted in diagrams using CSS classes
+- System shall traverse all upward parent relations to reach root requirements
+- System shall merge multiple verification paths into single tree per verification
+- System shall support `--verification-id=<id>` filter for specific verification element
+- System shall support `--filter-name=<regex>` for filtering by verification name pattern
+- System shall support `--filter-type=<type>` for filtering by verification type
+- Multiple filters shall be combinable using AND logic
+- JSON output shall include verification ID, directly verified requirements, and complete trace tree structure
+
+##### Test Criteria
+
+1. **Basic Markdown Output**
+   Command: `reqvire verification-traces`
+   - exits code **0**
+   - output contains `# Verification Traceability Report`
+   - output contains Mermaid diagram blocks with `graph BT`
+   - diagrams include verification element nodes and requirement nodes
+   - directly verified requirements have `:::verified` CSS class in diagram
+
+2. **JSON Output**
+   Command: `reqvire verification-traces --json`
+   - exits code **0**
+   - output parses as valid JSON
+   - JSON contains `verifications` array
+   - each verification includes `verification_id`, `verification_name`, `verification_type`
+   - each verification includes `directly_verified_requirements` array
+   - each verification includes `trace_tree` with nested requirement structure
+
+3. **Correct Arrow Directions**
+   - Mermaid diagrams use `SYS001 -.->|verify| VER001` format (requirement verifies verification)
+   - Mermaid diagrams use `USER001 -.->|deriveReqT| SYS001` format (parent derives child)
+   - Arrow directions match Reqvire relation semantics (TargetToElement, ElementToTarget)
+
+4. **Specific Verification Filter**
+   Command: `reqvire verification-traces --verification-id="specifications/Verifications/ValidationTests.md#invalid-relations-test"`
+   - exits code **0**
+   - output contains only trace for specified verification
+   - other verifications are excluded
+
+5. **Name Pattern Filter**
+   Command: `reqvire verification-traces --filter-name=".*Coverage.*"`
+   - exits code **0**
+   - output contains only verifications matching regex pattern
+   - non-matching verifications are excluded
+
+6. **Type Filter**
+   Command: `reqvire verification-traces --filter-type="test-verification"`
+   - exits code **0**
+   - output contains only test-verification elements
+   - analysis, inspection, demonstration verifications are excluded
+
+7. **Combined Filters**
+   Command: `reqvire verification-traces --filter-type="test-verification" --filter-name=".*Test"`
+   - exits code **0**
+   - output contains only verifications matching ALL filter criteria (AND logic)
+   - verifications matching only one filter are excluded
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [Verification Traces Filter Options](../SystemRequirements/Requirements.md#verification-traces-filter-options)
+  * satisfiedBy: [test.sh](../../tests/test-verification-traces/test.sh)
+
+---

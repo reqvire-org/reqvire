@@ -833,6 +833,18 @@ The report helps track verification completeness and identify gaps in requiremen
 
 ---
 
+### Verification Upward Traceability
+
+The system shall provide upward traceability visualization from verifications to root requirements, showing the complete requirement hierarchy and indicating which requirements are directly verified.
+
+#### Metadata
+  * type: user-requirement
+
+#### Relations
+  * refine: [Model Reports](#model-reports)
+
+---
+
 ## Trace Changes in MBSE Model
 ```mermaid
 graph LR;

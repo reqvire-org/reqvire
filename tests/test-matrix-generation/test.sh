@@ -1,4 +1,8 @@
 #!/bin/bash
+set -euo pipefail
+
+# Create log file immediately to ensure it exists for runner
+echo "Starting test..." > "${TEST_DIR}/test_results.log"
 
 # Test: Traceability Matrix Generation
 # ----------------------------------------------------
@@ -12,16 +16,20 @@
 # Test 1: Generate markdown traceability matrix
 
 MATRIX_MD="${TEST_DIR}/output/matrix.md"
+echo "Running: reqvire traces" >> "${TEST_DIR}/test_results.log"
+set +e
 OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" traces 2>&1)
 EXIT_CODE=$?
+set -e
 
-# Save all test outputs to log file
-printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 echo "$OUTPUT" > "$MATRIX_MD"
 
 # Verify exit code indicates success
 if [ $EXIT_CODE -ne 0 ]; then
   echo "❌ FAILED: Traceability matrix generation failed with exit code $EXIT_CODE"
+  echo "$OUTPUT"
   exit 1
 fi
 
@@ -80,15 +88,19 @@ fi
 
 # Test 2: Generate JSON traceability matrix
 MATRIX_JSON="${TEST_DIR}/output/matrix.json"
+echo "Running: reqvire traces --json" >> "${TEST_DIR}/test_results.log"
+set +e
 JSON_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" traces --json 2>&1)
 EXIT_CODE=$?
+set -e
 
-# Add JSON output to log
-printf "\n\nJSON OUTPUT:\n%s\n" "$JSON_OUTPUT" >> "${TEST_DIR}/test_results.log"
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$JSON_OUTPUT" >> "${TEST_DIR}/test_results.log"
 echo "$JSON_OUTPUT" > "$MATRIX_JSON"
 
 if [ $EXIT_CODE -ne 0 ]; then
   echo "❌ FAILED: JSON matrix generation failed with exit code $EXIT_CODE"
+  echo "$JSON_OUTPUT"
   exit 1
 fi
 
@@ -132,15 +144,19 @@ fi
 
 # Test 3: Generate SVG traceability matrix
 MATRIX_SVG="${TEST_DIR}/output/matrix.svg"
+echo "Running: reqvire traces --svg" >> "${TEST_DIR}/test_results.log"
+set +e
 SVG_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" traces --svg 2>&1)
 EXIT_CODE=$?
+set -e
 
-# Add SVG output to log
-printf "\n\nSVG OUTPUT:\n%s\n" "$SVG_OUTPUT" >> "${TEST_DIR}/test_results.log"
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$SVG_OUTPUT" >> "${TEST_DIR}/test_results.log"
 echo "$SVG_OUTPUT" > "$MATRIX_SVG"
 
 if [ $EXIT_CODE -ne 0 ]; then
   echo "❌ FAILED: SVG matrix generation failed with exit code $EXIT_CODE"
+  echo "$SVG_OUTPUT"
   exit 1
 fi
 
@@ -159,14 +175,18 @@ fi
 
 
 # Test 4: Check for conflicts
+echo "Running: reqvire traces --json --svg" >> "${TEST_DIR}/test_results.log"
+set +e
 CONFLICT_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN"  --config "${TEST_DIR}/reqvire.yaml" traces --json --svg 2>&1)
 EXIT_CODE=$?
+set -e
 
-# Add conflict output to log
-printf "\n\nCONFLICT OUTPUT:\n%s\n" "$CONFLICT_OUTPUT" >> "${TEST_DIR}/test_results.log"
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$CONFLICT_OUTPUT" >> "${TEST_DIR}/test_results.log"
 
 if [ $EXIT_CODE -eq 0 ]; then
   echo "❌ FAILED: Conflict between --json and --svg flags was not detected"
+  echo "$CONFLICT_OUTPUT"
   exit 1
 fi
 

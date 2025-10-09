@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 # Test: Validation of Valid Relation Targets
 # -----------------------------------------
@@ -11,26 +12,16 @@
 # - No error output about missing relation targets
 #
 
-# Create a unique temporary directory
-TMP_DIR=$(mktemp -d -t reqvire-change-impact-XXXXXX)
-cp -a "${TEST_DIR}/." "${TMP_DIR}/"
-mkdir -p "${TMP_DIR}/output"
+echo "Starting test..." > "${TEST_DIR}/test_results.log"
 
-# Create simple git repository to test changes
-cd "${TMP_DIR}"
-git init > /dev/null 2>&1
-git config --local user.email "test@example.com" > /dev/null 2>&1 
-git config --local user.name "Test User" > /dev/null 2>&1
-git remote add origin 'https://dummy.example.com/dummy-repo.git'  > /dev/null 2>&1
-git add Requirements.md > /dev/null 2>&1
-git commit -m "Initial commit" > /dev/null 2>&1
-
-
-
-OUTPUT=$(cd "$TMP_DIR" && "$REQVIRE_BIN" --config "${TMP_DIR}/reqvire.yaml" model-summary --json 2>&1)
+echo "Running: reqvire model-summary --json" >> "${TEST_DIR}/test_results.log"
+set +e
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary --json 2>&1)
 EXIT_CODE=$?
+set -e
 
-printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 
 
 # Verify exit code indicates success (0)

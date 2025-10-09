@@ -22,9 +22,16 @@ set -euo pipefail
 # - Filtered relations coverage: relations to filtered-out elements are preserved in both directions
 
 # 1) No filters: base JSON summary
+echo "Starting test..." > "${TEST_DIR}/test_results.log"
+
+echo "Running: reqvire model-summary --json" >> "${TEST_DIR}/test_results.log"
+set +e
 OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary --json 2>&1)
-printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
 EXIT_JSON=$?
+set -e
+
+echo "Exit code: $EXIT_JSON" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 if [ $EXIT_JSON -ne 0 ]; then
   echo "FAILED: base JSON summary exited $EXIT_JSON"
   exit 1
@@ -106,9 +113,14 @@ fi
 
 
 # 2) No filters: base text summary
+echo "Running: reqvire model-summary" >> "${TEST_DIR}/test_results.log"
+set +e
 OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary 2>&1)
-printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
 EXIT_TEXT=$?
+set -e
+
+echo "Exit code: $EXIT_TEXT" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 if [ $EXIT_TEXT -ne 0 ]; then
   echo "FAILED: base text summary exited $EXIT_TEXT"
   exit 1
@@ -187,18 +199,28 @@ fi
 
 
 # 3) --filter-file=Requirements.md
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary --json --filter-file="specifications/Requirements.md")
+echo "Running: reqvire model-summary --json --filter-file" >> "${TEST_DIR}/test_results.log"
+set +e
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary --json --filter-file="specifications/Requirements.md" 2>&1)
+EXIT_CODE=$?
+set -e
 
-printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 if [ "$(echo "$OUTPUT" | jq '.files | length')" -ne 1 ]; then
   echo "FAILED: --filter-file JSON did not limit to 1 file"
   exit 1
 fi
 
 
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN"  --config "${TEST_DIR}/reqvire.yaml" model-summary --filter-file="specifications/Requirements.md")
+echo "Running: reqvire model-summary --filter-file" >> "${TEST_DIR}/test_results.log"
+set +e
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN"  --config "${TEST_DIR}/reqvire.yaml" model-summary --filter-file="specifications/Requirements.md" 2>&1)
+EXIT_CODE=$?
+set -e
 
-printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 count=$(grep -c -- '^📂 File:' <<<"$OUTPUT")
 if (( count != 1 )); then
   echo "FAILED: --filter-file text did not limit to 1 file (got $count)"
@@ -206,8 +228,14 @@ if (( count != 1 )); then
 fi
 
 # 4) --filter-section=Requirements
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN"  --config "${TEST_DIR}/reqvire.yaml" model-summary --json --filter-section="Requirements*")
-printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
+echo "Running: reqvire model-summary --json --filter-section" >> "${TEST_DIR}/test_results.log"
+set +e
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN"  --config "${TEST_DIR}/reqvire.yaml" model-summary --json --filter-section="Requirements*" 2>&1)
+EXIT_CODE=$?
+set -e
+
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 
 COUNT_SEC_REQ=$(
   echo "$OUTPUT" | jq -r '
@@ -230,9 +258,14 @@ if [ "$COUNT_SEC_REQ" -ne 4 ]; then
   exit 1
 fi
 
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary --filter-section="Requirements A")
+echo "Running: reqvire model-summary --filter-section='Requirements A'" >> "${TEST_DIR}/test_results.log"
+set +e
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary --filter-section="Requirements A" 2>&1)
+EXIT_CODE=$?
+set -e
 
-printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 
 # 1) Make sure exactly one “Requirements A” section is printed
 sec_count=$(printf '%s\n' "$OUTPUT" \
@@ -253,14 +286,26 @@ fi
 
 
 # 5) --filter-type=user-requirement
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary --json --filter-type="user-requirement")
-printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
+echo "Running: reqvire model-summary --json --filter-type=user-requirement" >> "${TEST_DIR}/test_results.log"
+set +e
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary --json --filter-type="user-requirement" 2>&1)
+EXIT_CODE=$?
+set -e
+
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 if [ "$(echo "$OUTPUT" | jq '.global_counters.total_elements')" -ne 3 ]; then
   echo "FAILED: --filter-type=user-requirement JSON should yield 3 elements"
   exit 1
 fi
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN"  --config "${TEST_DIR}/reqvire.yaml" model-summary --filter-type="user-requirement")
-printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
+echo "Running: reqvire model-summary --filter-type=user-requirement" >> "${TEST_DIR}/test_results.log"
+set +e
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN"  --config "${TEST_DIR}/reqvire.yaml" model-summary --filter-type="user-requirement" 2>&1)
+EXIT_CODE=$?
+set -e
+
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 if [ "$(grep -c '🔹 Element:' <<< "$OUTPUT")" -ne 3 ]; then
   echo "FAILED: --filter-type=user-requirement text should yield 3 elements"
   exit 1
@@ -268,14 +313,26 @@ fi
 
 
 # 6) --filter-type=verification
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary --json --filter-type="verification")
-printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
+echo "Running: reqvire model-summary --json --filter-type=verification" >> "${TEST_DIR}/test_results.log"
+set +e
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary --json --filter-type="verification" 2>&1)
+EXIT_CODE=$?
+set -e
+
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 if [ "$(echo "$OUTPUT" | jq '.global_counters.total_elements')" -ne 1 ]; then
   echo "FAILED: --filter-type=verification JSON should yield 1 element"
   exit 1
 fi
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary --filter-type="verification")
-printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
+echo "Running: reqvire model-summary --filter-type=verification" >> "${TEST_DIR}/test_results.log"
+set +e
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary --filter-type="verification" 2>&1)
+EXIT_CODE=$?
+set -e
+
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 if [ "$(grep -c '🔹 Element:' <<< "$OUTPUT")" -ne 1 ]; then
   echo "FAILED: --filter-type=verification text should yield 1 element"
   exit 1
@@ -283,14 +340,26 @@ fi
 
 
 # 7) --filter-name-regex="^Requirement with Valid Standard"
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary --json --filter-name="^Requirement with Valid Standard")
-printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
+echo "Running: reqvire model-summary --json --filter-name" >> "${TEST_DIR}/test_results.log"
+set +e
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary --json --filter-name="^Requirement with Valid Standard" 2>&1)
+EXIT_CODE=$?
+set -e
+
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 if [ "$(echo "$OUTPUT" | jq '.global_counters.total_elements')" -ne 1 ]; then
   echo "FAILED: --filter-name-regex JSON should yield 1 element"
   exit 1
 fi
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary --filter-name="^Requirement with Valid Standard")
-printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
+echo "Running: reqvire model-summary --filter-name" >> "${TEST_DIR}/test_results.log"
+set +e
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary --filter-name="^Requirement with Valid Standard" 2>&1)
+EXIT_CODE=$?
+set -e
+
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 if [ "$(grep -c '🔹 Element:' <<< "$OUTPUT")" -ne 1 ]; then
   echo "FAILED: --filter-name-regex text should yield 1 element"
   exit 1
@@ -298,14 +367,26 @@ fi
 
 
 # 8) --filter-content="subsection"
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary --json --filter-content="subsection")
-printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
+echo "Running: reqvire model-summary --json --filter-content" >> "${TEST_DIR}/test_results.log"
+set +e
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary --json --filter-content="subsection" 2>&1)
+EXIT_CODE=$?
+set -e
+
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 if [ "$(echo "$OUTPUT" | jq '.global_counters.total_elements')" -ne 1 ]; then
   echo "FAILED: --filter-content JSON should yield 1 element"
   exit 1
 fi
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary --filter-content="subsection")
-printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
+echo "Running: reqvire model-summary --filter-content" >> "${TEST_DIR}/test_results.log"
+set +e
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary --filter-content="subsection" 2>&1)
+EXIT_CODE=$?
+set -e
+
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 if [ "$(grep -c '🔹 Element:' <<< "$OUTPUT")" -ne 1 ]; then
   echo "FAILED: --filter-content text should yield 1 element"
   exit 1
@@ -313,16 +394,28 @@ fi
 
 
 # 9) --filter-is-verified
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary --json --filter-is-not-verified)
-printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
+echo "Running: reqvire model-summary --json --filter-is-not-verified" >> "${TEST_DIR}/test_results.log"
+set +e
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary --json --filter-is-not-verified 2>&1)
+EXIT_CODE=$?
+set -e
+
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 
 if [ "$(echo "$OUTPUT" | jq '.global_counters.requirements_not_verified')" -ne 2 ]; then
   echo "FAILED: --filter-is-not-verified JSON should yield 2 elements"
   exit 1
 fi
 
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary --filter-is-not-verified)
-printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
+echo "Running: reqvire model-summary --filter-is-not-verified" >> "${TEST_DIR}/test_results.log"
+set +e
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary --filter-is-not-verified 2>&1)
+EXIT_CODE=$?
+set -e
+
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 if ! grep -q "Requirements not verified: 2" <<< "$OUTPUT"; then
   echo "FAILED: Expected 'Requirements not verified: 2' but got:"
   echo "$OUTPUT"
@@ -331,14 +424,26 @@ fi
 
 
 # 10) --filter-is-satisfied
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary --json --filter-is-not-satisfied)
-printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
+echo "Running: reqvire model-summary --json --filter-is-not-satisfied" >> "${TEST_DIR}/test_results.log"
+set +e
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary --json --filter-is-not-satisfied 2>&1)
+EXIT_CODE=$?
+set -e
+
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 if [ "$(echo "$OUTPUT" | jq '.global_counters.requirements_not_satisfied')" -ne 1 ]; then
   echo "FAILED: --filter-is-not-satisfied JSON should yield 3 elements"
   exit 1
 fi
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary --filter-is-not-satisfied)
-printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
+echo "Running: reqvire model-summary --filter-is-not-satisfied" >> "${TEST_DIR}/test_results.log"
+set +e
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary --filter-is-not-satisfied 2>&1)
+EXIT_CODE=$?
+set -e
+
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 if ! grep -q "Requirements not satisfied: 1" <<< "$OUTPUT"; then
   echo "FAILED: Expected 'Requirements not satisfied: 1' but got:"
   echo "$OUTPUT"
@@ -347,19 +452,31 @@ fi
 
 
 # 11) Combination: user-requirement + is-satisfied
+echo "Running: reqvire model-summary --json --filter-type=user-requirement --filter-is-not-satisfied" >> "${TEST_DIR}/test_results.log"
+set +e
 OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary --json \
-           --filter-type="user-requirement" --filter-is-not-satisfied)
-printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"           
+           --filter-type="user-requirement" --filter-is-not-satisfied 2>&1)
+EXIT_CODE=$?
+set -e
+
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"           
 if [ "$(echo "$OUTPUT" | jq '.global_counters.total_elements')" -ne 1 ]; then
   echo "FAILED: combo JSON should yield 1 elements"
   exit 1
 fi
 
 
-           
+
+echo "Running: reqvire model-summary --filter-type=user-requirement --filter-is-not-satisfied" >> "${TEST_DIR}/test_results.log"
+set +e
 OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary \
-           --filter-type="user-requirement" --filter-is-not-satisfied)
-printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"           
+           --filter-type="user-requirement" --filter-is-not-satisfied 2>&1)
+EXIT_CODE=$?
+set -e
+
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"           
 if [ "$(grep -c '🔹 Element:' <<< "$OUTPUT")" -ne 1 ]; then
   echo "FAILED: combo text should yield 1 elements"
   exit 1
@@ -402,8 +519,14 @@ fi
 # Test #13 removed - no longer testing filter without model-summary error case
 
 # 14) Relations coverage - bidirectional relationships
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary --json)
-printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results_relations.log"
+echo "Running: reqvire model-summary --json (relations test)" >> "${TEST_DIR}/test_results_relations.log"
+set +e
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary --json 2>&1)
+EXIT_CODE=$?
+set -e
+
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results_relations.log"
+printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results_relations.log"
 
 # Check that "Verification of Standard Relations" has verify relation pointing to requirement
 VERIFY_RELATIONS=$(echo "$OUTPUT" | jq -r '
@@ -485,8 +608,14 @@ if ! echo "$DERIVE_RELATIONS" | grep -q "requirement-with-designspecifications-r
 fi
 
 # 15) Relations visibility when filtering by type - verification filter
-OUTPUT_VERIFICATION_FILTER=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary --json --filter-type="verification")
-printf "%s\n" "$OUTPUT_VERIFICATION_FILTER" > "${TEST_DIR}/test_results_verification_filter.log"
+echo "Running: reqvire model-summary --json --filter-type=verification (filter test)" >> "${TEST_DIR}/test_results_verification_filter.log"
+set +e
+OUTPUT_VERIFICATION_FILTER=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary --json --filter-type="verification" 2>&1)
+EXIT_CODE=$?
+set -e
+
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results_verification_filter.log"
+printf "%s\n" "$OUTPUT_VERIFICATION_FILTER" >> "${TEST_DIR}/test_results_verification_filter.log"
 
 # When filtering by verification type, we should only see verification elements
 TOTAL_ELEMENTS_VERIFICATION_FILTER=$(echo "$OUTPUT_VERIFICATION_FILTER" | jq '.global_counters.total_elements')
@@ -514,8 +643,14 @@ if [ -z "$VERIFICATION_VERIFY_RELATIONS" ]; then
 fi
 
 # 16) Relations visibility when filtering by type - requirement filter
-OUTPUT_REQUIREMENT_FILTER=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary --json --filter-type="user-requirement")
-printf "%s\n" "$OUTPUT_REQUIREMENT_FILTER" > "${TEST_DIR}/test_results_requirement_filter.log"
+echo "Running: reqvire model-summary --json --filter-type=user-requirement (filter test)" >> "${TEST_DIR}/test_results_requirement_filter.log"
+set +e
+OUTPUT_REQUIREMENT_FILTER=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary --json --filter-type="user-requirement" 2>&1)
+EXIT_CODE=$?
+set -e
+
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results_requirement_filter.log"
+printf "%s\n" "$OUTPUT_REQUIREMENT_FILTER" >> "${TEST_DIR}/test_results_requirement_filter.log"
 
 # When filtering by requirement type, we should see 3 user-requirement elements
 TOTAL_ELEMENTS_REQUIREMENT_FILTER=$(echo "$OUTPUT_REQUIREMENT_FILTER" | jq '.global_counters.total_elements')
