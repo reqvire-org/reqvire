@@ -254,7 +254,7 @@ This test verifies that the verification-traces command filter options work corr
 - Directly verified requirements shall be marked/highlighted in diagrams using CSS classes
 - System shall traverse all upward parent relations to reach root requirements
 - System shall merge multiple verification paths into single tree per verification
-- System shall support `--verification-id=<id>` filter for specific verification element
+- System shall support `--filter-id=<id>` filter for specific verification element
 - System shall support `--filter-name=<regex>` for filtering by verification name pattern
 - System shall support `--filter-type=<type>` for filtering by verification type
 - Multiple filters shall be combinable using AND logic
@@ -284,7 +284,7 @@ This test verifies that the verification-traces command filter options work corr
    - Arrow directions match Reqvire relation semantics (TargetToElement, ElementToTarget)
 
 4. **Specific Verification Filter**
-   Command: `reqvire verification-traces --verification-id="specifications/Verifications/ValidationTests.md#invalid-relations-test"`
+   Command: `reqvire verification-traces --filter-id="specifications/Verifications/ValidationTests.md#invalid-relations-test"`
    - exits code **0**
    - output contains only trace for specified verification
    - other verifications are excluded
