@@ -9,19 +9,12 @@ use crate::utils::EXTERNAL_SCHEMES;
 use std::path::PathBuf;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
-pub enum ArrowDirection {
-    ElementToTarget,    // element → target
-    TargetToElement,    // target → element
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct RelationTypeInfo {
     pub name: &'static str,
     pub opposite: Option<&'static str>,
     pub description: &'static str,
     pub arrow: &'static str,
     pub label: &'static str,
-    pub arrow_direction: ArrowDirection,
 }
 
 lazy_static! {
@@ -33,9 +26,8 @@ lazy_static! {
             name: "containedBy",
             opposite: Some("contain"),
             description: "Element is contained by another element",
-            arrow: "--o",
+            arrow: "o--",
             label: "containedBy",
-            arrow_direction: ArrowDirection::TargetToElement,  // Contained → Container
         });
         m.insert("contain", RelationTypeInfo {
             name: "contain",
@@ -43,7 +35,6 @@ lazy_static! {
             description: "Element contains another element",
             arrow: "--o",
             label: "contains",
-            arrow_direction: ArrowDirection::ElementToTarget,  // Container → Contained
         });
         
         // Derive relations
@@ -52,8 +43,7 @@ lazy_static! {
             opposite: Some("derive"),
             description: "Element is derived from another element",
             arrow: "-.->",
-            label: "deriveFrom",
-            arrow_direction: ArrowDirection::TargetToElement,  // Child → Parent (source)
+            label: "derivedFrom",
         });
         m.insert("derive", RelationTypeInfo {
             name: "derive",
@@ -61,7 +51,6 @@ lazy_static! {
             description: "Element is source for a derived element",
             arrow: "-.->",
             label: "deriveReqT",
-            arrow_direction: ArrowDirection::ElementToTarget,  // Parent → Child (derived)
         });
         
         // Refine relation
@@ -71,7 +60,6 @@ lazy_static! {
             description: "Element refines a higher-level element",
             arrow: "-->",
             label: "refines",
-            arrow_direction: ArrowDirection::TargetToElement,  // Refining → Refined (parent)
         });
 
         // Refine relation
@@ -81,7 +69,6 @@ lazy_static! {
             description: "A souce element being refined by other element.",
             arrow: "-->",
             label: "refinedBy",
-            arrow_direction: ArrowDirection::ElementToTarget,  // Refined → Refining (child)
         });        
         
         // Satisfy relations
@@ -91,7 +78,6 @@ lazy_static! {
             description: "A souce element being satisfied by other element.",
             arrow: "-->",
             label: "satisfiedBy",
-            arrow_direction: ArrowDirection::ElementToTarget,  // Requirement → Implementation
         });
         m.insert("satisfy", RelationTypeInfo {
             name: "satisfy",
@@ -99,7 +85,6 @@ lazy_static! {
             description: "Element satisfies another element",
             arrow: "-->",
             label: "satisfies",
-            arrow_direction: ArrowDirection::TargetToElement,  // Implementation → Requirement
         });
         
         // Verify relations
@@ -109,7 +94,6 @@ lazy_static! {
             description: "A souce element being verified by other element.",
             arrow: "-.->",
             label: "verifiedBy",
-            arrow_direction: ArrowDirection::TargetToElement,  // Requirement → Verification
         });
         m.insert("verify", RelationTypeInfo {
             name: "verify",
@@ -117,7 +101,6 @@ lazy_static! {
             description: "Element verifies another element",
             arrow: "-.->",
             label: "verifies",
-            arrow_direction: ArrowDirection::ElementToTarget,  // Verification → Requirement
         });
 
         // Trace relations
@@ -127,7 +110,6 @@ lazy_static! {
             description: "Element is related to another element in a non-directional way",
             arrow: "-.->",
             label: "trace",
-            arrow_direction: ArrowDirection::ElementToTarget,  // Tracing → Traced (neutral)
         });
 
         m

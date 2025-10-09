@@ -343,18 +343,13 @@ impl<'a> VerificationTraceGenerator<'a> {
 
         // Add link from source to this node using proper relation metadata
         if let Some(info) = crate::relation::RELATION_TYPES.get(relation_type_name) {
-            // Use the arrow_direction field to determine visual arrow flow
-            let (from_id, to_id) = match info.arrow_direction {
-                crate::relation::ArrowDirection::ElementToTarget => (source_id, node_id.as_str()),
-                crate::relation::ArrowDirection::TargetToElement => (node_id.as_str(), source_id),
-            };
-
+            // Always render as element → target
             diagram.push_str(&format!(
                 "  {} {}|{}| {};\n",
-                from_id,
+                source_id,
                 info.arrow,
                 info.label,
-                to_id,
+                node_id,
             ));
         }
 

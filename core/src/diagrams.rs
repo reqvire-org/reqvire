@@ -312,18 +312,13 @@ fn add_element_to_diagram(
 
 
         if let Some(info) = relation::RELATION_TYPES.get(relation.relation_type.name) {
-            // Use the arrow_direction field to determine visual arrow flow
-            let (from_id, to_id) = match info.arrow_direction {
-                relation::ArrowDirection::ElementToTarget => (element_id.clone(), target_id.clone()),
-                relation::ArrowDirection::TargetToElement => (target_id.clone(), element_id.clone()),
-            };
-
+            // Always render as element → target
             diagram.push_str(&format!(
                 "  {} {}|{}| {};\n",
-                from_id,
+                element_id,
                 info.arrow,
                 info.label,
-                to_id,
+                target_id,
             ));
         }
     }
