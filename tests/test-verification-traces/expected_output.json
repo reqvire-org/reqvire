@@ -2,168 +2,6 @@
   "files": {
     "specifications/Verifications/Tests.md": {
       "sections": {
-        "Authentication Tests": {
-          "verifications": [
-            {
-              "identifier": "specifications/Verifications/Tests.md#oauth-flow-test",
-              "name": "OAuth Flow Test",
-              "section": "Authentication Tests",
-              "file": "specifications/Verifications/Tests.md",
-              "type": "test-verification",
-              "directly_verified_requirements": [
-                "specifications/SystemRequirements.md#oauth-implementation",
-                "specifications/SystemRequirements.md#session-management"
-              ],
-              "trace_tree": {
-                "requirements": [
-                  {
-                    "id": "specifications/UserRequirements.md#user-authentication",
-                    "name": "User Authentication",
-                    "type": "user-requirement",
-                    "is_directly_verified": false,
-                    "children": [
-                      {
-                        "id": "specifications/SystemRequirements.md#oauth-implementation",
-                        "name": "OAuth Implementation",
-                        "type": "requirement",
-                        "is_directly_verified": true,
-                        "children": [
-                          {
-                            "id": "specifications/SystemRequirements.md#session-management",
-                            "name": "Session Management",
-                            "type": "requirement",
-                            "is_directly_verified": true,
-                            "children": []
-                          }
-                        ]
-                      }
-                    ]
-                  }
-                ]
-              },
-              "directly_verified_count": 2,
-              "total_requirements_in_tree": 3
-            },
-            {
-              "identifier": "specifications/Verifications/Tests.md#session-timeout-test",
-              "name": "Session Timeout Test",
-              "section": "Authentication Tests",
-              "file": "specifications/Verifications/Tests.md",
-              "type": "test-verification",
-              "directly_verified_requirements": [
-                "specifications/SystemRequirements.md#session-management"
-              ],
-              "trace_tree": {
-                "requirements": [
-                  {
-                    "id": "specifications/UserRequirements.md#user-authentication",
-                    "name": "User Authentication",
-                    "type": "user-requirement",
-                    "is_directly_verified": false,
-                    "children": [
-                      {
-                        "id": "specifications/SystemRequirements.md#oauth-implementation",
-                        "name": "OAuth Implementation",
-                        "type": "requirement",
-                        "is_directly_verified": false,
-                        "children": [
-                          {
-                            "id": "specifications/SystemRequirements.md#session-management",
-                            "name": "Session Management",
-                            "type": "requirement",
-                            "is_directly_verified": true,
-                            "children": []
-                          }
-                        ]
-                      }
-                    ]
-                  }
-                ]
-              },
-              "directly_verified_count": 1,
-              "total_requirements_in_tree": 3
-            }
-          ]
-        },
-        "Security Tests": {
-          "verifications": [
-            {
-              "identifier": "specifications/Verifications/Tests.md#encryption-coverage-test",
-              "name": "Encryption Coverage Test",
-              "section": "Security Tests",
-              "file": "specifications/Verifications/Tests.md",
-              "type": "test-verification",
-              "directly_verified_requirements": [
-                "specifications/SystemRequirements.md#encryption-implementation"
-              ],
-              "trace_tree": {
-                "requirements": [
-                  {
-                    "id": "specifications/UserRequirements.md#data-protection",
-                    "name": "Data Protection",
-                    "type": "user-requirement",
-                    "is_directly_verified": false,
-                    "children": [
-                      {
-                        "id": "specifications/SystemRequirements.md#encryption-implementation",
-                        "name": "Encryption Implementation",
-                        "type": "requirement",
-                        "is_directly_verified": true,
-                        "children": []
-                      }
-                    ]
-                  }
-                ]
-              },
-              "directly_verified_count": 1,
-              "total_requirements_in_tree": 2
-            }
-          ]
-        },
-        "Coverage Tests": {
-          "verifications": [
-            {
-              "identifier": "specifications/Verifications/Tests.md#coverage-calculation-test",
-              "name": "Coverage Calculation Test",
-              "section": "Coverage Tests",
-              "file": "specifications/Verifications/Tests.md",
-              "type": "test-verification",
-              "directly_verified_requirements": [
-                "specifications/SystemRequirements.md#coverage-calculator",
-                "specifications/SystemRequirements.md#coverage-report-generator"
-              ],
-              "trace_tree": {
-                "requirements": [
-                  {
-                    "id": "specifications/UserRequirements.md#coverage-reports",
-                    "name": "Coverage Reports",
-                    "type": "user-requirement",
-                    "is_directly_verified": false,
-                    "children": [
-                      {
-                        "id": "specifications/SystemRequirements.md#coverage-calculator",
-                        "name": "Coverage Calculator",
-                        "type": "requirement",
-                        "is_directly_verified": true,
-                        "children": [
-                          {
-                            "id": "specifications/SystemRequirements.md#coverage-report-generator",
-                            "name": "Coverage Report Generator",
-                            "type": "requirement",
-                            "is_directly_verified": true,
-                            "children": []
-                          }
-                        ]
-                      }
-                    ]
-                  }
-                ]
-              },
-              "directly_verified_count": 2,
-              "total_requirements_in_tree": 3
-            }
-          ]
-        },
         "Analysis Verifications": {
           "verifications": [
             {
@@ -191,6 +29,131 @@
             }
           ]
         },
+        "Authentication Tests": {
+          "verifications": [
+            {
+              "identifier": "specifications/Verifications/Tests.md#oauth-flow-test",
+              "name": "OAuth Flow Test",
+              "section": "Authentication Tests",
+              "file": "specifications/Verifications/Tests.md",
+              "type": "test-verification",
+              "directly_verified_requirements": [
+                "specifications/SystemRequirements.md#oauth-implementation",
+                "specifications/SystemRequirements.md#session-management"
+              ],
+              "trace_tree": {
+                "requirements": [
+                  {
+                    "id": "specifications/SystemRequirements.md#oauth-implementation",
+                    "name": "OAuth Implementation",
+                    "type": "requirement",
+                    "is_directly_verified": true,
+                    "children": [
+                      {
+                        "id": "specifications/UserRequirements.md#user-authentication",
+                        "name": "User Authentication",
+                        "type": "user-requirement",
+                        "is_directly_verified": false,
+                        "children": []
+                      }
+                    ]
+                  },
+                  {
+                    "id": "specifications/SystemRequirements.md#session-management",
+                    "name": "Session Management",
+                    "type": "requirement",
+                    "is_directly_verified": true,
+                    "children": []
+                  }
+                ]
+              },
+              "directly_verified_count": 2,
+              "total_requirements_in_tree": 3
+            },
+            {
+              "identifier": "specifications/Verifications/Tests.md#session-timeout-test",
+              "name": "Session Timeout Test",
+              "section": "Authentication Tests",
+              "file": "specifications/Verifications/Tests.md",
+              "type": "test-verification",
+              "directly_verified_requirements": [
+                "specifications/SystemRequirements.md#session-management"
+              ],
+              "trace_tree": {
+                "requirements": [
+                  {
+                    "id": "specifications/SystemRequirements.md#session-management",
+                    "name": "Session Management",
+                    "type": "requirement",
+                    "is_directly_verified": true,
+                    "children": [
+                      {
+                        "id": "specifications/SystemRequirements.md#oauth-implementation",
+                        "name": "OAuth Implementation",
+                        "type": "requirement",
+                        "is_directly_verified": false,
+                        "children": [
+                          {
+                            "id": "specifications/UserRequirements.md#user-authentication",
+                            "name": "User Authentication",
+                            "type": "user-requirement",
+                            "is_directly_verified": false,
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              "directly_verified_count": 1,
+              "total_requirements_in_tree": 3
+            }
+          ]
+        },
+        "Coverage Tests": {
+          "verifications": [
+            {
+              "identifier": "specifications/Verifications/Tests.md#coverage-calculation-test",
+              "name": "Coverage Calculation Test",
+              "section": "Coverage Tests",
+              "file": "specifications/Verifications/Tests.md",
+              "type": "test-verification",
+              "directly_verified_requirements": [
+                "specifications/SystemRequirements.md#coverage-calculator",
+                "specifications/SystemRequirements.md#coverage-report-generator"
+              ],
+              "trace_tree": {
+                "requirements": [
+                  {
+                    "id": "specifications/SystemRequirements.md#coverage-calculator",
+                    "name": "Coverage Calculator",
+                    "type": "requirement",
+                    "is_directly_verified": true,
+                    "children": [
+                      {
+                        "id": "specifications/UserRequirements.md#coverage-reports",
+                        "name": "Coverage Reports",
+                        "type": "user-requirement",
+                        "is_directly_verified": false,
+                        "children": []
+                      }
+                    ]
+                  },
+                  {
+                    "id": "specifications/SystemRequirements.md#coverage-report-generator",
+                    "name": "Coverage Report Generator",
+                    "type": "requirement",
+                    "is_directly_verified": true,
+                    "children": []
+                  }
+                ]
+              },
+              "directly_verified_count": 2,
+              "total_requirements_in_tree": 3
+            }
+          ]
+        },
         "Inspection Verifications": {
           "verifications": [
             {
@@ -205,16 +168,51 @@
               "trace_tree": {
                 "requirements": [
                   {
-                    "id": "specifications/UserRequirements.md#user-authentication",
-                    "name": "User Authentication",
-                    "type": "user-requirement",
-                    "is_directly_verified": false,
+                    "id": "specifications/SystemRequirements.md#oauth-implementation",
+                    "name": "OAuth Implementation",
+                    "type": "requirement",
+                    "is_directly_verified": true,
                     "children": [
                       {
-                        "id": "specifications/SystemRequirements.md#oauth-implementation",
-                        "name": "OAuth Implementation",
-                        "type": "requirement",
-                        "is_directly_verified": true,
+                        "id": "specifications/UserRequirements.md#user-authentication",
+                        "name": "User Authentication",
+                        "type": "user-requirement",
+                        "is_directly_verified": false,
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              },
+              "directly_verified_count": 1,
+              "total_requirements_in_tree": 2
+            }
+          ]
+        },
+        "Security Tests": {
+          "verifications": [
+            {
+              "identifier": "specifications/Verifications/Tests.md#encryption-coverage-test",
+              "name": "Encryption Coverage Test",
+              "section": "Security Tests",
+              "file": "specifications/Verifications/Tests.md",
+              "type": "test-verification",
+              "directly_verified_requirements": [
+                "specifications/SystemRequirements.md#encryption-implementation"
+              ],
+              "trace_tree": {
+                "requirements": [
+                  {
+                    "id": "specifications/SystemRequirements.md#encryption-implementation",
+                    "name": "Encryption Implementation",
+                    "type": "requirement",
+                    "is_directly_verified": true,
+                    "children": [
+                      {
+                        "id": "specifications/UserRequirements.md#data-protection",
+                        "name": "Data Protection",
+                        "type": "user-requirement",
+                        "is_directly_verified": false,
                         "children": []
                       }
                     ]

@@ -3,16 +3,16 @@ use crate::graph_registry::GraphRegistry;
 use crate::relation::{VERIFY_RELATION, VERIFICATION_TRACES_RELATIONS};
 use crate::utils;
 use serde::Serialize;
-use std::collections::{HashMap, HashSet};
+use std::collections::{BTreeMap, HashMap, HashSet};
 
 #[derive(Debug, Serialize)]
 pub struct VerificationTracesReport {
-    pub files: HashMap<String, FileVerifications>,
+    pub files: BTreeMap<String, FileVerifications>,
 }
 
 #[derive(Debug, Serialize)]
 pub struct FileVerifications {
-    pub sections: HashMap<String, SectionVerifications>,
+    pub sections: BTreeMap<String, SectionVerifications>,
 }
 
 #[derive(Debug, Serialize)]
@@ -32,6 +32,8 @@ pub struct VerificationTrace {
     pub trace_tree: TraceTree,
     pub directly_verified_count: usize,
     pub total_requirements_in_tree: usize,
+    #[serde(skip)]
+    section_order_index: usize,
 }
 
 #[derive(Debug, Serialize)]
@@ -70,12 +72,25 @@ impl<'a> VerificationTraceGenerator<'a> {
 
     /// Generate verification traces report
     pub fn generate(&self) -> VerificationTracesReport {
-        let mut files: HashMap<String, FileVerifications> = HashMap::new();
+        let mut files: BTreeMap<String, FileVerifications> = BTreeMap::new();
 
         // Find all verification elements
         for element in self.registry.get_all_elements() {
             if matches!(element.element_type, ElementType::Verification(_)) {
                 self.process_verification(element, &mut files);
+            }
+        }
+
+        // Sort verification data for deterministic output
+        // BTreeMap keeps files and sections sorted alphabetically automatically
+        for file_verifications in files.values_mut() {
+            for section_verifications in file_verifications.sections.values_mut() {
+                // Sort directly verified requirements alphabetically
+                for verification in &mut section_verifications.verifications {
+                    verification.directly_verified_requirements.sort();
+                }
+                // Sort verifications alphabetically by identifier
+                section_verifications.verifications.sort_by(|a, b| a.identifier.cmp(&b.identifier));
             }
         }
 
@@ -86,7 +101,7 @@ impl<'a> VerificationTraceGenerator<'a> {
     fn process_verification(
         &self,
         verification: &Element,
-        files: &mut HashMap<String, FileVerifications>,
+        files: &mut BTreeMap<String, FileVerifications>,
     ) {
         // Get directly verified requirements
         let directly_verified: Vec<String> = verification
@@ -118,18 +133,19 @@ impl<'a> VerificationTraceGenerator<'a> {
             name: verification.name.clone(),
             section: verification.section.clone(),
             file: verification.file_path.clone(),
-            verification_type: format!("{:?}", verification.element_type),
+            verification_type: verification.element_type.as_str().to_string(),
             directly_verified_count: directly_verified.len(),
             directly_verified_requirements: directly_verified.clone(),
             trace_tree,
             total_requirements_in_tree: total_count,
+            section_order_index: verification.section_order_index,
         };
 
         // Add to hierarchical structure
         let file_entry = files
             .entry(verification.file_path.clone())
             .or_insert_with(|| FileVerifications {
-                sections: HashMap::new(),
+                sections: BTreeMap::new(),
             });
 
         let section_entry = file_entry
@@ -194,7 +210,7 @@ impl<'a> VerificationTraceGenerator<'a> {
         Some(RequirementNode {
             id: requirement.identifier.clone(),
             name: requirement.name.clone(),
-            element_type: format!("{:?}", requirement.element_type),
+            element_type: requirement.element_type.as_str().to_string(),
             is_directly_verified,
             children,
         })
@@ -241,7 +257,7 @@ impl<'a> VerificationTraceGenerator<'a> {
         // Add verification node at the top
         let verification_id = utils::hash_identifier(&trace.identifier);
         diagram.push_str(&format!(
-            "  {}[\"{}\\n({})\"]:::verification\n",
+            "  {}[\"{}<br>({})\"]:::verification\n",
             verification_id, trace.name, trace.verification_type
         ));
 
@@ -310,7 +326,7 @@ impl<'a> VerificationTraceGenerator<'a> {
         Some(RequirementNodeWithRelation {
             id: requirement.identifier.clone(),
             name: requirement.name.clone(),
-            element_type: format!("{:?}", requirement.element_type),
+            element_type: requirement.element_type.as_str().to_string(),
             is_directly_verified,
             children,
         })
@@ -339,7 +355,7 @@ impl<'a> VerificationTraceGenerator<'a> {
             };
 
             diagram.push_str(&format!(
-                "  {}[\"{}\\n({})\"]:::{}\n",
+                "  {}[\"{}<br>({})\"]:::{}\n",
                 node_id, node.name, node.element_type, class
             ));
         }
@@ -374,13 +390,25 @@ impl<'a> VerificationTraceGenerator<'a> {
 
         markdown.push_str("# Verification Traces Report\n\n");
 
+        // Files are already sorted alphabetically by BTreeMap
         for (file_path, file_verifications) in &report.files {
             markdown.push_str(&format!("## File: {}\n\n", file_path));
 
-            for (section_name, section_verifications) in &file_verifications.sections {
+            // Sort sections by section_order from registry for deterministic output
+            let mut sorted_sections: Vec<_> = file_verifications.sections.iter().collect();
+            sorted_sections.sort_by_key(|(section_name, _)| {
+                let section_key = crate::graph_registry::SectionKey::new(file_path.clone(), section_name.to_string());
+                self.registry.sections.get(&section_key).map(|s| s.section_order).unwrap_or(0)
+            });
+
+            for (section_name, section_verifications) in sorted_sections {
                 markdown.push_str(&format!("### Section: {}\n\n", section_name));
 
-                for trace in &section_verifications.verifications {
+                // Sort verifications by document order (section_order_index)
+                let mut sorted_verifications: Vec<_> = section_verifications.verifications.iter().collect();
+                sorted_verifications.sort_by_key(|v| v.section_order_index);
+
+                for trace in sorted_verifications {
                     markdown.push_str(&format!("#### {}\n\n", trace.name));
                     markdown.push_str(&format!("- **Type**: {}\n", trace.verification_type));
                     markdown.push_str(&format!(

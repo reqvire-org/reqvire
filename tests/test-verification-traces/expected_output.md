@@ -1,195 +1,136 @@
-# Verification Traceability Report
+# Verification Traces Report
 
-📂 File: specifications/Verifications/Tests.md
+## File: specifications/Verifications/Tests.md
 
-  📖 Section: Authentication Tests
+### Section: Authentication Tests
 
-    ## OAuth Flow Test
-    **Verification ID:** specifications/Verifications/Tests.md#oauth-flow-test
-    **Type:** test-verification
+#### OAuth Flow Test
 
-    ### Upward Trace Tree
+- **Type**: test-verification
+- **Directly Verified**: 2 requirements
+- **Total in Tree**: 3 requirements
 
-    ```mermaid
-    graph BT
-        VER001["OAuth Flow Test<br/>test-verification"]
-        SYS001["OAuth Implementation"]:::verified
-        SYS002["Session Management"]:::verified
-        USER001["User Authentication"]
+```mermaid
+graph TD
+  classDef verified fill:#90EE90,stroke:#000,stroke-width:2px;
+  classDef requirement fill:#87CEEB,stroke:#000,stroke-width:1px;
+  classDef verification fill:#FFD700,stroke:#000,stroke-width:2px;
 
-        SYS001 -.->|verify| VER001
-        SYS002 -.->|verify| VER001
-        USER001 -.->|deriveReqT| SYS001
-        SYS001 -.->|deriveReqT| SYS002
+  bfd26e943c93f2b8["OAuth Flow Test<br>(test-verification)"]:::verification
+  d5a439e4972ea591["OAuth Implementation<br>(requirement)"]:::verified
+  bfd26e943c93f2b8 -.->|verifies| d5a439e4972ea591;
+  2934ea21a1d898a3["User Authentication<br>(user-requirement)"]:::requirement
+  d5a439e4972ea591 -.->|derivedFrom| 2934ea21a1d898a3;
+  5a755bb51a740c10["Session Management<br>(requirement)"]:::verified
+  bfd26e943c93f2b8 -.->|verifies| 5a755bb51a740c10;
+```
 
-        classDef verified fill:#90EE90,stroke:#5fd75f,stroke-width:2px;
-    ```
 
-    ### Requirements Traced
-    - ★ [OAuth Implementation](../SystemRequirements.md#oauth-implementation)
-    - ★ [Session Management](../SystemRequirements.md#session-management)
-    - [User Authentication](../UserRequirements.md#user-authentication) *(root)*
+#### Session Timeout Test
 
-    **Legend:**
-    - ★ = Directly verified by this verification (via verify relation)
-    - Green highlighted nodes = Directly verified requirements
-    - Graph shows upward trace from verification to root requirements
+- **Type**: test-verification
+- **Directly Verified**: 1 requirements
+- **Total in Tree**: 3 requirements
 
-    ---
+```mermaid
+graph TD
+  classDef verified fill:#90EE90,stroke:#000,stroke-width:2px;
+  classDef requirement fill:#87CEEB,stroke:#000,stroke-width:1px;
+  classDef verification fill:#FFD700,stroke:#000,stroke-width:2px;
 
-    ## Session Timeout Test
-    **Verification ID:** specifications/Verifications/Tests.md#session-timeout-test
-    **Type:** test-verification
+  473f7ef449cf9463["Session Timeout Test<br>(test-verification)"]:::verification
+  5a755bb51a740c10["Session Management<br>(requirement)"]:::verified
+  473f7ef449cf9463 -.->|verifies| 5a755bb51a740c10;
+  d5a439e4972ea591["OAuth Implementation<br>(requirement)"]:::requirement
+  5a755bb51a740c10 -.->|derivedFrom| d5a439e4972ea591;
+  2934ea21a1d898a3["User Authentication<br>(user-requirement)"]:::requirement
+  d5a439e4972ea591 -.->|derivedFrom| 2934ea21a1d898a3;
+```
 
-    ### Upward Trace Tree
 
-    ```mermaid
-    graph BT
-        VER002["Session Timeout Test<br/>test-verification"]
-        SYS002["Session Management"]:::verified
-        SYS001["OAuth Implementation"]
-        USER001["User Authentication"]
+### Section: Security Tests
 
-        SYS002 -.->|verify| VER002
-        SYS001 -.->|deriveReqT| SYS002
-        USER001 -.->|deriveReqT| SYS001
+#### Encryption Coverage Test
 
-        classDef verified fill:#90EE90,stroke:#5fd75f,stroke-width:2px;
-    ```
+- **Type**: test-verification
+- **Directly Verified**: 1 requirements
+- **Total in Tree**: 2 requirements
 
-    ### Requirements Traced
-    - ★ [Session Management](../SystemRequirements.md#session-management)
-    - [OAuth Implementation](../SystemRequirements.md#oauth-implementation)
-    - [User Authentication](../UserRequirements.md#user-authentication) *(root)*
+```mermaid
+graph TD
+  classDef verified fill:#90EE90,stroke:#000,stroke-width:2px;
+  classDef requirement fill:#87CEEB,stroke:#000,stroke-width:1px;
+  classDef verification fill:#FFD700,stroke:#000,stroke-width:2px;
 
-    **Legend:**
-    - ★ = Directly verified by this verification (via verify relation)
-    - Green highlighted nodes = Directly verified requirements
-    - Graph shows upward trace from verification to root requirements
+  30572046e8226c8d["Encryption Coverage Test<br>(test-verification)"]:::verification
+  de36a6e809a20bc2["Encryption Implementation<br>(requirement)"]:::verified
+  30572046e8226c8d -.->|verifies| de36a6e809a20bc2;
+  8ddbf0ce66bc6c18["Data Protection<br>(user-requirement)"]:::requirement
+  de36a6e809a20bc2 -.->|derivedFrom| 8ddbf0ce66bc6c18;
+```
 
-    ---
 
-  📖 Section: Security Tests
+### Section: Coverage Tests
 
-    ## Encryption Coverage Test
-    **Verification ID:** specifications/Verifications/Tests.md#encryption-coverage-test
-    **Type:** test-verification
+#### Coverage Calculation Test
 
-    ### Upward Trace Tree
+- **Type**: test-verification
+- **Directly Verified**: 2 requirements
+- **Total in Tree**: 3 requirements
 
-    ```mermaid
-    graph BT
-        VER003["Encryption Coverage Test<br/>test-verification"]
-        SYS003["Encryption Implementation"]:::verified
-        USER002["Data Protection"]
+```mermaid
+graph TD
+  classDef verified fill:#90EE90,stroke:#000,stroke-width:2px;
+  classDef requirement fill:#87CEEB,stroke:#000,stroke-width:1px;
+  classDef verification fill:#FFD700,stroke:#000,stroke-width:2px;
 
-        SYS003 -.->|verify| VER003
-        USER002 -.->|deriveReqT| SYS003
+  28383c90c121c4a5["Coverage Calculation Test<br>(test-verification)"]:::verification
+  4dc56d6383b230df["Coverage Calculator<br>(requirement)"]:::verified
+  28383c90c121c4a5 -.->|verifies| 4dc56d6383b230df;
+  a1b39797065ef491["Coverage Reports<br>(user-requirement)"]:::requirement
+  4dc56d6383b230df -.->|derivedFrom| a1b39797065ef491;
+  21afc68bc3823e3b["Coverage Report Generator<br>(requirement)"]:::verified
+  28383c90c121c4a5 -.->|verifies| 21afc68bc3823e3b;
+```
 
-        classDef verified fill:#90EE90,stroke:#5fd75f,stroke-width:2px;
-    ```
 
-    ### Requirements Traced
-    - ★ [Encryption Implementation](../SystemRequirements.md#encryption-implementation)
-    - [Data Protection](../UserRequirements.md#data-protection) *(root)*
+### Section: Analysis Verifications
 
-    **Legend:**
-    - ★ = Directly verified by this verification (via verify relation)
-    - Green highlighted nodes = Directly verified requirements
-    - Graph shows upward trace from verification to root requirements
+#### Security Analysis
 
-    ---
+- **Type**: analysis-verification
+- **Directly Verified**: 1 requirements
+- **Total in Tree**: 1 requirements
 
-  📖 Section: Coverage Tests
+```mermaid
+graph TD
+  classDef verified fill:#90EE90,stroke:#000,stroke-width:2px;
+  classDef requirement fill:#87CEEB,stroke:#000,stroke-width:1px;
+  classDef verification fill:#FFD700,stroke:#000,stroke-width:2px;
 
-    ## Coverage Calculation Test
-    **Verification ID:** specifications/Verifications/Tests.md#coverage-calculation-test
-    **Type:** test-verification
+  ee61d9a254ace553["Security Analysis<br>(analysis-verification)"]:::verification
+  8ddbf0ce66bc6c18["Data Protection<br>(user-requirement)"]:::verified
+  ee61d9a254ace553 -.->|verifies| 8ddbf0ce66bc6c18;
+```
 
-    ### Upward Trace Tree
 
-    ```mermaid
-    graph BT
-        VER004["Coverage Calculation Test<br/>test-verification"]
-        SYS004["Coverage Calculator"]:::verified
-        SYS005["Coverage Report Generator"]:::verified
-        USER003["Coverage Reports"]
+### Section: Inspection Verifications
 
-        SYS004 -.->|verify| VER004
-        SYS005 -.->|verify| VER004
-        USER003 -.->|deriveReqT| SYS004
-        SYS004 -.->|deriveReqT| SYS005
+#### Code Inspection
 
-        classDef verified fill:#90EE90,stroke:#5fd75f,stroke-width:2px;
-    ```
+- **Type**: inspection-verification
+- **Directly Verified**: 1 requirements
+- **Total in Tree**: 2 requirements
 
-    ### Requirements Traced
-    - ★ [Coverage Calculator](../SystemRequirements.md#coverage-calculator)
-    - ★ [Coverage Report Generator](../SystemRequirements.md#coverage-report-generator)
-    - [Coverage Reports](../UserRequirements.md#coverage-reports) *(root)*
+```mermaid
+graph TD
+  classDef verified fill:#90EE90,stroke:#000,stroke-width:2px;
+  classDef requirement fill:#87CEEB,stroke:#000,stroke-width:1px;
+  classDef verification fill:#FFD700,stroke:#000,stroke-width:2px;
 
-    **Legend:**
-    - ★ = Directly verified by this verification (via verify relation)
-    - Green highlighted nodes = Directly verified requirements
-    - Graph shows upward trace from verification to root requirements
-
-    ---
-
-  📖 Section: Analysis Verifications
-
-    ## Security Analysis
-    **Verification ID:** specifications/Verifications/Tests.md#security-analysis
-    **Type:** analysis-verification
-
-    ### Upward Trace Tree
-
-    ```mermaid
-    graph BT
-        VER005["Security Analysis<br/>analysis-verification"]
-        USER002["Data Protection"]:::verified
-
-        USER002 -.->|verify| VER005
-
-        classDef verified fill:#90EE90,stroke:#5fd75f,stroke-width:2px;
-    ```
-
-    ### Requirements Traced
-    - ★ [Data Protection](../UserRequirements.md#data-protection) *(root)*
-
-    **Legend:**
-    - ★ = Directly verified by this verification (via verify relation)
-    - Green highlighted nodes = Directly verified requirements
-    - Graph shows upward trace from verification to root requirements
-
-    ---
-
-  📖 Section: Inspection Verifications
-
-    ## Code Inspection
-    **Verification ID:** specifications/Verifications/Tests.md#code-inspection
-    **Type:** inspection-verification
-
-    ### Upward Trace Tree
-
-    ```mermaid
-    graph BT
-        VER006["Code Inspection<br/>inspection-verification"]
-        SYS001["OAuth Implementation"]:::verified
-        USER001["User Authentication"]
-
-        SYS001 -.->|verify| VER006
-        USER001 -.->|deriveReqT| SYS001
-
-        classDef verified fill:#90EE90,stroke:#5fd75f,stroke-width:2px;
-    ```
-
-    ### Requirements Traced
-    - ★ [OAuth Implementation](../SystemRequirements.md#oauth-implementation)
-    - [User Authentication](../UserRequirements.md#user-authentication) *(root)*
-
-    **Legend:**
-    - ★ = Directly verified by this verification (via verify relation)
-    - Green highlighted nodes = Directly verified requirements
-    - Graph shows upward trace from verification to root requirements
-
-    ---
+  cd126a6fddc2bd83["Code Inspection<br>(inspection-verification)"]:::verification
+  d5a439e4972ea591["OAuth Implementation<br>(requirement)"]:::verified
+  cd126a6fddc2bd83 -.->|verifies| d5a439e4972ea591;
+  2934ea21a1d898a3["User Authentication<br>(user-requirement)"]:::requirement
+  d5a439e4972ea591 -.->|derivedFrom| 2934ea21a1d898a3;
+```

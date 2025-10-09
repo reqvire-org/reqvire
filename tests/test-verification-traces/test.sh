@@ -96,10 +96,10 @@ if [ "$EXPECTED_JSON" != "$ACTUAL_JSON" ]; then
 fi
 
 # Test 3: Specific Verification Filter
-echo "Running: reqvire verification-traces --verification-id" >> "${TEST_DIR}/test_results.log"
+echo "Running: reqvire verification-traces --filter-id" >> "${TEST_DIR}/test_results.log"
 set +e
 OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" verification-traces \
-    --verification-id="specifications/Verifications/Tests.md#oauth-flow-test" 2>&1)
+    --filter-id="specifications/Verifications/Tests.md#oauth-flow-test" 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -107,7 +107,7 @@ echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
 printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 
 if [ $EXIT_CODE -ne 0 ]; then
-    echo "❌ FAILED: verification-traces with --verification-id exited with code $EXIT_CODE"
+    echo "❌ FAILED: verification-traces with --filter-id exited with code $EXIT_CODE"
     echo "$OUTPUT"
     exit 1
 fi
@@ -227,7 +227,7 @@ if grep -q "Security Analysis" <<< "$OUTPUT"; then
 fi
 
 # Verify count - should have exactly 4 test-verification elements ending with "Test"
-TEST_COUNT=$(echo "$OUTPUT" | grep -c '## ' || true)
+TEST_COUNT=$(echo "$OUTPUT" | grep -c '^#### ' || true)
 # We have: OAuth Flow Test, Session Timeout Test, Encryption Coverage Test, Coverage Calculation Test
 # That's 4 test-verification elements with "Test" in name
 if [ "$TEST_COUNT" -ne 4 ]; then
