@@ -35,6 +35,9 @@ This guide is split into domain-specific guides for better organization:
 - **Generate HTML documentation**: `./target/debug/reqvire html --output <OUTPUT_DIR>`
 - **Analyze change impact**: `./target/debug/reqvire change-impact --git-commit=<COMMIT_HASH>`
 - **Analyze change impact (JSON)**: `./target/debug/reqvire change-impact --git-commit=HEAD~1 --json > /tmp/impact.json`
+- **Generate verification traces**: `./target/debug/reqvire verification-traces` - Generates upward traceability from verifications to root requirements with Mermaid diagrams
+- **Generate verification traces (JSON)**: `./target/debug/reqvire verification-traces --json > /tmp/verification-traces.json` - JSON output with trace trees for programmatic analysis
+- **Filter verification traces**: `./target/debug/reqvire verification-traces --filter-id=<id>` or `--filter-name=<regex>` or `--filter-type=<type>` - Filter to specific verifications
 
 
 ### Filtering Options
