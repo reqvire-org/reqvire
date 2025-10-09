@@ -258,14 +258,16 @@ impl<'a> VerificationTraceGenerator<'a> {
         }
 
         // Add all requirements from trace tree
-        let mut visited_for_diagram = HashSet::new();
+        let mut visited_nodes = HashSet::new();
+        let mut visited_edges = HashSet::new();
         for node in &tree_with_relations {
             self.add_node_to_diagram_with_relations(
                 node,
                 &verification_id,
                 VERIFY_RELATION, // Connection from verification to verified requirement
                 &mut diagram,
-                &mut visited_for_diagram,
+                &mut visited_nodes,
+                &mut visited_edges,
             );
         }
 
@@ -321,13 +323,14 @@ impl<'a> VerificationTraceGenerator<'a> {
         source_id: &str,
         relation_type_name: &str,
         diagram: &mut String,
-        visited: &mut HashSet<String>,
+        visited_nodes: &mut HashSet<String>,
+        visited_edges: &mut HashSet<(String, String, String)>,
     ) {
         let node_id = utils::hash_identifier(&node.id);
 
         // Add node if not already visited
-        if !visited.contains(&node.id) {
-            visited.insert(node.id.clone());
+        if !visited_nodes.contains(&node.id) {
+            visited_nodes.insert(node.id.clone());
 
             let class = if node.is_directly_verified {
                 "verified"
@@ -342,20 +345,26 @@ impl<'a> VerificationTraceGenerator<'a> {
         }
 
         // Add link from source to this node using proper relation metadata
-        if let Some(info) = crate::relation::RELATION_TYPES.get(relation_type_name) {
-            // Always render as element → target
-            diagram.push_str(&format!(
-                "  {} {}|{}| {};\n",
-                source_id,
-                info.arrow,
-                info.label,
-                node_id,
-            ));
+        // Track edges to avoid duplicates (source, relation_type, target)
+        let edge_key = (source_id.to_string(), relation_type_name.to_string(), node_id.clone());
+        if !visited_edges.contains(&edge_key) {
+            visited_edges.insert(edge_key);
+
+            if let Some(info) = crate::relation::RELATION_TYPES.get(relation_type_name) {
+                // Always render as element → target
+                diagram.push_str(&format!(
+                    "  {} {}|{}| {};\n",
+                    source_id,
+                    info.arrow,
+                    info.label,
+                    node_id,
+                ));
+            }
         }
 
         // Recursively add children
         for (child_relation_type, child) in &node.children {
-            self.add_node_to_diagram_with_relations(child, &node_id, child_relation_type, diagram, visited);
+            self.add_node_to_diagram_with_relations(child, &node_id, child_relation_type, diagram, visited_nodes, visited_edges);
         }
     }
 
