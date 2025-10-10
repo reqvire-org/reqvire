@@ -66,11 +66,12 @@ struct RequirementNodeWithRelation {
 pub struct VerificationTraceGenerator<'a> {
     registry: &'a GraphRegistry,
     diagrams_with_blobs: bool,
+    from_folder: Option<String>,
 }
 
 impl<'a> VerificationTraceGenerator<'a> {
-    pub fn new(registry: &'a GraphRegistry, diagrams_with_blobs: bool) -> Self {
-        Self { registry, diagrams_with_blobs }
+    pub fn new(registry: &'a GraphRegistry, diagrams_with_blobs: bool, from_folder: Option<String>) -> Self {
+        Self { registry, diagrams_with_blobs, from_folder }
     }
 
     /// Generate verification traces report
@@ -286,12 +287,26 @@ impl<'a> VerificationTraceGenerator<'a> {
 
         // Add click handler for verification node
         let verification_click_target = if self.diagrams_with_blobs && has_git_info {
+            // Use GitHub blob URLs when diagrams_with_blobs is enabled
             let relative_id = match utils::get_relative_path(&PathBuf::from(&trace.identifier)) {
                 Ok(rel_path) => rel_path.to_string_lossy().to_string(),
                 Err(_) => trace.identifier.clone(),
             };
             format!("{}/blob/{}/{}", base_url, commit_hash, relative_id)
+        } else if let Some(ref from_folder) = self.from_folder {
+            // Special case: "/" means reqvire root (git root), use identifier as-is
+            if from_folder == "/" {
+                trace.identifier.clone()
+            } else {
+                // Calculate relative path from from_folder to the identifier
+                let from_folder_path = repo_root.join(from_folder);
+                match utils::to_relative_identifier(&trace.identifier, &from_folder_path, false) {
+                    Ok(rel_path) => rel_path,
+                    Err(_) => trace.identifier.clone(),
+                }
+            }
         } else {
+            // Use identifier as-is (default behavior)
             trace.identifier.clone()
         };
         diagram.push_str(&format!("  click {} \"{}\";\n", verification_id, verification_click_target));
@@ -409,6 +424,18 @@ impl<'a> VerificationTraceGenerator<'a> {
                     Err(_) => node.id.clone(),
                 };
                 format!("{}/blob/{}/{}", base_url, commit_hash, relative_id)
+            } else if let Some(ref from_folder) = self.from_folder {
+                // Special case: "/" means reqvire root (git root), use identifier as-is
+                if from_folder == "/" {
+                    node.id.clone()
+                } else {
+                    // Calculate relative path from from_folder to the identifier
+                    let from_folder_path = repo_root.join(from_folder);
+                    match utils::to_relative_identifier(&node.id, &from_folder_path, false) {
+                        Ok(rel_path) => rel_path,
+                        Err(_) => node.id.clone(),
+                    }
+                }
             } else {
                 node.id.clone()
             };

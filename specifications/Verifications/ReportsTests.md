@@ -485,3 +485,80 @@ This test verifies that the verification-traces command filter options work corr
   * verify: [CLI Verifications Traces Filter Options](../SystemRequirements/Requirements.md#cli-verifications-traces-filter-options)
   * satisfiedBy: [test.sh](../../tests/test-verification-traces/test.sh)
 ---
+
+### Verification Traces From-Folder Test
+
+This test verifies that the --from-folder option correctly generates relative links in verification traces output when the output file will be saved in a specific folder location.
+
+#### Details
+
+##### Acceptance Criteria
+- System shall provide `--from-folder=<path>` option for `verifications traces` command
+- Option shall accept a relative path to the folder where output will be saved
+- When `diagrams_with_blobs` is false (default), generated Mermaid diagram links shall be relative to the specified folder
+- When `diagrams_with_blobs` is true with Git info, links shall remain as GitHub blob URLs (absolute)
+- Links shall be correctly calculated so they work when output file is saved in the from-folder location
+- Option shall work with both Markdown and JSON output formats
+- Option shall work in combination with filter options
+
+##### Test Criteria
+1. **Basic From-Folder Option**
+   Command: `reqvire verifications traces --from-folder=docs/reports`
+   - exits code **0**
+   - output contains Mermaid diagrams with click handlers
+   - click handler links are relative paths calculated from `docs/reports/` to git root
+   - example: if element identifier is `specifications/file.md#element`, link should be `../../specifications/file.md#element`
+
+2. **From-Folder with Current Directory**
+   Command: `reqvire verifications traces --from-folder=.`
+   - exits code **0**
+   - links are relative to current directory (git root)
+   - same as omitting --from-folder option
+
+3. **From-Folder with Nested Path**
+   Command: `reqvire verifications traces --from-folder=output/verification/traces`
+   - exits code **0**
+   - links correctly navigate up three levels then to specifications
+   - example: `../../specifications/file.md#element` becomes `../../../specifications/file.md#element`
+
+4. **From-Folder with JSON Output**
+   Command: `reqvire verifications traces --from-folder=docs/reports --json`
+   - exits code **0**
+   - JSON output parses correctly
+   - JSON element identifiers remain absolute (from git root)
+   - from-folder only affects Markdown diagram links, not JSON structure
+
+5. **From-Folder Combined with Filters**
+   Command: `reqvire verifications traces --from-folder=docs/reports --filter-type=test-verification`
+   - exits code **0**
+   - filtering works correctly
+   - generated links still relative to `docs/reports/`
+
+6. **From-Folder with Git Blobs Enabled**
+   Environment: `diagrams_with_blobs=true` in config
+   Command: `reqvire verifications traces --from-folder=docs/reports`
+   - exits code **0**
+   - links remain as GitHub blob URLs (absolute)
+   - from-folder has no effect on external GitHub links
+
+7. **From-Folder Path Calculation Correctness**
+   - For from-folder `a/b/c` and identifier `specs/req.md#id`:
+     - Link should be `../../../specs/req.md#id`
+   - For from-folder `output` and identifier `specifications/UserRequirements.md#element`:
+     - Link should be `../specifications/UserRequirements.md#element`
+   - Path traversal (..) count matches folder depth
+
+8. **From-Folder Special Case for Root**
+   Command: `reqvire verifications traces --from-folder=/`
+   - exits code **0**
+   - identifiers remain as git-root-relative paths (no relative path calculation)
+   - links use identifiers as-is (e.g., `specifications/file.md#element`)
+   - special case `/` indicates reqvire root (git root)
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [CLI Verifications Traces From-Folder Option](../SystemRequirements/Requirements.md#cli-verifications-traces-from-folder-option)
+  * satisfiedBy: [test.sh](../../tests/test-verification-traces/test.sh)
+---

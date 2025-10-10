@@ -2235,6 +2235,42 @@ Filters shall be combinable, and when multiple filters are specified, only verif
   * derivedFrom: [CLI Verifications Traces Command](#cli-verifications-traces-command)
 ---
 
+### CLI Verifications Traces From-Folder Option
+
+The system shall support a `--from-folder` option for the `verifications traces` command that specifies the relative path from where Reqvire runs to the folder where generated output files will be saved, enabling generation of relative links in Mermaid diagrams and other outputs that are portable when the output is saved in different locations.
+
+#### Details
+The `--from-folder` option shall:
+- Accept a relative path string as parameter (e.g., `--from-folder=docs/verification-reports`)
+- Default to empty/current directory when not specified (maintaining existing behavior)
+- Support special case `/` to indicate the reqvire root (git root), keeping identifiers as git-root-relative paths
+- Adjust all clickable links in Mermaid diagrams to be relative to the specified folder path
+- Adjust all file path references in output to be relative to the specified folder path
+- Work with both Markdown output (with Mermaid diagrams) and JSON output
+- Ensure generated links work correctly when the output file is saved in the specified folder
+- Use the standard path resolution logic to calculate relative paths from the from-folder to git root
+
+**Example usage:**
+```bash
+# Generate traces with links relative to docs/reports/ folder
+reqvire verifications traces --from-folder=docs/reports > docs/reports/traces.md
+
+# The generated links will be relative to docs/reports/, so they work when traces.md is opened
+```
+
+**Link generation behavior:**
+- When `diagrams_with_blobs` is true and Git info is available:
+  - Links point to GitHub blob URLs (external, absolute)
+  - `--from-folder` has no effect (external links are already absolute)
+- When `diagrams_with_blobs` is false or Git info not available:
+  - Links are element identifiers (relative paths from git root)
+  - `--from-folder` adjusts these to be relative to the specified folder
+  - Example: Identifier `specifications/file.md#element` becomes `../../specifications/file.md#element` when from-folder is `docs/reports`
+
+#### Relations
+  * derivedFrom: [CLI Verifications Traces Command](#cli-verifications-traces-command)
+---
+
 ### CLI Verifications Matrix SVG Flag
 
 The system shall provide an SVG output option for verification traceability matrices, activated by the `--svg` command option flag when used with `verifications matrix` command, which shall generate a simplified SVG representation of the matrix that can be viewed directly or embedded in documents.

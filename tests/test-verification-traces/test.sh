@@ -235,4 +235,170 @@ if [ "$TEST_COUNT" -ne 4 ]; then
     exit 1
 fi
 
+# Test 7: From-Folder Option - Basic usage
+# Create the from-folder directory so canonicalize works
+mkdir -p "${TEST_DIR}/specifications"
+
+echo "Running: reqvire verifications traces --from-folder=specifications" >> "${TEST_DIR}/test_results.log"
+set +e
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" verifications traces \
+    --from-folder=specifications 2>&1)
+EXIT_CODE=$?
+set -e
+
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
+
+if [ $EXIT_CODE -ne 0 ]; then
+    echo "❌ FAILED: verifications traces --from-folder=specifications exited with code $EXIT_CODE"
+    echo "$OUTPUT"
+    exit 1
+fi
+
+# Check that output contains click handlers
+if ! grep -q 'click .* ".*' <<< "$OUTPUT"; then
+    echo "❌ FAILED: Output should contain click handlers with paths"
+    exit 1
+fi
+
+# When from-folder=specifications, links should NOT have "specifications/" prefix
+# They should be relative to the specifications folder (e.g., "Verifications/Tests.md" not "specifications/Verifications/Tests.md")
+if grep -q 'click .* "specifications/' <<< "$OUTPUT"; then
+    echo "❌ FAILED: Links should be relative to specifications folder (should not contain 'specifications/' prefix)"
+    exit 1
+fi
+
+# Check that links are correct format (like "Verifications/Tests.md" or "SystemRequirements.md")
+if ! grep -q 'click .* "Verifications/Tests\.md' <<< "$OUTPUT"; then
+    echo "❌ FAILED: Links should be relative to specifications folder (e.g., Verifications/Tests.md)"
+    exit 1
+fi
+
+# Test 8: From-Folder with nested path
+# Create the from-folder directory so canonicalize works
+mkdir -p "${TEST_DIR}/output/verification/traces"
+
+echo "Running: reqvire verifications traces --from-folder=output/verification/traces" >> "${TEST_DIR}/test_results.log"
+set +e
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" verifications traces \
+    --from-folder=output/verification/traces 2>&1)
+EXIT_CODE=$?
+set -e
+
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
+
+if [ $EXIT_CODE -ne 0 ]; then
+    echo "❌ FAILED: verifications traces --from-folder with nested path exited with code $EXIT_CODE"
+    echo "$OUTPUT"
+    exit 1
+fi
+
+# Debug: Show actual click handlers generated
+echo "DEBUG: Sample click handlers from output:"
+echo "$OUTPUT" | grep "click" | head -5
+
+# Check for correct relative path depth (should have ../../../ for three levels)
+if ! grep -q '\.\./\.\./\.\./specifications' <<< "$OUTPUT"; then
+    echo "❌ FAILED: Links should navigate up three levels (should contain ../../../specifications)"
+    echo "DEBUG: Actual links found:"
+    echo "$OUTPUT" | grep "click" | head -3
+    exit 1
+fi
+
+# Test 9: From-Folder with JSON output (should not affect JSON structure)
+# Create the from-folder directory so canonicalize works
+mkdir -p "${TEST_DIR}/docs/reports"
+
+echo "Running: reqvire verifications traces --from-folder=docs/reports --json" >> "${TEST_DIR}/test_results.log"
+set +e
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" verifications traces \
+    --from-folder=docs/reports --json 2>&1)
+EXIT_CODE=$?
+set -e
+
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
+
+if [ $EXIT_CODE -ne 0 ]; then
+    echo "❌ FAILED: verifications traces --from-folder --json exited with code $EXIT_CODE"
+    echo "$OUTPUT"
+    exit 1
+fi
+
+# Validate JSON structure
+echo "$OUTPUT" | jq . >/dev/null 2>&1
+if [ $? -ne 0 ]; then
+    echo "❌ FAILED: Output with --from-folder --json is not valid JSON"
+    exit 1
+fi
+
+# JSON identifiers should still be absolute (from git root), not affected by from-folder
+# Check that identifiers in JSON don't contain ../../ patterns
+if echo "$OUTPUT" | jq -e '.files | to_entries[] | .value.sections | to_entries[] | .value.verifications[].identifier' | grep -q '\.\./'; then
+    echo "❌ FAILED: JSON identifiers should remain absolute, not relative"
+    exit 1
+fi
+
+# Test 10: From-Folder combined with filter
+# Create the from-folder directory so canonicalize works
+mkdir -p "${TEST_DIR}/docs/reports"
+
+echo "Running: reqvire verifications traces --from-folder=docs/reports --filter-type=test-verification" >> "${TEST_DIR}/test_results.log"
+set +e
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" verifications traces \
+    --from-folder=docs/reports --filter-type="test-verification" 2>&1)
+EXIT_CODE=$?
+set -e
+
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
+
+if [ $EXIT_CODE -ne 0 ]; then
+    echo "❌ FAILED: verifications traces --from-folder with filter exited with code $EXIT_CODE"
+    echo "$OUTPUT"
+    exit 1
+fi
+
+# Should still have relative links
+if ! grep -q '\.\./\.\./specifications' <<< "$OUTPUT"; then
+    echo "❌ FAILED: Links should still be relative when using --from-folder with filters"
+    exit 1
+fi
+
+# Should contain test-verification elements
+if ! grep -q "OAuth Flow Test" <<< "$OUTPUT"; then
+    echo "❌ FAILED: Filter should work correctly with --from-folder option"
+    exit 1
+fi
+
+# Test 11: From-Folder with / (special case for git root)
+echo "Running: reqvire verifications traces --from-folder=/" >> "${TEST_DIR}/test_results.log"
+set +e
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" verifications traces \
+    --from-folder=/ 2>&1)
+EXIT_CODE=$?
+set -e
+
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
+
+if [ $EXIT_CODE -ne 0 ]; then
+    echo "❌ FAILED: verifications traces --from-folder=/ exited with code $EXIT_CODE"
+    echo "$OUTPUT"
+    exit 1
+fi
+
+# When from-folder=/, links should remain as git-root-relative (with "specifications/" prefix)
+if ! grep -q 'click .* "specifications/' <<< "$OUTPUT"; then
+    echo "❌ FAILED: With --from-folder=/, links should be git-root-relative (contain 'specifications/' prefix)"
+    exit 1
+fi
+
+# Should match the basic output format (Test 1)
+if ! grep -q 'click .* "specifications/Verifications/Tests\.md' <<< "$OUTPUT"; then
+    echo "❌ FAILED: With --from-folder=/, links should be same as basic output"
+    exit 1
+fi
+
 exit 0

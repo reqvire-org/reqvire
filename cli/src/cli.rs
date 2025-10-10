@@ -58,11 +58,15 @@ pub enum VerificationsCommands {
     },
 
     /// Generate verification traces showing upward paths from verifications to root requirements
-    #[clap(override_help = "Generate verification traces showing upward paths from verifications to root requirements\n\nVERIFICATIONS TRACES OPTIONS:\n      --json                      Output results in JSON format\n      --filter-id <ID>            Only include verification with this specific identifier\n      --filter-name <REGEX>       Only include verifications whose name matches this regular expression\n      --filter-type <TYPE>        Only include verifications of the given type e.g. `test-verification`, `analysis-verification`")]
+    #[clap(override_help = "Generate verification traces showing upward paths from verifications to root requirements\n\nVERIFICATIONS TRACES OPTIONS:\n      --json                      Output results in JSON format\n      --from-folder <PATH>        Generate links relative to this folder path\n      --filter-id <ID>            Only include verification with this specific identifier\n      --filter-name <REGEX>       Only include verifications whose name matches this regular expression\n      --filter-type <TYPE>        Only include verifications of the given type e.g. `test-verification`, `analysis-verification`")]
     Traces {
         /// Output results in JSON format
         #[clap(long, help_heading = "VERIFICATIONS TRACES OPTIONS")]
         json: bool,
+
+        /// Relative path to folder where output will be saved (for generating relative links in Mermaid diagrams)
+        #[clap(long, value_name = "PATH", help_heading = "VERIFICATIONS TRACES OPTIONS")]
+        from_folder: Option<String>,
 
         /// Only include verification with this specific identifier
         #[clap(long, value_name = "ID", help_heading = "VERIFICATIONS TRACES OPTIONS")]
@@ -571,6 +575,7 @@ pub fn handle_command(
                 },
                 VerificationsCommands::Traces {
                     json,
+                    from_folder,
                     filter_id,
                     filter_name,
                     filter_type
@@ -578,7 +583,8 @@ pub fn handle_command(
                     // Generate verification traces report (upward paths from verifications to requirements)
                     let generator = verification_trace::VerificationTraceGenerator::new(
                         &model_manager.graph_registry,
-                        diagrams_with_blobs
+                        diagrams_with_blobs,
+                        from_folder.clone()
                     );
 
                     let mut report = generator.generate();
