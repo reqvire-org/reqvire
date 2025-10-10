@@ -651,6 +651,32 @@ The system shall validate relation types against a defined vocabulary and provid
   * satisfiedBy: [relation.rs](../../core/src/relation.rs)
 ---
 
+### Refine Relation Chain Validator
+
+The system shall implement validation for refine/refinedBt relation chains to ensure purity of the chain.
+
+#### Details
+The validator shall enforce the following constraints:
+
+1. **Refine/RefinedBy Source Restrictions**:
+   - Requirements can refine other requirements
+   - System elements (block diagrams, architectural elements) can refine requirements
+
+2. **Refinement Chain Purity**:
+   - Once a refine/refinedBy relation is used in a chain, all subsequent children in that chain must also use refine/refinedBy
+   - The purity constraint applies from the first refine/refinedBy downward through all descendants
+   - Examples:
+     - Valid: `Req1 <- derive <- Req2 <- refine <- Req3 <- refinedBy <- Req4` (refine starts at Req3, all children must use refine)
+     - Invalid: `Req1 <- refine <- Req2 <- derivedFrom <- Req3` (refine at Req2, then derive at Req3)
+
+The validator shall report violations using dedicated error type with clear details about which elements violate the constraint.
+
+#### Relations
+  * derivedFrom: [Validate Relation Types](../UserRequirements.md#validate-relation-types)
+  * derivedFrom: [Relation Types and behaviors](../SpecificationsRequirements.md#relation-types-and-behaviors)
+  * satisfiedBy: [model.rs](../../core/src/model.rs)
+---
+
 ### Excluded File Relation Validation
 
 The system shall properly validate relations targeting files matching excluded filename patterns, enabling references to excluded files while still respecting their exclusion from processing and linting operations.

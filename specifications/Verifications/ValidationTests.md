@@ -228,3 +228,51 @@ This test verifies that the system correctly processes only files within the cur
   * verify: [Subdirectory Processing Option](../SystemRequirements/Requirements.md#subdirectory-processing-option)
   * satisfiedBy: [test.sh](../../tests/test-subdirectory-functionality/test.sh)
 ---
+
+### Refine Relation Chain Validation Test
+
+This test verifies that Reqvire correctly validates refinement relation chains, ensuring that once a refine/refinedBy relation is introduced, all subsequent children in that chain must also use refine/refinedBy relations.
+
+#### Details
+
+##### Acceptance Criteria
+**Valid Refinement Chains:**
+- System shall allow requirements to refine other requirements
+- System shall allow system elements to refine requirements
+- System shall allow refine relations to start at any point in a hierarchical chain
+- System shall allow mixed hierarchical relations before refine is introduced (e.g., Req1 <- derive <- Req2 <- refine <- Req3)
+
+**Invalid Refinement Chains:**
+- System shall detect and reject chains where refine/refinedBy is followed by derivedFrom/derive
+- System shall detect and reject chains where refine/refinedBy is followed by containedBy/contain
+- System shall report violations using the MixedHierarchicalRelations error type
+- System shall provide clear error messages indicating which elements violate the refinement chain purity constraint
+
+**Error Reporting:**
+- Error messages shall identify the specific elements that violate the constraint
+- Error messages shall explain that refinement chains cannot be mixed with other hierarchical relation types
+- Validation shall fail (non-zero exit code) when refinement chain purity violations are detected
+
+##### Test Criteria
+**Pass Scenarios:**
+- Pure refine chain: `Req1 <- refinedBy <- Req2 <- refinedBy <- Req3` validates successfully
+- Refine starting mid-chain: `Req1 <- derive <- Req2 <- refine <- Req3 <- refinedBy <- Req4` validates successfully
+- Pure derive chain: `Req1 <- derive <- Req2 <- derive <- Req3` validates successfully
+- Pure contain chain: `Req1 <- contain <- Req2 <- contain <- Req3` validates successfully
+
+**Fail Scenarios:**
+- Mixed chain after refine: `Req1 <- refine <- Req2 <- derive <- Req3` fails with MixedHierarchicalRelations error
+- Refine then contain: `Req1 <- refinedBy <- Req2 <- contain <- Req3` fails with MixedHierarchicalRelations error
+- Multiple descendants breaking purity: `Req1 <- refine <- Req2 <- refinedBy <- Req3 <- derive <- Req4` fails
+- Command exits with non-zero error code for all fail scenarios
+- Error output contains "Mixed hierarchical relations in chain" message
+- Error message identifies the specific elements violating the constraint
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [Refine Relation Chain Validator](../SystemRequirements/Requirements.md#refine-relation-chain-validator)
+  * verify: [Refinement Chain Purity Constraint](../SpecificationsRequirements.md#refinement-chain-purity-constraint)
+  * satisfiedBy: [test.sh](../../tests/test-refine-chain-validation/test.sh)
+---
