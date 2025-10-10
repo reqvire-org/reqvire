@@ -44,6 +44,72 @@ pub struct Args {
 }
 
 #[derive(Subcommand, Debug)]
+pub enum ModelCommands {
+    /// Output model registry and summary
+    #[clap(override_help = "Output model registry and summary\n\nMODEL SUMMARY OPTIONS:\n      --json                        Output results in JSON format\n      --filter-file <GLOB>          Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`\n      --filter-name <REGEX>         Only include elements whose name matches this regular expression\n      --filter-section <GLOB>       Only include sections whose name matches this glob pattern e.g. `System requirement*`\n      --filter-type <TYPE>          Only include elements of the given type e.g. `user-requirement`, `system-requirement`, `verification`, `file`, or other custom type\n      --filter-content <REGEX>      Only include elements whose content matches this regular expression\n      --filter-is-not-verified      Only include requirements that do NOT have any \"verifiedBy\" relations\n      --filter-is-not-satisfied     Only include requirements that do NOT have any \"satisfiedBy\" relations")]
+    Summary {
+        /// Output results in JSON format
+        #[clap(long, help_heading = "MODEL SUMMARY OPTIONS")]
+        json: bool,
+
+        /// Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`
+        #[clap(long, value_name = "GLOB", help_heading = "MODEL SUMMARY OPTIONS")]
+        filter_file: Option<String>,
+
+        /// Only include elements whose name matches this regular expression
+        #[clap(long, value_name = "REGEX", help_heading = "MODEL SUMMARY OPTIONS")]
+        filter_name: Option<String>,
+
+        /// Only include sections whose name matches this glob pattern e.g. `System requirement*`
+        #[clap(long, value_name = "GLOB", help_heading = "MODEL SUMMARY OPTIONS")]
+        filter_section: Option<String>,
+
+        /// Only include elements of the given type e.g. `user-requirement`, `system-requirement`, `verification`, `file`, or other custom type
+        #[clap(long, value_name = "TYPE", help_heading = "MODEL SUMMARY OPTIONS")]
+        filter_type: Option<String>,
+
+        /// Only include elements whose content matches this regular expression
+        #[clap(long, value_name = "REGEX", help_heading = "MODEL SUMMARY OPTIONS")]
+        filter_content: Option<String>,
+
+        /// Only include requirements that do NOT have any "verifiedBy" relations
+        #[clap(long, help_heading = "MODEL SUMMARY OPTIONS")]
+        filter_is_not_verified: bool,
+
+        /// Only include requirements that do NOT have any "satisfiedBy" relations
+        #[clap(long, help_heading = "MODEL SUMMARY OPTIONS")]
+        filter_is_not_satisfied: bool,
+
+        /// Output traceability matrix as SVG without hyperlinks and with full element names Cannot be used with --json
+        #[clap(long, hide = true, conflicts_with_all = &["json"], help_heading = "MODEL SUMMARY OPTIONS")]
+        cypher: bool,
+    },
+
+    /// Output sections summary showing files, section names, and section content without individual elements
+    #[clap(override_help = "Output sections summary showing files, section names, and section content without individual elements\n\nMODEL SECTION-SUMMARY OPTIONS:\n      --json                        Output results in JSON format\n      --filter-file <GLOB>          Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`\n      --filter-section <GLOB>       Only include sections whose name matches this glob pattern e.g. `System requirement*`\n      --filter-content <REGEX>      Only include sections whose content matches this regular expression")]
+    SectionSummary {
+        /// Output results in JSON format
+        #[clap(long, help_heading = "MODEL SECTION-SUMMARY OPTIONS")]
+        json: bool,
+
+        /// Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`
+        #[clap(long, value_name = "GLOB", help_heading = "MODEL SECTION-SUMMARY OPTIONS")]
+        filter_file: Option<String>,
+
+        /// Only include sections whose name matches this glob pattern e.g. `System requirement*`
+        #[clap(long, value_name = "GLOB", help_heading = "MODEL SECTION-SUMMARY OPTIONS")]
+        filter_section: Option<String>,
+
+        /// Only include sections whose content matches this regular expression
+        #[clap(long, value_name = "REGEX", help_heading = "MODEL SECTION-SUMMARY OPTIONS")]
+        filter_content: Option<String>,
+    },
+
+    /// Generate index document with links and summaries to all documents (outputs to stdout)
+    Index,
+}
+
+#[derive(Subcommand, Debug)]
 pub enum VerificationsCommands {
     /// Generate verification traceability matrix showing requirements and their verification status
     #[clap(override_help = "Generate verification traceability matrix showing requirements and their verification status\n\nVERIFICATIONS MATRIX OPTIONS:\n      --svg                       Output traceability matrix as SVG (cannot be used with --json)\n      --json                      Output results in JSON format")]
@@ -126,48 +192,9 @@ pub enum Commands {
     /// Remove all generated mermaid diagrams from markdown files
     RemoveDiagrams,
 
-    /// Generate index document with links and summaries to all documents
-    GenerateIndex,
-
-    /// Output model registry and summary
-    #[clap(override_help = "Output model registry and summary\n\nMODEL SUMMARY OPTIONS:\n      --json                        Output results in JSON format\n      --filter-file <GLOB>          Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`\n      --filter-name <REGEX>         Only include elements whose name matches this regular expression\n      --filter-section <GLOB>       Only include sections whose name matches this glob pattern e.g. `System requirement*`\n      --filter-type <TYPE>          Only include elements of the given type e.g. `user-requirement`, `system-requirement`, `verification`, `file`, or other custom type\n      --filter-content <REGEX>      Only include elements whose content matches this regular expression\n      --filter-is-not-verified      Only include requirements that do NOT have any \"verifiedBy\" relations\n      --filter-is-not-satisfied     Only include requirements that do NOT have any \"satisfiedBy\" relations")]
-    ModelSummary {
-        /// Output results in JSON format
-        #[clap(long, help_heading = "MODEL SUMMARY OPTIONS")]
-        json: bool,
-        
-        /// Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`
-        #[clap(long, value_name = "GLOB", help_heading = "MODEL SUMMARY OPTIONS")]
-        filter_file: Option<String>,
-
-        /// Only include elements whose name matches this regular expression
-        #[clap(long, value_name = "REGEX", help_heading = "MODEL SUMMARY OPTIONS")]
-        filter_name: Option<String>,
-        
-        /// Only include sections whose name matches this glob pattern e.g. `System requirement*`
-        #[clap(long, value_name = "GLOB", help_heading = "MODEL SUMMARY OPTIONS")]
-        filter_section: Option<String>,
-
-        /// Only include elements of the given type e.g. `user-requirement`, `system-requirement`, `verification`, `file`, or other custom type
-        #[clap(long, value_name = "TYPE", help_heading = "MODEL SUMMARY OPTIONS")]
-        filter_type: Option<String>,
-
-        /// Only include elements whose content matches this regular expression
-        #[clap(long, value_name = "REGEX", help_heading = "MODEL SUMMARY OPTIONS")]
-        filter_content: Option<String>,
-
-        /// Only include requirements that do NOT have any "verifiedBy" relations
-        #[clap(long, help_heading = "MODEL SUMMARY OPTIONS")]
-        filter_is_not_verified: bool,
-
-        /// Only include requirements that do NOT have any "satisfiedBy" relations
-        #[clap(long, help_heading = "MODEL SUMMARY OPTIONS")]
-        filter_is_not_satisfied: bool,
-                        
-        /// Output traceability matrix as SVG without hyperlinks and with full element names Cannot be used with --json
-        #[clap(long, hide = true, conflicts_with_all = &["json"], help_heading = "MODEL SUMMARY OPTIONS")]
-        cypher: bool,
-    },
+    /// Model management commands - generate summary, section-summary, and index reports
+    #[clap(subcommand)]
+    Model(ModelCommands),
     
     /// Analise change impact and provides report
     #[clap(override_help = "Analise change impact and provides report\n\nCHANGE IMPACT OPTIONS:\n      --git-commit <GIT_COMMIT>  Git commit hash to use when comparing models [default: HEAD]\n      --json                     Output results in JSON format")]
@@ -180,30 +207,10 @@ pub enum Commands {
         #[clap(long, help_heading = "CHANGE IMPACT OPTIONS")]
         json: bool,
     },
-    
+
     /// Verification management commands - generate matrix, traces, and coverage reports
     #[clap(subcommand)]
     Verifications(VerificationsCommands),
-
-    /// Output sections summary showing files, section names, and section content without individual elements
-    #[clap(override_help = "Output sections summary showing files, section names, and section content without individual elements\n\nSECTIONS SUMMARY OPTIONS:\n      --json                        Output results in JSON format\n      --filter-file <GLOB>          Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`\n      --filter-section <GLOB>       Only include sections whose name matches this glob pattern e.g. `System requirement*`\n      --filter-content <REGEX>      Only include sections whose content matches this regular expression")]
-    SectionsSummary {
-        /// Output results in JSON format
-        #[clap(long, help_heading = "SECTIONS SUMMARY OPTIONS")]
-        json: bool,
-
-        /// Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`
-        #[clap(long, value_name = "GLOB", help_heading = "SECTIONS SUMMARY OPTIONS")]
-        filter_file: Option<String>,
-
-        /// Only include sections whose name matches this glob pattern e.g. `System requirement*`
-        #[clap(long, value_name = "GLOB", help_heading = "SECTIONS SUMMARY OPTIONS")]
-        filter_section: Option<String>,
-
-        /// Only include sections whose content matches this regular expression
-        #[clap(long, value_name = "REGEX", help_heading = "SECTIONS SUMMARY OPTIONS")]
-        filter_content: Option<String>,
-    },
 
     /// Interactive shell for GraphRegistry operations (undocumented)
     #[clap(hide = true)]
@@ -391,9 +398,12 @@ fn wants_json(args: &Args) -> bool {
     match &args.command {
         Some(Commands::Format { json, .. }) => *json,
         Some(Commands::Validate { json }) => *json,
-        Some(Commands::ModelSummary { json, .. }) => *json,
         Some(Commands::ChangeImpact { json, .. }) => *json,
-        Some(Commands::SectionsSummary { json, .. }) => *json,
+        Some(Commands::Model(subcmd)) => match subcmd {
+            ModelCommands::Summary { json, .. } => *json,
+            ModelCommands::SectionSummary { json, .. } => *json,
+            ModelCommands::Index => false,
+        },
         Some(Commands::Verifications(subcmd)) => match subcmd {
             VerificationsCommands::Matrix { json, .. } => *json,
             VerificationsCommands::Traces { json, .. } => *json,
@@ -461,18 +471,6 @@ pub fn handle_command(
             }
             return Ok(0);
         },
-        Some(Commands::GenerateIndex) => {
-            info!("Generating index.....");
-            let index_output_path = PathBuf::from("output");
-            let _index_context = index_generator::generate_readme_index(
-                &model_manager.graph_registry, 
-                    &index_output_path
-                ).map_err(|e| {
-                    ReqvireError::ProcessError(format!("❌ Failed to generate README.md: {:?}", e))
-                })?;
-
-            return Ok(0);
-        },
         Some(Commands::GenerateDiagrams) => {
             info!("Generating mermaid diagrams");
             // Only collect identifiers and process files to add diagrams
@@ -488,39 +486,74 @@ pub fn handle_command(
             info!("Generated diagrams removed from source files");
             return Ok(0);
         },
-        Some(Commands::ModelSummary {
-            json,
-            cypher,
-            filter_file,
-            filter_name,
-            filter_section,
-            filter_type,
-            filter_content,
-            filter_is_not_verified,
-            filter_is_not_satisfied
-        }) => {
-            let filters = reports::Filters::new(
-                filter_file.as_deref(),
-                filter_name.as_deref(),
-                filter_section.as_deref(),
-                filter_type.as_deref(),
-                filter_content.as_deref(),
-                filter_is_not_verified,
-                filter_is_not_satisfied,
-            ).map_err(|e| {
-                ReqvireError::ProcessError(format!("❌ Failed to construct filters: {}", e))
-            })?;
+        Some(Commands::Model(subcmd)) => {
+            match subcmd {
+                ModelCommands::Summary {
+                    json,
+                    cypher,
+                    filter_file,
+                    filter_name,
+                    filter_section,
+                    filter_type,
+                    filter_content,
+                    filter_is_not_verified,
+                    filter_is_not_satisfied
+                } => {
+                    let filters = reports::Filters::new(
+                        filter_file.as_deref(),
+                        filter_name.as_deref(),
+                        filter_section.as_deref(),
+                        filter_type.as_deref(),
+                        filter_content.as_deref(),
+                        filter_is_not_verified,
+                        filter_is_not_satisfied,
+                    ).map_err(|e| {
+                        ReqvireError::ProcessError(format!("❌ Failed to construct filters: {}", e))
+                    })?;
 
-            let output_format = if cypher {
-                reports::SummaryOutputFormat::Cypher
-            } else if json {
-                reports::SummaryOutputFormat::Json
-            } else {
-                reports::SummaryOutputFormat::Text
-            };
+                    let output_format = if cypher {
+                        reports::SummaryOutputFormat::Cypher
+                    } else if json {
+                        reports::SummaryOutputFormat::Json
+                    } else {
+                        reports::SummaryOutputFormat::Text
+                    };
 
-            reports::print_registry_summary(&model_manager.graph_registry,output_format, &filters);
-            return Ok(0);        
+                    reports::print_registry_summary(&model_manager.graph_registry,output_format, &filters);
+                    return Ok(0);
+                },
+                ModelCommands::SectionSummary {
+                    json,
+                    filter_file,
+                    filter_section,
+                    filter_content
+                } => {
+                    let filters = sections_summary::SectionsFilters::new(
+                        filter_file.as_deref(),
+                        filter_section.as_deref(),
+                        filter_content.as_deref(),
+                    ).map_err(|e| {
+                        eprintln!("{}", e);
+                        std::process::exit(1);
+                    }).unwrap();
+
+                    sections_summary::print_sections_summary(&model_manager.graph_registry, json, &filters);
+                    return Ok(0);
+                },
+                ModelCommands::Index => {
+                    let index_output_path = PathBuf::from("output");
+                    let index_content = index_generator::generate_readme_index(
+                        &model_manager.graph_registry,
+                        &index_output_path
+                    ).map_err(|e| {
+                        ReqvireError::ProcessError(format!("❌ Failed to generate index: {:?}", e))
+                    })?;
+
+                    // Output to stdout
+                    println!("{}", index_content);
+                    return Ok(0);
+                },
+            }
         },
         Some(Commands::ChangeImpact { json, git_commit }) => {
             let base_url = git_commands::get_repository_base_url().map_err(|_| {
@@ -623,24 +656,6 @@ pub fn handle_command(
             let processed_count = export::export_model(&model_manager.graph_registry, &html_output_path)?;
             info!("{} markdown files converted to HTML", processed_count);
 
-            return Ok(0);
-        },
-        Some(Commands::SectionsSummary {
-            json,
-            filter_file,
-            filter_section,
-            filter_content
-        }) => {
-            let filters = sections_summary::SectionsFilters::new(
-                filter_file.as_deref(),
-                filter_section.as_deref(),
-                filter_content.as_deref(),
-            ).map_err(|e| {
-                eprintln!("{}", e);
-                std::process::exit(1);
-            }).unwrap();
-
-            sections_summary::print_sections_summary(&model_manager.graph_registry, json, &filters);
             return Ok(0);
         },
         Some(Commands::Shell) => {

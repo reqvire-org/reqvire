@@ -16,9 +16,9 @@ echo "Starting test..." > "${TEST_DIR}/test_results.log"
 # - Output shows expected content for each element including Details headers
 #
 
-echo "Running: reqvire model-summary --json" >> "${TEST_DIR}/test_results.log"
+echo "Running: reqvire model summary --json" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary --json 2>&1)
+OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model summary --json 2>&1)
 EXIT_CODE=$?
 set -e
 

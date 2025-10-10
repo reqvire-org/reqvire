@@ -26,10 +26,10 @@ pushd "$TEST_DIR" > /dev/null 2>&1
 git init > /dev/null 2>&1
 popd > /dev/null 2>&1
 
-# Run reqvire with generate-index flag
-echo "Running: reqvire generate-index" >> "${TEST_DIR}/test_results.log"
+# Run reqvire model index and redirect to file
+echo "Running: reqvire model index > SpecificationIndex.md" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" generate-index 2>&1)
+OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model index 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -42,6 +42,9 @@ if [ $EXIT_CODE -ne 0 ]; then
   echo "$OUTPUT"
   exit 1
 fi
+
+# Save output to file
+echo "$OUTPUT" > "${TEST_DIR}/SpecificationIndex.md"
 
 # Check that SpecificationIndex.md was generated (the index file is named SpecificationIndex.md, not index.md)
 if [ ! -f "${TEST_DIR}/SpecificationIndex.md" ]; then

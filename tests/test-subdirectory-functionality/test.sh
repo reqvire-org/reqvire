@@ -34,9 +34,9 @@ git add . > /dev/null 2>&1
 git commit -m "Initial test structure" > /dev/null 2>&1
 
 # Test 1: Model summary should fail with parent directory references
-echo "Running: reqvire model-summary (from submodule, should fail)" >> "${TEST_DIR}/test_results.log"
+echo "Running: reqvire model summary (from submodule, should fail)" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" model-summary 2>&1)
+OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" model summary 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -145,9 +145,9 @@ if echo "$OUTPUT" | grep -q "specifications/MainRequirements.md"; then
 fi
 
 # Test 6: Generate index from submodule directory
-echo "Running: reqvire generate-index" >> "${TEST_DIR}/test_results.log"
+echo "Running: reqvire model index > SpecificationIndex.md" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" generate-index 2>&1)
+OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" model index 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -160,8 +160,11 @@ if [ $EXIT_CODE -ne 0 ]; then
   exit 1
 fi
 
+# Save output to file in submodule directory
+echo "$OUTPUT" > "${TMP_DIR}/project-root/submodule/SpecificationIndex.md"
+
 # Check that index generation only processed submodule files
-# The generate-index command should only process files in the current subdirectory
+# The model index command should only process files in the current subdirectory
 if echo "$OUTPUT" | grep -q "specifications/MainRequirements.md"; then
   echo "❌ FAILED: Generate index processed main requirements when it should only process submodule"
   echo "Output: $OUTPUT"

@@ -144,10 +144,10 @@ When updating tests due to functionality changes:
 3. **Additional detailed queries (when needed):**
    ```bash
    # Get all verifications with full details
-   ./target/debug/reqvire model-summary --filter-type="verification" --json > /tmp/all-verifications.json
-   
+   ./target/debug/reqvire model summary --filter-type="verification" --json > /tmp/all-verifications.json
+
    # Human-readable list of all verifications
-   ./target/debug/reqvire model-summary --filter-type="verification"
+   ./target/debug/reqvire model summary --filter-type="verification"
    ```
 
 **Decision Framework:**

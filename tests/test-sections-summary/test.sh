@@ -4,8 +4,8 @@ set -euo pipefail
 # Test: Sections Summary Command Functionality
 # -------------------------------------------------------------------------------------
 # Acceptance Criteria:
-# - `reqvire sections-summary --json` produces valid JSON with sections information
-# - `reqvire sections-summary` prints human-readable text summary
+# - `reqvire model section-summary --json` produces valid JSON with sections information
+# - `reqvire model section-summary` prints human-readable text summary
 # - Both outputs include file paths, section names, section order indices, and section content
 # - Individual elements (requirements, verifications) are excluded from output
 # - Filter flags work independently and in combination
@@ -22,9 +22,9 @@ set -euo pipefail
 # Test 1: Base JSON sections summary
 echo "Starting test..." > "${TEST_DIR}/test_results.log"
 
-echo "Running: reqvire sections-summary --json" >> "${TEST_DIR}/test_results.log"
+echo "Running: reqvire model section-summary --json" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" sections-summary --json 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model section-summary --json 2>&1)
 EXIT_JSON=$?
 set -e
 
@@ -76,9 +76,9 @@ if [ "$UNEXPECTED_FIELDS" -gt 0 ]; then
 fi
 
 # Test 2: Base text sections summary
-echo "Running: reqvire sections-summary" >> "${TEST_DIR}/test_results.log"
+echo "Running: reqvire model section-summary" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT_TEXT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" sections-summary 2>&1)
+OUTPUT_TEXT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model section-summary 2>&1)
 EXIT_TEXT=$?
 set -e
 
@@ -114,9 +114,9 @@ if ! echo "$OUTPUT_TEXT" | grep -B1 "File: specifications/Requirements.md" | gre
 fi
 
 # Test 3: File filter
-echo "Running: reqvire sections-summary --filter-file --json" >> "${TEST_DIR}/test_results.log"
+echo "Running: reqvire model section-summary --filter-file --json" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT_FILTERED=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" sections-summary --filter-file="**/Requirements.md" --json 2>&1)
+OUTPUT_FILTERED=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model section-summary --filter-file="**/Requirements.md" --json 2>&1)
 EXIT_FILTERED=$?
 set -e
 
@@ -144,9 +144,9 @@ if [ "$REQ_SECTIONS" -eq 0 ]; then
 fi
 
 # Test 4: Section filter
-echo "Running: reqvire sections-summary --filter-section --json" >> "${TEST_DIR}/test_results.log"
+echo "Running: reqvire model section-summary --filter-section --json" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT_SECTION_FILTERED=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" sections-summary --filter-section="System*" --json 2>&1)
+OUTPUT_SECTION_FILTERED=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model section-summary --filter-section="System*" --json 2>&1)
 EXIT_SECTION_FILTERED=$?
 set -e
 
@@ -168,9 +168,9 @@ if [ "$SYSTEM_SECTIONS" -eq 0 ]; then
 fi
 
 # Test 5: Content filter
-echo "Running: reqvire sections-summary --filter-content --json" >> "${TEST_DIR}/test_results.log"
+echo "Running: reqvire model section-summary --filter-content --json" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT_CONTENT_FILTERED=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" sections-summary --filter-content="MUST" --json 2>&1)
+OUTPUT_CONTENT_FILTERED=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model section-summary --filter-content="MUST" --json 2>&1)
 EXIT_CONTENT_FILTERED=$?
 set -e
 
@@ -192,9 +192,9 @@ if [ "$MUST_SECTIONS" -eq 0 ]; then
 fi
 
 # Test 6: Combined filters
-echo "Running: reqvire sections-summary --filter-file --filter-section --json" >> "${TEST_DIR}/test_results.log"
+echo "Running: reqvire model section-summary --filter-file --filter-section --json" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT_COMBINED=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" sections-summary --filter-file="**/Requirements.md" --filter-section="System*" --json 2>&1)
+OUTPUT_COMBINED=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model section-summary --filter-file="**/Requirements.md" --filter-section="System*" --json 2>&1)
 EXIT_COMBINED=$?
 set -e
 

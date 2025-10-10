@@ -17,9 +17,9 @@ printf "%s\n" "Testing excluded patterns relative path resolution..." > "${TEST_
 # Test 1: Run from git root
 printf "%s\n" "=== Test 1: Running from git root ===" >> "${TEST_DIR}/test_results.log"
 
-echo "Running: reqvire model-summary --json (from root)" >> "${TEST_DIR}/test_results.log"
+echo "Running: reqvire model summary --json (from root)" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT_ROOT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary --json 2>&1)
+OUTPUT_ROOT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model summary --json 2>&1)
 EXIT_CODE_ROOT=$?
 set -e
 
@@ -34,9 +34,9 @@ fi
 # Test 2: Run from subfolder
 printf "%s\n" "=== Test 2: Running from subfolder ===" >> "${TEST_DIR}/test_results.log"
 
-echo "Running: reqvire model-summary --json (from subfolder)" >> "${TEST_DIR}/test_results.log"
+echo "Running: reqvire model summary --json (from subfolder)" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT_SUB=$(cd "${TEST_DIR}/specifications/subfolder" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary --json 2>&1)
+OUTPUT_SUB=$(cd "${TEST_DIR}/specifications/subfolder" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model summary --json 2>&1)
 EXIT_CODE_SUB=$?
 set -e
 
