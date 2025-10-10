@@ -159,21 +159,9 @@ if ! grep -q -- "-.->|trace|" "$TEST_DIR/specifications/Requirements.md"; then
   exit 1
 fi
 
-# Perform a specific check for relationships in diagrams and if rendered with right arrow
-if ! grep -q -- "-->|refinedBy|" "$TEST_DIR/specifications/Requirements.md"; then
-  echo "❌ FAILED: Missing relationships in Requirements.md diagram"
-  exit 1
-fi
-
-# Perform a specific check for relationships in diagrams and if rendered with right arrow
-if ! grep -q -- "--o|contains" "$TEST_DIR/specifications/Requirements.md"; then
-  echo "❌ FAILED: Missing relationships in Requirements.md diagram"
-  exit 1
-fi
-
-# Perform a specific check for relationships in diagrams and if rendered with right arrow
+# Perform a specific check for derive relationships in diagrams
 if ! grep -q -- "-.->|deriveReqT" "$TEST_DIR/specifications/Requirements.md"; then
-  echo "❌ FAILED: Missing relationships in Requirements.md diagram"
+  echo "❌ FAILED: Missing derive relationships in Requirements.md diagram"
   exit 1
 fi
 

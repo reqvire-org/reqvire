@@ -79,9 +79,9 @@ Test that verifies OAuth 2.0 authentication flow works correctly.
 ## Relation Types
 
 ### Hierarchical Relations
-- `containedBy`/`contain`: Physical or logical containment
 - `derivedFrom`/`derive`: Derivation from higher-level elements
-- `refine`/`refinedBy`: Adding more detail to requirements
+
+**Note**: Containment is managed through file structure, sections, and folders - not through explicit relations.
 
 ### Satisfaction Relations
 - `satisfiedBy`/`satisfy`: Links requirements to implementations or architectural diagrams and other non-requirement system elements
@@ -189,9 +189,8 @@ cargo run -- traces --json > /tmp/traces.json
 
 System SHALL provide data export functionality.
 
-#### Relations
-  * contain: #csv-export
-  * contain: #json-export
+#### Metadata
+  * type: requirement
 
 ### CSV Export
 
@@ -201,8 +200,50 @@ System SHALL export data in CSV format.
   * type: requirement
 
 #### Relations
-  * containedBy: #high-level-feature
+  * derivedFrom: #high-level-feature
   * verifiedBy: [CSV Export Test](../Verifications/ExportTests.md#csv-export-test)
+```
+
+### Verification Strategy: Verify Leaf Requirements
+
+**Preferable Approach**: Focus verification efforts on leaf requirements (lowest-level requirements with no derived children).
+
+#### Why Verify Leaf Requirements:
+- **Traces roll up**: Verification traces automatically propagate up the requirement hierarchy
+- **Efficient coverage**: One verification can verify multiple leaf requirements and cover the entire chain of parent requirements up to the root
+- **Avoid redundancy**: No need to create separate verifications for every level of the hierarchy
+- **Clear test scope**: Leaf requirements are concrete and testable, while parent requirements are often abstract
+
+#### Example:
+```markdown
+### Authentication (Root)
+High-level requirement about authentication.
+
+### Password Authentication (Parent)
+System SHALL support password authentication.
+
+#### Relations
+  * derivedFrom: #authentication
+
+### Password Strength Validation (Leaf)
+System SHALL enforce minimum 8 character passwords.
+
+#### Relations
+  * derivedFrom: #password-authentication
+  * verifiedBy: [Password Strength Test](Verifications/Tests.md#password-strength-test)
+
+### Login Rate Limiting (Leaf)
+System SHALL limit failed login attempts to 5 per minute.
+
+#### Relations
+  * derivedFrom: #password-authentication
+  * verifiedBy: [Rate Limit Test](Verifications/Tests.md#rate-limit-test)
+```
+
+In this example:
+- Only the two leaf requirements have `verifiedBy` relations
+- Both verifications roll up through "Password Authentication" to "Authentication"
+- The entire authentication hierarchy is verified through leaf requirement tests
 ```
 
 ### Verification with Multiple Requirements

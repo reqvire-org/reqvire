@@ -55,7 +55,7 @@ This is another test element with relations.
   * derivedFrom: [Root Requirement](#root-requirement)
   * verifiedBy: [Element 1](#element-1)
   * satisfiedBy: [implementation.py](implementation.py)
-  * contain: [Element 3](#element-3)
+  * derive: [Element 3](#element-3)
   * derive: [Element 4](#element-4)
 
 ## Custom Mermaid Diagram Section
@@ -98,7 +98,7 @@ graph TD;
 This is a third test element.
 
 #### Relations
-  * containedBy: [Element 2](#element-2)
+  * derivedFrom: [Element 2](#element-2)
   * verifiedBy: [Element 1](#element-1)
   * trace: [Element 4](#element-4)
 

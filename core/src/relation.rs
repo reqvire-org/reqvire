@@ -20,23 +20,7 @@ pub struct RelationTypeInfo {
 lazy_static! {
     pub static ref RELATION_TYPES: HashMap<&'static str, RelationTypeInfo> = {
         let mut m = HashMap::new();
-        
-        // Containment relations
-        m.insert("containedBy", RelationTypeInfo {
-            name: "containedBy",
-            opposite: Some("contain"),
-            description: "Element is contained by another element",
-            arrow: "-->",
-            label: "containedBy",
-        });
-        m.insert("contain", RelationTypeInfo {
-            name: "contain",
-            opposite: Some("containedBy"),
-            description: "Element contains another element",
-            arrow: "--o",
-            label: "contains",
-        });
-        
+
         // Derive relations
         m.insert("derivedFrom", RelationTypeInfo {
             name: "derivedFrom",
@@ -52,25 +36,7 @@ lazy_static! {
             arrow: "-.->",
             label: "deriveReqT",
         });
-        
-        // Refine relation
-        m.insert("refine", RelationTypeInfo {
-            name: "refine",
-            opposite: Some("refinedBy"),
-            description: "Element refines a higher-level element",
-            arrow: "-->",
-            label: "refines",
-        });
 
-        // Refine relation
-        m.insert("refinedBy", RelationTypeInfo {
-            name: "refinedBy",
-            opposite: Some("refine"),
-            description: "A souce element being refined by other element.",
-            arrow: "-->",
-            label: "refinedBy",
-        });        
-        
         // Satisfy relations
         m.insert("satisfiedBy", RelationTypeInfo {
             name: "satisfiedBy",
@@ -119,9 +85,7 @@ lazy_static! {
 /// Relations to show in diagrams (one from each pair to avoid duplicates)
 /// These are typically the "forward" relations from the old direction system
 pub const DIAGRAM_RELATIONS: &[&str] = &[
-    "contain",       // Not containedBy
     "derive",        // Not derivedFrom
-    "refinedBy",     // Not refine
     "satisfiedBy",   // Not satisfy
     "verifiedBy",    // Not verify
     "trace"
@@ -130,9 +94,7 @@ pub const DIAGRAM_RELATIONS: &[&str] = &[
 /// Relations that propagate changes in impact analysis
 /// When these relations exist, changes to the source affect the target
 pub const IMPACT_PROPAGATION_RELATIONS: &[&str] = &[
-    "contain",       // Parent changes affect children
     "derive",        // Source changes affect derived elements
-    "refinedBy",     // Base changes affect refinements
     "satisfiedBy",   // Requirement changes affect implementations
     "verifiedBy",    // Requirement changes invalidate verifications
 ];
@@ -143,27 +105,8 @@ pub const VERIFY_RELATION: &str = "verify";
 
 /// Relations that trace verification propagation in verification traces
 pub const VERIFICATION_TRACES_RELATIONS: &[&str] = &[
-    "containedBy",
-    "derivedFrom",
-    "refine",
-];
-
-/// Refinement relations - used for adding detail without changing scope
-/// Once these are used in a chain, all descendants must use refinement relations
-pub const REFINEMENT_RELATIONS: &[&str] = &[
-    "refine",
-    "refinedBy",
-];
-
-/// Hierarchical relations (contain, derive)
-/// These relations cannot be used once a refinement chain has started
-pub const HIERARCHICAL_RELATIONS: &[&str] = &[
-    "contain",
-    "containedBy",
-    "derive",
     "derivedFrom",
 ];
-
 
 #[derive(Debug, Clone, Serialize)]
 pub struct RelationTarget {
@@ -351,7 +294,7 @@ pub fn get_supported_relation_types() -> Vec<&'static str> {
 /// Get the list of valid parent relation types (hierarchical relationships).
 /// These are typically the "backward" pointing relations that refer to parent elements.
 pub fn get_parent_relation_types() -> Vec<&'static str> {
-    vec!["containedBy", "derivedFrom", "refine", "satisfy", "verify"]
+    vec!["derivedFrom", "satisfy", "verify"]
 }
 
 
@@ -378,6 +321,16 @@ pub fn validate_relation_element_types(
     use crate::element::ElementType;
 
     match relation_type {
+        "derivedFrom" => {
+            // Source should be a requirement and target should be a requirement
+            matches!(source_type, ElementType::Requirement(_)) && 
+            matches!(target_type, ElementType::Requirement(_))
+        },
+        "derive" => {
+            // Source should be a requirement and target should be a requirement
+            matches!(source_type, ElementType::Requirement(_)) && 
+            matches!(target_type, ElementType::Requirement(_))
+        },    
         "verifiedBy" => {
             // Source should be a requirement and target should be a verification
             matches!(source_type, ElementType::Requirement(_)) && 
@@ -409,6 +362,7 @@ pub fn validate_relation_element_types(
     }
 }
 
+//TODO: we can refactor and put this into description of each relation type
 /// Gets a detailed description of the expected element types for a relation
 pub fn get_relation_element_type_description(relation_type: &str) -> Option<String> {
     match relation_type {

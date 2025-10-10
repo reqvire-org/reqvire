@@ -126,16 +126,16 @@ graph TD
     SDD_LIMITS -.->|satisy| REQ_LIMITS
 
     MOE_CR -.->|trace| USER_STORY_PASSWORD
-    REQ_AUTH -.->|refine| USER_STORY_PASSWORD
-    REQ_SECURITY -.->|refine| USER_STORY_PASSWORD
-    
+    REQ_AUTH -.->|derive| USER_STORY_PASSWORD
+    REQ_SECURITY -.->|derive| USER_STORY_PASSWORD
+
     %% Relationships
     REQ_ENCRYPT -.->|derive| REQ_SECURITY 
     REQ_SESSION -.->|derive| REQ_SECURITY
 
 
-    REQ_AUTH -.->|contains| REQ_PASSWORD
-    REQ_AUTH -.->|contains| REQ_OAUTH
+    REQ_PASSWORD -.->|derive| REQ_AUTH
+    REQ_OAUTH -.->|derive| REQ_AUTH
 
 
     VerifyPasswordStrength -.->|verify| REQ_PASSWORD

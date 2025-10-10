@@ -146,12 +146,8 @@ From document at `/project/docs/spec.md`:
 
 | Relation Type | Direction | Opposite | Change Propagation | Description |
 |--------------|-----------|----------|-------------------|-------------|
-| **contain** | Forward | containedBy | Parent → Child | Parent contains child elements |
-| **containedBy** | Backward | contain | Parent → Child | Child is contained by parent |
 | **derive** | Forward | derivedFrom | Parent → Child | Parent derives child elements |
 | **derivedFrom** | Backward | derive | Parent → Child | Child derived from parent |
-| **refine** | Forward | refinedBy | Parent → Child | Refines with more detail |
-| **refinedBy** | Backward | refine | Parent → Child | Is refined by child |
 | **satisfy** | Backward | satisfiedBy | Req → Implementation | Implementation satisfies requirement |
 | **satisfiedBy** | Forward | satisfy | Req → Implementation | Requirement satisfied by implementation |
 | **verify** | Backward | verifiedBy | Req → Verification | Verification verifies requirement |
@@ -161,9 +157,7 @@ From document at `/project/docs/spec.md`:
 ### Relation Categories
 
 1. **Hierarchical Relations** (Parent-Child):
-   - contain/containedBy
    - derive/derivedFrom
-   - refine/refinedBy
 
 2. **Satisfaction Relations**:
    - satisfy/satisfiedBy
@@ -173,6 +167,35 @@ From document at `/project/docs/spec.md`:
 
 4. **Traceability Relations**:
    - trace (no propagation)
+
+### Containment Through File Structure
+
+**Important**: Containment relationships in Reqvire are managed through file structure and section organization, NOT through explicit relations.
+
+#### How Containment Works:
+- **File-Level Containment**: Requirements in the same file are naturally grouped together
+- **Section-Level Containment**: Elements under a section header (`##`) are contained by that section
+- **Folder-Level Containment**: Files in the same directory share a logical grouping
+
+#### Best Practices:
+- Use **sections** (`##`) to group related requirements within a file
+- Use **folders** to organize related specification documents
+- Use **derivedFrom** relations to show hierarchical refinement between requirements
+
+#### Example Structure:
+```
+specifications/
+  ├── SystemRequirements/
+  │   ├── Requirements.md          # Contains all system requirements
+  │   │   ## Authentication        # Section groups auth requirements
+  │   │   ### Password Auth        # Element in auth section
+  │   │   ### OAuth Auth           # Element in auth section
+  │   │   ## Security             # Section groups security requirements
+  │   │   ### Encryption           # Element in security section
+  │   └── PerformanceRequirements.md
+  └── Verifications/
+      └── Tests.md
+```
 
 ## Change Propagation Rules
 
@@ -316,8 +339,9 @@ reqvire change-impact --git-commit=HEAD~1 --json > /tmp/impact.json
 ### Adding New Requirements and Features:
 - **Start with user stories** and derive system requirements following the hierarchy
 - **Determine proper placement** in existing document structure or create new sections
+- **Establish containment** through file structure, sections, and folders - group related requirements in the same file under appropriate sections
 - **Follow naming conventions** and ensure uniqueness within files
-- **Establish proper relations** (deriveFrom, refine, contain) to parent requirements
+- **Establish proper relations** (deriveFrom) to parent requirements
 - **Add verification requirements** to ensure new functionality is testable
 - **Consider implementation impact** and add satisfiedBy relations to design elements
 - **Review existing patterns** to maintain consistency with current specifications
@@ -330,7 +354,7 @@ reqvire change-impact --git-commit=HEAD~1 --json > /tmp/impact.json
 2. Create user requirement with clear purpose and scope
 3. Derive system requirements that satisfy the user requirement
 4. Add verification requirements to ensure testability
-5. Establish proper traceability relations (deriveFrom, refine, verifiedBy)
+5. Establish proper traceability relations (deriveFrom, verifiedBy)
 6. Add implementation relations (satisfiedBy) to design/code elements
 7. Validate with `reqvire validate` and resolve any issues
 8. Review overall impact and update related documentation

@@ -31,7 +31,7 @@ This is a parent element that should be included in child section diagrams.
   * type: user-requirement
 
 #### Relations
-  * contain: [Child Element](#child-element)
+    * derive: [Child Element](#child-element)
   * derive: [Derived Child](#derived-child)
 
 ## Child Section
@@ -76,7 +76,7 @@ graph TD;
 This element has a parent in a different section to test hierarchy inclusion.
 
 #### Relations
-  * containedBy: [Parent Element](#parent-element)
+  * derivedFrom: [Parent Element](#parent-element)
   * satisfiedBy: [implementation.rs](implementation.rs)
   * verifiedBy: [Test Verification](#test-verification)
 
@@ -86,7 +86,7 @@ This element is derived from the parent to test derivation relationships.
 
 #### Relations
   * derivedFrom: [Parent Element](#parent-element)
-  * refinedBy: [Refined Element](#refined-element)
+  * derive: [Refined Element](#refined-element)
 
 ### Test Verification
 
@@ -100,8 +100,8 @@ This verification element tests the child element.
 
 ### Refined Element
 
-This element refines the derived child with more details.
+This element is further derived from the derived child with more details.
 
 #### Relations
-  * refine: [Derived Child](#derived-child)
+  * derivedFrom: [Derived Child](#derived-child)
   * satisfiedBy: [refined_impl.rs](refined_impl.rs)

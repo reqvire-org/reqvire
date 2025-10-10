@@ -9,7 +9,7 @@ This file contains submodule requirements that SHOULD be processed when run from
 This is a submodule requirement that should be processed when run from the submodule directory.
 
 #### Relations
-  * containedBy: [Submodule System](#submodule-system)
+  * derivedFrom: [Submodule System](#submodule-system)
 
 ---
 
@@ -21,7 +21,7 @@ This is the submodule system requirement.
   * type: user-requirement
 
 #### Relations
-  * contain: [Submodule Requirement One](#submodule-requirement-one)
+    * derive: [Submodule Requirement One](#submodule-requirement-one)
 
 ---
 

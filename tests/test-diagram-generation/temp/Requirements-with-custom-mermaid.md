@@ -40,7 +40,7 @@ This is a test element with relations.
 #### Relations
   * derivedFrom: [Root Requirement](#root-requirement)
   * derive: [Element 2](#element-2)
-  * contain: [Element 3](#element-3)
+    * derive: [Element 3](#element-3)
 
 ### Element 2
 
@@ -89,7 +89,7 @@ graph TD;
 This is a third test element.
 
 #### Relations
-  * containedBy: [Element 1](#element-1)
+  * derivedFrom: [Element 1](#element-1)
 
 ### Element 4
 

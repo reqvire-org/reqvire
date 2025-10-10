@@ -33,7 +33,7 @@ First user interface requirement.
 
 #### Relations
   * derivedFrom: [Main User Interface Requirement](#main-user-interface-requirement)
-  * refinedBy: [SystemRequirements.md#system-element-1](SystemRequirements.md#system-element-1)
+  * derive: [SystemRequirements.md#system-element-1](SystemRequirements.md#system-element-1)
 
 ### UI Element 2
 
@@ -41,7 +41,7 @@ Second user interface requirement.
 
 #### Relations
   * derivedFrom: [Main User Interface Requirement](#main-user-interface-requirement)
-  * refinedBy: [SystemRequirements.md#system-element-2](SystemRequirements.md#system-element-2)
+  * derive: [SystemRequirements.md#system-element-2](SystemRequirements.md#system-element-2)
 
 ## Performance Requirements
 ```mermaid
