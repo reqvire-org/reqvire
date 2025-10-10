@@ -508,7 +508,8 @@ pub fn handle_command(
         }) => {
             // Generate verification traces report
             let generator = verification_trace::VerificationTraceGenerator::new(
-                &model_manager.graph_registry
+                &model_manager.graph_registry,
+                diagrams_with_blobs
             );
 
             let mut report = generator.generate();

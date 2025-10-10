@@ -14,16 +14,17 @@ paths:
     - "specifications/Logical*.md"
     - "specifications/Physical*.md"
     - "TODO.md"
-    - "specifications/DesignSpecifications/**"        
-    - "tests/**"    
-    - "core/**"    
-    - "cli/**"            
+    - "specifications/DesignSpecifications/**"
+    - "tests/**"
+    - "core/**"
+    - "cli/**"
     - "doc/**"
-    - "html/**"    
+    - "html/**"
     - ".github/**"
-    - ".claude/**"    
+    - ".claude/**"
     - "target/**"
     - "Plan.md"
+    - "VerificationTraces.md"
 
 style:
   # Theme for HTML output (default, dark, light)
@@ -39,4 +40,4 @@ style:
   diagram_direction: "LR"
 
   # If diagrams click links should be blobs to work from GitHub console
-  diagrams_with_blobs: false  
+  diagrams_with_blobs: false

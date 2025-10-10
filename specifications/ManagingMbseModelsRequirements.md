@@ -47,7 +47,6 @@ The system shall support a **YAML-based configuration file** that defines folder
   * type: user-requirement
 
 #### Relations
-  * derivedFrom: [Managing MBSE Models](UserStories.md#managing-mbse-models)
   * refine: [Git Repository as Project Root](#git-repository-as-project-root)
 ---
 

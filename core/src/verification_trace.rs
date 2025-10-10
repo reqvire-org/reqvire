@@ -1,9 +1,11 @@
 use crate::element::{Element, ElementType};
+use crate::git_commands;
 use crate::graph_registry::GraphRegistry;
 use crate::relation::{VERIFY_RELATION, VERIFICATION_TRACES_RELATIONS};
 use crate::utils;
 use serde::Serialize;
-use std::collections::{BTreeMap, HashMap, HashSet};
+use std::collections::{BTreeMap, HashSet};
+use std::path::PathBuf;
 
 #[derive(Debug, Serialize)]
 pub struct VerificationTracesReport {
@@ -63,11 +65,12 @@ struct RequirementNodeWithRelation {
 
 pub struct VerificationTraceGenerator<'a> {
     registry: &'a GraphRegistry,
+    diagrams_with_blobs: bool,
 }
 
 impl<'a> VerificationTraceGenerator<'a> {
-    pub fn new(registry: &'a GraphRegistry) -> Self {
-        Self { registry }
+    pub fn new(registry: &'a GraphRegistry, diagrams_with_blobs: bool) -> Self {
+        Self { registry, diagrams_with_blobs }
     }
 
     /// Generate verification traces report
@@ -246,6 +249,26 @@ impl<'a> VerificationTraceGenerator<'a> {
     pub fn generate_mermaid_diagram(&self, trace: &VerificationTrace) -> String {
         let mut diagram = String::new();
 
+        // Get Git repository information for creating proper links
+        let repo_root = match git_commands::get_git_root_dir() {
+            Ok(root) => root,
+            Err(_) => PathBuf::from(""),
+        };
+
+        let base_url = match git_commands::get_repository_base_url() {
+            Ok(url) => url,
+            Err(_) => String::new(),
+        };
+
+        let commit_hash = match git_commands::get_commit_hash() {
+            Ok(hash) => hash,
+            Err(_) => String::new(),
+        };
+
+        let has_git_info = !repo_root.as_os_str().is_empty()
+            && !base_url.is_empty()
+            && !commit_hash.is_empty();
+
         // Header with CSS classes (reused from diagrams.rs pattern)
         diagram.push_str("```mermaid\n");
         diagram.push_str("graph TD\n");
@@ -260,6 +283,18 @@ impl<'a> VerificationTraceGenerator<'a> {
             "  {}[\"{}<br>({})\"]:::verification\n",
             verification_id, trace.name, trace.verification_type
         ));
+
+        // Add click handler for verification node
+        let verification_click_target = if self.diagrams_with_blobs && has_git_info {
+            let relative_id = match utils::get_relative_path(&PathBuf::from(&trace.identifier)) {
+                Ok(rel_path) => rel_path.to_string_lossy().to_string(),
+                Err(_) => trace.identifier.clone(),
+            };
+            format!("{}/blob/{}/{}", base_url, commit_hash, relative_id)
+        } else {
+            trace.identifier.clone()
+        };
+        diagram.push_str(&format!("  click {} \"{}\";\n", verification_id, verification_click_target));
 
         // Build tree with relation information
         let mut visited = HashSet::new();
@@ -284,6 +319,10 @@ impl<'a> VerificationTraceGenerator<'a> {
                 &mut diagram,
                 &mut visited_nodes,
                 &mut visited_edges,
+                &repo_root,
+                &base_url,
+                &commit_hash,
+                has_git_info,
             );
         }
 
@@ -341,6 +380,10 @@ impl<'a> VerificationTraceGenerator<'a> {
         diagram: &mut String,
         visited_nodes: &mut HashSet<String>,
         visited_edges: &mut HashSet<(String, String, String)>,
+        repo_root: &PathBuf,
+        base_url: &str,
+        commit_hash: &str,
+        has_git_info: bool,
     ) {
         let node_id = utils::hash_identifier(&node.id);
 
@@ -358,6 +401,18 @@ impl<'a> VerificationTraceGenerator<'a> {
                 "  {}[\"{}<br>({})\"]:::{}\n",
                 node_id, node.name, node.element_type, class
             ));
+
+            // Add click handler for requirement node
+            let click_target = if self.diagrams_with_blobs && has_git_info {
+                let relative_id = match utils::get_relative_path(&PathBuf::from(&node.id)) {
+                    Ok(rel_path) => rel_path.to_string_lossy().to_string(),
+                    Err(_) => node.id.clone(),
+                };
+                format!("{}/blob/{}/{}", base_url, commit_hash, relative_id)
+            } else {
+                node.id.clone()
+            };
+            diagram.push_str(&format!("  click {} \"{}\";\n", node_id, click_target));
         }
 
         // Add link from source to this node using proper relation metadata
@@ -380,7 +435,18 @@ impl<'a> VerificationTraceGenerator<'a> {
 
         // Recursively add children
         for (child_relation_type, child) in &node.children {
-            self.add_node_to_diagram_with_relations(child, &node_id, child_relation_type, diagram, visited_nodes, visited_edges);
+            self.add_node_to_diagram_with_relations(
+                child,
+                &node_id,
+                child_relation_type,
+                diagram,
+                visited_nodes,
+                visited_edges,
+                repo_root,
+                base_url,
+                commit_hash,
+                has_git_info,
+            );
         }
     }
 

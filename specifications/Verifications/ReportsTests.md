@@ -251,6 +251,7 @@ This test verifies that the verification-traces command filter options work corr
 - Command shall output to stdout in Markdown format with embedded Mermaid diagrams by default
 - Command shall support `--json` flag for structured JSON output without diagrams
 - Mermaid diagrams shall show verification element as root with arrows following relation semantics
+- Mermaid diagrams shall include clickable links on all nodes (verifications and requirements)
 - Directly verified requirements shall be marked/highlighted in diagrams using CSS classes
 - System shall traverse all upward parent relations to reach root requirements
 - System shall merge multiple verification paths into single tree per verification
@@ -267,6 +268,7 @@ This test verifies that the verification-traces command filter options work corr
    - output contains `# Verification Traceability Report`
    - output contains Mermaid diagram blocks with `graph BT`
    - diagrams include verification element nodes and requirement nodes
+   - diagrams include click handlers for all nodes (format: `click NODE_ID "url"`)
    - directly verified requirements have `:::verified` CSS class in diagram
 
 2. **JSON Output**

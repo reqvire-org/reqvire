@@ -513,7 +513,6 @@ The system shall provide a git commit hash flag  (--git_commit command option fl
 
 #### Relations
   * derivedFrom: [CLI Change Impact Report Command](#cli-change-impact-report-command)
-  * containedBy: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
 ---
 
@@ -1012,6 +1011,9 @@ The system shall provide functionality to build upward trace trees from verifica
 ### Verification Traces CLI Command
 
 The system shall implement a `verification-traces` CLI command that generates and outputs upward trace trees for verification elements in Markdown format with embedded Mermaid diagrams by default, and in JSON format when --json flag is provided.
+
+#### Details
+The Mermaid diagrams generated for verification traces shall include clickable links on diagram nodes that navigate to the referenced element, following the same interactive behavior as other diagrams in the system (respecting the `style.diagrams_with_blobs` configuration).
 
 #### Relations
   * derivedFrom: [Verification Trace Builder](#verification-trace-builder)
