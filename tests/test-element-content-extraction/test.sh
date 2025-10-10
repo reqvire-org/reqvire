@@ -1,4 +1,8 @@
 #!/bin/bash
+set -euo pipefail
+
+# Create log file immediately to ensure it exists for runner
+echo "Starting test..." > "${TEST_DIR}/test_results.log"
 
 # Test: Element content extraction
 # --------------------------------------
@@ -12,10 +16,14 @@
 # - Output shows expected content for each element including Details headers
 #
 
-OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary --json 2>&1)
+echo "Running: reqvire model summary --json" >> "${TEST_DIR}/test_results.log"
+set +e
+OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model summary --json 2>&1)
 EXIT_CODE=$?
+set -e
 
-printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 
 
 GOTTEN_CONTENT=$(awk '/# [^:]+:/' "${TEST_DIR}/test_results.log")

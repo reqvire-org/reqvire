@@ -44,7 +44,7 @@ jobs:
       
       - name: Generate traces svg
         run: |
-          ./reqvire traces --svg > specifications/matrix.svg
+          ./reqvire verifications traces --svg > specifications/matrix.svg
                 
       - name: Check for Changes
         id: check_changes

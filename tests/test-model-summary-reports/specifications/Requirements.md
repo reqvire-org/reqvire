@@ -40,7 +40,7 @@ Section introduction content with workflow diagram above.
 This requirement has valid relations to existing files, using standard format.
 
 #### Relations
-* refine: Requirements.md#Requirement with Valid Markdown Relations
+* derivedFrom: Requirements.md#Requirement with Valid Markdown Relations
 * satisfiedBy: DesignSpecifications/SampleDSD.md
 * verifiedBy: [Verification of Standard Relations](#Verification-of-Standard-Relations)
 

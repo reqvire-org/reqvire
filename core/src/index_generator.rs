@@ -2,7 +2,6 @@ use std::path::{PathBuf, Path};
 use std::collections::HashMap;
 use crate::graph_registry::GraphRegistry;
 use crate::element::Element;
-use crate::filesystem::write_file; 
 use crate::error::ReqvireError;
 use crate::git_commands;
 
@@ -70,26 +69,7 @@ pub fn generate_readme_index(
         total_files, total_sections, total_elements
     ));
 
-    // Determine where to write the index file
-    let git_root = git_commands::get_git_root_dir().unwrap_or_else(|_| PathBuf::from("."));
-    let current_dir = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
-    
-    // If running from a subdirectory, write index in current directory
-    // Otherwise, write to git root (original behavior)
-    let output_path = if current_dir.starts_with(&git_root) && current_dir != git_root {
-        current_dir.join("SpecificationIndex.md")
-    } else {
-        git_root.join("SpecificationIndex.md")
-    };
-    
-    // If writing fails, return an error immediately
-    if let Err(e) = write_file(&output_path, index_content.as_bytes()) {
-        return Err(e);
-    }
-
-    println!("✅ SpecificationIndex.md generated at: {}", output_path.display());
-
-    // Return the generated content only if writing was successful
+    // Return the generated content (file writing is handled by CLI)
     Ok(index_content)
 }
 

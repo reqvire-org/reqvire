@@ -10,40 +10,40 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  f0d721424636370e["Coexistence of Structured and Unstructured Documents"];
-  class f0d721424636370e requirement;
-  click f0d721424636370e "ManagingMbseModelsRequirements.md#coexistence-of-structured-and-unstructured-documents";
-  be83c2991e9535c7["Ignoring Unstructured Documents"];
-  class be83c2991e9535c7 requirement;
-  click be83c2991e9535c7 "SystemRequirements/Requirements.md#ignoring-unstructured-documents";
-  f0d721424636370e -.->|deriveReqT| be83c2991e9535c7;
-  649d72765b13e14f["Git Repository as Project Root"];
-  class 649d72765b13e14f requirement;
-  click 649d72765b13e14f "ManagingMbseModelsRequirements.md#git-repository-as-project-root";
   16b4b380c917deb1["Project Configuration with YAML"];
   class 16b4b380c917deb1 requirement;
   click 16b4b380c917deb1 "ManagingMbseModelsRequirements.md#project-configuration-with-yaml";
-  649d72765b13e14f -->|refinedBy| 16b4b380c917deb1;
-  c9cc6878a73bb951["Default Requirement Type Assignment"];
-  class c9cc6878a73bb951 requirement;
-  click c9cc6878a73bb951 "ManagingMbseModelsRequirements.md#default-requirement-type-assignment";
-  d193d11c43776bec["Efficient Processing"];
-  class d193d11c43776bec requirement;
-  click d193d11c43776bec "ManagingMbseModelsRequirements.md#efficient-processing";
-  7bdf935ec6d8effe["Subdirectory Processing Option"];
-  class 7bdf935ec6d8effe requirement;
-  click 7bdf935ec6d8effe "SystemRequirements/Requirements.md#subdirectory-processing-option";
-  16b4b380c917deb1 -.->|deriveReqT| 7bdf935ec6d8effe;
+  be83c2991e9535c7["Ignoring Unstructured Documents"];
+  class be83c2991e9535c7 requirement;
+  click be83c2991e9535c7 "SystemRequirements/Requirements.md#ignoring-unstructured-documents";
+  16b4b380c917deb1 -.->|deriveReqT| be83c2991e9535c7;
   d9354ef2eca0f2d0["Configurable User Requirements Root Folder"];
   class d9354ef2eca0f2d0 requirement;
   click d9354ef2eca0f2d0 "ManagingMbseModelsRequirements.md#configurable-user-requirements-root-folder";
   16b4b380c917deb1 -.->|deriveReqT| d9354ef2eca0f2d0;
-  16b4b380c917deb1 -.->|deriveReqT| be83c2991e9535c7;
-  d9354ef2eca0f2d0 -->|refinedBy| c9cc6878a73bb951;
+  7bdf935ec6d8effe["Subdirectory Processing Option"];
+  class 7bdf935ec6d8effe requirement;
+  click 7bdf935ec6d8effe "SystemRequirements/Requirements.md#subdirectory-processing-option";
+  16b4b380c917deb1 -.->|deriveReqT| 7bdf935ec6d8effe;
   a9d6e2569d5acd60["User Requirement Root Folders Support"];
   class a9d6e2569d5acd60 requirement;
   click a9d6e2569d5acd60 "SystemRequirements/Requirements.md#user-requirement-root-folders-support";
   d9354ef2eca0f2d0 -.->|deriveReqT| a9d6e2569d5acd60;
+  c9cc6878a73bb951["Default Requirement Type Assignment"];
+  class c9cc6878a73bb951 requirement;
+  click c9cc6878a73bb951 "ManagingMbseModelsRequirements.md#default-requirement-type-assignment";
+  d9354ef2eca0f2d0 -.->|deriveReqT| c9cc6878a73bb951;
+  649d72765b13e14f["Git Repository as Project Root"];
+  class 649d72765b13e14f requirement;
+  click 649d72765b13e14f "ManagingMbseModelsRequirements.md#git-repository-as-project-root";
+  649d72765b13e14f -.->|deriveReqT| 16b4b380c917deb1;
+  f0d721424636370e["Coexistence of Structured and Unstructured Documents"];
+  class f0d721424636370e requirement;
+  click f0d721424636370e "ManagingMbseModelsRequirements.md#coexistence-of-structured-and-unstructured-documents";
+  f0d721424636370e -.->|deriveReqT| be83c2991e9535c7;
+  d193d11c43776bec["Efficient Processing"];
+  class d193d11c43776bec requirement;
+  click d193d11c43776bec "ManagingMbseModelsRequirements.md#efficient-processing";
   e61b7c1baa89bfc6["Managing MBSE Models"];
   class e61b7c1baa89bfc6 requirement;
   click e61b7c1baa89bfc6 "UserStories.md#managing-mbse-models";
@@ -51,42 +51,34 @@ graph LR;
   class 2c5f30f14e792200 requirement;
   click 2c5f30f14e792200 "MOEs.md#moe_ua";
   e61b7c1baa89bfc6 -.->|trace| 2c5f30f14e792200;
-  e61b7c1baa89bfc6 -.->|deriveReqT| f0d721424636370e;
-  e61b7c1baa89bfc6 -.->|deriveReqT| 649d72765b13e14f;
-  f28849d46c19af44["CLI interface"];
-  class f28849d46c19af44 requirement;
-  click f28849d46c19af44 "UserRequirements.md#cli-interface";
-  e61b7c1baa89bfc6 -.->|deriveReqT| f28849d46c19af44;
   cd2d5dab49985ca2["AI-Assisted MBSE Model Management"];
   class cd2d5dab49985ca2 requirement;
   click cd2d5dab49985ca2 "UserStories.md#ai-assisted-mbse-model-management";
-  e61b7c1baa89bfc6 -->|refinedBy| cd2d5dab49985ca2;
+  e61b7c1baa89bfc6 -.->|deriveReqT| cd2d5dab49985ca2;
   c2b6c74b77726ad9["Generate Documentation Index"];
   class c2b6c74b77726ad9 requirement;
   click c2b6c74b77726ad9 "UserRequirements.md#generate-documentation-index";
   e61b7c1baa89bfc6 -.->|deriveReqT| c2b6c74b77726ad9;
-  e61b7c1baa89bfc6 -.->|deriveReqT| d193d11c43776bec;
-  e61b7c1baa89bfc6 -.->|deriveReqT| 16b4b380c917deb1;
+  f28849d46c19af44["CLI interface"];
+  class f28849d46c19af44 requirement;
+  click f28849d46c19af44 "UserRequirements.md#cli-interface";
+  e61b7c1baa89bfc6 -.->|deriveReqT| f28849d46c19af44;
   ade67c27bc5d3bbd["Structure and Addressing in Markdown Documents"];
   class ade67c27bc5d3bbd requirement;
   click ade67c27bc5d3bbd "SpecificationsRequirements.md#structure-and-addressing-in-markdown-documents";
   e61b7c1baa89bfc6 -.->|deriveReqT| ade67c27bc5d3bbd;
-  551906d5c51d91d9["Relation Types and behaviors"];
-  class 551906d5c51d91d9 requirement;
-  click 551906d5c51d91d9 "SpecificationsRequirements.md#relation-types-and-behaviors";
-  e61b7c1baa89bfc6 -.->|deriveReqT| 551906d5c51d91d9;
+  e61b7c1baa89bfc6 -.->|deriveReqT| 649d72765b13e14f;
+  e61b7c1baa89bfc6 -.->|deriveReqT| f0d721424636370e;
+  e61b7c1baa89bfc6 -.->|deriveReqT| d193d11c43776bec;
   80166c5161b33956["Promote Automation and Efficiency"];
   class 80166c5161b33956 requirement;
   click 80166c5161b33956 "MissionRequirements.md#promote-automation-and-efficiency";
+  80166c5161b33956 -.->|trace| 2c5f30f14e792200;
   80166c5161b33956 -.->|deriveReqT| d193d11c43776bec;
   98a581084d5542fa["Automate Diagram Generation"];
   class 98a581084d5542fa requirement;
   click 98a581084d5542fa "UserRequirements.md#automate-diagram-generation";
   80166c5161b33956 -.->|deriveReqT| 98a581084d5542fa;
-  15f2f511b2399406["Automate Pull Request Validations"];
-  class 15f2f511b2399406 requirement;
-  click 15f2f511b2399406 "UserRequirements.md#automate-pull-request-validations";
-  80166c5161b33956 -.->|deriveReqT| 15f2f511b2399406;
 ```
 ### Coexistence of Structured and Unstructured Documents
 
@@ -95,10 +87,8 @@ The system shall allow structured markdown and unstructured. (eg., markdown, PDF
 #### Metadata
   * type: user-requirement
 
-
 #### Relations
   * derivedFrom: [Managing MBSE Models](UserStories.md#managing-mbse-models)
-
 ---
 
 ### Efficient Processing
@@ -108,11 +98,9 @@ The system shall process structured documents and relations to extract model-rel
 #### Metadata
   * type: user-requirement
 
-
 #### Relations
   * derivedFrom: [Managing MBSE Models](UserStories.md#managing-mbse-models)
   * derivedFrom: [Promote Automation and Efficiency](MissionRequirements.md#promote-automation-and-efficiency)
-
 ---
 
 ### Git Repository as Project Root
@@ -120,16 +108,13 @@ The system shall process structured documents and relations to extract model-rel
 The system shall treat the **root directory of the Git repository as the project's base** for all file and folder references, streamlining configuration and promoting a self-contained project structure.
 
 #### Details
-
 All paths specified in the Reqvire configuration will be resolved relative to the Git repository root.
 
 #### Metadata
   * type: user-requirement
 
-
 #### Relations
   * derivedFrom: [Managing MBSE Models](UserStories.md#managing-mbse-models)
-
 ---
 
 ### Project Configuration with YAML
@@ -139,11 +124,8 @@ The system shall support a **YAML-based configuration file** that defines folder
 #### Metadata
   * type: user-requirement
 
-
 #### Relations
-  * derivedFrom: [Managing MBSE Models](UserStories.md#managing-mbse-models)
-  * refine: [Git Repository as Project Root](#git-repository-as-project-root)
-
+  * derivedFrom: [Git Repository as Project Root](#git-repository-as-project-root)
 ---
 
 ### Configurable User Requirements Root Folder
@@ -151,16 +133,13 @@ The system shall support a **YAML-based configuration file** that defines folder
 The system shall allow users to configure a specific **root folder within the Git repository**, designated exclusively for **user requirements**.
 
 #### Details
-
 This folder will be specified in the `reqvire.yaml` configuration.
 
 #### Metadata
   * type: user-requirement
 
-
 #### Relations
   * derivedFrom: [Project Configuration with YAML](#project-configuration-with-yaml)
-
 ---
 
 ### Default Requirement Type Assignment
@@ -172,8 +151,6 @@ The system shall automatically assign a **default type to requirements** if not 
 #### Metadata
   * type: user-requirement
 
-
 #### Relations
-  * refine: [Configurable User Requirements Root Folder](#configurable-user-requirements-root-folder)
-
+  * derivedFrom: [Configurable User Requirements Root Folder](#configurable-user-requirements-root-folder)
 ---

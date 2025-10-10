@@ -1,4 +1,8 @@
 #!/bin/bash
+set -euo pipefail
+
+# Create log file immediately to ensure it exists for runner
+echo "Starting test..." > "${TEST_DIR}/test_results.log"
 
 # Test: Traceability Matrix Generation
 # ----------------------------------------------------
@@ -12,16 +16,20 @@
 # Test 1: Generate markdown traceability matrix
 
 MATRIX_MD="${TEST_DIR}/output/matrix.md"
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" traces 2>&1)
+echo "Running: reqvire verifications matrix" >> "${TEST_DIR}/test_results.log"
+set +e
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" verifications matrix 2>&1)
 EXIT_CODE=$?
+set -e
 
-# Save all test outputs to log file
-printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 echo "$OUTPUT" > "$MATRIX_MD"
 
 # Verify exit code indicates success
 if [ $EXIT_CODE -ne 0 ]; then
   echo "❌ FAILED: Traceability matrix generation failed with exit code $EXIT_CODE"
+  echo "$OUTPUT"
   exit 1
 fi
 
@@ -77,18 +85,35 @@ if ! grep -q "| Requirement | Verified |" "$MATRIX_MD"; then
   exit 1
 fi
 
+# Test 1.1: Validate Verification Roll-up Strategy in Markdown
+# Root Requirement Alpha (all children verified → ✅)
+if ! grep "Root Requirement Alpha" "$MATRIX_MD" | grep -q "✅"; then
+  echo "❌ FAILED: Root Requirement Alpha should be verified (roll-up: all children verified)"
+  exit 1
+fi
+
+# Parent With Unverified Child (has direct verification BUT child unverified → ❌)
+if grep "Parent With Unverified Child" "$MATRIX_MD" | grep -q "✅"; then
+  echo "❌ FAILED: Parent With Unverified Child should be unverified (roll-up: not all children verified)"
+  exit 1
+fi
+
 
 # Test 2: Generate JSON traceability matrix
 MATRIX_JSON="${TEST_DIR}/output/matrix.json"
-JSON_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" traces --json 2>&1)
+echo "Running: reqvire verifications matrix --json" >> "${TEST_DIR}/test_results.log"
+set +e
+JSON_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" verifications matrix --json 2>&1)
 EXIT_CODE=$?
+set -e
 
-# Add JSON output to log
-printf "\n\nJSON OUTPUT:\n%s\n" "$JSON_OUTPUT" >> "${TEST_DIR}/test_results.log"
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$JSON_OUTPUT" >> "${TEST_DIR}/test_results.log"
 echo "$JSON_OUTPUT" > "$MATRIX_JSON"
 
 if [ $EXIT_CODE -ne 0 ]; then
   echo "❌ FAILED: JSON matrix generation failed with exit code $EXIT_CODE"
+  echo "$JSON_OUTPUT"
   exit 1
 fi
 
@@ -132,15 +157,19 @@ fi
 
 # Test 3: Generate SVG traceability matrix
 MATRIX_SVG="${TEST_DIR}/output/matrix.svg"
-SVG_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" traces --svg 2>&1)
+echo "Running: reqvire verifications matrix --svg" >> "${TEST_DIR}/test_results.log"
+set +e
+SVG_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" verifications matrix --svg 2>&1)
 EXIT_CODE=$?
+set -e
 
-# Add SVG output to log
-printf "\n\nSVG OUTPUT:\n%s\n" "$SVG_OUTPUT" >> "${TEST_DIR}/test_results.log"
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$SVG_OUTPUT" >> "${TEST_DIR}/test_results.log"
 echo "$SVG_OUTPUT" > "$MATRIX_SVG"
 
 if [ $EXIT_CODE -ne 0 ]; then
   echo "❌ FAILED: SVG matrix generation failed with exit code $EXIT_CODE"
+  echo "$SVG_OUTPUT"
   exit 1
 fi
 
@@ -156,17 +185,38 @@ if ! grep -q "<\(rect\|text\|g\)" "$MATRIX_SVG"; then
   exit 1
 fi
 
+# Test 3.1: Validate SVG output matches expected with verification roll-up strategy
+EXPECTED_SVG="${TEST_DIR}/expected.svg"
+
+if ! diff -q "$MATRIX_SVG" "$EXPECTED_SVG" > /dev/null 2>&1; then
+  echo "❌ FAILED: SVG output does not match expected output"
+  echo ""
+  echo "Differences:"
+  diff "$MATRIX_SVG" "$EXPECTED_SVG" || true
+  echo ""
+  echo "The SVG matrix should implement verification roll-up strategy:"
+  echo "- Parent With Unverified Child should be ❌ (has unverified child)"
+  echo "- Root Requirement Alpha should be ✅ (all children verified)"
+  echo "- Root Requirement Beta should be ✅ (all children verified)"
+  echo "- Unverified Requirement should be ❌ (no verification)"
+  exit 1
+fi
+
 
 
 # Test 4: Check for conflicts
-CONFLICT_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN"  --config "${TEST_DIR}/reqvire.yaml" traces --json --svg 2>&1)
+echo "Running: reqvire verifications matrix --json --svg" >> "${TEST_DIR}/test_results.log"
+set +e
+CONFLICT_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN"  --config "${TEST_DIR}/reqvire.yaml" verifications matrix --json --svg 2>&1)
 EXIT_CODE=$?
+set -e
 
-# Add conflict output to log
-printf "\n\nCONFLICT OUTPUT:\n%s\n" "$CONFLICT_OUTPUT" >> "${TEST_DIR}/test_results.log"
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$CONFLICT_OUTPUT" >> "${TEST_DIR}/test_results.log"
 
 if [ $EXIT_CODE -eq 0 ]; then
   echo "❌ FAILED: Conflict between --json and --svg flags was not detected"
+  echo "$CONFLICT_OUTPUT"
   exit 1
 fi
 

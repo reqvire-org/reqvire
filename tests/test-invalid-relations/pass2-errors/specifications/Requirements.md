@@ -33,7 +33,7 @@ This requirement has a relation to a non-existent element.
   * type: system-requirement
 
 #### Relations
-  * containedBy: [Valid User Requirement](#valid-user-requirement)
+  * derivedFrom: [Valid User Requirement](#valid-user-requirement)
   * satisfiedBy: [NonExistentElement.md#missing-element](NonExistentElement.md#missing-element)
 
 ---
@@ -46,7 +46,7 @@ This requirement has incompatible element in relation - satisfiedBy cannot point
   * type: system-requirement
 
 #### Relations
-  * containedBy: [Valid User Requirement](#valid-user-requirement)
+  * derivedFrom: [Valid User Requirement](#valid-user-requirement)
   * satisfiedBy: [Valid User Requirement](#valid-user-requirement)
 
 ---
@@ -59,7 +59,7 @@ This requirement has circular dependency.
   * type: system-requirement
 
 #### Relations
-  * containedBy: [Valid User Requirement](#valid-user-requirement)
+  * derivedFrom: [Valid User Requirement](#valid-user-requirement)
   * derivedFrom: [Requirement with Circular Dependencies C](#requirement-with-circular-dependencies-c)
 
 ---
@@ -72,7 +72,7 @@ This requirement has circular dependency.
   * type: system-requirement
 
 #### Relations
-  * containedBy: [Valid User Requirement](#valid-user-requirement)
+  * derivedFrom: [Valid User Requirement](#valid-user-requirement)
   * derivedFrom: [Requirement with Circular Dependencies A](#requirement-with-circular-dependencies-a)
 
 ---
@@ -85,7 +85,7 @@ This requirement has circular dependency.
   * type: system-requirement
 
 #### Relations
-  * containedBy: [Valid User Requirement](#valid-user-requirement)
+  * derivedFrom: [Valid User Requirement](#valid-user-requirement)
   * derivedFrom: [Requirement with Circular Dependencies B](#requirement-with-circular-dependencies-b)
 
 ---
@@ -111,7 +111,7 @@ This requirement has a verifiedBy relation pointing to a non-existing verificati
   * type: system-requirement
 
 #### Relations
-  * containedBy: [Valid User Requirement](#valid-user-requirement)
+  * derivedFrom: [Valid User Requirement](#valid-user-requirement)
   * verifiedBy: [NonExistentVerification.md#missing-verification](NonExistentVerification.md#missing-verification)
 
 ---
@@ -137,7 +137,7 @@ This requirement incorrectly uses satisfiedBy pointing to another requirement (s
   * type: system-requirement
 
 #### Relations
-  * containedBy: [Valid User Requirement](#valid-user-requirement)
+  * derivedFrom: [Valid User Requirement](#valid-user-requirement)
   * satisfiedBy: [Valid User Requirement](#valid-user-requirement)
 
 ---
@@ -163,7 +163,7 @@ This requirement has a satisfiedBy relation pointing to a non-existing file.
   * type: system-requirement
 
 #### Relations
-  * containedBy: [Valid User Requirement](#valid-user-requirement)
+  * derivedFrom: [Valid User Requirement](#valid-user-requirement)
   * satisfiedBy: [non-existing-implementation.py](non-existing-implementation.py)
 
 ---

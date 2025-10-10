@@ -1,0 +1,8 @@
+paths:
+  output_folder: "output"
+  excluded_filename_patterns:
+    - "**/expected_output.*"
+    - "**/actual_output.*"
+style:
+  theme: "default"
+  max_width: 1200

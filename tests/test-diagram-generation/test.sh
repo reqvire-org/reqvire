@@ -1,4 +1,8 @@
 #!/bin/bash
+set -euo pipefail
+
+# Create log file immediately to ensure it exists for runner
+echo "Starting test..." > "${TEST_DIR}/test_results.log"
 
 # Test: Diagram Generation Functionality
 # --------------------------------------
@@ -32,16 +36,19 @@ mkdir -p "$TEST_DIR/backup"
 cp -r "$TEST_DIR/specifications" "$TEST_DIR/backup/"
 
 # Run reqvire to generate diagrams (validation happens automatically)
+echo "Running: reqvire generate-diagrams" >> "${TEST_DIR}/test_results.log"
+set +e
 OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "$TEST_DIR/reqvire.yaml" generate-diagrams 2>&1)
 EXIT_CODE=$?
+set -e
 
-# Save output to log
-printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 
 # Check for basic success
 if [ $EXIT_CODE -ne 0 ]; then
   echo "❌ FAILED: Diagram generation command returned error: $EXIT_CODE"
-  cat "${TEST_DIR}/test_results.log"
+  echo "$OUTPUT"
   exit 1
 fi
 
@@ -152,21 +159,9 @@ if ! grep -q -- "-.->|trace|" "$TEST_DIR/specifications/Requirements.md"; then
   exit 1
 fi
 
-# Perform a specific check for relationships in diagrams and if rendered with right arrow
-if ! grep -q -- "-->|refinedBy|" "$TEST_DIR/specifications/Requirements.md"; then
-  echo "❌ FAILED: Missing relationships in Requirements.md diagram"
-  exit 1
-fi
-
-# Perform a specific check for relationships in diagrams and if rendered with right arrow
-if ! grep -q -- "--o|contains" "$TEST_DIR/specifications/Requirements.md"; then
-  echo "❌ FAILED: Missing relationships in Requirements.md diagram"
-  exit 1
-fi
-
-# Perform a specific check for relationships in diagrams and if rendered with right arrow
+# Perform a specific check for derive relationships in diagrams
 if ! grep -q -- "-.->|deriveReqT" "$TEST_DIR/specifications/Requirements.md"; then
-  echo "❌ FAILED: Missing relationships in Requirements.md diagram"
+  echo "❌ FAILED: Missing derive relationships in Requirements.md diagram"
   exit 1
 fi
 

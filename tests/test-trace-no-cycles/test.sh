@@ -15,10 +15,16 @@
 # - Tests requirements with trace relations forming cycles (Alpha->Beta->Gamma->Alpha)
 # - Verifies the fix for bug where trace relations incorrectly triggered circular dependency detection
 
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" model-summary --json 2>&1)
-EXIT_CODE=$?
+echo "Starting test..." > "${TEST_DIR}/test_results.log"
 
-printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
+echo "Running: reqvire model summary --json" >> "${TEST_DIR}/test_results.log"
+set +e
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" model summary --json 2>&1)
+EXIT_CODE=$?
+set -e
+
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 
 # Test should succeed - trace cycles should not cause validation failure
 if [ $EXIT_CODE -ne 0 ]; then

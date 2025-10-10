@@ -10,7 +10,7 @@ The notification system must be designed with reliability and fault tolerance in
 
 
 #### Relations
-  * refinedBy: [Reliability Requirements](#reliability-requirements)
+  * derive: [Reliability Requirements](#reliability-requirements)
   * derivedFrom: [User Preferences](../BasicRequirements.md#user-req-001-notification-preferences)  
 
 ---
@@ -23,7 +23,7 @@ The system should implement a reliable publishing mechanism for notifications.
 
 
 #### Relations
-  * refine: [NOTIF-ARCH-001 Reliable and Fault Tolerant Architecture](#notif-arch-001-reliable-and-fault-tolerant-architecture)
+  * derivedFrom: [NOTIF-ARCH-001 Reliable and Fault Tolerant Architecture](#notif-arch-001-reliable-and-fault-tolerant-architecture)
   * derivedFrom: [USER-REQ-002 Multi-channel Notifications](../BasicRequirements.md#user-req-002-multi-channel-notifications)
 
 ---
@@ -34,7 +34,7 @@ The system should implement efficient delivery of notifications to recipients.
 
 
 #### Relations
-  * refine: [NOTIF-ARCH-001 Reliable and Fault Tolerant Architecture](#notif-arch-001-reliable-and-fault-tolerant-architecture)
+  * derivedFrom: [NOTIF-ARCH-001 Reliable and Fault Tolerant Architecture](#notif-arch-001-reliable-and-fault-tolerant-architecture)
   * derivedFrom: [User Notification Grouping](../BasicRequirements.md#user-req-003-notification-grouping)
 
 ---
@@ -45,7 +45,7 @@ The system should store notifications for retrieval and audit purposes.
 
 #### Relations
   * trace: [NOTIF-IMPL-001 Notifications Publishing](#notif-impl-001-notifications-publishing)
-  * refine: [NOTIF-IMPL-002 Notifications Delivery](#notif-impl-002-notifications-delivery)
+  * derivedFrom: [NOTIF-IMPL-002 Notifications Delivery](#notif-impl-002-notifications-delivery)
   * derivedFrom: [Notification Interaction](../BasicRequirements.md#user-ux-001-notification-interaction)
 
 ---
@@ -56,4 +56,4 @@ The notification system must meet specific reliability requirements.
 
 
 #### Relations
-  * refine: [NOTIF-ARCH-001 Reliable and Fault Tolerant Architecture](#notif-arch-001-reliable-and-fault-tolerant-architecture)
+  * derivedFrom: [NOTIF-ARCH-001 Reliable and Fault Tolerant Architecture](#notif-arch-001-reliable-and-fault-tolerant-architecture)

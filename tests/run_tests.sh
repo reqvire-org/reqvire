@@ -5,7 +5,10 @@ set +e
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REQVIRE_BIN="${REQVIRE_BIN:-$(pwd)/target/debug/reqvire}"
 TMP_DIR="$(mktemp -d -t reqvire-e2e-XXXXXX)"
+LOG_DIR="/tmp/reqvire-test-logs"
 
+# Create persistent log directory
+mkdir -p "$LOG_DIR"
 
 # Cleanup on Exit
 cleanup() {
@@ -16,6 +19,7 @@ trap cleanup EXIT
 
 echo "🚀 Reqvire binary: $REQVIRE_BIN"
 echo "🗂 Temporary directory: $TMP_DIR"
+echo "📝 Test logs directory: $LOG_DIR"
 
 # Function to run a single test case
 run_test_case() {
@@ -41,15 +45,21 @@ run_test_case() {
     popd  > /dev/null 2>&1
     
     echo "🔹  Running test ${test_name}"
-    
-    TEST_DIR="$TEST_DIR" REQVIRE_BIN="$REQVIRE_BIN" bash "$test_folder/test.sh"    
+
+    # Save test output to persistent log file
+    local log_file="${LOG_DIR}/${test_name}.log"
+    TEST_DIR="$TEST_DIR" REQVIRE_BIN="$REQVIRE_BIN" bash "$test_folder/test.sh" > "$log_file" 2>&1
     local status=$?
-    
+
     if [ $status -eq 0 ]; then
         echo "✅ $test_name - PASSED"
     else
-        echo "❌ $test_name - FAILED" 
-        cat "${TEST_DIR}/test_results.log"
+        echo "❌ $test_name - FAILED"
+        echo "   Log file: $log_file"
+        echo ""
+        echo "   Last 30 lines of output:"
+        tail -30 "$log_file" | sed 's/^/   /'
+        echo ""
     fi
 
     return $status

@@ -10,45 +10,45 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  9314736a59776478["Traceability Format"];
-  class 9314736a59776478 requirement;
-  click 9314736a59776478 "CodeTraecabilityRequirements.md#traceability-format";
-  3db41d3530e56596["Validating Traceability Format"];
-  class 3db41d3530e56596 requirement;
-  click 3db41d3530e56596 "CodeTraecabilityRequirements.md#validating-traceability-format";
-  9314736a59776478 -->|refinedBy| 3db41d3530e56596;
   f4c09ad7359812ff["Comment Style by File Extension"];
   class f4c09ad7359812ff requirement;
   click f4c09ad7359812ff "CodeTraecabilityRequirements.md#comment-style-by-file-extension";
-  9314736a59776478 -->|refinedBy| f4c09ad7359812ff;
-  7fdde6a23819450b["BAT style comment"];
-  class 7fdde6a23819450b requirement;
-  click 7fdde6a23819450b "CodeTraecabilityRequirements.md#bat-style-comment";
-  a91fc474f292f1c9["CSS style comment"];
-  class a91fc474f292f1c9 requirement;
-  click a91fc474f292f1c9 "CodeTraecabilityRequirements.md#css-style-comment";
-  474c97b7d0029622["XML style comment"];
-  class 474c97b7d0029622 requirement;
-  click 474c97b7d0029622 "CodeTraecabilityRequirements.md#xml-style-comment";
-  39fc946195c12956["SQL style comment"];
-  class 39fc946195c12956 requirement;
-  click 39fc946195c12956 "CodeTraecabilityRequirements.md#sql-style-comment";
-  99c4cc438042d855["Slash style comment"];
-  class 99c4cc438042d855 requirement;
-  click 99c4cc438042d855 "CodeTraecabilityRequirements.md#slash-style-comment";
   be41c3d9e39abe6f["Dash style comment"];
   class be41c3d9e39abe6f requirement;
   click be41c3d9e39abe6f "CodeTraecabilityRequirements.md#dash-style-comment";
-  f4c09ad7359812ff --o|contains| 7fdde6a23819450b;
-  f4c09ad7359812ff --o|contains| a91fc474f292f1c9;
-  f4c09ad7359812ff --o|contains| 474c97b7d0029622;
-  f4c09ad7359812ff --o|contains| 39fc946195c12956;
-  f4c09ad7359812ff --o|contains| 99c4cc438042d855;
-  f4c09ad7359812ff --o|contains| be41c3d9e39abe6f;
+  f4c09ad7359812ff -.->|deriveReqT| be41c3d9e39abe6f;
+  a91fc474f292f1c9["CSS style comment"];
+  class a91fc474f292f1c9 requirement;
+  click a91fc474f292f1c9 "CodeTraecabilityRequirements.md#css-style-comment";
+  f4c09ad7359812ff -.->|deriveReqT| a91fc474f292f1c9;
+  7fdde6a23819450b["BAT style comment"];
+  class 7fdde6a23819450b requirement;
+  click 7fdde6a23819450b "CodeTraecabilityRequirements.md#bat-style-comment";
+  f4c09ad7359812ff -.->|deriveReqT| 7fdde6a23819450b;
+  39fc946195c12956["SQL style comment"];
+  class 39fc946195c12956 requirement;
+  click 39fc946195c12956 "CodeTraecabilityRequirements.md#sql-style-comment";
+  f4c09ad7359812ff -.->|deriveReqT| 39fc946195c12956;
+  474c97b7d0029622["XML style comment"];
+  class 474c97b7d0029622 requirement;
+  click 474c97b7d0029622 "CodeTraecabilityRequirements.md#xml-style-comment";
+  f4c09ad7359812ff -.->|deriveReqT| 474c97b7d0029622;
+  99c4cc438042d855["Slash style comment"];
+  class 99c4cc438042d855 requirement;
+  click 99c4cc438042d855 "CodeTraecabilityRequirements.md#slash-style-comment";
+  f4c09ad7359812ff -.->|deriveReqT| 99c4cc438042d855;
+  3db41d3530e56596["Validating Traceability Format"];
+  class 3db41d3530e56596 requirement;
+  click 3db41d3530e56596 "CodeTraecabilityRequirements.md#validating-traceability-format";
+  9314736a59776478["Traceability Format"];
+  class 9314736a59776478 requirement;
+  click 9314736a59776478 "CodeTraecabilityRequirements.md#traceability-format";
+  9314736a59776478 -.->|deriveReqT| f4c09ad7359812ff;
+  9314736a59776478 -.->|deriveReqT| 3db41d3530e56596;
   26ca72b617aff229["Code Traceability"];
   class 26ca72b617aff229 requirement;
   click 26ca72b617aff229 "UserRequirements.md#code-traceability";
-  26ca72b617aff229 -->|refinedBy| 9314736a59776478;
+  26ca72b617aff229 -.->|deriveReqT| 9314736a59776478;
 ```
 TODO:
  * this comes with config param to define code folder locations (special case as external foders but for the code) 
@@ -61,7 +61,6 @@ TODO:
 When parsing a source file for traceability, the system shall identify and extract all `[reqvire::...]` markers along with their associated requirement element identifiers.
 
 #### Details
-
 Syntax used for `[reqvire::...]` markers:
 
 ```
@@ -78,10 +77,8 @@ Where:
 #### Metadata
   * type: user-requirement
 
-
 #### Relations
-  * refine: [Code Traceability](UserRequirements.md#code-traceability)
-
+  * derivedFrom: [Code Traceability](UserRequirements.md#code-traceability)
 ---
 
 ### Validating Traceability Format
@@ -91,10 +88,8 @@ While processing traceability in code, the system shall ensure that each `[reqvi
 #### Metadata
   * type: user-requirement
 
-
 #### Relations
-  * refine: [Traceability Format](#traceability-format)
-
+  * derivedFrom: [Traceability Format](#traceability-format)
 ---
 
 ### Comment Style by File Extension
@@ -104,10 +99,8 @@ The system shall use different comment style based of file extension of the code
 #### Metadata
   * type: user-requirement
 
-
 #### Relations
-  * refine: [Traceability Format](#traceability-format)
-
+  * derivedFrom: [Traceability Format](#traceability-format)
 ---
 
 ### Slash style comment
@@ -115,7 +108,6 @@ The system shall use different comment style based of file extension of the code
 When a source file has a `.c`, `.cpp`, `.cs`, `.java`, `.js`, or `.ts` extension, the system shall use `//` for single-line comments.
 
 #### Details
-
 ```
 // [reqvire::satisfies: Req1] START
 void processSensorData() {
@@ -127,10 +119,8 @@ void processSensorData() {
 #### Metadata
   * type: user-requirement
 
-
 #### Relations
-  * containedBy: [Comment Style by File Extension](#comment-style-by-file-extension)
-
+  * derivedFrom: [Comment Style by File Extension](#comment-style-by-file-extension)
 ---
 
 ### Dash style comment
@@ -138,7 +128,6 @@ void processSensorData() {
 When a source file has a `.py`, `.sh`, `.rb`, or `.yml` extension, the system shall use `#` for single-line comments.
 
 #### Details
-
 ```
 # [reqvire::satisfies: Req1] START
 def process_sensor_data():
@@ -149,10 +138,8 @@ def process_sensor_data():
 #### Metadata
   * type: user-requirement
 
-
 #### Relations
-  * containedBy: [Comment Style by File Extension](#comment-style-by-file-extension)
-
+  * derivedFrom: [Comment Style by File Extension](#comment-style-by-file-extension)
 ---
 
 ### XML style comment
@@ -160,7 +147,6 @@ def process_sensor_data():
 When a source file has a `.html`, `.xml`, or `.xsl` extension, the system shall use `<!-- -->` for comments.
 
 #### Details
-
 ```
 <!-- [reqvire::satisfies: Req1] START -->
 <div> UI Component </div>
@@ -171,10 +157,8 @@ When a source file has a `.html`, `.xml`, or `.xsl` extension, the system shall 
 #### Metadata
   * type: user-requirement
 
-
 #### Relations
-  * containedBy: [Comment Style by File Extension](#comment-style-by-file-extension)
-
+  * derivedFrom: [Comment Style by File Extension](#comment-style-by-file-extension)
 ---
 
 ### CSS style comment
@@ -182,7 +166,6 @@ When a source file has a `.html`, `.xml`, or `.xsl` extension, the system shall 
 When a source file has a `.css` or `.scss` extension, the system shall use `/* */` for comments.
 
 #### Details
-
 ```
 /* [reqvire::satisfies: Req1] START */
 .button { background-color: blue; }
@@ -192,10 +175,8 @@ When a source file has a `.css` or `.scss` extension, the system shall use `/* *
 #### Metadata
   * type: user-requirement
 
-
 #### Relations
-  * containedBy: [Comment Style by File Extension](#comment-style-by-file-extension)
-
+  * derivedFrom: [Comment Style by File Extension](#comment-style-by-file-extension)
 ---
 
 ### SQL style comment
@@ -211,10 +192,8 @@ SELECT * FROM users;
 #### Metadata
   * type: user-requirement
 
-
 #### Relations
-  * containedBy: [Comment Style by File Extension](#comment-style-by-file-extension)
-
+  * derivedFrom: [Comment Style by File Extension](#comment-style-by-file-extension)
 ---
 
 ### BAT style comment
@@ -222,7 +201,6 @@ SELECT * FROM users;
 When a source file has a `.bat` or `.cmd` extension, the system shall use `REM` for comments.
 
 #### Details
-
 ```
 REM [reqvire::satisfies: Req1] START
 
@@ -235,8 +213,6 @@ REM [reqvire::satisfies: Req1] END
 #### Metadata
   * type: user-requirement
 
-
 #### Relations
-  * containedBy: [Comment Style by File Extension](#comment-style-by-file-extension)
-
+  * derivedFrom: [Comment Style by File Extension](#comment-style-by-file-extension)
 ---

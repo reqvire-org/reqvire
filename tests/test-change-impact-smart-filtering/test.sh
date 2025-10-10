@@ -1,4 +1,8 @@
 #!/bin/bash
+set -euo pipefail
+
+# Create log file immediately to ensure it exists for runner
+echo "Starting test..." > "${TEST_DIR}/test_results.log"
 
 # Test: Change Impact Smart Filtering
 # --------------------------------------
@@ -50,18 +54,21 @@ This is a new verification that should appear separately.
 ---
 EOF
 
+echo "Running: reqvire change-impact" >> "${TEST_DIR}/test_results.log"
+set +e
 OUTPUT=$(cd "${TEST_DIR}" && "${REQVIRE_BIN}" --config "${TEST_DIR}/reqvire.yaml" change-impact 2>&1)
 EXIT_CODE=$?
+set -e
 
-printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 
-# Write output to log file for debugging in temporary directory 
+# Write output to log file for debugging in temporary directory
 printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results_default.log"
 
 # Check exit code
 if [ $EXIT_CODE -ne 0 ]; then
     echo "❌ FAILED: Change impact detection failed with exit code $EXIT_CODE"
-    echo "Output:"
     echo "$OUTPUT"
     rm -rf "${TEST_DIR}"
     exit 1
@@ -106,11 +113,18 @@ fi
 
 
 # Test 2: Verify JSON output also applies smart filtering
+echo "Running: reqvire change-impact --json" >> "${TEST_DIR}/test_results.log"
+set +e
 OUTPUT_JSON=$(cd "${TEST_DIR}" && "${REQVIRE_BIN}" --config "${TEST_DIR}/reqvire.yaml" change-impact --json 2>&1)
 EXIT_CODE=$?
+set -e
+
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$OUTPUT_JSON" >> "${TEST_DIR}/test_results.log"
 
 if [ $EXIT_CODE -ne 0 ]; then
     echo "❌ FAILED: Change impact JSON detection failed with exit code $EXIT_CODE"
+    echo "$OUTPUT_JSON"
     rm -rf "${TEST_DIR}"
     exit 1
 fi

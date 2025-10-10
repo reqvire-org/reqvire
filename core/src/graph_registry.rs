@@ -788,7 +788,7 @@ impl GraphRegistry {
     /// Gets requirements grouped by root folder
     pub fn get_requirements_by_root(&self) -> BTreeMap<String, Vec<&Element>> {
         let mut requirements_by_root = BTreeMap::new();
-        let parent_relation_types = ["containedBy", "derivedFrom", "refine", "satisfy", "verify"];
+        let parent_relation_types = ["containedBy", "derivedFrom", "satisfy", "verify"];
 
         let all_elements = self.get_all_elements();
 
@@ -1625,7 +1625,7 @@ mod tests {
         let mut a = make_element("A", "Element A");
         let b = make_element("B", "Element B");
 
-        add_relation(&mut a, "contain", "B");
+        add_relation(&mut a, "derive", "B");
 
         registry.register_element(a.clone(), "file.md").unwrap();
         registry.register_element(b.clone(), "file.md").unwrap();
@@ -1635,7 +1635,7 @@ mod tests {
 
         let a_node = graph.nodes.get("A").unwrap();
         assert_eq!(a_node.relations.len(), 1);
-        assert_eq!(a_node.relations[0].relation_trigger, "contain");
+        assert_eq!(a_node.relations[0].relation_trigger, "derive");
         assert_eq!(a_node.relations[0].element_node.element.identifier, "B");
     }
 
@@ -1645,7 +1645,7 @@ mod tests {
         let mut a = make_element("A", "Element A");
         let b = make_element("B", "Element B");
 
-        add_relation(&mut a, "contain", "B");
+        add_relation(&mut a, "derive", "B");
 
         registry.register_element(a.clone(), "file.md").unwrap();
         registry.register_element(b.clone(), "file.md").unwrap();
@@ -1658,7 +1658,7 @@ mod tests {
         assert!(graph.nodes.get("B").is_none());
         assert!(graph.nodes.get("B_NEW").is_some());
 
-        // A’s relation should now point to B_NEW
+        // A's relation should now point to B_NEW
         let a_node = graph.nodes.get("A").unwrap();
         assert_eq!(a_node.relations.len(), 1);
         assert_eq!(a_node.relations[0].element_node.element.identifier, "B_NEW");
@@ -1671,7 +1671,7 @@ mod tests {
         let mut b = make_element("B", "Element B");
         let c = make_element("C", "Element C");
 
-        add_relation(&mut a, "contain", "B");
+        add_relation(&mut a, "derive", "B");
         add_relation(&mut b, "derive", "C");
 
         registry.register_element(a.clone(), "file.md").unwrap();
@@ -1698,7 +1698,7 @@ mod tests {
         let mut b = make_element("B", "Element B");
 
         // A -> B and B -> A (cycle)
-        add_relation(&mut a, "contain", "B");
+        add_relation(&mut a, "derive", "B");
         add_relation(&mut b, "derive", "A");
 
         registry.register_element(a.clone(), "file.md").unwrap();
@@ -1729,7 +1729,7 @@ mod tests {
         b.file_path = "file2.md".to_string();
         b.section = "Section2".to_string();
 
-        add_relation(&mut a, "contain", "B");
+        add_relation(&mut a, "derivedFrom", "B");
 
         registry.register_element(a.clone(), "file1.md").unwrap();
         registry.register_element(b.clone(), "file2.md").unwrap();
@@ -1798,7 +1798,7 @@ mod tests {
 
         // B and C both reference A
         add_relation(&mut b, "derive", "A");
-        add_relation(&mut c, "contain", "A");
+        add_relation(&mut c, "derivedFrom", "A");
 
         registry.register_element(a.clone(), "file.md").unwrap();
         registry.register_element(b.clone(), "file.md").unwrap();
@@ -1906,7 +1906,7 @@ mod tests {
         c.section = "Section2".to_string();
 
         // Create relations: B -> A, C -> A
-        add_relation(&mut b, "contain", "A");
+        add_relation(&mut b, "derive", "A");
         add_relation(&mut c, "derive", "A");
 
         registry.register_element(a.clone(), "file1.md").unwrap();
@@ -1921,7 +1921,7 @@ mod tests {
         let c_relations = graph.list_relations("C").unwrap();
         assert_eq!(b_relations.len(), 1);
         assert_eq!(c_relations.len(), 1);
-        assert_eq!(b_relations[0], ("contain".to_string(), "A".to_string()));
+        assert_eq!(b_relations[0], ("derive".to_string(), "A".to_string()));
         assert_eq!(c_relations[0], ("derive".to_string(), "A".to_string()));
 
         // Move A to a new file - this should update its identifier
@@ -1966,7 +1966,7 @@ mod tests {
         b.section = "Section1".to_string();
 
         // B has a relation pointing to A
-        add_relation(&mut b, "contain", "A");
+        add_relation(&mut b, "derivedFrom", "A");
 
         registry.register_element(a.clone(), "file1.md").unwrap();
         registry.register_element(b.clone(), "file1.md").unwrap();
@@ -2020,7 +2020,7 @@ mod tests {
         c.section = "Section1".to_string();
 
         // A has relations to both B (cross-file) and C (same-file)
-        add_relation(&mut a, "contain", "B");
+        add_relation(&mut a, "derivedFrom", "B");
         add_relation(&mut a, "derive", "C");
 
         registry.register_element(a.clone(), "file1.md").unwrap();
@@ -2097,9 +2097,9 @@ mod tests {
         // A -> B (file1.md -> file2.md)
         // B -> A (file2.md -> file1.md)
         // A -> C (file1.md -> file1.md, same file)
-        add_relation(&mut a, "contain", "ElementB");
+        add_relation(&mut a, "derivedFrom", "ElementB");
         add_relation(&mut a, "derive", "ElementC");
-        add_relation(&mut b, "refinedBy", "ElementA");
+        add_relation(&mut b, "derivedFrom", "ElementA");
 
         registry.register_element(a.clone(), "file1.md").unwrap();
         registry.register_element(b.clone(), "file2.md").unwrap();

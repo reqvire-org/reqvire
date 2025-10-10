@@ -685,7 +685,7 @@ pub fn compute_change_impact(
 mod tests {
     use super::*;
     use crate::element::Element;
-    use crate::relation::{RelationTypeInfo, Relation, RelationTarget, ArrowDirection};
+    use crate::relation::{RelationTypeInfo, Relation, RelationTarget};
     use crate::GraphRegistry;
    
     /// Helper function to create a simple element.
@@ -727,7 +727,6 @@ mod tests {
                 description: "Element B derives from A",
                 arrow: "-->",
                 label: "label",
-                arrow_direction: ArrowDirection::ElementToTarget,
             },
             "A",
         );
@@ -759,12 +758,11 @@ mod tests {
         add_relation(
             &mut element_a,
             &RelationTypeInfo {
-                name: "contain",
+                name: "derive",
                 opposite: Some("containedBy"),
                 description: "Element A contains B",
                 arrow: "-->",
                 label: "label",
-                arrow_direction: ArrowDirection::ElementToTarget,
             },
             "B",
         );
@@ -776,7 +774,6 @@ mod tests {
                 description: "Element B derives from A",
                 arrow: "-->",
                 label: "label",
-                arrow_direction: ArrowDirection::ElementToTarget,
             },
             "A",
         );
@@ -798,7 +795,7 @@ mod tests {
             tree.relations[0].element_node.element.identifier,
             "B"
         );
-        assert_eq!(tree.relations[0].relation_trigger, "contain");
+        assert_eq!(tree.relations[0].relation_trigger, "derive");
        
         // The child node for B has no relations in its tree because B -> A is not processed by the tree
         // since we only consider Forward relations in change_impact_with_relation
@@ -828,7 +825,6 @@ mod tests {
                 description: "Parent derives child",
                 arrow: "-->",
                 label: "derive",
-                arrow_direction: ArrowDirection::ElementToTarget,
             },
             target: RelationTarget {
                 text: "Child Requirement".to_string(),
@@ -843,7 +839,6 @@ mod tests {
                 description: "Verified by test",
                 arrow: "-->",
                 label: "verifiedBy",
-                arrow_direction: ArrowDirection::ElementToTarget,
             },
             target: RelationTarget {
                 text: "Parent Verification".to_string(),
@@ -861,7 +856,6 @@ mod tests {
                 description: "Child derived from parent",
                 arrow: "<--",
                 label: "derivedFrom",
-                arrow_direction: ArrowDirection::TargetToElement,
             },
             target: RelationTarget {
                 text: "Parent Requirement".to_string(),
@@ -886,7 +880,6 @@ mod tests {
                 description: "Verifies requirement",
                 arrow: "<--",
                 label: "verify",
-                arrow_direction: ArrowDirection::TargetToElement,
             },
             target: RelationTarget {
                 text: "Parent Requirement".to_string(),
@@ -930,7 +923,6 @@ mod tests {
                 description: "Verified by test",
                 arrow: "-->",
                 label: "verifiedBy",
-                arrow_direction: ArrowDirection::ElementToTarget,
             },
             target: RelationTarget {
                 text: "New Verification".to_string(),
@@ -955,7 +947,6 @@ mod tests {
                 description: "Verifies requirement",
                 arrow: "<--",
                 label: "verify",
-                arrow_direction: ArrowDirection::TargetToElement,
             },
             target: RelationTarget {
                 text: "New Requirement".to_string(),

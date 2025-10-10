@@ -146,12 +146,8 @@ From document at `/project/docs/spec.md`:
 
 | Relation Type | Direction | Opposite | Change Propagation | Description |
 |--------------|-----------|----------|-------------------|-------------|
-| **contain** | Forward | containedBy | Parent → Child | Parent contains child elements |
-| **containedBy** | Backward | contain | Parent → Child | Child is contained by parent |
 | **derive** | Forward | derivedFrom | Parent → Child | Parent derives child elements |
 | **derivedFrom** | Backward | derive | Parent → Child | Child derived from parent |
-| **refine** | Forward | refinedBy | Parent → Child | Refines with more detail |
-| **refinedBy** | Backward | refine | Parent → Child | Is refined by child |
 | **satisfy** | Backward | satisfiedBy | Req → Implementation | Implementation satisfies requirement |
 | **satisfiedBy** | Forward | satisfy | Req → Implementation | Requirement satisfied by implementation |
 | **verify** | Backward | verifiedBy | Req → Verification | Verification verifies requirement |
@@ -161,9 +157,7 @@ From document at `/project/docs/spec.md`:
 ### Relation Categories
 
 1. **Hierarchical Relations** (Parent-Child):
-   - contain/containedBy
    - derive/derivedFrom
-   - refine/refinedBy
 
 2. **Satisfaction Relations**:
    - satisfy/satisfiedBy
@@ -173,6 +167,35 @@ From document at `/project/docs/spec.md`:
 
 4. **Traceability Relations**:
    - trace (no propagation)
+
+### Containment Through File Structure
+
+**Important**: Containment relationships in Reqvire are managed through file structure and section organization, NOT through explicit relations.
+
+#### How Containment Works:
+- **File-Level Containment**: Requirements in the same file are naturally grouped together
+- **Section-Level Containment**: Elements under a section header (`##`) are contained by that section
+- **Folder-Level Containment**: Files in the same directory share a logical grouping
+
+#### Best Practices:
+- Use **sections** (`##`) to group related requirements within a file
+- Use **folders** to organize related specification documents
+- Use **derivedFrom** relations to show hierarchical refinement between requirements
+
+#### Example Structure:
+```
+specifications/
+  ├── SystemRequirements/
+  │   ├── Requirements.md          # Contains all system requirements
+  │   │   ## Authentication        # Section groups auth requirements
+  │   │   ### Password Auth        # Element in auth section
+  │   │   ### OAuth Auth           # Element in auth section
+  │   │   ## Security             # Section groups security requirements
+  │   │   ### Encryption           # Element in security section
+  │   └── PerformanceRequirements.md
+  └── Verifications/
+      └── Tests.md
+```
 
 ## Change Propagation Rules
 
@@ -200,22 +223,31 @@ From document at `/project/docs/spec.md`:
 reqvire validate [--json]
 
 # Generate model summary with filters
-reqvire model-summary [filters] [--json]
+reqvire model summary [filters] [--json]
 
 # Generate sections summary (files/sections only, no elements)
-reqvire sections-summary [filters] [--json]
+reqvire model section-summary [filters] [--json]
+
+# Generate index document
+reqvire model index
 
 # Analyze change impact
 reqvire change-impact --git-commit=<commit> [--json]
 
 # Generate traceability matrix
-reqvire traces [--json]
+reqvire verifications matrix [--json]
 
-# Lint specifications
-reqvire lint [--dry-run]
+# Generate verification traces
+reqvire verifications traces [--json] [--filter-id=<id>] [--filter-name=<regex>] [--filter-type=<type>]
+
+# Generate verification coverage report
+reqvire verifications coverage [--json]
+
+# Format specifications
+reqvire format [--dry-run] [--json]
 
 # Generate HTML documentation
-reqvire html
+reqvire html --output <dir>
 
 # Generate diagrams
 reqvire generate-diagrams
@@ -238,23 +270,26 @@ reqvire generate-diagrams
 reqvire validate --json > /tmp/validation.json
 
 # Filtered model summary
-reqvire model-summary --filter-type="requirement" --filter-is-not-verified --json
+reqvire model summary --filter-type="requirement" --filter-is-not-verified --json
 
 # Sections overview (without individual elements)
-reqvire sections-summary --filter-file="specifications/*.md" --json
+reqvire model section-summary --filter-file="specifications/*.md" --json
 
 # Change impact analysis
 reqvire change-impact --git-commit=HEAD~1 --json > /tmp/impact.json
+
+# Generate index and save to file
+reqvire model index > index.md
 ```
 
 ## Your Workflow
 
 ### 1. Discovery Phase:
-- Use `reqvire sections-summary --filter-content="security|authentication|authorization"` to understand security requirements in each section
-- Use `reqvire sections-summary --filter-content="performance|latency|throughput"` to identify performance-related requirements
-- Use `reqvire sections-summary --filter-content="validation|verify|test"` to find verification and testing requirements
-- Use `reqvire sections-summary --filter-content="interface|API|integration"` to locate interface requirements
-- Run `reqvire model-summary` to understand current state
+- Use `reqvire model section-summary --filter-content="security|authentication|authorization"` to understand security requirements in each section
+- Use `reqvire model section-summary --filter-content="performance|latency|throughput"` to identify performance-related requirements
+- Use `reqvire model section-summary --filter-content="validation|verify|test"` to find verification and testing requirements
+- Use `reqvire model section-summary --filter-content="interface|API|integration"` to locate interface requirements
+- Run `reqvire model summary` to understand current state
 - Use `reqvire validate --json > /tmp/validation.json` to identify issues
 - Apply filters to focus on specific areas
 
@@ -280,7 +315,7 @@ reqvire change-impact --git-commit=HEAD~1 --json > /tmp/impact.json
 ## Best Practices
 
 ### Strategic Content Analysis:
-- Use `sections-summary --filter-content` to understand requirement themes in each section before detailed work
+- Use `model section-summary --filter-content` to understand requirement themes in each section before detailed work
 - Filter by domain keywords (security, performance, interface) to map requirement distribution
 - Identify sections with specific requirement types to target your analysis effectively
 
@@ -316,8 +351,9 @@ reqvire change-impact --git-commit=HEAD~1 --json > /tmp/impact.json
 ### Adding New Requirements and Features:
 - **Start with user stories** and derive system requirements following the hierarchy
 - **Determine proper placement** in existing document structure or create new sections
+- **Establish containment** through file structure, sections, and folders - group related requirements in the same file under appropriate sections
 - **Follow naming conventions** and ensure uniqueness within files
-- **Establish proper relations** (deriveFrom, refine, contain) to parent requirements
+- **Establish proper relations** (deriveFrom) to parent requirements
 - **Add verification requirements** to ensure new functionality is testable
 - **Consider implementation impact** and add satisfiedBy relations to design elements
 - **Review existing patterns** to maintain consistency with current specifications
@@ -330,7 +366,7 @@ reqvire change-impact --git-commit=HEAD~1 --json > /tmp/impact.json
 2. Create user requirement with clear purpose and scope
 3. Derive system requirements that satisfy the user requirement
 4. Add verification requirements to ensure testability
-5. Establish proper traceability relations (deriveFrom, refine, verifiedBy)
+5. Establish proper traceability relations (deriveFrom, verifiedBy)
 6. Add implementation relations (satisfiedBy) to design/code elements
 7. Validate with `reqvire validate` and resolve any issues
 8. Review overall impact and update related documentation

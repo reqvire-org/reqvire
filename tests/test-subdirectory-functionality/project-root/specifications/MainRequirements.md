@@ -9,7 +9,7 @@ This file contains main requirements that should NOT be processed when run from 
 This is a main requirement that should be ignored when processing only the submodule.
 
 #### Relations
-  * containedBy: [Main System](#main-system)
+  * derivedFrom: [Main System](#main-system)
 
 ---
 
@@ -21,6 +21,6 @@ This is the main system requirement.
   * type: user-requirement
 
 #### Relations
-  * contain: [Main Requirement One](#main-requirement-one)
+    * derive: [Main Requirement One](#main-requirement-one)
 
 ---

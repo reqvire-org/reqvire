@@ -1,4 +1,8 @@
 #!/bin/bash
+set -euo pipefail
+
+# Create log file immediately to ensure it exists for runner
+echo "Starting test..." > "${TEST_DIR}/test_results.log"
 
 # Test: Excluded Patterns Functionality
 # ------------------------------------------------------------
@@ -13,12 +17,14 @@
 # - Only the file itself should be in the registry for relation validation
 
 
-OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary 2>&1)
+echo "Running: reqvire model-summary" >> "${TEST_DIR}/test_results.log"
+set +e
+OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model summary 2>&1)
 EXIT_CODE=$?
+set -e
 
-
-
-printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 
 if [[ $EXIT_CODE -ne 0 ]]; then
     exit $EXIT_CODE
@@ -32,7 +38,10 @@ if echo "$OUTPUT" | grep -q "Missing relation target"; then
 fi
 
 # There should also be no elements from excluded files in the registry
-OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model-summary 2>&1 | grep -n 'Element:')
+echo "Running: reqvire model summary (2nd check)" >> "${TEST_DIR}/test_results.log"
+set +e
+OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model summary 2>&1 | grep -n 'Element:')
+set -e
 
 if echo "$OUTPUT" | grep -q "DesignSpecifications"; then
   echo "FAILED: Elements from excluded files are being processed"

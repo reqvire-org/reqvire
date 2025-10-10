@@ -68,6 +68,10 @@ pub enum ReqvireError {
     #[error("Incompatible element types for relation: {0}")]
     IncompatibleElementTypes(String),
 
+    #[allow(dead_code)]
+    #[error("Mixed hierarchical relations in chain: {0}")]
+    MixedHierarchicalRelations(String),
+
     #[error("Path error: {0}")]
     PathError(String),
     

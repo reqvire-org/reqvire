@@ -1,4 +1,8 @@
 #!/bin/bash
+set -euo pipefail
+
+# Create log file immediately to ensure it exists for runner
+echo "Starting test..." > "${TEST_DIR}/test_results.log"
 
 # Test: Subdirectory Auto-Detection Functionality
 # ----------------------------------------------------
@@ -30,9 +34,14 @@ git add . > /dev/null 2>&1
 git commit -m "Initial test structure" > /dev/null 2>&1
 
 # Test 1: Model summary should fail with parent directory references
-OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" model-summary 2>&1)
+echo "Running: reqvire model summary (from submodule, should fail)" >> "${TEST_DIR}/test_results.log"
+set +e
+OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" model summary 2>&1)
 EXIT_CODE=$?
+set -e
 
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results_validate.log"
 
 if [ $EXIT_CODE -eq 0 ]; then
@@ -53,14 +62,18 @@ fi
 sed -i 's|derivedFrom: \[.*specifications/MainRequirements.md.*\].*|derivedFrom: [Submodule System](#submodule-system)|' "${TMP_DIR}/project-root/submodule/specifications/SubmoduleRequirements.md"
 
 # Test 2: HTML export from submodule directory
+echo "Running: reqvire html --output subdirectory-html" >> "${TEST_DIR}/test_results.log"
+set +e
 OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" html --output subdirectory-html 2>&1)
 EXIT_CODE=$?
+set -e
 
-printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 
 if [ $EXIT_CODE -ne 0 ]; then
   echo "❌ FAILED: HTML export from submodule directory failed with exit code $EXIT_CODE"
-  echo "Output: $OUTPUT"
+  echo "$OUTPUT"
   exit 1
 fi
 
@@ -76,38 +89,50 @@ if [ ! -f "${TMP_DIR}/project-root/submodule/subdirectory-html/specifications/Su
 fi
 
 # Test 3: Format from submodule directory
+echo "Running: reqvire format --dry-run" >> "${TEST_DIR}/test_results.log"
+set +e
 OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" format --dry-run 2>&1)
 EXIT_CODE=$?
+set -e
 
-printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 
 if [ $EXIT_CODE -ne 0 ]; then
   echo "❌ FAILED: Format from submodule directory failed with exit code $EXIT_CODE"
-  echo "Output: $OUTPUT"
+  echo "$OUTPUT"
   exit 1
 fi
 
 # Test 4: Traces from submodule directory
-OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" traces 2>&1)
+echo "Running: reqvire verifications traces" >> "${TEST_DIR}/test_results.log"
+set +e
+OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" verifications traces 2>&1)
 EXIT_CODE=$?
+set -e
 
-printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 
 if [ $EXIT_CODE -ne 0 ]; then
   echo "❌ FAILED: Traces from submodule directory failed with exit code $EXIT_CODE"
-  echo "Output: $OUTPUT"
+  echo "$OUTPUT"
   exit 1
 fi
 
 # Test 5: Generate diagrams from submodule directory
+echo "Running: reqvire generate-diagrams" >> "${TEST_DIR}/test_results.log"
+set +e
 OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" generate-diagrams 2>&1)
 EXIT_CODE=$?
+set -e
 
-printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 
 if [ $EXIT_CODE -ne 0 ]; then
   echo "❌ FAILED: Generate diagrams from submodule directory failed with exit code $EXIT_CODE"
-  echo "Output: $OUTPUT"
+  echo "$OUTPUT"
   exit 1
 fi
 
@@ -120,19 +145,26 @@ if echo "$OUTPUT" | grep -q "specifications/MainRequirements.md"; then
 fi
 
 # Test 6: Generate index from submodule directory
-OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" generate-index 2>&1)
+echo "Running: reqvire model index > SpecificationIndex.md" >> "${TEST_DIR}/test_results.log"
+set +e
+OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" model index 2>&1)
 EXIT_CODE=$?
+set -e
 
-printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 
 if [ $EXIT_CODE -ne 0 ]; then
   echo "❌ FAILED: Generate index from submodule directory failed with exit code $EXIT_CODE"
-  echo "Output: $OUTPUT"
+  echo "$OUTPUT"
   exit 1
 fi
 
+# Save output to file in submodule directory
+echo "$OUTPUT" > "${TMP_DIR}/project-root/submodule/SpecificationIndex.md"
+
 # Check that index generation only processed submodule files
-# The generate-index command should only process files in the current subdirectory
+# The model index command should only process files in the current subdirectory
 if echo "$OUTPUT" | grep -q "specifications/MainRequirements.md"; then
   echo "❌ FAILED: Generate index processed main requirements when it should only process submodule"
   echo "Output: $OUTPUT"

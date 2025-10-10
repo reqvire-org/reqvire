@@ -25,14 +25,14 @@ graph TD;
 First system requirement.
 
 #### Relations
-  * refine: [UserRequirements.md#ui-element-1](UserRequirements.md#ui-element-1)
+  * derivedFrom: [UserRequirements.md#ui-element-1](UserRequirements.md#ui-element-1)
 
 ### System Element 2
 
 Second system requirement.
 
 #### Relations
-  * refine: [UserRequirements.md#ui-element-2](UserRequirements.md#ui-element-2)
+  * derivedFrom: [UserRequirements.md#ui-element-2](UserRequirements.md#ui-element-2)
 
 ## Security Requirements
 ```mermaid

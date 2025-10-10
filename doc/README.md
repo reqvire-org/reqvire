@@ -5,14 +5,12 @@ Welcome to the **Reqvire** documentation! This folder contains all the informati
 ## Table of Contents
 
 - [About](./About.md)
-  - [Requirements](./Requirements.md)
-  - [Verifications](./Verifications.md)    
 - Reqvire Tool Documentation  
   - [Specifications](../specifications/README.md)
   - [User Guide](./user_guide.md)
     - [Commands and Configuration](./user_guide.md#basic-commands)
     - [Working with Requirements](./user_guide.md#working-with-requirements)
-    - [Validation and Linting](./user_guide.md#validation)
+    - [Validation and Formating](./user_guide.md#validation)
     - [Traceability](./user_guide.md#traceability)
     - [GitHub Integration](./user_guide.md#github-integration)
 - [Contributing](./CONTRIBUTING.md)

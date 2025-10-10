@@ -33,7 +33,6 @@ graph LR;
 This test verifies that trace relations do not trigger circular dependency errors even when they form cycles, confirming that trace relations are correctly excluded from dependency cycle detection.
 
 #### Details
-
 The test creates a model with trace relations forming cycles (Alpha→Beta→Gamma→Alpha) and verifies that:
 - Validation succeeds without circular dependency errors
 - The model is processed correctly with all requirements recognized
@@ -54,9 +53,7 @@ The test creates a model with trace relations forming cycles (Alpha→Beta→Gam
 #### Metadata
   * type: test-verification
 
-
 #### Relations
   * verify: [Trace Relation Non-Directional Behavior](../SystemRequirements/Requirements.md#trace-relation-non-directional-behavior)
   * satisfiedBy: [test.sh](../../tests/test-trace-no-cycles/test.sh)
-
 ---

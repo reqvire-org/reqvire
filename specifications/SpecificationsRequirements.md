@@ -10,6 +10,32 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
+  2054606d7574a553["Requirements Change Propagation"];
+  class 2054606d7574a553 requirement;
+  click 2054606d7574a553 "SpecificationsRequirements.md#requirements-change-propagation";
+  4ba519ed09b81863["Change Impact Visualization"];
+  class 4ba519ed09b81863 requirement;
+  click 4ba519ed09b81863 "SystemRequirements/ChangeImpactPropagation.md#change-impact-visualization";
+  2054606d7574a553 -.->|deriveReqT| 4ba519ed09b81863;
+  c8d1020a3844532d["Change Impact Detection Algorithm"];
+  class c8d1020a3844532d requirement;
+  click c8d1020a3844532d "SystemRequirements/ChangeImpactPropagation.md#change-impact-detection-algorithm";
+  2054606d7574a553 -.->|deriveReqT| c8d1020a3844532d;
+  ced028f36159c967["Smart Filtering for Change Impact Reports"];
+  class ced028f36159c967 requirement;
+  click ced028f36159c967 "SystemRequirements/ChangeImpactPropagation.md#smart-filtering-for-change-impact-reports";
+  2054606d7574a553 -.->|deriveReqT| ced028f36159c967;
+  816c1e0b1de4dc53["Identifiers and Relations"];
+  class 816c1e0b1de4dc53 requirement;
+  click 816c1e0b1de4dc53 "SpecificationsRequirements.md#identifiers-and-relations";
+  9450d4313f47ef36["relation.rs"];
+  class 9450d4313f47ef36 default;
+  click 9450d4313f47ef36 "../core/src/relation.rs";
+  816c1e0b1de4dc53 -->|satisfiedBy| 9450d4313f47ef36;
+  e37dc7f46d75d46["Invalid Relations Test"];
+  class e37dc7f46d75d46 verification;
+  click e37dc7f46d75d46 "Verifications/ValidationTests.md#invalid-relations-test";
+  816c1e0b1de4dc53 -.->|verifiedBy| e37dc7f46d75d46;
   b49d890e0bbe0a83["Structure of Markdown Documents"];
   class b49d890e0bbe0a83 requirement;
   click b49d890e0bbe0a83 "SpecificationsRequirements.md#structure-of-markdown-documents";
@@ -33,41 +59,14 @@ graph LR;
   class d50a859650933e55 default;
   click d50a859650933e55 "../core/src/model.rs";
   b49d890e0bbe0a83 -->|satisfiedBy| d50a859650933e55;
+  b0d0999636b025fa["Invalid Header Structure Test"];
+  class b0d0999636b025fa verification;
+  click b0d0999636b025fa "Verifications/ValidationTests.md#invalid-header-structure-test";
+  b49d890e0bbe0a83 -.->|verifiedBy| b0d0999636b025fa;
   735766802775ec41["Format Command Requirements Verification"];
   class 735766802775ec41 verification;
   click 735766802775ec41 "Verifications/Misc.md#format-command-requirements-verification";
   b49d890e0bbe0a83 -.->|verifiedBy| 735766802775ec41;
-  816c1e0b1de4dc53["Identifiers and Relations"];
-  class 816c1e0b1de4dc53 requirement;
-  click 816c1e0b1de4dc53 "SpecificationsRequirements.md#identifiers-and-relations";
-  9450d4313f47ef36["relation.rs"];
-  class 9450d4313f47ef36 default;
-  click 9450d4313f47ef36 "../core/src/relation.rs";
-  816c1e0b1de4dc53 -->|satisfiedBy| 9450d4313f47ef36;
-  e37dc7f46d75d46["Invalid Relations Test"];
-  class e37dc7f46d75d46 verification;
-  click e37dc7f46d75d46 "Verifications/ValidationTests.md#invalid-relations-test";
-  816c1e0b1de4dc53 -.->|verifiedBy| e37dc7f46d75d46;
-  2054606d7574a553["Requirements Change Propagation"];
-  class 2054606d7574a553 requirement;
-  click 2054606d7574a553 "SpecificationsRequirements.md#requirements-change-propagation";
-  ced028f36159c967["Smart Filtering for Change Impact Reports"];
-  class ced028f36159c967 requirement;
-  click ced028f36159c967 "SystemRequirements/ChangeImpactPropagation.md#smart-filtering-for-change-impact-reports";
-  2054606d7574a553 -.->|deriveReqT| ced028f36159c967;
-  c8d1020a3844532d["Change Impact Detection Algorithm"];
-  class c8d1020a3844532d requirement;
-  click c8d1020a3844532d "SystemRequirements/ChangeImpactPropagation.md#change-impact-detection-algorithm";
-  2054606d7574a553 -.->|deriveReqT| c8d1020a3844532d;
-  4ba519ed09b81863["Change Impact Visualization"];
-  class 4ba519ed09b81863 requirement;
-  click 4ba519ed09b81863 "SystemRequirements/ChangeImpactPropagation.md#change-impact-visualization";
-  2054606d7574a553 -.->|deriveReqT| 4ba519ed09b81863;
-  ade67c27bc5d3bbd["Structure and Addressing in Markdown Documents"];
-  class ade67c27bc5d3bbd requirement;
-  click ade67c27bc5d3bbd "SpecificationsRequirements.md#structure-and-addressing-in-markdown-documents";
-  ade67c27bc5d3bbd -.->|deriveReqT| b49d890e0bbe0a83;
-  ade67c27bc5d3bbd -.->|deriveReqT| 816c1e0b1de4dc53;
   551906d5c51d91d9["Relation Types and behaviors"];
   class 551906d5c51d91d9 requirement;
   click 551906d5c51d91d9 "SpecificationsRequirements.md#relation-types-and-behaviors";
@@ -79,14 +78,19 @@ graph LR;
   class 5a41848d39d13522 requirement;
   click 5a41848d39d13522 "SystemRequirements/Requirements.md#trace-relation-non-directional-behavior";
   551906d5c51d91d9 -.->|deriveReqT| 5a41848d39d13522;
-  dc7a9bb1bbebc57f["Relation Element Type Validator"];
-  class dc7a9bb1bbebc57f requirement;
-  click dc7a9bb1bbebc57f "SystemRequirements/Requirements.md#relation-element-type-validator";
-  551906d5c51d91d9 -.->|deriveReqT| dc7a9bb1bbebc57f;
   7f86e99e7804366a["Diagram Relation Filtering"];
   class 7f86e99e7804366a requirement;
   click 7f86e99e7804366a "SystemRequirements/Requirements.md#diagram-relation-filtering";
   551906d5c51d91d9 -.->|deriveReqT| 7f86e99e7804366a;
+  dc7a9bb1bbebc57f["Relation Element Type Validator"];
+  class dc7a9bb1bbebc57f requirement;
+  click dc7a9bb1bbebc57f "SystemRequirements/Requirements.md#relation-element-type-validator";
+  551906d5c51d91d9 -.->|deriveReqT| dc7a9bb1bbebc57f;
+  ade67c27bc5d3bbd["Structure and Addressing in Markdown Documents"];
+  class ade67c27bc5d3bbd requirement;
+  click ade67c27bc5d3bbd "SpecificationsRequirements.md#structure-and-addressing-in-markdown-documents";
+  ade67c27bc5d3bbd -.->|deriveReqT| 816c1e0b1de4dc53;
+  ade67c27bc5d3bbd -.->|deriveReqT| b49d890e0bbe0a83;
   e61b7c1baa89bfc6["Managing MBSE Models"];
   class e61b7c1baa89bfc6 requirement;
   click e61b7c1baa89bfc6 "UserStories.md#managing-mbse-models";
@@ -94,36 +98,34 @@ graph LR;
   class 2c5f30f14e792200 requirement;
   click 2c5f30f14e792200 "MOEs.md#moe_ua";
   e61b7c1baa89bfc6 -.->|trace| 2c5f30f14e792200;
-  f0d721424636370e["Coexistence of Structured and Unstructured Documents"];
-  class f0d721424636370e requirement;
-  click f0d721424636370e "ManagingMbseModelsRequirements.md#coexistence-of-structured-and-unstructured-documents";
-  e61b7c1baa89bfc6 -.->|deriveReqT| f0d721424636370e;
-  649d72765b13e14f["Git Repository as Project Root"];
-  class 649d72765b13e14f requirement;
-  click 649d72765b13e14f "ManagingMbseModelsRequirements.md#git-repository-as-project-root";
-  e61b7c1baa89bfc6 -.->|deriveReqT| 649d72765b13e14f;
-  f28849d46c19af44["CLI interface"];
-  class f28849d46c19af44 requirement;
-  click f28849d46c19af44 "UserRequirements.md#cli-interface";
-  e61b7c1baa89bfc6 -.->|deriveReqT| f28849d46c19af44;
   cd2d5dab49985ca2["AI-Assisted MBSE Model Management"];
   class cd2d5dab49985ca2 requirement;
   click cd2d5dab49985ca2 "UserStories.md#ai-assisted-mbse-model-management";
-  e61b7c1baa89bfc6 -->|refinedBy| cd2d5dab49985ca2;
+  e61b7c1baa89bfc6 -.->|deriveReqT| cd2d5dab49985ca2;
   c2b6c74b77726ad9["Generate Documentation Index"];
   class c2b6c74b77726ad9 requirement;
   click c2b6c74b77726ad9 "UserRequirements.md#generate-documentation-index";
   e61b7c1baa89bfc6 -.->|deriveReqT| c2b6c74b77726ad9;
+  f28849d46c19af44["CLI interface"];
+  class f28849d46c19af44 requirement;
+  click f28849d46c19af44 "UserRequirements.md#cli-interface";
+  e61b7c1baa89bfc6 -.->|deriveReqT| f28849d46c19af44;
+  e61b7c1baa89bfc6 -.->|deriveReqT| ade67c27bc5d3bbd;
+  649d72765b13e14f["Git Repository as Project Root"];
+  class 649d72765b13e14f requirement;
+  click 649d72765b13e14f "ManagingMbseModelsRequirements.md#git-repository-as-project-root";
+  e61b7c1baa89bfc6 -.->|deriveReqT| 649d72765b13e14f;
+  f0d721424636370e["Coexistence of Structured and Unstructured Documents"];
+  class f0d721424636370e requirement;
+  click f0d721424636370e "ManagingMbseModelsRequirements.md#coexistence-of-structured-and-unstructured-documents";
+  e61b7c1baa89bfc6 -.->|deriveReqT| f0d721424636370e;
   d193d11c43776bec["Efficient Processing"];
   class d193d11c43776bec requirement;
   click d193d11c43776bec "ManagingMbseModelsRequirements.md#efficient-processing";
   e61b7c1baa89bfc6 -.->|deriveReqT| d193d11c43776bec;
-  16b4b380c917deb1["Project Configuration with YAML"];
-  class 16b4b380c917deb1 requirement;
-  click 16b4b380c917deb1 "ManagingMbseModelsRequirements.md#project-configuration-with-yaml";
-  e61b7c1baa89bfc6 -.->|deriveReqT| 16b4b380c917deb1;
-  e61b7c1baa89bfc6 -.->|deriveReqT| ade67c27bc5d3bbd;
-  e61b7c1baa89bfc6 -.->|deriveReqT| 551906d5c51d91d9;
+  cd2d5dab49985ca2 -.->|deriveReqT| 816c1e0b1de4dc53;
+  cd2d5dab49985ca2 -.->|deriveReqT| b49d890e0bbe0a83;
+  cd2d5dab49985ca2 -.->|deriveReqT| 551906d5c51d91d9;
   9933cac5853a8584["Change Impact Analysis"];
   class 9933cac5853a8584 requirement;
   click 9933cac5853a8584 "UserRequirements.md#change-impact-analysis";
@@ -131,19 +133,14 @@ graph LR;
   class b72d56e7e360fe6c verification;
   click b72d56e7e360fe6c "Verifications/ChangeImpactTests.md#change-impact-analysis-verification";
   9933cac5853a8584 -.->|verifiedBy| b72d56e7e360fe6c;
-  9933cac5853a8584 -->|refinedBy| 2054606d7574a553;
+  9933cac5853a8584 -.->|deriveReqT| 2054606d7574a553;
   9933cac5853a8584 -.->|deriveReqT| ced028f36159c967;
-  cd2d5dab49985ca2 -.->|deriveReqT| b49d890e0bbe0a83;
-  cd2d5dab49985ca2 -.->|deriveReqT| 816c1e0b1de4dc53;
-  cd2d5dab49985ca2 -.->|deriveReqT| 551906d5c51d91d9;
 ```
 ### Requirements Change Propagation
 
 When a requirement is changed, the system shall propagate the change through related requirements, verification artifacts, and design elements according to relation type definitions and propagation rules.
 
 #### Details
-
-
 <details>
 <summary>View Full Specification</summary>
 
@@ -162,7 +159,7 @@ Automated tools should flag all impacted requirements for review.
 
 For change propagation purposes, relations can be categorized into several groups:
 
-1. **Hierarchical Relations** - Changes propagate from parent to child elements (contain, derivedFrom, refinedBy)
+1. **Hierarchical Relations** - Changes propagate from parent to child elements (derivedFrom)
 2. **Satisfaction Relations** - Changes to requirements affect implementations (satisfiedBy)
 3. **Verification Relations** - Changes to requirements invalidate verifications (verifiedBy)
 4. **Traceability Relations** - No change propagation, for documentation only (trace)
@@ -199,7 +196,7 @@ When a requirement changes, impact analysis must be conducted based on its relat
 This requirement defines a high-level system constraint.
 
 #### Relations
-  * contain: [Child Requirement](#child-requirement)
+  * derive: [Child Requirement](#child-requirement)
 
 
 ---
@@ -408,10 +405,8 @@ flowchart TD;
 #### Metadata
   * type: user-requirement
 
-
 #### Relations
-  * refine: [Change Impact Analysis](UserRequirements.md#change-impact-analysis)
-
+  * derivedFrom: [Change Impact Analysis](UserRequirements.md#change-impact-analysis)
 ---
 
 ### Structure and Addressing in Markdown Documents
@@ -421,10 +416,8 @@ The system shall implement semi-structured markdown format specifications that d
 #### Metadata
   * type: user-requirement
 
-
 #### Relations
   * derivedFrom: [Managing MBSE Models](UserStories.md#managing-mbse-models)
-
 ---
 
 ### Structure of Markdown Documents
@@ -432,7 +425,6 @@ The system shall implement semi-structured markdown format specifications that d
 The system shall implement the structure, rules, and usage of **Sections**, **Elements**, **Subsections**, **Relations**, and **Identifiers** in Markdown (`.md`) documents following clearly defined specifications.
 
 #### Details
-
 <details>
 <summary>View Full Specification</summary>
 
@@ -684,6 +676,7 @@ When parsing `#### Details` subsections, any markdown headers or elements within
 The **#### Details** subsection within an element provides additional information directly related to the main requirement text.
 
 - Content within the **Details** subsection is considered an **extension of the requirement text**.
+  - It serves the same purpose as refirement relation in other mbse tools and sysml.
 - Any statements in the **Details** subsection hold the same validity as the main requirement text.
 
 ###  Relations Subsection
@@ -778,19 +771,6 @@ The following verification types are supported:
    - `inspection-verification` - Verification through formal inspection or review
    - `demonstration-verification` - Verification through demonstration in a realistic environment
 
-These verification types align with standard systems engineering verification methods:
-- **Test**: Verification through formal testing according to documented test procedures with expected outcomes
-- **Analysis**: Verification through systematic analysis of artifacts without physical testing
-- **Inspection**: Verification through examination of documentation, code, or physical components
-- **Demonstration**: Verification through showing functionality in an operational-like environment
-
-
-The appropriate verification type should be selected based on the nature of the requirement:
-- **Test**: Verification through formal testing according to documented test procedures with expected outcomes
-- **Analysis**: Verification through systematic analysis of artifacts without physical testing
-- **Inspection**: Verification through examination of documentation, code, or physical components
-- **Demonstration**: Verification through showing functionality in an operational-like environment
-
 The appropriate verification type should be selected based on the nature of the requirement:
 - **Test-verification**: Used when formal test procedures with expected outcomes are required
 - **Analysis-verification**: Used when requirements can be verified through analysis of documentation or code
@@ -804,7 +784,6 @@ The appropriate verification type should be selected based on the nature of the 
 #### Metadata
   * type: user-requirement
 
-
 #### Relations
   * derivedFrom: [Structure and Addressing in Markdown Documents](#structure-and-addressing-in-markdown-documents)
   * derivedFrom: [AI-Assisted MBSE Model Management](UserStories.md#ai-assisted-mbse-model-management)
@@ -813,7 +792,6 @@ The appropriate verification type should be selected based on the nature of the 
   * satisfiedBy: [subsection.rs](../core/src/subsection.rs)
   * satisfiedBy: [parser.rs](../core/src/parser.rs)
   * satisfiedBy: [model.rs](../core/src/model.rs)
-
 ---
 
 ### Identifiers and Relations
@@ -821,7 +799,6 @@ The appropriate verification type should be selected based on the nature of the 
 The system shall implement  **Identifiers** and **Relations** following clearly defined specifications to ensure consistency, validity, and efficient querying and manipulation of these entities.
 
 #### Details
-
 <details>
 <summary>View Full Specification</summary>
 
@@ -1112,12 +1089,10 @@ The system must validate relation usage according to these rules:
 #### Metadata
   * type: user-requirement
 
-
 #### Relations
   * derivedFrom: [Structure and Addressing in Markdown Documents](#structure-and-addressing-in-markdown-documents)
   * derivedFrom: [AI-Assisted MBSE Model Management](UserStories.md#ai-assisted-mbse-model-management)
   * satisfiedBy: [relation.rs](../core/src/relation.rs)
-
 ---
 
 ### Relation Types and behaviors
@@ -1125,7 +1100,6 @@ The system must validate relation usage according to these rules:
 The system shall implement relations following clearly defined specifications for types and behaviors.
 
 #### Details
-
 <details>
 <summary>View Full Specification</summary>
 
@@ -1145,23 +1119,24 @@ A relation type in Reqvire:
 Relations are categorized by their usage in different system functions:
 
 1. **Diagram Rendering** - Relations that are rendered in visual diagrams to avoid duplicate arrows
-   - Only one relation from each opposite pair is shown (e.g., `contain` but not `containedBy`)
-   - Defined in DIAGRAM_RELATIONS list: `contain`, `derive`, `refinedBy`, `satisfiedBy`, `verifiedBy`, `trace`
+   - Only one relation from each opposite pair is shown (e.g., `derive` but not `derivedFrom`)
+   - Those are: `derive`, `satisfiedBy`, `verifiedBy`, `trace`
 
 2. **Change Propagation** - Relations through which changes propagate to dependent elements
    - When an element changes, impact flows through these relation types
-   - Defined in IMPACT_PROPAGATION_RELATIONS list: `contain`, `derive`, `refinedBy`, `satisfiedBy`, `verifiedBy`
+   - Those are: `derive`, `satisfiedBy`, `verifiedBy`
+
+3. **Verification traces**: Relations through which propagation from the verification element to requirements in traced (verification roll-up)
+   - Trace which requirements verification verifies: directly or indirecty  
+     - Parents inherit status from children via «derive» (e.g., ALL children verified => parent Verified).  
+   - Those are: `derivedFrom`
 
 ## Comprehensive Relation Type Table
 
 | Relation Type | Opposite Type | Diagram Rendering | Change Propagation | Description |
 |---------------|---------------|-------------------|-------------------|-------------|
-| **containedBy** | contain | No | No | Links a child element to its containing parent element |
-| **contain** | containedBy | Yes | Yes | Links a parent element to the child elements it contains |
 | **derivedFrom** | derive | No | No | Links a child element to the parent element it is derived from |
 | **derive** | derivedFrom | Yes | Yes | Links a parent element to child elements derived from it |
-| **refine** | refinedBy | No | No | Links a child element to parent elements that it refines |
-| **refinedBy** | refine | Yes | Yes | Links a parent element to a child element that refines it with more details |
 | **satisfiedBy** | satisfy | Yes | Yes | Links a requirement to elements that satisfy it |
 | **satisfy** | satisfiedBy | No | No | Links an implementation to the requirement it satisfies |
 | **verifiedBy** | verify | Yes | Yes | Links a requirement to verification artifacts |
@@ -1172,13 +1147,10 @@ Relations are categorized by their usage in different system functions:
 
 Relations are grouped into logical categories based on their semantic meaning:
 
-### 1. Parent-Child Hierarchical Relations
+### 1. Hierarchical/Transitive Relations
 
-These relations define hierarchical structures within the model:
-
-- **containedBy/contain**: Physical or logical containment hierarchy
+These relations define hierarchical structures and transitive ancestry within the model:
 - **derivedFrom/derive**: Derivation of elements from higher-level elements
-- **refine/refinedBy**: Refinement relationships adding more detail
 
 ### 2. Satisfaction Relations
 
@@ -1204,7 +1176,7 @@ When an element changes, the impact propagates according to these rules:
 
 1. **Hierarchical Changes**:
    - Changes to parent elements propagate to all children
-   - This includes containment, derivation, and refinement relationships
+   - This includes derivation relationships
 
 2. **Requirement Changes**:
    - Changes to requirements propagate to all satisfying implementations
@@ -1222,15 +1194,13 @@ When an element changes, the impact propagates according to these rules:
    - Changes do not propagate through trace relationships
    - Trace relationships are used for documentation and discovery purposes only
    
+
 </details>
 
 #### Metadata
   * type: user-requirement
 
-
 #### Relations
-  * derivedFrom: [Managing MBSE Models](UserStories.md#managing-mbse-models)
   * derivedFrom: [AI-Assisted MBSE Model Management](UserStories.md#ai-assisted-mbse-model-management)
   * satisfiedBy: [relation.rs](../core/src/relation.rs)
-
 ---

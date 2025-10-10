@@ -1,4 +1,8 @@
 #!/bin/bash
+set -euo pipefail
+
+# Create log file immediately to ensure it exists for runner
+echo "Starting test..." > "${TEST_DIR}/test_results.log"
 
 # Test: Diagram Removal Functionality (Marker-Based)
 # ----------------------------------------------------
@@ -22,8 +26,14 @@ mkdir -p "$TEST_DIR/backup"
 cp -r "$TEST_DIR/specifications" "$TEST_DIR/backup/"
 
 # First, ensure we have diagrams to remove by generating them (validation happens automatically)
+echo "Running: reqvire generate-diagrams (setup)" >> "${TEST_DIR}/test_results.log"
+set +e
 GENERATE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "$TEST_DIR/reqvire.yaml" generate-diagrams 2>&1)
 GENERATE_EXIT_CODE=$?
+set -e
+
+echo "Exit code: $GENERATE_EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$GENERATE_OUTPUT" >> "${TEST_DIR}/test_results.log"
 
 if [ $GENERATE_EXIT_CODE -ne 0 ]; then
   echo "❌ FAILED: Initial diagram generation failed:"
@@ -54,16 +64,19 @@ fi
 BEFORE_COUNT=$(grep -c '```mermaid' "$TEST_DIR/specifications/Requirements.md")
 
 # Run reqvire to remove diagrams
+echo "Running: reqvire remove-diagrams" >> "${TEST_DIR}/test_results.log"
+set +e
 OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "$TEST_DIR/reqvire.yaml" remove-diagrams 2>&1)
 EXIT_CODE=$?
+set -e
 
-# Save output to log
-printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 
 # Check for basic success
 if [ $EXIT_CODE -ne 0 ]; then
   echo "❌ FAILED: remove-diagrams command failed with exit code $EXIT_CODE"
-  echo "Output: $OUTPUT"
+  echo "$OUTPUT"
   exit 1
 fi
 

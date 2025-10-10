@@ -15,12 +15,18 @@ REQVIRE="$REQVIRE_BIN"
 
 # Test 1: Requirement - System shall provide format command and dry-run functionality
 echo "Starting test..." > test_results.log
+
+echo "Running: reqvire format --dry-run" >> test_results.log
+set +e
 "$REQVIRE" format --dry-run > dry_run_output.txt 2>&1
 DRY_RUN_EXIT_CODE=$?
+set -e
+
+echo "Exit code: $DRY_RUN_EXIT_CODE" >> test_results.log
+cat dry_run_output.txt >> test_results.log
 
 if [ $DRY_RUN_EXIT_CODE -ne 0 ]; then
-    echo "FAIL: Format command failed with exit code $DRY_RUN_EXIT_CODE" >> test_results.log
-    cat dry_run_output.txt >> test_results.log
+    echo "FAIL: Format command failed with exit code $DRY_RUN_EXIT_CODE"
     exit 1
 fi
 
@@ -90,8 +96,14 @@ if ! grep -q "$EXPECTED_VERIFICATION_ABSOLUTE_PATH" dry_run_clean.txt; then
 fi
 
 # Test 2: Apply formatting changes
+echo "Running: reqvire format" >> test_results.log
+set +e
 "$REQVIRE" format > format_output.txt 2>&1
 FORMAT_EXIT_CODE=$?
+set -e
+
+echo "Exit code: $FORMAT_EXIT_CODE" >> test_results.log
+cat format_output.txt >> test_results.log
 
 if [ $FORMAT_EXIT_CODE -ne 0 ]; then
     echo "FAIL: Format command execution failed with exit code $FORMAT_EXIT_CODE"
@@ -260,8 +272,14 @@ else
 fi
 
 # Test 4: Verify no additional changes needed (idempotent behavior)
+echo "Running: reqvire format --dry-run (second time)" >> test_results.log
+set +e
 "$REQVIRE" format --dry-run > no_changes_output.txt 2>&1
 NO_CHANGES_EXIT_CODE=$?
+set -e
+
+echo "Exit code: $NO_CHANGES_EXIT_CODE" >> test_results.log
+cat no_changes_output.txt >> test_results.log
 
 if [ $NO_CHANGES_EXIT_CODE -ne 0 ]; then
     echo "FAIL: Second dry-run failed with exit code $NO_CHANGES_EXIT_CODE"
@@ -306,8 +324,14 @@ fi
 
 # Test 7: Test JSON output functionality
 # Run format with --json flag on current files to test JSON output
+echo "Running: reqvire format --dry-run --json" >> test_results.log
+set +e
 "$REQVIRE" format --dry-run --json > json_format_output.txt 2>&1
 JSON_FORMAT_EXIT_CODE=$?
+set -e
+
+echo "Exit code: $JSON_FORMAT_EXIT_CODE" >> test_results.log
+cat json_format_output.txt >> test_results.log
 
 if [ $JSON_FORMAT_EXIT_CODE -ne 0 ]; then
     echo "FAIL: Format command with --json flag failed with exit code $JSON_FORMAT_EXIT_CODE"

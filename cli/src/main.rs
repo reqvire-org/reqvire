@@ -15,11 +15,18 @@ fn main() {
     
     // Check if any command uses JSON output to suppress logs
     let uses_json = match &args.command {
-        Some(cli::Commands::Traces { json, .. }) => *json,
-        Some(cli::Commands::ModelSummary { json, .. }) => *json,
         Some(cli::Commands::ChangeImpact { json, .. }) => *json,
         Some(cli::Commands::Format { json, .. }) => *json,
-        Some(cli::Commands::CoverageReport { json }) => *json,
+        Some(cli::Commands::Model(subcmd)) => match subcmd {
+            cli::ModelCommands::Summary { json, .. } => *json,
+            cli::ModelCommands::SectionSummary { json, .. } => *json,
+            cli::ModelCommands::Index => false,
+        },
+        Some(cli::Commands::Verifications(subcmd)) => match subcmd {
+            cli::VerificationsCommands::Matrix { json, .. } => *json,
+            cli::VerificationsCommands::Traces { json, .. } => *json,
+            cli::VerificationsCommands::Coverage { json } => *json,
+        },
         _ => false,
     };
     

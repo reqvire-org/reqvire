@@ -1,4 +1,8 @@
 #!/bin/bash
+set -euo pipefail
+
+# Create log file immediately to ensure it exists for runner
+echo "Starting test..." > "${TEST_DIR}/test_results.log"
 
 # Test: Diagram Relation Filtering
 # ---------------------------------
@@ -10,7 +14,7 @@
 #
 # Test Criteria:
 # - Command exits with success (0) return code
-# - Diagrams contain only forward relations (e.g., `contain` but not `containedBy`)
+# - Diagrams contain only forward relations (e.g., `derive` but not `derivedFrom`)
 # - Bidirectional relationships appear as single arrows in their forward direction
 # - Parent elements are included when child elements are in the section
 # - No duplicate arrows exist for the same logical relationship
@@ -32,16 +36,19 @@ mkdir -p "$TEST_DIR/backup"
 cp -r "$TEST_DIR/specifications" "$TEST_DIR/backup/"
 
 # Run reqvire to generate diagrams
+echo "Running: reqvire generate-diagrams" >> "${TEST_DIR}/test_results.log"
+set +e
 OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "$TEST_DIR/reqvire.yaml" generate-diagrams 2>&1)
 EXIT_CODE=$?
+set -e
 
-# Save output to log
-printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 
 # Check for basic success
 if [ $EXIT_CODE -ne 0 ]; then
   echo "❌ FAILED: Diagram generation command returned error: $EXIT_CODE"
-  cat "${TEST_DIR}/test_results.log"
+  echo "$OUTPUT"
   exit 1
 fi
 
@@ -63,11 +70,6 @@ fi
 FAILED_CHECKS=0
 
 # Check that forward relations are rendered
-if ! grep -q -- "--o|contains" "$TEST_FILE"; then
-  echo "❌ MISSING FORWARD: Expected 'contain' forward relation arrow"
-  FAILED_CHECKS=$((FAILED_CHECKS + 1))
-fi
-
 if ! grep -q -- "-.->|derive" "$TEST_FILE"; then
   echo "❌ MISSING FORWARD: Expected 'derive' forward relation arrow"
   FAILED_CHECKS=$((FAILED_CHECKS + 1))
@@ -102,10 +104,6 @@ if echo "$MERMAID_DIAGRAMS" | grep -q -- "verify"; then
   FAILED_CHECKS=$((FAILED_CHECKS + 1))
 fi
 
-# Note: "refines" label is correct in diagrams - it's the semantic label used by both
-# refine (Backward) and refinedBy (Forward). Since we only render Forward relations,
-# seeing "refines" means we're showing the refinedBy relation correctly.
-
 # Test 3: Parent elements should be included in child section diagrams
 # The "Parent Element" should appear in the "Child Section" diagram
 # even though it's defined in the "Parent Section"
@@ -118,14 +116,7 @@ if ! echo "$CHILD_SECTION_DIAGRAM" | grep -q '"Parent Element"'; then
   FAILED_CHECKS=$((FAILED_CHECKS + 1))
 fi
 
-# Test 4: Check that the contain relation is present in Child Section
-# The contain relation should flow from Parent Element to Child Element
-if ! echo "$CHILD_SECTION_DIAGRAM" | grep -q -- "--o|contains|"; then
-  echo "❌ MISSING CONTAIN: 'contain' relation should be present in Child Section diagram"
-  FAILED_CHECKS=$((FAILED_CHECKS + 1))
-fi
-
-# Test 5: Check that the derive relation is present in Child Section
+# Test 4: Check that the derive relation is present in Child Section
 # The derive relation should flow from Parent Element to Derived Child
 if ! echo "$CHILD_SECTION_DIAGRAM" | grep -q -- "-.->|deriveReqT|"; then
   echo "❌ MISSING DERIVE: 'derive' relation should be present in Child Section diagram"

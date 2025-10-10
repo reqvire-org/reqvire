@@ -1,0 +1,164 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1258 630" width="1258" height="630">
+<rect x="0" y="0" width="1258" height="630" fill="white" />
+<style>
+  .header { font-family: sans-serif; font-weight: bold; font-size: 14px; }
+  .cell { font-family: sans-serif; font-size: 12px; }
+  .verified { fill: #5fd75f; }
+  .unverified { fill: #f55f5f; }
+</style>
+<text x="20" y="30" class="header" font-size="18">Traceability Matrix</text>
+<rect x="20" y="60" width="430" height="30" fill="#f0f0f0" stroke="#333" />
+<text x="30" y="80" class="header">Requirement</text>
+<rect x="450" y="60" width="60" height="30" fill="#f0f0f0" stroke="#333" />
+<text x="480" y="80" class="header" text-anchor="middle">Verified</text>
+<rect x="510" y="60" width="184" height="30" fill="#f0f0f0" stroke="#333" />
+<text x="602" y="80" class="header" text-anchor="middle">Verification Alpha</text>
+<rect x="694" y="60" width="176" height="30" fill="#f0f0f0" stroke="#333" />
+<text x="782" y="80" class="header" text-anchor="middle">Verification Beta</text>
+<rect x="870" y="60" width="184" height="30" fill="#f0f0f0" stroke="#333" />
+<text x="962" y="80" class="header" text-anchor="middle">Verification Delta</text>
+<rect x="1054" y="60" width="184" height="30" fill="#f0f0f0" stroke="#333" />
+<text x="1146" y="80" class="header" text-anchor="middle">Verification Gamma</text>
+<rect x="20" y="100" width="430" height="30" fill="white" stroke="#333" />
+<text x="30" y="120" class="cell">Complex Root With Mixed Hierarchy</text>
+<rect x="450" y="100" width="60" height="30" fill="white" stroke="#333" />
+<text x="480" y="120" class="cell verified" text-anchor="middle">✅</text>
+<rect x="510" y="100" width="184" height="30" fill="white" stroke="#333" />
+<rect x="694" y="100" width="176" height="30" fill="white" stroke="#333" />
+<rect x="870" y="100" width="184" height="30" fill="white" stroke="#333" />
+<rect x="1054" y="100" width="184" height="30" fill="white" stroke="#333" />
+<rect x="20" y="130" width="430" height="30" fill="white" stroke="#333" />
+<text x="30" y="150" class="cell">↳ Direct Leaf Child of Complex Root</text>
+<rect x="450" y="130" width="60" height="30" fill="white" stroke="#333" />
+<text x="480" y="150" class="cell verified" text-anchor="middle">✅</text>
+<rect x="510" y="130" width="184" height="30" fill="white" stroke="#333" />
+<text x="602" y="150" class="cell verified" text-anchor="middle">✅</text>
+<rect x="694" y="130" width="176" height="30" fill="white" stroke="#333" />
+<rect x="870" y="130" width="184" height="30" fill="white" stroke="#333" />
+<rect x="1054" y="130" width="184" height="30" fill="white" stroke="#333" />
+<rect x="20" y="160" width="430" height="30" fill="white" stroke="#333" />
+<text x="30" y="180" class="cell">↳ Intermediate Parent Child of Complex Root</text>
+<rect x="450" y="160" width="60" height="30" fill="white" stroke="#333" />
+<text x="480" y="180" class="cell verified" text-anchor="middle">✅</text>
+<rect x="510" y="160" width="184" height="30" fill="white" stroke="#333" />
+<rect x="694" y="160" width="176" height="30" fill="white" stroke="#333" />
+<rect x="870" y="160" width="184" height="30" fill="white" stroke="#333" />
+<rect x="1054" y="160" width="184" height="30" fill="white" stroke="#333" />
+<rect x="20" y="190" width="430" height="30" fill="white" stroke="#333" />
+<text x="30" y="210" class="cell">__↳ Grandchild Leaf Under Complex Root</text>
+<rect x="450" y="190" width="60" height="30" fill="white" stroke="#333" />
+<text x="480" y="210" class="cell verified" text-anchor="middle">✅</text>
+<rect x="510" y="190" width="184" height="30" fill="white" stroke="#333" />
+<rect x="694" y="190" width="176" height="30" fill="white" stroke="#333" />
+<text x="782" y="210" class="cell verified" text-anchor="middle">✅</text>
+<rect x="870" y="190" width="184" height="30" fill="white" stroke="#333" />
+<rect x="1054" y="190" width="184" height="30" fill="white" stroke="#333" />
+<rect x="20" y="220" width="430" height="30" fill="white" stroke="#333" />
+<text x="30" y="240" class="cell">Parent Verified Through Children Only</text>
+<rect x="450" y="220" width="60" height="30" fill="white" stroke="#333" />
+<text x="480" y="240" class="cell verified" text-anchor="middle">✅</text>
+<rect x="510" y="220" width="184" height="30" fill="white" stroke="#333" />
+<rect x="694" y="220" width="176" height="30" fill="white" stroke="#333" />
+<rect x="870" y="220" width="184" height="30" fill="white" stroke="#333" />
+<rect x="1054" y="220" width="184" height="30" fill="white" stroke="#333" />
+<rect x="20" y="250" width="430" height="30" fill="white" stroke="#333" />
+<text x="30" y="270" class="cell">↳ Verified Child of Parent Verified Through Children</text>
+<rect x="450" y="250" width="60" height="30" fill="white" stroke="#333" />
+<text x="480" y="270" class="cell verified" text-anchor="middle">✅</text>
+<rect x="510" y="250" width="184" height="30" fill="white" stroke="#333" />
+<rect x="694" y="250" width="176" height="30" fill="white" stroke="#333" />
+<rect x="870" y="250" width="184" height="30" fill="white" stroke="#333" />
+<text x="962" y="270" class="cell verified" text-anchor="middle">✅</text>
+<rect x="1054" y="250" width="184" height="30" fill="white" stroke="#333" />
+<rect x="20" y="280" width="430" height="30" fill="white" stroke="#333" />
+<text x="30" y="300" class="cell">Parent With Unverified Child</text>
+<rect x="450" y="280" width="60" height="30" fill="white" stroke="#333" />
+<text x="480" y="300" class="cell unverified" text-anchor="middle">❌</text>
+<rect x="510" y="280" width="184" height="30" fill="white" stroke="#333" />
+<rect x="694" y="280" width="176" height="30" fill="white" stroke="#333" />
+<rect x="870" y="280" width="184" height="30" fill="white" stroke="#333" />
+<rect x="1054" y="280" width="184" height="30" fill="white" stroke="#333" />
+<text x="1146" y="300" class="cell verified" text-anchor="middle">✅</text>
+<rect x="20" y="310" width="430" height="30" fill="white" stroke="#333" />
+<text x="30" y="330" class="cell">↳ Unverified Child of Mixed Parent</text>
+<rect x="450" y="310" width="60" height="30" fill="white" stroke="#333" />
+<text x="480" y="330" class="cell unverified" text-anchor="middle">❌</text>
+<rect x="510" y="310" width="184" height="30" fill="white" stroke="#333" />
+<rect x="694" y="310" width="176" height="30" fill="white" stroke="#333" />
+<rect x="870" y="310" width="184" height="30" fill="white" stroke="#333" />
+<rect x="1054" y="310" width="184" height="30" fill="white" stroke="#333" />
+<rect x="20" y="340" width="430" height="30" fill="white" stroke="#333" />
+<text x="30" y="360" class="cell">↳ Verified Child of Mixed Parent</text>
+<rect x="450" y="340" width="60" height="30" fill="white" stroke="#333" />
+<text x="480" y="360" class="cell verified" text-anchor="middle">✅</text>
+<rect x="510" y="340" width="184" height="30" fill="white" stroke="#333" />
+<text x="602" y="360" class="cell verified" text-anchor="middle">✅</text>
+<rect x="694" y="340" width="176" height="30" fill="white" stroke="#333" />
+<rect x="870" y="340" width="184" height="30" fill="white" stroke="#333" />
+<rect x="1054" y="340" width="184" height="30" fill="white" stroke="#333" />
+<rect x="20" y="370" width="430" height="30" fill="white" stroke="#333" />
+<text x="30" y="390" class="cell">Root Requirement Alpha</text>
+<rect x="450" y="370" width="60" height="30" fill="white" stroke="#333" />
+<text x="480" y="390" class="cell verified" text-anchor="middle">✅</text>
+<rect x="510" y="370" width="184" height="30" fill="white" stroke="#333" />
+<text x="602" y="390" class="cell verified" text-anchor="middle">✅</text>
+<rect x="694" y="370" width="176" height="30" fill="white" stroke="#333" />
+<text x="782" y="390" class="cell verified" text-anchor="middle">✅</text>
+<rect x="870" y="370" width="184" height="30" fill="white" stroke="#333" />
+<rect x="1054" y="370" width="184" height="30" fill="white" stroke="#333" />
+<rect x="20" y="400" width="430" height="30" fill="white" stroke="#333" />
+<text x="30" y="420" class="cell">↳ Child Requirement A1</text>
+<rect x="450" y="400" width="60" height="30" fill="white" stroke="#333" />
+<text x="480" y="420" class="cell verified" text-anchor="middle">✅</text>
+<rect x="510" y="400" width="184" height="30" fill="white" stroke="#333" />
+<text x="602" y="420" class="cell verified" text-anchor="middle">✅</text>
+<rect x="694" y="400" width="176" height="30" fill="white" stroke="#333" />
+<rect x="870" y="400" width="184" height="30" fill="white" stroke="#333" />
+<rect x="1054" y="400" width="184" height="30" fill="white" stroke="#333" />
+<rect x="20" y="430" width="430" height="30" fill="white" stroke="#333" />
+<text x="30" y="450" class="cell">__↳ Grandchild Requirement A1-1</text>
+<rect x="450" y="430" width="60" height="30" fill="white" stroke="#333" />
+<text x="480" y="450" class="cell verified" text-anchor="middle">✅</text>
+<rect x="510" y="430" width="184" height="30" fill="white" stroke="#333" />
+<rect x="694" y="430" width="176" height="30" fill="white" stroke="#333" />
+<text x="782" y="450" class="cell verified" text-anchor="middle">✅</text>
+<rect x="870" y="430" width="184" height="30" fill="white" stroke="#333" />
+<rect x="1054" y="430" width="184" height="30" fill="white" stroke="#333" />
+<rect x="20" y="460" width="430" height="30" fill="white" stroke="#333" />
+<text x="30" y="480" class="cell">↳ Child Requirement A2</text>
+<rect x="450" y="460" width="60" height="30" fill="white" stroke="#333" />
+<text x="480" y="480" class="cell verified" text-anchor="middle">✅</text>
+<rect x="510" y="460" width="184" height="30" fill="white" stroke="#333" />
+<rect x="694" y="460" width="176" height="30" fill="white" stroke="#333" />
+<rect x="870" y="460" width="184" height="30" fill="white" stroke="#333" />
+<text x="962" y="480" class="cell verified" text-anchor="middle">✅</text>
+<rect x="1054" y="460" width="184" height="30" fill="white" stroke="#333" />
+<rect x="20" y="490" width="430" height="30" fill="white" stroke="#333" />
+<text x="30" y="510" class="cell">Root Requirement Beta</text>
+<rect x="450" y="490" width="60" height="30" fill="white" stroke="#333" />
+<text x="480" y="510" class="cell verified" text-anchor="middle">✅</text>
+<rect x="510" y="490" width="184" height="30" fill="white" stroke="#333" />
+<rect x="694" y="490" width="176" height="30" fill="white" stroke="#333" />
+<rect x="870" y="490" width="184" height="30" fill="white" stroke="#333" />
+<rect x="1054" y="490" width="184" height="30" fill="white" stroke="#333" />
+<text x="1146" y="510" class="cell verified" text-anchor="middle">✅</text>
+<rect x="20" y="520" width="430" height="30" fill="white" stroke="#333" />
+<text x="30" y="540" class="cell">↳ Child Requirement B1</text>
+<rect x="450" y="520" width="60" height="30" fill="white" stroke="#333" />
+<text x="480" y="540" class="cell verified" text-anchor="middle">✅</text>
+<rect x="510" y="520" width="184" height="30" fill="white" stroke="#333" />
+<rect x="694" y="520" width="176" height="30" fill="white" stroke="#333" />
+<rect x="870" y="520" width="184" height="30" fill="white" stroke="#333" />
+<text x="962" y="540" class="cell verified" text-anchor="middle">✅</text>
+<rect x="1054" y="520" width="184" height="30" fill="white" stroke="#333" />
+<rect x="20" y="550" width="430" height="30" fill="white" stroke="#333" />
+<text x="30" y="570" class="cell">Unverified Requirement</text>
+<rect x="450" y="550" width="60" height="30" fill="white" stroke="#333" />
+<text x="480" y="570" class="cell unverified" text-anchor="middle">❌</text>
+<rect x="510" y="550" width="184" height="30" fill="white" stroke="#333" />
+<rect x="694" y="550" width="176" height="30" fill="white" stroke="#333" />
+<rect x="870" y="550" width="184" height="30" fill="white" stroke="#333" />
+<rect x="1054" y="550" width="184" height="30" fill="white" stroke="#333" />
+<text x="20" y="610" class="header">Legend:</text>
+<text x="100" y="610" class="cell">✅ Verified requirement | ❌ Unverified requirement</text>
+</svg>

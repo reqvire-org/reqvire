@@ -11,10 +11,16 @@
 
 # Test 1: Pass 1 Errors (Parsing/Format Issues)
 
+echo "Starting test..." > "${TEST_DIR}/test_results_pass1.log"
+
+echo "Running: reqvire validate (pass1-errors)" >> "${TEST_DIR}/test_results_pass1.log"
+set +e
 OUTPUT_PASS1=$(cd "${TEST_DIR}/pass1-errors" && "$REQVIRE_BIN" validate 2>&1)
 EXIT_CODE_PASS1=$?
+set -e
 
-printf "%s\n" "$OUTPUT_PASS1" > "${TEST_DIR}/test_results_pass1.log"
+echo "Exit code: $EXIT_CODE_PASS1" >> "${TEST_DIR}/test_results_pass1.log"
+printf "%s\n" "$OUTPUT_PASS1" >> "${TEST_DIR}/test_results_pass1.log"
 
 # Verify exit code indicates validation failure (non-zero)
 if [ $EXIT_CODE_PASS1 -eq 0 ]; then
@@ -53,10 +59,14 @@ fi
 
 # Test 2: Pass 2 Errors (Relation Validation Issues)
 
+echo "Running: reqvire validate (pass2-errors)" >> "${TEST_DIR}/test_results_pass2.log"
+set +e
 OUTPUT_PASS2=$(cd "${TEST_DIR}/pass2-errors" && "$REQVIRE_BIN" validate 2>&1)
 EXIT_CODE_PASS2=$?
+set -e
 
-printf "%s\n" "$OUTPUT_PASS2" > "${TEST_DIR}/test_results_pass2.log"
+echo "Exit code: $EXIT_CODE_PASS2" >> "${TEST_DIR}/test_results_pass2.log"
+printf "%s\n" "$OUTPUT_PASS2" >> "${TEST_DIR}/test_results_pass2.log"
 
 # Verify exit code indicates validation failure (non-zero)
 if [ $EXIT_CODE_PASS2 -eq 0 ]; then
@@ -127,8 +137,14 @@ Content with multiple header levels.
 EOF
 
 cd "${TEST_DIR}/valid-test"
+echo "Running: reqvire validate (valid-test)" >> "${TEST_DIR}/test_results_pass2.log"
+set +e
 OUTPUT_VALID=$("$REQVIRE_BIN" validate 2>&1)
 EXIT_CODE_VALID=$?
+set -e
+
+echo "Exit code: $EXIT_CODE_VALID" >> "${TEST_DIR}/test_results_pass2.log"
+printf "%s\n" "$OUTPUT_VALID" >> "${TEST_DIR}/test_results_pass2.log"
 
 if [ $EXIT_CODE_VALID -ne 0 ]; then
   echo "❌ FAILED: Validate command should succeed on valid model but exited with code $EXIT_CODE_VALID"
@@ -144,8 +160,14 @@ fi
 
 # Test 3.2: Validate command with --json on valid model
 # Test 3.2: Validate command with --json flag on valid model
+echo "Running: reqvire validate --json (valid-test)" >> "${TEST_DIR}/test_results_pass2.log"
+set +e
 OUTPUT_VALID_JSON=$("$REQVIRE_BIN" validate --json 2>&1)
 EXIT_CODE_VALID_JSON=$?
+set -e
+
+echo "Exit code: $EXIT_CODE_VALID_JSON" >> "${TEST_DIR}/test_results_pass2.log"
+printf "%s\n" "$OUTPUT_VALID_JSON" >> "${TEST_DIR}/test_results_pass2.log"
 
 if [ $EXIT_CODE_VALID_JSON -ne 0 ]; then
   echo "❌ FAILED: Validate command with --json should succeed on valid model but exited with code $EXIT_CODE_VALID_JSON"
@@ -163,8 +185,14 @@ fi
 # Test 3.3: Validate command on invalid model (Pass 1 errors)
 # Test 3.3: Validate command on invalid model (Pass 1 errors)
 cd "${TEST_DIR}/pass1-errors"
+echo "Running: reqvire validate (pass1-errors again)" >> "${TEST_DIR}/test_results_pass2.log"
+set +e
 OUTPUT_VALIDATE_PASS1=$("$REQVIRE_BIN" validate 2>&1)
 EXIT_CODE_VALIDATE_PASS1=$?
+set -e
+
+echo "Exit code: $EXIT_CODE_VALIDATE_PASS1" >> "${TEST_DIR}/test_results_pass2.log"
+printf "%s\n" "$OUTPUT_VALIDATE_PASS1" >> "${TEST_DIR}/test_results_pass2.log"
 
 # Validate command should exit with non-zero code for invalid model
 if [ $EXIT_CODE_VALIDATE_PASS1 -eq 0 ]; then
@@ -185,8 +213,14 @@ done
 # Test 3.4: Validate command on invalid model (Pass 2 errors)
 # Test 3.4: Validate command on invalid model (Pass 2 errors)
 cd "${TEST_DIR}/pass2-errors"
+echo "Running: reqvire validate (pass2-errors again)" >> "${TEST_DIR}/test_results_pass2.log"
+set +e
 OUTPUT_VALIDATE_PASS2=$("$REQVIRE_BIN" validate 2>&1)
 EXIT_CODE_VALIDATE_PASS2=$?
+set -e
+
+echo "Exit code: $EXIT_CODE_VALIDATE_PASS2" >> "${TEST_DIR}/test_results_pass2.log"
+printf "%s\n" "$OUTPUT_VALIDATE_PASS2" >> "${TEST_DIR}/test_results_pass2.log"
 
 # Validate command should exit with non-zero code for invalid model
 if [ $EXIT_CODE_VALIDATE_PASS2 -eq 0 ]; then

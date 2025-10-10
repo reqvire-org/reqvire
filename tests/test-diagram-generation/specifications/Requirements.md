@@ -12,7 +12,6 @@ This is a root requirement for testing purposes.
   * type: user-requirement
 
 #### Relations
-  * derive: [Element 2](#element-2)
   * derive: [Element 3](#element-3)
 
 ### Element 1
@@ -24,7 +23,7 @@ This is a test element with relations.
 
 #### Relations
   * verify: [Element 3](#element-3)
-  * refinedBy: [Element 2](#element-2)
+  * derive: [Element 2](#element-2)
 
 ### Element 2
 
@@ -32,8 +31,7 @@ This is another test element with relations.
 
 #### Relations
   * trace: [Element 1](#element-1)
-  * derivedFrom: [Root Requirement](#root-requirement)
-  * refine: [Element 1](#element-1)
+  * derivedFrom: [Element 1](#element-1)
 
 ## Section 2
 
@@ -60,7 +58,7 @@ This is a fourth test element with relations.
 This is a fifth test element.
 
 #### Relations
-  * containedBy: [Element 6](#element-6)
+  * derivedFrom: [Element 6](#element-6)
   * trace: [Element 1](#element-1)
   * satisfiedBy: [element2_implementation.py](element2_implementation.py)  
 
@@ -70,7 +68,7 @@ This is a fifth test element.
 This is a sixth test element.
 
 #### Relations
-  * contain: [Element 5](#element-5)
+  * derive: [Element 5](#element-5)
   * derivedFrom: [Element 3](#element-3)
 
 
