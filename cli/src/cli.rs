@@ -26,21 +26,64 @@ use std::path::Path;
 #[derive(Parser, Debug)]
 #[clap(
     author,
-    version, 
-    about = "Reqvire requirements & treacibility management tool", 
+    version,
+    about = "Reqvire requirements & treacibility management tool",
     long_about = None,
     name = "reqvire"
 )]
 pub struct Args {
     #[clap(subcommand)]
     pub command: Option<Commands>,
-    
+
     /// Path to a custom configuration file (YAML format)
-    /// If not provided, the system will look for reqvire.yml, reqvire.yaml, 
+    /// If not provided, the system will look for reqvire.yml, reqvire.yaml,
     /// .reqvire.yml, or .reqvire.yaml in the current directory
     #[clap(long, short = 'c', global = true)]
     pub config: Option<PathBuf>,
-    
+
+}
+
+#[derive(Subcommand, Debug)]
+pub enum VerificationsCommands {
+    /// Generate verification traceability matrix showing requirements and their verification status
+    #[clap(override_help = "Generate verification traceability matrix showing requirements and their verification status\n\nVERIFICATIONS MATRIX OPTIONS:\n      --svg                       Output traceability matrix as SVG (cannot be used with --json)\n      --json                      Output results in JSON format")]
+    Matrix {
+        /// Output traceability matrix as SVG without hyperlinks and with full element names Cannot be used with --json
+        #[clap(long, conflicts_with = "json", help_heading = "VERIFICATIONS MATRIX OPTIONS")]
+        svg: bool,
+
+        /// Output results in JSON format
+        #[clap(long, help_heading = "VERIFICATIONS MATRIX OPTIONS")]
+        json: bool,
+    },
+
+    /// Generate verification traces showing upward paths from verifications to root requirements
+    #[clap(override_help = "Generate verification traces showing upward paths from verifications to root requirements\n\nVERIFICATIONS TRACES OPTIONS:\n      --json                      Output results in JSON format\n      --filter-id <ID>            Only include verification with this specific identifier\n      --filter-name <REGEX>       Only include verifications whose name matches this regular expression\n      --filter-type <TYPE>        Only include verifications of the given type e.g. `test-verification`, `analysis-verification`")]
+    Traces {
+        /// Output results in JSON format
+        #[clap(long, help_heading = "VERIFICATIONS TRACES OPTIONS")]
+        json: bool,
+
+        /// Only include verification with this specific identifier
+        #[clap(long, value_name = "ID", help_heading = "VERIFICATIONS TRACES OPTIONS")]
+        filter_id: Option<String>,
+
+        /// Only include verifications whose name matches this regular expression
+        #[clap(long, value_name = "REGEX", help_heading = "VERIFICATIONS TRACES OPTIONS")]
+        filter_name: Option<String>,
+
+        /// Only include verifications of the given type e.g. `test-verification`, `analysis-verification`
+        #[clap(long, value_name = "TYPE", help_heading = "VERIFICATIONS TRACES OPTIONS")]
+        filter_type: Option<String>,
+    },
+
+    /// Generate verification coverage report for leaf requirements
+    #[clap(override_help = "Generate verification coverage report for leaf requirements\n\nVERIFICATIONS COVERAGE OPTIONS:\n      --json                      Output results in JSON format")]
+    Coverage {
+        /// Output results in JSON format
+        #[clap(long, help_heading = "VERIFICATIONS COVERAGE OPTIONS")]
+        json: bool,
+    },
 }
 
 #[derive(Subcommand, Debug)]
@@ -72,37 +115,6 @@ pub enum Commands {
         json: bool,
     },
     
-    /// Generate traceability information without processing other files Creates matrices and reports showing relationships between elements in the model
-    #[clap(override_help = "Generate traceability information without processing other files Creates matrices and reports showing relationships between elements in the model\n\nTRACES OPTIONS:\n      --svg   Output traceability matrix as SVG without hyperlinks and with full element names Cannot be used with --json\n      --json  Output results in JSON format")]
-    Traces {
-        /// Output traceability matrix as SVG without hyperlinks and with full element names Cannot be used with --json
-        #[clap(long, conflicts_with = "json", help_heading = "TRACES OPTIONS")]
-        svg: bool,
-
-        /// Output results in JSON format
-        #[clap(long, help_heading = "TRACES OPTIONS")]
-        json: bool,
-    },
-
-    /// Generate verification traceability traces showing upward paths from verifications to root requirements
-    #[clap(override_help = "Generate verification traceability traces showing upward paths from verifications to root requirements\n\nVERIFICATION TRACES OPTIONS:\n      --json                      Output results in JSON format\n      --filter-id <ID>            Only include verification with this specific identifier\n      --filter-name <REGEX>       Only include verifications whose name matches this regular expression\n      --filter-type <TYPE>        Only include verifications of the given type e.g. `test-verification`, `analysis-verification`")]
-    VerificationTraces {
-        /// Output results in JSON format
-        #[clap(long, help_heading = "VERIFICATION TRACES OPTIONS")]
-        json: bool,
-
-        /// Only include verification with this specific identifier
-        #[clap(long, value_name = "ID", help_heading = "VERIFICATION TRACES OPTIONS")]
-        filter_id: Option<String>,
-
-        /// Only include verifications whose name matches this regular expression
-        #[clap(long, value_name = "REGEX", help_heading = "VERIFICATION TRACES OPTIONS")]
-        filter_name: Option<String>,
-
-        /// Only include verifications of the given type e.g. `test-verification`, `analysis-verification`
-        #[clap(long, value_name = "TYPE", help_heading = "VERIFICATION TRACES OPTIONS")]
-        filter_type: Option<String>,
-    },
 
     /// Generate mermaid diagrams in markdown files showing requirements relationships The diagrams will be placed at the top of each requirements document
     GenerateDiagrams,
@@ -165,12 +177,9 @@ pub enum Commands {
         json: bool,
     },
     
-    /// Output verification coverage report
-    CoverageReport {
-        /// Output results in JSON format
-        #[clap(long)]
-        json: bool,
-    },
+    /// Verification management commands - generate matrix, traces, and coverage reports
+    #[clap(subcommand)]
+    Verifications(VerificationsCommands),
 
     /// Output sections summary showing files, section names, and section content without individual elements
     #[clap(override_help = "Output sections summary showing files, section names, and section content without individual elements\n\nSECTIONS SUMMARY OPTIONS:\n      --json                        Output results in JSON format\n      --filter-file <GLOB>          Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`\n      --filter-section <GLOB>       Only include sections whose name matches this glob pattern e.g. `System requirement*`\n      --filter-content <REGEX>      Only include sections whose content matches this regular expression")]
@@ -225,20 +234,32 @@ fn print_custom_help(cmd: &clap::Command) {
         println!("{}", about);
     }
     println!();
-    
+
     println!("Usage: {} [OPTIONS] <COMMAND> [COMMAND OPTIONS]", cmd.get_name());
     println!();
-    
+
     // Print commands
     println!("Commands:");
     for subcommand in cmd.get_subcommands() {
         let name = subcommand.get_name();
         let about = subcommand.get_about().map(|s| s.to_string()).unwrap_or_default();
-        println!("  {:<17} {}", name, about);
+
+        // Check if this command has subcommands (like verifications)
+        if subcommand.has_subcommands() {
+            println!("  {:<17} {}", name, about);
+            // List nested subcommands indented
+            for nested in subcommand.get_subcommands() {
+                let nested_name = format!("{} {}", name, nested.get_name());
+                let nested_about = nested.get_about().map(|s| s.to_string()).unwrap_or_default();
+                println!("    {:<15} {}", nested_name, nested_about);
+            }
+        } else {
+            println!("  {:<17} {}", name, about);
+        }
     }
     println!("  help               Print this message or the help of the given subcommand(s)");
     println!();
-    
+
     // Print global options
     println!("Options:");
     for arg in cmd.get_arguments() {
@@ -262,38 +283,77 @@ fn print_custom_help(cmd: &clap::Command) {
     println!("  -h, --help               Print help");
     println!("  -V, --version            Print version");
     println!();
-    
+
     // Print command-specific options organized by command
     for subcommand in cmd.get_subcommands() {
-        let mut has_options = false;
-        let mut options = Vec::new();
-        
-        for arg in subcommand.get_arguments() {
-            if !arg.is_global_set() {
-                has_options = true;
-                let long = arg.get_long().map(|l| format!("--{}", l)).unwrap_or_default();
-                let value_name = if arg.get_action().takes_values() {
-                    let value = arg.get_value_names()
-                        .and_then(|v| v.get(0))
-                        .map(|s| s.to_string())
-                        .unwrap_or_else(|| "VALUE".to_string());
-                    format!(" <{}>", value)
-                } else {
-                    String::new()
-                };
-                let help = arg.get_help().map(|s| s.to_string()).unwrap_or_default();
-                let option_part = format!("{}{}", long, value_name);
-                options.push(format!("      {:<25} {}", option_part, help));
+        // Check if this command has nested subcommands (like verifications)
+        if subcommand.has_subcommands() {
+            // Print options for each nested subcommand
+            for nested in subcommand.get_subcommands() {
+                let mut has_options = false;
+                let mut options = Vec::new();
+
+                for arg in nested.get_arguments() {
+                    if !arg.is_global_set() {
+                        has_options = true;
+                        let long = arg.get_long().map(|l| format!("--{}", l)).unwrap_or_default();
+                        let value_name = if arg.get_action().takes_values() {
+                            let value = arg.get_value_names()
+                                .and_then(|v| v.get(0))
+                                .map(|s| s.to_string())
+                                .unwrap_or_else(|| "VALUE".to_string());
+                            format!(" <{}>", value)
+                        } else {
+                            String::new()
+                        };
+                        let help = arg.get_help().map(|s| s.to_string()).unwrap_or_default();
+                        let option_part = format!("{}{}", long, value_name);
+                        options.push(format!("      {:<25} {}", option_part, help));
+                    }
+                }
+
+                if has_options {
+                    let parent_name = subcommand.get_name().to_uppercase();
+                    let nested_name = nested.get_name().to_uppercase().replace("-", " ");
+                    println!("{} {} OPTIONS:", parent_name, nested_name);
+                    for option in options {
+                        println!("{}", option);
+                    }
+                    println!();
+                }
             }
-        }
-        
-        if has_options {
-            let command_name = subcommand.get_name().to_uppercase().replace("-", " ");
-            println!("{} OPTIONS:", command_name);
-            for option in options {
-                println!("{}", option);
+        } else {
+            // Regular command with options
+            let mut has_options = false;
+            let mut options = Vec::new();
+
+            for arg in subcommand.get_arguments() {
+                if !arg.is_global_set() {
+                    has_options = true;
+                    let long = arg.get_long().map(|l| format!("--{}", l)).unwrap_or_default();
+                    let value_name = if arg.get_action().takes_values() {
+                        let value = arg.get_value_names()
+                            .and_then(|v| v.get(0))
+                            .map(|s| s.to_string())
+                            .unwrap_or_else(|| "VALUE".to_string());
+                        format!(" <{}>", value)
+                    } else {
+                        String::new()
+                    };
+                    let help = arg.get_help().map(|s| s.to_string()).unwrap_or_default();
+                    let option_part = format!("{}{}", long, value_name);
+                    options.push(format!("      {:<25} {}", option_part, help));
+                }
             }
-            println!();
+
+            if has_options {
+                let command_name = subcommand.get_name().to_uppercase().replace("-", " ");
+                println!("{} OPTIONS:", command_name);
+                for option in options {
+                    println!("{}", option);
+                }
+                println!();
+            }
         }
     }
 }
@@ -327,12 +387,14 @@ fn wants_json(args: &Args) -> bool {
     match &args.command {
         Some(Commands::Format { json, .. }) => *json,
         Some(Commands::Validate { json }) => *json,
-        Some(Commands::Traces { json, .. }) => *json,
-        Some(Commands::VerificationTraces { json, .. }) => *json,
         Some(Commands::ModelSummary { json, .. }) => *json,
         Some(Commands::ChangeImpact { json, .. }) => *json,
-        Some(Commands::CoverageReport { json }) => *json,
         Some(Commands::SectionsSummary { json, .. }) => *json,
+        Some(Commands::Verifications(subcmd)) => match subcmd {
+            VerificationsCommands::Matrix { json, .. } => *json,
+            VerificationsCommands::Traces { json, .. } => *json,
+            VerificationsCommands::Coverage { json } => *json,
+        },
         _ => false,
     }
 }
@@ -488,70 +550,73 @@ pub fn handle_command(
             }
             return Ok(0);
         },
-        Some(Commands::Traces { json, svg }) => {
-            let matrix_config = matrix_generator::MatrixConfig::default();
-
-            let matrix_output = reqvire::matrix_generator::generate_matrix(
-                &model_manager.graph_registry,
-                &matrix_config,
-                if json {
-                    matrix_generator::MatrixFormat::Json
-                } else if svg {
-                    matrix_generator::MatrixFormat::Svg
-                } else {
-                    matrix_generator::MatrixFormat::Markdown
+        Some(Commands::Verifications(subcmd)) => {
+            match subcmd {
+                VerificationsCommands::Matrix { json, svg } => {
+                    // Generate traceability matrix with verification roll-up strategy
+                    let matrix_config = matrix_generator::MatrixConfig::default();
+                    let matrix_output = reqvire::matrix_generator::generate_matrix(
+                        &model_manager.graph_registry,
+                        &matrix_config,
+                        if json {
+                            matrix_generator::MatrixFormat::Json
+                        } else if svg {
+                            matrix_generator::MatrixFormat::Svg
+                        } else {
+                            matrix_generator::MatrixFormat::Markdown
+                        },
+                    );
+                    println!("{}", matrix_output);
+                    return Ok(0);
                 },
-            );
+                VerificationsCommands::Traces {
+                    json,
+                    filter_id,
+                    filter_name,
+                    filter_type
+                } => {
+                    // Generate verification traces report (upward paths from verifications to requirements)
+                    let generator = verification_trace::VerificationTraceGenerator::new(
+                        &model_manager.graph_registry,
+                        diagrams_with_blobs
+                    );
 
-            println!("{}", matrix_output);
-            return Ok(0);
-        },
-        Some(Commands::VerificationTraces {
-            json,
-            filter_id,
-            filter_name,
-            filter_type
-        }) => {
-            // Generate verification traces report
-            let generator = verification_trace::VerificationTraceGenerator::new(
-                &model_manager.graph_registry,
-                diagrams_with_blobs
-            );
+                    let mut report = generator.generate();
 
-            let mut report = generator.generate();
+                    // Apply filters
+                    if filter_id.is_some() || filter_name.is_some() || filter_type.is_some() {
+                        report = verification_trace::apply_filters(
+                            report,
+                            filter_id.as_deref(),
+                            filter_name.as_deref(),
+                            filter_type.as_deref(),
+                        )?;
+                    }
 
-            // Apply filters
-            if filter_id.is_some() || filter_name.is_some() || filter_type.is_some() {
-                report = verification_trace::apply_filters(
-                    report,
-                    filter_id.as_deref(),
-                    filter_name.as_deref(),
-                    filter_type.as_deref(),
-                )?;
+                    // Output the report
+                    if json {
+                        let json_output = serde_json::to_string_pretty(&report)
+                            .map_err(|e| ReqvireError::ProcessError(format!("Failed to serialize report: {}", e)))?;
+                        println!("{}", json_output);
+                    } else {
+                        let markdown_output = generator.generate_markdown(&report);
+                        println!("{}", markdown_output);
+                    }
+
+                    return Ok(0);
+                },
+                VerificationsCommands::Coverage { json } => {
+                    let coverage_report = reports::generate_coverage_report(&model_manager.graph_registry);
+                    coverage_report.print(json);
+                    return Ok(0);
+                },
             }
-
-            // Output the report
-            if json {
-                let json_output = serde_json::to_string_pretty(&report)
-                    .map_err(|e| ReqvireError::ProcessError(format!("Failed to serialize report: {}", e)))?;
-                println!("{}", json_output);
-            } else {
-                let markdown_output = generator.generate_markdown(&report);
-                println!("{}", markdown_output);
-            }
-
-            return Ok(0);
         },
         Some(Commands::Html { output }) => {
             let html_output_path = PathBuf::from(output);
             let processed_count = export::export_model(&model_manager.graph_registry, &html_output_path)?;
-            info!("{} markdown files converted to HTML", processed_count);   
-            
-            return Ok(0);
-        },
-        Some(Commands::CoverageReport { json }) => {
-            let coverage_report = reports::generate_coverage_report(&model_manager.graph_registry);
-            coverage_report.print(json);
+            info!("{} markdown files converted to HTML", processed_count);
+
             return Ok(0);
         },
         Some(Commands::SectionsSummary {

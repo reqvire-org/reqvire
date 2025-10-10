@@ -561,7 +561,7 @@ mod tests {
     fn test_verification_trace_structure() {
         // Basic structure test
         let report = VerificationTracesReport {
-            files: HashMap::new(),
+            files: BTreeMap::new(),
         };
         assert_eq!(report.files.len(), 0);
     }

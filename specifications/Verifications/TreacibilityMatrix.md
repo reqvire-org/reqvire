@@ -12,34 +12,6 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  62b41611d85d4161["SVG Matrix Output Test"];
-  class 62b41611d85d4161 verification;
-  click 62b41611d85d4161 "TreacibilityMatrix.md#svg-matrix-output-test";
-  8aec4f4d071ac12c["test.sh"];
-  class 8aec4f4d071ac12c default;
-  click 8aec4f4d071ac12c "../../tests/test-matrix-generation/test.sh";
-  62b41611d85d4161 -->|satisfiedBy| 8aec4f4d071ac12c;
-  7f6c7f917ed529ae["CLI Traces Flag Test"];
-  class 7f6c7f917ed529ae verification;
-  click 7f6c7f917ed529ae "TreacibilityMatrix.md#cli-traces-flag-test";
-  8aec4f4d071ac12c["test.sh"];
-  class 8aec4f4d071ac12c default;
-  click 8aec4f4d071ac12c "../../tests/test-matrix-generation/test.sh";
-  7f6c7f917ed529ae -->|satisfiedBy| 8aec4f4d071ac12c;
-  aa85c85e7c41d899["Traceability Matrix Generation Test"];
-  class aa85c85e7c41d899 verification;
-  click aa85c85e7c41d899 "TreacibilityMatrix.md#traceability-matrix-generation-test";
-  8aec4f4d071ac12c["test.sh"];
-  class 8aec4f4d071ac12c default;
-  click 8aec4f4d071ac12c "../../tests/test-matrix-generation/test.sh";
-  aa85c85e7c41d899 -->|satisfiedBy| 8aec4f4d071ac12c;
-  50c290277850dd17["JSON Matrix Output Test"];
-  class 50c290277850dd17 verification;
-  click 50c290277850dd17 "TreacibilityMatrix.md#json-matrix-output-test";
-  8aec4f4d071ac12c["test.sh"];
-  class 8aec4f4d071ac12c default;
-  click 8aec4f4d071ac12c "../../tests/test-matrix-generation/test.sh";
-  50c290277850dd17 -->|satisfiedBy| 8aec4f4d071ac12c;
   5a25cf6244f4f44["Hierarchical Matrix Format Test"];
   class 5a25cf6244f4f44 verification;
   click 5a25cf6244f4f44 "TreacibilityMatrix.md#hierarchical-matrix-format-test";
@@ -47,18 +19,34 @@ graph LR;
   class 8aec4f4d071ac12c default;
   click 8aec4f4d071ac12c "../../tests/test-matrix-generation/test.sh";
   5a25cf6244f4f44 -->|satisfiedBy| 8aec4f4d071ac12c;
-  5bfc0d5fd7bba25["CLI Traces Command"];
-  class 5bfc0d5fd7bba25 requirement;
-  click 5bfc0d5fd7bba25 "../SystemRequirements/Requirements.md#cli-traces-command";
-  80defdd4cbc7ee18["cli.rs"];
-  class 80defdd4cbc7ee18 default;
-  click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
-  5bfc0d5fd7bba25 -->|satisfiedBy| 80defdd4cbc7ee18;
-  5bfc0d5fd7bba25 -.->|verifiedBy| 7f6c7f917ed529ae;
-  1d9a1c502316e443["CLI Traces SVG Flag"];
-  class 1d9a1c502316e443 requirement;
-  click 1d9a1c502316e443 "../SystemRequirements/Requirements.md#cli-traces-svg-flag";
-  5bfc0d5fd7bba25 -.->|deriveReqT| 1d9a1c502316e443;
+  7f6c7f917ed529ae["CLI Traces Flag Test"];
+  class 7f6c7f917ed529ae verification;
+  click 7f6c7f917ed529ae "TreacibilityMatrix.md#cli-traces-flag-test";
+  8aec4f4d071ac12c["test.sh"];
+  class 8aec4f4d071ac12c default;
+  click 8aec4f4d071ac12c "../../tests/test-matrix-generation/test.sh";
+  7f6c7f917ed529ae -->|satisfiedBy| 8aec4f4d071ac12c;
+  62b41611d85d4161["SVG Matrix Output Test"];
+  class 62b41611d85d4161 verification;
+  click 62b41611d85d4161 "TreacibilityMatrix.md#svg-matrix-output-test";
+  8aec4f4d071ac12c["test.sh"];
+  class 8aec4f4d071ac12c default;
+  click 8aec4f4d071ac12c "../../tests/test-matrix-generation/test.sh";
+  62b41611d85d4161 -->|satisfiedBy| 8aec4f4d071ac12c;
+  50c290277850dd17["JSON Matrix Output Test"];
+  class 50c290277850dd17 verification;
+  click 50c290277850dd17 "TreacibilityMatrix.md#json-matrix-output-test";
+  8aec4f4d071ac12c["test.sh"];
+  class 8aec4f4d071ac12c default;
+  click 8aec4f4d071ac12c "../../tests/test-matrix-generation/test.sh";
+  50c290277850dd17 -->|satisfiedBy| 8aec4f4d071ac12c;
+  aa85c85e7c41d899["Traceability Matrix Generation Test"];
+  class aa85c85e7c41d899 verification;
+  click aa85c85e7c41d899 "TreacibilityMatrix.md#traceability-matrix-generation-test";
+  8aec4f4d071ac12c["test.sh"];
+  class 8aec4f4d071ac12c default;
+  click 8aec4f4d071ac12c "../../tests/test-matrix-generation/test.sh";
+  aa85c85e7c41d899 -->|satisfiedBy| 8aec4f4d071ac12c;
   7de9a55d6102af23["Export Traceability Matrix"];
   class 7de9a55d6102af23 requirement;
   click 7de9a55d6102af23 "../UserRequirements.md#export-traceability-matrix";
@@ -74,8 +62,33 @@ graph LR;
   class 16bf75b57622c10 default;
   click 16bf75b57622c10 "../../core/src/matrix_generator.rs";
   b55d8517cd3e58 -->|satisfiedBy| 16bf75b57622c10;
-  b55d8517cd3e58 -.->|verifiedBy| aa85c85e7c41d899;
   b55d8517cd3e58 -.->|verifiedBy| 5a25cf6244f4f44;
+  b55d8517cd3e58 -.->|verifiedBy| aa85c85e7c41d899;
+  61410f4d63a7b184["CLI Verifications Matrix Command"];
+  class 61410f4d63a7b184 requirement;
+  click 61410f4d63a7b184 "../SystemRequirements/Requirements.md#cli-verifications-matrix-command";
+  80defdd4cbc7ee18["cli.rs"];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
+  61410f4d63a7b184 -->|satisfiedBy| 80defdd4cbc7ee18;
+  16bf75b57622c10["matrix_generator.rs"];
+  class 16bf75b57622c10 default;
+  click 16bf75b57622c10 "../../core/src/matrix_generator.rs";
+  61410f4d63a7b184 -->|satisfiedBy| 16bf75b57622c10;
+  61410f4d63a7b184 -.->|verifiedBy| aa85c85e7c41d899;
+  9adfb46733c1755e["CLI Verifications Matrix JSON Flag"];
+  class 9adfb46733c1755e requirement;
+  click 9adfb46733c1755e "../SystemRequirements/Requirements.md#cli-verifications-matrix-json-flag";
+  61410f4d63a7b184 -.->|deriveReqT| 9adfb46733c1755e;
+  6222e9c0602fdba5["CLI Verifications Matrix SVG Flag"];
+  class 6222e9c0602fdba5 requirement;
+  click 6222e9c0602fdba5 "../SystemRequirements/Requirements.md#cli-verifications-matrix-svg-flag";
+  61410f4d63a7b184 -.->|deriveReqT| 6222e9c0602fdba5;
+  16bf75b57622c10["matrix_generator.rs"];
+  class 16bf75b57622c10 default;
+  click 16bf75b57622c10 "../../core/src/matrix_generator.rs";
+  9adfb46733c1755e -->|satisfiedBy| 16bf75b57622c10;
+  9adfb46733c1755e -.->|verifiedBy| 50c290277850dd17;
   1b7491b67a792bc9["Markdown Matrix Formatter"];
   class 1b7491b67a792bc9 requirement;
   click 1b7491b67a792bc9 "../SystemRequirements/Requirements.md#markdown-matrix-formatter";
@@ -84,11 +97,11 @@ graph LR;
   click 16bf75b57622c10 "../../core/src/matrix_generator.rs";
   1b7491b67a792bc9 -->|satisfiedBy| 16bf75b57622c10;
   1b7491b67a792bc9 -.->|verifiedBy| 50c290277850dd17;
-  80defdd4cbc7ee18["cli.rs"];
-  class 80defdd4cbc7ee18 default;
-  click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
-  1d9a1c502316e443 -->|satisfiedBy| 80defdd4cbc7ee18;
-  1d9a1c502316e443 -.->|verifiedBy| 62b41611d85d4161;
+  16bf75b57622c10["matrix_generator.rs"];
+  class 16bf75b57622c10 default;
+  click 16bf75b57622c10 "../../core/src/matrix_generator.rs";
+  6222e9c0602fdba5 -->|satisfiedBy| 16bf75b57622c10;
+  6222e9c0602fdba5 -.->|verifiedBy| 62b41611d85d4161;
 ```
 ### Traceability Matrix Generation Test
 
@@ -138,7 +151,6 @@ This test verifies that the system provides a command-line flag for generating t
   * type: test-verification
 
 #### Relations
-  * verify: [CLI Traces Command](../SystemRequirements/Requirements.md#cli-traces-command)
   * satisfiedBy: [test.sh](../../tests/test-matrix-generation/test.sh)
 ---
 
@@ -152,20 +164,25 @@ This test verifies that the system can generate an SVG representation of the tra
 - System should generate an SVG version of the traceability matrix when requested
 - SVG should display full element names without truncation
 - SVG should maintain hierarchical structure from the markdown matrix
-- SVG should use appropriate visual indicators for verification status
+- SVG should use appropriate visual indicators for verification status following the verification roll-up strategy
+- Command should support both legacy `traces --svg` and new `verifications traces --svg` formats
 
 ##### Test Criteria
-- Command with `--traces --svg` flags returns success (0) exit code
+- Command with `verifications traces --svg` returns success (0) exit code
 - Output is a valid SVG document
 - Element names are displayed in full without truncation
 - Hierarchical structure is preserved with visual indicators
-- Verification status is clearly indicated
+- Verification status follows roll-up strategy:
+  - Parent requirement with ALL children verified is marked as verified (✅)
+  - Parent requirement with ANY child unverified is marked as unverified (❌)
+  - Leaf requirement with direct verifiedBy relation is marked as verified (✅)
+  - Leaf requirement without verifiedBy relation is marked as unverified (❌)
 
 #### Metadata
   * type: test-verification
 
 #### Relations
-  * verify: [CLI Traces SVG Flag](../SystemRequirements/Requirements.md#cli-traces-svg-flag)
+  * verify: [CLI Verifications Matrix SVG Flag](../SystemRequirements/Requirements.md#cli-verifications-matrix-svg-flag)
   * satisfiedBy: [test.sh](../../tests/test-matrix-generation/test.sh)
 ---
 

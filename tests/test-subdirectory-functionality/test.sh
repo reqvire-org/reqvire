@@ -105,9 +105,9 @@ if [ $EXIT_CODE -ne 0 ]; then
 fi
 
 # Test 4: Traces from submodule directory
-echo "Running: reqvire traces" >> "${TEST_DIR}/test_results.log"
+echo "Running: reqvire verifications traces" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" traces 2>&1)
+OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" verifications traces 2>&1)
 EXIT_CODE=$?
 set -e
 

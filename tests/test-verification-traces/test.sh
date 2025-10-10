@@ -6,10 +6,10 @@ echo "Starting test..." > "${TEST_DIR}/test_results.log"
 
 # Test: Verification Traces Filter Options Test
 # --------------------------------------
-# Satisfies: specifications/Verifications/ReportsTests.md#verification-traces-filter-options-test
+# Satisfies: specifications/Verifications/ReportsTests.md#verifications traces-filter-options-test
 #
 # Acceptance Criteria:
-# - System shall provide CLI command `verification-traces` that generates upward trace trees from verifications
+# - System shall provide CLI command `verifications traces` that generates upward trace trees from verifications
 # - Command shall output to stdout in Markdown format with embedded Mermaid diagrams by default
 # - Command shall support `--json` flag for structured JSON output without diagrams
 # - Mermaid diagrams shall show verification element as root with arrows following relation semantics
@@ -29,9 +29,9 @@ echo "Starting test..." > "${TEST_DIR}/test_results.log"
 # - Filters correctly restrict output to matching verifications
 
 # Test 1: Basic Markdown Output - Compare against expected file
-echo "Running: reqvire verification-traces" >> "${TEST_DIR}/test_results.log"
+echo "Running: reqvire verifications traces" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" verification-traces 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" verifications traces 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -40,7 +40,7 @@ echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
 printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 
 if [ $EXIT_CODE -ne 0 ]; then
-    echo "❌ FAILED: verification-traces command exited with code $EXIT_CODE"
+    echo "❌ FAILED: verifications traces command exited with code $EXIT_CODE"
     echo "$OUTPUT"
     exit 1
 fi
@@ -58,9 +58,9 @@ if ! diff -u "${TEST_DIR}/expected_output.md" "${TEST_DIR}/actual_output.md"; th
 fi
 
 # Test 2: JSON Output - Compare against expected file
-echo "Running: reqvire verification-traces --json" >> "${TEST_DIR}/test_results.log"
+echo "Running: reqvire verifications traces --json" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" verification-traces --json 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" verifications traces --json 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -68,7 +68,7 @@ echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
 printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 
 if [ $EXIT_CODE -ne 0 ]; then
-    echo "❌ FAILED: verification-traces --json command exited with code $EXIT_CODE"
+    echo "❌ FAILED: verifications traces --json command exited with code $EXIT_CODE"
     echo "$OUTPUT"
     exit 1
 fi
@@ -96,9 +96,9 @@ if [ "$EXPECTED_JSON" != "$ACTUAL_JSON" ]; then
 fi
 
 # Test 3: Specific Verification Filter
-echo "Running: reqvire verification-traces --filter-id" >> "${TEST_DIR}/test_results.log"
+echo "Running: reqvire verifications traces --filter-id" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" verification-traces \
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" verifications traces \
     --filter-id="specifications/Verifications/Tests.md#oauth-flow-test" 2>&1)
 EXIT_CODE=$?
 set -e
@@ -107,7 +107,7 @@ echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
 printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 
 if [ $EXIT_CODE -ne 0 ]; then
-    echo "❌ FAILED: verification-traces with --filter-id exited with code $EXIT_CODE"
+    echo "❌ FAILED: verifications traces with --filter-id exited with code $EXIT_CODE"
     echo "$OUTPUT"
     exit 1
 fi
@@ -130,9 +130,9 @@ if grep -q "Encryption Coverage Test" <<< "$OUTPUT"; then
 fi
 
 # Test 4: Name Pattern Filter
-echo "Running: reqvire verification-traces --filter-name" >> "${TEST_DIR}/test_results.log"
+echo "Running: reqvire verifications traces --filter-name" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" verification-traces \
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" verifications traces \
     --filter-name=".*Coverage.*" 2>&1)
 EXIT_CODE=$?
 set -e
@@ -141,7 +141,7 @@ echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
 printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 
 if [ $EXIT_CODE -ne 0 ]; then
-    echo "❌ FAILED: verification-traces with --filter-name exited with code $EXIT_CODE"
+    echo "❌ FAILED: verifications traces with --filter-name exited with code $EXIT_CODE"
     echo "$OUTPUT"
     exit 1
 fi
@@ -164,9 +164,9 @@ if grep -q "OAuth Flow Test" <<< "$OUTPUT"; then
 fi
 
 # Test 5: Type Filter
-echo "Running: reqvire verification-traces --filter-type" >> "${TEST_DIR}/test_results.log"
+echo "Running: reqvire verifications traces --filter-type" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" verification-traces \
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" verifications traces \
     --filter-type="test-verification" 2>&1)
 EXIT_CODE=$?
 set -e
@@ -175,7 +175,7 @@ echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
 printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 
 if [ $EXIT_CODE -ne 0 ]; then
-    echo "❌ FAILED: verification-traces with --filter-type exited with code $EXIT_CODE"
+    echo "❌ FAILED: verifications traces with --filter-type exited with code $EXIT_CODE"
     echo "$OUTPUT"
     exit 1
 fi
@@ -198,9 +198,9 @@ if grep -q "Code Inspection" <<< "$OUTPUT"; then
 fi
 
 # Test 6: Combined Filters
-echo "Running: reqvire verification-traces --filter-type --filter-name" >> "${TEST_DIR}/test_results.log"
+echo "Running: reqvire verifications traces --filter-type --filter-name" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" verification-traces \
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" verifications traces \
     --filter-type="test-verification" --filter-name=".*Test" 2>&1)
 EXIT_CODE=$?
 set -e
@@ -209,7 +209,7 @@ echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
 printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 
 if [ $EXIT_CODE -ne 0 ]; then
-    echo "❌ FAILED: verification-traces with combined filters exited with code $EXIT_CODE"
+    echo "❌ FAILED: verifications traces with combined filters exited with code $EXIT_CODE"
     echo "$OUTPUT"
     exit 1
 fi

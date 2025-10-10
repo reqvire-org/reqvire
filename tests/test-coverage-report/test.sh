@@ -6,7 +6,8 @@ set -euo pipefail
 # Satisfies: specifications/Verifications/ReportsTests.md#verification-coverage-report-test
 #
 # Acceptance Criteria:
-# - System shall provide a CLI command `coverage-report` that generates coverage reports focusing on leaf requirements
+# - System shall provide a CLI command `verifications coverage` that generates coverage reports focusing on leaf requirements
+# - Legacy command `coverage-report` is also supported (deprecated)
 # - Command shall support `--json` flag for JSON output format
 # - Coverage report shall include summary section with total counts and percentages for leaf requirements
 # - Coverage report shall show breakdown by verification type (test, analysis, inspection, demonstration)
@@ -27,9 +28,9 @@ set -euo pipefail
 # Test 1: Basic Coverage Report (Text Output)
 echo "Starting test..." > "${TEST_DIR}/test_results.log"
 
-echo "Running: reqvire coverage-report" >> "${TEST_DIR}/test_results.log"
+echo "Running: reqvire verifications coverage" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" coverage-report 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" verifications coverage 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -37,7 +38,7 @@ echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
 printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 
 if [ $EXIT_CODE -ne 0 ]; then
-    echo "❌ FAILED: coverage-report command exited with code $EXIT_CODE"
+    echo "❌ FAILED: verifications coverage command exited with code $EXIT_CODE"
     exit 1
 fi
 
@@ -157,9 +158,9 @@ if grep -q "Unsatisfied Test Verifications:" <<< "$OUTPUT"; then
 fi
 
 # Test 2: JSON Coverage Report
-echo "Running: reqvire coverage-report --json" >> "${TEST_DIR}/test_results.log"
+echo "Running: reqvire verifications coverage --json" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" coverage-report --json 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" verifications coverage --json 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -167,7 +168,7 @@ echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
 printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 
 if [ $EXIT_CODE -ne 0 ]; then
-    echo "❌ FAILED: coverage-report --json command exited with code $EXIT_CODE"
+    echo "❌ FAILED: verifications coverage --json command exited with code $EXIT_CODE"
     exit 1
 fi
 

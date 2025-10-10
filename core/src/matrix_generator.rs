@@ -199,6 +199,9 @@ fn generate_matrix_table(
         add_children(element, level, &mut sorted_hierarchy, &parent_to_children);
     }
 
+    // Compute verification status with roll-up strategy
+    let mut verification_cache: HashMap<String, bool> = HashMap::new();
+
     // Rows with hierarchy and indentation
     for (source, level) in sorted_hierarchy {
         let source_id = &source.identifier;
@@ -213,7 +216,13 @@ fn generate_matrix_table(
         let source_url = format!("{}/blob/{}/{}", base_url, commit_hash, source_id);
         output.push_str(&format!("| [{}{}]({}) |", indentation, short_name, source_url));
 
-        let is_verified = matrix_data.get(source_id).map_or(false, |targets| !targets.is_empty());
+        // Verification status with roll-up strategy
+        let is_verified = compute_verification_status_with_rollup(
+            source_id,
+            matrix_data,
+            &parent_to_children,
+            &mut verification_cache
+        );
         output.push_str(if is_verified { " ✅ |" } else { " ❌ |" });
 
         for target in &relevant_targets {
@@ -343,9 +352,30 @@ fn generate_json_matrix(
         (source_id, targets)
     }).collect::<HashMap<_, _>>();
 
-    // Create verification status for each requirement
+    // Build parent-child hierarchy for roll-up computation
+    let mut parent_to_children: HashMap<String, Vec<&Element>> = HashMap::new();
+    let parent_relation_types = crate::relation::get_parent_relation_types();
+
+    for source in source_elements {
+        for relation in &source.relations {
+            if parent_relation_types.contains(&relation.relation_type.name) {
+                if let LinkType::Identifier(parent_id) = &relation.target.link {
+                    parent_to_children.entry(parent_id.clone()).or_default().push(source);
+                    break;
+                }
+            }
+        }
+    }
+
+    // Create verification status for each requirement with roll-up strategy
+    let mut verification_cache: HashMap<String, bool> = HashMap::new();
     let verification_status = source_elements.iter().map(|e| {
-        let is_verified = matrix_data.get(&e.identifier).map_or(false, |targets| !targets.is_empty());
+        let is_verified = compute_verification_status_with_rollup(
+            &e.identifier,
+            matrix_data,
+            &parent_to_children,
+            &mut verification_cache
+        );
         (&e.identifier, is_verified)
     }).collect::<HashMap<_, _>>();
 
@@ -360,12 +390,58 @@ fn generate_json_matrix(
     serde_json::to_string_pretty(&output).unwrap()
 }
 
+/// Computes verification status with roll-up strategy:
+/// - A requirement is verified if it has direct verifiedBy relations AND all its children are verified
+/// - If a requirement has no children, it's verified if it has direct verifiedBy relations
+/// - If a requirement has children but any child is unverified, the parent is unverified
+fn compute_verification_status_with_rollup(
+    element_id: &str,
+    matrix_data: &HashMap<String, HashSet<String>>,
+    parent_to_children: &HashMap<String, Vec<&Element>>,
+    cache: &mut HashMap<String, bool>,
+) -> bool {
+    // Check if we've already computed this
+    if let Some(&result) = cache.get(element_id) {
+        return result;
+    }
+
+    // Check if element has direct verification
+    let has_direct_verification = matrix_data.get(element_id).map_or(false, |targets| !targets.is_empty());
+
+    // Check if element has children
+    if let Some(children) = parent_to_children.get(element_id) {
+        // Element has children - must check if ALL children are verified
+        let all_children_verified = children.iter().all(|child| {
+            compute_verification_status_with_rollup(
+                &child.identifier,
+                matrix_data,
+                parent_to_children,
+                cache
+            )
+        });
+
+        // Requirement is verified only if ALL children are verified
+        // Note: Even if parent has direct verification, it's unverified if any child is unverified
+        let result = all_children_verified;
+        cache.insert(element_id.to_string(), result);
+        result
+    } else {
+        // No children - verification status is based on direct verifiedBy relations only
+        cache.insert(element_id.to_string(), has_direct_verification);
+        has_direct_verification
+    }
+}
+
 /// Generates a simple SVG representation of the traceability matrix
 fn generate_svg_matrix(
     matrix_data: &HashMap<String, HashSet<String>>,
     source_elements: &[&Element],
     target_elements: &[&Element],
 ) -> String {
+    // Sort target elements by identifier for deterministic column ordering
+    let mut sorted_target_elements = target_elements.to_vec();
+    sorted_target_elements.sort_by(|a, b| a.identifier.cmp(&b.identifier));
+
     // Determine column widths based on content
     // First, calculate the max width needed for source element names
     let source_max_width = source_elements.iter()
@@ -374,7 +450,7 @@ fn generate_svg_matrix(
         .unwrap_or(20) as i32;
     
     // Calculate width for each target element individually
-    let target_column_widths: Vec<i32> = target_elements.iter()
+    let target_column_widths: Vec<i32> = sorted_target_elements.iter()
         .map(|e| {
             // Calculate width based on text length with extra padding
             // Use 8px per character plus extra padding (40px) to ensure enough space
@@ -388,7 +464,7 @@ fn generate_svg_matrix(
     let verified_column_width = 60; // Narrower column for verification status
     
     // Calculate total width needed
-    let _total_columns = 2 + target_elements.len() as i32; // Requirements + Verified + All targets
+    let _total_columns = 2 + sorted_target_elements.len() as i32; // Requirements + Verified + All targets
     let total_width = source_column_width + verified_column_width + target_column_widths.iter().sum::<i32>() + 40;
     let total_height = 100 + (source_elements.len() as i32 * 30) + 50; // Header + rows + margin
     
@@ -432,16 +508,16 @@ fn generate_svg_matrix(
     
     // Verification elements header columns
     let mut current_x = verified_col_x + verified_column_width;
-    for (i, target) in target_elements.iter().enumerate() {
+    for (i, target) in sorted_target_elements.iter().enumerate() {
         let column_width = target_column_widths[i];
-        
-        svg.push_str(&format!("<rect x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" fill=\"#f0f0f0\" stroke=\"#333\" />\n", 
+
+        svg.push_str(&format!("<rect x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" fill=\"#f0f0f0\" stroke=\"#333\" />\n",
             current_x, start_y, column_width, cell_height));
-        
+
         // Display full name
-        svg.push_str(&format!("<text x=\"{}\" y=\"{}\" class=\"header\" text-anchor=\"middle\">{}</text>\n", 
+        svg.push_str(&format!("<text x=\"{}\" y=\"{}\" class=\"header\" text-anchor=\"middle\">{}</text>\n",
             current_x + column_width/2, start_y + 20, target.name));
-        
+
         current_x += column_width;
     }
     
@@ -488,15 +564,18 @@ fn generate_svg_matrix(
     for (element, level) in sorted_roots {
         add_svg_children(element, level, &mut sorted_hierarchy, &parent_to_children);
     }
-    
+
+    // Compute verification status with roll-up strategy
+    let mut verification_cache: HashMap<String, bool> = HashMap::new();
+
     // Draw rows for each requirement with indentation
     for (i, (source, level)) in sorted_hierarchy.iter().enumerate() {
         let row_y = start_y + header_offset + i as i32 * cell_height;
-        
+
         // Requirement name cell
-        svg.push_str(&format!("<rect x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" fill=\"white\" stroke=\"#333\" />\n", 
+        svg.push_str(&format!("<rect x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" fill=\"white\" stroke=\"#333\" />\n",
             start_x, row_y, source_column_width, cell_height));
-        
+
         // Apply indentation based on level
         let indentation = match level {
             0 => "",
@@ -505,37 +584,42 @@ fn generate_svg_matrix(
             3 => "____↳ ",
             _ => "______↳ ",
         };
-        
+
         // Display full name with indentation
-        svg.push_str(&format!("<text x=\"{}\" y=\"{}\" class=\"cell\">{}{}</text>\n", 
+        svg.push_str(&format!("<text x=\"{}\" y=\"{}\" class=\"cell\">{}{}</text>\n",
             start_x + 10, row_y + 20, indentation, source.name));
-        
-        // Verification status cell
-        let is_verified = matrix_data.get(&source.identifier).map_or(false, |targets| !targets.is_empty());
+
+        // Verification status cell with roll-up strategy
+        let is_verified = compute_verification_status_with_rollup(
+            &source.identifier,
+            matrix_data,
+            &parent_to_children,
+            &mut verification_cache
+        );
         let status_class = if is_verified { "verified" } else { "unverified" };
         let status_symbol = if is_verified { "✅" } else { "❌" };
-        
-        svg.push_str(&format!("<rect x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" fill=\"white\" stroke=\"#333\" />\n", 
+
+        svg.push_str(&format!("<rect x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" fill=\"white\" stroke=\"#333\" />\n",
             verified_col_x, row_y, verified_column_width, cell_height));
-        svg.push_str(&format!("<text x=\"{}\" y=\"{}\" class=\"cell {}\" text-anchor=\"middle\">{}</text>\n", 
+        svg.push_str(&format!("<text x=\"{}\" y=\"{}\" class=\"cell {}\" text-anchor=\"middle\">{}</text>\n",
             verified_col_x + verified_column_width/2, row_y + 20, status_class, status_symbol));
         
         // Cells for each verification element
         current_x = verified_col_x + verified_column_width;
-        for (i, target) in target_elements.iter().enumerate() {
+        for (i, target) in sorted_target_elements.iter().enumerate() {
             let column_width = target_column_widths[i];
-            
+
             let has_relation = matrix_data.get(&(*source).identifier)
                 .map_or(false, |targets| targets.contains(&target.identifier));
-            
-            svg.push_str(&format!("<rect x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" fill=\"white\" stroke=\"#333\" />\n", 
+
+            svg.push_str(&format!("<rect x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" fill=\"white\" stroke=\"#333\" />\n",
                 current_x, row_y, column_width, cell_height));
-            
+
             if has_relation {
-                svg.push_str(&format!("<text x=\"{}\" y=\"{}\" class=\"cell verified\" text-anchor=\"middle\">✅</text>\n", 
+                svg.push_str(&format!("<text x=\"{}\" y=\"{}\" class=\"cell verified\" text-anchor=\"middle\">✅</text>\n",
                     current_x + column_width/2, row_y + 20));
             }
-            
+
             current_x += column_width;
         }
     }

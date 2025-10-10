@@ -758,7 +758,7 @@ mod tests {
         add_relation(
             &mut element_a,
             &RelationTypeInfo {
-                name: "contain",
+                name: "derive",
                 opposite: Some("containedBy"),
                 description: "Element A contains B",
                 arrow: "-->",
@@ -795,7 +795,7 @@ mod tests {
             tree.relations[0].element_node.element.identifier,
             "B"
         );
-        assert_eq!(tree.relations[0].relation_trigger, "contain");
+        assert_eq!(tree.relations[0].relation_trigger, "derive");
        
         // The child node for B has no relations in its tree because B -> A is not processed by the tree
         // since we only consider Forward relations in change_impact_with_relation
