@@ -31,7 +31,7 @@ Where:
   * type: user-requirement
 
 #### Relations
-  * refine: [Code Traceability](UserRequirements.md#code-traceability)
+  * derivedFrom: [Code Traceability](UserRequirements.md#code-traceability)
 ---
 
 ### Validating Traceability Format
@@ -42,7 +42,7 @@ While processing traceability in code, the system shall ensure that each `[reqvi
   * type: user-requirement
 
 #### Relations
-  * refine: [Traceability Format](#traceability-format)
+  * derivedFrom: [Traceability Format](#traceability-format)
 ---
 
 ### Comment Style by File Extension
@@ -53,7 +53,7 @@ The system shall use different comment style based of file extension of the code
   * type: user-requirement
 
 #### Relations
-  * refine: [Traceability Format](#traceability-format)
+  * derivedFrom: [Traceability Format](#traceability-format)
 ---
 
 ### Slash style comment

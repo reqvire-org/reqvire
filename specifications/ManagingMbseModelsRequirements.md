@@ -47,7 +47,7 @@ The system shall support a **YAML-based configuration file** that defines folder
   * type: user-requirement
 
 #### Relations
-  * refine: [Git Repository as Project Root](#git-repository-as-project-root)
+  * derivedFrom: [Git Repository as Project Root](#git-repository-as-project-root)
 ---
 
 ### Configurable User Requirements Root Folder

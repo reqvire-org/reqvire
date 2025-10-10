@@ -457,7 +457,7 @@ trace (Neutral):
 | **trace**       | «trace»        | dashed dependency     | open (hollow) arrowhead | Tracing → Traced (neutral)        | Forward             |
 
 #### Relations
-  * refine: [Diagram Generation](#diagram-generation)
+  * derivedFrom: [Diagram Generation](#diagram-generation)
   * satisfiedBy: [diagrams.rs](../../core/src/diagrams.rs)
 ---
 
@@ -478,7 +478,7 @@ The filtering ensures that:
 - Diagram readability is maintained while accurately representing the complete model structure
 
 #### Relations
-  * refine: [SysML-Compatible Relationship Rendering](#sysml-compatible-relationship-rendering)
+  * derivedFrom: [SysML-Compatible Relationship Rendering](#sysml-compatible-relationship-rendering)
   * derivedFrom: [Relation Types and behaviors](../SpecificationsRequirements.md#relation-types-and-behaviors)
   * satisfiedBy: [diagrams.rs](../../core/src/diagrams.rs)
 ---
@@ -1157,7 +1157,7 @@ This enables the system to:
 The system shall provide a diagrams generation function, activated by the (generate-diagrams command), which shall generate interactive mermaid diagrams.
 
 #### Relations
-  * refine: [Diagram Generation](#diagram-generation)
+  * derivedFrom: [Diagram Generation](#diagram-generation)
   * containedBy: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
   * verifiedBy: [Diagram Generation Test](../Verifications/DiagramsTests.md#diagram-generation-test)
@@ -1168,7 +1168,7 @@ The system shall provide a diagrams generation function, activated by the (gener
 The system shall provide a diagram removal function, activated by the remove-diagrams command, which shall remove all generated mermaid diagrams from the model.
 
 #### Relations
-  * refine: [Diagram Removal](#diagram-removal)
+  * derivedFrom: [Diagram Removal](#diagram-removal)
   * containedBy: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
   * verifiedBy: [Remove Generated Diagrams Verification](../Verifications/DiagramsTests.md#remove-generated-diagrams-verification)

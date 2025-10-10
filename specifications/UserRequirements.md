@@ -48,7 +48,7 @@ The system shall support code traceability by using structured comments to link 
   * type: user-requirement
 
 #### Relations
-  * refine: [Aligning Design with Code](UserStories.md#aligning-design-with-code)
+  * derivedFrom: [Aligning Design with Code](UserStories.md#aligning-design-with-code)
 ---
 
 ### Suggest Code Refactoring
@@ -59,7 +59,7 @@ The system shall suggest code refactoring opportunities to better align with the
   * type: user-requirement
 
 #### Relations
-  * refine: [Aligning Design with Code](UserStories.md#aligning-design-with-code)
+  * derivedFrom: [Aligning Design with Code](UserStories.md#aligning-design-with-code)
 ---
 
 ## Validating Structures
@@ -72,7 +72,7 @@ The system shall provide comprehensive validation messages that include file pat
   * type: user-requirement
 
 #### Relations
-  * refine: [Validating Structures](UserStories.md#validating-structures)
+  * derivedFrom: [Validating Structures](UserStories.md#validating-structures)
 ---
 
 ### Model Formatting
@@ -83,7 +83,7 @@ The system shall provide formatting capabilities to normalize and standardize MB
   * type: user-requirement
 
 #### Relations
-  * refine: [Validating Structures](UserStories.md#validating-structures)
+  * derivedFrom: [Validating Structures](UserStories.md#validating-structures)
 ---
 
 ### Formatting Command
@@ -105,7 +105,7 @@ The system shall display formatting changes suggestion in similar manner as git 
   * type: user-requirement
 
 #### Relations
-  * refine: [Formatting Command](#formatting-command)
+  * derivedFrom: [Formatting Command](#formatting-command)
 ---
 
 ### Replace Absolute Links with Relative Links
@@ -162,7 +162,7 @@ The SpecificationIndex.md file shall be converted to index.html when HTML output
   * type: user-requirement
 
 #### Relations
-  * refine: [Generate Documentation Index](#generate-documentation-index)
+  * derivedFrom: [Generate Documentation Index](#generate-documentation-index)
   * verifiedBy: [HTML Export Verification](Verifications/Misc.md#html-export-verification)
 ---
 
@@ -174,7 +174,7 @@ The system shall validate the Markdown structure of MBSE documentation to ensure
   * type: user-requirement
 
 #### Relations
-  * refine: [Validating Structures](UserStories.md#validating-structures)
+  * derivedFrom: [Validating Structures](UserStories.md#validating-structures)
   * derivedFrom: [Align with Industry Standards](MissionRequirements.md#align-with-industry-standards)
 ---
 
@@ -186,7 +186,7 @@ The system shall validate the organization of files and folders in the repositor
   * type: user-requirement
 
 #### Relations
-  * refine: [Validating Structures](UserStories.md#validating-structures)
+  * derivedFrom: [Validating Structures](UserStories.md#validating-structures)
 ---
 
 ### Validate Internal Consistency
@@ -197,7 +197,7 @@ The system shall check the internal consistency of the MBSE model, ensuring that
   * type: user-requirement
 
 #### Relations
-  * refine: [Validating Structures](UserStories.md#validating-structures)
+  * derivedFrom: [Validating Structures](UserStories.md#validating-structures)
   * derivedFrom: [Align with Industry Standards](MissionRequirements.md#align-with-industry-standards)
 ---
 
@@ -209,7 +209,7 @@ The system shall validate dependencies across different components of the MBSE m
   * type: user-requirement
 
 #### Relations
-  * refine: [Validating Structures](UserStories.md#validating-structures)
+  * derivedFrom: [Validating Structures](UserStories.md#validating-structures)
   * derivedFrom: [Align with Industry Standards](MissionRequirements.md#align-with-industry-standards)
 ---
 
@@ -221,7 +221,7 @@ The system shall validate relation types and allow only supported types.
   * type: user-requirement
 
 #### Relations
-  * refine: [Validating Structures](UserStories.md#validating-structures)
+  * derivedFrom: [Validating Structures](UserStories.md#validating-structures)
   * derivedFrom: [Align with Industry Standards](MissionRequirements.md#align-with-industry-standards)
 ---
 
@@ -235,7 +235,7 @@ The system shall automate validations of pull requests in the GitHub workflow to
   * type: user-requirement
 
 #### Relations
-  * refine: [Integrate with GitHub Workflows](UserStories.md#integrate-with-github-workflows)
+  * derivedFrom: [Integrate with GitHub Workflows](UserStories.md#integrate-with-github-workflows)
 ---
 
 ### Generate Change Logs for Pull Requests
@@ -246,7 +246,7 @@ The system shall generate detailed change logs for pull requests, summarizing mo
   * type: user-requirement
 
 #### Relations
-  * refine: [Integrate with GitHub Workflows](UserStories.md#integrate-with-github-workflows)
+  * derivedFrom: [Integrate with GitHub Workflows](UserStories.md#integrate-with-github-workflows)
 ---
 
 ### Automate Diagram Generation
@@ -257,7 +257,7 @@ The system shall automate generation of diagrams in the GitHub workflow on PR me
   * type: user-requirement
 
 #### Relations
-  * refine: [Integrate with GitHub Workflows](UserStories.md#integrate-with-github-workflows)
+  * derivedFrom: [Integrate with GitHub Workflows](UserStories.md#integrate-with-github-workflows)
   * derivedFrom: [Promote Automation and Efficiency](MissionRequirements.md#promote-automation-and-efficiency)
 ---
 
@@ -271,7 +271,7 @@ When requested the system shall provide human readable MBSE model reports.
   * type: user-requirement
 
 #### Relations
-  * refine: [Provide Reports](UserStories.md#provide-reports)
+  * derivedFrom: [Provide Reports](UserStories.md#provide-reports)
 ---
 
 ### Model Structure and Summaries
@@ -307,7 +307,7 @@ Validation shall be performed automatically when any command requires the parsed
   * type: user-requirement
 
 #### Relations
-  * refine: [Provide Reports](UserStories.md#provide-reports)
+  * derivedFrom: [Provide Reports](UserStories.md#provide-reports)
   * derivedFrom: [Align with Industry Standards](MissionRequirements.md#align-with-industry-standards)
 ---
 
@@ -340,7 +340,7 @@ The report helps track verification completeness and identify gaps in requiremen
   * type: user-requirement
 
 #### Relations
-  * refine: [Model Reports](#model-reports)
+  * derivedFrom: [Model Reports](#model-reports)
   * verifiedBy: [Verification Coverage Report Test](Verifications/ReportsTests.md#verification-coverage-report-test)
 ---
 
@@ -355,7 +355,7 @@ The system shall provide upward traceability visualization from verifications to
   * type: user-requirement
 
 #### Relations
-  * refine: [Model Reports](#model-reports)
+  * derivedFrom: [Model Reports](#model-reports)
 ---
 
 ## Trace Changes in MBSE Model

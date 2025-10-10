@@ -272,7 +272,7 @@ flowchart TD;
   * type: user-requirement
 
 #### Relations
-  * refine: [Change Impact Analysis](UserRequirements.md#change-impact-analysis)
+  * derivedFrom: [Change Impact Analysis](UserRequirements.md#change-impact-analysis)
 ---
 
 ### Structure and Addressing in Markdown Documents

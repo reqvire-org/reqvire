@@ -27,7 +27,7 @@ As a **Systems Engineer**, I want to efficiently manage MBSE models using AI-pow
   * type: user-requirement
 
 #### Relations
-  * refine: [Managing MBSE Models](#managing-mbse-models)
+  * derivedFrom: [Managing MBSE Models](#managing-mbse-models)
 ---
 
 ### Generate Diagrams
