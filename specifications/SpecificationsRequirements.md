@@ -636,19 +636,6 @@ The following verification types are supported:
    - `inspection-verification` - Verification through formal inspection or review
    - `demonstration-verification` - Verification through demonstration in a realistic environment
 
-These verification types align with standard systems engineering verification methods:
-- **Test**: Verification through formal testing according to documented test procedures with expected outcomes
-- **Analysis**: Verification through systematic analysis of artifacts without physical testing
-- **Inspection**: Verification through examination of documentation, code, or physical components
-- **Demonstration**: Verification through showing functionality in an operational-like environment
-
-
-The appropriate verification type should be selected based on the nature of the requirement:
-- **Test**: Verification through formal testing according to documented test procedures with expected outcomes
-- **Analysis**: Verification through systematic analysis of artifacts without physical testing
-- **Inspection**: Verification through examination of documentation, code, or physical components
-- **Demonstration**: Verification through showing functionality in an operational-like environment
-
 The appropriate verification type should be selected based on the nature of the requirement:
 - **Test-verification**: Used when formal test procedures with expected outcomes are required
 - **Analysis-verification**: Used when requirements can be verified through analysis of documentation or code
@@ -960,6 +947,8 @@ The system must validate relation usage according to these rules:
 - **Identifier** targets (with fragments) must reference existing elements in markdown documents
 - **InternalPath** targets (without fragments) must reference existing files in the filesystem
 - **ExternalUrl** targets are not validated for existence
+- Verification elements must not use refine/refinedBy relations
+- Refinement chains (using refine/refinedBy) must not be mixed with other hierarchical relation types (derivedFrom/derive or contain/containedBy)
       
 
 </details>
@@ -998,11 +987,15 @@ Relations are categorized by their usage in different system functions:
 
 1. **Diagram Rendering** - Relations that are rendered in visual diagrams to avoid duplicate arrows
    - Only one relation from each opposite pair is shown (e.g., `contain` but not `containedBy`)
-   - Defined in DIAGRAM_RELATIONS list: `contain`, `derive`, `refinedBy`, `satisfiedBy`, `verifiedBy`, `trace`
+   - Those are: `contain`, `derive`, `refinedBy`, `satisfiedBy`, `verifiedBy`, `trace`
 
 2. **Change Propagation** - Relations through which changes propagate to dependent elements
    - When an element changes, impact flows through these relation types
-   - Defined in IMPACT_PROPAGATION_RELATIONS list: `contain`, `derive`, `refinedBy`, `satisfiedBy`, `verifiedBy`
+   - Those are: `contain`, `derive`, `refinedBy`, `satisfiedBy`, `verifiedBy`
+
+2. **Change Propagation** - Relations that trace verification propagation from the verification element
+   - Use to trace which requirements verification verifies directly or indirecty
+   - Those are: `containedBy`, `derivedFrom`, `refine`
 
 ## Comprehensive Relation Type Table
 
@@ -1024,31 +1017,70 @@ Relations are categorized by their usage in different system functions:
 
 Relations are grouped into logical categories based on their semantic meaning:
 
-### 1. Parent-Child Hierarchical Relations
+### 1. Hierarchical Relations
 
-These relations define hierarchical structures within the model:
+These relations define hierarchical structures and transitive ancestry within the model:
 
 - **containedBy/contain**: Physical or logical containment hierarchy
 - **derivedFrom/derive**: Derivation of elements from higher-level elements
-- **refine/refinedBy**: Refinement relationships adding more detail
 
-### 2. Satisfaction Relations
+### 2. Refirement Relations
+
+These relations are used for elaboration/clarification, from  non-requirement model elements or requirement model element.
+These can be in chain but the chain must be pure (only refine/refinedBy allowed in the chain).
+
+- **refine/refinedBy**: Refinement relationships adding more detail, clarifications or elaborations.
+
+### 3. Satisfaction Relations
 
 These relations connect requirements to implementations:
 
 - **satisfiedBy/satisfy**: Links requirements to design, code, or architectural elements
 
-### 3. Verification Relations
+### 4. Verification Relations
 
 These relations connect requirements to verification elements:
 
 - **verifiedBy/verify**: Links requirements to tests, validations, or other verification artifacts
 
-### 4. Traceability Relations
+### 5. Traceability Relations
 
 These relations establish lightweight connections for documentation:
 
 - **trace**: Simple non-directional traceability without strong semantic meaning or change propagation
+
+## Relation Constraints
+
+### Refine/RefinedBy Usage Constraints
+
+The **refine/refinedBy** relation has specific usage constraints:
+
+1. **Allowed Source Elements**:
+   - Requirements can refine other requirements
+   - System elements (block diagrams, architectural elements, or other non-verification elements) can refine requirements
+   - References to ignored documents and other file types are allowed
+
+
+### Refinement Chain Purity Constraint
+
+Once a refine/refinedBy relation is used in a chain, all subsequent child relations in that chain must also use refine/refinedBy:
+
+1. **Valid chains**:
+   ```
+   Req1 <- refinedBy <- Req2 <- refinedBy <- Req3  ✓ Valid (pure refine chain)
+   Req1 <- derive <- Req2 <- refinedBy <- Req3  ✓ Valid (refine starts at Req3)
+   Req1 <- contain <- Req2 <- refine <- Req3 <- refinedBy <- Req4  ✓ Valid (refine starts at Req3)
+   ```
+
+2. **Invalid chains** - mixing after refine starts:
+   ```
+   Req1 <- refinedBy <- Req2 <- derivedFrom <- Req3  ✗ Invalid (refine at Req2, then derive at Req3)
+   Req1 <- refine <- Req2 <- refinedBy <- Req3 <- contain <- Req4  ✗ Invalid (refine chain broken at Req4)
+   ```
+
+**Validation Rule**: If a requirement uses refine/refinedBy to connect to its parent, all its children (and their descendants) can only use refine/refinedBy relations for hierarchical connections. The refinement chain purity applies from the first refine/refinedBy downward through all descendants.
+
+**Rationale**: Refinement has specific semantics (adding detail without changing scope), which differs from derivation (creating new requirements from parents) and containment (logical grouping). Once a refinement chain begins, maintaining purity ensures consistent semantics throughout that lineage.
 
 ## Change Impact Rules
 
