@@ -653,28 +653,37 @@ The system shall validate relation types against a defined vocabulary and provid
 
 ### Refine Relation Chain Validator
 
-The system shall implement validation for refine/refinedBt relation chains to ensure purity of the chain.
+The system shall implement validation for refinement relation chains to ensure directional purity following the one-direction rule.
 
 #### Details
-The validator shall enforce the following constraints:
+The validator shall enforce the one-direction rule for refinement chains:
 
-1. **Refine/RefinedBy Source Restrictions**:
-   - Requirements can refine other requirements
-   - System elements (block diagrams, architectural elements) can refine requirements
+1. **Validation Approach**:
+   - Start with all elements that have "refinedBy" relations
+   - For each child element (target of refinedBy), recursively validate descendants
+   - Track visited elements to avoid redundant checking
 
-2. **Refinement Chain Purity**:
-   - Once a refine/refinedBy relation is used in a chain, all subsequent children in that chain must also use refine/refinedBy
-   - The purity constraint applies from the first refine/refinedBy downward through all descendants
-   - Examples:
-     - Valid: `Req1 <- derive <- Req2 <- refine <- Req3 <- refinedBy <- Req4` (refine starts at Req3, all children must use refine)
-     - Invalid: `Req1 <- refine <- Req2 <- derivedFrom <- Req3` (refine at Req2, then derive at Req3)
+2. **Chain Purity Constraints**:
+   - Child elements in refinement chain shall only have "refinedBy" to continue the chain
+   - Child elements shall have "refine" only to their direct parent (automatic opposite)
+   - Child elements shall not have: derive, derivedFrom, contain, containedBy
+   - Child elements may have non-hierarchical relations: verifiedBy, verify, trace, satisfiedBy, satisfy
 
-The validator shall report violations using dedicated error type with clear details about which elements violate the constraint.
+3. **Error Reporting**:
+   - Report violations using MixedHierarchicalRelations error type
+   - Identify which elements violate the constraint
+   - Explain that refinement chains cannot mix with other hierarchical relations
+
+4. **Examples**:
+   - Valid: `Req1 --refinedBy--> Req2 --refinedBy--> Req3` (pure chain)
+   - Valid: `Req2 --verifiedBy--> Test1` (non-hierarchical allowed)
+   - Invalid: `Req1 --refinedBy--> Req2 --derive--> Req3` (mixed hierarchical)
+   - Invalid: `Req1 --refinedBy--> Req2 --contain--> Req3` (mixed hierarchical)
 
 #### Relations
   * derivedFrom: [Validate Relation Types](../UserRequirements.md#validate-relation-types)
   * derivedFrom: [Relation Types and behaviors](../SpecificationsRequirements.md#relation-types-and-behaviors)
-  * satisfiedBy: [model.rs](../../core/src/model.rs)
+  * satisfiedBy: [graph_registry.rs](../../core/src/graph_registry.rs)
 ---
 
 ### Excluded File Relation Validation

@@ -1063,24 +1063,36 @@ The **refine/refinedBy** relation has specific usage constraints:
 
 ### Refinement Chain Purity Constraint
 
-Once a refine/refinedBy relation is used in a chain, all subsequent child relations in that chain must also use refine/refinedBy:
+Refinement chains must maintain directional purity to ensure consistent semantics throughout the hierarchy.
 
-1. **Valid chains**:
-   ```
-   Req1 <- refinedBy <- Req2 <- refinedBy <- Req3  ✓ Valid (pure refine chain)
-   Req1 <- derive <- Req2 <- refinedBy <- Req3  ✓ Valid (refine starts at Req3)
-   Req1 <- contain <- Req2 <- refine <- Req3 <- refinedBy <- Req4  ✓ Valid (refine starts at Req3)
-   ```
+#### Details
 
-2. **Invalid chains** - mixing after refine starts:
-   ```
-   Req1 <- refinedBy <- Req2 <- derivedFrom <- Req3  ✗ Invalid (refine at Req2, then derive at Req3)
-   Req1 <- refine <- Req2 <- refinedBy <- Req3 <- contain <- Req4  ✗ Invalid (refine chain broken at Req4)
-   ```
+**One-Direction Rule**: A requirement in a refinement chain cannot mix refinement relations with other hierarchical relations. Validation follows the parent→child direction using "refinedBy" relations.
 
-**Validation Rule**: If a requirement uses refine/refinedBy to connect to its parent, all its children (and their descendants) can only use refine/refinedBy relations for hierarchical connections. The refinement chain purity applies from the first refine/refinedBy downward through all descendants.
+**Chain Validation Rules**:
+- When an element has "refinedBy" relation(s), each child element in the refinement chain:
+  - shall only have "refinedBy" to continue the chain to its own children
+  - shall have "refine" only to its direct parent (automatic opposite)
+  - shall not have: derive, derivedFrom, contain, containedBy
+  - may have non-hierarchical relations: verifiedBy, verify, trace, satisfiedBy, satisfy
 
-**Rationale**: Refinement has specific semantics (adding detail without changing scope), which differs from derivation (creating new requirements from parents) and containment (logical grouping). Once a refinement chain begins, maintaining purity ensures consistent semantics throughout that lineage.
+**Valid chain examples**:
+```
+Req1 --refinedBy--> Req2 --refinedBy--> Req3  ✓ Valid (pure refinement chain)
+Req2 --refine--> Req1                         ✓ Valid (automatic opposite to parent)
+Req2 --verifiedBy--> Test1                    ✓ Valid (non-hierarchical allowed)
+```
+
+**Invalid chain examples**:
+```
+Req1 --refinedBy--> Req2 --derive--> Req3         ✗ Invalid (mixed hierarchical)
+Req1 --refinedBy--> Req2 --contain--> Req3        ✗ Invalid (mixed hierarchical)
+Req1 --refinedBy--> Req2 --derivedFrom--> Req3    ✗ Invalid (mixed hierarchical)
+```
+
+**Rationale**: Refinement has specific semantics (adding detail without changing scope), which differs from derivation (creating new requirements from parents) and containment (logical grouping). The one-direction rule ensures a requirement cannot simultaneously participate in multiple hierarchical structures, maintaining clear and consistent semantics.
+
+---
 
 ## Change Impact Rules
 

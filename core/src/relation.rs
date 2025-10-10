@@ -148,6 +148,22 @@ pub const VERIFICATION_TRACES_RELATIONS: &[&str] = &[
     "refine",
 ];
 
+/// Refinement relations - used for adding detail without changing scope
+/// Once these are used in a chain, all descendants must use refinement relations
+pub const REFINEMENT_RELATIONS: &[&str] = &[
+    "refine",
+    "refinedBy",
+];
+
+/// Hierarchical relations (contain, derive)
+/// These relations cannot be used once a refinement chain has started
+pub const HIERARCHICAL_RELATIONS: &[&str] = &[
+    "contain",
+    "containedBy",
+    "derive",
+    "derivedFrom",
+];
+
 
 #[derive(Debug, Clone, Serialize)]
 pub struct RelationTarget {

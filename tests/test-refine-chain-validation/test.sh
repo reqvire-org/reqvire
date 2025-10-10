@@ -73,11 +73,11 @@ fi
 
 # Test 3: Verify specific invalid scenarios are detected
 
-# Check that the error identifies specific violating elements
+# Check that the error identifies specific violating elements (by identifier)
 EXPECTED_VIOLATIONS=(
-  "Grandchild Requirement E11"
-  "Grandchild Requirement F11"
-  "Great-Great-Grandchild Requirement G1111"
+  "grandchild-requirement-e11"
+  "grandchild-requirement-f11"
+  "great-great-grandchild-requirement-g1111"
 )
 
 MISSING_VIOLATIONS=()

@@ -9,6 +9,9 @@ This is a parent requirement.
 #### Metadata
   * type: user-requirement
 
+#### Relations
+  * refinedBy: #child-requirement-e1
+
 ---
 
 ### Child Requirement E1
@@ -25,7 +28,7 @@ This requirement refines Parent Requirement E.
 
 ### Grandchild Requirement E11
 
-This requirement INCORRECTLY uses derive after refine was used.
+This requirement INCORRECTLY uses derivedFrom after refine was used.
 This violates refinement chain purity.
 
 #### Metadata
@@ -45,6 +48,9 @@ This is a parent requirement.
 #### Metadata
   * type: user-requirement
 
+#### Relations
+  * refinedBy: #child-requirement-f1
+
 ---
 
 ### Child Requirement F1
@@ -55,13 +61,13 @@ This requirement refines Parent Requirement F.
   * type: user-requirement
 
 #### Relations
-  * refinedBy: #parent-requirement-f
+  * refine: #parent-requirement-f
 
 ---
 
 ### Grandchild Requirement F11
 
-This requirement INCORRECTLY uses contain after refine was used.
+This requirement INCORRECTLY uses containedBy after refine was used.
 This violates refinement chain purity.
 
 #### Metadata
@@ -91,7 +97,7 @@ This requirement is derived from Parent Requirement G.
   * type: user-requirement
 
 #### Relations
-  * derive: #parent-requirement-g
+  * derivedFrom: #parent-requirement-g
 
 ---
 
@@ -104,6 +110,7 @@ This requirement refines Child Requirement G1 (refine starts here).
 
 #### Relations
   * refine: #child-requirement-g1
+  * refinedBy: #great-grandchild-requirement-g111
 
 ---
 
@@ -115,19 +122,19 @@ This requirement refines Grandchild Requirement G11.
   * type: user-requirement
 
 #### Relations
-  * refinedBy: #grandchild-requirement-g11
+  * refine: #grandchild-requirement-g11
 
 ---
 
 ### Great-Great-Grandchild Requirement G1111
 
-This requirement INCORRECTLY uses derive after refine chain started.
+This requirement INCORRECTLY uses derivedFrom after refine chain started.
 This violates refinement chain purity.
 
 #### Metadata
   * type: user-requirement
 
 #### Relations
-  * derive: #great-grandchild-requirement-g111
+  * derivedFrom: #great-grandchild-requirement-g111
 
 ---

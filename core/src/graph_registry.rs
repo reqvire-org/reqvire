@@ -4,7 +4,7 @@ use std::path::{Path, PathBuf};
 use log::{debug, warn};
 use serde::Serialize;
 
-use crate::relation::{self, LinkType, get_parent_relation_types, IMPACT_PROPAGATION_RELATIONS};
+use crate::relation::{self, LinkType, get_parent_relation_types, IMPACT_PROPAGATION_RELATIONS, HIERARCHICAL_RELATIONS};
 use crate::element::{Element, ElementType, RequirementType};
 use crate::error::ReqvireError;
 use crate::git_commands;
@@ -141,6 +141,9 @@ impl GraphRegistry {
 
         // Validate cross-component dependencies
         errors.extend(self.validate_cross_component_dependencies()?);
+
+        // Validate refinement chain purity
+        errors.extend(self.validate_refinement_chain_purity()?);
 
         Ok(errors)
     }
@@ -470,6 +473,103 @@ impl GraphRegistry {
         // Mark the current element as completely processed and remove it from the current path.
         visited.insert(element_id);
         path.pop();
+    }
+
+    /// Validate refinement chain purity
+    /// Start with root elements (longest chains first) then handle remaining elements
+    fn validate_refinement_chain_purity(&self) -> Result<Vec<ReqvireError>, ReqvireError> {
+        debug!("Validating refinement chain purity...");
+        let mut errors = Vec::new();
+        let mut visited = HashSet::new();
+
+        // First pass: start with root elements (have "refinedBy" but no "refine")
+        // This prioritizes checking from the top of chains for clearer error reporting
+        for element_node in self.nodes.values() {
+            let element = &element_node.element;
+
+            let has_refined_by = element.relations.iter().any(|r| {
+                r.relation_type.name == "refinedBy"
+            });
+
+            let has_refine = element.relations.iter().any(|r| {
+                r.relation_type.name == "refine"
+            });
+
+            // Process root elements first
+            if has_refined_by && !has_refine {
+                self.check_refinement_descendants(&element.identifier, &mut errors, &mut visited, true);
+            }
+        }
+
+        // Second pass: handle any remaining elements with "refinedBy" that weren't visited
+        // This catches chains where all elements have both "refine" and "refinedBy"
+        for element_node in self.nodes.values() {
+            let element = &element_node.element;
+
+            if visited.contains(&element.identifier) {
+                continue;
+            }
+
+            let has_refined_by = element.relations.iter().any(|r| {
+                r.relation_type.name == "refinedBy"
+            });
+
+            if has_refined_by {
+                self.check_refinement_descendants(&element.identifier, &mut errors, &mut visited, true);
+            }
+        }
+
+        if errors.is_empty() {
+            debug!("No refinement chain purity violations found.");
+        } else {
+            debug!("{} refinement chain purity violations found.", errors.len());
+        }
+
+        Ok(errors)
+    }
+
+    /// Recursively check that all descendants of an element in a refinement chain use refinement relations
+    /// Follows "refinedBy" relations from parent to child
+    /// Note: The root element can have other hierarchical relations, but children in the chain cannot
+    fn check_refinement_descendants(
+        &self,
+        element_id: &str,
+        errors: &mut Vec<ReqvireError>,
+        visited: &mut HashSet<String>,
+        is_root: bool,
+    ) {
+        // Avoid infinite loops in case of cycles
+        if visited.contains(element_id) {
+            return;
+        }
+        visited.insert(element_id.to_string());
+
+        if let Some(element_node) = self.nodes.get(element_id) {
+            let element = &element_node.element;
+
+            // Check all relations from this element
+            for relation in &element.relations {
+                if let LinkType::Identifier(ref target_id) = relation.target.link {
+                    let relation_name = relation.relation_type.name;
+
+                    if relation_name == "refinedBy" {
+                        // Follow refinedBy to check children
+                        // Children are not roots, so they cannot have other hierarchical relations
+                        self.check_refinement_descendants(target_id, errors, visited, false);
+                    } else if !is_root && HIERARCHICAL_RELATIONS.contains(&relation_name) {
+                        // Violation: child in refinement chain uses forbidden hierarchical relation
+                        if let Some(target_node) = self.nodes.get(target_id) {
+                            errors.push(ReqvireError::MixedHierarchicalRelations(
+                                format!(
+                                    "Element '{}' is in a refinement chain but uses '{}' relation to '{}'. Children in refinement chains must only use refinement hierarchical relations to the parent requirement element.",
+                                    element.identifier, relation_name, target_node.element.identifier
+                                )
+                            ));
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /// Updates an element's identifier and rewires all incoming relations

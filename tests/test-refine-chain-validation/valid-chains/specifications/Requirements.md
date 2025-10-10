@@ -9,6 +9,9 @@ This is a parent requirement that will be refined.
 #### Metadata
   * type: user-requirement
 
+#### Relations
+  * refinedBy: #child-requirement-a1
+
 ---
 
 ### Child Requirement A1
@@ -20,6 +23,7 @@ This requirement refines Parent Requirement A.
 
 #### Relations
   * refine: #parent-requirement-a
+  * refinedBy: #grandchild-requirement-a11
 
 ---
 
@@ -31,7 +35,7 @@ This requirement refines Child Requirement A1, maintaining chain purity.
   * type: user-requirement
 
 #### Relations
-  * refinedBy: #child-requirement-a1
+  * refine: #child-requirement-a1
 
 ---
 
@@ -67,6 +71,7 @@ This requirement refines Child Requirement B1 (refine starts here).
 
 #### Relations
   * refine: #child-requirement-b1
+  * refinedBy: #great-grandchild-requirement-b111
 
 ---
 
@@ -78,7 +83,7 @@ This requirement refines Grandchild Requirement B11 (purity maintained after ref
   * type: user-requirement
 
 #### Relations
-  * refinedBy: #grandchild-requirement-b11
+  * refine: #grandchild-requirement-b11
 
 ---
 
@@ -114,6 +119,45 @@ This requirement is derived from Child Requirement C1.
 
 #### Relations
   * derive: #child-requirement-c1
+
+---
+
+## Multiple Children Refine Chain Test
+
+### Parent Requirement H
+
+This is a parent requirement with multiple refinement children.
+
+#### Metadata
+  * type: user-requirement
+
+#### Relations
+  * refinedBy: #child-requirement-h1
+  * refinedBy: #child-requirement-h2
+
+---
+
+### Child Requirement H1
+
+This requirement refines Parent Requirement H (first child).
+
+#### Metadata
+  * type: user-requirement
+
+#### Relations
+  * refine: #parent-requirement-h
+
+---
+
+### Child Requirement H2
+
+This requirement refines Parent Requirement H (second child).
+
+#### Metadata
+  * type: user-requirement
+
+#### Relations
+  * refine: #parent-requirement-h
 
 ---
 

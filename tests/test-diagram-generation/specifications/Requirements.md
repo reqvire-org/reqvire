@@ -12,7 +12,6 @@ This is a root requirement for testing purposes.
   * type: user-requirement
 
 #### Relations
-  * derive: [Element 2](#element-2)
   * derive: [Element 3](#element-3)
 
 ### Element 1
@@ -32,7 +31,6 @@ This is another test element with relations.
 
 #### Relations
   * trace: [Element 1](#element-1)
-  * derivedFrom: [Root Requirement](#root-requirement)
   * refine: [Element 1](#element-1)
 
 ## Section 2

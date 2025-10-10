@@ -577,18 +577,18 @@ if ! echo "$VERIFIED_BY_RELATIONS_2" | grep -q "verification-of-standard-relatio
   exit 1
 fi
 
-# Check refinedBy relation (looking at the JSON output, this is the opposite relation that should be shown)
-REFINED_BY_RELATIONS=$(echo "$OUTPUT" | jq -r '
+# Check derive relation (looking at the JSON output, this is the opposite relation that should be shown)
+DERIVE_RELATIONS_2=$(echo "$OUTPUT" | jq -r '
   .files | to_entries[] | .value.sections."Requirements A".elements[]
   | select(.name == "Requirement with Valid Markdown Relations")
   | .relations[]
-  | select(.relation_type == "refinedBy")
+  | select(.relation_type == "derive")
   | .target.target
 ')
 
-if ! echo "$REFINED_BY_RELATIONS" | grep -q "requirement-with-valid-standard-relations"; then
-  echo "FAILED: Second requirement should have 'refinedBy' relation from first requirement"
-  echo "Found refinedBy relations: $REFINED_BY_RELATIONS"
+if ! echo "$DERIVE_RELATIONS_2" | grep -q "requirement-with-valid-standard-relations"; then
+  echo "FAILED: Second requirement should have 'derive' relation from first requirement"
+  echo "Found derive relations: $DERIVE_RELATIONS_2"
   exit 1
 fi
 

@@ -9,7 +9,6 @@ This document contains correctly formatted relations to existing targets, to ver
 This requirement has valid relations to existing files, using standard format.
 
 #### Relations
-* refine: Requirements.md#Requirement with Valid Markdown Relations
 * satisfiedBy: DesignSpecifications/SampleDSD.md
 
 ---

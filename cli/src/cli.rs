@@ -344,10 +344,16 @@ pub fn handle_command(
     diagrams_with_blobs: bool,
     user_requirements_root_folder: &Option<PathBuf>
 ) -> Result<i32,ReqvireError> {
-                        
+
+    // If no command provided, show help
+    if args.command.is_none() {
+        Args::print_help();
+        return Ok(0);
+    }
+
     let mut model_manager = ModelManager::new();
     let parse_result = model_manager.parse_and_validate(
-        None, 
+        None,
         user_requirements_root_folder,
         excluded_filename_patterns
     );
@@ -575,8 +581,8 @@ pub fn handle_command(
             return Ok(0);
         },
         None => {
-            Args::print_help();
-            return Ok(0);
+            // This case is handled at the beginning of handle_command
+            unreachable!("Command is None but should have been handled earlier");
         }
     }
 }
