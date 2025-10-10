@@ -396,7 +396,7 @@ The system shall include checkboxes in the traceability matrix for each verifica
   * type: user-requirement
 
 #### Relations
-  * refine: [Traceability Matrix](#traceability-matrix)
+  * derivedFrom: [Traceability Matrix](#traceability-matrix)
 ---
 
 ### Export Traceability Matrix

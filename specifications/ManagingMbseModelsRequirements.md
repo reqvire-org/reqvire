@@ -74,5 +74,5 @@ The system shall automatically assign a **default type to requirements** if not 
   * type: user-requirement
 
 #### Relations
-  * refine: [Configurable User Requirements Root Folder](#configurable-user-requirements-root-folder)
+  * derivedFrom: [Configurable User Requirements Root Folder](#configurable-user-requirements-root-folder)
 ---

@@ -275,7 +275,7 @@ The system must accept `--output` command option flag for knowing where to expor
 The system shall ensure that any related system elements are also copied into output folder to ensure consistency of exported model.
 
 #### Relations
-  * refine: [HTML Export](#html-export)
+  * derivedFrom: [HTML Export](#html-export)
   * satisfiedBy: [html_export.rs](../../core/src/html_export.rs)
   * satisfiedBy: [html.rs](../../core/src/html.rs)
 ---
@@ -1144,7 +1144,7 @@ This enables the system to:
 - Support mixed documents containing both auto-generated and custom diagrams
 
 #### Relations
-  * refine: [Diagram Generation](#diagram-generation)
+  * derivedFrom: [Diagram Generation](#diagram-generation)
   * satisfiedBy: [diagrams.rs](../../core/src/diagrams.rs)
   * satisfiedBy: [utils.rs](../../core/src/utils.rs)
   * satisfiedBy: [parser.rs](../../core/src/parser.rs)
@@ -1204,7 +1204,7 @@ When generating diagram node links and when `style.diagrams_with_blobs` is set t
 - Preserve interactive behavior across all generated diagrams
 
 #### Relations
-  * refine: [Diagram Generation](#diagram-generation)
+  * derivedFrom: [Diagram Generation](#diagram-generation)
   * satisfiedBy: [diagrams.rs](../../core/src/diagrams.rs)
   * satisfiedBy: [config.rs](../../cli/src/config.rs)
 ---
