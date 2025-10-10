@@ -236,7 +236,6 @@ The system shall automate validations of pull requests in the GitHub workflow to
 
 #### Relations
   * refine: [Integrate with GitHub Workflows](UserStories.md#integrate-with-github-workflows)
-  * derivedFrom: [Promote Automation and Efficiency](MissionRequirements.md#promote-automation-and-efficiency)
 ---
 
 ### Generate Change Logs for Pull Requests

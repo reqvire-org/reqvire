@@ -22,5 +22,5 @@ The system must significantly reduce manual effort in managing requirements, mod
   * type: user-requirement
 
 #### Relations
-  * derivedFrom: [MOE_UA](MOEs.md#moe_ua)
+  * trace: [MOE_UA](MOEs.md#moe_ua)
 ---
