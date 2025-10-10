@@ -1080,7 +1080,6 @@ When an element changes, the impact propagates according to these rules:
   * type: user-requirement
 
 #### Relations
-  * derivedFrom: [Managing MBSE Models](UserStories.md#managing-mbse-models)
   * derivedFrom: [AI-Assisted MBSE Model Management](UserStories.md#ai-assisted-mbse-model-management)
   * satisfiedBy: [relation.rs](../core/src/relation.rs)
 ---
