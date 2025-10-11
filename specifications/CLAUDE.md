@@ -168,12 +168,12 @@ cargo run -- model-summary --filter-is-not-satisfied
 
 Preview formatting changes:
 ```bash
-cargo run -- format --dry-run
+cargo run -- format
 ```
 
 Apply formatting:
 ```bash
-cargo run -- format
+cargo run -- format --fix
 ```
 
 Generate traceability matrix:

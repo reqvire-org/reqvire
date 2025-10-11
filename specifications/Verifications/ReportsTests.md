@@ -12,20 +12,6 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  76ae69270700044b["Model Summary Tests"];
-  class 76ae69270700044b verification;
-  click 76ae69270700044b "ReportsTests.md#model-summary-tests";
-  7b75340700b95177["test.sh"];
-  class 7b75340700b95177 default;
-  click 7b75340700b95177 "../../tests/test-model-summary-reports/test.sh";
-  76ae69270700044b -->|satisfiedBy| 7b75340700b95177;
-  9bf743e946ad83ea["Sections Summary Tests"];
-  class 9bf743e946ad83ea verification;
-  click 9bf743e946ad83ea "ReportsTests.md#sections-summary-tests";
-  bf32ae8da9b17852["test.sh"];
-  class bf32ae8da9b17852 default;
-  click bf32ae8da9b17852 "../../tests/test-sections-summary/test.sh";
-  9bf743e946ad83ea -->|satisfiedBy| bf32ae8da9b17852;
   fa3c1ae9e9b91644["Verification Traces From-Folder Test"];
   class fa3c1ae9e9b91644 verification;
   click fa3c1ae9e9b91644 "ReportsTests.md#verification-traces-from-folder-test";
@@ -40,6 +26,13 @@ graph LR;
   class c4c5998e49538704 default;
   click c4c5998e49538704 "../../tests/test-verification-traces/test.sh";
   958d9af6695bd8a -->|satisfiedBy| c4c5998e49538704;
+  76ae69270700044b["Model Summary Tests"];
+  class 76ae69270700044b verification;
+  click 76ae69270700044b "ReportsTests.md#model-summary-tests";
+  7b75340700b95177["test.sh"];
+  class 7b75340700b95177 default;
+  click 7b75340700b95177 "../../tests/test-model-summary-reports/test.sh";
+  76ae69270700044b -->|satisfiedBy| 7b75340700b95177;
   349f5e874cf22d98["Verification Coverage Report Test"];
   class 349f5e874cf22d98 verification;
   click 349f5e874cf22d98 "ReportsTests.md#verification-coverage-report-test";
@@ -47,6 +40,33 @@ graph LR;
   class 7099e5b2f8a08808 default;
   click 7099e5b2f8a08808 "../../tests/test-coverage-report/test.sh";
   349f5e874cf22d98 -->|satisfiedBy| 7099e5b2f8a08808;
+  9bf743e946ad83ea["Sections Summary Tests"];
+  class 9bf743e946ad83ea verification;
+  click 9bf743e946ad83ea "ReportsTests.md#sections-summary-tests";
+  bf32ae8da9b17852["test.sh"];
+  class bf32ae8da9b17852 default;
+  click bf32ae8da9b17852 "../../tests/test-sections-summary/test.sh";
+  9bf743e946ad83ea -->|satisfiedBy| bf32ae8da9b17852;
+  5bfc0d5fd7bba25["CLI Traces Command"];
+  class 5bfc0d5fd7bba25 requirement;
+  click 5bfc0d5fd7bba25 "../SystemRequirements/Requirements.md#cli-traces-command";
+  80defdd4cbc7ee18["cli.rs"];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
+  5bfc0d5fd7bba25 -->|satisfiedBy| 80defdd4cbc7ee18;
+  5bfc0d5fd7bba25 -.->|verifiedBy| 958d9af6695bd8a;
+  ddec547537f501ee["CLI Traces From-Folder Option"];
+  class ddec547537f501ee requirement;
+  click ddec547537f501ee "../SystemRequirements/Requirements.md#cli-traces-from-folder-option";
+  5bfc0d5fd7bba25 -.->|deriveReqT| ddec547537f501ee;
+  34c75e4a88e1f381["CLI Help Structure Verification"];
+  class 34c75e4a88e1f381 verification;
+  click 34c75e4a88e1f381 "Misc.md#cli-help-structure-verification";
+  5bfc0d5fd7bba25 -.->|verifiedBy| 34c75e4a88e1f381;
+  920a8118d579854b["CLI Traces Filter Options"];
+  class 920a8118d579854b requirement;
+  click 920a8118d579854b "../SystemRequirements/Requirements.md#cli-traces-filter-options";
+  5bfc0d5fd7bba25 -.->|deriveReqT| 920a8118d579854b;
   f7a606aa79ba438["Verification Coverage Report"];
   class f7a606aa79ba438 requirement;
   click f7a606aa79ba438 "../UserRequirements.md#verification-coverage-report";
@@ -59,46 +79,27 @@ graph LR;
   class 8d93a79de428970 requirement;
   click 8d93a79de428970 "../SystemRequirements/Requirements.md#cli-coverage-command";
   f7a606aa79ba438 -.->|deriveReqT| 8d93a79de428970;
-  ddec547537f501ee["CLI Traces From-Folder Option"];
-  class ddec547537f501ee requirement;
-  click ddec547537f501ee "../SystemRequirements/Requirements.md#cli-traces-from-folder-option";
-  ddec547537f501ee -.->|verifiedBy| fa3c1ae9e9b91644;
   2f5273c3b5655b33 -.->|verifiedBy| 349f5e874cf22d98;
   2f5273c3b5655b33 -.->|deriveReqT| 8d93a79de428970;
-  5bfc0d5fd7bba25["CLI Traces Command"];
-  class 5bfc0d5fd7bba25 requirement;
-  click 5bfc0d5fd7bba25 "../SystemRequirements/Requirements.md#cli-traces-command";
-  80defdd4cbc7ee18["cli.rs"];
-  class 80defdd4cbc7ee18 default;
-  click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
-  5bfc0d5fd7bba25 -->|satisfiedBy| 80defdd4cbc7ee18;
-  5bfc0d5fd7bba25 -.->|verifiedBy| 958d9af6695bd8a;
-  5bfc0d5fd7bba25 -.->|deriveReqT| ddec547537f501ee;
-  34c75e4a88e1f381["CLI Help Structure Verification"];
-  class 34c75e4a88e1f381 verification;
-  click 34c75e4a88e1f381 "Misc.md#cli-help-structure-verification";
-  5bfc0d5fd7bba25 -.->|verifiedBy| 34c75e4a88e1f381;
-  920a8118d579854b["CLI Traces Filter Options"];
-  class 920a8118d579854b requirement;
-  click 920a8118d579854b "../SystemRequirements/Requirements.md#cli-traces-filter-options";
-  5bfc0d5fd7bba25 -.->|deriveReqT| 920a8118d579854b;
   80defdd4cbc7ee18["cli.rs"];
   class 80defdd4cbc7ee18 default;
   click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
   8d93a79de428970 -->|satisfiedBy| 80defdd4cbc7ee18;
   8d93a79de428970 -.->|verifiedBy| 349f5e874cf22d98;
   8d93a79de428970 -.->|verifiedBy| 34c75e4a88e1f381;
-  8cafc3875f5e4938["Display Name-Regex Option in Help"];
-  class 8cafc3875f5e4938 requirement;
-  click 8cafc3875f5e4938 "../SystemRequirements/Requirements.md#display-name-regex-option-in-help";
-  80defdd4cbc7ee18["cli.rs"];
-  class 80defdd4cbc7ee18 default;
-  click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
-  8cafc3875f5e4938 -->|satisfiedBy| 80defdd4cbc7ee18;
-  8cafc3875f5e4938 -.->|verifiedBy| 76ae69270700044b;
+  ddec547537f501ee -.->|verifiedBy| fa3c1ae9e9b91644;
+  a3ed678951ce89ea["Sections Summary Report Generator"];
+  class a3ed678951ce89ea requirement;
+  click a3ed678951ce89ea "../SystemRequirements/Requirements.md#sections-summary-report-generator";
+  994f165ff784760d["sections_summary.rs"];
+  class 994f165ff784760d default;
+  click 994f165ff784760d "../../core/src/sections_summary.rs";
+  a3ed678951ce89ea -->|satisfiedBy| 994f165ff784760d;
+  a3ed678951ce89ea -.->|verifiedBy| 9bf743e946ad83ea;
   b50359102e04bf09["CLI Sections Summary Command"];
   class b50359102e04bf09 requirement;
   click b50359102e04bf09 "../SystemRequirements/Requirements.md#cli-sections-summary-command";
+  a3ed678951ce89ea -.->|deriveReqT| b50359102e04bf09;
   80defdd4cbc7ee18["cli.rs"];
   class 80defdd4cbc7ee18 default;
   click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
@@ -109,6 +110,23 @@ graph LR;
   b50359102e04bf09 -->|satisfiedBy| 994f165ff784760d;
   b50359102e04bf09 -.->|verifiedBy| 9bf743e946ad83ea;
   b50359102e04bf09 -.->|verifiedBy| 34c75e4a88e1f381;
+  40ff89d68c242f45["Handle Invalid Regex Filter Patterns"];
+  class 40ff89d68c242f45 requirement;
+  click 40ff89d68c242f45 "../SystemRequirements/Requirements.md#handle-invalid-regex-filter-patterns";
+  80defdd4cbc7ee18["cli.rs"];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
+  40ff89d68c242f45 -->|satisfiedBy| 80defdd4cbc7ee18;
+  40ff89d68c242f45 -.->|verifiedBy| 76ae69270700044b;
+  8cafc3875f5e4938["Display Name-Regex Option in Help"];
+  class 8cafc3875f5e4938 requirement;
+  click 8cafc3875f5e4938 "../SystemRequirements/Requirements.md#display-name-regex-option-in-help";
+  80defdd4cbc7ee18["cli.rs"];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
+  8cafc3875f5e4938 -->|satisfiedBy| 80defdd4cbc7ee18;
+  8cafc3875f5e4938 -.->|verifiedBy| 76ae69270700044b;
+  920a8118d579854b -.->|verifiedBy| 958d9af6695bd8a;
   73db87f73ef4c5a2["Model Summary Fine Grained Filtering"];
   class 73db87f73ef4c5a2 requirement;
   click 73db87f73ef4c5a2 "../SystemRequirements/Requirements.md#model-summary-fine-grained-filtering";
@@ -121,44 +139,6 @@ graph LR;
   click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
   73db87f73ef4c5a2 -->|satisfiedBy| 80defdd4cbc7ee18;
   73db87f73ef4c5a2 -.->|verifiedBy| 76ae69270700044b;
-  a3ed678951ce89ea["Sections Summary Report Generator"];
-  class a3ed678951ce89ea requirement;
-  click a3ed678951ce89ea "../SystemRequirements/Requirements.md#sections-summary-report-generator";
-  994f165ff784760d["sections_summary.rs"];
-  class 994f165ff784760d default;
-  click 994f165ff784760d "../../core/src/sections_summary.rs";
-  a3ed678951ce89ea -->|satisfiedBy| 994f165ff784760d;
-  a3ed678951ce89ea -.->|verifiedBy| 9bf743e946ad83ea;
-  a3ed678951ce89ea -.->|deriveReqT| b50359102e04bf09;
-  40ff89d68c242f45["Handle Invalid Regex Filter Patterns"];
-  class 40ff89d68c242f45 requirement;
-  click 40ff89d68c242f45 "../SystemRequirements/Requirements.md#handle-invalid-regex-filter-patterns";
-  80defdd4cbc7ee18["cli.rs"];
-  class 80defdd4cbc7ee18 default;
-  click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
-  40ff89d68c242f45 -->|satisfiedBy| 80defdd4cbc7ee18;
-  40ff89d68c242f45 -.->|verifiedBy| 76ae69270700044b;
-  ad6f7a2d41d80a38["Model Structure and Summaries"];
-  class ad6f7a2d41d80a38 requirement;
-  click ad6f7a2d41d80a38 "../UserRequirements.md#model-structure-and-summaries";
-  ad6f7a2d41d80a38 -.->|verifiedBy| 76ae69270700044b;
-  b882613af131f35f["Model Summary Report Generator"];
-  class b882613af131f35f requirement;
-  click b882613af131f35f "../SystemRequirements/Requirements.md#model-summary-report-generator";
-  ad6f7a2d41d80a38 -.->|deriveReqT| b882613af131f35f;
-  920a8118d579854b -.->|verifiedBy| 958d9af6695bd8a;
-  5a07afd22db51c40["CLI Summary Report Command"];
-  class 5a07afd22db51c40 requirement;
-  click 5a07afd22db51c40 "../SystemRequirements/Requirements.md#cli-summary-report-command";
-  80defdd4cbc7ee18["cli.rs"];
-  class 80defdd4cbc7ee18 default;
-  click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
-  5a07afd22db51c40 -->|satisfiedBy| 80defdd4cbc7ee18;
-  5a07afd22db51c40 -.->|verifiedBy| 76ae69270700044b;
-  5a07afd22db51c40 -.->|deriveReqT| 8cafc3875f5e4938;
-  5a07afd22db51c40 -.->|verifiedBy| 34c75e4a88e1f381;
-  5a07afd22db51c40 -.->|deriveReqT| a3ed678951ce89ea;
-  5a07afd22db51c40 -.->|deriveReqT| 40ff89d68c242f45;
 ```
 ### Model Summary Tests
 
@@ -249,8 +229,9 @@ This test verifies that the system provides a CLI flag and functionality for gen
   * type: test-verification
 
 #### Relations
-  * verify: [Model Structure and Summaries](../UserRequirements.md#model-structure-and-summaries)
-  * verify: [CLI Summary Report Command](../SystemRequirements/Requirements.md#cli-summary-report-command)
+  * verify: [Display Name-Regex Option in Help](../SystemRequirements/Requirements.md#display-name-regex-option-in-help)
+  * verify: [Model Summary Fine Grained Filtering](../SystemRequirements/Requirements.md#model-summary-fine-grained-filtering)
+  * verify: [Handle Invalid Regex Filter Patterns](../SystemRequirements/Requirements.md#handle-invalid-regex-filter-patterns)
   * satisfiedBy: [test.sh](../../tests/test-model-summary-reports/test.sh)
 ---
 
@@ -364,7 +345,6 @@ This test verifies that the system provides `section-summary` command functional
 
 #### Relations
   * verify: [CLI Sections Summary Command](../SystemRequirements/Requirements.md#cli-sections-summary-command)
-  * verify: [Sections Summary Report Generator](../SystemRequirements/Requirements.md#sections-summary-report-generator)
   * satisfiedBy: [test.sh](../../tests/test-sections-summary/test.sh)
 ---
 
@@ -458,7 +438,6 @@ This test verifies that the verification-traces command filter options work corr
   * type: test-verification
 
 #### Relations
-  * verify: [CLI Traces Command](../SystemRequirements/Requirements.md#cli-traces-command)
   * verify: [CLI Traces Filter Options](../SystemRequirements/Requirements.md#cli-traces-filter-options)
   * satisfiedBy: [test.sh](../../tests/test-verification-traces/test.sh)
 ---

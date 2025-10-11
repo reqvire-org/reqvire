@@ -65,12 +65,12 @@ pub enum Commands {
         port: u16,
     },
 
-    /// Format markdown files by applying automatic normalization and stylistic fixes
-    #[clap(override_help = "Format markdown files by applying automatic normalization and stylistic fixes\n\nFORMAT OPTIONS:\n      --dry-run  Show differences without applying changes\n      --json     Output results in JSON format")]
+    /// Format and normalize requirements files. By default, shows preview without applying changes
+    #[clap(override_help = "Format and normalize requirements files. By default, shows preview without applying changes\n\nFORMAT OPTIONS:\n      --fix      Apply formatting changes to files\n      --json     Output results in JSON format")]
     Format {
-        /// Show differences without applying changes
+        /// Apply formatting changes to files
         #[clap(long, help_heading = "FORMAT OPTIONS")]
-        dry_run: bool,
+        fix: bool,
 
         /// Output results in JSON format
         #[clap(long, help_heading = "FORMAT OPTIONS")]
@@ -561,7 +561,9 @@ pub fn handle_command(
                 
             return Ok(0);
         },
-        Some(Commands::Format { dry_run, json }) => {
+        Some(Commands::Format { fix, json }) => {
+            // Default is dry-run mode (preview only), --fix flag applies changes
+            let dry_run = !fix;
             let format_result = format_files(&model_manager.graph_registry, dry_run)?;
 
             if json {

@@ -19,13 +19,6 @@ graph LR;
   class 8899a52ea9866d8b default;
   click 8899a52ea9866d8b "../../tests/test-html-export/test.sh";
   14ef985b9a43174e -->|satisfiedBy| 8899a52ea9866d8b;
-  34c75e4a88e1f381["CLI Help Structure Verification"];
-  class 34c75e4a88e1f381 verification;
-  click 34c75e4a88e1f381 "Misc.md#cli-help-structure-verification";
-  6fb925575a1602f1["test.sh"];
-  class 6fb925575a1602f1 default;
-  click 6fb925575a1602f1 "../../tests/test-cli-help-structure/test.sh";
-  34c75e4a88e1f381 -->|satisfiedBy| 6fb925575a1602f1;
   735766802775ec41["Format Command Requirements Verification"];
   class 735766802775ec41 verification;
   click 735766802775ec41 "Misc.md#format-command-requirements-verification";
@@ -40,50 +33,65 @@ graph LR;
   class dd6732f292fab4eb default;
   click dd6732f292fab4eb "../../tests/test-serve-command/test.sh";
   a5590d2dcfffe431 -->|satisfiedBy| dd6732f292fab4eb;
-  837782fd5fe407a0["Document Structure Normalization"];
-  class 837782fd5fe407a0 requirement;
-  click 837782fd5fe407a0 "../SystemRequirements/Requirements.md#document-structure-normalization";
-  b7c871ab64a7059a["graph_registry.rs"];
-  class b7c871ab64a7059a default;
-  click b7c871ab64a7059a "../../core/src/graph_registry.rs";
-  837782fd5fe407a0 -->|satisfiedBy| b7c871ab64a7059a;
-  f22d93285fcd7664["parser.rs"];
-  class f22d93285fcd7664 default;
-  click f22d93285fcd7664 "../../core/src/parser.rs";
-  837782fd5fe407a0 -->|satisfiedBy| f22d93285fcd7664;
-  837782fd5fe407a0 -.->|verifiedBy| 735766802775ec41;
-  c1851df0c89e80f8["HTML Navigation Enhancement"];
-  class c1851df0c89e80f8 requirement;
-  click c1851df0c89e80f8 "../SystemRequirements/Requirements.md#html-navigation-enhancement";
-  d0e6cc47b904faa5["html.rs"];
-  class d0e6cc47b904faa5 default;
-  click d0e6cc47b904faa5 "../../core/src/html.rs";
-  c1851df0c89e80f8 -->|satisfiedBy| d0e6cc47b904faa5;
-  c3d63c5d4133e346["html_export.rs"];
-  class c3d63c5d4133e346 default;
-  click c3d63c5d4133e346 "../../core/src/html_export.rs";
-  c1851df0c89e80f8 -->|satisfiedBy| c3d63c5d4133e346;
-  c1851df0c89e80f8 -.->|verifiedBy| 14ef985b9a43174e;
-  749eaee85cfd0a43["CLI Remove Diagrams Flag"];
-  class 749eaee85cfd0a43 requirement;
-  click 749eaee85cfd0a43 "../SystemRequirements/Requirements.md#cli-remove-diagrams-flag";
+  34c75e4a88e1f381["CLI Help Structure Verification"];
+  class 34c75e4a88e1f381 verification;
+  click 34c75e4a88e1f381 "Misc.md#cli-help-structure-verification";
+  6fb925575a1602f1["test.sh"];
+  class 6fb925575a1602f1 default;
+  click 6fb925575a1602f1 "../../tests/test-cli-help-structure/test.sh";
+  34c75e4a88e1f381 -->|satisfiedBy| 6fb925575a1602f1;
+  8f22faacdb454b23["CLI Interface Structure"];
+  class 8f22faacdb454b23 requirement;
+  click 8f22faacdb454b23 "../SystemRequirements/Requirements.md#cli-interface-structure";
   80defdd4cbc7ee18["cli.rs"];
   class 80defdd4cbc7ee18 default;
   click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
-  749eaee85cfd0a43 -->|satisfiedBy| 80defdd4cbc7ee18;
-  6a6973ecb2f20ee3["Remove Generated Diagrams Verification"];
-  class 6a6973ecb2f20ee3 verification;
-  click 6a6973ecb2f20ee3 "DiagramsTests.md#remove-generated-diagrams-verification";
-  749eaee85cfd0a43 -.->|verifiedBy| 6a6973ecb2f20ee3;
-  749eaee85cfd0a43 -.->|verifiedBy| 34c75e4a88e1f381;
-  b7dd9db7a1290b97["Git-Style Diff Output for Linting"];
-  class b7dd9db7a1290b97 requirement;
-  click b7dd9db7a1290b97 "../SystemRequirements/Requirements.md#git-style-diff-output-for-linting";
-  8fbf4ca0471377ea["format.rs"];
-  class 8fbf4ca0471377ea default;
-  click 8fbf4ca0471377ea "../../core/src/format.rs";
-  b7dd9db7a1290b97 -->|satisfiedBy| 8fbf4ca0471377ea;
-  b7dd9db7a1290b97 -.->|verifiedBy| 735766802775ec41;
+  8f22faacdb454b23 -->|satisfiedBy| 80defdd4cbc7ee18;
+  8f22faacdb454b23 -.->|verifiedBy| 34c75e4a88e1f381;
+  749eaee85cfd0a43["CLI Remove Diagrams Flag"];
+  class 749eaee85cfd0a43 requirement;
+  click 749eaee85cfd0a43 "../SystemRequirements/Requirements.md#cli-remove-diagrams-flag";
+  8f22faacdb454b23 -.->|deriveReqT| 749eaee85cfd0a43;
+  875f89a9f301fb90["Format Command"];
+  class 875f89a9f301fb90 requirement;
+  click 875f89a9f301fb90 "../SystemRequirements/Requirements.md#format-command";
+  8f22faacdb454b23 -.->|deriveReqT| 875f89a9f301fb90;
+  5a07afd22db51c40["CLI Summary Report Command"];
+  class 5a07afd22db51c40 requirement;
+  click 5a07afd22db51c40 "../SystemRequirements/Requirements.md#cli-summary-report-command";
+  8f22faacdb454b23 -.->|deriveReqT| 5a07afd22db51c40;
+  5a67efb6be1c6c72["Integrated Validation"];
+  class 5a67efb6be1c6c72 requirement;
+  click 5a67efb6be1c6c72 "../SystemRequirements/TwoPassValidation.md#integrated-validation";
+  8f22faacdb454b23 -.->|deriveReqT| 5a67efb6be1c6c72;
+  52fe8f19c3102ecf["Serve Command"];
+  class 52fe8f19c3102ecf requirement;
+  click 52fe8f19c3102ecf "../SystemRequirements/Requirements.md#serve-command";
+  8f22faacdb454b23 -.->|deriveReqT| 52fe8f19c3102ecf;
+  4c9ae0a2fb751ce6["CLI Change Impact Report Command"];
+  class 4c9ae0a2fb751ce6 requirement;
+  click 4c9ae0a2fb751ce6 "../SystemRequirements/Requirements.md#cli-change-impact-report-command";
+  8f22faacdb454b23 -.->|deriveReqT| 4c9ae0a2fb751ce6;
+  b50359102e04bf09["CLI Sections Summary Command"];
+  class b50359102e04bf09 requirement;
+  click b50359102e04bf09 "../SystemRequirements/Requirements.md#cli-sections-summary-command";
+  8f22faacdb454b23 -.->|deriveReqT| b50359102e04bf09;
+  5deb63503bdf77c["HTML Export"];
+  class 5deb63503bdf77c requirement;
+  click 5deb63503bdf77c "../SystemRequirements/Requirements.md#html-export";
+  8f22faacdb454b23 -.->|deriveReqT| 5deb63503bdf77c;
+  b4f1757fc8831083["Validate Command"];
+  class b4f1757fc8831083 requirement;
+  click b4f1757fc8831083 "../SystemRequirements/Requirements.md#validate-command";
+  8f22faacdb454b23 -.->|deriveReqT| b4f1757fc8831083;
+  7bdf935ec6d8effe["Subdirectory Processing Option"];
+  class 7bdf935ec6d8effe requirement;
+  click 7bdf935ec6d8effe "../SystemRequirements/Requirements.md#subdirectory-processing-option";
+  8f22faacdb454b23 -.->|deriveReqT| 7bdf935ec6d8effe;
+  7223dec8fe51900f["CLI Generate Diagrams Flag"];
+  class 7223dec8fe51900f requirement;
+  click 7223dec8fe51900f "../SystemRequirements/Requirements.md#cli-generate-diagrams-flag";
+  8f22faacdb454b23 -.->|deriveReqT| 7223dec8fe51900f;
   5bfc0d5fd7bba25["CLI Traces Command"];
   class 5bfc0d5fd7bba25 requirement;
   click 5bfc0d5fd7bba25 "../SystemRequirements/Requirements.md#cli-traces-command";
@@ -104,6 +112,41 @@ graph LR;
   class 920a8118d579854b requirement;
   click 920a8118d579854b "../SystemRequirements/Requirements.md#cli-traces-filter-options";
   5bfc0d5fd7bba25 -.->|deriveReqT| 920a8118d579854b;
+  8dfe33c28555e80a["Replace Absolute Links with Relative Links"];
+  class 8dfe33c28555e80a requirement;
+  click 8dfe33c28555e80a "../UserRequirements.md#replace-absolute-links-with-relative-links";
+  8dfe33c28555e80a -.->|verifiedBy| 735766802775ec41;
+  7d44a9de72f2ed11["Inconsistent Newlines Format Implementation"];
+  class 7d44a9de72f2ed11 requirement;
+  click 7d44a9de72f2ed11 "../SystemRequirements/Requirements.md#inconsistent-newlines-format-implementation";
+  8fbf4ca0471377ea["format.rs"];
+  class 8fbf4ca0471377ea default;
+  click 8fbf4ca0471377ea "../../core/src/format.rs";
+  7d44a9de72f2ed11 -->|satisfiedBy| 8fbf4ca0471377ea;
+  7d44a9de72f2ed11 -.->|verifiedBy| 735766802775ec41;
+  80defdd4cbc7ee18["cli.rs"];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
+  749eaee85cfd0a43 -->|satisfiedBy| 80defdd4cbc7ee18;
+  6a6973ecb2f20ee3["Remove Generated Diagrams Verification"];
+  class 6a6973ecb2f20ee3 verification;
+  click 6a6973ecb2f20ee3 "DiagramsTests.md#remove-generated-diagrams-verification";
+  749eaee85cfd0a43 -.->|verifiedBy| 6a6973ecb2f20ee3;
+  749eaee85cfd0a43 -.->|verifiedBy| 34c75e4a88e1f381;
+  a7bd845c64d1685e["Reserved Subsections Format Implementation"];
+  class a7bd845c64d1685e requirement;
+  click a7bd845c64d1685e "../SystemRequirements/Requirements.md#reserved-subsections-format-implementation";
+  8fbf4ca0471377ea["format.rs"];
+  class 8fbf4ca0471377ea default;
+  click 8fbf4ca0471377ea "../../core/src/format.rs";
+  a7bd845c64d1685e -->|satisfiedBy| 8fbf4ca0471377ea;
+  a7bd845c64d1685e -.->|verifiedBy| 735766802775ec41;
+  80defdd4cbc7ee18["cli.rs"];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
+  875f89a9f301fb90 -->|satisfiedBy| 80defdd4cbc7ee18;
+  875f89a9f301fb90 -.->|verifiedBy| 735766802775ec41;
+  875f89a9f301fb90 -.->|verifiedBy| 34c75e4a88e1f381;
   8d93a79de428970["CLI Coverage Command"];
   class 8d93a79de428970 requirement;
   click 8d93a79de428970 "../SystemRequirements/Requirements.md#cli-coverage-command";
@@ -116,70 +159,22 @@ graph LR;
   click 349f5e874cf22d98 "ReportsTests.md#verification-coverage-report-test";
   8d93a79de428970 -.->|verifiedBy| 349f5e874cf22d98;
   8d93a79de428970 -.->|verifiedBy| 34c75e4a88e1f381;
-  8903fde565a36e15["Model Formatting"];
-  class 8903fde565a36e15 requirement;
-  click 8903fde565a36e15 "../UserRequirements.md#model-formatting";
+  b7dd9db7a1290b97["Git-Style Diff Output for Linting"];
+  class b7dd9db7a1290b97 requirement;
+  click b7dd9db7a1290b97 "../SystemRequirements/Requirements.md#git-style-diff-output-for-linting";
+  8fbf4ca0471377ea["format.rs"];
+  class 8fbf4ca0471377ea default;
+  click 8fbf4ca0471377ea "../../core/src/format.rs";
+  b7dd9db7a1290b97 -->|satisfiedBy| 8fbf4ca0471377ea;
+  b7dd9db7a1290b97 -.->|verifiedBy| 735766802775ec41;
   47401bd64e231632["Parallel Linting Processing"];
   class 47401bd64e231632 requirement;
   click 47401bd64e231632 "../SystemRequirements/Requirements.md#parallel-linting-processing";
-  8903fde565a36e15 -.->|deriveReqT| 47401bd64e231632;
-  974ccf933675ef44["Format Consistency Enforcement"];
-  class 974ccf933675ef44 requirement;
-  click 974ccf933675ef44 "../UserRequirements.md#format-consistency-enforcement";
-  8903fde565a36e15 -.->|deriveReqT| 974ccf933675ef44;
-  8903fde565a36e15 -.->|verifiedBy| 735766802775ec41;
-  b60a76b4bf328484["Formatting Command"];
-  class b60a76b4bf328484 requirement;
-  click b60a76b4bf328484 "../UserRequirements.md#formatting-command";
-  8903fde565a36e15 -.->|deriveReqT| b60a76b4bf328484;
-  8dfe33c28555e80a["Replace Absolute Links with Relative Links"];
-  class 8dfe33c28555e80a requirement;
-  click 8dfe33c28555e80a "../UserRequirements.md#replace-absolute-links-with-relative-links";
-  8903fde565a36e15 -.->|deriveReqT| 8dfe33c28555e80a;
   8fbf4ca0471377ea["format.rs"];
   class 8fbf4ca0471377ea default;
   click 8fbf4ca0471377ea "../../core/src/format.rs";
   47401bd64e231632 -->|satisfiedBy| 8fbf4ca0471377ea;
   47401bd64e231632 -.->|verifiedBy| 735766802775ec41;
-  974ccf933675ef44 -.->|deriveReqT| 837782fd5fe407a0;
-  974ccf933675ef44 -.->|verifiedBy| 735766802775ec41;
-  7d44a9de72f2ed11["Incosistent Newlines Linting Implementation"];
-  class 7d44a9de72f2ed11 requirement;
-  click 7d44a9de72f2ed11 "../SystemRequirements/Requirements.md#incosistent-newlines-linting-implementation";
-  974ccf933675ef44 -.->|deriveReqT| 7d44a9de72f2ed11;
-  719bf8b75772947d["Missing Separators Linting Implementation"];
-  class 719bf8b75772947d requirement;
-  click 719bf8b75772947d "../SystemRequirements/Requirements.md#missing-separators-linting-implementation";
-  974ccf933675ef44 -.->|deriveReqT| 719bf8b75772947d;
-  9f473f6e0b993cac["Excess Whitespace Linting Implementation"];
-  class 9f473f6e0b993cac requirement;
-  click 9f473f6e0b993cac "../SystemRequirements/Requirements.md#excess-whitespace-linting-implementation";
-  974ccf933675ef44 -.->|deriveReqT| 9f473f6e0b993cac;
-  a7bd845c64d1685e["Reserved Subsections Linting Implementation"];
-  class a7bd845c64d1685e requirement;
-  click a7bd845c64d1685e "../SystemRequirements/Requirements.md#reserved-subsections-linting-implementation";
-  974ccf933675ef44 -.->|deriveReqT| a7bd845c64d1685e;
-  b50359102e04bf09["CLI Sections Summary Command"];
-  class b50359102e04bf09 requirement;
-  click b50359102e04bf09 "../SystemRequirements/Requirements.md#cli-sections-summary-command";
-  80defdd4cbc7ee18["cli.rs"];
-  class 80defdd4cbc7ee18 default;
-  click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
-  b50359102e04bf09 -->|satisfiedBy| 80defdd4cbc7ee18;
-  994f165ff784760d["sections_summary.rs"];
-  class 994f165ff784760d default;
-  click 994f165ff784760d "../../core/src/sections_summary.rs";
-  b50359102e04bf09 -->|satisfiedBy| 994f165ff784760d;
-  9bf743e946ad83ea["Sections Summary Tests"];
-  class 9bf743e946ad83ea verification;
-  click 9bf743e946ad83ea "ReportsTests.md#sections-summary-tests";
-  b50359102e04bf09 -.->|verifiedBy| 9bf743e946ad83ea;
-  b50359102e04bf09 -.->|verifiedBy| 34c75e4a88e1f381;
-  c9988cdcfdea77a["Formatting Output"];
-  class c9988cdcfdea77a requirement;
-  click c9988cdcfdea77a "../UserRequirements.md#formatting-output";
-  c9988cdcfdea77a -.->|deriveReqT| b7dd9db7a1290b97;
-  c9988cdcfdea77a -.->|verifiedBy| 735766802775ec41;
   a21995894299effb["Index Generation"];
   class a21995894299effb requirement;
   click a21995894299effb "../SystemRequirements/Requirements.md#index-generation";
@@ -192,110 +187,30 @@ graph LR;
   click c3d63c5d4133e346 "../../core/src/html_export.rs";
   a21995894299effb -->|satisfiedBy| c3d63c5d4133e346;
   a21995894299effb -.->|verifiedBy| 14ef985b9a43174e;
-  2f4125edaacb1231["Documentation Index for HTML Export"];
-  class 2f4125edaacb1231 requirement;
-  click 2f4125edaacb1231 "../UserRequirements.md#documentation-index-for-html-export";
-  2f4125edaacb1231 -.->|verifiedBy| 14ef985b9a43174e;
-  2f4125edaacb1231 -.->|deriveReqT| c1851df0c89e80f8;
-  2f4125edaacb1231 -.->|deriveReqT| a21995894299effb;
-  5deb63503bdf77c["HTML Export"];
-  class 5deb63503bdf77c requirement;
-  click 5deb63503bdf77c "../SystemRequirements/Requirements.md#html-export";
-  c3d63c5d4133e346["html_export.rs"];
-  class c3d63c5d4133e346 default;
-  click c3d63c5d4133e346 "../../core/src/html_export.rs";
-  5deb63503bdf77c -->|satisfiedBy| c3d63c5d4133e346;
+  c1851df0c89e80f8["HTML Navigation Enhancement"];
+  class c1851df0c89e80f8 requirement;
+  click c1851df0c89e80f8 "../SystemRequirements/Requirements.md#html-navigation-enhancement";
   d0e6cc47b904faa5["html.rs"];
   class d0e6cc47b904faa5 default;
   click d0e6cc47b904faa5 "../../core/src/html.rs";
-  5deb63503bdf77c -->|satisfiedBy| d0e6cc47b904faa5;
-  80defdd4cbc7ee18["cli.rs"];
-  class 80defdd4cbc7ee18 default;
-  click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
-  5deb63503bdf77c -->|satisfiedBy| 80defdd4cbc7ee18;
-  5deb63503bdf77c -.->|verifiedBy| 34c75e4a88e1f381;
-  5deb63503bdf77c -.->|deriveReqT| a21995894299effb;
-  5ffd0c57f51e3b22["Export Related System Elements"];
-  class 5ffd0c57f51e3b22 requirement;
-  click 5ffd0c57f51e3b22 "../SystemRequirements/Requirements.md#export-related-system-elements";
-  5deb63503bdf77c -.->|deriveReqT| 5ffd0c57f51e3b22;
-  52fe8f19c3102ecf["Serve Command"];
-  class 52fe8f19c3102ecf requirement;
-  click 52fe8f19c3102ecf "../SystemRequirements/Requirements.md#serve-command";
-  5deb63503bdf77c -.->|deriveReqT| 52fe8f19c3102ecf;
-  2c4fbf015f452a3e["Model HTML Pages Design"];
-  class 2c4fbf015f452a3e requirement;
-  click 2c4fbf015f452a3e "../SystemRequirements/Requirements.md#model-html-pages-design";
-  5deb63503bdf77c -.->|deriveReqT| 2c4fbf015f452a3e;
-  875f89a9f301fb90["Format Command"];
-  class 875f89a9f301fb90 requirement;
-  click 875f89a9f301fb90 "../SystemRequirements/Requirements.md#format-command";
-  80defdd4cbc7ee18["cli.rs"];
-  class 80defdd4cbc7ee18 default;
-  click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
-  875f89a9f301fb90 -->|satisfiedBy| 80defdd4cbc7ee18;
-  875f89a9f301fb90 -.->|verifiedBy| 34c75e4a88e1f381;
-  875f89a9f301fb90 -.->|verifiedBy| 735766802775ec41;
-  8f22faacdb454b23["CLI Interface Structure"];
-  class 8f22faacdb454b23 requirement;
-  click 8f22faacdb454b23 "../SystemRequirements/Requirements.md#cli-interface-structure";
-  80defdd4cbc7ee18["cli.rs"];
-  class 80defdd4cbc7ee18 default;
-  click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
-  8f22faacdb454b23 -->|satisfiedBy| 80defdd4cbc7ee18;
-  8f22faacdb454b23 -.->|verifiedBy| 34c75e4a88e1f381;
-  8f22faacdb454b23 -.->|deriveReqT| 749eaee85cfd0a43;
-  8f22faacdb454b23 -.->|deriveReqT| b50359102e04bf09;
-  8f22faacdb454b23 -.->|deriveReqT| 5deb63503bdf77c;
-  8f22faacdb454b23 -.->|deriveReqT| 875f89a9f301fb90;
-  4c9ae0a2fb751ce6["CLI Change Impact Report Command"];
-  class 4c9ae0a2fb751ce6 requirement;
-  click 4c9ae0a2fb751ce6 "../SystemRequirements/Requirements.md#cli-change-impact-report-command";
-  8f22faacdb454b23 -.->|deriveReqT| 4c9ae0a2fb751ce6;
-  7bdf935ec6d8effe["Subdirectory Processing Option"];
-  class 7bdf935ec6d8effe requirement;
-  click 7bdf935ec6d8effe "../SystemRequirements/Requirements.md#subdirectory-processing-option";
-  8f22faacdb454b23 -.->|deriveReqT| 7bdf935ec6d8effe;
-  8f22faacdb454b23 -.->|deriveReqT| 52fe8f19c3102ecf;
-  5a07afd22db51c40["CLI Summary Report Command"];
-  class 5a07afd22db51c40 requirement;
-  click 5a07afd22db51c40 "../SystemRequirements/Requirements.md#cli-summary-report-command";
-  8f22faacdb454b23 -.->|deriveReqT| 5a07afd22db51c40;
-  7223dec8fe51900f["CLI Generate Diagrams Flag"];
-  class 7223dec8fe51900f requirement;
-  click 7223dec8fe51900f "../SystemRequirements/Requirements.md#cli-generate-diagrams-flag";
-  8f22faacdb454b23 -.->|deriveReqT| 7223dec8fe51900f;
-  b4f1757fc8831083["Validate Command"];
-  class b4f1757fc8831083 requirement;
-  click b4f1757fc8831083 "../SystemRequirements/Requirements.md#validate-command";
-  8f22faacdb454b23 -.->|deriveReqT| b4f1757fc8831083;
-  5a67efb6be1c6c72["Integrated Validation"];
-  class 5a67efb6be1c6c72 requirement;
-  click 5a67efb6be1c6c72 "../SystemRequirements/TwoPassValidation.md#integrated-validation";
-  8f22faacdb454b23 -.->|deriveReqT| 5a67efb6be1c6c72;
-  80defdd4cbc7ee18["cli.rs"];
-  class 80defdd4cbc7ee18 default;
-  click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
-  4c9ae0a2fb751ce6 -->|satisfiedBy| 80defdd4cbc7ee18;
-  4c9ae0a2fb751ce6 -.->|verifiedBy| 34c75e4a88e1f381;
-  37a75398bd174177["Change Impact Command Line Interface"];
-  class 37a75398bd174177 requirement;
-  click 37a75398bd174177 "../SystemRequirements/ChangeImpactPropagation.md#change-impact-command-line-interface";
-  4c9ae0a2fb751ce6 -.->|deriveReqT| 37a75398bd174177;
-  6c40e66699ba40dd["CLI Git Commit Hash Flag"];
-  class 6c40e66699ba40dd requirement;
-  click 6c40e66699ba40dd "../SystemRequirements/Requirements.md#cli-git-commit-hash-flag";
-  4c9ae0a2fb751ce6 -.->|deriveReqT| 6c40e66699ba40dd;
-  8fbf4ca0471377ea["format.rs"];
-  class 8fbf4ca0471377ea default;
-  click 8fbf4ca0471377ea "../../core/src/format.rs";
-  7d44a9de72f2ed11 -->|satisfiedBy| 8fbf4ca0471377ea;
-  7d44a9de72f2ed11 -.->|verifiedBy| 735766802775ec41;
-  8fbf4ca0471377ea["format.rs"];
-  class 8fbf4ca0471377ea default;
-  click 8fbf4ca0471377ea "../../core/src/format.rs";
-  719bf8b75772947d -->|satisfiedBy| 8fbf4ca0471377ea;
-  719bf8b75772947d -.->|verifiedBy| 735766802775ec41;
+  c1851df0c89e80f8 -->|satisfiedBy| d0e6cc47b904faa5;
+  c3d63c5d4133e346["html_export.rs"];
+  class c3d63c5d4133e346 default;
+  click c3d63c5d4133e346 "../../core/src/html_export.rs";
+  c1851df0c89e80f8 -->|satisfiedBy| c3d63c5d4133e346;
+  c1851df0c89e80f8 -.->|verifiedBy| 14ef985b9a43174e;
+  837782fd5fe407a0["Document Structure Normalization"];
+  class 837782fd5fe407a0 requirement;
+  click 837782fd5fe407a0 "../SystemRequirements/Requirements.md#document-structure-normalization";
+  b7c871ab64a7059a["graph_registry.rs"];
+  class b7c871ab64a7059a default;
+  click b7c871ab64a7059a "../../core/src/graph_registry.rs";
+  837782fd5fe407a0 -->|satisfiedBy| b7c871ab64a7059a;
+  f22d93285fcd7664["parser.rs"];
+  class f22d93285fcd7664 default;
+  click f22d93285fcd7664 "../../core/src/parser.rs";
+  837782fd5fe407a0 -->|satisfiedBy| f22d93285fcd7664;
+  837782fd5fe407a0 -.->|verifiedBy| 735766802775ec41;
   52fe8f19c3102ecf -.->|trace| b4f1757fc8831083;
   80defdd4cbc7ee18["cli.rs"];
   class 80defdd4cbc7ee18 default;
@@ -306,11 +221,19 @@ graph LR;
   click e313808f7a755f6 "../../cli/src/serve.rs";
   52fe8f19c3102ecf -->|satisfiedBy| e313808f7a755f6;
   52fe8f19c3102ecf -.->|verifiedBy| a5590d2dcfffe431;
-  8fbf4ca0471377ea["format.rs"];
-  class 8fbf4ca0471377ea default;
-  click 8fbf4ca0471377ea "../../core/src/format.rs";
-  9f473f6e0b993cac -->|satisfiedBy| 8fbf4ca0471377ea;
-  9f473f6e0b993cac -.->|verifiedBy| 735766802775ec41;
+  80defdd4cbc7ee18["cli.rs"];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
+  4c9ae0a2fb751ce6 -->|satisfiedBy| 80defdd4cbc7ee18;
+  6c40e66699ba40dd["CLI Git Commit Hash Flag"];
+  class 6c40e66699ba40dd requirement;
+  click 6c40e66699ba40dd "../SystemRequirements/Requirements.md#cli-git-commit-hash-flag";
+  4c9ae0a2fb751ce6 -.->|deriveReqT| 6c40e66699ba40dd;
+  37a75398bd174177["Change Impact Command Line Interface"];
+  class 37a75398bd174177 requirement;
+  click 37a75398bd174177 "../SystemRequirements/ChangeImpactPropagation.md#change-impact-command-line-interface";
+  4c9ae0a2fb751ce6 -.->|deriveReqT| 37a75398bd174177;
+  4c9ae0a2fb751ce6 -.->|verifiedBy| 34c75e4a88e1f381;
   b49d890e0bbe0a83["Structure of Markdown Documents"];
   class b49d890e0bbe0a83 requirement;
   click b49d890e0bbe0a83 "../SpecificationsRequirements.md#structure-of-markdown-documents";
@@ -334,51 +257,11 @@ graph LR;
   class d50a859650933e55 default;
   click d50a859650933e55 "../../core/src/model.rs";
   b49d890e0bbe0a83 -->|satisfiedBy| d50a859650933e55;
+  b49d890e0bbe0a83 -.->|verifiedBy| 735766802775ec41;
   b0d0999636b025fa["Invalid Header Structure Test"];
   class b0d0999636b025fa verification;
   click b0d0999636b025fa "ValidationTests.md#invalid-header-structure-test";
   b49d890e0bbe0a83 -.->|verifiedBy| b0d0999636b025fa;
-  b49d890e0bbe0a83 -.->|verifiedBy| 735766802775ec41;
-  a4c40962cac85d0c["Export HTML specifications"];
-  class a4c40962cac85d0c requirement;
-  click a4c40962cac85d0c "../UserRequirements.md#export-html-specifications";
-  a4c40962cac85d0c -.->|verifiedBy| 14ef985b9a43174e;
-  a4c40962cac85d0c -.->|deriveReqT| 5deb63503bdf77c;
-  80defdd4cbc7ee18["cli.rs"];
-  class 80defdd4cbc7ee18 default;
-  click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
-  5a07afd22db51c40 -->|satisfiedBy| 80defdd4cbc7ee18;
-  76ae69270700044b["Model Summary Tests"];
-  class 76ae69270700044b verification;
-  click 76ae69270700044b "ReportsTests.md#model-summary-tests";
-  5a07afd22db51c40 -.->|verifiedBy| 76ae69270700044b;
-  8cafc3875f5e4938["Display Name-Regex Option in Help"];
-  class 8cafc3875f5e4938 requirement;
-  click 8cafc3875f5e4938 "../SystemRequirements/Requirements.md#display-name-regex-option-in-help";
-  5a07afd22db51c40 -.->|deriveReqT| 8cafc3875f5e4938;
-  5a07afd22db51c40 -.->|verifiedBy| 34c75e4a88e1f381;
-  a3ed678951ce89ea["Sections Summary Report Generator"];
-  class a3ed678951ce89ea requirement;
-  click a3ed678951ce89ea "../SystemRequirements/Requirements.md#sections-summary-report-generator";
-  5a07afd22db51c40 -.->|deriveReqT| a3ed678951ce89ea;
-  40ff89d68c242f45["Handle Invalid Regex Filter Patterns"];
-  class 40ff89d68c242f45 requirement;
-  click 40ff89d68c242f45 "../SystemRequirements/Requirements.md#handle-invalid-regex-filter-patterns";
-  5a07afd22db51c40 -.->|deriveReqT| 40ff89d68c242f45;
-  8fbf4ca0471377ea["format.rs"];
-  class 8fbf4ca0471377ea default;
-  click 8fbf4ca0471377ea "../../core/src/format.rs";
-  a7bd845c64d1685e -->|satisfiedBy| 8fbf4ca0471377ea;
-  a7bd845c64d1685e -.->|verifiedBy| 735766802775ec41;
-  80defdd4cbc7ee18["cli.rs"];
-  class 80defdd4cbc7ee18 default;
-  click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
-  7223dec8fe51900f -->|satisfiedBy| 80defdd4cbc7ee18;
-  2d2cf67bb8070da8["Diagram Generation Test"];
-  class 2d2cf67bb8070da8 verification;
-  click 2d2cf67bb8070da8 "DiagramsTests.md#diagram-generation-test";
-  7223dec8fe51900f -.->|verifiedBy| 2d2cf67bb8070da8;
-  7223dec8fe51900f -.->|verifiedBy| 34c75e4a88e1f381;
   8b8c7d0ce4d237d3["CLI Matrix Command"];
   class 8b8c7d0ce4d237d3 requirement;
   click 8b8c7d0ce4d237d3 "../SystemRequirements/Requirements.md#cli-matrix-command";
@@ -394,25 +277,91 @@ graph LR;
   class aa85c85e7c41d899 verification;
   click aa85c85e7c41d899 "TreacibilityMatrix.md#traceability-matrix-generation-test";
   8b8c7d0ce4d237d3 -.->|verifiedBy| aa85c85e7c41d899;
-  62eb37827b2a642["CLI Matrix SVG Flag"];
-  class 62eb37827b2a642 requirement;
-  click 62eb37827b2a642 "../SystemRequirements/Requirements.md#cli-matrix-svg-flag";
-  8b8c7d0ce4d237d3 -.->|deriveReqT| 62eb37827b2a642;
   ce77e5e4d9a4a0ca["CLI Matrix JSON Flag"];
   class ce77e5e4d9a4a0ca requirement;
   click ce77e5e4d9a4a0ca "../SystemRequirements/Requirements.md#cli-matrix-json-flag";
   8b8c7d0ce4d237d3 -.->|deriveReqT| ce77e5e4d9a4a0ca;
+  62eb37827b2a642["CLI Matrix SVG Flag"];
+  class 62eb37827b2a642 requirement;
+  click 62eb37827b2a642 "../SystemRequirements/Requirements.md#cli-matrix-svg-flag";
+  8b8c7d0ce4d237d3 -.->|deriveReqT| 62eb37827b2a642;
   8b8c7d0ce4d237d3 -.->|verifiedBy| 34c75e4a88e1f381;
+  9f473f6e0b993cac["Excess Whitespace Linting Implementation"];
+  class 9f473f6e0b993cac requirement;
+  click 9f473f6e0b993cac "../SystemRequirements/Requirements.md#excess-whitespace-linting-implementation";
+  8fbf4ca0471377ea["format.rs"];
+  class 8fbf4ca0471377ea default;
+  click 8fbf4ca0471377ea "../../core/src/format.rs";
+  9f473f6e0b993cac -->|satisfiedBy| 8fbf4ca0471377ea;
+  9f473f6e0b993cac -.->|verifiedBy| 735766802775ec41;
+  80defdd4cbc7ee18["cli.rs"];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
+  b50359102e04bf09 -->|satisfiedBy| 80defdd4cbc7ee18;
+  994f165ff784760d["sections_summary.rs"];
+  class 994f165ff784760d default;
+  click 994f165ff784760d "../../core/src/sections_summary.rs";
+  b50359102e04bf09 -->|satisfiedBy| 994f165ff784760d;
+  9bf743e946ad83ea["Sections Summary Tests"];
+  class 9bf743e946ad83ea verification;
+  click 9bf743e946ad83ea "ReportsTests.md#sections-summary-tests";
+  b50359102e04bf09 -.->|verifiedBy| 9bf743e946ad83ea;
+  b50359102e04bf09 -.->|verifiedBy| 34c75e4a88e1f381;
+  719bf8b75772947d["Missing Separators Linting Implementation"];
+  class 719bf8b75772947d requirement;
+  click 719bf8b75772947d "../SystemRequirements/Requirements.md#missing-separators-linting-implementation";
+  8fbf4ca0471377ea["format.rs"];
+  class 8fbf4ca0471377ea default;
+  click 8fbf4ca0471377ea "../../core/src/format.rs";
+  719bf8b75772947d -->|satisfiedBy| 8fbf4ca0471377ea;
+  719bf8b75772947d -.->|verifiedBy| 735766802775ec41;
+  2f4125edaacb1231["Documentation Index for HTML Export"];
+  class 2f4125edaacb1231 requirement;
+  click 2f4125edaacb1231 "../UserRequirements.md#documentation-index-for-html-export";
+  2f4125edaacb1231 -.->|verifiedBy| 14ef985b9a43174e;
+  2f4125edaacb1231 -.->|deriveReqT| a21995894299effb;
+  2f4125edaacb1231 -.->|deriveReqT| c1851df0c89e80f8;
+  c3d63c5d4133e346["html_export.rs"];
+  class c3d63c5d4133e346 default;
+  click c3d63c5d4133e346 "../../core/src/html_export.rs";
+  5deb63503bdf77c -->|satisfiedBy| c3d63c5d4133e346;
+  d0e6cc47b904faa5["html.rs"];
+  class d0e6cc47b904faa5 default;
+  click d0e6cc47b904faa5 "../../core/src/html.rs";
+  5deb63503bdf77c -->|satisfiedBy| d0e6cc47b904faa5;
+  80defdd4cbc7ee18["cli.rs"];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
+  5deb63503bdf77c -->|satisfiedBy| 80defdd4cbc7ee18;
+  5ffd0c57f51e3b22["Export Related System Elements"];
+  class 5ffd0c57f51e3b22 requirement;
+  click 5ffd0c57f51e3b22 "../SystemRequirements/Requirements.md#export-related-system-elements";
+  5deb63503bdf77c -.->|deriveReqT| 5ffd0c57f51e3b22;
+  2c4fbf015f452a3e["Model HTML Pages Design"];
+  class 2c4fbf015f452a3e requirement;
+  click 2c4fbf015f452a3e "../SystemRequirements/Requirements.md#model-html-pages-design";
+  5deb63503bdf77c -.->|deriveReqT| 2c4fbf015f452a3e;
+  5deb63503bdf77c -.->|deriveReqT| a21995894299effb;
+  5deb63503bdf77c -.->|deriveReqT| 52fe8f19c3102ecf;
+  5deb63503bdf77c -.->|verifiedBy| 34c75e4a88e1f381;
   80defdd4cbc7ee18["cli.rs"];
   class 80defdd4cbc7ee18 default;
   click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
   b4f1757fc8831083 -->|satisfiedBy| 80defdd4cbc7ee18;
-  b4f1757fc8831083 -.->|verifiedBy| 34c75e4a88e1f381;
   e37dc7f46d75d46["Invalid Relations Test"];
   class e37dc7f46d75d46 verification;
   click e37dc7f46d75d46 "ValidationTests.md#invalid-relations-test";
   b4f1757fc8831083 -.->|verifiedBy| e37dc7f46d75d46;
-  8dfe33c28555e80a -.->|verifiedBy| 735766802775ec41;
+  b4f1757fc8831083 -.->|verifiedBy| 34c75e4a88e1f381;
+  80defdd4cbc7ee18["cli.rs"];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
+  7223dec8fe51900f -->|satisfiedBy| 80defdd4cbc7ee18;
+  2d2cf67bb8070da8["Diagram Generation Test"];
+  class 2d2cf67bb8070da8 verification;
+  click 2d2cf67bb8070da8 "DiagramsTests.md#diagram-generation-test";
+  7223dec8fe51900f -.->|verifiedBy| 2d2cf67bb8070da8;
+  7223dec8fe51900f -.->|verifiedBy| 34c75e4a88e1f381;
 ```
 ### HTML Export Verification
 
@@ -450,7 +399,6 @@ This test verifies that the system exports specifications into HTML format with 
   * type: test-verification
 
 #### Relations
-  * verify: [Export HTML specifications](../UserRequirements.md#export-html-specifications)
   * verify: [Index Generation](../SystemRequirements/Requirements.md#index-generation)
   * satisfiedBy: [test.sh](../../tests/test-html-export/test.sh)
 ---
@@ -500,13 +448,11 @@ This test verifies that the CLI help output displays all commands and their opti
   * type: test-verification
 
 #### Relations
-  * verify: [CLI Interface Structure](../SystemRequirements/Requirements.md#cli-interface-structure)
   * verify: [Format Command](../SystemRequirements/Requirements.md#format-command)
   * verify: [Validate Command](../SystemRequirements/Requirements.md#validate-command)
   * verify: [HTML Export](../SystemRequirements/Requirements.md#html-export)
   * verify: [CLI Generate Diagrams Flag](../SystemRequirements/Requirements.md#cli-generate-diagrams-flag)
   * verify: [CLI Remove Diagrams Flag](../SystemRequirements/Requirements.md#cli-remove-diagrams-flag)
-  * verify: [CLI Summary Report Command](../SystemRequirements/Requirements.md#cli-summary-report-command)
   * verify: [CLI Sections Summary Command](../SystemRequirements/Requirements.md#cli-sections-summary-command)
   * verify: [CLI Change Impact Report Command](../SystemRequirements/Requirements.md#cli-change-impact-report-command)
   * verify: [CLI Matrix Command](../SystemRequirements/Requirements.md#cli-matrix-command)
@@ -524,9 +470,10 @@ This test verifies the format command requirements from SystemRequirements and U
 ##### Acceptance Criteria
 **Format Command Functionality:**
 - System shall provide format command that normalizes and standardizes markdown documents
-- System shall support --dry-run flag to preview changes without applying them
+- System shall default to dry-run mode (preview changes without applying them)
+- System shall require --fix flag to actually apply formatting changes to files
 - System shall display changes in git diff style with line numbers and colors
-- System shall show diff output when applying formatting changes (not only in dry-run mode)
+- System shall show diff output in both preview mode and when applying changes with --fix
 - System shall support --json flag for structured output of formatting results
 - System shall preserve all document content while improving formatting consistency
 
@@ -578,9 +525,9 @@ This test verifies the format command requirements from SystemRequirements and U
 ##### Test Criteria
 1. **Basic format functionality**
    - Format command runs successfully on test markdown files
-   - Dry-run mode shows preview without making changes
-   - Actual format command applies changes correctly
-   - Format command shows diff output when applying changes (not only in dry-run)
+   - Default mode (no --fix flag) shows preview without making changes
+   - --fix flag applies changes correctly
+   - Format command shows diff output in both preview and --fix modes
    - JSON flag produces structured output with formatting results
 
 2. **Content preservation verification**
@@ -624,9 +571,6 @@ This test verifies the format command requirements from SystemRequirements and U
 #### Relations
   * verify: [Format Command](../SystemRequirements/Requirements.md#format-command)
   * verify: [Document Structure Normalization](../SystemRequirements/Requirements.md#document-structure-normalization)
-  * verify: [Model Formatting](../UserRequirements.md#model-formatting)
-  * verify: [Format Consistency Enforcement](../UserRequirements.md#format-consistency-enforcement)
-  * verify: [Formatting Output](../UserRequirements.md#formatting-output)
   * verify: [Structure of Markdown Documents](../SpecificationsRequirements.md#structure-of-markdown-documents)
   * satisfiedBy: [test.sh](../../tests/test-advanced-format/test.sh)
 ---

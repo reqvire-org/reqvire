@@ -240,17 +240,18 @@ reqvire traces [--json] [--filter-id=<id>] [--filter-name=<regex>] [--filter-typ
 # Generate verification coverage report
 reqvire coverage [--json]
 
-# Format specifications
-reqvire format [--dry-run] [--json]
+# Lint specifications for all quality issues (dry-run by default)
+reqvire lint [--json] [--fix]
+reqvire lint --syntax                    # Only syntax/structural checks
+reqvire lint --redundant-verify         # Only redundant verify relations
+reqvire lint --redundant-hierarchy      # Only hierarchical relations needing review
+reqvire lint --syntax --redundant-verify --fix  # Combine checks and apply fixes
 
 # Generate HTML documentation
 reqvire html --output <dir>
 
 # Generate diagrams
 reqvire generate-diagrams
-
-# Find redundant verify relations (via slash command)
-/find-redundant-verifications
 ```
 
 ### Filter Options:
@@ -402,85 +403,45 @@ Ask the user to run `./target/debug/reqvire serve` in another shell, then use Pl
 7. Validate with `reqvire validate` and resolve any issues
 8. Review overall impact and update related documentation
 
-### Redundant Relations Cleanup:
+### Model Linting and Cleanup:
 
-**Quick Command:**
-Use the `/find-redundant-verifications` slash command to automatically find all redundant verify relations in the model.
-
-**Understanding Redundant Verify Relations:**
-A redundant verification relation occurs when a verification directly verifies both a leaf requirement and one or more of its ancestor requirements. Since verification status automatically rolls up through the requirement hierarchy (via derivedFrom relations), verifying a leaf requirement implicitly verifies all its ancestors. Therefore, explicitly verifying both creates redundancy.
-
-**Example of Redundancy:**
-```markdown
-### Authentication Test
-
-#### Relations
-  * verify: [User Authentication](../UserRequirements.md#user-authentication)
-  * verify: [OAuth Implementation](../SystemRequirements.md#oauth-implementation)
-```
-
-If OAuth Implementation is derived from User Authentication, then verifying OAuth Implementation (the leaf) automatically verifies User Authentication (the parent). The explicit verify relation to User Authentication is **redundant**.
-
-**Identifying Redundant Relations:**
-
-Use the traces command with JSON output to identify redundancies:
+**Simple Workflow:**
 
 ```bash
-# Generate traces with redundant relations analysis
-reqvire traces --json > /tmp/traces.json
+# 1. Apply all auto-fixes (ALWAYS SAFE)
+reqvire lint --fix
 
-# Or view in markdown format to see which relations are redundant
-reqvire traces
+# 2. Check what needs manual review
+reqvire lint --json > /tmp/lint.json
 ```
 
-The output will include a `redundant_relations` array for each verification showing which directly-verified requirements are ancestors of other directly-verified requirements.
+**Command Options:**
 
-**Example Traces Output:**
+```bash
+reqvire lint                    # Dry-run all checks
+reqvire lint --fix              # Apply all auto-fixes
+reqvire lint --syntax           # Only syntax/formatting
+reqvire lint --redundant-verify # Only redundant verify relations
+reqvire lint --json             # JSON output
+```
+
+**JSON Output Structure:**
+
 ```json
 {
-  "files": {
-    "specifications/Verifications/Tests.md": {
-      "sections": {
-        "Authentication Tests": {
-          "verifications": [{
-            "identifier": "specifications/Verifications/Tests.md#oauth-flow-test",
-            "name": "OAuth Flow Test",
-            "redundant_relations": [
-              "specifications/SystemRequirements.md#user-authentication"
-            ]
-          }]
-        }
-      }
-    }
+  "auto_fixable": {
+    "syntax": [...],
+    "redundant_verify_relations": [...]
+  },
+  "needs_review": {
+    "maybe_redundant_hierarchical_relations": [...]
   }
 }
 ```
 
-**Removing Redundant Relations Workflow:**
+**Handling Manual Reviews:**
 
-1. **Generate traces** to identify redundancies:
-   ```bash
-   reqvire traces --json > /tmp/traces.json
-   ```
-
-2. **Analyze the output** to find verifications with non-empty `redundant_relations` arrays
-
-3. **For each redundant relation:**
-   - Locate the verification file
-   - Open the verification element
-   - Remove the verify relation to the redundant (parent) requirement
-   - Keep the verify relation to the leaf (most derived) requirement
-
-4. **Validate changes:**
-   ```bash
-   reqvire validate
-   ```
-
-5. **Verify cleanup** by re-running traces:
-   ```bash
-   reqvire traces --json > /tmp/traces-after.json
-   # All redundant_relations arrays should now be empty
-   ```
+For `needs_review` items, read the affected specifications and provide feedback to user on whether the suggested change should be applied.
 
 **Example Cleanup:**
 

@@ -5,7 +5,7 @@ Usage: reqvire [OPTIONS] <COMMAND> [COMMAND OPTIONS]
 Commands:
   export            Export model to browsable HTML documentation with complete traceability
   serve             Serve model as browsable HTML documentation via HTTP server
-  format            Format markdown files by applying automatic normalization and stylistic fixes
+  format            Format and normalize requirements files. By default, shows preview without applying changes
   validate          Validate model
   generate-diagrams Generate mermaid diagrams in markdown files showing requirements relationships The diagrams will be placed at the top of each requirements document
   remove-diagrams   Remove all generated mermaid diagrams from markdown files
@@ -30,7 +30,7 @@ SERVE OPTIONS:
       --port <PORT>             Server port
 
 FORMAT OPTIONS:
-      --dry-run                 Show differences without applying changes
+      --fix                     Apply formatting changes to files
       --json                    Output results in JSON format
 
 VALIDATE OPTIONS:

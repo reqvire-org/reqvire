@@ -121,10 +121,10 @@ for artifact in "index.html" "traces.html"; do
   fi
 done
 
-# Test 3: Format from submodule directory
-echo "Running: reqvire format --dry-run" >> "${TEST_DIR}/test_results.log"
+# Test 3: Format from submodule directory (preview mode - default)
+echo "Running: reqvire format" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" format --dry-run 2>&1)
+OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" format 2>&1)
 EXIT_CODE=$?
 set -e
 
