@@ -19,6 +19,33 @@ body {
     background-color: #f8f9fa;
     color: #333;
 }
+.reqvire-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    background-color: #2c3e50;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+}
+.reqvire-nav a {
+    color: #ecf0f1;
+    text-decoration: none;
+    padding: 10px 20px;
+    margin-right: 5px;
+    border-radius: 3px;
+    transition: background-color 0.2s;
+}
+.reqvire-nav a:hover {
+    background-color: #34495e;
+}
+.reqvire-nav-spacer {
+    height: 50px;
+}
 .container {
     max-width: 1200px;
     margin: 0 auto;
@@ -113,7 +140,7 @@ pub const HTML_TEMPLATE: &str = r#"
     <!-- Enhanced mermaid configuration for Reqvire diagrams -->
     <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
     <script>
-        mermaid.initialize({ 
+        mermaid.initialize({
             startOnLoad: true,
             theme: 'neutral',
             maxTextSize: 90000,
@@ -127,6 +154,13 @@ pub const HTML_TEMPLATE: &str = r#"
     </script>
 </head>
 <body>
+    <nav class="reqvire-nav">
+        <a href="{nav_prefix}index.html">Index</a>
+        <a href="{nav_prefix}traces.html">Traces</a>
+        <a href="{nav_prefix}coverage.html">Coverage</a>
+        <a href="{nav_prefix}matrix.svg" target="_blank">Matrix</a>
+    </nav>
+    <div class="reqvire-nav-spacer"></div>
     <div class="container">
         <div class="content">
             {content}
@@ -139,7 +173,7 @@ pub const HTML_TEMPLATE: &str = r#"
 /// Convert markdown content to styled HTML with additional processing
 pub fn convert_to_html(
     file_path: &PathBuf,
-    markdown_content: &str, 
+    markdown_content: &str,
     title: &str,
     base_folder: &PathBuf
 ) -> Result<String, ReqvireError> {
@@ -169,13 +203,41 @@ pub fn convert_to_html(
     let html_with_anchors = add_anchor_ids(&html_output);
     let html_with_mermaid = process_mermaid_diagrams(file_path, &html_with_anchors);
 
-    // 6. Final output
+    // 6. Calculate relative path prefix for navigation links
+    let nav_prefix = calculate_nav_prefix(file_path, base_folder);
+
+    // 7. Final output with relative navigation links
     let html_document = HTML_TEMPLATE
         .replace("{title}", title)
         .replace("{styles}", EMBEDDED_STYLES)
-        .replace("{content}", &html_with_mermaid);
+        .replace("{content}", &html_with_mermaid)
+        .replace("{nav_prefix}", &nav_prefix);
 
     Ok(html_document)
+}
+
+/// Calculate the relative path prefix needed for navigation links
+/// based on the depth of the current file relative to base_folder
+fn calculate_nav_prefix(file_path: &PathBuf, base_folder: &PathBuf) -> String {
+    // Get relative path from base_folder
+    let relative_path = match file_path.strip_prefix(base_folder) {
+        Ok(rel) => rel,
+        Err(_) => {
+            // If strip_prefix fails, assume file is at root
+            return String::new();
+        }
+    };
+
+    // Count the number of directory components (excluding the filename)
+    let depth = relative_path.components().count().saturating_sub(1);
+
+    if depth == 0 {
+        // File is at root level
+        String::new()
+    } else {
+        // Need to go up 'depth' levels
+        "../".repeat(depth)
+    }
 }
 
 /// Add id attributes to headers for anchor links

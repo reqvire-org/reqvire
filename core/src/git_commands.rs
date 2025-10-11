@@ -12,13 +12,11 @@ static COMMIT_HASH: Lazy<Mutex<Option<String>>> = Lazy::new(|| Mutex::new(None))
 static GIT_ROOT_DIR: Lazy<Mutex<Option<PathBuf>>> = Lazy::new(|| Mutex::new(None));
 static GIT_ROOT_CACHE: Lazy<Mutex<HashMap<PathBuf, String>>> = Lazy::new(|| Mutex::new(HashMap::new()));
 
-#[cfg(test)]
 pub fn clear_git_cache() {
     REPO_URL.lock().unwrap().take();
     COMMIT_HASH.lock().unwrap().take();
     GIT_ROOT_DIR.lock().unwrap().take();
     GIT_ROOT_CACHE.lock().unwrap().clear();
-    
 }
 
 /// Retrieves the repository base URL (HTTPS format) from Git remote configuration.

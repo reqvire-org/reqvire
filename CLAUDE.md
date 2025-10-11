@@ -27,19 +27,18 @@ This guide is split into domain-specific guides for better organization:
 - **Format requirements (preview only)**: `./target/debug/reqvire format --dry-run`
 - **Apply formatting fixes**: `./target/debug/reqvire format`
 - **Generate diagrams**: `./target/debug/reqvire generate-diagrams`
-- **Generate index document**: `./target/debug/reqvire model index > SpecificationIndex.md`
-- **Generate model summary**: `./target/debug/reqvire model summary`
-- **Generate model summary (JSON)**: `./target/debug/reqvire model summary --json > /tmp/model-summary.json`
-- **Generate section summary**: `./target/debug/reqvire model section-summary`
-- **Generate section summary (JSON)**: `./target/debug/reqvire model section-summary --json > /tmp/section-summary.json`
-- **Generate HTML documentation**: `./target/debug/reqvire html --output <OUTPUT_DIR>`
+- **Generate model summary**: `./target/debug/reqvire summary`
+- **Generate model summary (JSON)**: `./target/debug/reqvire summary --json > /tmp/model-summary.json`
+- **Generate section summary**: `./target/debug/reqvire section-summary`
+- **Generate section summary (JSON)**: `./target/debug/reqvire section-summary --json > /tmp/section-summary.json`
+- **Generate HTML documentation**: `./target/debug/reqvire html --output <OUTPUT_DIR>` - Generates HTML output with index, diagrams, traces, coverage, and matrix
 - **Analyze change impact**: `./target/debug/reqvire change-impact --git-commit=<COMMIT_HASH>`
 - **Analyze change impact (JSON)**: `./target/debug/reqvire change-impact --git-commit=HEAD~1 --json > /tmp/impact.json`
-- **Generate verification traces**: `./target/debug/reqvire verifications traces` - Generates upward traceability from verifications to root requirements with Mermaid diagrams
-- **Generate verification traces (JSON)**: `./target/debug/reqvire verifications traces --json > /tmp/verification-traces.json` - JSON output with trace trees for programmatic analysis
-- **Filter verification traces**: `./target/debug/reqvire verifications traces --filter-id=<id>` or `--filter-name=<regex>` or `--filter-type=<type>` - Filter to specific verifications
-- **Generate verification matrix**: `./target/debug/reqvire verifications matrix` - Generates verification traceability matrix
-- **Generate coverage report**: `./target/debug/reqvire verifications coverage` - Generates verification coverage report for leaf requirements
+- **Generate verification traces**: `./target/debug/reqvire traces` - Generates upward traceability from verifications to root requirements with Mermaid diagrams
+- **Generate verification traces (JSON)**: `./target/debug/reqvire traces --json > /tmp/verification-traces.json` - JSON output with trace trees for programmatic analysis
+- **Filter verification traces**: `./target/debug/reqvire traces --filter-id=<id>` or `--filter-name=<regex>` or `--filter-type=<type>` - Filter to specific verifications
+- **Generate verification matrix**: `./target/debug/reqvire matrix` - Generates verification traceability matrix
+- **Generate coverage report**: `./target/debug/reqvire coverage` - Generates verification coverage report for leaf requirements
 
 
 ### Filtering Options

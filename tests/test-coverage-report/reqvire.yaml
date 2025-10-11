@@ -6,6 +6,7 @@ paths:
   
   excluded_filename_patterns:
     - "**/DesignSpecifications/*.md"
+    - "**/expected_output.md"
 
 style:
   theme: "light"

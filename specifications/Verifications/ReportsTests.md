@@ -12,20 +12,13 @@ graph LR;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  349f5e874cf22d98["Verification Coverage Report Test"];
-  class 349f5e874cf22d98 verification;
-  click 349f5e874cf22d98 "ReportsTests.md#verification-coverage-report-test";
-  7099e5b2f8a08808["test.sh"];
-  class 7099e5b2f8a08808 default;
-  click 7099e5b2f8a08808 "../../tests/test-coverage-report/test.sh";
-  349f5e874cf22d98 -->|satisfiedBy| 7099e5b2f8a08808;
-  3108f29b131412a3["Index Generation Test"];
-  class 3108f29b131412a3 verification;
-  click 3108f29b131412a3 "ReportsTests.md#index-generation-test";
-  1123809d5f501bf1["test.sh"];
-  class 1123809d5f501bf1 default;
-  click 1123809d5f501bf1 "../../tests/test-index-generation/test.sh";
-  3108f29b131412a3 -->|satisfiedBy| 1123809d5f501bf1;
+  fa3c1ae9e9b91644["Verification Traces From-Folder Test"];
+  class fa3c1ae9e9b91644 verification;
+  click fa3c1ae9e9b91644 "ReportsTests.md#verification-traces-from-folder-test";
+  c4c5998e49538704["test.sh"];
+  class c4c5998e49538704 default;
+  click c4c5998e49538704 "../../tests/test-verification-traces/test.sh";
+  fa3c1ae9e9b91644 -->|satisfiedBy| c4c5998e49538704;
   958d9af6695bd8a["Verification Traces Filter Options Test"];
   class 958d9af6695bd8a verification;
   click 958d9af6695bd8a "ReportsTests.md#verification-traces-filter-options-test";
@@ -40,13 +33,6 @@ graph LR;
   class 7b75340700b95177 default;
   click 7b75340700b95177 "../../tests/test-model-summary-reports/test.sh";
   76ae69270700044b -->|satisfiedBy| 7b75340700b95177;
-  fa3c1ae9e9b91644["Verification Traces From-Folder Test"];
-  class fa3c1ae9e9b91644 verification;
-  click fa3c1ae9e9b91644 "ReportsTests.md#verification-traces-from-folder-test";
-  c4c5998e49538704["test.sh"];
-  class c4c5998e49538704 default;
-  click c4c5998e49538704 "../../tests/test-verification-traces/test.sh";
-  fa3c1ae9e9b91644 -->|satisfiedBy| c4c5998e49538704;
   9bf743e946ad83ea["Sections Summary Tests"];
   class 9bf743e946ad83ea verification;
   click 9bf743e946ad83ea "ReportsTests.md#sections-summary-tests";
@@ -54,52 +40,59 @@ graph LR;
   class bf32ae8da9b17852 default;
   click bf32ae8da9b17852 "../../tests/test-sections-summary/test.sh";
   9bf743e946ad83ea -->|satisfiedBy| bf32ae8da9b17852;
-  2f5273c3b5655b33["Verification Coverage Report Generator"];
-  class 2f5273c3b5655b33 requirement;
-  click 2f5273c3b5655b33 "../SystemRequirements/Requirements.md#verification-coverage-report-generator";
-  2f5273c3b5655b33 -.->|verifiedBy| 349f5e874cf22d98;
-  a2d558b5d772d284["CLI Verifications Coverage Command"];
-  class a2d558b5d772d284 requirement;
-  click a2d558b5d772d284 "../SystemRequirements/Requirements.md#cli-verifications-coverage-command";
-  2f5273c3b5655b33 -.->|deriveReqT| a2d558b5d772d284;
+  349f5e874cf22d98["Verification Coverage Report Test"];
+  class 349f5e874cf22d98 verification;
+  click 349f5e874cf22d98 "ReportsTests.md#verification-coverage-report-test";
+  7099e5b2f8a08808["test.sh"];
+  class 7099e5b2f8a08808 default;
+  click 7099e5b2f8a08808 "../../tests/test-coverage-report/test.sh";
+  349f5e874cf22d98 -->|satisfiedBy| 7099e5b2f8a08808;
+  40ff89d68c242f45["Handle Invalid Regex Filter Patterns"];
+  class 40ff89d68c242f45 requirement;
+  click 40ff89d68c242f45 "../SystemRequirements/Requirements.md#handle-invalid-regex-filter-patterns";
+  80defdd4cbc7ee18["cli.rs"];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
+  40ff89d68c242f45 -->|satisfiedBy| 80defdd4cbc7ee18;
+  40ff89d68c242f45 -.->|verifiedBy| 76ae69270700044b;
+  ddec547537f501ee["CLI Traces From-Folder Option"];
+  class ddec547537f501ee requirement;
+  click ddec547537f501ee "../SystemRequirements/Requirements.md#cli-traces-from-folder-option";
+  ddec547537f501ee -.->|verifiedBy| fa3c1ae9e9b91644;
+  8cafc3875f5e4938["Display Name-Regex Option in Help"];
+  class 8cafc3875f5e4938 requirement;
+  click 8cafc3875f5e4938 "../SystemRequirements/Requirements.md#display-name-regex-option-in-help";
+  80defdd4cbc7ee18["cli.rs"];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
+  8cafc3875f5e4938 -->|satisfiedBy| 80defdd4cbc7ee18;
+  8cafc3875f5e4938 -.->|verifiedBy| 76ae69270700044b;
+  920a8118d579854b["CLI Traces Filter Options"];
+  class 920a8118d579854b requirement;
+  click 920a8118d579854b "../SystemRequirements/Requirements.md#cli-traces-filter-options";
+  920a8118d579854b -.->|verifiedBy| 958d9af6695bd8a;
   ad6f7a2d41d80a38["Model Structure and Summaries"];
   class ad6f7a2d41d80a38 requirement;
   click ad6f7a2d41d80a38 "../UserRequirements.md#model-structure-and-summaries";
-  ad6f7a2d41d80a38 -.->|verifiedBy| 76ae69270700044b;
   b882613af131f35f["Model Summary Report Generator"];
   class b882613af131f35f requirement;
   click b882613af131f35f "../SystemRequirements/Requirements.md#model-summary-report-generator";
   ad6f7a2d41d80a38 -.->|deriveReqT| b882613af131f35f;
-  a3ed678951ce89ea["Sections Summary Report Generator"];
-  class a3ed678951ce89ea requirement;
-  click a3ed678951ce89ea "../SystemRequirements/Requirements.md#sections-summary-report-generator";
-  994f165ff784760d["sections_summary.rs"];
-  class 994f165ff784760d default;
-  click 994f165ff784760d "../../core/src/sections_summary.rs";
-  a3ed678951ce89ea -->|satisfiedBy| 994f165ff784760d;
-  a3ed678951ce89ea -.->|verifiedBy| 9bf743e946ad83ea;
-  b50359102e04bf09["CLI Sections Summary Command"];
-  class b50359102e04bf09 requirement;
-  click b50359102e04bf09 "../SystemRequirements/Requirements.md#cli-sections-summary-command";
-  a3ed678951ce89ea -.->|deriveReqT| b50359102e04bf09;
-  a21995894299effb["Index Generation"];
-  class a21995894299effb requirement;
-  click a21995894299effb "../SystemRequirements/Requirements.md#index-generation";
-  1a173441705701a0["index_generator.rs"];
-  class 1a173441705701a0 default;
-  click 1a173441705701a0 "../../core/src/index_generator.rs";
-  a21995894299effb -->|satisfiedBy| 1a173441705701a0;
+  ad6f7a2d41d80a38 -.->|verifiedBy| 76ae69270700044b;
+  5bfc0d5fd7bba25["CLI Traces Command"];
+  class 5bfc0d5fd7bba25 requirement;
+  click 5bfc0d5fd7bba25 "../SystemRequirements/Requirements.md#cli-traces-command";
   80defdd4cbc7ee18["cli.rs"];
   class 80defdd4cbc7ee18 default;
   click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
-  a21995894299effb -->|satisfiedBy| 80defdd4cbc7ee18;
-  a21995894299effb -.->|verifiedBy| 3108f29b131412a3;
-  f7a606aa79ba438["Verification Coverage Report"];
-  class f7a606aa79ba438 requirement;
-  click f7a606aa79ba438 "../UserRequirements.md#verification-coverage-report";
-  f7a606aa79ba438 -.->|verifiedBy| 349f5e874cf22d98;
-  f7a606aa79ba438 -.->|deriveReqT| 2f5273c3b5655b33;
-  f7a606aa79ba438 -.->|deriveReqT| a2d558b5d772d284;
+  5bfc0d5fd7bba25 -->|satisfiedBy| 80defdd4cbc7ee18;
+  5bfc0d5fd7bba25 -.->|verifiedBy| 958d9af6695bd8a;
+  34c75e4a88e1f381["CLI Help Structure Verification"];
+  class 34c75e4a88e1f381 verification;
+  click 34c75e4a88e1f381 "Misc.md#cli-help-structure-verification";
+  5bfc0d5fd7bba25 -.->|verifiedBy| 34c75e4a88e1f381;
+  5bfc0d5fd7bba25 -.->|deriveReqT| ddec547537f501ee;
+  5bfc0d5fd7bba25 -.->|deriveReqT| 920a8118d579854b;
   5a07afd22db51c40["CLI Summary Report Command"];
   class 5a07afd22db51c40 requirement;
   click 5a07afd22db51c40 "../SystemRequirements/Requirements.md#cli-summary-report-command";
@@ -107,21 +100,53 @@ graph LR;
   class 80defdd4cbc7ee18 default;
   click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
   5a07afd22db51c40 -->|satisfiedBy| 80defdd4cbc7ee18;
-  5a07afd22db51c40 -.->|deriveReqT| a3ed678951ce89ea;
-  8cafc3875f5e4938["Display Name-Regex Option in Help"];
-  class 8cafc3875f5e4938 requirement;
-  click 8cafc3875f5e4938 "../SystemRequirements/Requirements.md#display-name-regex-option-in-help";
-  5a07afd22db51c40 -.->|deriveReqT| 8cafc3875f5e4938;
-  40ff89d68c242f45["Handle Invalid Regex Filter Patterns"];
-  class 40ff89d68c242f45 requirement;
-  click 40ff89d68c242f45 "../SystemRequirements/Requirements.md#handle-invalid-regex-filter-patterns";
+  5a07afd22db51c40 -.->|verifiedBy| 34c75e4a88e1f381;
   5a07afd22db51c40 -.->|deriveReqT| 40ff89d68c242f45;
+  5a07afd22db51c40 -.->|deriveReqT| 8cafc3875f5e4938;
+  a3ed678951ce89ea["Sections Summary Report Generator"];
+  class a3ed678951ce89ea requirement;
+  click a3ed678951ce89ea "../SystemRequirements/Requirements.md#sections-summary-report-generator";
+  5a07afd22db51c40 -.->|deriveReqT| a3ed678951ce89ea;
   5a07afd22db51c40 -.->|verifiedBy| 76ae69270700044b;
+  2f5273c3b5655b33["Verification Coverage Report Generator"];
+  class 2f5273c3b5655b33 requirement;
+  click 2f5273c3b5655b33 "../SystemRequirements/Requirements.md#verification-coverage-report-generator";
+  2f5273c3b5655b33 -.->|verifiedBy| 349f5e874cf22d98;
+  8d93a79de428970["CLI Coverage Command"];
+  class 8d93a79de428970 requirement;
+  click 8d93a79de428970 "../SystemRequirements/Requirements.md#cli-coverage-command";
+  2f5273c3b5655b33 -.->|deriveReqT| 8d93a79de428970;
+  b50359102e04bf09["CLI Sections Summary Command"];
+  class b50359102e04bf09 requirement;
+  click b50359102e04bf09 "../SystemRequirements/Requirements.md#cli-sections-summary-command";
   80defdd4cbc7ee18["cli.rs"];
   class 80defdd4cbc7ee18 default;
   click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
-  8cafc3875f5e4938 -->|satisfiedBy| 80defdd4cbc7ee18;
-  8cafc3875f5e4938 -.->|verifiedBy| 76ae69270700044b;
+  b50359102e04bf09 -->|satisfiedBy| 80defdd4cbc7ee18;
+  994f165ff784760d["sections_summary.rs"];
+  class 994f165ff784760d default;
+  click 994f165ff784760d "../../core/src/sections_summary.rs";
+  b50359102e04bf09 -->|satisfiedBy| 994f165ff784760d;
+  b50359102e04bf09 -.->|verifiedBy| 9bf743e946ad83ea;
+  b50359102e04bf09 -.->|verifiedBy| 34c75e4a88e1f381;
+  f7a606aa79ba438["Verification Coverage Report"];
+  class f7a606aa79ba438 requirement;
+  click f7a606aa79ba438 "../UserRequirements.md#verification-coverage-report";
+  f7a606aa79ba438 -.->|verifiedBy| 349f5e874cf22d98;
+  f7a606aa79ba438 -.->|deriveReqT| 2f5273c3b5655b33;
+  f7a606aa79ba438 -.->|deriveReqT| 8d93a79de428970;
+  80defdd4cbc7ee18["cli.rs"];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
+  8d93a79de428970 -->|satisfiedBy| 80defdd4cbc7ee18;
+  8d93a79de428970 -.->|verifiedBy| 349f5e874cf22d98;
+  8d93a79de428970 -.->|verifiedBy| 34c75e4a88e1f381;
+  994f165ff784760d["sections_summary.rs"];
+  class 994f165ff784760d default;
+  click 994f165ff784760d "../../core/src/sections_summary.rs";
+  a3ed678951ce89ea -->|satisfiedBy| 994f165ff784760d;
+  a3ed678951ce89ea -.->|verifiedBy| 9bf743e946ad83ea;
+  a3ed678951ce89ea -.->|deriveReqT| b50359102e04bf09;
   73db87f73ef4c5a2["Model Summary Fine Grained Filtering"];
   class 73db87f73ef4c5a2 requirement;
   click 73db87f73ef4c5a2 "../SystemRequirements/Requirements.md#model-summary-fine-grained-filtering";
@@ -134,79 +159,7 @@ graph LR;
   click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
   73db87f73ef4c5a2 -->|satisfiedBy| 80defdd4cbc7ee18;
   73db87f73ef4c5a2 -.->|verifiedBy| 76ae69270700044b;
-  c2b6c74b77726ad9["Generate Documentation Index"];
-  class c2b6c74b77726ad9 requirement;
-  click c2b6c74b77726ad9 "../UserRequirements.md#generate-documentation-index";
-  c2b6c74b77726ad9 -.->|verifiedBy| 3108f29b131412a3;
-  84b3d0502132adb5["Documentation Index HTML Integration"];
-  class 84b3d0502132adb5 requirement;
-  click 84b3d0502132adb5 "../UserRequirements.md#documentation-index-html-integration";
-  c2b6c74b77726ad9 -.->|deriveReqT| 84b3d0502132adb5;
-  c2b6c74b77726ad9 -.->|deriveReqT| a21995894299effb;
-  80defdd4cbc7ee18["cli.rs"];
-  class 80defdd4cbc7ee18 default;
-  click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
-  40ff89d68c242f45 -->|satisfiedBy| 80defdd4cbc7ee18;
-  40ff89d68c242f45 -.->|verifiedBy| 76ae69270700044b;
-  80defdd4cbc7ee18["cli.rs"];
-  class 80defdd4cbc7ee18 default;
-  click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
-  b50359102e04bf09 -->|satisfiedBy| 80defdd4cbc7ee18;
-  994f165ff784760d["sections_summary.rs"];
-  class 994f165ff784760d default;
-  click 994f165ff784760d "../../core/src/sections_summary.rs";
-  b50359102e04bf09 -->|satisfiedBy| 994f165ff784760d;
-  b50359102e04bf09 -.->|verifiedBy| 9bf743e946ad83ea;
-  8d9cb651aa1c8331["CLI Verifications Traces Command"];
-  class 8d9cb651aa1c8331 requirement;
-  click 8d9cb651aa1c8331 "../SystemRequirements/Requirements.md#cli-verifications-traces-command";
-  80defdd4cbc7ee18["cli.rs"];
-  class 80defdd4cbc7ee18 default;
-  click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
-  8d9cb651aa1c8331 -->|satisfiedBy| 80defdd4cbc7ee18;
-  8d9cb651aa1c8331 -.->|verifiedBy| 958d9af6695bd8a;
-  6d69b75de1c99b99["CLI Verifications Traces From-Folder Option"];
-  class 6d69b75de1c99b99 requirement;
-  click 6d69b75de1c99b99 "../SystemRequirements/Requirements.md#cli-verifications-traces-from-folder-option";
-  8d9cb651aa1c8331 -.->|deriveReqT| 6d69b75de1c99b99;
-  a4b21e328dad2226["CLI Verifications Traces Filter Options"];
-  class a4b21e328dad2226 requirement;
-  click a4b21e328dad2226 "../SystemRequirements/Requirements.md#cli-verifications-traces-filter-options";
-  8d9cb651aa1c8331 -.->|deriveReqT| a4b21e328dad2226;
-  6d69b75de1c99b99 -.->|verifiedBy| fa3c1ae9e9b91644;
-  a4b21e328dad2226 -.->|verifiedBy| 958d9af6695bd8a;
-  80defdd4cbc7ee18["cli.rs"];
-  class 80defdd4cbc7ee18 default;
-  click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
-  a2d558b5d772d284 -->|satisfiedBy| 80defdd4cbc7ee18;
-  a2d558b5d772d284 -.->|verifiedBy| 349f5e874cf22d98;
 ```
-### Index Generation Test
-
-This test verifies that the system correctly generates an index document with links and summaries to all specification documents.
-
-#### Details
-
-##### Acceptance Criteria
-- System shall generate README.md in the specifications folder
-- README.md shall contain links to all specification documents
-- README.md shall be properly structured with sections
-- README.md shall include brief summaries of each document
-
-##### Test Criteria
-- `model index` command runs successfully and outputs to stdout
-- Output can be redirected to create index file
-- Output contains links to all specification documents
-- Output structure follows expected Markdown format
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * verify: [Index Generation](../SystemRequirements/Requirements.md#index-generation)
-  * satisfiedBy: [test.sh](../../tests/test-index-generation/test.sh)
----
-
 ### Model Summary Tests
 
 This test verifies that the system provides a CLI flag and functionality for generating summary reports of model structure and relationships including varius filters.
@@ -214,15 +167,15 @@ This test verifies that the system provides a CLI flag and functionality for gen
 #### Details
 
 ##### Acceptance Criteria
-- Running `reqvire model summary --json` produces a valid, pretty-printed JSON summary.
-- Running `reqvire model summary` (no `--json`) prints a human-readable markdown text summary beginning with `--- MBSE Model summary ---`.
+- Running `reqvire summary --json` produces a valid, pretty-printed JSON summary.
+- Running `reqvire summary` (no `--json`) prints a human-readable markdown text summary beginning with `--- MBSE Model summary ---`.
 - Both JSON and text summaries include exactly five elements with the identifiers:
   - `Requirement-with-Valid-Standard-Relations`
   - `Requirement-with-Valid-Markdown-Relations`
   - `Requirement-with-DesignSpecifications-Reference`
   - `Requirement-with-Many-Subsections`
   - `Verification-of-Standard-Relations`
-- When any filter flags (`--filter-file`, `--filter-section`, `--filter-type`, `--filter-name`, `--filter-content`, `--filter-is-verified`, `--filter-is-satisfied`) are supplied with `model summary` (and optionally `--json`), only elements matching **all** specified filters appear in both outputs.
+- When any filter flags (`--filter-file`, `--filter-section`, `--filter-type`, `--filter-name`, `--filter-content`, `--filter-is-verified`, `--filter-is-satisfied`) are supplied with `summary` (and optionally `--json`), only elements matching **all** specified filters appear in both outputs.
 - Supplying multiple filters in combination yields the intersection of their individual results.
 - Supplying an invalid regex to `--filter-name` or `--filter-content` fails with a non-zero exit code and displays a `ReqvireError::InvalidRegex` message.
 - Model summary report must include all relations for each element, showing both explicit relations and their opposite relations (e.g., if a requirement has `verifiedBy`, the verification element should show `verify`; if a verification has `verify`, the requirement should show `verifiedBy`).
@@ -233,7 +186,7 @@ This test verifies that the system provides a CLI flag and functionality for gen
 
 ##### Test Criteria
 1. **Base JSON summary**
-   Command: `reqvire model summary --json`
+   Command: `reqvire summary --json`
    - exits code **0**
    - output parses under `jq`
    - `.model_summary.global_counters.total_elements == 5`
@@ -241,7 +194,7 @@ This test verifies that the system provides a CLI flag and functionality for gen
    - `.model_summary.files["Requirements.md"]["Requirements"]` contains exactly the five identifiers above
 
 2. **Base text summary**
-   Command: `reqvire model summary`
+   Command: `reqvire summary`
    - exits code **0**
    - first line is `--- MBSE Model summary ---`
    - exactly five lines matching `🔹 Element: <identifier>` for the five identifiers above
@@ -265,19 +218,19 @@ This test verifies that the system provides a CLI flag and functionality for gen
    Combine two filters (e.g. `--filter-type=user-requirement` + `--filter-is-satisfied`) and verify both outputs contain exactly those identifiers passing both filters.
 
 5. **Invalid regex**
-   Command: `reqvire model summary --json --filter-name="***"`
+   Command: `reqvire summary --json --filter-name="***"`
    - exits non-zero
    - stderr contains `Invalid regex`
 
 6. **Relations coverage**
-   Command: `reqvire model summary --json`
+   Command: `reqvire summary --json`
    - For any requirement with `verifiedBy` relations, verify that the target verification elements show corresponding `verify` relations pointing back to the requirement
    - For any verification with `verify` relations, verify that the target requirement elements show corresponding `verifiedBy` relations pointing back to the verification
    - Same pattern applies to other relation pairs: `satisfiedBy`/`satisfy`, `derivedFrom`/`derive`
    - Both JSON and text outputs must show complete bidirectional relationship information
 
 7. **Enhanced content and counts verification**
-   Command: `reqvire model summary --json`
+   Command: `reqvire summary --json`
    - JSON output must include `page_content` field for files that have frontmatter content
    - JSON output must include `section_content` field for sections that have content
    - JSON output must include count fields: `total_files`, `total_sections`, `total_elements` in global counters
@@ -285,7 +238,7 @@ This test verifies that the system provides a CLI flag and functionality for gen
    - JSON output must include per-section counts: `element_count` in section summaries
 
 8. **Enhanced text output verification**
-   Command: `reqvire model summary`
+   Command: `reqvire summary`
    - Text output must show file counts in format: `📂 File: path (sections: N, elements: N)`
    - Text output must show section counts in format: `📖 Section: name (elements: N)`
    - Text output must display page content with `📄 Page content: "content with \n"` format when present
@@ -303,12 +256,12 @@ This test verifies that the system provides a CLI flag and functionality for gen
 
 ### Verification Coverage Report Test
 
-This test verifies that the system correctly generates verification coverage reports focusing on leaf requirements and showing the percentage and details of satisfied and unsatisfied test-verification elements.
+This test verifies that the system correctly generates verification coverage reports focusing on leaf requirements, showing the percentage and details of satisfied and unsatisfied test-verification elements, and identifying orphaned verifications.
 
 #### Details
 
 ##### Acceptance Criteria
-- System shall provide a CLI command `verifications coverage` that generates coverage reports focusing on leaf requirements
+- System shall provide a CLI command `coverage` that generates coverage reports focusing on leaf requirements
 - Command shall also support legacy `coverage-report` command (deprecated)
 - Command shall support `--json` flag for JSON output format
 - Coverage report shall include summary section with total counts and percentages for leaf requirements
@@ -317,6 +270,8 @@ This test verifies that the system correctly generates verification coverage rep
 - Coverage report shall list unverified leaf requirements with details
 - Coverage report shall list satisfied test-verification elements (those with satisfiedBy relations)
 - Coverage report shall list unsatisfied test-verification elements (those without satisfiedBy relations)
+- Coverage report shall list orphaned verifications (verifications without any verify relations to requirements)
+- Coverage report shall show orphaned verifications count and percentage in summary section
 - Non-test-verification elements (analysis, inspection, demonstration) are considered satisfied by default (no satisfiedBy required)
 - JSON output shall be valid and machine-readable
 - Text output shall be human-readable with clear formatting
@@ -355,19 +310,19 @@ This test verifies that the system correctly generates verification coverage rep
   * type: test-verification
 
 #### Relations
-  * verify: [CLI Verifications Coverage Command](../SystemRequirements/Requirements.md#cli-verifications-coverage-command)
+  * verify: [CLI Coverage Command](../SystemRequirements/Requirements.md#cli-coverage-command)
   * satisfiedBy: [test.sh](../../tests/test-coverage-report/test.sh)
 ---
 
 ### Sections Summary Tests
 
-This test verifies that the system provides `model section-summary` command functionality for generating focused reports of file and section structure without individual elements.
+This test verifies that the system provides `section-summary` command functionality for generating focused reports of file and section structure without individual elements.
 
 #### Details
 
 ##### Acceptance Criteria
-- Running `reqvire model section-summary --json` produces a valid, pretty-printed JSON summary with sections information.
-- Running `reqvire model section-summary` (no `--json`) prints a human-readable text summary showing files and sections.
+- Running `reqvire section-summary --json` produces a valid, pretty-printed JSON summary with sections information.
+- Running `reqvire section-summary` (no `--json`) prints a human-readable text summary showing files and sections.
 - Both JSON and text outputs include file paths, section names, section order indices, and section content.
 - Section order indices preserve the original document structure and enable reconstruction.
 - Individual elements (requirements, verifications) are excluded from the output.
@@ -377,7 +332,7 @@ This test verifies that the system provides `model section-summary` command func
 
 ##### Test Criteria
 1. **Base JSON sections summary**
-   Command: `reqvire model section-summary --json`
+   Command: `reqvire section-summary --json`
    - exits code **0**
    - output parses under `jq`
    - `.files` contains file path keys
@@ -385,7 +340,7 @@ This test verifies that the system provides `model section-summary` command func
    - No individual elements are included in the output
 
 2. **Base text sections summary**
-   Command: `reqvire model section-summary`
+   Command: `reqvire section-summary`
    - exits code **0**
    - output shows file paths and section information
    - sections are ordered by their `section_order` index
@@ -420,7 +375,7 @@ This test verifies that the verification-traces command filter options work corr
 #### Details
 
 ##### Acceptance Criteria
-- System shall provide CLI command `verifications traces` that generates upward trace trees from verifications
+- System shall provide CLI command `traces` that generates upward trace trees from verifications
 - Command shall also support legacy `verification-traces` command (deprecated)
 - Command shall output to stdout in Markdown format with embedded Mermaid diagrams by default
 - Command shall support `--json` flag for structured JSON output without diagrams
@@ -487,8 +442,8 @@ This test verifies that the verification-traces command filter options work corr
   * type: test-verification
 
 #### Relations
-  * verify: [CLI Verifications Traces Command](../SystemRequirements/Requirements.md#cli-verifications-traces-command)
-  * verify: [CLI Verifications Traces Filter Options](../SystemRequirements/Requirements.md#cli-verifications-traces-filter-options)
+  * verify: [CLI Traces Command](../SystemRequirements/Requirements.md#cli-traces-command)
+  * verify: [CLI Traces Filter Options](../SystemRequirements/Requirements.md#cli-traces-filter-options)
   * satisfiedBy: [test.sh](../../tests/test-verification-traces/test.sh)
 ---
 
@@ -499,7 +454,7 @@ This test verifies that the --from-folder option correctly generates relative li
 #### Details
 
 ##### Acceptance Criteria
-- System shall provide `--from-folder=<path>` option for `verifications traces` command
+- System shall provide `--from-folder=<path>` option for `traces` command
 - Option shall accept a relative path to the folder where output will be saved
 - When `diagrams_with_blobs` is false (default), generated Mermaid diagram links shall be relative to the specified folder
 - When `diagrams_with_blobs` is true with Git info, links shall remain as GitHub blob URLs (absolute)
@@ -509,40 +464,40 @@ This test verifies that the --from-folder option correctly generates relative li
 
 ##### Test Criteria
 1. **Basic From-Folder Option**
-   Command: `reqvire verifications traces --from-folder=docs/reports`
+   Command: `reqvire traces --from-folder=docs/reports`
    - exits code **0**
    - output contains Mermaid diagrams with click handlers
    - click handler links are relative paths calculated from `docs/reports/` to git root
    - example: if element identifier is `specifications/file.md#element`, link should be `../../specifications/file.md#element`
 
 2. **From-Folder with Current Directory**
-   Command: `reqvire verifications traces --from-folder=.`
+   Command: `reqvire traces --from-folder=.`
    - exits code **0**
    - links are relative to current directory (git root)
    - same as omitting --from-folder option
 
 3. **From-Folder with Nested Path**
-   Command: `reqvire verifications traces --from-folder=output/verification/traces`
+   Command: `reqvire traces --from-folder=output/verification/traces`
    - exits code **0**
    - links correctly navigate up three levels then to specifications
    - example: `../../specifications/file.md#element` becomes `../../../specifications/file.md#element`
 
 4. **From-Folder with JSON Output**
-   Command: `reqvire verifications traces --from-folder=docs/reports --json`
+   Command: `reqvire traces --from-folder=docs/reports --json`
    - exits code **0**
    - JSON output parses correctly
    - JSON element identifiers remain absolute (from git root)
    - from-folder only affects Markdown diagram links, not JSON structure
 
 5. **From-Folder Combined with Filters**
-   Command: `reqvire verifications traces --from-folder=docs/reports --filter-type=test-verification`
+   Command: `reqvire traces --from-folder=docs/reports --filter-type=test-verification`
    - exits code **0**
    - filtering works correctly
    - generated links still relative to `docs/reports/`
 
 6. **From-Folder with Git Blobs Enabled**
    Environment: `diagrams_with_blobs=true` in config
-   Command: `reqvire verifications traces --from-folder=docs/reports`
+   Command: `reqvire traces --from-folder=docs/reports`
    - exits code **0**
    - links remain as GitHub blob URLs (absolute)
    - from-folder has no effect on external GitHub links
@@ -555,7 +510,7 @@ This test verifies that the --from-folder option correctly generates relative li
    - Path traversal (..) count matches folder depth
 
 8. **From-Folder Special Case for Root**
-   Command: `reqvire verifications traces --from-folder=/`
+   Command: `reqvire traces --from-folder=/`
    - exits code **0**
    - identifiers remain as git-root-relative paths (no relative path calculation)
    - links use identifiers as-is (e.g., `specifications/file.md#element`)
@@ -565,6 +520,6 @@ This test verifies that the --from-folder option correctly generates relative li
   * type: test-verification
 
 #### Relations
-  * verify: [CLI Verifications Traces From-Folder Option](../SystemRequirements/Requirements.md#cli-verifications-traces-from-folder-option)
+  * verify: [CLI Traces From-Folder Option](../SystemRequirements/Requirements.md#cli-traces-from-folder-option)
   * satisfiedBy: [test.sh](../../tests/test-verification-traces/test.sh)
 ---

@@ -16,14 +16,15 @@ flowchart LR
             generateDiagrams((Generate/Remove Diagrams))
             analiseRelations((Analyze Relations))
             reports[Provide Reports]
-            validateStructure((Validate Structure))			
+            validateStructure((Validate Structure))
             filesStructure[Filesystem Structure]
             markdownSucture[Markdown Structure]
             modelStructure[Model Structure]
             reports[Reports]
             traceability((Generate Traceability Matrix))
-            handleDiffs((Trace Changes))        
-        end                   
+            handleDiffs((Trace Changes))
+            browseModel((Browse Model))
+        end
     end
 
     human[Human👤]
@@ -56,6 +57,7 @@ flowchart LR
 
     %% Human Interactions
     human -. use CLI to .-> manageModel
+    human -. use browser to .-> browseModel
 
     human -. colaborate via .-> GitHubOrSimilar
 
@@ -69,11 +71,18 @@ flowchart LR
 
     manageModel -. provide .-> traceability
     manageModel -. provide .-> analiseRelations
-    analiseRelations -. include .-> reports      
+    analiseRelations -. include .-> reports
     manageModel -. provide .-> generateDiagrams
     manageModel -. provide .-> handleDiffs
+    manageModel -. provide .-> browseModel
 
-    aiAgents -. uses MCP server to .-> manageModel    
+    browseModel -. include .-> validateStructure
+    browseModel -. include .-> generateDiagrams
+    browseModel -. include .-> traceability
+    browseModel -. include .-> reports
+
+    aiAgents -. uses MCP server to .-> manageModel
+    aiAgents -. uses MCP server to .-> browseModel
 
     aiAgents -. assist in development .-> developedSystem
     aiAgents -. commit code changes .-> gitRepository

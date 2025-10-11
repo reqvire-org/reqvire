@@ -41,11 +41,7 @@ jobs:
       - name: Generate Diagrams
         run: |
           ./reqvire generate-diagrams
-      
-      - name: Generate traces svg
-        run: |
-          ./reqvire verifications traces --svg > specifications/matrix.svg
-                
+
       - name: Check for Changes
         id: check_changes
         run: |

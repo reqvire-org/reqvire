@@ -1,0 +1,69 @@
+Reqvire requirements & treacibility management tool
+
+Usage: reqvire [OPTIONS] <COMMAND> [COMMAND OPTIONS]
+
+Commands:
+  export            Export model to browsable HTML documentation with complete traceability
+  format            Format markdown files by applying automatic normalization and stylistic fixes
+  validate          Validate model
+  generate-diagrams Generate mermaid diagrams in markdown files showing requirements relationships The diagrams will be placed at the top of each requirements document
+  remove-diagrams   Remove all generated mermaid diagrams from markdown files
+  summary           Output model registry and summary
+  section-summary   Output sections summary showing files, section names, and section content without individual elements
+  change-impact     Analise change impact and provides report
+  matrix            Generate verification traceability matrix showing requirements and their verification status
+  traces            Generate verification traces showing upward paths from verifications to root requirements
+  coverage          Generate verification coverage report for leaf requirements
+  shell             Interactive shell for GraphRegistry operations (undocumented)
+  sout              Single output stream for all pages, sections, and requirements (undocumented)
+  help               Print this message or the help of the given subcommand(s)
+
+Options:
+  -c, --config <CONFIG>     Path to a custom configuration file (YAML format) If not provided, the system will look for reqvire.yml, reqvire.yaml, .reqvire.yml, or .reqvire.yaml in the current directory
+  -h, --help               Print help
+  -V, --version            Print version
+
+EXPORT OPTIONS:
+      --output <OUTPUT>         Output directory for HTML files
+
+FORMAT OPTIONS:
+      --dry-run                 Show differences without applying changes
+      --json                    Output results in JSON format
+
+VALIDATE OPTIONS:
+      --json                    Output results in JSON format
+
+SUMMARY OPTIONS:
+      --json                    Output results in JSON format
+      --filter-file <GLOB>      Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`
+      --filter-name <REGEX>     Only include elements whose name matches this regular expression
+      --filter-section <GLOB>   Only include sections whose name matches this glob pattern e.g. `System requirement*`
+      --filter-type <TYPE>      Only include elements of the given type e.g. `user-requirement`, `system-requirement`, `verification`, `file`, or other custom type
+      --filter-content <REGEX>  Only include elements whose content matches this regular expression
+      --filter-is-not-verified  Only include requirements that do NOT have any "verifiedBy" relations
+      --filter-is-not-satisfied Only include requirements that do NOT have any "satisfiedBy" relations
+      --cypher                  Output traceability matrix as SVG without hyperlinks and with full element names Cannot be used with --json
+
+SECTION SUMMARY OPTIONS:
+      --json                    Output results in JSON format
+      --filter-file <GLOB>      Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`
+      --filter-section <GLOB>   Only include sections whose name matches this glob pattern e.g. `System requirement*`
+      --filter-content <REGEX>  Only include sections whose content matches this regular expression
+
+CHANGE IMPACT OPTIONS:
+      --git-commit <GIT_COMMIT> Git commit hash to use when comparing models
+      --json                    Output results in JSON format
+
+MATRIX OPTIONS:
+      --svg                     Output traceability matrix as SVG without hyperlinks and with full element names Cannot be used with --json
+      --json                    Output results in JSON format
+
+TRACES OPTIONS:
+      --json                    Output results in JSON format
+      --from-folder <PATH>      Relative path to folder where output will be saved (for generating relative links in Mermaid diagrams)
+      --filter-id <ID>          Only include verification with this specific identifier
+      --filter-name <REGEX>     Only include verifications whose name matches this regular expression
+      --filter-type <TYPE>      Only include verifications of the given type e.g. `test-verification`, `analysis-verification`
+
+COVERAGE OPTIONS:
+      --json                    Output results in JSON format

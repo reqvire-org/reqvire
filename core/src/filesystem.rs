@@ -82,3 +82,56 @@ pub fn create_dir_all<P: AsRef<Path>>(path: P) -> Result<(), ReqvireError> {
     })
 }
 
+/// Creates a temporary working directory with a unique name based on process ID
+pub fn create_temp_working_dir() -> Result<PathBuf, ReqvireError> {
+    let temp_base = std::env::temp_dir();
+    let temp_dir = temp_base.join(format!("reqvire-export-{}", std::process::id()));
+
+    fs::create_dir_all(&temp_dir)
+        .map_err(|e| ReqvireError::PathError(format!("Failed to create temp directory: {}", e)))?;
+
+    Ok(temp_dir)
+}
+
+/// Copies a single file from source to destination, creating parent directories as needed
+pub fn copy_file_with_structure(src: &Path, dst: &Path) -> Result<(), ReqvireError> {
+    if let Some(parent) = dst.parent() {
+        create_dir_all(parent)?;
+    }
+
+    fs::copy(src, dst)
+        .map_err(|e| ReqvireError::IoError(e))?;
+
+    Ok(())
+}
+
+/// Recursively copies all files and directories from source to destination
+pub fn copy_dir_all(src: &Path, dst: &Path) -> Result<(), ReqvireError> {
+    fs::create_dir_all(dst)
+        .map_err(|e| ReqvireError::IoError(e))?;
+
+    for entry in fs::read_dir(src).map_err(|e| ReqvireError::IoError(e))? {
+        let entry = entry.map_err(|e| ReqvireError::IoError(e))?;
+        let ty = entry.file_type().map_err(|e| ReqvireError::IoError(e))?;
+        let src_path = entry.path();
+        let dst_path = dst.join(entry.file_name());
+
+        if ty.is_dir() {
+            copy_dir_all(&src_path, &dst_path)?;
+        } else {
+            fs::copy(&src_path, &dst_path)
+                .map_err(|e| ReqvireError::IoError(e))?;
+        }
+    }
+    Ok(())
+}
+
+/// Removes a directory and all its contents
+pub fn remove_dir_all<P: AsRef<Path>>(path: P) -> Result<(), ReqvireError> {
+    if path.as_ref().exists() {
+        fs::remove_dir_all(path.as_ref())
+            .map_err(|e| ReqvireError::IoError(e))?;
+    }
+    Ok(())
+}
+

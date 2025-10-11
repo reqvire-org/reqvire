@@ -534,14 +534,14 @@ struct VerificationsByFile {
     files: HashMap<String, Vec<VerificationDetails>>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Clone)]
 struct RequirementDetails {
     identifier: String,
     name: String,
     section: String,
     verified_by: Vec<String>,
 }
-#[derive(Serialize)]
+#[derive(Serialize, Clone)]
 struct VerificationDetails {
     identifier: String,
     name: String,
@@ -601,9 +601,15 @@ impl CoverageReport {
         // Verified leaf requirements
         if !self.verified_leaf_requirements.files.is_empty() {
             output.push_str("## Verified Leaf Requirements\n\n");
-            for (file, requirements) in &self.verified_leaf_requirements.files {
+            let mut sorted_files: Vec<_> = self.verified_leaf_requirements.files.iter().collect();
+            sorted_files.sort_by_key(|(file, _)| *file);
+
+            for (file, requirements) in sorted_files {
                 output.push_str(&format!("### [{}]({})\n\n", file, file));
-                for requirement in requirements {
+                let mut sorted_requirements = requirements.clone();
+                sorted_requirements.sort_by(|a, b| a.name.cmp(&b.name));
+
+                for requirement in sorted_requirements {
                     output.push_str(&format!("- ✅ **{}**\n", requirement.name));
                     if !requirement.verified_by.is_empty() {
                         output.push_str("  - Verified by:\n");
@@ -619,9 +625,15 @@ impl CoverageReport {
         // Unverified leaf requirements
         if !self.unverified_leaf_requirements.files.is_empty() {
             output.push_str("## Unverified Leaf Requirements\n\n");
-            for (file, requirements) in &self.unverified_leaf_requirements.files {
+            let mut sorted_files: Vec<_> = self.unverified_leaf_requirements.files.iter().collect();
+            sorted_files.sort_by_key(|(file, _)| *file);
+
+            for (file, requirements) in sorted_files {
                 output.push_str(&format!("### [{}]({})\n\n", file, file));
-                for requirement in requirements {
+                let mut sorted_requirements = requirements.clone();
+                sorted_requirements.sort_by(|a, b| a.name.cmp(&b.name));
+
+                for requirement in sorted_requirements {
                     output.push_str(&format!("- ❌ **{}**\n", requirement.name));
                 }
                 output.push_str("\n");
@@ -631,9 +643,15 @@ impl CoverageReport {
         // Satisfied test verifications
         if !self.satisfied_test_verifications.files.is_empty() {
             output.push_str("## Satisfied Test Verifications\n\n");
-            for (file, verifications) in &self.satisfied_test_verifications.files {
+            let mut sorted_files: Vec<_> = self.satisfied_test_verifications.files.iter().collect();
+            sorted_files.sort_by_key(|(file, _)| *file);
+
+            for (file, verifications) in sorted_files {
                 output.push_str(&format!("### [{}]({})\n\n", file, file));
-                for verification in verifications {
+                let mut sorted_verifications = verifications.clone();
+                sorted_verifications.sort_by(|a, b| a.name.cmp(&b.name));
+
+                for verification in sorted_verifications {
                     output.push_str(&format!("- ✅ **{}** ({})\n", verification.name, verification.verification_type));
                     if !verification.satisfied_by.is_empty() {
                         output.push_str("  - Satisfied by:\n");
@@ -649,9 +667,15 @@ impl CoverageReport {
         // Unsatisfied test verifications
         if !self.unsatisfied_test_verifications.files.is_empty() {
             output.push_str("## Unsatisfied Test Verifications\n\n");
-            for (file, verifications) in &self.unsatisfied_test_verifications.files {
+            let mut sorted_files: Vec<_> = self.unsatisfied_test_verifications.files.iter().collect();
+            sorted_files.sort_by_key(|(file, _)| *file);
+
+            for (file, verifications) in sorted_files {
                 output.push_str(&format!("### [{}]({})\n\n", file, file));
-                for verification in verifications {
+                let mut sorted_verifications = verifications.clone();
+                sorted_verifications.sort_by(|a, b| a.name.cmp(&b.name));
+
+                for verification in sorted_verifications {
                     output.push_str(&format!("- ❌ **{}** ({})\n", verification.name, verification.verification_type));
                 }
                 output.push_str("\n");
@@ -661,9 +685,15 @@ impl CoverageReport {
         // Orphaned verifications
         if !self.orphaned_verifications.files.is_empty() {
             output.push_str("## Orphaned Verifications\n\n");
-            for (file, verifications) in &self.orphaned_verifications.files {
+            let mut sorted_files: Vec<_> = self.orphaned_verifications.files.iter().collect();
+            sorted_files.sort_by_key(|(file, _)| *file);
+
+            for (file, verifications) in sorted_files {
                 output.push_str(&format!("### [{}]({})\n\n", file, file));
-                for verification in verifications {
+                let mut sorted_verifications = verifications.clone();
+                sorted_verifications.sort_by(|a, b| a.name.cmp(&b.name));
+
+                for verification in sorted_verifications {
                     output.push_str(&format!("- ⚠️  **{}** ({})\n", verification.name, verification.verification_type));
                 }
                 output.push_str("\n");
