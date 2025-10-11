@@ -1,0 +1,13 @@
+## Needs Manual Review
+
+### Maybe-Redundant Hierarchical Relations
+
+**Element: Maybe Redundant Requirement**
+File: [specifications/Requirements.md#maybe-redundant-requirement](specifications/Requirements.md#maybe-redundant-requirement)
+
+Potentially redundant derivedFrom relations detected:
+  * derivedFrom: [specifications/Requirements.md#root-requirement](specifications/Requirements.md#root-requirement)
+
+Reason: This element has derivedFrom to both 'specifications/Requirements.md#parent-requirement' and its ancestor 'specifications/Requirements.md#root-requirement'. The hierarchy chain may already be established through the parent. Review if the direct link to the ancestor is semantically necessary.
+
+---

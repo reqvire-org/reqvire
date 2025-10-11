@@ -1,0 +1,13 @@
+## Auto-fixable Issues
+
+### Redundant Verify Relations
+
+**Verification: Test Verification**
+File: [specifications/Verifications/Tests.md#test-verification](specifications/Verifications/Tests.md#test-verification)
+
+Redundant verify relations (these can be automatically removed):
+  * verify: [specifications/Requirements.md#parent-requirement](specifications/Requirements.md#parent-requirement)
+
+Reason: This verification already verifies 'specifications/Requirements.md#leaf-requirement' which derives from 'specifications/Requirements.md#parent-requirement'. Verification traces automatically roll up through derivedFrom relations, so verifying the leaf requirement is sufficient.
+
+---

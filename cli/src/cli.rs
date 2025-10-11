@@ -14,6 +14,7 @@ use reqvire::git_commands;
 use reqvire::matrix_generator;
 use reqvire::sections_summary;
 use reqvire::verification_trace;
+use reqvire::lint;
 use reqvire::GraphRegistry;
 use reqvire::graph_registry::{Page, Section};
 use reqvire::element::Element;
@@ -205,6 +206,26 @@ pub enum Commands {
     Coverage {
         /// Output results in JSON format
         #[clap(long, help_heading = "COVERAGE OPTIONS")]
+        json: bool,
+    },
+
+    /// Analyze model quality and detect issues in requirements relations
+    #[clap(override_help = "Analyze model quality and detect issues in requirements relations\n\nLINT OPTIONS:\n      --fixable                   Show only auto-fixable issues\n      --auditable                 Show only issues requiring manual review\n      --fix                       Apply automatic fixes for auto-fixable issues\n      --json                      Output results in JSON format")]
+    Lint {
+        /// Show only auto-fixable issues
+        #[clap(long, help_heading = "LINT OPTIONS", conflicts_with = "auditable")]
+        fixable: bool,
+
+        /// Show only issues requiring manual review
+        #[clap(long, help_heading = "LINT OPTIONS", conflicts_with = "fixable")]
+        auditable: bool,
+
+        /// Apply automatic fixes for auto-fixable issues
+        #[clap(long, help_heading = "LINT OPTIONS")]
+        fix: bool,
+
+        /// Output results in JSON format
+        #[clap(long, help_heading = "LINT OPTIONS")]
         json: bool,
     },
 
@@ -410,6 +431,7 @@ fn wants_json(args: &Args) -> bool {
         Some(Commands::Matrix { json, .. }) => *json,
         Some(Commands::Traces { json, .. }) => *json,
         Some(Commands::Coverage { json }) => *json,
+        Some(Commands::Lint { json, .. }) => *json,
         _ => false,
     }
 }
@@ -631,6 +653,46 @@ pub fn handle_command(
         Some(Commands::Coverage { json }) => {
             let coverage_report = reports::generate_coverage_report(&model_manager.graph_registry);
             coverage_report.print(json);
+            return Ok(0);
+        },
+        Some(Commands::Lint { fixable, auditable, fix, json }) => {
+            // Run lint analysis
+            let lint_report = lint::analyze_model(&model_manager.graph_registry);
+
+            if fix {
+                // Apply automatic fixes
+                match lint_report.apply_fixes(&mut model_manager.graph_registry) {
+                    Ok(relations_removed) => {
+                        if relations_removed > 0 {
+                            // Rewrite all files with updated relations
+                            let format_result = format_files(&model_manager.graph_registry, false)?;
+
+                            if !json {
+                                println!("✅ Fixed {} redundant verify relation(s)\n", relations_removed);
+                                println!("Formatted {} file(s) with removed relations.\n", format_result.files_changed);
+                            }
+
+                            // Show remaining issues that need manual review
+                            if !lint_report.needs_manual_review.is_empty() {
+                                lint_report.print(json, false, true);  // Only show auditable issues
+                            }
+                        } else {
+                            if !json {
+                                println!("No auto-fixable issues found.\n");
+                            }
+                            lint_report.print(json, fixable, auditable);
+                        }
+                    }
+                    Err(e) => {
+                        eprintln!("❌ Failed to apply fixes: {}", e);
+                        return Ok(1);
+                    }
+                }
+            } else {
+                // Just print the report based on flags
+                lint_report.print(json, fixable, auditable);
+            }
+
             return Ok(0);
         },
         Some(Commands::Export { output }) => {

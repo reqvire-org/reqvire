@@ -1,0 +1,36 @@
+{
+  "auto_fixable": [
+    {
+      "type": "redundant_verify_relations",
+      "verification": {
+        "identifier": "specifications/Verifications/Tests.md#test-verification",
+        "name": "Test Verification",
+        "file": "specifications/Verifications/Tests.md"
+      },
+      "redundant_relations": [
+        {
+          "relation_type": "verify",
+          "target": "specifications/Requirements.md#parent-requirement"
+        }
+      ],
+      "rationale": "This verification already verifies 'specifications/Requirements.md#leaf-requirement' which derives from 'specifications/Requirements.md#parent-requirement'. Verification traces automatically roll up through derivedFrom relations, so verifying the leaf requirement is sufficient."
+    }
+  ],
+  "needs_manual_review": [
+    {
+      "type": "maybe_redundant_hierarchical_relations",
+      "element": {
+        "identifier": "specifications/Requirements.md#maybe-redundant-requirement",
+        "name": "Maybe Redundant Requirement",
+        "file": "specifications/Requirements.md"
+      },
+      "potentially_redundant_relations": [
+        {
+          "relation_type": "derivedFrom",
+          "target": "specifications/Requirements.md#root-requirement"
+        }
+      ],
+      "rationale": "This element has derivedFrom to both 'specifications/Requirements.md#parent-requirement' and its ancestor 'specifications/Requirements.md#root-requirement'. The hierarchy chain may already be established through the parent. Review if the direct link to the ancestor is semantically necessary."
+    }
+  ]
+}
