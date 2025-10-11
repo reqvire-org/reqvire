@@ -19,8 +19,9 @@ if [ $LINT_EXIT -ne 0 ]; then
   exit 1
 fi
 
-if ! diff -u "${TEST_SCRIPT_DIR}/expected-default.txt" <(echo "$LINT_OUTPUT"); then
+if ! diff -u "${TEST_SCRIPT_DIR}/expected-default.txt" <(echo "$LINT_OUTPUT") > /dev/null; then
   echo "❌ FAILED: Default lint output does not match expected"
+  diff -u "${TEST_SCRIPT_DIR}/expected-default.txt" <(echo "$LINT_OUTPUT")
   exit 1
 fi
 
@@ -36,8 +37,9 @@ if [ $FIXABLE_EXIT -ne 0 ]; then
   exit 1
 fi
 
-if ! diff -u "${TEST_SCRIPT_DIR}/expected-fixable.txt" <(echo "$FIXABLE_OUTPUT"); then
+if ! diff -u "${TEST_SCRIPT_DIR}/expected-fixable.txt" <(echo "$FIXABLE_OUTPUT") > /dev/null; then
   echo "❌ FAILED: --fixable output mismatch"
+  diff -u "${TEST_SCRIPT_DIR}/expected-fixable.txt" <(echo "$FIXABLE_OUTPUT")
   exit 1
 fi
 
@@ -53,8 +55,9 @@ if [ $AUDITABLE_EXIT -ne 0 ]; then
   exit 1
 fi
 
-if ! diff -u "${TEST_SCRIPT_DIR}/expected-auditable.txt" <(echo "$AUDITABLE_OUTPUT"); then
+if ! diff -u "${TEST_SCRIPT_DIR}/expected-auditable.txt" <(echo "$AUDITABLE_OUTPUT") > /dev/null; then
   echo "❌ FAILED: --auditable output mismatch"
+  diff -u "${TEST_SCRIPT_DIR}/expected-auditable.txt" <(echo "$AUDITABLE_OUTPUT")
   exit 1
 fi
 
@@ -70,8 +73,9 @@ if [ $JSON_EXIT -ne 0 ]; then
   exit 1
 fi
 
-if ! diff -u <(jq -S . "${TEST_SCRIPT_DIR}/expected-json.json") <(echo "$JSON_OUTPUT" | jq -S .); then
+if ! diff -u <(jq -S . "${TEST_SCRIPT_DIR}/expected-json.json") <(echo "$JSON_OUTPUT" | jq -S .) > /dev/null; then
   echo "❌ FAILED: JSON output mismatch"
+  diff -u <(jq -S . "${TEST_SCRIPT_DIR}/expected-json.json") <(echo "$JSON_OUTPUT" | jq -S .)
   exit 1
 fi
 
@@ -111,8 +115,9 @@ if [ $POST_FIX_EXIT -ne 0 ]; then
   exit 1
 fi
 
-if ! diff -u "${TEST_SCRIPT_DIR}/expected-after-fix.txt" <(echo "$POST_FIX_OUTPUT"); then
+if ! diff -u "${TEST_SCRIPT_DIR}/expected-after-fix.txt" <(echo "$POST_FIX_OUTPUT") > /dev/null; then
   echo "❌ FAILED: Post-fix output mismatch"
+  diff -u "${TEST_SCRIPT_DIR}/expected-after-fix.txt" <(echo "$POST_FIX_OUTPUT")
   exit 1
 fi
 

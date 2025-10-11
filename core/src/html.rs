@@ -124,6 +124,14 @@ blockquote {
 .mermaid {
     margin: 20px 0;
     text-align: center;
+    min-height: calc(100vh - 150px);
+    width: 100%;
+    overflow: visible;
+}
+.mermaid svg {
+    max-width: 100%;
+    max-height: calc(100vh - 150px);
+    height: auto;
 }
 </style>
 "#;
@@ -139,26 +147,94 @@ pub const HTML_TEMPLATE: &str = r#"
     {styles}
     <!-- Enhanced mermaid configuration for Reqvire diagrams -->
     <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.5.0/dist/svg-pan-zoom.min.js"></script>
     <script>
         mermaid.initialize({
             startOnLoad: true,
             theme: 'neutral',
             maxTextSize: 90000,
             flowchart: {
-                useMaxWidth: true,
+                useMaxWidth: false,
                 htmlLabels: true,
                 curve: 'basis'
             },
             securityLevel: 'loose'
+        });
+
+        // Add pan/zoom to large Mermaid diagrams after rendering
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                document.querySelectorAll('.mermaid svg').forEach(function(svg) {
+                    // Only add pan/zoom if the diagram is large
+                    if (svg.querySelectorAll('g').length > 50) {
+                        svg.style.maxWidth = 'none';
+                        svg.style.maxHeight = 'none';
+
+                        var eventsHandler = {
+                            haltEventListeners: ['touchstart', 'touchend', 'touchmove', 'touchleave', 'touchcancel'],
+                            init: function(options) {
+                                var instance = options.instance;
+                                var initialScale = 1;
+                                var pannedX = 0;
+                                var pannedY = 0;
+
+                                this.hammer = Hammer(options.svgElement, {
+                                    inputClass: Hammer.SUPPORT_POINTER_EVENTS ? Hammer.PointerEventInput : Hammer.TouchInput
+                                });
+
+                                this.hammer.get('pinch').set({enable: true});
+
+                                this.hammer.on('doubletap', function(ev){
+                                    instance.zoomIn();
+                                });
+
+                                this.hammer.on('panstart panmove', function(ev){
+                                    if (ev.type === 'panstart') {
+                                        pannedX = 0;
+                                        pannedY = 0;
+                                    }
+                                    instance.panBy({x: ev.deltaX - pannedX, y: ev.deltaY - pannedY});
+                                    pannedX = ev.deltaX;
+                                    pannedY = ev.deltaY;
+                                });
+
+                                this.hammer.on('pinchstart pinchmove', function(ev){
+                                    if (ev.type === 'pinchstart') {
+                                        initialScale = instance.getZoom();
+                                    }
+                                    instance.zoomAtPoint(initialScale * ev.scale, {x: ev.center.x, y: ev.center.y});
+                                });
+
+                                options.svgElement.addEventListener('touchmove', function(e){ e.preventDefault(); });
+                            },
+                            destroy: function(){
+                                this.hammer.destroy();
+                            }
+                        };
+
+                        svgPanZoom(svg, {
+                            zoomEnabled: true,
+                            controlIconsEnabled: true,
+                            fit: true,
+                            center: true,
+                            minZoom: 0.1,
+                            maxZoom: 10,
+                            customEventsHandler: eventsHandler
+                        });
+                    }
+                });
+            }, 1000);
         });
     </script>
 </head>
 <body>
     <nav class="reqvire-nav">
         <a href="{nav_prefix}index.html">Index</a>
+        <a href="{nav_prefix}model.html">Model</a>
         <a href="{nav_prefix}traces.html">Traces</a>
         <a href="{nav_prefix}coverage.html">Coverage</a>
-        <a href="{nav_prefix}matrix.svg" target="_blank">Matrix</a>
+        <a href="{nav_prefix}matrix.html">Matrix</a>
     </nav>
     <div class="reqvire-nav-spacer"></div>
     <div class="container">

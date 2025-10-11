@@ -16,7 +16,6 @@ pub mod git_commands;
 pub mod change_impact;
 pub mod subsection;
 pub mod matrix_generator;
-pub mod model_diagram;
 pub mod graph_registry;
 pub mod format;
 pub mod verification_trace;

@@ -10,6 +10,222 @@ use crate::html_export;
 use crate::graph_registry::GraphRegistry;
 use crate::filesystem;
 
+/// Generates HTML wrapper for matrix.svg with pan/zoom functionality
+fn generate_matrix_html() -> String {
+    r#"<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Verification Traceability Matrix</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        #controls {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: white;
+            padding: 10px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+        #controls button {
+            margin: 0 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            background: white;
+        }
+        #controls button:hover {
+            background: #f0f0f0;
+        }
+        .arrow-btn {
+            position: fixed;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        .arrow-btn:hover {
+            background: #f0f0f0;
+        }
+        #arrow-up {
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        #arrow-down {
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        #arrow-left {
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        #arrow-right {
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        #svg-container {
+            width: 100vw;
+            height: 100vh;
+        }
+        #svg-container object {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="controls">
+        <button id="zoom-in">Zoom In</button>
+        <button id="zoom-out">Zoom Out</button>
+        <button id="reset">Reset</button>
+        <button id="center">Center</button>
+    </div>
+    <button id="arrow-up" class="arrow-btn">▲</button>
+    <button id="arrow-down" class="arrow-btn">▼</button>
+    <button id="arrow-left" class="arrow-btn">◄</button>
+    <button id="arrow-right" class="arrow-btn">►</button>
+    <div id="svg-container"></div>
+    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.5.0/dist/svg-pan-zoom.min.js"></script>
+    <script>
+        var panZoomInstance = null;
+
+        window.onload = function() {
+            console.log('Page loaded');
+
+            // Load SVG inline to enable proper touch event handling
+            fetch('matrix.svg')
+                .then(function(response) {
+                    return response.text();
+                })
+                .then(function(svgText) {
+                    var container = document.getElementById('svg-container');
+                    container.innerHTML = svgText;
+
+                    var svgElement = container.querySelector('svg');
+                    if (!svgElement) {
+                        console.error('SVG element not found');
+                        return;
+                    }
+
+                    console.log('SVG loaded inline');
+
+                    var eventsHandler;
+                    eventsHandler = {
+                        haltEventListeners: ['touchstart', 'touchend', 'touchmove', 'touchleave', 'touchcancel'],
+                        init: function(options) {
+                            var instance = options.instance;
+                            var initialScale = 1;
+                            var pannedX = 0;
+                            var pannedY = 0;
+
+                            this.hammer = Hammer(options.svgElement, {
+                                inputClass: Hammer.SUPPORT_POINTER_EVENTS ? Hammer.PointerEventInput : Hammer.TouchInput
+                            });
+
+                            this.hammer.get('pinch').set({enable: true});
+
+                            this.hammer.on('doubletap', function(ev){
+                                instance.zoomIn();
+                            });
+
+                            this.hammer.on('panstart panmove', function(ev){
+                                if (ev.type === 'panstart') {
+                                    pannedX = 0;
+                                    pannedY = 0;
+                                }
+                                instance.panBy({x: ev.deltaX - pannedX, y: ev.deltaY - pannedY});
+                                pannedX = ev.deltaX;
+                                pannedY = ev.deltaY;
+                            });
+
+                            this.hammer.on('pinchstart pinchmove', function(ev){
+                                if (ev.type === 'pinchstart') {
+                                    initialScale = instance.getZoom();
+                                    instance.zoomAtPoint(initialScale * ev.scale, {x: ev.center.x, y: ev.center.y});
+                                }
+                                instance.zoomAtPoint(initialScale * ev.scale, {x: ev.center.x, y: ev.center.y});
+                            });
+
+                            options.svgElement.addEventListener('touchmove', function(e){ e.preventDefault(); });
+                        },
+                        destroy: function(){
+                            this.hammer.destroy();
+                        }
+                    };
+
+                    panZoomInstance = svgPanZoom(svgElement, {
+                        zoomEnabled: true,
+                        controlIconsEnabled: false,
+                        fit: true,
+                        center: true,
+                        minZoom: 0.1,
+                        maxZoom: 10,
+                        customEventsHandler: eventsHandler
+                    });
+
+                    console.log('PanZoom initialized');
+
+                    // Attach button event handlers
+                    document.getElementById('zoom-in').addEventListener('click', function() {
+                        if (panZoomInstance) panZoomInstance.zoomIn();
+                    });
+                    document.getElementById('zoom-out').addEventListener('click', function() {
+                        if (panZoomInstance) panZoomInstance.zoomOut();
+                    });
+                    document.getElementById('reset').addEventListener('click', function() {
+                        if (panZoomInstance) panZoomInstance.reset();
+                    });
+                    document.getElementById('center').addEventListener('click', function() {
+                        if (panZoomInstance) panZoomInstance.center();
+                    });
+
+                    // Attach arrow button handlers
+                    var panStep = 50;
+                    document.getElementById('arrow-up').addEventListener('click', function() {
+                        if (panZoomInstance) panZoomInstance.panBy({x: 0, y: panStep});
+                    });
+                    document.getElementById('arrow-down').addEventListener('click', function() {
+                        if (panZoomInstance) panZoomInstance.panBy({x: 0, y: -panStep});
+                    });
+                    document.getElementById('arrow-left').addEventListener('click', function() {
+                        if (panZoomInstance) panZoomInstance.panBy({x: panStep, y: 0});
+                    });
+                    document.getElementById('arrow-right').addEventListener('click', function() {
+                        if (panZoomInstance) panZoomInstance.panBy({x: -panStep, y: 0});
+                    });
+
+                    console.log('All event handlers attached');
+                })
+                .catch(function(error) {
+                    console.error('Error loading SVG:', error);
+                });
+        };
+    </script>
+</body>
+</html>"#.to_string()
+}
 
 fn prepare_output_folder(output_folder: &Path) -> std::io::Result<()> {
     // Clean output folder
@@ -294,6 +510,16 @@ pub fn generate_artifacts_in_temp(
         crate::matrix_generator::MatrixFormat::Svg
     );
     filesystem::write_file("matrix.svg", matrix_svg.as_bytes())?;
+
+    // Generate HTML wrapper for matrix.svg with pan/zoom functionality
+    info!("Generating matrix.html...");
+    let matrix_html = generate_matrix_html();
+    filesystem::write_file("matrix.html", matrix_html.as_bytes())?;
+
+    // Generate model structure diagram with Mermaid
+    info!("Generating model.md...");
+    let model_mermaid = crate::diagrams::generate_model_diagram(&temp_model_manager.graph_registry)?;
+    filesystem::write_file("model.md", model_mermaid.as_bytes())?;
 
     info!("Generating traces.md...");
     let trace_generator = crate::verification_trace::VerificationTraceGenerator::new(
