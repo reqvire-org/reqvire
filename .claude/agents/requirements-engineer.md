@@ -400,8 +400,11 @@ Ask the user to run `./target/debug/reqvire serve` in another shell, then use Pl
 4. Add verification requirements to ensure testability
 5. Establish proper traceability relations (deriveFrom, verifiedBy)
 6. Add implementation relations (satisfiedBy) to design/code elements
-7. Validate with `reqvire validate` and resolve any issues
-8. Review overall impact and update related documentation
+7. **Clean up model**: Run `reqvire lint --fix` to automatically fix redundant verify relations and other semantic issues
+8. **Review manual items**: Check `reqvire lint --json` for any items in `needs_review` that require manual attention
+9. Review overall impact and update related documentation
+
+**Note**: Always run `reqvire lint --fix` after adding or modifying specifications and verifications to ensure model quality.
 
 ### Model Linting and Cleanup:
 
