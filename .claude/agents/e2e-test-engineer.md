@@ -87,6 +87,61 @@ exit 0
 - Ensure proper cleanup of any test artifacts or state
 - Write tests that are maintainable and self-documenting
 
+**Visual Inspection with Playwright MCP:**
+
+When testing HTML exports, traces, or other visual functionality, you can use the Playwright MCP server for visual verification:
+
+**Setup (user runs in separate shell):**
+```bash
+# User starts serve command in another shell with test output
+./target/debug/reqvire serve --host localhost --port 8080
+```
+
+**Using Playwright MCP for Test Verification:**
+```
+Ask the user to run `./target/debug/reqvire serve` (or export to a test directory), then use Playwright MCP to:
+- Navigate to http://localhost:8080 to visually verify HTML export
+- Check traces visualization (traces.html) for correct rendering
+- Verify coverage reports display correctly (coverage.html)
+- Inspect traceability matrix rendering (matrix.svg)
+- Validate clickable links and navigation
+- Capture screenshots for test documentation
+```
+
+**When Visual Inspection is Critical:**
+- **Trace tests**: Verify trace trees render with correct structure and relations
+- **HTML export tests**: Validate visual layout, styling, and navigation
+- **Coverage report tests**: Check that percentages, colors, and indicators display correctly
+- **Matrix tests**: Verify traceability matrix elements and connections are visible
+- **Diagram tests**: Confirm Mermaid diagrams render with proper styling and click handlers
+- **Link tests**: Ensure relative/absolute links navigate correctly
+- **Cross-browser issues**: Identify rendering problems specific to certain contexts
+
+**Visual Test Integration Pattern:**
+```bash
+# In test.sh after generating HTML
+echo "To visually inspect results:"
+echo "  1. Run: ./target/debug/reqvire serve --port 8080"
+echo "  2. Use Playwright MCP to navigate and verify"
+echo "  3. Press Ctrl-C to stop server"
+
+# Example automated visual checks (can be added to tests)
+# Note: These require user to start serve in another shell
+# Then use Playwright MCP tools to:
+# - Screenshot key pages
+# - Verify elements exist
+# - Check CSS/styling
+# - Validate interactive features
+```
+
+**Best Practices for Visual Testing:**
+1. Request user starts serve command before visual inspection
+2. Use Playwright MCP to navigate to specific test URLs
+3. Take screenshots of issues for documentation
+4. Verify both structure (HTML) and presentation (CSS/rendering)
+5. Test interactive elements (links, diagrams, navigation)
+6. After visual verification, user stops server with Ctrl-C
+
 **Change Management Protocol:**
 
 When updating tests due to functionality changes:

@@ -4,6 +4,7 @@ Usage: reqvire [OPTIONS] <COMMAND> [COMMAND OPTIONS]
 
 Commands:
   export            Export model to browsable HTML documentation with complete traceability
+  serve             Serve model as browsable HTML documentation via HTTP server
   format            Format markdown files by applying automatic normalization and stylistic fixes
   validate          Validate model
   generate-diagrams Generate mermaid diagrams in markdown files showing requirements relationships The diagrams will be placed at the top of each requirements document
@@ -14,8 +15,6 @@ Commands:
   matrix            Generate verification traceability matrix showing requirements and their verification status
   traces            Generate verification traces showing upward paths from verifications to root requirements
   coverage          Generate verification coverage report for leaf requirements
-  shell             Interactive shell for GraphRegistry operations (undocumented)
-  sout              Single output stream for all pages, sections, and requirements (undocumented)
   help               Print this message or the help of the given subcommand(s)
 
 Options:
@@ -25,6 +24,10 @@ Options:
 
 EXPORT OPTIONS:
       --output <OUTPUT>         Output directory for HTML files
+
+SERVE OPTIONS:
+      --host <HOST>             Bind address
+      --port <PORT>             Server port
 
 FORMAT OPTIONS:
       --dry-run                 Show differences without applying changes

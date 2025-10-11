@@ -401,4 +401,72 @@ if ! grep -q 'click .* "specifications/Verifications/Tests\.md' <<< "$OUTPUT"; t
     exit 1
 fi
 
+# Test 12: Redundant Relations - Compare markdown output with expected
+echo "Running: reqvire traces (checking for redundant relations)" >> "${TEST_DIR}/test_results.log"
+set +e
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" traces 2>&1)
+EXIT_CODE=$?
+set -e
+
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
+
+if [ $EXIT_CODE -ne 0 ]; then
+    echo "❌ FAILED: traces command exited with code $EXIT_CODE"
+    echo "$OUTPUT"
+    exit 1
+fi
+
+# Save actual output
+echo "$OUTPUT" > "${TEST_DIR}/actual_redundant_output.md"
+
+# Compare with expected output if it exists
+if [ -f "${TEST_DIR}/expected_redundant_output.md" ]; then
+    if ! diff -u "${TEST_DIR}/expected_redundant_output.md" "${TEST_DIR}/actual_redundant_output.md" > "${TEST_DIR}/diff_redundant.txt" 2>&1; then
+        echo "❌ FAILED: Redundant relations markdown output does not match expected"
+        echo "Diff (expected vs actual):"
+        cat "${TEST_DIR}/diff_redundant.txt"
+        exit 1
+    fi
+fi
+
+# Test 13: Redundant Relations - Compare JSON output with expected
+echo "Running: reqvire traces --json (checking redundant_relations field)" >> "${TEST_DIR}/test_results.log"
+set +e
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" traces --json 2>&1)
+EXIT_CODE=$?
+set -e
+
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
+
+if [ $EXIT_CODE -ne 0 ]; then
+    echo "❌ FAILED: traces --json command exited with code $EXIT_CODE"
+    echo "$OUTPUT"
+    exit 1
+fi
+
+# Validate JSON structure
+echo "$OUTPUT" | jq . >/dev/null 2>&1
+if [ $? -ne 0 ]; then
+    echo "❌ FAILED: Output is not valid JSON"
+    exit 1
+fi
+
+# Save actual JSON output (formatted)
+echo "$OUTPUT" | jq '.' > "${TEST_DIR}/actual_redundant_output.json"
+
+# Compare JSON outputs if expected exists
+if [ -f "${TEST_DIR}/expected_redundant_output.json" ]; then
+    EXPECTED_JSON=$(jq -S '.' "${TEST_DIR}/expected_redundant_output.json")
+    ACTUAL_JSON=$(jq -S '.' "${TEST_DIR}/actual_redundant_output.json")
+
+    if [ "$EXPECTED_JSON" != "$ACTUAL_JSON" ]; then
+        echo "❌ FAILED: Redundant relations JSON output does not match expected"
+        echo "Diff (expected vs actual):"
+        diff -u <(echo "$EXPECTED_JSON") <(echo "$ACTUAL_JSON") || true
+        exit 1
+    fi
+fi
+
 exit 0
