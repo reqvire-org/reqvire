@@ -25,7 +25,8 @@
                 ]
               },
               "directly_verified_count": 1,
-              "total_requirements_in_tree": 1
+              "total_requirements_in_tree": 1,
+              "redundant_relations": []
             }
           ]
         },
@@ -68,7 +69,10 @@
                 ]
               },
               "directly_verified_count": 2,
-              "total_requirements_in_tree": 3
+              "total_requirements_in_tree": 3,
+              "redundant_relations": [
+                "specifications/SystemRequirements.md#oauth-implementation"
+              ]
             },
             {
               "identifier": "specifications/Verifications/Tests.md#session-timeout-test",
@@ -107,7 +111,8 @@
                 ]
               },
               "directly_verified_count": 1,
-              "total_requirements_in_tree": 3
+              "total_requirements_in_tree": 3,
+              "redundant_relations": []
             }
           ]
         },
@@ -150,7 +155,10 @@
                 ]
               },
               "directly_verified_count": 2,
-              "total_requirements_in_tree": 3
+              "total_requirements_in_tree": 3,
+              "redundant_relations": [
+                "specifications/SystemRequirements.md#coverage-calculator"
+              ]
             }
           ]
         },
@@ -185,7 +193,8 @@
                 ]
               },
               "directly_verified_count": 1,
-              "total_requirements_in_tree": 2
+              "total_requirements_in_tree": 2,
+              "redundant_relations": []
             }
           ]
         },
@@ -220,7 +229,8 @@
                 ]
               },
               "directly_verified_count": 1,
-              "total_requirements_in_tree": 2
+              "total_requirements_in_tree": 2,
+              "redundant_relations": []
             }
           ]
         }

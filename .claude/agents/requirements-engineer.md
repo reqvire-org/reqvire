@@ -248,6 +248,9 @@ reqvire html --output <dir>
 
 # Generate diagrams
 reqvire generate-diagrams
+
+# Find redundant verify relations (via slash command)
+/find-redundant-verifications
 ```
 
 ### Filter Options:
@@ -400,6 +403,9 @@ Ask the user to run `./target/debug/reqvire serve` in another shell, then use Pl
 8. Review overall impact and update related documentation
 
 ### Redundant Relations Cleanup:
+
+**Quick Command:**
+Use the `/find-redundant-verifications` slash command to automatically find all redundant verify relations in the model.
 
 **Understanding Redundant Verify Relations:**
 A redundant verification relation occurs when a verification directly verifies both a leaf requirement and one or more of its ancestor requirements. Since verification status automatically rolls up through the requirement hierarchy (via derivedFrom relations), verifying a leaf requirement implicitly verifies all its ancestors. Therefore, explicitly verifying both creates redundancy.
