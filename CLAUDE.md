@@ -31,7 +31,8 @@ This guide is split into domain-specific guides for better organization:
 - **Generate model summary (JSON)**: `./target/debug/reqvire summary --json > /tmp/model-summary.json`
 - **Generate section summary**: `./target/debug/reqvire section-summary`
 - **Generate section summary (JSON)**: `./target/debug/reqvire section-summary --json > /tmp/section-summary.json`
-- **Generate HTML documentation**: `./target/debug/reqvire html --output <OUTPUT_DIR>` - Generates HTML output with index, diagrams, traces, coverage, and matrix
+- **Export HTML documentation**: `./target/debug/reqvire export --output <OUTPUT_DIR>` - Exports HTML with index, diagrams, traces, coverage, and matrix
+- **Serve HTML documentation**: `./target/debug/reqvire serve --host localhost --port 8080` - Exports to temp dir and serves via HTTP server (quiet mode)
 - **Analyze change impact**: `./target/debug/reqvire change-impact --git-commit=<COMMIT_HASH>`
 - **Analyze change impact (JSON)**: `./target/debug/reqvire change-impact --git-commit=HEAD~1 --json > /tmp/impact.json`
 - **Generate verification traces**: `./target/debug/reqvire traces` - Generates upward traceability from verifications to root requirements with Mermaid diagrams

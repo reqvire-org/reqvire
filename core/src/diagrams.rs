@@ -4,6 +4,7 @@ use crate::graph_registry::GraphRegistry;
 use crate::error::ReqvireError;
 use std::path::PathBuf;
 use crate::utils;
+use crate::info_println;
 use log::debug;
 use crate::relation;
 use crate::element::ElementType;
@@ -390,7 +391,7 @@ pub fn process_diagrams(
         if let Err(e) = filesystem::write_file(&absolute_file_path, &file_content) {
             log::error!("Failed to write updated diagrams to '{}': {}", absolute_file_path.display(), e);
         } else {
-            println!("Updated diagrams in '{}'", file_path);
+            info_println!("Updated diagrams in '{}'", file_path);
         }
     }
 

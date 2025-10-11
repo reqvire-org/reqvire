@@ -34,6 +34,9 @@ serde_yml = { workspace = true }
 # File handling
 globset = { workspace = true }
 
+# HTTP server
+tiny_http = { workspace = true }
+
 [dev-dependencies]
 assert_fs = { workspace = true }
 predicates = { workspace = true }

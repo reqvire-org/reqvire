@@ -1,5 +1,6 @@
 pub mod cli;
 pub mod config;
+mod serve;
 
 use log::error;
 use crate::cli::handle_command;
@@ -24,7 +25,7 @@ fn main() {
         Some(cli::Commands::Coverage { json }) => *json,
         _ => false,
     };
-    
+
     if uses_json {
         std::env::set_var("RUST_LOG", "error");
     }

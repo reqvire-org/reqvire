@@ -52,7 +52,19 @@ pub enum Commands {
         #[clap(long, short = 'o', default_value = "html")]
         output: String,
     },
-    
+
+    /// Serve model as browsable HTML documentation via HTTP server
+    #[clap(override_help = "Serve model as browsable HTML documentation via HTTP server\n\nSERVE OPTIONS:\n      --host <HOST>  Bind address (default: localhost)\n      --port <PORT>  Server port (default: 8080)")]
+    Serve {
+        /// Bind address
+        #[clap(long, default_value = "localhost", help_heading = "SERVE OPTIONS")]
+        host: String,
+
+        /// Server port
+        #[clap(long, default_value = "8080", help_heading = "SERVE OPTIONS")]
+        port: u16,
+    },
+
     /// Format markdown files by applying automatic normalization and stylistic fixes
     #[clap(override_help = "Format markdown files by applying automatic normalization and stylistic fixes\n\nFORMAT OPTIONS:\n      --dry-run  Show differences without applying changes\n      --json     Output results in JSON format")]
     Format {
@@ -236,6 +248,11 @@ fn print_custom_help(cmd: &clap::Command) {
     // Print commands
     println!("Commands:");
     for subcommand in cmd.get_subcommands() {
+        // Skip hidden commands
+        if subcommand.is_hide_set() {
+            continue;
+        }
+
         let name = subcommand.get_name();
         let about = subcommand.get_about().map(|s| s.to_string()).unwrap_or_default();
 
@@ -281,6 +298,11 @@ fn print_custom_help(cmd: &clap::Command) {
 
     // Print command-specific options organized by command
     for subcommand in cmd.get_subcommands() {
+        // Skip hidden commands
+        if subcommand.is_hide_set() {
+            continue;
+        }
+
         // Check if this command has nested subcommands (like verifications)
         if subcommand.has_subcommands() {
             // Print options for each nested subcommand
@@ -618,6 +640,23 @@ pub fn handle_command(
                 diagram_direction,
                 diagrams_with_blobs
             )?;
+
+            return Ok(0);
+        },
+        Some(Commands::Serve { host, port }) => {
+            // Enable quiet mode for serve command (suppress verbose export output)
+            reqvire::utils::enable_quiet_mode();
+
+            // Generate HTML artifacts in temporary directory
+            let temp_dir = export::generate_artifacts_in_temp(
+                &model_manager.graph_registry,
+                excluded_filename_patterns,
+                diagram_direction,
+                diagrams_with_blobs
+            )?;
+
+            // Start HTTP server (runs until Ctrl-C)
+            crate::serve::serve_directory(&temp_dir, &host, port)?;
 
             return Ok(0);
         },

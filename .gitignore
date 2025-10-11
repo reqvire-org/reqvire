@@ -24,3 +24,6 @@ codefetch.config.mjs
 # Test result logs
 **/test_results.log
 **/new_test_results.log
+
+# Playwrightmcp
+.playwright-mcp/

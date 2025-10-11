@@ -3,6 +3,7 @@ use std::path::{PathBuf,Path};
 use crate::html;
 use crate::error::ReqvireError;
 use crate::git_commands;
+use crate::info_println;
 use walkdir::WalkDir;
 use log::debug;
 
@@ -46,7 +47,7 @@ pub fn export_markdown_to_html(
         output_folder,
     )?;
 
-    println!("✅ Total Markdown files exported: {}", processed_count);
+    info_println!("✅ Total Markdown files exported: {}", processed_count);
     Ok(processed_count)
 }
 
@@ -134,7 +135,7 @@ fn export_file_to_html(
     }
 
     fs::write(&html_path, html_content)?;
-    println!("✅ Exported: {} -> {}", file_path.display(), html_path.display());
+    info_println!("✅ Exported: {} -> {}", file_path.display(), html_path.display());
 
     Ok(())
 }
