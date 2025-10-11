@@ -6,7 +6,7 @@ set -euo pipefail
 # Satisfies: specifications/Verifications/ReportsTests.md#verification-coverage-report-test
 #
 # Acceptance Criteria:
-# - System shall provide a CLI command `verifications coverage` that generates coverage reports focusing on leaf requirements
+# - System shall provide a CLI command `coverage` that generates coverage reports focusing on leaf requirements
 # - Legacy command `coverage-report` is also supported (deprecated)
 # - Command shall support `--json` flag for JSON output format
 # - Coverage report shall include summary section with total counts and percentages for leaf requirements
@@ -28,9 +28,9 @@ set -euo pipefail
 # Test 1: Basic Coverage Report (Text Output)
 echo "Starting test..." > "${TEST_DIR}/test_results.log"
 
-echo "Running: reqvire verifications coverage" >> "${TEST_DIR}/test_results.log"
+echo "Running: reqvire coverage" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" verifications coverage 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" coverage 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -38,129 +38,31 @@ echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
 printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 
 if [ $EXIT_CODE -ne 0 ]; then
-    echo "❌ FAILED: verifications coverage command exited with code $EXIT_CODE"
+    echo "❌ FAILED: coverage command exited with code $EXIT_CODE"
     exit 1
 fi
 
-# Check for expected header
-if ! grep -q "=== Verification Coverage Report ===" <<< "$OUTPUT"; then
-    echo "❌ FAILED: Missing coverage report header"
+# Compare output with expected output
+EXPECTED_OUTPUT=$(cat "${TEST_DIR}/expected_output.md")
+
+if [ "$OUTPUT" != "$EXPECTED_OUTPUT" ]; then
+    echo "❌ FAILED: Coverage report output does not match expected output"
+    echo ""
+    echo "Expected:"
+    echo "$EXPECTED_OUTPUT"
+    echo ""
+    echo "Actual:"
+    echo "$OUTPUT"
+    echo ""
+    echo "Diff:"
+    diff -u <(echo "$EXPECTED_OUTPUT") <(echo "$OUTPUT") || true
     exit 1
-fi
-
-# Check for Summary section
-if ! grep -q "Summary:" <<< "$OUTPUT"; then
-    echo "❌ FAILED: Missing Summary section"
-    exit 1
-fi
-
-# Check for required summary fields - Leaf Requirements
-if ! grep -q "Total Leaf Requirements:" <<< "$OUTPUT"; then
-    echo "❌ FAILED: Missing 'Total Leaf Requirements' in summary"
-    exit 1
-fi
-
-if ! grep -q "Verified Leaf Requirements:" <<< "$OUTPUT"; then
-    echo "❌ FAILED: Missing 'Verified Leaf Requirements' count in summary"
-    exit 1
-fi
-
-if ! grep -q "Unverified Leaf Requirements:" <<< "$OUTPUT"; then
-    echo "❌ FAILED: Missing 'Unverified Leaf Requirements' count in summary"
-    exit 1
-fi
-
-# Check for required summary fields - Test Verifications
-if ! grep -q "Total Test Verifications:" <<< "$OUTPUT"; then
-    echo "❌ FAILED: Missing 'Total Test Verifications' in summary"
-    exit 1
-fi
-
-if ! grep -q "Satisfied Test Verifications:" <<< "$OUTPUT"; then
-    echo "❌ FAILED: Missing 'Satisfied Test Verifications' count in summary"
-    exit 1
-fi
-
-if ! grep -q "Unsatisfied Test Verifications:" <<< "$OUTPUT"; then
-    echo "❌ FAILED: Missing 'Unsatisfied Test Verifications' count in summary"
-    exit 1
-fi
-
-# Check for Verification Types breakdown
-if ! grep -q "Verification Types:" <<< "$OUTPUT"; then
-    echo "❌ FAILED: Missing 'Verification Types' section"
-    exit 1
-fi
-
-if ! grep -q "Test:" <<< "$OUTPUT"; then
-    echo "❌ FAILED: Missing 'Test' verification type"
-    exit 1
-fi
-
-if ! grep -q "Analysis:" <<< "$OUTPUT"; then
-    echo "❌ FAILED: Missing 'Analysis' verification type"
-    exit 1
-fi
-
-if ! grep -q "Inspection:" <<< "$OUTPUT"; then
-    echo "❌ FAILED: Missing 'Inspection' verification type"
-    exit 1
-fi
-
-if ! grep -q "Demonstration:" <<< "$OUTPUT"; then
-    echo "❌ FAILED: Missing 'Demonstration' verification type"
-    exit 1
-fi
-
-# Check for sections for verified/unverified leaf requirements
-if ! grep -q "Verified Leaf Requirements:\|Unverified Leaf Requirements:" <<< "$OUTPUT"; then
-    echo "❌ FAILED: Missing Verified/Unverified Leaf Requirements sections"
-    exit 1
-fi
-
-# Check for sections for satisfied/unsatisfied test verifications
-if ! grep -q "Satisfied Test Verifications:\|Unsatisfied Test Verifications:" <<< "$OUTPUT"; then
-    echo "❌ FAILED: Missing Satisfied/Unsatisfied Test Verifications sections"
-    exit 1
-fi
-
-# Check for visual indicators (✅ for verified/satisfied, ❌ for unverified/unsatisfied)
-if grep -q "Verified Leaf Requirements:" <<< "$OUTPUT"; then
-    # If we have verified leaf requirements section, it should contain ✅
-    if ! grep -A 10 "Verified Leaf Requirements:" <<< "$OUTPUT" | grep -q "✅"; then
-        echo "❌ FAILED: Verified leaf requirements should be marked with ✅"
-        exit 1
-    fi
-fi
-
-if grep -q "Unverified Leaf Requirements:" <<< "$OUTPUT"; then
-    # If we have unverified leaf requirements section, it should contain ❌
-    if ! grep -A 10 "Unverified Leaf Requirements:" <<< "$OUTPUT" | grep -q "❌"; then
-        echo "❌ FAILED: Unverified leaf requirements should be marked with ❌"
-        exit 1
-    fi
-fi
-
-if grep -q "Satisfied Test Verifications:" <<< "$OUTPUT"; then
-    # If we have satisfied test verifications section, it should contain ✅
-    if ! grep -A 10 "Satisfied Test Verifications:" <<< "$OUTPUT" | grep -q "✅"; then
-        echo "❌ FAILED: Satisfied test verifications should be marked with ✅"
-        exit 1
-    fi
-fi
-
-if grep -q "Unsatisfied Test Verifications:" <<< "$OUTPUT"; then
-    # If we have unsatisfied test verifications section, it should contain ❌
-    if ! grep -A 10 "Unsatisfied Test Verifications:" <<< "$OUTPUT" | grep -q "❌"; then
-        echo "❌ FAILED: Unsatisfied test verifications should be marked with ❌"
-        exit 1
-    fi
 fi
 
 # Test 2: JSON Coverage Report
-echo "Running: reqvire verifications coverage --json" >> "${TEST_DIR}/test_results.log"
+echo "Running: reqvire coverage --json" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" verifications coverage --json 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" coverage --json 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -168,7 +70,7 @@ echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
 printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 
 if [ $EXIT_CODE -ne 0 ]; then
-    echo "❌ FAILED: verifications coverage --json command exited with code $EXIT_CODE"
+    echo "❌ FAILED: coverage --json command exited with code $EXIT_CODE"
     exit 1
 fi
 

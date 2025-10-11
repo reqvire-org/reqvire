@@ -12,6 +12,7 @@ This is a test verification that should appear as satisfied in the coverage repo
 * type: test-verification
 
 #### Relations
+* verify: [Leaf Requirement Verified](#leaf-requirement-verified)
 * satisfiedBy: [test-satisfied.sh](test-satisfied.sh)
 
 ---
@@ -23,11 +24,14 @@ This is a test verification that should appear as unsatisfied in the coverage re
 #### Metadata
 * type: test-verification
 
+#### Relations
+* verify: [Another Leaf Requirement Verified](#another-leaf-requirement-verified)
+
 ---
 
 ### Analysis Verification Test
 
-This is an analysis-type verification for testing verification type breakdown. Analysis verifications are considered satisfied by default.
+This is an analysis-type verification for testing verification type breakdown. Analysis verifications are considered satisfied by default. This one is orphaned (no verify relation).
 
 #### Metadata
 * type: analysis-verification
@@ -36,7 +40,7 @@ This is an analysis-type verification for testing verification type breakdown. A
 
 ### Inspection Verification Test
 
-This is an inspection-type verification for testing verification type breakdown. Inspection verifications are considered satisfied by default.
+This is an inspection-type verification for testing verification type breakdown. Inspection verifications are considered satisfied by default. This one is orphaned (no verify relation).
 
 #### Metadata
 * type: inspection-verification
@@ -45,7 +49,7 @@ This is an inspection-type verification for testing verification type breakdown.
 
 ### Demonstration Verification Test
 
-This is a demonstration-type verification for testing verification type breakdown. Demonstration verifications are considered satisfied by default.
+This is a demonstration-type verification for testing verification type breakdown. Demonstration verifications are considered satisfied by default. This one is orphaned (no verify relation).
 
 #### Metadata
 * type: demonstration-verification
@@ -71,7 +75,6 @@ This is a leaf requirement (no forward relations) that should be verified. MUST 
 #### Relations
 * derivedFrom: [Parent Requirement](#parent-requirement)
 * verifiedBy: [Test Verification Satisfied](#test-verification-satisfied)
-* verifiedBy: [Analysis Verification Test](#analysis-verification-test)
 
 ---
 
@@ -86,11 +89,9 @@ This is a leaf requirement that is NOT verified. Should be flagged as missing ve
 
 ### Another Leaf Requirement Verified
 
-This is another leaf requirement that is verified by multiple verification types.
+This is another leaf requirement that is verified.
 
 #### Relations
 * verifiedBy: [Test Verification Unsatisfied](#test-verification-unsatisfied)
-* verifiedBy: [Inspection Verification Test](#inspection-verification-test)
-* verifiedBy: [Demonstration Verification Test](#demonstration-verification-test)
 
 ---

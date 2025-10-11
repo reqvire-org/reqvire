@@ -5,7 +5,6 @@ use log::{info};
 use serde::Serialize;
 use reqvire::error::ReqvireError;
 use reqvire::ModelManager;
-use reqvire::index_generator;
 use globset::GlobSet;
 use reqvire::reports;
 use reqvire::diagrams;
@@ -43,123 +42,12 @@ pub struct Args {
 
 }
 
-#[derive(Subcommand, Debug)]
-pub enum ModelCommands {
-    /// Output model registry and summary
-    #[clap(override_help = "Output model registry and summary\n\nMODEL SUMMARY OPTIONS:\n      --json                        Output results in JSON format\n      --filter-file <GLOB>          Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`\n      --filter-name <REGEX>         Only include elements whose name matches this regular expression\n      --filter-section <GLOB>       Only include sections whose name matches this glob pattern e.g. `System requirement*`\n      --filter-type <TYPE>          Only include elements of the given type e.g. `user-requirement`, `system-requirement`, `verification`, `file`, or other custom type\n      --filter-content <REGEX>      Only include elements whose content matches this regular expression\n      --filter-is-not-verified      Only include requirements that do NOT have any \"verifiedBy\" relations\n      --filter-is-not-satisfied     Only include requirements that do NOT have any \"satisfiedBy\" relations")]
-    Summary {
-        /// Output results in JSON format
-        #[clap(long, help_heading = "MODEL SUMMARY OPTIONS")]
-        json: bool,
 
-        /// Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`
-        #[clap(long, value_name = "GLOB", help_heading = "MODEL SUMMARY OPTIONS")]
-        filter_file: Option<String>,
-
-        /// Only include elements whose name matches this regular expression
-        #[clap(long, value_name = "REGEX", help_heading = "MODEL SUMMARY OPTIONS")]
-        filter_name: Option<String>,
-
-        /// Only include sections whose name matches this glob pattern e.g. `System requirement*`
-        #[clap(long, value_name = "GLOB", help_heading = "MODEL SUMMARY OPTIONS")]
-        filter_section: Option<String>,
-
-        /// Only include elements of the given type e.g. `user-requirement`, `system-requirement`, `verification`, `file`, or other custom type
-        #[clap(long, value_name = "TYPE", help_heading = "MODEL SUMMARY OPTIONS")]
-        filter_type: Option<String>,
-
-        /// Only include elements whose content matches this regular expression
-        #[clap(long, value_name = "REGEX", help_heading = "MODEL SUMMARY OPTIONS")]
-        filter_content: Option<String>,
-
-        /// Only include requirements that do NOT have any "verifiedBy" relations
-        #[clap(long, help_heading = "MODEL SUMMARY OPTIONS")]
-        filter_is_not_verified: bool,
-
-        /// Only include requirements that do NOT have any "satisfiedBy" relations
-        #[clap(long, help_heading = "MODEL SUMMARY OPTIONS")]
-        filter_is_not_satisfied: bool,
-
-        /// Output traceability matrix as SVG without hyperlinks and with full element names Cannot be used with --json
-        #[clap(long, hide = true, conflicts_with_all = &["json"], help_heading = "MODEL SUMMARY OPTIONS")]
-        cypher: bool,
-    },
-
-    /// Output sections summary showing files, section names, and section content without individual elements
-    #[clap(override_help = "Output sections summary showing files, section names, and section content without individual elements\n\nMODEL SECTION-SUMMARY OPTIONS:\n      --json                        Output results in JSON format\n      --filter-file <GLOB>          Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`\n      --filter-section <GLOB>       Only include sections whose name matches this glob pattern e.g. `System requirement*`\n      --filter-content <REGEX>      Only include sections whose content matches this regular expression")]
-    SectionSummary {
-        /// Output results in JSON format
-        #[clap(long, help_heading = "MODEL SECTION-SUMMARY OPTIONS")]
-        json: bool,
-
-        /// Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`
-        #[clap(long, value_name = "GLOB", help_heading = "MODEL SECTION-SUMMARY OPTIONS")]
-        filter_file: Option<String>,
-
-        /// Only include sections whose name matches this glob pattern e.g. `System requirement*`
-        #[clap(long, value_name = "GLOB", help_heading = "MODEL SECTION-SUMMARY OPTIONS")]
-        filter_section: Option<String>,
-
-        /// Only include sections whose content matches this regular expression
-        #[clap(long, value_name = "REGEX", help_heading = "MODEL SECTION-SUMMARY OPTIONS")]
-        filter_content: Option<String>,
-    },
-
-    /// Generate index document with links and summaries to all documents (outputs to stdout)
-    Index,
-}
-
-#[derive(Subcommand, Debug)]
-pub enum VerificationsCommands {
-    /// Generate verification traceability matrix showing requirements and their verification status
-    #[clap(override_help = "Generate verification traceability matrix showing requirements and their verification status\n\nVERIFICATIONS MATRIX OPTIONS:\n      --svg                       Output traceability matrix as SVG (cannot be used with --json)\n      --json                      Output results in JSON format")]
-    Matrix {
-        /// Output traceability matrix as SVG without hyperlinks and with full element names Cannot be used with --json
-        #[clap(long, conflicts_with = "json", help_heading = "VERIFICATIONS MATRIX OPTIONS")]
-        svg: bool,
-
-        /// Output results in JSON format
-        #[clap(long, help_heading = "VERIFICATIONS MATRIX OPTIONS")]
-        json: bool,
-    },
-
-    /// Generate verification traces showing upward paths from verifications to root requirements
-    #[clap(override_help = "Generate verification traces showing upward paths from verifications to root requirements\n\nVERIFICATIONS TRACES OPTIONS:\n      --json                      Output results in JSON format\n      --from-folder <PATH>        Generate links relative to this folder path\n      --filter-id <ID>            Only include verification with this specific identifier\n      --filter-name <REGEX>       Only include verifications whose name matches this regular expression\n      --filter-type <TYPE>        Only include verifications of the given type e.g. `test-verification`, `analysis-verification`")]
-    Traces {
-        /// Output results in JSON format
-        #[clap(long, help_heading = "VERIFICATIONS TRACES OPTIONS")]
-        json: bool,
-
-        /// Relative path to folder where output will be saved (for generating relative links in Mermaid diagrams)
-        #[clap(long, value_name = "PATH", help_heading = "VERIFICATIONS TRACES OPTIONS")]
-        from_folder: Option<String>,
-
-        /// Only include verification with this specific identifier
-        #[clap(long, value_name = "ID", help_heading = "VERIFICATIONS TRACES OPTIONS")]
-        filter_id: Option<String>,
-
-        /// Only include verifications whose name matches this regular expression
-        #[clap(long, value_name = "REGEX", help_heading = "VERIFICATIONS TRACES OPTIONS")]
-        filter_name: Option<String>,
-
-        /// Only include verifications of the given type e.g. `test-verification`, `analysis-verification`
-        #[clap(long, value_name = "TYPE", help_heading = "VERIFICATIONS TRACES OPTIONS")]
-        filter_type: Option<String>,
-    },
-
-    /// Generate verification coverage report for leaf requirements
-    #[clap(override_help = "Generate verification coverage report for leaf requirements\n\nVERIFICATIONS COVERAGE OPTIONS:\n      --json                      Output results in JSON format")]
-    Coverage {
-        /// Output results in JSON format
-        #[clap(long, help_heading = "VERIFICATIONS COVERAGE OPTIONS")]
-        json: bool,
-    },
-}
 
 #[derive(Subcommand, Debug)]
 pub enum Commands {
-    /// Convert Markdown to HTML with embedded styles and save to output location
-    Html {
+    /// Export model to browsable HTML documentation with complete traceability
+    Export {
         /// Output directory for HTML files
         #[clap(long, short = 'o', default_value = "html")]
         output: String,
@@ -192,25 +80,121 @@ pub enum Commands {
     /// Remove all generated mermaid diagrams from markdown files
     RemoveDiagrams,
 
-    /// Model management commands - generate summary, section-summary, and index reports
-    #[clap(subcommand)]
-    Model(ModelCommands),
-    
+    /// Output model registry and summary
+    #[clap(override_help = "Output model registry and summary\n\nSUMMARY OPTIONS:\n      --json                        Output results in JSON format\n      --filter-file <GLOB>          Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`\n      --filter-name <REGEX>         Only include elements whose name matches this regular expression\n      --filter-section <GLOB>       Only include sections whose name matches this glob pattern e.g. `System requirement*`\n      --filter-type <TYPE>          Only include elements of the given type e.g. `user-requirement`, `system-requirement`, `verification`, `file`, or other custom type\n      --filter-content <REGEX>      Only include elements whose content matches this regular expression\n      --filter-is-not-verified      Only include requirements that do NOT have any \"verifiedBy\" relations\n      --filter-is-not-satisfied     Only include requirements that do NOT have any \"satisfiedBy\" relations")]
+    Summary {
+        /// Output results in JSON format
+        #[clap(long, help_heading = "SUMMARY OPTIONS")]
+        json: bool,
+
+        /// Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`
+        #[clap(long, value_name = "GLOB", help_heading = "SUMMARY OPTIONS")]
+        filter_file: Option<String>,
+
+        /// Only include elements whose name matches this regular expression
+        #[clap(long, value_name = "REGEX", help_heading = "SUMMARY OPTIONS")]
+        filter_name: Option<String>,
+
+        /// Only include sections whose name matches this glob pattern e.g. `System requirement*`
+        #[clap(long, value_name = "GLOB", help_heading = "SUMMARY OPTIONS")]
+        filter_section: Option<String>,
+
+        /// Only include elements of the given type e.g. `user-requirement`, `system-requirement`, `verification`, `file`, or other custom type
+        #[clap(long, value_name = "TYPE", help_heading = "SUMMARY OPTIONS")]
+        filter_type: Option<String>,
+
+        /// Only include elements whose content matches this regular expression
+        #[clap(long, value_name = "REGEX", help_heading = "SUMMARY OPTIONS")]
+        filter_content: Option<String>,
+
+        /// Only include requirements that do NOT have any "verifiedBy" relations
+        #[clap(long, help_heading = "SUMMARY OPTIONS")]
+        filter_is_not_verified: bool,
+
+        /// Only include requirements that do NOT have any "satisfiedBy" relations
+        #[clap(long, help_heading = "SUMMARY OPTIONS")]
+        filter_is_not_satisfied: bool,
+
+        /// Output traceability matrix as SVG without hyperlinks and with full element names Cannot be used with --json
+        #[clap(long, hide = true, conflicts_with_all = &["json"], help_heading = "SUMMARY OPTIONS")]
+        cypher: bool,
+    },
+
+    /// Output sections summary showing files, section names, and section content without individual elements
+    #[clap(override_help = "Output sections summary showing files, section names, and section content without individual elements\n\nSECTION-SUMMARY OPTIONS:\n      --json                        Output results in JSON format\n      --filter-file <GLOB>          Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`\n      --filter-section <GLOB>       Only include sections whose name matches this glob pattern e.g. `System requirement*`\n      --filter-content <REGEX>      Only include sections whose content matches this regular expression")]
+    SectionSummary {
+        /// Output results in JSON format
+        #[clap(long, help_heading = "SECTION-SUMMARY OPTIONS")]
+        json: bool,
+
+        /// Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`
+        #[clap(long, value_name = "GLOB", help_heading = "SECTION-SUMMARY OPTIONS")]
+        filter_file: Option<String>,
+
+        /// Only include sections whose name matches this glob pattern e.g. `System requirement*`
+        #[clap(long, value_name = "GLOB", help_heading = "SECTION-SUMMARY OPTIONS")]
+        filter_section: Option<String>,
+
+        /// Only include sections whose content matches this regular expression
+        #[clap(long, value_name = "REGEX", help_heading = "SECTION-SUMMARY OPTIONS")]
+        filter_content: Option<String>,
+    },
+
     /// Analise change impact and provides report
     #[clap(override_help = "Analise change impact and provides report\n\nCHANGE IMPACT OPTIONS:\n      --git-commit <GIT_COMMIT>  Git commit hash to use when comparing models [default: HEAD]\n      --json                     Output results in JSON format")]
     ChangeImpact {
         /// Git commit hash to use when comparing models
-        #[clap(long, default_value = "HEAD", help_heading = "CHANGE IMPACT OPTIONS")]    
+        #[clap(long, default_value = "HEAD", help_heading = "CHANGE IMPACT OPTIONS")]
         git_commit: String,
-        
+
         /// Output results in JSON format
         #[clap(long, help_heading = "CHANGE IMPACT OPTIONS")]
         json: bool,
     },
 
-    /// Verification management commands - generate matrix, traces, and coverage reports
-    #[clap(subcommand)]
-    Verifications(VerificationsCommands),
+    /// Generate verification traceability matrix showing requirements and their verification status
+    #[clap(override_help = "Generate verification traceability matrix showing requirements and their verification status\n\nMATRIX OPTIONS:\n      --svg                       Output traceability matrix as SVG (cannot be used with --json)\n      --json                      Output results in JSON format")]
+    Matrix {
+        /// Output traceability matrix as SVG without hyperlinks and with full element names Cannot be used with --json
+        #[clap(long, conflicts_with = "json", help_heading = "MATRIX OPTIONS")]
+        svg: bool,
+
+        /// Output results in JSON format
+        #[clap(long, help_heading = "MATRIX OPTIONS")]
+        json: bool,
+    },
+
+    /// Generate verification traces showing upward paths from verifications to root requirements
+    #[clap(override_help = "Generate verification traces showing upward paths from verifications to root requirements\n\nTRACES OPTIONS:\n      --json                      Output results in JSON format\n      --from-folder <PATH>        Generate links relative to this folder path\n      --filter-id <ID>            Only include verification with this specific identifier\n      --filter-name <REGEX>       Only include verifications whose name matches this regular expression\n      --filter-type <TYPE>        Only include verifications of the given type e.g. `test-verification`, `analysis-verification`")]
+    Traces {
+        /// Output results in JSON format
+        #[clap(long, help_heading = "TRACES OPTIONS")]
+        json: bool,
+
+        /// Relative path to folder where output will be saved (for generating relative links in Mermaid diagrams)
+        #[clap(long, value_name = "PATH", help_heading = "TRACES OPTIONS")]
+        from_folder: Option<String>,
+
+        /// Only include verification with this specific identifier
+        #[clap(long, value_name = "ID", help_heading = "TRACES OPTIONS")]
+        filter_id: Option<String>,
+
+        /// Only include verifications whose name matches this regular expression
+        #[clap(long, value_name = "REGEX", help_heading = "TRACES OPTIONS")]
+        filter_name: Option<String>,
+
+        /// Only include verifications of the given type e.g. `test-verification`, `analysis-verification`
+        #[clap(long, value_name = "TYPE", help_heading = "TRACES OPTIONS")]
+        filter_type: Option<String>,
+    },
+
+    /// Generate verification coverage report for leaf requirements
+    #[clap(override_help = "Generate verification coverage report for leaf requirements\n\nCOVERAGE OPTIONS:\n      --json                      Output results in JSON format")]
+    Coverage {
+        /// Output results in JSON format
+        #[clap(long, help_heading = "COVERAGE OPTIONS")]
+        json: bool,
+    },
 
     /// Interactive shell for GraphRegistry operations (undocumented)
     #[clap(hide = true)]
@@ -399,16 +383,11 @@ fn wants_json(args: &Args) -> bool {
         Some(Commands::Format { json, .. }) => *json,
         Some(Commands::Validate { json }) => *json,
         Some(Commands::ChangeImpact { json, .. }) => *json,
-        Some(Commands::Model(subcmd)) => match subcmd {
-            ModelCommands::Summary { json, .. } => *json,
-            ModelCommands::SectionSummary { json, .. } => *json,
-            ModelCommands::Index => false,
-        },
-        Some(Commands::Verifications(subcmd)) => match subcmd {
-            VerificationsCommands::Matrix { json, .. } => *json,
-            VerificationsCommands::Traces { json, .. } => *json,
-            VerificationsCommands::Coverage { json } => *json,
-        },
+        Some(Commands::Summary { json, .. }) => *json,
+        Some(Commands::SectionSummary { json, .. }) => *json,
+        Some(Commands::Matrix { json, .. }) => *json,
+        Some(Commands::Traces { json, .. }) => *json,
+        Some(Commands::Coverage { json }) => *json,
         _ => false,
     }
 }
@@ -486,74 +465,57 @@ pub fn handle_command(
             info!("Generated diagrams removed from source files");
             return Ok(0);
         },
-        Some(Commands::Model(subcmd)) => {
-            match subcmd {
-                ModelCommands::Summary {
-                    json,
-                    cypher,
-                    filter_file,
-                    filter_name,
-                    filter_section,
-                    filter_type,
-                    filter_content,
-                    filter_is_not_verified,
-                    filter_is_not_satisfied
-                } => {
-                    let filters = reports::Filters::new(
-                        filter_file.as_deref(),
-                        filter_name.as_deref(),
-                        filter_section.as_deref(),
-                        filter_type.as_deref(),
-                        filter_content.as_deref(),
-                        filter_is_not_verified,
-                        filter_is_not_satisfied,
-                    ).map_err(|e| {
-                        ReqvireError::ProcessError(format!("❌ Failed to construct filters: {}", e))
-                    })?;
+        Some(Commands::Summary {
+            json,
+            cypher,
+            filter_file,
+            filter_name,
+            filter_section,
+            filter_type,
+            filter_content,
+            filter_is_not_verified,
+            filter_is_not_satisfied
+        }) => {
+            let filters = reports::Filters::new(
+                filter_file.as_deref(),
+                filter_name.as_deref(),
+                filter_section.as_deref(),
+                filter_type.as_deref(),
+                filter_content.as_deref(),
+                filter_is_not_verified,
+                filter_is_not_satisfied,
+            ).map_err(|e| {
+                ReqvireError::ProcessError(format!("❌ Failed to construct filters: {}", e))
+            })?;
 
-                    let output_format = if cypher {
-                        reports::SummaryOutputFormat::Cypher
-                    } else if json {
-                        reports::SummaryOutputFormat::Json
-                    } else {
-                        reports::SummaryOutputFormat::Text
-                    };
+            let output_format = if cypher {
+                reports::SummaryOutputFormat::Cypher
+            } else if json {
+                reports::SummaryOutputFormat::Json
+            } else {
+                reports::SummaryOutputFormat::Text
+            };
 
-                    reports::print_registry_summary(&model_manager.graph_registry,output_format, &filters);
-                    return Ok(0);
-                },
-                ModelCommands::SectionSummary {
-                    json,
-                    filter_file,
-                    filter_section,
-                    filter_content
-                } => {
-                    let filters = sections_summary::SectionsFilters::new(
-                        filter_file.as_deref(),
-                        filter_section.as_deref(),
-                        filter_content.as_deref(),
-                    ).map_err(|e| {
-                        eprintln!("{}", e);
-                        std::process::exit(1);
-                    }).unwrap();
+            reports::print_registry_summary(&model_manager.graph_registry,output_format, &filters);
+            return Ok(0);
+        },
+        Some(Commands::SectionSummary {
+            json,
+            filter_file,
+            filter_section,
+            filter_content
+        }) => {
+            let filters = sections_summary::SectionsFilters::new(
+                filter_file.as_deref(),
+                filter_section.as_deref(),
+                filter_content.as_deref(),
+            ).map_err(|e| {
+                eprintln!("{}", e);
+                std::process::exit(1);
+            }).unwrap();
 
-                    sections_summary::print_sections_summary(&model_manager.graph_registry, json, &filters);
-                    return Ok(0);
-                },
-                ModelCommands::Index => {
-                    let index_output_path = PathBuf::from("output");
-                    let index_content = index_generator::generate_readme_index(
-                        &model_manager.graph_registry,
-                        &index_output_path
-                    ).map_err(|e| {
-                        ReqvireError::ProcessError(format!("❌ Failed to generate index: {:?}", e))
-                    })?;
-
-                    // Output to stdout
-                    println!("{}", index_content);
-                    return Ok(0);
-                },
-            }
+            sections_summary::print_sections_summary(&model_manager.graph_registry, json, &filters);
+            return Ok(0);
         },
         Some(Commands::ChangeImpact { json, git_commit }) => {
             let base_url = git_commands::get_repository_base_url().map_err(|_| {
@@ -587,74 +549,75 @@ pub fn handle_command(
             }
             return Ok(0);
         },
-        Some(Commands::Verifications(subcmd)) => {
-            match subcmd {
-                VerificationsCommands::Matrix { json, svg } => {
-                    // Generate traceability matrix with verification roll-up strategy
-                    let matrix_config = matrix_generator::MatrixConfig::default();
-                    let matrix_output = reqvire::matrix_generator::generate_matrix(
-                        &model_manager.graph_registry,
-                        &matrix_config,
-                        if json {
-                            matrix_generator::MatrixFormat::Json
-                        } else if svg {
-                            matrix_generator::MatrixFormat::Svg
-                        } else {
-                            matrix_generator::MatrixFormat::Markdown
-                        },
-                    );
-                    println!("{}", matrix_output);
-                    return Ok(0);
+        Some(Commands::Matrix { json, svg }) => {
+            // Generate traceability matrix with verification roll-up strategy
+            let matrix_config = matrix_generator::MatrixConfig::default();
+            let matrix_output = reqvire::matrix_generator::generate_matrix(
+                &model_manager.graph_registry,
+                &matrix_config,
+                if json {
+                    matrix_generator::MatrixFormat::Json
+                } else if svg {
+                    matrix_generator::MatrixFormat::Svg
+                } else {
+                    matrix_generator::MatrixFormat::Markdown
                 },
-                VerificationsCommands::Traces {
-                    json,
-                    from_folder,
-                    filter_id,
-                    filter_name,
-                    filter_type
-                } => {
-                    // Generate verification traces report (upward paths from verifications to requirements)
-                    let generator = verification_trace::VerificationTraceGenerator::new(
-                        &model_manager.graph_registry,
-                        diagrams_with_blobs,
-                        from_folder.clone()
-                    );
-
-                    let mut report = generator.generate();
-
-                    // Apply filters
-                    if filter_id.is_some() || filter_name.is_some() || filter_type.is_some() {
-                        report = verification_trace::apply_filters(
-                            report,
-                            filter_id.as_deref(),
-                            filter_name.as_deref(),
-                            filter_type.as_deref(),
-                        )?;
-                    }
-
-                    // Output the report
-                    if json {
-                        let json_output = serde_json::to_string_pretty(&report)
-                            .map_err(|e| ReqvireError::ProcessError(format!("Failed to serialize report: {}", e)))?;
-                        println!("{}", json_output);
-                    } else {
-                        let markdown_output = generator.generate_markdown(&report);
-                        println!("{}", markdown_output);
-                    }
-
-                    return Ok(0);
-                },
-                VerificationsCommands::Coverage { json } => {
-                    let coverage_report = reports::generate_coverage_report(&model_manager.graph_registry);
-                    coverage_report.print(json);
-                    return Ok(0);
-                },
-            }
+            );
+            println!("{}", matrix_output);
+            return Ok(0);
         },
-        Some(Commands::Html { output }) => {
+        Some(Commands::Traces {
+            json,
+            from_folder,
+            filter_id,
+            filter_name,
+            filter_type
+        }) => {
+            // Generate verification traces report (upward paths from verifications to requirements)
+            let generator = verification_trace::VerificationTraceGenerator::new(
+                &model_manager.graph_registry,
+                diagrams_with_blobs,
+                from_folder.clone()
+            );
+
+            let mut report = generator.generate();
+
+            // Apply filters
+            if filter_id.is_some() || filter_name.is_some() || filter_type.is_some() {
+                report = verification_trace::apply_filters(
+                    report,
+                    filter_id.as_deref(),
+                    filter_name.as_deref(),
+                    filter_type.as_deref(),
+                )?;
+            }
+
+            // Output the report
+            if json {
+                let json_output = serde_json::to_string_pretty(&report)
+                    .map_err(|e| ReqvireError::ProcessError(format!("Failed to serialize report: {}", e)))?;
+                println!("{}", json_output);
+            } else {
+                let markdown_output = generator.generate_markdown(&report);
+                println!("{}", markdown_output);
+            }
+
+            return Ok(0);
+        },
+        Some(Commands::Coverage { json }) => {
+            let coverage_report = reports::generate_coverage_report(&model_manager.graph_registry);
+            coverage_report.print(json);
+            return Ok(0);
+        },
+        Some(Commands::Export { output }) => {
             let html_output_path = PathBuf::from(output);
-            let processed_count = export::export_model(&model_manager.graph_registry, &html_output_path)?;
-            info!("{} markdown files converted to HTML", processed_count);
+            export::export_model_with_artifacts(
+                &model_manager.graph_registry,
+                &html_output_path,
+                excluded_filename_patterns,
+                diagram_direction,
+                diagrams_with_blobs
+            )?;
 
             return Ok(0);
         },
@@ -1135,15 +1098,15 @@ mod tests {
 
     #[test]
     fn test_cli_parsing_subcommand() {
-        let args = Args::parse_from(&["reqvire", "html"]);
-        assert!(matches!(args.command, Some(Commands::Html { output: _ })));
+        let args = Args::parse_from(&["reqvire", "export"]);
+        assert!(matches!(args.command, Some(Commands::Export { output: _ })));
     }
-    
+
     #[test]
     fn test_handle_command() {
         // Mock CLI arguments
         let args = Args {
-            command: Some(Commands::Html { output: "html".to_string() }),
+            command: Some(Commands::Export { output: "html".to_string() }),
             config: None,
         };
 

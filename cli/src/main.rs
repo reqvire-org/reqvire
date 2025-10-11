@@ -17,16 +17,11 @@ fn main() {
     let uses_json = match &args.command {
         Some(cli::Commands::ChangeImpact { json, .. }) => *json,
         Some(cli::Commands::Format { json, .. }) => *json,
-        Some(cli::Commands::Model(subcmd)) => match subcmd {
-            cli::ModelCommands::Summary { json, .. } => *json,
-            cli::ModelCommands::SectionSummary { json, .. } => *json,
-            cli::ModelCommands::Index => false,
-        },
-        Some(cli::Commands::Verifications(subcmd)) => match subcmd {
-            cli::VerificationsCommands::Matrix { json, .. } => *json,
-            cli::VerificationsCommands::Traces { json, .. } => *json,
-            cli::VerificationsCommands::Coverage { json } => *json,
-        },
+        Some(cli::Commands::Summary { json, .. }) => *json,
+        Some(cli::Commands::SectionSummary { json, .. }) => *json,
+        Some(cli::Commands::Matrix { json, .. }) => *json,
+        Some(cli::Commands::Traces { json, .. }) => *json,
+        Some(cli::Commands::Coverage { json }) => *json,
         _ => false,
     };
     

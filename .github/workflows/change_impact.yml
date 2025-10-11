@@ -10,7 +10,7 @@ jobs:
       github.event.issue.pull_request != null &&
       (
         contains(github.event.comment.body, '/reqvire impact') ||
-        contains(github.event.comment.body, '/reqvire verifications traces')
+        contains(github.event.comment.body, '/reqvire traces')
       )
     runs-on: ubuntu-latest
     
@@ -89,11 +89,11 @@ jobs:
           echo "$OUTPUT" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
-      - name: Run Reqvire Verifications Traces (if triggered)
-        if: contains(github.event.comment.body, '/reqvire verifications traces')
+      - name: Run Reqvire Traces (if triggered)
+        if: contains(github.event.comment.body, '/reqvire traces')
         id: run_traces
         run: |
-          OUTPUT=$(./reqvire verifications traces 2>&1 || echo "⚠️ reqvire verifications traces failed.")
+          OUTPUT=$(./reqvire traces 2>&1 || echo "⚠️ reqvire traces failed.")
           echo "REQVIRE_OUTPUT<<EOF" >> $GITHUB_ENV
           echo "$OUTPUT" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV

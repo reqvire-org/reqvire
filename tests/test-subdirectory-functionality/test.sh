@@ -34,9 +34,9 @@ git add . > /dev/null 2>&1
 git commit -m "Initial test structure" > /dev/null 2>&1
 
 # Test 1: Model summary should fail with parent directory references
-echo "Running: reqvire model summary (from submodule, should fail)" >> "${TEST_DIR}/test_results.log"
+echo "Running: reqvire summary (from submodule, should fail)" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" model summary 2>&1)
+OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" summary 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -62,9 +62,9 @@ fi
 sed -i 's|derivedFrom: \[.*specifications/MainRequirements.md.*\].*|derivedFrom: [Submodule System](#submodule-system)|' "${TMP_DIR}/project-root/submodule/specifications/SubmoduleRequirements.md"
 
 # Test 2: HTML export from submodule directory
-echo "Running: reqvire html --output subdirectory-html" >> "${TEST_DIR}/test_results.log"
+echo "Running: reqvire export --output subdirectory-html" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" html --output subdirectory-html 2>&1)
+OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" export --output subdirectory-html 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -88,6 +88,39 @@ if [ ! -f "${TMP_DIR}/project-root/submodule/subdirectory-html/specifications/Su
   exit 1
 fi
 
+# Check that HTML content has correct paths (without submodule/ prefix)
+SUBMODULE_HTML="${TMP_DIR}/project-root/submodule/subdirectory-html/specifications/SubmoduleRequirements.html"
+
+# Verify paths don't have "submodule/" prefix in links
+if grep -q "submodule/specifications" "$SUBMODULE_HTML"; then
+  echo "❌ FAILED: HTML contains incorrect paths with 'submodule/' prefix"
+  grep "submodule/specifications" "$SUBMODULE_HTML"
+  exit 1
+fi
+
+# Check that mermaid diagrams use correct paths (if any exist)
+if grep -q "click.*specifications/" "$SUBMODULE_HTML"; then
+  # Mermaid click links should use specifications/, not submodule/specifications/
+  if grep -q "click.*submodule/specifications" "$SUBMODULE_HTML"; then
+    echo "❌ FAILED: Mermaid diagrams contain incorrect paths with 'submodule/' prefix"
+    grep "click.*submodule/specifications" "$SUBMODULE_HTML"
+    exit 1
+  fi
+fi
+
+# Check index.html and traces.html for correct file paths
+for artifact in "index.html" "traces.html"; do
+  ARTIFACT_PATH="${TMP_DIR}/project-root/submodule/subdirectory-html/$artifact"
+  if [ -f "$ARTIFACT_PATH" ]; then
+    # File paths in artifacts should be specifications/, not submodule/specifications/
+    if grep -q "submodule/specifications" "$ARTIFACT_PATH"; then
+      echo "❌ FAILED: $artifact contains incorrect paths with 'submodule/' prefix"
+      grep "submodule/specifications" "$ARTIFACT_PATH" | head -5
+      exit 1
+    fi
+  fi
+done
+
 # Test 3: Format from submodule directory
 echo "Running: reqvire format --dry-run" >> "${TEST_DIR}/test_results.log"
 set +e
@@ -105,9 +138,9 @@ if [ $EXIT_CODE -ne 0 ]; then
 fi
 
 # Test 4: Traces from submodule directory
-echo "Running: reqvire verifications traces" >> "${TEST_DIR}/test_results.log"
+echo "Running: reqvire traces" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" verifications traces 2>&1)
+OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" traces 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -144,42 +177,6 @@ if echo "$OUTPUT" | grep -q "specifications/MainRequirements.md"; then
   exit 1
 fi
 
-# Test 6: Generate index from submodule directory
-echo "Running: reqvire model index > SpecificationIndex.md" >> "${TEST_DIR}/test_results.log"
-set +e
-OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" model index 2>&1)
-EXIT_CODE=$?
-set -e
-
-echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
-printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
-
-if [ $EXIT_CODE -ne 0 ]; then
-  echo "❌ FAILED: Generate index from submodule directory failed with exit code $EXIT_CODE"
-  echo "$OUTPUT"
-  exit 1
-fi
-
-# Save output to file in submodule directory
-echo "$OUTPUT" > "${TMP_DIR}/project-root/submodule/SpecificationIndex.md"
-
-# Check that index generation only processed submodule files
-# The model index command should only process files in the current subdirectory
-if echo "$OUTPUT" | grep -q "specifications/MainRequirements.md"; then
-  echo "❌ FAILED: Generate index processed main requirements when it should only process submodule"
-  echo "Output: $OUTPUT"
-  exit 1
-fi
-
-# Check that index was generated in the submodule directory, not repo root
-if [ -f "${TMP_DIR}/project-root/SpecificationIndex.md" ]; then
-  echo "❌ FAILED: Generate index created file in repo root instead of submodule directory"
-  exit 1
-fi
-
-if [ ! -f "${TMP_DIR}/project-root/submodule/SpecificationIndex.md" ]; then
-  echo "❌ FAILED: Generate index did not create file in submodule directory"
-  exit 1
-fi
+# Note: Index generation is tested in Test 2 (export command generates index.html)
 
 exit 0

@@ -58,9 +58,9 @@ This is another test element with relations.
   * derive: [Element 3](#element-3)
   * derive: [Element 4](#element-4)
 
-## Custom Mermaid Diagram Section
+## Custom Mermaid Diagram Section (No Elements)
 
-This section contains a custom mermaid diagram that should not be removed:
+This section contains a custom mermaid diagram with no elements - should not be removed:
 
 ```mermaid
 flowchart TD
@@ -70,6 +70,43 @@ flowchart TD
     D --> B
     B -- No --> E[End]
 ```
+
+## Custom Mermaid Diagram Section (With Elements)
+
+This section contains BOTH a custom mermaid diagram AND elements - custom diagram should be preserved:
+
+```mermaid
+flowchart LR
+    X[Custom Start] --> Y[Custom End]
+```
+
+### Custom Diagram Element
+
+This element is in a section with a custom diagram.
+
+#### Metadata
+  * type: user-requirement
+
+#### Relations
+  * derivedFrom: [Root Requirement](#root-requirement)
+
+## Custom Diagram Immediately After Header
+```mermaid
+flowchart TB
+    P[Custom Process] --> Q[Custom Output]
+```
+
+This section has custom diagram immediately after header - it should be preserved.
+
+### Header Diagram Element
+
+This element is in a section with custom diagram right after header.
+
+#### Metadata
+  * type: user-requirement
+
+#### Relations
+  * derivedFrom: [Root Requirement](#root-requirement)
 
 ## Section 2
 ```mermaid

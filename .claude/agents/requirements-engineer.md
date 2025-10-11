@@ -222,26 +222,23 @@ specifications/
 # Validate specifications
 reqvire validate [--json]
 
-# Generate model summary with filters
-reqvire model summary [filters] [--json]
+# Generate summary with filters
+reqvire summary [filters] [--json]
 
 # Generate sections summary (files/sections only, no elements)
-reqvire model section-summary [filters] [--json]
-
-# Generate index document
-reqvire model index
+reqvire section-summary [filters] [--json]
 
 # Analyze change impact
 reqvire change-impact --git-commit=<commit> [--json]
 
 # Generate traceability matrix
-reqvire verifications matrix [--json]
+reqvire matrix [--json]
 
 # Generate verification traces
-reqvire verifications traces [--json] [--filter-id=<id>] [--filter-name=<regex>] [--filter-type=<type>]
+reqvire traces [--json] [--filter-id=<id>] [--filter-name=<regex>] [--filter-type=<type>]
 
 # Generate verification coverage report
-reqvire verifications coverage [--json]
+reqvire coverage [--json]
 
 # Format specifications
 reqvire format [--dry-run] [--json]
@@ -269,27 +266,24 @@ reqvire generate-diagrams
 # Full validation with JSON output
 reqvire validate --json > /tmp/validation.json
 
-# Filtered model summary
-reqvire model summary --filter-type="requirement" --filter-is-not-verified --json
+# Filtered summary
+reqvire summary --filter-type="requirement" --filter-is-not-verified --json
 
 # Sections overview (without individual elements)
-reqvire model section-summary --filter-file="specifications/*.md" --json
+reqvire section-summary --filter-file="specifications/*.md" --json
 
 # Change impact analysis
 reqvire change-impact --git-commit=HEAD~1 --json > /tmp/impact.json
-
-# Generate index and save to file
-reqvire model index > index.md
 ```
 
 ## Your Workflow
 
 ### 1. Discovery Phase:
-- Use `reqvire model section-summary --filter-content="security|authentication|authorization"` to understand security requirements in each section
-- Use `reqvire model section-summary --filter-content="performance|latency|throughput"` to identify performance-related requirements
-- Use `reqvire model section-summary --filter-content="validation|verify|test"` to find verification and testing requirements
-- Use `reqvire model section-summary --filter-content="interface|API|integration"` to locate interface requirements
-- Run `reqvire model summary` to understand current state
+- Use `reqvire section-summary --filter-content="security|authentication|authorization"` to understand security requirements in each section
+- Use `reqvire section-summary --filter-content="performance|latency|throughput"` to identify performance-related requirements
+- Use `reqvire section-summary --filter-content="validation|verify|test"` to find verification and testing requirements
+- Use `reqvire section-summary --filter-content="interface|API|integration"` to locate interface requirements
+- Run `reqvire summary` to understand current state
 - Use `reqvire validate --json > /tmp/validation.json` to identify issues
 - Apply filters to focus on specific areas
 
@@ -315,7 +309,7 @@ reqvire model index > index.md
 ## Best Practices
 
 ### Strategic Content Analysis:
-- Use `model section-summary --filter-content` to understand requirement themes in each section before detailed work
+- Use `section-summary --filter-content` to understand requirement themes in each section before detailed work
 - Filter by domain keywords (security, performance, interface) to map requirement distribution
 - Identify sections with specific requirement types to target your analysis effectively
 

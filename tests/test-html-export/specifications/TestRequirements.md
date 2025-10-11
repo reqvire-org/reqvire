@@ -2,6 +2,17 @@
 
 This document contains test requirements for HTML export testing.
 
+## Root Requirements
+
+### Root Requirement
+
+The system SHALL support HTML export functionality with proper link handling.
+
+#### Metadata
+  * type: user-requirement
+
+---
+
 ## Requirements
 ```mermaid
 graph LR;
@@ -33,9 +44,10 @@ graph LR;
 
 ### Test Requirement 1
 
-This is a test requirement with links to [README.md](README.md) and [TestVerifications.md](TestVerifications.md).
+This is a test requirement with links to [SpecificationIndex.md](SpecificationIndex.md) and [TestVerifications.md](TestVerifications.md).
 
 #### Relations
+  * derivedFrom: [Root Requirement](#root-requirement)
   * verifiedBy: [TestVerifications.md/Test Verification 1](TestVerifications.md#test-verification-1)
 
 ---
@@ -45,6 +57,7 @@ This is a test requirement with links to [README.md](README.md) and [TestVerific
 This is another test requirement.
 
 #### Relations
+  * derivedFrom: [Root Requirement](#root-requirement)
   * verifiedBy: [TestVerifications.md/Test Verification 2](TestVerifications.md#test-verification-2)
 
 ---

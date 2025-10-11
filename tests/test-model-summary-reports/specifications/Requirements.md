@@ -2,7 +2,7 @@
 
 This document contains correctly formatted relations to existing targets, to verify validation passes.
 
-This is page frontmatter content that should appear in the model summary.
+This is page frontmatter content that should appear in the summary.
 
 ```mermaid
 graph TD;

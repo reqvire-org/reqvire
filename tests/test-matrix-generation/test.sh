@@ -16,9 +16,9 @@ echo "Starting test..." > "${TEST_DIR}/test_results.log"
 # Test 1: Generate markdown traceability matrix
 
 MATRIX_MD="${TEST_DIR}/output/matrix.md"
-echo "Running: reqvire verifications matrix" >> "${TEST_DIR}/test_results.log"
+echo "Running: reqvire matrix" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" verifications matrix 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" matrix 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -101,9 +101,9 @@ fi
 
 # Test 2: Generate JSON traceability matrix
 MATRIX_JSON="${TEST_DIR}/output/matrix.json"
-echo "Running: reqvire verifications matrix --json" >> "${TEST_DIR}/test_results.log"
+echo "Running: reqvire matrix --json" >> "${TEST_DIR}/test_results.log"
 set +e
-JSON_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" verifications matrix --json 2>&1)
+JSON_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" matrix --json 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -157,9 +157,9 @@ fi
 
 # Test 3: Generate SVG traceability matrix
 MATRIX_SVG="${TEST_DIR}/output/matrix.svg"
-echo "Running: reqvire verifications matrix --svg" >> "${TEST_DIR}/test_results.log"
+echo "Running: reqvire matrix --svg" >> "${TEST_DIR}/test_results.log"
 set +e
-SVG_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" verifications matrix --svg 2>&1)
+SVG_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" matrix --svg 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -205,9 +205,9 @@ fi
 
 
 # Test 4: Check for conflicts
-echo "Running: reqvire verifications matrix --json --svg" >> "${TEST_DIR}/test_results.log"
+echo "Running: reqvire matrix --json --svg" >> "${TEST_DIR}/test_results.log"
 set +e
-CONFLICT_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN"  --config "${TEST_DIR}/reqvire.yaml" verifications matrix --json --svg 2>&1)
+CONFLICT_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN"  --config "${TEST_DIR}/reqvire.yaml" matrix --json --svg 2>&1)
 EXIT_CODE=$?
 set -e
 
