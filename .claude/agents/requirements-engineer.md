@@ -404,7 +404,7 @@ Ask the user to run `./target/debug/reqvire serve` in another shell, then use Pl
 8. **Review manual items**: Check `reqvire lint --json` for any items in `needs_review` that require manual attention
 9. Review overall impact and update related documentation
 
-**Note**: Always run `reqvire lint --fix` after adding or modifying specifications and verifications to ensure model quality.
+**Note**: Run `reqvire lint --fix` after completing a logical unit of work (e.g., adding a complete feature with its requirements, verifications, and relations) to ensure model quality.
 
 ### Model Linting and Cleanup:
 
