@@ -103,6 +103,13 @@ if ! grep -q "leaf-requirement" "$TEST_DIR/specifications/Verifications/Tests.md
   exit 1
 fi
 
+# Verify Requirements.md was modified correctly
+if ! diff -u "${TEST_SCRIPT_DIR}/expected-requirements.txt" "$TEST_DIR/specifications/Requirements.md" > /dev/null; then
+  echo "❌ FAILED: Requirements.md does not match expected state after fix"
+  diff -u "${TEST_SCRIPT_DIR}/expected-requirements.txt" "$TEST_DIR/specifications/Requirements.md"
+  exit 1
+fi
+
 # Test 6: After fix
 set +e
 POST_FIX_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" lint 2>&1)

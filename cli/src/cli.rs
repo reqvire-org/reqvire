@@ -209,6 +209,18 @@ pub enum Commands {
         json: bool,
     },
 
+    /// Generate model structure diagram with optional filtering
+    #[clap(override_help = "Generate model structure diagram with optional filtering\n\nMODEL OPTIONS:\n      --root-id <ID>              Filter model from specific root element (forward relations only)\n      --json                      Output results in JSON format")]
+    Model {
+        /// Filter model from specific root element using forward-only relation traversal
+        #[clap(long, value_name = "ID", help_heading = "MODEL OPTIONS")]
+        root_id: Option<String>,
+
+        /// Output results in JSON format
+        #[clap(long, help_heading = "MODEL OPTIONS")]
+        json: bool,
+    },
+
     /// Analyze model quality and detect issues in requirements relations
     #[clap(override_help = "Analyze model quality and detect issues in requirements relations\n\nLINT OPTIONS:\n      --fixable                   Show only auto-fixable issues\n      --auditable                 Show only issues requiring manual review\n      --fix                       Apply automatic fixes for auto-fixable issues\n      --json                      Output results in JSON format")]
     Lint {
@@ -431,6 +443,7 @@ fn wants_json(args: &Args) -> bool {
         Some(Commands::Matrix { json, .. }) => *json,
         Some(Commands::Traces { json, .. }) => *json,
         Some(Commands::Coverage { json }) => *json,
+        Some(Commands::Model { json, .. }) => *json,
         Some(Commands::Lint { json, .. }) => *json,
         _ => false,
     }
@@ -653,6 +666,18 @@ pub fn handle_command(
         Some(Commands::Coverage { json }) => {
             let coverage_report = reports::generate_coverage_report(&model_manager.graph_registry);
             coverage_report.print(json);
+            return Ok(0);
+        },
+        Some(Commands::Model { root_id, json }) => {
+            // Generate model diagram with optional filtering
+            let forward_only = root_id.is_some(); // Use forward-only when filtering by root element
+            let output = diagrams::generate_model_report(
+                &model_manager.graph_registry,
+                root_id.as_deref(),
+                forward_only,
+                json
+            )?;
+            println!("{}", output);
             return Ok(0);
         },
         Some(Commands::Lint { fixable, auditable, fix, json }) => {

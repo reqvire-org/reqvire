@@ -15,6 +15,7 @@ Commands:
   matrix            Generate verification traceability matrix showing requirements and their verification status
   traces            Generate verification traces showing upward paths from verifications to root requirements
   coverage          Generate verification coverage report for leaf requirements
+  model             Generate model structure diagram with optional filtering
   lint              Analyze model quality and detect issues in requirements relations
   help               Print this message or the help of the given subcommand(s)
 
@@ -70,6 +71,10 @@ TRACES OPTIONS:
       --filter-type <TYPE>      Only include verifications of the given type e.g. `test-verification`, `analysis-verification`
 
 COVERAGE OPTIONS:
+      --json                    Output results in JSON format
+
+MODEL OPTIONS:
+      --root-id <ID>            Filter model from specific root element using forward-only relation traversal
       --json                    Output results in JSON format
 
 LINT OPTIONS:

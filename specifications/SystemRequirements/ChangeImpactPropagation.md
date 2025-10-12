@@ -30,11 +30,11 @@ graph LR;
   class 80defdd4cbc7ee18 default;
   click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
   37a75398bd174177 -->|satisfiedBy| 80defdd4cbc7ee18;
+  37a75398bd174177 -.->|verifiedBy| 98d7b16583855bb7;
   cec02a5e3f71bed1["Change Impact Relations Test"];
   class cec02a5e3f71bed1 verification;
   click cec02a5e3f71bed1 "../Verifications/ChangeImpactTests.md#change-impact-relations-test";
   37a75398bd174177 -.->|verifiedBy| cec02a5e3f71bed1;
-  37a75398bd174177 -.->|verifiedBy| 98d7b16583855bb7;
   ced028f36159c967["Smart Filtering for Change Impact Reports"];
   class ced028f36159c967 systemRequirement;
   click ced028f36159c967 "ChangeImpactPropagation.md#smart-filtering-for-change-impact-reports";
@@ -42,11 +42,11 @@ graph LR;
   class 4b89dbed94c08c3e default;
   click 4b89dbed94c08c3e "../../core/src/change_impact.rs";
   ced028f36159c967 -->|satisfiedBy| 4b89dbed94c08c3e;
-  ced028f36159c967 -.->|verifiedBy| 98d7b16583855bb7;
   4f17266696162a10["Change Impact Smart Filtering Test"];
   class 4f17266696162a10 verification;
   click 4f17266696162a10 "../Verifications/ChangeImpactTests.md#change-impact-smart-filtering-test";
   ced028f36159c967 -.->|verifiedBy| 4f17266696162a10;
+  ced028f36159c967 -.->|verifiedBy| 98d7b16583855bb7;
   c8d1020a3844532d["Change Impact Detection Algorithm"];
   class c8d1020a3844532d systemRequirement;
   click c8d1020a3844532d "ChangeImpactPropagation.md#change-impact-detection-algorithm";
@@ -58,8 +58,14 @@ graph LR;
   class a4090fe7e30eeae4 verification;
   click a4090fe7e30eeae4 "../Verifications/ChangeImpactTests.md#element-content-extraction-test";
   c8d1020a3844532d -.->|verifiedBy| a4090fe7e30eeae4;
-  c8d1020a3844532d -.->|verifiedBy| cec02a5e3f71bed1;
   c8d1020a3844532d -.->|verifiedBy| 98d7b16583855bb7;
+  c8d1020a3844532d -.->|verifiedBy| cec02a5e3f71bed1;
+  2054606d7574a553["Requirements Change Propagation"];
+  class 2054606d7574a553 userRequirement;
+  click 2054606d7574a553 "../SpecificationsRequirements.md#requirements-change-propagation";
+  2054606d7574a553 -.->|deriveReqT| 4ba519ed09b81863;
+  2054606d7574a553 -.->|deriveReqT| ced028f36159c967;
+  2054606d7574a553 -.->|deriveReqT| c8d1020a3844532d;
   4c9ae0a2fb751ce6["CLI Change Impact Report Command"];
   class 4c9ae0a2fb751ce6 systemRequirement;
   click 4c9ae0a2fb751ce6 "Requirements.md#cli-change-impact-report-command";
@@ -67,6 +73,7 @@ graph LR;
   class 80defdd4cbc7ee18 default;
   click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
   4c9ae0a2fb751ce6 -->|satisfiedBy| 80defdd4cbc7ee18;
+  4c9ae0a2fb751ce6 -.->|deriveReqT| 37a75398bd174177;
   34c75e4a88e1f381["CLI Help Structure Verification"];
   class 34c75e4a88e1f381 verification;
   click 34c75e4a88e1f381 "../Verifications/Misc.md#cli-help-structure-verification";
@@ -75,22 +82,6 @@ graph LR;
   class 6c40e66699ba40dd systemRequirement;
   click 6c40e66699ba40dd "Requirements.md#cli-git-commit-hash-flag";
   4c9ae0a2fb751ce6 -.->|deriveReqT| 6c40e66699ba40dd;
-  4c9ae0a2fb751ce6 -.->|deriveReqT| 37a75398bd174177;
-  9933cac5853a8584["Change Impact Analysis"];
-  class 9933cac5853a8584 userRequirement;
-  click 9933cac5853a8584 "../UserRequirements.md#change-impact-analysis";
-  b72d56e7e360fe6c["Change Impact Analysis Verification"];
-  class b72d56e7e360fe6c verification;
-  click b72d56e7e360fe6c "../Verifications/ChangeImpactTests.md#change-impact-analysis-verification";
-  9933cac5853a8584 -.->|verifiedBy| b72d56e7e360fe6c;
-  9933cac5853a8584 -.->|deriveReqT| ced028f36159c967;
-  2054606d7574a553["Requirements Change Propagation"];
-  class 2054606d7574a553 userRequirement;
-  click 2054606d7574a553 "../SpecificationsRequirements.md#requirements-change-propagation";
-  9933cac5853a8584 -.->|deriveReqT| 2054606d7574a553;
-  2054606d7574a553 -.->|deriveReqT| 4ba519ed09b81863;
-  2054606d7574a553 -.->|deriveReqT| ced028f36159c967;
-  2054606d7574a553 -.->|deriveReqT| c8d1020a3844532d;
 ```
 ### Change Impact Detection Algorithm
 
@@ -285,7 +276,6 @@ Changed Elements:
 </details>
 
 #### Relations
-  * derivedFrom: [Change Impact Analysis](../UserRequirements.md#change-impact-analysis)
   * derivedFrom: [Requirements Change Propagation](../SpecificationsRequirements.md#requirements-change-propagation)
   * satisfiedBy: [change_impact.rs](../../core/src/change_impact.rs)
 ---

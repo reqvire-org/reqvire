@@ -1,5 +1,17 @@
 ## Auto-fixable Issues
 
+### Safe Redundant Hierarchical Relations
+
+**Element: Single-Chain Redundant Requirement**
+File: [specifications/Requirements.md#single-chain-redundant-requirement](specifications/Requirements.md#single-chain-redundant-requirement)
+
+Safe redundant derivedFrom relations (these can be automatically removed):
+  * derivedFrom: [specifications/Requirements.md#root-requirement](specifications/Requirements.md#root-requirement)
+
+Reason: This element reaches 'specifications/Requirements.md#root-requirement' through a single chain via 'specifications/Requirements.md#parent-requirement'. The direct relation to the ancestor is redundant and safe to remove.
+
+---
+
 ### Redundant Verify Relations
 
 **Verification: Test Verification**

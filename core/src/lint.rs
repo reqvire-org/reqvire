@@ -27,6 +27,12 @@ pub enum AutoFixableIssue {
         redundant_relations: Vec<RelationInfo>,
         rationale: String,
     },
+    #[serde(rename = "safe_redundant_hierarchical_relations")]
+    SafeRedundantHierarchicalRelations {
+        element: ElementInfo,
+        redundant_relations: Vec<RelationInfo>,
+        rationale: String,
+    },
 }
 
 #[derive(Debug, Serialize)]
@@ -86,6 +92,27 @@ impl LintReport {
                         println!("\nReason: {}\n", rationale);
                         println!("---\n");
                     }
+                    AutoFixableIssue::SafeRedundantHierarchicalRelations {
+                        element,
+                        redundant_relations,
+                        rationale,
+                    } => {
+                        println!("### Safe Redundant Hierarchical Relations\n");
+                        println!("**Element: {}**", element.name);
+                        println!("File: [{}]({})\n", element.identifier, element.identifier);
+                        println!("Safe redundant {} relations (these can be automatically removed):",
+                            if redundant_relations.len() == 1 {
+                                redundant_relations[0].relation_type.as_str()
+                            } else {
+                                "hierarchical"
+                            }
+                        );
+                        for rel in redundant_relations {
+                            println!("  * {}: [{}]({})", rel.relation_type, rel.target, rel.target);
+                        }
+                        println!("\nReason: {}\n", rationale);
+                        println!("---\n");
+                    }
                 }
             }
         }
@@ -122,12 +149,12 @@ impl LintReport {
     }
 
     /// Apply automatic fixes for auto-fixable issues
-    /// Only processes RedundantVerifyRelations issues
+    /// Processes RedundantVerifyRelations and SafeRedundantHierarchicalRelations issues
     /// Returns the number of relations removed
     pub fn apply_fixes(&self, registry: &mut GraphRegistry) -> Result<usize, ReqvireError> {
         let mut relations_removed = 0;
 
-        // Only process auto-fixable issues (redundant verify relations)
+        // Process all auto-fixable issues
         for issue in &self.auto_fixable {
             match issue {
                 AutoFixableIssue::RedundantVerifyRelations {
@@ -155,6 +182,31 @@ impl LintReport {
                         }
                     }
                 }
+                AutoFixableIssue::SafeRedundantHierarchicalRelations {
+                    element,
+                    redundant_relations,
+                    rationale: _,
+                } => {
+                    // Remove each safe redundant hierarchical relation
+                    for rel in redundant_relations {
+                        match registry.remove_element_relation(
+                            &element.identifier,
+                            &rel.target,
+                            &rel.relation_type,
+                        ) {
+                            Ok(()) => {
+                                relations_removed += 1;
+                            }
+                            Err(e) => {
+                                // Log error but continue with other relations
+                                eprintln!(
+                                    "Warning: Failed to remove relation '{}' from '{}' to '{}': {}",
+                                    rel.relation_type, element.identifier, rel.target, e
+                                );
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -170,8 +222,33 @@ pub fn analyze_model(registry: &GraphRegistry) -> LintReport {
     // Detect redundant verify relations
     auto_fixable.extend(detect_redundant_verify_relations(registry));
 
-    // Detect maybe-redundant hierarchical relations
-    needs_manual_review.extend(detect_maybe_redundant_hierarchical_relations(registry));
+    // Detect hierarchical relation redundancies (both safe and unsafe)
+    let (safe_issues, unsafe_issues) = detect_hierarchical_redundancies(registry);
+    auto_fixable.extend(safe_issues);
+    needs_manual_review.extend(unsafe_issues);
+
+    // Sort issues by element identifier for deterministic output
+    auto_fixable.sort_by(|a, b| {
+        let id_a = match a {
+            AutoFixableIssue::RedundantVerifyRelations { verification, .. } => &verification.identifier,
+            AutoFixableIssue::SafeRedundantHierarchicalRelations { element, .. } => &element.identifier,
+        };
+        let id_b = match b {
+            AutoFixableIssue::RedundantVerifyRelations { verification, .. } => &verification.identifier,
+            AutoFixableIssue::SafeRedundantHierarchicalRelations { element, .. } => &element.identifier,
+        };
+        id_a.cmp(id_b)
+    });
+
+    needs_manual_review.sort_by(|a, b| {
+        let id_a = match a {
+            ManualReviewIssue::MaybeRedundantHierarchicalRelations { element, .. } => &element.identifier,
+        };
+        let id_b = match b {
+            ManualReviewIssue::MaybeRedundantHierarchicalRelations { element, .. } => &element.identifier,
+        };
+        id_a.cmp(id_b)
+    });
 
     LintReport {
         auto_fixable,
@@ -254,11 +331,18 @@ fn detect_redundant_verify_relations(registry: &GraphRegistry) -> Vec<AutoFixabl
     issues
 }
 
-/// Detect maybe-redundant hierarchical relations
+/// Detect hierarchical relation redundancies
+/// Returns (safe_auto_fixable_issues, unsafe_manual_review_issues)
 /// An element has a redundant hierarchical relation if it has a direct parent relation
 /// to both a requirement and an ancestor of that requirement.
-fn detect_maybe_redundant_hierarchical_relations(registry: &GraphRegistry) -> Vec<ManualReviewIssue> {
-    let mut issues = Vec::new();
+///
+/// Safe to auto-remove (single chain): Element → Parent → Ancestor with direct Element → Ancestor
+/// Unsafe (multi-path): Element reaches Ancestor through multiple different paths
+fn detect_hierarchical_redundancies(
+    registry: &GraphRegistry,
+) -> (Vec<AutoFixableIssue>, Vec<ManualReviewIssue>) {
+    let mut safe_issues = Vec::new();
+    let mut unsafe_issues = Vec::new();
     let hierarchical_relation = VERIFICATION_TRACES_RELATIONS[0];
 
     // Check each element
@@ -309,48 +393,129 @@ fn detect_maybe_redundant_hierarchical_relations(registry: &GraphRegistry) -> Ve
                 }
             }
         }
+        // Sort for deterministic output
+        redundant_parents.sort();
 
         if !redundant_parents.is_empty() {
-            // Find non-redundant parents for the rationale
-            let non_redundant_parents: Vec<String> = direct_parents
+            // Find non-redundant parents (intermediate elements) for the rationale
+            let mut intermediate_parents: Vec<String> = direct_parents
                 .iter()
                 .filter(|id| !redundant_parents.contains(id))
                 .cloned()
                 .collect();
+            // Sort for deterministic output
+            intermediate_parents.sort();
 
-            let rationale = if non_redundant_parents.len() == 1 && redundant_parents.len() == 1 {
-                format!(
-                    "This element has {} to both '{}' and its ancestor '{}'. The hierarchy chain may already be established through the parent. Review if the direct link to the ancestor is semantically necessary.",
-                    hierarchical_relation,
-                    non_redundant_parents[0],
-                    redundant_parents[0]
-                )
-            } else {
-                format!(
-                    "This element has {} to both parent requirements and their ancestors. The hierarchy chain may already be established through the parents. Review if the direct links to ancestors are semantically necessary.",
-                    hierarchical_relation
-                )
-            };
+            // For each redundant parent, check if it's safe to auto-remove (single chain)
+            // or needs manual review (multi-path)
+            let mut safe_redundant = Vec::new();
+            let mut unsafe_redundant = Vec::new();
 
-            issues.push(ManualReviewIssue::MaybeRedundantHierarchicalRelations {
-                element: ElementInfo {
-                    identifier: element.identifier.clone(),
-                    name: element.name.clone(),
-                    file: element.file_path.clone(),
-                },
-                potentially_redundant_relations: redundant_parents
+            for redundant_parent_id in &redundant_parents {
+                // Count paths from element to this redundant parent through intermediates
+                let path_count = count_paths_to_target(
+                    &element.identifier,
+                    redundant_parent_id,
+                    &direct_parents,
+                    registry,
+                );
+
+                if path_count == 1 {
+                    // Single chain - safe to auto-remove
+                    safe_redundant.push(redundant_parent_id.clone());
+                } else {
+                    // Multiple paths - needs manual review
+                    unsafe_redundant.push(redundant_parent_id.clone());
+                }
+            }
+            // Sort for deterministic output
+            safe_redundant.sort();
+            unsafe_redundant.sort();
+
+            // Create safe auto-fixable issues
+            if !safe_redundant.is_empty() {
+                let rationale = if intermediate_parents.len() == 1 && safe_redundant.len() == 1 {
+                    format!(
+                        "This element reaches '{}' through a single chain via '{}'. The direct relation to the ancestor is redundant and safe to remove.",
+                        safe_redundant[0],
+                        intermediate_parents[0]
+                    )
+                } else {
+                    let ancestors_list = safe_redundant.join("', '");
+                    let intermediates_list = intermediate_parents.join("', '");
+                    format!(
+                        "This element reaches ancestor requirements ('{}') through single chains via intermediate requirements ('{}'). The direct relations to ancestors are redundant and safe to remove.",
+                        ancestors_list,
+                        intermediates_list
+                    )
+                };
+
+                safe_issues.push(AutoFixableIssue::SafeRedundantHierarchicalRelations {
+                    element: ElementInfo {
+                        identifier: element.identifier.clone(),
+                        name: element.name.clone(),
+                        file: element.file_path.clone(),
+                    },
+                    redundant_relations: safe_redundant
+                        .iter()
+                        .map(|id| RelationInfo {
+                            relation_type: hierarchical_relation.to_string(),
+                            target: id.clone(),
+                        })
+                        .collect(),
+                    rationale,
+                });
+            }
+
+            // Create unsafe manual review issues
+            if !unsafe_redundant.is_empty() {
+                // Find which intermediate parents lead to this redundant parent
+                let intermediate_paths: Vec<String> = intermediate_parents
                     .iter()
-                    .map(|id| RelationInfo {
-                        relation_type: hierarchical_relation.to_string(),
-                        target: id.clone(),
+                    .filter(|parent_id| {
+                        path_exists_to_target(
+                            parent_id,
+                            &unsafe_redundant[0],
+                            registry,
+                            &mut HashSet::new(),
+                        )
                     })
-                    .collect(),
-                rationale,
-            });
+                    .cloned()
+                    .collect();
+
+                let rationale = if intermediate_paths.len() >= 2 && unsafe_redundant.len() == 1 {
+                    format!(
+                        "This element reaches '{}' through multiple paths (via '{}' and '{}'). Multiple paths may have semantic meaning. Manual review required to determine if the direct relation should be removed.",
+                        unsafe_redundant[0],
+                        intermediate_paths.get(0).unwrap_or(&"unknown".to_string()),
+                        intermediate_paths.get(1).unwrap_or(&"unknown".to_string())
+                    )
+                } else {
+                    format!(
+                        "This element reaches ancestor requirements through multiple paths. Multiple paths may have semantic meaning. Manual review required to determine if the direct relations should be removed."
+                    )
+                };
+
+                unsafe_issues.push(ManualReviewIssue::MaybeRedundantHierarchicalRelations {
+                    element: ElementInfo {
+                        identifier: element.identifier.clone(),
+                        name: element.name.clone(),
+                        file: element.file_path.clone(),
+                    },
+                    potentially_redundant_relations: unsafe_redundant
+                        .iter()
+                        .map(|id| RelationInfo {
+                            relation_type: hierarchical_relation.to_string(),
+                            target: id.clone(),
+                        })
+                        .collect(),
+                    rationale,
+                });
+            }
         }
     }
 
-    issues
+    (safe_issues, unsafe_issues)
 }
 
 /// Collect all ancestors of a requirement by traversing upward through hierarchical relations
@@ -386,6 +551,67 @@ fn collect_ancestors_recursive(
             }
         }
     }
+}
+
+/// Count the number of distinct paths from source to target through intermediate elements
+/// Returns the count of unique paths found
+fn count_paths_to_target(
+    _source_id: &str,
+    target_id: &str,
+    direct_parents: &[String],
+    registry: &GraphRegistry,
+) -> usize {
+    let mut path_count = 0;
+    let visited = HashSet::new();
+
+    // Check each direct parent to see if it leads to the target
+    for parent_id in direct_parents {
+        if parent_id == target_id {
+            // Direct connection doesn't count as a path through intermediate
+            continue;
+        }
+
+        // Check if this parent leads to the target
+        if path_exists_to_target(parent_id, target_id, registry, &mut visited.clone()) {
+            path_count += 1;
+        }
+    }
+
+    path_count
+}
+
+/// Check if a path exists from source to target through hierarchical relations
+fn path_exists_to_target(
+    current_id: &str,
+    target_id: &str,
+    registry: &GraphRegistry,
+    visited: &mut HashSet<String>,
+) -> bool {
+    // Prevent cycles
+    if visited.contains(current_id) {
+        return false;
+    }
+    visited.insert(current_id.to_string());
+
+    // Check if we've reached the target
+    if current_id == target_id {
+        return true;
+    }
+
+    // Get current element and check its parents
+    if let Some(element) = registry.get_element(current_id) {
+        for relation in &element.relations {
+            if VERIFICATION_TRACES_RELATIONS.contains(&relation.relation_type.name) {
+                if let crate::relation::LinkType::Identifier(parent_id) = &relation.target.link {
+                    if path_exists_to_target(parent_id, target_id, registry, visited) {
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+
+    false
 }
 
 

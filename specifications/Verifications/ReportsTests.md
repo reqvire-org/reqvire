@@ -26,20 +26,6 @@ graph LR;
   class c4c5998e49538704 default;
   click c4c5998e49538704 "../../tests/test-verification-traces/test.sh";
   958d9af6695bd8a -->|satisfiedBy| c4c5998e49538704;
-  349f5e874cf22d98["Verification Coverage Report Test"];
-  class 349f5e874cf22d98 verification;
-  click 349f5e874cf22d98 "ReportsTests.md#verification-coverage-report-test";
-  7099e5b2f8a08808["test.sh"];
-  class 7099e5b2f8a08808 default;
-  click 7099e5b2f8a08808 "../../tests/test-coverage-report/test.sh";
-  349f5e874cf22d98 -->|satisfiedBy| 7099e5b2f8a08808;
-  fa3c1ae9e9b91644["Verification Traces From-Folder Test"];
-  class fa3c1ae9e9b91644 verification;
-  click fa3c1ae9e9b91644 "ReportsTests.md#verification-traces-from-folder-test";
-  c4c5998e49538704["test.sh"];
-  class c4c5998e49538704 default;
-  click c4c5998e49538704 "../../tests/test-verification-traces/test.sh";
-  fa3c1ae9e9b91644 -->|satisfiedBy| c4c5998e49538704;
   76ae69270700044b["Model Summary Tests"];
   class 76ae69270700044b verification;
   click 76ae69270700044b "ReportsTests.md#model-summary-tests";
@@ -47,34 +33,23 @@ graph LR;
   class 7b75340700b95177 default;
   click 7b75340700b95177 "../../tests/test-model-summary-reports/test.sh";
   76ae69270700044b -->|satisfiedBy| 7b75340700b95177;
-  8cafc3875f5e4938["Display Name-Regex Option in Help"];
-  class 8cafc3875f5e4938 systemRequirement;
-  click 8cafc3875f5e4938 "../SystemRequirements/Requirements.md#display-name-regex-option-in-help";
-  80defdd4cbc7ee18["cli.rs"];
-  class 80defdd4cbc7ee18 default;
-  click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
-  8cafc3875f5e4938 -->|satisfiedBy| 80defdd4cbc7ee18;
-  8cafc3875f5e4938 -.->|verifiedBy| 76ae69270700044b;
-  73db87f73ef4c5a2["Model Summary Fine Grained Filtering"];
-  class 73db87f73ef4c5a2 systemRequirement;
-  click 73db87f73ef4c5a2 "../SystemRequirements/Requirements.md#model-summary-fine-grained-filtering";
-  c4ea332ba94e8299["reports.rs"];
-  class c4ea332ba94e8299 default;
-  click c4ea332ba94e8299 "../../core/src/reports.rs";
-  73db87f73ef4c5a2 -->|satisfiedBy| c4ea332ba94e8299;
-  80defdd4cbc7ee18["cli.rs"];
-  class 80defdd4cbc7ee18 default;
-  click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
-  73db87f73ef4c5a2 -->|satisfiedBy| 80defdd4cbc7ee18;
-  73db87f73ef4c5a2 -.->|verifiedBy| 76ae69270700044b;
-  920a8118d579854b["CLI Traces Filter Options"];
-  class 920a8118d579854b systemRequirement;
-  click 920a8118d579854b "../SystemRequirements/Requirements.md#cli-traces-filter-options";
-  920a8118d579854b -.->|verifiedBy| 958d9af6695bd8a;
-  ddec547537f501ee["CLI Traces From-Folder Option"];
-  class ddec547537f501ee systemRequirement;
-  click ddec547537f501ee "../SystemRequirements/Requirements.md#cli-traces-from-folder-option";
-  ddec547537f501ee -.->|verifiedBy| fa3c1ae9e9b91644;
+  fa3c1ae9e9b91644["Verification Traces From-Folder Test"];
+  class fa3c1ae9e9b91644 verification;
+  click fa3c1ae9e9b91644 "ReportsTests.md#verification-traces-from-folder-test";
+  c4c5998e49538704["test.sh"];
+  class c4c5998e49538704 default;
+  click c4c5998e49538704 "../../tests/test-verification-traces/test.sh";
+  fa3c1ae9e9b91644 -->|satisfiedBy| c4c5998e49538704;
+  349f5e874cf22d98["Verification Coverage Report Test"];
+  class 349f5e874cf22d98 verification;
+  click 349f5e874cf22d98 "ReportsTests.md#verification-coverage-report-test";
+  7099e5b2f8a08808["test.sh"];
+  class 7099e5b2f8a08808 default;
+  click 7099e5b2f8a08808 "../../tests/test-coverage-report/test.sh";
+  349f5e874cf22d98 -->|satisfiedBy| 7099e5b2f8a08808;
+  6c3185c2d992e9fb["Model Command Verification"];
+  class 6c3185c2d992e9fb verification;
+  click 6c3185c2d992e9fb "ReportsTests.md#model-command-verification";
   8d93a79de428970["CLI Coverage Command"];
   class 8d93a79de428970 systemRequirement;
   click 8d93a79de428970 "../SystemRequirements/Requirements.md#cli-coverage-command";
@@ -87,14 +62,22 @@ graph LR;
   class 34c75e4a88e1f381 verification;
   click 34c75e4a88e1f381 "Misc.md#cli-help-structure-verification";
   8d93a79de428970 -.->|verifiedBy| 34c75e4a88e1f381;
-  40ff89d68c242f45["Handle Invalid Regex Filter Patterns"];
-  class 40ff89d68c242f45 systemRequirement;
-  click 40ff89d68c242f45 "../SystemRequirements/Requirements.md#handle-invalid-regex-filter-patterns";
+  73db87f73ef4c5a2["Model Summary Fine Grained Filtering"];
+  class 73db87f73ef4c5a2 systemRequirement;
+  click 73db87f73ef4c5a2 "../SystemRequirements/Requirements.md#model-summary-fine-grained-filtering";
+  c4ea332ba94e8299["reports.rs"];
+  class c4ea332ba94e8299 default;
+  click c4ea332ba94e8299 "../../core/src/reports.rs";
+  73db87f73ef4c5a2 -->|satisfiedBy| c4ea332ba94e8299;
   80defdd4cbc7ee18["cli.rs"];
   class 80defdd4cbc7ee18 default;
   click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
-  40ff89d68c242f45 -->|satisfiedBy| 80defdd4cbc7ee18;
-  40ff89d68c242f45 -.->|verifiedBy| 76ae69270700044b;
+  73db87f73ef4c5a2 -->|satisfiedBy| 80defdd4cbc7ee18;
+  73db87f73ef4c5a2 -.->|verifiedBy| 76ae69270700044b;
+  ddec547537f501ee["CLI Traces From-Folder Option"];
+  class ddec547537f501ee systemRequirement;
+  click ddec547537f501ee "../SystemRequirements/Requirements.md#cli-traces-from-folder-option";
+  ddec547537f501ee -.->|verifiedBy| fa3c1ae9e9b91644;
   b50359102e04bf09["CLI Sections Summary Command"];
   class b50359102e04bf09 systemRequirement;
   click b50359102e04bf09 "../SystemRequirements/Requirements.md#cli-sections-summary-command";
@@ -108,6 +91,42 @@ graph LR;
   b50359102e04bf09 -->|satisfiedBy| 994f165ff784760d;
   b50359102e04bf09 -.->|verifiedBy| 9bf743e946ad83ea;
   b50359102e04bf09 -.->|verifiedBy| 34c75e4a88e1f381;
+  5ae7a9223cb08424["Model Diagram Output Formats"];
+  class 5ae7a9223cb08424 systemRequirement;
+  click 5ae7a9223cb08424 "../SystemRequirements/Requirements.md#model-diagram-output-formats";
+  dad7eeb932afdb92["diagrams.rs"];
+  class dad7eeb932afdb92 default;
+  click dad7eeb932afdb92 "../../core/src/diagrams.rs";
+  5ae7a9223cb08424 -->|satisfiedBy| dad7eeb932afdb92;
+  5ae7a9223cb08424 -.->|verifiedBy| 6c3185c2d992e9fb;
+  40ff89d68c242f45["Handle Invalid Regex Filter Patterns"];
+  class 40ff89d68c242f45 systemRequirement;
+  click 40ff89d68c242f45 "../SystemRequirements/Requirements.md#handle-invalid-regex-filter-patterns";
+  80defdd4cbc7ee18["cli.rs"];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
+  40ff89d68c242f45 -->|satisfiedBy| 80defdd4cbc7ee18;
+  40ff89d68c242f45 -.->|verifiedBy| 76ae69270700044b;
+  920a8118d579854b["CLI Traces Filter Options"];
+  class 920a8118d579854b systemRequirement;
+  click 920a8118d579854b "../SystemRequirements/Requirements.md#cli-traces-filter-options";
+  920a8118d579854b -.->|verifiedBy| 958d9af6695bd8a;
+  721f66c3bade6da1["Forward-Only Relation Traversal"];
+  class 721f66c3bade6da1 systemRequirement;
+  click 721f66c3bade6da1 "../SystemRequirements/Requirements.md#forward-only-relation-traversal";
+  dad7eeb932afdb92["diagrams.rs"];
+  class dad7eeb932afdb92 default;
+  click dad7eeb932afdb92 "../../core/src/diagrams.rs";
+  721f66c3bade6da1 -->|satisfiedBy| dad7eeb932afdb92;
+  721f66c3bade6da1 -.->|verifiedBy| 6c3185c2d992e9fb;
+  8cafc3875f5e4938["Display Name-Regex Option in Help"];
+  class 8cafc3875f5e4938 systemRequirement;
+  click 8cafc3875f5e4938 "../SystemRequirements/Requirements.md#display-name-regex-option-in-help";
+  80defdd4cbc7ee18["cli.rs"];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
+  8cafc3875f5e4938 -->|satisfiedBy| 80defdd4cbc7ee18;
+  8cafc3875f5e4938 -.->|verifiedBy| 76ae69270700044b;
 ```
 ### Model Summary Tests
 
@@ -486,4 +505,75 @@ This test verifies that the --from-folder option correctly generates relative li
 #### Relations
   * verify: [CLI Traces From-Folder Option](../SystemRequirements/Requirements.md#cli-traces-from-folder-option)
   * satisfiedBy: [test.sh](../../tests/test-verification-traces/test.sh)
+---
+
+### Model Command Verification
+
+Comprehensive test verifying model command generates correct output in different modes.
+
+#### Details
+
+##### Acceptance Criteria
+1. `reqvire model` generates markdown with complete model diagram showing all elements
+2. `reqvire model --root-id=<id>` generates diagram with only forward-related elements from root
+3. `reqvire model --json` generates valid JSON structure with all model data
+4. `reqvire model --root-id=<id> --json` generates filtered JSON with forward-related elements
+5. Filtered diagrams include only elements reachable via forward relations
+6. JSON output can be parsed and contains expected fields (folders, relations)
+
+##### Test Criteria
+1. **Full Model Markdown Output**
+   Command: `reqvire model`
+   - exits code **0**
+   - output contains `# Model Diagram Report`
+   - output contains Mermaid diagram block with `graph TD`
+   - diagram includes all test elements
+   - diagram shows hierarchical structure (folders > files > sections > elements)
+
+2. **Filtered Model Markdown Output**
+   Command: `reqvire model --root-id=<test-element-id>`
+   - exits code **0**
+   - output contains `# Model Diagram Report`
+   - output contains Mermaid diagram with filtered elements
+   - diagram includes only elements reachable via forward relations from root
+   - elements not in forward path are excluded
+
+3. **Full Model JSON Output**
+   Command: `reqvire model --json`
+   - exits code **0**
+   - output parses as valid JSON
+   - JSON contains `folders` array
+   - JSON contains `relations` array
+   - folders contain files, files contain sections, sections contain elements
+   - all test elements are present in JSON structure
+
+4. **Filtered Model JSON Output**
+   Command: `reqvire model --root-id=<test-element-id> --json`
+   - exits code **0**
+   - output parses as valid JSON
+   - JSON contains only elements reachable via forward relations
+   - filtered elements count is less than full model
+
+5. **Forward-Only Traversal Verification**
+   - Create test with element A that derives B, and B derives C
+   - Running `reqvire model --root-id=<A-id>` includes B and C
+   - Create element D that is derived from B (backward relation)
+   - Running `reqvire model --root-id=<A-id>` includes B and C but NOT D
+   - Confirms only forward relations (derive, satisfiedBy, verifiedBy, trace) are followed
+
+6. **JSON Structure Validation**
+   Command: `reqvire model --json`
+   - JSON has keys: `folders`, `relations`
+   - Each folder has: `name`, `path`, `files`
+   - Each file has: `name`, `path`, `sections`
+   - Each section has: `name`, `elements`
+   - Each element has: `identifier`, `name`, `element_type`
+   - Each relation has: `source_id`, `target_id`, `relation_type`, `is_external`
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [Forward-Only Relation Traversal](../SystemRequirements/Requirements.md#forward-only-relation-traversal)
+  * verify: [Model Diagram Output Formats](../SystemRequirements/Requirements.md#model-diagram-output-formats)
 ---

@@ -1,6 +1,21 @@
 {
   "auto_fixable": [
     {
+      "type": "safe_redundant_hierarchical_relations",
+      "element": {
+        "identifier": "specifications/Requirements.md#single-chain-redundant-requirement",
+        "name": "Single-Chain Redundant Requirement",
+        "file": "specifications/Requirements.md"
+      },
+      "redundant_relations": [
+        {
+          "relation_type": "derivedFrom",
+          "target": "specifications/Requirements.md#root-requirement"
+        }
+      ],
+      "rationale": "This element reaches 'specifications/Requirements.md#root-requirement' through a single chain via 'specifications/Requirements.md#parent-requirement'. The direct relation to the ancestor is redundant and safe to remove."
+    },
+    {
       "type": "redundant_verify_relations",
       "verification": {
         "identifier": "specifications/Verifications/Tests.md#test-verification",
@@ -20,8 +35,8 @@
     {
       "type": "maybe_redundant_hierarchical_relations",
       "element": {
-        "identifier": "specifications/Requirements.md#maybe-redundant-requirement",
-        "name": "Maybe Redundant Requirement",
+        "identifier": "specifications/Requirements.md#multi-path-redundant-requirement",
+        "name": "Multi-Path Redundant Requirement",
         "file": "specifications/Requirements.md"
       },
       "potentially_redundant_relations": [
@@ -30,7 +45,7 @@
           "target": "specifications/Requirements.md#root-requirement"
         }
       ],
-      "rationale": "This element has derivedFrom to both 'specifications/Requirements.md#parent-requirement' and its ancestor 'specifications/Requirements.md#root-requirement'. The hierarchy chain may already be established through the parent. Review if the direct link to the ancestor is semantically necessary."
+      "rationale": "This element reaches 'specifications/Requirements.md#root-requirement' through multiple paths (via 'specifications/Requirements.md#alternative-parent-requirement' and 'specifications/Requirements.md#parent-requirement'). Multiple paths may have semantic meaning. Manual review required to determine if the direct relation should be removed."
     }
   ]
 }
