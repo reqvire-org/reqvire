@@ -9,7 +9,6 @@ use log::debug;
 use crate::relation;
 use crate::element::ElementType;
 use crate::element::RequirementType;
-use crate::element::VerificationType;
 use crate::git_commands;
 use crate::filesystem;
 use std::path::Path;
@@ -82,9 +81,9 @@ fn generate_section_diagram(
 
     // Define Mermaid graph styles
     diagram.push_str("  %% Graph styling\n");
-    diagram.push_str("  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;\n");
+    diagram.push_str("  classDef userRequirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;\n");
+    diagram.push_str("  classDef systemRequirement fill:#fce4e4,stroke:#e68a8a,stroke-width:1px;\n");
     diagram.push_str("  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;\n");
-    diagram.push_str("  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;\n");
     diagram.push_str("  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;\n\n");
 
     let mut included_elements = HashSet::new();
@@ -198,9 +197,9 @@ fn add_element_to_diagram(
        let label = element.name.replace('"', "&quot;");
        
        let class=match &element.element_type {
-           ElementType::Requirement(RequirementType::User)  => "requirement",                    
-           ElementType::Requirement(RequirementType::System) =>"requirement",
-           ElementType::Verification(_) =>"verification",           
+           ElementType::Requirement(RequirementType::User)  => "userRequirement",
+           ElementType::Requirement(RequirementType::System) =>"systemRequirement",
+           ElementType::Verification(_) =>"verification",
            _ => "default"
        };
            
@@ -256,10 +255,10 @@ fn add_element_to_diagram(
                     let class = match registry.get_element(&target) {
                         Some(existing_element)=>{
                             match existing_element.element_type {
-                                ElementType::Requirement(RequirementType::User)  => "requirement",                    
-                                ElementType::Requirement(RequirementType::System) => "requirement",
-                                ElementType::Verification(_) => "verification",           
-                                _ => "default"                    
+                                ElementType::Requirement(RequirementType::User)  => "userRequirement",
+                                ElementType::Requirement(RequirementType::System) => "systemRequirement",
+                                ElementType::Verification(_) => "verification",
+                                _ => "default"
                              }
                         },
                         _ => "default"
@@ -585,14 +584,11 @@ pub fn generate_model_diagram(registry: &GraphRegistry) -> Result<String, Reqvir
     // Add auto-generation marker
     diagram.push_str(&format!("  %% {}\n", AUTOGEN_DIAGRAM_MARKER));
 
-    // Enhanced color scheme for different element types
+    // Define Mermaid graph styles (matching section diagrams)
     diagram.push_str("  %% Graph styling\n");
-    diagram.push_str("  classDef userRequirement fill:#ffe6e6,stroke:#ff4444,stroke-width:2px;\n");
-    diagram.push_str("  classDef systemRequirement fill:#fff0e6,stroke:#ff8800,stroke-width:2px;\n");
-    diagram.push_str("  classDef testVerification fill:#e6ffe6,stroke:#44ff44,stroke-width:2px;\n");
-    diagram.push_str("  classDef analysisVerification fill:#e6f5ff,stroke:#4488ff,stroke-width:2px;\n");
-    diagram.push_str("  classDef inspectionVerification fill:#f0e6ff,stroke:#8844ff,stroke-width:2px;\n");
-    diagram.push_str("  classDef demonstrationVerification fill:#ffe6f5,stroke:#ff44aa,stroke-width:2px;\n");
+    diagram.push_str("  classDef userRequirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;\n");
+    diagram.push_str("  classDef systemRequirement fill:#fce4e4,stroke:#e68a8a,stroke-width:1px;\n");
+    diagram.push_str("  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;\n");
     diagram.push_str("  classDef folder fill:#f0f0f0,stroke:#666666,stroke-width:3px;\n");
     diagram.push_str("  classDef file fill:#ffffff,stroke:#999999,stroke-width:2px;\n");
     diagram.push_str("  classDef section fill:#fafafa,stroke:#aaaaaa,stroke-width:1px;\n");
@@ -656,6 +652,9 @@ pub fn generate_model_diagram(registry: &GraphRegistry) -> Result<String, Reqvir
                         // Determine element class based on type
                         let class = get_element_class(&element.element_type);
                         diagram.push_str(&format!("        class {} {};\n", element_id, class));
+
+                        // Add click link to element
+                        diagram.push_str(&format!("        click {} \"{}\";\n", element_id, element.identifier));
 
                         included_elements.insert(element.identifier.clone());
                     }
@@ -765,16 +764,12 @@ fn group_by_section<'a>(elements: &[&'a Element]) -> HashMap<String, Vec<&'a Ele
     result
 }
 
-/// Get CSS class name for element type with enhanced colors
+/// Get CSS class name for element type (matching section diagrams)
 fn get_element_class(element_type: &ElementType) -> &str {
     match element_type {
         ElementType::Requirement(RequirementType::User) => "userRequirement",
         ElementType::Requirement(RequirementType::System) => "systemRequirement",
-        ElementType::Verification(VerificationType::Test) => "testVerification",
-        ElementType::Verification(VerificationType::Analysis) => "analysisVerification",
-        ElementType::Verification(VerificationType::Inspection) => "inspectionVerification",
-        ElementType::Verification(VerificationType::Demonstration) => "demonstrationVerification",
-        ElementType::Verification(VerificationType::Default) => "testVerification",
+        ElementType::Verification(_) => "verification",
         _ => "default"
     }
 }
