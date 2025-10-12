@@ -333,7 +333,6 @@ This test verifies that the lint command analyzes model quality, detects issues 
   * type: test-verification
 
 #### Relations
-  * verify: [CLI Lint Command](../SystemRequirements/Requirements.md#cli-lint-command)
   * verify: [Redundant Verify Relations Detection](../SystemRequirements/Requirements.md#redundant-verify-relations-detection)
   * verify: [Maybe-Redundant Hierarchical Relations Detection](../SystemRequirements/Requirements.md#maybe-redundant-hierarchical-relations-detection)
   * verify: [Lint Output Formatting](../SystemRequirements/Requirements.md#lint-output-formatting)

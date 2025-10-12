@@ -35,7 +35,6 @@ The system shall provide functionality to remove all generated Mermaid diagrams 
 
 #### Relations
   * derivedFrom: [Generate Diagrams](UserStories.md#generate-diagrams)
-  * verifiedBy: [Remove Generated Diagrams Verification](Verifications/DiagramsTests.md#remove-generated-diagrams-verification)
 ---
 
 ### Complete Model Structure Visualization
@@ -180,7 +179,6 @@ The system shall automatically generate an index document during HTML export tha
 
 #### Relations
   * derivedFrom: [Managing MBSE Models](UserStories.md#managing-mbse-models)
-  * verifiedBy: [HTML Export Verification](Verifications/Misc.md#html-export-verification)
 ---
 
 ### Validate Markdown Structure
@@ -359,7 +357,6 @@ The report helps track verification completeness and identify gaps in requiremen
 
 #### Relations
   * derivedFrom: [Model Reports](#model-reports)
-  * verifiedBy: [Verification Coverage Report Test](Verifications/ReportsTests.md#verification-coverage-report-test)
 ---
 
 ### Verification Upward Traceability

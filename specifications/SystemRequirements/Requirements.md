@@ -128,7 +128,6 @@ FORMAT OPTIONS:
 #### Relations
   * derivedFrom: [CLI interface](../UserRequirements.md#cli-interface)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
-  * verifiedBy: [CLI Help Structure Verification](../Verifications/Misc.md#cli-help-structure-verification)
 ---
 
 ### Format Command
@@ -753,7 +752,6 @@ The system must support filtering by file path (glob pattern), section name (glo
 #### Relations
   * derivedFrom: [CLI Summary Report Command](#cli-summary-report-command)
   * satisfiedBy: [sections_summary.rs](../../core/src/sections_summary.rs)
-  * verifiedBy: [Sections Summary Tests](../Verifications/ReportsTests.md#sections-summary-tests)
 ---
 
 ### Model Summary Fine Grained Filtering
@@ -1016,7 +1014,6 @@ The report structure shall include:
 #### Relations
   * derivedFrom: [Verification Coverage Report](../UserRequirements.md#verification-coverage-report)
   * derivedFrom: [Model Summary Report Generator](#model-summary-report-generator)
-  * verifiedBy: [Verification Coverage Report Test](../Verifications/ReportsTests.md#verification-coverage-report-test)
 ---
 
 ### Verification Trace Builder
@@ -1125,7 +1122,6 @@ Command output shall be written to stdout for easy redirection to files.
   * derivedFrom: [Verification Trace Builder](#verification-trace-builder)
   * derivedFrom: [Verification Upward Traceability](../UserRequirements.md#verification-upward-traceability)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
-  * verifiedBy: [Verification Traces Filter Options Test](../Verifications/ReportsTests.md#verification-traces-filter-options-test)
 ---
 
 ### CLI Traces Filter Options
@@ -1437,7 +1433,6 @@ When requested, the system shall remove all generated diagrams from the model by
 #### Relations
   * derivedFrom: [Remove Generated Diagrams](../UserRequirements.md#remove-generated-diagrams)
   * satisfiedBy: [diagrams.rs](../../core/src/diagrams.rs)
-  * verifiedBy: [Remove Generated Diagrams Verification](../Verifications/DiagramsTests.md#remove-generated-diagrams-verification)
 ---
 
 ### Interactive Mermaid Diagram Node Behavior
