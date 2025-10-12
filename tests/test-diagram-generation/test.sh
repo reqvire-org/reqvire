@@ -203,6 +203,22 @@ if ! grep -q -- "-.->|deriveReqT" "$TEST_DIR/specifications/Requirements.md"; th
   exit 1
 fi
 
+# Check for correct color scheme in diagrams
+if ! grep -q "classDef userRequirement fill:#f9d6d6,stroke:#f55f5f" "$TEST_DIR/specifications/Requirements.md"; then
+  echo "❌ FAILED: Missing or incorrect userRequirement color definition in Requirements.md diagram"
+  exit 1
+fi
+
+if ! grep -q "classDef systemRequirement fill:#fce4e4,stroke:#e68a8a" "$TEST_DIR/specifications/Requirements.md"; then
+  echo "❌ FAILED: Missing or incorrect systemRequirement color definition in Requirements.md diagram"
+  exit 1
+fi
+
+if ! grep -q "classDef verification fill:#d6f9d6,stroke:#5fd75f" "$TEST_DIR/specifications/Requirements.md"; then
+  echo "❌ FAILED: Missing or incorrect verification color definition in Requirements.md diagram"
+  exit 1
+fi
+
 # Perform a specific check for relationships in diagrams and if rendered with right arrow
 if ! grep -q -- "-->|satisfiedBy|" "$TEST_DIR/specifications/Requirements.md"; then
   echo "❌ FAILED: Missing relationships in Requirements.md diagram"
