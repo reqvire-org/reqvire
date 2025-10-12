@@ -46,7 +46,7 @@ SUMMARY OPTIONS:
       --filter-content <REGEX>  Only include elements whose content matches this regular expression
       --filter-is-not-verified  Only include requirements that do NOT have any "verifiedBy" relations
       --filter-is-not-satisfied Only include requirements that do NOT have any "satisfiedBy" relations
-      --cypher                  Output traceability matrix as SVG without hyperlinks and with full element names Cannot be used with --json
+      --cypher                  Output model as Cypher queries for graph database import. Cannot be used with --json
 
 SECTION SUMMARY OPTIONS:
       --json                    Output results in JSON format

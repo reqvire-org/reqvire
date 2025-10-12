@@ -128,7 +128,7 @@ pub enum Commands {
         #[clap(long, help_heading = "SUMMARY OPTIONS")]
         filter_is_not_satisfied: bool,
 
-        /// Output traceability matrix as SVG without hyperlinks and with full element names Cannot be used with --json
+        /// Output model as Cypher queries for graph database import. Cannot be used with --json
         #[clap(long, hide = true, conflicts_with_all = &["json"], help_heading = "SUMMARY OPTIONS")]
         cypher: bool,
     },
