@@ -518,7 +518,7 @@ pub fn generate_artifacts_in_temp(
 
     // Generate model structure diagram with Mermaid
     info!("Generating model.md...");
-    let model_mermaid = crate::diagrams::generate_model_diagram(&temp_model_manager.graph_registry)?;
+    let model_mermaid = crate::diagrams::generate_model_diagram(&temp_model_manager.graph_registry, None)?;
     filesystem::write_file("model.md", model_mermaid.as_bytes())?;
 
     info!("Generating traces.md...");

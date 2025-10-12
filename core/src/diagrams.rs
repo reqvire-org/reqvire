@@ -578,7 +578,12 @@ fn remove_section_diagram(content: &str, section: &str) -> String {
 
 /// Generates a complete model diagram with containment hierarchy using Mermaid subgraphs
 /// Shows folders > files > sections > elements with relations
-pub fn generate_model_diagram(registry: &GraphRegistry) -> Result<String, ReqvireError> {
+///
+/// # Arguments
+/// * `registry` - The graph registry containing all elements
+/// * `root_element_id` - Optional element ID to generate diagram from. If None, generates full model.
+///                        If Some, generates diagram starting from that element and its related elements.
+pub fn generate_model_diagram(registry: &GraphRegistry, root_element_id: Option<&str>) -> Result<String, ReqvireError> {
     let mut diagram = String::from("```mermaid\ngraph TD;\n");
 
     // Add auto-generation marker
@@ -594,8 +599,16 @@ pub fn generate_model_diagram(registry: &GraphRegistry) -> Result<String, Reqvir
     diagram.push_str("  classDef section fill:#fafafa,stroke:#aaaaaa,stroke-width:1px;\n");
     diagram.push_str("  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;\n\n");
 
-    // Group elements by file path
-    let elements_by_file = group_elements_by_file(registry);
+    // Filter elements if root_element_id is provided
+    let filtered_elements = if let Some(root_id) = root_element_id {
+        collect_related_elements(registry, root_id)
+    } else {
+        // Include all elements
+        registry.get_all_elements().iter().map(|e| e.identifier.clone()).collect()
+    };
+
+    // Group elements by file path, including only filtered elements
+    let elements_by_file = group_elements_by_file_filtered(registry, &filtered_elements);
 
     // Group files by folder
     let files_by_folder = group_files_by_folder(&elements_by_file);
@@ -721,13 +734,57 @@ pub fn generate_model_diagram(registry: &GraphRegistry) -> Result<String, Reqvir
     Ok(diagram)
 }
 
-/// Helper to group elements by file path
-fn group_elements_by_file(registry: &GraphRegistry) -> HashMap<String, Vec<&Element>> {
-    let mut result: HashMap<String, Vec<&Element>> = HashMap::new();
+/// Collects all elements related to a root element by traversing the graph
+/// This includes the root element and all elements it has relations to/from
+fn collect_related_elements(registry: &GraphRegistry, root_id: &str) -> HashSet<String> {
+    let mut result = HashSet::new();
+    let mut to_visit = vec![root_id.to_string()];
+
+    while let Some(current_id) = to_visit.pop() {
+        if result.contains(&current_id) {
+            continue;
+        }
+        result.insert(current_id.clone());
+
+        if let Some(element) = registry.get_element(&current_id) {
+            // Add all elements this element relates to
+            for relation in &element.relations {
+                if let relation::LinkType::Identifier(target_id) = &relation.target.link {
+                    if !result.contains(target_id) {
+                        to_visit.push(target_id.clone());
+                    }
+                }
+            }
+
+            // Also find elements that relate to this element
+            for other_element in registry.get_all_elements() {
+                if other_element.identifier == current_id {
+                    continue;
+                }
+
+                for relation in &other_element.relations {
+                    if let relation::LinkType::Identifier(target_id) = &relation.target.link {
+                        if target_id == &current_id && !result.contains(&other_element.identifier) {
+                            to_visit.push(other_element.identifier.clone());
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    result
+}
+
+/// Helper to group elements by file path, filtering to only include specified element IDs
+fn group_elements_by_file_filtered<'a>(registry: &'a GraphRegistry, filter: &HashSet<String>) -> HashMap<String, Vec<&'a Element>> {
+    let mut result: HashMap<String, Vec<&'a Element>> = HashMap::new();
     for element in registry.get_all_elements() {
-        result.entry(element.file_path.clone())
-            .or_insert_with(Vec::new)
-            .push(element);
+        if filter.contains(&element.identifier) {
+            result.entry(element.file_path.clone())
+                .or_insert_with(Vec::new)
+                .push(element);
+        }
     }
     result
 }
