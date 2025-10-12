@@ -3,6 +3,9 @@ paths:
   excluded_filename_patterns:
     - "**/expected_output.*"
     - "**/actual_output.*"
+    - "**/expected_redundant_output.*"
+    - "**/actual_redundant_output.*"
+    - "**/diff_redundant.txt"
 style:
   theme: "default"
   max_width: 1200

@@ -1,0 +1,39 @@
+## Auto-fixable Issues
+
+### Safe Redundant Hierarchical Relations
+
+**Element: Single-Chain Redundant Requirement**
+File: [specifications/Requirements.md#single-chain-redundant-requirement](specifications/Requirements.md#single-chain-redundant-requirement)
+
+Safe redundant derivedFrom relations (these can be automatically removed):
+  * derivedFrom: [specifications/Requirements.md#root-requirement](specifications/Requirements.md#root-requirement)
+
+Reason: This element reaches 'specifications/Requirements.md#root-requirement' through a single chain via 'specifications/Requirements.md#parent-requirement'. The direct relation to the ancestor is redundant and safe to remove.
+
+---
+
+### Redundant Verify Relations
+
+**Verification: Test Verification**
+File: [specifications/Verifications/Tests.md#test-verification](specifications/Verifications/Tests.md#test-verification)
+
+Redundant verify relations (these can be automatically removed):
+  * verify: [specifications/Requirements.md#parent-requirement](specifications/Requirements.md#parent-requirement)
+
+Reason: This verification already verifies 'specifications/Requirements.md#leaf-requirement' which derives from 'specifications/Requirements.md#parent-requirement'. Verification traces automatically roll up through derivedFrom relations, so verifying the leaf requirement is sufficient.
+
+---
+
+## Needs Manual Review
+
+### Maybe-Redundant Hierarchical Relations
+
+**Element: Multi-Path Redundant Requirement**
+File: [specifications/Requirements.md#multi-path-redundant-requirement](specifications/Requirements.md#multi-path-redundant-requirement)
+
+Potentially redundant derivedFrom relations detected:
+  * derivedFrom: [specifications/Requirements.md#root-requirement](specifications/Requirements.md#root-requirement)
+
+Reason: This element reaches 'specifications/Requirements.md#root-requirement' through multiple paths (via 'specifications/Requirements.md#alternative-parent-requirement' and 'specifications/Requirements.md#parent-requirement'). Multiple paths may have semantic meaning. Manual review required to determine if the direct relation should be removed.
+
+---

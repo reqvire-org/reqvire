@@ -34,6 +34,7 @@ pub struct VerificationTrace {
     pub trace_tree: TraceTree,
     pub directly_verified_count: usize,
     pub total_requirements_in_tree: usize,
+    pub redundant_relations: Vec<String>,
     #[serde(skip)]
     section_order_index: usize,
 }
@@ -125,8 +126,8 @@ impl<'a> VerificationTraceGenerator<'a> {
             return; // Skip verifications that don't verify anything
         }
 
-        // Build trace tree
-        let trace_tree = self.build_trace_tree(&directly_verified);
+        // Build trace tree and detect redundant relations in one pass
+        let (trace_tree, redundant_relations) = self.build_trace_tree(&directly_verified);
 
         // Count total requirements in tree
         let total_count = self.count_requirements_in_tree(&trace_tree);
@@ -142,6 +143,7 @@ impl<'a> VerificationTraceGenerator<'a> {
             directly_verified_requirements: directly_verified.clone(),
             trace_tree,
             total_requirements_in_tree: total_count,
+            redundant_relations,
             section_order_index: verification.section_order_index,
         };
 
@@ -163,27 +165,42 @@ impl<'a> VerificationTraceGenerator<'a> {
     }
 
     /// Build trace tree from directly verified requirements
-    fn build_trace_tree(&self, directly_verified: &[String]) -> TraceTree {
+    /// Returns the tree and a list of redundant requirement IDs (sorted alphabetically)
+    fn build_trace_tree(&self, directly_verified: &[String]) -> (TraceTree, Vec<String>) {
         let mut requirements = Vec::new();
         let mut visited = HashSet::new();
+        let mut redundant = HashSet::new();
+        let directly_verified_set: HashSet<String> = directly_verified.iter().cloned().collect();
 
         for req_id in directly_verified {
             if let Some(req) = self.registry.get_element(req_id) {
-                if let Some(node) = self.build_requirement_node(req, true, &mut visited) {
+                if let Some(node) = self.build_requirement_node_with_redundancy_check(
+                    req,
+                    true,
+                    &mut visited,
+                    &directly_verified_set,
+                    &mut redundant,
+                ) {
                     requirements.push(node);
                 }
             }
         }
 
-        TraceTree { requirements }
+        // Convert redundant set to sorted vector for deterministic output
+        let mut redundant_vec: Vec<String> = redundant.into_iter().collect();
+        redundant_vec.sort();
+
+        (TraceTree { requirements }, redundant_vec)
     }
 
-    /// Build a requirement node with its parent chain
-    fn build_requirement_node(
+    /// Build a requirement node with its parent chain, checking for redundant relations
+    fn build_requirement_node_with_redundancy_check(
         &self,
         requirement: &Element,
         is_directly_verified: bool,
         visited: &mut HashSet<String>,
+        directly_verified_set: &HashSet<String>,
+        redundant: &mut HashSet<String>,
     ) -> Option<RequirementNode> {
         // Prevent cycles
         if visited.contains(&requirement.identifier) {
@@ -198,12 +215,21 @@ impl<'a> VerificationTraceGenerator<'a> {
             if VERIFICATION_TRACES_RELATIONS.contains(&relation.relation_type.name) {
                 // This is a parent relation, follow it
                 if let crate::relation::LinkType::Identifier(parent_id) = &relation.target.link {
+                    // Check if parent is also directly verified (making it redundant)
+                    if directly_verified_set.contains(parent_id) {
+                        redundant.insert(parent_id.clone());
+                    }
+
                     if let Some(parent) = self.registry.get_element(parent_id) {
                         // Clone visited set for this branch to allow multiple paths
                         let mut branch_visited = visited.clone();
-                        if let Some(parent_node) =
-                            self.build_requirement_node(parent, false, &mut branch_visited)
-                        {
+                        if let Some(parent_node) = self.build_requirement_node_with_redundancy_check(
+                            parent,
+                            false,
+                            &mut branch_visited,
+                            directly_verified_set,
+                            redundant,
+                        ) {
                             children.push(parent_node);
                         }
                     }
@@ -219,6 +245,7 @@ impl<'a> VerificationTraceGenerator<'a> {
             children,
         })
     }
+
 
     /// Count total requirements in tree
     fn count_requirements_in_tree(&self, tree: &TraceTree) -> usize {
@@ -270,12 +297,14 @@ impl<'a> VerificationTraceGenerator<'a> {
             && !base_url.is_empty()
             && !commit_hash.is_empty();
 
-        // Header with CSS classes (reused from diagrams.rs pattern)
+        // Header with CSS classes (matching diagrams.rs color scheme)
         diagram.push_str("```mermaid\n");
         diagram.push_str("graph TD\n");
-        diagram.push_str("  classDef verified fill:#90EE90,stroke:#000,stroke-width:2px;\n");
-        diagram.push_str("  classDef requirement fill:#87CEEB,stroke:#000,stroke-width:1px;\n");
-        diagram.push_str("  classDef verification fill:#FFD700,stroke:#000,stroke-width:2px;\n");
+        diagram.push_str("  classDef userRequirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;\n");
+        diagram.push_str("  classDef systemRequirement fill:#fce4e4,stroke:#e68a8a,stroke-width:1px;\n");
+        diagram.push_str("  classDef requirement fill:#fce4e4,stroke:#e68a8a,stroke-width:1px;\n");
+        diagram.push_str("  classDef verified fill:#f9d6d6,stroke:#f55f5f,stroke-width:2px;\n");
+        diagram.push_str("  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;\n");
         diagram.push_str("\n");
 
         // Add verification node at the top
@@ -515,7 +544,22 @@ impl<'a> VerificationTraceGenerator<'a> {
 
                     // Add Mermaid diagram
                     markdown.push_str(&self.generate_mermaid_diagram(trace));
-                    markdown.push_str("\n\n");
+
+                    // Add redundant relations list if any exist
+                    if !trace.redundant_relations.is_empty() {
+                        markdown.push_str("\n**Redundant Relations:**\n");
+                        for redundant_id in &trace.redundant_relations {
+                            // Get element name for the link text
+                            if let Some(element) = self.registry.get_element(redundant_id) {
+                                markdown.push_str(&format!("- [{}]({})\n", element.name, redundant_id));
+                            } else {
+                                markdown.push_str(&format!("- [{}]({})\n", redundant_id, redundant_id));
+                            }
+                        }
+                        markdown.push_str("\n");
+                    } else {
+                        markdown.push_str("\n\n");
+                    }
                 }
             }
         }

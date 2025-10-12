@@ -3,6 +3,18 @@
 ## System Overview
 Reqvire is an AI-driven framework for system modeling and requirements management that integrates with Git workflows. It processes semi-structured Markdown documents containing system requirements, manages relationships between elements, validates model consistency, and generates documentation and visualizations.
 
+## MBSE Development Workflow
+
+**CRITICAL**: This is a Model-Based Systems Engineering (MBSE) project. Always follow this workflow:
+
+1. **Requirements First**: Before implementing any new feature, add requirements to the specifications with proper traceability
+2. **Verifications**: Define how the feature will be verified before implementation
+3. **Tests**: Create tests to satisfy verifications (can be refined during implementation if needed)
+4. **Implementation**: Only after requirements and verifications are defined, implement the code
+5. **Satisfaction Links**: Link implementation to requirements via satisfiedBy relations
+
+**Never skip the requirements step.** Implementation without requirements violates the MBSE methodology and project principles.
+
 ## Domain-Specific Guides
 
 This guide is split into domain-specific guides for better organization:
@@ -10,6 +22,38 @@ This guide is split into domain-specific guides for better organization:
 - **[specifications/CLAUDE.md](specifications/CLAUDE.md)** - Guide for writing and editing specifications, requirements, and verifications
 - **[tests/CLAUDE.md](tests/CLAUDE.md)** - Guide for writing and executing end-to-end tests
 - **Core Development** (see sections below) - Guide for Rust code development, architecture, and components
+
+## Using Specialized Agents
+
+**IMPORTANT**: Use specialized agents for specific Reqvire tasks:
+
+### Requirements Engineer Agent
+Use the **requirements-engineer agent** when needing to:
+- **Manage Model**: Managing project specifications and model structure
+- **Create Requirements**: Adding new requirements or verifications to the specifications
+- **Update Specifications**: Updating or fixing existing requirements and verifications
+- **Add Features**: Adding new feature requirements to the model with proper traceability
+- **Analyze Relations**: Understanding relations between elements (verify, derivedFrom, satisfiedBy, etc.)
+- **Find Issues**: Finding redundant or missing relations, coverage gaps, or structural issues
+- **Review Structure**: Reviewing requirement structures and traceability
+- **Analyze Coverage**: Analyzing verification coverage and traceability
+- **Change Impact**: Understanding change impacts and propagation through the model
+- **Model Inquiries**: Any inquiry related to model analysis, requirements, verifications, or relations
+- **Report Analysis**: Generating or interpreting reports (summary, traces, coverage, matrix, etc.)
+
+**IMPORTANT**: The requirements-engineer agent is specifically designed to work with Reqvire specifications and model analysis. It works ONLY with specification files (Markdown) and model analysis - **it NEVER implements code** (Rust, tests, etc.). Always delegate specification management and model analysis tasks to this agent, but use other approaches for code implementation.
+
+### E2E Test Engineer Agent
+Use the **e2e-test-engineer agent** when needing to:
+- **Implement Tests**: Creating new e2e tests for unverified functionality
+- **Update Tests**: Updating existing tests to maintain consistency with implementation
+- **Review Tests**: Reviewing test coverage and quality
+- **Verify Functionality**: Ensuring all Reqvire functionality has corresponding e2e tests
+- **Satisfy Verifications**: Creating tests that properly satisfy verification requirements
+- **Maintain Tests**: Fixing broken tests or updating tests after implementation changes
+- **Analyze Test Coverage**: Analyzing test coverage gaps or test effectiveness
+
+The e2e-test-engineer agent is specifically designed to work with Reqvire's e2e test suite and ensure all functionality is properly verified. Always delegate test implementation and maintenance tasks to this specialized agent.
 
 ## Building and Running Reqvire
 
@@ -24,14 +68,15 @@ This guide is split into domain-specific guides for better organization:
 
 ### Basic Reqvire Commands
 - **Validate structure**: `./target/debug/reqvire validate --json > /tmp/validation.json`
-- **Format requirements (preview only)**: `./target/debug/reqvire format --dry-run`
-- **Apply formatting fixes**: `./target/debug/reqvire format`
+- **Format requirements (preview)**: `./target/debug/reqvire format`
+- **Apply formatting fixes**: `./target/debug/reqvire format --fix`
 - **Generate diagrams**: `./target/debug/reqvire generate-diagrams`
 - **Generate model summary**: `./target/debug/reqvire summary`
 - **Generate model summary (JSON)**: `./target/debug/reqvire summary --json > /tmp/model-summary.json`
 - **Generate section summary**: `./target/debug/reqvire section-summary`
 - **Generate section summary (JSON)**: `./target/debug/reqvire section-summary --json > /tmp/section-summary.json`
-- **Generate HTML documentation**: `./target/debug/reqvire html --output <OUTPUT_DIR>` - Generates HTML output with index, diagrams, traces, coverage, and matrix
+- **Export HTML documentation**: `./target/debug/reqvire export --output <OUTPUT_DIR>` - Exports HTML with index, diagrams, traces, coverage, and matrix
+- **Serve HTML documentation**: `./target/debug/reqvire serve --host localhost --port 8080` - Exports to temp dir and serves via HTTP server (quiet mode)
 - **Analyze change impact**: `./target/debug/reqvire change-impact --git-commit=<COMMIT_HASH>`
 - **Analyze change impact (JSON)**: `./target/debug/reqvire change-impact --git-commit=HEAD~1 --json > /tmp/impact.json`
 - **Generate verification traces**: `./target/debug/reqvire traces` - Generates upward traceability from verifications to root requirements with Mermaid diagrams

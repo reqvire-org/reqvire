@@ -13,12 +13,12 @@ cd "$TEST_DIR"
 # Use the reqvire binary provided by test runner
 REQVIRE="$REQVIRE_BIN"
 
-# Test 1: Requirement - System shall provide format command and dry-run functionality
+# Test 1: Requirement - System shall provide format command with dry-run as default
 echo "Starting test..." > test_results.log
 
-echo "Running: reqvire format --dry-run" >> test_results.log
+echo "Running: reqvire format (preview mode - default)" >> test_results.log
 set +e
-"$REQVIRE" format --dry-run > dry_run_output.txt 2>&1
+"$REQVIRE" format > dry_run_output.txt 2>&1
 DRY_RUN_EXIT_CODE=$?
 set -e
 
@@ -95,10 +95,10 @@ if ! grep -q "$EXPECTED_VERIFICATION_ABSOLUTE_PATH" dry_run_clean.txt; then
     exit 1
 fi
 
-# Test 2: Apply formatting changes
-echo "Running: reqvire format" >> test_results.log
+# Test 2: Apply formatting changes with --fix flag
+echo "Running: reqvire format --fix" >> test_results.log
 set +e
-"$REQVIRE" format > format_output.txt 2>&1
+"$REQVIRE" format --fix > format_output.txt 2>&1
 FORMAT_EXIT_CODE=$?
 set -e
 
@@ -272,9 +272,9 @@ else
 fi
 
 # Test 4: Verify no additional changes needed (idempotent behavior)
-echo "Running: reqvire format --dry-run (second time)" >> test_results.log
+echo "Running: reqvire format (preview mode - second time)" >> test_results.log
 set +e
-"$REQVIRE" format --dry-run > no_changes_output.txt 2>&1
+"$REQVIRE" format > no_changes_output.txt 2>&1
 NO_CHANGES_EXIT_CODE=$?
 set -e
 
@@ -323,10 +323,10 @@ fi
 # Any changes to line numbering will be caught by the diff comparison in Test 1.2
 
 # Test 7: Test JSON output functionality
-# Run format with --json flag on current files to test JSON output
-echo "Running: reqvire format --dry-run --json" >> test_results.log
+# Run format with --json flag on current files to test JSON output (default preview mode)
+echo "Running: reqvire format --json" >> test_results.log
 set +e
-"$REQVIRE" format --dry-run --json > json_format_output.txt 2>&1
+"$REQVIRE" format --json > json_format_output.txt 2>&1
 JSON_FORMAT_EXIT_CODE=$?
 set -e
 

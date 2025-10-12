@@ -9,6 +9,36 @@ use regex::Regex;
 use rustc_hash::FxHasher;
 use std::hash::{Hasher};
 use crate::git_commands;
+use std::cell::RefCell;
+
+thread_local! {
+    static QUIET_MODE: RefCell<bool> = RefCell::new(false);
+}
+
+/// Enable quiet mode (suppress verbose output)
+pub fn enable_quiet_mode() {
+    QUIET_MODE.with(|quiet| *quiet.borrow_mut() = true);
+}
+
+/// Disable quiet mode (show verbose output)
+pub fn disable_quiet_mode() {
+    QUIET_MODE.with(|quiet| *quiet.borrow_mut() = false);
+}
+
+/// Check if quiet mode is enabled
+pub fn is_quiet_mode() -> bool {
+    QUIET_MODE.with(|quiet| *quiet.borrow())
+}
+
+/// Prints to stdout only if quiet mode is not enabled
+#[macro_export]
+macro_rules! info_println {
+    ($($arg:tt)*) => {{
+        if !$crate::utils::is_quiet_mode() {
+            println!($($arg)*);
+        }
+    }};
+}
 
 
 /// Checks if a file should be processed

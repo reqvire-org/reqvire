@@ -106,4 +106,7 @@ pub enum ReqvireError {
     #[error("Validation failed with {} errors", .0.len())]
     ValidationError(Vec<ReqvireError>),
 
+    #[error("Serialization error: {0}")]
+    SerializationError(String),
+
 }

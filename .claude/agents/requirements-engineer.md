@@ -234,14 +234,18 @@ reqvire change-impact --git-commit=<commit> [--json]
 # Generate traceability matrix
 reqvire matrix [--json]
 
-# Generate verification traces
+# Generate verification traces (includes redundant_relations field in JSON)
 reqvire traces [--json] [--filter-id=<id>] [--filter-name=<regex>] [--filter-type=<type>]
 
 # Generate verification coverage report
 reqvire coverage [--json]
 
-# Format specifications
-reqvire format [--dry-run] [--json]
+# Lint specifications for all quality issues (dry-run by default)
+reqvire lint [--json] [--fix]
+reqvire lint --syntax                    # Only syntax/structural checks
+reqvire lint --redundant-verify         # Only redundant verify relations
+reqvire lint --redundant-hierarchy      # Only hierarchical relations needing review
+reqvire lint --syntax --redundant-verify --fix  # Combine checks and apply fixes
 
 # Generate HTML documentation
 reqvire html --output <dir>
@@ -355,6 +359,40 @@ reqvire change-impact --git-commit=HEAD~1 --json > /tmp/impact.json
 - **Use Details subsections** for complex acceptance criteria and rationale
 - **Validate immediately** after adding new requirements to catch structural issues
 
+### Visual Inspection with Playwright MCP:
+When working with HTML exports, traces, or other visual elements, you can use the Playwright MCP server to visually inspect the generated documentation:
+
+**Setup (user runs in separate shell):**
+```bash
+# User starts serve command in another shell
+./target/debug/reqvire serve --host localhost --port 8080
+```
+
+**Using Playwright MCP for Visual Verification:**
+```
+Ask the user to run `./target/debug/reqvire serve` in another shell, then use Playwright MCP tools to:
+- Navigate to http://localhost:8080 to view the model
+- Inspect traces visualization (http://localhost:8080/traces.html)
+- Check verification coverage (http://localhost:8080/coverage.html)
+- View traceability matrix (http://localhost:8080/matrix.svg)
+- Examine element pages and their relations
+```
+
+**When to Use Visual Inspection:**
+- **Traces analysis**: Visual verification that trace trees render correctly and relations are visible
+- **Coverage reports**: Check that coverage percentages and visual indicators display properly
+- **Matrix verification**: Verify traceability matrix layout and element connections
+- **Link validation**: Ensure clickable links navigate to correct elements
+- **Diagram rendering**: Confirm Mermaid diagrams render properly with correct styling
+- **Layout issues**: Identify visual problems that are hard to detect from HTML source
+
+**Visual Inspection Workflow:**
+1. Request user to start serve command: `./target/debug/reqvire serve --port 8080`
+2. Use Playwright MCP to navigate and inspect pages
+3. Take screenshots if issues are found for documentation
+4. Report findings with specific page URLs and visual evidence
+5. After inspection, user can stop server with Ctrl-C
+
 #### New Feature Addition Workflow:
 1. Analyze existing requirements structure to understand where new feature fits
 2. Create user requirement with clear purpose and scope
@@ -362,8 +400,88 @@ reqvire change-impact --git-commit=HEAD~1 --json > /tmp/impact.json
 4. Add verification requirements to ensure testability
 5. Establish proper traceability relations (deriveFrom, verifiedBy)
 6. Add implementation relations (satisfiedBy) to design/code elements
-7. Validate with `reqvire validate` and resolve any issues
-8. Review overall impact and update related documentation
+7. **Clean up model**: Run `reqvire lint --fix` to automatically fix redundant verify relations and other semantic issues
+8. **Review manual items**: Check `reqvire lint --json` for any items in `needs_review` that require manual attention
+9. Review overall impact and update related documentation
+
+**Note**: Run `reqvire lint --fix` after completing a logical unit of work (e.g., adding a complete feature with its requirements, verifications, and relations) to ensure model quality.
+
+### Model Linting and Cleanup:
+
+**Simple Workflow:**
+
+```bash
+# 1. Apply all auto-fixes (ALWAYS SAFE)
+reqvire lint --fix
+
+# 2. Check what needs manual review
+reqvire lint --json > /tmp/lint.json
+```
+
+**Command Options:**
+
+```bash
+reqvire lint                    # Dry-run all checks
+reqvire lint --fix              # Apply all auto-fixes
+reqvire lint --syntax           # Only syntax/formatting
+reqvire lint --redundant-verify # Only redundant verify relations
+reqvire lint --json             # JSON output
+```
+
+**JSON Output Structure:**
+
+```json
+{
+  "auto_fixable": {
+    "syntax": [...],
+    "redundant_verify_relations": [...]
+  },
+  "needs_review": {
+    "maybe_redundant_hierarchical_relations": [...]
+  }
+}
+```
+
+**Handling Manual Reviews:**
+
+For `needs_review` items, read the affected specifications and provide feedback to user on whether the suggested change should be applied.
+
+**Example Cleanup:**
+
+Before:
+```markdown
+### OAuth Flow Test
+
+This test verifies OAuth authentication flow.
+
+#### Relations
+  * verify: [User Authentication](../UserRequirements.md#user-authentication)
+  * verify: [OAuth Implementation](../SystemRequirements.md#oauth-implementation)
+  * verify: [Session Management](../SystemRequirements.md#session-management)
+```
+
+After (removing redundant parent):
+```markdown
+### OAuth Flow Test
+
+This test verifies OAuth authentication flow.
+
+#### Relations
+  * verify: [OAuth Implementation](../SystemRequirements.md#oauth-implementation)
+  * verify: [Session Management](../SystemRequirements.md#session-management)
+```
+
+**Benefits of Removing Redundancy:**
+- Simplifies the requirements model
+- Reduces maintenance burden (fewer relations to update)
+- Maintains complete verification coverage through rollup
+- Makes traceability clearer by focusing on leaf requirements
+
+**When to Clean Up:**
+- After adding new requirements that change the hierarchy
+- During regular requirements reviews and audits
+- When verification traces become complex and hard to follow
+- Before major releases to ensure clean traceability
 
 ## Key Principles
 

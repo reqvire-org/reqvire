@@ -14,6 +14,7 @@ use reqvire::git_commands;
 use reqvire::matrix_generator;
 use reqvire::sections_summary;
 use reqvire::verification_trace;
+use reqvire::lint;
 use reqvire::GraphRegistry;
 use reqvire::graph_registry::{Page, Section};
 use reqvire::element::Element;
@@ -52,13 +53,25 @@ pub enum Commands {
         #[clap(long, short = 'o', default_value = "html")]
         output: String,
     },
-    
-    /// Format markdown files by applying automatic normalization and stylistic fixes
-    #[clap(override_help = "Format markdown files by applying automatic normalization and stylistic fixes\n\nFORMAT OPTIONS:\n      --dry-run  Show differences without applying changes\n      --json     Output results in JSON format")]
+
+    /// Serve model as browsable HTML documentation via HTTP server
+    #[clap(override_help = "Serve model as browsable HTML documentation via HTTP server\n\nSERVE OPTIONS:\n      --host <HOST>  Bind address (default: localhost)\n      --port <PORT>  Server port (default: 8080)")]
+    Serve {
+        /// Bind address
+        #[clap(long, default_value = "localhost", help_heading = "SERVE OPTIONS")]
+        host: String,
+
+        /// Server port
+        #[clap(long, default_value = "8080", help_heading = "SERVE OPTIONS")]
+        port: u16,
+    },
+
+    /// Format and normalize requirements files. By default, shows preview without applying changes
+    #[clap(override_help = "Format and normalize requirements files. By default, shows preview without applying changes\n\nFORMAT OPTIONS:\n      --fix      Apply formatting changes to files\n      --json     Output results in JSON format")]
     Format {
-        /// Show differences without applying changes
+        /// Apply formatting changes to files
         #[clap(long, help_heading = "FORMAT OPTIONS")]
-        dry_run: bool,
+        fix: bool,
 
         /// Output results in JSON format
         #[clap(long, help_heading = "FORMAT OPTIONS")]
@@ -115,7 +128,7 @@ pub enum Commands {
         #[clap(long, help_heading = "SUMMARY OPTIONS")]
         filter_is_not_satisfied: bool,
 
-        /// Output traceability matrix as SVG without hyperlinks and with full element names Cannot be used with --json
+        /// Output model as Cypher queries for graph database import. Cannot be used with --json
         #[clap(long, hide = true, conflicts_with_all = &["json"], help_heading = "SUMMARY OPTIONS")]
         cypher: bool,
     },
@@ -196,6 +209,38 @@ pub enum Commands {
         json: bool,
     },
 
+    /// Generate model structure diagram with optional filtering
+    #[clap(override_help = "Generate model structure diagram with optional filtering\n\nMODEL OPTIONS:\n      --root-id <ID>              Filter model from specific root element (forward relations only)\n      --json                      Output results in JSON format")]
+    Model {
+        /// Filter model from specific root element using forward-only relation traversal
+        #[clap(long, value_name = "ID", help_heading = "MODEL OPTIONS")]
+        root_id: Option<String>,
+
+        /// Output results in JSON format
+        #[clap(long, help_heading = "MODEL OPTIONS")]
+        json: bool,
+    },
+
+    /// Analyze model quality and detect issues in requirements relations
+    #[clap(override_help = "Analyze model quality and detect issues in requirements relations\n\nLINT OPTIONS:\n      --fixable                   Show only auto-fixable issues\n      --auditable                 Show only issues requiring manual review\n      --fix                       Apply automatic fixes for auto-fixable issues\n      --json                      Output results in JSON format")]
+    Lint {
+        /// Show only auto-fixable issues
+        #[clap(long, help_heading = "LINT OPTIONS", conflicts_with = "auditable")]
+        fixable: bool,
+
+        /// Show only issues requiring manual review
+        #[clap(long, help_heading = "LINT OPTIONS", conflicts_with = "fixable")]
+        auditable: bool,
+
+        /// Apply automatic fixes for auto-fixable issues
+        #[clap(long, help_heading = "LINT OPTIONS")]
+        fix: bool,
+
+        /// Output results in JSON format
+        #[clap(long, help_heading = "LINT OPTIONS")]
+        json: bool,
+    },
+
     /// Interactive shell for GraphRegistry operations (undocumented)
     #[clap(hide = true)]
     Shell,
@@ -236,6 +281,11 @@ fn print_custom_help(cmd: &clap::Command) {
     // Print commands
     println!("Commands:");
     for subcommand in cmd.get_subcommands() {
+        // Skip hidden commands
+        if subcommand.is_hide_set() {
+            continue;
+        }
+
         let name = subcommand.get_name();
         let about = subcommand.get_about().map(|s| s.to_string()).unwrap_or_default();
 
@@ -281,6 +331,11 @@ fn print_custom_help(cmd: &clap::Command) {
 
     // Print command-specific options organized by command
     for subcommand in cmd.get_subcommands() {
+        // Skip hidden commands
+        if subcommand.is_hide_set() {
+            continue;
+        }
+
         // Check if this command has nested subcommands (like verifications)
         if subcommand.has_subcommands() {
             // Print options for each nested subcommand
@@ -388,6 +443,8 @@ fn wants_json(args: &Args) -> bool {
         Some(Commands::Matrix { json, .. }) => *json,
         Some(Commands::Traces { json, .. }) => *json,
         Some(Commands::Coverage { json }) => *json,
+        Some(Commands::Model { json, .. }) => *json,
+        Some(Commands::Lint { json, .. }) => *json,
         _ => false,
     }
 }
@@ -539,7 +596,9 @@ pub fn handle_command(
                 
             return Ok(0);
         },
-        Some(Commands::Format { dry_run, json }) => {
+        Some(Commands::Format { fix, json }) => {
+            // Default is dry-run mode (preview only), --fix flag applies changes
+            let dry_run = !fix;
             let format_result = format_files(&model_manager.graph_registry, dry_run)?;
 
             if json {
@@ -609,6 +668,58 @@ pub fn handle_command(
             coverage_report.print(json);
             return Ok(0);
         },
+        Some(Commands::Model { root_id, json }) => {
+            // Generate model diagram with optional filtering
+            let forward_only = root_id.is_some(); // Use forward-only when filtering by root element
+            let output = diagrams::generate_model_report(
+                &model_manager.graph_registry,
+                root_id.as_deref(),
+                forward_only,
+                json
+            )?;
+            println!("{}", output);
+            return Ok(0);
+        },
+        Some(Commands::Lint { fixable, auditable, fix, json }) => {
+            // Run lint analysis
+            let lint_report = lint::analyze_model(&model_manager.graph_registry);
+
+            if fix {
+                // Apply automatic fixes
+                match lint_report.apply_fixes(&mut model_manager.graph_registry) {
+                    Ok(relations_removed) => {
+                        if relations_removed > 0 {
+                            // Rewrite all files with updated relations
+                            let format_result = format_files(&model_manager.graph_registry, false)?;
+
+                            if !json {
+                                println!("✅ Fixed {} redundant verify relation(s)\n", relations_removed);
+                                println!("Formatted {} file(s) with removed relations.\n", format_result.files_changed);
+                            }
+
+                            // Show remaining issues that need manual review
+                            if !lint_report.needs_manual_review.is_empty() {
+                                lint_report.print(json, false, true);  // Only show auditable issues
+                            }
+                        } else {
+                            if !json {
+                                println!("No auto-fixable issues found.\n");
+                            }
+                            lint_report.print(json, fixable, auditable);
+                        }
+                    }
+                    Err(e) => {
+                        eprintln!("❌ Failed to apply fixes: {}", e);
+                        return Ok(1);
+                    }
+                }
+            } else {
+                // Just print the report based on flags
+                lint_report.print(json, fixable, auditable);
+            }
+
+            return Ok(0);
+        },
         Some(Commands::Export { output }) => {
             let html_output_path = PathBuf::from(output);
             export::export_model_with_artifacts(
@@ -618,6 +729,23 @@ pub fn handle_command(
                 diagram_direction,
                 diagrams_with_blobs
             )?;
+
+            return Ok(0);
+        },
+        Some(Commands::Serve { host, port }) => {
+            // Enable quiet mode for serve command (suppress verbose export output)
+            reqvire::utils::enable_quiet_mode();
+
+            // Generate HTML artifacts in temporary directory
+            let temp_dir = export::generate_artifacts_in_temp(
+                &model_manager.graph_registry,
+                excluded_filename_patterns,
+                diagram_direction,
+                diagrams_with_blobs
+            )?;
+
+            // Start HTTP server (runs until Ctrl-C)
+            crate::serve::serve_directory(&temp_dir, &host, port)?;
 
             return Ok(0);
         },

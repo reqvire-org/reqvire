@@ -1545,7 +1545,7 @@ impl GraphRegistry {
         Ok(())
     }
 
-    /// Removes a specific relation between two elements
+    /// Removes a specific relation between two elements (graph structure only)
     pub fn remove_relation(&mut self, source_id: &str, target_id: &str, relation_type: &str) -> Result<(), ReqvireError> {
         if !self.nodes.contains_key(source_id) {
             return Err(ReqvireError::LocationNotFound(format!("Source element '{}' not found", source_id)));
@@ -1560,6 +1560,50 @@ impl GraphRegistry {
 
         if source_node.relations.len() == initial_count {
             return Err(ReqvireError::ProcessError(format!("Relation '{}' from '{}' to '{}' not found", relation_type, source_id, target_id)));
+        }
+
+        Ok(())
+    }
+
+    /// Removes a relation from an element's relations array with bidirectional handling
+    /// This removes the relation from element.relations (which gets written to markdown)
+    /// and also removes the opposite relation if one exists
+    pub fn remove_element_relation(&mut self, element_id: &str, target_id: &str, relation_type: &str) -> Result<(), ReqvireError> {
+        // Check if source element exists
+        if !self.nodes.contains_key(element_id) {
+            return Err(ReqvireError::LocationNotFound(format!("Element '{}' not found", element_id)));
+        }
+
+        // Check if target element exists
+        if !self.nodes.contains_key(target_id) {
+            return Err(ReqvireError::LocationNotFound(format!("Target element '{}' not found", target_id)));
+        }
+
+        // Remove the relation from source element's relations array
+        let source_node = self.nodes.get_mut(element_id).unwrap();
+        let initial_count = source_node.element.relations.len();
+
+        source_node.element.relations.retain(|rel| {
+            !(rel.relation_type.name == relation_type &&
+              matches!(&rel.target.link, crate::relation::LinkType::Identifier(id) if id == target_id))
+        });
+
+        if source_node.element.relations.len() == initial_count {
+            return Err(ReqvireError::ProcessError(
+                format!("Relation '{}' from '{}' to '{}' not found", relation_type, element_id, target_id)
+            ));
+        }
+
+        // Check if this relation type has an opposite (bidirectional)
+        if let Some(relation_info) = crate::relation::RELATION_TYPES.get(relation_type) {
+            if let Some(opposite_type) = relation_info.opposite {
+                // Remove the opposite relation from target element
+                let target_node = self.nodes.get_mut(target_id).unwrap();
+                target_node.element.relations.retain(|rel| {
+                    !(rel.relation_type.name == opposite_type &&
+                      matches!(&rel.target.link, crate::relation::LinkType::Identifier(id) if id == element_id))
+                });
+            }
         }
 
         Ok(())

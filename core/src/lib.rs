@@ -19,6 +19,8 @@ pub mod matrix_generator;
 pub mod graph_registry;
 pub mod format;
 pub mod verification_trace;
+pub mod trace_tree_builder;
+pub mod lint;
 
 // Re-export commonly used modules
 pub use crate::model::ModelManager;

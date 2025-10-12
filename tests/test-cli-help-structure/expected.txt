@@ -4,7 +4,8 @@ Usage: reqvire [OPTIONS] <COMMAND> [COMMAND OPTIONS]
 
 Commands:
   export            Export model to browsable HTML documentation with complete traceability
-  format            Format markdown files by applying automatic normalization and stylistic fixes
+  serve             Serve model as browsable HTML documentation via HTTP server
+  format            Format and normalize requirements files. By default, shows preview without applying changes
   validate          Validate model
   generate-diagrams Generate mermaid diagrams in markdown files showing requirements relationships The diagrams will be placed at the top of each requirements document
   remove-diagrams   Remove all generated mermaid diagrams from markdown files
@@ -14,8 +15,8 @@ Commands:
   matrix            Generate verification traceability matrix showing requirements and their verification status
   traces            Generate verification traces showing upward paths from verifications to root requirements
   coverage          Generate verification coverage report for leaf requirements
-  shell             Interactive shell for GraphRegistry operations (undocumented)
-  sout              Single output stream for all pages, sections, and requirements (undocumented)
+  model             Generate model structure diagram with optional filtering
+  lint              Analyze model quality and detect issues in requirements relations
   help               Print this message or the help of the given subcommand(s)
 
 Options:
@@ -26,8 +27,12 @@ Options:
 EXPORT OPTIONS:
       --output <OUTPUT>         Output directory for HTML files
 
+SERVE OPTIONS:
+      --host <HOST>             Bind address
+      --port <PORT>             Server port
+
 FORMAT OPTIONS:
-      --dry-run                 Show differences without applying changes
+      --fix                     Apply formatting changes to files
       --json                    Output results in JSON format
 
 VALIDATE OPTIONS:
@@ -42,7 +47,7 @@ SUMMARY OPTIONS:
       --filter-content <REGEX>  Only include elements whose content matches this regular expression
       --filter-is-not-verified  Only include requirements that do NOT have any "verifiedBy" relations
       --filter-is-not-satisfied Only include requirements that do NOT have any "satisfiedBy" relations
-      --cypher                  Output traceability matrix as SVG without hyperlinks and with full element names Cannot be used with --json
+      --cypher                  Output model as Cypher queries for graph database import. Cannot be used with --json
 
 SECTION SUMMARY OPTIONS:
       --json                    Output results in JSON format
@@ -66,4 +71,14 @@ TRACES OPTIONS:
       --filter-type <TYPE>      Only include verifications of the given type e.g. `test-verification`, `analysis-verification`
 
 COVERAGE OPTIONS:
+      --json                    Output results in JSON format
+
+MODEL OPTIONS:
+      --root-id <ID>            Filter model from specific root element using forward-only relation traversal
+      --json                    Output results in JSON format
+
+LINT OPTIONS:
+      --fixable                 Show only auto-fixable issues
+      --auditable               Show only issues requiring manual review
+      --fix                     Apply automatic fixes for auto-fixable issues
       --json                    Output results in JSON format

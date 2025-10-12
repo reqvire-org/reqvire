@@ -1,0 +1,54 @@
+# Test Requirements
+
+## Hierarchical Requirements
+
+### Root Requirement
+
+This is the root requirement.
+
+#### Metadata
+  * type: user-requirement
+---
+
+### Parent Requirement
+
+This is a parent requirement derived from root.
+
+#### Relations
+  * derivedFrom: [Root Requirement](#root-requirement)
+---
+
+### Leaf Requirement
+
+This is a leaf requirement derived from parent.
+
+#### Relations
+  * derivedFrom: [Parent Requirement](#parent-requirement)
+  * verifiedBy: [Test Verification](Verifications/Tests.md#test-verification)
+---
+
+### Alternative Parent Requirement
+
+This is an alternative parent requirement also derived from root.
+
+#### Relations
+  * derivedFrom: [Root Requirement](#root-requirement)
+---
+
+### Single-Chain Redundant Requirement
+
+This requirement has derivedFrom to both parent and root through a SINGLE chain (safe to auto-remove the root relation).
+
+#### Relations
+  * derivedFrom: [Parent Requirement](#parent-requirement)
+---
+
+### Multi-Path Redundant Requirement
+
+This requirement reaches root through MULTIPLE paths (parent-requirement and alternative-parent-requirement), so the root relation is NOT safe to auto-remove.
+
+#### Relations
+  * derivedFrom: [Parent Requirement](#parent-requirement)
+  * derivedFrom: [Alternative Parent Requirement](#alternative-parent-requirement)
+  * derivedFrom: [Root Requirement](#root-requirement)
+---
