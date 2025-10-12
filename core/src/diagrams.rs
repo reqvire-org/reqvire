@@ -670,7 +670,7 @@ pub fn generate_model_diagram(registry: &GraphRegistry) -> Result<String, Reqvir
         diagram.push_str("  end\n"); // end folder
     }
 
-    // Now draw all relations between elements
+    // Now draw all relations between elements and to external resources
     for element in registry.get_all_elements() {
         let source_id = utils::hash_identifier(&element.identifier);
 
@@ -680,20 +680,40 @@ pub fn generate_model_diagram(registry: &GraphRegistry) -> Result<String, Reqvir
                 continue;
             }
 
-            if let relation::LinkType::Identifier(target_id) = &relation.target.link {
-                if included_elements.contains(target_id) {
-                    let target_hash = utils::hash_identifier(target_id);
-
-                    if let Some(info) = relation::RELATION_TYPES.get(relation.relation_type.name) {
-                        diagram.push_str(&format!(
-                            "  {} {}|{}| {};\n",
-                            source_id,
-                            info.arrow,
-                            info.label,
-                            target_hash,
-                        ));
+            let label = escape_label(&relation.target.text);
+            let target_hash = match &relation.target.link {
+                relation::LinkType::Identifier(target_id) => {
+                    if included_elements.contains(target_id) {
+                        utils::hash_identifier(target_id)
+                    } else {
+                        continue; // Skip relations to elements not in diagram
                     }
+                },
+                relation::LinkType::ExternalUrl(url) => {
+                    // Add external URL as a node
+                    let target_id = utils::hash_identifier(url);
+                    diagram.push_str(&format!("  {}[\"{}\"];\n", target_id, label));
+                    diagram.push_str(&format!("  class {} default;\n", target_id));
+                    target_id
+                },
+                relation::LinkType::InternalPath(path) => {
+                    // Add internal path (like code files) as a node
+                    let path_str = path.to_string_lossy();
+                    let target_id = utils::hash_identifier(&path_str);
+                    diagram.push_str(&format!("  {}[\"{}\"];\n", target_id, label));
+                    diagram.push_str(&format!("  class {} default;\n", target_id));
+                    target_id
                 }
+            };
+
+            if let Some(info) = relation::RELATION_TYPES.get(relation.relation_type.name) {
+                diagram.push_str(&format!(
+                    "  {} {}|{}| {};\n",
+                    source_id,
+                    info.arrow,
+                    info.label,
+                    target_hash,
+                ));
             }
         }
     }
