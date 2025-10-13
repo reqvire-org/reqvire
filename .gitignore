@@ -27,3 +27,6 @@ codefetch.config.mjs
 
 # Playwrightmcp
 .playwright-mcp/
+
+# Claude Code local settings (user-specific, not plugin files)
+.claude/
