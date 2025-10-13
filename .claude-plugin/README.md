@@ -40,19 +40,21 @@ Expert agent for setting up Reqvire in new projects:
 
 **Install Command**: `curl -fsSL https://raw.githubusercontent.com/reqvire-org/reqvire/main/scripts/install.sh | bash`
 
-#### E2E Test Engineer Agent
-Expert agent for implementing and maintaining end-to-end tests:
+#### Task Master Agent
+Expert agent for analyzing requirement changes and creating implementation plans:
 
-- **Implement Tests**: Create comprehensive e2e tests that satisfy verification requirements
-- **Update Tests**: Maintain tests in sync with implementation changes
-- **Review Tests**: Analyze test coverage and quality
-- **Verify Functionality**: Ensure all Reqvire features have corresponding tests
-- **Satisfy Verifications**: Create proper satisfiedBy relationships
-- **Maintain Tests**: Fix broken tests and update after implementation changes
-- **Analyze Coverage**: Identify coverage gaps and test effectiveness
+- **Analyze Changes**: Runs change-impact analysis from git commits
+- **Trace Requirements**: Identifies new and modified requirements with full traceability
+- **Generate Tasks**: Creates comprehensive TodoWrite task plans with checkboxes
+- **Link to Source**: Provides git blob links to exact requirement versions
+- **Test Mapping**: Maps requirements → verifications → tests for complete workflow
+- **Track Progress**: Uses TodoWrite for real-time task tracking
+- **Repository-Agnostic**: Creates abstract tasks without implementation assumptions
 
-**Model**: Claude Sonnet
-**When to use**: Any task involving e2e tests, test implementation, or verification coverage
+**Model**: Claude Opus
+**When to use**: Creating implementation plans from requirement changes on feature branches
+
+**Workflow**: Compares feature branch against base branch, analyzes changed requirements, generates phased task list with links, tests, and traceability updates
 
 ### ⚡ Custom Commands
 
@@ -222,7 +224,7 @@ The agents know how to use these commands effectively:
 ├── agents/
 │   ├── requirements-engineer.md       # Requirements management agent
 │   ├── project-bootstrapper.md        # Project setup agent
-│   └── e2e-test-engineer.md          # Test engineering agent
+│   └── task-master.md                 # Implementation planning agent
 ├── commands/
 │   └── find-redundant-verifications.md   # Redundancy analysis command
 └── templates/
@@ -254,7 +256,7 @@ Same license as the Reqvire project. See the main repository for details.
 ### 1.0.0 (Initial Release)
 - Requirements Engineer Agent (Claude Opus) - Manage specifications and requirements
 - Project Bootstrapper Agent (Claude Sonnet) - Set up Reqvire in new projects
-- E2E Test Engineer Agent (Claude Sonnet) - Implement and maintain tests
+- Task Master Agent (Claude Opus) - Analyze requirement changes and generate implementation plans
 - Find Redundant Verifications Command - Analyze and clean up model
 - Template system with CLAUDE.md guides for bootstrapping
 - Marketplace support for easy distribution

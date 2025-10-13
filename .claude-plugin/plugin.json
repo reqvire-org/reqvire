@@ -18,7 +18,8 @@
   ],
   "agents": [
     "agents/requirements-engineer.md",
-    "agents/project-bootstrapper.md"
+    "agents/project-bootstrapper.md",
+    "agents/task-master.md"
   ],
   "commands": [
     "commands/find-redundant-verifications.md"
