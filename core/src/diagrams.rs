@@ -235,7 +235,7 @@ impl<'a> ModelDiagramGenerator<'a> {
 
     /// Generate Mermaid diagram from model report
     pub fn generate_mermaid(&self, report: &ModelDiagramReport) -> String {
-        let mut diagram = String::from("```mermaid\ngraph TD;\n");
+        let mut diagram = String::from("```mermaid\ngraph LR;\n");
 
         // Add auto-generation marker
         diagram.push_str(&format!("  %% {}\n", AUTOGEN_DIAGRAM_MARKER));
@@ -291,13 +291,18 @@ impl<'a> ModelDiagramGenerator<'a> {
         }
 
         // Add relations
+        let mut added_external_nodes = HashSet::new();
         for relation in &report.relations {
             let source_id = utils::hash_identifier(&relation.source_id);
             let target_id = if relation.is_external {
                 let target_hash = utils::hash_identifier(&relation.target_id);
-                let label = escape_label(&relation.target_label);
-                diagram.push_str(&format!("  {}[\"{}\"];\n", target_hash, label));
-                diagram.push_str(&format!("  class {} default;\n", target_hash));
+                // Only add external node definition once
+                if !added_external_nodes.contains(&target_hash) {
+                    let label = escape_label(&relation.target_label);
+                    diagram.push_str(&format!("  {}[\"{}\"];\n", target_hash, label));
+                    diagram.push_str(&format!("  class {} default;\n", target_hash));
+                    added_external_nodes.insert(target_hash.clone());
+                }
                 target_hash
             } else {
                 utils::hash_identifier(&relation.target_id)

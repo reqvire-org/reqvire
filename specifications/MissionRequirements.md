@@ -15,7 +15,7 @@ graph LR;
   class 80166c5161b33956 userRequirement;
   click 80166c5161b33956 "MissionRequirements.md#promote-automation-and-efficiency";
   2c5f30f14e792200["MOE_UA"];
-  class 2c5f30f14e792200 userRequirement;
+  class 2c5f30f14e792200 default;
   click 2c5f30f14e792200 "MOEs.md#moe_ua";
   80166c5161b33956 -.->|trace| 2c5f30f14e792200;
   98eaeddc27f99e11["Integrate with GitHub Workflows"];
@@ -29,6 +29,14 @@ graph LR;
   b74eec7ed767e7c["Align with Industry Standards"];
   class b74eec7ed767e7c userRequirement;
   click b74eec7ed767e7c "MissionRequirements.md#align-with-industry-standards";
+  e9ad540a6411a0fc["MOE_CE"];
+  class e9ad540a6411a0fc default;
+  click e9ad540a6411a0fc "MOEs.md#moe_ce";
+  b74eec7ed767e7c -.->|trace| e9ad540a6411a0fc;
+  f25cbfbca6d6d92e["Validate Relation Types"];
+  class f25cbfbca6d6d92e userRequirement;
+  click f25cbfbca6d6d92e "UserRequirements.md#validate-relation-types";
+  b74eec7ed767e7c -.->|deriveReqT| f25cbfbca6d6d92e;
   974ccf933675ef44["Format Consistency Enforcement"];
   class 974ccf933675ef44 userRequirement;
   click 974ccf933675ef44 "UserRequirements.md#format-consistency-enforcement";
@@ -37,26 +45,18 @@ graph LR;
   class ed31b6bed1cde2f8 userRequirement;
   click ed31b6bed1cde2f8 "UserRequirements.md#provide-validation-reports";
   b74eec7ed767e7c -.->|deriveReqT| ed31b6bed1cde2f8;
-  586b073cd97908da["Validate Markdown Structure"];
-  class 586b073cd97908da userRequirement;
-  click 586b073cd97908da "UserRequirements.md#validate-markdown-structure";
-  b74eec7ed767e7c -.->|deriveReqT| 586b073cd97908da;
-  c50887ce89be280a["Validate Internal Consistency"];
-  class c50887ce89be280a userRequirement;
-  click c50887ce89be280a "UserRequirements.md#validate-internal-consistency";
-  b74eec7ed767e7c -.->|deriveReqT| c50887ce89be280a;
-  f25cbfbca6d6d92e["Validate Relation Types"];
-  class f25cbfbca6d6d92e userRequirement;
-  click f25cbfbca6d6d92e "UserRequirements.md#validate-relation-types";
-  b74eec7ed767e7c -.->|deriveReqT| f25cbfbca6d6d92e;
   3bd9d29239564eeb["Validate Cross-Component Dependencies"];
   class 3bd9d29239564eeb userRequirement;
   click 3bd9d29239564eeb "UserRequirements.md#validate-cross-component-dependencies";
   b74eec7ed767e7c -.->|deriveReqT| 3bd9d29239564eeb;
-  e9ad540a6411a0fc["MOE_CE"];
-  class e9ad540a6411a0fc userRequirement;
-  click e9ad540a6411a0fc "MOEs.md#moe_ce";
-  e9ad540a6411a0fc -.->|deriveReqT| b74eec7ed767e7c;
+  c50887ce89be280a["Validate Internal Consistency"];
+  class c50887ce89be280a userRequirement;
+  click c50887ce89be280a "UserRequirements.md#validate-internal-consistency";
+  b74eec7ed767e7c -.->|deriveReqT| c50887ce89be280a;
+  586b073cd97908da["Validate Markdown Structure"];
+  class 586b073cd97908da userRequirement;
+  click 586b073cd97908da "UserRequirements.md#validate-markdown-structure";
+  b74eec7ed767e7c -.->|deriveReqT| 586b073cd97908da;
 ```
 ### Align with Industry Standards
 
@@ -66,7 +66,7 @@ The system must adhere to widely recognized industry standards, such as ISO/IEC/
   * type: user-requirement
 
 #### Relations
-  * derivedFrom: [MOE_CE](MOEs.md#moe_ce)
+  * trace: [MOE_CE](MOEs.md#moe_ce)
 ---
 
 ### Promote Automation and Efficiency

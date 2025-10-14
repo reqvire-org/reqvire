@@ -197,16 +197,28 @@ pub const HTML_TEMPLATE: &str = r#"
     <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.5.0/dist/svg-pan-zoom.min.js"></script>
     <script>
+        // Capture Mermaid errors
+        mermaid.parseError = function(err, hash) {
+            console.error('Mermaid Parse Error:', err);
+            console.error('Error details:', {
+                str: err.str,
+                hash: err.hash,
+                message: err.message,
+                stack: err.stack
+            });
+        };
+
         mermaid.initialize({
             startOnLoad: true,
             theme: 'neutral',
-            maxTextSize: 90000,
+            maxTextSize: 120000,
             flowchart: {
                 useMaxWidth: true,
                 htmlLabels: true,
                 curve: 'basis'
             },
-            securityLevel: 'loose'
+            securityLevel: 'loose',
+            logLevel: 'error'
         });
 
         // Add pan/zoom to all Mermaid diagrams after rendering

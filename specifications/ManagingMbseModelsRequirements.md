@@ -10,79 +10,66 @@ graph LR;
   classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  16b4b380c917deb1["Project Configuration with YAML"];
-  class 16b4b380c917deb1 userRequirement;
-  click 16b4b380c917deb1 "ManagingMbseModelsRequirements.md#project-configuration-with-yaml";
-  be83c2991e9535c7["Ignoring Unstructured Documents"];
-  class be83c2991e9535c7 systemRequirement;
-  click be83c2991e9535c7 "SystemRequirements/Requirements.md#ignoring-unstructured-documents";
-  16b4b380c917deb1 -.->|deriveReqT| be83c2991e9535c7;
-  7bdf935ec6d8effe["Subdirectory Processing Option"];
-  class 7bdf935ec6d8effe systemRequirement;
-  click 7bdf935ec6d8effe "SystemRequirements/Requirements.md#subdirectory-processing-option";
-  16b4b380c917deb1 -.->|deriveReqT| 7bdf935ec6d8effe;
-  d9354ef2eca0f2d0["Configurable User Requirements Root Folder"];
-  class d9354ef2eca0f2d0 userRequirement;
-  click d9354ef2eca0f2d0 "ManagingMbseModelsRequirements.md#configurable-user-requirements-root-folder";
-  16b4b380c917deb1 -.->|deriveReqT| d9354ef2eca0f2d0;
-  f0d721424636370e["Coexistence of Structured and Unstructured Documents"];
-  class f0d721424636370e userRequirement;
-  click f0d721424636370e "ManagingMbseModelsRequirements.md#coexistence-of-structured-and-unstructured-documents";
-  f0d721424636370e -.->|deriveReqT| be83c2991e9535c7;
   c9cc6878a73bb951["Default Requirement Type Assignment"];
   class c9cc6878a73bb951 userRequirement;
   click c9cc6878a73bb951 "ManagingMbseModelsRequirements.md#default-requirement-type-assignment";
+  9b1d716eb258dd43["Default Element Type Assignment Test"];
+  class 9b1d716eb258dd43 verification;
+  click 9b1d716eb258dd43 "Verifications/ValidationTests.md#default-element-type-assignment-test";
+  c9cc6878a73bb951 -.->|verifiedBy| 9b1d716eb258dd43;
   649d72765b13e14f["Git Repository as Project Root"];
   class 649d72765b13e14f userRequirement;
   click 649d72765b13e14f "ManagingMbseModelsRequirements.md#git-repository-as-project-root";
-  649d72765b13e14f -.->|deriveReqT| 16b4b380c917deb1;
   d193d11c43776bec["Efficient Processing"];
   class d193d11c43776bec userRequirement;
   click d193d11c43776bec "ManagingMbseModelsRequirements.md#efficient-processing";
-  a9d6e2569d5acd60["User Requirement Root Folders Support"];
-  class a9d6e2569d5acd60 systemRequirement;
-  click a9d6e2569d5acd60 "SystemRequirements/Requirements.md#user-requirement-root-folders-support";
-  d9354ef2eca0f2d0 -.->|deriveReqT| a9d6e2569d5acd60;
-  d9354ef2eca0f2d0 -.->|deriveReqT| c9cc6878a73bb951;
-  e61b7c1baa89bfc6["Managing MBSE Models"];
-  class e61b7c1baa89bfc6 userRequirement;
-  click e61b7c1baa89bfc6 "UserStories.md#managing-mbse-models";
-  2c5f30f14e792200["MOE_UA"];
-  class 2c5f30f14e792200 userRequirement;
-  click 2c5f30f14e792200 "MOEs.md#moe_ua";
-  e61b7c1baa89bfc6 -.->|trace| 2c5f30f14e792200;
-  2f4125edaacb1231["Documentation Index for HTML Export"];
-  class 2f4125edaacb1231 userRequirement;
-  click 2f4125edaacb1231 "UserRequirements.md#documentation-index-for-html-export";
-  e61b7c1baa89bfc6 -.->|deriveReqT| 2f4125edaacb1231;
-  f28849d46c19af44["CLI interface"];
-  class f28849d46c19af44 userRequirement;
-  click f28849d46c19af44 "UserRequirements.md#cli-interface";
-  e61b7c1baa89bfc6 -.->|deriveReqT| f28849d46c19af44;
-  cd2d5dab49985ca2["AI-Assisted MBSE Model Management"];
-  class cd2d5dab49985ca2 userRequirement;
-  click cd2d5dab49985ca2 "UserStories.md#ai-assisted-mbse-model-management";
-  e61b7c1baa89bfc6 -.->|deriveReqT| cd2d5dab49985ca2;
-  a44b59684c593d1e["Browse Model via Web Interface"];
-  class a44b59684c593d1e userRequirement;
-  click a44b59684c593d1e "UserRequirements.md#browse-model-via-web-interface";
-  e61b7c1baa89bfc6 -.->|deriveReqT| a44b59684c593d1e;
-  e61b7c1baa89bfc6 -.->|deriveReqT| f0d721424636370e;
-  e61b7c1baa89bfc6 -.->|deriveReqT| 649d72765b13e14f;
-  e61b7c1baa89bfc6 -.->|deriveReqT| d193d11c43776bec;
-  ade67c27bc5d3bbd["Structure and Addressing in Markdown Documents"];
-  class ade67c27bc5d3bbd userRequirement;
-  click ade67c27bc5d3bbd "SpecificationsRequirements.md#structure-and-addressing-in-markdown-documents";
-  e61b7c1baa89bfc6 -.->|deriveReqT| ade67c27bc5d3bbd;
+  f0d721424636370e["Coexistence of Structured and Unstructured Documents"];
+  class f0d721424636370e userRequirement;
+  click f0d721424636370e "ManagingMbseModelsRequirements.md#coexistence-of-structured-and-unstructured-documents";
+  be83c2991e9535c7["Ignoring Unstructured Documents"];
+  class be83c2991e9535c7 systemRequirement;
+  click be83c2991e9535c7 "SystemRequirements/Requirements.md#ignoring-unstructured-documents";
+  f0d721424636370e -.->|deriveReqT| be83c2991e9535c7;
   80166c5161b33956["Promote Automation and Efficiency"];
   class 80166c5161b33956 userRequirement;
   click 80166c5161b33956 "MissionRequirements.md#promote-automation-and-efficiency";
+  2c5f30f14e792200["MOE_UA"];
+  class 2c5f30f14e792200 default;
+  click 2c5f30f14e792200 "MOEs.md#moe_ua";
   80166c5161b33956 -.->|trace| 2c5f30f14e792200;
   98eaeddc27f99e11["Integrate with GitHub Workflows"];
   class 98eaeddc27f99e11 userRequirement;
   click 98eaeddc27f99e11 "UserStories.md#integrate-with-github-workflows";
   80166c5161b33956 -.->|deriveReqT| 98eaeddc27f99e11;
   80166c5161b33956 -.->|deriveReqT| d193d11c43776bec;
+  e61b7c1baa89bfc6["Managing MBSE Models"];
+  class e61b7c1baa89bfc6 userRequirement;
+  click e61b7c1baa89bfc6 "UserStories.md#managing-mbse-models";
+  e61b7c1baa89bfc6 -.->|trace| 2c5f30f14e792200;
+  e61b7c1baa89bfc6 -.->|deriveReqT| c9cc6878a73bb951;
+  ade67c27bc5d3bbd["Structure and Addressing in Markdown Documents"];
+  class ade67c27bc5d3bbd userRequirement;
+  click ade67c27bc5d3bbd "SpecificationsRequirements.md#structure-and-addressing-in-markdown-documents";
+  e61b7c1baa89bfc6 -.->|deriveReqT| ade67c27bc5d3bbd;
+  f28849d46c19af44["CLI interface"];
+  class f28849d46c19af44 userRequirement;
+  click f28849d46c19af44 "UserRequirements.md#cli-interface";
+  e61b7c1baa89bfc6 -.->|deriveReqT| f28849d46c19af44;
+  a44b59684c593d1e["Browse Model via Web Interface"];
+  class a44b59684c593d1e userRequirement;
+  click a44b59684c593d1e "UserRequirements.md#browse-model-via-web-interface";
+  e61b7c1baa89bfc6 -.->|deriveReqT| a44b59684c593d1e;
+  e61b7c1baa89bfc6 -.->|deriveReqT| 649d72765b13e14f;
+  cd2d5dab49985ca2["AI-Assisted MBSE Model Management"];
+  class cd2d5dab49985ca2 userRequirement;
+  click cd2d5dab49985ca2 "UserStories.md#ai-assisted-mbse-model-management";
+  e61b7c1baa89bfc6 -.->|deriveReqT| cd2d5dab49985ca2;
+  e61b7c1baa89bfc6 -.->|deriveReqT| d193d11c43776bec;
+  e61b7c1baa89bfc6 -.->|deriveReqT| f0d721424636370e;
+  2f4125edaacb1231["Documentation Index for HTML Export"];
+  class 2f4125edaacb1231 userRequirement;
+  click 2f4125edaacb1231 "UserRequirements.md#documentation-index-for-html-export";
+  e61b7c1baa89bfc6 -.->|deriveReqT| 2f4125edaacb1231;
 ```
 ### Coexistence of Structured and Unstructured Documents
 
@@ -121,63 +108,6 @@ All paths specified in the Reqvire configuration will be resolved relative to th
   * derivedFrom: [Managing MBSE Models](UserStories.md#managing-mbse-models)
 ---
 
-### Project Configuration with YAML
-
-DEPRECATED: This requirement is deprecated and removed. Configuration files are no longer supported.
-
-The system shall NOT support YAML-based configuration files. All configuration is now done via hardcoded constants in the code.
-
-#### Details
-This requirement has been completely deprecated and removed from Reqvire.
-
-**Previous behavior (deprecated):**
-- System supported reqvire.yaml configuration files
-- Configuration parameters included `user_requirements_root_folder` and `diagram_direction`
-- Configuration files could be specified via `-c, --config` CLI option
-
-**New behavior:**
-- No configuration file support
-- Configuration is done via hardcoded constants (e.g., DEFAULT_DIAGRAM_DIRECTION = "LR")
-- All configuration parameters have been removed
-- Element type defaults to 'requirement' regardless of file location
-
-**Rationale for deprecation:**
-- Simplifies system architecture by removing configuration layer
-- Reduces complexity and potential configuration errors
-- Promotes convention over configuration approach
-- Makes system behavior more predictable and consistent
-
-#### Metadata
-  * type: user-requirement
-
-#### Relations
-  * derivedFrom: [Git Repository as Project Root](#git-repository-as-project-root)
----
-
-### Configurable User Requirements Root Folder
-
-DEPRECATED: This requirement is deprecated and will be removed in a future version.
-
-The system shall NOT provide folder-based automatic element type assignment. Element types must be explicitly specified in metadata.
-
-#### Details
-This requirement deprecates the previous `user_requirements_root_folder` configuration parameter from `reqvire.yaml`.
-
-The folder-based type assignment feature has been removed to simplify the system and provide more explicit control over element types. Users must now specify element types explicitly in the Metadata subsection using the `type` property.
-
-**Rationale for deprecation:**
-- Explicit type specification is clearer and less error-prone
-- Removes implicit behavior that depends on file location
-- Simplifies configuration and reduces confusion
-- Aligns with principle of explicit over implicit configuration
-
-#### Metadata
-  * type: user-requirement
-
-#### Relations
-  * derivedFrom: [Project Configuration with YAML](#project-configuration-with-yaml)
----
-
 ### Default Requirement Type Assignment
 
 The system shall automatically assign the **default type `requirement`** to all elements if not explicitly specified in their `metadata` subsection.
@@ -211,5 +141,5 @@ When an element does not have a `#### Metadata` subsection with a `type` propert
   * type: user-requirement
 
 #### Relations
-  * derivedFrom: [Project Configuration with YAML](#project-configuration-with-yaml)
+  * derivedFrom: [Managing MBSE Models](UserStories.md#managing-mbse-models)
 ---
