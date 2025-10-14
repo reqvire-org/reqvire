@@ -1,0 +1,2 @@
+# Exclude expected output files
+expected_*.md

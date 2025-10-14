@@ -1,7 +1,6 @@
 
 paths:
   user_requirements_root_folder: "."
-    - ./software
 
 style:
   theme: "light"

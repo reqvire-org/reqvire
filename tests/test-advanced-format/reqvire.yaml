@@ -3,4 +3,3 @@ default_types:
   other: requirement
 
 paths:
-    - "expected_*.md"
