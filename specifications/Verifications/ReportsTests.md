@@ -92,9 +92,9 @@ This test verifies that the system provides a CLI flag and functionality for gen
   * type: test-verification
 
 #### Relations
-  * verify: [Display Name-Regex Option in Help](../SystemRequirements/Requirements.md#display-name-regex-option-in-help)
-  * verify: [Model Summary Fine Grained Filtering](../SystemRequirements/Requirements.md#model-summary-fine-grained-filtering)
-  * verify: [Handle Invalid Regex Filter Patterns](../SystemRequirements/Requirements.md#handle-invalid-regex-filter-patterns)
+  * verify: [Display Name-Regex Option in Help](../ReqvireTool/UserInterface/CLI.md#display-name-regex-option-in-help)
+  * verify: [Model Summary Fine Grained Filtering](../ReqvireTool/ValidationAndReporting/Reports.md#model-summary-fine-grained-filtering)
+  * verify: [Handle Invalid Regex Filter Patterns](../ReqvireTool/UserInterface/CLI.md#handle-invalid-regex-filter-patterns)
   * satisfiedBy: [test.sh](../../tests/test-model-summary-reports/test.sh)
 ---
 
@@ -153,7 +153,7 @@ This test verifies that the system correctly generates verification coverage rep
   * type: test-verification
 
 #### Relations
-  * verify: [CLI Coverage Command](../SystemRequirements/Requirements.md#cli-coverage-command)
+  * verify: [CLI Coverage Command](../ReqvireTool/UserInterface/CLI.md#cli-coverage-command)
   * satisfiedBy: [test.sh](../../tests/test-coverage-report/test.sh)
 ---
 
@@ -206,7 +206,7 @@ This test verifies that the system provides `section-summary` command functional
   * type: test-verification
 
 #### Relations
-  * verify: [CLI Sections Summary Command](../SystemRequirements/Requirements.md#cli-sections-summary-command)
+  * verify: [CLI Sections Summary Command](../ReqvireTool/UserInterface/CLI.md#cli-sections-summary-command)
   * satisfiedBy: [test.sh](../../tests/test-sections-summary/test.sh)
 ---
 
@@ -299,7 +299,7 @@ This test verifies that the verification-traces command filter options work corr
   * type: test-verification
 
 #### Relations
-  * verify: [CLI Traces Filter Options](../SystemRequirements/Requirements.md#cli-traces-filter-options)
+  * verify: [CLI Traces Filter Options](../ReqvireTool/UserInterface/CLI.md#cli-traces-filter-options)
   * satisfiedBy: [test.sh](../../tests/test-verification-traces/test.sh)
 ---
 
@@ -376,7 +376,7 @@ This test verifies that the --from-folder option correctly generates relative li
   * type: test-verification
 
 #### Relations
-  * verify: [CLI Traces From-Folder Option](../SystemRequirements/Requirements.md#cli-traces-from-folder-option)
+  * verify: [CLI Traces From-Folder Option](../ReqvireTool/UserInterface/CLI.md#cli-traces-from-folder-option)
   * satisfiedBy: [test.sh](../../tests/test-verification-traces/test.sh)
 ---
 
@@ -447,8 +447,8 @@ Comprehensive test verifying model command generates correct output in different
   * type: test-verification
 
 #### Relations
-  * verify: [Forward-Only Relation Traversal](../SystemRequirements/Requirements.md#forward-only-relation-traversal)
-  * verify: [Model Diagram Output Formats](../SystemRequirements/Requirements.md#model-diagram-output-formats)
+  * verify: [Forward-Only Relation Traversal](../ReqvireTool/ValidationAndReporting/Reports.md#forward-only-relation-traversal)
+  * verify: [Model Diagram Output Formats](../ReqvireTool/ValidationAndReporting/Reports.md#model-diagram-output-formats)
 ---
 
 ### Custom Element Type Tracking Test
@@ -530,6 +530,6 @@ This test verifies that the system correctly tracks and displays custom element 
   * type: test-verification
 
 #### Relations
-  * verify: [Custom Element Type Tracking](../SystemRequirements/Requirements.md#custom-element-type-tracking)
+  * verify: [Custom Element Type Tracking](../ReqvireTool/ValidationAndReporting/Reports.md#custom-element-type-tracking)
   * satisfiedBy: [test.sh](../../tests/test-model-summary-reports/test.sh)
 ---

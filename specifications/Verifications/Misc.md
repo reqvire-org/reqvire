@@ -39,7 +39,7 @@ This test verifies that the system exports specifications into HTML format with 
   * type: test-verification
 
 #### Relations
-  * verify: [Index Generation](../SystemRequirements/Requirements.md#index-generation)
+  * verify: [Index Generation](../ReqvireTool/UserInterface/WebInterface.md#index-generation)
   * satisfiedBy: [test.sh](../../tests/test-html-export/test.sh)
 ---
 
@@ -88,16 +88,16 @@ This test verifies that the CLI help output displays all commands and their opti
   * type: test-verification
 
 #### Relations
-  * verify: [Format Command](../SystemRequirements/Requirements.md#format-command)
-  * verify: [Validate Command](../SystemRequirements/Requirements.md#validate-command)
-  * verify: [HTML Export](../SystemRequirements/Requirements.md#html-export)
-  * verify: [CLI Generate Diagrams Flag](../SystemRequirements/Requirements.md#cli-generate-diagrams-flag)
-  * verify: [CLI Remove Diagrams Flag](../SystemRequirements/Requirements.md#cli-remove-diagrams-flag)
-  * verify: [CLI Sections Summary Command](../SystemRequirements/Requirements.md#cli-sections-summary-command)
-  * verify: [CLI Change Impact Report Command](../SystemRequirements/Requirements.md#cli-change-impact-report-command)
-  * verify: [CLI Matrix Command](../SystemRequirements/Requirements.md#cli-matrix-command)
-  * verify: [CLI Traces Command](../SystemRequirements/Requirements.md#cli-traces-command)
-  * verify: [CLI Coverage Command](../SystemRequirements/Requirements.md#cli-coverage-command)
+  * verify: [Format Command](../ReqvireTool/UserInterface/CLI.md#format-command)
+  * verify: [Validate Command](../ReqvireTool/UserInterface/CLI.md#validate-command)
+  * verify: [HTML Export](../ReqvireTool/UserInterface/WebInterface.md#html-export)
+  * verify: [CLI Generate Diagrams Flag](../ReqvireTool/UserInterface/CLI.md#cli-generate-diagrams-flag)
+  * verify: [CLI Remove Diagrams Flag](../ReqvireTool/UserInterface/CLI.md#cli-remove-diagrams-flag)
+  * verify: [CLI Sections Summary Command](../ReqvireTool/UserInterface/CLI.md#cli-sections-summary-command)
+  * verify: [CLI Change Impact Report Command](../ReqvireTool/UserInterface/CLI.md#cli-change-impact-report-command)
+  * verify: [CLI Matrix Command](../ReqvireTool/UserInterface/CLI.md#cli-matrix-command)
+  * verify: [CLI Traces Command](../ReqvireTool/UserInterface/CLI.md#cli-traces-command)
+  * verify: [CLI Coverage Command](../ReqvireTool/UserInterface/CLI.md#cli-coverage-command)
   * satisfiedBy: [test.sh](../../tests/test-cli-help-structure/test.sh)
 ---
 
@@ -209,8 +209,8 @@ This test verifies the format command requirements from SystemRequirements and U
   * type: test-verification
 
 #### Relations
-  * verify: [Format Command](../SystemRequirements/Requirements.md#format-command)
-  * verify: [Document Structure Normalization](../SystemRequirements/Requirements.md#document-structure-normalization)
+  * verify: [Format Command](../ReqvireTool/UserInterface/CLI.md#format-command)
+  * verify: [Document Structure Normalization](../ReqvireTool/ValidationAndReporting/Formatting.md#document-structure-normalization)
   * verify: [Structure of Markdown Documents](../SpecificationsRequirements.md#structure-of-markdown-documents)
   * satisfiedBy: [test.sh](../../tests/test-advanced-format/test.sh)
 ---
@@ -247,7 +247,7 @@ This test verifies that the serve command exports HTML to a temporary directory 
   * type: test-verification
 
 #### Relations
-  * verify: [Serve Command](../SystemRequirements/Requirements.md#serve-command)
+  * verify: [Serve Command](../ReqvireTool/UserInterface/WebInterface.md#serve-command)
   * satisfiedBy: [test.sh](../../tests/test-serve-command/test.sh)
 ---
 
@@ -336,8 +336,8 @@ This test verifies that the lint command analyzes model quality, detects issues 
   * type: test-verification
 
 #### Relations
-  * verify: [Redundant Verify Relations Detection](../SystemRequirements/Requirements.md#redundant-verify-relations-detection)
-  * verify: [Safe Redundant Hierarchical Relations Auto-Removal](../SystemRequirements/Requirements.md#safe-redundant-hierarchical-relations-auto-removal)
-  * verify: [Lint Output Formatting](../SystemRequirements/Requirements.md#lint-output-formatting)
-  * verify: [Lint Auto-fix Capability](../SystemRequirements/Requirements.md#lint-auto-fix-capability)
+  * verify: [Redundant Verify Relations Detection](../ReqvireTool/ValidationAndReporting/Lint.md#redundant-verify-relations-detection)
+  * verify: [Safe Redundant Hierarchical Relations Auto-Removal](../ReqvireTool/ValidationAndReporting/Lint.md#safe-redundant-hierarchical-relations-auto-removal)
+  * verify: [Lint Output Formatting](../ReqvireTool/ValidationAndReporting/Lint.md#lint-output-formatting)
+  * verify: [Lint Auto-fix Capability](../ReqvireTool/ValidationAndReporting/Lint.md#lint-auto-fix-capability)
 ---

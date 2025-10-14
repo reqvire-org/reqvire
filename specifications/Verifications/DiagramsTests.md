@@ -34,7 +34,7 @@ This test verifies that the system can automatically generate and embed mermaid 
 
 #### Relations
   * verify: [Automate Diagram Generation](../UserRequirements.md#automate-diagram-generation)
-  * verify: [Auto-Generated Diagram Identification](../SystemRequirements/Requirements.md#auto-generated-diagram-identification)
+  * verify: [Auto-Generated Diagram Identification](../ReqvireTool/ModelManagement/DiagramGeneration.md#auto-generated-diagram-identification)
   * satisfiedBy: [test.sh](../../tests/test-diagram-generation/test.sh)
 ---
 
@@ -87,7 +87,7 @@ This test verifies that the system automatically generates and updates diagrams 
   * type: test-verification
 
 #### Relations
-  * verify: [Automated Diagram Generation on PR Merge](../SystemRequirements/Requirements.md#automated-diagram-generation-on-pr-merge)
+  * verify: [Automated Diagram Generation on PR Merge](../Integrations/GitHub.md#automated-diagram-generation-on-pr-merge)
   * satisfiedBy: [generate_diagrams.yml](../../.github/workflows/generate_diagrams.yml)
 ---
 
@@ -115,7 +115,7 @@ This test verifies that the system correctly filters relations in diagram genera
   * type: test-verification
 
 #### Relations
-  * verify: [Diagram Relation Filtering](../SystemRequirements/Requirements.md#diagram-relation-filtering)
+  * verify: [Diagram Relation Filtering](../ReqvireTool/ModelManagement/DiagramGeneration.md#diagram-relation-filtering)
   * satisfiedBy: [test.sh](../../tests/test-diagram-filtering/test.sh)
 ---
 
@@ -149,7 +149,7 @@ This test verifies that the system can remove all generated mermaid diagrams whi
   * type: test-verification
 
 #### Relations
-  * verify: [Auto-Generated Diagram Identification](../SystemRequirements/Requirements.md#auto-generated-diagram-identification)
+  * verify: [Auto-Generated Diagram Identification](../ReqvireTool/ModelManagement/DiagramGeneration.md#auto-generated-diagram-identification)
   * satisfiedBy: [test.sh](../../tests/test-remove-diagrams/test.sh)
 ---
 
@@ -182,5 +182,5 @@ This test verifies that the export command generates model.svg showing the compl
   * type: test-verification
 
 #### Relations
-  * verify: [Model Diagram SVG Generation](../SystemRequirements/Requirements.md#model-diagram-svg-generation)
+  * verify: [Model Diagram SVG Generation](../ReqvireTool/UserInterface/WebInterface.md#model-diagram-svg-generation)
 ---

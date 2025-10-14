@@ -26,7 +26,7 @@ This test verifies that the system can generate a traceability matrix that accur
   * type: test-verification
 
 #### Relations
-  * verify: [Traceability Matrix Builder Implementation](../SystemRequirements/Requirements.md#traceability-matrix-builder-implementation)
+  * verify: [Traceability Matrix Builder Implementation](../ReqvireTool/ModelManagement/TraceabilityMatrix.md#traceability-matrix-builder-implementation)
   * verify: [Include Verification Checkboxes](../UserRequirements.md#include-verification-checkboxes)
   * satisfiedBy: [test.sh](../../tests/test-matrix-generation/test.sh)
 ---
@@ -82,7 +82,7 @@ This test verifies that the system can generate an SVG representation of the tra
   * type: test-verification
 
 #### Relations
-  * verify: [CLI Matrix SVG Flag](../SystemRequirements/Requirements.md#cli-matrix-svg-flag)
+  * verify: [CLI Matrix SVG Flag](../ReqvireTool/ModelManagement/TraceabilityMatrix.md#cli-matrix-svg-flag)
   * satisfiedBy: [test.sh](../../tests/test-matrix-generation/test.sh)
 ---
 
@@ -106,7 +106,7 @@ This test verifies that the traceability matrix properly represents the hierarch
   * type: test-verification
 
 #### Relations
-  * verify: [Traceability Matrix Builder Implementation](../SystemRequirements/Requirements.md#traceability-matrix-builder-implementation)
+  * verify: [Traceability Matrix Builder Implementation](../ReqvireTool/ModelManagement/TraceabilityMatrix.md#traceability-matrix-builder-implementation)
   * satisfiedBy: [test.sh](../../tests/test-matrix-generation/test.sh)
 ---
 
@@ -132,7 +132,7 @@ This test verifies that the system can export the traceability matrix in a struc
   * type: test-verification
 
 #### Relations
-  * verify: [Markdown Matrix Formatter](../SystemRequirements/Requirements.md#markdown-matrix-formatter)
+  * verify: [Markdown Matrix Formatter](../ReqvireTool/ModelManagement/TraceabilityMatrix.md#markdown-matrix-formatter)
   * verify: [Export Traceability Matrix](../UserRequirements.md#export-traceability-matrix)
   * satisfiedBy: [test.sh](../../tests/test-matrix-generation/test.sh)
 ---

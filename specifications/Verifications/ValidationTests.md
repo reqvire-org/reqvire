@@ -52,12 +52,12 @@ This verification test checks that Reqvire correctly identifies and reports inva
   * type: test-verification
 
 #### Relations
-  * verify: [Validate Command](../SystemRequirements/Requirements.md#validate-command)
-  * verify: [Validation Error Handling](../SystemRequirements/TwoPassValidation.md#validation-error-handling)
-  * verify: [Relation Type Validation](../SystemRequirements/Requirements.md#relation-type-validation)
-  * verify: [Relation Element Type Validator](../SystemRequirements/Requirements.md#relation-element-type-validator)
+  * verify: [Validate Command](../ReqvireTool/UserInterface/CLI.md#validate-command)
+  * verify: [Validation Error Handling](../ReqvireTool/ValidationAndReporting/Validation.md#validation-error-handling)
+  * verify: [Relation Type Validation](../ReqvireTool/ValidationAndReporting/Validation.md#relation-type-validation)
+  * verify: [Relation Element Type Validator](../ReqvireTool/ValidationAndReporting/Validation.md#relation-element-type-validator)
   * verify: [Identifiers and Relations](../SpecificationsRequirements.md#identifiers-and-relations)
-  * verify: [Trace Relation Non-Directional Behavior](../SystemRequirements/Requirements.md#trace-relation-non-directional-behavior)
+  * verify: [Trace Relation Non-Directional Behavior](../ReqvireTool/ModelManagement/DiagramGeneration.md#trace-relation-non-directional-behavior)
   * satisfiedBy: [test.sh](../../tests/test-invalid-relations/test.sh)
 ---
 
@@ -81,8 +81,8 @@ This test verifies that Reqvire correctly handles and validates relations to fra
   * type: test-verification
 
 #### Relations
-  * verify: [Relation Type Validation](../SystemRequirements/Requirements.md#relation-type-validation)
-  * verify: [Requirements Processing](../SystemRequirements/Requirements.md#requirements-processing)
+  * verify: [Relation Type Validation](../ReqvireTool/ValidationAndReporting/Validation.md#relation-type-validation)
+  * verify: [Requirements Processing](../ReqvireTool/Storage/Configuration.md#requirements-processing)
   * satisfiedBy: [test.sh](../../tests/test-fragment-relations/test.sh)
 ---
 
@@ -128,7 +128,7 @@ This test verifies that the system correctly searches for and detects structured
   * type: test-verification
 
 #### Relations
-  * verify: [Structured Markdown Files Search and Detection](../SystemRequirements/Requirements.md#structured-markdown-files-search-and-detection)
+  * verify: [Structured Markdown Files Search and Detection](../ReqvireTool/Storage/Configuration.md#structured-markdown-files-search-and-detection)
   * satisfiedBy: [test.sh](../../tests/test-excluded-patterns/test.sh)
 ---
 
@@ -205,8 +205,8 @@ This test verifies that Reqvire correctly reads and applies exclusion patterns f
   * type: test-verification
 
 #### Relations
-  * verify: [Ignore Files Integration](../SystemRequirements/Requirements.md#ignore-files-integration)
-  * verify: [Reserved Repository Files Exclusion](../SystemRequirements/Requirements.md#reserved-repository-files-exclusion)
+  * verify: [Ignore Files Integration](../ReqvireTool/Storage/Configuration.md#ignore-files-integration)
+  * verify: [Reserved Repository Files Exclusion](../ReqvireTool/Storage/Configuration.md#reserved-repository-files-exclusion)
   * satisfiedBy: [test.sh](../../tests/test-gitignore-integration/test.sh)
 ---
 
@@ -232,7 +232,7 @@ This test verifies that the system correctly validates relations to excluded fil
   * type: test-verification
 
 #### Relations
-  * verify: [Excluded File Relation Validation](../SystemRequirements/Requirements.md#excluded-file-relation-validation)
+  * verify: [Excluded File Relation Validation](../ReqvireTool/ValidationAndReporting/Validation.md#excluded-file-relation-validation)
   * satisfiedBy: [test.sh](../../tests/test-valid-relations/test.sh)
 ---
 
@@ -260,7 +260,7 @@ This test verifies that Reqvire correctly detects and reports invalid header str
   * type: test-verification
 
 #### Relations
-  * verify: [Markdown Structure Validator](../SystemRequirements/Requirements.md#markdown-structure-validator)
+  * verify: [Markdown Structure Validator](../ReqvireTool/ValidationAndReporting/Validation.md#markdown-structure-validator)
   * verify: [Structure of Markdown Documents](../SpecificationsRequirements.md#structure-of-markdown-documents)
   * satisfiedBy: [test.sh](../../tests/test-invalid-relations/test.sh)
 ---
@@ -294,7 +294,7 @@ This test verifies that the system correctly processes only files within the cur
   * type: test-verification
 
 #### Relations
-  * verify: [Subdirectory Processing Option](../SystemRequirements/Requirements.md#subdirectory-processing-option)
+  * verify: [Subdirectory Processing Option](../ReqvireTool/UserInterface/CLI.md#subdirectory-processing-option)
   * satisfiedBy: [test.sh](../../tests/test-subdirectory-functionality/test.sh)
 ---
 

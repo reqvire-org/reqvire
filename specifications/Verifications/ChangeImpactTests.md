@@ -30,9 +30,9 @@ This test verifies that the system correctly implements change impact detection,
   * type: test-verification
 
 #### Relations
-  * verify: [Change Impact Detection Algorithm](../SystemRequirements/ChangeImpactPropagation.md#change-impact-detection-algorithm)
-  * verify: [Change Impact Command Line Interface](../SystemRequirements/ChangeImpactPropagation.md#change-impact-command-line-interface)
-  * verify: [Smart Filtering for Change Impact Reports](../SystemRequirements/ChangeImpactPropagation.md#smart-filtering-for-change-impact-reports)
+  * verify: [Change Impact Detection Algorithm](../ReqvireTool/ModelManagement/ChangeImpact.md#change-impact-detection-algorithm)
+  * verify: [Change Impact Command Line Interface](../ReqvireTool/ModelManagement/ChangeImpact.md#change-impact-command-line-interface)
+  * verify: [Smart Filtering for Change Impact Reports](../ReqvireTool/ModelManagement/ChangeImpact.md#smart-filtering-for-change-impact-reports)
   * trace: [test.sh](../../tests/test-change-impact-detection/test.sh)
 ---
 
@@ -58,8 +58,8 @@ This test verifies that the system correctly handles different relation types wh
   * type: test-verification
 
 #### Relations
-  * verify: [Change Impact Detection Algorithm](../SystemRequirements/ChangeImpactPropagation.md#change-impact-detection-algorithm)
-  * verify: [Change Impact Command Line Interface](../SystemRequirements/ChangeImpactPropagation.md#change-impact-command-line-interface)
+  * verify: [Change Impact Detection Algorithm](../ReqvireTool/ModelManagement/ChangeImpact.md#change-impact-detection-algorithm)
+  * verify: [Change Impact Command Line Interface](../ReqvireTool/ModelManagement/ChangeImpact.md#change-impact-command-line-interface)
   * trace: [test.sh](../../tests/test-change-impact-detection/test.sh)
 ---
 
@@ -94,7 +94,7 @@ This test verifies that the system properly handles the git commit hash flag for
   * type: test-verification
 
 #### Relations
-  * verify: [CLI Git Commit Hash Flag](../SystemRequirements/Requirements.md#cli-git-commit-hash-flag)
+  * verify: [CLI Git Commit Hash Flag](../ReqvireTool/UserInterface/CLI.md#cli-git-commit-hash-flag)
   * trace: [test.sh](../../tests/test-change-impact-detection/test.sh)
 ---
 
@@ -125,8 +125,8 @@ This test verifies that the system correctly extracts element content for change
   * type: test-verification
 
 #### Relations
-  * verify: [Change Impact Detection Algorithm](../SystemRequirements/ChangeImpactPropagation.md#change-impact-detection-algorithm)
-  * verify: [Requirements Processing](../SystemRequirements/Requirements.md#requirements-processing)
+  * verify: [Change Impact Detection Algorithm](../ReqvireTool/ModelManagement/ChangeImpact.md#change-impact-detection-algorithm)
+  * verify: [Requirements Processing](../ReqvireTool/Storage/Configuration.md#requirements-processing)
   * trace: [test.sh](../../tests/test-element-content-extraction/test.sh)
 ---
 
@@ -240,6 +240,6 @@ This test verifies that the smart filtering correctly handles new elements in ch
   * type: test-verification
 
 #### Relations
-  * verify: [Smart Filtering for Change Impact Reports](../SystemRequirements/ChangeImpactPropagation.md#smart-filtering-for-change-impact-reports)
+  * verify: [Smart Filtering for Change Impact Reports](../ReqvireTool/ModelManagement/ChangeImpact.md#smart-filtering-for-change-impact-reports)
   * trace: [test.sh](../../tests/test-change-impact-smart-filtering/test.sh)
 ---

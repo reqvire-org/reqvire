@@ -43,8 +43,8 @@ The algorithm shall consist of the following steps:
    - Support incremental impact analysis for large models
 
 #### Relations
-  * derivedFrom: [Requirements Change Propagation](../SpecificationsRequirements.md#requirements-change-propagation)
-  * satisfiedBy: [change_impact.rs](../../core/src/change_impact.rs)
+  * derivedFrom: [Requirements Change Propagation](../../SpecificationsRequirements.md#requirements-change-propagation)
+  * satisfiedBy: [../../../core/src/change_impact.rs](../../../core/src/change_impact.rs)
 ---
 
 ### Change Impact Visualization
@@ -78,9 +78,9 @@ The visualization shall include:
    - Generate overall change impact assessment
 
 #### Relations
-  * derivedFrom: [Requirements Change Propagation](../SpecificationsRequirements.md#requirements-change-propagation)
-  * satisfiedBy: [change_impact.rs](../../core/src/change_impact.rs)
-  * verifiedBy: [Change Impact Detection Test](../Verifications/ChangeImpactTests.md#change-impact-detection-test)
+  * derivedFrom: [Requirements Change Propagation](../../SpecificationsRequirements.md#requirements-change-propagation)
+  * satisfiedBy: [../../../core/src/change_impact.rs](../../../core/src/change_impact.rs)
+  * verifiedBy: [Change Impact Detection Test](../../Verifications/ChangeImpactTests.md#change-impact-detection-test)
 ---
 
 ### Smart Filtering for Change Impact Reports
@@ -196,8 +196,8 @@ Changed Elements:
 </details>
 
 #### Relations
-  * derivedFrom: [Requirements Change Propagation](../SpecificationsRequirements.md#requirements-change-propagation)
-  * satisfiedBy: [change_impact.rs](../../core/src/change_impact.rs)
+  * derivedFrom: [Requirements Change Propagation](../../SpecificationsRequirements.md#requirements-change-propagation)
+  * satisfiedBy: [../../../core/src/change_impact.rs](../../../core/src/change_impact.rs)
 ---
 
 ### Change Impact Command Line Interface
@@ -226,6 +226,16 @@ The CLI shall support the following functionality:
    - Allow scripting of analysis operations
 
 #### Relations
-  * derivedFrom: [CLI Change Impact Report Command](Requirements.md#cli-change-impact-report-command)
-  * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
+  * derivedFrom: [CLI Change Impact Report Command](../UserInterface/CLI.md#cli-change-impact-report-command)
+  * satisfiedBy: [../../../cli/src/cli.rs](../../../cli/src/cli.rs)
+---
+
+## Change Analysis Requirements
+### Structural Change Analyzer
+
+The system shall implement a model change analyzer that identifies structural modifications between model versions, determines affected elements through relationship traversal, and categorizes impacts according to change propagation rules.
+
+#### Relations
+  * derivedFrom: [Tracing Structural Changes](../../UserRequirements.md#tracing-structural-changes)
+  * satisfiedBy: [../../../core/src/change_impact.rs](../../../core/src/change_impact.rs)
 ---
