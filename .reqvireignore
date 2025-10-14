@@ -6,13 +6,6 @@
 # Use cases and stories (kept in repo but not processed as structured requirements)
 Usecases.md
 
-# Architecture diagrams (kept in repo for reference but not processed)
-specifications/Logical*.md
-specifications/Physical*.md
-
-# Design specifications (kept in repo but not processed)
-specifications/DesignSpecifications/**
-
 # Development and planning documents
 TODO.md
 Plan.md

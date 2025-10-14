@@ -1,6 +1,6 @@
 {
-  "name": "Reqvire MBSE Plugin Marketplace",
-  "description": "Official marketplace for Reqvire Model-Based Systems Engineering plugins and tools",
+  "name": "reqvire-org-marketplace",
+  "description": "Official marketplace for reqvire-org plugins and tools",
   "plugins": [
     {
       "name": "reqvire",
