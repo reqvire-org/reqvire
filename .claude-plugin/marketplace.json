@@ -1,7 +1,10 @@
 {
   "name": "reqvire-org-marketplace",
   "description": "Official marketplace for reqvire-org plugins and tools",
-  "owner": "reqvire-org",
+  "owner": {
+    "name": "Ilija Ljubicic",
+    "email": "ilijaljubicic@users.noreply.github.com"
+  },
   "plugins": [
     {
       "name": "reqvire",
