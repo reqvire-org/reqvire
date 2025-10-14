@@ -10,7 +10,7 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=flat-square)](https://opensource.org/licenses/Apache-2.0)
 [![Rust](https://img.shields.io/badge/Built%20with-Rust-orange?style=flat-square&logo=rust)](https://www.rust-lang.org/)
 
-[📖 **Documentation**](https://www.reqvire.org) • [🚀 **Quick Start**](https://www.reqvire.org/getting-started) • [👥 **Contributing**](./doc/README.md) • [💬 **Community**](https://github.com/reqvire-org/reqvire/discussions)
+[📖 **Documentation**](https://www.reqvire.org) • [🚀 **Quick Start**](#get-started) • [👥 **Contributing**](./doc/README.md) • [💬 **Community**](https://github.com/reqvire-org/reqvire/discussions)
 
 </div>
 
