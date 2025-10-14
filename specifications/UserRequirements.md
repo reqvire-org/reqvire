@@ -365,7 +365,7 @@ graph LR;
   e61b7c1baa89bfc6 -.->|deriveReqT| 2f4125edaacb1231;
   b74eec7ed767e7c["Align with Industry Standards"];
   class b74eec7ed767e7c userRequirement;
-  click b74eec7ed767e7c "MissionRequirements.md#align-with-industry-standards";
+  click b74eec7ed767e7c "UserRequirements.md#align-with-industry-standards";
   e9ad540a6411a0fc["MOE_CE"];
   class e9ad540a6411a0fc default;
   click e9ad540a6411a0fc "MOEs.md#moe_ce";
@@ -463,7 +463,7 @@ The system shall provide formatting capability to ensure consistent formatting i
 
 #### Relations
   * derivedFrom: [Model Formatting](#model-formatting)
-  * derivedFrom: [Align with Industry Standards](MissionRequirements.md#align-with-industry-standards)
+  * derivedFrom: [Align with Industry Standards](UserRequirements.md#align-with-industry-standards)
 ---
 
 ### Documentation Index for HTML Export
@@ -486,7 +486,7 @@ The system shall validate the Markdown structure of MBSE documentation to ensure
 
 #### Relations
   * derivedFrom: [Validating Structures](UserStories.md#validating-structures)
-  * derivedFrom: [Align with Industry Standards](MissionRequirements.md#align-with-industry-standards)
+  * derivedFrom: [Align with Industry Standards](UserRequirements.md#align-with-industry-standards)
 ---
 
 ### Validate Filesystem Structure
@@ -509,7 +509,7 @@ The system shall check the internal consistency of the MBSE model, ensuring that
 
 #### Relations
   * derivedFrom: [Validating Structures](UserStories.md#validating-structures)
-  * derivedFrom: [Align with Industry Standards](MissionRequirements.md#align-with-industry-standards)
+  * derivedFrom: [Align with Industry Standards](UserRequirements.md#align-with-industry-standards)
 ---
 
 ### Validate Cross-Component Dependencies
@@ -521,7 +521,7 @@ The system shall validate dependencies across different components of the MBSE m
 
 #### Relations
   * derivedFrom: [Validating Structures](UserStories.md#validating-structures)
-  * derivedFrom: [Align with Industry Standards](MissionRequirements.md#align-with-industry-standards)
+  * derivedFrom: [Align with Industry Standards](UserRequirements.md#align-with-industry-standards)
 ---
 
 ### Validate Relation Types
@@ -533,7 +533,7 @@ The system shall validate relation types and allow only supported types.
 
 #### Relations
   * derivedFrom: [Validating Structures](UserStories.md#validating-structures)
-  * derivedFrom: [Align with Industry Standards](MissionRequirements.md#align-with-industry-standards)
+  * derivedFrom: [Align with Industry Standards](UserRequirements.md#align-with-industry-standards)
 ---
 
 ## Integrate with GitHub Workflows
@@ -687,7 +687,7 @@ graph LR;
   91a0adb0b4d959c4 -.->|deriveReqT| ed31b6bed1cde2f8;
   b74eec7ed767e7c["Align with Industry Standards"];
   class b74eec7ed767e7c userRequirement;
-  click b74eec7ed767e7c "MissionRequirements.md#align-with-industry-standards";
+  click b74eec7ed767e7c "UserRequirements.md#align-with-industry-standards";
   b74eec7ed767e7c -.->|trace| e9ad540a6411a0fc;
   f25cbfbca6d6d92e["Validate Relation Types"];
   class f25cbfbca6d6d92e userRequirement;
@@ -772,7 +772,7 @@ Validation shall be performed automatically when any command requires the parsed
 
 #### Relations
   * derivedFrom: [Provide Reports](UserStories.md#provide-reports)
-  * derivedFrom: [Align with Industry Standards](MissionRequirements.md#align-with-industry-standards)
+  * derivedFrom: [Align with Industry Standards](UserRequirements.md#align-with-industry-standards)
 ---
 
 ### Verification Coverage Report
@@ -1191,4 +1191,30 @@ The system shall provide command line interface (CLI) to faciliate model managem
 
 #### Relations
   * derivedFrom: [Managing MBSE Models](UserStories.md#managing-mbse-models)
+---
+
+## Mission requirements
+Mission requirements represent the high-level mission / enterprise  objectives, needs and measures of effectiveness, that a system must fulfill to align with the strategic goals of the organization and satisfy stakeholder expectations.
+
+
+### Align with Industry Standards
+
+The system must adhere to widely recognized industry standards, such as ISO/IEC/IEEE 15288, to ensure compatibility and relevance in systems engineering practices.
+
+#### Metadata
+  * type: user-requirement
+
+#### Relations
+  * trace: [MOE_CE](MOEs.md#moe_ce)
+---
+
+### Promote Automation and Efficiency
+
+The system must significantly reduce manual effort in managing requirements, models, and traceability by automating routine tasks.
+
+#### Metadata
+  * type: user-requirement
+
+#### Relations
+  * trace: [MOE_UA](MOEs.md#moe_ua)
 ---

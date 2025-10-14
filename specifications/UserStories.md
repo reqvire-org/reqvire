@@ -201,7 +201,7 @@ graph LR;
   5ef9c8ae19a9f55a -.->|deriveReqT| 1908501a80db5c46;
   80166c5161b33956["Promote Automation and Efficiency"];
   class 80166c5161b33956 userRequirement;
-  click 80166c5161b33956 "MissionRequirements.md#promote-automation-and-efficiency";
+  click 80166c5161b33956 "UserRequirements.md#promote-automation-and-efficiency";
   80166c5161b33956 -.->|trace| 2c5f30f14e792200;
   80166c5161b33956 -.->|deriveReqT| d193d11c43776bec;
   80166c5161b33956 -.->|deriveReqT| 98eaeddc27f99e11;
@@ -280,7 +280,7 @@ As a **Contributor**, I want Reqvire to integrate seamlessly with GitHub workflo
   * type: user-requirement
 
 #### Relations
-  * derivedFrom: [Promote Automation and Efficiency](MissionRequirements.md#promote-automation-and-efficiency)
+  * derivedFrom: [Promote Automation and Efficiency](UserRequirements.md#promote-automation-and-efficiency)
   * trace: [MOE_CE](MOEs.md#moe_ce)
 ---
 

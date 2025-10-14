@@ -63,7 +63,7 @@ graph LR;
   e61b7c1baa89bfc6 -.->|deriveReqT| 2f4125edaacb1231;
   80166c5161b33956["Promote Automation and Efficiency"];
   class 80166c5161b33956 userRequirement;
-  click 80166c5161b33956 "MissionRequirements.md#promote-automation-and-efficiency";
+  click 80166c5161b33956 "UserRequirements.md#promote-automation-and-efficiency";
   80166c5161b33956 -.->|trace| 2c5f30f14e792200;
   80166c5161b33956 -.->|deriveReqT| d193d11c43776bec;
   98eaeddc27f99e11["Integrate with GitHub Workflows"];
@@ -91,7 +91,7 @@ The system shall process structured documents and relations to extract model-rel
 
 #### Relations
   * derivedFrom: [Managing MBSE Models](UserStories.md#managing-mbse-models)
-  * derivedFrom: [Promote Automation and Efficiency](MissionRequirements.md#promote-automation-and-efficiency)
+  * derivedFrom: [Promote Automation and Efficiency](UserRequirements.md#promote-automation-and-efficiency)
 ---
 
 ### Git Repository as Project Root
