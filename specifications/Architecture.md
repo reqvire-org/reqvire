@@ -117,75 +117,25 @@ classDiagram
 The Physical Architecture represents the concrete systems, services, and components that implement the functionality of Reqvire. It defines the deployment-level structure of the tool, detailing how various components interact and are organized in the actual system.
 
 ```mermaid
-classDiagram
-    class Reqvire {
-        <<system>>
-    }
+graph TD
+    subgraph Reqvire["Reqvire System"]
+        subgraph ReqvireTool["ReqvireTool Subsystem"]
+            subgraph UserInterface["UserInterface"]
+                CLI["CLI"]
+                ChatOps["ChatOps"]
+            end
+            ModelManagement["ModelManagement"]
+            ValidationAndReporting["ValidationAndReporting"]
+            Storage["Storage"]
+        end
 
-    class ReqvireTool {
-        <<subsystem>>
-    }
-
-    class UserInterface {
-        <<component>>
-    }
-
-    class CLI {
-        <<component>>
-    }
-    class ChatOps {
-        <<component>>
-    }
-
-    class ModelManagement {
-        <<component>>
-    }
-
-    class ValidationAndReporting {
-        <<component>>
-    }
-
-    class Integrations {
-        <<subsystem>>
-    }
-
-    class GitHubIntegration {
-        <<component>>
-    }
-
-    class CICDIntegration {
-        <<component>>
-    }
-
-    class AIWorkflows {
-        <<workflow>>
-    }
-
-    class Storage {
-        <<component>>
-    }
-
-
-    %% Hierarchical Relationships
-    Reqvire --> ReqvireTool
-    Reqvire --> Integrations
-
-
-    ReqvireTool --> UserInterface
-    ReqvireTool --> Storage
-
-    UserInterface--> CLI
-    UserInterface--> ChatOps
-
-    ReqvireTool --> ModelManagement
-    ReqvireTool --> ValidationAndReporting
-
-    Integrations --> GitHubIntegration
-    Integrations --> CICDIntegration
-
-    CICDIntegration --> AIWorkflows
-
-
+        subgraph Integrations["Integrations Subsystem"]
+            GitHubIntegration["GitHubIntegration"]
+            subgraph CICDIntegration["CICDIntegration"]
+                AIWorkflows["AIWorkflows"]
+            end
+        end
+    end
 ```
 
 **Logical to Physical Architecture Mapping:**
