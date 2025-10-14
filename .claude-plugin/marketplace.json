@@ -8,7 +8,7 @@
   "plugins": [
     {
       "name": "reqvire",
-      "description": "Complete plugin for Reqvire - The AI-Native Requirements As A Code framework for Modern Engineering Teams",
+      "description": "Requirements As A Code framework",
       "version": "1.0.0",
       "author": {
         "name": "Ilija Ljubicic",

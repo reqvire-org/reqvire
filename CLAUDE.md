@@ -19,7 +19,6 @@ Reqvire is an AI-driven framework for system modeling and requirements managemen
 
 This guide is split into domain-specific guides for better organization:
 
-- **[specifications/CLAUDE.md](specifications/CLAUDE.md)** - Guide for writing and editing specifications, requirements, and verifications
 - **[tests/CLAUDE.md](tests/CLAUDE.md)** - Guide for writing and executing end-to-end tests
 - **Core Development** (see sections below) - Guide for Rust code development, architecture, and components
 
