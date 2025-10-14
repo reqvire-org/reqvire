@@ -1,27 +1,24 @@
 {
   "name": "reqvire-org-marketplace",
   "description": "Official marketplace for reqvire-org plugins and tools",
+  "owner": "reqvire-org",
   "plugins": [
     {
       "name": "reqvire",
-      "displayName": "Reqvire MBSE Plugin",
       "description": "Complete plugin for Reqvire - The AI-Native Requirements As A Code framework for Modern Engineering Teams",
       "version": "1.0.0",
-      "author": "Reqvire Team",
+      "author": {
+        "name": "Ilija Ljubicic",
+        "email": "ilijaljubicic@users.noreply.github.com"
+      },
       "repository": "https://github.com/reqvire-org/reqvire",
-      "source": ".",
+      "source": "./",
       "tags": [
         "mbse",
         "requirements",
         "systems-engineering",
         "verification",
         "traceability"
-      ],
-      "features": [
-        "Requirements Engineer Agent - Specialized agent for managing specifications and requirements",
-        "Project Bootstrapper Agent - Sets up Reqvire in new projects with guides and configuration",
-        "Task Master Agent - Analyzes requirement changes and generates implementation task plans",
-        "Find Redundant Verifications Command - Analyzes verification traces to identify redundant relations"
       ]
     }
   ]
