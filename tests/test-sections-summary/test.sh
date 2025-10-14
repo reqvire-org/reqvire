@@ -24,7 +24,7 @@ echo "Starting test..." > "${TEST_DIR}/test_results.log"
 
 echo "Running: reqvire section-summary --json" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" section-summary --json 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" section-summary --json 2>&1)
 EXIT_JSON=$?
 set -e
 
@@ -78,7 +78,7 @@ fi
 # Test 2: Base text sections summary
 echo "Running: reqvire section-summary" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT_TEXT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" section-summary 2>&1)
+OUTPUT_TEXT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" section-summary 2>&1)
 EXIT_TEXT=$?
 set -e
 
@@ -116,7 +116,7 @@ fi
 # Test 3: File filter
 echo "Running: reqvire section-summary --filter-file --json" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT_FILTERED=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" section-summary --filter-file="**/Requirements.md" --json 2>&1)
+OUTPUT_FILTERED=$(cd "$TEST_DIR" && "$REQVIRE_BIN" section-summary --filter-file="**/Requirements.md" --json 2>&1)
 EXIT_FILTERED=$?
 set -e
 
@@ -146,7 +146,7 @@ fi
 # Test 4: Section filter
 echo "Running: reqvire section-summary --filter-section --json" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT_SECTION_FILTERED=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" section-summary --filter-section="System*" --json 2>&1)
+OUTPUT_SECTION_FILTERED=$(cd "$TEST_DIR" && "$REQVIRE_BIN" section-summary --filter-section="System*" --json 2>&1)
 EXIT_SECTION_FILTERED=$?
 set -e
 
@@ -170,7 +170,7 @@ fi
 # Test 5: Content filter
 echo "Running: reqvire section-summary --filter-content --json" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT_CONTENT_FILTERED=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" section-summary --filter-content="MUST" --json 2>&1)
+OUTPUT_CONTENT_FILTERED=$(cd "$TEST_DIR" && "$REQVIRE_BIN" section-summary --filter-content="MUST" --json 2>&1)
 EXIT_CONTENT_FILTERED=$?
 set -e
 
@@ -194,7 +194,7 @@ fi
 # Test 6: Combined filters
 echo "Running: reqvire section-summary --filter-file --filter-section --json" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT_COMBINED=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" section-summary --filter-file="**/Requirements.md" --filter-section="System*" --json 2>&1)
+OUTPUT_COMBINED=$(cd "$TEST_DIR" && "$REQVIRE_BIN" section-summary --filter-file="**/Requirements.md" --filter-section="System*" --json 2>&1)
 EXIT_COMBINED=$?
 set -e
 

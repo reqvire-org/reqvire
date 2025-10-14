@@ -6,6 +6,9 @@
 
 This is an existing requirement.
 
+#### Metadata
+* type: user-requirement
+
 #### Relations
   * verifiedBy: [Existing Verification](#existing-verification)
 
@@ -14,6 +17,9 @@ This is an existing requirement.
 ### Existing Requirement Two
 
 This is another existing requirement.
+
+#### Metadata
+* type: user-requirement
 
 ---
 

@@ -53,7 +53,6 @@ pub fn parse_elements(
     file: &str,
     content: &str,
     file_path: &PathBuf,
-    user_requirements_root_folder: &Option<PathBuf>,
 ) -> (Vec<Element>, Vec<ReqvireError>, String, Vec<(String, String, usize)>) {
     let mut elements = Vec::new();
     let mut current_element: Option<Element> = None;
@@ -179,11 +178,8 @@ pub fn parse_elements(
                             } else {
                                 seen_identifiers.insert(identifier.clone());
 
-                                let element_type = if utils::is_in_user_requirements_root(&file_folder.to_path_buf(), user_requirements_root_folder) {
-                                    ElementType::Requirement(RequirementType::User)
-                                } else {
-                                    ElementType::Requirement(RequirementType::System)
-                                };
+                                // Default element type is always 'requirement' (location-independent)
+                                let element_type = ElementType::Requirement(RequirementType::System);
 
                                 let mut new_element = Element::new(
                                     &element_name,

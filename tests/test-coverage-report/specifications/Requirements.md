@@ -62,6 +62,9 @@ This is a demonstration-type verification for testing verification type breakdow
 
 This is a parent requirement that derives child requirements. It MAY be verified but it's not required.
 
+#### Metadata
+* type: user-requirement
+
 #### Relations
 * derive: [Leaf Requirement Verified](#leaf-requirement-verified)
 * derive: [Leaf Requirement Unverified](#leaf-requirement-unverified)
@@ -90,6 +93,9 @@ This is a leaf requirement that is NOT verified. Should be flagged as missing ve
 ### Another Leaf Requirement Verified
 
 This is another leaf requirement that is verified.
+
+#### Metadata
+* type: user-requirement
 
 #### Relations
 * verifiedBy: [Test Verification Unsatisfied](#test-verification-unsatisfied)

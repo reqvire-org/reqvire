@@ -29,7 +29,7 @@ echo "Starting test..." > "${TEST_DIR}/test_results.log"
 # Generate HTML
 echo "Running: reqvire export --output output" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" export --output output 2>&1)
+OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" export --output output 2>&1)
 EXIT_CODE=$?
 set -e
 

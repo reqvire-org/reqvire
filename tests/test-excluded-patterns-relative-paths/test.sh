@@ -19,7 +19,7 @@ printf "%s\n" "=== Test 1: Running from git root ===" >> "${TEST_DIR}/test_resul
 
 echo "Running: reqvire summary --json (from root)" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT_ROOT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" summary --json 2>&1)
+OUTPUT_ROOT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" summary --json 2>&1)
 EXIT_CODE_ROOT=$?
 set -e
 
@@ -36,7 +36,7 @@ printf "%s\n" "=== Test 2: Running from subfolder ===" >> "${TEST_DIR}/test_resu
 
 echo "Running: reqvire summary --json (from subfolder)" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT_SUB=$(cd "${TEST_DIR}/specifications/subfolder" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" summary --json 2>&1)
+OUTPUT_SUB=$(cd "${TEST_DIR}/specifications/subfolder" && "$REQVIRE_BIN" summary --json 2>&1)
 EXIT_CODE_SUB=$?
 set -e
 

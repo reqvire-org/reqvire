@@ -77,27 +77,6 @@ pub fn is_excluded_by_patterns(path: &Path, excluded_filename_patterns: &GlobSet
 }
 
 
-pub fn is_in_user_requirements_root(
-    file_folder: &PathBuf,
-    user_requirements_root_folder: &Option<PathBuf>,
-) -> bool {
-    if let Some(user_req_folder) = user_requirements_root_folder {
-        if user_req_folder.as_os_str().is_empty() {
-            return false;
-        }
-        
-        let canonical_file_folder = file_folder.canonicalize().ok();
-        let canonical_user_req_folder = user_req_folder.canonicalize().ok();
-
-        match (canonical_file_folder, canonical_user_req_folder) {
-            (Some(file), Some(user_req)) => file == user_req,
-            _ => false,
-        }
-    } else {
-        false
-    }
-}
-
 /// Scans the git root folder for markdown files, excluding files based on patterns.
 /// If the current working directory is a subfolder of the git root, only scans within that subfolder.
 /// 

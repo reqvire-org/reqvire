@@ -8,6 +8,9 @@ This file contains test requirements for validating the traceability matrix func
 
 This is a top-level requirement without parent relations.
 
+#### Metadata
+* type: user-requirement
+
 #### Details
 
 This requirement should appear as a root in the traceability matrix.
@@ -21,6 +24,9 @@ This requirement should appear as a root in the traceability matrix.
 ### Root Requirement Beta
 
 This is another top-level requirement without parent relations.
+
+#### Metadata
+* type: user-requirement
 
 #### Details
 
@@ -91,6 +97,9 @@ This requirement should appear indented under Root Requirement Beta in the matri
 
 This is a requirement without any verification.
 
+#### Metadata
+* type: user-requirement
+
 #### Details
 
 This requirement should appear with ❌ in the verification status column.
@@ -100,6 +109,9 @@ This requirement should appear with ❌ in the verification status column.
 ### Parent With Unverified Child
 
 This is a parent requirement that has both verified and unverified children.
+
+#### Metadata
+* type: user-requirement
 
 #### Details
 
@@ -141,6 +153,9 @@ This child has NO verification, causing parent to be unverified via roll-up.
 
 This is a parent requirement with NO direct verification but all children are verified.
 
+#### Metadata
+* type: user-requirement
+
 #### Details
 
 This requirement has no direct verifiedBy relations but should be marked as verified (✅) because ALL children are verified via roll-up strategy.
@@ -164,6 +179,9 @@ This child has direct verification, contributing to parent's verified status.
 ### Complex Root With Mixed Hierarchy
 
 This is a root requirement with NO direct verification, demonstrating roll-up through a complex hierarchy.
+
+#### Metadata
+* type: user-requirement
 
 #### Details
 

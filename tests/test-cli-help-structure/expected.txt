@@ -7,7 +7,7 @@ Commands:
   serve             Serve model as browsable HTML documentation via HTTP server
   format            Format and normalize requirements files. By default, shows preview without applying changes
   validate          Validate model
-  generate-diagrams Generate mermaid diagrams in markdown files showing requirements relationships The diagrams will be placed at the top of each requirements document
+  generate-diagrams Generate mermaid diagrams in markdown files showing requirements relationships. Diagrams are placed at the top of each section
   remove-diagrams   Remove all generated mermaid diagrams from markdown files
   summary           Output model registry and summary
   section-summary   Output sections summary showing files, section names, and section content without individual elements
@@ -20,7 +20,6 @@ Commands:
   help               Print this message or the help of the given subcommand(s)
 
 Options:
-  -c, --config <CONFIG>     Path to a custom configuration file (YAML format) If not provided, the system will look for reqvire.yml, reqvire.yaml, .reqvire.yml, or .reqvire.yaml in the current directory
   -h, --help               Print help
   -V, --version            Print version
 
@@ -37,6 +36,9 @@ FORMAT OPTIONS:
 
 VALIDATE OPTIONS:
       --json                    Output results in JSON format
+
+GENERATE DIAGRAMS OPTIONS:
+      --links-with-blobs        Use GitHub blob URLs in diagram links instead of relative paths
 
 SUMMARY OPTIONS:
       --json                    Output results in JSON format
@@ -66,6 +68,7 @@ MATRIX OPTIONS:
 TRACES OPTIONS:
       --json                    Output results in JSON format
       --from-folder <PATH>      Relative path to folder where output will be saved (for generating relative links in Mermaid diagrams)
+      --links-with-blobs        Use GitHub blob URLs in diagram links instead of relative paths
       --filter-id <ID>          Only include verification with this specific identifier
       --filter-name <REGEX>     Only include verifications whose name matches this regular expression
       --filter-type <TYPE>      Only include verifications of the given type e.g. `test-verification`, `analysis-verification`

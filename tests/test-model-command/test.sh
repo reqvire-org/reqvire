@@ -25,7 +25,7 @@ echo "Starting test..." > "${TEST_DIR}/test_results.log"
 # Test 1: Full Model Markdown Output - Compare against expected file
 echo "Running: reqvire model" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" model 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -70,7 +70,7 @@ fi
 # Test 2: Full Model JSON Output - Compare against expected file
 echo "Running: reqvire model --json" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model --json 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" model --json 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -126,7 +126,7 @@ fi
 # - "Markdown Output Format" (sibling, no relation)
 echo "Running: reqvire model --root-id (filtered)" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model \
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" model \
     --root-id="specifications/SystemRequirements.md#model-diagram-generation" 2>&1)
 EXIT_CODE=$?
 set -e
@@ -195,7 +195,7 @@ fi
 # Test 4: Filtered Model JSON Output
 echo "Running: reqvire model --root-id --json (filtered)" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" model \
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" model \
     --root-id="specifications/SystemRequirements.md#model-diagram-generation" --json 2>&1)
 EXIT_CODE=$?
 set -e

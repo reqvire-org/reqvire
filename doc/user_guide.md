@@ -41,58 +41,30 @@ reqvire --version
 
 ## Configuration
 
-Reqvire uses a YAML configuration file to customize its behavior.
+Reqvire uses simple file-based configuration for excluding files from processing:
 
-### Default Configuration File
+### File Exclusion
 
-By default, Reqvire looks for configuration in the following files (in order):
-- `reqvire.yaml`
-- `reqvire.yml`
-- `.reqvire.yaml`
-- `.reqvire.yml`
+You can exclude files from Reqvire processing using:
 
-### Custom Configuration
+1. **`.gitignore`** - Patterns in your repository's `.gitignore` are automatically excluded
+2. **`.reqvireignore`** - Create this file in your repository root for Reqvire-specific exclusions
 
-To use a custom configuration file:
-
-```bash
-reqvire -c path/to/custom-config.yaml
+Both files support standard gitignore pattern syntax:
+```
+# Example .reqvireignore
+**/TODO.md
+**/NOTES.md
+temp/
 ```
 
-### Configuration Options
+### Reserved Filenames
 
-Here's an example of a Reqvire configuration file:
-
-```yaml
-  # Path to the user requirements root folder
-  user_requirements_root_folder: "specifications"
-  
-  # Glob patterns to exclude from requirements processing
-  excluded_filename_patterns:
-    - "Usecases.md"
-    - "**/Logical*.md"
-    - "**/Physical*.md"
-    - "**/TODO.md"
-    - "**/tests/**"    
-    - "**/core/**"    
-    - "**/cli/**"            
-
-style:
-  # Theme for HTML output (default, dark, light)
-  theme: "default"
-  
-  # Maximum width for HTML output
-  max_width: 1200
-  
-  # Optional path to custom CSS file
-  # custom_css: "path/to/custom.css"
-  
-  # Diagram direction (TD for top-down, LR for left-to-right)
-  diagram_direction: "LR"
-  
-  # If diagrams click links should be blobs to work from GitHub console
-  diagrams_with_blobs: false  
-```
+Reqvire automatically excludes common documentation files:
+- README.md, CHANGELOG.md, CONTRIBUTING.md
+- LICENSE.md, SECURITY.md, CODE_OF_CONDUCT.md
+- CLAUDE.md, AGENT.md, AI.md, PROMPT.md
+- INSTRUCTIONS.md, CONTEXT.md, CURSOR.md, COPILOT.md
 
 ## Working with Requirements
 

@@ -1,5 +1,4 @@
 use anyhow::Result;
-use std::path::PathBuf;
 
 use log::debug;
 use crate::graph_registry::GraphRegistry;
@@ -32,7 +31,6 @@ impl ModelManager {
     pub fn parse_and_validate(
         &mut self,
         git_commit_hash: Option<&str>,
-        user_requirements_root_folder: &Option<PathBuf>,
         excluded_filename_patterns: &GlobSet
     ) -> Result<Vec<ReqvireError>, ReqvireError> {
         debug!("Starting two-pass validation architecture");
@@ -40,7 +38,6 @@ impl ModelManager {
         // Pass 1: Element collection with local validation
         let pass1_errors = self.pass1_collect_elements(
             git_commit_hash,
-            user_requirements_root_folder,
             excluded_filename_patterns
         )?;
 
@@ -69,7 +66,6 @@ impl ModelManager {
     fn pass1_collect_elements(
         &mut self,
         git_commit_hash: Option<&str>,
-        user_requirements_root_folder: &Option<PathBuf>,
         excluded_filename_patterns: &GlobSet
     ) -> Result<Vec<ReqvireError>, ReqvireError> {
         let mut errors = Vec::new();
@@ -91,7 +87,6 @@ impl ModelManager {
                         &file_name,
                         &file_content,
                         &path,
-                        user_requirements_root_folder,
                     );
 
                     // Collect parse-time errors

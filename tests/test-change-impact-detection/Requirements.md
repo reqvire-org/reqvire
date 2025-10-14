@@ -8,21 +8,29 @@ This file should be processed.
 
 Power control.
 
+#### Metadata
+* type: user-requirement
+
 ### CPU Manager
 
 CPU Manager.
 
+#### Metadata
+* type: user-requirement
 
 ### Battery Manager
 
 Battery manager.
 
+#### Metadata
+* type: user-requirement
 
 ### Network Manager
 
 Network manager.
 
-
+#### Metadata
+* type: user-requirement
 
 ## Verification Elements
 
@@ -62,6 +70,9 @@ Battery Saving.
 ### System Power Management
 
 The system shall implement power-saving mechanisms to optimize battery usage.
+
+#### Metadata
+* type: user-requirement
 
 ---
 

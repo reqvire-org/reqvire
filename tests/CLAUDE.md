@@ -30,7 +30,6 @@ Each test is a directory containing:
 ```
 test-feature-name/
 ├── test.sh                    # Test execution script (REQUIRED)
-├── reqvire.yaml              # Configuration file (optional)
 └── specifications/           # Test markdown files
     ├── Requirements.md      # Test requirements
     └── Verifications/       # Test verifications
@@ -55,17 +54,8 @@ Use `ls tests/` to see all available test directories. Each `test-*` directory c
 # - Output matches expected format
 # - Files are modified as expected
 
-# Optional: Create reqvire.yaml config
-cat > "$TEST_DIR/reqvire.yaml" << EOF
-paths:
-  output_folder: "output"
-  excluded_filename_patterns: []
-style:
-  theme: "default"
-EOF
-
 # Run reqvire command
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "$TEST_DIR/reqvire.yaml" command 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" command 2>&1)
 EXIT_CODE=$?
 
 # Save output for debugging
@@ -213,19 +203,6 @@ Expected: Files contain valid mermaid diagrams with proper markers
 
 #### Relations
   * verify: ../Requirements.md#test-feature-requirement
-```
-
-## Configuration Files
-
-### reqvire.yaml Template
-```yaml
-paths:
-  output_folder: "output"
-  excluded_filename_patterns: []
-style:
-  theme: "default"
-  max_width: 1200
-  diagram_direction: "LR"
 ```
 
 ## Testing Specific Commands

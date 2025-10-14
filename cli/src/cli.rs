@@ -14,6 +14,7 @@ use reqvire::git_commands;
 use reqvire::matrix_generator;
 use reqvire::sections_summary;
 use reqvire::verification_trace;
+use crate::serve;
 use reqvire::lint;
 use reqvire::GraphRegistry;
 use reqvire::graph_registry::{Page, Section};
@@ -34,13 +35,6 @@ use std::path::Path;
 pub struct Args {
     #[clap(subcommand)]
     pub command: Option<Commands>,
-
-    /// Path to a custom configuration file (YAML format)
-    /// If not provided, the system will look for reqvire.yml, reqvire.yaml,
-    /// .reqvire.yml, or .reqvire.yaml in the current directory
-    #[clap(long, short = 'c', global = true)]
-    pub config: Option<PathBuf>,
-
 }
 
 
@@ -48,14 +42,15 @@ pub struct Args {
 #[derive(Subcommand, Debug)]
 pub enum Commands {
     /// Export model to browsable HTML documentation with complete traceability
+    
     Export {
         /// Output directory for HTML files
-        #[clap(long, short = 'o', default_value = "html")]
+        #[clap(long, short = 'o', default_value = "html", help_heading = "EXPORT OPTIONS")]
         output: String,
     },
 
     /// Serve model as browsable HTML documentation via HTTP server
-    #[clap(override_help = "Serve model as browsable HTML documentation via HTTP server\n\nSERVE OPTIONS:\n      --host <HOST>  Bind address (default: localhost)\n      --port <PORT>  Server port (default: 8080)")]
+    #[clap(override_help = "Serve model as browsable HTML documentation via HTTP server\n\nSERVE OPTIONS:\n      --host <HOST>          Bind address (default: localhost)\n      --port <PORT>          Server port (default: 8080)")]
     Serve {
         /// Bind address
         #[clap(long, default_value = "localhost", help_heading = "SERVE OPTIONS")]
@@ -87,8 +82,13 @@ pub enum Commands {
     },
     
 
-    /// Generate mermaid diagrams in markdown files showing requirements relationships The diagrams will be placed at the top of each requirements document
-    GenerateDiagrams,
+    /// Generate mermaid diagrams in markdown files showing requirements relationships. Diagrams are placed at the top of each section
+    #[clap(override_help = "Generate mermaid diagrams in markdown files showing requirements relationships. Diagrams are placed at the top of each section\n\nGENERATE-DIAGRAMS OPTIONS:\n      --links-with-blobs     Use GitHub blob URLs in diagram links instead of relative paths")]
+    GenerateDiagrams {
+        /// Use GitHub blob URLs in diagram links instead of relative paths
+        #[clap(long, help_heading = "GENERATE-DIAGRAMS OPTIONS")]
+        links_with_blobs: bool,
+    },
 
     /// Remove all generated mermaid diagrams from markdown files
     RemoveDiagrams,
@@ -178,7 +178,7 @@ pub enum Commands {
     },
 
     /// Generate verification traces showing upward paths from verifications to root requirements
-    #[clap(override_help = "Generate verification traces showing upward paths from verifications to root requirements\n\nTRACES OPTIONS:\n      --json                      Output results in JSON format\n      --from-folder <PATH>        Generate links relative to this folder path\n      --filter-id <ID>            Only include verification with this specific identifier\n      --filter-name <REGEX>       Only include verifications whose name matches this regular expression\n      --filter-type <TYPE>        Only include verifications of the given type e.g. `test-verification`, `analysis-verification`")]
+    #[clap(override_help = "Generate verification traces showing upward paths from verifications to root requirements\n\nTRACES OPTIONS:\n      --json                      Output results in JSON format\n      --from-folder <PATH>        Generate links relative to this folder path\n      --links-with-blobs          Use GitHub blob URLs in diagram links instead of relative paths\n      --filter-id <ID>            Only include verification with this specific identifier\n      --filter-name <REGEX>       Only include verifications whose name matches this regular expression\n      --filter-type <TYPE>        Only include verifications of the given type e.g. `test-verification`, `analysis-verification`")]
     Traces {
         /// Output results in JSON format
         #[clap(long, help_heading = "TRACES OPTIONS")]
@@ -187,6 +187,10 @@ pub enum Commands {
         /// Relative path to folder where output will be saved (for generating relative links in Mermaid diagrams)
         #[clap(long, value_name = "PATH", help_heading = "TRACES OPTIONS")]
         from_folder: Option<String>,
+
+        /// Use GitHub blob URLs in diagram links instead of relative paths
+        #[clap(long, help_heading = "TRACES OPTIONS")]
+        links_with_blobs: bool,
 
         /// Only include verification with this specific identifier
         #[clap(long, value_name = "ID", help_heading = "TRACES OPTIONS")]
@@ -452,9 +456,6 @@ fn wants_json(args: &Args) -> bool {
 pub fn handle_command(
     args: Args,
     excluded_filename_patterns: &GlobSet,
-    diagram_direction: &str,
-    diagrams_with_blobs: bool,
-    user_requirements_root_folder: &Option<PathBuf>
 ) -> Result<i32,ReqvireError> {
 
     // If no command provided, show help
@@ -466,7 +467,6 @@ pub fn handle_command(
     let mut model_manager = ModelManager::new();
     let parse_result = model_manager.parse_and_validate(
         None,
-        user_requirements_root_folder,
         excluded_filename_patterns
     );
 
@@ -507,11 +507,11 @@ pub fn handle_command(
             }
             return Ok(0);
         },
-        Some(Commands::GenerateDiagrams) => {
+        Some(Commands::GenerateDiagrams { links_with_blobs }) => {
             info!("Generating mermaid diagrams");
             // Only collect identifiers and process files to add diagrams
             // Skip validation checks for diagram generation mode
-            diagrams::process_diagrams(&model_manager.graph_registry,diagram_direction,diagrams_with_blobs)?;
+            diagrams::process_diagrams(&model_manager.graph_registry, links_with_blobs)?;
 
             info!("Requirements diagrams updated in source files");
             return Ok(0);
@@ -583,8 +583,8 @@ pub fn handle_command(
                 ReqvireError::ProcessError("❌ Failed to retrieve the current commit hash.".to_string())
             })?;
                  
-            let mut refference_model_manager = ModelManager::new();      
-            let _not_interested=refference_model_manager.parse_and_validate(Some(&git_commit), user_requirements_root_folder, excluded_filename_patterns);
+            let mut refference_model_manager = ModelManager::new();
+            let _not_interested=refference_model_manager.parse_and_validate(Some(&git_commit), excluded_filename_patterns);
                                     
             let report=change_impact::compute_change_impact(
                 &model_manager.graph_registry, 
@@ -628,6 +628,7 @@ pub fn handle_command(
         Some(Commands::Traces {
             json,
             from_folder,
+            links_with_blobs,
             filter_id,
             filter_name,
             filter_type
@@ -635,7 +636,7 @@ pub fn handle_command(
             // Generate verification traces report (upward paths from verifications to requirements)
             let generator = verification_trace::VerificationTraceGenerator::new(
                 &model_manager.graph_registry,
-                diagrams_with_blobs,
+                links_with_blobs,
                 from_folder.clone()
             );
 
@@ -721,31 +722,33 @@ pub fn handle_command(
             return Ok(0);
         },
         Some(Commands::Export { output }) => {
-            let html_output_path = PathBuf::from(output);
+            info!("Exporting model to HTML folder: {}", &output);
+            let output_path = PathBuf::from(&output);
             export::export_model_with_artifacts(
                 &model_manager.graph_registry,
-                &html_output_path,
+                &output_path,
                 excluded_filename_patterns,
-                diagram_direction,
-                diagrams_with_blobs
+                false // always generate links without blobs for Export
             )?;
-
+            info!("✅ Export completed successfully");
             return Ok(0);
         },
         Some(Commands::Serve { host, port }) => {
             // Enable quiet mode for serve command (suppress verbose export output)
             reqvire::utils::enable_quiet_mode();
 
-            // Generate HTML artifacts in temporary directory
             let temp_dir = export::generate_artifacts_in_temp(
                 &model_manager.graph_registry,
                 excluded_filename_patterns,
-                diagram_direction,
-                diagrams_with_blobs
+                false // always generate links without blobs for Serve
             )?;
 
             // Start HTTP server (runs until Ctrl-C)
-            crate::serve::serve_directory(&temp_dir, &host, port)?;
+            info!("Starting HTTP server at http://{}:{}/", host, port);
+            serve::serve_directory(&temp_dir, &host, port)?;
+
+            // Cleanup temporary directory after server stops
+            std::fs::remove_dir_all(&temp_dir)?;
 
             return Ok(0);
         },
@@ -1235,26 +1238,21 @@ mod tests {
         // Mock CLI arguments
         let args = Args {
             command: Some(Commands::Export { output: "html".to_string() }),
-            config: None,
         };
 
         // Define test input paths
-        
+
         let excluded_filename_patterns=vec![
             "**/README*.md".to_string(),
             "**/Logical*.md".to_string(),
             "**/Physical*.md".to_string(),
             "**/index.md".to_string()
         ];
-                        
+
         // Run the handle_command function
-        let user_requirements_root = None;
         let result = handle_command(
             args,
             &build_glob_set(&excluded_filename_patterns),
-            "TD",
-            false,
-            &user_requirements_root
         );
 
         // Assert that it runs without error

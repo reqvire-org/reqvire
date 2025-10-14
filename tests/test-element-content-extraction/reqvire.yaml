@@ -1,8 +1,0 @@
-
-paths:
-  user_requirements_root_folder: "."
-
-style:
-  theme: "light"
-  max_width: 1200
-

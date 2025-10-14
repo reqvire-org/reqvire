@@ -19,8 +19,6 @@ echo "Starting test..." > "${TEST_DIR}/test_results.log"
 # - Custom diagrams without marker are preserved regardless of location
 # - File structure remains intact except for diagram removal
 
-# Use existing reqvire.yaml configuration
-
 # Make backup copies of original files for comparison
 mkdir -p "$TEST_DIR/backup"
 cp -r "$TEST_DIR/specifications" "$TEST_DIR/backup/"
@@ -28,7 +26,7 @@ cp -r "$TEST_DIR/specifications" "$TEST_DIR/backup/"
 # First, ensure we have diagrams to remove by generating them (validation happens automatically)
 echo "Running: reqvire generate-diagrams (setup)" >> "${TEST_DIR}/test_results.log"
 set +e
-GENERATE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "$TEST_DIR/reqvire.yaml" generate-diagrams 2>&1)
+GENERATE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" generate-diagrams 2>&1)
 GENERATE_EXIT_CODE=$?
 set -e
 
@@ -66,7 +64,7 @@ BEFORE_COUNT=$(grep -c '```mermaid' "$TEST_DIR/specifications/Requirements.md")
 # Run reqvire to remove diagrams
 echo "Running: reqvire remove-diagrams" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "$TEST_DIR/reqvire.yaml" remove-diagrams 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" remove-diagrams 2>&1)
 EXIT_CODE=$?
 set -e
 

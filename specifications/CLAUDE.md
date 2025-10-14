@@ -68,13 +68,15 @@ Test that verifies OAuth 2.0 authentication flow works correctly.
 
 ## Supported Element Types via Metadata
 
-- `user-requirement`: User-level requirements (default for all requirements in this folders but not a subfolders)
-- `requirement`: System requirements (default for non-root specifications)
+- `requirement`: System requirements (default for all elements without explicit type metadata)
+- `user-requirement`: User-level requirements (must be explicitly specified in metadata)
 - `verification`: General verification (defaults to test-verification)
 - `test-verification`: Verification through testing
 - `analysis-verification`: Verification through analysis
 - `inspection-verification`: Verification through inspection
 - `demonstration-verification`: Verification through demonstration
+
+**Note**: Element type is determined by the `type` property in the `#### Metadata` subsection. If no type is specified, all elements default to `requirement` type regardless of file location. This behavior is location-independent.
 
 ## Relation Types
 

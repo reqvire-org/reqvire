@@ -140,12 +140,14 @@ blockquote {
     height: 100% !important;
     max-width: 100%;
     max-height: 100%;
+    position: relative;
+    z-index: 1;
 }
 .diagram-nav-buttons {
     position: absolute;
     top: 10px;
     left: 10px;
-    z-index: 1000; /* ensure buttons are on top of SVG */
+    z-index: 999; /* higher than SVG (1) but lower than header nav (1000) */
     display: flex;
     flex-direction: column;
     gap: 5px;
@@ -449,14 +451,20 @@ pub fn process_mermaid_diagrams(
     let mermaid_processed = MERMAID_BLOCK
         .replace_all(html_content, |caps: &regex::Captures| {
             let inner = &caps[1];
-            
+
+            // Decode HTML entities that pulldown_cmark added
+            let decoded = inner
+                .replace("&lt;", "<")
+                .replace("&gt;", ">")
+                .replace("&amp;", "&");
+
             // Handle .md links, but preserve GitHub blob links
-            let fixed = MD_LINK.replace_all(inner, |c: &regex::Captures| {
+            let fixed = MD_LINK.replace_all(&decoded, |c: &regex::Captures| {
                 let prefix = &c[1];          // click X &quot;
                 let path = &c[2];            // path/to/file
                 let anchor = c.get(3).map_or("", |m| m.as_str());
                 let suffix = &c[4];          // &quot;
-                
+
                 // Check if this is a GitHub URL - if so, preserve the .md extension
                 if path.starts_with("https://github.com") {
                     format!("{}{}.md{}{}", prefix, path, anchor, suffix)

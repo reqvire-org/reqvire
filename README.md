@@ -155,27 +155,11 @@ curl -fsSL https://raw.githubusercontent.com/reqvire-org/reqvire/main/scripts/in
 mkdir my-project && cd my-project
 git init
 
-# 2. Initialize Reqvire
-cat > reqvire.yaml << EOF
-paths:
-  user_requirements_root_folder: "specifications"
-  
-  excluded_filename_patterns:
-    - "**/TODO.md"
-
-style:
-  theme: "default"
-  max_width: 1200
-  diagram_direction: "LR"
-  diagrams_with_blobs: false
-EOF
-
-mkdir specifications
-mkdir output
-
+# 2. Create specifications directory
+mkdir -p specifications/Verifications
 
 # 3. Write your requirements
-
+# Create your first requirement file
 ```
 
 **[Full Documentation](./doc/README.md)** • 📋 **[Use Cases](./specifications/Usecases.md)** • 🎥 **[Demo Video](#)** (coming soon)

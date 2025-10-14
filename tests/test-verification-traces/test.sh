@@ -31,7 +31,7 @@ echo "Starting test..." > "${TEST_DIR}/test_results.log"
 # Test 1: Basic Markdown Output - Compare against expected file
 echo "Running: reqvire traces" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" traces 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" traces 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -60,7 +60,7 @@ fi
 # Test 2: JSON Output - Compare against expected file
 echo "Running: reqvire traces --json" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" traces --json 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" traces --json 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -98,7 +98,7 @@ fi
 # Test 3: Specific Verification Filter
 echo "Running: reqvire traces --filter-id" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" traces \
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" traces \
     --filter-id="specifications/Verifications/Tests.md#oauth-flow-test" 2>&1)
 EXIT_CODE=$?
 set -e
@@ -132,7 +132,7 @@ fi
 # Test 4: Name Pattern Filter
 echo "Running: reqvire traces --filter-name" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" traces \
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" traces \
     --filter-name=".*Coverage.*" 2>&1)
 EXIT_CODE=$?
 set -e
@@ -166,7 +166,7 @@ fi
 # Test 5: Type Filter
 echo "Running: reqvire traces --filter-type" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" traces \
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" traces \
     --filter-type="test-verification" 2>&1)
 EXIT_CODE=$?
 set -e
@@ -200,7 +200,7 @@ fi
 # Test 6: Combined Filters
 echo "Running: reqvire traces --filter-type --filter-name" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" traces \
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" traces \
     --filter-type="test-verification" --filter-name=".*Test" 2>&1)
 EXIT_CODE=$?
 set -e
@@ -241,7 +241,7 @@ mkdir -p "${TEST_DIR}/specifications"
 
 echo "Running: reqvire traces --from-folder=specifications" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" traces \
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" traces \
     --from-folder=specifications 2>&1)
 EXIT_CODE=$?
 set -e
@@ -280,7 +280,7 @@ mkdir -p "${TEST_DIR}/output/verification/traces"
 
 echo "Running: reqvire traces --from-folder=output/verification/traces" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" traces \
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" traces \
     --from-folder=output/verification/traces 2>&1)
 EXIT_CODE=$?
 set -e
@@ -312,7 +312,7 @@ mkdir -p "${TEST_DIR}/docs/reports"
 
 echo "Running: reqvire traces --from-folder=docs/reports --json" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" traces \
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" traces \
     --from-folder=docs/reports --json 2>&1)
 EXIT_CODE=$?
 set -e
@@ -346,7 +346,7 @@ mkdir -p "${TEST_DIR}/docs/reports"
 
 echo "Running: reqvire traces --from-folder=docs/reports --filter-type=test-verification" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" traces \
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" traces \
     --from-folder=docs/reports --filter-type="test-verification" 2>&1)
 EXIT_CODE=$?
 set -e
@@ -375,7 +375,7 @@ fi
 # Test 11: From-Folder with / (special case for git root)
 echo "Running: reqvire traces --from-folder=/" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" traces \
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" traces \
     --from-folder=/ 2>&1)
 EXIT_CODE=$?
 set -e
@@ -404,7 +404,7 @@ fi
 # Test 12: Redundant Relations - Compare markdown output with expected
 echo "Running: reqvire traces (checking for redundant relations)" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" traces 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" traces 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -433,7 +433,7 @@ fi
 # Test 13: Redundant Relations - Compare JSON output with expected
 echo "Running: reqvire traces --json (checking redundant_relations field)" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" traces --json 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" traces --json 2>&1)
 EXIT_CODE=$?
 set -e
 

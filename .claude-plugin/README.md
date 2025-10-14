@@ -31,9 +31,9 @@ Expert agent for setting up Reqvire in new projects:
 - **Detect Setup**: Automatically detects if Reqvire is configured in a project
 - **Create Structure**: Sets up specifications/ directory and file structure
 - **Copy Templates**: Installs CLAUDE.md guides from plugin templates
-- **Generate Config**: Creates reqvire.yaml configuration file
 - **Guide Installation**: Walks users through Reqvire CLI installation
 - **Verify Setup**: Validates that everything is configured correctly
+- **Optional Configuration**: Guides users to create .reqvireignore for file exclusions
 
 **Model**: Claude Sonnet
 **When to use**: Setting up Reqvire in a new project, or when Reqvire isn't configured yet

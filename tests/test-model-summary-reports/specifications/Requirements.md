@@ -39,6 +39,9 @@ Section introduction content with workflow diagram above.
 
 This requirement has valid relations to existing files, using standard format.
 
+#### Metadata
+* type: user-requirement
+
 #### Relations
 * derivedFrom: Requirements.md#Requirement with Valid Markdown Relations
 * satisfiedBy: DesignSpecifications/SampleDSD.md
@@ -49,6 +52,9 @@ This requirement has valid relations to existing files, using standard format.
 ### Requirement with Valid Markdown Relations
 
 This requirement has valid relations to existing files, using markdown link format.
+
+#### Metadata
+* type: user-requirement
 
 #### Relations
 * satisfiedBy: [./DesignSpecifications/SampleDSD.md](./DesignSpecifications/SampleDSD.md)
@@ -76,6 +82,8 @@ This requirement specifically tests validation of relations to files in the Desi
 
 This requirement specifically tests validation of 'Other' subsections
 
+#### Metadata
+* type: user-requirement
 
 #### Subsection 1
 

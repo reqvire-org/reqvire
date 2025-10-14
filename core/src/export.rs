@@ -439,7 +439,6 @@ fn post_process_html_files(temp_dir: &Path) -> Result<(), ReqvireError> {
 pub fn generate_artifacts_in_temp(
     registry: &GraphRegistry,
     excluded_patterns: &globset::GlobSet,
-    diagram_direction: &str,
     diagrams_with_blobs: bool,
 ) -> Result<PathBuf, ReqvireError> {
     use std::env;
@@ -475,7 +474,6 @@ pub fn generate_artifacts_in_temp(
     let mut temp_model_manager = crate::ModelManager::new();
     let parse_result = temp_model_manager.parse_and_validate(
         None,
-        &None,
         excluded_patterns
     );
 
@@ -500,7 +498,6 @@ pub fn generate_artifacts_in_temp(
     info!("Generating diagrams...");
     crate::diagrams::process_diagrams(
         &temp_model_manager.graph_registry,
-        diagram_direction,
         diagrams_with_blobs
     )?;
 
@@ -533,7 +530,7 @@ pub fn generate_artifacts_in_temp(
     info!("Generating traces.md...");
     let trace_generator = crate::verification_trace::VerificationTraceGenerator::new(
         &temp_model_manager.graph_registry,
-        diagrams_with_blobs,
+        false,  // Always use relative links for traces in HTML export
         None
     );
     let trace_report = trace_generator.generate();
@@ -584,13 +581,11 @@ pub fn export_model_with_artifacts(
     registry: &GraphRegistry,
     output_dir: &Path,
     excluded_patterns: &globset::GlobSet,
-    diagram_direction: &str,
     diagrams_with_blobs: bool,
 ) -> Result<(), ReqvireError> {
     let temp_dir = generate_artifacts_in_temp(
         registry,
         excluded_patterns,
-        diagram_direction,
         diagrams_with_blobs
     )?;
 

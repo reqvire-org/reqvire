@@ -237,12 +237,29 @@ graph LR;
 ```
 ### User Requirement Root Folders Support
 
-The system shall implement configuration parameter that would specify a single folder path, relative to the Git repository root, that is designated as the primary location for user requirements.
+DEPRECATED: This requirement is deprecated and will be removed in a future version.
+
+The system shall NOT implement the `user_requirements_root_folder` configuration parameter. Element type assignment must be explicit and location-independent.
 
 #### Details
-'paths.user_requirements_root_folder' parameter of type  String defines default folder for the user-requirements.
+This requirement deprecates the implementation of the `paths.user_requirements_root_folder` configuration parameter.
 
-All elements in markdown files (except those matching exclusion patterns) in root of this folders are considered **user requirements** unless explicitly set as other element type in the metadata.
+**Previous behavior (deprecated):**
+- `paths.user_requirements_root_folder` parameter specified a folder for automatic user-requirement type assignment
+- Elements in the root of this folder defaulted to type `user-requirement`
+
+**New behavior:**
+- No folder-based automatic type assignment
+- All elements default to type `requirement` regardless of location
+- Users must explicitly specify element types in the Metadata subsection
+
+**Implementation notes:**
+- The configuration parameter should be removed from config.rs
+- Any code that reads or uses this parameter should be removed
+- Parser should not consider file location when determining default element type
+
+#### Metadata
+  * type: requirement
 
 #### Relations
   * derivedFrom: [Configurable User Requirements Root Folder](../ManagingMbseModelsRequirements.md#configurable-user-requirements-root-folder)
@@ -302,8 +319,8 @@ Both ignore files use standard gitignore pattern syntax to exclude files from be
 **Rationale:**
 - `.gitignore` integration ensures anything not tracked by version control is also excluded from requirements processing
 - `.reqvireignore` provides flexibility to exclude specific files from requirements processing while keeping them in version control (e.g., draft specifications, example files, or documentation that shouldn't be processed as requirements)
-- Using a separate `.reqvireignore` file instead of configuration in reqvire.yaml follows the established convention that developers are familiar with from `.gitignore`, making it more intuitive
-- Configuration files like reqvire.yaml should be reserved for settings and options, not for file patterns
+- Using a `.reqvireignore` file follows the established convention that developers are familiar with from `.gitignore`, making it more intuitive
+- File-based exclusion patterns are more maintainable than configuration-based approaches
 
 #### Metadata
   * type: requirement
@@ -642,7 +659,6 @@ Commands:
   help               Print this message or the help of the given subcommand(s)
 
 Options:
-  -c, --config <CONFIG>    Path to a custom configuration file (YAML format) If not provided, the system will look for reqvire.yml, reqvire.yaml, .reqvire.yml, or .reqvire.yaml in the current directory
   -h, --help               Print help
   -V, --version            Print version
 
@@ -1114,7 +1130,15 @@ graph LR;
 ```
 ### Requirements Processing
 
-The system shall parse the files in all folders and subfolders from the root of git repository which are not explicitly excluded using the configuration from reqvire.yaml.
+The system shall parse the files in all folders and subfolders from the root of git repository which are not explicitly excluded using .gitignore and .reqvireignore files.
+
+#### Details
+File exclusion is handled through:
+- .gitignore patterns (files not in version control)
+- .reqvireignore patterns (files in version control but excluded from requirements processing)
+- Reserved repository files (README.md, LICENSE.md, etc.)
+
+No configuration file is used for this purpose.
 
 #### Relations
   * derivedFrom: [User Requirement Root Folders Support](#user-requirement-root-folders-support)
@@ -2485,7 +2509,7 @@ The command shall:
 - Exit with status code 0 on success
 - Exit with non-zero status code on errors
 
-The Mermaid diagrams generated for verification traces shall include clickable links on diagram nodes that navigate to the referenced element, following the same interactive behavior as other diagrams in the system (respecting the `style.diagrams_with_blobs` configuration).
+The Mermaid diagrams generated for verification traces shall include clickable links on diagram nodes that navigate to the referenced element using relative paths (the `traces` command always uses relative paths and does not support the `--links-with-blobs` flag).
 
 Command output shall be written to stdout for easy redirection to files.
 
@@ -3116,24 +3140,29 @@ When requested, the system shall remove all generated diagrams from the model by
 The system shall implement interactive click behavior for Mermaid diagram nodes that redirects to the referenced element.
 
 #### Details
-Clickable mermaid diagrams links by default must use use relative links to the git repository.
+Clickable mermaid diagrams links by default must use relative links to the git repository.
 
-Configuration options must be provided that can change default behavior to use stable github repository links:
-  * diagrams click links are not working on Github if not useng stable github repository links
-  * from another side that polutes PR diffs thus choise must be given to the user
-  * reqvire.yaml config must expose `style.diagrams_with_blobs: bool` for that purpose.
-  
-When generating diagram node links and when `style.diagrams_with_blobs` is set to `true`, the system shall:
+CLI flag options must be provided that can change default behavior to use stable github repository links:
+  * diagrams click links are not working on Github if not using stable github repository links
+  * from another side that pollutes PR diffs thus choice must be given to the user
+  * Commands that generate diagrams (`generate-diagrams`, `export`, `serve`) must expose `--links-with-blobs` CLI flag for that purpose
+  * The flag defaults to `false` (use relative paths)
+
+When generating diagram node links and when `--links-with-blobs` flag is set to `true`, the system shall:
 - Use stable git repository links (`{repository-url}/blob/{commit-hash}/{file-path}`) when git repository information is available
 - Fallback to relative markdown links when git repository information is not available
 - Use the current commit hash to ensure links remain stable even as the repository evolves
 - Match the same link format used in traceability matrices and change impact reports
 - Preserve interactive behavior across all generated diagrams
 
+The `traces` command shall always use relative paths (hardcoded to `false`, no flag needed).
+
+The `change-impact` command shall continue to use GitHub blob URLs by default (unchanged behavior).
+
 #### Relations
   * derivedFrom: [Diagram Generation](#diagram-generation)
   * satisfiedBy: [diagrams.rs](../../core/src/diagrams.rs)
-  * satisfiedBy: [config.rs](../../cli/src/config.rs)
+  * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
 ---
 
 ### Trace Relation Non-Directional Behavior

@@ -104,6 +104,9 @@ cat > "${TEST_DIR}/specifications/ValidRequirements.md" << 'EOF'
 
 Root requirement for gitignore test.
 
+#### Metadata
+  * type: user-requirement
+
 ### Valid Requirement 001
 
 This file should be processed - not matching .gitignore patterns.
@@ -114,7 +117,7 @@ EOF
 
 # Run reqvire summary and capture output
 set +e
-OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" summary 2>&1)
+OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" summary 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -176,13 +179,6 @@ README.md
 archive/
 EOF
 
-# Update reqvire.yaml to minimal config (no excluded_filename_patterns)
-cat > "${TEST_DIR}/reqvire.yaml" << 'EOF'
-paths:
-  user_requirements_root_folder: "specifications"
-  output_folder: "./output"
-EOF
-
 # Create root requirement file first
 cat > "${TEST_DIR}/specifications/ActiveRequirements.md" << 'EOF'
 # Active Requirements
@@ -190,6 +186,9 @@ cat > "${TEST_DIR}/specifications/ActiveRequirements.md" << 'EOF'
 ### Test Root
 
 Root requirement for gitignore test scenario 2.
+
+#### Metadata
+  * type: user-requirement
 
 ### Active Requirement 001
 
@@ -237,7 +236,7 @@ EOF
 
 # Run reqvire summary
 set +e
-OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" summary 2>&1)
+OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" summary 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -295,13 +294,6 @@ cat > "${TEST_DIR}/.gitignore" << 'EOF'
 excluded-*.md
 EOF
 
-# Update reqvire.yaml to minimal config
-cat > "${TEST_DIR}/reqvire.yaml" << 'EOF'
-paths:
-  user_requirements_root_folder: "specifications"
-  output_folder: "./output"
-EOF
-
 # Create files
 cat > "${TEST_DIR}/specifications/NormalRequirements.md" << 'EOF'
 # Normal Requirements
@@ -340,7 +332,7 @@ EOF
 
 # Run reqvire summary without .reqvireignore
 set +e
-OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" summary 2>&1)
+OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" summary 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -388,13 +380,6 @@ EOF
 cat > "${TEST_DIR}/.reqvireignore" << 'EOF'
 # Root reqvireignore pattern
 reqvire-excluded-*.md
-EOF
-
-# Update reqvire.yaml to minimal config
-cat > "${TEST_DIR}/reqvire.yaml" << 'EOF'
-paths:
-  user_requirements_root_folder: "specifications"
-  output_folder: "./output"
 EOF
 
 # Create nested .gitignore with different pattern
@@ -496,7 +481,7 @@ EOF
 
 # Run reqvire summary
 set +e
-OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" summary 2>&1)
+OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" summary 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -561,13 +546,6 @@ cat > "${TEST_DIR}/.reqvireignore" << 'EOF'
 reqvire-only-excluded-*.md
 EOF
 
-# Update reqvire.yaml to minimal config
-cat > "${TEST_DIR}/reqvire.yaml" << 'EOF'
-paths:
-  user_requirements_root_folder: "specifications"
-  output_folder: "./output"
-EOF
-
 # Create files
 cat > "${TEST_DIR}/specifications/ProcessedRequirements.md" << 'EOF'
 # Processed Requirements
@@ -606,7 +584,7 @@ EOF
 
 # Run reqvire summary without .gitignore
 set +e
-OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" summary 2>&1)
+OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" summary 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -647,13 +625,6 @@ mkdir -p "${TEST_DIR}/specifications"
 # Remove both .gitignore and .reqvireignore
 rm -f "${TEST_DIR}/.gitignore"
 rm -f "${TEST_DIR}/.reqvireignore"
-
-# Update reqvire.yaml to minimal config
-cat > "${TEST_DIR}/reqvire.yaml" << 'EOF'
-paths:
-  user_requirements_root_folder: "specifications"
-  output_folder: "./output"
-EOF
 
 # Create files that would match typical ignore patterns
 cat > "${TEST_DIR}/specifications/AllRequirements.md" << 'EOF'
@@ -707,7 +678,7 @@ EOF
 
 # Run reqvire summary without any ignore files
 set +e
-OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" summary 2>&1)
+OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" summary 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -754,13 +725,6 @@ mkdir -p "${TEST_DIR}/specifications"
 # Remove both .gitignore and .reqvireignore to test reserved filenames alone
 rm -f "${TEST_DIR}/.gitignore"
 rm -f "${TEST_DIR}/.reqvireignore"
-
-# Update reqvire.yaml to minimal config
-cat > "${TEST_DIR}/reqvire.yaml" << 'EOF'
-paths:
-  user_requirements_root_folder: "specifications"
-  output_folder: "./output"
-EOF
 
 # Create valid requirements file
 cat > "${TEST_DIR}/specifications/ValidRequirements.md" << 'EOF'
@@ -844,7 +808,7 @@ EOF
 
 # Run reqvire summary
 set +e
-OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" summary 2>&1)
+OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" summary 2>&1)
 EXIT_CODE=$?
 set -e
 

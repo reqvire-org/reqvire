@@ -17,7 +17,7 @@ echo "Starting test..." > "${TEST_DIR}/test_results.log"
 
 echo "Running: reqvire lint" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" --config "${TEST_DIR}/reqvire.yaml" lint 2>&1)
+OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" lint 2>&1)
 EXIT_CODE=$?
 set -e
 

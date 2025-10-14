@@ -355,13 +355,13 @@ This test verifies that the system properly implements JSON output formatting fo
 
 ### Requirements Files Search and Detection Test
 
-This test verifies that the system correctly searches for and detects structured document files according to specified patterns and configurations.
+This test verifies that the system correctly searches for and detects structured document files according to specified patterns.
 
 #### Details
 
 ##### Acceptance Criteria
-- System shall find all structured document files in project structure based on configuration
-- System shall respect excluded file patterns defined in configuration
+- System shall find all structured document files in project structure
+- System shall respect excluded file patterns defined in .gitignore and .reqvireignore files
 - System shall handle nested directory structures correctly
 - System shall correctly identify and categorize different file types
 
@@ -568,4 +568,57 @@ This test verifies that the system correctly processes only files within the cur
 #### Relations
   * verify: [Subdirectory Processing Option](../SystemRequirements/Requirements.md#subdirectory-processing-option)
   * satisfiedBy: [test.sh](../../tests/test-subdirectory-functionality/test.sh)
+---
+
+## Element Type Assignment Tests
+
+### Default Element Type Assignment Test
+
+This test verifies that the system assigns the default type 'requirement' to all elements without explicit type metadata, regardless of their file location within the repository.
+
+#### Details
+
+##### Acceptance Criteria
+**Location-Independent Default Type:**
+- System shall assign type 'requirement' to elements without explicit type metadata
+- Default type assignment shall be location-independent (same behavior for all directories)
+- System shall NOT use file location to determine element type
+- System shall NOT support user_requirements_root_folder configuration parameter
+
+**Explicit Type Metadata Overrides:**
+- System shall allow explicit type specification via Metadata subsection
+- System shall respect explicit type metadata when present
+- System shall support all standard element types: requirement, user-requirement, verification, test-verification, analysis-verification, inspection-verification, demonstration-verification, other
+
+**Configuration Removal:**
+- System shall NOT support user_requirements_root_folder configuration parameter
+- System shall NOT use user_requirements_root_folder for any type assignment logic
+
+##### Test Criteria
+1. **Default type assignment verification:**
+   - Create test elements in various directories without type metadata
+   - Run reqvire summary --json to extract element types
+   - Verify all elements without type metadata have type 'requirement'
+   - Test elements in root specifications folder
+   - Test elements in nested subdirectories
+   - Test elements in various file locations
+
+2. **Explicit type metadata verification:**
+   - Create elements with explicit type metadata (user-requirement, verification, etc.)
+   - Run reqvire summary --json
+   - Verify elements have the explicitly specified types
+   - Verify explicit types override default behavior
+
+3. **Location independence verification:**
+   - Create identical elements in different directories
+   - None have explicit type metadata
+   - Run reqvire summary --json
+   - Verify all elements have type 'requirement' regardless of location
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [Default Requirement Type Assignment](../ManagingMbseModelsRequirements.md#default-requirement-type-assignment)
+  * verify: [User Requirement Root Folders Support](../SystemRequirements/Requirements.md#user-requirement-root-folders-support)
 ---

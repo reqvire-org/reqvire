@@ -26,6 +26,9 @@ cat >> "${TEST_DIR}/Requirements.md" << 'EOF'
 
 This is a new parent requirement that will appear in the report.
 
+#### Metadata
+  * type: user-requirement
+
 #### Relations
   * derive: [New Child Requirement](#new-child-requirement)
   * verifiedBy: [New Verification](#new-verification)
@@ -56,7 +59,7 @@ EOF
 
 echo "Running: reqvire change-impact" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "${TEST_DIR}" && "${REQVIRE_BIN}" --config "${TEST_DIR}/reqvire.yaml" change-impact 2>&1)
+OUTPUT=$(cd "${TEST_DIR}" && "${REQVIRE_BIN}" change-impact 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -115,7 +118,7 @@ fi
 # Test 2: Verify JSON output also applies smart filtering
 echo "Running: reqvire change-impact --json" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT_JSON=$(cd "${TEST_DIR}" && "${REQVIRE_BIN}" --config "${TEST_DIR}/reqvire.yaml" change-impact --json 2>&1)
+OUTPUT_JSON=$(cd "${TEST_DIR}" && "${REQVIRE_BIN}" change-impact --json 2>&1)
 EXIT_CODE=$?
 set -e
 

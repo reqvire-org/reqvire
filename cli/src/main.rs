@@ -5,7 +5,7 @@ mod serve;
 use log::error;
 use crate::cli::handle_command;
 use crate::cli::Args;
-use crate::config::Config;
+use crate::config::get_excluded_filename_patterns_glob_set;
 
 fn main() {
     if std::env::var("RUST_LOG").is_err() {
@@ -31,16 +31,11 @@ fn main() {
     }
     
     env_logger::init();
-    
-    let config = Config::load_from_args(&args);
 
     // Run `handle_command` and get exit code
     let exit_code = handle_command(
         args,
-        &config.get_excluded_filename_patterns_glob_set(),
-        &config.style.diagram_direction,
-        config.style.diagrams_with_blobs,
-        &config.get_user_requirements_root_folder()
+        &get_excluded_filename_patterns_glob_set(),
      )
         .unwrap_or_else(|e| {
             error!("{}", e);
