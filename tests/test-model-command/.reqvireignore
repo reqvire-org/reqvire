@@ -1,0 +1,3 @@
+# Test exclusion patterns
+**/expected_*.md
+**/actual_*.md

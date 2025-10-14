@@ -1,8 +1,4 @@
 paths:
-  output_folder: "output"
-  excluded_filename_patterns:
-    - "**/expected_*.md"
-    - "**/actual_*.md"
 style:
   theme: "default"
   max_width: 1200

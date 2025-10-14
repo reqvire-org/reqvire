@@ -3,5 +3,4 @@ default_types:
   other: requirement
 
 paths:
-  excluded_filename_patterns:
     - "expected_*.md"

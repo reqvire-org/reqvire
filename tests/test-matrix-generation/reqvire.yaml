@@ -2,4 +2,3 @@ paths:
   user_requirements_root_folder: "./specifications"
   
   # Default output folder
-  output_folder: "output"    

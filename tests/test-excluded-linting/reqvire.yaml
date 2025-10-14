@@ -1,7 +1,2 @@
 paths:
   user_requirements_root_folder: "specifications"
-  output_folder: "./output"
-  excluded_filename_patterns:
-    - "**/README*.md"
-    - "**/index.md"
-    - "**/DesignSpecifications/**/*.md"  # Exclude DesignSpecifications

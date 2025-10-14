@@ -1,0 +1,6 @@
+# Test exclusion patterns
+**/expected_output.*
+**/actual_output.*
+**/expected_redundant_output.*
+**/actual_redundant_output.*
+**/diff_redundant.txt

@@ -1,6 +1,5 @@
 paths:
   user_requirements_root_folder: "./specifications"
-  output_folder: "output"
 
 style:
   theme: "light"

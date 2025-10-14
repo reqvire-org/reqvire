@@ -1,0 +1,3 @@
+# Exclude design specifications and expected output
+**/DesignSpecifications/*.md
+**/expected_output.md

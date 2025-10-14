@@ -1,41 +1,22 @@
 # Reqvire Configuration
-
+#
+# File exclusion patterns are now configured in .reqvireignore file at the repository root.
+# See .reqvireignore for exclusion patterns.
 
 paths:
   # Path to the user requirements root folder
   user_requirements_root_folder: "specifications"
-  
-  # Glob patterns to exclude from requirements processing
-  excluded_filename_patterns:
-    - "README.md"
-    - "Usecases.md"
-    - "**/CLAUDE.md"
-    - "**AGENT.md"
-    - ".claude-plugin/**"
-    - "codefetch/**"
-    - "specifications/Logical*.md"
-    - "specifications/Physical*.md"
-    - "TODO.md"
-    - "specifications/DesignSpecifications/**"
-    - "tests/**"
-    - "core/**"
-    - "cli/**"
-    - "doc/**"
-    - "html/**"
-    - ".github/**"
-    - ".claude/**"
-    - "Plan.md"
 
 style:
   # Theme for HTML output (default, dark, light)
   theme: "default"
-  
+
   # Maximum width for HTML output
   max_width: 1200
-  
+
   # Optional path to custom CSS file
   # custom_css: "path/to/custom.css"
-  
+
   # Diagram direction (TD for top-down, LR for left-to-right)
   diagram_direction: "LR"
 

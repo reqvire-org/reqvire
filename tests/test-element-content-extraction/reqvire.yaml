@@ -1,10 +1,6 @@
 
 paths:
   user_requirements_root_folder: "."
-  output_folder: "output"
-  excluded_filename_patterns:
-    - "**/Logical*.md"
-    - "**/Physical*.md"
 
 style:
   theme: "light"

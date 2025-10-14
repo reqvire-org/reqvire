@@ -1,0 +1,3 @@
+# Test patterns for relative path exclusion
+external/**/*.md
+build/**/*.md

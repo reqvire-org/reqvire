@@ -25,11 +25,9 @@ pub struct Config {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct PathsConfig {
     #[serde(default)]
-    pub excluded_filename_patterns: Vec<String>,
-    #[serde(default)]
     pub user_requirements_root_folder: String,
     #[serde(skip)]
-    pub base_path: PathBuf,             
+    pub base_path: PathBuf,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -46,13 +44,12 @@ pub struct StyleConfig {
 
 
 
-impl Default for PathsConfig {     
+impl Default for PathsConfig {
     fn default() -> Self {
-    
+
         Self {
-            excluded_filename_patterns: vec![],
             user_requirements_root_folder: "".to_string(),
-            base_path: env::current_dir().expect("Failed to get current directory"),            
+            base_path: env::current_dir().expect("Failed to get current directory"),
         }
     }
 }
@@ -181,16 +178,96 @@ impl Config {
         }
     }
 
-    /// Builds a GlobSet from the excluded filename patterns and gitignore
+    /// Returns reserved filenames that are always excluded from structured markdown processing
+    fn reserved_filenames() -> Vec<String> {
+        vec![
+            "**/README.md".to_string(),
+            "**/CHANGELOG.md".to_string(),
+            "**/CHANGES.md".to_string(),
+            "**/CONTRIBUTING.md".to_string(),
+            "**/LICENSE.md".to_string(),
+            "**/CODE_OF_CONDUCT.md".to_string(),
+            "**/SECURITY.md".to_string(),
+            "**/AUTHORS.md".to_string(),
+            "**/ROADMAP.md".to_string(),
+            "**/CLAUDE.md".to_string(),
+            "**/AGENT.md".to_string(),
+            "**/AI.md".to_string(),
+            "**/PROMPT.md".to_string(),
+            "**/INSTRUCTIONS.md".to_string(),
+            "**/CONTEXT.md".to_string(),
+            "**/CURSOR.md".to_string(),
+            "**/COPILOT.md".to_string(),
+        ]
+    }
+
+    /// Reads reqvireignore patterns from the repository root .reqvireignore file
+    fn read_reqvireignore_patterns() -> Vec<String> {
+        let git_root = match Self::find_git_root() {
+            Some(root) => root,
+            None => {
+                debug!("No git repository found, skipping .reqvireignore");
+                return vec![];
+            }
+        };
+
+        let reqvireignore_path = git_root.join(".reqvireignore");
+
+        if !reqvireignore_path.exists() {
+            debug!("No .reqvireignore file found at repository root");
+            return vec![];
+        }
+
+        // Read the reqvireignore file and extract patterns
+        // Same format as gitignore patterns
+        match fs::read_to_string(&reqvireignore_path) {
+            Ok(content) => {
+                content
+                    .lines()
+                    .filter(|line| !line.trim().is_empty() && !line.trim().starts_with('#'))
+                    .map(|line| {
+                        let pattern = line.trim();
+                        // Convert reqvireignore patterns to glob patterns
+
+                        // If pattern already starts with globstar, use as-is
+                        if pattern.starts_with("**/") || pattern.starts_with("**") {
+                            pattern.to_string()
+                        } else if pattern.ends_with('/') {
+                            // Directory pattern - match everything under directory anywhere in tree
+                            let dir_name = pattern.trim_end_matches('/');
+                            format!("**/{}/**", dir_name)
+                        } else if pattern.contains('/') {
+                            // Path pattern - use as-is with globstar prefix if needed
+                            if pattern.starts_with('/') {
+                                format!("**{}", pattern)
+                            } else {
+                                format!("**/{}", pattern)
+                            }
+                        } else {
+                            // Filename pattern - match anywhere in tree
+                            format!("**/{}", pattern)
+                        }
+                    })
+                    .collect()
+            }
+            Err(e) => {
+                warn!("Failed to read .reqvireignore content: {}", e);
+                vec![]
+            }
+        }
+    }
+
+    /// Builds a GlobSet from reserved filenames, gitignore, and reqvireignore
     pub fn get_excluded_filename_patterns_glob_set(&self) -> GlobSet {
         let mut builder = GlobSetBuilder::new();
 
-        // Add patterns from reqvire.yaml configuration
-        for pattern in &self.paths.excluded_filename_patterns {
-            if let Ok(glob) = Glob::new(pattern.as_str()) {
+        // Add reserved filenames (always excluded)
+        for pattern in Self::reserved_filenames() {
+            if let Ok(glob) = Glob::new(&pattern) {
                 builder.add(glob);
+                debug!("Added reserved filename pattern: {}", pattern);
             } else {
-                warn!("Invalid glob pattern in config: {}", pattern);
+                warn!("Invalid reserved filename pattern: {}", pattern);
             }
         }
 
@@ -201,6 +278,16 @@ impl Config {
                 debug!("Added gitignore pattern: {}", pattern);
             } else {
                 warn!("Invalid gitignore pattern: {}", pattern);
+            }
+        }
+
+        // Add patterns from root .reqvireignore
+        for pattern in Self::read_reqvireignore_patterns() {
+            if let Ok(glob) = Glob::new(&pattern) {
+                builder.add(glob);
+                debug!("Added reqvireignore pattern: {}", pattern);
+            } else {
+                warn!("Invalid reqvireignore pattern: {}", pattern);
             }
         }
 
@@ -425,10 +512,10 @@ mod config_tests {
 
         assert_eq!(config.paths.user_requirements_root_folder, "");
 
-        // With no excluded_filename_patterns and no .gitignore, globset should not match anything
-        // (The actual gitignore patterns will be tested in e2e tests)
+        // Build globset to verify it works correctly
+        // (The actual patterns will be tested in e2e tests)
         let globset = config.get_excluded_filename_patterns_glob_set();
-        // Note: Whether files are excluded depends on actual .gitignore in the repo
+        // Note: Whether files are excluded depends on reserved filenames, .gitignore, and .reqvireignore
         // This test just verifies the globset builds successfully
 
         // Verify style defaults
@@ -442,16 +529,10 @@ mod config_tests {
         // Create a temporary directory for our test config
         let temp_dir = tempdir().unwrap();
         let config_path = temp_dir.path().join("reqvire.yml");
-        
+
         // Create a test YAML configuration
         let yaml_content = r#"
-general:
-  verbose: true
-
 paths:
-  excluded_filename_patterns:
-    - "**/README*.md"
-    - "**/Design/**/*.md"
   user_requirements_root_folder: "specifications"
 
 style:
@@ -459,22 +540,19 @@ style:
   max_width: 1000
   custom_css: "custom.css"
 "#;
-        
+
         // Write the test config to the temporary file
         fs::write(&config_path, yaml_content).unwrap();
-        
+
         // Load the config
         let config = Config::from_file(&config_path).unwrap();
-        
-        
+
         assert_eq!(config.paths.user_requirements_root_folder, "specifications");
-        assert!(config.paths.excluded_filename_patterns.contains(&"**/README*.md".to_string()));
-        assert!(config.paths.excluded_filename_patterns.contains(&"**/Design/**/*.md".to_string()));
-        
+
         assert_eq!(config.style.theme, "dark");
         assert_eq!(config.style.max_width, 1000);
         assert_eq!(config.style.custom_css, Some("custom.css".to_string()));
- 
+
     }
     
     

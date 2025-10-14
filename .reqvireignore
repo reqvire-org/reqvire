@@ -1,0 +1,33 @@
+# Reqvire Ignore File
+# Files matching these patterns will be excluded from structured markdown processing
+# but can still be referenced in file relations.
+# Uses the same syntax as .gitignore
+
+# Use cases and stories (kept in repo but not processed as structured requirements)
+Usecases.md
+
+# Architecture diagrams (kept in repo for reference but not processed)
+specifications/Logical*.md
+specifications/Physical*.md
+
+# Design specifications (kept in repo but not processed)
+specifications/DesignSpecifications/**
+
+# Development and planning documents
+TODO.md
+Plan.md
+
+# Plugin and tool directories
+.claude-plugin/**
+
+# Source code directories (for projects that mix code and requirements)
+tests/**
+core/**
+cli/**
+
+# Documentation and build output
+doc/**
+html/**
+
+# CI/CD configurations
+.github/**

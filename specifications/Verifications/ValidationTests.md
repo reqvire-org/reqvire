@@ -12,6 +12,20 @@ graph LR;
   classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
+  55e6d839dbcc7077["File Exclusion Test"];
+  class 55e6d839dbcc7077 verification;
+  click 55e6d839dbcc7077 "ValidationTests.md#file-exclusion-test";
+  7f5e53340a03365f["test.sh"];
+  class 7f5e53340a03365f default;
+  click 7f5e53340a03365f "../../tests/test-gitignore-integration/test.sh";
+  55e6d839dbcc7077 -->|satisfiedBy| 7f5e53340a03365f;
+  e37dc7f46d75d46["Invalid Relations Test"];
+  class e37dc7f46d75d46 verification;
+  click e37dc7f46d75d46 "ValidationTests.md#invalid-relations-test";
+  8b8c9b79dcbe085e["test.sh"];
+  class 8b8c9b79dcbe085e default;
+  click 8b8c9b79dcbe085e "../../tests/test-invalid-relations/test.sh";
+  e37dc7f46d75d46 -->|satisfiedBy| 8b8c9b79dcbe085e;
   9a53e9c00918fd02["JSON Output Format Test"];
   class 9a53e9c00918fd02 verification;
   click 9a53e9c00918fd02 "ValidationTests.md#json-output-format-test";
@@ -29,13 +43,6 @@ graph LR;
   class b91bd280b4e9971 default;
   click b91bd280b4e9971 "../../tests/test-valid-relations/test.sh";
   526fb26c223ad188 -->|satisfiedBy| b91bd280b4e9971;
-  e37dc7f46d75d46["Invalid Relations Test"];
-  class e37dc7f46d75d46 verification;
-  click e37dc7f46d75d46 "ValidationTests.md#invalid-relations-test";
-  8b8c9b79dcbe085e["test.sh"];
-  class 8b8c9b79dcbe085e default;
-  click 8b8c9b79dcbe085e "../../tests/test-invalid-relations/test.sh";
-  e37dc7f46d75d46 -->|satisfiedBy| 8b8c9b79dcbe085e;
   b0d0999636b025fa["Invalid Header Structure Test"];
   class b0d0999636b025fa verification;
   click b0d0999636b025fa "ValidationTests.md#invalid-header-structure-test";
@@ -43,9 +50,6 @@ graph LR;
   class 8b8c9b79dcbe085e default;
   click 8b8c9b79dcbe085e "../../tests/test-invalid-relations/test.sh";
   b0d0999636b025fa -->|satisfiedBy| 8b8c9b79dcbe085e;
-  9078905027caefa6["Gitignore Integration Test"];
-  class 9078905027caefa6 verification;
-  click 9078905027caefa6 "ValidationTests.md#gitignore-integration-test";
   184bc01c18f5506f["Requirements Files Search and Detection Test"];
   class 184bc01c18f5506f verification;
   click 184bc01c18f5506f "ValidationTests.md#requirements-files-search-and-detection-test";
@@ -76,15 +80,11 @@ graph LR;
   class d50a859650933e55 default;
   click d50a859650933e55 "../../core/src/model.rs";
   b49d890e0bbe0a83 -->|satisfiedBy| d50a859650933e55;
-  b49d890e0bbe0a83 -.->|verifiedBy| b0d0999636b025fa;
   735766802775ec41["Format Command Requirements Verification"];
   class 735766802775ec41 verification;
   click 735766802775ec41 "Misc.md#format-command-requirements-verification";
   b49d890e0bbe0a83 -.->|verifiedBy| 735766802775ec41;
-  a0da26f71f33b98f["Gitignore Integration"];
-  class a0da26f71f33b98f systemRequirement;
-  click a0da26f71f33b98f "../SystemRequirements/Requirements.md#gitignore-integration";
-  a0da26f71f33b98f -.->|verifiedBy| 9078905027caefa6;
+  b49d890e0bbe0a83 -.->|verifiedBy| b0d0999636b025fa;
   db64a3e25646a37f["Relation Type Validation"];
   class db64a3e25646a37f systemRequirement;
   click db64a3e25646a37f "../SystemRequirements/Requirements.md#relation-type-validation";
@@ -92,8 +92,16 @@ graph LR;
   class 9450d4313f47ef36 default;
   click 9450d4313f47ef36 "../../core/src/relation.rs";
   db64a3e25646a37f -->|satisfiedBy| 9450d4313f47ef36;
-  db64a3e25646a37f -.->|verifiedBy| 6ca2ff1567644e78;
   db64a3e25646a37f -.->|verifiedBy| e37dc7f46d75d46;
+  db64a3e25646a37f -.->|verifiedBy| 6ca2ff1567644e78;
+  929c6c204cb3fedb["Excluded File Relation Validation"];
+  class 929c6c204cb3fedb systemRequirement;
+  click 929c6c204cb3fedb "../SystemRequirements/Requirements.md#excluded-file-relation-validation";
+  f22d93285fcd7664["parser.rs"];
+  class f22d93285fcd7664 default;
+  click f22d93285fcd7664 "../../core/src/parser.rs";
+  929c6c204cb3fedb -->|satisfiedBy| f22d93285fcd7664;
+  929c6c204cb3fedb -.->|verifiedBy| 526fb26c223ad188;
   7de12ce482cb509["Validation Error Handling"];
   class 7de12ce482cb509 systemRequirement;
   click 7de12ce482cb509 "../SystemRequirements/TwoPassValidation.md#validation-error-handling";
@@ -106,19 +114,26 @@ graph LR;
   click d50a859650933e55 "../../core/src/model.rs";
   7de12ce482cb509 -->|satisfiedBy| d50a859650933e55;
   7de12ce482cb509 -.->|verifiedBy| e37dc7f46d75d46;
-  9d7ad0f9a306af77["Markdown Structure Validator"];
-  class 9d7ad0f9a306af77 systemRequirement;
-  click 9d7ad0f9a306af77 "../SystemRequirements/Requirements.md#markdown-structure-validator";
-  d50a859650933e55["model.rs"];
-  class d50a859650933e55 default;
-  click d50a859650933e55 "../../core/src/model.rs";
-  9d7ad0f9a306af77 -->|satisfiedBy| d50a859650933e55;
-  f22d93285fcd7664["parser.rs"];
-  class f22d93285fcd7664 default;
-  click f22d93285fcd7664 "../../core/src/parser.rs";
-  9d7ad0f9a306af77 -->|satisfiedBy| f22d93285fcd7664;
-  9d7ad0f9a306af77 -.->|verifiedBy| e37dc7f46d75d46;
-  9d7ad0f9a306af77 -.->|verifiedBy| b0d0999636b025fa;
+  83a57a249c4322b8["Ignore Files Integration"];
+  class 83a57a249c4322b8 systemRequirement;
+  click 83a57a249c4322b8 "../SystemRequirements/Requirements.md#ignore-files-integration";
+  8419dcc77d92b609["config.rs"];
+  class 8419dcc77d92b609 default;
+  click 8419dcc77d92b609 "../../cli/src/config.rs";
+  83a57a249c4322b8 -->|satisfiedBy| 8419dcc77d92b609;
+  83a57a249c4322b8 -.->|verifiedBy| 55e6d839dbcc7077;
+  b4f1757fc8831083["Validate Command"];
+  class b4f1757fc8831083 systemRequirement;
+  click b4f1757fc8831083 "../SystemRequirements/Requirements.md#validate-command";
+  80defdd4cbc7ee18["cli.rs"];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
+  b4f1757fc8831083 -->|satisfiedBy| 80defdd4cbc7ee18;
+  b4f1757fc8831083 -.->|verifiedBy| e37dc7f46d75d46;
+  34c75e4a88e1f381["CLI Help Structure Verification"];
+  class 34c75e4a88e1f381 verification;
+  click 34c75e4a88e1f381 "Misc.md#cli-help-structure-verification";
+  b4f1757fc8831083 -.->|verifiedBy| 34c75e4a88e1f381;
   80aa3982504aea7b["Cross-Component Dependency Validator"];
   class 80aa3982504aea7b systemRequirement;
   click 80aa3982504aea7b "../SystemRequirements/Requirements.md#cross-component-dependency-validator";
@@ -143,51 +158,19 @@ graph LR;
   click f22d93285fcd7664 "../../core/src/parser.rs";
   dc7a9bb1bbebc57f -->|satisfiedBy| f22d93285fcd7664;
   dc7a9bb1bbebc57f -.->|verifiedBy| e37dc7f46d75d46;
-  b4f1757fc8831083["Validate Command"];
-  class b4f1757fc8831083 systemRequirement;
-  click b4f1757fc8831083 "../SystemRequirements/Requirements.md#validate-command";
-  80defdd4cbc7ee18["cli.rs"];
-  class 80defdd4cbc7ee18 default;
-  click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
-  b4f1757fc8831083 -->|satisfiedBy| 80defdd4cbc7ee18;
-  b4f1757fc8831083 -.->|verifiedBy| e37dc7f46d75d46;
-  34c75e4a88e1f381["CLI Help Structure Verification"];
-  class 34c75e4a88e1f381 verification;
-  click 34c75e4a88e1f381 "Misc.md#cli-help-structure-verification";
-  b4f1757fc8831083 -.->|verifiedBy| 34c75e4a88e1f381;
-  bed8d0948b3e5ccd["Requirements Processing"];
-  class bed8d0948b3e5ccd systemRequirement;
-  click bed8d0948b3e5ccd "../SystemRequirements/Requirements.md#requirements-processing";
+  9d7ad0f9a306af77["Markdown Structure Validator"];
+  class 9d7ad0f9a306af77 systemRequirement;
+  click 9d7ad0f9a306af77 "../SystemRequirements/Requirements.md#markdown-structure-validator";
   d50a859650933e55["model.rs"];
   class d50a859650933e55 default;
   click d50a859650933e55 "../../core/src/model.rs";
-  bed8d0948b3e5ccd -->|satisfiedBy| d50a859650933e55;
+  9d7ad0f9a306af77 -->|satisfiedBy| d50a859650933e55;
   f22d93285fcd7664["parser.rs"];
   class f22d93285fcd7664 default;
   click f22d93285fcd7664 "../../core/src/parser.rs";
-  bed8d0948b3e5ccd -->|satisfiedBy| f22d93285fcd7664;
-  c0cc52075c4770f2["Two-Pass Validation Strategy"];
-  class c0cc52075c4770f2 systemRequirement;
-  click c0cc52075c4770f2 "../SystemRequirements/TwoPassValidation.md#two-pass-validation-strategy";
-  bed8d0948b3e5ccd -.->|deriveReqT| c0cc52075c4770f2;
-  bed8d0948b3e5ccd -.->|verifiedBy| 6ca2ff1567644e78;
-  a4090fe7e30eeae4["Element Content Extraction Test"];
-  class a4090fe7e30eeae4 verification;
-  click a4090fe7e30eeae4 "ChangeImpactTests.md#element-content-extraction-test";
-  bed8d0948b3e5ccd -.->|verifiedBy| a4090fe7e30eeae4;
-  66582f9b6bdde6c4["Structured Markdown Files Search and Detection"];
-  class 66582f9b6bdde6c4 systemRequirement;
-  click 66582f9b6bdde6c4 "../SystemRequirements/Requirements.md#structured-markdown-files-search-and-detection";
-  bed8d0948b3e5ccd -.->|deriveReqT| 66582f9b6bdde6c4;
-  c3b9530980b77cba["GraphRegistry as Primary Registry"];
-  class c3b9530980b77cba systemRequirement;
-  click c3b9530980b77cba "../SystemRequirements/TwoPassValidation.md#graphregistry-as-primary-registry";
-  bed8d0948b3e5ccd -.->|deriveReqT| c3b9530980b77cba;
-  d50a859650933e55["model.rs"];
-  class d50a859650933e55 default;
-  click d50a859650933e55 "../../core/src/model.rs";
-  66582f9b6bdde6c4 -->|satisfiedBy| d50a859650933e55;
-  66582f9b6bdde6c4 -.->|verifiedBy| 184bc01c18f5506f;
+  9d7ad0f9a306af77 -->|satisfiedBy| f22d93285fcd7664;
+  9d7ad0f9a306af77 -.->|verifiedBy| e37dc7f46d75d46;
+  9d7ad0f9a306af77 -.->|verifiedBy| b0d0999636b025fa;
   816c1e0b1de4dc53["Identifiers and Relations"];
   class 816c1e0b1de4dc53 userRequirement;
   click 816c1e0b1de4dc53 "../SpecificationsRequirements.md#identifiers-and-relations";
@@ -196,15 +179,30 @@ graph LR;
   click 9450d4313f47ef36 "../../core/src/relation.rs";
   816c1e0b1de4dc53 -->|satisfiedBy| 9450d4313f47ef36;
   816c1e0b1de4dc53 -.->|verifiedBy| e37dc7f46d75d46;
-  b7c871ab64a7059a["graph_registry.rs"];
-  class b7c871ab64a7059a default;
-  click b7c871ab64a7059a "../../core/src/graph_registry.rs";
-  c3b9530980b77cba -->|satisfiedBy| b7c871ab64a7059a;
+  5a41848d39d13522["Trace Relation Non-Directional Behavior"];
+  class 5a41848d39d13522 systemRequirement;
+  click 5a41848d39d13522 "../SystemRequirements/Requirements.md#trace-relation-non-directional-behavior";
+  5a41848d39d13522 -.->|verifiedBy| e37dc7f46d75d46;
+  96a12d4873ff83a0["Trace Relations No Cycles Verification"];
+  class 96a12d4873ff83a0 verification;
+  click 96a12d4873ff83a0 "TraceRelationTests.md#trace-relations-no-cycles-verification";
+  5a41848d39d13522 -.->|verifiedBy| 96a12d4873ff83a0;
+  ac1ef28df8af0894["Reserved Repository Files Exclusion"];
+  class ac1ef28df8af0894 systemRequirement;
+  click ac1ef28df8af0894 "../SystemRequirements/Requirements.md#reserved-repository-files-exclusion";
+  8419dcc77d92b609["config.rs"];
+  class 8419dcc77d92b609 default;
+  click 8419dcc77d92b609 "../../cli/src/config.rs";
+  ac1ef28df8af0894 -->|satisfiedBy| 8419dcc77d92b609;
+  ac1ef28df8af0894 -.->|verifiedBy| 55e6d839dbcc7077;
+  66582f9b6bdde6c4["Structured Markdown Files Search and Detection"];
+  class 66582f9b6bdde6c4 systemRequirement;
+  click 66582f9b6bdde6c4 "../SystemRequirements/Requirements.md#structured-markdown-files-search-and-detection";
   d50a859650933e55["model.rs"];
   class d50a859650933e55 default;
   click d50a859650933e55 "../../core/src/model.rs";
-  c3b9530980b77cba -->|satisfiedBy| d50a859650933e55;
-  c3b9530980b77cba -.->|verifiedBy| 184bc01c18f5506f;
+  66582f9b6bdde6c4 -->|satisfiedBy| d50a859650933e55;
+  66582f9b6bdde6c4 -.->|verifiedBy| 184bc01c18f5506f;
   bcf308e253d2c6e7["Internal Consistency Validator"];
   class bcf308e253d2c6e7 systemRequirement;
   click bcf308e253d2c6e7 "../SystemRequirements/Requirements.md#internal-consistency-validator";
@@ -217,22 +215,40 @@ graph LR;
   click f22d93285fcd7664 "../../core/src/parser.rs";
   bcf308e253d2c6e7 -->|satisfiedBy| f22d93285fcd7664;
   bcf308e253d2c6e7 -.->|verifiedBy| e37dc7f46d75d46;
-  929c6c204cb3fedb["Excluded File Relation Validation"];
-  class 929c6c204cb3fedb systemRequirement;
-  click 929c6c204cb3fedb "../SystemRequirements/Requirements.md#excluded-file-relation-validation";
+  bed8d0948b3e5ccd["Requirements Processing"];
+  class bed8d0948b3e5ccd systemRequirement;
+  click bed8d0948b3e5ccd "../SystemRequirements/Requirements.md#requirements-processing";
+  d50a859650933e55["model.rs"];
+  class d50a859650933e55 default;
+  click d50a859650933e55 "../../core/src/model.rs";
+  bed8d0948b3e5ccd -->|satisfiedBy| d50a859650933e55;
   f22d93285fcd7664["parser.rs"];
   class f22d93285fcd7664 default;
   click f22d93285fcd7664 "../../core/src/parser.rs";
-  929c6c204cb3fedb -->|satisfiedBy| f22d93285fcd7664;
-  929c6c204cb3fedb -.->|verifiedBy| 526fb26c223ad188;
-  5a41848d39d13522["Trace Relation Non-Directional Behavior"];
-  class 5a41848d39d13522 systemRequirement;
-  click 5a41848d39d13522 "../SystemRequirements/Requirements.md#trace-relation-non-directional-behavior";
-  5a41848d39d13522 -.->|verifiedBy| e37dc7f46d75d46;
-  96a12d4873ff83a0["Trace Relations No Cycles Verification"];
-  class 96a12d4873ff83a0 verification;
-  click 96a12d4873ff83a0 "TraceRelationTests.md#trace-relations-no-cycles-verification";
-  5a41848d39d13522 -.->|verifiedBy| 96a12d4873ff83a0;
+  bed8d0948b3e5ccd -->|satisfiedBy| f22d93285fcd7664;
+  a4090fe7e30eeae4["Element Content Extraction Test"];
+  class a4090fe7e30eeae4 verification;
+  click a4090fe7e30eeae4 "ChangeImpactTests.md#element-content-extraction-test";
+  bed8d0948b3e5ccd -.->|verifiedBy| a4090fe7e30eeae4;
+  bed8d0948b3e5ccd -.->|deriveReqT| 66582f9b6bdde6c4;
+  c3b9530980b77cba["GraphRegistry as Primary Registry"];
+  class c3b9530980b77cba systemRequirement;
+  click c3b9530980b77cba "../SystemRequirements/TwoPassValidation.md#graphregistry-as-primary-registry";
+  bed8d0948b3e5ccd -.->|deriveReqT| c3b9530980b77cba;
+  bed8d0948b3e5ccd -.->|verifiedBy| 6ca2ff1567644e78;
+  c0cc52075c4770f2["Two-Pass Validation Strategy"];
+  class c0cc52075c4770f2 systemRequirement;
+  click c0cc52075c4770f2 "../SystemRequirements/TwoPassValidation.md#two-pass-validation-strategy";
+  bed8d0948b3e5ccd -.->|deriveReqT| c0cc52075c4770f2;
+  b7c871ab64a7059a["graph_registry.rs"];
+  class b7c871ab64a7059a default;
+  click b7c871ab64a7059a "../../core/src/graph_registry.rs";
+  c3b9530980b77cba -->|satisfiedBy| b7c871ab64a7059a;
+  d50a859650933e55["model.rs"];
+  class d50a859650933e55 default;
+  click d50a859650933e55 "../../core/src/model.rs";
+  c3b9530980b77cba -->|satisfiedBy| d50a859650933e55;
+  c3b9530980b77cba -.->|verifiedBy| 184bc01c18f5506f;
 ```
 ### Invalid Relations Test
 
@@ -363,19 +379,23 @@ This test verifies that the system correctly searches for and detects structured
   * satisfiedBy: [test.sh](../../tests/test-excluded-patterns/test.sh)
 ---
 
-### Gitignore Integration Test
+### File Exclusion Test
 
-This test verifies that Reqvire correctly reads and applies exclusion patterns from the repository root .gitignore file.
+This test verifies that Reqvire correctly reads and applies exclusion patterns from the repository root .gitignore file, .reqvireignore file, and reserved filenames.
 
 #### Details
 
 ##### Acceptance Criteria
-- System SHALL read exclusion patterns from root .gitignore file
-- System SHALL combine .gitignore patterns with configured excluded_filename_patterns
-- Files matching .gitignore patterns SHALL be excluded from processing
-- System SHALL use ONLY root .gitignore file, not nested .gitignore files
-- System SHALL correctly process files when .gitignore is absent
-- Exclusion SHALL work across all commands (validate, summary, format, traces, etc.)
+- System shall read exclusion patterns from root .gitignore file
+- System shall read exclusion patterns from root .reqvireignore file
+- System shall automatically exclude reserved repository documentation files
+- System shall combine patterns from .gitignore, .reqvireignore, and reserved filenames
+- Files matching patterns from any source shall be excluded from processing
+- System shall use ONLY root .gitignore file, not nested .gitignore files
+- System shall use ONLY root .reqvireignore file, not nested .reqvireignore files
+- System shall correctly process files when .gitignore is absent
+- System shall correctly process files when .reqvireignore is absent
+- Exclusion shall work across all commands (validate, summary, format, traces, etc.)
 
 ##### Test Criteria
 1. **Gitignore pattern exclusion:**
@@ -385,28 +405,55 @@ This test verifies that Reqvire correctly reads and applies exclusion patterns f
    - Verify files matching .gitignore patterns are NOT processed
    - Verify files NOT matching patterns ARE processed
 
-2. **Combined exclusion patterns:**
-   - Configure excluded_filename_patterns in reqvire.yaml (e.g., "**/README.md")
-   - Add different patterns to .gitignore (e.g., "**/DRAFT*.md")
-   - Create files matching both patterns
-   - Verify files matching EITHER pattern are excluded
+2. **Reqvireignore pattern exclusion:**
+   - Create test environment with root .reqvireignore containing patterns (e.g., "**/draft-*.md", "examples/**")
+   - Create files matching those patterns in specifications folder (files that ARE in Git)
+   - Run reqvire summary command
+   - Verify files matching .reqvireignore patterns are NOT processed
+   - Verify files NOT matching patterns ARE processed
+
+3. **Reserved filenames exclusion:**
+   - Create reserved documentation files (e.g., README.md, LICENSE.md, CONTRIBUTING.md) with structured markdown content
+   - Run reqvire summary command
+   - Verify reserved files are NOT processed as structured markdown
+   - Verify reserved files can still be referenced in relations
+   - Verify files NOT matching reserved patterns ARE processed
+
+4. **Combined exclusion patterns:**
+   - Add patterns to .gitignore (e.g., "**/build/**")
+   - Add different patterns to .reqvireignore (e.g., "**/DRAFT*.md")
+   - Create reserved files (e.g., README.md)
+   - Create files matching all pattern sets
+   - Verify files matching patterns from ANY source are excluded
    - Verify only non-matching files are processed
 
-3. **Missing .gitignore handling:**
-   - Run reqvire in environment without .gitignore file
+5. **Missing .gitignore handling:**
+   - Run reqvire in environment without .gitignore file but with .reqvireignore
    - Verify command succeeds without errors
-   - Verify only reqvire.yaml exclusions are applied
+   - Verify only .reqvireignore exclusions and reserved filenames are applied
 
-4. **Nested .gitignore ignored:**
+6. **Missing .reqvireignore handling:**
+   - Run reqvire in environment without .reqvireignore file but with .gitignore
+   - Verify command succeeds without errors
+   - Verify only .gitignore exclusions and reserved filenames are applied
+
+7. **Both files missing handling:**
+   - Run reqvire in environment without .gitignore or .reqvireignore files
+   - Verify command succeeds without errors
+   - Verify only reserved filename exclusions are applied
+
+8. **Nested files ignored:**
    - Create nested .gitignore in subdirectory with different patterns
-   - Verify patterns from nested .gitignore are NOT applied
-   - Verify only root .gitignore patterns are used
+   - Create nested .reqvireignore in subdirectory with different patterns
+   - Verify patterns from nested files are NOT applied
+   - Verify only root file patterns are used
 
 #### Metadata
   * type: test-verification
 
 #### Relations
-  * verify: [Gitignore Integration](../SystemRequirements/Requirements.md#gitignore-integration)
+  * verify: [Ignore Files Integration](../SystemRequirements/Requirements.md#ignore-files-integration)
+  * verify: [Reserved Repository Files Exclusion](../SystemRequirements/Requirements.md#reserved-repository-files-exclusion)
   * satisfiedBy: [test.sh](../../tests/test-gitignore-integration/test.sh)
 ---
 

@@ -1,0 +1,4 @@
+# Test patterns for exclusion
+**/README*.md
+**/index.md
+**/DesignSpecifications/**/*.md
