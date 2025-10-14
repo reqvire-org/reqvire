@@ -42,6 +42,91 @@ Reqvire is an AI-driven framework for system modeling and requirements managemen
 
 ## Document Structure Specifications
 
+### Folder Structure and Organization
+
+Reqvire supports flexible organization based on **architectural decomposition** - structuring by subsystem/component rather than by artifact type. Requirements can be organized separately from implementation or co-located with code.
+
+#### Organization Approaches:
+
+**Approach 1: Requirements Separate from Implementation**
+
+Requirements are organized in a dedicated directory structure, separate from the source code:
+
+```
+project/
+├── specifications/
+│   ├── Requirements.md
+│   ├── Authentication/
+│   │   └── Requirements.md           # Authentication subsystem requirements
+│   ├── Storage/
+│   │   └── Requirements.md           # Storage subsystem requirements
+│   └── API/
+│       └── Requirements.md           # API subsystem requirements
+└── src/
+    ├── auth.rs
+    ├── storage.rs
+    └── api.rs
+```
+
+**Benefits:**
+- Clear separation of concerns
+- Requirements discoverable in one place
+- Suitable for projects with dedicated requirements teams
+- Easy to navigate for stakeholders unfamiliar with code
+
+**Approach 2: Requirements Co-located with Implementation**
+
+Requirements are placed alongside the code they describe:
+
+```
+project/
+├── specifications/
+│   └── Requirements.md               # High-level/system-wide requirements
+└── src/
+    ├── authentication/
+    │   ├── Requirements.md           # Authentication subsystem requirements
+    │   └── auth.rs
+    ├── storage/
+    │   ├── Requirements.md           # Storage subsystem requirements
+    │   └── storage.rs
+    └── api/
+        ├── Requirements.md           # API subsystem requirements
+        └── api.rs
+```
+
+**Benefits:**
+- Requirements immediately visible to developers working on code
+- AI coding assistants can access requirements in local context
+- Changes to code and requirements happen in same location
+- Better traceability at the file system level
+
+#### Choosing an Approach:
+
+**Use Separate Organization when:**
+- Requirements team is distinct from development team
+- Stakeholders need requirements access without code exposure
+- Project has strict documentation governance
+- Requirements need separate version control or access control
+
+**Use Co-located Organization when:**
+- Developers are primary requirements authors
+- Using AI coding assistants extensively
+- Want tighter coupling between code and requirements
+- Prefer locality of reference for development
+
+**Mixed Approach:**
+You can combine both approaches:
+- High-level requirements in `specifications/`
+- Detailed subsystem requirements co-located with code in `src/`
+
+#### Key Principles for All Approaches:
+
+- **Organize by subsystem/component**, not by artifact type
+- Use **folders** to group related requirements
+- Use **sections** (`##`) within files for logical grouping
+- Maintain clear **derivedFrom** relations showing requirement hierarchy
+- Keep **file names consistent** (e.g., always `Requirements.md` per subsystem)
+
 ### Sections
 A **Section** groups similar requirements for easier management and visualization:
 - Starts with a `##` header
@@ -536,10 +621,14 @@ reqvire change-impact --git-commit=HEAD~1 --json > /tmp/impact.json
 
 ### Adding New Requirements and Features:
 - **Start with user stories** and derive system requirements following the hierarchy
-- **Determine proper placement** in existing document structure or create new sections
-- **Establish containment** through file structure, sections, and folders - group related requirements in the same file under appropriate sections
+- **Choose organization approach** based on project needs:
+  - Separate: Place in `specifications/` hierarchy by subsystem
+  - Co-located: Place alongside implementation in `src/` directories
+  - Mixed: High-level in `specifications/`, detailed near code
+- **Determine proper placement** in existing document structure or create new sections/folders
+- **Establish containment** through file structure, sections, and folders - group related requirements by subsystem/component
 - **Follow naming conventions** and ensure uniqueness within files
-- **Establish proper relations** (deriveFrom) to parent requirements
+- **Establish proper relations** (derivedFrom) to parent requirements
 - **Add verification requirements** to ensure new functionality is testable
 - **Consider implementation impact** and add satisfiedBy relations to design elements
 - **Review existing patterns** to maintain consistency with current specifications
@@ -583,14 +672,18 @@ Ask the user to run `./target/debug/reqvire serve` in another shell, then use Pl
 
 #### New Feature Addition Workflow:
 1. Analyze existing requirements structure to understand where new feature fits
-2. Create user requirement with clear purpose and scope
-3. Derive system requirements that satisfy the user requirement
-4. Add verification requirements to ensure testability
-5. Establish proper traceability relations (deriveFrom, verifiedBy)
-6. Add implementation relations (satisfiedBy) to design/code elements
-7. **Clean up model**: Run `reqvire lint --fix` to automatically fix redundant verify relations and other semantic issues
-8. **Review manual items**: Check `reqvire lint --json` for any items in `needs_review` that require manual attention
-9. Review overall impact and update related documentation
+2. **Decide on organization**:
+   - Identify the subsystem/component the feature belongs to
+   - Choose whether to place requirements separately or co-located with code
+   - Create new folders/files if needed, following architectural decomposition
+3. Create user requirement with clear purpose and scope
+4. Derive system requirements that satisfy the user requirement
+5. Add verification requirements to ensure testability
+6. Establish proper traceability relations (derivedFrom, verifiedBy)
+7. Add implementation relations (satisfiedBy) to design/code elements
+8. **Clean up model**: Run `reqvire lint --fix` to automatically fix redundant verify relations and other semantic issues
+9. **Review manual items**: Check `reqvire lint --json` for any items in `needs_review` that require manual attention
+10. Review overall impact and update related documentation
 
 **Note**: Run `reqvire lint --fix` after completing a logical unit of work (e.g., adding a complete feature with its requirements, verifications, and relations) to ensure model quality.
 
