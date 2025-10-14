@@ -71,7 +71,6 @@ For detailed installation options (from source, pre-built binaries, etc.), see t
 
 ### Next Steps
 
-- **[Quick Start Tutorial](https://www.reqvire.org/getting-started)** - Create your first Reqvire project
 - **[Documentation](https://www.reqvire.org)** - Learn how to use Reqvire
 - **[Use Cases](./specifications/Usecases.md)** - See Reqvire in action
 
