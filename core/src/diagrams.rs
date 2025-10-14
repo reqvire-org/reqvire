@@ -235,7 +235,7 @@ impl<'a> ModelDiagramGenerator<'a> {
 
     /// Generate Mermaid diagram from model report
     pub fn generate_mermaid(&self, report: &ModelDiagramReport) -> String {
-        let mut diagram = String::from("```mermaid\ngraph LR;\n");
+        let mut diagram = String::from(format!("```mermaid\ngraph {};\n", DEFAULT_DIAGRAM_DIRECTION));
 
         // Add auto-generation marker
         diagram.push_str(&format!("  %% {}\n", AUTOGEN_DIAGRAM_MARKER));

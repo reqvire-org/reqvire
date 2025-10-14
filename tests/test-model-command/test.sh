@@ -50,8 +50,8 @@ if ! grep -q '```mermaid' <<< "$OUTPUT"; then
     exit 1
 fi
 
-if ! grep -q 'graph TD' <<< "$OUTPUT"; then
-    echo "❌ FAILED: Mermaid diagram missing 'graph TD' declaration"
+if ! grep -q 'graph LR' <<< "$OUTPUT"; then
+    echo "❌ FAILED: Mermaid diagram missing 'graph LR' declaration"
     exit 1
 fi
 
