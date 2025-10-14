@@ -23,22 +23,49 @@ This documentation is for those who want to contribute to Reqvire's development:
 
 ## Development Quick Start
 
+### Prerequisites
+
+**Install Rust and Cargo**
+
+Install Rust using rustup:
+```bash
+curl -sSf https://sh.rustup.rs | sh
+```
+
+Follow the on-screen prompts to complete the installation, then verify:
+```bash
+rustc --version
+cargo --version
+```
+
 ### Building from Source
 
+**Clone the repository**
 ```bash
-# Clone the repository
 git clone https://github.com/reqvire-org/reqvire.git
 cd reqvire
+```
 
-# Build the project
+**Build the project**
+```bash
 cargo build
+```
 
-# Run tests
+**Run tests**
+```bash
 cargo test
+```
 
-# Run Reqvire locally
+**Run Reqvire locally**
+```bash
 cargo run -- --help
 ```
+
+**Install the binary (optional)**
+```bash
+cargo install --path .
+```
+This will install the binary to `~/.cargo/bin/reqvire`
 
 ### Project Structure
 
