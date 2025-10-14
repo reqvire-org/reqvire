@@ -147,6 +147,165 @@ Extended requirement information:
 - Headers within `<details>...</details>` tags are skipped during parsing
 - Same validity as main requirement text
 
+## Writing Requirements - EARS Standard and Best Practices
+
+### EARS Requirements Standard
+
+Follow the EARS (Easy Approach to Requirements Syntax) standard for writing clear, unambiguous requirements:
+
+**EARS Keywords (based on RFC 2119):**
+- **shall/MUST**: Mandatory requirements
+- **should**: Recommended but not mandatory
+- **may**: Optional features
+
+**EARS Requirement Patterns:**
+- **Ubiquitous**: "The system shall [capability]"
+- **Event-driven**: "WHEN [trigger] the system shall [response]"
+- **State-driven**: "WHILE [state] the system shall [capability]"
+- **Unwanted behavior**: "IF [condition] THEN the system shall [response]"
+- **Optional**: "WHERE [feature is included] the system shall [capability]"
+
+### Writing Atomic Requirements
+
+Each requirement should:
+- Address a single capability or constraint
+- Be testable and verifiable
+- Have clear acceptance criteria
+- Follow EARS patterns for consistency
+
+### Element Naming Conventions
+
+- Use descriptive names that indicate the element's purpose
+- Element names become URL fragments (spaces → hyphens, lowercase)
+- Keep names unique within each file
+
+### Complete Requirement Example
+
+```markdown
+### User Authentication Requirement
+
+The system shall provide user authentication using OAuth 2.0.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [High-Level Security Requirement](#high-level-security-requirement)
+  * verifiedBy: [OAuth Authentication Test](Verifications/AuthTests.md#oauth-authentication-test)
+  * satisfiedBy: ../core/src/auth.rs
+```
+
+### Complete Verification Example
+
+```markdown
+### OAuth Authentication Test
+
+Test that verifies OAuth 2.0 authentication flow works correctly.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [User Authentication Requirement](../SystemRequirements/Requirements.md#user-authentication-requirement)
+```
+
+### Verification Strategy - Focus on Leaf Requirements
+
+**Preferable Approach**: Focus verification efforts on leaf requirements (lowest-level requirements with no derived children).
+
+**Why Verify Leaf Requirements:**
+- **Traces roll up**: Verification traces automatically propagate up the requirement hierarchy
+- **Efficient coverage**: One verification can verify multiple leaf requirements and cover the entire chain of parent requirements up to the root
+- **Avoid redundancy**: No need to create separate verifications for every level of the hierarchy
+- **Clear test scope**: Leaf requirements are concrete and testable, while parent requirements are often abstract
+
+**Example Hierarchy:**
+
+```markdown
+### Authentication (Root)
+High-level requirement about authentication.
+
+### Password Authentication (Parent)
+System shall support password authentication.
+
+#### Relations
+  * derivedFrom: #authentication
+
+### Password Strength Validation (Leaf)
+System shall enforce minimum 8 character passwords.
+
+#### Relations
+  * derivedFrom: #password-authentication
+  * verifiedBy: [Password Strength Test](Verifications/Tests.md#password-strength-test)
+
+### Login Rate Limiting (Leaf)
+System shall limit failed login attempts to 5 per minute.
+
+#### Relations
+  * derivedFrom: #password-authentication
+  * verifiedBy: [Rate Limit Test](Verifications/Tests.md#rate-limit-test)
+```
+
+In this example:
+- Only the two leaf requirements have `verifiedBy` relations
+- Both verifications roll up through "Password Authentication" to "Authentication"
+- The entire authentication hierarchy is verified through leaf requirement tests
+
+### Verification with Multiple Requirements
+
+```markdown
+### Integration Test Suite
+
+Comprehensive test suite for authentication flow.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [Login Requirement](../Requirements.md#login-requirement)
+  * verify: [Session Management](../Requirements.md#session-management)
+  * verify: [Logout Requirement](../Requirements.md#logout-requirement)
+```
+
+### Using Details for Extended Information
+
+```markdown
+### Performance Requirement
+
+System shall respond within 100ms for API calls.
+
+#### Details
+
+<details>
+<summary>Performance Criteria</summary>
+
+- 95th percentile response time: < 100ms
+- 99th percentile response time: < 500ms
+- Maximum response time: < 1000ms
+
+Measured under standard load conditions with:
+- 100 concurrent users
+- 1000 requests per minute
+
+</details>
+
+#### Relations
+  * verifiedBy: [Performance Test Suite](../Verifications/Performance.md#performance-test-suite)
+```
+
+### Traceability Best Practices
+
+- Every requirement should have at least one verification
+- Link child requirements to parent requirements via derivedFrom
+- Connect requirements to implementing code via satisfiedBy
+- Keep requirements focused: One requirement per element
+- Use consistent terminology: Define terms in a glossary if needed
+- Include rationale: Explain why a requirement exists in the Details section
+- Regular validation: Run validation commands before committing
+- Version control: Track requirement changes through Git
+- Review coverage: Ensure all requirements have verifications
+- Link to code: Use satisfiedBy relations to connect to implementations
+
 ## Identifier Specifications
 
 ### Identifier Types:
