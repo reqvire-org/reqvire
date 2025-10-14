@@ -187,6 +187,10 @@ struct GlobalCounters {
     // All requirements missing relations
     requirements_not_verified: usize,
     requirements_not_satisfied: usize,
+
+    // Custom element types (anything not in the standard categories above)
+    #[serde(skip_serializing_if = "HashMap::is_empty")]
+    custom_element_types: HashMap<String, usize>,
 }
 
 pub enum SummaryOutputFormat {
@@ -241,7 +245,7 @@ fn build_summary(
                     element::RequirementType::User   => counters.total_requirements_user += 1,
                 }
 
-                    
+
                 let (mut vcount, mut scount) = (0, 0);
                 for r in &elem.relations {
                     if relation::is_verification_relation(r.relation_type) {
@@ -250,7 +254,7 @@ fn build_summary(
                         scount += 1;
                     }
                 }
-                        
+
                 if vcount == 0 {
                     counters.requirements_not_verified += 1;
                 }
@@ -261,7 +265,7 @@ fn build_summary(
             }
             element::ElementType::Verification(ver_t) => {
                 match ver_t {
-                    element::VerificationType::Default       => counters.total_verifications_test += 1,                
+                    element::VerificationType::Default       => counters.total_verifications_test += 1,
                     element::VerificationType::Test          => counters.total_verifications_test += 1,
                     element::VerificationType::Analysis      => counters.total_verifications_analysis += 1,
                     element::VerificationType::Inspection    => counters.total_verifications_inspection += 1,
@@ -269,7 +273,15 @@ fn build_summary(
                 }
                 (0, 0)
             }
-            _ => (0, 0),
+            element::ElementType::Other(custom_type) => {
+                // Track custom element types
+                *counters.custom_element_types.entry(custom_type.clone()).or_insert(0) += 1;
+                (0, 0)
+            }
+            element::ElementType::File => {
+                // File elements are not counted in custom types
+                (0, 0)
+            }
         };
 
         let rels: Vec<RelationSummary> = elem.relations.iter()
@@ -478,6 +490,16 @@ fn print_summary_text(summary: &Summary) {
     println!("Verifications (Analysis): {}", c.total_verifications_analysis);
     println!("Verifications (Inspection): {}", c.total_verifications_inspection);
     println!("Verifications (Demonstration): {}", c.total_verifications_demonstration);
+
+    // Display custom element types if any exist
+    if !c.custom_element_types.is_empty() {
+        let mut custom_types: Vec<_> = c.custom_element_types.iter().collect();
+        custom_types.sort_by_key(|(type_name, _)| *type_name);
+        for (type_name, count) in custom_types {
+            println!("Custom ({}): {}", type_name, count);
+        }
+    }
+
     println!();
     println!("⚠️  Missing Relations:");
     println!("Requirements not verified: {}", c.requirements_not_verified);

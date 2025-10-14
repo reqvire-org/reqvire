@@ -12,30 +12,6 @@ graph LR;
   classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  6c3185c2d992e9fb["Model Command Verification"];
-  class 6c3185c2d992e9fb verification;
-  click 6c3185c2d992e9fb "ReportsTests.md#model-command-verification";
-  349f5e874cf22d98["Verification Coverage Report Test"];
-  class 349f5e874cf22d98 verification;
-  click 349f5e874cf22d98 "ReportsTests.md#verification-coverage-report-test";
-  7099e5b2f8a08808["test.sh"];
-  class 7099e5b2f8a08808 default;
-  click 7099e5b2f8a08808 "../../tests/test-coverage-report/test.sh";
-  349f5e874cf22d98 -->|satisfiedBy| 7099e5b2f8a08808;
-  76ae69270700044b["Model Summary Tests"];
-  class 76ae69270700044b verification;
-  click 76ae69270700044b "ReportsTests.md#model-summary-tests";
-  7b75340700b95177["test.sh"];
-  class 7b75340700b95177 default;
-  click 7b75340700b95177 "../../tests/test-model-summary-reports/test.sh";
-  76ae69270700044b -->|satisfiedBy| 7b75340700b95177;
-  9bf743e946ad83ea["Sections Summary Tests"];
-  class 9bf743e946ad83ea verification;
-  click 9bf743e946ad83ea "ReportsTests.md#sections-summary-tests";
-  bf32ae8da9b17852["test.sh"];
-  class bf32ae8da9b17852 default;
-  click bf32ae8da9b17852 "../../tests/test-sections-summary/test.sh";
-  9bf743e946ad83ea -->|satisfiedBy| bf32ae8da9b17852;
   fa3c1ae9e9b91644["Verification Traces From-Folder Test"];
   class fa3c1ae9e9b91644 verification;
   click fa3c1ae9e9b91644 "ReportsTests.md#verification-traces-from-folder-test";
@@ -43,6 +19,30 @@ graph LR;
   class c4c5998e49538704 default;
   click c4c5998e49538704 "../../tests/test-verification-traces/test.sh";
   fa3c1ae9e9b91644 -->|satisfiedBy| c4c5998e49538704;
+  349f5e874cf22d98["Verification Coverage Report Test"];
+  class 349f5e874cf22d98 verification;
+  click 349f5e874cf22d98 "ReportsTests.md#verification-coverage-report-test";
+  7099e5b2f8a08808["test.sh"];
+  class 7099e5b2f8a08808 default;
+  click 7099e5b2f8a08808 "../../tests/test-coverage-report/test.sh";
+  349f5e874cf22d98 -->|satisfiedBy| 7099e5b2f8a08808;
+  6c3185c2d992e9fb["Model Command Verification"];
+  class 6c3185c2d992e9fb verification;
+  click 6c3185c2d992e9fb "ReportsTests.md#model-command-verification";
+  9bf743e946ad83ea["Sections Summary Tests"];
+  class 9bf743e946ad83ea verification;
+  click 9bf743e946ad83ea "ReportsTests.md#sections-summary-tests";
+  bf32ae8da9b17852["test.sh"];
+  class bf32ae8da9b17852 default;
+  click bf32ae8da9b17852 "../../tests/test-sections-summary/test.sh";
+  9bf743e946ad83ea -->|satisfiedBy| bf32ae8da9b17852;
+  76ae69270700044b["Model Summary Tests"];
+  class 76ae69270700044b verification;
+  click 76ae69270700044b "ReportsTests.md#model-summary-tests";
+  7b75340700b95177["test.sh"];
+  class 7b75340700b95177 default;
+  click 7b75340700b95177 "../../tests/test-model-summary-reports/test.sh";
+  76ae69270700044b -->|satisfiedBy| 7b75340700b95177;
   958d9af6695bd8a["Verification Traces Filter Options Test"];
   class 958d9af6695bd8a verification;
   click 958d9af6695bd8a "ReportsTests.md#verification-traces-filter-options-test";
@@ -50,10 +50,65 @@ graph LR;
   class c4c5998e49538704 default;
   click c4c5998e49538704 "../../tests/test-verification-traces/test.sh";
   958d9af6695bd8a -->|satisfiedBy| c4c5998e49538704;
+  b266b2fae4370efb["Custom Element Type Tracking Test"];
+  class b266b2fae4370efb verification;
+  click b266b2fae4370efb "ReportsTests.md#custom-element-type-tracking-test";
+  7b75340700b95177["test.sh"];
+  class 7b75340700b95177 default;
+  click 7b75340700b95177 "../../tests/test-model-summary-reports/test.sh";
+  b266b2fae4370efb -->|satisfiedBy| 7b75340700b95177;
+  21d080d86bda9620["Custom Element Type Tracking"];
+  class 21d080d86bda9620 systemRequirement;
+  click 21d080d86bda9620 "../SystemRequirements/Requirements.md#custom-element-type-tracking";
+  c4ea332ba94e8299["reports.rs"];
+  class c4ea332ba94e8299 default;
+  click c4ea332ba94e8299 "../../core/src/reports.rs";
+  21d080d86bda9620 -->|satisfiedBy| c4ea332ba94e8299;
+  21d080d86bda9620 -.->|verifiedBy| b266b2fae4370efb;
+  8d93a79de428970["CLI Coverage Command"];
+  class 8d93a79de428970 systemRequirement;
+  click 8d93a79de428970 "../SystemRequirements/Requirements.md#cli-coverage-command";
+  80defdd4cbc7ee18["cli.rs"];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
+  8d93a79de428970 -->|satisfiedBy| 80defdd4cbc7ee18;
+  8d93a79de428970 -.->|verifiedBy| 349f5e874cf22d98;
+  34c75e4a88e1f381["CLI Help Structure Verification"];
+  class 34c75e4a88e1f381 verification;
+  click 34c75e4a88e1f381 "Misc.md#cli-help-structure-verification";
+  8d93a79de428970 -.->|verifiedBy| 34c75e4a88e1f381;
   920a8118d579854b["CLI Traces Filter Options"];
   class 920a8118d579854b systemRequirement;
   click 920a8118d579854b "../SystemRequirements/Requirements.md#cli-traces-filter-options";
   920a8118d579854b -.->|verifiedBy| 958d9af6695bd8a;
+  5ae7a9223cb08424["Model Diagram Output Formats"];
+  class 5ae7a9223cb08424 systemRequirement;
+  click 5ae7a9223cb08424 "../SystemRequirements/Requirements.md#model-diagram-output-formats";
+  dad7eeb932afdb92["diagrams.rs"];
+  class dad7eeb932afdb92 default;
+  click dad7eeb932afdb92 "../../core/src/diagrams.rs";
+  5ae7a9223cb08424 -->|satisfiedBy| dad7eeb932afdb92;
+  5ae7a9223cb08424 -.->|verifiedBy| 6c3185c2d992e9fb;
+  ddec547537f501ee["CLI Traces From-Folder Option"];
+  class ddec547537f501ee systemRequirement;
+  click ddec547537f501ee "../SystemRequirements/Requirements.md#cli-traces-from-folder-option";
+  ddec547537f501ee -.->|verifiedBy| fa3c1ae9e9b91644;
+  40ff89d68c242f45["Handle Invalid Regex Filter Patterns"];
+  class 40ff89d68c242f45 systemRequirement;
+  click 40ff89d68c242f45 "../SystemRequirements/Requirements.md#handle-invalid-regex-filter-patterns";
+  80defdd4cbc7ee18["cli.rs"];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
+  40ff89d68c242f45 -->|satisfiedBy| 80defdd4cbc7ee18;
+  40ff89d68c242f45 -.->|verifiedBy| 76ae69270700044b;
+  8cafc3875f5e4938["Display Name-Regex Option in Help"];
+  class 8cafc3875f5e4938 systemRequirement;
+  click 8cafc3875f5e4938 "../SystemRequirements/Requirements.md#display-name-regex-option-in-help";
+  80defdd4cbc7ee18["cli.rs"];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
+  8cafc3875f5e4938 -->|satisfiedBy| 80defdd4cbc7ee18;
+  8cafc3875f5e4938 -.->|verifiedBy| 76ae69270700044b;
   73db87f73ef4c5a2["Model Summary Fine Grained Filtering"];
   class 73db87f73ef4c5a2 systemRequirement;
   click 73db87f73ef4c5a2 "../SystemRequirements/Requirements.md#model-summary-fine-grained-filtering";
@@ -66,18 +121,6 @@ graph LR;
   click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
   73db87f73ef4c5a2 -->|satisfiedBy| 80defdd4cbc7ee18;
   73db87f73ef4c5a2 -.->|verifiedBy| 76ae69270700044b;
-  8cafc3875f5e4938["Display Name-Regex Option in Help"];
-  class 8cafc3875f5e4938 systemRequirement;
-  click 8cafc3875f5e4938 "../SystemRequirements/Requirements.md#display-name-regex-option-in-help";
-  80defdd4cbc7ee18["cli.rs"];
-  class 80defdd4cbc7ee18 default;
-  click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
-  8cafc3875f5e4938 -->|satisfiedBy| 80defdd4cbc7ee18;
-  8cafc3875f5e4938 -.->|verifiedBy| 76ae69270700044b;
-  ddec547537f501ee["CLI Traces From-Folder Option"];
-  class ddec547537f501ee systemRequirement;
-  click ddec547537f501ee "../SystemRequirements/Requirements.md#cli-traces-from-folder-option";
-  ddec547537f501ee -.->|verifiedBy| fa3c1ae9e9b91644;
   b50359102e04bf09["CLI Sections Summary Command"];
   class b50359102e04bf09 systemRequirement;
   click b50359102e04bf09 "../SystemRequirements/Requirements.md#cli-sections-summary-command";
@@ -90,35 +133,7 @@ graph LR;
   click 994f165ff784760d "../../core/src/sections_summary.rs";
   b50359102e04bf09 -->|satisfiedBy| 994f165ff784760d;
   b50359102e04bf09 -.->|verifiedBy| 9bf743e946ad83ea;
-  34c75e4a88e1f381["CLI Help Structure Verification"];
-  class 34c75e4a88e1f381 verification;
-  click 34c75e4a88e1f381 "Misc.md#cli-help-structure-verification";
   b50359102e04bf09 -.->|verifiedBy| 34c75e4a88e1f381;
-  8d93a79de428970["CLI Coverage Command"];
-  class 8d93a79de428970 systemRequirement;
-  click 8d93a79de428970 "../SystemRequirements/Requirements.md#cli-coverage-command";
-  80defdd4cbc7ee18["cli.rs"];
-  class 80defdd4cbc7ee18 default;
-  click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
-  8d93a79de428970 -->|satisfiedBy| 80defdd4cbc7ee18;
-  8d93a79de428970 -.->|verifiedBy| 349f5e874cf22d98;
-  8d93a79de428970 -.->|verifiedBy| 34c75e4a88e1f381;
-  40ff89d68c242f45["Handle Invalid Regex Filter Patterns"];
-  class 40ff89d68c242f45 systemRequirement;
-  click 40ff89d68c242f45 "../SystemRequirements/Requirements.md#handle-invalid-regex-filter-patterns";
-  80defdd4cbc7ee18["cli.rs"];
-  class 80defdd4cbc7ee18 default;
-  click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
-  40ff89d68c242f45 -->|satisfiedBy| 80defdd4cbc7ee18;
-  40ff89d68c242f45 -.->|verifiedBy| 76ae69270700044b;
-  5ae7a9223cb08424["Model Diagram Output Formats"];
-  class 5ae7a9223cb08424 systemRequirement;
-  click 5ae7a9223cb08424 "../SystemRequirements/Requirements.md#model-diagram-output-formats";
-  dad7eeb932afdb92["diagrams.rs"];
-  class dad7eeb932afdb92 default;
-  click dad7eeb932afdb92 "../../core/src/diagrams.rs";
-  5ae7a9223cb08424 -->|satisfiedBy| dad7eeb932afdb92;
-  5ae7a9223cb08424 -.->|verifiedBy| 6c3185c2d992e9fb;
   721f66c3bade6da1["Forward-Only Relation Traversal"];
   class 721f66c3bade6da1 systemRequirement;
   click 721f66c3bade6da1 "../SystemRequirements/Requirements.md#forward-only-relation-traversal";
@@ -574,4 +589,87 @@ Comprehensive test verifying model command generates correct output in different
 #### Relations
   * verify: [Forward-Only Relation Traversal](../SystemRequirements/Requirements.md#forward-only-relation-traversal)
   * verify: [Model Diagram Output Formats](../SystemRequirements/Requirements.md#model-diagram-output-formats)
+---
+
+### Custom Element Type Tracking Test
+
+This test verifies that the system correctly tracks and displays custom element types in model summary reports, providing accurate counts in both text and JSON output formats.
+
+#### Details
+
+##### Acceptance Criteria
+- System SHALL track elements with custom types (types not in the standard categories)
+- Custom types SHALL be counted separately from standard element types
+- Text output SHALL display custom types in alphabetical order
+- JSON output SHALL include `custom_element_types` field in global_counters
+- Custom types field SHALL be omitted from JSON when no custom types exist
+- Standard types (requirement, user-requirement, verification types) SHALL NOT be counted as custom
+- File-type elements SHALL NOT be counted as custom types
+
+##### Test Criteria
+1. **Custom Types in Text Output**
+   Command: `reqvire summary` (on test data with custom types)
+   - exits code **0**
+   - output contains `📋 Element Types:` section
+   - custom types appear after standard types
+   - format: `Custom (type-name): count`
+   - custom types are sorted alphabetically
+   - standard types (System Requirements, User Requirements, Verifications) appear first
+
+2. **Custom Types in JSON Output**
+   Command: `reqvire summary --json` (on test data with custom types)
+   - exits code **0**
+   - output parses as valid JSON
+   - JSON contains `.global_counters.custom_element_types` object
+   - custom_element_types is a HashMap with type names as keys and counts as values
+   - example: `{"custom_element_types": {"moe": 2, "interface": 1}}`
+   - type names are stored and displayed exactly as defined in metadata
+
+3. **No Custom Types Handling**
+   Command: `reqvire summary --json` (on test data without custom types)
+   - exits code **0**
+   - output parses as valid JSON
+   - JSON does NOT contain `custom_element_types` field in global_counters
+   - field is omitted entirely (not present as empty object)
+
+4. **Standard Types Not Counted as Custom**
+   - Verify requirements with type `requirement` are NOT in custom_element_types
+   - Verify requirements with type `user-requirement` are NOT in custom_element_types
+   - Verify verifications with type `test-verification` are NOT in custom_element_types
+   - Verify verifications with type `analysis-verification` are NOT in custom_element_types
+   - Verify verifications with type `inspection-verification` are NOT in custom_element_types
+   - Verify verifications with type `demonstration-verification` are NOT in custom_element_types
+   - Only elements with non-standard types appear in custom_element_types
+
+5. **Multiple Custom Types**
+   Command: `reqvire summary` (on test data with multiple different custom types)
+   - exits code **0**
+   - each distinct custom type is counted separately
+   - counts are accurate for each type
+   - alphabetical sorting is maintained
+   - example output:
+     ```
+     Custom (interface): 1
+     Custom (moe): 2
+     Custom (other): 1
+     ```
+
+6. **Alphabetical Sorting**
+   - Custom types in text output are sorted alphabetically by type name
+   - Example: "interface" appears before "moe", which appears before "other"
+   - Sorting is case-sensitive (lowercase before uppercase if mixed)
+
+7. **JSON Structure Validation**
+   Command: `reqvire summary --json` (on test data with custom types)
+   - `.global_counters.custom_element_types` is an object/map
+   - Keys are strings (type names)
+   - Values are numbers (counts > 0)
+   - No custom_element_types entry with zero count
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [Custom Element Type Tracking](../SystemRequirements/Requirements.md#custom-element-type-tracking)
+  * satisfiedBy: [test.sh](../../tests/test-model-summary-reports/test.sh)
 ---
