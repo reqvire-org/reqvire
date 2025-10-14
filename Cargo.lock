@@ -183,6 +183,7 @@ dependencies = [
  "clap",
  "env_logger",
  "globset",
+ "ignore",
  "log",
  "predicates",
  "reqvire",

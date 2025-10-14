@@ -7,9 +7,11 @@ paths:
   
   # Glob patterns to exclude from requirements processing
   excluded_filename_patterns:
+    - "README.md"
     - "Usecases.md"
     - "**/CLAUDE.md"
-    - "SpecificationIndex.md"
+    - "**AGENT.md"
+    - ".claude-plugin/**"
     - "codefetch/**"
     - "specifications/Logical*.md"
     - "specifications/Physical*.md"
@@ -22,9 +24,7 @@ paths:
     - "html/**"
     - ".github/**"
     - ".claude/**"
-    - "target/**"
     - "Plan.md"
-    - "VerificationTraces.md"
 
 style:
   # Theme for HTML output (default, dark, light)

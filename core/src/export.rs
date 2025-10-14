@@ -184,6 +184,15 @@ fn generate_matrix_html() -> String {
                         maxZoom: 10,
                         customEventsHandler: eventsHandler
                     });
+                    // Determine default zoom based on node count for matrix diagram
+                    var nodeCount = svgElement.querySelectorAll('.node, [class*="node"]').length;
+                    var defaultScale = 1;
+                    if (nodeCount <= 5) {
+                        defaultScale = 0.5;
+                    } else if (nodeCount <= 10) {
+                        defaultScale = 0.8;
+                    }
+                    panZoomInstance.zoom(defaultScale);
 
                     console.log('PanZoom initialized');
 

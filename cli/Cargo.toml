@@ -33,6 +33,7 @@ serde_yml = { workspace = true }
 
 # File handling
 globset = { workspace = true }
+ignore = "0.4"
 
 # HTTP server
 tiny_http = { workspace = true }

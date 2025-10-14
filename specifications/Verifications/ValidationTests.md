@@ -12,27 +12,9 @@ graph LR;
   classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  b0d0999636b025fa["Invalid Header Structure Test"];
-  class b0d0999636b025fa verification;
-  click b0d0999636b025fa "ValidationTests.md#invalid-header-structure-test";
-  8b8c9b79dcbe085e["test.sh"];
-  class 8b8c9b79dcbe085e default;
-  click 8b8c9b79dcbe085e "../../tests/test-invalid-relations/test.sh";
-  b0d0999636b025fa -->|satisfiedBy| 8b8c9b79dcbe085e;
-  184bc01c18f5506f["Requirements Files Search and Detection Test"];
-  class 184bc01c18f5506f verification;
-  click 184bc01c18f5506f "ValidationTests.md#requirements-files-search-and-detection-test";
-  a29e69e90fa71f39["test.sh"];
-  class a29e69e90fa71f39 default;
-  click a29e69e90fa71f39 "../../tests/test-excluded-patterns/test.sh";
-  184bc01c18f5506f -->|satisfiedBy| a29e69e90fa71f39;
-  e37dc7f46d75d46["Invalid Relations Test"];
-  class e37dc7f46d75d46 verification;
-  click e37dc7f46d75d46 "ValidationTests.md#invalid-relations-test";
-  8b8c9b79dcbe085e["test.sh"];
-  class 8b8c9b79dcbe085e default;
-  click 8b8c9b79dcbe085e "../../tests/test-invalid-relations/test.sh";
-  e37dc7f46d75d46 -->|satisfiedBy| 8b8c9b79dcbe085e;
+  9a53e9c00918fd02["JSON Output Format Test"];
+  class 9a53e9c00918fd02 verification;
+  click 9a53e9c00918fd02 "ValidationTests.md#json-output-format-test";
   6ca2ff1567644e78["Same-File Fragment Relations Test"];
   class 6ca2ff1567644e78 verification;
   click 6ca2ff1567644e78 "ValidationTests.md#same-file-fragment-relations-test";
@@ -47,59 +29,30 @@ graph LR;
   class b91bd280b4e9971 default;
   click b91bd280b4e9971 "../../tests/test-valid-relations/test.sh";
   526fb26c223ad188 -->|satisfiedBy| b91bd280b4e9971;
-  9a53e9c00918fd02["JSON Output Format Test"];
-  class 9a53e9c00918fd02 verification;
-  click 9a53e9c00918fd02 "ValidationTests.md#json-output-format-test";
-  66582f9b6bdde6c4["Structured Markdown Files Search and Detection"];
-  class 66582f9b6bdde6c4 systemRequirement;
-  click 66582f9b6bdde6c4 "../SystemRequirements/Requirements.md#structured-markdown-files-search-and-detection";
-  d50a859650933e55["model.rs"];
-  class d50a859650933e55 default;
-  click d50a859650933e55 "../../core/src/model.rs";
-  66582f9b6bdde6c4 -->|satisfiedBy| d50a859650933e55;
-  66582f9b6bdde6c4 -.->|verifiedBy| 184bc01c18f5506f;
-  c3b9530980b77cba["GraphRegistry as Primary Registry"];
-  class c3b9530980b77cba systemRequirement;
-  click c3b9530980b77cba "../SystemRequirements/TwoPassValidation.md#graphregistry-as-primary-registry";
-  b7c871ab64a7059a["graph_registry.rs"];
-  class b7c871ab64a7059a default;
-  click b7c871ab64a7059a "../../core/src/graph_registry.rs";
-  c3b9530980b77cba -->|satisfiedBy| b7c871ab64a7059a;
-  d50a859650933e55["model.rs"];
-  class d50a859650933e55 default;
-  click d50a859650933e55 "../../core/src/model.rs";
-  c3b9530980b77cba -->|satisfiedBy| d50a859650933e55;
-  c3b9530980b77cba -.->|verifiedBy| 184bc01c18f5506f;
-  bed8d0948b3e5ccd["Requirements Processing"];
-  class bed8d0948b3e5ccd systemRequirement;
-  click bed8d0948b3e5ccd "../SystemRequirements/Requirements.md#requirements-processing";
-  d50a859650933e55["model.rs"];
-  class d50a859650933e55 default;
-  click d50a859650933e55 "../../core/src/model.rs";
-  bed8d0948b3e5ccd -->|satisfiedBy| d50a859650933e55;
-  f22d93285fcd7664["parser.rs"];
-  class f22d93285fcd7664 default;
-  click f22d93285fcd7664 "../../core/src/parser.rs";
-  bed8d0948b3e5ccd -->|satisfiedBy| f22d93285fcd7664;
-  bed8d0948b3e5ccd -.->|deriveReqT| 66582f9b6bdde6c4;
-  c0cc52075c4770f2["Two-Pass Validation Strategy"];
-  class c0cc52075c4770f2 systemRequirement;
-  click c0cc52075c4770f2 "../SystemRequirements/TwoPassValidation.md#two-pass-validation-strategy";
-  bed8d0948b3e5ccd -.->|deriveReqT| c0cc52075c4770f2;
-  bed8d0948b3e5ccd -.->|deriveReqT| c3b9530980b77cba;
-  a4090fe7e30eeae4["Element Content Extraction Test"];
-  class a4090fe7e30eeae4 verification;
-  click a4090fe7e30eeae4 "ChangeImpactTests.md#element-content-extraction-test";
-  bed8d0948b3e5ccd -.->|verifiedBy| a4090fe7e30eeae4;
-  bed8d0948b3e5ccd -.->|verifiedBy| 6ca2ff1567644e78;
-  5a41848d39d13522["Trace Relation Non-Directional Behavior"];
-  class 5a41848d39d13522 systemRequirement;
-  click 5a41848d39d13522 "../SystemRequirements/Requirements.md#trace-relation-non-directional-behavior";
-  5a41848d39d13522 -.->|verifiedBy| e37dc7f46d75d46;
-  96a12d4873ff83a0["Trace Relations No Cycles Verification"];
-  class 96a12d4873ff83a0 verification;
-  click 96a12d4873ff83a0 "TraceRelationTests.md#trace-relations-no-cycles-verification";
-  5a41848d39d13522 -.->|verifiedBy| 96a12d4873ff83a0;
+  e37dc7f46d75d46["Invalid Relations Test"];
+  class e37dc7f46d75d46 verification;
+  click e37dc7f46d75d46 "ValidationTests.md#invalid-relations-test";
+  8b8c9b79dcbe085e["test.sh"];
+  class 8b8c9b79dcbe085e default;
+  click 8b8c9b79dcbe085e "../../tests/test-invalid-relations/test.sh";
+  e37dc7f46d75d46 -->|satisfiedBy| 8b8c9b79dcbe085e;
+  b0d0999636b025fa["Invalid Header Structure Test"];
+  class b0d0999636b025fa verification;
+  click b0d0999636b025fa "ValidationTests.md#invalid-header-structure-test";
+  8b8c9b79dcbe085e["test.sh"];
+  class 8b8c9b79dcbe085e default;
+  click 8b8c9b79dcbe085e "../../tests/test-invalid-relations/test.sh";
+  b0d0999636b025fa -->|satisfiedBy| 8b8c9b79dcbe085e;
+  9078905027caefa6["Gitignore Integration Test"];
+  class 9078905027caefa6 verification;
+  click 9078905027caefa6 "ValidationTests.md#gitignore-integration-test";
+  184bc01c18f5506f["Requirements Files Search and Detection Test"];
+  class 184bc01c18f5506f verification;
+  click 184bc01c18f5506f "ValidationTests.md#requirements-files-search-and-detection-test";
+  a29e69e90fa71f39["test.sh"];
+  class a29e69e90fa71f39 default;
+  click a29e69e90fa71f39 "../../tests/test-excluded-patterns/test.sh";
+  184bc01c18f5506f -->|satisfiedBy| a29e69e90fa71f39;
   b49d890e0bbe0a83["Structure of Markdown Documents"];
   class b49d890e0bbe0a83 userRequirement;
   click b49d890e0bbe0a83 "../SpecificationsRequirements.md#structure-of-markdown-documents";
@@ -128,30 +81,19 @@ graph LR;
   class 735766802775ec41 verification;
   click 735766802775ec41 "Misc.md#format-command-requirements-verification";
   b49d890e0bbe0a83 -.->|verifiedBy| 735766802775ec41;
-  b4f1757fc8831083["Validate Command"];
-  class b4f1757fc8831083 systemRequirement;
-  click b4f1757fc8831083 "../SystemRequirements/Requirements.md#validate-command";
-  80defdd4cbc7ee18["cli.rs"];
-  class 80defdd4cbc7ee18 default;
-  click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
-  b4f1757fc8831083 -->|satisfiedBy| 80defdd4cbc7ee18;
-  34c75e4a88e1f381["CLI Help Structure Verification"];
-  class 34c75e4a88e1f381 verification;
-  click 34c75e4a88e1f381 "Misc.md#cli-help-structure-verification";
-  b4f1757fc8831083 -.->|verifiedBy| 34c75e4a88e1f381;
-  b4f1757fc8831083 -.->|verifiedBy| e37dc7f46d75d46;
-  80aa3982504aea7b["Cross-Component Dependency Validator"];
-  class 80aa3982504aea7b systemRequirement;
-  click 80aa3982504aea7b "../SystemRequirements/Requirements.md#cross-component-dependency-validator";
-  d50a859650933e55["model.rs"];
-  class d50a859650933e55 default;
-  click d50a859650933e55 "../../core/src/model.rs";
-  80aa3982504aea7b -->|satisfiedBy| d50a859650933e55;
-  f22d93285fcd7664["parser.rs"];
-  class f22d93285fcd7664 default;
-  click f22d93285fcd7664 "../../core/src/parser.rs";
-  80aa3982504aea7b -->|satisfiedBy| f22d93285fcd7664;
-  80aa3982504aea7b -.->|verifiedBy| e37dc7f46d75d46;
+  a0da26f71f33b98f["Gitignore Integration"];
+  class a0da26f71f33b98f systemRequirement;
+  click a0da26f71f33b98f "../SystemRequirements/Requirements.md#gitignore-integration";
+  a0da26f71f33b98f -.->|verifiedBy| 9078905027caefa6;
+  db64a3e25646a37f["Relation Type Validation"];
+  class db64a3e25646a37f systemRequirement;
+  click db64a3e25646a37f "../SystemRequirements/Requirements.md#relation-type-validation";
+  9450d4313f47ef36["relation.rs"];
+  class 9450d4313f47ef36 default;
+  click 9450d4313f47ef36 "../../core/src/relation.rs";
+  db64a3e25646a37f -->|satisfiedBy| 9450d4313f47ef36;
+  db64a3e25646a37f -.->|verifiedBy| 6ca2ff1567644e78;
+  db64a3e25646a37f -.->|verifiedBy| e37dc7f46d75d46;
   7de12ce482cb509["Validation Error Handling"];
   class 7de12ce482cb509 systemRequirement;
   click 7de12ce482cb509 "../SystemRequirements/TwoPassValidation.md#validation-error-handling";
@@ -164,15 +106,6 @@ graph LR;
   click d50a859650933e55 "../../core/src/model.rs";
   7de12ce482cb509 -->|satisfiedBy| d50a859650933e55;
   7de12ce482cb509 -.->|verifiedBy| e37dc7f46d75d46;
-  db64a3e25646a37f["Relation Type Validation"];
-  class db64a3e25646a37f systemRequirement;
-  click db64a3e25646a37f "../SystemRequirements/Requirements.md#relation-type-validation";
-  9450d4313f47ef36["relation.rs"];
-  class 9450d4313f47ef36 default;
-  click 9450d4313f47ef36 "../../core/src/relation.rs";
-  db64a3e25646a37f -->|satisfiedBy| 9450d4313f47ef36;
-  db64a3e25646a37f -.->|verifiedBy| e37dc7f46d75d46;
-  db64a3e25646a37f -.->|verifiedBy| 6ca2ff1567644e78;
   9d7ad0f9a306af77["Markdown Structure Validator"];
   class 9d7ad0f9a306af77 systemRequirement;
   click 9d7ad0f9a306af77 "../SystemRequirements/Requirements.md#markdown-structure-validator";
@@ -186,22 +119,18 @@ graph LR;
   9d7ad0f9a306af77 -->|satisfiedBy| f22d93285fcd7664;
   9d7ad0f9a306af77 -.->|verifiedBy| e37dc7f46d75d46;
   9d7ad0f9a306af77 -.->|verifiedBy| b0d0999636b025fa;
-  929c6c204cb3fedb["Excluded File Relation Validation"];
-  class 929c6c204cb3fedb systemRequirement;
-  click 929c6c204cb3fedb "../SystemRequirements/Requirements.md#excluded-file-relation-validation";
+  80aa3982504aea7b["Cross-Component Dependency Validator"];
+  class 80aa3982504aea7b systemRequirement;
+  click 80aa3982504aea7b "../SystemRequirements/Requirements.md#cross-component-dependency-validator";
+  d50a859650933e55["model.rs"];
+  class d50a859650933e55 default;
+  click d50a859650933e55 "../../core/src/model.rs";
+  80aa3982504aea7b -->|satisfiedBy| d50a859650933e55;
   f22d93285fcd7664["parser.rs"];
   class f22d93285fcd7664 default;
   click f22d93285fcd7664 "../../core/src/parser.rs";
-  929c6c204cb3fedb -->|satisfiedBy| f22d93285fcd7664;
-  929c6c204cb3fedb -.->|verifiedBy| 526fb26c223ad188;
-  816c1e0b1de4dc53["Identifiers and Relations"];
-  class 816c1e0b1de4dc53 userRequirement;
-  click 816c1e0b1de4dc53 "../SpecificationsRequirements.md#identifiers-and-relations";
-  9450d4313f47ef36["relation.rs"];
-  class 9450d4313f47ef36 default;
-  click 9450d4313f47ef36 "../../core/src/relation.rs";
-  816c1e0b1de4dc53 -->|satisfiedBy| 9450d4313f47ef36;
-  816c1e0b1de4dc53 -.->|verifiedBy| e37dc7f46d75d46;
+  80aa3982504aea7b -->|satisfiedBy| f22d93285fcd7664;
+  80aa3982504aea7b -.->|verifiedBy| e37dc7f46d75d46;
   dc7a9bb1bbebc57f["Relation Element Type Validator"];
   class dc7a9bb1bbebc57f systemRequirement;
   click dc7a9bb1bbebc57f "../SystemRequirements/Requirements.md#relation-element-type-validator";
@@ -214,6 +143,68 @@ graph LR;
   click f22d93285fcd7664 "../../core/src/parser.rs";
   dc7a9bb1bbebc57f -->|satisfiedBy| f22d93285fcd7664;
   dc7a9bb1bbebc57f -.->|verifiedBy| e37dc7f46d75d46;
+  b4f1757fc8831083["Validate Command"];
+  class b4f1757fc8831083 systemRequirement;
+  click b4f1757fc8831083 "../SystemRequirements/Requirements.md#validate-command";
+  80defdd4cbc7ee18["cli.rs"];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
+  b4f1757fc8831083 -->|satisfiedBy| 80defdd4cbc7ee18;
+  b4f1757fc8831083 -.->|verifiedBy| e37dc7f46d75d46;
+  34c75e4a88e1f381["CLI Help Structure Verification"];
+  class 34c75e4a88e1f381 verification;
+  click 34c75e4a88e1f381 "Misc.md#cli-help-structure-verification";
+  b4f1757fc8831083 -.->|verifiedBy| 34c75e4a88e1f381;
+  bed8d0948b3e5ccd["Requirements Processing"];
+  class bed8d0948b3e5ccd systemRequirement;
+  click bed8d0948b3e5ccd "../SystemRequirements/Requirements.md#requirements-processing";
+  d50a859650933e55["model.rs"];
+  class d50a859650933e55 default;
+  click d50a859650933e55 "../../core/src/model.rs";
+  bed8d0948b3e5ccd -->|satisfiedBy| d50a859650933e55;
+  f22d93285fcd7664["parser.rs"];
+  class f22d93285fcd7664 default;
+  click f22d93285fcd7664 "../../core/src/parser.rs";
+  bed8d0948b3e5ccd -->|satisfiedBy| f22d93285fcd7664;
+  c0cc52075c4770f2["Two-Pass Validation Strategy"];
+  class c0cc52075c4770f2 systemRequirement;
+  click c0cc52075c4770f2 "../SystemRequirements/TwoPassValidation.md#two-pass-validation-strategy";
+  bed8d0948b3e5ccd -.->|deriveReqT| c0cc52075c4770f2;
+  bed8d0948b3e5ccd -.->|verifiedBy| 6ca2ff1567644e78;
+  a4090fe7e30eeae4["Element Content Extraction Test"];
+  class a4090fe7e30eeae4 verification;
+  click a4090fe7e30eeae4 "ChangeImpactTests.md#element-content-extraction-test";
+  bed8d0948b3e5ccd -.->|verifiedBy| a4090fe7e30eeae4;
+  66582f9b6bdde6c4["Structured Markdown Files Search and Detection"];
+  class 66582f9b6bdde6c4 systemRequirement;
+  click 66582f9b6bdde6c4 "../SystemRequirements/Requirements.md#structured-markdown-files-search-and-detection";
+  bed8d0948b3e5ccd -.->|deriveReqT| 66582f9b6bdde6c4;
+  c3b9530980b77cba["GraphRegistry as Primary Registry"];
+  class c3b9530980b77cba systemRequirement;
+  click c3b9530980b77cba "../SystemRequirements/TwoPassValidation.md#graphregistry-as-primary-registry";
+  bed8d0948b3e5ccd -.->|deriveReqT| c3b9530980b77cba;
+  d50a859650933e55["model.rs"];
+  class d50a859650933e55 default;
+  click d50a859650933e55 "../../core/src/model.rs";
+  66582f9b6bdde6c4 -->|satisfiedBy| d50a859650933e55;
+  66582f9b6bdde6c4 -.->|verifiedBy| 184bc01c18f5506f;
+  816c1e0b1de4dc53["Identifiers and Relations"];
+  class 816c1e0b1de4dc53 userRequirement;
+  click 816c1e0b1de4dc53 "../SpecificationsRequirements.md#identifiers-and-relations";
+  9450d4313f47ef36["relation.rs"];
+  class 9450d4313f47ef36 default;
+  click 9450d4313f47ef36 "../../core/src/relation.rs";
+  816c1e0b1de4dc53 -->|satisfiedBy| 9450d4313f47ef36;
+  816c1e0b1de4dc53 -.->|verifiedBy| e37dc7f46d75d46;
+  b7c871ab64a7059a["graph_registry.rs"];
+  class b7c871ab64a7059a default;
+  click b7c871ab64a7059a "../../core/src/graph_registry.rs";
+  c3b9530980b77cba -->|satisfiedBy| b7c871ab64a7059a;
+  d50a859650933e55["model.rs"];
+  class d50a859650933e55 default;
+  click d50a859650933e55 "../../core/src/model.rs";
+  c3b9530980b77cba -->|satisfiedBy| d50a859650933e55;
+  c3b9530980b77cba -.->|verifiedBy| 184bc01c18f5506f;
   bcf308e253d2c6e7["Internal Consistency Validator"];
   class bcf308e253d2c6e7 systemRequirement;
   click bcf308e253d2c6e7 "../SystemRequirements/Requirements.md#internal-consistency-validator";
@@ -226,6 +217,22 @@ graph LR;
   click f22d93285fcd7664 "../../core/src/parser.rs";
   bcf308e253d2c6e7 -->|satisfiedBy| f22d93285fcd7664;
   bcf308e253d2c6e7 -.->|verifiedBy| e37dc7f46d75d46;
+  929c6c204cb3fedb["Excluded File Relation Validation"];
+  class 929c6c204cb3fedb systemRequirement;
+  click 929c6c204cb3fedb "../SystemRequirements/Requirements.md#excluded-file-relation-validation";
+  f22d93285fcd7664["parser.rs"];
+  class f22d93285fcd7664 default;
+  click f22d93285fcd7664 "../../core/src/parser.rs";
+  929c6c204cb3fedb -->|satisfiedBy| f22d93285fcd7664;
+  929c6c204cb3fedb -.->|verifiedBy| 526fb26c223ad188;
+  5a41848d39d13522["Trace Relation Non-Directional Behavior"];
+  class 5a41848d39d13522 systemRequirement;
+  click 5a41848d39d13522 "../SystemRequirements/Requirements.md#trace-relation-non-directional-behavior";
+  5a41848d39d13522 -.->|verifiedBy| e37dc7f46d75d46;
+  96a12d4873ff83a0["Trace Relations No Cycles Verification"];
+  class 96a12d4873ff83a0 verification;
+  click 96a12d4873ff83a0 "TraceRelationTests.md#trace-relations-no-cycles-verification";
+  5a41848d39d13522 -.->|verifiedBy| 96a12d4873ff83a0;
 ```
 ### Invalid Relations Test
 
@@ -354,6 +361,53 @@ This test verifies that the system correctly searches for and detects structured
 #### Relations
   * verify: [Structured Markdown Files Search and Detection](../SystemRequirements/Requirements.md#structured-markdown-files-search-and-detection)
   * satisfiedBy: [test.sh](../../tests/test-excluded-patterns/test.sh)
+---
+
+### Gitignore Integration Test
+
+This test verifies that Reqvire correctly reads and applies exclusion patterns from the repository root .gitignore file.
+
+#### Details
+
+##### Acceptance Criteria
+- System SHALL read exclusion patterns from root .gitignore file
+- System SHALL combine .gitignore patterns with configured excluded_filename_patterns
+- Files matching .gitignore patterns SHALL be excluded from processing
+- System SHALL use ONLY root .gitignore file, not nested .gitignore files
+- System SHALL correctly process files when .gitignore is absent
+- Exclusion SHALL work across all commands (validate, summary, format, traces, etc.)
+
+##### Test Criteria
+1. **Gitignore pattern exclusion:**
+   - Create test environment with root .gitignore containing patterns (e.g., "**/build/**", "temp-*.md")
+   - Create files matching those patterns in specifications folder
+   - Run reqvire summary command
+   - Verify files matching .gitignore patterns are NOT processed
+   - Verify files NOT matching patterns ARE processed
+
+2. **Combined exclusion patterns:**
+   - Configure excluded_filename_patterns in reqvire.yaml (e.g., "**/README.md")
+   - Add different patterns to .gitignore (e.g., "**/DRAFT*.md")
+   - Create files matching both patterns
+   - Verify files matching EITHER pattern are excluded
+   - Verify only non-matching files are processed
+
+3. **Missing .gitignore handling:**
+   - Run reqvire in environment without .gitignore file
+   - Verify command succeeds without errors
+   - Verify only reqvire.yaml exclusions are applied
+
+4. **Nested .gitignore ignored:**
+   - Create nested .gitignore in subdirectory with different patterns
+   - Verify patterns from nested .gitignore are NOT applied
+   - Verify only root .gitignore patterns are used
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [Gitignore Integration](../SystemRequirements/Requirements.md#gitignore-integration)
+  * satisfiedBy: [test.sh](../../tests/test-gitignore-integration/test.sh)
 ---
 
 ### Unstructured Documents Test
