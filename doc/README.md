@@ -1,45 +1,85 @@
-# Documentation
+# Contributor Documentation
 
-Welcome to the **Reqvire** documentation! This folder contains all the information you need to understand, set up, and use Reqvire effectively.
+Welcome to the **Reqvire** contributor documentation! This folder contains information for developers who want to contribute to Reqvire.
 
-## Table of Contents
+## For Users
 
-- [About](./About.md)
-- Reqvire Tool Documentation  
-  - [Specifications](../specifications/README.md)
-  - [User Guide](./user_guide.md)
-    - [Commands and Configuration](./user_guide.md#basic-commands)
-    - [Working with Requirements](./user_guide.md#working-with-requirements)
-    - [Validation and Formating](./user_guide.md#validation)
-    - [Traceability](./user_guide.md#traceability)
-    - [GitHub Integration](./user_guide.md#github-integration)
-- [Contributing](./CONTRIBUTING.md)
-- [Code of Conduct](./code_of_conduct.md)
+Looking for how to **use** Reqvire? Visit **[www.reqvire.org](https://www.reqvire.org)** for:
+- Installation instructions
+- User guides and tutorials
+- Command reference
+- Configuration options
+- Best practices
+
+## For Contributors
+
+This documentation is for those who want to contribute to Reqvire's development:
+
+- **[Contributing Guide](./CONTRIBUTING.md)** - How to contribute code, tests, and documentation
+- **[Code of Conduct](./code_of_conduct.md)** - Our community standards
+- **[Contributor License Agreement](./CLA.md)** - Legal terms for contributions
+- **[Release Process](./RELEASE.md)** - How releases are created
+- **[Development Guide](../CLAUDE.md)** - Technical architecture and development workflow
+
+## Development Quick Start
+
+### Building from Source
+
+```bash
+# Clone the repository
+git clone https://github.com/reqvire-org/reqvire.git
+cd reqvire
+
+# Build the project
+cargo build
+
+# Run tests
+cargo test
+
+# Run Reqvire locally
+cargo run -- --help
+```
+
+### Project Structure
+
+```
+reqvire/
+├── core/              # Core library (parsing, model, analysis)
+├── cli/               # Command-line interface
+├── specifications/    # Reqvire's own requirements and model
+├── tests/             # End-to-end tests
+└── doc/              # Contributor documentation (this folder)
+```
+
+## Key Resources
+
+- **[Project Specifications](../specifications/README.md)** - Reqvire's own requirements model
+- **[Architecture](../specifications/Architecture.md)** - System architecture documentation
+- **[E2E Tests Guide](../tests/CLAUDE.md)** - How to write and run tests
+- **[GitHub Issues](https://github.com/reqvire-org/reqvire/issues)** - Report bugs and request features
+- **[GitHub Discussions](https://github.com/reqvire-org/reqvire/discussions)** - Ask questions and share ideas
+
+## Contribution Workflow
+
+1. **Read** the [Contributing Guide](./CONTRIBUTING.md)
+2. **Fork** the repository
+3. **Create** a feature branch
+4. **Follow MBSE workflow** (see [CLAUDE.md](../CLAUDE.md)):
+   - Add requirements first
+   - Define verifications
+   - Implement tests
+   - Write code
+   - Link implementation to requirements
+5. **Test** your changes
+6. **Submit** a pull request
+
+## Need Help?
+
+- Review the [user documentation](https://www.reqvire.org) to understand how Reqvire works
+- Check the [CLAUDE.md](../CLAUDE.md) guide for development patterns
+- Open a [GitHub Discussion](https://github.com/reqvire-org/reqvire/discussions) to ask questions
+- Join our community to connect with other contributors
 
 ---
 
-
-## Key Benefits
-
-- **Familiar Workflow**: Use Git-based processes for requirements management
-- **Traceability**: Automatically track relationships between requirements and code
-- **Visualization**: Generate diagrams and matrices from your model
-- **Collaboration**: Review changes to requirements just like code changes
-- **CI/CD Integration**: Automate validation, linting, and documentation generation
-- **Change Impact Analysis**: Understand how changes affect related requirements
-
-## GitHub Integration
-
-The [GitHub Integration](./user_guide.md#github-integration) section in the User Guide provides detailed instructions on:
-
-- Setting up GitHub Actions for automated validation and diagram generation
-- Using PR comment commands for change impact analysis
-- Integrating with CI/CD pipelines
-- Release automation
-
-## Feedback and Support
-
-If you have any questions or suggestions, please feel free to open an issue in the repository or reach out via the contact methods listed in the contributing guide.
-
----
-
+Thank you for contributing to Reqvire!

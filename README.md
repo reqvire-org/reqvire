@@ -10,7 +10,7 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=flat-square)](https://opensource.org/licenses/Apache-2.0)
 [![Rust](https://img.shields.io/badge/Built%20with-Rust-orange?style=flat-square&logo=rust)](https://www.rust-lang.org/)
 
-[📖 **Documentation**](https://www.reqvire.org) • [🚀 **Quick Start**](#get-started) • [💬 **Community**](https://github.com/reqvire-org/reqvire/discussions) • [🐛 **Report Bug**](https://github.com/reqvire-org/reqvire/issues/new?template=bug_report.yml)
+[📖 **Documentation**](https://www.reqvire.org) • [🚀 **Quick Start**](https://www.reqvire.org/getting-started) • [👥 **Contributing**](./doc/README.md) • [💬 **Community**](https://github.com/reqvire-org/reqvire/discussions)
 
 </div>
 
@@ -162,7 +162,7 @@ mkdir -p specifications/Verifications
 # Create your first requirement file
 ```
 
-**[Full Documentation](./doc/README.md)** • 📋 **[Use Cases](./specifications/Usecases.md)** • 🎥 **[Demo Video](#)** (coming soon)
+**[📖 User Documentation](https://www.reqvire.org)** • **[👥 Contributing](./doc/README.md)** • 📋 **[Use Cases](./specifications/Usecases.md)**
 
 ### Installation From Source (Linux and macOS)
 
@@ -319,7 +319,7 @@ Licensed under the [Apache 2.0 License](LICENSE).
 
 **Built with ❤️ by the Reqvire Community**
 
-[🏠 Website](#) • [📖 Docs](./doc/README.md) • [💬 Community](https://github.com/reqvire-org/reqvire/discussions) • [🐛 Issues](https://github.com/reqvire-org/reqvire/issues)
+[🏠 Website](https://www.reqvire.org) • [📖 Docs](https://www.reqvire.org) • [👥 Contributing](./doc/README.md) • [💬 Community](https://github.com/reqvire-org/reqvire/discussions)
 
 ⭐ **Star us on GitHub** — it helps more than you know!
 

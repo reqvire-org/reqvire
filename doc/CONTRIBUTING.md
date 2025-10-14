@@ -28,16 +28,12 @@ Additionally, by accepting the **Contributor License Agreement (CLA)**, you gran
 - Once your idea is approved, fork the repository and work on your changes in a feature branch.
 
 ### 5. Making a Pull Request (PR)
-- Ensure your code adheres to the project’s coding standards.
+- Ensure your code adheres to the project's coding standards.
 - Write clear and descriptive commit messages.
 - Include tests for your changes whenever possible.
 - Run all existing tests to confirm that your changes do not introduce regressions.
 - Submit your pull request to the `main` branch, ensuring it links to the related issue (if applicable).
 - Be prepared to engage in discussion and make revisions as needed.
-
-### 6. Documentation Contributions
-- If you are adding or modifying a feature, update the corresponding documentation in the `doc/` folder.
-- Ensure your documentation follows the existing format and style for consistency.
 
 ---
 
@@ -66,7 +62,9 @@ For more details, see the [CLA.md](./CLA.md).
 ## Getting Help
 
 If you need help with your contribution, feel free to:
-- Review the [README.md](./README.md) and [documentation](./doc/).
-- Open an issue to request clarification or additional resources.
+- Review the [user documentation](https://www.reqvire.org) to understand how Reqvire works
+- Review the [contributor documentation](./README.md) for development guidelines
+- Open an issue to request clarification or additional resources
+- Join our [GitHub Discussions](https://github.com/reqvire-org/reqvire/discussions)
 
 Thank you for helping to make Reqvire better!
