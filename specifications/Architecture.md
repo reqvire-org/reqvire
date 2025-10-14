@@ -3,7 +3,6 @@
 This document defines the Reqvire architecture using block diagrams that show the logical and physical structure of the system.
 
 ## Logical Architecture
-
 ### Logical Architecture Block
 
 The Logical Architecture for Reqvire defines the high-level functional organization of the tool, focusing on the main components that deliver its core functionalities. This architecture serves as the foundation for further refinement into physical architecture and system requirements.
@@ -111,7 +110,6 @@ classDiagram
 ---
 
 ## Physical Architecture
-
 ### Physical Architecture Block
 
 The Physical Architecture represents the concrete systems, services, and components that implement the functionality of Reqvire. It defines the deployment-level structure of the tool, detailing how various components interact and are organized in the actual system.

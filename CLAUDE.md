@@ -105,7 +105,7 @@ The e2e-test-engineer agent is specifically designed to work with Reqvire's e2e 
 - System requirements: [SystemRequirements/Requirements.md](specifications/SystemRequirements/Requirements.md)
 - Verification specifications: [Verifications folder](specifications/Verifications)
 - Relationship types: [Relation Types and Behaviors](specifications/SpecificationsRequirements.md#relation-types-and-behaviors)
-- Architecture documentation: [LogicalArchitecture.md](specifications/LogicalArchitecture.md) and [PhysicalArchitecture.md](specifications/PhysicalArchitecture.md)
+- Architecture documentation: [Architecture.md](specifications/Architecture.md)
 
 
 ## Core Architecture

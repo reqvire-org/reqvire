@@ -775,16 +775,14 @@ mod tests {
             ("specifications/subfolder/README.md", true), // Should be excluded
             ("specifications/deep/nested/folder/README.md", true), // Should be excluded
             
-            // Logical* pattern test files
-            ("specifications/LogicalArchitecture.md", true), // Should be excluded
+            // Logical* pattern test files (pattern still works for other files starting with Logical*)
             ("specifications/LOGICAL_view.md", false), // Should NOT be excluded (case sensitive)
             ("specifications/logical_design.md", false), // Should NOT be excluded (case sensitive)
             ("specifications/Logicless.md", false), // Should NOT be excluded
             ("specifications/subfolder/LogicalModel.md", true), // Should be excluded
             ("external_repo/specs/LogicalView.md", true), // Should be excluded
-            
-            // Physical* pattern test files
-            ("specifications/PhysicalArchitecture.md", true), // Should be excluded
+
+            // Physical* pattern test files (pattern still works for other files starting with Physical*)
             ("specifications/subfolder/PhysicalDiagram.md", true), // Should be excluded
             ("specifications/NotPhysical.md", false), // Should NOT be excluded
             ("specifications/Physicalsomething.md", true), // Should be excluded
