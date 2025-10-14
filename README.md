@@ -22,34 +22,21 @@
 
 Experience the future of development where your requirements live alongside your code, evolve with your project, and unlock the full potential of AI-powered engineering—from intelligent requirement synthesis to automated code generation—all within your familiar Git workflow.
 
-### **Requirements as Code**
-Write requirements in **structured Markdown** that's both human-readable and AI-friendly. Version control everything with Git.
+## Key Features
 
-### **AI-First Engineering**
-Built from day one for **AI**. Your requirements become the perfect context and agentic memory.
+- **Requirements as Code** – Write requirements in structured Markdown that's both human-readable and AI-friendly. Version control everything with Git.
+- **AI-First Engineering** – Built from day one for AI. Your requirements become the perfect context and agentic memory.
+- **Automated Traceability** – Every requirement automatically traces to code, tests, and architecture with automatic diagram and matrix generation.
+- **Zero Context Switch** – Requirements, code, and documentation in one repository. Review requirement changes like code changes.
+- **CI/CD Integration** – Validate requirements, auto-generate diagrams, and analyze change impact directly in your pipelines.
+- **MBSE Meets Agile** – Combines Model-Based Systems Engineering rigor with the speed and simplicity of modern development.
 
-### **Automated Traceability**
-Every requirement automatically traces to code, tests, and architecture. Change impact analysis with every commit.
-
-### **Zero Context Switch**
-Requirements, code, and documentation in one repository. Review requirement changes like code changes.
+[Learn more about features →](https://www.reqvire.org/features)
 
 ---
 
 <sub>Figure 1: Example Diagram (click image to browse requirements)</sub>
 [![Example Diagram](doc/diagram_1.png)](specifications/SpecificationsRequirements.md#specifications-requirements)
-
----
-
-## Key Features
-
-- **Git-Native Workflow** – Requirements live alongside code with full version control. Review requirement changes just like code changes.
-- **AI-Friendly Format** – Structured Markdown documents are perfect context for LLMs and AI-powered development tools.
-- **Automated Traceability** – Every requirement automatically traces to code, tests, and architecture with automatic diagram and matrix generation.
-- **CI/CD Integration** – Validate requirements, auto-generate diagrams, and analyze change impact directly in your pipelines.
-- **MBSE Meets Agile** – Combines Model-Based Systems Engineering rigor with the speed and simplicity of modern development.
-
-[Learn more about features →](https://www.reqvire.org/features)
 
 ---
 
