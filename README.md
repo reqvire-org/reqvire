@@ -26,7 +26,7 @@ Experience the future of development where your requirements live alongside your
 Write requirements in **structured Markdown** that's both human-readable and AI-friendly. Version control everything with Git.
 
 ### **AI-First Engineering**
-Built from day one for **Large Language Models**. Your requirements become the perfect context for AI-assisted development.
+Built from day one for **AI**. Your requirements become the perfect context and agentic memory.
 
 ### **Automated Traceability**
 Every requirement automatically traces to code, tests, and architecture. Change impact analysis with every commit.
