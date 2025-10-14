@@ -136,14 +136,16 @@ blockquote {
     justify-content: center;
 }
 .mermaid svg {
+    width: 100% !important;
+    height: 100% !important;
     max-width: 100%;
-    height: auto;
+    max-height: 100%;
 }
 .diagram-nav-buttons {
     position: absolute;
     top: 10px;
     left: 10px;
-    z-index: 999;
+    z-index: 1000; /* ensure buttons are on top of SVG */
     display: flex;
     flex-direction: column;
     gap: 5px;
@@ -211,11 +213,9 @@ pub const HTML_TEMPLATE: &str = r#"
                 document.querySelectorAll('.mermaid').forEach(function(mermaidContainer) {
                     var svg = mermaidContainer.querySelector('svg');
                     if (!svg) return;
-                    // Ensure SVG can scale freely
+
                     svg.style.maxWidth = 'none';
                     svg.style.maxHeight = 'none';
-
-
 
                     var eventsHandler = {
                         haltEventListeners: ['touchstart', 'touchend', 'touchmove', 'touchleave', 'touchcancel'],
@@ -259,26 +259,18 @@ pub const HTML_TEMPLATE: &str = r#"
                         }
                     };
 
-var panZoomInstance = svgPanZoom(svg, {
+                    var panZoomInstance = svgPanZoom(svg, {
                         zoomEnabled: true,
                         controlIconsEnabled: true,
-                        fit: false,
+                        fit: true,
                         center: true,
-                        contain: true,
+                        contain: false,
                         minZoom: 0.5,
                         maxZoom: 10,
                         zoomScaleSensitivity: 0.3,
                         customEventsHandler: eventsHandler
                     });
-                    // Determine default zoom based on node count to avoid overly large rendering for small diagrams
-                    var nodeCount = svg.querySelectorAll('.node, [class*="node"]').length;
-                    var defaultScale = 1;
-                    if (nodeCount <= 5) {
-                        defaultScale = 0.5;
-                    } else if (nodeCount <= 10) {
-                        defaultScale = 0.8;
-                    }
-                    panZoomInstance.zoom(defaultScale);
+
                     // Position at top-center
                     setTimeout(function() {
                         var pan = panZoomInstance.getPan();
