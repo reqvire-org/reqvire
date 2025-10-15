@@ -87,10 +87,17 @@
                         }
                     };
 
+                    // Check if diagram is larger than container
+                    var containerWidth = mermaidContainer.clientWidth;
+                    var containerHeight = mermaidContainer.clientHeight;
+                    var svgWidth = svg.getBBox().width;
+                    var svgHeight = svg.getBBox().height;
+                    var shouldFit = svgWidth > containerWidth || svgHeight > containerHeight;
+
                     var panZoomInstance = svgPanZoom(svg, {
                         zoomEnabled: true,
                         controlIconsEnabled: true,
-                        fit: true,
+                        fit: shouldFit,
                         center: true,
                         contain: false,
                         minZoom: 0.5,
