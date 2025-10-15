@@ -3,6 +3,21 @@
     {
       "type": "safe_redundant_hierarchical_relations",
       "element": {
+        "identifier": "specifications/Requirements.md#multi-path-redundant-requirement",
+        "name": "Multi-Path Redundant Requirement",
+        "file": "specifications/Requirements.md"
+      },
+      "redundant_relations": [
+        {
+          "relation_type": "derivedFrom",
+          "target": "specifications/Requirements.md#root-requirement"
+        }
+      ],
+      "rationale": "This element reaches 'specifications/Requirements.md#root-requirement' through multiple paths (via 'specifications/Requirements.md#alternative-parent-requirement' and 'specifications/Requirements.md#parent-requirement'). The direct relation to the ancestor is redundant and safe to remove."
+    },
+    {
+      "type": "safe_redundant_hierarchical_relations",
+      "element": {
         "identifier": "specifications/Requirements.md#single-chain-redundant-requirement",
         "name": "Single-Chain Redundant Requirement",
         "file": "specifications/Requirements.md"
@@ -13,7 +28,22 @@
           "target": "specifications/Requirements.md#root-requirement"
         }
       ],
-      "rationale": "This element reaches 'specifications/Requirements.md#root-requirement' through a single chain via 'specifications/Requirements.md#parent-requirement'. The direct relation to the ancestor is redundant and safe to remove."
+      "rationale": "This element reaches 'specifications/Requirements.md#root-requirement' through a path via 'specifications/Requirements.md#parent-requirement'. The direct relation to the ancestor is redundant and safe to remove."
+    },
+    {
+      "type": "safe_redundant_hierarchical_relations",
+      "element": {
+        "identifier": "specifications/SystemRequirements.md#api-specification",
+        "name": "API Specification",
+        "file": "specifications/SystemRequirements.md"
+      },
+      "redundant_relations": [
+        {
+          "relation_type": "derivedFrom",
+          "target": "specifications/SystemRequirements.md#authorization"
+        }
+      ],
+      "rationale": "This element reaches 'specifications/SystemRequirements.md#authorization' through multiple paths (via 'specifications/SystemRequirements.md#management-api' and 'specifications/SystemRequirements.md#public-api'). The direct relation to the ancestor is redundant and safe to remove."
     },
     {
       "type": "redundant_verify_relations",
@@ -31,36 +61,5 @@
       "rationale": "This verification verifies leaf requirements which derive from parent requirements also directly verified. Verification traces automatically roll up through derivedFrom relations, so verifying the leaf requirements is sufficient."
     }
   ],
-  "needs_manual_review": [
-    {
-      "type": "maybe_redundant_hierarchical_relations",
-      "element": {
-        "identifier": "specifications/Requirements.md#multi-path-redundant-requirement",
-        "name": "Multi-Path Redundant Requirement",
-        "file": "specifications/Requirements.md"
-      },
-      "potentially_redundant_relations": [
-        {
-          "relation_type": "derivedFrom",
-          "target": "specifications/Requirements.md#root-requirement"
-        }
-      ],
-      "rationale": "This element reaches 'specifications/Requirements.md#root-requirement' through multiple paths (via 'specifications/Requirements.md#alternative-parent-requirement' and 'specifications/Requirements.md#parent-requirement'). Multiple paths may have semantic meaning. Manual review required to determine if the direct relation should be removed."
-    },
-    {
-      "type": "maybe_redundant_hierarchical_relations",
-      "element": {
-        "identifier": "specifications/SystemRequirements.md#api-specification",
-        "name": "API Specification",
-        "file": "specifications/SystemRequirements.md"
-      },
-      "potentially_redundant_relations": [
-        {
-          "relation_type": "derivedFrom",
-          "target": "specifications/SystemRequirements.md#authorization"
-        }
-      ],
-      "rationale": "This element reaches 'specifications/SystemRequirements.md#authorization' through multiple paths (via 'specifications/SystemRequirements.md#management-api' and 'specifications/SystemRequirements.md#public-api'). Multiple paths may have semantic meaning. Manual review required to determine if the direct relation should be removed."
-    }
-  ]
+  "needs_manual_review": []
 }

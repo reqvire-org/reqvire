@@ -292,7 +292,7 @@ pub fn render_diff(format_result: &FormatResult) {
         } else {
             println!("Found {} file(s) with formatting changes:\n", format_result.diffs.len());
             render_file_diffs(&format_result.diffs);
-            println!("Run without --dry-run to apply these changes.");
+            println!("Run with --fix to apply these changes.");
         }
     } else {
         // Actual formatting - show diffs when changes are applied

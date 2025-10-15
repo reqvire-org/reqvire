@@ -2,7 +2,7 @@
 ///
 /// This module provides linting functionality to detect issues in requirements relations:
 /// - Redundant verify relations (auto-fixable)
-/// - Maybe-redundant hierarchical relations (manual review needed)
+/// - Redundant hierarchical relations (auto-fixable)
 
 use crate::element::ElementType;
 use crate::error::ReqvireError;
@@ -12,13 +12,13 @@ use crate::trace_tree_builder;
 use serde::Serialize;
 use std::collections::{HashMap, HashSet};
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Clone)]
 pub struct LintReport {
     pub auto_fixable: Vec<AutoFixableIssue>,
     pub needs_manual_review: Vec<ManualReviewIssue>,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Clone)]
 #[serde(tag = "type")]
 pub enum AutoFixableIssue {
     #[serde(rename = "redundant_verify_relations")]
@@ -35,13 +35,20 @@ pub enum AutoFixableIssue {
     },
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Clone)]
 #[serde(tag = "type")]
 pub enum ManualReviewIssue {
     #[serde(rename = "maybe_redundant_hierarchical_relations")]
     MaybeRedundantHierarchicalRelations {
         element: ElementInfo,
         potentially_redundant_relations: Vec<RelationInfo>,
+        rationale: String,
+    },
+    #[serde(rename = "multi_branch_convergence")]
+    MultiBranchConvergence {
+        element: ElementInfo,
+        common_ancestor: String,
+        branch_paths: Vec<String>,
         rationale: String,
     },
 }
@@ -62,7 +69,22 @@ pub struct RelationInfo {
 impl LintReport {
     pub fn print(&self, json: bool, show_only_fixable: bool, show_only_auditable: bool) {
         if json {
-            println!("{}", serde_json::to_string_pretty(self).unwrap());
+            // Filter the report based on flags before serializing
+            let filtered_report = if show_only_fixable {
+                LintReport {
+                    auto_fixable: self.auto_fixable.clone(),
+                    needs_manual_review: vec![],
+                }
+            } else if show_only_auditable {
+                LintReport {
+                    auto_fixable: vec![],
+                    needs_manual_review: self.needs_manual_review.clone(),
+                }
+            } else {
+                // Show both
+                self.clone()
+            };
+            println!("{}", serde_json::to_string_pretty(&filtered_report).unwrap());
         } else {
             self.print_text(show_only_fixable, show_only_auditable);
         }
@@ -139,6 +161,24 @@ impl LintReport {
                         );
                         for rel in potentially_redundant_relations {
                             println!("  * {}: [{}]({})", rel.relation_type, rel.target, rel.target);
+                        }
+                        println!("\nReason: {}\n", rationale);
+                        println!("---\n");
+                    }
+                    ManualReviewIssue::MultiBranchConvergence {
+                        element,
+                        common_ancestor,
+                        branch_paths,
+                        rationale,
+                    } => {
+                        println!("### Multi-Branch Convergence\n");
+                        println!("**Element: {}**", element.name);
+                        println!("File: [{}]({})\n", element.identifier, element.identifier);
+                        println!("This element reaches a common ancestor through multiple distinct branch paths:");
+                        println!("  * Common ancestor: [{}]({})", common_ancestor, common_ancestor);
+                        println!("  * Branch paths:");
+                        for path in branch_paths {
+                            println!("    - Via: {}", path);
                         }
                         println!("\nReason: {}\n", rationale);
                         println!("---\n");
@@ -227,6 +267,9 @@ pub fn analyze_model(registry: &GraphRegistry) -> LintReport {
     auto_fixable.extend(safe_issues);
     needs_manual_review.extend(unsafe_issues);
 
+    // Detect multi-branch convergence (needs manual review)
+    needs_manual_review.extend(detect_multi_branch_convergence(registry));
+
     // Sort issues by element identifier for deterministic output
     auto_fixable.sort_by(|a, b| {
         let id_a = match a {
@@ -243,9 +286,11 @@ pub fn analyze_model(registry: &GraphRegistry) -> LintReport {
     needs_manual_review.sort_by(|a, b| {
         let id_a = match a {
             ManualReviewIssue::MaybeRedundantHierarchicalRelations { element, .. } => &element.identifier,
+            ManualReviewIssue::MultiBranchConvergence { element, .. } => &element.identifier,
         };
         let id_b = match b {
             ManualReviewIssue::MaybeRedundantHierarchicalRelations { element, .. } => &element.identifier,
+            ManualReviewIssue::MultiBranchConvergence { element, .. } => &element.identifier,
         };
         id_a.cmp(id_b)
     });
@@ -332,17 +377,18 @@ fn detect_redundant_verify_relations(registry: &GraphRegistry) -> Vec<AutoFixabl
 }
 
 /// Detect hierarchical relation redundancies
-/// Returns (safe_auto_fixable_issues, unsafe_manual_review_issues)
+/// Returns (auto_fixable_issues, unused_manual_review_issues)
 /// An element has a redundant hierarchical relation if it has a direct parent relation
 /// to both a requirement and an ancestor of that requirement.
 ///
-/// Safe to auto-remove (single chain): Element → Parent → Ancestor with direct Element → Ancestor
-/// Unsafe (multi-path): Element reaches Ancestor through multiple different paths
+/// All redundant relations are safe to auto-remove: If an element has a direct relation
+/// to a parent AND also reaches that parent through other paths (whether single or multiple),
+/// the direct relation is redundant and can be safely removed.
 fn detect_hierarchical_redundancies(
     registry: &GraphRegistry,
 ) -> (Vec<AutoFixableIssue>, Vec<ManualReviewIssue>) {
     let mut safe_issues = Vec::new();
-    let mut unsafe_issues = Vec::new();
+    let unsafe_issues = Vec::new();
     let hierarchical_relation = VERIFICATION_TRACES_RELATIONS[0];
 
     // Check each element
@@ -406,45 +452,56 @@ fn detect_hierarchical_redundancies(
             // Sort for deterministic output
             intermediate_parents.sort();
 
-            // For each redundant parent, check if it's safe to auto-remove (single chain)
-            // or needs manual review (multi-path)
-            let mut safe_redundant = Vec::new();
-            let mut unsafe_redundant = Vec::new();
-
-            for redundant_parent_id in &redundant_parents {
-                // Count paths from element to this redundant parent through intermediates
-                let path_count = count_paths_to_target(
-                    &element.identifier,
-                    redundant_parent_id,
-                    &direct_parents,
-                    registry,
-                );
-
-                if path_count == 1 {
-                    // Single chain - safe to auto-remove
-                    safe_redundant.push(redundant_parent_id.clone());
-                } else {
-                    // Multiple paths - needs manual review
-                    unsafe_redundant.push(redundant_parent_id.clone());
-                }
-            }
+            // All redundant parents are safe to auto-remove
+            // If an element has both a direct relation to a parent AND reaches that parent
+            // through other intermediate elements, the direct relation is redundant regardless
+            // of whether there's one path or multiple convergent paths
+            let mut safe_redundant = redundant_parents.clone();
             // Sort for deterministic output
             safe_redundant.sort();
-            unsafe_redundant.sort();
 
             // Create safe auto-fixable issues
             if !safe_redundant.is_empty() {
-                let rationale = if intermediate_parents.len() == 1 && safe_redundant.len() == 1 {
-                    format!(
-                        "This element reaches '{}' through a single chain via '{}'. The direct relation to the ancestor is redundant and safe to remove.",
-                        safe_redundant[0],
-                        intermediate_parents[0]
-                    )
+                // Find which intermediate parents lead to each redundant parent for detailed rationale
+                let rationale = if safe_redundant.len() == 1 {
+                    let redundant_id = &safe_redundant[0];
+                    let intermediate_paths: Vec<String> = intermediate_parents
+                        .iter()
+                        .filter(|parent_id| {
+                            path_exists_to_target(
+                                parent_id,
+                                redundant_id,
+                                registry,
+                                &mut HashSet::new(),
+                            )
+                        })
+                        .cloned()
+                        .collect();
+
+                    if intermediate_paths.len() == 1 {
+                        format!(
+                            "This element reaches '{}' through a path via '{}'. The direct relation to the ancestor is redundant and safe to remove.",
+                            redundant_id,
+                            intermediate_paths[0]
+                        )
+                    } else if intermediate_paths.len() >= 2 {
+                        format!(
+                            "This element reaches '{}' through multiple paths (via '{}' and '{}'). The direct relation to the ancestor is redundant and safe to remove.",
+                            redundant_id,
+                            intermediate_paths[0],
+                            intermediate_paths[1]
+                        )
+                    } else {
+                        format!(
+                            "This element reaches '{}' through intermediate elements. The direct relation to the ancestor is redundant and safe to remove.",
+                            redundant_id
+                        )
+                    }
                 } else {
                     let ancestors_list = safe_redundant.join("', '");
                     let intermediates_list = intermediate_parents.join("', '");
                     format!(
-                        "This element reaches ancestor requirements ('{}') through single chains via intermediate requirements ('{}'). The direct relations to ancestors are redundant and safe to remove.",
+                        "This element reaches ancestor requirements ('{}') via intermediate requirements ('{}'). The direct relations to ancestors are redundant and safe to remove.",
                         ancestors_list,
                         intermediates_list
                     )
@@ -457,52 +514,6 @@ fn detect_hierarchical_redundancies(
                         file: element.file_path.clone(),
                     },
                     redundant_relations: safe_redundant
-                        .iter()
-                        .map(|id| RelationInfo {
-                            relation_type: hierarchical_relation.to_string(),
-                            target: id.clone(),
-                        })
-                        .collect(),
-                    rationale,
-                });
-            }
-
-            // Create unsafe manual review issues
-            if !unsafe_redundant.is_empty() {
-                // Find which intermediate parents lead to this redundant parent
-                let intermediate_paths: Vec<String> = intermediate_parents
-                    .iter()
-                    .filter(|parent_id| {
-                        path_exists_to_target(
-                            parent_id,
-                            &unsafe_redundant[0],
-                            registry,
-                            &mut HashSet::new(),
-                        )
-                    })
-                    .cloned()
-                    .collect();
-
-                let rationale = if intermediate_paths.len() >= 2 && unsafe_redundant.len() == 1 {
-                    format!(
-                        "This element reaches '{}' through multiple paths (via '{}' and '{}'). Multiple paths may have semantic meaning. Manual review required to determine if the direct relation should be removed.",
-                        unsafe_redundant[0],
-                        intermediate_paths.get(0).unwrap_or(&"unknown".to_string()),
-                        intermediate_paths.get(1).unwrap_or(&"unknown".to_string())
-                    )
-                } else {
-                    format!(
-                        "This element reaches ancestor requirements through multiple paths. Multiple paths may have semantic meaning. Manual review required to determine if the direct relations should be removed."
-                    )
-                };
-
-                unsafe_issues.push(ManualReviewIssue::MaybeRedundantHierarchicalRelations {
-                    element: ElementInfo {
-                        identifier: element.identifier.clone(),
-                        name: element.name.clone(),
-                        file: element.file_path.clone(),
-                    },
-                    potentially_redundant_relations: unsafe_redundant
                         .iter()
                         .map(|id| RelationInfo {
                             relation_type: hierarchical_relation.to_string(),
@@ -553,33 +564,6 @@ fn collect_ancestors_recursive(
     }
 }
 
-/// Count the number of distinct paths from source to target through intermediate elements
-/// Returns the count of unique paths found
-fn count_paths_to_target(
-    _source_id: &str,
-    target_id: &str,
-    direct_parents: &[String],
-    registry: &GraphRegistry,
-) -> usize {
-    let mut path_count = 0;
-    let visited = HashSet::new();
-
-    // Check each direct parent to see if it leads to the target
-    for parent_id in direct_parents {
-        if parent_id == target_id {
-            // Direct connection doesn't count as a path through intermediate
-            continue;
-        }
-
-        // Check if this parent leads to the target
-        if path_exists_to_target(parent_id, target_id, registry, &mut visited.clone()) {
-            path_count += 1;
-        }
-    }
-
-    path_count
-}
-
 /// Check if a path exists from source to target through hierarchical relations
 fn path_exists_to_target(
     current_id: &str,
@@ -614,6 +598,226 @@ fn path_exists_to_target(
     false
 }
 
+/// Detect multi-branch convergence where an element reaches a common ancestor
+/// through multiple distinct branch paths WITHOUT a direct relation to the ancestor.
+///
+/// This is different from redundant hierarchical relations (which have a direct relation
+/// that can be auto-removed). Multi-branch convergence requires manual review to determine
+/// if all branches are semantically necessary or if one represents a modeling error.
+fn detect_multi_branch_convergence(registry: &GraphRegistry) -> Vec<ManualReviewIssue> {
+    let mut issues = Vec::new();
+
+    // Check each element
+    for element in registry.get_all_elements() {
+        // Skip verifications and files
+        if matches!(element.element_type, ElementType::Verification(_))
+            || matches!(element.element_type, ElementType::File)
+        {
+            continue;
+        }
+
+        // Get all direct parent relations for this element
+        let direct_parents: Vec<String> = element
+            .relations
+            .iter()
+            .filter(|rel| VERIFICATION_TRACES_RELATIONS.contains(&rel.relation_type.name))
+            .filter_map(|rel| {
+                if let crate::relation::LinkType::Identifier(id) = &rel.target.link {
+                    Some(id.clone())
+                } else {
+                    None
+                }
+            })
+            .collect();
+
+        // Need at least 2 parents to have potential convergence
+        if direct_parents.len() < 2 {
+            continue;
+        }
+
+        // For each direct parent, collect all its ancestors
+        let mut parent_ancestors: HashMap<String, HashSet<String>> = HashMap::new();
+        for parent_id in &direct_parents {
+            let ancestors = collect_ancestors(parent_id, registry);
+            parent_ancestors.insert(parent_id.clone(), ancestors);
+        }
+
+        // Find common ancestors that are reached through multiple branches
+        // We need to find ancestors that appear in multiple parent's ancestor sets
+        // BUT we skip ancestors that are direct parents (those are handled by redundant hierarchical detection)
+        let mut ancestor_counts: HashMap<String, Vec<String>> = HashMap::new();
+        for (parent_id, ancestors) in &parent_ancestors {
+            for ancestor_id in ancestors {
+                // Skip if this ancestor is also a direct parent
+                // (that case is handled by redundant hierarchical relations detection)
+                if direct_parents.contains(ancestor_id) {
+                    continue;
+                }
+
+                ancestor_counts
+                    .entry(ancestor_id.clone())
+                    .or_insert_with(Vec::new)
+                    .push(parent_id.clone());
+            }
+        }
+
+        // Find ancestors reached through multiple branches (2 or more)
+        // Only report the NEAREST common ancestor (fewest hops from element)
+        let mut candidates: Vec<(String, Vec<String>)> = ancestor_counts
+            .iter()
+            .filter(|(_, branches)| branches.len() >= 2)
+            .map(|(ancestor, branches)| (ancestor.clone(), branches.clone()))
+            .collect();
+
+        // Sort candidates by distance (number of hops) - closest first
+        // We want to report only the nearest common ancestor to avoid noise
+        candidates.sort_by_key(|(ancestor_id, _)| {
+            // Calculate minimum distance from element to this ancestor through any branch
+            let mut min_distance = usize::MAX;
+            for parent in &direct_parents {
+                if let Some(dist) = distance_to_ancestor(parent, ancestor_id, registry) {
+                    min_distance = min_distance.min(dist + 1); // +1 for edge from element to parent
+                }
+            }
+            min_distance
+        });
+
+        // Find the first candidate that meets all criteria
+        for (ancestor_id, branch_parents) in &candidates {
+            // Only report if the ancestor is NOT a direct parent
+            // (if it is a direct parent, that's handled by redundant hierarchical relations detection)
+            if direct_parents.contains(ancestor_id) {
+                continue;
+            }
+
+            // Get all ancestors of the common ancestor
+            let ancestor_ancestors = collect_ancestors(ancestor_id, registry);
+
+            // Filter branch paths to only include those that are DIRECT parents
+            // AND that are NOT themselves ancestors of the common ancestor
+            // (we want leaf branches, not intermediate ancestors)
+            let direct_branch_paths: Vec<String> = branch_parents
+                .iter()
+                .filter(|branch| {
+                    // Must be a direct parent
+                    if !direct_parents.contains(*branch) {
+                        return false;
+                    }
+                    // Must NOT be an ancestor of the common ancestor
+                    // (check if this branch appears in the common ancestor's ancestors)
+                    if ancestor_ancestors.contains(*branch) {
+                        return false;  // Skip this branch - it's an ancestor of the common ancestor
+                    }
+                    true
+                })
+                .cloned()
+                .collect();
+
+            // Only report if there are at least 2 direct branch paths
+            if direct_branch_paths.len() < 2 {
+                continue;
+            }
+
+            // Check if ALL branch paths have the common ancestor as a direct parent
+            // (this is the ideal case - all branches are immediate children of the common ancestor)
+            // If NOT all branches have it as a direct parent, skip and look for a closer ancestor
+            let all_branches_are_direct_children = direct_branch_paths.iter().all(|branch_path| {
+                if let Some(branch_element) = registry.get_element(branch_path) {
+                    for rel in &branch_element.relations {
+                        if VERIFICATION_TRACES_RELATIONS.contains(&rel.relation_type.name) {
+                            if let crate::relation::LinkType::Identifier(parent_id) = &rel.target.link {
+                                if parent_id == ancestor_id {
+                                    return true;  // This branch has the ancestor as a direct parent
+                                }
+                            }
+                        }
+                    }
+                }
+                false  // This branch does NOT have the ancestor as a direct parent
+            });
+
+            if !all_branches_are_direct_children {
+                continue;  // Skip this candidate - not all branches are direct children
+            }
+
+            // This is a valid multi-branch convergence - report it
+            let mut branch_paths = direct_branch_paths.clone();
+            branch_paths.sort();
+
+            issues.push(ManualReviewIssue::MultiBranchConvergence {
+                element: ElementInfo {
+                    identifier: element.identifier.clone(),
+                    name: element.name.clone(),
+                    file: element.file_path.clone(),
+                },
+                common_ancestor: ancestor_id.clone(),
+                branch_paths,
+                rationale: "This element reaches the common ancestor through multiple branches. Both branches may be semantically necessary (element derives from ancestor in multiple contexts), OR one branch may represent a modeling error. Human review is required to determine if all branches are valid.".to_string(),
+            });
+
+            // Only report the nearest valid common ancestor
+            break;
+        }
+    }
+
+    issues
+}
+
+/// Calculate the distance (number of hops) from source to target through hierarchical relations
+/// Returns None if no path exists
+fn distance_to_ancestor(
+    current_id: &str,
+    target_id: &str,
+    registry: &GraphRegistry,
+) -> Option<usize> {
+    let mut visited = HashSet::new();
+    distance_to_ancestor_recursive(current_id, target_id, registry, &mut visited, 0)
+}
+
+/// Recursive helper for distance calculation
+fn distance_to_ancestor_recursive(
+    current_id: &str,
+    target_id: &str,
+    registry: &GraphRegistry,
+    visited: &mut HashSet<String>,
+    current_distance: usize,
+) -> Option<usize> {
+    // Prevent cycles
+    if visited.contains(current_id) {
+        return None;
+    }
+    visited.insert(current_id.to_string());
+
+    // Check if we've reached the target
+    if current_id == target_id {
+        return Some(current_distance);
+    }
+
+    // Get current element and check its parents
+    if let Some(element) = registry.get_element(current_id) {
+        let mut min_distance: Option<usize> = None;
+
+        for relation in &element.relations {
+            if VERIFICATION_TRACES_RELATIONS.contains(&relation.relation_type.name) {
+                if let crate::relation::LinkType::Identifier(parent_id) = &relation.target.link {
+                    if let Some(dist) = distance_to_ancestor_recursive(
+                        parent_id,
+                        target_id,
+                        registry,
+                        visited,
+                        current_distance + 1,
+                    ) {
+                        min_distance = Some(min_distance.map_or(dist, |d| d.min(dist)));
+                    }
+                }
+            }
+        }
+
+        return min_distance;
+    }
+
+    None
+}
 
 #[cfg(test)]
 mod tests {

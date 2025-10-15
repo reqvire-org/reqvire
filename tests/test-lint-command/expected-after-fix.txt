@@ -1,25 +1,31 @@
 ## Needs Manual Review
 
-### Maybe-Redundant Hierarchical Relations
+### Multi-Branch Convergence
 
 **Element: Multi-Path Redundant Requirement**
 File: [specifications/Requirements.md#multi-path-redundant-requirement](specifications/Requirements.md#multi-path-redundant-requirement)
 
-Potentially redundant derivedFrom relations detected:
-  * derivedFrom: [specifications/Requirements.md#root-requirement](specifications/Requirements.md#root-requirement)
+This element reaches a common ancestor through multiple distinct branch paths:
+  * Common ancestor: [specifications/Requirements.md#root-requirement](specifications/Requirements.md#root-requirement)
+  * Branch paths:
+    - Via: specifications/Requirements.md#alternative-parent-requirement
+    - Via: specifications/Requirements.md#parent-requirement
 
-Reason: This element reaches 'specifications/Requirements.md#root-requirement' through multiple paths (via 'specifications/Requirements.md#alternative-parent-requirement' and 'specifications/Requirements.md#parent-requirement'). Multiple paths may have semantic meaning. Manual review required to determine if the direct relation should be removed.
+Reason: This element reaches the common ancestor through multiple branches. Both branches may be semantically necessary (element derives from ancestor in multiple contexts), OR one branch may represent a modeling error. Human review is required to determine if all branches are valid.
 
 ---
 
-### Maybe-Redundant Hierarchical Relations
+### Multi-Branch Convergence
 
 **Element: API Specification**
 File: [specifications/SystemRequirements.md#api-specification](specifications/SystemRequirements.md#api-specification)
 
-Potentially redundant derivedFrom relations detected:
-  * derivedFrom: [specifications/SystemRequirements.md#authorization](specifications/SystemRequirements.md#authorization)
+This element reaches a common ancestor through multiple distinct branch paths:
+  * Common ancestor: [specifications/SystemRequirements.md#authorization](specifications/SystemRequirements.md#authorization)
+  * Branch paths:
+    - Via: specifications/SystemRequirements.md#management-api
+    - Via: specifications/SystemRequirements.md#public-api
 
-Reason: This element reaches 'specifications/SystemRequirements.md#authorization' through multiple paths (via 'specifications/SystemRequirements.md#management-api' and 'specifications/SystemRequirements.md#public-api'). Multiple paths may have semantic meaning. Manual review required to determine if the direct relation should be removed.
+Reason: This element reaches the common ancestor through multiple branches. Both branches may be semantically necessary (element derives from ancestor in multiple contexts), OR one branch may represent a modeling error. Human review is required to determine if all branches are valid.
 
 ---

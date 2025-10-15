@@ -275,4 +275,4 @@ Found 7 file(s) with formatting changes:
 
 
 
-Run without --dry-run to apply these changes.
+Run with --fix to apply these changes.

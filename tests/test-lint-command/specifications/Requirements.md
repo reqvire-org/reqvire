@@ -62,7 +62,7 @@ This requirement has derivedFrom to both parent and root through a SINGLE chain 
 
 ### Multi-Path Redundant Requirement
 
-This requirement reaches root through MULTIPLE paths (parent-requirement and alternative-parent-requirement), so the root relation is NOT safe to auto-remove.
+This requirement reaches root through MULTIPLE convergent paths (via parent-requirement and alternative-parent-requirement). Since root is reachable through other paths, the direct root relation is redundant and safe to auto-remove.
 
 #### Metadata
   * type: requirement

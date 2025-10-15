@@ -79,6 +79,61 @@ if ! diff -u <(jq -S . "${TEST_SCRIPT_DIR}/expected-json.json") <(echo "$JSON_OU
   exit 1
 fi
 
+# Test 4a: --fixable --json (should only show auto_fixable items)
+set +e
+FIXABLE_JSON_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" lint --fixable --json 2>&1)
+FIXABLE_JSON_EXIT=$?
+set -e
+
+if [ $FIXABLE_JSON_EXIT -ne 0 ]; then
+  echo "❌ FAILED: lint --fixable --json exit code $FIXABLE_JSON_EXIT"
+  echo "$FIXABLE_JSON_OUTPUT"
+  exit 1
+fi
+
+# Verify needs_manual_review is empty
+MANUAL_REVIEW_COUNT=$(echo "$FIXABLE_JSON_OUTPUT" | jq '.needs_manual_review | length')
+if [ "$MANUAL_REVIEW_COUNT" -ne 0 ]; then
+  echo "❌ FAILED: --fixable --json should not show needs_manual_review items (found $MANUAL_REVIEW_COUNT)"
+  echo "$FIXABLE_JSON_OUTPUT" | jq '.needs_manual_review'
+  exit 1
+fi
+
+# Verify auto_fixable is not empty
+AUTO_FIXABLE_COUNT=$(echo "$FIXABLE_JSON_OUTPUT" | jq '.auto_fixable | length')
+if [ "$AUTO_FIXABLE_COUNT" -eq 0 ]; then
+  echo "❌ FAILED: --fixable --json should show auto_fixable items (found 0)"
+  exit 1
+fi
+
+# Test 4b: --auditable --json (should only show needs_manual_review items)
+set +e
+AUDITABLE_JSON_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" lint --auditable --json 2>&1)
+AUDITABLE_JSON_EXIT=$?
+set -e
+
+if [ $AUDITABLE_JSON_EXIT -ne 0 ]; then
+  echo "❌ FAILED: lint --auditable --json exit code $AUDITABLE_JSON_EXIT"
+  echo "$AUDITABLE_JSON_OUTPUT"
+  exit 1
+fi
+
+# Verify auto_fixable is empty
+AUTO_FIXABLE_COUNT_AUDIT=$(echo "$AUDITABLE_JSON_OUTPUT" | jq '.auto_fixable | length')
+if [ "$AUTO_FIXABLE_COUNT_AUDIT" -ne 0 ]; then
+  echo "❌ FAILED: --auditable --json should not show auto_fixable items (found $AUTO_FIXABLE_COUNT_AUDIT)"
+  echo "$AUDITABLE_JSON_OUTPUT" | jq '.auto_fixable'
+  exit 1
+fi
+
+# Verify needs_manual_review is empty (before fix, there are no manual review items)
+MANUAL_REVIEW_COUNT_AUDIT=$(echo "$AUDITABLE_JSON_OUTPUT" | jq '.needs_manual_review | length')
+if [ "$MANUAL_REVIEW_COUNT_AUDIT" -ne 0 ]; then
+  echo "❌ FAILED: --auditable --json should have empty needs_manual_review before fix (found $MANUAL_REVIEW_COUNT_AUDIT)"
+  echo "$AUDITABLE_JSON_OUTPUT" | jq '.needs_manual_review'
+  exit 1
+fi
+
 # Test 5: --fix flag
 set +e
 FIX_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" lint --fix 2>&1)
