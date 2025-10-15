@@ -14,13 +14,13 @@ Reason: This element reaches 'specifications/Requirements.md#root-requirement' t
 
 ### Redundant Verify Relations
 
-**Verification: Test Verification**
-File: [specifications/Verifications/Tests.md#test-verification](specifications/Verifications/Tests.md#test-verification)
+**Verification: API Integration Test**
+File: [specifications/Verifications/Tests.md#api-integration-test](specifications/Verifications/Tests.md#api-integration-test)
 
 Redundant verify relations (these can be automatically removed):
-  * verify: [specifications/Requirements.md#parent-requirement](specifications/Requirements.md#parent-requirement)
+  * verify: [specifications/SystemRequirements.md#authorization](specifications/SystemRequirements.md#authorization)
 
-Reason: This verification already verifies 'specifications/Requirements.md#leaf-requirement' which derives from 'specifications/Requirements.md#parent-requirement'. Verification traces automatically roll up through derivedFrom relations, so verifying the leaf requirement is sufficient.
+Reason: This verification verifies leaf requirements which derive from parent requirements also directly verified. Verification traces automatically roll up through derivedFrom relations, so verifying the leaf requirements is sufficient.
 
 ---
 
@@ -35,5 +35,17 @@ Potentially redundant derivedFrom relations detected:
   * derivedFrom: [specifications/Requirements.md#root-requirement](specifications/Requirements.md#root-requirement)
 
 Reason: This element reaches 'specifications/Requirements.md#root-requirement' through multiple paths (via 'specifications/Requirements.md#alternative-parent-requirement' and 'specifications/Requirements.md#parent-requirement'). Multiple paths may have semantic meaning. Manual review required to determine if the direct relation should be removed.
+
+---
+
+### Maybe-Redundant Hierarchical Relations
+
+**Element: API Specification**
+File: [specifications/SystemRequirements.md#api-specification](specifications/SystemRequirements.md#api-specification)
+
+Potentially redundant derivedFrom relations detected:
+  * derivedFrom: [specifications/SystemRequirements.md#authorization](specifications/SystemRequirements.md#authorization)
+
+Reason: This element reaches 'specifications/SystemRequirements.md#authorization' through multiple paths (via 'specifications/SystemRequirements.md#management-api' and 'specifications/SystemRequirements.md#public-api'). Multiple paths may have semantic meaning. Manual review required to determine if the direct relation should be removed.
 
 ---

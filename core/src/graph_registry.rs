@@ -775,9 +775,11 @@ impl GraphRegistry {
         }
     }
 
-    /// Gets all elements as a vector
+    /// Gets all elements as a vector, sorted by identifier for deterministic output
     pub fn get_all_elements(&self) -> Vec<&Element> {
-        self.nodes.values().map(|node| &node.element).collect()
+        let mut elements: Vec<&Element> = self.nodes.values().map(|node| &node.element).collect();
+        elements.sort_by(|a, b| a.identifier.cmp(&b.identifier));
+        elements
     }
 
     /// Collects all InternalPath targets from element relations

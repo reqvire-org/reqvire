@@ -31,8 +31,6 @@ graph TD
   bfd26e943c93f2b8 -.->|verifies| 5a755bb51a740c10;
 ```
 
-**Redundant Relations:**
-- [OAuth Implementation](specifications/SystemRequirements.md#oauth-implementation)
 
 #### Session Timeout Test
 
@@ -118,8 +116,6 @@ graph TD
   28383c90c121c4a5 -.->|verifies| 21afc68bc3823e3b;
 ```
 
-**Redundant Relations:**
-- [Coverage Calculator](specifications/SystemRequirements.md#coverage-calculator)
 
 ### Section: Analysis Verifications
 

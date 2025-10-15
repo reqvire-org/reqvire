@@ -18,17 +18,17 @@
     {
       "type": "redundant_verify_relations",
       "verification": {
-        "identifier": "specifications/Verifications/Tests.md#test-verification",
-        "name": "Test Verification",
+        "identifier": "specifications/Verifications/Tests.md#api-integration-test",
+        "name": "API Integration Test",
         "file": "specifications/Verifications/Tests.md"
       },
       "redundant_relations": [
         {
           "relation_type": "verify",
-          "target": "specifications/Requirements.md#parent-requirement"
+          "target": "specifications/SystemRequirements.md#authorization"
         }
       ],
-      "rationale": "This verification already verifies 'specifications/Requirements.md#leaf-requirement' which derives from 'specifications/Requirements.md#parent-requirement'. Verification traces automatically roll up through derivedFrom relations, so verifying the leaf requirement is sufficient."
+      "rationale": "This verification verifies leaf requirements which derive from parent requirements also directly verified. Verification traces automatically roll up through derivedFrom relations, so verifying the leaf requirements is sufficient."
     }
   ],
   "needs_manual_review": [
@@ -46,6 +46,21 @@
         }
       ],
       "rationale": "This element reaches 'specifications/Requirements.md#root-requirement' through multiple paths (via 'specifications/Requirements.md#alternative-parent-requirement' and 'specifications/Requirements.md#parent-requirement'). Multiple paths may have semantic meaning. Manual review required to determine if the direct relation should be removed."
+    },
+    {
+      "type": "maybe_redundant_hierarchical_relations",
+      "element": {
+        "identifier": "specifications/SystemRequirements.md#api-specification",
+        "name": "API Specification",
+        "file": "specifications/SystemRequirements.md"
+      },
+      "potentially_redundant_relations": [
+        {
+          "relation_type": "derivedFrom",
+          "target": "specifications/SystemRequirements.md#authorization"
+        }
+      ],
+      "rationale": "This element reaches 'specifications/SystemRequirements.md#authorization' through multiple paths (via 'specifications/SystemRequirements.md#management-api' and 'specifications/SystemRequirements.md#public-api'). Multiple paths may have semantic meaning. Manual review required to determine if the direct relation should be removed."
     }
   ]
 }

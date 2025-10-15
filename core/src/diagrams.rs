@@ -562,13 +562,27 @@ fn add_element_to_diagram(
 
 
 
-    for relation in &element.relations {
+    // Sort relations for deterministic output
+    let mut sorted_relations: Vec<_> = element.relations.iter().collect();
+    sorted_relations.sort_by(|a, b| {
+        a.relation_type.name.cmp(b.relation_type.name)
+            .then_with(|| {
+                match (&a.target.link, &b.target.link) {
+                    (relation::LinkType::Identifier(a_id), relation::LinkType::Identifier(b_id)) => a_id.cmp(b_id),
+                    (relation::LinkType::ExternalUrl(a_url), relation::LinkType::ExternalUrl(b_url)) => a_url.cmp(b_url),
+                    (relation::LinkType::InternalPath(a_path), relation::LinkType::InternalPath(b_path)) => a_path.cmp(b_path),
+                    _ => std::cmp::Ordering::Equal,
+                }
+            })
+    });
+
+    for relation in sorted_relations {
         // Only render relations that should be shown in diagrams (to prevent duplicate arrows)
         if !relation::DIAGRAM_RELATIONS.contains(&relation.relation_type.name) {
             continue;
         }
-        
-        
+
+
         let label = relation.target.text.clone();
         let target_id = match &relation.target.link {
             relation::LinkType::Identifier(target) => {            

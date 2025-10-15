@@ -22,11 +22,11 @@ graph LR;
   c860d0d799c1948f["Trace Relation Non-Directional Behavior"];
   class c860d0d799c1948f systemRequirement;
   click c860d0d799c1948f "../ReqvireTool/ModelManagement/DiagramGeneration.md#trace-relation-non-directional-behavior";
+  c860d0d799c1948f -.->|verifiedBy| 96a12d4873ff83a0;
   e37dc7f46d75d46["Invalid Relations Test"];
   class e37dc7f46d75d46 verification;
   click e37dc7f46d75d46 "ValidationTests.md#invalid-relations-test";
   c860d0d799c1948f -.->|verifiedBy| e37dc7f46d75d46;
-  c860d0d799c1948f -.->|verifiedBy| 96a12d4873ff83a0;
 ```
 ### Trace Relations No Cycles Verification
 

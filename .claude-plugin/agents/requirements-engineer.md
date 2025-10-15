@@ -525,6 +525,9 @@ reqvire html --output <dir>
 
 # Generate diagrams
 reqvire generate-diagrams
+
+# Remove diagrams
+reqvire remove-diagrams
 ```
 
 ### Filter Options:
@@ -554,6 +557,9 @@ reqvire change-impact --git-commit=HEAD~1 --json > /tmp/impact.json
 ```
 
 ## Your Workflow
+
+### 0. Startint Phase (CRITICAL):
+- You must always start any work with running `reqvire remove-diagrams` so that context tokens are not spent on reading diagrams in documents.
 
 ### 1. Discovery Phase:
 - Use `reqvire section-summary --filter-content="security|authentication|authorization"` to understand security requirements in each section

@@ -12,16 +12,6 @@ graph LR;
   classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  6c3185c2d992e9fb["Model Command Verification"];
-  class 6c3185c2d992e9fb verification;
-  click 6c3185c2d992e9fb "ReportsTests.md#model-command-verification";
-  fa3c1ae9e9b91644["Verification Traces From-Folder Test"];
-  class fa3c1ae9e9b91644 verification;
-  click fa3c1ae9e9b91644 "ReportsTests.md#verification-traces-from-folder-test";
-  c4c5998e49538704["test.sh"];
-  class c4c5998e49538704 default;
-  click c4c5998e49538704 "../../tests/test-verification-traces/test.sh";
-  fa3c1ae9e9b91644 -->|satisfiedBy| c4c5998e49538704;
   b266b2fae4370efb["Custom Element Type Tracking Test"];
   class b266b2fae4370efb verification;
   click b266b2fae4370efb "ReportsTests.md#custom-element-type-tracking-test";
@@ -29,13 +19,9 @@ graph LR;
   class 7b75340700b95177 default;
   click 7b75340700b95177 "../../tests/test-model-summary-reports/test.sh";
   b266b2fae4370efb -->|satisfiedBy| 7b75340700b95177;
-  958d9af6695bd8a["Verification Traces Filter Options Test"];
-  class 958d9af6695bd8a verification;
-  click 958d9af6695bd8a "ReportsTests.md#verification-traces-filter-options-test";
-  c4c5998e49538704["test.sh"];
-  class c4c5998e49538704 default;
-  click c4c5998e49538704 "../../tests/test-verification-traces/test.sh";
-  958d9af6695bd8a -->|satisfiedBy| c4c5998e49538704;
+  6c3185c2d992e9fb["Model Command Verification"];
+  class 6c3185c2d992e9fb verification;
+  click 6c3185c2d992e9fb "ReportsTests.md#model-command-verification";
   76ae69270700044b["Model Summary Tests"];
   class 76ae69270700044b verification;
   click 76ae69270700044b "ReportsTests.md#model-summary-tests";
@@ -43,13 +29,6 @@ graph LR;
   class 7b75340700b95177 default;
   click 7b75340700b95177 "../../tests/test-model-summary-reports/test.sh";
   76ae69270700044b -->|satisfiedBy| 7b75340700b95177;
-  349f5e874cf22d98["Verification Coverage Report Test"];
-  class 349f5e874cf22d98 verification;
-  click 349f5e874cf22d98 "ReportsTests.md#verification-coverage-report-test";
-  7099e5b2f8a08808["test.sh"];
-  class 7099e5b2f8a08808 default;
-  click 7099e5b2f8a08808 "../../tests/test-coverage-report/test.sh";
-  349f5e874cf22d98 -->|satisfiedBy| 7099e5b2f8a08808;
   9bf743e946ad83ea["Sections Summary Tests"];
   class 9bf743e946ad83ea verification;
   click 9bf743e946ad83ea "ReportsTests.md#sections-summary-tests";
@@ -57,6 +36,27 @@ graph LR;
   class bf32ae8da9b17852 default;
   click bf32ae8da9b17852 "../../tests/test-sections-summary/test.sh";
   9bf743e946ad83ea -->|satisfiedBy| bf32ae8da9b17852;
+  349f5e874cf22d98["Verification Coverage Report Test"];
+  class 349f5e874cf22d98 verification;
+  click 349f5e874cf22d98 "ReportsTests.md#verification-coverage-report-test";
+  7099e5b2f8a08808["test.sh"];
+  class 7099e5b2f8a08808 default;
+  click 7099e5b2f8a08808 "../../tests/test-coverage-report/test.sh";
+  349f5e874cf22d98 -->|satisfiedBy| 7099e5b2f8a08808;
+  958d9af6695bd8a["Verification Traces Filter Options Test"];
+  class 958d9af6695bd8a verification;
+  click 958d9af6695bd8a "ReportsTests.md#verification-traces-filter-options-test";
+  c4c5998e49538704["test.sh"];
+  class c4c5998e49538704 default;
+  click c4c5998e49538704 "../../tests/test-verification-traces/test.sh";
+  958d9af6695bd8a -->|satisfiedBy| c4c5998e49538704;
+  fa3c1ae9e9b91644["Verification Traces From-Folder Test"];
+  class fa3c1ae9e9b91644 verification;
+  click fa3c1ae9e9b91644 "ReportsTests.md#verification-traces-from-folder-test";
+  c4c5998e49538704["test.sh"];
+  class c4c5998e49538704 default;
+  click c4c5998e49538704 "../../tests/test-verification-traces/test.sh";
+  fa3c1ae9e9b91644 -->|satisfiedBy| c4c5998e49538704;
   b559b1f7629a5c62["CLI Coverage Command"];
   class b559b1f7629a5c62 systemRequirement;
   click b559b1f7629a5c62 "../ReqvireTool/UserInterface/CLI.md#cli-coverage-command";
@@ -64,19 +64,11 @@ graph LR;
   class 80defdd4cbc7ee18 default;
   click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
   b559b1f7629a5c62 -->|satisfiedBy| 80defdd4cbc7ee18;
-  b559b1f7629a5c62 -.->|verifiedBy| 349f5e874cf22d98;
   34c75e4a88e1f381["CLI Help Structure Verification"];
   class 34c75e4a88e1f381 verification;
   click 34c75e4a88e1f381 "Misc.md#cli-help-structure-verification";
   b559b1f7629a5c62 -.->|verifiedBy| 34c75e4a88e1f381;
-  11ca6eab6e458ae0["Forward-Only Relation Traversal"];
-  class 11ca6eab6e458ae0 systemRequirement;
-  click 11ca6eab6e458ae0 "../ReqvireTool/ValidationAndReporting/Reports.md#forward-only-relation-traversal";
-  dad7eeb932afdb92["diagrams.rs"];
-  class dad7eeb932afdb92 default;
-  click dad7eeb932afdb92 "../../core/src/diagrams.rs";
-  11ca6eab6e458ae0 -->|satisfiedBy| dad7eeb932afdb92;
-  11ca6eab6e458ae0 -.->|verifiedBy| 6c3185c2d992e9fb;
+  b559b1f7629a5c62 -.->|verifiedBy| 349f5e874cf22d98;
   18a5b514a8c14b09["CLI Sections Summary Command"];
   class 18a5b514a8c14b09 systemRequirement;
   click 18a5b514a8c14b09 "../ReqvireTool/UserInterface/CLI.md#cli-sections-summary-command";
@@ -88,44 +80,16 @@ graph LR;
   class 994f165ff784760d default;
   click 994f165ff784760d "../../core/src/sections_summary.rs";
   18a5b514a8c14b09 -->|satisfiedBy| 994f165ff784760d;
-  18a5b514a8c14b09 -.->|verifiedBy| 9bf743e946ad83ea;
   18a5b514a8c14b09 -.->|verifiedBy| 34c75e4a88e1f381;
-  9ba85ead8a1ca9fd["Custom Element Type Tracking"];
-  class 9ba85ead8a1ca9fd systemRequirement;
-  click 9ba85ead8a1ca9fd "../ReqvireTool/ValidationAndReporting/Reports.md#custom-element-type-tracking";
-  c4ea332ba94e8299["reports.rs"];
-  class c4ea332ba94e8299 default;
-  click c4ea332ba94e8299 "../../core/src/reports.rs";
-  9ba85ead8a1ca9fd -->|satisfiedBy| c4ea332ba94e8299;
-  9ba85ead8a1ca9fd -.->|verifiedBy| b266b2fae4370efb;
-  42a913d5509a336b["CLI Traces From-Folder Option"];
-  class 42a913d5509a336b systemRequirement;
-  click 42a913d5509a336b "../ReqvireTool/UserInterface/CLI.md#cli-traces-from-folder-option";
-  42a913d5509a336b -.->|verifiedBy| fa3c1ae9e9b91644;
-  746097d8a83067f1["Model Summary Fine Grained Filtering"];
-  class 746097d8a83067f1 systemRequirement;
-  click 746097d8a83067f1 "../ReqvireTool/ValidationAndReporting/Reports.md#model-summary-fine-grained-filtering";
-  c4ea332ba94e8299["reports.rs"];
-  class c4ea332ba94e8299 default;
-  click c4ea332ba94e8299 "../../core/src/reports.rs";
-  746097d8a83067f1 -->|satisfiedBy| c4ea332ba94e8299;
-  80defdd4cbc7ee18["cli.rs"];
-  class 80defdd4cbc7ee18 default;
-  click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
-  746097d8a83067f1 -->|satisfiedBy| 80defdd4cbc7ee18;
-  746097d8a83067f1 -.->|verifiedBy| 76ae69270700044b;
+  18a5b514a8c14b09 -.->|verifiedBy| 9bf743e946ad83ea;
   27e4931d9f0bc019["CLI Traces Filter Options"];
   class 27e4931d9f0bc019 systemRequirement;
   click 27e4931d9f0bc019 "../ReqvireTool/UserInterface/CLI.md#cli-traces-filter-options";
   27e4931d9f0bc019 -.->|verifiedBy| 958d9af6695bd8a;
-  96873a19c51bd42f["Model Diagram Output Formats"];
-  class 96873a19c51bd42f systemRequirement;
-  click 96873a19c51bd42f "../ReqvireTool/ValidationAndReporting/Reports.md#model-diagram-output-formats";
-  dad7eeb932afdb92["diagrams.rs"];
-  class dad7eeb932afdb92 default;
-  click dad7eeb932afdb92 "../../core/src/diagrams.rs";
-  96873a19c51bd42f -->|satisfiedBy| dad7eeb932afdb92;
-  96873a19c51bd42f -.->|verifiedBy| 6c3185c2d992e9fb;
+  42a913d5509a336b["CLI Traces From-Folder Option"];
+  class 42a913d5509a336b systemRequirement;
+  click 42a913d5509a336b "../ReqvireTool/UserInterface/CLI.md#cli-traces-from-folder-option";
+  42a913d5509a336b -.->|verifiedBy| fa3c1ae9e9b91644;
   fae83fbd83a35540["Display Name-Regex Option in Help"];
   class fae83fbd83a35540 systemRequirement;
   click fae83fbd83a35540 "../ReqvireTool/UserInterface/CLI.md#display-name-regex-option-in-help";
@@ -142,6 +106,42 @@ graph LR;
   click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
   dcbc1dc3a347ee00 -->|satisfiedBy| 80defdd4cbc7ee18;
   dcbc1dc3a347ee00 -.->|verifiedBy| 76ae69270700044b;
+  9ba85ead8a1ca9fd["Custom Element Type Tracking"];
+  class 9ba85ead8a1ca9fd systemRequirement;
+  click 9ba85ead8a1ca9fd "../ReqvireTool/ValidationAndReporting/Reports.md#custom-element-type-tracking";
+  c4ea332ba94e8299["reports.rs"];
+  class c4ea332ba94e8299 default;
+  click c4ea332ba94e8299 "../../core/src/reports.rs";
+  9ba85ead8a1ca9fd -->|satisfiedBy| c4ea332ba94e8299;
+  9ba85ead8a1ca9fd -.->|verifiedBy| b266b2fae4370efb;
+  11ca6eab6e458ae0["Forward-Only Relation Traversal"];
+  class 11ca6eab6e458ae0 systemRequirement;
+  click 11ca6eab6e458ae0 "../ReqvireTool/ValidationAndReporting/Reports.md#forward-only-relation-traversal";
+  dad7eeb932afdb92["diagrams.rs"];
+  class dad7eeb932afdb92 default;
+  click dad7eeb932afdb92 "../../core/src/diagrams.rs";
+  11ca6eab6e458ae0 -->|satisfiedBy| dad7eeb932afdb92;
+  11ca6eab6e458ae0 -.->|verifiedBy| 6c3185c2d992e9fb;
+  96873a19c51bd42f["Model Diagram Output Formats"];
+  class 96873a19c51bd42f systemRequirement;
+  click 96873a19c51bd42f "../ReqvireTool/ValidationAndReporting/Reports.md#model-diagram-output-formats";
+  dad7eeb932afdb92["diagrams.rs"];
+  class dad7eeb932afdb92 default;
+  click dad7eeb932afdb92 "../../core/src/diagrams.rs";
+  96873a19c51bd42f -->|satisfiedBy| dad7eeb932afdb92;
+  96873a19c51bd42f -.->|verifiedBy| 6c3185c2d992e9fb;
+  746097d8a83067f1["Model Summary Fine Grained Filtering"];
+  class 746097d8a83067f1 systemRequirement;
+  click 746097d8a83067f1 "../ReqvireTool/ValidationAndReporting/Reports.md#model-summary-fine-grained-filtering";
+  80defdd4cbc7ee18["cli.rs"];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 "../../cli/src/cli.rs";
+  746097d8a83067f1 -->|satisfiedBy| 80defdd4cbc7ee18;
+  c4ea332ba94e8299["reports.rs"];
+  class c4ea332ba94e8299 default;
+  click c4ea332ba94e8299 "../../core/src/reports.rs";
+  746097d8a83067f1 -->|satisfiedBy| c4ea332ba94e8299;
+  746097d8a83067f1 -.->|verifiedBy| 76ae69270700044b;
 ```
 ### Model Summary Tests
 
@@ -365,8 +365,6 @@ This test verifies that the verification-traces command filter options work corr
 - Directly verified requirements shall be marked/highlighted in diagrams using CSS classes
 - System shall traverse all upward parent relations to reach root requirements
 - System shall merge multiple verification paths into single tree per verification
-- Markdown output shall display list of redundant relations under each verification's diagram when detected
-- JSON output shall include `redundant_relations` array for each verification (empty if none)
 - System shall support `--filter-id=<id>` filter for specific verification element
 - System shall support `--filter-name=<regex>` for filtering by verification name pattern
 - System shall support `--filter-type=<type>` for filtering by verification type
@@ -420,20 +418,6 @@ This test verifies that the verification-traces command filter options work corr
    - exits code **0**
    - output contains only verifications matching ALL filter criteria (AND logic)
    - verifications matching only one filter are excluded
-
-8. **Redundant Relations Display in Markdown**
-   Command: `reqvire verification-traces`
-   - for verifications with redundant relations, output contains `**Redundant Relations:**` heading after the diagram
-   - redundant requirements are listed with markdown links
-   - only ancestor requirements of leaf requirements are flagged as redundant
-   - verifications without redundancies do not show the redundant relations section
-
-9. **Redundant Relations in JSON Output**
-   Command: `reqvire verification-traces --json`
-   - exits code **0**
-   - each verification includes `redundant_relations` array field
-   - for verifications without redundancies, array is empty `[]`
-   - for verifications with redundancies, array contains requirement identifiers of ancestor requirements
 
 #### Metadata
   * type: test-verification

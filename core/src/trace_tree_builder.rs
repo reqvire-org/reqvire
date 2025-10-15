@@ -23,19 +23,36 @@ pub fn find_redundant_relations(
     directly_linked: &[String],
     registry: &GraphRegistry,
 ) -> Vec<String> {
-    let mut visited = HashSet::new();
-    let mut redundant = HashSet::new();
-    let directly_linked_set: HashSet<String> = directly_linked.iter().cloned().collect();
+    // Track which ancestors are reachable from each directly-linked requirement
+    let mut reachable_from: std::collections::HashMap<String, HashSet<String>> =
+        std::collections::HashMap::new();
 
+    // Build reachability map from each directly-linked requirement
     for req_id in directly_linked {
         if let Some(req) = registry.get_element(req_id) {
-            find_redundant_in_tree(
-                req,
-                &mut visited,
-                &directly_linked_set,
-                &mut redundant,
-                registry,
-            );
+            let mut visited = HashSet::new();
+            let mut ancestors = HashSet::new();
+            collect_ancestors(req, &mut visited, &mut ancestors, registry);
+            reachable_from.insert(req_id.clone(), ancestors);
+        }
+    }
+
+    // Find redundant requirements: a directly-linked requirement is redundant
+    // if it's reachable from MULTIPLE (≥2) OTHER directly-linked requirements
+    // This detects "branching redundancy" where multiple paths converge on the same node
+    let mut redundant = HashSet::new();
+    for req_id in directly_linked {
+        // Count how many OTHER directly-linked requirements can reach this one
+        let mut reachable_count = 0;
+        for (other_id, ancestors) in &reachable_from {
+            if other_id != req_id && ancestors.contains(req_id) {
+                reachable_count += 1;
+            }
+        }
+
+        // Redundant if reachable from 2 or more other directly-linked requirements
+        if reachable_count >= 2 {
+            redundant.insert(req_id.clone());
         }
     }
 
@@ -45,12 +62,11 @@ pub fn find_redundant_relations(
     redundant_vec
 }
 
-/// Recursively traverse upward through parent relations to find redundancies
-fn find_redundant_in_tree(
+/// Recursively collect all ancestor IDs reachable from a requirement
+fn collect_ancestors(
     requirement: &Element,
     visited: &mut HashSet<String>,
-    directly_linked_set: &HashSet<String>,
-    redundant: &mut HashSet<String>,
+    ancestors: &mut HashSet<String>,
     registry: &GraphRegistry,
 ) {
     // Prevent cycles
@@ -64,21 +80,12 @@ fn find_redundant_in_tree(
         if VERIFICATION_TRACES_RELATIONS.contains(&relation.relation_type.name) {
             // This is a parent relation, follow it
             if let crate::relation::LinkType::Identifier(parent_id) = &relation.target.link {
-                // Check if parent is also directly linked (making it redundant)
-                if directly_linked_set.contains(parent_id) {
-                    redundant.insert(parent_id.clone());
-                }
+                // Add this parent to ancestors set
+                ancestors.insert(parent_id.clone());
 
+                // Recursively collect ancestors of this parent
                 if let Some(parent) = registry.get_element(parent_id) {
-                    // Clone visited set for this branch to allow multiple paths
-                    let mut branch_visited = visited.clone();
-                    find_redundant_in_tree(
-                        parent,
-                        &mut branch_visited,
-                        directly_linked_set,
-                        redundant,
-                        registry,
-                    );
+                    collect_ancestors(parent, visited, ancestors, registry);
                 }
             }
         }

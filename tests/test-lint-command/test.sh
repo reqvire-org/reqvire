@@ -91,14 +91,16 @@ if [ $FIX_EXIT -ne 0 ]; then
   exit 1
 fi
 
-if grep -q "parent-requirement" "$TEST_DIR/specifications/Verifications/Tests.md"; then
-  echo "❌ FAILED: Redundant verify relation not removed"
+# Check that authorization verify link was removed from API Integration Test
+if grep -q 'verify:.*Authorization.*specifications/SystemRequirements.md#authorization' "$TEST_DIR/specifications/Verifications/Tests.md"; then
+  echo "❌ FAILED: Redundant verify relation to Authorization not removed from API Integration Test"
   cat "$TEST_DIR/specifications/Verifications/Tests.md"
   exit 1
 fi
 
-if ! grep -q "leaf-requirement" "$TEST_DIR/specifications/Verifications/Tests.md"; then
-  echo "❌ FAILED: Original verify relation removed"
+# Check that the other verify links in API Integration Test are still present
+if ! grep -q "verify:.*Public API" "$TEST_DIR/specifications/Verifications/Tests.md"; then
+  echo "❌ FAILED: Public API verify relation was incorrectly removed"
   cat "$TEST_DIR/specifications/Verifications/Tests.md"
   exit 1
 fi
@@ -125,6 +127,25 @@ fi
 if ! diff -u "${TEST_SCRIPT_DIR}/expected-after-fix.txt" <(echo "$POST_FIX_OUTPUT") > /dev/null; then
   echo "❌ FAILED: Post-fix output mismatch"
   diff -u "${TEST_SCRIPT_DIR}/expected-after-fix.txt" <(echo "$POST_FIX_OUTPUT")
+  exit 1
+fi
+
+# Test 7: Generate diagrams after fix
+set +e
+DIAGRAM_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" generate-diagrams 2>&1)
+DIAGRAM_EXIT=$?
+set -e
+
+if [ $DIAGRAM_EXIT -ne 0 ]; then
+  echo "❌ FAILED: generate-diagrams exit code $DIAGRAM_EXIT"
+  echo "$DIAGRAM_OUTPUT"
+  exit 1
+fi
+
+# Verify Verifications/Tests.md has correct diagrams after fix
+if ! diff -u "${TEST_SCRIPT_DIR}/expected-verifications-after-fix.md" "$TEST_DIR/specifications/Verifications/Tests.md" > /dev/null; then
+  echo "❌ FAILED: Verifications/Tests.md does not match expected state after fix and diagram generation"
+  diff -u "${TEST_SCRIPT_DIR}/expected-verifications-after-fix.md" "$TEST_DIR/specifications/Verifications/Tests.md"
   exit 1
 fi
 
