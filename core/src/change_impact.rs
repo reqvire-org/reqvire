@@ -433,8 +433,23 @@ pub fn build_change_impact_tree(
             placeholder
         });
     // Recursively collect forward-impacting relation nodes
-    let relations = current
-        .change_impact_with_relation(&element)
+    let mut impact_relations = current.change_impact_with_relation(&element);
+
+    // Sort relations to prioritize verifiedBy over derive to prevent visited set conflicts
+    // When a parent requirement has both verifiedBy and derive relations, we want to process
+    // verifiedBy first so verifications are added before sibling requirements visit them
+    impact_relations.sort_by_key(|(_, rels)| {
+        let has_verified_by = rels.iter().any(|r| r.relation_type.name == "verifiedBy");
+        let has_derive = rels.iter().any(|r| r.relation_type.name == "derive");
+
+        // Priority: verifiedBy (0), satisfiedBy (1), derive (2), others (3)
+        if has_verified_by { 0 }
+        else if rels.iter().any(|r| r.relation_type.name == "satisfiedBy") { 1 }
+        else if has_derive { 2 }
+        else { 3 }
+    });
+
+    let relations = impact_relations
         .into_iter()
         .filter_map(|(impacted_id, rels)| {
             // Skip cycles
@@ -459,6 +474,7 @@ pub fn build_change_impact_tree(
                     element_node: child_node.clone(),
                 })
                 .collect();
+
             if forward_relations.is_empty() {
                 None
             } else {
@@ -591,6 +607,12 @@ pub fn compute_change_impact(
             .collect();
         let has_changed = content_changed || !added_relations.is_empty() || !removed_relations.is_empty();
         if has_changed {
+            // Debug: print element relations
+            log::debug!("Changed element '{}' has {} relations", cur_elem.name, cur_elem.relations.len());
+            for rel in &cur_elem.relations {
+                log::debug!("  - {} -> {:?}", rel.relation_type.name, rel.target.link);
+            }
+
             let mut visited = BTreeSet::new();
             visited.insert(id.clone());
             let change_impact_tree = build_change_impact_tree(current, id.to_string(), &mut visited,None);
@@ -670,14 +692,19 @@ pub fn compute_change_impact(
     inv_ver.dedup_by_key(|v| v.element_id.clone());
     report.invalidated_verifications =inv_ver;
     
+    // Sort all vectors by element_id for deterministic output
+    report.added.sort_by(|a, b| a.element_id.cmp(&b.element_id));
+    report.removed.sort_by(|a, b| a.element_id.cmp(&b.element_id));
+    report.changed.sort_by(|a, b| a.element_id.cmp(&b.element_id));
+
     // Store all added element IDs before smart filtering is applied
     report.all_added_element_ids = report.added.iter()
         .map(|elem| elem.element_id.clone())
         .collect();
-     
+
     // Apply smart filtering to eliminate redundant new elements
     apply_smart_filtering(&mut report, current);
-  
+
     Ok(report)
 }
 
