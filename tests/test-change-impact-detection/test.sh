@@ -67,13 +67,13 @@ EXPECTED_CONTENT='## Change Impact Report
 ### Changed Elements
 
 * [Power Saving Mode](Requirements.md#power-saving-mode)
+    * verifiedBy -> [Power Saving](Requirements.md#power-saving) ⚠️
+    * satisfiedBy -> [software/power_control.txt](software/power_control.txt)
     * derive -> [CPU Power Reduction](Requirements.md#cpu-power-reduction)
       * verifiedBy -> [CPU Throttling](Requirements.md#cpu-throttling)
       * satisfiedBy -> [software/cpu_manager.txt](software/cpu_manager.txt)
-    * verifiedBy -> [Power Saving](Requirements.md#power-saving) ⚠️
     * derive -> [Screen Brightness Adjustment](Requirements.md#screen-brightness-adjustment)
       * verifiedBy -> [Screen Brightness](Requirements.md#screen-brightness)
-    * satisfiedBy -> [software/power_control.txt](software/power_control.txt)
 
 
 

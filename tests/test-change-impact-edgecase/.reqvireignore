@@ -1,0 +1,4 @@
+# Ignore patterns for test
+.git/
+*.log
+expected_impact.md

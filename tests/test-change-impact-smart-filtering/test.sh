@@ -88,8 +88,8 @@ EXPECTED_CONTENT='## Change Impact Report
 ### New Elements
 
 * [New Parent Requirement](Requirements.md#new-parent-requirement)
-    * derive -> [New Child Requirement](Requirements.md#new-child-requirement) (new)
     * verifiedBy -> [New Verification](Requirements.md#new-verification) (new)
+    * derive -> [New Child Requirement](Requirements.md#new-child-requirement) (new)
 
 
 
