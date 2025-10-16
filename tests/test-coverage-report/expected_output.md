@@ -30,10 +30,10 @@
 
 ### [specifications/Requirements.md](specifications/Requirements.md)
 
-- ✅ **Another Leaf Requirement Verified**
+- ✅ **[Another Leaf Requirement Verified](specifications/Requirements.md#another-leaf-requirement-verified)**
   - Verified by:
     - [specifications/Requirements.md#test-verification-unsatisfied](specifications/Requirements.md#test-verification-unsatisfied)
-- ✅ **Leaf Requirement Verified**
+- ✅ **[Leaf Requirement Verified](specifications/Requirements.md#leaf-requirement-verified)**
   - Verified by:
     - [specifications/Requirements.md#test-verification-satisfied](specifications/Requirements.md#test-verification-satisfied)
 
@@ -41,13 +41,13 @@
 
 ### [specifications/Requirements.md](specifications/Requirements.md)
 
-- ❌ **Leaf Requirement Unverified**
+- ❌ **[Leaf Requirement Unverified](specifications/Requirements.md#leaf-requirement-unverified)**
 
 ## Satisfied Test Verifications
 
 ### [specifications/Requirements.md](specifications/Requirements.md)
 
-- ✅ **Test Verification Satisfied** (test-verification)
+- ✅ **[Test Verification Satisfied](specifications/Requirements.md#test-verification-satisfied)** (test-verification)
   - Satisfied by:
     - [specifications/test-satisfied.sh](specifications/test-satisfied.sh)
 
@@ -55,13 +55,13 @@
 
 ### [specifications/Requirements.md](specifications/Requirements.md)
 
-- ❌ **Test Verification Unsatisfied** (test-verification)
+- ❌ **[Test Verification Unsatisfied](specifications/Requirements.md#test-verification-unsatisfied)** (test-verification)
 
 ## Orphaned Verifications
 
 ### [specifications/Requirements.md](specifications/Requirements.md)
 
-- ⚠️  **Analysis Verification Test** (analysis-verification)
-- ⚠️  **Demonstration Verification Test** (demonstration-verification)
-- ⚠️  **Inspection Verification Test** (inspection-verification)
+- ⚠️  **[Analysis Verification Test](specifications/Requirements.md#analysis-verification-test)** (analysis-verification)
+- ⚠️  **[Demonstration Verification Test](specifications/Requirements.md#demonstration-verification-test)** (demonstration-verification)
+- ⚠️  **[Inspection Verification Test](specifications/Requirements.md#inspection-verification-test)** (inspection-verification)
 

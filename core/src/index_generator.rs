@@ -50,7 +50,12 @@ pub fn generate_readme_index(
 
 
             for element in elements {
-                let element_id = generate_section_slug(&element.identifier);
+                // Extract fragment from identifier (part after #)
+                let element_id = if let Some(pos) = element.identifier.rfind('#') {
+                    generate_section_slug(&element.identifier[pos + 1..])
+                } else {
+                    generate_section_slug(&element.identifier)
+                };
                 index_content.push_str(&format!("  - [{}]({}#{})\n", element.name, relative_path, element_id));
             }
 

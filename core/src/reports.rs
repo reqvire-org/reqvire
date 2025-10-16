@@ -572,6 +572,18 @@ struct VerificationDetails {
     satisfied_by: Vec<String>,
 }
 
+/// Helper function to format an identifier as a markdown link
+/// Splits identifier like "path/file.md#fragment" into proper link format
+fn format_identifier_link(identifier: &str) -> String {
+    if let Some(hash_pos) = identifier.rfind('#') {
+        let file_part = &identifier[..hash_pos];
+        let fragment_part = &identifier[hash_pos..];
+        format!("[{}]({}{})", identifier, file_part, fragment_part)
+    } else {
+        format!("[{}]({})", identifier, identifier)
+    }
+}
+
 impl CoverageReport {
     pub fn print(&self, json_output: bool) {
         if json_output {
@@ -632,11 +644,11 @@ impl CoverageReport {
                 sorted_requirements.sort_by(|a, b| a.name.cmp(&b.name));
 
                 for requirement in sorted_requirements {
-                    output.push_str(&format!("- ✅ **{}**\n", requirement.name));
+                    output.push_str(&format!("- ✅ **[{}]({})**\n", requirement.name, requirement.identifier));
                     if !requirement.verified_by.is_empty() {
                         output.push_str("  - Verified by:\n");
                         for id in &requirement.verified_by {
-                            output.push_str(&format!("    - [{}]({})\n", id, id));
+                            output.push_str(&format!("    - {}\n", format_identifier_link(id)));
                         }
                     }
                 }
@@ -656,7 +668,7 @@ impl CoverageReport {
                 sorted_requirements.sort_by(|a, b| a.name.cmp(&b.name));
 
                 for requirement in sorted_requirements {
-                    output.push_str(&format!("- ❌ **{}**\n", requirement.name));
+                    output.push_str(&format!("- ❌ **[{}]({})**\n", requirement.name, requirement.identifier));
                 }
                 output.push_str("\n");
             }
@@ -674,11 +686,11 @@ impl CoverageReport {
                 sorted_verifications.sort_by(|a, b| a.name.cmp(&b.name));
 
                 for verification in sorted_verifications {
-                    output.push_str(&format!("- ✅ **{}** ({})\n", verification.name, verification.verification_type));
+                    output.push_str(&format!("- ✅ **[{}]({})** ({})\n", verification.name, verification.identifier, verification.verification_type));
                     if !verification.satisfied_by.is_empty() {
                         output.push_str("  - Satisfied by:\n");
                         for id in &verification.satisfied_by {
-                            output.push_str(&format!("    - [{}]({})\n", id, id));
+                            output.push_str(&format!("    - {}\n", format_identifier_link(id)));
                         }
                     }
                 }
@@ -698,7 +710,7 @@ impl CoverageReport {
                 sorted_verifications.sort_by(|a, b| a.name.cmp(&b.name));
 
                 for verification in sorted_verifications {
-                    output.push_str(&format!("- ❌ **{}** ({})\n", verification.name, verification.verification_type));
+                    output.push_str(&format!("- ❌ **[{}]({})** ({})\n", verification.name, verification.identifier, verification.verification_type));
                 }
                 output.push_str("\n");
             }
@@ -716,7 +728,7 @@ impl CoverageReport {
                 sorted_verifications.sort_by(|a, b| a.name.cmp(&b.name));
 
                 for verification in sorted_verifications {
-                    output.push_str(&format!("- ⚠️  **{}** ({})\n", verification.name, verification.verification_type));
+                    output.push_str(&format!("- ⚠️  **[{}]({})** ({})\n", verification.name, verification.identifier, verification.verification_type));
                 }
                 output.push_str("\n");
             }
