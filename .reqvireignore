@@ -12,6 +12,7 @@ Plan.md
 
 # Plugin and tool directories
 .claude-plugin/**
+reqvire-claude-plugin/**
 
 # Source code directories (for projects that mix code and requirements)
 tests/**

@@ -22,38 +22,6 @@ This guide is split into domain-specific guides for better organization:
 - **[tests/CLAUDE.md](tests/CLAUDE.md)** - Guide for writing and executing end-to-end tests
 - **Core Development** (see sections below) - Guide for Rust code development, architecture, and components
 
-## Using Specialized Agents
-
-**IMPORTANT**: Use specialized agents for specific Reqvire tasks:
-
-### Requirements Engineer Agent
-Use the **requirements-engineer agent** when needing to:
-- **Manage Model**: Managing project specifications and model structure
-- **Create Requirements**: Adding new requirements or verifications to the specifications
-- **Update Specifications**: Updating or fixing existing requirements and verifications
-- **Add Features**: Adding new feature requirements to the model with proper traceability
-- **Analyze Relations**: Understanding relations between elements (verify, derivedFrom, satisfiedBy, etc.)
-- **Find Issues**: Finding redundant or missing relations, coverage gaps, or structural issues
-- **Review Structure**: Reviewing requirement structures and traceability
-- **Analyze Coverage**: Analyzing verification coverage and traceability
-- **Change Impact**: Understanding change impacts and propagation through the model
-- **Model Inquiries**: Any inquiry related to model analysis, requirements, verifications, or relations
-- **Report Analysis**: Generating or interpreting reports (summary, traces, coverage, matrix, etc.)
-
-**IMPORTANT**: The requirements-engineer agent is specifically designed to work with Reqvire specifications and model analysis. It works ONLY with specification files (Markdown) and model analysis - **it NEVER implements code** (Rust, tests, etc.). Always delegate specification management and model analysis tasks to this agent, but use other approaches for code implementation.
-
-### E2E Test Engineer Agent
-Use the **e2e-test-engineer agent** when needing to:
-- **Implement Tests**: Creating new e2e tests for unverified functionality
-- **Update Tests**: Updating existing tests to maintain consistency with implementation
-- **Review Tests**: Reviewing test coverage and quality
-- **Verify Functionality**: Ensuring all Reqvire functionality has corresponding e2e tests
-- **Satisfy Verifications**: Creating tests that properly satisfy verification requirements
-- **Maintain Tests**: Fixing broken tests or updating tests after implementation changes
-- **Analyze Test Coverage**: Analyzing test coverage gaps or test effectiveness
-
-The e2e-test-engineer agent is specifically designed to work with Reqvire's e2e test suite and ensure all functionality is properly verified. Always delegate test implementation and maintenance tasks to this specialized agent.
-
 ## Building and Running Reqvire
 
 ### Basic cargo Commands

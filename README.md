@@ -22,6 +22,12 @@
 
 Experience the future of development where your requirements live alongside your code, evolve with your project, and unlock the full potential of AI-powered engineering—from intelligent requirement synthesis to automated code generation—all within your familiar Git workflow.
 
+## 🤖 Now Available for Claude Code
+
+Reqvire is now available as a plugin for Claude Code! Get AI-assisted requirements engineering with specialized skills and commands directly in your Claude Code workflow.
+
+**[Install and learn more →](https://www.reqvire.org/claude_plugin)**
+
 ## Key Features
 
 - **Requirements as Code** – Write requirements in structured Markdown that's both human-readable and AI-friendly. Version control everything with Git.
