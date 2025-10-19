@@ -4,76 +4,103 @@ Official Claude Code plugin for [Reqvire](https://github.com/reqvire-org/reqvire
 
 ## Overview
 
-This plugin provides specialized agents and commands to enhance your Reqvire development workflow in Claude Code. It includes intelligent agents that understand MBSE methodology, Reqvire's architecture, and best practices for requirements engineering and test-driven development.
+This plugin provides specialized skills and commands for managing any project using systems engineering with Reqvire-adjusted agile methodology. The skills understand MBSE principles, requirements-as-code workflows, and how to leverage Reqvire for modern engineering teams.
 
 ## Features
 
-### 🤖 Specialized Agents
+### 🎯 Specialized Skills
 
-#### Requirements Engineer Agent
-Expert agent for managing Reqvire specifications and requirements:
+#### System and Requirements Engineer Skill (`/syseng`)
+Expert skill for managing any project's specifications and requirements using Reqvire:
 
-- **Model Management**: Analyze and manage project specifications and model structure
-- **Create Requirements**: Add new requirements with proper traceability and relations
-- **Update Specifications**: Modify existing requirements while maintaining consistency
-- **Add Features**: Introduce new feature requirements with complete traceability chain
-- **Analyze Relations**: Understand derivedFrom, verify, and satisfiedBy relationships
-- **Find Issues**: Identify redundant relations, coverage gaps, and structural problems
-- **Change Impact**: Analyze how changes propagate through the requirement hierarchy
-- **Report Analysis**: Generate and interpret summaries, traces, coverage, and matrix reports
+- **Model Management**: Analyze and manage specifications and model structure
+- **Create Requirements**: Add requirements with proper MBSE traceability
+- **Update Specifications**: Modify requirements while maintaining consistency
+- **Add Features**: Introduce new features following systems engineering principles
+- **Analyze Relations**: Understand hierarchical and verification relationships
+- **Find Issues**: Identify model quality issues and improvement opportunities
+- **Change Impact**: Analyze how changes propagate through requirement hierarchies
+- **Report Analysis**: Generate and interpret Reqvire reports (summary, traces, coverage, matrix)
+- **MBSE Workflows**: Support requirements-as-code and agile MBSE methodologies
 
-**Model**: Claude Opus
-**When to use**: Any task involving specifications, requirements, verifications, or model analysis
+**When to use**: Managing specifications, requirements, verifications, or performing model analysis
 
-#### Project Bootstrapper Agent
-Expert agent for setting up Reqvire in new projects:
+**Invoke with**: `/syseng`
 
-- **Detect Setup**: Automatically detects if Reqvire is configured in a project
-- **Create Structure**: Sets up specifications/ directory and file structure
-- **Copy Templates**: Installs CLAUDE.md guides from plugin templates
-- **Guide Installation**: Walks users through Reqvire CLI installation
-- **Verify Setup**: Validates that everything is configured correctly
-- **Optional Configuration**: Guides users to create .reqvireignore for file exclusions
+#### Task Master Skill (`/task-master`)
+Expert skill for analyzing requirement changes and creating implementation plans:
 
-**Model**: Claude Sonnet
-**When to use**: Setting up Reqvire in a new project, or when Reqvire isn't configured yet
-
-**Install Command**: `curl -fsSL https://raw.githubusercontent.com/reqvire-org/reqvire/main/scripts/install.sh | bash`
-
-#### Task Master Agent
-Expert agent for analyzing requirement changes and creating implementation plans:
-
-- **Analyze Changes**: Runs change-impact analysis from git commits
+- **Analyze Changes**: Runs Reqvire change-impact analysis from git commits
 - **Trace Requirements**: Identifies new and modified requirements with full traceability
 - **Generate Tasks**: Creates comprehensive TodoWrite task plans with checkboxes
 - **Link to Source**: Provides git blob links to exact requirement versions
 - **Test Mapping**: Maps requirements → verifications → tests for complete workflow
 - **Track Progress**: Uses TodoWrite for real-time task tracking
-- **Repository-Agnostic**: Creates abstract tasks without implementation assumptions
+- **Repository-Agnostic**: Creates abstract tasks without technology assumptions
 
-**Model**: Claude Opus
 **When to use**: Creating implementation plans from requirement changes on feature branches
 
-**Workflow**: Compares feature branch against base branch, analyzes changed requirements, generates phased task list with links, tests, and traceability updates
+**Invoke with**: `/task-master`
 
-### ⚡ Custom Commands
+**Workflow**: Compares feature branch against base, analyzes changed requirements, generates phased task list with links, tests, and traceability updates
 
-#### `/find-redundant-verifications`
-Analyzes verification traces to identify and report redundant verify relations in your model.
+### ⚡ Commands
 
-**What it does:**
-- Runs `reqvire traces --json` to analyze verification relationships
-- Identifies verifications that directly verify both child and parent requirements
-- Shows which verify relations can be safely removed (child verification is sufficient)
-- Explains why each relation is redundant
+Commands provide focused functionality for specific tasks. Skills orchestrate these commands.
 
-**When to use:**
-- After adding new requirements that change the hierarchy
-- During requirements reviews to simplify the model
-- Before major releases to ensure clean traceability
-- When verification traces become complex
+#### Analysis and Reporting
 
-**Requirements:** `jq` must be installed
+**`/analyze-model`** - Analyze model structure, identify issues, and provide recommendations
+- Runs validation, summary, coverage, and lint checks
+- Identifies errors, warnings, and improvement opportunities
+- Provides prioritized action items
+
+**`/analyze-coverage`** - Check verification coverage and identify gaps
+- Analyzes verification coverage percentages
+- Identifies unverified leaf requirements
+- Distinguishes between leaf requirements (need verification) and parents (inherit coverage)
+
+**`/analyze-impact`** - Analyze change impact from git commits
+- Shows added, modified, and affected elements
+- Identifies propagation through relations
+- Recommends verification and implementation updates
+
+**`/lint-model`** - Fix issues and identify items needing review
+- Automatically fixes syntax and redundant verify relations
+- Identifies hierarchical relations that may need manual review
+- Always safe to run `reqvire lint --fix`
+
+#### Requirements and Verifications
+
+**`/add-requirement`** - Add new requirement with proper structure
+- Follows ears patterns and MBSE best practices
+- Links to parent requirements via derivedFrom
+- Checks if verification needed (leaf vs parent)
+
+**`/add-verification`** - Add verification for existing requirement
+- Checks if verification needed based on hierarchy
+- Reads all requirements in trace chain for comprehensive test criteria
+- Links to tests for test-verifications only
+
+**`/add-feature`** - Add complete feature (orchestrates other commands)
+- Creates parent and leaf requirements
+- Adds verifications for leaf requirements
+- Validates and cleans up model
+
+#### Task Planning
+
+**`/generate-tasks`** - Generate implementation task plan from requirement changes
+- Detects base branch and runs change-impact analysis
+- Creates TodoWrite task plan with git blob links
+- Maps requirements → verifications → tests
+
+#### Utility
+
+**`/find-redundant-verifications`** - Find redundant verify relations
+- Analyzes verification traces
+- Identifies verifications verifying both leaf and parent
+- Shows which relations can be safely removed
+- Requires `jq` to be installed
 
 ## Installation
 
@@ -128,18 +155,23 @@ For teams, add to your repository's `.claude/settings.json`:
 
 ## Usage
 
-### Using Agents
+### Using Skills
 
-Agents are automatically available based on context. Claude Code will use the appropriate agent when you're working on related tasks.
+Skills are invoked using the `/` prefix followed by the skill name:
 
-**Explicitly invoke an agent:**
-```
-Use the requirements-engineer agent to analyze the current model structure
+```bash
+# Invoke System and Requirements Engineer skill
+/syseng
+
+# Invoke Task Master skill
+/task-master
 ```
 
-**Let Claude Code decide:**
+**Example workflows:**
 ```
-Add a new authentication feature with proper requirements and verifications
+/syseng analyze the current model structure and identify coverage gaps
+/syseng add a new authentication feature with proper requirements and verifications
+/task-master generate implementation plan for this feature branch
 ```
 
 ### Using Commands
@@ -147,9 +179,37 @@ Add a new authentication feature with proper requirements and verifications
 Commands are available via the `/` prefix:
 
 ```bash
-# Find redundant verify relations
+# Analysis commands
+/analyze-model
+/analyze-coverage
+/analyze-impact
+/lint-model
+
+# Requirements and verifications
+/add-requirement
+/add-verification
+/add-feature
+
+# Task planning
+/generate-tasks
+
+# Utility
 /find-redundant-verifications
 ```
+
+## Updating the Plugin
+
+Once installed, update the plugin to get the latest features and fixes:
+
+```bash
+# Update the Reqvire plugin
+/plugin update reqvire
+
+# Or update all plugins
+/plugin update
+```
+
+**For local repository users**: Simply pull the latest changes from git - Claude Code will automatically use the updated plugin files.
 
 ## Documentation
 
@@ -175,7 +235,7 @@ This plugin enforces Reqvire's MBSE development methodology:
 
 ## Key Reqvire Commands
 
-The agents know how to use these commands effectively:
+The skills know how to use these commands effectively:
 
 ```bash
 # Validate specifications
@@ -218,18 +278,17 @@ The agents know how to use these commands effectively:
 
 ```
 .claude-plugin/
-├── plugin.json                        # Plugin manifest
-├── marketplace.json                   # Marketplace configuration
-├── README.md                          # Plugin documentation
-├── agents/
-│   ├── requirements-engineer.md       # Requirements management agent
-│   ├── project-bootstrapper.md        # Project setup agent
-│   └── task-master.md                 # Implementation planning agent
+├── plugin.json                           # Plugin manifest
+├── marketplace.json                      # Marketplace configuration
+├── README.md                             # Plugin documentation
+├── skills/
+│   ├── syseng.md                         # System and Requirements Engineer skill
+│   └── task-master.md                    # Task planning skill
 ├── commands/
 │   └── find-redundant-verifications.md   # Redundancy analysis command
 └── templates/
-    ├── CLAUDE.md                      # Root development guide template
-    └── specifications-CLAUDE.md       # Specifications guide template
+    ├── CLAUDE.md                         # Root development guide template
+    └── specifications-CLAUDE.md          # Specifications guide template
 ```
 
 ## Contributing
@@ -238,7 +297,7 @@ Contributions to the plugin are welcome! Please:
 
 1. Follow the MBSE methodology (requirements first!)
 2. Add appropriate verifications for new features
-3. Maintain consistency with existing agent patterns
+3. Maintain consistency with existing skill patterns
 4. Update documentation as needed
 
 ## Support
@@ -254,9 +313,8 @@ Same license as the Reqvire project. See the main repository for details.
 ## Version History
 
 ### 1.0.0 (Initial Release)
-- Requirements Engineer Agent (Claude Opus) - Manage specifications and requirements
-- Project Bootstrapper Agent (Claude Sonnet) - Set up Reqvire in new projects
-- Task Master Agent (Claude Opus) - Analyze requirement changes and generate implementation plans
+- System and Requirements Engineer Skill (`/syseng`) - Manage specifications and requirements for any project
+- Task Master Skill (`/task-master`) - Analyze requirement changes and generate implementation plans
 - Find Redundant Verifications Command - Analyze and clean up model
 - Template system with CLAUDE.md guides for bootstrapping
 - Marketplace support for easy distribution

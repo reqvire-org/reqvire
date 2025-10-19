@@ -2,7 +2,7 @@
   "name": "reqvire",
   "displayName": "Reqvire: Requirments As Code",
   "version": "1.0.0",
-  "description": "Claude Code plugin for Reqvire - The AI-Native Requirements As A Code framework for Modern Engineering Teams. Includes specialized agents for requirements engineering plus commands for model analysis and verification management.",
+  "description": "Claude Code plugin for Reqvire - The AI-Native Requirements As A Code framework for Modern Engineering Teams. Includes specialized skills for requirements engineering and task planning, plus commands for model analysis and verification management.",
   "author": "Reqvire Team",
   "repository": "https://github.com/reqvire-org/reqvire",
   "homepage": "https://github.com/reqvire-org/reqvire",
@@ -16,12 +16,19 @@
     "traceability",
     "rust"
   ],
-  "agents": [
-    "agents/requirements-engineer.md",
-    "agents/project-bootstrapper.md",
-    "agents/task-master.md"
+  "skills": [
+    "skills/syseng.md",
+    "skills/task-master.md"
   ],
   "commands": [
+    "commands/analyze-model.md",
+    "commands/add-requirement.md",
+    "commands/add-verification.md",
+    "commands/add-feature.md",
+    "commands/analyze-coverage.md",
+    "commands/analyze-impact.md",
+    "commands/lint-model.md",
+    "commands/generate-tasks.md",
     "commands/find-redundant-verifications.md"
   ],
   "readme": "README.md"

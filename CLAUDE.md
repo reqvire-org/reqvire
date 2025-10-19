@@ -22,12 +22,12 @@ This guide is split into domain-specific guides for better organization:
 - **[tests/CLAUDE.md](tests/CLAUDE.md)** - Guide for writing and executing end-to-end tests
 - **Core Development** (see sections below) - Guide for Rust code development, architecture, and components
 
-## Using Specialized Agents
+## Using Specialized Skills and Commands
 
-**IMPORTANT**: Use specialized agents for specific Reqvire tasks:
+**IMPORTANT**: Use specialized skills and commands for specific Reqvire tasks:
 
-### Requirements Engineer Agent
-Use the **requirements-engineer agent** when needing to:
+### System and Requirements Engineer Skill (`/syseng`)
+Use the **`/syseng` skill** for managing specifications and requirements:
 - **Manage Model**: Managing project specifications and model structure
 - **Create Requirements**: Adding new requirements or verifications to the specifications
 - **Update Specifications**: Updating or fixing existing requirements and verifications
@@ -40,7 +40,16 @@ Use the **requirements-engineer agent** when needing to:
 - **Model Inquiries**: Any inquiry related to model analysis, requirements, verifications, or relations
 - **Report Analysis**: Generating or interpreting reports (summary, traces, coverage, matrix, etc.)
 
-**IMPORTANT**: The requirements-engineer agent is specifically designed to work with Reqvire specifications and model analysis. It works ONLY with specification files (Markdown) and model analysis - **it NEVER implements code** (Rust, tests, etc.). Always delegate specification management and model analysis tasks to this agent, but use other approaches for code implementation.
+**The `/syseng` skill orchestrates focused commands:**
+- `/analyze-model` - Analyze model structure and identify issues
+- `/add-requirement` - Add new requirement with proper structure
+- `/add-verification` - Add verification for existing requirement
+- `/add-feature` - Add complete feature with requirements and verifications
+- `/analyze-coverage` - Check verification coverage
+- `/analyze-impact` - Analyze change impact from git commits
+- `/lint-model` - Fix auto-fixable issues and identify items needing review
+
+**IMPORTANT**: The `/syseng` skill works ONLY with specification files (Markdown) and model analysis - **it NEVER implements code** (Rust, tests, etc.). Always use `/syseng` or its commands for specification management, but use other approaches for code implementation.
 
 ### E2E Test Engineer Agent
 Use the **e2e-test-engineer agent** when needing to:
