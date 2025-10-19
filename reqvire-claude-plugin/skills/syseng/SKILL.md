@@ -120,6 +120,30 @@ Use for requirement statements:
 - **inspection-verification** - Verification through inspection
 - **demonstration-verification** - Verification through demonstration
 
+### Model Exploration Strategy
+
+**CRITICAL: Use reqvire commands to explore the model - DO NOT read specification files directly!**
+
+Reqvire provides powerful query and analysis commands that:
+- Parse and validate the model structure
+- Follow relations automatically
+- Filter and format results
+- Provide JSON output for programmatic analysis
+- Are much more efficient than manual file reading
+
+**Always prefer commands over file reading:**
+
+| Instead of Reading Files | Use This Command |
+|--------------------------|------------------|
+| Read requirement content | `reqvire summary --filter-id="<id>"` |
+| Find requirements by name | `reqvire summary --filter-name="<pattern>"` |
+| Check verification status | `reqvire coverage --filter-name="<pattern>"` |
+| See requirement hierarchy | `reqvire traces --filter-id="<id>"` |
+| Find unverified requirements | `reqvire coverage --json \| jq '.unverified_leaf_requirements'` |
+| Check model validity | `reqvire validate --json` |
+| Find model issues | `reqvire lint --json` |
+| Understand changes | `reqvire change-impact --git-commit=<hash>` |
+
 ### Key Reqvire Commands
 
 ```bash
@@ -139,6 +163,17 @@ reqvire lint [--fix] [--json]
 reqvire export --output <dir>
 reqvire serve --port 8080
 ```
+
+### Common Filter Options
+
+All analysis commands support powerful filtering:
+- `--filter-file="path/pattern"` - Filter by file glob
+- `--filter-name="regex"` - Filter by element name
+- `--filter-id="full-id"` - Filter by exact identifier
+- `--filter-type="requirement"` - Filter by element type
+- `--filter-content="text"` - Filter by content
+- `--filter-is-not-verified` - Only unverified requirements
+- `--filter-is-not-satisfied` - Only unsatisfied verifications
 
 ### Verification Strategy
 

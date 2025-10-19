@@ -1,10 +1,18 @@
 ---
+allowed-tools: Read, Bash(reqvire:*), Bash(git:*)
+argument-hint: [base-commit]
 description: Generate implementation task plan from requirement changes using change-impact analysis
+model: claude-sonnet-4-5-20250929
 ---
 
 # Generate Tasks
 
 Generate implementation task plan from requirement changes on a feature branch.
+
+## Context
+
+- Current branch: !`git rev-parse --abbrev-ref HEAD`
+- Base commit: ${1:-!`git merge-base main HEAD 2>/dev/null || git merge-base master HEAD`}
 
 ## Steps
 
@@ -21,7 +29,7 @@ Generate implementation task plan from requirement changes on a feature branch.
        exit 1
    fi
 
-   BASE_COMMIT=$(git merge-base $BASE_BRANCH HEAD)
+   BASE_COMMIT="${1:-$(git merge-base $BASE_BRANCH HEAD)}"
    ```
 
 2. **Run change impact:**

@@ -1,10 +1,23 @@
 ---
+allowed-tools: Read, Write, Edit, Bash(reqvire:*), SlashCommand
+argument-hint: [feature-name]
 description: Add a complete feature by orchestrating requirement and verification creation following MBSE workflow
+model: claude-sonnet-4-5-20250929
 ---
 
 # Add Feature
 
 Add a complete feature by orchestrating multiple commands to create requirements, verifications, and proper traceability.
+
+## Current Model Context
+
+- Total requirements: !`reqvire summary --json | jq -r '.global_counters.total_elements'`
+- Verification coverage: !`reqvire coverage --json | jq -r '.summary.leaf_requirements_coverage_percentage'`%
+
+## User Request
+
+${1:+Feature name: $1}
+${1:-The user will provide feature details.}
 
 ## MBSE Workflow
 

@@ -1,15 +1,29 @@
 ---
+allowed-tools: Read, Write, Edit, Bash(reqvire:*)
+argument-hint: [requirement-id]
 description: Add a verification for an existing requirement, checking if verification is needed based on requirement hierarchy
+model: claude-sonnet-4-5-20250929
 ---
 
 # Add Verification
 
 Add a verification for an existing requirement following Reqvire's bottom roll-up verification philosophy.
 
+## Current Model Context
+
+- Total verifications: !`reqvire summary --json | jq -r '.global_counters.verifications'`
+- Verification coverage: !`reqvire coverage --json | jq -r '.summary.leaf_requirements_coverage_percentage'`%
+- Unverified leaf requirements: !`reqvire coverage --json | jq -r '.summary.unverified_leaf_requirements'`
+
+## User Request
+
+${1:+Requirement ID: $1}
+${1:-The user will specify which requirement needs verification.}
+
 ## Steps
 
 1. **Identify the requirement:**
-   - Ask user which requirement needs verification
+   - Ask user which requirement needs verification if not provided
    - Get the requirement identifier or name
 
 2. **Check if verification is needed:**

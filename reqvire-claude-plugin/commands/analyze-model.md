@@ -1,10 +1,19 @@
 ---
+allowed-tools: Read, Bash(reqvire:*)
 description: Analyze the current Reqvire model structure, identify issues, coverage gaps, and provide improvement recommendations
+model: claude-sonnet-4-5-20250929
 ---
 
 # Analyze Reqvire Model
 
 Perform comprehensive analysis of the current Reqvire model.
+
+## Current Model State
+
+- Validation status: !`reqvire validate 2>&1 | head -1`
+- Total elements: !`reqvire summary --json | jq -r '.global_counters.total_elements'`
+- Verification coverage: !`reqvire coverage --json | jq -r '.summary.leaf_requirements_coverage_percentage'`%
+- Test satisfaction: !`reqvire coverage --json | jq -r '.summary.test_verifications_satisfaction_percentage'`%
 
 ## Steps
 

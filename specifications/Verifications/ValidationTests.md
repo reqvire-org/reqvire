@@ -87,26 +87,6 @@ This test verifies that Reqvire correctly handles and validates relations to fra
   * satisfiedBy: [test.sh](../../tests/test-fragment-relations/test.sh)
 ---
 
-### JSON Output Format Test
-
-This test verifies that the system properly implements JSON output formatting for various commands that require it.
-
-#### Details
-
-##### Acceptance Criteria
-- System shall support --json flag for various commands
-- JSON output shall be properly formatted according to a consistent schema
-- JSON structure shall be parsable and machine-readable
-
-##### Test Criteria
-- Commands with --json flag produce valid JSON
-- JSON output can be parsed without errors
-- Output structure matches expected schema
-
-#### Metadata
-  * type: test-verification
----
-
 ### Requirements Files Search and Detection Test
 
 This test verifies that the system correctly searches for and detects structured document files according to specified patterns.
@@ -345,4 +325,5 @@ This test verifies that the system assigns the default type 'requirement' to all
 
 #### Relations
   * verify: [Default Requirement Type Assignment](../UserRequirements.md#default-requirement-type-assignment)
+  * satisfiedBy: [test.sh](../../tests/test-default-type-assignment/test.sh)
 ---

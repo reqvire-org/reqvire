@@ -1,6 +1,5 @@
 {
   "name": "reqvire",
-  "displayName": "Reqvire: Requirments As Code",
   "version": "1.0.0",
   "description": "Claude Code plugin for Reqvire - The AI-Native Requirements As A Code framework for Modern Engineering Teams. Includes specialized skills for requirements engineering and task planning, plus commands for model analysis and verification management.",
   "author": {
@@ -8,7 +7,8 @@
     "email": "ilijaljubicic@users.noreply.github.com"
   },
   "repository": "https://github.com/reqvire-org/reqvire",
-  "homepage": "https://github.com/reqvire-org/reqvire",
+  "homepage": "https://www.reqvire.org",
+  "license": "Apache-2.0",
   "keywords": [
     "mbse",
     "requirements",
@@ -19,20 +19,19 @@
     "traceability",
     "rust"
   ],
-  "skills": [
-    "skills/syseng",
-    "skills/task-master"
+  "agents": [
+    "./skills/syseng/SKILL.md",
+    "./skills/task-master/SKILL.md"
   ],
   "commands": [
-    "commands/analyze-model.md",
-    "commands/add-requirement.md",
-    "commands/add-verification.md",
-    "commands/add-feature.md",
-    "commands/analyze-coverage.md",
-    "commands/analyze-impact.md",
-    "commands/lint-model.md",
-    "commands/generate-tasks.md",
-    "commands/find-redundant-verifications.md"
-  ],
-  "readme": "README.md"
+    "./commands/analyze-model.md",
+    "./commands/add-requirement.md",
+    "./commands/add-verification.md",
+    "./commands/add-feature.md",
+    "./commands/analyze-coverage.md",
+    "./commands/analyze-impact.md",
+    "./commands/lint-model.md",
+    "./commands/generate-tasks.md",
+    "./commands/find-redundant-verifications.md"
+  ]
 }

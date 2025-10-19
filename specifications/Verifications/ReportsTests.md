@@ -434,6 +434,7 @@ Comprehensive test verifying model command generates correct output in different
 #### Relations
   * verify: [Forward-Only Relation Traversal](../ReqvireTool/ValidationAndReporting/Reports.md#forward-only-relation-traversal)
   * verify: [Model Diagram Output Formats](../ReqvireTool/ValidationAndReporting/Reports.md#model-diagram-output-formats)
+  * satisfiedBy: [test.sh](../../tests/test-model-command/test.sh)
 ---
 
 ### Custom Element Type Tracking Test

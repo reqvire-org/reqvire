@@ -32,26 +32,30 @@ This test verifies that the system can generate a traceability matrix that accur
   * satisfiedBy: [test.sh](../../tests/test-matrix-generation/test.sh)
 ---
 
-### CLI Traces Flag Test
+### CLI Matrix Command Test
 
-This test verifies that the system provides a command-line flag for generating traceability matrices.
+This test verifies that the system provides a command-line matrix command for generating traceability matrices.
 
 #### Details
 
 ##### Acceptance Criteria
-- System should provide a `--traces` flag for generating traceability matrices
-- Command should execute without errors when the flag is used
-- Output should be a properly formatted traceability matrix
+- System should provide a `matrix` command for generating traceability matrices
+- Command should execute without errors
+- Output should be a properly formatted traceability matrix in markdown format
+- Command should support --json and --svg output formats
 
 ##### Test Criteria
-- Command with `--traces` flag returns success (0) exit code
+- Command `reqvire matrix` returns success (0) exit code
 - Command produces the expected traceability matrix output
-- Help text includes documentation for the `--traces` flag
+- Command supports --json flag for JSON output
+- Command supports --svg flag for SVG output
+- Help text includes documentation for the matrix command
 
 #### Metadata
   * type: test-verification
 
 #### Relations
+  * verify: [CLI Matrix Command](../ReqvireTool/UserInterface/CLI.md#cli-matrix-command)
   * satisfiedBy: [test.sh](../../tests/test-matrix-generation/test.sh)
 ---
 

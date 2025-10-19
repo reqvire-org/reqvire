@@ -1,19 +1,28 @@
 ---
+allowed-tools: Read, Bash(reqvire:*), Bash(git:*)
+argument-hint: [commit-hash]
 description: Analyze change impact for modified requirements using git commit history
+model: claude-sonnet-4-5-20250929
 ---
 
 # Analyze Change Impact
 
 Analyze how changes to requirements propagate through the model.
 
+## Comparison Target
+
+${1:+Comparing against: $1}
+${1:-Comparing against: HEAD~1 (previous commit)}
+
 ## Steps
 
 1. **Get base commit:**
 
-   Ask user for commit hash or use default:
+   ${1:+Using provided commit: $1}
+   ${1:-Ask user for commit hash or use default:}
    ```bash
    # Compare against HEAD~1 (previous commit)
-   BASE_COMMIT="HEAD~1"
+   BASE_COMMIT="${1:-HEAD~1}"
 
    # Or compare against specific commit
    BASE_COMMIT="<commit-hash>"
@@ -24,8 +33,8 @@ Analyze how changes to requirements propagate through the model.
 
 2. **Run change impact analysis:**
    ```bash
-   reqvire change-impact --git-commit=$BASE_COMMIT
-   reqvire change-impact --git-commit=$BASE_COMMIT --json > /tmp/impact.json
+   reqvire change-impact --git-commit=${1:-HEAD~1}
+   reqvire change-impact --git-commit=${1:-HEAD~1} --json > /tmp/impact.json
    ```
 
 3. **Analyze the results:**

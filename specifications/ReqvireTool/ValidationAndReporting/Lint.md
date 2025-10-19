@@ -97,6 +97,8 @@ This enables the model author to review and decide:
 #### Relations
   * derivedFrom: [Model Linting](../../UserRequirements.md#model-linting)
   * derivedFrom: [Verification Trace Builder](../ModelManagement/TraceabilityMatrix.md#verification-trace-builder)
+  * satisfiedBy: [lint.rs](../../../core/src/lint.rs)
+  * verifiedBy: [Lint Command Verification](../../Verifications/Misc.md#lint-command-verification)
 ---
 
 ### Safe Redundant Hierarchical Relations Auto-Removal

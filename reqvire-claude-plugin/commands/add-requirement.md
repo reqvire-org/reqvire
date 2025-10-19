@@ -1,15 +1,29 @@
 ---
+allowed-tools: Read, Write, Edit, Bash(reqvire:*)
+argument-hint: [requirement-name]
 description: Add a new requirement to the Reqvire model with proper structure and traceability
+model: claude-sonnet-4-5-20250929
 ---
 
 # Add New Requirement
 
 Add a new requirement to the Reqvire model following MBSE best practices.
 
+## Current Model Context
+
+- Total requirements: !`reqvire summary --json | jq -r '.global_counters.total_elements'`
+- Verification coverage: !`reqvire coverage --json | jq -r '.summary.leaf_requirements_coverage_percentage'`%
+- Unverified leaf requirements: !`reqvire coverage --json | jq -r '.summary.unverified_leaf_requirements'`
+
+## User Request
+
+${1:+Requirement name: $1}
+${1:-The user will provide requirement details.}
+
 ## Steps
 
 1. **Understand the context:**
-   - Ask user for requirement details (name, description)
+   - Ask user for requirement details (name, description) if not provided
    - Identify parent requirement if this is a derived requirement
    - Determine which file should contain this requirement
    - Determine if this is a leaf requirement (no children) or parent requirement

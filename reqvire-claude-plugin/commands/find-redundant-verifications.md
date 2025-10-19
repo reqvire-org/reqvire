@@ -1,32 +1,37 @@
 ---
+allowed-tools: Read, Bash(reqvire:*)
 description: Find and analyze redundant verify relations in the Reqvire model
+model: claude-sonnet-4-5-20250929
 ---
 
 # Find Redundant Verify Relations
 
 Analyze the verification traces to find redundant verify relations in the model.
 
+## Current Status
+
+- Lint check: !`reqvire lint --json 2>&1 | jq -r 'if .auto_fixable then (.auto_fixable | length) else 0 end' | xargs -I{} echo "{} auto-fixable issues (including redundant verifications)"`
+
 ## Instructions
 
-1. Run the traces command to generate JSON report:
+1. Run the lint command to find redundancies:
    ```bash
-   cargo run -- traces --json 2>/dev/null > /tmp/traces.json
+   reqvire lint --json > /tmp/lint.json
    ```
 
-2. Parse the JSON to find all verifications with redundant verify relations:
+2. Parse the JSON to find redundant verify relations:
    ```bash
    jq -r '
-   .files[] | .sections[] | .verifications[] |
-   select(.redundant_relations | length > 0) |
-   "## Verification: \(.name)\n" +
-   "**File**: \(.file)\n" +
-   "**Identifier**: `\(.identifier)`\n" +
-   "**Directly Verified**: \(.directly_verified_count) requirements\n\n" +
-   "**Redundant VERIFY Relations** (remove these from the verification):\n" +
-   (.redundant_relations[] | "  * verify: \(.)\n") +
-   "\n**Reason**: These requirements are ancestors of other verified requirements. Since verification automatically rolls up through derivedFrom relations, verifying the leaf requirements is sufficient.\n\n" +
+   .auto_fixable[] |
+   select(.type == "redundant_verify_relations") |
+   "## Verification: \(.verification.name)\n" +
+   "**File**: \(.verification.file)\n" +
+   "**Identifier**: `\(.verification.identifier)`\n\n" +
+   "**Redundant VERIFY Relations** (will be auto-removed with lint --fix):\n" +
+   (.redundant_relations[] | "  * verify: \(.target)\n") +
+   "\n**Reason**: \(.rationale)\n\n" +
    "---\n"
-   ' /tmp/traces.json || echo "No redundant verify relations found in the model."
+   ' /tmp/lint.json || echo "No redundant verify relations found."
    ```
 
 3. Present the results to the user showing:
@@ -36,12 +41,10 @@ Analyze the verification traces to find redundant verify relations in the model.
 
 4. If no redundancies found, report: "No redundant verify relations found in the model."
 
-## Requirements
-
-- **jq** must be installed:
-  - Mac: `brew install jq`
-  - Linux: `sudo apt-get install jq` or `sudo yum install jq`
-  - Check: `jq --version`
+5. **Auto-fix option:**
+   ```bash
+   reqvire lint --fix
+   ```
 
 ## Background
 
@@ -60,3 +63,9 @@ Verification "Password Test" verifies:
 ```
 
 The system automatically detects this by building trace trees and checking if any ancestor requirements are also directly verified.
+
+## Notes
+
+- Use `reqvire lint --fix` to automatically remove redundant relations
+- Redundant verify relations are always safe to remove
+- Run `reqvire validate` after fixing to confirm model integrity

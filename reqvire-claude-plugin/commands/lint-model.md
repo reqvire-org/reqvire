@@ -1,10 +1,17 @@
 ---
+allowed-tools: Read, Bash(reqvire:*)
 description: Lint and clean up the Reqvire model by fixing issues and identifying items needing review
+model: claude-sonnet-4-5-20250929
 ---
 
 # Lint Model
 
 Lint the Reqvire model to fix quality issues and identify items needing manual review.
+
+## Current Lint Status
+
+- Lint check: !`reqvire lint --json 2>&1 | jq -r 'if .auto_fixable then (.auto_fixable | length) else 0 end' | xargs -I{} echo "{} auto-fixable issues"`
+- Manual review: !`reqvire lint --json 2>&1 | jq -r 'if .needs_manual_review then (.needs_manual_review | length) else 0 end' | xargs -I{} echo "{} items need review"`
 
 ## Steps
 
@@ -16,11 +23,12 @@ Lint the Reqvire model to fix quality issues and identify items needing manual r
    This automatically fixes:
    - Syntax and formatting issues
    - Redundant verify relations (verification verifying both leaf and parent)
+   - Safe redundant hierarchical relations (single-chain derivedFrom paths)
 
 2. **Check for manual review items:**
    ```bash
    reqvire lint --json > /tmp/lint.json
-   jq '.needs_review' /tmp/lint.json
+   jq '.needs_manual_review' /tmp/lint.json
    ```
 
 3. **For manual review items:**
@@ -44,12 +52,13 @@ Lint the Reqvire model to fix quality issues and identify items needing manual r
 
 ### Auto-Fixable (always safe to apply)
 
-- **Syntax**: Formatting, indentation, structure
-- **Redundant verify**: Verification verifies both leaf and parent requirement
+- **Redundant verify relations**: Verification verifies both leaf and parent requirement
+- **Safe redundant hierarchical relations**: Single-chain derivedFrom paths that can be safely removed
 
 ### Needs Review (requires judgment)
 
-- **Hierarchical relations**: derivedFrom relations that may be redundant
+- **Multi-branch convergence**: Element reaches ancestor through multiple distinct paths
+- **Complex hierarchical relations**: Multi-path derivedFrom relations requiring human judgment
 
 ## Best Practices
 

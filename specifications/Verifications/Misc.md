@@ -347,4 +347,5 @@ This test verifies that the lint command analyzes model quality, detects issues 
   * verify: [Safe Redundant Hierarchical Relations Auto-Removal](../ReqvireTool/ValidationAndReporting/Lint.md#safe-redundant-hierarchical-relations-auto-removal)
   * verify: [Lint Output Formatting](../ReqvireTool/ValidationAndReporting/Lint.md#lint-output-formatting)
   * verify: [Lint Auto-fix Capability](../ReqvireTool/ValidationAndReporting/Lint.md#lint-auto-fix-capability)
+  * satisfiedBy: [test.sh](../../tests/test-lint-command/test.sh)
 ---

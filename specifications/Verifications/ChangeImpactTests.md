@@ -34,7 +34,7 @@ This test verifies that the system correctly implements change impact detection,
   * verify: [Change Impact Detection Algorithm](../ReqvireTool/ModelManagement/ChangeImpact.md#change-impact-detection-algorithm)
   * verify: [Change Impact Command Line Interface](../ReqvireTool/ModelManagement/ChangeImpact.md#change-impact-command-line-interface)
   * verify: [Smart Filtering for Change Impact Reports](../ReqvireTool/ModelManagement/ChangeImpact.md#smart-filtering-for-change-impact-reports)
-  * trace: [test.sh](../../tests/test-change-impact-detection/test.sh)
+  * satisfiedBy: [test.sh](../../tests/test-change-impact-detection/test.sh)
 ---
 
 ### Change Impact Relations Test
@@ -61,7 +61,7 @@ This test verifies that the system correctly handles different relation types wh
 #### Relations
   * verify: [Change Impact Detection Algorithm](../ReqvireTool/ModelManagement/ChangeImpact.md#change-impact-detection-algorithm)
   * verify: [Change Impact Command Line Interface](../ReqvireTool/ModelManagement/ChangeImpact.md#change-impact-command-line-interface)
-  * trace: [test.sh](../../tests/test-change-impact-detection/test.sh)
+  * satisfiedBy: [test.sh](../../tests/test-change-impact-detection/test.sh)
 ---
 
 ### CLI Git Commit Hash Flag Test
@@ -96,7 +96,7 @@ This test verifies that the system properly handles the git commit hash flag for
 
 #### Relations
   * verify: [CLI Git Commit Hash Flag](../ReqvireTool/UserInterface/CLI.md#cli-git-commit-hash-flag)
-  * trace: [test.sh](../../tests/test-change-impact-detection/test.sh)
+  * satisfiedBy: [test.sh](../../tests/test-change-impact-detection/test.sh)
 ---
 
 ### Element Content Extraction Test
@@ -128,7 +128,7 @@ This test verifies that the system correctly extracts element content for change
 #### Relations
   * verify: [Change Impact Detection Algorithm](../ReqvireTool/ModelManagement/ChangeImpact.md#change-impact-detection-algorithm)
   * verify: [Requirements Processing](../ReqvireTool/Storage/Configuration.md#requirements-processing)
-  * trace: [test.sh](../../tests/test-element-content-extraction/test.sh)
+  * satisfiedBy: [test.sh](../../tests/test-element-content-extraction/test.sh)
 ---
 
 ### Change Impact Analysis Verification
@@ -155,7 +155,7 @@ TODO: write test procedure
 
 #### Relations
   * verify: [Change Impact Analysis](../UserRequirements.md#change-impact-analysis)
-  * trace: [test.sh](../../tests/test-change-impact-detection/test.sh)
+  * satisfiedBy: [test.sh](../../tests/test-change-impact-detection/test.sh)
 ---
 
 ### Traceability Matrix Verification
@@ -182,7 +182,7 @@ TODO: write test procedure
 
 #### Relations
   * verify: [Traceability Matrix](../UserRequirements.md#traceability-matrix)
-  * trace: [test.sh](../../tests/test-change-impact-detection/test.sh)
+  * satisfiedBy: [test.sh](../../tests/test-change-impact-detection/test.sh)
 ---
 
 ### Structural Change Reports Verification
@@ -209,7 +209,7 @@ TODO: write test procedure
 
 #### Relations
   * verify: [Tracing Structural Changes](../UserRequirements.md#tracing-structural-changes)
-  * trace: [test.sh](../../tests/test-change-impact-detection/test.sh)
+  * satisfiedBy: [test.sh](../../tests/test-change-impact-detection/test.sh)
 ---
 
 ### Change Impact Smart Filtering Test
@@ -242,5 +242,5 @@ This test verifies that the smart filtering correctly handles new elements in ch
 
 #### Relations
   * verify: [Smart Filtering for Change Impact Reports](../ReqvireTool/ModelManagement/ChangeImpact.md#smart-filtering-for-change-impact-reports)
-  * trace: [test.sh](../../tests/test-change-impact-smart-filtering/test.sh)
+  * satisfiedBy: [test.sh](../../tests/test-change-impact-smart-filtering/test.sh)
 ---

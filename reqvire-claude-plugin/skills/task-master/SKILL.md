@@ -40,6 +40,28 @@ You orchestrate the task generation process and provide context to help develope
 **When user has questions about specific requirements:**
 → Provide guidance using your knowledge below
 
+## Model Exploration for Task Generation
+
+**CRITICAL: Use reqvire commands to understand requirements - DO NOT read specification files directly!**
+
+When analyzing requirements for task generation:
+
+| To Understand This | Use This Command |
+|--------------------|------------------|
+| What requirements changed | `reqvire change-impact --git-commit=<hash> --json` |
+| Requirement full content | `reqvire summary --filter-id="<id>" --json` |
+| What verifies a requirement | `reqvire traces --filter-id="<id>" --json` |
+| Which tests to run | Extract `satisfiedBy` from verification via `reqvire summary` |
+| Implementation status | Check `satisfiedBy` relations in requirement |
+| Requirement hierarchy | `reqvire traces --filter-id="<id>"` shows derivedFrom chain |
+
+**Why use commands instead of reading files:**
+- Automatic relation following
+- Structured JSON output for parsing
+- Already validated and parsed
+- Includes computed fields (verification status, etc.)
+- Much more efficient than manual file reading
+
 ## Task Plan Principles
 
 - **Traceability First**: Every task maintains requirement → implementation → test links
@@ -48,6 +70,7 @@ You orchestrate the task generation process and provide context to help develope
 - **Test-Driven**: Always include tests in implementation workflow
 - **Read Requirements**: Summaries are context only - full requirements are mandatory reading
 - **Track Progress**: TodoWrite format enables real-time progress tracking
+- **Use Commands**: Always query model via reqvire commands, not file reading
 
 ## Task Structure
 

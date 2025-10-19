@@ -1,10 +1,19 @@
 ---
+allowed-tools: Read, Bash(reqvire:*)
 description: Analyze verification coverage and identify unverified requirements
+model: claude-sonnet-4-5-20250929
 ---
 
 # Analyze Verification Coverage
 
 Analyze verification coverage to identify gaps and unverified requirements.
+
+## Current Coverage
+
+- Total requirements: !`reqvire coverage --json | jq -r '.summary.total_leaf_requirements'`
+- Verified: !`reqvire coverage --json | jq -r '.summary.verified_leaf_requirements'`
+- Coverage: !`reqvire coverage --json | jq -r '.summary.leaf_requirements_coverage_percentage'`%
+- Unverified: !`reqvire coverage --json | jq -r '.summary.unverified_leaf_requirements'`
 
 ## Steps
 
@@ -23,7 +32,7 @@ Analyze verification coverage to identify gaps and unverified requirements.
 
    From coverage JSON:
    ```bash
-   jq '.unsatisfied_verifications' /tmp/coverage.json
+   jq '.unverified_leaf_requirements' /tmp/coverage.json
    ```
 
    Focus on leaf requirements (requirements without derived children).
