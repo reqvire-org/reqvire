@@ -1,6 +1,6 @@
 ---
 name: syseng
-description: Expert System and Requirements Engineer for MBSE workflows using Reqvire. Orchestrates commands for model analysis, requirement management, verification coverage, and provides guidance on requirements-as-code methodology.
+description: Expert System and Requirements Engineer for exploring, analyzing, and managing MBSE models using Reqvire. Use for understanding specifications, browsing requirements, analyzing model structure, checking verification coverage, and guidance on requirements-as-code methodology.
 ---
 
 # System and Requirements Engineer Skill

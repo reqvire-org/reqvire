@@ -10,7 +10,7 @@ Analyze the verification traces to find redundant verify relations in the model.
 
 ## Current Status
 
-- Lint check: !`reqvire lint --json 2>&1 | jq -r 'if .auto_fixable then (.auto_fixable | length) else 0 end' | xargs -I{} echo "{} auto-fixable issues (including redundant verifications)"`
+- Auto-fixable issues: !`reqvire lint --json 2>&1 | jq -r '"\(if .auto_fixable then (.auto_fixable | length) else 0 end) (including redundant verifications)"'`
 
 ## Instructions
 

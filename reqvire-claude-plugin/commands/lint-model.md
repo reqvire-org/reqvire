@@ -10,8 +10,8 @@ Lint the Reqvire model to fix quality issues and identify items needing manual r
 
 ## Current Lint Status
 
-- Lint check: !`reqvire lint --json 2>&1 | jq -r 'if .auto_fixable then (.auto_fixable | length) else 0 end' | xargs -I{} echo "{} auto-fixable issues"`
-- Manual review: !`reqvire lint --json 2>&1 | jq -r 'if .needs_manual_review then (.needs_manual_review | length) else 0 end' | xargs -I{} echo "{} items need review"`
+- Auto-fixable: !`reqvire lint --json 2>&1 | jq -r '"\(if .auto_fixable then (.auto_fixable | length) else 0 end) issues"'`
+- Manual review: !`reqvire lint --json 2>&1 | jq -r '"\(if .needs_manual_review then (.needs_manual_review | length) else 0 end) items"'`
 
 ## Steps
 
