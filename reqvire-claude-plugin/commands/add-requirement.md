@@ -1,5 +1,4 @@
 ---
-name: add-requirement
 description: Add a new requirement to the Reqvire model with proper structure and traceability
 ---
 

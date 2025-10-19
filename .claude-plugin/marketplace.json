@@ -15,13 +15,15 @@
         "email": "ilijaljubicic@users.noreply.github.com"
       },
       "repository": "https://github.com/reqvire-org/reqvire",
-      "source": "./",
+      "source": "./reqvire-claude-plugin",
       "tags": [
         "mbse",
         "requirements",
         "systems-engineering",
         "verification",
-        "traceability"
+        "traceability",
+        "context",
+        "memory"
       ]
     }
   ]

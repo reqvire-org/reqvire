@@ -1,3 +1,7 @@
+---
+description: Find and analyze redundant verify relations in the Reqvire model
+---
+
 # Find Redundant Verify Relations
 
 Analyze the verification traces to find redundant verify relations in the model.

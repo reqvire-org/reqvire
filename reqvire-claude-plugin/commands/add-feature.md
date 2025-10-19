@@ -1,5 +1,4 @@
 ---
-name: add-feature
 description: Add a complete feature by orchestrating requirement and verification creation following MBSE workflow
 ---
 

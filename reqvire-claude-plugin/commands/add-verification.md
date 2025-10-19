@@ -1,5 +1,4 @@
 ---
-name: add-verification
 description: Add a verification for an existing requirement, checking if verification is needed based on requirement hierarchy
 ---
 

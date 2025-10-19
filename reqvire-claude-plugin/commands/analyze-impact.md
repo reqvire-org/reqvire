@@ -1,5 +1,4 @@
 ---
-name: analyze-impact
 description: Analyze change impact for modified requirements using git commit history
 ---
 

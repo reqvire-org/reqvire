@@ -1,5 +1,4 @@
 ---
-name: generate-tasks
 description: Generate implementation task plan from requirement changes using change-impact analysis
 ---
 

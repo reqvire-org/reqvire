@@ -1,5 +1,4 @@
 ---
-name: analyze-model
 description: Analyze the current Reqvire model structure, identify issues, coverage gaps, and provide improvement recommendations
 ---
 

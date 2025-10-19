@@ -1,5 +1,4 @@
 ---
-name: analyze-coverage
 description: Analyze verification coverage and identify unverified requirements
 ---
 

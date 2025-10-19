@@ -3,7 +3,10 @@
   "displayName": "Reqvire: Requirments As Code",
   "version": "1.0.0",
   "description": "Claude Code plugin for Reqvire - The AI-Native Requirements As A Code framework for Modern Engineering Teams. Includes specialized skills for requirements engineering and task planning, plus commands for model analysis and verification management.",
-  "author": "Reqvire Team",
+  "author": {
+    "name": "Ilija Ljubicic",
+    "email": "ilijaljubicic@users.noreply.github.com"
+  },
   "repository": "https://github.com/reqvire-org/reqvire",
   "homepage": "https://github.com/reqvire-org/reqvire",
   "keywords": [
@@ -17,8 +20,8 @@
     "rust"
   ],
   "skills": [
-    "skills/syseng.md",
-    "skills/task-master.md"
+    "skills/syseng",
+    "skills/task-master"
   ],
   "commands": [
     "commands/analyze-model.md",
