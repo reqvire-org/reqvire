@@ -37,7 +37,7 @@ Reqvire is now available as a plugin for Claude Code! Get AI-assisted requiremen
 - **CI/CD Integration** – Validate requirements, auto-generate diagrams, and analyze change impact directly in your pipelines.
 - **MBSE Meets Agile** – Combines Model-Based Systems Engineering rigor with the speed and simplicity of modern development.
 
-[Learn more about features →](https://www.reqvire.org/features)
+[Learn more in our documentation →](https://www.reqvire.org/user_guide)
 
 ---
 
@@ -60,7 +60,7 @@ Reqvire is now available as a plugin for Claude Code! Get AI-assisted requiremen
 curl -fsSL https://raw.githubusercontent.com/reqvire-org/reqvire/main/scripts/install.sh | bash
 ```
 
-For detailed installation options (from source, pre-built binaries, etc.), see the [Installation Guide](https://www.reqvire.org/installation).
+For detailed installation options (from source, pre-built binaries, etc.), see the [Installation Guide](https://www.reqvire.org/user_guide#installation).
 
 ### Next Steps
 
@@ -124,8 +124,6 @@ Licensed under the [Apache 2.0 License](LICENSE).
 ---
 
 <div align="center">
-
-**Built with ❤️ by the Reqvire Community**
 
 [🏠 Website](https://www.reqvire.org) • [📖 Docs](https://www.reqvire.org) • [👥 Contributing](./doc/README.md) • [💬 Community](https://github.com/reqvire-org/reqvire/discussions)
 
