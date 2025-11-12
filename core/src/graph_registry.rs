@@ -132,6 +132,9 @@ impl GraphRegistry {
         // Add missing opposites
         self.propagate_missing_opposites(excluded_filename_patterns);
 
+        // Populate element_id for all relations
+        self.populate_relation_element_ids();
+
         // Validate relations
         let mut errors = self.validate_relations(excluded_filename_patterns)?;
 
@@ -197,7 +200,7 @@ impl GraphRegistry {
 
                                 if !already_present {
                                     if let Some(opposite_relation) =
-                                        relation.to_opposite(&source_node.element.name, &source_node.element.identifier)
+                                        relation.to_opposite(&source_node.element.name, &source_node.element.identifier, &source_node.element.id)
                                     {
                                         to_add.push((target_id.clone(), opposite_relation));
                                     }
@@ -214,6 +217,28 @@ impl GraphRegistry {
             if let Some(target_node) = self.nodes.get_mut(&target_id) {
                 target_node.element.relations.push(relation);
                 log::debug!("Added opposite relation to '{}'", target_id);
+            }
+        }
+    }
+
+    /// Populates element_id for all relations by looking up targets in the registry
+    fn populate_relation_element_ids(&mut self) {
+        log::debug!("Populating element_id for all relations...");
+
+        // First pass: collect mapping of identifier -> element_id
+        let id_map: std::collections::HashMap<String, String> = self.nodes.iter()
+            .map(|(identifier, node)| (identifier.clone(), node.element.id.clone()))
+            .collect();
+
+        // Second pass: update all relations with element_id
+        for source_node in self.nodes.values_mut() {
+            for relation in &mut source_node.element.relations {
+                // Populate element_id for all Identifier links
+                if let crate::relation::LinkType::Identifier(ref target_id) = relation.target.link {
+                    if let Some(element_id) = id_map.get(target_id) {
+                        relation.target.element_id = Some(element_id.clone());
+                    }
+                }
             }
         }
     }
@@ -1657,11 +1682,14 @@ mod tests {
 
     fn add_relation(from: &mut Element, relation_type: &'static str, to_id: &str) {
         let relation_info = RELATION_TYPES.get(relation_type).unwrap();
+        // Extract element_id from identifier (fragment after #)
+        let element_id = crate::utils::extract_path_and_fragment(to_id).1.map(|f| f.to_string());
         from.relations.push(Relation {
             relation_type: relation_info,
             target: RelationTarget {
                 text: to_id.to_string(),
                 link: LinkType::Identifier(to_id.to_string()),
+                element_id,
             },
             user_created: true,
         });

@@ -313,7 +313,8 @@ pub fn parse_elements(
                                         &file_folder.to_path_buf()
                                     ) {
                                         Ok(normalized_target) => {
-                                            match Relation::new(&relation_type, text, &normalized_target) {
+                                            // element_id will be populated later by GraphRegistry after all elements are registered
+                                            match Relation::new(&relation_type, text, &normalized_target, None) {
                                                 Ok(relation) => {
                                                     element.add_relation(relation);
                                                 }

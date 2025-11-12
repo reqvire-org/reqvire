@@ -112,6 +112,9 @@ pub const VERIFICATION_TRACES_RELATIONS: &[&str] = &[
 pub struct RelationTarget {
     pub text: String,
     pub link: LinkType,
+    /// Stable Element ID (fragment) for Identifier links, None for external/path links
+    /// This is the globally unique, location-independent identifier used for change detection
+    pub element_id: Option<String>,
 }
 
 impl PartialEq for RelationTarget {
@@ -206,14 +209,14 @@ impl Hash for Relation {
 }
 
 impl Relation {
-    pub fn new(relation_type: &str, text: String, normalized_target: &str) -> Result<Self, ReqvireError> {   
+    pub fn new(relation_type: &str, text: String, normalized_target: &str, element_id: Option<String>) -> Result<Self, ReqvireError> {
         let link=Self::parse_link_type(normalized_target);
-               
+
         let relation_info = RELATION_TYPES.get(relation_type)
             .ok_or_else(|| ReqvireError::UnsupportedRelationType(relation_type.to_string()))?;
         Ok(Self {
             relation_type: relation_info,
-            target: RelationTarget{text: text, link: link},
+            target: RelationTarget{text: text, link: link, element_id},
             user_created: true,  // Relations created via parsing are user-created
         })
     }
@@ -238,7 +241,7 @@ impl Relation {
 
 
     /// Creates an opposite relation if possible for given target
-    pub fn to_opposite(&self, name: &str, identifier: &str) -> Option<Relation> {
+    pub fn to_opposite(&self, name: &str, identifier: &str, element_id: &str) -> Option<Relation> {
         if let Some(opposite_name) = self.relation_type.opposite {
             match RELATION_TYPES.get(opposite_name) {
                 Some(opposite_info) => {
@@ -247,6 +250,7 @@ impl Relation {
                         target: RelationTarget {
                             text: name.to_string(),
                             link: LinkType::Identifier(identifier.to_string()),
+                            element_id: Some(element_id.to_string()),
                         },
                         user_created: false,  // Auto-generated opposite relations are not user-created
                     })

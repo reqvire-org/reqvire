@@ -617,17 +617,16 @@ fn collect_tree_ids_recursively(
 /// Helper to normalize a relation by resolving its target identifier to an element name
 /// Returns (relation_type_name, element_name) tuple for semantic comparison
 /// Falls back to identifier if element cannot be resolved
-fn normalize_relation_for_comparison(rel: &Relation, registry: &graph_registry::GraphRegistry) -> (String, String) {
+fn normalize_relation_for_comparison(rel: &Relation) -> (String, String) {
     let relation_type = rel.relation_type.name.to_string();
 
-    // Try to resolve the identifier to an element name
-    if let relation::LinkType::Identifier(identifier) = &rel.target.link {
-        if let Some(target_elem) = registry.get_element(identifier) {
-            return (relation_type, target_elem.name.clone());
-        }
+    // Use the stable element_id if available (populated by GraphRegistry)
+    // This is location-independent and remains unchanged across relocations
+    if let Some(ref element_id) = rel.target.element_id {
+        return (relation_type, element_id.clone());
     }
 
-    // Fall back to identifier for external links or unresolved identifiers
+    // Fallback to full link for external URLs or internal paths
     (relation_type, rel.target.link.as_str().to_string())
 }
 
@@ -653,12 +652,12 @@ pub fn compute_change_impact(
             .filter(|r| relation::IMPACT_PROPAGATION_RELATIONS.contains(&r.relation_type.name))
             .collect();
 
-        // Normalize relations for semantic comparison (by element name, not identifier)
+        // Normalize relations for semantic comparison (by Element ID, not identifier)
         let cur_relations_normalized: HashSet<_> = cur_relations_raw.iter()
-            .map(|r| normalize_relation_for_comparison(r, current))
+            .map(|r| normalize_relation_for_comparison(r))
             .collect();
         let ref_relations_normalized: HashSet<_> = ref_relations_raw.iter()
-            .map(|r| normalize_relation_for_comparison(r, reference))
+            .map(|r| normalize_relation_for_comparison(r))
             .collect();
 
         // Find truly added/removed relations based on semantic comparison
@@ -674,14 +673,14 @@ pub fn compute_change_impact(
         // Map back to actual Relation objects for reporting
         let added_relations: Vec<_> = cur_relations_raw.iter()
             .filter(|r| {
-                let normalized = normalize_relation_for_comparison(r, current);
+                let normalized = normalize_relation_for_comparison(r);
                 added_relation_keys.contains(&normalized)
             })
             .map(|r| convert_relation_to_summary(r))
             .collect();
         let removed_relations: Vec<_> = ref_relations_raw.iter()
             .filter(|r| {
-                let normalized = normalize_relation_for_comparison(r, reference);
+                let normalized = normalize_relation_for_comparison(r);
                 removed_relation_keys.contains(&normalized)
             })
             .map(|r| convert_relation_to_summary(r))
@@ -742,10 +741,10 @@ pub fn compute_change_impact(
                     .collect();
 
                 let cur_relations_normalized: HashSet<_> = cur_relations_raw.iter()
-                    .map(|r| normalize_relation_for_comparison(r, current))
+                    .map(|r| normalize_relation_for_comparison(r))
                     .collect();
                 let ref_relations_normalized: HashSet<_> = ref_relations_raw.iter()
-                    .map(|r| normalize_relation_for_comparison(r, reference))
+                    .map(|r| normalize_relation_for_comparison(r))
                     .collect();
 
                 let added_relation_keys: HashSet<_> = cur_relations_normalized
@@ -759,14 +758,14 @@ pub fn compute_change_impact(
 
                 let added_relations: Vec<_> = cur_relations_raw.iter()
                     .filter(|r| {
-                        let normalized = normalize_relation_for_comparison(r, current);
+                        let normalized = normalize_relation_for_comparison(r);
                         added_relation_keys.contains(&normalized)
                     })
                     .map(|r| convert_relation_to_summary(r))
                     .collect();
                 let removed_relations: Vec<_> = ref_relations_raw.iter()
                     .filter(|r| {
-                        let normalized = normalize_relation_for_comparison(r, reference);
+                        let normalized = normalize_relation_for_comparison(r);
                         removed_relation_keys.contains(&normalized)
                     })
                     .map(|r| convert_relation_to_summary(r))
@@ -906,11 +905,14 @@ mod tests {
        
     /// Helper function to add a relation to an element.
     fn add_relation(element: &mut Element, relation_type: &'static RelationTypeInfo, target_id: &str) {
+        // Extract element_id from identifier (fragment after #)
+        let element_id = crate::utils::extract_path_and_fragment(target_id).1.map(|f| f.to_string());
         element.relations.push(Relation {
             relation_type,
             target: RelationTarget {
                 text: target_id.to_string(),
                 link: relation::LinkType::Identifier(target_id.to_string()),
+                element_id,
             },
             user_created: true,
         });
@@ -1032,6 +1034,7 @@ mod tests {
             target: RelationTarget {
                 text: "Child Requirement".to_string(),
                 link: LinkType::Identifier("req1.md#child-requirement".to_string()),
+                element_id: Some("child-requirement".to_string()),
             },
             user_created: true,
         });
@@ -1046,6 +1049,7 @@ mod tests {
             target: RelationTarget {
                 text: "Parent Verification".to_string(),
                 link: LinkType::Identifier("verify.md#parent-verification".to_string()),
+                element_id: Some("parent-verification".to_string()),
             },
             user_created: true,
         });
@@ -1063,6 +1067,7 @@ mod tests {
             target: RelationTarget {
                 text: "Parent Requirement".to_string(),
                 link: LinkType::Identifier("req1.md#parent-requirement".to_string()),
+                element_id: Some("parent-requirement".to_string()),
             },
             user_created: false,  // Auto-generated opposite relations
         });
@@ -1088,6 +1093,7 @@ mod tests {
             target: RelationTarget {
                 text: "Parent Requirement".to_string(),
                 link: LinkType::Identifier("req1.md#parent-requirement".to_string()),
+                element_id: Some("parent-requirement".to_string()),
             },
             user_created: false,  // Auto-generated opposite relations
         });
@@ -1131,6 +1137,7 @@ mod tests {
             target: RelationTarget {
                 text: "New Verification".to_string(),
                 link: LinkType::Identifier("verify.md#new-verification".to_string()),
+                element_id: Some("new-verification".to_string()),
             },
             user_created: true,
         });
@@ -1156,6 +1163,7 @@ mod tests {
             target: RelationTarget {
                 text: "New Requirement".to_string(),
                 link: LinkType::Identifier("req.md#new-requirement".to_string()),
+                element_id: Some("new-requirement".to_string()),
             },
             user_created: false,  // Auto-generated opposite relations
         });
@@ -1179,5 +1187,110 @@ mod tests {
         let added_ids: Vec<&str> = report.added.iter().map(|e| e.element_id.as_str()).collect();
         assert!(added_ids.contains(&"req.md#new-requirement"), "Requirement should be in added elements");
         assert!(!added_ids.contains(&"verify.md#new-verification"), "Verification should be filtered out");
+    }
+
+    #[test]
+    fn test_normalize_relation_unchanged_in_modified_file() {
+        // Bug: Auto-generated opposite relations appear as "added" when file is modified
+        // even though the underlying user-created relation is unchanged
+
+        // Reference registry (base commit)
+        let mut reference_registry = GraphRegistry::new();
+        let mut parent_ref = create_element("file.md#parent", "Parent Element", "Parent content");
+        let mut child_ref = create_element("file.md#child", "Child Element", "Child content");
+
+        // User-created relation on child
+        child_ref.relations.push(Relation {
+            relation_type: &RelationTypeInfo {
+                name: "derivedFrom",
+                opposite: Some("derive"),
+                description: "Child derives from parent",
+                arrow: "<--",
+                label: "derivedFrom",
+            },
+            target: RelationTarget {
+                text: "Parent Element".to_string(),
+                link: LinkType::Identifier("file.md#parent".to_string()),
+                element_id: Some("parent".to_string()),
+            },
+            user_created: true,
+        });
+
+        // Auto-generated opposite relation on parent
+        parent_ref.relations.push(Relation {
+            relation_type: &RelationTypeInfo {
+                name: "derive",
+                opposite: Some("derivedFrom"),
+                description: "Parent has child",
+                arrow: "-->",
+                label: "derive",
+            },
+            target: RelationTarget {
+                text: "Child Element".to_string(),
+                link: LinkType::Identifier("file.md#child".to_string()),
+                element_id: Some("child".to_string()),
+            },
+            user_created: false,  // AUTO-GENERATED
+        });
+
+        reference_registry.register_element(parent_ref.clone(), "file.md").unwrap();
+        reference_registry.register_element(child_ref.clone(), "file.md").unwrap();
+
+        // Current registry (HEAD - file modified but relations unchanged)
+        let mut current_registry = GraphRegistry::new();
+        let mut parent_curr = create_element("file.md#parent", "Parent Element", "Parent content");
+        let mut child_curr = create_element("file.md#child", "Child Element", "Child content");
+
+        // Same user-created relation on child
+        child_curr.relations.push(Relation {
+            relation_type: &RelationTypeInfo {
+                name: "derivedFrom",
+                opposite: Some("derive"),
+                description: "Child derives from parent",
+                arrow: "<--",
+                label: "derivedFrom",
+            },
+            target: RelationTarget {
+                text: "Parent Element".to_string(),
+                link: LinkType::Identifier("file.md#parent".to_string()),
+                element_id: Some("parent".to_string()),
+            },
+            user_created: true,
+        });
+
+        // Same auto-generated opposite relation on parent
+        parent_curr.relations.push(Relation {
+            relation_type: &RelationTypeInfo {
+                name: "derive",
+                opposite: Some("derivedFrom"),
+                description: "Parent has child",
+                arrow: "-->",
+                label: "derive",
+            },
+            target: RelationTarget {
+                text: "Child Element".to_string(),
+                link: LinkType::Identifier("file.md#child".to_string()),
+                element_id: Some("child".to_string()),
+            },
+            user_created: false,  // AUTO-GENERATED
+        });
+
+        // Add unrelated element (simulating file change)
+        let new_elem = create_element("file.md#newelem", "New Element", "New content");
+        current_registry.register_element(parent_curr.clone(), "file.md").unwrap();
+        current_registry.register_element(child_curr, "file.md").unwrap();
+        current_registry.register_element(new_elem, "file.md").unwrap();
+
+        // Test: Compute change impact
+        let report = compute_change_impact(&current_registry, &reference_registry).unwrap();
+
+        // Parent Element should NOT appear in changed elements
+        // because its auto-generated derive relation hasn't actually changed
+        let parent_in_changed = report.changed.iter().any(|e| e.element_id == "file.md#parent");
+
+        assert!(
+            !parent_in_changed,
+            "Parent Element should NOT be in changed elements - auto-generated relation unchanged"
+        );
     }
 }

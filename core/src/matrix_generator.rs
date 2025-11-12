@@ -672,6 +672,7 @@ mod tests {
             target: RelationTarget {
                 text: "".to_string(),
                 link: LinkType::Identifier("tests/TEST-001".to_string()),
+                element_id: Some("test-001".to_string()),
             },
             user_created: true,
         };
@@ -683,6 +684,7 @@ mod tests {
         // Create requirement elements
         let req1 = Element {
             identifier: "reqs/REQ-001".to_string(),
+            id: "req-001".to_string(),
             name: "System Requirement 1".to_string(),
             element_type: ElementType::Requirement(RequirementType::System),
             section: "".to_string(),
@@ -698,6 +700,7 @@ mod tests {
 
         let req2 = Element {
             identifier: "reqs/REQ-002".to_string(),
+            id: "req-002".to_string(),
             name: "User Requirement 2".to_string(),
             element_type: ElementType::Requirement(RequirementType::User),
             section: "".to_string(),
@@ -714,6 +717,7 @@ mod tests {
         // Create verification element
         let ver1 = Element {
             identifier: "tests/TEST-001".to_string(),
+            id: "test-001".to_string(),
             name: "Test Case 1".to_string(),
             element_type: ElementType::Verification(VerificationType::Test),
             section: "".to_string(),
@@ -734,6 +738,7 @@ mod tests {
             target: RelationTarget {
                 link: LinkType::Identifier("tests/TEST-001".to_string()),
                 text: "".to_string(),
+                element_id: Some("test-001".to_string()),
             },
             user_created: true,
         });

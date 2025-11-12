@@ -109,6 +109,10 @@ impl ElementType {
 #[derive(Debug, Clone, Serialize)]
 pub struct Element {
     pub name: String,
+    /// Stable Element ID - globally unique, location-independent identifier
+    /// This is the normalized element name that remains unchanged across relocations
+    #[serde(skip)]
+    pub id: String,
     pub content: String,
     pub section: String,
     pub relations: Vec<Relation>,
@@ -131,8 +135,14 @@ pub struct Element {
 
 impl Element {
     pub fn new(name: &str, identifier: &str, file_path: &str, section: &str, line_number: usize, element_type: Option<ElementType>) -> Self {
+        // Extract stable ID (fragment) from identifier
+        let id = utils::extract_path_and_fragment(identifier).1
+            .unwrap_or(identifier)
+            .to_string();
+
         Self {
             name: name.to_string(),
+            id,
             content: "".to_string(),
             hash_impact_content: "".to_string(),
             section: section.to_string(),
