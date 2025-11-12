@@ -462,8 +462,10 @@ An **Element** is a uniquely identifiable system element within a Markdown docum
    - An element must start with a 3 `###` header.
    - The `###` header text must not be empty.
 
-2. **Uniqueness**:
-   - Element names must be unique within the same file.
+2. **Global Uniqueness**:
+   - Element names must be globally unique across all files in the model.
+   - Element names serve as stable IDs for element identity independent of file location.
+   - File location and section are containment properties, not identity attributes.
  
 3. **Nested Subheaders**:
    - Subheaders within an element defined with 4 header (e.g., `####`) are part of the same element and do not create new elements.
@@ -574,8 +576,10 @@ An **Element** is a uniquely identifiable system element within a Markdown docum
    - An element must start with a 3 `###` header.
    - The `###` header text must not be empty.
 
-2. **Uniqueness**:
-   - Element names must be unique within the same file.
+2. **Global Uniqueness**:
+   - Element names must be globally unique across all files in the model.
+   - Element names serve as stable IDs for element identity independent of file location.
+   - File location and section are containment properties, not identity attributes.
  
 3. **Nested Subheaders**:
    - Subheaders within an element defined with 4 header (e.g., `####`) are part of the same element and do not create new elements.
@@ -794,6 +798,133 @@ The appropriate verification type should be selected based on the nature of the 
   * satisfiedBy: [model.rs](../core/src/model.rs)
 ---
 
+### Element Identity Model
+
+The system shall distinguish between element identity (ID) and element addressing (identifier) to support stable element tracking independent of file location.
+
+#### Details
+<details>
+<summary>View Full Specification</summary>
+
+## Element ID vs Identifier
+
+The system maintains two distinct concepts for element identification:
+
+### Element ID
+
+An **Element ID** is a stable unique identifier for element identity:
+
+- **Source**: Derived from the element name (H3 header text)
+- **Uniqueness**: Globally unique across the entire model
+- **Stability**: Remains unchanged when element is relocated between files or sections
+- **Purpose**: Used internally for change detection and tracking element identity across versions
+- **Format**: Normalized element name following GitHub fragment rules (lowercase, hyphens, no special chars)
+- **Visibility**: Internal to the system, not directly visible in markdown documents
+
+### Element Identifier
+
+An **Element Identifier** is a location-based reference for addressing:
+
+- **Source**: Combination of file path and element name fragment
+- **Format**: `file_path#element-name-fragment` (e.g., `specifications/File.md#element-name`)
+- **Purpose**: Used for relationship targeting in Relations subsections and cross-referencing
+- **Usage**: What users write in markdown to reference elements
+- **Variability**: Changes when element is relocated (file_path component changes)
+- **Resolution**: System resolves identifiers to element IDs during parsing
+
+## Relationship Between ID and Identifier
+
+- Users write relations using **identifiers** (location-based references in markdown)
+- System resolves identifiers to **element IDs** during parsing for internal tracking
+- Change detection compares **element IDs**, not identifiers
+- One element ID can have different identifiers over time due to relocation
+- Identifier changes are detected as relocations, not identity changes
+
+## Implicit Containment Model
+
+Element location is tracked separately from element identity:
+
+- **file_path field**: Records which file contains the element (implicit file containment)
+- **section field**: Records which H2 section contains the element (implicit section containment)
+- **No explicit relations**: Containment is not expressed as relations in the Relations subsection
+- **Location changes**: Detected as relocations when file_path or section changes
+- **Identity preservation**: Element ID remains stable across location changes
+
+## Change Detection Using Element IDs
+
+When comparing model versions:
+
+1. Elements are matched by **Element ID** (not identifier)
+2. Change types detected:
+   - **Content change**: Same ID, different content hash
+   - **Addition**: ID exists only in new version
+   - **Removal**: ID exists only in old version
+   - **Relocation**: Same ID, different file_path or section (without content change)
+3. Pure relocations do not trigger impact propagation
+4. Relocations with content changes propagate based on content change only
+
+## Examples
+
+### Example 1: Element with ID and Identifier
+
+**Markdown in** `specifications/requirements.md`:
+```markdown
+### User Authentication
+
+The system shall provide secure user authentication.
+
+#### Relations
+  * derivedFrom: [Security Requirements](security.md#Security-Requirements)
+```
+
+- **Element ID**: `user-authentication` (stable, internal)
+- **Element Identifier**: `specifications/requirements.md#user-authentication` (current location)
+- **file_path**: `specifications/requirements.md` (implicit containment)
+- **section**: (empty if not in H2 section)
+
+### Example 2: Element Relocation
+
+**Before** - in `specifications/requirements.md`:
+```markdown
+### User Authentication
+Content here.
+```
+- **Element ID**: `user-authentication`
+- **Identifier**: `specifications/requirements.md#user-authentication`
+
+**After** - moved to `specifications/security/auth.md`:
+```markdown
+### User Authentication
+Content here.
+```
+- **Element ID**: `user-authentication` (unchanged)
+- **Identifier**: `specifications/security/auth.md#user-authentication` (changed)
+- **Detection**: Change detection recognizes same ID → relocation, not removal + addition
+
+### Example 3: Writing Relations
+
+**User writes in markdown**:
+```markdown
+#### Relations
+  * derivedFrom: [Parent Req](../parent.md#Parent-Req)
+  * verifiedBy: [Test Case](#Test-Case)
+```
+
+**System processing**:
+1. Parse identifier: `../parent.md#Parent-Req`
+2. Resolve to absolute: `specifications/parent.md#parent-req`
+3. Resolve to Element ID: `parent-req`
+4. Store relation using Element ID internally
+5. Change detection compares using Element ID
+
+</details>
+
+#### Relations
+  * derivedFrom: [Structure and Addressing in Markdown Documents](#structure-and-addressing-in-markdown-documents)
+  * satisfiedBy: [element.rs](../core/src/element.rs)
+  * satisfiedBy: [parser.rs](../core/src/parser.rs)
+---
+
 ### Identifiers and Relations
 
 The system shall implement  **Identifiers** and **Relations** following clearly defined specifications to ensure consistency, validity, and efficient querying and manipulation of these entities.
@@ -804,9 +935,14 @@ The system shall implement  **Identifiers** and **Relations** following clearly 
 
 ## Identifiers in Markdown Documents
 
-An **identifier** consists of a path following a filename with an extension (e.g., `file.md`) and optionally  **element** name (fragment).  
+An **identifier** is a location-based reference for addressing elements in markdown documents.
+It consists of a file path and optionally an element name (fragment).
 
-Every **element** in the system has unique identifier that depends on document it appears in, path of the document, and element name (fragment).
+**Distinction from Element ID**:
+- **Identifier**: Location-based address for targeting elements in relations (`file.md#element-name`)
+- **Element ID**: Stable identity independent of location (derived from element name)
+
+Identifiers are used for writing relations in markdown and cross-referencing between elements. The system resolves identifiers to Element IDs during parsing for internal tracking and change detection. When an element is relocated to a different file or section, its identifier changes but its Element ID remains stable.
 
 ## Identifier in markdown document can be of several types
 
@@ -1088,6 +1224,7 @@ The system must validate relation usage according to these rules:
 
 #### Relations
   * derivedFrom: [Structure and Addressing in Markdown Documents](#structure-and-addressing-in-markdown-documents)
+  * derivedFrom: [Element Identity Model](#element-identity-model)
   * derivedFrom: [AI-Assisted MBSE Model Management](UserStories.md#ai-assisted-mbse-model-management)
   * satisfiedBy: [relation.rs](../core/src/relation.rs)
 ---

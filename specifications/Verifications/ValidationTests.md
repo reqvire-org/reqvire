@@ -268,6 +268,9 @@ This verification test checks that Reqvire correctly identifies and reports inva
 
 **Pass 1 Validation Errors (Element Collection and Local Validation):**
 - System should detect and report duplicate elements in the same document
+- System should detect and report duplicate element names across different files (global uniqueness violation)
+- System should report both file locations where duplicate element names occur
+- Error message should clearly indicate element names must be globally unique
 - System should detect and report invalid metadata subsection format
 - System should detect and report invalid relation format syntax
 - System should detect and report invalid relation types (typos, etc.)
@@ -298,8 +301,10 @@ This verification test checks that Reqvire correctly identifies and reports inva
 #### Relations
   * verify: [Validate Command](../ReqvireTool/UserInterface/CLI.md#validate-command)
   * verify: [Validation Error Handling](../ReqvireTool/ValidationAndReporting/Validation.md#validation-error-handling)
+  * verify: [Internal Consistency Validator](../ReqvireTool/ValidationAndReporting/Validation.md#internal-consistency-validator)
   * verify: [Relation Type Validation](../ReqvireTool/ValidationAndReporting/Validation.md#relation-type-validation)
   * verify: [Relation Element Type Validator](../ReqvireTool/ValidationAndReporting/Validation.md#relation-element-type-validator)
+  * verify: [Element Identity Model](../SpecificationsRequirements.md#element-identity-model)
   * verify: [Identifiers and Relations](../SpecificationsRequirements.md#identifiers-and-relations)
   * verify: [Trace Relation Non-Directional Behavior](../ReqvireTool/ModelManagement/DiagramGeneration.md#trace-relation-non-directional-behavior)
   * satisfiedBy: [test.sh](../../tests/test-invalid-relations/test.sh)

@@ -424,10 +424,23 @@ The system shall implement a markdown structure validator that enforces Reqvire'
 
 ### Internal Consistency Validator
 
-The system shall implement a consistency validator that verifies logical coherence within the model, including checking for circular dependencies, orphaned elements, and inconsistent relationship patterns, with detailed error reporting.
+The system shall implement a consistency validator that verifies logical coherence within the model, including checking for circular dependencies, orphaned elements, inconsistent relationship patterns, and element name uniqueness, with detailed error reporting.
+
+#### Details
+The consistency validator shall verify:
+- **Global Element Name Uniqueness**: Element names are globally unique across all files in the model
+- **Duplicate Detection**: Detect and report when multiple elements in different files share the same name
+- **Location Reporting**: Report both file locations where duplicate element names occur
+- **Clear Error Messages**: Error messages clearly indicate that element names must be globally unique
+- **Circular Dependencies**: Detect and report circular dependency chains in requirements
+- **Orphaned Elements**: Identify elements without proper traceability connections
+- **Inconsistent Patterns**: Detect relationship patterns that violate model constraints
+
+Rationale: Element names serve as stable IDs for element identity, independent of file location. Global uniqueness is essential for proper element identification and change tracking across the model.
 
 #### Relations
   * derivedFrom: [Validate Internal Consistency](../../UserRequirements.md#validate-internal-consistency)
+  * derivedFrom: [Element Identity Model](../../SpecificationsRequirements.md#element-identity-model)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
   * verifiedBy: [Invalid Relations Test](../../Verifications/ValidationTests.md#invalid-relations-test)

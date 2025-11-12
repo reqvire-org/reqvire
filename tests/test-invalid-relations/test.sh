@@ -28,31 +28,17 @@ if [ $EXIT_CODE_PASS1 -eq 0 ]; then
   exit 1
 fi
 
-# Define Pass 1 errors we expect to see
-EXPECTED_PASS1_ERRORS=(
-  "Duplicate element:"
-  "Invalid metadata format:"
-  "Invalid relation format:"
-  "Unsupported relation type:"
-  "Duplicate subsection:"
-  "Invalid header level in element"
-)
+# Sanitize output by removing temp directory paths
+SANITIZED_OUTPUT=$(echo "$OUTPUT_PASS1" | sed "s|${TEST_DIR}/||g" | sed 's|/tmp/reqvire-test-invalid-relations-[^/]*/||g')
 
-MISSING_PASS1_ERRORS=()
-
-for expected in "${EXPECTED_PASS1_ERRORS[@]}"; do
-  if ! echo "$OUTPUT_PASS1" | grep -q "$expected"; then
-    MISSING_PASS1_ERRORS+=("❌ MISSING Pass 1: $expected")
-  fi
-done
-
-if [ ${#MISSING_PASS1_ERRORS[@]} -gt 0 ]; then
-  echo "❌ FAILED: Missing expected Pass 1 validation errors!"
-  for missing in "${MISSING_PASS1_ERRORS[@]}"; do
-    echo "$missing"
-  done
+# Compare against expected output file
+if ! diff "${TEST_DIR}/pass1-errors/expected-output.txt" <(echo "$SANITIZED_OUTPUT") > /dev/null; then
+  echo "❌ FAILED: Pass 1 validation errors don't match expected output"
   echo ""
-  echo "ACTUAL Pass 1 ERRORS:"
+  echo "DIFF (expected vs actual):"
+  diff -u "${TEST_DIR}/pass1-errors/expected-output.txt" <(echo "$SANITIZED_OUTPUT") || true
+  echo ""
+  echo "FULL ACTUAL OUTPUT:"
   echo "$OUTPUT_PASS1"
   exit 1
 fi
