@@ -691,6 +691,7 @@ mod tests {
             changed_since_commit: false,
             content: "Requirement content 1".to_string(),
             file_path: "reqs/REQ-001".to_string(),
+            line_number: 1,
             relations: vec![],
             section_order_index: 0,
         };
@@ -705,6 +706,7 @@ mod tests {
             changed_since_commit: false,
             content: "Requirement content 2".to_string(),
             file_path: "reqs/REQ-002".to_string(),
+            line_number: 1,
             relations: vec![],
             section_order_index: 1,
         };
@@ -720,6 +722,7 @@ mod tests {
             changed_since_commit: false,
             content: "Test case content".to_string(),
             file_path: "tests/TEST-001".to_string(),
+            line_number: 1,
             relations: vec![],
             section_order_index: 0,
         };

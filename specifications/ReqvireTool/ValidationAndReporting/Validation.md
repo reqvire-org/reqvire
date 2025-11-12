@@ -362,6 +362,30 @@ graph LR;
   class ce2625feec883e55 default;
   click ce2625feec883e55 "../../../core/src/utils.rs";
   dd454dd5831a33a0 -->|satisfiedBy| ce2625feec883e55;
+  e89edd8a1ab08d4["Element Identity Model"];
+  class e89edd8a1ab08d4 systemRequirement;
+  click e89edd8a1ab08d4 "../../SpecificationsRequirements.md#element-identity-model";
+  16b284f882a920cc["Change Impact Detection Algorithm"];
+  class 16b284f882a920cc systemRequirement;
+  click 16b284f882a920cc "../ModelManagement/ChangeImpact.md#change-impact-detection-algorithm";
+  e89edd8a1ab08d4 -.->|deriveReqT| 16b284f882a920cc;
+  674e6f27f5fda615["Change Impact Visualization"];
+  class 674e6f27f5fda615 systemRequirement;
+  click 674e6f27f5fda615 "../ModelManagement/ChangeImpact.md#change-impact-visualization";
+  e89edd8a1ab08d4 -.->|deriveReqT| 674e6f27f5fda615;
+  e89edd8a1ab08d4 -.->|deriveReqT| 19106261e8369e50;
+  816c1e0b1de4dc53["Identifiers and Relations"];
+  class 816c1e0b1de4dc53 systemRequirement;
+  click 816c1e0b1de4dc53 "../../SpecificationsRequirements.md#identifiers-and-relations";
+  e89edd8a1ab08d4 -.->|deriveReqT| 816c1e0b1de4dc53;
+  a814c4935e1a0449["element.rs"];
+  class a814c4935e1a0449 default;
+  click a814c4935e1a0449 "../../../core/src/element.rs";
+  e89edd8a1ab08d4 -->|satisfiedBy| a814c4935e1a0449;
+  f22d93285fcd7664["parser.rs"];
+  class f22d93285fcd7664 default;
+  click f22d93285fcd7664 "../../../core/src/parser.rs";
+  e89edd8a1ab08d4 -->|satisfiedBy| f22d93285fcd7664;
   551906d5c51d91d9["Relation Types and behaviors"];
   class 551906d5c51d91d9 systemRequirement;
   click 551906d5c51d91d9 "../../SpecificationsRequirements.md#relation-types-and-behaviors";
@@ -424,10 +448,23 @@ The system shall implement a markdown structure validator that enforces Reqvire'
 
 ### Internal Consistency Validator
 
-The system shall implement a consistency validator that verifies logical coherence within the model, including checking for circular dependencies, orphaned elements, and inconsistent relationship patterns, with detailed error reporting.
+The system shall implement a consistency validator that verifies logical coherence within the model, including checking for circular dependencies, orphaned elements, inconsistent relationship patterns, and element name uniqueness, with detailed error reporting.
+
+#### Details
+The consistency validator shall verify:
+- **Global Element Name Uniqueness**: Element names are globally unique across all files in the model
+- **Duplicate Detection**: Detect and report when multiple elements in different files share the same name
+- **Location Reporting**: Report both file locations where duplicate element names occur
+- **Clear Error Messages**: Error messages clearly indicate that element names must be globally unique
+- **Circular Dependencies**: Detect and report circular dependency chains in requirements
+- **Orphaned Elements**: Identify elements without proper traceability connections
+- **Inconsistent Patterns**: Detect relationship patterns that violate model constraints
+
+Rationale: Element names serve as stable IDs for element identity, independent of file location. Global uniqueness is essential for proper element identification and change tracking across the model.
 
 #### Relations
   * derivedFrom: [Validate Internal Consistency](../../UserRequirements.md#validate-internal-consistency)
+  * derivedFrom: [Element Identity Model](../../SpecificationsRequirements.md#element-identity-model)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
   * verifiedBy: [Invalid Relations Test](../../Verifications/ValidationTests.md#invalid-relations-test)

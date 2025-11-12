@@ -1,2 +1,3 @@
-# Exclude ignored file from processing
-**/IgnoredFile.md
+backup/
+temp/
+IgnoredFile.md

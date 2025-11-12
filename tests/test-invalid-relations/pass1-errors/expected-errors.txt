@@ -1,0 +1,8 @@
+Duplicate element:
+Invalid metadata format:
+Invalid relation format:
+Unsupported relation type:
+Duplicate subsection:
+Invalid header level in element
+Requirements.md
+SecondFile.md

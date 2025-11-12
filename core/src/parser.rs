@@ -158,45 +158,35 @@ pub fn parse_elements(
                         
                             let relative_file = match utils::get_relative_path(&file_path) {
                                 Ok(path) => path,
-                                Err(err) => {                                   
+                                Err(err) => {
                                     debug!("Error: {}", &err);
-                                    skip_current_element = true;                                
-                                    errors.push(err); 
+                                    skip_current_element = true;
+                                    errors.push(err);
                                     continue;
                                 }
                             };
-                            if seen_identifiers.contains(&identifier) {
-                                let msg = format!(
-                                    "'{}' already seen (file: {}, line {})",
-                                    element_name,
-                                    relative_file.display(),
-                                    line_num + 1
-                                );
-                                errors.push(ReqvireError::DuplicateElement(msg.clone()));
-                                debug!("Error: {}", msg);
-                                skip_current_element = true;
-                            } else {
-                                seen_identifiers.insert(identifier.clone());
 
-                                // Default element type is always 'requirement' (location-independent)
-                                let element_type = ElementType::Requirement(RequirementType::System);
+                            seen_identifiers.insert(identifier.clone());
 
-                                let mut new_element = Element::new(
-                                    &element_name,
-                                    &identifier,
-                                    &relative_file.to_string_lossy(),
-                                    &current_section_name,
-                                    Some(element_type),
-                                );
+                            // Default element type is always 'requirement' (location-independent)
+                            let element_type = ElementType::Requirement(RequirementType::System);
 
-                                // Set section order index
-                                let current_index = section_element_counter.get(current_section_name).unwrap_or(&0);
-                                new_element.section_order_index = *current_index;
-                                section_element_counter.insert(current_section_name.to_string(), current_index + 1);
+                            let mut new_element = Element::new(
+                                &element_name,
+                                &identifier,
+                                &relative_file.to_string_lossy(),
+                                &current_section_name,
+                                line_num + 1, // line_number is 1-indexed
+                                Some(element_type),
+                            );
 
-                                current_element = Some(new_element);
-                                debug!("Found element: {}", element_name);
-                            }
+                            // Set section order index
+                            let current_index = section_element_counter.get(current_section_name).unwrap_or(&0);
+                            new_element.section_order_index = *current_index;
+                            section_element_counter.insert(current_section_name.to_string(), current_index + 1);
+
+                            current_element = Some(new_element);
+                            debug!("Found element: {}", element_name);
                         }
                         Err(e) => {
                             let msg = format!(

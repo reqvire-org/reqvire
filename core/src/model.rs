@@ -70,6 +70,9 @@ impl ModelManager {
     ) -> Result<Vec<ReqvireError>, ReqvireError> {
         let mut errors = Vec::new();
 
+        // Track all element locations for global uniqueness checking
+        let mut all_element_locations: Vec<(String, String, usize)> = Vec::new(); // (name, file_path, line_number)
+
         let files = utils::scan_markdown_files(git_commit_hash, excluded_filename_patterns);
         debug!("Pass 1: Found {} markdown files.", files.len());
 
@@ -105,12 +108,55 @@ impl ModelManager {
                         );
                     }
 
+                    // Track element locations for global uniqueness checking
+                    for element in &elements {
+                        all_element_locations.push((
+                            element.name.clone(),
+                            element.file_path.clone(),
+                            element.line_number
+                        ));
+                    }
+
                     // Register parsed elements with local validation
                     for element in elements {
                         if let Err(e) = self.graph_registry.register_element(element, &relative_path_str) {
                             errors.push(e);
                         }
                     }
+                }
+            }
+        }
+
+        // Global uniqueness validation: Check for duplicate element names across all files
+        let mut name_locations: std::collections::HashMap<String, Vec<(String, usize)>> = std::collections::HashMap::new();
+
+        for (name, file_path, line_number) in all_element_locations {
+            name_locations
+                .entry(name)
+                .or_insert_with(Vec::new)
+                .push((file_path, line_number));
+        }
+
+        // Report duplicates with both locations
+        for (name, locations) in name_locations.iter() {
+            if locations.len() > 1 {
+                // Sort locations for consistent error messages
+                let mut sorted_locations = locations.clone();
+                sorted_locations.sort_by(|a, b| {
+                    a.0.cmp(&b.0).then(a.1.cmp(&b.1))
+                });
+
+                // For each duplicate after the first, report it with both locations
+                for i in 1..sorted_locations.len() {
+                    let msg = format!(
+                        "'{}' found in {}:{} and {}:{}",
+                        name,
+                        sorted_locations[0].0,
+                        sorted_locations[0].1,
+                        sorted_locations[i].0,
+                        sorted_locations[i].1
+                    );
+                    errors.push(ReqvireError::DuplicateElement(msg));
                 }
             }
         }

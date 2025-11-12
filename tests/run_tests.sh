@@ -57,8 +57,8 @@ run_test_case() {
         echo "❌ $test_name - FAILED"
         echo "   Log file: $log_file"
         echo ""
-        echo "   Last 30 lines of output:"
-        tail -30 "$log_file" | sed 's/^/   /'
+        echo "   Full output:"
+        cat "$log_file" | sed 's/^/   /'
         echo ""
     fi
 

@@ -111,9 +111,8 @@ impl GraphRegistry {
     pub fn register_element(&mut self, element: Element, _file_path: &str) -> Result<(), ReqvireError> {
         let element_id = element.identifier.clone();
 
-        if self.nodes.contains_key(&element_id) {
-            return Err(ReqvireError::DuplicateElement(element_id));
-        }
+        // Note: Duplicate checking is now done at global level in ModelManager::pass1_collect_elements
+        // to properly report all duplicate locations
 
         self.nodes.insert(element_id, ElementNode {
             element,
@@ -575,6 +574,7 @@ impl GraphRegistry {
             &virtual_id,
             file_path,
             new_section,
+            0, // Virtual elements don't have real line numbers
             None,
         );
 
@@ -603,6 +603,7 @@ impl GraphRegistry {
             &virtual_id,
             new_file_path,
             initial_section,
+            0, // Virtual elements don't have real line numbers
             None,
         );
 
@@ -1646,6 +1647,7 @@ mod tests {
             id,
             "file.md",
             "TestSection",
+            1, // Test elements at line 1
             Some(ElementType::Requirement(RequirementType::System)),
         );
         element.content = format!("This is {}", name);

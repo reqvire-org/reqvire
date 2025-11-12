@@ -114,6 +114,7 @@ pub struct Element {
     pub relations: Vec<Relation>,
     pub identifier: String,
     pub file_path: String,
+    pub line_number: usize,
     pub element_type: ElementType,
     pub metadata: HashMap<String, String>,
     //
@@ -129,7 +130,7 @@ pub struct Element {
 
 
 impl Element {
-    pub fn new(name: &str, identifier: &str, file_path: &str, section: &str, element_type: Option<ElementType>) -> Self {
+    pub fn new(name: &str, identifier: &str, file_path: &str, section: &str, line_number: usize, element_type: Option<ElementType>) -> Self {
         Self {
             name: name.to_string(),
             content: "".to_string(),
@@ -138,6 +139,7 @@ impl Element {
             relations: vec![],
             identifier: identifier.to_string(),
             file_path: file_path.to_string(),
+            line_number,
             element_type: element_type.unwrap_or(ElementType::Requirement(RequirementType::System)),
             metadata: HashMap::new(),
             changed_since_commit: false,

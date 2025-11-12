@@ -53,6 +53,14 @@ pub struct RemovedElement {
     pub removed_relations: Vec<RelationSummary>,
 }
 
+/// Report for an element that has been relocated (name exists in both registries but identifier changed).
+#[derive(Debug, Serialize)]
+pub struct RelocatedElement {
+    pub name: String,
+    pub old_identifier: String,
+    pub new_identifier: String,
+}
+
 #[derive(Debug, Clone, Serialize)]
 pub struct InvalidatedVerification {
     pub element_id: String,
@@ -86,6 +94,7 @@ pub struct ChangeImpactReport {
     pub added: Vec<AddedElement>,
     pub removed: Vec<RemovedElement>,
     pub changed: Vec<ChangedElement>,
+    pub relocated: Vec<RelocatedElement>,
     pub invalidated_verifications: Vec<InvalidatedVerification>,
     #[serde(skip)]
     pub all_added_element_ids: HashSet<String>,
@@ -97,6 +106,7 @@ impl ChangeImpactReport {
             added: Vec::new(),
             removed: Vec::new(),
             changed: Vec::new(),
+            relocated: Vec::new(),
             invalidated_verifications: Vec::new(),
             all_added_element_ids: HashSet::new(),
         }
@@ -195,6 +205,13 @@ impl ChangeImpactReport {
                 "change_impact_tree": impact_tree
             })
         }).collect();
+        let relocated: Vec<_> = self.relocated.iter().map(|elem| {
+            json!({
+                "name": elem.name,
+                "old_location": elem.old_identifier,
+                "new_location": elem.new_identifier
+            })
+        }).collect();
         let invalidated_verifications: Vec<_> = self.invalidated_verifications.iter().map(|invalidated_ver| {
             let target_url = format!("{}/blob/{}/{}", base_url, git_commit, invalidated_ver.element_id);
             json!({
@@ -207,6 +224,7 @@ impl ChangeImpactReport {
             "added": added,
             "removed": removed,
             "changed": changed,
+            "relocated": relocated,
             "invalidated_verifications": invalidated_verifications
         })
     }
@@ -214,9 +232,30 @@ impl ChangeImpactReport {
     pub fn to_text(&self, base_url: &str, git_commit: &str, previous_git_commit: &str) -> String {
         let mut output = String::new();
         output.push_str("## Change Impact Report\n\n");
-        
+
         // Use all_added_element_ids which contains IDs from before filtering
         let new_element_ids = &self.all_added_element_ids;
+
+        // Relocated Elements section
+        if !self.relocated.is_empty() {
+            output.push_str("### Relocated Elements\n\n");
+            for elem in &self.relocated {
+                output.push_str(&format!(
+                    "* [{}]({})\n",
+                    elem.name, elem.new_identifier
+                ));
+                output.push_str(&format!(
+                    "  * Old location: {}\n",
+                    elem.old_identifier
+                ));
+                output.push_str(&format!(
+                    "  * New location: {}\n",
+                    elem.new_identifier
+                ));
+            }
+            output.push_str("\n---\n\n");
+        }
+
         // Removed Elements section
         if !self.removed.is_empty() {
             output.push_str("### Removed Elements\n\n");
@@ -288,8 +327,8 @@ impl ChangeImpactReport {
             }
             output.push_str("\n");
         }
-       
-        if self.removed.is_empty() && self.added.is_empty() && self.changed.is_empty() {
+
+        if self.removed.is_empty() && self.added.is_empty() && self.changed.is_empty() && self.relocated.is_empty() {
             output.push_str("\nNothing to report...\n");
         }
         output
@@ -427,6 +466,7 @@ pub fn build_change_impact_tree(
                 &element_id,
                 "unknown",
                 "Placeholder",
+                0, // Placeholder elements don't have real line numbers
                 None,
             );
             placeholder.content = "Element referenced but not found in registry".to_string();
@@ -574,6 +614,23 @@ fn collect_tree_ids_recursively(
 
 
 
+/// Helper to normalize a relation by resolving its target identifier to an element name
+/// Returns (relation_type_name, element_name) tuple for semantic comparison
+/// Falls back to identifier if element cannot be resolved
+fn normalize_relation_for_comparison(rel: &Relation, registry: &graph_registry::GraphRegistry) -> (String, String) {
+    let relation_type = rel.relation_type.name.to_string();
+
+    // Try to resolve the identifier to an element name
+    if let relation::LinkType::Identifier(identifier) = &rel.target.link {
+        if let Some(target_elem) = registry.get_element(identifier) {
+            return (relation_type, target_elem.name.clone());
+        }
+    }
+
+    // Fall back to identifier for external links or unresolved identifiers
+    (relation_type, rel.target.link.as_str().to_string())
+}
+
 pub fn compute_change_impact(
     current: &graph_registry::GraphRegistry,
     reference: &graph_registry::GraphRegistry,
@@ -581,30 +638,55 @@ pub fn compute_change_impact(
     let mut report = ChangeImpactReport::new();
     let current_ids: HashSet<String> = current.get_all_elements().iter().map(|e| e.identifier.clone()).collect();
     let reference_ids: HashSet<String> = reference.get_all_elements().iter().map(|e| e.identifier.clone()).collect();
-   
+
     // Process elements present in both registries.
     for id in current_ids.intersection(&reference_ids) {
         let cur_elem = current.get_element(id).unwrap();
         let ref_elem = reference.get_element(id).unwrap();
         let content_changed = cur_elem.hash_impact_content != ref_elem.hash_impact_content;
-       
+
         // Only track changes to relations that propagate impact according to specifications
-        let cur_relations: HashSet<_> = cur_elem.relations.iter()
+        let cur_relations_raw: Vec<_> = cur_elem.relations.iter()
             .filter(|r| relation::IMPACT_PROPAGATION_RELATIONS.contains(&r.relation_type.name))
-            .cloned().collect();
-        let ref_relations: HashSet<_> = ref_elem.relations.iter()
+            .collect();
+        let ref_relations_raw: Vec<_> = ref_elem.relations.iter()
             .filter(|r| relation::IMPACT_PROPAGATION_RELATIONS.contains(&r.relation_type.name))
-            .cloned().collect();
-        let added_relations: Vec<_> = cur_relations
-            .difference(&ref_relations)
-            .cloned()
-            .map(|rel: Relation| convert_relation_to_summary(&rel))
             .collect();
-        let removed_relations: Vec<_> = ref_relations
-            .difference(&cur_relations)
-            .cloned()
-            .map(|rel: Relation| convert_relation_to_summary(&rel))
+
+        // Normalize relations for semantic comparison (by element name, not identifier)
+        let cur_relations_normalized: HashSet<_> = cur_relations_raw.iter()
+            .map(|r| normalize_relation_for_comparison(r, current))
             .collect();
+        let ref_relations_normalized: HashSet<_> = ref_relations_raw.iter()
+            .map(|r| normalize_relation_for_comparison(r, reference))
+            .collect();
+
+        // Find truly added/removed relations based on semantic comparison
+        let added_relation_keys: HashSet<_> = cur_relations_normalized
+            .difference(&ref_relations_normalized)
+            .cloned()
+            .collect();
+        let removed_relation_keys: HashSet<_> = ref_relations_normalized
+            .difference(&cur_relations_normalized)
+            .cloned()
+            .collect();
+
+        // Map back to actual Relation objects for reporting
+        let added_relations: Vec<_> = cur_relations_raw.iter()
+            .filter(|r| {
+                let normalized = normalize_relation_for_comparison(r, current);
+                added_relation_keys.contains(&normalized)
+            })
+            .map(|r| convert_relation_to_summary(r))
+            .collect();
+        let removed_relations: Vec<_> = ref_relations_raw.iter()
+            .filter(|r| {
+                let normalized = normalize_relation_for_comparison(r, reference);
+                removed_relation_keys.contains(&normalized)
+            })
+            .map(|r| convert_relation_to_summary(r))
+            .collect();
+
         let has_changed = content_changed || !added_relations.is_empty() || !removed_relations.is_empty();
         if has_changed {
             // Debug: print element relations
@@ -629,9 +711,98 @@ pub fn compute_change_impact(
             });
         }
     }
-    // Process added elements (present only in current registry).
+    // Detect relocated elements (same name, different identifier)
+    let mut relocated_element_names = HashSet::new();
+    let current_by_name: std::collections::HashMap<String, &element::Element> =
+        current.get_all_elements().iter().map(|e| (e.name.clone(), *e)).collect();
+    let reference_by_name: std::collections::HashMap<String, &element::Element> =
+        reference.get_all_elements().iter().map(|e| (e.name.clone(), *e)).collect();
+
+    for (name, ref_elem) in &reference_by_name {
+        if let Some(cur_elem) = current_by_name.get(name) {
+            // Same name exists in both registries
+            if ref_elem.identifier != cur_elem.identifier {
+                // Different identifiers = relocation
+                report.relocated.push(RelocatedElement {
+                    name: name.clone(),
+                    old_identifier: ref_elem.identifier.clone(),
+                    new_identifier: cur_elem.identifier.clone(),
+                });
+                relocated_element_names.insert(name.clone());
+
+                // Check if relocated element also has content or relation changes
+                let content_changed = cur_elem.hash_impact_content != ref_elem.hash_impact_content;
+
+                // Use semantic relation comparison (by element name, not identifier)
+                let cur_relations_raw: Vec<_> = cur_elem.relations.iter()
+                    .filter(|r| relation::IMPACT_PROPAGATION_RELATIONS.contains(&r.relation_type.name))
+                    .collect();
+                let ref_relations_raw: Vec<_> = ref_elem.relations.iter()
+                    .filter(|r| relation::IMPACT_PROPAGATION_RELATIONS.contains(&r.relation_type.name))
+                    .collect();
+
+                let cur_relations_normalized: HashSet<_> = cur_relations_raw.iter()
+                    .map(|r| normalize_relation_for_comparison(r, current))
+                    .collect();
+                let ref_relations_normalized: HashSet<_> = ref_relations_raw.iter()
+                    .map(|r| normalize_relation_for_comparison(r, reference))
+                    .collect();
+
+                let added_relation_keys: HashSet<_> = cur_relations_normalized
+                    .difference(&ref_relations_normalized)
+                    .cloned()
+                    .collect();
+                let removed_relation_keys: HashSet<_> = ref_relations_normalized
+                    .difference(&cur_relations_normalized)
+                    .cloned()
+                    .collect();
+
+                let added_relations: Vec<_> = cur_relations_raw.iter()
+                    .filter(|r| {
+                        let normalized = normalize_relation_for_comparison(r, current);
+                        added_relation_keys.contains(&normalized)
+                    })
+                    .map(|r| convert_relation_to_summary(r))
+                    .collect();
+                let removed_relations: Vec<_> = ref_relations_raw.iter()
+                    .filter(|r| {
+                        let normalized = normalize_relation_for_comparison(r, reference);
+                        removed_relation_keys.contains(&normalized)
+                    })
+                    .map(|r| convert_relation_to_summary(r))
+                    .collect();
+
+                let has_changed = content_changed || !added_relations.is_empty() || !removed_relations.is_empty();
+                if has_changed {
+                    let mut visited = BTreeSet::new();
+                    visited.insert(cur_elem.identifier.clone());
+                    let change_impact_tree = build_change_impact_tree(current, cur_elem.identifier.to_string(), &mut visited, None);
+
+                    report.changed.push(ChangedElement {
+                        element_id: cur_elem.identifier.clone(),
+                        name: cur_elem.name.clone(),
+                        old_content: ref_elem.content.clone(),
+                        new_content: cur_elem.content.clone(),
+                        content_changed,
+                        added_relations,
+                        removed_relations,
+                        change_impact_tree,
+                    });
+                }
+            }
+        }
+    }
+
+    // Sort relocated elements by name for deterministic output
+    report.relocated.sort_by(|a, b| a.name.cmp(&b.name));
+
+    // Process added elements (present only in current registry, excluding relocated).
     for id in current_ids.difference(&reference_ids) {
         let cur_elem = current.get_element(id).unwrap();
+        // Skip if this element was relocated (not truly added)
+        if relocated_element_names.contains(&cur_elem.name) {
+            continue;
+        }
         let added_relations: Vec<_> = cur_elem
             .relations
             .iter()
@@ -650,9 +821,13 @@ pub fn compute_change_impact(
             change_impact_tree,
         });
     }
-    // Process removed elements (present only in reference registry).
+    // Process removed elements (present only in reference registry, excluding relocated).
     for id in reference_ids.difference(&current_ids) {
         let ref_elem = reference.get_element(id).unwrap();
+        // Skip if this element was relocated (not truly removed)
+        if relocated_element_names.contains(&ref_elem.name) {
+            continue;
+        }
         let removed_relations: Vec<_> = ref_elem
             .relations
             .iter()
@@ -722,6 +897,7 @@ mod tests {
             identifier,
             "test.md",
             "TestSection",
+            1,
             Some(crate::element::ElementType::Requirement(crate::element::RequirementType::System))
         );
         element.add_content(content);
@@ -897,6 +1073,7 @@ mod tests {
             "verify.md#parent-verification",
             "verify.md",
             "Verifications",
+            1,
             Some(crate::element::ElementType::Verification(crate::element::VerificationType::Test))
         );
         verification.add_content("Verification content");
@@ -964,6 +1141,7 @@ mod tests {
             "verify.md#new-verification",
             "verify.md",
             "Verifications",
+            1,
             Some(crate::element::ElementType::Verification(crate::element::VerificationType::Test))
         );
         verification.add_content("Verification content");

@@ -76,6 +76,27 @@ graph LR;
   class 34c75e4a88e1f381 verification;
   click 34c75e4a88e1f381 "../../Verifications/Misc.md#cli-help-structure-verification";
   329255589f5b01a2 -.->|verifiedBy| 34c75e4a88e1f381;
+  e89edd8a1ab08d4["Element Identity Model"];
+  class e89edd8a1ab08d4 systemRequirement;
+  click e89edd8a1ab08d4 "../../SpecificationsRequirements.md#element-identity-model";
+  e89edd8a1ab08d4 -.->|deriveReqT| 16b284f882a920cc;
+  e89edd8a1ab08d4 -.->|deriveReqT| 674e6f27f5fda615;
+  19106261e8369e50["Internal Consistency Validator"];
+  class 19106261e8369e50 systemRequirement;
+  click 19106261e8369e50 "../ValidationAndReporting/Validation.md#internal-consistency-validator";
+  e89edd8a1ab08d4 -.->|deriveReqT| 19106261e8369e50;
+  816c1e0b1de4dc53["Identifiers and Relations"];
+  class 816c1e0b1de4dc53 systemRequirement;
+  click 816c1e0b1de4dc53 "../../SpecificationsRequirements.md#identifiers-and-relations";
+  e89edd8a1ab08d4 -.->|deriveReqT| 816c1e0b1de4dc53;
+  a814c4935e1a0449["element.rs"];
+  class a814c4935e1a0449 default;
+  click a814c4935e1a0449 "../../../core/src/element.rs";
+  e89edd8a1ab08d4 -->|satisfiedBy| a814c4935e1a0449;
+  f22d93285fcd7664["parser.rs"];
+  class f22d93285fcd7664 default;
+  click f22d93285fcd7664 "../../../core/src/parser.rs";
+  e89edd8a1ab08d4 -->|satisfiedBy| f22d93285fcd7664;
   2054606d7574a553["Requirements Change Propagation"];
   class 2054606d7574a553 systemRequirement;
   click 2054606d7574a553 "../../SpecificationsRequirements.md#requirements-change-propagation";
@@ -91,24 +112,38 @@ The system shall implement a requirement change detection algorithm that identif
 The algorithm shall consist of the following steps:
 
 1. **Diff Analysis**:
-   - Compare the current state of a requirement with its previous state
-   - Identify structural changes (additions, deletions, modifications)
+   - Compare elements between versions using stable Element IDs (not location-based identifiers)
+   - Identify changes by type:
+     - **Content Changes**: Element ID exists in both versions, content hash differs
+     - **Additions**: Element ID exists only in current version
+     - **Removals**: Element ID exists only in previous version
+     - **Relocations**: Element ID exists in both, but file_path or section differs
    - Generate a ChangeSet representing all detected changes
    - Associate changes with specific elements in the model
+   - Note: Pure relocations (no content changes) do not trigger impact propagation
 
-2. **Impact Determination**:
+2. **Relocation Detection**:
+   - For each element present in both versions (matched by Element ID):
+     - Compare file_path field (implicit file containment)
+     - Compare section field (implicit section containment)
+     - If either differs → classify as relocation
+     - Track old location and new location for reporting
+   - Relocations without content changes do NOT propagate impact
+   - Relocations WITH content changes propagate based on content change only
+
+3. **Impact Determination**:
    - For each changed element, identify all relations from the element
    - Apply relation-specific propagation rules as defined in RelationTypesRegistry.md
    - Consider the relation direction and change impact direction for each relation
    - Build an impact tree representing the propagation of changes
 
-3. **Recursive Traversal**:
+4. **Recursive Traversal**:
    - Perform a depth-first traversal of relationships
    - Create a directed acyclic graph (DAG) of change impact
    - Handle circular dependencies by preventing infinite recursion
    - Track visited nodes to prevent duplicate processing
 
-4. **Impact Classification**:
+5. **Impact Classification**:
    - Assign impact severity levels based on relation types
    - Classify changes as:
      - Direct: Changes to the element itself
@@ -124,6 +159,7 @@ The algorithm shall consist of the following steps:
 
 #### Relations
   * derivedFrom: [Requirements Change Propagation](../../SpecificationsRequirements.md#requirements-change-propagation)
+  * derivedFrom: [Element Identity Model](../../SpecificationsRequirements.md#element-identity-model)
   * satisfiedBy: [change_impact.rs](../../../core/src/change_impact.rs)
 ---
 
@@ -136,8 +172,13 @@ The visualization shall include:
 
 1. **Tree View**:
    - Display a hierarchical tree of affected elements
-   - Group elements by impact type (direct, indirect, potential)
+   - Group elements by change type:
+     - Content changes (direct, indirect, potential)
+     - Additions
+     - Removals
+     - Relocations (separate category)
    - Show relation types between elements
+   - Show old and new locations for relocated elements
    - Support collapsing/expanding nodes for better navigation
 
 2. **Color Coding**:
@@ -152,13 +193,18 @@ The visualization shall include:
    - Allow clicking on elements to focus the view
 
 4. **Summary Statistics**:
-   - Display counts of affected elements by type
+   - Display counts of affected elements by type:
+     - Elements with content changes
+     - Elements added
+     - Elements removed
+     - Elements relocated (without content changes)
    - Show metrics for impact breadth and depth
    - Calculate change propagation fan-out metrics
    - Generate overall change impact assessment
 
 #### Relations
   * derivedFrom: [Requirements Change Propagation](../../SpecificationsRequirements.md#requirements-change-propagation)
+  * derivedFrom: [Element Identity Model](../../SpecificationsRequirements.md#element-identity-model)
   * satisfiedBy: [change_impact.rs](../../../core/src/change_impact.rs)
   * verifiedBy: [Change Impact Detection Test](../../Verifications/ChangeImpactTests.md#change-impact-detection-test)
 ---

@@ -2,9 +2,9 @@
 
 This is a requirements document specifically created for testing diagram generation.
 
-## Root Requirements
+## Custom Root Requirements
 
-### Root Requirement
+### Custom Root Requirement
 
 This is the root requirement for testing purposes.
 
@@ -23,20 +23,20 @@ graph TD;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  d94b2c1859["Element 2"];
-  click d94b2c1859 "Requirements-with-custom-mermaid.md#element-2";
+  d94b2c1859["Custom Element 2"];
+  click d94b2c1859 "Requirements-with-custom-mermaid.md#custom-element-2";
   class d94b2c1859 requirement;
-  2ac7edcf81["Element 1"];
-  click 2ac7edcf81 "Requirements-with-custom-mermaid.md#element-1";
+  2ac7edcf81["Custom Element 1"];
+  click 2ac7edcf81 "Requirements-with-custom-mermaid.md#custom-element-1";
   class 2ac7edcf81 requirement;
-  87ce6a6132["Element 3"];
+  87ce6a6132["Custom Element 3"];
   class 87ce6a6132 requirement;
-  click 87ce6a6132 "Requirements-with-custom-mermaid.md#element-3";
+  click 87ce6a6132 "Requirements-with-custom-mermaid.md#custom-element-3";
   2ac7edcf81 -->|verifies| 87ce6a6132;
 ```
 
 
-### Element 1
+### Custom Element 1
 
 This is a test verification element with relations.
 
@@ -45,18 +45,18 @@ This is a test verification element with relations.
 
 #### Relations
   * satisfiedBy: [test_implementation.py](test_implementation.py)
-  * verify: [Element 3](#element-3)
+  * verify: [Custom Element 3](#custom-element-3)
 
-### Element 2
+### Custom Element 2
 
 This is another test element with relations.
 
 #### Relations
-  * derivedFrom: [Root Requirement](#root-requirement)
-  * verifiedBy: [Element 1](#element-1)
+  * derivedFrom: [Custom Root Requirement](#custom-root-requirement)
+  * verifiedBy: [Custom Element 1](#custom-element-1)
   * satisfiedBy: [implementation.py](implementation.py)
-  * derive: [Element 3](#element-3)
-  * derive: [Element 4](#element-4)
+  * derive: [Custom Element 3](#custom-element-3)
+  * derive: [Custom Element 4](#custom-element-4)
 
 ## Custom Mermaid Diagram Section (No Elements)
 
@@ -88,7 +88,7 @@ This element is in a section with a custom diagram.
   * type: user-requirement
 
 #### Relations
-  * derivedFrom: [Root Requirement](#root-requirement)
+  * derivedFrom: [Custom Root Requirement](#custom-root-requirement)
 
 ## Custom Diagram Immediately After Header
 ```mermaid
@@ -106,7 +106,7 @@ This element is in a section with custom diagram right after header.
   * type: user-requirement
 
 #### Relations
-  * derivedFrom: [Root Requirement](#root-requirement)
+  * derivedFrom: [Custom Root Requirement](#custom-root-requirement)
 
 ## Section 2
 ```mermaid
@@ -117,32 +117,32 @@ graph TD;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  3651a8aa0b["Element 4"];
-  click 3651a8aa0b "Requirements-with-custom-mermaid.md#element-4";
+  3651a8aa0b["Custom Element 4"];
+  click 3651a8aa0b "Requirements-with-custom-mermaid.md#custom-element-4";
   class 3651a8aa0b requirement;
-  87ce6a6132["Element 3"];
-  click 87ce6a6132 "Requirements-with-custom-mermaid.md#element-3";
+  87ce6a6132["Custom Element 3"];
+  click 87ce6a6132 "Requirements-with-custom-mermaid.md#custom-element-3";
   class 87ce6a6132 requirement;
-  2ac7edcf81["Element 1"];
+  2ac7edcf81["Custom Element 1"];
   class 2ac7edcf81 requirement;
-  click 2ac7edcf81 "Requirements-with-custom-mermaid.md#element-1";
+  click 2ac7edcf81 "Requirements-with-custom-mermaid.md#custom-element-1";
   2ac7edcf81 -->|verifies| 87ce6a6132;
 ```
 
 
-### Element 3
+### Custom Element 3
 
 This is a third test element.
 
 #### Relations
-  * derivedFrom: [Element 2](#element-2)
-  * verifiedBy: [Element 1](#element-1)
-  * trace: [Element 4](#element-4)
+  * derivedFrom: [Custom Element 2](#custom-element-2)
+  * verifiedBy: [Custom Element 1](#custom-element-1)
+  * trace: [Custom Element 4](#custom-element-4)
 
-### Element 4
+### Custom Element 4
 
 This is a fourth test element with relations.
 
 #### Relations
-  * derivedFrom: [Element 2](#element-2)
-  * trace: [Element 1](#element-1)
+  * derivedFrom: [Custom Element 2](#custom-element-2)
+  * trace: [Custom Element 1](#custom-element-1)
