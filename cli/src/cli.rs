@@ -1090,6 +1090,7 @@ fn process_shell_command(graph_registry: &mut GraphRegistry, command: &str) -> R
                 element_id,
                 file_path,
                 section,
+                1, // REPL-added elements default to line 1
                 None,
             );
 

@@ -26,6 +26,10 @@ graph LR;
   class e95e3160edec8f1b default;
   click e95e3160edec8f1b "../../tests/test-change-impact-detection/test.sh";
   98d7b16583855bb7 -->|satisfiedBy| e95e3160edec8f1b;
+  fe115b41c9238caf["test.sh"];
+  class fe115b41c9238caf default;
+  click fe115b41c9238caf "../../tests/test-change-impact-element-relocation/test.sh";
+  98d7b16583855bb7 -->|satisfiedBy| fe115b41c9238caf;
   cec02a5e3f71bed1["Change Impact Relations Test"];
   class cec02a5e3f71bed1 verification;
   click cec02a5e3f71bed1 "ChangeImpactTests.md#change-impact-relations-test";
@@ -187,8 +191,11 @@ This test verifies that the system correctly implements change impact detection,
 - System correctly detects changes between different versions of requirements
 - System correctly identifies element relocations (same Element ID, different file_path or section)
 - Relocated elements without content changes do not trigger impact propagation
+- Relocated elements WITH content or relation changes appear in BOTH "Relocated" AND "Changed" sections
 - Relocated elements appear in a separate "Relocated" section in the report
 - System properly constructs a change impact report based on relationships between elements
+- Relations are compared semantically by element name, not by identifier (prevents false positives when children relocate)
+- Relocated parent with new relation to relocated+changed child is detected correctly
 - Default git commit is HEAD when --git-commit parameter is not provided
 - System provides output in both human-readable text and JSON formats
 - Smart filtering removes redundant elements that appear in other elements' relations
@@ -201,6 +208,9 @@ This test verifies that the system correctly implements change impact detection,
 - Relocated elements are reported with old location → new location format
 - Pure relocations (same content, different location) do NOT appear in "Removed" + "Added" sections
 - Pure relocations do NOT appear in impact propagation tree
+- Relocated+changed elements appear in BOTH Relocated AND Changed sections
+- Parent element with added relation to relocated+changed child shows in Changed with impact tree
+- Relations to relocated elements don't cause false change detection in parent elements
 - Summary statistics include count of relocated elements
 - Element IDs remain stable when elements are relocated between files
 - Output format matches requested format (text or JSON)
@@ -215,8 +225,8 @@ This test verifies that the system correctly implements change impact detection,
   * verify: [Change Impact Detection Algorithm](../ReqvireTool/ModelManagement/ChangeImpact.md#change-impact-detection-algorithm)
   * verify: [Change Impact Command Line Interface](../ReqvireTool/ModelManagement/ChangeImpact.md#change-impact-command-line-interface)
   * verify: [Smart Filtering for Change Impact Reports](../ReqvireTool/ModelManagement/ChangeImpact.md#smart-filtering-for-change-impact-reports)
-  * verify: [Element Identity Model](../SpecificationsRequirements.md#element-identity-model)
   * satisfiedBy: [test.sh](../../tests/test-change-impact-detection/test.sh)
+  * satisfiedBy: [test.sh](../../tests/test-change-impact-element-relocation/test.sh)
 ---
 
 ### Change Impact Relations Test

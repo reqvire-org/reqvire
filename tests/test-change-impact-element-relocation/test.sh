@@ -9,30 +9,60 @@ echo "Starting test..." > "${TEST_DIR}/test_results.log"
 # Acceptance Criteria:
 # - System correctly identifies element relocations (same Element ID, different file_path)
 # - Relocated elements without content changes do not trigger impact propagation
+# - Relocated elements WITH content/relation changes appear in BOTH Relocated and Changed sections
 # - Relocated elements appear in a separate "Relocated" section in the report
 # - Element IDs remain stable when elements are relocated between files
+# - Relations are compared semantically by element name, not identifier
+# - Relocated parent with new relation to relocated+changed child is detected correctly
 #
 # Test Criteria:
 # - Command exits with success (0) return code
 # - Relocated elements are reported with old location → new location format
 # - Pure relocations do NOT appear in "Removed" + "Added" sections
 # - Pure relocations do NOT appear in impact propagation tree
-# - Summary statistics include count of relocated elements
+# - Relocated+changed elements appear in BOTH Relocated AND Changed sections
+# - Parent element with added relation to relocated+changed child shows in Changed with impact tree
+#
+# Test Scenarios:
+# 1. Battery Monitoring: Relocated + content changed (child)
+# 2. Battery Saver: Relocated + NEW derive relation added to Battery Monitoring (parent)
+# 3. Power Efficiency: Relocated + content changed
+# 4. Display Settings: Relocated + relation added
 
-# Test Scenario: Move "Battery Saver" requirement from FirstFile.md to SecondFile/Requirements.md
-# without changing its content
+# Test Scenario 1: Relocated parent + added relation to relocated+changed child
+# First move Battery Monitoring (will be relocated + content changed)
+BATTERY_MONITORING_CONTENT=$(sed -n '/^### Battery Monitoring$/,/^---$/p' "${TEST_DIR}/specifications/FirstFile.md")
+sed -i '/^### Battery Monitoring$/,/^---$/d' "${TEST_DIR}/specifications/FirstFile.md"
+echo "" >> "${TEST_DIR}/specifications/SecondFile/Requirements.md"
+echo "$BATTERY_MONITORING_CONTENT" >> "${TEST_DIR}/specifications/SecondFile/Requirements.md"
+# Change Battery Monitoring content
+sed -i 's/monitor battery levels continuously/monitor battery levels in real-time and log events/' "${TEST_DIR}/specifications/SecondFile/Requirements.md"
 
-# Initial state is already committed (FirstFile.md contains "Battery Saver")
-
-# Move the element to a different file (relocation)
+# Now move Battery Saver and add derive relation to Battery Monitoring (relocated+changed)
 BATTERY_SAVER_CONTENT=$(sed -n '/^### Battery Saver$/,/^---$/p' "${TEST_DIR}/specifications/FirstFile.md")
-
-# Remove from original file
 sed -i '/^### Battery Saver$/,/^---$/d' "${TEST_DIR}/specifications/FirstFile.md"
-
-# Add to new file
 echo "" >> "${TEST_DIR}/specifications/SecondFile/Requirements.md"
 echo "$BATTERY_SAVER_CONTENT" >> "${TEST_DIR}/specifications/SecondFile/Requirements.md"
+# Add derive relation from Battery Saver to Battery Monitoring (after Metadata section, before the ---)
+sed -i '/^#### Metadata/,/^---$/ { /^  \* type: user-requirement/a\
+\
+#### Relations\
+  * derive: [Battery Monitoring](#battery-monitoring)
+}' "${TEST_DIR}/specifications/SecondFile/Requirements.md"
+
+# Test Scenario 2: Relocated + content changed
+POWER_EFFICIENCY_CONTENT=$(sed -n '/^### Power Efficiency$/,/^---$/p' "${TEST_DIR}/specifications/FirstFile.md")
+sed -i '/^### Power Efficiency$/,/^---$/d' "${TEST_DIR}/specifications/FirstFile.md"
+echo "" >> "${TEST_DIR}/specifications/SecondFile/Requirements.md"
+echo "$POWER_EFFICIENCY_CONTENT" >> "${TEST_DIR}/specifications/SecondFile/Requirements.md"
+sed -i 's/optimize power consumption during idle periods/reduce power consumption during idle and active periods/' "${TEST_DIR}/specifications/SecondFile/Requirements.md"
+
+# Test Scenario 3: Relocated + relation added
+DISPLAY_SETTINGS_CONTENT=$(sed -n '/^### Display Settings$/,/^---$/p' "${TEST_DIR}/specifications/FirstFile.md")
+sed -i '/^### Display Settings$/,/^---$/d' "${TEST_DIR}/specifications/FirstFile.md"
+echo "" >> "${TEST_DIR}/specifications/SecondFile/Requirements.md"
+echo "$DISPLAY_SETTINGS_CONTENT" >> "${TEST_DIR}/specifications/SecondFile/Requirements.md"
+sed -i '/satisfiedBy: display_impl.py/a\  * verifiedBy: display_test.py' "${TEST_DIR}/specifications/SecondFile/Requirements.md"
 
 # Run change impact detection
 echo "Running: reqvire change-impact" >> "${TEST_DIR}/test_results.log"

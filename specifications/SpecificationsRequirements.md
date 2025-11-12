@@ -10,9 +10,33 @@ graph LR;
   classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
+  e89edd8a1ab08d4["Element Identity Model"];
+  class e89edd8a1ab08d4 systemRequirement;
+  click e89edd8a1ab08d4 "SpecificationsRequirements.md#element-identity-model";
+  16b284f882a920cc["Change Impact Detection Algorithm"];
+  class 16b284f882a920cc systemRequirement;
+  click 16b284f882a920cc "ReqvireTool/ModelManagement/ChangeImpact.md#change-impact-detection-algorithm";
+  e89edd8a1ab08d4 -.->|deriveReqT| 16b284f882a920cc;
+  674e6f27f5fda615["Change Impact Visualization"];
+  class 674e6f27f5fda615 systemRequirement;
+  click 674e6f27f5fda615 "ReqvireTool/ModelManagement/ChangeImpact.md#change-impact-visualization";
+  e89edd8a1ab08d4 -.->|deriveReqT| 674e6f27f5fda615;
+  19106261e8369e50["Internal Consistency Validator"];
+  class 19106261e8369e50 systemRequirement;
+  click 19106261e8369e50 "ReqvireTool/ValidationAndReporting/Validation.md#internal-consistency-validator";
+  e89edd8a1ab08d4 -.->|deriveReqT| 19106261e8369e50;
   816c1e0b1de4dc53["Identifiers and Relations"];
   class 816c1e0b1de4dc53 systemRequirement;
   click 816c1e0b1de4dc53 "SpecificationsRequirements.md#identifiers-and-relations";
+  e89edd8a1ab08d4 -.->|deriveReqT| 816c1e0b1de4dc53;
+  a814c4935e1a0449["element.rs"];
+  class a814c4935e1a0449 default;
+  click a814c4935e1a0449 "../core/src/element.rs";
+  e89edd8a1ab08d4 -->|satisfiedBy| a814c4935e1a0449;
+  f22d93285fcd7664["parser.rs"];
+  class f22d93285fcd7664 default;
+  click f22d93285fcd7664 "../core/src/parser.rs";
+  e89edd8a1ab08d4 -->|satisfiedBy| f22d93285fcd7664;
   9450d4313f47ef36["relation.rs"];
   class 9450d4313f47ef36 default;
   click 9450d4313f47ef36 "../core/src/relation.rs";
@@ -43,13 +67,7 @@ graph LR;
   2054606d7574a553["Requirements Change Propagation"];
   class 2054606d7574a553 systemRequirement;
   click 2054606d7574a553 "SpecificationsRequirements.md#requirements-change-propagation";
-  16b284f882a920cc["Change Impact Detection Algorithm"];
-  class 16b284f882a920cc systemRequirement;
-  click 16b284f882a920cc "ReqvireTool/ModelManagement/ChangeImpact.md#change-impact-detection-algorithm";
   2054606d7574a553 -.->|deriveReqT| 16b284f882a920cc;
-  674e6f27f5fda615["Change Impact Visualization"];
-  class 674e6f27f5fda615 systemRequirement;
-  click 674e6f27f5fda615 "ReqvireTool/ModelManagement/ChangeImpact.md#change-impact-visualization";
   2054606d7574a553 -.->|deriveReqT| 674e6f27f5fda615;
   5d60cdc1fa8c4bac["Smart Filtering for Change Impact Reports"];
   class 5d60cdc1fa8c4bac systemRequirement;
@@ -58,7 +76,7 @@ graph LR;
   ade67c27bc5d3bbd["Structure and Addressing in Markdown Documents"];
   class ade67c27bc5d3bbd systemRequirement;
   click ade67c27bc5d3bbd "SpecificationsRequirements.md#structure-and-addressing-in-markdown-documents";
-  ade67c27bc5d3bbd -.->|deriveReqT| 816c1e0b1de4dc53;
+  ade67c27bc5d3bbd -.->|deriveReqT| e89edd8a1ab08d4;
   b49d890e0bbe0a83["Structure of Markdown Documents"];
   class b49d890e0bbe0a83 systemRequirement;
   click b49d890e0bbe0a83 "SpecificationsRequirements.md#structure-of-markdown-documents";
@@ -1223,7 +1241,6 @@ The system must validate relation usage according to these rules:
 </details>
 
 #### Relations
-  * derivedFrom: [Structure and Addressing in Markdown Documents](#structure-and-addressing-in-markdown-documents)
   * derivedFrom: [Element Identity Model](#element-identity-model)
   * derivedFrom: [AI-Assisted MBSE Model Management](UserStories.md#ai-assisted-mbse-model-management)
   * satisfiedBy: [relation.rs](../core/src/relation.rs)

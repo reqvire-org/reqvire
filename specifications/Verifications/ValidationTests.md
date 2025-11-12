@@ -304,7 +304,6 @@ This verification test checks that Reqvire correctly identifies and reports inva
   * verify: [Internal Consistency Validator](../ReqvireTool/ValidationAndReporting/Validation.md#internal-consistency-validator)
   * verify: [Relation Type Validation](../ReqvireTool/ValidationAndReporting/Validation.md#relation-type-validation)
   * verify: [Relation Element Type Validator](../ReqvireTool/ValidationAndReporting/Validation.md#relation-element-type-validator)
-  * verify: [Element Identity Model](../SpecificationsRequirements.md#element-identity-model)
   * verify: [Identifiers and Relations](../SpecificationsRequirements.md#identifiers-and-relations)
   * verify: [Trace Relation Non-Directional Behavior](../ReqvireTool/ModelManagement/DiagramGeneration.md#trace-relation-non-directional-behavior)
   * satisfiedBy: [test.sh](../../tests/test-invalid-relations/test.sh)

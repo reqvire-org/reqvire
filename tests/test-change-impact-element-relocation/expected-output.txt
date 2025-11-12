@@ -1,0 +1,31 @@
+## Change Impact Report
+
+### Relocated Elements
+
+* [Battery Monitoring](specifications/SecondFile/Requirements.md#battery-monitoring)
+  * Old location: specifications/FirstFile.md#battery-monitoring
+  * New location: specifications/SecondFile/Requirements.md#battery-monitoring
+* [Battery Saver](specifications/SecondFile/Requirements.md#battery-saver)
+  * Old location: specifications/FirstFile.md#battery-saver
+  * New location: specifications/SecondFile/Requirements.md#battery-saver
+* [Display Settings](specifications/SecondFile/Requirements.md#display-settings)
+  * Old location: specifications/FirstFile.md#display-settings
+  * New location: specifications/SecondFile/Requirements.md#display-settings
+* [Power Efficiency](specifications/SecondFile/Requirements.md#power-efficiency)
+  * Old location: specifications/FirstFile.md#power-efficiency
+  * New location: specifications/SecondFile/Requirements.md#power-efficiency
+
+---
+
+### Changed Elements
+
+* [Battery Saver](specifications/SecondFile/Requirements.md#battery-saver)
+    * derive -> [Battery Monitoring](specifications/SecondFile/Requirements.md#battery-monitoring) ⚠️
+    * derive -> [Display Settings](specifications/SecondFile/Requirements.md#display-settings) ⚠️
+      * verifiedBy -> [display_test.py](specifications/SecondFile/display_test.py)
+      * satisfiedBy -> [display_impl.py](specifications/SecondFile/display_impl.py)
+    * derive -> [Power Efficiency](specifications/SecondFile/Requirements.md#power-efficiency) ⚠️
+
+
+
+---
