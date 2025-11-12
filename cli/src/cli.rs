@@ -584,7 +584,8 @@ pub fn handle_command(
             })?;
                  
             let mut refference_model_manager = ModelManager::new();
-            let _not_interested=refference_model_manager.parse_and_validate(Some(&git_commit), excluded_filename_patterns);
+            // Use lenient mode for reference registry to handle historical commits with validation issues
+            let _not_interested=refference_model_manager.parse_and_validate_with_mode(Some(&git_commit), excluded_filename_patterns, true);
                                     
             let report=change_impact::compute_change_impact(
                 &model_manager.graph_registry, 

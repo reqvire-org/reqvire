@@ -33,7 +33,16 @@ impl ModelManager {
         git_commit_hash: Option<&str>,
         excluded_filename_patterns: &GlobSet
     ) -> Result<Vec<ReqvireError>, ReqvireError> {
-        debug!("Starting two-pass validation architecture");
+        self.parse_and_validate_with_mode(git_commit_hash, excluded_filename_patterns, false)
+    }
+
+    pub fn parse_and_validate_with_mode(
+        &mut self,
+        git_commit_hash: Option<&str>,
+        excluded_filename_patterns: &GlobSet,
+        lenient: bool
+    ) -> Result<Vec<ReqvireError>, ReqvireError> {
+        debug!("Starting two-pass validation architecture (lenient={})", lenient);
 
         // Pass 1: Element collection with local validation
         let pass1_errors = self.pass1_collect_elements(
@@ -41,24 +50,30 @@ impl ModelManager {
             excluded_filename_patterns
         )?;
 
-        // If Pass 1 has errors, return them as an error
+        // If Pass 1 has errors, return them as an error (unless lenient mode)
         if !pass1_errors.is_empty() {
             debug!("Pass 1 validation failed with {} errors", pass1_errors.len());
-            return Err(ReqvireError::ValidationError(pass1_errors));
+            if !lenient {
+                return Err(ReqvireError::ValidationError(pass1_errors));
+            }
+            debug!("Lenient mode: continuing despite Pass 1 errors");
         }
 
-        debug!("Pass 1 completed successfully, proceeding to Pass 2");
+        debug!("Pass 1 completed, proceeding to Pass 2");
 
         // Pass 2: Graph construction and relation validation
         let pass2_errors = self.pass2_build_relations(excluded_filename_patterns)?;
 
-        // If Pass 2 has errors, return them as an error
+        // If Pass 2 has errors, return them as an error (unless lenient mode)
         if !pass2_errors.is_empty() {
             debug!("Pass 2 validation failed with {} errors", pass2_errors.len());
-            return Err(ReqvireError::ValidationError(pass2_errors));
+            if !lenient {
+                return Err(ReqvireError::ValidationError(pass2_errors));
+            }
+            debug!("Lenient mode: continuing despite Pass 2 errors");
         }
 
-        debug!("Both passes completed successfully");
+        debug!("Validation completed");
         Ok(Vec::new())
     }
 
