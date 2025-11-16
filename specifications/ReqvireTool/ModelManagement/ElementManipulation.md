@@ -67,7 +67,7 @@ When validating and preparing target locations, the system shall:
 
 ### Create Element Operation
 
-The system shall provide the capability to create new model elements by accepting a full element definition string in Markdown format, validating the element structure, and inserting it into the specified location if valid.
+The system shall provide the capability to create new model elements by accepting a full element definition string in Markdown format, validating the element structure and relations, and inserting it into the specified location if valid.
 
 #### Details
 When creating a new element, the system shall:
@@ -80,11 +80,26 @@ When creating a new element, the system shall:
 - Validate the element structure (proper subsections, valid relations, correct format)
 - Verify the element name is unique within the target file
 - Generate a unique element identifier based on file path and element name
+- **Validate and normalize all relations in the element:**
+  - Parse relation targets from the markdown (may be relative paths or repo-relative paths)
+  - Normalize relation targets to be relative to the git repository root
+  - Validate that each relation target element exists in the model
+  - Reject the operation if any relation target does not exist
+  - Provide clear error messages indicating which relation target was not found
 - If validation passes, insert the element into the specified file and section:
   - If index is provided and valid, insert at that position within the section
   - If index is not provided or out of bounds, append to the end of the section
 - If validation fails, reject the operation and report validation errors
 - Maintain file structure and formatting after insertion
+
+**Relation Validation Rules:**
+- Relation targets may be specified as:
+  - Relative paths from the target file location (e.g., `../UserReqs.md#requirement`)
+  - Paths relative to git repository root (e.g., `specifications/UserReqs.md#requirement`)
+  - Same-file references (e.g., `#other-requirement`)
+- All relation targets must be normalized to git repository root relative format before insertion
+- All relation targets must reference existing elements in the model
+- External links (http://, https://, etc.) are allowed and not validated
 
 #### Relations
   * derivedFrom: [Element Manipulation File Persistence](#element-manipulation-file-persistence)
@@ -95,6 +110,7 @@ When creating a new element, the system shall:
   * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
   * satisfiedBy: [diff.rs](../../../core/src/diff.rs)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
+  * satisfiedBy: [utils.rs](../../../core/src/utils.rs)
 ---
 
 ### Delete Element Operation

@@ -498,8 +498,10 @@ struct ValidationResult {
 /// Helper function to print validation results
 fn print_validation_results(errors: &[ReqvireError], json_output: bool) {
     if json_output {
+        let mut error_strings: Vec<String> = errors.iter().map(|e| e.to_string()).collect();
+        error_strings.sort(); // Sort for deterministic output
         let json_result = ValidationResult {
-            errors: errors.iter().map(|e| e.to_string()).collect(),
+            errors: error_strings,
         };
         println!("{}", serde_json::to_string_pretty(&json_result).unwrap());
     } else {

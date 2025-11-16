@@ -1,45 +1,55 @@
---- specifications/Requirements.md
-+++ specifications/Requirements.md
-@@ -33,15 +33,3 @@
-   * derivedFrom: [Feature A](#feature-a)
- ---
+Moved element: Feature C (specifications/Requirements.md#feature-c)
 
--### Feature C
--
--This is a test requirement for feature C with relations.
--
--#### Metadata
--  * type: requirement
--
--#### Relations
--  * derivedFrom: [Feature A](#feature-a)
--  * verifiedBy: [Test for Feature C](Verifications/Tests.md#test-for-feature-c)
-----
--
---- specifications/OtherRequirements.md
-+++ specifications/OtherRequirements.md
-@@ -2,3 +2,15 @@
+📄 specifications/OtherRequirements.md
+  [37m01     # Other Requirements[0m
+  [37m02[0m
+  [37m03     ## Other Features[0m
+  [32m04 +   ### Feature C[0m
+  [32m05 +   ␤[0m
+  [32m06 +   This is a test requirement for feature C with relations.[0m
+  [32m07 +   ␤[0m
+  [32m08 +   #### Relations[0m
+  [32m09 +     * derivedFrom: [Feature A](Requirements.md#feature-a)[0m
+  [32m10 +     * verifiedBy: [Test for Feature C](Verifications/Tests.md#test-for-feature-c)[0m
+  [32m11 +   ---[0m
+  [32m12 +   ␤[0m
+  [32m13 +   ␤[0m
 
- ## Other Features
-+
-+### Feature C
-+
-+This is a test requirement for feature C with relations.
-+
-+#### Metadata
-+  * type: requirement
-+
-+#### Relations
-+  * derivedFrom: [Feature A](Requirements.md#feature-a)
-+  * verifiedBy: [Test for Feature C](Verifications/Tests.md#test-for-feature-c)
-+---
-+
---- specifications/Verifications/Tests.md
-+++ specifications/Verifications/Tests.md
-@@ -11,5 +11,5 @@
-   * type: test-verification
 
- #### Relations
--  * verify: [Feature C](../Requirements.md#feature-c)
-+  * verify: [Feature C](../OtherRequirements.md#feature-c)
- ---
+
+📄 specifications/Requirements.md
+  [37m01     # Requirements[0m
+  [37m02[0m
+  [37m03     ## Features[0m
+
+  [37m17     #### Relations[0m
+  [37m18       * derivedFrom: [Parent Feature](#parent-feature)[0m
+  [37m19     ---[0m
+  [31m20 -   ### Feature C[0m
+  [31m20 -   ␤[0m
+  [31m20 -   This is a test requirement for feature C with relations.[0m
+  [31m20 -   ␤[0m
+  [31m20 -   #### Relations[0m
+  [31m20 -     * derivedFrom: [Feature A](#feature-a)[0m
+  [31m20 -     * verifiedBy: [Test for Feature C](Verifications/Tests.md#test-for-feature-c)[0m
+  [31m20 -   ---[0m
+  [31m20 -   ␤[0m
+  [37m20     ### Feature D[0m
+  [37m21[0m
+  [37m22     This is a newly added feature.[0m
+
+
+
+
+📄 specifications/Verifications/Tests.md
+  [37m01     # Tests[0m
+  [37m02[0m
+  [37m03     ## Verification Tests[0m
+
+  [37m10       * type: test-verification[0m
+  [37m11[0m
+  [37m12     #### Relations[0m
+  [31m13 -     * verify: [Feature C](../Requirements.md#feature-c)[0m
+  [32m13 +     * verify: [Feature C](../OtherRequirements.md#feature-c)[0m
+  [37m14     ---[0m
+  [32m15 +   ␤[0m

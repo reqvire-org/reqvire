@@ -78,6 +78,17 @@ This is requirement B1.
   * type: requirement
 
 #### Relations
+  * derivedFrom: FileA.md#root-requirement
+
+### Requirement B2
+
+This is requirement B2.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: FileA.md#root-requirement
   * derivedFrom: FileA.md#requirement-a1
 EOF
 

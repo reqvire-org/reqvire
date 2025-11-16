@@ -44,12 +44,13 @@ pub fn add_element(
         excluded_patterns,
     )?;
 
-    // Get list of newly modified files
-    let modified_files: Vec<String> = model_manager.graph_registry.modified_files
+    // Get list of newly modified files (sorted for deterministic output)
+    let mut modified_files: Vec<String> = model_manager.graph_registry.modified_files
         .iter()
         .filter(|f| !modified_before.contains(f))
         .cloned()
         .collect();
+    modified_files.sort();
 
     // Generate diffs for output
     let diffs = generate_crud_diffs(
@@ -102,12 +103,13 @@ pub fn remove_element(
     // Remove element using core business logic
     let _affected_files = model_manager.graph_registry.remove_element_with_cleanup(element_id)?;
 
-    // Get list of newly modified files
-    let modified_files: Vec<String> = model_manager.graph_registry.modified_files
+    // Get list of newly modified files (sorted for deterministic output)
+    let mut modified_files: Vec<String> = model_manager.graph_registry.modified_files
         .iter()
         .filter(|f| !modified_before.contains(f))
         .cloned()
         .collect();
+    modified_files.sort();
 
     // Generate diffs for output
     let diffs = generate_crud_diffs(
@@ -174,12 +176,13 @@ pub fn move_element(
         excluded_patterns,
     )?;
 
-    // Get list of newly modified files
-    let modified_files: Vec<String> = model_manager.graph_registry.modified_files
+    // Get list of newly modified files (sorted for deterministic output)
+    let mut modified_files: Vec<String> = model_manager.graph_registry.modified_files
         .iter()
         .filter(|f| !modified_before.contains(f))
         .cloned()
         .collect();
+    modified_files.sort();
 
     // Generate diffs for output
     let diffs = generate_crud_diffs(

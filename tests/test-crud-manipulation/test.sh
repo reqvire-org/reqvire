@@ -85,8 +85,8 @@ echo ""
 # ==================================
 echo "Test 2: Delete element operation..."
 
-# Make backup for comparison
-cp "$TEST_DIR/specifications/Requirements.md" "$TEST_DIR/requirements_backup.md"
+# Make backup for comparison (use .bak extension to avoid parsing)
+cp "$TEST_DIR/specifications/Requirements.md" "$TEST_DIR/requirements_backup.bak"
 
 set +e
 DELETE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" rm "specifications/Requirements.md#feature-b" 2>&1)
@@ -114,7 +114,7 @@ if grep -q "### Feature B" "$TEST_DIR/specifications/Requirements.md"; then
 fi
 
 # Verify file was modified
-if cmp -s "$TEST_DIR/specifications/Requirements.md" "$TEST_DIR/requirements_backup.md"; then
+if cmp -s "$TEST_DIR/specifications/Requirements.md" "$TEST_DIR/requirements_backup.bak"; then
   echo "❌ FAILED: File was not modified"
   exit 1
 fi
@@ -177,8 +177,8 @@ if ! grep -q "### Feature C" "$TEST_DIR/specifications/OtherRequirements.md"; th
   exit 1
 fi
 
-# Verify relation was updated in verification file
-if ! grep -q "specifications/OtherRequirements.md#feature-c" "$TEST_DIR/specifications/Verifications/Tests.md"; then
+# Verify relation was updated in verification file (check for relative path)
+if ! grep -q "OtherRequirements.md#feature-c" "$TEST_DIR/specifications/Verifications/Tests.md"; then
   echo "❌ FAILED: Relation was not updated to new location"
   exit 1
 fi
@@ -295,6 +295,37 @@ if ! echo "$ERROR_OUTPUT" | grep -qi "invalid\|malformed\|header\|format"; then
 fi
 
 echo "  ✓ Invalid element error handled"
+
+# Test 4e: Add element with non-existent relation target
+echo "  4e: Add element with non-existent relation target..."
+INVALID_RELATION_ELEMENT='### Feature With Bad Relation
+
+This element has a relation to a non-existent target.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: specifications/NonExistent.md#missing-element
+'
+
+set +e
+ERROR_OUTPUT=$(cd "$TEST_DIR" && echo "$INVALID_RELATION_ELEMENT" | "$REQVIRE_BIN" add specifications/Requirements.md "Features" 2>&1)
+ERROR_EXIT=$?
+set -e
+
+if [ $ERROR_EXIT -eq 0 ]; then
+  echo "❌ FAILED: Adding element with non-existent relation target should fail"
+  exit 1
+fi
+
+if ! echo "$ERROR_OUTPUT" | grep -qi "not found\|missing\|does not exist\|unknown"; then
+  echo "❌ FAILED: Error message should indicate relation target not found"
+  echo "Got: $ERROR_OUTPUT"
+  exit 1
+fi
+
+echo "  ✓ Invalid relation target error handled"
 echo ""
 
 echo "===================================="

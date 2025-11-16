@@ -1447,6 +1447,9 @@ impl GraphRegistry {
 
     /// Updates relation identifiers when elements move between files
     fn update_relation_identifiers(&mut self, moved_element_id: &str, _old_file_path: &str, new_file_path: &str) {
+        // Extract just the fragment (element name) from the moved element's identifier
+        let moved_fragment = moved_element_id.split('#').last().unwrap_or(moved_element_id);
+
         // 1. Update relations FROM other elements TO the moved element
         for (_id, node) in self.nodes.iter_mut() {
             // Skip the moved element itself for now
@@ -1460,9 +1463,9 @@ impl GraphRegistry {
                     if target_id == moved_element_id {
                         // The target element moved to a different file
                         if node.element.file_path != new_file_path {
-                            // Cross-file reference needed
-                            *target_id = format!("{}#{}", new_file_path, moved_element_id);
-                            relation.target.text = format!("{}#{}", new_file_path, moved_element_id);
+                            // Cross-file reference needed - use just the fragment
+                            *target_id = format!("{}#{}", new_file_path, moved_fragment);
+                            relation.target.text = format!("{}#{}", new_file_path, moved_fragment);
                         }
                         // If same file, keep as-is
                     }
@@ -1529,9 +1532,22 @@ impl GraphRegistry {
         // Remove the element itself
         self.nodes.remove(element_id);
 
-        // Remove all relations pointing to this element
+        // Remove all relations pointing to this element from graph structure
         for node in self.nodes.values_mut() {
             node.relations.retain(|rel| rel.element_node.element.identifier != element_id);
+        }
+
+        // Remove all relations pointing to this element from element's own relations list
+        for node in self.nodes.values_mut() {
+            node.element.relations.retain(|rel| {
+                match &rel.target.link {
+                    crate::relation::LinkType::Identifier(target) => {
+                        // Remove if it points to the deleted element (handle both forms)
+                        target != element_id && !target.ends_with(&format!("#{}", element_id))
+                    },
+                    _ => true, // Keep external links
+                }
+            });
         }
 
         Ok(())
@@ -1694,6 +1710,27 @@ impl GraphRegistry {
             ));
         }
 
+        // Validate that all relation targets exist in the model
+        // External links (http://, https://, etc.) are allowed and not validated
+        for relation in &element.relations {
+            if let crate::relation::LinkType::Identifier(target_id) = &relation.target.link {
+                // Check if this is an external link using the predefined list
+                let is_external = crate::utils::EXTERNAL_SCHEMES.iter()
+                    .any(|scheme| target_id.starts_with(scheme));
+
+                // If not external, validate that the target exists
+                if !is_external && !self.nodes.contains_key(target_id) {
+                    return Err(ReqvireError::MissingElement(
+                        format!(
+                            "Relation target '{}' does not exist in the model. Cannot add element '{}' with relation to non-existent element.",
+                            target_id,
+                            element.name
+                        )
+                    ));
+                }
+            }
+        }
+
         // Auto-create file if needed
         if validation.needs_file_creation {
             self.add_file_location(target_file, section)?;
@@ -1835,13 +1872,43 @@ impl GraphRegistry {
             });
 
             if !section_exists {
-                self.add_section_to_file(target_file, target_section)?;
+                // First check if file exists in graph, if not create it
+                let file_exists = self.nodes.values().any(|node| node.element.file_path == target_file);
+                if !file_exists {
+                    self.add_file_location(target_file, target_section)?;
+                } else {
+                    self.add_section_to_file(target_file, target_section)?;
+                }
             }
         }
 
         // Perform the move using existing move_element_to_location
         let old_identifier = element_id.to_string();
+
+        // Find all files with relations to this element BEFORE updating relations
+        let mut modified_files = vec![source_file.clone()];
+        if target_file != source_file {
+            modified_files.push(target_file.to_string());
+        }
+
+        for node in self.nodes.values() {
+            let has_relation = node.element.relations.iter().any(|rel| {
+                matches!(&rel.target.link, LinkType::Identifier(id) if id == &old_identifier)
+            });
+
+            if has_relation {
+                let file = node.element.file_path.clone();
+                if !modified_files.contains(&file) {
+                    modified_files.push(file);
+                }
+            }
+        }
+
+        // Now perform the move
         self.move_element_to_location(element_id, target_file, target_section)?;
+
+        // Update all relations (TO and FROM the moved element)
+        self.update_relation_identifiers(&old_identifier, &source_file, target_file);
 
         // Get new identifier after move
         let new_identifier = self.nodes.values()
@@ -1859,26 +1926,6 @@ impl GraphRegistry {
         if let Some(idx) = index {
             if let Some(node) = self.nodes.get_mut(&new_identifier) {
                 node.element.section_order_index = idx;
-            }
-        }
-
-        // Track modified files
-        let mut modified_files = vec![source_file.clone()];
-        if target_file != source_file {
-            modified_files.push(target_file.to_string());
-        }
-
-        // Find all files with relations that were updated
-        for node in self.nodes.values() {
-            let has_relation = node.element.relations.iter().any(|rel| {
-                matches!(&rel.target.link, LinkType::Identifier(id) if id == &new_identifier || id == &old_identifier)
-            });
-
-            if has_relation {
-                let file = node.element.file_path.clone();
-                if !modified_files.contains(&file) {
-                    modified_files.push(file);
-                }
             }
         }
 

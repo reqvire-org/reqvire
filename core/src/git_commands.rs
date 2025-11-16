@@ -5,6 +5,7 @@ use std::path::PathBuf;
 use once_cell::sync::Lazy;
 use std::sync::Mutex;
 use std::collections::HashMap;
+use std::sync::atomic::{AtomicBool, Ordering};
 
 
 static REPO_URL: Lazy<Mutex<Option<String>>> = Lazy::new(|| Mutex::new(None));
@@ -12,11 +13,24 @@ static COMMIT_HASH: Lazy<Mutex<Option<String>>> = Lazy::new(|| Mutex::new(None))
 static GIT_ROOT_DIR: Lazy<Mutex<Option<PathBuf>>> = Lazy::new(|| Mutex::new(None));
 static GIT_ROOT_CACHE: Lazy<Mutex<HashMap<PathBuf, String>>> = Lazy::new(|| Mutex::new(HashMap::new()));
 
+// Disable caching in tests to prevent interference between parallel tests
+static DISABLE_CACHE_FOR_TESTS: AtomicBool = AtomicBool::new(false);
+
 pub fn clear_git_cache() {
     REPO_URL.lock().unwrap().take();
     COMMIT_HASH.lock().unwrap().take();
     GIT_ROOT_DIR.lock().unwrap().take();
     GIT_ROOT_CACHE.lock().unwrap().clear();
+}
+
+#[cfg(test)]
+pub fn disable_git_cache_for_tests() {
+    DISABLE_CACHE_FOR_TESTS.store(true, Ordering::SeqCst);
+    clear_git_cache();
+}
+
+fn is_cache_disabled() -> bool {
+    DISABLE_CACHE_FOR_TESTS.load(Ordering::SeqCst)
 }
 
 /// Retrieves the repository base URL (HTTPS format) from Git remote configuration.
@@ -155,10 +169,12 @@ pub fn find_git_repo_root(absolute_folder_path: &PathBuf) -> Result<String, Reqv
 
 /// Returns the Git repository root directory
 pub fn get_git_root_dir() -> Result<PathBuf, ReqvireError> {
-
-    let mut cached = GIT_ROOT_DIR.lock().unwrap();
-    if let Some(ref path) = *cached {
-        return Ok(path.clone());
+    // Skip caching in tests to prevent parallel test interference
+    if !is_cache_disabled() {
+        let cached = GIT_ROOT_DIR.lock().unwrap();
+        if let Some(ref path) = *cached {
+            return Ok(path.clone());
+        }
     }
 
     let output = Command::new("git")
@@ -172,7 +188,13 @@ pub fn get_git_root_dir() -> Result<PathBuf, ReqvireError> {
     }
     let path_str = String::from_utf8_lossy(&output.stdout).trim().to_string();
     let path = PathBuf::from(path_str);
-    *cached = Some(path.clone());
+
+    // Only cache if caching is enabled
+    if !is_cache_disabled() {
+        let mut cached = GIT_ROOT_DIR.lock().unwrap();
+        *cached = Some(path.clone());
+    }
+
     Ok(path)
 }
 

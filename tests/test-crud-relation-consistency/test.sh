@@ -228,12 +228,13 @@ else
   fi
 
   # Verify incoming relation updated (verify relation from Test 2)
-  if grep -q "verify:.*Requirements.md#derived-requirement-2" "${TEST_DIR}/specifications/Verifications/Tests.md"; then
+  # Use more precise pattern to avoid matching OtherRequirements.md
+  if grep -q "verify:.*\.\.\/Requirements\.md#derived-requirement-2" "${TEST_DIR}/specifications/Verifications/Tests.md"; then
     echo "❌ FAILED: Incoming verify relation was not updated (still points to old location)"
     OVERALL_RESULT=1
   fi
 
-  if ! grep -q "verify:.*OtherRequirements.md#derived-requirement-2" "${TEST_DIR}/specifications/Verifications/Tests.md"; then
+  if ! grep -q "verify:.*OtherRequirements\.md#derived-requirement-2" "${TEST_DIR}/specifications/Verifications/Tests.md"; then
     echo "❌ FAILED: Incoming verify relation was not updated to new location"
     OVERALL_RESULT=1
   fi
@@ -294,40 +295,51 @@ else
     OVERALL_RESULT=1
   fi
 
-  # Verify model validates
+  # After deleting root, child elements (Derived Req 2 & 3) are orphaned
+  # Verify that validation correctly identifies these orphaned elements
   set +e
   VALIDATE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" validate 2>&1)
   VALIDATE_EXIT=$?
   set -e
 
-  if [ $VALIDATE_EXIT -ne 0 ]; then
-    echo "❌ FAILED: Model validation failed after deleting root"
-    echo "Output: $VALIDATE_OUTPUT"
+  if [ $VALIDATE_EXIT -eq 0 ]; then
+    echo "❌ FAILED: Model validation should fail after deleting root (orphaned children)"
     OVERALL_RESULT=1
   else
-    echo "✓ Root element deleted with all derived relations cleaned" >> "${TEST_DIR}/test_results.log"
+    # Verify specific expected errors for orphaned elements
+    if ! echo "$VALIDATE_OUTPUT" | grep -q "Missing parent relation.*Derived Requirement 2"; then
+      echo "❌ FAILED: Expected validation error for orphaned Derived Requirement 2"
+      OVERALL_RESULT=1
+    fi
+
+    if ! echo "$VALIDATE_OUTPUT" | grep -q "Missing parent relation.*Derived Requirement 3"; then
+      echo "❌ FAILED: Expected validation error for orphaned Derived Requirement 3"
+      OVERALL_RESULT=1
+    fi
+
+    echo "✓ Root element deleted and orphaned children correctly identified" >> "${TEST_DIR}/test_results.log"
   fi
 fi
 
 # ==================================
-# Test 5: Final Consistency Check
+# Test 5: Final Consistency Check - Verify Expected Validation Errors
 # ==================================
 echo "" >> "${TEST_DIR}/test_results.log"
-echo "Test 5: Final consistency check with summary..." >> "${TEST_DIR}/test_results.log"
+echo "Test 5: Final consistency check - verify expected validation errors..." >> "${TEST_DIR}/test_results.log"
 
 set +e
 SUMMARY_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" summary --json 2>&1)
 SUMMARY_EXIT=$?
 set -e
 
-if [ $SUMMARY_EXIT -ne 0 ]; then
-  echo "❌ FAILED: Summary generation failed"
-  echo "Output: $SUMMARY_OUTPUT"
+# Compare with expected output
+if ! diff -u "${TEST_SCRIPT_DIR}/expected-summary.json" <(echo "$SUMMARY_OUTPUT"); then
+  echo "❌ FAILED: Summary output does not match expected"
+  echo ""
+  echo "Differences shown above (expected vs actual)"
   OVERALL_RESULT=1
 else
-  # Verify no elements have dangling relations
-  # This would be caught by validation, but we double-check with summary
-  echo "✓ Summary generated successfully - no dangling relations" >> "${TEST_DIR}/test_results.log"
+  echo "✓ Summary correctly reports orphaned elements as validation errors" >> "${TEST_DIR}/test_results.log"
 fi
 
 # ==================================

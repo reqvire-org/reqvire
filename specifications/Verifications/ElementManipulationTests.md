@@ -120,6 +120,15 @@ The test shall verify that new model elements can be created from a full Markdow
 4. Verify appropriate validation error messages are reported
 5. Verify the target file remains unchanged
 
+**Test Steps for Relation Validation:**
+1. Create element with valid relations (targets exist in model)
+2. Verify relations are normalized to git-root-relative format
+3. Verify element is created successfully
+4. Attempt to create element with non-existent relation target
+5. Verify operation is rejected with clear error message
+6. Verify error message indicates which relation target was not found
+7. Verify target file remains unchanged after rejection
+
 **Test Coverage:**
 - Valid element with all subsections (metadata, relations, details)
 - Valid element with minimal structure (only ### header and content)
@@ -130,6 +139,12 @@ The test shall verify that new model elements can be created from a full Markdow
 - Invalid element with malformed subsections
 - Invalid element with invalid relations
 - Invalid element with missing ### header
+- **Valid element with relations to existing elements**
+- **Invalid element with relation to non-existent element**
+- **Relations specified as relative paths (../File.md#element)**
+- **Relations specified as repo-relative paths (specifications/File.md#element)**
+- **Relations specified as same-file references (#element)**
+- **External link relations (http://, https://) are allowed**
 
 **Success Criteria:**
 - Valid element definitions are accepted and created
@@ -142,6 +157,10 @@ The test shall verify that new model elements can be created from a full Markdow
 - Validation errors are reported clearly
 - Failed operations do not modify target files
 - Model validation passes after successful creation
+- **Relation targets are validated to exist in the model**
+- **Non-existent relation targets cause rejection**
+- **Relation paths are normalized to git-root-relative format**
+- **External links (http://, https://) bypass validation**
 
 #### Metadata
   * type: test-verification

@@ -1,17 +1,21 @@
---- specifications/Requirements.md
-+++ specifications/Requirements.md
-@@ -23,14 +23,6 @@
- ---
+Removed element: Feature B (specifications/Requirements.md#feature-b)
 
--### Feature B
--
--This is a test requirement for feature B.
--
--#### Metadata
--  * type: requirement
--
--#### Relations
--  * derivedFrom: [Feature A](#feature-a)
-----
--
- ### Feature C
+📄 specifications/Requirements.md
+  [37m01     # Requirements[0m
+  [37m02[0m
+  [37m03     ## Features[0m
+
+  [37m17     #### Relations[0m
+  [37m18       * derivedFrom: [Parent Feature](#parent-feature)[0m
+  [37m19     ---[0m
+  [31m20 -   ### Feature B[0m
+  [31m20 -   ␤[0m
+  [31m20 -   This is a test requirement for feature B.[0m
+  [31m20 -   ␤[0m
+  [31m20 -   #### Relations[0m
+  [31m20 -     * derivedFrom: [Feature A](#feature-a)[0m
+  [31m20 -   ---[0m
+  [31m20 -   ␤[0m
+  [37m20     ### Feature C[0m
+  [37m21[0m
+  [37m22     This is a test requirement for feature C with relations.[0m

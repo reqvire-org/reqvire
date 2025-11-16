@@ -132,14 +132,21 @@ pub fn validate_target_path(
     }
 
     // Check path depth (max 10 subdirectories from git root)
+    // Count only directories, excluding the filename
     if let Ok(rel_path) = absolute_path.strip_prefix(&git_root) {
-        let depth = rel_path.components().count();
-        if depth > 10 {
+        // Get parent path (directories only) and count components
+        let dir_depth = if let Some(parent) = rel_path.parent() {
+            parent.components().count()
+        } else {
+            0 // File at git root
+        };
+
+        if dir_depth > 10 {
             return Ok(PathValidation {
                 is_valid: false,
                 error_message: Some(format!(
                     "Target path '{}' exceeds maximum nesting depth of 10 subdirectories (current depth: {})",
-                    path, depth
+                    path, dir_depth
                 )),
                 needs_file_creation: false,
                 needs_section_creation: false,
@@ -609,9 +616,7 @@ mod tests {
     use tempfile::TempDir;
     use std::process::Command;
     use git_commands;
-    use serial_test::serial;
-     
-        
+
     // Mock Config structure for tests
     struct MockConfig {
         pub paths: MockPaths,
@@ -666,10 +671,20 @@ mod tests {
     }
     
     #[test]
-    #[serial]    
+    fn test_all_git_operations_sequential() {
+        // Disable git caching for tests to prevent interference
+        git_commands::disable_git_cache_for_tests();
+
+        // Run ALL git-dependent tests sequentially to avoid interference
+        test_to_relative_identifier_with_github_fragments();
+        test_to_relative_identifier();
+    }
+
     fn test_to_relative_identifier_with_github_fragments() {
         git_commands::clear_git_cache();
-        
+
+        // Save original directory to restore at the end
+        let original_dir = std::env::current_dir().unwrap();
 
         let temp_dir = TempDir::new().expect("Failed to create temp dir");
         let temp_path = temp_dir.path();
@@ -741,8 +756,12 @@ mod tests {
                 identifier
             );
         }
+
+        // Restore original directory
+        std::env::set_current_dir(&original_dir).unwrap();
+        git_commands::clear_git_cache();
     }
-   
+
     #[test]
     fn test_to_relative_identifier_external_links() {
 
@@ -959,11 +978,12 @@ mod tests {
     }
     
 
-    #[test]
-    #[serial]    
     fn test_to_relative_identifier() {
         git_commands::clear_git_cache();
-        
+
+        // Save original directory to restore at the end
+        let original_dir = std::env::current_dir().unwrap();
+
         let temp_spec_folder = TempDir::new().expect("Failed to create temp dir");
         let specifications_folder = temp_spec_folder.path().to_path_buf();
 
@@ -1016,7 +1036,9 @@ mod tests {
                 .expect("Should return relative path inside specifications folder");
         assert_eq!(result, "file.yaml", "Failed same-folder file check");
 
-
+        // Restore original directory
+        std::env::set_current_dir(&original_dir).unwrap();
+        git_commands::clear_git_cache();
     }
 }
 

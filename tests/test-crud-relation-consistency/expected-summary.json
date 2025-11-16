@@ -1,0 +1,6 @@
+{
+  "errors": [
+    "Missing parent relation: File specifications/OtherRequirements.md: Element 'Derived Requirement 2' has no parent relation (needs one of: [\"derivedFrom\", \"satisfy\", \"verify\"])",
+    "Missing parent relation: File specifications/Requirements.md: Element 'Derived Requirement 3' has no parent relation (needs one of: [\"derivedFrom\", \"satisfy\", \"verify\"])"
+  ]
+}

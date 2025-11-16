@@ -66,6 +66,9 @@ This should be rejected.
 
 #### Metadata
   * type: requirement
+
+#### Relations
+  * derivedFrom: Base.md#base-requirement
 '
 
 set +e
@@ -118,10 +121,19 @@ fi
 echo "" >> "${TEST_DIR}/test_results.log"
 echo "Test 3: Path depth limit (11 levels)..." >> "${TEST_DIR}/test_results.log"
 
-DEEP_PATH="specifications/a/b/c/d/e/f/g/h/i/j/k/DeepFile.md"
+# Use user-requirement for depth tests (no parent needed)
+DEPTH_TEST_ELEMENT='### Depth Test
+
+Testing path depth validation.
+
+#### Metadata
+  * type: user-requirement
+'
+
+DEEP_PATH="specifications/a/b/c/d/e/f/g/h/i/j/DeepFile.md"
 
 set +e
-OUTPUT=$(cd "$TEST_DIR" && echo "$NEW_ELEMENT" | "$REQVIRE_BIN" add "$DEEP_PATH" "Section" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && echo "$DEPTH_TEST_ELEMENT" | "$REQVIRE_BIN" add "$DEEP_PATH" "Section" 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -145,10 +157,10 @@ fi
 echo "" >> "${TEST_DIR}/test_results.log"
 echo "Test 4: Valid path depth (10 levels)..." >> "${TEST_DIR}/test_results.log"
 
-VALID_DEEP_PATH="specifications/a/b/c/d/e/f/g/h/i/j/ValidFile.md"
+VALID_DEEP_PATH="specifications/a/b/c/d/e/f/g/h/i/ValidFile.md"
 
 set +e
-OUTPUT=$(cd "$TEST_DIR" && echo "$NEW_ELEMENT" | "$REQVIRE_BIN" add "$VALID_DEEP_PATH" "Section" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && echo "$DEPTH_TEST_ELEMENT" | "$REQVIRE_BIN" add "$VALID_DEEP_PATH" "Section" 2>&1)
 EXIT_CODE=$?
 set -e
 
