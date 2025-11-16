@@ -17,7 +17,7 @@
         border-radius: 3px;
         background-color: #fafafa;
         display: flex;
-        align-items: flex-start;
+        align-items: center;
         justify-content: center;
         min-height: calc(100vh - 150px);
     }
@@ -112,17 +112,11 @@
                         }
                     };
 
-                    // Check if diagram is larger than container
-                    var containerWidth = mermaidContainer.clientWidth;
-                    var containerHeight = mermaidContainer.clientHeight;
-                    var svgWidth = svg.getBBox().width;
-                    var svgHeight = svg.getBBox().height;
-                    var shouldFit = svgWidth > containerWidth || svgHeight > containerHeight;
-
+                    // Always fit diagrams to fill available space
                     var panZoomInstance = svgPanZoom(svg, {
                         zoomEnabled: true,
                         controlIconsEnabled: true,
-                        fit: shouldFit,
+                        fit: true,
                         center: true,
                         contain: false,
                         minZoom: 0.1,
@@ -130,12 +124,6 @@
                         zoomScaleSensitivity: 0.3,
                         customEventsHandler: eventsHandler
                     });
-
-                    // Position at top-center
-                    setTimeout(function() {
-                        var pan = panZoomInstance.getPan();
-                        panZoomInstance.pan({x: pan.x, y: 0});
-                    }, 100);
 
                     // Add navigation buttons
                     var navButtons = document.createElement('div');
