@@ -487,9 +487,11 @@ The system SHALL provide a fixed navigation bar in all HTML pages with links to 
 #### Details
 The navigation bar must include:
 - Home: Link to index.html (model structure overview)
+- Model: Link to model.html (model-centric view with nested relations)
+- Whole Model: Link to whole-model.html (complete model diagram)
 - Traces: Link to traces.html (verification upward traceability report)
 - Coverage: Link to coverage.html (verification coverage report)
-- Matrix: Link to matrix.svg (traceability matrix visualization)
+- Matrix: Link to matrix.html (traceability matrix visualization)
 
 The navigation bar must be:
 - Always visible (fixed position) while scrolling

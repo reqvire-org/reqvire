@@ -63,9 +63,11 @@ The system SHALL generate comprehensive HTML documentation with all model artifa
 Execute all generation commands treating temporary directory as repository root:
 1. Generate all Mermaid diagrams in markdown files
 2. Generate index.md (model structure overview)
-3. Generate matrix.svg (traceability matrix visualization)
-4. Generate traces.md (verification upward traceability)
-5. Generate coverage.md (verification coverage report)
+3. Generate model.md (model-centric visualization with nested relations from root requirements)
+4. Generate whole-model.md (complete model diagram showing all elements and relations)
+5. Generate matrix.svg (traceability matrix visualization)
+6. Generate traces.md (verification upward traceability)
+7. Generate coverage.md (verification coverage report)
 
 **HTML Conversion:**
 - Convert all markdown files to HTML with embedded styles
@@ -100,6 +102,43 @@ The system shall ensure that any related system elements are also copied into ou
   * derivedFrom: [HTML Export](#html-export)
   * satisfiedBy: [html_export.rs](../../../core/src/html_export.rs)
   * satisfiedBy: [html.rs](../../../core/src/html.rs)
+---
+
+### Model-Centric View Generation
+
+The system SHALL generate a model-centric visualization (model.md) during HTML export showing root requirements with nested relations containing full element details.
+
+#### Details
+- Display root requirements (no hierarchical parent) as top-level entries
+- Show relations nested inside elements with full target details recursively
+- Include metadata about total elements and relations
+- Generate mermaid diagrams showing all nested relations
+- Output as markdown with embedded visualizations (model.html)
+
+#### Relations
+  * derivedFrom: [Complete Model Structure Visualization](../../UserRequirements.md#complete-model-structure-visualization)
+  * derivedFrom: [Model Visualization and Exploration](../../UserRequirements.md#model-visualization-and-exploration)
+  * derivedFrom: [HTML Export](#html-export)
+  * satisfiedBy: [export.rs](../../../core/src/export.rs)
+  * satisfiedBy: [reports.rs](../../../core/src/reports.rs)
+---
+
+### Whole Model Diagram Generation
+
+The system SHALL generate a complete model diagram (whole-model.md) during HTML export showing all elements and their relationships.
+
+#### Details
+- Display all elements without filtering
+- Show all forward relations (derive, satisfiedBy, verifiedBy, trace)
+- Group elements by file and section
+- Use mermaid diagram format
+- Output as whole-model.html
+
+#### Relations
+  * derivedFrom: [Browse Model via Web Interface](../../UserRequirements.md#browse-model-via-web-interface)
+  * derivedFrom: [HTML Export](#html-export)
+  * satisfiedBy: [export.rs](../../../core/src/export.rs)
+  * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
 ---
 
 ### Serve Command
