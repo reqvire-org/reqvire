@@ -30,6 +30,10 @@ OVERALL_RESULT=0
 echo "" >> "${TEST_DIR}/test_results.log"
 echo "=== Scenario 1: Default type assignment - location independent ===" >> "${TEST_DIR}/test_results.log"
 
+# Create test directory structure
+mkdir -p "${TEST_DIR}/specifications/root"
+mkdir -p "${TEST_DIR}/specifications/nested/deeper"
+
 # Create elements WITHOUT type metadata in various locations
 # 1. Root of specifications folder
 cat > "${TEST_DIR}/specifications/RootRequirements.md" << 'EOF'

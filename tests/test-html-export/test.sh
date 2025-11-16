@@ -73,8 +73,8 @@ if [ -f "${TEST_DIR}/SpecificationIndex.md" ] && [ ! -f "${TEST_DIR}/output/inde
   exit 1
 fi
 
-# Check basic HTML structure generation
-FIRST_HTML=$(find "${TEST_DIR}/output" -name "*.html" -not -name "index.html" | head -n 1)
+# Check basic HTML structure generation (use specifications subfolder to avoid generated files)
+FIRST_HTML=$(find "${TEST_DIR}/output/specifications" -name "*.html" -not -name "index.html" 2>/dev/null | head -n 1)
 if [ -n "$FIRST_HTML" ]; then
   # Check for presence of HTML structure
   if ! grep -q "<html" "$FIRST_HTML"; then
