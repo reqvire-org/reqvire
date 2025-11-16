@@ -814,7 +814,7 @@ impl GraphRegistry {
     pub fn find_root_requirements(&self) -> Vec<String> {
         let hierarchical_relations = relation::get_hierarchical_relation_types();
 
-        self.nodes.values()
+        let mut roots: Vec<String> = self.nodes.values()
             .map(|node| &node.element)
             .filter(|element| {
                 // Only consider requirements
@@ -829,7 +829,11 @@ impl GraphRegistry {
                 !has_parent
             })
             .map(|e| e.identifier.clone())
-            .collect()
+            .collect();
+
+        // Sort for deterministic output
+        roots.sort();
+        roots
     }
 
     /// Collects all InternalPath targets from element relations

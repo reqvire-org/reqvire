@@ -15,7 +15,7 @@ Commands:
   matrix            Generate verification traceability matrix showing requirements and their verification status
   traces            Generate verification traces showing upward paths from verifications to root requirements
   coverage          Generate verification coverage report for leaf requirements
-  model             Generate model structure diagram with optional filtering
+  model             Generate model-centric structure with nested relations
   lint              Analyze model quality and detect issues in requirements relations
   add               Add new element to model from Markdown definition
   rm                Remove element from model
@@ -80,8 +80,8 @@ COVERAGE OPTIONS:
       --json                    Output results in JSON format
 
 MODEL OPTIONS:
-      --from <NAME>             Filter model from specific root element by name using forward-only relation traversal
-      --json                    Output results in JSON format
+      --from <NAME>             Start from specific element by name
+      --json                    Output results in JSON format (nested structure)
 
 LINT OPTIONS:
       --fixable                 Show only auto-fixable issues

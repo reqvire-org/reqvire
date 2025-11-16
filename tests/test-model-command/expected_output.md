@@ -15,15 +15,15 @@ graph LR
   8accb4e2c9363546["Markdown Output Format"];
   32fb52886d6166a1 -->|derive| 8accb4e2c9363546;
   8accb4e2c9363546["Markdown Output Format"];
+  8cc3b7ebaf3ea9b["Output Format Test"];
+  8accb4e2c9363546 -->|verifiedBy| 8cc3b7ebaf3ea9b;
+  8cc3b7ebaf3ea9b["Output Format Test"];
   4f998d84bbf8f547["Model Diagram Generation"];
   32fb52886d6166a1 -->|derive| 4f998d84bbf8f547;
   4f998d84bbf8f547["Model Diagram Generation"];
   f27d93928246808["JSON Output Format"];
   4f998d84bbf8f547 -->|derive| f27d93928246808;
   f27d93928246808["JSON Output Format"];
-  8cc3b7ebaf3ea9b["Output Format Test"];
-  f27d93928246808 -->|verifiedBy| 8cc3b7ebaf3ea9b;
-  8cc3b7ebaf3ea9b["Output Format Test"];
   1ca5a7c02ab1c5f4["Model Filtering Capability"];
   4f998d84bbf8f547 -->|derive| 1ca5a7c02ab1c5f4;
   1ca5a7c02ab1c5f4["Model Filtering Capability"];

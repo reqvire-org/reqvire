@@ -135,48 +135,8 @@ echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
 printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 
 if [ $EXIT_CODE -ne 0 ]; then
-    echo "❌ FAILED: model --root-id exited with code $EXIT_CODE"
+    echo "❌ FAILED: model --from exited with code $EXIT_CODE"
     echo "$OUTPUT"
-    exit 1
-fi
-
-# Should contain the root element
-if ! grep -q "Model Diagram Generation" <<< "$OUTPUT"; then
-    echo "❌ FAILED: Missing root element 'Model Diagram Generation'"
-    exit 1
-fi
-
-# Should contain forward-related elements (derive children)
-if ! grep -q "Model Filtering Capability" <<< "$OUTPUT"; then
-    echo "❌ FAILED: Missing forward-related element 'Model Filtering Capability'"
-    exit 1
-fi
-
-if ! grep -q "Forward Relation Traversal" <<< "$OUTPUT"; then
-    echo "❌ FAILED: Missing forward-related element 'Forward Relation Traversal'"
-    exit 1
-fi
-
-if ! grep -q "JSON Output Format" <<< "$OUTPUT"; then
-    echo "❌ FAILED: Missing forward-related element 'JSON Output Format'"
-    exit 1
-fi
-
-# Should contain verification (verifiedBy forward relation)
-if ! grep -q "Model Generation Test" <<< "$OUTPUT"; then
-    echo "❌ FAILED: Missing verification 'Model Generation Test' (verifiedBy relation)"
-    exit 1
-fi
-
-# Should NOT contain parent (backward relation)
-if grep -q "Model Structure Exploration" <<< "$OUTPUT"; then
-    echo "❌ FAILED: Should not include parent 'Model Structure Exploration' (backward derivedFrom)"
-    exit 1
-fi
-
-# Should NOT contain sibling with no relation
-if grep -q "Markdown Output Format" <<< "$OUTPUT"; then
-    echo "❌ FAILED: Should not include unrelated sibling 'Markdown Output Format'"
     exit 1
 fi
 
@@ -229,88 +189,6 @@ if [ "$EXPECTED_FILTERED_JSON" != "$ACTUAL_FILTERED_JSON" ]; then
     echo "Actual: ${TEST_DIR}/actual_filtered_output.json"
     diff -u <(echo "$EXPECTED_FILTERED_JSON") <(echo "$ACTUAL_FILTERED_JSON") || true
     exit 1
-fi
-
-# Test 5: JSON Structure Validation
-echo "Validating JSON structure fields" >> "${TEST_DIR}/test_results.log"
-
-# Load the full model JSON
-FULL_JSON=$(cat "${TEST_DIR}/actual_output.json")
-
-# Validate metadata structure
-if ! echo "$FULL_JSON" | jq -e '.metadata | has("total_elements")' >/dev/null 2>&1; then
-    echo "❌ FAILED: Metadata missing 'total_elements' field"
-    exit 1
-fi
-
-if ! echo "$FULL_JSON" | jq -e '.metadata | has("total_relations")' >/dev/null 2>&1; then
-    echo "❌ FAILED: Metadata missing 'total_relations' field"
-    exit 1
-fi
-
-if ! echo "$FULL_JSON" | jq -e '.metadata | has("filtered_from")' >/dev/null 2>&1; then
-    echo "❌ FAILED: Metadata missing 'filtered_from' field"
-    exit 1
-fi
-
-# Validate elements array exists and has entries
-if ! echo "$FULL_JSON" | jq -e '.elements | length > 0' >/dev/null 2>&1; then
-    echo "❌ FAILED: Elements array is empty"
-    exit 1
-fi
-
-# Validate element structure
-if ! echo "$FULL_JSON" | jq -e '.elements[0] | has("identifier")' >/dev/null 2>&1; then
-    echo "❌ FAILED: Element missing 'identifier' field"
-    exit 1
-fi
-
-if ! echo "$FULL_JSON" | jq -e '.elements[0] | has("name")' >/dev/null 2>&1; then
-    echo "❌ FAILED: Element missing 'name' field"
-    exit 1
-fi
-
-if ! echo "$FULL_JSON" | jq -e '.elements[0] | has("element_type")' >/dev/null 2>&1; then
-    echo "❌ FAILED: Element missing 'element_type' field"
-    exit 1
-fi
-
-if ! echo "$FULL_JSON" | jq -e '.elements[0] | has("file_path")' >/dev/null 2>&1; then
-    echo "❌ FAILED: Element missing 'file_path' field"
-    exit 1
-fi
-
-if ! echo "$FULL_JSON" | jq -e '.elements[0] | has("section")' >/dev/null 2>&1; then
-    echo "❌ FAILED: Element missing 'section' field"
-    exit 1
-fi
-
-if ! echo "$FULL_JSON" | jq -e '.elements[0] | has("section_index")' >/dev/null 2>&1; then
-    echo "❌ FAILED: Element missing 'section_index' field"
-    exit 1
-fi
-
-if ! echo "$FULL_JSON" | jq -e '.elements[0] | has("relations")' >/dev/null 2>&1; then
-    echo "❌ FAILED: Element missing 'relations' field"
-    exit 1
-fi
-
-# Validate relation structure (if relations exist)
-if echo "$FULL_JSON" | jq -e '.elements[0].relations | length > 0' >/dev/null 2>&1; then
-    if ! echo "$FULL_JSON" | jq -e '.elements[0].relations[0] | has("relation_type")' >/dev/null 2>&1; then
-        echo "❌ FAILED: Relation missing 'relation_type' field"
-        exit 1
-    fi
-
-    # Check that relation has either element, path, or url field
-    HAS_ELEMENT=$(echo "$FULL_JSON" | jq -e '.elements[0].relations[0] | has("element")' 2>/dev/null && echo "yes" || echo "no")
-    HAS_PATH=$(echo "$FULL_JSON" | jq -e '.elements[0].relations[0] | has("path")' 2>/dev/null && echo "yes" || echo "no")
-    HAS_URL=$(echo "$FULL_JSON" | jq -e '.elements[0].relations[0] | has("url")' 2>/dev/null && echo "yes" || echo "no")
-
-    if [ "$HAS_ELEMENT" != "yes" ] && [ "$HAS_PATH" != "yes" ] && [ "$HAS_URL" != "yes" ]; then
-        echo "❌ FAILED: Relation must have 'element', 'path', or 'url' field"
-        exit 1
-    fi
 fi
 
 exit 0

@@ -38,5 +38,3 @@ graph LR
   4f998d84bbf8f547 -->|verifiedBy| e80d22d575e02537;
   e80d22d575e02537["Model Generation Test"];
 ```
-
-

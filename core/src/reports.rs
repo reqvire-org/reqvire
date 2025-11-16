@@ -989,7 +989,6 @@ pub struct ModelCentricRelation {
 #[serde(untagged)]
 pub enum RelationTarget {
     Element {
-        #[serde(flatten)]
         element: Box<ModelCentricElement>,
     },
     File {
@@ -1088,9 +1087,32 @@ fn build_element_recursive(
 
     let element = registry.get_element(element_id)?;
 
+    // Sort element relations for deterministic iteration
+    let mut sorted_relations = element.relations.clone();
+    sorted_relations.sort_by(|a, b| {
+        // First sort by relation type
+        let type_cmp = a.relation_type.name.cmp(&b.relation_type.name);
+        if type_cmp != std::cmp::Ordering::Equal {
+            return type_cmp;
+        }
+
+        // Then sort by target
+        let a_target = match &a.target.link {
+            relation::LinkType::Identifier(id) => id.as_str(),
+            relation::LinkType::ExternalUrl(url) => url.as_str(),
+            relation::LinkType::InternalPath(path) => path.to_str().unwrap_or(""),
+        };
+        let b_target = match &b.target.link {
+            relation::LinkType::Identifier(id) => id.as_str(),
+            relation::LinkType::ExternalUrl(url) => url.as_str(),
+            relation::LinkType::InternalPath(path) => path.to_str().unwrap_or(""),
+        };
+        a_target.cmp(b_target)
+    });
+
     // Build relations with nested targets
     let mut relations = Vec::new();
-    for relation in &element.relations {
+    for relation in &sorted_relations {
         // Only include forward relations (diagram relations)
         if !relation::DIAGRAM_RELATIONS.contains(&relation.relation_type.name) {
             continue;
@@ -1127,27 +1149,7 @@ fn build_element_recursive(
         });
     }
 
-    // Sort relations for deterministic output
-    relations.sort_by(|a, b| {
-        // First sort by relation type
-        let type_cmp = a.relation_type.cmp(&b.relation_type);
-        if type_cmp != std::cmp::Ordering::Equal {
-            return type_cmp;
-        }
-
-        // Then sort by target (identifier for elements, path/url for others)
-        let a_key = match &a.target {
-            RelationTarget::Element { element } => &element.identifier,
-            RelationTarget::File { path, .. } => path,
-            RelationTarget::External { url, .. } => url,
-        };
-        let b_key = match &b.target {
-            RelationTarget::Element { element } => &element.identifier,
-            RelationTarget::File { path, .. } => path,
-            RelationTarget::External { url, .. } => url,
-        };
-        a_key.cmp(b_key)
-    });
+    // Relations are already sorted from sorted_relations above
 
     Some(ModelCentricElement {
         identifier: element.identifier.clone(),
