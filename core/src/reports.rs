@@ -1233,6 +1233,14 @@ fn generate_element_text(element: &ModelCentricElement, depth: usize) -> String 
     if !element.relations.is_empty() {
         output.push_str(&format!("{}```mermaid\n", indent));
         output.push_str(&format!("{}graph LR\n", indent));
+
+        // Add CSS class definitions for colors
+        output.push_str(&format!("{}  classDef userRequirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;\n", indent));
+        output.push_str(&format!("{}  classDef systemRequirement fill:#fce4e4,stroke:#e68a8a,stroke-width:1px;\n", indent));
+        output.push_str(&format!("{}  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;\n", indent));
+        output.push_str(&format!("{}  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;\n", indent));
+        output.push_str(&format!("{}\n", indent));
+
         output.push_str(&generate_mermaid_for_element(element, &indent));
         output.push_str(&format!("{}```\n\n", indent));
     }
@@ -1263,13 +1271,23 @@ fn generate_mermaid_for_element_recursive(
     let mut output = String::new();
     let element_id = hash_identifier(&element.identifier);
 
+    // Determine CSS class based on element type
+    let element_class = get_element_class(&element.element_type);
+
+    // Add element node with class and click handler
     output.push_str(&format!("{}  {}[\"{}\"];\n", indent, element_id, escape_label(&element.name)));
+    output.push_str(&format!("{}  class {} {};\n", indent, element_id, element_class));
+    output.push_str(&format!("{}  click {} \"{}\";\n", indent, element_id, &element.identifier));
 
     for (idx, relation) in element.relations.iter().enumerate() {
         match &relation.target {
             RelationTarget::Element { element: target } => {
                 let target_id = hash_identifier(&target.identifier);
+                let target_class = get_element_class(&target.element_type);
+
                 output.push_str(&format!("{}  {}[\"{}\"];\n", indent, target_id, escape_label(&target.name)));
+                output.push_str(&format!("{}  class {} {};\n", indent, target_id, target_class));
+                output.push_str(&format!("{}  click {} \"{}\";\n", indent, target_id, &target.identifier));
                 output.push_str(&format!("{}  {} -->|{}| {};\n", indent, element_id, relation.relation_type, target_id));
 
                 // Recursively show target element's relations
@@ -1278,15 +1296,33 @@ fn generate_mermaid_for_element_recursive(
             RelationTarget::File { path, .. } => {
                 let file_id = hash_identifier(&format!("file:{}:{}", element.identifier, idx));
                 output.push_str(&format!("{}  {}[\"{}\"];\n", indent, file_id, escape_label(path)));
+                output.push_str(&format!("{}  class {} default;\n", indent, file_id));
+                output.push_str(&format!("{}  click {} \"{}\";\n", indent, file_id, path));
                 output.push_str(&format!("{}  {} -->|{}| {};\n", indent, element_id, relation.relation_type, file_id));
             },
             RelationTarget::External { url, .. } => {
                 let ext_id = hash_identifier(&format!("external:{}:{}", element.identifier, idx));
                 output.push_str(&format!("{}  {}[\"{}\"];\n", indent, ext_id, escape_label(url)));
+                output.push_str(&format!("{}  class {} default;\n", indent, ext_id));
+                output.push_str(&format!("{}  click {} \"{}\";\n", indent, ext_id, url));
                 output.push_str(&format!("{}  {} -->|{}| {};\n", indent, element_id, relation.relation_type, ext_id));
             },
         }
     }
 
     output
+}
+
+/// Determine CSS class name based on element type string
+fn get_element_class(element_type: &str) -> &'static str {
+    let lower = element_type.to_lowercase();
+    if lower == "user-requirement" {
+        "userRequirement"
+    } else if lower == "requirement" || lower.contains("system") && lower.contains("requirement") {
+        "systemRequirement"
+    } else if lower.contains("verification") {
+        "verification"
+    } else {
+        "default"
+    }
 }

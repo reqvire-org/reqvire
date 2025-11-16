@@ -136,7 +136,6 @@ The system SHALL generate a complete model diagram (whole-model.md) during HTML 
 
 #### Relations
   * derivedFrom: [Browse Model via Web Interface](../../UserRequirements.md#browse-model-via-web-interface)
-  * derivedFrom: [HTML Export](#html-export)
   * satisfiedBy: [export.rs](../../../core/src/export.rs)
   * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
 ---

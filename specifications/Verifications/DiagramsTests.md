@@ -6,7 +6,7 @@ This document verifies the requirements for Reqvire's diagram generation functio
 
 ### Diagram Generation Test
 
-This test verifies that the system can automatically generate and embed mermaid diagrams in requirements documents.
+This test verifies that the generate-diagrams CLI command correctly generates and embeds mermaid diagrams in requirements documents.
 
 #### Details
 
@@ -34,7 +34,8 @@ This test verifies that the system can automatically generate and embed mermaid 
   * type: test-verification
 
 #### Relations
-  * verify: [Automate Diagram Generation](../UserRequirements.md#automate-diagram-generation)
+  * verify: [CLI Generate Diagrams Flag](../ReqvireTool/UserInterface/CLI.md#cli-generate-diagrams-flag)
+  * verify: [Diagram Generation](../ReqvireTool/ModelManagement/DiagramGeneration.md#diagram-generation)
   * verify: [Auto-Generated Diagram Identification](../ReqvireTool/ModelManagement/DiagramGeneration.md#auto-generated-diagram-identification)
   * satisfiedBy: [test.sh](../../tests/test-diagram-generation/test.sh)
 ---
@@ -60,7 +61,7 @@ This test verifies that the system provides visual representations of relationsh
   * type: test-verification
 
 #### Relations
-  * verify: [Automate Diagram Generation](../UserRequirements.md#automate-diagram-generation)
+  * verify: [Diagram Generation](../ReqvireTool/ModelManagement/DiagramGeneration.md#diagram-generation)
   * satisfiedBy: [test.sh](../../tests/test-diagram-generation/test.sh)
 ---
 

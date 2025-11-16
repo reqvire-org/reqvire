@@ -230,7 +230,7 @@ pub fn convert_to_html(
     // 7. Determine which template to use based on filename
     let is_model_page = file_path.file_name()
         .and_then(|n| n.to_str())
-        .map(|n| n == "model.md")
+        .map(|n| n == "model.md" || n == "whole-model.md")
         .unwrap_or(false);
 
     let template = if is_model_page {

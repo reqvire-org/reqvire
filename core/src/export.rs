@@ -522,10 +522,19 @@ pub fn generate_artifacts_in_temp(
     let matrix_html = generate_matrix_html();
     filesystem::write_file("matrix.html", matrix_html.as_bytes())?;
 
-    // Generate model structure diagram with Mermaid
+    // Generate model-centric view (root requirements with nested relations)
     info!("Generating model.md...");
-    let model_mermaid = crate::diagrams::generate_model_diagram(&temp_model_manager.graph_registry, None)?;
-    filesystem::write_file("model.md", model_mermaid.as_bytes())?;
+    let model_report = crate::reports::generate_model_report(
+        &temp_model_manager.graph_registry,
+        None,  // No filtering - use root requirements
+        false  // Markdown output
+    )?;
+    filesystem::write_file("model.md", model_report.as_bytes())?;
+
+    // Generate whole model diagram (all elements and relations)
+    info!("Generating whole-model.md...");
+    let whole_model_mermaid = crate::diagrams::generate_model_diagram(&temp_model_manager.graph_registry, None)?;
+    filesystem::write_file("whole-model.md", whole_model_mermaid.as_bytes())?;
 
     info!("Generating traces.md...");
     let trace_generator = crate::verification_trace::VerificationTraceGenerator::new(
