@@ -17,6 +17,9 @@ Commands:
   coverage          Generate verification coverage report for leaf requirements
   model             Generate model structure diagram with optional filtering
   lint              Analyze model quality and detect issues in requirements relations
+  add               Add new element to model from Markdown definition
+  rm                Remove element from model
+  mv                Move element to different location
   help               Print this message or the help of the given subcommand(s)
 
 Options:
@@ -85,3 +88,25 @@ LINT OPTIONS:
       --auditable               Show only issues requiring manual review
       --fix                     Apply automatic fixes for auto-fixable issues
       --json                    Output results in JSON format
+
+ADD OPTIONS:
+      --to-file <FILE>          Target file path (relative to git repository root)
+      --to-section <SECTION>    Target section name
+      --index <INDEX>           Index within section (0-based, defaults to end)
+      --dry-run                 Preview changes without applying
+      --json                    Output results in JSON format
+       <ARGS>                   Positional arguments: [file] [section] [index] [element-markdown]
+
+RM OPTIONS:
+       <ELEMENT_ID>             Element identifier
+      --dry-run                 Preview changes without applying
+      --json                    Output results in JSON format
+
+MV OPTIONS:
+       <ELEMENT_ID>             Element identifier
+      --to-file <FILE>          Target file path (relative to git repository root)
+      --to-section <SECTION>    Target section name
+      --index <INDEX>           Index within section (0-based, defaults to end)
+      --dry-run                 Preview changes without applying
+      --json                    Output results in JSON format
+       <ARGS>                   Positional arguments: [file] [section] [index]

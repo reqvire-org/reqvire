@@ -442,6 +442,7 @@ The `add` command shall:
   * derivedFrom: [Create Element Operation](../ModelManagement/ElementManipulation.md#create-element-operation)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * derivedFrom: [Git Repository as Project Root](../../UserRequirements.md#git-repository-as-project-root)
+  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
 ---
 
 ### CLI Remove Element Command
@@ -464,6 +465,7 @@ The `rm` command shall:
 #### Relations
   * derivedFrom: [Delete Element Operation](../ModelManagement/ElementManipulation.md#delete-element-operation)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
+  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
 ---
 
 ### CLI Move Element Command
@@ -495,4 +497,5 @@ The `mv` command shall:
   * derivedFrom: [Move Element Operation](../ModelManagement/ElementManipulation.md#move-element-operation)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * derivedFrom: [Git Repository as Project Root](../../UserRequirements.md#git-repository-as-project-root)
+  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
 ---

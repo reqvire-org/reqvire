@@ -245,6 +245,80 @@ pub enum Commands {
         json: bool,
     },
 
+    /// Add new element to model from Markdown definition
+    #[clap(override_help = "Add new element to model from Markdown definition\n\nADD OPTIONS:\n      --to-file <FILE>           Target file path (relative to git repository root)\n      --to-section <SECTION>     Target section name\n      --index <INDEX>            Index within section (0-based, defaults to end)\n      --dry-run                  Preview changes without applying\n      --json                     Output results in JSON format\n\nUSAGE:\n    reqvire add <file> [<section>] [<index>]           # reads element from stdin\n    reqvire add <file> [<section>] [<index>] <element>  # element as last argument\n    reqvire add --to-file=<file> --to-section=<section> --index=<n> < element.md")]
+    Add {
+        /// Target file path (relative to git repository root)
+        #[clap(long, value_name = "FILE", help_heading = "ADD OPTIONS")]
+        to_file: Option<String>,
+
+        /// Target section name
+        #[clap(long, value_name = "SECTION", help_heading = "ADD OPTIONS")]
+        to_section: Option<String>,
+
+        /// Index within section (0-based, defaults to end)
+        #[clap(long, value_name = "INDEX", help_heading = "ADD OPTIONS")]
+        index: Option<usize>,
+
+        /// Preview changes without applying
+        #[clap(long, help_heading = "ADD OPTIONS")]
+        dry_run: bool,
+
+        /// Output results in JSON format
+        #[clap(long, help_heading = "ADD OPTIONS")]
+        json: bool,
+
+        /// Positional arguments: [file] [section] [index] [element-markdown]
+        #[clap(trailing_var_arg = true)]
+        args: Vec<String>,
+    },
+
+    /// Remove element from model
+    #[clap(override_help = "Remove element from model\n\nRM OPTIONS:\n      --dry-run     Preview changes without applying\n      --json        Output results in JSON format\n\nUSAGE:\n    reqvire rm <element-id>")]
+    Rm {
+        /// Element identifier
+        element_id: String,
+
+        /// Preview changes without applying
+        #[clap(long, help_heading = "RM OPTIONS")]
+        dry_run: bool,
+
+        /// Output results in JSON format
+        #[clap(long, help_heading = "RM OPTIONS")]
+        json: bool,
+    },
+
+    /// Move element to different location
+    #[clap(override_help = "Move element to different location\n\nMV OPTIONS:\n      --to-file <FILE>           Target file path (relative to git repository root)\n      --to-section <SECTION>     Target section name\n      --index <INDEX>            Index within section (0-based, defaults to end)\n      --dry-run                  Preview changes without applying\n      --json                     Output results in JSON format\n\nUSAGE:\n    reqvire mv <element-id> <file> [<section>] [<index>]\n    reqvire mv <element-id> --to-file=<file> --to-section=<section> --index=<n>")]
+    Mv {
+        /// Element identifier
+        element_id: String,
+
+        /// Target file path (relative to git repository root)
+        #[clap(long, value_name = "FILE", help_heading = "MV OPTIONS")]
+        to_file: Option<String>,
+
+        /// Target section name
+        #[clap(long, value_name = "SECTION", help_heading = "MV OPTIONS")]
+        to_section: Option<String>,
+
+        /// Index within section (0-based, defaults to end)
+        #[clap(long, value_name = "INDEX", help_heading = "MV OPTIONS")]
+        index: Option<usize>,
+
+        /// Preview changes without applying
+        #[clap(long, help_heading = "MV OPTIONS")]
+        dry_run: bool,
+
+        /// Output results in JSON format
+        #[clap(long, help_heading = "MV OPTIONS")]
+        json: bool,
+
+        /// Positional arguments: [file] [section] [index]
+        #[clap(trailing_var_arg = true)]
+        args: Vec<String>,
+    },
+
     /// Interactive shell for GraphRegistry operations (undocumented)
     #[clap(hide = true)]
     Shell,
@@ -752,6 +826,18 @@ pub fn handle_command(
             std::fs::remove_dir_all(&temp_dir)?;
 
             return Ok(0);
+        },
+        Some(Commands::Add { to_file, to_section, index, dry_run, json, args }) => {
+            eprintln!("NOT IMPLEMENTED");
+            return Ok(1);
+        },
+        Some(Commands::Rm { element_id, dry_run, json }) => {
+            eprintln!("NOT IMPLEMENTED");
+            return Ok(1);
+        },
+        Some(Commands::Mv { element_id, to_file, to_section, index, dry_run, json, args }) => {
+            eprintln!("NOT IMPLEMENTED");
+            return Ok(1);
         },
         Some(Commands::Shell) => {
             run_shell(&mut model_manager)?;
