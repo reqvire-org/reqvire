@@ -34,6 +34,7 @@ The test shall verify that element manipulation operations are persisted to sour
 
 #### Relations
   * verify: [Element Manipulation File Persistence](../ReqvireTool/ModelManagement/ElementManipulation.md#element-manipulation-file-persistence)
+  * satisfiedBy: [test-crud-file-persistence](../../tests/test-crud-file-persistence/test.sh)
 ---
 
 ### Target Location Validation Test
@@ -89,6 +90,7 @@ The test shall verify that target file path validation and auto-creation work co
 
 #### Relations
   * verify: [Target Location Validation and Auto-Creation](../ReqvireTool/ModelManagement/ElementManipulation.md#target-location-validation-and-auto-creation)
+  * satisfiedBy: [test-crud-target-location-validation](../../tests/test-crud-target-location-validation/test.sh)
 ---
 
 ### Create Element Test
@@ -146,6 +148,7 @@ The test shall verify that new model elements can be created from a full Markdow
 
 #### Relations
   * verify: [Create Element Operation](../ReqvireTool/ModelManagement/ElementManipulation.md#create-element-operation)
+  * satisfiedBy: [test-crud-manipulation](../../tests/test-crud-manipulation/test.sh)
 ---
 
 ### Delete Element Test
@@ -199,6 +202,7 @@ The test shall verify that existing model elements can be deleted, all relations
 
 #### Relations
   * verify: [Delete Element Operation](../ReqvireTool/ModelManagement/ElementManipulation.md#delete-element-operation)
+  * satisfiedBy: [test-crud-manipulation](../../tests/test-crud-manipulation/test.sh)
 ---
 
 ### Move Element Test
@@ -274,6 +278,7 @@ The test shall verify that existing model elements can be moved to different loc
 
 #### Relations
   * verify: [Move Element Operation](../ReqvireTool/ModelManagement/ElementManipulation.md#move-element-operation)
+  * satisfiedBy: [test-crud-manipulation](../../tests/test-crud-manipulation/test.sh)
 ---
 
 ### Relation Consistency Test
@@ -315,6 +320,7 @@ The test shall verify that bidirectional relation consistency is maintained when
 
 #### Relations
   * verify: [Relation Consistency Maintenance](../ReqvireTool/ModelManagement/ElementManipulation.md#relation-consistency-maintenance)
+  * satisfiedBy: [test-crud-relation-consistency](../../tests/test-crud-relation-consistency/test.sh)
 ---
 
 ### CLI Add Element Test
@@ -379,6 +385,7 @@ The test shall verify that the `add` command creates new elements from stdin or 
 
 #### Relations
   * verify: [CLI Add Element Command](../ReqvireTool/UserInterface/CLI.md#cli-add-element-command)
+  * satisfiedBy: [test-crud-manipulation](../../tests/test-crud-manipulation/test.sh)
 ---
 
 ### CLI Remove Element Test
@@ -428,6 +435,7 @@ The test shall verify that the `rm` command deletes elements, removes relations,
 
 #### Relations
   * verify: [CLI Remove Element Command](../ReqvireTool/UserInterface/CLI.md#cli-remove-element-command)
+  * satisfiedBy: [test-crud-manipulation](../../tests/test-crud-manipulation/test.sh)
 ---
 
 ### CLI Move Element Test
@@ -491,4 +499,5 @@ The test shall verify that the `mv` command relocates elements, updates all rela
 
 #### Relations
   * verify: [CLI Move Element Command](../ReqvireTool/UserInterface/CLI.md#cli-move-element-command)
+  * satisfiedBy: [test-crud-manipulation](../../tests/test-crud-manipulation/test.sh)
 ---

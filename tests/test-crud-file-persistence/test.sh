@@ -37,6 +37,13 @@ cat > "${TEST_DIR}/specifications/FileA.md" << 'EOF'
 
 ## Section A
 
+### Root Requirement
+
+This is the root requirement.
+
+#### Metadata
+  * type: user-requirement
+
 ### Requirement A1
 
 This is requirement A1.
@@ -44,12 +51,18 @@ This is requirement A1.
 #### Metadata
   * type: requirement
 
+#### Relations
+  * derivedFrom: #root-requirement
+
 ### Requirement A2
 
 This is requirement A2.
 
 #### Metadata
   * type: requirement
+
+#### Relations
+  * derivedFrom: #root-requirement
 EOF
 
 cat > "${TEST_DIR}/specifications/FileB.md" << 'EOF'
@@ -79,6 +92,9 @@ This is requirement C1.
 
 #### Metadata
   * type: requirement
+
+#### Relations
+  * derivedFrom: FileA.md#root-requirement
 EOF
 
 # Record initial timestamps
@@ -99,6 +115,9 @@ This is requirement A3.
 
 #### Metadata
   * type: requirement
+
+#### Relations
+  * derivedFrom: #root-requirement
 '
 
 sleep 1
