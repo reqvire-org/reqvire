@@ -321,7 +321,6 @@ When requested the system shall generate reports summarizing the structure and r
   * type: user-requirement
 
 #### Relations
-  * derivedFrom: [Model Reports](#model-reports)
   * derivedFrom: [Deterministic Output for All Generated Content](ReqvireTool/ValidationAndReporting/Reports.md#deterministic-output-for-all-generated-content)
 ---
 
@@ -347,7 +346,6 @@ Validation shall be performed automatically when any command requires the parsed
   * type: user-requirement
 
 #### Relations
-  * derivedFrom: [Provide Reports](UserStories.md#provide-reports)
   * derivedFrom: [Align with Industry Standards](#align-with-industry-standards)
   * derivedFrom: [Deterministic Output for All Generated Content](ReqvireTool/ValidationAndReporting/Reports.md#deterministic-output-for-all-generated-content)
 ---
@@ -383,7 +381,6 @@ The report helps track verification completeness and identify gaps in requiremen
   * type: user-requirement
 
 #### Relations
-  * derivedFrom: [Model Reports](#model-reports)
   * derivedFrom: [Deterministic Output for All Generated Content](ReqvireTool/ValidationAndReporting/Reports.md#deterministic-output-for-all-generated-content)
 ---
 
@@ -515,7 +512,6 @@ When requested the system shall generate change impact report, in Markdown forma
   * type: user-requirement
 
 #### Relations
-  * derivedFrom: [Model Reports](#model-reports)
   * derivedFrom: [Structural Change Reports](#structural-change-reports)
   * derivedFrom: [Deterministic Output for All Generated Content](ReqvireTool/ValidationAndReporting/Reports.md#deterministic-output-for-all-generated-content)
 ---

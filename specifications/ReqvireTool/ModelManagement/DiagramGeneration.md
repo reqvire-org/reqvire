@@ -8,7 +8,6 @@ When requested, the system shall automatically generate diagrams and save them t
 
 #### Relations
   * derivedFrom: [Interactive Mermaid Diagrams](../../UserRequirements.md#interactive-mermaid-diagrams)
-  * derivedFrom: [Deterministic Output for All Generated Content](../ValidationAndReporting/Reports.md#deterministic-output-for-all-generated-content)
   * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
 ---
 
@@ -161,7 +160,6 @@ The filtering ensures that:
 
 #### Relations
   * derivedFrom: [SysML-Compatible Relationship Rendering](#sysml-compatible-relationship-rendering)
-  * derivedFrom: [Diagram Generation](#diagram-generation)
   * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
 ---
 

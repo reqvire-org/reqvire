@@ -6,7 +6,8 @@ use serde::Serialize;
 use reqvire::error::ReqvireError;
 use reqvire::ModelManager;
 use globset::GlobSet;
-use reqvire::reports;
+use reqvire::report_coverage;
+use reqvire::report_model;
 use reqvire::diagrams;
 use reqvire::export;
 use reqvire::change_impact;
@@ -722,13 +723,13 @@ pub fn handle_command(
             return Ok(0);
         },
         Some(Commands::Coverage { json }) => {
-            let coverage_report = reports::generate_coverage_report(&model_manager.graph_registry);
+            let coverage_report = report_coverage::generate_coverage_report(&model_manager.graph_registry);
             coverage_report.print(json);
             return Ok(0);
         },
         Some(Commands::Model { from, json }) => {
             // Generate model-centric report with optional filtering
-            let output = reports::generate_model_report(
+            let output = report_model::generate_model_report(
                 &model_manager.graph_registry,
                 from.as_deref(),
                 json,

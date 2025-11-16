@@ -132,7 +132,6 @@ This test verifies that the system provides a unified `search` command functiona
 #### Relations
   * verify: [CLI Search Command](../ReqvireTool/UserInterface/CLI.md#cli-search-command)
   * verify: [Search Fine Grained Filtering](../ReqvireTool/ValidationAndReporting/Reports.md#search-fine-grained-filtering)
-  * verify: [Search Report Generator](../ReqvireTool/ValidationAndReporting/Reports.md#search-report-generator)
   * satisfiedBy: [test.sh](../../tests/test-search-all-features/test.sh)
 ---
 
@@ -194,7 +193,6 @@ This test verifies that the system correctly generates verification coverage rep
   * verify: [CLI Coverage Command](../ReqvireTool/UserInterface/CLI.md#cli-coverage-command)
   * satisfiedBy: [test.sh](../../tests/test-coverage-report/test.sh)
 ---
-
 
 ### Verification Traces Filter Options Test
 

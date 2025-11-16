@@ -35,7 +35,6 @@ This test verifies that the generate-diagrams CLI command correctly generates an
 
 #### Relations
   * verify: [CLI Generate Diagrams Flag](../ReqvireTool/UserInterface/CLI.md#cli-generate-diagrams-flag)
-  * verify: [Diagram Generation](../ReqvireTool/ModelManagement/DiagramGeneration.md#diagram-generation)
   * verify: [Auto-Generated Diagram Identification](../ReqvireTool/ModelManagement/DiagramGeneration.md#auto-generated-diagram-identification)
   * satisfiedBy: [test.sh](../../tests/test-diagram-generation/test.sh)
 ---

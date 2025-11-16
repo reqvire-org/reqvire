@@ -524,7 +524,7 @@ pub fn generate_artifacts_in_temp(
 
     // Generate model-centric view (root requirements with nested relations)
     info!("Generating model.md...");
-    let model_report = crate::reports::generate_model_report(
+    let model_report = crate::report_model::generate_model_report(
         &temp_model_manager.graph_registry,
         None,  // No filtering - use root requirements
         false, // Markdown output
@@ -548,7 +548,7 @@ pub fn generate_artifacts_in_temp(
     filesystem::write_file("traces.md", traces_markdown.as_bytes())?;
 
     info!("Generating coverage.md...");
-    let coverage_report = crate::reports::generate_coverage_report(&temp_model_manager.graph_registry);
+    let coverage_report = crate::report_coverage::generate_coverage_report(&temp_model_manager.graph_registry);
     let coverage_text = coverage_report.format_text();
     filesystem::write_file("coverage.md", coverage_text.as_bytes())?;
 

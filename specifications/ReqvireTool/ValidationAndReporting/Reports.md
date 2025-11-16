@@ -42,7 +42,6 @@ The system must support comprehensive filtering by file path, element name, sect
 
 #### Relations
   * derivedFrom: [Model Structure and Summaries](../../UserRequirements.md#model-structure-and-summaries)
-  * satisfiedBy: [reports.rs](../../../core/src/reports.rs)
   * satisfiedBy: [search.rs](../../../core/src/search.rs)
 ---
 
@@ -77,9 +76,8 @@ The custom element type tracking feature must:
 
 #### Relations
   * derivedFrom: [Search Report Generator](#search-report-generator)
-  * satisfiedBy: [reports.rs](../../../core/src/reports.rs)
+  * satisfiedBy: [search.rs](../../../core/src/search.rs)
 ---
-
 
 ### Search Fine Grained Filtering
 
@@ -272,7 +270,7 @@ The filtering system must evaluate filters with minimal passes over element data
 </details>
 
 #### Relations
-  * satisfiedBy: [reports.rs](../../../core/src/reports.rs)
+  * satisfiedBy: [filters.rs](../../../core/src/filters.rs)
   * satisfiedBy: [search.rs](../../../core/src/search.rs)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * derivedFrom: [Search Report Generator](#search-report-generator)
@@ -322,7 +320,6 @@ This requirement applies to all capabilities and operations that generate output
 The system shall implement a validation report generator that compiles and formats validation results from all validators, providing a unified view of model quality with categorized issues, remediation suggestions, and compliance metrics.
 
 #### Relations
-  * derivedFrom: [Deterministic Output for All Generated Content](#deterministic-output-for-all-generated-content)
   * derivedFrom: [Provide Validation Reports](../../UserRequirements.md#provide-validation-reports)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
 ---
@@ -354,9 +351,9 @@ The report structure shall include:
 - Analysis, inspection, and demonstration verification elements are considered satisfied by default
 
 #### Relations
+  * satisfiedBy: [report_coverage.rs](../../../core/src/report_coverage.rs)
   * derivedFrom: [Verification Coverage Report](../../UserRequirements.md#verification-coverage-report)
   * derivedFrom: [Search Report Generator](#search-report-generator)
-  * derivedFrom: [Deterministic Output for All Generated Content](#deterministic-output-for-all-generated-content)
 ---
 
 ## Model Diagram Reports
@@ -374,7 +371,6 @@ When filtering by root element, system shall traverse only forward relations dow
 
 #### Relations
   * derivedFrom: [CLI Model Diagram Command](../UserInterface/CLI.md#cli-model-diagram-command)
-  * derivedFrom: [Deterministic Output for All Generated Content](#deterministic-output-for-all-generated-content)
   * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
   * verifiedBy: [Model Command Verification](../../Verifications/ReportsTests.md#model-command-verification)
 ---
@@ -391,7 +387,6 @@ System shall support markdown and JSON output formats.
 
 #### Relations
   * derivedFrom: [CLI Model Diagram Command](../UserInterface/CLI.md#cli-model-diagram-command)
-  * derivedFrom: [Deterministic Output for All Generated Content](#deterministic-output-for-all-generated-content)
   * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
   * verifiedBy: [Model Command Verification](../../Verifications/ReportsTests.md#model-command-verification)
 ---

@@ -154,7 +154,6 @@ Default output:
 - Full detail mode showing all element metadata and relations
 
 #### Relations
-  * derivedFrom: [Search Report Generator](../ValidationAndReporting/Reports.md#search-report-generator)
   * derivedFrom: [Search Fine Grained Filtering](../ValidationAndReporting/Reports.md#search-fine-grained-filtering)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
@@ -411,7 +410,6 @@ The `add` command shall:
 #### Relations
   * derivedFrom: [Create Element Operation](../ModelManagement/ElementManipulation.md#create-element-operation)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * derivedFrom: [Git Repository as Project Root](../../UserRequirements.md#git-repository-as-project-root)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
 ---
 
@@ -466,6 +464,5 @@ The `mv` command shall:
 #### Relations
   * derivedFrom: [Move Element Operation](../ModelManagement/ElementManipulation.md#move-element-operation)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * derivedFrom: [Git Repository as Project Root](../../UserRequirements.md#git-repository-as-project-root)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
 ---

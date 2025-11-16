@@ -176,7 +176,6 @@ The system shall implement validation that verifies relation endpoints have appr
 
 #### Relations
   * derivedFrom: [Validate Relation Types](../../UserRequirements.md#validate-relation-types)
-  * derivedFrom: [Relation Types and behaviors](../../SpecificationsRequirements.md#relation-types-and-behaviors)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
   * verifiedBy: [Invalid Relations Test](../../Verifications/ValidationTests.md#invalid-relations-test)
