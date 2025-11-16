@@ -5,31 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{title}</title>
     {styles}
-    <!-- Override styles for model page to allow full diagram size -->
-    <style>
-    .mermaid {
-        margin: 20px 0;
-        text-align: center;
-        width: 100%;
-        overflow: auto;
-        position: relative;
-        border: 1px solid #dfe2e5;
-        border-radius: 3px;
-        background-color: #fafafa;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-height: calc(100vh - 150px);
-    }
-    .mermaid svg {
-        width: auto !important;
-        height: auto !important;
-        max-width: none;
-        max-height: none;
-        position: relative;
-        z-index: 1;
-    }
-    </style>
     <!-- Enhanced mermaid configuration for Reqvire diagrams -->
     <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
@@ -52,7 +27,7 @@
             maxTextSize: 120000,
             maxEdges: 2000,
             flowchart: {
-                useMaxWidth: false,
+                useMaxWidth: true,
                 htmlLabels: true,
                 curve: 'basis'
             },
@@ -112,14 +87,14 @@
                         }
                     };
 
-                    // Always fit diagrams to fill available space
+                    // Diagrams with default zoom (no auto-fit)
                     var panZoomInstance = svgPanZoom(svg, {
                         zoomEnabled: true,
                         controlIconsEnabled: true,
-                        fit: true,
-                        center: true,
+                        fit: false,
+                        center: false,
                         contain: false,
-                        minZoom: 0.1,
+                        minZoom: 0.5,
                         maxZoom: 10,
                         zoomScaleSensitivity: 0.3,
                         customEventsHandler: eventsHandler

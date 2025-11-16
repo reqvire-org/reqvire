@@ -87,12 +87,12 @@
                         }
                     };
 
-                    // Always fit diagrams to fill available space
+                    // Diagrams with default zoom (no auto-fit)
                     var panZoomInstance = svgPanZoom(svg, {
                         zoomEnabled: true,
                         controlIconsEnabled: true,
-                        fit: true,
-                        center: true,
+                        fit: false,
+                        center: false,
                         contain: false,
                         minZoom: 0.5,
                         maxZoom: 10,

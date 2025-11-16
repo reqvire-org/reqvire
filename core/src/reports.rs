@@ -1232,7 +1232,7 @@ fn generate_element_text(element: &ModelCentricElement, depth: usize) -> String 
     // Mermaid diagram for this element's relations
     if !element.relations.is_empty() {
         output.push_str(&format!("{}```mermaid\n", indent));
-        output.push_str(&format!("{}graph LR\n", indent));
+        output.push_str(&format!("{}graph TD\n", indent));
 
         // Add CSS class definitions for colors
         output.push_str(&format!("{}  classDef userRequirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;\n", indent));
