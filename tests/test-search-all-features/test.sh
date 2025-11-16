@@ -559,7 +559,49 @@ if [ $CODE -ne 1 ] || ! grep -q "Invalid regex" <<< "$OUTPUT"; then
   exit 1
 fi
 
-# 10) Test #10 removed - relation type validation not implemented yet
+# 10) Invalid relation type should produce error
+set +e
+OUTPUT=""
+CODE=0
+
+# Test invalid relation type with --have-relations
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --have-relations="invalidRelationType" 2>&1)
+CODE=$?
+set -e
+
+# Assert: must exit with error AND must mention 'Unsupported relation type' or 'Invalid relation type'
+if [ $CODE -eq 0 ]; then
+  echo "FAILED: Invalid relation type should produce error (exit code was 0)"
+  echo "Output: $OUTPUT"
+  exit 1
+fi
+
+if ! grep -q "relation type" <<< "$OUTPUT"; then
+  echo "FAILED: Error message should mention 'relation type'"
+  echo "Output: $OUTPUT"
+  exit 1
+fi
+
+# Test invalid relation type with --not-have-relations
+set +e
+OUTPUT=""
+CODE=0
+
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --not-have-relations="anotherInvalidType" 2>&1)
+CODE=$?
+set -e
+
+if [ $CODE -eq 0 ]; then
+  echo "FAILED: Invalid relation type in --not-have-relations should produce error"
+  echo "Output: $OUTPUT"
+  exit 1
+fi
+
+if ! grep -q "relation type" <<< "$OUTPUT"; then
+  echo "FAILED: Error message should mention 'relation type' for --not-have-relations"
+  echo "Output: $OUTPUT"
+  exit 1
+fi
 
 
 # 14) Relations coverage - bidirectional relationships
