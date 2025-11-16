@@ -80,7 +80,7 @@ COVERAGE OPTIONS:
       --json                    Output results in JSON format
 
 MODEL OPTIONS:
-      --root-id <ID>            Filter model from specific root element using forward-only relation traversal
+      --from <NAME>             Filter model from specific root element by name using forward-only relation traversal
       --json                    Output results in JSON format
 
 LINT OPTIONS:

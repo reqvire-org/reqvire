@@ -216,11 +216,11 @@ pub enum Commands {
     },
 
     /// Generate model structure diagram with optional filtering
-    #[clap(override_help = "Generate model structure diagram with optional filtering\n\nMODEL OPTIONS:\n      --root-id <ID>              Filter model from specific root element (forward relations only)\n      --json                      Output results in JSON format")]
+    #[clap(override_help = "Generate model structure diagram with optional filtering\n\nMODEL OPTIONS:\n      --from <NAME>               Filter model from specific root element by name (forward relations only)\n      --json                      Output results in JSON format")]
     Model {
-        /// Filter model from specific root element using forward-only relation traversal
-        #[clap(long, value_name = "ID", help_heading = "MODEL OPTIONS")]
-        root_id: Option<String>,
+        /// Filter model from specific root element by name using forward-only relation traversal
+        #[clap(long, value_name = "NAME", help_heading = "MODEL OPTIONS")]
+        from: Option<String>,
 
         /// Output results in JSON format
         #[clap(long, help_heading = "MODEL OPTIONS")]
@@ -748,8 +748,25 @@ pub fn handle_command(
             coverage_report.print(json);
             return Ok(0);
         },
-        Some(Commands::Model { root_id, json }) => {
+        Some(Commands::Model { from, json }) => {
             // Generate model diagram with optional filtering
+            // Look up element ID by name if provided
+            let root_id = if let Some(name) = from {
+                // Find element by name (element names are globally unique)
+                let found_element = model_manager.graph_registry.nodes.iter()
+                    .find(|(_, node)| node.element.name == name);
+
+                match found_element {
+                    Some((id, _)) => Some(id.clone()),
+                    None => {
+                        eprintln!("❌ Element with name '{}' not found", name);
+                        return Ok(1);
+                    }
+                }
+            } else {
+                None
+            };
+
             let forward_only = root_id.is_some(); // Use forward-only when filtering by root element
             let output = diagrams::generate_model_report(
                 &model_manager.graph_registry,

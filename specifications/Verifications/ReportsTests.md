@@ -373,9 +373,9 @@ Comprehensive test verifying model command generates correct output in different
 
 ##### Acceptance Criteria
 1. `reqvire model` generates markdown with complete model diagram showing all elements
-2. `reqvire model --root-id=<id>` generates diagram with only forward-related elements from root
+2. `reqvire model --from=<name>` generates diagram with only forward-related elements from root
 3. `reqvire model --json` generates valid JSON structure with all model data
-4. `reqvire model --root-id=<id> --json` generates filtered JSON with forward-related elements
+4. `reqvire model --from=<name> --json` generates filtered JSON with forward-related elements
 5. Filtered diagrams include only elements reachable via forward relations
 6. JSON output can be parsed and contains expected fields (folders, relations)
 
@@ -389,7 +389,7 @@ Comprehensive test verifying model command generates correct output in different
    - diagram shows hierarchical structure (folders > files > sections > elements)
 
 2. **Filtered Model Markdown Output**
-   Command: `reqvire model --root-id=<test-element-id>`
+   Command: `reqvire model --from=<test-element-name>`
    - exits code **0**
    - output contains `# Model Diagram Report`
    - output contains Mermaid diagram with filtered elements
@@ -406,7 +406,7 @@ Comprehensive test verifying model command generates correct output in different
    - all test elements are present in JSON structure
 
 4. **Filtered Model JSON Output**
-   Command: `reqvire model --root-id=<test-element-id> --json`
+   Command: `reqvire model --from=<test-element-name> --json`
    - exits code **0**
    - output parses as valid JSON
    - JSON contains only elements reachable via forward relations
@@ -414,9 +414,9 @@ Comprehensive test verifying model command generates correct output in different
 
 5. **Forward-Only Traversal Verification**
    - Create test with element A that derives B, and B derives C
-   - Running `reqvire model --root-id=<A-id>` includes B and C
+   - Running `reqvire model --from=<A-name>` includes B and C
    - Create element D that is derived from B (backward relation)
-   - Running `reqvire model --root-id=<A-id>` includes B and C but NOT D
+   - Running `reqvire model --from=<A-name>` includes B and C but NOT D
    - Confirms only forward relations (derive, satisfiedBy, verifiedBy, trace) are followed
 
 6. **JSON Structure Validation**

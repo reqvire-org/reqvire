@@ -198,7 +198,8 @@ System shall provide CLI command to generate model diagrams with optional filter
 
 #### Details
 - Command shall be named `model`
-- Shall support `--root-id=<identifier>` flag for filtering from specific element
+- Shall support `--from=<name>` flag for filtering from specific element by name
+- Element names are globally unique, allowing lookup by name alone
 - Shall support `--json` flag for JSON output format
 - Default output shall be markdown with embedded Mermaid diagram
 - Shall integrate with existing model diagram generation functionality

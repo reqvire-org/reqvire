@@ -10,9 +10,9 @@ echo "Starting test..." > "${TEST_DIR}/test_results.log"
 #
 # Acceptance Criteria:
 # - `reqvire model` generates markdown with complete model diagram showing all elements
-# - `reqvire model --root-id=<id>` generates diagram with only forward-related elements from root
+# - `reqvire model --from=<name>` generates diagram with only forward-related elements from root
 # - `reqvire model --json` generates valid JSON structure with all model data
-# - `reqvire model --root-id=<id> --json` generates filtered JSON with forward-related elements
+# - `reqvire model --from=<name> --json` generates filtered JSON with forward-related elements
 # - Filtered diagrams include only elements reachable via forward relations
 # - JSON output can be parsed and contains expected fields (folders, relations)
 #
@@ -124,10 +124,10 @@ fi
 # Should NOT include:
 # - "Model Structure Exploration" (parent, backward derivedFrom)
 # - "Markdown Output Format" (sibling, no relation)
-echo "Running: reqvire model --root-id (filtered)" >> "${TEST_DIR}/test_results.log"
+echo "Running: reqvire model --from (filtered)" >> "${TEST_DIR}/test_results.log"
 set +e
 OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" model \
-    --root-id="specifications/SystemRequirements.md#model-diagram-generation" 2>&1)
+    --from="Model Diagram Generation" 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -193,10 +193,10 @@ if ! diff -u "${TEST_DIR}/expected_filtered_output.md" "${TEST_DIR}/actual_filte
 fi
 
 # Test 4: Filtered Model JSON Output
-echo "Running: reqvire model --root-id --json (filtered)" >> "${TEST_DIR}/test_results.log"
+echo "Running: reqvire model --from --json (filtered)" >> "${TEST_DIR}/test_results.log"
 set +e
 OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" model \
-    --root-id="specifications/SystemRequirements.md#model-diagram-generation" --json 2>&1)
+    --from="Model Diagram Generation" --json 2>&1)
 EXIT_CODE=$?
 set -e
 

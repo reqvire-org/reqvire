@@ -371,10 +371,10 @@ When filtering by root element, system shall traverse only forward relations dow
 
 #### Details
 - Shall follow only forward relations (derive, satisfiedBy, verifiedBy, trace)
-- Shall start from specified root element
+- Shall start from specified root element (looked up by name)
 - Shall recursively traverse outgoing relations to leaf elements
 - Shall NOT traverse backward (no bidirectional traversal)
-- Unfiltered diagrams (no --root-id) shall show complete model with all elements
+- Unfiltered diagrams (no --from) shall show complete model with all elements
 
 #### Relations
   * derivedFrom: [CLI Model Diagram Command](../UserInterface/CLI.md#cli-model-diagram-command)
