@@ -20,6 +20,8 @@ use reqvire::GraphRegistry;
 use reqvire::graph_registry::{Page, Section};
 use reqvire::element::Element;
 use reqvire::format::{format_files, render_diff, render_diff_json};
+use reqvire::diff::{render_crud_result, render_crud_json};
+use reqvire::crud;
 use std::collections::HashMap;
 use std::path::Path;
 
@@ -828,15 +830,103 @@ pub fn handle_command(
             return Ok(0);
         },
         Some(Commands::Add { to_file, to_section, index, dry_run, json, args }) => {
-            println!("NOT IMPLEMENTED");
+            // Parse arguments
+            let target_file = to_file.as_ref()
+                .or(args.get(0))
+                .ok_or_else(|| ReqvireError::ProcessError(
+                    "Target file required. Usage: reqvire add <file> [section]".to_string()
+                ))?;
+
+            let target_section = to_section.as_ref()
+                .or(args.get(1))
+                .map(|s| s.as_str())
+                .unwrap_or("Requirements");
+
+            // Read element markdown from stdin
+            use std::io::Read;
+            let mut element_markdown = String::new();
+            std::io::stdin().read_to_string(&mut element_markdown)?;
+
+            if element_markdown.trim().is_empty() {
+                return Err(ReqvireError::ProcessError(
+                    "Element markdown is empty. Pipe element content to stdin.".to_string()
+                ));
+            }
+
+            // Call CRUD operation
+            let git_root = git_commands::get_git_root_dir()?;
+            let result = crud::add_element(
+                &mut model_manager,
+                &element_markdown,
+                target_file,
+                target_section,
+                index,
+                excluded_filename_patterns,
+                &git_root,
+                dry_run,
+            )?;
+
+            // Output result
+            if json {
+                println!("{}", render_crud_json(&result));
+            } else {
+                render_crud_result(&result);
+            }
+
             return Ok(0);
         },
         Some(Commands::Rm { element_id, dry_run, json }) => {
-            println!("NOT IMPLEMENTED");
+            // Call CRUD operation
+            let git_root = git_commands::get_git_root_dir()?;
+            let result = crud::remove_element(
+                &mut model_manager,
+                &element_id,
+                &git_root,
+                dry_run,
+            )?;
+
+            // Output result
+            if json {
+                println!("{}", render_crud_json(&result));
+            } else {
+                render_crud_result(&result);
+            }
+
             return Ok(0);
         },
         Some(Commands::Mv { element_id, to_file, to_section, index, dry_run, json, args }) => {
-            println!("NOT IMPLEMENTED");
+            // Parse arguments
+            let target_file = to_file.as_ref()
+                .or(args.get(0))
+                .ok_or_else(|| ReqvireError::ProcessError(
+                    "Target file required. Usage: reqvire mv <element-id> <file> [section]".to_string()
+                ))?;
+
+            let target_section = to_section.as_ref()
+                .or(args.get(1))
+                .map(|s| s.as_str())
+                .unwrap_or("Requirements");
+
+            // Call CRUD operation
+            let git_root = git_commands::get_git_root_dir()?;
+            let result = crud::move_element(
+                &mut model_manager,
+                &element_id,
+                target_file,
+                target_section,
+                index,
+                excluded_filename_patterns,
+                &git_root,
+                dry_run,
+            )?;
+
+            // Output result
+            if json {
+                println!("{}", render_crud_json(&result));
+            } else {
+                render_crud_result(&result);
+            }
+
             return Ok(0);
         },
         Some(Commands::Shell) => {

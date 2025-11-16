@@ -27,6 +27,8 @@ When element manipulation operations are performed, the system shall:
 
 #### Relations
   * derivedFrom: [Element Manipulation Operations](../../UserRequirements.md#element-manipulation-operations)
+  * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
+  * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
 ---
 
 ### Target Location Validation and Auto-Creation
@@ -59,6 +61,8 @@ When validating and preparing target locations, the system shall:
   * derivedFrom: [Element Manipulation Operations](../../UserRequirements.md#element-manipulation-operations)
   * derivedFrom: [Ignore Files Integration](../Storage/Configuration.md#ignore-files-integration)
   * derivedFrom: [Git Repository as Project Root](../../UserRequirements.md#git-repository-as-project-root)
+  * satisfiedBy: [utils.rs](../../../core/src/utils.rs)
+  * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
 ---
 
 ### Create Element Operation
@@ -86,6 +90,11 @@ When creating a new element, the system shall:
   * derivedFrom: [Element Manipulation File Persistence](#element-manipulation-file-persistence)
   * derivedFrom: [Target Location Validation and Auto-Creation](#target-location-validation-and-auto-creation)
   * derivedFrom: [Structure of Markdown Documents](../../SpecificationsRequirements.md#structure-of-markdown-documents)
+  * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
+  * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
+  * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
+  * satisfiedBy: [diff.rs](../../../core/src/diff.rs)
+  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
 ---
 
 ### Delete Element Operation
@@ -116,6 +125,10 @@ When deleting an element, the system shall:
 
 #### Relations
   * derivedFrom: [Element Manipulation File Persistence](#element-manipulation-file-persistence)
+  * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
+  * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
+  * satisfiedBy: [diff.rs](../../../core/src/diff.rs)
+  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
 ---
 
 ### Move Element Operation
@@ -158,6 +171,10 @@ When moving an element, the system shall:
 #### Relations
   * derivedFrom: [Element Manipulation File Persistence](#element-manipulation-file-persistence)
   * derivedFrom: [Target Location Validation and Auto-Creation](#target-location-validation-and-auto-creation)
+  * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
+  * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
+  * satisfiedBy: [diff.rs](../../../core/src/diff.rs)
+  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
 ---
 
 ### Relation Consistency Maintenance
@@ -184,4 +201,5 @@ When manipulating elements, the system shall ensure:
 
 #### Relations
   * derivedFrom: [Element Manipulation Operations](../../UserRequirements.md#element-manipulation-operations)
+  * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
 ---

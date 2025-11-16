@@ -146,7 +146,7 @@ pub fn parse_single_element(
             ));
 
         // Parse content for Requirement or Details subsections
-        } else if (current_subsection == SubSection::Requirement || current_subsection == SubSection::Details) {
+        } else if current_subsection == SubSection::Requirement || current_subsection == SubSection::Details {
             if let Some(element) = &mut current_element {
                 if trimmed.starts_with("<details") {
                     in_details_block = true;

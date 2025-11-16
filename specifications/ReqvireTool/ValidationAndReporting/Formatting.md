@@ -49,6 +49,7 @@ The system shall display formatting change suggestions in a git-style diff forma
 #### Relations
   * derivedFrom: [Formatting Output](../../UserRequirements.md#formatting-output)
   * satisfiedBy: [format.rs](../../../core/src/format.rs)
+  * satisfiedBy: [diff.rs](../../../core/src/diff.rs)
   * verifiedBy: [Format Command Requirements Verification](../../Verifications/Misc.md#format-command-requirements-verification)
 ---
 

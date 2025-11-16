@@ -18,6 +18,8 @@ pub mod subsection;
 pub mod matrix_generator;
 pub mod graph_registry;
 pub mod format;
+pub mod diff;
+pub mod crud;
 pub mod verification_trace;
 pub mod trace_tree_builder;
 pub mod lint;
