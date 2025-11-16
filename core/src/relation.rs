@@ -295,12 +295,19 @@ pub fn get_supported_relation_types() -> Vec<&'static str> {
     RELATION_TYPES.keys().cloned().collect()
 }
 
-/// Get the list of valid parent relation types (hierarchical relationships).
-/// These are typically the "backward" pointing relations that refer to parent elements.
+/// Get the list of general parent relation types (backward dependencies).
+/// These are the "backward" pointing relations where an element refers to something it depends on.
+/// Includes hierarchical (derivedFrom), satisfaction (satisfy), and verification (verify) parents.
 pub fn get_parent_relation_types() -> Vec<&'static str> {
     vec!["derivedFrom", "satisfy", "verify"]
 }
 
+/// Get the list of hierarchical relation types only.
+/// These define the derivation hierarchy in the model (parent-child relationships).
+/// Per specifications, only derivedFrom is hierarchical.
+pub fn get_hierarchical_relation_types() -> Vec<&'static str> {
+    vec!["derivedFrom"]
+}
 
 /// Returns whether the relation is a verification-related type
 pub fn is_verification_relation(rtype: &RelationTypeInfo) -> bool {

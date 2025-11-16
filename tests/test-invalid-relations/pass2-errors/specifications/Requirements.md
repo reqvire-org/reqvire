@@ -21,7 +21,7 @@ This is a valid user requirement that serves as a parent.
 This system requirement is missing parent relation.
 
 #### Metadata
-  * type: system-requirement
+  * type: requirement
 
 ---
 
@@ -30,7 +30,7 @@ This system requirement is missing parent relation.
 This requirement has a relation to a non-existent element.
 
 #### Metadata
-  * type: system-requirement
+  * type: requirement
 
 #### Relations
   * derivedFrom: [Valid User Requirement](#valid-user-requirement)
@@ -43,7 +43,7 @@ This requirement has a relation to a non-existent element.
 This requirement has incompatible element in relation - satisfiedBy cannot point to other requirement.
 
 #### Metadata
-  * type: system-requirement
+  * type: requirement
 
 #### Relations
   * derivedFrom: [Valid User Requirement](#valid-user-requirement)
@@ -56,7 +56,7 @@ This requirement has incompatible element in relation - satisfiedBy cannot point
 This requirement has circular dependency.
 
 #### Metadata
-  * type: system-requirement
+  * type: requirement
 
 #### Relations
   * derivedFrom: [Valid User Requirement](#valid-user-requirement)
@@ -69,7 +69,7 @@ This requirement has circular dependency.
 This requirement has circular dependency.
 
 #### Metadata
-  * type: system-requirement
+  * type: requirement
 
 #### Relations
   * derivedFrom: [Valid User Requirement](#valid-user-requirement)
@@ -82,7 +82,7 @@ This requirement has circular dependency.
 This requirement has circular dependency.
 
 #### Metadata
-  * type: system-requirement
+  * type: requirement
 
 #### Relations
   * derivedFrom: [Valid User Requirement](#valid-user-requirement)
@@ -108,7 +108,7 @@ This verification has a satisfiedBy relation pointing to a non-existing file.
 This requirement has a verifiedBy relation pointing to a non-existing verification element.
 
 #### Metadata
-  * type: system-requirement
+  * type: requirement
 
 #### Relations
   * derivedFrom: [Valid User Requirement](#valid-user-requirement)
@@ -134,7 +134,7 @@ This verification correctly uses satisfiedBy pointing to an existing test script
 This requirement incorrectly uses satisfiedBy pointing to another requirement (should fail).
 
 #### Metadata
-  * type: system-requirement
+  * type: requirement
 
 #### Relations
   * derivedFrom: [Valid User Requirement](#valid-user-requirement)
@@ -160,7 +160,7 @@ This verification incorrectly uses satisfiedBy pointing to another verification 
 This requirement has a satisfiedBy relation pointing to a non-existing file.
 
 #### Metadata
-  * type: system-requirement
+  * type: requirement
 
 #### Relations
   * derivedFrom: [Valid User Requirement](#valid-user-requirement)
@@ -204,5 +204,29 @@ This demonstration verification incorrectly has a satisfiedBy relation (should f
 #### Relations
   * verify: [Valid User Requirement](#valid-user-requirement)
   * satisfiedBy: [demo-script.sh](demo-script.sh)
+
+---
+
+### System Requirement with SatisfiedBy but No DerivedFrom
+
+This system requirement has satisfiedBy relation but is missing the required hierarchical parent (derivedFrom).
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * satisfiedBy: [ValidImplementation.txt](ValidImplementation.txt)
+
+---
+
+### System Requirement with VerifiedBy but No DerivedFrom
+
+This system requirement has verifiedBy relation but is missing the required hierarchical parent (derivedFrom).
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * verifiedBy: [Valid Verification with Correct SatisfiedBy](#valid-verification-with-correct-satisfiedby)
 
 ---

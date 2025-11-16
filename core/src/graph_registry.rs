@@ -4,7 +4,7 @@ use std::path::{Path, PathBuf};
 use log::{debug, warn};
 use serde::Serialize;
 
-use crate::relation::{self, LinkType, get_parent_relation_types, IMPACT_PROPAGATION_RELATIONS};
+use crate::relation::{self, LinkType, get_hierarchical_relation_types, IMPACT_PROPAGATION_RELATIONS};
 use crate::element::{Element, ElementType, RequirementType};
 use crate::error::ReqvireError;
 use crate::git_commands;
@@ -403,23 +403,23 @@ impl GraphRegistry {
             self.check_circular_dependencies(&element_node.element, &mut visited, &mut path, &mut errors);
         }
 
-        // Check for missing parent relations
-        let valid_parent_relations = get_parent_relation_types();
+        // Check for missing hierarchical parent relations
+        let valid_hierarchical_relations = get_hierarchical_relation_types();
         for element_node in self.nodes.values() {
             let element = &element_node.element;
             let element_file = &element.file_path;
 
-            // Important: Only system requirements needs parent
+            // Important: Only system requirements need hierarchical parent (derivedFrom)
             if let ElementType::Requirement(req_type) = &element.element_type {
                 match req_type {
                     RequirementType::User => continue,
                     RequirementType::System => {
-                        let has_parent_relation = element.relations.iter()
-                            .any(|r| valid_parent_relations.contains(&r.relation_type.name));
+                        let has_hierarchical_parent = element.relations.iter()
+                            .any(|r| valid_hierarchical_relations.contains(&r.relation_type.name));
 
-                        if !has_parent_relation {
+                        if !has_hierarchical_parent {
                             errors.push(ReqvireError::MissingParentRelation(
-                                format!("File {}: Element '{}' has no parent relation (needs one of: {:?})", element_file, element.name, valid_parent_relations),
+                                format!("File {}: Element '{}' has no hierarchical parent relation (needs derivedFrom)", element_file, element.name),
                             ));
                         }
                     }

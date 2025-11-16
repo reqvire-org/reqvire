@@ -70,6 +70,42 @@ pub struct ModelRelation {
     pub is_external: bool,
 }
 
+/// Model-centric report with flat element list and nested relations
+#[derive(Debug, Serialize)]
+pub struct ModelCentricReport {
+    pub elements: Vec<ModelCentricElement>,
+    pub metadata: ModelMetadata,
+}
+
+/// Element in model-centric view with nested relations
+#[derive(Debug, Serialize)]
+pub struct ModelCentricElement {
+    pub identifier: String,
+    pub name: String,
+    pub element_type: String,
+    pub file_path: String,
+    pub section: String,
+    pub section_index: usize,
+    pub relations: Vec<ElementRelation>,
+}
+
+/// Relation nested inside an element
+#[derive(Debug, Serialize)]
+pub struct ElementRelation {
+    pub relation_type: String,
+    pub target_identifier: String,
+    pub target_name: String,
+    pub target_type: String,
+}
+
+/// Metadata about the model
+#[derive(Debug, Serialize)]
+pub struct ModelMetadata {
+    pub total_elements: usize,
+    pub total_relations: usize,
+    pub filtered_from: Option<String>,
+}
+
 /// Model diagram generator that follows the data-first pattern
 pub struct ModelDiagramGenerator<'a> {
     registry: &'a GraphRegistry,
