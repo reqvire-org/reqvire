@@ -1,5 +1,5 @@
 ---
-allowed-tools: Read, Write, Edit, Bash(reqvire:*)
+allowed-tools: Read, Bash(reqvire:*)
 argument-hint: [requirement-name]
 description: Add a new requirement to the Reqvire model with proper structure and traceability
 model: claude-sonnet-4-5-20250929
@@ -25,19 +25,22 @@ ${1:-The user will provide requirement details.}
 1. **Understand the context:**
    - Ask user for requirement details (name, description) if not provided
    - Identify parent requirement if this is a derived requirement
-   - Determine which file should contain this requirement
-   - Determine if this is a leaf requirement (no children) or parent requirement
+   - Identify target file and section (user specifies or follows project conventions)
 
-2. **Locate the appropriate file:**
-   - Check existing specifications structure
-   - Follow organizational approach (separate vs co-located)
-   - Identify correct section within the file
+2. **Draft the requirement content:**
 
-3. **Create the requirement element:**
+   Follow EARS patterns for requirement statements:
+   - **Ubiquitous**: "The system shall [capability]"
+   - **Event-driven**: "when [trigger] the system shall [response]"
+   - **State-driven**: "while [state] the system shall [capability]"
+   - **Unwanted**: "if [condition] then the system shall [response]"
+   - **Optional**: "where [feature] the system shall [capability]"
+
+   Template:
    ```markdown
    ### Requirement Name
 
-   The system shall [capability/constraint following ears patterns].
+   The system shall [capability/constraint following EARS patterns].
 
    #### Metadata
      * type: requirement
@@ -46,8 +49,7 @@ ${1:-The user will provide requirement details.}
      * derivedFrom: [Parent Requirement](path/to/parent.md#parent-requirement)
    ```
 
-4. **Add refinement details if needed:**
-   Use `#### Details` for clarifications that refine but don't change/add capabilities:
+   Optional details section for clarifications:
    ```markdown
    #### Details
 
@@ -61,14 +63,35 @@ ${1:-The user will provide requirement details.}
    </details>
    ```
 
-5. **Follow ears patterns:**
-   - **Ubiquitous**: "The system shall [capability]"
-   - **Event-driven**: "when [trigger] the system shall [response]"
-   - **State-driven**: "while [state] the system shall [capability]"
-   - **Unwanted**: "if [condition] then the system shall [response]"
-   - **Optional**: "where [feature] the system shall [capability]"
+3. **Add the requirement using reqvire add command:**
+   ```bash
+   reqvire add --to-file="<file-path>" --to-section="<section-name>" <<'EOF'
+   ### Requirement Name
 
-6. **Check if verification is needed:**
+   The system shall [capability].
+
+   #### Metadata
+     * type: requirement
+
+   #### Relations
+     * derivedFrom: [Parent](path.md#parent)
+   EOF
+   ```
+
+   Optional: Insert at specific position (0-based index):
+   ```bash
+   reqvire add --to-file="<file-path>" --to-section="<section-name>" 0 <<'EOF'
+   ...
+   EOF
+   ```
+
+   The add command automatically:
+   - Validates markdown format
+   - Checks element name uniqueness
+   - Validates relation format
+   - Updates the file
+
+4. **Check if verification is needed:**
    - **Leaf requirement** (no derived children): Needs verification
    - **Parent requirement** (has derived children): Verification rolls up from children
 
@@ -77,19 +100,38 @@ ${1:-The user will provide requirement details.}
    reqvire traces --filter-name="<requirement-name>"
    ```
 
-7. **Validate the changes:**
-   ```bash
-   reqvire validate
-   ```
-
-8. **Check coverage:**
+5. **Check coverage:**
    ```bash
    reqvire coverage --filter-name="<requirement-name>"
    ```
 
-9. **Next steps:**
+6. **Next steps:**
    - If **leaf requirement**: Suggest `/add-verification` to create verification
    - If **parent requirement**: Explain verification will roll up from child requirements
+
+## Element Manipulation
+
+After adding requirements, you may need to reorganize:
+
+**Move element to different section (same file):**
+```bash
+reqvire mv "<file>#<element-name>" --to-file="<same-file>" --to-section="<new-section>"
+```
+
+**Move element with specific position:**
+```bash
+reqvire mv "<file>#<element-name>" --to-file="<target-file>" --to-section="<section>" --index=0
+```
+
+Or using positional arguments:
+```bash
+reqvire mv "<file>#<element-name>" <target-file> <section> [index]
+```
+
+**Remove element:**
+```bash
+reqvire rm "<file>#<element-name>"
+```
 
 ## Best Practices
 

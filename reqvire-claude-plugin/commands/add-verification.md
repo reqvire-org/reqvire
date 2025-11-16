@@ -1,5 +1,5 @@
 ---
-allowed-tools: Read, Write, Edit, Bash(reqvire:*)
+allowed-tools: Read, Edit, Bash(reqvire:*)
 argument-hint: [requirement-id]
 description: Add a verification for an existing requirement, checking if verification is needed based on requirement hierarchy
 model: claude-sonnet-4-5-20250929
@@ -60,37 +60,77 @@ ${1:-The user will specify which requirement needs verification.}
    - All requirements in derivedFrom chain up to root
    - Build complete understanding of what needs verification
 
-6. **Create verification with comprehensive test criteria:**
+6. **Draft verification content:**
 
-   In `specifications/Verifications/` directory:
+   Template for verification:
    ```markdown
    ### Verification Name
 
    [Description of how ALL requirements in the trace chain will be verified]
 
-   Test criteria must cover:
+   #### Details
+
+   ##### Acceptance Criteria
    - [Criterion for leaf requirement 1]
    - [Criterion for leaf requirement 2]
    - [Criterion that verifies parent capabilities through leaf tests]
 
+   ##### Test Criteria
+   - [How to test criterion 1]
+   - [How to test criterion 2]
+   - [Expected outcomes]
+
    #### Metadata
-     * type: verification
+     * type: test-verification
 
    #### Relations
      * verify: [Leaf Requirement 1](../path/to/req1.md#leaf-requirement-1)
      * verify: [Leaf Requirement 2](../path/to/req2.md#leaf-requirement-2)
+     * satisfiedBy: [test.sh](../../tests/test-name/test.sh)
    ```
 
-7. **Link test (only for test-verification):**
+   Note: Only test-verification type can have satisfiedBy relations to test files.
 
-   If verification type is `verification` or `test-verification` AND test file exists:
-   ```markdown
+7. **Add verification using reqvire add command:**
+
+   ```bash
+   reqvire add --to-file="specifications/Verifications/<file>.md" --to-section="<section>" <<'EOF'
+   ### Verification Name
+
+   [Description of verification approach]
+
+   #### Details
+
+   ##### Acceptance Criteria
+   - [What must be satisfied]
+   - [Functional criteria]
+
+   ##### Test Criteria
+   - [How to verify]
+   - [Expected behavior]
+
+   #### Metadata
+     * type: test-verification
+
    #### Relations
-     * verify: [Requirement Name](../path/to/requirement.md#requirement-name)
-     * satisfiedBy: [tests/test-name/test.sh](../../tests/test-name/test.sh)
+     * verify: [Requirement](../path.md#requirement)
+   EOF
    ```
 
-8. **Update the requirements:**
+   Optional: Insert at specific position (0-based index):
+   ```bash
+   reqvire add --to-file="specifications/Verifications/<file>.md" --to-section="<section>" 0 <<'EOF'
+   ...
+   EOF
+   ```
+
+   The add command automatically:
+   - Validates markdown format
+   - Checks element name uniqueness
+   - Validates relation format
+   - Updates the file
+
+8. **Update the requirements with verifiedBy relations:**
    Add `verifiedBy` relation to each verified requirement:
    ```markdown
    #### Relations
@@ -98,23 +138,42 @@ ${1:-The user will specify which requirement needs verification.}
      * verifiedBy: [Verification Name](../Verifications/file.md#verification-name)
    ```
 
-9. **Validate:**
-   ```bash
-   reqvire validate
-   ```
-
-10. **Check updated coverage:**
+9. **Check updated coverage:**
     ```bash
     reqvire coverage --filter-name="<requirement-name>"
     ```
 
-11. **Verify roll-up and check for redundancies:**
+10. **Verify roll-up and check for redundancies:**
     ```bash
     reqvire traces --filter-name="<verification-name>"
     reqvire lint --json > /tmp/lint.json
     ```
 
     Check if verification creates redundant verify relations (verifying both leaf and parent).
+
+## Element Manipulation
+
+After adding verifications, you may need to reorganize:
+
+**Move verification to different section (same file):**
+```bash
+reqvire mv "specifications/Verifications/<file>.md#<verification-name>" --to-file="specifications/Verifications/<file>.md" --to-section="<new-section>"
+```
+
+**Move verification with specific position:**
+```bash
+reqvire mv "specifications/Verifications/<file>.md#<verification-name>" --to-file="<target-file>" --to-section="<section>" --index=0
+```
+
+Or using positional arguments:
+```bash
+reqvire mv "specifications/Verifications/<file>.md#<verification-name>" <target-file> <section> [index]
+```
+
+**Remove verification:**
+```bash
+reqvire rm "specifications/Verifications/<file>.md#<verification-name>"
+```
 
 ## Decision Logic
 
