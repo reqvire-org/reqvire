@@ -161,7 +161,7 @@ The filtering ensures that:
 
 #### Relations
   * derivedFrom: [SysML-Compatible Relationship Rendering](#sysml-compatible-relationship-rendering)
-  * derivedFrom: [Relation Types and behaviors](../../SpecificationsRequirements.md#relation-types-and-behaviors)
+  * derivedFrom: [Diagram Generation](#diagram-generation)
   * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
 ---
 

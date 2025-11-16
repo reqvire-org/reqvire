@@ -1190,6 +1190,6 @@ When an element changes, the impact propagates according to these rules:
 </details>
 
 #### Relations
-  * derivedFrom: [AI-Assisted MBSE Model Management](UserStories.md#ai-assisted-mbse-model-management)
+  * derivedFrom: [Managing MBSE Models](UserStories.md#managing-mbse-models)
   * satisfiedBy: [relation.rs](../core/src/relation.rs)
 ---

@@ -20,6 +20,7 @@ The index generation is automatically performed as part of the HTML export proce
 #### Relations
   * derivedFrom: [Documentation Index for HTML Export](../../UserRequirements.md#documentation-index-for-html-export)
   * derivedFrom: [HTML Navigation Bar](../../UserRequirements.md#html-navigation-bar)
+  * derivedFrom: [Deterministic Output for All Generated Content](../ValidationAndReporting/Reports.md#deterministic-output-for-all-generated-content)
   * satisfiedBy: [index_generator.rs](../../../core/src/index_generator.rs)
   * satisfiedBy: [html_export.rs](../../../core/src/html_export.rs)
 ---
@@ -91,6 +92,7 @@ Execute all generation commands treating temporary directory as repository root:
 #### Relations
   * derivedFrom: [Browse Model via Web Interface](../../UserRequirements.md#browse-model-via-web-interface)
   * derivedFrom: [CLI Interface Structure](CLI.md#cli-interface-structure)
+  * derivedFrom: [Deterministic Output for All Generated Content](../ValidationAndReporting/Reports.md#deterministic-output-for-all-generated-content)
   * satisfiedBy: [html_export.rs](../../../core/src/html_export.rs)
   * satisfiedBy: [html.rs](../../../core/src/html.rs)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
@@ -121,6 +123,7 @@ The system SHALL generate a model-centric visualization (model.md) during HTML e
   * derivedFrom: [Complete Model Structure Visualization](../../UserRequirements.md#complete-model-structure-visualization)
   * derivedFrom: [Model Visualization and Exploration](../../UserRequirements.md#model-visualization-and-exploration)
   * derivedFrom: [HTML Navigation Bar](../../UserRequirements.md#html-navigation-bar)
+  * derivedFrom: [Deterministic Output for All Generated Content](../ValidationAndReporting/Reports.md#deterministic-output-for-all-generated-content)
   * satisfiedBy: [export.rs](../../../core/src/export.rs)
   * satisfiedBy: [reports.rs](../../../core/src/reports.rs)
 ---
@@ -138,6 +141,7 @@ The system SHALL generate a complete model diagram (whole-model.md) during HTML 
 
 #### Relations
   * derivedFrom: [HTML Navigation Bar](../../UserRequirements.md#html-navigation-bar)
+  * derivedFrom: [Deterministic Output for All Generated Content](../ValidationAndReporting/Reports.md#deterministic-output-for-all-generated-content)
   * satisfiedBy: [export.rs](../../../core/src/export.rs)
   * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
 ---

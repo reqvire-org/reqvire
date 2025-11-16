@@ -41,7 +41,6 @@ The system must support filtering by file path, element name, section, type, con
 
 #### Relations
   * derivedFrom: [Model Structure and Summaries](../../UserRequirements.md#model-structure-and-summaries)
-  * derivedFrom: [Deterministic Output for All Generated Content](#deterministic-output-for-all-generated-content)
   * satisfiedBy: [reports.rs](../../../core/src/reports.rs)
 ---
 
@@ -104,6 +103,7 @@ The system must support filtering by file path (glob pattern), section name (glo
 
 #### Relations
   * derivedFrom: [CLI Summary Report Command](../UserInterface/CLI.md#cli-summary-report-command)
+  * derivedFrom: [Deterministic Output for All Generated Content](#deterministic-output-for-all-generated-content)
   * satisfiedBy: [sections_summary.rs](../../../core/src/sections_summary.rs)
 ---
 
@@ -328,6 +328,7 @@ This requirement applies to all capabilities and operations that generate output
 The system shall implement a validation report generator that compiles and formats validation results from all validators, providing a unified view of model quality with categorized issues, remediation suggestions, and compliance metrics.
 
 #### Relations
+  * derivedFrom: [Deterministic Output for All Generated Content](#deterministic-output-for-all-generated-content)
   * derivedFrom: [Provide Validation Reports](../../UserRequirements.md#provide-validation-reports)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
 ---
@@ -361,6 +362,7 @@ The report structure shall include:
 #### Relations
   * derivedFrom: [Verification Coverage Report](../../UserRequirements.md#verification-coverage-report)
   * derivedFrom: [Model Summary Report Generator](#model-summary-report-generator)
+  * derivedFrom: [Deterministic Output for All Generated Content](#deterministic-output-for-all-generated-content)
 ---
 
 ## Model Diagram Reports
