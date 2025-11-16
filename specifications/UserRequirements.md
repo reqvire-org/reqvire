@@ -390,7 +390,7 @@ The system shall provide upward traceability visualization from verifications to
   * type: user-requirement
 
 #### Relations
-  * derivedFrom: [Model Reports](#model-reports)
+  * derivedFrom: [Verification Coverage Report](#verification-coverage-report)
 ---
 
 ## Trace Changes in MBSE Model
