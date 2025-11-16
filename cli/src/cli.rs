@@ -828,16 +828,16 @@ pub fn handle_command(
             return Ok(0);
         },
         Some(Commands::Add { to_file, to_section, index, dry_run, json, args }) => {
-            eprintln!("NOT IMPLEMENTED");
-            return Ok(1);
+            println!("NOT IMPLEMENTED");
+            return Ok(0);
         },
         Some(Commands::Rm { element_id, dry_run, json }) => {
-            eprintln!("NOT IMPLEMENTED");
-            return Ok(1);
+            println!("NOT IMPLEMENTED");
+            return Ok(0);
         },
         Some(Commands::Mv { element_id, to_file, to_section, index, dry_run, json, args }) => {
-            eprintln!("NOT IMPLEMENTED");
-            return Ok(1);
+            println!("NOT IMPLEMENTED");
+            return Ok(0);
         },
         Some(Commands::Shell) => {
             run_shell(&mut model_manager)?;

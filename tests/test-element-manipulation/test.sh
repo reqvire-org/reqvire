@@ -51,6 +51,14 @@ if [ $ADD_EXIT -ne 0 ]; then
   exit 1
 fi
 
+# Compare output with expected diff
+if ! diff -u "${TEST_SCRIPT_DIR}/expected-add-diff.txt" <(echo "$ADD_OUTPUT"); then
+  echo "❌ FAILED: Add command output does not match expected diff"
+  echo ""
+  echo "Differences shown above (expected vs actual)"
+  exit 1
+fi
+
 # Verify element was added
 if ! grep -q "### Feature D" "$TEST_DIR/specifications/Requirements.md"; then
   echo "❌ FAILED: Element was not added to file"
@@ -88,6 +96,14 @@ set -e
 if [ $DELETE_EXIT -ne 0 ]; then
   echo "❌ FAILED: Delete command failed with exit code $DELETE_EXIT"
   echo "$DELETE_OUTPUT"
+  exit 1
+fi
+
+# Compare output with expected diff
+if ! diff -u "${TEST_SCRIPT_DIR}/expected-rm-diff.txt" <(echo "$DELETE_OUTPUT"); then
+  echo "❌ FAILED: Delete command output does not match expected diff"
+  echo ""
+  echo "Differences shown above (expected vs actual)"
   exit 1
 fi
 
@@ -138,6 +154,14 @@ set -e
 if [ $MOVE_EXIT -ne 0 ]; then
   echo "❌ FAILED: Move command failed with exit code $MOVE_EXIT"
   echo "$MOVE_OUTPUT"
+  exit 1
+fi
+
+# Compare output with expected diff
+if ! diff -u "${TEST_SCRIPT_DIR}/expected-mv-diff.txt" <(echo "$MOVE_OUTPUT"); then
+  echo "❌ FAILED: Move command output does not match expected diff"
+  echo ""
+  echo "Differences shown above (expected vs actual)"
   exit 1
 fi
 
