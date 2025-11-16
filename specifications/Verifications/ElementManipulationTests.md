@@ -36,6 +36,61 @@ The test shall verify that element manipulation operations are persisted to sour
   * verify: [Element Manipulation File Persistence](../ReqvireTool/ModelManagement/ElementManipulation.md#element-manipulation-file-persistence)
 ---
 
+### Target Location Validation Test
+
+The test shall verify that target file path validation and auto-creation work correctly, enforcing safety constraints for gitignore, reqvireignore, and path depth limits.
+
+#### Details
+**Test Setup:**
+- Create `.gitignore` with exclusion patterns (e.g., `**/build/**`, `temp-*.md`)
+- Create `.reqvireignore` with exclusion patterns (e.g., `**/draft-*.md`)
+- Prepare valid target paths within depth limits
+- Prepare invalid target paths (ignored paths, excessive depth)
+
+**Test Steps - Path Validation:**
+1. Attempt to create element in path excluded by `.gitignore`
+2. Verify operation is rejected with appropriate error message
+3. Attempt to create element in path excluded by `.reqvireignore`
+4. Verify operation is rejected with appropriate error message
+5. Attempt to create element in path nested more than 10 subdirectories deep
+6. Verify operation is rejected with depth limit error
+7. Attempt to create element in valid path
+8. Verify operation succeeds
+
+**Test Steps - Auto-Creation:**
+1. Create element in non-existent file with valid path
+2. Verify file is created with proper structure (level 1 header based on filename)
+3. Verify section header is created if specified
+4. Create element in existing file but non-existent section
+5. Verify section header is added to existing file
+6. Verify existing file content is preserved
+
+**Success Criteria:**
+- Paths excluded by `.gitignore` are rejected
+- Paths excluded by `.reqvireignore` are rejected
+- Paths exceeding 10 subdirectory depth are rejected
+- Error messages clearly indicate which constraint was violated
+- Valid paths are accepted
+- Non-existent files are created with proper structure
+- Non-existent sections are added to existing files
+- Created files follow Reqvire markdown conventions
+
+**Test Coverage:**
+- Gitignore pattern exclusion
+- Reqvireignore pattern exclusion
+- Path depth limit (exactly 10, 11, 15 subdirectories)
+- Auto-create file with section
+- Auto-create file without section
+- Auto-create section in existing file
+- Valid path variations
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [Target Location Validation and Auto-Creation](../ReqvireTool/ModelManagement/ElementManipulation.md#target-location-validation-and-auto-creation)
+---
+
 ### Create Element Test
 
 The test shall verify that new model elements can be created from a full Markdown definition string after validation, and that invalid element definitions are rejected with appropriate error reporting.
@@ -95,16 +150,14 @@ The test shall verify that new model elements can be created from a full Markdow
 
 ### Delete Element Test
 
-The test shall verify that existing model elements can be deleted and all relations referencing the deleted element are automatically removed.
+The test shall verify that existing model elements can be deleted, all relations referencing the deleted element are automatically removed, and empty files are removed when no elements remain.
 
 #### Details
-<details>
-<summary>Test Criteria</summary>
-
 **Test Setup:**
 - Create a test model with multiple elements
 - Create an element to be deleted with incoming and outgoing relations
 - Document all relations pointing to the element (derivedFrom, verifiedBy, verify, satisfiedBy)
+- Create a file with only one element for empty file cleanup testing
 
 **Test Steps:**
 1. Delete the target element
@@ -114,12 +167,23 @@ The test shall verify that existing model elements can be deleted and all relati
 5. Validate the model after element deletion
 6. Check that no dangling relations exist
 
+**Test Steps - Empty File Cleanup:**
+1. Delete the only element in a file
+2. Verify the element is removed
+3. Verify the file is deleted from the filesystem
+4. Verify the file deletion is reported in the operation output
+5. Delete an element leaving other elements in the file
+6. Verify the file is NOT deleted (still contains elements)
+
 **Success Criteria:**
 - Element is completely removed from the source file
 - All incoming relations (relations from other elements to the deleted element) are removed
 - File structure remains valid
 - Model validation passes
 - No dangling relations remain in the model
+- Files containing only the deleted element are removed
+- Files with remaining elements are preserved
+- File deletion is reported when it occurs
 
 **Test Coverage:**
 - Delete element with `derivedFrom` relations pointing to it
@@ -127,8 +191,8 @@ The test shall verify that existing model elements can be deleted and all relati
 - Delete element with `verify` relations pointing to it
 - Delete element with `satisfiedBy` relations pointing to it
 - Delete element with multiple types of incoming relations
-
-</details>
+- Delete last element in file (triggers file deletion)
+- Delete element leaving other elements (file preserved)
 
 #### Metadata
   * type: test-verification
@@ -139,17 +203,15 @@ The test shall verify that existing model elements can be deleted and all relati
 
 ### Move Element Test
 
-The test shall verify that existing model elements can be moved to different locations and all relations referencing the moved element are automatically updated.
+The test shall verify that existing model elements can be moved to different locations, all relations referencing the moved element are automatically updated, target locations are created if needed, and empty source files are removed when no elements remain.
 
 #### Details
-<details>
-<summary>Test Criteria</summary>
-
 **Test Setup:**
 - Create a test model with multiple files and sections
 - Create an element to be moved with incoming and outgoing relations
 - Document all relations pointing to the element
-- Define target location (different file and/or section)
+- Create a file with only one element for empty file cleanup testing
+- Prepare non-existent target locations for auto-creation testing
 
 **Test Steps:**
 1. Move the element to the target location
@@ -161,6 +223,21 @@ The test shall verify that existing model elements can be moved to different loc
 7. Validate the model after element move
 8. Check that no dangling relations exist
 
+**Test Steps - Auto-Creation:**
+1. Move element to non-existent target file
+2. Verify target file is created with proper structure
+3. Verify section is created if specified
+4. Move element to existing file with non-existent section
+5. Verify section is added to existing file
+
+**Test Steps - Empty Source File Cleanup:**
+1. Move the only element from a file to another location
+2. Verify the element is moved successfully
+3. Verify the source file is deleted from the filesystem
+4. Verify the file deletion is reported in the operation output
+5. Move an element leaving other elements in the source file
+6. Verify the source file is NOT deleted (still contains elements)
+
 **Success Criteria:**
 - Element is removed from source location
 - Element is inserted into target location
@@ -170,6 +247,11 @@ The test shall verify that existing model elements can be moved to different loc
 - Outgoing relations (relations from the moved element to other elements) are preserved unchanged
 - File structure remains valid in both source and target files
 - Model validation passes
+- Non-existent target files are created with proper structure
+- Non-existent sections are added to existing files
+- Empty source files are deleted after move
+- Source files with remaining elements are preserved
+- File creation and deletion are reported
 
 **Test Coverage:**
 - Move element within the same file (different section)
@@ -182,8 +264,10 @@ The test shall verify that existing model elements can be moved to different loc
 - Move element with `verify` relations pointing to it
 - Move element with `satisfiedBy` relations pointing to it
 - Move element with multiple types of incoming relations
-
-</details>
+- Move to non-existent target file (auto-create)
+- Move to non-existent target section (auto-create)
+- Move last element from file (triggers source file deletion)
+- Move element leaving other elements (source file preserved)
 
 #### Metadata
   * type: test-verification

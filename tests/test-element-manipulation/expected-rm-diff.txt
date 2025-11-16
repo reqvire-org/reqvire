@@ -1,0 +1,17 @@
+--- specifications/Requirements.md
++++ specifications/Requirements.md
+@@ -23,14 +23,6 @@
+ ---
+
+-### Feature B
+-
+-This is a test requirement for feature B.
+-
+-#### Metadata
+-  * type: requirement
+-
+-#### Relations
+-  * derivedFrom: [Feature A](#feature-a)
+----
+-
+ ### Feature C

@@ -1,0 +1,45 @@
+--- specifications/Requirements.md
++++ specifications/Requirements.md
+@@ -33,15 +33,3 @@
+   * derivedFrom: [Feature A](#feature-a)
+ ---
+
+-### Feature C
+-
+-This is a test requirement for feature C with relations.
+-
+-#### Metadata
+-  * type: requirement
+-
+-#### Relations
+-  * derivedFrom: [Feature A](#feature-a)
+-  * verifiedBy: [Test for Feature C](Verifications/Tests.md#test-for-feature-c)
+----
+-
+--- specifications/OtherRequirements.md
++++ specifications/OtherRequirements.md
+@@ -2,3 +2,15 @@
+
+ ## Other Features
++
++### Feature C
++
++This is a test requirement for feature C with relations.
++
++#### Metadata
++  * type: requirement
++
++#### Relations
++  * derivedFrom: [Feature A](Requirements.md#feature-a)
++  * verifiedBy: [Test for Feature C](Verifications/Tests.md#test-for-feature-c)
++---
++
+--- specifications/Verifications/Tests.md
++++ specifications/Verifications/Tests.md
+@@ -11,5 +11,5 @@
+   * type: test-verification
+
+ #### Relations
+-  * verify: [Feature C](../Requirements.md#feature-c)
++  * verify: [Feature C](../OtherRequirements.md#feature-c)
+ ---

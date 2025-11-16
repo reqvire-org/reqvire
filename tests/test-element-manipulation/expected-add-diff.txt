@@ -1,0 +1,18 @@
+--- specifications/Requirements.md
++++ specifications/Requirements.md
+@@ -33,3 +33,15 @@
+   * derivedFrom: [Feature A](#feature-a)
+   * verifiedBy: [Test for Feature C](Verifications/Tests.md#test-for-feature-c)
+ ---
++
++### Feature D
++
++This is a newly added feature.
++
++#### Metadata
++  * type: requirement
++
++#### Relations
++  * derivedFrom: [Feature A](#feature-a)
++---
++

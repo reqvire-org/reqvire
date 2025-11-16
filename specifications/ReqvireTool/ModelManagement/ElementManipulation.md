@@ -29,6 +29,38 @@ When element manipulation operations are performed, the system shall:
   * derivedFrom: [Element Manipulation Operations](../../UserRequirements.md#element-manipulation-operations)
 ---
 
+### Target Location Validation and Auto-Creation
+
+The system shall validate target file paths for element manipulation operations and automatically create files and sections when they do not exist, subject to path safety constraints.
+
+#### Details
+When validating and preparing target locations, the system shall:
+
+**Path Validation:**
+- Verify the target file path is not excluded by `.gitignore` patterns
+- Verify the target file path is not excluded by `.reqvireignore` patterns
+- Verify the file path nesting depth does not exceed 10 subdirectories from the git repository root
+- Reject operations with invalid paths and provide clear error messages
+
+**Auto-Creation:**
+- If the target file does not exist and the path is valid, create the file with proper structure:
+  - Add level 1 header based on filename (e.g., `# Requirements` for `Requirements.md`)
+  - Add level 2 section header if section name is provided
+- If the target file exists but the specified section does not exist, add the section header
+- Ensure created files and sections follow Reqvire markdown structure conventions
+
+**Error Handling:**
+- Report error if path would be ignored by `.gitignore` or `.reqvireignore`
+- Report error if path nesting exceeds 10 subdirectories
+- Report error if file path is invalid or inaccessible
+- Provide specific error message indicating which constraint was violated
+
+#### Relations
+  * derivedFrom: [Element Manipulation Operations](../../UserRequirements.md#element-manipulation-operations)
+  * derivedFrom: [Ignore Files Integration](../Storage/Configuration.md#ignore-files-integration)
+  * derivedFrom: [Git Repository as Project Root](../../UserRequirements.md#git-repository-as-project-root)
+---
+
 ### Create Element Operation
 
 The system shall provide the capability to create new model elements by accepting a full element definition string in Markdown format, validating the element structure, and inserting it into the specified location if valid.
@@ -38,6 +70,8 @@ When creating a new element, the system shall:
 - Accept a string containing the full element definition in Markdown format (including ### header, metadata, relations, and content)
 - Accept target location: file path and section name
 - Accept optional index parameter for insertion position within section (0-based)
+- Validate the target location using path validation rules
+- Create target file and/or section if they do not exist (subject to validation constraints)
 - Parse the element definition string to extract element structure
 - Validate the element structure (proper subsections, valid relations, correct format)
 - Verify the element name is unique within the target file
@@ -50,17 +84,15 @@ When creating a new element, the system shall:
 
 #### Relations
   * derivedFrom: [Element Manipulation File Persistence](#element-manipulation-file-persistence)
+  * derivedFrom: [Target Location Validation and Auto-Creation](#target-location-validation-and-auto-creation)
   * derivedFrom: [Structure of Markdown Documents](../../SpecificationsRequirements.md#structure-of-markdown-documents)
 ---
 
 ### Delete Element Operation
 
-The system shall provide the capability to delete existing model elements while automatically removing or updating all relations that reference the deleted element.
+The system shall provide the capability to delete existing model elements while automatically removing or updating all relations that reference the deleted element, and removing empty files when no elements remain.
 
 #### Details
-<details>
-<summary>Delete Element Details</summary>
-
 When deleting an element, the system shall:
 - Remove the element and all its content from the source file
 - Identify all relations pointing to the deleted element (incoming relations)
@@ -70,6 +102,11 @@ When deleting an element, the system shall:
 - Maintain file structure and formatting after deletion
 - Provide a report of all relations that were affected by the deletion
 
+**Empty File Cleanup:**
+- After deleting the element, check if the source file contains any remaining elements
+- If no elements remain and all sections are empty (only page content, headers, or whitespace), remove the file from the filesystem
+- If the file is removed, report the file deletion in the operation output
+
 **Relation Handling:**
 - All `derivedFrom` relations pointing to the deleted element shall be removed
 - All `verifiedBy` relations pointing to the deleted element shall be removed
@@ -77,21 +114,18 @@ When deleting an element, the system shall:
 - All `satisfiedBy` relations pointing to the deleted element shall be removed
 - Relations from the deleted element are automatically removed with the element
 
-</details>
-
 #### Relations
   * derivedFrom: [Element Manipulation File Persistence](#element-manipulation-file-persistence)
 ---
 
 ### Move Element Operation
 
-The system shall provide the capability to move existing model elements to different locations (file and/or section) while automatically updating all relations that reference the moved element.
+The system shall provide the capability to move existing model elements to different locations (file and/or section) while automatically updating all relations that reference the moved element, creating target locations if needed, and removing empty source files when no elements remain.
 
 #### Details
-<details>
-<summary>Move Element Details</summary>
-
 When moving an element, the system shall:
+- Validate the target location using path validation rules
+- Create target file and/or section if they do not exist (subject to validation constraints)
 - Remove the element from the source location (file and section)
 - Accept optional index parameter for insertion position within target section (0-based)
 - Insert the element into the target location (file and section):
@@ -105,6 +139,11 @@ When moving an element, the system shall:
 - Ensure the element name is unique within the target file
 - Provide a report of all relations that were updated
 
+**Empty Source File Cleanup:**
+- After moving the element, check if the source file contains any remaining elements
+- If no elements remain and all sections are empty (only page content, headers, or whitespace), remove the source file from the filesystem
+- If the file is removed, report the file deletion in the operation output
+
 **Relation Update Requirements:**
 - All `derivedFrom` relations pointing to the moved element shall be updated to the new identifier
 - All `verifiedBy` relations pointing to the moved element shall be updated to the new identifier
@@ -116,10 +155,9 @@ When moving an element, the system shall:
 - The element's identifier changes from `<old-file>#<element-name>` to `<new-file>#<element-name>`
 - All references to the old identifier shall be updated to the new identifier
 
-</details>
-
 #### Relations
   * derivedFrom: [Element Manipulation File Persistence](#element-manipulation-file-persistence)
+  * derivedFrom: [Target Location Validation and Auto-Creation](#target-location-validation-and-auto-creation)
 ---
 
 ### Relation Consistency Maintenance
