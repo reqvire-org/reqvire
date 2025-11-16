@@ -115,9 +115,9 @@ This file should be processed - not matching .gitignore patterns.
   * derivedFrom: #test-root
 EOF
 
-# Run reqvire summary and capture output
+# Run reqvire search and capture output
 set +e
-OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" summary 2>&1)
+OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" search 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -234,9 +234,9 @@ This README.md is excluded by .reqvireignore pattern.
   * derivedFrom: ActiveRequirements.md#test-root
 EOF
 
-# Run reqvire summary
+# Run reqvire search
 set +e
-OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" summary 2>&1)
+OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" search 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -330,9 +330,9 @@ This file matches excluded-*.md pattern in .gitignore.
   * derivedFrom: NormalRequirements.md#test-root
 EOF
 
-# Run reqvire summary without .reqvireignore
+# Run reqvire search without .reqvireignore
 set +e
-OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" summary 2>&1)
+OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" search 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -479,9 +479,9 @@ This file SHOULD be processed.
   * derivedFrom: normal-file.md#test-root
 EOF
 
-# Run reqvire summary
+# Run reqvire search
 set +e
-OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" summary 2>&1)
+OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" search 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -582,9 +582,9 @@ This file matches reqvire-only-excluded-*.md pattern in .reqvireignore.
   * derivedFrom: ProcessedRequirements.md#test-root
 EOF
 
-# Run reqvire summary without .gitignore
+# Run reqvire search without .gitignore
 set +e
-OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" summary 2>&1)
+OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" search 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -676,9 +676,9 @@ This file should be processed (not a reserved filename).
   * derivedFrom: AllRequirements.md#test-root
 EOF
 
-# Run reqvire summary without any ignore files
+# Run reqvire search without any ignore files
 set +e
-OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" summary 2>&1)
+OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" search 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -806,9 +806,9 @@ Reserved AI instruction file - should be excluded.
   * derivedFrom: ValidRequirements.md#test-root
 EOF
 
-# Run reqvire summary
+# Run reqvire search
 set +e
-OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" summary 2>&1)
+OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" search 2>&1)
 EXIT_CODE=$?
 set -e
 

@@ -4,99 +4,136 @@ This document contains verification tests for Reqvire's report generation capabi
 
 ## Report Generation Tests
 
-### Model Summary Tests
+### Search Command Tests
 
-This test verifies that the system provides a CLI flag and functionality for generating summary reports of model structure and relationships including varius filters.
+This test verifies that the system provides a unified `search` command functionality for searching and filtering model elements with comprehensive filter options and output modes.
 
 #### Details
 
 ##### Acceptance Criteria
-- Running `reqvire summary --json` produces a valid, pretty-printed JSON summary.
-- Running `reqvire summary` (no `--json`) prints a human-readable markdown text summary beginning with `--- MBSE Model summary ---`.
-- Both JSON and text summaries include exactly five elements with the identifiers:
-  - `Requirement-with-Valid-Standard-Relations`
-  - `Requirement-with-Valid-Markdown-Relations`
-  - `Requirement-with-DesignSpecifications-Reference`
-  - `Requirement-with-Many-Subsections`
-  - `Verification-of-Standard-Relations`
-- When any filter flags (`--filter-file`, `--filter-section`, `--filter-type`, `--filter-name`, `--filter-content`, `--filter-is-verified`, `--filter-is-satisfied`) are supplied with `summary` (and optionally `--json`), only elements matching **all** specified filters appear in both outputs.
-- Supplying multiple filters in combination yields the intersection of their individual results.
-- Supplying an invalid regex to `--filter-name` or `--filter-content` fails with a non-zero exit code and displays a `ReqvireError::InvalidRegex` message.
-- Model summary report must include all relations for each element, showing both explicit relations and their opposite relations (e.g., if a requirement has `verifiedBy`, the verification element should show `verify`; if a verification has `verify`, the requirement should show `verifiedBy`).
-- **Enhanced Content Display**: Model summary must display page content (frontmatter before first section) and section content (content between section headers and first element).
-- **Count Information**: Model summary must show counts for files, pages, sections, and elements in both text and JSON formats.
-- **Content Formatting**: Page content and section content must use consistent newline formatting (`\n`) matching element content display format.
-- **Global Statistics**: Summary must include comprehensive global counters including total files, sections, elements, and verification/satisfaction statistics.
+- Running `reqvire search --json` produces a valid, pretty-printed JSON search result
+- Running `reqvire search` (no `--json`) prints a human-readable text search result
+- Running `reqvire search --short` produces abbreviated text output (one-line per element format: `[type] identifier - name`)
+- Running `reqvire search --short --json` produces abbreviated JSON output (omits specified fields)
+- Both JSON and text outputs include all elements matching filter criteria
+- All filter flags work individually and in combination (conjunctive AND logic)
+- Supplying an invalid regex to any regex-based filter fails with a non-zero exit code and displays a clear error message
+- Search results must include all relations for each element
+- **Enhanced Content Display**: Search must display page content (frontmatter before first section) and section content (content between section headers and first element) when not in short mode
+- **Count Information**: Search must show counts for files, pages, sections, and elements in full mode (omitted in short mode)
+- **Short Mode Behavior**: Short mode omits: `content`, `section_content`, `page_content`, `verified_relations_count`, `satisfied_relations_count`, `element_count`, `total_sections`, `total_elements`, `global_counters`
 
 ##### Test Criteria
-1. **Base JSON summary**
-   Command: `reqvire summary --json`
+1. **Base JSON search**
+   Command: `reqvire search --json`
    - exits code **0**
    - output parses under `jq`
-   - `.model_summary.global_counters.total_elements == 5`
-   - `.model_summary.files` contains key `"Requirements.md"`
-   - `.model_summary.files["Requirements.md"]["Requirements"]` contains exactly the five identifiers above
+   - `.files` contains file path keys
+   - All elements included when no filters specified
 
-2. **Base text summary**
-   Command: `reqvire summary`
+2. **Base text search**
+   Command: `reqvire search`
    - exits code **0**
-   - first line is `--- MBSE Model summary ---`
-   - exactly five lines matching `🔹 Element: <identifier>` for the five identifiers above
-   - each element block includes `- Name:`, `- Section:`, `- File:`, `- Type:`, and `- Content:`
+   - human-readable output with hierarchical structure
+   - each element block includes identifier, name, section, file, type, content
+   - relations displayed for each element
 
-3. **Individual filters**
+3. **Short mode text output**
+   Command: `reqvire search --short`
+   - exits code **0**
+   - one line per element: `[type] identifier - name`
+   - no content, section content, or page content displayed
+   - no count information displayed
+
+4. **Short mode JSON output**
+   Command: `reqvire search --short --json`
+   - exits code **0**
+   - output parses as valid JSON
+   - element objects do NOT contain: `content`, `verified_relations_count`, `satisfied_relations_count`
+   - section objects do NOT contain: `section_content`, `element_count`
+   - file objects do NOT contain: `page_content`, `total_sections`, `total_elements`
+   - top level does NOT contain: `global_counters`
+
+5. **Individual filters**
    For each flag in turn, run both JSON and text modes:
-   - `--filter-file="Requirements.md"`
-   - `--filter-section="Requirements"`
-   - `--filter-type="user-requirement"`
-   - `--filter-name="^Requirement with Valid Standard"`
-   - `--filter-content="subsection"`
-   - `--filter-is-verified`
-   - `--filter-is-satisfied`
+   - `--filter-file="**/*Reqs.md"` (glob)
+   - `--filter-name=".*safety.*"` (regex)
+   - `--filter-section="System*"` (glob)
+   - `--filter-type="user-requirement"` (exact)
+   - `--filter-content="MUST"` (regex)
+   - `--filter-section-content="implement.*"` (regex)
+   - `--filter-page-content="architecture"` (regex)
+   - `--have-relations=verifiedBy` (comma-separated)
+   - `--not-have-relations=verifiedBy` (comma-separated)
    Assert for each:
    - exit code **0**
-   - total elements < 5 (unless the filter matches all)
-   - only the expected subset of identifiers appears
+   - only elements matching the filter appear in output
 
-4. **Filter combinations**
-   Combine two filters (e.g. `--filter-type=user-requirement` + `--filter-is-satisfied`) and verify both outputs contain exactly those identifiers passing both filters.
+6. **Filter combinations**
+   Combine multiple filters and verify outputs contain exactly those elements passing ALL filters:
+   - `--filter-type=user-requirement --have-relations=verifiedBy,satisfiedBy`
+   - `--filter-section="System*" --filter-name=".*GPS.*"`
+   - `--filter-content="MUST" --not-have-relations=verifiedBy`
 
-5. **Invalid regex**
-   Command: `reqvire summary --json --filter-name="***"`
+7. **Invalid regex**
+   Command: `reqvire search --json --filter-name="***"`
    - exits non-zero
-   - stderr contains `Invalid regex`
+   - stderr contains error message with faulty pattern
 
-6. **Relations coverage**
-   Command: `reqvire summary --json`
-   - For any requirement with `verifiedBy` relations, verify that the target verification elements show corresponding `verify` relations pointing back to the requirement
-   - For any verification with `verify` relations, verify that the target requirement elements show corresponding `verifiedBy` relations pointing back to the verification
-   - Same pattern applies to other relation pairs: `satisfiedBy`/`satisfy`, `derivedFrom`/`derive`
-   - Both JSON and text outputs must show complete bidirectional relationship information
+8. **Invalid relation type**
+   Command: `reqvire search --have-relations=invalidRelationType`
+   - exits non-zero
+   - stderr contains error with list of valid relation types
 
-7. **Enhanced content and counts verification**
-   Command: `reqvire summary --json`
-   - JSON output must include `page_content` field for files that have frontmatter content
-   - JSON output must include `section_content` field for sections that have content
-   - JSON output must include count fields: `total_files`, `total_sections`, `total_elements` in global counters
-   - JSON output must include per-file counts: `total_sections`, `total_elements` in file summaries
-   - JSON output must include per-section counts: `element_count` in section summaries
+9. **Multiple relations in have-relations**
+   Command: `reqvire search --have-relations=verifiedBy,satisfiedBy`
+   - exits code **0**
+   - only elements that have BOTH verifiedBy AND satisfiedBy relations appear
+   - elements with only one of the relations are excluded
 
-8. **Enhanced text output verification**
-   Command: `reqvire summary`
-   - Text output must show file counts in format: `📂 File: path (sections: N, elements: N)`
-   - Text output must show section counts in format: `📖 Section: name (elements: N)`
-   - Text output must display page content with `📄 Page content: "content with \n"` format when present
-   - Text output must display section content with `📝 Section content: "content with \n"` format when present
-   - Global summary must include counts for total files, sections, and elements
+10. **Multiple relations in not-have-relations**
+    Command: `reqvire search --not-have-relations=verifiedBy,satisfiedBy`
+    - exits code **0**
+    - only elements that do NOT have ALL specified relations appear
+    - if element lacks verifiedBy OR satisfiedBy (or both), it is included
+
+11. **Section content filter**
+    Command: `reqvire search --filter-section-content="MUST.*implement"`
+    - exits code **0**
+    - only elements whose parent section content matches regex appear
+    - elements in sections without matching content are excluded
+
+12. **Page content filter**
+    Command: `reqvire search --filter-page-content="architecture"`
+    - exits code **0**
+    - only elements whose parent file page content matches regex appear
+    - elements in files without matching page content are excluded
+
+13. **Relations coverage**
+    Command: `reqvire search --json`
+    - Both JSON and text outputs must show complete relationship information
+    - All relation types and targets included
+
+14. **Enhanced content and counts verification (full mode)**
+    Command: `reqvire search --json`
+    - JSON output must include `page_content` field for files that have frontmatter content
+    - JSON output must include `section_content` field for sections that have content
+    - JSON output must include count fields in global counters
+    - JSON output must include per-file and per-section counts
+
+15. **Short mode field omission verification**
+    Command: `reqvire search --short --json`
+    - Verify all specified fields are omitted from JSON structure
+    - Verify no null/empty placeholders for omitted fields (fields completely absent)
 
 #### Metadata
   * type: test-verification
 
 #### Relations
-  * verify: [Display Name-Regex Option in Help](../ReqvireTool/UserInterface/CLI.md#display-name-regex-option-in-help)
-  * verify: [Model Summary Fine Grained Filtering](../ReqvireTool/ValidationAndReporting/Reports.md#model-summary-fine-grained-filtering)
-  * verify: [Handle Invalid Regex Filter Patterns](../ReqvireTool/UserInterface/CLI.md#handle-invalid-regex-filter-patterns)
-  * satisfiedBy: [test.sh](../../tests/test-model-summary-reports/test.sh)
+  * verify: [CLI Search Command](../ReqvireTool/UserInterface/CLI.md#cli-search-command)
+  * verify: [Search Fine Grained Filtering](../ReqvireTool/ValidationAndReporting/Reports.md#search-fine-grained-filtering)
+  * verify: [Search Report Generator](../ReqvireTool/ValidationAndReporting/Reports.md#search-report-generator)
+  * satisfiedBy: [test.sh](../../tests/test-search-all-features/test.sh)
 ---
 
 ### Verification Coverage Report Test
@@ -158,58 +195,6 @@ This test verifies that the system correctly generates verification coverage rep
   * satisfiedBy: [test.sh](../../tests/test-coverage-report/test.sh)
 ---
 
-### Sections Summary Tests
-
-This test verifies that the system provides `section-summary` command functionality for generating focused reports of file and section structure without individual elements.
-
-#### Details
-
-##### Acceptance Criteria
-- Running `reqvire section-summary --json` produces a valid, pretty-printed JSON summary with sections information.
-- Running `reqvire section-summary` (no `--json`) prints a human-readable text summary showing files and sections.
-- Both JSON and text outputs include file paths, section names, section order indices, and section content.
-- Section order indices preserve the original document structure and enable reconstruction.
-- Individual elements (requirements, verifications) are excluded from the output.
-- When filter flags are supplied, only sections matching **all** specified filters appear in both outputs.
-- Command supports filtering by file path (glob), section name (glob), and section content (regex).
-- JSON output includes section order information for document structure reconstruction.
-
-##### Test Criteria
-1. **Base JSON sections summary**
-   Command: `reqvire section-summary --json`
-   - exits code **0**
-   - output parses under `jq`
-   - `.files` contains file path keys
-   - Each file contains sections with `name`, `content`, and `section_order` fields
-   - No individual elements are included in the output
-
-2. **Base text sections summary**
-   Command: `reqvire section-summary`
-   - exits code **0**
-   - output shows file paths and section information
-   - sections are ordered by their `section_order` index
-   - section content is displayed but individual elements are not
-
-3. **Section filtering**
-   For each filter flag, run both JSON and text modes:
-   - `--filter-file="Requirements.md"` (glob pattern)
-   - `--filter-section="Requirements*"` (glob pattern)
-   - `--filter-content="system"` (regex pattern)
-   - Each filter produces subset of sections matching criteria
-   - Filters work independently and in combination
-
-4. **Section order preservation**
-   - JSON output includes `section_order` field for each section
-   - Text output displays sections in document order
-   - Order indices enable reconstruction of original document structure
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * verify: [CLI Sections Summary Command](../ReqvireTool/UserInterface/CLI.md#cli-sections-summary-command)
-  * satisfiedBy: [test.sh](../../tests/test-sections-summary/test.sh)
----
 
 ### Verification Traces Filter Options Test
 
@@ -516,5 +501,5 @@ This test verifies that the system correctly tracks and displays custom element 
 
 #### Relations
   * verify: [Custom Element Type Tracking](../ReqvireTool/ValidationAndReporting/Reports.md#custom-element-type-tracking)
-  * satisfiedBy: [test.sh](../../tests/test-model-summary-reports/test.sh)
+  * satisfiedBy: [test.sh](../../tests/test-search-all-features/test.sh)
 ---

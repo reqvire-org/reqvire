@@ -1016,6 +1016,7 @@ pub fn generate_model_report(
     registry: &GraphRegistry,
     root_element_name: Option<&str>,
     json_output: bool,
+    diagram_direction: &str,  // "LR" or "TD"
 ) -> Result<String, ReqvireError> {
     use std::collections::HashSet;
 
@@ -1068,7 +1069,7 @@ pub fn generate_model_report(
             .map_err(|e| ReqvireError::SerializationError(e.to_string()))
     } else {
         // Generate text with mermaid diagrams
-        Ok(generate_model_text(&report))
+        Ok(generate_model_text(&report, diagram_direction))
     }
 }
 
@@ -1197,7 +1198,7 @@ fn count_relations_recursive(registry: &GraphRegistry, element_id: &str, visited
 }
 
 /// Generate text output for model-centric report with mermaid diagrams
-fn generate_model_text(report: &ModelCentricReport) -> String {
+fn generate_model_text(report: &ModelCentricReport, diagram_direction: &str) -> String {
     let mut output = String::new();
 
     output.push_str("# Model Structure\n\n");
@@ -1212,14 +1213,14 @@ fn generate_model_text(report: &ModelCentricReport) -> String {
 
     // Elements with mermaid diagrams
     for element in &report.elements {
-        output.push_str(&generate_element_text(element, 0));
+        output.push_str(&generate_element_text(element, 0, diagram_direction));
     }
 
     output
 }
 
 /// Generate text for an element with mermaid diagram showing its relations
-fn generate_element_text(element: &ModelCentricElement, depth: usize) -> String {
+fn generate_element_text(element: &ModelCentricElement, depth: usize, diagram_direction: &str) -> String {
     let indent = "  ".repeat(depth);
     let mut output = String::new();
 
@@ -1232,7 +1233,7 @@ fn generate_element_text(element: &ModelCentricElement, depth: usize) -> String 
     // Mermaid diagram for this element's relations
     if !element.relations.is_empty() {
         output.push_str(&format!("{}```mermaid\n", indent));
-        output.push_str(&format!("{}graph TD\n", indent));
+        output.push_str(&format!("{}graph {}\n", indent, diagram_direction));
 
         // Add CSS class definitions for colors
         output.push_str(&format!("{}  classDef userRequirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;\n", indent));

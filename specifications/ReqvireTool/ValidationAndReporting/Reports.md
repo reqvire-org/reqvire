@@ -1,47 +1,49 @@
 # Reports
 
-## Model Summary Reports
+## Element Search Reports
 
-### Model Summary Report Generator
+### Search Report Generator
 
-The system shall implement a summary report generator that  produces comprehensive summaries of model relationships, including key metrics, element counts by type and counts.
+The system shall implement a search report generator that produces comprehensive element searches with filtering, supporting both full and abbreviated output modes.
 
 #### Details
-The summary report must include:
+The search report must include:
 
 **File-level Information:**
 - File path and name
 - Number of sections per file
 - Number of elements per file
-- Page content (frontmatter content before first section header)
+- Page content (frontmatter content before first section header) - omitted in short mode
 
 **Section-level Information:**
 - Section name and hierarchy
-- Number of elements per section
-- Section content (content between section header and first element, excluding generated diagrams)
+- Number of elements per section - omitted in short mode
+- Section content (content between section header and first element, excluding generated diagrams) - omitted in short mode
 
 **Element Information:**
 - Element identifier, name, type, and section
-- Element content
-- Verified and satisfied relations counts
+- Element content - omitted in short mode
+- Verified and satisfied relations counts - omitted in short mode
 - Complete list of relations with targets and types
 
 **Global Counts:**
-- Total files, pages, sections, and elements
-- Requirements by type (system, user)
-- Verifications by type (test, analysis, inspection, demonstration)
-- Missing relations (unverified and unsatisfied requirements)
+- Total files, pages, sections, and elements - omitted in short mode
+- Requirements by type (system, user) - omitted in short mode
+- Verifications by type (test, analysis, inspection, demonstration) - omitted in short mode
+- Missing relations (unverified and unsatisfied requirements) - omitted in short mode
 
 **Output Formats:**
 - Human-readable text format with hierarchical display
+- Human-readable abbreviated text format (with --short flag): one-line per element showing `[type] identifier - name`
 - JSON format for programmatic processing
-- Cypher format for graph database import
+- JSON abbreviated format (with --short flag): omits content, section_content, page_content, verified_relations_count, satisfied_relations_count, element_count, total_sections, total_elements, global_counters
 
-The system must support filtering by file path, element name, section, type, content, verification status, and satisfaction status. All filters are applied conjunctively.
+The system must support comprehensive filtering by file path, element name, section, type, element content, section content, page content, and relation presence. All filters are applied conjunctively.
 
 #### Relations
   * derivedFrom: [Model Structure and Summaries](../../UserRequirements.md#model-structure-and-summaries)
   * satisfiedBy: [reports.rs](../../../core/src/reports.rs)
+  * satisfiedBy: [search.rs](../../../core/src/search.rs)
 ---
 
 ### Custom Element Type Tracking
@@ -74,51 +76,23 @@ The custom element type tracking feature must:
 - File-type elements SHALL NOT be counted as custom types
 
 #### Relations
-  * derivedFrom: [Model Summary Report Generator](#model-summary-report-generator)
+  * derivedFrom: [Search Report Generator](#search-report-generator)
   * satisfiedBy: [reports.rs](../../../core/src/reports.rs)
 ---
 
-### Sections Summary Report Generator
 
-The system shall implement a sections summary report generator that produces focused summaries showing only file paths, section names, section order indices, and section content without individual elements.
+### Search Fine Grained Filtering
 
-#### Details
-The sections summary report must include:
-
-**File-level Information:**
-- File path and name
-- Number of sections per file
-- Page content (frontmatter content before first section header)
-
-**Section-level Information:**
-- Section name and hierarchy
-- Section order index (original document order)
-- Section content (content between section header and first element, excluding generated diagrams)
-
-**Output Formats:**
-- Human-readable text format with hierarchical display preserving section order
-- JSON format for programmatic processing with section order information
-
-The system must support filtering by file path (glob pattern), section name (glob pattern), and section content (regex pattern). All filters are applied conjunctively. The JSON output shall include section order information to enable reconstructing the original document structure.
-
-#### Relations
-  * derivedFrom: [CLI Summary Report Command](../UserInterface/CLI.md#cli-summary-report-command)
-  * derivedFrom: [Deterministic Output for All Generated Content](#deterministic-output-for-all-generated-content)
-  * satisfiedBy: [sections_summary.rs](../../../core/src/sections_summary.rs)
----
-
-### Model Summary Fine Grained Filtering
-
-The system shall implement a fine grained filtering for the  summary report generator following the specifications.
+The system shall implement comprehensive fine-grained filtering for the search report generator following the specifications below.
 
 #### Details
 <details><summary>View Full Specification</summary>
 
 ## Summary
 
-This specification defines the functional requirements for a filtering subsystem used within the `model-summary` reporting feature. The system must allow clients to selectively include or exclude elements from the summary output based on metadata, content, and traceability properties.
+This specification defines the functional requirements for a filtering subsystem used within the `search` reporting feature. The system must allow clients to selectively include or exclude elements from the search output based on metadata, content, and traceability properties.
 
-The filters shall be composable and applied conjunctively (i.e., all active filters must match for an element to be included). The filtering system must support both human-readable text output and structured machine-readable output (e.g., JSON).
+The filters shall be composable and applied conjunctively (i.e., all active filters must match for an element to be included). The filtering system must support both human-readable text output and structured machine-readable output (e.g., JSON), as well as abbreviated short mode output.
 
 ---
 
@@ -132,6 +106,8 @@ Filtering shall operate on the level of individual `Element` objects in the mode
 - `element_type: ElementType`
 - `content: String`
 - `relations: Vec<Relation>`
+- `section_content: String` (from parent section)
+- `page_content: String` (from parent file)
 
 ---
 
@@ -141,7 +117,7 @@ The filtering system **must support the following filters**, which may be active
 
 ### 1. File Path Filter (Glob)
 
-**Purpose:** Restrict summary to elements defined in files whose paths match a given glob pattern.
+**Purpose:** Restrict search to elements defined in files whose paths match a given glob pattern.
 
 **Input:** A single string pattern using glob syntax (e.g., `"src/**/*Spec.md"`)
 
@@ -205,33 +181,57 @@ The filtering system **must support the following filters**, which may be active
 
 ---
 
-### 6. Not Verified Filter (Boolean)
+### 6. Section Content Filter (Regex)
 
-**Purpose:** Include only requirement elements that are not connected via a `verifiedBy` or `verify` relation.
+**Purpose:** Include only elements whose parent section content matches a regular expression.
 
-**Input:** Boolean flag
+**Input:** A valid regex pattern applied to the section's content.
 
-**Match Target:** `Element.relations`
+**Match Target:** Section content of the element's parent section
 
-**Behavior:** When enabled, any element with one or more verification-related relations must be excluded.
+**Behavior:** Case-sensitive regex match. Invalid patterns must cause an immediate user-facing error.
 
 ---
 
-### 7. Not Satisfied Filter (Boolean)
+### 7. Page Content Filter (Regex)
 
-**Purpose:** Include only requirement elements that are not connected via a `satisfiedBy` or `satisfy` relation.
+**Purpose:** Include only elements whose parent file's page content (frontmatter) matches a regular expression.
 
-**Input:** Boolean flag
+**Input:** A valid regex pattern applied to the file's page content.
+
+**Match Target:** Page content (frontmatter) of the element's parent file
+
+**Behavior:** Case-sensitive regex match. Invalid patterns must cause an immediate user-facing error.
+
+---
+
+### 8. Have Relations Filter (Comma-separated list)
+
+**Purpose:** Include only elements that have ALL specified relation types.
+
+**Input:** Comma-separated list of relation type names (e.g., `"verifiedBy,satisfiedBy"`)
 
 **Match Target:** `Element.relations`
 
-**Behavior:** when enabled, any element with one or more satisfaction-related relations must be excluded.
+**Behavior:** When specified, element must have at least one relation of each specified type to be included. Invalid relation type names shall cause an error with a list of valid relation types.
+
+---
+
+### 9. Not Have Relations Filter (Comma-separated list)
+
+**Purpose:** Include only elements that do NOT have ALL specified relation types.
+
+**Input:** Comma-separated list of relation type names (e.g., `"verifiedBy"`)
+
+**Match Target:** `Element.relations`
+
+**Behavior:** When specified, element must NOT have all the specified relation types to be included. If element has all specified relation types, it is excluded. Invalid relation type names shall cause an error with a list of valid relation types.
 
 ---
 
 ## Filter Composition
 
-All filters are applied **conjunctively**. That is, an element is included in the summary **only if all active filters return `true`** for that element.
+All filters are applied **conjunctively**. That is, an element is included in the search results **only if all active filters return `true`** for that element.
 
 ---
 
@@ -240,28 +240,19 @@ All filters are applied **conjunctively**. That is, an element is included in th
 - Invalid regular expressions must produce a fatal error with a descriptive message.
 - Invalid glob patterns should fail at startup with appropriate feedback.
 - Unknown or malformed `type` filters should be rejected with a list of accepted values.
-
----
-
-## Extension Considerations
-
-The filtering system must be designed to allow future additions, including:
-
-- Filtering by relation type presence (e.g., "has any relation")
-- Filtering by linked element types (e.g., "verifiedBy test-verification")
-- Inversion (e.g., "not in section X")
+- Invalid relation type names in `--have-relations` or `--not-have-relations` shall produce an error listing valid relation types.
 
 ---
 
 ## Output Behavior
 
-Filtered results must be consistent across all output modes (text, JSON, HTML). The final summary must include only elements passing the full filter set, and global counters should reflect the filtered subset.
+Filtered results must be consistent across all output modes (text, JSON, short text, short JSON). The final search results must include only elements passing the full filter set, and global counters should reflect the filtered subset.
 
 ---
 
 ## Performance Considerations
 
-The filtering system must evaluate filters with minimal passes over element data. Repeated relation scans (e.g., for verification/satisfaction) should be avoided in favor of single-pass accumulation.
+The filtering system must evaluate filters with minimal passes over element data. Repeated relation scans should be avoided in favor of single-pass accumulation.
 
 ---
 
@@ -271,18 +262,21 @@ The filtering system must evaluate filters with minimal passes over element data
 |--------------------|------------------|
 | `type = verification` | Only verification elements |
 | `section = "System*"` + `name = ".*GPS.*"` | System section elements with GPS in name |
-| `type = system-requirement` + `not_verified = true` | Unverified system requirements only |
+| `have-relations = verifiedBy,satisfiedBy` | Elements that have both verifiedBy AND satisfiedBy relations |
+| `not-have-relations = verifiedBy` | Elements that do NOT have any verifiedBy relations |
+| `filter-section-content = "MUST.*implement"` | Elements in sections whose content matches the pattern |
+| `filter-page-content = "architecture"` | Elements in files whose frontmatter contains "architecture" |
 
 ---
-
 
 </details>
 
 #### Relations
   * satisfiedBy: [reports.rs](../../../core/src/reports.rs)
+  * satisfiedBy: [search.rs](../../../core/src/search.rs)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
-  * derivedFrom: [Model Summary Report Generator](#model-summary-report-generator)
-  * verifiedBy: [Model Summary Tests](../../Verifications/ReportsTests.md#model-summary-tests)
+  * derivedFrom: [Search Report Generator](#search-report-generator)
+  * verifiedBy: [Search Command Tests](../../Verifications/ReportsTests.md#search-command-tests)
 ---
 
 ### Deterministic Output for All Generated Content
@@ -361,7 +355,7 @@ The report structure shall include:
 
 #### Relations
   * derivedFrom: [Verification Coverage Report](../../UserRequirements.md#verification-coverage-report)
-  * derivedFrom: [Model Summary Report Generator](#model-summary-report-generator)
+  * derivedFrom: [Search Report Generator](#search-report-generator)
   * derivedFrom: [Deterministic Output for All Generated Content](#deterministic-output-for-all-generated-content)
 ---
 

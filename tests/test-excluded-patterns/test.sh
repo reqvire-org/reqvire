@@ -17,9 +17,9 @@ echo "Starting test..." > "${TEST_DIR}/test_results.log"
 # - Only the file itself should be in the registry for relation validation
 
 
-echo "Running: reqvire model-summary" >> "${TEST_DIR}/test_results.log"
+echo "Running: reqvire search" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" summary 2>&1)
+OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" search 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -38,9 +38,9 @@ if echo "$OUTPUT" | grep -q "Missing relation target"; then
 fi
 
 # There should also be no elements from excluded files in the registry
-echo "Running: reqvire summary (2nd check)" >> "${TEST_DIR}/test_results.log"
+echo "Running: reqvire search (2nd check)" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" summary 2>&1 | grep -n 'Element:')
+OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" search 2>&1 | grep -n 'Element:')
 set -e
 
 if echo "$OUTPUT" | grep -q "DesignSpecifications"; then

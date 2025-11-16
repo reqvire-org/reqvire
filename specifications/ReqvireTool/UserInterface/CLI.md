@@ -121,75 +121,44 @@ The system shall implement detailed error handling and logging throughout the ap
   * satisfiedBy: [error.rs](../../../core/src/error.rs)
 ---
 
-### CLI Summary Report Command
+### CLI Search Command
 
-The system shall provide a model summary report function, activated by the `summary` root command, which shall generate model summary report with ability to be passed several filters.
+The system shall provide a unified search function, activated by the `search` root command, which shall search and report on model elements with comprehensive filtering capabilities.
 
 #### Details
-Model summary CLI command:
-- `summary`:  Output model registry and summary to stdout, also supports json and cypher output.
+Search command features:
+- `search`: Search model elements and output results to stdout
+- Support `--json` flag for structured JSON output
+- Support `--short` flag for abbreviated output (both text and JSON)
+- Support comprehensive filter options (all combinable):
+  - By file path glob: `--filter-file="src/**/*Reqs.md"`
+  - By element name regex: `--filter-name=".*safety.*"`
+  - By section name glob: `--filter-section="System*"`
+  - By element type: `--filter-type="system-requirement"` (exact match)
+  - By element content regex: `--filter-content="MUST"`
+  - By section content regex: `--filter-section-content="MUST.*implement"`
+  - By page content regex: `--filter-page-content="architecture"`
+  - By having relations: `--have-relations=verifiedBy,satisfiedBy` (comma-separated, must have ALL)
+  - By not having relations: `--not-have-relations=verifiedBy` (comma-separated, must NOT have ALL)
 
-All filters can be combined with the command:
-- `summary`:  Output model registry and summary, also supports json and cypher output.
-  - By file path: `summary --filter-file="src/**/*Reqs.md"`
-  - By name: `summary --filter-name=".*safety.*"`
-  - By section: `summary --filter-section="System*"`
-  - By type: `summary --filter-type="system-requirement"` (exact match)
-  - By content: `summary --filter-content="MUST"`
-  - Not verified: `summary --filter-is-not-verified`
-  - Not satisfied: `summary --filter-is-not-satisfied`
+Short mode behavior:
+- Text output: Display abbreviated one-line format per element
+- JSON output: Omit fields: `content`, `section_content`, `page_content`, `verified_relations_count`, `satisfied_relations_count`, `element_count`, `total_sections`, `total_elements`, `global_counters`
 
-Must support `--json` and `--cypher` flags to output either json formatted string or valid Cypher queries that when executed in graph database produce valid graph of a system model.
+Error handling:
+- Invalid regex patterns shall return clear error message showing the faulty pattern and exit
+- Invalid relation type names shall return error with list of valid relation types
+
+Default output:
+- Human-readable text format when neither `--json` nor `--short` is specified
+- Full detail mode showing all element metadata and relations
 
 #### Relations
-  * derivedFrom: [Model Summary Report Generator](../ValidationAndReporting/Reports.md#model-summary-report-generator)
+  * derivedFrom: [Search Report Generator](../ValidationAndReporting/Reports.md#search-report-generator)
+  * derivedFrom: [Search Fine Grained Filtering](../ValidationAndReporting/Reports.md#search-fine-grained-filtering)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
----
-
-### Handle Invalid Regex Filter Patterns
-
-When the user invokes Reqvire with the `summary` command and invalid regular expression to regex based filters are provided the system shall return an error showing the faulty pattern and exit without producing a summary.
-
-#### Relations
-  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
-  * derivedFrom: [CLI Summary Report Command](#cli-summary-report-command)
-  * verifiedBy: [Model Summary Tests](../../Verifications/ReportsTests.md#model-summary-tests)
----
-
-### Display Name-Regex Option in Help
-
-When the user requests help (`--help` or `-h`), the system shall list summary filter flags under the SUMMARY OPTIONS heading, including descriptions for all filter options.
-
-#### Relations
-  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
-  * derivedFrom: [CLI Summary Report Command](#cli-summary-report-command)
-  * verifiedBy: [Model Summary Tests](../../Verifications/ReportsTests.md#model-summary-tests)
----
-
-### CLI Sections Summary Command
-
-The system shall provide a command-line interface root command `section-summary` that generates sections summary reports with filtering capabilities.
-
-#### Details
-Sections summary CLI command:
-- `section-summary`: Output file paths, section names, section order indices, and section content without individual elements
-- Support `--json` flag for JSON output format
-- Support filtering flags that can be combined:
-  - By file path (glob): `--filter-file="src/**/*Reqs.md"`
-  - By section name (glob): `--filter-section="System*"`
-  - By section content (regex): `--filter-content="MUST"`
-- Default to human-readable text output when JSON flag is not present
-- Exit with status code 0 on success
-- Exit with non-zero status code on errors
-
-Command output shall be written to stdout for easy redirection to files.
-
-#### Relations
-  * derivedFrom: [Sections Summary Report Generator](../ValidationAndReporting/Reports.md#sections-summary-report-generator)
-  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
-  * satisfiedBy: [sections_summary.rs](../../../core/src/sections_summary.rs)
-  * verifiedBy: [Sections Summary Tests](../../Verifications/ReportsTests.md#sections-summary-tests)
+  * verifiedBy: [Search Command Tests](../../Verifications/ReportsTests.md#search-command-tests)
 ---
 
 ### CLI Model Diagram Command

@@ -12,7 +12,6 @@ use reqvire::export;
 use reqvire::change_impact;
 use reqvire::git_commands;
 use reqvire::matrix_generator;
-use reqvire::sections_summary;
 use reqvire::verification_trace;
 use crate::serve;
 use reqvire::lint;
@@ -95,64 +94,52 @@ pub enum Commands {
     /// Remove all generated mermaid diagrams from markdown files
     RemoveDiagrams,
 
-    /// Output model registry and summary
-    #[clap(override_help = "Output model registry and summary\n\nSUMMARY OPTIONS:\n      --json                        Output results in JSON format\n      --filter-file <GLOB>          Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`\n      --filter-name <REGEX>         Only include elements whose name matches this regular expression\n      --filter-section <GLOB>       Only include sections whose name matches this glob pattern e.g. `System requirement*`\n      --filter-type <TYPE>          Only include elements of the given type e.g. `user-requirement`, `system-requirement`, `verification`, `file`, or other custom type\n      --filter-content <REGEX>      Only include elements whose content matches this regular expression\n      --filter-is-not-verified      Only include requirements that do NOT have any \"verifiedBy\" relations\n      --filter-is-not-satisfied     Only include requirements that do NOT have any \"satisfiedBy\" relations")]
-    Summary {
+    /// Search and filter model elements with comprehensive filtering options
+    #[clap(override_help = "Search and filter model elements with comprehensive filtering options\n\nSEARCH OPTIONS:\n      --json                            Output results in JSON format\n      --short                           Output abbreviated format (one-line per element)\n      --filter-file <GLOB>              Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`\n      --filter-name <REGEX>             Only include elements whose name matches this regular expression\n      --filter-section <GLOB>           Only include sections whose name matches this glob pattern e.g. `System requirement*`\n      --filter-type <TYPE>              Only include elements of the given type e.g. `user-requirement`, `system-requirement`, `verification`\n      --filter-content <REGEX>          Only include elements whose content matches this regular expression\n      --filter-section-content <REGEX>  Only include elements whose parent section content matches this regular expression\n      --filter-page-content <REGEX>     Only include elements whose parent file page content matches this regular expression\n      --have-relations <LIST>           Only include elements that have ALL specified relations (comma-separated)\n      --not-have-relations <LIST>       Only include elements that do NOT have ALL specified relations (comma-separated)")]
+    Search {
         /// Output results in JSON format
-        #[clap(long, help_heading = "SUMMARY OPTIONS")]
+        #[clap(long, help_heading = "SEARCH OPTIONS")]
         json: bool,
 
+        /// Output abbreviated format (one-line per element in text, omit fields in JSON)
+        #[clap(long, help_heading = "SEARCH OPTIONS")]
+        short: bool,
+
         /// Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`
-        #[clap(long, value_name = "GLOB", help_heading = "SUMMARY OPTIONS")]
+        #[clap(long, value_name = "GLOB", help_heading = "SEARCH OPTIONS")]
         filter_file: Option<String>,
 
         /// Only include elements whose name matches this regular expression
-        #[clap(long, value_name = "REGEX", help_heading = "SUMMARY OPTIONS")]
+        #[clap(long, value_name = "REGEX", help_heading = "SEARCH OPTIONS")]
         filter_name: Option<String>,
 
         /// Only include sections whose name matches this glob pattern e.g. `System requirement*`
-        #[clap(long, value_name = "GLOB", help_heading = "SUMMARY OPTIONS")]
+        #[clap(long, value_name = "GLOB", help_heading = "SEARCH OPTIONS")]
         filter_section: Option<String>,
 
-        /// Only include elements of the given type e.g. `user-requirement`, `system-requirement`, `verification`, `file`, or other custom type
-        #[clap(long, value_name = "TYPE", help_heading = "SUMMARY OPTIONS")]
+        /// Only include elements of the given type e.g. `user-requirement`, `system-requirement`, `verification`
+        #[clap(long, value_name = "TYPE", help_heading = "SEARCH OPTIONS")]
         filter_type: Option<String>,
 
         /// Only include elements whose content matches this regular expression
-        #[clap(long, value_name = "REGEX", help_heading = "SUMMARY OPTIONS")]
+        #[clap(long, value_name = "REGEX", help_heading = "SEARCH OPTIONS")]
         filter_content: Option<String>,
 
-        /// Only include requirements that do NOT have any "verifiedBy" relations
-        #[clap(long, help_heading = "SUMMARY OPTIONS")]
-        filter_is_not_verified: bool,
+        /// Only include elements whose parent section content matches this regular expression
+        #[clap(long, value_name = "REGEX", help_heading = "SEARCH OPTIONS")]
+        filter_section_content: Option<String>,
 
-        /// Only include requirements that do NOT have any "satisfiedBy" relations
-        #[clap(long, help_heading = "SUMMARY OPTIONS")]
-        filter_is_not_satisfied: bool,
+        /// Only include elements whose parent file page content matches this regular expression
+        #[clap(long, value_name = "REGEX", help_heading = "SEARCH OPTIONS")]
+        filter_page_content: Option<String>,
 
-        /// Output model as Cypher queries for graph database import. Cannot be used with --json
-        #[clap(long, hide = true, conflicts_with_all = &["json"], help_heading = "SUMMARY OPTIONS")]
-        cypher: bool,
-    },
+        /// Only include elements that have ALL specified relations (comma-separated, e.g., "verifiedBy,satisfiedBy")
+        #[clap(long, value_name = "LIST", help_heading = "SEARCH OPTIONS")]
+        have_relations: Option<String>,
 
-    /// Output sections summary showing files, section names, and section content without individual elements
-    #[clap(override_help = "Output sections summary showing files, section names, and section content without individual elements\n\nSECTION-SUMMARY OPTIONS:\n      --json                        Output results in JSON format\n      --filter-file <GLOB>          Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`\n      --filter-section <GLOB>       Only include sections whose name matches this glob pattern e.g. `System requirement*`\n      --filter-content <REGEX>      Only include sections whose content matches this regular expression")]
-    SectionSummary {
-        /// Output results in JSON format
-        #[clap(long, help_heading = "SECTION-SUMMARY OPTIONS")]
-        json: bool,
-
-        /// Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`
-        #[clap(long, value_name = "GLOB", help_heading = "SECTION-SUMMARY OPTIONS")]
-        filter_file: Option<String>,
-
-        /// Only include sections whose name matches this glob pattern e.g. `System requirement*`
-        #[clap(long, value_name = "GLOB", help_heading = "SECTION-SUMMARY OPTIONS")]
-        filter_section: Option<String>,
-
-        /// Only include sections whose content matches this regular expression
-        #[clap(long, value_name = "REGEX", help_heading = "SECTION-SUMMARY OPTIONS")]
-        filter_content: Option<String>,
+        /// Only include elements that do NOT have ALL specified relations (comma-separated, e.g., "verifiedBy")
+        #[clap(long, value_name = "LIST", help_heading = "SEARCH OPTIONS")]
+        not_have_relations: Option<String>,
     },
 
     /// Analise change impact and provides report
@@ -527,8 +514,7 @@ fn wants_json(args: &Args) -> bool {
         Some(Commands::Format { json, .. }) => *json,
         Some(Commands::Validate { json }) => *json,
         Some(Commands::ChangeImpact { json, .. }) => *json,
-        Some(Commands::Summary { json, .. }) => *json,
-        Some(Commands::SectionSummary { json, .. }) => *json,
+        Some(Commands::Search { json, .. }) => *json,
         Some(Commands::Matrix { json, .. }) => *json,
         Some(Commands::Traces { json, .. }) => *json,
         Some(Commands::Coverage { json }) => *json,
@@ -607,56 +593,41 @@ pub fn handle_command(
             info!("Generated diagrams removed from source files");
             return Ok(0);
         },
-        Some(Commands::Summary {
+        Some(Commands::Search {
             json,
-            cypher,
+            short,
             filter_file,
             filter_name,
             filter_section,
             filter_type,
             filter_content,
-            filter_is_not_verified,
-            filter_is_not_satisfied
+            filter_section_content,
+            filter_page_content,
+            have_relations,
+            not_have_relations,
         }) => {
-            let filters = reports::Filters::new(
+            // Build search filters
+            let filters = reqvire::search::SearchFilters::new(
                 filter_file.as_deref(),
                 filter_name.as_deref(),
                 filter_section.as_deref(),
                 filter_type.as_deref(),
                 filter_content.as_deref(),
-                filter_is_not_verified,
-                filter_is_not_satisfied,
-            ).map_err(|e| {
-                ReqvireError::ProcessError(format!("❌ Failed to construct filters: {}", e))
-            })?;
+                filter_section_content.as_deref(),
+                filter_page_content.as_deref(),
+                have_relations.as_deref(),
+                not_have_relations.as_deref(),
+            )?;
 
-            let output_format = if cypher {
-                reports::SummaryOutputFormat::Cypher
-            } else if json {
-                reports::SummaryOutputFormat::Json
-            } else {
-                reports::SummaryOutputFormat::Text
-            };
+            // Generate search report
+            let output = reqvire::search::generate_search_report(
+                &model_manager.graph_registry,
+                &filters,
+                json,
+                short,
+            )?;
 
-            reports::print_registry_summary(&model_manager.graph_registry,output_format, &filters);
-            return Ok(0);
-        },
-        Some(Commands::SectionSummary {
-            json,
-            filter_file,
-            filter_section,
-            filter_content
-        }) => {
-            let filters = sections_summary::SectionsFilters::new(
-                filter_file.as_deref(),
-                filter_section.as_deref(),
-                filter_content.as_deref(),
-            ).map_err(|e| {
-                eprintln!("{}", e);
-                std::process::exit(1);
-            }).unwrap();
-
-            sections_summary::print_sections_summary(&model_manager.graph_registry, json, &filters);
+            println!("{}", output);
             return Ok(0);
         },
         Some(Commands::ChangeImpact { json, git_commit }) => {
@@ -760,7 +731,8 @@ pub fn handle_command(
             let output = reports::generate_model_report(
                 &model_manager.graph_registry,
                 from.as_deref(),
-                json
+                json,
+                "LR"  // Left-to-right diagrams for markdown output
             )?;
             println!("{}", output);
             return Ok(0);

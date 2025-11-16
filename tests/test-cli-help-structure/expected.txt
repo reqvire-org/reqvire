@@ -9,8 +9,7 @@ Commands:
   validate          Validate model
   generate-diagrams Generate mermaid diagrams in markdown files showing requirements relationships. Diagrams are placed at the top of each section
   remove-diagrams   Remove all generated mermaid diagrams from markdown files
-  summary           Output model registry and summary
-  section-summary   Output sections summary showing files, section names, and section content without individual elements
+  search            Search and filter model elements with comprehensive filtering options
   change-impact     Analise change impact and provides report
   matrix            Generate verification traceability matrix showing requirements and their verification status
   traces            Generate verification traces showing upward paths from verifications to root requirements
@@ -43,22 +42,18 @@ VALIDATE OPTIONS:
 GENERATE DIAGRAMS OPTIONS:
       --links-with-blobs        Use GitHub blob URLs in diagram links instead of relative paths
 
-SUMMARY OPTIONS:
+SEARCH OPTIONS:
       --json                    Output results in JSON format
+      --short                   Output abbreviated format (one-line per element in text, omit fields in JSON)
       --filter-file <GLOB>      Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`
       --filter-name <REGEX>     Only include elements whose name matches this regular expression
       --filter-section <GLOB>   Only include sections whose name matches this glob pattern e.g. `System requirement*`
-      --filter-type <TYPE>      Only include elements of the given type e.g. `user-requirement`, `system-requirement`, `verification`, `file`, or other custom type
+      --filter-type <TYPE>      Only include elements of the given type e.g. `user-requirement`, `system-requirement`, `verification`
       --filter-content <REGEX>  Only include elements whose content matches this regular expression
-      --filter-is-not-verified  Only include requirements that do NOT have any "verifiedBy" relations
-      --filter-is-not-satisfied Only include requirements that do NOT have any "satisfiedBy" relations
-      --cypher                  Output model as Cypher queries for graph database import. Cannot be used with --json
-
-SECTION SUMMARY OPTIONS:
-      --json                    Output results in JSON format
-      --filter-file <GLOB>      Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`
-      --filter-section <GLOB>   Only include sections whose name matches this glob pattern e.g. `System requirement*`
-      --filter-content <REGEX>  Only include sections whose content matches this regular expression
+      --filter-section-content <REGEX> Only include elements whose parent section content matches this regular expression
+      --filter-page-content <REGEX> Only include elements whose parent file page content matches this regular expression
+      --have-relations <LIST>   Only include elements that have ALL specified relations (comma-separated, e.g., "verifiedBy,satisfiedBy")
+      --not-have-relations <LIST> Only include elements that do NOT have ALL specified relations (comma-separated, e.g., "verifiedBy")
 
 CHANGE IMPACT OPTIONS:
       --git-commit <GIT_COMMIT> Git commit hash to use when comparing models

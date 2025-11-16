@@ -527,7 +527,8 @@ pub fn generate_artifacts_in_temp(
     let model_report = crate::reports::generate_model_report(
         &temp_model_manager.graph_registry,
         None,  // No filtering - use root requirements
-        false  // Markdown output
+        false, // Markdown output
+        "TD"   // Top-down diagrams for HTML export
     )?;
     filesystem::write_file("model.md", model_report.as_bytes())?;
 

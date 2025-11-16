@@ -6,7 +6,7 @@ set -euo pipefail
 # Satisfies: TBD - specifications/Verifications/<file>.md#<verification-element>
 #
 # Acceptance Criteria:
-# - Custom element types (non-standard types) are tracked and counted in summary report
+# - Custom element types (non-standard types) are tracked and counted in search report
 # - Text output displays custom types as "Custom (type-name): count"
 # - JSON output includes "custom_element_types" object with correct counts
 # - Multiple custom types are sorted alphabetically in text output
@@ -16,8 +16,8 @@ set -euo pipefail
 #
 # Test Criteria:
 # - Commands exit with success (0) return code
-# - Text summary displays custom types in correct format
-# - JSON summary includes custom_element_types with correct counts
+# - Text search displays custom types in correct format
+# - JSON search includes custom_element_types with correct counts
 # - Custom types are alphabetically sorted in text output
 # - Standard types are excluded from custom type counting
 
@@ -28,7 +28,7 @@ echo "Starting test..." > "${TEST_DIR}/test_results.log"
 # Expected custom types: actor: 1, constraint: 1, moe: 2, use-case: 3
 echo "Test 1: Verifying JSON output with custom element types" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT_JSON=$(cd "$TEST_DIR" && "$REQVIRE_BIN" summary --json 2>&1)
+OUTPUT_JSON=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --json 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -36,7 +36,7 @@ echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
 printf "%s\n" "$OUTPUT_JSON" >> "${TEST_DIR}/test_results.log"
 
 if [ $EXIT_CODE -ne 0 ]; then
-    echo "FAILED: summary --json command exited with code $EXIT_CODE"
+    echo "FAILED: search --json command exited with code $EXIT_CODE"
     echo "$OUTPUT_JSON"
     exit 1
 fi
@@ -108,7 +108,7 @@ fi
 # Test 2: Text Output - Verify custom types display format and alphabetical sorting
 echo "Test 2: Verifying text output with custom element types" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT_TEXT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" summary 2>&1)
+OUTPUT_TEXT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -116,7 +116,7 @@ echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
 printf "%s\n" "$OUTPUT_TEXT" >> "${TEST_DIR}/test_results.log"
 
 if [ $EXIT_CODE -ne 0 ]; then
-    echo "FAILED: summary command exited with code $EXIT_CODE"
+    echo "FAILED: search command exited with code $EXIT_CODE"
     echo "$OUTPUT_TEXT"
     exit 1
 fi
@@ -243,14 +243,14 @@ git add . > /dev/null 2>&1
 git commit -m "Initial commit" > /dev/null 2>&1
 cd - > /dev/null 2>&1
 
-# Run summary on directory with no custom types
+# Run search on directory with no custom types
 set +e
-OUTPUT_NO_CUSTOM_JSON=$(cd "${TEMP_NO_CUSTOM}" && "$REQVIRE_BIN" summary --json 2>&1)
+OUTPUT_NO_CUSTOM_JSON=$(cd "${TEMP_NO_CUSTOM}" && "$REQVIRE_BIN" search --json 2>&1)
 EXIT_CODE=$?
 set -e
 
 if [ $EXIT_CODE -ne 0 ]; then
-    echo "FAILED: summary --json (no custom types) exited with code $EXIT_CODE"
+    echo "FAILED: search --json (no custom types) exited with code $EXIT_CODE"
     exit 1
 fi
 
@@ -262,14 +262,14 @@ if [ "$CUSTOM_TYPES_EMPTY" -ne 0 ]; then
     exit 1
 fi
 
-# Run summary in text format and verify no "Custom (" lines appear
+# Run search in text format and verify no "Custom (" lines appear
 set +e
-OUTPUT_NO_CUSTOM_TEXT=$(cd "${TEMP_NO_CUSTOM}" && "$REQVIRE_BIN" summary 2>&1)
+OUTPUT_NO_CUSTOM_TEXT=$(cd "${TEMP_NO_CUSTOM}" && "$REQVIRE_BIN" search 2>&1)
 EXIT_CODE=$?
 set -e
 
 if [ $EXIT_CODE -ne 0 ]; then
-    echo "FAILED: summary (no custom types) exited with code $EXIT_CODE"
+    echo "FAILED: search (no custom types) exited with code $EXIT_CODE"
     exit 1
 fi
 
@@ -289,12 +289,12 @@ echo "Test 7: Verifying custom type counts with filter-type" >> "${TEST_DIR}/tes
 
 # Filter to show only use-case custom type elements
 set +e
-OUTPUT_FILTERED_JSON=$(cd "$TEST_DIR" && "$REQVIRE_BIN" summary --json --filter-type="use-case" 2>&1)
+OUTPUT_FILTERED_JSON=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --json --filter-type="use-case" 2>&1)
 EXIT_CODE=$?
 set -e
 
 if [ $EXIT_CODE -ne 0 ]; then
-    echo "FAILED: summary --json --filter-type=use-case exited with code $EXIT_CODE"
+    echo "FAILED: search --json --filter-type=use-case exited with code $EXIT_CODE"
     exit 1
 fi
 

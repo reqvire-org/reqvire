@@ -12,6 +12,7 @@ pub mod diagrams;
 pub mod index_generator;
 pub mod reports;
 pub mod sections_summary;
+pub mod search;
 pub mod git_commands;
 pub mod change_impact;
 pub mod subsection;

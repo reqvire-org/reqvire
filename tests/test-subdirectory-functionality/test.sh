@@ -10,7 +10,7 @@ echo "Starting test..." > "${TEST_DIR}/test_results.log"
 # - System should process only files within current directory when run from a subfolder
 # - System should handle identifier normalization correctly within subdirectory context
 # - System should generate validation errors for references to parent directories
-# - System should work with validate, model-summary, html, and other commands
+# - System should work with validate, search, html, and other commands
 #
 # Test Criteria:
 # - Validation should fail when parent directory references are detected
@@ -33,10 +33,10 @@ git remote add origin 'https://dummy.example.com/dummy-repo.git' > /dev/null 2>&
 git add . > /dev/null 2>&1
 git commit -m "Initial test structure" > /dev/null 2>&1
 
-# Test 1: Model summary should fail with parent directory references
-echo "Running: reqvire summary (from submodule, should fail)" >> "${TEST_DIR}/test_results.log"
+# Test 1: Model search should fail with parent directory references
+echo "Running: reqvire search (from submodule, should fail)" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" summary 2>&1)
+OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" search 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -45,7 +45,7 @@ printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results_validate.log"
 
 if [ $EXIT_CODE -eq 0 ]; then
-  echo "❌ FAILED: Model summary should have failed due to parent directory references but succeeded"
+  echo "❌ FAILED: Model search should have failed due to parent directory references but succeeded"
   echo "Output: $OUTPUT"
   exit 1
 fi

@@ -105,9 +105,9 @@ This element has explicit test-verification type metadata.
   * verify: ../../RootRequirements.md#root-user-requirement
 EOF
 
-# Run reqvire summary --json to extract element types
+# Run reqvire search --json to extract element types
 set +e
-OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" summary --json 2>&1)
+OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" search --json 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -267,9 +267,9 @@ No type metadata - should default to requirement.
   * trace: #root-user-requirement
 EOF
 
-# Run reqvire summary --json
+# Run reqvire search --json
 set +e
-OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" summary --json 2>&1)
+OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" search --json 2>&1)
 EXIT_CODE=$?
 set -e
 

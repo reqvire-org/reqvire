@@ -18,8 +18,7 @@ fn main() {
     let uses_json = match &args.command {
         Some(cli::Commands::ChangeImpact { json, .. }) => *json,
         Some(cli::Commands::Format { json, .. }) => *json,
-        Some(cli::Commands::Summary { json, .. }) => *json,
-        Some(cli::Commands::SectionSummary { json, .. }) => *json,
+        Some(cli::Commands::Search { json, .. }) => *json,
         Some(cli::Commands::Matrix { json, .. }) => *json,
         Some(cli::Commands::Traces { json, .. }) => *json,
         Some(cli::Commands::Coverage { json }) => *json,

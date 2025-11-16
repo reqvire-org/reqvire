@@ -328,7 +328,7 @@ echo "" >> "${TEST_DIR}/test_results.log"
 echo "Test 5: Final consistency check - verify expected validation errors..." >> "${TEST_DIR}/test_results.log"
 
 set +e
-SUMMARY_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" summary --json 2>&1)
+SUMMARY_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --json 2>&1)
 SUMMARY_EXIT=$?
 set -e
 

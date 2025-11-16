@@ -94,7 +94,7 @@ This test verifies that the CLI help output displays all commands and their opti
   * verify: [HTML Export](../ReqvireTool/UserInterface/WebInterface.md#html-export)
   * verify: [CLI Generate Diagrams Flag](../ReqvireTool/UserInterface/CLI.md#cli-generate-diagrams-flag)
   * verify: [CLI Remove Diagrams Flag](../ReqvireTool/UserInterface/CLI.md#cli-remove-diagrams-flag)
-  * verify: [CLI Sections Summary Command](../ReqvireTool/UserInterface/CLI.md#cli-sections-summary-command)
+  * verify: [CLI Search Command](../ReqvireTool/UserInterface/CLI.md#cli-search-command)
   * verify: [CLI Change Impact Report Command](../ReqvireTool/UserInterface/CLI.md#cli-change-impact-report-command)
   * verify: [CLI Matrix Command](../ReqvireTool/UserInterface/CLI.md#cli-matrix-command)
   * verify: [CLI Traces Command](../ReqvireTool/UserInterface/CLI.md#cli-traces-command)

@@ -18,9 +18,9 @@ echo "Starting test..." > "${TEST_DIR}/test_results.log"
 # - Tests requirements with fragment-only references like "#fragment-id"
 # - Tests fragments referenced by proper element ID
 
-echo "Running: reqvire summary --json" >> "${TEST_DIR}/test_results.log"
+echo "Running: reqvire search --json" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" summary --json 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --json 2>&1)
 EXIT_CODE=$?
 set -e
 

@@ -4,48 +4,55 @@ set -euo pipefail
 # Test: Model Summary JSON and Filters Validation (with text checks and relations coverage)
 # -------------------------------------------------------------------------------------
 # Acceptance Criteria:
-# - `reqvire summary --json` emits valid JSON with a top-level "files" key
-# - `reqvire model-summary` prints a text summary beginning with `--- MBSE Model summary ---`
-# - Each filter flag when used with `model-summary --json` or `model-summary` correctly restricts output
-# - Using any filter flag without `model-summary` fails appropriately
+# - `reqvire search --json` emits valid JSON with a top-level "files" key
+# - `reqvire search` prints a text search beginning with `--- MBSE Search results ---`
+# - Each filter flag when used with `search --json` or `search` correctly restricts output
+# - Using any filter flag without `search` fails appropriately
 # - Invalid regex on name/content filters fails with `Invalid regex`
-# - Model summary report must include all relations for each element, showing both explicit relations and their opposite relations
+# - Search results report must include all relations for each element, showing both explicit relations and their opposite relations
 # - Relations must be preserved even when filtering excludes target elements (e.g., requirements show verifiedBy relations even when verifications are filtered out)
 #
 # Test Criteria:
 # - Commands exit 0 on success
 # - JSON output parses under jq
-# - Text summary contains expected header, element count, and required fields
+# - Text search contains expected header, element count, and required fields
 # - Filters reduce element counts as expected
 # - Incorrect usage exits non-zero with proper error message
 # - Relations coverage: bidirectional relationships are shown (verifiedBy/verify, refine/refinedBy, derivedFrom/derive, etc.)
 # - Filtered relations coverage: relations to filtered-out elements are preserved in both directions
 
-# 1) No filters: base JSON summary
+# 1) No filters: base JSON search - Full output comparison
 echo "Starting test..." > "${TEST_DIR}/test_results.log"
 
-echo "Running: reqvire summary --json" >> "${TEST_DIR}/test_results.log"
+echo "Running: reqvire search --json" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" summary --json 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --json 2>&1)
 EXIT_JSON=$?
 set -e
 
 echo "Exit code: $EXIT_JSON" >> "${TEST_DIR}/test_results.log"
 printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 if [ $EXIT_JSON -ne 0 ]; then
-  echo "FAILED: base JSON summary exited $EXIT_JSON"
+  echo "FAILED: base JSON search exited $EXIT_JSON"
   exit 1
 fi
 
+# Validate JSON is parseable
 echo "$OUTPUT" | jq . >/dev/null 2>&1
-if ! echo "$OUTPUT" | jq 'has("files")' | grep -q true; then
-  echo "FAILED: JSON missing files"
+
+# Compare against expected JSON output
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+EXPECTED_JSON="${SCRIPT_DIR}/expected-search.json"
+if ! diff <(echo "$OUTPUT" | jq --sort-keys .) <(jq --sort-keys . "$EXPECTED_JSON") > /dev/null; then
+  echo "❌ FAILED: JSON output does not match expected output"
+  echo "Diff:"
+  diff -u <(jq --sort-keys . "$EXPECTED_JSON") <(echo "$OUTPUT" | jq --sort-keys .)
   exit 1
 fi
 
 TOTAL=$(echo "$OUTPUT" | jq '.global_counters.total_elements')
-if [ "$TOTAL" -ne 5 ]; then
-  echo "FAILED: expected 5 elements in JSON, got $TOTAL"
+if [ "$TOTAL" -ne 6 ]; then
+  echo "FAILED: expected 6 elements in JSON, got $TOTAL"
   exit 1
 fi
 
@@ -112,29 +119,38 @@ else
 fi
 
 
-# 2) No filters: base text summary
-echo "Running: reqvire model-summary" >> "${TEST_DIR}/test_results.log"
+# 2) No filters: base text search - Full output comparison
+echo "Running: reqvire search" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" summary 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search 2>&1)
 EXIT_TEXT=$?
 set -e
 
 echo "Exit code: $EXIT_TEXT" >> "${TEST_DIR}/test_results.log"
 printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 if [ $EXIT_TEXT -ne 0 ]; then
-  echo "FAILED: base text summary exited $EXIT_TEXT"
+  echo "FAILED: base text search exited $EXIT_TEXT"
   exit 1
 fi
 
-if ! grep -q '^--- MBSE Model summary ---' <<< "$OUTPUT"; then
-  echo "FAILED: text summary header missing"
+if ! grep -q '^--- MBSE Search results ---' <<< "$OUTPUT"; then
+  echo "FAILED: text search header missing"
   exit 1
 fi
 
+# Compare against expected text output
+EXPECTED_TEXT="${SCRIPT_DIR}/expected-search.txt"
+printf "%s\n" "$OUTPUT" > "${TEST_DIR}/actual-search.txt"
+if ! diff "${TEST_DIR}/actual-search.txt" "$EXPECTED_TEXT" > /dev/null; then
+  echo "❌ FAILED: Text output does not match expected output"
+  echo "Diff:"
+  diff -u "$EXPECTED_TEXT" "${TEST_DIR}/actual-search.txt"
+  exit 1
+fi
 
 ELEMS_TEXT=$(grep -c '🔹 Element:' <<< "$OUTPUT")
-if [ "$ELEMS_TEXT" -ne 5 ]; then
-  echo "FAILED: expected 5 elements in text summary, got $ELEMS_TEXT"
+if [ "$ELEMS_TEXT" -ne 6 ]; then
+  echo "FAILED: expected 6 elements in text search, got $ELEMS_TEXT"
   exit 1
 fi
 
@@ -147,7 +163,7 @@ for KEY in \
     '- Content:'; do
 
   if ! grep -q -- "$KEY" <<< "$OUTPUT"; then
-    echo "FAILED: text summary missing '$KEY'"
+    echo "FAILED: text search missing '$KEY'"
     exit 1
   fi
 done
@@ -156,24 +172,24 @@ done
 
 # Check file counts format in text output
 if ! grep -q '^📂 File:.* (sections: [0-9]*, elements: [0-9]*)' <<< "$OUTPUT"; then
-  echo "FAILED: text summary missing file counts format"
+  echo "FAILED: text search missing file counts format"
   exit 1
 fi
 
 # Check section counts format in text output
 if ! grep -q '^  📖 Section:.* (elements: [0-9]*)' <<< "$OUTPUT"; then
-  echo "FAILED: text summary missing section counts format"
+  echo "FAILED: text search missing section counts format"
   exit 1
 fi
 
 # Check that global summary includes the new counts
 if ! grep -q 'Total files:' <<< "$OUTPUT"; then
-  echo "FAILED: text summary missing total files count"
+  echo "FAILED: text search missing total files count"
   exit 1
 fi
 
 if ! grep -q 'Total sections:' <<< "$OUTPUT"; then
-  echo "FAILED: text summary missing total sections count"
+  echo "FAILED: text search missing total sections count"
   exit 1
 fi
 
@@ -199,9 +215,9 @@ fi
 
 
 # 3) --filter-file=Requirements.md
-echo "Running: reqvire summary --json --filter-file" >> "${TEST_DIR}/test_results.log"
+echo "Running: reqvire search --json --filter-file" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" summary --json --filter-file="specifications/Requirements.md" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --json --filter-file="specifications/Requirements.md" 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -213,9 +229,9 @@ if [ "$(echo "$OUTPUT" | jq '.files | length')" -ne 1 ]; then
 fi
 
 
-echo "Running: reqvire summary --filter-file" >> "${TEST_DIR}/test_results.log"
+echo "Running: reqvire search --filter-file" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN"  summary --filter-file="specifications/Requirements.md" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN"  search --filter-file="specifications/Requirements.md" 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -228,9 +244,9 @@ if (( count != 1 )); then
 fi
 
 # 4) --filter-section=Requirements
-echo "Running: reqvire summary --json --filter-section" >> "${TEST_DIR}/test_results.log"
+echo "Running: reqvire search --json --filter-section" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN"  summary --json --filter-section="Requirements*" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN"  search --json --filter-section="Requirements*" 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -258,9 +274,9 @@ if [ "$COUNT_SEC_REQ" -ne 4 ]; then
   exit 1
 fi
 
-echo "Running: reqvire summary --filter-section='Requirements A'" >> "${TEST_DIR}/test_results.log"
+echo "Running: reqvire search --filter-section='Requirements A'" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" summary --filter-section="Requirements A" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --filter-section="Requirements A" 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -286,9 +302,9 @@ fi
 
 
 # 5) --filter-type=user-requirement
-echo "Running: reqvire summary --json --filter-type=user-requirement" >> "${TEST_DIR}/test_results.log"
+echo "Running: reqvire search --json --filter-type=user-requirement" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" summary --json --filter-type="user-requirement" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --json --filter-type="user-requirement" 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -298,9 +314,9 @@ if [ "$(echo "$OUTPUT" | jq '.global_counters.total_elements')" -ne 3 ]; then
   echo "FAILED: --filter-type=user-requirement JSON should yield 3 elements"
   exit 1
 fi
-echo "Running: reqvire summary --filter-type=user-requirement" >> "${TEST_DIR}/test_results.log"
+echo "Running: reqvire search --filter-type=user-requirement" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN"  summary --filter-type="user-requirement" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN"  search --filter-type="user-requirement" 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -313,36 +329,36 @@ fi
 
 
 # 6) --filter-type=verification
-echo "Running: reqvire summary --json --filter-type=verification" >> "${TEST_DIR}/test_results.log"
+echo "Running: reqvire search --json --filter-type=verification" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" summary --json --filter-type="verification" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --json --filter-type="verification" 2>&1)
 EXIT_CODE=$?
 set -e
 
 echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
 printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
-if [ "$(echo "$OUTPUT" | jq '.global_counters.total_elements')" -ne 1 ]; then
-  echo "FAILED: --filter-type=verification JSON should yield 1 element"
+if [ "$(echo "$OUTPUT" | jq '.global_counters.total_elements')" -ne 2 ]; then
+  echo "FAILED: --filter-type=verification JSON should yield 2 elements"
   exit 1
 fi
-echo "Running: reqvire summary --filter-type=verification" >> "${TEST_DIR}/test_results.log"
+echo "Running: reqvire search --filter-type=verification" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" summary --filter-type="verification" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --filter-type="verification" 2>&1)
 EXIT_CODE=$?
 set -e
 
 echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
 printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
-if [ "$(grep -c '🔹 Element:' <<< "$OUTPUT")" -ne 1 ]; then
-  echo "FAILED: --filter-type=verification text should yield 1 element"
+if [ "$(grep -c '🔹 Element:' <<< "$OUTPUT")" -ne 2 ]; then
+  echo "FAILED: --filter-type=verification text should yield 2 elements"
   exit 1
 fi
 
 
 # 7) --filter-name-regex="^Requirement with Valid Standard"
-echo "Running: reqvire summary --json --filter-name" >> "${TEST_DIR}/test_results.log"
+echo "Running: reqvire search --json --filter-name" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" summary --json --filter-name="^Requirement with Valid Standard" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --json --filter-name="^Requirement with Valid Standard" 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -352,9 +368,9 @@ if [ "$(echo "$OUTPUT" | jq '.global_counters.total_elements')" -ne 1 ]; then
   echo "FAILED: --filter-name-regex JSON should yield 1 element"
   exit 1
 fi
-echo "Running: reqvire summary --filter-name" >> "${TEST_DIR}/test_results.log"
+echo "Running: reqvire search --filter-name" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" summary --filter-name="^Requirement with Valid Standard" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --filter-name="^Requirement with Valid Standard" 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -367,9 +383,9 @@ fi
 
 
 # 8) --filter-content="subsection"
-echo "Running: reqvire summary --json --filter-content" >> "${TEST_DIR}/test_results.log"
+echo "Running: reqvire search --json --filter-content" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" summary --json --filter-content="subsection" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --json --filter-content="subsection" 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -379,9 +395,9 @@ if [ "$(echo "$OUTPUT" | jq '.global_counters.total_elements')" -ne 1 ]; then
   echo "FAILED: --filter-content JSON should yield 1 element"
   exit 1
 fi
-echo "Running: reqvire summary --filter-content" >> "${TEST_DIR}/test_results.log"
+echo "Running: reqvire search --filter-content" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" summary --filter-content="subsection" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --filter-content="subsection" 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -393,103 +409,130 @@ if [ "$(grep -c '🔹 Element:' <<< "$OUTPUT")" -ne 1 ]; then
 fi
 
 
-# 9) --filter-is-verified
-echo "Running: reqvire summary --json --filter-is-not-verified" >> "${TEST_DIR}/test_results.log"
+# 8.5) Additive filter behavior (AND logic) - Combining multiple filters should reduce results
+echo "Running: additive filter test" >> "${TEST_DIR}/test_results.log"
+
+# First, get count with just type filter
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" summary --json --filter-is-not-verified 2>&1)
-EXIT_CODE=$?
+OUTPUT1=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --json --filter-type="user-requirement" 2>&1)
 set -e
+COUNT1=$(echo "$OUTPUT1" | jq '.global_counters.total_elements')
 
-echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
-printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
+# Then, add section filter - should give fewer or equal results
+set +e
+OUTPUT2=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --json --filter-type="user-requirement" --filter-section="Requirements A" 2>&1)
+set -e
+COUNT2=$(echo "$OUTPUT2" | jq '.global_counters.total_elements')
 
-if [ "$(echo "$OUTPUT" | jq '.global_counters.requirements_not_verified')" -ne 2 ]; then
-  echo "FAILED: --filter-is-not-verified JSON should yield 2 elements"
+# Verify COUNT2 <= COUNT1 (filters are additive/AND)
+if [ "$COUNT2" -gt "$COUNT1" ]; then
+  echo "FAILED: Adding --filter-section should not increase element count (got $COUNT2 > $COUNT1)"
+  echo "This indicates filters are OR instead of AND"
   exit 1
 fi
 
-echo "Running: reqvire summary --filter-is-not-verified" >> "${TEST_DIR}/test_results.log"
-set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" summary --filter-is-not-verified 2>&1)
-EXIT_CODE=$?
-set -e
-
-echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
-printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
-if ! grep -q "Requirements not verified: 2" <<< "$OUTPUT"; then
-  echo "FAILED: Expected 'Requirements not verified: 2' but got:"
-  echo "$OUTPUT"
-  exit 1
-fi
-
-
-# 10) --filter-is-satisfied
-echo "Running: reqvire summary --json --filter-is-not-satisfied" >> "${TEST_DIR}/test_results.log"
-set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" summary --json --filter-is-not-satisfied 2>&1)
-EXIT_CODE=$?
-set -e
-
-echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
-printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
-if [ "$(echo "$OUTPUT" | jq '.global_counters.requirements_not_satisfied')" -ne 1 ]; then
-  echo "FAILED: --filter-is-not-satisfied JSON should yield 3 elements"
-  exit 1
-fi
-echo "Running: reqvire summary --filter-is-not-satisfied" >> "${TEST_DIR}/test_results.log"
-set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" summary --filter-is-not-satisfied 2>&1)
-EXIT_CODE=$?
-set -e
-
-echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
-printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
-if ! grep -q "Requirements not satisfied: 1" <<< "$OUTPUT"; then
-  echo "FAILED: Expected 'Requirements not satisfied: 1' but got:"
-  echo "$OUTPUT"
-  exit 1
-fi
-
-
-# 11) Combination: user-requirement + is-satisfied
-echo "Running: reqvire summary --json --filter-type=user-requirement --filter-is-not-satisfied" >> "${TEST_DIR}/test_results.log"
-set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" summary --json \
-           --filter-type="user-requirement" --filter-is-not-satisfied 2>&1)
-EXIT_CODE=$?
-set -e
-
-echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
-printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"           
-if [ "$(echo "$OUTPUT" | jq '.global_counters.total_elements')" -ne 1 ]; then
-  echo "FAILED: combo JSON should yield 1 elements"
+# Verify COUNT2 is actually less (not just equal), since we know there are elements outside "Requirements A"
+if [ "$COUNT2" -eq "$COUNT1" ]; then
+  echo "FAILED: Adding --filter-section='Requirements A' should reduce count from $COUNT1"
+  echo "All user-requirements appear to be in 'Requirements A' section, test data may be insufficient"
   exit 1
 fi
 
 
 
-echo "Running: reqvire summary --filter-type=user-requirement --filter-is-not-satisfied" >> "${TEST_DIR}/test_results.log"
+# 8.6) Test --have-relations filter (single relation)
+echo "Running: reqvire search --json --have-relations=verifiedBy" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" summary \
-           --filter-type="user-requirement" --filter-is-not-satisfied 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --json --have-relations=verifiedBy 2>&1)
 EXIT_CODE=$?
 set -e
 
-echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
-printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"           
-if [ "$(grep -c '🔹 Element:' <<< "$OUTPUT")" -ne 1 ]; then
-  echo "FAILED: combo text should yield 1 elements"
+if [ $EXIT_CODE -ne 0 ]; then
+  echo "FAILED: --have-relations=verifiedBy exited with error $EXIT_CODE"
+  exit 1
+fi
+
+# Should only include elements that HAVE verifiedBy relations
+COUNT_HAVE_VERIFIED=$(echo "$OUTPUT" | jq '.global_counters.total_elements')
+if [ "$COUNT_HAVE_VERIFIED" -eq 0 ]; then
+  echo "FAILED: --have-relations=verifiedBy should find elements with verifiedBy relations"
+  exit 1
+fi
+
+# 8.7) Test --have-relations with multiple relations (must have ALL)
+echo "Running: reqvire search --json --have-relations=verifiedBy,satisfiedBy" >> "${TEST_DIR}/test_results.log"
+set +e
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --json --have-relations=verifiedBy,satisfiedBy 2>&1)
+EXIT_CODE=$?
+set -e
+
+if [ $EXIT_CODE -ne 0 ]; then
+  echo "FAILED: --have-relations with multiple relations exited with error $EXIT_CODE"
+  exit 1
+fi
+
+# Should only include elements that have BOTH verifiedBy AND satisfiedBy
+COUNT_HAVE_BOTH=$(echo "$OUTPUT" | jq '.global_counters.total_elements')
+# This count should be <= single relation count (more restrictive)
+if [ "$COUNT_HAVE_BOTH" -gt "$COUNT_HAVE_VERIFIED" ]; then
+  echo "FAILED: --have-relations with 2 relations should be <= single relation count"
+  echo "Got $COUNT_HAVE_BOTH > $COUNT_HAVE_VERIFIED"
   exit 1
 fi
 
 
-# 12) invalid regex
+
+# 8.8) Test --not-have-relations filter (single relation)
+echo "Running: reqvire search --json --not-have-relations=verifiedBy" >> "${TEST_DIR}/test_results.log"
+set +e
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --json --not-have-relations=verifiedBy 2>&1)
+EXIT_CODE=$?
+set -e
+
+if [ $EXIT_CODE -ne 0 ]; then
+  echo "FAILED: --not-have-relations=verifiedBy exited with error $EXIT_CODE"
+  exit 1
+fi
+
+# Should only include elements that do NOT have verifiedBy relations
+COUNT_NOT_VERIFIED=$(echo "$OUTPUT" | jq '.global_counters.total_elements')
+if [ "$COUNT_NOT_VERIFIED" -eq 0 ]; then
+  echo "FAILED: --not-have-relations=verifiedBy should find elements without verifiedBy"
+  exit 1
+fi
+
+
+
+# 8.9) Test filter combination with have-relations
+echo "Running: reqvire search --json --filter-type=user-requirement --have-relations=verifiedBy" >> "${TEST_DIR}/test_results.log"
+set +e
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --json --filter-type=user-requirement --have-relations=verifiedBy 2>&1)
+EXIT_CODE=$?
+set -e
+
+if [ $EXIT_CODE -ne 0 ]; then
+  echo "FAILED: Combined filter with --have-relations exited with error $EXIT_CODE"
+  exit 1
+fi
+
+COUNT_COMBO=$(echo "$OUTPUT" | jq '.global_counters.total_elements')
+# Verify all returned elements are user-requirements with verifiedBy
+TYPES=$(echo "$OUTPUT" | jq -r '.files | .[] | .sections | .[] | .elements | .[] | .type' | sort -u)
+if echo "$TYPES" | grep -v "user-requirement" | grep -q .; then
+  echo "FAILED: Combined filter should only return user-requirement type"
+  echo "Found types: $TYPES"
+  exit 1
+fi
+
+
+
+# 9) invalid regex
 set +e
 OUTPUT=""
 CODE=0
 
 # Capture output and exit code separately
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" summary  --filter-name="[invalid" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search  --filter-name="[invalid" 2>&1)
 CODE=$?
 # Don't log error output that we expect to happen
 # printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
@@ -506,7 +549,7 @@ OUTPUT=""
 CODE=0
 
 # Capture output and exit code separately
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" summary  --json --filter-name="[invalid" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search  --json --filter-name="[invalid" 2>&1)
 CODE=$?
 set -e
 
@@ -516,12 +559,13 @@ if [ $CODE -ne 1 ] || ! grep -q "Invalid regex" <<< "$OUTPUT"; then
   exit 1
 fi
 
-# Test #13 removed - no longer testing filter without summary error case
+# 10) Test #10 removed - relation type validation not implemented yet
+
 
 # 14) Relations coverage - bidirectional relationships
-echo "Running: reqvire summary --json (relations test)" >> "${TEST_DIR}/test_results_relations.log"
+echo "Running: reqvire search --json (relations test)" >> "${TEST_DIR}/test_results_relations.log"
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" summary --json 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --json 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -549,7 +593,7 @@ fi
 
 # Check that "Requirement with Valid Standard Relations" has verifiedBy relation pointing back to verification
 VERIFIED_BY_RELATIONS=$(echo "$OUTPUT" | jq -r '
-  .files | to_entries[] | .value.sections."Requirements A".elements[]
+  .files["specifications/Requirements.md"].sections."Requirements A".elements[]
   | select(.name == "Requirement with Valid Standard Relations")
   | .relations[]
   | select(.relation_type == "verifiedBy")
@@ -564,7 +608,7 @@ fi
 
 # Check that "Requirement with Valid Markdown Relations" also has verifiedBy relation to the same verification
 VERIFIED_BY_RELATIONS_2=$(echo "$OUTPUT" | jq -r '
-  .files | to_entries[] | .value.sections."Requirements A".elements[]
+  .files["specifications/Requirements.md"].sections."Requirements A".elements[]
   | select(.name == "Requirement with Valid Markdown Relations")
   | .relations[]
   | select(.relation_type == "verifiedBy")
@@ -579,7 +623,7 @@ fi
 
 # Check derive relation (looking at the JSON output, this is the opposite relation that should be shown)
 DERIVE_RELATIONS_2=$(echo "$OUTPUT" | jq -r '
-  .files | to_entries[] | .value.sections."Requirements A".elements[]
+  .files["specifications/Requirements.md"].sections."Requirements A".elements[]
   | select(.name == "Requirement with Valid Markdown Relations")
   | .relations[]
   | select(.relation_type == "derive")
@@ -594,7 +638,7 @@ fi
 
 # Check derive relation (from the JSON, the parent shows derive relation to child)
 DERIVE_RELATIONS=$(echo "$OUTPUT" | jq -r '
-  .files | to_entries[] | .value.sections."Requirements A".elements[]
+  .files["specifications/Requirements.md"].sections."Requirements A".elements[]
   | select(.name == "Requirement with Valid Standard Relations")
   | .relations[]
   | select(.relation_type == "derive")
@@ -608,9 +652,9 @@ if ! echo "$DERIVE_RELATIONS" | grep -q "requirement-with-designspecifications-r
 fi
 
 # 15) Relations visibility when filtering by type - verification filter
-echo "Running: reqvire summary --json --filter-type=verification (filter test)" >> "${TEST_DIR}/test_results_verification_filter.log"
+echo "Running: reqvire search --json --filter-type=verification (filter test)" >> "${TEST_DIR}/test_results_verification_filter.log"
 set +e
-OUTPUT_VERIFICATION_FILTER=$(cd "$TEST_DIR" && "$REQVIRE_BIN" summary --json --filter-type="verification" 2>&1)
+OUTPUT_VERIFICATION_FILTER=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --json --filter-type="verification" 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -619,8 +663,8 @@ printf "%s\n" "$OUTPUT_VERIFICATION_FILTER" >> "${TEST_DIR}/test_results_verific
 
 # When filtering by verification type, we should only see verification elements
 TOTAL_ELEMENTS_VERIFICATION_FILTER=$(echo "$OUTPUT_VERIFICATION_FILTER" | jq '.global_counters.total_elements')
-if [ "$TOTAL_ELEMENTS_VERIFICATION_FILTER" -ne 1 ]; then
-  echo "FAILED: --filter-type=verification should show only 1 element"
+if [ "$TOTAL_ELEMENTS_VERIFICATION_FILTER" -ne 2 ]; then
+  echo "FAILED: --filter-type=verification should show 2 elements"
   echo "Found: $TOTAL_ELEMENTS_VERIFICATION_FILTER elements"
   exit 1
 fi
@@ -643,9 +687,9 @@ if [ -z "$VERIFICATION_VERIFY_RELATIONS" ]; then
 fi
 
 # 16) Relations visibility when filtering by type - requirement filter
-echo "Running: reqvire summary --json --filter-type=user-requirement (filter test)" >> "${TEST_DIR}/test_results_requirement_filter.log"
+echo "Running: reqvire search --json --filter-type=user-requirement (filter test)" >> "${TEST_DIR}/test_results_requirement_filter.log"
 set +e
-OUTPUT_REQUIREMENT_FILTER=$(cd "$TEST_DIR" && "$REQVIRE_BIN" summary --json --filter-type="user-requirement" 2>&1)
+OUTPUT_REQUIREMENT_FILTER=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --json --filter-type="user-requirement" 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -663,7 +707,7 @@ fi
 # The requirements should still show their 'verifiedBy' relations to verifications
 # Even though the verification element is not included in the filtered results
 REQUIREMENT_VERIFIEDBY_RELATIONS_FILTERED=$(echo "$OUTPUT_REQUIREMENT_FILTER" | jq -r '
-  .files | to_entries[] | .value.sections."Requirements A".elements[]
+  .files["specifications/Requirements.md"].sections."Requirements A".elements[]
   | select(.name == "Requirement with Valid Standard Relations")
   | .relations[]
   | select(.relation_type == "verifiedBy")
@@ -678,7 +722,7 @@ fi
 
 # Test that relations to filtered-out elements are preserved in both directions
 REQUIREMENT2_VERIFIEDBY_RELATIONS_FILTERED=$(echo "$OUTPUT_REQUIREMENT_FILTER" | jq -r '
-  .files | to_entries[] | .value.sections."Requirements A".elements[]
+  .files["specifications/Requirements.md"].sections."Requirements A".elements[]
   | select(.name == "Requirement with Valid Markdown Relations")
   | .relations[]
   | select(.relation_type == "verifiedBy")
