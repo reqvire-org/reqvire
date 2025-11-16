@@ -76,6 +76,91 @@ pub fn is_excluded_by_patterns(path: &Path, excluded_filename_patterns: &GlobSet
     false
 }
 
+/// Result of path validation for CRUD operations
+#[derive(Debug, Clone)]
+pub struct PathValidation {
+    pub is_valid: bool,
+    pub error_message: Option<String>,
+    pub needs_file_creation: bool,
+    pub needs_section_creation: bool,
+}
+
+/// Validates a target path for CRUD operations (add, move)
+///
+/// Checks:
+/// - Path is not excluded by gitignore or reqvireignore patterns
+/// - Path depth does not exceed 10 subdirectories from git root
+/// - Returns whether file/section need to be created
+///
+/// # Arguments
+///
+/// * `path` - Target file path (relative to git root or absolute)
+/// * `section` - Target section name (optional)
+/// * `excluded_patterns` - Glob patterns for exclusion (gitignore + reqvireignore)
+///
+/// # Returns
+///
+/// PathValidation result with validation status and creation flags
+pub fn validate_target_path(
+    path: &str,
+    section: Option<&str>,
+    excluded_patterns: &GlobSet,
+) -> Result<PathValidation, ReqvireError> {
+    let git_root = git_commands::get_git_root_dir()?;
+
+    // Convert to PathBuf
+    let target_path = PathBuf::from(path);
+
+    // Make absolute if relative
+    let absolute_path = if target_path.is_absolute() {
+        target_path.clone()
+    } else {
+        git_root.join(&target_path)
+    };
+
+    // Check if path is excluded by patterns
+    if is_excluded_by_patterns(&absolute_path, excluded_patterns) {
+        return Ok(PathValidation {
+            is_valid: false,
+            error_message: Some(format!(
+                "Target path '{}' is excluded by .gitignore or .reqvireignore patterns",
+                path
+            )),
+            needs_file_creation: false,
+            needs_section_creation: false,
+        });
+    }
+
+    // Check path depth (max 10 subdirectories from git root)
+    if let Ok(rel_path) = absolute_path.strip_prefix(&git_root) {
+        let depth = rel_path.components().count();
+        if depth > 10 {
+            return Ok(PathValidation {
+                is_valid: false,
+                error_message: Some(format!(
+                    "Target path '{}' exceeds maximum nesting depth of 10 subdirectories (current depth: {})",
+                    path, depth
+                )),
+                needs_file_creation: false,
+                needs_section_creation: false,
+            });
+        }
+    }
+
+    // Check if file exists
+    let needs_file_creation = !absolute_path.exists();
+
+    // We'll check section existence later in GraphRegistry (needs parsed file)
+    let needs_section_creation = section.is_some() && !needs_file_creation;
+
+    Ok(PathValidation {
+        is_valid: true,
+        error_message: None,
+        needs_file_creation,
+        needs_section_creation,
+    })
+}
+
 
 /// Scans the git root folder for markdown files, excluding files based on patterns.
 /// If the current working directory is a subfolder of the git root, only scans within that subfolder.

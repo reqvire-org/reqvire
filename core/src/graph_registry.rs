@@ -78,6 +78,7 @@ pub struct GraphRegistry {
     pub nodes: HashMap<String, ElementNode>,
     pub pages: HashMap<String, Page>,
     pub sections: HashMap<SectionKey, Section>,
+    pub modified_files: HashSet<String>, // Track files modified during CRUD operations
 }
 
 impl GraphRegistry {
@@ -87,6 +88,7 @@ impl GraphRegistry {
             nodes: HashMap::new(),
             pages: HashMap::new(),
             sections: HashMap::new(),
+            modified_files: HashSet::new(),
         }
     }
 
@@ -1657,6 +1659,251 @@ impl GraphRegistry {
             .sum();
 
         (element_count, relation_count)
+    }
+
+    // ================================
+    // CRUD Operations (Add, Delete, Move)
+    // ================================
+
+    /// Creates an element from markdown string and adds it to the graph
+    /// Used by CLI add command
+    pub fn create_element_from_string(
+        &mut self,
+        markdown: &str,
+        target_file: &str,
+        section: &str,
+        index: Option<usize>,
+        excluded_patterns: &GlobSet,
+    ) -> Result<Element, ReqvireError> {
+        // Validate target path
+        let validation = crate::utils::validate_target_path(target_file, Some(section), excluded_patterns)?;
+
+        if !validation.is_valid {
+            return Err(ReqvireError::InvalidPath(
+                validation.error_message.unwrap_or_else(|| "Invalid target path".to_string())
+            ));
+        }
+
+        // Parse element from markdown string
+        let element = crate::parser::parse_single_element(markdown, target_file, section)?;
+
+        // Check for duplicate element name (global uniqueness)
+        if self.nodes.contains_key(&element.identifier) {
+            return Err(ReqvireError::DuplicateElement(
+                format!("Element '{}' already exists in the model", element.name)
+            ));
+        }
+
+        // Auto-create file if needed
+        if validation.needs_file_creation {
+            self.add_file_location(target_file, section)?;
+
+            // Add page content (file header based on filename)
+            let file_stem = Path::new(target_file)
+                .file_stem()
+                .and_then(|s| s.to_str())
+                .unwrap_or("Document");
+
+            self.register_page(target_file.to_string(), format!("# {}\n", file_stem));
+        }
+
+        // Auto-create section if needed
+        if validation.needs_section_creation || validation.needs_file_creation {
+            let section_exists = self.nodes.values().any(|node| {
+                node.element.file_path == target_file && node.element.section == section
+            });
+
+            if !section_exists {
+                self.add_section_to_file(target_file, section)?;
+            }
+        }
+
+        // Set section_order_index if index provided
+        let mut new_element = element.clone();
+        if let Some(idx) = index {
+            new_element.section_order_index = idx;
+        } else {
+            // Default: append to end of section
+            let max_index = self.nodes.values()
+                .filter(|node| node.element.file_path == target_file && node.element.section == section)
+                .map(|node| node.element.section_order_index)
+                .max()
+                .unwrap_or(0);
+            new_element.section_order_index = max_index + 1;
+        }
+
+        // Add to graph
+        self.add_element(new_element.clone())?;
+
+        // Track modified file
+        self.modified_files.insert(target_file.to_string());
+
+        Ok(new_element)
+    }
+
+    /// Enhanced remove element that tracks modifications and performs cleanup
+    pub fn remove_element_with_cleanup(&mut self, element_id: &str) -> Result<Vec<String>, ReqvireError> {
+        if !self.nodes.contains_key(element_id) {
+            return Err(ReqvireError::LocationNotFound(
+                format!("Element '{}' not found in the graph", element_id)
+            ));
+        }
+
+        // Get element info before removal
+        let element = &self.nodes.get(element_id).unwrap().element;
+        let file_path = element.file_path.clone();
+
+        // Track all files that will be modified
+        let mut modified_files = vec![file_path.clone()];
+
+        // Find all elements with relations pointing to this element
+        for (other_id, node) in self.nodes.iter() {
+            if other_id != element_id {
+                let has_relation_to_target = node.element.relations.iter().any(|rel| {
+                    matches!(&rel.target.link, LinkType::Identifier(id) if id == element_id)
+                });
+
+                if has_relation_to_target {
+                    let other_file = node.element.file_path.clone();
+                    if !modified_files.contains(&other_file) {
+                        modified_files.push(other_file);
+                    }
+                }
+            }
+        }
+
+        // Remove element and relations
+        self.remove_element(element_id)?;
+
+        // Track modified files
+        for file in &modified_files {
+            self.modified_files.insert(file.clone());
+        }
+
+        Ok(modified_files)
+    }
+
+    /// Checks if a file has no elements remaining
+    pub fn is_file_empty(&self, file_path: &str) -> bool {
+        !self.nodes.values().any(|node| node.element.file_path == file_path)
+    }
+
+    /// Comprehensive move operation with full relation updates and file tracking
+    pub fn move_element_comprehensive(
+        &mut self,
+        element_id: &str,
+        target_file: &str,
+        target_section: &str,
+        index: Option<usize>,
+        excluded_patterns: &GlobSet,
+    ) -> Result<(String, Vec<String>), ReqvireError> {
+        // Validate element exists
+        if !self.nodes.contains_key(element_id) {
+            return Err(ReqvireError::LocationNotFound(
+                format!("Element '{}' not found", element_id)
+            ));
+        }
+
+        // Get source file before move
+        let source_file = self.nodes.get(element_id).unwrap().element.file_path.clone();
+
+        // Validate target path
+        let validation = crate::utils::validate_target_path(target_file, Some(target_section), excluded_patterns)?;
+
+        if !validation.is_valid {
+            return Err(ReqvireError::InvalidPath(
+                validation.error_message.unwrap_or_else(|| "Invalid target path".to_string())
+            ));
+        }
+
+        // Auto-create file if needed
+        if validation.needs_file_creation {
+            self.add_file_location(target_file, target_section)?;
+
+            let file_stem = Path::new(target_file)
+                .file_stem()
+                .and_then(|s| s.to_str())
+                .unwrap_or("Document");
+
+            self.register_page(target_file.to_string(), format!("# {}\n", file_stem));
+        }
+
+        // Auto-create section if needed
+        if validation.needs_section_creation || validation.needs_file_creation {
+            let section_exists = self.nodes.values().any(|node| {
+                node.element.file_path == target_file && node.element.section == target_section
+            });
+
+            if !section_exists {
+                self.add_section_to_file(target_file, target_section)?;
+            }
+        }
+
+        // Perform the move using existing move_element_to_location
+        let old_identifier = element_id.to_string();
+        self.move_element_to_location(element_id, target_file, target_section)?;
+
+        // Get new identifier after move
+        let new_identifier = self.nodes.values()
+            .find(|node| {
+                node.element.file_path == target_file &&
+                node.element.section == target_section &&
+                node.element.identifier.ends_with(&old_identifier.split('#').last().unwrap())
+            })
+            .map(|node| node.element.identifier.clone())
+            .ok_or_else(|| ReqvireError::ProcessError(
+                "Failed to find element after move".to_string()
+            ))?;
+
+        // Update section order index if provided
+        if let Some(idx) = index {
+            if let Some(node) = self.nodes.get_mut(&new_identifier) {
+                node.element.section_order_index = idx;
+            }
+        }
+
+        // Track modified files
+        let mut modified_files = vec![source_file.clone()];
+        if target_file != source_file {
+            modified_files.push(target_file.to_string());
+        }
+
+        // Find all files with relations that were updated
+        for node in self.nodes.values() {
+            let has_relation = node.element.relations.iter().any(|rel| {
+                matches!(&rel.target.link, LinkType::Identifier(id) if id == &new_identifier || id == &old_identifier)
+            });
+
+            if has_relation {
+                let file = node.element.file_path.clone();
+                if !modified_files.contains(&file) {
+                    modified_files.push(file);
+                }
+            }
+        }
+
+        // Track all modified files
+        for file in &modified_files {
+            self.modified_files.insert(file.clone());
+        }
+
+        Ok((new_identifier, modified_files))
+    }
+
+    /// Flushes only modified files to directory (optimization)
+    pub fn flush_modified_files(&self, directory: &Path) -> Result<(), ReqvireError> {
+        if self.modified_files.is_empty() {
+            return Ok(());
+        }
+
+        let file_vec: Vec<String> = self.modified_files.iter().cloned().collect();
+        let _result = self.flush_files_to_directory(&file_vec, directory)?;
+        Ok(())
+    }
+
+    /// Clears the modified files tracking
+    pub fn clear_modified_files(&mut self) {
+        self.modified_files.clear();
     }
 }
 

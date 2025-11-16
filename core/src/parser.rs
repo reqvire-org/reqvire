@@ -47,6 +47,185 @@ fn remove_generated_diagrams(content: &str) -> String {
     result
 }
 
+/// Parses a single element from markdown string.
+/// Used for CRUD operations (add command) to parse element from stdin or inline argument.
+/// Returns the parsed Element or an error.
+pub fn parse_single_element(
+    content: &str,
+    file_path: &str,
+    section: &str,
+) -> Result<Element, ReqvireError> {
+    let mut current_element: Option<Element> = None;
+    let mut current_subsection = SubSection::Other("".to_string());
+    let mut seen_subsections = HashSet::new();
+    let mut in_details_block = false;
+    let mut found_header = false;
+
+    let file_pathbuf = PathBuf::from(file_path);
+
+    for (line_num, line) in content.lines().enumerate() {
+        let trimmed = line.trim();
+
+        // Handle <details> blocks
+        if in_details_block {
+            if let Some(element) = &mut current_element {
+                element.add_content(&format!("{}\n", line));
+            }
+            if trimmed.starts_with("</details>") {
+                in_details_block = false;
+            }
+            continue;
+        }
+
+        // Separator line ends the element
+        if trimmed == "---" {
+            break;
+        }
+
+        // Parse ### header (element name)
+        if trimmed.starts_with("### ") {
+            if found_header {
+                return Err(ReqvireError::InvalidMarkdownStructure(
+                    "Multiple ### headers found. Single element should have only one ### header.".to_string()
+                ));
+            }
+
+            found_header = true;
+            current_subsection = SubSection::Requirement;
+
+            let element_name = trimmed[4..].trim().to_string();
+
+            let file_folder = file_pathbuf.parent()
+                .ok_or_else(|| ReqvireError::InvalidIdentifier(
+                    "File folder not accessible".to_string()
+                ))?;
+
+            let identifier = format!("{}#{}", file_path, element_name);
+            let normalized_id = utils::normalize_identifier(&identifier, &file_folder.to_path_buf())?;
+
+            let relative_file = utils::get_relative_path(&file_pathbuf)?;
+
+            // Default element type is always 'requirement' (location-independent)
+            let element_type = ElementType::Requirement(RequirementType::System);
+
+            let new_element = Element::new(
+                &element_name,
+                &normalized_id,
+                &relative_file.to_string_lossy(),
+                section,
+                line_num + 1,
+                Some(element_type),
+            );
+
+            current_element = Some(new_element);
+
+        // Parse #### subsections
+        } else if trimmed.starts_with("#### ") && current_element.is_some() {
+            let subsection = SubSection::from_str(&trimmed[5..].trim());
+
+            if seen_subsections.contains(&subsection) {
+                return Err(ReqvireError::DuplicateSubsection(
+                    format!("Duplicate subsection '{}'", subsection.name())
+                ));
+            }
+            seen_subsections.insert(subsection.clone());
+
+            // If transitioning to Details subsection, add the header to content
+            if subsection == SubSection::Details {
+                if let Some(element) = &mut current_element {
+                    element.add_content("\n#### Details\n");
+                }
+            }
+
+            current_subsection = subsection;
+
+        // Handle level 5+ headers
+        } else if trimmed.starts_with("#####") && current_element.is_some() && current_subsection != SubSection::Details {
+            return Err(ReqvireError::InvalidMarkdownStructure(
+                "Level 5+ headers (#####+) can only appear inside '#### Details' subsection".to_string()
+            ));
+
+        // Parse content for Requirement or Details subsections
+        } else if (current_subsection == SubSection::Requirement || current_subsection == SubSection::Details) {
+            if let Some(element) = &mut current_element {
+                if trimmed.starts_with("<details") {
+                    in_details_block = true;
+                }
+                element.add_content(&format!("{}\n", line));
+            }
+
+        // Parse metadata
+        } else if current_subsection == SubSection::Metadata {
+            if trimmed.is_empty() {
+                continue;
+            }
+            if let Some(element) = &mut current_element {
+                if let Some((key, value)) = utils::parse_metadata_line(trimmed) {
+                    element.metadata.insert(key.clone(), value.clone());
+
+                    if key.eq_ignore_ascii_case("type") {
+                        element.set_type_from_metadata();
+                    }
+                } else {
+                    return Err(ReqvireError::InvalidMetadataFormat(
+                        format!("Invalid metadata format: '{}'", trimmed)
+                    ));
+                }
+            }
+
+        // Parse relations
+        } else if current_subsection == SubSection::Relations {
+            if let Some(element) = &mut current_element {
+                if trimmed.starts_with("* ") {
+                    let (relation_type, (text, link)) = utils::parse_relation_line(trimmed)
+                        .map_err(|_| ReqvireError::InvalidRelationFormat(
+                            format!("Invalid relation format: '{}'", trimmed)
+                        ))?;
+
+                    let final_link = if link.starts_with('#') {
+                        format!("{}{}", file_path, link)
+                    } else {
+                        link
+                    };
+
+                    let file_folder = file_pathbuf.parent()
+                        .ok_or_else(|| ReqvireError::InvalidIdentifier(
+                            "File folder not accessible".to_string()
+                        ))?;
+
+                    let normalized_target = utils::normalize_identifier(
+                        &final_link,
+                        &file_folder.to_path_buf()
+                    )?;
+
+                    let relation = Relation::new(&relation_type, text, &normalized_target, None)?;
+                    element.add_relation(relation);
+
+                } else if !trimmed.is_empty() {
+                    return Err(ReqvireError::InvalidRelationFormat(
+                        format!("Invalid relations format: '{}'", trimmed)
+                    ));
+                }
+            }
+        }
+    }
+
+    // Finalize element
+    if let Some(mut element) = current_element {
+        if !found_header {
+            return Err(ReqvireError::InvalidMarkdownStructure(
+                "Element must start with ### header".to_string()
+            ));
+        }
+        element.freeze_content();
+        Ok(element)
+    } else {
+        Err(ReqvireError::InvalidMarkdownStructure(
+            "No element found in markdown string".to_string()
+        ))
+    }
+}
+
 /// Parses a markdown document and extracts elements with metadata and relations.
 /// Returns: (elements, errors, page_content, sections)
 pub fn parse_elements(

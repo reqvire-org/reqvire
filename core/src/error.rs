@@ -103,6 +103,10 @@ pub enum ReqvireError {
     LocationAlreadyExists(String),
 
     #[allow(dead_code)]
+    #[error("Invalid path: {0}")]
+    InvalidPath(String),
+
+    #[allow(dead_code)]
     #[error("Validation failed with {} errors", .0.len())]
     ValidationError(Vec<ReqvireError>),
 
