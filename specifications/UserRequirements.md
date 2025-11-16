@@ -447,17 +447,6 @@ The system shall provide an option to export the traceability matrix in formats 
 
 ## Exporting Specifications
 
-### Export HTML specifications
-
-The system shall export specifications into HTML format and save in designated output location.
-
-#### Metadata
-  * type: user-requirement
-
-#### Relations
-  * derivedFrom: [Export Specifications](UserStories.md#export-specifications)
----
-
 ### Browse Model via Web Interface
 
 The system SHALL provide a web-based interface to browse the MBSE model documentation, including all generated artifacts such as diagrams, reports, verification traces, and traceability matrix.
@@ -502,7 +491,9 @@ The navigation bar must be:
   * type: user-requirement
 
 #### Relations
-  * derivedFrom: [Browse Model via Web Interface](#browse-model-via-web-interface)
+  * derivedFrom: [HTML Export](ReqvireTool/UserInterface/WebInterface.md#html-export)
+  * satisfiedBy: [base.html](../core/templates/base.html)
+  * satisfiedBy: [model.html](../core/templates/model.html)
 ---
 
 ## Trace Changes

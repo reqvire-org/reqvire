@@ -1,6 +1,6 @@
 # Web Interface
 
-## HTML Export
+## HTML Documentation Export
 
 ### Index Generation
 
@@ -19,7 +19,7 @@ The index generation is automatically performed as part of the HTML export proce
 
 #### Relations
   * derivedFrom: [Documentation Index for HTML Export](../../UserRequirements.md#documentation-index-for-html-export)
-  * derivedFrom: [HTML Export](#html-export)
+  * derivedFrom: [HTML Navigation Bar](../../UserRequirements.md#html-navigation-bar)
   * satisfiedBy: [index_generator.rs](../../../core/src/index_generator.rs)
   * satisfiedBy: [html_export.rs](../../../core/src/html_export.rs)
 ---
@@ -46,6 +46,8 @@ The system SHALL design and implement HTML pages with consistent layout, styling
   * derivedFrom: [HTML Export](#html-export)
   * satisfiedBy: [html.rs](../../../core/src/html.rs)
   * satisfiedBy: [html_export.rs](../../../core/src/html_export.rs)
+  * satisfiedBy: [base.html](../../../core/templates/base.html)
+  * satisfiedBy: [model.html](../../../core/templates/model.html)
 ---
 
 ### HTML Export
@@ -87,7 +89,7 @@ Execute all generation commands treating temporary directory as repository root:
 - All generation happens in isolated temporary directory
 
 #### Relations
-  * derivedFrom: [Export HTML specifications](../../UserRequirements.md#export-html-specifications)
+  * derivedFrom: [Browse Model via Web Interface](../../UserRequirements.md#browse-model-via-web-interface)
   * derivedFrom: [CLI Interface Structure](CLI.md#cli-interface-structure)
   * satisfiedBy: [html_export.rs](../../../core/src/html_export.rs)
   * satisfiedBy: [html.rs](../../../core/src/html.rs)
@@ -118,7 +120,7 @@ The system SHALL generate a model-centric visualization (model.md) during HTML e
 #### Relations
   * derivedFrom: [Complete Model Structure Visualization](../../UserRequirements.md#complete-model-structure-visualization)
   * derivedFrom: [Model Visualization and Exploration](../../UserRequirements.md#model-visualization-and-exploration)
-  * derivedFrom: [HTML Export](#html-export)
+  * derivedFrom: [HTML Navigation Bar](../../UserRequirements.md#html-navigation-bar)
   * satisfiedBy: [export.rs](../../../core/src/export.rs)
   * satisfiedBy: [reports.rs](../../../core/src/reports.rs)
 ---
@@ -135,7 +137,7 @@ The system SHALL generate a complete model diagram (whole-model.md) during HTML 
 - Output as whole-model.html
 
 #### Relations
-  * derivedFrom: [Browse Model via Web Interface](../../UserRequirements.md#browse-model-via-web-interface)
+  * derivedFrom: [HTML Navigation Bar](../../UserRequirements.md#html-navigation-bar)
   * satisfiedBy: [export.rs](../../../core/src/export.rs)
   * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
 ---
@@ -157,7 +159,6 @@ The system SHALL provide a serve command that exports comprehensive HTML documen
 
 #### Relations
   * derivedFrom: [Browse Model via Web Interface](../../UserRequirements.md#browse-model-via-web-interface)
-  * derivedFrom: [HTML Export](#html-export)
   * trace: [Validate Command](CLI.md#validate-command)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * satisfiedBy: [serve.rs](../../../cli/src/serve.rs)
