@@ -49,9 +49,9 @@ When analyzing requirements for task generation:
 | To Understand This | Use This Command |
 |--------------------|------------------|
 | What requirements changed | `reqvire change-impact --git-commit=<hash> --json` |
-| Requirement full content | `reqvire summary --filter-id="<id>" --json` |
+| Requirement full content | `reqvire search --filter-id="<id>" --json` |
 | What verifies a requirement | `reqvire traces --filter-id="<id>" --json` |
-| Which tests to run | Extract `satisfiedBy` from verification via `reqvire summary` |
+| Which tests to run | Extract `satisfiedBy` from verification via `reqvire search` |
 | Implementation status | Check `satisfiedBy` relations in requirement |
 | Requirement hierarchy | `reqvire traces --filter-id="<id>"` shows derivedFrom chain |
 

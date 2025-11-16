@@ -34,36 +34,57 @@ This guide is split into domain-specific guides for better organization:
 - Format: `cargo fmt`
 
 ### Basic Reqvire Commands
+
+#### Model Manipulation
+- **Add element**: `./target/debug/reqvire add --to-file="specs/Reqs.md" --to-section="Features" <<'EOF' ... EOF`
+- **Add element (pipe)**: `cat element.md | ./target/debug/reqvire add specs/Reqs.md "Features"`
+- **Add element (at position)**: `cat element.md | ./target/debug/reqvire add specs/Reqs.md "Features" 0`
+- **Remove element**: `./target/debug/reqvire rm "specs/Reqs.md#element-name"`
+- **Move element**: `./target/debug/reqvire mv "specs/Reqs.md#element-name" --to-section="New Section"`
+
+#### Validation and Formatting
 - **Validate structure**: `./target/debug/reqvire validate --json > /tmp/validation.json`
 - **Format requirements (preview)**: `./target/debug/reqvire format`
 - **Apply formatting fixes**: `./target/debug/reqvire format --fix`
-- **Generate diagrams**: `./target/debug/reqvire generate-diagrams`
-- **Generate model summary**: `./target/debug/reqvire summary`
-- **Generate model summary (JSON)**: `./target/debug/reqvire summary --json > /tmp/model-summary.json`
-- **Generate section summary**: `./target/debug/reqvire section-summary`
-- **Generate section summary (JSON)**: `./target/debug/reqvire section-summary --json > /tmp/section-summary.json`
-- **Export HTML documentation**: `./target/debug/reqvire export --output <OUTPUT_DIR>` - Exports HTML with index, diagrams, traces, coverage, and matrix
-- **Serve HTML documentation**: `./target/debug/reqvire serve --host localhost --port 8080` - Exports to temp dir and serves via HTTP server (quiet mode)
-- **Analyze change impact**: `./target/debug/reqvire change-impact --git-commit=<COMMIT_HASH>`
-- **Analyze change impact (JSON)**: `./target/debug/reqvire change-impact --git-commit=HEAD~1 --json > /tmp/impact.json`
-- **Generate verification traces**: `./target/debug/reqvire traces` - Generates upward traceability from verifications to root requirements with Mermaid diagrams
-- **Generate verification traces (JSON)**: `./target/debug/reqvire traces --json > /tmp/verification-traces.json` - JSON output with trace trees for programmatic analysis
-- **Filter verification traces**: `./target/debug/reqvire traces --filter-id=<id>` or `--filter-name=<regex>` or `--filter-type=<type>` - Filter to specific verifications
-- **Generate verification matrix**: `./target/debug/reqvire matrix` - Generates verification traceability matrix
-- **Generate coverage report**: `./target/debug/reqvire coverage` - Generates verification coverage report for leaf requirements
 
+#### Search and Filtering
+- **Search elements**: `./target/debug/reqvire search`
+- **Search with filters**: `./target/debug/reqvire search --filter-type="user-requirement" --filter-name=".*auth.*"`
+- **Search by relations**: `./target/debug/reqvire search --have-relations="verifiedBy" --not-have-relations="satisfiedBy"`
+- **Search (JSON output)**: `./target/debug/reqvire search --json > /tmp/search.json`
+- **Search (short mode)**: `./target/debug/reqvire search --short`
 
-### Filtering Options
+**Search Filtering Options:**
 
 | Filter Type | Command Example | Description |
 |-------------|----------------|-------------|
-| File path | `--filter-file="src/**/*Reqs.md"` | Filter elements by file glob pattern |
+| File path | `--filter-file="specs/**/*Reqs.md"` | Filter elements by file glob pattern |
 | Name regex | `--filter-name=".*safety.*"` | Filter elements by name using regex |
 | Section | `--filter-section="System*"` | Filter elements by section glob pattern |
 | Type | `--filter-type="system-requirement"` | Filter by exact element type |
 | Content | `--filter-content="MUST"` | Filter elements containing specific text |
 | Not verified | `--filter-is-not-verified` | Show only unverified requirements |
 | Not satisfied | `--filter-is-not-satisfied` | Show only unsatisfied requirements |
+| Has relations | `--have-relations="verifiedBy,satisfiedBy"` | Show only elements with specified relations |
+| Missing relations | `--not-have-relations="verifiedBy"` | Show only elements without specified relations |
+
+#### Reports and Analysis
+- **Generate diagrams**: `./target/debug/reqvire generate-diagrams`
+- **Model report**: `./target/debug/reqvire model --from "Element Name"`
+- **Model report (JSON)**: `./target/debug/reqvire model --json > /tmp/model.json`
+- **Coverage report**: `./target/debug/reqvire coverage` - Generates verification coverage report for leaf requirements
+- **Analyze change impact**: `./target/debug/reqvire change-impact --git-commit=<COMMIT_HASH>`
+- **Analyze change impact (JSON)**: `./target/debug/reqvire change-impact --git-commit=HEAD~1 --json > /tmp/impact.json`
+
+#### Traceability
+- **Generate verification traces**: `./target/debug/reqvire traces` - Generates upward traceability from verifications to root requirements with Mermaid diagrams
+- **Generate verification traces (JSON)**: `./target/debug/reqvire traces --json > /tmp/verification-traces.json` - JSON output with trace trees for programmatic analysis
+- **Filter verification traces**: `./target/debug/reqvire traces --filter-id=<id>` or `--filter-name=<regex>` or `--filter-type=<type>` - Filter to specific verifications
+- **Generate verification matrix**: `./target/debug/reqvire matrix` - Generates verification traceability matrix
+
+#### Documentation Export
+- **Export HTML documentation**: `./target/debug/reqvire export --output <OUTPUT_DIR>` - Exports HTML with index, diagrams, traces, coverage, and matrix
+- **Serve HTML documentation**: `./target/debug/reqvire serve --host localhost --port 8080` - Exports to temp dir and serves via HTTP server (quiet mode)
 
 ### Key File Locations
 - Core specifications structure: [SpecificationsRequirements.md](specifications/SpecificationsRequirements.md)
@@ -100,7 +121,12 @@ core/src/
 ├── diagrams.rs            # Diagram generation (Mermaid)
 ├── matrix_generator.rs    # Traceability matrix generation
 ├── change_impact.rs       # Change impact analysis
-├── reports.rs             # Report generation
+├── filters.rs             # Element filtering logic
+├── search.rs              # Search and query functionality
+├── report_coverage.rs     # Coverage report generation
+├── report_model.rs        # Model-centric report generation
+├── report_trace.rs        # Verification trace report generation
+├── crud.rs                # Element manipulation (add, remove, move)
 ├── utils.rs               # Utility functions
 ├── error.rs               # Error handling
 └── tests/                 # Unit tests

@@ -47,7 +47,7 @@ ${1:-Comparing against: HEAD~1 (previous commit)}
 4. **For each modified requirement:**
 
    ```bash
-   reqvire summary --filter-id="<requirement-id>"
+   reqvire search --filter-id="<requirement-id>"
    reqvire traces --filter-id="<requirement-id>"
    ```
 

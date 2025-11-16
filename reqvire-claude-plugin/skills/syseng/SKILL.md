@@ -135,23 +135,37 @@ Reqvire provides powerful query and analysis commands that:
 
 | Instead of Reading Files | Use This Command |
 |--------------------------|------------------|
-| Read requirement content | `reqvire summary --filter-id="<id>"` |
-| Find requirements by name | `reqvire summary --filter-name="<pattern>"` |
+| Read requirement content | `reqvire search --filter-id="<id>"` |
+| Find requirements by name | `reqvire search --filter-name="<pattern>"` |
+| Find by relation | `reqvire search --have-relations="verifiedBy"` |
+| Analyze model structure | `reqvire search --short --json` (metadata only, no content) |
 | Check verification status | `reqvire coverage --filter-name="<pattern>"` |
 | See requirement hierarchy | `reqvire traces --filter-id="<id>"` |
-| Find unverified requirements | `reqvire coverage --json \| jq '.unverified_leaf_requirements'` |
+| Find unverified requirements | `reqvire search --filter-is-not-verified` |
 | Check model validity | `reqvire validate --json` |
 | Find model issues | `reqvire lint --json` |
 | Understand changes | `reqvire change-impact --git-commit=<hash>` |
+| Add element | `cat element.md \| reqvire add <file> <section>` |
+| Remove element | `reqvire rm "<file>#<element-name>"` |
+| Move element | `reqvire mv "<file>#<element-name>" --to-section="<section>"` |
 
 ### Key Reqvire Commands
 
 ```bash
+# Search and filtering
+reqvire search [--json] [--short] [--filter-*]
+# Use --short when analyzing model structure without needing full content
+
+# Element manipulation
+reqvire add --to-file=<file> --to-section=<section> [<index>]
+reqvire rm "<file>#<element-name>"
+reqvire mv "<file>#<element-name>" --to-section=<section> [--to-index=<index>]
+
 # Validation and analysis
 reqvire validate [--json]
-reqvire summary [--json] [--filter-*]
 reqvire coverage [--json]
 reqvire traces [--json] [--filter-*]
+reqvire model [--from=<name>] [--json]
 
 # Change analysis
 reqvire change-impact --git-commit=<hash> [--json]
@@ -166,14 +180,17 @@ reqvire serve --port 8080
 
 ### Common Filter Options
 
-All analysis commands support powerful filtering:
+Search and analysis commands support powerful filtering:
 - `--filter-file="path/pattern"` - Filter by file glob
 - `--filter-name="regex"` - Filter by element name
 - `--filter-id="full-id"` - Filter by exact identifier
+- `--filter-section="section*"` - Filter by section glob
 - `--filter-type="requirement"` - Filter by element type
 - `--filter-content="text"` - Filter by content
 - `--filter-is-not-verified` - Only unverified requirements
 - `--filter-is-not-satisfied` - Only unsatisfied verifications
+- `--have-relations="verifiedBy,satisfiedBy"` - Only elements with these relations
+- `--not-have-relations="verifiedBy"` - Only elements without these relations
 
 ### Verification Strategy
 

@@ -11,7 +11,7 @@ Add a new requirement to the Reqvire model following MBSE best practices.
 
 ## Current Model Context
 
-- Total requirements: !`reqvire summary --json | jq -r '.global_counters.total_elements'`
+- Total requirements: !`reqvire search --json | jq -r '.global_counters.total_elements'`
 - Verification coverage: !`reqvire coverage --json | jq -r '.summary.leaf_requirements_coverage_percentage'`%
 - Unverified leaf requirements: !`reqvire coverage --json | jq -r '.summary.unverified_leaf_requirements'`
 

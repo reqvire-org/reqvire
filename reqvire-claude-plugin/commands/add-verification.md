@@ -11,7 +11,7 @@ Add a verification for an existing requirement following Reqvire's bottom roll-u
 
 ## Current Model Context
 
-- Total verifications: !`reqvire summary --json | jq -r '.global_counters.verifications'`
+- Total verifications: !`reqvire search --json | jq -r '.global_counters.verifications'`
 - Verification coverage: !`reqvire coverage --json | jq -r '.summary.leaf_requirements_coverage_percentage'`%
 - Unverified leaf requirements: !`reqvire coverage --json | jq -r '.summary.unverified_leaf_requirements'`
 
@@ -52,7 +52,7 @@ ${1:-The user will specify which requirement needs verification.}
 
    For each requirement this verification will verify:
    ```bash
-   reqvire summary --filter-id="<requirement-id>"
+   reqvire search --filter-id="<requirement-id>"
    ```
 
    Extract:

@@ -35,7 +35,7 @@ Lint the Reqvire model to fix quality issues and identify items needing manual r
 
    Read affected specifications:
    ```bash
-   reqvire summary --filter-id="<element-id>"
+   reqvire search --filter-id="<element-id>"
    ```
 
    Provide recommendations:

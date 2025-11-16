@@ -41,7 +41,7 @@ Generate implementation task plan from requirement changes on a feature branch.
 
    Get details:
    ```bash
-   reqvire summary --filter-id="<requirement-id>" --json
+   reqvire search --filter-id="<requirement-id>" --json
    ```
 
    Extract:
@@ -54,7 +54,7 @@ Generate implementation task plan from requirement changes on a feature branch.
 
    Get test paths:
    ```bash
-   reqvire summary --filter-id="<verification-id>" --json
+   reqvire search --filter-id="<verification-id>" --json
    ```
 
    Extract satisfiedBy relations (test files).

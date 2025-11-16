@@ -11,7 +11,7 @@ Add a complete feature by orchestrating multiple commands to create requirements
 
 ## Current Model Context
 
-- Total requirements: !`reqvire summary --json | jq -r '.global_counters.total_elements'`
+- Total requirements: !`reqvire search --json | jq -r '.global_counters.total_elements'`
 - Verification coverage: !`reqvire coverage --json | jq -r '.summary.leaf_requirements_coverage_percentage'`%
 
 ## User Request
