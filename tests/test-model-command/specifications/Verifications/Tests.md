@@ -14,9 +14,21 @@ Test verifies that model diagrams can be generated from CLI.
 
 ---
 
-### Model Filtering Test
+### From Flag Filtering Test
 
-Test verifies that model diagrams can be filtered from a specific root element.
+Test verifies --from flag filters model starting from specified element.
+
+#### Details
+Test procedure:
+1. Run model command WITH --from <element-name> flag with --json
+2. Compare output against expected_filtered_output.json
+3. Verify output starts from specified element at top level
+4. Verify relations are nested recursively from that starting point
+5. Verify only forward-related elements appear in nested structure
+6. Verify metadata.filtered_from contains element name
+
+Expected files:
+- tests/test-model-command/expected_filtered_output.json
 
 #### Metadata
   * type: test-verification
@@ -27,9 +39,49 @@ Test verifies that model diagrams can be filtered from a specific root element.
 
 ---
 
+### Default Filtering Test
+
+Test verifies default behavior filters to root requirements when --from flag is NOT specified.
+
+#### Details
+Test procedure:
+1. Run model command WITHOUT --from flag with --json
+2. Compare output against expected_default_output.json
+3. Verify only root requirements (no hierarchical parent) appear at top level
+4. Verify their derived children appear nested in relations
+5. Verify output is model-centric (not folder-centric)
+
+Expected files:
+- tests/test-model-command/expected_default_output.json
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [Default Root Filtering](../SystemRequirements.md#default-root-filtering)
+
+---
+
 ### Output Format Test
 
-Test verifies that both markdown and JSON output formats are supported.
+Test verifies nested JSON structure and output formats against expected files.
+
+#### Details
+Test procedure:
+1. Run model command with --json flag
+2. Compare output against expected_output.json
+3. Verify JSON structure matches expected:
+   - Elements array with all required fields (identifier, name, element_type, file_path, section, section_index)
+   - Relations nested inside elements with target details
+   - Three target types handled correctly: element (recursive), file path, external URL
+   - Metadata counts elements/relations without duplicates
+4. Run model command without --json flag
+5. Compare markdown output against expected_output.md
+6. Verify mermaid diagrams present and correctly formatted with all nested relations
+
+Expected files:
+- tests/test-model-command/expected_output.json
+- tests/test-model-command/expected_output.md
 
 #### Metadata
   * type: test-verification

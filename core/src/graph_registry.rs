@@ -810,6 +810,28 @@ impl GraphRegistry {
         elements
     }
 
+    /// Find all requirements without hierarchical parent relations (root requirements)
+    pub fn find_root_requirements(&self) -> Vec<String> {
+        let hierarchical_relations = relation::get_hierarchical_relation_types();
+
+        self.nodes.values()
+            .map(|node| &node.element)
+            .filter(|element| {
+                // Only consider requirements
+                if !matches!(element.element_type, ElementType::Requirement(_)) {
+                    return false;
+                }
+
+                // Check if has any hierarchical parent relation
+                let has_parent = element.relations.iter()
+                    .any(|r| hierarchical_relations.contains(&r.relation_type.name));
+
+                !has_parent
+            })
+            .map(|e| e.identifier.clone())
+            .collect()
+    }
+
     /// Collects all InternalPath targets from element relations
     pub fn get_internal_path_targets(&self) -> HashSet<PathBuf> {
         self.collect_internal_path_targets()

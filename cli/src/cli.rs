@@ -215,14 +215,21 @@ pub enum Commands {
         json: bool,
     },
 
-    /// Generate model structure diagram with optional filtering
-    #[clap(override_help = "Generate model structure diagram with optional filtering\n\nMODEL OPTIONS:\n      --from <NAME>               Filter model from specific root element by name (forward relations only)\n      --json                      Output results in JSON format")]
+    /// Generate model-centric structure with nested relations
+    ///
+    /// By default, shows root requirements (no hierarchical parent).
+    /// Use --from <NAME> to start from specific element.
+    ///
+    /// Output formats:
+    /// - JSON: Nested structure with element details in relations
+    /// - Markdown: Mermaid diagrams with all nested relationships
+    #[clap(override_help = "Generate model-centric structure with nested relations\n\nBy default, shows root requirements (no hierarchical parent).\nUse --from <NAME> to start from specific element.\n\nOutput formats:\n  - JSON: Nested structure with element details in relations\n  - Markdown: Mermaid diagrams with all nested relationships\n\nMODEL OPTIONS:\n      --from <NAME>               Start from specific element by name\n      --json                      Output results in JSON format (nested structure)")]
     Model {
-        /// Filter model from specific root element by name using forward-only relation traversal
+        /// Start from specific element by name
         #[clap(long, value_name = "NAME", help_heading = "MODEL OPTIONS")]
         from: Option<String>,
 
-        /// Output results in JSON format
+        /// Output results in JSON format (nested structure)
         #[clap(long, help_heading = "MODEL OPTIONS")]
         json: bool,
     },
@@ -749,29 +756,10 @@ pub fn handle_command(
             return Ok(0);
         },
         Some(Commands::Model { from, json }) => {
-            // Generate model diagram with optional filtering
-            // Look up element ID by name if provided
-            let root_id = if let Some(name) = from {
-                // Find element by name (element names are globally unique)
-                let found_element = model_manager.graph_registry.nodes.iter()
-                    .find(|(_, node)| node.element.name == name);
-
-                match found_element {
-                    Some((id, _)) => Some(id.clone()),
-                    None => {
-                        eprintln!("❌ Element with name '{}' not found", name);
-                        return Ok(1);
-                    }
-                }
-            } else {
-                None
-            };
-
-            let forward_only = root_id.is_some(); // Use forward-only when filtering by root element
-            let output = diagrams::generate_model_report(
+            // Generate model-centric report with optional filtering
+            let output = reports::generate_model_report(
                 &model_manager.graph_registry,
-                root_id.as_deref(),
-                forward_only,
+                from.as_deref(),
                 json
             )?;
             println!("{}", output);

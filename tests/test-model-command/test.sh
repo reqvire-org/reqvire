@@ -9,17 +9,17 @@ echo "Starting test..." > "${TEST_DIR}/test_results.log"
 # Satisfies: specifications/Verifications/ReportsTests.md#model-command-verification
 #
 # Acceptance Criteria:
-# - `reqvire model` generates markdown with complete model diagram showing all elements
-# - `reqvire model --from=<name>` generates diagram with only forward-related elements from root
-# - `reqvire model --json` generates valid JSON structure with all model data
-# - `reqvire model --from=<name> --json` generates filtered JSON with forward-related elements
-# - Filtered diagrams include only elements reachable via forward relations
-# - JSON output can be parsed and contains expected fields (folders, relations)
+# - `reqvire model` generates model-centric output showing root requirements with nested relations
+# - `reqvire model --from=<name>` generates nested structure from specified element
+# - `reqvire model --json` generates valid JSON with nested element structure
+# - `reqvire model --from=<name> --json` generates filtered JSON from specified starting point
+# - Default mode filters to root requirements (no hierarchical parent relations)
+# - Relations contain full target element details recursively
 #
 # Test Criteria:
 # - Commands exit with success (0) return code
-# - Markdown output matches expected structure with model diagram
-# - JSON output matches expected structure with folders, files, sections, elements, relations
+# - Markdown output matches expected structure with model-centric view
+# - JSON output matches expected structure with elements, metadata, and nested relations
 # - Filters correctly restrict output to forward-reachable elements only
 
 # Test 1: Full Model Markdown Output - Compare against expected file
@@ -40,8 +40,8 @@ if [ $EXIT_CODE -ne 0 ]; then
 fi
 
 # Basic validation before comparing with expected
-if ! grep -q "# Model Diagram Report" <<< "$OUTPUT"; then
-    echo "❌ FAILED: Output missing '# Model Diagram Report' header"
+if ! grep -q "# Model Structure" <<< "$OUTPUT"; then
+    echo "❌ FAILED: Output missing '# Model Structure' header"
     exit 1
 fi
 
@@ -91,13 +91,13 @@ if [ $? -ne 0 ]; then
 fi
 
 # Validate required JSON fields
-if ! echo "$OUTPUT" | jq -e 'has("folders")' >/dev/null 2>&1; then
-    echo "❌ FAILED: JSON missing 'folders' field"
+if ! echo "$OUTPUT" | jq -e 'has("elements")' >/dev/null 2>&1; then
+    echo "❌ FAILED: JSON missing 'elements' field"
     exit 1
 fi
 
-if ! echo "$OUTPUT" | jq -e 'has("relations")' >/dev/null 2>&1; then
-    echo "❌ FAILED: JSON missing 'relations' field"
+if ! echo "$OUTPUT" | jq -e 'has("metadata")' >/dev/null 2>&1; then
+    echo "❌ FAILED: JSON missing 'metadata' field"
     exit 1
 fi
 
@@ -237,84 +237,80 @@ echo "Validating JSON structure fields" >> "${TEST_DIR}/test_results.log"
 # Load the full model JSON
 FULL_JSON=$(cat "${TEST_DIR}/actual_output.json")
 
-# Validate folder structure
-if ! echo "$FULL_JSON" | jq -e '.folders[0] | has("name")' >/dev/null 2>&1; then
-    echo "❌ FAILED: Folder missing 'name' field"
+# Validate metadata structure
+if ! echo "$FULL_JSON" | jq -e '.metadata | has("total_elements")' >/dev/null 2>&1; then
+    echo "❌ FAILED: Metadata missing 'total_elements' field"
     exit 1
 fi
 
-if ! echo "$FULL_JSON" | jq -e '.folders[0] | has("path")' >/dev/null 2>&1; then
-    echo "❌ FAILED: Folder missing 'path' field"
+if ! echo "$FULL_JSON" | jq -e '.metadata | has("total_relations")' >/dev/null 2>&1; then
+    echo "❌ FAILED: Metadata missing 'total_relations' field"
     exit 1
 fi
 
-if ! echo "$FULL_JSON" | jq -e '.folders[0] | has("files")' >/dev/null 2>&1; then
-    echo "❌ FAILED: Folder missing 'files' field"
+if ! echo "$FULL_JSON" | jq -e '.metadata | has("filtered_from")' >/dev/null 2>&1; then
+    echo "❌ FAILED: Metadata missing 'filtered_from' field"
     exit 1
 fi
 
-# Validate file structure
-if ! echo "$FULL_JSON" | jq -e '.folders[0].files[0] | has("name")' >/dev/null 2>&1; then
-    echo "❌ FAILED: File missing 'name' field"
-    exit 1
-fi
-
-if ! echo "$FULL_JSON" | jq -e '.folders[0].files[0] | has("path")' >/dev/null 2>&1; then
-    echo "❌ FAILED: File missing 'path' field"
-    exit 1
-fi
-
-if ! echo "$FULL_JSON" | jq -e '.folders[0].files[0] | has("sections")' >/dev/null 2>&1; then
-    echo "❌ FAILED: File missing 'sections' field"
-    exit 1
-fi
-
-# Validate section structure
-if ! echo "$FULL_JSON" | jq -e '.folders[0].files[0].sections[0] | has("name")' >/dev/null 2>&1; then
-    echo "❌ FAILED: Section missing 'name' field"
-    exit 1
-fi
-
-if ! echo "$FULL_JSON" | jq -e '.folders[0].files[0].sections[0] | has("elements")' >/dev/null 2>&1; then
-    echo "❌ FAILED: Section missing 'elements' field"
+# Validate elements array exists and has entries
+if ! echo "$FULL_JSON" | jq -e '.elements | length > 0' >/dev/null 2>&1; then
+    echo "❌ FAILED: Elements array is empty"
     exit 1
 fi
 
 # Validate element structure
-if ! echo "$FULL_JSON" | jq -e '.folders[0].files[0].sections[0].elements[0] | has("identifier")' >/dev/null 2>&1; then
+if ! echo "$FULL_JSON" | jq -e '.elements[0] | has("identifier")' >/dev/null 2>&1; then
     echo "❌ FAILED: Element missing 'identifier' field"
     exit 1
 fi
 
-if ! echo "$FULL_JSON" | jq -e '.folders[0].files[0].sections[0].elements[0] | has("name")' >/dev/null 2>&1; then
+if ! echo "$FULL_JSON" | jq -e '.elements[0] | has("name")' >/dev/null 2>&1; then
     echo "❌ FAILED: Element missing 'name' field"
     exit 1
 fi
 
-if ! echo "$FULL_JSON" | jq -e '.folders[0].files[0].sections[0].elements[0] | has("element_type")' >/dev/null 2>&1; then
+if ! echo "$FULL_JSON" | jq -e '.elements[0] | has("element_type")' >/dev/null 2>&1; then
     echo "❌ FAILED: Element missing 'element_type' field"
     exit 1
 fi
 
-# Validate relation structure
-if ! echo "$FULL_JSON" | jq -e '.relations[0] | has("source_id")' >/dev/null 2>&1; then
-    echo "❌ FAILED: Relation missing 'source_id' field"
+if ! echo "$FULL_JSON" | jq -e '.elements[0] | has("file_path")' >/dev/null 2>&1; then
+    echo "❌ FAILED: Element missing 'file_path' field"
     exit 1
 fi
 
-if ! echo "$FULL_JSON" | jq -e '.relations[0] | has("target_id")' >/dev/null 2>&1; then
-    echo "❌ FAILED: Relation missing 'target_id' field"
+if ! echo "$FULL_JSON" | jq -e '.elements[0] | has("section")' >/dev/null 2>&1; then
+    echo "❌ FAILED: Element missing 'section' field"
     exit 1
 fi
 
-if ! echo "$FULL_JSON" | jq -e '.relations[0] | has("relation_type")' >/dev/null 2>&1; then
-    echo "❌ FAILED: Relation missing 'relation_type' field"
+if ! echo "$FULL_JSON" | jq -e '.elements[0] | has("section_index")' >/dev/null 2>&1; then
+    echo "❌ FAILED: Element missing 'section_index' field"
     exit 1
 fi
 
-if ! echo "$FULL_JSON" | jq -e '.relations[0] | has("is_external")' >/dev/null 2>&1; then
-    echo "❌ FAILED: Relation missing 'is_external' field"
+if ! echo "$FULL_JSON" | jq -e '.elements[0] | has("relations")' >/dev/null 2>&1; then
+    echo "❌ FAILED: Element missing 'relations' field"
     exit 1
+fi
+
+# Validate relation structure (if relations exist)
+if echo "$FULL_JSON" | jq -e '.elements[0].relations | length > 0' >/dev/null 2>&1; then
+    if ! echo "$FULL_JSON" | jq -e '.elements[0].relations[0] | has("relation_type")' >/dev/null 2>&1; then
+        echo "❌ FAILED: Relation missing 'relation_type' field"
+        exit 1
+    fi
+
+    # Check that relation has either element, path, or url field
+    HAS_ELEMENT=$(echo "$FULL_JSON" | jq -e '.elements[0].relations[0] | has("element")' 2>/dev/null && echo "yes" || echo "no")
+    HAS_PATH=$(echo "$FULL_JSON" | jq -e '.elements[0].relations[0] | has("path")' 2>/dev/null && echo "yes" || echo "no")
+    HAS_URL=$(echo "$FULL_JSON" | jq -e '.elements[0].relations[0] | has("url")' 2>/dev/null && echo "yes" || echo "no")
+
+    if [ "$HAS_ELEMENT" != "yes" ] && [ "$HAS_PATH" != "yes" ] && [ "$HAS_URL" != "yes" ]; then
+        echo "❌ FAILED: Relation must have 'element', 'path', or 'url' field"
+        exit 1
+    fi
 fi
 
 exit 0

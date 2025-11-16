@@ -1,191 +1,123 @@
 {
-  "folders": [
+  "elements": [
     {
-      "name": "specifications",
-      "path": "specifications",
-      "files": [
+      "identifier": "specifications/UserRequirements.md#model-structure-exploration",
+      "name": "Model Structure Exploration",
+      "element_type": "user-requirement",
+      "file_path": "specifications/UserRequirements.md",
+      "section": "Model Visualization",
+      "section_index": 0,
+      "relations": [
         {
-          "name": "SystemRequirements.md",
-          "path": "specifications/SystemRequirements.md",
-          "sections": [
+          "relation_type": "derive",
+          "identifier": "specifications/SystemRequirements.md#markdown-output-format",
+          "name": "Markdown Output Format",
+          "element_type": "requirement",
+          "file_path": "specifications/SystemRequirements.md",
+          "section": "Output Formatting",
+          "section_index": 0,
+          "relations": [
             {
-              "name": "Output Formatting",
-              "elements": [
-                {
-                  "identifier": "specifications/SystemRequirements.md#json-output-format",
-                  "name": "JSON Output Format",
-                  "element_type": "requirement"
-                },
-                {
-                  "identifier": "specifications/SystemRequirements.md#markdown-output-format",
-                  "name": "Markdown Output Format",
-                  "element_type": "requirement"
-                }
-              ]
-            },
-            {
-              "name": "Visualization Commands",
-              "elements": [
-                {
-                  "identifier": "specifications/SystemRequirements.md#forward-relation-traversal",
-                  "name": "Forward Relation Traversal",
-                  "element_type": "requirement"
-                },
-                {
-                  "identifier": "specifications/SystemRequirements.md#model-diagram-generation",
-                  "name": "Model Diagram Generation",
-                  "element_type": "requirement"
-                },
-                {
-                  "identifier": "specifications/SystemRequirements.md#model-filtering-capability",
-                  "name": "Model Filtering Capability",
-                  "element_type": "requirement"
-                }
-              ]
+              "relation_type": "verifiedBy",
+              "identifier": "specifications/Verifications/Tests.md#output-format-test",
+              "name": "Output Format Test",
+              "element_type": "test-verification",
+              "file_path": "specifications/Verifications/Tests.md",
+              "section": "Model Command Tests",
+              "section_index": 3,
+              "relations": []
             }
           ]
         },
         {
-          "name": "UserRequirements.md",
-          "path": "specifications/UserRequirements.md",
-          "sections": [
+          "relation_type": "derive",
+          "identifier": "specifications/SystemRequirements.md#model-diagram-generation",
+          "name": "Model Diagram Generation",
+          "element_type": "requirement",
+          "file_path": "specifications/SystemRequirements.md",
+          "section": "Visualization Commands",
+          "section_index": 0,
+          "relations": [
             {
-              "name": "Model Visualization",
-              "elements": [
-                {
-                  "identifier": "specifications/UserRequirements.md#model-structure-exploration",
-                  "name": "Model Structure Exploration",
-                  "element_type": "user-requirement"
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "specifications/Verifications",
-      "path": "specifications/Verifications",
-      "files": [
-        {
-          "name": "Tests.md",
-          "path": "specifications/Verifications/Tests.md",
-          "sections": [
+              "relation_type": "derive",
+              "identifier": "specifications/SystemRequirements.md#json-output-format",
+              "name": "JSON Output Format",
+              "element_type": "requirement",
+              "file_path": "specifications/SystemRequirements.md",
+              "section": "Output Formatting",
+              "section_index": 1,
+              "relations": []
+            },
             {
-              "name": "Model Command Tests",
-              "elements": [
+              "relation_type": "derive",
+              "identifier": "specifications/SystemRequirements.md#model-filtering-capability",
+              "name": "Model Filtering Capability",
+              "element_type": "requirement",
+              "file_path": "specifications/SystemRequirements.md",
+              "section": "Visualization Commands",
+              "section_index": 1,
+              "relations": [
                 {
-                  "identifier": "specifications/Verifications/Tests.md#model-filtering-test",
-                  "name": "Model Filtering Test",
-                  "element_type": "test-verification"
+                  "relation_type": "derive",
+                  "identifier": "specifications/SystemRequirements.md#default-root-filtering",
+                  "name": "Default Root Filtering",
+                  "element_type": "requirement",
+                  "file_path": "specifications/SystemRequirements.md",
+                  "section": "Visualization Commands",
+                  "section_index": 3,
+                  "relations": [
+                    {
+                      "relation_type": "verifiedBy",
+                      "identifier": "specifications/Verifications/Tests.md#default-filtering-test",
+                      "name": "Default Filtering Test",
+                      "element_type": "test-verification",
+                      "file_path": "specifications/Verifications/Tests.md",
+                      "section": "Model Command Tests",
+                      "section_index": 2,
+                      "relations": []
+                    }
+                  ]
                 },
                 {
-                  "identifier": "specifications/Verifications/Tests.md#model-generation-test",
-                  "name": "Model Generation Test",
-                  "element_type": "test-verification"
+                  "relation_type": "derive",
+                  "identifier": "specifications/SystemRequirements.md#forward-relation-traversal",
+                  "name": "Forward Relation Traversal",
+                  "element_type": "requirement",
+                  "file_path": "specifications/SystemRequirements.md",
+                  "section": "Visualization Commands",
+                  "section_index": 2,
+                  "relations": []
                 },
                 {
-                  "identifier": "specifications/Verifications/Tests.md#output-format-test",
-                  "name": "Output Format Test",
-                  "element_type": "test-verification"
+                  "relation_type": "verifiedBy",
+                  "identifier": "specifications/Verifications/Tests.md#from-flag-filtering-test",
+                  "name": "From Flag Filtering Test",
+                  "element_type": "test-verification",
+                  "file_path": "specifications/Verifications/Tests.md",
+                  "section": "Model Command Tests",
+                  "section_index": 1,
+                  "relations": []
                 }
               ]
+            },
+            {
+              "relation_type": "verifiedBy",
+              "identifier": "specifications/Verifications/Tests.md#model-generation-test",
+              "name": "Model Generation Test",
+              "element_type": "test-verification",
+              "file_path": "specifications/Verifications/Tests.md",
+              "section": "Model Command Tests",
+              "section_index": 0,
+              "relations": []
             }
           ]
         }
       ]
     }
   ],
-  "relations": [
-    {
-      "source_id": "specifications/SystemRequirements.md#forward-relation-traversal",
-      "target_id": "specifications/Verifications/Tests.md#model-filtering-test",
-      "target_label": "Model Filtering Test",
-      "relation_type": "verifiedBy",
-      "relation_label": "verifiedBy",
-      "arrow": "-.->",
-      "is_external": false
-    },
-    {
-      "source_id": "specifications/SystemRequirements.md#json-output-format",
-      "target_id": "specifications/Verifications/Tests.md#output-format-test",
-      "target_label": "Output Format Test",
-      "relation_type": "verifiedBy",
-      "relation_label": "verifiedBy",
-      "arrow": "-.->",
-      "is_external": false
-    },
-    {
-      "source_id": "specifications/SystemRequirements.md#markdown-output-format",
-      "target_id": "specifications/Verifications/Tests.md#output-format-test",
-      "target_label": "Output Format Test",
-      "relation_type": "verifiedBy",
-      "relation_label": "verifiedBy",
-      "arrow": "-.->",
-      "is_external": false
-    },
-    {
-      "source_id": "specifications/SystemRequirements.md#model-diagram-generation",
-      "target_id": "specifications/SystemRequirements.md#json-output-format",
-      "target_label": "JSON Output Format",
-      "relation_type": "derive",
-      "relation_label": "deriveReqT",
-      "arrow": "-.->",
-      "is_external": false
-    },
-    {
-      "source_id": "specifications/SystemRequirements.md#model-diagram-generation",
-      "target_id": "specifications/SystemRequirements.md#model-filtering-capability",
-      "target_label": "Model Filtering Capability",
-      "relation_type": "derive",
-      "relation_label": "deriveReqT",
-      "arrow": "-.->",
-      "is_external": false
-    },
-    {
-      "source_id": "specifications/SystemRequirements.md#model-diagram-generation",
-      "target_id": "specifications/Verifications/Tests.md#model-generation-test",
-      "target_label": "Model Generation Test",
-      "relation_type": "verifiedBy",
-      "relation_label": "verifiedBy",
-      "arrow": "-.->",
-      "is_external": false
-    },
-    {
-      "source_id": "specifications/SystemRequirements.md#model-filtering-capability",
-      "target_id": "specifications/SystemRequirements.md#forward-relation-traversal",
-      "target_label": "Forward Relation Traversal",
-      "relation_type": "derive",
-      "relation_label": "deriveReqT",
-      "arrow": "-.->",
-      "is_external": false
-    },
-    {
-      "source_id": "specifications/SystemRequirements.md#model-filtering-capability",
-      "target_id": "specifications/Verifications/Tests.md#model-filtering-test",
-      "target_label": "Model Filtering Test",
-      "relation_type": "verifiedBy",
-      "relation_label": "verifiedBy",
-      "arrow": "-.->",
-      "is_external": false
-    },
-    {
-      "source_id": "specifications/UserRequirements.md#model-structure-exploration",
-      "target_id": "specifications/SystemRequirements.md#markdown-output-format",
-      "target_label": "Markdown Output Format",
-      "relation_type": "derive",
-      "relation_label": "deriveReqT",
-      "arrow": "-.->",
-      "is_external": false
-    },
-    {
-      "source_id": "specifications/UserRequirements.md#model-structure-exploration",
-      "target_id": "specifications/SystemRequirements.md#model-diagram-generation",
-      "target_label": "Model Diagram Generation",
-      "relation_type": "derive",
-      "relation_label": "deriveReqT",
-      "arrow": "-.->",
-      "is_external": false
-    }
-  ]
+  "metadata": {
+    "total_elements": 1,
+    "total_relations": 12,
+    "filtered_from": null
+  }
 }

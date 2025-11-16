@@ -367,66 +367,65 @@ This test verifies that the --from-folder option correctly generates relative li
 
 ### Model Command Verification
 
-Comprehensive test verifying model command generates correct output in different modes.
+Comprehensive test verifying model command generates model-centric nested output in different modes.
 
 #### Details
 
 ##### Acceptance Criteria
-1. `reqvire model` generates markdown with complete model diagram showing all elements
-2. `reqvire model --from=<name>` generates diagram with only forward-related elements from root
-3. `reqvire model --json` generates valid JSON structure with all model data
-4. `reqvire model --from=<name> --json` generates filtered JSON with forward-related elements
-5. Filtered diagrams include only elements reachable via forward relations
-6. JSON output can be parsed and contains expected fields (folders, relations)
+1. `reqvire model` generates model-centric output showing root requirements with nested relations
+2. `reqvire model --from=<name>` generates nested structure starting from specified element
+3. `reqvire model --json` generates valid JSON with nested element structure
+4. `reqvire model --from=<name> --json` generates filtered JSON from specified starting point
+5. Default mode filters to root requirements (no hierarchical parent relations)
+6. Relations contain full target element details recursively
 
 ##### Test Criteria
-1. **Full Model Markdown Output**
-   Command: `reqvire model`
-   - exits code **0**
-   - output contains `# Model Diagram Report`
-   - output contains Mermaid diagram block with `graph TD`
-   - diagram includes all test elements
-   - diagram shows hierarchical structure (folders > files > sections > elements)
-
-2. **Filtered Model Markdown Output**
-   Command: `reqvire model --from=<test-element-name>`
-   - exits code **0**
-   - output contains `# Model Diagram Report`
-   - output contains Mermaid diagram with filtered elements
-   - diagram includes only elements reachable via forward relations from root
-   - elements not in forward path are excluded
-
-3. **Full Model JSON Output**
+1. **Default Model Output (Root Requirements)**
    Command: `reqvire model --json`
    - exits code **0**
    - output parses as valid JSON
-   - JSON contains `folders` array
-   - JSON contains `relations` array
-   - folders contain files, files contain sections, sections contain elements
-   - all test elements are present in JSON structure
+   - JSON contains `elements` array with root requirements only at top level
+   - JSON contains `metadata` with total_elements, total_relations, filtered_from (null)
+   - Only requirements without hierarchical parent relations at top level
+   - Nested relations contain full element details recursively
 
-4. **Filtered Model JSON Output**
+2. **Filtered Model Output (From Specific Element)**
    Command: `reqvire model --from=<test-element-name> --json`
    - exits code **0**
    - output parses as valid JSON
-   - JSON contains only elements reachable via forward relations
-   - filtered elements count is less than full model
+   - JSON elements array contains specified element at top level
+   - metadata.filtered_from contains element name
+   - Only forward-related elements appear in nested structure
+
+3. **Markdown Output with Mermaid Diagrams**
+   Command: `reqvire model`
+   - exits code **0**
+   - output contains `# Model Structure`
+   - output contains metadata (Total Elements, Total Relations)
+   - output contains Mermaid diagram blocks showing all nested relations
+   - diagrams use hash identifiers for node IDs
+
+4. **Nested JSON Structure Validation**
+   Command: `reqvire model --json`
+   - JSON has keys: `elements`, `metadata`
+   - Each element has: `identifier`, `name`, `element_type`, `file_path`, `section`, `section_index`, `relations`
+   - Each relation has: `relation_type`, target (element/file/external)
+   - Element targets are nested recursively with same structure
+   - File targets have: `path`, `type: "file"`
+   - External targets have: `url`, `type: "external"`
+   - Metadata has: `total_elements`, `total_relations`, `filtered_from`
 
 5. **Forward-Only Traversal Verification**
    - Create test with element A that derives B, and B derives C
-   - Running `reqvire model --from=<A-name>` includes B and C
+   - Running `reqvire model --from=<A-name>` includes B and C nested in relations
    - Create element D that is derived from B (backward relation)
    - Running `reqvire model --from=<A-name>` includes B and C but NOT D
    - Confirms only forward relations (derive, satisfiedBy, verifiedBy, trace) are followed
 
-6. **JSON Structure Validation**
-   Command: `reqvire model --json`
-   - JSON has keys: `folders`, `relations`
-   - Each folder has: `name`, `path`, `files`
-   - Each file has: `name`, `path`, `sections`
-   - Each section has: `name`, `elements`
-   - Each element has: `identifier`, `name`, `element_type`
-   - Each relation has: `source_id`, `target_id`, `relation_type`, `is_external`
+6. **Cycle Detection Verification**
+   - System prevents infinite recursion when cycles exist in forward relations
+   - Nested structure handles circular dependencies gracefully
+   - Each element appears at most once in traversal
 
 #### Metadata
   * type: test-verification

@@ -39,17 +39,18 @@ The system shall provide functionality to remove all generated Mermaid diagrams 
 
 ### Complete Model Structure Visualization
 
-The system shall provide visualization of the complete model structure showing the containment hierarchy of folders, files, sections, and elements with their relationships.
+The system shall provide visualization of the complete model structure showing an element-centric view with nested relations.
 
 #### Details
 The visualization shall:
-- Show the complete model structure using nested containment boxes (folders > files > sections > elements)
-- Display elements with their relations connecting them inside their containing sections
-- Use consistent visual styling similar to existing mermaid diagrams
-- Support interactive pan and zoom for large models
-- Be generated alongside other model artifacts during export
+- Display elements with their properties (identifier, name, type, file location, section)
+- Show relations nested inside elements with full target details
+- Support recursive nesting for element-to-element relations
+- Handle file path and external URL relations
+- Provide metadata about total elements and relations
+- Use consistent visual styling with mermaid diagrams showing hash-based node identifiers
 
-The visualization helps users understand the overall model organization, navigate complex structures, and identify structural patterns across the entire model.
+The visualization helps users understand the model's logical structure, navigate relationships between elements, and explore the model from any starting point.
 
 #### Metadata
   * type: user-requirement
@@ -63,9 +64,12 @@ The visualization helps users understand the overall model organization, navigat
 Users shall be able to generate and view model structure diagrams from any starting point of the model.
 
 #### Details
-- Users shall be able to generate complete model structure diagrams showing all elements and relations
-- Users shall be able to focus on specific parts of the model by filtering from any element as a root of the tree
-- Output shall be available in human-readable (markdown) and machine-processable (JSON) formats
+- Generate complete model structure with nested relations showing element details recursively
+- Default view shows root requirements (no hierarchical parent)
+- Filter from specific element using --from flag
+- View both JSON and markdown output formats
+- Nested structure shows relations with full target details
+- Mermaid diagrams display all nested relations recursively
 
 #### Metadata
   * type: user-requirement
