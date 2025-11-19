@@ -215,6 +215,31 @@ The system shall reject the operation with a clear error message if:
   * derivedFrom: [Element Manipulation Operations](../../ModelManagement.md#element-manipulation-operations)
 ---
 
+### Rename Element Operation
+
+The system shall provide the capability to rename existing model elements by changing their heading text while updating all relation references and the registry.
+
+#### Details
+When renaming an element, the system shall:
+- Accept the current element name and the new element name
+- Validate that the current element exists in the model registry
+- Validate that the new name is globally unique in the model registry
+- Update the element's heading text in the markdown file
+- Update all relation references (both forward and backward) to use the new element identifier
+- Update the element identifier in the registry
+
+The system shall reject the operation with a clear error message if:
+- The element does not exist
+- The new name conflicts with an existing element
+
+#### Relations
+  * derivedFrom: [Element Manipulation File Persistence](#element-manipulation-file-persistence)
+  * derivedFrom: [Element Manipulation Operations](../../ModelManagement.md#element-manipulation-operations)
+  * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
+  * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
+  * satisfiedBy: [diff.rs](../../../core/src/diff.rs)
+---
+
 ### Relation Consistency Maintenance
 
 The system shall maintain bidirectional relation consistency when elements are manipulated, ensuring that forward and backward relations remain synchronized.
