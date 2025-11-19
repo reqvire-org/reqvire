@@ -146,7 +146,7 @@ This test verifies that the system correctly extracts element content for change
 
 #### Relations
   * verify: [Change Impact Detection Algorithm](../ReqvireTool/ModelManagement/ChangeImpact.md#change-impact-detection-algorithm)
-  * verify: [Requirements Processing](../ReqvireTool/Storage/Configuration.md#requirements-processing)
+  * verify: [Requirements Processing](../ReqvireTool/Configuration.md#requirements-processing)
   * satisfiedBy: [test.sh](../../tests/test-element-content-extraction/test.sh)
 ---
 
@@ -236,4 +236,3 @@ This test verifies that the smart filtering correctly handles new elements in ch
   * verify: [Smart Filtering for Change Impact Reports](../ReqvireTool/ModelManagement/ChangeImpact.md#smart-filtering-for-change-impact-reports)
   * satisfiedBy: [test.sh](../../tests/test-change-impact-smart-filtering/test.sh)
 ---
-

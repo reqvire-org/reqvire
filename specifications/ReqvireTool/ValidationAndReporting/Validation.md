@@ -36,7 +36,7 @@ Both passes maintain the existing behavior where validation errors cause process
 
 #### Relations
   * derivedFrom: [Validate Internal Consistency](../../Validation.md#validate-internal-consistency)
-  * derivedFrom: [Requirements Processing](../Storage/Configuration.md#requirements-processing)
+  * derivedFrom: [Requirements Processing](../Configuration.md#requirements-processing)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
 ---
 
@@ -108,7 +108,7 @@ The GraphRegistry shall be responsible for:
 The GraphRegistry shall be constructed from the ElementRegistry after Pass 1 completes successfully.
 
 #### Relations
-  * derivedFrom: [Requirements Processing](../Storage/Configuration.md#requirements-processing)
+  * derivedFrom: [Requirements Processing](../Configuration.md#requirements-processing)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
   * verifiedBy: [Requirements Files Search and Detection Test](../../Verifications/ValidationTests.md#requirements-files-search-and-detection-test)

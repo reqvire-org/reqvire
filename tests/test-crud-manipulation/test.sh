@@ -273,6 +273,9 @@ Content for element one.
 #### Metadata
   * type: requirement
 
+#### Relations
+  * derivedFrom: [Feature Alpha](Requirements.md#feature-alpha)
+
 ### Element Two
 
 Content for element two.
@@ -281,7 +284,7 @@ Content for element two.
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Feature Alpha](Requirements.md#feature-alpha)
+  * derivedFrom: [Element One](#element-one)
 EOF
 
 # Create element in another file that references element in file to be moved

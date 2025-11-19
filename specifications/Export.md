@@ -27,4 +27,3 @@ The navigation bar must be:
   * satisfiedBy: [base.html](../core/templates/base.html)
   * satisfiedBy: [model.html](../core/templates/model.html)
 ---
-

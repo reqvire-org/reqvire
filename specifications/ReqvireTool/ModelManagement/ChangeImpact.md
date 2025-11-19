@@ -266,4 +266,3 @@ The system shall implement a model change analyzer that identifies structural mo
   * derivedFrom: [Tracing Structural Changes](../../TraceChanges.md#tracing-structural-changes)
   * satisfiedBy: [change_impact.rs](../../../core/src/change_impact.rs)
 ---
-

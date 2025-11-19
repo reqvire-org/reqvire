@@ -1,5 +1,7 @@
 # Managing MBSE Models
 
+## Requirements
+
 ### Coexistence of Structured and Unstructured Documents
 
 The system shall allow structured markdown and unstructured. (eg., markdown, PDFs, DOCX, raw text) documents to coexist within the same MBSE model.
@@ -68,7 +70,6 @@ When an element does not have a `#### Metadata` subsection with a `type` propert
 
 </details>
 
-
 #### Metadata
   * type: user-requirement
 
@@ -81,7 +82,6 @@ When an element does not have a `#### Metadata` subsection with a `type` propert
 The system shall enable systems engineers to quickly bootstrap new MBSE models from predefined templates stored in Git repositories, accelerating project initialization and promoting best-practice model structures.
 
 #### Details
-
 Template Bootstrapping Capabilities
 
 Users can initialize new models using the CLI with templates from Git repositories:
@@ -98,7 +98,6 @@ reqvire init --template <github-repo-url>
 
 The system discovers all available templates in the repository and allows the user to select which template to apply.
 
-
 #### Metadata
   * type: user-requirement
 
@@ -111,13 +110,10 @@ The system discovers all available templates in the repository and allows the us
 The system shall provide programmatic manipulation of model elements through operations including, but not limited to, creating new elements, deleting existing elements, moving elements between locations, and renaming elements while maintaining model integrity and traceability.
 
 #### Details
-
-
 All manipulation operations shall:
 - Maintain model integrity and consistency
 - Update or remove affected relations automatically
 - Preserve traceability where appropriate
-
 
 #### Metadata
   * type: user-requirement

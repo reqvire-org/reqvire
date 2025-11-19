@@ -1,5 +1,7 @@
 # Generate Diagrams
 
+## Requirements
+
 ### Interactive Mermaid Diagrams
 
 The system shall produce visual representations of relationships within the MBSE model in the form of Mermaid diagrams, enabling users to explore relations and understand dependencies and their impact.

@@ -87,7 +87,7 @@ This test verifies that Reqvire correctly handles and validates relations to fra
 
 #### Relations
   * verify: [Relation Type Validation](../ReqvireTool/ValidationAndReporting/Validation.md#relation-type-validation)
-  * verify: [Requirements Processing](../ReqvireTool/Storage/Configuration.md#requirements-processing)
+  * verify: [Requirements Processing](../ReqvireTool/Configuration.md#requirements-processing)
   * satisfiedBy: [test.sh](../../tests/test-fragment-relations/test.sh)
 ---
 
@@ -113,7 +113,7 @@ This test verifies that the system correctly searches for and detects structured
   * type: test-verification
 
 #### Relations
-  * verify: [Structured Markdown Files Search and Detection](../ReqvireTool/Storage/Configuration.md#structured-markdown-files-search-and-detection)
+  * verify: [Structured Markdown Files Search and Detection](../ReqvireTool/Configuration.md#structured-markdown-files-search-and-detection)
   * satisfiedBy: [test.sh](../../tests/test-excluded-patterns/test.sh)
 ---
 
@@ -190,8 +190,8 @@ This test verifies that Reqvire correctly reads and applies exclusion patterns f
   * type: test-verification
 
 #### Relations
-  * verify: [Ignore Files Integration](../ReqvireTool/Storage/Configuration.md#ignore-files-integration)
-  * verify: [Reserved Repository Files Exclusion](../ReqvireTool/Storage/Configuration.md#reserved-repository-files-exclusion)
+  * verify: [Ignore Files Integration](../ReqvireTool/Configuration.md#ignore-files-integration)
+  * verify: [Reserved Repository Files Exclusion](../ReqvireTool/Configuration.md#reserved-repository-files-exclusion)
   * satisfiedBy: [test.sh](../../tests/test-gitignore-integration/test.sh)
 ---
 

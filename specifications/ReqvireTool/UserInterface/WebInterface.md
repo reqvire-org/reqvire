@@ -163,4 +163,3 @@ The system SHALL provide a serve command that exports comprehensive HTML documen
   * satisfiedBy: [serve.rs](../../../cli/src/serve.rs)
   * verifiedBy: [Serve Command Verification](../../Verifications/Misc.md#serve-command-verification)
 ---
-

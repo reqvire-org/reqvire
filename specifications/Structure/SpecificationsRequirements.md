@@ -923,4 +923,3 @@ When an element changes, the impact propagates according to these rules:
   * derivedFrom: [Managing MBSE Models](../UserStories.md#managing-mbse-models)
   * satisfiedBy: [relation.rs](../../core/src/relation.rs)
 ---
-

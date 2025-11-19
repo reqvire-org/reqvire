@@ -58,7 +58,7 @@ The system shall display formatting change suggestions in a git-style diff forma
 The system shall respect configured excluded filename patterns when performing formatting operations, ensuring that files intentionally excluded from processing do not receive inappropriate formatting suggestions.
 
 #### Relations
-  * derivedFrom: [Ignoring Unstructured Documents](../Storage/Configuration.md#ignoring-unstructured-documents)
+  * derivedFrom: [Ignoring Unstructured Documents](../Configuration.md#ignoring-unstructured-documents)
   * satisfiedBy: [utils.rs](../../../core/src/utils.rs)
 ---
 

@@ -1,5 +1,7 @@
 # Validating Structures
 
+## Requirements
+
 ### Enhanced Validation Error Reporting
 
 The system shall provide comprehensive validation messages that include file paths and line numbers when available, to help users quickly locate and fix model integrity and structure issues in their MBSE specifications.

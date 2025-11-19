@@ -160,4 +160,3 @@ The system shall suggest code refactoring opportunities to better align with the
 #### Relations
   * derivedFrom: [Aligning Design with Code](UserStories.md#aligning-design-with-code)
 ---
-

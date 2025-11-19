@@ -18,8 +18,8 @@ Commands:
   add               Add new element to model from Markdown definition
   rm                Remove element from model
   mv                Move element to different location
-  mv-file           Move entire specification file with all its elements
   rename            Rename element
+  mv-file           Move entire specification file with all its elements
   help               Print this message or the help of the given subcommand(s)
 
 Options:
@@ -103,14 +103,14 @@ MV OPTIONS:
       --json                    Output results in JSON format
        <ARGS>                   Positional arguments: [file] [section] [index]
 
-MV-FILE OPTIONS:
-       <SOURCE_FILE>            Source file path (relative to current working directory)
-       <TARGET_FILE>            Target file path (relative to current working directory)
-      --dry-run                 Preview changes without applying
-      --json                    Output results in JSON format
-
 RENAME OPTIONS:
        <ELEMENT_NAME>           Current element name
        <NEW_NAME>               New element name
+      --dry-run                 Preview changes without applying
+      --json                    Output results in JSON format
+
+MV FILE OPTIONS:
+       <SOURCE_FILE>            Source file path (relative to current working directory)
+       <TARGET_FILE>            Target file path (relative to current working directory)
       --dry-run                 Preview changes without applying
       --json                    Output results in JSON format
