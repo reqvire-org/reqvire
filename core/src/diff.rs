@@ -31,6 +31,7 @@ pub enum CrudOperation {
     Add,
     Remove,
     Move,
+    Rename,
 }
 
 /// Result of a CRUD operation
@@ -302,6 +303,7 @@ pub fn render_crud_result(result: &CrudResult) {
         CrudOperation::Add => "Added",
         CrudOperation::Remove => "Removed",
         CrudOperation::Move => "Moved",
+        CrudOperation::Rename => "Renamed",
     };
 
     if result.dry_run {
@@ -324,6 +326,7 @@ pub fn render_crud_json(result: &CrudResult) -> String {
         CrudOperation::Add => "add",
         CrudOperation::Remove => "remove",
         CrudOperation::Move => "move",
+        CrudOperation::Rename => "rename",
     };
 
     let json_result = serde_json::json!({

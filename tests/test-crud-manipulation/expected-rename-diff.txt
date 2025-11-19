@@ -1,4 +1,4 @@
-Renamed element: Feature Alpha (specifications/Requirements.md#feature-alpha)
+Renamed element: Feature A → Feature Alpha (specifications/Requirements.md#feature-alpha)
 
 📄 specifications/OtherRequirements.md
   [37m01     # Other Requirements[0m

@@ -179,17 +179,18 @@ fi
 
 # Note: Index generation is tested in Test 2 (export command generates index.html)
 
-# Test 6: CRUD mv command from submodule directory
-echo "Running: reqvire mv (move element within subdirectory)" >> "${TEST_DIR}/test_results.log"
+# Test 6: CRUD mv command from submodule directory (move to different file in subdirectory)
+echo "Running: reqvire mv (move element to different file within subdirectory)" >> "${TEST_DIR}/test_results.log"
 
-# Create a new section to move the element to
-cat >> "${TMP_DIR}/project-root/submodule/specifications/SubmoduleRequirements.md" <<'EOF'
+# Create a new target file in the submodule
+cat > "${TMP_DIR}/project-root/submodule/specifications/OtherRequirements.md" <<'EOF'
+# Other Requirements
 
 ## Other Features
 EOF
 
 set +e
-OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" mv "specifications/SubmoduleRequirements.md#submodule-feature" --to-section="Other Features" 2>&1)
+OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" mv "Submodule System" --to-file="specifications/OtherRequirements.md" --to-section="Other Features" 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -202,9 +203,17 @@ if [ $EXIT_CODE -ne 0 ]; then
   exit 1
 fi
 
-# Verify element was moved
-if ! grep -A 5 "## Other Features" "${TMP_DIR}/project-root/submodule/specifications/SubmoduleRequirements.md" | grep -q "### Submodule Feature"; then
-  echo "❌ FAILED: Element was not moved to the new section"
+# When running from submodule/, the path "specifications/OtherRequirements.md" is resolved
+# relative to git root, so the file is created at project-root/specifications/OtherRequirements.md
+# Verify element was moved to the new file (at git root)
+if ! grep -A 5 "## Other Features" "${TMP_DIR}/project-root/specifications/OtherRequirements.md" | grep -q "### Submodule System"; then
+  echo "❌ FAILED: Element was not moved to the new file"
+  exit 1
+fi
+
+# Verify element was removed from original file
+if grep -q "### Submodule System" "${TMP_DIR}/project-root/submodule/specifications/SubmoduleRequirements.md"; then
+  echo "❌ FAILED: Element was not removed from original file"
   exit 1
 fi
 

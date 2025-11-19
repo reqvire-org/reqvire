@@ -205,3 +205,67 @@ pub fn move_element(
         dry_run,
     })
 }
+
+/// Rename an element
+///
+/// # Arguments
+/// * `model_manager` - The model manager
+/// * `element_id` - ID of the element to rename
+/// * `new_name` - New name for the element
+/// * `git_root` - Git root directory
+/// * `dry_run` - If true, don't write changes to disk
+pub fn rename_element(
+    model_manager: &mut ModelManager,
+    element_id: &str,
+    new_name: &str,
+    git_root: &Path,
+    dry_run: bool,
+) -> Result<CrudResult, ReqvireError> {
+    // Get element info before rename
+    let element = model_manager.graph_registry.nodes.get(element_id)
+        .ok_or_else(|| ReqvireError::MissingElement(
+            format!("Element not found: {}", element_id)
+        ))?;
+    let old_name = element.element.name.clone();
+
+    // Track which files were modified before the operation
+    let modified_before: Vec<String> = model_manager.graph_registry.modified_files
+        .iter()
+        .cloned()
+        .collect();
+
+    // Rename element using core business logic
+    let new_id = model_manager.graph_registry.rename_element(
+        element_id,
+        new_name,
+    )?;
+
+    // Get list of newly modified files (sorted for deterministic output)
+    let mut modified_files: Vec<String> = model_manager.graph_registry.modified_files
+        .iter()
+        .filter(|f| !modified_before.contains(f))
+        .cloned()
+        .collect();
+    modified_files.sort();
+
+    // Generate diffs for output
+    let diffs = generate_crud_diffs(
+        &model_manager.graph_registry,
+        &modified_files,
+        git_root,
+    )?;
+
+    // Flush changes if not dry-run
+    if !dry_run {
+        model_manager.graph_registry.flush_modified_files(git_root)?;
+    }
+
+    // Create result structure showing the rename
+    Ok(CrudResult {
+        operation: CrudOperation::Rename,
+        element_id: new_id,
+        element_name: format!("{} → {}", old_name, new_name),
+        diffs,
+        dry_run,
+    })
+}

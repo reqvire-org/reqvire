@@ -258,10 +258,10 @@ pub enum Commands {
     },
 
     /// Remove element from model
-    #[clap(override_help = "Remove element from model\n\nRM OPTIONS:\n      --dry-run     Preview changes without applying\n      --json        Output results in JSON format\n\nUSAGE:\n    reqvire rm <element-id>")]
+    #[clap(override_help = "Remove element from model\n\nRM OPTIONS:\n       <ELEMENT_NAME>           Element name\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n\nUSAGE:\n    reqvire rm <element-name>")]
     Rm {
-        /// Element identifier
-        element_id: String,
+        /// Element name
+        element_name: String,
 
         /// Preview changes without applying
         #[clap(long, help_heading = "RM OPTIONS")]
@@ -273,10 +273,10 @@ pub enum Commands {
     },
 
     /// Move element to different location
-    #[clap(override_help = "Move element to different location\n\nMV OPTIONS:\n      --to-file <FILE>           Target file path (relative to git repository root)\n      --to-section <SECTION>     Target section name\n      --index <INDEX>            Index within section (0-based, defaults to end)\n      --dry-run                  Preview changes without applying\n      --json                     Output results in JSON format\n\nUSAGE:\n    reqvire mv <element-id> <file> [<section>] [<index>]\n    reqvire mv <element-id> --to-file=<file> --to-section=<section> --index=<n>")]
+    #[clap(override_help = "Move element to different location\n\nMV OPTIONS:\n       <ELEMENT_NAME>           Element name\n      --to-file <FILE>          Target file path (relative to git repository root)\n      --to-section <SECTION>    Target section name\n      --index <INDEX>           Index within section (0-based, defaults to end)\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n\nUSAGE:\n    reqvire mv <element-name> <file> [<section>] [<index>]\n    reqvire mv <element-name> --to-file=<file> --to-section=<section> --index=<n>")]
     Mv {
-        /// Element identifier
-        element_id: String,
+        /// Element name
+        element_name: String,
 
         /// Target file path (relative to git repository root)
         #[clap(long, value_name = "FILE", help_heading = "MV OPTIONS")]
@@ -301,6 +301,24 @@ pub enum Commands {
         /// Positional arguments: [file] [section] [index]
         #[clap(trailing_var_arg = true)]
         args: Vec<String>,
+    },
+
+    /// Rename element
+    #[clap(override_help = "Rename element\n\nRENAME OPTIONS:\n       <ELEMENT_NAME>           Current element name\n       <NEW_NAME>               New element name\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n\nUSAGE:\n    reqvire rename <element-name> <new-name>")]
+    Rename {
+        /// Current element name
+        element_name: String,
+
+        /// New element name
+        new_name: String,
+
+        /// Preview changes without applying
+        #[clap(long, help_heading = "RENAME OPTIONS")]
+        dry_run: bool,
+
+        /// Output results in JSON format
+        #[clap(long, help_heading = "RENAME OPTIONS")]
+        json: bool,
     },
 
     /// Interactive shell for GraphRegistry operations (undocumented)
@@ -824,7 +842,10 @@ pub fn handle_command(
 
             return Ok(0);
         },
-        Some(Commands::Rm { element_id, dry_run, json }) => {
+        Some(Commands::Rm { element_name, dry_run, json }) => {
+            // Resolve element name to identifier
+            let element_id = model_manager.graph_registry.find_element_by_name(&element_name)?;
+
             // Call CRUD operation
             let git_root = git_commands::get_git_root_dir()?;
             let result = crud::remove_element(
@@ -843,12 +864,15 @@ pub fn handle_command(
 
             return Ok(0);
         },
-        Some(Commands::Mv { element_id, to_file, to_section, index, dry_run, json, args }) => {
+        Some(Commands::Mv { element_name, to_file, to_section, index, dry_run, json, args }) => {
+            // Resolve element name to identifier
+            let element_id = model_manager.graph_registry.find_element_by_name(&element_name)?;
+
             // Parse arguments
             let target_file = to_file.as_ref()
                 .or(args.get(0))
                 .ok_or_else(|| ReqvireError::ProcessError(
-                    "Target file required. Usage: reqvire mv <element-id> <file> [section]".to_string()
+                    "Target file required. Usage: reqvire mv <element-name> <file> [section]".to_string()
                 ))?;
 
             let target_section = to_section.as_ref()
@@ -865,6 +889,29 @@ pub fn handle_command(
                 target_section,
                 index,
                 excluded_filename_patterns,
+                &git_root,
+                dry_run,
+            )?;
+
+            // Output result
+            if json {
+                println!("{}", render_crud_json(&result));
+            } else {
+                render_crud_result(&result);
+            }
+
+            return Ok(0);
+        },
+        Some(Commands::Rename { element_name, new_name, dry_run, json }) => {
+            // Resolve element name to identifier
+            let element_id = model_manager.graph_registry.find_element_by_name(&element_name)?;
+
+            // Call CRUD operation
+            let git_root = git_commands::get_git_root_dir()?;
+            let result = crud::rename_element(
+                &mut model_manager,
+                &element_id,
+                &new_name,
                 &git_root,
                 dry_run,
             )?;

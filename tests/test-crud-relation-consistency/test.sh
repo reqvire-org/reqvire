@@ -153,7 +153,7 @@ echo "" >> "${TEST_DIR}/test_results.log"
 echo "Test 2: Delete element with incoming relations..." >> "${TEST_DIR}/test_results.log"
 
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" rm "specifications/Requirements.md#derived-requirement-1" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" rm "Derived Requirement 1" 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -205,7 +205,7 @@ cat > "${TEST_DIR}/specifications/OtherRequirements.md" << 'EOF'
 EOF
 
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv "specifications/Requirements.md#derived-requirement-2" "specifications/OtherRequirements.md" "Other Section" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv "Derived Requirement 2" "specifications/OtherRequirements.md" "Other Section" 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -267,7 +267,7 @@ echo "" >> "${TEST_DIR}/test_results.log"
 echo "Test 4: Delete root element with multiple outgoing relations..." >> "${TEST_DIR}/test_results.log"
 
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" rm "specifications/Requirements.md#root-requirement" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" rm "Root Requirement" 2>&1)
 EXIT_CODE=$?
 set -e
 

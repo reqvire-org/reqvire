@@ -89,7 +89,7 @@ echo "Test 2: Delete element operation..."
 cp "$TEST_DIR/specifications/Requirements.md" "$TEST_DIR/requirements_backup.bak"
 
 set +e
-DELETE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" rm "specifications/Requirements.md#feature-b" 2>&1)
+DELETE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" rm "Feature B" 2>&1)
 DELETE_EXIT=$?
 set -e
 
@@ -147,7 +147,7 @@ cat > "$TEST_DIR/specifications/OtherRequirements.md" <<'EOF'
 EOF
 
 set +e
-MOVE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv "specifications/Requirements.md#feature-c" "specifications/OtherRequirements.md" "Other Features" 2>&1)
+MOVE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv "Feature C" "specifications/OtherRequirements.md" "Other Features" 2>&1)
 MOVE_EXIT=$?
 set -e
 
@@ -263,7 +263,7 @@ echo "Test 5: Error case handling..."
 # Test 4a: Move non-existent element
 echo "  4a: Move non-existent element..."
 set +e
-ERROR_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv "specifications/Requirements.md#non-existent" "specifications/OtherRequirements.md" "Other Features" 2>&1)
+ERROR_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv "Non Existent Element" "specifications/OtherRequirements.md" "Other Features" 2>&1)
 ERROR_EXIT=$?
 set -e
 
@@ -283,7 +283,7 @@ echo "  ✓ Non-existent element error handled"
 # Test 4b: Delete non-existent element
 echo "  4b: Delete non-existent element..."
 set +e
-ERROR_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" rm "specifications/Requirements.md#non-existent" 2>&1)
+ERROR_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" rm "Non Existent Element" 2>&1)
 ERROR_EXIT=$?
 set -e
 

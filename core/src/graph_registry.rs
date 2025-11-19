@@ -534,6 +534,38 @@ impl GraphRegistry {
         }
     }
 
+    /// Find element identifier by element name (globally unique)
+    ///
+    /// # Arguments
+    /// * `element_name` - Element name to search for
+    ///
+    /// # Returns
+    /// * Element identifier if found and unique
+    /// * Error if not found or multiple matches
+    pub fn find_element_by_name(&self, element_name: &str) -> Result<String, ReqvireError> {
+        // Generate slug from element name (same logic as HTML heading to ID)
+        let name_slug = element_name.trim().replace(' ', "-").to_lowercase();
+
+        // Find all matching identifiers
+        let matching_ids: Vec<String> = self.nodes
+            .keys()
+            .filter(|id| id.ends_with(&format!("#{}", name_slug)))
+            .cloned()
+            .collect();
+
+        if matching_ids.is_empty() {
+            return Err(ReqvireError::MissingElement(
+                format!("Element not found: {}", element_name)
+            ));
+        } else if matching_ids.len() > 1 {
+            return Err(ReqvireError::ProcessError(
+                format!("Multiple elements found with name '{}': {:?}", element_name, matching_ids)
+            ));
+        }
+
+        Ok(matching_ids[0].clone())
+    }
+
     /// Moves an element to an existing location in the graph (file and section must already exist)
     pub fn move_element_to_location(&mut self, element_id: &str, new_file_path: &str, new_section: &str) -> Result<(), ReqvireError> {
         // Verify the target location exists in the graph
@@ -1360,6 +1392,88 @@ impl GraphRegistry {
         }
 
         Ok(files_copied)
+    }
+
+    /// Rename an element while updating all relations
+    ///
+    /// # Arguments
+    /// * `element_id` - Current element identifier
+    /// * `new_name` - New name for the element
+    ///
+    /// # Returns
+    /// * New element identifier after rename
+    pub fn rename_element(
+        &mut self,
+        element_id: &str,
+        new_name: &str,
+    ) -> Result<String, ReqvireError> {
+        // Validate element exists
+        let node = self.nodes.get(element_id)
+            .ok_or_else(|| ReqvireError::MissingElement(
+                format!("Element '{}' not found", element_id)
+            ))?;
+
+        let file_path = node.element.file_path.clone();
+        let _old_name = node.element.name.clone();
+
+        // Generate new identifier (slug from new name - same logic as markdown heading to ID)
+        let new_slug = new_name.trim().replace(' ', "-").to_lowercase();
+        let new_identifier = format!("{}#{}", file_path, new_slug);
+
+        // Check if new identifier already exists (globally unique check)
+        if self.nodes.contains_key(&new_identifier) {
+            return Err(ReqvireError::DuplicateElement(
+                format!("An element with name '{}' already exists (identifier: {})", new_name, new_identifier)
+            ));
+        }
+
+        // Find all files with relations to this element
+        let mut modified_files = vec![file_path.clone()];
+        for node in self.nodes.values() {
+            let has_relation = node.element.relations.iter().any(|rel| {
+                matches!(&rel.target.link, LinkType::Identifier(id) if id == element_id)
+            });
+
+            if has_relation {
+                let file = node.element.file_path.clone();
+                if !modified_files.contains(&file) {
+                    modified_files.push(file);
+                }
+            }
+        }
+
+        // Update the element's name and identifier in the node
+        if let Some(node) = self.nodes.get_mut(element_id) {
+            node.element.name = new_name.to_string();
+            node.element.identifier = new_identifier.clone();
+        }
+
+        // Move node in the map (remove old key, insert with new key)
+        if let Some(node) = self.nodes.remove(element_id) {
+            self.nodes.insert(new_identifier.clone(), node);
+        }
+
+        // Update all relations (both forward and backward)
+        // Update relations in all elements that reference the old identifier
+        let old_id = element_id.to_string();
+        for node in self.nodes.values_mut() {
+            for relation in &mut node.element.relations {
+                if let LinkType::Identifier(ref mut id) = relation.target.link {
+                    if id == &old_id {
+                        *id = new_identifier.clone();
+                        // Update the text reference too
+                        relation.target.text = new_name.to_string();
+                    }
+                }
+            }
+        }
+
+        // Track all modified files
+        for file in &modified_files {
+            self.modified_files.insert(file.clone());
+        }
+
+        Ok(new_identifier)
     }
 
     /// Flushes all elements to markdown files and copies InternalPath files to the specified directory
