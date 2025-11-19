@@ -395,8 +395,8 @@ The system shall provide an `rm` command to delete existing model elements and a
 
 #### Details
 The `rm` command shall:
-- Accept element identifier as required positional argument
-- Support command syntax: `reqvire rm <element-id>`
+- Accept element name as required positional argument
+- Support command syntax: `reqvire rm <element-name>`
 - Delete the specified element from its file
 - Remove all incoming relations from other elements
 - Apply changes immediately by default
@@ -420,14 +420,14 @@ The system shall provide a `mv` command to move existing model elements to diffe
 
 #### Details
 The `mv` command shall:
-- Accept element identifier (required, provided as argument)
+- Accept element name (required, provided as argument)
 - Accept target location arguments (resolved relative to Git repository root):
   - Target file path (required, provided as argument or `--to-file` flag)
   - Target section name (optional, provided as argument or `--to-section` flag)
   - Index within target section (optional, provided as argument or `--index` flag, 0-based, defaults to end of section)
 - Support command syntax:
-  - `reqvire mv <element-id> <file> [<section>] [<index>]` - positional arguments
-  - `reqvire mv <element-id> --to-file=<file> --to-section=<section> --index=<n>` - with named flags
+  - `reqvire mv <element-name> <file> [<section>] [<index>]` - positional arguments
+  - `reqvire mv <element-name> --to-file=<file> --to-section=<section> --index=<n>` - with named flags
 - Move element to target location at specified index
 - Update all incoming relations system-wide with new identifier
 - Preserve element content, metadata, and outgoing relations

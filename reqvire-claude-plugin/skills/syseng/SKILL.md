@@ -146,8 +146,8 @@ Reqvire provides powerful query and analysis commands that:
 | Find model issues | `reqvire lint --json` |
 | Understand changes | `reqvire change-impact --git-commit=<hash>` |
 | Add element | `cat element.md \| reqvire add <file> <section>` |
-| Remove element | `reqvire rm "<file>#<element-name>"` |
-| Move element | `reqvire mv "<file>#<element-name>" --to-section="<section>"` |
+| Remove element | `reqvire rm "<element-name>"` |
+| Move element | `reqvire mv "<element-name>" --to-file=<file> --to-section="<section>"` |
 | Rename element | `reqvire rename "<current-name>" "<new-name>"` |
 
 ### Key Reqvire Commands
@@ -159,8 +159,8 @@ reqvire search [--json] [--short] [--filter-*]
 
 # Element manipulation
 reqvire add --to-file=<file> --to-section=<section> [<index>]
-reqvire rm "<file>#<element-name>"
-reqvire mv "<file>#<element-name>" --to-section=<section> [--to-index=<index>]
+reqvire rm "<element-name>"
+reqvire mv "<element-name>" --to-file=<file> --to-section=<section> [--index=<index>]
 reqvire rename "<current-name>" "<new-name>"
 
 # Validation and analysis

@@ -184,6 +184,7 @@ When moving an element, the system shall:
 #### Relations
   * derivedFrom: [Element Manipulation File Persistence](#element-manipulation-file-persistence)
   * derivedFrom: [Target Location Validation and Auto-Creation](#target-location-validation-and-auto-creation)
+  * derivedFrom: [Element Manipulation Operations](../../ModelManagement.md#element-manipulation-operations)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
   * satisfiedBy: [diff.rs](../../../core/src/diff.rs)
@@ -220,8 +221,6 @@ The system shall reject the operation with a clear error message if:
 The system shall maintain bidirectional relation consistency when elements are manipulated, ensuring that forward and backward relations remain synchronized.
 
 #### Details
-<details>
-<summary>Relation Consistency Details</summary>
 
 When manipulating elements, the system shall ensure:
 - If element A derives from element B, then B must have a derive relation to A
@@ -235,7 +234,7 @@ When manipulating elements, the system shall ensure:
 - The system shall report any inconsistencies detected during manipulation
 - The system shall prevent operations that would leave the model in an inconsistent state
 
-</details>
+
 
 #### Relations
   * derivedFrom: [Element Manipulation Operations](../../ModelManagement.md#element-manipulation-operations)

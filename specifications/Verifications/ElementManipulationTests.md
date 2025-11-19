@@ -418,25 +418,25 @@ The test shall verify that the `rm` command deletes elements, removes relations,
 - Document expected relation removals
 
 **Test Steps - Basic Deletion:**
-1. Run `reqvire rm <element-id>`
+1. Run `reqvire rm <element-name>`
 2. Verify element is deleted from file
 3. Verify all incoming relations are removed
 4. Verify git-style diff shows all affected files
 5. Verify changes are applied
 
 **Test Steps - Dry Run:**
-1. Run `reqvire rm --dry-run <element-id>`
+1. Run `reqvire rm --dry-run <element-name>`
 2. Verify git-style diff is shown
 3. Verify no changes are applied to files
 4. Verify affected files are listed
 
 **Test Steps - JSON Output:**
-1. Run `reqvire rm --json <element-id>`
+1. Run `reqvire rm --json <element-name>`
 2. Verify JSON output with removed relations
 3. Verify changes are applied
 
 **Test Steps - Error Cases:**
-1. Try to remove non-existent element
+1. Try to remove non-existent element by name
 2. Verify error is reported
 3. Verify exit code is non-zero
 
@@ -469,7 +469,7 @@ The test shall verify that the `mv` command relocates elements, updates all rela
 - Prepare target locations
 
 **Test Steps - Basic Move:**
-1. Run `reqvire mv <element-id> <target-file> <section>`
+1. Run `reqvire mv <element-name> <target-file> <section>`
 2. Verify element is removed from source
 3. Verify element is inserted into target
 4. Verify all incoming relations are updated
@@ -477,25 +477,25 @@ The test shall verify that the `mv` command relocates elements, updates all rela
 6. Verify identifier change is reported
 
 **Test Steps - Index Insertion:**
-1. Run `reqvire mv <element-id> <file> <section> 0`
+1. Run `reqvire mv <element-name> <file> <section> 0`
 2. Verify element is inserted at index 0 in target
 3. Run without index and verify append to end
 4. Run with out-of-bounds index and verify append
 
 **Test Steps - Dry Run:**
-1. Run `reqvire mv --dry-run <element-id> <file> <section>`
+1. Run `reqvire mv --dry-run <element-name> <file> <section>`
 2. Verify git-style diff is shown for all affected files
 3. Verify no changes are applied
 4. Verify relation updates are previewed
 
 **Test Steps - JSON Output:**
-1. Run `reqvire mv --json <element-id> <file> <section>`
+1. Run `reqvire mv --json <element-name> <file> <section>`
 2. Verify JSON output with relation updates
 3. Verify old → new identifier mapping
 4. Verify changes are applied
 
 **Test Steps - Error Cases:**
-1. Try to move non-existent element
+1. Try to move non-existent element by name
 2. Try to move to invalid location
 3. Try to move with duplicate name at target
 4. Verify errors are reported

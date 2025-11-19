@@ -68,6 +68,7 @@ When an element does not have a `#### Metadata` subsection with a `type` propert
 
 </details>
 
+
 #### Metadata
   * type: user-requirement
 
