@@ -89,12 +89,12 @@ ADD OPTIONS:
        <ARGS>                   Positional arguments: [file] [section] [index] [element-markdown]
 
 RM OPTIONS:
-       <ELEMENT_NAME>           Element name
+       <ELEMENT_ID>             Element identifier
       --dry-run                 Preview changes without applying
       --json                    Output results in JSON format
 
 MV OPTIONS:
-       <ELEMENT_NAME>           Element name
+       <ELEMENT_ID>             Element identifier
       --to-file <FILE>          Target file path (relative to git repository root)
       --to-section <SECTION>    Target section name
       --index <INDEX>           Index within section (0-based, defaults to end)

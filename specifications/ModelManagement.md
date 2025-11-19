@@ -80,8 +80,8 @@ When an element does not have a `#### Metadata` subsection with a `type` propert
 The system shall enable systems engineers to quickly bootstrap new MBSE models from predefined templates stored in Git repositories, accelerating project initialization and promoting best-practice model structures.
 
 #### Details
-<details>
-<summary>Template Bootstrapping Capabilities</summary>
+
+Template Bootstrapping Capabilities
 
 Users can initialize new models using the CLI with templates from Git repositories:
 - Discover available templates within a specified repository
@@ -97,7 +97,6 @@ reqvire init --template <github-repo-url>
 
 The system discovers all available templates in the repository and allows the user to select which template to apply.
 
-</details>
 
 #### Metadata
   * type: user-requirement
@@ -108,29 +107,16 @@ The system discovers all available templates in the repository and allows the us
 
 ### Element Manipulation Operations
 
-The system shall provide programmatic manipulation of model elements through operations including creating new elements, deleting existing elements, and moving elements between locations while maintaining model integrity and traceability.
+The system shall provide programmatic manipulation of model elements through operations including, but not limited to, creating new elements, deleting existing elements, moving elements between locations, and renaming elements while maintaining model integrity and traceability.
 
 #### Details
-<details>
-<summary>Element Manipulation Capabilities</summary>
 
-The system shall support the following element manipulation operations:
-- **Create** new elements in the model with proper structure and relations
-- **Delete** existing elements while managing dependent relations
-- **Move** elements to different locations (files/sections) while preserving traceability
 
 All manipulation operations shall:
 - Maintain model integrity and consistency
 - Update or remove affected relations automatically
 - Preserve traceability where appropriate
 
-**Relation Management:**
-When elements are moved or deleted, the system shall handle relations appropriately:
-- Relations pointing to moved elements shall be updated to new locations
-- Relations pointing to deleted elements shall be removed or handled gracefully
-- Bidirectional relation consistency shall be maintained
-
-</details>
 
 #### Metadata
   * type: user-requirement

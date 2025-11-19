@@ -92,7 +92,7 @@ When requested the system shall generate change impact report, in Markdown forma
   * type: user-requirement
 
 #### Relations
-  * derivedFrom: [Structural Change Reports](#structural-change-reports)
+  * derivedFrom: [Requirements Change Propagation](TraceChanges.md#requirements-change-propagation)
   * derivedFrom: [Deterministic Output for All Generated Content](ReqvireTool/ValidationAndReporting/Reports.md#deterministic-output-for-all-generated-content)
 ---
 

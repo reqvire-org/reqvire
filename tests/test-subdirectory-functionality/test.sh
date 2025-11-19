@@ -189,7 +189,7 @@ cat >> "${TMP_DIR}/project-root/submodule/specifications/SubmoduleRequirements.m
 EOF
 
 set +e
-OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" mv "Submodule Feature" --to-file="specifications/SubmoduleRequirements.md" --to-section="Other Features" 2>&1)
+OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" mv "specifications/SubmoduleRequirements.md#submodule-feature" --to-section="Other Features" 2>&1)
 EXIT_CODE=$?
 set -e
 

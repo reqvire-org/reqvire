@@ -58,7 +58,7 @@ The algorithm shall consist of the following steps:
    - Support incremental impact analysis for large models
 
 #### Relations
-  * derivedFrom: [Requirements Change Propagation](../../Structure/SpecificationsRequirements.md#requirements-change-propagation)
+  * derivedFrom: [Requirements Change Propagation](../../TraceChanges.md#requirements-change-propagation)
   * derivedFrom: [Element Identity Model](../../Structure/SpecificationsRequirements.md#element-identity-model)
   * satisfiedBy: [change_impact.rs](../../../core/src/change_impact.rs)
 ---
@@ -103,7 +103,7 @@ The visualization shall include:
    - Generate overall change impact assessment
 
 #### Relations
-  * derivedFrom: [Requirements Change Propagation](../../Structure/SpecificationsRequirements.md#requirements-change-propagation)
+  * derivedFrom: [Requirements Change Propagation](../../TraceChanges.md#requirements-change-propagation)
   * derivedFrom: [Element Identity Model](../../Structure/SpecificationsRequirements.md#element-identity-model)
   * satisfiedBy: [change_impact.rs](../../../core/src/change_impact.rs)
   * verifiedBy: [Change Impact Detection Test](../../Verifications/ChangeImpactTests.md#change-impact-detection-test)
@@ -222,7 +222,7 @@ Changed Elements:
 </details>
 
 #### Relations
-  * derivedFrom: [Requirements Change Propagation](../../Structure/SpecificationsRequirements.md#requirements-change-propagation)
+  * derivedFrom: [Requirements Change Propagation](../../TraceChanges.md#requirements-change-propagation)
   * satisfiedBy: [change_impact.rs](../../../core/src/change_impact.rs)
 ---
 

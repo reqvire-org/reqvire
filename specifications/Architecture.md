@@ -103,7 +103,7 @@ classDiagram
   * trace: [Managing MBSE Models](UserStories.md#managing-mbse-models)
   * trace: [AI-Assisted MBSE Model Management](UserStories.md#ai-assisted-mbse-model-management)
   * trace: [CLI interface](Interfaces.md#cli-interface)
-  * trace: [Browse Model via Web Interface](Export.md#browse-model-via-web-interface)
+  * trace: [Web Interface](Interfaces.md#web-interface)
   * trace: [Integrate with GitHub Workflows](UserStories.md#integrate-with-github-workflows)
   * trace: [Model Reports](Reports.md#model-reports)
   * trace: [Validating Structures](UserStories.md#validating-structures)
@@ -197,8 +197,9 @@ graph TD
   * trace: [Managing MBSE Models](UserStories.md#managing-mbse-models)
   * trace: [AI-Assisted MBSE Model Management](UserStories.md#ai-assisted-mbse-model-management)
   * trace: [CLI interface](Interfaces.md#cli-interface)
-  * trace: [Browse Model via Web Interface](Export.md#browse-model-via-web-interface)
+  * trace: [Web Interface](Interfaces.md#web-interface)
   * trace: [Integrate with GitHub Workflows](UserStories.md#integrate-with-github-workflows)
   * trace: [Model Reports](Reports.md#model-reports)
   * trace: [Validating Structures](UserStories.md#validating-structures)
 ---
+

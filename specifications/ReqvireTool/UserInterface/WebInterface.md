@@ -87,7 +87,7 @@ Execute all generation commands treating temporary directory as repository root:
 - All generation happens in isolated temporary directory
 
 #### Relations
-  * derivedFrom: [Browse Model via Web Interface](../../Export.md#browse-model-via-web-interface)
+  * derivedFrom: [Web Interface](../../Interfaces.md#web-interface)
   * derivedFrom: [CLI Interface Structure](CLI.md#cli-interface-structure)
   * derivedFrom: [Deterministic Output for All Generated Content](../ValidationAndReporting/Reports.md#deterministic-output-for-all-generated-content)
   * satisfiedBy: [html_export.rs](../../../core/src/html_export.rs)
@@ -157,9 +157,10 @@ The system SHALL provide a serve command that exports comprehensive HTML documen
   - Continue serving until terminated by the user (Ctrl-C)
 
 #### Relations
-  * derivedFrom: [Browse Model via Web Interface](../../Export.md#browse-model-via-web-interface)
+  * derivedFrom: [Web Interface](../../Interfaces.md#web-interface)
   * trace: [Validate Command](CLI.md#validate-command)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * satisfiedBy: [serve.rs](../../../cli/src/serve.rs)
   * verifiedBy: [Serve Command Verification](../../Verifications/Misc.md#serve-command-verification)
 ---
+
