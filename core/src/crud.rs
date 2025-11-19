@@ -286,3 +286,81 @@ pub fn rename_element(
         dry_run,
     })
 }
+
+/// Move entire file with all its elements to a new location
+pub fn move_file(
+    model_manager: &mut ModelManager,
+    source_file: &str,
+    target_file: &str,
+    current_dir: &Path,
+    git_root: &Path,
+    dry_run: bool,
+) -> Result<CrudResult, ReqvireError> {
+    // Normalize file paths: convert from CWD-relative to git-root-relative
+    use crate::utils;
+    let absolute_source = current_dir.join(source_file);
+    let source_file_normalized = utils::get_relative_path(&absolute_source)?
+        .to_string_lossy()
+        .to_string();
+
+    let absolute_target = current_dir.join(target_file);
+    let target_file_normalized = utils::get_relative_path(&absolute_target)?
+        .to_string_lossy()
+        .to_string();
+
+    // Track which files were modified before the operation
+    let modified_before: Vec<String> = model_manager.graph_registry.modified_files
+        .iter()
+        .cloned()
+        .collect();
+
+    // Move file using core business logic
+    let identifier_mappings = model_manager.graph_registry.move_file(
+        &source_file_normalized,
+        &target_file_normalized,
+    )?;
+
+    // Get list of newly modified files (sorted for deterministic output)
+    let mut modified_files: Vec<String> = model_manager.graph_registry.modified_files
+        .iter()
+        .filter(|f| !modified_before.contains(f))
+        .cloned()
+        .collect();
+    modified_files.sort();
+
+    // Generate diffs for output
+    let diffs = generate_crud_diffs(
+        &model_manager.graph_registry,
+        &modified_files,
+        git_root,
+    )?;
+
+    // Flush changes if not dry-run
+    if !dry_run {
+        model_manager.graph_registry.flush_modified_files(git_root)?;
+
+        // Delete the source file from disk
+        let source_path = git_root.join(&source_file_normalized);
+        if source_path.exists() {
+            std::fs::remove_file(&source_path)
+                .map_err(|e| ReqvireError::IoError(e))?;
+        }
+    }
+
+    // Create summary of moved elements
+    let element_count = identifier_mappings.len();
+    let element_name = format!("{} element{} from {} → {}",
+        element_count,
+        if element_count == 1 { "" } else { "s" },
+        source_file,
+        target_file
+    );
+
+    Ok(CrudResult {
+        operation: CrudOperation::Move,
+        element_id: source_file_normalized.clone(),
+        element_name,
+        diffs,
+        dry_run,
+    })
+}

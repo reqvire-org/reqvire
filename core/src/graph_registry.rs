@@ -1476,6 +1476,103 @@ impl GraphRegistry {
         Ok(new_identifier)
     }
 
+    /// Move entire file with all its elements to a new location
+    /// Updates all element identifiers and relations referencing moved elements
+    pub fn move_file(
+        &mut self,
+        source_file: &str,
+        target_file: &str,
+    ) -> Result<Vec<(String, String)>, ReqvireError> {
+        // Validate source file exists in the model
+        let elements_in_source: Vec<String> = self.nodes.values()
+            .filter(|node| node.element.file_path == source_file)
+            .map(|node| node.element.identifier.clone())
+            .collect();
+
+        if elements_in_source.is_empty() {
+            return Err(ReqvireError::LocationNotFound(
+                format!("Source file '{}' not found or contains no elements", source_file)
+            ));
+        }
+
+        // Validate target file doesn't exist
+        let target_exists = self.nodes.values()
+            .any(|node| node.element.file_path == target_file);
+
+        if target_exists {
+            return Err(ReqvireError::DuplicateElement(
+                format!("Target file '{}' already exists", target_file)
+            ));
+        }
+
+        // Track old -> new identifier mappings
+        let mut identifier_mappings: Vec<(String, String)> = Vec::new();
+        let mut modified_files = vec![source_file.to_string()];
+
+        // Build identifier mappings
+        for old_id in &elements_in_source {
+            let slug = if let Some(pos) = old_id.rfind('#') {
+                &old_id[pos+1..]
+            } else {
+                continue;
+            };
+            let new_id = format!("{}#{}", target_file, slug);
+            identifier_mappings.push((old_id.clone(), new_id.clone()));
+        }
+
+        // Find all files with relations to elements in the source file
+        for node in self.nodes.values() {
+            let has_relation = node.element.relations.iter().any(|rel| {
+                if let LinkType::Identifier(id) = &rel.target.link {
+                    elements_in_source.contains(id)
+                } else {
+                    false
+                }
+            });
+            if has_relation {
+                let file = node.element.file_path.clone();
+                if !modified_files.contains(&file) {
+                    modified_files.push(file);
+                }
+            }
+        }
+
+        // Update all elements in the source file
+        for (old_id, new_id) in &identifier_mappings {
+            if let Some(node) = self.nodes.get_mut(old_id) {
+                node.element.file_path = target_file.to_string();
+                node.element.identifier = new_id.clone();
+            }
+        }
+
+        // Move nodes in HashMap (remove old key, insert with new key)
+        for (old_id, new_id) in &identifier_mappings {
+            if let Some(node) = self.nodes.remove(old_id) {
+                self.nodes.insert(new_id.clone(), node);
+            }
+        }
+
+        // Update all relations pointing to moved elements
+        for (old_id, new_id) in &identifier_mappings {
+            for node in self.nodes.values_mut() {
+                for relation in &mut node.element.relations {
+                    if let LinkType::Identifier(ref mut target_id) = relation.target.link {
+                        if target_id == old_id {
+                            *target_id = new_id.clone();
+                        }
+                    }
+                }
+            }
+        }
+
+        modified_files.push(target_file.to_string());
+        for file in &modified_files {
+            self.modified_files.insert(file.clone());
+        }
+
+        Ok(identifier_mappings)
+    }
+
     /// Flushes all elements to markdown files and copies InternalPath files to the specified directory
     pub fn flush_to_directory(&self, output_dir: &Path) -> Result<(usize, usize), ReqvireError> {
         // Create output directory if it doesn't exist
