@@ -179,4 +179,65 @@ fi
 
 # Note: Index generation is tested in Test 2 (export command generates index.html)
 
+# Test 6: CRUD mv command from submodule directory
+echo "Running: reqvire mv (move element within subdirectory)" >> "${TEST_DIR}/test_results.log"
+
+# Create a new section to move the element to
+cat >> "${TMP_DIR}/project-root/submodule/specifications/SubmoduleRequirements.md" <<'EOF'
+
+## Other Features
+EOF
+
+set +e
+OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" mv "specifications/SubmoduleRequirements.md#submodule-feature" --to-section="Other Features" 2>&1)
+EXIT_CODE=$?
+set -e
+
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
+
+if [ $EXIT_CODE -ne 0 ]; then
+  echo "❌ FAILED: mv command from submodule directory failed with exit code $EXIT_CODE"
+  echo "$OUTPUT"
+  exit 1
+fi
+
+# Verify element was moved
+if ! grep -A 5 "## Other Features" "${TMP_DIR}/project-root/submodule/specifications/SubmoduleRequirements.md" | grep -q "### Submodule Feature"; then
+  echo "❌ FAILED: Element was not moved to the new section"
+  exit 1
+fi
+
+# Test 7: CRUD mv-file command from submodule directory
+# TODO: Uncomment when mv-file command is implemented
+# echo "Running: reqvire mv-file (move entire file within subdirectory)" >> "${TEST_DIR}/test_results.log"
+#
+# # Create a new directory structure
+# mkdir -p "${TMP_DIR}/project-root/submodule/specs"
+#
+# set +e
+# OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" mv-file "specifications/SubmoduleRequirements.md" "specs/SubmoduleRequirements.md" 2>&1)
+# EXIT_CODE=$?
+# set -e
+#
+# echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+# printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
+#
+# if [ $EXIT_CODE -ne 0 ]; then
+#   echo "❌ FAILED: mv-file command from submodule directory failed with exit code $EXIT_CODE"
+#   echo "$OUTPUT"
+#   exit 1
+# fi
+#
+# # Verify file was moved
+# if [ -f "${TMP_DIR}/project-root/submodule/specifications/SubmoduleRequirements.md" ]; then
+#   echo "❌ FAILED: Source file was not removed after mv-file"
+#   exit 1
+# fi
+#
+# if [ ! -f "${TMP_DIR}/project-root/submodule/specs/SubmoduleRequirements.md" ]; then
+#   echo "❌ FAILED: Target file was not created by mv-file"
+#   exit 1
+# fi
+
 exit 0

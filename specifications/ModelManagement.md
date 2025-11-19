@@ -28,7 +28,9 @@ The system shall process structured documents and relations to extract model-rel
 The system shall treat the **root directory of the Git repository as the project's base** for all file and folder references, streamlining configuration and promoting a self-contained project structure.
 
 #### Details
-All paths specified in the Reqvire configuration will be resolved relative to the Git repository root.
+All paths specified in Reqvire commands will be resolved relative to the current working directory:
+- When run from the git repository root: paths are relative to the git root
+- When run from a subdirectory: paths are relative to that subdirectory, and processing is limited to files within that subdirectory scope
 
 #### Metadata
   * type: user-requirement

@@ -174,10 +174,7 @@ When moving an element, the system shall:
 - If the file is removed, report the file deletion in the operation output
 
 **Relation Update Requirements:**
-- All `derivedFrom` relations pointing to the moved element shall be updated to the new identifier
-- All `verifiedBy` relations pointing to the moved element shall be updated to the new identifier
-- All `verify` relations pointing to the moved element shall be updated to the new identifier
-- All `satisfiedBy` relations pointing to the moved element shall be updated to the new identifier
+- All relations (both forward and backward) pointing to the moved element shall be updated to the new identifier
 - Relations within the moved element (outgoing relations) shall be preserved unchanged
 
 **Identifier Update:**
@@ -191,6 +188,31 @@ When moving an element, the system shall:
   * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
   * satisfiedBy: [diff.rs](../../../core/src/diff.rs)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
+---
+
+### Move File Operation
+
+The system shall provide the capability to move entire specification files with all their elements to a new location in the repository while updating all relation references throughout the model.
+
+#### Details
+When moving a file, the system shall:
+- Accept source file path (relative to git repository root)
+- Accept target file path (relative to git repository root)
+- Validate both source and target paths
+- Move the physical file from source to target location
+- Update all element identifiers within the file to reflect the new file path
+- Update all relation references (both forward and backward) throughout the model that point to any element in the moved file
+- Preserve all file content, structure, and formatting
+
+The system shall reject the operation with a clear error message if:
+- The source file does not exist
+- The target file already exists
+- The source or target paths fail validation
+
+#### Relations
+  * derivedFrom: [Element Manipulation File Persistence](#element-manipulation-file-persistence)
+  * derivedFrom: [Target Location Validation and Auto-Creation](#target-location-validation-and-auto-creation)
+  * derivedFrom: [Element Manipulation Operations](../../ModelManagement.md#element-manipulation-operations)
 ---
 
 ### Relation Consistency Maintenance

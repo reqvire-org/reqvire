@@ -260,9 +260,10 @@ This test verifies that the system correctly processes only files within the cur
 - System shall process only files within the current directory when run from a subfolder
 - System shall handle identifier normalization correctly within subdirectory context
 - System shall generate missing relation target errors for references to elements or files outside the current subdirectory scope
-- System shall work with model-summary, html, format, and traces commands (validation is automatic)
+- System shall work with model, export, format, traces, and CRUD commands (validation is automatic)
 - System shall ignore files outside the current directory scope
 - System shall provide meaningful missing relation target error messages for parent directory references
+- CRUD commands (add, rm, mv, mv-file) shall resolve paths relative to current working directory
 
 ##### Test Criteria
 - Commands run from subdirectory process only files within that subdirectory
@@ -270,7 +271,10 @@ This test verifies that the system correctly processes only files within the cur
 - Identifier normalization works correctly for paths within subdirectory
 - References to parent directories generate missing relation target errors with clear error messages
 - Missing relation target errors specifically identify the unreachable parent directory reference
-- All major commands (model-summary, html, format, traces) work from subdirectories with automatic validation
+- All major commands (model, export, format, traces) work from subdirectories with automatic validation
+- CRUD commands (add, rm, mv, mv-file) resolve file paths relative to current working directory
+- CRUD mv command successfully moves elements within subdirectory scope
+- CRUD mv-file command successfully moves entire files within subdirectory scope
 - Commands exit with validation error code when parent directory references cannot be resolved
 - Error messages clearly explain the missing relation target due to parent directory reference
 
@@ -279,6 +283,8 @@ This test verifies that the system correctly processes only files within the cur
 
 #### Relations
   * verify: [Subdirectory Processing Option](../ReqvireTool/UserInterface/CLI.md#subdirectory-processing-option)
+  * verify: [CLI Move Element Command](../ReqvireTool/UserInterface/CLI.md#cli-move-element-command)
+  * verify: [CLI Move File Command](../ReqvireTool/UserInterface/CLI.md#cli-move-file-command)
   * satisfiedBy: [test.sh](../../tests/test-subdirectory-functionality/test.sh)
 ---
 

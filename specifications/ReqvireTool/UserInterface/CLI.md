@@ -109,6 +109,7 @@ This validation ensures that subdirectory processing maintains logical boundarie
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
+  * derivedFrom: [Git Repository as Project Root](../../ModelManagement.md#git-repository-as-project-root)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
 ---
 
@@ -383,6 +384,8 @@ The `add` command shall:
 #### Relations
   * derivedFrom: [Create Element Operation](../ModelManagement/ElementManipulation.md#create-element-operation)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
+  * derivedFrom: [Git Repository as Project Root](../../ModelManagement.md#git-repository-as-project-root)
+  * derivedFrom: [Subdirectory Processing Option](#subdirectory-processing-option)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
 ---
 
@@ -406,6 +409,8 @@ The `rm` command shall:
 #### Relations
   * derivedFrom: [Delete Element Operation](../ModelManagement/ElementManipulation.md#delete-element-operation)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
+  * derivedFrom: [Git Repository as Project Root](../../ModelManagement.md#git-repository-as-project-root)
+  * derivedFrom: [Subdirectory Processing Option](#subdirectory-processing-option)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
 ---
 
@@ -436,6 +441,50 @@ The `mv` command shall:
 
 #### Relations
   * derivedFrom: [Move Element Operation](../ModelManagement/ElementManipulation.md#move-element-operation)
+  * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
+  * derivedFrom: [Git Repository as Project Root](../../ModelManagement.md#git-repository-as-project-root)
+  * derivedFrom: [Subdirectory Processing Option](#subdirectory-processing-option)
+  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
+---
+
+### CLI Move File Command
+
+The system shall provide a `mv-file` command to move entire specification files with all their elements to a new location.
+
+#### Details
+The `mv-file` command shall:
+- Accept source file path (required, relative to git repository root)
+- Accept target file path (required, relative to git repository root)
+- Support `--dry-run` flag to preview changes without applying
+- Support `--json` flag for structured output
+- Exit with code 0 on success, non-zero on error
+
+#### Relations
+  * derivedFrom: [Move File Operation](../ModelManagement/ElementManipulation.md#move-file-operation)
+  * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
+  * derivedFrom: [Git Repository as Project Root](../../ModelManagement.md#git-repository-as-project-root)
+  * derivedFrom: [Subdirectory Processing Option](#subdirectory-processing-option)
+---
+
+### CLI Rename Element Command
+
+The system shall provide a `rename` command to rename existing model elements while automatically updating all relations that reference the renamed element.
+
+#### Details
+The `rename` command shall:
+- Accept current element name (required)
+- Accept new element name (required)
+- Update all incoming relations system-wide with new identifier
+- Apply changes immediately by default
+- Support `--dry-run` flag to preview changes without applying
+- Output git-style diff showing all affected files by default
+- Support `--json` flag for structured output with relation updates and identifier change
+- Report identifier change (old → new)
+- Report error if element does not exist or new name conflicts with existing element
+- Exit with code 0 on success, non-zero on error
+
+#### Relations
+  * derivedFrom: [Rename Element Operation](../ModelManagement/ElementManipulation.md#rename-element-operation)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
 ---
