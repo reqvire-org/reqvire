@@ -321,6 +321,24 @@ pub enum Commands {
         json: bool,
     },
 
+    /// Move entire specification file with all its elements
+    #[clap(name = "mv-file", override_help = "Move entire specification file with all its elements\n\nMV-FILE OPTIONS:\n       <SOURCE_FILE>            Source file path (relative to current working directory)\n       <TARGET_FILE>            Target file path (relative to current working directory)\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n\nUSAGE:\n    reqvire mv-file <source-file> <target-file>")]
+    MvFile {
+        /// Source file path (relative to current working directory)
+        source_file: String,
+
+        /// Target file path (relative to current working directory)
+        target_file: String,
+
+        /// Preview changes without applying
+        #[clap(long, help_heading = "MV-FILE OPTIONS")]
+        dry_run: bool,
+
+        /// Output results in JSON format
+        #[clap(long, help_heading = "MV-FILE OPTIONS")]
+        json: bool,
+    },
+
     /// Interactive shell for GraphRegistry operations (undocumented)
     #[clap(hide = true)]
     Shell,
@@ -924,6 +942,27 @@ pub fn handle_command(
                 &mut model_manager,
                 &element_id,
                 &new_name,
+                &git_root,
+                dry_run,
+            )?;
+
+            // Output result
+            if json {
+                println!("{}", render_crud_json(&result));
+            } else {
+                render_crud_result(&result);
+            }
+
+            return Ok(0);
+        },
+        Some(Commands::MvFile { source_file, target_file, dry_run, json }) => {
+            // Call CRUD operation
+            let git_root = git_commands::get_git_root_dir()?;
+            let result = crud::move_file(
+                &mut model_manager,
+                &source_file,
+                &target_file,
+                &current_dir,
                 &git_root,
                 dry_run,
             )?;

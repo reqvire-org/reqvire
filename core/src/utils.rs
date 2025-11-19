@@ -462,16 +462,22 @@ pub fn to_relative_identifier(
         path
     };
     
-    let resolved_path=git_root.join(stripped);
-    
+    let resolved_path = git_root.join(stripped);
+
+    // Try to canonicalize if files exist, otherwise compute from path strings
     let canonical_path = resolved_path.canonicalize().ok();
     let canonical_base = base_path.canonicalize().ok();
-   
-    let relative = if let (Some(normalized), Some(base)) = (canonical_path, canonical_base) {
-        diff_paths(&normalized, &base).map(|p| p.to_string_lossy().into_owned())
-    } else {
 
-        None
+    let relative = if let (Some(ref normalized), Some(ref base)) = (&canonical_path, &canonical_base) {
+        // Both exist - use canonical paths
+        diff_paths(normalized, base).map(|p| p.to_string_lossy().into_owned())
+    } else if let Some(ref base) = canonical_base {
+        // Base exists but target doesn't - compute from git-root-relative paths
+        let base_relative = get_relative_path(base).unwrap_or_else(|_| base_path.to_path_buf());
+        diff_paths(Path::new(stripped), &base_relative).map(|p| p.to_string_lossy().into_owned())
+    } else {
+        // Neither exists - compute from path strings directly
+        diff_paths(Path::new(stripped), base_path).map(|p| p.to_string_lossy().into_owned())
     };
 
     let base = relative.unwrap_or_else(|| path.to_string());

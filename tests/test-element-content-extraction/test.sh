@@ -1,29 +1,35 @@
 #!/bin/bash
+set -euo pipefail
+
+# Create log file immediately to ensure it exists for runner
+echo "Starting test..." > "${TEST_DIR}/test_results.log"
 
 # Test: Element content extraction
 # --------------------------------------
 # Acceptance Criteria:
 # - System should properly extract Requirement body for change impact detection
-# - Requirement body is consiting of normalized main text and content from '#### Details subsection'
+# - Requirement body consists of normalized main text and content from '#### Details' subsection
+# - Details subsections should include the '#### Details' header in the extracted content
 #
 # Test Criteria:
 # - Command exits with success (0) return code
-# - Output shows expecte content for each element
+# - Output shows expected content for each element including Details headers
 #
 
-
-
-
-OUTPUT=$(cd "$TEST_DIR" && "$REQFLOW_BIN" --config "${TEST_DIR}/reqflow.yaml" --model-summary --json 2>&1)
+echo "Running: reqvire search --json" >> "${TEST_DIR}/test_results.log"
+set +e
+OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" search --json 2>&1)
 EXIT_CODE=$?
+set -e
 
-printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results.log"
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 
 
 GOTTEN_CONTENT=$(awk '/# [^:]+:/' "${TEST_DIR}/test_results.log")
 GOTTEN_CONTENT=$(echo "$OUTPUT" | jq -r '
   [
-    .model_summary.files
+    .files
     | .. 
     | objects 
     | select(.content != null)
@@ -38,24 +44,26 @@ GOTTEN_CONTENT=$(echo "$OUTPUT" | jq -r '
 GOTTEN_CONTENT=$(printf "\n%s" "$GOTTEN_CONTENT")
 
 
-EXPECTED_CONTENT='
+EXPECTED_CONTENT="
 REQ 0:Root requirement for relations to work.
 
 REQ 1:This is simple requirement with main text only.
 
-REQ 1A:This is simple requirement with main text and details. REQ 1A details.
+REQ 1A:This is simple requirement with main text and details. #### Details REQ 1A details.
 
 REQ 2:Requirement with main text and relations.
 
 REQ 3:Requirement with main text and relations and metadata.
 
-REQ 4:Requirement with main text and relations and metadata and details. REQ 4 Details.
+REQ 4:Requirement with main text and relations and metadata and details. #### Details REQ 4 Details.
 
-REQ 5:Requirement with main text and relations and metadata and details different order (A). REQ 5 Details.
+REQ 5:Requirement with main text and relations and metadata and details different order (A). #### Details REQ 5 Details.
 
-REQ 6:Requirement with main text and relations and metadata and details different order (B). REQ 6 Details.
+REQ 6:Requirement with main text and relations and metadata and details different order (B). #### Details REQ 6 Details.
 
-REQ 7:Requirement with main text and relations and metadata and details different order (C). REQ 7 Details.'
+REQ 7:Requirement with main text and relations and metadata and details different order (C). #### Details REQ 7 Details.
+
+REQ 8:Requirement with main text and relations details with <details> element that should not break parsing and validation.    #### Details <details> ### REQ 8 Nested requirement which should not be processed as requirement. #### Relations   * derivedFrom: #req-0          </details>"
 
 
 
