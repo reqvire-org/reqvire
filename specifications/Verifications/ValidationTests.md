@@ -2,7 +2,7 @@
 
 This document verifies the requirements for Reqvire's validation functionality.
 
-## Relation Validation Tests
+## Validation Tests
 
 ### Invalid Relations Test
 
@@ -61,7 +61,7 @@ This verification test checks that Reqvire correctly identifies and reports inva
   * verify: [Internal Consistency Validator](../ReqvireTool/ValidationAndReporting/Validation.md#internal-consistency-validator)
   * verify: [Relation Type Validation](../ReqvireTool/ValidationAndReporting/Validation.md#relation-type-validation)
   * verify: [Relation Element Type Validator](../ReqvireTool/ValidationAndReporting/Validation.md#relation-element-type-validator)
-  * verify: [Identifiers and Relations](../SpecificationsRequirements.md#identifiers-and-relations)
+  * verify: [Identifiers and Relations](../Structure/SpecificationsRequirements.md#identifiers-and-relations)
   * verify: [Trace Relation Non-Directional Behavior](../ReqvireTool/ModelManagement/DiagramGeneration.md#trace-relation-non-directional-behavior)
   * satisfiedBy: [test.sh](../../tests/test-invalid-relations/test.sh)
 ---
@@ -246,11 +246,9 @@ This test verifies that Reqvire correctly detects and reports invalid header str
 
 #### Relations
   * verify: [Markdown Structure Validator](../ReqvireTool/ValidationAndReporting/Validation.md#markdown-structure-validator)
-  * verify: [Structure of Markdown Documents](../SpecificationsRequirements.md#structure-of-markdown-documents)
+  * verify: [Structure of Markdown Documents](../Structure/SpecificationsRequirements.md#structure-of-markdown-documents)
   * satisfiedBy: [test.sh](../../tests/test-invalid-relations/test.sh)
 ---
-
-## Validation Report Tests
 
 ### Subdirectory Processing Verification
 
@@ -283,8 +281,6 @@ This test verifies that the system correctly processes only files within the cur
   * verify: [Subdirectory Processing Option](../ReqvireTool/UserInterface/CLI.md#subdirectory-processing-option)
   * satisfiedBy: [test.sh](../../tests/test-subdirectory-functionality/test.sh)
 ---
-
-## Element Type Assignment Tests
 
 ### Default Element Type Assignment Test
 
@@ -328,6 +324,6 @@ This test verifies that the system assigns the default type 'requirement' to all
   * type: test-verification
 
 #### Relations
-  * verify: [Default Requirement Type Assignment](../UserRequirements.md#default-requirement-type-assignment)
+  * verify: [Default Requirement Type Assignment](../ModelManagement.md#default-requirement-type-assignment)
   * satisfiedBy: [test.sh](../../tests/test-default-type-assignment/test.sh)
 ---

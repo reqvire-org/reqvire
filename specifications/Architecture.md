@@ -102,10 +102,10 @@ classDiagram
 #### Relations
   * trace: [Managing MBSE Models](UserStories.md#managing-mbse-models)
   * trace: [AI-Assisted MBSE Model Management](UserStories.md#ai-assisted-mbse-model-management)
-  * trace: [CLI interface](UserRequirements.md#cli-interface)
-  * trace: [Browse Model via Web Interface](UserRequirements.md#browse-model-via-web-interface)
+  * trace: [CLI interface](Interfaces.md#cli-interface)
+  * trace: [Browse Model via Web Interface](Export.md#browse-model-via-web-interface)
   * trace: [Integrate with GitHub Workflows](UserStories.md#integrate-with-github-workflows)
-  * trace: [Model Reports](UserRequirements.md#model-reports)
+  * trace: [Model Reports](Reports.md#model-reports)
   * trace: [Validating Structures](UserStories.md#validating-structures)
 ---
 
@@ -196,9 +196,9 @@ graph TD
 #### Relations
   * trace: [Managing MBSE Models](UserStories.md#managing-mbse-models)
   * trace: [AI-Assisted MBSE Model Management](UserStories.md#ai-assisted-mbse-model-management)
-  * trace: [CLI interface](UserRequirements.md#cli-interface)
-  * trace: [Browse Model via Web Interface](UserRequirements.md#browse-model-via-web-interface)
+  * trace: [CLI interface](Interfaces.md#cli-interface)
+  * trace: [Browse Model via Web Interface](Export.md#browse-model-via-web-interface)
   * trace: [Integrate with GitHub Workflows](UserStories.md#integrate-with-github-workflows)
-  * trace: [Model Reports](UserRequirements.md#model-reports)
+  * trace: [Model Reports](Reports.md#model-reports)
   * trace: [Validating Structures](UserStories.md#validating-structures)
 ---

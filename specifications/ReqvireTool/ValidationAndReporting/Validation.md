@@ -35,7 +35,7 @@ The validation process shall be split into two distinct passes:
 Both passes maintain the existing behavior where validation errors cause process termination with appropriate error reporting.
 
 #### Relations
-  * derivedFrom: [Validate Internal Consistency](../../UserRequirements.md#validate-internal-consistency)
+  * derivedFrom: [Validate Internal Consistency](../../Validation.md#validate-internal-consistency)
   * derivedFrom: [Requirements Processing](../Storage/Configuration.md#requirements-processing)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
 ---
@@ -64,7 +64,7 @@ Commands shall be categorized into two groups:
 Commands in the first group shall automatically run the two-pass validation and exit if any errors are found. Commands in the second group shall skip validation to allow operation on potentially invalid documents.
 
 #### Relations
-  * derivedFrom: [Provide Validation Reports](../../UserRequirements.md#provide-validation-reports)
+  * derivedFrom: [Provide Validation Reports](../../Reports.md#provide-validation-reports)
   * derivedFrom: [CLI Interface Structure](../UserInterface/CLI.md#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
 ---
@@ -121,7 +121,7 @@ The GraphRegistry shall be constructed from the ElementRegistry after Pass 1 com
 The system shall implement a markdown structure validator that enforces Reqvire's requirements for header levels, element structure, relation formatting, and other markdown-specific syntax rules, reporting violations with line numbers and suggested fixes.
 
 #### Relations
-  * derivedFrom: [Validate Markdown Structure](../../UserRequirements.md#validate-markdown-structure)
+  * derivedFrom: [Validate Markdown Structure](../../Validation.md#validate-markdown-structure)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
   * verifiedBy: [Invalid Relations Test](../../Verifications/ValidationTests.md#invalid-relations-test)
@@ -144,8 +144,8 @@ The consistency validator shall verify:
 Rationale: Element names serve as stable IDs for element identity, independent of file location. Global uniqueness is essential for proper element identification and change tracking across the model.
 
 #### Relations
-  * derivedFrom: [Validate Internal Consistency](../../UserRequirements.md#validate-internal-consistency)
-  * derivedFrom: [Element Identity Model](../../SpecificationsRequirements.md#element-identity-model)
+  * derivedFrom: [Validate Internal Consistency](../../Validation.md#validate-internal-consistency)
+  * derivedFrom: [Element Identity Model](../../Structure/SpecificationsRequirements.md#element-identity-model)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
   * verifiedBy: [Invalid Relations Test](../../Verifications/ValidationTests.md#invalid-relations-test)
@@ -156,7 +156,7 @@ Rationale: Element names serve as stable IDs for element identity, independent o
 The system shall implement a specialized validator that analyzes dependencies across different model components, ensuring proper alignment between architectural layers, requirement levels, and verification elements.
 
 #### Relations
-  * derivedFrom: [Validate Cross-Component Dependencies](../../UserRequirements.md#validate-cross-component-dependencies)
+  * derivedFrom: [Validate Cross-Component Dependencies](../../Validation.md#validate-cross-component-dependencies)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
   * verifiedBy: [Invalid Relations Test](../../Verifications/ValidationTests.md#invalid-relations-test)
@@ -175,7 +175,7 @@ The system shall implement validation that verifies relation endpoints have appr
 - Warnings should be issued when relation endpoints have incompatible element types
 
 #### Relations
-  * derivedFrom: [Validate Relation Types](../../UserRequirements.md#validate-relation-types)
+  * derivedFrom: [Validate Relation Types](../../Validation.md#validate-relation-types)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
   * verifiedBy: [Invalid Relations Test](../../Verifications/ValidationTests.md#invalid-relations-test)
@@ -186,7 +186,7 @@ The system shall implement validation that verifies relation endpoints have appr
 The system shall validate relation types against a defined vocabulary and provide clear error messages for unsupported relation types, including suggestions for the correct relation types.
 
 #### Relations
-  * derivedFrom: [Enhanced Validation Error Reporting](../../UserRequirements.md#enhanced-validation-error-reporting)
+  * derivedFrom: [Enhanced Validation Error Reporting](../../Validation.md#enhanced-validation-error-reporting)
   * satisfiedBy: [relation.rs](../../../core/src/relation.rs)
 ---
 

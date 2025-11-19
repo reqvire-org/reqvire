@@ -173,34 +173,7 @@ TODO: write test procedure
   * type: test-verification
 
 #### Relations
-  * verify: [Change Impact Analysis](../UserRequirements.md#change-impact-analysis)
-  * satisfiedBy: [test.sh](../../tests/test-change-impact-detection/test.sh)
----
-
-### Traceability Matrix Verification
-
-This test verifies that the system generates traceability matrices in Markdown format.
-
-#### Details
-
-##### Acceptance Criteria
-- System should generate traceability matrices in Markdown format
-- Matrices should support different views (Requirements-to-Verification, etc.)
-- Matrices should efficiently represent relationships between elements
-
-##### Test Criteria
-- Command exits with success (0) return code
-- Generated matrices contain expected relationship information
-- Different matrix views are properly supported
-
-##### Test Procedure
-TODO: write test procedure
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * verify: [Traceability Matrix](../UserRequirements.md#traceability-matrix)
+  * verify: [Change Impact Analysis](../Reports.md#change-impact-analysis)
   * satisfiedBy: [test.sh](../../tests/test-change-impact-detection/test.sh)
 ---
 
@@ -227,7 +200,7 @@ TODO: write test procedure
   * type: test-verification
 
 #### Relations
-  * verify: [Tracing Structural Changes](../UserRequirements.md#tracing-structural-changes)
+  * verify: [Tracing Structural Changes](../TraceChanges.md#tracing-structural-changes)
   * satisfiedBy: [test.sh](../../tests/test-change-impact-detection/test.sh)
 ---
 
@@ -263,3 +236,4 @@ This test verifies that the smart filtering correctly handles new elements in ch
   * verify: [Smart Filtering for Change Impact Reports](../ReqvireTool/ModelManagement/ChangeImpact.md#smart-filtering-for-change-impact-reports)
   * satisfiedBy: [test.sh](../../tests/test-change-impact-smart-filtering/test.sh)
 ---
+

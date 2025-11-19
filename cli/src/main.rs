@@ -19,7 +19,6 @@ fn main() {
         Some(cli::Commands::ChangeImpact { json, .. }) => *json,
         Some(cli::Commands::Format { json, .. }) => *json,
         Some(cli::Commands::Search { json, .. }) => *json,
-        Some(cli::Commands::Matrix { json, .. }) => *json,
         Some(cli::Commands::Traces { json, .. }) => *json,
         Some(cli::Commands::Coverage { json }) => *json,
         _ => false,

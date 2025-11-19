@@ -1,6 +1,6 @@
-# User Requirements
+# Specifications Requirements
 
-## Specifications Requirements
+## Requirements
 
 ### Requirements Change Propagation
 
@@ -269,7 +269,7 @@ flowchart TD;
 </details>
 
 #### Relations
-  * derivedFrom: [Change Impact Analysis](UserRequirements.md#change-impact-analysis)
+  * derivedFrom: [Change Impact Analysis](../Reports.md#change-impact-analysis)
 ---
 
 ### Structure and Addressing in Markdown Documents
@@ -277,7 +277,7 @@ flowchart TD;
 The system shall implement semi-structured markdown format specifications that defines the structure, rules, and usage of **Elements**, **Relations**, and **Identifiers** in Markdown (`.md`) documents.
 
 #### Relations
-  * derivedFrom: [Managing MBSE Models](UserStories.md#managing-mbse-models)
+  * derivedFrom: [Managing MBSE Models](../UserStories.md#managing-mbse-models)
 ---
 
 ### Structure of Markdown Documents
@@ -649,12 +649,12 @@ The appropriate verification type should be selected based on the nature of the 
 
 #### Relations
   * derivedFrom: [Structure and Addressing in Markdown Documents](#structure-and-addressing-in-markdown-documents)
-  * derivedFrom: [AI-Assisted MBSE Model Management](UserStories.md#ai-assisted-mbse-model-management)
-  * satisfiedBy: [relation.rs](../core/src/relation.rs)
-  * satisfiedBy: [element.rs](../core/src/element.rs)
-  * satisfiedBy: [subsection.rs](../core/src/subsection.rs)
-  * satisfiedBy: [parser.rs](../core/src/parser.rs)
-  * satisfiedBy: [model.rs](../core/src/model.rs)
+  * derivedFrom: [AI-Assisted MBSE Model Management](../UserStories.md#ai-assisted-mbse-model-management)
+  * satisfiedBy: [relation.rs](../../core/src/relation.rs)
+  * satisfiedBy: [element.rs](../../core/src/element.rs)
+  * satisfiedBy: [subsection.rs](../../core/src/subsection.rs)
+  * satisfiedBy: [parser.rs](../../core/src/parser.rs)
+  * satisfiedBy: [model.rs](../../core/src/model.rs)
 ---
 
 ### Element Identity Model
@@ -780,8 +780,8 @@ Content here.
 
 #### Relations
   * derivedFrom: [Structure and Addressing in Markdown Documents](#structure-and-addressing-in-markdown-documents)
-  * satisfiedBy: [element.rs](../core/src/element.rs)
-  * satisfiedBy: [parser.rs](../core/src/parser.rs)
+  * satisfiedBy: [element.rs](../../core/src/element.rs)
+  * satisfiedBy: [parser.rs](../../core/src/parser.rs)
 ---
 
 ### Identifiers and Relations
@@ -816,7 +816,7 @@ Identifiers are used for writing relations in markdown and cross-referencing bet
 - **InternalPath**
   - An internal filesystem file path without fragment, pointing to implementation files.
   - Used for satisfaction and traceability relations (e.g., `satisfiedBy`, `satisfy`, `trace`)
-  - **Example**: `"../core/src/diagrams.rs"`
+  - **Example**: `"../../core/src/diagrams.rs"`
   
   
 ### Identifier Path Resolution Rules
@@ -1083,8 +1083,8 @@ The system must validate relation usage according to these rules:
 
 #### Relations
   * derivedFrom: [Element Identity Model](#element-identity-model)
-  * derivedFrom: [AI-Assisted MBSE Model Management](UserStories.md#ai-assisted-mbse-model-management)
-  * satisfiedBy: [relation.rs](../core/src/relation.rs)
+  * derivedFrom: [AI-Assisted MBSE Model Management](../UserStories.md#ai-assisted-mbse-model-management)
+  * satisfiedBy: [relation.rs](../../core/src/relation.rs)
 ---
 
 ### Relation Types and behaviors
@@ -1190,6 +1190,7 @@ When an element changes, the impact propagates according to these rules:
 </details>
 
 #### Relations
-  * derivedFrom: [Managing MBSE Models](UserStories.md#managing-mbse-models)
-  * satisfiedBy: [relation.rs](../core/src/relation.rs)
+  * derivedFrom: [Managing MBSE Models](../UserStories.md#managing-mbse-models)
+  * satisfiedBy: [relation.rs](../../core/src/relation.rs)
 ---
+

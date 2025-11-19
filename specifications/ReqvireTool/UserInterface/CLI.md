@@ -28,7 +28,7 @@ FORMAT OPTIONS:
 ```
 
 #### Relations
-  * derivedFrom: [CLI interface](../../UserRequirements.md#cli-interface)
+  * derivedFrom: [CLI interface](../../Interfaces.md#cli-interface)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
 ---
 
@@ -51,7 +51,7 @@ Additional behavior:
   - When formatting is applied, show a summary of changed files with diff details
 
 #### Relations
-  * derivedFrom: [Model Formatting](../../UserRequirements.md#model-formatting)
+  * derivedFrom: [Model Formatting](../../Validation.md#model-formatting)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
 ---
@@ -78,8 +78,8 @@ The system shall provide a validation command that executes model validation and
   - Support --json flag to output validation results in JSON format
 
 #### Relations
-  * derivedFrom: [Provide Validation Reports](../../UserRequirements.md#provide-validation-reports)
-  * derivedFrom: [Enhanced Validation Error Reporting](../../UserRequirements.md#enhanced-validation-error-reporting)
+  * derivedFrom: [Provide Validation Reports](../../Reports.md#provide-validation-reports)
+  * derivedFrom: [Enhanced Validation Error Reporting](../../Validation.md#enhanced-validation-error-reporting)
   * derivedFrom: [Two-Pass Validation Strategy](../ValidationAndReporting/Validation.md#two-pass-validation-strategy)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
@@ -117,7 +117,7 @@ This validation ensures that subdirectory processing maintains logical boundarie
 The system shall implement detailed error handling and logging throughout the application to facilitate troubleshooting and provide meaningful feedback.
 
 #### Relations
-  * derivedFrom: [Enhanced Validation Error Reporting](../../UserRequirements.md#enhanced-validation-error-reporting)
+  * derivedFrom: [Enhanced Validation Error Reporting](../../Validation.md#enhanced-validation-error-reporting)
   * satisfiedBy: [error.rs](../../../core/src/error.rs)
 ---
 
@@ -173,36 +173,9 @@ System shall provide CLI command to generate model diagrams with optional filter
 - Shall integrate with existing model diagram generation functionality
 
 #### Relations
-  * derivedFrom: [Model Visualization and Exploration](../../UserRequirements.md#model-visualization-and-exploration)
+  * derivedFrom: [Model Visualization and Exploration](../../DiagramGeneration.md#model-visualization-and-exploration)
   * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
----
-
-### CLI Matrix Command
-
-The system shall implement a `matrix` subcommand under the main `verifications` command that generates traceability matrices showing requirements and their verification status.
-
-#### Details
-The command shall:
-- Be invoked as `reqvire matrix`
-- Generate output in Markdown format by default with hierarchical requirements
-- Support `--json` flag for structured JSON output (see [CLI Matrix JSON Flag](../ModelManagement/TraceabilityMatrix.md#cli-matrix-json-flag))
-- Support `--svg` flag for SVG matrix output (see [CLI Matrix SVG Flag](../ModelManagement/TraceabilityMatrix.md#cli-matrix-svg-flag))
-- The `--json` and `--svg` flags shall be mutually exclusive
-- Show requirements as rows and verification elements as columns
-- Display verification status for each requirement using [Verification Roll-up Strategy](../ModelManagement/TraceabilityMatrix.md#verification-roll-up-strategy)
-- Include hierarchical indentation for derived requirements
-- Show verification relationships with checkmarks where applicable
-- Exit with status code 0 on success
-- Exit with non-zero status code on errors
-
-Command output shall be written to stdout for easy redirection to files.
-
-#### Relations
-  * derivedFrom: [Verification Roll-up Strategy](../ModelManagement/TraceabilityMatrix.md#verification-roll-up-strategy)
-  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
-  * satisfiedBy: [matrix_generator.rs](../../../core/src/matrix_generator.rs)
-  * verifiedBy: [Traceability Matrix Generation Test](../../Verifications/TreacibilityMatrix.md#traceability-matrix-generation-test)
 ---
 
 ### CLI Traces Command
@@ -227,7 +200,7 @@ The Mermaid diagrams generated for verification traces shall include clickable l
 Command output shall be written to stdout for easy redirection to files.
 
 #### Relations
-  * derivedFrom: [Verification Trace Builder](../ModelManagement/TraceabilityMatrix.md#verification-trace-builder)
+  * derivedFrom: [Verification Trace Builder](../ModelManagement/VerificationTraces.md#verification-trace-builder)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
 ---
 
@@ -297,7 +270,7 @@ The command shall:
 - Include breakdowns by file, section, and verification type
 - Show satisfaction status of test-verification elements (those with satisfiedBy relations)
 - Show orphaned verifications (verification elements without any verify relations to requirements)
-- Follow [Verification Roll-up Strategy](../ModelManagement/TraceabilityMatrix.md#verification-roll-up-strategy)
+- Follow [Verification Roll-up Strategy](../ModelManagement/VerificationTraces.md#verification-roll-up-strategy)
 - Test-verification elements require satisfiedBy relations to be considered satisfied
 - Analysis, inspection, and demonstration verification elements are considered satisfied by default
 - Exit with status code 0 on success
@@ -307,7 +280,7 @@ Command output shall be written to stdout for easy redirection to files.
 
 #### Relations
   * derivedFrom: [Verification Coverage Report Generator](../ValidationAndReporting/Reports.md#verification-coverage-report-generator)
-  * derivedFrom: [Verification Roll-up Strategy](../ModelManagement/TraceabilityMatrix.md#verification-roll-up-strategy)
+  * derivedFrom: [Verification Roll-up Strategy](../ModelManagement/VerificationTraces.md#verification-roll-up-strategy)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * verifiedBy: [Verification Coverage Report Test](../../Verifications/ReportsTests.md#verification-coverage-report-test)
 ---
@@ -334,7 +307,7 @@ The command shall:
 Command output shall be written to stdout for easy redirection to files.
 
 #### Relations
-  * derivedFrom: [Model Linting](../../UserRequirements.md#model-linting)
+  * derivedFrom: [Model Linting](../../Validation.md#model-linting)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
 ---
 

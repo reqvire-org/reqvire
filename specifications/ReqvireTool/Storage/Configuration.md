@@ -20,7 +20,7 @@ examples/**
 The `.reqvireignore` file provides Reqvire-specific exclusions for files that should remain in version control but not be processed as requirements.
 
 #### Relations
-  * derivedFrom: [Coexistence of Structured and Unstructured Documents](../../UserRequirements.md#coexistence-of-structured-and-unstructured-documents)
+  * derivedFrom: [Coexistence of Structured and Unstructured Documents](../../ModelManagement.md#coexistence-of-structured-and-unstructured-documents)
   * satisfiedBy: [config.rs](../../../cli/src/config.rs)
 ---
 

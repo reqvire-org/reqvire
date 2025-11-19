@@ -1,12 +1,15 @@
 # User stories
 
+## User Stories
+
+
 **Personas**
 1. System Engineer: Focused on managing system models, ensuring alignment with project requirements, and validating structures.  
 2. SOI Developer: Implements features and makes system changes based on MBSE models, ensuring consistency between design and code.  
 3. Contributor: An external community member contributing to Reqvire by improving models, creating features, or providing feedback.  
 4. Manager: Oversees the MBSE processes, tracks progress, ensures alignment with objectives, and generates reports for decision-making.
 
-## User Stories
+---
 
 ### Managing MBSE Models
 
@@ -82,7 +85,7 @@ As a **Contributor**, I want Reqvire to integrate seamlessly with GitHub workflo
   * type: user-requirement
 
 #### Relations
-  * derivedFrom: [Promote Automation and Efficiency](UserRequirements.md#promote-automation-and-efficiency)
+  * derivedFrom: [Promote Automation and Efficiency](Mission.md#promote-automation-and-efficiency)
   * trace: [MOE_CE](MOEs.md#moe_ce)
 ---
 
@@ -118,3 +121,4 @@ As a **Contributor**, I want Reqvire tools to be intuitive and well-documented, 
 #### Relations
   * trace: [MOE_CE](MOEs.md#moe_ce)
 ---
+

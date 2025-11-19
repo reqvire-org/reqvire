@@ -57,7 +57,7 @@ This test verifies that the CLI help output displays all commands and their opti
 - Main help lists all global options under "Options:" section
 - Command-specific options are displayed under dedicated headings (e.g., "SUMMARY OPTIONS:", "FORMAT OPTIONS:")
 - All command options are flattened and visible in the main help without needing to drill down
-- Help output includes nested subcommands expanded (e.g., "matrix", "traces", "coverage")
+- Help output includes nested subcommands expanded (e.g., "traces", "coverage")
 - Each command's help text is descriptive and clear
 
 ##### Test Criteria
@@ -70,14 +70,13 @@ This test verifies that the CLI help output displays all commands and their opti
 
 2. **Command listing completeness**
    - All CLI commands are listed: html, format, validate, generate-diagrams, remove-diagrams, summary, section-summary, change-impact, verifications
-   - Nested commands are expanded: "matrix", "traces", "coverage"
+   - Nested commands are expanded: "traces", "coverage"
 
 3. **Options flattening - all command-specific option sections present**
    - FORMAT OPTIONS section visible
    - SUMMARY OPTIONS section visible
    - SECTION-SUMMARY OPTIONS section visible
    - CHANGE IMPACT OPTIONS section visible
-   - VERIFICATIONS MATRIX OPTIONS section visible
    - VERIFICATIONS TRACES OPTIONS section visible
    - VERIFICATIONS COVERAGE OPTIONS section visible
 
@@ -96,7 +95,6 @@ This test verifies that the CLI help output displays all commands and their opti
   * verify: [CLI Remove Diagrams Flag](../ReqvireTool/UserInterface/CLI.md#cli-remove-diagrams-flag)
   * verify: [CLI Search Command](../ReqvireTool/UserInterface/CLI.md#cli-search-command)
   * verify: [CLI Change Impact Report Command](../ReqvireTool/UserInterface/CLI.md#cli-change-impact-report-command)
-  * verify: [CLI Matrix Command](../ReqvireTool/UserInterface/CLI.md#cli-matrix-command)
   * verify: [CLI Traces Command](../ReqvireTool/UserInterface/CLI.md#cli-traces-command)
   * verify: [CLI Coverage Command](../ReqvireTool/UserInterface/CLI.md#cli-coverage-command)
   * satisfiedBy: [test.sh](../../tests/test-cli-help-structure/test.sh)
@@ -212,7 +210,7 @@ This test verifies the format command requirements from SystemRequirements and U
 #### Relations
   * verify: [Format Command](../ReqvireTool/UserInterface/CLI.md#format-command)
   * verify: [Document Structure Normalization](../ReqvireTool/ValidationAndReporting/Formatting.md#document-structure-normalization)
-  * verify: [Structure of Markdown Documents](../SpecificationsRequirements.md#structure-of-markdown-documents)
+  * verify: [Structure of Markdown Documents](../Structure/SpecificationsRequirements.md#structure-of-markdown-documents)
   * satisfiedBy: [test.sh](../../tests/test-advanced-format/test.sh)
 ---
 

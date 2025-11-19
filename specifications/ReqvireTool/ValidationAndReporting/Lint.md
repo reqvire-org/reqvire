@@ -13,14 +13,14 @@ A verify relation is redundant when:
 - Since verification traces roll up automatically through derivedFrom relations, verifying the leaf is sufficient
 
 Detection shall:
-- Reuse the trace tree building logic from [Verification Trace Builder](../ModelManagement/TraceabilityMatrix.md#verification-trace-builder)
+- Reuse the trace tree building logic from [Verification Trace Builder](../ModelManagement/VerificationTraces.md#verification-trace-builder)
 - Identify ancestor requirements in each verification's trace tree that are also directly verified
 - Report these as redundant relations that add noise to the model
 - Categorize as **auto-fixable** since removing them is safe and mechanical
 
 #### Relations
-  * derivedFrom: [Model Linting](../../UserRequirements.md#model-linting)
-  * derivedFrom: [Verification Trace Builder](../ModelManagement/TraceabilityMatrix.md#verification-trace-builder)
+  * derivedFrom: [Model Linting](../../Validation.md#model-linting)
+  * derivedFrom: [Verification Trace Builder](../ModelManagement/VerificationTraces.md#verification-trace-builder)
 ---
 
 ### Redundant Hierarchical Relations Detection
@@ -53,8 +53,8 @@ This approach reuses the proven trace tree logic for redundancy detection, ensur
 **Note**: The current implementation only detects cases where a direct redundant relation EXISTS. It does not detect or suggest whether converging paths without a direct relation should have one added - that remains a semantic modeling decision.
 
 #### Relations
-  * derivedFrom: [Model Linting](../../UserRequirements.md#model-linting)
-  * derivedFrom: [Verification Trace Builder](../ModelManagement/TraceabilityMatrix.md#verification-trace-builder)
+  * derivedFrom: [Model Linting](../../Validation.md#model-linting)
+  * derivedFrom: [Verification Trace Builder](../ModelManagement/VerificationTraces.md#verification-trace-builder)
 ---
 
 ### Multi-Branch Convergence Detection
@@ -95,8 +95,8 @@ This enables the model author to review and decide:
 - Should there be a direct relation instead? (restructure the model)
 
 #### Relations
-  * derivedFrom: [Model Linting](../../UserRequirements.md#model-linting)
-  * derivedFrom: [Verification Trace Builder](../ModelManagement/TraceabilityMatrix.md#verification-trace-builder)
+  * derivedFrom: [Model Linting](../../Validation.md#model-linting)
+  * derivedFrom: [Verification Trace Builder](../ModelManagement/VerificationTraces.md#verification-trace-builder)
   * satisfiedBy: [lint.rs](../../../core/src/lint.rs)
   * verifiedBy: [Lint Command Verification](../../Verifications/Misc.md#lint-command-verification)
 ---
@@ -175,7 +175,7 @@ Output format shall include:
 For auto-fixable issues, the output indicates these can be fixed with `--fix` flag. For manual review issues, the output explains why human judgment is required.
 
 #### Relations
-  * derivedFrom: [Model Linting](../../UserRequirements.md#model-linting)
+  * derivedFrom: [Model Linting](../../Validation.md#model-linting)
 ---
 
 ### Lint Auto-fix Capability

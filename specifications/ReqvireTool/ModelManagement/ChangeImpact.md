@@ -58,8 +58,8 @@ The algorithm shall consist of the following steps:
    - Support incremental impact analysis for large models
 
 #### Relations
-  * derivedFrom: [Requirements Change Propagation](../../SpecificationsRequirements.md#requirements-change-propagation)
-  * derivedFrom: [Element Identity Model](../../SpecificationsRequirements.md#element-identity-model)
+  * derivedFrom: [Requirements Change Propagation](../../Structure/SpecificationsRequirements.md#requirements-change-propagation)
+  * derivedFrom: [Element Identity Model](../../Structure/SpecificationsRequirements.md#element-identity-model)
   * satisfiedBy: [change_impact.rs](../../../core/src/change_impact.rs)
 ---
 
@@ -103,8 +103,8 @@ The visualization shall include:
    - Generate overall change impact assessment
 
 #### Relations
-  * derivedFrom: [Requirements Change Propagation](../../SpecificationsRequirements.md#requirements-change-propagation)
-  * derivedFrom: [Element Identity Model](../../SpecificationsRequirements.md#element-identity-model)
+  * derivedFrom: [Requirements Change Propagation](../../Structure/SpecificationsRequirements.md#requirements-change-propagation)
+  * derivedFrom: [Element Identity Model](../../Structure/SpecificationsRequirements.md#element-identity-model)
   * satisfiedBy: [change_impact.rs](../../../core/src/change_impact.rs)
   * verifiedBy: [Change Impact Detection Test](../../Verifications/ChangeImpactTests.md#change-impact-detection-test)
 ---
@@ -222,7 +222,7 @@ Changed Elements:
 </details>
 
 #### Relations
-  * derivedFrom: [Requirements Change Propagation](../../SpecificationsRequirements.md#requirements-change-propagation)
+  * derivedFrom: [Requirements Change Propagation](../../Structure/SpecificationsRequirements.md#requirements-change-propagation)
   * satisfiedBy: [change_impact.rs](../../../core/src/change_impact.rs)
 ---
 
@@ -263,6 +263,7 @@ The CLI shall support the following functionality:
 The system shall implement a model change analyzer that identifies structural modifications between model versions, determines affected elements through relationship traversal, and categorizes impacts according to change propagation rules.
 
 #### Relations
-  * derivedFrom: [Tracing Structural Changes](../../UserRequirements.md#tracing-structural-changes)
+  * derivedFrom: [Tracing Structural Changes](../../TraceChanges.md#tracing-structural-changes)
   * satisfiedBy: [change_impact.rs](../../../core/src/change_impact.rs)
 ---
+

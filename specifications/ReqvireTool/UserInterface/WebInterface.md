@@ -18,7 +18,7 @@ The index generator shall:
 The index generation is automatically performed as part of the HTML export process and saves the result as index.md in the temporary working directory, which is then converted to index.html when exported.
 
 #### Relations
-  * derivedFrom: [Documentation Index for HTML Export](../../UserRequirements.md#documentation-index-for-html-export)
+  * derivedFrom: [Documentation Index for HTML Export](../../Validation.md#documentation-index-for-html-export)
   * satisfiedBy: [index_generator.rs](../../../core/src/index_generator.rs)
   * satisfiedBy: [html_export.rs](../../../core/src/html_export.rs)
 ---
@@ -31,7 +31,7 @@ The system shall enhance the HTML generator to process SpecificationIndex.md as 
 SpecificationIndex.md file must be saved as index.html file when exported to the HTML output directory.
 
 #### Relations
-  * derivedFrom: [Documentation Index for HTML Export](../../UserRequirements.md#documentation-index-for-html-export)
+  * derivedFrom: [Documentation Index for HTML Export](../../Validation.md#documentation-index-for-html-export)
   * satisfiedBy: [html.rs](../../../core/src/html.rs)
   * satisfiedBy: [html_export.rs](../../../core/src/html_export.rs)
   * verifiedBy: [HTML Export Verification](../../Verifications/Misc.md#html-export-verification)
@@ -66,9 +66,8 @@ Execute all generation commands treating temporary directory as repository root:
 2. Generate index.md (model structure overview)
 3. Generate model.md (model-centric visualization with nested relations from root requirements)
 4. Generate whole-model.md (complete model diagram showing all elements and relations)
-5. Generate matrix.svg (traceability matrix visualization)
-6. Generate traces.md (verification upward traceability)
-7. Generate coverage.md (verification coverage report)
+5. Generate traces.md (verification upward traceability)
+6. Generate coverage.md (verification coverage report)
 
 **HTML Conversion:**
 - Convert all markdown files to HTML with embedded styles
@@ -88,7 +87,7 @@ Execute all generation commands treating temporary directory as repository root:
 - All generation happens in isolated temporary directory
 
 #### Relations
-  * derivedFrom: [Browse Model via Web Interface](../../UserRequirements.md#browse-model-via-web-interface)
+  * derivedFrom: [Browse Model via Web Interface](../../Export.md#browse-model-via-web-interface)
   * derivedFrom: [CLI Interface Structure](CLI.md#cli-interface-structure)
   * derivedFrom: [Deterministic Output for All Generated Content](../ValidationAndReporting/Reports.md#deterministic-output-for-all-generated-content)
   * satisfiedBy: [html_export.rs](../../../core/src/html_export.rs)
@@ -118,9 +117,9 @@ The system SHALL generate a model-centric visualization (model.md) during HTML e
 - Output as markdown with embedded visualizations (model.html)
 
 #### Relations
-  * derivedFrom: [Complete Model Structure Visualization](../../UserRequirements.md#complete-model-structure-visualization)
-  * derivedFrom: [Model Visualization and Exploration](../../UserRequirements.md#model-visualization-and-exploration)
-  * derivedFrom: [HTML Navigation Bar](../../UserRequirements.md#html-navigation-bar)
+  * derivedFrom: [Complete Model Structure Visualization](../../DiagramGeneration.md#complete-model-structure-visualization)
+  * derivedFrom: [Model Visualization and Exploration](../../DiagramGeneration.md#model-visualization-and-exploration)
+  * derivedFrom: [HTML Navigation Bar](../../Export.md#html-navigation-bar)
   * satisfiedBy: [export.rs](../../../core/src/export.rs)
   * satisfiedBy: [report_model.rs](../../../core/src/report_model.rs)
 ---
@@ -137,7 +136,7 @@ The system SHALL generate a complete model diagram (whole-model.md) during HTML 
 - Output as whole-model.html
 
 #### Relations
-  * derivedFrom: [HTML Navigation Bar](../../UserRequirements.md#html-navigation-bar)
+  * derivedFrom: [HTML Navigation Bar](../../Export.md#html-navigation-bar)
   * satisfiedBy: [export.rs](../../../core/src/export.rs)
   * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
 ---
@@ -158,7 +157,7 @@ The system SHALL provide a serve command that exports comprehensive HTML documen
   - Continue serving until terminated by the user (Ctrl-C)
 
 #### Relations
-  * derivedFrom: [Browse Model via Web Interface](../../UserRequirements.md#browse-model-via-web-interface)
+  * derivedFrom: [Browse Model via Web Interface](../../Export.md#browse-model-via-web-interface)
   * trace: [Validate Command](CLI.md#validate-command)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * satisfiedBy: [serve.rs](../../../cli/src/serve.rs)

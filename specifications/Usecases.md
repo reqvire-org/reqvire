@@ -21,7 +21,6 @@ flowchart LR
             markdownSucture[Markdown Structure]
             modelStructure[Model Structure]
             reports[Reports]
-            traceability((Generate Traceability Matrix))
             handleDiffs((Trace Changes))
             browseModel((Browse Model))
         end
@@ -136,10 +135,9 @@ Tool interfaces are **CLI** (Command Line Interface) and **MCP** (Model Context 
   - Markdown Structure: Verifies the correctness of the Markdown-based requirements and documentation.
   - Filesystem Structure: Validates the file organization in the project.
   - Model Structure: Validates model relations and semantics.
-- Generate Traceability Matrix: Produces matrices to link requirements to related elements.
 - Trace Changes
   - Tracks changes and display/visualize affected elements based on relations.
-  - Tracks elements such as verifications, that may require invalidation based on detected changes. 
+  - Tracks elements such as verifications, that may require invalidation based on detected changes.
   - This ensures that all affected components are flagged for review or updates.
 
 ### System of Interest (SOI)
@@ -164,7 +162,7 @@ Reqvire interacts with external systems to enhance functionality and support dev
 
 ### CI/CD System
 
-Reqvire provides tools and features that CI/CD systems, such as GitHub Actions, can utilize to perform tasks like validation, diagram generation, and traceability matrix creation. 
+Reqvire provides tools and features that CI/CD systems, such as GitHub Actions, can utilize to perform tasks like validation and diagram generation. 
 
 These tools enable CI/CD systems to enforce PR merge rules, validate changes, and automate feedback processes, such as adding comments, creating issues, or reporting statuses. 
 

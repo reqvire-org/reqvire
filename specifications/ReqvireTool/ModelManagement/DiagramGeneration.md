@@ -7,7 +7,7 @@
 When requested, the system shall automatically generate diagrams and save them to the required locations of the model.
 
 #### Relations
-  * derivedFrom: [Interactive Mermaid Diagrams](../../UserRequirements.md#interactive-mermaid-diagrams)
+  * derivedFrom: [Interactive Mermaid Diagrams](../../DiagramGeneration.md#interactive-mermaid-diagrams)
   * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
 ---
 
@@ -41,7 +41,7 @@ This enables the system to:
 When requested, the system shall remove all generated diagrams from the model by locating and deleting all mermaid code blocks that were automatically generated.
 
 #### Relations
-  * derivedFrom: [Remove Generated Diagrams](../../UserRequirements.md#remove-generated-diagrams)
+  * derivedFrom: [Remove Generated Diagrams](../../DiagramGeneration.md#remove-generated-diagrams)
   * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
 ---
 
@@ -193,7 +193,7 @@ The trace relation behavior shall include:
 This ensures that trace relations serve their intended purpose of establishing lightweight traceability connections without creating artificial dependency constraints or participating in architectural validation logic.
 
 #### Relations
-  * derivedFrom: [Relation Types and behaviors](../../SpecificationsRequirements.md#relation-types-and-behaviors)
+  * derivedFrom: [Relation Types and behaviors](../../Structure/SpecificationsRequirements.md#relation-types-and-behaviors)
   * verifiedBy: [Invalid Relations Test](../../Verifications/ValidationTests.md#invalid-relations-test)
   * verifiedBy: [Trace Relations No Cycles Verification](../../Verifications/TraceRelationTests.md#trace-relations-no-cycles-verification)
 ---

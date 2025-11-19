@@ -73,14 +73,13 @@ This test verifies that the system automatically generates and updates diagrams 
 ##### Acceptance Criteria
 - System should have a GitHub workflow that automatically generates diagrams on PR merge
 - The workflow should only be triggered when PRs are merged to the main branch
-- Generated diagrams and traceability matrix SVG should be committed back to the main branch
+- Generated diagrams should be committed back to the main branch
 - The commit message should clearly indicate the automated nature of the change
 
 ##### Test Criteria
 - Workflow defined in the GitHub workflow configuration correctly
 - Workflow triggers only on PR merge to main branch
 - Workflow correctly checks out code, builds the tool, and generates diagrams
-- Workflow generates a traceability matrix SVG file
 - Workflow commits and pushes changes back to the main branch
 - Commit message is informative and standardized
 
@@ -88,7 +87,7 @@ This test verifies that the system automatically generates and updates diagrams 
   * type: test-verification
 
 #### Relations
-  * verify: [Automated Diagram Generation on PR Merge](../Integrations/GitHub.md#automated-diagram-generation-on-pr-merge)
+  * verify: [Automated Diagram Generation on PR Merge](../GitHubIntegration.md#automated-diagram-generation-on-pr-merge)
   * satisfiedBy: [generate_diagrams.yml](../../.github/workflows/generate_diagrams.yml)
 ---
 

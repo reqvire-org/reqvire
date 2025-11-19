@@ -26,7 +26,7 @@ When element manipulation operations are performed, the system shall:
 - No changes shall be lost due to lack of persistence
 
 #### Relations
-  * derivedFrom: [Element Manipulation Operations](../../UserRequirements.md#element-manipulation-operations)
+  * derivedFrom: [Element Manipulation Operations](../../ModelManagement.md#element-manipulation-operations)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
 ---
@@ -58,9 +58,9 @@ When validating and preparing target locations, the system shall:
 - Provide specific error message indicating which constraint was violated
 
 #### Relations
-  * derivedFrom: [Element Manipulation Operations](../../UserRequirements.md#element-manipulation-operations)
+  * derivedFrom: [Element Manipulation Operations](../../ModelManagement.md#element-manipulation-operations)
   * derivedFrom: [Ignore Files Integration](../Storage/Configuration.md#ignore-files-integration)
-  * derivedFrom: [Git Repository as Project Root](../../UserRequirements.md#git-repository-as-project-root)
+  * derivedFrom: [Git Repository as Project Root](../../ModelManagement.md#git-repository-as-project-root)
   * satisfiedBy: [utils.rs](../../../core/src/utils.rs)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
 ---
@@ -104,7 +104,7 @@ When creating a new element, the system shall:
 #### Relations
   * derivedFrom: [Element Manipulation File Persistence](#element-manipulation-file-persistence)
   * derivedFrom: [Target Location Validation and Auto-Creation](#target-location-validation-and-auto-creation)
-  * derivedFrom: [Structure of Markdown Documents](../../SpecificationsRequirements.md#structure-of-markdown-documents)
+  * derivedFrom: [Structure of Markdown Documents](../../Structure/SpecificationsRequirements.md#structure-of-markdown-documents)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
@@ -216,6 +216,6 @@ When manipulating elements, the system shall ensure:
 </details>
 
 #### Relations
-  * derivedFrom: [Element Manipulation Operations](../../UserRequirements.md#element-manipulation-operations)
+  * derivedFrom: [Element Manipulation Operations](../../ModelManagement.md#element-manipulation-operations)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
 ---

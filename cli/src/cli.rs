@@ -12,7 +12,6 @@ use reqvire::diagrams;
 use reqvire::export;
 use reqvire::change_impact;
 use reqvire::git_commands;
-use reqvire::matrix_generator;
 use reqvire::verification_trace;
 use crate::serve;
 use reqvire::lint;
@@ -152,18 +151,6 @@ pub enum Commands {
 
         /// Output results in JSON format
         #[clap(long, help_heading = "CHANGE IMPACT OPTIONS")]
-        json: bool,
-    },
-
-    /// Generate verification traceability matrix showing requirements and their verification status
-    #[clap(override_help = "Generate verification traceability matrix showing requirements and their verification status\n\nMATRIX OPTIONS:\n      --svg                       Output traceability matrix as SVG (cannot be used with --json)\n      --json                      Output results in JSON format")]
-    Matrix {
-        /// Output traceability matrix as SVG without hyperlinks and with full element names Cannot be used with --json
-        #[clap(long, conflicts_with = "json", help_heading = "MATRIX OPTIONS")]
-        svg: bool,
-
-        /// Output results in JSON format
-        #[clap(long, help_heading = "MATRIX OPTIONS")]
         json: bool,
     },
 
@@ -516,7 +503,6 @@ fn wants_json(args: &Args) -> bool {
         Some(Commands::Validate { json }) => *json,
         Some(Commands::ChangeImpact { json, .. }) => *json,
         Some(Commands::Search { json, .. }) => *json,
-        Some(Commands::Matrix { json, .. }) => *json,
         Some(Commands::Traces { json, .. }) => *json,
         Some(Commands::Coverage { json }) => *json,
         Some(Commands::Model { json, .. }) => *json,
@@ -664,23 +650,6 @@ pub fn handle_command(
             } else {
                 render_diff(&format_result);
             }
-            return Ok(0);
-        },
-        Some(Commands::Matrix { json, svg }) => {
-            // Generate traceability matrix with verification roll-up strategy
-            let matrix_config = matrix_generator::MatrixConfig::default();
-            let matrix_output = reqvire::matrix_generator::generate_matrix(
-                &model_manager.graph_registry,
-                &matrix_config,
-                if json {
-                    matrix_generator::MatrixFormat::Json
-                } else if svg {
-                    matrix_generator::MatrixFormat::Svg
-                } else {
-                    matrix_generator::MatrixFormat::Markdown
-                },
-            );
-            println!("{}", matrix_output);
             return Ok(0);
         },
         Some(Commands::Traces {

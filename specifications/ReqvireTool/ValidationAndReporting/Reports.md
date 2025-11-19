@@ -41,7 +41,7 @@ The search report must include:
 The system must support comprehensive filtering by file path, element name, section, type, element content, section content, page content, and relation presence. All filters are applied conjunctively.
 
 #### Relations
-  * derivedFrom: [Model Structure and Summaries](../../UserRequirements.md#model-structure-and-summaries)
+  * derivedFrom: [Model Structure and Summaries](../../Reports.md#model-structure-and-summaries)
   * satisfiedBy: [search.rs](../../../core/src/search.rs)
 ---
 
@@ -302,7 +302,6 @@ This requirement applies to all capabilities and operations that generate output
 - Model summary reporting - Summary reports in text and JSON formats
 - Section summary reporting - Section-focused summaries
 - Verification tracing - Upward traceability trees from verifications to requirements
-- Traceability matrix generation - Requirement-to-verification matrices
 - Coverage reporting - Verification coverage analysis
 - Change impact analysis - Reports showing propagation of changes
 - Validation reporting - Model validation error reports
@@ -312,7 +311,7 @@ This requirement applies to all capabilities and operations that generate output
 - All text output formats
 
 #### Relations
-  * derivedFrom: [Model Reports](../../UserRequirements.md#model-reports)
+  * derivedFrom: [Model Reports](../../Reports.md#model-reports)
 ---
 
 ### Validation Report Generator
@@ -320,7 +319,7 @@ This requirement applies to all capabilities and operations that generate output
 The system shall implement a validation report generator that compiles and formats validation results from all validators, providing a unified view of model quality with categorized issues, remediation suggestions, and compliance metrics.
 
 #### Relations
-  * derivedFrom: [Provide Validation Reports](../../UserRequirements.md#provide-validation-reports)
+  * derivedFrom: [Provide Validation Reports](../../Reports.md#provide-validation-reports)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
 ---
 
@@ -352,7 +351,7 @@ The report structure shall include:
 
 #### Relations
   * satisfiedBy: [report_coverage.rs](../../../core/src/report_coverage.rs)
-  * derivedFrom: [Verification Coverage Report](../../UserRequirements.md#verification-coverage-report)
+  * derivedFrom: [Verification Coverage Report](../../Reports.md#verification-coverage-report)
   * derivedFrom: [Search Report Generator](#search-report-generator)
 ---
 
@@ -390,3 +389,4 @@ System shall support markdown and JSON output formats.
   * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
   * verifiedBy: [Model Command Verification](../../Verifications/ReportsTests.md#model-command-verification)
 ---
+

@@ -11,7 +11,6 @@ Commands:
   remove-diagrams   Remove all generated mermaid diagrams from markdown files
   search            Search and filter model elements with comprehensive filtering options
   change-impact     Analise change impact and provides report
-  matrix            Generate verification traceability matrix showing requirements and their verification status
   traces            Generate verification traces showing upward paths from verifications to root requirements
   coverage          Generate verification coverage report for leaf requirements
   model             Generate model-centric structure with nested relations
@@ -57,10 +56,6 @@ SEARCH OPTIONS:
 
 CHANGE IMPACT OPTIONS:
       --git-commit <GIT_COMMIT> Git commit hash to use when comparing models
-      --json                    Output results in JSON format
-
-MATRIX OPTIONS:
-      --svg                     Output traceability matrix as SVG without hyperlinks and with full element names Cannot be used with --json
       --json                    Output results in JSON format
 
 TRACES OPTIONS:
