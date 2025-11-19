@@ -148,6 +148,7 @@ Reqvire provides powerful query and analysis commands that:
 | Add element | `cat element.md \| reqvire add <file> <section>` |
 | Remove element | `reqvire rm "<file>#<element-name>"` |
 | Move element | `reqvire mv "<file>#<element-name>" --to-section="<section>"` |
+| Rename element | `reqvire rename "<current-name>" "<new-name>"` |
 
 ### Key Reqvire Commands
 
@@ -160,6 +161,7 @@ reqvire search [--json] [--short] [--filter-*]
 reqvire add --to-file=<file> --to-section=<section> [<index>]
 reqvire rm "<file>#<element-name>"
 reqvire mv "<file>#<element-name>" --to-section=<section> [--to-index=<index>]
+reqvire rename "<current-name>" "<new-name>"
 
 # Validation and analysis
 reqvire validate [--json]

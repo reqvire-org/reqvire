@@ -1,6 +1,6 @@
 {
   "name": "reqvire",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Claude Code plugin for Reqvire - The AI-Native Requirements As A Code framework for Modern Engineering Teams. Includes specialized skills for requirements engineering and task planning, plus commands for model analysis and verification management.",
   "author": {
     "name": "Ilija Ljubicic",
@@ -32,6 +32,7 @@
     "./commands/analyze-impact.md",
     "./commands/lint-model.md",
     "./commands/generate-tasks.md",
-    "./commands/find-redundant-verifications.md"
+    "./commands/find-redundant-verifications.md",
+    "./commands/rename-element.md"
   ]
 }
