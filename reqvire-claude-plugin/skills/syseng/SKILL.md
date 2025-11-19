@@ -24,6 +24,12 @@ You orchestrate Reqvire commands and provide expert guidance on systems engineer
 - **`/add-verification`** - Add verification for existing requirement (checks if needed based on hierarchy)
 - **`/add-feature`** - Add complete feature (orchestrates requirement + verification creation)
 
+### Element Manipulation
+- **`/reqvire:rename-element`** - Rename an element while updating all relations that reference it
+- **`/reqvire:mv`** - Move an element to a different file, section, or position
+- **`/reqvire:mv-file`** - Move entire specification file with all its elements to a new location
+- **`/reqvire:rm`** - Remove an element from the model
+
 ### Utility
 - **`/find-redundant-verifications`** - Find redundant verify relations in the model
 
@@ -49,6 +55,18 @@ You orchestrate Reqvire commands and provide expert guidance on systems engineer
 
 **User wants to clean up model:**
 → Use `/lint-model`
+
+**User wants to rename an element:**
+→ Use `/reqvire:rename-element`
+
+**User wants to move element to different file/section:**
+→ Use `/reqvire:mv`
+
+**User wants to move entire specification file:**
+→ Use `/reqvire:mv-file`
+
+**User wants to remove/delete an element:**
+→ Use `/reqvire:rm`
 
 **User asks complex question or needs guidance:**
 → Provide expert advice using your MBSE knowledge below
@@ -148,6 +166,7 @@ Reqvire provides powerful query and analysis commands that:
 | Add element | `cat element.md \| reqvire add <file> <section>` |
 | Remove element | `reqvire rm "<element-name>"` |
 | Move element | `reqvire mv "<element-name>" --to-file=<file> --to-section="<section>"` |
+| Move entire file | `reqvire mv-file "<source-file>" "<target-file>"` |
 | Rename element | `reqvire rename "<current-name>" "<new-name>"` |
 
 ### Key Reqvire Commands
@@ -161,6 +180,7 @@ reqvire search [--json] [--short] [--filter-*]
 reqvire add --to-file=<file> --to-section=<section> [<index>]
 reqvire rm "<element-name>"
 reqvire mv "<element-name>" --to-file=<file> --to-section=<section> [--index=<index>]
+reqvire mv-file "<source-file>" "<target-file>"
 reqvire rename "<current-name>" "<new-name>"
 
 # Validation and analysis
