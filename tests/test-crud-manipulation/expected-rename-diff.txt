@@ -1,0 +1,37 @@
+Renamed element: specifications/Requirements.md#feature-a → specifications/Requirements.md#feature-alpha
+
+📄 specifications/Requirements.md
+  [37m01     # Requirements[0m
+  [37m02[0m
+  [37m03     ## Features[0m
+
+  [37m13[0m
+  [31m14 -   ### Feature A[0m
+  [32m14 +   ### Feature Alpha[0m
+  [37m15[0m
+  [37m16     This is a test requirement for feature A.[0m
+  [37m17[0m
+
+  [37m20     #### Relations[0m
+  [31m21 -     * derivedFrom: [Parent Feature](#parent-feature)[0m
+  [32m21 +     * derivedFrom: [Parent Feature](#parent-feature)[0m
+  [37m22     ---[0m
+  [37m23[0m
+
+  [37m32     #### Relations[0m
+  [31m33 -     * derivedFrom: [Feature A](#feature-a)[0m
+  [32m33 +     * derivedFrom: [Feature Alpha](#feature-alpha)[0m
+  [37m34     ---[0m
+
+  [37m43     #### Relations[0m
+  [31m44 -     * derivedFrom: [Feature A](#feature-a)[0m
+  [32m44 +     * derivedFrom: [Feature Alpha](#feature-alpha)[0m
+  [37m45       * verifiedBy: [Test for Feature C](Verifications/Tests.md#test-for-feature-c)[0m
+  [37m46     ---[0m
+  [37m47[0m
+
+  [37m52     #### Relations[0m
+  [31m53 -     * derivedFrom: [Feature A](#feature-a)[0m
+  [32m53 +     * derivedFrom: [Feature Alpha](#feature-alpha)[0m
+  [37m54     ---[0m
+  [37m55[0m

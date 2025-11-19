@@ -199,9 +199,66 @@ echo "✓ Element moved successfully and relations updated"
 echo ""
 
 # ==================================
-# Test 4: Error Cases
+# Test 4: Rename Element
 # ==================================
-echo "Test 4: Error case handling..."
+echo "Test 4: Rename element operation..."
+
+set +e
+RENAME_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" rename "specifications/Requirements.md#feature-a" "Feature Alpha" 2>&1)
+RENAME_EXIT=$?
+set -e
+
+if [ $RENAME_EXIT -ne 0 ]; then
+  echo "❌ FAILED: Rename command failed with exit code $RENAME_EXIT"
+  echo "$RENAME_OUTPUT"
+  exit 1
+fi
+
+# Compare output with expected diff
+if ! diff -u "${TEST_SCRIPT_DIR}/expected-rename-diff.txt" <(echo "$RENAME_OUTPUT"); then
+  echo "❌ FAILED: Rename command output does not match expected diff"
+  echo ""
+  echo "Differences shown above (expected vs actual)"
+  exit 1
+fi
+
+# Verify element heading was updated
+if ! grep -q "### Feature Alpha" "$TEST_DIR/specifications/Requirements.md"; then
+  echo "❌ FAILED: Element heading was not renamed"
+  exit 1
+fi
+
+# Verify old heading is gone
+if grep -q "### Feature A$" "$TEST_DIR/specifications/Requirements.md"; then
+  echo "❌ FAILED: Old element heading still exists"
+  exit 1
+fi
+
+# Verify relations were updated (Feature D should now reference feature-alpha)
+if ! grep -q "#feature-alpha" "$TEST_DIR/specifications/Requirements.md"; then
+  echo "❌ FAILED: Relations were not updated with new identifier"
+  exit 1
+fi
+
+# Verify model still validates
+set +e
+VALIDATION_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" validate 2>&1)
+VALIDATION_EXIT=$?
+set -e
+
+if [ $VALIDATION_EXIT -ne 0 ]; then
+  echo "❌ FAILED: Model validation failed after rename"
+  echo "$VALIDATION_OUTPUT"
+  exit 1
+fi
+
+echo "✓ Element renamed successfully and relations updated"
+echo ""
+
+# ==================================
+# Test 5: Error Cases
+# ==================================
+echo "Test 5: Error case handling..."
 
 # Test 4a: Move non-existent element
 echo "  4a: Move non-existent element..."
@@ -326,6 +383,46 @@ if ! echo "$ERROR_OUTPUT" | grep -qi "not found\|missing\|does not exist\|unknow
 fi
 
 echo "  ✓ Invalid relation target error handled"
+
+# Test 5f: Rename non-existent element
+echo "  5f: Rename non-existent element..."
+set +e
+ERROR_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" rename "specifications/Requirements.md#non-existent" "New Name" 2>&1)
+ERROR_EXIT=$?
+set -e
+
+if [ $ERROR_EXIT -eq 0 ]; then
+  echo "❌ FAILED: Renaming non-existent element should fail"
+  exit 1
+fi
+
+if ! echo "$ERROR_OUTPUT" | grep -qi "not found\|does not exist\|missing"; then
+  echo "❌ FAILED: Error message should mention element not found"
+  echo "Got: $ERROR_OUTPUT"
+  exit 1
+fi
+
+echo "  ✓ Non-existent element rename error handled"
+
+# Test 5g: Rename to duplicate name
+echo "  5g: Rename to duplicate name..."
+set +e
+ERROR_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" rename "specifications/OtherRequirements.md#feature-c" "Parent Feature" 2>&1)
+ERROR_EXIT=$?
+set -e
+
+if [ $ERROR_EXIT -eq 0 ]; then
+  echo "❌ FAILED: Renaming to duplicate name should fail"
+  exit 1
+fi
+
+if ! echo "$ERROR_OUTPUT" | grep -qi "duplicate\|already exists\|conflict\|unique"; then
+  echo "❌ FAILED: Error message should mention duplicate/conflict"
+  echo "Got: $ERROR_OUTPUT"
+  exit 1
+fi
+
+echo "  ✓ Duplicate name rename error handled"
 echo ""
 
 echo "===================================="
