@@ -125,3 +125,4 @@ cli/src/
 - ALWAYS prefer editing existing files in the codebase over creating new ones
 - NEVER proactively create documentation files (*.md) or README files unless explicitly requested
 - Only use emojis if the user explicitly requests it
+- **CRITICAL**: always update www.reqvire.org/docs documentation when reqvire features and functionality changes.
