@@ -25,3 +25,6 @@ html/**
 
 # CI/CD configurations
 .github/**
+
+# www.reqvire.org
+www.reqvire.org/**
