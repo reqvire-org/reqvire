@@ -256,9 +256,128 @@ echo "✓ Element renamed successfully and relations updated"
 echo ""
 
 # ==================================
-# Test 5: Error Cases
+# Test 5: Move File
 # ==================================
-echo "Test 5: Error case handling..."
+echo "Test 5: Move file operation..."
+
+# Create a file with multiple elements to move
+cat > "$TEST_DIR/specifications/ToMove.md" <<'EOF'
+# To Move
+
+## Section One
+
+### Element One
+
+Content for element one.
+
+#### Metadata
+  * type: requirement
+
+### Element Two
+
+Content for element two.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Feature Alpha](Requirements.md#feature-alpha)
+EOF
+
+# Create element in another file that references element in file to be moved
+cat >> "$TEST_DIR/specifications/OtherRequirements.md" <<'EOF'
+
+### Referencer
+
+This element has a relation to element in file to be moved.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Element One](ToMove.md#element-one)
+EOF
+
+# Commit files so reqvire can find them
+(cd "$TEST_DIR" && git add specifications/ToMove.md specifications/OtherRequirements.md && git commit -m "Add file to move and referencer" >/dev/null 2>&1)
+
+set +e
+MVFILE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv-file "specifications/ToMove.md" "specifications/Moved.md" 2>&1)
+MVFILE_EXIT=$?
+set -e
+
+if [ $MVFILE_EXIT -ne 0 ]; then
+  echo "❌ FAILED: Move file command failed with exit code $MVFILE_EXIT"
+  echo "$MVFILE_OUTPUT"
+  exit 1
+fi
+
+# Verify source file was deleted
+if [ -f "$TEST_DIR/specifications/ToMove.md" ]; then
+  echo "❌ FAILED: Source file was not deleted"
+  exit 1
+fi
+
+# Verify target file was created
+if [ ! -f "$TEST_DIR/specifications/Moved.md" ]; then
+  echo "❌ FAILED: Target file was not created"
+  exit 1
+fi
+
+# Verify both elements were moved to target file
+if ! grep -q "### Element One" "$TEST_DIR/specifications/Moved.md"; then
+  echo "❌ FAILED: Element One was not moved to target file"
+  exit 1
+fi
+
+if ! grep -q "### Element Two" "$TEST_DIR/specifications/Moved.md"; then
+  echo "❌ FAILED: Element Two was not moved to target file"
+  exit 1
+fi
+
+# Verify element content was preserved
+if ! grep -q "Content for element one" "$TEST_DIR/specifications/Moved.md"; then
+  echo "❌ FAILED: Element content was not preserved"
+  exit 1
+fi
+
+# Verify relations were updated in other files
+if ! grep -q "Moved.md#element-one" "$TEST_DIR/specifications/OtherRequirements.md"; then
+  echo "❌ FAILED: Relation in other file was not updated"
+  exit 1
+fi
+
+# Verify old file reference is gone from other files
+if grep -q "ToMove.md#element-one" "$TEST_DIR/specifications/OtherRequirements.md"; then
+  echo "❌ FAILED: Old file reference still exists in other file"
+  exit 1
+fi
+
+# Verify outgoing relation was preserved (Element Two -> Feature Alpha)
+if ! grep -q "Requirements.md#feature-alpha" "$TEST_DIR/specifications/Moved.md"; then
+  echo "❌ FAILED: Outgoing relation was not preserved"
+  exit 1
+fi
+
+# Verify model still validates
+set +e
+VALIDATION_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" validate 2>&1)
+VALIDATION_EXIT=$?
+set -e
+
+if [ $VALIDATION_EXIT -ne 0 ]; then
+  echo "❌ FAILED: Model validation failed after file move"
+  echo "$VALIDATION_OUTPUT"
+  exit 1
+fi
+
+echo "✓ File moved successfully with all elements and relations updated"
+echo ""
+
+# ==================================
+# Test 6: Error Cases
+# ==================================
+echo "Test 6: Error case handling..."
 
 # Test 4a: Move non-existent element
 echo "  4a: Move non-existent element..."
@@ -423,6 +542,46 @@ if ! echo "$ERROR_OUTPUT" | grep -qi "duplicate\|already exists\|conflict\|uniqu
 fi
 
 echo "  ✓ Duplicate name rename error handled"
+
+# Test 6h: Move non-existent file
+echo "  6h: Move non-existent file..."
+set +e
+ERROR_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv-file "specifications/NonExistent.md" "specifications/Target.md" 2>&1)
+ERROR_EXIT=$?
+set -e
+
+if [ $ERROR_EXIT -eq 0 ]; then
+  echo "❌ FAILED: Moving non-existent file should fail"
+  exit 1
+fi
+
+if ! echo "$ERROR_OUTPUT" | grep -qi "not found\|does not exist\|missing"; then
+  echo "❌ FAILED: Error message should mention file not found"
+  echo "Got: $ERROR_OUTPUT"
+  exit 1
+fi
+
+echo "  ✓ Non-existent file move error handled"
+
+# Test 6i: Move file to existing target
+echo "  6i: Move file to existing target..."
+set +e
+ERROR_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv-file "specifications/Moved.md" "specifications/Requirements.md" 2>&1)
+ERROR_EXIT=$?
+set -e
+
+if [ $ERROR_EXIT -eq 0 ]; then
+  echo "❌ FAILED: Moving to existing file should fail"
+  exit 1
+fi
+
+if ! echo "$ERROR_OUTPUT" | grep -qi "exists\|already\|conflict"; then
+  echo "❌ FAILED: Error message should mention target already exists"
+  echo "Got: $ERROR_OUTPUT"
+  exit 1
+fi
+
+echo "  ✓ Existing target file error handled"
 echo ""
 
 echo "===================================="

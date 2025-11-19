@@ -189,6 +189,9 @@ cat > "${TMP_DIR}/project-root/submodule/specifications/OtherRequirements.md" <<
 ## Other Features
 EOF
 
+# Add to git so reqvire can find it
+cd "${TMP_DIR}/project-root" && git add submodule/specifications/OtherRequirements.md && git commit -m "Add other requirements" >/dev/null 2>&1
+
 set +e
 OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" mv "Submodule System" --to-file="specifications/OtherRequirements.md" --to-section="Other Features" 2>&1)
 EXIT_CODE=$?
@@ -203,11 +206,19 @@ if [ $EXIT_CODE -ne 0 ]; then
   exit 1
 fi
 
-# When running from submodule/, the path "specifications/OtherRequirements.md" is resolved
-# relative to git root, so the file is created at project-root/specifications/OtherRequirements.md
-# Verify element was moved to the new file (at git root)
-if ! grep -A 5 "## Other Features" "${TMP_DIR}/project-root/specifications/OtherRequirements.md" | grep -q "### Submodule System"; then
-  echo "❌ FAILED: Element was not moved to the new file"
+# According to requirement: "CRUD commands resolve paths relative to current working directory"
+# When running from submodule/, the path "specifications/OtherRequirements.md" should be resolved
+# relative to current working directory (submodule/), so it should resolve to:
+# submodule/specifications/OtherRequirements.md (relative to git root)
+# Verify element was moved to the file within submodule directory
+if ! grep -A 5 "## Other Features" "${TMP_DIR}/project-root/submodule/specifications/OtherRequirements.md" | grep -q "### Submodule System"; then
+  echo "❌ FAILED: Element was not moved to the correct file (should be submodule/specifications/OtherRequirements.md)"
+  # Debug: show where file was actually created
+  echo "Checking if file was incorrectly created at git root:"
+  if [ -f "${TMP_DIR}/project-root/specifications/OtherRequirements.md" ]; then
+    echo "  File exists at git root (WRONG): specifications/OtherRequirements.md"
+    grep "### Submodule System" "${TMP_DIR}/project-root/specifications/OtherRequirements.md" || true
+  fi
   exit 1
 fi
 
@@ -218,35 +229,55 @@ if grep -q "### Submodule System" "${TMP_DIR}/project-root/submodule/specificati
 fi
 
 # Test 7: CRUD mv-file command from submodule directory
-# TODO: Uncomment when mv-file command is implemented
-# echo "Running: reqvire mv-file (move entire file within subdirectory)" >> "${TEST_DIR}/test_results.log"
-#
-# # Create a new directory structure
-# mkdir -p "${TMP_DIR}/project-root/submodule/specs"
-#
-# set +e
-# OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" mv-file "specifications/SubmoduleRequirements.md" "specs/SubmoduleRequirements.md" 2>&1)
-# EXIT_CODE=$?
-# set -e
-#
-# echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
-# printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
-#
-# if [ $EXIT_CODE -ne 0 ]; then
-#   echo "❌ FAILED: mv-file command from submodule directory failed with exit code $EXIT_CODE"
-#   echo "$OUTPUT"
-#   exit 1
-# fi
-#
-# # Verify file was moved
-# if [ -f "${TMP_DIR}/project-root/submodule/specifications/SubmoduleRequirements.md" ]; then
-#   echo "❌ FAILED: Source file was not removed after mv-file"
-#   exit 1
-# fi
-#
-# if [ ! -f "${TMP_DIR}/project-root/submodule/specs/SubmoduleRequirements.md" ]; then
-#   echo "❌ FAILED: Target file was not created by mv-file"
-#   exit 1
-# fi
+echo "Running: reqvire mv-file (move entire file within subdirectory)" >> "${TEST_DIR}/test_results.log"
+
+# Create a new directory structure
+mkdir -p "${TMP_DIR}/project-root/submodule/specs"
+
+set +e
+OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" mv-file "specifications/OtherRequirements.md" "specs/Renamed.md" 2>&1)
+EXIT_CODE=$?
+set -e
+
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
+
+if [ $EXIT_CODE -ne 0 ]; then
+  echo "❌ FAILED: mv-file command from submodule directory failed with exit code $EXIT_CODE"
+  echo "$OUTPUT"
+  exit 1
+fi
+
+# According to requirement: "CRUD commands resolve paths relative to current working directory"
+# When running from submodule/, paths should be resolved relative to submodule/
+# Source: submodule/specifications/OtherRequirements.md
+# Target: submodule/specs/Renamed.md
+
+# Verify source file was removed
+if [ -f "${TMP_DIR}/project-root/submodule/specifications/OtherRequirements.md" ]; then
+  echo "❌ FAILED: Source file was not removed after mv-file"
+  exit 1
+fi
+
+# Verify target file was created in subdirectory
+if [ ! -f "${TMP_DIR}/project-root/submodule/specs/Renamed.md" ]; then
+  echo "❌ FAILED: Target file was not created by mv-file at submodule/specs/Renamed.md"
+  # Debug: check if file was incorrectly created at git root
+  if [ -f "${TMP_DIR}/project-root/specs/Renamed.md" ]; then
+    echo "  File exists at git root (WRONG): specs/Renamed.md"
+  fi
+  exit 1
+fi
+
+# Verify element content was preserved
+if ! grep -q "### Submodule System" "${TMP_DIR}/project-root/submodule/specs/Renamed.md"; then
+  echo "❌ FAILED: Element was not preserved in moved file"
+  exit 1
+fi
+
+# Verify cross-file reference was updated (if any exist)
+# Since we moved OtherRequirements.md which contained "Submodule System",
+# and SubmoduleRequirements.md originally had a self-reference that we changed,
+# we don't have cross-file references to check in this test
 
 exit 0

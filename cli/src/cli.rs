@@ -540,6 +540,10 @@ pub fn handle_command(
         return Ok(0);
     }
 
+    // Get current working directory once at the start
+    let current_dir = std::env::current_dir()
+        .unwrap_or_else(|_| PathBuf::from("."));
+
     let mut model_manager = ModelManager::new();
     let parse_result = model_manager.parse_and_validate(
         None,
@@ -768,11 +772,14 @@ pub fn handle_command(
         Some(Commands::Export { output }) => {
             info!("Exporting model to HTML folder: {}", &output);
             let output_path = PathBuf::from(&output);
+            let git_root = git_commands::get_git_root_dir()?;
             export::export_model_with_artifacts(
                 &model_manager.graph_registry,
                 &output_path,
                 excluded_filename_patterns,
-                false // always generate links without blobs for Export
+                false, // always generate links without blobs for Export
+                &current_dir,
+                &git_root
             )?;
             info!("✅ Export completed successfully");
             return Ok(0);
@@ -781,10 +788,13 @@ pub fn handle_command(
             // Enable quiet mode for serve command (suppress verbose export output)
             reqvire::utils::enable_quiet_mode();
 
+            let git_root = git_commands::get_git_root_dir()?;
             let temp_dir = export::generate_artifacts_in_temp(
                 &model_manager.graph_registry,
                 excluded_filename_patterns,
-                false // always generate links without blobs for Serve
+                false, // always generate links without blobs for Serve
+                &current_dir,
+                &git_root
             )?;
 
             // Start HTTP server (runs until Ctrl-C)
@@ -829,6 +839,7 @@ pub fn handle_command(
                 target_section,
                 index,
                 excluded_filename_patterns,
+                &current_dir,
                 &git_root,
                 dry_run,
             )?;
@@ -889,6 +900,7 @@ pub fn handle_command(
                 target_section,
                 index,
                 excluded_filename_patterns,
+                &current_dir,
                 &git_root,
                 dry_run,
             )?;

@@ -574,3 +574,91 @@ The test shall verify that the `rename` command renames elements, updates all re
   * verify: [CLI Rename Element Command](../ReqvireTool/UserInterface/CLI.md#cli-rename-element-command)
   * satisfiedBy: [test.sh](../../tests/test-crud-manipulation/test.sh)
 ---
+
+### CLI Move File Test
+
+The test shall verify that the `mv-file` command moves entire specification files with all their elements to a new location, updates all relations referencing elements in the moved file, and outputs git-style diffs.
+
+#### Details
+**Test Setup:**
+- Create test model with multiple specification files
+- Create files with multiple elements
+- Create elements in other files with relations pointing to elements in the file to be moved
+- Document expected relation updates
+- Prepare target file paths
+
+**Test Steps - Basic Move File:**
+1. Run `reqvire mv-file <source-file> <target-file>`
+2. Verify source file is removed from filesystem
+3. Verify target file is created with all elements from source
+4. Verify all elements are preserved with identical content, metadata, and relations
+5. Verify all incoming relations (from other files) are updated to reference the new file location
+6. Verify element identifiers are updated to reflect new file path
+7. Verify git-style diff shows source file deletion and target file creation
+8. Verify git-style diff shows all affected files with relation updates
+
+**Test Steps - Subdirectory Execution:**
+1. Navigate to a subdirectory of the git repository
+2. Run `reqvire mv-file specifications/File.md specifications/NewFile.md`
+3. Verify paths are resolved relative to current working directory
+4. Verify target file is created at `<cwd>/specifications/NewFile.md`
+5. Verify source file at `<cwd>/specifications/File.md` is removed
+6. Verify all relations are updated correctly
+
+**Test Steps - Dry Run:**
+1. Run `reqvire mv-file --dry-run <source-file> <target-file>`
+2. Verify git-style diff is shown for all affected files
+3. Verify no changes are applied to filesystem
+4. Verify relation updates are previewed
+5. Verify file move is previewed (deletion + creation)
+
+**Test Steps - JSON Output:**
+1. Run `reqvire mv-file --json <source-file> <target-file>`
+2. Verify JSON output with list of moved elements
+3. Verify old → new identifier mappings for all elements
+4. Verify list of affected files with relation updates
+5. Verify changes are applied
+
+**Test Steps - Error Cases:**
+1. Try to move non-existent source file
+2. Try to move to a target file that already exists
+3. Try to move file outside subdirectory scope when running from subdirectory
+4. Verify errors are reported clearly
+5. Verify exit code is non-zero
+6. Verify no changes are applied on error
+
+**Success Criteria:**
+- Source file is deleted from filesystem
+- Target file is created with all elements
+- All element content, metadata, and outgoing relations are preserved
+- All incoming relations are updated to new file location
+- Element identifiers are updated (file path component changes)
+- Shows git-style diff for source deletion, target creation, and all affected files
+- Paths are resolved relative to current working directory
+- Supports --dry-run preview
+- Supports --json output with element mappings
+- Reports errors for non-existent files and existing targets
+- Returns correct exit codes
+- Works correctly when executed from subdirectories
+
+**Test Coverage:**
+- Move file with single element
+- Move file with multiple elements
+- Move file with elements that have incoming relations from other files
+- Move file with elements that have outgoing relations to other files
+- Move file with bidirectional relations (verify/verifiedBy, derive/derivedFrom)
+- Execute from git repository root
+- Execute from subdirectory (relative path resolution)
+- Dry run mode
+- JSON output mode
+- Error: non-existent source file
+- Error: target file already exists
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [CLI Move File Command](../ReqvireTool/UserInterface/CLI.md#cli-move-file-command)
+  * satisfiedBy: [test.sh](../../tests/test-crud-manipulation/test.sh)
+  * satisfiedBy: [test.sh](../../tests/test-subdirectory-functionality/test.sh)
+---

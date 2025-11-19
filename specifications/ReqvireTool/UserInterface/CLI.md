@@ -453,11 +453,12 @@ The system shall provide a `mv-file` command to move entire specification files 
 
 #### Details
 The `mv-file` command shall:
-- Accept source file path (required, relative to git repository root)
-- Accept target file path (required, relative to git repository root)
+- Accept source file path (required, relative to current working directory)
+- Accept target file path (required, relative to current working directory)
 - Support `--dry-run` flag to preview changes without applying
 - Support `--json` flag for structured output
 - Exit with code 0 on success, non-zero on error
+- Command syntax: `reqvire mv-file <source-file> <target-file>`
 
 #### Relations
   * derivedFrom: [Move File Operation](../ModelManagement/ElementManipulation.md#move-file-operation)

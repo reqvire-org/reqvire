@@ -13,10 +13,11 @@ use std::path::Path;
 /// # Arguments
 /// * `model_manager` - The model manager
 /// * `element_markdown` - The markdown content for the element
-/// * `target_file` - Target file path (relative to git root)
+/// * `target_file` - Target file path (relative to current working directory)
 /// * `target_section` - Target section name
 /// * `index` - Optional index for insertion
 /// * `excluded_patterns` - Patterns to exclude from path validation
+/// * `current_dir` - Current working directory (where command was invoked)
 /// * `git_root` - Git root directory
 /// * `dry_run` - If true, don't write changes to disk
 pub fn add_element(
@@ -26,9 +27,16 @@ pub fn add_element(
     target_section: &str,
     index: Option<usize>,
     excluded_patterns: &GlobSet,
+    current_dir: &Path,
     git_root: &Path,
     dry_run: bool,
 ) -> Result<CrudResult, ReqvireError> {
+    // Normalize target_file: convert from CWD-relative to git-root-relative
+    use crate::utils;
+    let absolute_target = current_dir.join(target_file);
+    let target_file_normalized = utils::get_relative_path(&absolute_target)?
+        .to_string_lossy()
+        .to_string();
     // Track which files were modified before the operation
     let modified_before: Vec<String> = model_manager.graph_registry.modified_files
         .iter()
@@ -38,7 +46,7 @@ pub fn add_element(
     // Create element using core business logic
     let element = model_manager.graph_registry.create_element_from_string(
         element_markdown,
-        target_file,
+        &target_file_normalized,
         target_section,
         index,
         excluded_patterns,
@@ -138,10 +146,11 @@ pub fn remove_element(
 /// # Arguments
 /// * `model_manager` - The model manager
 /// * `element_id` - ID of the element to move
-/// * `target_file` - Target file path (relative to git root)
+/// * `target_file` - Target file path (relative to current working directory)
 /// * `target_section` - Target section name
 /// * `index` - Optional index for insertion
 /// * `excluded_patterns` - Patterns to exclude from path validation
+/// * `current_dir` - Current working directory (where command was invoked)
 /// * `git_root` - Git root directory
 /// * `dry_run` - If true, don't write changes to disk
 pub fn move_element(
@@ -151,9 +160,17 @@ pub fn move_element(
     target_section: &str,
     index: Option<usize>,
     excluded_patterns: &GlobSet,
+    current_dir: &Path,
     git_root: &Path,
     dry_run: bool,
 ) -> Result<CrudResult, ReqvireError> {
+    // Normalize target_file: convert from CWD-relative to git-root-relative
+    use crate::utils;
+    let absolute_target = current_dir.join(target_file);
+    let target_file_normalized = utils::get_relative_path(&absolute_target)?
+        .to_string_lossy()
+        .to_string();
+
     // Get element info before move
     let element = model_manager.graph_registry.nodes.get(element_id)
         .ok_or_else(|| ReqvireError::MissingElement(
@@ -170,7 +187,7 @@ pub fn move_element(
     // Move element using core business logic
     let (new_id, _affected_files) = model_manager.graph_registry.move_element_comprehensive(
         element_id,
-        target_file,
+        &target_file_normalized,
         target_section,
         index,
         excluded_patterns,

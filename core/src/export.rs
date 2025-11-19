@@ -34,12 +34,9 @@ fn prepare_output_folder(output_folder: &Path) -> std::io::Result<()> {
 pub fn copy_model_files_to_temp(
     registry: &GraphRegistry,
     temp_dir: &Path,
+    current_dir: &Path,
+    git_root: &Path,
 ) -> Result<(), ReqvireError> {
-    let git_root = git_commands::get_git_root_dir()
-        .unwrap_or_else(|_| std::env::current_dir().unwrap_or_else(|_| PathBuf::from(".")));
-
-    let current_dir = std::env::current_dir()
-        .unwrap_or_else(|_| PathBuf::from("."));
 
     // Determine if we're in a subdirectory and get the relative path prefix to strip
     let subdir_prefix = if current_dir.starts_with(&git_root) && current_dir != git_root {
@@ -215,6 +212,8 @@ pub fn generate_artifacts_in_temp(
     registry: &GraphRegistry,
     excluded_patterns: &globset::GlobSet,
     diagrams_with_blobs: bool,
+    current_dir: &Path,
+    git_root: &Path,
 ) -> Result<PathBuf, ReqvireError> {
     use std::env;
 
@@ -224,7 +223,7 @@ pub fn generate_artifacts_in_temp(
     info!("✅ Temporary directory: {}", temp_dir.display());
 
     // Step 2: Copy all model files to temp
-    copy_model_files_to_temp(registry, &temp_dir)?;
+    copy_model_files_to_temp(registry, &temp_dir, current_dir, git_root)?;
 
     // Step 3: Initialize git repository in temp directory
     info!("Initializing git repository in temporary directory...");
@@ -354,11 +353,15 @@ pub fn export_model_with_artifacts(
     output_dir: &Path,
     excluded_patterns: &globset::GlobSet,
     diagrams_with_blobs: bool,
+    current_dir: &Path,
+    git_root: &Path,
 ) -> Result<(), ReqvireError> {
     let temp_dir = generate_artifacts_in_temp(
         registry,
         excluded_patterns,
-        diagrams_with_blobs
+        diagrams_with_blobs,
+        current_dir,
+        git_root
     )?;
 
     finalize_export(&temp_dir, output_dir, true)?;
