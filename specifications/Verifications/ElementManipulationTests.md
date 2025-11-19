@@ -520,3 +520,57 @@ The test shall verify that the `mv` command relocates elements, updates all rela
   * verify: [CLI Move Element Command](../ReqvireTool/UserInterface/CLI.md#cli-move-element-command)
   * satisfiedBy: [test.sh](../../tests/test-crud-manipulation/test.sh)
 ---
+
+### CLI Rename Element Test
+
+The test shall verify that the `rename` command renames elements, updates all relations, and outputs git-style diffs.
+
+#### Details
+**Test Setup:**
+- Create test model with elements
+- Create elements with incoming and outgoing relations
+- Document expected relation updates
+
+**Test Steps - Basic Rename:**
+1. Run `reqvire rename <current-name> <new-name>`
+2. Verify element heading is updated in markdown file
+3. Verify all incoming relations are updated with new identifier
+4. Verify git-style diff shows all affected files
+5. Verify identifier change is reported (old → new)
+
+**Test Steps - Dry Run:**
+1. Run `reqvire rename --dry-run <current-name> <new-name>`
+2. Verify git-style diff is shown
+3. Verify no changes are applied
+4. Verify relation updates are previewed
+
+**Test Steps - JSON Output:**
+1. Run `reqvire rename --json <current-name> <new-name>`
+2. Verify JSON output with relation updates
+3. Verify old → new identifier mapping
+4. Verify changes are applied
+
+**Test Steps - Error Cases:**
+1. Try to rename non-existent element
+2. Try to rename to an existing element name
+3. Verify errors are reported
+4. Verify exit code is non-zero
+
+**Success Criteria:**
+- Updates element heading text
+- Updates all incoming relations
+- Preserves element content and outgoing relations
+- Shows git-style diff for all affected files
+- Reports identifier change
+- Supports --dry-run preview
+- Supports --json output
+- Reports validation errors
+- Returns correct exit codes
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [CLI Rename Element Command](../ReqvireTool/UserInterface/CLI.md#cli-rename-element-command)
+  * satisfiedBy: [test.sh](../../tests/test-crud-manipulation/test.sh)
+---

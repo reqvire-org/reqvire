@@ -204,7 +204,7 @@ echo ""
 echo "Test 4: Rename element operation..."
 
 set +e
-RENAME_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" rename "specifications/Requirements.md#feature-a" "Feature Alpha" 2>&1)
+RENAME_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" rename "Feature A" "Feature Alpha" 2>&1)
 RENAME_EXIT=$?
 set -e
 
@@ -302,7 +302,7 @@ echo "  ✓ Non-existent element delete error handled"
 
 # Test 4c: Add element with duplicate name
 echo "  4c: Add element with duplicate name..."
-DUPLICATE_ELEMENT='### Feature A
+DUPLICATE_ELEMENT='### Feature Alpha
 
 This is a duplicate.
 
@@ -387,7 +387,7 @@ echo "  ✓ Invalid relation target error handled"
 # Test 5f: Rename non-existent element
 echo "  5f: Rename non-existent element..."
 set +e
-ERROR_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" rename "specifications/Requirements.md#non-existent" "New Name" 2>&1)
+ERROR_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" rename "Non Existent Element" "New Name" 2>&1)
 ERROR_EXIT=$?
 set -e
 
@@ -407,7 +407,7 @@ echo "  ✓ Non-existent element rename error handled"
 # Test 5g: Rename to duplicate name
 echo "  5g: Rename to duplicate name..."
 set +e
-ERROR_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" rename "specifications/OtherRequirements.md#feature-c" "Parent Feature" 2>&1)
+ERROR_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" rename "Feature D" "Parent Feature" 2>&1)
 ERROR_EXIT=$?
 set -e
 
