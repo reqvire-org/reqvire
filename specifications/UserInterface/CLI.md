@@ -51,7 +51,7 @@ Additional behavior:
   - When formatting is applied, show a summary of changed files with diff details
 
 #### Relations
-  * derivedFrom: [Model Formatting](../../Fomarmatting.md#model-formatting)
+  * derivedFrom: [Model Formatting](../Formatting.md#model-formatting)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
 ---
@@ -501,3 +501,4 @@ The markdown output shall include:
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * derivedFrom: [Containment View Report Generation](../ReqvireTool/Reporting.md#containment-view-report-generation)
 ---
+

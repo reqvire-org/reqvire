@@ -1,4 +1,4 @@
-# Fomarmatting
+# Formatting
 
 ## Model Formatting
 
@@ -10,7 +10,7 @@ The system shall provide formatting capabilities to normalize and standardize MB
   * type: user-requirement
 
 #### Relations
-  * derivedFrom: [Validating Structures](specifications/UserStories.md#validating-structures)
+  * derivedFrom: [Validating Structures](UserStories.md#validating-structures)
 ---
 
 ### Formatting Output
@@ -43,5 +43,6 @@ The system shall provide formatting capability to ensure consistent formatting i
 
 #### Relations
   * derivedFrom: [Model Formatting](#model-formatting)
-  * derivedFrom: [Align with Industry Standards](specifications/Mission.md#align-with-industry-standards)
+  * derivedFrom: [Align with Industry Standards](Mission.md#align-with-industry-standards)
 ---
+
