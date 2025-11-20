@@ -2189,6 +2189,21 @@ impl GraphRegistry {
 
         let file_vec: Vec<String> = self.modified_files.iter().cloned().collect();
         let _result = self.flush_files_to_directory(&file_vec, directory)?;
+
+        // Check for and delete empty files (files with no elements)
+        let grouped_elements = self.group_elements_by_location();
+        for file_path in &file_vec {
+            if !grouped_elements.contains_key(file_path) {
+                // This file has no elements, delete it
+                let file_full_path = directory.join(file_path);
+                if file_full_path.exists() {
+                    fs::remove_file(&file_full_path)
+                        .map_err(|e| ReqvireError::IoError(e))?;
+                    log::info!("Deleted empty file: {}", file_path);
+                }
+            }
+        }
+
         Ok(())
     }
 

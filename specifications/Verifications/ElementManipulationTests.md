@@ -298,6 +298,7 @@ The test shall verify that existing model elements can be moved to different loc
 #### Relations
   * verify: [Move Element Operation](../ModelManagement/ElementManipulation.md#move-element-operation)
   * satisfiedBy: [test.sh](../../tests/test-crud-manipulation/test.sh)
+  * satisfiedBy: [test.sh](../../tests/test-crud-empty-file-cleanup/test.sh)
 ---
 
 ### Relation Consistency Test
