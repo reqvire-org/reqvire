@@ -291,6 +291,10 @@ graph LR;
   class 735766802775ec41 verification;
   click 735766802775ec41 "Misc.md#format-command-requirements-verification";
   df3d1e30a948a4e0 -.->|verifiedBy| 735766802775ec41;
+  7559f2ddc9d909ed["Element Subsection Parsing Test"];
+  class 7559f2ddc9d909ed verification;
+  click 7559f2ddc9d909ed "ParsingTests.md#element-subsection-parsing-test";
+  df3d1e30a948a4e0 -.->|verifiedBy| 7559f2ddc9d909ed;
   df3d1e30a948a4e0 -.->|verifiedBy| b0d0999636b025fa;
 ```
 ### Invalid Relations Test
