@@ -18,6 +18,7 @@ You orchestrate Reqvire commands and provide expert guidance on systems engineer
 - **`/analyze-coverage`** - Check verification coverage and identify unverified requirements
 - **`/analyze-impact`** - Analyze change impact for modified requirements using git history
 - **`/lint-model`** - Fix auto-fixable issues and identify items needing manual review
+- **`/reqvire:containment`** - Analyze containment structure (folders/files/elements) and suggest organizational improvements
 
 ### Requirements and Verifications
 - **`/add-requirement`** - Add a new requirement with proper structure and traceability
@@ -64,9 +65,15 @@ You orchestrate Reqvire commands and provide expert guidance on systems engineer
 
 **User wants to move entire specification file:**
 → Use `/reqvire:mv-file`
+→ Use `/reqvire:mv-file` with `--squash` to merge into existing file
 
 **User wants to remove/delete an element:**
 → Use `/reqvire:rm`
+
+**User wants to understand model organization or plan refactoring:**
+→ Use `/reqvire:containment` to analyze physical folder/file/element structure
+→ Use `/analyze-model` to check logical model structure (relations, coverage, issues)
+→ Use `reqvire search` to find specific elements and understand placement
 
 **User asks complex question or needs guidance:**
 → Provide expert advice using your MBSE knowledge below
@@ -255,6 +262,52 @@ Search and analysis commands support powerful filtering:
 
 **Mixed**: High-level in `specifications/`, detailed near code
 - Best of both approaches
+
+### Understanding Model Organization
+
+**Containment View** (physical structure):
+- Use `/reqvire:containment` to analyze folder/file/element organization
+- Shows hierarchical structure: folders → files → elements
+- **Note:** Containment filters elements to show only top-level parents (elements without hierarchical parent relations in same file)
+- **To get actual file sizes:** Use `reqvire search --json` and check `.files[].total_elements`
+- Helps identify organizational issues:
+  - Misplaced or orphaned files
+  - Inconsistent naming patterns
+  - Overall folder structure clarity
+- Use for planning refactoring with mv-file or mv commands
+
+**When to use containment analysis:**
+- User wants to understand model structure
+- Planning to reorganize specifications
+- New team members onboarding
+- Model feels cluttered or hard to navigate
+- Before large-scale refactoring operations
+
+### File Consolidation with --squash
+
+Use `reqvire mv-file --squash` to merge files:
+
+**When to squash:**
+- Consolidating experimental/temporary specs back into main files
+- Merging over-fragmented specifications
+- Simplifying model structure by reducing file count
+- Combining related requirements spread across multiple files
+
+**Example workflow:**
+```bash
+# Analyze structure first
+reqvire containment --json
+
+# Identify files to consolidate (e.g., temp/A.md with 2 elements)
+# Merge into existing file
+reqvire mv-file "temp/A.md" "specifications/Main.md" --squash
+```
+
+**Squash behavior:**
+- All source elements move to target file's first section
+- Target file's existing elements remain unchanged
+- Source file is deleted
+- All relations throughout model are updated
 
 ## Best Practices
 
