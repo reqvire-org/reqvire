@@ -160,7 +160,7 @@ fn copy_html_and_assets(src: &Path, dst: &Path, temp_root: &Path) -> Result<(), 
 /// Post-processes generated HTML files to convert .md references to .html in display text
 /// This fixes text like "File: path/to/file.md" that appears in HTML content
 fn post_process_html_files(temp_dir: &Path) -> Result<(), ReqvireError> {
-    let html_files = vec!["index.html", "traces.html", "coverage.html"];
+    let html_files = vec!["index.html", "traces.html", "coverage.html", "containment.html"];
 
     for file_name in html_files {
         let file_path = temp_dir.join(file_name);
@@ -312,6 +312,10 @@ pub fn generate_artifacts_in_temp(
     let coverage_report = crate::report_coverage::generate_coverage_report(&temp_model_manager.graph_registry);
     let coverage_text = coverage_report.format_text();
     filesystem::write_file("coverage.md", coverage_text.as_bytes())?;
+
+    info!("Generating containment.md...");
+    let containment_diagram = crate::diagrams::generate_containment_diagram(&temp_model_manager.graph_registry)?;
+    filesystem::write_file("containment.md", containment_diagram.as_bytes())?;
 
     // Step 6: Convert markdown to HTML
     info!("Converting markdown to HTML...");

@@ -985,12 +985,16 @@ pub fn handle_command(
             return Ok(0);
         },
         Some(Commands::Containment { json }) => {
-            // TODO: Implement containment view generation
             if json {
-                println!("{{\"status\": \"TODO\"}}");
+                // Build containment hierarchy
+                let hierarchy = reqvire::containment::ContainmentHierarchy::build(&model_manager.graph_registry)?;
+                // Serialize to JSON
+                let json_output = serde_json::to_string_pretty(&hierarchy)
+                    .map_err(|e| ReqvireError::ElementError(format!("JSON serialization error: {}", e)))?;
+                println!("{}", json_output);
             } else {
-                println!("# Containment View\n");
-                println!("TODO: Implement containment hierarchy extraction");
+                let output = diagrams::generate_containment_diagram(&model_manager.graph_registry)?;
+                println!("{}", output);
             }
             return Ok(0);
         },

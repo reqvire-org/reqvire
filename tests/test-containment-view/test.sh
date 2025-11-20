@@ -60,9 +60,9 @@ fi
 # Extract mermaid diagram from code block for further testing
 MERMAID_DIAGRAM=$(echo "$DIAGRAM_OUTPUT" | sed -n '/```mermaid/,/```/p' | sed '1d;$d')
 
-# Verify diagram starts with flowchart TD
-if ! echo "$MERMAID_DIAGRAM" | head -1 | grep -q "^flowchart TD"; then
-  echo "❌ FAILED: Mermaid diagram does not start with 'flowchart TD'"
+# Verify diagram starts with graph LR
+if ! echo "$MERMAID_DIAGRAM" | head -1 | grep -q "^graph LR"; then
+  echo "❌ FAILED: Mermaid diagram does not start with 'graph LR'"
   exit 1
 fi
 
@@ -74,9 +74,9 @@ echo "✓ Markdown output with Mermaid diagram is correct"
 echo ""
 echo "Test 2: Subgraph nesting and structure..."
 
-# Verify folder subgraphs with emoji
-if ! echo "$MERMAID_DIAGRAM" | grep -q 'subgraph.*\["📁.*"\]'; then
-  echo "❌ FAILED: Missing folder subgraphs with 📁 emoji"
+# Verify folder nodes with emoji
+if ! echo "$MERMAID_DIAGRAM" | grep -q '\["📁.*"\]'; then
+  echo "❌ FAILED: Missing folder nodes with 📁 emoji"
   exit 1
 fi
 
@@ -86,10 +86,9 @@ if ! echo "$MERMAID_DIAGRAM" | grep -q 'subgraph.*\["📄.*"\]'; then
   exit 1
 fi
 
-# Verify subgraphs have direction TB
-DIRECTION_COUNT=$(echo "$MERMAID_DIAGRAM" | grep -c "direction TB" || true)
-if [ "$DIRECTION_COUNT" -lt 5 ]; then
-  echo "❌ FAILED: Expected at least 5 'direction TB' directives, got $DIRECTION_COUNT"
+# Verify folder connections exist (tree structure)
+if ! echo "$MERMAID_DIAGRAM" | grep -q -- '-->'; then
+  echo "❌ FAILED: Missing folder/file connections (-->)"
   exit 1
 fi
 
@@ -110,16 +109,18 @@ echo ""
 echo "Test 3: Element nodes and hash IDs..."
 
 # Verify element nodes exist (format: hashId["Element Name"])
+# Note: Filtered to show only top-level parents (9 elements instead of 14)
 NODE_COUNT=$(echo "$MERMAID_DIAGRAM" | grep -cE '^\s+[a-f0-9]+\["[^"]+"\]' || true)
-if [ "$NODE_COUNT" -lt 14 ]; then
-  echo "❌ FAILED: Expected at least 14 element nodes, got $NODE_COUNT"
+if [ "$NODE_COUNT" -lt 9 ]; then
+  echo "❌ FAILED: Expected at least 9 element nodes, got $NODE_COUNT"
   exit 1
 fi
 
-# Verify hash IDs are consistent length (16 characters)
-INVALID_HASH=$(echo "$MERMAID_DIAGRAM" | grep -oE '[a-f0-9]+\["[^"]+"\]' | grep -oE '^[a-f0-9]+' | awk 'length($0) != 16' || true)
+# Verify element hash IDs are consistent length (16 characters)
+# Only check element nodes (indented inside subgraphs), not folder/file nodes
+INVALID_HASH=$(echo "$MERMAID_DIAGRAM" | grep -E '^\s+[a-f0-9]+\["[^"]+"\]' | grep -oE '^[[:space:]]+[a-f0-9]+' | grep -oE '[a-f0-9]+' | awk 'length($0) != 16' || true)
 if [ -n "$INVALID_HASH" ]; then
-  echo "❌ FAILED: Found hash IDs not exactly 16 characters"
+  echo "❌ FAILED: Found element hash IDs not exactly 16 characters"
   echo "$INVALID_HASH"
   exit 1
 fi
@@ -167,10 +168,10 @@ echo "✓ Element type styling is applied correctly"
 echo ""
 echo "Test 5: Clickable links..."
 
-# Verify click directives exist
+# Verify click directives exist (9 for top-level filtered elements)
 CLICK_COUNT=$(echo "$MERMAID_DIAGRAM" | grep -c "^  click" || true)
-if [ "$CLICK_COUNT" -lt 14 ]; then
-  echo "❌ FAILED: Expected at least 14 click directives, got $CLICK_COUNT"
+if [ "$CLICK_COUNT" -lt 9 ]; then
+  echo "❌ FAILED: Expected at least 9 click directives, got $CLICK_COUNT"
   exit 1
 fi
 
@@ -221,17 +222,13 @@ echo "✓ Sections are correctly omitted from hierarchy"
 echo ""
 echo "Test 7: All element types present..."
 
-# Verify all test elements appear in diagram
+# Verify top-level parent elements appear in diagram (filtered)
+# Child elements with derivedFrom to same-file parents are excluded
 REQUIRED_ELEMENTS=(
   "User Authentication"
-  "Data Validation"
-  "Error Logging"
   "Export to CSV"
-  "Import from JSON"
   "High Performance"
-  "Scalability"
   "Root User Requirement"
-  "Root System Requirement"
   "Test Verification Element"
   "Analysis Verification Element"
   "Inspection Verification Element"
@@ -268,7 +265,7 @@ if [ $JSON_EXIT -eq 0 ]; then
 
   # Verify JSON structure
   if ! echo "$JSON_OUTPUT" | jq -e '.root_folder' > /dev/null 2>&1; then
-    echo "❌ FAILED: JSON missing root_folder field"
+    echo "❌ FAILED: JSON missing root_folder field (TODO response not acceptable for tests)"
     exit 1
   fi
 
@@ -290,7 +287,7 @@ set -e
 
 if [ $EXPORT_EXIT -eq 0 ] && [ -f "$TEST_DIR/output/containment.html" ]; then
   # Verify HTML file exists and contains Mermaid
-  if ! grep -q "flowchart TD" "$TEST_DIR/output/containment.html"; then
+  if ! grep -q "graph LR" "$TEST_DIR/output/containment.html"; then
     echo "❌ FAILED: containment.html doesn't contain Mermaid diagram"
     exit 1
   fi

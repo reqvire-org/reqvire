@@ -1108,3 +1108,150 @@ pub fn escape_label(text: &str) -> String {
         .replace('(', "&#40;")
         .replace(')', "&#41;")
 }
+
+/// Generate containment view diagram showing folder/file/element hierarchy
+pub fn generate_containment_diagram(registry: &GraphRegistry) -> Result<String, ReqvireError> {
+    // Build containment hierarchy structure
+    let hierarchy = crate::containment::ContainmentHierarchy::build(registry)?;
+
+    let mut output = String::new();
+
+    // Markdown header
+    output.push_str("# Containment View\n\n");
+    output.push_str("This diagram shows the containment hierarchy (folders, files, and elements).\n");
+    output.push_str("Elements displayed in each file are filtered to show only top-level parents (those without hierarchical parent relations within the same file).\n\n");
+    output.push_str("```mermaid\n");
+    output.push_str("graph LR\n");
+
+    // CSS class definitions
+    output.push_str("  %% Graph styling\n");
+    output.push_str("  classDef userRequirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;\n");
+    output.push_str("  classDef systemRequirement fill:#fce4e4,stroke:#e68a8a,stroke-width:1px;\n");
+    output.push_str("  classDef requirement fill:#fce4e4,stroke:#e68a8a,stroke-width:1px;\n");
+    output.push_str("  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;\n");
+    output.push_str("  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;\n");
+    output.push_str("  classDef folder fill:#e8f4f8,stroke:#4a90a4,stroke-width:2px;\n");
+    output.push_str("  classDef file fill:#fff8e1,stroke:#f9a825,stroke-width:2px;\n\n");
+
+    // Define root node
+    output.push_str("  root[\"📁 Reqvire root\"]\n");
+    output.push_str("  class root folder\n\n");
+
+    // Generate tree structure from hierarchy
+    generate_folder_tree(&hierarchy.root_folder, "root", &mut output)?;
+    output.push_str("\n");
+
+    // Collect all elements for styling and links
+    let all_elements = collect_all_elements(&hierarchy.root_folder);
+
+    // Generate element styling
+    output.push_str("  %% Element type styling\n");
+    for element in &all_elements {
+        let hash_id = generate_element_hash(&element.identifier);
+        let class_name = get_element_class_from_type(&element.element_type);
+        output.push_str(&format!("  class {} {}\n", hash_id, class_name));
+    }
+
+    // Generate clickable links
+    output.push_str("\n  %% Clickable links\n");
+    for element in &all_elements {
+        let hash_id = generate_element_hash(&element.identifier);
+        let fragment = element.identifier.split('#').nth(1).unwrap_or("");
+        output.push_str(&format!("  click {} \"{}#{}\"\n", hash_id, element.file_path, fragment));
+    }
+
+    output.push_str("```\n");
+
+    Ok(output)
+}
+
+/// Generate folder tree structure recursively using containment hierarchy
+fn generate_folder_tree(
+    folder: &crate::containment::ContainmentFolder,
+    parent_id: &str,
+    output: &mut String,
+) -> Result<(), ReqvireError> {
+    // Generate subfolders
+    for subfolder in &folder.subfolders {
+        let folder_id = sanitize_folder_id(&subfolder.path);
+        output.push_str(&format!("  {}[\"📁 {}\"]\n", folder_id, subfolder.name));
+        output.push_str(&format!("  {} --> {}\n", parent_id, folder_id));
+        output.push_str(&format!("  class {} folder\n", folder_id));
+
+        // Recursively generate subfolder contents
+        generate_folder_tree(subfolder, &folder_id, output)?;
+    }
+
+    // Generate files
+    for file in &folder.files {
+        let file_id = sanitize_file_id(&file.path);
+
+        // Create subgraph for file containing elements
+        output.push_str(&format!("  subgraph {}[\"📄 {}\"]\n", file_id, file.name));
+
+        // Generate element nodes
+        for element in &file.elements {
+            let hash_id = generate_element_hash(&element.identifier);
+            let label = escape_label(&element.name);
+            output.push_str(&format!("    {}[\"{}\"]\n", hash_id, label));
+        }
+
+        output.push_str("  end\n");
+        output.push_str(&format!("  {} --> {}\n", parent_id, file_id));
+    }
+
+    Ok(())
+}
+
+/// Collect all elements from folder hierarchy for styling and links
+fn collect_all_elements(folder: &crate::containment::ContainmentFolder) -> Vec<crate::containment::ContainmentElement> {
+    let mut elements = Vec::new();
+
+    // Collect from files in this folder
+    for file in &folder.files {
+        elements.extend(file.elements.clone());
+    }
+
+    // Recursively collect from subfolders
+    for subfolder in &folder.subfolders {
+        elements.extend(collect_all_elements(subfolder));
+    }
+
+    // Sort for deterministic output
+    elements.sort_by(|a, b| a.identifier.cmp(&b.identifier));
+
+    elements
+}
+
+fn sanitize_folder_id(path: &[String]) -> String {
+    path.join("_")
+        .replace(".", "")
+        .replace("-", "_")
+        .replace(" ", "_")
+}
+
+fn sanitize_file_id(name: &str) -> String {
+    name.replace(".md", "")
+        .replace(".", "")
+        .replace("-", "_")
+        .replace(" ", "_")
+}
+
+fn generate_element_hash(identifier: &str) -> String {
+    use std::collections::hash_map::DefaultHasher;
+    use std::hash::{Hash, Hasher};
+
+    let mut hasher = DefaultHasher::new();
+    identifier.hash(&mut hasher);
+    let hash = hasher.finish();
+    format!("{:016x}", hash)
+}
+
+fn get_element_class_from_type(element_type: &ElementType) -> &'static str {
+    match element_type {
+        ElementType::Requirement(RequirementType::User) => "userRequirement",
+        ElementType::Requirement(RequirementType::System) => "requirement",
+        ElementType::Verification(_) => "verification",
+        _ => "default",
+    }
+}

@@ -1,3 +1,9 @@
+# Containment View
+
+This diagram shows the containment hierarchy (folders, files, and elements).
+Elements displayed in each file are filtered to show only top-level parents (those without hierarchical parent relations within the same file).
+
+```mermaid
 graph LR
   %% Graph styling
   classDef userRequirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
@@ -76,3 +82,5 @@ graph LR
   click e7f7eefa12a25e33 "specifications/RootFile.md#root-system-requirement"
   click 2a302bfb04c46059 "specifications/RootFile.md#root-user-requirement"
   click 939fef5f29ad393f "specifications/RootFile.md#test-verification-element"
+```
+
