@@ -295,6 +295,7 @@ pub fn move_file(
     current_dir: &Path,
     git_root: &Path,
     dry_run: bool,
+    squash: bool,
 ) -> Result<CrudResult, ReqvireError> {
     // Normalize file paths: convert from CWD-relative to git-root-relative
     use crate::utils;
@@ -318,6 +319,7 @@ pub fn move_file(
     let identifier_mappings = model_manager.graph_registry.move_file(
         &source_file_normalized,
         &target_file_normalized,
+        squash,
     )?;
 
     // Get list of newly modified files (sorted for deterministic output)

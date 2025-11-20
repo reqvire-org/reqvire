@@ -322,13 +322,17 @@ pub enum Commands {
     },
 
     /// Move entire specification file with all its elements
-    #[clap(name = "mv-file", override_help = "Move entire specification file with all its elements\n\nMV-FILE OPTIONS:\n       <SOURCE_FILE>            Source file path (relative to current working directory)\n       <TARGET_FILE>            Target file path (relative to current working directory)\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n\nUSAGE:\n    reqvire mv-file <source-file> <target-file>")]
+    #[clap(name = "mv-file", override_help = "Move entire specification file with all its elements\n\nMV-FILE OPTIONS:\n       <SOURCE_FILE>            Source file path (relative to current working directory)\n       <TARGET_FILE>            Target file path (relative to current working directory)\n      --squash                  Move all elements to target file's first section (if target exists)\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n\nUSAGE:\n    reqvire mv-file <source-file> <target-file>\n    reqvire mv-file <source-file> <target-file> --squash")]
     MvFile {
         /// Source file path (relative to current working directory)
         source_file: String,
 
         /// Target file path (relative to current working directory)
         target_file: String,
+
+        /// Move all elements to target file's first section (if target exists)
+        #[clap(long, help_heading = "MV-FILE OPTIONS")]
+        squash: bool,
 
         /// Preview changes without applying
         #[clap(long, help_heading = "MV-FILE OPTIONS")]
@@ -963,7 +967,7 @@ pub fn handle_command(
 
             return Ok(0);
         },
-        Some(Commands::MvFile { source_file, target_file, dry_run, json }) => {
+        Some(Commands::MvFile { source_file, target_file, squash, dry_run, json }) => {
             // Call CRUD operation
             let git_root = git_commands::get_git_root_dir()?;
             let result = crud::move_file(
@@ -973,6 +977,7 @@ pub fn handle_command(
                 &current_dir,
                 &git_root,
                 dry_run,
+                squash,
             )?;
 
             // Output result

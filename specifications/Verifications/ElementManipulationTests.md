@@ -664,3 +664,78 @@ The test shall verify that the `mv-file` command moves entire specification file
   * satisfiedBy: [test.sh](../../tests/test-subdirectory-functionality/test.sh)
 ---
 
+### Move File Squash Test
+
+The test shall verify that the `mv-file --squash` command moves all elements from a source file to an existing target file's first section, updates all relations, and removes the source file.
+
+#### Details
+**Test Setup:**
+- Create a source file with multiple elements
+- Create a target file that already exists with its own elements and sections
+- Create elements in other files with relations pointing to elements in the source file
+- Document expected relation updates and element placement
+
+**Test Steps - Squash to Existing File:**
+1. Run `reqvire mv-file --squash <source-file> <existing-target-file>`
+2. Verify source file is removed from filesystem
+3. Verify all elements from source file are added to target file's first section
+4. Verify elements from source file are appended to the first level-2 section (##) in target file
+5. Verify original target file elements remain unchanged
+6. Verify element ordering from source file is preserved when inserted
+7. Verify all element identifiers are updated to reflect new file path
+8. Verify all incoming relations (from other files) are updated to reference the new file location
+9. Verify git-style diff shows source file deletion and target file modification
+10. Verify git-style diff shows all affected files with relation updates
+
+**Test Steps - Error Without Squash Flag:**
+1. Run `reqvire mv-file <source-file> <existing-target-file>` (without --squash)
+2. Verify operation fails with clear error message
+3. Verify error message indicates target file already exists
+4. Verify no changes are applied to any files
+5. Verify exit code is non-zero
+
+**Test Steps - Squash with Dry Run:**
+1. Run `reqvire mv-file --squash --dry-run <source-file> <existing-target-file>`
+2. Verify git-style diff is shown for all affected files
+3. Verify no changes are applied to filesystem
+4. Verify preview shows elements being added to target file's first section
+
+**Test Steps - Squash with JSON Output:**
+1. Run `reqvire mv-file --squash --json <source-file> <existing-target-file>`
+2. Verify JSON output with list of moved elements
+3. Verify old → new identifier mappings for all elements
+4. Verify list of affected files with relation updates
+5. Verify changes are applied
+
+**Success Criteria:**
+- Source file is deleted from filesystem
+- All elements from source are added to target file's first section
+- Target file's existing elements remain unchanged
+- Element ordering from source file is preserved
+- All incoming relations are updated to new file location
+- Element identifiers are updated (file path component changes)
+- Shows git-style diff for source deletion, target modification, and all affected files
+- Supports --dry-run preview
+- Supports --json output with element mappings
+- Returns correct exit codes
+- Without --squash flag, existing target file causes error
+
+**Test Coverage:**
+- Squash file with single element to existing target
+- Squash file with multiple elements to existing target
+- Squash file with elements that have incoming relations from other files
+- Squash file with elements that have outgoing relations to other files
+- Verify elements are placed in target file's first section
+- Verify target file's existing content is preserved
+- Dry run mode with --squash
+- JSON output mode with --squash
+- Error: target file exists without --squash flag
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [Move File Operation](../ModelManagement/ElementManipulation.md#move-file-operation)
+  * satisfiedBy: [test.sh](../../tests/test-crud-mv-file-squash/test.sh)
+---
+

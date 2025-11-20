@@ -113,6 +113,7 @@ RENAME OPTIONS:
 MV FILE OPTIONS:
        <SOURCE_FILE>            Source file path (relative to current working directory)
        <TARGET_FILE>            Target file path (relative to current working directory)
+      --squash                  Move all elements to target file's first section (if target exists)
       --dry-run                 Preview changes without applying
       --json                    Output results in JSON format
 

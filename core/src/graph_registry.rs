@@ -1488,6 +1488,7 @@ impl GraphRegistry {
         &mut self,
         source_file: &str,
         target_file: &str,
+        squash: bool,
     ) -> Result<Vec<(String, String)>, ReqvireError> {
         // Validate source file exists in the model
         let elements_in_source: Vec<String> = self.nodes.values()
@@ -1501,11 +1502,11 @@ impl GraphRegistry {
             ));
         }
 
-        // Validate target file doesn't exist
+        // Validate target file doesn't exist (unless squash mode)
         let target_exists = self.nodes.values()
             .any(|node| node.element.file_path == target_file);
 
-        if target_exists {
+        if target_exists && !squash {
             return Err(ReqvireError::DuplicateElement(
                 format!("Target file '{}' already exists", target_file)
             ));
@@ -1515,15 +1516,59 @@ impl GraphRegistry {
         let mut identifier_mappings: Vec<(String, String)> = Vec::new();
         let mut modified_files = vec![source_file.to_string()];
 
-        // Build identifier mappings
-        for old_id in &elements_in_source {
-            let slug = if let Some(pos) = old_id.rfind('#') {
-                &old_id[pos+1..]
+        // In squash mode, move elements to first section in target file
+        if squash && target_exists {
+            // Find first section in target file
+            let mut target_sections: Vec<String> = self.nodes.values()
+                .filter(|node| node.element.file_path == target_file)
+                .map(|node| node.element.section.clone())
+                .collect();
+            target_sections.sort();
+            target_sections.dedup();
+
+            let target_section = if target_sections.is_empty() {
+                "Requirements".to_string()
             } else {
-                continue;
+                target_sections[0].clone()
             };
-            let new_id = format!("{}#{}", target_file, slug);
-            identifier_mappings.push((old_id.clone(), new_id.clone()));
+
+            // Move each element to target file's first section
+            for old_id in &elements_in_source {
+                let slug = if let Some(pos) = old_id.rfind('#') {
+                    &old_id[pos+1..]
+                } else {
+                    continue;
+                };
+                let new_id = format!("{}#{}", target_file, slug);
+
+                // Update element
+                if let Some(node) = self.nodes.get_mut(old_id) {
+                    node.element.file_path = target_file.to_string();
+                    node.element.section = target_section.clone();
+                    node.element.identifier = new_id.clone();
+                }
+
+                identifier_mappings.push((old_id.clone(), new_id.clone()));
+            }
+        } else {
+            // Normal mode: move entire file (keep sections as-is)
+            for old_id in &elements_in_source {
+                let slug = if let Some(pos) = old_id.rfind('#') {
+                    &old_id[pos+1..]
+                } else {
+                    continue;
+                };
+                let new_id = format!("{}#{}", target_file, slug);
+                identifier_mappings.push((old_id.clone(), new_id.clone()));
+            }
+
+            // Update all elements in the source file
+            for (old_id, new_id) in &identifier_mappings {
+                if let Some(node) = self.nodes.get_mut(old_id) {
+                    node.element.file_path = target_file.to_string();
+                    node.element.identifier = new_id.clone();
+                }
+            }
         }
 
         // Find all files with relations to elements in the source file
@@ -1540,14 +1585,6 @@ impl GraphRegistry {
                 if !modified_files.contains(&file) {
                     modified_files.push(file);
                 }
-            }
-        }
-
-        // Update all elements in the source file
-        for (old_id, new_id) in &identifier_mappings {
-            if let Some(node) = self.nodes.get_mut(old_id) {
-                node.element.file_path = target_file.to_string();
-                node.element.identifier = new_id.clone();
             }
         }
 

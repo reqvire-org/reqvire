@@ -104,7 +104,7 @@ When creating a new element, the system shall:
 #### Relations
   * derivedFrom: [Element Manipulation File Persistence](#element-manipulation-file-persistence)
   * derivedFrom: [Target Location Validation and Auto-Creation](#target-location-validation-and-auto-creation)
-  * derivedFrom: [Structure of Markdown Documents](../Structure/SpecificationsRequirements.md#structure-of-markdown-documents)
+  * derivedFrom: [Structure and Addressing in Markdown Documents](../ModelStructure.md#structure-and-addressing-in-markdown-documents)
   * satisfiedBy: [parser.rs](../../core/src/parser.rs)
   * satisfiedBy: [graph_registry.rs](../../core/src/graph_registry.rs)
   * satisfiedBy: [crud.rs](../../core/src/crud.rs)
@@ -198,6 +198,7 @@ The system shall provide the capability to move entire specification files with 
 When moving a file, the system shall:
 - Accept source file path (relative to git repository root)
 - Accept target file path (relative to git repository root)
+- Accept optional squashing flag
 - Validate both source and target paths
 - Move the physical file from source to target location
 - Update all element identifiers within the file to reflect the new file path
@@ -206,8 +207,14 @@ When moving a file, the system shall:
 
 The system shall reject the operation with a clear error message if:
 - The source file does not exist
-- The target file already exists
+- The target file already exists (unless --squash flag is provided)
 - The source or target paths fail validation
+
+**Squash Mode Behavior:**
+When the --squash flag is provided and the target file already exists, the system shall:
+- Move all elements from the source file to the target file's first section
+- Remove the source file after all elements have been successfully moved
+- Preserve element ordering from the source file when inserting into target section
 
 #### Relations
   * derivedFrom: [Element Manipulation File Persistence](#element-manipulation-file-persistence)
