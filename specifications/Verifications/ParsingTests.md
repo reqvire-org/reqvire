@@ -1,7 +1,11 @@
 # Parsing Tests
 
 ## Parsing Tests
+
+
 Tests verifying core parsing functionality including element extraction, identifier normalization, and markdown processing.
+
+---
 
 ### Fragment Normalization Test
 
@@ -10,7 +14,6 @@ This test verifies that the system correctly normalizes element name fragments a
 #### Details
 
 ##### Acceptance Criteria
-
 **GitHub Fragment Normalization Rules:**
 - System shall convert all letters to lowercase
 - System shall replace spaces with hyphens (-)
@@ -38,7 +41,6 @@ This test verifies that the system correctly normalizes element name fragments a
 - System shall handle case-insensitive element name lookups
 
 ##### Test Criteria
-
 1. **Basic normalization verification:**
    - Create elements with various naming patterns
    - Verify Element IDs use normalized fragments
@@ -79,7 +81,7 @@ This test verifies that the system correctly normalizes element name fragments a
   * type: test-verification
 
 #### Relations
-  * verify: [Element Identity Model](../Structure/SpecificationsRequirements.md#element-identity-model)
+  * verify: [Element Identity Model](../ModelStructure.md#element-identity-model)
   * satisfiedBy: [test.sh](../../tests/test-parsing-functionality/test.sh)
 ---
 
@@ -90,7 +92,6 @@ This test verifies that the system correctly extracts and parses element subsect
 #### Details
 
 ##### Acceptance Criteria
-
 **Subsection Extraction:**
 - System shall identify and extract Metadata subsection (level 4 heading)
 - System shall identify and extract Relations subsection (level 4 heading)
@@ -122,7 +123,6 @@ This test verifies that the system correctly extracts and parses element subsect
 - System shall store Details separately from main content
 
 ##### Test Criteria
-
 1. **Metadata subsection parsing:**
    - Create elements with various element types in Metadata
    - Query model via JSON output
@@ -159,6 +159,6 @@ This test verifies that the system correctly extracts and parses element subsect
   * type: test-verification
 
 #### Relations
-  * verify: [Structure of Markdown Documents](../Structure/SpecificationsRequirements.md#structure-of-markdown-documents)
+  * verify: [Structure and Addressing in Markdown Documents](../ModelStructure.md#structure-and-addressing-in-markdown-documents)
   * satisfiedBy: [test.sh](../../tests/test-parsing-functionality/test.sh)
 ---

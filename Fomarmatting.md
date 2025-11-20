@@ -45,4 +45,3 @@ The system shall provide formatting capability to ensure consistent formatting i
   * derivedFrom: [Model Formatting](#model-formatting)
   * derivedFrom: [Align with Industry Standards](specifications/Mission.md#align-with-industry-standards)
 ---
-

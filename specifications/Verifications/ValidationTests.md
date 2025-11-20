@@ -61,7 +61,7 @@ This verification test checks that Reqvire correctly identifies and reports inva
   * verify: [Internal Consistency Validator](../ReqvireTool/Validation.md#internal-consistency-validator)
   * verify: [Relation Type Validation](../ReqvireTool/Validation.md#relation-type-validation)
   * verify: [Relation Element Type Validator](../ReqvireTool/Validation.md#relation-element-type-validator)
-  * verify: [Identifiers and Relations](../Structure/SpecificationsRequirements.md#identifiers-and-relations)
+  * verify: [Identifiers and Relations](../ModelStructure.md#identifiers-and-relations)
   * verify: [Trace Relation Non-Directional Behavior](../ModelManagement/DiagramGeneration.md#trace-relation-non-directional-behavior)
   * satisfiedBy: [test.sh](../../tests/test-invalid-relations/test.sh)
 ---
@@ -246,7 +246,7 @@ This test verifies that Reqvire correctly detects and reports invalid header str
 
 #### Relations
   * verify: [Markdown Structure Validator](../ReqvireTool/Validation.md#markdown-structure-validator)
-  * verify: [Structure of Markdown Documents](../Structure/SpecificationsRequirements.md#structure-of-markdown-documents)
+  * verify: [Structure and Addressing in Markdown Documents](../ModelStructure.md#structure-and-addressing-in-markdown-documents)
   * satisfiedBy: [test.sh](../../tests/test-invalid-relations/test.sh)
 ---
 
@@ -332,4 +332,3 @@ This test verifies that the system assigns the default type 'requirement' to all
   * verify: [Default Requirement Type Assignment](../ModelManagement.md#default-requirement-type-assignment)
   * satisfiedBy: [test.sh](../../tests/test-default-type-assignment/test.sh)
 ---
-

@@ -1,18 +1,10 @@
-# Specifications Requirements
+# ModelStructure
 
 ## Requirements
 
 ### Structure and Addressing in Markdown Documents
 
-The system shall implement semi-structured markdown format specifications that defines the structure, rules, and usage of **Elements**, **Relations**, and **Identifiers** in Markdown (`.md`) documents.
-
-#### Relations
-  * derivedFrom: [Managing MBSE Models](../UserStories.md#managing-mbse-models)
----
-
-### Structure of Markdown Documents
-
-The system shall implement the structure, rules, and usage of **Sections**, **Elements**, **Subsections**, **Relations**, and **Identifiers** in Markdown (`.md`) documents following clearly defined specifications.
+The system shall implement semi-structured markdown format specifications that defines the structure, rules, and usage of **Sections**, **Elements**, **Subsections**, **Relations**, and **Identifiers** in Markdown (`.md`) documents following clearly defined specifications.
 
 #### Details
 <details>
@@ -32,7 +24,7 @@ An **Element** is a uniquely identifiable system element within a Markdown docum
 1. **Element Header**
   - The `###` header defines the start of an element.
   - The text of the `###` header serves as the **element name**.
-  - The element name must be unique within the same document to ensure unambiguous references.
+  - The element name must be globaly unique to ensure unambiguous references.
 
 2. **Element Content**
   - The element includes all content under the `###` header until:
@@ -378,13 +370,12 @@ The appropriate verification type should be selected based on the nature of the 
 </details>
 
 #### Relations
-  * derivedFrom: [Structure and Addressing in Markdown Documents](#structure-and-addressing-in-markdown-documents)
-  * derivedFrom: [AI-Assisted MBSE Model Management](../UserStories.md#ai-assisted-mbse-model-management)
-  * satisfiedBy: [relation.rs](../../core/src/relation.rs)
-  * satisfiedBy: [element.rs](../../core/src/element.rs)
-  * satisfiedBy: [subsection.rs](../../core/src/subsection.rs)
-  * satisfiedBy: [parser.rs](../../core/src/parser.rs)
-  * satisfiedBy: [model.rs](../../core/src/model.rs)
+  * derivedFrom: [Managing MBSE Models](UserStories.md#managing-mbse-models)
+  * satisfiedBy: [relation.rs](../core/src/relation.rs)
+  * satisfiedBy: [element.rs](../core/src/element.rs)
+  * satisfiedBy: [subsection.rs](../core/src/subsection.rs)
+  * satisfiedBy: [parser.rs](../core/src/parser.rs)
+  * satisfiedBy: [model.rs](../core/src/model.rs)
 ---
 
 ### Element Identity Model
@@ -440,7 +431,6 @@ An **Element Identifier** is a location-based reference for addressing:
 
 - Users write relations using **identifiers** (location-based references in markdown)
 - System resolves identifiers to **element IDs** during parsing for internal tracking
-- Change detection compares **element IDs**, not identifiers
 - One element ID can have different identifiers over time due to relocation
 - Identifier changes are detected as relocations, not identity changes
 
@@ -525,8 +515,8 @@ Content here.
 
 #### Relations
   * derivedFrom: [Structure and Addressing in Markdown Documents](#structure-and-addressing-in-markdown-documents)
-  * satisfiedBy: [element.rs](../../core/src/element.rs)
-  * satisfiedBy: [parser.rs](../../core/src/parser.rs)
+  * satisfiedBy: [element.rs](../core/src/element.rs)
+  * satisfiedBy: [parser.rs](../core/src/parser.rs)
 ---
 
 ### Identifiers and Relations
@@ -828,8 +818,8 @@ The system must validate relation usage according to these rules:
 
 #### Relations
   * derivedFrom: [Element Identity Model](#element-identity-model)
-  * derivedFrom: [AI-Assisted MBSE Model Management](../UserStories.md#ai-assisted-mbse-model-management)
-  * satisfiedBy: [relation.rs](../../core/src/relation.rs)
+  * derivedFrom: [AI-Assisted MBSE Model Management](UserStories.md#ai-assisted-mbse-model-management)
+  * satisfiedBy: [relation.rs](../core/src/relation.rs)
 ---
 
 ### Relation Types and behaviors
@@ -935,7 +925,6 @@ When an element changes, the impact propagates according to these rules:
 </details>
 
 #### Relations
-  * derivedFrom: [Managing MBSE Models](../UserStories.md#managing-mbse-models)
-  * satisfiedBy: [relation.rs](../../core/src/relation.rs)
+  * derivedFrom: [Managing MBSE Models](UserStories.md#managing-mbse-models)
+  * satisfiedBy: [relation.rs](../core/src/relation.rs)
 ---
-

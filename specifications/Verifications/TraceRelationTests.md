@@ -33,4 +33,3 @@ The test creates a model with trace relations forming cycles (Alpha→Beta→Gam
   * verify: [Trace Relation Non-Directional Behavior](../ModelManagement/DiagramGeneration.md#trace-relation-non-directional-behavior)
   * satisfiedBy: [test.sh](../../tests/test-trace-no-cycles/test.sh)
 ---
-

@@ -152,4 +152,3 @@ This test verifies that the system can remove all generated mermaid diagrams whi
   * verify: [Auto-Generated Diagram Identification](../ModelManagement/DiagramGeneration.md#auto-generated-diagram-identification)
   * satisfiedBy: [test.sh](../../tests/test-remove-diagrams/test.sh)
 ---
-

@@ -101,4 +101,3 @@ When parsing  documents, the system shall:
   * satisfiedBy: [graph_registry.rs](../../core/src/graph_registry.rs)
   * satisfiedBy: [parser.rs](../../core/src/parser.rs)
 ---
-

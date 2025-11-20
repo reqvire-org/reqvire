@@ -61,7 +61,6 @@ Auto-fix shall:
 - Skip issues categorized as needing manual review
 
 #### Relations
-  * derivedFrom: [Model Linting](#model-linting)
   * derivedFrom: [CLI Lint Command](../UserInterface/CLI.md#cli-lint-command)
 ---
 
@@ -210,9 +209,7 @@ Reason: D is reachable via A → B → D and A → C → D
 - Show which intermediate paths provide the alternate routes
 
 #### Relations
-  * derivedFrom: [Model Linting](#model-linting)
   * derivedFrom: [Redundant Hierarchical Relations Detection](#redundant-hierarchical-relations-detection)
   * satisfiedBy: [lint.rs](../../core/src/lint.rs)
   * verifiedBy: [Lint Command Verification](../Verifications/Misc.md#lint-command-verification)
 ---
-

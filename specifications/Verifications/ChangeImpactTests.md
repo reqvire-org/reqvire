@@ -236,4 +236,3 @@ This test verifies that the smart filtering correctly handles new elements in ch
   * verify: [Smart Filtering for Change Impact Reports](../ModelManagement/ChangeImpact.md#smart-filtering-for-change-impact-reports)
   * satisfiedBy: [test.sh](../../tests/test-change-impact-smart-filtering/test.sh)
 ---
-

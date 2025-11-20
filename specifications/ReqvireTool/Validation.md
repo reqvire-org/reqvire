@@ -31,7 +31,7 @@ Rationale: Element names serve as stable IDs for element identity, independent o
 
 #### Relations
   * derivedFrom: [Validate Internal Consistency](../Validation.md#validate-internal-consistency)
-  * derivedFrom: [Element Identity Model](../Structure/SpecificationsRequirements.md#element-identity-model)
+  * derivedFrom: [Element Identity Model](../ModelStructure.md#element-identity-model)
   * satisfiedBy: [model.rs](../../core/src/model.rs)
   * satisfiedBy: [parser.rs](../../core/src/parser.rs)
   * verifiedBy: [Invalid Relations Test](../Verifications/ValidationTests.md#invalid-relations-test)
@@ -198,4 +198,3 @@ The GraphRegistry shall be constructed from the ElementRegistry after Pass 1 com
   * satisfiedBy: [model.rs](../../core/src/model.rs)
   * verifiedBy: [Requirements Files Search and Detection Test](../Verifications/ValidationTests.md#requirements-files-search-and-detection-test)
 ---
-

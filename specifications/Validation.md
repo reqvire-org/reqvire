@@ -15,7 +15,7 @@ The system shall provide comprehensive validation messages that include file pat
 
 ### Validate Markdown Structure
 
-The system shall validate the Markdown structure of MBSE documentation to ensure compliance with formatting standards.
+The system shall validate the Markdown structure of system model to ensure compliance with formatting standards.
 
 #### Metadata
   * type: user-requirement
@@ -38,7 +38,7 @@ The system shall validate the organization of files and folders in the repositor
 
 ### Validate Internal Consistency
 
-The system shall check the internal consistency of the MBSE model, ensuring that relationships and elements align correctly.
+The system shall check the internal consistency of the system model, ensuring that relationships and elements align correctly.
 
 #### Metadata
   * type: user-requirement
@@ -70,6 +70,5 @@ The system shall validate relation types and allow only supported types.
 #### Relations
   * derivedFrom: [Validating Structures](UserStories.md#validating-structures)
   * derivedFrom: [Align with Industry Standards](Mission.md#align-with-industry-standards)
-  * derivedFrom: [Relation Types and behaviors](Structure/SpecificationsRequirements.md#relation-types-and-behaviors)
+  * derivedFrom: [Relation Types and behaviors](ModelStructure.md#relation-types-and-behaviors)
 ---
-

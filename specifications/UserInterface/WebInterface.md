@@ -130,7 +130,6 @@ The system shall generate a model-centric visualization during HTML export showi
 - Output as markdown with embedded visualizations (model.html)
 
 #### Relations
-  * derivedFrom: [Model Export](../UserStories.md#model-export)
   * derivedFrom: [Complete Model Structure Visualization](../DiagramGeneration.md#complete-model-structure-visualization)
   * derivedFrom: [Model Visualization and Exploration](../DiagramGeneration.md#model-visualization-and-exploration)
   * derivedFrom: [HTML Navigation Bar](#html-navigation-bar)
@@ -150,7 +149,6 @@ The system shall generate a complete model diagram during HTML export showing al
 - Output as whole-model.html
 
 #### Relations
-  * derivedFrom: [Model Export](../UserStories.md#model-export)
   * derivedFrom: [HTML Navigation Bar](#html-navigation-bar)
   * satisfiedBy: [export.rs](../../core/src/export.rs)
   * satisfiedBy: [diagrams.rs](../../core/src/diagrams.rs)
@@ -178,4 +176,3 @@ The system SHALL provide a serve command that exports comprehensive HTML documen
   * satisfiedBy: [serve.rs](../../cli/src/serve.rs)
   * verifiedBy: [Serve Command Verification](../Verifications/Misc.md#serve-command-verification)
 ---
-

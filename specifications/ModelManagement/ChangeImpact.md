@@ -57,7 +57,7 @@ The algorithm shall consist of the following steps:
 
 #### Relations
   * derivedFrom: [Requirements Change Propagation](../TraceChanges.md#requirements-change-propagation)
-  * derivedFrom: [Element Identity Model](../Structure/SpecificationsRequirements.md#element-identity-model)
+  * derivedFrom: [Element Identity Model](../ModelStructure.md#element-identity-model)
   * satisfiedBy: [change_impact.rs](../../core/src/change_impact.rs)
 ---
 
@@ -102,7 +102,7 @@ The visualization shall include:
 
 #### Relations
   * derivedFrom: [Requirements Change Propagation](../TraceChanges.md#requirements-change-propagation)
-  * derivedFrom: [Element Identity Model](../Structure/SpecificationsRequirements.md#element-identity-model)
+  * derivedFrom: [Element Identity Model](../ModelStructure.md#element-identity-model)
   * satisfiedBy: [change_impact.rs](../../core/src/change_impact.rs)
   * verifiedBy: [Change Impact Detection Test](../Verifications/ChangeImpactTests.md#change-impact-detection-test)
 ---
@@ -264,4 +264,3 @@ The system shall implement a model change analyzer that identifies structural mo
   * derivedFrom: [Tracing Structural Changes](../TraceChanges.md#tracing-structural-changes)
   * satisfiedBy: [change_impact.rs](../../core/src/change_impact.rs)
 ---
-

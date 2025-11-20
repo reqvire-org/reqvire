@@ -118,7 +118,7 @@ The trace relation behavior shall include:
 This ensures that trace relations serve their intended purpose of establishing lightweight traceability connections without creating artificial dependency constraints or participating in architectural validation logic.
 
 #### Relations
-  * derivedFrom: [Relation Types and behaviors](../Structure/SpecificationsRequirements.md#relation-types-and-behaviors)
+  * derivedFrom: [Relation Types and behaviors](../ModelStructure.md#relation-types-and-behaviors)
   * verifiedBy: [Invalid Relations Test](../Verifications/ValidationTests.md#invalid-relations-test)
   * verifiedBy: [Trace Relations No Cycles Verification](../Verifications/TraceRelationTests.md#trace-relations-no-cycles-verification)
 ---
@@ -197,4 +197,3 @@ The `change-impact` command shall continue to use GitHub blob URLs by default (u
   * satisfiedBy: [diagrams.rs](../../core/src/diagrams.rs)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
 ---
-
