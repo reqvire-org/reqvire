@@ -326,12 +326,30 @@ pub fn extract_path_and_fragment(identifier: &str) -> (&str, Option<&str>) {
         ("", Some(identifier))
     }
 }
-pub fn normalize_fragment(fragment: &str) -> String{
+/// Normalizes a fragment identifier according to GitHub's rules:
+/// - Convert to lowercase
+/// - Replace spaces with hyphens
+/// - Remove all other punctuation and whitespace
+/// - Trim leading/trailing whitespace
+pub fn normalize_fragment(fragment: &str) -> String {
     fragment
         .trim()
-        .to_lowercase()
-        .replace(' ', "-")     // Replace spaces with hyphens
-        .replace(['(', ')', ',', ':'], "") // Remove disallowed characters
+        .chars()
+        .map(|c| {
+            if c == ' ' {
+                '-'
+            } else if c.is_alphanumeric() || c == '-' || c == '_' {
+                c.to_ascii_lowercase()
+            } else if c.is_whitespace() {
+                // Remove other whitespace (tabs, newlines, etc.)
+                '\0'
+            } else {
+                // Remove punctuation and other characters
+                '\0'
+            }
+        })
+        .filter(|&c| c != '\0')
+        .collect()
 }
 
 
@@ -456,13 +474,19 @@ pub fn to_relative_identifier(
         .map_err(|e| ReqvireError::PathError(format!("Failed to get git root: {}", e)))?;
 
 
-    let stripped = if path.starts_with('/') {
+    let is_absolute = path.starts_with('/');
+    let stripped = if is_absolute {
         &path[1..]
     } else {
         path
     };
-    
-    let resolved_path = git_root.join(stripped);
+
+    let resolved_path = if is_absolute {
+        git_root.join(stripped)
+    } else {
+        // Relative path - resolve against base_path
+        base_path.join(stripped)
+    };
 
     // Try to canonicalize if files exist, otherwise compute from path strings
     let canonical_path = resolved_path.canonicalize().ok();
@@ -715,25 +739,59 @@ mod tests {
 
         // Test cases: (identifier, base_path, expected result with GitHub-style fragment)
         let test_cases = vec![
+        // Relative path in base_path
         (
             "File1.md#Some Fragment",
             &base_path,
             "File1.md#some-fragment",
         ),
+        // Absolute path at git root
         (
             "/File4.md#Title: Example",
             &base_path,
             "../../File4.md#title-example",
         ),
+        // Absolute path nested
         (
             "/some/other/File4.md",
             &base_path,
             "../../some/other/File4.md",
-        ),                
+        ),
+        // Relative path with parentheses in fragment
         (
             "README.md#Installation (Windows)",
             &base_path,
             "README.md#installation-windows",
+        ),
+        // Relative path going deeper
+        (
+            "subdir/File.md#Section",
+            &base_path,
+            "subdir/File.md#section",
+        ),
+        // Fragment with special characters (C++) - punctuation removed
+        (
+            "API.md#C++ Reference",
+            &base_path,
+            "API.md#c-reference",
+        ),
+        // Fragment with underscores
+        (
+            "Code.md#my_variable_name",
+            &base_path,
+            "Code.md#my_variable_name",
+        ),
+        // Fragment with dots and numbers - dots (punctuation) removed
+        (
+            "Changelog.md#Version 1.2.3",
+            &base_path,
+            "Changelog.md#version-123",
+        ),
+        // Multiple consecutive spaces - each space becomes hyphen
+        (
+            "Doc.md#Multiple    Spaces",
+            &base_path,
+            "Doc.md#multiple----spaces",
         ),
         ];
 

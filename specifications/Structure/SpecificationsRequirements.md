@@ -37,6 +37,10 @@ graph LR;
   class f22d93285fcd7664 default;
   click f22d93285fcd7664 "../../core/src/parser.rs";
   6cbe71eb757988df -->|satisfiedBy| f22d93285fcd7664;
+  2abd8d6ef97cade6["Fragment Normalization Test"];
+  class 2abd8d6ef97cade6 verification;
+  click 2abd8d6ef97cade6 "../Verifications/ParsingTests.md#fragment-normalization-test";
+  6cbe71eb757988df -.->|verifiedBy| 2abd8d6ef97cade6;
   9450d4313f47ef36["relation.rs"];
   class 9450d4313f47ef36 default;
   click 9450d4313f47ef36 "../../core/src/relation.rs";
@@ -96,6 +100,10 @@ graph LR;
   class 735766802775ec41 verification;
   click 735766802775ec41 "../Verifications/Misc.md#format-command-requirements-verification";
   df3d1e30a948a4e0 -.->|verifiedBy| 735766802775ec41;
+  7559f2ddc9d909ed["Element Subsection Parsing Test"];
+  class 7559f2ddc9d909ed verification;
+  click 7559f2ddc9d909ed "../Verifications/ParsingTests.md#element-subsection-parsing-test";
+  df3d1e30a948a4e0 -.->|verifiedBy| 7559f2ddc9d909ed;
   b0d0999636b025fa["Invalid Header Structure Test"];
   class b0d0999636b025fa verification;
   click b0d0999636b025fa "../Verifications/ValidationTests.md#invalid-header-structure-test";
@@ -553,8 +561,23 @@ An **Element ID** is a stable unique identifier for element identity:
 - **Uniqueness**: Globally unique across the entire model
 - **Stability**: Remains unchanged when element is relocated between files or sections
 - **Purpose**: Used internally for change detection and tracking element identity across versions
-- **Format**: Normalized element name following GitHub fragment rules (lowercase, hyphens, no special chars)
+- **Format**: Normalized element name following GitHub fragment identifier rules
 - **Visibility**: Internal to the system, not directly visible in markdown documents
+
+**GitHub Fragment Normalization Rules:**
+1. Convert all letters to lowercase
+2. Replace spaces with hyphens (-)
+3. Remove all punctuation characters (except hyphens and underscores)
+4. Remove all other whitespace characters (tabs, newlines, etc.)
+5. Trim leading and trailing whitespace before processing
+6. Keep alphanumeric characters, hyphens, and underscores only
+
+Example transformations:
+- `"My Feature Name"` → `"my-feature-name"`
+- `"Version 1.2.3"` → `"version-123"` (dots removed)
+- `"Installation (Windows)"` → `"installation-windows"` (parentheses removed)
+- `"C++ API Reference"` → `"c-api-reference"` (++ removed)
+- `"my_variable_name"` → `"my_variable_name"` (underscores kept)
 
 ### Element Identifier
 
