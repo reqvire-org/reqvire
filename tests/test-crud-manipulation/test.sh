@@ -671,6 +671,7 @@ MVFILE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv-file "specifications/ToMove2
 MVFILE_EXIT=$?
 set -e
 
+
 if [ $MVFILE_EXIT -ne 0 ]; then
   echo "❌ FAILED: mv-file command failed with exit code $MVFILE_EXIT"
   echo "$MVFILE_OUTPUT"

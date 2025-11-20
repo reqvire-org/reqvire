@@ -1373,6 +1373,12 @@ impl GraphRegistry {
             // Build the destination path
             let dst_path = output_dir.join(internal_path);
 
+            // Skip if source and destination are the same (in-place operations)
+            if src_path == dst_path {
+                debug!("Skipping InternalPath file (same source and destination): {:?}", src_path);
+                continue;
+            }
+
             // Create parent directories if needed
             if let Some(parent_dir) = dst_path.parent() {
                 fs::create_dir_all(parent_dir)
@@ -1567,9 +1573,7 @@ impl GraphRegistry {
 
         modified_files.push(target_file.to_string());
 
-        // Debug: log all files being added to modified_files
         for file in &modified_files {
-            debug!("move_file adding to modified_files: {}", file);
             self.modified_files.insert(file.clone());
         }
 
@@ -1635,11 +1639,8 @@ impl GraphRegistry {
         let mut markdown_files_written = 0;
         let mut related_internal_paths = HashSet::new();
 
-        debug!("flush_files_to_directory: Processing {} file paths", file_paths.len());
         for file_path in file_paths {
-            debug!("  Checking file: {}", file_path);
             if let Some(sections) = grouped_elements.get(file_path) {
-                debug!("    -> Has {} sections, will write", sections.len());
                 // Generate the markdown content for this file
                 let markdown_content = self.generate_file_markdown(file_path, sections);
 
