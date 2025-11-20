@@ -587,6 +587,199 @@ fi
 echo "  ✓ Existing target file error handled"
 echo ""
 
+# ==================================
+# Test 7: InternalPath Files Protection
+# ==================================
+echo "Test 7: InternalPath files not cleared during mv-file..."
+
+# Create InternalPath files (source code)
+mkdir -p "$TEST_DIR/src"
+cat > "$TEST_DIR/src/code1.rs" <<'EOF'
+// Implementation file 1
+// This file should NOT be cleared when moving specification files
+fn main() {
+    println!("Important code 1!");
+}
+EOF
+
+cat > "$TEST_DIR/src/code2.rs" <<'EOF'
+// Implementation file 2
+// This file should also NOT be cleared
+fn secondary() {
+    println!("Important code 2!");
+}
+EOF
+
+# Store original file sizes and content
+CODE1_SIZE=$(wc -c < "$TEST_DIR/src/code1.rs")
+CODE2_SIZE=$(wc -c < "$TEST_DIR/src/code2.rs")
+CODE1_CONTENT=$(cat "$TEST_DIR/src/code1.rs")
+CODE2_CONTENT=$(cat "$TEST_DIR/src/code2.rs")
+
+# Create stable specification file with satisfiedBy to code1.rs
+cat > "$TEST_DIR/specifications/StableFile.md" <<'EOF'
+# Stable File
+
+## Core Features
+
+### Requirement A
+
+This requirement is satisfied by implementation code.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Feature Alpha](Requirements.md#feature-alpha)
+  * satisfiedBy: [code1.rs](../src/code1.rs)
+EOF
+
+# Create file to be moved with complex relations
+cat > "$TEST_DIR/specifications/ToMove2.md" <<'EOF'
+# File To Move 2
+
+## Derived Features
+
+### Requirement B
+
+This requirement is derived from Requirement A.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Requirement A](StableFile.md#requirement-a)
+
+### Requirement C
+
+This requirement is satisfied by different implementation code.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Requirement B](#requirement-b)
+  * satisfiedBy: [code2.rs](../src/code2.rs)
+EOF
+
+# Commit files
+(cd "$TEST_DIR" && git add -A && git commit -m "Add files for InternalPath test" >/dev/null 2>&1)
+
+# Run mv-file
+set +e
+MVFILE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv-file "specifications/ToMove2.md" "specifications/Moved2.md" 2>&1)
+MVFILE_EXIT=$?
+set -e
+
+if [ $MVFILE_EXIT -ne 0 ]; then
+  echo "❌ FAILED: mv-file command failed with exit code $MVFILE_EXIT"
+  echo "$MVFILE_OUTPUT"
+  exit 1
+fi
+
+# CRITICAL CHECK: Verify InternalPath files were NOT cleared/modified
+if [ ! -f "$TEST_DIR/src/code1.rs" ]; then
+  echo "❌ FAILED: src/code1.rs was deleted!"
+  exit 1
+fi
+
+if [ ! -f "$TEST_DIR/src/code2.rs" ]; then
+  echo "❌ FAILED: src/code2.rs was deleted!"
+  exit 1
+fi
+
+# Check file sizes
+CODE1_SIZE_AFTER=$(wc -c < "$TEST_DIR/src/code1.rs")
+CODE2_SIZE_AFTER=$(wc -c < "$TEST_DIR/src/code2.rs")
+
+if [ "$CODE1_SIZE" -ne "$CODE1_SIZE_AFTER" ]; then
+  echo "❌ FAILED: src/code1.rs size changed from $CODE1_SIZE to $CODE1_SIZE_AFTER (file was overwritten!)"
+  echo "Original content:"
+  echo "$CODE1_CONTENT"
+  echo "New content:"
+  cat "$TEST_DIR/src/code1.rs"
+  exit 1
+fi
+
+if [ "$CODE2_SIZE" -ne "$CODE2_SIZE_AFTER" ]; then
+  echo "❌ FAILED: src/code2.rs size changed from $CODE2_SIZE to $CODE2_SIZE_AFTER (file was overwritten!)"
+  echo "Original content:"
+  echo "$CODE2_CONTENT"
+  echo "New content:"
+  cat "$TEST_DIR/src/code2.rs"
+  exit 1
+fi
+
+# Check content integrity
+CODE1_CONTENT_AFTER=$(cat "$TEST_DIR/src/code1.rs")
+CODE2_CONTENT_AFTER=$(cat "$TEST_DIR/src/code2.rs")
+
+if [ "$CODE1_CONTENT" != "$CODE1_CONTENT_AFTER" ]; then
+  echo "❌ FAILED: src/code1.rs content was modified!"
+  echo "Expected:"
+  echo "$CODE1_CONTENT"
+  echo "Got:"
+  echo "$CODE1_CONTENT_AFTER"
+  exit 1
+fi
+
+if [ "$CODE2_CONTENT" != "$CODE2_CONTENT_AFTER" ]; then
+  echo "❌ FAILED: src/code2.rs content was modified!"
+  echo "Expected:"
+  echo "$CODE2_CONTENT"
+  echo "Got:"
+  echo "$CODE2_CONTENT_AFTER"
+  exit 1
+fi
+
+# Verify specification files were handled correctly
+if [ -f "$TEST_DIR/specifications/ToMove2.md" ]; then
+  echo "❌ FAILED: Source file ToMove2.md was not deleted"
+  exit 1
+fi
+
+if [ ! -f "$TEST_DIR/specifications/Moved2.md" ]; then
+  echo "❌ FAILED: Target file Moved2.md was not created"
+  exit 1
+fi
+
+if [ ! -f "$TEST_DIR/specifications/StableFile.md" ]; then
+  echo "❌ FAILED: StableFile.md was deleted (should remain unchanged)"
+  exit 1
+fi
+
+# Verify elements were moved
+if ! grep -q "### Requirement B" "$TEST_DIR/specifications/Moved2.md"; then
+  echo "❌ FAILED: Requirement B was not moved to target file"
+  exit 1
+fi
+
+if ! grep -q "### Requirement C" "$TEST_DIR/specifications/Moved2.md"; then
+  echo "❌ FAILED: Requirement C was not moved to target file"
+  exit 1
+fi
+
+# Verify relations are correct in moved file
+if ! grep -q "StableFile.md#requirement-a" "$TEST_DIR/specifications/Moved2.md"; then
+  echo "❌ FAILED: derivedFrom relation was not preserved correctly"
+  exit 1
+fi
+
+if ! grep -q "../src/code2.rs" "$TEST_DIR/specifications/Moved2.md"; then
+  echo "❌ FAILED: satisfiedBy relation to code2.rs was not preserved"
+  exit 1
+fi
+
+# Verify stable file wasn't modified
+if ! grep -q "../src/code1.rs" "$TEST_DIR/specifications/StableFile.md"; then
+  echo "❌ FAILED: StableFile.md was modified (should remain unchanged)"
+  exit 1
+fi
+
+echo "✓ InternalPath files protected: src/code1.rs and src/code2.rs unchanged"
+echo "✓ Specification files moved correctly with relations intact"
+echo ""
+
 echo "===================================="
 echo "✓ All tests passed"
 echo "===================================="
