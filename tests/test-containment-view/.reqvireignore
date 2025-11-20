@@ -1,0 +1,3 @@
+# Exclude test fixtures from validation
+# These are minimal fixtures for testing containment view structure only
+specifications/

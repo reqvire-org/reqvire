@@ -339,6 +339,14 @@ pub enum Commands {
         json: bool,
     },
 
+    /// Generate containment view showing folder/file/element hierarchy
+    #[clap(override_help = "Generate containment view showing folder/file/element hierarchy\n\nCONTAINMENT OPTIONS:\n      --json     Output results in JSON format")]
+    Containment {
+        /// Output results in JSON format
+        #[clap(long, help_heading = "CONTAINMENT OPTIONS")]
+        json: bool,
+    },
+
     /// Interactive shell for GraphRegistry operations (undocumented)
     #[clap(hide = true)]
     Shell,
@@ -974,6 +982,16 @@ pub fn handle_command(
                 render_crud_result(&result);
             }
 
+            return Ok(0);
+        },
+        Some(Commands::Containment { json }) => {
+            // TODO: Implement containment view generation
+            if json {
+                println!("{{\"status\": \"TODO\"}}");
+            } else {
+                println!("# Containment View\n");
+                println!("TODO: Implement containment hierarchy extraction");
+            }
             return Ok(0);
         },
         Some(Commands::Shell) => {
