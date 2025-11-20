@@ -140,11 +140,7 @@ echo ""
 echo "Test 3: Move element operation..."
 
 # Create target file for move
-cat > "$TEST_DIR/specifications/OtherRequirements.md" <<'EOF'
-# Other Requirements
-
-## Other Features
-EOF
+cp "${TEST_SCRIPT_DIR}/fixtures/specifications/OtherRequirements.md" "$TEST_DIR/specifications/OtherRequirements.md"
 
 set +e
 MOVE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv "Feature C" "specifications/OtherRequirements.md" "Other Features" 2>&1)
@@ -261,45 +257,10 @@ echo ""
 echo "Test 5: Move file operation..."
 
 # Create a file with multiple elements to move
-cat > "$TEST_DIR/specifications/ToMove.md" <<'EOF'
-# To Move
-
-## Section One
-
-### Element One
-
-Content for element one.
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * derivedFrom: [Feature Alpha](Requirements.md#feature-alpha)
-
-### Element Two
-
-Content for element two.
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * derivedFrom: [Element One](#element-one)
-EOF
+cp "${TEST_SCRIPT_DIR}/fixtures/specifications/ToMove.md" "$TEST_DIR/specifications/ToMove.md"
 
 # Create element in another file that references element in file to be moved
-cat >> "$TEST_DIR/specifications/OtherRequirements.md" <<'EOF'
-
-### Referencer
-
-This element has a relation to element in file to be moved.
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * derivedFrom: [Element One](ToMove.md#element-one)
-EOF
+cat "${TEST_SCRIPT_DIR}/fixtures/specifications/OtherRequirements-referencer.md" >> "$TEST_DIR/specifications/OtherRequirements.md"
 
 # Commit files so reqvire can find them
 (cd "$TEST_DIR" && git add specifications/ToMove.md specifications/OtherRequirements.md && git commit -m "Add file to move and referencer" >/dev/null 2>&1)
@@ -594,21 +555,8 @@ echo "Test 7: InternalPath files not cleared during mv-file..."
 
 # Create InternalPath files (source code)
 mkdir -p "$TEST_DIR/src"
-cat > "$TEST_DIR/src/code1.rs" <<'EOF'
-// Implementation file 1
-// This file should NOT be cleared when moving specification files
-fn main() {
-    println!("Important code 1!");
-}
-EOF
-
-cat > "$TEST_DIR/src/code2.rs" <<'EOF'
-// Implementation file 2
-// This file should also NOT be cleared
-fn secondary() {
-    println!("Important code 2!");
-}
-EOF
+cp "${TEST_SCRIPT_DIR}/fixtures/src/code1.rs" "$TEST_DIR/src/code1.rs"
+cp "${TEST_SCRIPT_DIR}/fixtures/src/code2.rs" "$TEST_DIR/src/code2.rs"
 
 # Store original file sizes and content
 CODE1_SIZE=$(wc -c < "$TEST_DIR/src/code1.rs")
@@ -617,50 +565,10 @@ CODE1_CONTENT=$(cat "$TEST_DIR/src/code1.rs")
 CODE2_CONTENT=$(cat "$TEST_DIR/src/code2.rs")
 
 # Create stable specification file with satisfiedBy to code1.rs
-cat > "$TEST_DIR/specifications/StableFile.md" <<'EOF'
-# Stable File
-
-## Core Features
-
-### Requirement A
-
-This requirement is satisfied by implementation code.
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * derivedFrom: [Feature Alpha](Requirements.md#feature-alpha)
-  * satisfiedBy: [code1.rs](../src/code1.rs)
-EOF
+cp "${TEST_SCRIPT_DIR}/fixtures/specifications/StableFile.md" "$TEST_DIR/specifications/StableFile.md"
 
 # Create file to be moved with complex relations
-cat > "$TEST_DIR/specifications/ToMove2.md" <<'EOF'
-# File To Move 2
-
-## Derived Features
-
-### Requirement B
-
-This requirement is derived from Requirement A.
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * derivedFrom: [Requirement A](StableFile.md#requirement-a)
-
-### Requirement C
-
-This requirement is satisfied by different implementation code.
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * derivedFrom: [Requirement B](#requirement-b)
-  * satisfiedBy: [code2.rs](../src/code2.rs)
-EOF
+cp "${TEST_SCRIPT_DIR}/fixtures/specifications/ToMove2.md" "$TEST_DIR/specifications/ToMove2.md"
 
 # Commit files
 (cd "$TEST_DIR" && git add -A && git commit -m "Add files for InternalPath test" >/dev/null 2>&1)
