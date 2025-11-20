@@ -1015,3 +1015,25 @@ The `rename` command shall:
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
 ---
+### CLI Containment Command
+
+The system shall provide a `containment` command to generate markdown output with the containment view diagram showing the folder/file/element hierarchy.
+
+#### Details
+
+The `containment` command shall:
+- Output markdown format with header and embedded Mermaid flowchart diagram
+- Support `--json` flag for structured JSON output (optional)
+- Exit with code 0 on success, non-zero on error
+- Command syntax: `reqvire containment [--json]`
+
+The markdown output shall include:
+- `# Containment View` header
+- Mermaid code block with flowchart diagram
+
+#### Relations
+  * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
+  * derivedFrom: [Containment Hierarchy Extraction](../ValidationAndReporting/Reports.md#containment-hierarchy-extraction)
+  * derivedFrom: [Containment View Mermaid Diagram](../ValidationAndReporting/Reports.md#containment-view-mermaid-diagram)
+  * derivedFrom: [Containment View JSON Output](../ValidationAndReporting/Reports.md#containment-view-json-output)
+---

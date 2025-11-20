@@ -214,6 +214,33 @@ When requested the system shall generate reports summarizing the structure and r
   * derivedFrom: [Deterministic Output for All Generated Content](ReqvireTool/ValidationAndReporting/Reports.md#deterministic-output-for-all-generated-content)
 ---
 
+### Containment View Report
+
+The system shall provide a containment view report that displays the physical hierarchical structure of the model showing the containment relationships between folders, files, and elements.
+
+#### Details
+
+The containment view shows the **physical organization** of the model, complementing the existing relation-centric model view that shows derivedFrom/verifiedBy relationships.
+
+The containment hierarchy represents:
+- **Root folder** → **Subfolders** → **Files** → **Elements**
+- Sections are skipped in this view (elements are shown directly under files)
+
+This view helps users:
+- Understand model organization and file structure
+- Navigate the physical layout of specifications
+- Identify where elements are located
+- Visualize the containment structure in diagrams
+
+The containment view must support multiple output formats (text, JSON, Mermaid diagram) and be included in HTML export.
+
+#### Metadata
+  * type: user-requirement
+
+#### Relations
+  * derivedFrom: [Model Structure and Summaries](#model-structure-and-summaries)
+---
+
 ### Structural Change Reports
 
 The system shall generate detailed reports summarizing the impact of structural changes, including affected relationships and components.

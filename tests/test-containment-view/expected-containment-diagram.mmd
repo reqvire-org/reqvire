@@ -1,0 +1,78 @@
+flowchart TD
+  %% Graph styling
+  classDef userRequirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef systemRequirement fill:#fce4e4,stroke:#e68a8a,stroke-width:1px;
+  classDef requirement fill:#fce4e4,stroke:#e68a8a,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+
+  subgraph RootFolder["📁 specifications"]
+    direction TB
+    subgraph Folder1["📁 Folder1"]
+      direction TB
+      subgraph Subfolder1["📁 Subfolder1"]
+        direction TB
+        subgraph FileA["📄 FileA.md"]
+          direction TB
+          hash001["User Authentication"]
+          hash002["Data Validation"]
+          hash003["Error Logging"]
+        end
+      end
+      subgraph FileB["📄 FileB.md"]
+        direction TB
+        hash004["Export to CSV"]
+        hash005["Import from JSON"]
+      end
+    end
+    subgraph Folder2["📁 Folder2"]
+      direction TB
+      subgraph FileC["📄 FileC.md"]
+        direction TB
+        hash006["High Performance"]
+        hash007["Scalability"]
+      end
+    end
+    subgraph RootFile["📄 RootFile.md"]
+      direction TB
+      hash008["Root User Requirement"]
+      hash009["Root System Requirement"]
+      hash010["Test Verification Element"]
+      hash011["Analysis Verification Element"]
+      hash012["Inspection Verification Element"]
+      hash013["Demonstration Verification Element"]
+      hash014["Custom Type Element"]
+    end
+  end
+
+  %% Element type styling
+  class hash001 userRequirement
+  class hash002 requirement
+  class hash003 requirement
+  class hash004 requirement
+  class hash005 requirement
+  class hash006 requirement
+  class hash007 requirement
+  class hash008 userRequirement
+  class hash009 requirement
+  class hash010 verification
+  class hash011 verification
+  class hash012 verification
+  class hash013 verification
+  class hash014 default
+
+  %% Clickable links
+  click hash001 "Folder1/Subfolder1/FileA.md#user-authentication"
+  click hash002 "Folder1/Subfolder1/FileA.md#data-validation"
+  click hash003 "Folder1/Subfolder1/FileA.md#error-logging"
+  click hash004 "Folder1/FileB.md#export-to-csv"
+  click hash005 "Folder1/FileB.md#import-from-json"
+  click hash006 "Folder2/FileC.md#high-performance"
+  click hash007 "Folder2/FileC.md#scalability"
+  click hash008 "RootFile.md#root-user-requirement"
+  click hash009 "RootFile.md#root-system-requirement"
+  click hash010 "RootFile.md#test-verification-element"
+  click hash011 "RootFile.md#analysis-verification-element"
+  click hash012 "RootFile.md#inspection-verification-element"
+  click hash013 "RootFile.md#demonstration-verification-element"
+  click hash014 "RootFile.md#custom-type-element"

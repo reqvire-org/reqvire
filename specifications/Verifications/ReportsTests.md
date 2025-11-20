@@ -622,3 +622,303 @@ This test verifies that the system correctly tracks and displays custom element 
   * verify: [Custom Element Type Tracking](../ReqvireTool/ValidationAndReporting/Reports.md#custom-element-type-tracking)
   * satisfiedBy: [test.sh](../../tests/test-search-all-features/test.sh)
 ---
+## Containment View Tests
+
+### Containment Hierarchy Extraction Test
+
+This test verifies that the system correctly extracts the physical containment hierarchy from the model, representing folders, files, and elements in a tree structure while omitting sections.
+
+#### Details
+
+##### Test Criteria
+
+1. **Hierarchy structure extraction:**
+   - Create test model with nested folder structure
+   - Include multiple levels: root → subfolder → file → elements
+   - Verify folders are extracted in correct hierarchy
+   - Verify files are placed under correct folders
+   - Verify elements are extracted from files
+
+2. **Section omission:**
+   - Create test file with H2 sections and H3 elements
+   - Verify sections (H2) are NOT included in hierarchy
+   - Verify elements (H3) are directly under files
+   - Confirm no section nodes in output structure
+
+3. **Element information:**
+   - Verify element identifier is extracted correctly
+   - Verify element name matches H3 header text
+   - Verify element type from Metadata is captured
+   - Test with multiple element types (requirement, verification, user-requirement)
+
+4. **Ordering verification:**
+   - Verify folders are sorted alphabetically
+   - Verify files are sorted alphabetically within folders
+   - Verify elements maintain document order
+   - Test deterministic output across multiple runs
+
+5. **Data structure validation:**
+   - Verify tree structure: Folder → [Subfolders, Files]
+   - Verify File → [Elements] relationship
+   - Verify all paths are relative to git root
+   - Test with empty folders and files without elements
+
+##### Acceptance Criteria
+
+- All folders, files, and elements are extracted correctly
+- Sections are omitted from the hierarchy
+- Element metadata (identifier, name, type) is preserved
+- Output follows deterministic ordering
+- Tree structure is valid and navigable
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [Containment Hierarchy Extraction](../ReqvireTool/ValidationAndReporting/Reports.md#containment-hierarchy-extraction)
+  * satisfiedBy: [test.sh](../../tests/test-containment-view/test.sh)
+---
+
+### Containment View Text Output Test
+
+This test verifies that the system generates correctly formatted human-readable text output for the containment view with proper indentation and element metadata display.
+
+#### Details
+
+##### Test Criteria
+
+1. **Hierarchical indentation:**
+   - Verify indentation uses 2 spaces per level
+   - Test nested structure: root (0), folder (2), subfolder (4), file (6), element (8)
+   - Verify consistent indentation across all levels
+
+2. **Visual markers:**
+   - Verify folders display with `📁 Folder: <name>`
+   - Verify files display with `📄 File: <path>`
+   - Verify elements display with `[<type>] <name>`
+   - Test all element types have correct bracket notation
+
+3. **Element type display:**
+   - Test `[requirement]` for system requirements
+   - Test `[user-requirement]` for user requirements
+   - Test `[verification]` and `[test-verification]` for verifications
+   - Test custom element types
+
+4. **Content accuracy:**
+   - Verify all folders are displayed
+   - Verify all files are displayed with correct paths
+   - Verify all elements are displayed with correct names
+   - Test empty folders and files are handled correctly
+
+5. **Output format validation:**
+   - Verify output is valid UTF-8 text
+   - Verify line breaks are consistent
+   - Test output matches expected format exactly
+   - Compare against reference output
+
+##### Acceptance Criteria
+
+- Text output uses correct indentation (2 spaces per level)
+- Visual markers (📁, 📄) are displayed correctly
+- Element types are shown in brackets
+- All hierarchy levels are represented
+- Output is human-readable and well-formatted
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [Containment View Text Output](../ReqvireTool/ValidationAndReporting/Reports.md#containment-view-text-output)
+  * satisfiedBy: [test.sh](../../tests/test-containment-view/test.sh)
+---
+
+### Containment View JSON Output Test
+
+This test verifies that the system generates valid, well-structured JSON output for the containment view with correct schema and deterministic ordering.
+
+#### Details
+
+##### Test Criteria
+
+1. **JSON schema validation:**
+   - Verify root object has required keys: `root_folder`, `folders`, `files`, `element_count`
+   - Verify folder objects have: `path`, `name`, `subfolders`, `files`
+   - Verify file objects have: `path`, `name`, `elements`
+   - Verify element objects have: `identifier`, `name`, `type`
+   - Test schema with JSON validator
+
+2. **Data accuracy:**
+   - Verify `root_folder` matches specifications directory
+   - Verify `element_count` matches actual element count
+   - Verify all folder paths are correct and relative
+   - Verify all file paths are correct and relative
+   - Verify all element identifiers match format `path#fragment`
+
+3. **Nested structure:**
+   - Verify subfolders are nested under parent folders
+   - Verify files are associated with correct folders
+   - Verify elements are associated with correct files
+   - Test deep nesting (3+ levels)
+
+4. **JSON validity:**
+   - Verify output is valid JSON (parse without errors)
+   - Verify special characters are properly escaped
+   - Verify Unicode characters in element names are handled
+   - Test with `jq` tool for validation
+
+5. **Deterministic output:**
+   - Verify key ordering is consistent
+   - Verify array ordering is deterministic
+   - Run command multiple times and compare outputs
+   - Verify byte-identical JSON across runs
+
+##### Acceptance Criteria
+
+- JSON output is valid and parseable
+- Schema matches specification exactly
+- All data is accurate and complete
+- Special characters and Unicode are handled correctly
+- Output is deterministic
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [Containment View JSON Output](../ReqvireTool/ValidationAndReporting/Reports.md#containment-view-json-output)
+  * satisfiedBy: [test.sh](../../tests/test-containment-view/test.sh)
+---
+
+### Containment View Mermaid Diagram Test
+
+This test verifies that the system generates valid Mermaid flowchart diagrams with correct syntax, nested subgraphs, element styling, and clickable links.
+
+#### Details
+
+##### Test Criteria
+
+1. **Mermaid syntax validation:**
+   - Verify output starts with `flowchart TD`
+   - Verify all subgraphs use correct syntax: `subgraph ID ["Label"]`
+   - Verify subgraphs are properly closed with `end`
+   - Test diagram can be rendered by Mermaid parser
+   - Validate with mermaid-cli or online editor
+
+2. **Subgraph structure:**
+   - Verify folders use subgraph with 📁 prefix
+   - Verify files use subgraph with 📄 prefix
+   - Verify subgraphs are properly nested
+   - Test nested structure: folder → subfolder → file
+   - Verify `direction TB` is set for nested subgraphs
+
+3. **Element nodes:**
+   - Verify nodes use 16-character hash IDs
+   - Verify node labels show element names
+   - Verify hash IDs are unique across diagram
+   - Test hash ID generation is deterministic
+   - Verify nodes are placed within file subgraphs
+
+4. **Styling:**
+   - Verify `class` directives for element types
+   - Test `userRequirement` class has correct colors
+   - Test `systemRequirement` class has correct colors
+   - Test `verification` class has correct colors
+   - Test `default` class for other types
+   - Verify CSS class definitions are included
+
+5. **Clickable links:**
+   - Verify `click` directives for all element nodes
+   - Verify links use correct format: `click hashId "path#fragment"`
+   - Verify paths are relative to diagram location
+   - Test links with special characters in fragments
+   - Verify fragment normalization (lowercase, hyphens)
+
+6. **Deterministic output:**
+   - Verify node ordering is consistent
+   - Verify hash IDs are stable across runs
+   - Compare output across multiple executions
+   - Test byte-identical output
+
+##### Acceptance Criteria
+
+- Mermaid diagram syntax is valid
+- Subgraphs correctly represent folder/file hierarchy
+- Element nodes use hash IDs and show names
+- Styling classes are applied correctly
+- Clickable links navigate to correct elements
+- Output is deterministic
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [Containment View Mermaid Diagram](../ReqvireTool/ValidationAndReporting/Reports.md#containment-view-mermaid-diagram)
+  * satisfiedBy: [test.sh](../../tests/test-containment-view/test.sh)
+---
+
+### HTML Export Containment View Integration Test
+
+This test verifies that the containment view is correctly integrated into HTML export with proper navigation, interactive features, and styling.
+
+#### Details
+
+##### Test Criteria
+
+1. **File generation:**
+   - Run `reqvire export` command
+   - Verify `containment.html` file is created in output directory
+   - Verify file contains valid HTML5
+   - Test file size is reasonable (< 1MB for typical models)
+
+2. **Navigation integration:**
+   - Verify containment view appears in navigation menu
+   - Test link text is "Containment View" or "Model Structure"
+   - Verify clicking nav link loads containment page
+   - Test navigation persistence across page loads
+
+3. **Mermaid diagram embedding:**
+   - Verify page contains embedded Mermaid diagram
+   - Verify Mermaid.js library is loaded
+   - Test diagram renders correctly in browser
+   - Verify clickable links work (navigate to element pages)
+
+4. **Hierarchical tree navigation:**
+   - Verify page includes tree view component
+   - Test folders can be expanded/collapsed
+   - Verify clicking elements navigates to their pages
+   - Test tree state persistence
+
+5. **Styling consistency:**
+   - Verify page uses same CSS as other export pages
+   - Test element type colors match specification
+   - Verify layout matches existing pages
+   - Test responsive design on different screen sizes
+
+6. **Interactive features:**
+   - Test element type filtering controls
+   - Verify filter updates both diagram and tree
+   - Test search/filter by folder or file name
+   - Verify search highlights matches
+
+7. **Integration with model:**
+   - Test containment view updates when model changes
+   - Verify new elements appear after re-export
+   - Test moved elements show in correct location
+   - Verify deterministic output for version control
+
+##### Acceptance Criteria
+
+- containment.html file is generated correctly
+- Page appears in navigation menu
+- Mermaid diagram renders and is interactive
+- Tree navigation works correctly
+- Styling is consistent with existing pages
+- Interactive features (filter, search) function properly
+- Integration updates correctly when model changes
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [HTML Export Containment View Integration](../ReqvireTool/ValidationAndReporting/Reports.md#html-export-containment-view-integration)
+  * satisfiedBy: [test.sh](../../tests/test-containment-view/test.sh)
+---

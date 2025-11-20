@@ -594,3 +594,245 @@ System shall support markdown and JSON output formats.
   * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
   * verifiedBy: [Model Command Verification](../../Verifications/ReportsTests.md#model-command-verification)
 ---
+## Containment View Reports
+
+### Containment Hierarchy Extraction
+
+The system shall extract and represent the physical containment hierarchy of the model as a tree structure with folders, files, and elements, omitting sections from the hierarchy.
+
+#### Details
+
+The containment hierarchy extraction must:
+
+**Hierarchy Structure:**
+- Start from the specifications root folder
+- Traverse folder structure recursively
+- For each folder: collect subfolders and files
+- For each file: collect all elements (H3 headers with Metadata)
+- Skip sections (H2 headers) in the hierarchy representation
+
+**Element Information:**
+- Extract element identifier, name, and type
+- Preserve file path and folder structure
+- Maintain insertion order for elements within files
+
+**Data Structure:**
+- Represent as tree: `Folder → [Subfolders, Files]`
+- Files contain: `File → [Elements]`
+- Elements contain: identifier, name, type
+
+**Ordering:**
+- Folders sorted alphabetically
+- Files sorted alphabetically within folders
+- Elements preserve document order within files
+
+This forms the foundational data structure for all containment view output formats.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Containment View Report](../../Reports.md#containment-view-report)
+---
+
+### Containment View Text Output
+
+The system shall generate human-readable text output for the containment view showing the hierarchical structure with indentation and element metadata.
+
+#### Details
+
+The text output format must:
+
+**Hierarchical Display:**
+- Use indentation to show nesting levels (2 spaces per level)
+- Display folders with `📁 Folder: <name>`
+- Display files with `📄 File: <path>`
+- Display elements with `[<type>] <name>`
+
+**Element Details:**
+- Show element type in brackets: `[requirement]`, `[verification]`, `[user-requirement]`
+- Show full element name
+- Optional: show element identifier with `--verbose` flag
+
+**Example Format:**
+```
+📁 Folder: specifications
+  📁 Folder: SystemRequirements
+    📄 File: SystemRequirements/Requirements.md
+      [requirement] Authentication System
+      [requirement] Data Validation
+  📄 File: UserRequirements.md
+    [user-requirement] Easy Model Navigation
+```
+
+**Ordering:**
+- Follow deterministic ordering from hierarchy extraction
+- Consistent output for version control and testing
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Containment View Report](../../Reports.md#containment-view-report)
+---
+
+### Containment View JSON Output
+
+The system shall generate structured JSON output for the containment view enabling programmatic analysis and processing.
+
+#### Details
+
+The JSON structure must include:
+
+**Root Level:**
+```json
+{
+  "root_folder": "specifications",
+  "folders": [ ... ],
+  "files": [ ... ],
+  "element_count": 123
+}
+```
+
+**Folder Objects:**
+```json
+{
+  "path": "specifications/SystemRequirements",
+  "name": "SystemRequirements",
+  "subfolders": [ ... ],
+  "files": [ ... ]
+}
+```
+
+**File Objects:**
+```json
+{
+  "path": "specifications/Requirements.md",
+  "name": "Requirements.md",
+  "elements": [ ... ]
+}
+```
+
+**Element Objects:**
+```json
+{
+  "identifier": "specifications/Requirements.md#auth-system",
+  "name": "Authentication System",
+  "type": "requirement"
+}
+```
+
+**Requirements:**
+- Valid JSON format with proper escaping
+- Deterministic key ordering
+- Include metadata counts (folders, files, elements)
+- Support filtering (by file pattern, element type, etc.)
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Containment View Report](../../Reports.md#containment-view-report)
+---
+
+### Containment View Mermaid Diagram
+
+The system shall generate Mermaid flowchart diagrams visualizing the containment hierarchy with nested subgraphs, element type styling, and clickable links.
+
+#### Details
+
+The Mermaid flowchart must:
+
+**Subgraph Structure:**
+- Use nested `subgraph` for folders and files
+- Folder subgraphs: `subgraph FolderName ["📁 Folder Name"]`
+- File subgraphs: `subgraph FileName ["📄 File Name"]`
+- Element nodes within file subgraphs
+
+**Element Nodes:**
+- Format: `hashId["Element Name"]`
+- Use 16-character hash IDs for node uniqueness
+- Display element name as node label
+
+**Styling:**
+- Apply CSS classes based on element type
+- `userRequirement` - pink fill (#f9d6d6), red stroke (#f55f5f)
+- `systemRequirement` - light pink fill (#fce4e4), pink stroke (#e68a8a)
+- `verification` - light green fill (#d6f9d6), green stroke (#5fd75f)
+- `default` - gray fill (#f5f5f5), dark stroke (#333333)
+
+**Clickable Links:**
+- Add `click` directives for each element node
+- Link to element location: `click hashId "path.md#fragment"`
+- Use relative paths from diagram location
+
+**Example Structure:**
+```mermaid
+flowchart TD
+  subgraph RootFolder ["📁 specifications"]
+    direction TB
+    subgraph Folder1 ["📁 SystemRequirements"]
+      subgraph FileA ["📄 Requirements.md"]
+        ReqA1["Authentication System"]
+        ReqA2["Data Validation"]
+      end
+    end
+  end
+
+  class ReqA1 systemRequirement
+  class ReqA2 systemRequirement
+  click ReqA1 "Requirements.md#authentication-system"
+  click ReqA2 "Requirements.md#data-validation"
+```
+
+**Requirements:**
+- Valid Mermaid syntax
+- Deterministic node ordering
+- Consistent hash ID generation
+- Follow existing diagram styling conventions
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Containment View Report](../../Reports.md#containment-view-report)
+---
+
+### HTML Export Containment View Integration
+
+The system shall include the containment view in HTML export as an interactive browsable page with embedded Mermaid diagram and hierarchical navigation.
+
+#### Details
+
+HTML export integration must:
+
+**Containment View Page:**
+- Create dedicated page: `containment.html`
+- Include in navigation menu as "Containment View" or "Model Structure"
+- Embed Mermaid diagram for visualization
+- Provide hierarchical tree navigation
+
+**Interactive Features:**
+- Clickable elements in Mermaid diagram navigate to element pages
+- Expandable/collapsible folder tree
+- Element type filtering
+- Search/filter by folder or file
+
+**Integration with Existing Export:**
+- Follow existing HTML export styling and structure
+- Use same CSS classes for element types
+- Maintain consistent navigation patterns
+- Include in table of contents
+
+**Requirements:**
+- Generated during `reqvire export` command
+- Uses same containment hierarchy data structure
+- Updates automatically when model changes
+- Deterministic output for version control
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Containment View Report](../../Reports.md#containment-view-report)
+---
