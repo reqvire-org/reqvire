@@ -1,3 +1,4 @@
 [submodule "www.reqvire.org"]
 	path = www.reqvire.org
 	url = git@github.com:reqvire-org/www.reqvire.org.git
+	branch = main
