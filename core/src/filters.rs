@@ -13,6 +13,8 @@ pub struct Filters {
     content_re:   Option<Regex>,
     not_verified: bool,
     not_satisfied: bool,
+    has_attachments: bool,
+    attachment_glob: Option<GlobMatcher>,
 }
 
 impl Filters {
@@ -25,6 +27,8 @@ impl Filters {
         content: Option<&str>,
         is_not_verified: bool,
         is_not_satisfied: bool,
+        has_attachments: bool,
+        attachment: Option<&str>,
     ) -> Result<Self, ReqvireError> {
         fn compile_glob(pat: &str) -> Result<GlobMatcher, ReqvireError> {
             let glob =Glob::new(pat)
@@ -45,6 +49,7 @@ impl Filters {
             Some(r) => Some(Regex::new(r).map_err(|e| ReqvireError::InvalidRegex(e.to_string()))?),
             None => None,
         };
+        let attachment_glob = attachment.map(|p| compile_glob(p)).transpose()?;
 
         Ok(Filters {
             file_glob,
@@ -54,6 +59,8 @@ impl Filters {
             content_re,
             not_verified: is_not_verified,
             not_satisfied: is_not_satisfied,
+            has_attachments,
+            attachment_glob,
         })
     }
 
@@ -109,6 +116,18 @@ impl Filters {
         // 7) not_satisfied: exclude any element that *has* a satisfied relation
         if self.not_satisfied && satisfied_count > 0 {
             return false;
+        }
+        // 8) has_attachments: only include elements that have at least one attachment
+        if self.has_attachments && e.attachments.is_empty() {
+            return false;
+        }
+        // 9) attachment_glob: only include elements with attachments matching the glob
+        if let Some(g) = &self.attachment_glob {
+            let has_matching_attachment = e.attachments.iter()
+                .any(|a| g.is_match(a.file_path.to_string_lossy().as_ref()));
+            if !has_matching_attachment {
+                return false;
+            }
         }
 
         // passed all filters

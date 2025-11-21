@@ -122,6 +122,10 @@ pub enum ReqvireError {
     MissingAttachmentTarget(String),
 
     #[allow(dead_code)]
+    #[error("Missing attachment file: {0}")]
+    MissingAttachmentFile(String),
+
+    #[allow(dead_code)]
     #[error("Duplicate attachment: {0}")]
     DuplicateAttachment(String),
 

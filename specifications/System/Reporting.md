@@ -202,6 +202,7 @@ The search report must include:
 - Element content - omitted in short mode
 - Verified and satisfied relations counts - omitted in short mode
 - Complete list of relations with targets and types
+- Complete list of attachments as file paths - omitted in short mode
 
 **Global Counts:**
 - Total files, pages, sections, and elements - omitted in short mode
@@ -346,8 +347,9 @@ System shall support markdown and JSON output formats.
 #### Details
 - Markdown format shall include embedded Mermaid diagram with model structure
 - Markdown shall show hierarchical structure (folders > files > sections > elements)
-- JSON format shall use structured data with folders, files, sections, elements, and relations
+- JSON format shall use structured data with folders, files, sections, elements, relations, and attachments
 - Both formats shall represent the same filtered or complete model data
+- Element attachments shall be included as an array of file paths in both formats
 
 #### Relations
   * derivedFrom: [CLI Model Diagram Command](../Interfaces/CLI.md#cli-model-diagram-command)
@@ -370,9 +372,10 @@ This test verifies that the system provides a unified `search` command functiona
 - All filter flags work individually and in combination (conjunctive AND logic)
 - Supplying an invalid regex to any regex-based filter fails with a non-zero exit code and displays a clear error message
 - Search results must include all relations for each element
+- Search results must include all attachments for each element (omitted in short mode)
 - **Enhanced Content Display**: Search must display page content (frontmatter before first section) and section content (content between section headers and first element) when not in short mode
 - **Count Information**: Search must show counts for files, pages, sections, and elements in full mode (omitted in short mode)
-- **Short Mode Behavior**: Short mode omits: `content`, `section_content`, `page_content`, `verified_relations_count`, `satisfied_relations_count`, `element_count`, `total_sections`, `total_elements`, `global_counters`
+- **Short Mode Behavior**: Short mode omits: `content`, `section_content`, `page_content`, `verified_relations_count`, `satisfied_relations_count`, `element_count`, `total_sections`, `total_elements`, `global_counters`, `attachments`
 
 ##### Test Criteria
 1. **Base JSON search**
@@ -476,6 +479,18 @@ This test verifies that the system provides a unified `search` command functiona
     Command: `reqvire search --short --json`
     - Verify all specified fields are omitted from JSON structure
     - Verify no null/empty placeholders for omitted fields (fields completely absent)
+
+16. **Attachments in search output (full mode)**
+    Command: `reqvire search --json`
+    - JSON output must include `attachments` field for each element
+    - Attachments is an array of file path strings
+    - Elements without attachments have empty array `[]`
+    - Attachment paths are relative to git root
+
+17. **Attachments omitted in short mode**
+    Command: `reqvire search --short --json`
+    - Element objects do NOT contain `attachments` field
+    - Field is completely absent (not empty array)
 
 #### Metadata
   * type: test-verification
@@ -1268,11 +1283,12 @@ Comprehensive test verifying model command generates model-centric nested output
 4. **Nested JSON Structure Validation**
    Command: `reqvire model --json`
    - JSON has keys: `elements`, `metadata`
-   - Each element has: `identifier`, `name`, `element_type`, `file_path`, `section`, `section_index`, `relations`
+   - Each element has: `identifier`, `name`, `element_type`, `file_path`, `section`, `section_index`, `relations`, `attachments`
    - Each relation has: `relation_type`, target (element/file/external)
    - Element targets are nested recursively with same structure
    - File targets have: `path`, `type: "file"`
    - External targets have: `url`, `type: "external"`
+   - Attachments is an array of file path strings (empty array if no attachments)
    - Metadata has: `total_elements`, `total_relations`, `filtered_from`
 
 5. **Forward-Only Traversal Verification**

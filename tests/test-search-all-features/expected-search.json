@@ -28,7 +28,8 @@
                     "type": "internal-path"
                   }
                 }
-              ]
+              ],
+              "attachments": []
             },
             {
               "identifier": "specifications/Requirements.md#requirement-with-valid-markdown-relations",
@@ -75,7 +76,8 @@
                     "type": "identifier"
                   }
                 }
-              ]
+              ],
+              "attachments": []
             },
             {
               "identifier": "specifications/Requirements.md#requirement-with-valid-standard-relations",
@@ -122,7 +124,8 @@
                     "type": "identifier"
                   }
                 }
-              ]
+              ],
+              "attachments": []
             }
           ],
           "section_content": "This section contains requirements with various relation types for testing.\n\n```mermaid\nflowchart LR;\n    Req1[Requirement 1] --> Req2[Requirement 2];\n    Req2 --> Req3[Requirement 3];\n```\n\nSection introduction content with workflow diagram above.",
@@ -139,7 +142,8 @@
               "content": "This requirement specifically tests validation of 'Other' subsections",
               "verified_relations_count": 0,
               "satisfied_relations_count": 0,
-              "relations": []
+              "relations": [],
+              "attachments": []
             }
           ],
           "section_content": "Some text of subsection 1\n\n\nSome text of subsection 2",
@@ -171,7 +175,8 @@
                     "type": "identifier"
                   }
                 }
-              ]
+              ],
+              "attachments": []
             }
           ],
           "section_content": "",
@@ -210,7 +215,8 @@
                     "type": "identifier"
                   }
                 }
-              ]
+              ],
+              "attachments": []
             }
           ],
           "section_content": "",

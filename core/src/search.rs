@@ -21,6 +21,8 @@ pub struct SearchFilters {
     page_content_re: Option<Regex>,
     have_relations: Vec<String>,
     not_have_relations: Vec<String>,
+    has_attachments: bool,
+    attachment_glob: Option<GlobMatcher>,
 }
 
 impl SearchFilters {
@@ -35,6 +37,8 @@ impl SearchFilters {
         page_content: Option<&str>,
         have_relations: Option<&str>,
         not_have_relations: Option<&str>,
+        has_attachments: bool,
+        attachment: Option<&str>,
     ) -> Result<Self, ReqvireError> {
         fn compile_glob(pat: &str) -> Result<GlobMatcher, ReqvireError> {
             let glob = Glob::new(pat)
@@ -54,6 +58,7 @@ impl SearchFilters {
         let content_re = content.map(|r| compile_regex(r)).transpose()?;
         let section_content_re = section_content.map(|r| compile_regex(r)).transpose()?;
         let page_content_re = page_content.map(|r| compile_regex(r)).transpose()?;
+        let attachment_glob = attachment.map(|p| compile_glob(p)).transpose()?;
 
         // Parse and validate comma-separated relation lists
         let have_relations = if let Some(s) = have_relations {
@@ -102,6 +107,8 @@ impl SearchFilters {
             page_content_re,
             have_relations,
             not_have_relations,
+            has_attachments,
+            attachment_glob,
         })
     }
 
@@ -195,6 +202,20 @@ impl SearchFilters {
             }
         }
 
+        // Has attachments filter - must have at least one attachment
+        if self.has_attachments && elem.attachments.is_empty() {
+            return false;
+        }
+
+        // Attachment glob filter - must have an attachment matching the glob
+        if let Some(g) = &self.attachment_glob {
+            let has_matching_attachment = elem.attachments.iter()
+                .any(|a| g.is_match(a.file_path.to_string_lossy().as_ref()));
+            if !has_matching_attachment {
+                return false;
+            }
+        }
+
         true
     }
 }
@@ -242,6 +263,8 @@ struct ElementSearchResult {
     #[serde(skip_serializing_if = "Option::is_none")]
     satisfied_relations_count: Option<usize>,
     relations: Vec<RelationSearchResult>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    attachments: Option<Vec<String>>,
 }
 
 #[derive(Serialize)]
@@ -391,6 +414,16 @@ fn build_search_result(
             (Some(verified_count), Some(satisfied_count))
         };
 
+        // Build attachments list (omit in short mode)
+        let attachments = if short_mode {
+            None
+        } else {
+            Some(elem.attachments
+                .iter()
+                .map(|a| a.file_path.to_string_lossy().to_string())
+                .collect())
+        };
+
         // Build element summary
         let es = ElementSearchResult {
             identifier: elem.identifier.clone(),
@@ -402,6 +435,7 @@ fn build_search_result(
             verified_relations_count: vc,
             satisfied_relations_count: sc,
             relations: rels,
+            attachments,
         };
 
         // Insert into nested file→section map

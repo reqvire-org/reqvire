@@ -21,6 +21,7 @@ Test cases:
 
 #### Relations
   * verify: [Reserved Subsections Support](Subsections.md#reserved-subsections-support)
+  * satisfiedBy: [test.sh](../../tests/test-attachments/test.sh)
 ---
 
 ### Attachments Validation Verification
@@ -59,6 +60,10 @@ Test cases:
 
 #### Metadata
   * type: test-verification
+
+#### Relations
+  * verify: [Requirements Change Propagation](ChangeImpact.md#requirements-change-propagation)
+  * satisfiedBy: [test.sh](../../tests/test-attachments/test.sh)
 ---
 
 ### Attach Command Verification
@@ -180,5 +185,9 @@ Test cases:
 
 #### Metadata
   * type: test-verification
+
+#### Relations
+  * verify: [Reserved Subsections Support](Subsections.md#reserved-subsections-support)
+  * satisfiedBy: [test.sh](../../tests/test-attachments/test.sh)
 ---
 

@@ -20,6 +20,10 @@ Commands:
   mv                Move element to different location
   rename            Rename element
   mv-file           Move entire specification file with all its elements
+  attach            Attach external document to element
+  detach            Detach external document from element
+  mv-attachment     Move/rename attachment file and update all references
+  rm-attachment     Remove attachment file and detach from all elements
   containment       Generate containment view showing folder/file/element hierarchy
   help               Print this message or the help of the given subcommand(s)
 
@@ -56,6 +60,8 @@ SEARCH OPTIONS:
       --filter-page-content <REGEX> Only include elements whose parent file page content matches this regular expression
       --have-relations <LIST>   Only include elements that have ALL specified relations (comma-separated, e.g., "verifiedBy,satisfiedBy")
       --not-have-relations <LIST> Only include elements that do NOT have ALL specified relations (comma-separated, e.g., "verifiedBy")
+      --has-attachments         Only include elements that have attachments
+      --filter-attachment <GLOB> Only include elements with attachments matching this glob pattern (e.g., "*.pdf", "docs/**/*")
 
 CHANGE IMPACT OPTIONS:
       --git-commit <GIT_COMMIT> Git commit hash to use when comparing models
@@ -116,6 +122,25 @@ MV FILE OPTIONS:
       --squash                  Move all elements to target file's first section (if target exists)
       --dry-run                 Preview changes without applying
       --json                    Output results in JSON format
+
+ATTACH OPTIONS:
+       <ATTACHMENT_PATH>        Path to attachment file
+       <ELEMENT_NAME>           Name of element to attach to
+      --dry-run                 Preview changes without applying
+
+DETACH OPTIONS:
+       <ELEMENT_NAME>           Name of element to detach from
+       <ATTACHMENT_PATH>        Path to attachment file
+      --dry-run                 Preview changes without applying
+
+MV ATTACHMENT OPTIONS:
+       <OLD_PATH>               Current attachment file path
+       <NEW_PATH>               New attachment file path
+      --dry-run                 Preview changes without applying
+
+RM ATTACHMENT OPTIONS:
+       <ATTACHMENT_PATH>        Path to attachment file to remove
+      --dry-run                 Preview changes without applying
 
 CONTAINMENT OPTIONS:
       --json                    Output results in JSON format

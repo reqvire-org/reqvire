@@ -1,4 +1,4 @@
-use crate::element::{Element, SubSection, ElementType, RequirementType};
+use crate::element::{Element, SubSection, ElementType, RequirementType, Attachment};
 use crate::relation::Relation;
 use crate::error::ReqvireError;
 use crate::utils;
@@ -550,13 +550,43 @@ pub fn parse_elements(
             }
 
         } else if current_subsection == SubSection::Attachments && !skip_current_element {
-            // TODO: Parse Attachments subsection
-            // Format: * [path](path)
-            // 1. Extract markdown link where link text equals href
-            // 2. Normalize path to git-root-relative
-            // 3. Add to element.attachments vector
-            // 4. Validate format: reject if text != href
-            todo!("Implement Attachments subsection parsing")
+            // Parse Attachments subsection
+            // Format: * [path](path) where link text equals href
+            if let Some(element) = &mut current_element {
+                if trimmed.starts_with("* ") || trimmed.starts_with("- ") {
+                    match utils::parse_attachment_line(trimmed) {
+                        Ok(path) => {
+                            // Store path as-is (git-root-relative)
+                            // File existence validation happens in Pass 2
+                            let attachment_path = PathBuf::from(&path);
+
+                            // Check for duplicates
+                            if !element.attachments.iter().any(|a| a.file_path == attachment_path) {
+                                element.attachments.push(Attachment { file_path: attachment_path });
+                            } else {
+                                let msg = format!(
+                                    "Duplicate attachment '{}' in element '{}' (file: {}, line {})",
+                                    path, element.name, file, line_num + 1
+                                );
+                                errors.push(ReqvireError::DuplicateAttachment(msg.clone()));
+                                debug!("Warning: {}", msg);
+                            }
+                        }
+                        Err(e) => {
+                            let msg = format!(
+                                "Invalid attachment in element '{}': {} (file: {}, line {})",
+                                element.name, e, file, line_num + 1
+                            );
+                            errors.push(ReqvireError::InvalidAttachmentFormat(msg.clone()));
+                            debug!("Error: {}", msg);
+                        }
+                    }
+                } else if !trimmed.is_empty() {
+                    // Non-empty line that's not a bullet point - end of Attachments subsection
+                    current_subsection = SubSection::Other("".to_string());
+                }
+                // Empty lines are ignored within Attachments subsection
+            }
 
         } else if matches!(current_subsection, SubSection::Other(_)) {
             // Accumulate content outside of elements

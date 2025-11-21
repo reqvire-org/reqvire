@@ -633,9 +633,41 @@ pub fn hash_identifier(identifier: &str) -> String {
 pub fn hash_content(content: &str) -> String {
     let mut hasher = FxHasher::default();
     hasher.write(content.as_bytes());
-    format!("{:x}", hasher.finish()).to_string() 
+    format!("{:x}", hasher.finish()).to_string()
 }
 
+/// Parses an attachment line from the Attachments subsection.
+/// Format: * [path](path) where link text must equal href
+/// Returns the path if valid, or an error if format is invalid.
+pub fn parse_attachment_line(line: &str) -> Result<String, ReqvireError> {
+    let trimmed = line.trim();
+
+    // Must start with bullet point
+    if !trimmed.starts_with("* ") && !trimmed.starts_with("- ") {
+        return Err(ReqvireError::InvalidAttachmentFormat(
+            format!("Attachment must start with '* ' or '- ': '{}'", line)
+        ));
+    }
+
+    // Extract the markdown link part (after bullet)
+    let link_part = trimmed.trim_start_matches("* ").trim_start_matches("- ").trim();
+
+    // Parse as markdown link
+    if let Some((text, href)) = extract_markdown_link(link_part) {
+        // Validate: text must equal href (git-root-relative path)
+        if text == href {
+            Ok(href)
+        } else {
+            Err(ReqvireError::InvalidAttachmentFormat(
+                format!("Attachment link text must equal href. Got text='{}', href='{}'", text, href)
+            ))
+        }
+    } else {
+        Err(ReqvireError::InvalidAttachmentFormat(
+            format!("Invalid attachment format, expected '[path](path)': '{}'", line)
+        ))
+    }
+}
 
 
 #[cfg(test)]

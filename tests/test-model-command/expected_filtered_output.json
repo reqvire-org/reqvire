@@ -27,10 +27,12 @@
                   "file_path": "specifications/Verifications/Tests.md",
                   "section": "Model Command Tests",
                   "section_index": 3,
-                  "relations": []
+                  "relations": [],
+                  "attachments": []
                 }
               }
-            ]
+            ],
+            "attachments": []
           }
         },
         {
@@ -62,10 +64,12 @@
                         "file_path": "specifications/Verifications/Tests.md",
                         "section": "Model Command Tests",
                         "section_index": 2,
-                        "relations": []
+                        "relations": [],
+                        "attachments": []
                       }
                     }
-                  ]
+                  ],
+                  "attachments": []
                 }
               },
               {
@@ -87,13 +91,16 @@
                         "file_path": "specifications/Verifications/Tests.md",
                         "section": "Model Command Tests",
                         "section_index": 1,
-                        "relations": []
+                        "relations": [],
+                        "attachments": []
                       }
                     }
-                  ]
+                  ],
+                  "attachments": []
                 }
               }
-            ]
+            ],
+            "attachments": []
           }
         },
         {
@@ -105,10 +112,12 @@
             "file_path": "specifications/Verifications/Tests.md",
             "section": "Model Command Tests",
             "section_index": 0,
-            "relations": []
+            "relations": [],
+            "attachments": []
           }
         }
-      ]
+      ],
+      "attachments": []
     }
   ],
   "metadata": {

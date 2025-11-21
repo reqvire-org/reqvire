@@ -146,6 +146,9 @@ impl GraphRegistry {
         // Validate cross-component dependencies
         errors.extend(self.validate_cross_component_dependencies()?);
 
+        // Validate attachments exist
+        errors.extend(self.validate_attachments()?);
+
         Ok(errors)
     }
 
@@ -431,6 +434,44 @@ impl GraphRegistry {
             debug!("No cross-component dependency validation errors found.");
         } else {
             debug!("{} cross-component validation errors found.", errors.len());
+        }
+
+        Ok(errors)
+    }
+
+    /// Validates that all attachment files referenced by elements exist.
+    fn validate_attachments(&self) -> Result<Vec<ReqvireError>, ReqvireError> {
+        debug!("Validating attachment file existence...");
+        let mut errors = Vec::new();
+
+        // Get git root for resolving attachment paths
+        let git_root = crate::git_commands::get_git_root_dir()
+            .unwrap_or_else(|_| std::env::current_dir().unwrap_or_default());
+
+        for element_node in self.nodes.values() {
+            let element = &element_node.element;
+
+            for attachment in &element.attachments {
+                // Resolve attachment path relative to git root
+                let full_path = git_root.join(&attachment.file_path);
+
+                if !full_path.exists() {
+                    errors.push(ReqvireError::MissingAttachmentFile(
+                        format!(
+                            "File {}: Element '{}' references missing attachment file: {}",
+                            element.file_path,
+                            element.name,
+                            attachment.file_path.display()
+                        ),
+                    ));
+                }
+            }
+        }
+
+        if errors.is_empty() {
+            debug!("No attachment validation errors found.");
+        } else {
+            debug!("{} attachment validation errors found.", errors.len());
         }
 
         Ok(errors)
@@ -977,6 +1018,13 @@ impl GraphRegistry {
     /// Gets a specific element by ID
     pub fn get_element(&self, element_id: &str) -> Option<&Element> {
         self.nodes.get(element_id).map(|node| &node.element)
+    }
+
+    /// Gets an element by its display name
+    pub fn get_element_by_name(&self, name: &str) -> Option<&Element> {
+        self.nodes.values()
+            .map(|node| &node.element)
+            .find(|elem| elem.name == name)
     }
 
     /// Creates a virtual section in an existing file

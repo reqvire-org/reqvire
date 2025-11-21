@@ -140,6 +140,14 @@ pub enum Commands {
         /// Only include elements that do NOT have ALL specified relations (comma-separated, e.g., "verifiedBy")
         #[clap(long, value_name = "LIST", help_heading = "SEARCH OPTIONS")]
         not_have_relations: Option<String>,
+
+        /// Only include elements that have attachments
+        #[clap(long, help_heading = "SEARCH OPTIONS")]
+        has_attachments: bool,
+
+        /// Only include elements with attachments matching this glob pattern (e.g., "*.pdf", "docs/**/*")
+        #[clap(long, value_name = "GLOB", help_heading = "SEARCH OPTIONS")]
+        filter_attachment: Option<String>,
     },
 
     /// Analise change impact and provides report
@@ -697,6 +705,8 @@ pub fn handle_command(
             filter_page_content,
             have_relations,
             not_have_relations,
+            has_attachments,
+            filter_attachment,
         }) => {
             // Build search filters
             let filters = reqvire::search::SearchFilters::new(
@@ -709,6 +719,8 @@ pub fn handle_command(
                 filter_page_content.as_deref(),
                 have_relations.as_deref(),
                 not_have_relations.as_deref(),
+                has_attachments,
+                filter_attachment.as_deref(),
             )?;
 
             // Generate search report
@@ -1043,40 +1055,55 @@ pub fn handle_command(
             return Ok(0);
         },
         Some(Commands::Attach { attachment_path, element_name, dry_run }) => {
-            // TODO: Implement attach command
-            // 1. Validate attachment file exists
-            // 2. Find element by name
-            // 3. Create Attachments subsection if needed
-            // 4. Add markdown link [path](path)
-            // 5. Update file on disk (unless dry_run)
-            // 6. Trigger change impact
-            todo!("Implement attach command")
+            let git_root = git_commands::get_git_root_dir()?;
+            let result = reqvire::crud::attach(
+                &mut model_manager,
+                &element_name,
+                &attachment_path,
+                &git_root,
+                dry_run,
+            )?;
+
+            render_crud_result(&result);
+            return Ok(0);
         },
         Some(Commands::Detach { element_name, attachment_path, dry_run }) => {
-            // TODO: Implement detach command
-            // 1. Find element by name
-            // 2. Remove attachment link from Attachments subsection
-            // 3. Remove subsection if empty
-            // 4. Update file on disk (unless dry_run)
-            // 5. CRITICAL: Trigger change impact
-            todo!("Implement detach command")
+            let git_root = git_commands::get_git_root_dir()?;
+            let result = reqvire::crud::detach(
+                &mut model_manager,
+                &element_name,
+                &attachment_path,
+                &git_root,
+                dry_run,
+            )?;
+
+            render_crud_result(&result);
+            return Ok(0);
         },
         Some(Commands::MvAttachment { old_path, new_path, dry_run }) => {
-            // TODO: Implement mv-attachment command
-            // 1. Find all elements with old_path attachment
-            // 2. Update link text and href in ALL elements
-            // 3. Update files on disk (unless dry_run)
-            // 4. Report affected elements
-            todo!("Implement mv-attachment command")
+            let git_root = git_commands::get_git_root_dir()?;
+            let result = reqvire::crud::mv_attachment(
+                &mut model_manager,
+                &old_path,
+                &new_path,
+                &git_root,
+                dry_run,
+            )?;
+
+            render_crud_result(&result);
+            return Ok(0);
         },
         Some(Commands::RmAttachment { attachment_path, dry_run }) => {
-            // TODO: Implement rm-attachment command
-            // 1. Find all elements with this attachment
-            // 2. Delete physical file from filesystem (unless dry_run)
-            // 3. Detach from ALL elements
-            // 4. Remove empty Attachments subsections
-            // 5. Report affected elements
-            todo!("Implement rm-attachment command")
+            let git_root = git_commands::get_git_root_dir()?;
+            let result = reqvire::crud::rm_attachment(
+                &mut model_manager,
+                &attachment_path,
+                &git_root,
+                dry_run,
+            )?;
+
+            render_crud_result(&result);
+            return Ok(0);
         },
         Some(Commands::Containment { json }) => {
             if json {

@@ -23,6 +23,7 @@ pub struct ModelCentricElement {
     pub section: String,
     pub section_index: usize,
     pub relations: Vec<ModelCentricRelation>,
+    pub attachments: Vec<String>,
 }
 
 /// Relation in model-centric view with target details
@@ -201,6 +202,12 @@ fn build_element_recursive(
 
     // Relations are already sorted from sorted_relations above
 
+    // Build attachments list
+    let attachments: Vec<String> = element.attachments
+        .iter()
+        .map(|a| a.file_path.to_string_lossy().to_string())
+        .collect();
+
     Some(ModelCentricElement {
         identifier: element.identifier.clone(),
         name: element.name.clone(),
@@ -209,6 +216,7 @@ fn build_element_recursive(
         section: element.section.clone(),
         section_index: element.section_order_index,
         relations,
+        attachments,
     })
 }
 

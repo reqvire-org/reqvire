@@ -31,7 +31,7 @@ echo ""
 echo "Test 1: Attach command..."
 
 set +e
-ATTACH_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" attach "Performance Requirement" "docs/SLA.txt" 2>&1)
+ATTACH_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" attach "docs/SLA.txt" "Performance Requirement" 2>&1)
 ATTACH_EXIT=$?
 set -e
 
@@ -77,7 +77,7 @@ echo "Test 2: Attach idempotency (duplicate attach)..."
 cp "$TEST_DIR/specifications/Requirements.md" "$TEST_DIR/requirements_backup.bak"
 
 set +e
-ATTACH_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" attach "Performance Requirement" "docs/SLA.txt" 2>&1)
+ATTACH_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" attach "docs/SLA.txt" "Performance Requirement" 2>&1)
 ATTACH_EXIT=$?
 set -e
 
@@ -103,7 +103,7 @@ echo ""
 echo "Test 3: Multiple attachments on same element..."
 
 set +e
-ATTACH_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" attach "Performance Requirement" "docs/benchmarks.txt" 2>&1)
+ATTACH_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" attach "docs/benchmarks.txt" "Performance Requirement" 2>&1)
 ATTACH_EXIT=$?
 set -e
 
@@ -133,7 +133,7 @@ echo ""
 echo "Test 4: Same file attached to multiple elements..."
 
 set +e
-ATTACH_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" attach "Implementation Detail" "docs/SLA.txt" 2>&1)
+ATTACH_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" attach "docs/SLA.txt" "Implementation Detail" 2>&1)
 ATTACH_EXIT=$?
 set -e
 
@@ -176,8 +176,8 @@ if grep -q '\[docs/benchmarks.txt\](docs/benchmarks.txt)' "$TEST_DIR/specificati
 fi
 
 # Verify SLA.txt still exists on Performance Requirement
-# (We need to check the specific element)
-if ! grep -A 10 "### Performance Requirement" "$TEST_DIR/specifications/Requirements.md" | grep -q '\[docs/SLA.txt\](docs/SLA.txt)'; then
+# (We need to check the specific element - use enough lines to capture all sections)
+if ! grep -A 20 "### Performance Requirement" "$TEST_DIR/specifications/Requirements.md" | grep -q '\[docs/SLA.txt\](docs/SLA.txt)'; then
   echo "FAILED: Other attachment was incorrectly removed"
   exit 1
 fi
@@ -202,12 +202,12 @@ if [ $DETACH_EXIT -ne 0 ]; then
 fi
 
 # Verify SLA.txt was removed from Performance Requirement but still on Implementation Detail
-if grep -A 15 "### Performance Requirement" "$TEST_DIR/specifications/Requirements.md" | grep -B 15 "### Implementation Detail" | grep -q '\[docs/SLA.txt\](docs/SLA.txt)'; then
+if grep -A 20 "### Performance Requirement" "$TEST_DIR/specifications/Requirements.md" | grep -B 20 "### Implementation Detail" | grep -q '\[docs/SLA.txt\](docs/SLA.txt)'; then
   echo "FAILED: SLA.txt was not removed from Performance Requirement"
   exit 1
 fi
 
-if ! grep -A 10 "### Implementation Detail" "$TEST_DIR/specifications/Requirements.md" | grep -q '\[docs/SLA.txt\](docs/SLA.txt)'; then
+if ! grep -A 20 "### Implementation Detail" "$TEST_DIR/specifications/Requirements.md" | grep -q '\[docs/SLA.txt\](docs/SLA.txt)'; then
   echo "FAILED: SLA.txt was incorrectly removed from Implementation Detail"
   exit 1
 fi
@@ -241,7 +241,7 @@ echo "Test 8: Search filters for attachments..."
 
 # Re-attach for search tests
 set +e
-"$REQVIRE_BIN" attach "Performance Requirement" "docs/SLA.txt" 2>&1 > /dev/null
+cd "$TEST_DIR" && "$REQVIRE_BIN" attach "docs/SLA.txt" "Performance Requirement" 2>&1 > /dev/null
 set -e
 
 # Test --has-attachments filter
@@ -399,6 +399,9 @@ This element has a missing attachment.
 
 #### Metadata
   * type: requirement
+
+#### Relations
+  * derivedFrom: [System Requirements](#system-requirements)
 ---
 
 EOF
@@ -427,6 +430,10 @@ echo ""
 # ==================================
 echo "Test 12: Dry-run mode..."
 
+# Clean up Test 11's invalid element before continuing
+# Remove the Test Missing Attachment element that was added
+sed -i '/### Test Missing Attachment/,/^---$/d' "$TEST_DIR/specifications/Requirements.md"
+
 # Create a fresh requirement for dry-run test
 cat > "$TEST_DIR/specifications/DryRunTest.md" << 'EOF'
 # Dry Run Test
@@ -439,6 +446,9 @@ Test element for dry-run.
 
 #### Metadata
   * type: requirement
+
+#### Relations
+  * derivedFrom: Requirements.md#system-requirements
 ---
 
 EOF
@@ -447,7 +457,7 @@ EOF
 cp "$TEST_DIR/specifications/DryRunTest.md" "$TEST_DIR/dryrun_backup.bak"
 
 set +e
-DRYRUN_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" attach "Dry Run Element" "docs/benchmarks.txt" --dry-run 2>&1)
+DRYRUN_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" attach "docs/benchmarks.txt" "Dry Run Element" --dry-run 2>&1)
 DRYRUN_EXIT=$?
 set -e
 
