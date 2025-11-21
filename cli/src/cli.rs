@@ -343,6 +343,59 @@ pub enum Commands {
         json: bool,
     },
 
+    /// Attach external document to element
+    #[clap(name = "attach", override_help = "Attach external document to element\n\nATTACH OPTIONS:\n       <ATTACHMENT_PATH>        Path to attachment file (relative to current working directory)\n       <ELEMENT_NAME>           Name of element to attach document to\n      --dry-run                 Preview changes without applying\n\nUSAGE:\n    reqvire attach <attachment-path> <element-name>\n    reqvire attach docs/SLO.pdf \"System Performance Requirements\"")]
+    Attach {
+        /// Path to attachment file
+        attachment_path: String,
+
+        /// Name of element to attach to
+        element_name: String,
+
+        /// Preview changes without applying
+        #[clap(long, help_heading = "ATTACH OPTIONS")]
+        dry_run: bool,
+    },
+
+    /// Detach external document from element
+    #[clap(name = "detach", override_help = "Detach external document from element\n\nDETACH OPTIONS:\n       <ELEMENT_NAME>           Name of element to detach document from\n       <ATTACHMENT_PATH>        Path to attachment file (relative to current working directory)\n      --dry-run                 Preview changes without applying\n\nUSAGE:\n    reqvire detach \"System Performance Requirements\" docs/SLO.pdf")]
+    Detach {
+        /// Name of element to detach from
+        element_name: String,
+
+        /// Path to attachment file
+        attachment_path: String,
+
+        /// Preview changes without applying
+        #[clap(long, help_heading = "DETACH OPTIONS")]
+        dry_run: bool,
+    },
+
+    /// Move/rename attachment file and update all references
+    #[clap(name = "mv-attachment", override_help = "Move/rename attachment file and update all references\n\nMV-ATTACHMENT OPTIONS:\n       <OLD_PATH>               Current attachment file path\n       <NEW_PATH>               New attachment file path\n      --dry-run                 Preview changes without applying\n\nUSAGE:\n    reqvire mv-attachment docs/old.pdf docs/new.pdf")]
+    MvAttachment {
+        /// Current attachment file path
+        old_path: String,
+
+        /// New attachment file path
+        new_path: String,
+
+        /// Preview changes without applying
+        #[clap(long, help_heading = "MV-ATTACHMENT OPTIONS")]
+        dry_run: bool,
+    },
+
+    /// Remove attachment file and detach from all elements
+    #[clap(name = "rm-attachment", override_help = "Remove attachment file and detach from all elements\n\nRM-ATTACHMENT OPTIONS:\n       <ATTACHMENT_PATH>        Path to attachment file to remove\n      --dry-run                 Preview changes without applying\n\nUSAGE:\n    reqvire rm-attachment docs/obsolete.pdf")]
+    RmAttachment {
+        /// Path to attachment file to remove
+        attachment_path: String,
+
+        /// Preview changes without applying
+        #[clap(long, help_heading = "RM-ATTACHMENT OPTIONS")]
+        dry_run: bool,
+    },
+
     /// Generate containment view showing folder/file/element hierarchy
     #[clap(override_help = "Generate containment view showing folder/file/element hierarchy\n\nCONTAINMENT OPTIONS:\n      --json     Output results in JSON format")]
     Containment {
@@ -988,6 +1041,42 @@ pub fn handle_command(
             }
 
             return Ok(0);
+        },
+        Some(Commands::Attach { attachment_path, element_name, dry_run }) => {
+            // TODO: Implement attach command
+            // 1. Validate attachment file exists
+            // 2. Find element by name
+            // 3. Create Attachments subsection if needed
+            // 4. Add markdown link [path](path)
+            // 5. Update file on disk (unless dry_run)
+            // 6. Trigger change impact
+            todo!("Implement attach command")
+        },
+        Some(Commands::Detach { element_name, attachment_path, dry_run }) => {
+            // TODO: Implement detach command
+            // 1. Find element by name
+            // 2. Remove attachment link from Attachments subsection
+            // 3. Remove subsection if empty
+            // 4. Update file on disk (unless dry_run)
+            // 5. CRITICAL: Trigger change impact
+            todo!("Implement detach command")
+        },
+        Some(Commands::MvAttachment { old_path, new_path, dry_run }) => {
+            // TODO: Implement mv-attachment command
+            // 1. Find all elements with old_path attachment
+            // 2. Update link text and href in ALL elements
+            // 3. Update files on disk (unless dry_run)
+            // 4. Report affected elements
+            todo!("Implement mv-attachment command")
+        },
+        Some(Commands::RmAttachment { attachment_path, dry_run }) => {
+            // TODO: Implement rm-attachment command
+            // 1. Find all elements with this attachment
+            // 2. Delete physical file from filesystem (unless dry_run)
+            // 3. Detach from ALL elements
+            // 4. Remove empty Attachments subsections
+            // 5. Report affected elements
+            todo!("Implement rm-attachment command")
         },
         Some(Commands::Containment { json }) => {
             if json {

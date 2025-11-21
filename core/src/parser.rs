@@ -549,6 +549,15 @@ pub fn parse_elements(
                 }
             }
 
+        } else if current_subsection == SubSection::Attachments && !skip_current_element {
+            // TODO: Parse Attachments subsection
+            // Format: * [path](path)
+            // 1. Extract markdown link where link text equals href
+            // 2. Normalize path to git-root-relative
+            // 3. Add to element.attachments vector
+            // 4. Validate format: reject if text != href
+            todo!("Implement Attachments subsection parsing")
+
         } else if matches!(current_subsection, SubSection::Other(_)) {
             // Accumulate content outside of elements
             if !found_first_section {

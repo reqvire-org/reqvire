@@ -234,7 +234,7 @@ Content of the second duplicate.
 ## Subsections in Markdown documents
 
 An element may contain different **Subsections**, some of which are strictly defined, while others allow free-form content.
-- **Reserved Subsections**: These subsections follow a predefined structure.
+- **Reserved Subsections**: These subsections follow a predefined structure and behavior.
 - **Other Subsections**: These allow additional descriptive or supporting information.
 
 Subsections starts with the `#### Subsection Name` and ends either with new element or next subsection.
@@ -244,16 +244,44 @@ The `#### ` header marks the beginning of the subsection.
 It must appear directly within an element chunk, **following** the `###` header of the parent element and any preceding content, including previous subsections.
 Each element chunk can have **at most one** `#### SubsectionName` subsection where 'SubsectionName' is a unique name of the subsection within an element.
 
-The reserved subsections are:
- * Relations
- * Details
- * Properties
- * Metadata
- 
-Those have defines structure that must be followed.
+Some subsections are **reserved** with predefined structure and behavior, while others allow free-form content. The specific reserved subsections are defined separately as capabilities of the system.
 
+</details>
+
+#### Relations
+  * derivedFrom: [Managing System Models](../UserStories.md#managing-system-models)
+  * satisfiedBy: [relation.rs](../../core/src/relation.rs)
+  * satisfiedBy: [element.rs](../../core/src/element.rs)
+  * satisfiedBy: [subsection.rs](../../core/src/subsection.rs)
+  * satisfiedBy: [parser.rs](../../core/src/parser.rs)
+  * satisfiedBy: [model.rs](../../core/src/model.rs)
+---
+
+### Reserved Subsections Support
+The system shall support the following reserved subsections with predefined structure and behavior.
+
+#### Details
+The reserved subsections are:
+ * **Relations**: Define relationships between elements
+ * **Details**: Extend requirement text with additional information
+ * **Properties**: Store metadata properties
+ * **Metadata**: Define element type and classification
+ * **Attachments**: Link external documents
+
+Each reserved subsection has specific parsing rules, validation requirements, and behaviors defined in dedicated requirements.
+
+#### Relations
+* derivedFrom: [Structure and Addressing in Markdown Documents](#structure-and-addressing-in-markdown-documents)
+* satisfiedBy: [element.rs](../../core/src/element.rs)
+* satisfiedBy: [parser.rs](../../core/src/parser.rs)
+
+---
 
 ### Details Subsection
+
+System shall support 'Details' reserved subsection and parse it accordinly to specified rules.
+
+#### Details
 
 Must be defined with a level 4 header: `#### Details`.
 
@@ -265,13 +293,34 @@ The **#### Details** subsection within an element provides additional informatio
   - It serves the same purpose as refirement relation in other mbse tools and sysml.
 - Any statements in the **Details** subsection hold the same validity as the main requirement text.
 
+#### Relations
+* derivedFrom: [Reserved Subsections Support](#reserved-subsections-support)
+
+---
+
 ###  Relations Subsection
+
+System shall support 'Relations' reserved subsection and parse it accordinly to specified rules.
+
+#### Details
 
 Must be defined with a level 4 header: `#### Relations`.
 
 Duplicate relation entries within the same `#### Relations` subsection are not allowed.
 
+#### Relations
+* derivedFrom: [Reserved Subsections Support](#reserved-subsections-support)
+
+---
+
 ### Metadata Subsection
+
+System shall support 'Metadata' reserved subsection and parse it accordinly to specified rules.
+
+#### Details
+
+<details>
+<summary>View Full Specification</summary>
 
 Must be defined with a level 4 header: `#### Metadata`.
 
@@ -346,7 +395,14 @@ Some details.
   * verifies: [Some Requirement](#some-requirement)
 ```
 
+<details>
+
+
 #### Verification Type Categories
+
+The system shall support defined verifications categories.
+
+#### Details
 
 The following verification types are supported:
 
@@ -365,17 +421,16 @@ The appropriate verification type should be selected based on the nature of the 
 - **Inspection-verification**: Used when requirements can be verified through review of artifacts
 - **Demonstration-verification**: Used when requirements can be verified by demonstrating functionality
 
+#### Relations
+* derivedFrom: [Metadata Subsection](#metadata-subsection)
 
+---
 
 </details>
 
 #### Relations
-  * derivedFrom: [Managing System Models](../UserStories.md#managing-system-models)
-  * satisfiedBy: [relation.rs](../../core/src/relation.rs)
-  * satisfiedBy: [element.rs](../../core/src/element.rs)
-  * satisfiedBy: [subsection.rs](../../core/src/subsection.rs)
-  * satisfiedBy: [parser.rs](../../core/src/parser.rs)
-  * satisfiedBy: [model.rs](../../core/src/model.rs)
+* derivedFrom: [Reserved Subsections Support](#reserved-subsections-support)
+
 ---
 
 ### Fragment Normalization Test

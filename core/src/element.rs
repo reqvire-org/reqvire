@@ -1,40 +1,48 @@
 use std::collections::HashMap;
+use std::path::PathBuf;
 use crate::relation::{Relation};
 use crate::utils;
 use serde::Serialize;
 
+#[derive(Debug, Clone, Serialize)]
+pub struct Attachment {
+    pub file_path: PathBuf,  // Git-root-relative, normalized
+}
 
 #[derive(Debug, PartialEq, Hash, Eq, Clone)]
 pub enum SubSection {
     Other(String),
-    Requirement,    
+    Requirement,
     Relations,
     Metadata,
     Details,
     Properties,
+    Attachments,
 }
 impl SubSection {
     pub fn name(&self) -> &str {
         match self {
-            SubSection::Requirement => "Requirement",        
+            SubSection::Requirement => "Requirement",
             SubSection::Relations => "Relations",
             SubSection::Metadata => "Metadata",
             SubSection::Details => "Details",
             SubSection::Properties => "Properties",
-            SubSection::Other(name) => name.as_str(),            
+            SubSection::Attachments => "Attachments",
+            SubSection::Other(name) => name.as_str(),
         }
     }
-    
+
     pub fn from_str(s: &str) -> Self {
         match s {
-            "Requirement" => SubSection::Requirement,        
+            "Requirement" => SubSection::Requirement,
             "Relations" => SubSection::Relations,
             "Metadata" => SubSection::Metadata,
             "Details" =>   SubSection::Details,
             "Properties" => SubSection::Properties,
+            "Attachments" => SubSection::Attachments,
             other => SubSection::Other(other.to_string()),
         }
-    }    
+    }
 }
 
 
@@ -129,6 +137,9 @@ pub struct Element {
     //
     // Order index within the section (used for preserving original order)
     pub section_order_index: usize,
+    //
+    // Attachments - external documents linked to this element
+    pub attachments: Vec<Attachment>,
 }
 
 
@@ -154,6 +165,7 @@ impl Element {
             metadata: HashMap::new(),
             changed_since_commit: false,
             section_order_index: 0, // Will be set during parsing
+            attachments: vec![],
         }
     }
 

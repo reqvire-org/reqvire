@@ -113,4 +113,20 @@ pub enum ReqvireError {
     #[error("Serialization error: {0}")]
     SerializationError(String),
 
+    #[allow(dead_code)]
+    #[error("Invalid attachment format: {0}")]
+    InvalidAttachmentFormat(String),
+
+    #[allow(dead_code)]
+    #[error("Missing attachment target: {0}")]
+    MissingAttachmentTarget(String),
+
+    #[allow(dead_code)]
+    #[error("Duplicate attachment: {0}")]
+    DuplicateAttachment(String),
+
+    #[allow(dead_code)]
+    #[error("Element not found: {0}")]
+    ElementNotFound(String),
+
 }
