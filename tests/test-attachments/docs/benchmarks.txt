@@ -1,0 +1,6 @@
+Benchmark Results
+
+Test 1: 95ms
+Test 2: 87ms
+Test 3: 102ms
+Average: 94.67ms

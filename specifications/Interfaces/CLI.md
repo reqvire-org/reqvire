@@ -113,6 +113,66 @@ This validation ensures that subdirectory processing maintains logical boundarie
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
 ---
 
+### Attachment Commands
+
+The system shall provide CLI commands for attachment management: attach, detach, mv-attachment, and rm-attachment.
+
+#### Details
+<details>
+<summary>View Full Specification</summary>
+
+## Attach Command
+
+Syntax: `reqvire attach <attachment-path> <element-name> [--dry-run]`
+
+Behavior:
+- Create Attachments subsection if doesn't exist
+- Add link to subsection with format `* [path](path)`
+- Skip if already attached (idempotent)
+- Support many-to-many (same file to multiple elements)
+- Mark element file as modified
+- Support dry-run mode for preview
+
+## Detach Command
+
+Syntax: `reqvire detach <element-name> <attachment-path> [--dry-run]`
+
+Behavior:
+- Remove link from Attachments subsection
+- Remove subsection if no attachments remain
+- Trigger change impact on element (CRITICAL)
+- Mark element file as modified
+- Support dry-run mode for preview
+
+## Move Attachment Command
+
+Syntax: `reqvire mv-attachment <old-path> <new-path> [--dry-run]`
+
+Behavior:
+- Update ALL references across all elements
+- Update both link text and href (text = path)
+- Report affected elements
+- Mark all affected element files as modified
+- Support dry-run mode for preview
+
+## Remove Attachment Command
+
+Syntax: `reqvire rm-attachment <attachment-path> [--dry-run]`
+
+Behavior:
+- Delete physical file from filesystem
+- Detach from ALL elements
+- Remove empty Attachments subsections
+- Report affected elements
+- Mark all affected element files as modified
+- Support dry-run mode for preview
+
+</details>
+
+#### Relations
+  * derivedFrom: [Reserved Subsections Support](../System/Subsections.md#reserved-subsections-support)
+---
+
 ### Detailed Error Handling and Logging
 
 The system shall implement detailed error handling and logging throughout the application to facilitate troubleshooting and provide meaningful feedback.
@@ -141,6 +201,8 @@ Search command features:
   - By page content regex: `--filter-page-content="architecture"`
   - By having relations: `--have-relations=verifiedBy,satisfiedBy` (comma-separated, must have ALL)
   - By not having relations: `--not-have-relations=verifiedBy` (comma-separated, must NOT have ALL)
+  - By having attachments: `--has-attachments` (filter elements with Attachments subsection)
+  - By attachment path pattern: `--filter-attachment <glob>` (supports glob patterns like `*.pdf`, `docs/*`)
 
 Short mode behavior:
 - Text output: Display abbreviated one-line format per element
@@ -156,6 +218,7 @@ Default output:
 
 #### Relations
   * derivedFrom: [Search Fine Grained Filtering](../System/Reporting.md#search-fine-grained-filtering)
+  * derivedFrom: [Reserved Subsections Support](../System/Subsections.md#reserved-subsections-support)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
   * verifiedBy: [Search Command Tests](../System/Reporting.md#search-command-tests)
@@ -293,14 +356,29 @@ Command output shall be written to stdout for easy redirection to files.
 
 ### CLI Change Impact Report Command
 
-The system shall provide a change and impact report function, activated by the (change-impact command), which shall generate change impact report
+The system shall provide a command-line interface for initiating change impact analysis and controlling output formats.
 
 #### Details
-Command options:
-- Must support `--json` option flag to output json formatted string
-- Shall provide a `--git-commit` option flag to specify the git commit hash for comparing changes
+Command invocation: `reqvire change-impact [OPTIONS]`
 
-The `--git-commit` flag shall be used with the CLI Change Impact Report Command to specify which commit to analyze for changes.
+**Analysis Options**:
+- `--git-commit <hash>`: Specify git commit hash for comparing changes
+- Support analyzing changes between git commits
+- Enable specifying elements to analyze by ID or pattern
+- Allow limiting analysis to specific relation types
+- Support depth limitations for large models
+
+**Output Options**:
+- `--json`: Output structured JSON impact data
+- Default to formatted text reports
+- Support Mermaid diagrams of impact trees
+- Integrate with HTML report generation
+
+**Integration Support**:
+- Support integration with CI/CD pipelines
+- Enable calling from external systems via API
+- Support webhook triggers for automated analysis
+- Allow scripting of analysis operations
 
 #### Relations
   * derivedFrom: [Structural Change Analyzer](../System/ChangeImpact.md#structural-change-analyzer)
@@ -533,3 +611,39 @@ This test verifies that the CLI help output displays all commands and their opti
   * verify: [CLI Coverage Command](#cli-coverage-command)
   * satisfiedBy: [test.sh](../../tests/test-cli-help-structure/test.sh)
 ---
+
+### CLI Git Commit Hash Flag Test
+
+This test verifies that the system properly handles the git commit hash flag for change impact analysis.
+
+#### Details
+
+##### Acceptance Criteria
+- System shall support --git-commit flag for change impact analysis
+- System shall use specified commit hash as base for comparison
+- System shall default to HEAD when flag is not specified
+- System shall handle relative commit references (HEAD~1, etc.)
+
+##### Test Criteria
+- Command with explicit --git-commit flag runs successfully
+- Command without flag defaults to HEAD commit
+- Relative commit references are correctly resolved
+- Invalid commit references are reported appropriately
+- Change impact analysis correctly uses specified commit as baseline
+
+##### Test Procedure
+1. Create test fixtures with git repository containing multiple commits
+2. Run Reqvire with --change-impact --git-commit=HEAD~1
+3. Verify that the specified commit is used as baseline
+4. Run Reqvire with --change-impact (no git-commit flag)
+5. Verify that HEAD is used as default baseline
+6. Run with invalid commit reference and verify appropriate error
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [CLI Change Impact Report Command](#cli-change-impact-report-command)
+  * satisfiedBy: [test.sh](../../tests/test-change-impact-detection/test.sh)
+---
+

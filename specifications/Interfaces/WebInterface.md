@@ -76,7 +76,7 @@ The system shall design and implement HTML pages with consistent layout, styling
   * derivedFrom: [Model Export](../UserStories.md#model-export)
   * derivedFrom: [Web Interface](Interfaces.md#web-interface)
   * derivedFrom: [CLI Interface Structure](CLI.md#cli-interface-structure)
-  * derivedFrom: [Deterministic Output for All Generated Content](../System/Reporting.md#deterministic-output-for-all-generated-content)
+  * derivedFrom: [Model Reports](../System/Reporting.md#model-reports)
   * satisfiedBy: [html_export.rs](../../core/src/html_export.rs)
   * satisfiedBy: [html.rs](../../core/src/html.rs)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)

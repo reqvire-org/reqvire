@@ -151,7 +151,7 @@ When validating and preparing target locations, the system shall:
 #### Relations
   * derivedFrom: [Element Manipulation Operations](ModelManagement.md#element-manipulation-operations)
   * derivedFrom: [Ignore Files Integration](Configuration.md#ignore-files-integration)
-  * derivedFrom: [Git Repository as Project Root](ModelManagement.md#git-repository-as-project-root)
+  * derivedFrom: [Git Repository As Project Root](ModelManagement.md#git-repository-as-project-root)
   * satisfiedBy: [utils.rs](../../core/src/utils.rs)
   * satisfiedBy: [graph_registry.rs](../../core/src/graph_registry.rs)
 ---
@@ -195,7 +195,7 @@ When creating a new element, the system shall:
 #### Relations
   * derivedFrom: [Element Manipulation File Persistence](#element-manipulation-file-persistence)
   * derivedFrom: [Target Location Validation and Auto-Creation](#target-location-validation-and-auto-creation)
-  * derivedFrom: [Structure and Addressing in Markdown Documents](ModelManagement.md#structure-and-addressing-in-markdown-documents)
+  * derivedFrom: [Structure and Addressing in Markdown Documents](StructureAndParsing.md#structure-and-addressing-in-markdown-documents)
   * satisfiedBy: [parser.rs](../../core/src/parser.rs)
   * satisfiedBy: [graph_registry.rs](../../core/src/graph_registry.rs)
   * satisfiedBy: [crud.rs](../../core/src/crud.rs)
@@ -1003,3 +1003,4 @@ The test shall verify that the `mv-file --squash` command moves all elements fro
   * verify: [Move File Operation](#move-file-operation)
   * satisfiedBy: [test.sh](../../tests/test-crud-mv-file-squash/test.sh)
 ---
+

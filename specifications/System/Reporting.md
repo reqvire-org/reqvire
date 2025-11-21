@@ -686,7 +686,7 @@ The filtering system must evaluate filters with minimal passes over element data
 
 ### Tracing Structural Changes
 
-When tracing structural changes, the system shall analyze the MBSE model and diffs to identify affected components and generate a report of impacted elements and structures, so that the user can review the changes and decide on further actions.
+When tracing structural changes, the system shall analyze the System model and diffs to identify affected components and generate a report of impacted elements and structures, so that the user can review the changes and decide on further actions.
 
 #### Metadata
   * type: user-requirement
@@ -754,11 +754,22 @@ This test verifies that the system correctly generates verification coverage rep
   * satisfiedBy: [test.sh](../../tests/test-coverage-report/test.sh)
 ---
 
-### Deterministic Output for All Generated Content
+### Validation Report Generator
 
-All generated content including reports, diagrams, exports, text, JSON, and HTML shall produce deterministic output with consistent ordering to enable reliable testing, version control, and reproducible builds.
+The system shall implement a validation report generator that compiles and formats validation results from all validators, providing a unified view of model quality with categorized issues, remediation suggestions, and compliance metrics.
+
+#### Relations
+  * derivedFrom: [Provide Validation Reports](#provide-validation-reports)
+  * satisfiedBy: [model.rs](../../core/src/model.rs)
+---
+
+### Model Reports
+
+When requested the system shall provide human readable and machine readable System model reports.
 
 #### Details
+All generated reports shall produce deterministic output with consistent ordering to enable reliable testing, version control, and reproducible builds.
+
 The system shall ensure deterministic output by:
 
 1. **Element Ordering**: Elements shall be sorted by identifier before iteration to ensure consistent processing order across all operations
@@ -771,38 +782,14 @@ This determinism ensures that:
 - Automated tests can reliably compare expected and actual outputs using simple diff tools without special normalization
 - Version control diffs are meaningful and reflect actual changes rather than random ordering variations
 - Continuous integration pipelines produce consistent, reproducible results
-- Generated diagrams maintain stable node and relation ordering for easier review
 
-This requirement applies to all capabilities and operations that generate output, including but not limited to:
-- Diagram generation - Mermaid diagrams embedded in markdown files
-- Documentation export - Complete HTML documentation with all pages
+This requirement applies to all report operations, including:
 - Model summary reporting - Summary reports in text and JSON formats
-- Section summary reporting - Section-focused summaries
 - Verification tracing - Upward traceability trees from verifications to requirements
 - Coverage reporting - Verification coverage analysis
 - Change impact analysis - Reports showing propagation of changes
 - Validation reporting - Model validation error reports
 - Linting - Model quality issue reports
-- All JSON output formats
-- All HTML output formats
-- All text output formats
-
-#### Relations
-  * derivedFrom: [Model Reports](#model-reports)
----
-
-### Validation Report Generator
-
-The system shall implement a validation report generator that compiles and formats validation results from all validators, providing a unified view of model quality with categorized issues, remediation suggestions, and compliance metrics.
-
-#### Relations
-  * derivedFrom: [Provide Validation Reports](#provide-validation-reports)
-  * satisfiedBy: [model.rs](../../core/src/model.rs)
----
-
-### Model Reports
-
-When requested the system shall provide human readable MBSE model reports.
 
 #### Metadata
   * type: user-requirement
@@ -995,283 +982,13 @@ This test verifies that the verification-traces command filter options work corr
 
 ### Model Structure and Summaries
 
-When requested the system shall generate reports summarizing the structure and relationships in the MBSE model, including counts and types of connections also supporting json and cypher output.
+When requested the system shall generate reports summarizing the structure and relationships in the System model, including counts and types of connections also supporting json and cypher output.
 
 #### Metadata
   * type: user-requirement
 
 #### Relations
-  * derivedFrom: [Deterministic Output for All Generated Content](#deterministic-output-for-all-generated-content)
----
-
-### Requirements Change Propagation
-
-When a requirement is changed, the system shall propagate the change through related requirements, verification artifacts, and design elements according to relation type definitions and propagation rules.
-
-#### Details
-<details>
-<summary>View Full Specification</summary>
-
-
-## Change Impact Propagation in Requirements
-
-Requirements are interconnected through relations, and changes to a requirement may affect related requirements, verification methods, design specifications, or software components.
-
-Changes propagate based on the relation type, which determines the impact direction and scope.
-
-Changes to high-level requirements cascade down to implementation.
-Verification artifacts must be marked for revalidation to reflect changes.
-Automated tools should flag all impacted requirements for review.
-
-### Relation Categories for Change Propagation
-
-For change propagation purposes, relations can be categorized into several groups:
-
-1. **Hierarchical Relations** - Changes propagate from parent to child elements (derivedFrom)
-2. **Satisfaction Relations** - Changes to requirements affect implementations (satisfiedBy)
-3. **Verification Relations** - Changes to requirements invalidate verifications (verifiedBy)
-4. **Traceability Relations** - No change propagation, for documentation only (trace)
-
----
-
-
-## Change Propagation Mechanism
-
-When a requirement changes, impact analysis must be conducted based on its relations. The following mechanism ensures traceability and controlled updates.
-
-- Identify Impacted Relations
-  - When a requirement is modified, check its Relations subsection to identify linked elements.
-- Determine Change Propagation Scope
-  - Apply the rules in Relation Types and Change Propagation Rules to assess whether the change affects child requirements, design artifacts, verification, or other linked documents.
-- Invalidate Affected Elements
-  - If a related element is impacted, flag it for review.  
-  - Example: If a requirement verified by a test changes, the test must be reviewed.
-- Require Re-validation or Re-design
-  - If changes affect satisfaction (e.g., code or architecture), update the relevant design.  
-  - If changes affect verification, update test cases or validation documents.
-- If a change results in a requirement being merged, split, or removed, update its Relations to maintain traceability.
-
-## Examples of Change Propagation
-
-
-### Parent-Child Requirement Change
-
-```markdown
-
----
-
-### Parent Requirement
-This requirement defines a high-level system constraint.
-
-#### Relations
-  * derive: [Child Requirement](#child-requirement)
-
-
----
-
-### Child Requirement
-This requirement defines additional functionality.
-
-```
-
-If Parent Requirement changes, Child Requirement must be reviewed and updated.
-
-
----
-
-### Requirement Satisfied by a Design Specification
-
-```markdown
-
----
-
-### Functional Requirement
-
-The system shall process transactions within 500ms.
-
-#### Relations
-  * satisfiedBy: [architecture/system_design.md/Performance Constraints](architecture/system_design.md#performance-constraints)
-```
-
-If Functional Requirement changes, Performance Constraints in the architecture document must be updated.
-
-
-
----
-
-### Requirement Verified by a Test
-
-```
-
----
-
-### Safety Requirement
-
-The system shall shut down if temperature exceeds 100°C.
-
-#### Relations
-  * verifiedBy: [test_cases/safety_verification.md/Overheat Shutdown Test](test_cases/safety_verification.md#overheat-shutdown-test)
-
-```
-
-If Safety Requirement changes, the Overheat Shutdown Test must be reviewed for update and executed again for verification.
-
-
-
----
-
-### Example of Multi-Level Change Propagation in Requirements
-
-The following analysis explains how a **change in the requirement**  propagates through multiple levels of related requirements, impacting their definitions, design artifacts, and verification processes.
-
----
-
-```
-### Root Requirement: System Power Management
-
-The system shall implement power-saving mechanisms to optimize battery usage.  
-
----
-
-### Power Saving Mode
-
-The system shall activate power-saving mode when the battery level drops below 20%.  
-
-#### Relations
-  * deriveFrom: [System Power Management](#system-power-management)
-  * satisfiedBy: [software/power_control.md](software/power_control.md)
-  * verifiedBy: [test_cases/power_saving.md](test_cases/power_saving.md)
-
----
-
-### CPU Power Reduction
-
-The system shall reduce CPU frequency by 30% in power-saving mode.  
-
-#### Relations
-  * deriveFrom: [Power Saving Mode](#power-saving-mode)
-  * satisfiedBy: [firmware/cpu_manager.md](firmware/cpu_manager.md)
-  * verifiedBy: [test_cases/cpu_throttling.md](test_cases/cpu_throttling.md)
-
----
-
-### Screen Brightness Adjustment
-
-The system shall reduce screen brightness by 40% in power-saving mode.  
-
-#### Relations
-  * deriveFrom: [Power Saving Mode](#power-saving-mode)
-  * verifiedBy: [test_cases/screen_brightness.md](test_cases/screen_brightness.md)
-
----
-
-### Battery Optimization
-
-The system shall disable non-essential background services when battery levels drop below 15%.  
-
-#### Relations
-  * deriveFrom: [System Power Management](#system-power-management)
-  * satisfiedBy: [software/battery_manager.md](software/battery_manager.md)
-  * verifiedBy: [test_cases/battery_saving.md](test_cases/battery_saving.md)
-
----
-
-### Network Power Optimization
-The system shall reduce network polling frequency when battery levels drop below 15%.  
-
-#### Relations
-  * deriveFrom: [Battery Optimization](#battery-optimization)
-  * satisfiedBy: [software/network_manager.md](software/network_manager.md)
-```
-
-**Power Saving Mode** requirment has been changed to:
->The system shall activate power-saving mode when the battery level drops below 30%.
-
-
-Change Propagation Flow:
-1. A **change** in **Power Saving Mode** flows **downward** to **CPU Power Reduction**.
-2. A **change** in **Power Saving Mode** flows **downward** to **Screen Brightness Adjustment**.
-3. Additionally, all **satisfiedBy** and **verifiedBy** relations from affected requirements must be reviewed:
-   - **Power Saving Mode** → **software/power_control.md** (implementation) & **test_cases/power_saving.md** (verification).  
-   - **CPU Power Reduction** → **firmware/cpu_manager.md** (implementation) & **test_cases/cpu_throttling.md** (verification).  
-   - **Screen Brightness Adjustment** → **[test_cases/screen_brightness.md** (verification).  
-
-
-Mermaid diagram showing relations:
-```mermaid
-flowchart TD;
-    %% Define Classes
-    classDef requirement fill:#D0E0FF,stroke:#0066FF,stroke-width:2px;
-    classDef implementation fill:#DFFFD0,stroke:#009900,stroke-width:2px;
-    classDef verification fill:#FFF7B3,stroke:#CC9900,stroke-width:2px;
-
-    %% Requirements Hierarchy
-    A[System Power Management]:::requirement
-    A -->|deriveReqt| B[Power Saving Mode]:::requirement
-    B -->|deriveReqt| C[CPU Power Reduction]:::requirement
-    B -->|deriveReqt| D[Screen Brightness Adjustment]:::requirement
-    A -->|deriveReqt| E[Battery Optimization]:::requirement 
-    E -->|deriveReqt| G[Network Power Optimization]:::requirement
-
-    %% Implementations (Satisfied By)
-    B -->|satisfiedBy| SB1[software/power_control.md]:::implementation
-    C -->|satisfiedBy| SB2[firmware/cpu_manager.md]:::implementation
-    E -->|satisfiedBy| SB3[software/battery_manager.md]:::implementation
-    G -->|satisfiedBy| SB4[software/network_manager.md]:::implementation
-
-    %% Verifications (Verified By)
-    B -->|verifiedBy| VB1[test_cases/power_saving.md]:::verification
-    C -->|verifiedBy| VB2[test_cases/cpu_throttling.md]:::verification
-    D -->|verifiedBy| VB3[test_cases/screen_brightness.md]:::verification
-    E -->|verifiedBy| VB4[test_cases/battery_saving.md]:::verification
-```
-
-Legend:
-- **🟦 Requirements (Blue)** → Directly from your provided requirements.  
-- **🟩 Implementations (Green)** → Only **satisfiedBy** links
-- **🟨 Verifications (Yellow)** → Only **verifiedBy** links
-
-Change propagation flow diagram:
-```mermaid
-flowchart TD;
-    %% Define Classes
-    classDef requirement fill:#D0E0FF,stroke:#0066FF,stroke-width:2px;
-    classDef implementation fill:#DFFFD0,stroke:#009900,stroke-width:2px;
-    classDef verification fill:#FFF7B3,stroke:#CC9900,stroke-width:2px;
-    classDef changed fill:#FFDD57,stroke:#FF7700,stroke-width:2px;
-    classDef impacted fill:#FFAAAA,stroke:#FF0000,stroke-width:2px;
-    classDef validate fill:#E0D0FF,stroke:#6600CC,stroke-width:2px;
-
-    %% Change Propagation Paths
-    B[Power Saving Mode]
-    B -->|Impacts| A[CPU Power Reduction]:::impacted
-    B -->|Impacts| D[Screen Brightness Adjustment]:::impacted
-
-    %% Impact on Implementation (Code / Design)
-    B -->|Requires Update| SB1[software/power_control.md]:::implementation
-    A -->|Requires Update| SB2[firmware/cpu_manager.md]:::implementation
-
-
-    %% Impact on Verification (Test Cases)
-    B -->|Revalidate + Maybe Requires Update| VB1[test_cases/power_saving.md]:::verification
-    D -->|Revalidate + Maybe Requires Update| VB3[test_cases/screen_brightness.md]:::verification
-    A -->|Revalidate + Maybe Requires Update| VB4[test_cases/cpu_throttling.md]:::verification
-    
-
-    %% Arrange Classes
-    class C changed;
-    class A,B,D,E,G impacted;
-    class SB1,SB2,SB3,SB4 implementation;
-    class VB1,VB2,VB3,VB4 verification;
-    class V validate;
-
-
-```
-
-</details>
-
-#### Relations
-  * derivedFrom: [Tracing Structural Changes](#tracing-structural-changes)
+  * derivedFrom: [Model Reports](#model-reports)
 ---
 
 ### Containment View Mermaid Diagram Test
@@ -1664,7 +1381,7 @@ This test verifies that the system correctly tracks and displays custom element 
 
 ### Provide Validation Reports
 
-The system shall generate detailed validation reports, highlighting any inconsistencies or errors in the MBSE model structure.
+The system shall generate detailed validation reports, highlighting any inconsistencies or errors in the System model structure.
 
 #### Details
 Validation shall be performed automatically when any command requires the parsed model, eliminating the need for a separate validation command. Commands that operate on raw files shall skip validation to allow operation on potentially invalid documents.
@@ -1674,7 +1391,7 @@ Validation shall be performed automatically when any command requires the parsed
 
 #### Relations
   * derivedFrom: [Align with Industry Standards](../UserStories.md#align-with-industry-standards)
-  * derivedFrom: [Deterministic Output for All Generated Content](#deterministic-output-for-all-generated-content)
+  * derivedFrom: [Model Reports](#model-reports)
 ---
 
 ### Verification Coverage Report
@@ -1708,7 +1425,7 @@ The report helps track verification completeness and identify gaps in requiremen
   * type: user-requirement
 
 #### Relations
-  * derivedFrom: [Deterministic Output for All Generated Content](#deterministic-output-for-all-generated-content)
+  * derivedFrom: [Model Reports](#model-reports)
 ---
 
 ### Verification Upward Traceability
@@ -1724,3 +1441,4 @@ The system shall provide upward traceability visualization from verifications to
 #### Relations
   * derivedFrom: [Verification Coverage Report](#verification-coverage-report)
 ---
+

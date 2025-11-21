@@ -49,6 +49,19 @@ As a **System Engineer**, I want to generate diagrams for different system viewp
 
 As a **Manager**, I want to export specifications into diferent formats including HTML, so that I can communicate system architecture effectively.
 
+#### Details
+All exports shall produce deterministic output with consistent ordering to enable reliable version control and reproducible builds.
+
+The system shall ensure deterministic export output by:
+- Sorting elements by identifier before processing
+- Sorting relations by type and target identifier
+- Maintaining consistent file ordering alphabetically
+
+This determinism ensures that:
+- Running exports multiple times produces byte-identical output
+- Version control diffs reflect actual content changes
+- Continuous integration pipelines produce reproducible results
+
 #### Metadata
   * type: user-requirement
 ---
@@ -82,7 +95,7 @@ As a **Contributor**, I want Reqvire to integrate seamlessly with GitHub workflo
 
 ### Provide Reports
 
-As a **Manager**, I want to generate structured reports based on the MBSE model, so that I can track progress and ensure alignment with organizational objectives.
+As a **Manager**, I want to generate structured reports based on the System model, so that I can track progress and ensure alignment with organizational objectives.
 
 #### Metadata
   * type: user-requirement
@@ -90,7 +103,7 @@ As a **Manager**, I want to generate structured reports based on the MBSE model,
 
 ### Trace Changes in System Model
 
-As a **System Engineer**, I want to trace changes in the MBSE model to identify affected components and ensure all updates are consistent across the system.
+As a **System Engineer**, I want to trace changes in the System model to identify affected components and ensure all updates are consistent across the system.
 
 #### Metadata
   * type: user-requirement
@@ -103,3 +116,4 @@ As a **Contributor**, I want Reqvire tools to be intuitive and well-documented, 
 #### Metadata
   * type: user-requirement
 ---
+

@@ -92,7 +92,7 @@ This verification test checks that Reqvire correctly identifies and reports inva
   * verify: [Internal Consistency Validator](#internal-consistency-validator)
   * verify: [Relation Type Validation](#relation-type-validation)
   * verify: [Relation Element Type Validator](#relation-element-type-validator)
-  * verify: [Identifiers and Relations](ModelManagement.md#identifiers-and-relations)
+  * verify: [Identifiers and Relations](StructureAndParsing.md#identifiers-and-relations)
   * verify: [Trace Relation Non-Directional Behavior](DiagramGeneration.md#trace-relation-non-directional-behavior)
   * satisfiedBy: [test.sh](../../tests/test-invalid-relations/test.sh)
 ---
@@ -340,7 +340,7 @@ This test verifies that Reqvire correctly detects and reports invalid header str
 
 #### Relations
   * verify: [Markdown Structure Validator](#markdown-structure-validator)
-  * verify: [Structure and Addressing in Markdown Documents](ModelManagement.md#structure-and-addressing-in-markdown-documents)
+  * verify: [Structure and Addressing in Markdown Documents](StructureAndParsing.md#structure-and-addressing-in-markdown-documents)
   * satisfiedBy: [test.sh](../../tests/test-invalid-relations/test.sh)
 ---
 
@@ -362,7 +362,7 @@ Rationale: Element names serve as stable IDs for element identity, independent o
 
 #### Relations
   * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
-  * derivedFrom: [Element Identity Model](ModelManagement.md#element-identity-model)
+  * derivedFrom: [Element Identity Model](StructureAndParsing.md#element-identity-model)
   * satisfiedBy: [model.rs](../../core/src/model.rs)
   * satisfiedBy: [parser.rs](../../core/src/parser.rs)
   * verifiedBy: [Invalid Relations Test](#invalid-relations-test)
@@ -594,5 +594,6 @@ The system shall validate relation types and allow only supported types.
 #### Relations
   * derivedFrom: [Validating Structures](../UserStories.md#validating-structures)
   * derivedFrom: [Align with Industry Standards](../UserStories.md#align-with-industry-standards)
-  * derivedFrom: [Relation Types and behaviors](ModelManagement.md#relation-types-and-behaviors)
+  * derivedFrom: [Relation Types And Behaviors](ModelManagement.md#relation-types-and-behaviors)
 ---
+

@@ -2,9 +2,10 @@
 
 This document specifies verifications for the Attachments feature requirements.
 
----
+## Requirements
 
 ### Attachments Subsection Parsing Verification
+
 Verify the system correctly parses Attachments subsections.
 
 #### Details
@@ -16,14 +17,14 @@ Test cases:
 - Reject links where text ≠ href
 
 #### Metadata
-* type: test-verification
+  * type: test-verification
 
 #### Relations
-* verify: [Attachment Parsing](Attachments.md#attachment-parsing)
-
+  * verify: [Reserved Subsections Support](Subsections.md#reserved-subsections-support)
 ---
 
 ### Attachments Validation Verification
+
 Verify the system validates attachment file existence.
 
 #### Details
@@ -34,14 +35,15 @@ Test cases:
 - Validation occurs in Pass 2
 
 #### Metadata
-* type: test-verification
+  * type: test-verification
 
 #### Relations
-* verify: [Attachment Validation](Attachments.md#attachment-validation)
-
+  * verify: [Reserved Subsections Support](Subsections.md#reserved-subsections-support)
+  * satisfiedBy: [test.sh](../../tests/test-attachments/test.sh)
 ---
 
 ### Attachments Change Impact Verification
+
 Verify attach/detach operations trigger change impact analysis.
 
 #### Details
@@ -56,14 +58,11 @@ Test cases:
 - Change impact propagates through derivedFrom relations
 
 #### Metadata
-* type: test-verification
-
-#### Relations
-* verify: [Attachment Change Impact](Attachments.md#attachment-change-impact)
-
+  * type: test-verification
 ---
 
 ### Attach Command Verification
+
 Verify attach command creates Attachments subsection and adds links.
 
 #### Details
@@ -76,14 +75,15 @@ Test cases:
 - Validation passes after attach
 
 #### Metadata
-* type: test-verification
+  * type: test-verification
 
 #### Relations
-* verify: [Attach Command](Attachments.md#attach-command)
-
+  * verify: [Attachment Commands](../Interfaces/CLI.md#attachment-commands)
+  * satisfiedBy: [test.sh](../../tests/test-attachments/test.sh)
 ---
 
 ### Detach Command Verification
+
 Verify detach command removes links and cleans up empty subsections.
 
 #### Details
@@ -97,14 +97,15 @@ Test cases:
 - Change impact analysis shows element as changed
 
 #### Metadata
-* type: test-verification
+  * type: test-verification
 
 #### Relations
-* verify: [Detach Command](Attachments.md#detach-command)
-
+  * verify: [Attachment Commands](../Interfaces/CLI.md#attachment-commands)
+  * satisfiedBy: [test.sh](../../tests/test-attachments/test.sh)
 ---
 
 ### Move Attachment Command Verification
+
 Verify mv-attachment updates all references across elements.
 
 #### Details
@@ -117,14 +118,15 @@ Test cases:
 - Validation passes after move
 
 #### Metadata
-* type: test-verification
+  * type: test-verification
 
 #### Relations
-* verify: [Move Attachment Command](Attachments.md#move-attachment-command)
-
+  * verify: [Attachment Commands](../Interfaces/CLI.md#attachment-commands)
+  * satisfiedBy: [test.sh](../../tests/test-attachments/test.sh)
 ---
 
 ### Remove Attachment Command Verification
+
 Verify rm-attachment deletes file and detaches from all elements.
 
 #### Details
@@ -137,14 +139,15 @@ Test cases:
 - Validation passes after removal
 
 #### Metadata
-* type: test-verification
+  * type: test-verification
 
 #### Relations
-* verify: [Remove Attachment Command](Attachments.md#remove-attachment-command)
-
+  * verify: [Attachment Commands](../Interfaces/CLI.md#attachment-commands)
+  * satisfiedBy: [test.sh](../../tests/test-attachments/test.sh)
 ---
 
 ### Attachment Search Filters Verification
+
 Verify search filters correctly find elements by attachments.
 
 #### Details
@@ -156,14 +159,15 @@ Test cases:
 - No false positives or false negatives
 
 #### Metadata
-* type: test-verification
+  * type: test-verification
 
 #### Relations
-* verify: [Attachment Search Filters](Attachments.md#attachment-search-filters)
-
+  * verify: [CLI Search Command](../Interfaces/CLI.md#cli-search-command)
+  * satisfiedBy: [test.sh](../../tests/test-attachments/test.sh)
 ---
 
 ### Attachment Output Rendering Verification
+
 Verify attachments render correctly in all output formats.
 
 #### Details
@@ -175,9 +179,6 @@ Test cases:
 - Consistent indentation in markdown
 
 #### Metadata
-* type: test-verification
-
-#### Relations
-* verify: [Attachment Output Rendering](Attachments.md#attachment-output-rendering)
-
+  * type: test-verification
 ---
+
