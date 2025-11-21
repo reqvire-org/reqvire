@@ -2,7 +2,6 @@
 
 This is a requirements document specifically created for testing diagram generation.
 
-## Section 1
 
 ### Root Requirement
 
@@ -33,7 +32,6 @@ This is another test element with relations.
   * trace: [Element 1](#element-1)
   * derivedFrom: [Element 1](#element-1)
 
-## Section 2
 
 
 

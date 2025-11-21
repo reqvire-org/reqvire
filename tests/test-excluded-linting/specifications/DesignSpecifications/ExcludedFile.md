@@ -2,7 +2,6 @@
 
 This file should be excluded from linting.
 
-## Overview
 
 ### DSD-001 Design Element With  Extra  Spaces
 

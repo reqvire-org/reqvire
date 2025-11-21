@@ -14,11 +14,6 @@ pub struct VerificationTracesReport {
 
 #[derive(Debug, Serialize)]
 pub struct FileVerifications {
-    pub sections: BTreeMap<String, SectionVerifications>,
-}
-
-#[derive(Debug, Serialize)]
-pub struct SectionVerifications {
     pub verifications: Vec<VerificationTrace>,
 }
 
@@ -26,7 +21,6 @@ pub struct SectionVerifications {
 pub struct VerificationTrace {
     pub identifier: String,
     pub name: String,
-    pub section: String,
     pub file: String,
     #[serde(rename = "type")]
     pub verification_type: String,
@@ -35,7 +29,7 @@ pub struct VerificationTrace {
     pub directly_verified_count: usize,
     pub total_requirements_in_tree: usize,
     #[serde(skip)]
-    section_order_index: usize,
+    file_order_index: usize,
 }
 
 #[derive(Debug, Serialize)]
@@ -86,16 +80,14 @@ impl<'a> VerificationTraceGenerator<'a> {
         }
 
         // Sort verification data for deterministic output
-        // BTreeMap keeps files and sections sorted alphabetically automatically
+        // BTreeMap keeps files sorted alphabetically automatically
         for file_verifications in files.values_mut() {
-            for section_verifications in file_verifications.sections.values_mut() {
-                // Sort directly verified requirements alphabetically
-                for verification in &mut section_verifications.verifications {
-                    verification.directly_verified_requirements.sort();
-                }
-                // Sort verifications alphabetically by identifier
-                section_verifications.verifications.sort_by(|a, b| a.identifier.cmp(&b.identifier));
+            // Sort directly verified requirements alphabetically
+            for verification in &mut file_verifications.verifications {
+                verification.directly_verified_requirements.sort();
             }
+            // Sort verifications by file_order_index for document order
+            file_verifications.verifications.sort_by_key(|v| v.file_order_index);
         }
 
         VerificationTracesReport { files }
@@ -135,31 +127,23 @@ impl<'a> VerificationTraceGenerator<'a> {
         let trace = VerificationTrace {
             identifier: verification.identifier.clone(),
             name: verification.name.clone(),
-            section: verification.section.clone(),
             file: verification.file_path.clone(),
             verification_type: verification.element_type.as_str().to_string(),
             directly_verified_count: directly_verified.len(),
             directly_verified_requirements: directly_verified.clone(),
             trace_tree,
             total_requirements_in_tree: total_count,
-            section_order_index: verification.section_order_index,
+            file_order_index: verification.file_order_index,
         };
 
-        // Add to hierarchical structure
+        // Add to file-level structure
         let file_entry = files
             .entry(verification.file_path.clone())
             .or_insert_with(|| FileVerifications {
-                sections: BTreeMap::new(),
-            });
-
-        let section_entry = file_entry
-            .sections
-            .entry(verification.section.clone())
-            .or_insert_with(|| SectionVerifications {
                 verifications: Vec::new(),
             });
 
-        section_entry.verifications.push(trace);
+        file_entry.verifications.push(trace);
     }
 
     /// Build trace tree from directly verified requirements
@@ -492,36 +476,22 @@ impl<'a> VerificationTraceGenerator<'a> {
         for (file_path, file_verifications) in &report.files {
             markdown.push_str(&format!("## File: {}\n\n", file_path));
 
-            // Sort sections by section_order from registry for deterministic output
-            let mut sorted_sections: Vec<_> = file_verifications.sections.iter().collect();
-            sorted_sections.sort_by_key(|(section_name, _)| {
-                let section_key = crate::graph_registry::SectionKey::new(file_path.clone(), section_name.to_string());
-                self.registry.sections.get(&section_key).map(|s| s.section_order).unwrap_or(0)
-            });
+            // Verifications are already sorted by file_order_index in generate()
+            for trace in &file_verifications.verifications {
+                markdown.push_str(&format!("### {}\n\n", trace.name));
+                markdown.push_str(&format!("- **Type**: {}\n", trace.verification_type));
+                markdown.push_str(&format!(
+                    "- **Directly Verified**: {} requirements\n",
+                    trace.directly_verified_count
+                ));
+                markdown.push_str(&format!(
+                    "- **Total in Tree**: {} requirements\n\n",
+                    trace.total_requirements_in_tree
+                ));
 
-            for (section_name, section_verifications) in sorted_sections {
-                markdown.push_str(&format!("### Section: {}\n\n", section_name));
-
-                // Sort verifications by document order (section_order_index)
-                let mut sorted_verifications: Vec<_> = section_verifications.verifications.iter().collect();
-                sorted_verifications.sort_by_key(|v| v.section_order_index);
-
-                for trace in sorted_verifications {
-                    markdown.push_str(&format!("#### {}\n\n", trace.name));
-                    markdown.push_str(&format!("- **Type**: {}\n", trace.verification_type));
-                    markdown.push_str(&format!(
-                        "- **Directly Verified**: {} requirements\n",
-                        trace.directly_verified_count
-                    ));
-                    markdown.push_str(&format!(
-                        "- **Total in Tree**: {} requirements\n\n",
-                        trace.total_requirements_in_tree
-                    ));
-
-                    // Add Mermaid diagram
-                    markdown.push_str(&self.generate_mermaid_diagram(trace));
-                    markdown.push_str("\n\n");
-                }
+                // Add Mermaid diagram
+                markdown.push_str(&self.generate_mermaid_diagram(trace));
+                markdown.push_str("\n\n");
             }
         }
 
@@ -546,41 +516,36 @@ pub fn apply_filters(
         None
     };
 
-    // Filter verifications in each file/section
+    // Filter verifications in each file
     for file_verifications in report.files.values_mut() {
-        for section_verifications in file_verifications.sections.values_mut() {
-            section_verifications.verifications.retain(|v| {
-                // Filter by ID
-                if let Some(id) = filter_id {
-                    if v.identifier != id {
-                        return false;
-                    }
+        file_verifications.verifications.retain(|v| {
+            // Filter by ID
+            if let Some(id) = filter_id {
+                if v.identifier != id {
+                    return false;
                 }
+            }
 
-                // Filter by name regex
-                if let Some(ref regex) = name_regex {
-                    if !regex.is_match(&v.name) {
-                        return false;
-                    }
+            // Filter by name regex
+            if let Some(ref regex) = name_regex {
+                if !regex.is_match(&v.name) {
+                    return false;
                 }
+            }
 
-                // Filter by type
-                if let Some(vtype) = filter_type {
-                    if v.verification_type != vtype {
-                        return false;
-                    }
+            // Filter by type
+            if let Some(vtype) = filter_type {
+                if v.verification_type != vtype {
+                    return false;
                 }
+            }
 
-                true
-            });
-        }
-
-        // Remove empty sections
-        file_verifications.sections.retain(|_, s| !s.verifications.is_empty());
+            true
+        });
     }
 
     // Remove empty files
-    report.files.retain(|_, f| !f.sections.is_empty());
+    report.files.retain(|_, f| !f.verifications.is_empty());
 
     Ok(report)
 }

@@ -16,7 +16,7 @@ use reqvire::verification_trace;
 use crate::serve;
 use reqvire::lint;
 use reqvire::GraphRegistry;
-use reqvire::graph_registry::{Page, Section};
+use reqvire::graph_registry::Page;
 use reqvire::element::Element;
 use reqvire::format::{format_files, render_diff, render_diff_json};
 use reqvire::diff::{render_crud_result, render_crud_json};
@@ -95,7 +95,7 @@ pub enum Commands {
     RemoveDiagrams,
 
     /// Search and filter model elements with comprehensive filtering options
-    #[clap(override_help = "Search and filter model elements with comprehensive filtering options\n\nSEARCH OPTIONS:\n      --json                            Output results in JSON format\n      --short                           Output abbreviated format (one-line per element)\n      --filter-file <GLOB>              Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`\n      --filter-name <REGEX>             Only include elements whose name matches this regular expression\n      --filter-section <GLOB>           Only include sections whose name matches this glob pattern e.g. `System requirement*`\n      --filter-type <TYPE>              Only include elements of the given type e.g. `user-requirement`, `system-requirement`, `verification`\n      --filter-content <REGEX>          Only include elements whose content matches this regular expression\n      --filter-section-content <REGEX>  Only include elements whose parent section content matches this regular expression\n      --filter-page-content <REGEX>     Only include elements whose parent file page content matches this regular expression\n      --have-relations <LIST>           Only include elements that have ALL specified relations (comma-separated)\n      --not-have-relations <LIST>       Only include elements that do NOT have ALL specified relations (comma-separated)")]
+    #[clap(override_help = "Search and filter model elements with comprehensive filtering options\n\nSEARCH OPTIONS:\n      --json                            Output results in JSON format\n      --short                           Output abbreviated format (one-line per element)\n      --filter-file <GLOB>              Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`\n      --filter-name <REGEX>             Only include elements whose name matches this regular expression\n      --filter-type <TYPE>              Only include elements of the given type e.g. `user-requirement`, `system-requirement`, `verification`\n      --filter-content <REGEX>          Only include elements whose content matches this regular expression\n      --filter-page-content <REGEX>     Only include elements whose parent file page content matches this regular expression\n      --have-relations <LIST>           Only include elements that have ALL specified relations (comma-separated)\n      --not-have-relations <LIST>       Only include elements that do NOT have ALL specified relations (comma-separated)")]
     Search {
         /// Output results in JSON format
         #[clap(long, help_heading = "SEARCH OPTIONS")]
@@ -113,10 +113,6 @@ pub enum Commands {
         #[clap(long, value_name = "REGEX", help_heading = "SEARCH OPTIONS")]
         filter_name: Option<String>,
 
-        /// Only include sections whose name matches this glob pattern e.g. `System requirement*`
-        #[clap(long, value_name = "GLOB", help_heading = "SEARCH OPTIONS")]
-        filter_section: Option<String>,
-
         /// Only include elements of the given type e.g. `user-requirement`, `system-requirement`, `verification`
         #[clap(long, value_name = "TYPE", help_heading = "SEARCH OPTIONS")]
         filter_type: Option<String>,
@@ -124,10 +120,6 @@ pub enum Commands {
         /// Only include elements whose content matches this regular expression
         #[clap(long, value_name = "REGEX", help_heading = "SEARCH OPTIONS")]
         filter_content: Option<String>,
-
-        /// Only include elements whose parent section content matches this regular expression
-        #[clap(long, value_name = "REGEX", help_heading = "SEARCH OPTIONS")]
-        filter_section_content: Option<String>,
 
         /// Only include elements whose parent file page content matches this regular expression
         #[clap(long, value_name = "REGEX", help_heading = "SEARCH OPTIONS")]
@@ -238,17 +230,13 @@ pub enum Commands {
     },
 
     /// Add new element to model from Markdown definition
-    #[clap(override_help = "Add new element to model from Markdown definition\n\nADD OPTIONS:\n      --to-file <FILE>           Target file path (relative to git repository root)\n      --to-section <SECTION>     Target section name\n      --index <INDEX>            Index within section (0-based, defaults to end)\n      --dry-run                  Preview changes without applying\n      --json                     Output results in JSON format\n\nUSAGE:\n    reqvire add <file> [<section>] [<index>]           # reads element from stdin\n    reqvire add <file> [<section>] [<index>] <element>  # element as last argument\n    reqvire add --to-file=<file> --to-section=<section> --index=<n> < element.md")]
+    #[clap(override_help = "Add new element to model from Markdown definition\n\nADD OPTIONS:\n      --to-file <FILE>           Target file path (relative to git repository root)\n      --index <INDEX>            Index within file (0-based, defaults to end)\n      --dry-run                  Preview changes without applying\n      --json                     Output results in JSON format\n\nUSAGE:\n    reqvire add <file> [<index>]           # reads element from stdin\n    reqvire add <file> [<index>] <element>  # element as last argument\n    reqvire add --to-file=<file> --index=<n> < element.md")]
     Add {
         /// Target file path (relative to git repository root)
         #[clap(long, value_name = "FILE", help_heading = "ADD OPTIONS")]
         to_file: Option<String>,
 
-        /// Target section name
-        #[clap(long, value_name = "SECTION", help_heading = "ADD OPTIONS")]
-        to_section: Option<String>,
-
-        /// Index within section (0-based, defaults to end)
+        /// Index within file (0-based, defaults to end)
         #[clap(long, value_name = "INDEX", help_heading = "ADD OPTIONS")]
         index: Option<usize>,
 
@@ -281,7 +269,7 @@ pub enum Commands {
     },
 
     /// Move element to different location
-    #[clap(override_help = "Move element to different location\n\nMV OPTIONS:\n       <ELEMENT_NAME>           Element name\n      --to-file <FILE>          Target file path (relative to git repository root)\n      --to-section <SECTION>    Target section name\n      --index <INDEX>           Index within section (0-based, defaults to end)\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n\nUSAGE:\n    reqvire mv <element-name> <file> [<section>] [<index>]\n    reqvire mv <element-name> --to-file=<file> --to-section=<section> --index=<n>")]
+    #[clap(override_help = "Move element to different location\n\nMV OPTIONS:\n       <ELEMENT_NAME>           Element name\n      --to-file <FILE>          Target file path (relative to git repository root)\n      --index <INDEX>           Index within file (0-based, defaults to end)\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n\nUSAGE:\n    reqvire mv <element-name> <file> [<index>]\n    reqvire mv <element-name> --to-file=<file> --index=<n>")]
     Mv {
         /// Element name
         element_name: String,
@@ -290,11 +278,7 @@ pub enum Commands {
         #[clap(long, value_name = "FILE", help_heading = "MV OPTIONS")]
         to_file: Option<String>,
 
-        /// Target section name
-        #[clap(long, value_name = "SECTION", help_heading = "MV OPTIONS")]
-        to_section: Option<String>,
-
-        /// Index within section (0-based, defaults to end)
+        /// Index within file (0-based, defaults to end)
         #[clap(long, value_name = "INDEX", help_heading = "MV OPTIONS")]
         index: Option<usize>,
 
@@ -698,10 +682,8 @@ pub fn handle_command(
             short,
             filter_file,
             filter_name,
-            filter_section,
             filter_type,
             filter_content,
-            filter_section_content,
             filter_page_content,
             have_relations,
             not_have_relations,
@@ -712,10 +694,8 @@ pub fn handle_command(
             let filters = reqvire::search::SearchFilters::new(
                 filter_file.as_deref(),
                 filter_name.as_deref(),
-                filter_section.as_deref(),
                 filter_type.as_deref(),
                 filter_content.as_deref(),
-                filter_section_content.as_deref(),
                 filter_page_content.as_deref(),
                 have_relations.as_deref(),
                 not_have_relations.as_deref(),
@@ -901,18 +881,13 @@ pub fn handle_command(
 
             return Ok(0);
         },
-        Some(Commands::Add { to_file, to_section, index, dry_run, json, args }) => {
+        Some(Commands::Add { to_file, index, dry_run, json, args }) => {
             // Parse arguments
             let target_file = to_file.as_ref()
                 .or(args.get(0))
                 .ok_or_else(|| ReqvireError::ProcessError(
-                    "Target file required. Usage: reqvire add <file> [section]".to_string()
+                    "Target file required. Usage: reqvire add <file>".to_string()
                 ))?;
-
-            let target_section = to_section.as_ref()
-                .or(args.get(1))
-                .map(|s| s.as_str())
-                .unwrap_or("Requirements");
 
             // Read element markdown from stdin
             use std::io::Read;
@@ -931,7 +906,6 @@ pub fn handle_command(
                 &mut model_manager,
                 &element_markdown,
                 target_file,
-                target_section,
                 index,
                 excluded_filename_patterns,
                 &current_dir,
@@ -970,7 +944,7 @@ pub fn handle_command(
 
             return Ok(0);
         },
-        Some(Commands::Mv { element_name, to_file, to_section, index, dry_run, json, args }) => {
+        Some(Commands::Mv { element_name, to_file, index, dry_run, json, args }) => {
             // Resolve element name to identifier
             let element_id = model_manager.graph_registry.find_element_by_name(&element_name)?;
 
@@ -978,13 +952,8 @@ pub fn handle_command(
             let target_file = to_file.as_ref()
                 .or(args.get(0))
                 .ok_or_else(|| ReqvireError::ProcessError(
-                    "Target file required. Usage: reqvire mv <element-name> <file> [section]".to_string()
+                    "Target file required. Usage: reqvire mv <element-name> <file>".to_string()
                 ))?;
-
-            let target_section = to_section.as_ref()
-                .or(args.get(1))
-                .map(|s| s.as_str())
-                .unwrap_or("Requirements");
 
             // Call CRUD operation
             let git_root = git_commands::get_git_root_dir()?;
@@ -992,7 +961,6 @@ pub fn handle_command(
                 &mut model_manager,
                 &element_id,
                 target_file,
-                target_section,
                 index,
                 excluded_filename_patterns,
                 &current_dir,
@@ -1137,28 +1105,23 @@ pub fn handle_command(
 fn run_sout(graph_registry: &GraphRegistry) -> Result<(), ReqvireError> {
     use std::collections::BTreeMap;
 
-    // Collect all file paths from pages, sections, and elements
-    let mut file_map: BTreeMap<String, (Option<&Page>, Vec<&Section>, Vec<&Element>)> = BTreeMap::new();
+    // Collect all file paths from pages and elements
+    let mut file_map: BTreeMap<String, (Option<&Page>, Vec<&Element>)> = BTreeMap::new();
 
     // Collect pages
     for (file_path, page) in &graph_registry.pages {
         file_map.entry(file_path.clone()).or_default().0 = Some(page);
     }
 
-    // Collect sections grouped by file
-    for (section_key, section) in &graph_registry.sections {
-        file_map.entry(section_key.file_path.clone()).or_default().1.push(section);
-    }
-
     // Collect elements grouped by file
     for element_node in graph_registry.nodes.values() {
         let element = &element_node.element;
-        file_map.entry(element.file_path.clone()).or_default().2.push(element);
+        file_map.entry(element.file_path.clone()).or_default().1.push(element);
     }
 
     // Output content for each file in sorted order
-    for (file_path, (page, mut sections, mut elements)) in file_map {
-        println!("📄 {}", file_path);
+    for (file_path, (page, mut elements)) in file_map {
+        println!("File: {}", file_path);
         println!();
 
         // Output page content if exists
@@ -1169,19 +1132,8 @@ fn run_sout(graph_registry: &GraphRegistry) -> Result<(), ReqvireError> {
             }
         }
 
-        // Sort sections by section_order
-        sections.sort_by_key(|s| s.section_order);
-
-        // Output sections
-        for section in sections {
-            if !section.content.trim().is_empty() {
-                println!("{}", section.content);
-                println!();
-            }
-        }
-
-        // Sort elements by section_order_index for consistent ordering
-        elements.sort_by_key(|e| e.section_order_index);
+        // Sort elements by file_order_index for consistent ordering
+        elements.sort_by_key(|e| e.file_order_index);
 
         // Output elements
         for element in elements {
@@ -1327,7 +1279,6 @@ fn process_shell_command(graph_registry: &mut GraphRegistry, command: &str) -> R
                 println!("Name: {}", element.name);
                 println!("Type: {:?}", element.element_type);
                 println!("File: {}", element.file_path);
-                println!("Section: {}", element.section);
                 println!("Content: {}", element.content);
                 if !element.relations.is_empty() {
                     println!("Relations:");
@@ -1340,41 +1291,29 @@ fn process_shell_command(graph_registry: &mut GraphRegistry, command: &str) -> R
             }
         }
         "move-element" => {
-            if parts.len() < 4 {
-                return Err(ReqvireError::ProcessError("Usage: move-element <element_id> <file> <section>".to_string()));
+            if parts.len() < 3 {
+                return Err(ReqvireError::ProcessError("Usage: move-element <element_id> <file>".to_string()));
             }
             let element_id = parts[1];
             let file_path = parts[2];
-            let section = parts[3];
 
-            graph_registry.move_element_to_location(element_id, file_path, section)?;
-            println!("Element '{}' moved to {}#{}", element_id, file_path, section);
-        }
-        "create-section" => {
-            if parts.len() < 3 {
-                return Err(ReqvireError::ProcessError("Usage: create-section <file> <section>".to_string()));
-            }
-            let file_path = parts[1];
-            let section = parts[2];
-
-            graph_registry.create_virtual_section(file_path, section)?;
-            println!("Virtual section '{}' created in file '{}'", section, file_path);
+            graph_registry.move_element_to_location(element_id, file_path)?;
+            println!("Element '{}' moved to {}", element_id, file_path);
         }
         "create-file" => {
-            if parts.len() < 3 {
-                return Err(ReqvireError::ProcessError("Usage: create-file <file> <section>".to_string()));
+            if parts.len() < 2 {
+                return Err(ReqvireError::ProcessError("Usage: create-file <file>".to_string()));
             }
             let file_path = parts[1];
-            let section = parts[2];
 
-            graph_registry.create_virtual_file(file_path, section)?;
-            println!("Virtual file '{}' created with section '{}'", file_path, section);
+            graph_registry.create_virtual_file(file_path)?;
+            println!("Virtual file '{}' created", file_path);
         }
         "list-locations" => {
             let locations = graph_registry.get_available_locations();
-            println!("Available locations:");
-            for (file, section) in locations {
-                println!("  {}#{}", file, section);
+            println!("Available file locations:");
+            for file in locations {
+                println!("  {}", file);
             }
         }
         "get-move-impact" => {
@@ -1450,13 +1389,12 @@ fn process_shell_command(graph_registry: &mut GraphRegistry, command: &str) -> R
             let element_id = parts[1];
             let element_name = parts[2];
             let file_path = parts[3];
-            let section = parts.get(4).map_or("Main", |v| v);
+            // Note: section parameter removed - sections are no longer tracked in the model
 
             let element = reqvire::element::Element::new(
                 element_name,
                 element_id,
                 file_path,
-                section,
                 1, // REPL-added elements default to line 1
                 None,
             );
@@ -1552,7 +1490,7 @@ fn print_impact_tree(node: &reqvire::graph_registry::ElementNode, depth: usize) 
 
     // Print element details
     println!("{}   Type: {:?}", indent, element.element_type);
-    println!("{}   Location: {}#{}", indent, element.file_path, element.section);
+    println!("{}   Location: {}", indent, element.file_path);
 
     // Print relations that caused this impact
     if !node.relations.is_empty() {

@@ -96,7 +96,6 @@ mkdir -p "${TEST_DIR}/valid-test/specifications"
 cat > "${TEST_DIR}/valid-test/specifications/ValidRequirements.md" << 'EOF'
 # Requirements
 
-## Valid Requirement
 
 This is a valid requirement.
 

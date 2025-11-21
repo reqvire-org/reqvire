@@ -122,30 +122,19 @@ if ! grep -q "Another Requirement" "$TEST_DIR/specifications/Requirements.md"; t
   exit 1
 fi
 
-# Test 4: Check that section headers are preserved
-if ! grep -q "## Test Section" "$TEST_DIR/specifications/Requirements.md"; then
-  echo "❌ FAILED: Section headers were removed"
-  exit 1
-fi
-
-if ! grep -q "## Another Section" "$TEST_DIR/specifications/Requirements.md"; then
-  echo "❌ FAILED: Second section header was removed"
-  exit 1
-fi
-
-# Test 5: Verify that element headers are preserved
+# Test 4: Verify that element headers are preserved
 if ! grep -q "### Test Requirement" "$TEST_DIR/specifications/Requirements.md"; then
   echo "❌ FAILED: Element headers were removed"
   exit 1
 fi
 
-# Test 6: Check command output for success indicators
+# Test 5: Check command output for success indicators
 if ! echo "$OUTPUT" | grep -q -i "diagram"; then
   echo "❌ FAILED: Output does not mention diagrams"
   exit 1
 fi
 
-# Test 7: Verify that diagrams in excluded files are preserved
+# Test 6: Verify that diagrams in excluded files are preserved
 IGNORED_FILE_DIAGRAMS=$(grep -c '```mermaid' "$TEST_DIR/specifications/IgnoredFile.md" 2>/dev/null)
 if [ $? -ne 0 ]; then
     IGNORED_FILE_DIAGRAMS=0

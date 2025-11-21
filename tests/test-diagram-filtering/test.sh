@@ -93,22 +93,17 @@ if echo "$MERMAID_DIAGRAMS" | grep -q -- "verify"; then
   FAILED_CHECKS=$((FAILED_CHECKS + 1))
 fi
 
-# Test 3: Parent elements should be included in child section diagrams
-# The "Parent Element" should appear in the "Child Section" diagram
-# even though it's defined in the "Parent Section"
-
-# Extract the Child Section diagram
-CHILD_SECTION_DIAGRAM=$(sed -n '/## Child Section/,/## /p' "$TEST_FILE" | sed -n '/```mermaid/,/```/p')
-
-if ! echo "$CHILD_SECTION_DIAGRAM" | grep -q '"Parent Element"'; then
-  echo "❌ MISSING HIERARCHY: Parent Element should be included in Child Section diagram"
+# Test 3: All elements with relations should be included in the file-level diagram
+# With section removal, there's 1 diagram per file that includes all related elements
+if ! echo "$MERMAID_DIAGRAMS" | grep -q '"Parent Element"'; then
+  echo "❌ MISSING ELEMENT: Parent Element should be included in file diagram"
   FAILED_CHECKS=$((FAILED_CHECKS + 1))
 fi
 
-# Test 4: Check that the derive relation is present in Child Section
+# Test 4: Check that the derive relation is present in the file-level diagram
 # The derive relation should flow from Parent Element to Derived Child
-if ! echo "$CHILD_SECTION_DIAGRAM" | grep -q -- "-.->|deriveReqT|"; then
-  echo "❌ MISSING DERIVE: 'derive' relation should be present in Child Section diagram"
+if ! echo "$MERMAID_DIAGRAMS" | grep -q -- "-.->|deriveReqT|"; then
+  echo "❌ MISSING DERIVE: 'derive' relation should be present in file diagram"
   FAILED_CHECKS=$((FAILED_CHECKS + 1))
 fi
 

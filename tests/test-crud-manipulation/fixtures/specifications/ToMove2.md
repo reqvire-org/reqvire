@@ -1,6 +1,5 @@
 # Requirements
 
-## Derived Features
 
 ### Requirement B
 

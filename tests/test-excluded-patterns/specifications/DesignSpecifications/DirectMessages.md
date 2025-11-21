@@ -2,7 +2,6 @@
 
 This file should be excluded from processing.
 
-## Overview
 
 This document describes the design of a feature.
 

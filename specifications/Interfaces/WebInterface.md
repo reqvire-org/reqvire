@@ -1,7 +1,5 @@
 # Requirements
 
-## HTML Documentation Export
-
 ### HTML Export
 
 The system SHALL generate comprehensive HTML documentation with all model artifacts by creating a temporary working copy, generating all reports in that copy, and exporting to the output directory.

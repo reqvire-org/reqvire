@@ -8,7 +8,6 @@ use regex::Regex;
 pub struct Filters {
     file_glob:    Option<GlobMatcher>,
     name_re:      Option<Regex>,
-    section_glob: Option<GlobMatcher>,
     type_pat:     Option<String>,
     content_re:   Option<Regex>,
     not_verified: bool,
@@ -22,7 +21,6 @@ impl Filters {
     pub fn new(
         file: Option<&str>,
         name_regex: Option<&str>,
-        section: Option<&str>,
         typ: Option<&str>,
         content: Option<&str>,
         is_not_verified: bool,
@@ -43,7 +41,6 @@ impl Filters {
             Some(r) => Some(Regex::new(r).map_err(|e| ReqvireError::InvalidRegex(e.to_string()))?),
             None => None,
         };
-        let section_glob = section.map(|p| compile_glob(p)).transpose()?;
         let type_pat = typ.map(|s| s.to_lowercase());
         let content_re = match content {
             Some(r) => Some(Regex::new(r).map_err(|e| ReqvireError::InvalidRegex(e.to_string()))?),
@@ -54,7 +51,6 @@ impl Filters {
         Ok(Filters {
             file_glob,
             name_re,
-            section_glob,
             type_pat,
             content_re,
             not_verified: is_not_verified,
@@ -78,13 +74,7 @@ impl Filters {
                 return false;
             }
         }
-        // 3) section glob
-        if let Some(g) = &self.section_glob {
-            if !g.is_match(&e.section) {
-                return false;
-            }
-        }
-        // 4) type filter
+        // 3) type filter
         if let Some(tp) = &self.type_pat {
             let filter_type = element::ElementType::from_metadata(tp);
             if &e.element_type != &filter_type {

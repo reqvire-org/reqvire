@@ -2,7 +2,6 @@
 
 This document specifies verifications for the Attachments feature requirements.
 
-## Requirements
 
 ### Attachments Subsection Parsing Verification
 

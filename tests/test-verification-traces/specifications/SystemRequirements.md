@@ -1,7 +1,5 @@
 # Requirements
 
-## Authentication Requirements
-
 ### OAuth Implementation
 
 The system SHALL implement OAuth 2.0 authentication flow.
@@ -26,8 +24,6 @@ The system SHALL manage user sessions securely with token expiration.
 
 ---
 
-## Security Requirements
-
 ### Encryption Implementation
 
 The system SHALL encrypt sensitive data using AES-256.
@@ -39,8 +35,6 @@ The system SHALL encrypt sensitive data using AES-256.
   * derivedFrom: [Data Protection](UserRequirements.md#data-protection)
 
 ---
-
-## Coverage Requirements
 
 ### Coverage Calculator
 

@@ -20,8 +20,7 @@ pub struct ModelCentricElement {
     pub name: String,
     pub element_type: String,
     pub file_path: String,
-    pub section: String,
-    pub section_index: usize,
+    pub file_order_index: usize,
     pub relations: Vec<ModelCentricRelation>,
     pub attachments: Vec<String>,
 }
@@ -213,8 +212,7 @@ fn build_element_recursive(
         name: element.name.clone(),
         element_type: element.element_type.as_str().to_string(),
         file_path: element.file_path.clone(),
-        section: element.section.clone(),
-        section_index: element.section_order_index,
+        file_order_index: element.file_order_index,
         relations,
         attachments,
     })
@@ -284,8 +282,7 @@ fn generate_element_text(element: &ModelCentricElement, depth: usize, diagram_di
     // Element header
     output.push_str(&format!("{}## {}\n\n", indent, element.name));
     output.push_str(&format!("{}**Type**: {}\n", indent, element.element_type));
-    output.push_str(&format!("{}**File**: [{}]({})\n", indent, element.file_path, element.file_path));
-    output.push_str(&format!("{}**Section**: {}\n\n", indent, element.section));
+    output.push_str(&format!("{}**File**: [{}]({})\n\n", indent, element.file_path, element.file_path));
 
     // Mermaid diagram for this element's relations
     if !element.relations.is_empty() {

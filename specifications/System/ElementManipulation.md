@@ -1,7 +1,5 @@
 # Requirements
 
-## Element Manipulation
-
 ### File Persistence Test
 
 The test shall verify that element manipulation operations are persisted to source files in storage and that only modified files are flushed.
@@ -89,11 +87,8 @@ The test shall verify that target file path validation and auto-creation work co
 
 **Test Steps - Auto-Creation:**
 1. Create element in non-existent file with valid path
-2. Verify file is created with proper structure (level 1 header based on filename)
-3. Verify section header is created if specified
-4. Create element in existing file but non-existent section
-5. Verify section header is added to existing file
-6. Verify existing file content is preserved
+2. Verify file is created with proper structure (`# Requirements` header)
+3. Verify existing file content is preserved when adding elements
 
 **Success Criteria:**
 - Paths excluded by `.gitignore` are rejected
@@ -102,16 +97,13 @@ The test shall verify that target file path validation and auto-creation work co
 - Error messages clearly indicate which constraint was violated
 - Valid paths are accepted
 - Non-existent files are created with proper structure
-- Non-existent sections are added to existing files
 - Created files follow Reqvire markdown conventions
 
 **Test Coverage:**
 - Gitignore pattern exclusion
 - Reqvireignore pattern exclusion
 - Path depth limit (exactly 10, 11, 15 subdirectories)
-- Auto-create file with section
-- Auto-create file without section
-- Auto-create section in existing file
+- Auto-create file
 - Valid path variations
 
 #### Metadata
@@ -124,7 +116,7 @@ The test shall verify that target file path validation and auto-creation work co
 
 ### Target Location Validation and Auto-Creation
 
-The system shall validate target file paths for element manipulation operations and automatically create files and sections when they do not exist, subject to path safety constraints.
+The system shall validate target file paths for element manipulation operations and automatically create files when they do not exist, subject to path safety constraints.
 
 #### Details
 When validating and preparing target locations, the system shall:
@@ -137,10 +129,8 @@ When validating and preparing target locations, the system shall:
 
 **Auto-Creation:**
 - If the target file does not exist and the path is valid, create the file with proper structure:
-  - Add level 1 header based on filename (e.g., `# Requirements` for `Requirements.md`)
-  - Add level 2 section header if section name is provided
-- If the target file exists but the specified section does not exist, add the section header
-- Ensure created files and sections follow Reqvire markdown structure conventions
+  - Add `# Requirements` as the page header (required for specification files)
+- Ensure created files follow Reqvire markdown structure conventions
 
 **Error Handling:**
 - Report error if path would be ignored by `.gitignore` or `.reqvireignore`
@@ -163,13 +153,13 @@ The system shall provide the capability to create new model elements by acceptin
 #### Details
 When creating a new element, the system shall:
 - Accept a string containing the full element definition in Markdown format (including ### header, metadata, relations, and content)
-- Accept target location: file path and section name
-- Accept optional index parameter for insertion position within section (0-based)
+- Accept target location: file path
+- Accept optional index parameter for insertion position within the file (0-based)
 - Validate the target location using path validation rules
-- Create target file and/or section if they do not exist (subject to validation constraints)
+- Create target file if it does not exist (subject to validation constraints)
 - Parse the element definition string to extract element structure
 - Validate the element structure (proper subsections, valid relations, correct format)
-- Verify the element name is unique within the target file
+- Verify the element name is globally unique in the model
 - Generate a unique element identifier based on file path and element name
 - **Validate and normalize all relations in the element:**
   - Parse relation targets from the markdown (may be relative paths or repo-relative paths)
@@ -177,9 +167,9 @@ When creating a new element, the system shall:
   - Validate that each relation target element exists in the model
   - Reject the operation if any relation target does not exist
   - Provide clear error messages indicating which relation target was not found
-- If validation passes, insert the element into the specified file and section:
-  - If index is provided and valid, insert at that position within the section
-  - If index is not provided or out of bounds, append to the end of the section
+- If validation passes, insert the element into the specified file:
+  - If index is provided and valid, insert at that position within the file
+  - If index is not provided or out of bounds, append to the end of the file
 - If validation fails, reject the operation and report validation errors
 - Maintain file structure and formatting after insertion
 
@@ -210,17 +200,17 @@ The test shall verify that new model elements can be created from a full Markdow
 
 #### Details
 **Test Setup:**
-- Prepare a test model with existing files and sections
+- Prepare a test model with existing files
 - Prepare valid element definition strings in Markdown format (with ### header, metadata, relations, content)
 - Prepare invalid element definition strings (malformed structure, duplicate names, invalid relations)
-- Identify target location (file path and section)
+- Identify target file path
 
 **Test Steps:**
 1. Attempt to create an element with a valid definition string
 2. Verify the element was parsed correctly from the string
 3. Verify the element structure was validated (subsections, relations, format)
 4. Verify the element name was checked for global uniqueness
-5. Verify the element was inserted into the correct file and section
+5. Verify the element was inserted into the correct file
 6. Verify the element has proper Markdown structure in the file
 7. Validate the model after element creation
 
@@ -262,7 +252,7 @@ The test shall verify that new model elements can be created from a full Markdow
 - Element is parsed from the Markdown string correctly
 - Element structure validation runs before insertion
 - Global uniqueness is enforced
-- Element inserted at specified index position within section
+- Element inserted at specified index position within file
 - Element appended to end when index not provided or out of bounds
 - Invalid element definitions are rejected
 - Validation errors are reported clearly
@@ -375,7 +365,7 @@ The test shall verify that existing model elements can be moved to different loc
 
 #### Details
 **Test Setup:**
-- Create a test model with multiple files and sections
+- Create a test model with multiple files
 - Create an element to be moved with incoming and outgoing relations
 - Document all relations pointing to the element
 - Create a file with only one element for empty file cleanup testing
@@ -394,9 +384,6 @@ The test shall verify that existing model elements can be moved to different loc
 **Test Steps - Auto-Creation:**
 1. Move element to non-existent target file
 2. Verify target file is created with proper structure
-3. Verify section is created if specified
-4. Move element to existing file with non-existent section
-5. Verify section is added to existing file
 
 **Test Steps - Empty Source File Cleanup:**
 1. Move the only element from a file to another location
@@ -416,16 +403,15 @@ The test shall verify that existing model elements can be moved to different loc
 - File structure remains valid in both source and target files
 - Model validation passes
 - Non-existent target files are created with proper structure
-- Non-existent sections are added to existing files
 - Empty source files are deleted after move
 - Source files with remaining elements are preserved
 - File creation and deletion are reported
 
 **Test Coverage:**
-- Move element within the same file (different section)
-- Move element to a different file (same or different section)
-- Move element to specific index in target section (0, middle, end)
-- Move element without index (defaults to end of target section)
+- Move element within the same file (different position)
+- Move element to a different file
+- Move element to specific index in target file (0, middle, end)
+- Move element without index (defaults to end of target file)
 - Move element with out-of-bounds index (appends to end)
 - Move element with `derivedFrom` relations pointing to it
 - Move element with `verifiedBy` relations pointing to it
@@ -433,7 +419,6 @@ The test shall verify that existing model elements can be moved to different loc
 - Move element with `satisfiedBy` relations pointing to it
 - Move element with multiple types of incoming relations
 - Move to non-existent target file (auto-create)
-- Move to non-existent target section (auto-create)
 - Move last element from file (triggers source file deletion)
 - Move element leaving other elements (source file preserved)
 
@@ -448,28 +433,28 @@ The test shall verify that existing model elements can be moved to different loc
 
 ### Move Element Operation
 
-The system shall provide the capability to move existing model elements to different locations (file and/or section) while automatically updating all relations that reference the moved element, creating target locations if needed, and removing empty source files when no elements remain.
+The system shall provide the capability to move existing model elements to different file locations while automatically updating all relations that reference the moved element, creating target files if needed, and removing empty source files when no elements remain.
 
 #### Details
 When moving an element, the system shall:
 - Validate the target location using path validation rules
-- Create target file and/or section if they do not exist (subject to validation constraints)
-- Remove the element from the source location (file and section)
-- Accept optional index parameter for insertion position within target section (0-based)
-- Insert the element into the target location (file and section):
-  - If index is provided and valid, insert at that position within the target section
-  - If index is not provided or out of bounds, append to the end of the target section
+- Create target file if it does not exist (subject to validation constraints)
+- Remove the element from the source file
+- Accept optional index parameter for insertion position within target file (0-based)
+- Insert the element into the target file:
+  - If index is provided and valid, insert at that position within the target file
+  - If index is not provided or out of bounds, append to the end of the target file
 - Preserve all element content, metadata, and relations
 - Update the element's identifier to reflect the new location
 - Identify all relations pointing to the moved element (incoming relations)
 - Update all relations that reference the moved element with the new identifier
 - Maintain file structure and formatting in both source and target files
-- Ensure the element name is unique within the target file
+- Ensure the element name is globally unique in the model
 - Provide a report of all relations that were updated
 
 **Empty Source File Cleanup:**
 - After moving the element, check if the source file contains any remaining elements
-- If no elements remain and all sections are empty (only page content, headers, or whitespace), remove the source file from the filesystem
+- If no elements remain (only page content, headers, or whitespace), remove the source file from the filesystem
 - If the file is removed, report the file deletion in the operation output
 
 **Relation Update Requirements:**
@@ -511,7 +496,7 @@ The system shall reject the operation with a clear error message if:
 
 **Squash Mode Behavior:**
 When the --squash flag is provided and the target file already exists, the system shall:
-- Move all elements from the source file to the target file's first section
+- Move all elements from the source file to the target end of file
 - Remove the source file after all elements have been successfully moved
 - Preserve element ordering from the source file when inserting into target section
 

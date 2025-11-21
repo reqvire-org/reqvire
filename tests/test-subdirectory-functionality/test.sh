@@ -182,18 +182,18 @@ fi
 # Test 6: CRUD mv command from submodule directory (move to different file in subdirectory)
 echo "Running: reqvire mv (move element to different file within subdirectory)" >> "${TEST_DIR}/test_results.log"
 
-# Create a new target file in the submodule
+# Create a new target file in the submodule (just a header, no elements needed - pages are tracked)
 cat > "${TMP_DIR}/project-root/submodule/specifications/OtherRequirements.md" <<'EOF'
 # Requirements
 
-## Other Features
+This file will receive the moved element.
 EOF
 
 # Add to git so reqvire can find it
 cd "${TMP_DIR}/project-root" && git add submodule/specifications/OtherRequirements.md && git commit -m "Add other requirements" >/dev/null 2>&1
 
 set +e
-OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" mv "Submodule System" --to-file="specifications/OtherRequirements.md" --to-section="Other Features" 2>&1)
+OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" mv "Submodule System" --to-file="specifications/OtherRequirements.md" 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -211,7 +211,7 @@ fi
 # relative to current working directory (submodule/), so it should resolve to:
 # submodule/specifications/OtherRequirements.md (relative to git root)
 # Verify element was moved to the file within submodule directory
-if ! grep -A 5 "## Other Features" "${TMP_DIR}/project-root/submodule/specifications/OtherRequirements.md" | grep -q "### Submodule System"; then
+if ! grep -q "### Submodule System" "${TMP_DIR}/project-root/submodule/specifications/OtherRequirements.md"; then
   echo "❌ FAILED: Element was not moved to the correct file (should be submodule/specifications/OtherRequirements.md)"
   # Debug: show where file was actually created
   echo "Checking if file was incorrectly created at git root:"

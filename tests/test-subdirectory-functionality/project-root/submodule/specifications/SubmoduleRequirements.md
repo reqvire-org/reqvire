@@ -2,7 +2,6 @@
 
 This file contains submodule requirements that SHOULD be processed when run from the submodule directory.
 
-## Submodule Requirements
 
 ### Submodule Requirement One
 

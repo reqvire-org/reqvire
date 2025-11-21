@@ -58,14 +58,12 @@ struct VerificationsByFile {
 struct RequirementDetails {
     identifier: String,
     name: String,
-    section: String,
     verified_by: Vec<String>,
 }
 #[derive(Serialize, Clone)]
 struct VerificationDetails {
     identifier: String,
     name: String,
-    section: String,
     verification_type: String,
     satisfied_by: Vec<String>,
 }
@@ -291,7 +289,6 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
                     let verification_details = VerificationDetails {
                         identifier: element.identifier.clone(),
                         name: element.name.clone(),
-                        section: element.section.clone(),
                         verification_type: element.element_type.as_str().to_string(),
                         satisfied_by: satisfied_by.clone(),
                     };
@@ -326,7 +323,6 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
                 let orphaned_details = VerificationDetails {
                     identifier: element.identifier.clone(),
                     name: element.name.clone(),
-                    section: element.section.clone(),
                     verification_type: element.element_type.as_str().to_string(),
                     satisfied_by: vec![], // Orphaned verifications don't need satisfied_by info here
                 };
@@ -376,7 +372,6 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
                 let requirement_details = RequirementDetails {
                     identifier: element.identifier.clone(),
                     name: element.name.clone(),
-                    section: element.section.clone(),
                     verified_by: verified_by.clone(),
                 };
 

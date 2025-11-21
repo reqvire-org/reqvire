@@ -7,7 +7,7 @@ set -euo pipefail
 #
 # Acceptance Criteria:
 # - Without --squash: moving to existing file should error
-# - With --squash: all elements from source moved to target's first section
+# - With --squash: all elements from source moved to end of the target file
 # - Source file is deleted after squash
 # - Target file's existing elements remain unchanged
 # - All relations are updated to reference new file location
@@ -18,7 +18,7 @@ set -euo pipefail
 # - mv-file --squash command exits with code 0
 # - Source file is deleted after squash
 # - Target file contains all elements from both files
-# - Elements from source are added to first section of target
+# - Elements from source are added to the end of the target
 # - Existing target elements remain in their original positions
 # - Relations in other files are updated
 # - Model validates successfully
@@ -133,34 +133,20 @@ echo "✓ All elements found in target file"
 echo ""
 
 # ==================================
-# Test 5: Verify elements added to first section
+# Test 5: Verify element count after squash
 # ==================================
-echo "Test 5: Verify source elements added to first section..."
+echo "Test 5: Verify correct element count after squash..."
 
-# Find line numbers
-FIRST_SECTION_LINE=$(grep -n "^## Target First Section" "$TEST_DIR/specifications/Target.md" | cut -d: -f1)
-SECOND_SECTION_LINE=$(grep -n "^## Target Second Section" "$TEST_DIR/specifications/Target.md" | cut -d: -f1)
-SOURCE_ELEM_ONE_LINE=$(grep -n "### Source Element One" "$TEST_DIR/specifications/Target.md" | cut -d: -f1)
-SOURCE_ELEM_TWO_LINE=$(grep -n "### Source Element Two" "$TEST_DIR/specifications/Target.md" | cut -d: -f1)
+# Count total elements (both existing and moved)
+ELEMENT_COUNT=$(grep -c "^### " "$TEST_DIR/specifications/Target.md")
+EXPECTED_COUNT=4  # 2 existing + 2 moved
 
-if [ -z "$FIRST_SECTION_LINE" ] || [ -z "$SECOND_SECTION_LINE" ] || [ -z "$SOURCE_ELEM_ONE_LINE" ] || [ -z "$SOURCE_ELEM_TWO_LINE" ]; then
-  echo "❌ FAILED: Could not find required sections or elements"
+if [ "$ELEMENT_COUNT" -ne "$EXPECTED_COUNT" ]; then
+  echo "❌ FAILED: Expected $EXPECTED_COUNT elements, found $ELEMENT_COUNT"
   exit 1
 fi
 
-# Verify source elements are between first and second section
-if [ "$SOURCE_ELEM_ONE_LINE" -le "$FIRST_SECTION_LINE" ] || [ "$SOURCE_ELEM_ONE_LINE" -ge "$SECOND_SECTION_LINE" ]; then
-  echo "❌ FAILED: Source Element One is not in first section"
-  echo "First section: $FIRST_SECTION_LINE, Second section: $SECOND_SECTION_LINE, Element: $SOURCE_ELEM_ONE_LINE"
-  exit 1
-fi
-
-if [ "$SOURCE_ELEM_TWO_LINE" -le "$FIRST_SECTION_LINE" ] || [ "$SOURCE_ELEM_TWO_LINE" -ge "$SECOND_SECTION_LINE" ]; then
-  echo "❌ FAILED: Source Element Two is not in first section"
-  exit 1
-fi
-
-echo "✓ Source elements correctly placed in first section"
+echo "✓ Correct number of elements in target file"
 echo ""
 
 # ==================================

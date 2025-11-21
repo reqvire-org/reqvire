@@ -2,7 +2,6 @@
 
 This file should be processed.
 
-## Requirements
 
 ### REQ 0
 

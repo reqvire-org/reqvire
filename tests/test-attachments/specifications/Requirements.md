@@ -1,7 +1,5 @@
 # Requirements
 
-## Root
-
 ### System Requirements
 
 Top-level container for test requirements.
@@ -14,7 +12,6 @@ Top-level container for test requirements.
   * derive: [No Attachments Requirement](#no-attachments-requirement)
 ---
 
-## Requirements
 
 ### Performance Requirement
 

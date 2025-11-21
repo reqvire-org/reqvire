@@ -211,7 +211,6 @@ mkdir -p "${TEMP_NO_CUSTOM}/specifications"
 cat > "${TEMP_NO_CUSTOM}/specifications/StandardOnly.md" << 'EOF'
 # Requirements
 
-## Requirements
 
 ### User Requirement
 

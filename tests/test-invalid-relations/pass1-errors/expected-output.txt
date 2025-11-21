@@ -1,16 +1,16 @@
 
 ❌ 7 validation failed with error(s):
 
-  1. Invalid metadata format: Element 'Requirement with Invalid Metadata Format' has invalid metadata format: 'This is not ok - invalid format.' (file: Requirements.md, line 36)
+  1. Invalid metadata format: Element 'Requirement with Invalid Metadata Format' has invalid metadata format: 'This is not ok - invalid format.' (file: Requirements.md, line 35)
 
-  2. Invalid relation format: Element 'Requirement with Invalid Relation Format' has invalid relations format: 'This is not ok - invalid format.' (file: Requirements.md, line 49)
+  2. Invalid relation format: Element 'Requirement with Invalid Relation Format' has invalid relations format: 'This is not ok - invalid format.' (file: Requirements.md, line 48)
 
-  3. Unsupported relation type: 'satisfiedBBy' in element 'Requirement with Invalid Relation Type': (file: Requirements.md, line 62)
+  3. Unsupported relation type: 'satisfiedBBy' in element 'Requirement with Invalid Relation Type': (file: Requirements.md, line 61)
 
-  4. Duplicate subsection: Duplicate subsection 'Relations' in element 'Requirement with Duplicate Subsection' (file: pass1-errors/specifications/Requirements.md, line 76)
+  4. Duplicate subsection: Duplicate subsection 'Relations' in element 'Requirement with Duplicate Subsection' (file: pass1-errors/specifications/Requirements.md, line 75)
 
-  5. Invalid markdown structure: Invalid header level in element 'Requirement with Invalid Header Structure': Level 5+ headers (#####+) can only appear inside '#### Details' subsection (file: pass1-errors/specifications/Requirements.md, line 85)
+  5. Invalid markdown structure: Invalid header level in element 'Requirement with Invalid Header Structure': Level 5+ headers (#####+) can only appear inside '#### Details' subsection (file: pass1-errors/specifications/Requirements.md, line 84)
 
-  6. Duplicate element: 'Valid Requirement' found in pass1-errors/specifications/Requirements.md:7 and pass1-errors/specifications/Requirements.md:19
+  6. Duplicate element: 'Valid Requirement' found in pass1-errors/specifications/Requirements.md:6 and pass1-errors/specifications/Requirements.md:18
 
-  7. Duplicate element: 'Valid Requirement' found in pass1-errors/specifications/Requirements.md:7 and pass1-errors/specifications/SecondFile.md:7
+  7. Duplicate element: 'Valid Requirement' found in pass1-errors/specifications/Requirements.md:6 and pass1-errors/specifications/SecondFile.md:6

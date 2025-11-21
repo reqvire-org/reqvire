@@ -53,7 +53,6 @@ fn remove_generated_diagrams(content: &str) -> String {
 pub fn parse_single_element(
     content: &str,
     file_path: &str,
-    section: &str,
 ) -> Result<Element, ReqvireError> {
     let mut current_element: Option<Element> = None;
     let mut current_subsection = SubSection::Other("".to_string());
@@ -105,7 +104,6 @@ pub fn parse_single_element(
                 &element_name,
                 &normalized_id,
                 file_path,  // Already relative
-                section,
                 line_num + 1,
                 Some(element_type),
             );
@@ -249,17 +247,17 @@ fn is_specification_file(content: &str) -> bool {
 }
 
 /// Parses a markdown document and extracts elements with metadata and relations.
-/// Returns: (elements, errors, page_content, sections)
+/// Returns: (elements, errors, page_content)
 /// Only parses files where the first H1 heading is "# Requirements".
 pub fn parse_elements(
     file: &str,
     content: &str,
     file_path: &PathBuf,
-) -> (Vec<Element>, Vec<ReqvireError>, String, Vec<(String, String, usize)>) {
+) -> (Vec<Element>, Vec<ReqvireError>, String) {
     // Check if this is a specification file (first H1 must be "# Requirements")
     if !is_specification_file(content) {
         debug!("Skipping file {} - not a specification file (no '# Requirements' heading)", file);
-        return (Vec::new(), Vec::new(), String::new(), Vec::new());
+        return (Vec::new(), Vec::new(), String::new());
     }
 
     let mut elements = Vec::new();
@@ -272,20 +270,12 @@ pub fn parse_elements(
 
 
     let mut current_subsection = SubSection::Other("".to_string());
-    let mut current_section_name = "Requirements";
 
     // Content tracking variables
     let mut page_content = String::new();
-    let mut current_section_content = String::new();
-    let mut found_first_section = false;
-    let mut sections = Vec::new();
 
-    // Section order tracking
-    let mut section_element_counter: std::collections::HashMap<String, usize> = std::collections::HashMap::new();
-    let mut section_order_counter = 0;
-
-    // Initialize the default section order
-    section_element_counter.insert(current_section_name.to_string(), 0);
+    // File element order tracking
+    let mut file_element_counter: usize = 0;
 
     for (line_num, line) in content.lines().enumerate() {
         let trimmed = line.trim();
@@ -307,37 +297,26 @@ pub fn parse_elements(
         }else if trimmed == "---" {
             current_subsection = SubSection::Other("".to_string());
 
-        } else if trimmed.starts_with("## ") {
-            // Save previous section content if this isn't the first section
-            if found_first_section {
-                let cleaned_content = remove_generated_diagrams(&current_section_content);
-                // Always save the section, even if it has no content, to preserve order
-                sections.push((current_section_name.to_string(), cleaned_content.trim().to_string(), section_order_counter));
-                // Increment section order after saving the previous section
-                section_order_counter += 1;
-            } else {
-                // First ## section encountered - check if default section has elements
-                let default_section_count = section_element_counter.get(current_section_name).unwrap_or(&0);
-                if *default_section_count > 0 {
-                    // Save the default "Requirements" section with order 0 only if it has elements
-                    let cleaned_content = remove_generated_diagrams(&current_section_content);
-                    sections.push((current_section_name.to_string(), cleaned_content.trim().to_string(), 0));
-                    // Next section will have order 1
-                    section_order_counter = 1;
-                } else {
-                    // No elements in default section, first ## section gets order 0
-                    section_order_counter = 0;
+        } else if trimmed.starts_with("<details") {
+            // Start of details block - set flag and add content if in element
+            in_details_block = true;
+            if let Some(element) = &mut current_element {
+                if !skip_current_element {
+                    element.add_content(&format!("{}\n", line));
                 }
             }
+            continue;
 
-            // Start new section
-            current_section_name = trimmed[3..].trim();
-            current_section_content.clear();
-            found_first_section = true;
-            current_subsection = SubSection::Other("".to_string());
-
-            // Reset element counter for new section
-            section_element_counter.insert(current_section_name.to_string(), 0);
+        } else if trimmed.starts_with("## ") {
+            // Section headers (## ) are not allowed - report syntax error
+            let section_name = trimmed[3..].trim();
+            errors.push(ReqvireError::InvalidMarkdownStructure(format!(
+                "Section headers (## ) are not allowed in specification files. Found '## {}' at line {} in file '{}'. Use ### for element headers instead.",
+                section_name,
+                line_num + 1,
+                file_path.display()
+            )));
+            continue;
 
         } else if trimmed.starts_with("### ") {
             current_subsection = SubSection::Requirement;
@@ -383,15 +362,13 @@ pub fn parse_elements(
                                 &element_name,
                                 &identifier,
                                 &relative_file.to_string_lossy(),
-                                &current_section_name,
                                 line_num + 1, // line_number is 1-indexed
                                 Some(element_type),
                             );
 
-                            // Set section order index
-                            let current_index = section_element_counter.get(current_section_name).unwrap_or(&0);
-                            new_element.section_order_index = *current_index;
-                            section_element_counter.insert(current_section_name.to_string(), current_index + 1);
+                            // Set file order index
+                            new_element.file_order_index = file_element_counter;
+                            file_element_counter += 1;
 
                             current_element = Some(new_element);
                             debug!("Found element: {}", element_name);
@@ -621,17 +598,10 @@ pub fn parse_elements(
             }
 
         } else if matches!(current_subsection, SubSection::Other(_)) {
-            // Accumulate content outside of elements
-            if !found_first_section {
-                // Page content: everything before first section, but skip the # Requirements title
-                if !trimmed.starts_with("# ") {
-                    page_content.push_str(line);
-                    page_content.push('\n');
-                }
-            } else {
-                // Section content: everything after section header but before first element
-                current_section_content.push_str(line);
-                current_section_content.push('\n');
+            // Accumulate page content: everything outside of elements, but skip the # Requirements title
+            if !trimmed.starts_with("# ") {
+                page_content.push_str(line);
+                page_content.push('\n');
             }
         }
     }
@@ -644,17 +614,10 @@ pub fn parse_elements(
         }
     }
 
-    // Save final section content
-    if found_first_section {
-        let cleaned_content = remove_generated_diagrams(&current_section_content);
-        // Always save the final section, even if it has no content, to preserve order
-        sections.push((current_section_name.to_string(), cleaned_content.trim().to_string(), section_order_counter));
-    }
-
     // Clean page content
     let cleaned_page_content = remove_generated_diagrams(&page_content);
 
-    (elements, errors, cleaned_page_content.trim().to_string(), sections)
+    (elements, errors, cleaned_page_content.trim().to_string())
 }
 
 

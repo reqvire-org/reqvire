@@ -64,27 +64,10 @@ if ! echo "$OUTPUT" | jq -e '.global_counters.total_files' >/dev/null; then
   exit 1
 fi
 
-if ! echo "$OUTPUT" | jq -e '.global_counters.total_sections' >/dev/null; then
-  echo "FAILED: JSON missing total_sections in global_counters"
-  exit 1
-fi
-
-# Check that file summaries include the new count fields
+# Check that file summaries include the count fields
 FIRST_FILE=$(echo "$OUTPUT" | jq -r '.files | keys[0]')
-if ! echo "$OUTPUT" | jq -e ".files[\"$FIRST_FILE\"].total_sections" >/dev/null; then
-  echo "FAILED: JSON missing total_sections in file summaries"
-  exit 1
-fi
-
 if ! echo "$OUTPUT" | jq -e ".files[\"$FIRST_FILE\"].total_elements" >/dev/null; then
   echo "FAILED: JSON missing total_elements in file summaries"
-  exit 1
-fi
-
-# Check that section summaries include element_count field
-FIRST_SECTION=$(echo "$OUTPUT" | jq -r ".files[\"$FIRST_FILE\"].sections | keys[0]")
-if ! echo "$OUTPUT" | jq -e ".files[\"$FIRST_FILE\"].sections[\"$FIRST_SECTION\"].element_count" >/dev/null; then
-  echo "FAILED: JSON missing element_count in section summaries"
   exit 1
 fi
 
@@ -101,23 +84,6 @@ if echo "$OUTPUT" | jq -e ".files[\"$REQUIREMENTS_FILE\"].page_content" >/dev/nu
     exit 1
   fi
 fi
-
-# Test section content with mermaid diagrams
-REQUIREMENTS_SECTION="Requirements A"
-if echo "$OUTPUT" | jq -e ".files[\"$REQUIREMENTS_FILE\"].sections[\"$REQUIREMENTS_SECTION\"].section_content" >/dev/null; then
-  SECTION_CONTENT=$(echo "$OUTPUT" | jq -r ".files[\"$REQUIREMENTS_FILE\"].sections[\"$REQUIREMENTS_SECTION\"].section_content")
-  if [[ ! "$SECTION_CONTENT" == *"mermaid"* ]]; then
-    echo "FAILED: Section content should include mermaid diagram"
-    exit 1
-  fi
-  if [[ ! "$SECTION_CONTENT" == *"flowchart LR"* ]]; then
-    echo "FAILED: Section content should include the test mermaid diagram content"
-    exit 1
-  fi
-else
-  echo "Warning: Section content not found for Requirements A"
-fi
-
 
 # 2) No filters: base text search - Full output comparison
 echo "Running: reqvire search" >> "${TEST_DIR}/test_results.log"
@@ -157,7 +123,6 @@ fi
 # Check required fields in text
 for KEY in \
     '- Name:' \
-    '- Section:' \
     '- File:' \
     '- Type:' \
     '- Content:'; do
@@ -171,25 +136,14 @@ done
 # Enhanced content and counts verification - Test new features
 
 # Check file counts format in text output
-if ! grep -q '^📂 File:.* (sections: [0-9]*, elements: [0-9]*)' <<< "$OUTPUT"; then
+if ! grep -q '^📂 File:.* (elements: [0-9]*)' <<< "$OUTPUT"; then
   echo "FAILED: text search missing file counts format"
   exit 1
 fi
 
-# Check section counts format in text output
-if ! grep -q '^  📖 Section:.* (elements: [0-9]*)' <<< "$OUTPUT"; then
-  echo "FAILED: text search missing section counts format"
-  exit 1
-fi
-
-# Check that global summary includes the new counts
+# Check that global summary includes the counts
 if ! grep -q 'Total files:' <<< "$OUTPUT"; then
   echo "FAILED: text search missing total files count"
-  exit 1
-fi
-
-if ! grep -q 'Total sections:' <<< "$OUTPUT"; then
-  echo "FAILED: text search missing total sections count"
   exit 1
 fi
 
@@ -198,15 +152,6 @@ if grep -q '📄 Page content:' <<< "$OUTPUT"; then
   # Verify that page content includes mermaid diagrams with \n formatting
   if ! grep -A5 '📄 Page content:' <<< "$OUTPUT" | grep -q '\\n'; then
     echo "FAILED: Page content should use debug format with \\n newlines"
-    exit 1
-  fi
-fi
-
-# Test section content display in text format with debug formatting
-if grep -q '📝 Section content:' <<< "$OUTPUT"; then
-  # Verify that section content includes mermaid diagrams with \n formatting
-  if ! grep -A5 '📝 Section content:' <<< "$OUTPUT" | grep -q '\\n'; then
-    echo "FAILED: Section content should use debug format with \\n newlines"
     exit 1
   fi
 fi
@@ -243,65 +188,7 @@ if (( count != 1 )); then
   exit 1
 fi
 
-# 4) --filter-section=Requirements
-echo "Running: reqvire search --json --filter-section" >> "${TEST_DIR}/test_results.log"
-set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN"  search --json --filter-section="Requirements*" 2>&1)
-EXIT_CODE=$?
-set -e
-
-echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
-printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
-
-COUNT_SEC_REQ=$(
-  echo "$OUTPUT" | jq -r '
-    .files
-    | to_entries[]
-    | select(.key | endswith("Requirements.md"))
-    | .value.sections
-    | to_entries
-    | map(
-        select(.key | test("^Requirements.*"))
-        .value.elements
-        | length
-      )
-    | add  // 0
-  '
-)
-
-if [ "$COUNT_SEC_REQ" -ne 4 ]; then
-  echo "FAILED: --filter-section=Requirements should yield 4 elements (got $COUNT_SEC_REQ)"
-  exit 1
-fi
-
-echo "Running: reqvire search --filter-section='Requirements A'" >> "${TEST_DIR}/test_results.log"
-set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --filter-section="Requirements A" 2>&1)
-EXIT_CODE=$?
-set -e
-
-echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
-printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
-
-# 1) Make sure exactly one “Requirements A” section is printed
-sec_count=$(printf '%s\n' "$OUTPUT" \
-  | grep -F -c "📖 Section: Requirements")
-
-if [ "$sec_count" -ne 1 ]; then
-  echo "FAILED: expected 1 'Section: Requirements' header (got $sec_count)"
-  exit 1
-fi
-
-# 2) Make sure there are exactly 3 elements in total
-elem_count=$(grep -c 'Element:' <<<"$OUTPUT")
-if [ "$elem_count" -ne 3 ]; then
-  echo "FAILED: expected 3 elements under Requirements (got $elem_count)"
-  exit 1
-fi
-
-
-
-# 5) --filter-type=user-requirement
+# 4) --filter-type=user-requirement
 echo "Running: reqvire search --json --filter-type=user-requirement" >> "${TEST_DIR}/test_results.log"
 set +e
 OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --json --filter-type="user-requirement" 2>&1)
@@ -418,23 +305,22 @@ OUTPUT1=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --json --filter-type="user-req
 set -e
 COUNT1=$(echo "$OUTPUT1" | jq '.global_counters.total_elements')
 
-# Then, add section filter - should give fewer or equal results
+# Then, add name filter - should give fewer results
 set +e
-OUTPUT2=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --json --filter-type="user-requirement" --filter-section="Requirements A" 2>&1)
+OUTPUT2=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --json --filter-type="user-requirement" --filter-name="Valid Standard" 2>&1)
 set -e
 COUNT2=$(echo "$OUTPUT2" | jq '.global_counters.total_elements')
 
 # Verify COUNT2 <= COUNT1 (filters are additive/AND)
 if [ "$COUNT2" -gt "$COUNT1" ]; then
-  echo "FAILED: Adding --filter-section should not increase element count (got $COUNT2 > $COUNT1)"
+  echo "FAILED: Adding --filter-name should not increase element count (got $COUNT2 > $COUNT1)"
   echo "This indicates filters are OR instead of AND"
   exit 1
 fi
 
-# Verify COUNT2 is actually less (not just equal), since we know there are elements outside "Requirements A"
-if [ "$COUNT2" -eq "$COUNT1" ]; then
-  echo "FAILED: Adding --filter-section='Requirements A' should reduce count from $COUNT1"
-  echo "All user-requirements appear to be in 'Requirements A' section, test data may be insufficient"
+# Verify COUNT2 is actually less (not just equal), since we know there are elements that don't match the name filter
+if [ "$COUNT2" -ge "$COUNT1" ]; then
+  echo "FAILED: Adding --filter-name='Valid Standard' should reduce count from $COUNT1"
   exit 1
 fi
 
@@ -517,7 +403,7 @@ fi
 
 COUNT_COMBO=$(echo "$OUTPUT" | jq '.global_counters.total_elements')
 # Verify all returned elements are user-requirements with verifiedBy
-TYPES=$(echo "$OUTPUT" | jq -r '.files | .[] | .sections | .[] | .elements | .[] | .type' | sort -u)
+TYPES=$(echo "$OUTPUT" | jq -r '.files | .[] | .elements | .[] | .type' | sort -u)
 if echo "$TYPES" | grep -v "user-requirement" | grep -q .; then
   echo "FAILED: Combined filter should only return user-requirement type"
   echo "Found types: $TYPES"
@@ -616,7 +502,7 @@ printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results_relations.log"
 
 # Check that "Verification of Standard Relations" has verify relation pointing to requirement
 VERIFY_RELATIONS=$(echo "$OUTPUT" | jq -r '
-  .files | to_entries[] | .value.sections.Verifictions.elements[]?
+  .files["specifications/Requirements.md"].elements[]
   | select(.name == "Verification of Standard Relations")
   | .relations[]?
   | select(.relation_type == "verify")
@@ -635,7 +521,7 @@ fi
 
 # Check that "Requirement with Valid Standard Relations" has verifiedBy relation pointing back to verification
 VERIFIED_BY_RELATIONS=$(echo "$OUTPUT" | jq -r '
-  .files["specifications/Requirements.md"].sections."Requirements A".elements[]
+  .files["specifications/Requirements.md"].elements[]
   | select(.name == "Requirement with Valid Standard Relations")
   | .relations[]
   | select(.relation_type == "verifiedBy")
@@ -650,7 +536,7 @@ fi
 
 # Check that "Requirement with Valid Markdown Relations" also has verifiedBy relation to the same verification
 VERIFIED_BY_RELATIONS_2=$(echo "$OUTPUT" | jq -r '
-  .files["specifications/Requirements.md"].sections."Requirements A".elements[]
+  .files["specifications/Requirements.md"].elements[]
   | select(.name == "Requirement with Valid Markdown Relations")
   | .relations[]
   | select(.relation_type == "verifiedBy")
@@ -665,7 +551,7 @@ fi
 
 # Check derive relation (looking at the JSON output, this is the opposite relation that should be shown)
 DERIVE_RELATIONS_2=$(echo "$OUTPUT" | jq -r '
-  .files["specifications/Requirements.md"].sections."Requirements A".elements[]
+  .files["specifications/Requirements.md"].elements[]
   | select(.name == "Requirement with Valid Markdown Relations")
   | .relations[]
   | select(.relation_type == "derive")
@@ -680,7 +566,7 @@ fi
 
 # Check derive relation (from the JSON, the parent shows derive relation to child)
 DERIVE_RELATIONS=$(echo "$OUTPUT" | jq -r '
-  .files["specifications/Requirements.md"].sections."Requirements A".elements[]
+  .files["specifications/Requirements.md"].elements[]
   | select(.name == "Requirement with Valid Standard Relations")
   | .relations[]
   | select(.relation_type == "derive")
@@ -714,7 +600,7 @@ fi
 # But the verification element should still show its 'verify' relations to requirements (if it has any)
 # Even though those requirements are not included in the filtered results
 VERIFICATION_VERIFY_RELATIONS=$(echo "$OUTPUT_VERIFICATION_FILTER" | jq -r '
-  .files | to_entries[] | .value.sections.Verifictions.elements[]?
+  .files["specifications/Requirements.md"].elements[]
   | select(.name == "Verification of Standard Relations")
   | .relations[]?
   | select(.relation_type == "verify")
@@ -749,7 +635,7 @@ fi
 # The requirements should still show their 'verifiedBy' relations to verifications
 # Even though the verification element is not included in the filtered results
 REQUIREMENT_VERIFIEDBY_RELATIONS_FILTERED=$(echo "$OUTPUT_REQUIREMENT_FILTER" | jq -r '
-  .files["specifications/Requirements.md"].sections."Requirements A".elements[]
+  .files["specifications/Requirements.md"].elements[]
   | select(.name == "Requirement with Valid Standard Relations")
   | .relations[]
   | select(.relation_type == "verifiedBy")
@@ -764,7 +650,7 @@ fi
 
 # Test that relations to filtered-out elements are preserved in both directions
 REQUIREMENT2_VERIFIEDBY_RELATIONS_FILTERED=$(echo "$OUTPUT_REQUIREMENT_FILTER" | jq -r '
-  .files["specifications/Requirements.md"].sections."Requirements A".elements[]
+  .files["specifications/Requirements.md"].elements[]
   | select(.name == "Requirement with Valid Markdown Relations")
   | .relations[]
   | select(.relation_type == "verifiedBy")

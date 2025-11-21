@@ -1,7 +1,5 @@
 # Requirements
 
-## CLI Interface
-
 ### CLI Interface Structure
 
 The CLI interface shall implement the clear `[OPTIONS] <COMMAND> [COMMAND OPTIONS]` structure.
@@ -194,10 +192,8 @@ Search command features:
 - Support comprehensive filter options (all combinable):
   - By file path glob: `--filter-file="src/**/*Reqs.md"`
   - By element name regex: `--filter-name=".*safety.*"`
-  - By section name glob: `--filter-section="System*"`
   - By element type: `--filter-type="system-requirement"` (exact match)
   - By element content regex: `--filter-content="MUST"`
-  - By section content regex: `--filter-section-content="MUST.*implement"`
   - By page content regex: `--filter-page-content="architecture"`
   - By having relations: `--have-relations=verifiedBy,satisfiedBy` (comma-separated, must have ALL)
   - By not having relations: `--not-have-relations=verifiedBy` (comma-separated, must NOT have ALL)
@@ -206,7 +202,7 @@ Search command features:
 
 Short mode behavior:
 - Text output: Display abbreviated one-line format per element
-- JSON output: Omit fields: `content`, `section_content`, `page_content`, `verified_relations_count`, `satisfied_relations_count`, `element_count`, `total_sections`, `total_elements`, `global_counters`
+- JSON output: Omit fields: `content`, `page_content`, `verified_relations_count`, `satisfied_relations_count`, `element_count`, `total_elements`, `global_counters`
 
 Error handling:
 - Invalid regex patterns shall return clear error message showing the faulty pattern and exit
@@ -419,12 +415,11 @@ The `add` command shall:
   - Last positional argument as inline string when not reading from stdin
 - Accept target location arguments (resolved relative to Git repository root):
   - Target file path (required, provided as argument or `--to-file` flag)
-  - Target section name (optional, provided as argument or `--to-section` flag)
-  - Index within section (optional, provided as argument or `--index` flag, 0-based, defaults to end of section)
+  - Index within file (optional, provided as argument or `--index` flag, 0-based, defaults to end of file)
 - Support command syntax:
-  - `reqvire add <file> [<section>] [<index>]` - reads element from stdin
-  - `reqvire add <file> [<section>] [<index>] <element-markdown>` - element as last argument
-  - `reqvire add --to-file=<file> --to-section=<section> --index=<n> < element.md` - with named flags
+  - `reqvire add <file> [<index>]` - reads element from stdin
+  - `reqvire add <file> [<index>] <element-markdown>` - element as last argument
+  - `reqvire add --to-file=<file> --index=<n> < element.md` - with named flags
 - Validate element structure before insertion
 - Apply changes immediately by default
 - Support `--dry-run` flag to preview changes without applying
@@ -464,18 +459,17 @@ The `rm` command shall:
 
 ### CLI Move Element Command
 
-The system shall provide a `mv` command to move existing model elements to different locations while automatically updating all relations that reference the moved element.
+The system shall provide a `mv` command to move existing model elements to different file locations while automatically updating all relations that reference the moved element.
 
 #### Details
 The `mv` command shall:
 - Accept element name (required, provided as argument)
 - Accept target location arguments (resolved relative to Git repository root):
   - Target file path (required, provided as argument or `--to-file` flag)
-  - Target section name (optional, provided as argument or `--to-section` flag)
-  - Index within target section (optional, provided as argument or `--index` flag, 0-based, defaults to end of section)
+  - Index within target file (optional, provided as argument or `--index` flag, 0-based, defaults to end of file)
 - Support command syntax:
-  - `reqvire mv <element-name> <file> [<section>] [<index>]` - positional arguments
-  - `reqvire mv <element-name> --to-file=<file> --to-section=<section> --index=<n>` - with named flags
+  - `reqvire mv <element-name> <file> [<index>]` - positional arguments
+  - `reqvire mv <element-name> --to-file=<file> --index=<n>` - with named flags
 - Move element to target location at specified index
 - Update all incoming relations system-wide with new identifier
 - Preserve element content, metadata, and outgoing relations
@@ -553,8 +547,6 @@ The markdown output shall include:
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * derivedFrom: [Containment View Report Generation](../System/Reporting.md#containment-view-report-generation)
 ---
-
-## CLI Command Structure
 
 ### CLI Help Structure Verification
 

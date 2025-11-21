@@ -1,13 +1,11 @@
 # Requirements
 
-## Personas
+Personas:
 1. System Engineer: Focused on managing system models, ensuring alignment with project requirements, and validating structures.
 2. SOI Developer: Implements features and makes system changes based on MBSE models, ensuring consistency between design and code.
 3. Contributor: An external community member contributing to Reqvire by improving models, creating features, or providing feedback.
 4. Manager: Oversees the MBSE processes, tracks progress, ensures alignment with objectives, and generates reports for decision-making.
 
-
-## User Stories
 
 ### Managing MBSE Models
 

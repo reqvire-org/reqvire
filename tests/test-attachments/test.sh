@@ -438,8 +438,6 @@ sed -i '/### Test Missing Attachment/,/^---$/d' "$TEST_DIR/specifications/Requir
 cat > "$TEST_DIR/specifications/DryRunTest.md" << 'EOF'
 # Requirements
 
-## Requirements
-
 ### Dry Run Element
 
 Test element for dry-run.

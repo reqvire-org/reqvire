@@ -1,7 +1,5 @@
 # Requirements
 
-## Test Section
-
 ### Element Alpha
 
 This file has section header but no page header.

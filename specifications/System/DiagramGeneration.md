@@ -1,7 +1,5 @@
 # Requirements
 
-## Requirements
-
 ### Diagram Generation Test
 
 This test verifies that the generate-diagrams CLI command correctly generates and embeds mermaid diagrams in requirements documents.
@@ -62,12 +60,12 @@ The system shall implement relation filtering in diagram generation to render on
 When generating diagrams, the system shall apply the following relation filtering rules:
 
 1. **Diagram Relation Filtering**: Only relations specified in the DIAGRAM_RELATIONS list shall be rendered to prevent duplicate arrows representing the same logical relationship
-2. **Complete Hierarchy Inclusion**: When any element in a hierarchical chain is included in a section, all parent elements up to the root of the hierarchy shall be automatically included in the diagram
+2. **Complete Hierarchy Inclusion**: When any element in a hierarchical chain is included in a file, all parent elements up to the root of the hierarchy shall be automatically included in the diagram
 3. **List-Based Rendering**: Relations shall be rendered according to the DIAGRAM_RELATIONS list which defines which relation from each opposite pair should be shown
 
 The filtering ensures that:
 - Bidirectional relationships (e.g., `derivedFrom`/`derive`) appear as single arrows using the relation specified in DIAGRAM_RELATIONS
-- Hierarchical context is preserved by including parent elements even if they belong to different sections
+- Hierarchical context is preserved by including parent elements even if they belong to different files
 - Diagram readability is maintained while accurately representing the complete model structure
 
 #### Relations
@@ -198,17 +196,16 @@ This test verifies that the system automatically generates and updates diagrams 
 The system shall produce visual representations of relationships within the MBSE model in the form of Mermaid diagrams, enabling users to explore relations and understand dependencies and their impact.
 
 #### Details
-Diagrams must be broken into several diagrams using following logic:
- * requirements_file_name/'## section name'
-   * all requirements inside are 1 diagram
-   * if requirements documents doesn't have '##' paragraphs then requirements file name is used only
-   * external related resources box must be a link to actual resource
+Diagram generation follows a file-based approach:
+- One diagram is generated per specification file
+- The diagram shows all elements in the file and their relationships
+- External related resources are displayed as linked boxes to the actual resource
 
 Color code for rendering diagrams:
- * red for requirement
- * yellow for resources which satisfies requirement
- * green for verifiction which verifies requirement
- * light blue for box representing another diagram/category with requirments where linked requirement or resource exist.
+- Red for requirement elements
+- Yellow for resources which satisfy requirements
+- Green for verification elements which verify requirements
+- Light blue for boxes representing elements in other files
 
 #### Metadata
   * type: user-requirement
@@ -237,7 +234,7 @@ This test verifies that the system correctly filters relations in diagram genera
 
 ##### Acceptance Criteria
 - System should render only relations from DIAGRAM_RELATIONS list to prevent duplicate arrows for bidirectional relationships
-- System should include parent elements in diagrams even when they belong to different sections
+- System should include parent elements in diagrams even when they belong to different files
 - System should apply list-based rendering according to DIAGRAM_RELATIONS specification
 - Generated diagrams should not contain both relations from opposite pairs for the same logical relationship
 
@@ -245,7 +242,7 @@ This test verifies that the system correctly filters relations in diagram genera
 - Command exits with success (0) return code
 - Diagrams contain only relations specified in DIAGRAM_RELATIONS (e.g., `derive` but not `derivedFrom`)
 - Bidirectional relationships appear as single arrows using the relation specified in DIAGRAM_RELATIONS
-- Parent elements are included when child elements are in the section
+- Parent elements are included when child elements are in the file
 - No duplicate arrows exist for the same logical relationship
 - Arrow rendering follows the DIAGRAM_RELATIONS list specification
 
@@ -332,7 +329,7 @@ The system shall provide visualization of the complete model structure showing a
 
 #### Details
 The visualization shall:
-- Display elements with their properties (identifier, name, type, file location, section)
+- Display elements with their properties (identifier, name, type, file location)
 - Show relations nested inside elements with full target details
 - Support recursive nesting for element-to-element relations
 - Handle file path and external URL relations

@@ -2,8 +2,6 @@
 
 This is a test system requirements document for diagram generation.
 
-## Functional Requirements
-
 ### System Element 1
 
 First system requirement.
@@ -18,7 +16,6 @@ Second system requirement.
 #### Relations
   * derivedFrom: [UserRequirements.md#ui-element-2](UserRequirements.md#ui-element-2)
 
-## Security Requirements
 
 ### System Element 3
 

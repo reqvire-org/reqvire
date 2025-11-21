@@ -1,6 +1,5 @@
 # Requirements
 
-## Test Section
 
 Here's a custom diagram that should be preserved:
 
@@ -36,7 +35,6 @@ This verification tests the requirement.
 
 ---
 
-## Another Section
 ---
 
 ### Another Requirement

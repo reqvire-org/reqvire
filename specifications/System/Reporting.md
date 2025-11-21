@@ -1,7 +1,5 @@
 # Requirements
 
-## Requirements
-
 ### Containment View Report Generation
 
 The system shall generate containment view reports showing the physical hierarchical structure of the model (folders → files → elements) in multiple output formats including Mermaid diagrams, JSON, and HTML export integration.
@@ -214,9 +212,9 @@ The search report must include:
 - Human-readable text format with hierarchical display
 - Human-readable abbreviated text format (with --short flag): one-line per element showing `[type] identifier - name`
 - JSON format for programmatic processing
-- JSON abbreviated format (with --short flag): omits content, section_content, page_content, verified_relations_count, satisfied_relations_count, element_count, total_sections, total_elements, global_counters
+- JSON abbreviated format (with --short flag): omits content, page_content, verified_relations_count, satisfied_relations_count, element_count, total_elements, global_counters
 
-The system must support comprehensive filtering by file path, element name, section, type, element content, section content, page content, and relation presence. All filters are applied conjunctively.
+The system must support comprehensive filtering by file path, element name, type, element content, page content, and relation presence. All filters are applied conjunctively.
 
 #### Relations
   * derivedFrom: [Model Structure and Summaries](#model-structure-and-summaries)
@@ -373,9 +371,9 @@ This test verifies that the system provides a unified `search` command functiona
 - Supplying an invalid regex to any regex-based filter fails with a non-zero exit code and displays a clear error message
 - Search results must include all relations for each element
 - Search results must include all attachments for each element (omitted in short mode)
-- **Enhanced Content Display**: Search must display page content (frontmatter before first section) and section content (content between section headers and first element) when not in short mode
-- **Count Information**: Search must show counts for files, pages, sections, and elements in full mode (omitted in short mode)
-- **Short Mode Behavior**: Short mode omits: `content`, `section_content`, `page_content`, `verified_relations_count`, `satisfied_relations_count`, `element_count`, `total_sections`, `total_elements`, `global_counters`, `attachments`
+- **Enhanced Content Display**: Search must display page content (frontmatter before first element) when not in short mode
+- **Count Information**: Search must show counts for files and elements in full mode (omitted in short mode)
+- **Short Mode Behavior**: Short mode omits: `content`, `page_content`, `verified_relations_count`, `satisfied_relations_count`, `element_count`, `total_elements`, `global_counters`, `attachments`
 
 ##### Test Criteria
 1. **Base JSON search**
@@ -389,14 +387,14 @@ This test verifies that the system provides a unified `search` command functiona
    Command: `reqvire search`
    - exits code **0**
    - human-readable output with hierarchical structure
-   - each element block includes identifier, name, section, file, type, content
+   - each element block includes identifier, name, file, type, content
    - relations displayed for each element
 
 3. **Short mode text output**
    Command: `reqvire search --short`
    - exits code **0**
    - one line per element: `[type] identifier - name`
-   - no content, section content, or page content displayed
+   - no content or page content displayed
    - no count information displayed
 
 4. **Short mode JSON output**
@@ -404,18 +402,15 @@ This test verifies that the system provides a unified `search` command functiona
    - exits code **0**
    - output parses as valid JSON
    - element objects do NOT contain: `content`, `verified_relations_count`, `satisfied_relations_count`
-   - section objects do NOT contain: `section_content`, `element_count`
-   - file objects do NOT contain: `page_content`, `total_sections`, `total_elements`
+   - file objects do NOT contain: `page_content`, `total_elements`
    - top level does NOT contain: `global_counters`
 
 5. **Individual filters**
    For each flag in turn, run both JSON and text modes:
    - `--filter-file="**/*Reqs.md"` (glob)
    - `--filter-name=".*safety.*"` (regex)
-   - `--filter-section="System*"` (glob)
    - `--filter-type="user-requirement"` (exact)
    - `--filter-content="MUST"` (regex)
-   - `--filter-section-content="implement.*"` (regex)
    - `--filter-page-content="architecture"` (regex)
    - `--have-relations=verifiedBy` (comma-separated)
    - `--not-have-relations=verifiedBy` (comma-separated)
@@ -426,7 +421,7 @@ This test verifies that the system provides a unified `search` command functiona
 6. **Filter combinations**
    Combine multiple filters and verify outputs contain exactly those elements passing ALL filters:
    - `--filter-type=user-requirement --have-relations=verifiedBy,satisfiedBy`
-   - `--filter-section="System*" --filter-name=".*GPS.*"`
+   - `--filter-file="System*" --filter-name=".*GPS.*"`
    - `--filter-content="MUST" --not-have-relations=verifiedBy`
 
 7. **Invalid regex**
@@ -451,31 +446,24 @@ This test verifies that the system provides a unified `search` command functiona
     - only elements that do NOT have ALL specified relations appear
     - if element lacks verifiedBy OR satisfiedBy (or both), it is included
 
-11. **Section content filter**
-    Command: `reqvire search --filter-section-content="MUST.*implement"`
-    - exits code **0**
-    - only elements whose parent section content matches regex appear
-    - elements in sections without matching content are excluded
-
-12. **Page content filter**
+11. **Page content filter**
     Command: `reqvire search --filter-page-content="architecture"`
     - exits code **0**
     - only elements whose parent file page content matches regex appear
     - elements in files without matching page content are excluded
 
-13. **Relations coverage**
+12. **Relations coverage**
     Command: `reqvire search --json`
     - Both JSON and text outputs must show complete relationship information
     - All relation types and targets included
 
-14. **Enhanced content and counts verification (full mode)**
+13. **Enhanced content and counts verification (full mode)**
     Command: `reqvire search --json`
     - JSON output must include `page_content` field for files that have frontmatter content
-    - JSON output must include `section_content` field for sections that have content
     - JSON output must include count fields in global counters
-    - JSON output must include per-file and per-section counts
+    - JSON output must include per-file counts
 
-15. **Short mode field omission verification**
+14. **Short mode field omission verification**
     Command: `reqvire search --short --json`
     - Verify all specified fields are omitted from JSON structure
     - Verify no null/empty placeholders for omitted fields (fields completely absent)
@@ -522,11 +510,9 @@ Filtering shall operate on the level of individual `Element` objects in the mode
 
 - `file_path: String`
 - `name: String`
-- `section: String`
 - `element_type: ElementType`
 - `content: String`
 - `relations: Vec<Relation>`
-- `section_content: String` (from parent section)
 - `page_content: String` (from parent file)
 
 ---
@@ -559,19 +545,7 @@ The filtering system **must support the following filters**, which may be active
 
 ---
 
-### 3. Section Filter (Glob)
-
-**Purpose:** Include only elements belonging to sections with matching names.
-
-**Input:** A glob pattern string (e.g., `"System Requirements*"`)
-
-**Match Target:** `Element.section`
-
-**Behavior:** Case-sensitive match. Globbing follows standard `globset` semantics.
-
----
-
-### 4. Type Filter (Exact Match)
+### 3. Type Filter (Exact Match)
 
 **Purpose:** Include only elements of a specific type.
 
@@ -589,7 +563,7 @@ The filtering system **must support the following filters**, which may be active
 
 ---
 
-### 5. Content Filter (Regex)
+### 4. Content Filter (Regex)
 
 **Purpose:** Include only elements whose body content matches a regular expression.
 
@@ -601,19 +575,7 @@ The filtering system **must support the following filters**, which may be active
 
 ---
 
-### 6. Section Content Filter (Regex)
-
-**Purpose:** Include only elements whose parent section content matches a regular expression.
-
-**Input:** A valid regex pattern applied to the section's content.
-
-**Match Target:** Section content of the element's parent section
-
-**Behavior:** Case-sensitive regex match. Invalid patterns must cause an immediate user-facing error.
-
----
-
-### 7. Page Content Filter (Regex)
+### 5. Page Content Filter (Regex)
 
 **Purpose:** Include only elements whose parent file's page content (frontmatter) matches a regular expression.
 
@@ -625,7 +587,7 @@ The filtering system **must support the following filters**, which may be active
 
 ---
 
-### 8. Have Relations Filter (Comma-separated list)
+### 6. Have Relations Filter (Comma-separated list)
 
 **Purpose:** Include only elements that have ALL specified relation types.
 
@@ -637,7 +599,7 @@ The filtering system **must support the following filters**, which may be active
 
 ---
 
-### 9. Not Have Relations Filter (Comma-separated list)
+### 7. Not Have Relations Filter (Comma-separated list)
 
 **Purpose:** Include only elements that do NOT have ALL specified relation types.
 
@@ -681,10 +643,9 @@ The filtering system must evaluate filters with minimal passes over element data
 | Filter Combination | Expected Result |
 |--------------------|------------------|
 | `type = verification` | Only verification elements |
-| `section = "System*"` + `name = ".*GPS.*"` | System section elements with GPS in name |
+| `filter-file = "System*"` + `name = ".*GPS.*"` | Elements in System files with GPS in name |
 | `have-relations = verifiedBy,satisfiedBy` | Elements that have both verifiedBy AND satisfiedBy relations |
 | `not-have-relations = verifiedBy` | Elements that do NOT have any verifiedBy relations |
-| `filter-section-content = "MUST.*implement"` | Elements in sections whose content matches the pattern |
 | `filter-page-content = "architecture"` | Elements in files whose frontmatter contains "architecture" |
 
 ---

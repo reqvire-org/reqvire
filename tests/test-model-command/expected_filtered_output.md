@@ -8,7 +8,6 @@
 
 **Type**: requirement
 **File**: [specifications/SystemRequirements.md](specifications/SystemRequirements.md)
-**Section**: Visualization Commands
 
 ```mermaid
 graph LR

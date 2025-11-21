@@ -13,7 +13,6 @@ pub mod index_generator;
 pub mod filters;
 pub mod report_coverage;
 pub mod report_model;
-pub mod sections_summary;
 pub mod search;
 pub mod git_commands;
 pub mod change_impact;

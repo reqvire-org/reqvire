@@ -2,7 +2,6 @@
 
 This document contains test verifications for HTML export testing.
 
-## Verifications
 
 ### Test Verification 1
 

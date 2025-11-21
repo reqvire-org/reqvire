@@ -2,7 +2,6 @@
 
 This document contains verification tests for the system requirements.
 
-## System Verification Tests
 ```mermaid
 graph TD;
   %% Graph styling
@@ -18,6 +17,7 @@ graph TD;
   click b31d9f68fd "VerificationTests.md#system-verification-test-1";
   class b31d9f68fd requirement;
 ```
+
 ### System Verification Test 1
 
 First system verification test.
@@ -27,6 +27,7 @@ First system verification test.
 
 #### Relations
   * verify: [SystemRequirements.md#system-element-3](SystemRequirements.md#system-element-3)
+---
 
 ### System Verification Test 2
 
@@ -37,3 +38,4 @@ Second system verification test.
 
 #### Relations
   * verify: [SystemRequirements.md#system-element-4](SystemRequirements.md#system-element-4)
+---

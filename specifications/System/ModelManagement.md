@@ -1,7 +1,5 @@
 # Requirements
 
-## Requirements
-
 ### Coexistence of Structured and Unstructured Documents
 
 The system shall allow structured markdown and unstructured. (eg., markdown, PDFs, DOCX, raw text) documents to coexist within the same MBSE model.

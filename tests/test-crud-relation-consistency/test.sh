@@ -34,7 +34,6 @@ mkdir -p "${TEST_DIR}/specifications/Verifications"
 cat > "${TEST_DIR}/specifications/Requirements.md" << 'EOF'
 # Requirements
 
-## System Requirements
 
 ### Root Requirement
 
@@ -69,7 +68,6 @@ EOF
 cat > "${TEST_DIR}/specifications/Verifications/Tests.md" << 'EOF'
 # Requirements
 
-## Tests
 
 ### Test 1
 
@@ -203,7 +201,6 @@ echo "Test 3: Move element with incoming relations..." >> "${TEST_DIR}/test_resu
 cat > "${TEST_DIR}/specifications/OtherRequirements.md" << 'EOF'
 # Requirements
 
-## Other Section
 EOF
 
 set +e
@@ -278,7 +275,6 @@ echo "Test 4: Move verification element and check verifiedBy relation updates...
 cat > "${TEST_DIR}/specifications/SystemTests.md" << 'EOF'
 # Requirements
 
-## Integration Tests
 EOF
 
 set +e

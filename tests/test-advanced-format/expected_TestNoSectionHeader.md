@@ -1,7 +1,5 @@
 # Requirements
 
-## Requirements
-
 ### Element One
 
 This file has page header but no section header.

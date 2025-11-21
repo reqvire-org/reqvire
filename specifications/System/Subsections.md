@@ -2,8 +2,6 @@
 
 This document specifies requirements for reserved subsections in Reqvire markdown documents.
 
-## Requirements
-
 ### Reserved Subsections Support
 
 The system shall support the following reserved subsections with predefined structure and behavior: Relations, Details, Metadata, and Attachments.

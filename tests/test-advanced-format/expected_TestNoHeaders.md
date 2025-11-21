@@ -1,7 +1,5 @@
 # Requirements
 
-## Requirements
-
 ### Element Without Section
 
 This element has no page header and no section header.

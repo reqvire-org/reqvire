@@ -61,9 +61,9 @@ if [ "$TOTAL_ELEMENTS" != "8" ]; then
 fi
 
 # Verify we have the expected trace cycle elements by checking specific requirements exist
-ALPHA_EXISTS=$(echo "$OUTPUT" | jq '.files."specifications/Requirements.md".sections.Requirements.elements[] | select(.name == "Requirement Alpha")')
-BETA_EXISTS=$(echo "$OUTPUT" | jq '.files."specifications/Requirements.md".sections.Requirements.elements[] | select(.name == "Requirement Beta")')
-GAMMA_EXISTS=$(echo "$OUTPUT" | jq '.files."specifications/Requirements.md".sections.Requirements.elements[] | select(.name == "Requirement Gamma")')
+ALPHA_EXISTS=$(echo "$OUTPUT" | jq '.files."specifications/Requirements.md".elements[] | select(.name == "Requirement Alpha")')
+BETA_EXISTS=$(echo "$OUTPUT" | jq '.files."specifications/Requirements.md".elements[] | select(.name == "Requirement Beta")')
+GAMMA_EXISTS=$(echo "$OUTPUT" | jq '.files."specifications/Requirements.md".elements[] | select(.name == "Requirement Gamma")')
 
 if [ -z "$ALPHA_EXISTS" ]; then
   echo "FAILED: Requirement Alpha not found in output"

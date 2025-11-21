@@ -227,7 +227,7 @@ if grep -q "Security Analysis" <<< "$OUTPUT"; then
 fi
 
 # Verify count - should have exactly 4 test-verification elements ending with "Test"
-TEST_COUNT=$(echo "$OUTPUT" | grep -c '^#### ' || true)
+TEST_COUNT=$(echo "$OUTPUT" | grep -c '^### ' || true)
 # We have: OAuth Flow Test, Session Timeout Test, Encryption Coverage Test, Coverage Calculation Test
 # That's 4 test-verification elements with "Test" in name
 if [ "$TEST_COUNT" -ne 4 ]; then
@@ -335,7 +335,7 @@ fi
 
 # JSON identifiers should still be absolute (from git root), not affected by from-folder
 # Check that identifiers in JSON don't contain ../../ patterns
-if echo "$OUTPUT" | jq -e '.files | to_entries[] | .value.sections | to_entries[] | .value.verifications[].identifier' | grep -q '\.\./'; then
+if echo "$OUTPUT" | jq -e '.files | to_entries[] | .value.verifications[].identifier' | grep -q '\.\./'; then
     echo "❌ FAILED: JSON identifiers should remain absolute, not relative"
     exit 1
 fi

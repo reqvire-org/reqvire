@@ -2,8 +2,6 @@
 
 This is a requirements document specifically created for testing diagram generation.
 
-## Custom Root Requirements
-
 ### Custom Root Requirement
 
 This is the root requirement for testing purposes.
@@ -13,8 +11,8 @@ This is the root requirement for testing purposes.
 
 #### Relations
   * satisfiedBy: [root_implementation.py](root_implementation.py)
+---
 
-## Section 1
 ```mermaid
 graph TD;
   %% Graph styling
@@ -46,6 +44,7 @@ This is a test verification element with relations.
 #### Relations
   * satisfiedBy: [test_implementation.py](test_implementation.py)
   * verify: [Custom Element 3](#custom-element-3)
+---
 
 ### Custom Element 2
 
@@ -57,10 +56,9 @@ This is another test element with relations.
   * satisfiedBy: [implementation.py](implementation.py)
   * derive: [Custom Element 3](#custom-element-3)
   * derive: [Custom Element 4](#custom-element-4)
+---
 
-## Custom Mermaid Diagram Section (No Elements)
-
-This section contains a custom mermaid diagram with no elements - should not be removed:
+This paragraph contains a custom mermaid diagram - should not be removed:
 
 ```mermaid
 flowchart TD
@@ -70,8 +68,6 @@ flowchart TD
     D --> B
     B -- No --> E[End]
 ```
-
-## Custom Mermaid Diagram Section (With Elements)
 
 This section contains BOTH a custom mermaid diagram AND elements - custom diagram should be preserved:
 
@@ -89,8 +85,8 @@ This element is in a section with a custom diagram.
 
 #### Relations
   * derivedFrom: [Custom Root Requirement](#custom-root-requirement)
+---
 
-## Custom Diagram Immediately After Header
 ```mermaid
 flowchart TB
     P[Custom Process] --> Q[Custom Output]
@@ -107,27 +103,7 @@ This element is in a section with custom diagram right after header.
 
 #### Relations
   * derivedFrom: [Custom Root Requirement](#custom-root-requirement)
-
-## Section 2
-```mermaid
-graph TD;
-  %% Graph styling
-  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
-  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
-  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
-  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
-
-  3651a8aa0b["Custom Element 4"];
-  click 3651a8aa0b "Requirements-with-custom-mermaid.md#custom-element-4";
-  class 3651a8aa0b requirement;
-  87ce6a6132["Custom Element 3"];
-  click 87ce6a6132 "Requirements-with-custom-mermaid.md#custom-element-3";
-  class 87ce6a6132 requirement;
-  2ac7edcf81["Custom Element 1"];
-  class 2ac7edcf81 requirement;
-  click 2ac7edcf81 "Requirements-with-custom-mermaid.md#custom-element-1";
-  2ac7edcf81 -->|verifies| 87ce6a6132;
-```
+---
 
 
 ### Custom Element 3
@@ -138,6 +114,7 @@ This is a third test element.
   * derivedFrom: [Custom Element 2](#custom-element-2)
   * verifiedBy: [Custom Element 1](#custom-element-1)
   * trace: [Custom Element 4](#custom-element-4)
+---
 
 ### Custom Element 4
 
@@ -146,3 +123,4 @@ This is a fourth test element with relations.
 #### Relations
   * derivedFrom: [Custom Element 2](#custom-element-2)
   * trace: [Custom Element 1](#custom-element-1)
+---

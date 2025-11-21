@@ -2,9 +2,6 @@
 
 This document contains various test cases.
 
-## Test Categories
-Some introduction text here.
-
 ### Format Test
 This test verifies formatting capabilities.
 

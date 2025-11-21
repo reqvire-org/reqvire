@@ -2,7 +2,6 @@
 
 This file should be processed.
 
-## Requirements
 
 ### SYS 001 System Requirement
 

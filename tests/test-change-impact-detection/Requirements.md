@@ -2,8 +2,6 @@
 
 This file should be processed.
 
-## Implementation Elements
-
 ### Power Control
 
 Power control.
@@ -32,7 +30,6 @@ Network manager.
 #### Metadata
 * type: user-requirement
 
-## Verification Elements
 
 ### Power Saving
 
@@ -65,7 +62,6 @@ Battery Saving.
 
 
 
-## Requirements
 
 ### System Power Management
 

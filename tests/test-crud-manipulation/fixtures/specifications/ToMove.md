@@ -1,6 +1,5 @@
 # Requirements
 
-## Section One
 
 ### Element One
 

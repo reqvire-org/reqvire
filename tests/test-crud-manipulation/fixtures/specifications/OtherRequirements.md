@@ -1,3 +1,2 @@
 # Requirements
 
-## Other Features

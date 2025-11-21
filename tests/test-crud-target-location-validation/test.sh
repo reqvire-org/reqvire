@@ -11,13 +11,12 @@ set -euo pipefail
 # - Paths exceeding 10 subdirectory depth are rejected
 # - Valid paths are accepted
 # - Non-existent files are created with proper structure
-# - Non-existent sections are added to existing files
 #
 # Test Criteria:
 # - Commands exit with error code for invalid paths
 # - Error messages indicate which constraint was violated
 # - Commands succeed for valid paths
-# - Files and sections are auto-created as needed
+# - Files are auto-created as needed
 
 TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -45,8 +44,6 @@ mkdir -p "${TEST_DIR}/specifications"
 cat > "${TEST_DIR}/specifications/Base.md" << 'EOF'
 # Requirements
 
-## Base Section
-
 ### Base Requirement
 
 This is the base requirement.
@@ -73,7 +70,7 @@ This should be rejected.
 '
 
 set +e
-OUTPUT=$(cd "$TEST_DIR" && echo "$NEW_ELEMENT" | "$REQVIRE_BIN" add specifications/build/Ignored.md "Section" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && echo "$NEW_ELEMENT" | "$REQVIRE_BIN" add specifications/build/Ignored.md 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -98,7 +95,7 @@ echo "" >> "${TEST_DIR}/test_results.log"
 echo "Test 2: Reqvireignore exclusion..." >> "${TEST_DIR}/test_results.log"
 
 set +e
-OUTPUT=$(cd "$TEST_DIR" && echo "$NEW_ELEMENT" | "$REQVIRE_BIN" add specifications/draft-Ideas.md "Section" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && echo "$NEW_ELEMENT" | "$REQVIRE_BIN" add specifications/draft-Ideas.md 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -134,7 +131,7 @@ Testing path depth validation.
 DEEP_PATH="specifications/a/b/c/d/e/f/g/h/i/j/DeepFile.md"
 
 set +e
-OUTPUT=$(cd "$TEST_DIR" && echo "$DEPTH_TEST_ELEMENT" | "$REQVIRE_BIN" add "$DEEP_PATH" "Section" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && echo "$DEPTH_TEST_ELEMENT" | "$REQVIRE_BIN" add "$DEEP_PATH" 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -161,7 +158,7 @@ echo "Test 4: Valid path depth (10 levels)..." >> "${TEST_DIR}/test_results.log"
 VALID_DEEP_PATH="specifications/a/b/c/d/e/f/g/h/i/ValidFile.md"
 
 set +e
-OUTPUT=$(cd "$TEST_DIR" && echo "$DEPTH_TEST_ELEMENT" | "$REQVIRE_BIN" add "$VALID_DEEP_PATH" "Section" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && echo "$DEPTH_TEST_ELEMENT" | "$REQVIRE_BIN" add "$VALID_DEEP_PATH" 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -183,7 +180,7 @@ echo "" >> "${TEST_DIR}/test_results.log"
 echo "Test 5: Auto-create non-existent file..." >> "${TEST_DIR}/test_results.log"
 
 set +e
-OUTPUT=$(cd "$TEST_DIR" && echo "$NEW_ELEMENT" | "$REQVIRE_BIN" add specifications/NewFile.md "New Section" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && echo "$NEW_ELEMENT" | "$REQVIRE_BIN" add specifications/NewFile.md 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -202,9 +199,6 @@ else
   if ! grep -q "^# " "${TEST_DIR}/specifications/NewFile.md"; then
     echo "❌ FAILED: Created file missing level 1 header"
     OVERALL_RESULT=1
-  elif ! grep -q "^## New Section" "${TEST_DIR}/specifications/NewFile.md"; then
-    echo "❌ FAILED: Created file missing section header"
-    OVERALL_RESULT=1
   elif ! grep -q "^### Test Requirement" "${TEST_DIR}/specifications/NewFile.md"; then
     echo "❌ FAILED: Created file missing element"
     OVERALL_RESULT=1
@@ -214,13 +208,13 @@ else
 fi
 
 # ==================================
-# Test 6: Auto-Create Section in Existing File
+# Test 6: Add Element to Existing File
 # ==================================
 echo "" >> "${TEST_DIR}/test_results.log"
-echo "Test 6: Auto-create section in existing file..." >> "${TEST_DIR}/test_results.log"
+echo "Test 6: Add element to existing file..." >> "${TEST_DIR}/test_results.log"
 
 set +e
-OUTPUT=$(cd "$TEST_DIR" && echo "$NEW_ELEMENT" | "$REQVIRE_BIN" add specifications/Base.md "New Section" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && echo "$NEW_ELEMENT" | "$REQVIRE_BIN" add specifications/Base.md 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -228,17 +222,17 @@ echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
 echo "Output: $OUTPUT" >> "${TEST_DIR}/test_results.log"
 
 if [ $EXIT_CODE -ne 0 ]; then
-  echo "❌ FAILED: Should auto-create section in existing file"
+  echo "❌ FAILED: Should add element to existing file"
   echo "Got: $OUTPUT"
   OVERALL_RESULT=1
-elif ! grep -q "^## New Section" "${TEST_DIR}/specifications/Base.md"; then
-  echo "❌ FAILED: Section was not added to existing file"
+elif ! grep -q "^### Test Requirement" "${TEST_DIR}/specifications/Base.md"; then
+  echo "❌ FAILED: Element was not added to existing file"
   OVERALL_RESULT=1
-elif ! grep -q "^## Base Section" "${TEST_DIR}/specifications/Base.md"; then
-  echo "❌ FAILED: Original section was removed"
+elif ! grep -q "^### Base Requirement" "${TEST_DIR}/specifications/Base.md"; then
+  echo "❌ FAILED: Original element was removed"
   OVERALL_RESULT=1
 else
-  echo "✓ Section auto-creation working" >> "${TEST_DIR}/test_results.log"
+  echo "✓ Adding to existing file working" >> "${TEST_DIR}/test_results.log"
 fi
 
 # ==================================

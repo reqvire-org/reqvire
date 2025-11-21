@@ -7,7 +7,6 @@
 
 **Type**: user-requirement
 **File**: [specifications/UserRequirements.md](specifications/UserRequirements.md)
-**Section**: Model Visualization
 
 ```mermaid
 graph LR

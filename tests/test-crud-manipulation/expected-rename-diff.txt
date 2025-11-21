@@ -3,37 +3,37 @@ Renamed element: Feature A → Feature Alpha (specifications/Requirements.md#fea
 📄 specifications/OtherRequirements.md
   [37m01     # Requirements[0m
   [37m02[0m
-  [37m03     ## Other Features[0m
+  [37m03     ### Feature C[0m
 
-  [37m07     This is a test requirement for feature C with relations.[0m
-  [37m08[0m
-  [37m09     #### Relations[0m
-  [31m10 -     * derivedFrom: [Feature A](Requirements.md#feature-a)[0m
-  [32m10 +     * derivedFrom: [Feature Alpha](Requirements.md#feature-alpha)[0m
-  [37m11       * verifiedBy: [Test for Feature C](Verifications/Tests.md#test-for-feature-c)[0m
-  [37m12     ---[0m
-  [37m13[0m
+  [37m05     This is a test requirement for feature C with relations.[0m
+  [37m06[0m
+  [37m07     #### Relations[0m
+  [31m08 -     * derivedFrom: [Feature A](Requirements.md#feature-a)[0m
+  [32m08 +     * derivedFrom: [Feature Alpha](Requirements.md#feature-alpha)[0m
+  [37m09       * verifiedBy: [Test for Feature C](Verifications/Tests.md#test-for-feature-c)[0m
+  [37m10     ---[0m
+  [37m11[0m
 
 
 
 📄 specifications/Requirements.md
   [37m01     # Requirements[0m
   [37m02[0m
-  [37m03     ## Features[0m
+  [37m03     ### Parent Feature[0m
 
-  [37m09     #### Metadata[0m
-  [37m10       * type: user-requirement[0m
-  [37m11     ---[0m
-  [31m12 -   ### Feature A[0m
-  [32m12 +   ### Feature Alpha[0m
+  [37m07     #### Metadata[0m
+  [37m08       * type: user-requirement[0m
+  [37m09     ---[0m
+  [31m10 -   ### Feature A[0m
+  [32m10 +   ### Feature Alpha[0m
+  [37m11[0m
+  [37m12     This is a test requirement for feature A.[0m
   [37m13[0m
-  [37m14     This is a test requirement for feature A.[0m
-  [37m15[0m
 
-  [37m22     This is a newly added feature.[0m
-  [37m23[0m
-  [37m24     #### Relations[0m
-  [31m25 -     * derivedFrom: [Feature A](#feature-a)[0m
-  [32m25 +     * derivedFrom: [Feature Alpha](#feature-alpha)[0m
-  [37m26     ---[0m
-  [37m27[0m
+  [37m20     This is a newly added feature.[0m
+  [37m21[0m
+  [37m22     #### Relations[0m
+  [31m23 -     * derivedFrom: [Feature A](#feature-a)[0m
+  [32m23 +     * derivedFrom: [Feature Alpha](#feature-alpha)[0m
+  [37m24     ---[0m
+  [37m25[0m

@@ -1,7 +1,5 @@
 # Requirements
 
-## Verification Traceability
-
 ### Trace Relations No Cycles Verification
 
 This test verifies that trace relations do not trigger circular dependency errors even when they form cycles, confirming that trace relations are correctly excluded from dependency cycle detection.

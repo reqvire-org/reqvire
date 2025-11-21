@@ -340,11 +340,6 @@ if [ "$SATISFIED_TEST" -gt 0 ]; then
         exit 1
     fi
 
-    if ! echo "$FIRST_SATISFIED_TEST" | jq 'has("section")' | grep -q true; then
-        echo "❌ FAILED: Satisfied test verification missing 'section'"
-        exit 1
-    fi
-
     if ! echo "$FIRST_SATISFIED_TEST" | jq 'has("verification_type")' | grep -q true; then
         echo "❌ FAILED: Satisfied test verification missing 'verification_type'"
         exit 1

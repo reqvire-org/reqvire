@@ -2,7 +2,6 @@
 
 This document contains requirements with Pass 2 validation errors (relation validation issues).
 
-## Requirements
 
 ### Valid User Requirement
 

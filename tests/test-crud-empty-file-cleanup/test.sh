@@ -40,9 +40,9 @@ if ! grep -q "### Only Element" "$TEST_DIR/specifications/Source.md"; then
   exit 1
 fi
 
-# Perform move operation
+# Perform move operation (no section argument - sections were removed)
 set +e
-MOVE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv "Only Element" "specifications/Target.md" "Destination Section" 2>&1)
+MOVE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv "Only Element" "specifications/Target.md" 2>&1)
 MOVE_EXIT=$?
 set -e
 
@@ -76,21 +76,15 @@ fi
 
 echo "✓ Element was moved to target file"
 
-# Verify the element is under the correct section
-SECTION_LINE=$(grep -n "## Destination Section" "$TEST_DIR/specifications/Target.md" | cut -d: -f1)
+# Verify the element exists in target file
 ELEMENT_LINE=$(grep -n "### Only Element" "$TEST_DIR/specifications/Target.md" | cut -d: -f1)
 
-if [ -z "$SECTION_LINE" ] || [ -z "$ELEMENT_LINE" ]; then
-  echo "❌ FAILED: Could not find section or element in target file"
+if [ -z "$ELEMENT_LINE" ]; then
+  echo "❌ FAILED: Could not find element in target file"
   exit 1
 fi
 
-if [ "$ELEMENT_LINE" -le "$SECTION_LINE" ]; then
-  echo "❌ FAILED: Element is not under the destination section"
-  exit 1
-fi
-
-echo "✓ Element is correctly placed under destination section"
+echo "✓ Element is correctly placed in target file"
 
 # Verify model validates
 set +e

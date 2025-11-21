@@ -1,7 +1,5 @@
 # Requirements
 
-## Performance Requirements
-
 ### High Performance
 
 The system shall process requests within 100ms.

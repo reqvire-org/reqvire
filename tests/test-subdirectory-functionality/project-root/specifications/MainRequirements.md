@@ -2,7 +2,6 @@
 
 This file contains main requirements that should NOT be processed when run from a subdirectory.
 
-## Main Requirements
 
 ### Main Requirement One
 

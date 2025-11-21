@@ -2,7 +2,6 @@
 
 This document contains requirements with intentional relation errors for testing validation.
 
-## Requirements
 
 ### Valid Requirement
 

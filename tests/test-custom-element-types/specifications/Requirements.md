@@ -2,8 +2,6 @@
 
 This file contains test requirements with various custom element types.
 
-## Standard Requirements Section
-
 ### Standard Requirement 1
 
 This is a standard requirement element derived from User Requirement 1.
@@ -24,7 +22,6 @@ This is another standard requirement element derived from User Requirement 2.
 #### Relations
 * derivedFrom: #user-requirement-2
 
-## Custom Types Section
 
 ### Use Case Element 1
 
@@ -75,7 +72,6 @@ This element uses a custom type: constraint.
 #### Metadata
 * type: constraint
 
-## User Requirements Section
 
 ### User Requirement 1
 

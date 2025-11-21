@@ -1,7 +1,5 @@
 # Requirements
 
-## Root Elements
-
 ### Root User Requirement
 
 The system shall provide comprehensive functionality.

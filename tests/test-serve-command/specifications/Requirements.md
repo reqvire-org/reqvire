@@ -1,7 +1,5 @@
 # Requirements
 
-## Test Requirements
-
 ### Parent Requirement
 
 This is a parent requirement for the test.

@@ -5,8 +5,7 @@
       "name": "Model Diagram Generation",
       "element_type": "requirement",
       "file_path": "specifications/SystemRequirements.md",
-      "section": "Visualization Commands",
-      "section_index": 0,
+      "file_order_index": 0,
       "relations": [
         {
           "relation_type": "derive",
@@ -15,8 +14,7 @@
             "name": "JSON Output Format",
             "element_type": "requirement",
             "file_path": "specifications/SystemRequirements.md",
-            "section": "Output Formatting",
-            "section_index": 1,
+            "file_order_index": 5,
             "relations": [
               {
                 "relation_type": "verifiedBy",
@@ -25,8 +23,7 @@
                   "name": "Output Format Test",
                   "element_type": "test-verification",
                   "file_path": "specifications/Verifications/Tests.md",
-                  "section": "Model Command Tests",
-                  "section_index": 3,
+                  "file_order_index": 3,
                   "relations": [],
                   "attachments": []
                 }
@@ -42,8 +39,7 @@
             "name": "Model Filtering Capability",
             "element_type": "requirement",
             "file_path": "specifications/SystemRequirements.md",
-            "section": "Visualization Commands",
-            "section_index": 1,
+            "file_order_index": 1,
             "relations": [
               {
                 "relation_type": "derive",
@@ -52,8 +48,7 @@
                   "name": "Default Root Filtering",
                   "element_type": "requirement",
                   "file_path": "specifications/SystemRequirements.md",
-                  "section": "Visualization Commands",
-                  "section_index": 3,
+                  "file_order_index": 3,
                   "relations": [
                     {
                       "relation_type": "verifiedBy",
@@ -62,8 +57,7 @@
                         "name": "Default Filtering Test",
                         "element_type": "test-verification",
                         "file_path": "specifications/Verifications/Tests.md",
-                        "section": "Model Command Tests",
-                        "section_index": 2,
+                        "file_order_index": 2,
                         "relations": [],
                         "attachments": []
                       }
@@ -79,8 +73,7 @@
                   "name": "Forward Relation Traversal",
                   "element_type": "requirement",
                   "file_path": "specifications/SystemRequirements.md",
-                  "section": "Visualization Commands",
-                  "section_index": 2,
+                  "file_order_index": 2,
                   "relations": [
                     {
                       "relation_type": "verifiedBy",
@@ -89,8 +82,7 @@
                         "name": "From Flag Filtering Test",
                         "element_type": "test-verification",
                         "file_path": "specifications/Verifications/Tests.md",
-                        "section": "Model Command Tests",
-                        "section_index": 1,
+                        "file_order_index": 1,
                         "relations": [],
                         "attachments": []
                       }
@@ -110,8 +102,7 @@
             "name": "Model Generation Test",
             "element_type": "test-verification",
             "file_path": "specifications/Verifications/Tests.md",
-            "section": "Model Command Tests",
-            "section_index": 0,
+            "file_order_index": 0,
             "relations": [],
             "attachments": []
           }

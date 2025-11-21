@@ -1,7 +1,5 @@
 # Requirements
 
-## Requirements
-
 ### BAT style comment
 
 When a source file has a `.bat` or `.cmd` extension, the system shall use `REM` for comments.

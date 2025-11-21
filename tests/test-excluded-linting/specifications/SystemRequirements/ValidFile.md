@@ -2,7 +2,6 @@
 
 This file should be processed and has no linting issues.
 
-## Requirements
 
 ### SYS-001 System Requirement
 

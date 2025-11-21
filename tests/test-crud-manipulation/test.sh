@@ -41,7 +41,7 @@ This is a newly added feature.
 '
 
 set +e
-ADD_OUTPUT=$(cd "$TEST_DIR" && echo "$NEW_ELEMENT" | "$REQVIRE_BIN" add specifications/Requirements.md "Features" 2>&1)
+ADD_OUTPUT=$(cd "$TEST_DIR" && echo "$NEW_ELEMENT" | "$REQVIRE_BIN" add specifications/Requirements.md 2>&1)
 ADD_EXIT=$?
 set -e
 
@@ -143,7 +143,7 @@ echo "Test 3: Move element operation..."
 cp "${TEST_SCRIPT_DIR}/fixtures/specifications/OtherRequirements.md" "$TEST_DIR/specifications/OtherRequirements.md"
 
 set +e
-MOVE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv "Feature C" "specifications/OtherRequirements.md" "Other Features" 2>&1)
+MOVE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv "Feature C" "specifications/OtherRequirements.md" 2>&1)
 MOVE_EXIT=$?
 set -e
 
@@ -346,7 +346,7 @@ echo "Test 6: Error case handling..."
 # Test 4a: Move non-existent element
 echo "  4a: Move non-existent element..."
 set +e
-ERROR_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv "Non Existent Element" "specifications/OtherRequirements.md" "Other Features" 2>&1)
+ERROR_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv "Non Existent Element" "specifications/OtherRequirements.md" 2>&1)
 ERROR_EXIT=$?
 set -e
 
@@ -394,7 +394,7 @@ This is a duplicate.
 '
 
 set +e
-ERROR_OUTPUT=$(cd "$TEST_DIR" && echo "$DUPLICATE_ELEMENT" | "$REQVIRE_BIN" add specifications/Requirements.md "Features" 2>&1)
+ERROR_OUTPUT=$(cd "$TEST_DIR" && echo "$DUPLICATE_ELEMENT" | "$REQVIRE_BIN" add specifications/Requirements.md 2>&1)
 ERROR_EXIT=$?
 set -e
 
@@ -419,7 +419,7 @@ No header here
 '
 
 set +e
-ERROR_OUTPUT=$(cd "$TEST_DIR" && echo "$INVALID_ELEMENT" | "$REQVIRE_BIN" add specifications/Requirements.md "Features" 2>&1)
+ERROR_OUTPUT=$(cd "$TEST_DIR" && echo "$INVALID_ELEMENT" | "$REQVIRE_BIN" add specifications/Requirements.md 2>&1)
 ERROR_EXIT=$?
 set -e
 
@@ -450,7 +450,7 @@ This element has a relation to a non-existent target.
 '
 
 set +e
-ERROR_OUTPUT=$(cd "$TEST_DIR" && echo "$INVALID_RELATION_ELEMENT" | "$REQVIRE_BIN" add specifications/Requirements.md "Features" 2>&1)
+ERROR_OUTPUT=$(cd "$TEST_DIR" && echo "$INVALID_RELATION_ELEMENT" | "$REQVIRE_BIN" add specifications/Requirements.md 2>&1)
 ERROR_EXIT=$?
 set -e
 

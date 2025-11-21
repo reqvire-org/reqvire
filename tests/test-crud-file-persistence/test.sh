@@ -35,7 +35,6 @@ mkdir -p "${TEST_DIR}/specifications"
 cat > "${TEST_DIR}/specifications/FileA.md" << 'EOF'
 # Requirements
 
-## Section A
 
 ### Root Requirement
 
@@ -68,7 +67,6 @@ EOF
 cat > "${TEST_DIR}/specifications/FileB.md" << 'EOF'
 # Requirements
 
-## Section B
 
 ### Requirement B1
 
@@ -95,7 +93,6 @@ EOF
 cat > "${TEST_DIR}/specifications/FileC.md" << 'EOF'
 # Requirements
 
-## Section C
 
 ### Requirement C1
 

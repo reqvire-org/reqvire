@@ -100,8 +100,8 @@ impl ModelManager {
 
                     let relative_path_str = utils::get_relative_path(&path)?.to_string_lossy().to_string();
 
-                    // Parse Elements, page content, and section content
-                    let (elements, parse_errors, page_content, sections) = parser::parse_elements(
+                    // Parse Elements and page content
+                    let (elements, parse_errors, page_content) = parser::parse_elements(
                         &file_name,
                         &file_content,
                         &path,
@@ -112,16 +112,6 @@ impl ModelManager {
 
                     // Register page content
                     self.graph_registry.register_page(relative_path_str.clone(), page_content);
-
-                    // Register section content
-                    for (section_name, section_content, section_order) in sections {
-                        self.graph_registry.register_section_with_order(
-                            relative_path_str.clone(),
-                            section_name,
-                            section_content,
-                            section_order
-                        );
-                    }
 
                     // Track element locations for global uniqueness checking
                     for element in &elements {

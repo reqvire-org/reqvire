@@ -2,7 +2,6 @@
 
 This is a requirements document specifically created for testing diagram generation.
 
-## Root Requirements
 
 ### Root Requirement
 
@@ -11,7 +10,6 @@ This is the root requirement for testing purposes.
 #### Metadata
   * type: user-requirement
 
-## Section 1
 ```mermaid
 graph TD;
   %% Graph styling
@@ -49,7 +47,6 @@ This is another test element with relations.
 #### Relations
   * derivedFrom: [Element 1](#element-1)
 
-## Custom Mermaid Diagram Section
 
 This section contains a custom mermaid diagram that should not be removed:
 
@@ -62,7 +59,6 @@ flowchart TD
     B -- No --> E[End]
 ```
 
-## Section 2
 ```mermaid
 graph TD;
   %% Graph styling

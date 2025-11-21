@@ -2,8 +2,6 @@
 
 This file contains a single element that will be moved.
 
-## Single Section
-
 ### Only Element
 
 This is the only element in this file. Moving it should result in this file being deleted.

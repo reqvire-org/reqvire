@@ -1,7 +1,5 @@
 # Requirements
 
-## Data Operations
-
 ### Export to CSV
 
 The system shall export data to CSV format.

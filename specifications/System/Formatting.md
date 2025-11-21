@@ -1,7 +1,5 @@
 # Requirements
 
-## Model Formatting
-
 ### Model Formatting
 
 The system shall provide formatting capabilities to normalize and standardize MBSE models for consistency and readability.
@@ -78,10 +76,8 @@ This test verifies the format command requirements from SystemRequirements and U
 
 **Content Preservation:**
 - System shall preserve personas sections and other non-element content
-- System shall maintain element ordering within sections
-- System shall preserve section ordering throughout documents
-- System shall preserve page content (frontmatter before first section)
-- System shall preserve section content (content between section headers and first element)
+- System shall maintain element ordering within files
+- System shall preserve page content (frontmatter before first element)
 
 **Formatting Consistency:**
 - System shall trim excess whitespace from lines
@@ -131,8 +127,8 @@ This test verifies the format command requirements from SystemRequirements and U
 2. **Content preservation verification**
    - Personas sections remain intact after formatting
    - Element content and structure preserved
-   - Section ordering maintained correctly
-   - Page and section content preserved
+   - Element ordering maintained correctly within files
+   - Page content preserved
 
 3. **Change detection and preview**
    - Changes are clearly identified by file

@@ -2,7 +2,6 @@
 
 This document contains user requirements for testing validation.
 
-## Requirements
 
 ### Valid User Requirement
 

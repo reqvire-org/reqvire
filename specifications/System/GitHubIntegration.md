@@ -1,6 +1,5 @@
 # Requirements
 
-## Requirements
 
 ### Automate Pull Request Validations
 

@@ -1,7 +1,5 @@
 # Requirements
 
-## Section One
-
 ### User Authentication
 
 The system shall provide user authentication capabilities.

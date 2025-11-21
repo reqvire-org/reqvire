@@ -1,7 +1,5 @@
 # Requirements
 
-## Security Requirements
-
 ### User Authentication
 
 The system SHALL provide secure user authentication.
@@ -19,8 +17,6 @@ The system SHALL protect user data from unauthorized access.
   * type: user-requirement
 
 ---
-
-## Reporting Requirements
 
 ### Coverage Reports
 

@@ -1,3 +1,2 @@
 # Requirements
 
-## Network Features

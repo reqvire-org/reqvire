@@ -1,7 +1,5 @@
 # Requirements
 
-## Deployments
-
 ### Deployments
 
 Root requiement.

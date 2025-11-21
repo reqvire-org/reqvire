@@ -122,7 +122,7 @@ fi
 
 # Parse JSON and verify types for elements WITHOUT metadata
 # Root element without type should be 'requirement'
-ROOT_TYPE=$(echo "$OUTPUT" | jq -r '.files["specifications/RootRequirements.md"].sections[].elements[] | select(.name == "Root Requirement Without Type") | .type')
+ROOT_TYPE=$(echo "$OUTPUT" | jq -r '.files["specifications/RootRequirements.md"].elements[] | select(.name == "Root Requirement Without Type") | .type')
 if [ "$ROOT_TYPE" != "requirement" ]; then
     echo "FAILED: Root element without type metadata should be 'requirement', got '$ROOT_TYPE'" >> "${TEST_DIR}/test_results.log"
     OVERALL_RESULT=1
@@ -131,7 +131,7 @@ else
 fi
 
 # Subfolder element without type should be 'requirement'
-SUBFOLDER_TYPE=$(echo "$OUTPUT" | jq -r '.files["specifications/root/SubfolderRequirements.md"].sections[].elements[] | select(.name == "Subfolder Requirement Without Type") | .type')
+SUBFOLDER_TYPE=$(echo "$OUTPUT" | jq -r '.files["specifications/root/SubfolderRequirements.md"].elements[] | select(.name == "Subfolder Requirement Without Type") | .type')
 if [ "$SUBFOLDER_TYPE" != "requirement" ]; then
     echo "FAILED: Subfolder element without type metadata should be 'requirement', got '$SUBFOLDER_TYPE'" >> "${TEST_DIR}/test_results.log"
     OVERALL_RESULT=1
@@ -140,7 +140,7 @@ else
 fi
 
 # Nested element without type should be 'requirement'
-NESTED_TYPE=$(echo "$OUTPUT" | jq -r '.files["specifications/nested/deeper/NestedRequirements.md"].sections[].elements[] | select(.name == "Nested Requirement Without Type") | .type')
+NESTED_TYPE=$(echo "$OUTPUT" | jq -r '.files["specifications/nested/deeper/NestedRequirements.md"].elements[] | select(.name == "Nested Requirement Without Type") | .type')
 if [ "$NESTED_TYPE" != "requirement" ]; then
     echo "FAILED: Nested element without type metadata should be 'requirement', got '$NESTED_TYPE'" >> "${TEST_DIR}/test_results.log"
     OVERALL_RESULT=1
@@ -149,7 +149,7 @@ else
 fi
 
 # Verify elements WITH explicit type metadata use the specified type
-ROOT_USER_TYPE=$(echo "$OUTPUT" | jq -r '.files["specifications/RootRequirements.md"].sections[].elements[] | select(.name == "Root Requirement With User Type") | .type')
+ROOT_USER_TYPE=$(echo "$OUTPUT" | jq -r '.files["specifications/RootRequirements.md"].elements[] | select(.name == "Root Requirement With User Type") | .type')
 if [ "$ROOT_USER_TYPE" != "user-requirement" ]; then
     echo "FAILED: Element with explicit user-requirement type should be 'user-requirement', got '$ROOT_USER_TYPE'" >> "${TEST_DIR}/test_results.log"
     OVERALL_RESULT=1
@@ -157,7 +157,7 @@ else
     echo "PASSED: Element with explicit type metadata has type 'user-requirement'" >> "${TEST_DIR}/test_results.log"
 fi
 
-SUBFOLDER_VERIF_TYPE=$(echo "$OUTPUT" | jq -r '.files["specifications/root/SubfolderRequirements.md"].sections[].elements[] | select(.name == "Subfolder Requirement With Verification Type") | .type')
+SUBFOLDER_VERIF_TYPE=$(echo "$OUTPUT" | jq -r '.files["specifications/root/SubfolderRequirements.md"].elements[] | select(.name == "Subfolder Requirement With Verification Type") | .type')
 if [ "$SUBFOLDER_VERIF_TYPE" != "test-verification" ]; then
     echo "FAILED: Element with explicit verification type should default to 'test-verification', got '$SUBFOLDER_VERIF_TYPE'" >> "${TEST_DIR}/test_results.log"
     OVERALL_RESULT=1
@@ -165,7 +165,7 @@ else
     echo "PASSED: Element with explicit type metadata has type 'test-verification' (default for verification)" >> "${TEST_DIR}/test_results.log"
 fi
 
-NESTED_TEST_TYPE=$(echo "$OUTPUT" | jq -r '.files["specifications/nested/deeper/NestedRequirements.md"].sections[].elements[] | select(.name == "Nested Requirement With Test Type") | .type')
+NESTED_TEST_TYPE=$(echo "$OUTPUT" | jq -r '.files["specifications/nested/deeper/NestedRequirements.md"].elements[] | select(.name == "Nested Requirement With Test Type") | .type')
 if [ "$NESTED_TEST_TYPE" != "test-verification" ]; then
     echo "FAILED: Element with explicit test-verification type should be 'test-verification', got '$NESTED_TEST_TYPE'" >> "${TEST_DIR}/test_results.log"
     OVERALL_RESULT=1
@@ -298,7 +298,7 @@ for type_check in "${TYPES_TO_CHECK[@]}"; do
     ELEMENT_NAME="${type_check%:*}"
     EXPECTED_TYPE="${type_check#*:}"
 
-    ACTUAL_TYPE=$(echo "$OUTPUT" | jq -r --arg name "$ELEMENT_NAME" '.files["specifications/AllTypes.md"].sections[].elements[] | select(.name == $name) | .type')
+    ACTUAL_TYPE=$(echo "$OUTPUT" | jq -r --arg name "$ELEMENT_NAME" '.files["specifications/AllTypes.md"].elements[] | select(.name == $name) | .type')
 
     if [ "$ACTUAL_TYPE" != "$EXPECTED_TYPE" ]; then
         echo "FAILED: Element '$ELEMENT_NAME' should have type '$EXPECTED_TYPE', got '$ACTUAL_TYPE'" >> "${TEST_DIR}/test_results.log"

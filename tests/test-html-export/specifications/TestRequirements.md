@@ -2,7 +2,6 @@
 
 This document contains test requirements for HTML export testing.
 
-## Root Requirements
 
 ### Root Requirement
 
@@ -13,7 +12,6 @@ The system SHALL support HTML export functionality with proper link handling.
 
 ---
 
-## Requirements
 ```mermaid
 graph LR;
   %% Graph styling

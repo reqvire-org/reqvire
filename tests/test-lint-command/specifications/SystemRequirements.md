@@ -1,6 +1,5 @@
 # Requirements
 
-## API Requirements
 
 ### Authorization
 

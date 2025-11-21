@@ -177,10 +177,10 @@ if ! grep -q "$EXPECTED_VERIFICATION_ABSOLUTE_PATH_APPLIED" Verifications/Tests.
     exit 1
 fi
 
-# Test 3.4: Check that personas section is preserved exactly
+# Test 3.4: Check that personas content is preserved exactly
 EXPECTED_PERSONA="System Engineer"
-if ! grep -A 5 "## Personas" UserStories.md | grep -q "$EXPECTED_PERSONA"; then
-    echo "FAIL: Personas section not preserved"
+if ! grep -A 5 "Personas:" UserStories.md | grep -q "$EXPECTED_PERSONA"; then
+    echo "FAIL: Personas content not preserved"
     exit 1
 fi
 

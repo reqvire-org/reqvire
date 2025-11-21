@@ -1,7 +1,5 @@
 # Requirements
 
-## User Stories
-
 ### Align with Industry Standards
 
 As as **System Engineer**, I want to work with the system that adheres to widely recognized industry standards, such as ISO/IEC/IEEE 15288, to ensure compatibility and relevance in systems engineering practices.

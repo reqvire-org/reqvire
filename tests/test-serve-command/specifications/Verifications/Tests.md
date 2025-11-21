@@ -1,7 +1,5 @@
 # Requirements
 
-## Verifications
-
 ### Test Verification One
 
 This verification tests the first requirement.

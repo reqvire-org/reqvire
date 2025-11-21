@@ -122,7 +122,6 @@ pub struct Element {
     #[serde(skip)]
     pub id: String,
     pub content: String,
-    pub section: String,
     pub relations: Vec<Relation>,
     pub identifier: String,
     pub file_path: String,
@@ -135,8 +134,8 @@ pub struct Element {
     //
     pub changed_since_commit: bool,
     //
-    // Order index within the section (used for preserving original order)
-    pub section_order_index: usize,
+    // Order index within the file (used for preserving original order)
+    pub file_order_index: usize,
     //
     // Attachments - external documents linked to this element
     pub attachments: Vec<Attachment>,
@@ -145,7 +144,7 @@ pub struct Element {
 
 
 impl Element {
-    pub fn new(name: &str, identifier: &str, file_path: &str, section: &str, line_number: usize, element_type: Option<ElementType>) -> Self {
+    pub fn new(name: &str, identifier: &str, file_path: &str, line_number: usize, element_type: Option<ElementType>) -> Self {
         // Extract stable ID (fragment) from identifier
         let id = utils::extract_path_and_fragment(identifier).1
             .unwrap_or(identifier)
@@ -156,7 +155,6 @@ impl Element {
             id,
             content: "".to_string(),
             hash_impact_content: "".to_string(),
-            section: section.to_string(),
             relations: vec![],
             identifier: identifier.to_string(),
             file_path: file_path.to_string(),
@@ -164,7 +162,7 @@ impl Element {
             element_type: element_type.unwrap_or(ElementType::Requirement(RequirementType::System)),
             metadata: HashMap::new(),
             changed_since_commit: false,
-            section_order_index: 0, // Will be set during parsing
+            file_order_index: 0, // Will be set during parsing
             attachments: vec![],
         }
     }

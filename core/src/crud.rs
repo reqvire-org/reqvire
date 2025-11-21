@@ -14,7 +14,6 @@ use std::path::Path;
 /// * `model_manager` - The model manager
 /// * `element_markdown` - The markdown content for the element
 /// * `target_file` - Target file path (relative to current working directory)
-/// * `target_section` - Target section name
 /// * `index` - Optional index for insertion
 /// * `excluded_patterns` - Patterns to exclude from path validation
 /// * `current_dir` - Current working directory (where command was invoked)
@@ -24,7 +23,6 @@ pub fn add_element(
     model_manager: &mut ModelManager,
     element_markdown: &str,
     target_file: &str,
-    target_section: &str,
     index: Option<usize>,
     excluded_patterns: &GlobSet,
     current_dir: &Path,
@@ -47,7 +45,6 @@ pub fn add_element(
     let element = model_manager.graph_registry.create_element_from_string(
         element_markdown,
         &target_file_normalized,
-        target_section,
         index,
         excluded_patterns,
     )?;
@@ -147,7 +144,6 @@ pub fn remove_element(
 /// * `model_manager` - The model manager
 /// * `element_id` - ID of the element to move
 /// * `target_file` - Target file path (relative to current working directory)
-/// * `target_section` - Target section name
 /// * `index` - Optional index for insertion
 /// * `excluded_patterns` - Patterns to exclude from path validation
 /// * `current_dir` - Current working directory (where command was invoked)
@@ -157,7 +153,6 @@ pub fn move_element(
     model_manager: &mut ModelManager,
     element_id: &str,
     target_file: &str,
-    target_section: &str,
     index: Option<usize>,
     excluded_patterns: &GlobSet,
     current_dir: &Path,
@@ -188,7 +183,6 @@ pub fn move_element(
     let (new_id, _affected_files) = model_manager.graph_registry.move_element_comprehensive(
         element_id,
         &target_file_normalized,
-        target_section,
         index,
         excluded_patterns,
     )?;

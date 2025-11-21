@@ -1,7 +1,5 @@
 # Requirements
 
-## Existing Requirements
-
 ### Existing Requirement One
 
 This is an existing requirement.
@@ -23,7 +21,6 @@ This is another existing requirement.
 
 ---
 
-## Verifications
 
 ### Existing Verification
 

@@ -38,7 +38,6 @@ echo "Test 1: Basic normalization (spaces, case, punctuation)..."
 cat > "$TEST_DIR/specifications/Features.md" <<'EOF'
 # Requirements
 
-## Test Features
 
 ### My Feature Name
 
@@ -137,7 +136,7 @@ fi
 echo "$FULL_JSON" > "$TEST_DIR/actual-output.json"
 
 # Extract fragments from identifiers and verify normalization
-FRAGMENTS=$(echo "$FULL_JSON" | jq -r '.files | to_entries[] | .value.sections | to_entries[] | .value.elements[] | .identifier | split("#")[1]' | sort)
+FRAGMENTS=$(echo "$FULL_JSON" | jq -r '.files | to_entries[] | .value.elements[] | .identifier | split("#")[1]' | sort)
 
 # Expected normalized fragments
 EXPECTED_FRAGMENTS=(
@@ -172,7 +171,6 @@ echo "Test 3: Case-insensitive cross-reference resolution..."
 cat > "$TEST_DIR/specifications/References.md" <<'EOF'
 # Requirements
 
-## Test References
 
 ### Referencer A
 
@@ -226,7 +224,7 @@ echo ""
 echo "Test 4: Element ID remains stable after file relocation..."
 
 # Get initial fragment identifier
-INITIAL_FRAGMENT=$(echo "$FULL_JSON" | jq -r '.files | to_entries[] | .value.sections | to_entries[] | .value.elements[] | select(.name == "My Feature Name") | .identifier | split("#")[1]')
+INITIAL_FRAGMENT=$(echo "$FULL_JSON" | jq -r '.files | to_entries[] | .value.elements[] | select(.name == "My Feature Name") | .identifier | split("#")[1]')
 
 if [ "$INITIAL_FRAGMENT" != "my-feature-name" ]; then
   echo "❌ FAILED: Initial fragment ID is incorrect: $INITIAL_FRAGMENT"
@@ -247,7 +245,7 @@ fi
 
 # Get fragment identifier after relocation
 AFTER_JSON=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --json 2>&1)
-AFTER_FRAGMENT=$(echo "$AFTER_JSON" | jq -r '.files | to_entries[] | .value.sections | to_entries[] | .value.elements[] | select(.name == "My Feature Name") | .identifier | split("#")[1]')
+AFTER_FRAGMENT=$(echo "$AFTER_JSON" | jq -r '.files | to_entries[] | .value.elements[] | select(.name == "My Feature Name") | .identifier | split("#")[1]')
 
 if [ "$AFTER_FRAGMENT" != "my-feature-name" ]; then
   echo "❌ FAILED: Fragment ID changed after relocation: $AFTER_FRAGMENT"
@@ -292,7 +290,7 @@ for test in "${TESTS[@]}"; do
   IFS='|' read -r expected_frag element_name <<< "$test"
 
   # Extract fragment from FULL_JSON
-  ACTUAL_FRAG=$(echo "$FULL_JSON" | jq -r --arg name "$element_name" '.files | to_entries[] | .value.sections | to_entries[] | .value.elements[] | select(.name == $name) | .identifier | split("#")[1]')
+  ACTUAL_FRAG=$(echo "$FULL_JSON" | jq -r --arg name "$element_name" '.files | to_entries[] | .value.elements[] | select(.name == $name) | .identifier | split("#")[1]')
 
   if [ "$ACTUAL_FRAG" != "$expected_frag" ]; then
     echo "❌ FAILED: Element '$element_name' has incorrect fragment ID"
@@ -313,7 +311,7 @@ echo "Test 6: Verify parsing extracts subsections and relations correctly..."
 # Get full model JSON
 # Use the existing FULL_JSON from Test 2
 # Find "My Feature Name" element using correct JSON structure
-MY_FEATURE=$(echo "$FULL_JSON" | jq -r '.files | to_entries[] | .value.sections | to_entries[] | .value.elements[] | select(.name == "My Feature Name")')
+MY_FEATURE=$(echo "$FULL_JSON" | jq -r '.files | to_entries[] | .value.elements[] | select(.name == "My Feature Name")')
 
 # Test 6a: Verify Metadata subsection is parsed
 ELEMENT_TYPE=$(echo "$MY_FEATURE" | jq -r '.type')
@@ -374,7 +372,6 @@ echo "✓ Element content extracted correctly (subsections excluded)"
 cat > "$TEST_DIR/specifications/Detailed.md" <<'EOF'
 # Requirements
 
-## Detailed Features
 
 ### Parent Req
 
@@ -414,7 +411,7 @@ fi
 
 # Search for the element with Details
 DETAILED_JSON=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --json 2>&1)
-DETAILED_ELEM=$(echo "$DETAILED_JSON" | jq -r '.files."specifications/Detailed.md".sections."Detailed Features".elements[] | select(.name == "Feature With Details")')
+DETAILED_ELEM=$(echo "$DETAILED_JSON" | jq -r '.files."specifications/Detailed.md".elements[] | select(.name == "Feature With Details")')
 
 # Check if element was found
 if [ -z "$DETAILED_ELEM" ] || [ "$DETAILED_ELEM" == "null" ]; then

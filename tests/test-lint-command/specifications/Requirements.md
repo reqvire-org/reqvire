@@ -1,6 +1,5 @@
 # Requirements
 
-## Hierarchical Requirements
 ### Root Requirement
 
 This is the root requirement.

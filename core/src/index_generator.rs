@@ -8,19 +8,17 @@ use crate::git_commands;
 
 /// Generates a SpecificationsIndex.md index from the existing element registry
 pub fn generate_readme_index(
-    registry: &GraphRegistry, 
+    registry: &GraphRegistry,
     _output_folder: &PathBuf
 ) -> Result<String, ReqvireError> {
     let mut index_content = String::from("# Specification Index\n\n");
 
-    // Group elements by file and section
-    let mut grouped_elements: HashMap<String, HashMap<String, Vec<&Element>>> = HashMap::new();
+    // Group elements by file only
+    let mut grouped_elements: HashMap<String, Vec<&Element>> = HashMap::new();
 
     for element in registry.get_all_elements() {
         grouped_elements
-            .entry(element.file_path.clone()) // Group by file
-            .or_insert_with(HashMap::new)
-            .entry(element.section.clone()) // Group by section
+            .entry(element.file_path.clone())
             .or_insert_with(Vec::new)
             .push(element);
     }
@@ -30,56 +28,44 @@ pub fn generate_readme_index(
     sorted_files.sort(); // Sort files alphabetically
 
     for file in sorted_files {
-        let sections = grouped_elements.get(file).unwrap();
+        let elements = grouped_elements.get(file).unwrap();
 
         // Compute relative path
         let relative_path = get_relative_path(file);
 
+        index_content.push_str(&format!("## [{}]({})\n\n", relative_path, relative_path));
 
-        index_content.push_str(&format!("## [{}]({})\n", relative_path, relative_path));
+        // Sort elements by file_order_index for consistent ordering
+        let mut sorted_elements: Vec<_> = elements.iter().collect();
+        sorted_elements.sort_by_key(|e| e.file_order_index);
 
-        let mut sorted_sections: Vec<_> = sections.keys().collect();
-        sorted_sections.sort(); // Sort sections alphabetically
-
-        for section in sorted_sections {
-            let elements = sections.get(section).unwrap();
-            let section_id = generate_section_slug(section);
-
-
-            index_content.push_str(&format!("- [{}]({}#{})\n", section, relative_path, section_id));
-
-
-            for element in elements {
-                // Extract fragment from identifier (part after #)
-                let element_id = if let Some(pos) = element.identifier.rfind('#') {
-                    generate_section_slug(&element.identifier[pos + 1..])
-                } else {
-                    generate_section_slug(&element.identifier)
-                };
-                index_content.push_str(&format!("  - [{}]({}#{})\n", element.name, relative_path, element_id));
-            }
-
-            index_content.push_str("\n"); // Add spacing between sections
+        for element in sorted_elements {
+            // Extract fragment from identifier (part after #)
+            let element_id = if let Some(pos) = element.identifier.rfind('#') {
+                generate_element_slug(&element.identifier[pos + 1..])
+            } else {
+                generate_element_slug(&element.identifier)
+            };
+            index_content.push_str(&format!("- [{}]({}#{})\n", element.name, relative_path, element_id));
         }
 
         index_content.push_str("\n"); // Add spacing between files
     }
-    
+
     let total_files = grouped_elements.len();
-    let total_sections: usize = grouped_elements.values().map(|s| s.len()).sum();
     let total_elements: usize = registry.get_all_elements().len();
 
     index_content.push_str(&format!(
-        "\n---\n📊 **Summary:**\n- {} Files\n- {} Sections\n- {} Elements\n",
-        total_files, total_sections, total_elements
+        "\n---\n**Summary:**\n- {} Files\n- {} Elements\n",
+        total_files, total_elements
     ));
 
     // Return the generated content (file writing is handled by CLI)
     Ok(index_content)
 }
 
-fn generate_section_slug(section: &str) -> String {
-    section
+fn generate_element_slug(name: &str) -> String {
+    name
         .to_lowercase()
         .replace(" ", "-")
         .replace(|c: char| !c.is_alphanumeric() && c != '-', "") // Remove special characters

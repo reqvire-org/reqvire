@@ -11,20 +11,6 @@ use crate::git_commands;
 use globset::GlobSet;
 use regex::Regex;
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
-pub struct SectionKey {
-    pub file_path: String,
-    pub section_name: String,
-}
-
-impl SectionKey {
-    pub fn new(file_path: String, section_name: String) -> Self {
-        Self {
-            file_path,
-            section_name,
-        }
-    }
-}
 
 #[derive(Debug, Clone, Serialize)]
 pub struct Page {
@@ -39,27 +25,6 @@ impl Page {
     }
 }
 
-#[derive(Debug, Clone, Serialize)]
-pub struct Section {
-    pub content: String,
-    pub section_order: usize,
-}
-
-impl Section {
-    pub fn new(content: String) -> Self {
-        Self {
-            content,
-            section_order: 0, // Will be set when section is added
-        }
-    }
-
-    pub fn new_with_order(content: String, section_order: usize) -> Self {
-        Self {
-            content,
-            section_order,
-        }
-    }
-}
 
 #[derive(Debug, Clone, Serialize)]
 pub struct RelationNode {
@@ -77,7 +42,6 @@ pub struct ElementNode {
 pub struct GraphRegistry {
     pub nodes: HashMap<String, ElementNode>,
     pub pages: HashMap<String, Page>,
-    pub sections: HashMap<SectionKey, Section>,
     pub modified_files: HashSet<String>, // Track files modified during CRUD operations
 }
 
@@ -87,7 +51,6 @@ impl GraphRegistry {
         Self {
             nodes: HashMap::new(),
             pages: HashMap::new(),
-            sections: HashMap::new(),
             modified_files: HashSet::new(),
         }
     }
@@ -95,18 +58,6 @@ impl GraphRegistry {
     /// Registers a page with content
     pub fn register_page(&mut self, file_path: String, page_content: String) {
         self.pages.insert(file_path, Page::new(page_content));
-    }
-
-    /// Registers a section with content
-    pub fn register_section(&mut self, file_path: String, section_name: String, section_content: String) {
-        let section_key = SectionKey::new(file_path, section_name);
-        self.sections.insert(section_key, Section::new(section_content));
-    }
-
-    /// Registers a section with content and order
-    pub fn register_section_with_order(&mut self, file_path: String, section_name: String, section_content: String, section_order: usize) {
-        let section_key = SectionKey::new(file_path, section_name);
-        self.sections.insert(section_key, Section::new_with_order(section_content, section_order));
     }
 
     /// Registers an element with local validation
@@ -607,40 +558,38 @@ impl GraphRegistry {
         Ok(matching_ids[0].clone())
     }
 
-    /// Moves an element to an existing location in the graph (file and section must already exist)
-    pub fn move_element_to_location(&mut self, element_id: &str, new_file_path: &str, new_section: &str) -> Result<(), ReqvireError> {
-        // Verify the target location exists in the graph
-        let target_exists = self.nodes.values().any(|node| {
-            node.element.file_path == new_file_path && node.element.section == new_section
+    /// Moves an element to an existing file in the graph
+    pub fn move_element_to_location(&mut self, element_id: &str, new_file_path: &str) -> Result<(), ReqvireError> {
+        // Verify the target file exists in the graph (either has elements or is registered as a page)
+        let target_has_elements = self.nodes.values().any(|node| {
+            node.element.file_path == new_file_path
         });
+        let target_is_page = self.pages.contains_key(new_file_path);
 
-        if !target_exists {
+        if !target_has_elements && !target_is_page {
             return Err(ReqvireError::LocationNotFound(format!(
-                "Target location '{}:{}' does not exist in the graph",
-                new_file_path, new_section
+                "Target file '{}' does not exist in the graph",
+                new_file_path
             )));
         }
 
         if let Some(node) = self.nodes.get_mut(element_id) {
             let old_file_path = node.element.file_path.clone();
-            let old_section = node.element.section.clone();
 
             node.element.file_path = new_file_path.to_string();
-            node.element.section = new_section.to_string();
 
             // Update the element in all relation nodes that reference it
             for (_id, other_node) in self.nodes.iter_mut() {
                 for relation_node in &mut other_node.relations {
                     if relation_node.element_node.element.identifier == element_id {
                         relation_node.element_node.element.file_path = new_file_path.to_string();
-                        relation_node.element_node.element.section = new_section.to_string();
                     }
                 }
             }
 
             log::debug!(
-                "Moved element '{}' from '{}:{}' to '{}:{}'",
-                element_id, old_file_path, old_section, new_file_path, new_section
+                "Moved element '{}' from '{}' to '{}'",
+                element_id, old_file_path, new_file_path
             );
 
             Ok(())
@@ -649,46 +598,8 @@ impl GraphRegistry {
         }
     }
 
-    /// Adds a new section to an existing file in the graph (virtual - no filesystem changes)
-    pub fn add_section_to_file(&mut self, file_path: &str, new_section: &str) -> Result<(), ReqvireError> {
-        // Verify the file exists in the graph
-        let file_exists = self.nodes.values().any(|node| node.element.file_path == file_path);
-
-        if !file_exists {
-            return Err(ReqvireError::LocationNotFound(format!("File '{}' does not exist in the graph", file_path)));
-        }
-
-        // Check if the section already exists
-        let section_exists = self.nodes.values().any(|node| {
-            node.element.file_path == file_path && node.element.section == new_section
-        });
-
-        if section_exists {
-            return Err(ReqvireError::LocationAlreadyExists(format!("Section '{}' already exists in file '{}'", new_section, file_path)));
-        }
-
-        // Create a virtual placeholder element to track this location
-        let virtual_id = format!("__virtual__{}#{}", file_path, new_section);
-        let virtual_element = Element::new(
-            &format!("Virtual placeholder for {}", new_section),
-            &virtual_id,
-            file_path,
-            new_section,
-            0, // Virtual elements don't have real line numbers
-            None,
-        );
-
-        self.nodes.insert(virtual_id, ElementNode {
-            element: virtual_element,
-            relations: Vec::new(),
-        });
-
-        log::debug!("Added virtual section '{}' to file '{}'", new_section, file_path);
-        Ok(())
-    }
-
     /// Adds a new file location to the graph (virtual - no filesystem changes)
-    pub fn add_file_location(&mut self, new_file_path: &str, initial_section: &str) -> Result<(), ReqvireError> {
+    pub fn add_file_location(&mut self, new_file_path: &str) -> Result<(), ReqvireError> {
         // Check if the file already exists
         let file_exists = self.nodes.values().any(|node| node.element.file_path == new_file_path);
 
@@ -697,12 +608,11 @@ impl GraphRegistry {
         }
 
         // Create a virtual placeholder element to track this file location
-        let virtual_id = format!("__virtual__{}#{}", new_file_path, initial_section);
+        let virtual_id = format!("__virtual__{}", new_file_path);
         let virtual_element = Element::new(
             &format!("Virtual placeholder for {}", new_file_path),
             &virtual_id,
             new_file_path,
-            initial_section,
             0, // Virtual elements don't have real line numbers
             None,
         );
@@ -712,78 +622,29 @@ impl GraphRegistry {
             relations: Vec::new(),
         });
 
-        log::debug!("Added virtual file location '{}' with initial section '{}'", new_file_path, initial_section);
+        log::debug!("Added virtual file location '{}'", new_file_path);
         Ok(())
     }
 
-    /// Moves element to a new section in an existing file (creates section if needed)
-    pub fn move_element_to_new_section(&mut self, element_id: &str, file_path: &str, new_section: &str) -> Result<(), ReqvireError> {
-        // Verify the file exists in the graph
-        let file_exists = self.nodes.values().any(|node| node.element.file_path == file_path);
-
-        if !file_exists {
-            return Err(ReqvireError::LocationNotFound(format!("File '{}' does not exist in the graph", file_path)));
-        }
-
-        // Check if section exists, if not, create it virtually
-        let section_exists = self.nodes.values().any(|node| {
-            node.element.file_path == file_path && node.element.section == new_section
-        });
-
-        if !section_exists {
-            self.add_section_to_file(file_path, new_section)?;
-        }
-
-        if let Some(node) = self.nodes.get_mut(element_id) {
-            let old_file_path = node.element.file_path.clone();
-            let old_section = node.element.section.clone();
-
-            node.element.file_path = file_path.to_string();
-            node.element.section = new_section.to_string();
-
-            // Update the element in all relation nodes that reference it
-            for (_id, other_node) in self.nodes.iter_mut() {
-                for relation_node in &mut other_node.relations {
-                    if relation_node.element_node.element.identifier == element_id {
-                        relation_node.element_node.element.file_path = file_path.to_string();
-                        relation_node.element_node.element.section = new_section.to_string();
-                    }
-                }
-            }
-
-            log::debug!(
-                "Moved element '{}' from '{}:{}' to new section '{}:{}'",
-                element_id, old_file_path, old_section, file_path, new_section
-            );
-
-            Ok(())
-        } else {
-            Err(ReqvireError::MissingElement(format!("Element '{}' not found in graph", element_id)))
-        }
-    }
-
     /// Moves element to a new file location (creates file location if needed)
-    pub fn move_element_to_new_file(&mut self, element_id: &str, new_file_path: &str, new_section: &str) -> Result<(), ReqvireError> {
+    pub fn move_element_to_new_file(&mut self, element_id: &str, new_file_path: &str) -> Result<(), ReqvireError> {
         // Check if file exists, if not, create it virtually
         let file_exists = self.nodes.values().any(|node| node.element.file_path == new_file_path);
 
         if !file_exists {
-            self.add_file_location(new_file_path, new_section)?;
+            self.add_file_location(new_file_path)?;
         }
 
         if let Some(node) = self.nodes.get_mut(element_id) {
             let old_file_path = node.element.file_path.clone();
-            let old_section = node.element.section.clone();
 
             node.element.file_path = new_file_path.to_string();
-            node.element.section = new_section.to_string();
 
             // Update the element in all relation nodes that reference it
             for (_id, other_node) in self.nodes.iter_mut() {
                 for relation_node in &mut other_node.relations {
                     if relation_node.element_node.element.identifier == element_id {
                         relation_node.element_node.element.file_path = new_file_path.to_string();
-                        relation_node.element_node.element.section = new_section.to_string();
                     }
                 }
             }
@@ -792,8 +653,8 @@ impl GraphRegistry {
             self.update_relation_identifiers(element_id, &old_file_path, new_file_path);
 
             log::debug!(
-                "Moved element '{}' from '{}:{}' to new file '{}:{}'",
-                element_id, old_file_path, old_section, new_file_path, new_section
+                "Moved element '{}' from '{}' to new file '{}'",
+                element_id, old_file_path, new_file_path
             );
 
             Ok(())
@@ -802,12 +663,12 @@ impl GraphRegistry {
         }
     }
 
-    /// Gets all available locations (file:section combinations) in the graph
-    pub fn get_available_locations(&self) -> Vec<(String, String)> {
+    /// Gets all available file locations in the graph
+    pub fn get_available_locations(&self) -> Vec<String> {
         let mut locations = std::collections::BTreeSet::new();
 
         for node in self.nodes.values() {
-            locations.insert((node.element.file_path.clone(), node.element.section.clone()));
+            locations.insert(node.element.file_path.clone());
         }
 
         locations.into_iter().collect()
@@ -1027,14 +888,9 @@ impl GraphRegistry {
             .find(|elem| elem.name == name)
     }
 
-    /// Creates a virtual section in an existing file
-    pub fn create_virtual_section(&mut self, file_path: &str, section: &str) -> Result<(), ReqvireError> {
-        self.add_section_to_file(file_path, section)
-    }
-
-    /// Creates a virtual file with initial section
-    pub fn create_virtual_file(&mut self, file_path: &str, section: &str) -> Result<(), ReqvireError> {
-        self.add_file_location(file_path, section)
+    /// Creates a virtual file location
+    pub fn create_virtual_file(&mut self, file_path: &str) -> Result<(), ReqvireError> {
+        self.add_file_location(file_path)
     }
 
     /// Collects all InternalPath targets from element relations
@@ -1248,9 +1104,9 @@ impl GraphRegistry {
         }
     }
 
-    /// Groups elements by their file path and section
-    pub fn group_elements_by_location(&self) -> HashMap<String, HashMap<String, Vec<&Element>>> {
-        let mut file_sections: HashMap<String, HashMap<String, Vec<&Element>>> = HashMap::new();
+    /// Groups elements by their file path
+    pub fn group_elements_by_location(&self) -> HashMap<String, Vec<&Element>> {
+        let mut file_elements: HashMap<String, Vec<&Element>> = HashMap::new();
 
         for node in self.nodes.values() {
             let element = &node.element;
@@ -1260,26 +1116,22 @@ impl GraphRegistry {
                 continue;
             }
 
-            file_sections
+            file_elements
                 .entry(element.file_path.clone())
-                .or_insert_with(HashMap::new)
-                .entry(element.section.clone())
                 .or_insert_with(Vec::new)
                 .push(element);
         }
 
-        // Sort elements within each section by their original order index
-        for file_map in file_sections.values_mut() {
-            for elements in file_map.values_mut() {
-                elements.sort_by_key(|element| element.section_order_index);
-            }
+        // Sort elements within each file by their original order index
+        for elements in file_elements.values_mut() {
+            elements.sort_by_key(|element| element.file_order_index);
         }
 
-        file_sections
+        file_elements
     }
 
     /// Generates markdown content for a file
-    pub fn generate_file_markdown(&self, file_path: &str, sections: &HashMap<String, Vec<&Element>>) -> String {
+    pub fn generate_file_markdown(&self, file_path: &str, elements: &[&Element]) -> String {
         let mut markdown = String::new();
 
         // All specification files must have "# Requirements" as the page header
@@ -1296,74 +1148,18 @@ impl GraphRegistry {
             }
         }
 
-        // Get all sections for this file (including those without elements)
-        let mut all_sections: HashMap<String, Vec<&Element>> = sections.clone();
-
-        // Add sections without elements from the sections registry
-        for (section_key, _) in &self.sections {
-            if section_key.file_path == file_path {
-                all_sections.entry(section_key.section_name.clone()).or_insert_with(Vec::new);
-            }
-        }
-
-        // Sort sections by their original order (section_order)
-        let mut sorted_sections: Vec<_> = all_sections.iter().collect();
-        sorted_sections.sort_by_key(|(section_name, _)| {
-            let section_key = SectionKey {
-                file_path: file_path.to_string(),
-                section_name: (*section_name).clone(),
-            };
-            self.sections.get(&section_key)
-                .map(|section| section.section_order)
-                .unwrap_or(usize::MAX) // Put sections without order at the end
-        });
-
-        for (section_name, elements) in sorted_sections {
-            // Skip empty section names, but always output section headers including "Requirements"
-            // "Requirements" is the default section name used by parser when no ## header is present
-            if !section_name.is_empty() {
-                debug!("Adding section header: '## {}' with 2 newlines", section_name);
-                markdown.push_str(&format!("## {}\n\n", section_name));
-            }
-
-            // Add section content if available
-            let section_key = SectionKey {
-                file_path: file_path.to_string(),
-                section_name: section_name.clone(),
-            };
-            let has_section_content = if let Some(section) = self.sections.get(&section_key) {
-                if !section.content.trim().is_empty() {
-                    markdown.push('\n'); // Add blank line after section header
-                    markdown.push_str(&section.content);
-                    if !section.content.ends_with('\n') {
-                        markdown.push('\n');
-                    }
-                    markdown.push('\n');
-                    true
-                } else {
-                    false
-                }
-            } else {
-                false
-            };
-
-            // Section header with format "## {}\n\n" already provides correct spacing for elements
-
-            // Add elements in this section
-            for (i, element) in elements.iter().enumerate() {
-                // Add separator before each element
-                // - Always before 2nd, 3rd, etc. elements (i > 0)
-                // - Before first element if there was section content
-                if i > 0 || has_section_content {
-                    markdown.push_str("---\n\n");
-                }
-                markdown.push_str(&self.element_to_markdown_with_context(element, file_path));
-            }
-
-            // Add final separator after the last element in the section (if there were any elements)
-            if !elements.is_empty() {
+        // Add elements in file order
+        for (i, element) in elements.iter().enumerate() {
+            // Add separator before each element (except the first)
+            if i > 0 {
                 markdown.push_str("---\n\n");
             }
+            markdown.push_str(&self.element_to_markdown_with_context(element, file_path));
+        }
+
+        // Add final separator after the last element (if there were any elements)
+        if !elements.is_empty() {
+            markdown.push_str("---\n\n");
         }
 
         markdown
@@ -1542,23 +1338,9 @@ impl GraphRegistry {
         let mut identifier_mappings: Vec<(String, String)> = Vec::new();
         let mut modified_files = vec![source_file.to_string()];
 
-        // In squash mode, move elements to first section in target file
+        // In squash mode, move elements to target file
         if squash && target_exists {
-            // Find first section in target file
-            let mut target_sections: Vec<String> = self.nodes.values()
-                .filter(|node| node.element.file_path == target_file)
-                .map(|node| node.element.section.clone())
-                .collect();
-            target_sections.sort();
-            target_sections.dedup();
-
-            let target_section = if target_sections.is_empty() {
-                "Requirements".to_string()
-            } else {
-                target_sections[0].clone()
-            };
-
-            // Move each element to target file's first section
+            // Move each element to target file
             for old_id in &elements_in_source {
                 let slug = if let Some(pos) = old_id.rfind('#') {
                     &old_id[pos+1..]
@@ -1570,7 +1352,6 @@ impl GraphRegistry {
                 // Update element
                 if let Some(node) = self.nodes.get_mut(old_id) {
                     node.element.file_path = target_file.to_string();
-                    node.element.section = target_section.clone();
                     node.element.identifier = new_id.clone();
                 }
 
@@ -1655,9 +1436,9 @@ impl GraphRegistry {
         let grouped_elements = self.group_elements_by_location();
         let mut markdown_files_written = 0;
 
-        for (file_path, sections) in grouped_elements {
+        for (file_path, elements) in grouped_elements {
             // Generate the markdown content for this file
-            let markdown_content = self.generate_file_markdown(&file_path, &sections);
+            let markdown_content = self.generate_file_markdown(&file_path, &elements);
 
             // Determine the output file path
             let output_file_path = output_dir.join(&file_path);
@@ -1673,7 +1454,7 @@ impl GraphRegistry {
                 .map_err(|e| ReqvireError::IoError(e))?;
 
             debug!("Flushed {} elements to {}",
-                sections.values().map(|v| v.len()).sum::<usize>(),
+                elements.len(),
                 output_file_path.display()
             );
 
@@ -1703,9 +1484,9 @@ impl GraphRegistry {
         let mut related_internal_paths = HashSet::new();
 
         for file_path in file_paths {
-            if let Some(sections) = grouped_elements.get(file_path) {
+            if let Some(elements) = grouped_elements.get(file_path) {
                 // Generate the markdown content for this file
-                let markdown_content = self.generate_file_markdown(file_path, sections);
+                let markdown_content = self.generate_file_markdown(file_path, elements);
 
                 // Determine the output file path
                 let output_file_path = output_dir.join(file_path);
@@ -1721,18 +1502,16 @@ impl GraphRegistry {
                     .map_err(|e| ReqvireError::IoError(e))?;
 
                 // Collect InternalPath relations from elements in this file
-                for elements in sections.values() {
-                    for element in elements {
-                        for relation in &element.relations {
-                            if let LinkType::InternalPath(ref path) = relation.target.link {
-                                related_internal_paths.insert(path.clone());
-                            }
+                for element in elements {
+                    for relation in &element.relations {
+                        if let LinkType::InternalPath(ref path) = relation.target.link {
+                            related_internal_paths.insert(path.clone());
                         }
                     }
                 }
 
                 debug!("Flushed {} elements to {}",
-                    sections.values().map(|v| v.len()).sum::<usize>(),
+                    elements.len(),
                     output_file_path.display()
                 );
 
@@ -1994,12 +1773,11 @@ impl GraphRegistry {
         &mut self,
         markdown: &str,
         target_file: &str,
-        section: &str,
         index: Option<usize>,
         excluded_patterns: &GlobSet,
     ) -> Result<Element, ReqvireError> {
         // Validate target path
-        let validation = crate::utils::validate_target_path(target_file, Some(section), excluded_patterns)?;
+        let validation = crate::utils::validate_target_path(target_file, None, excluded_patterns)?;
 
         if !validation.is_valid {
             return Err(ReqvireError::InvalidPath(
@@ -2008,7 +1786,7 @@ impl GraphRegistry {
         }
 
         // Parse element from markdown string
-        let element = crate::parser::parse_single_element(markdown, target_file, section)?;
+        let element = crate::parser::parse_single_element(markdown, target_file)?;
 
         // Check for duplicate element name (global uniqueness)
         if self.nodes.contains_key(&element.identifier) {
@@ -2040,7 +1818,7 @@ impl GraphRegistry {
 
         // Auto-create file if needed
         if validation.needs_file_creation {
-            self.add_file_location(target_file, section)?;
+            self.add_file_location(target_file)?;
 
             // Add page content (file header based on filename)
             let file_stem = Path::new(target_file)
@@ -2051,29 +1829,18 @@ impl GraphRegistry {
             self.register_page(target_file.to_string(), format!("# {}\n", file_stem));
         }
 
-        // Auto-create section if needed
-        if validation.needs_section_creation || validation.needs_file_creation {
-            let section_exists = self.nodes.values().any(|node| {
-                node.element.file_path == target_file && node.element.section == section
-            });
-
-            if !section_exists {
-                self.add_section_to_file(target_file, section)?;
-            }
-        }
-
-        // Set section_order_index if index provided
+        // Set file_order_index if index provided
         let mut new_element = element.clone();
         if let Some(idx) = index {
-            new_element.section_order_index = idx;
+            new_element.file_order_index = idx;
         } else {
-            // Default: append to end of section
+            // Default: append to end of file
             let max_index = self.nodes.values()
-                .filter(|node| node.element.file_path == target_file && node.element.section == section)
-                .map(|node| node.element.section_order_index)
+                .filter(|node| node.element.file_path == target_file)
+                .map(|node| node.element.file_order_index)
                 .max()
                 .unwrap_or(0);
-            new_element.section_order_index = max_index + 1;
+            new_element.file_order_index = max_index + 1;
         }
 
         // Add to graph
@@ -2137,7 +1904,6 @@ impl GraphRegistry {
         &mut self,
         element_id: &str,
         target_file: &str,
-        target_section: &str,
         index: Option<usize>,
         excluded_patterns: &GlobSet,
     ) -> Result<(String, Vec<String>), ReqvireError> {
@@ -2152,7 +1918,7 @@ impl GraphRegistry {
         let source_file = self.nodes.get(element_id).unwrap().element.file_path.clone();
 
         // Validate target path
-        let validation = crate::utils::validate_target_path(target_file, Some(target_section), excluded_patterns)?;
+        let validation = crate::utils::validate_target_path(target_file, None, excluded_patterns)?;
 
         if !validation.is_valid {
             return Err(ReqvireError::InvalidPath(
@@ -2162,7 +1928,7 @@ impl GraphRegistry {
 
         // Auto-create file if needed
         if validation.needs_file_creation {
-            self.add_file_location(target_file, target_section)?;
+            self.add_file_location(target_file)?;
 
             let file_stem = Path::new(target_file)
                 .file_stem()
@@ -2170,23 +1936,6 @@ impl GraphRegistry {
                 .unwrap_or("Document");
 
             self.register_page(target_file.to_string(), format!("# {}\n", file_stem));
-        }
-
-        // Auto-create section if needed
-        if validation.needs_section_creation || validation.needs_file_creation {
-            let section_exists = self.nodes.values().any(|node| {
-                node.element.file_path == target_file && node.element.section == target_section
-            });
-
-            if !section_exists {
-                // First check if file exists in graph, if not create it
-                let file_exists = self.nodes.values().any(|node| node.element.file_path == target_file);
-                if !file_exists {
-                    self.add_file_location(target_file, target_section)?;
-                } else {
-                    self.add_section_to_file(target_file, target_section)?;
-                }
-            }
         }
 
         // Perform the move using existing move_element_to_location
@@ -2212,7 +1961,7 @@ impl GraphRegistry {
         }
 
         // Now perform the move
-        self.move_element_to_location(element_id, target_file, target_section)?;
+        self.move_element_to_location(element_id, target_file)?;
 
         // Update all relations (TO and FROM the moved element)
         self.update_relation_identifiers(&old_identifier, &source_file, target_file);
@@ -2221,7 +1970,6 @@ impl GraphRegistry {
         let new_identifier = self.nodes.values()
             .find(|node| {
                 node.element.file_path == target_file &&
-                node.element.section == target_section &&
                 node.element.identifier.ends_with(&old_identifier.split('#').last().unwrap())
             })
             .map(|node| node.element.identifier.clone())
@@ -2229,10 +1977,10 @@ impl GraphRegistry {
                 "Failed to find element after move".to_string()
             ))?;
 
-        // Update section order index if provided
+        // Update file order index if provided
         if let Some(idx) = index {
             if let Some(node) = self.nodes.get_mut(&new_identifier) {
-                node.element.section_order_index = idx;
+                node.element.file_order_index = idx;
             }
         }
 
@@ -2287,7 +2035,6 @@ mod tests {
             name,
             id,
             "file.md",
-            "TestSection",
             1, // Test elements at line 1
             Some(ElementType::Requirement(RequirementType::System)),
         );
@@ -2412,14 +2159,12 @@ mod tests {
     fn test_move_element_to_existing_location() {
         let mut registry = GraphRegistry::new();
 
-        // Create elements in different locations
+        // Create elements in different files
         let mut a = make_element("A", "Element A");
         a.file_path = "file1.md".to_string();
-        a.section = "Section1".to_string();
 
         let mut b = make_element("B", "Element B");
         b.file_path = "file2.md".to_string();
-        b.section = "Section2".to_string();
 
         add_relation(&mut a, "derivedFrom", "B");
 
@@ -2428,14 +2173,13 @@ mod tests {
 
         let mut graph = registry;
 
-        // Move A to B's location
-        let result = graph.move_element_to_location("A", "file2.md", "Section2");
+        // Move A to B's file
+        let result = graph.move_element_to_location("A", "file2.md");
         assert!(result.is_ok());
 
-        // Verify A is now at B's location
+        // Verify A is now in file2.md
         let a_node = graph.nodes.get("A").unwrap();
         assert_eq!(a_node.element.file_path, "file2.md");
-        assert_eq!(a_node.element.section, "Section2");
     }
 
     #[test]
@@ -2446,8 +2190,8 @@ mod tests {
         registry.register_element(a.clone(), "file.md").unwrap();
         let mut graph = registry;
 
-        // Try to move to non-existent location
-        let result = graph.move_element_to_location("A", "nonexistent.md", "NonexistentSection");
+        // Try to move to non-existent file
+        let result = graph.move_element_to_location("A", "nonexistent.md");
         assert!(result.is_err());
         assert!(result.unwrap_err().to_string().contains("does not exist in the graph"));
     }
@@ -2458,15 +2202,12 @@ mod tests {
 
         let mut a = make_element("A", "Element A");
         a.file_path = "file1.md".to_string();
-        a.section = "Section1".to_string();
 
         let mut b = make_element("B", "Element B");
         b.file_path = "file2.md".to_string();
-        b.section = "Section2".to_string();
 
         let mut c = make_element("C", "Element C");
-        c.file_path = "file1.md".to_string();
-        c.section = "Section1".to_string(); // Same location as A
+        c.file_path = "file1.md".to_string(); // Same file as A
 
         registry.register_element(a.clone(), "file1.md").unwrap();
         registry.register_element(b.clone(), "file2.md").unwrap();
@@ -2475,10 +2216,10 @@ mod tests {
         let graph = registry;
         let locations = graph.get_available_locations();
 
-        // Should only have 2 unique locations
+        // Should only have 2 unique files
         assert_eq!(locations.len(), 2);
-        assert!(locations.contains(&("file1.md".to_string(), "Section1".to_string())));
-        assert!(locations.contains(&("file2.md".to_string(), "Section2".to_string())));
+        assert!(locations.contains(&"file1.md".to_string()));
+        assert!(locations.contains(&"file2.md".to_string()));
     }
 
     #[test]
@@ -2506,26 +2247,6 @@ mod tests {
     }
 
     #[test]
-    fn test_move_element_to_new_section() {
-        let mut registry = GraphRegistry::new();
-        let mut a = make_element("A", "Element A");
-        a.file_path = "file1.md".to_string();
-        a.section = "Section1".to_string();
-
-        registry.register_element(a.clone(), "file1.md").unwrap();
-        let mut graph = registry;
-
-        // Move A to a new section in the same file
-        let result = graph.move_element_to_new_section("A", "file1.md", "NewSection");
-        assert!(result.is_ok());
-
-        // Verify A is now in the new section
-        let a_node = graph.nodes.get("A").unwrap();
-        assert_eq!(a_node.element.file_path, "file1.md");
-        assert_eq!(a_node.element.section, "NewSection");
-    }
-
-    #[test]
     fn test_move_element_to_new_file() {
         let mut registry = GraphRegistry::new();
         let a = make_element("A", "Element A");
@@ -2533,32 +2254,13 @@ mod tests {
         registry.register_element(a.clone(), "file.md").unwrap();
         let mut graph = registry;
 
-        // Move A to a new file with new section
-        let result = graph.move_element_to_new_file("A", "new_file.md", "NewSection");
+        // Move A to a new file
+        let result = graph.move_element_to_new_file("A", "new_file.md");
         assert!(result.is_ok());
 
-        // Verify A is now in the new file and section
+        // Verify A is now in the new file
         let a_node = graph.nodes.get("A").unwrap();
         assert_eq!(a_node.element.file_path, "new_file.md");
-        assert_eq!(a_node.element.section, "NewSection");
-    }
-
-    #[test]
-    fn test_add_section_to_existing_file() {
-        let mut registry = GraphRegistry::new();
-        let a = make_element("A", "Element A");
-
-        registry.register_element(a.clone(), "file.md").unwrap();
-        let mut graph = registry;
-
-        // Add a new section to existing file
-        let result = graph.add_section_to_file("file.md", "NewSection");
-        assert!(result.is_ok());
-
-        // Try to add the same section again (should fail)
-        let result = graph.add_section_to_file("file.md", "NewSection");
-        assert!(result.is_err());
-        assert!(result.unwrap_err().to_string().contains("already exists"));
     }
 
     #[test]
@@ -2571,11 +2273,11 @@ mod tests {
         let mut graph = registry;
 
         // Add a new file location
-        let result = graph.add_file_location("new_file.md", "Section1");
+        let result = graph.add_file_location("new_file.md");
         assert!(result.is_ok());
 
         // Try to add the same file again (should fail)
-        let result = graph.add_file_location("existing.md", "Section1");
+        let result = graph.add_file_location("existing.md");
         assert!(result.is_err());
         assert!(result.unwrap_err().to_string().contains("already exists"));
     }
@@ -2587,15 +2289,12 @@ mod tests {
         // Create elements A, B, C
         let mut a = make_element("A", "Element A");
         a.file_path = "file1.md".to_string();
-        a.section = "Section1".to_string();
 
         let mut b = make_element("B", "Element B");
         b.file_path = "file1.md".to_string();
-        b.section = "Section1".to_string();
 
         let mut c = make_element("C", "Element C");
         c.file_path = "file2.md".to_string();
-        c.section = "Section2".to_string();
 
         // Create relations: B -> A, C -> A
         add_relation(&mut b, "derive", "A");
@@ -2617,13 +2316,12 @@ mod tests {
         assert_eq!(c_relations[0], ("derive".to_string(), "A".to_string()));
 
         // Move A to a new file - this should update its identifier
-        let result = graph.move_element_to_new_file("A", "file3.md", "Section3");
+        let result = graph.move_element_to_new_file("A", "file3.md");
         assert!(result.is_ok());
 
         // Check that A's location has changed
         let a_element = graph.get_element("A").unwrap();
         assert_eq!(a_element.file_path, "file3.md");
-        assert_eq!(a_element.section, "Section3");
 
         // CRITICAL: Relations from B and C should still point to A
         // But they should be pointing to the NEW identifier if A's identifier changed
@@ -2651,11 +2349,9 @@ mod tests {
         // Create elements A, B where B references A
         let mut a = make_element("A", "Element A");
         a.file_path = "file1.md".to_string();
-        a.section = "Section1".to_string();
 
         let mut b = make_element("B", "Element B");
         b.file_path = "file1.md".to_string();
-        b.section = "Section1".to_string();
 
         // B has a relation pointing to A
         add_relation(&mut b, "derivedFrom", "A");
@@ -2666,7 +2362,7 @@ mod tests {
         let mut graph = registry;
 
         // Move A to a different file
-        let result = graph.move_element_to_new_file("A", "file2.md", "Section2");
+        let result = graph.move_element_to_new_file("A", "file2.md");
         assert!(result.is_ok());
 
         // Check B's original relations in the element
@@ -2701,15 +2397,12 @@ mod tests {
         // Create elements A, B, C where A has relations to both B and C
         let mut a = make_element("A", "Element A");
         a.file_path = "file1.md".to_string();
-        a.section = "Section1".to_string();
 
         let mut b = make_element("B", "Element B");
         b.file_path = "file2.md".to_string();  // B is in different file
-        b.section = "Section2".to_string();
 
         let mut c = make_element("C", "Element C");
         c.file_path = "file1.md".to_string();  // C is in same file as A initially
-        c.section = "Section1".to_string();
 
         // A has relations to both B (cross-file) and C (same-file)
         add_relation(&mut a, "derivedFrom", "B");
@@ -2731,7 +2424,7 @@ mod tests {
         // So A should reference B as "file2.md#B" and C as just "C" (same file)
 
         // Move A to file3.md
-        let result = graph.move_element_to_new_file("A", "file3.md", "Section3");
+        let result = graph.move_element_to_new_file("A", "file3.md");
         assert!(result.is_ok());
 
         // Check A's relations after the move
@@ -2775,15 +2468,12 @@ mod tests {
         // Create elements in different files with cross-file relations
         let mut a = make_element("ElementA", "Element A Description");
         a.file_path = "file1.md".to_string();
-        a.section = "Section1".to_string();
 
         let mut b = make_element("ElementB", "Element B Description");
         b.file_path = "file2.md".to_string();
-        b.section = "Section2".to_string();
 
         let mut c = make_element("ElementC", "Element C Description");
         c.file_path = "file1.md".to_string(); // Same file as A
-        c.section = "Section1".to_string();
 
         // Create cross-file relations:
         // A -> B (file1.md -> file2.md)
@@ -2800,7 +2490,7 @@ mod tests {
         let mut graph = registry;
 
         // Move ElementB to file3.md to create more cross-file relations
-        let result = graph.move_element_to_new_file("ElementB", "file3.md", "Section3");
+        let result = graph.move_element_to_new_file("ElementB", "file3.md");
         assert!(result.is_ok());
 
         // Create temp directory for flush output
@@ -2872,20 +2562,6 @@ mod tests {
     }
 
     #[test]
-    fn test_move_to_new_section_nonexistent_file() {
-        let mut registry = GraphRegistry::new();
-        let a = make_element("A", "Element A");
-
-        registry.register_element(a.clone(), "file.md").unwrap();
-        let mut graph = registry;
-
-        // Try to move to new section in non-existent file (should fail)
-        let result = graph.move_element_to_new_section("A", "nonexistent.md", "NewSection");
-        assert!(result.is_err());
-        assert!(result.unwrap_err().to_string().contains("does not exist in the graph"));
-    }
-
-    #[test]
     fn test_flush_includes_page_content() {
         use std::fs;
         use tempfile::TempDir;
@@ -2895,7 +2571,6 @@ mod tests {
         // Create an element
         let mut a = make_element("ElementA", "Element A Description");
         a.file_path = "test_file.md".to_string();
-        a.section = "Section1".to_string();
 
         registry.register_element(a.clone(), "test_file.md").unwrap();
 
@@ -2922,93 +2597,37 @@ mod tests {
         // Verify file header is present - all files start with "# Requirements"
         assert!(file_content.starts_with("# Requirements\n\n"));
 
-        // Verify page content is included after header and before sections
+        // Verify page content is included after header and before elements
         assert!(file_content.contains("This is page frontmatter content."));
         assert!(file_content.contains("More page content here."));
 
         // Verify element is still present
         assert!(file_content.contains("### Element A Description"));
 
-        // Verify order: header, page content, section, element
+        // Verify order: header, page content, element
         let header_pos = file_content.find("# Requirements").unwrap();
         let page_content_pos = file_content.find("This is page frontmatter content.").unwrap();
-        let section_pos = file_content.find("## Section1").unwrap();
         let element_pos = file_content.find("### Element A Description").unwrap();
 
         assert!(header_pos < page_content_pos);
-        assert!(page_content_pos < section_pos);
-        assert!(section_pos < element_pos);
+        assert!(page_content_pos < element_pos);
     }
 
     #[test]
-    fn test_flush_includes_section_content() {
+    fn test_flush_multiple_elements() {
         use std::fs;
         use tempfile::TempDir;
 
         let mut registry = GraphRegistry::new();
 
-        // Create an element
+        // Create multiple elements
         let mut a = make_element("ElementA", "Element A Description");
         a.file_path = "test_file.md".to_string();
-        a.section = "Section1".to_string();
-
-        registry.register_element(a.clone(), "test_file.md").unwrap();
-
-        // Add section content
-        let section_key = SectionKey {
-            file_path: "test_file.md".to_string(),
-            section_name: "Section1".to_string(),
-        };
-        let section = Section::new("This is section content.\n\nSection description here.".to_string());
-        registry.sections.insert(section_key, section);
-
-        let graph = registry;
-
-        // Create temp directory for flush output
-        let temp_dir = TempDir::new().unwrap();
-        let output_path = temp_dir.path();
-
-        // Flush the graph to markdown files
-        let result = graph.flush_to_directory(output_path);
-        assert!(result.is_ok());
-
-        // Read the generated markdown file
-        let file_content = fs::read_to_string(output_path.join("test_file.md")).unwrap();
-
-        println!("=== Generated file content ===");
-        println!("{}", file_content);
-
-        // Verify section content is included after section header and before elements
-        assert!(file_content.contains("This is section content."));
-        assert!(file_content.contains("Section description here."));
-
-        // Verify element is still present
-        assert!(file_content.contains("### Element A Description"));
-
-        // Verify order: section header, section content, element
-        let section_header_pos = file_content.find("## Section1").unwrap();
-        let section_content_pos = file_content.find("This is section content.").unwrap();
-        let element_pos = file_content.find("### Element A Description").unwrap();
-
-        assert!(section_header_pos < section_content_pos);
-        assert!(section_content_pos < element_pos);
-    }
-
-    #[test]
-    fn test_flush_includes_both_page_and_section_content() {
-        use std::fs;
-        use tempfile::TempDir;
-
-        let mut registry = GraphRegistry::new();
-
-        // Create elements in multiple sections
-        let mut a = make_element("ElementA", "Element A Description");
-        a.file_path = "test_file.md".to_string();
-        a.section = "Section1".to_string();
+        a.file_order_index = 1;
 
         let mut b = make_element("ElementB", "Element B Description");
         b.file_path = "test_file.md".to_string();
-        b.section = "Section2".to_string();
+        b.file_order_index = 2;
 
         registry.register_element(a.clone(), "test_file.md").unwrap();
         registry.register_element(b.clone(), "test_file.md").unwrap();
@@ -3016,21 +2635,6 @@ mod tests {
         // Add page content
         let page = Page::new("Page frontmatter content.".to_string());
         registry.pages.insert("test_file.md".to_string(), page);
-
-        // Add section content for both sections
-        let section1_key = SectionKey {
-            file_path: "test_file.md".to_string(),
-            section_name: "Section1".to_string(),
-        };
-        let section1 = Section::new("Section 1 content.".to_string());
-        registry.sections.insert(section1_key, section1);
-
-        let section2_key = SectionKey {
-            file_path: "test_file.md".to_string(),
-            section_name: "Section2".to_string(),
-        };
-        let section2 = Section::new("Section 2 content.".to_string());
-        registry.sections.insert(section2_key, section2);
 
         let graph = registry;
 
@@ -3050,34 +2654,12 @@ mod tests {
 
         // Verify all content is present
         assert!(file_content.contains("Page frontmatter content."));
-        assert!(file_content.contains("Section 1 content."));
-        assert!(file_content.contains("Section 2 content."));
         assert!(file_content.contains("### Element A Description"));
         assert!(file_content.contains("### Element B Description"));
-
-        // Verify proper ordering
-        let page_pos = file_content.find("Page frontmatter content.").unwrap();
-        let section1_header_pos = file_content.find("## Section1").unwrap();
-        let section1_content_pos = file_content.find("Section 1 content.").unwrap();
-        let element_a_pos = file_content.find("### Element A Description").unwrap();
-        let section2_header_pos = file_content.find("## Section2").unwrap();
-        let section2_content_pos = file_content.find("Section 2 content.").unwrap();
-        let element_b_pos = file_content.find("### Element B Description").unwrap();
-
-        // Page content should come first
-        assert!(page_pos < section1_header_pos);
-
-        // Section 1: header, content, element
-        assert!(section1_header_pos < section1_content_pos);
-        assert!(section1_content_pos < element_a_pos);
-
-        // Section 2: header, content, element
-        assert!(section2_header_pos < section2_content_pos);
-        assert!(section2_content_pos < element_b_pos);
     }
 
     #[test]
-    fn test_flush_handles_empty_page_and_section_content() {
+    fn test_flush_handles_empty_page_content() {
         use std::fs;
         use tempfile::TempDir;
 
@@ -3086,21 +2668,12 @@ mod tests {
         // Create an element
         let mut a = make_element("ElementA", "Element A Description");
         a.file_path = "test_file.md".to_string();
-        a.section = "Section1".to_string();
 
         registry.register_element(a.clone(), "test_file.md").unwrap();
 
         // Add empty page content (should be skipped)
         let page = Page::new("   \n\t  \n  ".to_string()); // only whitespace
         registry.pages.insert("test_file.md".to_string(), page);
-
-        // Add empty section content (should be skipped)
-        let section_key = SectionKey {
-            file_path: "test_file.md".to_string(),
-            section_name: "Section1".to_string(),
-        };
-        let section = Section::new("".to_string()); // empty string
-        registry.sections.insert(section_key, section);
 
         let graph = registry;
 
@@ -3118,10 +2691,6 @@ mod tests {
         println!("=== Generated file content ===");
         println!("{}", file_content);
 
-        // Verify that empty/whitespace-only content is not included
-        // The file should go directly from header to section header to element
-        assert!(file_content.starts_with("# Requirements\n\n## Section1\n\n### Element A Description"));
-
         // Verify element is still present
         assert!(file_content.contains("### Element A Description"));
     }
@@ -3136,7 +2705,6 @@ mod tests {
         // Create an element in MOEs.md
         let mut a = make_element("ElementA", "Element A Description");
         a.file_path = "MOEs.md".to_string();
-        a.section = "Section1".to_string();
 
         registry.register_element(a.clone(), "MOEs.md").unwrap();
 
@@ -3165,56 +2733,5 @@ mod tests {
 
         // Page content should be included after the header
         assert!(file_content.contains("This is the MOEs page content."));
-    }
-
-    #[test]
-    fn test_flush_generates_requirements_header_with_page_content() {
-        use std::fs;
-        use tempfile::TempDir;
-
-        let mut registry = GraphRegistry::new();
-
-        // Create an element
-        let mut a = make_element("ElementA", "Element A Description");
-        a.file_path = "test_file.md".to_string();
-        a.section = "Section1".to_string();
-
-        registry.register_element(a.clone(), "test_file.md").unwrap();
-
-        // Add page content (without header - parser strips the H1)
-        let page = Page::new("This is page content without a header.\n\nMore content here.".to_string());
-        registry.pages.insert("test_file.md".to_string(), page);
-
-        let graph = registry;
-
-        // Create temp directory for flush output
-        let temp_dir = TempDir::new().unwrap();
-        let output_path = temp_dir.path();
-
-        // Flush the graph to markdown files
-        let result = graph.flush_to_directory(output_path);
-        assert!(result.is_ok());
-
-        // Read the generated markdown file
-        let file_content = fs::read_to_string(output_path.join("test_file.md")).unwrap();
-
-        println!("=== Generated file content ===");
-        println!("{}", file_content);
-
-        // All files should start with "# Requirements"
-        assert!(file_content.starts_with("# Requirements\n\n"));
-
-        // Should contain page content after the header
-        assert!(file_content.contains("This is page content without a header."));
-
-        // Verify order: Requirements header, page content, section, element
-        let header_pos = file_content.find("# Requirements").unwrap();
-        let page_content_pos = file_content.find("This is page content without a header.").unwrap();
-        let section_pos = file_content.find("## Section1").unwrap();
-        let element_pos = file_content.find("### Element A Description").unwrap();
-
-        assert!(header_pos < page_content_pos);
-        assert!(page_content_pos < section_pos);
-        assert!(section_pos < element_pos);
     }
 }

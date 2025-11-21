@@ -1,6 +1,5 @@
 # Requirements
 
-## Other Requirements
 
 ### Referencer
 

@@ -1,7 +1,5 @@
 # Requirements
 
-## Lint Output
-
 ### Model Linting
 
 The system shall provide model linting capabilities to analyze model quality and detect issues in requirements relations.
@@ -161,8 +159,6 @@ This test verifies that the lint command analyzes model quality, detects issues 
   * verify: [Lint Auto-fix Capability](#lint-auto-fix-capability)
   * satisfiedBy: [test.sh](../../tests/test-lint-command/test.sh)
 ---
-
-## Lint Detection
 
 ### Redundant Verify Relations Detection
 

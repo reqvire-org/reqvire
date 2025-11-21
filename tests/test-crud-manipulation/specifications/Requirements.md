@@ -1,7 +1,5 @@
 # Requirements
 
-## Features
-
 ### Parent Feature
 
 This is a parent requirement.

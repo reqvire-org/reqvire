@@ -40,13 +40,6 @@ pub struct FolderNode {
 pub struct FileNode {
     pub name: String,
     pub path: String,
-    pub sections: Vec<SectionNode>,
-}
-
-/// Section node in the model hierarchy
-#[derive(Debug, Serialize)]
-pub struct SectionNode {
-    pub name: String,
     pub elements: Vec<ElementNode>,
 }
 
@@ -140,37 +133,22 @@ impl<'a> ModelDiagramGenerator<'a> {
                         .unwrap_or(file_path_str.as_str())
                         .to_string();
 
-                    // Group by section
-                    let sections = group_by_section(elements);
-                    let mut sorted_sections: Vec<&String> = sections.keys().collect();
-                    sorted_sections.sort();
-
-                    let mut section_nodes = Vec::new();
-                    for section_name in sorted_sections {
-                        let section_elements = &sections[section_name];
-
-                        let mut element_nodes = Vec::new();
-                        // Sort elements within section by identifier for deterministic output
-                        let mut sorted_elements = section_elements.clone();
-                        sorted_elements.sort_by(|a, b| a.identifier.cmp(&b.identifier));
-                        for element in sorted_elements {
-                            element_nodes.push(ElementNode {
-                                identifier: element.identifier.clone(),
-                                name: element.name.clone(),
-                                element_type: element.element_type.as_str().to_string(),
-                            });
-                        }
-
-                        section_nodes.push(SectionNode {
-                            name: section_name.clone(),
-                            elements: element_nodes,
+                    let mut element_nodes = Vec::new();
+                    // Sort elements by identifier for deterministic output
+                    let mut sorted_elements = elements.clone();
+                    sorted_elements.sort_by(|a, b| a.identifier.cmp(&b.identifier));
+                    for element in sorted_elements {
+                        element_nodes.push(ElementNode {
+                            identifier: element.identifier.clone(),
+                            name: element.name.clone(),
+                            element_type: element.element_type.as_str().to_string(),
                         });
                     }
 
                     file_nodes.push(FileNode {
                         name: file_name,
                         path: file_path_str.to_string(),
-                        sections: section_nodes,
+                        elements: element_nodes,
                     });
                 }
             }
@@ -240,17 +218,16 @@ impl<'a> ModelDiagramGenerator<'a> {
         // Add auto-generation marker
         diagram.push_str(&format!("  %% {}\n", AUTOGEN_DIAGRAM_MARKER));
 
-        // Define Mermaid graph styles (matching section diagrams)
+        // Define Mermaid graph styles
         diagram.push_str("  %% Graph styling\n");
         diagram.push_str("  classDef userRequirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;\n");
         diagram.push_str("  classDef systemRequirement fill:#fce4e4,stroke:#e68a8a,stroke-width:1px;\n");
         diagram.push_str("  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;\n");
         diagram.push_str("  classDef folder fill:#f0f0f0,stroke:#666666,stroke-width:3px;\n");
         diagram.push_str("  classDef file fill:#ffffff,stroke:#999999,stroke-width:2px;\n");
-        diagram.push_str("  classDef section fill:#fafafa,stroke:#aaaaaa,stroke-width:1px;\n");
         diagram.push_str("  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;\n\n");
 
-        // Add folders, files, sections, and elements
+        // Add folders, files, and elements
         for folder in &report.folders {
             let folder_id = utils::hash_identifier(&folder.path);
             diagram.push_str(&format!("  subgraph {}[\"📁 {}\"]\n", folder_id, escape_label(&folder.name)));
@@ -259,29 +236,22 @@ impl<'a> ModelDiagramGenerator<'a> {
                 let file_id = utils::hash_identifier(&file.path);
                 diagram.push_str(&format!("    subgraph {}[\"📄 {}\"]\n", file_id, escape_label(&file.name)));
 
-                for section in &file.sections {
-                    let section_id = utils::hash_identifier(&format!("{}::{}", file.path, section.name));
-                    diagram.push_str(&format!("      subgraph {}[\"§ {}\"]\n", section_id, escape_label(&section.name)));
+                for element in &file.elements {
+                    let element_id = utils::hash_identifier(&element.identifier);
+                    let label = escape_label(&element.name);
+                    diagram.push_str(&format!("      {}[\"{}\"];\n", element_id, label));
 
-                    for element in &section.elements {
-                        let element_id = utils::hash_identifier(&element.identifier);
-                        let label = escape_label(&element.name);
-                        diagram.push_str(&format!("        {}[\"{}\"];\n", element_id, label));
+                    // Determine element class based on type
+                    let class = match element.element_type.as_str() {
+                        "user-requirement" => "userRequirement",
+                        "requirement" | "system-requirement" => "systemRequirement",
+                        t if t.contains("verification") => "verification",
+                        _ => "default",
+                    };
+                    diagram.push_str(&format!("      class {} {};\n", element_id, class));
 
-                        // Determine element class based on type
-                        let class = match element.element_type.as_str() {
-                            "user-requirement" => "userRequirement",
-                            "requirement" | "system-requirement" => "systemRequirement",
-                            t if t.contains("verification") => "verification",
-                            _ => "default",
-                        };
-                        diagram.push_str(&format!("        class {} {};\n", element_id, class));
-
-                        // Add click link to element
-                        diagram.push_str(&format!("        click {} \"{}\";\n", element_id, element.identifier));
-                    }
-
-                    diagram.push_str("      end\n"); // end section
+                    // Add click link to element
+                    diagram.push_str(&format!("      click {} \"{}\";\n", element_id, element.identifier));
                 }
 
                 diagram.push_str("    end\n"); // end file
@@ -338,15 +308,11 @@ impl<'a> ModelDiagramGenerator<'a> {
             for file in &folder.files {
                 markdown.push_str(&format!("### 📄 {}\n\n", file.name));
 
-                for section in &file.sections {
-                    markdown.push_str(&format!("#### § {}\n\n", section.name));
-
-                    for element in &section.elements {
-                        markdown.push_str(&format!("- **{}** ({}): `{}`\n", element.name, element.element_type, element.identifier));
-                    }
-
-                    markdown.push_str("\n");
+                for element in &file.elements {
+                    markdown.push_str(&format!("- **{}** ({}): `{}`\n", element.name, element.element_type, element.identifier));
                 }
+
+                markdown.push_str("\n");
             }
         }
 
@@ -368,41 +334,40 @@ impl<'a> ModelDiagramGenerator<'a> {
     }
 }
 
-/// Generates diagrams grouped by `file_path` and `section`
-pub fn generate_diagrams_by_section(
+/// Generates diagrams grouped by `file_path` (one diagram per file)
+/// Returns HashMap where key is file_path and value is the Mermaid diagram
+pub fn generate_diagrams_by_file(
     registry: &GraphRegistry,
     diagrams_with_blobs: bool,
 ) -> Result<HashMap<String, String>, ReqvireError> {
     let mut diagrams: HashMap<String, String> = HashMap::new();
 
-    // Group elements by (file_path, section)
-    let mut grouped_elements: HashMap<(String, String), Vec<&Element>> = HashMap::new();
+    // Group elements by file_path (one diagram per file)
+    let mut grouped_elements: HashMap<String, Vec<&Element>> = HashMap::new();
 
     let elements=registry.get_all_elements();
 
     for element in elements {
         grouped_elements
-            .entry((element.file_path.clone(), element.section.clone()))
+            .entry(element.file_path.clone())
             .or_insert_with(Vec::new)
             .push(element);
     }
 
-    // Generate diagrams for each group
-    for ((file_path, section), section_elements) in grouped_elements {
-        debug!("Generating diagram for file: {}, section: {}", file_path, section);
+    // Generate diagrams for each file
+    for (file_path, file_elements) in grouped_elements {
+        debug!("Generating diagram for file: {}", file_path);
 
-        let diagram = generate_section_diagram(registry, &section, &section_elements, &file_path, diagrams_with_blobs)?;
-        let diagram_key = format!("{}::{}", file_path, section);
-        diagrams.insert(diagram_key, diagram);
+        let diagram = generate_file_diagram(registry, &file_elements, &file_path, diagrams_with_blobs)?;
+        diagrams.insert(file_path, diagram);
     }
 
     Ok(diagrams)
 }
 
-/// Generates a diagram for a single section
-fn generate_section_diagram(
+/// Generates a diagram for a single file
+fn generate_file_diagram(
     registry: &GraphRegistry,
-    _section: &str,
     elements: &[&Element],
     file_path: &str,
     diagrams_with_blobs: bool
@@ -438,7 +403,7 @@ fn generate_section_diagram(
 
     let mut included_elements = HashSet::new();
 
-    // First, add all elements in the current section
+    // First, add all elements in the current file
     for element in elements {
         add_element_to_diagram(
             registry,
@@ -453,29 +418,29 @@ fn generate_section_diagram(
         )?;
     }
 
-    // Then, find parent elements from other sections that have Forward relations pointing to elements in this section
-    let section_element_identifiers: HashSet<String> = elements.iter()
+    // Then, find parent elements from other files that have forward relations pointing to elements in this file
+    let file_element_identifiers: HashSet<String> = elements.iter()
         .map(|e| e.identifier.clone())
         .collect();
 
     for element in registry.get_all_elements() {
-        // Skip elements already in this section
-        if section_element_identifiers.contains(&element.identifier) {
+        // Skip elements already in this file
+        if file_element_identifiers.contains(&element.identifier) {
             continue;
         }
 
-        // Check if this element has diagram relations pointing to any element in the current section
-        let has_forward_relation_to_section = element.relations.iter().any(|relation| {
+        // Check if this element has diagram relations pointing to any element in the current file
+        let has_forward_relation_to_file = element.relations.iter().any(|relation| {
             // Only consider relations that should be shown in diagrams
             if relation::DIAGRAM_RELATIONS.contains(&relation.relation_type.name) {
                 if let relation::LinkType::Identifier(target_id) = &relation.target.link {
-                    return section_element_identifiers.contains(target_id);
+                    return file_element_identifiers.contains(target_id);
                 }
             }
             false
         });
 
-        if has_forward_relation_to_section {
+        if has_forward_relation_to_file {
             add_element_to_diagram(
                 registry,
                 &mut diagram,
@@ -703,25 +668,8 @@ pub fn process_diagrams(
     diagrams_with_blobs: bool,
     ) -> Result<(), ReqvireError> {
 
-    // Generate diagrams by section
-    let diagrams = generate_diagrams_by_section(&registry, diagrams_with_blobs)?;
-
-    // Group diagrams by file path
-    let mut files_to_update: HashMap<String, Vec<(&str, &String)>> = HashMap::new();
-
-    for (file_section_key, new_diagram) in &diagrams {
-        let parts: Vec<&str> = file_section_key.split("::").collect();
-        if parts.len() != 2 {
-            continue; // Skip invalid entries
-        }
-        let file_path = parts[0];
-        let section = parts[1];
-    
-        files_to_update
-            .entry(file_path.to_string())
-            .or_insert_with(Vec::new)
-            .push((section, new_diagram));
-    }
+    // Generate diagrams by file
+    let diagrams = generate_diagrams_by_file(&registry, diagrams_with_blobs)?;
 
     // Get git root for resolving relative paths
     let git_root = match git_commands::get_git_root_dir() {
@@ -733,12 +681,12 @@ pub fn process_diagrams(
     };
 
     // Process each file
-    for (file_path, section_diagrams) in files_to_update {
+    for (file_path, new_diagram) in diagrams {
         // Resolve file path relative to git root, not current directory
         let absolute_file_path = git_root.join(&file_path);
 
         // Read file content
-        let mut file_content = match filesystem::read_file(&absolute_file_path) {
+        let file_content = match filesystem::read_file(&absolute_file_path) {
             Ok(content) => content,
             Err(e) => {
                 log::error!("Failed to read file '{}': {}", absolute_file_path.display(), e);
@@ -746,13 +694,11 @@ pub fn process_diagrams(
             }
         };
 
-        // Replace diagrams for all sections in this file
-        for (section, new_diagram) in section_diagrams {              
-            file_content = replace_section_diagram(&file_content, section, new_diagram);
-        }
+        // Replace diagram in this file
+        let updated_content = replace_file_diagram(&file_content, &new_diagram);
 
         // Write updated content back if modified
-        if let Err(e) = filesystem::write_file(&absolute_file_path, &file_content) {
+        if let Err(e) = filesystem::write_file(&absolute_file_path, &updated_content) {
             log::error!("Failed to write updated diagrams to '{}': {}", absolute_file_path.display(), e);
         } else {
             info_println!("Updated diagrams in '{}'", file_path);
@@ -762,29 +708,31 @@ pub fn process_diagrams(
     Ok(())
 }
 
-/// Replaces the old diagram in a specific section of a markdown file.
+/// Replaces the auto-generated diagram in a markdown file.
+/// Inserts after the `# Requirements` header.
 ///
 /// - `content`: The original file content.
-/// - `section`: The section name where the diagram should be replaced.
 /// - `new_diagram`: The newly generated Mermaid diagram.
 ///
 /// Returns the modified file content as a `String`.
-fn replace_section_diagram(content: &str, section: &str, new_diagram: &str) -> String {
-    let section_header = format!("## {}", section);
+fn replace_file_diagram(content: &str, new_diagram: &str) -> String {
+    let requirements_header = "# Requirements";
     let mermaid_block_start = "```mermaid";
     let mermaid_block_end = "```";
 
     let mut new_lines = Vec::new();
     let mut lines = content.lines().peekable();
+    let mut found_requirements = false;
+
     while let Some(line) = lines.next() {
-        if line.trim() == section_header {
-            // Found the target section header.
+        if line.trim() == requirements_header && !found_requirements {
+            found_requirements = true;
             new_lines.push(line.to_string());
 
-            // Skip any blank lines immediately after the header.
+            // Skip any blank lines immediately after the header
             while let Some(&next_line) = lines.peek() {
                 if next_line.trim().is_empty() {
-                    lines.next();
+                    new_lines.push(lines.next().unwrap().to_string());
                 } else {
                     break;
                 }
@@ -803,7 +751,7 @@ fn replace_section_diagram(content: &str, section: &str, new_diagram: &str) -> S
                             has_autogen_marker = true;
                         }
                         mermaid_lines.push(l.to_string());
-                        if l.trim().starts_with(mermaid_block_end) {
+                        if l.trim() == mermaid_block_end {
                             break;
                         }
                     }
@@ -820,9 +768,51 @@ fn replace_section_diagram(content: &str, section: &str, new_diagram: &str) -> S
                     new_lines.push(new_diagram.to_string());
                 }
             } else {
-                // No content after section header, insert the new diagram
+                // No content after header, insert the new diagram
                 new_lines.push(new_diagram.to_string());
             }
+        } else {
+            new_lines.push(line.to_string());
+        }
+    }
+    new_lines.join("\n")
+}
+
+/// Removes all auto-generated mermaid diagrams from a markdown file.
+///
+/// - `content`: The original file content.
+///
+/// Returns the modified file content as a `String`.
+fn remove_file_diagrams(content: &str) -> String {
+    let mermaid_block_start = "```mermaid";
+    let mermaid_block_end = "```";
+
+    let mut new_lines = Vec::new();
+    let mut lines = content.lines().peekable();
+
+    while let Some(line) = lines.next() {
+        if line.trim().starts_with(mermaid_block_start) {
+            // Found a mermaid block - collect it to check for autogen marker
+            let mut mermaid_lines = Vec::new();
+            mermaid_lines.push(line.to_string());
+
+            let mut has_autogen_marker = false;
+            while let Some(l) = lines.next() {
+                if l.contains(AUTOGEN_DIAGRAM_MARKER) {
+                    has_autogen_marker = true;
+                }
+                mermaid_lines.push(l.to_string());
+                if l.trim() == mermaid_block_end {
+                    break;
+                }
+            }
+
+            // Only remove diagrams with the autogenerated marker
+            if !has_autogen_marker {
+                // Preserve user-created diagrams
+                new_lines.extend(mermaid_lines);
+            }
+            // If it has autogen marker, we skip it (effectively removing it)
         } else {
             new_lines.push(line.to_string());
         }
@@ -833,26 +823,12 @@ fn replace_section_diagram(content: &str, section: &str, new_diagram: &str) -> S
 /// Remove all generated mermaid diagrams from markdown files
 /// Follows the same pattern as process_diagrams but removes instead of replacing
 pub fn remove_diagrams(registry: &GraphRegistry) -> Result<(), ReqvireError> {
-    // Group elements by (file_path, section) - same as in generate_diagrams_by_section
-    let mut grouped_elements: HashMap<(String, String), Vec<&Element>> = HashMap::new();
-
+    // Get unique file paths from elements
     let elements = registry.get_all_elements();
+    let mut files_to_update: std::collections::HashSet<String> = std::collections::HashSet::new();
 
     for element in elements {
-        grouped_elements
-            .entry((element.file_path.clone(), element.section.clone()))
-            .or_insert_with(Vec::new)
-            .push(element);
-    }
-
-    // Group sections by file path - same pattern as in process_diagrams
-    let mut files_to_update: HashMap<String, Vec<String>> = HashMap::new();
-
-    for (file_path, section) in grouped_elements.keys() {
-        files_to_update
-            .entry(file_path.clone())
-            .or_insert_with(Vec::new)
-            .push(section.clone());
+        files_to_update.insert(element.file_path.clone());
     }
 
     // Get git root for resolving relative paths
@@ -865,12 +841,12 @@ pub fn remove_diagrams(registry: &GraphRegistry) -> Result<(), ReqvireError> {
     };
 
     // Process each file
-    for (file_path, sections) in files_to_update {
+    for file_path in files_to_update {
         // Resolve file path relative to git root, not current directory
         let absolute_file_path = git_root.join(&file_path);
 
         // Read file content
-        let mut file_content = match filesystem::read_file(&absolute_file_path) {
+        let file_content = match filesystem::read_file(&absolute_file_path) {
             Ok(content) => content,
             Err(e) => {
                 log::error!("Failed to read file '{}': {}", absolute_file_path.display(), e);
@@ -878,13 +854,11 @@ pub fn remove_diagrams(registry: &GraphRegistry) -> Result<(), ReqvireError> {
             }
         };
 
-        // Remove diagrams for all sections in this file
-        for section in sections {
-            file_content = remove_section_diagram(&file_content, &section);
-        }
+        // Remove all diagrams from this file
+        let updated_content = remove_file_diagrams(&file_content);
 
         // Write updated content back if modified
-        if let Err(e) = filesystem::write_file(&absolute_file_path, &file_content) {
+        if let Err(e) = filesystem::write_file(&absolute_file_path, &updated_content) {
             log::error!("Failed to write updated file '{}': {}", absolute_file_path.display(), e);
         } else {
             println!("Removed diagrams from '{}'", file_path);
@@ -894,53 +868,8 @@ pub fn remove_diagrams(registry: &GraphRegistry) -> Result<(), ReqvireError> {
     Ok(())
 }
 
-
-/// Removes the diagram from a specific section of a markdown file.
-/// Similar to replace_section_diagram but only removes without adding a new diagram.
-fn remove_section_diagram(content: &str, section: &str) -> String {
-    let section_header = format!("## {}", section);
-    let mermaid_block_start = "```mermaid";
-    let mermaid_block_end = "```";
-
-    let mut new_lines = Vec::new();
-    let mut lines = content.lines().peekable();
-
-    while let Some(line) = lines.next() {
-        if line.trim() == section_header {
-            // Found the target section header.
-            new_lines.push(line.to_string());
-            // Skip any blank lines immediately after the header.
-            while let Some(&next_line) = lines.peek() {
-                if next_line.trim().is_empty() {
-                    lines.next();
-                } else {
-                    break;
-                }
-            }
-            // If the next non-empty line starts a Mermaid block, skip it.
-            if let Some(&next_line) = lines.peek() {
-                if next_line.trim().starts_with(mermaid_block_start) {
-                    // Skip the mermaid block: first skip the start marker.
-                    lines.next();
-                    // Then skip lines until the end marker is found.
-                    while let Some(l) = lines.next() {
-                        if l.trim().starts_with(mermaid_block_end) {
-                            break;
-                        }
-                    }
-                }
-            }
-            // Continue with the rest of the file.
-        } else {
-            new_lines.push(line.to_string());
-        }
-    }
-
-    new_lines.join("\n")
-}
-
 /// Generates a complete model diagram with containment hierarchy using Mermaid subgraphs
-/// Shows folders > files > sections > elements with relations
+/// Shows folders > files > elements with relations
 ///
 /// # Arguments
 /// * `registry` - The graph registry containing all elements
@@ -1080,22 +1009,6 @@ fn group_files_by_folder(elements_by_file: &HashMap<String, Vec<&Element>>) -> H
         result.entry(folder)
             .or_insert_with(Vec::new)
             .push(file_path.clone());
-    }
-    result
-}
-
-/// Helper to group elements by section
-fn group_by_section<'a>(elements: &[&'a Element]) -> HashMap<String, Vec<&'a Element>> {
-    let mut result: HashMap<String, Vec<&Element>> = HashMap::new();
-    for element in elements {
-        let section = if element.section.is_empty() {
-            "(no section)".to_string()
-        } else {
-            element.section.clone()
-        };
-        result.entry(section)
-            .or_insert_with(Vec::new)
-            .push(element);
     }
     result
 }

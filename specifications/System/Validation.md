@@ -1,7 +1,5 @@
 # Requirements
 
-## Requirements
-
 ### Two-Pass Validation Strategy
 
 The system shall implement a two-pass validation strategy that separates element collection from relation validation, enabling complete error reporting while maintaining existing error behavior.

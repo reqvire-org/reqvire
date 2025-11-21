@@ -465,7 +465,6 @@ pub fn build_change_impact_tree(
                 &display_name,
                 &element_id,
                 "unknown",
-                "Placeholder",
                 0, // Placeholder elements don't have real line numbers
                 None,
             );
@@ -895,7 +894,6 @@ mod tests {
             name,
             identifier,
             "test.md",
-            "TestSection",
             1,
             Some(crate::element::ElementType::Requirement(crate::element::RequirementType::System))
         );
@@ -1077,7 +1075,6 @@ mod tests {
             "Parent Verification",
             "verify.md#parent-verification",
             "verify.md",
-            "Verifications",
             1,
             Some(crate::element::ElementType::Verification(crate::element::VerificationType::Test))
         );
@@ -1147,7 +1144,6 @@ mod tests {
             "New Verification",
             "verify.md#new-verification",
             "verify.md",
-            "Verifications",
             1,
             Some(crate::element::ElementType::Verification(crate::element::VerificationType::Test))
         );

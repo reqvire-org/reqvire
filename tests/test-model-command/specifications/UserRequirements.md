@@ -1,6 +1,5 @@
 # Requirements
 
-## Model Visualization
 
 ### Model Structure Exploration
 

@@ -1,7 +1,5 @@
 # Requirements
 
-## Requirements
-
 ### Change Impact Detection
 
 The system shall detect, analyze, and report changes to model elements between versions by comparing element content hashes, tracking relocations, and propagating impact through relationships.

@@ -2,7 +2,6 @@
 
 This file should be ignored by Reqvire based on the configuration.
 
-## Some Section
 
 ```mermaid
 graph TD;
@@ -19,7 +18,6 @@ This looks like a real requirement but should be ignored.
 
 ---
 
-## Another Section
 
 ```mermaid
 graph LR;

@@ -1,6 +1,5 @@
 # Requirements
 
-## Visualization Commands
 
 ### Model Diagram Generation
 
@@ -57,7 +56,6 @@ Root requirements are those without hierarchical parent relations.
 
 ---
 
-## Output Formatting
 
 ### Markdown Output Format
 

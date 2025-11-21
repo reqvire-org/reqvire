@@ -1,6 +1,5 @@
 # Requirements
 
-## Core Features
 
 ### Base Requirement
 

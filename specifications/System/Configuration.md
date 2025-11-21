@@ -1,7 +1,5 @@
 # Requirements
 
-## File Exclusion Configuration
-
 ### Ignoring Unstructured Documents
 
 The system shall support configurable glob patterns to exclude specific files from requirement processing.
@@ -92,8 +90,6 @@ The following reserved filenames are always excluded from structured markdown pr
   * satisfiedBy: [config.rs](../../cli/src/config.rs)
 ---
 
-## Requirements Processing Logic
-
 ### Requirements Processing
 
 The system shall parse the files in all folders and subfolders from the root of git repository which are not explicitly excluded using .gitignore and .reqvireignore files.
@@ -103,8 +99,6 @@ File exclusion is handled through:
 - .gitignore patterns (files not in version control)
 - .reqvireignore patterns (files in version control but excluded from requirements processing)
 - Reserved repository files (README.md, LICENSE.md, etc.)
-
-No configuration file is used for this purpose.
 
 #### Relations
   * derivedFrom: [Ignoring Unstructured Documents](#ignoring-unstructured-documents)

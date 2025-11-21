@@ -1,6 +1,5 @@
 # Requirements
 
-## Verifications
 ### Test Verification
 
 This verification has redundant verify relations - it verifies both the leaf requirement and its parent.

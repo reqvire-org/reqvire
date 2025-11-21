@@ -2,8 +2,6 @@
 
 This document contains test requirements and verifications to validate the coverage report functionality.
 
-## Verifications
-
 ### Test Verification Satisfied
 
 This is a test verification that should appear as satisfied in the coverage report.
@@ -55,8 +53,6 @@ This is a demonstration-type verification for testing verification type breakdow
 * type: demonstration-verification
 
 ---
-
-## Requirements
 
 ### Parent Requirement
 

@@ -1,7 +1,5 @@
 # Requirements
 
-## Verification Tests
-
 ### Test for Feature C
 
 This test verifies Feature C functionality.

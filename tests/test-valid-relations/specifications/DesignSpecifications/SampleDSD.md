@@ -2,7 +2,6 @@
 
 This is a sample DSD file for testing validation of relations to the DesignSpecifications folder.
 
-## Design Elements
 
 ### Sample Design Element
 

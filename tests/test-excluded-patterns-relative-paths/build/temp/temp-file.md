@@ -2,7 +2,6 @@
 
 This file should be excluded from processing.
 
-## Temp Requirements
 
 ### Temp Requirement
 

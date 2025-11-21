@@ -2,7 +2,6 @@
 
 This file should be excluded from processing but should be referenceable as a relation target.
 
-## Configuration Details
 
 ### External Configuration Item
 

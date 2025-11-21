@@ -1,7 +1,5 @@
 # Requirements
 
-## Requirements
-
 ### CLI interface
 
 The system shall provide command line interface (CLI) to faciliate model management.

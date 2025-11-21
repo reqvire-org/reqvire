@@ -2,8 +2,6 @@
 
 This document specifies requirements for markdown document structure, element identification, and relation parsing in Reqvire.
 
-## Requirements
-
 ### Specification File Identification
 
 The system shall only parse markdown files that are identified as specification files. A markdown file is considered a specification file if and only if its first level-1 heading (`#`) is exactly `# Requirements`. Files not meeting this criterion shall be ignored during model parsing, even if they have a `.md` extension.
@@ -17,23 +15,19 @@ The system shall only parse markdown files that are identified as specification 
 
 #### Relations
   * derivedFrom: [Managing System Models](../UserStories.md#managing-system-models)
+  * verifiedBy: [Specification File Identification Test](ParsingAndValidationVerifications.md#specification-file-identification-test)
   * satisfiedBy: [parser.rs](../../core/src/parser.rs)
   * satisfiedBy: [model.rs](../../core/src/model.rs)
 ---
 
 ### Structure and Addressing in Markdown Documents
 
-The system shall implement semi-structured markdown format specifications that defines the structure, rules, and usage of **Sections**, **Elements**, **Subsections**, **Relations**, and **Identifiers** in Markdown (`.md`) documents following clearly defined specifications.
+The system shall implement semi-structured markdown format specifications that defines the structure, rules, and usage of **Elements**, **Subsections**, **Relations**, and **Identifiers** in Markdown (`.md`) documents following clearly defined specifications.
 
 #### Details
 <details>
 <summary>View Full Specification</summary>
 
-
-## Sections in Markdown Documents
-
-A **Section** is used for grouping of similar requirements for easier management and visualizations. It starts with a `##` header and includes all system elements under that header until the next header of the same or higher hierarchy.
-
 ## Elements in Markdown Documents
 
 An **Element** is a uniquely identifiable system element within a Markdown document. It starts with a `###` header and includes all content under that header until the next header of the same or higher hierarchy.
@@ -43,7 +37,7 @@ An **Element** is a uniquely identifiable system element within a Markdown docum
 1. **Element Header**
   - The `###` header defines the start of an element.
   - The text of the `###` header serves as the **element name**.
-  - The element name must be globaly unique to ensure unambiguous references.
+  - The element name must be globally unique to ensure unambiguous references.
 
 2. **Element Content**
   - The element includes all content under the `###` header until:
@@ -59,29 +53,32 @@ An **Element** is a uniquely identifiable system element within a Markdown docum
 ## Rules for Elements
 
 1. **Header Format**:
-   - An element must start with a 3 `###` header.
+   - An element must start with a `###` header.
    - The `###` header text must not be empty.
 
 2. **Global Uniqueness**:
    - Element names must be globally unique across all files in the model.
    - Element names serve as stable IDs for element identity independent of file location.
-   - File location and section are containment properties, not identity attributes.
- 
+   - File location is the only containment property tracked by the system.
+
 3. **Nested Subheaders**:
-   - Subheaders within an element defined with 4 header (e.g., `####`) are part of the same element and do not create new elements.
+   - Subheaders within an element defined with `####` header are part of the same element and do not create new elements.
 
 4. **No Overlapping Content**:
    - Content in an element belongs exclusively to that element and cannot overlap with another.
 
+## Section Headers (H2) - Not Tracked
 
-
+Section headers (`## Header`) may exist in markdown documents for visual organization but are **not tracked** by the system:
+- The parser ignores `##` headers during model construction
+- Elements are indexed by their position within the file, not within sections
+- When writing/formatting files, existing `##` headers are preserved but not managed
+- The `--index` parameter in CLI commands refers to element position in the entire file
 
 ### Examples of Elements
 
 Single Element:
 ```markdown
-
-
 ### My Element
 
 This is the content of My Element.
@@ -91,14 +88,10 @@ Additional details about My Element.
 ```
 
 Multiple Elements:
-```
-
-
+```markdown
 ### Element One
 
 This is the content of Element One.
-
-
 
 ### Element Two
 
@@ -106,9 +99,7 @@ This is the content of Element Two.
 ```
 
 Nested Subheaders:
-```
-
-
+```markdown
 ### Main Element
 This is the main element content.
 
@@ -119,8 +110,6 @@ Details about the subsection.
 More details about another subsection.
 ```
 
-
-
 ### Invalid Cases
 
 Element headers empty:
@@ -128,123 +117,10 @@ Element headers empty:
 ###
 ```
 
-Headers not unique within the same document:
-```
-
-
-
-
-### Duplicate
-Content of the first duplicate.
-
-
-
-### Duplicate
-Content of the second duplicate.
-```
-
-
-## Sections in Markdown Documents
-
-A **Section** is used for grouping of similar requirements for easier management and visualizations. It starts with a `##` header and includes all system elements under that header until the next header of the same or higher hierarchy.
-
-## Elements in Markdown Documents
-
-An **Element** is a uniquely identifiable system element within a Markdown document. It starts with a `###` header and includes all content under that header until the next header of the same or higher hierarchy.
-
-### Structure of an Element
-
-1. **Element Header**
-  - The `###` header defines the start of an element.
-  - The text of the `###` header serves as the **element name**.
-  - The element name must be unique within the same document to ensure unambiguous references.
-
-2. **Element Content**
-  - The element includes all content under the `###` header until:
-    - The next `###` header, or
-    - A higher-level header (`##`, `#`), or
-    - The end of the document.
-  - The content can include:
-    - Text
-    - Subheaders (e.g., `####`)
-    - Bullet points, code blocks, tables, etc.
-
-
-## Rules for Elements
-
-1. **Header Format**:
-   - An element must start with a 3 `###` header.
-   - The `###` header text must not be empty.
-
-2. **Global Uniqueness**:
-   - Element names must be globally unique across all files in the model.
-   - Element names serve as stable IDs for element identity independent of file location.
-   - File location and section are containment properties, not identity attributes.
- 
-3. **Nested Subheaders**:
-   - Subheaders within an element defined with 4 header (e.g., `####`) are part of the same element and do not create new elements.
-
-4. **No Overlapping Content**:
-   - Content in an element belongs exclusively to that element and cannot overlap with another.
-
-### Examples of Elements
-
-Single Element:
+Headers not unique within the model:
 ```markdown
-
-
-### My Element
-
-This is the content of My Element.
-
-#### Subsection
-Additional details about My Element.
-```
-
-Multiple Elements:
-```
-
-
-### Element One
-
-This is the content of Element One.
-
-
-
-### Element Two
-
-This is the content of Element Two.
-```
-
-Nested Subheaders:
-```
-
-
-### Main Element
-This is the main element content.
-
-#### Subsection
-Details about the subsection.
-
-#### Another Subsection
-More details about another subsection.
-```
-
-
-
-### Invalid Cases
-
-Element headers empty:
-```
-###
-```
-
-Headers not unique within the same document:
-```
-
 ### Duplicate
 Content of the first duplicate.
-
 
 ### Duplicate
 Content of the second duplicate.
@@ -640,9 +516,8 @@ An **Element Identifier** is a location-based reference for addressing:
 Element location is tracked separately from element identity:
 
 - **file_path field**: Records which file contains the element (implicit file containment)
-- **section field**: Records which H2 section contains the element (implicit section containment)
 - **No explicit relations**: Containment is not expressed as relations in the Relations subsection
-- **Location changes**: Detected as relocations when file_path or section changes
+- **Location changes**: Detected as relocations when file_path changes
 - **Identity preservation**: Element ID remains stable across location changes
 
 ## Change Detection Using Element IDs
@@ -654,7 +529,7 @@ When comparing model versions:
    - **Content change**: Same ID, different content hash
    - **Addition**: ID exists only in new version
    - **Removal**: ID exists only in old version
-   - **Relocation**: Same ID, different file_path or section (without content change)
+   - **Relocation**: Same ID, different file_path (without content change)
 3. Pure relocations do not trigger impact propagation
 4. Relocations with content changes propagate based on content change only
 
@@ -675,7 +550,6 @@ The system shall provide secure user authentication.
 - **Element ID**: `user-authentication` (stable, internal)
 - **Element Identifier**: `specifications/requirements.md#user-authentication` (current location)
 - **file_path**: `specifications/requirements.md` (implicit containment)
-- **section**: (empty if not in H2 section)
 
 ### Example 2: Element Relocation
 

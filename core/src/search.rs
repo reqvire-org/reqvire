@@ -14,10 +14,8 @@ use std::collections::BTreeMap;
 pub struct SearchFilters {
     file_glob: Option<GlobMatcher>,
     name_re: Option<Regex>,
-    section_glob: Option<GlobMatcher>,
     type_pat: Option<String>,
     content_re: Option<Regex>,
-    section_content_re: Option<Regex>,
     page_content_re: Option<Regex>,
     have_relations: Vec<String>,
     not_have_relations: Vec<String>,
@@ -30,10 +28,8 @@ impl SearchFilters {
     pub fn new(
         file: Option<&str>,
         name_regex: Option<&str>,
-        section: Option<&str>,
         typ: Option<&str>,
         content: Option<&str>,
-        section_content: Option<&str>,
         page_content: Option<&str>,
         have_relations: Option<&str>,
         not_have_relations: Option<&str>,
@@ -53,10 +49,8 @@ impl SearchFilters {
 
         let file_glob = file.map(|p| compile_glob(p)).transpose()?;
         let name_re = name_regex.map(|r| compile_regex(r)).transpose()?;
-        let section_glob = section.map(|p| compile_glob(p)).transpose()?;
         let type_pat = typ.map(|s| s.to_lowercase());
         let content_re = content.map(|r| compile_regex(r)).transpose()?;
-        let section_content_re = section_content.map(|r| compile_regex(r)).transpose()?;
         let page_content_re = page_content.map(|r| compile_regex(r)).transpose()?;
         let attachment_glob = attachment.map(|p| compile_glob(p)).transpose()?;
 
@@ -100,10 +94,8 @@ impl SearchFilters {
         Ok(SearchFilters {
             file_glob,
             name_re,
-            section_glob,
             type_pat,
             content_re,
-            section_content_re,
             page_content_re,
             have_relations,
             not_have_relations,
@@ -128,13 +120,6 @@ impl SearchFilters {
             }
         }
 
-        // Section glob filter
-        if let Some(g) = &self.section_glob {
-            if !g.is_match(&elem.section) {
-                return false;
-            }
-        }
-
         // Type filter
         if let Some(tp) = &self.type_pat {
             let filter_type = element::ElementType::from_metadata(tp);
@@ -146,22 +131,6 @@ impl SearchFilters {
         // Content regex filter
         if let Some(re) = &self.content_re {
             if !re.is_match(&elem.content) {
-                return false;
-            }
-        }
-
-        // Section content filter
-        if let Some(re) = &self.section_content_re {
-            let section_key = crate::graph_registry::SectionKey::new(
-                elem.file_path.clone(),
-                elem.section.clone(),
-            );
-            if let Some(section) = registry.sections.get(&section_key) {
-                if !re.is_match(&section.content) {
-                    return false;
-                }
-            } else {
-                // No section content means it doesn't match
                 return false;
             }
         }
@@ -230,29 +199,17 @@ pub struct SearchResult {
 
 #[derive(Serialize)]
 struct FileSearchResult {
-    sections: BTreeMap<String, SectionSearchResult>,
+    elements: Vec<ElementSearchResult>,
     #[serde(skip_serializing_if = "Option::is_none")]
     page_content: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    total_sections: Option<usize>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     total_elements: Option<usize>,
-}
-
-#[derive(Serialize)]
-struct SectionSearchResult {
-    elements: Vec<ElementSearchResult>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    section_content: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    element_count: Option<usize>,
 }
 
 #[derive(Serialize)]
 struct ElementSearchResult {
     identifier: String,
     name: String,
-    section: String,
     file: String,
     #[serde(rename = "type")]
     element_type: String,
@@ -284,7 +241,6 @@ struct TargetSearchResult {
 struct GlobalSearchCounters {
     total_elements: usize,
     total_files: usize,
-    total_sections: usize,
     total_requirements_system: usize,
     total_requirements_user: usize,
     total_verifications_test: usize,
@@ -300,7 +256,6 @@ impl Default for GlobalSearchCounters {
         Self {
             total_elements: 0,
             total_files: 0,
-            total_sections: 0,
             total_requirements_system: 0,
             total_requirements_user: 0,
             total_verifications_test: 0,
@@ -428,7 +383,6 @@ fn build_search_result(
         let es = ElementSearchResult {
             identifier: elem.identifier.clone(),
             name: elem.name.clone(),
-            section: elem.section.clone(),
             file: elem.file_path.clone(),
             element_type: elem.element_type.as_str().to_string(),
             content: if short_mode { None } else { Some(elem.content.clone()) },
@@ -438,19 +392,12 @@ fn build_search_result(
             attachments,
         };
 
-        // Insert into nested file→section map
+        // Insert into flat file→elements map
         files.entry(elem.file_path.clone())
             .or_insert_with(|| FileSearchResult {
-                sections: BTreeMap::new(),
-                page_content: None,
-                total_sections: None,
-                total_elements: None,
-            })
-            .sections.entry(elem.section.clone())
-            .or_insert_with(|| SectionSearchResult {
                 elements: Vec::new(),
-                section_content: None,
-                element_count: None,
+                page_content: None,
+                total_elements: None,
             })
             .elements.push(es);
     }
@@ -463,34 +410,13 @@ fn build_search_result(
                 file_result.page_content = Some(page.frontmatter_content.clone());
             }
 
-            // Get section content and calculate counts
-            for (section_name, section_result) in &mut file_result.sections {
-                let section_key = crate::graph_registry::SectionKey::new(
-                    file_path.clone(),
-                    section_name.clone(),
-                );
-                if let Some(section) = registry.sections.get(&section_key) {
-                    section_result.section_content = Some(section.content.clone());
-                }
-                section_result.element_count = Some(section_result.elements.len());
-            }
-
-            file_result.total_sections = Some(file_result.sections.len());
-            file_result.total_elements = Some(
-                file_result.sections.values()
-                    .map(|s| s.elements.len())
-                    .sum()
-            );
+            file_result.total_elements = Some(file_result.elements.len());
         }
     }
 
     // Calculate global counts (skip in short mode)
     if let Some(ref mut c) = counters {
         c.total_files = files.len();
-        // Count sections in filtered results, not all sections in registry
-        c.total_sections = files.values()
-            .map(|f| f.sections.len())
-            .sum();
     }
 
     SearchResult {
@@ -505,11 +431,9 @@ fn generate_search_text(result: &SearchResult, short_mode: bool) -> String {
     if short_mode {
         // Short mode: one line per element
         for file_result in result.files.values() {
-            for section_result in file_result.sections.values() {
-                for elem in &section_result.elements {
-                    output.push_str(&format!("[{}] {} - {}\n",
-                        elem.element_type, elem.identifier, elem.name));
-                }
+            for elem in &file_result.elements {
+                output.push_str(&format!("[{}] {} - {}\n",
+                    elem.element_type, elem.identifier, elem.name));
             }
         }
     } else {
@@ -517,9 +441,8 @@ fn generate_search_text(result: &SearchResult, short_mode: bool) -> String {
         output.push_str("--- MBSE Search results ---\n");
 
         for (file, file_result) in &result.files {
-            output.push_str(&format!("📂 File: {} (sections: {}, elements: {})\n",
+            output.push_str(&format!("📂 File: {} (elements: {})\n",
                 file,
-                file_result.total_sections.unwrap_or(0),
                 file_result.total_elements.unwrap_or(0)));
 
             // Show page content if available
@@ -530,46 +453,32 @@ fn generate_search_text(result: &SearchResult, short_mode: bool) -> String {
                 }
             }
 
-            for (sec, section_result) in &file_result.sections {
-                output.push_str(&format!("  📖 Section: {} (elements: {})\n",
-                    sec, section_result.element_count.unwrap_or(0)));
+            for elem in &file_result.elements {
+                output.push_str(&format!("    🔹 Element: {}\n", elem.identifier));
+                output.push_str(&format!("      - Name: {}\n", elem.name));
+                output.push_str(&format!("      - File: {}\n", elem.file));
+                output.push_str(&format!("      - Type: {}\n", elem.element_type));
 
-                // Show section content if available
-                if let Some(section_content) = &section_result.section_content {
-                    if !section_content.trim().is_empty() {
-                        output.push_str(&format!("    📝 Section content: {:?}\n", section_content));
-                        output.push('\n');
-                    }
+                if let Some(content) = &elem.content {
+                    output.push_str(&format!("      - Content: {:?}\n", content));
+                }
+                if let Some(vc) = elem.verified_relations_count {
+                    output.push_str(&format!("      - Verified relations count: {}\n", vc));
+                }
+                if let Some(sc) = elem.satisfied_relations_count {
+                    output.push_str(&format!("      - Satisfied relations count: {}\n", sc));
                 }
 
-                for elem in &section_result.elements {
-                    output.push_str(&format!("    🔹 Element: {}\n", elem.identifier));
-                    output.push_str(&format!("      - Name: {}\n", elem.name));
-                    output.push_str(&format!("      - Section: {}\n", elem.section));
-                    output.push_str(&format!("      - File: {}\n", elem.file));
-                    output.push_str(&format!("      - Type: {}\n", elem.element_type));
-
-                    if let Some(content) = &elem.content {
-                        output.push_str(&format!("      - Content: {:?}\n", content));
+                if elem.relations.is_empty() {
+                    output.push_str("      - No relations.\n");
+                } else {
+                    output.push_str("      - Relations:\n");
+                    for r in &elem.relations {
+                        output.push_str(&format!("        ↪ {}: {} ({})\n",
+                            r.relation_type, r.target.target, r.target.link_type));
                     }
-                    if let Some(vc) = elem.verified_relations_count {
-                        output.push_str(&format!("      - Verified relations count: {}\n", vc));
-                    }
-                    if let Some(sc) = elem.satisfied_relations_count {
-                        output.push_str(&format!("      - Satisfied relations count: {}\n", sc));
-                    }
-
-                    if elem.relations.is_empty() {
-                        output.push_str("      - No relations.\n");
-                    } else {
-                        output.push_str("      - Relations:\n");
-                        for r in &elem.relations {
-                            output.push_str(&format!("        ↪ {}: {} ({})\n",
-                                r.relation_type, r.target.target, r.target.link_type));
-                        }
-                    }
-                    output.push('\n');
                 }
+                output.push('\n');
             }
         }
 
@@ -578,7 +487,6 @@ fn generate_search_text(result: &SearchResult, short_mode: bool) -> String {
             output.push_str("------------------------------------\n");
             output.push_str("📊 Summary Counts:\n");
             output.push_str(&format!("Total files: {}\n", c.total_files));
-            output.push_str(&format!("Total sections: {}\n", c.total_sections));
             output.push_str(&format!("Total elements: {}\n", c.total_elements));
             output.push('\n');
             output.push_str("📋 Element Types:\n");

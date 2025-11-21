@@ -2,7 +2,6 @@
 
 This document contains requirements with Pass 1 validation errors (parsing/format issues).
 
-## Requirements
 
 ### Valid Requirement
 

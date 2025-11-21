@@ -32,9 +32,9 @@ pub fn format_files(registry: &GraphRegistry, dry_run: bool) -> Result<FormatRes
     let mut sorted_files: Vec<_> = grouped_elements.into_iter().collect();
     sorted_files.sort_by(|a, b| a.0.cmp(&b.0));
 
-    for (file_path, sections) in sorted_files {
+    for (file_path, elements) in sorted_files {
         // Generate the new markdown content for this file
-        let mut new_content = registry.generate_file_markdown(&file_path, &sections);
+        let mut new_content = registry.generate_file_markdown(&file_path, &elements);
 
         // Apply linting rules to ensure consistent formatting
         new_content = apply_formatting_rules(&new_content);
@@ -72,8 +72,7 @@ pub fn format_files(registry: &GraphRegistry, dry_run: bool) -> Result<FormatRes
                 fs::write(&full_file_path, new_content)
                     .map_err(|e| ReqvireError::IoError(e))?;
 
-                debug!("Formatted {} with {} elements",
-                    file_path, sections.values().map(|v| v.len()).sum::<usize>());
+                debug!("Formatted {} with {} elements", file_path, elements.len());
             }
         }
     }

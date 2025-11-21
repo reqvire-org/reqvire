@@ -2,7 +2,6 @@
 
 This document contains the requirements for the notification system, including cases with same-file fragment references.
 
-## Architecture Overview
 
 ### NOTIF-ARCH-001 Reliable and Fault Tolerant Architecture
 
@@ -15,7 +14,6 @@ The notification system must be designed with reliability and fault tolerance in
 
 ---
 
-## Implementation Details
 
 ### NOTIF-IMPL-001 Notifications Publishing
 
