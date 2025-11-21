@@ -52,6 +52,7 @@ This requirement is derived from root.
 
 #### Relations
   * derivedFrom: #root-requirement
+  * verifiedBy: Verifications/Tests.md#test-1
 
 ### Derived Requirement 2
 
@@ -62,6 +63,7 @@ This requirement is also derived from root.
 
 #### Relations
   * derivedFrom: #root-requirement
+  * verifiedBy: Verifications/Tests.md#test-2
 EOF
 
 cat > "${TEST_DIR}/specifications/Verifications/Tests.md" << 'EOF'
@@ -245,6 +247,12 @@ else
     OVERALL_RESULT=1
   fi
 
+  # Verify outgoing verifiedBy relation preserved and moved with element
+  if ! grep -A 10 "### Derived Requirement 2" "${TEST_DIR}/specifications/OtherRequirements.md" | grep -q "verifiedBy:.*Verifications/Tests.md#test-2"; then
+    echo "❌ FAILED: Outgoing verifiedBy relation was not preserved during move"
+    OVERALL_RESULT=1
+  fi
+
   # Verify model validates
   set +e
   VALIDATE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" validate 2>&1)
@@ -261,10 +269,86 @@ else
 fi
 
 # ==================================
-# Test 4: Delete Root Element - Verify All Derived Relations Removed
+# Test 4: Move Verification Element - Verify VerifiedBy Relations Updated
 # ==================================
 echo "" >> "${TEST_DIR}/test_results.log"
-echo "Test 4: Delete root element with multiple outgoing relations..." >> "${TEST_DIR}/test_results.log"
+echo "Test 4: Move verification element and check verifiedBy relation updates..." >> "${TEST_DIR}/test_results.log"
+
+# Create target file for verification
+cat > "${TEST_DIR}/specifications/SystemTests.md" << 'EOF'
+# System Tests
+
+## Integration Tests
+EOF
+
+set +e
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv "Test 2" "specifications/SystemTests.md" "Integration Tests" 2>&1)
+EXIT_CODE=$?
+set -e
+
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+
+if [ $EXIT_CODE -ne 0 ]; then
+  echo "❌ FAILED: Move verification command failed"
+  echo "Output: $OUTPUT"
+  OVERALL_RESULT=1
+else
+  # Verify verification element was moved
+  if grep -q "### Test 2" "${TEST_DIR}/specifications/Verifications/Tests.md"; then
+    echo "❌ FAILED: Verification was not removed from source"
+    OVERALL_RESULT=1
+  fi
+
+  if ! grep -q "### Test 2" "${TEST_DIR}/specifications/SystemTests.md"; then
+    echo "❌ FAILED: Verification was not added to target"
+    OVERALL_RESULT=1
+  fi
+
+  # CRITICAL: Verify verifiedBy relation in OtherRequirements.md was updated
+  # (Derived Requirement 2 was moved to OtherRequirements.md in Test 3)
+  if grep -q "verifiedBy:.*Verifications/Tests\.md#test-2" "${TEST_DIR}/specifications/OtherRequirements.md"; then
+    echo "❌ FAILED: VerifiedBy relation still points to old verification location"
+    cat "${TEST_DIR}/specifications/OtherRequirements.md"
+    OVERALL_RESULT=1
+  fi
+
+  if ! grep -q "verifiedBy:.*SystemTests\.md#test-2" "${TEST_DIR}/specifications/OtherRequirements.md"; then
+    echo "❌ FAILED: VerifiedBy relation was not updated to new verification location"
+    cat "${TEST_DIR}/specifications/OtherRequirements.md"
+    OVERALL_RESULT=1
+  fi
+
+  # Verify verify relation moved with the verification element and path updated
+  # The verification moved from Verifications/Tests.md to SystemTests.md
+  # Both are at specifications/ level, so relative path should be OtherRequirements.md
+  if ! grep -A 10 "### Test 2" "${TEST_DIR}/specifications/SystemTests.md" | grep -q "verify:.*OtherRequirements\.md#derived-requirement-2"; then
+    echo "❌ FAILED: Verify relation was not updated correctly during verification move"
+    echo "Expected: verify: OtherRequirements.md#derived-requirement-2"
+    echo "Actual content:"
+    grep -A 10 "### Test 2" "${TEST_DIR}/specifications/SystemTests.md" || true
+    OVERALL_RESULT=1
+  fi
+
+  # Verify model validates
+  set +e
+  VALIDATE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" validate 2>&1)
+  VALIDATE_EXIT=$?
+  set -e
+
+  if [ $VALIDATE_EXIT -ne 0 ]; then
+    echo "❌ FAILED: Model validation failed after moving verification"
+    echo "Output: $VALIDATE_OUTPUT"
+    OVERALL_RESULT=1
+  else
+    echo "✓ Verification moved and verifiedBy relations updated in requirements" >> "${TEST_DIR}/test_results.log"
+  fi
+fi
+
+# ==================================
+# Test 5: Delete Root Element - Verify All Derived Relations Removed
+# ==================================
+echo "" >> "${TEST_DIR}/test_results.log"
+echo "Test 5: Delete root element with multiple outgoing relations..." >> "${TEST_DIR}/test_results.log"
 
 set +e
 OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" rm "Root Requirement" 2>&1)
@@ -322,10 +406,10 @@ else
 fi
 
 # ==================================
-# Test 5: Final Consistency Check - Verify Expected Validation Errors
+# Test 6: Final Consistency Check - Verify Expected Validation Errors
 # ==================================
 echo "" >> "${TEST_DIR}/test_results.log"
-echo "Test 5: Final consistency check - verify expected validation errors..." >> "${TEST_DIR}/test_results.log"
+echo "Test 6: Final consistency check - verify expected validation errors..." >> "${TEST_DIR}/test_results.log"
 
 set +e
 SUMMARY_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --json 2>&1)
