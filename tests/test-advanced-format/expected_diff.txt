@@ -1,7 +1,7 @@
-Found 7 file(s) with formatting changes:
+Found 6 file(s) with formatting changes:
 
 📄 MOEs.md
-  01     # Measures of Effectiveness
+  01     # Requirements
   02
   03     ## User Adoption
   04 -   ---
@@ -29,7 +29,7 @@ Found 7 file(s) with formatting changes:
 
 
 📄 SystemRequirements/Requirements.md
-  01     # System Requirements
+  01     # Requirements
   02
   03     ## Processing
   04
@@ -81,29 +81,18 @@ Found 7 file(s) with formatting changes:
 
 
 📄 TestNoHeaders.md
-  01 +   # TestNoHeaders
-  02 +   ␤
-  03 +   ## Requirements
-  04 +   ␤
-  05     ### Element Without Section
-  06
-  07     This element has no page header and no section header.
-
-
-
-
-📄 TestNoPageHeader.md
-  01 +   # TestNoPageHeader
-  02 +   ␤
-  03     ## Test Section
-  04
-  05     ### Element Alpha
+  01     # Requirements
+  02 +   ## Requirements
+  03 +   ␤
+  04     ### Element Without Section
+  05
+  06     This element has no page header and no section header.
 
 
 
 
 📄 TestNoSectionHeader.md
-  01     # TestNoSectionHeader
+  01     # Requirements
   02 +   ## Requirements
   03 +   ␤
   04     ### Element One
@@ -114,7 +103,7 @@ Found 7 file(s) with formatting changes:
 
 
 📄 UserStories.md
-  001     # User Stories
+  001     # Requirements
   002
   003     ## Personas
   004 +   ␤
@@ -218,7 +207,7 @@ Found 7 file(s) with formatting changes:
 
 
 📄 Verifications/Tests.md
-  01     # Verification Tests
+  01     # Requirements
   02
   03     This document contains various test cases.
   04

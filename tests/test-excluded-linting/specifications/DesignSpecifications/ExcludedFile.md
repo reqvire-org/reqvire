@@ -1,4 +1,4 @@
-# Design Specification: Excluded File
+# Requirements
 
 This file should be excluded from linting.
 

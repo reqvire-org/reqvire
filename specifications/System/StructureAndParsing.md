@@ -1,8 +1,25 @@
-# Structure and Parsing
+# Requirements
 
 This document specifies requirements for markdown document structure, element identification, and relation parsing in Reqvire.
 
 ## Requirements
+
+### Specification File Identification
+
+The system shall only parse markdown files that are identified as specification files. A markdown file is considered a specification file if and only if its first level-1 heading (`#`) is exactly `# Requirements`. Files not meeting this criterion shall be ignored during model parsing, even if they have a `.md` extension.
+
+#### Details
+- The `# Requirements` heading must be the first H1 header in the file
+- Leading whitespace, blank lines, or frontmatter before the heading are allowed
+- Files without `# Requirements` as first H1 are silently skipped (no error)
+- This rule applies in addition to `.gitignore` and `.reqvireignore` exclusions
+- The page title is not stored or tracked by the system
+
+#### Relations
+  * derivedFrom: [Managing System Models](../UserStories.md#managing-system-models)
+  * satisfiedBy: [parser.rs](../../core/src/parser.rs)
+  * satisfiedBy: [model.rs](../../core/src/model.rs)
+---
 
 ### Structure and Addressing in Markdown Documents
 

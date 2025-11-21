@@ -1,4 +1,4 @@
-# Second File with Duplicate Element Name
+# Requirements
 
 This file contains an element with a name that already exists in Requirements.md, testing global uniqueness validation.
 

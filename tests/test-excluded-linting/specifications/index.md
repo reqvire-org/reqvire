@@ -1,4 +1,4 @@
-# Reqvire Specifications Index
+# Requirements
 
 This index provides a structured overview of all specification documents.
 

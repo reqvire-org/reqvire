@@ -1,4 +1,4 @@
-# Test Requirements with Custom Mermaid
+# Requirements
 
 This is a requirements document specifically created for testing diagram generation.
 

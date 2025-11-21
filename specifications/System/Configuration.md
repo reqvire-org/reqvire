@@ -1,4 +1,4 @@
-# Configuration
+# Requirements
 
 ## File Exclusion Configuration
 

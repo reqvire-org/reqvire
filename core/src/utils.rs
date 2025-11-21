@@ -41,11 +41,12 @@ macro_rules! info_println {
 }
 
 
-/// Checks if a file should be processed
-pub fn is_requirements_file_by_path(path: &Path, excluded_filename_patterns: &GlobSet) -> bool {
-    let filename = path.file_name().and_then(|s| s.to_str()).unwrap_or("");
-       
-    filename.ends_with(".md") && !is_excluded_by_patterns(path, &excluded_filename_patterns)
+/// Checks if a file should be ignored based on gitignore and reqvireignore patterns.
+/// Returns true if the file should be IGNORED (not processed).
+/// Note: This only checks ignore patterns. The `# Requirements` header check
+/// happens later when reading file content (in parser.rs).
+pub fn is_to_be_ignored(path: &Path, excluded_filename_patterns: &GlobSet) -> bool {
+    is_excluded_by_patterns(path, excluded_filename_patterns)
 }
 
 
@@ -217,11 +218,12 @@ pub fn scan_markdown_files(
             debug!("Scanning for markdown files in: {}", scan_dir.display());
             
             // Scan all markdown files in the repository or specified subdirectory
+            // Filter out files that are ignored by gitignore or reqvireignore
             for entry in WalkDir::new(&scan_dir)
                 .into_iter()
                 .filter_map(Result::ok)
                 .filter(|e| e.path().is_file() && e.path().extension().map_or(false, |ext| ext == "md"))
-                .filter(|e| is_requirements_file_by_path(e.path(), excluded_filename_patterns))
+                .filter(|e| !is_to_be_ignored(e.path(), excluded_filename_patterns))
             {
                 files.push(entry.path().to_path_buf());
             }
@@ -263,10 +265,10 @@ pub fn scan_markdown_files_from_commit(
     };
 
     let matching_paths = documents_vec
-        .into_iter() 
-        .map(|p| git_root.join(p))             
+        .into_iter()
+        .map(|p| git_root.join(p))
         .filter(|p| p.extension().map_or(false, |ext| ext == "md"))
-        .filter(|p| is_requirements_file_by_path(p, excluded_filename_patterns))
+        .filter(|p| !is_to_be_ignored(p, excluded_filename_patterns))
         .collect::<Vec<PathBuf>>();
 
     files.extend(matching_paths);
@@ -882,69 +884,65 @@ mod tests {
         }
     }   
     
-    // Test the is_requirements_file_by_path function
+    // Test the is_to_be_ignored function
     #[test]
-    fn test_is_requirements_file_by_path() {
-     
-        // Configure external folders for these tests
+    fn test_is_to_be_ignored() {
+
+        // Configure excluded patterns for these tests
         let mut config_with_externals = MockConfig::default();
         config_with_externals.paths.user_requirements_root_folder = "specifications".to_string();
-    
+
         config_with_externals.paths.excluded_filename_patterns=vec![
             "**/README*.md".to_string(),
             "**/Logical*.md".to_string(),
             "**/Physical*.md".to_string(),
             "**/index.md".to_string()
         ];
-               
-                       
-        // Test cases for requirements files
-        let req_file_cases = vec![
+
+        // Test cases for files that should NOT be ignored (will be processed)
+        let not_ignored_cases = vec![
             // Requirements files in specifications root
             "specifications/UserRequirements.md",
             "specifications/SystemRequirements.md",
             "specifications/MissionRequirements.md",
-            
+
             // Requirements files in system requirements folder
             "specifications/SystemRequirements/Requirements.md",
             "specifications/SystemRequirements/Subsystem/Requirements.md",
-        ];
-        
-        // Test cases for non-requirements files
-        let non_req_file_cases = vec![
-            // Design specifications
+
+            // Design specifications (not in ignore patterns)
             "specifications/DesignSpecifications/DSD_Diagram.md",
             "specifications/DSD_Architecture.md",
-            
-            // Other markdown files
+        ];
+
+        // Test cases for files that SHOULD be ignored
+        let ignored_cases = vec![
+            // README files match **/README*.md pattern
             "specifications/README.md",
             "README.md",
-            
-            // Non-markdown files
-            "specifications/document.txt",
         ];
-        
-        // Test that requirements files are properly identified
-        for path_str in req_file_cases {
+
+        // Test that non-ignored files are not flagged for ignoring
+        for path_str in not_ignored_cases {
             let path = PathBuf::from(path_str);
-            // Skip tests if the path doesn't exist 
+            // Skip tests if the path doesn't exist
             // This allows the tests to be run in different environments
             if !path.exists() {
                 continue;
             }
-            assert!(is_requirements_file_by_path(&path, &config_with_externals.get_excluded_filename_patterns_glob_set()), 
-                    "Expected {} to be identified as a requirements file", path_str);
+            assert!(!is_to_be_ignored(&path, &config_with_externals.get_excluded_filename_patterns_glob_set()),
+                    "Expected {} to NOT be ignored", path_str);
         }
-        
-        // Test that non-requirements files are properly excluded
-        for path_str in non_req_file_cases {
+
+        // Test that ignored files are properly flagged
+        for path_str in ignored_cases {
             let path = PathBuf::from(path_str);
             // Skip tests if the path doesn't exist
             if !path.exists() {
                 continue;
             }
-            assert!(!is_requirements_file_by_path(&path, &config_with_externals.get_excluded_filename_patterns_glob_set()), 
-                    "Expected {} to NOT be identified as a requirements file", path_str);
+            assert!(is_to_be_ignored(&path, &config_with_externals.get_excluded_filename_patterns_glob_set()),
+                    "Expected {} to be ignored", path_str);
         }
     }
     

@@ -1,7 +1,7 @@
 Renamed element: Feature A → Feature Alpha (specifications/Requirements.md#feature-alpha)
 
 📄 specifications/OtherRequirements.md
-  [37m01     # Other Requirements[0m
+  [37m01     # Requirements[0m
   [37m02[0m
   [37m03     ## Other Features[0m
 

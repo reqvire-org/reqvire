@@ -183,7 +183,7 @@
           "element_count": 1
         }
       },
-      "page_content": "# Test Requirements for Valid Relations\n\nThis document contains correctly formatted relations to existing targets, to verify validation passes.\n\nThis is page frontmatter content that should appear in the summary.\n\n```mermaid\ngraph TD;\n    A[Start] --> B[Process];\n    B --> C[End];\n```\n\nAdditional page content to test mermaid diagram inclusion in page summaries.",
+      "page_content": "This document contains correctly formatted relations to existing targets, to verify validation passes.\n\nThis is page frontmatter content that should appear in the summary.\n\n```mermaid\ngraph TD;\n    A[Start] --> B[Process];\n    B --> C[End];\n```\n\nAdditional page content to test mermaid diagram inclusion in page summaries.",
       "total_sections": 3,
       "total_elements": 5
     },
@@ -223,7 +223,7 @@
           "element_count": 1
         }
       },
-      "page_content": "# Verifications\n\nThis document contains test verifications.",
+      "page_content": "This document contains test verifications.",
       "total_sections": 1,
       "total_elements": 1
     }

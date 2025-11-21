@@ -1,7 +1,7 @@
 Moved element: Feature C (specifications/Requirements.md#feature-c)
 
 📄 specifications/OtherRequirements.md
-  [37m01     # Other Requirements[0m
+  [37m01     # Requirements[0m
   [37m02[0m
   [37m03     ## Other Features[0m
   [32m04 +   ### Feature C[0m
@@ -42,7 +42,7 @@ Moved element: Feature C (specifications/Requirements.md#feature-c)
 
 
 📄 specifications/Verifications/Tests.md
-  [37m01     # Tests[0m
+  [37m01     # Requirements[0m
   [37m02[0m
   [37m03     ## Verification Tests[0m
 

@@ -1282,30 +1282,8 @@ impl GraphRegistry {
     pub fn generate_file_markdown(&self, file_path: &str, sections: &HashMap<String, Vec<&Element>>) -> String {
         let mut markdown = String::new();
 
-        // Get file title from file path (remove extension and path)
-        let file_title = Path::new(file_path)
-            .file_stem()
-            .unwrap_or_default()
-            .to_string_lossy()
-            .replace('_', " ")
-            .replace('-', " ");
-
-        // Check if page content already has a level 1 header to avoid duplication
-        let mut has_page_header = false;
-        if let Some(page) = self.pages.get(file_path) {
-            if !page.frontmatter_content.trim().is_empty() {
-                let trimmed = page.frontmatter_content.trim_start();
-                // Check if page content starts with a level 1 header (# followed by space, not ##)
-                if trimmed.starts_with("# ") || (trimmed.starts_with('#') && trimmed.len() > 1 && !trimmed.chars().nth(1).unwrap().is_ascii_punctuation()) {
-                    has_page_header = true;
-                }
-            }
-        }
-
-        // Add file header only if page content doesn't already have a level 1 header
-        if !has_page_header {
-            markdown.push_str(&format!("# {}\n\n", file_title));
-        }
+        // All specification files must have "# Requirements" as the page header
+        markdown.push_str("# Requirements\n\n");
 
         // Add page content if available
         if let Some(page) = self.pages.get(file_path) {
@@ -2888,9 +2866,9 @@ mod tests {
         assert!(!file2_content.contains("Virtual placeholder"));
         assert!(!file3_content.contains("Virtual placeholder"));
 
-        // Verify proper markdown structure
-        assert!(file1_content.starts_with("# file1\n"));
-        assert!(file3_content.starts_with("# file3\n"));
+        // Verify proper markdown structure - all files start with "# Requirements"
+        assert!(file1_content.starts_with("# Requirements\n"));
+        assert!(file3_content.starts_with("# Requirements\n"));
     }
 
     #[test]
@@ -2941,8 +2919,8 @@ mod tests {
         println!("=== Generated file content ===");
         println!("{}", file_content);
 
-        // Verify file header is present
-        assert!(file_content.starts_with("# test file\n\n"));
+        // Verify file header is present - all files start with "# Requirements"
+        assert!(file_content.starts_with("# Requirements\n\n"));
 
         // Verify page content is included after header and before sections
         assert!(file_content.contains("This is page frontmatter content."));
@@ -2952,7 +2930,7 @@ mod tests {
         assert!(file_content.contains("### Element A Description"));
 
         // Verify order: header, page content, section, element
-        let header_pos = file_content.find("# test file").unwrap();
+        let header_pos = file_content.find("# Requirements").unwrap();
         let page_content_pos = file_content.find("This is page frontmatter content.").unwrap();
         let section_pos = file_content.find("## Section1").unwrap();
         let element_pos = file_content.find("### Element A Description").unwrap();
@@ -3142,14 +3120,14 @@ mod tests {
 
         // Verify that empty/whitespace-only content is not included
         // The file should go directly from header to section header to element
-        assert!(file_content.starts_with("# test file\n\n## Section1\n\n### Element A Description"));
+        assert!(file_content.starts_with("# Requirements\n\n## Section1\n\n### Element A Description"));
 
         // Verify element is still present
         assert!(file_content.contains("### Element A Description"));
     }
 
     #[test]
-    fn test_flush_detects_duplicate_headers_in_page_content() {
+    fn test_flush_always_outputs_requirements_header() {
         use std::fs;
         use tempfile::TempDir;
 
@@ -3162,8 +3140,8 @@ mod tests {
 
         registry.register_element(a.clone(), "MOEs.md").unwrap();
 
-        // Add page content that contains a header matching the file title
-        let page = Page::new("# MOEs\n\nThis is the MOEs page content.".to_string());
+        // Add page content (without header - parser strips the H1)
+        let page = Page::new("This is the MOEs page content.".to_string());
         registry.pages.insert("MOEs.md".to_string(), page);
 
         let graph = registry;
@@ -3179,22 +3157,18 @@ mod tests {
         // Read the generated markdown file
         let file_content = fs::read_to_string(output_path.join("MOEs.md")).unwrap();
 
-        println!("=== Generated file content with potential duplicate header ===");
+        println!("=== Generated file content ===");
         println!("{}", file_content);
 
-        // Count occurrences of "# MOEs" - should be 1, not 2
-        let header_count = file_content.matches("# MOEs").count();
-        println!("Header count: {}", header_count);
+        // All specification files should start with "# Requirements"
+        assert!(file_content.starts_with("# Requirements\n\n"));
 
-        // Should have only one header now that auto-generation is skipped when page content has header
-        assert_eq!(header_count, 1, "Should have only one '# MOEs' header, but found {}", header_count);
-
-        // Verify the content starts with the page header (not auto-generated)
-        assert!(file_content.starts_with("# MOEs\n\nThis is the MOEs page content."));
+        // Page content should be included after the header
+        assert!(file_content.contains("This is the MOEs page content."));
     }
 
     #[test]
-    fn test_flush_generates_header_when_page_content_has_no_header() {
+    fn test_flush_generates_requirements_header_with_page_content() {
         use std::fs;
         use tempfile::TempDir;
 
@@ -3207,7 +3181,7 @@ mod tests {
 
         registry.register_element(a.clone(), "test_file.md").unwrap();
 
-        // Add page content WITHOUT a header
+        // Add page content (without header - parser strips the H1)
         let page = Page::new("This is page content without a header.\n\nMore content here.".to_string());
         registry.pages.insert("test_file.md".to_string(), page);
 
@@ -3224,17 +3198,17 @@ mod tests {
         // Read the generated markdown file
         let file_content = fs::read_to_string(output_path.join("test_file.md")).unwrap();
 
-        println!("=== Generated file content with auto-generated header ===");
+        println!("=== Generated file content ===");
         println!("{}", file_content);
 
-        // Should have auto-generated header since page content doesn't have one
-        assert!(file_content.starts_with("# test file\n\n"));
+        // All files should start with "# Requirements"
+        assert!(file_content.starts_with("# Requirements\n\n"));
 
-        // Should contain page content after the auto-generated header
+        // Should contain page content after the header
         assert!(file_content.contains("This is page content without a header."));
 
-        // Verify order: auto-generated header, page content, section, element
-        let header_pos = file_content.find("# test file").unwrap();
+        // Verify order: Requirements header, page content, section, element
+        let header_pos = file_content.find("# Requirements").unwrap();
         let page_content_pos = file_content.find("This is page content without a header.").unwrap();
         let section_pos = file_content.find("## Section1").unwrap();
         let element_pos = file_content.find("### Element A Description").unwrap();

@@ -1,4 +1,4 @@
-# Subsections
+# Requirements
 
 This document specifies requirements for reserved subsections in Reqvire markdown documents.
 

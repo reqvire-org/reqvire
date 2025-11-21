@@ -1,4 +1,4 @@
-# Test Requirements with Invalid Relations
+# Requirements
 
 This document contains requirements with intentional relation errors for testing validation.
 

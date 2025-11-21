@@ -94,7 +94,7 @@ fi
 # Create a simple valid model for testing
 mkdir -p "${TEST_DIR}/valid-test/specifications"
 cat > "${TEST_DIR}/valid-test/specifications/ValidRequirements.md" << 'EOF'
-# Valid Test Requirements
+# Requirements
 
 ## Valid Requirement
 

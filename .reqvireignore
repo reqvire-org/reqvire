@@ -3,21 +3,12 @@
 # but can still be referenced in file relations.
 # Uses the same syntax as .gitignore
 
-# Use cases and stories (kept in repo but not processed as structured requirements)
-Usecases.md
-
-# Development and planning documents
-TODO.md
-Plan.md
+# Tests
+tests/**
 
 # Plugin and tool directories
 .claude-plugin/**
 reqvire-claude-plugin/**
-
-# Source code directories (for projects that mix code and requirements)
-tests/**
-core/**
-cli/**
 
 # Documentation and build output
 doc/**

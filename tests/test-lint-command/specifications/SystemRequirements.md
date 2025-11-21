@@ -1,4 +1,4 @@
-# System Requirements
+# Requirements
 
 ## API Requirements
 

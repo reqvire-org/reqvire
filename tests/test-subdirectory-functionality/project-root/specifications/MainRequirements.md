@@ -1,4 +1,4 @@
-# Main Requirements
+# Requirements
 
 This file contains main requirements that should NOT be processed when run from a subdirectory.
 

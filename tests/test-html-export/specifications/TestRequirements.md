@@ -1,4 +1,4 @@
-# Test Requirements
+# Requirements
 
 This document contains test requirements for HTML export testing.
 

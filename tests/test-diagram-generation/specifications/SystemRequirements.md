@@ -1,4 +1,4 @@
-# System Requirements
+# Requirements
 
 This is a test system requirements document for diagram generation.
 

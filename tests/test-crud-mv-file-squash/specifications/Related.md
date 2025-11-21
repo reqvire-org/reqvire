@@ -1,4 +1,4 @@
-# Related File
+# Requirements
 
 This file contains an element with a relation to source elements.
 

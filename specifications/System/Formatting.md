@@ -1,4 +1,4 @@
-# Formatting
+# Requirements
 
 ## Model Formatting
 
@@ -93,9 +93,8 @@ This test verifies the format command requirements from SystemRequirements and U
 - System shall clean up file references to show filename only for implementation files
 
 **Document Structure Normalization:**
-- System shall add level 1 page header (based on filename) when document lacks page header
+- System shall always output `# Requirements` as the page header
 - System shall add `## Requirements` section header when elements exist without section header
-- System shall preserve existing page headers (starting with `# `)
 - System shall preserve existing section headers (starting with `## `)
 - System shall correctly distinguish level 1 headers from level 2+ headers
 
@@ -208,25 +207,22 @@ The system shall respect configured excluded filename patterns when performing f
 
 ### Document Structure Normalization
 
-When parsing documents, the system shall normalize document by adding missing page headers and section headers to ensure all documents follow a consistent hierarchical structure.
+When generating formatted output, the system shall ensure all documents follow a consistent hierarchical structure.
 
 #### Details
-When parsing  documents, the system shall:
-- Add a level 1 page header based on the filename when document lacks a page header (does not start with `# `)
+When generating formatted output, the system shall:
+- Always output `# Requirements` as the page header (all specification files must have this header)
 - Add a default section header `## Requirements` when elements exist without an explicit section header
-- Preserve existing page headers when present (starting with `# `)
 - Preserve existing section headers when present (starting with `## `)
 - Correctly distinguish between level 1 headers (`# `) and level 2 or deeper headers (`##`, `###`)
 
 **Default Header Names:**
-- Page header: Derived from filename (e.g., "User Requirements" from "UserRequirements.md")
+- Page header: Always `# Requirements` (required for all specification files)
 - Section header: "Requirements" (the default section name used by parser)
 
 **Normalization Rules:**
-1. If document starts with `###` element (no `#` and no `##`): Add both page header and section header
-2. If document starts with `#` then `###` (no `##`): Add section header only
-3. If document starts with `##` (no `#`): Add page header only
-4. If document has both `#` and `##`: No header additions needed
+1. If document has `# Requirements` then `###` (no `##`): Add section header only
+2. If document has `# Requirements` and `##`: No header additions needed
 
 #### Relations
   * derivedFrom: [Format Consistency Enforcement](#format-consistency-enforcement)

@@ -1,3 +1,3 @@
-# Other Requirements
+# Requirements
 
 ## Other Features

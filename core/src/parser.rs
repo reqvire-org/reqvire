@@ -223,20 +223,52 @@ pub fn parse_single_element(
     }
 }
 
+/// Checks if the file is a specification file by looking for "# Requirements" as first H1 heading.
+/// Returns true if file should be parsed, false if it should be skipped.
+fn is_specification_file(content: &str) -> bool {
+    for line in content.lines() {
+        let trimmed = line.trim();
+        // Skip empty lines and non-heading content before first H1
+        if trimmed.is_empty() {
+            continue;
+        }
+        // Check if this is an H1 heading
+        if trimmed.starts_with("# ") {
+            // First H1 heading found - check if it's "# Requirements"
+            return trimmed == "# Requirements";
+        }
+        // If we hit any other H1 or content that's not a heading, keep looking
+        // (allow frontmatter, comments, etc. before the heading)
+        if !trimmed.starts_with('#') && !trimmed.starts_with("---") && !trimmed.starts_with("<!--") {
+            // Non-header, non-frontmatter content before H1 - skip but continue looking
+            continue;
+        }
+    }
+    // No H1 heading found
+    false
+}
+
 /// Parses a markdown document and extracts elements with metadata and relations.
 /// Returns: (elements, errors, page_content, sections)
+/// Only parses files where the first H1 heading is "# Requirements".
 pub fn parse_elements(
     file: &str,
     content: &str,
     file_path: &PathBuf,
 ) -> (Vec<Element>, Vec<ReqvireError>, String, Vec<(String, String, usize)>) {
+    // Check if this is a specification file (first H1 must be "# Requirements")
+    if !is_specification_file(content) {
+        debug!("Skipping file {} - not a specification file (no '# Requirements' heading)", file);
+        return (Vec::new(), Vec::new(), String::new(), Vec::new());
+    }
+
     let mut elements = Vec::new();
     let mut current_element: Option<Element> = None;
     let mut errors = Vec::new();
     let mut seen_identifiers = HashSet::new();
     let mut skip_current_element = false;
     let mut seen_subsections = HashSet::new();
-    let mut in_details_block = false; 
+    let mut in_details_block = false;
 
 
     let mut current_subsection = SubSection::Other("".to_string());
@@ -591,9 +623,11 @@ pub fn parse_elements(
         } else if matches!(current_subsection, SubSection::Other(_)) {
             // Accumulate content outside of elements
             if !found_first_section {
-                // Page content: everything before first section
-                page_content.push_str(line);
-                page_content.push('\n');
+                // Page content: everything before first section, but skip the # Requirements title
+                if !trimmed.starts_with("# ") {
+                    page_content.push_str(line);
+                    page_content.push('\n');
+                }
             } else {
                 // Section content: everything after section header but before first element
                 current_section_content.push_str(line);

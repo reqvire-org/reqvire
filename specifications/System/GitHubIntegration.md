@@ -1,4 +1,4 @@
-# GitHubIntegration
+# Requirements
 
 ## Requirements
 

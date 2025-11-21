@@ -36,7 +36,7 @@ echo "Test 1: Basic normalization (spaces, case, punctuation)..."
 
 # Create test elements with various naming patterns
 cat > "$TEST_DIR/specifications/Features.md" <<'EOF'
-# Features
+# Requirements
 
 ## Test Features
 
@@ -170,7 +170,7 @@ echo "Test 3: Case-insensitive cross-reference resolution..."
 
 # Create element that references another with different casing
 cat > "$TEST_DIR/specifications/References.md" <<'EOF'
-# References
+# Requirements
 
 ## Test References
 
@@ -372,7 +372,7 @@ echo "✓ Element content extracted correctly (subsections excluded)"
 # Test 6e: Verify Details subsection parsing
 # Test with an element that has Details subsection
 cat > "$TEST_DIR/specifications/Detailed.md" <<'EOF'
-# Detailed Requirements
+# Requirements
 
 ## Detailed Features
 

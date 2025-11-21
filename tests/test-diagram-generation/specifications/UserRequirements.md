@@ -1,4 +1,4 @@
-# User Requirements
+# Requirements
 
 This is a test user requirements document for diagram generation.
 

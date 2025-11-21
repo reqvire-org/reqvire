@@ -1,4 +1,4 @@
-# Parent Requirements
+# Requirements
 
 ## Parent Section
 

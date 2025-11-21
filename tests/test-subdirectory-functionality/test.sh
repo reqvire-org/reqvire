@@ -184,7 +184,7 @@ echo "Running: reqvire mv (move element to different file within subdirectory)" 
 
 # Create a new target file in the submodule
 cat > "${TMP_DIR}/project-root/submodule/specifications/OtherRequirements.md" <<'EOF'
-# Other Requirements
+# Requirements
 
 ## Other Features
 EOF

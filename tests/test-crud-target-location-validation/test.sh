@@ -43,7 +43,7 @@ EOF
 # Create a simple base element for testing
 mkdir -p "${TEST_DIR}/specifications"
 cat > "${TEST_DIR}/specifications/Base.md" << 'EOF'
-# Base Requirements
+# Requirements
 
 ## Base Section
 

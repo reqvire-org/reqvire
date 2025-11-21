@@ -1,4 +1,4 @@
-# Ignored File
+# Requirements
 
 This file should be ignored by Reqvire based on the configuration.
 

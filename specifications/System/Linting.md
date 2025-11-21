@@ -1,4 +1,4 @@
-# Linting
+# Requirements
 
 ## Lint Output
 

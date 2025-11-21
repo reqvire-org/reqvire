@@ -209,7 +209,7 @@ TEMP_NO_CUSTOM="${TEST_DIR}/test_no_custom"
 mkdir -p "${TEMP_NO_CUSTOM}/specifications"
 
 cat > "${TEMP_NO_CUSTOM}/specifications/StandardOnly.md" << 'EOF'
-# Standard Types Only
+# Requirements
 
 ## Requirements
 

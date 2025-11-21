@@ -1,4 +1,4 @@
-# Notification System Requirements
+# Requirements
 
 This document contains the requirements for the notification system, including cases with same-file fragment references.
 

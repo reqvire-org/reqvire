@@ -1,4 +1,4 @@
-# Test Requirements
+# Requirements
 
 This is a requirements document specifically created for testing diagram generation.
 

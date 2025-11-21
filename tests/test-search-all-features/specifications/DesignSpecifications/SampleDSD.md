@@ -1,4 +1,4 @@
-# Sample Design Specification Document
+# Requirements
 
 This is a sample DSD file for testing validation of relations to the DesignSpecifications folder.
 
