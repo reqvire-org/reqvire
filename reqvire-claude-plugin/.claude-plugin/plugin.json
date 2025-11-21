@@ -31,6 +31,7 @@
     "./commands/analyze-coverage.md",
     "./commands/analyze-impact.md",
     "./commands/lint-model.md",
+    "./commands/consolidate.md",
     "./commands/generate-tasks.md",
     "./commands/find-redundant-verifications.md",
     "./commands/rename-element.md",
