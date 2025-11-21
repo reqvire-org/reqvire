@@ -12,7 +12,7 @@ The use case diagram below highlights the primary interactions between the Reqvi
 flowchart LR
     subgraph "ReqvireTool"
         subgraph "Cli"
-            manageModel((Manage MBSE Model))
+            manageModel((Manage System Model))
             generateDiagrams((Generate/Remove Diagrams))
             analiseRelations((Analyze Relations))
             reports[Provide Reports]
@@ -46,7 +46,7 @@ flowchart LR
     end
 
     subgraph "System of Interest: SOI"
-        model[MBSE Model]
+        model[System Model]
         developedSystem["Developed System"]
         subgraph "Git Repository<br>monorepo or multirepo"
             gitRepository[Git Repository]
@@ -116,7 +116,7 @@ flowchart LR
 
 ## Explanation of Reqvire Use Case Diagram
 
-This diagram outlines the core interactions, components, and workflows of the **Reqvire** tool in the context of managing Model-Based Systems Engineering (MBSE) models, integrating with external systems, and supporting development activities for a System of Interest (SOI).
+This diagram outlines the core interactions, components, and workflows of the **Reqvire** tool in the context of managing Model-Based Systems Engineering (System) models, integrating with external systems, and supporting development activities for a System of Interest (SOI).
 
 
 ### Reqvire Tool
@@ -126,7 +126,7 @@ The central component of the system, which facilitates various MBSE-related acti
 #### Tool Interfaces
 
 Tool interfaces are **CLI** (Command Line Interface) and **MCP** (Model Context Protocol) server:
-- Manage MBSE Model: Core functionality to handle the MBSE model lifecycle including refactoring model.
+- Manage System Model: Core functionality to handle the System model lifecycle including refactoring model.
 - Generate Diagrams: Allows users to generate visual representations of the system model.
  - Diagrams can be generated for different viewpoints.
 - Analyze Relations: Provides tools to analyze relationships and dependencies within the model.
@@ -145,11 +145,11 @@ Tool interfaces are **CLI** (Command Line Interface) and **MCP** (Model Context 
 The **System of Interest (SOI)** refers to the system which is under development.
  
 It represents the primary focus of development and includes the following key elements:
-- MBSE Model: The structured system specification and design documentation created and managed using Reqvire. 
+- System Model: The structured system specification and design documentation created and managed using Reqvire. 
   - This model defines the requirements, architecture, and traceability necessary for developing the SOI.
-- Developed System: The actual physical or implemented system that is built based on the MBSE model. 
+- Developed System: The actual physical or implemented system that is built based on the System model. 
   - It embodies the realization of the design and requirements outlined in the model.
-- Git Repository: A storage and version control system where the MBSE model and the developed system artifacts are stored.
+- Git Repository: A storage and version control system where the System model and the developed system artifacts are stored.
   - This repository can be organized as a monorepo or a multirepo, depending on the project’s needs.
 
 The SOI serves as the centerpiece of the Reqvire framework, linking specifications, development, and validation processes.
@@ -169,11 +169,11 @@ These tools enable CI/CD systems to enforce PR merge rules, validate changes, an
 ### GitHub or Similar
 
 Reqvire integrates into existing agile and collaborative workflows by providing the necessary tools and scripts to support version control, change management, and traceability. 
-These features allow teams to seamlessly integrate MBSE practices into their development processes, enabling effective collaboration through GitHub or similar platforms.
+These features allow teams to seamlessly integrate System practices into their development processes, enabling effective collaboration through GitHub or similar platforms.
 
 ### Human Interaction
 
-Humans interact with Reqvire tools to manage, refine, and validate MBSE models, as well as to collaborate effectively within development workflows:
+Humans interact with Reqvire tools to manage, refine, and validate System models, as well as to collaborate effectively within development workflows:
 - Via CLI: Users leverage Reqvire’s CLI to perform tasks such as managing models, generating diagrams, analyzing relationships, and validating structures.
 - Via AI Agents: Users interact with AI agents to receive intelligent suggestions, review potential improvements, and approve changes, ensuring a human-in-the-loop approach.
   - AI agents may laverage Reqvire’s MCP server or consume model directly from the filesystem.
@@ -185,7 +185,7 @@ Humans interact with Reqvire tools to manage, refine, and validate MBSE models, 
 
 ### Reqvire Interactions with Git
 
-- Reqvire uses Git repositories to store and version the MBSE model and developed system.
+- Reqvire uses Git repositories to store and version the System model and developed system.
 - Changes, including approved AI suggestions, are prepared and committed through standard Git workflows.
 
 
@@ -194,13 +194,13 @@ Humans interact with Reqvire tools to manage, refine, and validate MBSE models, 
 - Invalid merges are prevented based on the validation results.
 
 ### SOI Feedback Loop
-- The Developed System provides feedback to the MBSE Model, enabling iterative refinement.
+- The Developed System provides feedback to the Syetem Model, enabling iterative refinement.
 - The model guides the development of the system, ensuring alignment with requirements and objectives.
 
 
 ## Key Relationships
 
-- The MBSE Model is implemented into the Developed System, which is stored and versioned in the Git repository.
+- The System Model is implemented into the Developed System, which is stored and versioned in the Git repository.
 - The Reqvire CLI provides tools to validate, analyze, and generate artifacts from the model.
 - AI Agents assist humans by generating suggestions and automating repetitive tasks.
 - The **CI/CD System** ensures quality control and prevents invalid changes from being merged.

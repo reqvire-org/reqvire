@@ -30,3 +30,5 @@ codefetch.config.mjs
 
 # Claude Code local settings (user-specific, not plugin files)
 .claude/
+
+Plan.md
