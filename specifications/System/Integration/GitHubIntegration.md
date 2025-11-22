@@ -8,7 +8,7 @@ The system shall automate validations of pull requests in the GitHub workflow to
   * type: user-requirement
 
 #### Relations
-  * derivedFrom: [Integrate with GitHub Workflows](../UserStories.md#integrate-with-github-workflows)
+  * derivedFrom: [Integrate with GitHub Workflows](../../UserStories.md#integrate-with-github-workflows)
 ---
 
 ### Generate Change Logs for Pull Requests
@@ -19,7 +19,7 @@ The system shall generate detailed change logs for pull requests, summarizing mo
   * type: user-requirement
 
 #### Relations
-  * derivedFrom: [Integrate with GitHub Workflows](../UserStories.md#integrate-with-github-workflows)
+  * derivedFrom: [Integrate with GitHub Workflows](../../UserStories.md#integrate-with-github-workflows)
 ---
 
 ### Automate Documentation Export
@@ -30,7 +30,7 @@ The system shall automate export of HTML documentation in the GitHub workflow on
   * type: user-requirement
 
 #### Relations
-  * derivedFrom: [Integrate with GitHub Workflows](../UserStories.md#integrate-with-github-workflows)
+  * derivedFrom: [Integrate with GitHub Workflows](../../UserStories.md#integrate-with-github-workflows)
 ---
 
 ### Automated Documentation Export on PR Merge
@@ -52,6 +52,6 @@ This ensures that the HTML documentation in the `docs/` folder is always up-to-d
 #### Relations
   * derivedFrom: [Automate Documentation Export](#automate-documentation-export)
   * derivedFrom: [Automate Pull Request Validations](#automate-pull-request-validations)
-  * satisfiedBy: [update_docs.yml](../../.github/workflows/update_docs.yml)
+  * satisfiedBy: [update_docs.yml](../../../.github/workflows/update_docs.yml)
 ---
 

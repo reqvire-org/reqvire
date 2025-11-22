@@ -1,7 +1,5 @@
 # Requirements
 
-# FormattingVerifications
-
 ### Format Command Requirements Verification
 
 This test verifies the format command requirements from SystemRequirements and UserRequirements, focusing on normalizing and standardizing MBSE models for consistency and readability.
@@ -107,9 +105,9 @@ This test verifies the format command requirements from SystemRequirements and U
   * type: test-verification
 
 #### Relations
-  * verify: [Format Command](../../Interfaces/CLI.md#format-command)
+  * verify: [Format Command](../../../Interfaces/CLI.md#format-command)
   * verify: [Document Structure Normalization](../Formatting.md#document-structure-normalization)
-  * verify: [Structure and Addressing in Markdown Documents](../StructureAndParsing.md#structure-and-addressing-in-markdown-documents)
-  * satisfiedBy: [test.sh](../../../tests/test-advanced-format/test.sh)
+  * verify: [Structure and Addressing in Markdown Documents](../../Core/StructureAndParsing.md#structure-and-addressing-in-markdown-documents)
+  * satisfiedBy: [test.sh](../../../../tests/test-advanced-format/test.sh)
 ---
 

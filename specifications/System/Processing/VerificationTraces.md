@@ -5,7 +5,7 @@
 The system shall provide functionality to build upward trace trees from verification elements by traversing all upward parent relations to reach root requirements, merging all paths into a single tree structure with marked directly-verified requirements.
 
 #### Relations
-  * derivedFrom: [Verification Upward Traceability](Reporting.md#verification-upward-traceability)
+  * derivedFrom: [Verification Upward Traceability](../Output/Reporting.md#verification-upward-traceability)
 ---
 
 ### Verification Roll-up Strategy
@@ -21,6 +21,6 @@ The roll-up strategy shall work as follows:
 - This strategy applies to all verification matrices, coverage reports, and trace outputs
 
 #### Relations
-  * derivedFrom: [Verification Upward Traceability](Reporting.md#verification-upward-traceability)
+  * derivedFrom: [Verification Upward Traceability](../Output/Reporting.md#verification-upward-traceability)
 ---
 

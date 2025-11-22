@@ -16,7 +16,7 @@ The linting capability should:
   * type: user-requirement
 
 #### Relations
-  * derivedFrom: [Validating Structures](../UserStories.md#validating-structures)
+  * derivedFrom: [Validating Structures](../../UserStories.md#validating-structures)
 ---
 
 ### Lint Output Formatting
@@ -59,7 +59,7 @@ Auto-fix shall:
 - Skip issues categorized as needing manual review
 
 #### Relations
-  * derivedFrom: [CLI Lint Command](../Interfaces/CLI.md#cli-lint-command)
+  * derivedFrom: [CLI Lint Command](../../Interfaces/CLI.md#cli-lint-command)
 ---
 
 ### Redundant Verify Relations Detection
@@ -80,7 +80,7 @@ Detection shall:
 
 #### Relations
   * derivedFrom: [Model Linting](#model-linting)
-  * derivedFrom: [Verification Trace Builder](VerificationTraces.md#verification-trace-builder)
+  * derivedFrom: [Verification Trace Builder](../Processing/VerificationTraces.md#verification-trace-builder)
 ---
 
 ### Redundant Hierarchical Relations Detection
@@ -114,7 +114,7 @@ This approach reuses the proven trace tree logic for redundancy detection, ensur
 
 #### Relations
   * derivedFrom: [Model Linting](#model-linting)
-  * derivedFrom: [Verification Trace Builder](VerificationTraces.md#verification-trace-builder)
+  * derivedFrom: [Verification Trace Builder](../Processing/VerificationTraces.md#verification-trace-builder)
 ---
 
 ### Multi-Branch Convergence Detection
@@ -156,8 +156,8 @@ This enables the model author to review and decide:
 
 #### Relations
   * derivedFrom: [Model Linting](#model-linting)
-  * derivedFrom: [Verification Trace Builder](VerificationTraces.md#verification-trace-builder)
-  * satisfiedBy: [lint.rs](../../core/src/lint.rs)
+  * derivedFrom: [Verification Trace Builder](../Processing/VerificationTraces.md#verification-trace-builder)
+  * satisfiedBy: [lint.rs](../../../core/src/lint.rs)
   * verifiedBy: [Lint Command Verification](Verifications/LintingVerifications.md#lint-command-verification)
 ---
 
@@ -206,7 +206,7 @@ Reason: D is reachable via A → B → D and A → C → D
 
 #### Relations
   * derivedFrom: [Redundant Hierarchical Relations Detection](#redundant-hierarchical-relations-detection)
-  * satisfiedBy: [lint.rs](../../core/src/lint.rs)
+  * satisfiedBy: [lint.rs](../../../core/src/lint.rs)
   * verifiedBy: [Lint Command Verification](Verifications/LintingVerifications.md#lint-command-verification)
 ---
 

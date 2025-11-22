@@ -1,7 +1,5 @@
 # Requirements
 
-# LintingVerifications
-
 ### Lint Command Verification
 
 This test verifies that the lint command analyzes model quality, detects issues in requirements relations, and provides categorized output distinguishing between auto-fixable issues and those requiring manual review.
@@ -97,6 +95,6 @@ This test verifies that the lint command analyzes model quality, detects issues 
   * verify: [Safe Redundant Hierarchical Relations Auto-Removal](../Linting.md#safe-redundant-hierarchical-relations-auto-removal)
   * verify: [Lint Output Formatting](../Linting.md#lint-output-formatting)
   * verify: [Lint Auto-fix Capability](../Linting.md#lint-auto-fix-capability)
-  * satisfiedBy: [test.sh](../../../tests/test-lint-command/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-lint-command/test.sh)
 ---
 

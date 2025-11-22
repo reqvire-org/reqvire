@@ -49,7 +49,7 @@ Additional behavior:
   - When formatting is applied, show a summary of changed files with diff details
 
 #### Relations
-  * derivedFrom: [Model Formatting](../System/Formatting.md#model-formatting)
+  * derivedFrom: [Model Formatting](../System/Operations/Formatting.md#model-formatting)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
 ---
@@ -76,9 +76,9 @@ The system shall provide a validation command that executes model validation and
   - Support --json flag to output validation results in JSON format
 
 #### Relations
-  * derivedFrom: [Provide Validation Reports](../System/Reporting.md#provide-validation-reports)
-  * derivedFrom: [Enhanced Validation Error Reporting](../System/Validation.md#enhanced-validation-error-reporting)
-  * derivedFrom: [Two-Pass Validation Strategy](../System/Validation.md#two-pass-validation-strategy)
+  * derivedFrom: [Provide Validation Reports](../System/Output/Reporting.md#provide-validation-reports)
+  * derivedFrom: [Enhanced Validation Error Reporting](../System/Core/Validation.md#enhanced-validation-error-reporting)
+  * derivedFrom: [Two-Pass Validation Strategy](../System/Core/Validation.md#two-pass-validation-strategy)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
 ---
@@ -107,7 +107,7 @@ This validation ensures that subdirectory processing maintains logical boundarie
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * derivedFrom: [Git Repository as Project Root](../System/ModelManagement.md#git-repository-as-project-root)
+  * derivedFrom: [Git Repository as Project Root](../System/Core/ModelManagement.md#git-repository-as-project-root)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
 ---
 
@@ -168,7 +168,7 @@ Behavior:
 </details>
 
 #### Relations
-  * derivedFrom: [Reserved Subsections Support](../System/StructureAndParsing.md#reserved-subsections-support)
+  * derivedFrom: [Reserved Subsections Support](../System/Core/StructureAndParsing.md#reserved-subsections-support)
 ---
 
 ### Detailed Error Handling and Logging
@@ -176,7 +176,7 @@ Behavior:
 The system shall implement detailed error handling and logging throughout the application to facilitate troubleshooting and provide meaningful feedback.
 
 #### Relations
-  * derivedFrom: [Enhanced Validation Error Reporting](../System/Validation.md#enhanced-validation-error-reporting)
+  * derivedFrom: [Enhanced Validation Error Reporting](../System/Core/Validation.md#enhanced-validation-error-reporting)
   * satisfiedBy: [error.rs](../../core/src/error.rs)
 ---
 
@@ -213,11 +213,11 @@ Default output:
 - Full detail mode showing all element metadata and relations
 
 #### Relations
-  * derivedFrom: [Search Fine Grained Filtering](../System/Reporting.md#search-fine-grained-filtering)
-  * derivedFrom: [Reserved Subsections Support](../System/StructureAndParsing.md#reserved-subsections-support)
+  * derivedFrom: [Search Fine Grained Filtering](../System/Output/Reporting.md#search-fine-grained-filtering)
+  * derivedFrom: [Reserved Subsections Support](../System/Core/StructureAndParsing.md#reserved-subsections-support)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
-  * verifiedBy: [Search Command Tests](../System/Verifications/ReportingVerifications.md#search-command-tests)
+  * verifiedBy: [Search Command Tests](../System/Output/Verifications/ReportingVerifications.md#search-command-tests)
 ---
 
 ### CLI Model Diagram Command
@@ -233,7 +233,7 @@ System shall provide CLI command to generate model diagrams with optional filter
 - Shall integrate with existing model diagram generation functionality
 
 #### Relations
-  * derivedFrom: [Model Visualization and Exploration](../System/DiagramGeneration.md#model-visualization-and-exploration)
+  * derivedFrom: [Model Visualization and Exploration](../System/Output/DiagramGeneration.md#model-visualization-and-exploration)
   * satisfiedBy: [diagrams.rs](../../core/src/diagrams.rs)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
 ---
@@ -291,7 +291,7 @@ reqvire traces --from-folder=docs/reports > docs/reports/traces.md
 ```
 
 #### Relations
-  * derivedFrom: [Verification Trace Builder](../System/VerificationTraces.md#verification-trace-builder)
+  * derivedFrom: [Verification Trace Builder](../System/Processing/VerificationTraces.md#verification-trace-builder)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
 ---
 
@@ -318,10 +318,10 @@ The command shall:
 Command output shall be written to stdout for easy redirection to files.
 
 #### Relations
-  * derivedFrom: [Verification Coverage Report Generator](../System/Reporting.md#verification-coverage-report-generator)
-  * derivedFrom: [Verification Roll-up Strategy](../System/VerificationTraces.md#verification-roll-up-strategy)
+  * derivedFrom: [Verification Coverage Report Generator](../System/Output/Reporting.md#verification-coverage-report-generator)
+  * derivedFrom: [Verification Roll-up Strategy](../System/Processing/VerificationTraces.md#verification-roll-up-strategy)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
-  * verifiedBy: [Verification Coverage Report Test](../System/Verifications/ReportingVerifications.md#verification-coverage-report-test)
+  * verifiedBy: [Verification Coverage Report Test](../System/Output/Verifications/ReportingVerifications.md#verification-coverage-report-test)
 ---
 
 ### CLI Lint Command
@@ -346,7 +346,7 @@ The command shall:
 Command output shall be written to stdout for easy redirection to files.
 
 #### Relations
-  * derivedFrom: [Model Linting](../System/Linting.md#model-linting)
+  * derivedFrom: [Model Linting](../System/Operations/Linting.md#model-linting)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
 ---
 
@@ -377,7 +377,7 @@ Command invocation: `reqvire change-impact [OPTIONS]`
 - Allow scripting of analysis operations
 
 #### Relations
-  * derivedFrom: [Structural Change Analyzer](../System/ChangeImpact.md#structural-change-analyzer)
+  * derivedFrom: [Structural Change Analyzer](../System/Processing/ChangeImpact.md#structural-change-analyzer)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
 ---
@@ -387,10 +387,10 @@ Command invocation: `reqvire change-impact [OPTIONS]`
 The system shall provide a diagrams generation function, activated by the (generate-diagrams command), which shall generate interactive mermaid diagrams.
 
 #### Relations
-  * derivedFrom: [Diagram Generation](../System/DiagramGeneration.md#diagram-generation)
+  * derivedFrom: [Diagram Generation](../System/Output/DiagramGeneration.md#diagram-generation)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
-  * verifiedBy: [Diagram Generation Test](../System/Verifications/DiagramVerifications.md#diagram-generation-test)
+  * verifiedBy: [Diagram Generation Test](../System/Output/Verifications/DiagramVerifications.md#diagram-generation-test)
 ---
 
 ### CLI Remove Diagrams Flag
@@ -398,10 +398,10 @@ The system shall provide a diagrams generation function, activated by the (gener
 The system shall provide a diagram removal function, activated by the remove-diagrams command, which shall remove all generated mermaid diagrams from the model.
 
 #### Relations
-  * derivedFrom: [Diagram Removal](../System/DiagramGeneration.md#diagram-removal)
+  * derivedFrom: [Diagram Removal](../System/Output/DiagramGeneration.md#diagram-removal)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
-  * verifiedBy: [Remove Generated Diagrams Verification](../System/Verifications/DiagramVerifications.md#remove-generated-diagrams-verification)
+  * verifiedBy: [Remove Generated Diagrams Verification](../System/Output/Verifications/DiagramVerifications.md#remove-generated-diagrams-verification)
 ---
 
 ### CLI Add Element Command
@@ -429,7 +429,7 @@ The `add` command shall:
 - Exit with code 0 on success, non-zero on error
 
 #### Relations
-  * derivedFrom: [Create Element Operation](../System/ElementManipulation.md#create-element-operation)
+  * derivedFrom: [Create Element Operation](../System/Operations/ElementManipulation.md#create-element-operation)
   * derivedFrom: [Subdirectory Processing Option](#subdirectory-processing-option)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
 ---
@@ -452,7 +452,7 @@ The `rm` command shall:
 - Exit with code 0 on success, non-zero on error
 
 #### Relations
-  * derivedFrom: [Delete Element Operation](../System/ElementManipulation.md#delete-element-operation)
+  * derivedFrom: [Delete Element Operation](../System/Operations/ElementManipulation.md#delete-element-operation)
   * derivedFrom: [Subdirectory Processing Option](#subdirectory-processing-option)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
 ---
@@ -482,7 +482,7 @@ The `mv` command shall:
 - Exit with code 0 on success, non-zero on error
 
 #### Relations
-  * derivedFrom: [Move Element Operation](../System/ElementManipulation.md#move-element-operation)
+  * derivedFrom: [Move Element Operation](../System/Operations/ElementManipulation.md#move-element-operation)
   * derivedFrom: [Subdirectory Processing Option](#subdirectory-processing-option)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
 ---
@@ -501,7 +501,7 @@ The `mv-file` command shall:
 - Command syntax: `reqvire mv-file <source-file> <target-file>`
 
 #### Relations
-  * derivedFrom: [Move File Operation](../System/ElementManipulation.md#move-file-operation)
+  * derivedFrom: [Move File Operation](../System/Operations/ElementManipulation.md#move-file-operation)
   * derivedFrom: [Subdirectory Processing Option](#subdirectory-processing-option)
 ---
 
@@ -523,7 +523,7 @@ The `rename` command shall:
 - Exit with code 0 on success, non-zero on error
 
 #### Relations
-  * derivedFrom: [Rename Element Operation](../System/ElementManipulation.md#rename-element-operation)
+  * derivedFrom: [Rename Element Operation](../System/Operations/ElementManipulation.md#rename-element-operation)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
 ---
@@ -548,7 +548,7 @@ The markdown output shall include:
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * derivedFrom: [Containment View Report Generation](../System/Reporting.md#containment-view-report-generation)
+  * derivedFrom: [Containment View Report Generation](../System/Output/Reporting.md#containment-view-report-generation)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
   * satisfiedBy: [containment.rs](../../core/src/containment.rs)
   * satisfiedBy: [diagrams.rs](../../core/src/diagrams.rs)

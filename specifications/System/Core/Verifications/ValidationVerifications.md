@@ -43,7 +43,7 @@ This test verifies that the system assigns the default type 'requirement' to all
 
 #### Relations
   * verify: [Default Requirement Type Assignment](../ModelManagement.md#default-requirement-type-assignment)
-  * satisfiedBy: [test.sh](../../../tests/test-default-type-assignment/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-default-type-assignment/test.sh)
 ---
 
 ### Same-File Fragment Relations Test
@@ -68,7 +68,7 @@ This test verifies that Reqvire correctly handles and validates relations to fra
 #### Relations
   * verify: [Relation Type Validation](../Validation.md#relation-type-validation)
   * verify: [Requirements Processing](../Configuration.md#requirements-processing)
-  * satisfiedBy: [test.sh](../../../tests/test-fragment-relations/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-fragment-relations/test.sh)
 ---
 
 ### File Exclusion Test
@@ -146,7 +146,7 @@ This test verifies that Reqvire correctly reads and applies exclusion patterns f
 #### Relations
   * verify: [Ignore Files Integration](../Configuration.md#ignore-files-integration)
   * verify: [Reserved Repository Files Exclusion](../Configuration.md#reserved-repository-files-exclusion)
-  * satisfiedBy: [test.sh](../../../tests/test-gitignore-integration/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-gitignore-integration/test.sh)
 ---
 
 ### Invalid Relations Test
@@ -201,14 +201,14 @@ This verification test checks that Reqvire correctly identifies and reports inva
   * type: test-verification
 
 #### Relations
-  * verify: [Validate Command](../../Interfaces/CLI.md#validate-command)
+  * verify: [Validate Command](../../../Interfaces/CLI.md#validate-command)
   * verify: [Validation Error Handling](../Validation.md#validation-error-handling)
   * verify: [Internal Consistency Validator](../Validation.md#internal-consistency-validator)
   * verify: [Relation Type Validation](../Validation.md#relation-type-validation)
   * verify: [Relation Element Type Validator](../Validation.md#relation-element-type-validator)
   * verify: [Identifiers and Relations](../StructureAndParsing.md#identifiers-and-relations)
-  * verify: [Trace Relation Non-Directional Behavior](../DiagramGeneration.md#trace-relation-non-directional-behavior)
-  * satisfiedBy: [test.sh](../../../tests/test-invalid-relations/test.sh)
+  * verify: [Trace Relation Non-Directional Behavior](../../Output/DiagramGeneration.md#trace-relation-non-directional-behavior)
+  * satisfiedBy: [test.sh](../../../../tests/test-invalid-relations/test.sh)
 ---
 
 ### Invalid Header Structure Test
@@ -237,7 +237,7 @@ This test verifies that Reqvire correctly detects and reports invalid header str
 #### Relations
   * verify: [Markdown Structure Validator](../Validation.md#markdown-structure-validator)
   * verify: [Structure and Addressing in Markdown Documents](../StructureAndParsing.md#structure-and-addressing-in-markdown-documents)
-  * satisfiedBy: [test.sh](../../../tests/test-invalid-relations/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-invalid-relations/test.sh)
 ---
 
 ### Unstructured Documents Test
@@ -263,7 +263,7 @@ This test verifies that the system correctly validates relations to excluded fil
 
 #### Relations
   * verify: [Excluded File Relation Validation](../Validation.md#excluded-file-relation-validation)
-  * satisfiedBy: [test.sh](../../../tests/test-valid-relations/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-valid-relations/test.sh)
 ---
 
 ### Requirements Files Search and Detection Test
@@ -289,7 +289,7 @@ This test verifies that the system correctly searches for and detects structured
 
 #### Relations
   * verify: [Structured Markdown Files Search and Detection](../Configuration.md#structured-markdown-files-search-and-detection)
-  * satisfiedBy: [test.sh](../../../tests/test-excluded-patterns/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-excluded-patterns/test.sh)
 ---
 
 ### Subdirectory Processing Verification
@@ -324,8 +324,8 @@ This test verifies that the system correctly processes only files within the cur
   * type: test-verification
 
 #### Relations
-  * verify: [CLI Move Element Command](../../Interfaces/CLI.md#cli-move-element-command)
-  * verify: [CLI Move File Command](../../Interfaces/CLI.md#cli-move-file-command)
-  * satisfiedBy: [test.sh](../../../tests/test-subdirectory-functionality/test.sh)
+  * verify: [CLI Move Element Command](../../../Interfaces/CLI.md#cli-move-element-command)
+  * verify: [CLI Move File Command](../../../Interfaces/CLI.md#cli-move-file-command)
+  * satisfiedBy: [test.sh](../../../../tests/test-subdirectory-functionality/test.sh)
 ---
 

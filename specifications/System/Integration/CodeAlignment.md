@@ -145,7 +145,7 @@ The system shall support code traceability by using structured comments to link 
   * type: user-requirement
 
 #### Relations
-  * derivedFrom: [Aligning Design with Code](../UserStories.md#aligning-design-with-code)
+  * derivedFrom: [Aligning Design with Code](../../UserStories.md#aligning-design-with-code)
 ---
 
 ### Suggest Code Refactoring
@@ -156,5 +156,6 @@ The system shall suggest code refactoring opportunities to better align with the
   * type: user-requirement
 
 #### Relations
-  * derivedFrom: [Aligning Design with Code](../UserStories.md#aligning-design-with-code)
+  * derivedFrom: [Aligning Design with Code](../../UserStories.md#aligning-design-with-code)
 ---
+

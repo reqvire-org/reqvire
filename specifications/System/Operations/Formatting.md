@@ -8,7 +8,7 @@ The system shall provide formatting capabilities to normalize and standardize MB
   * type: user-requirement
 
 #### Relations
-  * derivedFrom: [Validating Structures](../UserStories.md#validating-structures)
+  * derivedFrom: [Validating Structures](../../UserStories.md#validating-structures)
 ---
 
 ### Formatting Output
@@ -53,8 +53,8 @@ The system shall implement the following formatting fixes:
 
 #### Relations
   * derivedFrom: [Model Formatting](#model-formatting)
-  * derivedFrom: [Align with Industry Standards](../UserStories.md#align-with-industry-standards)
-  * satisfiedBy: [format.rs](../../core/src/format.rs)
+  * derivedFrom: [Align with Industry Standards](../../UserStories.md#align-with-industry-standards)
+  * satisfiedBy: [format.rs](../../../core/src/format.rs)
   * verifiedBy: [Format Command Requirements Verification](Verifications/FormattingVerifications.md#format-command-requirements-verification)
 ---
 
@@ -76,8 +76,8 @@ The system shall display formatting change suggestions in a git-style diff forma
 
 #### Relations
   * derivedFrom: [Formatting Output](#formatting-output)
-  * satisfiedBy: [format.rs](../../core/src/format.rs)
-  * satisfiedBy: [diff.rs](../../core/src/diff.rs)
+  * satisfiedBy: [format.rs](../../../core/src/format.rs)
+  * satisfiedBy: [diff.rs](../../../core/src/diff.rs)
   * verifiedBy: [Format Command Requirements Verification](Verifications/FormattingVerifications.md#format-command-requirements-verification)
 ---
 
@@ -86,8 +86,8 @@ The system shall display formatting change suggestions in a git-style diff forma
 The system shall respect configured excluded filename patterns when performing formatting operations, ensuring that files intentionally excluded from processing do not receive inappropriate formatting suggestions.
 
 #### Relations
-  * derivedFrom: [Ignoring Unstructured Documents](Configuration.md#ignoring-unstructured-documents)
-  * satisfiedBy: [utils.rs](../../core/src/utils.rs)
+  * derivedFrom: [Ignoring Unstructured Documents](../Core/Configuration.md#ignoring-unstructured-documents)
+  * satisfiedBy: [utils.rs](../../../core/src/utils.rs)
 ---
 
 ### Document Structure Normalization
@@ -111,7 +111,7 @@ When generating formatted output, the system shall:
 
 #### Relations
   * derivedFrom: [Format Consistency Enforcement](#format-consistency-enforcement)
-  * satisfiedBy: [graph_registry.rs](../../core/src/graph_registry.rs)
-  * satisfiedBy: [parser.rs](../../core/src/parser.rs)
+  * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
+  * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
 ---
 

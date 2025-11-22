@@ -30,9 +30,9 @@ This test verifies that the generate-diagrams CLI command correctly generates an
   * type: test-verification
 
 #### Relations
-  * verify: [CLI Generate Diagrams Flag](../../Interfaces/CLI.md#cli-generate-diagrams-flag)
+  * verify: [CLI Generate Diagrams Flag](../../../Interfaces/CLI.md#cli-generate-diagrams-flag)
   * verify: [Diagram Generation](../DiagramGeneration.md#diagram-generation)
-  * satisfiedBy: [test.sh](../../../tests/test-diagram-generation/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-diagram-generation/test.sh)
 ---
 
 ### Automated Documentation Export on PR Merge Verification
@@ -58,8 +58,8 @@ This test verifies that the system automatically exports and updates HTML docume
   * type: test-verification
 
 #### Relations
-  * verify: [Automated Documentation Export on PR Merge](../GitHubIntegration.md#automated-documentation-export-on-pr-merge)
-  * satisfiedBy: [update_docs.yml](../../../.github/workflows/update_docs.yml)
+  * verify: [Automated Documentation Export on PR Merge](../../Integration/GitHubIntegration.md#automated-documentation-export-on-pr-merge)
+  * satisfiedBy: [update_docs.yml](../../../../.github/workflows/update_docs.yml)
 ---
 
 ### Diagram Relation Filtering Verification
@@ -87,7 +87,7 @@ This test verifies that the system correctly filters relations in diagram genera
 
 #### Relations
   * verify: [Diagram Generation](../DiagramGeneration.md#diagram-generation)
-  * satisfiedBy: [test.sh](../../../tests/test-diagram-filtering/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-diagram-filtering/test.sh)
 ---
 
 ### Visualize Model Relationships Verification
@@ -112,7 +112,7 @@ This test verifies that the system provides visual representations of relationsh
 
 #### Relations
   * verify: [Diagram Generation](../DiagramGeneration.md#diagram-generation)
-  * satisfiedBy: [test.sh](../../../tests/test-diagram-generation/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-diagram-generation/test.sh)
 ---
 
 ### Remove Generated Diagrams Verification
@@ -146,6 +146,6 @@ This test verifies that the system can remove all generated mermaid diagrams whi
 
 #### Relations
   * verify: [Diagram Generation](../DiagramGeneration.md#diagram-generation)
-  * satisfiedBy: [test.sh](../../../tests/test-remove-diagrams/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-remove-diagrams/test.sh)
 ---
 

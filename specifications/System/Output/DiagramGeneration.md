@@ -35,8 +35,8 @@ The filtering ensures that:
 
 #### Relations
   * derivedFrom: [Interactive Mermaid Diagrams](#interactive-mermaid-diagrams)
-  * satisfiedBy: [diagrams.rs](../../core/src/diagrams.rs)
-  * satisfiedBy: [utils.rs](../../core/src/utils.rs)
+  * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
+  * satisfiedBy: [utils.rs](../../../core/src/utils.rs)
 ---
 
 ### SysML-Compatible Relationship Rendering
@@ -101,7 +101,7 @@ trace (Neutral):
 
 #### Relations
   * derivedFrom: [Diagram Generation](#diagram-generation)
-  * satisfiedBy: [diagrams.rs](../../core/src/diagrams.rs)
+  * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
 ---
 
 ### Interactive Mermaid Diagrams
@@ -124,7 +124,7 @@ Color code for rendering diagrams:
   * type: user-requirement
 
 #### Relations
-  * derivedFrom: [Generate Diagrams](../UserStories.md#generate-diagrams)
+  * derivedFrom: [Generate Diagrams](../../UserStories.md#generate-diagrams)
   * derivedFrom: [Model Reports](Reporting.md#model-reports)
 ---
 
@@ -136,7 +136,7 @@ The system shall provide functionality to remove all generated Mermaid diagrams 
   * type: user-requirement
 
 #### Relations
-  * derivedFrom: [Generate Diagrams](../UserStories.md#generate-diagrams)
+  * derivedFrom: [Generate Diagrams](../../UserStories.md#generate-diagrams)
 ---
 
 ### Trace Relation Non-Directional Behavior
@@ -169,9 +169,9 @@ The trace relation behavior shall include:
 This ensures that trace relations serve their intended purpose of establishing lightweight traceability connections without creating artificial dependency constraints or participating in architectural validation logic.
 
 #### Relations
-  * derivedFrom: [Relation Types and behaviors](ModelManagement.md#relation-types-and-behaviors)
-  * verifiedBy: [Invalid Relations Test](Verifications/ValidationVerifications.md#invalid-relations-test)
-  * verifiedBy: [Trace Relations No Cycles Verification](Verifications/TraceVerifications.md#trace-relations-no-cycles-verification)
+  * derivedFrom: [Relation Types and behaviors](../Core/ModelManagement.md#relation-types-and-behaviors)
+  * verifiedBy: [Invalid Relations Test](../Core/Verifications/ValidationVerifications.md#invalid-relations-test)
+  * verifiedBy: [Trace Relations No Cycles Verification](../Processing/Verifications/TraceVerifications.md#trace-relations-no-cycles-verification)
 ---
 
 ### Complete Model Structure Visualization
@@ -193,7 +193,7 @@ The visualization helps users understand the model's logical structure, navigate
   * type: user-requirement
 
 #### Relations
-  * derivedFrom: [Generate Diagrams](../UserStories.md#generate-diagrams)
+  * derivedFrom: [Generate Diagrams](../../UserStories.md#generate-diagrams)
   * derivedFrom: [Model Reports](Reporting.md#model-reports)
 ---
 
@@ -203,7 +203,7 @@ When requested, the system shall remove all generated diagrams from the model by
 
 #### Relations
   * derivedFrom: [Remove Generated Diagrams](#remove-generated-diagrams)
-  * satisfiedBy: [diagrams.rs](../../core/src/diagrams.rs)
+  * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
 ---
 
 ### Interactive Mermaid Diagram Node Behavior
@@ -232,8 +232,8 @@ The `change-impact` command shall continue to use GitHub blob URLs by default (u
 
 #### Relations
   * derivedFrom: [Diagram Generation](#diagram-generation)
-  * satisfiedBy: [diagrams.rs](../../core/src/diagrams.rs)
-  * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
+  * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
+  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
 ---
 
 ### Model Visualization and Exploration
@@ -252,7 +252,7 @@ Users shall be able to generate and view model structure diagrams from any start
   * type: user-requirement
 
 #### Relations
-  * derivedFrom: [Generate Diagrams](../UserStories.md#generate-diagrams)
+  * derivedFrom: [Generate Diagrams](../../UserStories.md#generate-diagrams)
   * derivedFrom: [Model Reports](Reporting.md#model-reports)
 ---
 

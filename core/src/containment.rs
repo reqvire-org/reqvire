@@ -135,6 +135,9 @@ fn build_folder_structure(files_map: &BTreeMap<String, Vec<ContainmentElement>>)
     // Build intermediate structure: folder_path -> files in that folder
     let mut folder_files: BTreeMap<Vec<String>, Vec<ContainmentFile>> = BTreeMap::new();
 
+    // Track all folder paths (including intermediate folders without direct files)
+    let mut all_folder_paths: std::collections::HashSet<Vec<String>> = std::collections::HashSet::new();
+
     for (file_path, elements) in files_map {
         let path = Path::new(file_path);
         let folder_path: Vec<String> = path.parent()
@@ -143,6 +146,11 @@ fn build_folder_structure(files_map: &BTreeMap<String, Vec<ContainmentElement>>)
                 .map(String::from)
                 .collect())
             .unwrap_or_default();
+
+        // Add all intermediate folder paths (e.g., for "a/b/c", add "", "a", "a/b", "a/b/c")
+        for i in 0..=folder_path.len() {
+            all_folder_paths.insert(folder_path[..i].to_vec());
+        }
 
         let file_name = path.file_name()
             .and_then(|n| n.to_str())
@@ -160,14 +168,15 @@ fn build_folder_structure(files_map: &BTreeMap<String, Vec<ContainmentElement>>)
             .push(file);
     }
 
-    // Build hierarchical folder structure
-    build_folder_recursive(&[], &folder_files)
+    // Build hierarchical folder structure using all folder paths
+    build_folder_recursive(&[], &folder_files, &all_folder_paths)
 }
 
 /// Recursively build folder structure
 fn build_folder_recursive(
     current_path: &[String],
-    folder_files: &BTreeMap<Vec<String>, Vec<ContainmentFile>>
+    folder_files: &BTreeMap<Vec<String>, Vec<ContainmentFile>>,
+    all_folder_paths: &std::collections::HashSet<Vec<String>>
 ) -> ContainmentFolder {
     let folder_name = current_path.last()
         .map(|s| s.clone())
@@ -178,13 +187,13 @@ fn build_folder_recursive(
         .cloned()
         .unwrap_or_default();
 
-    // Find all immediate subfolders
+    // Find all immediate subfolders (using all_folder_paths to include intermediate folders)
     let mut subfolders = Vec::new();
     let current_depth = current_path.len();
 
     let mut seen_subfolders: std::collections::HashSet<String> = std::collections::HashSet::new();
 
-    for folder_path in folder_files.keys() {
+    for folder_path in all_folder_paths.iter() {
         if folder_path.len() == current_depth + 1 {
             // Check if this is an immediate child
             let is_child = current_path.iter()
@@ -194,13 +203,16 @@ fn build_folder_recursive(
             if is_child {
                 if let Some(subfolder_name) = folder_path.last() {
                     if seen_subfolders.insert(subfolder_name.clone()) {
-                        let subfolder = build_folder_recursive(folder_path, folder_files);
+                        let subfolder = build_folder_recursive(folder_path, folder_files, all_folder_paths);
                         subfolders.push(subfolder);
                     }
                 }
             }
         }
     }
+
+    // Sort subfolders for deterministic output
+    subfolders.sort_by(|a, b| a.name.cmp(&b.name));
 
     ContainmentFolder {
         name: folder_name,

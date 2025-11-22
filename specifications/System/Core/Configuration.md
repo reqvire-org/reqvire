@@ -19,7 +19,7 @@ The `.reqvireignore` file provides Reqvire-specific exclusions for files that sh
 
 #### Relations
   * derivedFrom: [Coexistence of Structured and Unstructured Documents](ModelManagement.md#coexistence-of-structured-and-unstructured-documents)
-  * satisfiedBy: [config.rs](../../cli/src/config.rs)
+  * satisfiedBy: [config.rs](../../../cli/src/config.rs)
 ---
 
 ### Ignore Files Integration
@@ -55,7 +55,7 @@ Both ignore files use standard gitignore pattern syntax to exclude files from be
 
 #### Relations
   * derivedFrom: [Ignoring Unstructured Documents](#ignoring-unstructured-documents)
-  * satisfiedBy: [config.rs](../../cli/src/config.rs)
+  * satisfiedBy: [config.rs](../../../cli/src/config.rs)
 ---
 
 ### Reserved Repository Files Exclusion
@@ -87,7 +87,7 @@ The following reserved filenames are always excluded from structured markdown pr
 
 #### Relations
   * derivedFrom: [Ignoring Unstructured Documents](#ignoring-unstructured-documents)
-  * satisfiedBy: [config.rs](../../cli/src/config.rs)
+  * satisfiedBy: [config.rs](../../../cli/src/config.rs)
 ---
 
 ### Requirements Processing
@@ -102,8 +102,8 @@ File exclusion is handled through:
 
 #### Relations
   * derivedFrom: [Ignoring Unstructured Documents](#ignoring-unstructured-documents)
-  * satisfiedBy: [model.rs](../../core/src/model.rs)
-  * satisfiedBy: [parser.rs](../../core/src/parser.rs)
+  * satisfiedBy: [model.rs](../../../core/src/model.rs)
+  * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
 ---
 
 ### Structured Markdown Files Search and Detection
@@ -118,6 +118,6 @@ Identification Process:
 
 #### Relations
   * derivedFrom: [Requirements Processing](#requirements-processing)
-  * satisfiedBy: [model.rs](../../core/src/model.rs)
+  * satisfiedBy: [model.rs](../../../core/src/model.rs)
 ---
 

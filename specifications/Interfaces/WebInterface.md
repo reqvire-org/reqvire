@@ -77,7 +77,7 @@ The system shall design and implement HTML pages with consistent layout, styling
   * derivedFrom: [Model Export](../UserStories.md#model-export)
   * derivedFrom: [Web Interface](Interfaces.md#web-interface)
   * derivedFrom: [CLI Interface Structure](CLI.md#cli-interface-structure)
-  * derivedFrom: [Model Reports](../System/Reporting.md#model-reports)
+  * derivedFrom: [Model Reports](../System/Output/Reporting.md#model-reports)
   * satisfiedBy: [html_export.rs](../../core/src/html_export.rs)
   * satisfiedBy: [html.rs](../../core/src/html.rs)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
@@ -100,8 +100,8 @@ The system shall generate a model-centric visualization during HTML export showi
 - Output as markdown with embedded visualizations (model.html)
 
 #### Relations
-  * derivedFrom: [Complete Model Structure Visualization](../System/DiagramGeneration.md#complete-model-structure-visualization)
-  * derivedFrom: [Model Visualization and Exploration](../System/DiagramGeneration.md#model-visualization-and-exploration)
+  * derivedFrom: [Complete Model Structure Visualization](../System/Output/DiagramGeneration.md#complete-model-structure-visualization)
+  * derivedFrom: [Model Visualization and Exploration](../System/Output/DiagramGeneration.md#model-visualization-and-exploration)
   * derivedFrom: [HTML Export](#html-export)
   * satisfiedBy: [export.rs](../../core/src/export.rs)
   * satisfiedBy: [report_model.rs](../../core/src/report_model.rs)

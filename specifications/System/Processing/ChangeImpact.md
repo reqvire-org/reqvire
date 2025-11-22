@@ -11,9 +11,9 @@ Change impact detection encompasses:
 3. **Reporting**: Present change analysis results to users
 
 #### Relations
-  * derivedFrom: [Tracing Structural Changes](Reporting.md#tracing-structural-changes)
-  * derivedFrom: [Element Identity Model](StructureAndParsing.md#element-identity-model)
-  * satisfiedBy: [change_impact.rs](../../core/src/change_impact.rs)
+  * derivedFrom: [Tracing Structural Changes](../Output/Reporting.md#tracing-structural-changes)
+  * derivedFrom: [Element Identity Model](../Core/StructureAndParsing.md#element-identity-model)
+  * satisfiedBy: [change_impact.rs](../../../core/src/change_impact.rs)
 ---
 
 ### Structural Change Analyzer
@@ -22,7 +22,7 @@ The system shall implement a model change analyzer that identifies structural mo
 
 #### Relations
   * derivedFrom: [Change Impact Detection](#change-impact-detection)
-  * satisfiedBy: [change_impact.rs](../../core/src/change_impact.rs)
+  * satisfiedBy: [change_impact.rs](../../../core/src/change_impact.rs)
 ---
 
 ### Requirements Change Propagation
@@ -428,6 +428,6 @@ flowchart TD;
 
 #### Relations
   * derivedFrom: [Change Impact Detection](#change-impact-detection)
-  * satisfiedBy: [change_impact.rs](../../core/src/change_impact.rs)
+  * satisfiedBy: [change_impact.rs](../../../core/src/change_impact.rs)
 ---
 

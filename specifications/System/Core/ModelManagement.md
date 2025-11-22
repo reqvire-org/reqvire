@@ -8,7 +8,7 @@ The system shall allow structured markdown and unstructured. (eg., markdown, PDF
   * type: user-requirement
 
 #### Relations
-  * derivedFrom: [Managing System Models](../UserStories.md#managing-system-models)
+  * derivedFrom: [Managing System Models](../../UserStories.md#managing-system-models)
 ---
 
 ### Relation Types and behaviors
@@ -115,8 +115,8 @@ When an element changes, the impact propagates according to these rules:
 
 #### Relations
   * derivedFrom: [Identifiers and Relations](StructureAndParsing.md#identifiers-and-relations)
-  * derivedFrom: [Managing System Models](../UserStories.md#managing-system-models)
-  * satisfiedBy: [relation.rs](../../core/src/relation.rs)
+  * derivedFrom: [Managing System Models](../../UserStories.md#managing-system-models)
+  * satisfiedBy: [relation.rs](../../../core/src/relation.rs)
 ---
 
 ### Efficient Processing
@@ -127,8 +127,8 @@ The system shall process structured documents and relations to extract model-rel
   * type: user-requirement
 
 #### Relations
-  * derivedFrom: [Managing System Models](../UserStories.md#managing-system-models)
-  * derivedFrom: [Promote Automation and Efficiency](../UserStories.md#promote-automation-and-efficiency)
+  * derivedFrom: [Managing System Models](../../UserStories.md#managing-system-models)
+  * derivedFrom: [Promote Automation and Efficiency](../../UserStories.md#promote-automation-and-efficiency)
 ---
 
 ### Default Requirement Type Assignment
@@ -164,7 +164,7 @@ When an element does not have a `#### Metadata` subsection with a `type` propert
   * type: user-requirement
 
 #### Relations
-  * derivedFrom: [Managing System Models](../UserStories.md#managing-system-models)
+  * derivedFrom: [Managing System Models](../../UserStories.md#managing-system-models)
 ---
 
 ### Template-Based Model Bootstrapping
@@ -192,7 +192,7 @@ The system discovers all available templates in the repository and allows the us
   * type: user-requirement
 
 #### Relations
-  * derivedFrom: [Managing System Models](../UserStories.md#managing-system-models)
+  * derivedFrom: [Managing System Models](../../UserStories.md#managing-system-models)
 ---
 
 ### Git Repository as Project Root
@@ -208,7 +208,7 @@ All paths specified in Reqvire commands will be resolved relative to the current
   * type: user-requirement
 
 #### Relations
-  * derivedFrom: [Managing System Models](../UserStories.md#managing-system-models)
+  * derivedFrom: [Managing System Models](../../UserStories.md#managing-system-models)
 ---
 
 ### Element Manipulation Operations
@@ -225,7 +225,7 @@ All manipulation operations shall:
   * type: user-requirement
 
 #### Relations
-  * derivedFrom: [Managing System Models](../UserStories.md#managing-system-models)
+  * derivedFrom: [Managing System Models](../../UserStories.md#managing-system-models)
 ---
 
 ### Verification Type Categories
@@ -272,7 +272,7 @@ Element types are identified through a reserved "type" metadata property. The fo
 
 #### Relations
   * derivedFrom: [Reserved Subsections Support](StructureAndParsing.md#reserved-subsections-support)
-  * satisfiedBy: [element.rs](../../core/src/element.rs)
-  * satisfiedBy: [parser.rs](../../core/src/parser.rs)
+  * satisfiedBy: [element.rs](../../../core/src/element.rs)
+  * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
 ---
 

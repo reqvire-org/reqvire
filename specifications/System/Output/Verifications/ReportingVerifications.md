@@ -38,19 +38,27 @@ This test verifies that the system correctly extracts the physical containment h
    - Verify all paths are relative to git root
    - Test with empty folders and files without elements
 
+6. **Intermediate folders without files:**
+   - Create folder structure: `root/parent/child/file.md` where `parent` has no direct files
+   - Verify `parent` folder appears in hierarchy even though it has no files
+   - Verify `child` folder appears as subfolder of `parent`
+   - Verify deeply nested structures (3+ levels) with intermediate empty folders work correctly
+   - Test case: `specifications/System/Core/Verifications/file.md` should show `System` folder even if `System/` has no files directly
+
 ##### Acceptance Criteria
 - All folders, files, and elements are extracted correctly
 - Sections are omitted from the hierarchy
 - Element metadata (identifier, name, type) is preserved
 - Output follows deterministic ordering
 - Tree structure is valid and navigable
+- Intermediate folders without direct files are included in hierarchy
 
 #### Metadata
   * type: test-verification
 
 #### Relations
   * verify: [Containment View Report Generation](../Reporting.md#containment-view-report-generation)
-  * satisfiedBy: [test.sh](../../../tests/test-containment-view/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-containment-view/test.sh)
 ---
 
 ### Containment View JSON Output Test
@@ -104,7 +112,7 @@ This test verifies that the system generates valid, well-structured JSON output 
 
 #### Relations
   * verify: [Containment View Report Generation](../Reporting.md#containment-view-report-generation)
-  * satisfiedBy: [test.sh](../../../tests/test-containment-view/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-containment-view/test.sh)
 ---
 
 ### Containment View Mermaid Diagram Test
@@ -177,7 +185,7 @@ This test verifies that the system generates valid Mermaid flowchart diagrams wi
 
 #### Relations
   * verify: [Containment View Report Generation](../Reporting.md#containment-view-report-generation)
-  * satisfiedBy: [test.sh](../../../tests/test-containment-view/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-containment-view/test.sh)
 ---
 
 ### Containment View Text Output Test
@@ -228,7 +236,7 @@ This test verifies that the system generates correctly formatted human-readable 
 
 #### Relations
   * verify: [Containment View Report Generation](../Reporting.md#containment-view-report-generation)
-  * satisfiedBy: [test.sh](../../../tests/test-containment-view/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-containment-view/test.sh)
 ---
 
 ### Custom Element Type Tracking Test
@@ -311,7 +319,7 @@ This test verifies that the system correctly tracks and displays custom element 
 
 #### Relations
   * verify: [Custom Element Type Tracking](../Reporting.md#custom-element-type-tracking)
-  * satisfiedBy: [test.sh](../../../tests/test-search-all-features/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-search-all-features/test.sh)
 ---
 
 ### HTML Export Containment View Integration Test
@@ -377,7 +385,7 @@ This test verifies that the containment view is correctly integrated into HTML e
 
 #### Relations
   * verify: [Containment View Report Generation](../Reporting.md#containment-view-report-generation)
-  * satisfiedBy: [test.sh](../../../tests/test-containment-view/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-containment-view/test.sh)
 ---
 
 ### Search Command Tests
@@ -509,9 +517,9 @@ This test verifies that the system provides a unified `search` command functiona
   * type: test-verification
 
 #### Relations
-  * verify: [CLI Search Command](../../Interfaces/CLI.md#cli-search-command)
+  * verify: [CLI Search Command](../../../Interfaces/CLI.md#cli-search-command)
   * verify: [Search Fine Grained Filtering](../Reporting.md#search-fine-grained-filtering)
-  * satisfiedBy: [test.sh](../../../tests/test-search-all-features/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-search-all-features/test.sh)
 ---
 
 ### Model Command Verification
@@ -583,7 +591,7 @@ Comprehensive test verifying model command generates model-centric nested output
 #### Relations
   * verify: [Forward-Only Relation Traversal](../Reporting.md#forward-only-relation-traversal)
   * verify: [Model Diagram Output Formats](../Reporting.md#model-diagram-output-formats)
-  * satisfiedBy: [test.sh](../../../tests/test-model-command/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-model-command/test.sh)
 ---
 
 ### Verification Coverage Report Test
@@ -641,8 +649,8 @@ This test verifies that the system correctly generates verification coverage rep
   * type: test-verification
 
 #### Relations
-  * verify: [CLI Coverage Command](../../Interfaces/CLI.md#cli-coverage-command)
-  * satisfiedBy: [test.sh](../../../tests/test-coverage-report/test.sh)
+  * verify: [CLI Coverage Command](../../../Interfaces/CLI.md#cli-coverage-command)
+  * satisfiedBy: [test.sh](../../../../tests/test-coverage-report/test.sh)
 ---
 
 ### Verification Traces Filter Options Test
@@ -718,8 +726,8 @@ This test verifies that the verification-traces command filter options work corr
   * type: test-verification
 
 #### Relations
-  * verify: [CLI Traces Command](../../Interfaces/CLI.md#cli-traces-command)
-  * satisfiedBy: [test.sh](../../../tests/test-verification-traces/test.sh)
+  * verify: [CLI Traces Command](../../../Interfaces/CLI.md#cli-traces-command)
+  * satisfiedBy: [test.sh](../../../../tests/test-verification-traces/test.sh)
 ---
 
 ### Verification Traces From-Folder Test
@@ -795,7 +803,7 @@ This test verifies that the --from-folder option correctly generates relative li
   * type: test-verification
 
 #### Relations
-  * verify: [CLI Traces Command](../../Interfaces/CLI.md#cli-traces-command)
-  * satisfiedBy: [test.sh](../../../tests/test-verification-traces/test.sh)
+  * verify: [CLI Traces Command](../../../Interfaces/CLI.md#cli-traces-command)
+  * satisfiedBy: [test.sh](../../../../tests/test-verification-traces/test.sh)
 ---
 

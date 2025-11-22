@@ -176,8 +176,8 @@ When filtering by root element, system shall traverse only forward relations dow
 - Unfiltered diagrams (no --from) shall show complete model with all elements
 
 #### Relations
-  * derivedFrom: [CLI Model Diagram Command](../Interfaces/CLI.md#cli-model-diagram-command)
-  * satisfiedBy: [diagrams.rs](../../core/src/diagrams.rs)
+  * derivedFrom: [CLI Model Diagram Command](../../Interfaces/CLI.md#cli-model-diagram-command)
+  * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
   * verifiedBy: [Model Command Verification](Verifications/ReportingVerifications.md#model-command-verification)
 ---
 
@@ -222,7 +222,7 @@ The system must support comprehensive filtering by file path, element name, type
 
 #### Relations
   * derivedFrom: [Model Structure and Summaries](#model-structure-and-summaries)
-  * satisfiedBy: [search.rs](../../core/src/search.rs)
+  * satisfiedBy: [search.rs](../../../core/src/search.rs)
 ---
 
 ### Verification Coverage Report Generator
@@ -250,7 +250,7 @@ The report structure shall include:
 - Analysis, inspection, and demonstration verification elements are considered satisfied by default
 
 #### Relations
-  * satisfiedBy: [report_coverage.rs](../../core/src/report_coverage.rs)
+  * satisfiedBy: [report_coverage.rs](../../../core/src/report_coverage.rs)
   * derivedFrom: [Verification Coverage Report](#verification-coverage-report)
   * derivedFrom: [Search Report Generator](#search-report-generator)
 ---
@@ -286,7 +286,7 @@ The custom element type tracking feature must:
 
 #### Relations
   * derivedFrom: [Search Report Generator](#search-report-generator)
-  * satisfiedBy: [search.rs](../../core/src/search.rs)
+  * satisfiedBy: [search.rs](../../../core/src/search.rs)
 ---
 
 ### Model Diagram Output Formats
@@ -301,8 +301,8 @@ System shall support markdown and JSON output formats.
 - Element attachments shall be included as an array of file paths in both formats
 
 #### Relations
-  * derivedFrom: [CLI Model Diagram Command](../Interfaces/CLI.md#cli-model-diagram-command)
-  * satisfiedBy: [diagrams.rs](../../core/src/diagrams.rs)
+  * derivedFrom: [CLI Model Diagram Command](../../Interfaces/CLI.md#cli-model-diagram-command)
+  * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
   * verifiedBy: [Model Command Verification](Verifications/ReportingVerifications.md#model-command-verification)
 ---
 
@@ -470,9 +470,9 @@ The filtering system must evaluate filters with minimal passes over element data
 </details>
 
 #### Relations
-  * satisfiedBy: [filters.rs](../../core/src/filters.rs)
-  * satisfiedBy: [search.rs](../../core/src/search.rs)
-  * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
+  * satisfiedBy: [filters.rs](../../../core/src/filters.rs)
+  * satisfiedBy: [search.rs](../../../core/src/search.rs)
+  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * derivedFrom: [Search Report Generator](#search-report-generator)
   * verifiedBy: [Search Command Tests](Verifications/ReportingVerifications.md#search-command-tests)
 ---
@@ -485,7 +485,7 @@ When tracing structural changes, the system shall analyze the System model and d
   * type: user-requirement
 
 #### Relations
-  * derivedFrom: [Trace Changes in System Model](../UserStories.md#trace-changes-in-system-model)
+  * derivedFrom: [Trace Changes in System Model](../../UserStories.md#trace-changes-in-system-model)
 ---
 
 ### Validation Report Generator
@@ -494,7 +494,7 @@ The system shall implement a validation report generator that compiles and forma
 
 #### Relations
   * derivedFrom: [Provide Validation Reports](#provide-validation-reports)
-  * satisfiedBy: [model.rs](../../core/src/model.rs)
+  * satisfiedBy: [model.rs](../../../core/src/model.rs)
 ---
 
 ### Model Reports
@@ -529,7 +529,7 @@ This requirement applies to all report operations, including:
   * type: user-requirement
 
 #### Relations
-  * derivedFrom: [Provide Reports](../UserStories.md#provide-reports)
+  * derivedFrom: [Provide Reports](../../UserStories.md#provide-reports)
 ---
 
 ### Model Structure and Summaries
@@ -580,7 +580,7 @@ Validation shall be performed automatically when any command requires the parsed
   * type: user-requirement
 
 #### Relations
-  * derivedFrom: [Align with Industry Standards](../UserStories.md#align-with-industry-standards)
+  * derivedFrom: [Align with Industry Standards](../../UserStories.md#align-with-industry-standards)
   * derivedFrom: [Model Reports](#model-reports)
 ---
 

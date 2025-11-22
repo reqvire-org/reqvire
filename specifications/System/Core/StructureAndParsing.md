@@ -1,7 +1,5 @@
 # Requirements
 
-This document specifies requirements for markdown document structure, element identification, and relation parsing in Reqvire.
-
 ### Specification File Identification
 
 The system shall only parse markdown files that are identified as specification files. A markdown file is considered a specification file if and only if its first level-1 heading (`#`) is exactly `# Requirements`. Files not meeting this criterion shall be ignored during model parsing, even if they have a `.md` extension.
@@ -14,10 +12,10 @@ The system shall only parse markdown files that are identified as specification 
 - The page title is not stored or tracked by the system
 
 #### Relations
-  * derivedFrom: [Managing System Models](../UserStories.md#managing-system-models)
+  * derivedFrom: [Managing System Models](../../UserStories.md#managing-system-models)
   * verifiedBy: [Specification File Identification Test](Verifications/ParsingVerifications.md#specification-file-identification-test)
-  * satisfiedBy: [parser.rs](../../core/src/parser.rs)
-  * satisfiedBy: [model.rs](../../core/src/model.rs)
+  * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
+  * satisfiedBy: [model.rs](../../../core/src/model.rs)
 ---
 
 ### Reserved Subsections Support
@@ -164,8 +162,8 @@ The system shall meet defined performance criteria.
 
 #### Relations
   * derivedFrom: [Structure and Addressing in Markdown Documents](#structure-and-addressing-in-markdown-documents)
-  * satisfiedBy: [element.rs](../../core/src/element.rs)
-  * satisfiedBy: [parser.rs](../../core/src/parser.rs)
+  * satisfiedBy: [element.rs](../../../core/src/element.rs)
+  * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
 ---
 
 ### Structure and Addressing in Markdown Documents
@@ -292,12 +290,12 @@ Some subsections are **reserved** with predefined structure and behavior, while 
 </details>
 
 #### Relations
-  * derivedFrom: [Managing System Models](../UserStories.md#managing-system-models)
-  * satisfiedBy: [relation.rs](../../core/src/relation.rs)
-  * satisfiedBy: [element.rs](../../core/src/element.rs)
-  * satisfiedBy: [subsection.rs](../../core/src/subsection.rs)
-  * satisfiedBy: [parser.rs](../../core/src/parser.rs)
-  * satisfiedBy: [model.rs](../../core/src/model.rs)
+  * derivedFrom: [Managing System Models](../../UserStories.md#managing-system-models)
+  * satisfiedBy: [relation.rs](../../../core/src/relation.rs)
+  * satisfiedBy: [element.rs](../../../core/src/element.rs)
+  * satisfiedBy: [subsection.rs](../../../core/src/subsection.rs)
+  * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
+  * satisfiedBy: [model.rs](../../../core/src/model.rs)
 ---
 
 ### Identifiers and Relations
@@ -599,8 +597,8 @@ The system must validate relation usage according to these rules:
 
 #### Relations
   * derivedFrom: [Element Identity Model](#element-identity-model)
-  * derivedFrom: [AI-Assisted System Model Management](../UserStories.md#ai-assisted-system-model-management)
-  * satisfiedBy: [relation.rs](../../core/src/relation.rs)
+  * derivedFrom: [AI-Assisted System Model Management](../../UserStories.md#ai-assisted-system-model-management)
+  * satisfiedBy: [relation.rs](../../../core/src/relation.rs)
 ---
 
 ### Element Identity Model
@@ -738,7 +736,7 @@ Content here.
 
 #### Relations
   * derivedFrom: [Structure and Addressing in Markdown Documents](#structure-and-addressing-in-markdown-documents)
-  * satisfiedBy: [element.rs](../../core/src/element.rs)
-  * satisfiedBy: [parser.rs](../../core/src/parser.rs)
+  * satisfiedBy: [element.rs](../../../core/src/element.rs)
+  * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
 ---
 
