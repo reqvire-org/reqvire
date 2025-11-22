@@ -28,6 +28,27 @@ const ASSETS: &[(&str, &[u8])] = &[
     ("android-chrome-192x192.png", include_bytes!("../templates/assets/android-chrome-192x192.png")),
 ];
 
+/// Page descriptions for HTML export pages
+const PAGE_DESCRIPTION_CONTAINMENT: &str = r#"# Containment
+
+The containment view shows the physical organization of the model—how elements are structured within folders and files. This hierarchical view reflects the file system layout and helps navigate to specific specification documents. In MBSE, containment represents where model elements are stored, separate from their logical relationships."#;
+
+const PAGE_DESCRIPTION_MODEL: &str = r#"# Model
+
+The model view displays the logical structure starting from root requirements—requirements without parent derivations. Each element shows its complete relation tree: derived child requirements, verifications, and implementations. This follows MBSE principles where stakeholder needs flow down through requirement hierarchies to verifiable, implementable specifications."#;
+
+const PAGE_DESCRIPTION_WHOLE_MODEL: &str = r#"# Whole Model
+
+This diagram visualizes the complete model as a single interconnected graph showing all elements and their relationships. Hover over any node to highlight its connected elements—ancestors (upstream) and descendants (downstream). Use this bird's-eye view to understand the overall requirements architecture and identify traceability chains across the model."#;
+
+const PAGE_DESCRIPTION_TRACES: &str = r#"# Verification Traces
+
+Verification traces show upward traceability—how each verification connects through the requirement hierarchy to root requirements. Each trace diagram starts from a verification and follows derivedFrom relations upward, marking which requirements along the path are directly verified. This view helps identify coverage gaps and detect redundant verify relations."#;
+
+const PAGE_DESCRIPTION_COVERAGE: &str = r#"# Verification Coverage
+
+Coverage analysis focuses on leaf requirements—the most specific requirements that don't derive other requirements. These represent implementable specifications that should be verified. The report shows verified vs. unverified percentages, broken down by file and type, helping identify gaps in verification coverage across the model."#;
+
 /// Copies assets folder to output directory
 fn copy_assets_folder(output_dir: &Path) -> Result<(), ReqvireError> {
     let assets_dir = output_dir.join("assets");
@@ -311,12 +332,22 @@ pub fn generate_artifacts_in_temp(
         false, // Markdown output
         "TD"   // Top-down diagrams for HTML export
     )?;
-    filesystem::write_file("model.md", model_report.as_bytes())?;
+    let model_content = format!(
+        "{}\n\n{}",
+        PAGE_DESCRIPTION_MODEL,
+        model_report
+    );
+    filesystem::write_file("model.md", model_content.as_bytes())?;
 
     // Generate whole model diagram (all elements and relations)
     info!("Generating whole-model.md...");
     let whole_model_mermaid = crate::diagrams::generate_model_diagram(&temp_model_manager.graph_registry, None)?;
-    filesystem::write_file("whole-model.md", whole_model_mermaid.as_bytes())?;
+    let whole_model_content = format!(
+        "{}\n\n{}",
+        PAGE_DESCRIPTION_WHOLE_MODEL,
+        whole_model_mermaid
+    );
+    filesystem::write_file("whole-model.md", whole_model_content.as_bytes())?;
 
     info!("Generating traces.md...");
     let trace_generator = crate::verification_trace::VerificationTraceGenerator::new(
@@ -326,16 +357,31 @@ pub fn generate_artifacts_in_temp(
     );
     let trace_report = trace_generator.generate();
     let traces_markdown = trace_generator.generate_markdown(&trace_report);
-    filesystem::write_file("traces.md", traces_markdown.as_bytes())?;
+    let traces_content = format!(
+        "{}\n\n{}",
+        PAGE_DESCRIPTION_TRACES,
+        traces_markdown
+    );
+    filesystem::write_file("traces.md", traces_content.as_bytes())?;
 
     info!("Generating coverage.md...");
     let coverage_report = crate::report_coverage::generate_coverage_report(&temp_model_manager.graph_registry);
     let coverage_text = coverage_report.format_text();
-    filesystem::write_file("coverage.md", coverage_text.as_bytes())?;
+    let coverage_content = format!(
+        "{}\n\n{}",
+        PAGE_DESCRIPTION_COVERAGE,
+        coverage_text
+    );
+    filesystem::write_file("coverage.md", coverage_content.as_bytes())?;
 
     info!("Generating containment.md...");
     let containment_diagram = crate::diagrams::generate_containment_diagram(&temp_model_manager.graph_registry, false)?;
-    filesystem::write_file("containment.md", containment_diagram.as_bytes())?;
+    let containment_content = format!(
+        "{}\n\n{}",
+        PAGE_DESCRIPTION_CONTAINMENT,
+        containment_diagram
+    );
+    filesystem::write_file("containment.md", containment_content.as_bytes())?;
 
     // Step 6: Convert markdown to HTML
     info!("Converting markdown to HTML...");
