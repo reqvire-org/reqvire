@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebInterface</title>
+    
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa;
+    color: #333;
+}
+.reqvire-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    background-color: #2c3e50;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+}
+.reqvire-nav a {
+    color: #ecf0f1;
+    text-decoration: none;
+    padding: 10px 20px;
+    margin-right: 5px;
+    border-radius: 3px;
+    transition: background-color 0.2s;
+}
+.reqvire-nav a:hover {
+    background-color: #34495e;
+}
+.reqvire-nav-spacer {
+    height: 50px;
+}
+.container {
+    max-width: 95%;
+    margin: 0 auto;
+    padding: 20px;
+}
+.content {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+h1 {
+    color: #333;
+    border-bottom: 2px solid #eaecef;
+    padding-bottom: 10px;
+    margin-top: 0;
+}
+h2 {
+    color: #333;
+    border-bottom: 1px solid #eaecef;
+    padding-bottom: 5px;
+}
+h3 {
+    color: #1a6fb7;
+    margin-top: 25px;
+}
+h4 {
+    color: #555;
+    font-weight: 600;
+}
+a {
+    color: #0366d6;
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 20px 0;
+}
+table, th, td {
+    border: 1px solid #dfe2e5;
+}
+th, td {
+    padding: 8px 12px;
+    text-align: left;
+}
+th {
+    background-color: #f6f8fa;
+}
+code {
+    background: #f6f8fa;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 90%;
+}
+pre {
+    background: #f6f8fa;
+    border-radius: 3px;
+    padding: 16px;
+    overflow: auto;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+}
+blockquote {
+    margin: 0;
+    padding: 0 15px;
+    color: #777;
+    border-left: 4px solid #dfe2e5;
+}
+.mermaid {
+    margin: 20px 0;
+    text-align: center;
+    height: calc(100vh - 150px);
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid #dfe2e5;
+    border-radius: 3px;
+    background-color: #fafafa;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+.mermaid svg {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    position: relative;
+    z-index: 1;
+}
+.diagram-nav-buttons {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 999; /* higher than SVG (1) but lower than header nav (1000) */
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 5px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+.diagram-nav-row {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+}
+.diagram-nav-btn {
+    width: 32px;
+    height: 32px;
+    background-color: #2c3e50;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.diagram-nav-btn:hover {
+    background-color: #34495e;
+}
+.diagram-nav-btn:active {
+    background-color: #1a252f;
+}
+</style>
+
+    <!-- Enhanced mermaid configuration for Reqvire diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.5.0/dist/svg-pan-zoom.min.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+        import elkLayouts from 'https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk/dist/mermaid-layout-elk.esm.min.mjs';
+
+        // Register ELK layout for large diagrams
+        mermaid.registerLayoutLoaders(elkLayouts);
+
+        // Capture Mermaid errors
+        mermaid.parseError = function(err, hash) {
+            console.error('Mermaid Parse Error:', err);
+            console.error('Error details:', {
+                str: err.str,
+                hash: err.hash,
+                message: err.message,
+                stack: err.stack
+            });
+        };
+
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            maxTextSize: 5000000,
+            maxEdges: 50000,
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis',
+                defaultRenderer: 'elk'
+            },
+            layout: 'elk',
+            elk: {
+                mergeEdges: true,
+                nodePlacementStrategy: 'SIMPLE'
+            },
+            securityLevel: 'loose',
+            logLevel: 'error'
+        });
+
+        await mermaid.run();
+        window.mermaid = mermaid;
+
+        // Add pan/zoom to all Mermaid diagrams after rendering
+        setTimeout(function() {
+            document.querySelectorAll('.mermaid').forEach(function(mermaidContainer) {
+                    var svg = mermaidContainer.querySelector('svg');
+                    if (!svg) return;
+
+                    svg.style.maxWidth = 'none';
+                    svg.style.maxHeight = 'none';
+
+                    var eventsHandler = {
+                        haltEventListeners: ['touchstart', 'touchend', 'touchmove', 'touchleave', 'touchcancel'],
+                        init: function(options) {
+                            var instance = options.instance;
+                            var initialScale = 1;
+                            var pannedX = 0;
+                            var pannedY = 0;
+
+                            this.hammer = Hammer(options.svgElement, {
+                                inputClass: Hammer.SUPPORT_POINTER_EVENTS ? Hammer.PointerEventInput : Hammer.TouchInput
+                            });
+
+                            this.hammer.get('pinch').set({enable: true});
+
+                            this.hammer.on('doubletap', function(ev){
+                                instance.zoomIn();
+                            });
+
+                            this.hammer.on('panstart panmove', function(ev){
+                                if (ev.type === 'panstart') {
+                                    pannedX = 0;
+                                    pannedY = 0;
+                                }
+                                instance.panBy({x: ev.deltaX - pannedX, y: ev.deltaY - pannedY});
+                                pannedX = ev.deltaX;
+                                pannedY = ev.deltaY;
+                            });
+
+                            this.hammer.on('pinchstart pinchmove', function(ev){
+                                if (ev.type === 'pinchstart') {
+                                    initialScale = instance.getZoom();
+                                }
+                                instance.zoomAtPoint(initialScale * ev.scale, {x: ev.center.x, y: ev.center.y});
+                            });
+
+                            options.svgElement.addEventListener('touchmove', function(e){ e.preventDefault(); });
+                        },
+                        destroy: function(){
+                            this.hammer.destroy();
+                        }
+                    };
+
+                    // Diagrams with default zoom (no auto-fit)
+                    var panZoomInstance = svgPanZoom(svg, {
+                        zoomEnabled: true,
+                        controlIconsEnabled: true,
+                        fit: false,
+                        center: false,
+                        contain: false,
+                        minZoom: 0.5,
+                        maxZoom: 10,
+                        zoomScaleSensitivity: 0.3,
+                        customEventsHandler: eventsHandler
+                    });
+
+                    // Add navigation buttons
+                    var navButtons = document.createElement('div');
+                    navButtons.className = 'diagram-nav-buttons';
+                    navButtons.innerHTML = `
+                        <div class="diagram-nav-row">
+                            <button class="diagram-nav-btn" data-action="up">▲</button>
+                        </div>
+                        <div class="diagram-nav-row">
+                            <button class="diagram-nav-btn" data-action="left">◀</button>
+                            <button class="diagram-nav-btn" data-action="down">▼</button>
+                            <button class="diagram-nav-btn" data-action="right">▶</button>
+                        </div>
+                    `;
+                    mermaidContainer.appendChild(navButtons);
+
+                    // Wire up navigation buttons
+                    var panStep = 100;
+                    navButtons.querySelectorAll('.diagram-nav-btn').forEach(function(btn) {
+                        btn.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            var action = this.getAttribute('data-action');
+                            switch(action) {
+                                case 'up':
+                                    panZoomInstance.panBy({x: 0, y: panStep});
+                                    break;
+                                case 'down':
+                                    panZoomInstance.panBy({x: 0, y: -panStep});
+                                    break;
+                                case 'left':
+                                    panZoomInstance.panBy({x: panStep, y: 0});
+                                    break;
+                                case 'right':
+                                    panZoomInstance.panBy({x: -panStep, y: 0});
+                                    break;
+                            }
+                        });
+                    });
+            });
+        }, 500);
+
+        // Add CSS for edge highlighting (high specificity for SVG)
+        var style = document.createElement('style');
+        style.textContent = `
+            path.edge-highlighted,
+            .edge-highlighted path,
+            svg path.edge-highlighted {
+                stroke: #ff6b6b !important;
+                stroke-width: 3px !important;
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Add edge highlighting on node hover
+        setTimeout(function() {
+            document.querySelectorAll('.mermaid svg').forEach(function(svg) {
+                var nodes = svg.querySelectorAll('.node');
+
+                // Find flowchart-link paths (actual edges)
+                var edgePaths = svg.querySelectorAll('path.flowchart-link');
+                // Fallback: find paths in .edges group
+                if (edgePaths.length === 0) {
+                    var edgesGroup = svg.querySelector('.edges');
+                    if (edgesGroup) {
+                        edgePaths = edgesGroup.querySelectorAll('path');
+                    }
+                }
+
+                // Get SVG point for coordinate transforms
+                var svgPoint = svg.createSVGPoint();
+
+                // Helper: transform point through element's CTM
+                function getTransformedBBox(element) {
+                    var bbox = element.getBBox();
+                    var ctm = element.getCTM();
+                    if (!ctm) return bbox;
+
+                    // Transform all four corners
+                    var corners = [
+                        {x: bbox.x, y: bbox.y},
+                        {x: bbox.x + bbox.width, y: bbox.y},
+                        {x: bbox.x, y: bbox.y + bbox.height},
+                        {x: bbox.x + bbox.width, y: bbox.y + bbox.height}
+                    ];
+
+                    var transformed = corners.map(function(c) {
+                        svgPoint.x = c.x;
+                        svgPoint.y = c.y;
+                        var tp = svgPoint.matrixTransform(ctm);
+                        return {x: tp.x, y: tp.y};
+                    });
+
+                    var minX = Math.min.apply(null, transformed.map(function(p) { return p.x; }));
+                    var maxX = Math.max.apply(null, transformed.map(function(p) { return p.x; }));
+                    var minY = Math.min.apply(null, transformed.map(function(p) { return p.y; }));
+                    var maxY = Math.max.apply(null, transformed.map(function(p) { return p.y; }));
+
+                    return {x: minX, y: minY, width: maxX - minX, height: maxY - minY};
+                }
+
+                // Helper: get all points from path
+                function getPathPoints(path) {
+                    var d = path.getAttribute('d') || '';
+                    var points = [];
+                    var ctm = path.getCTM();
+
+                    // Get M (start) point
+                    var startMatch = d.match(/M\s*([\d.-]+)[,\s]+([\d.-]+)/i);
+                    if (startMatch) {
+                        var sx = parseFloat(startMatch[1]);
+                        var sy = parseFloat(startMatch[2]);
+                        if (ctm) {
+                            svgPoint.x = sx; svgPoint.y = sy;
+                            var tp = svgPoint.matrixTransform(ctm);
+                            points.push({x: tp.x, y: tp.y});
+                        } else {
+                            points.push({x: sx, y: sy});
+                        }
+                    }
+
+                    // Get last point - find last number pair before Z or end
+                    var allNums = d.match(/[\d.-]+/g);
+                    if (allNums && allNums.length >= 2) {
+                        var ex = parseFloat(allNums[allNums.length - 2]);
+                        var ey = parseFloat(allNums[allNums.length - 1]);
+                        if (ctm) {
+                            svgPoint.x = ex; svgPoint.y = ey;
+                            var tp = svgPoint.matrixTransform(ctm);
+                            points.push({x: tp.x, y: tp.y});
+                        } else {
+                            points.push({x: ex, y: ey});
+                        }
+                    }
+
+                    return points;
+                }
+
+                // Build node bounding boxes with transforms
+                var nodeData = {};
+                nodes.forEach(function(node) {
+                    var nodeId = node.id || '';
+                    var parts = nodeId.split('-');
+                    var hashId = parts.length >= 2 ? parts[1] : nodeId;
+
+                    nodeData[hashId] = {
+                        node: node,
+                        bbox: getTransformedBBox(node)
+                    };
+                });
+
+                // Check if point is near bbox
+                function isNearBbox(pt, bbox, margin) {
+                    margin = margin || 40;
+                    return pt.x >= bbox.x - margin && pt.x <= bbox.x + bbox.width + margin &&
+                           pt.y >= bbox.y - margin && pt.y <= bbox.y + bbox.height + margin;
+                }
+
+                // Map edges to nodes
+                var nodeEdgeMap = {};
+                Object.keys(nodeData).forEach(function(hashId) {
+                    nodeEdgeMap[hashId] = [];
+                    var bbox = nodeData[hashId].bbox;
+
+                    edgePaths.forEach(function(path) {
+                        var points = getPathPoints(path);
+                        for (var i = 0; i < points.length; i++) {
+                            if (isNearBbox(points[i], bbox, 40)) {
+                                if (!nodeEdgeMap[hashId].includes(path)) {
+                                    nodeEdgeMap[hashId].push(path);
+                                }
+                                break;
+                            }
+                        }
+                    });
+                });
+
+                // Attach hover handlers
+                nodes.forEach(function(node) {
+                    var nodeId = node.id || '';
+                    var parts = nodeId.split('-');
+                    var hashId = parts.length >= 2 ? parts[1] : nodeId;
+
+                    node.style.cursor = 'pointer';
+
+                    node.addEventListener('mouseenter', function(e) {
+                        e.stopPropagation();
+                        nodes.forEach(function(n) { n.style.filter = ''; });
+                        node.style.filter = 'drop-shadow(0 0 6px #ff6b6b)';
+
+                        var connectedEdges = nodeEdgeMap[hashId] || [];
+                        connectedEdges.forEach(function(path) {
+                            path.classList.add('edge-highlighted');
+                        });
+                    });
+
+                    node.addEventListener('mouseleave', function() {
+                        node.style.filter = '';
+                        var connectedEdges = nodeEdgeMap[hashId] || [];
+                        connectedEdges.forEach(function(path) {
+                            path.classList.remove('edge-highlighted');
+                        });
+                    });
+                });
+            });
+        }, 1000);
+    </script>
+</head>
+<body>
+    <nav class="reqvire-nav">
+        <a href="../../index.html">Home</a>
+        <a href="../../containment.html">Containment</a>
+        <a href="../../model.html">Model</a>
+        <a href="../../whole-model.html">Whole Model</a>
+        <a href="../../traces.html">Traces</a>
+        <a href="../../coverage.html">Coverage</a>
+    </nav>
+    <div class="reqvire-nav-spacer"></div>
+    <div class="container">
+        <div class="content">
+            <h1 id="requirements">Requirements</h1>
+<div class="mermaid">graph LR;
+  %% REQVIRE-AUTOGENERATED-DIAGRAM
+  %% Graph styling
+  classDef userRequirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef systemRequirement fill:#fce4e4,stroke:#e68a8a,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+
+  59093bf57f656ef3[&quot;HTML Export&quot;];
+  class 59093bf57f656ef3 systemRequirement;
+  click 59093bf57f656ef3 &quot;WebInterface.html#html-export&quot;;
+  b07859a209e66b4b[&quot;Model-Centric View Generation&quot;];
+  class b07859a209e66b4b systemRequirement;
+  click b07859a209e66b4b &quot;WebInterface.html#model-centric-view-generation&quot;;
+  59093bf57f656ef3 -.->|deriveReqT| b07859a209e66b4b;
+  db6fe291d67a0271[&quot;Whole Model Diagram Generation&quot;];
+  class db6fe291d67a0271 systemRequirement;
+  click db6fe291d67a0271 &quot;WebInterface.html#whole-model-diagram-generation&quot;;
+  59093bf57f656ef3 -.->|deriveReqT| db6fe291d67a0271;
+  80defdd4cbc7ee18[&quot;cli.rs&quot;];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 &quot;../../cli/src/cli.rs&quot;;
+  59093bf57f656ef3 -->|satisfiedBy| 80defdd4cbc7ee18;
+  345c82cd34408acb[&quot;export.rs&quot;];
+  class 345c82cd34408acb default;
+  click 345c82cd34408acb &quot;../../core/src/export.rs&quot;;
+  59093bf57f656ef3 -->|satisfiedBy| 345c82cd34408acb;
+  d0e6cc47b904faa5[&quot;html.rs&quot;];
+  class d0e6cc47b904faa5 default;
+  click d0e6cc47b904faa5 &quot;../../core/src/html.rs&quot;;
+  59093bf57f656ef3 -->|satisfiedBy| d0e6cc47b904faa5;
+  c3d63c5d4133e346[&quot;html_export.rs&quot;];
+  class c3d63c5d4133e346 default;
+  click c3d63c5d4133e346 &quot;../../core/src/html_export.rs&quot;;
+  59093bf57f656ef3 -->|satisfiedBy| c3d63c5d4133e346;
+  1a173441705701a0[&quot;index_generator.rs&quot;];
+  class 1a173441705701a0 default;
+  click 1a173441705701a0 &quot;../../core/src/index_generator.rs&quot;;
+  59093bf57f656ef3 -->|satisfiedBy| 1a173441705701a0;
+  3a807a8535fb41fa[&quot;base.html&quot;];
+  class 3a807a8535fb41fa default;
+  click 3a807a8535fb41fa &quot;../../core/templates/base.html&quot;;
+  59093bf57f656ef3 -->|satisfiedBy| 3a807a8535fb41fa;
+  c196fa9b3e2c2258[&quot;model.html&quot;];
+  class c196fa9b3e2c2258 default;
+  click c196fa9b3e2c2258 &quot;../../core/templates/model.html&quot;;
+  59093bf57f656ef3 -->|satisfiedBy| c196fa9b3e2c2258;
+  7ff28ff401dbaef7[&quot;CLI Help Structure Verification&quot;];
+  class 7ff28ff401dbaef7 verification;
+  click 7ff28ff401dbaef7 &quot;CLI.html#cli-help-structure-verification&quot;;
+  59093bf57f656ef3 -.->|verifiedBy| 7ff28ff401dbaef7;
+  73fc82b744d6851c[&quot;HTML Export Verification&quot;];
+  class 73fc82b744d6851c verification;
+  click 73fc82b744d6851c &quot;WebInterface.html#html-export-verification&quot;;
+  59093bf57f656ef3 -.->|verifiedBy| 73fc82b744d6851c;
+  8899a52ea9866d8b[&quot;test.sh&quot;];
+  class 8899a52ea9866d8b default;
+  click 8899a52ea9866d8b &quot;../../tests/test-html-export/test.sh&quot;;
+  73fc82b744d6851c -->|satisfiedBy| 8899a52ea9866d8b;
+  345c82cd34408acb[&quot;export.rs&quot;];
+  class 345c82cd34408acb default;
+  click 345c82cd34408acb &quot;../../core/src/export.rs&quot;;
+  b07859a209e66b4b -->|satisfiedBy| 345c82cd34408acb;
+  ee222ed1a55fa477[&quot;report_model.rs&quot;];
+  class ee222ed1a55fa477 default;
+  click ee222ed1a55fa477 &quot;../../core/src/report_model.rs&quot;;
+  b07859a209e66b4b -->|satisfiedBy| ee222ed1a55fa477;
+  ed77c8b81e72691f[&quot;Serve Command&quot;];
+  class ed77c8b81e72691f systemRequirement;
+  click ed77c8b81e72691f &quot;WebInterface.html#serve-command&quot;;
+  80defdd4cbc7ee18[&quot;cli.rs&quot;];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 &quot;../../cli/src/cli.rs&quot;;
+  ed77c8b81e72691f -->|satisfiedBy| 80defdd4cbc7ee18;
+  e313808f7a755f6[&quot;serve.rs&quot;];
+  class e313808f7a755f6 default;
+  click e313808f7a755f6 &quot;../../cli/src/serve.rs&quot;;
+  ed77c8b81e72691f -->|satisfiedBy| e313808f7a755f6;
+  8f321516e91a74d6[&quot;Validate Command&quot;];
+  class 8f321516e91a74d6 systemRequirement;
+  click 8f321516e91a74d6 &quot;CLI.html#validate-command&quot;;
+  ed77c8b81e72691f -.->|trace| 8f321516e91a74d6;
+  c9349ff6d96c56d7[&quot;Serve Command Verification&quot;];
+  class c9349ff6d96c56d7 verification;
+  click c9349ff6d96c56d7 &quot;WebInterface.html#serve-command-verification&quot;;
+  ed77c8b81e72691f -.->|verifiedBy| c9349ff6d96c56d7;
+  dd6732f292fab4eb[&quot;test.sh&quot;];
+  class dd6732f292fab4eb default;
+  click dd6732f292fab4eb &quot;../../tests/test-serve-command/test.sh&quot;;
+  c9349ff6d96c56d7 -->|satisfiedBy| dd6732f292fab4eb;
+  dad7eeb932afdb92[&quot;diagrams.rs&quot;];
+  class dad7eeb932afdb92 default;
+  click dad7eeb932afdb92 &quot;../../core/src/diagrams.rs&quot;;
+  db6fe291d67a0271 -->|satisfiedBy| dad7eeb932afdb92;
+  345c82cd34408acb[&quot;export.rs&quot;];
+  class 345c82cd34408acb default;
+  click 345c82cd34408acb &quot;../../core/src/export.rs&quot;;
+  db6fe291d67a0271 -->|satisfiedBy| 345c82cd34408acb;
+  e16108a30570f434[&quot;CLI Interface Structure&quot;];
+  class e16108a30570f434 systemRequirement;
+  click e16108a30570f434 &quot;CLI.html#cli-interface-structure&quot;;
+  7b6287a68f3ac83f[&quot;CLI Change Impact Report Command&quot;];
+  class 7b6287a68f3ac83f systemRequirement;
+  click 7b6287a68f3ac83f &quot;CLI.html#cli-change-impact-report-command&quot;;
+  e16108a30570f434 -.->|deriveReqT| 7b6287a68f3ac83f;
+  c9d3c9fb2d43619b[&quot;CLI Containment Command&quot;];
+  class c9d3c9fb2d43619b systemRequirement;
+  click c9d3c9fb2d43619b &quot;CLI.html#cli-containment-command&quot;;
+  e16108a30570f434 -.->|deriveReqT| c9d3c9fb2d43619b;
+  892e19ec234ec4d8[&quot;CLI Generate Diagrams Flag&quot;];
+  class 892e19ec234ec4d8 systemRequirement;
+  click 892e19ec234ec4d8 &quot;CLI.html#cli-generate-diagrams-flag&quot;;
+  e16108a30570f434 -.->|deriveReqT| 892e19ec234ec4d8;
+  7faaae7c608ed9f2[&quot;CLI Lint Command&quot;];
+  class 7faaae7c608ed9f2 systemRequirement;
+  click 7faaae7c608ed9f2 &quot;CLI.html#cli-lint-command&quot;;
+  e16108a30570f434 -.->|deriveReqT| 7faaae7c608ed9f2;
+  b3bb7792bbc95f02[&quot;CLI Remove Diagrams Flag&quot;];
+  class b3bb7792bbc95f02 systemRequirement;
+  click b3bb7792bbc95f02 &quot;CLI.html#cli-remove-diagrams-flag&quot;;
+  e16108a30570f434 -.->|deriveReqT| b3bb7792bbc95f02;
+  3814555dac6871e9[&quot;CLI Rename Element Command&quot;];
+  class 3814555dac6871e9 systemRequirement;
+  click 3814555dac6871e9 &quot;CLI.html#cli-rename-element-command&quot;;
+  e16108a30570f434 -.->|deriveReqT| 3814555dac6871e9;
+  e342a2a82ef67934[&quot;CLI Search Command&quot;];
+  class e342a2a82ef67934 systemRequirement;
+  click e342a2a82ef67934 &quot;CLI.html#cli-search-command&quot;;
+  e16108a30570f434 -.->|deriveReqT| e342a2a82ef67934;
+  e21c06baba741337[&quot;Format Command&quot;];
+  class e21c06baba741337 systemRequirement;
+  click e21c06baba741337 &quot;CLI.html#format-command&quot;;
+  e16108a30570f434 -.->|deriveReqT| e21c06baba741337;
+  4fd92091a4cfac13[&quot;Subdirectory Processing Option&quot;];
+  class 4fd92091a4cfac13 systemRequirement;
+  click 4fd92091a4cfac13 &quot;CLI.html#subdirectory-processing-option&quot;;
+  e16108a30570f434 -.->|deriveReqT| 4fd92091a4cfac13;
+  e16108a30570f434 -.->|deriveReqT| 8f321516e91a74d6;
+  e16108a30570f434 -.->|deriveReqT| 59093bf57f656ef3;
+  ec8a8cc688b1d9d9[&quot;Integrated Validation&quot;];
+  class ec8a8cc688b1d9d9 systemRequirement;
+  click ec8a8cc688b1d9d9 &quot;../System/Validation.html#integrated-validation&quot;;
+  e16108a30570f434 -.->|deriveReqT| ec8a8cc688b1d9d9;
+  80defdd4cbc7ee18[&quot;cli.rs&quot;];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 &quot;../../cli/src/cli.rs&quot;;
+  e16108a30570f434 -->|satisfiedBy| 80defdd4cbc7ee18;
+  adfe41db00d52285[&quot;Web Interface&quot;];
+  class adfe41db00d52285 userRequirement;
+  click adfe41db00d52285 &quot;Interfaces.html#web-interface&quot;;
+  adfe41db00d52285 -.->|deriveReqT| 59093bf57f656ef3;
+  adfe41db00d52285 -.->|deriveReqT| ed77c8b81e72691f;
+  71adfd59da9ff84f[&quot;Complete Model Structure Visualization&quot;];
+  class 71adfd59da9ff84f userRequirement;
+  click 71adfd59da9ff84f &quot;../System/DiagramGeneration.html#complete-model-structure-visualization&quot;;
+  71adfd59da9ff84f -.->|deriveReqT| b07859a209e66b4b;
+  c57d76a5aa346a53[&quot;Model Visualization and Exploration&quot;];
+  class c57d76a5aa346a53 userRequirement;
+  click c57d76a5aa346a53 &quot;../System/DiagramGeneration.html#model-visualization-and-exploration&quot;;
+  ccf73e5865717df6[&quot;CLI Model Diagram Command&quot;];
+  class ccf73e5865717df6 systemRequirement;
+  click ccf73e5865717df6 &quot;CLI.html#cli-model-diagram-command&quot;;
+  c57d76a5aa346a53 -.->|deriveReqT| ccf73e5865717df6;
+  c57d76a5aa346a53 -.->|deriveReqT| b07859a209e66b4b;
+  1c6b7180f4e0214a[&quot;Model Reports&quot;];
+  class 1c6b7180f4e0214a userRequirement;
+  click 1c6b7180f4e0214a &quot;../System/Reporting.html#model-reports&quot;;
+  1c6b7180f4e0214a -.->|deriveReqT| 59093bf57f656ef3;
+  1c6b7180f4e0214a -.->|deriveReqT| 71adfd59da9ff84f;
+  5be870a7fe3078ce[&quot;Interactive Mermaid Diagrams&quot;];
+  class 5be870a7fe3078ce userRequirement;
+  click 5be870a7fe3078ce &quot;../System/DiagramGeneration.html#interactive-mermaid-diagrams&quot;;
+  1c6b7180f4e0214a -.->|deriveReqT| 5be870a7fe3078ce;
+  1c6b7180f4e0214a -.->|deriveReqT| c57d76a5aa346a53;
+  99d6386e6ce8f5f9[&quot;Model Structure and Summaries&quot;];
+  class 99d6386e6ce8f5f9 userRequirement;
+  click 99d6386e6ce8f5f9 &quot;../System/Reporting.html#model-structure-and-summaries&quot;;
+  1c6b7180f4e0214a -.->|deriveReqT| 99d6386e6ce8f5f9;
+  9c9b9aa3155688f3[&quot;Provide Validation Reports&quot;];
+  class 9c9b9aa3155688f3 userRequirement;
+  click 9c9b9aa3155688f3 &quot;../System/Reporting.html#provide-validation-reports&quot;;
+  1c6b7180f4e0214a -.->|deriveReqT| 9c9b9aa3155688f3;
+  a7bb3c1af2e2d306[&quot;Verification Coverage Report&quot;];
+  class a7bb3c1af2e2d306 userRequirement;
+  click a7bb3c1af2e2d306 &quot;../System/Reporting.html#verification-coverage-report&quot;;
+  1c6b7180f4e0214a -.->|deriveReqT| a7bb3c1af2e2d306;
+  59725c25046f87ea[&quot;Model Export&quot;];
+  class 59725c25046f87ea userRequirement;
+  click 59725c25046f87ea &quot;../UserStories.html#model-export&quot;;
+  59725c25046f87ea -.->|deriveReqT| 59093bf57f656ef3;
+</div>
+<h3 id="html-export">HTML Export</h3>
+<p>The system SHALL generate comprehensive HTML documentation with all model artifacts by creating a temporary working copy, generating all reports in that copy, and exporting to the output directory.</p>
+<h4>Details</h4>
+<p><strong>Working Directory Setup:</strong></p>
+<ul>
+<li>Create temporary working directory (e.g., in /tmp)</li>
+<li>Use graph registry to identify all model files and artifacts</li>
+<li>Copy all identified files to temporary directory preserving structure</li>
+<li>Copy all related system elements (following satisfiedBy and other relations)</li>
+</ul>
+<p><strong>Generation Pipeline (in temporary directory):</strong>
+Execute all generation commands treating temporary directory as repository root:</p>
+<ol>
+<li>Generate all Mermaid diagrams in markdown files</li>
+<li>Generate index.md (model structure overview)</li>
+<li>Generate model.md (model-centric visualization with nested relations from root requirements)</li>
+<li>Generate whole-model.md (complete model diagram showing all elements and relations)</li>
+<li>Generate traces.md (verification upward traceability)</li>
+<li>Generate coverage.md (verification coverage report)</li>
+</ol>
+<p><strong>HTML Conversion:</strong></p>
+<ul>
+<li>Convert all markdown files to HTML with embedded styles</li>
+<li>Process Mermaid diagrams for web rendering</li>
+<li>Convert internal .md links to .html links</li>
+<li>Preserve directory structure</li>
+</ul>
+<p><strong>Output:</strong></p>
+<ul>
+<li>Accept <code>--output</code> option (default: ‘html’)</li>
+<li>Create output folder if not existing</li>
+<li>Copy generated HTML and all artifacts from temp directory to output directory</li>
+<li>Clean up temporary working directory</li>
+</ul>
+<p><strong>Source Protection:</strong></p>
+<ul>
+<li>Never modify original repository files</li>
+<li>All generation happens in isolated temporary directory</li>
+</ul>
+<p><strong>Git Directory Exclusion:</strong></p>
+<ul>
+<li>The .git directory shall never be exported to the output folder</li>
+<li>This prevents internal git metadata from polluting the exported documentation</li>
+</ul>
+<p><strong>Export Related System Elements:</strong></p>
+<ul>
+<li>Ensure that any related system elements are also copied into output folder to ensure consistency of exported model</li>
+</ul>
+<p><strong>Index Generation:</strong>
+The index document generator shall:</p>
+<ol>
+<li>Traverse all specifications and documents in the model</li>
+<li>Group elements by file and section</li>
+<li>Create a hierarchical index with links to documents and elements</li>
+<li>Generate summary statistics including total files, sections, and elements</li>
+<li>Generate the index as index.md during HTML export</li>
+<li>Be integrated into the HTML export pipeline</li>
+</ol>
+<p>The index generation is automatically performed as part of the HTML export process and saves the result as index.md in the temporary working directory, which is then converted to index.html when exported. The index shall contain a structured summary of all specification documents and folders, serving as the primary entry point (index.html) for HTML documentation.</p>
+<p><strong>HTML Navigation Bar:</strong>
+The system shall provide a fixed navigation bar in all HTML pages with links to key model artifacts for easy access.</p>
+<p>The navigation bar must include:</p>
+<ul>
+<li>Home: Link to index.html (model structure overview)</li>
+<li>Containment: Link to containment.html (model containment diagram)</li>
+<li>Model: Link to model.html (model-centric view with nested relations)</li>
+<li>Whole Model: Link to whole-model.html (complete model diagram)</li>
+<li>Traces: Link to traces.html (verification upward traceability report)</li>
+<li>Coverage: Link to coverage.html (verification coverage report)</li>
+</ul>
+<p>The navigation bar must be:</p>
+<ul>
+<li>Always visible (fixed position) while scrolling</li>
+<li>Consistent across all HTML pages</li>
+<li>Clearly visible and accessible</li>
+</ul>
+<p><strong>HTML Design:</strong>
+The system shall design and implement HTML pages with consistent layout, styling, and navigation for browsing the MBSE model.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../UserStories.html#model-export">Model Export</a></li>
+<li>derivedFrom: <a href="Interfaces.html#web-interface">Web Interface</a></li>
+<li>derivedFrom: <a href="CLI.html#cli-interface-structure">CLI Interface Structure</a></li>
+<li>derivedFrom: <a href="../System/Reporting.html#model-reports">Model Reports</a></li>
+<li>satisfiedBy: <a href="../../core/src/html_export.rs">html_export.rs</a></li>
+<li>satisfiedBy: <a href="../../core/src/html.rs">html.rs</a></li>
+<li>satisfiedBy: <a href="../../cli/src/cli.rs">cli.rs</a></li>
+<li>satisfiedBy: <a href="../../core/src/index_generator.rs">index_generator.rs</a></li>
+<li>satisfiedBy: <a href="../../core/templates/base.html">base.html</a></li>
+<li>satisfiedBy: <a href="../../core/templates/model.html">model.html</a></li>
+<li>satisfiedBy: <a href="../../core/src/export.rs">export.rs</a></li>
+<li>verifiedBy: <a href="#html-export-verification">HTML Export Verification</a></li>
+</ul>
+<hr />
+<h3 id="html-export-verification">HTML Export Verification</h3>
+<p>This test verifies that the system exports specifications into HTML format with generated index and saves them in the designated output location.</p>
+<h4>Details</h4>
+<h5>Acceptance Criteria:</h5>
+<ul>
+<li>System should export specifications to HTML format</li>
+<li>HTML files should be saved in the designated output location</li>
+<li>HTML output should maintain the structure and content of the original specifications</li>
+<li>System shall generate index.md in the temporary working directory during HTML export</li>
+<li>index.md shall be converted to index.html in the output directory</li>
+<li>index.html shall contain links to all specification documents</li>
+<li>index.html shall be properly structured with sections</li>
+<li>index.html shall include brief summaries of each document</li>
+<li>index.html shall serve as the primary entry point for HTML documentation</li>
+<li>Links in diagrams and text must be converted to use .html instead of .md</li>
+<li>Paths in HTML files should maintain the original relative structure</li>
+<li>System should work in environments without Git repositories</li>
+</ul>
+<h5>Test Criteria:</h5>
+<ul>
+<li>Command exits with success (0) return code</li>
+<li>HTML files are generated at the expected location with .html extension</li>
+<li>Output directory contains index.html file</li>
+<li>index.html contains links to all specification documents</li>
+<li>index.html structure follows expected format</li>
+<li>HTML content preserves the structure and information from the source files</li>
+<li>Links in HTML files use .html extension instead of .md</li>
+<li>Mermaid click links are properly converted from .md to .html</li>
+<li>Both GitHub-style URLs and direct file paths in mermaid click links are handled correctly</li>
+<li>Paths should not have duplicated folder names (e.g., specifications/specifications)</li>
+<li>The .git directory is not present in export output</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="#html-export">HTML Export</a></li>
+<li>satisfiedBy: <a href="../../tests/test-html-export/test.sh">test.sh</a></li>
+</ul>
+<hr />
+<h3 id="model-centric-view-generation">Model-Centric View Generation</h3>
+<p>The system shall generate a model-centric visualization during HTML export showing root requirements with nested relations containing full element details.</p>
+<h4>Details</h4>
+<ul>
+<li>Display root requirements (no hierarchical parent) as top-level entries</li>
+<li>Show relations nested inside elements with full target details recursively</li>
+<li>Include metadata about total elements and relations</li>
+<li>Generate mermaid diagrams showing all nested relations</li>
+<li>Output as markdown with embedded visualizations (model.html)</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../System/DiagramGeneration.html#complete-model-structure-visualization">Complete Model Structure Visualization</a></li>
+<li>derivedFrom: <a href="../System/DiagramGeneration.html#model-visualization-and-exploration">Model Visualization and Exploration</a></li>
+<li>derivedFrom: <a href="#html-export">HTML Export</a></li>
+<li>satisfiedBy: <a href="../../core/src/export.rs">export.rs</a></li>
+<li>satisfiedBy: <a href="../../core/src/report_model.rs">report_model.rs</a></li>
+</ul>
+<hr />
+<h3 id="whole-model-diagram-generation">Whole Model Diagram Generation</h3>
+<p>The system shall generate a complete model diagram during HTML export showing all elements and their relationships.</p>
+<h4>Details</h4>
+<ul>
+<li>Display all elements without filtering</li>
+<li>Show all forward relations (derive, satisfiedBy, verifiedBy, trace)</li>
+<li>Group elements by file and section</li>
+<li>Use mermaid diagram format</li>
+<li>Output as whole-model.html</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#html-export">HTML Export</a></li>
+<li>satisfiedBy: <a href="../../core/src/export.rs">export.rs</a></li>
+<li>satisfiedBy: <a href="../../core/src/diagrams.rs">diagrams.rs</a></li>
+</ul>
+<hr />
+<h3 id="serve-command-verification">Serve Command Verification</h3>
+<p>This test verifies that the serve command exports HTML to a temporary directory and starts an HTTP server that serves the model documentation.</p>
+<h4>Details</h4>
+<h5>Acceptance Criteria:</h5>
+<ul>
+<li>System shall export HTML artifacts to a temporary directory</li>
+<li>System shall start HTTP server on specified host and port</li>
+<li>System shall display clickable terminal link to the server URL</li>
+<li>System shall serve index.html when accessing root URL</li>
+<li>System shall serve all exported HTML files with correct paths</li>
+<li>System shall serve static assets (SVG diagrams, CSS, etc.)</li>
+<li>System shall return 404 for non-existent files</li>
+<li>System shall set correct Content-Type headers for different file types</li>
+<li>System shall run in quiet mode (suppress verbose export output)</li>
+<li>System shall not automatically open browser window</li>
+<li>System shall display instructions for Ctrl-C stop</li>
+</ul>
+<h5>Test Criteria:</h5>
+<ul>
+<li>Command starts successfully and displays server URL with instructions</li>
+<li>Server responds to HTTP requests on specified port</li>
+<li>Root URL (/) serves index.html</li>
+<li>HTML files are served with text/html content type</li>
+<li>SVG files are served with image/svg+xml content type</li>
+<li>Non-existent paths return 404 status</li>
+<li>Export verbose output is suppressed (quiet mode active)</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="#serve-command">Serve Command</a></li>
+<li>satisfiedBy: <a href="../../tests/test-serve-command/test.sh">test.sh</a></li>
+</ul>
+<hr />
+<h3 id="serve-command">Serve Command</h3>
+<p>The system SHALL provide a serve command that exports comprehensive HTML documentation and serves it via an HTTP server for browsing.</p>
+<h4>Details</h4>
+<p><code>serve</code> command shall:</p>
+<ul>
+<li>Accept <code>--host &lt;HOST&gt;</code> option to specify the bind address (default: localhost)</li>
+<li>Accept <code>--port &lt;PORT&gt;</code> option to specify the server port (default: 8080)</li>
+<li>Use a random temporary directory for HTML export</li>
+<li>Run HTML Export to generate complete documentation in temporary directory</li>
+<li>Start an HTTP server serving static files from the temporary directory</li>
+<li>Display clickable server URL for user to open in browser</li>
+<li>Display instructions to press Ctrl-C to stop server</li>
+<li>Continue serving until terminated by the user (Ctrl-C)</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="Interfaces.html#web-interface">Web Interface</a></li>
+<li>trace: <a href="CLI.html#validate-command">Validate Command</a></li>
+<li>satisfiedBy: <a href="../../cli/src/cli.rs">cli.rs</a></li>
+<li>satisfiedBy: <a href="../../cli/src/serve.rs">serve.rs</a></li>
+<li>verifiedBy: <a href="#serve-command-verification">Serve Command Verification</a></li>
+</ul>
+<hr />
+
+        </div>
+    </div>
+</body>
+</html>

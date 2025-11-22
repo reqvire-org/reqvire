@@ -30,12 +30,15 @@ Execute all generation commands treating temporary directory as repository root:
 - Accept `--output` option (default: 'html')
 - Create output folder if not existing
 - Copy generated HTML and all artifacts from temp directory to output directory
-- Add .gitignore file to output directory ignoring all files except itself
 - Clean up temporary working directory
 
 **Source Protection:**
 - Never modify original repository files
 - All generation happens in isolated temporary directory
+
+**Git Directory Exclusion:**
+- The .git directory shall never be exported to the output folder
+- This prevents internal git metadata from polluting the exported documentation
 
 **Export Related System Elements:**
 - Ensure that any related system elements are also copied into output folder to ensure consistency of exported model
@@ -81,6 +84,7 @@ The system shall design and implement HTML pages with consistent layout, styling
   * satisfiedBy: [index_generator.rs](../../core/src/index_generator.rs)
   * satisfiedBy: [base.html](../../core/templates/base.html)
   * satisfiedBy: [model.html](../../core/templates/model.html)
+  * satisfiedBy: [export.rs](../../core/src/export.rs)
   * verifiedBy: [HTML Export Verification](#html-export-verification)
 ---
 
@@ -115,6 +119,7 @@ This test verifies that the system exports specifications into HTML format with 
 - Mermaid click links are properly converted from .md to .html
 - Both GitHub-style URLs and direct file paths in mermaid click links are handled correctly
 - Paths should not have duplicated folder names (e.g., specifications/specifications)
+- The .git directory is not present in export output
 
 #### Metadata
   * type: test-verification

@@ -1,0 +1,1937 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ElementManipulation</title>
+    
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa;
+    color: #333;
+}
+.reqvire-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    background-color: #2c3e50;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+}
+.reqvire-nav a {
+    color: #ecf0f1;
+    text-decoration: none;
+    padding: 10px 20px;
+    margin-right: 5px;
+    border-radius: 3px;
+    transition: background-color 0.2s;
+}
+.reqvire-nav a:hover {
+    background-color: #34495e;
+}
+.reqvire-nav-spacer {
+    height: 50px;
+}
+.container {
+    max-width: 95%;
+    margin: 0 auto;
+    padding: 20px;
+}
+.content {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+h1 {
+    color: #333;
+    border-bottom: 2px solid #eaecef;
+    padding-bottom: 10px;
+    margin-top: 0;
+}
+h2 {
+    color: #333;
+    border-bottom: 1px solid #eaecef;
+    padding-bottom: 5px;
+}
+h3 {
+    color: #1a6fb7;
+    margin-top: 25px;
+}
+h4 {
+    color: #555;
+    font-weight: 600;
+}
+a {
+    color: #0366d6;
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 20px 0;
+}
+table, th, td {
+    border: 1px solid #dfe2e5;
+}
+th, td {
+    padding: 8px 12px;
+    text-align: left;
+}
+th {
+    background-color: #f6f8fa;
+}
+code {
+    background: #f6f8fa;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 90%;
+}
+pre {
+    background: #f6f8fa;
+    border-radius: 3px;
+    padding: 16px;
+    overflow: auto;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+}
+blockquote {
+    margin: 0;
+    padding: 0 15px;
+    color: #777;
+    border-left: 4px solid #dfe2e5;
+}
+.mermaid {
+    margin: 20px 0;
+    text-align: center;
+    height: calc(100vh - 150px);
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid #dfe2e5;
+    border-radius: 3px;
+    background-color: #fafafa;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+.mermaid svg {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    position: relative;
+    z-index: 1;
+}
+.diagram-nav-buttons {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 999; /* higher than SVG (1) but lower than header nav (1000) */
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 5px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+.diagram-nav-row {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+}
+.diagram-nav-btn {
+    width: 32px;
+    height: 32px;
+    background-color: #2c3e50;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.diagram-nav-btn:hover {
+    background-color: #34495e;
+}
+.diagram-nav-btn:active {
+    background-color: #1a252f;
+}
+</style>
+
+    <!-- Enhanced mermaid configuration for Reqvire diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.5.0/dist/svg-pan-zoom.min.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+        import elkLayouts from 'https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk/dist/mermaid-layout-elk.esm.min.mjs';
+
+        // Register ELK layout for large diagrams
+        mermaid.registerLayoutLoaders(elkLayouts);
+
+        // Capture Mermaid errors
+        mermaid.parseError = function(err, hash) {
+            console.error('Mermaid Parse Error:', err);
+            console.error('Error details:', {
+                str: err.str,
+                hash: err.hash,
+                message: err.message,
+                stack: err.stack
+            });
+        };
+
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            maxTextSize: 5000000,
+            maxEdges: 50000,
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis',
+                defaultRenderer: 'elk'
+            },
+            layout: 'elk',
+            elk: {
+                mergeEdges: true,
+                nodePlacementStrategy: 'SIMPLE'
+            },
+            securityLevel: 'loose',
+            logLevel: 'error'
+        });
+
+        await mermaid.run();
+        window.mermaid = mermaid;
+
+        // Add pan/zoom to all Mermaid diagrams after rendering
+        setTimeout(function() {
+            document.querySelectorAll('.mermaid').forEach(function(mermaidContainer) {
+                    var svg = mermaidContainer.querySelector('svg');
+                    if (!svg) return;
+
+                    svg.style.maxWidth = 'none';
+                    svg.style.maxHeight = 'none';
+
+                    var eventsHandler = {
+                        haltEventListeners: ['touchstart', 'touchend', 'touchmove', 'touchleave', 'touchcancel'],
+                        init: function(options) {
+                            var instance = options.instance;
+                            var initialScale = 1;
+                            var pannedX = 0;
+                            var pannedY = 0;
+
+                            this.hammer = Hammer(options.svgElement, {
+                                inputClass: Hammer.SUPPORT_POINTER_EVENTS ? Hammer.PointerEventInput : Hammer.TouchInput
+                            });
+
+                            this.hammer.get('pinch').set({enable: true});
+
+                            this.hammer.on('doubletap', function(ev){
+                                instance.zoomIn();
+                            });
+
+                            this.hammer.on('panstart panmove', function(ev){
+                                if (ev.type === 'panstart') {
+                                    pannedX = 0;
+                                    pannedY = 0;
+                                }
+                                instance.panBy({x: ev.deltaX - pannedX, y: ev.deltaY - pannedY});
+                                pannedX = ev.deltaX;
+                                pannedY = ev.deltaY;
+                            });
+
+                            this.hammer.on('pinchstart pinchmove', function(ev){
+                                if (ev.type === 'pinchstart') {
+                                    initialScale = instance.getZoom();
+                                }
+                                instance.zoomAtPoint(initialScale * ev.scale, {x: ev.center.x, y: ev.center.y});
+                            });
+
+                            options.svgElement.addEventListener('touchmove', function(e){ e.preventDefault(); });
+                        },
+                        destroy: function(){
+                            this.hammer.destroy();
+                        }
+                    };
+
+                    // Diagrams with default zoom (no auto-fit)
+                    var panZoomInstance = svgPanZoom(svg, {
+                        zoomEnabled: true,
+                        controlIconsEnabled: true,
+                        fit: false,
+                        center: false,
+                        contain: false,
+                        minZoom: 0.5,
+                        maxZoom: 10,
+                        zoomScaleSensitivity: 0.3,
+                        customEventsHandler: eventsHandler
+                    });
+
+                    // Add navigation buttons
+                    var navButtons = document.createElement('div');
+                    navButtons.className = 'diagram-nav-buttons';
+                    navButtons.innerHTML = `
+                        <div class="diagram-nav-row">
+                            <button class="diagram-nav-btn" data-action="up">▲</button>
+                        </div>
+                        <div class="diagram-nav-row">
+                            <button class="diagram-nav-btn" data-action="left">◀</button>
+                            <button class="diagram-nav-btn" data-action="down">▼</button>
+                            <button class="diagram-nav-btn" data-action="right">▶</button>
+                        </div>
+                    `;
+                    mermaidContainer.appendChild(navButtons);
+
+                    // Wire up navigation buttons
+                    var panStep = 100;
+                    navButtons.querySelectorAll('.diagram-nav-btn').forEach(function(btn) {
+                        btn.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            var action = this.getAttribute('data-action');
+                            switch(action) {
+                                case 'up':
+                                    panZoomInstance.panBy({x: 0, y: panStep});
+                                    break;
+                                case 'down':
+                                    panZoomInstance.panBy({x: 0, y: -panStep});
+                                    break;
+                                case 'left':
+                                    panZoomInstance.panBy({x: panStep, y: 0});
+                                    break;
+                                case 'right':
+                                    panZoomInstance.panBy({x: -panStep, y: 0});
+                                    break;
+                            }
+                        });
+                    });
+            });
+        }, 500);
+
+        // Add CSS for edge highlighting (high specificity for SVG)
+        var style = document.createElement('style');
+        style.textContent = `
+            path.edge-highlighted,
+            .edge-highlighted path,
+            svg path.edge-highlighted {
+                stroke: #ff6b6b !important;
+                stroke-width: 3px !important;
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Add edge highlighting on node hover
+        setTimeout(function() {
+            document.querySelectorAll('.mermaid svg').forEach(function(svg) {
+                var nodes = svg.querySelectorAll('.node');
+
+                // Find flowchart-link paths (actual edges)
+                var edgePaths = svg.querySelectorAll('path.flowchart-link');
+                // Fallback: find paths in .edges group
+                if (edgePaths.length === 0) {
+                    var edgesGroup = svg.querySelector('.edges');
+                    if (edgesGroup) {
+                        edgePaths = edgesGroup.querySelectorAll('path');
+                    }
+                }
+
+                // Get SVG point for coordinate transforms
+                var svgPoint = svg.createSVGPoint();
+
+                // Helper: transform point through element's CTM
+                function getTransformedBBox(element) {
+                    var bbox = element.getBBox();
+                    var ctm = element.getCTM();
+                    if (!ctm) return bbox;
+
+                    // Transform all four corners
+                    var corners = [
+                        {x: bbox.x, y: bbox.y},
+                        {x: bbox.x + bbox.width, y: bbox.y},
+                        {x: bbox.x, y: bbox.y + bbox.height},
+                        {x: bbox.x + bbox.width, y: bbox.y + bbox.height}
+                    ];
+
+                    var transformed = corners.map(function(c) {
+                        svgPoint.x = c.x;
+                        svgPoint.y = c.y;
+                        var tp = svgPoint.matrixTransform(ctm);
+                        return {x: tp.x, y: tp.y};
+                    });
+
+                    var minX = Math.min.apply(null, transformed.map(function(p) { return p.x; }));
+                    var maxX = Math.max.apply(null, transformed.map(function(p) { return p.x; }));
+                    var minY = Math.min.apply(null, transformed.map(function(p) { return p.y; }));
+                    var maxY = Math.max.apply(null, transformed.map(function(p) { return p.y; }));
+
+                    return {x: minX, y: minY, width: maxX - minX, height: maxY - minY};
+                }
+
+                // Helper: get all points from path
+                function getPathPoints(path) {
+                    var d = path.getAttribute('d') || '';
+                    var points = [];
+                    var ctm = path.getCTM();
+
+                    // Get M (start) point
+                    var startMatch = d.match(/M\s*([\d.-]+)[,\s]+([\d.-]+)/i);
+                    if (startMatch) {
+                        var sx = parseFloat(startMatch[1]);
+                        var sy = parseFloat(startMatch[2]);
+                        if (ctm) {
+                            svgPoint.x = sx; svgPoint.y = sy;
+                            var tp = svgPoint.matrixTransform(ctm);
+                            points.push({x: tp.x, y: tp.y});
+                        } else {
+                            points.push({x: sx, y: sy});
+                        }
+                    }
+
+                    // Get last point - find last number pair before Z or end
+                    var allNums = d.match(/[\d.-]+/g);
+                    if (allNums && allNums.length >= 2) {
+                        var ex = parseFloat(allNums[allNums.length - 2]);
+                        var ey = parseFloat(allNums[allNums.length - 1]);
+                        if (ctm) {
+                            svgPoint.x = ex; svgPoint.y = ey;
+                            var tp = svgPoint.matrixTransform(ctm);
+                            points.push({x: tp.x, y: tp.y});
+                        } else {
+                            points.push({x: ex, y: ey});
+                        }
+                    }
+
+                    return points;
+                }
+
+                // Build node bounding boxes with transforms
+                var nodeData = {};
+                nodes.forEach(function(node) {
+                    var nodeId = node.id || '';
+                    var parts = nodeId.split('-');
+                    var hashId = parts.length >= 2 ? parts[1] : nodeId;
+
+                    nodeData[hashId] = {
+                        node: node,
+                        bbox: getTransformedBBox(node)
+                    };
+                });
+
+                // Check if point is near bbox
+                function isNearBbox(pt, bbox, margin) {
+                    margin = margin || 40;
+                    return pt.x >= bbox.x - margin && pt.x <= bbox.x + bbox.width + margin &&
+                           pt.y >= bbox.y - margin && pt.y <= bbox.y + bbox.height + margin;
+                }
+
+                // Map edges to nodes
+                var nodeEdgeMap = {};
+                Object.keys(nodeData).forEach(function(hashId) {
+                    nodeEdgeMap[hashId] = [];
+                    var bbox = nodeData[hashId].bbox;
+
+                    edgePaths.forEach(function(path) {
+                        var points = getPathPoints(path);
+                        for (var i = 0; i < points.length; i++) {
+                            if (isNearBbox(points[i], bbox, 40)) {
+                                if (!nodeEdgeMap[hashId].includes(path)) {
+                                    nodeEdgeMap[hashId].push(path);
+                                }
+                                break;
+                            }
+                        }
+                    });
+                });
+
+                // Attach hover handlers
+                nodes.forEach(function(node) {
+                    var nodeId = node.id || '';
+                    var parts = nodeId.split('-');
+                    var hashId = parts.length >= 2 ? parts[1] : nodeId;
+
+                    node.style.cursor = 'pointer';
+
+                    node.addEventListener('mouseenter', function(e) {
+                        e.stopPropagation();
+                        nodes.forEach(function(n) { n.style.filter = ''; });
+                        node.style.filter = 'drop-shadow(0 0 6px #ff6b6b)';
+
+                        var connectedEdges = nodeEdgeMap[hashId] || [];
+                        connectedEdges.forEach(function(path) {
+                            path.classList.add('edge-highlighted');
+                        });
+                    });
+
+                    node.addEventListener('mouseleave', function() {
+                        node.style.filter = '';
+                        var connectedEdges = nodeEdgeMap[hashId] || [];
+                        connectedEdges.forEach(function(path) {
+                            path.classList.remove('edge-highlighted');
+                        });
+                    });
+                });
+            });
+        }, 1000);
+    </script>
+</head>
+<body>
+    <nav class="reqvire-nav">
+        <a href="../../index.html">Home</a>
+        <a href="../../containment.html">Containment</a>
+        <a href="../../model.html">Model</a>
+        <a href="../../whole-model.html">Whole Model</a>
+        <a href="../../traces.html">Traces</a>
+        <a href="../../coverage.html">Coverage</a>
+    </nav>
+    <div class="reqvire-nav-spacer"></div>
+    <div class="container">
+        <div class="content">
+            <h1 id="requirements">Requirements</h1>
+<div class="mermaid">graph LR;
+  %% REQVIRE-AUTOGENERATED-DIAGRAM
+  %% Graph styling
+  classDef userRequirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef systemRequirement fill:#fce4e4,stroke:#e68a8a,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+
+  2c686dc939f5e5c8[&quot;CLI Add Element Test&quot;];
+  class 2c686dc939f5e5c8 verification;
+  click 2c686dc939f5e5c8 &quot;ElementManipulation.html#cli-add-element-test&quot;;
+  e0536c36e7700661[&quot;test.sh&quot;];
+  class e0536c36e7700661 default;
+  click e0536c36e7700661 &quot;../../tests/test-crud-manipulation/test.sh&quot;;
+  2c686dc939f5e5c8 -->|satisfiedBy| e0536c36e7700661;
+  48206a12925753fe[&quot;CLI Move Element Test&quot;];
+  class 48206a12925753fe verification;
+  click 48206a12925753fe &quot;ElementManipulation.html#cli-move-element-test&quot;;
+  e0536c36e7700661[&quot;test.sh&quot;];
+  class e0536c36e7700661 default;
+  click e0536c36e7700661 &quot;../../tests/test-crud-manipulation/test.sh&quot;;
+  48206a12925753fe -->|satisfiedBy| e0536c36e7700661;
+  f8b8eb56f941a697[&quot;CLI Move File Test&quot;];
+  class f8b8eb56f941a697 verification;
+  click f8b8eb56f941a697 &quot;ElementManipulation.html#cli-move-file-test&quot;;
+  e0536c36e7700661[&quot;test.sh&quot;];
+  class e0536c36e7700661 default;
+  click e0536c36e7700661 &quot;../../tests/test-crud-manipulation/test.sh&quot;;
+  f8b8eb56f941a697 -->|satisfiedBy| e0536c36e7700661;
+  a565a00c1df16a79[&quot;test.sh&quot;];
+  class a565a00c1df16a79 default;
+  click a565a00c1df16a79 &quot;../../tests/test-subdirectory-functionality/test.sh&quot;;
+  f8b8eb56f941a697 -->|satisfiedBy| a565a00c1df16a79;
+  839c6dca90d0b83b[&quot;CLI Remove Element Test&quot;];
+  class 839c6dca90d0b83b verification;
+  click 839c6dca90d0b83b &quot;ElementManipulation.html#cli-remove-element-test&quot;;
+  e0536c36e7700661[&quot;test.sh&quot;];
+  class e0536c36e7700661 default;
+  click e0536c36e7700661 &quot;../../tests/test-crud-manipulation/test.sh&quot;;
+  839c6dca90d0b83b -->|satisfiedBy| e0536c36e7700661;
+  94178a26b5d5bb02[&quot;CLI Rename Element Test&quot;];
+  class 94178a26b5d5bb02 verification;
+  click 94178a26b5d5bb02 &quot;ElementManipulation.html#cli-rename-element-test&quot;;
+  e0536c36e7700661[&quot;test.sh&quot;];
+  class e0536c36e7700661 default;
+  click e0536c36e7700661 &quot;../../tests/test-crud-manipulation/test.sh&quot;;
+  94178a26b5d5bb02 -->|satisfiedBy| e0536c36e7700661;
+  39b03efc9e2074f5[&quot;Create Element Operation&quot;];
+  class 39b03efc9e2074f5 systemRequirement;
+  click 39b03efc9e2074f5 &quot;ElementManipulation.html#create-element-operation&quot;;
+  d6a8d0b0ef89a349[&quot;CLI Add Element Command&quot;];
+  class d6a8d0b0ef89a349 systemRequirement;
+  click d6a8d0b0ef89a349 &quot;../Interfaces/CLI.html#cli-add-element-command&quot;;
+  39b03efc9e2074f5 -.->|deriveReqT| d6a8d0b0ef89a349;
+  80defdd4cbc7ee18[&quot;cli.rs&quot;];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 &quot;../../cli/src/cli.rs&quot;;
+  39b03efc9e2074f5 -->|satisfiedBy| 80defdd4cbc7ee18;
+  ea4ba0d9ffba93a5[&quot;crud.rs&quot;];
+  class ea4ba0d9ffba93a5 default;
+  click ea4ba0d9ffba93a5 &quot;../../core/src/crud.rs&quot;;
+  39b03efc9e2074f5 -->|satisfiedBy| ea4ba0d9ffba93a5;
+  e69395f926bba6a5[&quot;diff.rs&quot;];
+  class e69395f926bba6a5 default;
+  click e69395f926bba6a5 &quot;../../core/src/diff.rs&quot;;
+  39b03efc9e2074f5 -->|satisfiedBy| e69395f926bba6a5;
+  b7c871ab64a7059a[&quot;graph_registry.rs&quot;];
+  class b7c871ab64a7059a default;
+  click b7c871ab64a7059a &quot;../../core/src/graph_registry.rs&quot;;
+  39b03efc9e2074f5 -->|satisfiedBy| b7c871ab64a7059a;
+  f22d93285fcd7664[&quot;parser.rs&quot;];
+  class f22d93285fcd7664 default;
+  click f22d93285fcd7664 &quot;../../core/src/parser.rs&quot;;
+  39b03efc9e2074f5 -->|satisfiedBy| f22d93285fcd7664;
+  ce2625feec883e55[&quot;utils.rs&quot;];
+  class ce2625feec883e55 default;
+  click ce2625feec883e55 &quot;../../core/src/utils.rs&quot;;
+  39b03efc9e2074f5 -->|satisfiedBy| ce2625feec883e55;
+  536b2416710a3312[&quot;Create Element Test&quot;];
+  class 536b2416710a3312 verification;
+  click 536b2416710a3312 &quot;ElementManipulation.html#create-element-test&quot;;
+  39b03efc9e2074f5 -.->|verifiedBy| 536b2416710a3312;
+  e0536c36e7700661[&quot;test.sh&quot;];
+  class e0536c36e7700661 default;
+  click e0536c36e7700661 &quot;../../tests/test-crud-manipulation/test.sh&quot;;
+  536b2416710a3312 -->|satisfiedBy| e0536c36e7700661;
+  732965664f6f3888[&quot;Delete Element Operation&quot;];
+  class 732965664f6f3888 systemRequirement;
+  click 732965664f6f3888 &quot;ElementManipulation.html#delete-element-operation&quot;;
+  dc747a38a6fa7319[&quot;CLI Remove Element Command&quot;];
+  class dc747a38a6fa7319 systemRequirement;
+  click dc747a38a6fa7319 &quot;../Interfaces/CLI.html#cli-remove-element-command&quot;;
+  732965664f6f3888 -.->|deriveReqT| dc747a38a6fa7319;
+  80defdd4cbc7ee18[&quot;cli.rs&quot;];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 &quot;../../cli/src/cli.rs&quot;;
+  732965664f6f3888 -->|satisfiedBy| 80defdd4cbc7ee18;
+  ea4ba0d9ffba93a5[&quot;crud.rs&quot;];
+  class ea4ba0d9ffba93a5 default;
+  click ea4ba0d9ffba93a5 &quot;../../core/src/crud.rs&quot;;
+  732965664f6f3888 -->|satisfiedBy| ea4ba0d9ffba93a5;
+  e69395f926bba6a5[&quot;diff.rs&quot;];
+  class e69395f926bba6a5 default;
+  click e69395f926bba6a5 &quot;../../core/src/diff.rs&quot;;
+  732965664f6f3888 -->|satisfiedBy| e69395f926bba6a5;
+  b7c871ab64a7059a[&quot;graph_registry.rs&quot;];
+  class b7c871ab64a7059a default;
+  click b7c871ab64a7059a &quot;../../core/src/graph_registry.rs&quot;;
+  732965664f6f3888 -->|satisfiedBy| b7c871ab64a7059a;
+  861fc6a32bf8e8b0[&quot;Delete Element Test&quot;];
+  class 861fc6a32bf8e8b0 verification;
+  click 861fc6a32bf8e8b0 &quot;ElementManipulation.html#delete-element-test&quot;;
+  732965664f6f3888 -.->|verifiedBy| 861fc6a32bf8e8b0;
+  e0536c36e7700661[&quot;test.sh&quot;];
+  class e0536c36e7700661 default;
+  click e0536c36e7700661 &quot;../../tests/test-crud-manipulation/test.sh&quot;;
+  861fc6a32bf8e8b0 -->|satisfiedBy| e0536c36e7700661;
+  a8be62c9929ecba6[&quot;Element Manipulation File Persistence&quot;];
+  class a8be62c9929ecba6 systemRequirement;
+  click a8be62c9929ecba6 &quot;ElementManipulation.html#element-manipulation-file-persistence&quot;;
+  a8be62c9929ecba6 -.->|deriveReqT| 39b03efc9e2074f5;
+  a8be62c9929ecba6 -.->|deriveReqT| 732965664f6f3888;
+  4710e82a69e1246f[&quot;Move Element Operation&quot;];
+  class 4710e82a69e1246f systemRequirement;
+  click 4710e82a69e1246f &quot;ElementManipulation.html#move-element-operation&quot;;
+  a8be62c9929ecba6 -.->|deriveReqT| 4710e82a69e1246f;
+  67cb6a2fa0f7b927[&quot;Move File Operation&quot;];
+  class 67cb6a2fa0f7b927 systemRequirement;
+  click 67cb6a2fa0f7b927 &quot;ElementManipulation.html#move-file-operation&quot;;
+  a8be62c9929ecba6 -.->|deriveReqT| 67cb6a2fa0f7b927;
+  eaf9a98cbcf98dfe[&quot;Rename Element Operation&quot;];
+  class eaf9a98cbcf98dfe systemRequirement;
+  click eaf9a98cbcf98dfe &quot;ElementManipulation.html#rename-element-operation&quot;;
+  a8be62c9929ecba6 -.->|deriveReqT| eaf9a98cbcf98dfe;
+  ea4ba0d9ffba93a5[&quot;crud.rs&quot;];
+  class ea4ba0d9ffba93a5 default;
+  click ea4ba0d9ffba93a5 &quot;../../core/src/crud.rs&quot;;
+  a8be62c9929ecba6 -->|satisfiedBy| ea4ba0d9ffba93a5;
+  b7c871ab64a7059a[&quot;graph_registry.rs&quot;];
+  class b7c871ab64a7059a default;
+  click b7c871ab64a7059a &quot;../../core/src/graph_registry.rs&quot;;
+  a8be62c9929ecba6 -->|satisfiedBy| b7c871ab64a7059a;
+  b97768ae6ae1b844[&quot;File Persistence Test&quot;];
+  class b97768ae6ae1b844 verification;
+  click b97768ae6ae1b844 &quot;ElementManipulation.html#file-persistence-test&quot;;
+  a8be62c9929ecba6 -.->|verifiedBy| b97768ae6ae1b844;
+  ed4c8791300dc55[&quot;test.sh&quot;];
+  class ed4c8791300dc55 default;
+  click ed4c8791300dc55 &quot;../../tests/test-crud-file-persistence/test.sh&quot;;
+  b97768ae6ae1b844 -->|satisfiedBy| ed4c8791300dc55;
+  2ea9a1b3289a7961[&quot;CLI Move Element Command&quot;];
+  class 2ea9a1b3289a7961 systemRequirement;
+  click 2ea9a1b3289a7961 &quot;../Interfaces/CLI.html#cli-move-element-command&quot;;
+  4710e82a69e1246f -.->|deriveReqT| 2ea9a1b3289a7961;
+  80defdd4cbc7ee18[&quot;cli.rs&quot;];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 &quot;../../cli/src/cli.rs&quot;;
+  4710e82a69e1246f -->|satisfiedBy| 80defdd4cbc7ee18;
+  ea4ba0d9ffba93a5[&quot;crud.rs&quot;];
+  class ea4ba0d9ffba93a5 default;
+  click ea4ba0d9ffba93a5 &quot;../../core/src/crud.rs&quot;;
+  4710e82a69e1246f -->|satisfiedBy| ea4ba0d9ffba93a5;
+  e69395f926bba6a5[&quot;diff.rs&quot;];
+  class e69395f926bba6a5 default;
+  click e69395f926bba6a5 &quot;../../core/src/diff.rs&quot;;
+  4710e82a69e1246f -->|satisfiedBy| e69395f926bba6a5;
+  b7c871ab64a7059a[&quot;graph_registry.rs&quot;];
+  class b7c871ab64a7059a default;
+  click b7c871ab64a7059a &quot;../../core/src/graph_registry.rs&quot;;
+  4710e82a69e1246f -->|satisfiedBy| b7c871ab64a7059a;
+  15dd27c62fb2fa32[&quot;Move Element Test&quot;];
+  class 15dd27c62fb2fa32 verification;
+  click 15dd27c62fb2fa32 &quot;ElementManipulation.html#move-element-test&quot;;
+  4710e82a69e1246f -.->|verifiedBy| 15dd27c62fb2fa32;
+  47784e5a5c634123[&quot;test.sh&quot;];
+  class 47784e5a5c634123 default;
+  click 47784e5a5c634123 &quot;../../tests/test-crud-empty-file-cleanup/test.sh&quot;;
+  15dd27c62fb2fa32 -->|satisfiedBy| 47784e5a5c634123;
+  e0536c36e7700661[&quot;test.sh&quot;];
+  class e0536c36e7700661 default;
+  click e0536c36e7700661 &quot;../../tests/test-crud-manipulation/test.sh&quot;;
+  15dd27c62fb2fa32 -->|satisfiedBy| e0536c36e7700661;
+  e090ad559abc31b0[&quot;CLI Move File Command&quot;];
+  class e090ad559abc31b0 systemRequirement;
+  click e090ad559abc31b0 &quot;../Interfaces/CLI.html#cli-move-file-command&quot;;
+  67cb6a2fa0f7b927 -.->|deriveReqT| e090ad559abc31b0;
+  81039f528f015e75[&quot;Move File Squash Test&quot;];
+  class 81039f528f015e75 verification;
+  click 81039f528f015e75 &quot;ElementManipulation.html#move-file-squash-test&quot;;
+  67cb6a2fa0f7b927 -.->|verifiedBy| 81039f528f015e75;
+  53d96c0e15013013[&quot;test.sh&quot;];
+  class 53d96c0e15013013 default;
+  click 53d96c0e15013013 &quot;../../tests/test-crud-mv-file-squash/test.sh&quot;;
+  81039f528f015e75 -->|satisfiedBy| 53d96c0e15013013;
+  79981da8cf61470b[&quot;Relation Consistency Maintenance&quot;];
+  class 79981da8cf61470b systemRequirement;
+  click 79981da8cf61470b &quot;ElementManipulation.html#relation-consistency-maintenance&quot;;
+  b7c871ab64a7059a[&quot;graph_registry.rs&quot;];
+  class b7c871ab64a7059a default;
+  click b7c871ab64a7059a &quot;../../core/src/graph_registry.rs&quot;;
+  79981da8cf61470b -->|satisfiedBy| b7c871ab64a7059a;
+  858ce9a278233aac[&quot;Relation Consistency Test&quot;];
+  class 858ce9a278233aac verification;
+  click 858ce9a278233aac &quot;ElementManipulation.html#relation-consistency-test&quot;;
+  79981da8cf61470b -.->|verifiedBy| 858ce9a278233aac;
+  34577630f675428e[&quot;test.sh&quot;];
+  class 34577630f675428e default;
+  click 34577630f675428e &quot;../../tests/test-crud-relation-consistency/test.sh&quot;;
+  858ce9a278233aac -->|satisfiedBy| 34577630f675428e;
+  3814555dac6871e9[&quot;CLI Rename Element Command&quot;];
+  class 3814555dac6871e9 systemRequirement;
+  click 3814555dac6871e9 &quot;../Interfaces/CLI.html#cli-rename-element-command&quot;;
+  eaf9a98cbcf98dfe -.->|deriveReqT| 3814555dac6871e9;
+  ea4ba0d9ffba93a5[&quot;crud.rs&quot;];
+  class ea4ba0d9ffba93a5 default;
+  click ea4ba0d9ffba93a5 &quot;../../core/src/crud.rs&quot;;
+  eaf9a98cbcf98dfe -->|satisfiedBy| ea4ba0d9ffba93a5;
+  e69395f926bba6a5[&quot;diff.rs&quot;];
+  class e69395f926bba6a5 default;
+  click e69395f926bba6a5 &quot;../../core/src/diff.rs&quot;;
+  eaf9a98cbcf98dfe -->|satisfiedBy| e69395f926bba6a5;
+  b7c871ab64a7059a[&quot;graph_registry.rs&quot;];
+  class b7c871ab64a7059a default;
+  click b7c871ab64a7059a &quot;../../core/src/graph_registry.rs&quot;;
+  eaf9a98cbcf98dfe -->|satisfiedBy| b7c871ab64a7059a;
+  aabdd633a10c716b[&quot;Target Location Validation and Auto-Creation&quot;];
+  class aabdd633a10c716b systemRequirement;
+  click aabdd633a10c716b &quot;ElementManipulation.html#target-location-validation-and-auto-creation&quot;;
+  aabdd633a10c716b -.->|deriveReqT| 39b03efc9e2074f5;
+  aabdd633a10c716b -.->|deriveReqT| 4710e82a69e1246f;
+  aabdd633a10c716b -.->|deriveReqT| 67cb6a2fa0f7b927;
+  b7c871ab64a7059a[&quot;graph_registry.rs&quot;];
+  class b7c871ab64a7059a default;
+  click b7c871ab64a7059a &quot;../../core/src/graph_registry.rs&quot;;
+  aabdd633a10c716b -->|satisfiedBy| b7c871ab64a7059a;
+  ce2625feec883e55[&quot;utils.rs&quot;];
+  class ce2625feec883e55 default;
+  click ce2625feec883e55 &quot;../../core/src/utils.rs&quot;;
+  aabdd633a10c716b -->|satisfiedBy| ce2625feec883e55;
+  77a97ab498b10a77[&quot;Target Location Validation Test&quot;];
+  class 77a97ab498b10a77 verification;
+  click 77a97ab498b10a77 &quot;ElementManipulation.html#target-location-validation-test&quot;;
+  aabdd633a10c716b -.->|verifiedBy| 77a97ab498b10a77;
+  fe344320c82b0bbf[&quot;test.sh&quot;];
+  class fe344320c82b0bbf default;
+  click fe344320c82b0bbf &quot;../../tests/test-crud-target-location-validation/test.sh&quot;;
+  77a97ab498b10a77 -->|satisfiedBy| fe344320c82b0bbf;
+  80defdd4cbc7ee18[&quot;cli.rs&quot;];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 &quot;../../cli/src/cli.rs&quot;;
+  d6a8d0b0ef89a349 -->|satisfiedBy| 80defdd4cbc7ee18;
+  d6a8d0b0ef89a349 -.->|verifiedBy| 2c686dc939f5e5c8;
+  80defdd4cbc7ee18[&quot;cli.rs&quot;];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 &quot;../../cli/src/cli.rs&quot;;
+  2ea9a1b3289a7961 -->|satisfiedBy| 80defdd4cbc7ee18;
+  2ea9a1b3289a7961 -.->|verifiedBy| 48206a12925753fe;
+  33f73ad674ea5b88[&quot;Subdirectory Processing Verification&quot;];
+  class 33f73ad674ea5b88 verification;
+  click 33f73ad674ea5b88 &quot;Validation.html#subdirectory-processing-verification&quot;;
+  2ea9a1b3289a7961 -.->|verifiedBy| 33f73ad674ea5b88;
+  e090ad559abc31b0 -.->|verifiedBy| f8b8eb56f941a697;
+  e090ad559abc31b0 -.->|verifiedBy| 33f73ad674ea5b88;
+  80defdd4cbc7ee18[&quot;cli.rs&quot;];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 &quot;../../cli/src/cli.rs&quot;;
+  dc747a38a6fa7319 -->|satisfiedBy| 80defdd4cbc7ee18;
+  dc747a38a6fa7319 -.->|verifiedBy| 839c6dca90d0b83b;
+  80defdd4cbc7ee18[&quot;cli.rs&quot;];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 &quot;../../cli/src/cli.rs&quot;;
+  3814555dac6871e9 -->|satisfiedBy| 80defdd4cbc7ee18;
+  3814555dac6871e9 -.->|verifiedBy| 94178a26b5d5bb02;
+  51f6a669348ab400[&quot;Ignore Files Integration&quot;];
+  class 51f6a669348ab400 systemRequirement;
+  click 51f6a669348ab400 &quot;Configuration.html#ignore-files-integration&quot;;
+  51f6a669348ab400 -.->|deriveReqT| aabdd633a10c716b;
+  8419dcc77d92b609[&quot;config.rs&quot;];
+  class 8419dcc77d92b609 default;
+  click 8419dcc77d92b609 &quot;../../cli/src/config.rs&quot;;
+  51f6a669348ab400 -->|satisfiedBy| 8419dcc77d92b609;
+  2410cac865bec586[&quot;File Exclusion Test&quot;];
+  class 2410cac865bec586 verification;
+  click 2410cac865bec586 &quot;Validation.html#file-exclusion-test&quot;;
+  51f6a669348ab400 -.->|verifiedBy| 2410cac865bec586;
+  8653ca8c1766105d[&quot;Element Manipulation Operations&quot;];
+  class 8653ca8c1766105d userRequirement;
+  click 8653ca8c1766105d &quot;ModelManagement.html#element-manipulation-operations&quot;;
+  8653ca8c1766105d -.->|deriveReqT| a8be62c9929ecba6;
+  8653ca8c1766105d -.->|deriveReqT| 79981da8cf61470b;
+  8653ca8c1766105d -.->|deriveReqT| aabdd633a10c716b;
+  674b333d552bcab0[&quot;Git Repository as Project Root&quot;];
+  class 674b333d552bcab0 userRequirement;
+  click 674b333d552bcab0 &quot;ModelManagement.html#git-repository-as-project-root&quot;;
+  4fd92091a4cfac13[&quot;Subdirectory Processing Option&quot;];
+  class 4fd92091a4cfac13 systemRequirement;
+  click 4fd92091a4cfac13 &quot;../Interfaces/CLI.html#subdirectory-processing-option&quot;;
+  674b333d552bcab0 -.->|deriveReqT| 4fd92091a4cfac13;
+  674b333d552bcab0 -.->|deriveReqT| aabdd633a10c716b;
+  9da2c9df563c07bb[&quot;Structure and Addressing in Markdown Documents&quot;];
+  class 9da2c9df563c07bb systemRequirement;
+  click 9da2c9df563c07bb &quot;StructureAndParsing.html#structure-and-addressing-in-markdown-documents&quot;;
+  9da2c9df563c07bb -.->|deriveReqT| 39b03efc9e2074f5;
+  af98a411c9028161[&quot;Element Identity Model&quot;];
+  class af98a411c9028161 systemRequirement;
+  click af98a411c9028161 &quot;StructureAndParsing.html#element-identity-model&quot;;
+  9da2c9df563c07bb -.->|deriveReqT| af98a411c9028161;
+  1d0bfcae44a9063[&quot;Reserved Subsections Support&quot;];
+  class 1d0bfcae44a9063 systemRequirement;
+  click 1d0bfcae44a9063 &quot;Subsections.html#reserved-subsections-support&quot;;
+  9da2c9df563c07bb -.->|deriveReqT| 1d0bfcae44a9063;
+  a814c4935e1a0449[&quot;element.rs&quot;];
+  class a814c4935e1a0449 default;
+  click a814c4935e1a0449 &quot;../../core/src/element.rs&quot;;
+  9da2c9df563c07bb -->|satisfiedBy| a814c4935e1a0449;
+  d50a859650933e55[&quot;model.rs&quot;];
+  class d50a859650933e55 default;
+  click d50a859650933e55 &quot;../../core/src/model.rs&quot;;
+  9da2c9df563c07bb -->|satisfiedBy| d50a859650933e55;
+  f22d93285fcd7664[&quot;parser.rs&quot;];
+  class f22d93285fcd7664 default;
+  click f22d93285fcd7664 &quot;../../core/src/parser.rs&quot;;
+  9da2c9df563c07bb -->|satisfiedBy| f22d93285fcd7664;
+  9450d4313f47ef36[&quot;relation.rs&quot;];
+  class 9450d4313f47ef36 default;
+  click 9450d4313f47ef36 &quot;../../core/src/relation.rs&quot;;
+  9da2c9df563c07bb -->|satisfiedBy| 9450d4313f47ef36;
+  398003c91b6b2cde[&quot;subsection.rs&quot;];
+  class 398003c91b6b2cde default;
+  click 398003c91b6b2cde &quot;../../core/src/subsection.rs&quot;;
+  9da2c9df563c07bb -->|satisfiedBy| 398003c91b6b2cde;
+  11434b30ee3de97b[&quot;Format Command Requirements Verification&quot;];
+  class 11434b30ee3de97b verification;
+  click 11434b30ee3de97b &quot;Formatting.html#format-command-requirements-verification&quot;;
+  9da2c9df563c07bb -.->|verifiedBy| 11434b30ee3de97b;
+  2fc995cfff6720de[&quot;Invalid Header Structure Test&quot;];
+  class 2fc995cfff6720de verification;
+  click 2fc995cfff6720de &quot;Validation.html#invalid-header-structure-test&quot;;
+  9da2c9df563c07bb -.->|verifiedBy| 2fc995cfff6720de;
+</div>
+<h3 id="file-persistence-test">File Persistence Test</h3>
+<p>The test shall verify that element manipulation operations are persisted to source files in storage and that only modified files are flushed.</p>
+<h4>Details</h4>
+<p><strong>Test Setup:</strong></p>
+<ul>
+<li>Create a test model with multiple files and elements</li>
+<li>Record initial file timestamps and content</li>
+<li>Prepare element manipulation operations that affect specific files</li>
+</ul>
+<p><strong>Test Steps:</strong></p>
+<ol>
+<li>Perform element manipulation operation (create/delete/move)</li>
+<li>Verify that modified files are written to disk</li>
+<li>Verify that file content on disk matches the in-memory model state</li>
+<li>Verify that only files affected by the operation were rewritten</li>
+<li>Verify that unmodified files remain unchanged (check timestamps)</li>
+<li>Read files from disk and parse to confirm changes persisted</li>
+<li>Test file I/O error handling (simulate write failures)</li>
+</ol>
+<p><strong>Success Criteria:</strong></p>
+<ul>
+<li>All changes are persisted to disk after manipulation completes</li>
+<li>File content on disk matches in-memory model state exactly</li>
+<li>Only modified files are written (optimization verified)</li>
+<li>Unmodified files have unchanged timestamps</li>
+<li>File format and structure are maintained</li>
+<li>Errors are handled gracefully with appropriate reporting</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="#element-manipulation-file-persistence">Element Manipulation File Persistence</a></li>
+<li>satisfiedBy: <a href="../../tests/test-crud-file-persistence/test.sh">test.sh</a></li>
+</ul>
+<hr />
+<h3 id="element-manipulation-file-persistence">Element Manipulation File Persistence</h3>
+<p>The system shall persist all element manipulation operations to the source files in storage, synchronizing changes from the in-memory model to the file system to ensure data durability.</p>
+<h4>Details</h4>
+<p>When element manipulation operations are performed, the system shall:</p>
+<ul>
+<li>Track which files have been modified during manipulation operations</li>
+<li>Flush modified files to storage after manipulation operations complete</li>
+<li>Update only the files that were actually modified (optimization)</li>
+<li>Ensure file content on disk reflects the current state of the in-memory model</li>
+<li>Maintain file format and structure during write operations</li>
+<li>Handle file I/O errors gracefully with appropriate error reporting</li>
+</ul>
+<p><strong>Optimization Strategy:</strong></p>
+<ul>
+<li>The system may maintain a list of modified files during manipulation operations</li>
+<li>Only files marked as modified need to be written to storage</li>
+<li>Unmodified files shall not be rewritten to avoid unnecessary I/O operations</li>
+</ul>
+<p><strong>Synchronization Guarantee:</strong></p>
+<ul>
+<li>After a manipulation operation completes successfully, all changes shall be persisted to disk</li>
+<li>The on-disk representation shall match the in-memory model state</li>
+<li>No changes shall be lost due to lack of persistence</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="ModelManagement.html#element-manipulation-operations">Element Manipulation Operations</a></li>
+<li>satisfiedBy: <a href="../../core/src/graph_registry.rs">graph_registry.rs</a></li>
+<li>satisfiedBy: <a href="../../core/src/crud.rs">crud.rs</a></li>
+</ul>
+<hr />
+<h3 id="target-location-validation-test">Target Location Validation Test</h3>
+<p>The test shall verify that target file path validation and auto-creation work correctly, enforcing safety constraints for gitignore, reqvireignore, and path depth limits.</p>
+<h4>Details</h4>
+<p><strong>Test Setup:</strong></p>
+<ul>
+<li>Create <code>.gitignore</code> with exclusion patterns (e.g., <code>**/build/**</code>, <code>temp-*.md</code>)</li>
+<li>Create <code>.reqvireignore</code> with exclusion patterns (e.g., <code>**/draft-*.md</code>)</li>
+<li>Prepare valid target paths within depth limits</li>
+<li>Prepare invalid target paths (ignored paths, excessive depth)</li>
+</ul>
+<p><strong>Test Steps - Path Validation:</strong></p>
+<ol>
+<li>Attempt to create element in path excluded by <code>.gitignore</code></li>
+<li>Verify operation is rejected with appropriate error message</li>
+<li>Attempt to create element in path excluded by <code>.reqvireignore</code></li>
+<li>Verify operation is rejected with appropriate error message</li>
+<li>Attempt to create element in path nested more than 10 subdirectories deep</li>
+<li>Verify operation is rejected with depth limit error</li>
+<li>Attempt to create element in valid path</li>
+<li>Verify operation succeeds</li>
+</ol>
+<p><strong>Test Steps - Auto-Creation:</strong></p>
+<ol>
+<li>Create element in non-existent file with valid path</li>
+<li>Verify file is created with proper structure (<code># Requirements</code> header)</li>
+<li>Verify existing file content is preserved when adding elements</li>
+</ol>
+<p><strong>Success Criteria:</strong></p>
+<ul>
+<li>Paths excluded by <code>.gitignore</code> are rejected</li>
+<li>Paths excluded by <code>.reqvireignore</code> are rejected</li>
+<li>Paths exceeding 10 subdirectory depth are rejected</li>
+<li>Error messages clearly indicate which constraint was violated</li>
+<li>Valid paths are accepted</li>
+<li>Non-existent files are created with proper structure</li>
+<li>Created files follow Reqvire markdown conventions</li>
+</ul>
+<p><strong>Test Coverage:</strong></p>
+<ul>
+<li>Gitignore pattern exclusion</li>
+<li>Reqvireignore pattern exclusion</li>
+<li>Path depth limit (exactly 10, 11, 15 subdirectories)</li>
+<li>Auto-create file</li>
+<li>Valid path variations</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="#target-location-validation-and-auto-creation">Target Location Validation and Auto-Creation</a></li>
+<li>satisfiedBy: <a href="../../tests/test-crud-target-location-validation/test.sh">test.sh</a></li>
+</ul>
+<hr />
+<h3 id="target-location-validation-and-auto-creation">Target Location Validation and Auto-Creation</h3>
+<p>The system shall validate target file paths for element manipulation operations and automatically create files when they do not exist, subject to path safety constraints.</p>
+<h4>Details</h4>
+<p>When validating and preparing target locations, the system shall:</p>
+<p><strong>Path Validation:</strong></p>
+<ul>
+<li>Verify the target file path is not excluded by <code>.gitignore</code> patterns</li>
+<li>Verify the target file path is not excluded by <code>.reqvireignore</code> patterns</li>
+<li>Verify the file path nesting depth does not exceed 10 subdirectories from the git repository root</li>
+<li>Reject operations with invalid paths and provide clear error messages</li>
+</ul>
+<p><strong>Auto-Creation:</strong></p>
+<ul>
+<li>If the target file does not exist and the path is valid, create the file with proper structure:
+<ul>
+<li>Add <code># Requirements</code> as the page header (required for specification files)</li>
+</ul>
+</li>
+<li>Ensure created files follow Reqvire markdown structure conventions</li>
+</ul>
+<p><strong>Error Handling:</strong></p>
+<ul>
+<li>Report error if path would be ignored by <code>.gitignore</code> or <code>.reqvireignore</code></li>
+<li>Report error if path nesting exceeds 10 subdirectories</li>
+<li>Report error if file path is invalid or inaccessible</li>
+<li>Provide specific error message indicating which constraint was violated</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="ModelManagement.html#element-manipulation-operations">Element Manipulation Operations</a></li>
+<li>derivedFrom: <a href="Configuration.html#ignore-files-integration">Ignore Files Integration</a></li>
+<li>derivedFrom: <a href="ModelManagement.html#git-repository-as-project-root">Git Repository as Project Root</a></li>
+<li>satisfiedBy: <a href="../../core/src/utils.rs">utils.rs</a></li>
+<li>satisfiedBy: <a href="../../core/src/graph_registry.rs">graph_registry.rs</a></li>
+</ul>
+<hr />
+<h3 id="create-element-operation">Create Element Operation</h3>
+<p>The system shall provide the capability to create new model elements by accepting a full element definition string in Markdown format, validating the element structure and relations, and inserting it into the specified location if valid.</p>
+<h4>Details</h4>
+<p>When creating a new element, the system shall:</p>
+<ul>
+<li>Accept a string containing the full element definition in Markdown format (including ### header, metadata, relations, and content)</li>
+<li>Accept target location: file path</li>
+<li>Accept optional index parameter for insertion position within the file (0-based)</li>
+<li>Validate the target location using path validation rules</li>
+<li>Create target file if it does not exist (subject to validation constraints)</li>
+<li>Parse the element definition string to extract element structure</li>
+<li>Validate the element structure (proper subsections, valid relations, correct format)</li>
+<li>Verify the element name is globally unique in the model</li>
+<li>Generate a unique element identifier based on file path and element name</li>
+<li><strong>Validate and normalize all relations in the element:</strong>
+<ul>
+<li>Parse relation targets from the markdown (may be relative paths or repo-relative paths)</li>
+<li>Normalize relation targets to be relative to the git repository root</li>
+<li>Validate that each relation target element exists in the model</li>
+<li>Reject the operation if any relation target does not exist</li>
+<li>Provide clear error messages indicating which relation target was not found</li>
+</ul>
+</li>
+<li>If validation passes, insert the element into the specified file:
+<ul>
+<li>If index is provided and valid, insert at that position within the file</li>
+<li>If index is not provided or out of bounds, append to the end of the file</li>
+</ul>
+</li>
+<li>If validation fails, reject the operation and report validation errors</li>
+<li>Maintain file structure and formatting after insertion</li>
+</ul>
+<p><strong>Relation Validation Rules:</strong></p>
+<ul>
+<li>Relation targets may be specified as:
+<ul>
+<li>Relative paths from the target file location (e.g., <code>../UserReqs.md#requirement</code>)</li>
+<li>Paths relative to git repository root (e.g., <code>specifications/UserReqs.md#requirement</code>)</li>
+<li>Same-file references (e.g., <code>#other-requirement</code>)</li>
+</ul>
+</li>
+<li>All relation targets must be normalized to git repository root relative format before insertion</li>
+<li>All relation targets must reference existing elements in the model</li>
+<li>External links (http://, https://, etc.) are allowed and not validated</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#element-manipulation-file-persistence">Element Manipulation File Persistence</a></li>
+<li>derivedFrom: <a href="#target-location-validation-and-auto-creation">Target Location Validation and Auto-Creation</a></li>
+<li>derivedFrom: <a href="StructureAndParsing.html#structure-and-addressing-in-markdown-documents">Structure and Addressing in Markdown Documents</a></li>
+<li>satisfiedBy: <a href="../../core/src/parser.rs">parser.rs</a></li>
+<li>satisfiedBy: <a href="../../core/src/graph_registry.rs">graph_registry.rs</a></li>
+<li>satisfiedBy: <a href="../../core/src/crud.rs">crud.rs</a></li>
+<li>satisfiedBy: <a href="../../core/src/diff.rs">diff.rs</a></li>
+<li>satisfiedBy: <a href="../../cli/src/cli.rs">cli.rs</a></li>
+<li>satisfiedBy: <a href="../../core/src/utils.rs">utils.rs</a></li>
+</ul>
+<hr />
+<h3 id="create-element-test">Create Element Test</h3>
+<p>The test shall verify that new model elements can be created from a full Markdown definition string after validation, and that invalid element definitions are rejected with appropriate error reporting.</p>
+<h4>Details</h4>
+<p><strong>Test Setup:</strong></p>
+<ul>
+<li>Prepare a test model with existing files</li>
+<li>Prepare valid element definition strings in Markdown format (with ### header, metadata, relations, content)</li>
+<li>Prepare invalid element definition strings (malformed structure, duplicate names, invalid relations)</li>
+<li>Identify target file path</li>
+</ul>
+<p><strong>Test Steps:</strong></p>
+<ol>
+<li>Attempt to create an element with a valid definition string</li>
+<li>Verify the element was parsed correctly from the string</li>
+<li>Verify the element structure was validated (subsections, relations, format)</li>
+<li>Verify the element name was checked for global uniqueness</li>
+<li>Verify the element was inserted into the correct file</li>
+<li>Verify the element has proper Markdown structure in the file</li>
+<li>Validate the model after element creation</li>
+</ol>
+<p><strong>Test Steps for Invalid Cases:</strong></p>
+<ol>
+<li>Attempt to create an element with an invalid definition string</li>
+<li>Verify the validation detects the structural errors</li>
+<li>Verify the operation is rejected before insertion</li>
+<li>Verify appropriate validation error messages are reported</li>
+<li>Verify the target file remains unchanged</li>
+</ol>
+<p><strong>Test Steps for Relation Validation:</strong></p>
+<ol>
+<li>Create element with valid relations (targets exist in model)</li>
+<li>Verify relations are normalized to git-root-relative format</li>
+<li>Verify element is created successfully</li>
+<li>Attempt to create element with non-existent relation target</li>
+<li>Verify operation is rejected with clear error message</li>
+<li>Verify error message indicates which relation target was not found</li>
+<li>Verify target file remains unchanged after rejection</li>
+</ol>
+<p><strong>Test Coverage:</strong></p>
+<ul>
+<li>Valid element with all subsections (metadata, relations, details)</li>
+<li>Valid element with minimal structure (only ### header and content)</li>
+<li>Valid element inserted at specific index (0, middle, end)</li>
+<li>Valid element inserted without index (defaults to end)</li>
+<li>Valid element inserted with out-of-bounds index (appends to end)</li>
+<li>Invalid element with duplicate name (violates global uniqueness)</li>
+<li>Invalid element with malformed subsections</li>
+<li>Invalid element with invalid relations</li>
+<li>Invalid element with missing ### header</li>
+<li><strong>Valid element with relations to existing elements</strong></li>
+<li><strong>Invalid element with relation to non-existent element</strong></li>
+<li><strong>Relations specified as relative paths (../File.md#element)</strong></li>
+<li><strong>Relations specified as repo-relative paths (specifications/File.md#element)</strong></li>
+<li><strong>Relations specified as same-file references (#element)</strong></li>
+<li><strong>External link relations (http://, https://) are allowed</strong></li>
+</ul>
+<p><strong>Success Criteria:</strong></p>
+<ul>
+<li>Valid element definitions are accepted and created</li>
+<li>Element is parsed from the Markdown string correctly</li>
+<li>Element structure validation runs before insertion</li>
+<li>Global uniqueness is enforced</li>
+<li>Element inserted at specified index position within file</li>
+<li>Element appended to end when index not provided or out of bounds</li>
+<li>Invalid element definitions are rejected</li>
+<li>Validation errors are reported clearly</li>
+<li>Failed operations do not modify target files</li>
+<li>Model validation passes after successful creation</li>
+<li><strong>Relation targets are validated to exist in the model</strong></li>
+<li><strong>Non-existent relation targets cause rejection</strong></li>
+<li><strong>Relation paths are normalized to git-root-relative format</strong></li>
+<li><strong>External links (http://, https://) bypass validation</strong></li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="#create-element-operation">Create Element Operation</a></li>
+<li>satisfiedBy: <a href="../../tests/test-crud-manipulation/test.sh">test.sh</a></li>
+</ul>
+<hr />
+<h3 id="delete-element-test">Delete Element Test</h3>
+<p>The test shall verify that existing model elements can be deleted, all relations referencing the deleted element are automatically removed, and empty files are removed when no elements remain.</p>
+<h4>Details</h4>
+<p><strong>Test Setup:</strong></p>
+<ul>
+<li>Create a test model with multiple elements</li>
+<li>Create an element to be deleted with incoming and outgoing relations</li>
+<li>Document all relations pointing to the element (derivedFrom, verifiedBy, verify, satisfiedBy)</li>
+<li>Create a file with only one element for empty file cleanup testing</li>
+</ul>
+<p><strong>Test Steps:</strong></p>
+<ol>
+<li>Delete the target element</li>
+<li>Verify the element was completely removed from the file</li>
+<li>Verify all relations pointing to the deleted element were removed from other elements</li>
+<li>Verify the file structure and formatting remain intact</li>
+<li>Validate the model after element deletion</li>
+<li>Check that no dangling relations exist</li>
+</ol>
+<p><strong>Test Steps - Empty File Cleanup:</strong></p>
+<ol>
+<li>Delete the only element in a file</li>
+<li>Verify the element is removed</li>
+<li>Verify the file is deleted from the filesystem</li>
+<li>Verify the file deletion is reported in the operation output</li>
+<li>Delete an element leaving other elements in the file</li>
+<li>Verify the file is NOT deleted (still contains elements)</li>
+</ol>
+<p><strong>Success Criteria:</strong></p>
+<ul>
+<li>Element is completely removed from the source file</li>
+<li>All incoming relations (relations from other elements to the deleted element) are removed</li>
+<li>File structure remains valid</li>
+<li>Model validation passes</li>
+<li>No dangling relations remain in the model</li>
+<li>Files containing only the deleted element are removed</li>
+<li>Files with remaining elements are preserved</li>
+<li>File deletion is reported when it occurs</li>
+</ul>
+<p><strong>Test Coverage:</strong></p>
+<ul>
+<li>Delete element with <code>derivedFrom</code> relations pointing to it</li>
+<li>Delete element with <code>verifiedBy</code> relations pointing to it</li>
+<li>Delete element with <code>verify</code> relations pointing to it</li>
+<li>Delete element with <code>satisfiedBy</code> relations pointing to it</li>
+<li>Delete element with multiple types of incoming relations</li>
+<li>Delete last element in file (triggers file deletion)</li>
+<li>Delete element leaving other elements (file preserved)</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="#delete-element-operation">Delete Element Operation</a></li>
+<li>satisfiedBy: <a href="../../tests/test-crud-manipulation/test.sh">test.sh</a></li>
+</ul>
+<hr />
+<h3 id="delete-element-operation">Delete Element Operation</h3>
+<p>The system shall provide the capability to delete existing model elements while automatically removing or updating all relations that reference the deleted element, and removing empty files when no elements remain.</p>
+<h4>Details</h4>
+<p>When deleting an element, the system shall:</p>
+<ul>
+<li>Remove the element and all its content from the source file</li>
+<li>Identify all relations pointing to the deleted element (incoming relations)</li>
+<li>Remove all relations that reference the deleted element from other elements</li>
+<li>Identify all relations from the deleted element (outgoing relations)</li>
+<li>Remove the complete element section including separators</li>
+<li>Maintain file structure and formatting after deletion</li>
+<li>Provide a report of all relations that were affected by the deletion</li>
+</ul>
+<p><strong>Empty File Cleanup:</strong></p>
+<ul>
+<li>After deleting the element, check if the source file contains any remaining elements</li>
+<li>If no elements remain and all sections are empty (only page content, headers, or whitespace), remove the file from the filesystem</li>
+<li>If the file is removed, report the file deletion in the operation output</li>
+</ul>
+<p><strong>Relation Handling:</strong></p>
+<ul>
+<li>All <code>derivedFrom</code> relations pointing to the deleted element shall be removed</li>
+<li>All <code>verifiedBy</code> relations pointing to the deleted element shall be removed</li>
+<li>All <code>verify</code> relations pointing to the deleted element shall be removed</li>
+<li>All <code>satisfiedBy</code> relations pointing to the deleted element shall be removed</li>
+<li>Relations from the deleted element are automatically removed with the element</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#element-manipulation-file-persistence">Element Manipulation File Persistence</a></li>
+<li>satisfiedBy: <a href="../../core/src/graph_registry.rs">graph_registry.rs</a></li>
+<li>satisfiedBy: <a href="../../core/src/crud.rs">crud.rs</a></li>
+<li>satisfiedBy: <a href="../../core/src/diff.rs">diff.rs</a></li>
+<li>satisfiedBy: <a href="../../cli/src/cli.rs">cli.rs</a></li>
+</ul>
+<hr />
+<h3 id="move-element-test">Move Element Test</h3>
+<p>The test shall verify that existing model elements can be moved to different locations, all relations referencing the moved element are automatically updated, target locations are created if needed, and empty source files are removed when no elements remain.</p>
+<h4>Details</h4>
+<p><strong>Test Setup:</strong></p>
+<ul>
+<li>Create a test model with multiple files</li>
+<li>Create an element to be moved with incoming and outgoing relations</li>
+<li>Document all relations pointing to the element</li>
+<li>Create a file with only one element for empty file cleanup testing</li>
+<li>Prepare non-existent target locations for auto-creation testing</li>
+</ul>
+<p><strong>Test Steps:</strong></p>
+<ol>
+<li>Move the element to the target location</li>
+<li>Verify the element was removed from the source location</li>
+<li>Verify the element was inserted into the target location</li>
+<li>Verify all element content, metadata, and outgoing relations are preserved</li>
+<li>Verify the element identifier was updated to reflect the new location</li>
+<li>Verify all incoming relations were updated to reference the new identifier</li>
+<li>Validate the model after element move</li>
+<li>Check that no dangling relations exist</li>
+</ol>
+<p><strong>Test Steps - Auto-Creation:</strong></p>
+<ol>
+<li>Move element to non-existent target file</li>
+<li>Verify target file is created with proper structure</li>
+</ol>
+<p><strong>Test Steps - Empty Source File Cleanup:</strong></p>
+<ol>
+<li>Move the only element from a file to another location</li>
+<li>Verify the element is moved successfully</li>
+<li>Verify the source file is deleted from the filesystem</li>
+<li>Verify the file deletion is reported in the operation output</li>
+<li>Move an element leaving other elements in the source file</li>
+<li>Verify the source file is NOT deleted (still contains elements)</li>
+</ol>
+<p><strong>Success Criteria:</strong></p>
+<ul>
+<li>Element is removed from source location</li>
+<li>Element is inserted into target location</li>
+<li>Element content and metadata are preserved</li>
+<li>Element identifier is updated correctly</li>
+<li>All incoming relations (derivedFrom, verifiedBy, verify, satisfiedBy) are updated to the new identifier</li>
+<li>Outgoing relations (relations from the moved element to other elements) are preserved unchanged</li>
+<li>File structure remains valid in both source and target files</li>
+<li>Model validation passes</li>
+<li>Non-existent target files are created with proper structure</li>
+<li>Empty source files are deleted after move</li>
+<li>Source files with remaining elements are preserved</li>
+<li>File creation and deletion are reported</li>
+</ul>
+<p><strong>Test Coverage:</strong></p>
+<ul>
+<li>Move element within the same file (different position)</li>
+<li>Move element to a different file</li>
+<li>Move element to specific index in target file (0, middle, end)</li>
+<li>Move element without index (defaults to end of target file)</li>
+<li>Move element with out-of-bounds index (appends to end)</li>
+<li>Move element with <code>derivedFrom</code> relations pointing to it</li>
+<li>Move element with <code>verifiedBy</code> relations pointing to it</li>
+<li>Move element with <code>verify</code> relations pointing to it</li>
+<li>Move element with <code>satisfiedBy</code> relations pointing to it</li>
+<li>Move element with multiple types of incoming relations</li>
+<li>Move to non-existent target file (auto-create)</li>
+<li>Move last element from file (triggers source file deletion)</li>
+<li>Move element leaving other elements (source file preserved)</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="#move-element-operation">Move Element Operation</a></li>
+<li>satisfiedBy: <a href="../../tests/test-crud-manipulation/test.sh">test.sh</a></li>
+<li>satisfiedBy: <a href="../../tests/test-crud-empty-file-cleanup/test.sh">test.sh</a></li>
+</ul>
+<hr />
+<h3 id="move-element-operation">Move Element Operation</h3>
+<p>The system shall provide the capability to move existing model elements to different file locations while automatically updating all relations that reference the moved element, creating target files if needed, and removing empty source files when no elements remain.</p>
+<h4>Details</h4>
+<p>When moving an element, the system shall:</p>
+<ul>
+<li>Validate the target location using path validation rules</li>
+<li>Create target file if it does not exist (subject to validation constraints)</li>
+<li>Remove the element from the source file</li>
+<li>Accept optional index parameter for insertion position within target file (0-based)</li>
+<li>Insert the element into the target file:
+<ul>
+<li>If index is provided and valid, insert at that position within the target file</li>
+<li>If index is not provided or out of bounds, append to the end of the target file</li>
+</ul>
+</li>
+<li>Preserve all element content, metadata, and relations</li>
+<li>Update the element’s identifier to reflect the new location</li>
+<li>Identify all relations pointing to the moved element (incoming relations)</li>
+<li>Update all relations that reference the moved element with the new identifier</li>
+<li>Maintain file structure and formatting in both source and target files</li>
+<li>Ensure the element name is globally unique in the model</li>
+<li>Provide a report of all relations that were updated</li>
+</ul>
+<p><strong>Empty Source File Cleanup:</strong></p>
+<ul>
+<li>After moving the element, check if the source file contains any remaining elements</li>
+<li>If no elements remain (only page content, headers, or whitespace), remove the source file from the filesystem</li>
+<li>If the file is removed, report the file deletion in the operation output</li>
+</ul>
+<p><strong>Relation Update Requirements:</strong></p>
+<ul>
+<li>All relations (both forward and backward) pointing to the moved element shall be updated to the new identifier</li>
+<li>Relations within the moved element (outgoing relations) shall be preserved unchanged</li>
+</ul>
+<p><strong>Identifier Update:</strong></p>
+<ul>
+<li>The element’s identifier changes from <code>&lt;old-file&gt;#&lt;element-name&gt;</code> to <code>&lt;new-file&gt;#&lt;element-name&gt;</code></li>
+<li>All references to the old identifier shall be updated to the new identifier</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#element-manipulation-file-persistence">Element Manipulation File Persistence</a></li>
+<li>derivedFrom: <a href="#target-location-validation-and-auto-creation">Target Location Validation and Auto-Creation</a></li>
+<li>satisfiedBy: <a href="../../core/src/graph_registry.rs">graph_registry.rs</a></li>
+<li>satisfiedBy: <a href="../../core/src/crud.rs">crud.rs</a></li>
+<li>satisfiedBy: <a href="../../core/src/diff.rs">diff.rs</a></li>
+<li>satisfiedBy: <a href="../../cli/src/cli.rs">cli.rs</a></li>
+</ul>
+<hr />
+<h3 id="move-file-operation">Move File Operation</h3>
+<p>The system shall provide the capability to move entire specification files with all their elements to a new location in the repository while updating all relation references throughout the model.</p>
+<h4>Details</h4>
+<p>When moving a file, the system shall:</p>
+<ul>
+<li>Accept source file path (relative to git repository root)</li>
+<li>Accept target file path (relative to git repository root)</li>
+<li>Accept optional squashing flag</li>
+<li>Validate both source and target paths</li>
+<li>Move the physical file from source to target location</li>
+<li>Update all element identifiers within the file to reflect the new file path</li>
+<li>Update all relation references (both forward and backward) throughout the model that point to any element in the moved file</li>
+<li>Preserve all file content, structure, and formatting</li>
+</ul>
+<p>The system shall reject the operation with a clear error message if:</p>
+<ul>
+<li>The source file does not exist</li>
+<li>The target file already exists (unless –squash flag is provided)</li>
+<li>The source or target paths fail validation</li>
+</ul>
+<p><strong>Squash Mode Behavior:</strong>
+When the –squash flag is provided and the target file already exists, the system shall:</p>
+<ul>
+<li>Move all elements from the source file to the target end of file</li>
+<li>Remove the source file after all elements have been successfully moved</li>
+<li>Preserve element ordering from the source file when inserting into target section</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#element-manipulation-file-persistence">Element Manipulation File Persistence</a></li>
+<li>derivedFrom: <a href="#target-location-validation-and-auto-creation">Target Location Validation and Auto-Creation</a></li>
+</ul>
+<hr />
+<h3 id="relation-consistency-test">Relation Consistency Test</h3>
+<p>The test shall verify that bidirectional relation consistency is maintained when elements are manipulated.</p>
+<h4>Details</h4>
+<details>
+<summary>Test Criteria</summary>
+<p><strong>Test Setup:</strong></p>
+<ul>
+<li>Create a test model with elements having bidirectional relations</li>
+<li>Set up test cases for derivedFrom/derive, verifiedBy/verify relations</li>
+</ul>
+<p><strong>Test Steps:</strong></p>
+<ol>
+<li>Create an element with relations and verify bidirectional consistency</li>
+<li>Delete an element and verify both forward and backward relations are removed</li>
+<li>Move an element and verify both forward and backward relations are updated</li>
+<li>Validate model consistency after each manipulation operation</li>
+</ol>
+<p><strong>Success Criteria:</strong></p>
+<ul>
+<li>After element creation: bidirectional relations are properly established</li>
+<li>After element deletion: both forward and backward relations are removed</li>
+<li>After element move: both forward and backward relations are updated</li>
+<li>Model validation passes after each operation</li>
+<li>No dangling or inconsistent relations exist</li>
+</ul>
+<p><strong>Test Coverage:</strong></p>
+<ul>
+<li>Verify derivedFrom/derive relation consistency</li>
+<li>Verify verifiedBy/verify relation consistency</li>
+<li>Test consistency after create operations</li>
+<li>Test consistency after delete operations</li>
+<li>Test consistency after move operations</li>
+</ul>
+</details>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="#relation-consistency-maintenance">Relation Consistency Maintenance</a></li>
+<li>satisfiedBy: <a href="../../tests/test-crud-relation-consistency/test.sh">test.sh</a></li>
+</ul>
+<hr />
+<h3 id="relation-consistency-maintenance">Relation Consistency Maintenance</h3>
+<p>The system shall maintain bidirectional relation consistency when elements are manipulated, ensuring that forward and backward relations remain synchronized.</p>
+<h4>Details</h4>
+<p>When manipulating elements, the system shall ensure:</p>
+<ul>
+<li>If element A derives from element B, then B must have a derive relation to A</li>
+<li>If element A is verified by verification V, then V must have a verify relation to A</li>
+<li>When an element is deleted, both forward and backward relations are removed</li>
+<li>When an element is moved, both forward and backward relations are updated</li>
+<li>After any manipulation operation, the model remains in a valid state with no dangling relations</li>
+</ul>
+<p><strong>Validation:</strong></p>
+<ul>
+<li>The system shall validate relation consistency after each manipulation operation</li>
+<li>The system shall report any inconsistencies detected during manipulation</li>
+<li>The system shall prevent operations that would leave the model in an inconsistent state</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="ModelManagement.html#element-manipulation-operations">Element Manipulation Operations</a></li>
+<li>satisfiedBy: <a href="../../core/src/graph_registry.rs">graph_registry.rs</a></li>
+</ul>
+<hr />
+<h3 id="cli-add-element-test">CLI Add Element Test</h3>
+<p>The test shall verify that the <code>add</code> command creates new elements from stdin or inline string input, validates structure, supports index-based insertion, and outputs git-style diffs.</p>
+<h4>Details</h4>
+<p><strong>Test Setup:</strong></p>
+<ul>
+<li>Prepare test model with existing files and sections</li>
+<li>Prepare valid element markdown strings</li>
+<li>Prepare invalid element markdown strings</li>
+<li>Set up test environment with stdin/tty detection</li>
+</ul>
+<p><strong>Test Steps - Stdin Input:</strong></p>
+<ol>
+<li>Pipe element markdown to <code>reqvire add &lt;file&gt; &lt;section&gt;</code></li>
+<li>Verify element is read from stdin</li>
+<li>Verify element is validated and inserted</li>
+<li>Verify git-style diff is output showing changes</li>
+<li>Verify file is modified on disk</li>
+</ol>
+<p><strong>Test Steps - Inline String:</strong></p>
+<ol>
+<li>Run <code>reqvire add &lt;file&gt; &lt;section&gt; &quot;### Element...&quot;</code></li>
+<li>Verify element is read from inline argument</li>
+<li>Verify element is validated and inserted</li>
+<li>Verify git-style diff is output</li>
+</ol>
+<p><strong>Test Steps - Index Insertion:</strong></p>
+<ol>
+<li>Run <code>reqvire add &lt;file&gt; &lt;section&gt; 0 &lt; element.md</code></li>
+<li>Verify element is inserted at index 0</li>
+<li>Run without index and verify append to end</li>
+<li>Run with out-of-bounds index and verify append</li>
+</ol>
+<p><strong>Test Steps - Dry Run:</strong></p>
+<ol>
+<li>Run <code>reqvire add --dry-run &lt;file&gt; &lt;section&gt; &lt; element.md</code></li>
+<li>Verify git-style diff is shown</li>
+<li>Verify no changes are applied to files</li>
+</ol>
+<p><strong>Test Steps - JSON Output:</strong></p>
+<ol>
+<li>Run <code>reqvire add --json &lt;file&gt; &lt;section&gt; &lt; element.md</code></li>
+<li>Verify JSON output with element details</li>
+<li>Verify changes are applied</li>
+</ol>
+<p><strong>Test Steps - Validation Errors:</strong></p>
+<ol>
+<li>Provide invalid element (duplicate name, malformed)</li>
+<li>Verify error is reported</li>
+<li>Verify file is not modified</li>
+<li>Verify exit code is non-zero</li>
+</ol>
+<p><strong>Success Criteria:</strong></p>
+<ul>
+<li>Reads from stdin when piped</li>
+<li>Reads from inline argument when provided</li>
+<li>Validates before insertion</li>
+<li>Inserts at specified index or appends</li>
+<li>Shows git-style diff by default</li>
+<li>Supports –dry-run preview</li>
+<li>Supports –json output</li>
+<li>Reports validation errors</li>
+<li>Returns correct exit codes</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../Interfaces/CLI.html#cli-add-element-command">CLI Add Element Command</a></li>
+<li>satisfiedBy: <a href="../../tests/test-crud-manipulation/test.sh">test.sh</a></li>
+</ul>
+<hr />
+<h3 id="cli-remove-element-test">CLI Remove Element Test</h3>
+<p>The test shall verify that the <code>rm</code> command deletes elements, removes relations, and outputs git-style diffs showing all affected files.</p>
+<h4>Details</h4>
+<p><strong>Test Setup:</strong></p>
+<ul>
+<li>Create test model with multiple elements</li>
+<li>Create elements with incoming relations (derivedFrom, verifiedBy, etc.)</li>
+<li>Document expected relation removals</li>
+</ul>
+<p><strong>Test Steps - Basic Deletion:</strong></p>
+<ol>
+<li>Run <code>reqvire rm &lt;element-name&gt;</code></li>
+<li>Verify element is deleted from file</li>
+<li>Verify all incoming relations are removed</li>
+<li>Verify git-style diff shows all affected files</li>
+<li>Verify changes are applied</li>
+</ol>
+<p><strong>Test Steps - Dry Run:</strong></p>
+<ol>
+<li>Run <code>reqvire rm --dry-run &lt;element-name&gt;</code></li>
+<li>Verify git-style diff is shown</li>
+<li>Verify no changes are applied to files</li>
+<li>Verify affected files are listed</li>
+</ol>
+<p><strong>Test Steps - JSON Output:</strong></p>
+<ol>
+<li>Run <code>reqvire rm --json &lt;element-name&gt;</code></li>
+<li>Verify JSON output with removed relations</li>
+<li>Verify changes are applied</li>
+</ol>
+<p><strong>Test Steps - Error Cases:</strong></p>
+<ol>
+<li>Try to remove non-existent element by name</li>
+<li>Verify error is reported</li>
+<li>Verify exit code is non-zero</li>
+</ol>
+<p><strong>Success Criteria:</strong></p>
+<ul>
+<li>Deletes element from file</li>
+<li>Removes all incoming relations</li>
+<li>Shows git-style diff for all affected files</li>
+<li>Supports –dry-run preview</li>
+<li>Supports –json output with relation details</li>
+<li>Reports errors for non-existent elements</li>
+<li>Returns correct exit codes</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../Interfaces/CLI.html#cli-remove-element-command">CLI Remove Element Command</a></li>
+<li>satisfiedBy: <a href="../../tests/test-crud-manipulation/test.sh">test.sh</a></li>
+</ul>
+<hr />
+<h3 id="rename-element-operation">Rename Element Operation</h3>
+<p>The system shall provide the capability to rename existing model elements by changing their heading text while updating all relation references and the registry.</p>
+<h4>Details</h4>
+<p>When renaming an element, the system shall:</p>
+<ul>
+<li>Accept the current element name and the new element name</li>
+<li>Validate that the current element exists in the model registry</li>
+<li>Validate that the new name is globally unique in the model registry</li>
+<li>Update the element’s heading text in the markdown file</li>
+<li>Update all relation references (both forward and backward) to use the new element identifier</li>
+<li>Update the element identifier in the registry</li>
+</ul>
+<p>The system shall reject the operation with a clear error message if:</p>
+<ul>
+<li>The element does not exist</li>
+<li>The new name conflicts with an existing element</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#element-manipulation-file-persistence">Element Manipulation File Persistence</a></li>
+<li>satisfiedBy: <a href="../../core/src/graph_registry.rs">graph_registry.rs</a></li>
+<li>satisfiedBy: <a href="../../core/src/crud.rs">crud.rs</a></li>
+<li>satisfiedBy: <a href="../../core/src/diff.rs">diff.rs</a></li>
+</ul>
+<hr />
+<h3 id="cli-move-element-test">CLI Move Element Test</h3>
+<p>The test shall verify that the <code>mv</code> command relocates elements, updates all relations, supports index-based insertion, and outputs git-style diffs.</p>
+<h4>Details</h4>
+<p><strong>Test Setup:</strong></p>
+<ul>
+<li>Create test model with multiple files and sections</li>
+<li>Create elements with incoming and outgoing relations</li>
+<li>Document expected relation updates</li>
+<li>Prepare target locations</li>
+</ul>
+<p><strong>Test Steps - Basic Move:</strong></p>
+<ol>
+<li>Run <code>reqvire mv &lt;element-name&gt; &lt;target-file&gt; &lt;section&gt;</code></li>
+<li>Verify element is removed from source</li>
+<li>Verify element is inserted into target</li>
+<li>Verify all incoming relations are updated</li>
+<li>Verify git-style diff shows all affected files</li>
+<li>Verify identifier change is reported</li>
+</ol>
+<p><strong>Test Steps - Index Insertion:</strong></p>
+<ol>
+<li>Run <code>reqvire mv &lt;element-name&gt; &lt;file&gt; &lt;section&gt; 0</code></li>
+<li>Verify element is inserted at index 0 in target</li>
+<li>Run without index and verify append to end</li>
+<li>Run with out-of-bounds index and verify append</li>
+</ol>
+<p><strong>Test Steps - Dry Run:</strong></p>
+<ol>
+<li>Run <code>reqvire mv --dry-run &lt;element-name&gt; &lt;file&gt; &lt;section&gt;</code></li>
+<li>Verify git-style diff is shown for all affected files</li>
+<li>Verify no changes are applied</li>
+<li>Verify relation updates are previewed</li>
+</ol>
+<p><strong>Test Steps - JSON Output:</strong></p>
+<ol>
+<li>Run <code>reqvire mv --json &lt;element-name&gt; &lt;file&gt; &lt;section&gt;</code></li>
+<li>Verify JSON output with relation updates</li>
+<li>Verify old → new identifier mapping</li>
+<li>Verify changes are applied</li>
+</ol>
+<p><strong>Test Steps - Error Cases:</strong></p>
+<ol>
+<li>Try to move non-existent element by name</li>
+<li>Try to move to invalid location</li>
+<li>Try to move with duplicate name at target</li>
+<li>Verify errors are reported</li>
+<li>Verify exit code is non-zero</li>
+</ol>
+<p><strong>Success Criteria:</strong></p>
+<ul>
+<li>Moves element to target location</li>
+<li>Updates all incoming relations</li>
+<li>Preserves element content and outgoing relations</li>
+<li>Inserts at specified index or appends</li>
+<li>Shows git-style diff for all affected files</li>
+<li>Reports identifier change</li>
+<li>Supports –dry-run preview</li>
+<li>Supports –json output with relation mapping</li>
+<li>Reports validation and location errors</li>
+<li>Returns correct exit codes</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../Interfaces/CLI.html#cli-move-element-command">CLI Move Element Command</a></li>
+<li>satisfiedBy: <a href="../../tests/test-crud-manipulation/test.sh">test.sh</a></li>
+</ul>
+<hr />
+<h3 id="cli-rename-element-test">CLI Rename Element Test</h3>
+<p>The test shall verify that the <code>rename</code> command renames elements, updates all relations, and outputs git-style diffs.</p>
+<h4>Details</h4>
+<p><strong>Test Setup:</strong></p>
+<ul>
+<li>Create test model with elements</li>
+<li>Create elements with incoming and outgoing relations</li>
+<li>Document expected relation updates</li>
+</ul>
+<p><strong>Test Steps - Basic Rename:</strong></p>
+<ol>
+<li>Run <code>reqvire rename &lt;current-name&gt; &lt;new-name&gt;</code></li>
+<li>Verify element heading is updated in markdown file</li>
+<li>Verify all incoming relations are updated with new identifier</li>
+<li>Verify git-style diff shows all affected files</li>
+<li>Verify identifier change is reported (old → new)</li>
+</ol>
+<p><strong>Test Steps - Dry Run:</strong></p>
+<ol>
+<li>Run <code>reqvire rename --dry-run &lt;current-name&gt; &lt;new-name&gt;</code></li>
+<li>Verify git-style diff is shown</li>
+<li>Verify no changes are applied</li>
+<li>Verify relation updates are previewed</li>
+</ol>
+<p><strong>Test Steps - JSON Output:</strong></p>
+<ol>
+<li>Run <code>reqvire rename --json &lt;current-name&gt; &lt;new-name&gt;</code></li>
+<li>Verify JSON output with relation updates</li>
+<li>Verify old → new identifier mapping</li>
+<li>Verify changes are applied</li>
+</ol>
+<p><strong>Test Steps - Error Cases:</strong></p>
+<ol>
+<li>Try to rename non-existent element</li>
+<li>Try to rename to an existing element name</li>
+<li>Verify errors are reported</li>
+<li>Verify exit code is non-zero</li>
+</ol>
+<p><strong>Success Criteria:</strong></p>
+<ul>
+<li>Updates element heading text</li>
+<li>Updates all incoming relations</li>
+<li>Preserves element content and outgoing relations</li>
+<li>Shows git-style diff for all affected files</li>
+<li>Reports identifier change</li>
+<li>Supports –dry-run preview</li>
+<li>Supports –json output</li>
+<li>Reports validation errors</li>
+<li>Returns correct exit codes</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../Interfaces/CLI.html#cli-rename-element-command">CLI Rename Element Command</a></li>
+<li>satisfiedBy: <a href="../../tests/test-crud-manipulation/test.sh">test.sh</a></li>
+</ul>
+<hr />
+<h3 id="cli-move-file-test">CLI Move File Test</h3>
+<p>The test shall verify that the <code>mv-file</code> command moves entire specification files with all their elements to a new location, updates all relations referencing elements in the moved file, and outputs git-style diffs.</p>
+<h4>Details</h4>
+<p><strong>Test Setup:</strong></p>
+<ul>
+<li>Create test model with multiple specification files</li>
+<li>Create files with multiple elements</li>
+<li>Create elements in other files with relations pointing to elements in the file to be moved</li>
+<li>Document expected relation updates</li>
+<li>Prepare target file paths</li>
+</ul>
+<p><strong>Test Steps - Basic Move File:</strong></p>
+<ol>
+<li>Run <code>reqvire mv-file &lt;source-file&gt; &lt;target-file&gt;</code></li>
+<li>Verify source file is removed from filesystem</li>
+<li>Verify target file is created with all elements from source</li>
+<li>Verify all elements are preserved with identical content, metadata, and relations</li>
+<li>Verify all incoming relations (from other files) are updated to reference the new file location</li>
+<li>Verify element identifiers are updated to reflect new file path</li>
+<li>Verify git-style diff shows source file deletion and target file creation</li>
+<li>Verify git-style diff shows all affected files with relation updates</li>
+</ol>
+<p><strong>Test Steps - Subdirectory Execution:</strong></p>
+<ol>
+<li>Navigate to a subdirectory of the git repository</li>
+<li>Run <code>reqvire mv-file specifications/File.md specifications/NewFile.md</code></li>
+<li>Verify paths are resolved relative to current working directory</li>
+<li>Verify target file is created at <code>&lt;cwd&gt;/specifications/NewFile.md</code></li>
+<li>Verify source file at <code>&lt;cwd&gt;/specifications/File.md</code> is removed</li>
+<li>Verify all relations are updated correctly</li>
+</ol>
+<p><strong>Test Steps - Dry Run:</strong></p>
+<ol>
+<li>Run <code>reqvire mv-file --dry-run &lt;source-file&gt; &lt;target-file&gt;</code></li>
+<li>Verify git-style diff is shown for all affected files</li>
+<li>Verify no changes are applied to filesystem</li>
+<li>Verify relation updates are previewed</li>
+<li>Verify file move is previewed (deletion + creation)</li>
+</ol>
+<p><strong>Test Steps - JSON Output:</strong></p>
+<ol>
+<li>Run <code>reqvire mv-file --json &lt;source-file&gt; &lt;target-file&gt;</code></li>
+<li>Verify JSON output with list of moved elements</li>
+<li>Verify old → new identifier mappings for all elements</li>
+<li>Verify list of affected files with relation updates</li>
+<li>Verify changes are applied</li>
+</ol>
+<p><strong>Test Steps - Error Cases:</strong></p>
+<ol>
+<li>Try to move non-existent source file</li>
+<li>Try to move to a target file that already exists</li>
+<li>Try to move file outside subdirectory scope when running from subdirectory</li>
+<li>Verify errors are reported clearly</li>
+<li>Verify exit code is non-zero</li>
+<li>Verify no changes are applied on error</li>
+</ol>
+<p><strong>Success Criteria:</strong></p>
+<ul>
+<li>Source file is deleted from filesystem</li>
+<li>Target file is created with all elements</li>
+<li>All element content, metadata, and outgoing relations are preserved</li>
+<li>All incoming relations are updated to new file location</li>
+<li>Element identifiers are updated (file path component changes)</li>
+<li>Shows git-style diff for source deletion, target creation, and all affected files</li>
+<li>Paths are resolved relative to current working directory</li>
+<li>Supports –dry-run preview</li>
+<li>Supports –json output with element mappings</li>
+<li>Reports errors for non-existent files and existing targets</li>
+<li>Returns correct exit codes</li>
+<li>Works correctly when executed from subdirectories</li>
+</ul>
+<p><strong>Test Coverage:</strong></p>
+<ul>
+<li>Move file with single element</li>
+<li>Move file with multiple elements</li>
+<li>Move file with elements that have incoming relations from other files</li>
+<li>Move file with elements that have outgoing relations to other files</li>
+<li>Move file with bidirectional relations (verify/verifiedBy, derive/derivedFrom)</li>
+<li>Execute from git repository root</li>
+<li>Execute from subdirectory (relative path resolution)</li>
+<li>Dry run mode</li>
+<li>JSON output mode</li>
+<li>Error: non-existent source file</li>
+<li>Error: target file already exists</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../Interfaces/CLI.html#cli-move-file-command">CLI Move File Command</a></li>
+<li>satisfiedBy: <a href="../../tests/test-crud-manipulation/test.sh">test.sh</a></li>
+<li>satisfiedBy: <a href="../../tests/test-subdirectory-functionality/test.sh">test.sh</a></li>
+</ul>
+<hr />
+<h3 id="move-file-squash-test">Move File Squash Test</h3>
+<p>The test shall verify that the <code>mv-file --squash</code> command moves all elements from a source file to an existing target file’s first section, updates all relations, and removes the source file.</p>
+<h4>Details</h4>
+<p><strong>Test Setup:</strong></p>
+<ul>
+<li>Create a source file with multiple elements</li>
+<li>Create a target file that already exists with its own elements and sections</li>
+<li>Create elements in other files with relations pointing to elements in the source file</li>
+<li>Document expected relation updates and element placement</li>
+</ul>
+<p><strong>Test Steps - Squash to Existing File:</strong></p>
+<ol>
+<li>Run <code>reqvire mv-file --squash &lt;source-file&gt; &lt;existing-target-file&gt;</code></li>
+<li>Verify source file is removed from filesystem</li>
+<li>Verify all elements from source file are added to target file’s first section</li>
+<li>Verify elements from source file are appended to the first level-2 section (##) in target file</li>
+<li>Verify original target file elements remain unchanged</li>
+<li>Verify element ordering from source file is preserved when inserted</li>
+<li>Verify all element identifiers are updated to reflect new file path</li>
+<li>Verify all incoming relations (from other files) are updated to reference the new file location</li>
+<li>Verify git-style diff shows source file deletion and target file modification</li>
+<li>Verify git-style diff shows all affected files with relation updates</li>
+</ol>
+<p><strong>Test Steps - Error Without Squash Flag:</strong></p>
+<ol>
+<li>Run <code>reqvire mv-file &lt;source-file&gt; &lt;existing-target-file&gt;</code> (without –squash)</li>
+<li>Verify operation fails with clear error message</li>
+<li>Verify error message indicates target file already exists</li>
+<li>Verify no changes are applied to any files</li>
+<li>Verify exit code is non-zero</li>
+</ol>
+<p><strong>Test Steps - Squash with Dry Run:</strong></p>
+<ol>
+<li>Run <code>reqvire mv-file --squash --dry-run &lt;source-file&gt; &lt;existing-target-file&gt;</code></li>
+<li>Verify git-style diff is shown for all affected files</li>
+<li>Verify no changes are applied to filesystem</li>
+<li>Verify preview shows elements being added to target file’s first section</li>
+</ol>
+<p><strong>Test Steps - Squash with JSON Output:</strong></p>
+<ol>
+<li>Run <code>reqvire mv-file --squash --json &lt;source-file&gt; &lt;existing-target-file&gt;</code></li>
+<li>Verify JSON output with list of moved elements</li>
+<li>Verify old → new identifier mappings for all elements</li>
+<li>Verify list of affected files with relation updates</li>
+<li>Verify changes are applied</li>
+</ol>
+<p><strong>Success Criteria:</strong></p>
+<ul>
+<li>Source file is deleted from filesystem</li>
+<li>All elements from source are added to target file’s first section</li>
+<li>Target file’s existing elements remain unchanged</li>
+<li>Element ordering from source file is preserved</li>
+<li>All incoming relations are updated to new file location</li>
+<li>Element identifiers are updated (file path component changes)</li>
+<li>Shows git-style diff for source deletion, target modification, and all affected files</li>
+<li>Supports –dry-run preview</li>
+<li>Supports –json output with element mappings</li>
+<li>Returns correct exit codes</li>
+<li>Without –squash flag, existing target file causes error</li>
+</ul>
+<p><strong>Test Coverage:</strong></p>
+<ul>
+<li>Squash file with single element to existing target</li>
+<li>Squash file with multiple elements to existing target</li>
+<li>Squash file with elements that have incoming relations from other files</li>
+<li>Squash file with elements that have outgoing relations to other files</li>
+<li>Verify elements are placed in target file’s first section</li>
+<li>Verify target file’s existing content is preserved</li>
+<li>Dry run mode with –squash</li>
+<li>JSON output mode with –squash</li>
+<li>Error: target file exists without –squash flag</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="#move-file-operation">Move File Operation</a></li>
+<li>satisfiedBy: <a href="../../tests/test-crud-mv-file-squash/test.sh">test.sh</a></li>
+</ul>
+<hr />
+
+        </div>
+    </div>
+</body>
+</html>

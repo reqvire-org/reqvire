@@ -1,0 +1,120 @@
+#!/bin/bash
+set -euo pipefail
+
+# Create log file immediately to ensure it exists for runner
+echo "Starting test..." > "${TEST_DIR}/test_results.log"
+
+# Test: Diagram Relation Filtering
+# ---------------------------------
+# Acceptance Criteria:
+# - System should render only forward relations to prevent duplicate arrows
+# - System should include parent elements in diagrams even when they belong to different sections
+# - System should apply direction-based rendering according to relation type registry
+# - Generated diagrams should not contain both forward and backward relations for the same logical relationship
+#
+# Test Criteria:
+# - Command exits with success (0) return code
+# - Diagrams contain only forward relations (e.g., `derive` but not `derivedFrom`)
+# - Bidirectional relationships appear as single arrows in their forward direction
+# - Parent elements are included when child elements are in the section
+# - No duplicate arrows exist for the same logical relationship
+# - Arrow directions follow the semantic direction defined in relation type registry
+
+# Make backup copies of original files for comparison
+mkdir -p "$TEST_DIR/backup"
+cp -r "$TEST_DIR/specifications" "$TEST_DIR/backup/"
+
+# Run reqvire to generate diagrams
+echo "Running: reqvire generate-diagrams" >> "${TEST_DIR}/test_results.log"
+set +e
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" generate-diagrams 2>&1)
+EXIT_CODE=$?
+set -e
+
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
+
+# Check for basic success
+if [ $EXIT_CODE -ne 0 ]; then
+  echo "❌ FAILED: Diagram generation command returned error: $EXIT_CODE"
+  echo "$OUTPUT"
+  exit 1
+fi
+
+# Check that the test file was modified and contains mermaid diagrams
+TEST_FILE="$TEST_DIR/specifications/RelationFilteringTest.md"
+BACKUP_FILE="$TEST_DIR/backup/specifications/RelationFilteringTest.md"
+
+if cmp -s "$TEST_FILE" "$BACKUP_FILE"; then
+  echo "❌ NOT MODIFIED: Expected test file to be modified with diagrams"
+  exit 1
+fi
+
+if ! grep -q '```mermaid' "$TEST_FILE"; then
+  echo "❌ NO DIAGRAM: Expected test file to contain mermaid diagrams"
+  exit 1
+fi
+
+# Test 1: Forward relations should be present
+FAILED_CHECKS=0
+
+# Check that forward relations are rendered
+if ! grep -q -- "-.->|derive" "$TEST_FILE"; then
+  echo "❌ MISSING FORWARD: Expected 'derive' forward relation arrow"
+  FAILED_CHECKS=$((FAILED_CHECKS + 1))
+fi
+
+if ! grep -q -- "-->|satisfiedBy" "$TEST_FILE"; then
+  echo "❌ MISSING FORWARD: Expected 'satisfiedBy' forward relation arrow"
+  FAILED_CHECKS=$((FAILED_CHECKS + 1))
+fi
+
+if ! grep -q -- "-.->|verifiedBy" "$TEST_FILE"; then
+  echo "❌ MISSING FORWARD: Expected 'verifiedBy' forward relation arrow"
+  FAILED_CHECKS=$((FAILED_CHECKS + 1))
+fi
+
+# Test 2: Backward relation names should NOT be present in Mermaid diagrams
+# Extract only the Mermaid diagram sections
+MERMAID_DIAGRAMS=$(sed -n '/```mermaid/,/```/p' "$TEST_FILE")
+
+if echo "$MERMAID_DIAGRAMS" | grep -q -- "containedBy"; then
+  echo "❌ BACKWARD PRESENT: Found 'containedBy' backward relation in Mermaid diagrams - should be filtered"
+  FAILED_CHECKS=$((FAILED_CHECKS + 1))
+fi
+
+if echo "$MERMAID_DIAGRAMS" | grep -q -- "derivedFrom"; then
+  echo "❌ BACKWARD PRESENT: Found 'derivedFrom' backward relation in Mermaid diagrams - should be filtered"
+  FAILED_CHECKS=$((FAILED_CHECKS + 1))
+fi
+
+if echo "$MERMAID_DIAGRAMS" | grep -q -- "verify"; then
+  echo "❌ BACKWARD PRESENT: Found 'verify' backward relation in Mermaid diagrams - should be filtered"
+  FAILED_CHECKS=$((FAILED_CHECKS + 1))
+fi
+
+# Test 3: All elements with relations should be included in the file-level diagram
+# With section removal, there's 1 diagram per file that includes all related elements
+if ! echo "$MERMAID_DIAGRAMS" | grep -q '"Parent Element"'; then
+  echo "❌ MISSING ELEMENT: Parent Element should be included in file diagram"
+  FAILED_CHECKS=$((FAILED_CHECKS + 1))
+fi
+
+# Test 4: Check that the derive relation is present in the file-level diagram
+# The derive relation should flow from Parent Element to Derived Child
+if ! echo "$MERMAID_DIAGRAMS" | grep -q -- "-.->|deriveReqT|"; then
+  echo "❌ MISSING DERIVE: 'derive' relation should be present in file diagram"
+  FAILED_CHECKS=$((FAILED_CHECKS + 1))
+fi
+
+if [ $FAILED_CHECKS -gt 0 ]; then
+  echo "❌ FAILED: $FAILED_CHECKS relation filtering checks failed"
+  echo "Generated diagram content:"
+  cat "$TEST_FILE"
+  exit 1
+fi
+
+# Clean up backup directory
+rm -rf "$TEST_DIR/backup"
+
+exit 0
