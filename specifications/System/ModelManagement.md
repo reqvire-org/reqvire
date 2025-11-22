@@ -251,7 +251,7 @@ The appropriate verification type should be selected based on the nature of the 
 - **Demonstration-verification**: Used when requirements can be verified by demonstrating functionality
 
 #### Relations
-  * derivedFrom: [Reserved Subsections Support](Subsections.md#reserved-subsections-support)
+  * derivedFrom: [Reserved Subsections Support](StructureAndParsing.md#reserved-subsections-support)
 ---
 
 ### Supported Element Types
@@ -271,7 +271,8 @@ Element types are identified through a reserved "type" metadata property. The fo
 8. **other**: Custom element types defined by users
 
 #### Relations
-  * derivedFrom: [Reserved Subsections Support](Subsections.md#reserved-subsections-support)
+  * derivedFrom: [Reserved Subsections Support](StructureAndParsing.md#reserved-subsections-support)
   * satisfiedBy: [element.rs](../../core/src/element.rs)
   * satisfiedBy: [parser.rs](../../core/src/parser.rs)
 ---
+

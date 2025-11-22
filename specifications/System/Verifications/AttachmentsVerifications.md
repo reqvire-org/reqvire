@@ -1,7 +1,5 @@
 # Requirements
 
-This document specifies verifications for the Attachments feature requirements.
-
 ### Attachments Subsection Parsing Verification
 
 Verify the system correctly parses Attachments subsections.
@@ -18,8 +16,8 @@ Test cases:
   * type: test-verification
 
 #### Relations
-  * verify: [Reserved Subsections Support](Subsections.md#reserved-subsections-support)
-  * satisfiedBy: [test.sh](../../tests/test-attachments/test.sh)
+  * verify: [Reserved Subsections Support](../StructureAndParsing.md#reserved-subsections-support)
+  * satisfiedBy: [test.sh](../../../tests/test-attachments/test.sh)
 ---
 
 ### Attachments Validation Verification
@@ -37,8 +35,8 @@ Test cases:
   * type: test-verification
 
 #### Relations
-  * verify: [Reserved Subsections Support](Subsections.md#reserved-subsections-support)
-  * satisfiedBy: [test.sh](../../tests/test-attachments/test.sh)
+  * verify: [Reserved Subsections Support](../StructureAndParsing.md#reserved-subsections-support)
+  * satisfiedBy: [test.sh](../../../tests/test-attachments/test.sh)
 ---
 
 ### Attachments Change Impact Verification
@@ -60,8 +58,8 @@ Test cases:
   * type: test-verification
 
 #### Relations
-  * verify: [Requirements Change Propagation](ChangeImpact.md#requirements-change-propagation)
-  * satisfiedBy: [test.sh](../../tests/test-attachments/test.sh)
+  * verify: [Requirements Change Propagation](../ChangeImpact.md#requirements-change-propagation)
+  * satisfiedBy: [test.sh](../../../tests/test-attachments/test.sh)
 ---
 
 ### Attach Command Verification
@@ -81,8 +79,8 @@ Test cases:
   * type: test-verification
 
 #### Relations
-  * verify: [Attachment Commands](../Interfaces/CLI.md#attachment-commands)
-  * satisfiedBy: [test.sh](../../tests/test-attachments/test.sh)
+  * verify: [Attachment Commands](../../Interfaces/CLI.md#attachment-commands)
+  * satisfiedBy: [test.sh](../../../tests/test-attachments/test.sh)
 ---
 
 ### Detach Command Verification
@@ -103,8 +101,8 @@ Test cases:
   * type: test-verification
 
 #### Relations
-  * verify: [Attachment Commands](../Interfaces/CLI.md#attachment-commands)
-  * satisfiedBy: [test.sh](../../tests/test-attachments/test.sh)
+  * verify: [Attachment Commands](../../Interfaces/CLI.md#attachment-commands)
+  * satisfiedBy: [test.sh](../../../tests/test-attachments/test.sh)
 ---
 
 ### Move Attachment Command Verification
@@ -124,8 +122,8 @@ Test cases:
   * type: test-verification
 
 #### Relations
-  * verify: [Attachment Commands](../Interfaces/CLI.md#attachment-commands)
-  * satisfiedBy: [test.sh](../../tests/test-attachments/test.sh)
+  * verify: [Attachment Commands](../../Interfaces/CLI.md#attachment-commands)
+  * satisfiedBy: [test.sh](../../../tests/test-attachments/test.sh)
 ---
 
 ### Remove Attachment Command Verification
@@ -145,8 +143,8 @@ Test cases:
   * type: test-verification
 
 #### Relations
-  * verify: [Attachment Commands](../Interfaces/CLI.md#attachment-commands)
-  * satisfiedBy: [test.sh](../../tests/test-attachments/test.sh)
+  * verify: [Attachment Commands](../../Interfaces/CLI.md#attachment-commands)
+  * satisfiedBy: [test.sh](../../../tests/test-attachments/test.sh)
 ---
 
 ### Attachment Search Filters Verification
@@ -165,8 +163,8 @@ Test cases:
   * type: test-verification
 
 #### Relations
-  * verify: [CLI Search Command](../Interfaces/CLI.md#cli-search-command)
-  * satisfiedBy: [test.sh](../../tests/test-attachments/test.sh)
+  * verify: [CLI Search Command](../../Interfaces/CLI.md#cli-search-command)
+  * satisfiedBy: [test.sh](../../../tests/test-attachments/test.sh)
 ---
 
 ### Attachment Output Rendering Verification
@@ -185,6 +183,7 @@ Test cases:
   * type: test-verification
 
 #### Relations
-  * verify: [Reserved Subsections Support](Subsections.md#reserved-subsections-support)
-  * satisfiedBy: [test.sh](../../tests/test-attachments/test.sh)
+  * verify: [Reserved Subsections Support](../StructureAndParsing.md#reserved-subsections-support)
+  * satisfiedBy: [test.sh](../../../tests/test-attachments/test.sh)
 ---
+

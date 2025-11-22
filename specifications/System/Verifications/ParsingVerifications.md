@@ -74,11 +74,11 @@ This test verifies that the system correctly extracts and parses element subsect
   * type: test-verification
 
 #### Relations
-  * verify: [Reserved Subsections Support](Subsections.md#reserved-subsections-support)
-  * verify: [Supported Element Types](ModelManagement.md#supported-element-types)
-  * verify: [Relation Types and behaviors](ModelManagement.md#relation-types-and-behaviors)
-  * verify: [Default Requirement Type Assignment](ModelManagement.md#default-requirement-type-assignment)
-  * satisfiedBy: [test.sh](../../tests/test-parsing-functionality/test.sh)
+  * verify: [Reserved Subsections Support](../StructureAndParsing.md#reserved-subsections-support)
+  * verify: [Supported Element Types](../ModelManagement.md#supported-element-types)
+  * verify: [Relation Types and behaviors](../ModelManagement.md#relation-types-and-behaviors)
+  * verify: [Default Requirement Type Assignment](../ModelManagement.md#default-requirement-type-assignment)
+  * satisfiedBy: [test.sh](../../../tests/test-parsing-functionality/test.sh)
 ---
 
 ### Specification File Identification Test
@@ -136,8 +136,8 @@ This test verifies that the system only parses markdown files where the first H1
   * type: test-verification
 
 #### Relations
-  * verify: [Specification File Identification](StructureAndParsing.md#specification-file-identification)
-  * satisfiedBy: [test.sh](../../tests/test-gitignore-integration/test.sh)
+  * verify: [Specification File Identification](../StructureAndParsing.md#specification-file-identification)
+  * satisfiedBy: [test.sh](../../../tests/test-gitignore-integration/test.sh)
 ---
 
 ### Fragment Normalization Test
@@ -214,6 +214,7 @@ This test verifies that the system correctly normalizes element name fragments a
   * type: test-verification
 
 #### Relations
-  * verify: [Element Identity Model](StructureAndParsing.md#element-identity-model)
-  * satisfiedBy: [test.sh](../../tests/test-parsing-functionality/test.sh)
+  * verify: [Element Identity Model](../StructureAndParsing.md#element-identity-model)
+  * satisfiedBy: [test.sh](../../../tests/test-parsing-functionality/test.sh)
 ---
+
