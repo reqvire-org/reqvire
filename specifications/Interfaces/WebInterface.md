@@ -73,6 +73,12 @@ The navigation bar must be:
 **HTML Design:**
 The system shall design and implement HTML pages with consistent layout, styling, and navigation for browsing the MBSE model.
 
+**Logo and Branding:**
+- The navigation bar shall display the Reqvire logo on the left side before the navigation links
+- A favicon shall be included for browser tab identification
+- Apple touch icons shall be included for mobile device support
+- All brand assets shall be exported to an assets folder during HTML export
+
 #### Relations
   * derivedFrom: [Model Export](../UserStories.md#model-export)
   * derivedFrom: [Web Interface](Interfaces.md#web-interface)
@@ -86,6 +92,58 @@ The system shall design and implement HTML pages with consistent layout, styling
   * satisfiedBy: [model.html](../../core/templates/model.html)
   * satisfiedBy: [export.rs](../../core/src/export.rs)
   * verifiedBy: [HTML Export Verification](Verifications/WebInterfaceVerifications.md#html-export-verification)
+---
+
+### Web Interface Color Scheme
+
+The system shall implement a consistent color scheme across all HTML pages optimized for MBSE and requirements management applications.
+
+#### Details
+**Primary Colors:**
+| Color Name | Hex Code | Usage |
+|------------|----------|-------|
+| Deep Sapphire | #1E3A5F | Navigation bar background, primary headers |
+| White | #FFFFFF | Navigation text, content background |
+| Slate Gray | #64748B | Secondary text, borders |
+
+**Element Type Colors:**
+The web interface shall use consistent colors matching the diagram color scheme:
+| Element Type | Color | Hex Code |
+|-------------|-------|----------|
+| Requirement | Royal Blue | #2563EB |
+| Verification | Emerald | #059669 |
+| Design | Purple | #7C3AED |
+| Test | Teal | #0891B2 |
+
+**Status Indicator Colors:**
+| Status | Color | Hex Code | Usage |
+|--------|-------|----------|-------|
+| Verified/Passing | Emerald | #059669 | Verified requirements, passing tests |
+| Pending/Warning | Amber | #D97706 | Unverified items, warnings |
+| Failed/Error | Rose | #DC2626 | Failed tests, validation errors |
+
+**Interactive State Colors:**
+| State | Color | Usage |
+|-------|-------|-------|
+| Hover Highlight | #ff6b6b | Diagram node hover effect |
+| Link Hover | Lighter shade | Navigation link hover states |
+| Active/Selected | Primary color | Currently selected navigation item |
+
+**Typography:**
+- Primary font: System font stack (sans-serif)
+- Monospace font: For code blocks and element identifiers
+- Line height: 1.6 for content readability
+
+**Layout:**
+- Navigation bar: Fixed position, full width
+- Content container: Centered with max-width for readability
+- Responsive design: Adapts to different screen sizes
+
+#### Relations
+  * derivedFrom: [HTML Export](#html-export)
+  * derivedFrom: [Interactive Mermaid Diagrams](../System/Output/DiagramGeneration.md#interactive-mermaid-diagrams)
+  * satisfiedBy: [html.rs](../../core/src/html.rs)
+  * satisfiedBy: [base.html](../../core/templates/base.html)
 ---
 
 ### Model-Centric View Generation
@@ -146,4 +204,3 @@ The system SHALL provide a serve command that exports comprehensive HTML documen
   * satisfiedBy: [serve.rs](../../cli/src/serve.rs)
   * verifiedBy: [Serve Command Verification](Verifications/WebInterfaceVerifications.md#serve-command-verification)
 ---
-

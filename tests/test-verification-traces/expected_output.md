@@ -10,11 +10,11 @@
 
 ```mermaid
 graph TD
-  classDef userRequirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
-  classDef systemRequirement fill:#fce4e4,stroke:#e68a8a,stroke-width:1px;
-  classDef requirement fill:#fce4e4,stroke:#e68a8a,stroke-width:1px;
-  classDef verified fill:#f9d6d6,stroke:#f55f5f,stroke-width:2px;
-  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef userRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:2px;
+  classDef systemRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:1px;
+  classDef requirement fill:#dbeafe,stroke:#2563EB,stroke-width:1px;
+  classDef verified fill:#dbeafe,stroke:#2563EB,stroke-width:2px;
+  classDef verification fill:#d1fae5,stroke:#059669,stroke-width:2px;
 
   bfd26e943c93f2b8["OAuth Flow Test<br>(test-verification)"]:::verification
   click bfd26e943c93f2b8 "specifications/Verifications/Tests.md#oauth-flow-test";
@@ -38,11 +38,11 @@ graph TD
 
 ```mermaid
 graph TD
-  classDef userRequirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
-  classDef systemRequirement fill:#fce4e4,stroke:#e68a8a,stroke-width:1px;
-  classDef requirement fill:#fce4e4,stroke:#e68a8a,stroke-width:1px;
-  classDef verified fill:#f9d6d6,stroke:#f55f5f,stroke-width:2px;
-  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef userRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:2px;
+  classDef systemRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:1px;
+  classDef requirement fill:#dbeafe,stroke:#2563EB,stroke-width:1px;
+  classDef verified fill:#dbeafe,stroke:#2563EB,stroke-width:2px;
+  classDef verification fill:#d1fae5,stroke:#059669,stroke-width:2px;
 
   473f7ef449cf9463["Session Timeout Test<br>(test-verification)"]:::verification
   click 473f7ef449cf9463 "specifications/Verifications/Tests.md#session-timeout-test";
@@ -66,11 +66,11 @@ graph TD
 
 ```mermaid
 graph TD
-  classDef userRequirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
-  classDef systemRequirement fill:#fce4e4,stroke:#e68a8a,stroke-width:1px;
-  classDef requirement fill:#fce4e4,stroke:#e68a8a,stroke-width:1px;
-  classDef verified fill:#f9d6d6,stroke:#f55f5f,stroke-width:2px;
-  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef userRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:2px;
+  classDef systemRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:1px;
+  classDef requirement fill:#dbeafe,stroke:#2563EB,stroke-width:1px;
+  classDef verified fill:#dbeafe,stroke:#2563EB,stroke-width:2px;
+  classDef verification fill:#d1fae5,stroke:#059669,stroke-width:2px;
 
   30572046e8226c8d["Encryption Coverage Test<br>(test-verification)"]:::verification
   click 30572046e8226c8d "specifications/Verifications/Tests.md#encryption-coverage-test";
@@ -91,11 +91,11 @@ graph TD
 
 ```mermaid
 graph TD
-  classDef userRequirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
-  classDef systemRequirement fill:#fce4e4,stroke:#e68a8a,stroke-width:1px;
-  classDef requirement fill:#fce4e4,stroke:#e68a8a,stroke-width:1px;
-  classDef verified fill:#f9d6d6,stroke:#f55f5f,stroke-width:2px;
-  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef userRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:2px;
+  classDef systemRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:1px;
+  classDef requirement fill:#dbeafe,stroke:#2563EB,stroke-width:1px;
+  classDef verified fill:#dbeafe,stroke:#2563EB,stroke-width:2px;
+  classDef verification fill:#d1fae5,stroke:#059669,stroke-width:2px;
 
   28383c90c121c4a5["Coverage Calculation Test<br>(test-verification)"]:::verification
   click 28383c90c121c4a5 "specifications/Verifications/Tests.md#coverage-calculation-test";
@@ -119,11 +119,11 @@ graph TD
 
 ```mermaid
 graph TD
-  classDef userRequirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
-  classDef systemRequirement fill:#fce4e4,stroke:#e68a8a,stroke-width:1px;
-  classDef requirement fill:#fce4e4,stroke:#e68a8a,stroke-width:1px;
-  classDef verified fill:#f9d6d6,stroke:#f55f5f,stroke-width:2px;
-  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef userRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:2px;
+  classDef systemRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:1px;
+  classDef requirement fill:#dbeafe,stroke:#2563EB,stroke-width:1px;
+  classDef verified fill:#dbeafe,stroke:#2563EB,stroke-width:2px;
+  classDef verification fill:#d1fae5,stroke:#059669,stroke-width:2px;
 
   ee61d9a254ace553["Security Analysis<br>(analysis-verification)"]:::verification
   click ee61d9a254ace553 "specifications/Verifications/Tests.md#security-analysis";
@@ -141,11 +141,11 @@ graph TD
 
 ```mermaid
 graph TD
-  classDef userRequirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
-  classDef systemRequirement fill:#fce4e4,stroke:#e68a8a,stroke-width:1px;
-  classDef requirement fill:#fce4e4,stroke:#e68a8a,stroke-width:1px;
-  classDef verified fill:#f9d6d6,stroke:#f55f5f,stroke-width:2px;
-  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef userRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:2px;
+  classDef systemRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:1px;
+  classDef requirement fill:#dbeafe,stroke:#2563EB,stroke-width:1px;
+  classDef verified fill:#dbeafe,stroke:#2563EB,stroke-width:2px;
+  classDef verification fill:#d1fae5,stroke:#059669,stroke-width:2px;
 
   cd126a6fddc2bd83["Code Inspection<br>(inspection-verification)"]:::verification
   click cd126a6fddc2bd83 "specifications/Verifications/Tests.md#code-inspection";

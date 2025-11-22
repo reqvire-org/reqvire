@@ -806,4 +806,3 @@ This test verifies that the --from-folder option correctly generates relative li
   * verify: [CLI Traces Command](../../../Interfaces/CLI.md#cli-traces-command)
   * satisfiedBy: [test.sh](../../../../tests/test-verification-traces/test.sh)
 ---
-

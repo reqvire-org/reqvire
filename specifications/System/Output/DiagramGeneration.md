@@ -114,11 +114,29 @@ Diagram generation follows a file-based approach:
 - The diagram shows all elements in the file and their relationships
 - External related resources are displayed as linked boxes to the actual resource
 
-Color code for rendering diagrams:
-- Red for requirement elements
-- Yellow for resources which satisfy requirements
-- Green for verification elements which verify requirements
-- Light blue for boxes representing elements in other files
+**Element Type Color Scheme:**
+The system shall use the following color scheme for rendering diagram elements:
+
+| Element Type | Color Name | Hex Code | Usage |
+|-------------|------------|----------|-------|
+| Requirement | Royal Blue | #2563EB | Requirement elements (refines, derives relations) |
+| Verification | Emerald | #059669 | Verification elements that verify requirements |
+| Design Element | Purple | #7C3AED | Design and architecture elements |
+| Test Case | Teal | #0891B2 | Test implementation elements |
+| Implementation | Amber | #D97706 | Resources which satisfy requirements |
+| External Reference | Slate | #64748B | Elements in other files (linked boxes) |
+
+**Relation Line Colors:**
+| Relation Type | Color | Style |
+|--------------|-------|-------|
+| Derive/DerivedFrom | #2563EB | Dashed |
+| Verify/VerifiedBy | #059669 | Dashed |
+| Satisfy/SatisfiedBy | #D97706 | Solid |
+| Trace | #64748B | Dashed |
+
+**Interactive Highlighting:**
+- Hovered element: Red drop-shadow glow (#ff6b6b)
+- Connected edges: Highlighted stroke (#ff6b6b) with increased width
 
 #### Metadata
   * type: user-requirement
@@ -255,4 +273,3 @@ Users shall be able to generate and view model structure diagrams from any start
   * derivedFrom: [Generate Diagrams](../../UserStories.md#generate-diagrams)
   * derivedFrom: [Model Reports](Reporting.md#model-reports)
 ---
-

@@ -10,9 +10,9 @@
 
 ```mermaid
 graph LR
-  classDef userRequirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
-  classDef systemRequirement fill:#fce4e4,stroke:#e68a8a,stroke-width:1px;
-  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef userRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:2px;
+  classDef systemRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:1px;
+  classDef verification fill:#d1fae5,stroke:#059669,stroke-width:2px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
   32fb52886d6166a1["Model Structure Exploration"];

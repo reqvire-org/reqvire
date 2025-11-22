@@ -97,4 +97,3 @@ This test verifies that the lint command analyzes model quality, detects issues 
   * verify: [Lint Auto-fix Capability](../Linting.md#lint-auto-fix-capability)
   * satisfiedBy: [test.sh](../../../../tests/test-lint-command/test.sh)
 ---
-

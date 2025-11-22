@@ -265,4 +265,3 @@ The system shall validate relation types and allow only supported types.
   * derivedFrom: [Align with Industry Standards](../../UserStories.md#align-with-industry-standards)
   * derivedFrom: [Relation Types and behaviors](ModelManagement.md#relation-types-and-behaviors)
 ---
-

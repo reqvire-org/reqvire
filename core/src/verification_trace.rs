@@ -257,14 +257,14 @@ impl<'a> VerificationTraceGenerator<'a> {
             && !base_url.is_empty()
             && !commit_hash.is_empty();
 
-        // Header with CSS classes (matching diagrams.rs color scheme)
+        // Header with CSS classes (MBSE color scheme)
         diagram.push_str("```mermaid\n");
         diagram.push_str("graph TD\n");
-        diagram.push_str("  classDef userRequirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;\n");
-        diagram.push_str("  classDef systemRequirement fill:#fce4e4,stroke:#e68a8a,stroke-width:1px;\n");
-        diagram.push_str("  classDef requirement fill:#fce4e4,stroke:#e68a8a,stroke-width:1px;\n");
-        diagram.push_str("  classDef verified fill:#f9d6d6,stroke:#f55f5f,stroke-width:2px;\n");
-        diagram.push_str("  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;\n");
+        diagram.push_str("  classDef userRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:2px;\n");
+        diagram.push_str("  classDef systemRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:1px;\n");
+        diagram.push_str("  classDef requirement fill:#dbeafe,stroke:#2563EB,stroke-width:1px;\n");
+        diagram.push_str("  classDef verified fill:#dbeafe,stroke:#2563EB,stroke-width:2px;\n");
+        diagram.push_str("  classDef verification fill:#d1fae5,stroke:#059669,stroke-width:2px;\n");
         diagram.push_str("\n");
 
         // Add verification node at the top

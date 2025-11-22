@@ -725,4 +725,3 @@ The test shall verify that the `mv-file --squash` command moves all elements fro
   * verify: [Move File Operation](../ElementManipulation.md#move-file-operation)
   * satisfiedBy: [test.sh](../../../../tests/test-crud-mv-file-squash/test.sh)
 ---
-

@@ -71,14 +71,14 @@
         // Add pan/zoom to all Mermaid diagrams after rendering
         waitForSvgs(function() {
             document.querySelectorAll('.mermaid').forEach(function(mermaidContainer) {
-                var svg = mermaidContainer.querySelector('svg');
-                if (!svg) return;
+                    var svg = mermaidContainer.querySelector('svg');
+                    if (!svg) return;
 
-                svg.style.maxWidth = 'none';
-                svg.style.maxHeight = 'none';
+                    svg.style.maxWidth = 'none';
+                    svg.style.maxHeight = 'none';
 
-                var eventsHandler = {
-                    haltEventListeners: ['touchstart', 'touchend', 'touchmove', 'touchleave', 'touchcancel'],
+                    var eventsHandler = {
+                        haltEventListeners: ['touchstart', 'touchend', 'touchmove', 'touchleave', 'touchcancel'],
                         init: function(options) {
                             var instance = options.instance;
                             var initialScale = 1;
@@ -171,7 +171,7 @@
                     });
             });
 
-            // Add CSS for edge highlighting
+            // Add CSS for edge highlighting (high specificity for SVG)
             var style = document.createElement('style');
             style.textContent = `
                 path.edge-highlighted,
@@ -183,7 +183,7 @@
             `;
             document.head.appendChild(style);
 
-            // Initialize edge highlighting for all diagrams
+            // Add edge highlighting on node hover
             document.querySelectorAll('.mermaid svg').forEach(function(svg) {
                 var nodes = svg.querySelectorAll('.node');
 
@@ -234,6 +234,10 @@
                     var d = path.getAttribute('d') || '';
                     var points = [];
                     var ctm = path.getCTM();
+
+                    // Match all coordinate pairs in the path
+                    var regex = /([ML])\s*([\d.-]+)[,\s]+([\d.-]+)|([CQ])[^MLCQZ]*/gi;
+                    var match;
 
                     // Get M (start) point
                     var startMatch = d.match(/M\s*([\d.-]+)[,\s]+([\d.-]+)/i);
@@ -306,13 +310,13 @@
                     var sourceNode = null;
                     var targetNode = null;
 
-                    // Find source and target nodes for this edge
+                    // Find source and target nodes for this edge (tight 5px margin for dense whole-model)
                     Object.keys(nodeData).forEach(function(hashId) {
                         var bbox = nodeData[hashId].bbox;
-                        if (isNearBbox(startPt, bbox, 20)) {
+                        if (isNearBbox(startPt, bbox, 5)) {
                             sourceNode = hashId;
                         }
-                        if (isNearBbox(endPt, bbox, 20)) {
+                        if (isNearBbox(endPt, bbox, 5)) {
                             targetNode = hashId;
                         }
                     });

@@ -144,13 +144,19 @@ HTML export integration must:
 - Create dedicated page: `containment.html`
 - Generate `containment.md` with Mermaid diagram
 - Convert to HTML during export process
-- Include in navigation menu as "Containment" (after "Home")
+- Include in navigation menu as "Containment" (after "Index")
 
 **Integration with Existing Export:**
 - Follow existing HTML export styling and structure
 - Use same CSS classes for element types
 - Maintain consistent navigation patterns
 - Apply post-processing for .md to .html conversions
+
+**Assets Export:**
+- Export `assets/` folder with logo, favicon, and touch icons
+- Include favicon link in all HTML pages
+- Include logo in navigation bar before Index link
+- Assets embedded at compile time for portability
 
 **Requirements:**
 - Generated during `reqvire export` command
@@ -631,4 +637,3 @@ The system shall provide upward traceability visualization from verifications to
 #### Relations
   * derivedFrom: [Verification Coverage Report](#verification-coverage-report)
 ---
-

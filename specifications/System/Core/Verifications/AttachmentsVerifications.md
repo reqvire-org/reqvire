@@ -186,4 +186,3 @@ Test cases:
   * verify: [Reserved Subsections Support](../StructureAndParsing.md#reserved-subsections-support)
   * satisfiedBy: [test.sh](../../../../tests/test-attachments/test.sh)
 ---
-

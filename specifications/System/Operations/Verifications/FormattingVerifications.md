@@ -110,4 +110,3 @@ This test verifies the format command requirements from SystemRequirements and U
   * verify: [Structure and Addressing in Markdown Documents](../../Core/StructureAndParsing.md#structure-and-addressing-in-markdown-documents)
   * satisfiedBy: [test.sh](../../../../tests/test-advanced-format/test.sh)
 ---
-

@@ -196,4 +196,3 @@ This test verifies that the smart filtering correctly handles new elements in ch
   * verify: [Requirements Change Propagation](../ChangeImpact.md#requirements-change-propagation)
   * satisfiedBy: [test.sh](../../../../tests/test-change-impact-smart-filtering/test.sh)
 ---
-

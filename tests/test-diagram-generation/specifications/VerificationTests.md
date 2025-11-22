@@ -5,8 +5,8 @@ This document contains verification tests for the system requirements.
 ```mermaid
 graph TD;
   %% Graph styling
-  classDef requirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
-  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef requirement fill:#dbeafe,stroke:#2563EB,stroke-width:1px;
+  classDef verification fill:#d1fae5,stroke:#059669,stroke-width:1px;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 

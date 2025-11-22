@@ -11,6 +11,29 @@ use std::path::Path;
 /// Embedded CSS styles for HTML output
 pub const EMBEDDED_STYLES: &str = r#"
 <style>
+:root {
+    /* Primary Colors */
+    --color-primary: #1E3A5F;           /* Deep Sapphire - navigation, headers */
+    --color-primary-hover: #2a4a73;     /* Lighter shade for hover states */
+    --color-primary-active: #15293f;    /* Darker shade for active states */
+
+    /* Element Type Colors */
+    --color-requirement: #2563EB;       /* Royal Blue */
+    --color-verification: #059669;      /* Emerald */
+    --color-design: #7C3AED;            /* Purple */
+    --color-test: #0891B2;              /* Teal */
+    --color-implementation: #D97706;    /* Amber */
+    --color-external: #64748B;          /* Slate */
+
+    /* Status Colors */
+    --color-verified: #059669;          /* Emerald - verified/passing */
+    --color-pending: #D97706;           /* Amber - pending/warning */
+    --color-error: #DC2626;             /* Rose - error/failed */
+
+    /* Interactive Colors */
+    --color-highlight: #ff6b6b;         /* Hover highlight */
+    --color-link: #0366d6;              /* Link color */
+}
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
     line-height: 1.6;
@@ -25,7 +48,7 @@ body {
     left: 0;
     right: 0;
     height: 50px;
-    background-color: #2c3e50;
+    background-color: var(--color-primary);
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     z-index: 1000;
     display: flex;
@@ -33,15 +56,23 @@ body {
     padding: 0 20px;
 }
 .reqvire-nav a {
-    color: #ecf0f1;
+    color: #ffffff;
     text-decoration: none;
     padding: 10px 20px;
     margin-right: 5px;
     border-radius: 3px;
     transition: background-color 0.2s;
 }
+.reqvire-nav a.nav-logo {
+    display: flex;
+    align-items: center;
+    padding: 5px 15px 5px 0;
+}
+.reqvire-nav a.nav-logo img {
+    vertical-align: middle;
+}
 .reqvire-nav a:hover {
-    background-color: #34495e;
+    background-color: var(--color-primary-hover);
 }
 .reqvire-nav-spacer {
     height: 50px;
@@ -69,7 +100,7 @@ h2 {
     padding-bottom: 5px;
 }
 h3 {
-    color: #1a6fb7;
+    color: var(--color-requirement);
     margin-top: 25px;
 }
 h4 {
@@ -77,7 +108,7 @@ h4 {
     font-weight: 600;
 }
 a {
-    color: #0366d6;
+    color: var(--color-link);
     text-decoration: none;
 }
 a:hover {
@@ -164,7 +195,7 @@ blockquote {
 .diagram-nav-btn {
     width: 32px;
     height: 32px;
-    background-color: #2c3e50;
+    background-color: var(--color-primary);
     color: white;
     border: none;
     border-radius: 3px;
@@ -175,10 +206,10 @@ blockquote {
     justify-content: center;
 }
 .diagram-nav-btn:hover {
-    background-color: #34495e;
+    background-color: var(--color-primary-hover);
 }
 .diagram-nav-btn:active {
-    background-color: #1a252f;
+    background-color: var(--color-primary-active);
 }
 </style>
 "#;
@@ -186,6 +217,10 @@ blockquote {
 /// HTML template for model.html page with full-size diagram support
 /// Loaded at compile time from templates/model.html
 pub const HTML_TEMPLATE_MODEL: &str = include_str!("../templates/model.html");
+
+/// HTML template for whole-model.html page with tighter edge detection for dense diagrams
+/// Loaded at compile time from templates/whole-model.html
+pub const HTML_TEMPLATE_WHOLE_MODEL: &str = include_str!("../templates/whole-model.html");
 
 /// HTML template for generated pages
 /// Loaded at compile time from templates/base.html
@@ -228,12 +263,13 @@ pub fn convert_to_html(
     let nav_prefix = calculate_nav_prefix(file_path, base_folder);
 
     // 7. Determine which template to use based on filename
-    let is_model_page = file_path.file_name()
+    let filename = file_path.file_name()
         .and_then(|n| n.to_str())
-        .map(|n| n == "model.md" || n == "whole-model.md")
-        .unwrap_or(false);
+        .unwrap_or("");
 
-    let template = if is_model_page {
+    let template = if filename == "whole-model.md" {
+        HTML_TEMPLATE_WHOLE_MODEL
+    } else if filename == "model.md" {
         HTML_TEMPLATE_MODEL
     } else {
         HTML_TEMPLATE

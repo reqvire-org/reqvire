@@ -90,4 +90,3 @@ This test verifies that the CLI help output displays all commands and their opti
   * verify: [CLI Coverage Command](../CLI.md#cli-coverage-command)
   * satisfiedBy: [test.sh](../../../tests/test-cli-help-structure/test.sh)
 ---
-

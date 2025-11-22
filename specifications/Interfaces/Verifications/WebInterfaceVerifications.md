@@ -76,4 +76,3 @@ This test verifies that the serve command exports HTML to a temporary directory 
   * verify: [Serve Command](../WebInterface.md#serve-command)
   * satisfiedBy: [test.sh](../../../tests/test-serve-command/test.sh)
 ---
-

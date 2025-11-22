@@ -217,4 +217,3 @@ This test verifies that the system correctly normalizes element name fragments a
   * verify: [Element Identity Model](../StructureAndParsing.md#element-identity-model)
   * satisfiedBy: [test.sh](../../../../tests/test-parsing-functionality/test.sh)
 ---
-

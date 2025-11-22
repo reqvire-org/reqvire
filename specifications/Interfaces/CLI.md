@@ -553,4 +553,3 @@ The markdown output shall include:
   * satisfiedBy: [containment.rs](../../core/src/containment.rs)
   * satisfiedBy: [diagrams.rs](../../core/src/diagrams.rs)
 ---
-

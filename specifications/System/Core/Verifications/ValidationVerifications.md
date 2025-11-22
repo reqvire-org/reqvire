@@ -328,4 +328,3 @@ This test verifies that the system correctly processes only files within the cur
   * verify: [CLI Move File Command](../../../Interfaces/CLI.md#cli-move-file-command)
   * satisfiedBy: [test.sh](../../../../tests/test-subdirectory-functionality/test.sh)
 ---
-

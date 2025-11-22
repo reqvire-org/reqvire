@@ -23,4 +23,3 @@ The roll-up strategy shall work as follows:
 #### Relations
   * derivedFrom: [Verification Upward Traceability](../Output/Reporting.md#verification-upward-traceability)
 ---
-

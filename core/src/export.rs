@@ -20,6 +20,31 @@ fn prepare_output_folder(output_folder: &Path) -> std::io::Result<()> {
     Ok(())
 }
 
+/// Assets folder embedded at compile time
+const ASSETS: &[(&str, &[u8])] = &[
+    ("logo.png", include_bytes!("../templates/assets/logo.png")),
+    ("favicon.ico", include_bytes!("../templates/assets/favicon.ico")),
+    ("apple-touch-icon.png", include_bytes!("../templates/assets/apple-touch-icon.png")),
+    ("android-chrome-192x192.png", include_bytes!("../templates/assets/android-chrome-192x192.png")),
+];
+
+/// Copies assets folder to output directory
+fn copy_assets_folder(output_dir: &Path) -> Result<(), ReqvireError> {
+    let assets_dir = output_dir.join("assets");
+    fs::create_dir_all(&assets_dir)
+        .map_err(|e| ReqvireError::IoError(e))?;
+
+    for (filename, content) in ASSETS {
+        let dest_path = assets_dir.join(filename);
+        fs::write(&dest_path, content)
+            .map_err(|e| ReqvireError::IoError(e))?;
+        debug!("Copied asset: {}", filename);
+    }
+
+    info!("✅ Copied {} assets", ASSETS.len());
+    Ok(())
+}
+
 
 /// Copies all model files from graph registry to temporary directory
 pub fn copy_model_files_to_temp(
@@ -317,7 +342,11 @@ pub fn generate_artifacts_in_temp(
     let html_count = html_export::export_markdown_to_html(&temp_dir, &temp_dir)?;
     info!("✅ Converted {} markdown files to HTML", html_count);
 
-    // Step 6.5: Post-process HTML files to convert .md references to .html
+    // Step 6.5: Copy assets folder for HTML pages
+    info!("Copying assets...");
+    copy_assets_folder(&temp_dir)?;
+
+    // Step 6.6: Post-process HTML files to convert .md references to .html
     info!("Post-processing HTML artifacts...");
     post_process_html_files(&temp_dir)?;
 

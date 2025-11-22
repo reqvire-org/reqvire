@@ -209,4 +209,3 @@ Reason: D is reachable via A → B → D and A → C → D
   * satisfiedBy: [lint.rs](../../../core/src/lint.rs)
   * verifiedBy: [Lint Command Verification](Verifications/LintingVerifications.md#lint-command-verification)
 ---
-
