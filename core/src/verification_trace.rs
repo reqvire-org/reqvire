@@ -470,8 +470,6 @@ impl<'a> VerificationTraceGenerator<'a> {
     pub fn generate_markdown(&self, report: &VerificationTracesReport) -> String {
         let mut markdown = String::new();
 
-        markdown.push_str("# Verification Traces Report\n\n");
-
         // Files are already sorted alphabetically by BTreeMap
         for (file_path, file_verifications) in &report.files {
             markdown.push_str(&format!("## File: {}\n\n", file_path));

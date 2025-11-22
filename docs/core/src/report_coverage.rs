@@ -91,7 +91,6 @@ impl CoverageReport {
 
     pub fn format_text(&self) -> String {
         let mut output = String::new();
-        output.push_str("# Verification Coverage Report\n\n");
 
         // Summary
         output.push_str("## Summary\n\n");

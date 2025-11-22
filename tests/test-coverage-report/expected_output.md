@@ -1,5 +1,3 @@
-# Verification Coverage Report
-
 ## Summary
 
 ### Leaf Requirements

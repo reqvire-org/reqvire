@@ -45,15 +45,9 @@ fi
 # Save actual output
 echo "$DIAGRAM_OUTPUT" > "$TEST_DIR/actual-containment-output.md"
 
-# Verify output is markdown with header
-if ! echo "$DIAGRAM_OUTPUT" | head -1 | grep -q "^# Containment View"; then
-  echo "❌ FAILED: Output does not start with '# Containment View' header"
-  exit 1
-fi
-
-# Verify mermaid code block is present
-if ! echo "$DIAGRAM_OUTPUT" | grep -q '```mermaid'; then
-  echo "❌ FAILED: Output does not contain mermaid code block"
+# Verify output starts with mermaid code block
+if ! echo "$DIAGRAM_OUTPUT" | head -1 | grep -q '```mermaid'; then
+  echo "❌ FAILED: Output does not start with mermaid code block"
   exit 1
 fi
 

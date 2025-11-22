@@ -256,8 +256,6 @@ fn count_relations_recursive(registry: &GraphRegistry, element_id: &str, visited
 fn generate_model_text(report: &ModelCentricReport, diagram_direction: &str) -> String {
     let mut output = String::new();
 
-    output.push_str("# Model Structure\n\n");
-
     // Metadata
     output.push_str(&format!("**Total Elements**: {}\n", report.metadata.total_elements));
     output.push_str(&format!("**Total Relations**: {}\n", report.metadata.total_relations));

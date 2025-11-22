@@ -1,5 +1,3 @@
-# Model Structure
-
 **Total Elements**: 1
 **Total Relations**: 12
 

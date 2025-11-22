@@ -1,18 +1,15 @@
-# Containment View
-
-This diagram shows the containment hierarchy (folders, files, and elements).
-Elements displayed in each file are filtered to show only top-level parents (those without hierarchical parent relations within the same file).
+*Elements filtered to show only root elements (those without hierarchical parent relations within the same file).*
 
 ```mermaid
-graph LR
+graph TD
   %% Graph styling
-  classDef userRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:1px;
+  classDef userRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:2px;
   classDef systemRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:1px;
   classDef requirement fill:#dbeafe,stroke:#2563EB,stroke-width:1px;
-  classDef verification fill:#d1fae5,stroke:#059669,stroke-width:1px;
+  classDef verification fill:#d1fae5,stroke:#059669,stroke-width:2px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
-  classDef folder fill:#e8f4f8,stroke:#4a90a4,stroke-width:2px;
-  classDef file fill:#fff8e1,stroke:#f9a825,stroke-width:2px;
+  classDef folder fill:#f1f5f9,stroke:#64748B,stroke-width:2px;
+  classDef file fill:#fef3c7,stroke:#D97706,stroke-width:2px;
 
   root["📁 Reqvire root"]
   class root folder

@@ -1,5 +1,3 @@
-# Verification Traces Report
-
 ## File: specifications/Verifications/Tests.md
 
 ### OAuth Flow Test

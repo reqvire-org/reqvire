@@ -635,8 +635,7 @@ blockquote {
     <div class="container">
         <div class="content">
             <h1 id="verification-traces">Verification Traces</h1>
-<p>Verification traces show upward traceability—how each verification connects through the requirement hierarchy to root requirements. Each trace diagram starts from a verification and follows derivedFrom relations upward, marking which requirements along the path are directly verified. This view helps identify coverage gaps and detect redundant verify relations.</p>
-<h1 id="verification-traces-report">Verification Traces Report</h1>
+<p>Verification traces show upward traceability from each verification through the requirement hierarchy. Using the <strong>roll-up strategy</strong>, verifying a leaf requirement automatically provides coverage to all its ancestors through derivedFrom relations—you don’t need to verify every level. Each diagram marks directly verified requirements, helping identify redundant verify relations where both a requirement and its ancestor are explicitly verified.</p>
 <h2 id="file:-specifications/interfaces/verifications/cliverifications.html">File: specifications/Interfaces/Verifications/CLIVerifications.html</h2>
 <h3 id="cli-git-commit-hash-flag-test">CLI Git Commit Hash Flag Test</h3>
 <ul>

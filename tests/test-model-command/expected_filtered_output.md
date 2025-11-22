@@ -1,5 +1,3 @@
-# Model Structure
-
 **Total Elements**: 1
 **Total Relations**: 9
 **Filtered From**: Model Diagram Generation

@@ -300,7 +300,6 @@ impl<'a> ModelDiagramGenerator<'a> {
     /// Generate Markdown text from model report
     pub fn generate_markdown(&self, report: &ModelDiagramReport) -> String {
         let mut markdown = String::new();
-        markdown.push_str("# Model Diagram Report\n\n");
 
         for folder in &report.folders {
             markdown.push_str(&format!("## 📁 {}\n\n", folder.name));
@@ -1032,13 +1031,9 @@ pub fn generate_containment_diagram(registry: &GraphRegistry, short: bool) -> Re
 
     let mut output = String::new();
 
-    // Markdown header
-    output.push_str("# Containment View\n\n");
-    output.push_str("This diagram shows the containment hierarchy (folders, files, and elements).\n");
+    // Note about element display mode
     if short {
-        output.push_str("Elements displayed in each file are filtered to show only root elements (those without hierarchical parent relations within the same file).\n\n");
-    } else {
-        output.push_str("All elements in each file are displayed.\n\n");
+        output.push_str("*Elements filtered to show only root elements (those without hierarchical parent relations within the same file).*\n\n");
     }
     output.push_str("```mermaid\n");
     output.push_str("graph TD\n");

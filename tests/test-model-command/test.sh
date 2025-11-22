@@ -40,11 +40,6 @@ if [ $EXIT_CODE -ne 0 ]; then
 fi
 
 # Basic validation before comparing with expected
-if ! grep -q "# Model Structure" <<< "$OUTPUT"; then
-    echo "❌ FAILED: Output missing '# Model Structure' header"
-    exit 1
-fi
-
 if ! grep -q '```mermaid' <<< "$OUTPUT"; then
     echo "❌ FAILED: Output missing mermaid diagram block"
     exit 1

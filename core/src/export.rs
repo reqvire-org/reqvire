@@ -43,11 +43,11 @@ This diagram visualizes the complete model as a single interconnected graph show
 
 const PAGE_DESCRIPTION_TRACES: &str = r#"# Verification Traces
 
-Verification traces show upward traceability—how each verification connects through the requirement hierarchy to root requirements. Each trace diagram starts from a verification and follows derivedFrom relations upward, marking which requirements along the path are directly verified. This view helps identify coverage gaps and detect redundant verify relations."#;
+Verification traces show upward traceability from each verification through the requirement hierarchy. Using the **roll-up strategy**, verifying a leaf requirement automatically provides coverage to all its ancestors through derivedFrom relations—you don't need to verify every level. Each diagram marks directly verified requirements, helping identify redundant verify relations where both a requirement and its ancestor are explicitly verified."#;
 
 const PAGE_DESCRIPTION_COVERAGE: &str = r#"# Verification Coverage
 
-Coverage analysis focuses on leaf requirements—the most specific requirements that don't derive other requirements. These represent implementable specifications that should be verified. The report shows verified vs. unverified percentages, broken down by file and type, helping identify gaps in verification coverage across the model."#;
+Coverage analysis focuses on **leaf requirements**—the lowest-level requirements that don't derive others. In MBSE, these are the implementable specifications. The **roll-up strategy** means verifying leaves provides automatic coverage to their ancestors through derivedFrom chains. This report shows verified vs. unverified leaf percentages by file and type, identifying where verification effort is needed."#;
 
 /// Copies assets folder to output directory
 fn copy_assets_folder(output_dir: &Path) -> Result<(), ReqvireError> {
