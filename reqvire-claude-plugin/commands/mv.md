@@ -1,13 +1,13 @@
 ---
 allowed-tools: Read, Bash(reqvire:*)
-argument-hint: [element-name] [--to-file] [--to-section] [--index]
-description: Move an element to a different file, section, or position
+argument-hint: [element-name] [--to-file] [--index]
+description: Move an element to a different file or position
 model: claude-sonnet-4-5-20250929
 ---
 
 # Move Element
 
-Move an existing model element to a different file, section, or position within the model.
+Move an existing model element to a different file or position within the model.
 
 ## Current Model Context
 
