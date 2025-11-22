@@ -22,12 +22,12 @@ ${1:-The user will provide element name and target location.}
 
 1. **Understand the context:**
    - Identify the element to move (by name)
-   - Determine the target location (file, section, and/or index)
+   - Determine the target location (file and/or index)
    - Verify element exists in the model
 
 2. **Preview the move operation:**
    ```bash
-   reqvire mv "<element-name>" --to-file="<file>" --to-section="<section>" --dry-run
+   reqvire mv "<element-name>" --to-file="<file>" --dry-run
    ```
 
    This shows:
@@ -38,12 +38,12 @@ ${1:-The user will provide element name and target location.}
 
 3. **Apply the move:**
    ```bash
-   reqvire mv "<element-name>" --to-file="<file>" --to-section="<section>"
+   reqvire mv "<element-name>" --to-file="<file>"
    ```
 
    The mv command automatically:
    - Removes element from source file
-   - Adds element to target file and section
+   - Adds element to target file
    - Updates the element identifier to reflect new location
    - Updates all forward relations (from the element to others)
    - Updates all backward relations (from other elements to this one)
@@ -60,13 +60,11 @@ ${1:-The user will provide element name and target location.}
 - **Path resolution**: File paths are resolved relative to current working directory
 - **Automatic relation updates**: All relations throughout the model are automatically updated
 - **Identifier update**: Element identifier changes from `<old-file>#<slug>` to `<new-file>#<slug>`
-- **Optional parameters**: You can specify just --to-file, just --to-section, or both
 
 ## Move Options
 
 - `--to-file="<file>"`: Move element to a different file
-- `--to-section="<section>"`: Move element to a specific section (by heading text)
-- `--index=<n>`: Position within target section (0-based, default: append to end)
+- `--index=<n>`: Position within target file (0-based, default: append to end)
 - `--dry-run`: Preview changes without applying
 - `--json`: Output results in JSON format
 
@@ -75,7 +73,6 @@ ${1:-The user will provide element name and target location.}
 The mv operation will fail with a clear error if:
 - The element name does not exist
 - The target file does not exist (must exist in git)
-- The target section does not exist in the target file
 - The operation would result in invalid model state
 
 ## Examples
@@ -85,19 +82,9 @@ The mv operation will fail with a clear error if:
 reqvire mv "User Authentication" --to-file="specifications/Security.md"
 ```
 
-**Move element to specific section:**
+**Insert at specific position (index 0 = first element in file):**
 ```bash
-reqvire mv "Login Feature" --to-section="Authentication Requirements"
-```
-
-**Move element to different file and section:**
-```bash
-reqvire mv "Data Storage" --to-file="specs/Backend.md" --to-section="Database"
-```
-
-**Insert at specific position (index 0 = first element in section):**
-```bash
-reqvire mv "High Priority Req" --to-section="Critical Features" --index=0
+reqvire mv "High Priority Req" --to-file="specifications/Critical.md" --index=0
 ```
 
 **Preview before moving:**
@@ -115,8 +102,7 @@ reqvire mv "Element" --to-file="File.md" --json
 Use mv when:
 - Moving individual requirements or verifications between files
 - Reorganizing elements within specification structure
-- Moving elements to more appropriate sections
-- Reordering elements within sections
+- Reordering elements within files
 
 **Note**: To move entire files with all their elements, use `reqvire mv-file` instead.
 
@@ -125,4 +111,4 @@ Use mv when:
 - **Move file**: `reqvire mv-file "<source-file>" "<target-file>"`
 - **Rename element**: `reqvire rename "<current-name>" "<new-name>"`
 - **Remove element**: `reqvire rm "<element-name>"`
-- **Add element**: `reqvire add --to-file="<file>" --to-section="<section>" < element.md`
+- **Add element**: `reqvire add "<file>" < element.md`

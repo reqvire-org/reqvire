@@ -94,7 +94,7 @@ ${1:-The user will specify which requirement needs verification.}
 7. **Add verification using reqvire add command:**
 
    ```bash
-   reqvire add --to-file="specifications/Verifications/<file>.md" --to-section="<section>" <<'EOF'
+   reqvire add "specifications/Verifications/<file>.md" <<'EOF'
    ### Verification Name
 
    [Description of verification approach]
@@ -119,7 +119,7 @@ ${1:-The user will specify which requirement needs verification.}
 
    Optional: Insert at specific position (0-based index):
    ```bash
-   reqvire add --to-file="specifications/Verifications/<file>.md" --to-section="<section>" 0 <<'EOF'
+   reqvire add "specifications/Verifications/<file>.md" 0 <<'EOF'
    ...
    EOF
    ```
@@ -155,19 +155,14 @@ ${1:-The user will specify which requirement needs verification.}
 
 After adding verifications, you may need to reorganize:
 
-**Move verification to different section (same file):**
+**Move verification to different file:**
 ```bash
-reqvire mv "specifications/Verifications/<file>.md#<verification-name>" --to-file="specifications/Verifications/<file>.md" --to-section="<new-section>"
+reqvire mv "<verification-name>" --to-file="specifications/Verifications/<file>.md"
 ```
 
 **Move verification with specific position:**
 ```bash
-reqvire mv "specifications/Verifications/<file>.md#<verification-name>" --to-file="<target-file>" --to-section="<section>" --index=0
-```
-
-Or using positional arguments:
-```bash
-reqvire mv "specifications/Verifications/<file>.md#<verification-name>" <target-file> <section> [index]
+reqvire mv "<verification-name>" --to-file="<target-file>" --index=0
 ```
 
 **Remove verification:**

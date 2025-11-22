@@ -72,7 +72,7 @@ reqvire mv-file "<source-file>" "<existing-target-file>" --squash
 ```
 
 **Squash behavior:**
-- Moves all elements from source file to target file's first section
+- All source elements are appended to target file
 - Target file's existing elements remain unchanged
 - Source file is deleted after successful move
 - All relations are updated throughout the model
@@ -145,7 +145,7 @@ Use mv-file with --squash when:
 
 ## Related Commands
 
-- **Move element**: `reqvire mv "<element-name>" --to-file="<file>" --to-section="<section>"`
+- **Move element**: `reqvire mv "<element-name>" --to-file="<file>"`
 - **Rename element**: `reqvire rename "<current-name>" "<new-name>"`
 - **Remove element**: `reqvire rm "<element-name>"`
-- **Add element**: `reqvire add --to-file="<file>" --to-section="<section>" < element.md`
+- **Add element**: `reqvire add "<file>" < element.md`

@@ -107,7 +107,7 @@ After removing an element, you may need to:
 
 ## Related Commands
 
-- **Move element**: `reqvire mv "<element-name>" --to-file="<file>" --to-section="<section>"`
+- **Move element**: `reqvire mv "<element-name>" --to-file="<file>"`
 - **Rename element**: `reqvire rename "<current-name>" "<new-name>"`
-- **Add element**: `reqvire add --to-file="<file>" --to-section="<section>" < element.md`
+- **Add element**: `reqvire add "<file>" < element.md`
 - **Search elements**: `reqvire search --filter-name="<pattern>"`

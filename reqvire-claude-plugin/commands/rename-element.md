@@ -92,10 +92,10 @@ Use rename when:
 - Consolidating or clarifying element names
 - Refactoring the model structure
 
-**Note**: Rename only changes the element name and heading. To move an element to a different file or section, use `reqvire mv` instead.
+**Note**: Rename only changes the element name and heading. To move an element to a different file, use `reqvire mv` instead.
 
 ## Related Commands
 
-- **Move element**: `reqvire mv "<element-id>" --to-file="<file>" --to-section="<section>"`
+- **Move element**: `reqvire mv "<element-id>" --to-file="<file>"`
 - **Remove element**: `reqvire rm "<element-id>"`
-- **Add element**: `reqvire add --to-file="<file>" --to-section="<section>" < element.md`
+- **Add element**: `reqvire add "<file>" < element.md`

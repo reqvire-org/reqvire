@@ -25,7 +25,7 @@ ${1:-The user will provide requirement details.}
 1. **Understand the context:**
    - Ask user for requirement details (name, description) if not provided
    - Identify parent requirement if this is a derived requirement
-   - Identify target file and section (user specifies or follows project conventions)
+   - Identify target file (user specifies or follows project conventions)
 
 2. **Draft the requirement content:**
 
@@ -65,7 +65,7 @@ ${1:-The user will provide requirement details.}
 
 3. **Add the requirement using reqvire add command:**
    ```bash
-   reqvire add --to-file="<file-path>" --to-section="<section-name>" <<'EOF'
+   reqvire add "<file-path>" <<'EOF'
    ### Requirement Name
 
    The system shall [capability].
@@ -80,7 +80,7 @@ ${1:-The user will provide requirement details.}
 
    Optional: Insert at specific position (0-based index):
    ```bash
-   reqvire add --to-file="<file-path>" --to-section="<section-name>" 0 <<'EOF'
+   reqvire add "<file-path>" 0 <<'EOF'
    ...
    EOF
    ```
@@ -113,24 +113,19 @@ ${1:-The user will provide requirement details.}
 
 After adding requirements, you may need to reorganize:
 
-**Move element to different section (same file):**
+**Move element to different file:**
 ```bash
-reqvire mv "<file>#<element-name>" --to-file="<same-file>" --to-section="<new-section>"
+reqvire mv "<element-name>" --to-file="<target-file>"
 ```
 
 **Move element with specific position:**
 ```bash
-reqvire mv "<file>#<element-name>" --to-file="<target-file>" --to-section="<section>" --index=0
-```
-
-Or using positional arguments:
-```bash
-reqvire mv "<file>#<element-name>" <target-file> <section> [index]
+reqvire mv "<element-name>" --to-file="<target-file>" --index=0
 ```
 
 **Remove element:**
 ```bash
-reqvire rm "<file>#<element-name>"
+reqvire rm "<element-name>"
 ```
 
 ## Best Practices
