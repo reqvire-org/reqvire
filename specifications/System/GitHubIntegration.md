@@ -22,9 +22,9 @@ The system shall generate detailed change logs for pull requests, summarizing mo
   * derivedFrom: [Integrate with GitHub Workflows](../UserStories.md#integrate-with-github-workflows)
 ---
 
-### Automate Diagram Generation
+### Automate Documentation Export
 
-The system shall automate generation of diagrams in the GitHub workflow on PR merge event, so that the diagrams are always accessible and up-to-date.
+The system shall automate export of HTML documentation in the GitHub workflow on PR merge event, so that the documentation is always accessible and up-to-date for GitHub Pages.
 
 #### Metadata
   * type: user-requirement
@@ -33,24 +33,24 @@ The system shall automate generation of diagrams in the GitHub workflow on PR me
   * derivedFrom: [Integrate with GitHub Workflows](../UserStories.md#integrate-with-github-workflows)
 ---
 
-### Automated Diagram Generation on PR Merge
+### Automated Documentation Export on PR Merge
 
-The system shall implement a GitHub workflow that automatically generates and commits updated diagrams when pull requests are merged to the main branch.
+The system shall implement a GitHub workflow that automatically exports and commits updated HTML documentation when pull requests are merged to the main branch.
 
 #### Details
 The GitHub workflow shall:
 - Be triggered only when a pull request is merged to the main branch (not on PR creation or updates)
 - Check out the latest code from the main branch post-merge
 - Build the Reqvire tool from source
-- Run the diagram generation process using the `--generate-diagrams` flag
-- Check if any diagrams have been added or modified
+- Run the HTML export process using `reqvire export --output docs`
+- Check if any documentation files have been added or modified
 - Commit any updated files with a standardized commit message
 - Push the updates back to the main branch
 
-This ensures that the Mermaid diagrams in the repository are always up-to-date after changes are merged to the main branch, providing accurate visual representations of the latest model state without requiring manual intervention.
+This ensures that the HTML documentation in the `docs/` folder is always up-to-date after changes are merged to the main branch, providing accurate documentation for GitHub Pages without requiring manual intervention.
 
 #### Relations
-  * derivedFrom: [Automate Diagram Generation](#automate-diagram-generation)
+  * derivedFrom: [Automate Documentation Export](#automate-documentation-export)
   * derivedFrom: [Automate Pull Request Validations](#automate-pull-request-validations)
-  * satisfiedBy: [generate_diagrams.yml](../../.github/workflows/generate_diagrams.yml)
+  * satisfiedBy: [update_docs.yml](../../.github/workflows/update_docs.yml)
 ---
