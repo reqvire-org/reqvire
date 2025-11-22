@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>index</title>
+    
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa;
+    color: #333;
+}
+.reqvire-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    background-color: #2c3e50;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+}
+.reqvire-nav a {
+    color: #ecf0f1;
+    text-decoration: none;
+    padding: 10px 20px;
+    margin-right: 5px;
+    border-radius: 3px;
+    transition: background-color 0.2s;
+}
+.reqvire-nav a:hover {
+    background-color: #34495e;
+}
+.reqvire-nav-spacer {
+    height: 50px;
+}
+.container {
+    max-width: 95%;
+    margin: 0 auto;
+    padding: 20px;
+}
+.content {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+h1 {
+    color: #333;
+    border-bottom: 2px solid #eaecef;
+    padding-bottom: 10px;
+    margin-top: 0;
+}
+h2 {
+    color: #333;
+    border-bottom: 1px solid #eaecef;
+    padding-bottom: 5px;
+}
+h3 {
+    color: #1a6fb7;
+    margin-top: 25px;
+}
+h4 {
+    color: #555;
+    font-weight: 600;
+}
+a {
+    color: #0366d6;
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 20px 0;
+}
+table, th, td {
+    border: 1px solid #dfe2e5;
+}
+th, td {
+    padding: 8px 12px;
+    text-align: left;
+}
+th {
+    background-color: #f6f8fa;
+}
+code {
+    background: #f6f8fa;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 90%;
+}
+pre {
+    background: #f6f8fa;
+    border-radius: 3px;
+    padding: 16px;
+    overflow: auto;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+}
+blockquote {
+    margin: 0;
+    padding: 0 15px;
+    color: #777;
+    border-left: 4px solid #dfe2e5;
+}
+.mermaid {
+    margin: 20px 0;
+    text-align: center;
+    height: calc(100vh - 150px);
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid #dfe2e5;
+    border-radius: 3px;
+    background-color: #fafafa;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+.mermaid svg {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    position: relative;
+    z-index: 1;
+}
+.diagram-nav-buttons {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 999; /* higher than SVG (1) but lower than header nav (1000) */
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 5px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+.diagram-nav-row {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+}
+.diagram-nav-btn {
+    width: 32px;
+    height: 32px;
+    background-color: #2c3e50;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.diagram-nav-btn:hover {
+    background-color: #34495e;
+}
+.diagram-nav-btn:active {
+    background-color: #1a252f;
+}
+</style>
+
+    <!-- Enhanced mermaid configuration for Reqvire diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.5.0/dist/svg-pan-zoom.min.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+        import elkLayouts from 'https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk/dist/mermaid-layout-elk.esm.min.mjs';
+
+        // Register ELK layout for large diagrams
+        mermaid.registerLayoutLoaders(elkLayouts);
+
+        // Capture Mermaid errors
+        mermaid.parseError = function(err, hash) {
+            console.error('Mermaid Parse Error:', err);
+            console.error('Error details:', {
+                str: err.str,
+                hash: err.hash,
+                message: err.message,
+                stack: err.stack
+            });
+        };
+
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            maxTextSize: 5000000,
+            maxEdges: 50000,
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis',
+                defaultRenderer: 'elk'
+            },
+            layout: 'elk',
+            elk: {
+                mergeEdges: true,
+                nodePlacementStrategy: 'SIMPLE'
+            },
+            securityLevel: 'loose',
+            logLevel: 'error'
+        });
+
+        await mermaid.run();
+        window.mermaid = mermaid;
+
+        // Add pan/zoom to all Mermaid diagrams after rendering
+        setTimeout(function() {
+            document.querySelectorAll('.mermaid').forEach(function(mermaidContainer) {
+                    var svg = mermaidContainer.querySelector('svg');
+                    if (!svg) return;
+
+                    svg.style.maxWidth = 'none';
+                    svg.style.maxHeight = 'none';
+
+                    var eventsHandler = {
+                        haltEventListeners: ['touchstart', 'touchend', 'touchmove', 'touchleave', 'touchcancel'],
+                        init: function(options) {
+                            var instance = options.instance;
+                            var initialScale = 1;
+                            var pannedX = 0;
+                            var pannedY = 0;
+
+                            this.hammer = Hammer(options.svgElement, {
+                                inputClass: Hammer.SUPPORT_POINTER_EVENTS ? Hammer.PointerEventInput : Hammer.TouchInput
+                            });
+
+                            this.hammer.get('pinch').set({enable: true});
+
+                            this.hammer.on('doubletap', function(ev){
+                                instance.zoomIn();
+                            });
+
+                            this.hammer.on('panstart panmove', function(ev){
+                                if (ev.type === 'panstart') {
+                                    pannedX = 0;
+                                    pannedY = 0;
+                                }
+                                instance.panBy({x: ev.deltaX - pannedX, y: ev.deltaY - pannedY});
+                                pannedX = ev.deltaX;
+                                pannedY = ev.deltaY;
+                            });
+
+                            this.hammer.on('pinchstart pinchmove', function(ev){
+                                if (ev.type === 'pinchstart') {
+                                    initialScale = instance.getZoom();
+                                }
+                                instance.zoomAtPoint(initialScale * ev.scale, {x: ev.center.x, y: ev.center.y});
+                            });
+
+                            options.svgElement.addEventListener('touchmove', function(e){ e.preventDefault(); });
+                        },
+                        destroy: function(){
+                            this.hammer.destroy();
+                        }
+                    };
+
+                    // Diagrams with default zoom (no auto-fit)
+                    var panZoomInstance = svgPanZoom(svg, {
+                        zoomEnabled: true,
+                        controlIconsEnabled: true,
+                        fit: false,
+                        center: false,
+                        contain: false,
+                        minZoom: 0.5,
+                        maxZoom: 10,
+                        zoomScaleSensitivity: 0.3,
+                        customEventsHandler: eventsHandler
+                    });
+
+                    // Add navigation buttons
+                    var navButtons = document.createElement('div');
+                    navButtons.className = 'diagram-nav-buttons';
+                    navButtons.innerHTML = `
+                        <div class="diagram-nav-row">
+                            <button class="diagram-nav-btn" data-action="up">▲</button>
+                        </div>
+                        <div class="diagram-nav-row">
+                            <button class="diagram-nav-btn" data-action="left">◀</button>
+                            <button class="diagram-nav-btn" data-action="down">▼</button>
+                            <button class="diagram-nav-btn" data-action="right">▶</button>
+                        </div>
+                    `;
+                    mermaidContainer.appendChild(navButtons);
+
+                    // Wire up navigation buttons
+                    var panStep = 100;
+                    navButtons.querySelectorAll('.diagram-nav-btn').forEach(function(btn) {
+                        btn.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            var action = this.getAttribute('data-action');
+                            switch(action) {
+                                case 'up':
+                                    panZoomInstance.panBy({x: 0, y: panStep});
+                                    break;
+                                case 'down':
+                                    panZoomInstance.panBy({x: 0, y: -panStep});
+                                    break;
+                                case 'left':
+                                    panZoomInstance.panBy({x: panStep, y: 0});
+                                    break;
+                                case 'right':
+                                    panZoomInstance.panBy({x: -panStep, y: 0});
+                                    break;
+                            }
+                        });
+                    });
+            });
+        }, 500);
+
+        // Add CSS for edge highlighting (high specificity for SVG)
+        var style = document.createElement('style');
+        style.textContent = `
+            path.edge-highlighted,
+            .edge-highlighted path,
+            svg path.edge-highlighted {
+                stroke: #ff6b6b !important;
+                stroke-width: 3px !important;
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Add edge highlighting on node hover
+        setTimeout(function() {
+            document.querySelectorAll('.mermaid svg').forEach(function(svg) {
+                var nodes = svg.querySelectorAll('.node');
+
+                // Find flowchart-link paths (actual edges)
+                var edgePaths = svg.querySelectorAll('path.flowchart-link');
+                // Fallback: find paths in .edges group
+                if (edgePaths.length === 0) {
+                    var edgesGroup = svg.querySelector('.edges');
+                    if (edgesGroup) {
+                        edgePaths = edgesGroup.querySelectorAll('path');
+                    }
+                }
+
+                // Get SVG point for coordinate transforms
+                var svgPoint = svg.createSVGPoint();
+
+                // Helper: transform point through element's CTM
+                function getTransformedBBox(element) {
+                    var bbox = element.getBBox();
+                    var ctm = element.getCTM();
+                    if (!ctm) return bbox;
+
+                    // Transform all four corners
+                    var corners = [
+                        {x: bbox.x, y: bbox.y},
+                        {x: bbox.x + bbox.width, y: bbox.y},
+                        {x: bbox.x, y: bbox.y + bbox.height},
+                        {x: bbox.x + bbox.width, y: bbox.y + bbox.height}
+                    ];
+
+                    var transformed = corners.map(function(c) {
+                        svgPoint.x = c.x;
+                        svgPoint.y = c.y;
+                        var tp = svgPoint.matrixTransform(ctm);
+                        return {x: tp.x, y: tp.y};
+                    });
+
+                    var minX = Math.min.apply(null, transformed.map(function(p) { return p.x; }));
+                    var maxX = Math.max.apply(null, transformed.map(function(p) { return p.x; }));
+                    var minY = Math.min.apply(null, transformed.map(function(p) { return p.y; }));
+                    var maxY = Math.max.apply(null, transformed.map(function(p) { return p.y; }));
+
+                    return {x: minX, y: minY, width: maxX - minX, height: maxY - minY};
+                }
+
+                // Helper: get all points from path
+                function getPathPoints(path) {
+                    var d = path.getAttribute('d') || '';
+                    var points = [];
+                    var ctm = path.getCTM();
+
+                    // Get M (start) point
+                    var startMatch = d.match(/M\s*([\d.-]+)[,\s]+([\d.-]+)/i);
+                    if (startMatch) {
+                        var sx = parseFloat(startMatch[1]);
+                        var sy = parseFloat(startMatch[2]);
+                        if (ctm) {
+                            svgPoint.x = sx; svgPoint.y = sy;
+                            var tp = svgPoint.matrixTransform(ctm);
+                            points.push({x: tp.x, y: tp.y});
+                        } else {
+                            points.push({x: sx, y: sy});
+                        }
+                    }
+
+                    // Get last point - find last number pair before Z or end
+                    var allNums = d.match(/[\d.-]+/g);
+                    if (allNums && allNums.length >= 2) {
+                        var ex = parseFloat(allNums[allNums.length - 2]);
+                        var ey = parseFloat(allNums[allNums.length - 1]);
+                        if (ctm) {
+                            svgPoint.x = ex; svgPoint.y = ey;
+                            var tp = svgPoint.matrixTransform(ctm);
+                            points.push({x: tp.x, y: tp.y});
+                        } else {
+                            points.push({x: ex, y: ey});
+                        }
+                    }
+
+                    return points;
+                }
+
+                // Build node bounding boxes with transforms
+                var nodeData = {};
+                nodes.forEach(function(node) {
+                    var nodeId = node.id || '';
+                    var parts = nodeId.split('-');
+                    var hashId = parts.length >= 2 ? parts[1] : nodeId;
+
+                    nodeData[hashId] = {
+                        node: node,
+                        bbox: getTransformedBBox(node)
+                    };
+                });
+
+                // Check if point is near bbox
+                function isNearBbox(pt, bbox, margin) {
+                    margin = margin || 40;
+                    return pt.x >= bbox.x - margin && pt.x <= bbox.x + bbox.width + margin &&
+                           pt.y >= bbox.y - margin && pt.y <= bbox.y + bbox.height + margin;
+                }
+
+                // Map edges to nodes
+                var nodeEdgeMap = {};
+                Object.keys(nodeData).forEach(function(hashId) {
+                    nodeEdgeMap[hashId] = [];
+                    var bbox = nodeData[hashId].bbox;
+
+                    edgePaths.forEach(function(path) {
+                        var points = getPathPoints(path);
+                        for (var i = 0; i < points.length; i++) {
+                            if (isNearBbox(points[i], bbox, 40)) {
+                                if (!nodeEdgeMap[hashId].includes(path)) {
+                                    nodeEdgeMap[hashId].push(path);
+                                }
+                                break;
+                            }
+                        }
+                    });
+                });
+
+                // Attach hover handlers
+                nodes.forEach(function(node) {
+                    var nodeId = node.id || '';
+                    var parts = nodeId.split('-');
+                    var hashId = parts.length >= 2 ? parts[1] : nodeId;
+
+                    node.style.cursor = 'pointer';
+
+                    node.addEventListener('mouseenter', function(e) {
+                        e.stopPropagation();
+                        nodes.forEach(function(n) { n.style.filter = ''; });
+                        node.style.filter = 'drop-shadow(0 0 6px #ff6b6b)';
+
+                        var connectedEdges = nodeEdgeMap[hashId] || [];
+                        connectedEdges.forEach(function(path) {
+                            path.classList.add('edge-highlighted');
+                        });
+                    });
+
+                    node.addEventListener('mouseleave', function() {
+                        node.style.filter = '';
+                        var connectedEdges = nodeEdgeMap[hashId] || [];
+                        connectedEdges.forEach(function(path) {
+                            path.classList.remove('edge-highlighted');
+                        });
+                    });
+                });
+            });
+        }, 1000);
+    </script>
+</head>
+<body>
+    <nav class="reqvire-nav">
+        <a href="index.html">Home</a>
+        <a href="containment.html">Containment</a>
+        <a href="model.html">Model</a>
+        <a href="whole-model.html">Whole Model</a>
+        <a href="traces.html">Traces</a>
+        <a href="coverage.html">Coverage</a>
+    </nav>
+    <div class="reqvire-nav-spacer"></div>
+    <div class="container">
+        <div class="content">
+            <h1 id="specification-index">Specification Index</h1>
+<h2><a href="specifications/Interfaces/CLI.html">specifications/Interfaces/CLI.html</a></h2>
+<ul>
+<li><a href="specifications/Interfaces/CLI.html#cli-interface-structure">CLI Interface Structure</a></li>
+<li><a href="specifications/Interfaces/CLI.html#format-command">Format Command</a></li>
+<li><a href="specifications/Interfaces/CLI.html#validate-command">Validate Command</a></li>
+<li><a href="specifications/Interfaces/CLI.html#subdirectory-processing-option">Subdirectory Processing Option</a></li>
+<li><a href="specifications/Interfaces/CLI.html#attachment-commands">Attachment Commands</a></li>
+<li><a href="specifications/Interfaces/CLI.html#detailed-error-handling-and-logging">Detailed Error Handling and Logging</a></li>
+<li><a href="specifications/Interfaces/CLI.html#cli-search-command">CLI Search Command</a></li>
+<li><a href="specifications/Interfaces/CLI.html#cli-model-diagram-command">CLI Model Diagram Command</a></li>
+<li><a href="specifications/Interfaces/CLI.html#cli-traces-command">CLI Traces Command</a></li>
+<li><a href="specifications/Interfaces/CLI.html#cli-coverage-command">CLI Coverage Command</a></li>
+<li><a href="specifications/Interfaces/CLI.html#cli-lint-command">CLI Lint Command</a></li>
+<li><a href="specifications/Interfaces/CLI.html#cli-change-impact-report-command">CLI Change Impact Report Command</a></li>
+<li><a href="specifications/Interfaces/CLI.html#cli-generate-diagrams-flag">CLI Generate Diagrams Flag</a></li>
+<li><a href="specifications/Interfaces/CLI.html#cli-remove-diagrams-flag">CLI Remove Diagrams Flag</a></li>
+<li><a href="specifications/Interfaces/CLI.html#cli-add-element-command">CLI Add Element Command</a></li>
+<li><a href="specifications/Interfaces/CLI.html#cli-remove-element-command">CLI Remove Element Command</a></li>
+<li><a href="specifications/Interfaces/CLI.html#cli-move-element-command">CLI Move Element Command</a></li>
+<li><a href="specifications/Interfaces/CLI.html#cli-move-file-command">CLI Move File Command</a></li>
+<li><a href="specifications/Interfaces/CLI.html#cli-rename-element-command">CLI Rename Element Command</a></li>
+<li><a href="specifications/Interfaces/CLI.html#cli-containment-command">CLI Containment Command</a></li>
+<li><a href="specifications/Interfaces/CLI.html#cli-help-structure-verification">CLI Help Structure Verification</a></li>
+<li><a href="specifications/Interfaces/CLI.html#cli-git-commit-hash-flag-test">CLI Git Commit Hash Flag Test</a></li>
+</ul>
+<h2><a href="specifications/Interfaces/Interfaces.html">specifications/Interfaces/Interfaces.html</a></h2>
+<ul>
+<li><a href="specifications/Interfaces/Interfaces.html#cli-interface">CLI interface</a></li>
+<li><a href="specifications/Interfaces/Interfaces.html#web-interface">Web Interface</a></li>
+</ul>
+<h2><a href="specifications/Interfaces/WebInterface.html">specifications/Interfaces/WebInterface.html</a></h2>
+<ul>
+<li><a href="specifications/Interfaces/WebInterface.html#html-export">HTML Export</a></li>
+<li><a href="specifications/Interfaces/WebInterface.html#html-export-verification">HTML Export Verification</a></li>
+<li><a href="specifications/Interfaces/WebInterface.html#model-centric-view-generation">Model-Centric View Generation</a></li>
+<li><a href="specifications/Interfaces/WebInterface.html#whole-model-diagram-generation">Whole Model Diagram Generation</a></li>
+<li><a href="specifications/Interfaces/WebInterface.html#serve-command-verification">Serve Command Verification</a></li>
+<li><a href="specifications/Interfaces/WebInterface.html#serve-command">Serve Command</a></li>
+</ul>
+<h2><a href="specifications/System/AttachmentsVerifications.html">specifications/System/AttachmentsVerifications.html</a></h2>
+<ul>
+<li><a href="specifications/System/AttachmentsVerifications.html#attachments-subsection-parsing-verification">Attachments Subsection Parsing Verification</a></li>
+<li><a href="specifications/System/AttachmentsVerifications.html#attachments-validation-verification">Attachments Validation Verification</a></li>
+<li><a href="specifications/System/AttachmentsVerifications.html#attachments-change-impact-verification">Attachments Change Impact Verification</a></li>
+<li><a href="specifications/System/AttachmentsVerifications.html#attach-command-verification">Attach Command Verification</a></li>
+<li><a href="specifications/System/AttachmentsVerifications.html#detach-command-verification">Detach Command Verification</a></li>
+<li><a href="specifications/System/AttachmentsVerifications.html#move-attachment-command-verification">Move Attachment Command Verification</a></li>
+<li><a href="specifications/System/AttachmentsVerifications.html#remove-attachment-command-verification">Remove Attachment Command Verification</a></li>
+<li><a href="specifications/System/AttachmentsVerifications.html#attachment-search-filters-verification">Attachment Search Filters Verification</a></li>
+<li><a href="specifications/System/AttachmentsVerifications.html#attachment-output-rendering-verification">Attachment Output Rendering Verification</a></li>
+</ul>
+<h2><a href="specifications/System/ChangeImpact.html">specifications/System/ChangeImpact.html</a></h2>
+<ul>
+<li><a href="specifications/System/ChangeImpact.html#change-impact-detection">Change Impact Detection</a></li>
+<li><a href="specifications/System/ChangeImpact.html#structural-change-analyzer">Structural Change Analyzer</a></li>
+<li><a href="specifications/System/ChangeImpact.html#change-impact-detection-test">Change Impact Detection Test</a></li>
+<li><a href="specifications/System/ChangeImpact.html#change-impact-relations-test">Change Impact Relations Test</a></li>
+<li><a href="specifications/System/ChangeImpact.html#element-content-extraction-test">Element Content Extraction Test</a></li>
+<li><a href="specifications/System/ChangeImpact.html#change-impact-analysis-verification">Change Impact Analysis Verification</a></li>
+<li><a href="specifications/System/ChangeImpact.html#structural-change-reports-verification">Structural Change Reports Verification</a></li>
+<li><a href="specifications/System/ChangeImpact.html#change-impact-smart-filtering-test">Change Impact Smart Filtering Test</a></li>
+<li><a href="specifications/System/ChangeImpact.html#requirements-change-propagation">Requirements Change Propagation</a></li>
+</ul>
+<h2><a href="specifications/System/CodeAlignment.html">specifications/System/CodeAlignment.html</a></h2>
+<ul>
+<li><a href="specifications/System/CodeAlignment.html#bat-style-comment">BAT style comment</a></li>
+<li><a href="specifications/System/CodeAlignment.html#dash-style-comment">Dash style comment</a></li>
+<li><a href="specifications/System/CodeAlignment.html#sql-style-comment">SQL style comment</a></li>
+<li><a href="specifications/System/CodeAlignment.html#css-style-comment">CSS style comment</a></li>
+<li><a href="specifications/System/CodeAlignment.html#xml-style-comment">XML style comment</a></li>
+<li><a href="specifications/System/CodeAlignment.html#slash-style-comment">Slash style comment</a></li>
+<li><a href="specifications/System/CodeAlignment.html#traceability-format">Traceability Format</a></li>
+<li><a href="specifications/System/CodeAlignment.html#comment-style-by-file-extension">Comment Style by File Extension</a></li>
+<li><a href="specifications/System/CodeAlignment.html#validating-traceability-format">Validating Traceability Format</a></li>
+<li><a href="specifications/System/CodeAlignment.html#code-traceability">Code Traceability</a></li>
+<li><a href="specifications/System/CodeAlignment.html#suggest-code-refactoring">Suggest Code Refactoring</a></li>
+</ul>
+<h2><a href="specifications/System/Configuration.html">specifications/System/Configuration.html</a></h2>
+<ul>
+<li><a href="specifications/System/Configuration.html#ignoring-unstructured-documents">Ignoring Unstructured Documents</a></li>
+<li><a href="specifications/System/Configuration.html#ignore-files-integration">Ignore Files Integration</a></li>
+<li><a href="specifications/System/Configuration.html#reserved-repository-files-exclusion">Reserved Repository Files Exclusion</a></li>
+<li><a href="specifications/System/Configuration.html#requirements-processing">Requirements Processing</a></li>
+<li><a href="specifications/System/Configuration.html#structured-markdown-files-search-and-detection">Structured Markdown Files Search and Detection</a></li>
+</ul>
+<h2><a href="specifications/System/DiagramGeneration.html">specifications/System/DiagramGeneration.html</a></h2>
+<ul>
+<li><a href="specifications/System/DiagramGeneration.html#diagram-generation-test">Diagram Generation Test</a></li>
+<li><a href="specifications/System/DiagramGeneration.html#diagram-generation">Diagram Generation</a></li>
+<li><a href="specifications/System/DiagramGeneration.html#sysml-compatible-relationship-rendering">SysML-Compatible Relationship Rendering</a></li>
+<li><a href="specifications/System/DiagramGeneration.html#visualize-model-relationships-verification">Visualize Model Relationships Verification</a></li>
+<li><a href="specifications/System/DiagramGeneration.html#automated-diagram-generation-on-pr-merge-verification">Automated Diagram Generation on PR Merge Verification</a></li>
+<li><a href="specifications/System/DiagramGeneration.html#interactive-mermaid-diagrams">Interactive Mermaid Diagrams</a></li>
+<li><a href="specifications/System/DiagramGeneration.html#remove-generated-diagrams">Remove Generated Diagrams</a></li>
+<li><a href="specifications/System/DiagramGeneration.html#diagram-relation-filtering-verification">Diagram Relation Filtering Verification</a></li>
+<li><a href="specifications/System/DiagramGeneration.html#remove-generated-diagrams-verification">Remove Generated Diagrams Verification</a></li>
+<li><a href="specifications/System/DiagramGeneration.html#trace-relation-non-directional-behavior">Trace Relation Non-Directional Behavior</a></li>
+<li><a href="specifications/System/DiagramGeneration.html#complete-model-structure-visualization">Complete Model Structure Visualization</a></li>
+<li><a href="specifications/System/DiagramGeneration.html#diagram-removal">Diagram Removal</a></li>
+<li><a href="specifications/System/DiagramGeneration.html#interactive-mermaid-diagram-node-behavior">Interactive Mermaid Diagram Node Behavior</a></li>
+<li><a href="specifications/System/DiagramGeneration.html#model-visualization-and-exploration">Model Visualization and Exploration</a></li>
+</ul>
+<h2><a href="specifications/System/ElementManipulation.html">specifications/System/ElementManipulation.html</a></h2>
+<ul>
+<li><a href="specifications/System/ElementManipulation.html#file-persistence-test">File Persistence Test</a></li>
+<li><a href="specifications/System/ElementManipulation.html#element-manipulation-file-persistence">Element Manipulation File Persistence</a></li>
+<li><a href="specifications/System/ElementManipulation.html#target-location-validation-test">Target Location Validation Test</a></li>
+<li><a href="specifications/System/ElementManipulation.html#target-location-validation-and-auto-creation">Target Location Validation and Auto-Creation</a></li>
+<li><a href="specifications/System/ElementManipulation.html#create-element-operation">Create Element Operation</a></li>
+<li><a href="specifications/System/ElementManipulation.html#create-element-test">Create Element Test</a></li>
+<li><a href="specifications/System/ElementManipulation.html#delete-element-test">Delete Element Test</a></li>
+<li><a href="specifications/System/ElementManipulation.html#delete-element-operation">Delete Element Operation</a></li>
+<li><a href="specifications/System/ElementManipulation.html#move-element-test">Move Element Test</a></li>
+<li><a href="specifications/System/ElementManipulation.html#move-element-operation">Move Element Operation</a></li>
+<li><a href="specifications/System/ElementManipulation.html#move-file-operation">Move File Operation</a></li>
+<li><a href="specifications/System/ElementManipulation.html#relation-consistency-test">Relation Consistency Test</a></li>
+<li><a href="specifications/System/ElementManipulation.html#relation-consistency-maintenance">Relation Consistency Maintenance</a></li>
+<li><a href="specifications/System/ElementManipulation.html#cli-add-element-test">CLI Add Element Test</a></li>
+<li><a href="specifications/System/ElementManipulation.html#cli-remove-element-test">CLI Remove Element Test</a></li>
+<li><a href="specifications/System/ElementManipulation.html#rename-element-operation">Rename Element Operation</a></li>
+<li><a href="specifications/System/ElementManipulation.html#cli-move-element-test">CLI Move Element Test</a></li>
+<li><a href="specifications/System/ElementManipulation.html#cli-rename-element-test">CLI Rename Element Test</a></li>
+<li><a href="specifications/System/ElementManipulation.html#cli-move-file-test">CLI Move File Test</a></li>
+<li><a href="specifications/System/ElementManipulation.html#move-file-squash-test">Move File Squash Test</a></li>
+</ul>
+<h2><a href="specifications/System/Formatting.html">specifications/System/Formatting.html</a></h2>
+<ul>
+<li><a href="specifications/System/Formatting.html#model-formatting">Model Formatting</a></li>
+<li><a href="specifications/System/Formatting.html#formatting-output">Formatting Output</a></li>
+<li><a href="specifications/System/Formatting.html#format-consistency-enforcement">Format Consistency Enforcement</a></li>
+<li><a href="specifications/System/Formatting.html#format-command-requirements-verification">Format Command Requirements Verification</a></li>
+<li><a href="specifications/System/Formatting.html#replace-absolute-links-with-relative-links">Replace Absolute Links with Relative Links</a></li>
+<li><a href="specifications/System/Formatting.html#git-style-diff-output-for-format">Git-Style Diff Output for Format</a></li>
+<li><a href="specifications/System/Formatting.html#file-pattern-exclusion-for-format">File Pattern Exclusion for Format</a></li>
+<li><a href="specifications/System/Formatting.html#document-structure-normalization">Document Structure Normalization</a></li>
+</ul>
+<h2><a href="specifications/System/GitHubIntegration.html">specifications/System/GitHubIntegration.html</a></h2>
+<ul>
+<li><a href="specifications/System/GitHubIntegration.html#automate-pull-request-validations">Automate Pull Request Validations</a></li>
+<li><a href="specifications/System/GitHubIntegration.html#generate-change-logs-for-pull-requests">Generate Change Logs for Pull Requests</a></li>
+<li><a href="specifications/System/GitHubIntegration.html#automate-diagram-generation">Automate Diagram Generation</a></li>
+<li><a href="specifications/System/GitHubIntegration.html#automated-diagram-generation-on-pr-merge">Automated Diagram Generation on PR Merge</a></li>
+</ul>
+<h2><a href="specifications/System/Linting.html">specifications/System/Linting.html</a></h2>
+<ul>
+<li><a href="specifications/System/Linting.html#model-linting">Model Linting</a></li>
+<li><a href="specifications/System/Linting.html#lint-output-formatting">Lint Output Formatting</a></li>
+<li><a href="specifications/System/Linting.html#lint-auto-fix-capability">Lint Auto-fix Capability</a></li>
+<li><a href="specifications/System/Linting.html#lint-command-verification">Lint Command Verification</a></li>
+<li><a href="specifications/System/Linting.html#redundant-verify-relations-detection">Redundant Verify Relations Detection</a></li>
+<li><a href="specifications/System/Linting.html#redundant-hierarchical-relations-detection">Redundant Hierarchical Relations Detection</a></li>
+<li><a href="specifications/System/Linting.html#multi-branch-convergence-detection">Multi-Branch Convergence Detection</a></li>
+<li><a href="specifications/System/Linting.html#safe-redundant-hierarchical-relations-auto-removal">Safe Redundant Hierarchical Relations Auto-Removal</a></li>
+</ul>
+<h2><a href="specifications/System/ModelManagement.html">specifications/System/ModelManagement.html</a></h2>
+<ul>
+<li><a href="specifications/System/ModelManagement.html#coexistence-of-structured-and-unstructured-documents">Coexistence of Structured and Unstructured Documents</a></li>
+<li><a href="specifications/System/ModelManagement.html#relation-types-and-behaviors">Relation Types and behaviors</a></li>
+<li><a href="specifications/System/ModelManagement.html#efficient-processing">Efficient Processing</a></li>
+<li><a href="specifications/System/ModelManagement.html#default-requirement-type-assignment">Default Requirement Type Assignment</a></li>
+<li><a href="specifications/System/ModelManagement.html#template-based-model-bootstrapping">Template-Based Model Bootstrapping</a></li>
+<li><a href="specifications/System/ModelManagement.html#git-repository-as-project-root">Git Repository as Project Root</a></li>
+<li><a href="specifications/System/ModelManagement.html#element-manipulation-operations">Element Manipulation Operations</a></li>
+<li><a href="specifications/System/ModelManagement.html#verification-type-categories">Verification Type Categories</a></li>
+<li><a href="specifications/System/ModelManagement.html#supported-element-types">Supported Element Types</a></li>
+</ul>
+<h2><a href="specifications/System/ParsingAndValidationVerifications.html">specifications/System/ParsingAndValidationVerifications.html</a></h2>
+<ul>
+<li><a href="specifications/System/ParsingAndValidationVerifications.html#element-subsection-parsing-test">Element Subsection Parsing Test</a></li>
+<li><a href="specifications/System/ParsingAndValidationVerifications.html#specification-file-identification-test">Specification File Identification Test</a></li>
+<li><a href="specifications/System/ParsingAndValidationVerifications.html#fragment-normalization-test">Fragment Normalization Test</a></li>
+</ul>
+<h2><a href="specifications/System/Reporting.html">specifications/System/Reporting.html</a></h2>
+<ul>
+<li><a href="specifications/System/Reporting.html#containment-view-report-generation">Containment View Report Generation</a></li>
+<li><a href="specifications/System/Reporting.html#forward-only-relation-traversal">Forward-Only Relation Traversal</a></li>
+<li><a href="specifications/System/Reporting.html#search-report-generator">Search Report Generator</a></li>
+<li><a href="specifications/System/Reporting.html#containment-hierarchy-extraction-test">Containment Hierarchy Extraction Test</a></li>
+<li><a href="specifications/System/Reporting.html#verification-coverage-report-generator">Verification Coverage Report Generator</a></li>
+<li><a href="specifications/System/Reporting.html#custom-element-type-tracking">Custom Element Type Tracking</a></li>
+<li><a href="specifications/System/Reporting.html#model-diagram-output-formats">Model Diagram Output Formats</a></li>
+<li><a href="specifications/System/Reporting.html#search-command-tests">Search Command Tests</a></li>
+<li><a href="specifications/System/Reporting.html#search-fine-grained-filtering">Search Fine Grained Filtering</a></li>
+<li><a href="specifications/System/Reporting.html#tracing-structural-changes">Tracing Structural Changes</a></li>
+<li><a href="specifications/System/Reporting.html#verification-coverage-report-test">Verification Coverage Report Test</a></li>
+<li><a href="specifications/System/Reporting.html#validation-report-generator">Validation Report Generator</a></li>
+<li><a href="specifications/System/Reporting.html#model-reports">Model Reports</a></li>
+<li><a href="specifications/System/Reporting.html#containment-view-text-output-test">Containment View Text Output Test</a></li>
+<li><a href="specifications/System/Reporting.html#containment-view-json-output-test">Containment View JSON Output Test</a></li>
+<li><a href="specifications/System/Reporting.html#verification-traces-filter-options-test">Verification Traces Filter Options Test</a></li>
+<li><a href="specifications/System/Reporting.html#model-structure-and-summaries">Model Structure and Summaries</a></li>
+<li><a href="specifications/System/Reporting.html#containment-view-mermaid-diagram-test">Containment View Mermaid Diagram Test</a></li>
+<li><a href="specifications/System/Reporting.html#verification-traces-from-folder-test">Verification Traces From-Folder Test</a></li>
+<li><a href="specifications/System/Reporting.html#html-export-containment-view-integration-test">HTML Export Containment View Integration Test</a></li>
+<li><a href="specifications/System/Reporting.html#containment-view-report">Containment View Report</a></li>
+<li><a href="specifications/System/Reporting.html#model-command-verification">Model Command Verification</a></li>
+<li><a href="specifications/System/Reporting.html#custom-element-type-tracking-test">Custom Element Type Tracking Test</a></li>
+<li><a href="specifications/System/Reporting.html#provide-validation-reports">Provide Validation Reports</a></li>
+<li><a href="specifications/System/Reporting.html#verification-coverage-report">Verification Coverage Report</a></li>
+<li><a href="specifications/System/Reporting.html#verification-upward-traceability">Verification Upward Traceability</a></li>
+</ul>
+<h2><a href="specifications/System/StructureAndParsing.html">specifications/System/StructureAndParsing.html</a></h2>
+<ul>
+<li><a href="specifications/System/StructureAndParsing.html#specification-file-identification">Specification File Identification</a></li>
+<li><a href="specifications/System/StructureAndParsing.html#structure-and-addressing-in-markdown-documents">Structure and Addressing in Markdown Documents</a></li>
+<li><a href="specifications/System/StructureAndParsing.html#identifiers-and-relations">Identifiers and Relations</a></li>
+<li><a href="specifications/System/StructureAndParsing.html#element-identity-model">Element Identity Model</a></li>
+</ul>
+<h2><a href="specifications/System/Subsections.html">specifications/System/Subsections.html</a></h2>
+<ul>
+<li><a href="specifications/System/Subsections.html#reserved-subsections-support">Reserved Subsections Support</a></li>
+</ul>
+<h2><a href="specifications/System/Validation.html">specifications/System/Validation.html</a></h2>
+<ul>
+<li><a href="specifications/System/Validation.html#two-pass-validation-strategy">Two-Pass Validation Strategy</a></li>
+<li><a href="specifications/System/Validation.html#invalid-relations-test">Invalid Relations Test</a></li>
+<li><a href="specifications/System/Validation.html#same-file-fragment-relations-test">Same-File Fragment Relations Test</a></li>
+<li><a href="specifications/System/Validation.html#markdown-structure-validator">Markdown Structure Validator</a></li>
+<li><a href="specifications/System/Validation.html#enhanced-validation-error-reporting">Enhanced Validation Error Reporting</a></li>
+<li><a href="specifications/System/Validation.html#requirements-files-search-and-detection-test">Requirements Files Search and Detection Test</a></li>
+<li><a href="specifications/System/Validation.html#integrated-validation">Integrated Validation</a></li>
+<li><a href="specifications/System/Validation.html#file-exclusion-test">File Exclusion Test</a></li>
+<li><a href="specifications/System/Validation.html#validate-markdown-structure">Validate Markdown Structure</a></li>
+<li><a href="specifications/System/Validation.html#unstructured-documents-test">Unstructured Documents Test</a></li>
+<li><a href="specifications/System/Validation.html#invalid-header-structure-test">Invalid Header Structure Test</a></li>
+<li><a href="specifications/System/Validation.html#internal-consistency-validator">Internal Consistency Validator</a></li>
+<li><a href="specifications/System/Validation.html#validate-filesystem-structure">Validate Filesystem Structure</a></li>
+<li><a href="specifications/System/Validation.html#subdirectory-processing-verification">Subdirectory Processing Verification</a></li>
+<li><a href="specifications/System/Validation.html#default-element-type-assignment-test">Default Element Type Assignment Test</a></li>
+<li><a href="specifications/System/Validation.html#cross-component-dependency-validator">Cross-Component Dependency Validator</a></li>
+<li><a href="specifications/System/Validation.html#validation-error-handling">Validation Error Handling</a></li>
+<li><a href="specifications/System/Validation.html#relation-element-type-validator">Relation Element Type Validator</a></li>
+<li><a href="specifications/System/Validation.html#graphregistry-as-primary-registry">GraphRegistry as Primary Registry</a></li>
+<li><a href="specifications/System/Validation.html#validate-internal-consistency">Validate Internal Consistency</a></li>
+<li><a href="specifications/System/Validation.html#validate-cross-component-dependencies">Validate Cross-Component Dependencies</a></li>
+<li><a href="specifications/System/Validation.html#relation-type-validation">Relation Type Validation</a></li>
+<li><a href="specifications/System/Validation.html#excluded-file-relation-validation">Excluded File Relation Validation</a></li>
+<li><a href="specifications/System/Validation.html#validate-relation-types">Validate Relation Types</a></li>
+</ul>
+<h2><a href="specifications/System/VerificationTraces.html">specifications/System/VerificationTraces.html</a></h2>
+<ul>
+<li><a href="specifications/System/VerificationTraces.html#trace-relations-no-cycles-verification">Trace Relations No Cycles Verification</a></li>
+<li><a href="specifications/System/VerificationTraces.html#verification-trace-builder">Verification Trace Builder</a></li>
+<li><a href="specifications/System/VerificationTraces.html#verification-roll-up-strategy">Verification Roll-up Strategy</a></li>
+</ul>
+<h2><a href="specifications/UserStories.html">specifications/UserStories.html</a></h2>
+<ul>
+<li><a href="specifications/UserStories.html#align-with-industry-standards">Align with Industry Standards</a></li>
+<li><a href="specifications/UserStories.html#promote-automation-and-efficiency">Promote Automation and Efficiency</a></li>
+<li><a href="specifications/UserStories.html#managing-system-models">Managing System Models</a></li>
+<li><a href="specifications/UserStories.html#ai-assisted-system-model-management">AI-Assisted System Model Management</a></li>
+<li><a href="specifications/UserStories.html#generate-diagrams">Generate Diagrams</a></li>
+<li><a href="specifications/UserStories.html#model-export">Model Export</a></li>
+<li><a href="specifications/UserStories.html#aligning-design-with-code">Aligning Design with Code</a></li>
+<li><a href="specifications/UserStories.html#validating-structures">Validating Structures</a></li>
+<li><a href="specifications/UserStories.html#integrate-with-github-workflows">Integrate with GitHub Workflows</a></li>
+<li><a href="specifications/UserStories.html#provide-reports">Provide Reports</a></li>
+<li><a href="specifications/UserStories.html#trace-changes-in-system-model">Trace Changes in System Model</a></li>
+<li><a href="specifications/UserStories.html#fostering-community-contributions">Fostering Community Contributions</a></li>
+</ul>
+<hr />
+<p><strong>Summary:</strong></p>
+<ul>
+<li>20 Files</li>
+<li>200 Elements</li>
+</ul>
+
+        </div>
+    </div>
+</body>
+</html>
