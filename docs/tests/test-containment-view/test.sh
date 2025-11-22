@@ -60,9 +60,9 @@ fi
 # Extract mermaid diagram from code block for further testing
 MERMAID_DIAGRAM=$(echo "$DIAGRAM_OUTPUT" | sed -n '/```mermaid/,/```/p' | sed '1d;$d')
 
-# Verify diagram starts with graph LR
-if ! echo "$MERMAID_DIAGRAM" | head -1 | grep -q "^graph LR"; then
-  echo "❌ FAILED: Mermaid diagram does not start with 'graph LR'"
+# Verify diagram starts with graph TD
+if ! echo "$MERMAID_DIAGRAM" | head -1 | grep -q "^graph TD"; then
+  echo "❌ FAILED: Mermaid diagram does not start with 'graph TD'"
   exit 1
 fi
 
@@ -109,10 +109,10 @@ echo ""
 echo "Test 3: Element nodes and hash IDs..."
 
 # Verify element nodes exist (format: hashId["Element Name"])
-# Note: Filtered to show only top-level parents (9 elements instead of 14)
+# Default mode shows all elements (14 total)
 NODE_COUNT=$(echo "$MERMAID_DIAGRAM" | grep -cE '^\s+[a-f0-9]+\["[^"]+"\]' || true)
-if [ "$NODE_COUNT" -lt 9 ]; then
-  echo "❌ FAILED: Expected at least 9 element nodes, got $NODE_COUNT"
+if [ "$NODE_COUNT" -lt 14 ]; then
+  echo "❌ FAILED: Expected at least 14 element nodes (all elements), got $NODE_COUNT"
   exit 1
 fi
 
@@ -168,10 +168,10 @@ echo "✓ Element type styling is applied correctly"
 echo ""
 echo "Test 5: Clickable links..."
 
-# Verify click directives exist (9 for top-level filtered elements)
+# Verify click directives exist (14 for all elements in default mode)
 CLICK_COUNT=$(echo "$MERMAID_DIAGRAM" | grep -c "^  click" || true)
-if [ "$CLICK_COUNT" -lt 9 ]; then
-  echo "❌ FAILED: Expected at least 9 click directives, got $CLICK_COUNT"
+if [ "$CLICK_COUNT" -lt 14 ]; then
+  echo "❌ FAILED: Expected at least 14 click directives (all elements), got $CLICK_COUNT"
   exit 1
 fi
 
@@ -287,7 +287,7 @@ set -e
 
 if [ $EXPORT_EXIT -eq 0 ] && [ -f "$TEST_DIR/output/containment.html" ]; then
   # Verify HTML file exists and contains Mermaid
-  if ! grep -q "graph LR" "$TEST_DIR/output/containment.html"; then
+  if ! grep -q "graph TD" "$TEST_DIR/output/containment.html"; then
     echo "❌ FAILED: containment.html doesn't contain Mermaid diagram"
     exit 1
   fi

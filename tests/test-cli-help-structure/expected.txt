@@ -140,3 +140,4 @@ RM ATTACHMENT OPTIONS:
 
 CONTAINMENT OPTIONS:
       --json                    Output results in JSON format
+      --short                   Show only root elements (without hierarchical parents in same file)

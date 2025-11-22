@@ -505,8 +505,8 @@ blockquote {
         <div class="content">
             <h1 id="containment-view">Containment View</h1>
 <p>This diagram shows the containment hierarchy (folders, files, and elements).
-Elements displayed in each file are filtered to show only top-level parents (those without hierarchical parent relations within the same file).</p>
-<div class="mermaid">graph LR
+All elements in each file are displayed.</p>
+<div class="mermaid">graph TD
   %% Graph styling
   classDef userRequirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
   classDef systemRequirement fill:#fce4e4,stroke:#e68a8a,stroke-width:1px;
@@ -526,32 +526,52 @@ Elements displayed in each file are filtered to show only top-level parents (tho
   specifications --> specifications_Interfaces
   class specifications_Interfaces folder
   subgraph specifications/Interfaces/CLI[&quot;📄 CLI.md&quot;]
+    direction TB
     bc47257b545846c1[&quot;Attachment Commands&quot;]
+    c3f31692af982337[&quot;CLI Add Element Command&quot;]
+    0466a71b10f4a893[&quot;CLI Change Impact Report Command&quot;]
+    cb57cc99292a62fa[&quot;CLI Containment Command&quot;]
     235da8e2168b9f6a[&quot;CLI Coverage Command&quot;]
+    802f456709870e8d[&quot;CLI Generate Diagrams Flag&quot;]
     2e82974d2d21b9e6[&quot;CLI Git Commit Hash Flag Test&quot;]
     b6ade0e9d74483ae[&quot;CLI Help Structure Verification&quot;]
     fc1c4911cd5758b4[&quot;CLI Interface Structure&quot;]
+    c635f268b710f1f0[&quot;CLI Lint Command&quot;]
     275600e6e14e0126[&quot;CLI Model Diagram Command&quot;]
+    91d5372baeb7775f[&quot;CLI Move Element Command&quot;]
+    e0bc0530143463f7[&quot;CLI Move File Command&quot;]
+    f7d6f9bdf63c8aa9[&quot;CLI Remove Diagrams Flag&quot;]
+    0915be6909c3de76[&quot;CLI Remove Element Command&quot;]
+    91605128dfe5524f[&quot;CLI Rename Element Command&quot;]
+    508d5a19defec54d[&quot;CLI Search Command&quot;]
     6e733aaef7687066[&quot;CLI Traces Command&quot;]
     3706d8a6d6a10014[&quot;Detailed Error Handling and Logging&quot;]
+    f5c62abef3588c05[&quot;Format Command&quot;]
+    4e5e3f4d55b0a239[&quot;Subdirectory Processing Option&quot;]
+    767aae89fe7d0e36[&quot;Validate Command&quot;]
   end
   specifications_Interfaces --> specifications/Interfaces/CLI
   subgraph specifications/Interfaces/Interfaces[&quot;📄 Interfaces.md&quot;]
+    direction TB
     212473ea6147fe61[&quot;CLI interface&quot;]
     befd612b67d91ac7[&quot;Web Interface&quot;]
   end
   specifications_Interfaces --> specifications/Interfaces/Interfaces
   subgraph specifications/Interfaces/WebInterface[&quot;📄 WebInterface.md&quot;]
+    direction TB
     f74d17b8cb0d18f6[&quot;HTML Export&quot;]
     42c12e62f4eabf65[&quot;HTML Export Verification&quot;]
+    616a2b5bf721d57c[&quot;Model-Centric View Generation&quot;]
     d76f41d446037179[&quot;Serve Command&quot;]
     95b5b2884934be43[&quot;Serve Command Verification&quot;]
+    510bedadffcc06a5[&quot;Whole Model Diagram Generation&quot;]
   end
   specifications_Interfaces --> specifications/Interfaces/WebInterface
   specifications_System[&quot;📁 System&quot;]
   specifications --> specifications_System
   class specifications_System folder
   subgraph specifications/System/AttachmentsVerifications[&quot;📄 AttachmentsVerifications.md&quot;]
+    direction TB
     1301c1064f1b3c53[&quot;Attach Command Verification&quot;]
     0554f5b452fcfda0[&quot;Attachment Output Rendering Verification&quot;]
     b138049f5d70f085[&quot;Attachment Search Filters Verification&quot;]
@@ -564,74 +584,118 @@ Elements displayed in each file are filtered to show only top-level parents (tho
   end
   specifications_System --> specifications/System/AttachmentsVerifications
   subgraph specifications/System/ChangeImpact[&quot;📄 ChangeImpact.md&quot;]
+    direction TB
     3118863c0e73fff8[&quot;Change Impact Analysis Verification&quot;]
     44f090b1cc8ceed5[&quot;Change Impact Detection&quot;]
     bd6cf6d79b9d6fe8[&quot;Change Impact Detection Test&quot;]
     b433a9b6f1af2988[&quot;Change Impact Relations Test&quot;]
     85f7e6759ad86468[&quot;Change Impact Smart Filtering Test&quot;]
     b81416c2c6baf432[&quot;Element Content Extraction Test&quot;]
+    57bc7dcc01ac1ab8[&quot;Requirements Change Propagation&quot;]
+    bddf986f9c41ea3a[&quot;Structural Change Analyzer&quot;]
     adb4125110a9fb55[&quot;Structural Change Reports Verification&quot;]
   end
   specifications_System --> specifications/System/ChangeImpact
   subgraph specifications/System/CodeAlignment[&quot;📄 CodeAlignment.md&quot;]
+    direction TB
+    78d113aa81d9eba9[&quot;BAT style comment&quot;]
     39c21cfcc1927eba[&quot;Code Traceability&quot;]
+    ff4361ddcaf9e85c[&quot;Comment Style by File Extension&quot;]
+    51a571776c15789f[&quot;CSS style comment&quot;]
+    4b5354b675176e0d[&quot;Dash style comment&quot;]
+    8173a352d0ff73e0[&quot;Slash style comment&quot;]
+    fd7ba8aa84067722[&quot;SQL style comment&quot;]
     243de8fbc48aa9a8[&quot;Suggest Code Refactoring&quot;]
+    5de938a9c8ee620b[&quot;Traceability Format&quot;]
+    92850bd8d95d8e30[&quot;Validating Traceability Format&quot;]
+    5866fda92894f8b8[&quot;XML style comment&quot;]
   end
   specifications_System --> specifications/System/CodeAlignment
   subgraph specifications/System/Configuration[&quot;📄 Configuration.md&quot;]
+    direction TB
+    efaad0f04f75e62a[&quot;Ignore Files Integration&quot;]
     764945f655338130[&quot;Ignoring Unstructured Documents&quot;]
+    dc3aea2c57c6ba26[&quot;Requirements Processing&quot;]
+    9b0c7e9b5714bb7a[&quot;Reserved Repository Files Exclusion&quot;]
+    dc4e680aa718e118[&quot;Structured Markdown Files Search and Detection&quot;]
   end
   specifications_System --> specifications/System/Configuration
   subgraph specifications/System/DiagramGeneration[&quot;📄 DiagramGeneration.md&quot;]
-    319e4ce583defef6[&quot;Automated Diagram Generation on PR Merge Verification&quot;]
+    direction TB
+    e9cab0c0c58f28c2[&quot;Automated Documentation Export on PR Merge Verification&quot;]
     28912f6c08953613[&quot;Complete Model Structure Visualization&quot;]
+    04e3672c55225ffe[&quot;Diagram Generation&quot;]
     62bd4e7920be79ce[&quot;Diagram Generation Test&quot;]
     de1da31b651e767e[&quot;Diagram Relation Filtering Verification&quot;]
+    70489eb259eb44bb[&quot;Diagram Removal&quot;]
+    ee840ffe8dc45e66[&quot;Interactive Mermaid Diagram Node Behavior&quot;]
     18b39b0e9245a678[&quot;Interactive Mermaid Diagrams&quot;]
     4c47df975c67f67a[&quot;Model Visualization and Exploration&quot;]
     854a1b9ef1ec5555[&quot;Remove Generated Diagrams&quot;]
     ce4b9673337f364f[&quot;Remove Generated Diagrams Verification&quot;]
+    fb166f0f31122ec2[&quot;SysML-Compatible Relationship Rendering&quot;]
     14d915e2f1e9801d[&quot;Trace Relation Non-Directional Behavior&quot;]
     0617e8a68cc21268[&quot;Visualize Model Relationships Verification&quot;]
   end
   specifications_System --> specifications/System/DiagramGeneration
   subgraph specifications/System/ElementManipulation[&quot;📄 ElementManipulation.md&quot;]
+    direction TB
     26f7b07332ebf105[&quot;CLI Add Element Test&quot;]
     e9c3e2ebcfc0f50e[&quot;CLI Move Element Test&quot;]
     4fe17b1db9e68a04[&quot;CLI Move File Test&quot;]
     0133f24da5708787[&quot;CLI Remove Element Test&quot;]
     98b38fa7749e11ff[&quot;CLI Rename Element Test&quot;]
+    30eda628a432350b[&quot;Create Element Operation&quot;]
     0d0eaf59d63fc7b7[&quot;Create Element Test&quot;]
+    545a8b3a6b052b40[&quot;Delete Element Operation&quot;]
     c6a3faf0456108de[&quot;Delete Element Test&quot;]
     3315f006df81feb7[&quot;Element Manipulation File Persistence&quot;]
     f5e857e2b4217e88[&quot;File Persistence Test&quot;]
+    22efb1b1aa098dbc[&quot;Move Element Operation&quot;]
     b8f8f7ed337acecc[&quot;Move Element Test&quot;]
+    d87de81c43c2de6d[&quot;Move File Operation&quot;]
     0af6cf03e40c2811[&quot;Move File Squash Test&quot;]
     44d7e7550a417327[&quot;Relation Consistency Maintenance&quot;]
     fdf32f44858c0f04[&quot;Relation Consistency Test&quot;]
+    1f160272de4ea024[&quot;Rename Element Operation&quot;]
     fd37a3fadaec7fbb[&quot;Target Location Validation and Auto-Creation&quot;]
     24824d79bde9a7c3[&quot;Target Location Validation Test&quot;]
   end
   specifications_System --> specifications/System/ElementManipulation
   subgraph specifications/System/Formatting[&quot;📄 Formatting.md&quot;]
+    direction TB
+    48c742d92eceaeb2[&quot;Document Structure Normalization&quot;]
     9e1ec528931a74f5[&quot;File Pattern Exclusion for Format&quot;]
     3f50a5270df5621e[&quot;Format Command Requirements Verification&quot;]
+    f4d444eefe601016[&quot;Format Consistency Enforcement&quot;]
+    d7676e7d0a6de5e9[&quot;Formatting Output&quot;]
+    a626e482770f42e7[&quot;Git-Style Diff Output for Format&quot;]
     9b57c6d214dc2f92[&quot;Model Formatting&quot;]
+    b68e97a59bd9156e[&quot;Replace Absolute Links with Relative Links&quot;]
   end
   specifications_System --> specifications/System/Formatting
   subgraph specifications/System/GitHubIntegration[&quot;📄 GitHubIntegration.md&quot;]
-    4736db87348185dc[&quot;Automate Diagram Generation&quot;]
+    direction TB
+    16f6232b664a7621[&quot;Automate Documentation Export&quot;]
     b8035d2bbd695009[&quot;Automate Pull Request Validations&quot;]
+    1bcfe0c98e7ad146[&quot;Automated Documentation Export on PR Merge&quot;]
     e8fd2b7f1201e071[&quot;Generate Change Logs for Pull Requests&quot;]
   end
   specifications_System --> specifications/System/GitHubIntegration
   subgraph specifications/System/Linting[&quot;📄 Linting.md&quot;]
+    direction TB
     41ec5ad6646a94c5[&quot;Lint Auto-fix Capability&quot;]
     09af237ced679d5b[&quot;Lint Command Verification&quot;]
+    c660858de057068c[&quot;Lint Output Formatting&quot;]
     d5e30a5fbfeed558[&quot;Model Linting&quot;]
+    a71185e8f8320ffe[&quot;Multi-Branch Convergence Detection&quot;]
+    c6430667d6fcf899[&quot;Redundant Hierarchical Relations Detection&quot;]
+    b2c4cbe652d3a103[&quot;Redundant Verify Relations Detection&quot;]
+    4261039896762f94[&quot;Safe Redundant Hierarchical Relations Auto-Removal&quot;]
   end
   specifications_System --> specifications/System/Linting
   subgraph specifications/System/ModelManagement[&quot;📄 ModelManagement.md&quot;]
+    direction TB
     01259bb1ef808bd4[&quot;Coexistence of Structured and Unstructured Documents&quot;]
     e223bb12898de7a1[&quot;Default Requirement Type Assignment&quot;]
     c1bbed8449b3597f[&quot;Efficient Processing&quot;]
@@ -644,50 +708,74 @@ Elements displayed in each file are filtered to show only top-level parents (tho
   end
   specifications_System --> specifications/System/ModelManagement
   subgraph specifications/System/ParsingAndValidationVerifications[&quot;📄 ParsingAndValidationVerifications.md&quot;]
+    direction TB
     44e4b17644d06c13[&quot;Element Subsection Parsing Test&quot;]
     0a22417ab99cee1b[&quot;Fragment Normalization Test&quot;]
     28a12a7b39cd4ae4[&quot;Specification File Identification Test&quot;]
   end
   specifications_System --> specifications/System/ParsingAndValidationVerifications
   subgraph specifications/System/Reporting[&quot;📄 Reporting.md&quot;]
+    direction TB
     2264e8e6dcc0467d[&quot;Containment Hierarchy Extraction Test&quot;]
     5ddddb2a5822f171[&quot;Containment View JSON Output Test&quot;]
     088586bf0a803101[&quot;Containment View Mermaid Diagram Test&quot;]
+    936f29a9939439bb[&quot;Containment View Report&quot;]
+    522f4f9247bdb1bd[&quot;Containment View Report Generation&quot;]
     6a2d6fb1d1e85f0f[&quot;Containment View Text Output Test&quot;]
+    07c2dd967b6e6395[&quot;Custom Element Type Tracking&quot;]
     10df81a7b39dd5ee[&quot;Custom Element Type Tracking Test&quot;]
     67aa841da2242ee2[&quot;Forward-Only Relation Traversal&quot;]
     4a5d8d91bdf37448[&quot;HTML Export Containment View Integration Test&quot;]
     7d8057c9f08006a3[&quot;Model Command Verification&quot;]
     7a84be9f3d374c4e[&quot;Model Diagram Output Formats&quot;]
     4df07eae59e29a03[&quot;Model Reports&quot;]
+    b7948a0183f65b13[&quot;Model Structure and Summaries&quot;]
+    84c077ea701037eb[&quot;Provide Validation Reports&quot;]
     22e43245699604b4[&quot;Search Command Tests&quot;]
+    e4962360a713773c[&quot;Search Fine Grained Filtering&quot;]
+    811aac535dbba41e[&quot;Search Report Generator&quot;]
     5c39ae2462e8e781[&quot;Tracing Structural Changes&quot;]
+    20276d8192bbe0bb[&quot;Validation Report Generator&quot;]
+    630e8ee8f263973c[&quot;Verification Coverage Report&quot;]
+    660a115c22f79f72[&quot;Verification Coverage Report Generator&quot;]
     cce0c37b0bb757f2[&quot;Verification Coverage Report Test&quot;]
     b84abcacdb3c2ff1[&quot;Verification Traces Filter Options Test&quot;]
     e14347459cdbdef2[&quot;Verification Traces From-Folder Test&quot;]
+    e206194041b00500[&quot;Verification Upward Traceability&quot;]
   end
   specifications_System --> specifications/System/Reporting
   subgraph specifications/System/StructureAndParsing[&quot;📄 StructureAndParsing.md&quot;]
+    direction TB
+    2f37aa2bb2ab396f[&quot;Element Identity Model&quot;]
+    6e302620f4eb60f4[&quot;Identifiers and Relations&quot;]
     2bb5c3e9aafa774a[&quot;Specification File Identification&quot;]
     75237a9db6381f55[&quot;Structure and Addressing in Markdown Documents&quot;]
   end
   specifications_System --> specifications/System/StructureAndParsing
   subgraph specifications/System/Subsections[&quot;📄 Subsections.md&quot;]
+    direction TB
     81fa006cf11c867f[&quot;Reserved Subsections Support&quot;]
   end
   specifications_System --> specifications/System/Subsections
   subgraph specifications/System/Validation[&quot;📄 Validation.md&quot;]
+    direction TB
+    f4d82e3742ce94e4[&quot;Cross-Component Dependency Validator&quot;]
     104625b352d6ae73[&quot;Default Element Type Assignment Test&quot;]
     ee8a586f8a2f22f1[&quot;Enhanced Validation Error Reporting&quot;]
     26725734f75e0059[&quot;Excluded File Relation Validation&quot;]
     5b51e4d78869b44d[&quot;File Exclusion Test&quot;]
     fcfb347ce647345b[&quot;GraphRegistry as Primary Registry&quot;]
     09a428f99271bcfa[&quot;Integrated Validation&quot;]
+    6d85cfd9495565c3[&quot;Internal Consistency Validator&quot;]
     10605d2afd5ad2a8[&quot;Invalid Header Structure Test&quot;]
     ffa850f839fff896[&quot;Invalid Relations Test&quot;]
+    5dca5fab54bc6143[&quot;Markdown Structure Validator&quot;]
+    971c42ea3d119bc4[&quot;Relation Element Type Validator&quot;]
+    a394cee2df5e4467[&quot;Relation Type Validation&quot;]
     6c1702cefb575ab5[&quot;Requirements Files Search and Detection Test&quot;]
     f53ccc6ffcd7609c[&quot;Same-File Fragment Relations Test&quot;]
     ee2fa08d70903183[&quot;Subdirectory Processing Verification&quot;]
+    ffe3e5d933c85c03[&quot;Two-Pass Validation Strategy&quot;]
     0da6d32bacc1967d[&quot;Unstructured Documents Test&quot;]
     bfb4222d0e8190f4[&quot;Validate Cross-Component Dependencies&quot;]
     e2cb765a4c34a5e9[&quot;Validate Filesystem Structure&quot;]
@@ -698,16 +786,20 @@ Elements displayed in each file are filtered to show only top-level parents (tho
   end
   specifications_System --> specifications/System/Validation
   subgraph specifications/System/VerificationTraces[&quot;📄 VerificationTraces.md&quot;]
+    direction TB
     99014f44c209a4a1[&quot;Trace Relations No Cycles Verification&quot;]
     6f6de0df4a338a8e[&quot;Verification Roll-up Strategy&quot;]
     c586ad48c4342713[&quot;Verification Trace Builder&quot;]
   end
   specifications_System --> specifications/System/VerificationTraces
   subgraph specifications/UserStories[&quot;📄 UserStories.md&quot;]
+    direction TB
+    3cfea38fac46622f[&quot;AI-Assisted System Model Management&quot;]
     c6788cef7ce33047[&quot;Align with Industry Standards&quot;]
     01ccb1349a31fb86[&quot;Aligning Design with Code&quot;]
     ae44d2c00828c2bb[&quot;Fostering Community Contributions&quot;]
     e6cd30be72ce4a7e[&quot;Generate Diagrams&quot;]
+    15c0e1ae8cdaa8e9[&quot;Integrate with GitHub Workflows&quot;]
     fb05f2c6b06c7084[&quot;Managing System Models&quot;]
     287a7b8b85d40a81[&quot;Model Export&quot;]
     cc713ce0dcc58e0c[&quot;Promote Automation and Efficiency&quot;]
@@ -719,19 +811,35 @@ Elements displayed in each file are filtered to show only top-level parents (tho
 
   %% Element type styling
   class bc47257b545846c1 requirement
+  class c3f31692af982337 requirement
+  class 0466a71b10f4a893 requirement
+  class cb57cc99292a62fa requirement
   class 235da8e2168b9f6a requirement
+  class 802f456709870e8d requirement
   class 2e82974d2d21b9e6 verification
   class b6ade0e9d74483ae verification
   class fc1c4911cd5758b4 requirement
+  class c635f268b710f1f0 requirement
   class 275600e6e14e0126 requirement
+  class 91d5372baeb7775f requirement
+  class e0bc0530143463f7 requirement
+  class f7d6f9bdf63c8aa9 requirement
+  class 0915be6909c3de76 requirement
+  class 91605128dfe5524f requirement
+  class 508d5a19defec54d requirement
   class 6e733aaef7687066 requirement
   class 3706d8a6d6a10014 requirement
+  class f5c62abef3588c05 requirement
+  class 4e5e3f4d55b0a239 requirement
+  class 767aae89fe7d0e36 requirement
   class 212473ea6147fe61 userRequirement
   class befd612b67d91ac7 userRequirement
   class f74d17b8cb0d18f6 requirement
   class 42c12e62f4eabf65 verification
+  class 616a2b5bf721d57c requirement
   class d76f41d446037179 requirement
   class 95b5b2884934be43 verification
+  class 510bedadffcc06a5 requirement
   class 1301c1064f1b3c53 verification
   class 0554f5b452fcfda0 verification
   class b138049f5d70f085 verification
@@ -747,18 +855,37 @@ Elements displayed in each file are filtered to show only top-level parents (tho
   class b433a9b6f1af2988 verification
   class 85f7e6759ad86468 verification
   class b81416c2c6baf432 verification
+  class 57bc7dcc01ac1ab8 requirement
+  class bddf986f9c41ea3a requirement
   class adb4125110a9fb55 verification
+  class 78d113aa81d9eba9 requirement
   class 39c21cfcc1927eba userRequirement
+  class ff4361ddcaf9e85c requirement
+  class 51a571776c15789f requirement
+  class 4b5354b675176e0d userRequirement
+  class 8173a352d0ff73e0 requirement
+  class fd7ba8aa84067722 requirement
   class 243de8fbc48aa9a8 userRequirement
+  class 5de938a9c8ee620b requirement
+  class 92850bd8d95d8e30 requirement
+  class 5866fda92894f8b8 requirement
+  class efaad0f04f75e62a requirement
   class 764945f655338130 requirement
-  class 319e4ce583defef6 verification
+  class dc3aea2c57c6ba26 requirement
+  class 9b0c7e9b5714bb7a requirement
+  class dc4e680aa718e118 requirement
+  class e9cab0c0c58f28c2 verification
   class 28912f6c08953613 userRequirement
+  class 04e3672c55225ffe requirement
   class 62bd4e7920be79ce verification
   class de1da31b651e767e verification
+  class 70489eb259eb44bb requirement
+  class ee840ffe8dc45e66 requirement
   class 18b39b0e9245a678 userRequirement
   class 4c47df975c67f67a userRequirement
   class 854a1b9ef1ec5555 userRequirement
   class ce4b9673337f364f verification
+  class fb166f0f31122ec2 requirement
   class 14d915e2f1e9801d requirement
   class 0617e8a68cc21268 verification
   class 26f7b07332ebf105 verification
@@ -766,25 +893,41 @@ Elements displayed in each file are filtered to show only top-level parents (tho
   class 4fe17b1db9e68a04 verification
   class 0133f24da5708787 verification
   class 98b38fa7749e11ff verification
+  class 30eda628a432350b requirement
   class 0d0eaf59d63fc7b7 verification
+  class 545a8b3a6b052b40 requirement
   class c6a3faf0456108de verification
   class 3315f006df81feb7 requirement
   class f5e857e2b4217e88 verification
+  class 22efb1b1aa098dbc requirement
   class b8f8f7ed337acecc verification
+  class d87de81c43c2de6d requirement
   class 0af6cf03e40c2811 verification
   class 44d7e7550a417327 requirement
   class fdf32f44858c0f04 verification
+  class 1f160272de4ea024 requirement
   class fd37a3fadaec7fbb requirement
   class 24824d79bde9a7c3 verification
+  class 48c742d92eceaeb2 requirement
   class 9e1ec528931a74f5 requirement
   class 3f50a5270df5621e verification
+  class f4d444eefe601016 requirement
+  class d7676e7d0a6de5e9 requirement
+  class a626e482770f42e7 userRequirement
   class 9b57c6d214dc2f92 userRequirement
-  class 4736db87348185dc userRequirement
+  class b68e97a59bd9156e requirement
+  class 16f6232b664a7621 userRequirement
   class b8035d2bbd695009 userRequirement
+  class 1bcfe0c98e7ad146 requirement
   class e8fd2b7f1201e071 userRequirement
   class 41ec5ad6646a94c5 requirement
   class 09af237ced679d5b verification
+  class c660858de057068c requirement
   class d5e30a5fbfeed558 userRequirement
+  class a71185e8f8320ffe requirement
+  class c6430667d6fcf899 requirement
+  class b2c4cbe652d3a103 requirement
+  class 4261039896762f94 requirement
   class 01259bb1ef808bd4 userRequirement
   class e223bb12898de7a1 userRequirement
   class c1bbed8449b3597f userRequirement
@@ -800,32 +943,51 @@ Elements displayed in each file are filtered to show only top-level parents (tho
   class 2264e8e6dcc0467d verification
   class 5ddddb2a5822f171 verification
   class 088586bf0a803101 verification
+  class 936f29a9939439bb userRequirement
+  class 522f4f9247bdb1bd requirement
   class 6a2d6fb1d1e85f0f verification
+  class 07c2dd967b6e6395 requirement
   class 10df81a7b39dd5ee verification
   class 67aa841da2242ee2 requirement
   class 4a5d8d91bdf37448 verification
   class 7d8057c9f08006a3 verification
   class 7a84be9f3d374c4e requirement
   class 4df07eae59e29a03 userRequirement
+  class b7948a0183f65b13 userRequirement
+  class 84c077ea701037eb userRequirement
   class 22e43245699604b4 verification
+  class e4962360a713773c requirement
+  class 811aac535dbba41e requirement
   class 5c39ae2462e8e781 userRequirement
+  class 20276d8192bbe0bb requirement
+  class 630e8ee8f263973c userRequirement
+  class 660a115c22f79f72 requirement
   class cce0c37b0bb757f2 verification
   class b84abcacdb3c2ff1 verification
   class e14347459cdbdef2 verification
+  class e206194041b00500 userRequirement
+  class 2f37aa2bb2ab396f requirement
+  class 6e302620f4eb60f4 requirement
   class 2bb5c3e9aafa774a requirement
   class 75237a9db6381f55 requirement
   class 81fa006cf11c867f requirement
+  class f4d82e3742ce94e4 requirement
   class 104625b352d6ae73 verification
   class ee8a586f8a2f22f1 userRequirement
   class 26725734f75e0059 requirement
   class 5b51e4d78869b44d verification
   class fcfb347ce647345b requirement
   class 09a428f99271bcfa requirement
+  class 6d85cfd9495565c3 requirement
   class 10605d2afd5ad2a8 verification
   class ffa850f839fff896 verification
+  class 5dca5fab54bc6143 requirement
+  class 971c42ea3d119bc4 requirement
+  class a394cee2df5e4467 requirement
   class 6c1702cefb575ab5 verification
   class f53ccc6ffcd7609c verification
   class ee2fa08d70903183 verification
+  class ffe3e5d933c85c03 requirement
   class 0da6d32bacc1967d verification
   class bfb4222d0e8190f4 userRequirement
   class e2cb765a4c34a5e9 userRequirement
@@ -836,10 +998,12 @@ Elements displayed in each file are filtered to show only top-level parents (tho
   class 99014f44c209a4a1 verification
   class 6f6de0df4a338a8e requirement
   class c586ad48c4342713 requirement
+  class 3cfea38fac46622f userRequirement
   class c6788cef7ce33047 userRequirement
   class 01ccb1349a31fb86 userRequirement
   class ae44d2c00828c2bb userRequirement
   class e6cd30be72ce4a7e userRequirement
+  class 15c0e1ae8cdaa8e9 userRequirement
   class fb05f2c6b06c7084 userRequirement
   class 287a7b8b85d40a81 userRequirement
   class cc713ce0dcc58e0c userRequirement
@@ -849,19 +1013,35 @@ Elements displayed in each file are filtered to show only top-level parents (tho
 
   %% Clickable links
   click bc47257b545846c1 &quot;specifications/Interfaces/CLI.html#attachment-commands&quot;
+  click c3f31692af982337 &quot;specifications/Interfaces/CLI.html#cli-add-element-command&quot;
+  click 0466a71b10f4a893 &quot;specifications/Interfaces/CLI.html#cli-change-impact-report-command&quot;
+  click cb57cc99292a62fa &quot;specifications/Interfaces/CLI.html#cli-containment-command&quot;
   click 235da8e2168b9f6a &quot;specifications/Interfaces/CLI.html#cli-coverage-command&quot;
+  click 802f456709870e8d &quot;specifications/Interfaces/CLI.html#cli-generate-diagrams-flag&quot;
   click 2e82974d2d21b9e6 &quot;specifications/Interfaces/CLI.html#cli-git-commit-hash-flag-test&quot;
   click b6ade0e9d74483ae &quot;specifications/Interfaces/CLI.html#cli-help-structure-verification&quot;
   click fc1c4911cd5758b4 &quot;specifications/Interfaces/CLI.html#cli-interface-structure&quot;
+  click c635f268b710f1f0 &quot;specifications/Interfaces/CLI.html#cli-lint-command&quot;
   click 275600e6e14e0126 &quot;specifications/Interfaces/CLI.html#cli-model-diagram-command&quot;
+  click 91d5372baeb7775f &quot;specifications/Interfaces/CLI.html#cli-move-element-command&quot;
+  click e0bc0530143463f7 &quot;specifications/Interfaces/CLI.html#cli-move-file-command&quot;
+  click f7d6f9bdf63c8aa9 &quot;specifications/Interfaces/CLI.html#cli-remove-diagrams-flag&quot;
+  click 0915be6909c3de76 &quot;specifications/Interfaces/CLI.html#cli-remove-element-command&quot;
+  click 91605128dfe5524f &quot;specifications/Interfaces/CLI.html#cli-rename-element-command&quot;
+  click 508d5a19defec54d &quot;specifications/Interfaces/CLI.html#cli-search-command&quot;
   click 6e733aaef7687066 &quot;specifications/Interfaces/CLI.html#cli-traces-command&quot;
   click 3706d8a6d6a10014 &quot;specifications/Interfaces/CLI.html#detailed-error-handling-and-logging&quot;
+  click f5c62abef3588c05 &quot;specifications/Interfaces/CLI.html#format-command&quot;
+  click 4e5e3f4d55b0a239 &quot;specifications/Interfaces/CLI.html#subdirectory-processing-option&quot;
+  click 767aae89fe7d0e36 &quot;specifications/Interfaces/CLI.html#validate-command&quot;
   click 212473ea6147fe61 &quot;specifications/Interfaces/Interfaces.html#cli-interface&quot;
   click befd612b67d91ac7 &quot;specifications/Interfaces/Interfaces.html#web-interface&quot;
   click f74d17b8cb0d18f6 &quot;specifications/Interfaces/WebInterface.html#html-export&quot;
   click 42c12e62f4eabf65 &quot;specifications/Interfaces/WebInterface.html#html-export-verification&quot;
+  click 616a2b5bf721d57c &quot;specifications/Interfaces/WebInterface.html#model-centric-view-generation&quot;
   click d76f41d446037179 &quot;specifications/Interfaces/WebInterface.html#serve-command&quot;
   click 95b5b2884934be43 &quot;specifications/Interfaces/WebInterface.html#serve-command-verification&quot;
+  click 510bedadffcc06a5 &quot;specifications/Interfaces/WebInterface.html#whole-model-diagram-generation&quot;
   click 1301c1064f1b3c53 &quot;specifications/System/AttachmentsVerifications.html#attach-command-verification&quot;
   click 0554f5b452fcfda0 &quot;specifications/System/AttachmentsVerifications.html#attachment-output-rendering-verification&quot;
   click b138049f5d70f085 &quot;specifications/System/AttachmentsVerifications.html#attachment-search-filters-verification&quot;
@@ -877,18 +1057,37 @@ Elements displayed in each file are filtered to show only top-level parents (tho
   click b433a9b6f1af2988 &quot;specifications/System/ChangeImpact.html#change-impact-relations-test&quot;
   click 85f7e6759ad86468 &quot;specifications/System/ChangeImpact.html#change-impact-smart-filtering-test&quot;
   click b81416c2c6baf432 &quot;specifications/System/ChangeImpact.html#element-content-extraction-test&quot;
+  click 57bc7dcc01ac1ab8 &quot;specifications/System/ChangeImpact.html#requirements-change-propagation&quot;
+  click bddf986f9c41ea3a &quot;specifications/System/ChangeImpact.html#structural-change-analyzer&quot;
   click adb4125110a9fb55 &quot;specifications/System/ChangeImpact.html#structural-change-reports-verification&quot;
+  click 78d113aa81d9eba9 &quot;specifications/System/CodeAlignment.html#bat-style-comment&quot;
   click 39c21cfcc1927eba &quot;specifications/System/CodeAlignment.html#code-traceability&quot;
+  click ff4361ddcaf9e85c &quot;specifications/System/CodeAlignment.html#comment-style-by-file-extension&quot;
+  click 51a571776c15789f &quot;specifications/System/CodeAlignment.html#css-style-comment&quot;
+  click 4b5354b675176e0d &quot;specifications/System/CodeAlignment.html#dash-style-comment&quot;
+  click 8173a352d0ff73e0 &quot;specifications/System/CodeAlignment.html#slash-style-comment&quot;
+  click fd7ba8aa84067722 &quot;specifications/System/CodeAlignment.html#sql-style-comment&quot;
   click 243de8fbc48aa9a8 &quot;specifications/System/CodeAlignment.html#suggest-code-refactoring&quot;
+  click 5de938a9c8ee620b &quot;specifications/System/CodeAlignment.html#traceability-format&quot;
+  click 92850bd8d95d8e30 &quot;specifications/System/CodeAlignment.html#validating-traceability-format&quot;
+  click 5866fda92894f8b8 &quot;specifications/System/CodeAlignment.html#xml-style-comment&quot;
+  click efaad0f04f75e62a &quot;specifications/System/Configuration.html#ignore-files-integration&quot;
   click 764945f655338130 &quot;specifications/System/Configuration.html#ignoring-unstructured-documents&quot;
-  click 319e4ce583defef6 &quot;specifications/System/DiagramGeneration.html#automated-diagram-generation-on-pr-merge-verification&quot;
+  click dc3aea2c57c6ba26 &quot;specifications/System/Configuration.html#requirements-processing&quot;
+  click 9b0c7e9b5714bb7a &quot;specifications/System/Configuration.html#reserved-repository-files-exclusion&quot;
+  click dc4e680aa718e118 &quot;specifications/System/Configuration.html#structured-markdown-files-search-and-detection&quot;
+  click e9cab0c0c58f28c2 &quot;specifications/System/DiagramGeneration.html#automated-documentation-export-on-pr-merge-verification&quot;
   click 28912f6c08953613 &quot;specifications/System/DiagramGeneration.html#complete-model-structure-visualization&quot;
+  click 04e3672c55225ffe &quot;specifications/System/DiagramGeneration.html#diagram-generation&quot;
   click 62bd4e7920be79ce &quot;specifications/System/DiagramGeneration.html#diagram-generation-test&quot;
   click de1da31b651e767e &quot;specifications/System/DiagramGeneration.html#diagram-relation-filtering-verification&quot;
+  click 70489eb259eb44bb &quot;specifications/System/DiagramGeneration.html#diagram-removal&quot;
+  click ee840ffe8dc45e66 &quot;specifications/System/DiagramGeneration.html#interactive-mermaid-diagram-node-behavior&quot;
   click 18b39b0e9245a678 &quot;specifications/System/DiagramGeneration.html#interactive-mermaid-diagrams&quot;
   click 4c47df975c67f67a &quot;specifications/System/DiagramGeneration.html#model-visualization-and-exploration&quot;
   click 854a1b9ef1ec5555 &quot;specifications/System/DiagramGeneration.html#remove-generated-diagrams&quot;
   click ce4b9673337f364f &quot;specifications/System/DiagramGeneration.html#remove-generated-diagrams-verification&quot;
+  click fb166f0f31122ec2 &quot;specifications/System/DiagramGeneration.html#sysml-compatible-relationship-rendering&quot;
   click 14d915e2f1e9801d &quot;specifications/System/DiagramGeneration.html#trace-relation-non-directional-behavior&quot;
   click 0617e8a68cc21268 &quot;specifications/System/DiagramGeneration.html#visualize-model-relationships-verification&quot;
   click 26f7b07332ebf105 &quot;specifications/System/ElementManipulation.html#cli-add-element-test&quot;
@@ -896,25 +1095,41 @@ Elements displayed in each file are filtered to show only top-level parents (tho
   click 4fe17b1db9e68a04 &quot;specifications/System/ElementManipulation.html#cli-move-file-test&quot;
   click 0133f24da5708787 &quot;specifications/System/ElementManipulation.html#cli-remove-element-test&quot;
   click 98b38fa7749e11ff &quot;specifications/System/ElementManipulation.html#cli-rename-element-test&quot;
+  click 30eda628a432350b &quot;specifications/System/ElementManipulation.html#create-element-operation&quot;
   click 0d0eaf59d63fc7b7 &quot;specifications/System/ElementManipulation.html#create-element-test&quot;
+  click 545a8b3a6b052b40 &quot;specifications/System/ElementManipulation.html#delete-element-operation&quot;
   click c6a3faf0456108de &quot;specifications/System/ElementManipulation.html#delete-element-test&quot;
   click 3315f006df81feb7 &quot;specifications/System/ElementManipulation.html#element-manipulation-file-persistence&quot;
   click f5e857e2b4217e88 &quot;specifications/System/ElementManipulation.html#file-persistence-test&quot;
+  click 22efb1b1aa098dbc &quot;specifications/System/ElementManipulation.html#move-element-operation&quot;
   click b8f8f7ed337acecc &quot;specifications/System/ElementManipulation.html#move-element-test&quot;
+  click d87de81c43c2de6d &quot;specifications/System/ElementManipulation.html#move-file-operation&quot;
   click 0af6cf03e40c2811 &quot;specifications/System/ElementManipulation.html#move-file-squash-test&quot;
   click 44d7e7550a417327 &quot;specifications/System/ElementManipulation.html#relation-consistency-maintenance&quot;
   click fdf32f44858c0f04 &quot;specifications/System/ElementManipulation.html#relation-consistency-test&quot;
+  click 1f160272de4ea024 &quot;specifications/System/ElementManipulation.html#rename-element-operation&quot;
   click fd37a3fadaec7fbb &quot;specifications/System/ElementManipulation.html#target-location-validation-and-auto-creation&quot;
   click 24824d79bde9a7c3 &quot;specifications/System/ElementManipulation.html#target-location-validation-test&quot;
+  click 48c742d92eceaeb2 &quot;specifications/System/Formatting.html#document-structure-normalization&quot;
   click 9e1ec528931a74f5 &quot;specifications/System/Formatting.html#file-pattern-exclusion-for-format&quot;
   click 3f50a5270df5621e &quot;specifications/System/Formatting.html#format-command-requirements-verification&quot;
+  click f4d444eefe601016 &quot;specifications/System/Formatting.html#format-consistency-enforcement&quot;
+  click d7676e7d0a6de5e9 &quot;specifications/System/Formatting.html#formatting-output&quot;
+  click a626e482770f42e7 &quot;specifications/System/Formatting.html#git-style-diff-output-for-format&quot;
   click 9b57c6d214dc2f92 &quot;specifications/System/Formatting.html#model-formatting&quot;
-  click 4736db87348185dc &quot;specifications/System/GitHubIntegration.html#automate-diagram-generation&quot;
+  click b68e97a59bd9156e &quot;specifications/System/Formatting.html#replace-absolute-links-with-relative-links&quot;
+  click 16f6232b664a7621 &quot;specifications/System/GitHubIntegration.html#automate-documentation-export&quot;
   click b8035d2bbd695009 &quot;specifications/System/GitHubIntegration.html#automate-pull-request-validations&quot;
+  click 1bcfe0c98e7ad146 &quot;specifications/System/GitHubIntegration.html#automated-documentation-export-on-pr-merge&quot;
   click e8fd2b7f1201e071 &quot;specifications/System/GitHubIntegration.html#generate-change-logs-for-pull-requests&quot;
   click 41ec5ad6646a94c5 &quot;specifications/System/Linting.html#lint-auto-fix-capability&quot;
   click 09af237ced679d5b &quot;specifications/System/Linting.html#lint-command-verification&quot;
+  click c660858de057068c &quot;specifications/System/Linting.html#lint-output-formatting&quot;
   click d5e30a5fbfeed558 &quot;specifications/System/Linting.html#model-linting&quot;
+  click a71185e8f8320ffe &quot;specifications/System/Linting.html#multi-branch-convergence-detection&quot;
+  click c6430667d6fcf899 &quot;specifications/System/Linting.html#redundant-hierarchical-relations-detection&quot;
+  click b2c4cbe652d3a103 &quot;specifications/System/Linting.html#redundant-verify-relations-detection&quot;
+  click 4261039896762f94 &quot;specifications/System/Linting.html#safe-redundant-hierarchical-relations-auto-removal&quot;
   click 01259bb1ef808bd4 &quot;specifications/System/ModelManagement.html#coexistence-of-structured-and-unstructured-documents&quot;
   click e223bb12898de7a1 &quot;specifications/System/ModelManagement.html#default-requirement-type-assignment&quot;
   click c1bbed8449b3597f &quot;specifications/System/ModelManagement.html#efficient-processing&quot;
@@ -930,32 +1145,51 @@ Elements displayed in each file are filtered to show only top-level parents (tho
   click 2264e8e6dcc0467d &quot;specifications/System/Reporting.html#containment-hierarchy-extraction-test&quot;
   click 5ddddb2a5822f171 &quot;specifications/System/Reporting.html#containment-view-json-output-test&quot;
   click 088586bf0a803101 &quot;specifications/System/Reporting.html#containment-view-mermaid-diagram-test&quot;
+  click 936f29a9939439bb &quot;specifications/System/Reporting.html#containment-view-report&quot;
+  click 522f4f9247bdb1bd &quot;specifications/System/Reporting.html#containment-view-report-generation&quot;
   click 6a2d6fb1d1e85f0f &quot;specifications/System/Reporting.html#containment-view-text-output-test&quot;
+  click 07c2dd967b6e6395 &quot;specifications/System/Reporting.html#custom-element-type-tracking&quot;
   click 10df81a7b39dd5ee &quot;specifications/System/Reporting.html#custom-element-type-tracking-test&quot;
   click 67aa841da2242ee2 &quot;specifications/System/Reporting.html#forward-only-relation-traversal&quot;
   click 4a5d8d91bdf37448 &quot;specifications/System/Reporting.html#html-export-containment-view-integration-test&quot;
   click 7d8057c9f08006a3 &quot;specifications/System/Reporting.html#model-command-verification&quot;
   click 7a84be9f3d374c4e &quot;specifications/System/Reporting.html#model-diagram-output-formats&quot;
   click 4df07eae59e29a03 &quot;specifications/System/Reporting.html#model-reports&quot;
+  click b7948a0183f65b13 &quot;specifications/System/Reporting.html#model-structure-and-summaries&quot;
+  click 84c077ea701037eb &quot;specifications/System/Reporting.html#provide-validation-reports&quot;
   click 22e43245699604b4 &quot;specifications/System/Reporting.html#search-command-tests&quot;
+  click e4962360a713773c &quot;specifications/System/Reporting.html#search-fine-grained-filtering&quot;
+  click 811aac535dbba41e &quot;specifications/System/Reporting.html#search-report-generator&quot;
   click 5c39ae2462e8e781 &quot;specifications/System/Reporting.html#tracing-structural-changes&quot;
+  click 20276d8192bbe0bb &quot;specifications/System/Reporting.html#validation-report-generator&quot;
+  click 630e8ee8f263973c &quot;specifications/System/Reporting.html#verification-coverage-report&quot;
+  click 660a115c22f79f72 &quot;specifications/System/Reporting.html#verification-coverage-report-generator&quot;
   click cce0c37b0bb757f2 &quot;specifications/System/Reporting.html#verification-coverage-report-test&quot;
   click b84abcacdb3c2ff1 &quot;specifications/System/Reporting.html#verification-traces-filter-options-test&quot;
   click e14347459cdbdef2 &quot;specifications/System/Reporting.html#verification-traces-from-folder-test&quot;
+  click e206194041b00500 &quot;specifications/System/Reporting.html#verification-upward-traceability&quot;
+  click 2f37aa2bb2ab396f &quot;specifications/System/StructureAndParsing.html#element-identity-model&quot;
+  click 6e302620f4eb60f4 &quot;specifications/System/StructureAndParsing.html#identifiers-and-relations&quot;
   click 2bb5c3e9aafa774a &quot;specifications/System/StructureAndParsing.html#specification-file-identification&quot;
   click 75237a9db6381f55 &quot;specifications/System/StructureAndParsing.html#structure-and-addressing-in-markdown-documents&quot;
   click 81fa006cf11c867f &quot;specifications/System/Subsections.html#reserved-subsections-support&quot;
+  click f4d82e3742ce94e4 &quot;specifications/System/Validation.html#cross-component-dependency-validator&quot;
   click 104625b352d6ae73 &quot;specifications/System/Validation.html#default-element-type-assignment-test&quot;
   click ee8a586f8a2f22f1 &quot;specifications/System/Validation.html#enhanced-validation-error-reporting&quot;
   click 26725734f75e0059 &quot;specifications/System/Validation.html#excluded-file-relation-validation&quot;
   click 5b51e4d78869b44d &quot;specifications/System/Validation.html#file-exclusion-test&quot;
   click fcfb347ce647345b &quot;specifications/System/Validation.html#graphregistry-as-primary-registry&quot;
   click 09a428f99271bcfa &quot;specifications/System/Validation.html#integrated-validation&quot;
+  click 6d85cfd9495565c3 &quot;specifications/System/Validation.html#internal-consistency-validator&quot;
   click 10605d2afd5ad2a8 &quot;specifications/System/Validation.html#invalid-header-structure-test&quot;
   click ffa850f839fff896 &quot;specifications/System/Validation.html#invalid-relations-test&quot;
+  click 5dca5fab54bc6143 &quot;specifications/System/Validation.html#markdown-structure-validator&quot;
+  click 971c42ea3d119bc4 &quot;specifications/System/Validation.html#relation-element-type-validator&quot;
+  click a394cee2df5e4467 &quot;specifications/System/Validation.html#relation-type-validation&quot;
   click 6c1702cefb575ab5 &quot;specifications/System/Validation.html#requirements-files-search-and-detection-test&quot;
   click f53ccc6ffcd7609c &quot;specifications/System/Validation.html#same-file-fragment-relations-test&quot;
   click ee2fa08d70903183 &quot;specifications/System/Validation.html#subdirectory-processing-verification&quot;
+  click ffe3e5d933c85c03 &quot;specifications/System/Validation.html#two-pass-validation-strategy&quot;
   click 0da6d32bacc1967d &quot;specifications/System/Validation.html#unstructured-documents-test&quot;
   click bfb4222d0e8190f4 &quot;specifications/System/Validation.html#validate-cross-component-dependencies&quot;
   click e2cb765a4c34a5e9 &quot;specifications/System/Validation.html#validate-filesystem-structure&quot;
@@ -966,10 +1200,12 @@ Elements displayed in each file are filtered to show only top-level parents (tho
   click 99014f44c209a4a1 &quot;specifications/System/VerificationTraces.html#trace-relations-no-cycles-verification&quot;
   click 6f6de0df4a338a8e &quot;specifications/System/VerificationTraces.html#verification-roll-up-strategy&quot;
   click c586ad48c4342713 &quot;specifications/System/VerificationTraces.html#verification-trace-builder&quot;
+  click 3cfea38fac46622f &quot;specifications/UserStories.html#ai-assisted-system-model-management&quot;
   click c6788cef7ce33047 &quot;specifications/UserStories.html#align-with-industry-standards&quot;
   click 01ccb1349a31fb86 &quot;specifications/UserStories.html#aligning-design-with-code&quot;
   click ae44d2c00828c2bb &quot;specifications/UserStories.html#fostering-community-contributions&quot;
   click e6cd30be72ce4a7e &quot;specifications/UserStories.html#generate-diagrams&quot;
+  click 15c0e1ae8cdaa8e9 &quot;specifications/UserStories.html#integrate-with-github-workflows&quot;
   click fb05f2c6b06c7084 &quot;specifications/UserStories.html#managing-system-models&quot;
   click 287a7b8b85d40a81 &quot;specifications/UserStories.html#model-export&quot;
   click cc713ce0dcc58e0c &quot;specifications/UserStories.html#promote-automation-and-efficiency&quot;

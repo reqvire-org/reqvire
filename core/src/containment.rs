@@ -58,7 +58,10 @@ pub struct ContainmentHierarchy {
 
 impl ContainmentHierarchy {
     /// Build containment hierarchy from a registry
-    pub fn build(registry: &GraphRegistry) -> Result<Self, ReqvireError> {
+    ///
+    /// When `short` is true, shows only root elements (those without hierarchical parents).
+    /// When `short` is false (default), shows all elements.
+    pub fn build(registry: &GraphRegistry, short: bool) -> Result<Self, ReqvireError> {
         // Group elements by file
         let mut files_map: BTreeMap<String, Vec<&Element>> = BTreeMap::new();
         for element in registry.get_all_elements() {
@@ -67,18 +70,26 @@ impl ContainmentHierarchy {
                 .push(element);
         }
 
-        // Filter to only top-level elements in each file
-        let mut filtered_files_map: BTreeMap<String, Vec<ContainmentElement>> = BTreeMap::new();
+        // Build elements map - filter if short mode, otherwise show all
+        let mut elements_map: BTreeMap<String, Vec<ContainmentElement>> = BTreeMap::new();
         for (file_path, elements) in files_map.iter() {
-            let filtered = filter_top_level_elements(elements);
-            filtered_files_map.insert(
-                file_path.clone(),
-                filtered.iter().map(|e| ContainmentElement::from_element(e)).collect()
-            );
+            let selected_elements: Vec<ContainmentElement> = if short {
+                // Short mode: only top-level elements
+                filter_top_level_elements(elements)
+                    .iter()
+                    .map(|e| ContainmentElement::from_element(e))
+                    .collect()
+            } else {
+                // Full mode: all elements
+                elements.iter()
+                    .map(|e| ContainmentElement::from_element(e))
+                    .collect()
+            };
+            elements_map.insert(file_path.clone(), selected_elements);
         }
 
         // Build folder structure
-        let root_folder = build_folder_structure(&filtered_files_map);
+        let root_folder = build_folder_structure(&elements_map);
 
         Ok(ContainmentHierarchy { root_folder })
     }

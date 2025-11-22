@@ -859,7 +859,7 @@ blockquote {
 <p>The Mermaid diagram generation must:</p>
 <p><strong>Graph Structure:</strong></p>
 <ul>
-<li>Use <code>graph LR</code> (left-to-right layout)</li>
+<li>Use <code>graph TD</code> (top-down layout)</li>
 <li>Folder nodes with connections to child folders and files</li>
 <li>File subgraphs containing element nodes</li>
 <li>Tree structure with explicit parent-child connections</li>
@@ -875,6 +875,11 @@ blockquote {
 <ul>
 <li><code>parent --&gt; child</code> for folder/file hierarchy</li>
 <li>No connections between elements within files</li>
+</ul>
+<p><strong>Element Display Modes:</strong></p>
+<ul>
+<li>Default: Show ALL elements in each file</li>
+<li>With <code>--short</code> flag: Show only root elements (those without hierarchical parents in same file)</li>
 </ul>
 <p><strong>Element Nodes:</strong></p>
 <ul>

@@ -512,13 +512,13 @@ blockquote {
   classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  c9211e23a87d8cf6[&quot;Automated Diagram Generation on PR Merge Verification&quot;];
-  class c9211e23a87d8cf6 verification;
-  click c9211e23a87d8cf6 &quot;DiagramGeneration.html#automated-diagram-generation-on-pr-merge-verification&quot;;
-  98af8a1cf9c86822[&quot;generate_diagrams.yml&quot;];
-  class 98af8a1cf9c86822 default;
-  click 98af8a1cf9c86822 &quot;../../.github/workflows/generate_diagrams.yml&quot;;
-  c9211e23a87d8cf6 -->|satisfiedBy| 98af8a1cf9c86822;
+  98e59ee2968bbb79[&quot;Automated Documentation Export on PR Merge Verification&quot;];
+  class 98e59ee2968bbb79 verification;
+  click 98e59ee2968bbb79 &quot;DiagramGeneration.html#automated-documentation-export-on-pr-merge-verification&quot;;
+  13fc1caf0ecb96e1[&quot;update_docs.yml&quot;];
+  class 13fc1caf0ecb96e1 default;
+  click 13fc1caf0ecb96e1 &quot;../../.github/workflows/update_docs.yml&quot;;
+  98e59ee2968bbb79 -->|satisfiedBy| 13fc1caf0ecb96e1;
   71adfd59da9ff84f[&quot;Complete Model Structure Visualization&quot;];
   class 71adfd59da9ff84f userRequirement;
   click 71adfd59da9ff84f &quot;DiagramGeneration.html#complete-model-structure-visualization&quot;;
@@ -646,14 +646,14 @@ blockquote {
   b3bb7792bbc95f02 -->|satisfiedBy| 80defdd4cbc7ee18;
   b3bb7792bbc95f02 -.->|verifiedBy| 7ff28ff401dbaef7;
   b3bb7792bbc95f02 -.->|verifiedBy| 196bcb7d75f45d2b;
-  ebfa0fa4fc77deab[&quot;Automated Diagram Generation on PR Merge&quot;];
-  class ebfa0fa4fc77deab systemRequirement;
-  click ebfa0fa4fc77deab &quot;GitHubIntegration.html#automated-diagram-generation-on-pr-merge&quot;;
-  98af8a1cf9c86822[&quot;generate_diagrams.yml&quot;];
-  class 98af8a1cf9c86822 default;
-  click 98af8a1cf9c86822 &quot;../../.github/workflows/generate_diagrams.yml&quot;;
-  ebfa0fa4fc77deab -->|satisfiedBy| 98af8a1cf9c86822;
-  ebfa0fa4fc77deab -.->|verifiedBy| c9211e23a87d8cf6;
+  b81ccff1f7bf39b3[&quot;Automated Documentation Export on PR Merge&quot;];
+  class b81ccff1f7bf39b3 systemRequirement;
+  click b81ccff1f7bf39b3 &quot;GitHubIntegration.html#automated-documentation-export-on-pr-merge&quot;;
+  13fc1caf0ecb96e1[&quot;update_docs.yml&quot;];
+  class 13fc1caf0ecb96e1 default;
+  click 13fc1caf0ecb96e1 &quot;../../.github/workflows/update_docs.yml&quot;;
+  b81ccff1f7bf39b3 -->|satisfiedBy| 13fc1caf0ecb96e1;
+  b81ccff1f7bf39b3 -.->|verifiedBy| 98e59ee2968bbb79;
   c661b225443ae709[&quot;Relation Types and behaviors&quot;];
   class c661b225443ae709 systemRequirement;
   click c661b225443ae709 &quot;ModelManagement.html#relation-types-and-behaviors&quot;;
@@ -871,21 +871,21 @@ derive (Forward):</p>
 <li>satisfiedBy: <a href="../../tests/test-diagram-generation/test.sh">test.sh</a></li>
 </ul>
 <hr />
-<h3 id="automated-diagram-generation-on-pr-merge-verification">Automated Diagram Generation on PR Merge Verification</h3>
-<p>This test verifies that the system automatically generates and updates diagrams when pull requests are merged to the main branch.</p>
+<h3 id="automated-documentation-export-on-pr-merge-verification">Automated Documentation Export on PR Merge Verification</h3>
+<p>This test verifies that the system automatically exports and updates HTML documentation when pull requests are merged to the main branch.</p>
 <h4>Details</h4>
 <h5>Acceptance Criteria</h5>
 <ul>
-<li>System should have a GitHub workflow that automatically generates diagrams on PR merge</li>
+<li>System should have a GitHub workflow that automatically exports documentation on PR merge</li>
 <li>The workflow should only be triggered when PRs are merged to the main branch</li>
-<li>Generated diagrams should be committed back to the main branch</li>
+<li>Exported documentation should be committed back to the main branch</li>
 <li>The commit message should clearly indicate the automated nature of the change</li>
 </ul>
 <h5>Test Criteria</h5>
 <ul>
 <li>Workflow defined in the GitHub workflow configuration correctly</li>
 <li>Workflow triggers only on PR merge to main branch</li>
-<li>Workflow correctly checks out code, builds the tool, and generates diagrams</li>
+<li>Workflow correctly checks out code, builds the tool, and exports documentation</li>
 <li>Workflow commits and pushes changes back to the main branch</li>
 <li>Commit message is informative and standardized</li>
 </ul>
@@ -895,8 +895,8 @@ derive (Forward):</p>
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>verify: <a href="GitHubIntegration.html#automated-diagram-generation-on-pr-merge">Automated Diagram Generation on PR Merge</a></li>
-<li>satisfiedBy: <a href="../../.github/workflows/generate_diagrams.yml">generate_diagrams.yml</a></li>
+<li>verify: <a href="GitHubIntegration.html#automated-documentation-export-on-pr-merge">Automated Documentation Export on PR Merge</a></li>
+<li>satisfiedBy: <a href="../../.github/workflows/update_docs.yml">update_docs.yml</a></li>
 </ul>
 <hr />
 <h3 id="interactive-mermaid-diagrams">Interactive Mermaid Diagrams</h3>

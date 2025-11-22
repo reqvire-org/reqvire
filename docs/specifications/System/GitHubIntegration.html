@@ -512,32 +512,32 @@ blockquote {
   classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  f1b3aa9ecd256e77[&quot;Automate Diagram Generation&quot;];
-  class f1b3aa9ecd256e77 userRequirement;
-  click f1b3aa9ecd256e77 &quot;GitHubIntegration.html#automate-diagram-generation&quot;;
-  ebfa0fa4fc77deab[&quot;Automated Diagram Generation on PR Merge&quot;];
-  class ebfa0fa4fc77deab systemRequirement;
-  click ebfa0fa4fc77deab &quot;GitHubIntegration.html#automated-diagram-generation-on-pr-merge&quot;;
-  f1b3aa9ecd256e77 -.->|deriveReqT| ebfa0fa4fc77deab;
+  ae7a74c47c79e78c[&quot;Automate Documentation Export&quot;];
+  class ae7a74c47c79e78c userRequirement;
+  click ae7a74c47c79e78c &quot;GitHubIntegration.html#automate-documentation-export&quot;;
+  b81ccff1f7bf39b3[&quot;Automated Documentation Export on PR Merge&quot;];
+  class b81ccff1f7bf39b3 systemRequirement;
+  click b81ccff1f7bf39b3 &quot;GitHubIntegration.html#automated-documentation-export-on-pr-merge&quot;;
+  ae7a74c47c79e78c -.->|deriveReqT| b81ccff1f7bf39b3;
   1080a1eb81fc4bbf[&quot;Automate Pull Request Validations&quot;];
   class 1080a1eb81fc4bbf userRequirement;
   click 1080a1eb81fc4bbf &quot;GitHubIntegration.html#automate-pull-request-validations&quot;;
-  1080a1eb81fc4bbf -.->|deriveReqT| ebfa0fa4fc77deab;
-  98af8a1cf9c86822[&quot;generate_diagrams.yml&quot;];
-  class 98af8a1cf9c86822 default;
-  click 98af8a1cf9c86822 &quot;../../.github/workflows/generate_diagrams.yml&quot;;
-  ebfa0fa4fc77deab -->|satisfiedBy| 98af8a1cf9c86822;
-  c9211e23a87d8cf6[&quot;Automated Diagram Generation on PR Merge Verification&quot;];
-  class c9211e23a87d8cf6 verification;
-  click c9211e23a87d8cf6 &quot;DiagramGeneration.html#automated-diagram-generation-on-pr-merge-verification&quot;;
-  ebfa0fa4fc77deab -.->|verifiedBy| c9211e23a87d8cf6;
+  1080a1eb81fc4bbf -.->|deriveReqT| b81ccff1f7bf39b3;
+  13fc1caf0ecb96e1[&quot;update_docs.yml&quot;];
+  class 13fc1caf0ecb96e1 default;
+  click 13fc1caf0ecb96e1 &quot;../../.github/workflows/update_docs.yml&quot;;
+  b81ccff1f7bf39b3 -->|satisfiedBy| 13fc1caf0ecb96e1;
+  98e59ee2968bbb79[&quot;Automated Documentation Export on PR Merge Verification&quot;];
+  class 98e59ee2968bbb79 verification;
+  click 98e59ee2968bbb79 &quot;DiagramGeneration.html#automated-documentation-export-on-pr-merge-verification&quot;;
+  b81ccff1f7bf39b3 -.->|verifiedBy| 98e59ee2968bbb79;
   aac8b8bec20319fa[&quot;Generate Change Logs for Pull Requests&quot;];
   class aac8b8bec20319fa userRequirement;
   click aac8b8bec20319fa &quot;GitHubIntegration.html#generate-change-logs-for-pull-requests&quot;;
   98eaeddc27f99e11[&quot;Integrate with GitHub Workflows&quot;];
   class 98eaeddc27f99e11 userRequirement;
   click 98eaeddc27f99e11 &quot;../UserStories.html#integrate-with-github-workflows&quot;;
-  98eaeddc27f99e11 -.->|deriveReqT| f1b3aa9ecd256e77;
+  98eaeddc27f99e11 -.->|deriveReqT| ae7a74c47c79e78c;
   98eaeddc27f99e11 -.->|deriveReqT| 1080a1eb81fc4bbf;
   98eaeddc27f99e11 -.->|deriveReqT| aac8b8bec20319fa;
 </div>
@@ -563,8 +563,8 @@ blockquote {
 <li>derivedFrom: <a href="../UserStories.html#integrate-with-github-workflows">Integrate with GitHub Workflows</a></li>
 </ul>
 <hr />
-<h3 id="automate-diagram-generation">Automate Diagram Generation</h3>
-<p>The system shall automate generation of diagrams in the GitHub workflow on PR merge event, so that the diagrams are always accessible and up-to-date.</p>
+<h3 id="automate-documentation-export">Automate Documentation Export</h3>
+<p>The system shall automate export of HTML documentation in the GitHub workflow on PR merge event, so that the documentation is always accessible and up-to-date for GitHub Pages.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: user-requirement</li>
@@ -574,25 +574,25 @@ blockquote {
 <li>derivedFrom: <a href="../UserStories.html#integrate-with-github-workflows">Integrate with GitHub Workflows</a></li>
 </ul>
 <hr />
-<h3 id="automated-diagram-generation-on-pr-merge">Automated Diagram Generation on PR Merge</h3>
-<p>The system shall implement a GitHub workflow that automatically generates and commits updated diagrams when pull requests are merged to the main branch.</p>
+<h3 id="automated-documentation-export-on-pr-merge">Automated Documentation Export on PR Merge</h3>
+<p>The system shall implement a GitHub workflow that automatically exports and commits updated HTML documentation when pull requests are merged to the main branch.</p>
 <h4>Details</h4>
 <p>The GitHub workflow shall:</p>
 <ul>
 <li>Be triggered only when a pull request is merged to the main branch (not on PR creation or updates)</li>
 <li>Check out the latest code from the main branch post-merge</li>
 <li>Build the Reqvire tool from source</li>
-<li>Run the diagram generation process using the <code>--generate-diagrams</code> flag</li>
-<li>Check if any diagrams have been added or modified</li>
+<li>Run the HTML export process using <code>reqvire export --output docs</code></li>
+<li>Check if any documentation files have been added or modified</li>
 <li>Commit any updated files with a standardized commit message</li>
 <li>Push the updates back to the main branch</li>
 </ul>
-<p>This ensures that the Mermaid diagrams in the repository are always up-to-date after changes are merged to the main branch, providing accurate visual representations of the latest model state without requiring manual intervention.</p>
+<p>This ensures that the HTML documentation in the <code>docs/</code> folder is always up-to-date after changes are merged to the main branch, providing accurate documentation for GitHub Pages without requiring manual intervention.</p>
 <h4>Relations</h4>
 <ul>
-<li>derivedFrom: <a href="#automate-diagram-generation">Automate Diagram Generation</a></li>
+<li>derivedFrom: <a href="#automate-documentation-export">Automate Documentation Export</a></li>
 <li>derivedFrom: <a href="#automate-pull-request-validations">Automate Pull Request Validations</a></li>
-<li>satisfiedBy: <a href="../../.github/workflows/generate_diagrams.yml">generate_diagrams.yml</a></li>
+<li>satisfiedBy: <a href="../../.github/workflows/update_docs.yml">update_docs.yml</a></li>
 </ul>
 <hr />
 

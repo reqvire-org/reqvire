@@ -40,7 +40,7 @@ The containment hierarchy extraction must:
 The Mermaid diagram generation must:
 
 **Graph Structure:**
-- Use `graph LR` (left-to-right layout)
+- Use `graph TD` (top-down layout)
 - Folder nodes with connections to child folders and files
 - File subgraphs containing element nodes
 - Tree structure with explicit parent-child connections
@@ -54,6 +54,10 @@ The Mermaid diagram generation must:
 **Connections:**
 - `parent --> child` for folder/file hierarchy
 - No connections between elements within files
+
+**Element Display Modes:**
+- Default: Show ALL elements in each file
+- With `--short` flag: Show only root elements (those without hierarchical parents in same file)
 
 **Element Nodes:**
 - Use 16-character hash IDs for node uniqueness
@@ -1016,6 +1020,12 @@ This test verifies that the system generates valid Mermaid flowchart diagrams wi
    - Compare output across multiple executions
    - Test byte-identical output
 
+7. **Element display modes:**
+   - Default mode (no flags): verify ALL elements are displayed in each file
+   - With `--short` flag: verify only root elements are displayed (those without hierarchical parents in same file)
+   - Verify element count changes appropriately between modes
+   - Verify description text reflects current display mode
+
 ##### Acceptance Criteria
 - Mermaid diagram syntax is valid
 - Subgraphs correctly represent folder/file hierarchy
@@ -1023,6 +1033,8 @@ This test verifies that the system generates valid Mermaid flowchart diagrams wi
 - Styling classes are applied correctly
 - Clickable links navigate to correct elements
 - Output is deterministic
+- Default mode shows all elements
+- Short mode shows only root elements
 
 #### Metadata
   * type: test-verification

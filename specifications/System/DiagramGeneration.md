@@ -164,22 +164,22 @@ This test verifies that the system provides visual representations of relationsh
   * satisfiedBy: [test.sh](../../tests/test-diagram-generation/test.sh)
 ---
 
-### Automated Diagram Generation on PR Merge Verification
+### Automated Documentation Export on PR Merge Verification
 
-This test verifies that the system automatically generates and updates diagrams when pull requests are merged to the main branch.
+This test verifies that the system automatically exports and updates HTML documentation when pull requests are merged to the main branch.
 
 #### Details
 
 ##### Acceptance Criteria
-- System should have a GitHub workflow that automatically generates diagrams on PR merge
+- System should have a GitHub workflow that automatically exports documentation on PR merge
 - The workflow should only be triggered when PRs are merged to the main branch
-- Generated diagrams should be committed back to the main branch
+- Exported documentation should be committed back to the main branch
 - The commit message should clearly indicate the automated nature of the change
 
 ##### Test Criteria
 - Workflow defined in the GitHub workflow configuration correctly
 - Workflow triggers only on PR merge to main branch
-- Workflow correctly checks out code, builds the tool, and generates diagrams
+- Workflow correctly checks out code, builds the tool, and exports documentation
 - Workflow commits and pushes changes back to the main branch
 - Commit message is informative and standardized
 
@@ -187,8 +187,8 @@ This test verifies that the system automatically generates and updates diagrams 
   * type: test-verification
 
 #### Relations
-  * verify: [Automated Diagram Generation on PR Merge](GitHubIntegration.md#automated-diagram-generation-on-pr-merge)
-  * satisfiedBy: [generate_diagrams.yml](../../.github/workflows/generate_diagrams.yml)
+  * verify: [Automated Documentation Export on PR Merge](GitHubIntegration.md#automated-documentation-export-on-pr-merge)
+  * satisfiedBy: [update_docs.yml](../../.github/workflows/update_docs.yml)
 ---
 
 ### Interactive Mermaid Diagrams

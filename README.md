@@ -10,7 +10,7 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=flat-square)](https://opensource.org/licenses/Apache-2.0)
 [![Rust](https://img.shields.io/badge/Built%20with-Rust-orange?style=flat-square&logo=rust)](https://www.rust-lang.org/)
 
-[📖 **Documentation**](https://www.reqvire.org) • [🚀 **Quick Start**](#get-started) • [👥 **Contributing**](./doc/README.md) • [💬 **Community**](https://github.com/reqvire-org/reqvire/discussions)
+[📖 **Documentation**](https://www.reqvire.org) • [🔍 **Browse Model**](https://reqvire-org.github.io/reqvire/) • [🚀 **Quick Start**](#get-started) • [👥 **Contributing**](./doc/README.md)
 
 </div>
 
@@ -58,6 +58,7 @@ For detailed installation options (from source, pre-built binaries, etc.), see t
 ### Next Steps
 
 - **[Documentation](https://www.reqvire.org)** - Learn how to use Reqvire
+- **[Browse Model](https://reqvire-org.github.io/reqvire/)** - Explore Reqvire's own specifications
 - **[Use Cases](./specifications/Usecases.md)** - See Reqvire in action
 
 ---

@@ -1,4 +1,4 @@
-name: Generate Diagrams and Traces SVG on PR Merge
+name: Update Documentation on PR Merge
 
 on:
   pull_request:
@@ -7,40 +7,40 @@ on:
       - main
 
 jobs:
-  generate-diagrams:
+  update-docs:
     if: github.event.pull_request.merged == true && !startsWith(github.event.pull_request.head.ref, 'release/')
-    name: Generate and Commit Diagrams
+    name: Export and Update Documentation
     runs-on: ubuntu-latest
-    
+
     permissions:
-      contents: write  # Required to commit to the repository
-    
+      contents: write
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
-          ref: main  # Checkout the main branch
-          fetch-depth: 0  # Get full history for proper Git operations
-      
+          ref: main
+          fetch-depth: 0
+
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
-      
+
       - name: Cache Cargo dependencies
         uses: Swatinem/rust-cache@v2
-      
+
       - name: Build Reqvire
         run: |
           cargo build --release
           cp target/release/reqvire ./reqvire
-      
+
       - name: Configure Git
         run: |
           git config --global user.name "GitHub Action"
           git config --global user.email "actions@github.com"
-      
-      - name: Generate Diagrams
+
+      - name: Export Documentation to docs folder
         run: |
-          ./reqvire generate-diagrams
+          ./reqvire export --output docs
 
       - name: Check for Changes
         id: check_changes
@@ -50,10 +50,10 @@ jobs:
           else
             echo "HAS_CHANGES=false" >> $GITHUB_ENV
           fi
-      
+
       - name: Commit and Push Changes
         if: env.HAS_CHANGES == 'true'
         run: |
           git add -A
-          git commit -m "Auto-generate diagrams after PR merge to main"
+          git commit -m "Auto-update documentation after PR merge"
           git push origin main

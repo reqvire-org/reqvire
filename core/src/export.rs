@@ -309,7 +309,7 @@ pub fn generate_artifacts_in_temp(
     filesystem::write_file("coverage.md", coverage_text.as_bytes())?;
 
     info!("Generating containment.md...");
-    let containment_diagram = crate::diagrams::generate_containment_diagram(&temp_model_manager.graph_registry)?;
+    let containment_diagram = crate::diagrams::generate_containment_diagram(&temp_model_manager.graph_registry, false)?;
     filesystem::write_file("containment.md", containment_diagram.as_bytes())?;
 
     // Step 6: Convert markdown to HTML

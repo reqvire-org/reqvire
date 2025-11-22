@@ -1023,18 +1023,25 @@ pub fn escape_label(text: &str) -> String {
 }
 
 /// Generate containment view diagram showing folder/file/element hierarchy
-pub fn generate_containment_diagram(registry: &GraphRegistry) -> Result<String, ReqvireError> {
+///
+/// When `short` is true, shows only root elements (those without hierarchical parents).
+/// When `short` is false (default), shows all elements.
+pub fn generate_containment_diagram(registry: &GraphRegistry, short: bool) -> Result<String, ReqvireError> {
     // Build containment hierarchy structure
-    let hierarchy = crate::containment::ContainmentHierarchy::build(registry)?;
+    let hierarchy = crate::containment::ContainmentHierarchy::build(registry, short)?;
 
     let mut output = String::new();
 
     // Markdown header
     output.push_str("# Containment View\n\n");
     output.push_str("This diagram shows the containment hierarchy (folders, files, and elements).\n");
-    output.push_str("Elements displayed in each file are filtered to show only top-level parents (those without hierarchical parent relations within the same file).\n\n");
+    if short {
+        output.push_str("Elements displayed in each file are filtered to show only root elements (those without hierarchical parent relations within the same file).\n\n");
+    } else {
+        output.push_str("All elements in each file are displayed.\n\n");
+    }
     output.push_str("```mermaid\n");
-    output.push_str("graph LR\n");
+    output.push_str("graph TD\n");
 
     // CSS class definitions
     output.push_str("  %% Graph styling\n");
@@ -1101,6 +1108,7 @@ fn generate_folder_tree(
 
         // Create subgraph for file containing elements
         output.push_str(&format!("  subgraph {}[\"📄 {}\"]\n", file_id, file.name));
+        output.push_str("    direction TB\n");
 
         // Generate element nodes
         for element in &file.elements {

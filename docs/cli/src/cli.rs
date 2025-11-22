@@ -389,11 +389,15 @@ pub enum Commands {
     },
 
     /// Generate containment view showing folder/file/element hierarchy
-    #[clap(override_help = "Generate containment view showing folder/file/element hierarchy\n\nCONTAINMENT OPTIONS:\n      --json     Output results in JSON format")]
+    #[clap(override_help = "Generate containment view showing folder/file/element hierarchy\n\nCONTAINMENT OPTIONS:\n      --json     Output results in JSON format\n      --short    Show only root elements (without hierarchical parents)")]
     Containment {
         /// Output results in JSON format
         #[clap(long, help_heading = "CONTAINMENT OPTIONS")]
         json: bool,
+
+        /// Show only root elements (without hierarchical parents in same file)
+        #[clap(long, help_heading = "CONTAINMENT OPTIONS")]
+        short: bool,
     },
 
     /// Interactive shell for GraphRegistry operations (undocumented)
@@ -1078,16 +1082,16 @@ pub fn handle_command(
             render_crud_result(&result);
             return Ok(0);
         },
-        Some(Commands::Containment { json }) => {
+        Some(Commands::Containment { json, short }) => {
             if json {
                 // Build containment hierarchy
-                let hierarchy = reqvire::containment::ContainmentHierarchy::build(&model_manager.graph_registry)?;
+                let hierarchy = reqvire::containment::ContainmentHierarchy::build(&model_manager.graph_registry, short)?;
                 // Serialize to JSON
                 let json_output = serde_json::to_string_pretty(&hierarchy)
                     .map_err(|e| ReqvireError::ElementError(format!("JSON serialization error: {}", e)))?;
                 println!("{}", json_output);
             } else {
-                let output = diagrams::generate_containment_diagram(&model_manager.graph_registry)?;
+                let output = diagrams::generate_containment_diagram(&model_manager.graph_registry, short)?;
                 println!("{}", output);
             }
             return Ok(0);

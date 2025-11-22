@@ -767,9 +767,9 @@ blockquote {
       click 61dc6cf5b44dc78e &quot;specifications/System/Configuration.html#structured-markdown-files-search-and-detection&quot;;
     end
     subgraph bb8910d215c867e4[&quot;📄 DiagramGeneration.md&quot;]
-      c9211e23a87d8cf6[&quot;Automated Diagram Generation on PR Merge Verification&quot;];
-      class c9211e23a87d8cf6 verification;
-      click c9211e23a87d8cf6 &quot;specifications/System/DiagramGeneration.html#automated-diagram-generation-on-pr-merge-verification&quot;;
+      98e59ee2968bbb79[&quot;Automated Documentation Export on PR Merge Verification&quot;];
+      class 98e59ee2968bbb79 verification;
+      click 98e59ee2968bbb79 &quot;specifications/System/DiagramGeneration.html#automated-documentation-export-on-pr-merge-verification&quot;;
       71adfd59da9ff84f[&quot;Complete Model Structure Visualization&quot;];
       class 71adfd59da9ff84f userRequirement;
       click 71adfd59da9ff84f &quot;specifications/System/DiagramGeneration.html#complete-model-structure-visualization&quot;;
@@ -899,15 +899,15 @@ blockquote {
       click 1869a2ddda635001 &quot;specifications/System/Formatting.html#replace-absolute-links-with-relative-links&quot;;
     end
     subgraph 436b18807a6d0617[&quot;📄 GitHubIntegration.md&quot;]
-      f1b3aa9ecd256e77[&quot;Automate Diagram Generation&quot;];
-      class f1b3aa9ecd256e77 userRequirement;
-      click f1b3aa9ecd256e77 &quot;specifications/System/GitHubIntegration.html#automate-diagram-generation&quot;;
+      ae7a74c47c79e78c[&quot;Automate Documentation Export&quot;];
+      class ae7a74c47c79e78c userRequirement;
+      click ae7a74c47c79e78c &quot;specifications/System/GitHubIntegration.html#automate-documentation-export&quot;;
       1080a1eb81fc4bbf[&quot;Automate Pull Request Validations&quot;];
       class 1080a1eb81fc4bbf userRequirement;
       click 1080a1eb81fc4bbf &quot;specifications/System/GitHubIntegration.html#automate-pull-request-validations&quot;;
-      ebfa0fa4fc77deab[&quot;Automated Diagram Generation on PR Merge&quot;];
-      class ebfa0fa4fc77deab systemRequirement;
-      click ebfa0fa4fc77deab &quot;specifications/System/GitHubIntegration.html#automated-diagram-generation-on-pr-merge&quot;;
+      b81ccff1f7bf39b3[&quot;Automated Documentation Export on PR Merge&quot;];
+      class b81ccff1f7bf39b3 systemRequirement;
+      click b81ccff1f7bf39b3 &quot;specifications/System/GitHubIntegration.html#automated-documentation-export-on-pr-merge&quot;;
       aac8b8bec20319fa[&quot;Generate Change Logs for Pull Requests&quot;];
       class aac8b8bec20319fa userRequirement;
       click aac8b8bec20319fa &quot;specifications/System/GitHubIntegration.html#generate-change-logs-for-pull-requests&quot;;
@@ -1359,9 +1359,9 @@ blockquote {
   65dfd6faa150fe4 -.->|verifiedBy| 2410cac865bec586;
   61dc6cf5b44dc78e -->|satisfiedBy| d50a859650933e55;
   61dc6cf5b44dc78e -.->|verifiedBy| b7acac3ba8b9c2da;
-  98af8a1cf9c86822[&quot;generate_diagrams.yml&quot;];
-  class 98af8a1cf9c86822 default;
-  c9211e23a87d8cf6 -->|satisfiedBy| 98af8a1cf9c86822;
+  13fc1caf0ecb96e1[&quot;update_docs.yml&quot;];
+  class 13fc1caf0ecb96e1 default;
+  98e59ee2968bbb79 -->|satisfiedBy| 13fc1caf0ecb96e1;
   71adfd59da9ff84f -.->|deriveReqT| b07859a209e66b4b;
   b740af57e790f8f0 -->|satisfiedBy| dad7eeb932afdb92;
   ce2625feec883e55[&quot;utils.rs&quot;];
@@ -1493,10 +1493,10 @@ blockquote {
   8a37a2f2cdcda820 -.->|deriveReqT| 2cde97b8bbea0703;
   8a37a2f2cdcda820 -.->|deriveReqT| 1869a2ddda635001;
   1869a2ddda635001 -.->|verifiedBy| 11434b30ee3de97b;
-  f1b3aa9ecd256e77 -.->|deriveReqT| ebfa0fa4fc77deab;
-  1080a1eb81fc4bbf -.->|deriveReqT| ebfa0fa4fc77deab;
-  ebfa0fa4fc77deab -->|satisfiedBy| 98af8a1cf9c86822;
-  ebfa0fa4fc77deab -.->|verifiedBy| c9211e23a87d8cf6;
+  ae7a74c47c79e78c -.->|deriveReqT| b81ccff1f7bf39b3;
+  1080a1eb81fc4bbf -.->|deriveReqT| b81ccff1f7bf39b3;
+  b81ccff1f7bf39b3 -->|satisfiedBy| 13fc1caf0ecb96e1;
+  b81ccff1f7bf39b3 -.->|verifiedBy| 98e59ee2968bbb79;
   6a435286a5c0531f -.->|verifiedBy| 6cd6ad41953ca79d;
   68ac732fe5c5db53[&quot;test.sh&quot;];
   class 68ac732fe5c5db53 default;
@@ -1720,7 +1720,7 @@ blockquote {
   37a5b8e199a838f -.->|deriveReqT| 5be870a7fe3078ce;
   37a5b8e199a838f -.->|deriveReqT| c57d76a5aa346a53;
   37a5b8e199a838f -.->|deriveReqT| 8fccd7073a4d582;
-  98eaeddc27f99e11 -.->|deriveReqT| f1b3aa9ecd256e77;
+  98eaeddc27f99e11 -.->|deriveReqT| ae7a74c47c79e78c;
   98eaeddc27f99e11 -.->|deriveReqT| 1080a1eb81fc4bbf;
   98eaeddc27f99e11 -.->|deriveReqT| aac8b8bec20319fa;
   3f1b65e8cdc9ec2 -.->|deriveReqT| 1ac3e4fc194fd9d;

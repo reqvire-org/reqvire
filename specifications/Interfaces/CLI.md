@@ -535,17 +535,23 @@ The system shall provide a `containment` command to generate markdown output wit
 #### Details
 The `containment` command shall:
 - Output markdown format with header and embedded Mermaid flowchart diagram
-- Support `--json` flag for structured JSON output (optional)
+- Support `--json` flag for structured JSON output
+- Support `--short` flag to show only root elements (those without hierarchical parents in same file)
+- Default behavior (without --short): show ALL elements in each file
 - Exit with code 0 on success, non-zero on error
-- Command syntax: `reqvire containment [--json]`
+- Command syntax: `reqvire containment [--json] [--short]`
 
 The markdown output shall include:
 - `# Containment View` header
-- Mermaid code block with flowchart diagram
+- Mermaid code block with flowchart diagram (using `graph TD` direction)
+- Description indicating whether all elements or only root elements are displayed
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * derivedFrom: [Containment View Report Generation](../System/Reporting.md#containment-view-report-generation)
+  * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
+  * satisfiedBy: [containment.rs](../../core/src/containment.rs)
+  * satisfiedBy: [diagrams.rs](../../core/src/diagrams.rs)
 ---
 
 ### CLI Help Structure Verification
