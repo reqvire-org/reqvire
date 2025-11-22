@@ -4,8 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Linting</title>
+    <link rel="icon" type="image/x-icon" href="../../../assets/favicon.ico">
+    <link rel="apple-touch-icon" href="../../../assets/apple-touch-icon.png">
     
 <style>
+:root {
+    /* Primary Colors */
+    --color-primary: #1E3A5F;           /* Deep Sapphire - navigation, headers */
+    --color-primary-hover: #2a4a73;     /* Lighter shade for hover states */
+    --color-primary-active: #15293f;    /* Darker shade for active states */
+
+    /* Element Type Colors */
+    --color-requirement: #2563EB;       /* Royal Blue */
+    --color-verification: #059669;      /* Emerald */
+    --color-design: #7C3AED;            /* Purple */
+    --color-test: #0891B2;              /* Teal */
+    --color-implementation: #D97706;    /* Amber */
+    --color-external: #64748B;          /* Slate */
+
+    /* Status Colors */
+    --color-verified: #059669;          /* Emerald - verified/passing */
+    --color-pending: #D97706;           /* Amber - pending/warning */
+    --color-error: #DC2626;             /* Rose - error/failed */
+
+    /* Interactive Colors */
+    --color-highlight: #ff6b6b;         /* Hover highlight */
+    --color-link: #0366d6;              /* Link color */
+}
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
     line-height: 1.6;
@@ -20,7 +45,7 @@ body {
     left: 0;
     right: 0;
     height: 50px;
-    background-color: #2c3e50;
+    background-color: var(--color-primary);
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     z-index: 1000;
     display: flex;
@@ -28,15 +53,23 @@ body {
     padding: 0 20px;
 }
 .reqvire-nav a {
-    color: #ecf0f1;
+    color: #ffffff;
     text-decoration: none;
     padding: 10px 20px;
     margin-right: 5px;
     border-radius: 3px;
     transition: background-color 0.2s;
 }
+.reqvire-nav a.nav-logo {
+    display: flex;
+    align-items: center;
+    padding: 5px 15px 5px 0;
+}
+.reqvire-nav a.nav-logo img {
+    vertical-align: middle;
+}
 .reqvire-nav a:hover {
-    background-color: #34495e;
+    background-color: var(--color-primary-hover);
 }
 .reqvire-nav-spacer {
     height: 50px;
@@ -64,7 +97,7 @@ h2 {
     padding-bottom: 5px;
 }
 h3 {
-    color: #1a6fb7;
+    color: var(--color-requirement);
     margin-top: 25px;
 }
 h4 {
@@ -72,7 +105,7 @@ h4 {
     font-weight: 600;
 }
 a {
-    color: #0366d6;
+    color: var(--color-link);
     text-decoration: none;
 }
 a:hover {
@@ -159,7 +192,7 @@ blockquote {
 .diagram-nav-btn {
     width: 32px;
     height: 32px;
-    background-color: #2c3e50;
+    background-color: var(--color-primary);
     color: white;
     border: none;
     border-radius: 3px;
@@ -170,10 +203,10 @@ blockquote {
     justify-content: center;
 }
 .diagram-nav-btn:hover {
-    background-color: #34495e;
+    background-color: var(--color-primary-hover);
 }
 .diagram-nav-btn:active {
-    background-color: #1a252f;
+    background-color: var(--color-primary-active);
 }
 </style>
 
@@ -221,17 +254,34 @@ blockquote {
         await mermaid.run();
         window.mermaid = mermaid;
 
+        // Wait for SVGs to be fully rendered, then initialize
+        function waitForSvgs(callback) {
+            var containers = document.querySelectorAll('.mermaid');
+            var allReady = true;
+            containers.forEach(function(c) {
+                var svg = c.querySelector('svg');
+                if (!svg || !svg.getBBox || svg.getBBox().width === 0) {
+                    allReady = false;
+                }
+            });
+            if (allReady && containers.length > 0) {
+                callback();
+            } else {
+                requestAnimationFrame(function() { waitForSvgs(callback); });
+            }
+        }
+
         // Add pan/zoom to all Mermaid diagrams after rendering
-        setTimeout(function() {
+        waitForSvgs(function() {
             document.querySelectorAll('.mermaid').forEach(function(mermaidContainer) {
-                    var svg = mermaidContainer.querySelector('svg');
-                    if (!svg) return;
+                var svg = mermaidContainer.querySelector('svg');
+                if (!svg) return;
 
-                    svg.style.maxWidth = 'none';
-                    svg.style.maxHeight = 'none';
+                svg.style.maxWidth = 'none';
+                svg.style.maxHeight = 'none';
 
-                    var eventsHandler = {
-                        haltEventListeners: ['touchstart', 'touchend', 'touchmove', 'touchleave', 'touchcancel'],
+                var eventsHandler = {
+                    haltEventListeners: ['touchstart', 'touchend', 'touchmove', 'touchleave', 'touchcancel'],
                         init: function(options) {
                             var instance = options.instance;
                             var initialScale = 1;
@@ -323,22 +373,20 @@ blockquote {
                         });
                     });
             });
-        }, 500);
 
-        // Add CSS for edge highlighting (high specificity for SVG)
-        var style = document.createElement('style');
-        style.textContent = `
-            path.edge-highlighted,
-            .edge-highlighted path,
-            svg path.edge-highlighted {
-                stroke: #ff6b6b !important;
-                stroke-width: 3px !important;
-            }
-        `;
-        document.head.appendChild(style);
+            // Add CSS for edge highlighting
+            var style = document.createElement('style');
+            style.textContent = `
+                path.edge-highlighted,
+                .edge-highlighted path,
+                svg path.edge-highlighted {
+                    stroke: #ff6b6b !important;
+                    stroke-width: 3px !important;
+                }
+            `;
+            document.head.appendChild(style);
 
-        // Add edge highlighting on node hover
-        setTimeout(function() {
+            // Initialize edge highlighting for all diagrams
             document.querySelectorAll('.mermaid svg').forEach(function(svg) {
                 var nodes = svg.querySelectorAll('.node');
 
@@ -441,24 +489,98 @@ blockquote {
                            pt.y >= bbox.y - margin && pt.y <= bbox.y + bbox.height + margin;
                 }
 
-                // Map edges to nodes
-                var nodeEdgeMap = {};
-                Object.keys(nodeData).forEach(function(hashId) {
-                    nodeEdgeMap[hashId] = [];
-                    var bbox = nodeData[hashId].bbox;
+                // Build edge connections with direction tracking
+                var edgeConnections = []; // [{path, source, target}]
+                var upstreamOf = {}; // node -> [parent nodes that point TO this node]
+                var downstreamOf = {}; // node -> [child nodes this node points TO]
 
-                    edgePaths.forEach(function(path) {
-                        var points = getPathPoints(path);
-                        for (var i = 0; i < points.length; i++) {
-                            if (isNearBbox(points[i], bbox, 40)) {
-                                if (!nodeEdgeMap[hashId].includes(path)) {
-                                    nodeEdgeMap[hashId].push(path);
-                                }
-                                break;
-                            }
+                Object.keys(nodeData).forEach(function(hashId) {
+                    upstreamOf[hashId] = [];
+                    downstreamOf[hashId] = [];
+                });
+
+                edgePaths.forEach(function(path) {
+                    var points = getPathPoints(path);
+                    if (points.length < 2) return;
+
+                    var startPt = points[0];
+                    var endPt = points[points.length - 1];
+
+                    var sourceNode = null;
+                    var targetNode = null;
+
+                    // Find source and target nodes for this edge
+                    Object.keys(nodeData).forEach(function(hashId) {
+                        var bbox = nodeData[hashId].bbox;
+                        if (isNearBbox(startPt, bbox, 20)) {
+                            sourceNode = hashId;
+                        }
+                        if (isNearBbox(endPt, bbox, 20)) {
+                            targetNode = hashId;
                         }
                     });
+
+                    if (sourceNode && targetNode && sourceNode !== targetNode) {
+                        edgeConnections.push({path: path, source: sourceNode, target: targetNode});
+                        // source -> target means: target's upstream includes source
+                        if (!upstreamOf[targetNode].includes(sourceNode)) {
+                            upstreamOf[targetNode].push(sourceNode);
+                        }
+                        // source -> target means: source's downstream includes target
+                        if (!downstreamOf[sourceNode].includes(targetNode)) {
+                            downstreamOf[sourceNode].push(targetNode);
+                        }
+                    }
                 });
+
+                // Traverse only upstream (to parents/ancestors)
+                function findUpstream(startNodeId) {
+                    var visited = {};
+                    var queue = [startNodeId];
+                    visited[startNodeId] = true;
+
+                    while (queue.length > 0) {
+                        var current = queue.shift();
+                        var parents = upstreamOf[current] || [];
+                        parents.forEach(function(parent) {
+                            if (!visited[parent]) {
+                                visited[parent] = true;
+                                queue.push(parent);
+                            }
+                        });
+                    }
+                    return visited;
+                }
+
+                // Traverse only downstream (to children/descendants)
+                function findDownstream(startNodeId) {
+                    var visited = {};
+                    var queue = [startNodeId];
+                    visited[startNodeId] = true;
+
+                    while (queue.length > 0) {
+                        var current = queue.shift();
+                        var children = downstreamOf[current] || [];
+                        children.forEach(function(child) {
+                            if (!visited[child]) {
+                                visited[child] = true;
+                                queue.push(child);
+                            }
+                        });
+                    }
+                    return visited;
+                }
+
+                // Get edges for connected nodes
+                function getChainEdges(nodeSet) {
+                    var edges = [];
+                    edgeConnections.forEach(function(conn) {
+                        if (nodeSet[conn.source] && nodeSet[conn.target]) {
+                            edges.push(conn.path);
+                        }
+                    });
+                    return edges;
+                }
 
                 // Attach hover handlers
                 nodes.forEach(function(node) {
@@ -473,138 +595,143 @@ blockquote {
                         nodes.forEach(function(n) { n.style.filter = ''; });
                         node.style.filter = 'drop-shadow(0 0 6px #ff6b6b)';
 
-                        var connectedEdges = nodeEdgeMap[hashId] || [];
-                        connectedEdges.forEach(function(path) {
+                        // Find upstream (ancestors) and downstream (descendants) separately
+                        var upstream = findUpstream(hashId);
+                        var downstream = findDownstream(hashId);
+                        // Merge both sets
+                        var allConnected = {};
+                        Object.keys(upstream).forEach(function(k) { allConnected[k] = true; });
+                        Object.keys(downstream).forEach(function(k) { allConnected[k] = true; });
+
+                        var chainEdges = getChainEdges(allConnected);
+                        chainEdges.forEach(function(path) {
                             path.classList.add('edge-highlighted');
                         });
                     });
 
                     node.addEventListener('mouseleave', function() {
                         node.style.filter = '';
-                        var connectedEdges = nodeEdgeMap[hashId] || [];
-                        connectedEdges.forEach(function(path) {
+                        // Remove highlight from all edges
+                        edgePaths.forEach(function(path) {
                             path.classList.remove('edge-highlighted');
                         });
                     });
                 });
             });
-        }, 1000);
+        });
     </script>
 </head>
 <body>
     <nav class="reqvire-nav">
-        <a href="../../index.html">Home</a>
-        <a href="../../containment.html">Containment</a>
-        <a href="../../model.html">Model</a>
-        <a href="../../whole-model.html">Whole Model</a>
-        <a href="../../traces.html">Traces</a>
-        <a href="../../coverage.html">Coverage</a>
+        <a href="../../../index.html" class="nav-logo"><img src="../../../assets/logo.png" alt="Reqvire" height="24"></a>
+        <a href="../../../index.html">Index</a>
+        <a href="../../../containment.html">Containment</a>
+        <a href="../../../model.html">Model</a>
+        <a href="../../../whole-model.html">Whole Model</a>
+        <a href="../../../traces.html">Traces</a>
+        <a href="../../../coverage.html">Coverage</a>
     </nav>
     <div class="reqvire-nav-spacer"></div>
     <div class="container">
         <div class="content">
             <h1 id="requirements">Requirements</h1>
-<div class="mermaid">graph LR;
+<div class="mermaid">graph TD;
   %% REQVIRE-AUTOGENERATED-DIAGRAM
   %% Graph styling
-  classDef userRequirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
-  classDef systemRequirement fill:#fce4e4,stroke:#e68a8a,stroke-width:1px;
-  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef userRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:2px;
+  classDef systemRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:1px;
+  classDef verification fill:#d1fae5,stroke:#059669,stroke-width:2px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  6a435286a5c0531f[&quot;Lint Auto-fix Capability&quot;];
-  class 6a435286a5c0531f systemRequirement;
-  click 6a435286a5c0531f &quot;Linting.html#lint-auto-fix-capability&quot;;
-  6cd6ad41953ca79d[&quot;Lint Command Verification&quot;];
-  class 6cd6ad41953ca79d verification;
-  click 6cd6ad41953ca79d &quot;Linting.html#lint-command-verification&quot;;
-  6a435286a5c0531f -.->|verifiedBy| 6cd6ad41953ca79d;
-  68ac732fe5c5db53[&quot;test.sh&quot;];
-  class 68ac732fe5c5db53 default;
-  click 68ac732fe5c5db53 &quot;../../tests/test-lint-command/test.sh&quot;;
-  6cd6ad41953ca79d -->|satisfiedBy| 68ac732fe5c5db53;
-  1989110e4f387ac0[&quot;Lint Output Formatting&quot;];
-  class 1989110e4f387ac0 systemRequirement;
-  click 1989110e4f387ac0 &quot;Linting.html#lint-output-formatting&quot;;
-  1989110e4f387ac0 -.->|verifiedBy| 6cd6ad41953ca79d;
-  2158f3cb9fd89442[&quot;Model Linting&quot;];
-  class 2158f3cb9fd89442 userRequirement;
-  click 2158f3cb9fd89442 &quot;Linting.html#model-linting&quot;;
+  e1706df5a39b841e[&quot;Lint Auto-fix Capability&quot;];
+  class e1706df5a39b841e systemRequirement;
+  click e1706df5a39b841e &quot;Linting.html#lint-auto-fix-capability&quot;;
+  48a9bbc2594ba75f[&quot;Lint Command Verification&quot;];
+  class 48a9bbc2594ba75f verification;
+  click 48a9bbc2594ba75f &quot;Verifications/LintingVerifications.html#lint-command-verification&quot;;
+  e1706df5a39b841e -.->|verifiedBy| 48a9bbc2594ba75f;
+  d6a912ff5bea38fc[&quot;Lint Output Formatting&quot;];
+  class d6a912ff5bea38fc systemRequirement;
+  click d6a912ff5bea38fc &quot;Linting.html#lint-output-formatting&quot;;
+  d6a912ff5bea38fc -.->|verifiedBy| 48a9bbc2594ba75f;
+  4ad4e1a3e594725b[&quot;Model Linting&quot;];
+  class 4ad4e1a3e594725b userRequirement;
+  click 4ad4e1a3e594725b &quot;Linting.html#model-linting&quot;;
   7faaae7c608ed9f2[&quot;CLI Lint Command&quot;];
   class 7faaae7c608ed9f2 systemRequirement;
-  click 7faaae7c608ed9f2 &quot;../Interfaces/CLI.html#cli-lint-command&quot;;
-  2158f3cb9fd89442 -.->|deriveReqT| 7faaae7c608ed9f2;
-  2158f3cb9fd89442 -.->|deriveReqT| 1989110e4f387ac0;
-  b2e88ccde814d231[&quot;Multi-Branch Convergence Detection&quot;];
-  class b2e88ccde814d231 systemRequirement;
-  click b2e88ccde814d231 &quot;Linting.html#multi-branch-convergence-detection&quot;;
-  2158f3cb9fd89442 -.->|deriveReqT| b2e88ccde814d231;
-  a190b891ad2ea24a[&quot;Redundant Hierarchical Relations Detection&quot;];
-  class a190b891ad2ea24a systemRequirement;
-  click a190b891ad2ea24a &quot;Linting.html#redundant-hierarchical-relations-detection&quot;;
-  2158f3cb9fd89442 -.->|deriveReqT| a190b891ad2ea24a;
-  49b24681b9a54557[&quot;Redundant Verify Relations Detection&quot;];
-  class 49b24681b9a54557 systemRequirement;
-  click 49b24681b9a54557 &quot;Linting.html#redundant-verify-relations-detection&quot;;
-  2158f3cb9fd89442 -.->|deriveReqT| 49b24681b9a54557;
+  click 7faaae7c608ed9f2 &quot;../../Interfaces/CLI.html#cli-lint-command&quot;;
+  4ad4e1a3e594725b -.->|deriveReqT| 7faaae7c608ed9f2;
+  4ad4e1a3e594725b -.->|deriveReqT| d6a912ff5bea38fc;
+  b4f7299aff69e0a4[&quot;Multi-Branch Convergence Detection&quot;];
+  class b4f7299aff69e0a4 systemRequirement;
+  click b4f7299aff69e0a4 &quot;Linting.html#multi-branch-convergence-detection&quot;;
+  4ad4e1a3e594725b -.->|deriveReqT| b4f7299aff69e0a4;
+  754bccf6ec2ea027[&quot;Redundant Hierarchical Relations Detection&quot;];
+  class 754bccf6ec2ea027 systemRequirement;
+  click 754bccf6ec2ea027 &quot;Linting.html#redundant-hierarchical-relations-detection&quot;;
+  4ad4e1a3e594725b -.->|deriveReqT| 754bccf6ec2ea027;
+  2cd90a7116fa5f01[&quot;Redundant Verify Relations Detection&quot;];
+  class 2cd90a7116fa5f01 systemRequirement;
+  click 2cd90a7116fa5f01 &quot;Linting.html#redundant-verify-relations-detection&quot;;
+  4ad4e1a3e594725b -.->|deriveReqT| 2cd90a7116fa5f01;
   a9b6f3acdf104ea5[&quot;lint.rs&quot;];
   class a9b6f3acdf104ea5 default;
-  click a9b6f3acdf104ea5 &quot;../../core/src/lint.rs&quot;;
-  b2e88ccde814d231 -->|satisfiedBy| a9b6f3acdf104ea5;
-  b2e88ccde814d231 -.->|verifiedBy| 6cd6ad41953ca79d;
-  1025798e7661970b[&quot;Safe Redundant Hierarchical Relations Auto-Removal&quot;];
-  class 1025798e7661970b systemRequirement;
-  click 1025798e7661970b &quot;Linting.html#safe-redundant-hierarchical-relations-auto-removal&quot;;
-  a190b891ad2ea24a -.->|deriveReqT| 1025798e7661970b;
-  49b24681b9a54557 -.->|verifiedBy| 6cd6ad41953ca79d;
+  click a9b6f3acdf104ea5 &quot;../../../core/src/lint.rs&quot;;
+  b4f7299aff69e0a4 -->|satisfiedBy| a9b6f3acdf104ea5;
+  b4f7299aff69e0a4 -.->|verifiedBy| 48a9bbc2594ba75f;
+  52a162e2c0e847d6[&quot;Safe Redundant Hierarchical Relations Auto-Removal&quot;];
+  class 52a162e2c0e847d6 systemRequirement;
+  click 52a162e2c0e847d6 &quot;Linting.html#safe-redundant-hierarchical-relations-auto-removal&quot;;
+  754bccf6ec2ea027 -.->|deriveReqT| 52a162e2c0e847d6;
+  2cd90a7116fa5f01 -.->|verifiedBy| 48a9bbc2594ba75f;
   a9b6f3acdf104ea5[&quot;lint.rs&quot;];
   class a9b6f3acdf104ea5 default;
-  click a9b6f3acdf104ea5 &quot;../../core/src/lint.rs&quot;;
-  1025798e7661970b -->|satisfiedBy| a9b6f3acdf104ea5;
-  1025798e7661970b -.->|verifiedBy| 6cd6ad41953ca79d;
-  7faaae7c608ed9f2 -.->|deriveReqT| 6a435286a5c0531f;
-  aebbb10b2edecacf[&quot;Verification Trace Builder&quot;];
-  class aebbb10b2edecacf systemRequirement;
-  click aebbb10b2edecacf &quot;VerificationTraces.html#verification-trace-builder&quot;;
+  click a9b6f3acdf104ea5 &quot;../../../core/src/lint.rs&quot;;
+  52a162e2c0e847d6 -->|satisfiedBy| a9b6f3acdf104ea5;
+  52a162e2c0e847d6 -.->|verifiedBy| 48a9bbc2594ba75f;
+  7faaae7c608ed9f2 -.->|deriveReqT| e1706df5a39b841e;
+  977c97663017a433[&quot;Verification Trace Builder&quot;];
+  class 977c97663017a433 systemRequirement;
+  click 977c97663017a433 &quot;../Processing/VerificationTraces.html#verification-trace-builder&quot;;
   e0a8bb95946239f1[&quot;CLI Traces Command&quot;];
   class e0a8bb95946239f1 systemRequirement;
-  click e0a8bb95946239f1 &quot;../Interfaces/CLI.html#cli-traces-command&quot;;
-  aebbb10b2edecacf -.->|deriveReqT| e0a8bb95946239f1;
-  aebbb10b2edecacf -.->|deriveReqT| b2e88ccde814d231;
-  aebbb10b2edecacf -.->|deriveReqT| a190b891ad2ea24a;
-  aebbb10b2edecacf -.->|deriveReqT| 49b24681b9a54557;
+  click e0a8bb95946239f1 &quot;../../Interfaces/CLI.html#cli-traces-command&quot;;
+  977c97663017a433 -.->|deriveReqT| e0a8bb95946239f1;
+  977c97663017a433 -.->|deriveReqT| b4f7299aff69e0a4;
+  977c97663017a433 -.->|deriveReqT| 754bccf6ec2ea027;
+  977c97663017a433 -.->|deriveReqT| 2cd90a7116fa5f01;
   113748a94885138d[&quot;Validating Structures&quot;];
   class 113748a94885138d userRequirement;
-  click 113748a94885138d &quot;../UserStories.html#validating-structures&quot;;
-  8a37a2f2cdcda820[&quot;Model Formatting&quot;];
-  class 8a37a2f2cdcda820 userRequirement;
-  click 8a37a2f2cdcda820 &quot;Formatting.html#model-formatting&quot;;
-  113748a94885138d -.->|deriveReqT| 8a37a2f2cdcda820;
-  113748a94885138d -.->|deriveReqT| 2158f3cb9fd89442;
-  f7984d9de36af48f[&quot;Enhanced Validation Error Reporting&quot;];
-  class f7984d9de36af48f userRequirement;
-  click f7984d9de36af48f &quot;Validation.html#enhanced-validation-error-reporting&quot;;
-  113748a94885138d -.->|deriveReqT| f7984d9de36af48f;
-  637c1508441834d0[&quot;Validate Cross-Component Dependencies&quot;];
-  class 637c1508441834d0 userRequirement;
-  click 637c1508441834d0 &quot;Validation.html#validate-cross-component-dependencies&quot;;
-  113748a94885138d -.->|deriveReqT| 637c1508441834d0;
-  500b81dacddd4c4f[&quot;Validate Filesystem Structure&quot;];
-  class 500b81dacddd4c4f userRequirement;
-  click 500b81dacddd4c4f &quot;Validation.html#validate-filesystem-structure&quot;;
-  113748a94885138d -.->|deriveReqT| 500b81dacddd4c4f;
-  93dfcb0f0d842641[&quot;Validate Internal Consistency&quot;];
-  class 93dfcb0f0d842641 userRequirement;
-  click 93dfcb0f0d842641 &quot;Validation.html#validate-internal-consistency&quot;;
-  113748a94885138d -.->|deriveReqT| 93dfcb0f0d842641;
-  7acb63b03cf52c6f[&quot;Validate Markdown Structure&quot;];
-  class 7acb63b03cf52c6f userRequirement;
-  click 7acb63b03cf52c6f &quot;Validation.html#validate-markdown-structure&quot;;
-  113748a94885138d -.->|deriveReqT| 7acb63b03cf52c6f;
-  75edbbb74412662d[&quot;Validate Relation Types&quot;];
-  class 75edbbb74412662d userRequirement;
-  click 75edbbb74412662d &quot;Validation.html#validate-relation-types&quot;;
-  113748a94885138d -.->|deriveReqT| 75edbbb74412662d;
+  click 113748a94885138d &quot;../../UserStories.html#validating-structures&quot;;
+  5218c9b64682cc5b[&quot;Enhanced Validation Error Reporting&quot;];
+  class 5218c9b64682cc5b userRequirement;
+  click 5218c9b64682cc5b &quot;../Core/Validation.html#enhanced-validation-error-reporting&quot;;
+  113748a94885138d -.->|deriveReqT| 5218c9b64682cc5b;
+  42866a4fff564a40[&quot;Validate Cross-Component Dependencies&quot;];
+  class 42866a4fff564a40 userRequirement;
+  click 42866a4fff564a40 &quot;../Core/Validation.html#validate-cross-component-dependencies&quot;;
+  113748a94885138d -.->|deriveReqT| 42866a4fff564a40;
+  3da5747659937a48[&quot;Validate Filesystem Structure&quot;];
+  class 3da5747659937a48 userRequirement;
+  click 3da5747659937a48 &quot;../Core/Validation.html#validate-filesystem-structure&quot;;
+  113748a94885138d -.->|deriveReqT| 3da5747659937a48;
+  9fc657de0d5cfb63[&quot;Validate Internal Consistency&quot;];
+  class 9fc657de0d5cfb63 userRequirement;
+  click 9fc657de0d5cfb63 &quot;../Core/Validation.html#validate-internal-consistency&quot;;
+  113748a94885138d -.->|deriveReqT| 9fc657de0d5cfb63;
+  4762ab7f9d809ce1[&quot;Validate Markdown Structure&quot;];
+  class 4762ab7f9d809ce1 userRequirement;
+  click 4762ab7f9d809ce1 &quot;../Core/Validation.html#validate-markdown-structure&quot;;
+  113748a94885138d -.->|deriveReqT| 4762ab7f9d809ce1;
+  c1893a6f39afeabf[&quot;Validate Relation Types&quot;];
+  class c1893a6f39afeabf userRequirement;
+  click c1893a6f39afeabf &quot;../Core/Validation.html#validate-relation-types&quot;;
+  113748a94885138d -.->|deriveReqT| c1893a6f39afeabf;
+  cefdf0c8c7959360[&quot;Model Formatting&quot;];
+  class cefdf0c8c7959360 userRequirement;
+  click cefdf0c8c7959360 &quot;Formatting.html#model-formatting&quot;;
+  113748a94885138d -.->|deriveReqT| cefdf0c8c7959360;
+  113748a94885138d -.->|deriveReqT| 4ad4e1a3e594725b;
 </div>
 <h3 id="model-linting">Model Linting</h3>
 <p>The system shall provide model linting capabilities to analyze model quality and detect issues in requirements relations.</p>
@@ -623,7 +750,7 @@ blockquote {
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>derivedFrom: <a href="../UserStories.html#validating-structures">Validating Structures</a></li>
+<li>derivedFrom: <a href="../../UserStories.html#validating-structures">Validating Structures</a></li>
 </ul>
 <hr />
 <h3 id="lint-output-formatting">Lint Output Formatting</h3>
@@ -671,129 +798,7 @@ blockquote {
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>derivedFrom: <a href="../Interfaces/CLI.html#cli-lint-command">CLI Lint Command</a></li>
-</ul>
-<hr />
-<h3 id="lint-command-verification">Lint Command Verification</h3>
-<p>This test verifies that the lint command analyzes model quality, detects issues in requirements relations, and provides categorized output distinguishing between auto-fixable issues and those requiring manual review.</p>
-<h4>Details</h4>
-<h5>Acceptance Criteria:</h5>
-<p><strong>Basic Command Functionality:</strong></p>
-<ul>
-<li>System shall provide lint command that analyzes model quality</li>
-<li>System shall default to dry-run mode (report issues without applying fixes)</li>
-<li>System shall support –fixable flag to show only auto-fixable issues</li>
-<li>System shall support –auditable flag to show only issues requiring manual review</li>
-<li>System shall support –fix flag to automatically apply fixes for auto-fixable issues</li>
-<li>System shall support –json flag for structured JSON output</li>
-<li>System shall show ALL issues when no filter flags are provided</li>
-<li>System shall exit with code 0 when no issues are found or fixes are successfully applied</li>
-<li>System shall exit with non-zero code on errors</li>
-</ul>
-<p><strong>Redundant Verify Relations Detection:</strong></p>
-<ul>
-<li>System shall detect when a verification verifies both a leaf requirement and its ancestor</li>
-<li>System shall reuse verification trace tree logic for detection</li>
-<li>System shall report these as auto-fixable issues</li>
-<li>System shall show affected verification elements with file paths</li>
-<li>System shall list specific redundant verify relations</li>
-<li>System shall explain why relations are redundant</li>
-</ul>
-<p><strong>Maybe-Redundant Hierarchical Relations Detection:</strong></p>
-<ul>
-<li>System shall detect when an element has derivedFrom to both a requirement and its ancestor</li>
-<li>System shall use virtual verification connected to all leaf requirements for detection</li>
-<li>System shall reuse trace tree building logic for consistency</li>
-<li>System shall report these as needs manual review issues</li>
-<li>System shall show affected elements with their derivedFrom relations</li>
-<li>System shall not suggest which relations to remove</li>
-</ul>
-<p><strong>Output Formatting:</strong></p>
-<ul>
-<li>System shall categorize output into “Auto-fixable Issues” and “Needs Manual Review” sections</li>
-<li>Each issue shall include element identifier, file path, specific relations, and rationale</li>
-<li>JSON output shall include issue categorization, type, affected elements, relation details, and rationale</li>
-<li>System shall not suggest what to remove in output</li>
-</ul>
-<p><strong>Auto-fix Capability:</strong></p>
-<ul>
-<li>System shall apply fixes only for auto-fixable issues when –fix is used</li>
-<li>System shall remove redundant verify relations from verification elements</li>
-<li>System shall remove safe redundant hierarchical derivation relations following single-chain constraint</li>
-<li>System shall NOT auto-remove hierarchical relations with multiple converging paths (requires manual review)</li>
-<li>System shall preserve all other content and formatting in files</li>
-<li>System shall report all changes made (files modified, relations removed)</li>
-<li>System shall not modify issues categorized as needs manual review</li>
-</ul>
-<h5>Test Criteria:</h5>
-<ol>
-<li>
-<p><strong>Command execution</strong></p>
-<ul>
-<li>Lint command runs successfully with default behavior</li>
-<li>–fixable flag shows only auto-fixable issues</li>
-<li>–auditable flag shows only manual review issues</li>
-<li>–fix flag applies fixes for auto-fixable issues</li>
-<li>–json flag produces structured JSON output</li>
-</ul>
-</li>
-<li>
-<p><strong>JSON output filtering</strong></p>
-<ul>
-<li>–fixable –json shows only auto_fixable items (needs_manual_review is empty array)</li>
-<li>–auditable –json shows only needs_manual_review items (auto_fixable is empty array)</li>
-<li>–json without filters shows both auto_fixable and needs_manual_review items</li>
-<li>JSON output correctly filters based on flags before serialization</li>
-</ul>
-</li>
-<li>
-<p><strong>Redundant verify detection</strong></p>
-<ul>
-<li>Correctly identifies redundant verify relations using trace tree logic</li>
-<li>Reports verification elements with redundant relations</li>
-<li>Categorizes as auto-fixable</li>
-</ul>
-</li>
-<li>
-<p><strong>Hierarchical redundancy detection</strong></p>
-<ul>
-<li>Creates virtual verification connected to leaf requirements</li>
-<li>Correctly identifies potentially redundant derivedFrom relations</li>
-<li>Categorizes as needs manual review</li>
-</ul>
-</li>
-<li>
-<p><strong>Output quality</strong></p>
-<ul>
-<li>Clear categorization into auto-fixable and manual review sections</li>
-<li>Complete information for each issue</li>
-<li>JSON output has correct structure</li>
-<li>No suggestions on what to remove</li>
-</ul>
-</li>
-<li>
-<p><strong>Auto-fix functionality</strong></p>
-<ul>
-<li>Removes redundant verify relations from markdown files</li>
-<li>Removes safe redundant hierarchical derivation relations (single-chain only)</li>
-<li>Does NOT auto-remove hierarchical relations with multiple converging paths</li>
-<li>Preserves file content and formatting</li>
-<li>Reports changes accurately</li>
-<li>Does not modify manual review issues</li>
-</ul>
-</li>
-</ol>
-<h4>Metadata</h4>
-<ul>
-<li>type: test-verification</li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>verify: <a href="#redundant-verify-relations-detection">Redundant Verify Relations Detection</a></li>
-<li>verify: <a href="#safe-redundant-hierarchical-relations-auto-removal">Safe Redundant Hierarchical Relations Auto-Removal</a></li>
-<li>verify: <a href="#lint-output-formatting">Lint Output Formatting</a></li>
-<li>verify: <a href="#lint-auto-fix-capability">Lint Auto-fix Capability</a></li>
-<li>satisfiedBy: <a href="../../tests/test-lint-command/test.sh">test.sh</a></li>
+<li>derivedFrom: <a href="../../Interfaces/CLI.html#cli-lint-command">CLI Lint Command</a></li>
 </ul>
 <hr />
 <h3 id="redundant-verify-relations-detection">Redundant Verify Relations Detection</h3>
@@ -815,7 +820,7 @@ blockquote {
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#model-linting">Model Linting</a></li>
-<li>derivedFrom: <a href="VerificationTraces.html#verification-trace-builder">Verification Trace Builder</a></li>
+<li>derivedFrom: <a href="../Processing/VerificationTraces.html#verification-trace-builder">Verification Trace Builder</a></li>
 </ul>
 <hr />
 <h3 id="redundant-hierarchical-relations-detection">Redundant Hierarchical Relations Detection</h3>
@@ -848,7 +853,7 @@ blockquote {
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#model-linting">Model Linting</a></li>
-<li>derivedFrom: <a href="VerificationTraces.html#verification-trace-builder">Verification Trace Builder</a></li>
+<li>derivedFrom: <a href="../Processing/VerificationTraces.html#verification-trace-builder">Verification Trace Builder</a></li>
 </ul>
 <hr />
 <h3 id="multi-branch-convergence-detection">Multi-Branch Convergence Detection</h3>
@@ -891,9 +896,9 @@ blockquote {
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#model-linting">Model Linting</a></li>
-<li>derivedFrom: <a href="VerificationTraces.html#verification-trace-builder">Verification Trace Builder</a></li>
-<li>satisfiedBy: <a href="../../core/src/lint.rs">lint.rs</a></li>
-<li>verifiedBy: <a href="#lint-command-verification">Lint Command Verification</a></li>
+<li>derivedFrom: <a href="../Processing/VerificationTraces.html#verification-trace-builder">Verification Trace Builder</a></li>
+<li>satisfiedBy: <a href="../../../core/src/lint.rs">lint.rs</a></li>
+<li>verifiedBy: <a href="Verifications/LintingVerifications.html#lint-command-verification">Lint Command Verification</a></li>
 </ul>
 <hr />
 <h3 id="safe-redundant-hierarchical-relations-auto-removal">Safe Redundant Hierarchical Relations Auto-Removal</h3>
@@ -935,8 +940,8 @@ Reason: D is reachable via A → B → D and A → C → D
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#redundant-hierarchical-relations-detection">Redundant Hierarchical Relations Detection</a></li>
-<li>satisfiedBy: <a href="../../core/src/lint.rs">lint.rs</a></li>
-<li>verifiedBy: <a href="#lint-command-verification">Lint Command Verification</a></li>
+<li>satisfiedBy: <a href="../../../core/src/lint.rs">lint.rs</a></li>
+<li>verifiedBy: <a href="Verifications/LintingVerifications.html#lint-command-verification">Lint Command Verification</a></li>
 </ul>
 <hr />
 

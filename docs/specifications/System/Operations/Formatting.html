@@ -4,8 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Formatting</title>
+    <link rel="icon" type="image/x-icon" href="../../../assets/favicon.ico">
+    <link rel="apple-touch-icon" href="../../../assets/apple-touch-icon.png">
     
 <style>
+:root {
+    /* Primary Colors */
+    --color-primary: #1E3A5F;           /* Deep Sapphire - navigation, headers */
+    --color-primary-hover: #2a4a73;     /* Lighter shade for hover states */
+    --color-primary-active: #15293f;    /* Darker shade for active states */
+
+    /* Element Type Colors */
+    --color-requirement: #2563EB;       /* Royal Blue */
+    --color-verification: #059669;      /* Emerald */
+    --color-design: #7C3AED;            /* Purple */
+    --color-test: #0891B2;              /* Teal */
+    --color-implementation: #D97706;    /* Amber */
+    --color-external: #64748B;          /* Slate */
+
+    /* Status Colors */
+    --color-verified: #059669;          /* Emerald - verified/passing */
+    --color-pending: #D97706;           /* Amber - pending/warning */
+    --color-error: #DC2626;             /* Rose - error/failed */
+
+    /* Interactive Colors */
+    --color-highlight: #ff6b6b;         /* Hover highlight */
+    --color-link: #0366d6;              /* Link color */
+}
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
     line-height: 1.6;
@@ -20,7 +45,7 @@ body {
     left: 0;
     right: 0;
     height: 50px;
-    background-color: #2c3e50;
+    background-color: var(--color-primary);
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     z-index: 1000;
     display: flex;
@@ -28,15 +53,23 @@ body {
     padding: 0 20px;
 }
 .reqvire-nav a {
-    color: #ecf0f1;
+    color: #ffffff;
     text-decoration: none;
     padding: 10px 20px;
     margin-right: 5px;
     border-radius: 3px;
     transition: background-color 0.2s;
 }
+.reqvire-nav a.nav-logo {
+    display: flex;
+    align-items: center;
+    padding: 5px 15px 5px 0;
+}
+.reqvire-nav a.nav-logo img {
+    vertical-align: middle;
+}
 .reqvire-nav a:hover {
-    background-color: #34495e;
+    background-color: var(--color-primary-hover);
 }
 .reqvire-nav-spacer {
     height: 50px;
@@ -64,7 +97,7 @@ h2 {
     padding-bottom: 5px;
 }
 h3 {
-    color: #1a6fb7;
+    color: var(--color-requirement);
     margin-top: 25px;
 }
 h4 {
@@ -72,7 +105,7 @@ h4 {
     font-weight: 600;
 }
 a {
-    color: #0366d6;
+    color: var(--color-link);
     text-decoration: none;
 }
 a:hover {
@@ -159,7 +192,7 @@ blockquote {
 .diagram-nav-btn {
     width: 32px;
     height: 32px;
-    background-color: #2c3e50;
+    background-color: var(--color-primary);
     color: white;
     border: none;
     border-radius: 3px;
@@ -170,10 +203,10 @@ blockquote {
     justify-content: center;
 }
 .diagram-nav-btn:hover {
-    background-color: #34495e;
+    background-color: var(--color-primary-hover);
 }
 .diagram-nav-btn:active {
-    background-color: #1a252f;
+    background-color: var(--color-primary-active);
 }
 </style>
 
@@ -221,17 +254,34 @@ blockquote {
         await mermaid.run();
         window.mermaid = mermaid;
 
+        // Wait for SVGs to be fully rendered, then initialize
+        function waitForSvgs(callback) {
+            var containers = document.querySelectorAll('.mermaid');
+            var allReady = true;
+            containers.forEach(function(c) {
+                var svg = c.querySelector('svg');
+                if (!svg || !svg.getBBox || svg.getBBox().width === 0) {
+                    allReady = false;
+                }
+            });
+            if (allReady && containers.length > 0) {
+                callback();
+            } else {
+                requestAnimationFrame(function() { waitForSvgs(callback); });
+            }
+        }
+
         // Add pan/zoom to all Mermaid diagrams after rendering
-        setTimeout(function() {
+        waitForSvgs(function() {
             document.querySelectorAll('.mermaid').forEach(function(mermaidContainer) {
-                    var svg = mermaidContainer.querySelector('svg');
-                    if (!svg) return;
+                var svg = mermaidContainer.querySelector('svg');
+                if (!svg) return;
 
-                    svg.style.maxWidth = 'none';
-                    svg.style.maxHeight = 'none';
+                svg.style.maxWidth = 'none';
+                svg.style.maxHeight = 'none';
 
-                    var eventsHandler = {
-                        haltEventListeners: ['touchstart', 'touchend', 'touchmove', 'touchleave', 'touchcancel'],
+                var eventsHandler = {
+                    haltEventListeners: ['touchstart', 'touchend', 'touchmove', 'touchleave', 'touchcancel'],
                         init: function(options) {
                             var instance = options.instance;
                             var initialScale = 1;
@@ -323,22 +373,20 @@ blockquote {
                         });
                     });
             });
-        }, 500);
 
-        // Add CSS for edge highlighting (high specificity for SVG)
-        var style = document.createElement('style');
-        style.textContent = `
-            path.edge-highlighted,
-            .edge-highlighted path,
-            svg path.edge-highlighted {
-                stroke: #ff6b6b !important;
-                stroke-width: 3px !important;
-            }
-        `;
-        document.head.appendChild(style);
+            // Add CSS for edge highlighting
+            var style = document.createElement('style');
+            style.textContent = `
+                path.edge-highlighted,
+                .edge-highlighted path,
+                svg path.edge-highlighted {
+                    stroke: #ff6b6b !important;
+                    stroke-width: 3px !important;
+                }
+            `;
+            document.head.appendChild(style);
 
-        // Add edge highlighting on node hover
-        setTimeout(function() {
+            // Initialize edge highlighting for all diagrams
             document.querySelectorAll('.mermaid svg').forEach(function(svg) {
                 var nodes = svg.querySelectorAll('.node');
 
@@ -441,24 +489,98 @@ blockquote {
                            pt.y >= bbox.y - margin && pt.y <= bbox.y + bbox.height + margin;
                 }
 
-                // Map edges to nodes
-                var nodeEdgeMap = {};
-                Object.keys(nodeData).forEach(function(hashId) {
-                    nodeEdgeMap[hashId] = [];
-                    var bbox = nodeData[hashId].bbox;
+                // Build edge connections with direction tracking
+                var edgeConnections = []; // [{path, source, target}]
+                var upstreamOf = {}; // node -> [parent nodes that point TO this node]
+                var downstreamOf = {}; // node -> [child nodes this node points TO]
 
-                    edgePaths.forEach(function(path) {
-                        var points = getPathPoints(path);
-                        for (var i = 0; i < points.length; i++) {
-                            if (isNearBbox(points[i], bbox, 40)) {
-                                if (!nodeEdgeMap[hashId].includes(path)) {
-                                    nodeEdgeMap[hashId].push(path);
-                                }
-                                break;
-                            }
+                Object.keys(nodeData).forEach(function(hashId) {
+                    upstreamOf[hashId] = [];
+                    downstreamOf[hashId] = [];
+                });
+
+                edgePaths.forEach(function(path) {
+                    var points = getPathPoints(path);
+                    if (points.length < 2) return;
+
+                    var startPt = points[0];
+                    var endPt = points[points.length - 1];
+
+                    var sourceNode = null;
+                    var targetNode = null;
+
+                    // Find source and target nodes for this edge
+                    Object.keys(nodeData).forEach(function(hashId) {
+                        var bbox = nodeData[hashId].bbox;
+                        if (isNearBbox(startPt, bbox, 20)) {
+                            sourceNode = hashId;
+                        }
+                        if (isNearBbox(endPt, bbox, 20)) {
+                            targetNode = hashId;
                         }
                     });
+
+                    if (sourceNode && targetNode && sourceNode !== targetNode) {
+                        edgeConnections.push({path: path, source: sourceNode, target: targetNode});
+                        // source -> target means: target's upstream includes source
+                        if (!upstreamOf[targetNode].includes(sourceNode)) {
+                            upstreamOf[targetNode].push(sourceNode);
+                        }
+                        // source -> target means: source's downstream includes target
+                        if (!downstreamOf[sourceNode].includes(targetNode)) {
+                            downstreamOf[sourceNode].push(targetNode);
+                        }
+                    }
                 });
+
+                // Traverse only upstream (to parents/ancestors)
+                function findUpstream(startNodeId) {
+                    var visited = {};
+                    var queue = [startNodeId];
+                    visited[startNodeId] = true;
+
+                    while (queue.length > 0) {
+                        var current = queue.shift();
+                        var parents = upstreamOf[current] || [];
+                        parents.forEach(function(parent) {
+                            if (!visited[parent]) {
+                                visited[parent] = true;
+                                queue.push(parent);
+                            }
+                        });
+                    }
+                    return visited;
+                }
+
+                // Traverse only downstream (to children/descendants)
+                function findDownstream(startNodeId) {
+                    var visited = {};
+                    var queue = [startNodeId];
+                    visited[startNodeId] = true;
+
+                    while (queue.length > 0) {
+                        var current = queue.shift();
+                        var children = downstreamOf[current] || [];
+                        children.forEach(function(child) {
+                            if (!visited[child]) {
+                                visited[child] = true;
+                                queue.push(child);
+                            }
+                        });
+                    }
+                    return visited;
+                }
+
+                // Get edges for connected nodes
+                function getChainEdges(nodeSet) {
+                    var edges = [];
+                    edgeConnections.forEach(function(conn) {
+                        if (nodeSet[conn.source] && nodeSet[conn.target]) {
+                            edges.push(conn.path);
+                        }
+                    });
+                    return edges;
+                }
 
                 // Attach hover handlers
                 nodes.forEach(function(node) {
@@ -473,227 +595,183 @@ blockquote {
                         nodes.forEach(function(n) { n.style.filter = ''; });
                         node.style.filter = 'drop-shadow(0 0 6px #ff6b6b)';
 
-                        var connectedEdges = nodeEdgeMap[hashId] || [];
-                        connectedEdges.forEach(function(path) {
+                        // Find upstream (ancestors) and downstream (descendants) separately
+                        var upstream = findUpstream(hashId);
+                        var downstream = findDownstream(hashId);
+                        // Merge both sets
+                        var allConnected = {};
+                        Object.keys(upstream).forEach(function(k) { allConnected[k] = true; });
+                        Object.keys(downstream).forEach(function(k) { allConnected[k] = true; });
+
+                        var chainEdges = getChainEdges(allConnected);
+                        chainEdges.forEach(function(path) {
                             path.classList.add('edge-highlighted');
                         });
                     });
 
                     node.addEventListener('mouseleave', function() {
                         node.style.filter = '';
-                        var connectedEdges = nodeEdgeMap[hashId] || [];
-                        connectedEdges.forEach(function(path) {
+                        // Remove highlight from all edges
+                        edgePaths.forEach(function(path) {
                             path.classList.remove('edge-highlighted');
                         });
                     });
                 });
             });
-        }, 1000);
+        });
     </script>
 </head>
 <body>
     <nav class="reqvire-nav">
-        <a href="../../index.html">Home</a>
-        <a href="../../containment.html">Containment</a>
-        <a href="../../model.html">Model</a>
-        <a href="../../whole-model.html">Whole Model</a>
-        <a href="../../traces.html">Traces</a>
-        <a href="../../coverage.html">Coverage</a>
+        <a href="../../../index.html" class="nav-logo"><img src="../../../assets/logo.png" alt="Reqvire" height="24"></a>
+        <a href="../../../index.html">Index</a>
+        <a href="../../../containment.html">Containment</a>
+        <a href="../../../model.html">Model</a>
+        <a href="../../../whole-model.html">Whole Model</a>
+        <a href="../../../traces.html">Traces</a>
+        <a href="../../../coverage.html">Coverage</a>
     </nav>
     <div class="reqvire-nav-spacer"></div>
     <div class="container">
         <div class="content">
             <h1 id="requirements">Requirements</h1>
-<div class="mermaid">graph LR;
+<div class="mermaid">graph TD;
   %% REQVIRE-AUTOGENERATED-DIAGRAM
   %% Graph styling
-  classDef userRequirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
-  classDef systemRequirement fill:#fce4e4,stroke:#e68a8a,stroke-width:1px;
-  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef userRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:2px;
+  classDef systemRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:1px;
+  classDef verification fill:#d1fae5,stroke:#059669,stroke-width:2px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  fcc759d670a82bb5[&quot;Document Structure Normalization&quot;];
-  class fcc759d670a82bb5 systemRequirement;
-  click fcc759d670a82bb5 &quot;Formatting.html#document-structure-normalization&quot;;
+  f5e6ab25bf4e1dfc[&quot;Document Structure Normalization&quot;];
+  class f5e6ab25bf4e1dfc systemRequirement;
+  click f5e6ab25bf4e1dfc &quot;Formatting.html#document-structure-normalization&quot;;
   b7c871ab64a7059a[&quot;graph_registry.rs&quot;];
   class b7c871ab64a7059a default;
-  click b7c871ab64a7059a &quot;../../core/src/graph_registry.rs&quot;;
-  fcc759d670a82bb5 -->|satisfiedBy| b7c871ab64a7059a;
+  click b7c871ab64a7059a &quot;../../../core/src/graph_registry.rs&quot;;
+  f5e6ab25bf4e1dfc -->|satisfiedBy| b7c871ab64a7059a;
   f22d93285fcd7664[&quot;parser.rs&quot;];
   class f22d93285fcd7664 default;
-  click f22d93285fcd7664 &quot;../../core/src/parser.rs&quot;;
-  fcc759d670a82bb5 -->|satisfiedBy| f22d93285fcd7664;
-  11434b30ee3de97b[&quot;Format Command Requirements Verification&quot;];
-  class 11434b30ee3de97b verification;
-  click 11434b30ee3de97b &quot;Formatting.html#format-command-requirements-verification&quot;;
-  fcc759d670a82bb5 -.->|verifiedBy| 11434b30ee3de97b;
-  b536f1d1c16d6734[&quot;File Pattern Exclusion for Format&quot;];
-  class b536f1d1c16d6734 systemRequirement;
-  click b536f1d1c16d6734 &quot;Formatting.html#file-pattern-exclusion-for-format&quot;;
-  d67147b0311bf4fb[&quot;Excluded File Relation Validation&quot;];
-  class d67147b0311bf4fb systemRequirement;
-  click d67147b0311bf4fb &quot;Validation.html#excluded-file-relation-validation&quot;;
-  b536f1d1c16d6734 -.->|deriveReqT| d67147b0311bf4fb;
+  click f22d93285fcd7664 &quot;../../../core/src/parser.rs&quot;;
+  f5e6ab25bf4e1dfc -->|satisfiedBy| f22d93285fcd7664;
+  8711fb43b402dd78[&quot;Format Command Requirements Verification&quot;];
+  class 8711fb43b402dd78 verification;
+  click 8711fb43b402dd78 &quot;Verifications/FormattingVerifications.html#format-command-requirements-verification&quot;;
+  f5e6ab25bf4e1dfc -.->|verifiedBy| 8711fb43b402dd78;
+  3a0b420780e08346[&quot;File Pattern Exclusion for Format&quot;];
+  class 3a0b420780e08346 systemRequirement;
+  click 3a0b420780e08346 &quot;Formatting.html#file-pattern-exclusion-for-format&quot;;
+  c139a260a67571f3[&quot;Excluded File Relation Validation&quot;];
+  class c139a260a67571f3 systemRequirement;
+  click c139a260a67571f3 &quot;../Core/Validation.html#excluded-file-relation-validation&quot;;
+  3a0b420780e08346 -.->|deriveReqT| c139a260a67571f3;
   ce2625feec883e55[&quot;utils.rs&quot;];
   class ce2625feec883e55 default;
-  click ce2625feec883e55 &quot;../../core/src/utils.rs&quot;;
-  b536f1d1c16d6734 -->|satisfiedBy| ce2625feec883e55;
-  eaf33ce1e6113c8a[&quot;test.sh&quot;];
-  class eaf33ce1e6113c8a default;
-  click eaf33ce1e6113c8a &quot;../../tests/test-advanced-format/test.sh&quot;;
-  11434b30ee3de97b -->|satisfiedBy| eaf33ce1e6113c8a;
-  416d98eefd31dee3[&quot;Format Consistency Enforcement&quot;];
-  class 416d98eefd31dee3 systemRequirement;
-  click 416d98eefd31dee3 &quot;Formatting.html#format-consistency-enforcement&quot;;
-  416d98eefd31dee3 -.->|deriveReqT| fcc759d670a82bb5;
+  click ce2625feec883e55 &quot;../../../core/src/utils.rs&quot;;
+  3a0b420780e08346 -->|satisfiedBy| ce2625feec883e55;
+  9839a41063dbb990[&quot;Format Consistency Enforcement&quot;];
+  class 9839a41063dbb990 systemRequirement;
+  click 9839a41063dbb990 &quot;Formatting.html#format-consistency-enforcement&quot;;
+  9839a41063dbb990 -.->|deriveReqT| f5e6ab25bf4e1dfc;
   8fbf4ca0471377ea[&quot;format.rs&quot;];
   class 8fbf4ca0471377ea default;
-  click 8fbf4ca0471377ea &quot;../../core/src/format.rs&quot;;
-  416d98eefd31dee3 -->|satisfiedBy| 8fbf4ca0471377ea;
-  416d98eefd31dee3 -.->|verifiedBy| 11434b30ee3de97b;
-  2cde97b8bbea0703[&quot;Formatting Output&quot;];
-  class 2cde97b8bbea0703 systemRequirement;
-  click 2cde97b8bbea0703 &quot;Formatting.html#formatting-output&quot;;
-  de89d3cc32a25287[&quot;Git-Style Diff Output for Format&quot;];
-  class de89d3cc32a25287 userRequirement;
-  click de89d3cc32a25287 &quot;Formatting.html#git-style-diff-output-for-format&quot;;
-  2cde97b8bbea0703 -.->|deriveReqT| de89d3cc32a25287;
+  click 8fbf4ca0471377ea &quot;../../../core/src/format.rs&quot;;
+  9839a41063dbb990 -->|satisfiedBy| 8fbf4ca0471377ea;
+  9839a41063dbb990 -.->|verifiedBy| 8711fb43b402dd78;
+  39adf071b0ba241b[&quot;Formatting Output&quot;];
+  class 39adf071b0ba241b systemRequirement;
+  click 39adf071b0ba241b &quot;Formatting.html#formatting-output&quot;;
+  a66301b050b15be4[&quot;Git-Style Diff Output for Format&quot;];
+  class a66301b050b15be4 userRequirement;
+  click a66301b050b15be4 &quot;Formatting.html#git-style-diff-output-for-format&quot;;
+  39adf071b0ba241b -.->|deriveReqT| a66301b050b15be4;
   e69395f926bba6a5[&quot;diff.rs&quot;];
   class e69395f926bba6a5 default;
-  click e69395f926bba6a5 &quot;../../core/src/diff.rs&quot;;
-  de89d3cc32a25287 -->|satisfiedBy| e69395f926bba6a5;
+  click e69395f926bba6a5 &quot;../../../core/src/diff.rs&quot;;
+  a66301b050b15be4 -->|satisfiedBy| e69395f926bba6a5;
   8fbf4ca0471377ea[&quot;format.rs&quot;];
   class 8fbf4ca0471377ea default;
-  click 8fbf4ca0471377ea &quot;../../core/src/format.rs&quot;;
-  de89d3cc32a25287 -->|satisfiedBy| 8fbf4ca0471377ea;
-  de89d3cc32a25287 -.->|verifiedBy| 11434b30ee3de97b;
-  8a37a2f2cdcda820[&quot;Model Formatting&quot;];
-  class 8a37a2f2cdcda820 userRequirement;
-  click 8a37a2f2cdcda820 &quot;Formatting.html#model-formatting&quot;;
+  click 8fbf4ca0471377ea &quot;../../../core/src/format.rs&quot;;
+  a66301b050b15be4 -->|satisfiedBy| 8fbf4ca0471377ea;
+  a66301b050b15be4 -.->|verifiedBy| 8711fb43b402dd78;
+  cefdf0c8c7959360[&quot;Model Formatting&quot;];
+  class cefdf0c8c7959360 userRequirement;
+  click cefdf0c8c7959360 &quot;Formatting.html#model-formatting&quot;;
   e21c06baba741337[&quot;Format Command&quot;];
   class e21c06baba741337 systemRequirement;
-  click e21c06baba741337 &quot;../Interfaces/CLI.html#format-command&quot;;
-  8a37a2f2cdcda820 -.->|deriveReqT| e21c06baba741337;
-  8a37a2f2cdcda820 -.->|deriveReqT| 416d98eefd31dee3;
-  8a37a2f2cdcda820 -.->|deriveReqT| 2cde97b8bbea0703;
-  1869a2ddda635001[&quot;Replace Absolute Links with Relative Links&quot;];
-  class 1869a2ddda635001 systemRequirement;
-  click 1869a2ddda635001 &quot;Formatting.html#replace-absolute-links-with-relative-links&quot;;
-  8a37a2f2cdcda820 -.->|deriveReqT| 1869a2ddda635001;
-  1869a2ddda635001 -.->|verifiedBy| 11434b30ee3de97b;
-  80defdd4cbc7ee18[&quot;cli.rs&quot;];
-  class 80defdd4cbc7ee18 default;
-  click 80defdd4cbc7ee18 &quot;../../cli/src/cli.rs&quot;;
-  e21c06baba741337 -->|satisfiedBy| 80defdd4cbc7ee18;
-  7ff28ff401dbaef7[&quot;CLI Help Structure Verification&quot;];
-  class 7ff28ff401dbaef7 verification;
-  click 7ff28ff401dbaef7 &quot;../Interfaces/CLI.html#cli-help-structure-verification&quot;;
-  e21c06baba741337 -.->|verifiedBy| 7ff28ff401dbaef7;
-  e21c06baba741337 -.->|verifiedBy| 11434b30ee3de97b;
-  4eac83ebf624008b[&quot;Ignoring Unstructured Documents&quot;];
-  class 4eac83ebf624008b systemRequirement;
-  click 4eac83ebf624008b &quot;Configuration.html#ignoring-unstructured-documents&quot;;
-  51f6a669348ab400[&quot;Ignore Files Integration&quot;];
-  class 51f6a669348ab400 systemRequirement;
-  click 51f6a669348ab400 &quot;Configuration.html#ignore-files-integration&quot;;
-  4eac83ebf624008b -.->|deriveReqT| 51f6a669348ab400;
-  2de3037d86c97be2[&quot;Requirements Processing&quot;];
-  class 2de3037d86c97be2 systemRequirement;
-  click 2de3037d86c97be2 &quot;Configuration.html#requirements-processing&quot;;
-  4eac83ebf624008b -.->|deriveReqT| 2de3037d86c97be2;
-  65dfd6faa150fe4[&quot;Reserved Repository Files Exclusion&quot;];
-  class 65dfd6faa150fe4 systemRequirement;
-  click 65dfd6faa150fe4 &quot;Configuration.html#reserved-repository-files-exclusion&quot;;
-  4eac83ebf624008b -.->|deriveReqT| 65dfd6faa150fe4;
-  4eac83ebf624008b -.->|deriveReqT| b536f1d1c16d6734;
+  click e21c06baba741337 &quot;../../Interfaces/CLI.html#format-command&quot;;
+  cefdf0c8c7959360 -.->|deriveReqT| e21c06baba741337;
+  cefdf0c8c7959360 -.->|deriveReqT| 9839a41063dbb990;
+  cefdf0c8c7959360 -.->|deriveReqT| 39adf071b0ba241b;
+  bdd210be2229a1bd[&quot;Replace Absolute Links with Relative Links&quot;];
+  class bdd210be2229a1bd systemRequirement;
+  click bdd210be2229a1bd &quot;Formatting.html#replace-absolute-links-with-relative-links&quot;;
+  cefdf0c8c7959360 -.->|deriveReqT| bdd210be2229a1bd;
+  bdd210be2229a1bd -.->|verifiedBy| 8711fb43b402dd78;
+  6510525dc4b73b00[&quot;Ignoring Unstructured Documents&quot;];
+  class 6510525dc4b73b00 systemRequirement;
+  click 6510525dc4b73b00 &quot;../Core/Configuration.html#ignoring-unstructured-documents&quot;;
+  113f2336f66685b9[&quot;Ignore Files Integration&quot;];
+  class 113f2336f66685b9 systemRequirement;
+  click 113f2336f66685b9 &quot;../Core/Configuration.html#ignore-files-integration&quot;;
+  6510525dc4b73b00 -.->|deriveReqT| 113f2336f66685b9;
+  2d67b1edc8545aa1[&quot;Requirements Processing&quot;];
+  class 2d67b1edc8545aa1 systemRequirement;
+  click 2d67b1edc8545aa1 &quot;../Core/Configuration.html#requirements-processing&quot;;
+  6510525dc4b73b00 -.->|deriveReqT| 2d67b1edc8545aa1;
+  7d13ff7f52dde9f5[&quot;Reserved Repository Files Exclusion&quot;];
+  class 7d13ff7f52dde9f5 systemRequirement;
+  click 7d13ff7f52dde9f5 &quot;../Core/Configuration.html#reserved-repository-files-exclusion&quot;;
+  6510525dc4b73b00 -.->|deriveReqT| 7d13ff7f52dde9f5;
+  6510525dc4b73b00 -.->|deriveReqT| 3a0b420780e08346;
   8419dcc77d92b609[&quot;config.rs&quot;];
   class 8419dcc77d92b609 default;
-  click 8419dcc77d92b609 &quot;../../cli/src/config.rs&quot;;
-  4eac83ebf624008b -->|satisfiedBy| 8419dcc77d92b609;
-  9da2c9df563c07bb[&quot;Structure and Addressing in Markdown Documents&quot;];
-  class 9da2c9df563c07bb systemRequirement;
-  click 9da2c9df563c07bb &quot;StructureAndParsing.html#structure-and-addressing-in-markdown-documents&quot;;
-  39b03efc9e2074f5[&quot;Create Element Operation&quot;];
-  class 39b03efc9e2074f5 systemRequirement;
-  click 39b03efc9e2074f5 &quot;ElementManipulation.html#create-element-operation&quot;;
-  9da2c9df563c07bb -.->|deriveReqT| 39b03efc9e2074f5;
-  af98a411c9028161[&quot;Element Identity Model&quot;];
-  class af98a411c9028161 systemRequirement;
-  click af98a411c9028161 &quot;StructureAndParsing.html#element-identity-model&quot;;
-  9da2c9df563c07bb -.->|deriveReqT| af98a411c9028161;
-  1d0bfcae44a9063[&quot;Reserved Subsections Support&quot;];
-  class 1d0bfcae44a9063 systemRequirement;
-  click 1d0bfcae44a9063 &quot;Subsections.html#reserved-subsections-support&quot;;
-  9da2c9df563c07bb -.->|deriveReqT| 1d0bfcae44a9063;
-  a814c4935e1a0449[&quot;element.rs&quot;];
-  class a814c4935e1a0449 default;
-  click a814c4935e1a0449 &quot;../../core/src/element.rs&quot;;
-  9da2c9df563c07bb -->|satisfiedBy| a814c4935e1a0449;
-  d50a859650933e55[&quot;model.rs&quot;];
-  class d50a859650933e55 default;
-  click d50a859650933e55 &quot;../../core/src/model.rs&quot;;
-  9da2c9df563c07bb -->|satisfiedBy| d50a859650933e55;
-  f22d93285fcd7664[&quot;parser.rs&quot;];
-  class f22d93285fcd7664 default;
-  click f22d93285fcd7664 &quot;../../core/src/parser.rs&quot;;
-  9da2c9df563c07bb -->|satisfiedBy| f22d93285fcd7664;
-  9450d4313f47ef36[&quot;relation.rs&quot;];
-  class 9450d4313f47ef36 default;
-  click 9450d4313f47ef36 &quot;../../core/src/relation.rs&quot;;
-  9da2c9df563c07bb -->|satisfiedBy| 9450d4313f47ef36;
-  398003c91b6b2cde[&quot;subsection.rs&quot;];
-  class 398003c91b6b2cde default;
-  click 398003c91b6b2cde &quot;../../core/src/subsection.rs&quot;;
-  9da2c9df563c07bb -->|satisfiedBy| 398003c91b6b2cde;
-  9da2c9df563c07bb -.->|verifiedBy| 11434b30ee3de97b;
-  2fc995cfff6720de[&quot;Invalid Header Structure Test&quot;];
-  class 2fc995cfff6720de verification;
-  click 2fc995cfff6720de &quot;Validation.html#invalid-header-structure-test&quot;;
-  9da2c9df563c07bb -.->|verifiedBy| 2fc995cfff6720de;
+  click 8419dcc77d92b609 &quot;../../../cli/src/config.rs&quot;;
+  6510525dc4b73b00 -->|satisfiedBy| 8419dcc77d92b609;
   b3410eccc9703232[&quot;Align with Industry Standards&quot;];
   class b3410eccc9703232 userRequirement;
-  click b3410eccc9703232 &quot;../UserStories.html#align-with-industry-standards&quot;;
-  b3410eccc9703232 -.->|deriveReqT| 416d98eefd31dee3;
-  9c9b9aa3155688f3[&quot;Provide Validation Reports&quot;];
-  class 9c9b9aa3155688f3 userRequirement;
-  click 9c9b9aa3155688f3 &quot;Reporting.html#provide-validation-reports&quot;;
-  b3410eccc9703232 -.->|deriveReqT| 9c9b9aa3155688f3;
-  637c1508441834d0[&quot;Validate Cross-Component Dependencies&quot;];
-  class 637c1508441834d0 userRequirement;
-  click 637c1508441834d0 &quot;Validation.html#validate-cross-component-dependencies&quot;;
-  b3410eccc9703232 -.->|deriveReqT| 637c1508441834d0;
-  93dfcb0f0d842641[&quot;Validate Internal Consistency&quot;];
-  class 93dfcb0f0d842641 userRequirement;
-  click 93dfcb0f0d842641 &quot;Validation.html#validate-internal-consistency&quot;;
-  b3410eccc9703232 -.->|deriveReqT| 93dfcb0f0d842641;
-  7acb63b03cf52c6f[&quot;Validate Markdown Structure&quot;];
-  class 7acb63b03cf52c6f userRequirement;
-  click 7acb63b03cf52c6f &quot;Validation.html#validate-markdown-structure&quot;;
-  b3410eccc9703232 -.->|deriveReqT| 7acb63b03cf52c6f;
-  75edbbb74412662d[&quot;Validate Relation Types&quot;];
-  class 75edbbb74412662d userRequirement;
-  click 75edbbb74412662d &quot;Validation.html#validate-relation-types&quot;;
-  b3410eccc9703232 -.->|deriveReqT| 75edbbb74412662d;
+  click b3410eccc9703232 &quot;../../UserStories.html#align-with-industry-standards&quot;;
+  42866a4fff564a40[&quot;Validate Cross-Component Dependencies&quot;];
+  class 42866a4fff564a40 userRequirement;
+  click 42866a4fff564a40 &quot;../Core/Validation.html#validate-cross-component-dependencies&quot;;
+  b3410eccc9703232 -.->|deriveReqT| 42866a4fff564a40;
+  9fc657de0d5cfb63[&quot;Validate Internal Consistency&quot;];
+  class 9fc657de0d5cfb63 userRequirement;
+  click 9fc657de0d5cfb63 &quot;../Core/Validation.html#validate-internal-consistency&quot;;
+  b3410eccc9703232 -.->|deriveReqT| 9fc657de0d5cfb63;
+  4762ab7f9d809ce1[&quot;Validate Markdown Structure&quot;];
+  class 4762ab7f9d809ce1 userRequirement;
+  click 4762ab7f9d809ce1 &quot;../Core/Validation.html#validate-markdown-structure&quot;;
+  b3410eccc9703232 -.->|deriveReqT| 4762ab7f9d809ce1;
+  c1893a6f39afeabf[&quot;Validate Relation Types&quot;];
+  class c1893a6f39afeabf userRequirement;
+  click c1893a6f39afeabf &quot;../Core/Validation.html#validate-relation-types&quot;;
+  b3410eccc9703232 -.->|deriveReqT| c1893a6f39afeabf;
+  b3410eccc9703232 -.->|deriveReqT| 9839a41063dbb990;
+  51f1f398e207d6d4[&quot;Provide Validation Reports&quot;];
+  class 51f1f398e207d6d4 userRequirement;
+  click 51f1f398e207d6d4 &quot;../Output/Reporting.html#provide-validation-reports&quot;;
+  b3410eccc9703232 -.->|deriveReqT| 51f1f398e207d6d4;
   113748a94885138d[&quot;Validating Structures&quot;];
   class 113748a94885138d userRequirement;
-  click 113748a94885138d &quot;../UserStories.html#validating-structures&quot;;
-  113748a94885138d -.->|deriveReqT| 8a37a2f2cdcda820;
-  2158f3cb9fd89442[&quot;Model Linting&quot;];
-  class 2158f3cb9fd89442 userRequirement;
-  click 2158f3cb9fd89442 &quot;Linting.html#model-linting&quot;;
-  113748a94885138d -.->|deriveReqT| 2158f3cb9fd89442;
-  f7984d9de36af48f[&quot;Enhanced Validation Error Reporting&quot;];
-  class f7984d9de36af48f userRequirement;
-  click f7984d9de36af48f &quot;Validation.html#enhanced-validation-error-reporting&quot;;
-  113748a94885138d -.->|deriveReqT| f7984d9de36af48f;
-  113748a94885138d -.->|deriveReqT| 637c1508441834d0;
-  500b81dacddd4c4f[&quot;Validate Filesystem Structure&quot;];
-  class 500b81dacddd4c4f userRequirement;
-  click 500b81dacddd4c4f &quot;Validation.html#validate-filesystem-structure&quot;;
-  113748a94885138d -.->|deriveReqT| 500b81dacddd4c4f;
-  113748a94885138d -.->|deriveReqT| 93dfcb0f0d842641;
-  113748a94885138d -.->|deriveReqT| 7acb63b03cf52c6f;
-  113748a94885138d -.->|deriveReqT| 75edbbb74412662d;
+  click 113748a94885138d &quot;../../UserStories.html#validating-structures&quot;;
+  5218c9b64682cc5b[&quot;Enhanced Validation Error Reporting&quot;];
+  class 5218c9b64682cc5b userRequirement;
+  click 5218c9b64682cc5b &quot;../Core/Validation.html#enhanced-validation-error-reporting&quot;;
+  113748a94885138d -.->|deriveReqT| 5218c9b64682cc5b;
+  113748a94885138d -.->|deriveReqT| 42866a4fff564a40;
+  3da5747659937a48[&quot;Validate Filesystem Structure&quot;];
+  class 3da5747659937a48 userRequirement;
+  click 3da5747659937a48 &quot;../Core/Validation.html#validate-filesystem-structure&quot;;
+  113748a94885138d -.->|deriveReqT| 3da5747659937a48;
+  113748a94885138d -.->|deriveReqT| 9fc657de0d5cfb63;
+  113748a94885138d -.->|deriveReqT| 4762ab7f9d809ce1;
+  113748a94885138d -.->|deriveReqT| c1893a6f39afeabf;
+  113748a94885138d -.->|deriveReqT| cefdf0c8c7959360;
+  4ad4e1a3e594725b[&quot;Model Linting&quot;];
+  class 4ad4e1a3e594725b userRequirement;
+  click 4ad4e1a3e594725b &quot;Linting.html#model-linting&quot;;
+  113748a94885138d -.->|deriveReqT| 4ad4e1a3e594725b;
 </div>
 <h3 id="model-formatting">Model Formatting</h3>
 <p>The system shall provide formatting capabilities to normalize and standardize MBSE models for consistency and readability.</p>
@@ -703,7 +781,7 @@ blockquote {
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>derivedFrom: <a href="../UserStories.html#validating-structures">Validating Structures</a></li>
+<li>derivedFrom: <a href="../../UserStories.html#validating-structures">Validating Structures</a></li>
 </ul>
 <hr />
 <h3 id="formatting-output">Formatting Output</h3>
@@ -750,146 +828,9 @@ blockquote {
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#model-formatting">Model Formatting</a></li>
-<li>derivedFrom: <a href="../UserStories.html#align-with-industry-standards">Align with Industry Standards</a></li>
-<li>satisfiedBy: <a href="../../core/src/format.rs">format.rs</a></li>
-<li>verifiedBy: <a href="#format-command-requirements-verification">Format Command Requirements Verification</a></li>
-</ul>
-<hr />
-<h3 id="format-command-requirements-verification">Format Command Requirements Verification</h3>
-<p>This test verifies the format command requirements from SystemRequirements and UserRequirements, focusing on normalizing and standardizing MBSE models for consistency and readability.</p>
-<h4>Details</h4>
-<h5>Acceptance Criteria</h5>
-<p><strong>Format Command Functionality:</strong></p>
-<ul>
-<li>System shall provide format command that normalizes and standardizes markdown documents</li>
-<li>System shall default to dry-run mode (preview changes without applying them)</li>
-<li>System shall require –fix flag to actually apply formatting changes to files</li>
-<li>System shall display changes in git diff style with line numbers and colors</li>
-<li>System shall show diff output in both preview mode and when applying changes with –fix</li>
-<li>System shall support –json flag for structured output of formatting results</li>
-<li>System shall preserve all document content while improving formatting consistency</li>
-</ul>
-<p><strong>Content Preservation:</strong></p>
-<ul>
-<li>System shall preserve personas sections and other non-element content</li>
-<li>System shall maintain element ordering within files</li>
-<li>System shall preserve page content (frontmatter before first element)</li>
-</ul>
-<p><strong>Formatting Consistency:</strong></p>
-<ul>
-<li>System shall trim excess whitespace from lines</li>
-<li>System shall normalize line endings consistently</li>
-<li>System shall insert proper separators between elements</li>
-<li>System shall normalize consecutive separators to single separators</li>
-<li>System shall normalize relation indentation to proper 2-space format</li>
-<li>System shall format relation links with human-readable names</li>
-<li>System shall clean up file references to show filename only for implementation files</li>
-</ul>
-<p><strong>Document Structure Normalization:</strong></p>
-<ul>
-<li>System shall always output <code># Requirements</code> as the page header</li>
-<li>System shall add <code>## Requirements</code> section header when elements exist without section header</li>
-<li>System shall preserve existing section headers (starting with <code>## </code>)</li>
-<li>System shall correctly distinguish level 1 headers from level 2+ headers</li>
-</ul>
-<p><strong>Change Preview Quality:</strong></p>
-<ul>
-<li>System shall show file identification clearly in change output</li>
-<li>System shall display line references with consistent width based on maximum line number</li>
-</ul>
-<p><strong>Known Limitations:</strong></p>
-<ul>
-<li>Diff output may not correctly display blank line additions in all cases (blank lines shown with ␤ character may have incorrect line numbering or positioning)</li>
-<li>System shall visualize trailing whitespace removal with special characters</li>
-<li>System shall use colors to distinguish additions (green) and removals (red)</li>
-<li>System shall group changes by file with clear separators</li>
-<li>System shall only show lines that have changes, omitting unchanged content</li>
-<li>System shall provide context lines before and after changes for better readability</li>
-<li>System shall maintain sequential line numbering that reflects final file positions</li>
-<li>System shall ensure line number continuity throughout diff output</li>
-</ul>
-<p><strong>Relation Link Enhancement:</strong></p>
-<ul>
-<li>System shall convert simple identifiers (non-markdown format) to proper markdown link format</li>
-<li>System shall convert absolute links to relative links where appropriate</li>
-<li>System shall preserve already correct relative links without modification</li>
-<li>System shall replace fragment-only same-file references with full element names</li>
-<li>System shall convert implementation file paths to clean filename references</li>
-<li>System shall preserve external URLs without modification</li>
-</ul>
-<h5>Test Criteria</h5>
-<ol>
-<li>
-<p><strong>Basic format functionality</strong></p>
-<ul>
-<li>Format command runs successfully on test markdown files</li>
-<li>Default mode (no –fix flag) shows preview without making changes</li>
-<li>–fix flag applies changes correctly</li>
-<li>Format command shows diff output in both preview and –fix modes</li>
-<li>JSON flag produces structured output with formatting results</li>
-</ul>
-</li>
-<li>
-<p><strong>Content preservation verification</strong></p>
-<ul>
-<li>Personas sections remain intact after formatting</li>
-<li>Element content and structure preserved</li>
-<li>Element ordering maintained correctly within files</li>
-<li>Page content preserved</li>
-</ul>
-</li>
-<li>
-<p><strong>Change detection and preview</strong></p>
-<ul>
-<li>Changes are clearly identified by file</li>
-<li>Line references include consistent number width</li>
-<li>Trailing whitespace removal is visualized</li>
-<li>Color coding distinguishes addition/removal changes</li>
-<li>Context lines provide readable context around changes</li>
-<li>Line numbering maintains sequential continuity reflecting final file positions</li>
-</ul>
-</li>
-<li>
-<p><strong>Relation link quality</strong></p>
-<ul>
-<li>Simple identifiers are converted to proper markdown link format</li>
-<li>Absolute links are converted to relative links where appropriate</li>
-<li>Already correct relative links remain unchanged</li>
-<li>Same-file references use human-readable element names</li>
-<li>Implementation file references show clean filenames</li>
-<li>Fragment references use proper notation</li>
-</ul>
-</li>
-<li>
-<p><strong>Formatting consistency</strong></p>
-<ul>
-<li>Excess whitespace is trimmed appropriately</li>
-<li>Separators are inserted correctly between elements</li>
-<li>Consecutive separators are normalized to single separators</li>
-<li>Relation indentation is normalized to proper 2-space format</li>
-<li>Line endings are normalized</li>
-</ul>
-</li>
-<li>
-<p><strong>Line numbering accuracy</strong></p>
-<ul>
-<li>Line numbers in diff output are sequential and consistent</li>
-<li>Context lines maintain proper numbering continuity</li>
-<li>Added lines show correct position in final file</li>
-<li>Line numbering reflects final file structure accurately</li>
-</ul>
-</li>
-</ol>
-<h4>Metadata</h4>
-<ul>
-<li>type: test-verification</li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>verify: <a href="../Interfaces/CLI.html#format-command">Format Command</a></li>
-<li>verify: <a href="#document-structure-normalization">Document Structure Normalization</a></li>
-<li>verify: <a href="StructureAndParsing.html#structure-and-addressing-in-markdown-documents">Structure and Addressing in Markdown Documents</a></li>
-<li>satisfiedBy: <a href="../../tests/test-advanced-format/test.sh">test.sh</a></li>
+<li>derivedFrom: <a href="../../UserStories.html#align-with-industry-standards">Align with Industry Standards</a></li>
+<li>satisfiedBy: <a href="../../../core/src/format.rs">format.rs</a></li>
+<li>verifiedBy: <a href="Verifications/FormattingVerifications.html#format-command-requirements-verification">Format Command Requirements Verification</a></li>
 </ul>
 <hr />
 <h3 id="replace-absolute-links-with-relative-links">Replace Absolute Links with Relative Links</h3>
@@ -897,7 +838,7 @@ blockquote {
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#model-formatting">Model Formatting</a></li>
-<li>verifiedBy: <a href="#format-command-requirements-verification">Format Command Requirements Verification</a></li>
+<li>verifiedBy: <a href="Verifications/FormattingVerifications.html#format-command-requirements-verification">Format Command Requirements Verification</a></li>
 </ul>
 <hr />
 <h3 id="git-style-diff-output-for-format">Git-Style Diff Output for Format</h3>
@@ -909,17 +850,17 @@ blockquote {
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#formatting-output">Formatting Output</a></li>
-<li>satisfiedBy: <a href="../../core/src/format.rs">format.rs</a></li>
-<li>satisfiedBy: <a href="../../core/src/diff.rs">diff.rs</a></li>
-<li>verifiedBy: <a href="#format-command-requirements-verification">Format Command Requirements Verification</a></li>
+<li>satisfiedBy: <a href="../../../core/src/format.rs">format.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/diff.rs">diff.rs</a></li>
+<li>verifiedBy: <a href="Verifications/FormattingVerifications.html#format-command-requirements-verification">Format Command Requirements Verification</a></li>
 </ul>
 <hr />
 <h3 id="file-pattern-exclusion-for-format">File Pattern Exclusion for Format</h3>
 <p>The system shall respect configured excluded filename patterns when performing formatting operations, ensuring that files intentionally excluded from processing do not receive inappropriate formatting suggestions.</p>
 <h4>Relations</h4>
 <ul>
-<li>derivedFrom: <a href="Configuration.html#ignoring-unstructured-documents">Ignoring Unstructured Documents</a></li>
-<li>satisfiedBy: <a href="../../core/src/utils.rs">utils.rs</a></li>
+<li>derivedFrom: <a href="../Core/Configuration.html#ignoring-unstructured-documents">Ignoring Unstructured Documents</a></li>
+<li>satisfiedBy: <a href="../../../core/src/utils.rs">utils.rs</a></li>
 </ul>
 <hr />
 <h3 id="document-structure-normalization">Document Structure Normalization</h3>
@@ -945,8 +886,8 @@ blockquote {
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#format-consistency-enforcement">Format Consistency Enforcement</a></li>
-<li>satisfiedBy: <a href="../../core/src/graph_registry.rs">graph_registry.rs</a></li>
-<li>satisfiedBy: <a href="../../core/src/parser.rs">parser.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/graph_registry.rs">graph_registry.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/parser.rs">parser.rs</a></li>
 </ul>
 <hr />
 

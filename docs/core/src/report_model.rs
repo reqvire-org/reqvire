@@ -289,10 +289,10 @@ fn generate_element_text(element: &ModelCentricElement, depth: usize, diagram_di
         output.push_str(&format!("{}```mermaid\n", indent));
         output.push_str(&format!("{}graph {}\n", indent, diagram_direction));
 
-        // Add CSS class definitions for colors
-        output.push_str(&format!("{}  classDef userRequirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;\n", indent));
-        output.push_str(&format!("{}  classDef systemRequirement fill:#fce4e4,stroke:#e68a8a,stroke-width:1px;\n", indent));
-        output.push_str(&format!("{}  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;\n", indent));
+        // Add CSS class definitions for colors (MBSE color scheme)
+        output.push_str(&format!("{}  classDef userRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:2px;\n", indent));
+        output.push_str(&format!("{}  classDef systemRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:1px;\n", indent));
+        output.push_str(&format!("{}  classDef verification fill:#d1fae5,stroke:#059669,stroke-width:2px;\n", indent));
         output.push_str(&format!("{}  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;\n", indent));
         output.push_str(&format!("{}\n", indent));
 

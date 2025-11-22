@@ -4,8 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ChangeImpact</title>
+    <link rel="icon" type="image/x-icon" href="../../../assets/favicon.ico">
+    <link rel="apple-touch-icon" href="../../../assets/apple-touch-icon.png">
     
 <style>
+:root {
+    /* Primary Colors */
+    --color-primary: #1E3A5F;           /* Deep Sapphire - navigation, headers */
+    --color-primary-hover: #2a4a73;     /* Lighter shade for hover states */
+    --color-primary-active: #15293f;    /* Darker shade for active states */
+
+    /* Element Type Colors */
+    --color-requirement: #2563EB;       /* Royal Blue */
+    --color-verification: #059669;      /* Emerald */
+    --color-design: #7C3AED;            /* Purple */
+    --color-test: #0891B2;              /* Teal */
+    --color-implementation: #D97706;    /* Amber */
+    --color-external: #64748B;          /* Slate */
+
+    /* Status Colors */
+    --color-verified: #059669;          /* Emerald - verified/passing */
+    --color-pending: #D97706;           /* Amber - pending/warning */
+    --color-error: #DC2626;             /* Rose - error/failed */
+
+    /* Interactive Colors */
+    --color-highlight: #ff6b6b;         /* Hover highlight */
+    --color-link: #0366d6;              /* Link color */
+}
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
     line-height: 1.6;
@@ -20,7 +45,7 @@ body {
     left: 0;
     right: 0;
     height: 50px;
-    background-color: #2c3e50;
+    background-color: var(--color-primary);
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     z-index: 1000;
     display: flex;
@@ -28,15 +53,23 @@ body {
     padding: 0 20px;
 }
 .reqvire-nav a {
-    color: #ecf0f1;
+    color: #ffffff;
     text-decoration: none;
     padding: 10px 20px;
     margin-right: 5px;
     border-radius: 3px;
     transition: background-color 0.2s;
 }
+.reqvire-nav a.nav-logo {
+    display: flex;
+    align-items: center;
+    padding: 5px 15px 5px 0;
+}
+.reqvire-nav a.nav-logo img {
+    vertical-align: middle;
+}
 .reqvire-nav a:hover {
-    background-color: #34495e;
+    background-color: var(--color-primary-hover);
 }
 .reqvire-nav-spacer {
     height: 50px;
@@ -64,7 +97,7 @@ h2 {
     padding-bottom: 5px;
 }
 h3 {
-    color: #1a6fb7;
+    color: var(--color-requirement);
     margin-top: 25px;
 }
 h4 {
@@ -72,7 +105,7 @@ h4 {
     font-weight: 600;
 }
 a {
-    color: #0366d6;
+    color: var(--color-link);
     text-decoration: none;
 }
 a:hover {
@@ -159,7 +192,7 @@ blockquote {
 .diagram-nav-btn {
     width: 32px;
     height: 32px;
-    background-color: #2c3e50;
+    background-color: var(--color-primary);
     color: white;
     border: none;
     border-radius: 3px;
@@ -170,10 +203,10 @@ blockquote {
     justify-content: center;
 }
 .diagram-nav-btn:hover {
-    background-color: #34495e;
+    background-color: var(--color-primary-hover);
 }
 .diagram-nav-btn:active {
-    background-color: #1a252f;
+    background-color: var(--color-primary-active);
 }
 </style>
 
@@ -221,17 +254,34 @@ blockquote {
         await mermaid.run();
         window.mermaid = mermaid;
 
+        // Wait for SVGs to be fully rendered, then initialize
+        function waitForSvgs(callback) {
+            var containers = document.querySelectorAll('.mermaid');
+            var allReady = true;
+            containers.forEach(function(c) {
+                var svg = c.querySelector('svg');
+                if (!svg || !svg.getBBox || svg.getBBox().width === 0) {
+                    allReady = false;
+                }
+            });
+            if (allReady && containers.length > 0) {
+                callback();
+            } else {
+                requestAnimationFrame(function() { waitForSvgs(callback); });
+            }
+        }
+
         // Add pan/zoom to all Mermaid diagrams after rendering
-        setTimeout(function() {
+        waitForSvgs(function() {
             document.querySelectorAll('.mermaid').forEach(function(mermaidContainer) {
-                    var svg = mermaidContainer.querySelector('svg');
-                    if (!svg) return;
+                var svg = mermaidContainer.querySelector('svg');
+                if (!svg) return;
 
-                    svg.style.maxWidth = 'none';
-                    svg.style.maxHeight = 'none';
+                svg.style.maxWidth = 'none';
+                svg.style.maxHeight = 'none';
 
-                    var eventsHandler = {
-                        haltEventListeners: ['touchstart', 'touchend', 'touchmove', 'touchleave', 'touchcancel'],
+                var eventsHandler = {
+                    haltEventListeners: ['touchstart', 'touchend', 'touchmove', 'touchleave', 'touchcancel'],
                         init: function(options) {
                             var instance = options.instance;
                             var initialScale = 1;
@@ -323,22 +373,20 @@ blockquote {
                         });
                     });
             });
-        }, 500);
 
-        // Add CSS for edge highlighting (high specificity for SVG)
-        var style = document.createElement('style');
-        style.textContent = `
-            path.edge-highlighted,
-            .edge-highlighted path,
-            svg path.edge-highlighted {
-                stroke: #ff6b6b !important;
-                stroke-width: 3px !important;
-            }
-        `;
-        document.head.appendChild(style);
+            // Add CSS for edge highlighting
+            var style = document.createElement('style');
+            style.textContent = `
+                path.edge-highlighted,
+                .edge-highlighted path,
+                svg path.edge-highlighted {
+                    stroke: #ff6b6b !important;
+                    stroke-width: 3px !important;
+                }
+            `;
+            document.head.appendChild(style);
 
-        // Add edge highlighting on node hover
-        setTimeout(function() {
+            // Initialize edge highlighting for all diagrams
             document.querySelectorAll('.mermaid svg').forEach(function(svg) {
                 var nodes = svg.querySelectorAll('.node');
 
@@ -441,24 +489,98 @@ blockquote {
                            pt.y >= bbox.y - margin && pt.y <= bbox.y + bbox.height + margin;
                 }
 
-                // Map edges to nodes
-                var nodeEdgeMap = {};
-                Object.keys(nodeData).forEach(function(hashId) {
-                    nodeEdgeMap[hashId] = [];
-                    var bbox = nodeData[hashId].bbox;
+                // Build edge connections with direction tracking
+                var edgeConnections = []; // [{path, source, target}]
+                var upstreamOf = {}; // node -> [parent nodes that point TO this node]
+                var downstreamOf = {}; // node -> [child nodes this node points TO]
 
-                    edgePaths.forEach(function(path) {
-                        var points = getPathPoints(path);
-                        for (var i = 0; i < points.length; i++) {
-                            if (isNearBbox(points[i], bbox, 40)) {
-                                if (!nodeEdgeMap[hashId].includes(path)) {
-                                    nodeEdgeMap[hashId].push(path);
-                                }
-                                break;
-                            }
+                Object.keys(nodeData).forEach(function(hashId) {
+                    upstreamOf[hashId] = [];
+                    downstreamOf[hashId] = [];
+                });
+
+                edgePaths.forEach(function(path) {
+                    var points = getPathPoints(path);
+                    if (points.length < 2) return;
+
+                    var startPt = points[0];
+                    var endPt = points[points.length - 1];
+
+                    var sourceNode = null;
+                    var targetNode = null;
+
+                    // Find source and target nodes for this edge
+                    Object.keys(nodeData).forEach(function(hashId) {
+                        var bbox = nodeData[hashId].bbox;
+                        if (isNearBbox(startPt, bbox, 20)) {
+                            sourceNode = hashId;
+                        }
+                        if (isNearBbox(endPt, bbox, 20)) {
+                            targetNode = hashId;
                         }
                     });
+
+                    if (sourceNode && targetNode && sourceNode !== targetNode) {
+                        edgeConnections.push({path: path, source: sourceNode, target: targetNode});
+                        // source -> target means: target's upstream includes source
+                        if (!upstreamOf[targetNode].includes(sourceNode)) {
+                            upstreamOf[targetNode].push(sourceNode);
+                        }
+                        // source -> target means: source's downstream includes target
+                        if (!downstreamOf[sourceNode].includes(targetNode)) {
+                            downstreamOf[sourceNode].push(targetNode);
+                        }
+                    }
                 });
+
+                // Traverse only upstream (to parents/ancestors)
+                function findUpstream(startNodeId) {
+                    var visited = {};
+                    var queue = [startNodeId];
+                    visited[startNodeId] = true;
+
+                    while (queue.length > 0) {
+                        var current = queue.shift();
+                        var parents = upstreamOf[current] || [];
+                        parents.forEach(function(parent) {
+                            if (!visited[parent]) {
+                                visited[parent] = true;
+                                queue.push(parent);
+                            }
+                        });
+                    }
+                    return visited;
+                }
+
+                // Traverse only downstream (to children/descendants)
+                function findDownstream(startNodeId) {
+                    var visited = {};
+                    var queue = [startNodeId];
+                    visited[startNodeId] = true;
+
+                    while (queue.length > 0) {
+                        var current = queue.shift();
+                        var children = downstreamOf[current] || [];
+                        children.forEach(function(child) {
+                            if (!visited[child]) {
+                                visited[child] = true;
+                                queue.push(child);
+                            }
+                        });
+                    }
+                    return visited;
+                }
+
+                // Get edges for connected nodes
+                function getChainEdges(nodeSet) {
+                    var edges = [];
+                    edgeConnections.forEach(function(conn) {
+                        if (nodeSet[conn.source] && nodeSet[conn.target]) {
+                            edges.push(conn.path);
+                        }
+                    });
+                    return edges;
+                }
 
                 // Attach hover handlers
                 nodes.forEach(function(node) {
@@ -473,198 +595,133 @@ blockquote {
                         nodes.forEach(function(n) { n.style.filter = ''; });
                         node.style.filter = 'drop-shadow(0 0 6px #ff6b6b)';
 
-                        var connectedEdges = nodeEdgeMap[hashId] || [];
-                        connectedEdges.forEach(function(path) {
+                        // Find upstream (ancestors) and downstream (descendants) separately
+                        var upstream = findUpstream(hashId);
+                        var downstream = findDownstream(hashId);
+                        // Merge both sets
+                        var allConnected = {};
+                        Object.keys(upstream).forEach(function(k) { allConnected[k] = true; });
+                        Object.keys(downstream).forEach(function(k) { allConnected[k] = true; });
+
+                        var chainEdges = getChainEdges(allConnected);
+                        chainEdges.forEach(function(path) {
                             path.classList.add('edge-highlighted');
                         });
                     });
 
                     node.addEventListener('mouseleave', function() {
                         node.style.filter = '';
-                        var connectedEdges = nodeEdgeMap[hashId] || [];
-                        connectedEdges.forEach(function(path) {
+                        // Remove highlight from all edges
+                        edgePaths.forEach(function(path) {
                             path.classList.remove('edge-highlighted');
                         });
                     });
                 });
             });
-        }, 1000);
+        });
     </script>
 </head>
 <body>
     <nav class="reqvire-nav">
-        <a href="../../index.html">Home</a>
-        <a href="../../containment.html">Containment</a>
-        <a href="../../model.html">Model</a>
-        <a href="../../whole-model.html">Whole Model</a>
-        <a href="../../traces.html">Traces</a>
-        <a href="../../coverage.html">Coverage</a>
+        <a href="../../../index.html" class="nav-logo"><img src="../../../assets/logo.png" alt="Reqvire" height="24"></a>
+        <a href="../../../index.html">Index</a>
+        <a href="../../../containment.html">Containment</a>
+        <a href="../../../model.html">Model</a>
+        <a href="../../../whole-model.html">Whole Model</a>
+        <a href="../../../traces.html">Traces</a>
+        <a href="../../../coverage.html">Coverage</a>
     </nav>
     <div class="reqvire-nav-spacer"></div>
     <div class="container">
         <div class="content">
             <h1 id="requirements">Requirements</h1>
-<div class="mermaid">graph LR;
+<div class="mermaid">graph TD;
   %% REQVIRE-AUTOGENERATED-DIAGRAM
   %% Graph styling
-  classDef userRequirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
-  classDef systemRequirement fill:#fce4e4,stroke:#e68a8a,stroke-width:1px;
-  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef userRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:2px;
+  classDef systemRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:1px;
+  classDef verification fill:#d1fae5,stroke:#059669,stroke-width:2px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  1e196c3f567a7eae[&quot;Change Impact Analysis Verification&quot;];
-  class 1e196c3f567a7eae verification;
-  click 1e196c3f567a7eae &quot;ChangeImpact.html#change-impact-analysis-verification&quot;;
-  e95e3160edec8f1b[&quot;test.sh&quot;];
-  class e95e3160edec8f1b default;
-  click e95e3160edec8f1b &quot;../../tests/test-change-impact-detection/test.sh&quot;;
-  1e196c3f567a7eae -->|satisfiedBy| e95e3160edec8f1b;
-  8d8ac7ecbf826962[&quot;Change Impact Detection&quot;];
-  class 8d8ac7ecbf826962 systemRequirement;
-  click 8d8ac7ecbf826962 &quot;ChangeImpact.html#change-impact-detection&quot;;
-  2a29f1f7ce22846e[&quot;Requirements Change Propagation&quot;];
-  class 2a29f1f7ce22846e systemRequirement;
-  click 2a29f1f7ce22846e &quot;ChangeImpact.html#requirements-change-propagation&quot;;
-  8d8ac7ecbf826962 -.->|deriveReqT| 2a29f1f7ce22846e;
-  6fad3eb745d39b47[&quot;Structural Change Analyzer&quot;];
-  class 6fad3eb745d39b47 systemRequirement;
-  click 6fad3eb745d39b47 &quot;ChangeImpact.html#structural-change-analyzer&quot;;
-  8d8ac7ecbf826962 -.->|deriveReqT| 6fad3eb745d39b47;
+  b58a906566fb6956[&quot;Change Impact Detection&quot;];
+  class b58a906566fb6956 systemRequirement;
+  click b58a906566fb6956 &quot;ChangeImpact.html#change-impact-detection&quot;;
+  25a30542d9f084f3[&quot;Requirements Change Propagation&quot;];
+  class 25a30542d9f084f3 systemRequirement;
+  click 25a30542d9f084f3 &quot;ChangeImpact.html#requirements-change-propagation&quot;;
+  b58a906566fb6956 -.->|deriveReqT| 25a30542d9f084f3;
+  99a8ca248ac74156[&quot;Structural Change Analyzer&quot;];
+  class 99a8ca248ac74156 systemRequirement;
+  click 99a8ca248ac74156 &quot;ChangeImpact.html#structural-change-analyzer&quot;;
+  b58a906566fb6956 -.->|deriveReqT| 99a8ca248ac74156;
   4b89dbed94c08c3e[&quot;change_impact.rs&quot;];
   class 4b89dbed94c08c3e default;
-  click 4b89dbed94c08c3e &quot;../../core/src/change_impact.rs&quot;;
-  8d8ac7ecbf826962 -->|satisfiedBy| 4b89dbed94c08c3e;
-  3f87bd87eadd90fb[&quot;Change Impact Detection Test&quot;];
-  class 3f87bd87eadd90fb verification;
-  click 3f87bd87eadd90fb &quot;ChangeImpact.html#change-impact-detection-test&quot;;
-  e95e3160edec8f1b[&quot;test.sh&quot;];
-  class e95e3160edec8f1b default;
-  click e95e3160edec8f1b &quot;../../tests/test-change-impact-detection/test.sh&quot;;
-  3f87bd87eadd90fb -->|satisfiedBy| e95e3160edec8f1b;
-  fe115b41c9238caf[&quot;test.sh&quot;];
-  class fe115b41c9238caf default;
-  click fe115b41c9238caf &quot;../../tests/test-change-impact-element-relocation/test.sh&quot;;
-  3f87bd87eadd90fb -->|satisfiedBy| fe115b41c9238caf;
-  5c87ffb56362b634[&quot;Change Impact Relations Test&quot;];
-  class 5c87ffb56362b634 verification;
-  click 5c87ffb56362b634 &quot;ChangeImpact.html#change-impact-relations-test&quot;;
-  e95e3160edec8f1b[&quot;test.sh&quot;];
-  class e95e3160edec8f1b default;
-  click e95e3160edec8f1b &quot;../../tests/test-change-impact-detection/test.sh&quot;;
-  5c87ffb56362b634 -->|satisfiedBy| e95e3160edec8f1b;
-  7c2dfd8fd2bf95ad[&quot;Change Impact Smart Filtering Test&quot;];
-  class 7c2dfd8fd2bf95ad verification;
-  click 7c2dfd8fd2bf95ad &quot;ChangeImpact.html#change-impact-smart-filtering-test&quot;;
-  6cc7cc8a3f2af10b[&quot;test.sh&quot;];
-  class 6cc7cc8a3f2af10b default;
-  click 6cc7cc8a3f2af10b &quot;../../tests/test-change-impact-smart-filtering/test.sh&quot;;
-  7c2dfd8fd2bf95ad -->|satisfiedBy| 6cc7cc8a3f2af10b;
-  423634b0183d5b48[&quot;Element Content Extraction Test&quot;];
-  class 423634b0183d5b48 verification;
-  click 423634b0183d5b48 &quot;ChangeImpact.html#element-content-extraction-test&quot;;
-  c287b52ceb52aa04[&quot;test.sh&quot;];
-  class c287b52ceb52aa04 default;
-  click c287b52ceb52aa04 &quot;../../tests/test-element-content-extraction/test.sh&quot;;
-  423634b0183d5b48 -->|satisfiedBy| c287b52ceb52aa04;
+  click 4b89dbed94c08c3e &quot;../../../core/src/change_impact.rs&quot;;
+  b58a906566fb6956 -->|satisfiedBy| 4b89dbed94c08c3e;
   4b89dbed94c08c3e[&quot;change_impact.rs&quot;];
   class 4b89dbed94c08c3e default;
-  click 4b89dbed94c08c3e &quot;../../core/src/change_impact.rs&quot;;
-  2a29f1f7ce22846e -->|satisfiedBy| 4b89dbed94c08c3e;
-  1e80cec5af56a72c[&quot;Attachments Change Impact Verification&quot;];
-  class 1e80cec5af56a72c verification;
-  click 1e80cec5af56a72c &quot;AttachmentsVerifications.html#attachments-change-impact-verification&quot;;
-  2a29f1f7ce22846e -.->|verifiedBy| 1e80cec5af56a72c;
-  2a29f1f7ce22846e -.->|verifiedBy| 3f87bd87eadd90fb;
-  2a29f1f7ce22846e -.->|verifiedBy| 5c87ffb56362b634;
-  2a29f1f7ce22846e -.->|verifiedBy| 7c2dfd8fd2bf95ad;
-  2a29f1f7ce22846e -.->|verifiedBy| 423634b0183d5b48;
+  click 4b89dbed94c08c3e &quot;../../../core/src/change_impact.rs&quot;;
+  25a30542d9f084f3 -->|satisfiedBy| 4b89dbed94c08c3e;
+  ac22a318c2f0e072[&quot;Attachments Change Impact Verification&quot;];
+  class ac22a318c2f0e072 verification;
+  click ac22a318c2f0e072 &quot;../Core/Verifications/AttachmentsVerifications.html#attachments-change-impact-verification&quot;;
+  25a30542d9f084f3 -.->|verifiedBy| ac22a318c2f0e072;
+  c4dd1dd8ac41b4de[&quot;Change Impact Detection Test&quot;];
+  class c4dd1dd8ac41b4de verification;
+  click c4dd1dd8ac41b4de &quot;Verifications/ChangeImpactVerifications.html#change-impact-detection-test&quot;;
+  25a30542d9f084f3 -.->|verifiedBy| c4dd1dd8ac41b4de;
+  8cae07084a6ab404[&quot;Change Impact Relations Test&quot;];
+  class 8cae07084a6ab404 verification;
+  click 8cae07084a6ab404 &quot;Verifications/ChangeImpactVerifications.html#change-impact-relations-test&quot;;
+  25a30542d9f084f3 -.->|verifiedBy| 8cae07084a6ab404;
+  5f17003a2fd58e53[&quot;Change Impact Smart Filtering Test&quot;];
+  class 5f17003a2fd58e53 verification;
+  click 5f17003a2fd58e53 &quot;Verifications/ChangeImpactVerifications.html#change-impact-smart-filtering-test&quot;;
+  25a30542d9f084f3 -.->|verifiedBy| 5f17003a2fd58e53;
+  3de3ec44e43109a9[&quot;Element Content Extraction Test&quot;];
+  class 3de3ec44e43109a9 verification;
+  click 3de3ec44e43109a9 &quot;Verifications/ChangeImpactVerifications.html#element-content-extraction-test&quot;;
+  25a30542d9f084f3 -.->|verifiedBy| 3de3ec44e43109a9;
   7b6287a68f3ac83f[&quot;CLI Change Impact Report Command&quot;];
   class 7b6287a68f3ac83f systemRequirement;
-  click 7b6287a68f3ac83f &quot;../Interfaces/CLI.html#cli-change-impact-report-command&quot;;
-  6fad3eb745d39b47 -.->|deriveReqT| 7b6287a68f3ac83f;
+  click 7b6287a68f3ac83f &quot;../../Interfaces/CLI.html#cli-change-impact-report-command&quot;;
+  99a8ca248ac74156 -.->|deriveReqT| 7b6287a68f3ac83f;
   4b89dbed94c08c3e[&quot;change_impact.rs&quot;];
   class 4b89dbed94c08c3e default;
-  click 4b89dbed94c08c3e &quot;../../core/src/change_impact.rs&quot;;
-  6fad3eb745d39b47 -->|satisfiedBy| 4b89dbed94c08c3e;
-  ccac1b7eecc517ed[&quot;Structural Change Reports Verification&quot;];
-  class ccac1b7eecc517ed verification;
-  click ccac1b7eecc517ed &quot;ChangeImpact.html#structural-change-reports-verification&quot;;
-  e95e3160edec8f1b[&quot;test.sh&quot;];
-  class e95e3160edec8f1b default;
-  click e95e3160edec8f1b &quot;../../tests/test-change-impact-detection/test.sh&quot;;
-  ccac1b7eecc517ed -->|satisfiedBy| e95e3160edec8f1b;
-  80defdd4cbc7ee18[&quot;cli.rs&quot;];
-  class 80defdd4cbc7ee18 default;
-  click 80defdd4cbc7ee18 &quot;../../cli/src/cli.rs&quot;;
-  7b6287a68f3ac83f -->|satisfiedBy| 80defdd4cbc7ee18;
-  94dcf167655cb366[&quot;CLI Git Commit Hash Flag Test&quot;];
-  class 94dcf167655cb366 verification;
-  click 94dcf167655cb366 &quot;../Interfaces/CLI.html#cli-git-commit-hash-flag-test&quot;;
-  7b6287a68f3ac83f -.->|verifiedBy| 94dcf167655cb366;
-  7ff28ff401dbaef7[&quot;CLI Help Structure Verification&quot;];
-  class 7ff28ff401dbaef7 verification;
-  click 7ff28ff401dbaef7 &quot;../Interfaces/CLI.html#cli-help-structure-verification&quot;;
-  7b6287a68f3ac83f -.->|verifiedBy| 7ff28ff401dbaef7;
-  7b6287a68f3ac83f -.->|verifiedBy| 1e196c3f567a7eae;
-  7b6287a68f3ac83f -.->|verifiedBy| 3f87bd87eadd90fb;
-  7b6287a68f3ac83f -.->|verifiedBy| 5c87ffb56362b634;
-  2de3037d86c97be2[&quot;Requirements Processing&quot;];
-  class 2de3037d86c97be2 systemRequirement;
-  click 2de3037d86c97be2 &quot;Configuration.html#requirements-processing&quot;;
-  61dc6cf5b44dc78e[&quot;Structured Markdown Files Search and Detection&quot;];
-  class 61dc6cf5b44dc78e systemRequirement;
-  click 61dc6cf5b44dc78e &quot;Configuration.html#structured-markdown-files-search-and-detection&quot;;
-  2de3037d86c97be2 -.->|deriveReqT| 61dc6cf5b44dc78e;
-  1adb91a2a42359ac[&quot;GraphRegistry as Primary Registry&quot;];
-  class 1adb91a2a42359ac systemRequirement;
-  click 1adb91a2a42359ac &quot;Validation.html#graphregistry-as-primary-registry&quot;;
-  2de3037d86c97be2 -.->|deriveReqT| 1adb91a2a42359ac;
-  8e06d2864718a991[&quot;Two-Pass Validation Strategy&quot;];
-  class 8e06d2864718a991 systemRequirement;
-  click 8e06d2864718a991 &quot;Validation.html#two-pass-validation-strategy&quot;;
-  2de3037d86c97be2 -.->|deriveReqT| 8e06d2864718a991;
-  d50a859650933e55[&quot;model.rs&quot;];
-  class d50a859650933e55 default;
-  click d50a859650933e55 &quot;../../core/src/model.rs&quot;;
-  2de3037d86c97be2 -->|satisfiedBy| d50a859650933e55;
-  f22d93285fcd7664[&quot;parser.rs&quot;];
-  class f22d93285fcd7664 default;
-  click f22d93285fcd7664 &quot;../../core/src/parser.rs&quot;;
-  2de3037d86c97be2 -->|satisfiedBy| f22d93285fcd7664;
-  2de3037d86c97be2 -.->|verifiedBy| 423634b0183d5b48;
-  a7191ddd998c390e[&quot;Same-File Fragment Relations Test&quot;];
-  class a7191ddd998c390e verification;
-  click a7191ddd998c390e &quot;Validation.html#same-file-fragment-relations-test&quot;;
-  2de3037d86c97be2 -.->|verifiedBy| a7191ddd998c390e;
-  a4e0aaa5c14c250b[&quot;Tracing Structural Changes&quot;];
-  class a4e0aaa5c14c250b userRequirement;
-  click a4e0aaa5c14c250b &quot;Reporting.html#tracing-structural-changes&quot;;
-  a4e0aaa5c14c250b -.->|deriveReqT| 8d8ac7ecbf826962;
-  a4e0aaa5c14c250b -.->|verifiedBy| ccac1b7eecc517ed;
-  af98a411c9028161[&quot;Element Identity Model&quot;];
-  class af98a411c9028161 systemRequirement;
-  click af98a411c9028161 &quot;StructureAndParsing.html#element-identity-model&quot;;
-  af98a411c9028161 -.->|deriveReqT| 8d8ac7ecbf826962;
-  6e6ce5b5e93ac423[&quot;Identifiers and Relations&quot;];
-  class 6e6ce5b5e93ac423 systemRequirement;
-  click 6e6ce5b5e93ac423 &quot;StructureAndParsing.html#identifiers-and-relations&quot;;
-  af98a411c9028161 -.->|deriveReqT| 6e6ce5b5e93ac423;
-  c5c516af837b24e1[&quot;Internal Consistency Validator&quot;];
-  class c5c516af837b24e1 systemRequirement;
-  click c5c516af837b24e1 &quot;Validation.html#internal-consistency-validator&quot;;
-  af98a411c9028161 -.->|deriveReqT| c5c516af837b24e1;
+  click 4b89dbed94c08c3e &quot;../../../core/src/change_impact.rs&quot;;
+  99a8ca248ac74156 -->|satisfiedBy| 4b89dbed94c08c3e;
+  b0cc2fce0e12a405[&quot;Element Identity Model&quot;];
+  class b0cc2fce0e12a405 systemRequirement;
+  click b0cc2fce0e12a405 &quot;../Core/StructureAndParsing.html#element-identity-model&quot;;
+  43dcbb7ab74ba45e[&quot;Identifiers and Relations&quot;];
+  class 43dcbb7ab74ba45e systemRequirement;
+  click 43dcbb7ab74ba45e &quot;../Core/StructureAndParsing.html#identifiers-and-relations&quot;;
+  b0cc2fce0e12a405 -.->|deriveReqT| 43dcbb7ab74ba45e;
+  2f63ffaf1de3849f[&quot;Internal Consistency Validator&quot;];
+  class 2f63ffaf1de3849f systemRequirement;
+  click 2f63ffaf1de3849f &quot;../Core/Validation.html#internal-consistency-validator&quot;;
+  b0cc2fce0e12a405 -.->|deriveReqT| 2f63ffaf1de3849f;
+  b0cc2fce0e12a405 -.->|deriveReqT| b58a906566fb6956;
   a814c4935e1a0449[&quot;element.rs&quot;];
   class a814c4935e1a0449 default;
-  click a814c4935e1a0449 &quot;../../core/src/element.rs&quot;;
-  af98a411c9028161 -->|satisfiedBy| a814c4935e1a0449;
+  click a814c4935e1a0449 &quot;../../../core/src/element.rs&quot;;
+  b0cc2fce0e12a405 -->|satisfiedBy| a814c4935e1a0449;
   f22d93285fcd7664[&quot;parser.rs&quot;];
   class f22d93285fcd7664 default;
-  click f22d93285fcd7664 &quot;../../core/src/parser.rs&quot;;
-  af98a411c9028161 -->|satisfiedBy| f22d93285fcd7664;
-  50f68924a7a176df[&quot;Fragment Normalization Test&quot;];
-  class 50f68924a7a176df verification;
-  click 50f68924a7a176df &quot;ParsingAndValidationVerifications.html#fragment-normalization-test&quot;;
-  af98a411c9028161 -.->|verifiedBy| 50f68924a7a176df;
+  click f22d93285fcd7664 &quot;../../../core/src/parser.rs&quot;;
+  b0cc2fce0e12a405 -->|satisfiedBy| f22d93285fcd7664;
+  9434925eb2b35c3[&quot;Fragment Normalization Test&quot;];
+  class 9434925eb2b35c3 verification;
+  click 9434925eb2b35c3 &quot;../Core/Verifications/ParsingVerifications.html#fragment-normalization-test&quot;;
+  b0cc2fce0e12a405 -.->|verifiedBy| 9434925eb2b35c3;
+  ec0f4be9b911a40c[&quot;Tracing Structural Changes&quot;];
+  class ec0f4be9b911a40c userRequirement;
+  click ec0f4be9b911a40c &quot;../Output/Reporting.html#tracing-structural-changes&quot;;
+  ec0f4be9b911a40c -.->|deriveReqT| b58a906566fb6956;
+  82a231e353fdf46d[&quot;Structural Change Reports Verification&quot;];
+  class 82a231e353fdf46d verification;
+  click 82a231e353fdf46d &quot;Verifications/ChangeImpactVerifications.html#structural-change-reports-verification&quot;;
+  ec0f4be9b911a40c -.->|verifiedBy| 82a231e353fdf46d;
 </div>
 <h3 id="change-impact-detection">Change Impact Detection</h3>
 <p>The system shall detect, analyze, and report changes to model elements between versions by comparing element content hashes, tracking relocations, and propagating impact through relationships.</p>
@@ -677,9 +734,9 @@ blockquote {
 </ol>
 <h4>Relations</h4>
 <ul>
-<li>derivedFrom: <a href="Reporting.html#tracing-structural-changes">Tracing Structural Changes</a></li>
-<li>derivedFrom: <a href="StructureAndParsing.html#element-identity-model">Element Identity Model</a></li>
-<li>satisfiedBy: <a href="../../core/src/change_impact.rs">change_impact.rs</a></li>
+<li>derivedFrom: <a href="../Output/Reporting.html#tracing-structural-changes">Tracing Structural Changes</a></li>
+<li>derivedFrom: <a href="../Core/StructureAndParsing.html#element-identity-model">Element Identity Model</a></li>
+<li>satisfiedBy: <a href="../../../core/src/change_impact.rs">change_impact.rs</a></li>
 </ul>
 <hr />
 <h3 id="structural-change-analyzer">Structural Change Analyzer</h3>
@@ -687,210 +744,7 @@ blockquote {
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#change-impact-detection">Change Impact Detection</a></li>
-<li>satisfiedBy: <a href="../../core/src/change_impact.rs">change_impact.rs</a></li>
-</ul>
-<hr />
-<h3 id="change-impact-detection-test">Change Impact Detection Test</h3>
-<p>This test verifies that the system correctly implements change impact detection, including proper default handling of the git commit parameter and smart filtering.</p>
-<h4>Details</h4>
-<h5>Acceptance Criteria</h5>
-<ul>
-<li>System correctly detects changes between different versions of requirements</li>
-<li>System correctly identifies element relocations (same Element ID, different file_path or section)</li>
-<li>Relocated elements without content changes do not trigger impact propagation</li>
-<li>Relocated elements WITH content or relation changes appear in BOTH “Relocated” AND “Changed” sections</li>
-<li>Relocated elements appear in a separate “Relocated” section in the report</li>
-<li>System properly constructs a change impact report based on relationships between elements</li>
-<li>Relations are compared semantically by element name, not by identifier (prevents false positives when children relocate)</li>
-<li>Relocated parent with new relation to relocated+changed child is detected correctly</li>
-<li>Default git commit is HEAD when –git-commit parameter is not provided</li>
-<li>System provides output in both human-readable text and JSON formats</li>
-<li>Smart filtering removes redundant elements that appear in other elements’ relations</li>
-</ul>
-<h5>Test Criteria</h5>
-<ul>
-<li>Command exits with success (0) return code</li>
-<li>Change impact report shows expected elements</li>
-<li>Change impact report shows correct relationships between elements</li>
-<li>Changed elements referenced in other changed elements’ relations are filtered out (e.g., “Power Saving” filtered when referenced by “Power Saving Mode”)</li>
-<li>Relocated elements are reported with old location → new location format</li>
-<li>Pure relocations (same content, different location) do NOT appear in “Removed” + “Added” sections</li>
-<li>Pure relocations do NOT appear in impact propagation tree</li>
-<li>Relocated+changed elements appear in BOTH Relocated AND Changed sections</li>
-<li>Parent element with added relation to relocated+changed child shows in Changed with impact tree</li>
-<li>Relations to relocated elements don’t cause false change detection in parent elements</li>
-<li>Summary statistics include count of relocated elements</li>
-<li>Element IDs remain stable when elements are relocated between files</li>
-<li>Output format matches requested format (text or JSON)</li>
-<li>Both explicit and implicit git commit parameters work properly</li>
-<li>JSON output is valid and contains all necessary information</li>
-<li>GitHub-style blob URLs are included in the output</li>
-</ul>
-<h4>Metadata</h4>
-<ul>
-<li>type: test-verification</li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>verify: <a href="#requirements-change-propagation">Requirements Change Propagation</a></li>
-<li>verify: <a href="../Interfaces/CLI.html#cli-change-impact-report-command">CLI Change Impact Report Command</a></li>
-<li>satisfiedBy: <a href="../../tests/test-change-impact-detection/test.sh">test.sh</a></li>
-<li>satisfiedBy: <a href="../../tests/test-change-impact-element-relocation/test.sh">test.sh</a></li>
-</ul>
-<hr />
-<h3 id="change-impact-relations-test">Change Impact Relations Test</h3>
-<p>This test verifies that the system correctly handles different relation types when calculating change impact.</p>
-<h4>Details</h4>
-<h5>Acceptance Criteria</h5>
-<ul>
-<li>System correctly propagates changes through different relation types</li>
-<li>System respects the IMPACT_PROPAGATION_RELATIONS list when determining impact flow</li>
-<li>System does not propagate impact through containment (file location) changes</li>
-<li>Element relocations without content changes do not trigger impact propagation</li>
-<li>System handles complex chains of relations properly</li>
-</ul>
-<h5>Test Criteria</h5>
-<ul>
-<li>Command exits with success (0) return code</li>
-<li>Change impact report shows expected propagation through derivedFrom/derive relations</li>
-<li>Change impact report shows expected propagation through satisfiedBy/satisfy relations</li>
-<li>Change impact report shows expected propagation through verifiedBy/verify relations</li>
-<li>Relocations without content changes do NOT propagate through relations</li>
-<li>When an element moves files without content change, related elements are not marked as impacted</li>
-<li>System correctly handles circular dependencies in relation chains</li>
-</ul>
-<h4>Metadata</h4>
-<ul>
-<li>type: test-verification</li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>verify: <a href="#requirements-change-propagation">Requirements Change Propagation</a></li>
-<li>verify: <a href="../Interfaces/CLI.html#cli-change-impact-report-command">CLI Change Impact Report Command</a></li>
-<li>satisfiedBy: <a href="../../tests/test-change-impact-detection/test.sh">test.sh</a></li>
-</ul>
-<hr />
-<h3 id="element-content-extraction-test">Element Content Extraction Test</h3>
-<p>This test verifies that the system correctly extracts element content for change impact detection.</p>
-<h4>Details</h4>
-<h5>Acceptance Criteria</h5>
-<ul>
-<li>System should properly extract requirement body for change impact detection</li>
-<li>Requirement body should include normalized main text and content from the Details subsection</li>
-<li>System should handle requirements with various combinations of subsections</li>
-</ul>
-<h5>Test Criteria</h5>
-<ul>
-<li>Command exits with success (0) return code</li>
-<li>Output shows expected content for each element</li>
-<li>Content extraction correctly handles different subsection ordering</li>
-<li>Content extraction properly handles HTML details tags</li>
-</ul>
-<h5>Test Procedure</h5>
-<ol>
-<li>Create test fixtures with requirements containing various combinations of subsections</li>
-<li>Run Reqvire model summary on the test fixtures</li>
-<li>Verify that extracted content matches expected content for each element</li>
-<li>Verify that content from Details subsection is properly included</li>
-</ol>
-<h4>Metadata</h4>
-<ul>
-<li>type: test-verification</li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>verify: <a href="#requirements-change-propagation">Requirements Change Propagation</a></li>
-<li>verify: <a href="Configuration.html#requirements-processing">Requirements Processing</a></li>
-<li>satisfiedBy: <a href="../../tests/test-element-content-extraction/test.sh">test.sh</a></li>
-</ul>
-<hr />
-<h3 id="change-impact-analysis-verification">Change Impact Analysis Verification</h3>
-<p>This test verifies that the system generates change impact reports when requested.</p>
-<h4>Details</h4>
-<h5>Acceptance Criteria</h5>
-<ul>
-<li>System should generate change impact reports in Markdown format</li>
-<li>System should support JSON output for change impact reports</li>
-<li>Reports should include an overview of model changes and their impact</li>
-</ul>
-<h5>Test Criteria</h5>
-<ul>
-<li>Command exits with success (0) return code</li>
-<li>Reports contain expected impact information</li>
-<li>Both Markdown and JSON formats are properly supported</li>
-</ul>
-<h5>Test Procedure</h5>
-<p>TODO: write test procedure</p>
-<h4>Metadata</h4>
-<ul>
-<li>type: test-verification</li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>verify: <a href="../Interfaces/CLI.html#cli-change-impact-report-command">CLI Change Impact Report Command</a></li>
-<li>satisfiedBy: <a href="../../tests/test-change-impact-detection/test.sh">test.sh</a></li>
-</ul>
-<hr />
-<h3 id="structural-change-reports-verification">Structural Change Reports Verification</h3>
-<p>This test verifies that the system analyzes and reports on structural changes in the MBSE model.</p>
-<h4>Details</h4>
-<h5>Acceptance Criteria</h5>
-<ul>
-<li>System should analyze structural changes in the MBSE model</li>
-<li>System should identify affected components through relationship traversal</li>
-<li>System should generate reports of impacted elements and structures</li>
-</ul>
-<h5>Test Criteria</h5>
-<ul>
-<li>Command exits with success (0) return code</li>
-<li>Change reports correctly identify affected elements</li>
-<li>Relationship traversal properly determines impact propagation</li>
-</ul>
-<h5>Test Procedure</h5>
-<p>TODO: write test procedure</p>
-<h4>Metadata</h4>
-<ul>
-<li>type: test-verification</li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>verify: <a href="Reporting.html#tracing-structural-changes">Tracing Structural Changes</a></li>
-<li>satisfiedBy: <a href="../../tests/test-change-impact-detection/test.sh">test.sh</a></li>
-</ul>
-<hr />
-<h3 id="change-impact-smart-filtering-test">Change Impact Smart Filtering Test</h3>
-<p>This test verifies that the smart filtering correctly handles new elements in change impact reports, filtering child elements while showing parent elements.</p>
-<h4>Details</h4>
-<h5>Acceptance Criteria</h5>
-<ul>
-<li>New parent elements appear in the “New Elements” section</li>
-<li>New child elements (with parent relationships to other new elements) are filtered out</li>
-<li>Filtered child elements are shown in parent’s relations with “(new)” marker</li>
-<li>Verification elements that are not children remain in the report</li>
-</ul>
-<h5>Test Criteria</h5>
-<ul>
-<li>When adding a parent and child requirement together, only parent appears in “New Elements”</li>
-<li>When adding a requirement and its verification, both appear (verification is not a child)</li>
-<li>Child elements are visible in the parent’s change impact tree with appropriate markers</li>
-</ul>
-<h5>Test Procedure</h5>
-<ol>
-<li>Create test repository with existing requirements</li>
-<li>Add new parent requirement with derive relation to new child requirement</li>
-<li>Add new child requirement with derivedFrom relation to parent</li>
-<li>Run change impact detection</li>
-<li>Verify only parent appears in “New Elements” section</li>
-<li>Verify child appears in parent’s relations with “(new)” marker</li>
-</ol>
-<h4>Metadata</h4>
-<ul>
-<li>type: test-verification</li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>verify: <a href="#requirements-change-propagation">Requirements Change Propagation</a></li>
-<li>satisfiedBy: <a href="../../tests/test-change-impact-smart-filtering/test.sh">test.sh</a></li>
+<li>satisfiedBy: <a href="../../../core/src/change_impact.rs">change_impact.rs</a></li>
 </ul>
 <hr />
 <h3 id="requirements-change-propagation">Requirements Change Propagation</h3>
@@ -1327,7 +1181,7 @@ The system shall reduce network polling frequency when battery levels drop below
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#change-impact-detection">Change Impact Detection</a></li>
-<li>satisfiedBy: <a href="../../core/src/change_impact.rs">change_impact.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/change_impact.rs">change_impact.rs</a></li>
 </ul>
 <hr />
 

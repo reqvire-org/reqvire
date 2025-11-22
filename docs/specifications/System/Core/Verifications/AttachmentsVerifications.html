@@ -4,8 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AttachmentsVerifications</title>
+    <link rel="icon" type="image/x-icon" href="../../../../assets/favicon.ico">
+    <link rel="apple-touch-icon" href="../../../../assets/apple-touch-icon.png">
     
 <style>
+:root {
+    /* Primary Colors */
+    --color-primary: #1E3A5F;           /* Deep Sapphire - navigation, headers */
+    --color-primary-hover: #2a4a73;     /* Lighter shade for hover states */
+    --color-primary-active: #15293f;    /* Darker shade for active states */
+
+    /* Element Type Colors */
+    --color-requirement: #2563EB;       /* Royal Blue */
+    --color-verification: #059669;      /* Emerald */
+    --color-design: #7C3AED;            /* Purple */
+    --color-test: #0891B2;              /* Teal */
+    --color-implementation: #D97706;    /* Amber */
+    --color-external: #64748B;          /* Slate */
+
+    /* Status Colors */
+    --color-verified: #059669;          /* Emerald - verified/passing */
+    --color-pending: #D97706;           /* Amber - pending/warning */
+    --color-error: #DC2626;             /* Rose - error/failed */
+
+    /* Interactive Colors */
+    --color-highlight: #ff6b6b;         /* Hover highlight */
+    --color-link: #0366d6;              /* Link color */
+}
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
     line-height: 1.6;
@@ -20,7 +45,7 @@ body {
     left: 0;
     right: 0;
     height: 50px;
-    background-color: #2c3e50;
+    background-color: var(--color-primary);
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     z-index: 1000;
     display: flex;
@@ -28,15 +53,23 @@ body {
     padding: 0 20px;
 }
 .reqvire-nav a {
-    color: #ecf0f1;
+    color: #ffffff;
     text-decoration: none;
     padding: 10px 20px;
     margin-right: 5px;
     border-radius: 3px;
     transition: background-color 0.2s;
 }
+.reqvire-nav a.nav-logo {
+    display: flex;
+    align-items: center;
+    padding: 5px 15px 5px 0;
+}
+.reqvire-nav a.nav-logo img {
+    vertical-align: middle;
+}
 .reqvire-nav a:hover {
-    background-color: #34495e;
+    background-color: var(--color-primary-hover);
 }
 .reqvire-nav-spacer {
     height: 50px;
@@ -64,7 +97,7 @@ h2 {
     padding-bottom: 5px;
 }
 h3 {
-    color: #1a6fb7;
+    color: var(--color-requirement);
     margin-top: 25px;
 }
 h4 {
@@ -72,7 +105,7 @@ h4 {
     font-weight: 600;
 }
 a {
-    color: #0366d6;
+    color: var(--color-link);
     text-decoration: none;
 }
 a:hover {
@@ -159,7 +192,7 @@ blockquote {
 .diagram-nav-btn {
     width: 32px;
     height: 32px;
-    background-color: #2c3e50;
+    background-color: var(--color-primary);
     color: white;
     border: none;
     border-radius: 3px;
@@ -170,10 +203,10 @@ blockquote {
     justify-content: center;
 }
 .diagram-nav-btn:hover {
-    background-color: #34495e;
+    background-color: var(--color-primary-hover);
 }
 .diagram-nav-btn:active {
-    background-color: #1a252f;
+    background-color: var(--color-primary-active);
 }
 </style>
 
@@ -221,17 +254,34 @@ blockquote {
         await mermaid.run();
         window.mermaid = mermaid;
 
+        // Wait for SVGs to be fully rendered, then initialize
+        function waitForSvgs(callback) {
+            var containers = document.querySelectorAll('.mermaid');
+            var allReady = true;
+            containers.forEach(function(c) {
+                var svg = c.querySelector('svg');
+                if (!svg || !svg.getBBox || svg.getBBox().width === 0) {
+                    allReady = false;
+                }
+            });
+            if (allReady && containers.length > 0) {
+                callback();
+            } else {
+                requestAnimationFrame(function() { waitForSvgs(callback); });
+            }
+        }
+
         // Add pan/zoom to all Mermaid diagrams after rendering
-        setTimeout(function() {
+        waitForSvgs(function() {
             document.querySelectorAll('.mermaid').forEach(function(mermaidContainer) {
-                    var svg = mermaidContainer.querySelector('svg');
-                    if (!svg) return;
+                var svg = mermaidContainer.querySelector('svg');
+                if (!svg) return;
 
-                    svg.style.maxWidth = 'none';
-                    svg.style.maxHeight = 'none';
+                svg.style.maxWidth = 'none';
+                svg.style.maxHeight = 'none';
 
-                    var eventsHandler = {
-                        haltEventListeners: ['touchstart', 'touchend', 'touchmove', 'touchleave', 'touchcancel'],
+                var eventsHandler = {
+                    haltEventListeners: ['touchstart', 'touchend', 'touchmove', 'touchleave', 'touchcancel'],
                         init: function(options) {
                             var instance = options.instance;
                             var initialScale = 1;
@@ -323,22 +373,20 @@ blockquote {
                         });
                     });
             });
-        }, 500);
 
-        // Add CSS for edge highlighting (high specificity for SVG)
-        var style = document.createElement('style');
-        style.textContent = `
-            path.edge-highlighted,
-            .edge-highlighted path,
-            svg path.edge-highlighted {
-                stroke: #ff6b6b !important;
-                stroke-width: 3px !important;
-            }
-        `;
-        document.head.appendChild(style);
+            // Add CSS for edge highlighting
+            var style = document.createElement('style');
+            style.textContent = `
+                path.edge-highlighted,
+                .edge-highlighted path,
+                svg path.edge-highlighted {
+                    stroke: #ff6b6b !important;
+                    stroke-width: 3px !important;
+                }
+            `;
+            document.head.appendChild(style);
 
-        // Add edge highlighting on node hover
-        setTimeout(function() {
+            // Initialize edge highlighting for all diagrams
             document.querySelectorAll('.mermaid svg').forEach(function(svg) {
                 var nodes = svg.querySelectorAll('.node');
 
@@ -441,24 +489,98 @@ blockquote {
                            pt.y >= bbox.y - margin && pt.y <= bbox.y + bbox.height + margin;
                 }
 
-                // Map edges to nodes
-                var nodeEdgeMap = {};
-                Object.keys(nodeData).forEach(function(hashId) {
-                    nodeEdgeMap[hashId] = [];
-                    var bbox = nodeData[hashId].bbox;
+                // Build edge connections with direction tracking
+                var edgeConnections = []; // [{path, source, target}]
+                var upstreamOf = {}; // node -> [parent nodes that point TO this node]
+                var downstreamOf = {}; // node -> [child nodes this node points TO]
 
-                    edgePaths.forEach(function(path) {
-                        var points = getPathPoints(path);
-                        for (var i = 0; i < points.length; i++) {
-                            if (isNearBbox(points[i], bbox, 40)) {
-                                if (!nodeEdgeMap[hashId].includes(path)) {
-                                    nodeEdgeMap[hashId].push(path);
-                                }
-                                break;
-                            }
+                Object.keys(nodeData).forEach(function(hashId) {
+                    upstreamOf[hashId] = [];
+                    downstreamOf[hashId] = [];
+                });
+
+                edgePaths.forEach(function(path) {
+                    var points = getPathPoints(path);
+                    if (points.length < 2) return;
+
+                    var startPt = points[0];
+                    var endPt = points[points.length - 1];
+
+                    var sourceNode = null;
+                    var targetNode = null;
+
+                    // Find source and target nodes for this edge
+                    Object.keys(nodeData).forEach(function(hashId) {
+                        var bbox = nodeData[hashId].bbox;
+                        if (isNearBbox(startPt, bbox, 20)) {
+                            sourceNode = hashId;
+                        }
+                        if (isNearBbox(endPt, bbox, 20)) {
+                            targetNode = hashId;
                         }
                     });
+
+                    if (sourceNode && targetNode && sourceNode !== targetNode) {
+                        edgeConnections.push({path: path, source: sourceNode, target: targetNode});
+                        // source -> target means: target's upstream includes source
+                        if (!upstreamOf[targetNode].includes(sourceNode)) {
+                            upstreamOf[targetNode].push(sourceNode);
+                        }
+                        // source -> target means: source's downstream includes target
+                        if (!downstreamOf[sourceNode].includes(targetNode)) {
+                            downstreamOf[sourceNode].push(targetNode);
+                        }
+                    }
                 });
+
+                // Traverse only upstream (to parents/ancestors)
+                function findUpstream(startNodeId) {
+                    var visited = {};
+                    var queue = [startNodeId];
+                    visited[startNodeId] = true;
+
+                    while (queue.length > 0) {
+                        var current = queue.shift();
+                        var parents = upstreamOf[current] || [];
+                        parents.forEach(function(parent) {
+                            if (!visited[parent]) {
+                                visited[parent] = true;
+                                queue.push(parent);
+                            }
+                        });
+                    }
+                    return visited;
+                }
+
+                // Traverse only downstream (to children/descendants)
+                function findDownstream(startNodeId) {
+                    var visited = {};
+                    var queue = [startNodeId];
+                    visited[startNodeId] = true;
+
+                    while (queue.length > 0) {
+                        var current = queue.shift();
+                        var children = downstreamOf[current] || [];
+                        children.forEach(function(child) {
+                            if (!visited[child]) {
+                                visited[child] = true;
+                                queue.push(child);
+                            }
+                        });
+                    }
+                    return visited;
+                }
+
+                // Get edges for connected nodes
+                function getChainEdges(nodeSet) {
+                    var edges = [];
+                    edgeConnections.forEach(function(conn) {
+                        if (nodeSet[conn.source] && nodeSet[conn.target]) {
+                            edges.push(conn.path);
+                        }
+                    });
+                    return edges;
+                }
 
                 // Attach hover handlers
                 nodes.forEach(function(node) {
@@ -473,185 +595,193 @@ blockquote {
                         nodes.forEach(function(n) { n.style.filter = ''; });
                         node.style.filter = 'drop-shadow(0 0 6px #ff6b6b)';
 
-                        var connectedEdges = nodeEdgeMap[hashId] || [];
-                        connectedEdges.forEach(function(path) {
+                        // Find upstream (ancestors) and downstream (descendants) separately
+                        var upstream = findUpstream(hashId);
+                        var downstream = findDownstream(hashId);
+                        // Merge both sets
+                        var allConnected = {};
+                        Object.keys(upstream).forEach(function(k) { allConnected[k] = true; });
+                        Object.keys(downstream).forEach(function(k) { allConnected[k] = true; });
+
+                        var chainEdges = getChainEdges(allConnected);
+                        chainEdges.forEach(function(path) {
                             path.classList.add('edge-highlighted');
                         });
                     });
 
                     node.addEventListener('mouseleave', function() {
                         node.style.filter = '';
-                        var connectedEdges = nodeEdgeMap[hashId] || [];
-                        connectedEdges.forEach(function(path) {
+                        // Remove highlight from all edges
+                        edgePaths.forEach(function(path) {
                             path.classList.remove('edge-highlighted');
                         });
                     });
                 });
             });
-        }, 1000);
+        });
     </script>
 </head>
 <body>
     <nav class="reqvire-nav">
-        <a href="../../index.html">Home</a>
-        <a href="../../containment.html">Containment</a>
-        <a href="../../model.html">Model</a>
-        <a href="../../whole-model.html">Whole Model</a>
-        <a href="../../traces.html">Traces</a>
-        <a href="../../coverage.html">Coverage</a>
+        <a href="../../../../index.html" class="nav-logo"><img src="../../../../assets/logo.png" alt="Reqvire" height="24"></a>
+        <a href="../../../../index.html">Index</a>
+        <a href="../../../../containment.html">Containment</a>
+        <a href="../../../../model.html">Model</a>
+        <a href="../../../../whole-model.html">Whole Model</a>
+        <a href="../../../../traces.html">Traces</a>
+        <a href="../../../../coverage.html">Coverage</a>
     </nav>
     <div class="reqvire-nav-spacer"></div>
     <div class="container">
         <div class="content">
             <h1 id="requirements">Requirements</h1>
-<div class="mermaid">graph LR;
+<div class="mermaid">graph TD;
   %% REQVIRE-AUTOGENERATED-DIAGRAM
   %% Graph styling
-  classDef userRequirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
-  classDef systemRequirement fill:#fce4e4,stroke:#e68a8a,stroke-width:1px;
-  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef userRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:2px;
+  classDef systemRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:1px;
+  classDef verification fill:#d1fae5,stroke:#059669,stroke-width:2px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  e9aa10046e23e76c[&quot;Attach Command Verification&quot;];
-  class e9aa10046e23e76c verification;
-  click e9aa10046e23e76c &quot;AttachmentsVerifications.html#attach-command-verification&quot;;
+  a6b4b85f1dd10dc7[&quot;Attach Command Verification&quot;];
+  class a6b4b85f1dd10dc7 verification;
+  click a6b4b85f1dd10dc7 &quot;AttachmentsVerifications.html#attach-command-verification&quot;;
   1940de2d7d61adab[&quot;test.sh&quot;];
   class 1940de2d7d61adab default;
-  click 1940de2d7d61adab &quot;../../tests/test-attachments/test.sh&quot;;
-  e9aa10046e23e76c -->|satisfiedBy| 1940de2d7d61adab;
-  a4d507bff359d303[&quot;Attachment Output Rendering Verification&quot;];
-  class a4d507bff359d303 verification;
-  click a4d507bff359d303 &quot;AttachmentsVerifications.html#attachment-output-rendering-verification&quot;;
+  click 1940de2d7d61adab &quot;../../../../tests/test-attachments/test.sh&quot;;
+  a6b4b85f1dd10dc7 -->|satisfiedBy| 1940de2d7d61adab;
+  bfad224e68f0c92b[&quot;Attachment Output Rendering Verification&quot;];
+  class bfad224e68f0c92b verification;
+  click bfad224e68f0c92b &quot;AttachmentsVerifications.html#attachment-output-rendering-verification&quot;;
   1940de2d7d61adab[&quot;test.sh&quot;];
   class 1940de2d7d61adab default;
-  click 1940de2d7d61adab &quot;../../tests/test-attachments/test.sh&quot;;
-  a4d507bff359d303 -->|satisfiedBy| 1940de2d7d61adab;
-  c5f21359e4574c2b[&quot;Attachment Search Filters Verification&quot;];
-  class c5f21359e4574c2b verification;
-  click c5f21359e4574c2b &quot;AttachmentsVerifications.html#attachment-search-filters-verification&quot;;
+  click 1940de2d7d61adab &quot;../../../../tests/test-attachments/test.sh&quot;;
+  bfad224e68f0c92b -->|satisfiedBy| 1940de2d7d61adab;
+  4859f411728d1e95[&quot;Attachment Search Filters Verification&quot;];
+  class 4859f411728d1e95 verification;
+  click 4859f411728d1e95 &quot;AttachmentsVerifications.html#attachment-search-filters-verification&quot;;
   1940de2d7d61adab[&quot;test.sh&quot;];
   class 1940de2d7d61adab default;
-  click 1940de2d7d61adab &quot;../../tests/test-attachments/test.sh&quot;;
-  c5f21359e4574c2b -->|satisfiedBy| 1940de2d7d61adab;
-  1e80cec5af56a72c[&quot;Attachments Change Impact Verification&quot;];
-  class 1e80cec5af56a72c verification;
-  click 1e80cec5af56a72c &quot;AttachmentsVerifications.html#attachments-change-impact-verification&quot;;
+  click 1940de2d7d61adab &quot;../../../../tests/test-attachments/test.sh&quot;;
+  4859f411728d1e95 -->|satisfiedBy| 1940de2d7d61adab;
+  ac22a318c2f0e072[&quot;Attachments Change Impact Verification&quot;];
+  class ac22a318c2f0e072 verification;
+  click ac22a318c2f0e072 &quot;AttachmentsVerifications.html#attachments-change-impact-verification&quot;;
   1940de2d7d61adab[&quot;test.sh&quot;];
   class 1940de2d7d61adab default;
-  click 1940de2d7d61adab &quot;../../tests/test-attachments/test.sh&quot;;
-  1e80cec5af56a72c -->|satisfiedBy| 1940de2d7d61adab;
-  f7ea2ade9f0cb1fe[&quot;Attachments Subsection Parsing Verification&quot;];
-  class f7ea2ade9f0cb1fe verification;
-  click f7ea2ade9f0cb1fe &quot;AttachmentsVerifications.html#attachments-subsection-parsing-verification&quot;;
+  click 1940de2d7d61adab &quot;../../../../tests/test-attachments/test.sh&quot;;
+  ac22a318c2f0e072 -->|satisfiedBy| 1940de2d7d61adab;
+  edbc73b37eb9cbe[&quot;Attachments Subsection Parsing Verification&quot;];
+  class edbc73b37eb9cbe verification;
+  click edbc73b37eb9cbe &quot;AttachmentsVerifications.html#attachments-subsection-parsing-verification&quot;;
   1940de2d7d61adab[&quot;test.sh&quot;];
   class 1940de2d7d61adab default;
-  click 1940de2d7d61adab &quot;../../tests/test-attachments/test.sh&quot;;
-  f7ea2ade9f0cb1fe -->|satisfiedBy| 1940de2d7d61adab;
-  71fc5a8b1616ecd[&quot;Attachments Validation Verification&quot;];
-  class 71fc5a8b1616ecd verification;
-  click 71fc5a8b1616ecd &quot;AttachmentsVerifications.html#attachments-validation-verification&quot;;
+  click 1940de2d7d61adab &quot;../../../../tests/test-attachments/test.sh&quot;;
+  edbc73b37eb9cbe -->|satisfiedBy| 1940de2d7d61adab;
+  cd463a2ba2fbdafc[&quot;Attachments Validation Verification&quot;];
+  class cd463a2ba2fbdafc verification;
+  click cd463a2ba2fbdafc &quot;AttachmentsVerifications.html#attachments-validation-verification&quot;;
   1940de2d7d61adab[&quot;test.sh&quot;];
   class 1940de2d7d61adab default;
-  click 1940de2d7d61adab &quot;../../tests/test-attachments/test.sh&quot;;
-  71fc5a8b1616ecd -->|satisfiedBy| 1940de2d7d61adab;
-  356e1341797a881b[&quot;Detach Command Verification&quot;];
-  class 356e1341797a881b verification;
-  click 356e1341797a881b &quot;AttachmentsVerifications.html#detach-command-verification&quot;;
+  click 1940de2d7d61adab &quot;../../../../tests/test-attachments/test.sh&quot;;
+  cd463a2ba2fbdafc -->|satisfiedBy| 1940de2d7d61adab;
+  32a3ea471bc6d707[&quot;Detach Command Verification&quot;];
+  class 32a3ea471bc6d707 verification;
+  click 32a3ea471bc6d707 &quot;AttachmentsVerifications.html#detach-command-verification&quot;;
   1940de2d7d61adab[&quot;test.sh&quot;];
   class 1940de2d7d61adab default;
-  click 1940de2d7d61adab &quot;../../tests/test-attachments/test.sh&quot;;
-  356e1341797a881b -->|satisfiedBy| 1940de2d7d61adab;
-  a456b31063afc5d8[&quot;Move Attachment Command Verification&quot;];
-  class a456b31063afc5d8 verification;
-  click a456b31063afc5d8 &quot;AttachmentsVerifications.html#move-attachment-command-verification&quot;;
+  click 1940de2d7d61adab &quot;../../../../tests/test-attachments/test.sh&quot;;
+  32a3ea471bc6d707 -->|satisfiedBy| 1940de2d7d61adab;
+  810c1e7fef1cf44c[&quot;Move Attachment Command Verification&quot;];
+  class 810c1e7fef1cf44c verification;
+  click 810c1e7fef1cf44c &quot;AttachmentsVerifications.html#move-attachment-command-verification&quot;;
   1940de2d7d61adab[&quot;test.sh&quot;];
   class 1940de2d7d61adab default;
-  click 1940de2d7d61adab &quot;../../tests/test-attachments/test.sh&quot;;
-  a456b31063afc5d8 -->|satisfiedBy| 1940de2d7d61adab;
-  26e41fb78f24abd[&quot;Remove Attachment Command Verification&quot;];
-  class 26e41fb78f24abd verification;
-  click 26e41fb78f24abd &quot;AttachmentsVerifications.html#remove-attachment-command-verification&quot;;
+  click 1940de2d7d61adab &quot;../../../../tests/test-attachments/test.sh&quot;;
+  810c1e7fef1cf44c -->|satisfiedBy| 1940de2d7d61adab;
+  1d45fdf3b9015649[&quot;Remove Attachment Command Verification&quot;];
+  class 1d45fdf3b9015649 verification;
+  click 1d45fdf3b9015649 &quot;AttachmentsVerifications.html#remove-attachment-command-verification&quot;;
   1940de2d7d61adab[&quot;test.sh&quot;];
   class 1940de2d7d61adab default;
-  click 1940de2d7d61adab &quot;../../tests/test-attachments/test.sh&quot;;
-  26e41fb78f24abd -->|satisfiedBy| 1940de2d7d61adab;
+  click 1940de2d7d61adab &quot;../../../../tests/test-attachments/test.sh&quot;;
+  1d45fdf3b9015649 -->|satisfiedBy| 1940de2d7d61adab;
   a957c400a0de2045[&quot;Attachment Commands&quot;];
   class a957c400a0de2045 systemRequirement;
-  click a957c400a0de2045 &quot;../Interfaces/CLI.html#attachment-commands&quot;;
-  a957c400a0de2045 -.->|verifiedBy| e9aa10046e23e76c;
-  a957c400a0de2045 -.->|verifiedBy| 356e1341797a881b;
-  a957c400a0de2045 -.->|verifiedBy| a456b31063afc5d8;
-  a957c400a0de2045 -.->|verifiedBy| 26e41fb78f24abd;
+  click a957c400a0de2045 &quot;../../../Interfaces/CLI.html#attachment-commands&quot;;
+  a957c400a0de2045 -.->|verifiedBy| a6b4b85f1dd10dc7;
+  a957c400a0de2045 -.->|verifiedBy| 32a3ea471bc6d707;
+  a957c400a0de2045 -.->|verifiedBy| 810c1e7fef1cf44c;
+  a957c400a0de2045 -.->|verifiedBy| 1d45fdf3b9015649;
   e342a2a82ef67934[&quot;CLI Search Command&quot;];
   class e342a2a82ef67934 systemRequirement;
-  click e342a2a82ef67934 &quot;../Interfaces/CLI.html#cli-search-command&quot;;
+  click e342a2a82ef67934 &quot;../../../Interfaces/CLI.html#cli-search-command&quot;;
   80defdd4cbc7ee18[&quot;cli.rs&quot;];
   class 80defdd4cbc7ee18 default;
-  click 80defdd4cbc7ee18 &quot;../../cli/src/cli.rs&quot;;
+  click 80defdd4cbc7ee18 &quot;../../../../cli/src/cli.rs&quot;;
   e342a2a82ef67934 -->|satisfiedBy| 80defdd4cbc7ee18;
-  7ff28ff401dbaef7[&quot;CLI Help Structure Verification&quot;];
-  class 7ff28ff401dbaef7 verification;
-  click 7ff28ff401dbaef7 &quot;../Interfaces/CLI.html#cli-help-structure-verification&quot;;
-  e342a2a82ef67934 -.->|verifiedBy| 7ff28ff401dbaef7;
-  e342a2a82ef67934 -.->|verifiedBy| c5f21359e4574c2b;
-  aba20c01c777da73[&quot;Search Command Tests&quot;];
-  class aba20c01c777da73 verification;
-  click aba20c01c777da73 &quot;Reporting.html#search-command-tests&quot;;
-  e342a2a82ef67934 -.->|verifiedBy| aba20c01c777da73;
-  2a29f1f7ce22846e[&quot;Requirements Change Propagation&quot;];
-  class 2a29f1f7ce22846e systemRequirement;
-  click 2a29f1f7ce22846e &quot;ChangeImpact.html#requirements-change-propagation&quot;;
-  4b89dbed94c08c3e[&quot;change_impact.rs&quot;];
-  class 4b89dbed94c08c3e default;
-  click 4b89dbed94c08c3e &quot;../../core/src/change_impact.rs&quot;;
-  2a29f1f7ce22846e -->|satisfiedBy| 4b89dbed94c08c3e;
-  2a29f1f7ce22846e -.->|verifiedBy| 1e80cec5af56a72c;
-  3f87bd87eadd90fb[&quot;Change Impact Detection Test&quot;];
-  class 3f87bd87eadd90fb verification;
-  click 3f87bd87eadd90fb &quot;ChangeImpact.html#change-impact-detection-test&quot;;
-  2a29f1f7ce22846e -.->|verifiedBy| 3f87bd87eadd90fb;
-  5c87ffb56362b634[&quot;Change Impact Relations Test&quot;];
-  class 5c87ffb56362b634 verification;
-  click 5c87ffb56362b634 &quot;ChangeImpact.html#change-impact-relations-test&quot;;
-  2a29f1f7ce22846e -.->|verifiedBy| 5c87ffb56362b634;
-  7c2dfd8fd2bf95ad[&quot;Change Impact Smart Filtering Test&quot;];
-  class 7c2dfd8fd2bf95ad verification;
-  click 7c2dfd8fd2bf95ad &quot;ChangeImpact.html#change-impact-smart-filtering-test&quot;;
-  2a29f1f7ce22846e -.->|verifiedBy| 7c2dfd8fd2bf95ad;
-  423634b0183d5b48[&quot;Element Content Extraction Test&quot;];
-  class 423634b0183d5b48 verification;
-  click 423634b0183d5b48 &quot;ChangeImpact.html#element-content-extraction-test&quot;;
-  2a29f1f7ce22846e -.->|verifiedBy| 423634b0183d5b48;
-  1d0bfcae44a9063[&quot;Reserved Subsections Support&quot;];
-  class 1d0bfcae44a9063 systemRequirement;
-  click 1d0bfcae44a9063 &quot;Subsections.html#reserved-subsections-support&quot;;
-  1d0bfcae44a9063 -.->|deriveReqT| a957c400a0de2045;
-  1d0bfcae44a9063 -.->|deriveReqT| e342a2a82ef67934;
-  c80ab353c1242f1f[&quot;Supported Element Types&quot;];
-  class c80ab353c1242f1f systemRequirement;
-  click c80ab353c1242f1f &quot;ModelManagement.html#supported-element-types&quot;;
-  1d0bfcae44a9063 -.->|deriveReqT| c80ab353c1242f1f;
-  b0ca2a8e86aafe4b[&quot;Verification Type Categories&quot;];
-  class b0ca2a8e86aafe4b systemRequirement;
-  click b0ca2a8e86aafe4b &quot;ModelManagement.html#verification-type-categories&quot;;
-  1d0bfcae44a9063 -.->|deriveReqT| b0ca2a8e86aafe4b;
+  815c04291cd56adf[&quot;CLI Help Structure Verification&quot;];
+  class 815c04291cd56adf verification;
+  click 815c04291cd56adf &quot;../../../Interfaces/Verifications/CLIVerifications.html#cli-help-structure-verification&quot;;
+  e342a2a82ef67934 -.->|verifiedBy| 815c04291cd56adf;
+  e342a2a82ef67934 -.->|verifiedBy| 4859f411728d1e95;
+  7710784caae312f6[&quot;Search Command Tests&quot;];
+  class 7710784caae312f6 verification;
+  click 7710784caae312f6 &quot;../../Output/Verifications/ReportingVerifications.html#search-command-tests&quot;;
+  e342a2a82ef67934 -.->|verifiedBy| 7710784caae312f6;
+  bd0604b1a72a0172[&quot;Reserved Subsections Support&quot;];
+  class bd0604b1a72a0172 systemRequirement;
+  click bd0604b1a72a0172 &quot;../StructureAndParsing.html#reserved-subsections-support&quot;;
+  bd0604b1a72a0172 -.->|deriveReqT| a957c400a0de2045;
+  bd0604b1a72a0172 -.->|deriveReqT| e342a2a82ef67934;
+  15fbadeac35968b9[&quot;Supported Element Types&quot;];
+  class 15fbadeac35968b9 systemRequirement;
+  click 15fbadeac35968b9 &quot;../ModelManagement.html#supported-element-types&quot;;
+  bd0604b1a72a0172 -.->|deriveReqT| 15fbadeac35968b9;
+  ea60608d4ce12d93[&quot;Verification Type Categories&quot;];
+  class ea60608d4ce12d93 systemRequirement;
+  click ea60608d4ce12d93 &quot;../ModelManagement.html#verification-type-categories&quot;;
+  bd0604b1a72a0172 -.->|deriveReqT| ea60608d4ce12d93;
   a814c4935e1a0449[&quot;element.rs&quot;];
   class a814c4935e1a0449 default;
-  click a814c4935e1a0449 &quot;../../core/src/element.rs&quot;;
-  1d0bfcae44a9063 -->|satisfiedBy| a814c4935e1a0449;
+  click a814c4935e1a0449 &quot;../../../../core/src/element.rs&quot;;
+  bd0604b1a72a0172 -->|satisfiedBy| a814c4935e1a0449;
   f22d93285fcd7664[&quot;parser.rs&quot;];
   class f22d93285fcd7664 default;
-  click f22d93285fcd7664 &quot;../../core/src/parser.rs&quot;;
-  1d0bfcae44a9063 -->|satisfiedBy| f22d93285fcd7664;
-  1d0bfcae44a9063 -.->|verifiedBy| a4d507bff359d303;
-  1d0bfcae44a9063 -.->|verifiedBy| f7ea2ade9f0cb1fe;
-  1d0bfcae44a9063 -.->|verifiedBy| 71fc5a8b1616ecd;
-  c8dd29521fe145e9[&quot;Element Subsection Parsing Test&quot;];
-  class c8dd29521fe145e9 verification;
-  click c8dd29521fe145e9 &quot;ParsingAndValidationVerifications.html#element-subsection-parsing-test&quot;;
-  1d0bfcae44a9063 -.->|verifiedBy| c8dd29521fe145e9;
+  click f22d93285fcd7664 &quot;../../../../core/src/parser.rs&quot;;
+  bd0604b1a72a0172 -->|satisfiedBy| f22d93285fcd7664;
+  bd0604b1a72a0172 -.->|verifiedBy| bfad224e68f0c92b;
+  bd0604b1a72a0172 -.->|verifiedBy| edbc73b37eb9cbe;
+  bd0604b1a72a0172 -.->|verifiedBy| cd463a2ba2fbdafc;
+  908de1f59852b43a[&quot;Element Subsection Parsing Test&quot;];
+  class 908de1f59852b43a verification;
+  click 908de1f59852b43a &quot;ParsingVerifications.html#element-subsection-parsing-test&quot;;
+  bd0604b1a72a0172 -.->|verifiedBy| 908de1f59852b43a;
+  25a30542d9f084f3[&quot;Requirements Change Propagation&quot;];
+  class 25a30542d9f084f3 systemRequirement;
+  click 25a30542d9f084f3 &quot;../../Processing/ChangeImpact.html#requirements-change-propagation&quot;;
+  4b89dbed94c08c3e[&quot;change_impact.rs&quot;];
+  class 4b89dbed94c08c3e default;
+  click 4b89dbed94c08c3e &quot;../../../../core/src/change_impact.rs&quot;;
+  25a30542d9f084f3 -->|satisfiedBy| 4b89dbed94c08c3e;
+  25a30542d9f084f3 -.->|verifiedBy| ac22a318c2f0e072;
+  c4dd1dd8ac41b4de[&quot;Change Impact Detection Test&quot;];
+  class c4dd1dd8ac41b4de verification;
+  click c4dd1dd8ac41b4de &quot;../../Processing/Verifications/ChangeImpactVerifications.html#change-impact-detection-test&quot;;
+  25a30542d9f084f3 -.->|verifiedBy| c4dd1dd8ac41b4de;
+  8cae07084a6ab404[&quot;Change Impact Relations Test&quot;];
+  class 8cae07084a6ab404 verification;
+  click 8cae07084a6ab404 &quot;../../Processing/Verifications/ChangeImpactVerifications.html#change-impact-relations-test&quot;;
+  25a30542d9f084f3 -.->|verifiedBy| 8cae07084a6ab404;
+  5f17003a2fd58e53[&quot;Change Impact Smart Filtering Test&quot;];
+  class 5f17003a2fd58e53 verification;
+  click 5f17003a2fd58e53 &quot;../../Processing/Verifications/ChangeImpactVerifications.html#change-impact-smart-filtering-test&quot;;
+  25a30542d9f084f3 -.->|verifiedBy| 5f17003a2fd58e53;
+  3de3ec44e43109a9[&quot;Element Content Extraction Test&quot;];
+  class 3de3ec44e43109a9 verification;
+  click 3de3ec44e43109a9 &quot;../../Processing/Verifications/ChangeImpactVerifications.html#element-content-extraction-test&quot;;
+  25a30542d9f084f3 -.->|verifiedBy| 3de3ec44e43109a9;
 </div>
-<p>This document specifies verifications for the Attachments feature requirements.</p>
 <h3 id="attachments-subsection-parsing-verification">Attachments Subsection Parsing Verification</h3>
 <p>Verify the system correctly parses Attachments subsections.</p>
 <h4>Details</h4>
@@ -669,8 +799,8 @@ blockquote {
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>verify: <a href="Subsections.html#reserved-subsections-support">Reserved Subsections Support</a></li>
-<li>satisfiedBy: <a href="../../tests/test-attachments/test.sh">test.sh</a></li>
+<li>verify: <a href="../StructureAndParsing.html#reserved-subsections-support">Reserved Subsections Support</a></li>
+<li>satisfiedBy: <a href="../../../../tests/test-attachments/test.sh">test.sh</a></li>
 </ul>
 <hr />
 <h3 id="attachments-validation-verification">Attachments Validation Verification</h3>
@@ -689,8 +819,8 @@ blockquote {
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>verify: <a href="Subsections.html#reserved-subsections-support">Reserved Subsections Support</a></li>
-<li>satisfiedBy: <a href="../../tests/test-attachments/test.sh">test.sh</a></li>
+<li>verify: <a href="../StructureAndParsing.html#reserved-subsections-support">Reserved Subsections Support</a></li>
+<li>satisfiedBy: <a href="../../../../tests/test-attachments/test.sh">test.sh</a></li>
 </ul>
 <hr />
 <h3 id="attachments-change-impact-verification">Attachments Change Impact Verification</h3>
@@ -712,8 +842,8 @@ blockquote {
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>verify: <a href="ChangeImpact.html#requirements-change-propagation">Requirements Change Propagation</a></li>
-<li>satisfiedBy: <a href="../../tests/test-attachments/test.sh">test.sh</a></li>
+<li>verify: <a href="../../Processing/ChangeImpact.html#requirements-change-propagation">Requirements Change Propagation</a></li>
+<li>satisfiedBy: <a href="../../../../tests/test-attachments/test.sh">test.sh</a></li>
 </ul>
 <hr />
 <h3 id="attach-command-verification">Attach Command Verification</h3>
@@ -734,8 +864,8 @@ blockquote {
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>verify: <a href="../Interfaces/CLI.html#attachment-commands">Attachment Commands</a></li>
-<li>satisfiedBy: <a href="../../tests/test-attachments/test.sh">test.sh</a></li>
+<li>verify: <a href="../../../Interfaces/CLI.html#attachment-commands">Attachment Commands</a></li>
+<li>satisfiedBy: <a href="../../../../tests/test-attachments/test.sh">test.sh</a></li>
 </ul>
 <hr />
 <h3 id="detach-command-verification">Detach Command Verification</h3>
@@ -756,8 +886,8 @@ blockquote {
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>verify: <a href="../Interfaces/CLI.html#attachment-commands">Attachment Commands</a></li>
-<li>satisfiedBy: <a href="../../tests/test-attachments/test.sh">test.sh</a></li>
+<li>verify: <a href="../../../Interfaces/CLI.html#attachment-commands">Attachment Commands</a></li>
+<li>satisfiedBy: <a href="../../../../tests/test-attachments/test.sh">test.sh</a></li>
 </ul>
 <hr />
 <h3 id="move-attachment-command-verification">Move Attachment Command Verification</h3>
@@ -778,8 +908,8 @@ blockquote {
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>verify: <a href="../Interfaces/CLI.html#attachment-commands">Attachment Commands</a></li>
-<li>satisfiedBy: <a href="../../tests/test-attachments/test.sh">test.sh</a></li>
+<li>verify: <a href="../../../Interfaces/CLI.html#attachment-commands">Attachment Commands</a></li>
+<li>satisfiedBy: <a href="../../../../tests/test-attachments/test.sh">test.sh</a></li>
 </ul>
 <hr />
 <h3 id="remove-attachment-command-verification">Remove Attachment Command Verification</h3>
@@ -800,8 +930,8 @@ blockquote {
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>verify: <a href="../Interfaces/CLI.html#attachment-commands">Attachment Commands</a></li>
-<li>satisfiedBy: <a href="../../tests/test-attachments/test.sh">test.sh</a></li>
+<li>verify: <a href="../../../Interfaces/CLI.html#attachment-commands">Attachment Commands</a></li>
+<li>satisfiedBy: <a href="../../../../tests/test-attachments/test.sh">test.sh</a></li>
 </ul>
 <hr />
 <h3 id="attachment-search-filters-verification">Attachment Search Filters Verification</h3>
@@ -821,8 +951,8 @@ blockquote {
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>verify: <a href="../Interfaces/CLI.html#cli-search-command">CLI Search Command</a></li>
-<li>satisfiedBy: <a href="../../tests/test-attachments/test.sh">test.sh</a></li>
+<li>verify: <a href="../../../Interfaces/CLI.html#cli-search-command">CLI Search Command</a></li>
+<li>satisfiedBy: <a href="../../../../tests/test-attachments/test.sh">test.sh</a></li>
 </ul>
 <hr />
 <h3 id="attachment-output-rendering-verification">Attachment Output Rendering Verification</h3>
@@ -842,8 +972,8 @@ blockquote {
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>verify: <a href="Subsections.html#reserved-subsections-support">Reserved Subsections Support</a></li>
-<li>satisfiedBy: <a href="../../tests/test-attachments/test.sh">test.sh</a></li>
+<li>verify: <a href="../StructureAndParsing.html#reserved-subsections-support">Reserved Subsections Support</a></li>
+<li>satisfiedBy: <a href="../../../../tests/test-attachments/test.sh">test.sh</a></li>
 </ul>
 <hr />
 

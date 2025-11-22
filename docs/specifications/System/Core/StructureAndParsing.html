@@ -4,8 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>StructureAndParsing</title>
+    <link rel="icon" type="image/x-icon" href="../../../assets/favicon.ico">
+    <link rel="apple-touch-icon" href="../../../assets/apple-touch-icon.png">
     
 <style>
+:root {
+    /* Primary Colors */
+    --color-primary: #1E3A5F;           /* Deep Sapphire - navigation, headers */
+    --color-primary-hover: #2a4a73;     /* Lighter shade for hover states */
+    --color-primary-active: #15293f;    /* Darker shade for active states */
+
+    /* Element Type Colors */
+    --color-requirement: #2563EB;       /* Royal Blue */
+    --color-verification: #059669;      /* Emerald */
+    --color-design: #7C3AED;            /* Purple */
+    --color-test: #0891B2;              /* Teal */
+    --color-implementation: #D97706;    /* Amber */
+    --color-external: #64748B;          /* Slate */
+
+    /* Status Colors */
+    --color-verified: #059669;          /* Emerald - verified/passing */
+    --color-pending: #D97706;           /* Amber - pending/warning */
+    --color-error: #DC2626;             /* Rose - error/failed */
+
+    /* Interactive Colors */
+    --color-highlight: #ff6b6b;         /* Hover highlight */
+    --color-link: #0366d6;              /* Link color */
+}
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
     line-height: 1.6;
@@ -20,7 +45,7 @@ body {
     left: 0;
     right: 0;
     height: 50px;
-    background-color: #2c3e50;
+    background-color: var(--color-primary);
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     z-index: 1000;
     display: flex;
@@ -28,15 +53,23 @@ body {
     padding: 0 20px;
 }
 .reqvire-nav a {
-    color: #ecf0f1;
+    color: #ffffff;
     text-decoration: none;
     padding: 10px 20px;
     margin-right: 5px;
     border-radius: 3px;
     transition: background-color 0.2s;
 }
+.reqvire-nav a.nav-logo {
+    display: flex;
+    align-items: center;
+    padding: 5px 15px 5px 0;
+}
+.reqvire-nav a.nav-logo img {
+    vertical-align: middle;
+}
 .reqvire-nav a:hover {
-    background-color: #34495e;
+    background-color: var(--color-primary-hover);
 }
 .reqvire-nav-spacer {
     height: 50px;
@@ -64,7 +97,7 @@ h2 {
     padding-bottom: 5px;
 }
 h3 {
-    color: #1a6fb7;
+    color: var(--color-requirement);
     margin-top: 25px;
 }
 h4 {
@@ -72,7 +105,7 @@ h4 {
     font-weight: 600;
 }
 a {
-    color: #0366d6;
+    color: var(--color-link);
     text-decoration: none;
 }
 a:hover {
@@ -159,7 +192,7 @@ blockquote {
 .diagram-nav-btn {
     width: 32px;
     height: 32px;
-    background-color: #2c3e50;
+    background-color: var(--color-primary);
     color: white;
     border: none;
     border-radius: 3px;
@@ -170,10 +203,10 @@ blockquote {
     justify-content: center;
 }
 .diagram-nav-btn:hover {
-    background-color: #34495e;
+    background-color: var(--color-primary-hover);
 }
 .diagram-nav-btn:active {
-    background-color: #1a252f;
+    background-color: var(--color-primary-active);
 }
 </style>
 
@@ -221,17 +254,34 @@ blockquote {
         await mermaid.run();
         window.mermaid = mermaid;
 
+        // Wait for SVGs to be fully rendered, then initialize
+        function waitForSvgs(callback) {
+            var containers = document.querySelectorAll('.mermaid');
+            var allReady = true;
+            containers.forEach(function(c) {
+                var svg = c.querySelector('svg');
+                if (!svg || !svg.getBBox || svg.getBBox().width === 0) {
+                    allReady = false;
+                }
+            });
+            if (allReady && containers.length > 0) {
+                callback();
+            } else {
+                requestAnimationFrame(function() { waitForSvgs(callback); });
+            }
+        }
+
         // Add pan/zoom to all Mermaid diagrams after rendering
-        setTimeout(function() {
+        waitForSvgs(function() {
             document.querySelectorAll('.mermaid').forEach(function(mermaidContainer) {
-                    var svg = mermaidContainer.querySelector('svg');
-                    if (!svg) return;
+                var svg = mermaidContainer.querySelector('svg');
+                if (!svg) return;
 
-                    svg.style.maxWidth = 'none';
-                    svg.style.maxHeight = 'none';
+                svg.style.maxWidth = 'none';
+                svg.style.maxHeight = 'none';
 
-                    var eventsHandler = {
-                        haltEventListeners: ['touchstart', 'touchend', 'touchmove', 'touchleave', 'touchcancel'],
+                var eventsHandler = {
+                    haltEventListeners: ['touchstart', 'touchend', 'touchmove', 'touchleave', 'touchcancel'],
                         init: function(options) {
                             var instance = options.instance;
                             var initialScale = 1;
@@ -323,22 +373,20 @@ blockquote {
                         });
                     });
             });
-        }, 500);
 
-        // Add CSS for edge highlighting (high specificity for SVG)
-        var style = document.createElement('style');
-        style.textContent = `
-            path.edge-highlighted,
-            .edge-highlighted path,
-            svg path.edge-highlighted {
-                stroke: #ff6b6b !important;
-                stroke-width: 3px !important;
-            }
-        `;
-        document.head.appendChild(style);
+            // Add CSS for edge highlighting
+            var style = document.createElement('style');
+            style.textContent = `
+                path.edge-highlighted,
+                .edge-highlighted path,
+                svg path.edge-highlighted {
+                    stroke: #ff6b6b !important;
+                    stroke-width: 3px !important;
+                }
+            `;
+            document.head.appendChild(style);
 
-        // Add edge highlighting on node hover
-        setTimeout(function() {
+            // Initialize edge highlighting for all diagrams
             document.querySelectorAll('.mermaid svg').forEach(function(svg) {
                 var nodes = svg.querySelectorAll('.node');
 
@@ -441,24 +489,98 @@ blockquote {
                            pt.y >= bbox.y - margin && pt.y <= bbox.y + bbox.height + margin;
                 }
 
-                // Map edges to nodes
-                var nodeEdgeMap = {};
-                Object.keys(nodeData).forEach(function(hashId) {
-                    nodeEdgeMap[hashId] = [];
-                    var bbox = nodeData[hashId].bbox;
+                // Build edge connections with direction tracking
+                var edgeConnections = []; // [{path, source, target}]
+                var upstreamOf = {}; // node -> [parent nodes that point TO this node]
+                var downstreamOf = {}; // node -> [child nodes this node points TO]
 
-                    edgePaths.forEach(function(path) {
-                        var points = getPathPoints(path);
-                        for (var i = 0; i < points.length; i++) {
-                            if (isNearBbox(points[i], bbox, 40)) {
-                                if (!nodeEdgeMap[hashId].includes(path)) {
-                                    nodeEdgeMap[hashId].push(path);
-                                }
-                                break;
-                            }
+                Object.keys(nodeData).forEach(function(hashId) {
+                    upstreamOf[hashId] = [];
+                    downstreamOf[hashId] = [];
+                });
+
+                edgePaths.forEach(function(path) {
+                    var points = getPathPoints(path);
+                    if (points.length < 2) return;
+
+                    var startPt = points[0];
+                    var endPt = points[points.length - 1];
+
+                    var sourceNode = null;
+                    var targetNode = null;
+
+                    // Find source and target nodes for this edge
+                    Object.keys(nodeData).forEach(function(hashId) {
+                        var bbox = nodeData[hashId].bbox;
+                        if (isNearBbox(startPt, bbox, 20)) {
+                            sourceNode = hashId;
+                        }
+                        if (isNearBbox(endPt, bbox, 20)) {
+                            targetNode = hashId;
                         }
                     });
+
+                    if (sourceNode && targetNode && sourceNode !== targetNode) {
+                        edgeConnections.push({path: path, source: sourceNode, target: targetNode});
+                        // source -> target means: target's upstream includes source
+                        if (!upstreamOf[targetNode].includes(sourceNode)) {
+                            upstreamOf[targetNode].push(sourceNode);
+                        }
+                        // source -> target means: source's downstream includes target
+                        if (!downstreamOf[sourceNode].includes(targetNode)) {
+                            downstreamOf[sourceNode].push(targetNode);
+                        }
+                    }
                 });
+
+                // Traverse only upstream (to parents/ancestors)
+                function findUpstream(startNodeId) {
+                    var visited = {};
+                    var queue = [startNodeId];
+                    visited[startNodeId] = true;
+
+                    while (queue.length > 0) {
+                        var current = queue.shift();
+                        var parents = upstreamOf[current] || [];
+                        parents.forEach(function(parent) {
+                            if (!visited[parent]) {
+                                visited[parent] = true;
+                                queue.push(parent);
+                            }
+                        });
+                    }
+                    return visited;
+                }
+
+                // Traverse only downstream (to children/descendants)
+                function findDownstream(startNodeId) {
+                    var visited = {};
+                    var queue = [startNodeId];
+                    visited[startNodeId] = true;
+
+                    while (queue.length > 0) {
+                        var current = queue.shift();
+                        var children = downstreamOf[current] || [];
+                        children.forEach(function(child) {
+                            if (!visited[child]) {
+                                visited[child] = true;
+                                queue.push(child);
+                            }
+                        });
+                    }
+                    return visited;
+                }
+
+                // Get edges for connected nodes
+                function getChainEdges(nodeSet) {
+                    var edges = [];
+                    edgeConnections.forEach(function(conn) {
+                        if (nodeSet[conn.source] && nodeSet[conn.target]) {
+                            edges.push(conn.path);
+                        }
+                    });
+                    return edges;
+                }
 
                 // Attach hover handlers
                 nodes.forEach(function(node) {
@@ -473,184 +595,232 @@ blockquote {
                         nodes.forEach(function(n) { n.style.filter = ''; });
                         node.style.filter = 'drop-shadow(0 0 6px #ff6b6b)';
 
-                        var connectedEdges = nodeEdgeMap[hashId] || [];
-                        connectedEdges.forEach(function(path) {
+                        // Find upstream (ancestors) and downstream (descendants) separately
+                        var upstream = findUpstream(hashId);
+                        var downstream = findDownstream(hashId);
+                        // Merge both sets
+                        var allConnected = {};
+                        Object.keys(upstream).forEach(function(k) { allConnected[k] = true; });
+                        Object.keys(downstream).forEach(function(k) { allConnected[k] = true; });
+
+                        var chainEdges = getChainEdges(allConnected);
+                        chainEdges.forEach(function(path) {
                             path.classList.add('edge-highlighted');
                         });
                     });
 
                     node.addEventListener('mouseleave', function() {
                         node.style.filter = '';
-                        var connectedEdges = nodeEdgeMap[hashId] || [];
-                        connectedEdges.forEach(function(path) {
+                        // Remove highlight from all edges
+                        edgePaths.forEach(function(path) {
                             path.classList.remove('edge-highlighted');
                         });
                     });
                 });
             });
-        }, 1000);
+        });
     </script>
 </head>
 <body>
     <nav class="reqvire-nav">
-        <a href="../../index.html">Home</a>
-        <a href="../../containment.html">Containment</a>
-        <a href="../../model.html">Model</a>
-        <a href="../../whole-model.html">Whole Model</a>
-        <a href="../../traces.html">Traces</a>
-        <a href="../../coverage.html">Coverage</a>
+        <a href="../../../index.html" class="nav-logo"><img src="../../../assets/logo.png" alt="Reqvire" height="24"></a>
+        <a href="../../../index.html">Index</a>
+        <a href="../../../containment.html">Containment</a>
+        <a href="../../../model.html">Model</a>
+        <a href="../../../whole-model.html">Whole Model</a>
+        <a href="../../../traces.html">Traces</a>
+        <a href="../../../coverage.html">Coverage</a>
     </nav>
     <div class="reqvire-nav-spacer"></div>
     <div class="container">
         <div class="content">
             <h1 id="requirements">Requirements</h1>
-<div class="mermaid">graph LR;
+<div class="mermaid">graph TD;
   %% REQVIRE-AUTOGENERATED-DIAGRAM
   %% Graph styling
-  classDef userRequirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
-  classDef systemRequirement fill:#fce4e4,stroke:#e68a8a,stroke-width:1px;
-  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef userRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:2px;
+  classDef systemRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:1px;
+  classDef verification fill:#d1fae5,stroke:#059669,stroke-width:2px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
-  af98a411c9028161[&quot;Element Identity Model&quot;];
-  class af98a411c9028161 systemRequirement;
-  click af98a411c9028161 &quot;StructureAndParsing.html#element-identity-model&quot;;
-  8d8ac7ecbf826962[&quot;Change Impact Detection&quot;];
-  class 8d8ac7ecbf826962 systemRequirement;
-  click 8d8ac7ecbf826962 &quot;ChangeImpact.html#change-impact-detection&quot;;
-  af98a411c9028161 -.->|deriveReqT| 8d8ac7ecbf826962;
-  6e6ce5b5e93ac423[&quot;Identifiers and Relations&quot;];
-  class 6e6ce5b5e93ac423 systemRequirement;
-  click 6e6ce5b5e93ac423 &quot;StructureAndParsing.html#identifiers-and-relations&quot;;
-  af98a411c9028161 -.->|deriveReqT| 6e6ce5b5e93ac423;
-  c5c516af837b24e1[&quot;Internal Consistency Validator&quot;];
-  class c5c516af837b24e1 systemRequirement;
-  click c5c516af837b24e1 &quot;Validation.html#internal-consistency-validator&quot;;
-  af98a411c9028161 -.->|deriveReqT| c5c516af837b24e1;
+  b0cc2fce0e12a405[&quot;Element Identity Model&quot;];
+  class b0cc2fce0e12a405 systemRequirement;
+  click b0cc2fce0e12a405 &quot;StructureAndParsing.html#element-identity-model&quot;;
+  43dcbb7ab74ba45e[&quot;Identifiers and Relations&quot;];
+  class 43dcbb7ab74ba45e systemRequirement;
+  click 43dcbb7ab74ba45e &quot;StructureAndParsing.html#identifiers-and-relations&quot;;
+  b0cc2fce0e12a405 -.->|deriveReqT| 43dcbb7ab74ba45e;
+  2f63ffaf1de3849f[&quot;Internal Consistency Validator&quot;];
+  class 2f63ffaf1de3849f systemRequirement;
+  click 2f63ffaf1de3849f &quot;Validation.html#internal-consistency-validator&quot;;
+  b0cc2fce0e12a405 -.->|deriveReqT| 2f63ffaf1de3849f;
+  b58a906566fb6956[&quot;Change Impact Detection&quot;];
+  class b58a906566fb6956 systemRequirement;
+  click b58a906566fb6956 &quot;../Processing/ChangeImpact.html#change-impact-detection&quot;;
+  b0cc2fce0e12a405 -.->|deriveReqT| b58a906566fb6956;
   a814c4935e1a0449[&quot;element.rs&quot;];
   class a814c4935e1a0449 default;
-  click a814c4935e1a0449 &quot;../../core/src/element.rs&quot;;
-  af98a411c9028161 -->|satisfiedBy| a814c4935e1a0449;
+  click a814c4935e1a0449 &quot;../../../core/src/element.rs&quot;;
+  b0cc2fce0e12a405 -->|satisfiedBy| a814c4935e1a0449;
   f22d93285fcd7664[&quot;parser.rs&quot;];
   class f22d93285fcd7664 default;
-  click f22d93285fcd7664 &quot;../../core/src/parser.rs&quot;;
-  af98a411c9028161 -->|satisfiedBy| f22d93285fcd7664;
-  50f68924a7a176df[&quot;Fragment Normalization Test&quot;];
-  class 50f68924a7a176df verification;
-  click 50f68924a7a176df &quot;ParsingAndValidationVerifications.html#fragment-normalization-test&quot;;
-  af98a411c9028161 -.->|verifiedBy| 50f68924a7a176df;
-  c661b225443ae709[&quot;Relation Types and behaviors&quot;];
-  class c661b225443ae709 systemRequirement;
-  click c661b225443ae709 &quot;ModelManagement.html#relation-types-and-behaviors&quot;;
-  6e6ce5b5e93ac423 -.->|deriveReqT| c661b225443ae709;
+  click f22d93285fcd7664 &quot;../../../core/src/parser.rs&quot;;
+  b0cc2fce0e12a405 -->|satisfiedBy| f22d93285fcd7664;
+  9434925eb2b35c3[&quot;Fragment Normalization Test&quot;];
+  class 9434925eb2b35c3 verification;
+  click 9434925eb2b35c3 &quot;Verifications/ParsingVerifications.html#fragment-normalization-test&quot;;
+  b0cc2fce0e12a405 -.->|verifiedBy| 9434925eb2b35c3;
+  c3c6a63530e5e37b[&quot;Relation Types and behaviors&quot;];
+  class c3c6a63530e5e37b systemRequirement;
+  click c3c6a63530e5e37b &quot;ModelManagement.html#relation-types-and-behaviors&quot;;
+  43dcbb7ab74ba45e -.->|deriveReqT| c3c6a63530e5e37b;
   9450d4313f47ef36[&quot;relation.rs&quot;];
   class 9450d4313f47ef36 default;
-  click 9450d4313f47ef36 &quot;../../core/src/relation.rs&quot;;
-  6e6ce5b5e93ac423 -->|satisfiedBy| 9450d4313f47ef36;
-  400e3d7614d84c23[&quot;Invalid Relations Test&quot;];
-  class 400e3d7614d84c23 verification;
-  click 400e3d7614d84c23 &quot;Validation.html#invalid-relations-test&quot;;
-  6e6ce5b5e93ac423 -.->|verifiedBy| 400e3d7614d84c23;
-  8621d0377762987f[&quot;Specification File Identification&quot;];
-  class 8621d0377762987f systemRequirement;
-  click 8621d0377762987f &quot;StructureAndParsing.html#specification-file-identification&quot;;
-  d50a859650933e55[&quot;model.rs&quot;];
-  class d50a859650933e55 default;
-  click d50a859650933e55 &quot;../../core/src/model.rs&quot;;
-  8621d0377762987f -->|satisfiedBy| d50a859650933e55;
-  f22d93285fcd7664[&quot;parser.rs&quot;];
-  class f22d93285fcd7664 default;
-  click f22d93285fcd7664 &quot;../../core/src/parser.rs&quot;;
-  8621d0377762987f -->|satisfiedBy| f22d93285fcd7664;
-  4f1291b0d2ff9aaf[&quot;Specification File Identification Test&quot;];
-  class 4f1291b0d2ff9aaf verification;
-  click 4f1291b0d2ff9aaf &quot;ParsingAndValidationVerifications.html#specification-file-identification-test&quot;;
-  8621d0377762987f -.->|verifiedBy| 4f1291b0d2ff9aaf;
-  9da2c9df563c07bb[&quot;Structure and Addressing in Markdown Documents&quot;];
-  class 9da2c9df563c07bb systemRequirement;
-  click 9da2c9df563c07bb &quot;StructureAndParsing.html#structure-and-addressing-in-markdown-documents&quot;;
-  39b03efc9e2074f5[&quot;Create Element Operation&quot;];
-  class 39b03efc9e2074f5 systemRequirement;
-  click 39b03efc9e2074f5 &quot;ElementManipulation.html#create-element-operation&quot;;
-  9da2c9df563c07bb -.->|deriveReqT| 39b03efc9e2074f5;
-  9da2c9df563c07bb -.->|deriveReqT| af98a411c9028161;
-  1d0bfcae44a9063[&quot;Reserved Subsections Support&quot;];
-  class 1d0bfcae44a9063 systemRequirement;
-  click 1d0bfcae44a9063 &quot;Subsections.html#reserved-subsections-support&quot;;
-  9da2c9df563c07bb -.->|deriveReqT| 1d0bfcae44a9063;
+  click 9450d4313f47ef36 &quot;../../../core/src/relation.rs&quot;;
+  43dcbb7ab74ba45e -->|satisfiedBy| 9450d4313f47ef36;
+  19db7c09ab210848[&quot;Invalid Relations Test&quot;];
+  class 19db7c09ab210848 verification;
+  click 19db7c09ab210848 &quot;Verifications/ValidationVerifications.html#invalid-relations-test&quot;;
+  43dcbb7ab74ba45e -.->|verifiedBy| 19db7c09ab210848;
+  bd0604b1a72a0172[&quot;Reserved Subsections Support&quot;];
+  class bd0604b1a72a0172 systemRequirement;
+  click bd0604b1a72a0172 &quot;StructureAndParsing.html#reserved-subsections-support&quot;;
+  a957c400a0de2045[&quot;Attachment Commands&quot;];
+  class a957c400a0de2045 systemRequirement;
+  click a957c400a0de2045 &quot;../../Interfaces/CLI.html#attachment-commands&quot;;
+  bd0604b1a72a0172 -.->|deriveReqT| a957c400a0de2045;
+  e342a2a82ef67934[&quot;CLI Search Command&quot;];
+  class e342a2a82ef67934 systemRequirement;
+  click e342a2a82ef67934 &quot;../../Interfaces/CLI.html#cli-search-command&quot;;
+  bd0604b1a72a0172 -.->|deriveReqT| e342a2a82ef67934;
+  15fbadeac35968b9[&quot;Supported Element Types&quot;];
+  class 15fbadeac35968b9 systemRequirement;
+  click 15fbadeac35968b9 &quot;ModelManagement.html#supported-element-types&quot;;
+  bd0604b1a72a0172 -.->|deriveReqT| 15fbadeac35968b9;
+  ea60608d4ce12d93[&quot;Verification Type Categories&quot;];
+  class ea60608d4ce12d93 systemRequirement;
+  click ea60608d4ce12d93 &quot;ModelManagement.html#verification-type-categories&quot;;
+  bd0604b1a72a0172 -.->|deriveReqT| ea60608d4ce12d93;
   a814c4935e1a0449[&quot;element.rs&quot;];
   class a814c4935e1a0449 default;
-  click a814c4935e1a0449 &quot;../../core/src/element.rs&quot;;
-  9da2c9df563c07bb -->|satisfiedBy| a814c4935e1a0449;
-  d50a859650933e55[&quot;model.rs&quot;];
-  class d50a859650933e55 default;
-  click d50a859650933e55 &quot;../../core/src/model.rs&quot;;
-  9da2c9df563c07bb -->|satisfiedBy| d50a859650933e55;
+  click a814c4935e1a0449 &quot;../../../core/src/element.rs&quot;;
+  bd0604b1a72a0172 -->|satisfiedBy| a814c4935e1a0449;
   f22d93285fcd7664[&quot;parser.rs&quot;];
   class f22d93285fcd7664 default;
-  click f22d93285fcd7664 &quot;../../core/src/parser.rs&quot;;
-  9da2c9df563c07bb -->|satisfiedBy| f22d93285fcd7664;
+  click f22d93285fcd7664 &quot;../../../core/src/parser.rs&quot;;
+  bd0604b1a72a0172 -->|satisfiedBy| f22d93285fcd7664;
+  bfad224e68f0c92b[&quot;Attachment Output Rendering Verification&quot;];
+  class bfad224e68f0c92b verification;
+  click bfad224e68f0c92b &quot;Verifications/AttachmentsVerifications.html#attachment-output-rendering-verification&quot;;
+  bd0604b1a72a0172 -.->|verifiedBy| bfad224e68f0c92b;
+  edbc73b37eb9cbe[&quot;Attachments Subsection Parsing Verification&quot;];
+  class edbc73b37eb9cbe verification;
+  click edbc73b37eb9cbe &quot;Verifications/AttachmentsVerifications.html#attachments-subsection-parsing-verification&quot;;
+  bd0604b1a72a0172 -.->|verifiedBy| edbc73b37eb9cbe;
+  cd463a2ba2fbdafc[&quot;Attachments Validation Verification&quot;];
+  class cd463a2ba2fbdafc verification;
+  click cd463a2ba2fbdafc &quot;Verifications/AttachmentsVerifications.html#attachments-validation-verification&quot;;
+  bd0604b1a72a0172 -.->|verifiedBy| cd463a2ba2fbdafc;
+  908de1f59852b43a[&quot;Element Subsection Parsing Test&quot;];
+  class 908de1f59852b43a verification;
+  click 908de1f59852b43a &quot;Verifications/ParsingVerifications.html#element-subsection-parsing-test&quot;;
+  bd0604b1a72a0172 -.->|verifiedBy| 908de1f59852b43a;
+  f9e98bd82d03a3ae[&quot;Specification File Identification&quot;];
+  class f9e98bd82d03a3ae systemRequirement;
+  click f9e98bd82d03a3ae &quot;StructureAndParsing.html#specification-file-identification&quot;;
+  d50a859650933e55[&quot;model.rs&quot;];
+  class d50a859650933e55 default;
+  click d50a859650933e55 &quot;../../../core/src/model.rs&quot;;
+  f9e98bd82d03a3ae -->|satisfiedBy| d50a859650933e55;
+  f22d93285fcd7664[&quot;parser.rs&quot;];
+  class f22d93285fcd7664 default;
+  click f22d93285fcd7664 &quot;../../../core/src/parser.rs&quot;;
+  f9e98bd82d03a3ae -->|satisfiedBy| f22d93285fcd7664;
+  bb3aec581adb8afc[&quot;Specification File Identification Test&quot;];
+  class bb3aec581adb8afc verification;
+  click bb3aec581adb8afc &quot;Verifications/ParsingVerifications.html#specification-file-identification-test&quot;;
+  f9e98bd82d03a3ae -.->|verifiedBy| bb3aec581adb8afc;
+  a9d5a1da8c1265be[&quot;Structure and Addressing in Markdown Documents&quot;];
+  class a9d5a1da8c1265be systemRequirement;
+  click a9d5a1da8c1265be &quot;StructureAndParsing.html#structure-and-addressing-in-markdown-documents&quot;;
+  a9d5a1da8c1265be -.->|deriveReqT| b0cc2fce0e12a405;
+  a9d5a1da8c1265be -.->|deriveReqT| bd0604b1a72a0172;
+  40ff83bf78b6e993[&quot;Create Element Operation&quot;];
+  class 40ff83bf78b6e993 systemRequirement;
+  click 40ff83bf78b6e993 &quot;../Operations/ElementManipulation.html#create-element-operation&quot;;
+  a9d5a1da8c1265be -.->|deriveReqT| 40ff83bf78b6e993;
+  a814c4935e1a0449[&quot;element.rs&quot;];
+  class a814c4935e1a0449 default;
+  click a814c4935e1a0449 &quot;../../../core/src/element.rs&quot;;
+  a9d5a1da8c1265be -->|satisfiedBy| a814c4935e1a0449;
+  d50a859650933e55[&quot;model.rs&quot;];
+  class d50a859650933e55 default;
+  click d50a859650933e55 &quot;../../../core/src/model.rs&quot;;
+  a9d5a1da8c1265be -->|satisfiedBy| d50a859650933e55;
+  f22d93285fcd7664[&quot;parser.rs&quot;];
+  class f22d93285fcd7664 default;
+  click f22d93285fcd7664 &quot;../../../core/src/parser.rs&quot;;
+  a9d5a1da8c1265be -->|satisfiedBy| f22d93285fcd7664;
   9450d4313f47ef36[&quot;relation.rs&quot;];
   class 9450d4313f47ef36 default;
-  click 9450d4313f47ef36 &quot;../../core/src/relation.rs&quot;;
-  9da2c9df563c07bb -->|satisfiedBy| 9450d4313f47ef36;
+  click 9450d4313f47ef36 &quot;../../../core/src/relation.rs&quot;;
+  a9d5a1da8c1265be -->|satisfiedBy| 9450d4313f47ef36;
   398003c91b6b2cde[&quot;subsection.rs&quot;];
   class 398003c91b6b2cde default;
-  click 398003c91b6b2cde &quot;../../core/src/subsection.rs&quot;;
-  9da2c9df563c07bb -->|satisfiedBy| 398003c91b6b2cde;
-  11434b30ee3de97b[&quot;Format Command Requirements Verification&quot;];
-  class 11434b30ee3de97b verification;
-  click 11434b30ee3de97b &quot;Formatting.html#format-command-requirements-verification&quot;;
-  9da2c9df563c07bb -.->|verifiedBy| 11434b30ee3de97b;
-  2fc995cfff6720de[&quot;Invalid Header Structure Test&quot;];
-  class 2fc995cfff6720de verification;
-  click 2fc995cfff6720de &quot;Validation.html#invalid-header-structure-test&quot;;
-  9da2c9df563c07bb -.->|verifiedBy| 2fc995cfff6720de;
+  click 398003c91b6b2cde &quot;../../../core/src/subsection.rs&quot;;
+  a9d5a1da8c1265be -->|satisfiedBy| 398003c91b6b2cde;
+  917f1e41f3a856bb[&quot;Invalid Header Structure Test&quot;];
+  class 917f1e41f3a856bb verification;
+  click 917f1e41f3a856bb &quot;Verifications/ValidationVerifications.html#invalid-header-structure-test&quot;;
+  a9d5a1da8c1265be -.->|verifiedBy| 917f1e41f3a856bb;
+  8711fb43b402dd78[&quot;Format Command Requirements Verification&quot;];
+  class 8711fb43b402dd78 verification;
+  click 8711fb43b402dd78 &quot;../Operations/Verifications/FormattingVerifications.html#format-command-requirements-verification&quot;;
+  a9d5a1da8c1265be -.->|verifiedBy| 8711fb43b402dd78;
   8c8c33ba0c6249d1[&quot;AI-Assisted System Model Management&quot;];
   class 8c8c33ba0c6249d1 userRequirement;
-  click 8c8c33ba0c6249d1 &quot;../UserStories.html#ai-assisted-system-model-management&quot;;
-  8c8c33ba0c6249d1 -.->|deriveReqT| 6e6ce5b5e93ac423;
+  click 8c8c33ba0c6249d1 &quot;../../UserStories.html#ai-assisted-system-model-management&quot;;
+  8c8c33ba0c6249d1 -.->|deriveReqT| 43dcbb7ab74ba45e;
   3f1b65e8cdc9ec2[&quot;Managing System Models&quot;];
   class 3f1b65e8cdc9ec2 userRequirement;
-  click 3f1b65e8cdc9ec2 &quot;../UserStories.html#managing-system-models&quot;;
+  click 3f1b65e8cdc9ec2 &quot;../../UserStories.html#managing-system-models&quot;;
   1ac3e4fc194fd9d[&quot;CLI interface&quot;];
   class 1ac3e4fc194fd9d userRequirement;
-  click 1ac3e4fc194fd9d &quot;../Interfaces/Interfaces.html#cli-interface&quot;;
+  click 1ac3e4fc194fd9d &quot;../../Interfaces/Interfaces.html#cli-interface&quot;;
   3f1b65e8cdc9ec2 -.->|deriveReqT| 1ac3e4fc194fd9d;
   adfe41db00d52285[&quot;Web Interface&quot;];
   class adfe41db00d52285 userRequirement;
-  click adfe41db00d52285 &quot;../Interfaces/Interfaces.html#web-interface&quot;;
+  click adfe41db00d52285 &quot;../../Interfaces/Interfaces.html#web-interface&quot;;
   3f1b65e8cdc9ec2 -.->|deriveReqT| adfe41db00d52285;
-  fc73aaf423ccdbca[&quot;Coexistence of Structured and Unstructured Documents&quot;];
-  class fc73aaf423ccdbca userRequirement;
-  click fc73aaf423ccdbca &quot;ModelManagement.html#coexistence-of-structured-and-unstructured-documents&quot;;
-  3f1b65e8cdc9ec2 -.->|deriveReqT| fc73aaf423ccdbca;
-  6809edf871add06a[&quot;Default Requirement Type Assignment&quot;];
-  class 6809edf871add06a userRequirement;
-  click 6809edf871add06a &quot;ModelManagement.html#default-requirement-type-assignment&quot;;
-  3f1b65e8cdc9ec2 -.->|deriveReqT| 6809edf871add06a;
-  dd224415c58ae90f[&quot;Efficient Processing&quot;];
-  class dd224415c58ae90f userRequirement;
-  click dd224415c58ae90f &quot;ModelManagement.html#efficient-processing&quot;;
-  3f1b65e8cdc9ec2 -.->|deriveReqT| dd224415c58ae90f;
-  8653ca8c1766105d[&quot;Element Manipulation Operations&quot;];
-  class 8653ca8c1766105d userRequirement;
-  click 8653ca8c1766105d &quot;ModelManagement.html#element-manipulation-operations&quot;;
-  3f1b65e8cdc9ec2 -.->|deriveReqT| 8653ca8c1766105d;
-  674b333d552bcab0[&quot;Git Repository as Project Root&quot;];
-  class 674b333d552bcab0 userRequirement;
-  click 674b333d552bcab0 &quot;ModelManagement.html#git-repository-as-project-root&quot;;
-  3f1b65e8cdc9ec2 -.->|deriveReqT| 674b333d552bcab0;
-  3f1b65e8cdc9ec2 -.->|deriveReqT| c661b225443ae709;
-  1d5ad841d768c48[&quot;Template-Based Model Bootstrapping&quot;];
-  class 1d5ad841d768c48 userRequirement;
-  click 1d5ad841d768c48 &quot;ModelManagement.html#template-based-model-bootstrapping&quot;;
-  3f1b65e8cdc9ec2 -.->|deriveReqT| 1d5ad841d768c48;
-  3f1b65e8cdc9ec2 -.->|deriveReqT| 8621d0377762987f;
-  3f1b65e8cdc9ec2 -.->|deriveReqT| 9da2c9df563c07bb;
+  c311e0dacd2ee00e[&quot;Coexistence of Structured and Unstructured Documents&quot;];
+  class c311e0dacd2ee00e userRequirement;
+  click c311e0dacd2ee00e &quot;ModelManagement.html#coexistence-of-structured-and-unstructured-documents&quot;;
+  3f1b65e8cdc9ec2 -.->|deriveReqT| c311e0dacd2ee00e;
+  11e96f445182244e[&quot;Default Requirement Type Assignment&quot;];
+  class 11e96f445182244e userRequirement;
+  click 11e96f445182244e &quot;ModelManagement.html#default-requirement-type-assignment&quot;;
+  3f1b65e8cdc9ec2 -.->|deriveReqT| 11e96f445182244e;
+  7667b9a2031d7c5[&quot;Efficient Processing&quot;];
+  class 7667b9a2031d7c5 userRequirement;
+  click 7667b9a2031d7c5 &quot;ModelManagement.html#efficient-processing&quot;;
+  3f1b65e8cdc9ec2 -.->|deriveReqT| 7667b9a2031d7c5;
+  c905891227e4f5f1[&quot;Element Manipulation Operations&quot;];
+  class c905891227e4f5f1 userRequirement;
+  click c905891227e4f5f1 &quot;ModelManagement.html#element-manipulation-operations&quot;;
+  3f1b65e8cdc9ec2 -.->|deriveReqT| c905891227e4f5f1;
+  24f47a13e05f9654[&quot;Git Repository as Project Root&quot;];
+  class 24f47a13e05f9654 userRequirement;
+  click 24f47a13e05f9654 &quot;ModelManagement.html#git-repository-as-project-root&quot;;
+  3f1b65e8cdc9ec2 -.->|deriveReqT| 24f47a13e05f9654;
+  3f1b65e8cdc9ec2 -.->|deriveReqT| c3c6a63530e5e37b;
+  b9dde144234d825c[&quot;Template-Based Model Bootstrapping&quot;];
+  class b9dde144234d825c userRequirement;
+  click b9dde144234d825c &quot;ModelManagement.html#template-based-model-bootstrapping&quot;;
+  3f1b65e8cdc9ec2 -.->|deriveReqT| b9dde144234d825c;
+  3f1b65e8cdc9ec2 -.->|deriveReqT| f9e98bd82d03a3ae;
+  3f1b65e8cdc9ec2 -.->|deriveReqT| a9d5a1da8c1265be;
   3f1b65e8cdc9ec2 -.->|deriveReqT| 8c8c33ba0c6249d1;
 </div>
-<p>This document specifies requirements for markdown document structure, element identification, and relation parsing in Reqvire.</p>
 <h3 id="specification-file-identification">Specification File Identification</h3>
 <p>The system shall only parse markdown files that are identified as specification files. A markdown file is considered a specification file if and only if its first level-1 heading (<code>#</code>) is exactly <code># Requirements</code>. Files not meeting this criterion shall be ignored during model parsing, even if they have a <code>.md</code> extension.</p>
 <h4>Details</h4>
@@ -663,10 +833,137 @@ blockquote {
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>derivedFrom: <a href="../UserStories.html#managing-system-models">Managing System Models</a></li>
-<li>verifiedBy: <a href="ParsingAndValidationVerifications.html#specification-file-identification-test">Specification File Identification Test</a></li>
-<li>satisfiedBy: <a href="../../core/src/parser.rs">parser.rs</a></li>
-<li>satisfiedBy: <a href="../../core/src/model.rs">model.rs</a></li>
+<li>derivedFrom: <a href="../../UserStories.html#managing-system-models">Managing System Models</a></li>
+<li>verifiedBy: <a href="Verifications/ParsingVerifications.html#specification-file-identification-test">Specification File Identification Test</a></li>
+<li>satisfiedBy: <a href="../../../core/src/parser.rs">parser.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/model.rs">model.rs</a></li>
+</ul>
+<hr />
+<h3 id="reserved-subsections-support">Reserved Subsections Support</h3>
+<p>The system shall support the following reserved subsections with predefined structure and behavior: Relations, Details, Metadata, and Attachments.</p>
+<h4>Details</h4>
+<p>The system shall support following reserved subsections:</p>
+<ul>
+<li><strong>Relations</strong>: Define relationships between elements</li>
+<li><strong>Details</strong>: Extend requirement text with additional information</li>
+<li><strong>Metadata</strong>: Define element type and classification</li>
+<li><strong>Attachments</strong>: Link external documents</li>
+</ul>
+<p>Each reserved subsection has specific parsing rules, validation requirements, and behaviors.</p>
+<details>
+<summary>View Full Specification</summary>
+<h2 id="relations-subsection">Relations Subsection</h2>
+<p>Must be defined with a level 4 header: <code>#### Relations</code>.</p>
+<p>The Relations subsection defines relationships between elements using markdown bullet list syntax.</p>
+<p><strong>Parsing Rules:</strong></p>
+<ul>
+<li>Relation entries are bullet points starting with <code>*</code></li>
+<li>Format: <code>* relationType: [Element Name](path#element-id)</code></li>
+<li>Duplicate relation entries within the same <code>#### Relations</code> subsection are not allowed</li>
+</ul>
+<p><strong>Examples:</strong></p>
+<pre><code class="language-markdown">#### Relations
+* derivedFrom: [Parent Requirement](../path/file.html#parent)
+* satisfiedBy: [Implementation](../../src/module.rs)
+* verifies: [Target Requirement](file.html#target)
+</code></pre>
+<h2 id="details-subsection">Details Subsection</h2>
+<p>Must be defined with a level 4 header: <code>#### Details</code>.</p>
+<p>The Details subsection provides additional information directly related to the main requirement text.</p>
+<p><strong>Parsing Rules:</strong></p>
+<ul>
+<li>When parsing <code>#### Details</code> subsections, any markdown headers or elements within <code>&lt;details&gt;...&lt;/details&gt;</code> tags are skipped</li>
+<li>Content within the Details subsection is considered an <strong>extension of the requirement text</strong></li>
+<li>It serves the same purpose as refinement relation in other MBSE tools and SysML</li>
+<li>Any statements in the Details subsection hold the same validity as the main requirement text</li>
+</ul>
+<p><strong>Examples:</strong></p>
+<pre><code class="language-markdown">### My Requirement
+
+The system shall perform action X.
+
+#### Details
+Additional context about action X:
+- Constraint 1
+- Constraint 2
+- Performance requirement
+</code></pre>
+<h2 id="metadata-subsection">Metadata Subsection</h2>
+<p>Must be defined with a level 4 header: <code>#### Metadata</code>.</p>
+<p>The Metadata subsection stores element properties including type and custom attributes.</p>
+<p><strong>Parsing Rules:</strong></p>
+<ul>
+<li>Contains properties in list format: <code>* property_name: property_value</code></li>
+<li>Property entries are listed as bullet points (<code>*</code>), with <strong>two spaces</strong> (<code>  *</code>) of indentation followed by property_name + ’: ’ + property_value</li>
+<li>May include any custom properties, not just <code>type</code></li>
+</ul>
+<p><strong>Reserved Properties:</strong></p>
+<p>The following properties have special meaning:</p>
+<ul>
+<li><code>type</code>: Defines the element type (supported types are defined in <a href="ModelManagement.html#supported-element-types">Supported Element Types</a>)</li>
+<li>Additional reserved properties may be defined in future releases</li>
+</ul>
+<p><strong>Examples:</strong></p>
+<pre><code class="language-markdown">### My Element
+
+This is a verification element.
+
+#### Metadata
+  * type: verification
+  * priority: high
+  * owner: team-a
+
+#### Relations
+* verifies: [Some Requirement](#some-requirement)
+</code></pre>
+<pre><code class="language-markdown">### My Element
+
+This is a verification element.
+
+#### Details
+Some details.
+
+#### Metadata
+  * type: verification
+  * priority: high
+  * owner: team-a
+
+#### Relations
+  * verifies: [Some Requirement](#some-requirement)
+</code></pre>
+<h2 id="attachments-subsection">Attachments Subsection</h2>
+<p>Must be defined with a level 4 header: <code>#### Attachments</code>.</p>
+<p>The Attachments subsection links external documents to requirements.</p>
+<p><strong>Parsing Rules:</strong></p>
+<ul>
+<li>Support markdown link syntax: <code>* [path](path)</code></li>
+<li>Link text equals path (git-root-relative)</li>
+<li>Many-to-many relationship (multiple requirements can link same document)</li>
+<li>Never parse attachment files (treat as opaque)</li>
+<li>Auto-cleanup: remove subsection when empty</li>
+</ul>
+<p><strong>Validation Rules (Pass 2):</strong></p>
+<ul>
+<li>Verify file existence on filesystem</li>
+<li>Validate markdown link format: <code>[path](path)</code></li>
+<li>Detect duplicate attachments within element</li>
+<li>Report missing attachment targets as validation errors</li>
+</ul>
+<p><strong>Examples:</strong></p>
+<pre><code class="language-markdown">### System Performance Requirements
+
+The system shall meet defined performance criteria.
+
+#### Attachments
+* [docs/SLO.pdf](docs/SLO.pdf)
+* [docs/benchmarks.xlsx](docs/benchmarks.xlsx)
+</code></pre>
+</details>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#structure-and-addressing-in-markdown-documents">Structure and Addressing in Markdown Documents</a></li>
+<li>satisfiedBy: <a href="../../../core/src/element.rs">element.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/parser.rs">parser.rs</a></li>
 </ul>
 <hr />
 <h3 id="structure-and-addressing-in-markdown-documents">Structure and Addressing in Markdown Documents</h3>
@@ -796,12 +1093,12 @@ Each element chunk can have <strong>at most one</strong> <code>#### SubsectionNa
 </details>
 <h4>Relations</h4>
 <ul>
-<li>derivedFrom: <a href="../UserStories.html#managing-system-models">Managing System Models</a></li>
-<li>satisfiedBy: <a href="../../core/src/relation.rs">relation.rs</a></li>
-<li>satisfiedBy: <a href="../../core/src/element.rs">element.rs</a></li>
-<li>satisfiedBy: <a href="../../core/src/subsection.rs">subsection.rs</a></li>
-<li>satisfiedBy: <a href="../../core/src/parser.rs">parser.rs</a></li>
-<li>satisfiedBy: <a href="../../core/src/model.rs">model.rs</a></li>
+<li>derivedFrom: <a href="../../UserStories.html#managing-system-models">Managing System Models</a></li>
+<li>satisfiedBy: <a href="../../../core/src/relation.rs">relation.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/element.rs">element.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/subsection.rs">subsection.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/parser.rs">parser.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/model.rs">model.rs</a></li>
 </ul>
 <hr />
 <h3 id="identifiers-and-relations">Identifiers and Relations</h3>
@@ -1085,8 +1382,8 @@ This element contains invalid relation entries.
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#element-identity-model">Element Identity Model</a></li>
-<li>derivedFrom: <a href="../UserStories.html#ai-assisted-system-model-management">AI-Assisted System Model Management</a></li>
-<li>satisfiedBy: <a href="../../core/src/relation.rs">relation.rs</a></li>
+<li>derivedFrom: <a href="../../UserStories.html#ai-assisted-system-model-management">AI-Assisted System Model Management</a></li>
+<li>satisfiedBy: <a href="../../../core/src/relation.rs">relation.rs</a></li>
 </ul>
 <hr />
 <h3 id="element-identity-model">Element Identity Model</h3>
@@ -1214,8 +1511,8 @@ Content here.
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#structure-and-addressing-in-markdown-documents">Structure and Addressing in Markdown Documents</a></li>
-<li>satisfiedBy: <a href="../../core/src/element.rs">element.rs</a></li>
-<li>satisfiedBy: <a href="../../core/src/parser.rs">parser.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/element.rs">element.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/parser.rs">parser.rs</a></li>
 </ul>
 <hr />
 

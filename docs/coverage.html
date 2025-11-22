@@ -4,8 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>coverage</title>
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+    <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
     
 <style>
+:root {
+    /* Primary Colors */
+    --color-primary: #1E3A5F;           /* Deep Sapphire - navigation, headers */
+    --color-primary-hover: #2a4a73;     /* Lighter shade for hover states */
+    --color-primary-active: #15293f;    /* Darker shade for active states */
+
+    /* Element Type Colors */
+    --color-requirement: #2563EB;       /* Royal Blue */
+    --color-verification: #059669;      /* Emerald */
+    --color-design: #7C3AED;            /* Purple */
+    --color-test: #0891B2;              /* Teal */
+    --color-implementation: #D97706;    /* Amber */
+    --color-external: #64748B;          /* Slate */
+
+    /* Status Colors */
+    --color-verified: #059669;          /* Emerald - verified/passing */
+    --color-pending: #D97706;           /* Amber - pending/warning */
+    --color-error: #DC2626;             /* Rose - error/failed */
+
+    /* Interactive Colors */
+    --color-highlight: #ff6b6b;         /* Hover highlight */
+    --color-link: #0366d6;              /* Link color */
+}
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
     line-height: 1.6;
@@ -20,7 +45,7 @@ body {
     left: 0;
     right: 0;
     height: 50px;
-    background-color: #2c3e50;
+    background-color: var(--color-primary);
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     z-index: 1000;
     display: flex;
@@ -28,15 +53,23 @@ body {
     padding: 0 20px;
 }
 .reqvire-nav a {
-    color: #ecf0f1;
+    color: #ffffff;
     text-decoration: none;
     padding: 10px 20px;
     margin-right: 5px;
     border-radius: 3px;
     transition: background-color 0.2s;
 }
+.reqvire-nav a.nav-logo {
+    display: flex;
+    align-items: center;
+    padding: 5px 15px 5px 0;
+}
+.reqvire-nav a.nav-logo img {
+    vertical-align: middle;
+}
 .reqvire-nav a:hover {
-    background-color: #34495e;
+    background-color: var(--color-primary-hover);
 }
 .reqvire-nav-spacer {
     height: 50px;
@@ -64,7 +97,7 @@ h2 {
     padding-bottom: 5px;
 }
 h3 {
-    color: #1a6fb7;
+    color: var(--color-requirement);
     margin-top: 25px;
 }
 h4 {
@@ -72,7 +105,7 @@ h4 {
     font-weight: 600;
 }
 a {
-    color: #0366d6;
+    color: var(--color-link);
     text-decoration: none;
 }
 a:hover {
@@ -159,7 +192,7 @@ blockquote {
 .diagram-nav-btn {
     width: 32px;
     height: 32px;
-    background-color: #2c3e50;
+    background-color: var(--color-primary);
     color: white;
     border: none;
     border-radius: 3px;
@@ -170,10 +203,10 @@ blockquote {
     justify-content: center;
 }
 .diagram-nav-btn:hover {
-    background-color: #34495e;
+    background-color: var(--color-primary-hover);
 }
 .diagram-nav-btn:active {
-    background-color: #1a252f;
+    background-color: var(--color-primary-active);
 }
 </style>
 
@@ -221,17 +254,34 @@ blockquote {
         await mermaid.run();
         window.mermaid = mermaid;
 
+        // Wait for SVGs to be fully rendered, then initialize
+        function waitForSvgs(callback) {
+            var containers = document.querySelectorAll('.mermaid');
+            var allReady = true;
+            containers.forEach(function(c) {
+                var svg = c.querySelector('svg');
+                if (!svg || !svg.getBBox || svg.getBBox().width === 0) {
+                    allReady = false;
+                }
+            });
+            if (allReady && containers.length > 0) {
+                callback();
+            } else {
+                requestAnimationFrame(function() { waitForSvgs(callback); });
+            }
+        }
+
         // Add pan/zoom to all Mermaid diagrams after rendering
-        setTimeout(function() {
+        waitForSvgs(function() {
             document.querySelectorAll('.mermaid').forEach(function(mermaidContainer) {
-                    var svg = mermaidContainer.querySelector('svg');
-                    if (!svg) return;
+                var svg = mermaidContainer.querySelector('svg');
+                if (!svg) return;
 
-                    svg.style.maxWidth = 'none';
-                    svg.style.maxHeight = 'none';
+                svg.style.maxWidth = 'none';
+                svg.style.maxHeight = 'none';
 
-                    var eventsHandler = {
-                        haltEventListeners: ['touchstart', 'touchend', 'touchmove', 'touchleave', 'touchcancel'],
+                var eventsHandler = {
+                    haltEventListeners: ['touchstart', 'touchend', 'touchmove', 'touchleave', 'touchcancel'],
                         init: function(options) {
                             var instance = options.instance;
                             var initialScale = 1;
@@ -323,22 +373,20 @@ blockquote {
                         });
                     });
             });
-        }, 500);
 
-        // Add CSS for edge highlighting (high specificity for SVG)
-        var style = document.createElement('style');
-        style.textContent = `
-            path.edge-highlighted,
-            .edge-highlighted path,
-            svg path.edge-highlighted {
-                stroke: #ff6b6b !important;
-                stroke-width: 3px !important;
-            }
-        `;
-        document.head.appendChild(style);
+            // Add CSS for edge highlighting
+            var style = document.createElement('style');
+            style.textContent = `
+                path.edge-highlighted,
+                .edge-highlighted path,
+                svg path.edge-highlighted {
+                    stroke: #ff6b6b !important;
+                    stroke-width: 3px !important;
+                }
+            `;
+            document.head.appendChild(style);
 
-        // Add edge highlighting on node hover
-        setTimeout(function() {
+            // Initialize edge highlighting for all diagrams
             document.querySelectorAll('.mermaid svg').forEach(function(svg) {
                 var nodes = svg.querySelectorAll('.node');
 
@@ -441,24 +489,98 @@ blockquote {
                            pt.y >= bbox.y - margin && pt.y <= bbox.y + bbox.height + margin;
                 }
 
-                // Map edges to nodes
-                var nodeEdgeMap = {};
-                Object.keys(nodeData).forEach(function(hashId) {
-                    nodeEdgeMap[hashId] = [];
-                    var bbox = nodeData[hashId].bbox;
+                // Build edge connections with direction tracking
+                var edgeConnections = []; // [{path, source, target}]
+                var upstreamOf = {}; // node -> [parent nodes that point TO this node]
+                var downstreamOf = {}; // node -> [child nodes this node points TO]
 
-                    edgePaths.forEach(function(path) {
-                        var points = getPathPoints(path);
-                        for (var i = 0; i < points.length; i++) {
-                            if (isNearBbox(points[i], bbox, 40)) {
-                                if (!nodeEdgeMap[hashId].includes(path)) {
-                                    nodeEdgeMap[hashId].push(path);
-                                }
-                                break;
-                            }
+                Object.keys(nodeData).forEach(function(hashId) {
+                    upstreamOf[hashId] = [];
+                    downstreamOf[hashId] = [];
+                });
+
+                edgePaths.forEach(function(path) {
+                    var points = getPathPoints(path);
+                    if (points.length < 2) return;
+
+                    var startPt = points[0];
+                    var endPt = points[points.length - 1];
+
+                    var sourceNode = null;
+                    var targetNode = null;
+
+                    // Find source and target nodes for this edge
+                    Object.keys(nodeData).forEach(function(hashId) {
+                        var bbox = nodeData[hashId].bbox;
+                        if (isNearBbox(startPt, bbox, 20)) {
+                            sourceNode = hashId;
+                        }
+                        if (isNearBbox(endPt, bbox, 20)) {
+                            targetNode = hashId;
                         }
                     });
+
+                    if (sourceNode && targetNode && sourceNode !== targetNode) {
+                        edgeConnections.push({path: path, source: sourceNode, target: targetNode});
+                        // source -> target means: target's upstream includes source
+                        if (!upstreamOf[targetNode].includes(sourceNode)) {
+                            upstreamOf[targetNode].push(sourceNode);
+                        }
+                        // source -> target means: source's downstream includes target
+                        if (!downstreamOf[sourceNode].includes(targetNode)) {
+                            downstreamOf[sourceNode].push(targetNode);
+                        }
+                    }
                 });
+
+                // Traverse only upstream (to parents/ancestors)
+                function findUpstream(startNodeId) {
+                    var visited = {};
+                    var queue = [startNodeId];
+                    visited[startNodeId] = true;
+
+                    while (queue.length > 0) {
+                        var current = queue.shift();
+                        var parents = upstreamOf[current] || [];
+                        parents.forEach(function(parent) {
+                            if (!visited[parent]) {
+                                visited[parent] = true;
+                                queue.push(parent);
+                            }
+                        });
+                    }
+                    return visited;
+                }
+
+                // Traverse only downstream (to children/descendants)
+                function findDownstream(startNodeId) {
+                    var visited = {};
+                    var queue = [startNodeId];
+                    visited[startNodeId] = true;
+
+                    while (queue.length > 0) {
+                        var current = queue.shift();
+                        var children = downstreamOf[current] || [];
+                        children.forEach(function(child) {
+                            if (!visited[child]) {
+                                visited[child] = true;
+                                queue.push(child);
+                            }
+                        });
+                    }
+                    return visited;
+                }
+
+                // Get edges for connected nodes
+                function getChainEdges(nodeSet) {
+                    var edges = [];
+                    edgeConnections.forEach(function(conn) {
+                        if (nodeSet[conn.source] && nodeSet[conn.target]) {
+                            edges.push(conn.path);
+                        }
+                    });
+                    return edges;
+                }
 
                 // Attach hover handlers
                 nodes.forEach(function(node) {
@@ -473,27 +595,36 @@ blockquote {
                         nodes.forEach(function(n) { n.style.filter = ''; });
                         node.style.filter = 'drop-shadow(0 0 6px #ff6b6b)';
 
-                        var connectedEdges = nodeEdgeMap[hashId] || [];
-                        connectedEdges.forEach(function(path) {
+                        // Find upstream (ancestors) and downstream (descendants) separately
+                        var upstream = findUpstream(hashId);
+                        var downstream = findDownstream(hashId);
+                        // Merge both sets
+                        var allConnected = {};
+                        Object.keys(upstream).forEach(function(k) { allConnected[k] = true; });
+                        Object.keys(downstream).forEach(function(k) { allConnected[k] = true; });
+
+                        var chainEdges = getChainEdges(allConnected);
+                        chainEdges.forEach(function(path) {
                             path.classList.add('edge-highlighted');
                         });
                     });
 
                     node.addEventListener('mouseleave', function() {
                         node.style.filter = '';
-                        var connectedEdges = nodeEdgeMap[hashId] || [];
-                        connectedEdges.forEach(function(path) {
+                        // Remove highlight from all edges
+                        edgePaths.forEach(function(path) {
                             path.classList.remove('edge-highlighted');
                         });
                     });
                 });
             });
-        }, 1000);
+        });
     </script>
 </head>
 <body>
     <nav class="reqvire-nav">
-        <a href="index.html">Home</a>
+        <a href="index.html" class="nav-logo"><img src="assets/logo.png" alt="Reqvire" height="24"></a>
+        <a href="index.html">Index</a>
         <a href="containment.html">Containment</a>
         <a href="model.html">Model</a>
         <a href="whole-model.html">Whole Model</a>
@@ -503,13 +634,15 @@ blockquote {
     <div class="reqvire-nav-spacer"></div>
     <div class="container">
         <div class="content">
-            <h1 id="verification-coverage-report">Verification Coverage Report</h1>
+            <h1 id="verification-coverage">Verification Coverage</h1>
+<p>Coverage analysis focuses on leaf requirements—the most specific requirements that don’t derive other requirements. These represent implementable specifications that should be verified. The report shows verified vs. unverified percentages, broken down by file and type, helping identify gaps in verification coverage across the model.</p>
+<h1 id="verification-coverage-report">Verification Coverage Report</h1>
 <h2 id="summary">Summary</h2>
 <h3 id="leaf-requirements">Leaf Requirements</h3>
 <ul>
-<li><strong>Total Leaf Requirements:</strong> 63</li>
-<li><strong>Verified Leaf Requirements:</strong> 43 (68.3%)</li>
-<li><strong>Unverified Leaf Requirements:</strong> 20</li>
+<li><strong>Total Leaf Requirements:</strong> 64</li>
+<li><strong>Verified Leaf Requirements:</strong> 43 (67.2%)</li>
+<li><strong>Unverified Leaf Requirements:</strong> 21</li>
 </ul>
 <h3 id="test-verifications">Test Verifications</h3>
 <ul>
@@ -536,10 +669,10 @@ blockquote {
 <ul>
 <li>Verified by:
 <ul>
-<li><a href="specifications/System/AttachmentsVerifications.html#remove-attachment-command-verification">specifications/System/AttachmentsVerifications.md#remove-attachment-command-verification</a></li>
-<li><a href="specifications/System/AttachmentsVerifications.html#detach-command-verification">specifications/System/AttachmentsVerifications.md#detach-command-verification</a></li>
-<li><a href="specifications/System/AttachmentsVerifications.html#attach-command-verification">specifications/System/AttachmentsVerifications.md#attach-command-verification</a></li>
-<li><a href="specifications/System/AttachmentsVerifications.html#move-attachment-command-verification">specifications/System/AttachmentsVerifications.md#move-attachment-command-verification</a></li>
+<li><a href="specifications/System/Core/Verifications/AttachmentsVerifications.html#remove-attachment-command-verification">specifications/System/Core/Verifications/AttachmentsVerifications.md#remove-attachment-command-verification</a></li>
+<li><a href="specifications/System/Core/Verifications/AttachmentsVerifications.html#detach-command-verification">specifications/System/Core/Verifications/AttachmentsVerifications.md#detach-command-verification</a></li>
+<li><a href="specifications/System/Core/Verifications/AttachmentsVerifications.html#attach-command-verification">specifications/System/Core/Verifications/AttachmentsVerifications.md#attach-command-verification</a></li>
+<li><a href="specifications/System/Core/Verifications/AttachmentsVerifications.html#move-attachment-command-verification">specifications/System/Core/Verifications/AttachmentsVerifications.md#move-attachment-command-verification</a></li>
 </ul>
 </li>
 </ul>
@@ -548,7 +681,7 @@ blockquote {
 <ul>
 <li>Verified by:
 <ul>
-<li><a href="specifications/System/ElementManipulation.html#cli-add-element-test">specifications/System/ElementManipulation.md#cli-add-element-test</a></li>
+<li><a href="specifications/System/Operations/Verifications/ElementManipulationVerifications.html#cli-add-element-test">specifications/System/Operations/Verifications/ElementManipulationVerifications.md#cli-add-element-test</a></li>
 </ul>
 </li>
 </ul>
@@ -557,11 +690,11 @@ blockquote {
 <ul>
 <li>Verified by:
 <ul>
-<li><a href="specifications/System/ChangeImpact.html#change-impact-analysis-verification">specifications/System/ChangeImpact.md#change-impact-analysis-verification</a></li>
-<li><a href="specifications/Interfaces/CLI.html#cli-help-structure-verification">specifications/Interfaces/CLI.md#cli-help-structure-verification</a></li>
-<li><a href="specifications/System/ChangeImpact.html#change-impact-relations-test">specifications/System/ChangeImpact.md#change-impact-relations-test</a></li>
-<li><a href="specifications/Interfaces/CLI.html#cli-git-commit-hash-flag-test">specifications/Interfaces/CLI.md#cli-git-commit-hash-flag-test</a></li>
-<li><a href="specifications/System/ChangeImpact.html#change-impact-detection-test">specifications/System/ChangeImpact.md#change-impact-detection-test</a></li>
+<li><a href="specifications/Interfaces/Verifications/CLIVerifications.html#cli-help-structure-verification">specifications/Interfaces/Verifications/CLIVerifications.md#cli-help-structure-verification</a></li>
+<li><a href="specifications/System/Processing/Verifications/ChangeImpactVerifications.html#change-impact-relations-test">specifications/System/Processing/Verifications/ChangeImpactVerifications.md#change-impact-relations-test</a></li>
+<li><a href="specifications/System/Processing/Verifications/ChangeImpactVerifications.html#change-impact-analysis-verification">specifications/System/Processing/Verifications/ChangeImpactVerifications.md#change-impact-analysis-verification</a></li>
+<li><a href="specifications/System/Processing/Verifications/ChangeImpactVerifications.html#change-impact-detection-test">specifications/System/Processing/Verifications/ChangeImpactVerifications.md#change-impact-detection-test</a></li>
+<li><a href="specifications/Interfaces/Verifications/CLIVerifications.html#cli-git-commit-hash-flag-test">specifications/Interfaces/Verifications/CLIVerifications.md#cli-git-commit-hash-flag-test</a></li>
 </ul>
 </li>
 </ul>
@@ -570,8 +703,8 @@ blockquote {
 <ul>
 <li>Verified by:
 <ul>
-<li><a href="specifications/System/Reporting.html#verification-coverage-report-test">specifications/System/Reporting.md#verification-coverage-report-test</a></li>
-<li><a href="specifications/Interfaces/CLI.html#cli-help-structure-verification">specifications/Interfaces/CLI.md#cli-help-structure-verification</a></li>
+<li><a href="specifications/System/Output/Verifications/ReportingVerifications.html#verification-coverage-report-test">specifications/System/Output/Verifications/ReportingVerifications.md#verification-coverage-report-test</a></li>
+<li><a href="specifications/Interfaces/Verifications/CLIVerifications.html#cli-help-structure-verification">specifications/Interfaces/Verifications/CLIVerifications.md#cli-help-structure-verification</a></li>
 </ul>
 </li>
 </ul>
@@ -580,8 +713,8 @@ blockquote {
 <ul>
 <li>Verified by:
 <ul>
-<li><a href="specifications/System/DiagramGeneration.html#diagram-generation-test">specifications/System/DiagramGeneration.md#diagram-generation-test</a></li>
-<li><a href="specifications/Interfaces/CLI.html#cli-help-structure-verification">specifications/Interfaces/CLI.md#cli-help-structure-verification</a></li>
+<li><a href="specifications/System/Output/Verifications/DiagramVerifications.html#diagram-generation-test">specifications/System/Output/Verifications/DiagramVerifications.md#diagram-generation-test</a></li>
+<li><a href="specifications/Interfaces/Verifications/CLIVerifications.html#cli-help-structure-verification">specifications/Interfaces/Verifications/CLIVerifications.md#cli-help-structure-verification</a></li>
 </ul>
 </li>
 </ul>
@@ -590,8 +723,8 @@ blockquote {
 <ul>
 <li>Verified by:
 <ul>
-<li><a href="specifications/System/ElementManipulation.html#cli-move-element-test">specifications/System/ElementManipulation.md#cli-move-element-test</a></li>
-<li><a href="specifications/System/Validation.html#subdirectory-processing-verification">specifications/System/Validation.md#subdirectory-processing-verification</a></li>
+<li><a href="specifications/System/Operations/Verifications/ElementManipulationVerifications.html#cli-move-element-test">specifications/System/Operations/Verifications/ElementManipulationVerifications.md#cli-move-element-test</a></li>
+<li><a href="specifications/System/Core/Verifications/ValidationVerifications.html#subdirectory-processing-verification">specifications/System/Core/Verifications/ValidationVerifications.md#subdirectory-processing-verification</a></li>
 </ul>
 </li>
 </ul>
@@ -600,8 +733,8 @@ blockquote {
 <ul>
 <li>Verified by:
 <ul>
-<li><a href="specifications/System/Validation.html#subdirectory-processing-verification">specifications/System/Validation.md#subdirectory-processing-verification</a></li>
-<li><a href="specifications/System/ElementManipulation.html#cli-move-file-test">specifications/System/ElementManipulation.md#cli-move-file-test</a></li>
+<li><a href="specifications/System/Operations/Verifications/ElementManipulationVerifications.html#cli-move-file-test">specifications/System/Operations/Verifications/ElementManipulationVerifications.md#cli-move-file-test</a></li>
+<li><a href="specifications/System/Core/Verifications/ValidationVerifications.html#subdirectory-processing-verification">specifications/System/Core/Verifications/ValidationVerifications.md#subdirectory-processing-verification</a></li>
 </ul>
 </li>
 </ul>
@@ -610,8 +743,8 @@ blockquote {
 <ul>
 <li>Verified by:
 <ul>
-<li><a href="specifications/System/DiagramGeneration.html#remove-generated-diagrams-verification">specifications/System/DiagramGeneration.md#remove-generated-diagrams-verification</a></li>
-<li><a href="specifications/Interfaces/CLI.html#cli-help-structure-verification">specifications/Interfaces/CLI.md#cli-help-structure-verification</a></li>
+<li><a href="specifications/System/Output/Verifications/DiagramVerifications.html#remove-generated-diagrams-verification">specifications/System/Output/Verifications/DiagramVerifications.md#remove-generated-diagrams-verification</a></li>
+<li><a href="specifications/Interfaces/Verifications/CLIVerifications.html#cli-help-structure-verification">specifications/Interfaces/Verifications/CLIVerifications.md#cli-help-structure-verification</a></li>
 </ul>
 </li>
 </ul>
@@ -620,7 +753,7 @@ blockquote {
 <ul>
 <li>Verified by:
 <ul>
-<li><a href="specifications/System/ElementManipulation.html#cli-remove-element-test">specifications/System/ElementManipulation.md#cli-remove-element-test</a></li>
+<li><a href="specifications/System/Operations/Verifications/ElementManipulationVerifications.html#cli-remove-element-test">specifications/System/Operations/Verifications/ElementManipulationVerifications.md#cli-remove-element-test</a></li>
 </ul>
 </li>
 </ul>
@@ -629,7 +762,7 @@ blockquote {
 <ul>
 <li>Verified by:
 <ul>
-<li><a href="specifications/System/ElementManipulation.html#cli-rename-element-test">specifications/System/ElementManipulation.md#cli-rename-element-test</a></li>
+<li><a href="specifications/System/Operations/Verifications/ElementManipulationVerifications.html#cli-rename-element-test">specifications/System/Operations/Verifications/ElementManipulationVerifications.md#cli-rename-element-test</a></li>
 </ul>
 </li>
 </ul>
@@ -638,9 +771,9 @@ blockquote {
 <ul>
 <li>Verified by:
 <ul>
-<li><a href="specifications/System/Reporting.html#search-command-tests">specifications/System/Reporting.md#search-command-tests</a></li>
-<li><a href="specifications/System/AttachmentsVerifications.html#attachment-search-filters-verification">specifications/System/AttachmentsVerifications.md#attachment-search-filters-verification</a></li>
-<li><a href="specifications/Interfaces/CLI.html#cli-help-structure-verification">specifications/Interfaces/CLI.md#cli-help-structure-verification</a></li>
+<li><a href="specifications/System/Output/Verifications/ReportingVerifications.html#search-command-tests">specifications/System/Output/Verifications/ReportingVerifications.md#search-command-tests</a></li>
+<li><a href="specifications/Interfaces/Verifications/CLIVerifications.html#cli-help-structure-verification">specifications/Interfaces/Verifications/CLIVerifications.md#cli-help-structure-verification</a></li>
+<li><a href="specifications/System/Core/Verifications/AttachmentsVerifications.html#attachment-search-filters-verification">specifications/System/Core/Verifications/AttachmentsVerifications.md#attachment-search-filters-verification</a></li>
 </ul>
 </li>
 </ul>
@@ -649,9 +782,9 @@ blockquote {
 <ul>
 <li>Verified by:
 <ul>
-<li><a href="specifications/System/Reporting.html#verification-traces-filter-options-test">specifications/System/Reporting.md#verification-traces-filter-options-test</a></li>
-<li><a href="specifications/System/Reporting.html#verification-traces-from-folder-test">specifications/System/Reporting.md#verification-traces-from-folder-test</a></li>
-<li><a href="specifications/Interfaces/CLI.html#cli-help-structure-verification">specifications/Interfaces/CLI.md#cli-help-structure-verification</a></li>
+<li><a href="specifications/Interfaces/Verifications/CLIVerifications.html#cli-help-structure-verification">specifications/Interfaces/Verifications/CLIVerifications.md#cli-help-structure-verification</a></li>
+<li><a href="specifications/System/Output/Verifications/ReportingVerifications.html#verification-traces-from-folder-test">specifications/System/Output/Verifications/ReportingVerifications.md#verification-traces-from-folder-test</a></li>
+<li><a href="specifications/System/Output/Verifications/ReportingVerifications.html#verification-traces-filter-options-test">specifications/System/Output/Verifications/ReportingVerifications.md#verification-traces-filter-options-test</a></li>
 </ul>
 </li>
 </ul>
@@ -660,8 +793,8 @@ blockquote {
 <ul>
 <li>Verified by:
 <ul>
-<li><a href="specifications/System/Formatting.html#format-command-requirements-verification">specifications/System/Formatting.md#format-command-requirements-verification</a></li>
-<li><a href="specifications/Interfaces/CLI.html#cli-help-structure-verification">specifications/Interfaces/CLI.md#cli-help-structure-verification</a></li>
+<li><a href="specifications/System/Operations/Verifications/FormattingVerifications.html#format-command-requirements-verification">specifications/System/Operations/Verifications/FormattingVerifications.md#format-command-requirements-verification</a></li>
+<li><a href="specifications/Interfaces/Verifications/CLIVerifications.html#cli-help-structure-verification">specifications/Interfaces/Verifications/CLIVerifications.md#cli-help-structure-verification</a></li>
 </ul>
 </li>
 </ul>
@@ -670,8 +803,8 @@ blockquote {
 <ul>
 <li>Verified by:
 <ul>
-<li><a href="specifications/Interfaces/CLI.html#cli-help-structure-verification">specifications/Interfaces/CLI.md#cli-help-structure-verification</a></li>
-<li><a href="specifications/System/Validation.html#invalid-relations-test">specifications/System/Validation.md#invalid-relations-test</a></li>
+<li><a href="specifications/Interfaces/Verifications/CLIVerifications.html#cli-help-structure-verification">specifications/Interfaces/Verifications/CLIVerifications.md#cli-help-structure-verification</a></li>
+<li><a href="specifications/System/Core/Verifications/ValidationVerifications.html#invalid-relations-test">specifications/System/Core/Verifications/ValidationVerifications.md#invalid-relations-test</a></li>
 </ul>
 </li>
 </ul>
@@ -683,300 +816,300 @@ blockquote {
 <ul>
 <li>Verified by:
 <ul>
-<li><a href="specifications/Interfaces/WebInterface.html#serve-command-verification">specifications/Interfaces/WebInterface.md#serve-command-verification</a></li>
+<li><a href="specifications/Interfaces/Verifications/WebInterfaceVerifications.html#serve-command-verification">specifications/Interfaces/Verifications/WebInterfaceVerifications.md#serve-command-verification</a></li>
 </ul>
 </li>
 </ul>
 </li>
 </ul>
-<h3><a href="specifications/System/ChangeImpact.html">specifications/System/ChangeImpact.html</a></h3>
+<h3><a href="specifications/System/Core/Configuration.html">specifications/System/Core/Configuration.html</a></h3>
 <ul>
-<li>✅ <strong><a href="specifications/System/ChangeImpact.html#requirements-change-propagation">Requirements Change Propagation</a></strong>
+<li>✅ <strong><a href="specifications/System/Core/Configuration.html#reserved-repository-files-exclusion">Reserved Repository Files Exclusion</a></strong>
 <ul>
 <li>Verified by:
 <ul>
-<li><a href="specifications/System/ChangeImpact.html#element-content-extraction-test">specifications/System/ChangeImpact.md#element-content-extraction-test</a></li>
-<li><a href="specifications/System/ChangeImpact.html#change-impact-smart-filtering-test">specifications/System/ChangeImpact.md#change-impact-smart-filtering-test</a></li>
-<li><a href="specifications/System/AttachmentsVerifications.html#attachments-change-impact-verification">specifications/System/AttachmentsVerifications.md#attachments-change-impact-verification</a></li>
-<li><a href="specifications/System/ChangeImpact.html#change-impact-relations-test">specifications/System/ChangeImpact.md#change-impact-relations-test</a></li>
-<li><a href="specifications/System/ChangeImpact.html#change-impact-detection-test">specifications/System/ChangeImpact.md#change-impact-detection-test</a></li>
+<li><a href="specifications/System/Core/Verifications/ValidationVerifications.html#file-exclusion-test">specifications/System/Core/Verifications/ValidationVerifications.md#file-exclusion-test</a></li>
 </ul>
 </li>
 </ul>
 </li>
-</ul>
-<h3><a href="specifications/System/Configuration.html">specifications/System/Configuration.html</a></h3>
-<ul>
-<li>✅ <strong><a href="specifications/System/Configuration.html#reserved-repository-files-exclusion">Reserved Repository Files Exclusion</a></strong>
+<li>✅ <strong><a href="specifications/System/Core/Configuration.html#structured-markdown-files-search-and-detection">Structured Markdown Files Search and Detection</a></strong>
 <ul>
 <li>Verified by:
 <ul>
-<li><a href="specifications/System/Validation.html#file-exclusion-test">specifications/System/Validation.md#file-exclusion-test</a></li>
+<li><a href="specifications/System/Core/Verifications/ValidationVerifications.html#requirements-files-search-and-detection-test">specifications/System/Core/Verifications/ValidationVerifications.md#requirements-files-search-and-detection-test</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li>✅ <strong><a href="specifications/System/Configuration.html#structured-markdown-files-search-and-detection">Structured Markdown Files Search and Detection</a></strong>
+</ul>
+<h3><a href="specifications/System/Core/ModelManagement.html">specifications/System/Core/ModelManagement.html</a></h3>
+<ul>
+<li>✅ <strong><a href="specifications/System/Core/ModelManagement.html#default-requirement-type-assignment">Default Requirement Type Assignment</a></strong>
 <ul>
 <li>Verified by:
 <ul>
-<li><a href="specifications/System/Validation.html#requirements-files-search-and-detection-test">specifications/System/Validation.md#requirements-files-search-and-detection-test</a></li>
+<li><a href="specifications/System/Core/Verifications/ParsingVerifications.html#element-subsection-parsing-test">specifications/System/Core/Verifications/ParsingVerifications.md#element-subsection-parsing-test</a></li>
+<li><a href="specifications/System/Core/Verifications/ValidationVerifications.html#default-element-type-assignment-test">specifications/System/Core/Verifications/ValidationVerifications.md#default-element-type-assignment-test</a></li>
 </ul>
 </li>
 </ul>
 </li>
-</ul>
-<h3><a href="specifications/System/DiagramGeneration.html">specifications/System/DiagramGeneration.html</a></h3>
-<ul>
-<li>✅ <strong><a href="specifications/System/DiagramGeneration.html#trace-relation-non-directional-behavior">Trace Relation Non-Directional Behavior</a></strong>
+<li>✅ <strong><a href="specifications/System/Core/ModelManagement.html#supported-element-types">Supported Element Types</a></strong>
 <ul>
 <li>Verified by:
 <ul>
-<li><a href="specifications/System/Validation.html#invalid-relations-test">specifications/System/Validation.md#invalid-relations-test</a></li>
-<li><a href="specifications/System/VerificationTraces.html#trace-relations-no-cycles-verification">specifications/System/VerificationTraces.md#trace-relations-no-cycles-verification</a></li>
+<li><a href="specifications/System/Core/Verifications/ParsingVerifications.html#element-subsection-parsing-test">specifications/System/Core/Verifications/ParsingVerifications.md#element-subsection-parsing-test</a></li>
 </ul>
 </li>
 </ul>
 </li>
 </ul>
-<h3><a href="specifications/System/ElementManipulation.html">specifications/System/ElementManipulation.html</a></h3>
+<h3><a href="specifications/System/Core/StructureAndParsing.html">specifications/System/Core/StructureAndParsing.html</a></h3>
 <ul>
-<li>✅ <strong><a href="specifications/System/ElementManipulation.html#relation-consistency-maintenance">Relation Consistency Maintenance</a></strong>
+<li>✅ <strong><a href="specifications/System/Core/StructureAndParsing.html#specification-file-identification">Specification File Identification</a></strong>
 <ul>
 <li>Verified by:
 <ul>
-<li><a href="specifications/System/ElementManipulation.html#relation-consistency-test">specifications/System/ElementManipulation.md#relation-consistency-test</a></li>
+<li><a href="specifications/System/Core/Verifications/ParsingVerifications.html#specification-file-identification-test">specifications/System/Core/Verifications/ParsingVerifications.md#specification-file-identification-test</a></li>
 </ul>
 </li>
 </ul>
 </li>
 </ul>
-<h3><a href="specifications/System/Formatting.html">specifications/System/Formatting.html</a></h3>
+<h3><a href="specifications/System/Core/Validation.html">specifications/System/Core/Validation.html</a></h3>
 <ul>
-<li>✅ <strong><a href="specifications/System/Formatting.html#document-structure-normalization">Document Structure Normalization</a></strong>
+<li>✅ <strong><a href="specifications/System/Core/Validation.html#cross-component-dependency-validator">Cross-Component Dependency Validator</a></strong>
 <ul>
 <li>Verified by:
 <ul>
-<li><a href="specifications/System/Formatting.html#format-command-requirements-verification">specifications/System/Formatting.md#format-command-requirements-verification</a></li>
+<li><a href="specifications/System/Core/Verifications/ValidationVerifications.html#invalid-relations-test">specifications/System/Core/Verifications/ValidationVerifications.md#invalid-relations-test</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li>✅ <strong><a href="specifications/System/Formatting.html#git-style-diff-output-for-format">Git-Style Diff Output for Format</a></strong>
+<li>✅ <strong><a href="specifications/System/Core/Validation.html#excluded-file-relation-validation">Excluded File Relation Validation</a></strong>
 <ul>
 <li>Verified by:
 <ul>
-<li><a href="specifications/System/Formatting.html#format-command-requirements-verification">specifications/System/Formatting.md#format-command-requirements-verification</a></li>
+<li><a href="specifications/System/Core/Verifications/ValidationVerifications.html#unstructured-documents-test">specifications/System/Core/Verifications/ValidationVerifications.md#unstructured-documents-test</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li>✅ <strong><a href="specifications/System/Formatting.html#replace-absolute-links-with-relative-links">Replace Absolute Links with Relative Links</a></strong>
+<li>✅ <strong><a href="specifications/System/Core/Validation.html#graphregistry-as-primary-registry">GraphRegistry as Primary Registry</a></strong>
 <ul>
 <li>Verified by:
 <ul>
-<li><a href="specifications/System/Formatting.html#format-command-requirements-verification">specifications/System/Formatting.md#format-command-requirements-verification</a></li>
+<li><a href="specifications/System/Core/Verifications/ValidationVerifications.html#requirements-files-search-and-detection-test">specifications/System/Core/Verifications/ValidationVerifications.md#requirements-files-search-and-detection-test</a></li>
 </ul>
 </li>
 </ul>
 </li>
-</ul>
-<h3><a href="specifications/System/GitHubIntegration.html">specifications/System/GitHubIntegration.html</a></h3>
-<ul>
-<li>✅ <strong><a href="specifications/System/GitHubIntegration.html#automated-documentation-export-on-pr-merge">Automated Documentation Export on PR Merge</a></strong>
+<li>✅ <strong><a href="specifications/System/Core/Validation.html#internal-consistency-validator">Internal Consistency Validator</a></strong>
 <ul>
 <li>Verified by:
 <ul>
-<li><a href="specifications/System/DiagramGeneration.html#automated-documentation-export-on-pr-merge-verification">specifications/System/DiagramGeneration.md#automated-documentation-export-on-pr-merge-verification</a></li>
+<li><a href="specifications/System/Core/Verifications/ValidationVerifications.html#invalid-relations-test">specifications/System/Core/Verifications/ValidationVerifications.md#invalid-relations-test</a></li>
 </ul>
 </li>
 </ul>
 </li>
-</ul>
-<h3><a href="specifications/System/Linting.html">specifications/System/Linting.html</a></h3>
-<ul>
-<li>✅ <strong><a href="specifications/System/Linting.html#lint-auto-fix-capability">Lint Auto-fix Capability</a></strong>
+<li>✅ <strong><a href="specifications/System/Core/Validation.html#markdown-structure-validator">Markdown Structure Validator</a></strong>
 <ul>
 <li>Verified by:
 <ul>
-<li><a href="specifications/System/Linting.html#lint-command-verification">specifications/System/Linting.md#lint-command-verification</a></li>
+<li><a href="specifications/System/Core/Verifications/ValidationVerifications.html#invalid-relations-test">specifications/System/Core/Verifications/ValidationVerifications.md#invalid-relations-test</a></li>
+<li><a href="specifications/System/Core/Verifications/ValidationVerifications.html#invalid-header-structure-test">specifications/System/Core/Verifications/ValidationVerifications.md#invalid-header-structure-test</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li>✅ <strong><a href="specifications/System/Linting.html#lint-output-formatting">Lint Output Formatting</a></strong>
+<li>✅ <strong><a href="specifications/System/Core/Validation.html#relation-element-type-validator">Relation Element Type Validator</a></strong>
 <ul>
 <li>Verified by:
 <ul>
-<li><a href="specifications/System/Linting.html#lint-command-verification">specifications/System/Linting.md#lint-command-verification</a></li>
+<li><a href="specifications/System/Core/Verifications/ValidationVerifications.html#invalid-relations-test">specifications/System/Core/Verifications/ValidationVerifications.md#invalid-relations-test</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li>✅ <strong><a href="specifications/System/Linting.html#multi-branch-convergence-detection">Multi-Branch Convergence Detection</a></strong>
+<li>✅ <strong><a href="specifications/System/Core/Validation.html#relation-type-validation">Relation Type Validation</a></strong>
 <ul>
 <li>Verified by:
 <ul>
-<li><a href="specifications/System/Linting.html#lint-command-verification">specifications/System/Linting.md#lint-command-verification</a></li>
+<li><a href="specifications/System/Core/Verifications/ValidationVerifications.html#invalid-relations-test">specifications/System/Core/Verifications/ValidationVerifications.md#invalid-relations-test</a></li>
+<li><a href="specifications/System/Core/Verifications/ValidationVerifications.html#same-file-fragment-relations-test">specifications/System/Core/Verifications/ValidationVerifications.md#same-file-fragment-relations-test</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li>✅ <strong><a href="specifications/System/Linting.html#redundant-verify-relations-detection">Redundant Verify Relations Detection</a></strong>
+<li>✅ <strong><a href="specifications/System/Core/Validation.html#validation-error-handling">Validation Error Handling</a></strong>
 <ul>
 <li>Verified by:
 <ul>
-<li><a href="specifications/System/Linting.html#lint-command-verification">specifications/System/Linting.md#lint-command-verification</a></li>
+<li><a href="specifications/System/Core/Verifications/ValidationVerifications.html#invalid-relations-test">specifications/System/Core/Verifications/ValidationVerifications.md#invalid-relations-test</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li>✅ <strong><a href="specifications/System/Linting.html#safe-redundant-hierarchical-relations-auto-removal">Safe Redundant Hierarchical Relations Auto-Removal</a></strong>
+</ul>
+<h3><a href="specifications/System/Integration/GitHubIntegration.html">specifications/System/Integration/GitHubIntegration.html</a></h3>
+<ul>
+<li>✅ <strong><a href="specifications/System/Integration/GitHubIntegration.html#automated-documentation-export-on-pr-merge">Automated Documentation Export on PR Merge</a></strong>
 <ul>
 <li>Verified by:
 <ul>
-<li><a href="specifications/System/Linting.html#lint-command-verification">specifications/System/Linting.md#lint-command-verification</a></li>
+<li><a href="specifications/System/Output/Verifications/DiagramVerifications.html#automated-documentation-export-on-pr-merge-verification">specifications/System/Output/Verifications/DiagramVerifications.md#automated-documentation-export-on-pr-merge-verification</a></li>
 </ul>
 </li>
 </ul>
 </li>
 </ul>
-<h3><a href="specifications/System/ModelManagement.html">specifications/System/ModelManagement.html</a></h3>
+<h3><a href="specifications/System/Operations/ElementManipulation.html">specifications/System/Operations/ElementManipulation.html</a></h3>
 <ul>
-<li>✅ <strong><a href="specifications/System/ModelManagement.html#default-requirement-type-assignment">Default Requirement Type Assignment</a></strong>
+<li>✅ <strong><a href="specifications/System/Operations/ElementManipulation.html#relation-consistency-maintenance">Relation Consistency Maintenance</a></strong>
 <ul>
 <li>Verified by:
 <ul>
-<li><a href="specifications/System/Validation.html#default-element-type-assignment-test">specifications/System/Validation.md#default-element-type-assignment-test</a></li>
-<li><a href="specifications/System/ParsingAndValidationVerifications.html#element-subsection-parsing-test">specifications/System/ParsingAndValidationVerifications.md#element-subsection-parsing-test</a></li>
+<li><a href="specifications/System/Operations/Verifications/ElementManipulationVerifications.html#relation-consistency-test">specifications/System/Operations/Verifications/ElementManipulationVerifications.md#relation-consistency-test</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li>✅ <strong><a href="specifications/System/ModelManagement.html#supported-element-types">Supported Element Types</a></strong>
+</ul>
+<h3><a href="specifications/System/Operations/Formatting.html">specifications/System/Operations/Formatting.html</a></h3>
+<ul>
+<li>✅ <strong><a href="specifications/System/Operations/Formatting.html#document-structure-normalization">Document Structure Normalization</a></strong>
 <ul>
 <li>Verified by:
 <ul>
-<li><a href="specifications/System/ParsingAndValidationVerifications.html#element-subsection-parsing-test">specifications/System/ParsingAndValidationVerifications.md#element-subsection-parsing-test</a></li>
+<li><a href="specifications/System/Operations/Verifications/FormattingVerifications.html#format-command-requirements-verification">specifications/System/Operations/Verifications/FormattingVerifications.md#format-command-requirements-verification</a></li>
 </ul>
 </li>
 </ul>
 </li>
-</ul>
-<h3><a href="specifications/System/Reporting.html">specifications/System/Reporting.html</a></h3>
-<ul>
-<li>✅ <strong><a href="specifications/System/Reporting.html#custom-element-type-tracking">Custom Element Type Tracking</a></strong>
+<li>✅ <strong><a href="specifications/System/Operations/Formatting.html#git-style-diff-output-for-format">Git-Style Diff Output for Format</a></strong>
 <ul>
 <li>Verified by:
 <ul>
-<li><a href="specifications/System/Reporting.html#custom-element-type-tracking-test">specifications/System/Reporting.md#custom-element-type-tracking-test</a></li>
+<li><a href="specifications/System/Operations/Verifications/FormattingVerifications.html#format-command-requirements-verification">specifications/System/Operations/Verifications/FormattingVerifications.md#format-command-requirements-verification</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li>✅ <strong><a href="specifications/System/Reporting.html#forward-only-relation-traversal">Forward-Only Relation Traversal</a></strong>
+<li>✅ <strong><a href="specifications/System/Operations/Formatting.html#replace-absolute-links-with-relative-links">Replace Absolute Links with Relative Links</a></strong>
 <ul>
 <li>Verified by:
 <ul>
-<li><a href="specifications/System/Reporting.html#model-command-verification">specifications/System/Reporting.md#model-command-verification</a></li>
+<li><a href="specifications/System/Operations/Verifications/FormattingVerifications.html#format-command-requirements-verification">specifications/System/Operations/Verifications/FormattingVerifications.md#format-command-requirements-verification</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li>✅ <strong><a href="specifications/System/Reporting.html#model-diagram-output-formats">Model Diagram Output Formats</a></strong>
+</ul>
+<h3><a href="specifications/System/Operations/Linting.html">specifications/System/Operations/Linting.html</a></h3>
+<ul>
+<li>✅ <strong><a href="specifications/System/Operations/Linting.html#lint-auto-fix-capability">Lint Auto-fix Capability</a></strong>
 <ul>
 <li>Verified by:
 <ul>
-<li><a href="specifications/System/Reporting.html#model-command-verification">specifications/System/Reporting.md#model-command-verification</a></li>
+<li><a href="specifications/System/Operations/Verifications/LintingVerifications.html#lint-command-verification">specifications/System/Operations/Verifications/LintingVerifications.md#lint-command-verification</a></li>
 </ul>
 </li>
 </ul>
 </li>
-</ul>
-<h3><a href="specifications/System/StructureAndParsing.html">specifications/System/StructureAndParsing.html</a></h3>
-<ul>
-<li>✅ <strong><a href="specifications/System/StructureAndParsing.html#specification-file-identification">Specification File Identification</a></strong>
+<li>✅ <strong><a href="specifications/System/Operations/Linting.html#lint-output-formatting">Lint Output Formatting</a></strong>
 <ul>
 <li>Verified by:
 <ul>
-<li><a href="specifications/System/ParsingAndValidationVerifications.html#specification-file-identification-test">specifications/System/ParsingAndValidationVerifications.md#specification-file-identification-test</a></li>
+<li><a href="specifications/System/Operations/Verifications/LintingVerifications.html#lint-command-verification">specifications/System/Operations/Verifications/LintingVerifications.md#lint-command-verification</a></li>
 </ul>
 </li>
 </ul>
 </li>
-</ul>
-<h3><a href="specifications/System/Validation.html">specifications/System/Validation.html</a></h3>
-<ul>
-<li>✅ <strong><a href="specifications/System/Validation.html#cross-component-dependency-validator">Cross-Component Dependency Validator</a></strong>
+<li>✅ <strong><a href="specifications/System/Operations/Linting.html#multi-branch-convergence-detection">Multi-Branch Convergence Detection</a></strong>
 <ul>
 <li>Verified by:
 <ul>
-<li><a href="specifications/System/Validation.html#invalid-relations-test">specifications/System/Validation.md#invalid-relations-test</a></li>
+<li><a href="specifications/System/Operations/Verifications/LintingVerifications.html#lint-command-verification">specifications/System/Operations/Verifications/LintingVerifications.md#lint-command-verification</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li>✅ <strong><a href="specifications/System/Validation.html#excluded-file-relation-validation">Excluded File Relation Validation</a></strong>
+<li>✅ <strong><a href="specifications/System/Operations/Linting.html#redundant-verify-relations-detection">Redundant Verify Relations Detection</a></strong>
 <ul>
 <li>Verified by:
 <ul>
-<li><a href="specifications/System/Validation.html#unstructured-documents-test">specifications/System/Validation.md#unstructured-documents-test</a></li>
+<li><a href="specifications/System/Operations/Verifications/LintingVerifications.html#lint-command-verification">specifications/System/Operations/Verifications/LintingVerifications.md#lint-command-verification</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li>✅ <strong><a href="specifications/System/Validation.html#graphregistry-as-primary-registry">GraphRegistry as Primary Registry</a></strong>
+<li>✅ <strong><a href="specifications/System/Operations/Linting.html#safe-redundant-hierarchical-relations-auto-removal">Safe Redundant Hierarchical Relations Auto-Removal</a></strong>
 <ul>
 <li>Verified by:
 <ul>
-<li><a href="specifications/System/Validation.html#requirements-files-search-and-detection-test">specifications/System/Validation.md#requirements-files-search-and-detection-test</a></li>
+<li><a href="specifications/System/Operations/Verifications/LintingVerifications.html#lint-command-verification">specifications/System/Operations/Verifications/LintingVerifications.md#lint-command-verification</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li>✅ <strong><a href="specifications/System/Validation.html#internal-consistency-validator">Internal Consistency Validator</a></strong>
+</ul>
+<h3><a href="specifications/System/Output/DiagramGeneration.html">specifications/System/Output/DiagramGeneration.html</a></h3>
+<ul>
+<li>✅ <strong><a href="specifications/System/Output/DiagramGeneration.html#trace-relation-non-directional-behavior">Trace Relation Non-Directional Behavior</a></strong>
 <ul>
 <li>Verified by:
 <ul>
-<li><a href="specifications/System/Validation.html#invalid-relations-test">specifications/System/Validation.md#invalid-relations-test</a></li>
+<li><a href="specifications/System/Core/Verifications/ValidationVerifications.html#invalid-relations-test">specifications/System/Core/Verifications/ValidationVerifications.md#invalid-relations-test</a></li>
+<li><a href="specifications/System/Processing/Verifications/TraceVerifications.html#trace-relations-no-cycles-verification">specifications/System/Processing/Verifications/TraceVerifications.md#trace-relations-no-cycles-verification</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li>✅ <strong><a href="specifications/System/Validation.html#markdown-structure-validator">Markdown Structure Validator</a></strong>
+</ul>
+<h3><a href="specifications/System/Output/Reporting.html">specifications/System/Output/Reporting.html</a></h3>
+<ul>
+<li>✅ <strong><a href="specifications/System/Output/Reporting.html#custom-element-type-tracking">Custom Element Type Tracking</a></strong>
 <ul>
 <li>Verified by:
 <ul>
-<li><a href="specifications/System/Validation.html#invalid-relations-test">specifications/System/Validation.md#invalid-relations-test</a></li>
-<li><a href="specifications/System/Validation.html#invalid-header-structure-test">specifications/System/Validation.md#invalid-header-structure-test</a></li>
+<li><a href="specifications/System/Output/Verifications/ReportingVerifications.html#custom-element-type-tracking-test">specifications/System/Output/Verifications/ReportingVerifications.md#custom-element-type-tracking-test</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li>✅ <strong><a href="specifications/System/Validation.html#relation-element-type-validator">Relation Element Type Validator</a></strong>
+<li>✅ <strong><a href="specifications/System/Output/Reporting.html#forward-only-relation-traversal">Forward-Only Relation Traversal</a></strong>
 <ul>
 <li>Verified by:
 <ul>
-<li><a href="specifications/System/Validation.html#invalid-relations-test">specifications/System/Validation.md#invalid-relations-test</a></li>
+<li><a href="specifications/System/Output/Verifications/ReportingVerifications.html#model-command-verification">specifications/System/Output/Verifications/ReportingVerifications.md#model-command-verification</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li>✅ <strong><a href="specifications/System/Validation.html#relation-type-validation">Relation Type Validation</a></strong>
+<li>✅ <strong><a href="specifications/System/Output/Reporting.html#model-diagram-output-formats">Model Diagram Output Formats</a></strong>
 <ul>
 <li>Verified by:
 <ul>
-<li><a href="specifications/System/Validation.html#same-file-fragment-relations-test">specifications/System/Validation.md#same-file-fragment-relations-test</a></li>
-<li><a href="specifications/System/Validation.html#invalid-relations-test">specifications/System/Validation.md#invalid-relations-test</a></li>
+<li><a href="specifications/System/Output/Verifications/ReportingVerifications.html#model-command-verification">specifications/System/Output/Verifications/ReportingVerifications.md#model-command-verification</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li>✅ <strong><a href="specifications/System/Validation.html#validation-error-handling">Validation Error Handling</a></strong>
+</ul>
+<h3><a href="specifications/System/Processing/ChangeImpact.html">specifications/System/Processing/ChangeImpact.html</a></h3>
+<ul>
+<li>✅ <strong><a href="specifications/System/Processing/ChangeImpact.html#requirements-change-propagation">Requirements Change Propagation</a></strong>
 <ul>
 <li>Verified by:
 <ul>
-<li><a href="specifications/System/Validation.html#invalid-relations-test">specifications/System/Validation.md#invalid-relations-test</a></li>
+<li><a href="specifications/System/Processing/Verifications/ChangeImpactVerifications.html#element-content-extraction-test">specifications/System/Processing/Verifications/ChangeImpactVerifications.md#element-content-extraction-test</a></li>
+<li><a href="specifications/System/Processing/Verifications/ChangeImpactVerifications.html#change-impact-relations-test">specifications/System/Processing/Verifications/ChangeImpactVerifications.md#change-impact-relations-test</a></li>
+<li><a href="specifications/System/Processing/Verifications/ChangeImpactVerifications.html#change-impact-detection-test">specifications/System/Processing/Verifications/ChangeImpactVerifications.md#change-impact-detection-test</a></li>
+<li><a href="specifications/System/Core/Verifications/AttachmentsVerifications.html#attachments-change-impact-verification">specifications/System/Core/Verifications/AttachmentsVerifications.md#attachments-change-impact-verification</a></li>
+<li><a href="specifications/System/Processing/Verifications/ChangeImpactVerifications.html#change-impact-smart-filtering-test">specifications/System/Processing/Verifications/ChangeImpactVerifications.md#change-impact-smart-filtering-test</a></li>
 </ul>
 </li>
 </ul>
@@ -990,47 +1123,48 @@ blockquote {
 <h3><a href="specifications/Interfaces/WebInterface.html">specifications/Interfaces/WebInterface.html</a></h3>
 <ul>
 <li>❌ <strong><a href="specifications/Interfaces/WebInterface.html#model-centric-view-generation">Model-Centric View Generation</a></strong></li>
+<li>❌ <strong><a href="specifications/Interfaces/WebInterface.html#web-interface-color-scheme">Web Interface Color Scheme</a></strong></li>
 <li>❌ <strong><a href="specifications/Interfaces/WebInterface.html#whole-model-diagram-generation">Whole Model Diagram Generation</a></strong></li>
 </ul>
-<h3><a href="specifications/System/CodeAlignment.html">specifications/System/CodeAlignment.html</a></h3>
+<h3><a href="specifications/System/Core/ModelManagement.html">specifications/System/Core/ModelManagement.html</a></h3>
 <ul>
-<li>❌ <strong><a href="specifications/System/CodeAlignment.html#bat-style-comment">BAT style comment</a></strong></li>
-<li>❌ <strong><a href="specifications/System/CodeAlignment.html#css-style-comment">CSS style comment</a></strong></li>
-<li>❌ <strong><a href="specifications/System/CodeAlignment.html#dash-style-comment">Dash style comment</a></strong></li>
-<li>❌ <strong><a href="specifications/System/CodeAlignment.html#sql-style-comment">SQL style comment</a></strong></li>
-<li>❌ <strong><a href="specifications/System/CodeAlignment.html#slash-style-comment">Slash style comment</a></strong></li>
-<li>❌ <strong><a href="specifications/System/CodeAlignment.html#suggest-code-refactoring">Suggest Code Refactoring</a></strong></li>
-<li>❌ <strong><a href="specifications/System/CodeAlignment.html#validating-traceability-format">Validating Traceability Format</a></strong></li>
-<li>❌ <strong><a href="specifications/System/CodeAlignment.html#xml-style-comment">XML style comment</a></strong></li>
+<li>❌ <strong><a href="specifications/System/Core/ModelManagement.html#efficient-processing">Efficient Processing</a></strong></li>
+<li>❌ <strong><a href="specifications/System/Core/ModelManagement.html#template-based-model-bootstrapping">Template-Based Model Bootstrapping</a></strong></li>
+<li>❌ <strong><a href="specifications/System/Core/ModelManagement.html#verification-type-categories">Verification Type Categories</a></strong></li>
 </ul>
-<h3><a href="specifications/System/DiagramGeneration.html">specifications/System/DiagramGeneration.html</a></h3>
+<h3><a href="specifications/System/Core/Validation.html">specifications/System/Core/Validation.html</a></h3>
 <ul>
-<li>❌ <strong><a href="specifications/System/DiagramGeneration.html#interactive-mermaid-diagram-node-behavior">Interactive Mermaid Diagram Node Behavior</a></strong></li>
-<li>❌ <strong><a href="specifications/System/DiagramGeneration.html#sysml-compatible-relationship-rendering">SysML-Compatible Relationship Rendering</a></strong></li>
+<li>❌ <strong><a href="specifications/System/Core/Validation.html#integrated-validation">Integrated Validation</a></strong></li>
+<li>❌ <strong><a href="specifications/System/Core/Validation.html#validate-filesystem-structure">Validate Filesystem Structure</a></strong></li>
 </ul>
-<h3><a href="specifications/System/GitHubIntegration.html">specifications/System/GitHubIntegration.html</a></h3>
+<h3><a href="specifications/System/Integration/CodeAlignment.html">specifications/System/Integration/CodeAlignment.html</a></h3>
 <ul>
-<li>❌ <strong><a href="specifications/System/GitHubIntegration.html#generate-change-logs-for-pull-requests">Generate Change Logs for Pull Requests</a></strong></li>
+<li>❌ <strong><a href="specifications/System/Integration/CodeAlignment.html#bat-style-comment">BAT style comment</a></strong></li>
+<li>❌ <strong><a href="specifications/System/Integration/CodeAlignment.html#css-style-comment">CSS style comment</a></strong></li>
+<li>❌ <strong><a href="specifications/System/Integration/CodeAlignment.html#dash-style-comment">Dash style comment</a></strong></li>
+<li>❌ <strong><a href="specifications/System/Integration/CodeAlignment.html#sql-style-comment">SQL style comment</a></strong></li>
+<li>❌ <strong><a href="specifications/System/Integration/CodeAlignment.html#slash-style-comment">Slash style comment</a></strong></li>
+<li>❌ <strong><a href="specifications/System/Integration/CodeAlignment.html#suggest-code-refactoring">Suggest Code Refactoring</a></strong></li>
+<li>❌ <strong><a href="specifications/System/Integration/CodeAlignment.html#validating-traceability-format">Validating Traceability Format</a></strong></li>
+<li>❌ <strong><a href="specifications/System/Integration/CodeAlignment.html#xml-style-comment">XML style comment</a></strong></li>
 </ul>
-<h3><a href="specifications/System/ModelManagement.html">specifications/System/ModelManagement.html</a></h3>
+<h3><a href="specifications/System/Integration/GitHubIntegration.html">specifications/System/Integration/GitHubIntegration.html</a></h3>
 <ul>
-<li>❌ <strong><a href="specifications/System/ModelManagement.html#efficient-processing">Efficient Processing</a></strong></li>
-<li>❌ <strong><a href="specifications/System/ModelManagement.html#template-based-model-bootstrapping">Template-Based Model Bootstrapping</a></strong></li>
-<li>❌ <strong><a href="specifications/System/ModelManagement.html#verification-type-categories">Verification Type Categories</a></strong></li>
+<li>❌ <strong><a href="specifications/System/Integration/GitHubIntegration.html#generate-change-logs-for-pull-requests">Generate Change Logs for Pull Requests</a></strong></li>
 </ul>
-<h3><a href="specifications/System/Validation.html">specifications/System/Validation.html</a></h3>
+<h3><a href="specifications/System/Output/DiagramGeneration.html">specifications/System/Output/DiagramGeneration.html</a></h3>
 <ul>
-<li>❌ <strong><a href="specifications/System/Validation.html#integrated-validation">Integrated Validation</a></strong></li>
-<li>❌ <strong><a href="specifications/System/Validation.html#validate-filesystem-structure">Validate Filesystem Structure</a></strong></li>
+<li>❌ <strong><a href="specifications/System/Output/DiagramGeneration.html#interactive-mermaid-diagram-node-behavior">Interactive Mermaid Diagram Node Behavior</a></strong></li>
+<li>❌ <strong><a href="specifications/System/Output/DiagramGeneration.html#sysml-compatible-relationship-rendering">SysML-Compatible Relationship Rendering</a></strong></li>
 </ul>
 <h3><a href="specifications/UserStories.html">specifications/UserStories.html</a></h3>
 <ul>
 <li>❌ <strong><a href="specifications/UserStories.html#fostering-community-contributions">Fostering Community Contributions</a></strong></li>
 </ul>
 <h2 id="satisfied-test-verifications">Satisfied Test Verifications</h2>
-<h3><a href="specifications/Interfaces/CLI.html">specifications/Interfaces/CLI.html</a></h3>
+<h3><a href="specifications/Interfaces/Verifications/CLIVerifications.html">specifications/Interfaces/Verifications/CLIVerifications.html</a></h3>
 <ul>
-<li>✅ <strong><a href="specifications/Interfaces/CLI.html#cli-git-commit-hash-flag-test">CLI Git Commit Hash Flag Test</a></strong> (test-verification)
+<li>✅ <strong><a href="specifications/Interfaces/Verifications/CLIVerifications.html#cli-git-commit-hash-flag-test">CLI Git Commit Hash Flag Test</a></strong> (test-verification)
 <ul>
 <li>Satisfied by:
 <ul>
@@ -1039,7 +1173,7 @@ blockquote {
 </li>
 </ul>
 </li>
-<li>✅ <strong><a href="specifications/Interfaces/CLI.html#cli-help-structure-verification">CLI Help Structure Verification</a></strong> (test-verification)
+<li>✅ <strong><a href="specifications/Interfaces/Verifications/CLIVerifications.html#cli-help-structure-verification">CLI Help Structure Verification</a></strong> (test-verification)
 <ul>
 <li>Satisfied by:
 <ul>
@@ -1049,9 +1183,9 @@ blockquote {
 </ul>
 </li>
 </ul>
-<h3><a href="specifications/Interfaces/WebInterface.html">specifications/Interfaces/WebInterface.html</a></h3>
+<h3><a href="specifications/Interfaces/Verifications/WebInterfaceVerifications.html">specifications/Interfaces/Verifications/WebInterfaceVerifications.html</a></h3>
 <ul>
-<li>✅ <strong><a href="specifications/Interfaces/WebInterface.html#html-export-verification">HTML Export Verification</a></strong> (test-verification)
+<li>✅ <strong><a href="specifications/Interfaces/Verifications/WebInterfaceVerifications.html#html-export-verification">HTML Export Verification</a></strong> (test-verification)
 <ul>
 <li>Satisfied by:
 <ul>
@@ -1060,7 +1194,7 @@ blockquote {
 </li>
 </ul>
 </li>
-<li>✅ <strong><a href="specifications/Interfaces/WebInterface.html#serve-command-verification">Serve Command Verification</a></strong> (test-verification)
+<li>✅ <strong><a href="specifications/Interfaces/Verifications/WebInterfaceVerifications.html#serve-command-verification">Serve Command Verification</a></strong> (test-verification)
 <ul>
 <li>Satisfied by:
 <ul>
@@ -1070,18 +1204,9 @@ blockquote {
 </ul>
 </li>
 </ul>
-<h3><a href="specifications/System/AttachmentsVerifications.html">specifications/System/AttachmentsVerifications.html</a></h3>
+<h3><a href="specifications/System/Core/Verifications/AttachmentsVerifications.html">specifications/System/Core/Verifications/AttachmentsVerifications.html</a></h3>
 <ul>
-<li>✅ <strong><a href="specifications/System/AttachmentsVerifications.html#attach-command-verification">Attach Command Verification</a></strong> (test-verification)
-<ul>
-<li>Satisfied by:
-<ul>
-<li><a href="tests/test-attachments/test.sh">tests/test-attachments/test.sh</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li>✅ <strong><a href="specifications/System/AttachmentsVerifications.html#attachment-output-rendering-verification">Attachment Output Rendering Verification</a></strong> (test-verification)
+<li>✅ <strong><a href="specifications/System/Core/Verifications/AttachmentsVerifications.html#attach-command-verification">Attach Command Verification</a></strong> (test-verification)
 <ul>
 <li>Satisfied by:
 <ul>
@@ -1090,7 +1215,7 @@ blockquote {
 </li>
 </ul>
 </li>
-<li>✅ <strong><a href="specifications/System/AttachmentsVerifications.html#attachment-search-filters-verification">Attachment Search Filters Verification</a></strong> (test-verification)
+<li>✅ <strong><a href="specifications/System/Core/Verifications/AttachmentsVerifications.html#attachment-output-rendering-verification">Attachment Output Rendering Verification</a></strong> (test-verification)
 <ul>
 <li>Satisfied by:
 <ul>
@@ -1099,7 +1224,7 @@ blockquote {
 </li>
 </ul>
 </li>
-<li>✅ <strong><a href="specifications/System/AttachmentsVerifications.html#attachments-change-impact-verification">Attachments Change Impact Verification</a></strong> (test-verification)
+<li>✅ <strong><a href="specifications/System/Core/Verifications/AttachmentsVerifications.html#attachment-search-filters-verification">Attachment Search Filters Verification</a></strong> (test-verification)
 <ul>
 <li>Satisfied by:
 <ul>
@@ -1108,7 +1233,7 @@ blockquote {
 </li>
 </ul>
 </li>
-<li>✅ <strong><a href="specifications/System/AttachmentsVerifications.html#attachments-subsection-parsing-verification">Attachments Subsection Parsing Verification</a></strong> (test-verification)
+<li>✅ <strong><a href="specifications/System/Core/Verifications/AttachmentsVerifications.html#attachments-change-impact-verification">Attachments Change Impact Verification</a></strong> (test-verification)
 <ul>
 <li>Satisfied by:
 <ul>
@@ -1117,7 +1242,7 @@ blockquote {
 </li>
 </ul>
 </li>
-<li>✅ <strong><a href="specifications/System/AttachmentsVerifications.html#attachments-validation-verification">Attachments Validation Verification</a></strong> (test-verification)
+<li>✅ <strong><a href="specifications/System/Core/Verifications/AttachmentsVerifications.html#attachments-subsection-parsing-verification">Attachments Subsection Parsing Verification</a></strong> (test-verification)
 <ul>
 <li>Satisfied by:
 <ul>
@@ -1126,7 +1251,7 @@ blockquote {
 </li>
 </ul>
 </li>
-<li>✅ <strong><a href="specifications/System/AttachmentsVerifications.html#detach-command-verification">Detach Command Verification</a></strong> (test-verification)
+<li>✅ <strong><a href="specifications/System/Core/Verifications/AttachmentsVerifications.html#attachments-validation-verification">Attachments Validation Verification</a></strong> (test-verification)
 <ul>
 <li>Satisfied by:
 <ul>
@@ -1135,7 +1260,7 @@ blockquote {
 </li>
 </ul>
 </li>
-<li>✅ <strong><a href="specifications/System/AttachmentsVerifications.html#move-attachment-command-verification">Move Attachment Command Verification</a></strong> (test-verification)
+<li>✅ <strong><a href="specifications/System/Core/Verifications/AttachmentsVerifications.html#detach-command-verification">Detach Command Verification</a></strong> (test-verification)
 <ul>
 <li>Satisfied by:
 <ul>
@@ -1144,7 +1269,16 @@ blockquote {
 </li>
 </ul>
 </li>
-<li>✅ <strong><a href="specifications/System/AttachmentsVerifications.html#remove-attachment-command-verification">Remove Attachment Command Verification</a></strong> (test-verification)
+<li>✅ <strong><a href="specifications/System/Core/Verifications/AttachmentsVerifications.html#move-attachment-command-verification">Move Attachment Command Verification</a></strong> (test-verification)
+<ul>
+<li>Satisfied by:
+<ul>
+<li><a href="tests/test-attachments/test.sh">tests/test-attachments/test.sh</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>✅ <strong><a href="specifications/System/Core/Verifications/AttachmentsVerifications.html#remove-attachment-command-verification">Remove Attachment Command Verification</a></strong> (test-verification)
 <ul>
 <li>Satisfied by:
 <ul>
@@ -1154,252 +1288,9 @@ blockquote {
 </ul>
 </li>
 </ul>
-<h3><a href="specifications/System/ChangeImpact.html">specifications/System/ChangeImpact.html</a></h3>
+<h3><a href="specifications/System/Core/Verifications/ParsingVerifications.html">specifications/System/Core/Verifications/ParsingVerifications.html</a></h3>
 <ul>
-<li>✅ <strong><a href="specifications/System/ChangeImpact.html#change-impact-analysis-verification">Change Impact Analysis Verification</a></strong> (test-verification)
-<ul>
-<li>Satisfied by:
-<ul>
-<li><a href="tests/test-change-impact-detection/test.sh">tests/test-change-impact-detection/test.sh</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li>✅ <strong><a href="specifications/System/ChangeImpact.html#change-impact-detection-test">Change Impact Detection Test</a></strong> (test-verification)
-<ul>
-<li>Satisfied by:
-<ul>
-<li><a href="tests/test-change-impact-detection/test.sh">tests/test-change-impact-detection/test.sh</a></li>
-<li><a href="tests/test-change-impact-element-relocation/test.sh">tests/test-change-impact-element-relocation/test.sh</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li>✅ <strong><a href="specifications/System/ChangeImpact.html#change-impact-relations-test">Change Impact Relations Test</a></strong> (test-verification)
-<ul>
-<li>Satisfied by:
-<ul>
-<li><a href="tests/test-change-impact-detection/test.sh">tests/test-change-impact-detection/test.sh</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li>✅ <strong><a href="specifications/System/ChangeImpact.html#change-impact-smart-filtering-test">Change Impact Smart Filtering Test</a></strong> (test-verification)
-<ul>
-<li>Satisfied by:
-<ul>
-<li><a href="tests/test-change-impact-smart-filtering/test.sh">tests/test-change-impact-smart-filtering/test.sh</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li>✅ <strong><a href="specifications/System/ChangeImpact.html#element-content-extraction-test">Element Content Extraction Test</a></strong> (test-verification)
-<ul>
-<li>Satisfied by:
-<ul>
-<li><a href="tests/test-element-content-extraction/test.sh">tests/test-element-content-extraction/test.sh</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li>✅ <strong><a href="specifications/System/ChangeImpact.html#structural-change-reports-verification">Structural Change Reports Verification</a></strong> (test-verification)
-<ul>
-<li>Satisfied by:
-<ul>
-<li><a href="tests/test-change-impact-detection/test.sh">tests/test-change-impact-detection/test.sh</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<h3><a href="specifications/System/DiagramGeneration.html">specifications/System/DiagramGeneration.html</a></h3>
-<ul>
-<li>✅ <strong><a href="specifications/System/DiagramGeneration.html#automated-documentation-export-on-pr-merge-verification">Automated Documentation Export on PR Merge Verification</a></strong> (test-verification)
-<ul>
-<li>Satisfied by:
-<ul>
-<li><a href=".github/workflows/update_docs.yml">.github/workflows/update_docs.yml</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li>✅ <strong><a href="specifications/System/DiagramGeneration.html#diagram-generation-test">Diagram Generation Test</a></strong> (test-verification)
-<ul>
-<li>Satisfied by:
-<ul>
-<li><a href="tests/test-diagram-generation/test.sh">tests/test-diagram-generation/test.sh</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li>✅ <strong><a href="specifications/System/DiagramGeneration.html#diagram-relation-filtering-verification">Diagram Relation Filtering Verification</a></strong> (test-verification)
-<ul>
-<li>Satisfied by:
-<ul>
-<li><a href="tests/test-diagram-filtering/test.sh">tests/test-diagram-filtering/test.sh</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li>✅ <strong><a href="specifications/System/DiagramGeneration.html#remove-generated-diagrams-verification">Remove Generated Diagrams Verification</a></strong> (test-verification)
-<ul>
-<li>Satisfied by:
-<ul>
-<li><a href="tests/test-remove-diagrams/test.sh">tests/test-remove-diagrams/test.sh</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li>✅ <strong><a href="specifications/System/DiagramGeneration.html#visualize-model-relationships-verification">Visualize Model Relationships Verification</a></strong> (test-verification)
-<ul>
-<li>Satisfied by:
-<ul>
-<li><a href="tests/test-diagram-generation/test.sh">tests/test-diagram-generation/test.sh</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<h3><a href="specifications/System/ElementManipulation.html">specifications/System/ElementManipulation.html</a></h3>
-<ul>
-<li>✅ <strong><a href="specifications/System/ElementManipulation.html#cli-add-element-test">CLI Add Element Test</a></strong> (test-verification)
-<ul>
-<li>Satisfied by:
-<ul>
-<li><a href="tests/test-crud-manipulation/test.sh">tests/test-crud-manipulation/test.sh</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li>✅ <strong><a href="specifications/System/ElementManipulation.html#cli-move-element-test">CLI Move Element Test</a></strong> (test-verification)
-<ul>
-<li>Satisfied by:
-<ul>
-<li><a href="tests/test-crud-manipulation/test.sh">tests/test-crud-manipulation/test.sh</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li>✅ <strong><a href="specifications/System/ElementManipulation.html#cli-move-file-test">CLI Move File Test</a></strong> (test-verification)
-<ul>
-<li>Satisfied by:
-<ul>
-<li><a href="tests/test-crud-manipulation/test.sh">tests/test-crud-manipulation/test.sh</a></li>
-<li><a href="tests/test-subdirectory-functionality/test.sh">tests/test-subdirectory-functionality/test.sh</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li>✅ <strong><a href="specifications/System/ElementManipulation.html#cli-remove-element-test">CLI Remove Element Test</a></strong> (test-verification)
-<ul>
-<li>Satisfied by:
-<ul>
-<li><a href="tests/test-crud-manipulation/test.sh">tests/test-crud-manipulation/test.sh</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li>✅ <strong><a href="specifications/System/ElementManipulation.html#cli-rename-element-test">CLI Rename Element Test</a></strong> (test-verification)
-<ul>
-<li>Satisfied by:
-<ul>
-<li><a href="tests/test-crud-manipulation/test.sh">tests/test-crud-manipulation/test.sh</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li>✅ <strong><a href="specifications/System/ElementManipulation.html#create-element-test">Create Element Test</a></strong> (test-verification)
-<ul>
-<li>Satisfied by:
-<ul>
-<li><a href="tests/test-crud-manipulation/test.sh">tests/test-crud-manipulation/test.sh</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li>✅ <strong><a href="specifications/System/ElementManipulation.html#delete-element-test">Delete Element Test</a></strong> (test-verification)
-<ul>
-<li>Satisfied by:
-<ul>
-<li><a href="tests/test-crud-manipulation/test.sh">tests/test-crud-manipulation/test.sh</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li>✅ <strong><a href="specifications/System/ElementManipulation.html#file-persistence-test">File Persistence Test</a></strong> (test-verification)
-<ul>
-<li>Satisfied by:
-<ul>
-<li><a href="tests/test-crud-file-persistence/test.sh">tests/test-crud-file-persistence/test.sh</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li>✅ <strong><a href="specifications/System/ElementManipulation.html#move-element-test">Move Element Test</a></strong> (test-verification)
-<ul>
-<li>Satisfied by:
-<ul>
-<li><a href="tests/test-crud-manipulation/test.sh">tests/test-crud-manipulation/test.sh</a></li>
-<li><a href="tests/test-crud-empty-file-cleanup/test.sh">tests/test-crud-empty-file-cleanup/test.sh</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li>✅ <strong><a href="specifications/System/ElementManipulation.html#move-file-squash-test">Move File Squash Test</a></strong> (test-verification)
-<ul>
-<li>Satisfied by:
-<ul>
-<li><a href="tests/test-crud-mv-file-squash/test.sh">tests/test-crud-mv-file-squash/test.sh</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li>✅ <strong><a href="specifications/System/ElementManipulation.html#relation-consistency-test">Relation Consistency Test</a></strong> (test-verification)
-<ul>
-<li>Satisfied by:
-<ul>
-<li><a href="tests/test-crud-relation-consistency/test.sh">tests/test-crud-relation-consistency/test.sh</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li>✅ <strong><a href="specifications/System/ElementManipulation.html#target-location-validation-test">Target Location Validation Test</a></strong> (test-verification)
-<ul>
-<li>Satisfied by:
-<ul>
-<li><a href="tests/test-crud-target-location-validation/test.sh">tests/test-crud-target-location-validation/test.sh</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<h3><a href="specifications/System/Formatting.html">specifications/System/Formatting.html</a></h3>
-<ul>
-<li>✅ <strong><a href="specifications/System/Formatting.html#format-command-requirements-verification">Format Command Requirements Verification</a></strong> (test-verification)
-<ul>
-<li>Satisfied by:
-<ul>
-<li><a href="tests/test-advanced-format/test.sh">tests/test-advanced-format/test.sh</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<h3><a href="specifications/System/Linting.html">specifications/System/Linting.html</a></h3>
-<ul>
-<li>✅ <strong><a href="specifications/System/Linting.html#lint-command-verification">Lint Command Verification</a></strong> (test-verification)
-<ul>
-<li>Satisfied by:
-<ul>
-<li><a href="tests/test-lint-command/test.sh">tests/test-lint-command/test.sh</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<h3><a href="specifications/System/ParsingAndValidationVerifications.html">specifications/System/ParsingAndValidationVerifications.html</a></h3>
-<ul>
-<li>✅ <strong><a href="specifications/System/ParsingAndValidationVerifications.html#element-subsection-parsing-test">Element Subsection Parsing Test</a></strong> (test-verification)
+<li>✅ <strong><a href="specifications/System/Core/Verifications/ParsingVerifications.html#element-subsection-parsing-test">Element Subsection Parsing Test</a></strong> (test-verification)
 <ul>
 <li>Satisfied by:
 <ul>
@@ -1408,7 +1299,7 @@ blockquote {
 </li>
 </ul>
 </li>
-<li>✅ <strong><a href="specifications/System/ParsingAndValidationVerifications.html#fragment-normalization-test">Fragment Normalization Test</a></strong> (test-verification)
+<li>✅ <strong><a href="specifications/System/Core/Verifications/ParsingVerifications.html#fragment-normalization-test">Fragment Normalization Test</a></strong> (test-verification)
 <ul>
 <li>Satisfied by:
 <ul>
@@ -1417,7 +1308,7 @@ blockquote {
 </li>
 </ul>
 </li>
-<li>✅ <strong><a href="specifications/System/ParsingAndValidationVerifications.html#specification-file-identification-test">Specification File Identification Test</a></strong> (test-verification)
+<li>✅ <strong><a href="specifications/System/Core/Verifications/ParsingVerifications.html#specification-file-identification-test">Specification File Identification Test</a></strong> (test-verification)
 <ul>
 <li>Satisfied by:
 <ul>
@@ -1427,111 +1318,9 @@ blockquote {
 </ul>
 </li>
 </ul>
-<h3><a href="specifications/System/Reporting.html">specifications/System/Reporting.html</a></h3>
+<h3><a href="specifications/System/Core/Verifications/ValidationVerifications.html">specifications/System/Core/Verifications/ValidationVerifications.html</a></h3>
 <ul>
-<li>✅ <strong><a href="specifications/System/Reporting.html#containment-hierarchy-extraction-test">Containment Hierarchy Extraction Test</a></strong> (test-verification)
-<ul>
-<li>Satisfied by:
-<ul>
-<li><a href="tests/test-containment-view/test.sh">tests/test-containment-view/test.sh</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li>✅ <strong><a href="specifications/System/Reporting.html#containment-view-json-output-test">Containment View JSON Output Test</a></strong> (test-verification)
-<ul>
-<li>Satisfied by:
-<ul>
-<li><a href="tests/test-containment-view/test.sh">tests/test-containment-view/test.sh</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li>✅ <strong><a href="specifications/System/Reporting.html#containment-view-mermaid-diagram-test">Containment View Mermaid Diagram Test</a></strong> (test-verification)
-<ul>
-<li>Satisfied by:
-<ul>
-<li><a href="tests/test-containment-view/test.sh">tests/test-containment-view/test.sh</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li>✅ <strong><a href="specifications/System/Reporting.html#containment-view-text-output-test">Containment View Text Output Test</a></strong> (test-verification)
-<ul>
-<li>Satisfied by:
-<ul>
-<li><a href="tests/test-containment-view/test.sh">tests/test-containment-view/test.sh</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li>✅ <strong><a href="specifications/System/Reporting.html#custom-element-type-tracking-test">Custom Element Type Tracking Test</a></strong> (test-verification)
-<ul>
-<li>Satisfied by:
-<ul>
-<li><a href="tests/test-search-all-features/test.sh">tests/test-search-all-features/test.sh</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li>✅ <strong><a href="specifications/System/Reporting.html#html-export-containment-view-integration-test">HTML Export Containment View Integration Test</a></strong> (test-verification)
-<ul>
-<li>Satisfied by:
-<ul>
-<li><a href="tests/test-containment-view/test.sh">tests/test-containment-view/test.sh</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li>✅ <strong><a href="specifications/System/Reporting.html#model-command-verification">Model Command Verification</a></strong> (test-verification)
-<ul>
-<li>Satisfied by:
-<ul>
-<li><a href="tests/test-model-command/test.sh">tests/test-model-command/test.sh</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li>✅ <strong><a href="specifications/System/Reporting.html#search-command-tests">Search Command Tests</a></strong> (test-verification)
-<ul>
-<li>Satisfied by:
-<ul>
-<li><a href="tests/test-search-all-features/test.sh">tests/test-search-all-features/test.sh</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li>✅ <strong><a href="specifications/System/Reporting.html#verification-coverage-report-test">Verification Coverage Report Test</a></strong> (test-verification)
-<ul>
-<li>Satisfied by:
-<ul>
-<li><a href="tests/test-coverage-report/test.sh">tests/test-coverage-report/test.sh</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li>✅ <strong><a href="specifications/System/Reporting.html#verification-traces-filter-options-test">Verification Traces Filter Options Test</a></strong> (test-verification)
-<ul>
-<li>Satisfied by:
-<ul>
-<li><a href="tests/test-verification-traces/test.sh">tests/test-verification-traces/test.sh</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li>✅ <strong><a href="specifications/System/Reporting.html#verification-traces-from-folder-test">Verification Traces From-Folder Test</a></strong> (test-verification)
-<ul>
-<li>Satisfied by:
-<ul>
-<li><a href="tests/test-verification-traces/test.sh">tests/test-verification-traces/test.sh</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<h3><a href="specifications/System/Validation.html">specifications/System/Validation.html</a></h3>
-<ul>
-<li>✅ <strong><a href="specifications/System/Validation.html#default-element-type-assignment-test">Default Element Type Assignment Test</a></strong> (test-verification)
+<li>✅ <strong><a href="specifications/System/Core/Verifications/ValidationVerifications.html#default-element-type-assignment-test">Default Element Type Assignment Test</a></strong> (test-verification)
 <ul>
 <li>Satisfied by:
 <ul>
@@ -1540,7 +1329,7 @@ blockquote {
 </li>
 </ul>
 </li>
-<li>✅ <strong><a href="specifications/System/Validation.html#file-exclusion-test">File Exclusion Test</a></strong> (test-verification)
+<li>✅ <strong><a href="specifications/System/Core/Verifications/ValidationVerifications.html#file-exclusion-test">File Exclusion Test</a></strong> (test-verification)
 <ul>
 <li>Satisfied by:
 <ul>
@@ -1549,7 +1338,7 @@ blockquote {
 </li>
 </ul>
 </li>
-<li>✅ <strong><a href="specifications/System/Validation.html#invalid-header-structure-test">Invalid Header Structure Test</a></strong> (test-verification)
+<li>✅ <strong><a href="specifications/System/Core/Verifications/ValidationVerifications.html#invalid-header-structure-test">Invalid Header Structure Test</a></strong> (test-verification)
 <ul>
 <li>Satisfied by:
 <ul>
@@ -1558,7 +1347,7 @@ blockquote {
 </li>
 </ul>
 </li>
-<li>✅ <strong><a href="specifications/System/Validation.html#invalid-relations-test">Invalid Relations Test</a></strong> (test-verification)
+<li>✅ <strong><a href="specifications/System/Core/Verifications/ValidationVerifications.html#invalid-relations-test">Invalid Relations Test</a></strong> (test-verification)
 <ul>
 <li>Satisfied by:
 <ul>
@@ -1567,7 +1356,7 @@ blockquote {
 </li>
 </ul>
 </li>
-<li>✅ <strong><a href="specifications/System/Validation.html#requirements-files-search-and-detection-test">Requirements Files Search and Detection Test</a></strong> (test-verification)
+<li>✅ <strong><a href="specifications/System/Core/Verifications/ValidationVerifications.html#requirements-files-search-and-detection-test">Requirements Files Search and Detection Test</a></strong> (test-verification)
 <ul>
 <li>Satisfied by:
 <ul>
@@ -1576,7 +1365,7 @@ blockquote {
 </li>
 </ul>
 </li>
-<li>✅ <strong><a href="specifications/System/Validation.html#same-file-fragment-relations-test">Same-File Fragment Relations Test</a></strong> (test-verification)
+<li>✅ <strong><a href="specifications/System/Core/Verifications/ValidationVerifications.html#same-file-fragment-relations-test">Same-File Fragment Relations Test</a></strong> (test-verification)
 <ul>
 <li>Satisfied by:
 <ul>
@@ -1585,7 +1374,7 @@ blockquote {
 </li>
 </ul>
 </li>
-<li>✅ <strong><a href="specifications/System/Validation.html#subdirectory-processing-verification">Subdirectory Processing Verification</a></strong> (test-verification)
+<li>✅ <strong><a href="specifications/System/Core/Verifications/ValidationVerifications.html#subdirectory-processing-verification">Subdirectory Processing Verification</a></strong> (test-verification)
 <ul>
 <li>Satisfied by:
 <ul>
@@ -1594,7 +1383,7 @@ blockquote {
 </li>
 </ul>
 </li>
-<li>✅ <strong><a href="specifications/System/Validation.html#unstructured-documents-test">Unstructured Documents Test</a></strong> (test-verification)
+<li>✅ <strong><a href="specifications/System/Core/Verifications/ValidationVerifications.html#unstructured-documents-test">Unstructured Documents Test</a></strong> (test-verification)
 <ul>
 <li>Satisfied by:
 <ul>
@@ -1604,9 +1393,354 @@ blockquote {
 </ul>
 </li>
 </ul>
-<h3><a href="specifications/System/VerificationTraces.html">specifications/System/VerificationTraces.html</a></h3>
+<h3><a href="specifications/System/Operations/Verifications/ElementManipulationVerifications.html">specifications/System/Operations/Verifications/ElementManipulationVerifications.html</a></h3>
 <ul>
-<li>✅ <strong><a href="specifications/System/VerificationTraces.html#trace-relations-no-cycles-verification">Trace Relations No Cycles Verification</a></strong> (test-verification)
+<li>✅ <strong><a href="specifications/System/Operations/Verifications/ElementManipulationVerifications.html#cli-add-element-test">CLI Add Element Test</a></strong> (test-verification)
+<ul>
+<li>Satisfied by:
+<ul>
+<li><a href="tests/test-crud-manipulation/test.sh">tests/test-crud-manipulation/test.sh</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>✅ <strong><a href="specifications/System/Operations/Verifications/ElementManipulationVerifications.html#cli-move-element-test">CLI Move Element Test</a></strong> (test-verification)
+<ul>
+<li>Satisfied by:
+<ul>
+<li><a href="tests/test-crud-manipulation/test.sh">tests/test-crud-manipulation/test.sh</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>✅ <strong><a href="specifications/System/Operations/Verifications/ElementManipulationVerifications.html#cli-move-file-test">CLI Move File Test</a></strong> (test-verification)
+<ul>
+<li>Satisfied by:
+<ul>
+<li><a href="tests/test-crud-manipulation/test.sh">tests/test-crud-manipulation/test.sh</a></li>
+<li><a href="tests/test-subdirectory-functionality/test.sh">tests/test-subdirectory-functionality/test.sh</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>✅ <strong><a href="specifications/System/Operations/Verifications/ElementManipulationVerifications.html#cli-remove-element-test">CLI Remove Element Test</a></strong> (test-verification)
+<ul>
+<li>Satisfied by:
+<ul>
+<li><a href="tests/test-crud-manipulation/test.sh">tests/test-crud-manipulation/test.sh</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>✅ <strong><a href="specifications/System/Operations/Verifications/ElementManipulationVerifications.html#cli-rename-element-test">CLI Rename Element Test</a></strong> (test-verification)
+<ul>
+<li>Satisfied by:
+<ul>
+<li><a href="tests/test-crud-manipulation/test.sh">tests/test-crud-manipulation/test.sh</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>✅ <strong><a href="specifications/System/Operations/Verifications/ElementManipulationVerifications.html#create-element-test">Create Element Test</a></strong> (test-verification)
+<ul>
+<li>Satisfied by:
+<ul>
+<li><a href="tests/test-crud-manipulation/test.sh">tests/test-crud-manipulation/test.sh</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>✅ <strong><a href="specifications/System/Operations/Verifications/ElementManipulationVerifications.html#delete-element-test">Delete Element Test</a></strong> (test-verification)
+<ul>
+<li>Satisfied by:
+<ul>
+<li><a href="tests/test-crud-manipulation/test.sh">tests/test-crud-manipulation/test.sh</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>✅ <strong><a href="specifications/System/Operations/Verifications/ElementManipulationVerifications.html#file-persistence-test">File Persistence Test</a></strong> (test-verification)
+<ul>
+<li>Satisfied by:
+<ul>
+<li><a href="tests/test-crud-file-persistence/test.sh">tests/test-crud-file-persistence/test.sh</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>✅ <strong><a href="specifications/System/Operations/Verifications/ElementManipulationVerifications.html#move-element-test">Move Element Test</a></strong> (test-verification)
+<ul>
+<li>Satisfied by:
+<ul>
+<li><a href="tests/test-crud-manipulation/test.sh">tests/test-crud-manipulation/test.sh</a></li>
+<li><a href="tests/test-crud-empty-file-cleanup/test.sh">tests/test-crud-empty-file-cleanup/test.sh</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>✅ <strong><a href="specifications/System/Operations/Verifications/ElementManipulationVerifications.html#move-file-squash-test">Move File Squash Test</a></strong> (test-verification)
+<ul>
+<li>Satisfied by:
+<ul>
+<li><a href="tests/test-crud-mv-file-squash/test.sh">tests/test-crud-mv-file-squash/test.sh</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>✅ <strong><a href="specifications/System/Operations/Verifications/ElementManipulationVerifications.html#relation-consistency-test">Relation Consistency Test</a></strong> (test-verification)
+<ul>
+<li>Satisfied by:
+<ul>
+<li><a href="tests/test-crud-relation-consistency/test.sh">tests/test-crud-relation-consistency/test.sh</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>✅ <strong><a href="specifications/System/Operations/Verifications/ElementManipulationVerifications.html#target-location-validation-test">Target Location Validation Test</a></strong> (test-verification)
+<ul>
+<li>Satisfied by:
+<ul>
+<li><a href="tests/test-crud-target-location-validation/test.sh">tests/test-crud-target-location-validation/test.sh</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3><a href="specifications/System/Operations/Verifications/FormattingVerifications.html">specifications/System/Operations/Verifications/FormattingVerifications.html</a></h3>
+<ul>
+<li>✅ <strong><a href="specifications/System/Operations/Verifications/FormattingVerifications.html#format-command-requirements-verification">Format Command Requirements Verification</a></strong> (test-verification)
+<ul>
+<li>Satisfied by:
+<ul>
+<li><a href="tests/test-advanced-format/test.sh">tests/test-advanced-format/test.sh</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3><a href="specifications/System/Operations/Verifications/LintingVerifications.html">specifications/System/Operations/Verifications/LintingVerifications.html</a></h3>
+<ul>
+<li>✅ <strong><a href="specifications/System/Operations/Verifications/LintingVerifications.html#lint-command-verification">Lint Command Verification</a></strong> (test-verification)
+<ul>
+<li>Satisfied by:
+<ul>
+<li><a href="tests/test-lint-command/test.sh">tests/test-lint-command/test.sh</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3><a href="specifications/System/Output/Verifications/DiagramVerifications.html">specifications/System/Output/Verifications/DiagramVerifications.html</a></h3>
+<ul>
+<li>✅ <strong><a href="specifications/System/Output/Verifications/DiagramVerifications.html#automated-documentation-export-on-pr-merge-verification">Automated Documentation Export on PR Merge Verification</a></strong> (test-verification)
+<ul>
+<li>Satisfied by:
+<ul>
+<li><a href=".github/workflows/update_docs.yml">.github/workflows/update_docs.yml</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>✅ <strong><a href="specifications/System/Output/Verifications/DiagramVerifications.html#diagram-generation-test">Diagram Generation Test</a></strong> (test-verification)
+<ul>
+<li>Satisfied by:
+<ul>
+<li><a href="tests/test-diagram-generation/test.sh">tests/test-diagram-generation/test.sh</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>✅ <strong><a href="specifications/System/Output/Verifications/DiagramVerifications.html#diagram-relation-filtering-verification">Diagram Relation Filtering Verification</a></strong> (test-verification)
+<ul>
+<li>Satisfied by:
+<ul>
+<li><a href="tests/test-diagram-filtering/test.sh">tests/test-diagram-filtering/test.sh</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>✅ <strong><a href="specifications/System/Output/Verifications/DiagramVerifications.html#remove-generated-diagrams-verification">Remove Generated Diagrams Verification</a></strong> (test-verification)
+<ul>
+<li>Satisfied by:
+<ul>
+<li><a href="tests/test-remove-diagrams/test.sh">tests/test-remove-diagrams/test.sh</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>✅ <strong><a href="specifications/System/Output/Verifications/DiagramVerifications.html#visualize-model-relationships-verification">Visualize Model Relationships Verification</a></strong> (test-verification)
+<ul>
+<li>Satisfied by:
+<ul>
+<li><a href="tests/test-diagram-generation/test.sh">tests/test-diagram-generation/test.sh</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3><a href="specifications/System/Output/Verifications/ReportingVerifications.html">specifications/System/Output/Verifications/ReportingVerifications.html</a></h3>
+<ul>
+<li>✅ <strong><a href="specifications/System/Output/Verifications/ReportingVerifications.html#containment-hierarchy-extraction-test">Containment Hierarchy Extraction Test</a></strong> (test-verification)
+<ul>
+<li>Satisfied by:
+<ul>
+<li><a href="tests/test-containment-view/test.sh">tests/test-containment-view/test.sh</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>✅ <strong><a href="specifications/System/Output/Verifications/ReportingVerifications.html#containment-view-json-output-test">Containment View JSON Output Test</a></strong> (test-verification)
+<ul>
+<li>Satisfied by:
+<ul>
+<li><a href="tests/test-containment-view/test.sh">tests/test-containment-view/test.sh</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>✅ <strong><a href="specifications/System/Output/Verifications/ReportingVerifications.html#containment-view-mermaid-diagram-test">Containment View Mermaid Diagram Test</a></strong> (test-verification)
+<ul>
+<li>Satisfied by:
+<ul>
+<li><a href="tests/test-containment-view/test.sh">tests/test-containment-view/test.sh</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>✅ <strong><a href="specifications/System/Output/Verifications/ReportingVerifications.html#containment-view-text-output-test">Containment View Text Output Test</a></strong> (test-verification)
+<ul>
+<li>Satisfied by:
+<ul>
+<li><a href="tests/test-containment-view/test.sh">tests/test-containment-view/test.sh</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>✅ <strong><a href="specifications/System/Output/Verifications/ReportingVerifications.html#custom-element-type-tracking-test">Custom Element Type Tracking Test</a></strong> (test-verification)
+<ul>
+<li>Satisfied by:
+<ul>
+<li><a href="tests/test-search-all-features/test.sh">tests/test-search-all-features/test.sh</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>✅ <strong><a href="specifications/System/Output/Verifications/ReportingVerifications.html#html-export-containment-view-integration-test">HTML Export Containment View Integration Test</a></strong> (test-verification)
+<ul>
+<li>Satisfied by:
+<ul>
+<li><a href="tests/test-containment-view/test.sh">tests/test-containment-view/test.sh</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>✅ <strong><a href="specifications/System/Output/Verifications/ReportingVerifications.html#model-command-verification">Model Command Verification</a></strong> (test-verification)
+<ul>
+<li>Satisfied by:
+<ul>
+<li><a href="tests/test-model-command/test.sh">tests/test-model-command/test.sh</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>✅ <strong><a href="specifications/System/Output/Verifications/ReportingVerifications.html#search-command-tests">Search Command Tests</a></strong> (test-verification)
+<ul>
+<li>Satisfied by:
+<ul>
+<li><a href="tests/test-search-all-features/test.sh">tests/test-search-all-features/test.sh</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>✅ <strong><a href="specifications/System/Output/Verifications/ReportingVerifications.html#verification-coverage-report-test">Verification Coverage Report Test</a></strong> (test-verification)
+<ul>
+<li>Satisfied by:
+<ul>
+<li><a href="tests/test-coverage-report/test.sh">tests/test-coverage-report/test.sh</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>✅ <strong><a href="specifications/System/Output/Verifications/ReportingVerifications.html#verification-traces-filter-options-test">Verification Traces Filter Options Test</a></strong> (test-verification)
+<ul>
+<li>Satisfied by:
+<ul>
+<li><a href="tests/test-verification-traces/test.sh">tests/test-verification-traces/test.sh</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>✅ <strong><a href="specifications/System/Output/Verifications/ReportingVerifications.html#verification-traces-from-folder-test">Verification Traces From-Folder Test</a></strong> (test-verification)
+<ul>
+<li>Satisfied by:
+<ul>
+<li><a href="tests/test-verification-traces/test.sh">tests/test-verification-traces/test.sh</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3><a href="specifications/System/Processing/Verifications/ChangeImpactVerifications.html">specifications/System/Processing/Verifications/ChangeImpactVerifications.html</a></h3>
+<ul>
+<li>✅ <strong><a href="specifications/System/Processing/Verifications/ChangeImpactVerifications.html#change-impact-analysis-verification">Change Impact Analysis Verification</a></strong> (test-verification)
+<ul>
+<li>Satisfied by:
+<ul>
+<li><a href="tests/test-change-impact-detection/test.sh">tests/test-change-impact-detection/test.sh</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>✅ <strong><a href="specifications/System/Processing/Verifications/ChangeImpactVerifications.html#change-impact-detection-test">Change Impact Detection Test</a></strong> (test-verification)
+<ul>
+<li>Satisfied by:
+<ul>
+<li><a href="tests/test-change-impact-detection/test.sh">tests/test-change-impact-detection/test.sh</a></li>
+<li><a href="tests/test-change-impact-element-relocation/test.sh">tests/test-change-impact-element-relocation/test.sh</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>✅ <strong><a href="specifications/System/Processing/Verifications/ChangeImpactVerifications.html#change-impact-relations-test">Change Impact Relations Test</a></strong> (test-verification)
+<ul>
+<li>Satisfied by:
+<ul>
+<li><a href="tests/test-change-impact-detection/test.sh">tests/test-change-impact-detection/test.sh</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>✅ <strong><a href="specifications/System/Processing/Verifications/ChangeImpactVerifications.html#change-impact-smart-filtering-test">Change Impact Smart Filtering Test</a></strong> (test-verification)
+<ul>
+<li>Satisfied by:
+<ul>
+<li><a href="tests/test-change-impact-smart-filtering/test.sh">tests/test-change-impact-smart-filtering/test.sh</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>✅ <strong><a href="specifications/System/Processing/Verifications/ChangeImpactVerifications.html#element-content-extraction-test">Element Content Extraction Test</a></strong> (test-verification)
+<ul>
+<li>Satisfied by:
+<ul>
+<li><a href="tests/test-element-content-extraction/test.sh">tests/test-element-content-extraction/test.sh</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>✅ <strong><a href="specifications/System/Processing/Verifications/ChangeImpactVerifications.html#structural-change-reports-verification">Structural Change Reports Verification</a></strong> (test-verification)
+<ul>
+<li>Satisfied by:
+<ul>
+<li><a href="tests/test-change-impact-detection/test.sh">tests/test-change-impact-detection/test.sh</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3><a href="specifications/System/Processing/Verifications/TraceVerifications.html">specifications/System/Processing/Verifications/TraceVerifications.html</a></h3>
+<ul>
+<li>✅ <strong><a href="specifications/System/Processing/Verifications/TraceVerifications.html#trace-relations-no-cycles-verification">Trace Relations No Cycles Verification</a></strong> (test-verification)
 <ul>
 <li>Satisfied by:
 <ul>

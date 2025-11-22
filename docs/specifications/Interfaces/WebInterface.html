@@ -4,8 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WebInterface</title>
+    <link rel="icon" type="image/x-icon" href="../../assets/favicon.ico">
+    <link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
     
 <style>
+:root {
+    /* Primary Colors */
+    --color-primary: #1E3A5F;           /* Deep Sapphire - navigation, headers */
+    --color-primary-hover: #2a4a73;     /* Lighter shade for hover states */
+    --color-primary-active: #15293f;    /* Darker shade for active states */
+
+    /* Element Type Colors */
+    --color-requirement: #2563EB;       /* Royal Blue */
+    --color-verification: #059669;      /* Emerald */
+    --color-design: #7C3AED;            /* Purple */
+    --color-test: #0891B2;              /* Teal */
+    --color-implementation: #D97706;    /* Amber */
+    --color-external: #64748B;          /* Slate */
+
+    /* Status Colors */
+    --color-verified: #059669;          /* Emerald - verified/passing */
+    --color-pending: #D97706;           /* Amber - pending/warning */
+    --color-error: #DC2626;             /* Rose - error/failed */
+
+    /* Interactive Colors */
+    --color-highlight: #ff6b6b;         /* Hover highlight */
+    --color-link: #0366d6;              /* Link color */
+}
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
     line-height: 1.6;
@@ -20,7 +45,7 @@ body {
     left: 0;
     right: 0;
     height: 50px;
-    background-color: #2c3e50;
+    background-color: var(--color-primary);
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     z-index: 1000;
     display: flex;
@@ -28,15 +53,23 @@ body {
     padding: 0 20px;
 }
 .reqvire-nav a {
-    color: #ecf0f1;
+    color: #ffffff;
     text-decoration: none;
     padding: 10px 20px;
     margin-right: 5px;
     border-radius: 3px;
     transition: background-color 0.2s;
 }
+.reqvire-nav a.nav-logo {
+    display: flex;
+    align-items: center;
+    padding: 5px 15px 5px 0;
+}
+.reqvire-nav a.nav-logo img {
+    vertical-align: middle;
+}
 .reqvire-nav a:hover {
-    background-color: #34495e;
+    background-color: var(--color-primary-hover);
 }
 .reqvire-nav-spacer {
     height: 50px;
@@ -64,7 +97,7 @@ h2 {
     padding-bottom: 5px;
 }
 h3 {
-    color: #1a6fb7;
+    color: var(--color-requirement);
     margin-top: 25px;
 }
 h4 {
@@ -72,7 +105,7 @@ h4 {
     font-weight: 600;
 }
 a {
-    color: #0366d6;
+    color: var(--color-link);
     text-decoration: none;
 }
 a:hover {
@@ -159,7 +192,7 @@ blockquote {
 .diagram-nav-btn {
     width: 32px;
     height: 32px;
-    background-color: #2c3e50;
+    background-color: var(--color-primary);
     color: white;
     border: none;
     border-radius: 3px;
@@ -170,10 +203,10 @@ blockquote {
     justify-content: center;
 }
 .diagram-nav-btn:hover {
-    background-color: #34495e;
+    background-color: var(--color-primary-hover);
 }
 .diagram-nav-btn:active {
-    background-color: #1a252f;
+    background-color: var(--color-primary-active);
 }
 </style>
 
@@ -221,17 +254,34 @@ blockquote {
         await mermaid.run();
         window.mermaid = mermaid;
 
+        // Wait for SVGs to be fully rendered, then initialize
+        function waitForSvgs(callback) {
+            var containers = document.querySelectorAll('.mermaid');
+            var allReady = true;
+            containers.forEach(function(c) {
+                var svg = c.querySelector('svg');
+                if (!svg || !svg.getBBox || svg.getBBox().width === 0) {
+                    allReady = false;
+                }
+            });
+            if (allReady && containers.length > 0) {
+                callback();
+            } else {
+                requestAnimationFrame(function() { waitForSvgs(callback); });
+            }
+        }
+
         // Add pan/zoom to all Mermaid diagrams after rendering
-        setTimeout(function() {
+        waitForSvgs(function() {
             document.querySelectorAll('.mermaid').forEach(function(mermaidContainer) {
-                    var svg = mermaidContainer.querySelector('svg');
-                    if (!svg) return;
+                var svg = mermaidContainer.querySelector('svg');
+                if (!svg) return;
 
-                    svg.style.maxWidth = 'none';
-                    svg.style.maxHeight = 'none';
+                svg.style.maxWidth = 'none';
+                svg.style.maxHeight = 'none';
 
-                    var eventsHandler = {
-                        haltEventListeners: ['touchstart', 'touchend', 'touchmove', 'touchleave', 'touchcancel'],
+                var eventsHandler = {
+                    haltEventListeners: ['touchstart', 'touchend', 'touchmove', 'touchleave', 'touchcancel'],
                         init: function(options) {
                             var instance = options.instance;
                             var initialScale = 1;
@@ -323,22 +373,20 @@ blockquote {
                         });
                     });
             });
-        }, 500);
 
-        // Add CSS for edge highlighting (high specificity for SVG)
-        var style = document.createElement('style');
-        style.textContent = `
-            path.edge-highlighted,
-            .edge-highlighted path,
-            svg path.edge-highlighted {
-                stroke: #ff6b6b !important;
-                stroke-width: 3px !important;
-            }
-        `;
-        document.head.appendChild(style);
+            // Add CSS for edge highlighting
+            var style = document.createElement('style');
+            style.textContent = `
+                path.edge-highlighted,
+                .edge-highlighted path,
+                svg path.edge-highlighted {
+                    stroke: #ff6b6b !important;
+                    stroke-width: 3px !important;
+                }
+            `;
+            document.head.appendChild(style);
 
-        // Add edge highlighting on node hover
-        setTimeout(function() {
+            // Initialize edge highlighting for all diagrams
             document.querySelectorAll('.mermaid svg').forEach(function(svg) {
                 var nodes = svg.querySelectorAll('.node');
 
@@ -441,24 +489,98 @@ blockquote {
                            pt.y >= bbox.y - margin && pt.y <= bbox.y + bbox.height + margin;
                 }
 
-                // Map edges to nodes
-                var nodeEdgeMap = {};
-                Object.keys(nodeData).forEach(function(hashId) {
-                    nodeEdgeMap[hashId] = [];
-                    var bbox = nodeData[hashId].bbox;
+                // Build edge connections with direction tracking
+                var edgeConnections = []; // [{path, source, target}]
+                var upstreamOf = {}; // node -> [parent nodes that point TO this node]
+                var downstreamOf = {}; // node -> [child nodes this node points TO]
 
-                    edgePaths.forEach(function(path) {
-                        var points = getPathPoints(path);
-                        for (var i = 0; i < points.length; i++) {
-                            if (isNearBbox(points[i], bbox, 40)) {
-                                if (!nodeEdgeMap[hashId].includes(path)) {
-                                    nodeEdgeMap[hashId].push(path);
-                                }
-                                break;
-                            }
+                Object.keys(nodeData).forEach(function(hashId) {
+                    upstreamOf[hashId] = [];
+                    downstreamOf[hashId] = [];
+                });
+
+                edgePaths.forEach(function(path) {
+                    var points = getPathPoints(path);
+                    if (points.length < 2) return;
+
+                    var startPt = points[0];
+                    var endPt = points[points.length - 1];
+
+                    var sourceNode = null;
+                    var targetNode = null;
+
+                    // Find source and target nodes for this edge
+                    Object.keys(nodeData).forEach(function(hashId) {
+                        var bbox = nodeData[hashId].bbox;
+                        if (isNearBbox(startPt, bbox, 20)) {
+                            sourceNode = hashId;
+                        }
+                        if (isNearBbox(endPt, bbox, 20)) {
+                            targetNode = hashId;
                         }
                     });
+
+                    if (sourceNode && targetNode && sourceNode !== targetNode) {
+                        edgeConnections.push({path: path, source: sourceNode, target: targetNode});
+                        // source -> target means: target's upstream includes source
+                        if (!upstreamOf[targetNode].includes(sourceNode)) {
+                            upstreamOf[targetNode].push(sourceNode);
+                        }
+                        // source -> target means: source's downstream includes target
+                        if (!downstreamOf[sourceNode].includes(targetNode)) {
+                            downstreamOf[sourceNode].push(targetNode);
+                        }
+                    }
                 });
+
+                // Traverse only upstream (to parents/ancestors)
+                function findUpstream(startNodeId) {
+                    var visited = {};
+                    var queue = [startNodeId];
+                    visited[startNodeId] = true;
+
+                    while (queue.length > 0) {
+                        var current = queue.shift();
+                        var parents = upstreamOf[current] || [];
+                        parents.forEach(function(parent) {
+                            if (!visited[parent]) {
+                                visited[parent] = true;
+                                queue.push(parent);
+                            }
+                        });
+                    }
+                    return visited;
+                }
+
+                // Traverse only downstream (to children/descendants)
+                function findDownstream(startNodeId) {
+                    var visited = {};
+                    var queue = [startNodeId];
+                    visited[startNodeId] = true;
+
+                    while (queue.length > 0) {
+                        var current = queue.shift();
+                        var children = downstreamOf[current] || [];
+                        children.forEach(function(child) {
+                            if (!visited[child]) {
+                                visited[child] = true;
+                                queue.push(child);
+                            }
+                        });
+                    }
+                    return visited;
+                }
+
+                // Get edges for connected nodes
+                function getChainEdges(nodeSet) {
+                    var edges = [];
+                    edgeConnections.forEach(function(conn) {
+                        if (nodeSet[conn.source] && nodeSet[conn.target]) {
+                            edges.push(conn.path);
+                        }
+                    });
+                    return edges;
+                }
 
                 // Attach hover handlers
                 nodes.forEach(function(node) {
@@ -473,27 +595,36 @@ blockquote {
                         nodes.forEach(function(n) { n.style.filter = ''; });
                         node.style.filter = 'drop-shadow(0 0 6px #ff6b6b)';
 
-                        var connectedEdges = nodeEdgeMap[hashId] || [];
-                        connectedEdges.forEach(function(path) {
+                        // Find upstream (ancestors) and downstream (descendants) separately
+                        var upstream = findUpstream(hashId);
+                        var downstream = findDownstream(hashId);
+                        // Merge both sets
+                        var allConnected = {};
+                        Object.keys(upstream).forEach(function(k) { allConnected[k] = true; });
+                        Object.keys(downstream).forEach(function(k) { allConnected[k] = true; });
+
+                        var chainEdges = getChainEdges(allConnected);
+                        chainEdges.forEach(function(path) {
                             path.classList.add('edge-highlighted');
                         });
                     });
 
                     node.addEventListener('mouseleave', function() {
                         node.style.filter = '';
-                        var connectedEdges = nodeEdgeMap[hashId] || [];
-                        connectedEdges.forEach(function(path) {
+                        // Remove highlight from all edges
+                        edgePaths.forEach(function(path) {
                             path.classList.remove('edge-highlighted');
                         });
                     });
                 });
             });
-        }, 1000);
+        });
     </script>
 </head>
 <body>
     <nav class="reqvire-nav">
-        <a href="../../index.html">Home</a>
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Reqvire" height="24"></a>
+        <a href="../../index.html">Index</a>
         <a href="../../containment.html">Containment</a>
         <a href="../../model.html">Model</a>
         <a href="../../whole-model.html">Whole Model</a>
@@ -504,12 +635,12 @@ blockquote {
     <div class="container">
         <div class="content">
             <h1 id="requirements">Requirements</h1>
-<div class="mermaid">graph LR;
+<div class="mermaid">graph TD;
   %% REQVIRE-AUTOGENERATED-DIAGRAM
   %% Graph styling
-  classDef userRequirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
-  classDef systemRequirement fill:#fce4e4,stroke:#e68a8a,stroke-width:1px;
-  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef userRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:2px;
+  classDef systemRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:1px;
+  classDef verification fill:#d1fae5,stroke:#059669,stroke-width:2px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 
   59093bf57f656ef3[&quot;HTML Export&quot;];
@@ -519,6 +650,10 @@ blockquote {
   class b07859a209e66b4b systemRequirement;
   click b07859a209e66b4b &quot;WebInterface.html#model-centric-view-generation&quot;;
   59093bf57f656ef3 -.->|deriveReqT| b07859a209e66b4b;
+  781d708df3bbd8fd[&quot;Web Interface Color Scheme&quot;];
+  class 781d708df3bbd8fd systemRequirement;
+  click 781d708df3bbd8fd &quot;WebInterface.html#web-interface-color-scheme&quot;;
+  59093bf57f656ef3 -.->|deriveReqT| 781d708df3bbd8fd;
   db6fe291d67a0271[&quot;Whole Model Diagram Generation&quot;];
   class db6fe291d67a0271 systemRequirement;
   click db6fe291d67a0271 &quot;WebInterface.html#whole-model-diagram-generation&quot;;
@@ -551,18 +686,14 @@ blockquote {
   class c196fa9b3e2c2258 default;
   click c196fa9b3e2c2258 &quot;../../core/templates/model.html&quot;;
   59093bf57f656ef3 -->|satisfiedBy| c196fa9b3e2c2258;
-  7ff28ff401dbaef7[&quot;CLI Help Structure Verification&quot;];
-  class 7ff28ff401dbaef7 verification;
-  click 7ff28ff401dbaef7 &quot;CLI.html#cli-help-structure-verification&quot;;
-  59093bf57f656ef3 -.->|verifiedBy| 7ff28ff401dbaef7;
-  73fc82b744d6851c[&quot;HTML Export Verification&quot;];
-  class 73fc82b744d6851c verification;
-  click 73fc82b744d6851c &quot;WebInterface.html#html-export-verification&quot;;
-  59093bf57f656ef3 -.->|verifiedBy| 73fc82b744d6851c;
-  8899a52ea9866d8b[&quot;test.sh&quot;];
-  class 8899a52ea9866d8b default;
-  click 8899a52ea9866d8b &quot;../../tests/test-html-export/test.sh&quot;;
-  73fc82b744d6851c -->|satisfiedBy| 8899a52ea9866d8b;
+  815c04291cd56adf[&quot;CLI Help Structure Verification&quot;];
+  class 815c04291cd56adf verification;
+  click 815c04291cd56adf &quot;Verifications/CLIVerifications.html#cli-help-structure-verification&quot;;
+  59093bf57f656ef3 -.->|verifiedBy| 815c04291cd56adf;
+  26a9cd8d23aabf88[&quot;HTML Export Verification&quot;];
+  class 26a9cd8d23aabf88 verification;
+  click 26a9cd8d23aabf88 &quot;Verifications/WebInterfaceVerifications.html#html-export-verification&quot;;
+  59093bf57f656ef3 -.->|verifiedBy| 26a9cd8d23aabf88;
   345c82cd34408acb[&quot;export.rs&quot;];
   class 345c82cd34408acb default;
   click 345c82cd34408acb &quot;../../core/src/export.rs&quot;;
@@ -586,14 +717,18 @@ blockquote {
   class 8f321516e91a74d6 systemRequirement;
   click 8f321516e91a74d6 &quot;CLI.html#validate-command&quot;;
   ed77c8b81e72691f -.->|trace| 8f321516e91a74d6;
-  c9349ff6d96c56d7[&quot;Serve Command Verification&quot;];
-  class c9349ff6d96c56d7 verification;
-  click c9349ff6d96c56d7 &quot;WebInterface.html#serve-command-verification&quot;;
-  ed77c8b81e72691f -.->|verifiedBy| c9349ff6d96c56d7;
-  dd6732f292fab4eb[&quot;test.sh&quot;];
-  class dd6732f292fab4eb default;
-  click dd6732f292fab4eb &quot;../../tests/test-serve-command/test.sh&quot;;
-  c9349ff6d96c56d7 -->|satisfiedBy| dd6732f292fab4eb;
+  7ae93e4f0a2b797d[&quot;Serve Command Verification&quot;];
+  class 7ae93e4f0a2b797d verification;
+  click 7ae93e4f0a2b797d &quot;Verifications/WebInterfaceVerifications.html#serve-command-verification&quot;;
+  ed77c8b81e72691f -.->|verifiedBy| 7ae93e4f0a2b797d;
+  d0e6cc47b904faa5[&quot;html.rs&quot;];
+  class d0e6cc47b904faa5 default;
+  click d0e6cc47b904faa5 &quot;../../core/src/html.rs&quot;;
+  781d708df3bbd8fd -->|satisfiedBy| d0e6cc47b904faa5;
+  3a807a8535fb41fa[&quot;base.html&quot;];
+  class 3a807a8535fb41fa default;
+  click 3a807a8535fb41fa &quot;../../core/templates/base.html&quot;;
+  781d708df3bbd8fd -->|satisfiedBy| 3a807a8535fb41fa;
   dad7eeb932afdb92[&quot;diagrams.rs&quot;];
   class dad7eeb932afdb92 default;
   click dad7eeb932afdb92 &quot;../../core/src/diagrams.rs&quot;;
@@ -643,10 +778,10 @@ blockquote {
   e16108a30570f434 -.->|deriveReqT| 4fd92091a4cfac13;
   e16108a30570f434 -.->|deriveReqT| 8f321516e91a74d6;
   e16108a30570f434 -.->|deriveReqT| 59093bf57f656ef3;
-  ec8a8cc688b1d9d9[&quot;Integrated Validation&quot;];
-  class ec8a8cc688b1d9d9 systemRequirement;
-  click ec8a8cc688b1d9d9 &quot;../System/Validation.html#integrated-validation&quot;;
-  e16108a30570f434 -.->|deriveReqT| ec8a8cc688b1d9d9;
+  34989dd78e7df469[&quot;Integrated Validation&quot;];
+  class 34989dd78e7df469 systemRequirement;
+  click 34989dd78e7df469 &quot;../System/Core/Validation.html#integrated-validation&quot;;
+  e16108a30570f434 -.->|deriveReqT| 34989dd78e7df469;
   80defdd4cbc7ee18[&quot;cli.rs&quot;];
   class 80defdd4cbc7ee18 default;
   click 80defdd4cbc7ee18 &quot;../../cli/src/cli.rs&quot;;
@@ -656,40 +791,45 @@ blockquote {
   click adfe41db00d52285 &quot;Interfaces.html#web-interface&quot;;
   adfe41db00d52285 -.->|deriveReqT| 59093bf57f656ef3;
   adfe41db00d52285 -.->|deriveReqT| ed77c8b81e72691f;
-  71adfd59da9ff84f[&quot;Complete Model Structure Visualization&quot;];
-  class 71adfd59da9ff84f userRequirement;
-  click 71adfd59da9ff84f &quot;../System/DiagramGeneration.html#complete-model-structure-visualization&quot;;
-  71adfd59da9ff84f -.->|deriveReqT| b07859a209e66b4b;
-  c57d76a5aa346a53[&quot;Model Visualization and Exploration&quot;];
-  class c57d76a5aa346a53 userRequirement;
-  click c57d76a5aa346a53 &quot;../System/DiagramGeneration.html#model-visualization-and-exploration&quot;;
+  9c62bd365584dc2e[&quot;Complete Model Structure Visualization&quot;];
+  class 9c62bd365584dc2e userRequirement;
+  click 9c62bd365584dc2e &quot;../System/Output/DiagramGeneration.html#complete-model-structure-visualization&quot;;
+  9c62bd365584dc2e -.->|deriveReqT| b07859a209e66b4b;
+  7db46f0e09d5d48e[&quot;Interactive Mermaid Diagrams&quot;];
+  class 7db46f0e09d5d48e userRequirement;
+  click 7db46f0e09d5d48e &quot;../System/Output/DiagramGeneration.html#interactive-mermaid-diagrams&quot;;
+  7db46f0e09d5d48e -.->|deriveReqT| 781d708df3bbd8fd;
+  7eef8716dbe1c578[&quot;Diagram Generation&quot;];
+  class 7eef8716dbe1c578 systemRequirement;
+  click 7eef8716dbe1c578 &quot;../System/Output/DiagramGeneration.html#diagram-generation&quot;;
+  7db46f0e09d5d48e -.->|deriveReqT| 7eef8716dbe1c578;
+  b95348d09df26743[&quot;Model Visualization and Exploration&quot;];
+  class b95348d09df26743 userRequirement;
+  click b95348d09df26743 &quot;../System/Output/DiagramGeneration.html#model-visualization-and-exploration&quot;;
   ccf73e5865717df6[&quot;CLI Model Diagram Command&quot;];
   class ccf73e5865717df6 systemRequirement;
   click ccf73e5865717df6 &quot;CLI.html#cli-model-diagram-command&quot;;
-  c57d76a5aa346a53 -.->|deriveReqT| ccf73e5865717df6;
-  c57d76a5aa346a53 -.->|deriveReqT| b07859a209e66b4b;
-  1c6b7180f4e0214a[&quot;Model Reports&quot;];
-  class 1c6b7180f4e0214a userRequirement;
-  click 1c6b7180f4e0214a &quot;../System/Reporting.html#model-reports&quot;;
-  1c6b7180f4e0214a -.->|deriveReqT| 59093bf57f656ef3;
-  1c6b7180f4e0214a -.->|deriveReqT| 71adfd59da9ff84f;
-  5be870a7fe3078ce[&quot;Interactive Mermaid Diagrams&quot;];
-  class 5be870a7fe3078ce userRequirement;
-  click 5be870a7fe3078ce &quot;../System/DiagramGeneration.html#interactive-mermaid-diagrams&quot;;
-  1c6b7180f4e0214a -.->|deriveReqT| 5be870a7fe3078ce;
-  1c6b7180f4e0214a -.->|deriveReqT| c57d76a5aa346a53;
-  99d6386e6ce8f5f9[&quot;Model Structure and Summaries&quot;];
-  class 99d6386e6ce8f5f9 userRequirement;
-  click 99d6386e6ce8f5f9 &quot;../System/Reporting.html#model-structure-and-summaries&quot;;
-  1c6b7180f4e0214a -.->|deriveReqT| 99d6386e6ce8f5f9;
-  9c9b9aa3155688f3[&quot;Provide Validation Reports&quot;];
-  class 9c9b9aa3155688f3 userRequirement;
-  click 9c9b9aa3155688f3 &quot;../System/Reporting.html#provide-validation-reports&quot;;
-  1c6b7180f4e0214a -.->|deriveReqT| 9c9b9aa3155688f3;
-  a7bb3c1af2e2d306[&quot;Verification Coverage Report&quot;];
-  class a7bb3c1af2e2d306 userRequirement;
-  click a7bb3c1af2e2d306 &quot;../System/Reporting.html#verification-coverage-report&quot;;
-  1c6b7180f4e0214a -.->|deriveReqT| a7bb3c1af2e2d306;
+  b95348d09df26743 -.->|deriveReqT| ccf73e5865717df6;
+  b95348d09df26743 -.->|deriveReqT| b07859a209e66b4b;
+  a2af7f82db048fbc[&quot;Model Reports&quot;];
+  class a2af7f82db048fbc userRequirement;
+  click a2af7f82db048fbc &quot;../System/Output/Reporting.html#model-reports&quot;;
+  a2af7f82db048fbc -.->|deriveReqT| 59093bf57f656ef3;
+  a2af7f82db048fbc -.->|deriveReqT| 9c62bd365584dc2e;
+  a2af7f82db048fbc -.->|deriveReqT| 7db46f0e09d5d48e;
+  a2af7f82db048fbc -.->|deriveReqT| b95348d09df26743;
+  9cd81bb70e97a906[&quot;Model Structure and Summaries&quot;];
+  class 9cd81bb70e97a906 userRequirement;
+  click 9cd81bb70e97a906 &quot;../System/Output/Reporting.html#model-structure-and-summaries&quot;;
+  a2af7f82db048fbc -.->|deriveReqT| 9cd81bb70e97a906;
+  51f1f398e207d6d4[&quot;Provide Validation Reports&quot;];
+  class 51f1f398e207d6d4 userRequirement;
+  click 51f1f398e207d6d4 &quot;../System/Output/Reporting.html#provide-validation-reports&quot;;
+  a2af7f82db048fbc -.->|deriveReqT| 51f1f398e207d6d4;
+  3643f79c67e5b0d3[&quot;Verification Coverage Report&quot;];
+  class 3643f79c67e5b0d3 userRequirement;
+  click 3643f79c67e5b0d3 &quot;../System/Output/Reporting.html#verification-coverage-report&quot;;
+  a2af7f82db048fbc -.->|deriveReqT| 3643f79c67e5b0d3;
   59725c25046f87ea[&quot;Model Export&quot;];
   class 59725c25046f87ea userRequirement;
   click 59725c25046f87ea &quot;../UserStories.html#model-export&quot;;
@@ -773,12 +913,19 @@ The system shall provide a fixed navigation bar in all HTML pages with links to 
 </ul>
 <p><strong>HTML Design:</strong>
 The system shall design and implement HTML pages with consistent layout, styling, and navigation for browsing the MBSE model.</p>
+<p><strong>Logo and Branding:</strong></p>
+<ul>
+<li>The navigation bar shall display the Reqvire logo on the left side before the navigation links</li>
+<li>A favicon shall be included for browser tab identification</li>
+<li>Apple touch icons shall be included for mobile device support</li>
+<li>All brand assets shall be exported to an assets folder during HTML export</li>
+</ul>
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="../UserStories.html#model-export">Model Export</a></li>
 <li>derivedFrom: <a href="Interfaces.html#web-interface">Web Interface</a></li>
 <li>derivedFrom: <a href="CLI.html#cli-interface-structure">CLI Interface Structure</a></li>
-<li>derivedFrom: <a href="../System/Reporting.html#model-reports">Model Reports</a></li>
+<li>derivedFrom: <a href="../System/Output/Reporting.html#model-reports">Model Reports</a></li>
 <li>satisfiedBy: <a href="../../core/src/html_export.rs">html_export.rs</a></li>
 <li>satisfiedBy: <a href="../../core/src/html.rs">html.rs</a></li>
 <li>satisfiedBy: <a href="../../cli/src/cli.rs">cli.rs</a></li>
@@ -786,49 +933,56 @@ The system shall design and implement HTML pages with consistent layout, styling
 <li>satisfiedBy: <a href="../../core/templates/base.html">base.html</a></li>
 <li>satisfiedBy: <a href="../../core/templates/model.html">model.html</a></li>
 <li>satisfiedBy: <a href="../../core/src/export.rs">export.rs</a></li>
-<li>verifiedBy: <a href="#html-export-verification">HTML Export Verification</a></li>
+<li>verifiedBy: <a href="Verifications/WebInterfaceVerifications.html#html-export-verification">HTML Export Verification</a></li>
 </ul>
 <hr />
-<h3 id="html-export-verification">HTML Export Verification</h3>
-<p>This test verifies that the system exports specifications into HTML format with generated index and saves them in the designated output location.</p>
+<h3 id="web-interface-color-scheme">Web Interface Color Scheme</h3>
+<p>The system shall implement a consistent color scheme across all HTML pages optimized for MBSE and requirements management applications.</p>
 <h4>Details</h4>
-<h5>Acceptance Criteria:</h5>
+<p><strong>Primary Colors:</strong>
+| Color Name | Hex Code | Usage |
+|————|–––––|—––|
+| Deep Sapphire | #1E3A5F | Navigation bar background, primary headers |
+| White | #FFFFFF | Navigation text, content background |
+| Slate Gray | #64748B | Secondary text, borders |</p>
+<p><strong>Element Type Colors:</strong>
+The web interface shall use consistent colors matching the diagram color scheme:
+| Element Type | Color | Hex Code |
+|———––|—––|–––––|
+| Requirement | Royal Blue | #2563EB |
+| Verification | Emerald | #059669 |
+| Design | Purple | #7C3AED |
+| Test | Teal | #0891B2 |</p>
+<p><strong>Status Indicator Colors:</strong>
+| Status | Color | Hex Code | Usage |
+|––––|—––|–––––|—––|
+| Verified/Passing | Emerald | #059669 | Verified requirements, passing tests |
+| Pending/Warning | Amber | #D97706 | Unverified items, warnings |
+| Failed/Error | Rose | #DC2626 | Failed tests, validation errors |</p>
+<p><strong>Interactive State Colors:</strong>
+| State | Color | Usage |
+|—––|—––|—––|
+| Hover Highlight | #ff6b6b | Diagram node hover effect |
+| Link Hover | Lighter shade | Navigation link hover states |
+| Active/Selected | Primary color | Currently selected navigation item |</p>
+<p><strong>Typography:</strong></p>
 <ul>
-<li>System should export specifications to HTML format</li>
-<li>HTML files should be saved in the designated output location</li>
-<li>HTML output should maintain the structure and content of the original specifications</li>
-<li>System shall generate index.md in the temporary working directory during HTML export</li>
-<li>index.md shall be converted to index.html in the output directory</li>
-<li>index.html shall contain links to all specification documents</li>
-<li>index.html shall be properly structured with sections</li>
-<li>index.html shall include brief summaries of each document</li>
-<li>index.html shall serve as the primary entry point for HTML documentation</li>
-<li>Links in diagrams and text must be converted to use .html instead of .md</li>
-<li>Paths in HTML files should maintain the original relative structure</li>
-<li>System should work in environments without Git repositories</li>
+<li>Primary font: System font stack (sans-serif)</li>
+<li>Monospace font: For code blocks and element identifiers</li>
+<li>Line height: 1.6 for content readability</li>
 </ul>
-<h5>Test Criteria:</h5>
+<p><strong>Layout:</strong></p>
 <ul>
-<li>Command exits with success (0) return code</li>
-<li>HTML files are generated at the expected location with .html extension</li>
-<li>Output directory contains index.html file</li>
-<li>index.html contains links to all specification documents</li>
-<li>index.html structure follows expected format</li>
-<li>HTML content preserves the structure and information from the source files</li>
-<li>Links in HTML files use .html extension instead of .md</li>
-<li>Mermaid click links are properly converted from .md to .html</li>
-<li>Both GitHub-style URLs and direct file paths in mermaid click links are handled correctly</li>
-<li>Paths should not have duplicated folder names (e.g., specifications/specifications)</li>
-<li>The .git directory is not present in export output</li>
-</ul>
-<h4>Metadata</h4>
-<ul>
-<li>type: test-verification</li>
+<li>Navigation bar: Fixed position, full width</li>
+<li>Content container: Centered with max-width for readability</li>
+<li>Responsive design: Adapts to different screen sizes</li>
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>verify: <a href="#html-export">HTML Export</a></li>
-<li>satisfiedBy: <a href="../../tests/test-html-export/test.sh">test.sh</a></li>
+<li>derivedFrom: <a href="#html-export">HTML Export</a></li>
+<li>derivedFrom: <a href="../System/Output/DiagramGeneration.html#interactive-mermaid-diagrams">Interactive Mermaid Diagrams</a></li>
+<li>satisfiedBy: <a href="../../core/src/html.rs">html.rs</a></li>
+<li>satisfiedBy: <a href="../../core/templates/base.html">base.html</a></li>
 </ul>
 <hr />
 <h3 id="model-centric-view-generation">Model-Centric View Generation</h3>
@@ -843,8 +997,8 @@ The system shall design and implement HTML pages with consistent layout, styling
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>derivedFrom: <a href="../System/DiagramGeneration.html#complete-model-structure-visualization">Complete Model Structure Visualization</a></li>
-<li>derivedFrom: <a href="../System/DiagramGeneration.html#model-visualization-and-exploration">Model Visualization and Exploration</a></li>
+<li>derivedFrom: <a href="../System/Output/DiagramGeneration.html#complete-model-structure-visualization">Complete Model Structure Visualization</a></li>
+<li>derivedFrom: <a href="../System/Output/DiagramGeneration.html#model-visualization-and-exploration">Model Visualization and Exploration</a></li>
 <li>derivedFrom: <a href="#html-export">HTML Export</a></li>
 <li>satisfiedBy: <a href="../../core/src/export.rs">export.rs</a></li>
 <li>satisfiedBy: <a href="../../core/src/report_model.rs">report_model.rs</a></li>
@@ -867,43 +1021,6 @@ The system shall design and implement HTML pages with consistent layout, styling
 <li>satisfiedBy: <a href="../../core/src/diagrams.rs">diagrams.rs</a></li>
 </ul>
 <hr />
-<h3 id="serve-command-verification">Serve Command Verification</h3>
-<p>This test verifies that the serve command exports HTML to a temporary directory and starts an HTTP server that serves the model documentation.</p>
-<h4>Details</h4>
-<h5>Acceptance Criteria:</h5>
-<ul>
-<li>System shall export HTML artifacts to a temporary directory</li>
-<li>System shall start HTTP server on specified host and port</li>
-<li>System shall display clickable terminal link to the server URL</li>
-<li>System shall serve index.html when accessing root URL</li>
-<li>System shall serve all exported HTML files with correct paths</li>
-<li>System shall serve static assets (SVG diagrams, CSS, etc.)</li>
-<li>System shall return 404 for non-existent files</li>
-<li>System shall set correct Content-Type headers for different file types</li>
-<li>System shall run in quiet mode (suppress verbose export output)</li>
-<li>System shall not automatically open browser window</li>
-<li>System shall display instructions for Ctrl-C stop</li>
-</ul>
-<h5>Test Criteria:</h5>
-<ul>
-<li>Command starts successfully and displays server URL with instructions</li>
-<li>Server responds to HTTP requests on specified port</li>
-<li>Root URL (/) serves index.html</li>
-<li>HTML files are served with text/html content type</li>
-<li>SVG files are served with image/svg+xml content type</li>
-<li>Non-existent paths return 404 status</li>
-<li>Export verbose output is suppressed (quiet mode active)</li>
-</ul>
-<h4>Metadata</h4>
-<ul>
-<li>type: test-verification</li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>verify: <a href="#serve-command">Serve Command</a></li>
-<li>satisfiedBy: <a href="../../tests/test-serve-command/test.sh">test.sh</a></li>
-</ul>
-<hr />
 <h3 id="serve-command">Serve Command</h3>
 <p>The system SHALL provide a serve command that exports comprehensive HTML documentation and serves it via an HTTP server for browsing.</p>
 <h4>Details</h4>
@@ -924,7 +1041,7 @@ The system shall design and implement HTML pages with consistent layout, styling
 <li>trace: <a href="CLI.html#validate-command">Validate Command</a></li>
 <li>satisfiedBy: <a href="../../cli/src/cli.rs">cli.rs</a></li>
 <li>satisfiedBy: <a href="../../cli/src/serve.rs">serve.rs</a></li>
-<li>verifiedBy: <a href="#serve-command-verification">Serve Command Verification</a></li>
+<li>verifiedBy: <a href="Verifications/WebInterfaceVerifications.html#serve-command-verification">Serve Command Verification</a></li>
 </ul>
 <hr />
 
