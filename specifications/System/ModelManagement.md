@@ -275,4 +275,3 @@ Element types are identified through a reserved "type" metadata property. The fo
   * satisfiedBy: [element.rs](../../core/src/element.rs)
   * satisfiedBy: [parser.rs](../../core/src/parser.rs)
 ---
-

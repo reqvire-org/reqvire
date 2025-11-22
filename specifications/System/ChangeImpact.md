@@ -627,4 +627,3 @@ flowchart TD;
   * derivedFrom: [Change Impact Detection](#change-impact-detection)
   * satisfiedBy: [change_impact.rs](../../core/src/change_impact.rs)
 ---
-

@@ -165,7 +165,7 @@ This test verifies the format command requirements from SystemRequirements and U
 #### Relations
   * verify: [Format Command](../Interfaces/CLI.md#format-command)
   * verify: [Document Structure Normalization](#document-structure-normalization)
-  * verify: [Structure And Addressing In Markdown Documents](StructureAndParsing.md#structure-and-addressing-in-markdown-documents)
+  * verify: [Structure and Addressing in Markdown Documents](StructureAndParsing.md#structure-and-addressing-in-markdown-documents)
   * satisfiedBy: [test.sh](../../tests/test-advanced-format/test.sh)
 ---
 
@@ -225,4 +225,3 @@ When generating formatted output, the system shall:
   * satisfiedBy: [graph_registry.rs](../../core/src/graph_registry.rs)
   * satisfiedBy: [parser.rs](../../core/src/parser.rs)
 ---
-

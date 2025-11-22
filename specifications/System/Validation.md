@@ -592,6 +592,5 @@ The system shall validate relation types and allow only supported types.
 #### Relations
   * derivedFrom: [Validating Structures](../UserStories.md#validating-structures)
   * derivedFrom: [Align with Industry Standards](../UserStories.md#align-with-industry-standards)
-  * derivedFrom: [Relation Types And Behaviors](ModelManagement.md#relation-types-and-behaviors)
+  * derivedFrom: [Relation Types and behaviors](ModelManagement.md#relation-types-and-behaviors)
 ---
-

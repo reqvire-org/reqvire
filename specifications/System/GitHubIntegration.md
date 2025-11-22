@@ -1,6 +1,5 @@
 # Requirements
 
-
 ### Automate Pull Request Validations
 
 The system shall automate validations of pull requests in the GitHub workflow to ensure model consistency before merging.

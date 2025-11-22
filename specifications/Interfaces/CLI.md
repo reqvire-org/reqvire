@@ -638,4 +638,3 @@ This test verifies that the system properly handles the git commit hash flag for
   * verify: [CLI Change Impact Report Command](#cli-change-impact-report-command)
   * satisfiedBy: [test.sh](../../tests/test-change-impact-detection/test.sh)
 ---
-

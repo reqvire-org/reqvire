@@ -6,10 +6,15 @@
     <title>{title}</title>
     {styles}
     <!-- Enhanced mermaid configuration for Reqvire diagrams -->
-    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.5.0/dist/svg-pan-zoom.min.js"></script>
-    <script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+        import elkLayouts from 'https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk/dist/mermaid-layout-elk.esm.min.mjs';
+
+        // Register ELK layout for large diagrams
+        mermaid.registerLayoutLoaders(elkLayouts);
+
         // Capture Mermaid errors
         mermaid.parseError = function(err, hash) {
             console.error('Mermaid Parse Error:', err);
@@ -24,21 +29,29 @@
         mermaid.initialize({
             startOnLoad: true,
             theme: 'neutral',
-            maxTextSize: 120000,
-            maxEdges: 2000,
+            maxTextSize: 5000000,
+            maxEdges: 50000,
             flowchart: {
                 useMaxWidth: true,
                 htmlLabels: true,
-                curve: 'basis'
+                curve: 'basis',
+                defaultRenderer: 'elk'
+            },
+            layout: 'elk',
+            elk: {
+                mergeEdges: true,
+                nodePlacementStrategy: 'SIMPLE'
             },
             securityLevel: 'loose',
             logLevel: 'error'
         });
 
+        await mermaid.run();
+        window.mermaid = mermaid;
+
         // Add pan/zoom to all Mermaid diagrams after rendering
-        window.addEventListener('load', function() {
-            setTimeout(function() {
-                document.querySelectorAll('.mermaid').forEach(function(mermaidContainer) {
+        setTimeout(function() {
+            document.querySelectorAll('.mermaid').forEach(function(mermaidContainer) {
                     var svg = mermaidContainer.querySelector('svg');
                     if (!svg) return;
 
@@ -137,14 +150,183 @@
                             }
                         });
                     });
+            });
+        }, 500);
+
+        // Add CSS for edge highlighting (high specificity for SVG)
+        var style = document.createElement('style');
+        style.textContent = `
+            path.edge-highlighted,
+            .edge-highlighted path,
+            svg path.edge-highlighted {
+                stroke: #ff6b6b !important;
+                stroke-width: 3px !important;
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Add edge highlighting on node hover
+        setTimeout(function() {
+            document.querySelectorAll('.mermaid svg').forEach(function(svg) {
+                var nodes = svg.querySelectorAll('.node');
+
+                // Find flowchart-link paths (actual edges)
+                var edgePaths = svg.querySelectorAll('path.flowchart-link');
+                // Fallback: find paths in .edges group
+                if (edgePaths.length === 0) {
+                    var edgesGroup = svg.querySelector('.edges');
+                    if (edgesGroup) {
+                        edgePaths = edgesGroup.querySelectorAll('path');
+                    }
+                }
+
+                // Get SVG point for coordinate transforms
+                var svgPoint = svg.createSVGPoint();
+
+                // Helper: transform point through element's CTM
+                function getTransformedBBox(element) {
+                    var bbox = element.getBBox();
+                    var ctm = element.getCTM();
+                    if (!ctm) return bbox;
+
+                    // Transform all four corners
+                    var corners = [
+                        {x: bbox.x, y: bbox.y},
+                        {x: bbox.x + bbox.width, y: bbox.y},
+                        {x: bbox.x, y: bbox.y + bbox.height},
+                        {x: bbox.x + bbox.width, y: bbox.y + bbox.height}
+                    ];
+
+                    var transformed = corners.map(function(c) {
+                        svgPoint.x = c.x;
+                        svgPoint.y = c.y;
+                        var tp = svgPoint.matrixTransform(ctm);
+                        return {x: tp.x, y: tp.y};
+                    });
+
+                    var minX = Math.min.apply(null, transformed.map(function(p) { return p.x; }));
+                    var maxX = Math.max.apply(null, transformed.map(function(p) { return p.x; }));
+                    var minY = Math.min.apply(null, transformed.map(function(p) { return p.y; }));
+                    var maxY = Math.max.apply(null, transformed.map(function(p) { return p.y; }));
+
+                    return {x: minX, y: minY, width: maxX - minX, height: maxY - minY};
+                }
+
+                // Helper: get all points from path
+                function getPathPoints(path) {
+                    var d = path.getAttribute('d') || '';
+                    var points = [];
+                    var ctm = path.getCTM();
+
+                    // Match all coordinate pairs in the path
+                    var regex = /([ML])\s*([\d.-]+)[,\s]+([\d.-]+)|([CQ])[^MLCQZ]*/gi;
+                    var match;
+
+                    // Get M (start) point
+                    var startMatch = d.match(/M\s*([\d.-]+)[,\s]+([\d.-]+)/i);
+                    if (startMatch) {
+                        var sx = parseFloat(startMatch[1]);
+                        var sy = parseFloat(startMatch[2]);
+                        if (ctm) {
+                            svgPoint.x = sx; svgPoint.y = sy;
+                            var tp = svgPoint.matrixTransform(ctm);
+                            points.push({x: tp.x, y: tp.y});
+                        } else {
+                            points.push({x: sx, y: sy});
+                        }
+                    }
+
+                    // Get last point - find last number pair before Z or end
+                    var allNums = d.match(/[\d.-]+/g);
+                    if (allNums && allNums.length >= 2) {
+                        var ex = parseFloat(allNums[allNums.length - 2]);
+                        var ey = parseFloat(allNums[allNums.length - 1]);
+                        if (ctm) {
+                            svgPoint.x = ex; svgPoint.y = ey;
+                            var tp = svgPoint.matrixTransform(ctm);
+                            points.push({x: tp.x, y: tp.y});
+                        } else {
+                            points.push({x: ex, y: ey});
+                        }
+                    }
+
+                    return points;
+                }
+
+                // Build node bounding boxes with transforms
+                var nodeData = {};
+                nodes.forEach(function(node) {
+                    var nodeId = node.id || '';
+                    var parts = nodeId.split('-');
+                    var hashId = parts.length >= 2 ? parts[1] : nodeId;
+
+                    nodeData[hashId] = {
+                        node: node,
+                        bbox: getTransformedBBox(node)
+                    };
                 });
-            }, 1500);
-        });
+
+                // Check if point is near bbox
+                function isNearBbox(pt, bbox, margin) {
+                    margin = margin || 40;
+                    return pt.x >= bbox.x - margin && pt.x <= bbox.x + bbox.width + margin &&
+                           pt.y >= bbox.y - margin && pt.y <= bbox.y + bbox.height + margin;
+                }
+
+                // Map edges to nodes
+                var nodeEdgeMap = {};
+                Object.keys(nodeData).forEach(function(hashId) {
+                    nodeEdgeMap[hashId] = [];
+                    var bbox = nodeData[hashId].bbox;
+
+                    edgePaths.forEach(function(path) {
+                        var points = getPathPoints(path);
+                        for (var i = 0; i < points.length; i++) {
+                            if (isNearBbox(points[i], bbox, 40)) {
+                                if (!nodeEdgeMap[hashId].includes(path)) {
+                                    nodeEdgeMap[hashId].push(path);
+                                }
+                                break;
+                            }
+                        }
+                    });
+                });
+
+                // Attach hover handlers
+                nodes.forEach(function(node) {
+                    var nodeId = node.id || '';
+                    var parts = nodeId.split('-');
+                    var hashId = parts.length >= 2 ? parts[1] : nodeId;
+
+                    node.style.cursor = 'pointer';
+
+                    node.addEventListener('mouseenter', function(e) {
+                        e.stopPropagation();
+                        nodes.forEach(function(n) { n.style.filter = ''; });
+                        node.style.filter = 'drop-shadow(0 0 6px #ff6b6b)';
+
+                        var connectedEdges = nodeEdgeMap[hashId] || [];
+                        connectedEdges.forEach(function(path) {
+                            path.classList.add('edge-highlighted');
+                        });
+                    });
+
+                    node.addEventListener('mouseleave', function() {
+                        node.style.filter = '';
+                        var connectedEdges = nodeEdgeMap[hashId] || [];
+                        connectedEdges.forEach(function(path) {
+                            path.classList.remove('edge-highlighted');
+                        });
+                    });
+                });
+            });
+        }, 1000);
     </script>
 </head>
 <body>
     <nav class="reqvire-nav">
         <a href="{nav_prefix}index.html">Home</a>
+        <a href="{nav_prefix}containment.html">Containment</a>
         <a href="{nav_prefix}model.html">Model</a>
         <a href="{nav_prefix}whole-model.html">Whole Model</a>
         <a href="{nav_prefix}traces.html">Traces</a>

@@ -76,7 +76,7 @@ This test verifies that the system correctly extracts and parses element subsect
 #### Relations
   * verify: [Reserved Subsections Support](Subsections.md#reserved-subsections-support)
   * verify: [Supported Element Types](ModelManagement.md#supported-element-types)
-  * verify: [Relation Types And Behaviors](ModelManagement.md#relation-types-and-behaviors)
+  * verify: [Relation Types and behaviors](ModelManagement.md#relation-types-and-behaviors)
   * verify: [Default Requirement Type Assignment](ModelManagement.md#default-requirement-type-assignment)
   * satisfiedBy: [test.sh](../../tests/test-parsing-functionality/test.sh)
 ---
@@ -217,4 +217,3 @@ This test verifies that the system correctly normalizes element name fragments a
   * verify: [Element Identity Model](StructureAndParsing.md#element-identity-model)
   * satisfiedBy: [test.sh](../../tests/test-parsing-functionality/test.sh)
 ---
-

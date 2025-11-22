@@ -318,7 +318,7 @@ The trace relation behavior shall include:
 This ensures that trace relations serve their intended purpose of establishing lightweight traceability connections without creating artificial dependency constraints or participating in architectural validation logic.
 
 #### Relations
-  * derivedFrom: [Relation Types And Behaviors](ModelManagement.md#relation-types-and-behaviors)
+  * derivedFrom: [Relation Types and behaviors](ModelManagement.md#relation-types-and-behaviors)
   * verifiedBy: [Invalid Relations Test](Validation.md#invalid-relations-test)
   * verifiedBy: [Trace Relations No Cycles Verification](VerificationTraces.md#trace-relations-no-cycles-verification)
 ---
@@ -404,4 +404,3 @@ Users shall be able to generate and view model structure diagrams from any start
   * derivedFrom: [Generate Diagrams](../UserStories.md#generate-diagrams)
   * derivedFrom: [Model Reports](Reporting.md#model-reports)
 ---
-

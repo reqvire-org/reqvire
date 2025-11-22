@@ -2,7 +2,6 @@
 
 This document specifies verifications for the Attachments feature requirements.
 
-
 ### Attachments Subsection Parsing Verification
 
 Verify the system correctly parses Attachments subsections.
@@ -189,4 +188,3 @@ Test cases:
   * verify: [Reserved Subsections Support](Subsections.md#reserved-subsections-support)
   * satisfiedBy: [test.sh](../../tests/test-attachments/test.sh)
 ---
-

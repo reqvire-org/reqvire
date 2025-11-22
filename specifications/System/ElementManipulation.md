@@ -141,7 +141,7 @@ When validating and preparing target locations, the system shall:
 #### Relations
   * derivedFrom: [Element Manipulation Operations](ModelManagement.md#element-manipulation-operations)
   * derivedFrom: [Ignore Files Integration](Configuration.md#ignore-files-integration)
-  * derivedFrom: [Git Repository As Project Root](ModelManagement.md#git-repository-as-project-root)
+  * derivedFrom: [Git Repository as Project Root](ModelManagement.md#git-repository-as-project-root)
   * satisfiedBy: [utils.rs](../../core/src/utils.rs)
   * satisfiedBy: [graph_registry.rs](../../core/src/graph_registry.rs)
 ---
@@ -988,4 +988,3 @@ The test shall verify that the `mv-file --squash` command moves all elements fro
   * verify: [Move File Operation](#move-file-operation)
   * satisfiedBy: [test.sh](../../tests/test-crud-mv-file-squash/test.sh)
 ---
-

@@ -42,16 +42,9 @@ Reqvire is now available as a plugin for Claude Code! Get AI-assisted requiremen
 ---
 
 <sub>Figure 1: Example Diagram (click image to browse requirements)</sub>
-[![Example Diagram](doc/diagram_1.png)](specifications/SpecificationsRequirements.md#specifications-requirements)
+[![Example Diagram](doc/diagram_1.png)](specifications/System/DiagramGeneration.md)
 
 ---
-
-<sub>Figure 2: Example Change Impact Report (click image to read specifications)</sub>
-
-[![Example Change Impact Report](doc/change_impact_report_pr.png)](specifications/SpecificationsRequirements.md#requirements-change-propagation)
-
----
-
 ## Get Started
 
 ### Installation
