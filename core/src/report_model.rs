@@ -288,10 +288,10 @@ fn generate_element_text(element: &ModelCentricElement, depth: usize, diagram_di
         output.push_str(&format!("{}graph {}\n", indent, diagram_direction));
 
         // Add CSS class definitions for colors (MBSE color scheme)
-        output.push_str(&format!("{}  classDef userRequirement fill:#bfdbfe,stroke:#1d4ed8,stroke-width:2px;\n", indent));
-        output.push_str(&format!("{}  classDef systemRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:1.5px;\n", indent));
-        output.push_str(&format!("{}  classDef verification fill:#d4edda,stroke:#006400,stroke-width:2px;\n", indent));
-        output.push_str(&format!("{}  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1.5px;\n", indent));
+        output.push_str(&format!("{}  classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;\n", indent));
+        output.push_str(&format!("{}  classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;\n", indent));
+        output.push_str(&format!("{}  classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;\n", indent));
+        output.push_str(&format!("{}  classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;\n", indent));
         output.push_str(&format!("{}\n", indent));
 
         output.push_str(&generate_mermaid_for_element(element, &indent));

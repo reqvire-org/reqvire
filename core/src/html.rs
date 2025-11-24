@@ -13,34 +13,39 @@ pub const EMBEDDED_STYLES: &str = r#"
 <style>
 :root {
     /* Primary Colors */
-    --color-primary: #1E3A5F;           /* Deep Sapphire - navigation, headers */
-    --color-primary-hover: #265280;     /* Lighter shade for hover states */
-    --color-primary-active: #152737;    /* Darker shade for active states */
+    --color-primary: #3F51B5;           /* Indigo - core branding */
+    --color-primary-hover: #7986CB;     /* Much lighter Indigo for hover - more visible */
+    --color-primary-active: #303F9F;    /* Darker Indigo for active */
 
     /* Element Type Colors */
-    --color-requirement: #2563EB;       /* Royal Blue */
-    --color-verification: #006400;      /* Dark Emerald */
-    --color-design: #4B0082;            /* Indigo */
-    --color-test: #0891B2;              /* Teal */
-    --color-implementation: #D97706;    /* Amber */
-    --color-external: #64748B;          /* Slate */
+    --color-requirement: #673AB7;       /* Deep Purple - core requirements */
+    --color-verification: #4CAF50;      /* Emerald Green - validated/completed */
+    --color-other: #9E9E9E;             /* Cool Gray - other element types */
 
     /* Status Colors */
-    --color-verified: #006400;          /* Dark Emerald - verified/passing */
-    --color-pending: #D97706;           /* Amber - pending/warning */
-    --color-error: #FF6B6B;             /* Coral Red - error/failed */
+    --color-verified: #4CAF50;          /* Forest Green - verified/passing */
+    --color-pending: #FFB74D;           /* Amber - pending/warning */
+    --color-error: #F44336;             /* Red - error/failed */
 
     /* Interactive Colors */
-    --color-highlight: #ff6b6b;         /* Hover highlight */
-    --color-link: #2563EB;              /* Royal Blue - link color */
+    --color-highlight: #FFAB91;         /* Peach - hover highlight */
+    --color-link: #212121;              /* Black - link color */
+    --color-link-hover: #3F51B5;        /* Indigo (same as nav bar) - link hover */
+
+    /* Text Colors */
+    --color-text-primary: #212121;      /* Primary text */
+    --color-text-secondary: #424242;    /* Body text */
+    --color-text-muted: #757575;        /* De-emphasized text */
+    --color-background: #FAFAFA;        /* Off-white background */
+    --color-border: #EEEEEE;            /* Very light gray borders */
 }
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
     line-height: 1.6;
     margin: 0;
     padding: 0;
-    background-color: #F5F5F5;
-    color: #333;
+    background-color: #FAFAFA;
+    color: var(--color-text-secondary);
 }
 .reqvire-nav {
     position: fixed;
@@ -61,7 +66,7 @@ body {
     padding: 10px 20px;
     margin-right: 5px;
     border-radius: 3px;
-    transition: background-color 0.2s;
+    transition: background-color 0.2s, text-decoration 0.2s;
 }
 .reqvire-nav a.nav-logo {
     display: flex;
@@ -73,6 +78,14 @@ body {
 }
 .reqvire-nav a:hover {
     background-color: var(--color-primary-hover);
+    text-decoration: underline;
+    color: #ffffff;
+}
+.reqvire-nav a:active,
+.reqvire-nav a.active {
+    background-color: var(--color-primary-active);
+    text-decoration: underline;
+    color: #ffffff;
 }
 .reqvire-nav-spacer {
     height: 50px;
@@ -85,34 +98,41 @@ body {
 .content {
     background-color: #fff;
     padding: 30px;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    border: 1px solid #E0E0E0;
 }
 h1 {
-    color: #333;
-    border-bottom: 2px solid #e0e0e0;
+    color: var(--color-text-primary);
+    border-bottom: 2px solid #EEEEEE;
     padding-bottom: 10px;
     margin-top: 0;
 }
 h2 {
-    color: #333;
-    border-bottom: 1px solid #e0e0e0;
+    color: var(--color-text-primary);
+    border-bottom: 1px solid #EEEEEE;
     padding-bottom: 5px;
 }
 h3 {
-    color: var(--color-requirement);
+    color: var(--color-text-primary);
     margin-top: 25px;
 }
 h4 {
-    color: #555;
+    color: var(--color-text-secondary);
     font-weight: 600;
 }
 a {
-    color: var(--color-link);
+    color: var(--color-primary);
     text-decoration: none;
+    font-weight: 500;
+    transition: text-decoration 0.15s ease;
 }
 a:hover {
     text-decoration: underline;
+}
+a:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
 }
 table {
     border-collapse: collapse;
@@ -120,14 +140,19 @@ table {
     margin: 20px 0;
 }
 table, th, td {
-    border: 1px solid #ced4da;
+    border: 1px solid #EEEEEE;
 }
 th, td {
     padding: 8px 12px;
     text-align: left;
 }
 th {
-    background-color: #f6f8fa;
+    background-color: #F5F5F5;
+    color: #212121;
+    font-weight: 600;
+}
+tr:hover td {
+    background-color: #FFF8E1;
 }
 code {
     background: #f6f8fa;
@@ -149,8 +174,8 @@ pre code {
 blockquote {
     margin: 0;
     padding: 0 15px;
-    color: #777;
-    border-left: 4px solid #ced4da;
+    color: var(--color-text-muted);
+    border-left: 4px solid var(--color-primary);
 }
 .mermaid {
     margin: 20px 0;
@@ -159,9 +184,9 @@ blockquote {
     width: 100%;
     overflow: hidden;
     position: relative;
-    border: 1px solid #ced4da;
+    border: 1px solid #EEEEEE;
     border-radius: 3px;
-    background-color: #fafafa;
+    background-color: #FAFAFA;
     display: flex;
     align-items: flex-start;
     justify-content: center;

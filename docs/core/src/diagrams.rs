@@ -220,12 +220,12 @@ impl<'a> ModelDiagramGenerator<'a> {
 
         // Define Mermaid graph styles with MBSE color scheme
         diagram.push_str("  %% Graph styling\n");
-        diagram.push_str("  classDef userRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:2px;\n");
-        diagram.push_str("  classDef systemRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:1px;\n");
-        diagram.push_str("  classDef verification fill:#d1fae5,stroke:#059669,stroke-width:2px;\n");
-        diagram.push_str("  classDef folder fill:#f1f5f9,stroke:#64748B,stroke-width:3px;\n");
-        diagram.push_str("  classDef file fill:#ffffff,stroke:#64748B,stroke-width:2px;\n");
-        diagram.push_str("  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;\n\n");
+        diagram.push_str("  classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;\n");
+        diagram.push_str("  classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;\n");
+        diagram.push_str("  classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;\n");
+        diagram.push_str("  classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:3px;\n");
+        diagram.push_str("  classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;\n");
+        diagram.push_str("  classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;\n\n");
 
         // Add folders, files, and elements
         for folder in &report.folders {
@@ -395,10 +395,10 @@ fn generate_file_diagram(
 
     // Define Mermaid graph styles
     diagram.push_str("  %% Graph styling\n");
-    diagram.push_str("  classDef userRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:2px;\n");
-    diagram.push_str("  classDef systemRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:1px;\n");
-    diagram.push_str("  classDef verification fill:#d1fae5,stroke:#059669,stroke-width:2px;\n");
-    diagram.push_str("  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;\n\n");
+    diagram.push_str("  classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;\n");
+    diagram.push_str("  classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;\n");
+    diagram.push_str("  classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;\n");
+    diagram.push_str("  classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;\n\n");
 
     let mut included_elements = HashSet::new();
 
@@ -1040,13 +1040,13 @@ pub fn generate_containment_diagram(registry: &GraphRegistry, short: bool) -> Re
 
     // CSS class definitions
     output.push_str("  %% Graph styling\n");
-    output.push_str("  classDef userRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:2px;\n");
-    output.push_str("  classDef systemRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:1px;\n");
-    output.push_str("  classDef requirement fill:#dbeafe,stroke:#2563EB,stroke-width:1px;\n");
-    output.push_str("  classDef verification fill:#d1fae5,stroke:#059669,stroke-width:2px;\n");
-    output.push_str("  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;\n");
-    output.push_str("  classDef folder fill:#f1f5f9,stroke:#64748B,stroke-width:2px;\n");
-    output.push_str("  classDef file fill:#fef3c7,stroke:#D97706,stroke-width:2px;\n\n");
+    output.push_str("  classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;\n");
+    output.push_str("  classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;\n");
+    output.push_str("  classDef requirement fill:#ECEFF1,stroke:#673AB7,stroke-width:1.5px;\n");
+    output.push_str("  classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;\n");
+    output.push_str("  classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;\n");
+    output.push_str("  classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:2px;\n");
+    output.push_str("  classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;\n\n");
 
     // Define root node
     output.push_str("  root[\"📁 Reqvire root\"]\n");
@@ -1166,7 +1166,7 @@ fn generate_element_hash(identifier: &str) -> String {
 fn get_element_class_from_type(element_type: &ElementType) -> &'static str {
     match element_type {
         ElementType::Requirement(RequirementType::User) => "userRequirement",
-        ElementType::Requirement(RequirementType::System) => "requirement",
+        ElementType::Requirement(RequirementType::System) => "systemRequirement",
         ElementType::Verification(_) => "verification",
         _ => "default",
     }

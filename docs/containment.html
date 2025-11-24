@@ -10,34 +10,39 @@
 <style>
 :root {
     /* Primary Colors */
-    --color-primary: #1E3A5F;           /* Deep Sapphire - navigation, headers */
-    --color-primary-hover: #2a4a73;     /* Lighter shade for hover states */
-    --color-primary-active: #15293f;    /* Darker shade for active states */
+    --color-primary: #3F51B5;           /* Indigo - core branding */
+    --color-primary-hover: #7986CB;     /* Much lighter Indigo for hover - more visible */
+    --color-primary-active: #303F9F;    /* Darker Indigo for active */
 
     /* Element Type Colors */
-    --color-requirement: #2563EB;       /* Royal Blue */
-    --color-verification: #059669;      /* Emerald */
-    --color-design: #7C3AED;            /* Purple */
-    --color-test: #0891B2;              /* Teal */
-    --color-implementation: #D97706;    /* Amber */
-    --color-external: #64748B;          /* Slate */
+    --color-requirement: #673AB7;       /* Deep Purple - core requirements */
+    --color-verification: #4CAF50;      /* Emerald Green - validated/completed */
+    --color-other: #9E9E9E;             /* Cool Gray - other element types */
 
     /* Status Colors */
-    --color-verified: #059669;          /* Emerald - verified/passing */
-    --color-pending: #D97706;           /* Amber - pending/warning */
-    --color-error: #DC2626;             /* Rose - error/failed */
+    --color-verified: #4CAF50;          /* Forest Green - verified/passing */
+    --color-pending: #FFB74D;           /* Amber - pending/warning */
+    --color-error: #F44336;             /* Red - error/failed */
 
     /* Interactive Colors */
-    --color-highlight: #ff6b6b;         /* Hover highlight */
-    --color-link: #0366d6;              /* Link color */
+    --color-highlight: #FFAB91;         /* Peach - hover highlight */
+    --color-link: #212121;              /* Black - link color */
+    --color-link-hover: #3F51B5;        /* Indigo (same as nav bar) - link hover */
+
+    /* Text Colors */
+    --color-text-primary: #212121;      /* Primary text */
+    --color-text-secondary: #424242;    /* Body text */
+    --color-text-muted: #757575;        /* De-emphasized text */
+    --color-background: #FAFAFA;        /* Off-white background */
+    --color-border: #EEEEEE;            /* Very light gray borders */
 }
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
     line-height: 1.6;
     margin: 0;
     padding: 0;
-    background-color: #f8f9fa;
-    color: #333;
+    background-color: #FAFAFA;
+    color: var(--color-text-secondary);
 }
 .reqvire-nav {
     position: fixed;
@@ -58,7 +63,7 @@ body {
     padding: 10px 20px;
     margin-right: 5px;
     border-radius: 3px;
-    transition: background-color 0.2s;
+    transition: background-color 0.2s, text-decoration 0.2s;
 }
 .reqvire-nav a.nav-logo {
     display: flex;
@@ -70,6 +75,14 @@ body {
 }
 .reqvire-nav a:hover {
     background-color: var(--color-primary-hover);
+    text-decoration: underline;
+    color: #ffffff;
+}
+.reqvire-nav a:active,
+.reqvire-nav a.active {
+    background-color: var(--color-primary-active);
+    text-decoration: underline;
+    color: #ffffff;
 }
 .reqvire-nav-spacer {
     height: 50px;
@@ -82,34 +95,41 @@ body {
 .content {
     background-color: #fff;
     padding: 30px;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    border: 1px solid #E0E0E0;
 }
 h1 {
-    color: #333;
-    border-bottom: 2px solid #eaecef;
+    color: var(--color-text-primary);
+    border-bottom: 2px solid #EEEEEE;
     padding-bottom: 10px;
     margin-top: 0;
 }
 h2 {
-    color: #333;
-    border-bottom: 1px solid #eaecef;
+    color: var(--color-text-primary);
+    border-bottom: 1px solid #EEEEEE;
     padding-bottom: 5px;
 }
 h3 {
-    color: var(--color-requirement);
+    color: var(--color-text-primary);
     margin-top: 25px;
 }
 h4 {
-    color: #555;
+    color: var(--color-text-secondary);
     font-weight: 600;
 }
 a {
-    color: var(--color-link);
+    color: var(--color-primary);
     text-decoration: none;
+    font-weight: 500;
+    transition: text-decoration 0.15s ease;
 }
 a:hover {
     text-decoration: underline;
+}
+a:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
 }
 table {
     border-collapse: collapse;
@@ -117,14 +137,19 @@ table {
     margin: 20px 0;
 }
 table, th, td {
-    border: 1px solid #dfe2e5;
+    border: 1px solid #EEEEEE;
 }
 th, td {
     padding: 8px 12px;
     text-align: left;
 }
 th {
-    background-color: #f6f8fa;
+    background-color: #F5F5F5;
+    color: #212121;
+    font-weight: 600;
+}
+tr:hover td {
+    background-color: #FFF8E1;
 }
 code {
     background: #f6f8fa;
@@ -146,8 +171,8 @@ pre code {
 blockquote {
     margin: 0;
     padding: 0 15px;
-    color: #777;
-    border-left: 4px solid #dfe2e5;
+    color: var(--color-text-muted);
+    border-left: 4px solid var(--color-primary);
 }
 .mermaid {
     margin: 20px 0;
@@ -156,9 +181,9 @@ blockquote {
     width: 100%;
     overflow: hidden;
     position: relative;
-    border: 1px solid #dfe2e5;
+    border: 1px solid #EEEEEE;
     border-radius: 3px;
-    background-color: #fafafa;
+    background-color: #FAFAFA;
     display: flex;
     align-items: flex-start;
     justify-content: center;
@@ -380,7 +405,7 @@ blockquote {
                 path.edge-highlighted,
                 .edge-highlighted path,
                 svg path.edge-highlighted {
-                    stroke: #ff6b6b !important;
+                    stroke: #FFAB91 !important;
                     stroke-width: 3px !important;
                 }
             `;
@@ -593,7 +618,7 @@ blockquote {
                     node.addEventListener('mouseenter', function(e) {
                         e.stopPropagation();
                         nodes.forEach(function(n) { n.style.filter = ''; });
-                        node.style.filter = 'drop-shadow(0 0 6px #ff6b6b)';
+                        node.style.filter = 'drop-shadow(0 0 8px rgba(255, 171, 145, 0.7))';
 
                         // Find upstream (ancestors) and downstream (descendants) separately
                         var upstream = findUpstream(hashId);
@@ -638,13 +663,13 @@ blockquote {
 <p>The containment view shows the physical organization of the model—how elements are structured within folders and files. This hierarchical view reflects the file system layout and helps navigate to specific specification documents. In MBSE, containment represents where model elements are stored, separate from their logical relationships.</p>
 <div class="mermaid">graph TD
   %% Graph styling
-  classDef userRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:2px;
-  classDef systemRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:1px;
-  classDef requirement fill:#dbeafe,stroke:#2563EB,stroke-width:1px;
-  classDef verification fill:#d1fae5,stroke:#059669,stroke-width:2px;
-  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
-  classDef folder fill:#f1f5f9,stroke:#64748B,stroke-width:2px;
-  classDef file fill:#fef3c7,stroke:#D97706,stroke-width:2px;
+  classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;
+  classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
+  classDef requirement fill:#ECEFF1,stroke:#673AB7,stroke-width:1.5px;
+  classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
+  classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
+  classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:2px;
+  classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
 
   root[&quot;📁 Reqvire root&quot;]
   class root folder
@@ -1007,72 +1032,72 @@ blockquote {
   specifications --> specifications/UserStories
 
   %% Element type styling
-  class bc47257b545846c1 requirement
-  class c3f31692af982337 requirement
-  class 0466a71b10f4a893 requirement
-  class cb57cc99292a62fa requirement
-  class 235da8e2168b9f6a requirement
-  class 802f456709870e8d requirement
-  class fc1c4911cd5758b4 requirement
-  class c635f268b710f1f0 requirement
-  class 275600e6e14e0126 requirement
-  class 91d5372baeb7775f requirement
-  class e0bc0530143463f7 requirement
-  class f7d6f9bdf63c8aa9 requirement
-  class 0915be6909c3de76 requirement
-  class 91605128dfe5524f requirement
-  class 508d5a19defec54d requirement
-  class 6e733aaef7687066 requirement
-  class 3706d8a6d6a10014 requirement
-  class f5c62abef3588c05 requirement
-  class 4e5e3f4d55b0a239 requirement
-  class 767aae89fe7d0e36 requirement
+  class bc47257b545846c1 systemRequirement
+  class c3f31692af982337 systemRequirement
+  class 0466a71b10f4a893 systemRequirement
+  class cb57cc99292a62fa systemRequirement
+  class 235da8e2168b9f6a systemRequirement
+  class 802f456709870e8d systemRequirement
+  class fc1c4911cd5758b4 systemRequirement
+  class c635f268b710f1f0 systemRequirement
+  class 275600e6e14e0126 systemRequirement
+  class 91d5372baeb7775f systemRequirement
+  class e0bc0530143463f7 systemRequirement
+  class f7d6f9bdf63c8aa9 systemRequirement
+  class 0915be6909c3de76 systemRequirement
+  class 91605128dfe5524f systemRequirement
+  class 508d5a19defec54d systemRequirement
+  class 6e733aaef7687066 systemRequirement
+  class 3706d8a6d6a10014 systemRequirement
+  class f5c62abef3588c05 systemRequirement
+  class 4e5e3f4d55b0a239 systemRequirement
+  class 767aae89fe7d0e36 systemRequirement
   class 212473ea6147fe61 userRequirement
   class befd612b67d91ac7 userRequirement
   class 395309fcf33fe1d3 verification
   class d47533c3801679f9 verification
   class 9df68757e0d9311c verification
   class 464cfe2c13d912c4 verification
-  class f74d17b8cb0d18f6 requirement
-  class 616a2b5bf721d57c requirement
-  class d76f41d446037179 requirement
-  class d83f72b0eab66a39 requirement
-  class 510bedadffcc06a5 requirement
-  class ba2d74bd1d32ee79 requirement
-  class 9cb25d92cf528039 requirement
-  class 1f00d0f36ff3105f requirement
-  class e65d2555e08cbd3b requirement
-  class 1110a6d05b822b6e requirement
+  class f74d17b8cb0d18f6 systemRequirement
+  class 616a2b5bf721d57c systemRequirement
+  class d76f41d446037179 systemRequirement
+  class d83f72b0eab66a39 systemRequirement
+  class 510bedadffcc06a5 systemRequirement
+  class ba2d74bd1d32ee79 systemRequirement
+  class 9cb25d92cf528039 systemRequirement
+  class 1f00d0f36ff3105f systemRequirement
+  class e65d2555e08cbd3b systemRequirement
+  class 1110a6d05b822b6e systemRequirement
   class 90c70a2f43788f29 userRequirement
   class da4147c566b50878 userRequirement
   class e744981e117bb42a userRequirement
   class a13dec7ed557eb1d userRequirement
   class e95f0d74311ad416 userRequirement
-  class d4b089980c260d2d requirement
-  class 7c929b3c6edfca05 requirement
+  class d4b089980c260d2d systemRequirement
+  class 7c929b3c6edfca05 systemRequirement
   class 059a5c3bf86dc292 userRequirement
-  class eafd6ad72f737b69 requirement
-  class 8d68fc04dd3b25f8 requirement
-  class d3c2de7659d618c8 requirement
-  class 27b91d4356867923 requirement
-  class 4142d0b499258842 requirement
-  class f26e0ad77efc4fef requirement
-  class bd4e1e180d3bb026 requirement
+  class eafd6ad72f737b69 systemRequirement
+  class 8d68fc04dd3b25f8 systemRequirement
+  class d3c2de7659d618c8 systemRequirement
+  class 27b91d4356867923 systemRequirement
+  class 4142d0b499258842 systemRequirement
+  class f26e0ad77efc4fef systemRequirement
+  class bd4e1e180d3bb026 systemRequirement
   class d79d02a130c810c5 userRequirement
-  class f6ab295ad818bb88 requirement
-  class 0e5c2520bf740e8a requirement
-  class 9455d8e18aefeb82 requirement
-  class a09fd54e5273d4ef requirement
-  class 7de85ebaf122d283 requirement
-  class 3e9b6fe1494d5d5c requirement
-  class 2b39b184a14128bc requirement
-  class a849eed2eb87274b requirement
+  class f6ab295ad818bb88 systemRequirement
+  class 0e5c2520bf740e8a systemRequirement
+  class 9455d8e18aefeb82 systemRequirement
+  class a09fd54e5273d4ef systemRequirement
+  class 7de85ebaf122d283 systemRequirement
+  class 3e9b6fe1494d5d5c systemRequirement
+  class 2b39b184a14128bc systemRequirement
+  class a849eed2eb87274b systemRequirement
   class 8aa78d67e1c9bca6 userRequirement
   class 1ac25ea520243411 userRequirement
   class 85005e509a135185 userRequirement
   class d7112af733774e60 userRequirement
   class cb188d43ba22233f userRequirement
-  class 9f09d3b52951ca60 requirement
+  class 9f09d3b52951ca60 systemRequirement
   class 267bc9289795a37d verification
   class 8f88361076bf97ab verification
   class 9efb6feee612d3fc verification
@@ -1093,43 +1118,43 @@ blockquote {
   class c4742c48d2f4458d verification
   class 72276ff57b8e38c8 verification
   class 946cbb09dbdc5e67 verification
-  class ae0b0e16587db9dc requirement
+  class ae0b0e16587db9dc systemRequirement
   class 62473e42c38fff08 userRequirement
-  class 6b8f1eceae91b44c requirement
-  class e53b0f6683ff808c requirement
+  class 6b8f1eceae91b44c systemRequirement
+  class e53b0f6683ff808c systemRequirement
   class 4fbd56ef1f013c9f userRequirement
-  class 339196d2aeddc7a4 requirement
-  class 0933e7d34aa47331 requirement
+  class 339196d2aeddc7a4 systemRequirement
+  class 0933e7d34aa47331 systemRequirement
   class 8d8802b49b376653 userRequirement
-  class 4ec25046cf2b2e22 requirement
-  class 97583b9d96d4f5b6 requirement
-  class 1aae5b52d8edafb8 requirement
+  class 4ec25046cf2b2e22 systemRequirement
+  class 97583b9d96d4f5b6 systemRequirement
+  class 1aae5b52d8edafb8 systemRequirement
   class ea28906724fb546e userRequirement
   class bcd583773c3c77c5 userRequirement
-  class f185bd917ebb6f61 requirement
+  class f185bd917ebb6f61 systemRequirement
   class 2a349b682f27a1cf userRequirement
-  class f3853272e5804140 requirement
-  class 69f7b0fa32183235 requirement
-  class 8bfb2b4c29922496 requirement
-  class 8e029dbdc58e57bf requirement
-  class fb8c73a6ec05ea3c requirement
-  class b66e7314868eef31 requirement
-  class 3ca9c65be5b550a2 requirement
-  class 0afef2e086e5d5c3 requirement
-  class 462c740a44702300 requirement
-  class a9bec1473ee9d748 requirement
-  class b921d7fe8139ecd8 requirement
-  class 7c0ed9b2f1920c63 requirement
+  class f3853272e5804140 systemRequirement
+  class 69f7b0fa32183235 systemRequirement
+  class 8bfb2b4c29922496 systemRequirement
+  class 8e029dbdc58e57bf systemRequirement
+  class fb8c73a6ec05ea3c systemRequirement
+  class b66e7314868eef31 systemRequirement
+  class 3ca9c65be5b550a2 systemRequirement
+  class 0afef2e086e5d5c3 systemRequirement
+  class 462c740a44702300 systemRequirement
+  class a9bec1473ee9d748 systemRequirement
+  class b921d7fe8139ecd8 systemRequirement
+  class 7c0ed9b2f1920c63 systemRequirement
   class d9dcd933fb3cda8b userRequirement
   class 9ba144c175eee4aa userRequirement
-  class 2f1dba04b4aff71a requirement
-  class 2dc18d51c3f0e35d requirement
-  class a64bd69fa02ef486 requirement
+  class 2f1dba04b4aff71a systemRequirement
+  class 2dc18d51c3f0e35d systemRequirement
+  class a64bd69fa02ef486 systemRequirement
   class 590f2e9e34928b2b userRequirement
-  class 0230b14e994f4268 requirement
-  class 9a310d96ea7b3be2 requirement
-  class 603bdfcca97c46ef requirement
-  class fe8212d3599e7616 requirement
+  class 0230b14e994f4268 systemRequirement
+  class 9a310d96ea7b3be2 systemRequirement
+  class 603bdfcca97c46ef systemRequirement
+  class fe8212d3599e7616 systemRequirement
   class 7a1fa50ea339b3f1 verification
   class c504373f535dfaa2 verification
   class 55b9ffba81f962d5 verification
@@ -1145,28 +1170,28 @@ blockquote {
   class dab08e5fbc4efc2f verification
   class 0e97cfea69ff1b42 verification
   class a45b6b98f5f1786b userRequirement
-  class 486f90d6abe7c201 requirement
-  class 6e157f877c375157 requirement
-  class 63275c8dde9c3f64 requirement
+  class 486f90d6abe7c201 systemRequirement
+  class 6e157f877c375157 systemRequirement
+  class 63275c8dde9c3f64 systemRequirement
   class a2bd821924953c0e userRequirement
   class bfb6c2e2786f852e userRequirement
   class 1089fc0006d93c58 userRequirement
-  class e86ffc69ea73d1fc requirement
-  class c90c649fbca3bbf2 requirement
+  class e86ffc69ea73d1fc systemRequirement
+  class c90c649fbca3bbf2 systemRequirement
   class 9c70a3fc7c5119a2 userRequirement
-  class d3ad31e3f10696a6 requirement
-  class 7d36c5fe8e88f06d requirement
-  class 125dfff235c47677 requirement
-  class c761061d0117840e requirement
+  class d3ad31e3f10696a6 systemRequirement
+  class 7d36c5fe8e88f06d systemRequirement
+  class 125dfff235c47677 systemRequirement
+  class c761061d0117840e systemRequirement
   class 468d2803c327540f userRequirement
   class f8c814958f0104af userRequirement
   class 77da8f6901b21ce5 userRequirement
-  class d92d1becb10e0401 requirement
-  class b775b9f177ca877b requirement
+  class d92d1becb10e0401 systemRequirement
+  class b775b9f177ca877b systemRequirement
   class 34c460a962d3f44f userRequirement
-  class e1a0fd417cfabac9 requirement
+  class e1a0fd417cfabac9 systemRequirement
   class 7b5bd94bcd468068 userRequirement
-  class 48b456c2da33eaa1 requirement
+  class 48b456c2da33eaa1 systemRequirement
   class 855da66798aae884 userRequirement
   class a64076ced22d43c2 verification
   class efb4143d3ebbaa04 verification
@@ -1184,11 +1209,11 @@ blockquote {
   class 28f5e8a364cb00b6 verification
   class dbee66956adb4479 verification
   class 3bb361bda650dc56 verification
-  class ce1ea283bc1e2266 requirement
-  class 0b29dedf82ea7f78 requirement
-  class d965e70037840e3c requirement
-  class d2f95fca6a103a82 requirement
-  class 732c180f3e426016 requirement
+  class ce1ea283bc1e2266 systemRequirement
+  class 0b29dedf82ea7f78 systemRequirement
+  class d965e70037840e3c systemRequirement
+  class d2f95fca6a103a82 systemRequirement
+  class 732c180f3e426016 systemRequirement
   class 1c7f7870e358edaf verification
   class 97f4f6bbc94a4db2 verification
   class f436e58857126f8e verification

@@ -10,34 +10,39 @@
 <style>
 :root {
     /* Primary Colors */
-    --color-primary: #1E3A5F;           /* Deep Sapphire - navigation, headers */
-    --color-primary-hover: #2a4a73;     /* Lighter shade for hover states */
-    --color-primary-active: #15293f;    /* Darker shade for active states */
+    --color-primary: #3F51B5;           /* Indigo - core branding */
+    --color-primary-hover: #7986CB;     /* Much lighter Indigo for hover - more visible */
+    --color-primary-active: #303F9F;    /* Darker Indigo for active */
 
     /* Element Type Colors */
-    --color-requirement: #2563EB;       /* Royal Blue */
-    --color-verification: #059669;      /* Emerald */
-    --color-design: #7C3AED;            /* Purple */
-    --color-test: #0891B2;              /* Teal */
-    --color-implementation: #D97706;    /* Amber */
-    --color-external: #64748B;          /* Slate */
+    --color-requirement: #673AB7;       /* Deep Purple - core requirements */
+    --color-verification: #4CAF50;      /* Emerald Green - validated/completed */
+    --color-other: #9E9E9E;             /* Cool Gray - other element types */
 
     /* Status Colors */
-    --color-verified: #059669;          /* Emerald - verified/passing */
-    --color-pending: #D97706;           /* Amber - pending/warning */
-    --color-error: #DC2626;             /* Rose - error/failed */
+    --color-verified: #4CAF50;          /* Forest Green - verified/passing */
+    --color-pending: #FFB74D;           /* Amber - pending/warning */
+    --color-error: #F44336;             /* Red - error/failed */
 
     /* Interactive Colors */
-    --color-highlight: #ff6b6b;         /* Hover highlight */
-    --color-link: #0366d6;              /* Link color */
+    --color-highlight: #FFAB91;         /* Peach - hover highlight */
+    --color-link: #212121;              /* Black - link color */
+    --color-link-hover: #3F51B5;        /* Indigo (same as nav bar) - link hover */
+
+    /* Text Colors */
+    --color-text-primary: #212121;      /* Primary text */
+    --color-text-secondary: #424242;    /* Body text */
+    --color-text-muted: #757575;        /* De-emphasized text */
+    --color-background: #FAFAFA;        /* Off-white background */
+    --color-border: #EEEEEE;            /* Very light gray borders */
 }
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
     line-height: 1.6;
     margin: 0;
     padding: 0;
-    background-color: #f8f9fa;
-    color: #333;
+    background-color: #FAFAFA;
+    color: var(--color-text-secondary);
 }
 .reqvire-nav {
     position: fixed;
@@ -58,7 +63,7 @@ body {
     padding: 10px 20px;
     margin-right: 5px;
     border-radius: 3px;
-    transition: background-color 0.2s;
+    transition: background-color 0.2s, text-decoration 0.2s;
 }
 .reqvire-nav a.nav-logo {
     display: flex;
@@ -70,6 +75,14 @@ body {
 }
 .reqvire-nav a:hover {
     background-color: var(--color-primary-hover);
+    text-decoration: underline;
+    color: #ffffff;
+}
+.reqvire-nav a:active,
+.reqvire-nav a.active {
+    background-color: var(--color-primary-active);
+    text-decoration: underline;
+    color: #ffffff;
 }
 .reqvire-nav-spacer {
     height: 50px;
@@ -82,34 +95,41 @@ body {
 .content {
     background-color: #fff;
     padding: 30px;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    border: 1px solid #E0E0E0;
 }
 h1 {
-    color: #333;
-    border-bottom: 2px solid #eaecef;
+    color: var(--color-text-primary);
+    border-bottom: 2px solid #EEEEEE;
     padding-bottom: 10px;
     margin-top: 0;
 }
 h2 {
-    color: #333;
-    border-bottom: 1px solid #eaecef;
+    color: var(--color-text-primary);
+    border-bottom: 1px solid #EEEEEE;
     padding-bottom: 5px;
 }
 h3 {
-    color: var(--color-requirement);
+    color: var(--color-text-primary);
     margin-top: 25px;
 }
 h4 {
-    color: #555;
+    color: var(--color-text-secondary);
     font-weight: 600;
 }
 a {
-    color: var(--color-link);
+    color: var(--color-primary);
     text-decoration: none;
+    font-weight: 500;
+    transition: text-decoration 0.15s ease;
 }
 a:hover {
     text-decoration: underline;
+}
+a:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
 }
 table {
     border-collapse: collapse;
@@ -117,14 +137,19 @@ table {
     margin: 20px 0;
 }
 table, th, td {
-    border: 1px solid #dfe2e5;
+    border: 1px solid #EEEEEE;
 }
 th, td {
     padding: 8px 12px;
     text-align: left;
 }
 th {
-    background-color: #f6f8fa;
+    background-color: #F5F5F5;
+    color: #212121;
+    font-weight: 600;
+}
+tr:hover td {
+    background-color: #FFF8E1;
 }
 code {
     background: #f6f8fa;
@@ -146,8 +171,8 @@ pre code {
 blockquote {
     margin: 0;
     padding: 0 15px;
-    color: #777;
-    border-left: 4px solid #dfe2e5;
+    color: var(--color-text-muted);
+    border-left: 4px solid var(--color-primary);
 }
 .mermaid {
     margin: 20px 0;
@@ -156,9 +181,9 @@ blockquote {
     width: 100%;
     overflow: hidden;
     position: relative;
-    border: 1px solid #dfe2e5;
+    border: 1px solid #EEEEEE;
     border-radius: 3px;
-    background-color: #fafafa;
+    background-color: #FAFAFA;
     display: flex;
     align-items: flex-start;
     justify-content: center;
@@ -380,7 +405,7 @@ blockquote {
                 path.edge-highlighted,
                 .edge-highlighted path,
                 svg path.edge-highlighted {
-                    stroke: #ff6b6b !important;
+                    stroke: #FFAB91 !important;
                     stroke-width: 3px !important;
                 }
             `;
@@ -593,7 +618,7 @@ blockquote {
                     node.addEventListener('mouseenter', function(e) {
                         e.stopPropagation();
                         nodes.forEach(function(n) { n.style.filter = ''; });
-                        node.style.filter = 'drop-shadow(0 0 6px #ff6b6b)';
+                        node.style.filter = 'drop-shadow(0 0 8px rgba(255, 171, 145, 0.7))';
 
                         // Find upstream (ancestors) and downstream (descendants) separately
                         var upstream = findUpstream(hashId);
@@ -638,10 +663,10 @@ blockquote {
 <div class="mermaid">graph TD;
   %% REQVIRE-AUTOGENERATED-DIAGRAM
   %% Graph styling
-  classDef userRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:2px;
-  classDef systemRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:1px;
-  classDef verification fill:#d1fae5,stroke:#059669,stroke-width:2px;
-  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+  classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;
+  classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
+  classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
+  classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
   a957c400a0de2045[&quot;Attachment Commands&quot;];
   class a957c400a0de2045 systemRequirement;

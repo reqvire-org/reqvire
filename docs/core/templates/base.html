@@ -177,7 +177,7 @@
                 path.edge-highlighted,
                 .edge-highlighted path,
                 svg path.edge-highlighted {
-                    stroke: #ff6b6b !important;
+                    stroke: #FFAB91 !important;
                     stroke-width: 3px !important;
                 }
             `;
@@ -390,7 +390,7 @@
                     node.addEventListener('mouseenter', function(e) {
                         e.stopPropagation();
                         nodes.forEach(function(n) { n.style.filter = ''; });
-                        node.style.filter = 'drop-shadow(0 0 6px #ff6b6b)';
+                        node.style.filter = 'drop-shadow(0 0 8px rgba(255, 171, 145, 0.7))';
 
                         // Find upstream (ancestors) and downstream (descendants) separately
                         var upstream = findUpstream(hashId);

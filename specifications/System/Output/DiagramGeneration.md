@@ -119,44 +119,41 @@ The system shall use Mermaid CSS classes to style diagram elements with differen
 
 | Class Name | Fill Color | Stroke Color | Stroke Width | Usage |
 |------------|------------|--------------|--------------|-------|
-| userRequirement | #bfdbfe (darker blue) | #1d4ed8 | 2px | Top-level user requirements |
-| systemRequirement | #dbeafe (light blue) | #2563EB | 1.5px | System-level requirements |
-| requirement | #dbeafe (light blue) | #2563EB | 1.5px | Generic requirements |
-| verified | #bfdbfe (darker blue) | #1d4ed8 | 2px | Directly verified requirements |
-| verification | #d4edda (light green) | #006400 | 2px | Verification elements |
-| folder | #f1f5f9 (light slate) | #64748B | 2-3px | Folder containers |
-| file | #ffffff / #fef3c7 | #64748B / #D97706 | 2px | File containers |
-| default | #f5f5f5 (light gray) | #333333 | 1.5px | Default/fallback styling |
+| userRequirement | #D1C4E9 (light purple) | #7E57C2 | 2px | Top-level user requirements |
+| systemRequirement | #E1D8EE (lighter purple) | #673AB7 | 1.5px | System-level requirements |
+| requirement | #ECEFF1 (blue-gray) | #673AB7 | 1.5px | Generic requirements |
+| verified | #D1C4E9 (light purple) | #7E57C2 | 2px | Directly verified requirements |
+| verification | #DCEDC8 (light green) | #4CAF50 | 2px | Verification elements |
+| folder | #FAFAFA (off-white) | #9E9E9E | 2-3px | Folder containers |
+| file | #FFFFFF / #FFF8E1 | #9E9E9E / #FFCA28 | 2px | File containers |
+| default | #F5F5F5 (light gray) | #424242 | 1.5px | Default/fallback styling |
 
 **Element Type Color Scheme:**
 The system shall use the following color scheme for rendering diagram elements:
 
 | Element Type | Color Name | Hex Code | Usage |
 |--------------|------------|----------|-------|
-| Requirement | Royal Blue | #2563EB | Core requirements, goals |
-| Verification | Dark Emerald | #006400 | Validation criteria, testing completion |
-| Design Element | Indigo | #4B0082 | Design specifications, architectural elements |
-| Test Case | Teal | #0891B2 | Test cases, test plans |
-| Implementation | Amber | #D97706 | Code implementation, deployment |
-| External Reference | Slate Gray | #64748B | Elements in other files (linked boxes) |
+| Requirement | Deep Purple | #673AB7 | Core requirements, goals |
+| Verification | Emerald Green | #4CAF50 | Validation criteria, testing completion |
+| Other | Cool Gray | #9E9E9E | Other element types, external references |
 
 **Relation Line Colors:**
 | Relation Type | Color | Style |
 |--------------|-------|-------|
-| Derive/DerivedFrom | #2563EB | Dashed |
-| Verify/VerifiedBy | #006400 | Dashed |
-| Satisfy/SatisfiedBy | #D97706 | Solid |
-| Trace | #64748B | Dashed |
+| Derive/DerivedFrom | #673AB7 | Dashed |
+| Verify/VerifiedBy | #4CAF50 | Dashed |
+| Satisfy/SatisfiedBy | #673AB7 | Solid |
+| Trace | #9E9E9E | Dashed |
 
 **Interactive Highlighting:**
 | Effect | Color | Implementation |
 |--------|-------|----------------|
-| Hovered node | Coral Red | drop-shadow(0 0 8px rgba(255,107,107,0.7)) |
-| Connected edges | Coral Red | stroke: #ff6b6b with increased width |
+| Hovered node | Peach | drop-shadow(0 0 8px rgba(255,171,145,0.7)) |
+| Connected edges | Peach | stroke: #FFAB91 with increased width |
 
 **Diagram Background:**
-- Canvas background: #fafafa (light gray)
-- Border: 1px solid #ced4da
+- Canvas background: #FAFAFA (off-white)
+- Border: 1px solid #EEEEEE
 
 #### Metadata
   * type: user-requirement

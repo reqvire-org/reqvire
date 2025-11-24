@@ -103,59 +103,59 @@ The system shall implement a consistent color scheme across all HTML pages optim
 **Primary Colors:**
 | Color Name | Hex Code | Usage |
 |------------|----------|-------|
-| Deep Sapphire | #1E3A5F | Navigation bar background, primary headers |
-| Deep Sapphire Hover | #265280 | Navigation hover states |
-| Deep Sapphire Active | #152737 | Navigation active/pressed states |
-| White | #FFFFFF | Navigation text, button text, content background |
-| Light Gray | #F5F5F5 | Body background - reduces eye strain |
-| Slate Gray | #64748B | Secondary text, borders, external elements |
+| Indigo | #3F51B5 | Navigation bar background, primary branding |
+| Indigo Hover | #7986CB | Navigation hover states (lighter for visibility) |
+| Indigo Active | #303F9F | Navigation active/pressed states |
+| Off-White | #FAFAFA | Body background - reduces eye strain |
+| White | #FFFFFF | Content background, navigation text |
 
 **Element Type Colors:**
 The web interface shall use consistent colors matching the diagram color scheme:
 | Element Type | Color Name | Hex Code | Usage |
 |--------------|------------|----------|-------|
-| Requirement | Royal Blue | #2563EB | Core requirements, goals |
-| Verification | Dark Emerald | #006400 | Validation criteria, testing completion |
-| Design | Indigo | #4B0082 | Design specifications, architectural elements |
-| Test | Teal | #0891B2 | Test cases, test plans |
-| Implementation | Amber | #D97706 | Code implementation, deployment |
-| External | Slate Gray | #64748B | Elements in other files, linked boxes |
+| Requirement | Deep Purple | #673AB7 | Core requirements, goals |
+| Verification | Emerald Green | #4CAF50 | Validation criteria, testing completion |
+| Other | Cool Gray | #9E9E9E | Other element types, external dependencies |
 
 **Status Indicator Colors:**
 | Status | Color Name | Hex Code | Usage |
 |--------|------------|----------|-------|
-| Verified/Passing | Dark Emerald | #006400 | Verified requirements, passing tests |
-| Pending/Warning | Amber | #D97706 | Unverified items, warnings |
-| Failed/Error | Coral Red | #FF6B6B | Error messages, validation errors |
+| Verified/Passing | Forest Green | #4CAF50 | Verified requirements, passing tests |
+| Pending/Warning | Amber | #FFB74D | Unverified items, warnings |
+| Failed/Error | Red | #F44336 | Error messages, validation errors |
 
 **Interactive State Colors:**
 | State | Color | Hex Code | Usage |
 |-------|-------|----------|-------|
-| Hover Highlight | Coral Red | #ff6b6b | Diagram node/edge hover effect |
-| Node Hover Shadow | Coral Red (70%) | rgba(255,107,107,0.7) | Soft drop-shadow on node hover |
-| Link Color | Royal Blue | #2563EB | Hyperlinks |
-| Primary Button Hover | Darker Blue | #1A52BB | Button hover state |
+| Hover Highlight | Peach | #FFAB91 | Diagram node/edge hover effect |
+| Node Hover Shadow | Peach (70%) | rgba(255,171,145,0.7) | Soft drop-shadow on node hover |
+| Link Color | Indigo | #3F51B5 | Hyperlinks (matches nav bar, font-weight: 500) |
+| Link Hover | Indigo | #3F51B5 | Hyperlinks with underline on hover |
+| Nav Hover | Light Indigo | #7986CB | Navigation item hover background |
 
 **Border Colors:**
 | Element | Hex Code | Usage |
 |---------|----------|-------|
-| Header Borders | #e0e0e0 | H1/H2 underlines |
-| Table Borders | #ced4da | Tables, blockquotes, mermaid container |
+| Header Borders | #EEEEEE | H1/H2 underlines |
+| Table Borders | #EEEEEE | Tables, content separation |
+| Content Border | #E0E0E0 | Content card borders |
 | Code Background | #f6f8fa | Code blocks |
-| Diagram Canvas | #fafafa | Mermaid diagram background |
+| Diagram Canvas | #FAFAFA | Mermaid diagram background |
 
 **Typography:**
 - Primary font: System font stack (sans-serif)
 - Monospace font: For code blocks and element identifiers
 - Line height: 1.6 for content readability
-- Primary text: #333333 (dark gray)
-- Secondary text: #777777 (medium gray)
+- Primary text: #212121 (dark gray - headings)
+- Secondary text: #424242 (medium gray - body)
+- Muted text: #757575 (light gray - de-emphasized)
 
 **Layout:**
 - Navigation bar: Fixed position, full width, 50px height
 - Content container: Centered with max-width 95% for readability
+- Content card: White background with subtle border and shadow
 - Responsive design: Adapts to different screen sizes
-- Box shadows: rgba(0,0,0,0.1) for subtle depth
+- Box shadows: rgba(0,0,0,0.08) for subtle depth
 
 #### Relations
   * derivedFrom: [HTML Export](#html-export)
