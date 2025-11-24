@@ -99,7 +99,6 @@ The system shall design and implement HTML pages with consistent layout, styling
 The system shall implement a consistent color scheme across all HTML pages optimized for MBSE and requirements management applications.
 
 #### Details
-
 **Primary Colors:**
 | Color Name | Hex Code | Usage |
 |------------|----------|-------|
@@ -198,6 +197,73 @@ The system shall generate a complete model diagram during HTML export showing al
   * derivedFrom: [HTML Export](#html-export)
   * satisfiedBy: [export.rs](../../core/src/export.rs)
   * satisfiedBy: [diagrams.rs](../../core/src/diagrams.rs)
+---
+
+### Attachment Export
+
+The system shall copy all attachment files referenced by elements during HTML export to preserve document completeness and enable navigation.
+
+#### Details
+During HTML export, the system shall:
+- Identify all attachments from element.attachments across the model
+- Copy each attachment file to the output directory preserving relative paths
+- Skip duplicate attachments (same file referenced by multiple elements)
+- Log attachment copying progress
+
+This ensures exported documentation includes all referenced external documents (PDFs, design documents, etc.) for complete offline browsing.
+
+#### Relations
+  * derivedFrom: [HTML Export](#html-export)
+  * satisfiedBy: [export.rs](../../core/src/export.rs)
+  * verifiedBy: [Attachment Export Verification](Verifications/WebInterfaceVerifications.md#attachment-export-verification)
+---
+
+### Index View Attachment Links
+
+The system shall display attachment links under each element in the index view to provide quick access to associated documents.
+
+#### Details
+For each element with attachments:
+- Display attachment links indented under the element entry
+- Use paperclip icon (📎) to indicate attachments
+- Show only filename (not full path) for readability
+- Link directly to the attachment file
+
+Example output:
+```
+- [Element Name](path#fragment)
+  - 📎 [DesignDoc.md](path/to/DesignDoc.md)
+  - 📎 [Spec.pdf](docs/Spec.pdf)
+```
+
+#### Relations
+  * derivedFrom: [HTML Export](#html-export)
+  * satisfiedBy: [index_generator.rs](../../core/src/index_generator.rs)
+  * verifiedBy: [Index Attachment Links Verification](Verifications/WebInterfaceVerifications.md#index-attachment-links-verification)
+---
+
+### Diagram Attachment Display
+
+The system shall display attachment links within element boxes in generated diagrams to show document associations visually.
+
+#### Details
+In Mermaid diagrams:
+- Element boxes shall include attachment links below the element name
+- Use paperclip icon (📎) prefix for each attachment
+- Show filename only (not full path) for space efficiency
+- Make attachment links clickable to open the document
+- Format using Mermaid's multiline label syntax (`<br/>`)
+
+Example Mermaid node:
+```
+elementId["Element Name<br/>📎 DesignDoc.md"]
+```
+
+#### Relations
+  * derivedFrom: [HTML Export](#html-export)
+  * derivedFrom: [Complete Model Structure Visualization](../System/Output/DiagramGeneration.md#complete-model-structure-visualization)
+  * satisfiedBy: [diagrams.rs](../../core/src/diagrams.rs)
+  * verifiedBy: [Diagram Attachment Display Verification](Verifications/WebInterfaceVerifications.md#diagram-attachment-display-verification)
 ---
 
 ### Serve Command

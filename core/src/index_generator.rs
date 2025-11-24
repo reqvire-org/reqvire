@@ -47,6 +47,18 @@ pub fn generate_readme_index(
                 generate_element_slug(&element.identifier)
             };
             index_content.push_str(&format!("- [{}]({}#{})\n", element.name, relative_path, element_id));
+
+            // Add attachment links if present
+            if !element.attachments.is_empty() {
+                for attachment in &element.attachments {
+                    let attachment_path = attachment.file_path.to_string_lossy();
+                    let attachment_name = attachment.file_path
+                        .file_name()
+                        .map(|n| n.to_string_lossy().into_owned())
+                        .unwrap_or_else(|| attachment_path.to_string());
+                    index_content.push_str(&format!("  - 📎 [{}]({})\n", attachment_name, attachment_path));
+                }
+            }
         }
 
         index_content.push_str("\n"); // Add spacing between files

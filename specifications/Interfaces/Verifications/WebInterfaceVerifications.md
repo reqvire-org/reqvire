@@ -76,3 +76,84 @@ This test verifies that the serve command exports HTML to a temporary directory 
   * verify: [Serve Command](../WebInterface.md#serve-command)
   * satisfiedBy: [test.sh](../../../tests/test-serve-command/test.sh)
 ---
+
+### Attachment Export Verification
+
+This test verifies that HTML export copies all attachment files to the output directory.
+
+#### Details
+
+##### Acceptance Criteria:
+- System shall copy all attachment files referenced by elements
+- Attachment files shall preserve their relative paths in output
+- Duplicate attachments (same file referenced multiple times) shall be copied only once
+- All attachment file types shall be supported (md, pdf, txt, etc.)
+
+##### Test Criteria:
+- Create model with elements having attachments
+- Run HTML export command
+- Verify attachment files exist in output directory at correct relative paths
+- Verify attachment files content matches original
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [Attachment Export](../WebInterface.md#attachment-export)
+  * satisfiedBy: [test.sh](../../../tests/test-attachment-export/test.sh)
+---
+
+### Index Attachment Links Verification
+
+This test verifies that the index view displays attachment links under elements.
+
+#### Details
+
+##### Acceptance Criteria:
+- Elements with attachments shall show attachment links in index.html
+- Attachment links shall be indented under the parent element
+- Attachment links shall use paperclip icon (📎) prefix
+- Attachment links shall show filename only (not full path)
+- Attachment links shall be clickable and link to the correct file
+
+##### Test Criteria:
+- Create model with element having attachments
+- Run HTML export command
+- Verify index.html contains attachment links with 📎 icon
+- Verify attachment links are properly nested under element entries
+- Verify attachment link href points to correct file path
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [Index View Attachment Links](../WebInterface.md#index-view-attachment-links)
+  * satisfiedBy: [test.sh](../../../tests/test-attachment-export/test.sh)
+---
+
+### Diagram Attachment Display Verification
+
+This test verifies that diagrams display attachment links within element boxes.
+
+#### Details
+
+##### Acceptance Criteria:
+- Element boxes in diagrams shall include attachment filenames
+- Attachments shall be prefixed with paperclip icon (📎)
+- Attachments shall appear below element name using line breaks
+- Attachment display shall not break diagram rendering
+
+##### Test Criteria:
+- Create model with element having attachments
+- Generate diagram (format or model command)
+- Verify Mermaid output contains multiline labels with attachments
+- Verify attachment filenames appear with 📎 prefix
+- Verify diagram renders correctly with attachment labels
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [Diagram Attachment Display](../WebInterface.md#diagram-attachment-display)
+  * satisfiedBy: [test.sh](../../../tests/test-attachment-export/test.sh)
+---

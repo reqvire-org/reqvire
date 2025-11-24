@@ -944,6 +944,39 @@ impl GraphRegistry {
             markdown.push_str("\n");
         }
 
+        // Add attachments subsection if there are attachments
+        if !element.attachments.is_empty() {
+            markdown.push_str("#### Attachments\n");
+            for attachment in &element.attachments {
+                // Attachment paths are stored as git-root-relative paths
+                let attachment_path = attachment.file_path.to_string_lossy().to_string();
+
+                // Make the path relative to the current file's directory (same as relations)
+                let current_file_path = std::path::PathBuf::from(_current_file);
+                let current_folder = current_file_path.parent()
+                    .unwrap_or_else(|| std::path::Path::new("."))
+                    .to_path_buf();
+
+                // Use to_relative_identifier like we do for InternalPath relations
+                // Prepend "/" to indicate git-root-relative path
+                let absolute_path = format!("/{}", attachment_path);
+                let relative_path = crate::utils::to_relative_identifier(
+                    &absolute_path,
+                    &current_folder,
+                    false
+                ).unwrap_or_else(|_| attachment_path.clone());
+
+                // Use filename as display text for cleaner markdown
+                let display_name = attachment.file_path
+                    .file_name()
+                    .and_then(|name| name.to_str())
+                    .unwrap_or(&attachment_path);
+
+                markdown.push_str(&format!("  * [{}]({})\n", display_name, relative_path));
+            }
+            markdown.push_str("\n");
+        }
+
         // Add relations subsection if there are user-created relations
         let user_relations: Vec<_> = element.relations.iter().filter(|r| r.user_created).collect();
         if !user_relations.is_empty() {

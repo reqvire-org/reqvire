@@ -639,8 +639,8 @@ pub fn hash_content(content: &str) -> String {
 }
 
 /// Parses an attachment line from the Attachments subsection.
-/// Format: * [path](path) where link text must equal href
-/// Returns the path if valid, or an error if format is invalid.
+/// Format: * [display-text](path) - display text can be filename or full path
+/// Returns the path (href) if valid, or an error if format is invalid.
 pub fn parse_attachment_line(line: &str) -> Result<String, ReqvireError> {
     let trimmed = line.trim();
 
@@ -654,19 +654,12 @@ pub fn parse_attachment_line(line: &str) -> Result<String, ReqvireError> {
     // Extract the markdown link part (after bullet)
     let link_part = trimmed.trim_start_matches("* ").trim_start_matches("- ").trim();
 
-    // Parse as markdown link
-    if let Some((text, href)) = extract_markdown_link(link_part) {
-        // Validate: text must equal href (git-root-relative path)
-        if text == href {
-            Ok(href)
-        } else {
-            Err(ReqvireError::InvalidAttachmentFormat(
-                format!("Attachment link text must equal href. Got text='{}', href='{}'", text, href)
-            ))
-        }
+    // Parse as markdown link - display text can be anything (filename or path)
+    if let Some((_text, href)) = extract_markdown_link(link_part) {
+        Ok(href)
     } else {
         Err(ReqvireError::InvalidAttachmentFormat(
-            format!("Invalid attachment format, expected '[path](path)': '{}'", line)
+            format!("Invalid attachment format, expected '[text](path)': '{}'", line)
         ))
     }
 }

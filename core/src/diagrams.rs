@@ -49,6 +49,7 @@ pub struct ElementNode {
     pub identifier: String,
     pub name: String,
     pub element_type: String,
+    pub attachments: Vec<String>,
 }
 
 /// Relation between elements in the model
@@ -138,10 +139,17 @@ impl<'a> ModelDiagramGenerator<'a> {
                     let mut sorted_elements = elements.clone();
                     sorted_elements.sort_by(|a, b| a.identifier.cmp(&b.identifier));
                     for element in sorted_elements {
+                        let attachments: Vec<String> = element.attachments.iter()
+                            .map(|a| a.file_path
+                                .file_name()
+                                .map(|n| n.to_string_lossy().into_owned())
+                                .unwrap_or_else(|| a.file_path.to_string_lossy().into_owned()))
+                            .collect();
                         element_nodes.push(ElementNode {
                             identifier: element.identifier.clone(),
                             name: element.name.clone(),
                             element_type: element.element_type.as_str().to_string(),
+                            attachments,
                         });
                     }
 
@@ -238,7 +246,13 @@ impl<'a> ModelDiagramGenerator<'a> {
 
                 for element in &file.elements {
                     let element_id = utils::hash_identifier(&element.identifier);
-                    let label = escape_label(&element.name);
+
+                    // Build label with element name and attachments
+                    let mut label = escape_label(&element.name);
+                    for attachment in &element.attachments {
+                        label.push_str(&format!("<br/>📎 {}", escape_label(attachment)));
+                    }
+
                     diagram.push_str(&format!("      {}[\"{}\"];\n", element_id, label));
 
                     // Determine element class based on type
@@ -507,21 +521,31 @@ fn add_element_to_diagram(
 
     if !included_elements.contains(&element.identifier) {
        included_elements.insert(element.identifier.clone());
-       
-       let label = element.name.replace('"', "&quot;");
-       
+
+       // Build label with element name and attachments
+       let mut label = element.name.replace('"', "&quot;");
+
+       // Add attachment links to label
+       for attachment in &element.attachments {
+           let attachment_name = attachment.file_path
+               .file_name()
+               .map(|n| n.to_string_lossy().into_owned())
+               .unwrap_or_else(|| attachment.file_path.to_string_lossy().into_owned());
+           label.push_str(&format!("<br/>📎 {}", escape_label(&attachment_name)));
+       }
+
        let class=match &element.element_type {
            ElementType::Requirement(RequirementType::User)  => "userRequirement",
            ElementType::Requirement(RequirementType::System) =>"systemRequirement",
            ElementType::Verification(_) =>"verification",
            _ => "default"
        };
-           
-                  
+
+
        // Add the element node
-       diagram.push_str(&format!("  {}[\"{}\"];\n", element_id, label));      
+       diagram.push_str(&format!("  {}[\"{}\"];\n", element_id, label));
        diagram.push_str(&format!("  class {} {};\n", element_id, class));
-       diagram.push_str(&format!("  click {} \"{}\";\n", element_id, click_target));       
+       diagram.push_str(&format!("  click {} \"{}\";\n", element_id, click_target));
     }
 
 

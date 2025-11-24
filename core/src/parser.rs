@@ -560,14 +560,43 @@ pub fn parse_elements(
 
         } else if current_subsection == SubSection::Attachments && !skip_current_element {
             // Parse Attachments subsection
-            // Format: * [path](path) where link text equals href
+            // Format: * [text](path) where path can be file-relative or git-root-relative
             if let Some(element) = &mut current_element {
                 if trimmed.starts_with("* ") || trimmed.starts_with("- ") {
                     match utils::parse_attachment_line(trimmed) {
                         Ok(path) => {
-                            // Store path as-is (git-root-relative)
-                            // File existence validation happens in Pass 2
-                            let attachment_path = PathBuf::from(&path);
+                            // Resolve attachment path to git-root-relative
+                            // Try: 1) as git-root-relative, 2) as file-relative
+                            let git_root = crate::git_commands::get_git_root_dir()
+                                .unwrap_or_else(|_| PathBuf::from("."));
+
+                            // First, check if path exists as git-root-relative
+                            let git_root_path = git_root.join(&path);
+                            let attachment_path = if git_root_path.exists() {
+                                // Path is git-root-relative (e.g., docs/SLA.txt)
+                                PathBuf::from(&path)
+                            } else {
+                                // Try file-relative path
+                                let file_dir = file_path
+                                    .parent()
+                                    .unwrap_or_else(|| Path::new("."));
+                                let resolved = file_dir.join(&path);
+
+                                // Normalize path by resolving .. and . components
+                                let mut normalized = PathBuf::new();
+                                for component in resolved.components() {
+                                    match component {
+                                        std::path::Component::ParentDir => { normalized.pop(); }
+                                        std::path::Component::CurDir => { /* skip */ }
+                                        _ => { normalized.push(component); }
+                                    }
+                                }
+
+                                // Strip git root to get git-root-relative path
+                                normalized.strip_prefix(&git_root)
+                                    .map(|p| p.to_path_buf())
+                                    .unwrap_or(normalized)
+                            };
 
                             // Check for duplicates
                             if !element.attachments.iter().any(|a| a.file_path == attachment_path) {
