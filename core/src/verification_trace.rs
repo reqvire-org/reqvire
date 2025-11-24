@@ -476,7 +476,12 @@ impl<'a> VerificationTraceGenerator<'a> {
 
             // Verifications are already sorted by file_order_index in generate()
             for trace in &file_verifications.verifications {
-                markdown.push_str(&format!("### {}\n\n", trace.name));
+                // Make element name a clickable link to its definition
+                let element_fragment = trace.identifier
+                    .rfind('#')
+                    .map(|pos| &trace.identifier[pos..])
+                    .unwrap_or("");
+                markdown.push_str(&format!("### [{}]({}{})\n\n", trace.name, trace.file, element_fragment));
                 markdown.push_str(&format!("- **Type**: {}\n", trace.verification_type));
                 markdown.push_str(&format!(
                     "- **Directly Verified**: {} requirements\n",

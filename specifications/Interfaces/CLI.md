@@ -295,6 +295,22 @@ reqvire traces --from-folder=docs/reports > docs/reports/traces.md
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
 ---
 
+### Verification Traces Element Navigation
+
+The system shall make verification element names in the traces report clickable links that navigate to the element's definition in its source file.
+
+#### Details
+- Verification element names displayed as headers shall be hyperlinks
+- Links shall point to the verification's source file with fragment identifier
+- Format: `[Verification Name](file_path#element-fragment)`
+- Enables direct navigation from traces report to verification definition
+
+#### Relations
+  * derivedFrom: [CLI Traces Command](#cli-traces-command)
+  * satisfiedBy: [verification_trace.rs](../../core/src/verification_trace.rs)
+  * verifiedBy: [Verification Traces Element Navigation Test](Verifications/CLIVerifications.md#verification-traces-element-navigation-test)
+---
+
 ### CLI Coverage Command
 
 The system shall implement a `coverage` subcommand under the main `verifications` command that generates verification coverage reports focusing on leaf requirements, test-verification satisfaction status, and orphaned verifications.

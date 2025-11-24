@@ -90,3 +90,24 @@ This test verifies that the CLI help output displays all commands and their opti
   * verify: [CLI Coverage Command](../CLI.md#cli-coverage-command)
   * satisfiedBy: [test.sh](../../../tests/test-cli-help-structure/test.sh)
 ---
+
+### Verification Traces Element Navigation Test
+
+Test verifies that verification element names in the traces report are clickable links.
+
+#### Test Steps
+1. Run `reqvire traces` command to generate traces report
+2. Verify output contains verification headers as markdown links
+3. Verify links follow format `[Verification Name](file_path#fragment)`
+
+#### Expected Results
+- Verification names are rendered as markdown links
+- Links point to source file with verification fragment
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [Verification Traces Element Navigation](../CLI.md#verification-traces-element-navigation)
+  * satisfiedBy: [test.sh](../../../tests/test-verification-traces/test.sh)
+---

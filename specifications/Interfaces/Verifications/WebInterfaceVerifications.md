@@ -157,3 +157,24 @@ This test verifies that diagrams display attachment links within element boxes.
   * verify: [Diagram Attachment Display](../WebInterface.md#diagram-attachment-display)
   * satisfiedBy: [test.sh](../../../tests/test-attachment-export/test.sh)
 ---
+
+### Model View Element Navigation Test
+
+Test verifies that element names in the model-centric view are clickable links.
+
+#### Test Steps
+1. Run `reqvire model` command to generate model report
+2. Verify output contains element headers as markdown links
+3. Verify links follow format `[Element Name](file_path#fragment)`
+
+#### Expected Results
+- Element names are rendered as markdown links
+- Links point to source file with element fragment
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [Model View Element Navigation](../WebInterface.md#model-view-element-navigation)
+  * satisfiedBy: [test.sh](../../../tests/test-model-command/test.sh)
+---

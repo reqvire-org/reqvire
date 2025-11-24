@@ -1,6 +1,6 @@
 ## File: specifications/Verifications/Tests.md
 
-### OAuth Flow Test
+### [OAuth Flow Test](specifications/Verifications/Tests.md#oauth-flow-test)
 
 - **Type**: test-verification
 - **Directly Verified**: 2 requirements
@@ -28,7 +28,7 @@ graph TD
 ```
 
 
-### Session Timeout Test
+### [Session Timeout Test](specifications/Verifications/Tests.md#session-timeout-test)
 
 - **Type**: test-verification
 - **Directly Verified**: 1 requirements
@@ -56,7 +56,7 @@ graph TD
 ```
 
 
-### Encryption Coverage Test
+### [Encryption Coverage Test](specifications/Verifications/Tests.md#encryption-coverage-test)
 
 - **Type**: test-verification
 - **Directly Verified**: 1 requirements
@@ -81,7 +81,7 @@ graph TD
 ```
 
 
-### Coverage Calculation Test
+### [Coverage Calculation Test](specifications/Verifications/Tests.md#coverage-calculation-test)
 
 - **Type**: test-verification
 - **Directly Verified**: 2 requirements
@@ -109,7 +109,7 @@ graph TD
 ```
 
 
-### Security Analysis
+### [Security Analysis](specifications/Verifications/Tests.md#security-analysis)
 
 - **Type**: analysis-verification
 - **Directly Verified**: 1 requirements
@@ -131,7 +131,7 @@ graph TD
 ```
 
 
-### Code Inspection
+### [Code Inspection](specifications/Verifications/Tests.md#code-inspection)
 
 - **Type**: inspection-verification
 - **Directly Verified**: 1 requirements

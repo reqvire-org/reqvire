@@ -182,6 +182,22 @@ The system shall generate a model-centric visualization during HTML export showi
   * satisfiedBy: [report_model.rs](../../core/src/report_model.rs)
 ---
 
+### Model View Element Navigation
+
+The system shall make element names in the model-centric view clickable links that navigate to the element's definition in its source file.
+
+#### Details
+- Element names displayed as headers shall be hyperlinks
+- Links shall point to the element's source file with fragment identifier
+- Format: `[Element Name](file_path#element-fragment)`
+- Enables direct navigation from model view to element definition
+
+#### Relations
+  * derivedFrom: [Model-Centric View Generation](#model-centric-view-generation)
+  * satisfiedBy: [report_model.rs](../../core/src/report_model.rs)
+  * verifiedBy: [Model View Element Navigation Test](Verifications/WebInterfaceVerifications.md#model-view-element-navigation-test)
+---
+
 ### Whole Model Diagram Generation
 
 The system shall generate a complete model diagram during HTML export showing all elements and their relationships.

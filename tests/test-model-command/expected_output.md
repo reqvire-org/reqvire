@@ -1,7 +1,7 @@
 **Total Elements**: 1
 **Total Relations**: 12
 
-## Model Structure Exploration
+## [Model Structure Exploration](specifications/UserRequirements.md#model-structure-exploration)
 
 **Type**: user-requirement
 **File**: [specifications/UserRequirements.md](specifications/UserRequirements.md)
