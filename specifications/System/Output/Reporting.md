@@ -11,6 +11,23 @@ The system shall generate containment view reports showing the physical hierarch
   * derivedFrom: [Containment View Report](#containment-view-report)
 ---
 
+### Containment View Design Documents
+
+The system shall include design documents (files in DesignDocuments folders) in the containment view, grouped by their containing folder and displayed alongside specification elements.
+
+#### Details
+- Design documents are non-specification markdown files in DesignDocuments folders
+- They shall be shown in the containment hierarchy under their parent folder
+- Each design document shall display its filename
+- Design documents shall be visually distinguished from specification elements
+- Clicking a design document in diagrams shall navigate to the file
+
+#### Relations
+  * derivedFrom: [Containment View Report Generation](#containment-view-report-generation)
+  * satisfiedBy: [containment.rs](../../../core/src/containment.rs)
+  * verifiedBy: [Containment View Design Documents Test](Verifications/ReportingVerifications.md#containment-view-design-documents-test)
+---
+
 ### Forward-Only Relation Traversal
 
 When filtering by root element, system shall traverse only forward relations down to leaf elements.

@@ -1,0 +1,1908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CLI</title>
+    <link rel="icon" type="image/x-icon" href="../../assets/favicon.ico">
+    <link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+    
+<style>
+:root {
+    /* Primary Colors */
+    --color-primary: #3F51B5;           /* Indigo - core branding */
+    --color-primary-hover: #7986CB;     /* Much lighter Indigo for hover - more visible */
+    --color-primary-active: #303F9F;    /* Darker Indigo for active */
+
+    /* Element Type Colors */
+    --color-requirement: #673AB7;       /* Deep Purple - core requirements */
+    --color-verification: #4CAF50;      /* Emerald Green - validated/completed */
+    --color-other: #9E9E9E;             /* Cool Gray - other element types */
+
+    /* Status Colors */
+    --color-verified: #4CAF50;          /* Forest Green - verified/passing */
+    --color-pending: #FFB74D;           /* Amber - pending/warning */
+    --color-error: #F44336;             /* Red - error/failed */
+
+    /* Interactive Colors */
+    --color-highlight: #FFAB91;         /* Peach - hover highlight */
+    --color-link: #212121;              /* Black - link color */
+    --color-link-hover: #3F51B5;        /* Indigo (same as nav bar) - link hover */
+
+    /* Text Colors */
+    --color-text-primary: #212121;      /* Primary text */
+    --color-text-secondary: #424242;    /* Body text */
+    --color-text-muted: #757575;        /* De-emphasized text */
+    --color-background: #FAFAFA;        /* Off-white background */
+    --color-border: #EEEEEE;            /* Very light gray borders */
+}
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #FAFAFA;
+    color: var(--color-text-secondary);
+}
+.reqvire-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    background-color: var(--color-primary);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+}
+.reqvire-nav a {
+    color: #ffffff;
+    text-decoration: none;
+    padding: 10px 20px;
+    margin-right: 5px;
+    border-radius: 3px;
+    transition: background-color 0.2s, text-decoration 0.2s;
+}
+.reqvire-nav a.nav-logo {
+    display: flex;
+    align-items: center;
+    padding: 5px 15px 5px 0;
+}
+.reqvire-nav a.nav-logo img {
+    vertical-align: middle;
+}
+.reqvire-nav a:hover {
+    background-color: var(--color-primary-hover);
+    text-decoration: underline;
+    color: #ffffff;
+}
+.reqvire-nav a:active,
+.reqvire-nav a.active {
+    background-color: var(--color-primary-active);
+    text-decoration: underline;
+    color: #ffffff;
+}
+.reqvire-nav-spacer {
+    height: 50px;
+}
+.container {
+    max-width: 95%;
+    margin: 0 auto;
+    padding: 20px;
+}
+.content {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    border: 1px solid #E0E0E0;
+}
+h1 {
+    color: var(--color-text-primary);
+    border-bottom: 2px solid #EEEEEE;
+    padding-bottom: 10px;
+    margin-top: 0;
+}
+h2 {
+    color: var(--color-text-primary);
+    border-bottom: 1px solid #EEEEEE;
+    padding-bottom: 5px;
+}
+h3 {
+    color: var(--color-text-primary);
+    margin-top: 25px;
+}
+h4 {
+    color: var(--color-text-secondary);
+    font-weight: 600;
+}
+a {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: text-decoration 0.15s ease;
+}
+a:hover {
+    text-decoration: underline;
+}
+a:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 20px 0;
+}
+table, th, td {
+    border: 1px solid #EEEEEE;
+}
+th, td {
+    padding: 8px 12px;
+    text-align: left;
+}
+th {
+    background-color: #F5F5F5;
+    color: #212121;
+    font-weight: 600;
+}
+tr:hover td {
+    background-color: #FFF8E1;
+}
+code {
+    background: #f6f8fa;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 90%;
+}
+pre {
+    background: #f6f8fa;
+    border-radius: 3px;
+    padding: 16px;
+    overflow: auto;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+}
+blockquote {
+    margin: 0;
+    padding: 0 15px;
+    color: var(--color-text-muted);
+    border-left: 4px solid var(--color-primary);
+}
+.mermaid {
+    margin: 20px 0;
+    text-align: center;
+    height: calc(100vh - 150px);
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid #EEEEEE;
+    border-radius: 3px;
+    background-color: #FAFAFA;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+.mermaid svg {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    position: relative;
+    z-index: 1;
+}
+.diagram-nav-buttons {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 999; /* higher than SVG (1) but lower than header nav (1000) */
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 5px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+.diagram-nav-row {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+}
+.diagram-nav-btn {
+    width: 32px;
+    height: 32px;
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.diagram-nav-btn:hover {
+    background-color: var(--color-primary-hover);
+}
+.diagram-nav-btn:active {
+    background-color: var(--color-primary-active);
+}
+</style>
+
+    <!-- Enhanced mermaid configuration for Reqvire diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.5.0/dist/svg-pan-zoom.min.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+        import elkLayouts from 'https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk/dist/mermaid-layout-elk.esm.min.mjs';
+
+        // Register ELK layout for large diagrams
+        mermaid.registerLayoutLoaders(elkLayouts);
+
+        // Capture Mermaid errors
+        mermaid.parseError = function(err, hash) {
+            console.error('Mermaid Parse Error:', err);
+            console.error('Error details:', {
+                str: err.str,
+                hash: err.hash,
+                message: err.message,
+                stack: err.stack
+            });
+        };
+
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            maxTextSize: 5000000,
+            maxEdges: 50000,
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis',
+                defaultRenderer: 'elk'
+            },
+            layout: 'elk',
+            elk: {
+                mergeEdges: true,
+                nodePlacementStrategy: 'SIMPLE'
+            },
+            securityLevel: 'loose',
+            logLevel: 'error'
+        });
+
+        await mermaid.run();
+        window.mermaid = mermaid;
+
+        // Wait for SVGs to be fully rendered, then initialize
+        function waitForSvgs(callback) {
+            var containers = document.querySelectorAll('.mermaid');
+            var allReady = true;
+            containers.forEach(function(c) {
+                var svg = c.querySelector('svg');
+                if (!svg || !svg.getBBox || svg.getBBox().width === 0) {
+                    allReady = false;
+                }
+            });
+            if (allReady && containers.length > 0) {
+                callback();
+            } else {
+                requestAnimationFrame(function() { waitForSvgs(callback); });
+            }
+        }
+
+        // Add pan/zoom to all Mermaid diagrams after rendering
+        waitForSvgs(function() {
+            document.querySelectorAll('.mermaid').forEach(function(mermaidContainer) {
+                var svg = mermaidContainer.querySelector('svg');
+                if (!svg) return;
+
+                svg.style.maxWidth = 'none';
+                svg.style.maxHeight = 'none';
+
+                var eventsHandler = {
+                    haltEventListeners: ['touchstart', 'touchend', 'touchmove', 'touchleave', 'touchcancel'],
+                        init: function(options) {
+                            var instance = options.instance;
+                            var initialScale = 1;
+                            var pannedX = 0;
+                            var pannedY = 0;
+
+                            this.hammer = Hammer(options.svgElement, {
+                                inputClass: Hammer.SUPPORT_POINTER_EVENTS ? Hammer.PointerEventInput : Hammer.TouchInput
+                            });
+
+                            this.hammer.get('pinch').set({enable: true});
+
+                            this.hammer.on('doubletap', function(ev){
+                                instance.zoomIn();
+                            });
+
+                            this.hammer.on('panstart panmove', function(ev){
+                                if (ev.type === 'panstart') {
+                                    pannedX = 0;
+                                    pannedY = 0;
+                                }
+                                instance.panBy({x: ev.deltaX - pannedX, y: ev.deltaY - pannedY});
+                                pannedX = ev.deltaX;
+                                pannedY = ev.deltaY;
+                            });
+
+                            this.hammer.on('pinchstart pinchmove', function(ev){
+                                if (ev.type === 'pinchstart') {
+                                    initialScale = instance.getZoom();
+                                }
+                                instance.zoomAtPoint(initialScale * ev.scale, {x: ev.center.x, y: ev.center.y});
+                            });
+
+                            options.svgElement.addEventListener('touchmove', function(e){ e.preventDefault(); });
+                        },
+                        destroy: function(){
+                            this.hammer.destroy();
+                        }
+                    };
+
+                    // Diagrams with default zoom (no auto-fit)
+                    var panZoomInstance = svgPanZoom(svg, {
+                        zoomEnabled: true,
+                        controlIconsEnabled: true,
+                        fit: false,
+                        center: false,
+                        contain: false,
+                        minZoom: 0.5,
+                        maxZoom: 10,
+                        zoomScaleSensitivity: 0.3,
+                        customEventsHandler: eventsHandler
+                    });
+
+                    // Add navigation buttons
+                    var navButtons = document.createElement('div');
+                    navButtons.className = 'diagram-nav-buttons';
+                    navButtons.innerHTML = `
+                        <div class="diagram-nav-row">
+                            <button class="diagram-nav-btn" data-action="up">▲</button>
+                        </div>
+                        <div class="diagram-nav-row">
+                            <button class="diagram-nav-btn" data-action="left">◀</button>
+                            <button class="diagram-nav-btn" data-action="down">▼</button>
+                            <button class="diagram-nav-btn" data-action="right">▶</button>
+                        </div>
+                    `;
+                    mermaidContainer.appendChild(navButtons);
+
+                    // Wire up navigation buttons
+                    var panStep = 100;
+                    navButtons.querySelectorAll('.diagram-nav-btn').forEach(function(btn) {
+                        btn.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            var action = this.getAttribute('data-action');
+                            switch(action) {
+                                case 'up':
+                                    panZoomInstance.panBy({x: 0, y: panStep});
+                                    break;
+                                case 'down':
+                                    panZoomInstance.panBy({x: 0, y: -panStep});
+                                    break;
+                                case 'left':
+                                    panZoomInstance.panBy({x: panStep, y: 0});
+                                    break;
+                                case 'right':
+                                    panZoomInstance.panBy({x: -panStep, y: 0});
+                                    break;
+                            }
+                        });
+                    });
+            });
+
+            // Add CSS for edge highlighting
+            var style = document.createElement('style');
+            style.textContent = `
+                path.edge-highlighted,
+                .edge-highlighted path,
+                svg path.edge-highlighted {
+                    stroke: #FFAB91 !important;
+                    stroke-width: 3px !important;
+                }
+            `;
+            document.head.appendChild(style);
+
+            // Initialize edge highlighting for all diagrams
+            document.querySelectorAll('.mermaid svg').forEach(function(svg) {
+                var nodes = svg.querySelectorAll('.node');
+
+                // Find flowchart-link paths (actual edges)
+                var edgePaths = svg.querySelectorAll('path.flowchart-link');
+                // Fallback: find paths in .edges group
+                if (edgePaths.length === 0) {
+                    var edgesGroup = svg.querySelector('.edges');
+                    if (edgesGroup) {
+                        edgePaths = edgesGroup.querySelectorAll('path');
+                    }
+                }
+
+                // Get SVG point for coordinate transforms
+                var svgPoint = svg.createSVGPoint();
+
+                // Helper: transform point through element's CTM
+                function getTransformedBBox(element) {
+                    var bbox = element.getBBox();
+                    var ctm = element.getCTM();
+                    if (!ctm) return bbox;
+
+                    // Transform all four corners
+                    var corners = [
+                        {x: bbox.x, y: bbox.y},
+                        {x: bbox.x + bbox.width, y: bbox.y},
+                        {x: bbox.x, y: bbox.y + bbox.height},
+                        {x: bbox.x + bbox.width, y: bbox.y + bbox.height}
+                    ];
+
+                    var transformed = corners.map(function(c) {
+                        svgPoint.x = c.x;
+                        svgPoint.y = c.y;
+                        var tp = svgPoint.matrixTransform(ctm);
+                        return {x: tp.x, y: tp.y};
+                    });
+
+                    var minX = Math.min.apply(null, transformed.map(function(p) { return p.x; }));
+                    var maxX = Math.max.apply(null, transformed.map(function(p) { return p.x; }));
+                    var minY = Math.min.apply(null, transformed.map(function(p) { return p.y; }));
+                    var maxY = Math.max.apply(null, transformed.map(function(p) { return p.y; }));
+
+                    return {x: minX, y: minY, width: maxX - minX, height: maxY - minY};
+                }
+
+                // Helper: get all points from path
+                function getPathPoints(path) {
+                    var d = path.getAttribute('d') || '';
+                    var points = [];
+                    var ctm = path.getCTM();
+
+                    // Get M (start) point
+                    var startMatch = d.match(/M\s*([\d.-]+)[,\s]+([\d.-]+)/i);
+                    if (startMatch) {
+                        var sx = parseFloat(startMatch[1]);
+                        var sy = parseFloat(startMatch[2]);
+                        if (ctm) {
+                            svgPoint.x = sx; svgPoint.y = sy;
+                            var tp = svgPoint.matrixTransform(ctm);
+                            points.push({x: tp.x, y: tp.y});
+                        } else {
+                            points.push({x: sx, y: sy});
+                        }
+                    }
+
+                    // Get last point - find last number pair before Z or end
+                    var allNums = d.match(/[\d.-]+/g);
+                    if (allNums && allNums.length >= 2) {
+                        var ex = parseFloat(allNums[allNums.length - 2]);
+                        var ey = parseFloat(allNums[allNums.length - 1]);
+                        if (ctm) {
+                            svgPoint.x = ex; svgPoint.y = ey;
+                            var tp = svgPoint.matrixTransform(ctm);
+                            points.push({x: tp.x, y: tp.y});
+                        } else {
+                            points.push({x: ex, y: ey});
+                        }
+                    }
+
+                    return points;
+                }
+
+                // Build node bounding boxes with transforms
+                var nodeData = {};
+                nodes.forEach(function(node) {
+                    var nodeId = node.id || '';
+                    var parts = nodeId.split('-');
+                    var hashId = parts.length >= 2 ? parts[1] : nodeId;
+
+                    nodeData[hashId] = {
+                        node: node,
+                        bbox: getTransformedBBox(node)
+                    };
+                });
+
+                // Check if point is near bbox
+                function isNearBbox(pt, bbox, margin) {
+                    margin = margin || 40;
+                    return pt.x >= bbox.x - margin && pt.x <= bbox.x + bbox.width + margin &&
+                           pt.y >= bbox.y - margin && pt.y <= bbox.y + bbox.height + margin;
+                }
+
+                // Build edge connections with direction tracking
+                var edgeConnections = []; // [{path, source, target}]
+                var upstreamOf = {}; // node -> [parent nodes that point TO this node]
+                var downstreamOf = {}; // node -> [child nodes this node points TO]
+
+                Object.keys(nodeData).forEach(function(hashId) {
+                    upstreamOf[hashId] = [];
+                    downstreamOf[hashId] = [];
+                });
+
+                edgePaths.forEach(function(path) {
+                    var points = getPathPoints(path);
+                    if (points.length < 2) return;
+
+                    var startPt = points[0];
+                    var endPt = points[points.length - 1];
+
+                    var sourceNode = null;
+                    var targetNode = null;
+
+                    // Find source and target nodes for this edge
+                    Object.keys(nodeData).forEach(function(hashId) {
+                        var bbox = nodeData[hashId].bbox;
+                        if (isNearBbox(startPt, bbox, 20)) {
+                            sourceNode = hashId;
+                        }
+                        if (isNearBbox(endPt, bbox, 20)) {
+                            targetNode = hashId;
+                        }
+                    });
+
+                    if (sourceNode && targetNode && sourceNode !== targetNode) {
+                        edgeConnections.push({path: path, source: sourceNode, target: targetNode});
+                        // source -> target means: target's upstream includes source
+                        if (!upstreamOf[targetNode].includes(sourceNode)) {
+                            upstreamOf[targetNode].push(sourceNode);
+                        }
+                        // source -> target means: source's downstream includes target
+                        if (!downstreamOf[sourceNode].includes(targetNode)) {
+                            downstreamOf[sourceNode].push(targetNode);
+                        }
+                    }
+                });
+
+                // Traverse only upstream (to parents/ancestors)
+                function findUpstream(startNodeId) {
+                    var visited = {};
+                    var queue = [startNodeId];
+                    visited[startNodeId] = true;
+
+                    while (queue.length > 0) {
+                        var current = queue.shift();
+                        var parents = upstreamOf[current] || [];
+                        parents.forEach(function(parent) {
+                            if (!visited[parent]) {
+                                visited[parent] = true;
+                                queue.push(parent);
+                            }
+                        });
+                    }
+                    return visited;
+                }
+
+                // Traverse only downstream (to children/descendants)
+                function findDownstream(startNodeId) {
+                    var visited = {};
+                    var queue = [startNodeId];
+                    visited[startNodeId] = true;
+
+                    while (queue.length > 0) {
+                        var current = queue.shift();
+                        var children = downstreamOf[current] || [];
+                        children.forEach(function(child) {
+                            if (!visited[child]) {
+                                visited[child] = true;
+                                queue.push(child);
+                            }
+                        });
+                    }
+                    return visited;
+                }
+
+                // Get edges for connected nodes
+                function getChainEdges(nodeSet) {
+                    var edges = [];
+                    edgeConnections.forEach(function(conn) {
+                        if (nodeSet[conn.source] && nodeSet[conn.target]) {
+                            edges.push(conn.path);
+                        }
+                    });
+                    return edges;
+                }
+
+                // Attach hover handlers
+                nodes.forEach(function(node) {
+                    var nodeId = node.id || '';
+                    var parts = nodeId.split('-');
+                    var hashId = parts.length >= 2 ? parts[1] : nodeId;
+
+                    node.style.cursor = 'pointer';
+
+                    node.addEventListener('mouseenter', function(e) {
+                        e.stopPropagation();
+                        nodes.forEach(function(n) { n.style.filter = ''; });
+                        node.style.filter = 'drop-shadow(0 0 8px rgba(255, 171, 145, 0.7))';
+
+                        // Find upstream (ancestors) and downstream (descendants) separately
+                        var upstream = findUpstream(hashId);
+                        var downstream = findDownstream(hashId);
+                        // Merge both sets
+                        var allConnected = {};
+                        Object.keys(upstream).forEach(function(k) { allConnected[k] = true; });
+                        Object.keys(downstream).forEach(function(k) { allConnected[k] = true; });
+
+                        var chainEdges = getChainEdges(allConnected);
+                        chainEdges.forEach(function(path) {
+                            path.classList.add('edge-highlighted');
+                        });
+                    });
+
+                    node.addEventListener('mouseleave', function() {
+                        node.style.filter = '';
+                        // Remove highlight from all edges
+                        edgePaths.forEach(function(path) {
+                            path.classList.remove('edge-highlighted');
+                        });
+                    });
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <nav class="reqvire-nav">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Reqvire" height="24"></a>
+        <a href="../../index.html">Index</a>
+        <a href="../../containment.html">Containment</a>
+        <a href="../../model.html">Model</a>
+        <a href="../../whole-model.html">Whole Model</a>
+        <a href="../../traces.html">Traces</a>
+        <a href="../../coverage.html">Coverage</a>
+    </nav>
+    <div class="reqvire-nav-spacer"></div>
+    <div class="container">
+        <div class="content">
+            <h1 id="requirements">Requirements</h1>
+<div class="mermaid">graph TD;
+  %% REQVIRE-AUTOGENERATED-DIAGRAM
+  %% Graph styling
+  classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;
+  classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
+  classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
+  classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
+
+  a957c400a0de2045[&quot;Attachment Commands&quot;];
+  class a957c400a0de2045 systemRequirement;
+  click a957c400a0de2045 &quot;CLI.html#attachment-commands&quot;;
+  a6b4b85f1dd10dc7[&quot;Attach Command Verification&quot;];
+  class a6b4b85f1dd10dc7 verification;
+  click a6b4b85f1dd10dc7 &quot;../System/Core/Verifications/AttachmentsVerifications.html#attach-command-verification&quot;;
+  a957c400a0de2045 -.->|verifiedBy| a6b4b85f1dd10dc7;
+  32a3ea471bc6d707[&quot;Detach Command Verification&quot;];
+  class 32a3ea471bc6d707 verification;
+  click 32a3ea471bc6d707 &quot;../System/Core/Verifications/AttachmentsVerifications.html#detach-command-verification&quot;;
+  a957c400a0de2045 -.->|verifiedBy| 32a3ea471bc6d707;
+  810c1e7fef1cf44c[&quot;Move Attachment Command Verification&quot;];
+  class 810c1e7fef1cf44c verification;
+  click 810c1e7fef1cf44c &quot;../System/Core/Verifications/AttachmentsVerifications.html#move-attachment-command-verification&quot;;
+  a957c400a0de2045 -.->|verifiedBy| 810c1e7fef1cf44c;
+  1d45fdf3b9015649[&quot;Remove Attachment Command Verification&quot;];
+  class 1d45fdf3b9015649 verification;
+  click 1d45fdf3b9015649 &quot;../System/Core/Verifications/AttachmentsVerifications.html#remove-attachment-command-verification&quot;;
+  a957c400a0de2045 -.->|verifiedBy| 1d45fdf3b9015649;
+  d6a8d0b0ef89a349[&quot;CLI Add Element Command&quot;];
+  class d6a8d0b0ef89a349 systemRequirement;
+  click d6a8d0b0ef89a349 &quot;CLI.html#cli-add-element-command&quot;;
+  80defdd4cbc7ee18[&quot;cli.rs&quot;];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 &quot;../../cli/src/cli.rs&quot;;
+  d6a8d0b0ef89a349 -->|satisfiedBy| 80defdd4cbc7ee18;
+  fb6e3a86a919feed[&quot;CLI Add Element Test&quot;];
+  class fb6e3a86a919feed verification;
+  click fb6e3a86a919feed &quot;../System/Operations/Verifications/ElementManipulationVerifications.html#cli-add-element-test&quot;;
+  d6a8d0b0ef89a349 -.->|verifiedBy| fb6e3a86a919feed;
+  7b6287a68f3ac83f[&quot;CLI Change Impact Report Command&quot;];
+  class 7b6287a68f3ac83f systemRequirement;
+  click 7b6287a68f3ac83f &quot;CLI.html#cli-change-impact-report-command&quot;;
+  80defdd4cbc7ee18[&quot;cli.rs&quot;];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 &quot;../../cli/src/cli.rs&quot;;
+  7b6287a68f3ac83f -->|satisfiedBy| 80defdd4cbc7ee18;
+  aa7f514c16bfcd7a[&quot;CLI Git Commit Hash Flag Test&quot;];
+  class aa7f514c16bfcd7a verification;
+  click aa7f514c16bfcd7a &quot;Verifications/CLIVerifications.html#cli-git-commit-hash-flag-test&quot;;
+  7b6287a68f3ac83f -.->|verifiedBy| aa7f514c16bfcd7a;
+  815c04291cd56adf[&quot;CLI Help Structure Verification&quot;];
+  class 815c04291cd56adf verification;
+  click 815c04291cd56adf &quot;Verifications/CLIVerifications.html#cli-help-structure-verification&quot;;
+  7b6287a68f3ac83f -.->|verifiedBy| 815c04291cd56adf;
+  8b2f8ffaa1b1d96f[&quot;Change Impact Analysis Verification&quot;];
+  class 8b2f8ffaa1b1d96f verification;
+  click 8b2f8ffaa1b1d96f &quot;../System/Processing/Verifications/ChangeImpactVerifications.html#change-impact-analysis-verification&quot;;
+  7b6287a68f3ac83f -.->|verifiedBy| 8b2f8ffaa1b1d96f;
+  c4dd1dd8ac41b4de[&quot;Change Impact Detection Test&quot;];
+  class c4dd1dd8ac41b4de verification;
+  click c4dd1dd8ac41b4de &quot;../System/Processing/Verifications/ChangeImpactVerifications.html#change-impact-detection-test&quot;;
+  7b6287a68f3ac83f -.->|verifiedBy| c4dd1dd8ac41b4de;
+  8cae07084a6ab404[&quot;Change Impact Relations Test&quot;];
+  class 8cae07084a6ab404 verification;
+  click 8cae07084a6ab404 &quot;../System/Processing/Verifications/ChangeImpactVerifications.html#change-impact-relations-test&quot;;
+  7b6287a68f3ac83f -.->|verifiedBy| 8cae07084a6ab404;
+  c9d3c9fb2d43619b[&quot;CLI Containment Command&quot;];
+  class c9d3c9fb2d43619b systemRequirement;
+  click c9d3c9fb2d43619b &quot;CLI.html#cli-containment-command&quot;;
+  80defdd4cbc7ee18[&quot;cli.rs&quot;];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 &quot;../../cli/src/cli.rs&quot;;
+  c9d3c9fb2d43619b -->|satisfiedBy| 80defdd4cbc7ee18;
+  2ab7d933a525a383[&quot;containment.rs&quot;];
+  class 2ab7d933a525a383 default;
+  click 2ab7d933a525a383 &quot;../../core/src/containment.rs&quot;;
+  c9d3c9fb2d43619b -->|satisfiedBy| 2ab7d933a525a383;
+  dad7eeb932afdb92[&quot;diagrams.rs&quot;];
+  class dad7eeb932afdb92 default;
+  click dad7eeb932afdb92 &quot;../../core/src/diagrams.rs&quot;;
+  c9d3c9fb2d43619b -->|satisfiedBy| dad7eeb932afdb92;
+  f3bdc01040587c85[&quot;CLI Coverage Command&quot;];
+  class f3bdc01040587c85 systemRequirement;
+  click f3bdc01040587c85 &quot;CLI.html#cli-coverage-command&quot;;
+  80defdd4cbc7ee18[&quot;cli.rs&quot;];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 &quot;../../cli/src/cli.rs&quot;;
+  f3bdc01040587c85 -->|satisfiedBy| 80defdd4cbc7ee18;
+  f3bdc01040587c85 -.->|verifiedBy| 815c04291cd56adf;
+  cc1604b61092ae14[&quot;Verification Coverage Report Test&quot;];
+  class cc1604b61092ae14 verification;
+  click cc1604b61092ae14 &quot;../System/Output/Verifications/ReportingVerifications.html#verification-coverage-report-test&quot;;
+  f3bdc01040587c85 -.->|verifiedBy| cc1604b61092ae14;
+  892e19ec234ec4d8[&quot;CLI Generate Diagrams Flag&quot;];
+  class 892e19ec234ec4d8 systemRequirement;
+  click 892e19ec234ec4d8 &quot;CLI.html#cli-generate-diagrams-flag&quot;;
+  80defdd4cbc7ee18[&quot;cli.rs&quot;];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 &quot;../../cli/src/cli.rs&quot;;
+  892e19ec234ec4d8 -->|satisfiedBy| 80defdd4cbc7ee18;
+  892e19ec234ec4d8 -.->|verifiedBy| 815c04291cd56adf;
+  38042f86baa09c0e[&quot;Diagram Generation Test&quot;];
+  class 38042f86baa09c0e verification;
+  click 38042f86baa09c0e &quot;../System/Output/Verifications/DiagramVerifications.html#diagram-generation-test&quot;;
+  892e19ec234ec4d8 -.->|verifiedBy| 38042f86baa09c0e;
+  e16108a30570f434[&quot;CLI Interface Structure&quot;];
+  class e16108a30570f434 systemRequirement;
+  click e16108a30570f434 &quot;CLI.html#cli-interface-structure&quot;;
+  e16108a30570f434 -.->|deriveReqT| 7b6287a68f3ac83f;
+  e16108a30570f434 -.->|deriveReqT| c9d3c9fb2d43619b;
+  e16108a30570f434 -.->|deriveReqT| 892e19ec234ec4d8;
+  7faaae7c608ed9f2[&quot;CLI Lint Command&quot;];
+  class 7faaae7c608ed9f2 systemRequirement;
+  click 7faaae7c608ed9f2 &quot;CLI.html#cli-lint-command&quot;;
+  e16108a30570f434 -.->|deriveReqT| 7faaae7c608ed9f2;
+  b3bb7792bbc95f02[&quot;CLI Remove Diagrams Flag&quot;];
+  class b3bb7792bbc95f02 systemRequirement;
+  click b3bb7792bbc95f02 &quot;CLI.html#cli-remove-diagrams-flag&quot;;
+  e16108a30570f434 -.->|deriveReqT| b3bb7792bbc95f02;
+  3814555dac6871e9[&quot;CLI Rename Element Command&quot;];
+  class 3814555dac6871e9 systemRequirement;
+  click 3814555dac6871e9 &quot;CLI.html#cli-rename-element-command&quot;;
+  e16108a30570f434 -.->|deriveReqT| 3814555dac6871e9;
+  e342a2a82ef67934[&quot;CLI Search Command&quot;];
+  class e342a2a82ef67934 systemRequirement;
+  click e342a2a82ef67934 &quot;CLI.html#cli-search-command&quot;;
+  e16108a30570f434 -.->|deriveReqT| e342a2a82ef67934;
+  e21c06baba741337[&quot;Format Command&quot;];
+  class e21c06baba741337 systemRequirement;
+  click e21c06baba741337 &quot;CLI.html#format-command&quot;;
+  e16108a30570f434 -.->|deriveReqT| e21c06baba741337;
+  4fd92091a4cfac13[&quot;Subdirectory Processing Option&quot;];
+  class 4fd92091a4cfac13 systemRequirement;
+  click 4fd92091a4cfac13 &quot;CLI.html#subdirectory-processing-option&quot;;
+  e16108a30570f434 -.->|deriveReqT| 4fd92091a4cfac13;
+  8f321516e91a74d6[&quot;Validate Command&quot;];
+  class 8f321516e91a74d6 systemRequirement;
+  click 8f321516e91a74d6 &quot;CLI.html#validate-command&quot;;
+  e16108a30570f434 -.->|deriveReqT| 8f321516e91a74d6;
+  59093bf57f656ef3[&quot;HTML Export&quot;];
+  class 59093bf57f656ef3 systemRequirement;
+  click 59093bf57f656ef3 &quot;WebInterface.html#html-export&quot;;
+  e16108a30570f434 -.->|deriveReqT| 59093bf57f656ef3;
+  34989dd78e7df469[&quot;Integrated Validation&quot;];
+  class 34989dd78e7df469 systemRequirement;
+  click 34989dd78e7df469 &quot;../System/Core/Validation.html#integrated-validation&quot;;
+  e16108a30570f434 -.->|deriveReqT| 34989dd78e7df469;
+  80defdd4cbc7ee18[&quot;cli.rs&quot;];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 &quot;../../cli/src/cli.rs&quot;;
+  e16108a30570f434 -->|satisfiedBy| 80defdd4cbc7ee18;
+  e1706df5a39b841e[&quot;Lint Auto-fix Capability&quot;];
+  class e1706df5a39b841e systemRequirement;
+  click e1706df5a39b841e &quot;../System/Operations/Linting.html#lint-auto-fix-capability&quot;;
+  7faaae7c608ed9f2 -.->|deriveReqT| e1706df5a39b841e;
+  ccf73e5865717df6[&quot;CLI Model Diagram Command&quot;];
+  class ccf73e5865717df6 systemRequirement;
+  click ccf73e5865717df6 &quot;CLI.html#cli-model-diagram-command&quot;;
+  f866b59da6009e1a[&quot;Forward-Only Relation Traversal&quot;];
+  class f866b59da6009e1a systemRequirement;
+  click f866b59da6009e1a &quot;../System/Output/Reporting.html#forward-only-relation-traversal&quot;;
+  ccf73e5865717df6 -.->|deriveReqT| f866b59da6009e1a;
+  97c13a253f6aa5bf[&quot;Model Diagram Output Formats&quot;];
+  class 97c13a253f6aa5bf systemRequirement;
+  click 97c13a253f6aa5bf &quot;../System/Output/Reporting.html#model-diagram-output-formats&quot;;
+  ccf73e5865717df6 -.->|deriveReqT| 97c13a253f6aa5bf;
+  80defdd4cbc7ee18[&quot;cli.rs&quot;];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 &quot;../../cli/src/cli.rs&quot;;
+  ccf73e5865717df6 -->|satisfiedBy| 80defdd4cbc7ee18;
+  dad7eeb932afdb92[&quot;diagrams.rs&quot;];
+  class dad7eeb932afdb92 default;
+  click dad7eeb932afdb92 &quot;../../core/src/diagrams.rs&quot;;
+  ccf73e5865717df6 -->|satisfiedBy| dad7eeb932afdb92;
+  2ea9a1b3289a7961[&quot;CLI Move Element Command&quot;];
+  class 2ea9a1b3289a7961 systemRequirement;
+  click 2ea9a1b3289a7961 &quot;CLI.html#cli-move-element-command&quot;;
+  80defdd4cbc7ee18[&quot;cli.rs&quot;];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 &quot;../../cli/src/cli.rs&quot;;
+  2ea9a1b3289a7961 -->|satisfiedBy| 80defdd4cbc7ee18;
+  7dd15b765f9e6b38[&quot;Subdirectory Processing Verification&quot;];
+  class 7dd15b765f9e6b38 verification;
+  click 7dd15b765f9e6b38 &quot;../System/Core/Verifications/ValidationVerifications.html#subdirectory-processing-verification&quot;;
+  2ea9a1b3289a7961 -.->|verifiedBy| 7dd15b765f9e6b38;
+  bbf19c7e256dc938[&quot;CLI Move Element Test&quot;];
+  class bbf19c7e256dc938 verification;
+  click bbf19c7e256dc938 &quot;../System/Operations/Verifications/ElementManipulationVerifications.html#cli-move-element-test&quot;;
+  2ea9a1b3289a7961 -.->|verifiedBy| bbf19c7e256dc938;
+  e090ad559abc31b0[&quot;CLI Move File Command&quot;];
+  class e090ad559abc31b0 systemRequirement;
+  click e090ad559abc31b0 &quot;CLI.html#cli-move-file-command&quot;;
+  e090ad559abc31b0 -.->|verifiedBy| 7dd15b765f9e6b38;
+  148bc8a2c62a32f9[&quot;CLI Move File Test&quot;];
+  class 148bc8a2c62a32f9 verification;
+  click 148bc8a2c62a32f9 &quot;../System/Operations/Verifications/ElementManipulationVerifications.html#cli-move-file-test&quot;;
+  e090ad559abc31b0 -.->|verifiedBy| 148bc8a2c62a32f9;
+  80defdd4cbc7ee18[&quot;cli.rs&quot;];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 &quot;../../cli/src/cli.rs&quot;;
+  b3bb7792bbc95f02 -->|satisfiedBy| 80defdd4cbc7ee18;
+  b3bb7792bbc95f02 -.->|verifiedBy| 815c04291cd56adf;
+  2b6bb41e59bfb171[&quot;Remove Generated Diagrams Verification&quot;];
+  class 2b6bb41e59bfb171 verification;
+  click 2b6bb41e59bfb171 &quot;../System/Output/Verifications/DiagramVerifications.html#remove-generated-diagrams-verification&quot;;
+  b3bb7792bbc95f02 -.->|verifiedBy| 2b6bb41e59bfb171;
+  dc747a38a6fa7319[&quot;CLI Remove Element Command&quot;];
+  class dc747a38a6fa7319 systemRequirement;
+  click dc747a38a6fa7319 &quot;CLI.html#cli-remove-element-command&quot;;
+  80defdd4cbc7ee18[&quot;cli.rs&quot;];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 &quot;../../cli/src/cli.rs&quot;;
+  dc747a38a6fa7319 -->|satisfiedBy| 80defdd4cbc7ee18;
+  9091872437b0354f[&quot;CLI Remove Element Test&quot;];
+  class 9091872437b0354f verification;
+  click 9091872437b0354f &quot;../System/Operations/Verifications/ElementManipulationVerifications.html#cli-remove-element-test&quot;;
+  dc747a38a6fa7319 -.->|verifiedBy| 9091872437b0354f;
+  80defdd4cbc7ee18[&quot;cli.rs&quot;];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 &quot;../../cli/src/cli.rs&quot;;
+  3814555dac6871e9 -->|satisfiedBy| 80defdd4cbc7ee18;
+  6b98c9b862ef4b7c[&quot;CLI Rename Element Test&quot;];
+  class 6b98c9b862ef4b7c verification;
+  click 6b98c9b862ef4b7c &quot;../System/Operations/Verifications/ElementManipulationVerifications.html#cli-rename-element-test&quot;;
+  3814555dac6871e9 -.->|verifiedBy| 6b98c9b862ef4b7c;
+  80defdd4cbc7ee18[&quot;cli.rs&quot;];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 &quot;../../cli/src/cli.rs&quot;;
+  e342a2a82ef67934 -->|satisfiedBy| 80defdd4cbc7ee18;
+  e342a2a82ef67934 -.->|verifiedBy| 815c04291cd56adf;
+  4859f411728d1e95[&quot;Attachment Search Filters Verification&quot;];
+  class 4859f411728d1e95 verification;
+  click 4859f411728d1e95 &quot;../System/Core/Verifications/AttachmentsVerifications.html#attachment-search-filters-verification&quot;;
+  e342a2a82ef67934 -.->|verifiedBy| 4859f411728d1e95;
+  7710784caae312f6[&quot;Search Command Tests&quot;];
+  class 7710784caae312f6 verification;
+  click 7710784caae312f6 &quot;../System/Output/Verifications/ReportingVerifications.html#search-command-tests&quot;;
+  e342a2a82ef67934 -.->|verifiedBy| 7710784caae312f6;
+  e0a8bb95946239f1[&quot;CLI Traces Command&quot;];
+  class e0a8bb95946239f1 systemRequirement;
+  click e0a8bb95946239f1 &quot;CLI.html#cli-traces-command&quot;;
+  95accfe4a6ba3ae5[&quot;Verification Traces Element Navigation&quot;];
+  class 95accfe4a6ba3ae5 systemRequirement;
+  click 95accfe4a6ba3ae5 &quot;CLI.html#verification-traces-element-navigation&quot;;
+  e0a8bb95946239f1 -.->|deriveReqT| 95accfe4a6ba3ae5;
+  80defdd4cbc7ee18[&quot;cli.rs&quot;];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 &quot;../../cli/src/cli.rs&quot;;
+  e0a8bb95946239f1 -->|satisfiedBy| 80defdd4cbc7ee18;
+  e0a8bb95946239f1 -.->|verifiedBy| 815c04291cd56adf;
+  40fbc0832143f5f4[&quot;Verification Traces Filter Options Test&quot;];
+  class 40fbc0832143f5f4 verification;
+  click 40fbc0832143f5f4 &quot;../System/Output/Verifications/ReportingVerifications.html#verification-traces-filter-options-test&quot;;
+  e0a8bb95946239f1 -.->|verifiedBy| 40fbc0832143f5f4;
+  28cbc6e381c1dd86[&quot;Verification Traces From-Folder Test&quot;];
+  class 28cbc6e381c1dd86 verification;
+  click 28cbc6e381c1dd86 &quot;../System/Output/Verifications/ReportingVerifications.html#verification-traces-from-folder-test&quot;;
+  e0a8bb95946239f1 -.->|verifiedBy| 28cbc6e381c1dd86;
+  9717f5af74dd01c1[&quot;Detailed Error Handling and Logging&quot;];
+  class 9717f5af74dd01c1 systemRequirement;
+  click 9717f5af74dd01c1 &quot;CLI.html#detailed-error-handling-and-logging&quot;;
+  5789fb8fa54eea23[&quot;Validation Error Handling&quot;];
+  class 5789fb8fa54eea23 systemRequirement;
+  click 5789fb8fa54eea23 &quot;../System/Core/Validation.html#validation-error-handling&quot;;
+  9717f5af74dd01c1 -.->|deriveReqT| 5789fb8fa54eea23;
+  a581221890d15c0c[&quot;error.rs&quot;];
+  class a581221890d15c0c default;
+  click a581221890d15c0c &quot;../../core/src/error.rs&quot;;
+  9717f5af74dd01c1 -->|satisfiedBy| a581221890d15c0c;
+  80defdd4cbc7ee18[&quot;cli.rs&quot;];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 &quot;../../cli/src/cli.rs&quot;;
+  e21c06baba741337 -->|satisfiedBy| 80defdd4cbc7ee18;
+  e21c06baba741337 -.->|verifiedBy| 815c04291cd56adf;
+  8711fb43b402dd78[&quot;Format Command Requirements Verification&quot;];
+  class 8711fb43b402dd78 verification;
+  click 8711fb43b402dd78 &quot;../System/Operations/Verifications/FormattingVerifications.html#format-command-requirements-verification&quot;;
+  e21c06baba741337 -.->|verifiedBy| 8711fb43b402dd78;
+  4fd92091a4cfac13 -.->|deriveReqT| d6a8d0b0ef89a349;
+  4fd92091a4cfac13 -.->|deriveReqT| 2ea9a1b3289a7961;
+  4fd92091a4cfac13 -.->|deriveReqT| e090ad559abc31b0;
+  4fd92091a4cfac13 -.->|deriveReqT| dc747a38a6fa7319;
+  80defdd4cbc7ee18[&quot;cli.rs&quot;];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 &quot;../../cli/src/cli.rs&quot;;
+  4fd92091a4cfac13 -->|satisfiedBy| 80defdd4cbc7ee18;
+  80defdd4cbc7ee18[&quot;cli.rs&quot;];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 &quot;../../cli/src/cli.rs&quot;;
+  8f321516e91a74d6 -->|satisfiedBy| 80defdd4cbc7ee18;
+  8f321516e91a74d6 -.->|verifiedBy| 815c04291cd56adf;
+  19db7c09ab210848[&quot;Invalid Relations Test&quot;];
+  class 19db7c09ab210848 verification;
+  click 19db7c09ab210848 &quot;../System/Core/Verifications/ValidationVerifications.html#invalid-relations-test&quot;;
+  8f321516e91a74d6 -.->|verifiedBy| 19db7c09ab210848;
+  71217113837fd638[&quot;verification_trace.rs&quot;];
+  class 71217113837fd638 default;
+  click 71217113837fd638 &quot;../../core/src/verification_trace.rs&quot;;
+  95accfe4a6ba3ae5 -->|satisfiedBy| 71217113837fd638;
+  7ccd413a598120aa[&quot;Verification Traces Element Navigation Test&quot;];
+  class 7ccd413a598120aa verification;
+  click 7ccd413a598120aa &quot;Verifications/CLIVerifications.html#verification-traces-element-navigation-test&quot;;
+  95accfe4a6ba3ae5 -.->|verifiedBy| 7ccd413a598120aa;
+  1ac3e4fc194fd9d[&quot;CLI interface&quot;];
+  class 1ac3e4fc194fd9d userRequirement;
+  click 1ac3e4fc194fd9d &quot;Interfaces.html#cli-interface&quot;;
+  1ac3e4fc194fd9d -.->|deriveReqT| e16108a30570f434;
+  ed77c8b81e72691f[&quot;Serve Command&quot;];
+  class ed77c8b81e72691f systemRequirement;
+  click ed77c8b81e72691f &quot;WebInterface.html#serve-command&quot;;
+  80defdd4cbc7ee18[&quot;cli.rs&quot;];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 &quot;../../cli/src/cli.rs&quot;;
+  ed77c8b81e72691f -->|satisfiedBy| 80defdd4cbc7ee18;
+  e313808f7a755f6[&quot;serve.rs&quot;];
+  class e313808f7a755f6 default;
+  click e313808f7a755f6 &quot;../../cli/src/serve.rs&quot;;
+  ed77c8b81e72691f -->|satisfiedBy| e313808f7a755f6;
+  ed77c8b81e72691f -.->|trace| 8f321516e91a74d6;
+  7ae93e4f0a2b797d[&quot;Serve Command Verification&quot;];
+  class 7ae93e4f0a2b797d verification;
+  click 7ae93e4f0a2b797d &quot;Verifications/WebInterfaceVerifications.html#serve-command-verification&quot;;
+  ed77c8b81e72691f -.->|verifiedBy| 7ae93e4f0a2b797d;
+  24f47a13e05f9654[&quot;Git Repository as Project Root&quot;];
+  class 24f47a13e05f9654 userRequirement;
+  click 24f47a13e05f9654 &quot;../System/Core/ModelManagement.html#git-repository-as-project-root&quot;;
+  24f47a13e05f9654 -.->|deriveReqT| 4fd92091a4cfac13;
+  d72aa0b295ce50c9[&quot;Target Location Validation and Auto-Creation&quot;];
+  class d72aa0b295ce50c9 systemRequirement;
+  click d72aa0b295ce50c9 &quot;../System/Operations/ElementManipulation.html#target-location-validation-and-auto-creation&quot;;
+  24f47a13e05f9654 -.->|deriveReqT| d72aa0b295ce50c9;
+  bd0604b1a72a0172[&quot;Reserved Subsections Support<br/>📎 ReservedSubsections.md&quot;];
+  class bd0604b1a72a0172 systemRequirement;
+  click bd0604b1a72a0172 &quot;../System/Core/StructureAndParsing.html#reserved-subsections-support&quot;;
+  bd0604b1a72a0172 -.->|deriveReqT| a957c400a0de2045;
+  bd0604b1a72a0172 -.->|deriveReqT| e342a2a82ef67934;
+  15fbadeac35968b9[&quot;Supported Element Types&quot;];
+  class 15fbadeac35968b9 systemRequirement;
+  click 15fbadeac35968b9 &quot;../System/Core/ModelManagement.html#supported-element-types&quot;;
+  bd0604b1a72a0172 -.->|deriveReqT| 15fbadeac35968b9;
+  ea60608d4ce12d93[&quot;Verification Type Categories&quot;];
+  class ea60608d4ce12d93 systemRequirement;
+  click ea60608d4ce12d93 &quot;../System/Core/ModelManagement.html#verification-type-categories&quot;;
+  bd0604b1a72a0172 -.->|deriveReqT| ea60608d4ce12d93;
+  a814c4935e1a0449[&quot;element.rs&quot;];
+  class a814c4935e1a0449 default;
+  click a814c4935e1a0449 &quot;../../core/src/element.rs&quot;;
+  bd0604b1a72a0172 -->|satisfiedBy| a814c4935e1a0449;
+  f22d93285fcd7664[&quot;parser.rs&quot;];
+  class f22d93285fcd7664 default;
+  click f22d93285fcd7664 &quot;../../core/src/parser.rs&quot;;
+  bd0604b1a72a0172 -->|satisfiedBy| f22d93285fcd7664;
+  bfad224e68f0c92b[&quot;Attachment Output Rendering Verification&quot;];
+  class bfad224e68f0c92b verification;
+  click bfad224e68f0c92b &quot;../System/Core/Verifications/AttachmentsVerifications.html#attachment-output-rendering-verification&quot;;
+  bd0604b1a72a0172 -.->|verifiedBy| bfad224e68f0c92b;
+  edbc73b37eb9cbe[&quot;Attachments Subsection Parsing Verification&quot;];
+  class edbc73b37eb9cbe verification;
+  click edbc73b37eb9cbe &quot;../System/Core/Verifications/AttachmentsVerifications.html#attachments-subsection-parsing-verification&quot;;
+  bd0604b1a72a0172 -.->|verifiedBy| edbc73b37eb9cbe;
+  cd463a2ba2fbdafc[&quot;Attachments Validation Verification&quot;];
+  class cd463a2ba2fbdafc verification;
+  click cd463a2ba2fbdafc &quot;../System/Core/Verifications/AttachmentsVerifications.html#attachments-validation-verification&quot;;
+  bd0604b1a72a0172 -.->|verifiedBy| cd463a2ba2fbdafc;
+  908de1f59852b43a[&quot;Element Subsection Parsing Test&quot;];
+  class 908de1f59852b43a verification;
+  click 908de1f59852b43a &quot;../System/Core/Verifications/ParsingVerifications.html#element-subsection-parsing-test&quot;;
+  bd0604b1a72a0172 -.->|verifiedBy| 908de1f59852b43a;
+  5218c9b64682cc5b[&quot;Enhanced Validation Error Reporting&quot;];
+  class 5218c9b64682cc5b userRequirement;
+  click 5218c9b64682cc5b &quot;../System/Core/Validation.html#enhanced-validation-error-reporting&quot;;
+  5218c9b64682cc5b -.->|deriveReqT| 9717f5af74dd01c1;
+  5218c9b64682cc5b -.->|deriveReqT| 8f321516e91a74d6;
+  9610b5626acc5744[&quot;Relation Type Validation&quot;];
+  class 9610b5626acc5744 systemRequirement;
+  click 9610b5626acc5744 &quot;../System/Core/Validation.html#relation-type-validation&quot;;
+  5218c9b64682cc5b -.->|deriveReqT| 9610b5626acc5744;
+  4d94211796e29e4[&quot;Two-Pass Validation Strategy&quot;];
+  class 4d94211796e29e4 systemRequirement;
+  click 4d94211796e29e4 &quot;../System/Core/Validation.html#two-pass-validation-strategy&quot;;
+  4d94211796e29e4 -.->|deriveReqT| 8f321516e91a74d6;
+  d50a859650933e55[&quot;model.rs&quot;];
+  class d50a859650933e55 default;
+  click d50a859650933e55 &quot;../../core/src/model.rs&quot;;
+  4d94211796e29e4 -->|satisfiedBy| d50a859650933e55;
+  40ff83bf78b6e993[&quot;Create Element Operation&quot;];
+  class 40ff83bf78b6e993 systemRequirement;
+  click 40ff83bf78b6e993 &quot;../System/Operations/ElementManipulation.html#create-element-operation&quot;;
+  40ff83bf78b6e993 -.->|deriveReqT| d6a8d0b0ef89a349;
+  80defdd4cbc7ee18[&quot;cli.rs&quot;];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 &quot;../../cli/src/cli.rs&quot;;
+  40ff83bf78b6e993 -->|satisfiedBy| 80defdd4cbc7ee18;
+  ea4ba0d9ffba93a5[&quot;crud.rs&quot;];
+  class ea4ba0d9ffba93a5 default;
+  click ea4ba0d9ffba93a5 &quot;../../core/src/crud.rs&quot;;
+  40ff83bf78b6e993 -->|satisfiedBy| ea4ba0d9ffba93a5;
+  e69395f926bba6a5[&quot;diff.rs&quot;];
+  class e69395f926bba6a5 default;
+  click e69395f926bba6a5 &quot;../../core/src/diff.rs&quot;;
+  40ff83bf78b6e993 -->|satisfiedBy| e69395f926bba6a5;
+  b7c871ab64a7059a[&quot;graph_registry.rs&quot;];
+  class b7c871ab64a7059a default;
+  click b7c871ab64a7059a &quot;../../core/src/graph_registry.rs&quot;;
+  40ff83bf78b6e993 -->|satisfiedBy| b7c871ab64a7059a;
+  f22d93285fcd7664[&quot;parser.rs&quot;];
+  class f22d93285fcd7664 default;
+  click f22d93285fcd7664 &quot;../../core/src/parser.rs&quot;;
+  40ff83bf78b6e993 -->|satisfiedBy| f22d93285fcd7664;
+  ce2625feec883e55[&quot;utils.rs&quot;];
+  class ce2625feec883e55 default;
+  click ce2625feec883e55 &quot;../../core/src/utils.rs&quot;;
+  40ff83bf78b6e993 -->|satisfiedBy| ce2625feec883e55;
+  3e00e3e0be5d5127[&quot;Create Element Test&quot;];
+  class 3e00e3e0be5d5127 verification;
+  click 3e00e3e0be5d5127 &quot;../System/Operations/Verifications/ElementManipulationVerifications.html#create-element-test&quot;;
+  40ff83bf78b6e993 -.->|verifiedBy| 3e00e3e0be5d5127;
+  ce618b500d99383[&quot;Delete Element Operation&quot;];
+  class ce618b500d99383 systemRequirement;
+  click ce618b500d99383 &quot;../System/Operations/ElementManipulation.html#delete-element-operation&quot;;
+  ce618b500d99383 -.->|deriveReqT| dc747a38a6fa7319;
+  80defdd4cbc7ee18[&quot;cli.rs&quot;];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 &quot;../../cli/src/cli.rs&quot;;
+  ce618b500d99383 -->|satisfiedBy| 80defdd4cbc7ee18;
+  ea4ba0d9ffba93a5[&quot;crud.rs&quot;];
+  class ea4ba0d9ffba93a5 default;
+  click ea4ba0d9ffba93a5 &quot;../../core/src/crud.rs&quot;;
+  ce618b500d99383 -->|satisfiedBy| ea4ba0d9ffba93a5;
+  e69395f926bba6a5[&quot;diff.rs&quot;];
+  class e69395f926bba6a5 default;
+  click e69395f926bba6a5 &quot;../../core/src/diff.rs&quot;;
+  ce618b500d99383 -->|satisfiedBy| e69395f926bba6a5;
+  b7c871ab64a7059a[&quot;graph_registry.rs&quot;];
+  class b7c871ab64a7059a default;
+  click b7c871ab64a7059a &quot;../../core/src/graph_registry.rs&quot;;
+  ce618b500d99383 -->|satisfiedBy| b7c871ab64a7059a;
+  34ef74acae1cfec[&quot;Delete Element Test&quot;];
+  class 34ef74acae1cfec verification;
+  click 34ef74acae1cfec &quot;../System/Operations/Verifications/ElementManipulationVerifications.html#delete-element-test&quot;;
+  ce618b500d99383 -.->|verifiedBy| 34ef74acae1cfec;
+  574a7ab029e74916[&quot;Move Element Operation&quot;];
+  class 574a7ab029e74916 systemRequirement;
+  click 574a7ab029e74916 &quot;../System/Operations/ElementManipulation.html#move-element-operation&quot;;
+  574a7ab029e74916 -.->|deriveReqT| 2ea9a1b3289a7961;
+  80defdd4cbc7ee18[&quot;cli.rs&quot;];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 &quot;../../cli/src/cli.rs&quot;;
+  574a7ab029e74916 -->|satisfiedBy| 80defdd4cbc7ee18;
+  ea4ba0d9ffba93a5[&quot;crud.rs&quot;];
+  class ea4ba0d9ffba93a5 default;
+  click ea4ba0d9ffba93a5 &quot;../../core/src/crud.rs&quot;;
+  574a7ab029e74916 -->|satisfiedBy| ea4ba0d9ffba93a5;
+  e69395f926bba6a5[&quot;diff.rs&quot;];
+  class e69395f926bba6a5 default;
+  click e69395f926bba6a5 &quot;../../core/src/diff.rs&quot;;
+  574a7ab029e74916 -->|satisfiedBy| e69395f926bba6a5;
+  b7c871ab64a7059a[&quot;graph_registry.rs&quot;];
+  class b7c871ab64a7059a default;
+  click b7c871ab64a7059a &quot;../../core/src/graph_registry.rs&quot;;
+  574a7ab029e74916 -->|satisfiedBy| b7c871ab64a7059a;
+  4a2b7e74d59e684d[&quot;Move Element Test&quot;];
+  class 4a2b7e74d59e684d verification;
+  click 4a2b7e74d59e684d &quot;../System/Operations/Verifications/ElementManipulationVerifications.html#move-element-test&quot;;
+  574a7ab029e74916 -.->|verifiedBy| 4a2b7e74d59e684d;
+  954de6afbb79153b[&quot;Move File Operation&quot;];
+  class 954de6afbb79153b systemRequirement;
+  click 954de6afbb79153b &quot;../System/Operations/ElementManipulation.html#move-file-operation&quot;;
+  954de6afbb79153b -.->|deriveReqT| e090ad559abc31b0;
+  b1d95adb20fdfeca[&quot;Move File Squash Test&quot;];
+  class b1d95adb20fdfeca verification;
+  click b1d95adb20fdfeca &quot;../System/Operations/Verifications/ElementManipulationVerifications.html#move-file-squash-test&quot;;
+  954de6afbb79153b -.->|verifiedBy| b1d95adb20fdfeca;
+  aa8e8824965f69b6[&quot;Rename Element Operation&quot;];
+  class aa8e8824965f69b6 systemRequirement;
+  click aa8e8824965f69b6 &quot;../System/Operations/ElementManipulation.html#rename-element-operation&quot;;
+  aa8e8824965f69b6 -.->|deriveReqT| 3814555dac6871e9;
+  ea4ba0d9ffba93a5[&quot;crud.rs&quot;];
+  class ea4ba0d9ffba93a5 default;
+  click ea4ba0d9ffba93a5 &quot;../../core/src/crud.rs&quot;;
+  aa8e8824965f69b6 -->|satisfiedBy| ea4ba0d9ffba93a5;
+  e69395f926bba6a5[&quot;diff.rs&quot;];
+  class e69395f926bba6a5 default;
+  click e69395f926bba6a5 &quot;../../core/src/diff.rs&quot;;
+  aa8e8824965f69b6 -->|satisfiedBy| e69395f926bba6a5;
+  b7c871ab64a7059a[&quot;graph_registry.rs&quot;];
+  class b7c871ab64a7059a default;
+  click b7c871ab64a7059a &quot;../../core/src/graph_registry.rs&quot;;
+  aa8e8824965f69b6 -->|satisfiedBy| b7c871ab64a7059a;
+  cefdf0c8c7959360[&quot;Model Formatting&quot;];
+  class cefdf0c8c7959360 userRequirement;
+  click cefdf0c8c7959360 &quot;../System/Operations/Formatting.html#model-formatting&quot;;
+  cefdf0c8c7959360 -.->|deriveReqT| e21c06baba741337;
+  9839a41063dbb990[&quot;Format Consistency Enforcement&quot;];
+  class 9839a41063dbb990 systemRequirement;
+  click 9839a41063dbb990 &quot;../System/Operations/Formatting.html#format-consistency-enforcement&quot;;
+  cefdf0c8c7959360 -.->|deriveReqT| 9839a41063dbb990;
+  39adf071b0ba241b[&quot;Formatting Output&quot;];
+  class 39adf071b0ba241b systemRequirement;
+  click 39adf071b0ba241b &quot;../System/Operations/Formatting.html#formatting-output&quot;;
+  cefdf0c8c7959360 -.->|deriveReqT| 39adf071b0ba241b;
+  bdd210be2229a1bd[&quot;Replace Absolute Links with Relative Links&quot;];
+  class bdd210be2229a1bd systemRequirement;
+  click bdd210be2229a1bd &quot;../System/Operations/Formatting.html#replace-absolute-links-with-relative-links&quot;;
+  cefdf0c8c7959360 -.->|deriveReqT| bdd210be2229a1bd;
+  4ad4e1a3e594725b[&quot;Model Linting&quot;];
+  class 4ad4e1a3e594725b userRequirement;
+  click 4ad4e1a3e594725b &quot;../System/Operations/Linting.html#model-linting&quot;;
+  4ad4e1a3e594725b -.->|deriveReqT| 7faaae7c608ed9f2;
+  d6a912ff5bea38fc[&quot;Lint Output Formatting&quot;];
+  class d6a912ff5bea38fc systemRequirement;
+  click d6a912ff5bea38fc &quot;../System/Operations/Linting.html#lint-output-formatting&quot;;
+  4ad4e1a3e594725b -.->|deriveReqT| d6a912ff5bea38fc;
+  b4f7299aff69e0a4[&quot;Multi-Branch Convergence Detection&quot;];
+  class b4f7299aff69e0a4 systemRequirement;
+  click b4f7299aff69e0a4 &quot;../System/Operations/Linting.html#multi-branch-convergence-detection&quot;;
+  4ad4e1a3e594725b -.->|deriveReqT| b4f7299aff69e0a4;
+  754bccf6ec2ea027[&quot;Redundant Hierarchical Relations Detection&quot;];
+  class 754bccf6ec2ea027 systemRequirement;
+  click 754bccf6ec2ea027 &quot;../System/Operations/Linting.html#redundant-hierarchical-relations-detection&quot;;
+  4ad4e1a3e594725b -.->|deriveReqT| 754bccf6ec2ea027;
+  2cd90a7116fa5f01[&quot;Redundant Verify Relations Detection&quot;];
+  class 2cd90a7116fa5f01 systemRequirement;
+  click 2cd90a7116fa5f01 &quot;../System/Operations/Linting.html#redundant-verify-relations-detection&quot;;
+  4ad4e1a3e594725b -.->|deriveReqT| 2cd90a7116fa5f01;
+  7eef8716dbe1c578[&quot;Diagram Generation&quot;];
+  class 7eef8716dbe1c578 systemRequirement;
+  click 7eef8716dbe1c578 &quot;../System/Output/DiagramGeneration.html#diagram-generation&quot;;
+  7eef8716dbe1c578 -.->|deriveReqT| 892e19ec234ec4d8;
+  f57e308c2161373b[&quot;Diagram Element Attachment Display&quot;];
+  class f57e308c2161373b systemRequirement;
+  click f57e308c2161373b &quot;../System/Output/DiagramGeneration.html#diagram-element-attachment-display&quot;;
+  7eef8716dbe1c578 -.->|deriveReqT| f57e308c2161373b;
+  37f9fcec9ded1733[&quot;File Diagram Attachment Display&quot;];
+  class 37f9fcec9ded1733 systemRequirement;
+  click 37f9fcec9ded1733 &quot;../System/Output/DiagramGeneration.html#file-diagram-attachment-display&quot;;
+  7eef8716dbe1c578 -.->|deriveReqT| 37f9fcec9ded1733;
+  856209d3ca0b6eec[&quot;Interactive Mermaid Diagram Node Behavior&quot;];
+  class 856209d3ca0b6eec systemRequirement;
+  click 856209d3ca0b6eec &quot;../System/Output/DiagramGeneration.html#interactive-mermaid-diagram-node-behavior&quot;;
+  7eef8716dbe1c578 -.->|deriveReqT| 856209d3ca0b6eec;
+  e14408b847fbee65[&quot;SysML-Compatible Relationship Rendering&quot;];
+  class e14408b847fbee65 systemRequirement;
+  click e14408b847fbee65 &quot;../System/Output/DiagramGeneration.html#sysml-compatible-relationship-rendering&quot;;
+  7eef8716dbe1c578 -.->|deriveReqT| e14408b847fbee65;
+  dad7eeb932afdb92[&quot;diagrams.rs&quot;];
+  class dad7eeb932afdb92 default;
+  click dad7eeb932afdb92 &quot;../../core/src/diagrams.rs&quot;;
+  7eef8716dbe1c578 -->|satisfiedBy| dad7eeb932afdb92;
+  ce2625feec883e55[&quot;utils.rs&quot;];
+  class ce2625feec883e55 default;
+  click ce2625feec883e55 &quot;../../core/src/utils.rs&quot;;
+  7eef8716dbe1c578 -->|satisfiedBy| ce2625feec883e55;
+  7eef8716dbe1c578 -.->|verifiedBy| 38042f86baa09c0e;
+  7f92da2f85b6d57d[&quot;Diagram Relation Filtering Verification&quot;];
+  class 7f92da2f85b6d57d verification;
+  click 7f92da2f85b6d57d &quot;../System/Output/Verifications/DiagramVerifications.html#diagram-relation-filtering-verification&quot;;
+  7eef8716dbe1c578 -.->|verifiedBy| 7f92da2f85b6d57d;
+  7eef8716dbe1c578 -.->|verifiedBy| 2b6bb41e59bfb171;
+  237c8f8cf5d3bf75[&quot;Visualize Model Relationships Verification&quot;];
+  class 237c8f8cf5d3bf75 verification;
+  click 237c8f8cf5d3bf75 &quot;../System/Output/Verifications/DiagramVerifications.html#visualize-model-relationships-verification&quot;;
+  7eef8716dbe1c578 -.->|verifiedBy| 237c8f8cf5d3bf75;
+  c0b50979a9430837[&quot;Diagram Removal&quot;];
+  class c0b50979a9430837 systemRequirement;
+  click c0b50979a9430837 &quot;../System/Output/DiagramGeneration.html#diagram-removal&quot;;
+  c0b50979a9430837 -.->|deriveReqT| b3bb7792bbc95f02;
+  dad7eeb932afdb92[&quot;diagrams.rs&quot;];
+  class dad7eeb932afdb92 default;
+  click dad7eeb932afdb92 &quot;../../core/src/diagrams.rs&quot;;
+  c0b50979a9430837 -->|satisfiedBy| dad7eeb932afdb92;
+  b95348d09df26743[&quot;Model Visualization and Exploration&quot;];
+  class b95348d09df26743 userRequirement;
+  click b95348d09df26743 &quot;../System/Output/DiagramGeneration.html#model-visualization-and-exploration&quot;;
+  b95348d09df26743 -.->|deriveReqT| ccf73e5865717df6;
+  b07859a209e66b4b[&quot;Model-Centric View Generation&quot;];
+  class b07859a209e66b4b systemRequirement;
+  click b07859a209e66b4b &quot;WebInterface.html#model-centric-view-generation&quot;;
+  b95348d09df26743 -.->|deriveReqT| b07859a209e66b4b;
+  797bf4b837a4a201[&quot;Containment View Report Generation<br/>📎 ContainmentView.md&quot;];
+  class 797bf4b837a4a201 systemRequirement;
+  click 797bf4b837a4a201 &quot;../System/Output/Reporting.html#containment-view-report-generation&quot;;
+  797bf4b837a4a201 -.->|deriveReqT| c9d3c9fb2d43619b;
+  457fe4197d762fb1[&quot;Containment View Design Documents&quot;];
+  class 457fe4197d762fb1 systemRequirement;
+  click 457fe4197d762fb1 &quot;../System/Output/Reporting.html#containment-view-design-documents&quot;;
+  797bf4b837a4a201 -.->|deriveReqT| 457fe4197d762fb1;
+  edac9518a5d1f97[&quot;Containment Hierarchy Extraction Test&quot;];
+  class edac9518a5d1f97 verification;
+  click edac9518a5d1f97 &quot;../System/Output/Verifications/ReportingVerifications.html#containment-hierarchy-extraction-test&quot;;
+  797bf4b837a4a201 -.->|verifiedBy| edac9518a5d1f97;
+  5e2581264aa56cbe[&quot;Containment View JSON Output Test&quot;];
+  class 5e2581264aa56cbe verification;
+  click 5e2581264aa56cbe &quot;../System/Output/Verifications/ReportingVerifications.html#containment-view-json-output-test&quot;;
+  797bf4b837a4a201 -.->|verifiedBy| 5e2581264aa56cbe;
+  18180bec8b6762e1[&quot;Containment View Mermaid Diagram Test&quot;];
+  class 18180bec8b6762e1 verification;
+  click 18180bec8b6762e1 &quot;../System/Output/Verifications/ReportingVerifications.html#containment-view-mermaid-diagram-test&quot;;
+  797bf4b837a4a201 -.->|verifiedBy| 18180bec8b6762e1;
+  5f9c499eabeb44ad[&quot;Containment View Text Output Test&quot;];
+  class 5f9c499eabeb44ad verification;
+  click 5f9c499eabeb44ad &quot;../System/Output/Verifications/ReportingVerifications.html#containment-view-text-output-test&quot;;
+  797bf4b837a4a201 -.->|verifiedBy| 5f9c499eabeb44ad;
+  31af3beb8a076301[&quot;HTML Export Containment View Integration Test&quot;];
+  class 31af3beb8a076301 verification;
+  click 31af3beb8a076301 &quot;../System/Output/Verifications/ReportingVerifications.html#html-export-containment-view-integration-test&quot;;
+  797bf4b837a4a201 -.->|verifiedBy| 31af3beb8a076301;
+  51f1f398e207d6d4[&quot;Provide Validation Reports&quot;];
+  class 51f1f398e207d6d4 userRequirement;
+  click 51f1f398e207d6d4 &quot;../System/Output/Reporting.html#provide-validation-reports&quot;;
+  51f1f398e207d6d4 -.->|deriveReqT| 8f321516e91a74d6;
+  51f1f398e207d6d4 -.->|deriveReqT| 34989dd78e7df469;
+  6b1c2def6dc3d81e[&quot;Validation Report Generator&quot;];
+  class 6b1c2def6dc3d81e systemRequirement;
+  click 6b1c2def6dc3d81e &quot;../System/Output/Reporting.html#validation-report-generator&quot;;
+  51f1f398e207d6d4 -.->|deriveReqT| 6b1c2def6dc3d81e;
+  db8b8ec7785d3a59[&quot;Search Fine Grained Filtering<br/>📎 SearchFiltering.md&quot;];
+  class db8b8ec7785d3a59 systemRequirement;
+  click db8b8ec7785d3a59 &quot;../System/Output/Reporting.html#search-fine-grained-filtering&quot;;
+  db8b8ec7785d3a59 -.->|deriveReqT| e342a2a82ef67934;
+  80defdd4cbc7ee18[&quot;cli.rs&quot;];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 &quot;../../cli/src/cli.rs&quot;;
+  db8b8ec7785d3a59 -->|satisfiedBy| 80defdd4cbc7ee18;
+  1c9b1c7c49701993[&quot;filters.rs&quot;];
+  class 1c9b1c7c49701993 default;
+  click 1c9b1c7c49701993 &quot;../../core/src/filters.rs&quot;;
+  db8b8ec7785d3a59 -->|satisfiedBy| 1c9b1c7c49701993;
+  46f5ca73b0822d14[&quot;search.rs&quot;];
+  class 46f5ca73b0822d14 default;
+  click 46f5ca73b0822d14 &quot;../../core/src/search.rs&quot;;
+  db8b8ec7785d3a59 -->|satisfiedBy| 46f5ca73b0822d14;
+  db8b8ec7785d3a59 -.->|verifiedBy| 7710784caae312f6;
+  b7ce9753482be37b[&quot;Verification Coverage Report Generator&quot;];
+  class b7ce9753482be37b systemRequirement;
+  click b7ce9753482be37b &quot;../System/Output/Reporting.html#verification-coverage-report-generator&quot;;
+  b7ce9753482be37b -.->|deriveReqT| f3bdc01040587c85;
+  1261cbc7612c8952[&quot;report_coverage.rs&quot;];
+  class 1261cbc7612c8952 default;
+  click 1261cbc7612c8952 &quot;../../core/src/report_coverage.rs&quot;;
+  b7ce9753482be37b -->|satisfiedBy| 1261cbc7612c8952;
+  99a8ca248ac74156[&quot;Structural Change Analyzer&quot;];
+  class 99a8ca248ac74156 systemRequirement;
+  click 99a8ca248ac74156 &quot;../System/Processing/ChangeImpact.html#structural-change-analyzer&quot;;
+  99a8ca248ac74156 -.->|deriveReqT| 7b6287a68f3ac83f;
+  4b89dbed94c08c3e[&quot;change_impact.rs&quot;];
+  class 4b89dbed94c08c3e default;
+  click 4b89dbed94c08c3e &quot;../../core/src/change_impact.rs&quot;;
+  99a8ca248ac74156 -->|satisfiedBy| 4b89dbed94c08c3e;
+  114a879394c791e0[&quot;Verification Roll-up Strategy&quot;];
+  class 114a879394c791e0 systemRequirement;
+  click 114a879394c791e0 &quot;../System/Processing/VerificationTraces.html#verification-roll-up-strategy&quot;;
+  114a879394c791e0 -.->|deriveReqT| f3bdc01040587c85;
+  977c97663017a433[&quot;Verification Trace Builder&quot;];
+  class 977c97663017a433 systemRequirement;
+  click 977c97663017a433 &quot;../System/Processing/VerificationTraces.html#verification-trace-builder&quot;;
+  977c97663017a433 -.->|deriveReqT| e0a8bb95946239f1;
+  977c97663017a433 -.->|deriveReqT| b4f7299aff69e0a4;
+  977c97663017a433 -.->|deriveReqT| 754bccf6ec2ea027;
+  977c97663017a433 -.->|deriveReqT| 2cd90a7116fa5f01;
+</div>
+<h3 id="cli-interface-structure">CLI Interface Structure</h3>
+<p>The CLI interface shall implement the clear <code>[OPTIONS] &lt;COMMAND&gt; [COMMAND OPTIONS]</code> structure.</p>
+<h4>Details</h4>
+<p>The CLI must display all commands and options and command’s options flattened in the main help output which must also be a default commnad:</p>
+<pre><code>Reqvire requirements &amp; treacibility management tool
+
+Usage: reqvire [OPTIONS] &lt;COMMAND&gt; [COMMAND OPTIONS]
+
+Commands:
+  format             Format and normalize requirements files. By default, shows preview without applying changes
+  validate           Validate model
+  help               Print this message or the help of the given subcommand(s)
+
+Options:
+  -h, --help               Print help
+  -V, --version            Print version
+
+FORMAT OPTIONS:
+      --fix      Apply formatting changes to files
+      --json     Output results in JSON format
+</code></pre>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="Interfaces.html#cli-interface">CLI interface</a></li>
+<li>satisfiedBy: <a href="../../cli/src/cli.rs">cli.rs</a></li>
+</ul>
+<hr />
+<h3 id="format-command">Format Command</h3>
+<p>The system shall provide a formatting function, activated by the (format command), which shall execute the formatting process upon user request.</p>
+<h4>Details</h4>
+<p><code>format</code> command shall:</p>
+<ul>
+<li>Default to dry-run mode (show suggested changes without applying them)</li>
+<li>Require –fix flag to actually apply formatting changes to files</li>
+<li>Display a diff-style summary of changes that would be or have been made</li>
+<li>Support –json flag for structured output of formatting results</li>
+<li>Show git diff style output with line numbers and colors for both preview and actual formatting</li>
+</ul>
+<p>Additional behavior:</p>
+<ul>
+<li>By default (no –fix flag), preview changes without applying them</li>
+<li>–fix flag applies the formatting changes to files</li>
+<li>–json flag outputs formatting results in JSON format including file changes and diff information</li>
+<li>When formatting is applied, show a summary of changed files with diff details</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../System/Operations/Formatting.html#model-formatting">Model Formatting</a></li>
+<li>derivedFrom: <a href="#cli-interface-structure">CLI Interface Structure</a></li>
+<li>satisfiedBy: <a href="../../cli/src/cli.rs">cli.rs</a></li>
+</ul>
+<hr />
+<h3 id="validate-command">Validate Command</h3>
+<p>The system shall provide a validation command that executes model validation and reports any issues found.</p>
+<h4>Details</h4>
+<p><code>validate</code> command shall:</p>
+<ul>
+<li>Execute two-pass validation strategy:
+<ul>
+<li><strong>Pass 1: Element Collection and Local Validation</strong>
+<ul>
+<li>Parse all markdown files</li>
+<li>Extract elements with metadata</li>
+<li>Perform local validation (element uniqueness, identifier format, metadata syntax)</li>
+<li>Report errors if found</li>
+</ul>
+</li>
+<li><strong>Pass 2: Graph Construction and Relation Validation</strong>
+<ul>
+<li>Build GraphRegistry from collected elements</li>
+<li>Validate all relations (target existence, type compatibility)</li>
+<li>Perform cross-component validation</li>
+<li>Report errors if found</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Print all validation issues found in the model</li>
+<li>Output a success message “No validation issues found” when the model is valid</li>
+<li>Support –json flag to output validation results in JSON format</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../System/Output/Reporting.html#provide-validation-reports">Provide Validation Reports</a></li>
+<li>derivedFrom: <a href="../System/Core/Validation.html#enhanced-validation-error-reporting">Enhanced Validation Error Reporting</a></li>
+<li>derivedFrom: <a href="../System/Core/Validation.html#two-pass-validation-strategy">Two-Pass Validation Strategy</a></li>
+<li>derivedFrom: <a href="#cli-interface-structure">CLI Interface Structure</a></li>
+<li>satisfiedBy: <a href="../../cli/src/cli.rs">cli.rs</a></li>
+</ul>
+<hr />
+<h3 id="subdirectory-processing-option">Subdirectory Processing Option</h3>
+<p>The system shall automatically detect when it is run from a subdirectory of a git repository and process only files within that subdirectory.</p>
+<h4>Details</h4>
+<p>The subdirectory auto-detection is designed to limit the scope of processing to the current working directory when it is a subdirectory of the git root.</p>
+<p>When run from the git root, the system processes all files. When run from a subdirectory, it automatically limits scope to that subdirectory:</p>
+<pre><code>cd specifications/Verifications
+reqvire model-summary  # Only processes files in Verifications directory (with automatic validation)
+</code></pre>
+<p>The system shall validate references when processing from a subdirectory and generate validation errors for any references to elements or files outside the current subdirectory scope. This includes:</p>
+<ol>
+<li><strong>Parent Directory Reference Validation</strong>: Any relation that references an element or file outside the current subdirectory scope shall be reported as a missing relation target error</li>
+<li><strong>Scope Boundary Enforcement</strong>: References using relative paths (e.g., <code>../ParentFile.md#element</code>) that escape the subdirectory shall result in missing relation target errors when the referenced elements cannot be found</li>
+<li><strong>Absolute Path Validation</strong>: Absolute paths that point outside the subdirectory scope shall generate missing relation target errors</li>
+<li><strong>Error Reporting</strong>: Missing relation target errors shall clearly identify the unreachable reference due to subdirectory scope limitations</li>
+</ol>
+<p>This validation ensures that subdirectory processing maintains logical boundaries and prevents architectural inconsistencies by reporting parent directory references as missing targets.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#cli-interface-structure">CLI Interface Structure</a></li>
+<li>derivedFrom: <a href="../System/Core/ModelManagement.html#git-repository-as-project-root">Git Repository as Project Root</a></li>
+<li>satisfiedBy: <a href="../../cli/src/cli.rs">cli.rs</a></li>
+</ul>
+<hr />
+<h3 id="attachment-commands">Attachment Commands</h3>
+<p>The system shall provide CLI commands for attachment management: attach, detach, mv-attachment, and rm-attachment.</p>
+<h4>Details</h4>
+<details>
+<summary>View Full Specification</summary>
+<h2 id="attach-command">Attach Command</h2>
+<p>Syntax: <code>reqvire attach &lt;attachment-path&gt; &lt;element-name&gt; [--dry-run]</code></p>
+<p>Behavior:</p>
+<ul>
+<li>Create Attachments subsection if doesn’t exist</li>
+<li>Add link to subsection with format <code>* [path](path)</code></li>
+<li>Skip if already attached (idempotent)</li>
+<li>Support many-to-many (same file to multiple elements)</li>
+<li>Mark element file as modified</li>
+<li>Support dry-run mode for preview</li>
+</ul>
+<h2 id="detach-command">Detach Command</h2>
+<p>Syntax: <code>reqvire detach &lt;element-name&gt; &lt;attachment-path&gt; [--dry-run]</code></p>
+<p>Behavior:</p>
+<ul>
+<li>Remove link from Attachments subsection</li>
+<li>Remove subsection if no attachments remain</li>
+<li>Trigger change impact on element (CRITICAL)</li>
+<li>Mark element file as modified</li>
+<li>Support dry-run mode for preview</li>
+</ul>
+<h2 id="move-attachment-command">Move Attachment Command</h2>
+<p>Syntax: <code>reqvire mv-attachment &lt;old-path&gt; &lt;new-path&gt; [--dry-run]</code></p>
+<p>Behavior:</p>
+<ul>
+<li>Update ALL references across all elements</li>
+<li>Update both link text and href (text = path)</li>
+<li>Report affected elements</li>
+<li>Mark all affected element files as modified</li>
+<li>Support dry-run mode for preview</li>
+</ul>
+<h2 id="remove-attachment-command">Remove Attachment Command</h2>
+<p>Syntax: <code>reqvire rm-attachment &lt;attachment-path&gt; [--dry-run]</code></p>
+<p>Behavior:</p>
+<ul>
+<li>Delete physical file from filesystem</li>
+<li>Detach from ALL elements</li>
+<li>Remove empty Attachments subsections</li>
+<li>Report affected elements</li>
+<li>Mark all affected element files as modified</li>
+<li>Support dry-run mode for preview</li>
+</ul>
+</details>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../System/Core/StructureAndParsing.html#reserved-subsections-support">Reserved Subsections Support</a></li>
+</ul>
+<hr />
+<h3 id="detailed-error-handling-and-logging">Detailed Error Handling and Logging</h3>
+<p>The system shall implement detailed error handling and logging throughout the application to facilitate troubleshooting and provide meaningful feedback.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../System/Core/Validation.html#enhanced-validation-error-reporting">Enhanced Validation Error Reporting</a></li>
+<li>satisfiedBy: <a href="../../core/src/error.rs">error.rs</a></li>
+</ul>
+<hr />
+<h3 id="cli-search-command">CLI Search Command</h3>
+<p>The system shall provide a unified search function, activated by the <code>search</code> root command, which shall search and report on model elements with comprehensive filtering capabilities.</p>
+<h4>Details</h4>
+<p>Search command features:</p>
+<ul>
+<li><code>search</code>: Search model elements and output results to stdout</li>
+<li>Support <code>--json</code> flag for structured JSON output</li>
+<li>Support <code>--short</code> flag for abbreviated output (both text and JSON)</li>
+<li>Support comprehensive filter options (all combinable):
+<ul>
+<li>By file path glob: <code>--filter-file=&quot;src/**/*Reqs.md&quot;</code></li>
+<li>By element name regex: <code>--filter-name=&quot;.*safety.*&quot;</code></li>
+<li>By element type: <code>--filter-type=&quot;system-requirement&quot;</code> (exact match)</li>
+<li>By element content regex: <code>--filter-content=&quot;MUST&quot;</code></li>
+<li>By page content regex: <code>--filter-page-content=&quot;architecture&quot;</code></li>
+<li>By having relations: <code>--have-relations=verifiedBy,satisfiedBy</code> (comma-separated, must have ALL)</li>
+<li>By not having relations: <code>--not-have-relations=verifiedBy</code> (comma-separated, must NOT have ALL)</li>
+<li>By having attachments: <code>--has-attachments</code> (filter elements with Attachments subsection)</li>
+<li>By attachment path pattern: <code>--filter-attachment &lt;glob&gt;</code> (supports glob patterns like <code>*.pdf</code>, <code>docs/*</code>)</li>
+</ul>
+</li>
+</ul>
+<p>Short mode behavior:</p>
+<ul>
+<li>Text output: Display abbreviated one-line format per element</li>
+<li>JSON output: Omit fields: <code>content</code>, <code>page_content</code>, <code>verified_relations_count</code>, <code>satisfied_relations_count</code>, <code>element_count</code>, <code>total_elements</code>, <code>global_counters</code></li>
+</ul>
+<p>Error handling:</p>
+<ul>
+<li>Invalid regex patterns shall return clear error message showing the faulty pattern and exit</li>
+<li>Invalid relation type names shall return error with list of valid relation types</li>
+</ul>
+<p>Default output:</p>
+<ul>
+<li>Human-readable text format when neither <code>--json</code> nor <code>--short</code> is specified</li>
+<li>Full detail mode showing all element metadata and relations</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../System/Output/Reporting.html#search-fine-grained-filtering">Search Fine Grained Filtering</a></li>
+<li>derivedFrom: <a href="../System/Core/StructureAndParsing.html#reserved-subsections-support">Reserved Subsections Support</a></li>
+<li>derivedFrom: <a href="#cli-interface-structure">CLI Interface Structure</a></li>
+<li>satisfiedBy: <a href="../../cli/src/cli.rs">cli.rs</a></li>
+<li>verifiedBy: <a href="../System/Output/Verifications/ReportingVerifications.html#search-command-tests">Search Command Tests</a></li>
+</ul>
+<hr />
+<h3 id="cli-model-diagram-command">CLI Model Diagram Command</h3>
+<p>System shall provide CLI command to generate model diagrams with optional filtering and output format selection.</p>
+<h4>Details</h4>
+<ul>
+<li>Command shall be named <code>model</code></li>
+<li>Shall support <code>--from=&lt;name&gt;</code> flag for filtering from specific element by name</li>
+<li>Element names are globally unique, allowing lookup by name alone</li>
+<li>Shall support <code>--json</code> flag for JSON output format</li>
+<li>Default output shall be markdown with embedded Mermaid diagram</li>
+<li>Shall integrate with existing model diagram generation functionality</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../System/Output/DiagramGeneration.html#model-visualization-and-exploration">Model Visualization and Exploration</a></li>
+<li>satisfiedBy: <a href="../../core/src/diagrams.rs">diagrams.rs</a></li>
+<li>satisfiedBy: <a href="../../cli/src/cli.rs">cli.rs</a></li>
+</ul>
+<hr />
+<h3 id="cli-traces-command">CLI Traces Command</h3>
+<p>The system shall implement a <code>traces</code> subcommand under the main <code>verifications</code> command that generates and outputs upward trace trees for verification elements, showing the complete requirement hierarchy from verifications to root requirements.</p>
+<h4>Details</h4>
+<p>The command shall:</p>
+<ul>
+<li>Be invoked as <code>reqvire traces</code></li>
+<li>Generate output in Markdown format with embedded Mermaid diagrams by default</li>
+<li>Support <code>--json</code> flag for structured JSON output without diagrams</li>
+<li>Show verification elements as roots with arrows following relation semantics</li>
+<li>Include clickable links on all nodes (verifications and requirements) in Mermaid diagrams</li>
+<li>Highlight directly verified requirements using CSS classes in diagrams</li>
+<li>Traverse all upward parent relations to reach root requirements</li>
+<li>Merge multiple verification paths into a single tree per verification</li>
+<li>Exit with status code 0 on success</li>
+<li>Exit with non-zero status code on errors</li>
+</ul>
+<p>The Mermaid diagrams generated for verification traces shall include clickable links on diagram nodes that navigate to the referenced element using relative paths (the <code>traces</code> command always uses relative paths and does not support the <code>--links-with-blobs</code> flag).</p>
+<p>Command output shall be written to stdout for easy redirection to files.</p>
+<p><strong>Filter Options:</strong>
+The system shall support filtering verification traces by verification ID, name pattern, and verification type to allow users to generate traces for specific subsets of verifications.</p>
+<p>The following filter options shall be supported:</p>
+<ul>
+<li><code>--filter-id=&lt;id&gt;</code>: Generate trace for a specific verification element by its full identifier</li>
+<li><code>--filter-name=&lt;regex&gt;</code>: Filter verifications by name using regular expression matching</li>
+<li><code>--filter-type=&lt;type&gt;</code>: Filter by verification type (test-verification, analysis-verification, inspection-verification, demonstration-verification)</li>
+</ul>
+<p>Filters shall be combinable, and when multiple filters are specified, only verifications matching ALL filter criteria shall be included in the output.</p>
+<p><strong>From-Folder Option:</strong>
+The system shall support a <code>--from-folder</code> option for the <code>traces</code> command that specifies the relative path from where Reqvire runs to the folder where generated output files will be saved, enabling generation of relative links in Mermaid diagrams and other outputs that are portable when the output is saved in different locations.</p>
+<p>The <code>--from-folder</code> option shall:</p>
+<ul>
+<li>Accept a relative path string as parameter (e.g., <code>--from-folder=docs/verification-reports</code>)</li>
+<li>Default to empty/current directory when not specified (maintaining existing behavior)</li>
+<li>Support special case <code>/</code> to indicate the reqvire root (git root), keeping identifiers as git-root-relative paths</li>
+<li>Adjust all clickable links in Mermaid diagrams to be relative to the specified folder path</li>
+<li>Adjust all file path references in output to be relative to the specified folder path</li>
+<li>Work with both Markdown output (with Mermaid diagrams) and JSON output</li>
+<li>Ensure generated links work correctly when the output file is saved in the specified folder</li>
+<li>Use the standard path resolution logic to calculate relative paths from the from-folder to git root</li>
+</ul>
+<p><strong>Example usage:</strong></p>
+<pre><code class="language-bash"># Generate traces with links relative to docs/reports/ folder
+reqvire traces --from-folder=docs/reports &gt; docs/reports/traces.md
+
+# Links in the output will be relative to docs/reports/ (e.g., ../../specifications/file.md)
+</code></pre>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../System/Processing/VerificationTraces.html#verification-trace-builder">Verification Trace Builder</a></li>
+<li>satisfiedBy: <a href="../../cli/src/cli.rs">cli.rs</a></li>
+</ul>
+<hr />
+<h3 id="verification-traces-element-navigation">Verification Traces Element Navigation</h3>
+<p>The system shall make verification element names in the traces report clickable links that navigate to the element’s definition in its source file.</p>
+<h4>Details</h4>
+<ul>
+<li>Verification element names displayed as headers shall be hyperlinks</li>
+<li>Links shall point to the verification’s source file with fragment identifier</li>
+<li>Format: <code>[Verification Name](file_path#element-fragment)</code></li>
+<li>Enables direct navigation from traces report to verification definition</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#cli-traces-command">CLI Traces Command</a></li>
+<li>satisfiedBy: <a href="../../core/src/verification_trace.rs">verification_trace.rs</a></li>
+<li>verifiedBy: <a href="Verifications/CLIVerifications.html#verification-traces-element-navigation-test">Verification Traces Element Navigation Test</a></li>
+</ul>
+<hr />
+<h3 id="cli-coverage-command">CLI Coverage Command</h3>
+<p>The system shall implement a <code>coverage</code> subcommand under the main <code>verifications</code> command that generates verification coverage reports focusing on leaf requirements, test-verification satisfaction status, and orphaned verifications.</p>
+<h4>Details</h4>
+<p>The command shall:</p>
+<ul>
+<li>Be invoked as <code>reqvire coverage</code></li>
+<li>Support <code>--json</code> flag for JSON output format</li>
+<li>Default to human-readable text output when JSON flag is not present</li>
+<li>Generate reports focusing on leaf requirements (requirements without forward relations to other requirements)</li>
+<li>Show the percentage and details of verified and unverified leaf requirements</li>
+<li>Include breakdowns by file, section, and verification type</li>
+<li>Show satisfaction status of test-verification elements (those with satisfiedBy relations)</li>
+<li>Show orphaned verifications (verification elements without any verify relations to requirements)</li>
+<li>Follow <a href="../ModelManagement/VerificationTraces.html#verification-roll-up-strategy">Verification Roll-up Strategy</a></li>
+<li>Test-verification elements require satisfiedBy relations to be considered satisfied</li>
+<li>Analysis, inspection, and demonstration verification elements are considered satisfied by default</li>
+<li>Exit with status code 0 on success</li>
+<li>Exit with non-zero status code on errors</li>
+</ul>
+<p>Command output shall be written to stdout for easy redirection to files.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../System/Output/Reporting.html#verification-coverage-report-generator">Verification Coverage Report Generator</a></li>
+<li>derivedFrom: <a href="../System/Processing/VerificationTraces.html#verification-roll-up-strategy">Verification Roll-up Strategy</a></li>
+<li>satisfiedBy: <a href="../../cli/src/cli.rs">cli.rs</a></li>
+<li>verifiedBy: <a href="../System/Output/Verifications/ReportingVerifications.html#verification-coverage-report-test">Verification Coverage Report Test</a></li>
+</ul>
+<hr />
+<h3 id="cli-lint-command">CLI Lint Command</h3>
+<p>The system shall implement a <code>lint</code> command that analyzes model quality and detects issues in requirements relations, providing categorized output that distinguishes between auto-fixable issues and those requiring manual review.</p>
+<h4>Details</h4>
+<p>The command shall:</p>
+<ul>
+<li>Be invoked as <code>reqvire lint</code></li>
+<li>Default to dry-run mode (report issues without applying fixes)</li>
+<li>Support <code>--fixable</code> flag to show only auto-fixable issues</li>
+<li>Support <code>--auditable</code> flag to show only issues requiring manual review</li>
+<li>Support <code>--fix</code> flag to automatically apply fixes for auto-fixable issues</li>
+<li>Support <code>--json</code> flag for structured JSON output</li>
+<li>Default to showing ALL issues when no filter flags are provided</li>
+<li>Categorize output into two sections:
+<ul>
+<li><strong>Auto-fixable Issues</strong>: Issues that can be automatically corrected by the system</li>
+<li><strong>Needs Manual Review</strong>: Issues that require human judgment to resolve</li>
+</ul>
+</li>
+<li>Exit with status code 0 when no issues are found or when fixes are successfully applied</li>
+<li>Exit with non-zero status code on errors</li>
+</ul>
+<p>Command output shall be written to stdout for easy redirection to files.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../System/Operations/Linting.html#model-linting">Model Linting</a></li>
+<li>derivedFrom: <a href="#cli-interface-structure">CLI Interface Structure</a></li>
+</ul>
+<hr />
+<h3 id="cli-change-impact-report-command">CLI Change Impact Report Command</h3>
+<p>The system shall provide a command-line interface for initiating change impact analysis and controlling output formats.</p>
+<h4>Details</h4>
+<p>Command invocation: <code>reqvire change-impact [OPTIONS]</code></p>
+<p><strong>Analysis Options</strong>:</p>
+<ul>
+<li><code>--git-commit &lt;hash&gt;</code>: Specify git commit hash for comparing changes</li>
+<li>Support analyzing changes between git commits</li>
+<li>Enable specifying elements to analyze by ID or pattern</li>
+<li>Allow limiting analysis to specific relation types</li>
+<li>Support depth limitations for large models</li>
+</ul>
+<p><strong>Output Options</strong>:</p>
+<ul>
+<li><code>--json</code>: Output structured JSON impact data</li>
+<li>Default to formatted text reports</li>
+<li>Support Mermaid diagrams of impact trees</li>
+<li>Integrate with HTML report generation</li>
+</ul>
+<p><strong>Integration Support</strong>:</p>
+<ul>
+<li>Support integration with CI/CD pipelines</li>
+<li>Enable calling from external systems via API</li>
+<li>Support webhook triggers for automated analysis</li>
+<li>Allow scripting of analysis operations</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../System/Processing/ChangeImpact.html#structural-change-analyzer">Structural Change Analyzer</a></li>
+<li>derivedFrom: <a href="#cli-interface-structure">CLI Interface Structure</a></li>
+<li>satisfiedBy: <a href="../../cli/src/cli.rs">cli.rs</a></li>
+</ul>
+<hr />
+<h3 id="cli-generate-diagrams-flag">CLI Generate Diagrams Flag</h3>
+<p>The system shall provide a diagrams generation function, activated by the (generate-diagrams command), which shall generate interactive mermaid diagrams.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../System/Output/DiagramGeneration.html#diagram-generation">Diagram Generation</a></li>
+<li>derivedFrom: <a href="#cli-interface-structure">CLI Interface Structure</a></li>
+<li>satisfiedBy: <a href="../../cli/src/cli.rs">cli.rs</a></li>
+<li>verifiedBy: <a href="../System/Output/Verifications/DiagramVerifications.html#diagram-generation-test">Diagram Generation Test</a></li>
+</ul>
+<hr />
+<h3 id="cli-remove-diagrams-flag">CLI Remove Diagrams Flag</h3>
+<p>The system shall provide a diagram removal function, activated by the remove-diagrams command, which shall remove all generated mermaid diagrams from the model.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../System/Output/DiagramGeneration.html#diagram-removal">Diagram Removal</a></li>
+<li>derivedFrom: <a href="#cli-interface-structure">CLI Interface Structure</a></li>
+<li>satisfiedBy: <a href="../../cli/src/cli.rs">cli.rs</a></li>
+<li>verifiedBy: <a href="../System/Output/Verifications/DiagramVerifications.html#remove-generated-diagrams-verification">Remove Generated Diagrams Verification</a></li>
+</ul>
+<hr />
+<h3 id="cli-add-element-command">CLI Add Element Command</h3>
+<p>The system shall provide an <code>add</code> command to create new model elements by accepting element definition in Markdown format from stdin or as an inline string argument, validating the structure, and inserting it at the specified location.</p>
+<h4>Details</h4>
+<p>The <code>add</code> command shall:</p>
+<ul>
+<li>Accept element definition input from:
+<ul>
+<li>Standard input (stdin) for piped or redirected content</li>
+<li>Last positional argument as inline string when not reading from stdin</li>
+</ul>
+</li>
+<li>Accept target location arguments (resolved relative to Git repository root):
+<ul>
+<li>Target file path (required, provided as argument or <code>--to-file</code> flag)</li>
+<li>Index within file (optional, provided as argument or <code>--index</code> flag, 0-based, defaults to end of file)</li>
+</ul>
+</li>
+<li>Support command syntax:
+<ul>
+<li><code>reqvire add &lt;file&gt; [&lt;index&gt;]</code> - reads element from stdin</li>
+<li><code>reqvire add &lt;file&gt; [&lt;index&gt;] &lt;element-markdown&gt;</code> - element as last argument</li>
+<li><code>reqvire add --to-file=&lt;file&gt; --index=&lt;n&gt; &lt; element.md</code> - with named flags</li>
+</ul>
+</li>
+<li>Validate element structure before insertion</li>
+<li>Apply changes immediately by default</li>
+<li>Support <code>--dry-run</code> flag to preview changes without applying</li>
+<li>Output git-style diff showing file changes by default</li>
+<li>Support <code>--json</code> flag for structured output format</li>
+<li>Report validation errors if element structure is invalid</li>
+<li>Exit with code 0 on success, non-zero on error</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../System/Operations/ElementManipulation.html#create-element-operation">Create Element Operation</a></li>
+<li>derivedFrom: <a href="#subdirectory-processing-option">Subdirectory Processing Option</a></li>
+<li>satisfiedBy: <a href="../../cli/src/cli.rs">cli.rs</a></li>
+</ul>
+<hr />
+<h3 id="cli-remove-element-command">CLI Remove Element Command</h3>
+<p>The system shall provide an <code>rm</code> command to delete existing model elements and automatically remove all relations referencing the deleted element.</p>
+<h4>Details</h4>
+<p>The <code>rm</code> command shall:</p>
+<ul>
+<li>Accept element name as required positional argument</li>
+<li>Support command syntax: <code>reqvire rm &lt;element-name&gt;</code></li>
+<li>Delete the specified element from its file</li>
+<li>Remove all incoming relations from other elements</li>
+<li>Apply changes immediately by default</li>
+<li>Support <code>--dry-run</code> flag to preview changes without applying</li>
+<li>Output git-style diff showing file changes by default</li>
+<li>Support <code>--json</code> flag for structured output with affected relations</li>
+<li>Report error if element does not exist</li>
+<li>Exit with code 0 on success, non-zero on error</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../System/Operations/ElementManipulation.html#delete-element-operation">Delete Element Operation</a></li>
+<li>derivedFrom: <a href="#subdirectory-processing-option">Subdirectory Processing Option</a></li>
+<li>satisfiedBy: <a href="../../cli/src/cli.rs">cli.rs</a></li>
+</ul>
+<hr />
+<h3 id="cli-move-element-command">CLI Move Element Command</h3>
+<p>The system shall provide a <code>mv</code> command to move existing model elements to different file locations while automatically updating all relations that reference the moved element.</p>
+<h4>Details</h4>
+<p>The <code>mv</code> command shall:</p>
+<ul>
+<li>Accept element name (required, provided as argument)</li>
+<li>Accept target location arguments (resolved relative to Git repository root):
+<ul>
+<li>Target file path (required, provided as argument or <code>--to-file</code> flag)</li>
+<li>Index within target file (optional, provided as argument or <code>--index</code> flag, 0-based, defaults to end of file)</li>
+</ul>
+</li>
+<li>Support command syntax:
+<ul>
+<li><code>reqvire mv &lt;element-name&gt; &lt;file&gt; [&lt;index&gt;]</code> - positional arguments</li>
+<li><code>reqvire mv &lt;element-name&gt; --to-file=&lt;file&gt; --index=&lt;n&gt;</code> - with named flags</li>
+</ul>
+</li>
+<li>Move element to target location at specified index</li>
+<li>Update all incoming relations system-wide with new identifier</li>
+<li>Preserve element content, metadata, and outgoing relations</li>
+<li>Apply changes immediately by default</li>
+<li>Support <code>--dry-run</code> flag to preview changes without applying</li>
+<li>Output git-style diff showing all affected files by default</li>
+<li>Support <code>--json</code> flag for structured output with relation updates and identifier change</li>
+<li>Report identifier change (old → new)</li>
+<li>Report error if element does not exist or target location is invalid</li>
+<li>Exit with code 0 on success, non-zero on error</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../System/Operations/ElementManipulation.html#move-element-operation">Move Element Operation</a></li>
+<li>derivedFrom: <a href="#subdirectory-processing-option">Subdirectory Processing Option</a></li>
+<li>satisfiedBy: <a href="../../cli/src/cli.rs">cli.rs</a></li>
+</ul>
+<hr />
+<h3 id="cli-move-file-command">CLI Move File Command</h3>
+<p>The system shall provide a <code>mv-file</code> command to move entire specification files with all their elements to a new location.</p>
+<h4>Details</h4>
+<p>The <code>mv-file</code> command shall:</p>
+<ul>
+<li>Accept source file path (required, relative to current working directory)</li>
+<li>Accept target file path (required, relative to current working directory)</li>
+<li>Support <code>--dry-run</code> flag to preview changes without applying</li>
+<li>Support <code>--json</code> flag for structured output</li>
+<li>Exit with code 0 on success, non-zero on error</li>
+<li>Command syntax: <code>reqvire mv-file &lt;source-file&gt; &lt;target-file&gt;</code></li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../System/Operations/ElementManipulation.html#move-file-operation">Move File Operation</a></li>
+<li>derivedFrom: <a href="#subdirectory-processing-option">Subdirectory Processing Option</a></li>
+</ul>
+<hr />
+<h3 id="cli-rename-element-command">CLI Rename Element Command</h3>
+<p>The system shall provide a <code>rename</code> command to rename existing model elements while automatically updating all relations that reference the renamed element.</p>
+<h4>Details</h4>
+<p>The <code>rename</code> command shall:</p>
+<ul>
+<li>Accept current element name (required)</li>
+<li>Accept new element name (required)</li>
+<li>Update all incoming relations system-wide with new identifier</li>
+<li>Apply changes immediately by default</li>
+<li>Support <code>--dry-run</code> flag to preview changes without applying</li>
+<li>Output git-style diff showing all affected files by default</li>
+<li>Support <code>--json</code> flag for structured output with relation updates and identifier change</li>
+<li>Report identifier change (old → new)</li>
+<li>Report error if element does not exist or new name conflicts with existing element</li>
+<li>Exit with code 0 on success, non-zero on error</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../System/Operations/ElementManipulation.html#rename-element-operation">Rename Element Operation</a></li>
+<li>derivedFrom: <a href="#cli-interface-structure">CLI Interface Structure</a></li>
+<li>satisfiedBy: <a href="../../cli/src/cli.rs">cli.rs</a></li>
+</ul>
+<hr />
+<h3 id="cli-containment-command">CLI Containment Command</h3>
+<p>The system shall provide a <code>containment</code> command to generate markdown output with the containment view diagram showing the folder/file/element hierarchy.</p>
+<h4>Details</h4>
+<p>The <code>containment</code> command shall:</p>
+<ul>
+<li>Output markdown format with header and embedded Mermaid flowchart diagram</li>
+<li>Support <code>--json</code> flag for structured JSON output</li>
+<li>Support <code>--short</code> flag to show only root elements (those without hierarchical parents in same file)</li>
+<li>Default behavior (without –short): show ALL elements in each file</li>
+<li>Exit with code 0 on success, non-zero on error</li>
+<li>Command syntax: <code>reqvire containment [--json] [--short]</code></li>
+</ul>
+<p>The markdown output shall include:</p>
+<ul>
+<li><code># Containment View</code> header</li>
+<li>Mermaid code block with flowchart diagram (using <code>graph TD</code> direction)</li>
+<li>Description indicating whether all elements or only root elements are displayed</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#cli-interface-structure">CLI Interface Structure</a></li>
+<li>derivedFrom: <a href="../System/Output/Reporting.html#containment-view-report-generation">Containment View Report Generation</a></li>
+<li>satisfiedBy: <a href="../../cli/src/cli.rs">cli.rs</a></li>
+<li>satisfiedBy: <a href="../../core/src/containment.rs">containment.rs</a></li>
+<li>satisfiedBy: <a href="../../core/src/diagrams.rs">diagrams.rs</a></li>
+</ul>
+<hr />
+
+        </div>
+    </div>
+</body>
+</html>

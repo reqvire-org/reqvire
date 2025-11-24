@@ -233,6 +233,7 @@ impl<'a> ModelDiagramGenerator<'a> {
         diagram.push_str("  classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;\n");
         diagram.push_str("  classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:3px;\n");
         diagram.push_str("  classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;\n");
+        diagram.push_str("  classDef attachment fill:#EFEBE9,stroke:#8D6E63,stroke-width:1.5px;\n");
         diagram.push_str("  classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;\n\n");
 
         // Add folders, files, and elements
@@ -603,22 +604,32 @@ fn add_element_to_diagram(
                 
                 if !included_elements.contains(target) {
                     included_elements.insert(target.clone());
-                                 
-                    let class = match registry.get_element(&target) {
+
+                    let (class, target_label) = match registry.get_element(&target) {
                         Some(existing_element)=>{
-                            match existing_element.element_type {
+                            let c = match existing_element.element_type {
                                 ElementType::Requirement(RequirementType::User)  => "userRequirement",
                                 ElementType::Requirement(RequirementType::System) => "systemRequirement",
                                 ElementType::Verification(_) => "verification",
                                 _ => "default"
-                             }
+                            };
+                            // Build label with attachments
+                            let mut lbl = existing_element.name.replace('"', "&quot;");
+                            for attachment in &existing_element.attachments {
+                                let attachment_name = attachment.file_path
+                                    .file_name()
+                                    .map(|n| n.to_string_lossy().into_owned())
+                                    .unwrap_or_else(|| attachment.file_path.to_string_lossy().into_owned());
+                                lbl.push_str(&format!("<br/>📎 {}", escape_label(&attachment_name)));
+                            }
+                            (c, lbl)
                         },
-                        _ => "default"
+                        _ => ("default", label.clone())
                     };
-                                                               
-                    diagram.push_str(&format!("  {}[\"{}\"];\n", target_id, label));
-                    diagram.push_str(&format!("  class {} {};\n", target_id, class));                    
-                    diagram.push_str(&format!("  click {} \"{}\";\n", target_id, click_target));                    
+
+                    diagram.push_str(&format!("  {}[\"{}\"];\n", target_id, target_label));
+                    diagram.push_str(&format!("  class {} {};\n", target_id, class));
+                    diagram.push_str(&format!("  click {} \"{}\";\n", target_id, click_target));
                 }
                 target_id
             },
@@ -1070,7 +1081,8 @@ pub fn generate_containment_diagram(registry: &GraphRegistry, short: bool) -> Re
     output.push_str("  classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;\n");
     output.push_str("  classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;\n");
     output.push_str("  classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:2px;\n");
-    output.push_str("  classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;\n\n");
+    output.push_str("  classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;\n");
+    output.push_str("  classDef attachment fill:#EFEBE9,stroke:#8D6E63,stroke-width:1.5px;\n\n");
 
     // Define root node
     output.push_str("  root[\"📁 Reqvire root\"]\n");
@@ -1082,6 +1094,7 @@ pub fn generate_containment_diagram(registry: &GraphRegistry, short: bool) -> Re
 
     // Collect all elements for styling and links
     let all_elements = collect_all_elements(&hierarchy.root_folder);
+    let all_design_docs = collect_all_design_documents(&hierarchy.root_folder);
 
     // Generate element styling
     output.push_str("  %% Element type styling\n");
@@ -1093,6 +1106,12 @@ pub fn generate_containment_diagram(registry: &GraphRegistry, short: bool) -> Re
 
     // Generate clickable links
     output.push_str("\n  %% Clickable links\n");
+    // Design documents first
+    for doc in &all_design_docs {
+        let doc_id = sanitize_design_doc_id(&doc.path);
+        output.push_str(&format!("  click {} \"{}\"\n", doc_id, doc.path));
+    }
+    // Elements
     for element in &all_elements {
         let hash_id = generate_element_hash(&element.identifier);
         let fragment = element.identifier.split('#').nth(1).unwrap_or("");
@@ -1121,6 +1140,14 @@ fn generate_folder_tree(
         generate_folder_tree(subfolder, &folder_id, output)?;
     }
 
+    // Generate design documents
+    for doc in &folder.design_documents {
+        let doc_id = sanitize_design_doc_id(&doc.path);
+        output.push_str(&format!("  {}[\"📝 {}\"]\n", doc_id, doc.name));
+        output.push_str(&format!("  {} --> {}\n", parent_id, doc_id));
+        output.push_str(&format!("  class {} attachment\n", doc_id));
+    }
+
     // Generate files
     for file in &folder.files {
         let file_id = sanitize_file_id(&file.path);
@@ -1129,10 +1156,14 @@ fn generate_folder_tree(
         output.push_str(&format!("  subgraph {}[\"📄 {}\"]\n", file_id, file.name));
         output.push_str("    direction TB\n");
 
-        // Generate element nodes
+        // Generate element nodes with attachments
         for element in &file.elements {
             let hash_id = generate_element_hash(&element.identifier);
-            let label = escape_label(&element.name);
+            let mut label = escape_label(&element.name);
+            // Add attachments to label
+            for attachment in &element.attachments {
+                label.push_str(&format!("<br/>📎 {}", escape_label(attachment)));
+            }
             output.push_str(&format!("    {}[\"{}\"]\n", hash_id, label));
         }
 
@@ -1163,6 +1194,24 @@ fn collect_all_elements(folder: &crate::containment::ContainmentFolder) -> Vec<c
     elements
 }
 
+/// Collect all design documents from folder hierarchy for click links
+fn collect_all_design_documents(folder: &crate::containment::ContainmentFolder) -> Vec<crate::containment::DesignDocument> {
+    let mut docs = Vec::new();
+
+    // Collect from this folder
+    docs.extend(folder.design_documents.clone());
+
+    // Recursively collect from subfolders
+    for subfolder in &folder.subfolders {
+        docs.extend(collect_all_design_documents(subfolder));
+    }
+
+    // Sort for deterministic output
+    docs.sort_by(|a, b| a.path.cmp(&b.path));
+
+    docs
+}
+
 fn sanitize_folder_id(path: &[String]) -> String {
     path.join("_")
         .replace(".", "")
@@ -1172,6 +1221,14 @@ fn sanitize_folder_id(path: &[String]) -> String {
 
 fn sanitize_file_id(name: &str) -> String {
     name.replace(".md", "")
+        .replace(".", "")
+        .replace("-", "_")
+        .replace(" ", "_")
+}
+
+fn sanitize_design_doc_id(path: &str) -> String {
+    path.replace("/", "_")
+        .replace(".md", "")
         .replace(".", "")
         .replace("-", "_")
         .replace(" ", "_")

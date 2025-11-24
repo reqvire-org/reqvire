@@ -328,8 +328,14 @@ fn generate_mermaid_for_element_recursive(
     // Determine CSS class based on element type
     let element_class = get_element_class(&element.element_type);
 
+    // Build label with attachments
+    let mut element_label = escape_label(&element.name);
+    for attachment in &element.attachments {
+        element_label.push_str(&format!("<br/>📎 {}", escape_label(attachment)));
+    }
+
     // Add element node with class and click handler
-    output.push_str(&format!("{}  {}[\"{}\"];\n", indent, element_id, escape_label(&element.name)));
+    output.push_str(&format!("{}  {}[\"{}\"];\n", indent, element_id, element_label));
     output.push_str(&format!("{}  class {} {};\n", indent, element_id, element_class));
     output.push_str(&format!("{}  click {} \"{}\";\n", indent, element_id, &element.identifier));
 
@@ -339,7 +345,13 @@ fn generate_mermaid_for_element_recursive(
                 let target_id = hash_identifier(&target.identifier);
                 let target_class = get_element_class(&target.element_type);
 
-                output.push_str(&format!("{}  {}[\"{}\"];\n", indent, target_id, escape_label(&target.name)));
+                // Build target label with attachments
+                let mut target_label = escape_label(&target.name);
+                for attachment in &target.attachments {
+                    target_label.push_str(&format!("<br/>📎 {}", escape_label(attachment)));
+                }
+
+                output.push_str(&format!("{}  {}[\"{}\"];\n", indent, target_id, target_label));
                 output.push_str(&format!("{}  class {} {};\n", indent, target_id, target_class));
                 output.push_str(&format!("{}  click {} \"{}\";\n", indent, target_id, &target.identifier));
                 output.push_str(&format!("{}  {} -->|{}| {};\n", indent, element_id, relation.relation_type, target_id));

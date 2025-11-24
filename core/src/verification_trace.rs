@@ -52,9 +52,9 @@ pub struct RequirementNode {
 struct RequirementNodeWithRelation {
     pub id: String,
     pub name: String,
-    pub element_type: String,
     pub is_directly_verified: bool,
     pub children: Vec<(String, RequirementNodeWithRelation)>, // (relation_type, node)
+    pub attachments: Vec<String>,
 }
 
 pub struct VerificationTraceGenerator<'a> {
@@ -270,8 +270,8 @@ impl<'a> VerificationTraceGenerator<'a> {
         // Add verification node at the top
         let verification_id = utils::hash_identifier(&trace.identifier);
         diagram.push_str(&format!(
-            "  {}[\"{}<br>({})\"]:::verification\n",
-            verification_id, trace.name, trace.verification_type
+            "  {}[\"{}\"]:::verification\n",
+            verification_id, trace.name
         ));
 
         // Add click handler for verification node
@@ -369,9 +369,13 @@ impl<'a> VerificationTraceGenerator<'a> {
         Some(RequirementNodeWithRelation {
             id: requirement.identifier.clone(),
             name: requirement.name.clone(),
-            element_type: requirement.element_type.as_str().to_string(),
             is_directly_verified,
             children,
+            attachments: requirement.attachments.iter()
+                .map(|a| a.file_path.file_name()
+                    .map(|n| n.to_string_lossy().into_owned())
+                    .unwrap_or_else(|| a.file_path.to_string_lossy().into_owned()))
+                .collect(),
         })
     }
 
@@ -401,9 +405,15 @@ impl<'a> VerificationTraceGenerator<'a> {
                 "requirement"
             };
 
+            // Build label with attachments
+            let mut node_label = node.name.clone();
+            for attachment in &node.attachments {
+                node_label.push_str(&format!("<br/>📎 {}", attachment));
+            }
+
             diagram.push_str(&format!(
-                "  {}[\"{}<br>({})\"]:::{}\n",
-                node_id, node.name, node.element_type, class
+                "  {}[\"{}\"]:::{}\n",
+                node_id, node_label, class
             ));
 
             // Add click handler for requirement node

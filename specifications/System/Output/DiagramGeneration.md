@@ -39,6 +39,26 @@ The filtering ensures that:
   * satisfiedBy: [utils.rs](../../../core/src/utils.rs)
 ---
 
+### File Diagram Attachment Display
+
+The system shall display element attachments in file-based mermaid diagrams as clickable links below the element name within the node box.
+
+#### Details
+- Attachments shall appear below the element name using `<br/>` line separator
+- Each attachment shall be prefixed with 📎 icon
+- Attachment filenames shall be shown (not full paths)
+- Clicking an attachment shall navigate to the attachment file
+- Multiple attachments shall each appear on separate lines
+- Elements without attachments show only their name
+
+Format: `Element Name<br/>📎 attachment1.md<br/>📎 attachment2.md`
+
+#### Relations
+  * derivedFrom: [Diagram Generation](#diagram-generation)
+  * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
+  * verifiedBy: [File Diagram Attachment Test](Verifications/DiagramVerifications.md#file-diagram-attachment-test)
+---
+
 ### SysML-Compatible Relationship Rendering
 
 The system shall implement a relationship rendering engine that adheres to SysML notation standards, defining specific arrow styles, line types, and visual properties for each relationship type to ensure diagram consistency and standards compliance.
@@ -126,6 +146,7 @@ The system shall use Mermaid CSS classes to style diagram elements with differen
 | verification | #DCEDC8 (light green) | #4CAF50 | 2px | Verification elements |
 | folder | #FAFAFA (off-white) | #9E9E9E | 2-3px | Folder containers |
 | file | #FFFFFF / #FFF8E1 | #9E9E9E / #FFCA28 | 2px | File containers |
+| attachment | #EFEBE9 (warm grey) | #8D6E63 | 1.5px | Design documents in DesignDocuments folders |
 | default | #F5F5F5 (light gray) | #424242 | 1.5px | Default/fallback styling |
 
 **Element Type Color Scheme:**

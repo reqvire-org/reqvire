@@ -35,6 +35,31 @@ This test verifies that the generate-diagrams CLI command correctly generates an
   * satisfiedBy: [test.sh](../../../../tests/test-diagram-generation/test.sh)
 ---
 
+### File Diagram Attachment Test
+
+This test verifies that element attachments are displayed within file-based diagram node boxes with clickable links.
+
+#### Test Steps
+1. Create a model with elements that have attachments
+2. Run export or generate-diagrams command
+3. Verify element nodes show attachment filenames with 📎 prefix
+4. Verify attachments appear below element name using `<br/>` separator
+5. Verify attachment links are clickable (click handlers present)
+
+#### Expected Results
+- Elements with attachments show `Element Name<br/>📎 filename.md` format
+- Multiple attachments are each on separate lines
+- Elements without attachments show only their name
+- Click handlers navigate to attachment files
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [File Diagram Attachment Display](../DiagramGeneration.md#file-diagram-attachment-display)
+  * satisfiedBy: [test.sh](../../../../tests/test-attachment-export/test.sh)
+---
+
 ### Automated Documentation Export on PR Merge Verification
 
 This test verifies that the system automatically exports and updates HTML documentation when pull requests are merged to the main branch.

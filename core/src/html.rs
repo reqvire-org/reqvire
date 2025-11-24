@@ -183,7 +183,7 @@ blockquote {
     height: calc(100vh - 150px);
     width: 100%;
     overflow: hidden;
-    position: relative;
+    position: relative; /* Required for absolutely-positioned navigation buttons */
     border: 1px solid #EEEEEE;
     border-radius: 3px;
     background-color: #FAFAFA;

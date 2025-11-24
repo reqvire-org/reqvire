@@ -29,7 +29,7 @@
         };
 
         mermaid.initialize({
-            startOnLoad: true,
+            startOnLoad: false,
             theme: 'neutral',
             maxTextSize: 5000000,
             maxEdges: 50000,
@@ -57,7 +57,8 @@
             var allReady = true;
             containers.forEach(function(c) {
                 var svg = c.querySelector('svg');
-                if (!svg || !svg.getBBox || svg.getBBox().width === 0) {
+                // Check SVG exists, has getBBox, valid dimensions, and has actual content (nodes)
+                if (!svg || !svg.getBBox || svg.getBBox().width === 0 || !svg.querySelector('.node')) {
                     allReady = false;
                 }
             });
@@ -70,9 +71,24 @@
 
         // Add pan/zoom to all Mermaid diagrams after rendering
         waitForSvgs(function() {
-            document.querySelectorAll('.mermaid').forEach(function(mermaidContainer) {
+            var allMermaidContainers = document.querySelectorAll('.mermaid');
+
+            allMermaidContainers.forEach(function(mermaidContainer, index) {
+
                 var svg = mermaidContainer.querySelector('svg');
-                if (!svg) return;
+                if (!svg) {
+                    return;
+                }
+
+                // Double-check SVG is ready
+                try {
+                    var bbox = svg.getBBox();
+                    if (bbox.width === 0 || bbox.height === 0) {
+                        return;
+                    }
+                } catch (e) {
+                    return;
+                }
 
                 svg.style.maxWidth = 'none';
                 svg.style.maxHeight = 'none';
@@ -120,17 +136,26 @@
                     };
 
                     // Diagrams with default zoom (no auto-fit)
-                    var panZoomInstance = svgPanZoom(svg, {
-                        zoomEnabled: true,
-                        controlIconsEnabled: true,
-                        fit: false,
-                        center: false,
-                        contain: false,
-                        minZoom: 0.5,
-                        maxZoom: 10,
-                        zoomScaleSensitivity: 0.3,
-                        customEventsHandler: eventsHandler
-                    });
+                    var panZoomInstance;
+                    try {
+                        panZoomInstance = svgPanZoom(svg, {
+                            zoomEnabled: true,
+                            controlIconsEnabled: true,
+                            fit: false,
+                            center: false,
+                            contain: false,
+                            minZoom: 0.5,
+                            maxZoom: 10,
+                            zoomScaleSensitivity: 0.3,
+                            customEventsHandler: eventsHandler
+                        });
+                    } catch (e) {
+                        return; // Skip this diagram and continue with others
+                    }
+
+                    if (!panZoomInstance) {
+                        return;
+                    }
 
                     // Add navigation buttons
                     var navButtons = document.createElement('div');

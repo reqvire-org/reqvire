@@ -388,6 +388,31 @@ This test verifies that the containment view is correctly integrated into HTML e
   * satisfiedBy: [test.sh](../../../../tests/test-containment-view/test.sh)
 ---
 
+### Containment View Design Documents Test
+
+This test verifies that design documents (files in DesignDocuments folders) are correctly included in the containment view output.
+
+#### Test Steps
+1. Create a model with DesignDocuments folder containing markdown files
+2. Run `reqvire containment` command
+3. Verify design documents appear in output grouped by folder
+4. Verify design documents are visually distinguished from elements
+5. In diagram output, verify design document nodes have click handlers
+
+#### Expected Results
+- Design documents are shown under their parent folder
+- Design documents display filename
+- Design documents are styled differently from specification elements
+- Click handlers navigate to document files
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [Containment View Design Documents](../Reporting.md#containment-view-design-documents)
+  * satisfiedBy: [test.sh](../../../../tests/test-containment-view/test.sh)
+---
+
 ### Search Command Tests
 
 This test verifies that the system provides a unified `search` command functionality for searching and filtering model elements with comprehensive filter options and output modes.

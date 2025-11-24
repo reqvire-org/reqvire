@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ParsingVerifications</title>
+    <link rel="icon" type="image/x-icon" href="../../../../assets/favicon.ico">
+    <link rel="apple-touch-icon" href="../../../../assets/apple-touch-icon.png">
+    
+<style>
+:root {
+    /* Primary Colors */
+    --color-primary: #3F51B5;           /* Indigo - core branding */
+    --color-primary-hover: #7986CB;     /* Much lighter Indigo for hover - more visible */
+    --color-primary-active: #303F9F;    /* Darker Indigo for active */
+
+    /* Element Type Colors */
+    --color-requirement: #673AB7;       /* Deep Purple - core requirements */
+    --color-verification: #4CAF50;      /* Emerald Green - validated/completed */
+    --color-other: #9E9E9E;             /* Cool Gray - other element types */
+
+    /* Status Colors */
+    --color-verified: #4CAF50;          /* Forest Green - verified/passing */
+    --color-pending: #FFB74D;           /* Amber - pending/warning */
+    --color-error: #F44336;             /* Red - error/failed */
+
+    /* Interactive Colors */
+    --color-highlight: #FFAB91;         /* Peach - hover highlight */
+    --color-link: #212121;              /* Black - link color */
+    --color-link-hover: #3F51B5;        /* Indigo (same as nav bar) - link hover */
+
+    /* Text Colors */
+    --color-text-primary: #212121;      /* Primary text */
+    --color-text-secondary: #424242;    /* Body text */
+    --color-text-muted: #757575;        /* De-emphasized text */
+    --color-background: #FAFAFA;        /* Off-white background */
+    --color-border: #EEEEEE;            /* Very light gray borders */
+}
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #FAFAFA;
+    color: var(--color-text-secondary);
+}
+.reqvire-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    background-color: var(--color-primary);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+}
+.reqvire-nav a {
+    color: #ffffff;
+    text-decoration: none;
+    padding: 10px 20px;
+    margin-right: 5px;
+    border-radius: 3px;
+    transition: background-color 0.2s, text-decoration 0.2s;
+}
+.reqvire-nav a.nav-logo {
+    display: flex;
+    align-items: center;
+    padding: 5px 15px 5px 0;
+}
+.reqvire-nav a.nav-logo img {
+    vertical-align: middle;
+}
+.reqvire-nav a:hover {
+    background-color: var(--color-primary-hover);
+    text-decoration: underline;
+    color: #ffffff;
+}
+.reqvire-nav a:active,
+.reqvire-nav a.active {
+    background-color: var(--color-primary-active);
+    text-decoration: underline;
+    color: #ffffff;
+}
+.reqvire-nav-spacer {
+    height: 50px;
+}
+.container {
+    max-width: 95%;
+    margin: 0 auto;
+    padding: 20px;
+}
+.content {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    border: 1px solid #E0E0E0;
+}
+h1 {
+    color: var(--color-text-primary);
+    border-bottom: 2px solid #EEEEEE;
+    padding-bottom: 10px;
+    margin-top: 0;
+}
+h2 {
+    color: var(--color-text-primary);
+    border-bottom: 1px solid #EEEEEE;
+    padding-bottom: 5px;
+}
+h3 {
+    color: var(--color-text-primary);
+    margin-top: 25px;
+}
+h4 {
+    color: var(--color-text-secondary);
+    font-weight: 600;
+}
+a {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: text-decoration 0.15s ease;
+}
+a:hover {
+    text-decoration: underline;
+}
+a:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 20px 0;
+}
+table, th, td {
+    border: 1px solid #EEEEEE;
+}
+th, td {
+    padding: 8px 12px;
+    text-align: left;
+}
+th {
+    background-color: #F5F5F5;
+    color: #212121;
+    font-weight: 600;
+}
+tr:hover td {
+    background-color: #FFF8E1;
+}
+code {
+    background: #f6f8fa;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 90%;
+}
+pre {
+    background: #f6f8fa;
+    border-radius: 3px;
+    padding: 16px;
+    overflow: auto;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+}
+blockquote {
+    margin: 0;
+    padding: 0 15px;
+    color: var(--color-text-muted);
+    border-left: 4px solid var(--color-primary);
+}
+.mermaid {
+    margin: 20px 0;
+    text-align: center;
+    height: calc(100vh - 150px);
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid #EEEEEE;
+    border-radius: 3px;
+    background-color: #FAFAFA;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+.mermaid svg {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    position: relative;
+    z-index: 1;
+}
+.diagram-nav-buttons {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 999; /* higher than SVG (1) but lower than header nav (1000) */
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 5px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+.diagram-nav-row {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+}
+.diagram-nav-btn {
+    width: 32px;
+    height: 32px;
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.diagram-nav-btn:hover {
+    background-color: var(--color-primary-hover);
+}
+.diagram-nav-btn:active {
+    background-color: var(--color-primary-active);
+}
+</style>
+
+    <!-- Enhanced mermaid configuration for Reqvire diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.5.0/dist/svg-pan-zoom.min.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+        import elkLayouts from 'https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk/dist/mermaid-layout-elk.esm.min.mjs';
+
+        // Register ELK layout for large diagrams
+        mermaid.registerLayoutLoaders(elkLayouts);
+
+        // Capture Mermaid errors
+        mermaid.parseError = function(err, hash) {
+            console.error('Mermaid Parse Error:', err);
+            console.error('Error details:', {
+                str: err.str,
+                hash: err.hash,
+                message: err.message,
+                stack: err.stack
+            });
+        };
+
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            maxTextSize: 5000000,
+            maxEdges: 50000,
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis',
+                defaultRenderer: 'elk'
+            },
+            layout: 'elk',
+            elk: {
+                mergeEdges: true,
+                nodePlacementStrategy: 'SIMPLE'
+            },
+            securityLevel: 'loose',
+            logLevel: 'error'
+        });
+
+        await mermaid.run();
+        window.mermaid = mermaid;
+
+        // Wait for SVGs to be fully rendered, then initialize
+        function waitForSvgs(callback) {
+            var containers = document.querySelectorAll('.mermaid');
+            var allReady = true;
+            containers.forEach(function(c) {
+                var svg = c.querySelector('svg');
+                if (!svg || !svg.getBBox || svg.getBBox().width === 0) {
+                    allReady = false;
+                }
+            });
+            if (allReady && containers.length > 0) {
+                callback();
+            } else {
+                requestAnimationFrame(function() { waitForSvgs(callback); });
+            }
+        }
+
+        // Add pan/zoom to all Mermaid diagrams after rendering
+        waitForSvgs(function() {
+            document.querySelectorAll('.mermaid').forEach(function(mermaidContainer) {
+                var svg = mermaidContainer.querySelector('svg');
+                if (!svg) return;
+
+                svg.style.maxWidth = 'none';
+                svg.style.maxHeight = 'none';
+
+                var eventsHandler = {
+                    haltEventListeners: ['touchstart', 'touchend', 'touchmove', 'touchleave', 'touchcancel'],
+                        init: function(options) {
+                            var instance = options.instance;
+                            var initialScale = 1;
+                            var pannedX = 0;
+                            var pannedY = 0;
+
+                            this.hammer = Hammer(options.svgElement, {
+                                inputClass: Hammer.SUPPORT_POINTER_EVENTS ? Hammer.PointerEventInput : Hammer.TouchInput
+                            });
+
+                            this.hammer.get('pinch').set({enable: true});
+
+                            this.hammer.on('doubletap', function(ev){
+                                instance.zoomIn();
+                            });
+
+                            this.hammer.on('panstart panmove', function(ev){
+                                if (ev.type === 'panstart') {
+                                    pannedX = 0;
+                                    pannedY = 0;
+                                }
+                                instance.panBy({x: ev.deltaX - pannedX, y: ev.deltaY - pannedY});
+                                pannedX = ev.deltaX;
+                                pannedY = ev.deltaY;
+                            });
+
+                            this.hammer.on('pinchstart pinchmove', function(ev){
+                                if (ev.type === 'pinchstart') {
+                                    initialScale = instance.getZoom();
+                                }
+                                instance.zoomAtPoint(initialScale * ev.scale, {x: ev.center.x, y: ev.center.y});
+                            });
+
+                            options.svgElement.addEventListener('touchmove', function(e){ e.preventDefault(); });
+                        },
+                        destroy: function(){
+                            this.hammer.destroy();
+                        }
+                    };
+
+                    // Diagrams with default zoom (no auto-fit)
+                    var panZoomInstance = svgPanZoom(svg, {
+                        zoomEnabled: true,
+                        controlIconsEnabled: true,
+                        fit: false,
+                        center: false,
+                        contain: false,
+                        minZoom: 0.5,
+                        maxZoom: 10,
+                        zoomScaleSensitivity: 0.3,
+                        customEventsHandler: eventsHandler
+                    });
+
+                    // Add navigation buttons
+                    var navButtons = document.createElement('div');
+                    navButtons.className = 'diagram-nav-buttons';
+                    navButtons.innerHTML = `
+                        <div class="diagram-nav-row">
+                            <button class="diagram-nav-btn" data-action="up">▲</button>
+                        </div>
+                        <div class="diagram-nav-row">
+                            <button class="diagram-nav-btn" data-action="left">◀</button>
+                            <button class="diagram-nav-btn" data-action="down">▼</button>
+                            <button class="diagram-nav-btn" data-action="right">▶</button>
+                        </div>
+                    `;
+                    mermaidContainer.appendChild(navButtons);
+
+                    // Wire up navigation buttons
+                    var panStep = 100;
+                    navButtons.querySelectorAll('.diagram-nav-btn').forEach(function(btn) {
+                        btn.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            var action = this.getAttribute('data-action');
+                            switch(action) {
+                                case 'up':
+                                    panZoomInstance.panBy({x: 0, y: panStep});
+                                    break;
+                                case 'down':
+                                    panZoomInstance.panBy({x: 0, y: -panStep});
+                                    break;
+                                case 'left':
+                                    panZoomInstance.panBy({x: panStep, y: 0});
+                                    break;
+                                case 'right':
+                                    panZoomInstance.panBy({x: -panStep, y: 0});
+                                    break;
+                            }
+                        });
+                    });
+            });
+
+            // Add CSS for edge highlighting
+            var style = document.createElement('style');
+            style.textContent = `
+                path.edge-highlighted,
+                .edge-highlighted path,
+                svg path.edge-highlighted {
+                    stroke: #FFAB91 !important;
+                    stroke-width: 3px !important;
+                }
+            `;
+            document.head.appendChild(style);
+
+            // Initialize edge highlighting for all diagrams
+            document.querySelectorAll('.mermaid svg').forEach(function(svg) {
+                var nodes = svg.querySelectorAll('.node');
+
+                // Find flowchart-link paths (actual edges)
+                var edgePaths = svg.querySelectorAll('path.flowchart-link');
+                // Fallback: find paths in .edges group
+                if (edgePaths.length === 0) {
+                    var edgesGroup = svg.querySelector('.edges');
+                    if (edgesGroup) {
+                        edgePaths = edgesGroup.querySelectorAll('path');
+                    }
+                }
+
+                // Get SVG point for coordinate transforms
+                var svgPoint = svg.createSVGPoint();
+
+                // Helper: transform point through element's CTM
+                function getTransformedBBox(element) {
+                    var bbox = element.getBBox();
+                    var ctm = element.getCTM();
+                    if (!ctm) return bbox;
+
+                    // Transform all four corners
+                    var corners = [
+                        {x: bbox.x, y: bbox.y},
+                        {x: bbox.x + bbox.width, y: bbox.y},
+                        {x: bbox.x, y: bbox.y + bbox.height},
+                        {x: bbox.x + bbox.width, y: bbox.y + bbox.height}
+                    ];
+
+                    var transformed = corners.map(function(c) {
+                        svgPoint.x = c.x;
+                        svgPoint.y = c.y;
+                        var tp = svgPoint.matrixTransform(ctm);
+                        return {x: tp.x, y: tp.y};
+                    });
+
+                    var minX = Math.min.apply(null, transformed.map(function(p) { return p.x; }));
+                    var maxX = Math.max.apply(null, transformed.map(function(p) { return p.x; }));
+                    var minY = Math.min.apply(null, transformed.map(function(p) { return p.y; }));
+                    var maxY = Math.max.apply(null, transformed.map(function(p) { return p.y; }));
+
+                    return {x: minX, y: minY, width: maxX - minX, height: maxY - minY};
+                }
+
+                // Helper: get all points from path
+                function getPathPoints(path) {
+                    var d = path.getAttribute('d') || '';
+                    var points = [];
+                    var ctm = path.getCTM();
+
+                    // Get M (start) point
+                    var startMatch = d.match(/M\s*([\d.-]+)[,\s]+([\d.-]+)/i);
+                    if (startMatch) {
+                        var sx = parseFloat(startMatch[1]);
+                        var sy = parseFloat(startMatch[2]);
+                        if (ctm) {
+                            svgPoint.x = sx; svgPoint.y = sy;
+                            var tp = svgPoint.matrixTransform(ctm);
+                            points.push({x: tp.x, y: tp.y});
+                        } else {
+                            points.push({x: sx, y: sy});
+                        }
+                    }
+
+                    // Get last point - find last number pair before Z or end
+                    var allNums = d.match(/[\d.-]+/g);
+                    if (allNums && allNums.length >= 2) {
+                        var ex = parseFloat(allNums[allNums.length - 2]);
+                        var ey = parseFloat(allNums[allNums.length - 1]);
+                        if (ctm) {
+                            svgPoint.x = ex; svgPoint.y = ey;
+                            var tp = svgPoint.matrixTransform(ctm);
+                            points.push({x: tp.x, y: tp.y});
+                        } else {
+                            points.push({x: ex, y: ey});
+                        }
+                    }
+
+                    return points;
+                }
+
+                // Build node bounding boxes with transforms
+                var nodeData = {};
+                nodes.forEach(function(node) {
+                    var nodeId = node.id || '';
+                    var parts = nodeId.split('-');
+                    var hashId = parts.length >= 2 ? parts[1] : nodeId;
+
+                    nodeData[hashId] = {
+                        node: node,
+                        bbox: getTransformedBBox(node)
+                    };
+                });
+
+                // Check if point is near bbox
+                function isNearBbox(pt, bbox, margin) {
+                    margin = margin || 40;
+                    return pt.x >= bbox.x - margin && pt.x <= bbox.x + bbox.width + margin &&
+                           pt.y >= bbox.y - margin && pt.y <= bbox.y + bbox.height + margin;
+                }
+
+                // Build edge connections with direction tracking
+                var edgeConnections = []; // [{path, source, target}]
+                var upstreamOf = {}; // node -> [parent nodes that point TO this node]
+                var downstreamOf = {}; // node -> [child nodes this node points TO]
+
+                Object.keys(nodeData).forEach(function(hashId) {
+                    upstreamOf[hashId] = [];
+                    downstreamOf[hashId] = [];
+                });
+
+                edgePaths.forEach(function(path) {
+                    var points = getPathPoints(path);
+                    if (points.length < 2) return;
+
+                    var startPt = points[0];
+                    var endPt = points[points.length - 1];
+
+                    var sourceNode = null;
+                    var targetNode = null;
+
+                    // Find source and target nodes for this edge
+                    Object.keys(nodeData).forEach(function(hashId) {
+                        var bbox = nodeData[hashId].bbox;
+                        if (isNearBbox(startPt, bbox, 20)) {
+                            sourceNode = hashId;
+                        }
+                        if (isNearBbox(endPt, bbox, 20)) {
+                            targetNode = hashId;
+                        }
+                    });
+
+                    if (sourceNode && targetNode && sourceNode !== targetNode) {
+                        edgeConnections.push({path: path, source: sourceNode, target: targetNode});
+                        // source -> target means: target's upstream includes source
+                        if (!upstreamOf[targetNode].includes(sourceNode)) {
+                            upstreamOf[targetNode].push(sourceNode);
+                        }
+                        // source -> target means: source's downstream includes target
+                        if (!downstreamOf[sourceNode].includes(targetNode)) {
+                            downstreamOf[sourceNode].push(targetNode);
+                        }
+                    }
+                });
+
+                // Traverse only upstream (to parents/ancestors)
+                function findUpstream(startNodeId) {
+                    var visited = {};
+                    var queue = [startNodeId];
+                    visited[startNodeId] = true;
+
+                    while (queue.length > 0) {
+                        var current = queue.shift();
+                        var parents = upstreamOf[current] || [];
+                        parents.forEach(function(parent) {
+                            if (!visited[parent]) {
+                                visited[parent] = true;
+                                queue.push(parent);
+                            }
+                        });
+                    }
+                    return visited;
+                }
+
+                // Traverse only downstream (to children/descendants)
+                function findDownstream(startNodeId) {
+                    var visited = {};
+                    var queue = [startNodeId];
+                    visited[startNodeId] = true;
+
+                    while (queue.length > 0) {
+                        var current = queue.shift();
+                        var children = downstreamOf[current] || [];
+                        children.forEach(function(child) {
+                            if (!visited[child]) {
+                                visited[child] = true;
+                                queue.push(child);
+                            }
+                        });
+                    }
+                    return visited;
+                }
+
+                // Get edges for connected nodes
+                function getChainEdges(nodeSet) {
+                    var edges = [];
+                    edgeConnections.forEach(function(conn) {
+                        if (nodeSet[conn.source] && nodeSet[conn.target]) {
+                            edges.push(conn.path);
+                        }
+                    });
+                    return edges;
+                }
+
+                // Attach hover handlers
+                nodes.forEach(function(node) {
+                    var nodeId = node.id || '';
+                    var parts = nodeId.split('-');
+                    var hashId = parts.length >= 2 ? parts[1] : nodeId;
+
+                    node.style.cursor = 'pointer';
+
+                    node.addEventListener('mouseenter', function(e) {
+                        e.stopPropagation();
+                        nodes.forEach(function(n) { n.style.filter = ''; });
+                        node.style.filter = 'drop-shadow(0 0 8px rgba(255, 171, 145, 0.7))';
+
+                        // Find upstream (ancestors) and downstream (descendants) separately
+                        var upstream = findUpstream(hashId);
+                        var downstream = findDownstream(hashId);
+                        // Merge both sets
+                        var allConnected = {};
+                        Object.keys(upstream).forEach(function(k) { allConnected[k] = true; });
+                        Object.keys(downstream).forEach(function(k) { allConnected[k] = true; });
+
+                        var chainEdges = getChainEdges(allConnected);
+                        chainEdges.forEach(function(path) {
+                            path.classList.add('edge-highlighted');
+                        });
+                    });
+
+                    node.addEventListener('mouseleave', function() {
+                        node.style.filter = '';
+                        // Remove highlight from all edges
+                        edgePaths.forEach(function(path) {
+                            path.classList.remove('edge-highlighted');
+                        });
+                    });
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <nav class="reqvire-nav">
+        <a href="../../../../index.html" class="nav-logo"><img src="../../../../assets/logo.png" alt="Reqvire" height="24"></a>
+        <a href="../../../../index.html">Index</a>
+        <a href="../../../../containment.html">Containment</a>
+        <a href="../../../../model.html">Model</a>
+        <a href="../../../../whole-model.html">Whole Model</a>
+        <a href="../../../../traces.html">Traces</a>
+        <a href="../../../../coverage.html">Coverage</a>
+    </nav>
+    <div class="reqvire-nav-spacer"></div>
+    <div class="container">
+        <div class="content">
+            <h1 id="requirements">Requirements</h1>
+<div class="mermaid">graph TD;
+  %% REQVIRE-AUTOGENERATED-DIAGRAM
+  %% Graph styling
+  classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;
+  classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
+  classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
+  classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
+
+  908de1f59852b43a[&quot;Element Subsection Parsing Test&quot;];
+  class 908de1f59852b43a verification;
+  click 908de1f59852b43a &quot;ParsingVerifications.html#element-subsection-parsing-test&quot;;
+  494239c0f3861cb5[&quot;test.sh&quot;];
+  class 494239c0f3861cb5 default;
+  click 494239c0f3861cb5 &quot;../../../../tests/test-parsing-functionality/test.sh&quot;;
+  908de1f59852b43a -->|satisfiedBy| 494239c0f3861cb5;
+  9434925eb2b35c3[&quot;Fragment Normalization Test&quot;];
+  class 9434925eb2b35c3 verification;
+  click 9434925eb2b35c3 &quot;ParsingVerifications.html#fragment-normalization-test&quot;;
+  494239c0f3861cb5[&quot;test.sh&quot;];
+  class 494239c0f3861cb5 default;
+  click 494239c0f3861cb5 &quot;../../../../tests/test-parsing-functionality/test.sh&quot;;
+  9434925eb2b35c3 -->|satisfiedBy| 494239c0f3861cb5;
+  bb3aec581adb8afc[&quot;Specification File Identification Test&quot;];
+  class bb3aec581adb8afc verification;
+  click bb3aec581adb8afc &quot;ParsingVerifications.html#specification-file-identification-test&quot;;
+  7f5e53340a03365f[&quot;test.sh&quot;];
+  class 7f5e53340a03365f default;
+  click 7f5e53340a03365f &quot;../../../../tests/test-gitignore-integration/test.sh&quot;;
+  bb3aec581adb8afc -->|satisfiedBy| 7f5e53340a03365f;
+  11e96f445182244e[&quot;Default Requirement Type Assignment&quot;];
+  class 11e96f445182244e userRequirement;
+  click 11e96f445182244e &quot;../ModelManagement.html#default-requirement-type-assignment&quot;;
+  11e96f445182244e -.->|verifiedBy| 908de1f59852b43a;
+  4590bca224b3003[&quot;Default Element Type Assignment Test&quot;];
+  class 4590bca224b3003 verification;
+  click 4590bca224b3003 &quot;ValidationVerifications.html#default-element-type-assignment-test&quot;;
+  11e96f445182244e -.->|verifiedBy| 4590bca224b3003;
+  c3c6a63530e5e37b[&quot;Relation Types and behaviors<br/>📎 RelationTypes.md&quot;];
+  class c3c6a63530e5e37b systemRequirement;
+  click c3c6a63530e5e37b &quot;../ModelManagement.html#relation-types-and-behaviors&quot;;
+  c1893a6f39afeabf[&quot;Validate Relation Types&quot;];
+  class c1893a6f39afeabf userRequirement;
+  click c1893a6f39afeabf &quot;../Validation.html#validate-relation-types&quot;;
+  c3c6a63530e5e37b -.->|deriveReqT| c1893a6f39afeabf;
+  8776f98206c23aaf[&quot;Trace Relation Non-Directional Behavior&quot;];
+  class 8776f98206c23aaf systemRequirement;
+  click 8776f98206c23aaf &quot;../../Output/DiagramGeneration.html#trace-relation-non-directional-behavior&quot;;
+  c3c6a63530e5e37b -.->|deriveReqT| 8776f98206c23aaf;
+  9450d4313f47ef36[&quot;relation.rs&quot;];
+  class 9450d4313f47ef36 default;
+  click 9450d4313f47ef36 &quot;../../../../core/src/relation.rs&quot;;
+  c3c6a63530e5e37b -->|satisfiedBy| 9450d4313f47ef36;
+  c3c6a63530e5e37b -.->|verifiedBy| 908de1f59852b43a;
+  15fbadeac35968b9[&quot;Supported Element Types&quot;];
+  class 15fbadeac35968b9 systemRequirement;
+  click 15fbadeac35968b9 &quot;../ModelManagement.html#supported-element-types&quot;;
+  a814c4935e1a0449[&quot;element.rs&quot;];
+  class a814c4935e1a0449 default;
+  click a814c4935e1a0449 &quot;../../../../core/src/element.rs&quot;;
+  15fbadeac35968b9 -->|satisfiedBy| a814c4935e1a0449;
+  f22d93285fcd7664[&quot;parser.rs&quot;];
+  class f22d93285fcd7664 default;
+  click f22d93285fcd7664 &quot;../../../../core/src/parser.rs&quot;;
+  15fbadeac35968b9 -->|satisfiedBy| f22d93285fcd7664;
+  15fbadeac35968b9 -.->|verifiedBy| 908de1f59852b43a;
+  b0cc2fce0e12a405[&quot;Element Identity Model<br/>📎 ElementIdentity.md&quot;];
+  class b0cc2fce0e12a405 systemRequirement;
+  click b0cc2fce0e12a405 &quot;../StructureAndParsing.html#element-identity-model&quot;;
+  43dcbb7ab74ba45e[&quot;Identifiers and Relations&quot;];
+  class 43dcbb7ab74ba45e systemRequirement;
+  click 43dcbb7ab74ba45e &quot;../StructureAndParsing.html#identifiers-and-relations&quot;;
+  b0cc2fce0e12a405 -.->|deriveReqT| 43dcbb7ab74ba45e;
+  2f63ffaf1de3849f[&quot;Internal Consistency Validator&quot;];
+  class 2f63ffaf1de3849f systemRequirement;
+  click 2f63ffaf1de3849f &quot;../Validation.html#internal-consistency-validator&quot;;
+  b0cc2fce0e12a405 -.->|deriveReqT| 2f63ffaf1de3849f;
+  b58a906566fb6956[&quot;Change Impact Detection&quot;];
+  class b58a906566fb6956 systemRequirement;
+  click b58a906566fb6956 &quot;../../Processing/ChangeImpact.html#change-impact-detection&quot;;
+  b0cc2fce0e12a405 -.->|deriveReqT| b58a906566fb6956;
+  a814c4935e1a0449[&quot;element.rs&quot;];
+  class a814c4935e1a0449 default;
+  click a814c4935e1a0449 &quot;../../../../core/src/element.rs&quot;;
+  b0cc2fce0e12a405 -->|satisfiedBy| a814c4935e1a0449;
+  f22d93285fcd7664[&quot;parser.rs&quot;];
+  class f22d93285fcd7664 default;
+  click f22d93285fcd7664 &quot;../../../../core/src/parser.rs&quot;;
+  b0cc2fce0e12a405 -->|satisfiedBy| f22d93285fcd7664;
+  b0cc2fce0e12a405 -.->|verifiedBy| 9434925eb2b35c3;
+  bd0604b1a72a0172[&quot;Reserved Subsections Support<br/>📎 ReservedSubsections.md&quot;];
+  class bd0604b1a72a0172 systemRequirement;
+  click bd0604b1a72a0172 &quot;../StructureAndParsing.html#reserved-subsections-support&quot;;
+  a957c400a0de2045[&quot;Attachment Commands&quot;];
+  class a957c400a0de2045 systemRequirement;
+  click a957c400a0de2045 &quot;../../../Interfaces/CLI.html#attachment-commands&quot;;
+  bd0604b1a72a0172 -.->|deriveReqT| a957c400a0de2045;
+  e342a2a82ef67934[&quot;CLI Search Command&quot;];
+  class e342a2a82ef67934 systemRequirement;
+  click e342a2a82ef67934 &quot;../../../Interfaces/CLI.html#cli-search-command&quot;;
+  bd0604b1a72a0172 -.->|deriveReqT| e342a2a82ef67934;
+  bd0604b1a72a0172 -.->|deriveReqT| 15fbadeac35968b9;
+  ea60608d4ce12d93[&quot;Verification Type Categories&quot;];
+  class ea60608d4ce12d93 systemRequirement;
+  click ea60608d4ce12d93 &quot;../ModelManagement.html#verification-type-categories&quot;;
+  bd0604b1a72a0172 -.->|deriveReqT| ea60608d4ce12d93;
+  a814c4935e1a0449[&quot;element.rs&quot;];
+  class a814c4935e1a0449 default;
+  click a814c4935e1a0449 &quot;../../../../core/src/element.rs&quot;;
+  bd0604b1a72a0172 -->|satisfiedBy| a814c4935e1a0449;
+  f22d93285fcd7664[&quot;parser.rs&quot;];
+  class f22d93285fcd7664 default;
+  click f22d93285fcd7664 &quot;../../../../core/src/parser.rs&quot;;
+  bd0604b1a72a0172 -->|satisfiedBy| f22d93285fcd7664;
+  bfad224e68f0c92b[&quot;Attachment Output Rendering Verification&quot;];
+  class bfad224e68f0c92b verification;
+  click bfad224e68f0c92b &quot;AttachmentsVerifications.html#attachment-output-rendering-verification&quot;;
+  bd0604b1a72a0172 -.->|verifiedBy| bfad224e68f0c92b;
+  edbc73b37eb9cbe[&quot;Attachments Subsection Parsing Verification&quot;];
+  class edbc73b37eb9cbe verification;
+  click edbc73b37eb9cbe &quot;AttachmentsVerifications.html#attachments-subsection-parsing-verification&quot;;
+  bd0604b1a72a0172 -.->|verifiedBy| edbc73b37eb9cbe;
+  cd463a2ba2fbdafc[&quot;Attachments Validation Verification&quot;];
+  class cd463a2ba2fbdafc verification;
+  click cd463a2ba2fbdafc &quot;AttachmentsVerifications.html#attachments-validation-verification&quot;;
+  bd0604b1a72a0172 -.->|verifiedBy| cd463a2ba2fbdafc;
+  bd0604b1a72a0172 -.->|verifiedBy| 908de1f59852b43a;
+  f9e98bd82d03a3ae[&quot;Specification File Identification&quot;];
+  class f9e98bd82d03a3ae systemRequirement;
+  click f9e98bd82d03a3ae &quot;../StructureAndParsing.html#specification-file-identification&quot;;
+  d50a859650933e55[&quot;model.rs&quot;];
+  class d50a859650933e55 default;
+  click d50a859650933e55 &quot;../../../../core/src/model.rs&quot;;
+  f9e98bd82d03a3ae -->|satisfiedBy| d50a859650933e55;
+  f22d93285fcd7664[&quot;parser.rs&quot;];
+  class f22d93285fcd7664 default;
+  click f22d93285fcd7664 &quot;../../../../core/src/parser.rs&quot;;
+  f9e98bd82d03a3ae -->|satisfiedBy| f22d93285fcd7664;
+  f9e98bd82d03a3ae -.->|verifiedBy| bb3aec581adb8afc;
+</div>
+<h3 id="element-subsection-parsing-test">Element Subsection Parsing Test</h3>
+<p>This test verifies that the system correctly extracts and parses element subsections (Metadata, Relations, Details) and element content from markdown documents.</p>
+<h4>Details</h4>
+<h5>Acceptance Criteria</h5>
+<p><strong>Subsection Extraction:</strong></p>
+<ul>
+<li>System shall identify and extract Metadata subsection (level 4 heading)</li>
+<li>System shall identify and extract Relations subsection (level 4 heading)</li>
+<li>System shall identify and extract Details subsection (level 4 heading) when present</li>
+<li>System shall parse element content (text before first subsection)</li>
+<li>System shall exclude subsection headers and content from main element content</li>
+</ul>
+<p><strong>Metadata Parsing:</strong></p>
+<ul>
+<li>System shall extract element type from <code>* type:</code> metadata entry</li>
+<li>System shall support all element types: requirement, user-requirement, verification, test-verification, analysis-verification, inspection-verification, demonstration-verification, other</li>
+<li>System shall assign default type ‘requirement’ when no type metadata present</li>
+</ul>
+<p><strong>Relations Parsing:</strong></p>
+<ul>
+<li>System shall extract relation type (derivedFrom, verifiedBy, verify, satisfiedBy)</li>
+<li>System shall extract relation target (element identifier with file path and fragment)</li>
+<li>System shall normalize target fragment identifiers</li>
+<li>System shall support multiple relations of same or different types</li>
+<li>System shall validate relation targets exist in model</li>
+</ul>
+<p><strong>Content Extraction:</strong></p>
+<ul>
+<li>System shall extract element description text before subsections</li>
+<li>System shall preserve markdown formatting in content</li>
+<li>System shall NOT include subsection headers in content</li>
+<li>System shall NOT include subsection body text in content</li>
+</ul>
+<p><strong>Details Subsection:</strong></p>
+<ul>
+<li>System shall extract Details subsection content when present</li>
+<li>System shall preserve multi-paragraph Details content</li>
+<li>System shall store Details separately from main content</li>
+</ul>
+<h5>Test Criteria</h5>
+<ol>
+<li>
+<p><strong>Metadata subsection parsing:</strong></p>
+<ul>
+<li>Create elements with various element types in Metadata</li>
+<li>Query model via JSON output</li>
+<li>Verify <code>element_type</code> field matches metadata</li>
+<li>Test all supported element types</li>
+</ul>
+</li>
+<li>
+<p><strong>Relations subsection parsing:</strong></p>
+<ul>
+<li>Create elements with multiple relations</li>
+<li>Query model via JSON output</li>
+<li>Verify <code>relations</code> array contains all relations</li>
+<li>Verify each relation has <code>relation_type</code> and <code>target</code> fields</li>
+<li>Verify target fragments are normalized</li>
+</ul>
+</li>
+<li>
+<p><strong>Content extraction:</strong></p>
+<ul>
+<li>Create element with description text before subsections</li>
+<li>Query model via JSON output</li>
+<li>Verify <code>content</code> field contains description</li>
+<li>Verify content does NOT include subsection headers</li>
+<li>Verify content does NOT include metadata or relations</li>
+</ul>
+</li>
+<li>
+<p><strong>Details subsection parsing:</strong></p>
+<ul>
+<li>Create element with Details subsection</li>
+<li>Query model via JSON output</li>
+<li>Verify <code>details</code> field is populated</li>
+<li>Verify details content is separate from main content</li>
+<li>Test multi-paragraph details</li>
+</ul>
+</li>
+<li>
+<p><strong>JSON structure validation:</strong></p>
+<ul>
+<li>Verify JSON output contains <code>elements</code> array</li>
+<li>Verify each element has required fields: <code>element_id</code>, <code>name</code>, <code>file_path</code>, <code>section</code>, <code>element_type</code>, <code>content</code></li>
+<li>Verify optional fields present when applicable: <code>details</code>, <code>relations</code>, <code>metadata</code></li>
+</ul>
+</li>
+</ol>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../StructureAndParsing.html#reserved-subsections-support">Reserved Subsections Support</a></li>
+<li>verify: <a href="../ModelManagement.html#supported-element-types">Supported Element Types</a></li>
+<li>verify: <a href="../ModelManagement.html#relation-types-and-behaviors">Relation Types and behaviors</a></li>
+<li>verify: <a href="../ModelManagement.html#default-requirement-type-assignment">Default Requirement Type Assignment</a></li>
+<li>satisfiedBy: <a href="../../../../tests/test-parsing-functionality/test.sh">test.sh</a></li>
+</ul>
+<hr />
+<h3 id="specification-file-identification-test">Specification File Identification Test</h3>
+<p>This test verifies that the system only parses markdown files where the first H1 heading is exactly <code># Requirements</code>, and silently ignores all other markdown files.</p>
+<h4>Details</h4>
+<h5>Acceptance Criteria</h5>
+<p><strong>File Identification:</strong></p>
+<ul>
+<li>System shall parse markdown files where first H1 heading is <code># Requirements</code></li>
+<li>System shall ignore markdown files where first H1 heading is not <code># Requirements</code></li>
+<li>System shall ignore markdown files with no H1 heading</li>
+<li>Files without <code># Requirements</code> heading shall be silently skipped (no error)</li>
+</ul>
+<p><strong>Leading Content Handling:</strong></p>
+<ul>
+<li>System shall allow blank lines before <code># Requirements</code> heading</li>
+<li>System shall allow frontmatter (YAML between <code>---</code> markers) before <code># Requirements</code> heading</li>
+<li>System shall allow HTML comments before <code># Requirements</code> heading</li>
+<li>System shall check the first H1 heading encountered, ignoring non-heading content</li>
+</ul>
+<p><strong>Backward Compatibility:</strong></p>
+<ul>
+<li>Files with different H1 headings (e.g., <code># User Stories</code>, <code># System Design</code>) shall be ignored</li>
+<li>This behavior applies in addition to <code>.gitignore</code> and <code>.reqvireignore</code> exclusions</li>
+<li>Page title/header is not stored in the model (always output as <code># Requirements</code>)</li>
+</ul>
+<h5>Test Criteria</h5>
+<ol>
+<li>
+<p><strong>Valid specification file parsing:</strong></p>
+<ul>
+<li>Create file with <code># Requirements</code> as first H1</li>
+<li>Run reqvire search</li>
+<li>Verify elements from file are in model</li>
+</ul>
+</li>
+<li>
+<p><strong>Invalid specification file skipping:</strong></p>
+<ul>
+<li>Create file with different H1 (e.g., <code># Other Title</code>)</li>
+<li>Run reqvire search</li>
+<li>Verify elements from file are NOT in model</li>
+<li>Verify no error is reported</li>
+</ul>
+</li>
+<li>
+<p><strong>No H1 heading:</strong></p>
+<ul>
+<li>Create markdown file starting with <code>## Section</code> (no H1)</li>
+<li>Run reqvire search</li>
+<li>Verify file is ignored</li>
+</ul>
+</li>
+<li>
+<p><strong>Leading blank lines:</strong></p>
+<ul>
+<li>Create file with blank lines before <code># Requirements</code></li>
+<li>Run reqvire search</li>
+<li>Verify file is parsed correctly</li>
+</ul>
+</li>
+<li>
+<p><strong>Combined with ignore patterns:</strong></p>
+<ul>
+<li>Create valid <code># Requirements</code> file matching .gitignore pattern</li>
+<li>Verify file is still excluded by ignore pattern</li>
+<li>Both checks must pass for file to be parsed</li>
+</ul>
+</li>
+</ol>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../StructureAndParsing.html#specification-file-identification">Specification File Identification</a></li>
+<li>satisfiedBy: <a href="../../../../tests/test-gitignore-integration/test.sh">test.sh</a></li>
+</ul>
+<hr />
+<h3 id="fragment-normalization-test">Fragment Normalization Test</h3>
+<p>This test verifies that the system correctly normalizes element name fragments according to GitHub’s fragment identifier rules for use in Element IDs and cross-references.</p>
+<h4>Details</h4>
+<h5>Acceptance Criteria</h5>
+<p><strong>GitHub Fragment Normalization Rules:</strong></p>
+<ul>
+<li>System shall convert all letters to lowercase</li>
+<li>System shall replace spaces with hyphens (-)</li>
+<li>System shall remove all punctuation characters except hyphens and underscores</li>
+<li>System shall remove all whitespace characters except spaces (which become hyphens)</li>
+<li>System shall trim leading and trailing whitespace before processing</li>
+<li>System shall preserve alphanumeric characters, hyphens, and underscores</li>
+</ul>
+<p><strong>Normalization Examples:</strong></p>
+<ul>
+<li><code>&quot;My Feature Name&quot;</code> → <code>&quot;my-feature-name&quot;</code></li>
+<li><code>&quot;Version 1.2.3&quot;</code> → <code>&quot;version-123&quot;</code> (dots removed)</li>
+<li><code>&quot;Installation (Windows)&quot;</code> → <code>&quot;installation-windows&quot;</code> (parentheses removed)</li>
+<li><code>&quot;C++ API Reference&quot;</code> → <code>&quot;c-api-reference&quot;</code> (plus signs removed)</li>
+<li><code>&quot;my_variable_name&quot;</code> → <code>&quot;my_variable_name&quot;</code> (underscores preserved)</li>
+<li><code>&quot;Multiple    Spaces&quot;</code> → <code>&quot;multiple----spaces&quot;</code> (each space becomes hyphen)</li>
+</ul>
+<p><strong>Element ID Generation:</strong></p>
+<ul>
+<li>System shall use normalized fragments to generate Element IDs</li>
+<li>Element IDs shall be stable across element relocations</li>
+<li>Element IDs shall be globally unique within the model</li>
+</ul>
+<p><strong>Cross-Reference Resolution:</strong></p>
+<ul>
+<li>System shall normalize fragment portions of identifiers during relation resolution</li>
+<li>System shall match elements using normalized fragments</li>
+<li>System shall handle case-insensitive element name lookups</li>
+</ul>
+<h5>Test Criteria</h5>
+<ol>
+<li>
+<p><strong>Basic normalization verification:</strong></p>
+<ul>
+<li>Create elements with various naming patterns</li>
+<li>Verify Element IDs use normalized fragments</li>
+<li>Test lowercase conversion</li>
+<li>Test space-to-hyphen conversion</li>
+<li>Test punctuation removal</li>
+</ul>
+</li>
+<li>
+<p><strong>Special character handling:</strong></p>
+<ul>
+<li>Test elements with punctuation: <code>&quot;Feature (v2.0)&quot;</code></li>
+<li>Test elements with symbols: <code>&quot;C++ API&quot;</code></li>
+<li>Test elements with dots: <code>&quot;Version 1.2.3&quot;</code></li>
+<li>Verify all punctuation is removed correctly</li>
+</ul>
+</li>
+<li>
+<p><strong>Underscore and hyphen preservation:</strong></p>
+<ul>
+<li>Test elements with underscores: <code>&quot;my_variable_name&quot;</code></li>
+<li>Test elements with hyphens: <code>&quot;pre-release-build&quot;</code></li>
+<li>Verify both are preserved in normalized form</li>
+</ul>
+</li>
+<li>
+<p><strong>Whitespace handling:</strong></p>
+<ul>
+<li>Test multiple consecutive spaces: <code>&quot;Multiple    Spaces&quot;</code></li>
+<li>Test leading/trailing spaces: <code>&quot;  Trimmed  &quot;</code></li>
+<li>Verify each space becomes a hyphen</li>
+<li>Verify trim operation works correctly</li>
+</ul>
+</li>
+<li>
+<p><strong>Cross-reference resolution:</strong></p>
+<ul>
+<li>Create element <code>&quot;My Feature Name&quot;</code></li>
+<li>Reference it as <code>&quot;My Feature Name&quot;</code>, <code>&quot;my feature name&quot;</code>, <code>&quot;MY FEATURE NAME&quot;</code></li>
+<li>Verify all variants resolve to same element</li>
+<li>Verify relations are established correctly</li>
+</ul>
+</li>
+<li>
+<p><strong>Element ID stability:</strong></p>
+<ul>
+<li>Rename element markdown file (relocation)</li>
+<li>Verify Element ID remains unchanged (uses normalized name)</li>
+<li>Verify cross-references continue to work</li>
+<li>Verify change detection identifies as relocation, not new element</li>
+</ul>
+</li>
+</ol>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../StructureAndParsing.html#element-identity-model">Element Identity Model</a></li>
+<li>satisfiedBy: <a href="../../../../tests/test-parsing-functionality/test.sh">test.sh</a></li>
+</ul>
+<hr />
+
+        </div>
+    </div>
+</body>
+</html>

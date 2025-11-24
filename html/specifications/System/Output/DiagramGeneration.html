@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiagramGeneration</title>
+    <link rel="icon" type="image/x-icon" href="../../../assets/favicon.ico">
+    <link rel="apple-touch-icon" href="../../../assets/apple-touch-icon.png">
+    
+<style>
+:root {
+    /* Primary Colors */
+    --color-primary: #3F51B5;           /* Indigo - core branding */
+    --color-primary-hover: #7986CB;     /* Much lighter Indigo for hover - more visible */
+    --color-primary-active: #303F9F;    /* Darker Indigo for active */
+
+    /* Element Type Colors */
+    --color-requirement: #673AB7;       /* Deep Purple - core requirements */
+    --color-verification: #4CAF50;      /* Emerald Green - validated/completed */
+    --color-other: #9E9E9E;             /* Cool Gray - other element types */
+
+    /* Status Colors */
+    --color-verified: #4CAF50;          /* Forest Green - verified/passing */
+    --color-pending: #FFB74D;           /* Amber - pending/warning */
+    --color-error: #F44336;             /* Red - error/failed */
+
+    /* Interactive Colors */
+    --color-highlight: #FFAB91;         /* Peach - hover highlight */
+    --color-link: #212121;              /* Black - link color */
+    --color-link-hover: #3F51B5;        /* Indigo (same as nav bar) - link hover */
+
+    /* Text Colors */
+    --color-text-primary: #212121;      /* Primary text */
+    --color-text-secondary: #424242;    /* Body text */
+    --color-text-muted: #757575;        /* De-emphasized text */
+    --color-background: #FAFAFA;        /* Off-white background */
+    --color-border: #EEEEEE;            /* Very light gray borders */
+}
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #FAFAFA;
+    color: var(--color-text-secondary);
+}
+.reqvire-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    background-color: var(--color-primary);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+}
+.reqvire-nav a {
+    color: #ffffff;
+    text-decoration: none;
+    padding: 10px 20px;
+    margin-right: 5px;
+    border-radius: 3px;
+    transition: background-color 0.2s, text-decoration 0.2s;
+}
+.reqvire-nav a.nav-logo {
+    display: flex;
+    align-items: center;
+    padding: 5px 15px 5px 0;
+}
+.reqvire-nav a.nav-logo img {
+    vertical-align: middle;
+}
+.reqvire-nav a:hover {
+    background-color: var(--color-primary-hover);
+    text-decoration: underline;
+    color: #ffffff;
+}
+.reqvire-nav a:active,
+.reqvire-nav a.active {
+    background-color: var(--color-primary-active);
+    text-decoration: underline;
+    color: #ffffff;
+}
+.reqvire-nav-spacer {
+    height: 50px;
+}
+.container {
+    max-width: 95%;
+    margin: 0 auto;
+    padding: 20px;
+}
+.content {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    border: 1px solid #E0E0E0;
+}
+h1 {
+    color: var(--color-text-primary);
+    border-bottom: 2px solid #EEEEEE;
+    padding-bottom: 10px;
+    margin-top: 0;
+}
+h2 {
+    color: var(--color-text-primary);
+    border-bottom: 1px solid #EEEEEE;
+    padding-bottom: 5px;
+}
+h3 {
+    color: var(--color-text-primary);
+    margin-top: 25px;
+}
+h4 {
+    color: var(--color-text-secondary);
+    font-weight: 600;
+}
+a {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: text-decoration 0.15s ease;
+}
+a:hover {
+    text-decoration: underline;
+}
+a:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 20px 0;
+}
+table, th, td {
+    border: 1px solid #EEEEEE;
+}
+th, td {
+    padding: 8px 12px;
+    text-align: left;
+}
+th {
+    background-color: #F5F5F5;
+    color: #212121;
+    font-weight: 600;
+}
+tr:hover td {
+    background-color: #FFF8E1;
+}
+code {
+    background: #f6f8fa;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 90%;
+}
+pre {
+    background: #f6f8fa;
+    border-radius: 3px;
+    padding: 16px;
+    overflow: auto;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+}
+blockquote {
+    margin: 0;
+    padding: 0 15px;
+    color: var(--color-text-muted);
+    border-left: 4px solid var(--color-primary);
+}
+.mermaid {
+    margin: 20px 0;
+    text-align: center;
+    height: calc(100vh - 150px);
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid #EEEEEE;
+    border-radius: 3px;
+    background-color: #FAFAFA;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+.mermaid svg {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    position: relative;
+    z-index: 1;
+}
+.diagram-nav-buttons {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 999; /* higher than SVG (1) but lower than header nav (1000) */
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 5px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+.diagram-nav-row {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+}
+.diagram-nav-btn {
+    width: 32px;
+    height: 32px;
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.diagram-nav-btn:hover {
+    background-color: var(--color-primary-hover);
+}
+.diagram-nav-btn:active {
+    background-color: var(--color-primary-active);
+}
+</style>
+
+    <!-- Enhanced mermaid configuration for Reqvire diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.5.0/dist/svg-pan-zoom.min.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+        import elkLayouts from 'https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk/dist/mermaid-layout-elk.esm.min.mjs';
+
+        // Register ELK layout for large diagrams
+        mermaid.registerLayoutLoaders(elkLayouts);
+
+        // Capture Mermaid errors
+        mermaid.parseError = function(err, hash) {
+            console.error('Mermaid Parse Error:', err);
+            console.error('Error details:', {
+                str: err.str,
+                hash: err.hash,
+                message: err.message,
+                stack: err.stack
+            });
+        };
+
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            maxTextSize: 5000000,
+            maxEdges: 50000,
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis',
+                defaultRenderer: 'elk'
+            },
+            layout: 'elk',
+            elk: {
+                mergeEdges: true,
+                nodePlacementStrategy: 'SIMPLE'
+            },
+            securityLevel: 'loose',
+            logLevel: 'error'
+        });
+
+        await mermaid.run();
+        window.mermaid = mermaid;
+
+        // Wait for SVGs to be fully rendered, then initialize
+        function waitForSvgs(callback) {
+            var containers = document.querySelectorAll('.mermaid');
+            var allReady = true;
+            containers.forEach(function(c) {
+                var svg = c.querySelector('svg');
+                if (!svg || !svg.getBBox || svg.getBBox().width === 0) {
+                    allReady = false;
+                }
+            });
+            if (allReady && containers.length > 0) {
+                callback();
+            } else {
+                requestAnimationFrame(function() { waitForSvgs(callback); });
+            }
+        }
+
+        // Add pan/zoom to all Mermaid diagrams after rendering
+        waitForSvgs(function() {
+            document.querySelectorAll('.mermaid').forEach(function(mermaidContainer) {
+                var svg = mermaidContainer.querySelector('svg');
+                if (!svg) return;
+
+                svg.style.maxWidth = 'none';
+                svg.style.maxHeight = 'none';
+
+                var eventsHandler = {
+                    haltEventListeners: ['touchstart', 'touchend', 'touchmove', 'touchleave', 'touchcancel'],
+                        init: function(options) {
+                            var instance = options.instance;
+                            var initialScale = 1;
+                            var pannedX = 0;
+                            var pannedY = 0;
+
+                            this.hammer = Hammer(options.svgElement, {
+                                inputClass: Hammer.SUPPORT_POINTER_EVENTS ? Hammer.PointerEventInput : Hammer.TouchInput
+                            });
+
+                            this.hammer.get('pinch').set({enable: true});
+
+                            this.hammer.on('doubletap', function(ev){
+                                instance.zoomIn();
+                            });
+
+                            this.hammer.on('panstart panmove', function(ev){
+                                if (ev.type === 'panstart') {
+                                    pannedX = 0;
+                                    pannedY = 0;
+                                }
+                                instance.panBy({x: ev.deltaX - pannedX, y: ev.deltaY - pannedY});
+                                pannedX = ev.deltaX;
+                                pannedY = ev.deltaY;
+                            });
+
+                            this.hammer.on('pinchstart pinchmove', function(ev){
+                                if (ev.type === 'pinchstart') {
+                                    initialScale = instance.getZoom();
+                                }
+                                instance.zoomAtPoint(initialScale * ev.scale, {x: ev.center.x, y: ev.center.y});
+                            });
+
+                            options.svgElement.addEventListener('touchmove', function(e){ e.preventDefault(); });
+                        },
+                        destroy: function(){
+                            this.hammer.destroy();
+                        }
+                    };
+
+                    // Diagrams with default zoom (no auto-fit)
+                    var panZoomInstance = svgPanZoom(svg, {
+                        zoomEnabled: true,
+                        controlIconsEnabled: true,
+                        fit: false,
+                        center: false,
+                        contain: false,
+                        minZoom: 0.5,
+                        maxZoom: 10,
+                        zoomScaleSensitivity: 0.3,
+                        customEventsHandler: eventsHandler
+                    });
+
+                    // Add navigation buttons
+                    var navButtons = document.createElement('div');
+                    navButtons.className = 'diagram-nav-buttons';
+                    navButtons.innerHTML = `
+                        <div class="diagram-nav-row">
+                            <button class="diagram-nav-btn" data-action="up">▲</button>
+                        </div>
+                        <div class="diagram-nav-row">
+                            <button class="diagram-nav-btn" data-action="left">◀</button>
+                            <button class="diagram-nav-btn" data-action="down">▼</button>
+                            <button class="diagram-nav-btn" data-action="right">▶</button>
+                        </div>
+                    `;
+                    mermaidContainer.appendChild(navButtons);
+
+                    // Wire up navigation buttons
+                    var panStep = 100;
+                    navButtons.querySelectorAll('.diagram-nav-btn').forEach(function(btn) {
+                        btn.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            var action = this.getAttribute('data-action');
+                            switch(action) {
+                                case 'up':
+                                    panZoomInstance.panBy({x: 0, y: panStep});
+                                    break;
+                                case 'down':
+                                    panZoomInstance.panBy({x: 0, y: -panStep});
+                                    break;
+                                case 'left':
+                                    panZoomInstance.panBy({x: panStep, y: 0});
+                                    break;
+                                case 'right':
+                                    panZoomInstance.panBy({x: -panStep, y: 0});
+                                    break;
+                            }
+                        });
+                    });
+            });
+
+            // Add CSS for edge highlighting
+            var style = document.createElement('style');
+            style.textContent = `
+                path.edge-highlighted,
+                .edge-highlighted path,
+                svg path.edge-highlighted {
+                    stroke: #FFAB91 !important;
+                    stroke-width: 3px !important;
+                }
+            `;
+            document.head.appendChild(style);
+
+            // Initialize edge highlighting for all diagrams
+            document.querySelectorAll('.mermaid svg').forEach(function(svg) {
+                var nodes = svg.querySelectorAll('.node');
+
+                // Find flowchart-link paths (actual edges)
+                var edgePaths = svg.querySelectorAll('path.flowchart-link');
+                // Fallback: find paths in .edges group
+                if (edgePaths.length === 0) {
+                    var edgesGroup = svg.querySelector('.edges');
+                    if (edgesGroup) {
+                        edgePaths = edgesGroup.querySelectorAll('path');
+                    }
+                }
+
+                // Get SVG point for coordinate transforms
+                var svgPoint = svg.createSVGPoint();
+
+                // Helper: transform point through element's CTM
+                function getTransformedBBox(element) {
+                    var bbox = element.getBBox();
+                    var ctm = element.getCTM();
+                    if (!ctm) return bbox;
+
+                    // Transform all four corners
+                    var corners = [
+                        {x: bbox.x, y: bbox.y},
+                        {x: bbox.x + bbox.width, y: bbox.y},
+                        {x: bbox.x, y: bbox.y + bbox.height},
+                        {x: bbox.x + bbox.width, y: bbox.y + bbox.height}
+                    ];
+
+                    var transformed = corners.map(function(c) {
+                        svgPoint.x = c.x;
+                        svgPoint.y = c.y;
+                        var tp = svgPoint.matrixTransform(ctm);
+                        return {x: tp.x, y: tp.y};
+                    });
+
+                    var minX = Math.min.apply(null, transformed.map(function(p) { return p.x; }));
+                    var maxX = Math.max.apply(null, transformed.map(function(p) { return p.x; }));
+                    var minY = Math.min.apply(null, transformed.map(function(p) { return p.y; }));
+                    var maxY = Math.max.apply(null, transformed.map(function(p) { return p.y; }));
+
+                    return {x: minX, y: minY, width: maxX - minX, height: maxY - minY};
+                }
+
+                // Helper: get all points from path
+                function getPathPoints(path) {
+                    var d = path.getAttribute('d') || '';
+                    var points = [];
+                    var ctm = path.getCTM();
+
+                    // Get M (start) point
+                    var startMatch = d.match(/M\s*([\d.-]+)[,\s]+([\d.-]+)/i);
+                    if (startMatch) {
+                        var sx = parseFloat(startMatch[1]);
+                        var sy = parseFloat(startMatch[2]);
+                        if (ctm) {
+                            svgPoint.x = sx; svgPoint.y = sy;
+                            var tp = svgPoint.matrixTransform(ctm);
+                            points.push({x: tp.x, y: tp.y});
+                        } else {
+                            points.push({x: sx, y: sy});
+                        }
+                    }
+
+                    // Get last point - find last number pair before Z or end
+                    var allNums = d.match(/[\d.-]+/g);
+                    if (allNums && allNums.length >= 2) {
+                        var ex = parseFloat(allNums[allNums.length - 2]);
+                        var ey = parseFloat(allNums[allNums.length - 1]);
+                        if (ctm) {
+                            svgPoint.x = ex; svgPoint.y = ey;
+                            var tp = svgPoint.matrixTransform(ctm);
+                            points.push({x: tp.x, y: tp.y});
+                        } else {
+                            points.push({x: ex, y: ey});
+                        }
+                    }
+
+                    return points;
+                }
+
+                // Build node bounding boxes with transforms
+                var nodeData = {};
+                nodes.forEach(function(node) {
+                    var nodeId = node.id || '';
+                    var parts = nodeId.split('-');
+                    var hashId = parts.length >= 2 ? parts[1] : nodeId;
+
+                    nodeData[hashId] = {
+                        node: node,
+                        bbox: getTransformedBBox(node)
+                    };
+                });
+
+                // Check if point is near bbox
+                function isNearBbox(pt, bbox, margin) {
+                    margin = margin || 40;
+                    return pt.x >= bbox.x - margin && pt.x <= bbox.x + bbox.width + margin &&
+                           pt.y >= bbox.y - margin && pt.y <= bbox.y + bbox.height + margin;
+                }
+
+                // Build edge connections with direction tracking
+                var edgeConnections = []; // [{path, source, target}]
+                var upstreamOf = {}; // node -> [parent nodes that point TO this node]
+                var downstreamOf = {}; // node -> [child nodes this node points TO]
+
+                Object.keys(nodeData).forEach(function(hashId) {
+                    upstreamOf[hashId] = [];
+                    downstreamOf[hashId] = [];
+                });
+
+                edgePaths.forEach(function(path) {
+                    var points = getPathPoints(path);
+                    if (points.length < 2) return;
+
+                    var startPt = points[0];
+                    var endPt = points[points.length - 1];
+
+                    var sourceNode = null;
+                    var targetNode = null;
+
+                    // Find source and target nodes for this edge
+                    Object.keys(nodeData).forEach(function(hashId) {
+                        var bbox = nodeData[hashId].bbox;
+                        if (isNearBbox(startPt, bbox, 20)) {
+                            sourceNode = hashId;
+                        }
+                        if (isNearBbox(endPt, bbox, 20)) {
+                            targetNode = hashId;
+                        }
+                    });
+
+                    if (sourceNode && targetNode && sourceNode !== targetNode) {
+                        edgeConnections.push({path: path, source: sourceNode, target: targetNode});
+                        // source -> target means: target's upstream includes source
+                        if (!upstreamOf[targetNode].includes(sourceNode)) {
+                            upstreamOf[targetNode].push(sourceNode);
+                        }
+                        // source -> target means: source's downstream includes target
+                        if (!downstreamOf[sourceNode].includes(targetNode)) {
+                            downstreamOf[sourceNode].push(targetNode);
+                        }
+                    }
+                });
+
+                // Traverse only upstream (to parents/ancestors)
+                function findUpstream(startNodeId) {
+                    var visited = {};
+                    var queue = [startNodeId];
+                    visited[startNodeId] = true;
+
+                    while (queue.length > 0) {
+                        var current = queue.shift();
+                        var parents = upstreamOf[current] || [];
+                        parents.forEach(function(parent) {
+                            if (!visited[parent]) {
+                                visited[parent] = true;
+                                queue.push(parent);
+                            }
+                        });
+                    }
+                    return visited;
+                }
+
+                // Traverse only downstream (to children/descendants)
+                function findDownstream(startNodeId) {
+                    var visited = {};
+                    var queue = [startNodeId];
+                    visited[startNodeId] = true;
+
+                    while (queue.length > 0) {
+                        var current = queue.shift();
+                        var children = downstreamOf[current] || [];
+                        children.forEach(function(child) {
+                            if (!visited[child]) {
+                                visited[child] = true;
+                                queue.push(child);
+                            }
+                        });
+                    }
+                    return visited;
+                }
+
+                // Get edges for connected nodes
+                function getChainEdges(nodeSet) {
+                    var edges = [];
+                    edgeConnections.forEach(function(conn) {
+                        if (nodeSet[conn.source] && nodeSet[conn.target]) {
+                            edges.push(conn.path);
+                        }
+                    });
+                    return edges;
+                }
+
+                // Attach hover handlers
+                nodes.forEach(function(node) {
+                    var nodeId = node.id || '';
+                    var parts = nodeId.split('-');
+                    var hashId = parts.length >= 2 ? parts[1] : nodeId;
+
+                    node.style.cursor = 'pointer';
+
+                    node.addEventListener('mouseenter', function(e) {
+                        e.stopPropagation();
+                        nodes.forEach(function(n) { n.style.filter = ''; });
+                        node.style.filter = 'drop-shadow(0 0 8px rgba(255, 171, 145, 0.7))';
+
+                        // Find upstream (ancestors) and downstream (descendants) separately
+                        var upstream = findUpstream(hashId);
+                        var downstream = findDownstream(hashId);
+                        // Merge both sets
+                        var allConnected = {};
+                        Object.keys(upstream).forEach(function(k) { allConnected[k] = true; });
+                        Object.keys(downstream).forEach(function(k) { allConnected[k] = true; });
+
+                        var chainEdges = getChainEdges(allConnected);
+                        chainEdges.forEach(function(path) {
+                            path.classList.add('edge-highlighted');
+                        });
+                    });
+
+                    node.addEventListener('mouseleave', function() {
+                        node.style.filter = '';
+                        // Remove highlight from all edges
+                        edgePaths.forEach(function(path) {
+                            path.classList.remove('edge-highlighted');
+                        });
+                    });
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <nav class="reqvire-nav">
+        <a href="../../../index.html" class="nav-logo"><img src="../../../assets/logo.png" alt="Reqvire" height="24"></a>
+        <a href="../../../index.html">Index</a>
+        <a href="../../../containment.html">Containment</a>
+        <a href="../../../model.html">Model</a>
+        <a href="../../../whole-model.html">Whole Model</a>
+        <a href="../../../traces.html">Traces</a>
+        <a href="../../../coverage.html">Coverage</a>
+    </nav>
+    <div class="reqvire-nav-spacer"></div>
+    <div class="container">
+        <div class="content">
+            <h1 id="requirements">Requirements</h1>
+<div class="mermaid">graph TD;
+  %% REQVIRE-AUTOGENERATED-DIAGRAM
+  %% Graph styling
+  classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;
+  classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
+  classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
+  classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
+
+  9c62bd365584dc2e[&quot;Complete Model Structure Visualization&quot;];
+  class 9c62bd365584dc2e userRequirement;
+  click 9c62bd365584dc2e &quot;DiagramGeneration.html#complete-model-structure-visualization&quot;;
+  7aa18deb76141065[&quot;Diagram Attachment Display&quot;];
+  class 7aa18deb76141065 systemRequirement;
+  click 7aa18deb76141065 &quot;../../Interfaces/WebInterface.html#diagram-attachment-display&quot;;
+  9c62bd365584dc2e -.->|deriveReqT| 7aa18deb76141065;
+  b07859a209e66b4b[&quot;Model-Centric View Generation&quot;];
+  class b07859a209e66b4b systemRequirement;
+  click b07859a209e66b4b &quot;../../Interfaces/WebInterface.html#model-centric-view-generation&quot;;
+  9c62bd365584dc2e -.->|deriveReqT| b07859a209e66b4b;
+  f57e308c2161373b[&quot;Diagram Element Attachment Display&quot;];
+  class f57e308c2161373b systemRequirement;
+  click f57e308c2161373b &quot;DiagramGeneration.html#diagram-element-attachment-display&quot;;
+  dad7eeb932afdb92[&quot;diagrams.rs&quot;];
+  class dad7eeb932afdb92 default;
+  click dad7eeb932afdb92 &quot;../../../core/src/diagrams.rs&quot;;
+  f57e308c2161373b -->|satisfiedBy| dad7eeb932afdb92;
+  ff3ba56e62aee3e8[&quot;Containment Diagram Attachment Test&quot;];
+  class ff3ba56e62aee3e8 verification;
+  click ff3ba56e62aee3e8 &quot;Verifications/DiagramVerifications.html#containment-diagram-attachment-test&quot;;
+  f57e308c2161373b -.->|verifiedBy| ff3ba56e62aee3e8;
+  7eef8716dbe1c578[&quot;Diagram Generation&quot;];
+  class 7eef8716dbe1c578 systemRequirement;
+  click 7eef8716dbe1c578 &quot;DiagramGeneration.html#diagram-generation&quot;;
+  892e19ec234ec4d8[&quot;CLI Generate Diagrams Flag&quot;];
+  class 892e19ec234ec4d8 systemRequirement;
+  click 892e19ec234ec4d8 &quot;../../Interfaces/CLI.html#cli-generate-diagrams-flag&quot;;
+  7eef8716dbe1c578 -.->|deriveReqT| 892e19ec234ec4d8;
+  7eef8716dbe1c578 -.->|deriveReqT| f57e308c2161373b;
+  37f9fcec9ded1733[&quot;File Diagram Attachment Display&quot;];
+  class 37f9fcec9ded1733 systemRequirement;
+  click 37f9fcec9ded1733 &quot;DiagramGeneration.html#file-diagram-attachment-display&quot;;
+  7eef8716dbe1c578 -.->|deriveReqT| 37f9fcec9ded1733;
+  856209d3ca0b6eec[&quot;Interactive Mermaid Diagram Node Behavior&quot;];
+  class 856209d3ca0b6eec systemRequirement;
+  click 856209d3ca0b6eec &quot;DiagramGeneration.html#interactive-mermaid-diagram-node-behavior&quot;;
+  7eef8716dbe1c578 -.->|deriveReqT| 856209d3ca0b6eec;
+  e14408b847fbee65[&quot;SysML-Compatible Relationship Rendering&quot;];
+  class e14408b847fbee65 systemRequirement;
+  click e14408b847fbee65 &quot;DiagramGeneration.html#sysml-compatible-relationship-rendering&quot;;
+  7eef8716dbe1c578 -.->|deriveReqT| e14408b847fbee65;
+  dad7eeb932afdb92[&quot;diagrams.rs&quot;];
+  class dad7eeb932afdb92 default;
+  click dad7eeb932afdb92 &quot;../../../core/src/diagrams.rs&quot;;
+  7eef8716dbe1c578 -->|satisfiedBy| dad7eeb932afdb92;
+  ce2625feec883e55[&quot;utils.rs&quot;];
+  class ce2625feec883e55 default;
+  click ce2625feec883e55 &quot;../../../core/src/utils.rs&quot;;
+  7eef8716dbe1c578 -->|satisfiedBy| ce2625feec883e55;
+  38042f86baa09c0e[&quot;Diagram Generation Test&quot;];
+  class 38042f86baa09c0e verification;
+  click 38042f86baa09c0e &quot;Verifications/DiagramVerifications.html#diagram-generation-test&quot;;
+  7eef8716dbe1c578 -.->|verifiedBy| 38042f86baa09c0e;
+  7f92da2f85b6d57d[&quot;Diagram Relation Filtering Verification&quot;];
+  class 7f92da2f85b6d57d verification;
+  click 7f92da2f85b6d57d &quot;Verifications/DiagramVerifications.html#diagram-relation-filtering-verification&quot;;
+  7eef8716dbe1c578 -.->|verifiedBy| 7f92da2f85b6d57d;
+  2b6bb41e59bfb171[&quot;Remove Generated Diagrams Verification&quot;];
+  class 2b6bb41e59bfb171 verification;
+  click 2b6bb41e59bfb171 &quot;Verifications/DiagramVerifications.html#remove-generated-diagrams-verification&quot;;
+  7eef8716dbe1c578 -.->|verifiedBy| 2b6bb41e59bfb171;
+  237c8f8cf5d3bf75[&quot;Visualize Model Relationships Verification&quot;];
+  class 237c8f8cf5d3bf75 verification;
+  click 237c8f8cf5d3bf75 &quot;Verifications/DiagramVerifications.html#visualize-model-relationships-verification&quot;;
+  7eef8716dbe1c578 -.->|verifiedBy| 237c8f8cf5d3bf75;
+  c0b50979a9430837[&quot;Diagram Removal&quot;];
+  class c0b50979a9430837 systemRequirement;
+  click c0b50979a9430837 &quot;DiagramGeneration.html#diagram-removal&quot;;
+  b3bb7792bbc95f02[&quot;CLI Remove Diagrams Flag&quot;];
+  class b3bb7792bbc95f02 systemRequirement;
+  click b3bb7792bbc95f02 &quot;../../Interfaces/CLI.html#cli-remove-diagrams-flag&quot;;
+  c0b50979a9430837 -.->|deriveReqT| b3bb7792bbc95f02;
+  dad7eeb932afdb92[&quot;diagrams.rs&quot;];
+  class dad7eeb932afdb92 default;
+  click dad7eeb932afdb92 &quot;../../../core/src/diagrams.rs&quot;;
+  c0b50979a9430837 -->|satisfiedBy| dad7eeb932afdb92;
+  dad7eeb932afdb92[&quot;diagrams.rs&quot;];
+  class dad7eeb932afdb92 default;
+  click dad7eeb932afdb92 &quot;../../../core/src/diagrams.rs&quot;;
+  37f9fcec9ded1733 -->|satisfiedBy| dad7eeb932afdb92;
+  e97cc302fad436f7[&quot;File Diagram Attachment Test&quot;];
+  class e97cc302fad436f7 verification;
+  click e97cc302fad436f7 &quot;Verifications/DiagramVerifications.html#file-diagram-attachment-test&quot;;
+  37f9fcec9ded1733 -.->|verifiedBy| e97cc302fad436f7;
+  80defdd4cbc7ee18[&quot;cli.rs&quot;];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 &quot;../../../cli/src/cli.rs&quot;;
+  856209d3ca0b6eec -->|satisfiedBy| 80defdd4cbc7ee18;
+  dad7eeb932afdb92[&quot;diagrams.rs&quot;];
+  class dad7eeb932afdb92 default;
+  click dad7eeb932afdb92 &quot;../../../core/src/diagrams.rs&quot;;
+  856209d3ca0b6eec -->|satisfiedBy| dad7eeb932afdb92;
+  7db46f0e09d5d48e[&quot;Interactive Mermaid Diagrams&quot;];
+  class 7db46f0e09d5d48e userRequirement;
+  click 7db46f0e09d5d48e &quot;DiagramGeneration.html#interactive-mermaid-diagrams&quot;;
+  781d708df3bbd8fd[&quot;Web Interface Color Scheme&quot;];
+  class 781d708df3bbd8fd systemRequirement;
+  click 781d708df3bbd8fd &quot;../../Interfaces/WebInterface.html#web-interface-color-scheme&quot;;
+  7db46f0e09d5d48e -.->|deriveReqT| 781d708df3bbd8fd;
+  7db46f0e09d5d48e -.->|deriveReqT| 7eef8716dbe1c578;
+  b95348d09df26743[&quot;Model Visualization and Exploration&quot;];
+  class b95348d09df26743 userRequirement;
+  click b95348d09df26743 &quot;DiagramGeneration.html#model-visualization-and-exploration&quot;;
+  ccf73e5865717df6[&quot;CLI Model Diagram Command&quot;];
+  class ccf73e5865717df6 systemRequirement;
+  click ccf73e5865717df6 &quot;../../Interfaces/CLI.html#cli-model-diagram-command&quot;;
+  b95348d09df26743 -.->|deriveReqT| ccf73e5865717df6;
+  b95348d09df26743 -.->|deriveReqT| b07859a209e66b4b;
+  257392049dfa746b[&quot;Remove Generated Diagrams&quot;];
+  class 257392049dfa746b userRequirement;
+  click 257392049dfa746b &quot;DiagramGeneration.html#remove-generated-diagrams&quot;;
+  257392049dfa746b -.->|deriveReqT| c0b50979a9430837;
+  dad7eeb932afdb92[&quot;diagrams.rs&quot;];
+  class dad7eeb932afdb92 default;
+  click dad7eeb932afdb92 &quot;../../../core/src/diagrams.rs&quot;;
+  e14408b847fbee65 -->|satisfiedBy| dad7eeb932afdb92;
+  8776f98206c23aaf[&quot;Trace Relation Non-Directional Behavior&quot;];
+  class 8776f98206c23aaf systemRequirement;
+  click 8776f98206c23aaf &quot;DiagramGeneration.html#trace-relation-non-directional-behavior&quot;;
+  19db7c09ab210848[&quot;Invalid Relations Test&quot;];
+  class 19db7c09ab210848 verification;
+  click 19db7c09ab210848 &quot;../Core/Verifications/ValidationVerifications.html#invalid-relations-test&quot;;
+  8776f98206c23aaf -.->|verifiedBy| 19db7c09ab210848;
+  45d97b7cefe2beb6[&quot;Trace Relations No Cycles Verification&quot;];
+  class 45d97b7cefe2beb6 verification;
+  click 45d97b7cefe2beb6 &quot;../Processing/Verifications/TraceVerifications.html#trace-relations-no-cycles-verification&quot;;
+  8776f98206c23aaf -.->|verifiedBy| 45d97b7cefe2beb6;
+  c3c6a63530e5e37b[&quot;Relation Types and behaviors<br/>📎 RelationTypes.md&quot;];
+  class c3c6a63530e5e37b systemRequirement;
+  click c3c6a63530e5e37b &quot;../Core/ModelManagement.html#relation-types-and-behaviors&quot;;
+  c1893a6f39afeabf[&quot;Validate Relation Types&quot;];
+  class c1893a6f39afeabf userRequirement;
+  click c1893a6f39afeabf &quot;../Core/Validation.html#validate-relation-types&quot;;
+  c3c6a63530e5e37b -.->|deriveReqT| c1893a6f39afeabf;
+  c3c6a63530e5e37b -.->|deriveReqT| 8776f98206c23aaf;
+  9450d4313f47ef36[&quot;relation.rs&quot;];
+  class 9450d4313f47ef36 default;
+  click 9450d4313f47ef36 &quot;../../../core/src/relation.rs&quot;;
+  c3c6a63530e5e37b -->|satisfiedBy| 9450d4313f47ef36;
+  908de1f59852b43a[&quot;Element Subsection Parsing Test&quot;];
+  class 908de1f59852b43a verification;
+  click 908de1f59852b43a &quot;../Core/Verifications/ParsingVerifications.html#element-subsection-parsing-test&quot;;
+  c3c6a63530e5e37b -.->|verifiedBy| 908de1f59852b43a;
+  a2af7f82db048fbc[&quot;Model Reports&quot;];
+  class a2af7f82db048fbc userRequirement;
+  click a2af7f82db048fbc &quot;Reporting.html#model-reports&quot;;
+  59093bf57f656ef3[&quot;HTML Export&quot;];
+  class 59093bf57f656ef3 systemRequirement;
+  click 59093bf57f656ef3 &quot;../../Interfaces/WebInterface.html#html-export&quot;;
+  a2af7f82db048fbc -.->|deriveReqT| 59093bf57f656ef3;
+  a2af7f82db048fbc -.->|deriveReqT| 9c62bd365584dc2e;
+  a2af7f82db048fbc -.->|deriveReqT| 7db46f0e09d5d48e;
+  a2af7f82db048fbc -.->|deriveReqT| b95348d09df26743;
+  9cd81bb70e97a906[&quot;Model Structure and Summaries&quot;];
+  class 9cd81bb70e97a906 userRequirement;
+  click 9cd81bb70e97a906 &quot;Reporting.html#model-structure-and-summaries&quot;;
+  a2af7f82db048fbc -.->|deriveReqT| 9cd81bb70e97a906;
+  51f1f398e207d6d4[&quot;Provide Validation Reports&quot;];
+  class 51f1f398e207d6d4 userRequirement;
+  click 51f1f398e207d6d4 &quot;Reporting.html#provide-validation-reports&quot;;
+  a2af7f82db048fbc -.->|deriveReqT| 51f1f398e207d6d4;
+  3643f79c67e5b0d3[&quot;Verification Coverage Report&quot;];
+  class 3643f79c67e5b0d3 userRequirement;
+  click 3643f79c67e5b0d3 &quot;Reporting.html#verification-coverage-report&quot;;
+  a2af7f82db048fbc -.->|deriveReqT| 3643f79c67e5b0d3;
+  37a5b8e199a838f[&quot;Generate Diagrams&quot;];
+  class 37a5b8e199a838f userRequirement;
+  click 37a5b8e199a838f &quot;../../UserStories.html#generate-diagrams&quot;;
+  37a5b8e199a838f -.->|deriveReqT| 9c62bd365584dc2e;
+  37a5b8e199a838f -.->|deriveReqT| 7db46f0e09d5d48e;
+  37a5b8e199a838f -.->|deriveReqT| b95348d09df26743;
+  37a5b8e199a838f -.->|deriveReqT| 257392049dfa746b;
+</div>
+<h3 id="diagram-generation">Diagram Generation</h3>
+<p>When requested, the system shall automatically generate diagrams and save them to the required locations of the model.</p>
+<h4>Details</h4>
+<p><strong>Auto-Generated Diagram Identification:</strong>
+The system shall embed a unique identification marker “REQVIRE-AUTOGENERATED-DIAGRAM” as a comment within all auto-generated mermaid diagrams to distinguish them from user-created diagrams for reliable filtering and removal operations.</p>
+<p>The marker must be:</p>
+<ul>
+<li>Embedded as a mermaid comment line using the <code>%% REQVIRE-AUTOGENERATED-DIAGRAM</code> format</li>
+<li>Present in every auto-generated diagram</li>
+<li>Used by diagram removal functionality to identify which diagrams to remove</li>
+<li>Not present in user-created custom diagrams</li>
+</ul>
+<p>This enables the system to:</p>
+<ul>
+<li>Reliably identify auto-generated diagrams regardless of their location in documents</li>
+<li>Preserve user-created diagrams during removal operations</li>
+<li>Support mixed documents containing both auto-generated and custom diagrams</li>
+</ul>
+<p><strong>Diagram Relation Filtering:</strong>
+The system shall implement relation filtering in diagram generation to render only forward relations while ensuring complete element hierarchy representation starting from top-level parent elements.</p>
+<p>When generating diagrams, the system shall apply the following relation filtering rules:</p>
+<ol>
+<li><strong>Diagram Relation Filtering</strong>: Only relations specified in the DIAGRAM_RELATIONS list shall be rendered to prevent duplicate arrows representing the same logical relationship</li>
+<li><strong>Complete Hierarchy Inclusion</strong>: When any element in a hierarchical chain is included in a file, all parent elements up to the root of the hierarchy shall be automatically included in the diagram</li>
+<li><strong>List-Based Rendering</strong>: Relations shall be rendered according to the DIAGRAM_RELATIONS list which defines which relation from each opposite pair should be shown</li>
+</ol>
+<p>The filtering ensures that:</p>
+<ul>
+<li>Bidirectional relationships (e.g., <code>derivedFrom</code>/<code>derive</code>) appear as single arrows using the relation specified in DIAGRAM_RELATIONS</li>
+<li>Hierarchical context is preserved by including parent elements even if they belong to different files</li>
+<li>Diagram readability is maintained while accurately representing the complete model structure</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#interactive-mermaid-diagrams">Interactive Mermaid Diagrams</a></li>
+<li>satisfiedBy: <a href="../../../core/src/diagrams.rs">diagrams.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/utils.rs">utils.rs</a></li>
+</ul>
+<hr />
+<h3 id="diagram-element-attachment-display">Diagram Element Attachment Display</h3>
+<p>The system shall display element attachments in containment view diagrams as a dedicated “Attachments” subgraph box containing individual attachment nodes.</p>
+<h4>Details</h4>
+<ul>
+<li>Attachments shall be displayed in a separate subgraph titled “📎 Attachments”</li>
+<li>Each attachment shall be shown as an individual node with 📝 icon prefix</li>
+<li>Attachment filenames shall be shown (not full paths)</li>
+<li>Clicking an attachment node shall navigate to the attachment file</li>
+<li>The Attachments subgraph shall use a distinct styling (designDocument class)</li>
+<li>Only files within the same folder as the specification shall show attachments</li>
+<li>Elements without attachments do not show an Attachments subgraph</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#diagram-generation">Diagram Generation</a></li>
+<li>satisfiedBy: <a href="../../../core/src/diagrams.rs">diagrams.rs</a></li>
+<li>verifiedBy: <a href="Verifications/DiagramVerifications.html#containment-diagram-attachment-test">Containment Diagram Attachment Test</a></li>
+</ul>
+<hr />
+<h3 id="file-diagram-attachment-display">File Diagram Attachment Display</h3>
+<p>The system shall display element attachments in file-based mermaid diagrams as clickable links below the element name within the node box.</p>
+<h4>Details</h4>
+<ul>
+<li>Attachments shall appear below the element name using <code>&lt;br/&gt;</code> line separator</li>
+<li>Each attachment shall be prefixed with 📎 icon</li>
+<li>Attachment filenames shall be shown (not full paths)</li>
+<li>Clicking an attachment shall navigate to the attachment file</li>
+<li>Multiple attachments shall each appear on separate lines</li>
+<li>Elements without attachments show only their name</li>
+</ul>
+<p>Format: <code>Element Name&lt;br/&gt;📎 attachment1.md&lt;br/&gt;📎 attachment2.md</code></p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#diagram-generation">Diagram Generation</a></li>
+<li>satisfiedBy: <a href="../../../core/src/diagrams.rs">diagrams.rs</a></li>
+<li>verifiedBy: <a href="Verifications/DiagramVerifications.html#file-diagram-attachment-test">File Diagram Attachment Test</a></li>
+</ul>
+<hr />
+<h3 id="sysml-compatible-relationship-rendering">SysML-Compatible Relationship Rendering</h3>
+<p>The system shall implement a relationship rendering engine that adheres to SysML notation standards, defining specific arrow styles, line types, and visual properties for each relationship type to ensure diagram consistency and standards compliance.</p>
+<h4>Details</h4>
+<p>The visual representation and direction of relationships in diagrams aligns with the SysML specification.
+Each relationship is represented using SysML standard notation with a specified arrow direction.
+derive (Forward):</p>
+<ul>
+<li>Definition: Links a parent element to child elements derived from it.</li>
+<li>Notation: Dashed arrow with an open arrowhead.</li>
+<li>Arrow Direction: Parent → Child (derived)</li>
+<li>Used when: Parent element wants to show its derived children</li>
+</ul>
+<p>derivedFrom (Backward):</p>
+<ul>
+<li>Definition: Links a child element to the parent element it is derived from.</li>
+<li>Notation: Dashed arrow with an open arrowhead.</li>
+<li>Arrow Direction: Child → Parent (source)</li>
+<li>Used when: Child element references its source parent</li>
+</ul>
+<p>verify (Backward):</p>
+<ul>
+<li>Definition: Links a verification artifact to the requirement it verifies.</li>
+<li>Notation: Dashed arrow with an open arrowhead.</li>
+<li>Arrow Direction: Verification → Requirement</li>
+<li>Used when: Test/verification references the requirement it validates</li>
+</ul>
+<p>verifiedBy (Forward):</p>
+<ul>
+<li>Definition: Links a requirement to verification artifacts.</li>
+<li>Notation: Dashed arrow with an open arrowhead.</li>
+<li>Arrow Direction: Requirement → Verification</li>
+<li>Used when: Requirement shows how it’s verified</li>
+</ul>
+<p>satisfy (Backward):</p>
+<ul>
+<li>Definition: Links an implementation to the requirement it satisfies.</li>
+<li>Notation: Solid arrow with an open arrowhead.</li>
+<li>Arrow Direction: Implementation → Requirement</li>
+<li>Used when: Implementation references the requirement it satisfies</li>
+</ul>
+<p>satisfiedBy (Forward):</p>
+<ul>
+<li>Definition: Links a requirement to elements that satisfy it.</li>
+<li>Notation: Solid arrow with an open arrowhead.</li>
+<li>Arrow Direction: Requirement → Implementation</li>
+<li>Used when: Requirement shows how it’s implemented</li>
+</ul>
+<p>trace (Neutral):</p>
+<ul>
+<li>Definition: Shows a general traceability relationship without implying hierarchy.</li>
+<li>Notation: Dashed arrow with an open arrowhead.</li>
+<li>Arrow Direction: Tracing → Traced (neutral)</li>
+<li>Used when: Simple traceability connection is needed</li>
+</ul>
+<p><strong>Summary Table</strong>
+| Relation        | Stereotype     | Line style            | Arrowhead               | Arrow Direction                   | Hierarchy Direction |
+|—————–|––––––––|———————–|———————––|———————————–|–––––––––– |
+| <strong>derive</strong>      | «deriveReqt»   | dashed dependency     | open (hollow) arrowhead | Parent → Child (derived)          | Forward             |
+| <strong>derivedFrom</strong> | «deriveReqt»   | dashed dependency     | open (hollow) arrowhead | Child → Parent (source)           | Backward            |
+| <strong>satisfy</strong>     | «satisfy»      | solid dependency      | open (hollow) arrowhead | Implementation → Requirement      | Backward            |
+| <strong>satisfiedBy</strong> | «satisfy»      | solid dependency      | open (hollow) arrowhead | Requirement → Implementation      | Forward             |
+| <strong>verify</strong>      | «verify»       | dashed dependency     | open (hollow) arrowhead | Verification → Requirement        | Backward            |
+| <strong>verifiedBy</strong>  | «verify»       | dashed dependency     | open (hollow) arrowhead | Requirement → Verification        | Forward             |
+| <strong>trace</strong>       | «trace»        | dashed dependency     | open (hollow) arrowhead | Tracing → Traced (neutral)        | Forward             |</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#diagram-generation">Diagram Generation</a></li>
+<li>satisfiedBy: <a href="../../../core/src/diagrams.rs">diagrams.rs</a></li>
+</ul>
+<hr />
+<h3 id="interactive-mermaid-diagrams">Interactive Mermaid Diagrams</h3>
+<p>The system shall produce visual representations of relationships within the MBSE model in the form of Mermaid diagrams, enabling users to explore relations and understand dependencies and their impact.</p>
+<h4>Details</h4>
+<p>Diagram generation follows a file-based approach:</p>
+<ul>
+<li>One diagram is generated per specification file</li>
+<li>The diagram shows all elements in the file and their relationships</li>
+<li>External related resources are displayed as linked boxes to the actual resource</li>
+</ul>
+<p><strong>Diagram Node Classes:</strong>
+The system shall use Mermaid CSS classes to style diagram elements with differentiated colors:</p>
+<table><thead><tr><th>Class Name</th><th>Fill Color</th><th>Stroke Color</th><th>Stroke Width</th><th>Usage</th></tr></thead><tbody>
+<tr><td>userRequirement</td><td>#D1C4E9 (light purple)</td><td>#7E57C2</td><td>2px</td><td>Top-level user requirements</td></tr>
+<tr><td>systemRequirement</td><td>#E1D8EE (lighter purple)</td><td>#673AB7</td><td>1.5px</td><td>System-level requirements</td></tr>
+<tr><td>requirement</td><td>#ECEFF1 (blue-gray)</td><td>#673AB7</td><td>1.5px</td><td>Generic requirements</td></tr>
+<tr><td>verified</td><td>#D1C4E9 (light purple)</td><td>#7E57C2</td><td>2px</td><td>Directly verified requirements</td></tr>
+<tr><td>verification</td><td>#DCEDC8 (light green)</td><td>#4CAF50</td><td>2px</td><td>Verification elements</td></tr>
+<tr><td>folder</td><td>#FAFAFA (off-white)</td><td>#9E9E9E</td><td>2-3px</td><td>Folder containers</td></tr>
+<tr><td>file</td><td>#FFFFFF / #FFF8E1</td><td>#9E9E9E / #FFCA28</td><td>2px</td><td>File containers</td></tr>
+<tr><td>default</td><td>#F5F5F5 (light gray)</td><td>#424242</td><td>1.5px</td><td>Default/fallback styling</td></tr>
+</tbody></table>
+<p><strong>Element Type Color Scheme:</strong>
+The system shall use the following color scheme for rendering diagram elements:</p>
+<table><thead><tr><th>Element Type</th><th>Color Name</th><th>Hex Code</th><th>Usage</th></tr></thead><tbody>
+<tr><td>Requirement</td><td>Deep Purple</td><td>#673AB7</td><td>Core requirements, goals</td></tr>
+<tr><td>Verification</td><td>Emerald Green</td><td>#4CAF50</td><td>Validation criteria, testing completion</td></tr>
+<tr><td>Other</td><td>Cool Gray</td><td>#9E9E9E</td><td>Other element types, external references</td></tr>
+</tbody></table>
+<p><strong>Relation Line Colors:</strong>
+| Relation Type | Color | Style |
+|–––––––|—––|—––|
+| Derive/DerivedFrom | #673AB7 | Dashed |
+| Verify/VerifiedBy | #4CAF50 | Dashed |
+| Satisfy/SatisfiedBy | #673AB7 | Solid |
+| Trace | #9E9E9E | Dashed |</p>
+<p><strong>Interactive Highlighting:</strong>
+| Effect | Color | Implementation |
+|––––|—––|––––––––|
+| Hovered node | Peach | drop-shadow(0 0 8px rgba(255,171,145,0.7)) |
+| Connected edges | Peach | stroke: #FFAB91 with increased width |</p>
+<p><strong>Diagram Background:</strong></p>
+<ul>
+<li>Canvas background: #FAFAFA (off-white)</li>
+<li>Border: 1px solid #EEEEEE</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../../UserStories.html#generate-diagrams">Generate Diagrams</a></li>
+<li>derivedFrom: <a href="Reporting.html#model-reports">Model Reports</a></li>
+</ul>
+<hr />
+<h3 id="remove-generated-diagrams">Remove Generated Diagrams</h3>
+<p>The system shall provide functionality to remove all generated Mermaid diagrams from the model, allowing users to clean up generated artifacts when needed.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../../UserStories.html#generate-diagrams">Generate Diagrams</a></li>
+</ul>
+<hr />
+<h3 id="trace-relation-non-directional-behavior">Trace Relation Non-Directional Behavior</h3>
+<p>The system shall treat trace relations as non-directional for circular dependency detection while maintaining their traceability purpose, ensuring that trace relations do not participate in cycle detection algorithms.</p>
+<h4>Details</h4>
+<p>The trace relation behavior shall include:</p>
+<ol>
+<li>
+<p><strong>Circular Dependency Exclusion</strong>:</p>
+<ul>
+<li>Trace relations shall not be traversed during circular dependency detection</li>
+<li>The cycle detection algorithm shall skip trace relations to prevent false positive cycles</li>
+<li>Trace relations exist solely for traceability and documentation purposes</li>
+</ul>
+</li>
+<li>
+<p><strong>Non-Propagation Behavior</strong>:</p>
+<ul>
+<li>Changes shall not propagate through trace relations</li>
+<li>Trace relations shall not be included in change impact analysis</li>
+<li>Impact trees shall not traverse trace relation connections</li>
+</ul>
+</li>
+<li>
+<p><strong>Bidirectional Traceability</strong>:</p>
+<ul>
+<li>Trace relations shall provide bidirectional navigational capability</li>
+<li>Users can navigate from source to target and target to source</li>
+<li>Both directions are semantically equivalent for traceability purposes</li>
+</ul>
+</li>
+<li>
+<p><strong>Validation Behavior</strong>:</p>
+<ul>
+<li>Trace relations shall be validated for target existence</li>
+<li>Trace relations shall not require type compatibility validation</li>
+<li>Trace relations can connect any element type to any other element type</li>
+</ul>
+</li>
+</ol>
+<p>This ensures that trace relations serve their intended purpose of establishing lightweight traceability connections without creating artificial dependency constraints or participating in architectural validation logic.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../Core/ModelManagement.html#relation-types-and-behaviors">Relation Types and behaviors</a></li>
+<li>verifiedBy: <a href="../Core/Verifications/ValidationVerifications.html#invalid-relations-test">Invalid Relations Test</a></li>
+<li>verifiedBy: <a href="../Processing/Verifications/TraceVerifications.html#trace-relations-no-cycles-verification">Trace Relations No Cycles Verification</a></li>
+</ul>
+<hr />
+<h3 id="complete-model-structure-visualization">Complete Model Structure Visualization</h3>
+<p>The system shall provide visualization of the complete model structure showing an element-centric view with nested relations.</p>
+<h4>Details</h4>
+<p>The visualization shall:</p>
+<ul>
+<li>Display elements with their properties (identifier, name, type, file location)</li>
+<li>Show relations nested inside elements with full target details</li>
+<li>Support recursive nesting for element-to-element relations</li>
+<li>Handle file path and external URL relations</li>
+<li>Provide metadata about total elements and relations</li>
+<li>Use consistent visual styling with mermaid diagrams showing hash-based node identifiers</li>
+</ul>
+<p>The visualization helps users understand the model’s logical structure, navigate relationships between elements, and explore the model from any starting point.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../../UserStories.html#generate-diagrams">Generate Diagrams</a></li>
+<li>derivedFrom: <a href="Reporting.html#model-reports">Model Reports</a></li>
+</ul>
+<hr />
+<h3 id="diagram-removal">Diagram Removal</h3>
+<p>When requested, the system shall remove all generated diagrams from the model by locating and deleting all mermaid code blocks that were automatically generated.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#remove-generated-diagrams">Remove Generated Diagrams</a></li>
+<li>satisfiedBy: <a href="../../../core/src/diagrams.rs">diagrams.rs</a></li>
+</ul>
+<hr />
+<h3 id="interactive-mermaid-diagram-node-behavior">Interactive Mermaid Diagram Node Behavior</h3>
+<p>The system shall implement interactive click behavior for Mermaid diagram nodes that redirects to the referenced element.</p>
+<h4>Details</h4>
+<p>Clickable mermaid diagrams links by default must use relative links to the git repository.</p>
+<p>CLI flag options must be provided that can change default behavior to use stable github repository links:</p>
+<ul>
+<li>diagrams click links are not working on Github if not using stable github repository links</li>
+<li>from another side that pollutes PR diffs thus choice must be given to the user</li>
+<li>Commands that generate diagrams (<code>generate-diagrams</code>, <code>export</code>, <code>serve</code>) must expose <code>--links-with-blobs</code> CLI flag for that purpose</li>
+<li>The flag defaults to <code>false</code> (use relative paths)</li>
+</ul>
+<p>When generating diagram node links and when <code>--links-with-blobs</code> flag is set to <code>true</code>, the system shall:</p>
+<ul>
+<li>Use stable git repository links (<code>{repository-url}/blob/{commit-hash}/{file-path}</code>) when git repository information is available</li>
+<li>Fallback to relative markdown links when git repository information is not available</li>
+<li>Use the current commit hash to ensure links remain stable even as the repository evolves</li>
+<li>Match the same link format used in traceability matrices and change impact reports</li>
+<li>Preserve interactive behavior across all generated diagrams</li>
+</ul>
+<p>The <code>traces</code> command shall always use relative paths (hardcoded to <code>false</code>, no flag needed).</p>
+<p>The <code>change-impact</code> command shall continue to use GitHub blob URLs by default (unchanged behavior).</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#diagram-generation">Diagram Generation</a></li>
+<li>satisfiedBy: <a href="../../../core/src/diagrams.rs">diagrams.rs</a></li>
+<li>satisfiedBy: <a href="../../../cli/src/cli.rs">cli.rs</a></li>
+</ul>
+<hr />
+<h3 id="model-visualization-and-exploration">Model Visualization and Exploration</h3>
+<p>Users shall be able to generate and view model structure diagrams from any starting point of the model.</p>
+<h4>Details</h4>
+<ul>
+<li>Generate complete model structure with nested relations showing element details recursively</li>
+<li>Default view shows root requirements (no hierarchical parent)</li>
+<li>Filter from specific element using –from flag</li>
+<li>View both JSON and markdown output formats</li>
+<li>Nested structure shows relations with full target details</li>
+<li>Mermaid diagrams display all nested relations recursively</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../../UserStories.html#generate-diagrams">Generate Diagrams</a></li>
+<li>derivedFrom: <a href="Reporting.html#model-reports">Model Reports</a></li>
+</ul>
+<hr />
+
+        </div>
+    </div>
+</body>
+</html>
