@@ -277,8 +277,12 @@ fn generate_element_text(element: &ModelCentricElement, depth: usize, diagram_di
     let indent = "  ".repeat(depth);
     let mut output = String::new();
 
-    // Element header
-    output.push_str(&format!("{}## {}\n\n", indent, element.name));
+    // Element header - make name a link to the element
+    let element_fragment = element.identifier
+        .rfind('#')
+        .map(|pos| &element.identifier[pos..])
+        .unwrap_or("");
+    output.push_str(&format!("{}## [{}]({}{})\n\n", indent, element.name, element.file_path, element_fragment));
     output.push_str(&format!("{}**Type**: {}\n", indent, element.element_type));
     output.push_str(&format!("{}**File**: [{}]({})\n\n", indent, element.file_path, element.file_path));
 
