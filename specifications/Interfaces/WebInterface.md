@@ -99,45 +99,63 @@ The system shall design and implement HTML pages with consistent layout, styling
 The system shall implement a consistent color scheme across all HTML pages optimized for MBSE and requirements management applications.
 
 #### Details
+
 **Primary Colors:**
 | Color Name | Hex Code | Usage |
 |------------|----------|-------|
 | Deep Sapphire | #1E3A5F | Navigation bar background, primary headers |
-| White | #FFFFFF | Navigation text, content background |
-| Slate Gray | #64748B | Secondary text, borders |
+| Deep Sapphire Hover | #265280 | Navigation hover states |
+| Deep Sapphire Active | #152737 | Navigation active/pressed states |
+| White | #FFFFFF | Navigation text, button text, content background |
+| Light Gray | #F5F5F5 | Body background - reduces eye strain |
+| Slate Gray | #64748B | Secondary text, borders, external elements |
 
 **Element Type Colors:**
 The web interface shall use consistent colors matching the diagram color scheme:
-| Element Type | Color | Hex Code |
-|-------------|-------|----------|
-| Requirement | Royal Blue | #2563EB |
-| Verification | Emerald | #059669 |
-| Design | Purple | #7C3AED |
-| Test | Teal | #0891B2 |
+| Element Type | Color Name | Hex Code | Usage |
+|--------------|------------|----------|-------|
+| Requirement | Royal Blue | #2563EB | Core requirements, goals |
+| Verification | Dark Emerald | #006400 | Validation criteria, testing completion |
+| Design | Indigo | #4B0082 | Design specifications, architectural elements |
+| Test | Teal | #0891B2 | Test cases, test plans |
+| Implementation | Amber | #D97706 | Code implementation, deployment |
+| External | Slate Gray | #64748B | Elements in other files, linked boxes |
 
 **Status Indicator Colors:**
-| Status | Color | Hex Code | Usage |
-|--------|-------|----------|-------|
-| Verified/Passing | Emerald | #059669 | Verified requirements, passing tests |
+| Status | Color Name | Hex Code | Usage |
+|--------|------------|----------|-------|
+| Verified/Passing | Dark Emerald | #006400 | Verified requirements, passing tests |
 | Pending/Warning | Amber | #D97706 | Unverified items, warnings |
-| Failed/Error | Rose | #DC2626 | Failed tests, validation errors |
+| Failed/Error | Coral Red | #FF6B6B | Error messages, validation errors |
 
 **Interactive State Colors:**
-| State | Color | Usage |
-|-------|-------|-------|
-| Hover Highlight | #ff6b6b | Diagram node hover effect |
-| Link Hover | Lighter shade | Navigation link hover states |
-| Active/Selected | Primary color | Currently selected navigation item |
+| State | Color | Hex Code | Usage |
+|-------|-------|----------|-------|
+| Hover Highlight | Coral Red | #ff6b6b | Diagram node/edge hover effect |
+| Node Hover Shadow | Coral Red (70%) | rgba(255,107,107,0.7) | Soft drop-shadow on node hover |
+| Link Color | Royal Blue | #2563EB | Hyperlinks |
+| Primary Button Hover | Darker Blue | #1A52BB | Button hover state |
+
+**Border Colors:**
+| Element | Hex Code | Usage |
+|---------|----------|-------|
+| Header Borders | #e0e0e0 | H1/H2 underlines |
+| Table Borders | #ced4da | Tables, blockquotes, mermaid container |
+| Code Background | #f6f8fa | Code blocks |
+| Diagram Canvas | #fafafa | Mermaid diagram background |
 
 **Typography:**
 - Primary font: System font stack (sans-serif)
 - Monospace font: For code blocks and element identifiers
 - Line height: 1.6 for content readability
+- Primary text: #333333 (dark gray)
+- Secondary text: #777777 (medium gray)
 
 **Layout:**
-- Navigation bar: Fixed position, full width
-- Content container: Centered with max-width for readability
+- Navigation bar: Fixed position, full width, 50px height
+- Content container: Centered with max-width 95% for readability
 - Responsive design: Adapts to different screen sizes
+- Box shadows: rgba(0,0,0,0.1) for subtle depth
 
 #### Relations
   * derivedFrom: [HTML Export](#html-export)

@@ -191,7 +191,7 @@ if ! grep -q -- "-.->|deriveReqT" "$TEST_DIR/specifications/Requirements.md"; th
 fi
 
 # Check for correct color scheme in diagrams
-if ! grep -q "classDef userRequirement fill:#dbeafe,stroke:#2563EB" "$TEST_DIR/specifications/Requirements.md"; then
+if ! grep -q "classDef userRequirement fill:#bfdbfe,stroke:#1d4ed8" "$TEST_DIR/specifications/Requirements.md"; then
   echo "❌ FAILED: Missing or incorrect userRequirement color definition in Requirements.md diagram"
   exit 1
 fi
@@ -201,7 +201,7 @@ if ! grep -q "classDef systemRequirement fill:#dbeafe,stroke:#2563EB" "$TEST_DIR
   exit 1
 fi
 
-if ! grep -q "classDef verification fill:#d1fae5,stroke:#059669" "$TEST_DIR/specifications/Requirements.md"; then
+if ! grep -q "classDef verification fill:#d4edda,stroke:#006400" "$TEST_DIR/specifications/Requirements.md"; then
   echo "❌ FAILED: Missing or incorrect verification color definition in Requirements.md diagram"
   exit 1
 fi

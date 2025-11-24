@@ -260,11 +260,11 @@ impl<'a> VerificationTraceGenerator<'a> {
         // Header with CSS classes (MBSE color scheme)
         diagram.push_str("```mermaid\n");
         diagram.push_str("graph TD\n");
-        diagram.push_str("  classDef userRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:2px;\n");
-        diagram.push_str("  classDef systemRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:1px;\n");
-        diagram.push_str("  classDef requirement fill:#dbeafe,stroke:#2563EB,stroke-width:1px;\n");
-        diagram.push_str("  classDef verified fill:#dbeafe,stroke:#2563EB,stroke-width:2px;\n");
-        diagram.push_str("  classDef verification fill:#d1fae5,stroke:#059669,stroke-width:2px;\n");
+        diagram.push_str("  classDef userRequirement fill:#bfdbfe,stroke:#1d4ed8,stroke-width:2px;\n");
+        diagram.push_str("  classDef systemRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:1.5px;\n");
+        diagram.push_str("  classDef requirement fill:#dbeafe,stroke:#2563EB,stroke-width:1.5px;\n");
+        diagram.push_str("  classDef verified fill:#bfdbfe,stroke:#1d4ed8,stroke-width:2px;\n");
+        diagram.push_str("  classDef verification fill:#d4edda,stroke:#006400,stroke-width:2px;\n");
         diagram.push_str("\n");
 
         // Add verification node at the top

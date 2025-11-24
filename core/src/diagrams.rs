@@ -220,9 +220,9 @@ impl<'a> ModelDiagramGenerator<'a> {
 
         // Define Mermaid graph styles with MBSE color scheme
         diagram.push_str("  %% Graph styling\n");
-        diagram.push_str("  classDef userRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:2px;\n");
-        diagram.push_str("  classDef systemRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:1px;\n");
-        diagram.push_str("  classDef verification fill:#d1fae5,stroke:#059669,stroke-width:2px;\n");
+        diagram.push_str("  classDef userRequirement fill:#bfdbfe,stroke:#1d4ed8,stroke-width:2px;\n");
+        diagram.push_str("  classDef systemRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:1.5px;\n");
+        diagram.push_str("  classDef verification fill:#d4edda,stroke:#006400,stroke-width:2px;\n");
         diagram.push_str("  classDef folder fill:#f1f5f9,stroke:#64748B,stroke-width:3px;\n");
         diagram.push_str("  classDef file fill:#ffffff,stroke:#64748B,stroke-width:2px;\n");
         diagram.push_str("  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;\n\n");
@@ -395,10 +395,10 @@ fn generate_file_diagram(
 
     // Define Mermaid graph styles
     diagram.push_str("  %% Graph styling\n");
-    diagram.push_str("  classDef userRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:2px;\n");
-    diagram.push_str("  classDef systemRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:1px;\n");
-    diagram.push_str("  classDef verification fill:#d1fae5,stroke:#059669,stroke-width:2px;\n");
-    diagram.push_str("  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;\n\n");
+    diagram.push_str("  classDef userRequirement fill:#bfdbfe,stroke:#1d4ed8,stroke-width:2px;\n");
+    diagram.push_str("  classDef systemRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:1.5px;\n");
+    diagram.push_str("  classDef verification fill:#d4edda,stroke:#006400,stroke-width:2px;\n");
+    diagram.push_str("  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1.5px;\n\n");
 
     let mut included_elements = HashSet::new();
 
@@ -1040,11 +1040,11 @@ pub fn generate_containment_diagram(registry: &GraphRegistry, short: bool) -> Re
 
     // CSS class definitions
     output.push_str("  %% Graph styling\n");
-    output.push_str("  classDef userRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:2px;\n");
-    output.push_str("  classDef systemRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:1px;\n");
-    output.push_str("  classDef requirement fill:#dbeafe,stroke:#2563EB,stroke-width:1px;\n");
-    output.push_str("  classDef verification fill:#d1fae5,stroke:#059669,stroke-width:2px;\n");
-    output.push_str("  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;\n");
+    output.push_str("  classDef userRequirement fill:#bfdbfe,stroke:#1d4ed8,stroke-width:2px;\n");
+    output.push_str("  classDef systemRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:1.5px;\n");
+    output.push_str("  classDef requirement fill:#dbeafe,stroke:#2563EB,stroke-width:1.5px;\n");
+    output.push_str("  classDef verification fill:#d4edda,stroke:#006400,stroke-width:2px;\n");
+    output.push_str("  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1.5px;\n");
     output.push_str("  classDef folder fill:#f1f5f9,stroke:#64748B,stroke-width:2px;\n");
     output.push_str("  classDef file fill:#fef3c7,stroke:#D97706,stroke-width:2px;\n\n");
 

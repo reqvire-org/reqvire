@@ -14,32 +14,32 @@ pub const EMBEDDED_STYLES: &str = r#"
 :root {
     /* Primary Colors */
     --color-primary: #1E3A5F;           /* Deep Sapphire - navigation, headers */
-    --color-primary-hover: #2a4a73;     /* Lighter shade for hover states */
-    --color-primary-active: #15293f;    /* Darker shade for active states */
+    --color-primary-hover: #265280;     /* Lighter shade for hover states */
+    --color-primary-active: #152737;    /* Darker shade for active states */
 
     /* Element Type Colors */
     --color-requirement: #2563EB;       /* Royal Blue */
-    --color-verification: #059669;      /* Emerald */
-    --color-design: #7C3AED;            /* Purple */
+    --color-verification: #006400;      /* Dark Emerald */
+    --color-design: #4B0082;            /* Indigo */
     --color-test: #0891B2;              /* Teal */
     --color-implementation: #D97706;    /* Amber */
     --color-external: #64748B;          /* Slate */
 
     /* Status Colors */
-    --color-verified: #059669;          /* Emerald - verified/passing */
+    --color-verified: #006400;          /* Dark Emerald - verified/passing */
     --color-pending: #D97706;           /* Amber - pending/warning */
-    --color-error: #DC2626;             /* Rose - error/failed */
+    --color-error: #FF6B6B;             /* Coral Red - error/failed */
 
     /* Interactive Colors */
     --color-highlight: #ff6b6b;         /* Hover highlight */
-    --color-link: #0366d6;              /* Link color */
+    --color-link: #2563EB;              /* Royal Blue - link color */
 }
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
     line-height: 1.6;
     margin: 0;
     padding: 0;
-    background-color: #f8f9fa;
+    background-color: #F5F5F5;
     color: #333;
 }
 .reqvire-nav {
@@ -90,13 +90,13 @@ body {
 }
 h1 {
     color: #333;
-    border-bottom: 2px solid #eaecef;
+    border-bottom: 2px solid #e0e0e0;
     padding-bottom: 10px;
     margin-top: 0;
 }
 h2 {
     color: #333;
-    border-bottom: 1px solid #eaecef;
+    border-bottom: 1px solid #e0e0e0;
     padding-bottom: 5px;
 }
 h3 {
@@ -120,7 +120,7 @@ table {
     margin: 20px 0;
 }
 table, th, td {
-    border: 1px solid #dfe2e5;
+    border: 1px solid #ced4da;
 }
 th, td {
     padding: 8px 12px;
@@ -150,7 +150,7 @@ blockquote {
     margin: 0;
     padding: 0 15px;
     color: #777;
-    border-left: 4px solid #dfe2e5;
+    border-left: 4px solid #ced4da;
 }
 .mermaid {
     margin: 20px 0;
@@ -159,7 +159,7 @@ blockquote {
     width: 100%;
     overflow: hidden;
     position: relative;
-    border: 1px solid #dfe2e5;
+    border: 1px solid #ced4da;
     border-radius: 3px;
     background-color: #fafafa;
     display: flex;

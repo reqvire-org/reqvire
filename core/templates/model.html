@@ -394,7 +394,7 @@
                     node.addEventListener('mouseenter', function(e) {
                         e.stopPropagation();
                         nodes.forEach(function(n) { n.style.filter = ''; });
-                        node.style.filter = 'drop-shadow(0 0 6px #ff6b6b)';
+                        node.style.filter = 'drop-shadow(0 0 8px rgba(255, 107, 107, 0.7))';
 
                         // Find upstream (ancestors) and downstream (descendants) separately
                         var upstream = findUpstream(hashId);

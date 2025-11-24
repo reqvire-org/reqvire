@@ -114,29 +114,49 @@ Diagram generation follows a file-based approach:
 - The diagram shows all elements in the file and their relationships
 - External related resources are displayed as linked boxes to the actual resource
 
+**Diagram Node Classes:**
+The system shall use Mermaid CSS classes to style diagram elements with differentiated colors:
+
+| Class Name | Fill Color | Stroke Color | Stroke Width | Usage |
+|------------|------------|--------------|--------------|-------|
+| userRequirement | #bfdbfe (darker blue) | #1d4ed8 | 2px | Top-level user requirements |
+| systemRequirement | #dbeafe (light blue) | #2563EB | 1.5px | System-level requirements |
+| requirement | #dbeafe (light blue) | #2563EB | 1.5px | Generic requirements |
+| verified | #bfdbfe (darker blue) | #1d4ed8 | 2px | Directly verified requirements |
+| verification | #d4edda (light green) | #006400 | 2px | Verification elements |
+| folder | #f1f5f9 (light slate) | #64748B | 2-3px | Folder containers |
+| file | #ffffff / #fef3c7 | #64748B / #D97706 | 2px | File containers |
+| default | #f5f5f5 (light gray) | #333333 | 1.5px | Default/fallback styling |
+
 **Element Type Color Scheme:**
 The system shall use the following color scheme for rendering diagram elements:
 
 | Element Type | Color Name | Hex Code | Usage |
-|-------------|------------|----------|-------|
-| Requirement | Royal Blue | #2563EB | Requirement elements (refines, derives relations) |
-| Verification | Emerald | #059669 | Verification elements that verify requirements |
-| Design Element | Purple | #7C3AED | Design and architecture elements |
-| Test Case | Teal | #0891B2 | Test implementation elements |
-| Implementation | Amber | #D97706 | Resources which satisfy requirements |
-| External Reference | Slate | #64748B | Elements in other files (linked boxes) |
+|--------------|------------|----------|-------|
+| Requirement | Royal Blue | #2563EB | Core requirements, goals |
+| Verification | Dark Emerald | #006400 | Validation criteria, testing completion |
+| Design Element | Indigo | #4B0082 | Design specifications, architectural elements |
+| Test Case | Teal | #0891B2 | Test cases, test plans |
+| Implementation | Amber | #D97706 | Code implementation, deployment |
+| External Reference | Slate Gray | #64748B | Elements in other files (linked boxes) |
 
 **Relation Line Colors:**
 | Relation Type | Color | Style |
 |--------------|-------|-------|
 | Derive/DerivedFrom | #2563EB | Dashed |
-| Verify/VerifiedBy | #059669 | Dashed |
+| Verify/VerifiedBy | #006400 | Dashed |
 | Satisfy/SatisfiedBy | #D97706 | Solid |
 | Trace | #64748B | Dashed |
 
 **Interactive Highlighting:**
-- Hovered element: Red drop-shadow glow (#ff6b6b)
-- Connected edges: Highlighted stroke (#ff6b6b) with increased width
+| Effect | Color | Implementation |
+|--------|-------|----------------|
+| Hovered node | Coral Red | drop-shadow(0 0 8px rgba(255,107,107,0.7)) |
+| Connected edges | Coral Red | stroke: #ff6b6b with increased width |
+
+**Diagram Background:**
+- Canvas background: #fafafa (light gray)
+- Border: 1px solid #ced4da
 
 #### Metadata
   * type: user-requirement

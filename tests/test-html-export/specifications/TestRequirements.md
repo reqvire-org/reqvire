@@ -16,7 +16,7 @@ The system SHALL support HTML export functionality with proper link handling.
 graph LR;
   %% Graph styling
   classDef requirement fill:#dbeafe,stroke:#2563EB,stroke-width:1px;
-  classDef verification fill:#d1fae5,stroke:#059669,stroke-width:1px;
+  classDef verification fill:#d4edda,stroke:#006400,stroke-width:1px;
   classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
   classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
 

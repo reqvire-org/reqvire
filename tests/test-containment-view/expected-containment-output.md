@@ -3,11 +3,11 @@
 ```mermaid
 graph TD
   %% Graph styling
-  classDef userRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:2px;
-  classDef systemRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:1px;
-  classDef requirement fill:#dbeafe,stroke:#2563EB,stroke-width:1px;
-  classDef verification fill:#d1fae5,stroke:#059669,stroke-width:2px;
-  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+  classDef userRequirement fill:#bfdbfe,stroke:#1d4ed8,stroke-width:2px;
+  classDef systemRequirement fill:#dbeafe,stroke:#2563EB,stroke-width:1.5px;
+  classDef requirement fill:#dbeafe,stroke:#2563EB,stroke-width:1.5px;
+  classDef verification fill:#d4edda,stroke:#006400,stroke-width:2px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1.5px;
   classDef folder fill:#f1f5f9,stroke:#64748B,stroke-width:2px;
   classDef file fill:#fef3c7,stroke:#D97706,stroke-width:2px;
 
