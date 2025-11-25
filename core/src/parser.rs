@@ -571,11 +571,17 @@ pub fn parse_elements(
                             // Element identifiers contain '#' (e.g., "File.md#element-name" or "#element-name")
                             let target = if href.contains('#') {
                                 // This is an element identifier - normalize it like relation targets
+                                // For same-file references (starting with #), prepend current file path
+                                let href_to_normalize = if href.starts_with('#') {
+                                    format!("{}{}", file, href)
+                                } else {
+                                    href.clone()
+                                };
                                 let file_dir = file_path
                                     .parent()
                                     .unwrap_or_else(|| Path::new("."))
                                     .to_path_buf();
-                                match utils::normalize_identifier(&href, &file_dir) {
+                                match utils::normalize_identifier(&href_to_normalize, &file_dir) {
                                     Ok(normalized) => AttachmentTarget::ElementIdentifier(normalized),
                                     Err(e) => {
                                         let msg = format!(
