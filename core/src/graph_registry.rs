@@ -100,6 +100,9 @@ impl GraphRegistry {
         // Validate attachments exist
         errors.extend(self.validate_attachments()?);
 
+        // Validate Refinement elements have no relations
+        errors.extend(self.validate_refinement_elements()?);
+
         Ok(errors)
     }
 
@@ -452,6 +455,44 @@ impl GraphRegistry {
             debug!("No attachment validation errors found.");
         } else {
             debug!("{} attachment validation errors found.", errors.len());
+        }
+
+        Ok(errors)
+    }
+
+    /// Validate Refinement element constraints
+    /// Refinement elements (constraint, behavior, specification) cannot have Relations subsection
+    fn validate_refinement_elements(&self) -> Result<Vec<ReqvireError>, ReqvireError> {
+        debug!("Validating Refinement element constraints...");
+        let mut errors = Vec::new();
+
+        for element_node in self.nodes.values() {
+            let element = &element_node.element;
+
+            // Check if this is a Refinement element type
+            if element.element_type.is_refinement() {
+                // Refinement elements cannot have user-created relations
+                let user_relations: Vec<_> = element.relations.iter()
+                    .filter(|r| r.user_created)
+                    .collect();
+
+                if !user_relations.is_empty() {
+                    errors.push(ReqvireError::InvalidMarkdownStructure(
+                        format!(
+                            "File {}: Refinement element '{}' (type: {}) cannot have Relations subsection. Refinement elements are documentation-only and cannot have relations.",
+                            element.file_path,
+                            element.name,
+                            element.element_type.as_str()
+                        ),
+                    ));
+                }
+            }
+        }
+
+        if errors.is_empty() {
+            debug!("No Refinement element validation errors found.");
+        } else {
+            debug!("{} Refinement element validation errors found.", errors.len());
         }
 
         Ok(errors)
