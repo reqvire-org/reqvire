@@ -230,10 +230,13 @@ pub enum Commands {
     },
 
     /// Add new element to model from Markdown definition
-    #[clap(override_help = "Add new element to model from Markdown definition\n\nADD OPTIONS:\n       <FILE>                    Target file path (relative to git repository root)\n      --dry-run                  Preview changes without applying\n      --json                     Output results in JSON format\n\nUSAGE:\n    reqvire add <file>           # reads element from stdin")]
+    #[clap(override_help = "Add new element to model from Markdown definition\n\nADD OPTIONS:\n       <FILE>                    Target file path (relative to git repository root)\n       [INDEX]                   Index within file (0-based, defaults to end)\n      --dry-run                  Preview changes without applying\n      --json                     Output results in JSON format\n\nUSAGE:\n    reqvire add <file> [<index>]  # reads element from stdin")]
     Add {
         /// Target file path (relative to git repository root)
         file: String,
+
+        /// Index within file (0-based, defaults to end)
+        index: Option<usize>,
 
         /// Preview changes without applying
         #[clap(long, help_heading = "ADD OPTIONS")]
@@ -875,7 +878,7 @@ pub fn handle_command(
 
             return Ok(0);
         },
-        Some(Commands::Add { file, dry_run, json }) => {
+        Some(Commands::Add { file, index, dry_run, json }) => {
             // Read element markdown from stdin
             use std::io::Read;
             let mut element_markdown = String::new();
@@ -893,7 +896,7 @@ pub fn handle_command(
                 &mut model_manager,
                 &element_markdown,
                 &file,
-                None,  // index not supported in positional-only mode
+                index,
                 excluded_filename_patterns,
                 &current_dir,
                 &git_root,

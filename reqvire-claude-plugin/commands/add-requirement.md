@@ -78,6 +78,17 @@ ${1:-The user will provide requirement details.}
    EOF
    ```
 
+   Optional: Insert at specific position (0-based index):
+   ```bash
+   reqvire add "<file-path>" 0 <<'EOF'
+   ...
+   EOF
+   ```
+
+   Alternative using pipe:
+   ```bash
+   cat element.md | reqvire add "<file-path>"
+   ```
 
    The add command automatically:
    - Validates markdown format

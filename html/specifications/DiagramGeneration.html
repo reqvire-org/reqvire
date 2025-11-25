@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiagramGeneration</title>
+    
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa;
+    color: #333;
+}
+.reqvire-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    background-color: #2c3e50;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+}
+.reqvire-nav a {
+    color: #ecf0f1;
+    text-decoration: none;
+    padding: 10px 20px;
+    margin-right: 5px;
+    border-radius: 3px;
+    transition: background-color 0.2s;
+}
+.reqvire-nav a:hover {
+    background-color: #34495e;
+}
+.reqvire-nav-spacer {
+    height: 50px;
+}
+.container {
+    max-width: 95%;
+    margin: 0 auto;
+    padding: 20px;
+}
+.content {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+h1 {
+    color: #333;
+    border-bottom: 2px solid #eaecef;
+    padding-bottom: 10px;
+    margin-top: 0;
+}
+h2 {
+    color: #333;
+    border-bottom: 1px solid #eaecef;
+    padding-bottom: 5px;
+}
+h3 {
+    color: #1a6fb7;
+    margin-top: 25px;
+}
+h4 {
+    color: #555;
+    font-weight: 600;
+}
+a {
+    color: #0366d6;
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 20px 0;
+}
+table, th, td {
+    border: 1px solid #dfe2e5;
+}
+th, td {
+    padding: 8px 12px;
+    text-align: left;
+}
+th {
+    background-color: #f6f8fa;
+}
+code {
+    background: #f6f8fa;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 90%;
+}
+pre {
+    background: #f6f8fa;
+    border-radius: 3px;
+    padding: 16px;
+    overflow: auto;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+}
+blockquote {
+    margin: 0;
+    padding: 0 15px;
+    color: #777;
+    border-left: 4px solid #dfe2e5;
+}
+.mermaid {
+    margin: 20px 0;
+    text-align: center;
+    height: calc(100vh - 150px);
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid #dfe2e5;
+    border-radius: 3px;
+    background-color: #fafafa;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+.mermaid svg {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    position: relative;
+    z-index: 1;
+}
+.diagram-nav-buttons {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 999; /* higher than SVG (1) but lower than header nav (1000) */
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 5px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+.diagram-nav-row {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+}
+.diagram-nav-btn {
+    width: 32px;
+    height: 32px;
+    background-color: #2c3e50;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.diagram-nav-btn:hover {
+    background-color: #34495e;
+}
+.diagram-nav-btn:active {
+    background-color: #1a252f;
+}
+</style>
+
+    <!-- Enhanced mermaid configuration for Reqvire diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.5.0/dist/svg-pan-zoom.min.js"></script>
+    <script>
+        // Capture Mermaid errors
+        mermaid.parseError = function(err, hash) {
+            console.error('Mermaid Parse Error:', err);
+            console.error('Error details:', {
+                str: err.str,
+                hash: err.hash,
+                message: err.message,
+                stack: err.stack
+            });
+        };
+
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            maxTextSize: 120000,
+            maxEdges: 2000,
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            securityLevel: 'loose',
+            logLevel: 'error'
+        });
+
+        // Add pan/zoom to all Mermaid diagrams after rendering
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                document.querySelectorAll('.mermaid').forEach(function(mermaidContainer) {
+                    var svg = mermaidContainer.querySelector('svg');
+                    if (!svg) return;
+
+                    svg.style.maxWidth = 'none';
+                    svg.style.maxHeight = 'none';
+
+                    var eventsHandler = {
+                        haltEventListeners: ['touchstart', 'touchend', 'touchmove', 'touchleave', 'touchcancel'],
+                        init: function(options) {
+                            var instance = options.instance;
+                            var initialScale = 1;
+                            var pannedX = 0;
+                            var pannedY = 0;
+
+                            this.hammer = Hammer(options.svgElement, {
+                                inputClass: Hammer.SUPPORT_POINTER_EVENTS ? Hammer.PointerEventInput : Hammer.TouchInput
+                            });
+
+                            this.hammer.get('pinch').set({enable: true});
+
+                            this.hammer.on('doubletap', function(ev){
+                                instance.zoomIn();
+                            });
+
+                            this.hammer.on('panstart panmove', function(ev){
+                                if (ev.type === 'panstart') {
+                                    pannedX = 0;
+                                    pannedY = 0;
+                                }
+                                instance.panBy({x: ev.deltaX - pannedX, y: ev.deltaY - pannedY});
+                                pannedX = ev.deltaX;
+                                pannedY = ev.deltaY;
+                            });
+
+                            this.hammer.on('pinchstart pinchmove', function(ev){
+                                if (ev.type === 'pinchstart') {
+                                    initialScale = instance.getZoom();
+                                }
+                                instance.zoomAtPoint(initialScale * ev.scale, {x: ev.center.x, y: ev.center.y});
+                            });
+
+                            options.svgElement.addEventListener('touchmove', function(e){ e.preventDefault(); });
+                        },
+                        destroy: function(){
+                            this.hammer.destroy();
+                        }
+                    };
+
+                    // Diagrams with default zoom (no auto-fit)
+                    var panZoomInstance = svgPanZoom(svg, {
+                        zoomEnabled: true,
+                        controlIconsEnabled: true,
+                        fit: false,
+                        center: false,
+                        contain: false,
+                        minZoom: 0.5,
+                        maxZoom: 10,
+                        zoomScaleSensitivity: 0.3,
+                        customEventsHandler: eventsHandler
+                    });
+
+                    // Add navigation buttons
+                    var navButtons = document.createElement('div');
+                    navButtons.className = 'diagram-nav-buttons';
+                    navButtons.innerHTML = `
+                        <div class="diagram-nav-row">
+                            <button class="diagram-nav-btn" data-action="up">▲</button>
+                        </div>
+                        <div class="diagram-nav-row">
+                            <button class="diagram-nav-btn" data-action="left">◀</button>
+                            <button class="diagram-nav-btn" data-action="down">▼</button>
+                            <button class="diagram-nav-btn" data-action="right">▶</button>
+                        </div>
+                    `;
+                    mermaidContainer.appendChild(navButtons);
+
+                    // Wire up navigation buttons
+                    var panStep = 100;
+                    navButtons.querySelectorAll('.diagram-nav-btn').forEach(function(btn) {
+                        btn.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            var action = this.getAttribute('data-action');
+                            switch(action) {
+                                case 'up':
+                                    panZoomInstance.panBy({x: 0, y: panStep});
+                                    break;
+                                case 'down':
+                                    panZoomInstance.panBy({x: 0, y: -panStep});
+                                    break;
+                                case 'left':
+                                    panZoomInstance.panBy({x: panStep, y: 0});
+                                    break;
+                                case 'right':
+                                    panZoomInstance.panBy({x: -panStep, y: 0});
+                                    break;
+                            }
+                        });
+                    });
+                });
+            }, 1500);
+        });
+    </script>
+</head>
+<body>
+    <nav class="reqvire-nav">
+        <a href="../index.html">Home</a>
+        <a href="../model.html">Model</a>
+        <a href="../whole-model.html">Whole Model</a>
+        <a href="../traces.html">Traces</a>
+        <a href="../coverage.html">Coverage</a>
+    </nav>
+    <div class="reqvire-nav-spacer"></div>
+    <div class="container">
+        <div class="content">
+            <h1 id="generate-diagrams">Generate Diagrams</h1>
+<h2 id="requirements">Requirements</h2>
+<div class="mermaid">graph LR;
+  %% REQVIRE-AUTOGENERATED-DIAGRAM
+  %% Graph styling
+  classDef userRequirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef systemRequirement fill:#fce4e4,stroke:#e68a8a,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+
+  5575b01daa5155ad[&quot;Complete Model Structure Visualization&quot;];
+  class 5575b01daa5155ad userRequirement;
+  click 5575b01daa5155ad &quot;DiagramGeneration.html#complete-model-structure-visualization&quot;;
+  d9257e6077381f1c[&quot;Model-Centric View Generation&quot;];
+  class d9257e6077381f1c systemRequirement;
+  click d9257e6077381f1c &quot;ReqvireTool/UserInterface/WebInterface.html#model-centric-view-generation&quot;;
+  5575b01daa5155ad -.->|deriveReqT| d9257e6077381f1c;
+  d64c45036b5300a[&quot;Interactive Mermaid Diagrams&quot;];
+  class d64c45036b5300a userRequirement;
+  click d64c45036b5300a &quot;DiagramGeneration.html#interactive-mermaid-diagrams&quot;;
+  4538e809d640b93a[&quot;Diagram Generation&quot;];
+  class 4538e809d640b93a systemRequirement;
+  click 4538e809d640b93a &quot;ReqvireTool/ModelManagement/DiagramGeneration.html#diagram-generation&quot;;
+  d64c45036b5300a -.->|deriveReqT| 4538e809d640b93a;
+  58b20ede35a77731[&quot;Model Visualization and Exploration&quot;];
+  class 58b20ede35a77731 userRequirement;
+  click 58b20ede35a77731 &quot;DiagramGeneration.html#model-visualization-and-exploration&quot;;
+  65754948eae2de4c[&quot;CLI Model Diagram Command&quot;];
+  class 65754948eae2de4c systemRequirement;
+  click 65754948eae2de4c &quot;ReqvireTool/UserInterface/CLI.html#cli-model-diagram-command&quot;;
+  58b20ede35a77731 -.->|deriveReqT| 65754948eae2de4c;
+  58b20ede35a77731 -.->|deriveReqT| d9257e6077381f1c;
+  2b95c07a4d55debd[&quot;Remove Generated Diagrams&quot;];
+  class 2b95c07a4d55debd userRequirement;
+  click 2b95c07a4d55debd &quot;DiagramGeneration.html#remove-generated-diagrams&quot;;
+  cd0997e703de4cff[&quot;Diagram Removal&quot;];
+  class cd0997e703de4cff systemRequirement;
+  click cd0997e703de4cff &quot;ReqvireTool/ModelManagement/DiagramGeneration.html#diagram-removal&quot;;
+  2b95c07a4d55debd -.->|deriveReqT| cd0997e703de4cff;
+  c1bbfdadfce7e10a[&quot;Deterministic Output for All Generated Content&quot;];
+  class c1bbfdadfce7e10a systemRequirement;
+  click c1bbfdadfce7e10a &quot;ReqvireTool/ValidationAndReporting/Reports.html#deterministic-output-for-all-generated-content&quot;;
+  c1bbfdadfce7e10a -.->|deriveReqT| 5575b01daa5155ad;
+  c1bbfdadfce7e10a -.->|deriveReqT| d64c45036b5300a;
+  c1bbfdadfce7e10a -.->|deriveReqT| 58b20ede35a77731;
+  fc4865d1e9b57596[&quot;Change Impact Analysis&quot;];
+  class fc4865d1e9b57596 userRequirement;
+  click fc4865d1e9b57596 &quot;Reports.html#change-impact-analysis&quot;;
+  c1bbfdadfce7e10a -.->|deriveReqT| fc4865d1e9b57596;
+  8ebc9188f44f7785[&quot;Model Structure and Summaries&quot;];
+  class 8ebc9188f44f7785 userRequirement;
+  click 8ebc9188f44f7785 &quot;Reports.html#model-structure-and-summaries&quot;;
+  c1bbfdadfce7e10a -.->|deriveReqT| 8ebc9188f44f7785;
+  13b1d75fa43ceda2[&quot;Provide Validation Reports&quot;];
+  class 13b1d75fa43ceda2 userRequirement;
+  click 13b1d75fa43ceda2 &quot;Reports.html#provide-validation-reports&quot;;
+  c1bbfdadfce7e10a -.->|deriveReqT| 13b1d75fa43ceda2;
+  30c2f7b2360f1dc9[&quot;Verification Coverage Report&quot;];
+  class 30c2f7b2360f1dc9 userRequirement;
+  click 30c2f7b2360f1dc9 &quot;Reports.html#verification-coverage-report&quot;;
+  c1bbfdadfce7e10a -.->|deriveReqT| 30c2f7b2360f1dc9;
+  a43a5abca24c066c[&quot;HTML Export&quot;];
+  class a43a5abca24c066c systemRequirement;
+  click a43a5abca24c066c &quot;ReqvireTool/UserInterface/WebInterface.html#html-export&quot;;
+  c1bbfdadfce7e10a -.->|deriveReqT| a43a5abca24c066c;
+  c3ea27eb9d610e25[&quot;Model Linting&quot;];
+  class c3ea27eb9d610e25 userRequirement;
+  click c3ea27eb9d610e25 &quot;Validation.html#model-linting&quot;;
+  c1bbfdadfce7e10a -.->|deriveReqT| c3ea27eb9d610e25;
+  37a5b8e199a838f[&quot;Generate Diagrams&quot;];
+  class 37a5b8e199a838f userRequirement;
+  click 37a5b8e199a838f &quot;UserStories.html#generate-diagrams&quot;;
+  37a5b8e199a838f -.->|deriveReqT| 5575b01daa5155ad;
+  37a5b8e199a838f -.->|deriveReqT| d64c45036b5300a;
+  37a5b8e199a838f -.->|deriveReqT| 58b20ede35a77731;
+  37a5b8e199a838f -.->|deriveReqT| 2b95c07a4d55debd;
+  2c5f30f14e792200[&quot;MOE_UA&quot;];
+  class 2c5f30f14e792200 default;
+  click 2c5f30f14e792200 &quot;MOEs.html#moe_ua&quot;;
+  37a5b8e199a838f -.->|trace| 2c5f30f14e792200;
+</div>
+<h3 id="interactive-mermaid-diagrams">Interactive Mermaid Diagrams</h3>
+<p>The system shall produce visual representations of relationships within the MBSE model in the form of Mermaid diagrams, enabling users to explore relations and understand dependencies and their impact.</p>
+<h4>Details</h4>
+<p>Diagrams must be broken into several diagrams using following logic:</p>
+<ul>
+<li>requirements_file_name/‘## section name’
+<ul>
+<li>all requirements inside are 1 diagram</li>
+<li>if requirements documents doesn’t have ‘##’ paragraphs then requirements file name is used only</li>
+<li>external related resources box must be a link to actual resource</li>
+</ul>
+</li>
+</ul>
+<p>Color code for rendering diagrams:</p>
+<ul>
+<li>red for requirement</li>
+<li>yellow for resources which satisfies requirement</li>
+<li>green for verifiction which verifies requirement</li>
+<li>light blue for box representing another diagram/category with requirments where linked requirement or resource exist.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="UserStories.html#generate-diagrams">Generate Diagrams</a></li>
+<li>derivedFrom: <a href="ReqvireTool/ValidationAndReporting/Reports.html#deterministic-output-for-all-generated-content">Deterministic Output for All Generated Content</a></li>
+</ul>
+<hr />
+<h3 id="remove-generated-diagrams">Remove Generated Diagrams</h3>
+<p>The system shall provide functionality to remove all generated Mermaid diagrams from the model, allowing users to clean up generated artifacts when needed.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="UserStories.html#generate-diagrams">Generate Diagrams</a></li>
+</ul>
+<hr />
+<h3 id="complete-model-structure-visualization">Complete Model Structure Visualization</h3>
+<p>The system shall provide visualization of the complete model structure showing an element-centric view with nested relations.</p>
+<h4>Details</h4>
+<p>The visualization shall:</p>
+<ul>
+<li>Display elements with their properties (identifier, name, type, file location, section)</li>
+<li>Show relations nested inside elements with full target details</li>
+<li>Support recursive nesting for element-to-element relations</li>
+<li>Handle file path and external URL relations</li>
+<li>Provide metadata about total elements and relations</li>
+<li>Use consistent visual styling with mermaid diagrams showing hash-based node identifiers</li>
+</ul>
+<p>The visualization helps users understand the model’s logical structure, navigate relationships between elements, and explore the model from any starting point.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="UserStories.html#generate-diagrams">Generate Diagrams</a></li>
+<li>derivedFrom: <a href="ReqvireTool/ValidationAndReporting/Reports.html#deterministic-output-for-all-generated-content">Deterministic Output for All Generated Content</a></li>
+</ul>
+<hr />
+<h3 id="model-visualization-and-exploration">Model Visualization and Exploration</h3>
+<p>Users shall be able to generate and view model structure diagrams from any starting point of the model.</p>
+<h4>Details</h4>
+<ul>
+<li>Generate complete model structure with nested relations showing element details recursively</li>
+<li>Default view shows root requirements (no hierarchical parent)</li>
+<li>Filter from specific element using –from flag</li>
+<li>View both JSON and markdown output formats</li>
+<li>Nested structure shows relations with full target details</li>
+<li>Mermaid diagrams display all nested relations recursively</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="UserStories.html#generate-diagrams">Generate Diagrams</a></li>
+<li>derivedFrom: <a href="ReqvireTool/ValidationAndReporting/Reports.html#deterministic-output-for-all-generated-content">Deterministic Output for All Generated Content</a></li>
+</ul>
+<hr />
+
+        </div>
+    </div>
+</body>
+</html>

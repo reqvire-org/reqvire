@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validation</title>
+    
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa;
+    color: #333;
+}
+.reqvire-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    background-color: #2c3e50;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+}
+.reqvire-nav a {
+    color: #ecf0f1;
+    text-decoration: none;
+    padding: 10px 20px;
+    margin-right: 5px;
+    border-radius: 3px;
+    transition: background-color 0.2s;
+}
+.reqvire-nav a:hover {
+    background-color: #34495e;
+}
+.reqvire-nav-spacer {
+    height: 50px;
+}
+.container {
+    max-width: 95%;
+    margin: 0 auto;
+    padding: 20px;
+}
+.content {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+h1 {
+    color: #333;
+    border-bottom: 2px solid #eaecef;
+    padding-bottom: 10px;
+    margin-top: 0;
+}
+h2 {
+    color: #333;
+    border-bottom: 1px solid #eaecef;
+    padding-bottom: 5px;
+}
+h3 {
+    color: #1a6fb7;
+    margin-top: 25px;
+}
+h4 {
+    color: #555;
+    font-weight: 600;
+}
+a {
+    color: #0366d6;
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 20px 0;
+}
+table, th, td {
+    border: 1px solid #dfe2e5;
+}
+th, td {
+    padding: 8px 12px;
+    text-align: left;
+}
+th {
+    background-color: #f6f8fa;
+}
+code {
+    background: #f6f8fa;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 90%;
+}
+pre {
+    background: #f6f8fa;
+    border-radius: 3px;
+    padding: 16px;
+    overflow: auto;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+}
+blockquote {
+    margin: 0;
+    padding: 0 15px;
+    color: #777;
+    border-left: 4px solid #dfe2e5;
+}
+.mermaid {
+    margin: 20px 0;
+    text-align: center;
+    height: calc(100vh - 150px);
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid #dfe2e5;
+    border-radius: 3px;
+    background-color: #fafafa;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+.mermaid svg {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    position: relative;
+    z-index: 1;
+}
+.diagram-nav-buttons {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 999; /* higher than SVG (1) but lower than header nav (1000) */
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 5px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+.diagram-nav-row {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+}
+.diagram-nav-btn {
+    width: 32px;
+    height: 32px;
+    background-color: #2c3e50;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.diagram-nav-btn:hover {
+    background-color: #34495e;
+}
+.diagram-nav-btn:active {
+    background-color: #1a252f;
+}
+</style>
+
+    <!-- Enhanced mermaid configuration for Reqvire diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.5.0/dist/svg-pan-zoom.min.js"></script>
+    <script>
+        // Capture Mermaid errors
+        mermaid.parseError = function(err, hash) {
+            console.error('Mermaid Parse Error:', err);
+            console.error('Error details:', {
+                str: err.str,
+                hash: err.hash,
+                message: err.message,
+                stack: err.stack
+            });
+        };
+
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            maxTextSize: 120000,
+            maxEdges: 2000,
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            securityLevel: 'loose',
+            logLevel: 'error'
+        });
+
+        // Add pan/zoom to all Mermaid diagrams after rendering
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                document.querySelectorAll('.mermaid').forEach(function(mermaidContainer) {
+                    var svg = mermaidContainer.querySelector('svg');
+                    if (!svg) return;
+
+                    svg.style.maxWidth = 'none';
+                    svg.style.maxHeight = 'none';
+
+                    var eventsHandler = {
+                        haltEventListeners: ['touchstart', 'touchend', 'touchmove', 'touchleave', 'touchcancel'],
+                        init: function(options) {
+                            var instance = options.instance;
+                            var initialScale = 1;
+                            var pannedX = 0;
+                            var pannedY = 0;
+
+                            this.hammer = Hammer(options.svgElement, {
+                                inputClass: Hammer.SUPPORT_POINTER_EVENTS ? Hammer.PointerEventInput : Hammer.TouchInput
+                            });
+
+                            this.hammer.get('pinch').set({enable: true});
+
+                            this.hammer.on('doubletap', function(ev){
+                                instance.zoomIn();
+                            });
+
+                            this.hammer.on('panstart panmove', function(ev){
+                                if (ev.type === 'panstart') {
+                                    pannedX = 0;
+                                    pannedY = 0;
+                                }
+                                instance.panBy({x: ev.deltaX - pannedX, y: ev.deltaY - pannedY});
+                                pannedX = ev.deltaX;
+                                pannedY = ev.deltaY;
+                            });
+
+                            this.hammer.on('pinchstart pinchmove', function(ev){
+                                if (ev.type === 'pinchstart') {
+                                    initialScale = instance.getZoom();
+                                }
+                                instance.zoomAtPoint(initialScale * ev.scale, {x: ev.center.x, y: ev.center.y});
+                            });
+
+                            options.svgElement.addEventListener('touchmove', function(e){ e.preventDefault(); });
+                        },
+                        destroy: function(){
+                            this.hammer.destroy();
+                        }
+                    };
+
+                    // Diagrams with default zoom (no auto-fit)
+                    var panZoomInstance = svgPanZoom(svg, {
+                        zoomEnabled: true,
+                        controlIconsEnabled: true,
+                        fit: false,
+                        center: false,
+                        contain: false,
+                        minZoom: 0.5,
+                        maxZoom: 10,
+                        zoomScaleSensitivity: 0.3,
+                        customEventsHandler: eventsHandler
+                    });
+
+                    // Add navigation buttons
+                    var navButtons = document.createElement('div');
+                    navButtons.className = 'diagram-nav-buttons';
+                    navButtons.innerHTML = `
+                        <div class="diagram-nav-row">
+                            <button class="diagram-nav-btn" data-action="up">▲</button>
+                        </div>
+                        <div class="diagram-nav-row">
+                            <button class="diagram-nav-btn" data-action="left">◀</button>
+                            <button class="diagram-nav-btn" data-action="down">▼</button>
+                            <button class="diagram-nav-btn" data-action="right">▶</button>
+                        </div>
+                    `;
+                    mermaidContainer.appendChild(navButtons);
+
+                    // Wire up navigation buttons
+                    var panStep = 100;
+                    navButtons.querySelectorAll('.diagram-nav-btn').forEach(function(btn) {
+                        btn.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            var action = this.getAttribute('data-action');
+                            switch(action) {
+                                case 'up':
+                                    panZoomInstance.panBy({x: 0, y: panStep});
+                                    break;
+                                case 'down':
+                                    panZoomInstance.panBy({x: 0, y: -panStep});
+                                    break;
+                                case 'left':
+                                    panZoomInstance.panBy({x: panStep, y: 0});
+                                    break;
+                                case 'right':
+                                    panZoomInstance.panBy({x: -panStep, y: 0});
+                                    break;
+                            }
+                        });
+                    });
+                });
+            }, 1500);
+        });
+    </script>
+</head>
+<body>
+    <nav class="reqvire-nav">
+        <a href="../../../index.html">Home</a>
+        <a href="../../../model.html">Model</a>
+        <a href="../../../whole-model.html">Whole Model</a>
+        <a href="../../../traces.html">Traces</a>
+        <a href="../../../coverage.html">Coverage</a>
+    </nav>
+    <div class="reqvire-nav-spacer"></div>
+    <div class="container">
+        <div class="content">
+            <h1 id="two-pass-validation-architecture">Two-Pass Validation Architecture</h1>
+<h2 id="overview">Overview</h2>
+<div class="mermaid">graph LR;
+  %% REQVIRE-AUTOGENERATED-DIAGRAM
+  %% Graph styling
+  classDef userRequirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef systemRequirement fill:#fce4e4,stroke:#e68a8a,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+
+  e1d08514a32ae308[&quot;GraphRegistry as Primary Registry&quot;];
+  class e1d08514a32ae308 systemRequirement;
+  click e1d08514a32ae308 &quot;Validation.html#graphregistry-as-primary-registry&quot;;
+  b7c871ab64a7059a[&quot;graph_registry.rs&quot;];
+  class b7c871ab64a7059a default;
+  click b7c871ab64a7059a &quot;../../../core/src/graph_registry.rs&quot;;
+  e1d08514a32ae308 -->|satisfiedBy| b7c871ab64a7059a;
+  d50a859650933e55[&quot;model.rs&quot;];
+  class d50a859650933e55 default;
+  click d50a859650933e55 &quot;../../../core/src/model.rs&quot;;
+  e1d08514a32ae308 -->|satisfiedBy| d50a859650933e55;
+  184bc01c18f5506f[&quot;Requirements Files Search and Detection Test&quot;];
+  class 184bc01c18f5506f verification;
+  click 184bc01c18f5506f &quot;../../Verifications/ValidationTests.html#requirements-files-search-and-detection-test&quot;;
+  e1d08514a32ae308 -.->|verifiedBy| 184bc01c18f5506f;
+  60fc330ec8dd12b6[&quot;Integrated Validation&quot;];
+  class 60fc330ec8dd12b6 systemRequirement;
+  click 60fc330ec8dd12b6 &quot;Validation.html#integrated-validation&quot;;
+  80defdd4cbc7ee18[&quot;cli.rs&quot;];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 &quot;../../../cli/src/cli.rs&quot;;
+  60fc330ec8dd12b6 -->|satisfiedBy| 80defdd4cbc7ee18;
+  6f1d7610c2419511[&quot;Two-Pass Validation Strategy&quot;];
+  class 6f1d7610c2419511 systemRequirement;
+  click 6f1d7610c2419511 &quot;Validation.html#two-pass-validation-strategy&quot;;
+  27e30811e4587820[&quot;Validate Command&quot;];
+  class 27e30811e4587820 systemRequirement;
+  click 27e30811e4587820 &quot;../UserInterface/CLI.html#validate-command&quot;;
+  6f1d7610c2419511 -.->|deriveReqT| 27e30811e4587820;
+  d50a859650933e55[&quot;model.rs&quot;];
+  class d50a859650933e55 default;
+  click d50a859650933e55 &quot;../../../core/src/model.rs&quot;;
+  6f1d7610c2419511 -->|satisfiedBy| d50a859650933e55;
+  edfaf8b9c988d13b[&quot;Validation Error Handling&quot;];
+  class edfaf8b9c988d13b systemRequirement;
+  click edfaf8b9c988d13b &quot;Validation.html#validation-error-handling&quot;;
+  a581221890d15c0c[&quot;error.rs&quot;];
+  class a581221890d15c0c default;
+  click a581221890d15c0c &quot;../../../core/src/error.rs&quot;;
+  edfaf8b9c988d13b -->|satisfiedBy| a581221890d15c0c;
+  d50a859650933e55[&quot;model.rs&quot;];
+  class d50a859650933e55 default;
+  click d50a859650933e55 &quot;../../../core/src/model.rs&quot;;
+  edfaf8b9c988d13b -->|satisfiedBy| d50a859650933e55;
+  e37dc7f46d75d46[&quot;Invalid Relations Test&quot;];
+  class e37dc7f46d75d46 verification;
+  click e37dc7f46d75d46 &quot;../../Verifications/ValidationTests.html#invalid-relations-test&quot;;
+  edfaf8b9c988d13b -.->|verifiedBy| e37dc7f46d75d46;
+  13b1d75fa43ceda2[&quot;Provide Validation Reports&quot;];
+  class 13b1d75fa43ceda2 userRequirement;
+  click 13b1d75fa43ceda2 &quot;../../Reports.html#provide-validation-reports&quot;;
+  13b1d75fa43ceda2 -.->|deriveReqT| 27e30811e4587820;
+  7ab891515e6782ef[&quot;Validation Report Generator&quot;];
+  class 7ab891515e6782ef systemRequirement;
+  click 7ab891515e6782ef &quot;Reports.html#validation-report-generator&quot;;
+  13b1d75fa43ceda2 -.->|deriveReqT| 7ab891515e6782ef;
+  13b1d75fa43ceda2 -.->|deriveReqT| 60fc330ec8dd12b6;
+  efd73443f766d5c5[&quot;Requirements Processing&quot;];
+  class efd73443f766d5c5 systemRequirement;
+  click efd73443f766d5c5 &quot;../Configuration.html#requirements-processing&quot;;
+  a6b9b8b7bb8958d7[&quot;Structured Markdown Files Search and Detection&quot;];
+  class a6b9b8b7bb8958d7 systemRequirement;
+  click a6b9b8b7bb8958d7 &quot;../Configuration.html#structured-markdown-files-search-and-detection&quot;;
+  efd73443f766d5c5 -.->|deriveReqT| a6b9b8b7bb8958d7;
+  efd73443f766d5c5 -.->|deriveReqT| e1d08514a32ae308;
+  efd73443f766d5c5 -.->|deriveReqT| 6f1d7610c2419511;
+  d50a859650933e55[&quot;model.rs&quot;];
+  class d50a859650933e55 default;
+  click d50a859650933e55 &quot;../../../core/src/model.rs&quot;;
+  efd73443f766d5c5 -->|satisfiedBy| d50a859650933e55;
+  f22d93285fcd7664[&quot;parser.rs&quot;];
+  class f22d93285fcd7664 default;
+  click f22d93285fcd7664 &quot;../../../core/src/parser.rs&quot;;
+  efd73443f766d5c5 -->|satisfiedBy| f22d93285fcd7664;
+  a4090fe7e30eeae4[&quot;Element Content Extraction Test&quot;];
+  class a4090fe7e30eeae4 verification;
+  click a4090fe7e30eeae4 &quot;../../Verifications/ChangeImpactTests.html#element-content-extraction-test&quot;;
+  efd73443f766d5c5 -.->|verifiedBy| a4090fe7e30eeae4;
+  6ca2ff1567644e78[&quot;Same-File Fragment Relations Test&quot;];
+  class 6ca2ff1567644e78 verification;
+  click 6ca2ff1567644e78 &quot;../../Verifications/ValidationTests.html#same-file-fragment-relations-test&quot;;
+  efd73443f766d5c5 -.->|verifiedBy| 6ca2ff1567644e78;
+  94d9018991f76e0c[&quot;CLI Interface Structure&quot;];
+  class 94d9018991f76e0c systemRequirement;
+  click 94d9018991f76e0c &quot;../UserInterface/CLI.html#cli-interface-structure&quot;;
+  329255589f5b01a2[&quot;CLI Change Impact Report Command&quot;];
+  class 329255589f5b01a2 systemRequirement;
+  click 329255589f5b01a2 &quot;../UserInterface/CLI.html#cli-change-impact-report-command&quot;;
+  94d9018991f76e0c -.->|deriveReqT| 329255589f5b01a2;
+  9de966bf39d57a5b[&quot;CLI Containment Command&quot;];
+  class 9de966bf39d57a5b systemRequirement;
+  click 9de966bf39d57a5b &quot;../UserInterface/CLI.html#cli-containment-command&quot;;
+  94d9018991f76e0c -.->|deriveReqT| 9de966bf39d57a5b;
+  dae82e912381c0d8[&quot;CLI Generate Diagrams Flag&quot;];
+  class dae82e912381c0d8 systemRequirement;
+  click dae82e912381c0d8 &quot;../UserInterface/CLI.html#cli-generate-diagrams-flag&quot;;
+  94d9018991f76e0c -.->|deriveReqT| dae82e912381c0d8;
+  5cf5c9e2e5f6f00d[&quot;CLI Lint Command&quot;];
+  class 5cf5c9e2e5f6f00d systemRequirement;
+  click 5cf5c9e2e5f6f00d &quot;../UserInterface/CLI.html#cli-lint-command&quot;;
+  94d9018991f76e0c -.->|deriveReqT| 5cf5c9e2e5f6f00d;
+  6ca4ccd32e3b556[&quot;CLI Remove Diagrams Flag&quot;];
+  class 6ca4ccd32e3b556 systemRequirement;
+  click 6ca4ccd32e3b556 &quot;../UserInterface/CLI.html#cli-remove-diagrams-flag&quot;;
+  94d9018991f76e0c -.->|deriveReqT| 6ca4ccd32e3b556;
+  7b46a079724dce38[&quot;CLI Rename Element Command&quot;];
+  class 7b46a079724dce38 systemRequirement;
+  click 7b46a079724dce38 &quot;../UserInterface/CLI.html#cli-rename-element-command&quot;;
+  94d9018991f76e0c -.->|deriveReqT| 7b46a079724dce38;
+  a51eeded115214db[&quot;CLI Search Command&quot;];
+  class a51eeded115214db systemRequirement;
+  click a51eeded115214db &quot;../UserInterface/CLI.html#cli-search-command&quot;;
+  94d9018991f76e0c -.->|deriveReqT| a51eeded115214db;
+  8c22c72bf047a650[&quot;Format Command&quot;];
+  class 8c22c72bf047a650 systemRequirement;
+  click 8c22c72bf047a650 &quot;../UserInterface/CLI.html#format-command&quot;;
+  94d9018991f76e0c -.->|deriveReqT| 8c22c72bf047a650;
+  8e1ebba79e760691[&quot;Subdirectory Processing Option&quot;];
+  class 8e1ebba79e760691 systemRequirement;
+  click 8e1ebba79e760691 &quot;../UserInterface/CLI.html#subdirectory-processing-option&quot;;
+  94d9018991f76e0c -.->|deriveReqT| 8e1ebba79e760691;
+  94d9018991f76e0c -.->|deriveReqT| 27e30811e4587820;
+  a43a5abca24c066c[&quot;HTML Export&quot;];
+  class a43a5abca24c066c systemRequirement;
+  click a43a5abca24c066c &quot;../UserInterface/WebInterface.html#html-export&quot;;
+  94d9018991f76e0c -.->|deriveReqT| a43a5abca24c066c;
+  94d9018991f76e0c -.->|deriveReqT| 60fc330ec8dd12b6;
+  80defdd4cbc7ee18[&quot;cli.rs&quot;];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 &quot;../../../cli/src/cli.rs&quot;;
+  94d9018991f76e0c -->|satisfiedBy| 80defdd4cbc7ee18;
+  626279768f0dd586[&quot;Detailed Error Handling and Logging&quot;];
+  class 626279768f0dd586 systemRequirement;
+  click 626279768f0dd586 &quot;../UserInterface/CLI.html#detailed-error-handling-and-logging&quot;;
+  626279768f0dd586 -.->|deriveReqT| edfaf8b9c988d13b;
+  a581221890d15c0c[&quot;error.rs&quot;];
+  class a581221890d15c0c default;
+  click a581221890d15c0c &quot;../../../core/src/error.rs&quot;;
+  626279768f0dd586 -->|satisfiedBy| a581221890d15c0c;
+  7ab891515e6782ef -.->|deriveReqT| edfaf8b9c988d13b;
+  d50a859650933e55[&quot;model.rs&quot;];
+  class d50a859650933e55 default;
+  click d50a859650933e55 &quot;../../../core/src/model.rs&quot;;
+  7ab891515e6782ef -->|satisfiedBy| d50a859650933e55;
+  51f3a96863c8744b[&quot;Validate Internal Consistency&quot;];
+  class 51f3a96863c8744b userRequirement;
+  click 51f3a96863c8744b &quot;../../Validation.html#validate-internal-consistency&quot;;
+  19106261e8369e50[&quot;Internal Consistency Validator&quot;];
+  class 19106261e8369e50 systemRequirement;
+  click 19106261e8369e50 &quot;Validation.html#internal-consistency-validator&quot;;
+  51f3a96863c8744b -.->|deriveReqT| 19106261e8369e50;
+  51f3a96863c8744b -.->|deriveReqT| 6f1d7610c2419511;
+</div>
+<p>This document specifies the two-pass validation architecture that integrates validation into all commands that require the model, eliminating the need for a separate validation command.</p>
+<hr />
+<h3 id="two-pass-validation-strategy">Two-Pass Validation Strategy</h3>
+<p>The system shall implement a two-pass validation strategy that separates element collection from relation validation, enabling complete error reporting while maintaining existing error behavior.</p>
+<h4>Details</h4>
+<p>The validation process shall be split into two distinct passes:</p>
+<p><strong>Pass 1: Element Collection and Local Validation</strong></p>
+<ul>
+<li>Parse all markdown files</li>
+<li>Extract elements with metadata</li>
+<li>Apply automatic semantic normalization during parsing:
+<ul>
+<li>Convert non-link identifiers to proper markdown links with display text</li>
+<li>Normalize absolute paths to relative paths for portable references</li>
+</ul>
+</li>
+<li>Perform local validation (element uniqueness, identifier format, metadata syntax)</li>
+<li>Store elements in ElementRegistry</li>
+<li>Defer relation validation to Pass 2</li>
+<li>If errors are found, report them and exit the process</li>
+</ul>
+<p><strong>Pass 2: Graph Construction and Relation Validation</strong></p>
+<ul>
+<li>Build GraphRegistry from ElementRegistry</li>
+<li>Validate all relations (target existence, type compatibility)</li>
+<li>Generate missing opposite relations</li>
+<li>Perform cross-component validation</li>
+<li>If errors are found, report them and exit the process</li>
+</ul>
+<p>Both passes maintain the existing behavior where validation errors cause process termination with appropriate error reporting.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../../Validation.html#validate-internal-consistency">Validate Internal Consistency</a></li>
+<li>derivedFrom: <a href="../Configuration.html#requirements-processing">Requirements Processing</a></li>
+<li>satisfiedBy: <a href="../../../core/src/model.rs">model.rs</a></li>
+</ul>
+<hr />
+<h3 id="integrated-validation">Integrated Validation</h3>
+<p>The system shall automatically perform validation when any command requires the parsed model, eliminating the need for a separate validate command.</p>
+<h4>Details</h4>
+<p>Commands shall be categorized into two groups:</p>
+<p><strong>Commands requiring validated model:</strong></p>
+<ul>
+<li>model-summary: Needs complete element and relation data</li>
+<li>change-impact: Requires valid relations for impact analysis</li>
+<li>traces: Needs validated relationships for traceability</li>
+<li>generate-index: Requires complete element registry</li>
+<li>generate-diagrams: Needs valid relations for visualization</li>
+<li>remove-diagrams: Operates on validated markdown structure</li>
+<li>coverage-report: Requires complete verification data</li>
+</ul>
+<p><strong>Commands operating on raw files:</strong></p>
+<ul>
+<li>html: Converts markdown to HTML without parsing elements</li>
+<li>format: Fixes markdown formatting without validation</li>
+<li>shell: Interactive mode with optional validation</li>
+</ul>
+<p>Commands in the first group shall automatically run the two-pass validation and exit if any errors are found. Commands in the second group shall skip validation to allow operation on potentially invalid documents.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../../Reports.html#provide-validation-reports">Provide Validation Reports</a></li>
+<li>derivedFrom: <a href="../UserInterface/CLI.html#cli-interface-structure">CLI Interface Structure</a></li>
+<li>satisfiedBy: <a href="../../../cli/src/cli.rs">cli.rs</a></li>
+</ul>
+<hr />
+<h3 id="validation-error-handling">Validation Error Handling</h3>
+<p>The system shall maintain consistent error handling across both validation passes, collecting all errors within each pass before reporting.</p>
+<h4>Details</h4>
+<p>Error handling shall follow these principles:</p>
+<ol>
+<li><strong>Complete pass execution</strong>: Each pass runs to completion, collecting all errors found</li>
+<li><strong>Aggregated reporting</strong>: All errors from a pass are reported together</li>
+<li><strong>Early termination</strong>: Process exits after reporting errors from either pass</li>
+<li><strong>Existing error format</strong>: Error messages maintain the current format and structure</li>
+<li><strong>Exit codes</strong>: Non-zero exit codes indicate validation failures</li>
+</ol>
+<p>This ensures users see all relevant errors at once rather than fixing issues one at a time.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../UserInterface/CLI.html#detailed-error-handling-and-logging">Detailed Error Handling and Logging</a></li>
+<li>derivedFrom: <a href="Reports.html#validation-report-generator">Validation Report Generator</a></li>
+<li>satisfiedBy: <a href="../../../core/src/error.rs">error.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/model.rs">model.rs</a></li>
+</ul>
+<hr />
+<h3 id="graphregistry-as-primary-registry">GraphRegistry as Primary Registry</h3>
+<p>The system shall enhance GraphRegistry to serve as the primary structure for relation operations and validation during Pass 2.</p>
+<h4>Details</h4>
+<p>The GraphRegistry shall be responsible for:</p>
+<ol>
+<li><strong>Graph construction</strong>: Building adjacency lists from ElementRegistry</li>
+<li><strong>Relation validation</strong>: Checking target existence and type compatibility</li>
+<li><strong>Opposite generation</strong>: Creating missing bidirectional relations</li>
+<li><strong>Cycle detection</strong>: Identifying circular dependencies</li>
+<li><strong>Orphan detection</strong>: Finding isolated elements</li>
+<li><strong>Impact analysis</strong>: Supporting change propagation queries</li>
+</ol>
+<p>The GraphRegistry shall be constructed from the ElementRegistry after Pass 1 completes successfully.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../Configuration.html#requirements-processing">Requirements Processing</a></li>
+<li>satisfiedBy: <a href="../../../core/src/graph_registry.rs">graph_registry.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/model.rs">model.rs</a></li>
+<li>verifiedBy: <a href="../../Verifications/ValidationTests.html#requirements-files-search-and-detection-test">Requirements Files Search and Detection Test</a></li>
+</ul>
+<hr />
+<h2 id="validation-capabilities">Validation Capabilities</h2>
+<div class="mermaid">graph LR;
+  %% REQVIRE-AUTOGENERATED-DIAGRAM
+  %% Graph styling
+  classDef userRequirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef systemRequirement fill:#fce4e4,stroke:#e68a8a,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+
+  19ef88dd52a92a0a[&quot;Cross-Component Dependency Validator&quot;];
+  class 19ef88dd52a92a0a systemRequirement;
+  click 19ef88dd52a92a0a &quot;Validation.html#cross-component-dependency-validator&quot;;
+  d50a859650933e55[&quot;model.rs&quot;];
+  class d50a859650933e55 default;
+  click d50a859650933e55 &quot;../../../core/src/model.rs&quot;;
+  19ef88dd52a92a0a -->|satisfiedBy| d50a859650933e55;
+  f22d93285fcd7664[&quot;parser.rs&quot;];
+  class f22d93285fcd7664 default;
+  click f22d93285fcd7664 &quot;../../../core/src/parser.rs&quot;;
+  19ef88dd52a92a0a -->|satisfiedBy| f22d93285fcd7664;
+  e37dc7f46d75d46[&quot;Invalid Relations Test&quot;];
+  class e37dc7f46d75d46 verification;
+  click e37dc7f46d75d46 &quot;../../Verifications/ValidationTests.html#invalid-relations-test&quot;;
+  19ef88dd52a92a0a -.->|verifiedBy| e37dc7f46d75d46;
+  1bb19f609996c42d[&quot;Excluded File Relation Validation&quot;];
+  class 1bb19f609996c42d systemRequirement;
+  click 1bb19f609996c42d &quot;Validation.html#excluded-file-relation-validation&quot;;
+  f22d93285fcd7664[&quot;parser.rs&quot;];
+  class f22d93285fcd7664 default;
+  click f22d93285fcd7664 &quot;../../../core/src/parser.rs&quot;;
+  1bb19f609996c42d -->|satisfiedBy| f22d93285fcd7664;
+  526fb26c223ad188[&quot;Unstructured Documents Test&quot;];
+  class 526fb26c223ad188 verification;
+  click 526fb26c223ad188 &quot;../../Verifications/ValidationTests.html#unstructured-documents-test&quot;;
+  1bb19f609996c42d -.->|verifiedBy| 526fb26c223ad188;
+  19106261e8369e50[&quot;Internal Consistency Validator&quot;];
+  class 19106261e8369e50 systemRequirement;
+  click 19106261e8369e50 &quot;Validation.html#internal-consistency-validator&quot;;
+  d50a859650933e55[&quot;model.rs&quot;];
+  class d50a859650933e55 default;
+  click d50a859650933e55 &quot;../../../core/src/model.rs&quot;;
+  19106261e8369e50 -->|satisfiedBy| d50a859650933e55;
+  f22d93285fcd7664[&quot;parser.rs&quot;];
+  class f22d93285fcd7664 default;
+  click f22d93285fcd7664 &quot;../../../core/src/parser.rs&quot;;
+  19106261e8369e50 -->|satisfiedBy| f22d93285fcd7664;
+  19106261e8369e50 -.->|verifiedBy| e37dc7f46d75d46;
+  bc1555a765d8bca3[&quot;Markdown Structure Validator&quot;];
+  class bc1555a765d8bca3 systemRequirement;
+  click bc1555a765d8bca3 &quot;Validation.html#markdown-structure-validator&quot;;
+  d50a859650933e55[&quot;model.rs&quot;];
+  class d50a859650933e55 default;
+  click d50a859650933e55 &quot;../../../core/src/model.rs&quot;;
+  bc1555a765d8bca3 -->|satisfiedBy| d50a859650933e55;
+  f22d93285fcd7664[&quot;parser.rs&quot;];
+  class f22d93285fcd7664 default;
+  click f22d93285fcd7664 &quot;../../../core/src/parser.rs&quot;;
+  bc1555a765d8bca3 -->|satisfiedBy| f22d93285fcd7664;
+  b0d0999636b025fa[&quot;Invalid Header Structure Test&quot;];
+  class b0d0999636b025fa verification;
+  click b0d0999636b025fa &quot;../../Verifications/ValidationTests.html#invalid-header-structure-test&quot;;
+  bc1555a765d8bca3 -.->|verifiedBy| b0d0999636b025fa;
+  bc1555a765d8bca3 -.->|verifiedBy| e37dc7f46d75d46;
+  7444737db501bf59[&quot;Relation Element Type Validator&quot;];
+  class 7444737db501bf59 systemRequirement;
+  click 7444737db501bf59 &quot;Validation.html#relation-element-type-validator&quot;;
+  d50a859650933e55[&quot;model.rs&quot;];
+  class d50a859650933e55 default;
+  click d50a859650933e55 &quot;../../../core/src/model.rs&quot;;
+  7444737db501bf59 -->|satisfiedBy| d50a859650933e55;
+  f22d93285fcd7664[&quot;parser.rs&quot;];
+  class f22d93285fcd7664 default;
+  click f22d93285fcd7664 &quot;../../../core/src/parser.rs&quot;;
+  7444737db501bf59 -->|satisfiedBy| f22d93285fcd7664;
+  7444737db501bf59 -.->|verifiedBy| e37dc7f46d75d46;
+  d1c4f6a4da249044[&quot;Relation Type Validation&quot;];
+  class d1c4f6a4da249044 systemRequirement;
+  click d1c4f6a4da249044 &quot;Validation.html#relation-type-validation&quot;;
+  9450d4313f47ef36[&quot;relation.rs&quot;];
+  class 9450d4313f47ef36 default;
+  click 9450d4313f47ef36 &quot;../../../core/src/relation.rs&quot;;
+  d1c4f6a4da249044 -->|satisfiedBy| 9450d4313f47ef36;
+  d1c4f6a4da249044 -.->|verifiedBy| e37dc7f46d75d46;
+  6ca2ff1567644e78[&quot;Same-File Fragment Relations Test&quot;];
+  class 6ca2ff1567644e78 verification;
+  click 6ca2ff1567644e78 &quot;../../Verifications/ValidationTests.html#same-file-fragment-relations-test&quot;;
+  d1c4f6a4da249044 -.->|verifiedBy| 6ca2ff1567644e78;
+  dd454dd5831a33a0[&quot;File Pattern Exclusion for Format&quot;];
+  class dd454dd5831a33a0 systemRequirement;
+  click dd454dd5831a33a0 &quot;Formatting.html#file-pattern-exclusion-for-format&quot;;
+  dd454dd5831a33a0 -.->|deriveReqT| 1bb19f609996c42d;
+  ce2625feec883e55[&quot;utils.rs&quot;];
+  class ce2625feec883e55 default;
+  click ce2625feec883e55 &quot;../../../core/src/utils.rs&quot;;
+  dd454dd5831a33a0 -->|satisfiedBy| ce2625feec883e55;
+  6cbe71eb757988df[&quot;Element Identity Model&quot;];
+  class 6cbe71eb757988df systemRequirement;
+  click 6cbe71eb757988df &quot;../../Structure/SpecificationsRequirements.html#element-identity-model&quot;;
+  16b284f882a920cc[&quot;Change Impact Detection Algorithm&quot;];
+  class 16b284f882a920cc systemRequirement;
+  click 16b284f882a920cc &quot;../ModelManagement/ChangeImpact.html#change-impact-detection-algorithm&quot;;
+  6cbe71eb757988df -.->|deriveReqT| 16b284f882a920cc;
+  674e6f27f5fda615[&quot;Change Impact Visualization&quot;];
+  class 674e6f27f5fda615 systemRequirement;
+  click 674e6f27f5fda615 &quot;../ModelManagement/ChangeImpact.html#change-impact-visualization&quot;;
+  6cbe71eb757988df -.->|deriveReqT| 674e6f27f5fda615;
+  6cbe71eb757988df -.->|deriveReqT| 19106261e8369e50;
+  c1fb51fe8a0b650[&quot;Identifiers and Relations&quot;];
+  class c1fb51fe8a0b650 systemRequirement;
+  click c1fb51fe8a0b650 &quot;../../Structure/SpecificationsRequirements.html#identifiers-and-relations&quot;;
+  6cbe71eb757988df -.->|deriveReqT| c1fb51fe8a0b650;
+  a814c4935e1a0449[&quot;element.rs&quot;];
+  class a814c4935e1a0449 default;
+  click a814c4935e1a0449 &quot;../../../core/src/element.rs&quot;;
+  6cbe71eb757988df -->|satisfiedBy| a814c4935e1a0449;
+  f22d93285fcd7664[&quot;parser.rs&quot;];
+  class f22d93285fcd7664 default;
+  click f22d93285fcd7664 &quot;../../../core/src/parser.rs&quot;;
+  6cbe71eb757988df -->|satisfiedBy| f22d93285fcd7664;
+  2abd8d6ef97cade6[&quot;Fragment Normalization Test&quot;];
+  class 2abd8d6ef97cade6 verification;
+  click 2abd8d6ef97cade6 &quot;../../Verifications/ParsingTests.html#fragment-normalization-test&quot;;
+  6cbe71eb757988df -.->|verifiedBy| 2abd8d6ef97cade6;
+  71f959f03ed35c96[&quot;Enhanced Validation Error Reporting&quot;];
+  class 71f959f03ed35c96 userRequirement;
+  click 71f959f03ed35c96 &quot;../../Validation.html#enhanced-validation-error-reporting&quot;;
+  626279768f0dd586[&quot;Detailed Error Handling and Logging&quot;];
+  class 626279768f0dd586 systemRequirement;
+  click 626279768f0dd586 &quot;../UserInterface/CLI.html#detailed-error-handling-and-logging&quot;;
+  71f959f03ed35c96 -.->|deriveReqT| 626279768f0dd586;
+  27e30811e4587820[&quot;Validate Command&quot;];
+  class 27e30811e4587820 systemRequirement;
+  click 27e30811e4587820 &quot;../UserInterface/CLI.html#validate-command&quot;;
+  71f959f03ed35c96 -.->|deriveReqT| 27e30811e4587820;
+  71f959f03ed35c96 -.->|deriveReqT| d1c4f6a4da249044;
+  5e9e8e0fea56c140[&quot;Validate Cross-Component Dependencies&quot;];
+  class 5e9e8e0fea56c140 userRequirement;
+  click 5e9e8e0fea56c140 &quot;../../Validation.html#validate-cross-component-dependencies&quot;;
+  5e9e8e0fea56c140 -.->|deriveReqT| 19ef88dd52a92a0a;
+  51f3a96863c8744b[&quot;Validate Internal Consistency&quot;];
+  class 51f3a96863c8744b userRequirement;
+  click 51f3a96863c8744b &quot;../../Validation.html#validate-internal-consistency&quot;;
+  51f3a96863c8744b -.->|deriveReqT| 19106261e8369e50;
+  6f1d7610c2419511[&quot;Two-Pass Validation Strategy&quot;];
+  class 6f1d7610c2419511 systemRequirement;
+  click 6f1d7610c2419511 &quot;Validation.html#two-pass-validation-strategy&quot;;
+  51f3a96863c8744b -.->|deriveReqT| 6f1d7610c2419511;
+  11b5fe3115be7b77[&quot;Validate Markdown Structure&quot;];
+  class 11b5fe3115be7b77 userRequirement;
+  click 11b5fe3115be7b77 &quot;../../Validation.html#validate-markdown-structure&quot;;
+  11b5fe3115be7b77 -.->|deriveReqT| bc1555a765d8bca3;
+  377c97439aac9d3b[&quot;Validate Relation Types&quot;];
+  class 377c97439aac9d3b userRequirement;
+  click 377c97439aac9d3b &quot;../../Validation.html#validate-relation-types&quot;;
+  377c97439aac9d3b -.->|deriveReqT| 7444737db501bf59;
+</div>
+<h3 id="markdown-structure-validator">Markdown Structure Validator</h3>
+<p>The system shall implement a markdown structure validator that enforces Reqvire’s requirements for header levels, element structure, relation formatting, and other markdown-specific syntax rules, reporting violations with line numbers and suggested fixes.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../../Validation.html#validate-markdown-structure">Validate Markdown Structure</a></li>
+<li>satisfiedBy: <a href="../../../core/src/model.rs">model.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/parser.rs">parser.rs</a></li>
+<li>verifiedBy: <a href="../../Verifications/ValidationTests.html#invalid-relations-test">Invalid Relations Test</a></li>
+</ul>
+<hr />
+<h3 id="internal-consistency-validator">Internal Consistency Validator</h3>
+<p>The system shall implement a consistency validator that verifies logical coherence within the model, including checking for circular dependencies, orphaned elements, inconsistent relationship patterns, and element name uniqueness, with detailed error reporting.</p>
+<h4>Details</h4>
+<p>The consistency validator shall verify:</p>
+<ul>
+<li><strong>Global Element Name Uniqueness</strong>: Element names are globally unique across all files in the model</li>
+<li><strong>Duplicate Detection</strong>: Detect and report when multiple elements in different files share the same name</li>
+<li><strong>Location Reporting</strong>: Report both file locations where duplicate element names occur</li>
+<li><strong>Clear Error Messages</strong>: Error messages clearly indicate that element names must be globally unique</li>
+<li><strong>Circular Dependencies</strong>: Detect and report circular dependency chains in requirements</li>
+<li><strong>Orphaned Elements</strong>: Identify elements without proper traceability connections</li>
+<li><strong>Inconsistent Patterns</strong>: Detect relationship patterns that violate model constraints</li>
+</ul>
+<p>Rationale: Element names serve as stable IDs for element identity, independent of file location. Global uniqueness is essential for proper element identification and change tracking across the model.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../../Validation.html#validate-internal-consistency">Validate Internal Consistency</a></li>
+<li>derivedFrom: <a href="../../Structure/SpecificationsRequirements.html#element-identity-model">Element Identity Model</a></li>
+<li>satisfiedBy: <a href="../../../core/src/model.rs">model.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/parser.rs">parser.rs</a></li>
+<li>verifiedBy: <a href="../../Verifications/ValidationTests.html#invalid-relations-test">Invalid Relations Test</a></li>
+</ul>
+<hr />
+<h3 id="cross-component-dependency-validator">Cross-Component Dependency Validator</h3>
+<p>The system shall implement a specialized validator that analyzes dependencies across different model components, ensuring proper alignment between architectural layers, requirement levels, and verification elements.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../../Validation.html#validate-cross-component-dependencies">Validate Cross-Component Dependencies</a></li>
+<li>satisfiedBy: <a href="../../../core/src/model.rs">model.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/parser.rs">parser.rs</a></li>
+<li>verifiedBy: <a href="../../Verifications/ValidationTests.html#invalid-relations-test">Invalid Relations Test</a></li>
+</ul>
+<hr />
+<h3 id="relation-element-type-validator">Relation Element Type Validator</h3>
+<p>The system shall implement validation that verifies relation endpoints have appropriate element types based on the relation type.</p>
+<h4>Details</h4>
+<ul>
+<li>For <code>verifiedBy</code>/<code>verify</code> relations, validate that one endpoint is a requirement element and the other is a verification element</li>
+<li>For <code>satisfiedBy</code>/<code>satisfy</code> relations, validate that one endpoint is a requirement or test-verification element and the other is an implementation element</li>
+<li>For verification elements with <code>satisfiedBy</code> relations, validate that only test-verification elements may use satisfiedBy (other verification types should not have satisfiedBy relations)</li>
+<li><code>trace</code> relations are always allowed for any verification type</li>
+<li>Relations should only connect elements of appropriate types based on the RelationTypesRegistry definition</li>
+<li>Warnings should be issued when relation endpoints have incompatible element types</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../../Validation.html#validate-relation-types">Validate Relation Types</a></li>
+<li>satisfiedBy: <a href="../../../core/src/model.rs">model.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/parser.rs">parser.rs</a></li>
+<li>verifiedBy: <a href="../../Verifications/ValidationTests.html#invalid-relations-test">Invalid Relations Test</a></li>
+</ul>
+<hr />
+<h3 id="relation-type-validation">Relation Type Validation</h3>
+<p>The system shall validate relation types against a defined vocabulary and provide clear error messages for unsupported relation types, including suggestions for the correct relation types.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../../Validation.html#enhanced-validation-error-reporting">Enhanced Validation Error Reporting</a></li>
+<li>satisfiedBy: <a href="../../../core/src/relation.rs">relation.rs</a></li>
+</ul>
+<hr />
+<h3 id="excluded-file-relation-validation">Excluded File Relation Validation</h3>
+<p>The system shall properly validate relations targeting files matching excluded filename patterns, enabling references to excluded files while still respecting their exclusion from processing and formatting operations.</p>
+<h4>Details</h4>
+<p>The validation process for excluded files:</p>
+<ol>
+<li>Files matching excluded patterns are registered in the element registry for relation validation only</li>
+<li>Internal elements within excluded files are not processed or validated</li>
+</ol>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="Formatting.html#file-pattern-exclusion-for-format">File Pattern Exclusion for Format</a></li>
+<li>satisfiedBy: <a href="../../../core/src/parser.rs">parser.rs</a></li>
+</ul>
+<hr />
+
+        </div>
+    </div>
+</body>
+</html>

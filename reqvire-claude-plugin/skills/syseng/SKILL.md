@@ -208,7 +208,7 @@ reqvire search [--json] [--short] [--filter-*]
 # Use --short when analyzing model structure without needing full content
 
 # Element manipulation
-reqvire add <file>
+reqvire add <file> [<index>]
 reqvire rm "<element-name>"
 reqvire mv "<element-name>" "<target-file>" [<index>]
 reqvire mv-file "<source-file>" "<target-file>"

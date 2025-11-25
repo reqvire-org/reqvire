@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiagramsTests</title>
+    
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa;
+    color: #333;
+}
+.reqvire-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    background-color: #2c3e50;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+}
+.reqvire-nav a {
+    color: #ecf0f1;
+    text-decoration: none;
+    padding: 10px 20px;
+    margin-right: 5px;
+    border-radius: 3px;
+    transition: background-color 0.2s;
+}
+.reqvire-nav a:hover {
+    background-color: #34495e;
+}
+.reqvire-nav-spacer {
+    height: 50px;
+}
+.container {
+    max-width: 95%;
+    margin: 0 auto;
+    padding: 20px;
+}
+.content {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+h1 {
+    color: #333;
+    border-bottom: 2px solid #eaecef;
+    padding-bottom: 10px;
+    margin-top: 0;
+}
+h2 {
+    color: #333;
+    border-bottom: 1px solid #eaecef;
+    padding-bottom: 5px;
+}
+h3 {
+    color: #1a6fb7;
+    margin-top: 25px;
+}
+h4 {
+    color: #555;
+    font-weight: 600;
+}
+a {
+    color: #0366d6;
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 20px 0;
+}
+table, th, td {
+    border: 1px solid #dfe2e5;
+}
+th, td {
+    padding: 8px 12px;
+    text-align: left;
+}
+th {
+    background-color: #f6f8fa;
+}
+code {
+    background: #f6f8fa;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 90%;
+}
+pre {
+    background: #f6f8fa;
+    border-radius: 3px;
+    padding: 16px;
+    overflow: auto;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+}
+blockquote {
+    margin: 0;
+    padding: 0 15px;
+    color: #777;
+    border-left: 4px solid #dfe2e5;
+}
+.mermaid {
+    margin: 20px 0;
+    text-align: center;
+    height: calc(100vh - 150px);
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid #dfe2e5;
+    border-radius: 3px;
+    background-color: #fafafa;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+.mermaid svg {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    position: relative;
+    z-index: 1;
+}
+.diagram-nav-buttons {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 999; /* higher than SVG (1) but lower than header nav (1000) */
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 5px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+.diagram-nav-row {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+}
+.diagram-nav-btn {
+    width: 32px;
+    height: 32px;
+    background-color: #2c3e50;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.diagram-nav-btn:hover {
+    background-color: #34495e;
+}
+.diagram-nav-btn:active {
+    background-color: #1a252f;
+}
+</style>
+
+    <!-- Enhanced mermaid configuration for Reqvire diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.5.0/dist/svg-pan-zoom.min.js"></script>
+    <script>
+        // Capture Mermaid errors
+        mermaid.parseError = function(err, hash) {
+            console.error('Mermaid Parse Error:', err);
+            console.error('Error details:', {
+                str: err.str,
+                hash: err.hash,
+                message: err.message,
+                stack: err.stack
+            });
+        };
+
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            maxTextSize: 120000,
+            maxEdges: 2000,
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            securityLevel: 'loose',
+            logLevel: 'error'
+        });
+
+        // Add pan/zoom to all Mermaid diagrams after rendering
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                document.querySelectorAll('.mermaid').forEach(function(mermaidContainer) {
+                    var svg = mermaidContainer.querySelector('svg');
+                    if (!svg) return;
+
+                    svg.style.maxWidth = 'none';
+                    svg.style.maxHeight = 'none';
+
+                    var eventsHandler = {
+                        haltEventListeners: ['touchstart', 'touchend', 'touchmove', 'touchleave', 'touchcancel'],
+                        init: function(options) {
+                            var instance = options.instance;
+                            var initialScale = 1;
+                            var pannedX = 0;
+                            var pannedY = 0;
+
+                            this.hammer = Hammer(options.svgElement, {
+                                inputClass: Hammer.SUPPORT_POINTER_EVENTS ? Hammer.PointerEventInput : Hammer.TouchInput
+                            });
+
+                            this.hammer.get('pinch').set({enable: true});
+
+                            this.hammer.on('doubletap', function(ev){
+                                instance.zoomIn();
+                            });
+
+                            this.hammer.on('panstart panmove', function(ev){
+                                if (ev.type === 'panstart') {
+                                    pannedX = 0;
+                                    pannedY = 0;
+                                }
+                                instance.panBy({x: ev.deltaX - pannedX, y: ev.deltaY - pannedY});
+                                pannedX = ev.deltaX;
+                                pannedY = ev.deltaY;
+                            });
+
+                            this.hammer.on('pinchstart pinchmove', function(ev){
+                                if (ev.type === 'pinchstart') {
+                                    initialScale = instance.getZoom();
+                                }
+                                instance.zoomAtPoint(initialScale * ev.scale, {x: ev.center.x, y: ev.center.y});
+                            });
+
+                            options.svgElement.addEventListener('touchmove', function(e){ e.preventDefault(); });
+                        },
+                        destroy: function(){
+                            this.hammer.destroy();
+                        }
+                    };
+
+                    // Diagrams with default zoom (no auto-fit)
+                    var panZoomInstance = svgPanZoom(svg, {
+                        zoomEnabled: true,
+                        controlIconsEnabled: true,
+                        fit: false,
+                        center: false,
+                        contain: false,
+                        minZoom: 0.5,
+                        maxZoom: 10,
+                        zoomScaleSensitivity: 0.3,
+                        customEventsHandler: eventsHandler
+                    });
+
+                    // Add navigation buttons
+                    var navButtons = document.createElement('div');
+                    navButtons.className = 'diagram-nav-buttons';
+                    navButtons.innerHTML = `
+                        <div class="diagram-nav-row">
+                            <button class="diagram-nav-btn" data-action="up">▲</button>
+                        </div>
+                        <div class="diagram-nav-row">
+                            <button class="diagram-nav-btn" data-action="left">◀</button>
+                            <button class="diagram-nav-btn" data-action="down">▼</button>
+                            <button class="diagram-nav-btn" data-action="right">▶</button>
+                        </div>
+                    `;
+                    mermaidContainer.appendChild(navButtons);
+
+                    // Wire up navigation buttons
+                    var panStep = 100;
+                    navButtons.querySelectorAll('.diagram-nav-btn').forEach(function(btn) {
+                        btn.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            var action = this.getAttribute('data-action');
+                            switch(action) {
+                                case 'up':
+                                    panZoomInstance.panBy({x: 0, y: panStep});
+                                    break;
+                                case 'down':
+                                    panZoomInstance.panBy({x: 0, y: -panStep});
+                                    break;
+                                case 'left':
+                                    panZoomInstance.panBy({x: panStep, y: 0});
+                                    break;
+                                case 'right':
+                                    panZoomInstance.panBy({x: -panStep, y: 0});
+                                    break;
+                            }
+                        });
+                    });
+                });
+            }, 1500);
+        });
+    </script>
+</head>
+<body>
+    <nav class="reqvire-nav">
+        <a href="../../index.html">Home</a>
+        <a href="../../model.html">Model</a>
+        <a href="../../whole-model.html">Whole Model</a>
+        <a href="../../traces.html">Traces</a>
+        <a href="../../coverage.html">Coverage</a>
+    </nav>
+    <div class="reqvire-nav-spacer"></div>
+    <div class="container">
+        <div class="content">
+            <h1 id="diagram-tests">Diagram Tests</h1>
+<p>This document verifies the requirements for Reqvire’s diagram generation functionality.</p>
+<h2 id="diagram-generation-tests">Diagram Generation Tests</h2>
+<div class="mermaid">graph LR;
+  %% REQVIRE-AUTOGENERATED-DIAGRAM
+  %% Graph styling
+  classDef userRequirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef systemRequirement fill:#fce4e4,stroke:#e68a8a,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+
+  f8849dfe948d04fa[&quot;Automated Diagram Generation on PR Merge Verification&quot;];
+  class f8849dfe948d04fa verification;
+  click f8849dfe948d04fa &quot;DiagramsTests.html#automated-diagram-generation-on-pr-merge-verification&quot;;
+  98af8a1cf9c86822[&quot;generate_diagrams.yml&quot;];
+  class 98af8a1cf9c86822 default;
+  click 98af8a1cf9c86822 &quot;../../.github/workflows/generate_diagrams.yml&quot;;
+  f8849dfe948d04fa -->|satisfiedBy| 98af8a1cf9c86822;
+  2d2cf67bb8070da8[&quot;Diagram Generation Test&quot;];
+  class 2d2cf67bb8070da8 verification;
+  click 2d2cf67bb8070da8 &quot;DiagramsTests.html#diagram-generation-test&quot;;
+  3df49fd1a91c3db7[&quot;test.sh&quot;];
+  class 3df49fd1a91c3db7 default;
+  click 3df49fd1a91c3db7 &quot;../../tests/test-diagram-generation/test.sh&quot;;
+  2d2cf67bb8070da8 -->|satisfiedBy| 3df49fd1a91c3db7;
+  ba2fd3fb7c42cdb3[&quot;Diagram Relation Filtering Verification&quot;];
+  class ba2fd3fb7c42cdb3 verification;
+  click ba2fd3fb7c42cdb3 &quot;DiagramsTests.html#diagram-relation-filtering-verification&quot;;
+  f6a73030d877fc0f[&quot;test.sh&quot;];
+  class f6a73030d877fc0f default;
+  click f6a73030d877fc0f &quot;../../tests/test-diagram-filtering/test.sh&quot;;
+  ba2fd3fb7c42cdb3 -->|satisfiedBy| f6a73030d877fc0f;
+  6a6973ecb2f20ee3[&quot;Remove Generated Diagrams Verification&quot;];
+  class 6a6973ecb2f20ee3 verification;
+  click 6a6973ecb2f20ee3 &quot;DiagramsTests.html#remove-generated-diagrams-verification&quot;;
+  af81a7b6d75c2363[&quot;test.sh&quot;];
+  class af81a7b6d75c2363 default;
+  click af81a7b6d75c2363 &quot;../../tests/test-remove-diagrams/test.sh&quot;;
+  6a6973ecb2f20ee3 -->|satisfiedBy| af81a7b6d75c2363;
+  de8ab093f22a5cd7[&quot;Visualize Model Relationships Verification&quot;];
+  class de8ab093f22a5cd7 verification;
+  click de8ab093f22a5cd7 &quot;DiagramsTests.html#visualize-model-relationships-verification&quot;;
+  3df49fd1a91c3db7[&quot;test.sh&quot;];
+  class 3df49fd1a91c3db7 default;
+  click 3df49fd1a91c3db7 &quot;../../tests/test-diagram-generation/test.sh&quot;;
+  de8ab093f22a5cd7 -->|satisfiedBy| 3df49fd1a91c3db7;
+  e3c16fdca00bd991[&quot;Automated Diagram Generation on PR Merge&quot;];
+  class e3c16fdca00bd991 systemRequirement;
+  click e3c16fdca00bd991 &quot;../GitHubIntegration.html#automated-diagram-generation-on-pr-merge&quot;;
+  98af8a1cf9c86822[&quot;generate_diagrams.yml&quot;];
+  class 98af8a1cf9c86822 default;
+  click 98af8a1cf9c86822 &quot;../../.github/workflows/generate_diagrams.yml&quot;;
+  e3c16fdca00bd991 -->|satisfiedBy| 98af8a1cf9c86822;
+  e3c16fdca00bd991 -.->|verifiedBy| f8849dfe948d04fa;
+  626af7bb0e4f5bdf[&quot;Auto-Generated Diagram Identification&quot;];
+  class 626af7bb0e4f5bdf systemRequirement;
+  click 626af7bb0e4f5bdf &quot;../ReqvireTool/ModelManagement/DiagramGeneration.html#auto-generated-diagram-identification&quot;;
+  dad7eeb932afdb92[&quot;diagrams.rs&quot;];
+  class dad7eeb932afdb92 default;
+  click dad7eeb932afdb92 &quot;../../core/src/diagrams.rs&quot;;
+  626af7bb0e4f5bdf -->|satisfiedBy| dad7eeb932afdb92;
+  f22d93285fcd7664[&quot;parser.rs&quot;];
+  class f22d93285fcd7664 default;
+  click f22d93285fcd7664 &quot;../../core/src/parser.rs&quot;;
+  626af7bb0e4f5bdf -->|satisfiedBy| f22d93285fcd7664;
+  ce2625feec883e55[&quot;utils.rs&quot;];
+  class ce2625feec883e55 default;
+  click ce2625feec883e55 &quot;../../core/src/utils.rs&quot;;
+  626af7bb0e4f5bdf -->|satisfiedBy| ce2625feec883e55;
+  626af7bb0e4f5bdf -.->|verifiedBy| 2d2cf67bb8070da8;
+  626af7bb0e4f5bdf -.->|verifiedBy| 6a6973ecb2f20ee3;
+  4538e809d640b93a[&quot;Diagram Generation&quot;];
+  class 4538e809d640b93a systemRequirement;
+  click 4538e809d640b93a &quot;../ReqvireTool/ModelManagement/DiagramGeneration.html#diagram-generation&quot;;
+  4538e809d640b93a -.->|deriveReqT| 626af7bb0e4f5bdf;
+  48a352f2d1383a4[&quot;Interactive Mermaid Diagram Node Behavior&quot;];
+  class 48a352f2d1383a4 systemRequirement;
+  click 48a352f2d1383a4 &quot;../ReqvireTool/ModelManagement/DiagramGeneration.html#interactive-mermaid-diagram-node-behavior&quot;;
+  4538e809d640b93a -.->|deriveReqT| 48a352f2d1383a4;
+  5332418612408aa0[&quot;SysML-Compatible Relationship Rendering&quot;];
+  class 5332418612408aa0 systemRequirement;
+  click 5332418612408aa0 &quot;../ReqvireTool/ModelManagement/DiagramGeneration.html#sysml-compatible-relationship-rendering&quot;;
+  4538e809d640b93a -.->|deriveReqT| 5332418612408aa0;
+  dae82e912381c0d8[&quot;CLI Generate Diagrams Flag&quot;];
+  class dae82e912381c0d8 systemRequirement;
+  click dae82e912381c0d8 &quot;../ReqvireTool/UserInterface/CLI.html#cli-generate-diagrams-flag&quot;;
+  4538e809d640b93a -.->|deriveReqT| dae82e912381c0d8;
+  dad7eeb932afdb92[&quot;diagrams.rs&quot;];
+  class dad7eeb932afdb92 default;
+  click dad7eeb932afdb92 &quot;../../core/src/diagrams.rs&quot;;
+  4538e809d640b93a -->|satisfiedBy| dad7eeb932afdb92;
+  4538e809d640b93a -.->|verifiedBy| de8ab093f22a5cd7;
+  78e3cd9cda00a39[&quot;Diagram Relation Filtering&quot;];
+  class 78e3cd9cda00a39 systemRequirement;
+  click 78e3cd9cda00a39 &quot;../ReqvireTool/ModelManagement/DiagramGeneration.html#diagram-relation-filtering&quot;;
+  dad7eeb932afdb92[&quot;diagrams.rs&quot;];
+  class dad7eeb932afdb92 default;
+  click dad7eeb932afdb92 &quot;../../core/src/diagrams.rs&quot;;
+  78e3cd9cda00a39 -->|satisfiedBy| dad7eeb932afdb92;
+  78e3cd9cda00a39 -.->|verifiedBy| ba2fd3fb7c42cdb3;
+  80defdd4cbc7ee18[&quot;cli.rs&quot;];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 &quot;../../cli/src/cli.rs&quot;;
+  dae82e912381c0d8 -->|satisfiedBy| 80defdd4cbc7ee18;
+  dae82e912381c0d8 -.->|verifiedBy| 2d2cf67bb8070da8;
+  34c75e4a88e1f381[&quot;CLI Help Structure Verification&quot;];
+  class 34c75e4a88e1f381 verification;
+  click 34c75e4a88e1f381 &quot;Misc.html#cli-help-structure-verification&quot;;
+  dae82e912381c0d8 -.->|verifiedBy| 34c75e4a88e1f381;
+  6ca4ccd32e3b556[&quot;CLI Remove Diagrams Flag&quot;];
+  class 6ca4ccd32e3b556 systemRequirement;
+  click 6ca4ccd32e3b556 &quot;../ReqvireTool/UserInterface/CLI.html#cli-remove-diagrams-flag&quot;;
+  80defdd4cbc7ee18[&quot;cli.rs&quot;];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 &quot;../../cli/src/cli.rs&quot;;
+  6ca4ccd32e3b556 -->|satisfiedBy| 80defdd4cbc7ee18;
+  6ca4ccd32e3b556 -.->|verifiedBy| 6a6973ecb2f20ee3;
+  6ca4ccd32e3b556 -.->|verifiedBy| 34c75e4a88e1f381;
+</div>
+<h3 id="diagram-generation-test">Diagram Generation Test</h3>
+<p>This test verifies that the generate-diagrams CLI command correctly generates and embeds mermaid diagrams in requirements documents.</p>
+<h4>Details</h4>
+<h5>Acceptance Criteria</h5>
+<ul>
+<li>System should process requirements files and add/update embedded mermaid diagrams</li>
+<li>System should create diagrams that represent relationships between elements</li>
+<li>System should preserve any existing custom mermaid diagrams in the documents</li>
+<li>System should update automatically generated diagrams when requirements change</li>
+<li>System should properly visualize all relationship types (verifies, trace, derives, satisfies, etc.)</li>
+<li>System should render relationships with appropriate arrows and formatting</li>
+<li>All auto-generated diagrams must include the REQVIRE-AUTOGENERATED-DIAGRAM marker for identification</li>
+<li>Marker should be embedded within the mermaid diagram as a comment for reliable identification</li>
+</ul>
+<h5>Test Criteria</h5>
+<ul>
+<li>Command exits with success (0) return code</li>
+<li>Modified files contain the expected mermaid diagrams</li>
+<li>Custom mermaid diagrams are preserved</li>
+<li>Diagram content accurately reflects the relationships defined in the requirements</li>
+<li>All relationship types are correctly visualized with proper arrows and labels (verifies, trace, derives, satisfies)</li>
+<li>Special relationship types like “deriveReqT” are properly rendered</li>
+<li>All auto-generated diagrams contain the REQVIRE-AUTOGENERATED-DIAGRAM marker</li>
+<li>Marker appears as a mermaid comment within the diagram block</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../ReqvireTool/UserInterface/CLI.html#cli-generate-diagrams-flag">CLI Generate Diagrams Flag</a></li>
+<li>verify: <a href="../ReqvireTool/ModelManagement/DiagramGeneration.html#auto-generated-diagram-identification">Auto-Generated Diagram Identification</a></li>
+<li>satisfiedBy: <a href="../../tests/test-diagram-generation/test.sh">test.sh</a></li>
+</ul>
+<hr />
+<h3 id="visualize-model-relationships-verification">Visualize Model Relationships Verification</h3>
+<p>This test verifies that the system provides visual representations of relationships within the MBSE model in the generated diagrams.</p>
+<h4>Details</h4>
+<h5>Acceptance Criteria</h5>
+<ul>
+<li>System should generate diagrams showing relationships between model elements</li>
+<li>Diagrams should clearly represent different relationship types</li>
+<li>Visual representation should aid in understanding dependencies between elements</li>
+</ul>
+<h5>Test Criteria</h5>
+<ul>
+<li>Command exits with success (0) return code</li>
+<li>Generated diagrams contain all expected relationship types</li>
+<li>Relationships are visually differentiated based on their type</li>
+<li>Element dependencies are clearly displayed in the diagrams</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../ReqvireTool/ModelManagement/DiagramGeneration.html#diagram-generation">Diagram Generation</a></li>
+<li>satisfiedBy: <a href="../../tests/test-diagram-generation/test.sh">test.sh</a></li>
+</ul>
+<hr />
+<h3 id="automated-diagram-generation-on-pr-merge-verification">Automated Diagram Generation on PR Merge Verification</h3>
+<p>This test verifies that the system automatically generates and updates diagrams when pull requests are merged to the main branch.</p>
+<h4>Details</h4>
+<h5>Acceptance Criteria</h5>
+<ul>
+<li>System should have a GitHub workflow that automatically generates diagrams on PR merge</li>
+<li>The workflow should only be triggered when PRs are merged to the main branch</li>
+<li>Generated diagrams should be committed back to the main branch</li>
+<li>The commit message should clearly indicate the automated nature of the change</li>
+</ul>
+<h5>Test Criteria</h5>
+<ul>
+<li>Workflow defined in the GitHub workflow configuration correctly</li>
+<li>Workflow triggers only on PR merge to main branch</li>
+<li>Workflow correctly checks out code, builds the tool, and generates diagrams</li>
+<li>Workflow commits and pushes changes back to the main branch</li>
+<li>Commit message is informative and standardized</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../GitHubIntegration.html#automated-diagram-generation-on-pr-merge">Automated Diagram Generation on PR Merge</a></li>
+<li>satisfiedBy: <a href="../../.github/workflows/generate_diagrams.yml">generate_diagrams.yml</a></li>
+</ul>
+<hr />
+<h3 id="diagram-relation-filtering-verification">Diagram Relation Filtering Verification</h3>
+<p>This test verifies that the system correctly filters relations in diagram generation to render only forward relations while ensuring complete element hierarchy representation.</p>
+<h4>Details</h4>
+<h5>Acceptance Criteria</h5>
+<ul>
+<li>System should render only relations from DIAGRAM_RELATIONS list to prevent duplicate arrows for bidirectional relationships</li>
+<li>System should include parent elements in diagrams even when they belong to different sections</li>
+<li>System should apply list-based rendering according to DIAGRAM_RELATIONS specification</li>
+<li>Generated diagrams should not contain both relations from opposite pairs for the same logical relationship</li>
+</ul>
+<h5>Test Criteria</h5>
+<ul>
+<li>Command exits with success (0) return code</li>
+<li>Diagrams contain only relations specified in DIAGRAM_RELATIONS (e.g., <code>derive</code> but not <code>derivedFrom</code>)</li>
+<li>Bidirectional relationships appear as single arrows using the relation specified in DIAGRAM_RELATIONS</li>
+<li>Parent elements are included when child elements are in the section</li>
+<li>No duplicate arrows exist for the same logical relationship</li>
+<li>Arrow rendering follows the DIAGRAM_RELATIONS list specification</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../ReqvireTool/ModelManagement/DiagramGeneration.html#diagram-relation-filtering">Diagram Relation Filtering</a></li>
+<li>satisfiedBy: <a href="../../tests/test-diagram-filtering/test.sh">test.sh</a></li>
+</ul>
+<hr />
+<h3 id="remove-generated-diagrams-verification">Remove Generated Diagrams Verification</h3>
+<p>This test verifies that the system can remove all generated mermaid diagrams while preserving custom user-created diagrams and respecting file exclusion patterns.</p>
+<h4>Details</h4>
+<h5>Acceptance Criteria</h5>
+<ul>
+<li>System should remove all auto-generated mermaid diagrams identified by the REQVIRE-AUTOGENERATED-DIAGRAM marker</li>
+<li>System should preserve custom mermaid diagrams that do not contain the auto-generation marker</li>
+<li>System should respect exclusion patterns defined in .gitignore and .reqvireignore files</li>
+<li>System should handle files with multiple diagrams correctly, removing only marked ones</li>
+<li>System should work on files without any diagrams</li>
+<li>System should maintain file structure and content except for diagram removal</li>
+<li>Auto-generated diagrams must contain the REQVIRE-AUTOGENERATED-DIAGRAM marker for identification</li>
+<li>Marker-based identification should work regardless of diagram location in the document</li>
+</ul>
+<h5>Test Criteria</h5>
+<ul>
+<li>Command exits with success (0) return code</li>
+<li>Auto-generated diagrams containing REQVIRE-AUTOGENERATED-DIAGRAM marker are removed from files</li>
+<li>Custom diagrams without the marker are preserved regardless of their location</li>
+<li>Files matching exclusion patterns are not processed for diagram removal</li>
+<li>File structure remains intact except for diagram removal</li>
+<li>Element text and relationships are preserved</li>
+<li>Section headers and element headers are preserved</li>
+<li>Mixed files with both auto-generated (marked) and custom (unmarked) diagrams handle removal correctly</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../ReqvireTool/ModelManagement/DiagramGeneration.html#auto-generated-diagram-identification">Auto-Generated Diagram Identification</a></li>
+<li>satisfiedBy: <a href="../../tests/test-remove-diagrams/test.sh">test.sh</a></li>
+</ul>
+<hr />
+
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,1564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ReportsTests</title>
+    
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa;
+    color: #333;
+}
+.reqvire-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    background-color: #2c3e50;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+}
+.reqvire-nav a {
+    color: #ecf0f1;
+    text-decoration: none;
+    padding: 10px 20px;
+    margin-right: 5px;
+    border-radius: 3px;
+    transition: background-color 0.2s;
+}
+.reqvire-nav a:hover {
+    background-color: #34495e;
+}
+.reqvire-nav-spacer {
+    height: 50px;
+}
+.container {
+    max-width: 95%;
+    margin: 0 auto;
+    padding: 20px;
+}
+.content {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+h1 {
+    color: #333;
+    border-bottom: 2px solid #eaecef;
+    padding-bottom: 10px;
+    margin-top: 0;
+}
+h2 {
+    color: #333;
+    border-bottom: 1px solid #eaecef;
+    padding-bottom: 5px;
+}
+h3 {
+    color: #1a6fb7;
+    margin-top: 25px;
+}
+h4 {
+    color: #555;
+    font-weight: 600;
+}
+a {
+    color: #0366d6;
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 20px 0;
+}
+table, th, td {
+    border: 1px solid #dfe2e5;
+}
+th, td {
+    padding: 8px 12px;
+    text-align: left;
+}
+th {
+    background-color: #f6f8fa;
+}
+code {
+    background: #f6f8fa;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 90%;
+}
+pre {
+    background: #f6f8fa;
+    border-radius: 3px;
+    padding: 16px;
+    overflow: auto;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+}
+blockquote {
+    margin: 0;
+    padding: 0 15px;
+    color: #777;
+    border-left: 4px solid #dfe2e5;
+}
+.mermaid {
+    margin: 20px 0;
+    text-align: center;
+    height: calc(100vh - 150px);
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid #dfe2e5;
+    border-radius: 3px;
+    background-color: #fafafa;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+.mermaid svg {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    position: relative;
+    z-index: 1;
+}
+.diagram-nav-buttons {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 999; /* higher than SVG (1) but lower than header nav (1000) */
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 5px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+.diagram-nav-row {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+}
+.diagram-nav-btn {
+    width: 32px;
+    height: 32px;
+    background-color: #2c3e50;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.diagram-nav-btn:hover {
+    background-color: #34495e;
+}
+.diagram-nav-btn:active {
+    background-color: #1a252f;
+}
+</style>
+
+    <!-- Enhanced mermaid configuration for Reqvire diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.5.0/dist/svg-pan-zoom.min.js"></script>
+    <script>
+        // Capture Mermaid errors
+        mermaid.parseError = function(err, hash) {
+            console.error('Mermaid Parse Error:', err);
+            console.error('Error details:', {
+                str: err.str,
+                hash: err.hash,
+                message: err.message,
+                stack: err.stack
+            });
+        };
+
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            maxTextSize: 120000,
+            maxEdges: 2000,
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            securityLevel: 'loose',
+            logLevel: 'error'
+        });
+
+        // Add pan/zoom to all Mermaid diagrams after rendering
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                document.querySelectorAll('.mermaid').forEach(function(mermaidContainer) {
+                    var svg = mermaidContainer.querySelector('svg');
+                    if (!svg) return;
+
+                    svg.style.maxWidth = 'none';
+                    svg.style.maxHeight = 'none';
+
+                    var eventsHandler = {
+                        haltEventListeners: ['touchstart', 'touchend', 'touchmove', 'touchleave', 'touchcancel'],
+                        init: function(options) {
+                            var instance = options.instance;
+                            var initialScale = 1;
+                            var pannedX = 0;
+                            var pannedY = 0;
+
+                            this.hammer = Hammer(options.svgElement, {
+                                inputClass: Hammer.SUPPORT_POINTER_EVENTS ? Hammer.PointerEventInput : Hammer.TouchInput
+                            });
+
+                            this.hammer.get('pinch').set({enable: true});
+
+                            this.hammer.on('doubletap', function(ev){
+                                instance.zoomIn();
+                            });
+
+                            this.hammer.on('panstart panmove', function(ev){
+                                if (ev.type === 'panstart') {
+                                    pannedX = 0;
+                                    pannedY = 0;
+                                }
+                                instance.panBy({x: ev.deltaX - pannedX, y: ev.deltaY - pannedY});
+                                pannedX = ev.deltaX;
+                                pannedY = ev.deltaY;
+                            });
+
+                            this.hammer.on('pinchstart pinchmove', function(ev){
+                                if (ev.type === 'pinchstart') {
+                                    initialScale = instance.getZoom();
+                                }
+                                instance.zoomAtPoint(initialScale * ev.scale, {x: ev.center.x, y: ev.center.y});
+                            });
+
+                            options.svgElement.addEventListener('touchmove', function(e){ e.preventDefault(); });
+                        },
+                        destroy: function(){
+                            this.hammer.destroy();
+                        }
+                    };
+
+                    // Diagrams with default zoom (no auto-fit)
+                    var panZoomInstance = svgPanZoom(svg, {
+                        zoomEnabled: true,
+                        controlIconsEnabled: true,
+                        fit: false,
+                        center: false,
+                        contain: false,
+                        minZoom: 0.5,
+                        maxZoom: 10,
+                        zoomScaleSensitivity: 0.3,
+                        customEventsHandler: eventsHandler
+                    });
+
+                    // Add navigation buttons
+                    var navButtons = document.createElement('div');
+                    navButtons.className = 'diagram-nav-buttons';
+                    navButtons.innerHTML = `
+                        <div class="diagram-nav-row">
+                            <button class="diagram-nav-btn" data-action="up">▲</button>
+                        </div>
+                        <div class="diagram-nav-row">
+                            <button class="diagram-nav-btn" data-action="left">◀</button>
+                            <button class="diagram-nav-btn" data-action="down">▼</button>
+                            <button class="diagram-nav-btn" data-action="right">▶</button>
+                        </div>
+                    `;
+                    mermaidContainer.appendChild(navButtons);
+
+                    // Wire up navigation buttons
+                    var panStep = 100;
+                    navButtons.querySelectorAll('.diagram-nav-btn').forEach(function(btn) {
+                        btn.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            var action = this.getAttribute('data-action');
+                            switch(action) {
+                                case 'up':
+                                    panZoomInstance.panBy({x: 0, y: panStep});
+                                    break;
+                                case 'down':
+                                    panZoomInstance.panBy({x: 0, y: -panStep});
+                                    break;
+                                case 'left':
+                                    panZoomInstance.panBy({x: panStep, y: 0});
+                                    break;
+                                case 'right':
+                                    panZoomInstance.panBy({x: -panStep, y: 0});
+                                    break;
+                            }
+                        });
+                    });
+                });
+            }, 1500);
+        });
+    </script>
+</head>
+<body>
+    <nav class="reqvire-nav">
+        <a href="../../index.html">Home</a>
+        <a href="../../model.html">Model</a>
+        <a href="../../whole-model.html">Whole Model</a>
+        <a href="../../traces.html">Traces</a>
+        <a href="../../coverage.html">Coverage</a>
+    </nav>
+    <div class="reqvire-nav-spacer"></div>
+    <div class="container">
+        <div class="content">
+            <h1 id="report-generation-tests">Report Generation Tests</h1>
+<p>This document contains verification tests for Reqvire’s report generation capabilities.</p>
+<h2 id="report-generation-tests">Report Generation Tests</h2>
+<div class="mermaid">graph LR;
+  %% REQVIRE-AUTOGENERATED-DIAGRAM
+  %% Graph styling
+  classDef userRequirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef systemRequirement fill:#fce4e4,stroke:#e68a8a,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+
+  b266b2fae4370efb[&quot;Custom Element Type Tracking Test&quot;];
+  class b266b2fae4370efb verification;
+  click b266b2fae4370efb &quot;ReportsTests.html#custom-element-type-tracking-test&quot;;
+  e8358fc93fee95fb[&quot;test.sh&quot;];
+  class e8358fc93fee95fb default;
+  click e8358fc93fee95fb &quot;../../tests/test-search-all-features/test.sh&quot;;
+  b266b2fae4370efb -->|satisfiedBy| e8358fc93fee95fb;
+  6c3185c2d992e9fb[&quot;Model Command Verification&quot;];
+  class 6c3185c2d992e9fb verification;
+  click 6c3185c2d992e9fb &quot;ReportsTests.html#model-command-verification&quot;;
+  e3433ff5bc275516[&quot;test.sh&quot;];
+  class e3433ff5bc275516 default;
+  click e3433ff5bc275516 &quot;../../tests/test-model-command/test.sh&quot;;
+  6c3185c2d992e9fb -->|satisfiedBy| e3433ff5bc275516;
+  d32ffdff20bc3c1e[&quot;Search Command Tests&quot;];
+  class d32ffdff20bc3c1e verification;
+  click d32ffdff20bc3c1e &quot;ReportsTests.html#search-command-tests&quot;;
+  e8358fc93fee95fb[&quot;test.sh&quot;];
+  class e8358fc93fee95fb default;
+  click e8358fc93fee95fb &quot;../../tests/test-search-all-features/test.sh&quot;;
+  d32ffdff20bc3c1e -->|satisfiedBy| e8358fc93fee95fb;
+  349f5e874cf22d98[&quot;Verification Coverage Report Test&quot;];
+  class 349f5e874cf22d98 verification;
+  click 349f5e874cf22d98 &quot;ReportsTests.html#verification-coverage-report-test&quot;;
+  7099e5b2f8a08808[&quot;test.sh&quot;];
+  class 7099e5b2f8a08808 default;
+  click 7099e5b2f8a08808 &quot;../../tests/test-coverage-report/test.sh&quot;;
+  349f5e874cf22d98 -->|satisfiedBy| 7099e5b2f8a08808;
+  958d9af6695bd8a[&quot;Verification Traces Filter Options Test&quot;];
+  class 958d9af6695bd8a verification;
+  click 958d9af6695bd8a &quot;ReportsTests.html#verification-traces-filter-options-test&quot;;
+  c4c5998e49538704[&quot;test.sh&quot;];
+  class c4c5998e49538704 default;
+  click c4c5998e49538704 &quot;../../tests/test-verification-traces/test.sh&quot;;
+  958d9af6695bd8a -->|satisfiedBy| c4c5998e49538704;
+  fa3c1ae9e9b91644[&quot;Verification Traces From-Folder Test&quot;];
+  class fa3c1ae9e9b91644 verification;
+  click fa3c1ae9e9b91644 &quot;ReportsTests.html#verification-traces-from-folder-test&quot;;
+  c4c5998e49538704[&quot;test.sh&quot;];
+  class c4c5998e49538704 default;
+  click c4c5998e49538704 &quot;../../tests/test-verification-traces/test.sh&quot;;
+  fa3c1ae9e9b91644 -->|satisfiedBy| c4c5998e49538704;
+  b559b1f7629a5c62[&quot;CLI Coverage Command&quot;];
+  class b559b1f7629a5c62 systemRequirement;
+  click b559b1f7629a5c62 &quot;../ReqvireTool/UserInterface/CLI.html#cli-coverage-command&quot;;
+  80defdd4cbc7ee18[&quot;cli.rs&quot;];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 &quot;../../cli/src/cli.rs&quot;;
+  b559b1f7629a5c62 -->|satisfiedBy| 80defdd4cbc7ee18;
+  34c75e4a88e1f381[&quot;CLI Help Structure Verification&quot;];
+  class 34c75e4a88e1f381 verification;
+  click 34c75e4a88e1f381 &quot;Misc.html#cli-help-structure-verification&quot;;
+  b559b1f7629a5c62 -.->|verifiedBy| 34c75e4a88e1f381;
+  b559b1f7629a5c62 -.->|verifiedBy| 349f5e874cf22d98;
+  a51eeded115214db[&quot;CLI Search Command&quot;];
+  class a51eeded115214db systemRequirement;
+  click a51eeded115214db &quot;../ReqvireTool/UserInterface/CLI.html#cli-search-command&quot;;
+  80defdd4cbc7ee18[&quot;cli.rs&quot;];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 &quot;../../cli/src/cli.rs&quot;;
+  a51eeded115214db -->|satisfiedBy| 80defdd4cbc7ee18;
+  a51eeded115214db -.->|verifiedBy| 34c75e4a88e1f381;
+  a51eeded115214db -.->|verifiedBy| d32ffdff20bc3c1e;
+  27e4931d9f0bc019[&quot;CLI Traces Filter Options&quot;];
+  class 27e4931d9f0bc019 systemRequirement;
+  click 27e4931d9f0bc019 &quot;../ReqvireTool/UserInterface/CLI.html#cli-traces-filter-options&quot;;
+  27e4931d9f0bc019 -.->|verifiedBy| 958d9af6695bd8a;
+  42a913d5509a336b[&quot;CLI Traces From-Folder Option&quot;];
+  class 42a913d5509a336b systemRequirement;
+  click 42a913d5509a336b &quot;../ReqvireTool/UserInterface/CLI.html#cli-traces-from-folder-option&quot;;
+  42a913d5509a336b -.->|verifiedBy| fa3c1ae9e9b91644;
+  9ba85ead8a1ca9fd[&quot;Custom Element Type Tracking&quot;];
+  class 9ba85ead8a1ca9fd systemRequirement;
+  click 9ba85ead8a1ca9fd &quot;../ReqvireTool/ValidationAndReporting/Reports.html#custom-element-type-tracking&quot;;
+  46f5ca73b0822d14[&quot;search.rs&quot;];
+  class 46f5ca73b0822d14 default;
+  click 46f5ca73b0822d14 &quot;../../core/src/search.rs&quot;;
+  9ba85ead8a1ca9fd -->|satisfiedBy| 46f5ca73b0822d14;
+  9ba85ead8a1ca9fd -.->|verifiedBy| b266b2fae4370efb;
+  11ca6eab6e458ae0[&quot;Forward-Only Relation Traversal&quot;];
+  class 11ca6eab6e458ae0 systemRequirement;
+  click 11ca6eab6e458ae0 &quot;../ReqvireTool/ValidationAndReporting/Reports.html#forward-only-relation-traversal&quot;;
+  dad7eeb932afdb92[&quot;diagrams.rs&quot;];
+  class dad7eeb932afdb92 default;
+  click dad7eeb932afdb92 &quot;../../core/src/diagrams.rs&quot;;
+  11ca6eab6e458ae0 -->|satisfiedBy| dad7eeb932afdb92;
+  11ca6eab6e458ae0 -.->|verifiedBy| 6c3185c2d992e9fb;
+  96873a19c51bd42f[&quot;Model Diagram Output Formats&quot;];
+  class 96873a19c51bd42f systemRequirement;
+  click 96873a19c51bd42f &quot;../ReqvireTool/ValidationAndReporting/Reports.html#model-diagram-output-formats&quot;;
+  dad7eeb932afdb92[&quot;diagrams.rs&quot;];
+  class dad7eeb932afdb92 default;
+  click dad7eeb932afdb92 &quot;../../core/src/diagrams.rs&quot;;
+  96873a19c51bd42f -->|satisfiedBy| dad7eeb932afdb92;
+  96873a19c51bd42f -.->|verifiedBy| 6c3185c2d992e9fb;
+  2f4ed9115af684ea[&quot;Search Fine Grained Filtering&quot;];
+  class 2f4ed9115af684ea systemRequirement;
+  click 2f4ed9115af684ea &quot;../ReqvireTool/ValidationAndReporting/Reports.html#search-fine-grained-filtering&quot;;
+  2f4ed9115af684ea -.->|deriveReqT| a51eeded115214db;
+  80defdd4cbc7ee18[&quot;cli.rs&quot;];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 &quot;../../cli/src/cli.rs&quot;;
+  2f4ed9115af684ea -->|satisfiedBy| 80defdd4cbc7ee18;
+  1c9b1c7c49701993[&quot;filters.rs&quot;];
+  class 1c9b1c7c49701993 default;
+  click 1c9b1c7c49701993 &quot;../../core/src/filters.rs&quot;;
+  2f4ed9115af684ea -->|satisfiedBy| 1c9b1c7c49701993;
+  46f5ca73b0822d14[&quot;search.rs&quot;];
+  class 46f5ca73b0822d14 default;
+  click 46f5ca73b0822d14 &quot;../../core/src/search.rs&quot;;
+  2f4ed9115af684ea -->|satisfiedBy| 46f5ca73b0822d14;
+  2f4ed9115af684ea -.->|verifiedBy| d32ffdff20bc3c1e;
+</div>
+<h3 id="search-command-tests">Search Command Tests</h3>
+<p>This test verifies that the system provides a unified <code>search</code> command functionality for searching and filtering model elements with comprehensive filter options and output modes.</p>
+<h4>Details</h4>
+<h5>Acceptance Criteria</h5>
+<ul>
+<li>Running <code>reqvire search --json</code> produces a valid, pretty-printed JSON search result</li>
+<li>Running <code>reqvire search</code> (no <code>--json</code>) prints a human-readable text search result</li>
+<li>Running <code>reqvire search --short</code> produces abbreviated text output (one-line per element format: <code>[type] identifier - name</code>)</li>
+<li>Running <code>reqvire search --short --json</code> produces abbreviated JSON output (omits specified fields)</li>
+<li>Both JSON and text outputs include all elements matching filter criteria</li>
+<li>All filter flags work individually and in combination (conjunctive AND logic)</li>
+<li>Supplying an invalid regex to any regex-based filter fails with a non-zero exit code and displays a clear error message</li>
+<li>Search results must include all relations for each element</li>
+<li><strong>Enhanced Content Display</strong>: Search must display page content (frontmatter before first section) and section content (content between section headers and first element) when not in short mode</li>
+<li><strong>Count Information</strong>: Search must show counts for files, pages, sections, and elements in full mode (omitted in short mode)</li>
+<li><strong>Short Mode Behavior</strong>: Short mode omits: <code>content</code>, <code>section_content</code>, <code>page_content</code>, <code>verified_relations_count</code>, <code>satisfied_relations_count</code>, <code>element_count</code>, <code>total_sections</code>, <code>total_elements</code>, <code>global_counters</code></li>
+</ul>
+<h5>Test Criteria</h5>
+<ol>
+<li>
+<p><strong>Base JSON search</strong>
+Command: <code>reqvire search --json</code></p>
+<ul>
+<li>exits code <strong>0</strong></li>
+<li>output parses under <code>jq</code></li>
+<li><code>.files</code> contains file path keys</li>
+<li>All elements included when no filters specified</li>
+</ul>
+</li>
+<li>
+<p><strong>Base text search</strong>
+Command: <code>reqvire search</code></p>
+<ul>
+<li>exits code <strong>0</strong></li>
+<li>human-readable output with hierarchical structure</li>
+<li>each element block includes identifier, name, section, file, type, content</li>
+<li>relations displayed for each element</li>
+</ul>
+</li>
+<li>
+<p><strong>Short mode text output</strong>
+Command: <code>reqvire search --short</code></p>
+<ul>
+<li>exits code <strong>0</strong></li>
+<li>one line per element: <code>[type] identifier - name</code></li>
+<li>no content, section content, or page content displayed</li>
+<li>no count information displayed</li>
+</ul>
+</li>
+<li>
+<p><strong>Short mode JSON output</strong>
+Command: <code>reqvire search --short --json</code></p>
+<ul>
+<li>exits code <strong>0</strong></li>
+<li>output parses as valid JSON</li>
+<li>element objects do NOT contain: <code>content</code>, <code>verified_relations_count</code>, <code>satisfied_relations_count</code></li>
+<li>section objects do NOT contain: <code>section_content</code>, <code>element_count</code></li>
+<li>file objects do NOT contain: <code>page_content</code>, <code>total_sections</code>, <code>total_elements</code></li>
+<li>top level does NOT contain: <code>global_counters</code></li>
+</ul>
+</li>
+<li>
+<p><strong>Individual filters</strong>
+For each flag in turn, run both JSON and text modes:</p>
+<ul>
+<li><code>--filter-file=&quot;**/*Reqs.md&quot;</code> (glob)</li>
+<li><code>--filter-name=&quot;.*safety.*&quot;</code> (regex)</li>
+<li><code>--filter-section=&quot;System*&quot;</code> (glob)</li>
+<li><code>--filter-type=&quot;user-requirement&quot;</code> (exact)</li>
+<li><code>--filter-content=&quot;MUST&quot;</code> (regex)</li>
+<li><code>--filter-section-content=&quot;implement.*&quot;</code> (regex)</li>
+<li><code>--filter-page-content=&quot;architecture&quot;</code> (regex)</li>
+<li><code>--have-relations=verifiedBy</code> (comma-separated)</li>
+<li><code>--not-have-relations=verifiedBy</code> (comma-separated)
+Assert for each:</li>
+<li>exit code <strong>0</strong></li>
+<li>only elements matching the filter appear in output</li>
+</ul>
+</li>
+<li>
+<p><strong>Filter combinations</strong>
+Combine multiple filters and verify outputs contain exactly those elements passing ALL filters:</p>
+<ul>
+<li><code>--filter-type=user-requirement --have-relations=verifiedBy,satisfiedBy</code></li>
+<li><code>--filter-section=&quot;System*&quot; --filter-name=&quot;.*GPS.*&quot;</code></li>
+<li><code>--filter-content=&quot;MUST&quot; --not-have-relations=verifiedBy</code></li>
+</ul>
+</li>
+<li>
+<p><strong>Invalid regex</strong>
+Command: <code>reqvire search --json --filter-name=&quot;***&quot;</code></p>
+<ul>
+<li>exits non-zero</li>
+<li>stderr contains error message with faulty pattern</li>
+</ul>
+</li>
+<li>
+<p><strong>Invalid relation type</strong>
+Command: <code>reqvire search --have-relations=invalidRelationType</code></p>
+<ul>
+<li>exits non-zero</li>
+<li>stderr contains error with list of valid relation types</li>
+</ul>
+</li>
+<li>
+<p><strong>Multiple relations in have-relations</strong>
+Command: <code>reqvire search --have-relations=verifiedBy,satisfiedBy</code></p>
+<ul>
+<li>exits code <strong>0</strong></li>
+<li>only elements that have BOTH verifiedBy AND satisfiedBy relations appear</li>
+<li>elements with only one of the relations are excluded</li>
+</ul>
+</li>
+<li>
+<p><strong>Multiple relations in not-have-relations</strong>
+Command: <code>reqvire search --not-have-relations=verifiedBy,satisfiedBy</code></p>
+<ul>
+<li>exits code <strong>0</strong></li>
+<li>only elements that do NOT have ALL specified relations appear</li>
+<li>if element lacks verifiedBy OR satisfiedBy (or both), it is included</li>
+</ul>
+</li>
+<li>
+<p><strong>Section content filter</strong>
+Command: <code>reqvire search --filter-section-content=&quot;MUST.*implement&quot;</code></p>
+<ul>
+<li>exits code <strong>0</strong></li>
+<li>only elements whose parent section content matches regex appear</li>
+<li>elements in sections without matching content are excluded</li>
+</ul>
+</li>
+<li>
+<p><strong>Page content filter</strong>
+Command: <code>reqvire search --filter-page-content=&quot;architecture&quot;</code></p>
+<ul>
+<li>exits code <strong>0</strong></li>
+<li>only elements whose parent file page content matches regex appear</li>
+<li>elements in files without matching page content are excluded</li>
+</ul>
+</li>
+<li>
+<p><strong>Relations coverage</strong>
+Command: <code>reqvire search --json</code></p>
+<ul>
+<li>Both JSON and text outputs must show complete relationship information</li>
+<li>All relation types and targets included</li>
+</ul>
+</li>
+<li>
+<p><strong>Enhanced content and counts verification (full mode)</strong>
+Command: <code>reqvire search --json</code></p>
+<ul>
+<li>JSON output must include <code>page_content</code> field for files that have frontmatter content</li>
+<li>JSON output must include <code>section_content</code> field for sections that have content</li>
+<li>JSON output must include count fields in global counters</li>
+<li>JSON output must include per-file and per-section counts</li>
+</ul>
+</li>
+<li>
+<p><strong>Short mode field omission verification</strong>
+Command: <code>reqvire search --short --json</code></p>
+<ul>
+<li>Verify all specified fields are omitted from JSON structure</li>
+<li>Verify no null/empty placeholders for omitted fields (fields completely absent)</li>
+</ul>
+</li>
+</ol>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../ReqvireTool/UserInterface/CLI.html#cli-search-command">CLI Search Command</a></li>
+<li>verify: <a href="../ReqvireTool/ValidationAndReporting/Reports.html#search-fine-grained-filtering">Search Fine Grained Filtering</a></li>
+<li>satisfiedBy: <a href="../../tests/test-search-all-features/test.sh">test.sh</a></li>
+</ul>
+<hr />
+<h3 id="verification-coverage-report-test">Verification Coverage Report Test</h3>
+<p>This test verifies that the system correctly generates verification coverage reports focusing on leaf requirements, showing the percentage and details of satisfied and unsatisfied test-verification elements, and identifying orphaned verifications.</p>
+<h4>Details</h4>
+<h5>Acceptance Criteria</h5>
+<ul>
+<li>System shall provide a CLI command <code>coverage</code> that generates coverage reports focusing on leaf requirements</li>
+<li>Command shall support <code>--json</code> flag for JSON output format</li>
+<li>Coverage report shall include summary section with total counts and percentages for leaf requirements</li>
+<li>Coverage report shall show breakdown by verification type (test, analysis, inspection, demonstration)</li>
+<li>Coverage report shall list verified leaf requirements grouped by file and section</li>
+<li>Coverage report shall list unverified leaf requirements with details</li>
+<li>Coverage report shall list satisfied test-verification elements (those with satisfiedBy relations)</li>
+<li>Coverage report shall list unsatisfied test-verification elements (those without satisfiedBy relations)</li>
+<li>Coverage report shall list orphaned verifications (verifications without any verify relations to requirements)</li>
+<li>Coverage report shall show orphaned verifications count and percentage in summary section</li>
+<li>Non-test-verification elements (analysis, inspection, demonstration) are considered satisfied by default (no satisfiedBy required)</li>
+<li>JSON output shall be valid and machine-readable</li>
+<li>Text output shall be human-readable with clear formatting</li>
+</ul>
+<h5>Test Criteria</h5>
+<ol>
+<li>
+<p><strong>Basic Coverage Report</strong>
+Command: <code>reqvire coverage-report</code></p>
+<ul>
+<li>exits code <strong>0</strong></li>
+<li>output contains <code>=== Verification Coverage Report ===</code></li>
+<li>output contains <code>Summary:</code> section with leaf requirements counts and percentages</li>
+<li>output contains <code>Verification Types:</code> breakdown</li>
+<li>output contains coverage percentage calculation for leaf requirements</li>
+<li>verified leaf requirements are marked with ✅</li>
+<li>unverified leaf requirements are marked with ❌</li>
+<li>satisfied test-verification elements are marked with ✅</li>
+<li>unsatisfied test-verification elements are marked with ❌</li>
+</ul>
+</li>
+<li>
+<p><strong>JSON Coverage Report</strong>
+Command: <code>reqvire coverage-report --json</code></p>
+<ul>
+<li>exits code <strong>0</strong></li>
+<li>output parses as valid JSON</li>
+<li>JSON contains <code>summary</code> object with leaf requirements counts and percentages</li>
+<li>JSON contains <code>verified_leaf_requirements</code> and <code>unverified_leaf_requirements</code> sections</li>
+<li>JSON contains <code>satisfied_test_verifications</code> and <code>unsatisfied_test_verifications</code> sections</li>
+<li>verification details include identifier, name, section, type, and satisfied_by relations (for test-verification only)</li>
+</ul>
+</li>
+<li>
+<p><strong>Coverage Calculation</strong></p>
+<ul>
+<li>Leaf requirements coverage percentage calculated as (verified_leaf_requirements/total_leaf_requirements * 100)</li>
+<li>Test-verification satisfaction percentage calculated as (satisfied_test_verifications/total_test_verifications * 100)</li>
+<li>Verification types correctly categorized</li>
+<li>Test-verification elements without satisfiedBy relations are flagged as unsatisfied</li>
+<li>Test-verification elements with valid satisfiedBy relations are considered satisfied</li>
+<li>Analysis, inspection, and demonstration verifications are considered satisfied by default (no satisfiedBy evaluation)</li>
+</ul>
+</li>
+</ol>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../ReqvireTool/UserInterface/CLI.html#cli-coverage-command">CLI Coverage Command</a></li>
+<li>satisfiedBy: <a href="../../tests/test-coverage-report/test.sh">test.sh</a></li>
+</ul>
+<hr />
+<h3 id="verification-traces-filter-options-test">Verification Traces Filter Options Test</h3>
+<p>This test verifies that the verification-traces command filter options work correctly when generating upward trace trees from verification elements to root requirements.</p>
+<h4>Details</h4>
+<h5>Acceptance Criteria</h5>
+<ul>
+<li>System shall provide CLI command <code>traces</code> that generates upward trace trees from verifications</li>
+<li>Command shall output to stdout in Markdown format with embedded Mermaid diagrams by default</li>
+<li>Command shall support <code>--json</code> flag for structured JSON output without diagrams</li>
+<li>Mermaid diagrams shall show verification element as root with arrows following relation semantics</li>
+<li>Mermaid diagrams shall include clickable links on all nodes (verifications and requirements)</li>
+<li>Directly verified requirements shall be marked/highlighted in diagrams using CSS classes</li>
+<li>System shall traverse all upward parent relations to reach root requirements</li>
+<li>System shall merge multiple verification paths into single tree per verification</li>
+<li>System shall support <code>--filter-id=&lt;id&gt;</code> filter for specific verification element</li>
+<li>System shall support <code>--filter-name=&lt;regex&gt;</code> for filtering by verification name pattern</li>
+<li>System shall support <code>--filter-type=&lt;type&gt;</code> for filtering by verification type</li>
+<li>Multiple filters shall be combinable using AND logic</li>
+<li>JSON output shall include verification ID, directly verified requirements, and complete trace tree structure</li>
+</ul>
+<h5>Test Criteria</h5>
+<ol>
+<li>
+<p><strong>Basic Markdown Output</strong>
+Command: <code>reqvire verification-traces</code></p>
+<ul>
+<li>exits code <strong>0</strong></li>
+<li>output contains <code># Verification Traceability Report</code></li>
+<li>output contains Mermaid diagram blocks with <code>graph BT</code></li>
+<li>diagrams include verification element nodes and requirement nodes</li>
+<li>diagrams include click handlers for all nodes (format: <code>click NODE_ID &quot;url&quot;</code>)</li>
+<li>directly verified requirements have <code>:::verified</code> CSS class in diagram</li>
+</ul>
+</li>
+<li>
+<p><strong>JSON Output</strong>
+Command: <code>reqvire verification-traces --json</code></p>
+<ul>
+<li>exits code <strong>0</strong></li>
+<li>output parses as valid JSON</li>
+<li>JSON contains <code>verifications</code> array</li>
+<li>each verification includes <code>verification_id</code>, <code>verification_name</code>, <code>verification_type</code></li>
+<li>each verification includes <code>directly_verified_requirements</code> array</li>
+<li>each verification includes <code>trace_tree</code> with nested requirement structure</li>
+</ul>
+</li>
+<li>
+<p><strong>Correct Arrow Directions</strong></p>
+<ul>
+<li>Mermaid diagrams use <code>SYS001 -.-&gt;|verify| VER001</code> format (requirement verifies verification)</li>
+<li>Mermaid diagrams use <code>USER001 -.-&gt;|deriveReqT| SYS001</code> format (parent derives child)</li>
+<li>Arrow directions match Reqvire relation semantics (TargetToElement, ElementToTarget)</li>
+</ul>
+</li>
+<li>
+<p><strong>Specific Verification Filter</strong>
+Command: <code>reqvire verification-traces --filter-id=&quot;specifications/Verifications/ValidationTests.md#invalid-relations-test&quot;</code></p>
+<ul>
+<li>exits code <strong>0</strong></li>
+<li>output contains only trace for specified verification</li>
+<li>other verifications are excluded</li>
+</ul>
+</li>
+<li>
+<p><strong>Name Pattern Filter</strong>
+Command: <code>reqvire verification-traces --filter-name=&quot;.*Coverage.*&quot;</code></p>
+<ul>
+<li>exits code <strong>0</strong></li>
+<li>output contains only verifications matching regex pattern</li>
+<li>non-matching verifications are excluded</li>
+</ul>
+</li>
+<li>
+<p><strong>Type Filter</strong>
+Command: <code>reqvire verification-traces --filter-type=&quot;test-verification&quot;</code></p>
+<ul>
+<li>exits code <strong>0</strong></li>
+<li>output contains only test-verification elements</li>
+<li>analysis, inspection, demonstration verifications are excluded</li>
+</ul>
+</li>
+<li>
+<p><strong>Combined Filters</strong>
+Command: <code>reqvire verification-traces --filter-type=&quot;test-verification&quot; --filter-name=&quot;.*Test&quot;</code></p>
+<ul>
+<li>exits code <strong>0</strong></li>
+<li>output contains only verifications matching ALL filter criteria (AND logic)</li>
+<li>verifications matching only one filter are excluded</li>
+</ul>
+</li>
+</ol>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../ReqvireTool/UserInterface/CLI.html#cli-traces-filter-options">CLI Traces Filter Options</a></li>
+<li>satisfiedBy: <a href="../../tests/test-verification-traces/test.sh">test.sh</a></li>
+</ul>
+<hr />
+<h3 id="verification-traces-from-folder-test">Verification Traces From-Folder Test</h3>
+<p>This test verifies that the –from-folder option correctly generates relative links in verification traces output when the output file will be saved in a specific folder location.</p>
+<h4>Details</h4>
+<h5>Acceptance Criteria</h5>
+<ul>
+<li>System shall provide <code>--from-folder=&lt;path&gt;</code> option for <code>traces</code> command</li>
+<li>Option shall accept a relative path to the folder where output will be saved</li>
+<li>When <code>diagrams_with_blobs</code> is false (default), generated Mermaid diagram links shall be relative to the specified folder</li>
+<li>When <code>diagrams_with_blobs</code> is true with Git info, links shall remain as GitHub blob URLs (absolute)</li>
+<li>Links shall be correctly calculated so they work when output file is saved in the from-folder location</li>
+<li>Option shall work with both Markdown and JSON output formats</li>
+<li>Option shall work in combination with filter options</li>
+</ul>
+<h5>Test Criteria</h5>
+<ol>
+<li>
+<p><strong>Basic From-Folder Option</strong>
+Command: <code>reqvire traces --from-folder=docs/reports</code></p>
+<ul>
+<li>exits code <strong>0</strong></li>
+<li>output contains Mermaid diagrams with click handlers</li>
+<li>click handler links are relative paths calculated from <code>docs/reports/</code> to git root</li>
+<li>example: if element identifier is <code>specifications/file.md#element</code>, link should be <code>../../specifications/file.md#element</code></li>
+</ul>
+</li>
+<li>
+<p><strong>From-Folder with Current Directory</strong>
+Command: <code>reqvire traces --from-folder=.</code></p>
+<ul>
+<li>exits code <strong>0</strong></li>
+<li>links are relative to current directory (git root)</li>
+<li>same as omitting –from-folder option</li>
+</ul>
+</li>
+<li>
+<p><strong>From-Folder with Nested Path</strong>
+Command: <code>reqvire traces --from-folder=output/verification/traces</code></p>
+<ul>
+<li>exits code <strong>0</strong></li>
+<li>links correctly navigate up three levels then to specifications</li>
+<li>example: <code>../../specifications/file.md#element</code> becomes <code>../../../specifications/file.md#element</code></li>
+</ul>
+</li>
+<li>
+<p><strong>From-Folder with JSON Output</strong>
+Command: <code>reqvire traces --from-folder=docs/reports --json</code></p>
+<ul>
+<li>exits code <strong>0</strong></li>
+<li>JSON output parses correctly</li>
+<li>JSON element identifiers remain absolute (from git root)</li>
+<li>from-folder only affects Markdown diagram links, not JSON structure</li>
+</ul>
+</li>
+<li>
+<p><strong>From-Folder Combined with Filters</strong>
+Command: <code>reqvire traces --from-folder=docs/reports --filter-type=test-verification</code></p>
+<ul>
+<li>exits code <strong>0</strong></li>
+<li>filtering works correctly</li>
+<li>generated links still relative to <code>docs/reports/</code></li>
+</ul>
+</li>
+<li>
+<p><strong>From-Folder with Git Blobs Enabled</strong>
+Environment: <code>diagrams_with_blobs=true</code> in config
+Command: <code>reqvire traces --from-folder=docs/reports</code></p>
+<ul>
+<li>exits code <strong>0</strong></li>
+<li>links remain as GitHub blob URLs (absolute)</li>
+<li>from-folder has no effect on external GitHub links</li>
+</ul>
+</li>
+<li>
+<p><strong>From-Folder Path Calculation Correctness</strong></p>
+<ul>
+<li>For from-folder <code>a/b/c</code> and identifier <code>specs/req.md#id</code>:
+<ul>
+<li>Link should be <code>../../../specs/req.md#id</code></li>
+</ul>
+</li>
+<li>For from-folder <code>output</code> and identifier <code>specifications/UserRequirements.md#element</code>:
+<ul>
+<li>Link should be <code>../specifications/UserRequirements.md#element</code></li>
+</ul>
+</li>
+<li>Path traversal (..) count matches folder depth</li>
+</ul>
+</li>
+<li>
+<p><strong>From-Folder Special Case for Root</strong>
+Command: <code>reqvire traces --from-folder=/</code></p>
+<ul>
+<li>exits code <strong>0</strong></li>
+<li>identifiers remain as git-root-relative paths (no relative path calculation)</li>
+<li>links use identifiers as-is (e.g., <code>specifications/file.md#element</code>)</li>
+<li>special case <code>/</code> indicates reqvire root (git root)</li>
+</ul>
+</li>
+</ol>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../ReqvireTool/UserInterface/CLI.html#cli-traces-from-folder-option">CLI Traces From-Folder Option</a></li>
+<li>satisfiedBy: <a href="../../tests/test-verification-traces/test.sh">test.sh</a></li>
+</ul>
+<hr />
+<h3 id="model-command-verification">Model Command Verification</h3>
+<p>Comprehensive test verifying model command generates model-centric nested output in different modes.</p>
+<h4>Details</h4>
+<h5>Acceptance Criteria</h5>
+<ol>
+<li><code>reqvire model</code> generates model-centric output showing root requirements with nested relations</li>
+<li><code>reqvire model --from=&lt;name&gt;</code> generates nested structure starting from specified element</li>
+<li><code>reqvire model --json</code> generates valid JSON with nested element structure</li>
+<li><code>reqvire model --from=&lt;name&gt; --json</code> generates filtered JSON from specified starting point</li>
+<li>Default mode filters to root requirements (no hierarchical parent relations)</li>
+<li>Relations contain full target element details recursively</li>
+</ol>
+<h5>Test Criteria</h5>
+<ol>
+<li>
+<p><strong>Default Model Output (Root Requirements)</strong>
+Command: <code>reqvire model --json</code></p>
+<ul>
+<li>exits code <strong>0</strong></li>
+<li>output parses as valid JSON</li>
+<li>JSON contains <code>elements</code> array with root requirements only at top level</li>
+<li>JSON contains <code>metadata</code> with total_elements, total_relations, filtered_from (null)</li>
+<li>Only requirements without hierarchical parent relations at top level</li>
+<li>Nested relations contain full element details recursively</li>
+</ul>
+</li>
+<li>
+<p><strong>Filtered Model Output (From Specific Element)</strong>
+Command: <code>reqvire model --from=&lt;test-element-name&gt; --json</code></p>
+<ul>
+<li>exits code <strong>0</strong></li>
+<li>output parses as valid JSON</li>
+<li>JSON elements array contains specified element at top level</li>
+<li>metadata.filtered_from contains element name</li>
+<li>Only forward-related elements appear in nested structure</li>
+</ul>
+</li>
+<li>
+<p><strong>Markdown Output with Mermaid Diagrams</strong>
+Command: <code>reqvire model</code></p>
+<ul>
+<li>exits code <strong>0</strong></li>
+<li>output contains <code># Model Structure</code></li>
+<li>output contains metadata (Total Elements, Total Relations)</li>
+<li>output contains Mermaid diagram blocks showing all nested relations</li>
+<li>diagrams use hash identifiers for node IDs</li>
+</ul>
+</li>
+<li>
+<p><strong>Nested JSON Structure Validation</strong>
+Command: <code>reqvire model --json</code></p>
+<ul>
+<li>JSON has keys: <code>elements</code>, <code>metadata</code></li>
+<li>Each element has: <code>identifier</code>, <code>name</code>, <code>element_type</code>, <code>file_path</code>, <code>section</code>, <code>section_index</code>, <code>relations</code></li>
+<li>Each relation has: <code>relation_type</code>, target (element/file/external)</li>
+<li>Element targets are nested recursively with same structure</li>
+<li>File targets have: <code>path</code>, <code>type: &quot;file&quot;</code></li>
+<li>External targets have: <code>url</code>, <code>type: &quot;external&quot;</code></li>
+<li>Metadata has: <code>total_elements</code>, <code>total_relations</code>, <code>filtered_from</code></li>
+</ul>
+</li>
+<li>
+<p><strong>Forward-Only Traversal Verification</strong></p>
+<ul>
+<li>Create test with element A that derives B, and B derives C</li>
+<li>Running <code>reqvire model --from=&lt;A-name&gt;</code> includes B and C nested in relations</li>
+<li>Create element D that is derived from B (backward relation)</li>
+<li>Running <code>reqvire model --from=&lt;A-name&gt;</code> includes B and C but NOT D</li>
+<li>Confirms only forward relations (derive, satisfiedBy, verifiedBy, trace) are followed</li>
+</ul>
+</li>
+<li>
+<p><strong>Cycle Detection Verification</strong></p>
+<ul>
+<li>System prevents infinite recursion when cycles exist in forward relations</li>
+<li>Nested structure handles circular dependencies gracefully</li>
+<li>Each element appears at most once in traversal</li>
+</ul>
+</li>
+</ol>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../ReqvireTool/ValidationAndReporting/Reports.html#forward-only-relation-traversal">Forward-Only Relation Traversal</a></li>
+<li>verify: <a href="../ReqvireTool/ValidationAndReporting/Reports.html#model-diagram-output-formats">Model Diagram Output Formats</a></li>
+<li>satisfiedBy: <a href="../../tests/test-model-command/test.sh">test.sh</a></li>
+</ul>
+<hr />
+<h3 id="custom-element-type-tracking-test">Custom Element Type Tracking Test</h3>
+<p>This test verifies that the system correctly tracks and displays custom element types in model summary reports, providing accurate counts in both text and JSON output formats.</p>
+<h4>Details</h4>
+<h5>Acceptance Criteria</h5>
+<ul>
+<li>System SHALL track elements with custom types (types not in the standard categories)</li>
+<li>Custom types SHALL be counted separately from standard element types</li>
+<li>Text output SHALL display custom types in alphabetical order</li>
+<li>JSON output SHALL include <code>custom_element_types</code> field in global_counters</li>
+<li>Custom types field SHALL be omitted from JSON when no custom types exist</li>
+<li>Standard types (requirement, user-requirement, verification types) SHALL NOT be counted as custom</li>
+<li>File-type elements SHALL NOT be counted as custom types</li>
+</ul>
+<h5>Test Criteria</h5>
+<ol>
+<li>
+<p><strong>Custom Types in Text Output</strong>
+Command: <code>reqvire summary</code> (on test data with custom types)</p>
+<ul>
+<li>exits code <strong>0</strong></li>
+<li>output contains <code>📋 Element Types:</code> section</li>
+<li>custom types appear after standard types</li>
+<li>format: <code>Custom (type-name): count</code></li>
+<li>custom types are sorted alphabetically</li>
+<li>standard types (System Requirements, User Requirements, Verifications) appear first</li>
+</ul>
+</li>
+<li>
+<p><strong>Custom Types in JSON Output</strong>
+Command: <code>reqvire summary --json</code> (on test data with custom types)</p>
+<ul>
+<li>exits code <strong>0</strong></li>
+<li>output parses as valid JSON</li>
+<li>JSON contains <code>.global_counters.custom_element_types</code> object</li>
+<li>custom_element_types is a HashMap with type names as keys and counts as values</li>
+<li>example: <code>{&quot;custom_element_types&quot;: {&quot;moe&quot;: 2, &quot;interface&quot;: 1}}</code></li>
+<li>type names are stored and displayed exactly as defined in metadata</li>
+</ul>
+</li>
+<li>
+<p><strong>No Custom Types Handling</strong>
+Command: <code>reqvire summary --json</code> (on test data without custom types)</p>
+<ul>
+<li>exits code <strong>0</strong></li>
+<li>output parses as valid JSON</li>
+<li>JSON does NOT contain <code>custom_element_types</code> field in global_counters</li>
+<li>field is omitted entirely (not present as empty object)</li>
+</ul>
+</li>
+<li>
+<p><strong>Standard Types Not Counted as Custom</strong></p>
+<ul>
+<li>Verify requirements with type <code>requirement</code> are NOT in custom_element_types</li>
+<li>Verify requirements with type <code>user-requirement</code> are NOT in custom_element_types</li>
+<li>Verify verifications with type <code>test-verification</code> are NOT in custom_element_types</li>
+<li>Verify verifications with type <code>analysis-verification</code> are NOT in custom_element_types</li>
+<li>Verify verifications with type <code>inspection-verification</code> are NOT in custom_element_types</li>
+<li>Verify verifications with type <code>demonstration-verification</code> are NOT in custom_element_types</li>
+<li>Only elements with non-standard types appear in custom_element_types</li>
+</ul>
+</li>
+<li>
+<p><strong>Multiple Custom Types</strong>
+Command: <code>reqvire summary</code> (on test data with multiple different custom types)</p>
+<ul>
+<li>exits code <strong>0</strong></li>
+<li>each distinct custom type is counted separately</li>
+<li>counts are accurate for each type</li>
+<li>alphabetical sorting is maintained</li>
+<li>example output:
+<pre><code>Custom (interface): 1
+Custom (moe): 2
+Custom (other): 1
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Alphabetical Sorting</strong></p>
+<ul>
+<li>Custom types in text output are sorted alphabetically by type name</li>
+<li>Example: “interface” appears before “moe”, which appears before “other”</li>
+<li>Sorting is case-sensitive (lowercase before uppercase if mixed)</li>
+</ul>
+</li>
+<li>
+<p><strong>JSON Structure Validation</strong>
+Command: <code>reqvire summary --json</code> (on test data with custom types)</p>
+<ul>
+<li><code>.global_counters.custom_element_types</code> is an object/map</li>
+<li>Keys are strings (type names)</li>
+<li>Values are numbers (counts &gt; 0)</li>
+<li>No custom_element_types entry with zero count</li>
+</ul>
+</li>
+</ol>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../ReqvireTool/ValidationAndReporting/Reports.html#custom-element-type-tracking">Custom Element Type Tracking</a></li>
+<li>satisfiedBy: <a href="../../tests/test-search-all-features/test.sh">test.sh</a></li>
+</ul>
+<hr />
+<h2 id="containment-view-tests">Containment View Tests</h2>
+<div class="mermaid">graph LR;
+  %% REQVIRE-AUTOGENERATED-DIAGRAM
+  %% Graph styling
+  classDef userRequirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef systemRequirement fill:#fce4e4,stroke:#e68a8a,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+
+  ae2c8d177ed193ac[&quot;Containment Hierarchy Extraction Test&quot;];
+  class ae2c8d177ed193ac verification;
+  click ae2c8d177ed193ac &quot;ReportsTests.html#containment-hierarchy-extraction-test&quot;;
+  a9afd714aa1408bb[&quot;test.sh&quot;];
+  class a9afd714aa1408bb default;
+  click a9afd714aa1408bb &quot;../../tests/test-containment-view/test.sh&quot;;
+  ae2c8d177ed193ac -->|satisfiedBy| a9afd714aa1408bb;
+  b5eaae18d1e5be83[&quot;Containment View JSON Output Test&quot;];
+  class b5eaae18d1e5be83 verification;
+  click b5eaae18d1e5be83 &quot;ReportsTests.html#containment-view-json-output-test&quot;;
+  a9afd714aa1408bb[&quot;test.sh&quot;];
+  class a9afd714aa1408bb default;
+  click a9afd714aa1408bb &quot;../../tests/test-containment-view/test.sh&quot;;
+  b5eaae18d1e5be83 -->|satisfiedBy| a9afd714aa1408bb;
+  965164e5e1cfc008[&quot;Containment View Mermaid Diagram Test&quot;];
+  class 965164e5e1cfc008 verification;
+  click 965164e5e1cfc008 &quot;ReportsTests.html#containment-view-mermaid-diagram-test&quot;;
+  a9afd714aa1408bb[&quot;test.sh&quot;];
+  class a9afd714aa1408bb default;
+  click a9afd714aa1408bb &quot;../../tests/test-containment-view/test.sh&quot;;
+  965164e5e1cfc008 -->|satisfiedBy| a9afd714aa1408bb;
+  d3792f9ed981b302[&quot;Containment View Text Output Test&quot;];
+  class d3792f9ed981b302 verification;
+  click d3792f9ed981b302 &quot;ReportsTests.html#containment-view-text-output-test&quot;;
+  a9afd714aa1408bb[&quot;test.sh&quot;];
+  class a9afd714aa1408bb default;
+  click a9afd714aa1408bb &quot;../../tests/test-containment-view/test.sh&quot;;
+  d3792f9ed981b302 -->|satisfiedBy| a9afd714aa1408bb;
+  6a00e96c2d140410[&quot;HTML Export Containment View Integration Test&quot;];
+  class 6a00e96c2d140410 verification;
+  click 6a00e96c2d140410 &quot;ReportsTests.html#html-export-containment-view-integration-test&quot;;
+  a9afd714aa1408bb[&quot;test.sh&quot;];
+  class a9afd714aa1408bb default;
+  click a9afd714aa1408bb &quot;../../tests/test-containment-view/test.sh&quot;;
+  6a00e96c2d140410 -->|satisfiedBy| a9afd714aa1408bb;
+  e4a4bf8a91c5e5a5[&quot;Containment Hierarchy Extraction&quot;];
+  class e4a4bf8a91c5e5a5 systemRequirement;
+  click e4a4bf8a91c5e5a5 &quot;../ReqvireTool/ValidationAndReporting/Reports.html#containment-hierarchy-extraction&quot;;
+  9de966bf39d57a5b[&quot;CLI Containment Command&quot;];
+  class 9de966bf39d57a5b systemRequirement;
+  click 9de966bf39d57a5b &quot;../ReqvireTool/UserInterface/CLI.html#cli-containment-command&quot;;
+  e4a4bf8a91c5e5a5 -.->|deriveReqT| 9de966bf39d57a5b;
+  e4a4bf8a91c5e5a5 -.->|verifiedBy| ae2c8d177ed193ac;
+  a8664dcdd8419640[&quot;Containment View JSON Output&quot;];
+  class a8664dcdd8419640 systemRequirement;
+  click a8664dcdd8419640 &quot;../ReqvireTool/ValidationAndReporting/Reports.html#containment-view-json-output&quot;;
+  a8664dcdd8419640 -.->|deriveReqT| 9de966bf39d57a5b;
+  a8664dcdd8419640 -.->|verifiedBy| b5eaae18d1e5be83;
+  3bf3a5cf7e998f67[&quot;Containment View Mermaid Diagram&quot;];
+  class 3bf3a5cf7e998f67 systemRequirement;
+  click 3bf3a5cf7e998f67 &quot;../ReqvireTool/ValidationAndReporting/Reports.html#containment-view-mermaid-diagram&quot;;
+  3bf3a5cf7e998f67 -.->|deriveReqT| 9de966bf39d57a5b;
+  3bf3a5cf7e998f67 -.->|verifiedBy| 965164e5e1cfc008;
+  c870f66404e90299[&quot;Containment View Text Output&quot;];
+  class c870f66404e90299 systemRequirement;
+  click c870f66404e90299 &quot;../ReqvireTool/ValidationAndReporting/Reports.html#containment-view-text-output&quot;;
+  c870f66404e90299 -.->|verifiedBy| d3792f9ed981b302;
+  d3084056cad1a8c0[&quot;HTML Export Containment View Integration&quot;];
+  class d3084056cad1a8c0 systemRequirement;
+  click d3084056cad1a8c0 &quot;../ReqvireTool/ValidationAndReporting/Reports.html#html-export-containment-view-integration&quot;;
+  d3084056cad1a8c0 -.->|verifiedBy| 6a00e96c2d140410;
+</div>
+<h3 id="containment-hierarchy-extraction-test">Containment Hierarchy Extraction Test</h3>
+<p>This test verifies that the system correctly extracts the physical containment hierarchy from the model, representing folders, files, and elements in a tree structure while omitting sections.</p>
+<h4>Details</h4>
+<h5>Test Criteria</h5>
+<ol>
+<li>
+<p><strong>Hierarchy structure extraction:</strong></p>
+<ul>
+<li>Create test model with nested folder structure</li>
+<li>Include multiple levels: root → subfolder → file → elements</li>
+<li>Verify folders are extracted in correct hierarchy</li>
+<li>Verify files are placed under correct folders</li>
+<li>Verify elements are extracted from files</li>
+</ul>
+</li>
+<li>
+<p><strong>Section omission:</strong></p>
+<ul>
+<li>Create test file with H2 sections and H3 elements</li>
+<li>Verify sections (H2) are NOT included in hierarchy</li>
+<li>Verify elements (H3) are directly under files</li>
+<li>Confirm no section nodes in output structure</li>
+</ul>
+</li>
+<li>
+<p><strong>Element information:</strong></p>
+<ul>
+<li>Verify element identifier is extracted correctly</li>
+<li>Verify element name matches H3 header text</li>
+<li>Verify element type from Metadata is captured</li>
+<li>Test with multiple element types (requirement, verification, user-requirement)</li>
+</ul>
+</li>
+<li>
+<p><strong>Ordering verification:</strong></p>
+<ul>
+<li>Verify folders are sorted alphabetically</li>
+<li>Verify files are sorted alphabetically within folders</li>
+<li>Verify elements maintain document order</li>
+<li>Test deterministic output across multiple runs</li>
+</ul>
+</li>
+<li>
+<p><strong>Data structure validation:</strong></p>
+<ul>
+<li>Verify tree structure: Folder → [Subfolders, Files]</li>
+<li>Verify File → [Elements] relationship</li>
+<li>Verify all paths are relative to git root</li>
+<li>Test with empty folders and files without elements</li>
+</ul>
+</li>
+</ol>
+<h5>Acceptance Criteria</h5>
+<ul>
+<li>All folders, files, and elements are extracted correctly</li>
+<li>Sections are omitted from the hierarchy</li>
+<li>Element metadata (identifier, name, type) is preserved</li>
+<li>Output follows deterministic ordering</li>
+<li>Tree structure is valid and navigable</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../ReqvireTool/ValidationAndReporting/Reports.html#containment-hierarchy-extraction">Containment Hierarchy Extraction</a></li>
+<li>satisfiedBy: <a href="../../tests/test-containment-view/test.sh">test.sh</a></li>
+</ul>
+<hr />
+<h3 id="containment-view-text-output-test">Containment View Text Output Test</h3>
+<p>This test verifies that the system generates correctly formatted human-readable text output for the containment view with proper indentation and element metadata display.</p>
+<h4>Details</h4>
+<h5>Test Criteria</h5>
+<ol>
+<li>
+<p><strong>Hierarchical indentation:</strong></p>
+<ul>
+<li>Verify indentation uses 2 spaces per level</li>
+<li>Test nested structure: root (0), folder (2), subfolder (4), file (6), element (8)</li>
+<li>Verify consistent indentation across all levels</li>
+</ul>
+</li>
+<li>
+<p><strong>Visual markers:</strong></p>
+<ul>
+<li>Verify folders display with <code>📁 Folder: &lt;name&gt;</code></li>
+<li>Verify files display with <code>📄 File: &lt;path&gt;</code></li>
+<li>Verify elements display with <code>[&lt;type&gt;] &lt;name&gt;</code></li>
+<li>Test all element types have correct bracket notation</li>
+</ul>
+</li>
+<li>
+<p><strong>Element type display:</strong></p>
+<ul>
+<li>Test <code>[requirement]</code> for system requirements</li>
+<li>Test <code>[user-requirement]</code> for user requirements</li>
+<li>Test <code>[verification]</code> and <code>[test-verification]</code> for verifications</li>
+<li>Test custom element types</li>
+</ul>
+</li>
+<li>
+<p><strong>Content accuracy:</strong></p>
+<ul>
+<li>Verify all folders are displayed</li>
+<li>Verify all files are displayed with correct paths</li>
+<li>Verify all elements are displayed with correct names</li>
+<li>Test empty folders and files are handled correctly</li>
+</ul>
+</li>
+<li>
+<p><strong>Output format validation:</strong></p>
+<ul>
+<li>Verify output is valid UTF-8 text</li>
+<li>Verify line breaks are consistent</li>
+<li>Test output matches expected format exactly</li>
+<li>Compare against reference output</li>
+</ul>
+</li>
+</ol>
+<h5>Acceptance Criteria</h5>
+<ul>
+<li>Text output uses correct indentation (2 spaces per level)</li>
+<li>Visual markers (📁, 📄) are displayed correctly</li>
+<li>Element types are shown in brackets</li>
+<li>All hierarchy levels are represented</li>
+<li>Output is human-readable and well-formatted</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../ReqvireTool/ValidationAndReporting/Reports.html#containment-view-text-output">Containment View Text Output</a></li>
+<li>satisfiedBy: <a href="../../tests/test-containment-view/test.sh">test.sh</a></li>
+</ul>
+<hr />
+<h3 id="containment-view-json-output-test">Containment View JSON Output Test</h3>
+<p>This test verifies that the system generates valid, well-structured JSON output for the containment view with correct schema and deterministic ordering.</p>
+<h4>Details</h4>
+<h5>Test Criteria</h5>
+<ol>
+<li>
+<p><strong>JSON schema validation:</strong></p>
+<ul>
+<li>Verify root object has required keys: <code>root_folder</code>, <code>folders</code>, <code>files</code>, <code>element_count</code></li>
+<li>Verify folder objects have: <code>path</code>, <code>name</code>, <code>subfolders</code>, <code>files</code></li>
+<li>Verify file objects have: <code>path</code>, <code>name</code>, <code>elements</code></li>
+<li>Verify element objects have: <code>identifier</code>, <code>name</code>, <code>type</code></li>
+<li>Test schema with JSON validator</li>
+</ul>
+</li>
+<li>
+<p><strong>Data accuracy:</strong></p>
+<ul>
+<li>Verify <code>root_folder</code> matches specifications directory</li>
+<li>Verify <code>element_count</code> matches actual element count</li>
+<li>Verify all folder paths are correct and relative</li>
+<li>Verify all file paths are correct and relative</li>
+<li>Verify all element identifiers match format <code>path#fragment</code></li>
+</ul>
+</li>
+<li>
+<p><strong>Nested structure:</strong></p>
+<ul>
+<li>Verify subfolders are nested under parent folders</li>
+<li>Verify files are associated with correct folders</li>
+<li>Verify elements are associated with correct files</li>
+<li>Test deep nesting (3+ levels)</li>
+</ul>
+</li>
+<li>
+<p><strong>JSON validity:</strong></p>
+<ul>
+<li>Verify output is valid JSON (parse without errors)</li>
+<li>Verify special characters are properly escaped</li>
+<li>Verify Unicode characters in element names are handled</li>
+<li>Test with <code>jq</code> tool for validation</li>
+</ul>
+</li>
+<li>
+<p><strong>Deterministic output:</strong></p>
+<ul>
+<li>Verify key ordering is consistent</li>
+<li>Verify array ordering is deterministic</li>
+<li>Run command multiple times and compare outputs</li>
+<li>Verify byte-identical JSON across runs</li>
+</ul>
+</li>
+</ol>
+<h5>Acceptance Criteria</h5>
+<ul>
+<li>JSON output is valid and parseable</li>
+<li>Schema matches specification exactly</li>
+<li>All data is accurate and complete</li>
+<li>Special characters and Unicode are handled correctly</li>
+<li>Output is deterministic</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../ReqvireTool/ValidationAndReporting/Reports.html#containment-view-json-output">Containment View JSON Output</a></li>
+<li>satisfiedBy: <a href="../../tests/test-containment-view/test.sh">test.sh</a></li>
+</ul>
+<hr />
+<h3 id="containment-view-mermaid-diagram-test">Containment View Mermaid Diagram Test</h3>
+<p>This test verifies that the system generates valid Mermaid flowchart diagrams with correct syntax, nested subgraphs, element styling, and clickable links.</p>
+<h4>Details</h4>
+<h5>Test Criteria</h5>
+<ol>
+<li>
+<p><strong>Mermaid syntax validation:</strong></p>
+<ul>
+<li>Verify output starts with <code>flowchart TD</code></li>
+<li>Verify all subgraphs use correct syntax: <code>subgraph ID [&quot;Label&quot;]</code></li>
+<li>Verify subgraphs are properly closed with <code>end</code></li>
+<li>Test diagram can be rendered by Mermaid parser</li>
+<li>Validate with mermaid-cli or online editor</li>
+</ul>
+</li>
+<li>
+<p><strong>Subgraph structure:</strong></p>
+<ul>
+<li>Verify folders use subgraph with 📁 prefix</li>
+<li>Verify files use subgraph with 📄 prefix</li>
+<li>Verify subgraphs are properly nested</li>
+<li>Test nested structure: folder → subfolder → file</li>
+<li>Verify <code>direction TB</code> is set for nested subgraphs</li>
+</ul>
+</li>
+<li>
+<p><strong>Element nodes:</strong></p>
+<ul>
+<li>Verify nodes use 16-character hash IDs</li>
+<li>Verify node labels show element names</li>
+<li>Verify hash IDs are unique across diagram</li>
+<li>Test hash ID generation is deterministic</li>
+<li>Verify nodes are placed within file subgraphs</li>
+</ul>
+</li>
+<li>
+<p><strong>Styling:</strong></p>
+<ul>
+<li>Verify <code>class</code> directives for element types</li>
+<li>Test <code>userRequirement</code> class has correct colors</li>
+<li>Test <code>systemRequirement</code> class has correct colors</li>
+<li>Test <code>verification</code> class has correct colors</li>
+<li>Test <code>default</code> class for other types</li>
+<li>Verify CSS class definitions are included</li>
+</ul>
+</li>
+<li>
+<p><strong>Clickable links:</strong></p>
+<ul>
+<li>Verify <code>click</code> directives for all element nodes</li>
+<li>Verify links use correct format: <code>click hashId &quot;path#fragment&quot;</code></li>
+<li>Verify paths are relative to diagram location</li>
+<li>Test links with special characters in fragments</li>
+<li>Verify fragment normalization (lowercase, hyphens)</li>
+</ul>
+</li>
+<li>
+<p><strong>Deterministic output:</strong></p>
+<ul>
+<li>Verify node ordering is consistent</li>
+<li>Verify hash IDs are stable across runs</li>
+<li>Compare output across multiple executions</li>
+<li>Test byte-identical output</li>
+</ul>
+</li>
+</ol>
+<h5>Acceptance Criteria</h5>
+<ul>
+<li>Mermaid diagram syntax is valid</li>
+<li>Subgraphs correctly represent folder/file hierarchy</li>
+<li>Element nodes use hash IDs and show names</li>
+<li>Styling classes are applied correctly</li>
+<li>Clickable links navigate to correct elements</li>
+<li>Output is deterministic</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../ReqvireTool/ValidationAndReporting/Reports.html#containment-view-mermaid-diagram">Containment View Mermaid Diagram</a></li>
+<li>satisfiedBy: <a href="../../tests/test-containment-view/test.sh">test.sh</a></li>
+</ul>
+<hr />
+<h3 id="html-export-containment-view-integration-test">HTML Export Containment View Integration Test</h3>
+<p>This test verifies that the containment view is correctly integrated into HTML export with proper navigation, interactive features, and styling.</p>
+<h4>Details</h4>
+<h5>Test Criteria</h5>
+<ol>
+<li>
+<p><strong>File generation:</strong></p>
+<ul>
+<li>Run <code>reqvire export</code> command</li>
+<li>Verify <code>containment.html</code> file is created in output directory</li>
+<li>Verify file contains valid HTML5</li>
+<li>Test file size is reasonable (&lt; 1MB for typical models)</li>
+</ul>
+</li>
+<li>
+<p><strong>Navigation integration:</strong></p>
+<ul>
+<li>Verify containment view appears in navigation menu</li>
+<li>Test link text is “Containment View” or “Model Structure”</li>
+<li>Verify clicking nav link loads containment page</li>
+<li>Test navigation persistence across page loads</li>
+</ul>
+</li>
+<li>
+<p><strong>Mermaid diagram embedding:</strong></p>
+<ul>
+<li>Verify page contains embedded Mermaid diagram</li>
+<li>Verify Mermaid.js library is loaded</li>
+<li>Test diagram renders correctly in browser</li>
+<li>Verify clickable links work (navigate to element pages)</li>
+</ul>
+</li>
+<li>
+<p><strong>Hierarchical tree navigation:</strong></p>
+<ul>
+<li>Verify page includes tree view component</li>
+<li>Test folders can be expanded/collapsed</li>
+<li>Verify clicking elements navigates to their pages</li>
+<li>Test tree state persistence</li>
+</ul>
+</li>
+<li>
+<p><strong>Styling consistency:</strong></p>
+<ul>
+<li>Verify page uses same CSS as other export pages</li>
+<li>Test element type colors match specification</li>
+<li>Verify layout matches existing pages</li>
+<li>Test responsive design on different screen sizes</li>
+</ul>
+</li>
+<li>
+<p><strong>Interactive features:</strong></p>
+<ul>
+<li>Test element type filtering controls</li>
+<li>Verify filter updates both diagram and tree</li>
+<li>Test search/filter by folder or file name</li>
+<li>Verify search highlights matches</li>
+</ul>
+</li>
+<li>
+<p><strong>Integration with model:</strong></p>
+<ul>
+<li>Test containment view updates when model changes</li>
+<li>Verify new elements appear after re-export</li>
+<li>Test moved elements show in correct location</li>
+<li>Verify deterministic output for version control</li>
+</ul>
+</li>
+</ol>
+<h5>Acceptance Criteria</h5>
+<ul>
+<li>containment.html file is generated correctly</li>
+<li>Page appears in navigation menu</li>
+<li>Mermaid diagram renders and is interactive</li>
+<li>Tree navigation works correctly</li>
+<li>Styling is consistent with existing pages</li>
+<li>Interactive features (filter, search) function properly</li>
+<li>Integration updates correctly when model changes</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../ReqvireTool/ValidationAndReporting/Reports.html#html-export-containment-view-integration">HTML Export Containment View Integration</a></li>
+<li>satisfiedBy: <a href="../../tests/test-containment-view/test.sh">test.sh</a></li>
+</ul>
+<hr />
+
+        </div>
+    </div>
+</body>
+</html>

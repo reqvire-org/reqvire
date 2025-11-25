@@ -428,7 +428,8 @@ The system shall provide an `add` command to create new model elements by accept
 The `add` command shall:
 - Accept element definition input from standard input (stdin)
 - Accept target file path as required positional argument (resolved relative to Git repository root)
-- Support command syntax: `reqvire add <file>`
+- Accept optional index as positional argument (0-based, defaults to end of file)
+- Support command syntax: `reqvire add <file> [<index>]`
 - Validate element structure before insertion
 - Apply changes immediately by default
 - Support `--dry-run` flag to preview changes without applying

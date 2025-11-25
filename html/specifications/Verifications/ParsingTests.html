@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ParsingTests</title>
+    
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa;
+    color: #333;
+}
+.reqvire-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    background-color: #2c3e50;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+}
+.reqvire-nav a {
+    color: #ecf0f1;
+    text-decoration: none;
+    padding: 10px 20px;
+    margin-right: 5px;
+    border-radius: 3px;
+    transition: background-color 0.2s;
+}
+.reqvire-nav a:hover {
+    background-color: #34495e;
+}
+.reqvire-nav-spacer {
+    height: 50px;
+}
+.container {
+    max-width: 95%;
+    margin: 0 auto;
+    padding: 20px;
+}
+.content {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+h1 {
+    color: #333;
+    border-bottom: 2px solid #eaecef;
+    padding-bottom: 10px;
+    margin-top: 0;
+}
+h2 {
+    color: #333;
+    border-bottom: 1px solid #eaecef;
+    padding-bottom: 5px;
+}
+h3 {
+    color: #1a6fb7;
+    margin-top: 25px;
+}
+h4 {
+    color: #555;
+    font-weight: 600;
+}
+a {
+    color: #0366d6;
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 20px 0;
+}
+table, th, td {
+    border: 1px solid #dfe2e5;
+}
+th, td {
+    padding: 8px 12px;
+    text-align: left;
+}
+th {
+    background-color: #f6f8fa;
+}
+code {
+    background: #f6f8fa;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 90%;
+}
+pre {
+    background: #f6f8fa;
+    border-radius: 3px;
+    padding: 16px;
+    overflow: auto;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+}
+blockquote {
+    margin: 0;
+    padding: 0 15px;
+    color: #777;
+    border-left: 4px solid #dfe2e5;
+}
+.mermaid {
+    margin: 20px 0;
+    text-align: center;
+    height: calc(100vh - 150px);
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid #dfe2e5;
+    border-radius: 3px;
+    background-color: #fafafa;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+.mermaid svg {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    position: relative;
+    z-index: 1;
+}
+.diagram-nav-buttons {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 999; /* higher than SVG (1) but lower than header nav (1000) */
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 5px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+.diagram-nav-row {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+}
+.diagram-nav-btn {
+    width: 32px;
+    height: 32px;
+    background-color: #2c3e50;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.diagram-nav-btn:hover {
+    background-color: #34495e;
+}
+.diagram-nav-btn:active {
+    background-color: #1a252f;
+}
+</style>
+
+    <!-- Enhanced mermaid configuration for Reqvire diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.5.0/dist/svg-pan-zoom.min.js"></script>
+    <script>
+        // Capture Mermaid errors
+        mermaid.parseError = function(err, hash) {
+            console.error('Mermaid Parse Error:', err);
+            console.error('Error details:', {
+                str: err.str,
+                hash: err.hash,
+                message: err.message,
+                stack: err.stack
+            });
+        };
+
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            maxTextSize: 120000,
+            maxEdges: 2000,
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            securityLevel: 'loose',
+            logLevel: 'error'
+        });
+
+        // Add pan/zoom to all Mermaid diagrams after rendering
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                document.querySelectorAll('.mermaid').forEach(function(mermaidContainer) {
+                    var svg = mermaidContainer.querySelector('svg');
+                    if (!svg) return;
+
+                    svg.style.maxWidth = 'none';
+                    svg.style.maxHeight = 'none';
+
+                    var eventsHandler = {
+                        haltEventListeners: ['touchstart', 'touchend', 'touchmove', 'touchleave', 'touchcancel'],
+                        init: function(options) {
+                            var instance = options.instance;
+                            var initialScale = 1;
+                            var pannedX = 0;
+                            var pannedY = 0;
+
+                            this.hammer = Hammer(options.svgElement, {
+                                inputClass: Hammer.SUPPORT_POINTER_EVENTS ? Hammer.PointerEventInput : Hammer.TouchInput
+                            });
+
+                            this.hammer.get('pinch').set({enable: true});
+
+                            this.hammer.on('doubletap', function(ev){
+                                instance.zoomIn();
+                            });
+
+                            this.hammer.on('panstart panmove', function(ev){
+                                if (ev.type === 'panstart') {
+                                    pannedX = 0;
+                                    pannedY = 0;
+                                }
+                                instance.panBy({x: ev.deltaX - pannedX, y: ev.deltaY - pannedY});
+                                pannedX = ev.deltaX;
+                                pannedY = ev.deltaY;
+                            });
+
+                            this.hammer.on('pinchstart pinchmove', function(ev){
+                                if (ev.type === 'pinchstart') {
+                                    initialScale = instance.getZoom();
+                                }
+                                instance.zoomAtPoint(initialScale * ev.scale, {x: ev.center.x, y: ev.center.y});
+                            });
+
+                            options.svgElement.addEventListener('touchmove', function(e){ e.preventDefault(); });
+                        },
+                        destroy: function(){
+                            this.hammer.destroy();
+                        }
+                    };
+
+                    // Diagrams with default zoom (no auto-fit)
+                    var panZoomInstance = svgPanZoom(svg, {
+                        zoomEnabled: true,
+                        controlIconsEnabled: true,
+                        fit: false,
+                        center: false,
+                        contain: false,
+                        minZoom: 0.5,
+                        maxZoom: 10,
+                        zoomScaleSensitivity: 0.3,
+                        customEventsHandler: eventsHandler
+                    });
+
+                    // Add navigation buttons
+                    var navButtons = document.createElement('div');
+                    navButtons.className = 'diagram-nav-buttons';
+                    navButtons.innerHTML = `
+                        <div class="diagram-nav-row">
+                            <button class="diagram-nav-btn" data-action="up">▲</button>
+                        </div>
+                        <div class="diagram-nav-row">
+                            <button class="diagram-nav-btn" data-action="left">◀</button>
+                            <button class="diagram-nav-btn" data-action="down">▼</button>
+                            <button class="diagram-nav-btn" data-action="right">▶</button>
+                        </div>
+                    `;
+                    mermaidContainer.appendChild(navButtons);
+
+                    // Wire up navigation buttons
+                    var panStep = 100;
+                    navButtons.querySelectorAll('.diagram-nav-btn').forEach(function(btn) {
+                        btn.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            var action = this.getAttribute('data-action');
+                            switch(action) {
+                                case 'up':
+                                    panZoomInstance.panBy({x: 0, y: panStep});
+                                    break;
+                                case 'down':
+                                    panZoomInstance.panBy({x: 0, y: -panStep});
+                                    break;
+                                case 'left':
+                                    panZoomInstance.panBy({x: panStep, y: 0});
+                                    break;
+                                case 'right':
+                                    panZoomInstance.panBy({x: -panStep, y: 0});
+                                    break;
+                            }
+                        });
+                    });
+                });
+            }, 1500);
+        });
+    </script>
+</head>
+<body>
+    <nav class="reqvire-nav">
+        <a href="../../index.html">Home</a>
+        <a href="../../model.html">Model</a>
+        <a href="../../whole-model.html">Whole Model</a>
+        <a href="../../traces.html">Traces</a>
+        <a href="../../coverage.html">Coverage</a>
+    </nav>
+    <div class="reqvire-nav-spacer"></div>
+    <div class="container">
+        <div class="content">
+            <h1 id="parsing-tests">Parsing Tests</h1>
+<h2 id="parsing-tests">Parsing Tests</h2>
+<div class="mermaid">graph LR;
+  %% REQVIRE-AUTOGENERATED-DIAGRAM
+  %% Graph styling
+  classDef userRequirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef systemRequirement fill:#fce4e4,stroke:#e68a8a,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+
+  7559f2ddc9d909ed[&quot;Element Subsection Parsing Test&quot;];
+  class 7559f2ddc9d909ed verification;
+  click 7559f2ddc9d909ed &quot;ParsingTests.html#element-subsection-parsing-test&quot;;
+  494239c0f3861cb5[&quot;test.sh&quot;];
+  class 494239c0f3861cb5 default;
+  click 494239c0f3861cb5 &quot;../../tests/test-parsing-functionality/test.sh&quot;;
+  7559f2ddc9d909ed -->|satisfiedBy| 494239c0f3861cb5;
+  2abd8d6ef97cade6[&quot;Fragment Normalization Test&quot;];
+  class 2abd8d6ef97cade6 verification;
+  click 2abd8d6ef97cade6 &quot;ParsingTests.html#fragment-normalization-test&quot;;
+  494239c0f3861cb5[&quot;test.sh&quot;];
+  class 494239c0f3861cb5 default;
+  click 494239c0f3861cb5 &quot;../../tests/test-parsing-functionality/test.sh&quot;;
+  2abd8d6ef97cade6 -->|satisfiedBy| 494239c0f3861cb5;
+  6cbe71eb757988df[&quot;Element Identity Model&quot;];
+  class 6cbe71eb757988df systemRequirement;
+  click 6cbe71eb757988df &quot;../Structure/SpecificationsRequirements.html#element-identity-model&quot;;
+  16b284f882a920cc[&quot;Change Impact Detection Algorithm&quot;];
+  class 16b284f882a920cc systemRequirement;
+  click 16b284f882a920cc &quot;../ReqvireTool/ModelManagement/ChangeImpact.html#change-impact-detection-algorithm&quot;;
+  6cbe71eb757988df -.->|deriveReqT| 16b284f882a920cc;
+  674e6f27f5fda615[&quot;Change Impact Visualization&quot;];
+  class 674e6f27f5fda615 systemRequirement;
+  click 674e6f27f5fda615 &quot;../ReqvireTool/ModelManagement/ChangeImpact.html#change-impact-visualization&quot;;
+  6cbe71eb757988df -.->|deriveReqT| 674e6f27f5fda615;
+  19106261e8369e50[&quot;Internal Consistency Validator&quot;];
+  class 19106261e8369e50 systemRequirement;
+  click 19106261e8369e50 &quot;../ReqvireTool/ValidationAndReporting/Validation.html#internal-consistency-validator&quot;;
+  6cbe71eb757988df -.->|deriveReqT| 19106261e8369e50;
+  c1fb51fe8a0b650[&quot;Identifiers and Relations&quot;];
+  class c1fb51fe8a0b650 systemRequirement;
+  click c1fb51fe8a0b650 &quot;../Structure/SpecificationsRequirements.html#identifiers-and-relations&quot;;
+  6cbe71eb757988df -.->|deriveReqT| c1fb51fe8a0b650;
+  a814c4935e1a0449[&quot;element.rs&quot;];
+  class a814c4935e1a0449 default;
+  click a814c4935e1a0449 &quot;../../core/src/element.rs&quot;;
+  6cbe71eb757988df -->|satisfiedBy| a814c4935e1a0449;
+  f22d93285fcd7664[&quot;parser.rs&quot;];
+  class f22d93285fcd7664 default;
+  click f22d93285fcd7664 &quot;../../core/src/parser.rs&quot;;
+  6cbe71eb757988df -->|satisfiedBy| f22d93285fcd7664;
+  6cbe71eb757988df -.->|verifiedBy| 2abd8d6ef97cade6;
+  df3d1e30a948a4e0[&quot;Structure of Markdown Documents&quot;];
+  class df3d1e30a948a4e0 systemRequirement;
+  click df3d1e30a948a4e0 &quot;../Structure/SpecificationsRequirements.html#structure-of-markdown-documents&quot;;
+  b8373b7489450d74[&quot;Create Element Operation&quot;];
+  class b8373b7489450d74 systemRequirement;
+  click b8373b7489450d74 &quot;../ReqvireTool/ModelManagement/ElementManipulation.html#create-element-operation&quot;;
+  df3d1e30a948a4e0 -.->|deriveReqT| b8373b7489450d74;
+  a814c4935e1a0449[&quot;element.rs&quot;];
+  class a814c4935e1a0449 default;
+  click a814c4935e1a0449 &quot;../../core/src/element.rs&quot;;
+  df3d1e30a948a4e0 -->|satisfiedBy| a814c4935e1a0449;
+  d50a859650933e55[&quot;model.rs&quot;];
+  class d50a859650933e55 default;
+  click d50a859650933e55 &quot;../../core/src/model.rs&quot;;
+  df3d1e30a948a4e0 -->|satisfiedBy| d50a859650933e55;
+  f22d93285fcd7664[&quot;parser.rs&quot;];
+  class f22d93285fcd7664 default;
+  click f22d93285fcd7664 &quot;../../core/src/parser.rs&quot;;
+  df3d1e30a948a4e0 -->|satisfiedBy| f22d93285fcd7664;
+  9450d4313f47ef36[&quot;relation.rs&quot;];
+  class 9450d4313f47ef36 default;
+  click 9450d4313f47ef36 &quot;../../core/src/relation.rs&quot;;
+  df3d1e30a948a4e0 -->|satisfiedBy| 9450d4313f47ef36;
+  398003c91b6b2cde[&quot;subsection.rs&quot;];
+  class 398003c91b6b2cde default;
+  click 398003c91b6b2cde &quot;../../core/src/subsection.rs&quot;;
+  df3d1e30a948a4e0 -->|satisfiedBy| 398003c91b6b2cde;
+  735766802775ec41[&quot;Format Command Requirements Verification&quot;];
+  class 735766802775ec41 verification;
+  click 735766802775ec41 &quot;Misc.html#format-command-requirements-verification&quot;;
+  df3d1e30a948a4e0 -.->|verifiedBy| 735766802775ec41;
+  df3d1e30a948a4e0 -.->|verifiedBy| 7559f2ddc9d909ed;
+  b0d0999636b025fa[&quot;Invalid Header Structure Test&quot;];
+  class b0d0999636b025fa verification;
+  click b0d0999636b025fa &quot;ValidationTests.html#invalid-header-structure-test&quot;;
+  df3d1e30a948a4e0 -.->|verifiedBy| b0d0999636b025fa;
+</div>
+<p>Tests verifying core parsing functionality including element extraction, identifier normalization, and markdown processing.</p>
+<h3 id="fragment-normalization-test">Fragment Normalization Test</h3>
+<p>This test verifies that the system correctly normalizes element name fragments according to GitHub’s fragment identifier rules for use in Element IDs and cross-references.</p>
+<h4>Details</h4>
+<h5>Acceptance Criteria</h5>
+<p><strong>GitHub Fragment Normalization Rules:</strong></p>
+<ul>
+<li>System shall convert all letters to lowercase</li>
+<li>System shall replace spaces with hyphens (-)</li>
+<li>System shall remove all punctuation characters except hyphens and underscores</li>
+<li>System shall remove all whitespace characters except spaces (which become hyphens)</li>
+<li>System shall trim leading and trailing whitespace before processing</li>
+<li>System shall preserve alphanumeric characters, hyphens, and underscores</li>
+</ul>
+<p><strong>Normalization Examples:</strong></p>
+<ul>
+<li><code>&quot;My Feature Name&quot;</code> → <code>&quot;my-feature-name&quot;</code></li>
+<li><code>&quot;Version 1.2.3&quot;</code> → <code>&quot;version-123&quot;</code> (dots removed)</li>
+<li><code>&quot;Installation (Windows)&quot;</code> → <code>&quot;installation-windows&quot;</code> (parentheses removed)</li>
+<li><code>&quot;C++ API Reference&quot;</code> → <code>&quot;c-api-reference&quot;</code> (plus signs removed)</li>
+<li><code>&quot;my_variable_name&quot;</code> → <code>&quot;my_variable_name&quot;</code> (underscores preserved)</li>
+<li><code>&quot;Multiple    Spaces&quot;</code> → <code>&quot;multiple----spaces&quot;</code> (each space becomes hyphen)</li>
+</ul>
+<p><strong>Element ID Generation:</strong></p>
+<ul>
+<li>System shall use normalized fragments to generate Element IDs</li>
+<li>Element IDs shall be stable across element relocations</li>
+<li>Element IDs shall be globally unique within the model</li>
+</ul>
+<p><strong>Cross-Reference Resolution:</strong></p>
+<ul>
+<li>System shall normalize fragment portions of identifiers during relation resolution</li>
+<li>System shall match elements using normalized fragments</li>
+<li>System shall handle case-insensitive element name lookups</li>
+</ul>
+<h5>Test Criteria</h5>
+<ol>
+<li>
+<p><strong>Basic normalization verification:</strong></p>
+<ul>
+<li>Create elements with various naming patterns</li>
+<li>Verify Element IDs use normalized fragments</li>
+<li>Test lowercase conversion</li>
+<li>Test space-to-hyphen conversion</li>
+<li>Test punctuation removal</li>
+</ul>
+</li>
+<li>
+<p><strong>Special character handling:</strong></p>
+<ul>
+<li>Test elements with punctuation: <code>&quot;Feature (v2.0)&quot;</code></li>
+<li>Test elements with symbols: <code>&quot;C++ API&quot;</code></li>
+<li>Test elements with dots: <code>&quot;Version 1.2.3&quot;</code></li>
+<li>Verify all punctuation is removed correctly</li>
+</ul>
+</li>
+<li>
+<p><strong>Underscore and hyphen preservation:</strong></p>
+<ul>
+<li>Test elements with underscores: <code>&quot;my_variable_name&quot;</code></li>
+<li>Test elements with hyphens: <code>&quot;pre-release-build&quot;</code></li>
+<li>Verify both are preserved in normalized form</li>
+</ul>
+</li>
+<li>
+<p><strong>Whitespace handling:</strong></p>
+<ul>
+<li>Test multiple consecutive spaces: <code>&quot;Multiple    Spaces&quot;</code></li>
+<li>Test leading/trailing spaces: <code>&quot;  Trimmed  &quot;</code></li>
+<li>Verify each space becomes a hyphen</li>
+<li>Verify trim operation works correctly</li>
+</ul>
+</li>
+<li>
+<p><strong>Cross-reference resolution:</strong></p>
+<ul>
+<li>Create element <code>&quot;My Feature Name&quot;</code></li>
+<li>Reference it as <code>&quot;My Feature Name&quot;</code>, <code>&quot;my feature name&quot;</code>, <code>&quot;MY FEATURE NAME&quot;</code></li>
+<li>Verify all variants resolve to same element</li>
+<li>Verify relations are established correctly</li>
+</ul>
+</li>
+<li>
+<p><strong>Element ID stability:</strong></p>
+<ul>
+<li>Rename element markdown file (relocation)</li>
+<li>Verify Element ID remains unchanged (uses normalized name)</li>
+<li>Verify cross-references continue to work</li>
+<li>Verify change detection identifies as relocation, not new element</li>
+</ul>
+</li>
+</ol>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../Structure/SpecificationsRequirements.html#element-identity-model">Element Identity Model</a></li>
+<li>satisfiedBy: <a href="../../tests/test-parsing-functionality/test.sh">test.sh</a></li>
+</ul>
+<hr />
+<h3 id="element-subsection-parsing-test">Element Subsection Parsing Test</h3>
+<p>This test verifies that the system correctly extracts and parses element subsections (Metadata, Relations, Details) and element content from markdown documents.</p>
+<h4>Details</h4>
+<h5>Acceptance Criteria</h5>
+<p><strong>Subsection Extraction:</strong></p>
+<ul>
+<li>System shall identify and extract Metadata subsection (level 4 heading)</li>
+<li>System shall identify and extract Relations subsection (level 4 heading)</li>
+<li>System shall identify and extract Details subsection (level 4 heading) when present</li>
+<li>System shall parse element content (text before first subsection)</li>
+<li>System shall exclude subsection headers and content from main element content</li>
+</ul>
+<p><strong>Metadata Parsing:</strong></p>
+<ul>
+<li>System shall extract element type from <code>* type:</code> metadata entry</li>
+<li>System shall support all element types: requirement, user-requirement, verification, test-verification, analysis-verification, inspection-verification, demonstration-verification, other</li>
+<li>System shall assign default type ‘requirement’ when no type metadata present</li>
+</ul>
+<p><strong>Relations Parsing:</strong></p>
+<ul>
+<li>System shall extract relation type (derivedFrom, verifiedBy, verify, satisfiedBy)</li>
+<li>System shall extract relation target (element identifier with file path and fragment)</li>
+<li>System shall normalize target fragment identifiers</li>
+<li>System shall support multiple relations of same or different types</li>
+<li>System shall validate relation targets exist in model</li>
+</ul>
+<p><strong>Content Extraction:</strong></p>
+<ul>
+<li>System shall extract element description text before subsections</li>
+<li>System shall preserve markdown formatting in content</li>
+<li>System shall NOT include subsection headers in content</li>
+<li>System shall NOT include subsection body text in content</li>
+</ul>
+<p><strong>Details Subsection:</strong></p>
+<ul>
+<li>System shall extract Details subsection content when present</li>
+<li>System shall preserve multi-paragraph Details content</li>
+<li>System shall store Details separately from main content</li>
+</ul>
+<h5>Test Criteria</h5>
+<ol>
+<li>
+<p><strong>Metadata subsection parsing:</strong></p>
+<ul>
+<li>Create elements with various element types in Metadata</li>
+<li>Query model via JSON output</li>
+<li>Verify <code>element_type</code> field matches metadata</li>
+<li>Test all supported element types</li>
+</ul>
+</li>
+<li>
+<p><strong>Relations subsection parsing:</strong></p>
+<ul>
+<li>Create elements with multiple relations</li>
+<li>Query model via JSON output</li>
+<li>Verify <code>relations</code> array contains all relations</li>
+<li>Verify each relation has <code>relation_type</code> and <code>target</code> fields</li>
+<li>Verify target fragments are normalized</li>
+</ul>
+</li>
+<li>
+<p><strong>Content extraction:</strong></p>
+<ul>
+<li>Create element with description text before subsections</li>
+<li>Query model via JSON output</li>
+<li>Verify <code>content</code> field contains description</li>
+<li>Verify content does NOT include subsection headers</li>
+<li>Verify content does NOT include metadata or relations</li>
+</ul>
+</li>
+<li>
+<p><strong>Details subsection parsing:</strong></p>
+<ul>
+<li>Create element with Details subsection</li>
+<li>Query model via JSON output</li>
+<li>Verify <code>details</code> field is populated</li>
+<li>Verify details content is separate from main content</li>
+<li>Test multi-paragraph details</li>
+</ul>
+</li>
+<li>
+<p><strong>JSON structure validation:</strong></p>
+<ul>
+<li>Verify JSON output contains <code>elements</code> array</li>
+<li>Verify each element has required fields: <code>element_id</code>, <code>name</code>, <code>file_path</code>, <code>section</code>, <code>element_type</code>, <code>content</code></li>
+<li>Verify optional fields present when applicable: <code>details</code>, <code>relations</code>, <code>metadata</code></li>
+</ul>
+</li>
+</ol>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../Structure/SpecificationsRequirements.html#structure-of-markdown-documents">Structure of Markdown Documents</a></li>
+<li>satisfiedBy: <a href="../../tests/test-parsing-functionality/test.sh">test.sh</a></li>
+</ul>
+<hr />
+
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports</title>
+    
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa;
+    color: #333;
+}
+.reqvire-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    background-color: #2c3e50;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+}
+.reqvire-nav a {
+    color: #ecf0f1;
+    text-decoration: none;
+    padding: 10px 20px;
+    margin-right: 5px;
+    border-radius: 3px;
+    transition: background-color 0.2s;
+}
+.reqvire-nav a:hover {
+    background-color: #34495e;
+}
+.reqvire-nav-spacer {
+    height: 50px;
+}
+.container {
+    max-width: 95%;
+    margin: 0 auto;
+    padding: 20px;
+}
+.content {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+h1 {
+    color: #333;
+    border-bottom: 2px solid #eaecef;
+    padding-bottom: 10px;
+    margin-top: 0;
+}
+h2 {
+    color: #333;
+    border-bottom: 1px solid #eaecef;
+    padding-bottom: 5px;
+}
+h3 {
+    color: #1a6fb7;
+    margin-top: 25px;
+}
+h4 {
+    color: #555;
+    font-weight: 600;
+}
+a {
+    color: #0366d6;
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 20px 0;
+}
+table, th, td {
+    border: 1px solid #dfe2e5;
+}
+th, td {
+    padding: 8px 12px;
+    text-align: left;
+}
+th {
+    background-color: #f6f8fa;
+}
+code {
+    background: #f6f8fa;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 90%;
+}
+pre {
+    background: #f6f8fa;
+    border-radius: 3px;
+    padding: 16px;
+    overflow: auto;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+}
+blockquote {
+    margin: 0;
+    padding: 0 15px;
+    color: #777;
+    border-left: 4px solid #dfe2e5;
+}
+.mermaid {
+    margin: 20px 0;
+    text-align: center;
+    height: calc(100vh - 150px);
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid #dfe2e5;
+    border-radius: 3px;
+    background-color: #fafafa;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+.mermaid svg {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    position: relative;
+    z-index: 1;
+}
+.diagram-nav-buttons {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 999; /* higher than SVG (1) but lower than header nav (1000) */
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 5px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+.diagram-nav-row {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+}
+.diagram-nav-btn {
+    width: 32px;
+    height: 32px;
+    background-color: #2c3e50;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.diagram-nav-btn:hover {
+    background-color: #34495e;
+}
+.diagram-nav-btn:active {
+    background-color: #1a252f;
+}
+</style>
+
+    <!-- Enhanced mermaid configuration for Reqvire diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.5.0/dist/svg-pan-zoom.min.js"></script>
+    <script>
+        // Capture Mermaid errors
+        mermaid.parseError = function(err, hash) {
+            console.error('Mermaid Parse Error:', err);
+            console.error('Error details:', {
+                str: err.str,
+                hash: err.hash,
+                message: err.message,
+                stack: err.stack
+            });
+        };
+
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            maxTextSize: 120000,
+            maxEdges: 2000,
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            securityLevel: 'loose',
+            logLevel: 'error'
+        });
+
+        // Add pan/zoom to all Mermaid diagrams after rendering
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                document.querySelectorAll('.mermaid').forEach(function(mermaidContainer) {
+                    var svg = mermaidContainer.querySelector('svg');
+                    if (!svg) return;
+
+                    svg.style.maxWidth = 'none';
+                    svg.style.maxHeight = 'none';
+
+                    var eventsHandler = {
+                        haltEventListeners: ['touchstart', 'touchend', 'touchmove', 'touchleave', 'touchcancel'],
+                        init: function(options) {
+                            var instance = options.instance;
+                            var initialScale = 1;
+                            var pannedX = 0;
+                            var pannedY = 0;
+
+                            this.hammer = Hammer(options.svgElement, {
+                                inputClass: Hammer.SUPPORT_POINTER_EVENTS ? Hammer.PointerEventInput : Hammer.TouchInput
+                            });
+
+                            this.hammer.get('pinch').set({enable: true});
+
+                            this.hammer.on('doubletap', function(ev){
+                                instance.zoomIn();
+                            });
+
+                            this.hammer.on('panstart panmove', function(ev){
+                                if (ev.type === 'panstart') {
+                                    pannedX = 0;
+                                    pannedY = 0;
+                                }
+                                instance.panBy({x: ev.deltaX - pannedX, y: ev.deltaY - pannedY});
+                                pannedX = ev.deltaX;
+                                pannedY = ev.deltaY;
+                            });
+
+                            this.hammer.on('pinchstart pinchmove', function(ev){
+                                if (ev.type === 'pinchstart') {
+                                    initialScale = instance.getZoom();
+                                }
+                                instance.zoomAtPoint(initialScale * ev.scale, {x: ev.center.x, y: ev.center.y});
+                            });
+
+                            options.svgElement.addEventListener('touchmove', function(e){ e.preventDefault(); });
+                        },
+                        destroy: function(){
+                            this.hammer.destroy();
+                        }
+                    };
+
+                    // Diagrams with default zoom (no auto-fit)
+                    var panZoomInstance = svgPanZoom(svg, {
+                        zoomEnabled: true,
+                        controlIconsEnabled: true,
+                        fit: false,
+                        center: false,
+                        contain: false,
+                        minZoom: 0.5,
+                        maxZoom: 10,
+                        zoomScaleSensitivity: 0.3,
+                        customEventsHandler: eventsHandler
+                    });
+
+                    // Add navigation buttons
+                    var navButtons = document.createElement('div');
+                    navButtons.className = 'diagram-nav-buttons';
+                    navButtons.innerHTML = `
+                        <div class="diagram-nav-row">
+                            <button class="diagram-nav-btn" data-action="up">▲</button>
+                        </div>
+                        <div class="diagram-nav-row">
+                            <button class="diagram-nav-btn" data-action="left">◀</button>
+                            <button class="diagram-nav-btn" data-action="down">▼</button>
+                            <button class="diagram-nav-btn" data-action="right">▶</button>
+                        </div>
+                    `;
+                    mermaidContainer.appendChild(navButtons);
+
+                    // Wire up navigation buttons
+                    var panStep = 100;
+                    navButtons.querySelectorAll('.diagram-nav-btn').forEach(function(btn) {
+                        btn.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            var action = this.getAttribute('data-action');
+                            switch(action) {
+                                case 'up':
+                                    panZoomInstance.panBy({x: 0, y: panStep});
+                                    break;
+                                case 'down':
+                                    panZoomInstance.panBy({x: 0, y: -panStep});
+                                    break;
+                                case 'left':
+                                    panZoomInstance.panBy({x: panStep, y: 0});
+                                    break;
+                                case 'right':
+                                    panZoomInstance.panBy({x: -panStep, y: 0});
+                                    break;
+                            }
+                        });
+                    });
+                });
+            }, 1500);
+        });
+    </script>
+</head>
+<body>
+    <nav class="reqvire-nav">
+        <a href="../index.html">Home</a>
+        <a href="../model.html">Model</a>
+        <a href="../whole-model.html">Whole Model</a>
+        <a href="../traces.html">Traces</a>
+        <a href="../coverage.html">Coverage</a>
+    </nav>
+    <div class="reqvire-nav-spacer"></div>
+    <div class="container">
+        <div class="content">
+            <h1 id="provide-reports">Provide Reports</h1>
+<h2 id="requirements">Requirements</h2>
+<div class="mermaid">graph LR;
+  %% REQVIRE-AUTOGENERATED-DIAGRAM
+  %% Graph styling
+  classDef userRequirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef systemRequirement fill:#fce4e4,stroke:#e68a8a,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+
+  fc4865d1e9b57596[&quot;Change Impact Analysis&quot;];
+  class fc4865d1e9b57596 userRequirement;
+  click fc4865d1e9b57596 &quot;Reports.html#change-impact-analysis&quot;;
+  b72d56e7e360fe6c[&quot;Change Impact Analysis Verification&quot;];
+  class b72d56e7e360fe6c verification;
+  click b72d56e7e360fe6c &quot;Verifications/ChangeImpactTests.html#change-impact-analysis-verification&quot;;
+  fc4865d1e9b57596 -.->|verifiedBy| b72d56e7e360fe6c;
+  e04872bebb8341a2[&quot;Containment View Report&quot;];
+  class e04872bebb8341a2 userRequirement;
+  click e04872bebb8341a2 &quot;Reports.html#containment-view-report&quot;;
+  e4a4bf8a91c5e5a5[&quot;Containment Hierarchy Extraction&quot;];
+  class e4a4bf8a91c5e5a5 systemRequirement;
+  click e4a4bf8a91c5e5a5 &quot;ReqvireTool/ValidationAndReporting/Reports.html#containment-hierarchy-extraction&quot;;
+  e04872bebb8341a2 -.->|deriveReqT| e4a4bf8a91c5e5a5;
+  a8664dcdd8419640[&quot;Containment View JSON Output&quot;];
+  class a8664dcdd8419640 systemRequirement;
+  click a8664dcdd8419640 &quot;ReqvireTool/ValidationAndReporting/Reports.html#containment-view-json-output&quot;;
+  e04872bebb8341a2 -.->|deriveReqT| a8664dcdd8419640;
+  3bf3a5cf7e998f67[&quot;Containment View Mermaid Diagram&quot;];
+  class 3bf3a5cf7e998f67 systemRequirement;
+  click 3bf3a5cf7e998f67 &quot;ReqvireTool/ValidationAndReporting/Reports.html#containment-view-mermaid-diagram&quot;;
+  e04872bebb8341a2 -.->|deriveReqT| 3bf3a5cf7e998f67;
+  c870f66404e90299[&quot;Containment View Text Output&quot;];
+  class c870f66404e90299 systemRequirement;
+  click c870f66404e90299 &quot;ReqvireTool/ValidationAndReporting/Reports.html#containment-view-text-output&quot;;
+  e04872bebb8341a2 -.->|deriveReqT| c870f66404e90299;
+  d3084056cad1a8c0[&quot;HTML Export Containment View Integration&quot;];
+  class d3084056cad1a8c0 systemRequirement;
+  click d3084056cad1a8c0 &quot;ReqvireTool/ValidationAndReporting/Reports.html#html-export-containment-view-integration&quot;;
+  e04872bebb8341a2 -.->|deriveReqT| d3084056cad1a8c0;
+  2a459f3a7a497b8e[&quot;Model Reports&quot;];
+  class 2a459f3a7a497b8e userRequirement;
+  click 2a459f3a7a497b8e &quot;Reports.html#model-reports&quot;;
+  c1bbfdadfce7e10a[&quot;Deterministic Output for All Generated Content&quot;];
+  class c1bbfdadfce7e10a systemRequirement;
+  click c1bbfdadfce7e10a &quot;ReqvireTool/ValidationAndReporting/Reports.html#deterministic-output-for-all-generated-content&quot;;
+  2a459f3a7a497b8e -.->|deriveReqT| c1bbfdadfce7e10a;
+  8ebc9188f44f7785[&quot;Model Structure and Summaries&quot;];
+  class 8ebc9188f44f7785 userRequirement;
+  click 8ebc9188f44f7785 &quot;Reports.html#model-structure-and-summaries&quot;;
+  8ebc9188f44f7785 -.->|deriveReqT| e04872bebb8341a2;
+  c2e7b787c7b1dd99[&quot;Search Report Generator&quot;];
+  class c2e7b787c7b1dd99 systemRequirement;
+  click c2e7b787c7b1dd99 &quot;ReqvireTool/ValidationAndReporting/Reports.html#search-report-generator&quot;;
+  8ebc9188f44f7785 -.->|deriveReqT| c2e7b787c7b1dd99;
+  13b1d75fa43ceda2[&quot;Provide Validation Reports&quot;];
+  class 13b1d75fa43ceda2 userRequirement;
+  click 13b1d75fa43ceda2 &quot;Reports.html#provide-validation-reports&quot;;
+  27e30811e4587820[&quot;Validate Command&quot;];
+  class 27e30811e4587820 systemRequirement;
+  click 27e30811e4587820 &quot;ReqvireTool/UserInterface/CLI.html#validate-command&quot;;
+  13b1d75fa43ceda2 -.->|deriveReqT| 27e30811e4587820;
+  7ab891515e6782ef[&quot;Validation Report Generator&quot;];
+  class 7ab891515e6782ef systemRequirement;
+  click 7ab891515e6782ef &quot;ReqvireTool/ValidationAndReporting/Reports.html#validation-report-generator&quot;;
+  13b1d75fa43ceda2 -.->|deriveReqT| 7ab891515e6782ef;
+  60fc330ec8dd12b6[&quot;Integrated Validation&quot;];
+  class 60fc330ec8dd12b6 systemRequirement;
+  click 60fc330ec8dd12b6 &quot;ReqvireTool/ValidationAndReporting/Validation.html#integrated-validation&quot;;
+  13b1d75fa43ceda2 -.->|deriveReqT| 60fc330ec8dd12b6;
+  1aba1587af87f21e[&quot;Structural Change Reports&quot;];
+  class 1aba1587af87f21e userRequirement;
+  click 1aba1587af87f21e &quot;Reports.html#structural-change-reports&quot;;
+  30c2f7b2360f1dc9[&quot;Verification Coverage Report&quot;];
+  class 30c2f7b2360f1dc9 userRequirement;
+  click 30c2f7b2360f1dc9 &quot;Reports.html#verification-coverage-report&quot;;
+  dba7405a40d698d9[&quot;Verification Upward Traceability&quot;];
+  class dba7405a40d698d9 userRequirement;
+  click dba7405a40d698d9 &quot;Reports.html#verification-upward-traceability&quot;;
+  30c2f7b2360f1dc9 -.->|deriveReqT| dba7405a40d698d9;
+  32e697e712b093ce[&quot;Verification Coverage Report Generator&quot;];
+  class 32e697e712b093ce systemRequirement;
+  click 32e697e712b093ce &quot;ReqvireTool/ValidationAndReporting/Reports.html#verification-coverage-report-generator&quot;;
+  30c2f7b2360f1dc9 -.->|deriveReqT| 32e697e712b093ce;
+  d9907cdae43de97a[&quot;Verification Roll-up Strategy&quot;];
+  class d9907cdae43de97a systemRequirement;
+  click d9907cdae43de97a &quot;ReqvireTool/ModelManagement/VerificationTraces.html#verification-roll-up-strategy&quot;;
+  dba7405a40d698d9 -.->|deriveReqT| d9907cdae43de97a;
+  c52fefea97861728[&quot;Verification Trace Builder&quot;];
+  class c52fefea97861728 systemRequirement;
+  click c52fefea97861728 &quot;ReqvireTool/ModelManagement/VerificationTraces.html#verification-trace-builder&quot;;
+  dba7405a40d698d9 -.->|deriveReqT| c52fefea97861728;
+  7d9bdb39c1c646f3[&quot;Logical Architecture Block&quot;];
+  class 7d9bdb39c1c646f3 default;
+  click 7d9bdb39c1c646f3 &quot;Architecture.html#logical-architecture-block&quot;;
+  8abab383b0b3cde3[&quot;CLI interface&quot;];
+  class 8abab383b0b3cde3 userRequirement;
+  click 8abab383b0b3cde3 &quot;Interfaces.html#cli-interface&quot;;
+  7d9bdb39c1c646f3 -.->|trace| 8abab383b0b3cde3;
+  e77da96ed07d172c[&quot;Web Interface&quot;];
+  class e77da96ed07d172c userRequirement;
+  click e77da96ed07d172c &quot;Interfaces.html#web-interface&quot;;
+  7d9bdb39c1c646f3 -.->|trace| e77da96ed07d172c;
+  7d9bdb39c1c646f3 -.->|trace| 2a459f3a7a497b8e;
+  cd2d5dab49985ca2[&quot;AI-Assisted MBSE Model Management&quot;];
+  class cd2d5dab49985ca2 userRequirement;
+  click cd2d5dab49985ca2 &quot;UserStories.html#ai-assisted-mbse-model-management&quot;;
+  7d9bdb39c1c646f3 -.->|trace| cd2d5dab49985ca2;
+  98eaeddc27f99e11[&quot;Integrate with GitHub Workflows&quot;];
+  class 98eaeddc27f99e11 userRequirement;
+  click 98eaeddc27f99e11 &quot;UserStories.html#integrate-with-github-workflows&quot;;
+  7d9bdb39c1c646f3 -.->|trace| 98eaeddc27f99e11;
+  e61b7c1baa89bfc6[&quot;Managing MBSE Models&quot;];
+  class e61b7c1baa89bfc6 userRequirement;
+  click e61b7c1baa89bfc6 &quot;UserStories.html#managing-mbse-models&quot;;
+  7d9bdb39c1c646f3 -.->|trace| e61b7c1baa89bfc6;
+  113748a94885138d[&quot;Validating Structures&quot;];
+  class 113748a94885138d userRequirement;
+  click 113748a94885138d &quot;UserStories.html#validating-structures&quot;;
+  7d9bdb39c1c646f3 -.->|trace| 113748a94885138d;
+  4f5b8eb9100ba32a[&quot;Physical Architecture Block&quot;];
+  class 4f5b8eb9100ba32a default;
+  click 4f5b8eb9100ba32a &quot;Architecture.html#physical-architecture-block&quot;;
+  4f5b8eb9100ba32a -.->|trace| 8abab383b0b3cde3;
+  4f5b8eb9100ba32a -.->|trace| e77da96ed07d172c;
+  4f5b8eb9100ba32a -.->|trace| 2a459f3a7a497b8e;
+  4f5b8eb9100ba32a -.->|trace| cd2d5dab49985ca2;
+  4f5b8eb9100ba32a -.->|trace| 98eaeddc27f99e11;
+  4f5b8eb9100ba32a -.->|trace| e61b7c1baa89bfc6;
+  4f5b8eb9100ba32a -.->|trace| 113748a94885138d;
+  6318258d140045e2[&quot;Align with Industry Standards&quot;];
+  class 6318258d140045e2 userRequirement;
+  click 6318258d140045e2 &quot;Mission.html#align-with-industry-standards&quot;;
+  6318258d140045e2 -.->|deriveReqT| 13b1d75fa43ceda2;
+  6e24e906a1c9d5ec[&quot;Format Consistency Enforcement&quot;];
+  class 6e24e906a1c9d5ec userRequirement;
+  click 6e24e906a1c9d5ec &quot;Validation.html#format-consistency-enforcement&quot;;
+  6318258d140045e2 -.->|deriveReqT| 6e24e906a1c9d5ec;
+  5e9e8e0fea56c140[&quot;Validate Cross-Component Dependencies&quot;];
+  class 5e9e8e0fea56c140 userRequirement;
+  click 5e9e8e0fea56c140 &quot;Validation.html#validate-cross-component-dependencies&quot;;
+  6318258d140045e2 -.->|deriveReqT| 5e9e8e0fea56c140;
+  51f3a96863c8744b[&quot;Validate Internal Consistency&quot;];
+  class 51f3a96863c8744b userRequirement;
+  click 51f3a96863c8744b &quot;Validation.html#validate-internal-consistency&quot;;
+  6318258d140045e2 -.->|deriveReqT| 51f3a96863c8744b;
+  11b5fe3115be7b77[&quot;Validate Markdown Structure&quot;];
+  class 11b5fe3115be7b77 userRequirement;
+  click 11b5fe3115be7b77 &quot;Validation.html#validate-markdown-structure&quot;;
+  6318258d140045e2 -.->|deriveReqT| 11b5fe3115be7b77;
+  377c97439aac9d3b[&quot;Validate Relation Types&quot;];
+  class 377c97439aac9d3b userRequirement;
+  click 377c97439aac9d3b &quot;Validation.html#validate-relation-types&quot;;
+  6318258d140045e2 -.->|deriveReqT| 377c97439aac9d3b;
+  e9ad540a6411a0fc[&quot;MOE_CE&quot;];
+  class e9ad540a6411a0fc default;
+  click e9ad540a6411a0fc &quot;MOEs.html#moe_ce&quot;;
+  6318258d140045e2 -.->|trace| e9ad540a6411a0fc;
+  5575b01daa5155ad[&quot;Complete Model Structure Visualization&quot;];
+  class 5575b01daa5155ad userRequirement;
+  click 5575b01daa5155ad &quot;DiagramGeneration.html#complete-model-structure-visualization&quot;;
+  c1bbfdadfce7e10a -.->|deriveReqT| 5575b01daa5155ad;
+  d64c45036b5300a[&quot;Interactive Mermaid Diagrams&quot;];
+  class d64c45036b5300a userRequirement;
+  click d64c45036b5300a &quot;DiagramGeneration.html#interactive-mermaid-diagrams&quot;;
+  c1bbfdadfce7e10a -.->|deriveReqT| d64c45036b5300a;
+  58b20ede35a77731[&quot;Model Visualization and Exploration&quot;];
+  class 58b20ede35a77731 userRequirement;
+  click 58b20ede35a77731 &quot;DiagramGeneration.html#model-visualization-and-exploration&quot;;
+  c1bbfdadfce7e10a -.->|deriveReqT| 58b20ede35a77731;
+  c1bbfdadfce7e10a -.->|deriveReqT| fc4865d1e9b57596;
+  c1bbfdadfce7e10a -.->|deriveReqT| 8ebc9188f44f7785;
+  c1bbfdadfce7e10a -.->|deriveReqT| 13b1d75fa43ceda2;
+  c1bbfdadfce7e10a -.->|deriveReqT| 30c2f7b2360f1dc9;
+  a43a5abca24c066c[&quot;HTML Export&quot;];
+  class a43a5abca24c066c systemRequirement;
+  click a43a5abca24c066c &quot;ReqvireTool/UserInterface/WebInterface.html#html-export&quot;;
+  c1bbfdadfce7e10a -.->|deriveReqT| a43a5abca24c066c;
+  c3ea27eb9d610e25[&quot;Model Linting&quot;];
+  class c3ea27eb9d610e25 userRequirement;
+  click c3ea27eb9d610e25 &quot;Validation.html#model-linting&quot;;
+  c1bbfdadfce7e10a -.->|deriveReqT| c3ea27eb9d610e25;
+  4137315e38ab921e[&quot;Requirements Change Propagation&quot;];
+  class 4137315e38ab921e systemRequirement;
+  click 4137315e38ab921e &quot;TraceChanges.html#requirements-change-propagation&quot;;
+  4137315e38ab921e -.->|deriveReqT| fc4865d1e9b57596;
+  16b284f882a920cc[&quot;Change Impact Detection Algorithm&quot;];
+  class 16b284f882a920cc systemRequirement;
+  click 16b284f882a920cc &quot;ReqvireTool/ModelManagement/ChangeImpact.html#change-impact-detection-algorithm&quot;;
+  4137315e38ab921e -.->|deriveReqT| 16b284f882a920cc;
+  674e6f27f5fda615[&quot;Change Impact Visualization&quot;];
+  class 674e6f27f5fda615 systemRequirement;
+  click 674e6f27f5fda615 &quot;ReqvireTool/ModelManagement/ChangeImpact.html#change-impact-visualization&quot;;
+  4137315e38ab921e -.->|deriveReqT| 674e6f27f5fda615;
+  5d60cdc1fa8c4bac[&quot;Smart Filtering for Change Impact Reports&quot;];
+  class 5d60cdc1fa8c4bac systemRequirement;
+  click 5d60cdc1fa8c4bac &quot;ReqvireTool/ModelManagement/ChangeImpact.html#smart-filtering-for-change-impact-reports&quot;;
+  4137315e38ab921e -.->|deriveReqT| 5d60cdc1fa8c4bac;
+  91a0adb0b4d959c4[&quot;Provide Reports&quot;];
+  class 91a0adb0b4d959c4 userRequirement;
+  click 91a0adb0b4d959c4 &quot;UserStories.html#provide-reports&quot;;
+  91a0adb0b4d959c4 -.->|deriveReqT| 2a459f3a7a497b8e;
+  91a0adb0b4d959c4 -.->|trace| e9ad540a6411a0fc;
+  5ef9c8ae19a9f55a[&quot;Trace Changes in MBSE Model&quot;];
+  class 5ef9c8ae19a9f55a userRequirement;
+  click 5ef9c8ae19a9f55a &quot;UserStories.html#trace-changes-in-mbse-model&quot;;
+  5ef9c8ae19a9f55a -.->|deriveReqT| 1aba1587af87f21e;
+  9f47e50ee9028e7b[&quot;Tracing Structural Changes&quot;];
+  class 9f47e50ee9028e7b userRequirement;
+  click 9f47e50ee9028e7b &quot;TraceChanges.html#tracing-structural-changes&quot;;
+  5ef9c8ae19a9f55a -.->|deriveReqT| 9f47e50ee9028e7b;
+  2c5f30f14e792200[&quot;MOE_UA&quot;];
+  class 2c5f30f14e792200 default;
+  click 2c5f30f14e792200 &quot;MOEs.html#moe_ua&quot;;
+  5ef9c8ae19a9f55a -.->|trace| 2c5f30f14e792200;
+</div>
+<h3 id="model-reports">Model Reports</h3>
+<p>When requested the system shall provide human readable MBSE model reports.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="UserStories.html#provide-reports">Provide Reports</a></li>
+</ul>
+<hr />
+<h3 id="model-structure-and-summaries">Model Structure and Summaries</h3>
+<p>When requested the system shall generate reports summarizing the structure and relationships in the MBSE model, including counts and types of connections also supporting json and cypher output.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="ReqvireTool/ValidationAndReporting/Reports.html#deterministic-output-for-all-generated-content">Deterministic Output for All Generated Content</a></li>
+</ul>
+<hr />
+<h3 id="containment-view-report">Containment View Report</h3>
+<p>The system shall provide a containment view report that displays the physical hierarchical structure of the model showing the containment relationships between folders, files, and elements.</p>
+<h4>Details</h4>
+<p>The containment view shows the <strong>physical organization</strong> of the model, complementing the existing relation-centric model view that shows derivedFrom/verifiedBy relationships.</p>
+<p>The containment hierarchy represents:</p>
+<ul>
+<li><strong>Root folder</strong> → <strong>Subfolders</strong> → <strong>Files</strong> → <strong>Elements</strong></li>
+<li>Sections are skipped in this view (elements are shown directly under files)</li>
+</ul>
+<p>This view helps users:</p>
+<ul>
+<li>Understand model organization and file structure</li>
+<li>Navigate the physical layout of specifications</li>
+<li>Identify where elements are located</li>
+<li>Visualize the containment structure in diagrams</li>
+</ul>
+<p>The containment view must support multiple output formats (text, JSON, Mermaid diagram) and be included in HTML export.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#model-structure-and-summaries">Model Structure and Summaries</a></li>
+</ul>
+<hr />
+<h3 id="structural-change-reports">Structural Change Reports</h3>
+<p>The system shall generate detailed reports summarizing the impact of structural changes, including affected relationships and components.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="UserStories.html#trace-changes-in-mbse-model">Trace Changes in MBSE Model</a></li>
+</ul>
+<hr />
+<h3 id="provide-validation-reports">Provide Validation Reports</h3>
+<p>The system shall generate detailed validation reports, highlighting any inconsistencies or errors in the MBSE model structure.</p>
+<h4>Details</h4>
+<p>Validation shall be performed automatically when any command requires the parsed model, eliminating the need for a separate validation command. Commands that operate on raw files shall skip validation to allow operation on potentially invalid documents.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="Mission.html#align-with-industry-standards">Align with Industry Standards</a></li>
+<li>derivedFrom: <a href="ReqvireTool/ValidationAndReporting/Reports.html#deterministic-output-for-all-generated-content">Deterministic Output for All Generated Content</a></li>
+</ul>
+<hr />
+<h3 id="verification-coverage-report">Verification Coverage Report</h3>
+<p>The system shall generate verification coverage reports focusing on leaf requirements (requirements that do not have forward relations to any other requirement), showing the percentage and details of verified and unverified leaf requirements, including breakdowns by file, section, and verification type.</p>
+<h4>Details</h4>
+<p>The verification coverage report shall provide:</p>
+<ul>
+<li>Total count of leaf requirements with breakdown by requirement type</li>
+<li>Count and percentage of verified leaf requirements (those with verifiedBy relations pointing to existing verification artifacts)</li>
+<li>Count and percentage of unverified leaf requirements</li>
+<li>Total count of verification artifacts with breakdown by verification type (test, analysis, inspection, demonstration)</li>
+<li>Count and percentage of satisfied test-verification artifacts (those with satisfiedBy relations pointing to existing test implementations)</li>
+<li>Count and percentage of orphaned verification artifacts (those without any verify relations to requirements)</li>
+<li>Detailed list of verified leaf requirements grouped by file and section</li>
+<li>Detailed list of unverified leaf requirements with impact analysis</li>
+<li>Detailed list of orphaned verifications (flagged for attention as they may be redundant or incorrectly configured)</li>
+<li>Output in both human-readable text and machine-readable JSON formats</li>
+</ul>
+<p>The report helps track verification completeness and identify gaps in requirement verification coverage, supporting quality assurance and compliance activities.</p>
+<p><strong>Coverage Philosophy:</strong></p>
+<ul>
+<li><strong>Leaf requirements</strong> (requirements that don’t derive other requirements) MUST be verified</li>
+<li><strong>Parent/intermediate requirements</strong> MAY be verified but it’s not a hard requirement as they might be covered in verification of leaf requirements</li>
+<li>One verification may verify multiple leaf requirements (N:1 relationship)</li>
+<li>The change impact analysis system propagates changes from parent requirements down to leaf requirements and their verifications</li>
+<li>System engineers/architects are responsible for ensuring verification scopes are broad enough to cover parent requirements when there’s no dedicated parent verification</li>
+<li>AI systems can help create comprehensive verification scopes and prevent verification overlap</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="ReqvireTool/ValidationAndReporting/Reports.html#deterministic-output-for-all-generated-content">Deterministic Output for All Generated Content</a></li>
+</ul>
+<hr />
+<h3 id="change-impact-analysis">Change Impact Analysis</h3>
+<p>When requested the system shall generate change impact report, in Markdown format by default and also supporting json output.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="TraceChanges.html#requirements-change-propagation">Requirements Change Propagation</a></li>
+<li>derivedFrom: <a href="ReqvireTool/ValidationAndReporting/Reports.html#deterministic-output-for-all-generated-content">Deterministic Output for All Generated Content</a></li>
+</ul>
+<hr />
+<h3 id="verification-upward-traceability">Verification Upward Traceability</h3>
+<p>The system shall provide upward traceability visualization from verifications to root requirements, showing the complete requirement hierarchy and indicating which requirements are directly verified.</p>
+<h4>Details</h4>
+<p><strong>Used for identifying redundant verifications</strong>: When a verification directly verifies both a leaf requirement and its parent requirement, this creates a redundant relation that adds noise into the model and may be removed from the parent - verifying the leaf requirement is sufficient since it traces upward to the parent. This keeps verification placement at the most specific level.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#verification-coverage-report">Verification Coverage Report</a></li>
+</ul>
+<hr />
+
+        </div>
+    </div>
+</body>
+</html>

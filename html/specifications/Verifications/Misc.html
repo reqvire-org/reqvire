@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misc</title>
+    
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa;
+    color: #333;
+}
+.reqvire-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    background-color: #2c3e50;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+}
+.reqvire-nav a {
+    color: #ecf0f1;
+    text-decoration: none;
+    padding: 10px 20px;
+    margin-right: 5px;
+    border-radius: 3px;
+    transition: background-color 0.2s;
+}
+.reqvire-nav a:hover {
+    background-color: #34495e;
+}
+.reqvire-nav-spacer {
+    height: 50px;
+}
+.container {
+    max-width: 95%;
+    margin: 0 auto;
+    padding: 20px;
+}
+.content {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+h1 {
+    color: #333;
+    border-bottom: 2px solid #eaecef;
+    padding-bottom: 10px;
+    margin-top: 0;
+}
+h2 {
+    color: #333;
+    border-bottom: 1px solid #eaecef;
+    padding-bottom: 5px;
+}
+h3 {
+    color: #1a6fb7;
+    margin-top: 25px;
+}
+h4 {
+    color: #555;
+    font-weight: 600;
+}
+a {
+    color: #0366d6;
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 20px 0;
+}
+table, th, td {
+    border: 1px solid #dfe2e5;
+}
+th, td {
+    padding: 8px 12px;
+    text-align: left;
+}
+th {
+    background-color: #f6f8fa;
+}
+code {
+    background: #f6f8fa;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 90%;
+}
+pre {
+    background: #f6f8fa;
+    border-radius: 3px;
+    padding: 16px;
+    overflow: auto;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+}
+blockquote {
+    margin: 0;
+    padding: 0 15px;
+    color: #777;
+    border-left: 4px solid #dfe2e5;
+}
+.mermaid {
+    margin: 20px 0;
+    text-align: center;
+    height: calc(100vh - 150px);
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid #dfe2e5;
+    border-radius: 3px;
+    background-color: #fafafa;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+.mermaid svg {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    position: relative;
+    z-index: 1;
+}
+.diagram-nav-buttons {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 999; /* higher than SVG (1) but lower than header nav (1000) */
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 5px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+.diagram-nav-row {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+}
+.diagram-nav-btn {
+    width: 32px;
+    height: 32px;
+    background-color: #2c3e50;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.diagram-nav-btn:hover {
+    background-color: #34495e;
+}
+.diagram-nav-btn:active {
+    background-color: #1a252f;
+}
+</style>
+
+    <!-- Enhanced mermaid configuration for Reqvire diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.5.0/dist/svg-pan-zoom.min.js"></script>
+    <script>
+        // Capture Mermaid errors
+        mermaid.parseError = function(err, hash) {
+            console.error('Mermaid Parse Error:', err);
+            console.error('Error details:', {
+                str: err.str,
+                hash: err.hash,
+                message: err.message,
+                stack: err.stack
+            });
+        };
+
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            maxTextSize: 120000,
+            maxEdges: 2000,
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            securityLevel: 'loose',
+            logLevel: 'error'
+        });
+
+        // Add pan/zoom to all Mermaid diagrams after rendering
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                document.querySelectorAll('.mermaid').forEach(function(mermaidContainer) {
+                    var svg = mermaidContainer.querySelector('svg');
+                    if (!svg) return;
+
+                    svg.style.maxWidth = 'none';
+                    svg.style.maxHeight = 'none';
+
+                    var eventsHandler = {
+                        haltEventListeners: ['touchstart', 'touchend', 'touchmove', 'touchleave', 'touchcancel'],
+                        init: function(options) {
+                            var instance = options.instance;
+                            var initialScale = 1;
+                            var pannedX = 0;
+                            var pannedY = 0;
+
+                            this.hammer = Hammer(options.svgElement, {
+                                inputClass: Hammer.SUPPORT_POINTER_EVENTS ? Hammer.PointerEventInput : Hammer.TouchInput
+                            });
+
+                            this.hammer.get('pinch').set({enable: true});
+
+                            this.hammer.on('doubletap', function(ev){
+                                instance.zoomIn();
+                            });
+
+                            this.hammer.on('panstart panmove', function(ev){
+                                if (ev.type === 'panstart') {
+                                    pannedX = 0;
+                                    pannedY = 0;
+                                }
+                                instance.panBy({x: ev.deltaX - pannedX, y: ev.deltaY - pannedY});
+                                pannedX = ev.deltaX;
+                                pannedY = ev.deltaY;
+                            });
+
+                            this.hammer.on('pinchstart pinchmove', function(ev){
+                                if (ev.type === 'pinchstart') {
+                                    initialScale = instance.getZoom();
+                                }
+                                instance.zoomAtPoint(initialScale * ev.scale, {x: ev.center.x, y: ev.center.y});
+                            });
+
+                            options.svgElement.addEventListener('touchmove', function(e){ e.preventDefault(); });
+                        },
+                        destroy: function(){
+                            this.hammer.destroy();
+                        }
+                    };
+
+                    // Diagrams with default zoom (no auto-fit)
+                    var panZoomInstance = svgPanZoom(svg, {
+                        zoomEnabled: true,
+                        controlIconsEnabled: true,
+                        fit: false,
+                        center: false,
+                        contain: false,
+                        minZoom: 0.5,
+                        maxZoom: 10,
+                        zoomScaleSensitivity: 0.3,
+                        customEventsHandler: eventsHandler
+                    });
+
+                    // Add navigation buttons
+                    var navButtons = document.createElement('div');
+                    navButtons.className = 'diagram-nav-buttons';
+                    navButtons.innerHTML = `
+                        <div class="diagram-nav-row">
+                            <button class="diagram-nav-btn" data-action="up">▲</button>
+                        </div>
+                        <div class="diagram-nav-row">
+                            <button class="diagram-nav-btn" data-action="left">◀</button>
+                            <button class="diagram-nav-btn" data-action="down">▼</button>
+                            <button class="diagram-nav-btn" data-action="right">▶</button>
+                        </div>
+                    `;
+                    mermaidContainer.appendChild(navButtons);
+
+                    // Wire up navigation buttons
+                    var panStep = 100;
+                    navButtons.querySelectorAll('.diagram-nav-btn').forEach(function(btn) {
+                        btn.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            var action = this.getAttribute('data-action');
+                            switch(action) {
+                                case 'up':
+                                    panZoomInstance.panBy({x: 0, y: panStep});
+                                    break;
+                                case 'down':
+                                    panZoomInstance.panBy({x: 0, y: -panStep});
+                                    break;
+                                case 'left':
+                                    panZoomInstance.panBy({x: panStep, y: 0});
+                                    break;
+                                case 'right':
+                                    panZoomInstance.panBy({x: -panStep, y: 0});
+                                    break;
+                            }
+                        });
+                    });
+                });
+            }, 1500);
+        });
+    </script>
+</head>
+<body>
+    <nav class="reqvire-nav">
+        <a href="../../index.html">Home</a>
+        <a href="../../model.html">Model</a>
+        <a href="../../whole-model.html">Whole Model</a>
+        <a href="../../traces.html">Traces</a>
+        <a href="../../coverage.html">Coverage</a>
+    </nav>
+    <div class="reqvire-nav-spacer"></div>
+    <div class="container">
+        <div class="content">
+            <h1 id="miscellaneous-verifications">Miscellaneous Verifications</h1>
+<p>This document contains miscellaneous verification tests that don’t fit into the other verification categories.</p>
+<h2 id="export-and-context-verifications">Export and Context Verifications</h2>
+<div class="mermaid">graph LR;
+  %% REQVIRE-AUTOGENERATED-DIAGRAM
+  %% Graph styling
+  classDef userRequirement fill:#f9d6d6,stroke:#f55f5f,stroke-width:1px;
+  classDef systemRequirement fill:#fce4e4,stroke:#e68a8a,stroke-width:1px;
+  classDef verification fill:#d6f9d6,stroke:#5fd75f,stroke-width:1px;
+  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
+
+  34c75e4a88e1f381[&quot;CLI Help Structure Verification&quot;];
+  class 34c75e4a88e1f381 verification;
+  click 34c75e4a88e1f381 &quot;Misc.html#cli-help-structure-verification&quot;;
+  6fb925575a1602f1[&quot;test.sh&quot;];
+  class 6fb925575a1602f1 default;
+  click 6fb925575a1602f1 &quot;../../tests/test-cli-help-structure/test.sh&quot;;
+  34c75e4a88e1f381 -->|satisfiedBy| 6fb925575a1602f1;
+  735766802775ec41[&quot;Format Command Requirements Verification&quot;];
+  class 735766802775ec41 verification;
+  click 735766802775ec41 &quot;Misc.html#format-command-requirements-verification&quot;;
+  eaf33ce1e6113c8a[&quot;test.sh&quot;];
+  class eaf33ce1e6113c8a default;
+  click eaf33ce1e6113c8a &quot;../../tests/test-advanced-format/test.sh&quot;;
+  735766802775ec41 -->|satisfiedBy| eaf33ce1e6113c8a;
+  14ef985b9a43174e[&quot;HTML Export Verification&quot;];
+  class 14ef985b9a43174e verification;
+  click 14ef985b9a43174e &quot;Misc.html#html-export-verification&quot;;
+  8899a52ea9866d8b[&quot;test.sh&quot;];
+  class 8899a52ea9866d8b default;
+  click 8899a52ea9866d8b &quot;../../tests/test-html-export/test.sh&quot;;
+  14ef985b9a43174e -->|satisfiedBy| 8899a52ea9866d8b;
+  1e055437d952f703[&quot;Lint Command Verification&quot;];
+  class 1e055437d952f703 verification;
+  click 1e055437d952f703 &quot;Misc.html#lint-command-verification&quot;;
+  68ac732fe5c5db53[&quot;test.sh&quot;];
+  class 68ac732fe5c5db53 default;
+  click 68ac732fe5c5db53 &quot;../../tests/test-lint-command/test.sh&quot;;
+  1e055437d952f703 -->|satisfiedBy| 68ac732fe5c5db53;
+  a5590d2dcfffe431[&quot;Serve Command Verification&quot;];
+  class a5590d2dcfffe431 verification;
+  click a5590d2dcfffe431 &quot;Misc.html#serve-command-verification&quot;;
+  dd6732f292fab4eb[&quot;test.sh&quot;];
+  class dd6732f292fab4eb default;
+  click dd6732f292fab4eb &quot;../../tests/test-serve-command/test.sh&quot;;
+  a5590d2dcfffe431 -->|satisfiedBy| dd6732f292fab4eb;
+  329255589f5b01a2[&quot;CLI Change Impact Report Command&quot;];
+  class 329255589f5b01a2 systemRequirement;
+  click 329255589f5b01a2 &quot;../ReqvireTool/UserInterface/CLI.html#cli-change-impact-report-command&quot;;
+  2316dac9e73bfda0[&quot;Change Impact Command Line Interface&quot;];
+  class 2316dac9e73bfda0 systemRequirement;
+  click 2316dac9e73bfda0 &quot;../ReqvireTool/ModelManagement/ChangeImpact.html#change-impact-command-line-interface&quot;;
+  329255589f5b01a2 -.->|deriveReqT| 2316dac9e73bfda0;
+  a19b7b8063d130c5[&quot;CLI Git Commit Hash Flag&quot;];
+  class a19b7b8063d130c5 systemRequirement;
+  click a19b7b8063d130c5 &quot;../ReqvireTool/UserInterface/CLI.html#cli-git-commit-hash-flag&quot;;
+  329255589f5b01a2 -.->|deriveReqT| a19b7b8063d130c5;
+  80defdd4cbc7ee18[&quot;cli.rs&quot;];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 &quot;../../cli/src/cli.rs&quot;;
+  329255589f5b01a2 -->|satisfiedBy| 80defdd4cbc7ee18;
+  329255589f5b01a2 -.->|verifiedBy| 34c75e4a88e1f381;
+  b559b1f7629a5c62[&quot;CLI Coverage Command&quot;];
+  class b559b1f7629a5c62 systemRequirement;
+  click b559b1f7629a5c62 &quot;../ReqvireTool/UserInterface/CLI.html#cli-coverage-command&quot;;
+  80defdd4cbc7ee18[&quot;cli.rs&quot;];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 &quot;../../cli/src/cli.rs&quot;;
+  b559b1f7629a5c62 -->|satisfiedBy| 80defdd4cbc7ee18;
+  b559b1f7629a5c62 -.->|verifiedBy| 34c75e4a88e1f381;
+  349f5e874cf22d98[&quot;Verification Coverage Report Test&quot;];
+  class 349f5e874cf22d98 verification;
+  click 349f5e874cf22d98 &quot;ReportsTests.html#verification-coverage-report-test&quot;;
+  b559b1f7629a5c62 -.->|verifiedBy| 349f5e874cf22d98;
+  dae82e912381c0d8[&quot;CLI Generate Diagrams Flag&quot;];
+  class dae82e912381c0d8 systemRequirement;
+  click dae82e912381c0d8 &quot;../ReqvireTool/UserInterface/CLI.html#cli-generate-diagrams-flag&quot;;
+  80defdd4cbc7ee18[&quot;cli.rs&quot;];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 &quot;../../cli/src/cli.rs&quot;;
+  dae82e912381c0d8 -->|satisfiedBy| 80defdd4cbc7ee18;
+  2d2cf67bb8070da8[&quot;Diagram Generation Test&quot;];
+  class 2d2cf67bb8070da8 verification;
+  click 2d2cf67bb8070da8 &quot;DiagramsTests.html#diagram-generation-test&quot;;
+  dae82e912381c0d8 -.->|verifiedBy| 2d2cf67bb8070da8;
+  dae82e912381c0d8 -.->|verifiedBy| 34c75e4a88e1f381;
+  6ca4ccd32e3b556[&quot;CLI Remove Diagrams Flag&quot;];
+  class 6ca4ccd32e3b556 systemRequirement;
+  click 6ca4ccd32e3b556 &quot;../ReqvireTool/UserInterface/CLI.html#cli-remove-diagrams-flag&quot;;
+  80defdd4cbc7ee18[&quot;cli.rs&quot;];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 &quot;../../cli/src/cli.rs&quot;;
+  6ca4ccd32e3b556 -->|satisfiedBy| 80defdd4cbc7ee18;
+  6a6973ecb2f20ee3[&quot;Remove Generated Diagrams Verification&quot;];
+  class 6a6973ecb2f20ee3 verification;
+  click 6a6973ecb2f20ee3 &quot;DiagramsTests.html#remove-generated-diagrams-verification&quot;;
+  6ca4ccd32e3b556 -.->|verifiedBy| 6a6973ecb2f20ee3;
+  6ca4ccd32e3b556 -.->|verifiedBy| 34c75e4a88e1f381;
+  a51eeded115214db[&quot;CLI Search Command&quot;];
+  class a51eeded115214db systemRequirement;
+  click a51eeded115214db &quot;../ReqvireTool/UserInterface/CLI.html#cli-search-command&quot;;
+  80defdd4cbc7ee18[&quot;cli.rs&quot;];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 &quot;../../cli/src/cli.rs&quot;;
+  a51eeded115214db -->|satisfiedBy| 80defdd4cbc7ee18;
+  a51eeded115214db -.->|verifiedBy| 34c75e4a88e1f381;
+  d32ffdff20bc3c1e[&quot;Search Command Tests&quot;];
+  class d32ffdff20bc3c1e verification;
+  click d32ffdff20bc3c1e &quot;ReportsTests.html#search-command-tests&quot;;
+  a51eeded115214db -.->|verifiedBy| d32ffdff20bc3c1e;
+  7d29669df287de3a[&quot;CLI Traces Command&quot;];
+  class 7d29669df287de3a systemRequirement;
+  click 7d29669df287de3a &quot;../ReqvireTool/UserInterface/CLI.html#cli-traces-command&quot;;
+  27e4931d9f0bc019[&quot;CLI Traces Filter Options&quot;];
+  class 27e4931d9f0bc019 systemRequirement;
+  click 27e4931d9f0bc019 &quot;../ReqvireTool/UserInterface/CLI.html#cli-traces-filter-options&quot;;
+  7d29669df287de3a -.->|deriveReqT| 27e4931d9f0bc019;
+  42a913d5509a336b[&quot;CLI Traces From-Folder Option&quot;];
+  class 42a913d5509a336b systemRequirement;
+  click 42a913d5509a336b &quot;../ReqvireTool/UserInterface/CLI.html#cli-traces-from-folder-option&quot;;
+  7d29669df287de3a -.->|deriveReqT| 42a913d5509a336b;
+  80defdd4cbc7ee18[&quot;cli.rs&quot;];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 &quot;../../cli/src/cli.rs&quot;;
+  7d29669df287de3a -->|satisfiedBy| 80defdd4cbc7ee18;
+  7d29669df287de3a -.->|verifiedBy| 34c75e4a88e1f381;
+  8c22c72bf047a650[&quot;Format Command&quot;];
+  class 8c22c72bf047a650 systemRequirement;
+  click 8c22c72bf047a650 &quot;../ReqvireTool/UserInterface/CLI.html#format-command&quot;;
+  80defdd4cbc7ee18[&quot;cli.rs&quot;];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 &quot;../../cli/src/cli.rs&quot;;
+  8c22c72bf047a650 -->|satisfiedBy| 80defdd4cbc7ee18;
+  8c22c72bf047a650 -.->|verifiedBy| 34c75e4a88e1f381;
+  8c22c72bf047a650 -.->|verifiedBy| 735766802775ec41;
+  27e30811e4587820[&quot;Validate Command&quot;];
+  class 27e30811e4587820 systemRequirement;
+  click 27e30811e4587820 &quot;../ReqvireTool/UserInterface/CLI.html#validate-command&quot;;
+  80defdd4cbc7ee18[&quot;cli.rs&quot;];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 &quot;../../cli/src/cli.rs&quot;;
+  27e30811e4587820 -->|satisfiedBy| 80defdd4cbc7ee18;
+  27e30811e4587820 -.->|verifiedBy| 34c75e4a88e1f381;
+  e37dc7f46d75d46[&quot;Invalid Relations Test&quot;];
+  class e37dc7f46d75d46 verification;
+  click e37dc7f46d75d46 &quot;ValidationTests.html#invalid-relations-test&quot;;
+  27e30811e4587820 -.->|verifiedBy| e37dc7f46d75d46;
+  a43a5abca24c066c[&quot;HTML Export&quot;];
+  class a43a5abca24c066c systemRequirement;
+  click a43a5abca24c066c &quot;../ReqvireTool/UserInterface/WebInterface.html#html-export&quot;;
+  9048171ff5d2f3ed[&quot;HTML Navigation Bar&quot;];
+  class 9048171ff5d2f3ed userRequirement;
+  click 9048171ff5d2f3ed &quot;../Export.html#html-navigation-bar&quot;;
+  a43a5abca24c066c -.->|deriveReqT| 9048171ff5d2f3ed;
+  f9b6c8a9147b50f3[&quot;Export Related System Elements&quot;];
+  class f9b6c8a9147b50f3 systemRequirement;
+  click f9b6c8a9147b50f3 &quot;../ReqvireTool/UserInterface/WebInterface.html#export-related-system-elements&quot;;
+  a43a5abca24c066c -.->|deriveReqT| f9b6c8a9147b50f3;
+  67e2ac6a378e9fae[&quot;Model HTML Pages Design&quot;];
+  class 67e2ac6a378e9fae systemRequirement;
+  click 67e2ac6a378e9fae &quot;../ReqvireTool/UserInterface/WebInterface.html#model-html-pages-design&quot;;
+  a43a5abca24c066c -.->|deriveReqT| 67e2ac6a378e9fae;
+  80defdd4cbc7ee18[&quot;cli.rs&quot;];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 &quot;../../cli/src/cli.rs&quot;;
+  a43a5abca24c066c -->|satisfiedBy| 80defdd4cbc7ee18;
+  d0e6cc47b904faa5[&quot;html.rs&quot;];
+  class d0e6cc47b904faa5 default;
+  click d0e6cc47b904faa5 &quot;../../core/src/html.rs&quot;;
+  a43a5abca24c066c -->|satisfiedBy| d0e6cc47b904faa5;
+  c3d63c5d4133e346[&quot;html_export.rs&quot;];
+  class c3d63c5d4133e346 default;
+  click c3d63c5d4133e346 &quot;../../core/src/html_export.rs&quot;;
+  a43a5abca24c066c -->|satisfiedBy| c3d63c5d4133e346;
+  a43a5abca24c066c -.->|verifiedBy| 34c75e4a88e1f381;
+  ed03f89aa02f9313[&quot;HTML Navigation Enhancement&quot;];
+  class ed03f89aa02f9313 systemRequirement;
+  click ed03f89aa02f9313 &quot;../ReqvireTool/UserInterface/WebInterface.html#html-navigation-enhancement&quot;;
+  d0e6cc47b904faa5[&quot;html.rs&quot;];
+  class d0e6cc47b904faa5 default;
+  click d0e6cc47b904faa5 &quot;../../core/src/html.rs&quot;;
+  ed03f89aa02f9313 -->|satisfiedBy| d0e6cc47b904faa5;
+  c3d63c5d4133e346[&quot;html_export.rs&quot;];
+  class c3d63c5d4133e346 default;
+  click c3d63c5d4133e346 &quot;../../core/src/html_export.rs&quot;;
+  ed03f89aa02f9313 -->|satisfiedBy| c3d63c5d4133e346;
+  ed03f89aa02f9313 -.->|verifiedBy| 14ef985b9a43174e;
+  21223366cdd4ce90[&quot;Index Generation&quot;];
+  class 21223366cdd4ce90 systemRequirement;
+  click 21223366cdd4ce90 &quot;../ReqvireTool/UserInterface/WebInterface.html#index-generation&quot;;
+  c3d63c5d4133e346[&quot;html_export.rs&quot;];
+  class c3d63c5d4133e346 default;
+  click c3d63c5d4133e346 &quot;../../core/src/html_export.rs&quot;;
+  21223366cdd4ce90 -->|satisfiedBy| c3d63c5d4133e346;
+  1a173441705701a0[&quot;index_generator.rs&quot;];
+  class 1a173441705701a0 default;
+  click 1a173441705701a0 &quot;../../core/src/index_generator.rs&quot;;
+  21223366cdd4ce90 -->|satisfiedBy| 1a173441705701a0;
+  21223366cdd4ce90 -.->|verifiedBy| 14ef985b9a43174e;
+  bcf832a934807ed0[&quot;Serve Command&quot;];
+  class bcf832a934807ed0 systemRequirement;
+  click bcf832a934807ed0 &quot;../ReqvireTool/UserInterface/WebInterface.html#serve-command&quot;;
+  80defdd4cbc7ee18[&quot;cli.rs&quot;];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 &quot;../../cli/src/cli.rs&quot;;
+  bcf832a934807ed0 -->|satisfiedBy| 80defdd4cbc7ee18;
+  e313808f7a755f6[&quot;serve.rs&quot;];
+  class e313808f7a755f6 default;
+  click e313808f7a755f6 &quot;../../cli/src/serve.rs&quot;;
+  bcf832a934807ed0 -->|satisfiedBy| e313808f7a755f6;
+  bcf832a934807ed0 -.->|trace| 27e30811e4587820;
+  bcf832a934807ed0 -.->|verifiedBy| a5590d2dcfffe431;
+  565cc5dfa0512876[&quot;Document Structure Normalization&quot;];
+  class 565cc5dfa0512876 systemRequirement;
+  click 565cc5dfa0512876 &quot;../ReqvireTool/ValidationAndReporting/Formatting.html#document-structure-normalization&quot;;
+  b7c871ab64a7059a[&quot;graph_registry.rs&quot;];
+  class b7c871ab64a7059a default;
+  click b7c871ab64a7059a &quot;../../core/src/graph_registry.rs&quot;;
+  565cc5dfa0512876 -->|satisfiedBy| b7c871ab64a7059a;
+  f22d93285fcd7664[&quot;parser.rs&quot;];
+  class f22d93285fcd7664 default;
+  click f22d93285fcd7664 &quot;../../core/src/parser.rs&quot;;
+  565cc5dfa0512876 -->|satisfiedBy| f22d93285fcd7664;
+  565cc5dfa0512876 -.->|verifiedBy| 735766802775ec41;
+  48079820e0958064[&quot;Excess Whitespace Format Implementation&quot;];
+  class 48079820e0958064 systemRequirement;
+  click 48079820e0958064 &quot;../ReqvireTool/ValidationAndReporting/Formatting.html#excess-whitespace-format-implementation&quot;;
+  8fbf4ca0471377ea[&quot;format.rs&quot;];
+  class 8fbf4ca0471377ea default;
+  click 8fbf4ca0471377ea &quot;../../core/src/format.rs&quot;;
+  48079820e0958064 -->|satisfiedBy| 8fbf4ca0471377ea;
+  48079820e0958064 -.->|verifiedBy| 735766802775ec41;
+  39d8198b424886f5[&quot;Git-Style Diff Output for Format&quot;];
+  class 39d8198b424886f5 systemRequirement;
+  click 39d8198b424886f5 &quot;../ReqvireTool/ValidationAndReporting/Formatting.html#git-style-diff-output-for-format&quot;;
+  e69395f926bba6a5[&quot;diff.rs&quot;];
+  class e69395f926bba6a5 default;
+  click e69395f926bba6a5 &quot;../../core/src/diff.rs&quot;;
+  39d8198b424886f5 -->|satisfiedBy| e69395f926bba6a5;
+  8fbf4ca0471377ea[&quot;format.rs&quot;];
+  class 8fbf4ca0471377ea default;
+  click 8fbf4ca0471377ea &quot;../../core/src/format.rs&quot;;
+  39d8198b424886f5 -->|satisfiedBy| 8fbf4ca0471377ea;
+  39d8198b424886f5 -.->|verifiedBy| 735766802775ec41;
+  b3dfaa5f76484ceb[&quot;Inconsistent Newlines Format Implementation&quot;];
+  class b3dfaa5f76484ceb systemRequirement;
+  click b3dfaa5f76484ceb &quot;../ReqvireTool/ValidationAndReporting/Formatting.html#inconsistent-newlines-format-implementation&quot;;
+  8fbf4ca0471377ea[&quot;format.rs&quot;];
+  class 8fbf4ca0471377ea default;
+  click 8fbf4ca0471377ea &quot;../../core/src/format.rs&quot;;
+  b3dfaa5f76484ceb -->|satisfiedBy| 8fbf4ca0471377ea;
+  b3dfaa5f76484ceb -.->|verifiedBy| 735766802775ec41;
+  61f2a6a1c9804b94[&quot;Missing Separators Format Implementation&quot;];
+  class 61f2a6a1c9804b94 systemRequirement;
+  click 61f2a6a1c9804b94 &quot;../ReqvireTool/ValidationAndReporting/Formatting.html#missing-separators-format-implementation&quot;;
+  8fbf4ca0471377ea[&quot;format.rs&quot;];
+  class 8fbf4ca0471377ea default;
+  click 8fbf4ca0471377ea &quot;../../core/src/format.rs&quot;;
+  61f2a6a1c9804b94 -->|satisfiedBy| 8fbf4ca0471377ea;
+  61f2a6a1c9804b94 -.->|verifiedBy| 735766802775ec41;
+  b92b29e4582bfb78[&quot;Reserved Subsections Format Implementation&quot;];
+  class b92b29e4582bfb78 systemRequirement;
+  click b92b29e4582bfb78 &quot;../ReqvireTool/ValidationAndReporting/Formatting.html#reserved-subsections-format-implementation&quot;;
+  8fbf4ca0471377ea[&quot;format.rs&quot;];
+  class 8fbf4ca0471377ea default;
+  click 8fbf4ca0471377ea &quot;../../core/src/format.rs&quot;;
+  b92b29e4582bfb78 -->|satisfiedBy| 8fbf4ca0471377ea;
+  b92b29e4582bfb78 -.->|verifiedBy| 735766802775ec41;
+  aaabcd9a18f29740[&quot;Lint Auto-fix Capability&quot;];
+  class aaabcd9a18f29740 systemRequirement;
+  click aaabcd9a18f29740 &quot;../ReqvireTool/ValidationAndReporting/Lint.html#lint-auto-fix-capability&quot;;
+  aaabcd9a18f29740 -.->|verifiedBy| 1e055437d952f703;
+  c17206ef87710036[&quot;Lint Output Formatting&quot;];
+  class c17206ef87710036 systemRequirement;
+  click c17206ef87710036 &quot;../ReqvireTool/ValidationAndReporting/Lint.html#lint-output-formatting&quot;;
+  c17206ef87710036 -.->|verifiedBy| 1e055437d952f703;
+  825309264fad98c5[&quot;Multi-Branch Convergence Detection&quot;];
+  class 825309264fad98c5 systemRequirement;
+  click 825309264fad98c5 &quot;../ReqvireTool/ValidationAndReporting/Lint.html#multi-branch-convergence-detection&quot;;
+  a9b6f3acdf104ea5[&quot;lint.rs&quot;];
+  class a9b6f3acdf104ea5 default;
+  click a9b6f3acdf104ea5 &quot;../../core/src/lint.rs&quot;;
+  825309264fad98c5 -->|satisfiedBy| a9b6f3acdf104ea5;
+  825309264fad98c5 -.->|verifiedBy| 1e055437d952f703;
+  4517ba9864214f8f[&quot;Redundant Verify Relations Detection&quot;];
+  class 4517ba9864214f8f systemRequirement;
+  click 4517ba9864214f8f &quot;../ReqvireTool/ValidationAndReporting/Lint.html#redundant-verify-relations-detection&quot;;
+  4517ba9864214f8f -.->|verifiedBy| 1e055437d952f703;
+  e64af7bdc80d458e[&quot;Safe Redundant Hierarchical Relations Auto-Removal&quot;];
+  class e64af7bdc80d458e systemRequirement;
+  click e64af7bdc80d458e &quot;../ReqvireTool/ValidationAndReporting/Lint.html#safe-redundant-hierarchical-relations-auto-removal&quot;;
+  a9b6f3acdf104ea5[&quot;lint.rs&quot;];
+  class a9b6f3acdf104ea5 default;
+  click a9b6f3acdf104ea5 &quot;../../core/src/lint.rs&quot;;
+  e64af7bdc80d458e -->|satisfiedBy| a9b6f3acdf104ea5;
+  e64af7bdc80d458e -.->|verifiedBy| 1e055437d952f703;
+  df3d1e30a948a4e0[&quot;Structure of Markdown Documents&quot;];
+  class df3d1e30a948a4e0 systemRequirement;
+  click df3d1e30a948a4e0 &quot;../Structure/SpecificationsRequirements.html#structure-of-markdown-documents&quot;;
+  b8373b7489450d74[&quot;Create Element Operation&quot;];
+  class b8373b7489450d74 systemRequirement;
+  click b8373b7489450d74 &quot;../ReqvireTool/ModelManagement/ElementManipulation.html#create-element-operation&quot;;
+  df3d1e30a948a4e0 -.->|deriveReqT| b8373b7489450d74;
+  a814c4935e1a0449[&quot;element.rs&quot;];
+  class a814c4935e1a0449 default;
+  click a814c4935e1a0449 &quot;../../core/src/element.rs&quot;;
+  df3d1e30a948a4e0 -->|satisfiedBy| a814c4935e1a0449;
+  d50a859650933e55[&quot;model.rs&quot;];
+  class d50a859650933e55 default;
+  click d50a859650933e55 &quot;../../core/src/model.rs&quot;;
+  df3d1e30a948a4e0 -->|satisfiedBy| d50a859650933e55;
+  f22d93285fcd7664[&quot;parser.rs&quot;];
+  class f22d93285fcd7664 default;
+  click f22d93285fcd7664 &quot;../../core/src/parser.rs&quot;;
+  df3d1e30a948a4e0 -->|satisfiedBy| f22d93285fcd7664;
+  9450d4313f47ef36[&quot;relation.rs&quot;];
+  class 9450d4313f47ef36 default;
+  click 9450d4313f47ef36 &quot;../../core/src/relation.rs&quot;;
+  df3d1e30a948a4e0 -->|satisfiedBy| 9450d4313f47ef36;
+  398003c91b6b2cde[&quot;subsection.rs&quot;];
+  class 398003c91b6b2cde default;
+  click 398003c91b6b2cde &quot;../../core/src/subsection.rs&quot;;
+  df3d1e30a948a4e0 -->|satisfiedBy| 398003c91b6b2cde;
+  df3d1e30a948a4e0 -.->|verifiedBy| 735766802775ec41;
+  7559f2ddc9d909ed[&quot;Element Subsection Parsing Test&quot;];
+  class 7559f2ddc9d909ed verification;
+  click 7559f2ddc9d909ed &quot;ParsingTests.html#element-subsection-parsing-test&quot;;
+  df3d1e30a948a4e0 -.->|verifiedBy| 7559f2ddc9d909ed;
+  b0d0999636b025fa[&quot;Invalid Header Structure Test&quot;];
+  class b0d0999636b025fa verification;
+  click b0d0999636b025fa &quot;ValidationTests.html#invalid-header-structure-test&quot;;
+  df3d1e30a948a4e0 -.->|verifiedBy| b0d0999636b025fa;
+  c904c9c769f7b038[&quot;Replace Absolute Links with Relative Links&quot;];
+  class c904c9c769f7b038 userRequirement;
+  click c904c9c769f7b038 &quot;../Validation.html#replace-absolute-links-with-relative-links&quot;;
+  c904c9c769f7b038 -.->|verifiedBy| 735766802775ec41;
+</div>
+<h3 id="html-export-verification">HTML Export Verification</h3>
+<p>This test verifies that the system exports specifications into HTML format with generated index and saves them in the designated output location.</p>
+<h4>Details</h4>
+<h5>Acceptance Criteria:</h5>
+<ul>
+<li>System should export specifications to HTML format</li>
+<li>HTML files should be saved in the designated output location</li>
+<li>HTML output should maintain the structure and content of the original specifications</li>
+<li>System shall generate index.md in the temporary working directory during HTML export</li>
+<li>index.md shall be converted to index.html in the output directory</li>
+<li>index.html shall contain links to all specification documents</li>
+<li>index.html shall be properly structured with sections</li>
+<li>index.html shall include brief summaries of each document</li>
+<li>index.html shall serve as the primary entry point for HTML documentation</li>
+<li>Links in diagrams and text must be converted to use .html instead of .md</li>
+<li>Paths in HTML files should maintain the original relative structure</li>
+<li>System should work in environments without Git repositories</li>
+</ul>
+<h5>Test Criteria:</h5>
+<ul>
+<li>Command exits with success (0) return code</li>
+<li>HTML files are generated at the expected location with .html extension</li>
+<li>Output directory contains index.html file</li>
+<li>index.html contains links to all specification documents</li>
+<li>index.html structure follows expected format</li>
+<li>HTML content preserves the structure and information from the source files</li>
+<li>Links in HTML files use .html extension instead of .md</li>
+<li>Mermaid click links are properly converted from .md to .html</li>
+<li>Both GitHub-style URLs and direct file paths in mermaid click links are handled correctly</li>
+<li>Paths should not have duplicated folder names (e.g., specifications/specifications)</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../ReqvireTool/UserInterface/WebInterface.html#index-generation">Index Generation</a></li>
+<li>satisfiedBy: <a href="../../tests/test-html-export/test.sh">test.sh</a></li>
+</ul>
+<hr />
+<h3 id="cli-help-structure-verification">CLI Help Structure Verification</h3>
+<p>This test verifies that the CLI help output displays all commands and their options flattened in the main help, and that all CLI command requirements are covered.</p>
+<h4>Details</h4>
+<h5>Acceptance Criteria</h5>
+<ul>
+<li>Running <code>reqvire</code> (without arguments) displays the main help output as the default command</li>
+<li>Main help output shows Usage line: <code>reqvire [OPTIONS] &lt;COMMAND&gt; [COMMAND OPTIONS]</code></li>
+<li>Main help lists all available commands under “Commands:” section</li>
+<li>Main help lists all global options under “Options:” section</li>
+<li>Command-specific options are displayed under dedicated headings (e.g., “SUMMARY OPTIONS:”, “FORMAT OPTIONS:”)</li>
+<li>All command options are flattened and visible in the main help without needing to drill down</li>
+<li>Help output includes nested subcommands expanded (e.g., “traces”, “coverage”)</li>
+<li>Each command’s help text is descriptive and clear</li>
+</ul>
+<h5>Test Criteria</h5>
+<ol>
+<li>
+<p><strong>Main help output structure</strong>
+Command: <code>reqvire</code></p>
+<ul>
+<li>exits code <strong>0</strong></li>
+<li>output contains “Usage: reqvire [OPTIONS] <COMMAND> [COMMAND OPTIONS]”</li>
+<li>output contains “Commands:” section</li>
+<li>output contains “Options:” section with <code>-h, --help</code>, <code>-V, --version</code></li>
+</ul>
+</li>
+<li>
+<p><strong>Command listing completeness</strong></p>
+<ul>
+<li>All CLI commands are listed: html, format, validate, generate-diagrams, remove-diagrams, summary, section-summary, change-impact, verifications</li>
+<li>Nested commands are expanded: “traces”, “coverage”</li>
+</ul>
+</li>
+<li>
+<p><strong>Options flattening - all command-specific option sections present</strong></p>
+<ul>
+<li>FORMAT OPTIONS section visible</li>
+<li>SUMMARY OPTIONS section visible</li>
+<li>SECTION-SUMMARY OPTIONS section visible</li>
+<li>CHANGE IMPACT OPTIONS section visible</li>
+<li>VERIFICATIONS TRACES OPTIONS section visible</li>
+<li>VERIFICATIONS COVERAGE OPTIONS section visible</li>
+</ul>
+</li>
+<li>
+<p><strong>Help text quality</strong></p>
+<ul>
+<li>Each command has descriptive help text</li>
+<li>Options have clear descriptions</li>
+</ul>
+</li>
+</ol>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../ReqvireTool/UserInterface/CLI.html#format-command">Format Command</a></li>
+<li>verify: <a href="../ReqvireTool/UserInterface/CLI.html#validate-command">Validate Command</a></li>
+<li>verify: <a href="../ReqvireTool/UserInterface/WebInterface.html#html-export">HTML Export</a></li>
+<li>verify: <a href="../ReqvireTool/UserInterface/CLI.html#cli-generate-diagrams-flag">CLI Generate Diagrams Flag</a></li>
+<li>verify: <a href="../ReqvireTool/UserInterface/CLI.html#cli-remove-diagrams-flag">CLI Remove Diagrams Flag</a></li>
+<li>verify: <a href="../ReqvireTool/UserInterface/CLI.html#cli-search-command">CLI Search Command</a></li>
+<li>verify: <a href="../ReqvireTool/UserInterface/CLI.html#cli-change-impact-report-command">CLI Change Impact Report Command</a></li>
+<li>verify: <a href="../ReqvireTool/UserInterface/CLI.html#cli-traces-command">CLI Traces Command</a></li>
+<li>verify: <a href="../ReqvireTool/UserInterface/CLI.html#cli-coverage-command">CLI Coverage Command</a></li>
+<li>satisfiedBy: <a href="../../tests/test-cli-help-structure/test.sh">test.sh</a></li>
+</ul>
+<hr />
+<h3 id="format-command-requirements-verification">Format Command Requirements Verification</h3>
+<p>This test verifies the format command requirements from SystemRequirements and UserRequirements, focusing on normalizing and standardizing MBSE models for consistency and readability.</p>
+<h4>Details</h4>
+<h5>Acceptance Criteria</h5>
+<p><strong>Format Command Functionality:</strong></p>
+<ul>
+<li>System shall provide format command that normalizes and standardizes markdown documents</li>
+<li>System shall default to dry-run mode (preview changes without applying them)</li>
+<li>System shall require –fix flag to actually apply formatting changes to files</li>
+<li>System shall display changes in git diff style with line numbers and colors</li>
+<li>System shall show diff output in both preview mode and when applying changes with –fix</li>
+<li>System shall support –json flag for structured output of formatting results</li>
+<li>System shall preserve all document content while improving formatting consistency</li>
+</ul>
+<p><strong>Content Preservation:</strong></p>
+<ul>
+<li>System shall preserve personas sections and other non-element content</li>
+<li>System shall maintain element ordering within sections</li>
+<li>System shall preserve section ordering throughout documents</li>
+<li>System shall preserve page content (frontmatter before first section)</li>
+<li>System shall preserve section content (content between section headers and first element)</li>
+</ul>
+<p><strong>Formatting Consistency:</strong></p>
+<ul>
+<li>System shall trim excess whitespace from lines</li>
+<li>System shall normalize line endings consistently</li>
+<li>System shall insert proper separators between elements</li>
+<li>System shall normalize consecutive separators to single separators</li>
+<li>System shall normalize relation indentation to proper 2-space format</li>
+<li>System shall format relation links with human-readable names</li>
+<li>System shall clean up file references to show filename only for implementation files</li>
+</ul>
+<p><strong>Document Structure Normalization:</strong></p>
+<ul>
+<li>System shall add level 1 page header (based on filename) when document lacks page header</li>
+<li>System shall add <code>## Requirements</code> section header when elements exist without section header</li>
+<li>System shall preserve existing page headers (starting with <code># </code>)</li>
+<li>System shall preserve existing section headers (starting with <code>## </code>)</li>
+<li>System shall correctly distinguish level 1 headers from level 2+ headers</li>
+</ul>
+<p><strong>Change Preview Quality:</strong></p>
+<ul>
+<li>System shall show file identification clearly in change output</li>
+<li>System shall display line references with consistent width based on maximum line number</li>
+</ul>
+<p><strong>Known Limitations:</strong></p>
+<ul>
+<li>Diff output may not correctly display blank line additions in all cases (blank lines shown with ␤ character may have incorrect line numbering or positioning)</li>
+<li>System shall visualize trailing whitespace removal with special characters</li>
+<li>System shall use colors to distinguish additions (green) and removals (red)</li>
+<li>System shall group changes by file with clear separators</li>
+<li>System shall only show lines that have changes, omitting unchanged content</li>
+<li>System shall provide context lines before and after changes for better readability</li>
+<li>System shall maintain sequential line numbering that reflects final file positions</li>
+<li>System shall ensure line number continuity throughout diff output</li>
+</ul>
+<p><strong>Relation Link Enhancement:</strong></p>
+<ul>
+<li>System shall convert simple identifiers (non-markdown format) to proper markdown link format</li>
+<li>System shall convert absolute links to relative links where appropriate</li>
+<li>System shall preserve already correct relative links without modification</li>
+<li>System shall replace fragment-only same-file references with full element names</li>
+<li>System shall convert implementation file paths to clean filename references</li>
+<li>System shall preserve external URLs without modification</li>
+</ul>
+<h5>Test Criteria</h5>
+<ol>
+<li>
+<p><strong>Basic format functionality</strong></p>
+<ul>
+<li>Format command runs successfully on test markdown files</li>
+<li>Default mode (no –fix flag) shows preview without making changes</li>
+<li>–fix flag applies changes correctly</li>
+<li>Format command shows diff output in both preview and –fix modes</li>
+<li>JSON flag produces structured output with formatting results</li>
+</ul>
+</li>
+<li>
+<p><strong>Content preservation verification</strong></p>
+<ul>
+<li>Personas sections remain intact after formatting</li>
+<li>Element content and structure preserved</li>
+<li>Section ordering maintained correctly</li>
+<li>Page and section content preserved</li>
+</ul>
+</li>
+<li>
+<p><strong>Change detection and preview</strong></p>
+<ul>
+<li>Changes are clearly identified by file</li>
+<li>Line references include consistent number width</li>
+<li>Trailing whitespace removal is visualized</li>
+<li>Color coding distinguishes addition/removal changes</li>
+<li>Context lines provide readable context around changes</li>
+<li>Line numbering maintains sequential continuity reflecting final file positions</li>
+</ul>
+</li>
+<li>
+<p><strong>Relation link quality</strong></p>
+<ul>
+<li>Simple identifiers are converted to proper markdown link format</li>
+<li>Absolute links are converted to relative links where appropriate</li>
+<li>Already correct relative links remain unchanged</li>
+<li>Same-file references use human-readable element names</li>
+<li>Implementation file references show clean filenames</li>
+<li>Fragment references use proper notation</li>
+</ul>
+</li>
+<li>
+<p><strong>Formatting consistency</strong></p>
+<ul>
+<li>Excess whitespace is trimmed appropriately</li>
+<li>Separators are inserted correctly between elements</li>
+<li>Consecutive separators are normalized to single separators</li>
+<li>Relation indentation is normalized to proper 2-space format</li>
+<li>Line endings are normalized</li>
+</ul>
+</li>
+<li>
+<p><strong>Line numbering accuracy</strong></p>
+<ul>
+<li>Line numbers in diff output are sequential and consistent</li>
+<li>Context lines maintain proper numbering continuity</li>
+<li>Added lines show correct position in final file</li>
+<li>Line numbering reflects final file structure accurately</li>
+</ul>
+</li>
+</ol>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../ReqvireTool/UserInterface/CLI.html#format-command">Format Command</a></li>
+<li>verify: <a href="../ReqvireTool/ValidationAndReporting/Formatting.html#document-structure-normalization">Document Structure Normalization</a></li>
+<li>verify: <a href="../Structure/SpecificationsRequirements.html#structure-of-markdown-documents">Structure of Markdown Documents</a></li>
+<li>satisfiedBy: <a href="../../tests/test-advanced-format/test.sh">test.sh</a></li>
+</ul>
+<hr />
+<h3 id="serve-command-verification">Serve Command Verification</h3>
+<p>This test verifies that the serve command exports HTML to a temporary directory and starts an HTTP server that serves the model documentation.</p>
+<h4>Details</h4>
+<h5>Acceptance Criteria:</h5>
+<ul>
+<li>System shall export HTML artifacts to a temporary directory</li>
+<li>System shall start HTTP server on specified host and port</li>
+<li>System shall display clickable terminal link to the server URL</li>
+<li>System shall serve index.html when accessing root URL</li>
+<li>System shall serve all exported HTML files with correct paths</li>
+<li>System shall serve static assets (SVG diagrams, CSS, etc.)</li>
+<li>System shall return 404 for non-existent files</li>
+<li>System shall set correct Content-Type headers for different file types</li>
+<li>System shall run in quiet mode (suppress verbose export output)</li>
+<li>System shall not automatically open browser window</li>
+<li>System shall display instructions for Ctrl-C stop</li>
+</ul>
+<h5>Test Criteria:</h5>
+<ul>
+<li>Command starts successfully and displays server URL with instructions</li>
+<li>Server responds to HTTP requests on specified port</li>
+<li>Root URL (/) serves index.html</li>
+<li>HTML files are served with text/html content type</li>
+<li>SVG files are served with image/svg+xml content type</li>
+<li>Non-existent paths return 404 status</li>
+<li>Export verbose output is suppressed (quiet mode active)</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../ReqvireTool/UserInterface/WebInterface.html#serve-command">Serve Command</a></li>
+<li>satisfiedBy: <a href="../../tests/test-serve-command/test.sh">test.sh</a></li>
+</ul>
+<hr />
+<h3 id="lint-command-verification">Lint Command Verification</h3>
+<p>This test verifies that the lint command analyzes model quality, detects issues in requirements relations, and provides categorized output distinguishing between auto-fixable issues and those requiring manual review.</p>
+<h4>Details</h4>
+<h5>Acceptance Criteria:</h5>
+<p><strong>Basic Command Functionality:</strong></p>
+<ul>
+<li>System shall provide lint command that analyzes model quality</li>
+<li>System shall default to dry-run mode (report issues without applying fixes)</li>
+<li>System shall support –fixable flag to show only auto-fixable issues</li>
+<li>System shall support –auditable flag to show only issues requiring manual review</li>
+<li>System shall support –fix flag to automatically apply fixes for auto-fixable issues</li>
+<li>System shall support –json flag for structured JSON output</li>
+<li>System shall show ALL issues when no filter flags are provided</li>
+<li>System shall exit with code 0 when no issues are found or fixes are successfully applied</li>
+<li>System shall exit with non-zero code on errors</li>
+</ul>
+<p><strong>Redundant Verify Relations Detection:</strong></p>
+<ul>
+<li>System shall detect when a verification verifies both a leaf requirement and its ancestor</li>
+<li>System shall reuse verification trace tree logic for detection</li>
+<li>System shall report these as auto-fixable issues</li>
+<li>System shall show affected verification elements with file paths</li>
+<li>System shall list specific redundant verify relations</li>
+<li>System shall explain why relations are redundant</li>
+</ul>
+<p><strong>Maybe-Redundant Hierarchical Relations Detection:</strong></p>
+<ul>
+<li>System shall detect when an element has derivedFrom to both a requirement and its ancestor</li>
+<li>System shall use virtual verification connected to all leaf requirements for detection</li>
+<li>System shall reuse trace tree building logic for consistency</li>
+<li>System shall report these as needs manual review issues</li>
+<li>System shall show affected elements with their derivedFrom relations</li>
+<li>System shall not suggest which relations to remove</li>
+</ul>
+<p><strong>Output Formatting:</strong></p>
+<ul>
+<li>System shall categorize output into “Auto-fixable Issues” and “Needs Manual Review” sections</li>
+<li>Each issue shall include element identifier, file path, specific relations, and rationale</li>
+<li>JSON output shall include issue categorization, type, affected elements, relation details, and rationale</li>
+<li>System shall not suggest what to remove in output</li>
+</ul>
+<p><strong>Auto-fix Capability:</strong></p>
+<ul>
+<li>System shall apply fixes only for auto-fixable issues when –fix is used</li>
+<li>System shall remove redundant verify relations from verification elements</li>
+<li>System shall remove safe redundant hierarchical derivation relations following single-chain constraint</li>
+<li>System shall NOT auto-remove hierarchical relations with multiple converging paths (requires manual review)</li>
+<li>System shall preserve all other content and formatting in files</li>
+<li>System shall report all changes made (files modified, relations removed)</li>
+<li>System shall not modify issues categorized as needs manual review</li>
+</ul>
+<h5>Test Criteria:</h5>
+<ol>
+<li>
+<p><strong>Command execution</strong></p>
+<ul>
+<li>Lint command runs successfully with default behavior</li>
+<li>–fixable flag shows only auto-fixable issues</li>
+<li>–auditable flag shows only manual review issues</li>
+<li>–fix flag applies fixes for auto-fixable issues</li>
+<li>–json flag produces structured JSON output</li>
+</ul>
+</li>
+<li>
+<p><strong>JSON output filtering</strong></p>
+<ul>
+<li>–fixable –json shows only auto_fixable items (needs_manual_review is empty array)</li>
+<li>–auditable –json shows only needs_manual_review items (auto_fixable is empty array)</li>
+<li>–json without filters shows both auto_fixable and needs_manual_review items</li>
+<li>JSON output correctly filters based on flags before serialization</li>
+</ul>
+</li>
+<li>
+<p><strong>Redundant verify detection</strong></p>
+<ul>
+<li>Correctly identifies redundant verify relations using trace tree logic</li>
+<li>Reports verification elements with redundant relations</li>
+<li>Categorizes as auto-fixable</li>
+</ul>
+</li>
+<li>
+<p><strong>Hierarchical redundancy detection</strong></p>
+<ul>
+<li>Creates virtual verification connected to leaf requirements</li>
+<li>Correctly identifies potentially redundant derivedFrom relations</li>
+<li>Categorizes as needs manual review</li>
+</ul>
+</li>
+<li>
+<p><strong>Output quality</strong></p>
+<ul>
+<li>Clear categorization into auto-fixable and manual review sections</li>
+<li>Complete information for each issue</li>
+<li>JSON output has correct structure</li>
+<li>No suggestions on what to remove</li>
+</ul>
+</li>
+<li>
+<p><strong>Auto-fix functionality</strong></p>
+<ul>
+<li>Removes redundant verify relations from markdown files</li>
+<li>Removes safe redundant hierarchical derivation relations (single-chain only)</li>
+<li>Does NOT auto-remove hierarchical relations with multiple converging paths</li>
+<li>Preserves file content and formatting</li>
+<li>Reports changes accurately</li>
+<li>Does not modify manual review issues</li>
+</ul>
+</li>
+</ol>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../ReqvireTool/ValidationAndReporting/Lint.html#redundant-verify-relations-detection">Redundant Verify Relations Detection</a></li>
+<li>verify: <a href="../ReqvireTool/ValidationAndReporting/Lint.html#safe-redundant-hierarchical-relations-auto-removal">Safe Redundant Hierarchical Relations Auto-Removal</a></li>
+<li>verify: <a href="../ReqvireTool/ValidationAndReporting/Lint.html#lint-output-formatting">Lint Output Formatting</a></li>
+<li>verify: <a href="../ReqvireTool/ValidationAndReporting/Lint.html#lint-auto-fix-capability">Lint Auto-fix Capability</a></li>
+<li>satisfiedBy: <a href="../../tests/test-lint-command/test.sh">test.sh</a></li>
+</ul>
+<hr />
+
+        </div>
+    </div>
+</body>
+</html>

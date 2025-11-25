@@ -117,6 +117,17 @@ ${1:-The user will specify which requirement needs verification.}
    EOF
    ```
 
+   Optional: Insert at specific position (0-based index):
+   ```bash
+   reqvire add "specifications/Verifications/<file>.md" 0 <<'EOF'
+   ...
+   EOF
+   ```
+
+   Alternative using pipe:
+   ```bash
+   cat element.md | reqvire add "specifications/Verifications/<file>.md"
+   ```
 
    The add command automatically:
    - Validates markdown format
