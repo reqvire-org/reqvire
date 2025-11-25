@@ -22,10 +22,9 @@
 * [Battery Saver](specifications/SecondFile/Requirements.md#battery-saver)
     * derive -> [Battery Monitoring](specifications/SecondFile/Requirements.md#battery-monitoring) ⚠️
     * derive -> [Display Settings](specifications/SecondFile/Requirements.md#display-settings) ⚠️
-      * verifiedBy -> [display_test.py](specifications/SecondFile/display_test.py)
-      * satisfiedBy -> [display_impl.py](specifications/SecondFile/display_impl.py)
+        * verifiedBy -> [display_test.py](specifications/SecondFile/display_test.py)
+        * satisfiedBy -> [display_impl.py](specifications/SecondFile/display_impl.py)
     * derive -> [Power Efficiency](specifications/SecondFile/Requirements.md#power-efficiency) ⚠️
-
 
 
 ---

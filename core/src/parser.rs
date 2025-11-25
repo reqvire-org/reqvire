@@ -249,10 +249,12 @@ fn is_specification_file(content: &str) -> bool {
 /// Parses a markdown document and extracts elements with metadata and relations.
 /// Returns: (elements, errors, page_content)
 /// Only parses files where the first H1 heading is "# Requirements".
+/// If git_commit is Some, file attachment hashes are computed from the git commit, not working directory.
 pub fn parse_elements(
     file: &str,
     content: &str,
     file_path: &PathBuf,
+    git_commit: Option<&str>,
 ) -> (Vec<Element>, Vec<ReqvireError>, String) {
     // Check if this is a specification file (first H1 must be "# Requirements")
     if !is_specification_file(content) {
@@ -569,7 +571,7 @@ pub fn parse_elements(
                         Ok(href) => {
                             // Determine if this is an element identifier or file path
                             // Element identifiers contain '#' (e.g., "File.md#element-name" or "#element-name")
-                            let target = if href.contains('#') {
+                            let (target, content_hash): (AttachmentTarget, Option<String>) = if href.contains('#') {
                                 // This is an element identifier - normalize it like relation targets
                                 // For same-file references (starting with #), prepend current file path
                                 let href_to_normalize = if href.starts_with('#') {
@@ -582,7 +584,7 @@ pub fn parse_elements(
                                     .unwrap_or_else(|| Path::new("."))
                                     .to_path_buf();
                                 match utils::normalize_identifier(&href_to_normalize, &file_dir) {
-                                    Ok(normalized) => AttachmentTarget::ElementIdentifier(normalized),
+                                    Ok(normalized) => (AttachmentTarget::ElementIdentifier(normalized), None),
                                     Err(e) => {
                                         let msg = format!(
                                             "Invalid attachment identifier in element '{}': {} (file: {}, line {})",
@@ -625,12 +627,47 @@ pub fn parse_elements(
                                         .map(|p| p.to_path_buf())
                                         .unwrap_or(normalized)
                                 };
-                                AttachmentTarget::FilePath(attachment_path)
+
+                                // Compute content_hash for file attachment
+                                // If parsing from a git commit, read file from commit; otherwise from working directory
+                                let full_path = git_root.join(&attachment_path);
+                                let file_hash = if let Some(commit) = git_commit {
+                                    // Read from git commit
+                                    match crate::git_commands::get_file_at_commit(
+                                        &full_path.to_string_lossy(),
+                                        &git_root,
+                                        commit
+                                    ) {
+                                        Ok(content) => Some(crate::utils::hash_content(&content)),
+                                        Err(_) => None, // File doesn't exist in commit
+                                    }
+                                } else if full_path.exists() {
+                                    // Read from working directory
+                                    match std::fs::read_to_string(&full_path) {
+                                        Ok(content) => Some(crate::utils::hash_content(&content)),
+                                        Err(_) => {
+                                            // Binary file or read error - hash the raw bytes
+                                            match std::fs::read(&full_path) {
+                                                Ok(bytes) => {
+                                                    use std::hash::{Hash, Hasher};
+                                                    let mut hasher = rustc_hash::FxHasher::default();
+                                                    bytes.hash(&mut hasher);
+                                                    Some(format!("{:x}", hasher.finish()))
+                                                }
+                                                Err(_) => None,
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    None // File doesn't exist yet
+                                };
+
+                                (AttachmentTarget::FilePath(attachment_path), file_hash)
                             };
 
                             // Check for duplicates
                             if !element.attachments.iter().any(|a| a.target == target) {
-                                element.attachments.push(Attachment { target });
+                                element.attachments.push(Attachment { target, content_hash });
                             } else {
                                 let msg = format!(
                                     "Duplicate attachment '{}' in element '{}' (file: {}, line {})",

@@ -56,31 +56,27 @@ Test cases for element identifiers:
 
 ### Attachments Change Impact Verification
 
-Verify attach/detach operations and Refinement element changes trigger change impact analysis.
+Verify Refinement element operations are tracked in change impact analysis.
 
 #### Details
-CRITICAL: Detach operation must trigger change impact.
+Test cases for Refinement element content changes:
+- Refinement element content change is detected in change-impact report
+- Same-file, cross-file, and cross-directory Refinement references are validated
 
-Test cases for file attachment operations:
-- Attach operation marks element as changed
-- Detach operation marks element as changed
-- mv-attachment operation marks affected elements as changed
-- rm-attachment operation marks affected elements as changed
-- Element hash changes when attachments modified
-- Change impact propagates through derivedFrom relations
-
-Test cases for Refinement element changes:
-- Refinement element content change propagates impact to elements with attachment identifiers
-- Attachment identifier relocation (move/rename) is reported but does NOT propagate impact
+Test cases for Refinement element mv operations:
+- mv to different file: relocation reported, attachment identifiers updated automatically
+- mv to different directory: relocation reported, attachment identifiers updated automatically
 - Behavior matches relation target relocation handling
+
+Test cases for Refinement element rm operations:
+- rm of attached Refinement element: validation fails with clear error about broken attachment
 
 #### Metadata
   * type: test-verification
 
 #### Relations
-  * verify: [Requirements Change Propagation](../../Processing/ChangeImpact.md#requirements-change-propagation)
   * verify: [Change Impact Detection](../../Processing/ChangeImpact.md#change-impact-detection)
-  * satisfiedBy: [test.sh](../../../../tests/test-attachments/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-change-impact-attachments/test.sh)
 ---
 
 ### Attach Command Verification

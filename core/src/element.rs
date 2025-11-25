@@ -36,6 +36,9 @@ impl AttachmentTarget {
 #[derive(Debug, Clone, Serialize)]
 pub struct Attachment {
     pub target: AttachmentTarget,
+    /// Content hash for file attachments (FilePath only).
+    /// For ElementIdentifier attachments, the hash is looked up from registry.
+    pub content_hash: Option<String>,
 }
 
 #[derive(Debug, PartialEq, Hash, Eq, Clone)]

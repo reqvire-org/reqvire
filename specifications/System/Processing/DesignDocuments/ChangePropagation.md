@@ -48,11 +48,14 @@ When a requirement changes, impact analysis must be conducted based on its relat
      - **Removals**: Element ID exists only in previous version
      - **Relocations**: Element ID exists in both, but file_path or section differs
    - **Attachment Content Changes**:
-     - Element content hash includes hashes of attached document content
-     - Attach operation: adds document content hash -> element hash changes -> triggers impact
-     - Detach operation: removes document content hash -> element hash changes -> triggers impact
+     - Attachment hashes are stored separately from element content hash
+     - For file attachments: content_hash is computed from file content during parsing
+     - For element attachments: hash is looked up from referenced element's hash_impact_content in registry
+     - Change impact compares both element hash AND attachment hashes independently
+     - Attach operation: new attachment hash appears -> triggers impact
+     - Detach operation: attachment hash removed -> triggers impact
      - mv-attachment operation: path change only -> does NOT trigger impact (tracked for reporting like relation renames)
-     - If attached document content changes: element hash changes -> triggers impact
+     - If attached document content changes: attachment hash differs -> triggers impact on element
      - Path renames are tracked separately for reference updates without impact propagation
    - Generate a ChangeSet representing all detected changes
    - Associate changes with specific elements in the model
