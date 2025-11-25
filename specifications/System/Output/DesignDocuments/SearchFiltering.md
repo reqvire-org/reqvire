@@ -55,10 +55,16 @@ The filtering system **must support the following filters**, which may be active
 
 **Input:** One of the following valid string identifiers:
 
-- `"user-requirement"`
-- `"system-requirement"`
-- `"verification"`
-- `"file"`
+- `"requirement"` - System requirement (default type)
+- `"user-requirement"` - User requirement
+- `"verification"` / `"test-verification"` - Test verification
+- `"analysis-verification"` - Analysis verification
+- `"inspection-verification"` - Inspection verification
+- `"demonstration-verification"` - Demonstration verification
+- `"constraint"` - Refinement documenting constraints
+- `"behavior"` - Refinement documenting behavior details
+- `"specification"` - Refinement documenting specifications
+- `"file"` - File element
 - Any user-defined type (e.g., `"interface"`, `"design"`)
 
 **Match Target:** `Element.element_type`
@@ -147,6 +153,9 @@ The filtering system must evaluate filters with minimal passes over element data
 | Filter Combination | Expected Result |
 |--------------------|------------------|
 | `type = verification` | Only verification elements |
+| `type = constraint` | Only constraint refinement elements |
+| `type = behavior` | Only behavior refinement elements |
+| `type = specification` | Only specification refinement elements |
 | `filter-file = "System*"` + `name = ".*GPS.*"` | Elements in System files with GPS in name |
 | `have-relations = verifiedBy,satisfiedBy` | Elements that have both verifiedBy AND satisfiedBy relations |
 | `not-have-relations = verifiedBy` | Elements that do NOT have any verifiedBy relations |
