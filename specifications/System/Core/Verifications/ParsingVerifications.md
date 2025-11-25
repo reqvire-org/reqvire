@@ -311,3 +311,49 @@ This test verifies that the system rejects Refinement elements that include a Re
 #### Relations
   * verify: [Refinement Element Structure Constraints](../ModelManagement.md#refinement-element-structure-constraints)
 ---
+
+### Non-Reserved Subsections Content Test
+
+This test verifies that non-reserved subsections (subsections other than Relations, Details, Metadata, Attachments) are correctly included in the element's content field.
+
+#### Details
+
+##### Acceptance Criteria
+**Non-Reserved Subsection Handling:**
+- System shall include non-reserved subsection headers (e.g., `#### Test Steps`, `#### Expected Results`) in element content
+- System shall include content following non-reserved subsection headers in element content
+- Non-reserved subsection content shall NOT be moved to page content
+- Non-reserved subsections shall behave like `#### Details` (content goes into element's content field)
+
+**Reserved Subsection Behavior:**
+- Reserved subsections (Relations, Metadata, Attachments) shall NOT be included in element content
+- `#### Details` subsection header and its content shall be included in element content
+
+**Format Command:**
+- Format command shall preserve non-reserved subsections within their parent element
+- Format command shall NOT move non-reserved subsection content to page level
+
+##### Test Criteria
+1. **Non-reserved subsection parsing:**
+   - Create element with `#### Test Steps` and `#### Expected Results` subsections
+   - Run reqvire search --json
+   - Verify element content includes both subsection headers and their content
+
+2. **Page content exclusion:**
+   - Create element with non-reserved subsections
+   - Run reqvire search --json
+   - Verify page_content does NOT contain non-reserved subsection content
+
+3. **Format preservation:**
+   - Run reqvire format on file with non-reserved subsections
+   - Verify format does not propose moving subsection content to page level
+   - Run reqvire format --fix
+   - Verify subsections remain under their parent element
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [Reserved Subsections Support](../StructureAndParsing.md#reserved-subsections-support)
+  * satisfiedBy: [test.sh](../../../../tests/test-search-all-features/test.sh)
+---

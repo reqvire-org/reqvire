@@ -1,6 +1,6 @@
 --- MBSE Search results ---
 📂 File: specifications/Requirements.md (elements: 6)
-  📄 Page content: "This document contains correctly formatted relations to existing targets, to verify validation passes.\n\nThis is page frontmatter content that should appear in the summary.\n\n```mermaid\ngraph TD;\n    A[Start] --> B[Process];\n    B --> C[End];\n```\n\nAdditional page content to test mermaid diagram inclusion in page summaries.\n\n\n\n\n\n\nSome text of subsection 1\n\n\nSome text of subsection 2"
+  📄 Page content: "This document contains correctly formatted relations to existing targets, to verify validation passes.\n\nThis is page frontmatter content that should appear in the summary.\n\n```mermaid\ngraph TD;\n    A[Start] --> B[Process];\n    B --> C[End];\n```\n\nAdditional page content to test mermaid diagram inclusion in page summaries."
 
     🔹 Element: specifications/Requirements.md#requirement-with-designspecifications-reference
       - Name: Requirement with DesignSpecifications Reference
@@ -15,7 +15,7 @@
       - Name: Requirement with Many Subsections
       - File: specifications/Requirements.md
       - Type: user-requirement
-      - Content: "This requirement specifically tests validation of 'Other' subsections"
+      - Content: "This requirement specifically tests validation of 'Other' subsections\n\n\n#### Subsection 1\n\nSome text of subsection 1\n\n\n#### Subsection 2\n\nSome text of subsection 2"
       - No relations.
 
     🔹 Element: specifications/Requirements.md#requirement-with-valid-markdown-relations

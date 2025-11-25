@@ -31,7 +31,7 @@
           "name": "Requirement with Many Subsections",
           "file": "specifications/Requirements.md",
           "type": "user-requirement",
-          "content": "This requirement specifically tests validation of 'Other' subsections",
+          "content": "This requirement specifically tests validation of 'Other' subsections\n\n\n#### Subsection 1\n\nSome text of subsection 1\n\n\n#### Subsection 2\n\nSome text of subsection 2",
           "relations": [],
           "attachments": []
         },
@@ -174,7 +174,7 @@
           "attachments": []
         }
       ],
-      "page_content": "This document contains correctly formatted relations to existing targets, to verify validation passes.\n\nThis is page frontmatter content that should appear in the summary.\n\n```mermaid\ngraph TD;\n    A[Start] --> B[Process];\n    B --> C[End];\n```\n\nAdditional page content to test mermaid diagram inclusion in page summaries.\n\n\n\n\n\n\nSome text of subsection 1\n\n\nSome text of subsection 2",
+      "page_content": "This document contains correctly formatted relations to existing targets, to verify validation passes.\n\nThis is page frontmatter content that should appear in the summary.\n\n```mermaid\ngraph TD;\n    A[Start] --> B[Process];\n    B --> C[End];\n```\n\nAdditional page content to test mermaid diagram inclusion in page summaries.",
       "total_elements": 6
     }
   },

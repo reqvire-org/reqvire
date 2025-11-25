@@ -433,23 +433,28 @@ pub fn parse_elements(
                 }
             }
 
-            // If transitioning to Details subsection, add the header to content
-            if subsection == SubSection::Details && !skip_current_element {
+            // If transitioning to Details or non-reserved subsection, add the header to content
+            if !skip_current_element {
                 if let Some(element) = &mut current_element {
-                    element.add_content("\n#### Details\n");
+                    if subsection == SubSection::Details || matches!(subsection, SubSection::Other(_)) {
+                        element.add_content(&format!("\n{}\n", line));
+                    }
                 }
             }
 
             current_subsection = subsection;
 
-        } else if (current_subsection == SubSection::Requirement || current_subsection == SubSection::Details)
+        } else if (current_subsection == SubSection::Requirement
+            || current_subsection == SubSection::Details
+            || matches!(current_subsection, SubSection::Other(_)))
+            && current_element.is_some()
             && !skip_current_element
         {
             if let Some(element) = &mut current_element {
                 if trimmed.starts_with("<details") {
                     in_details_block = true;
                 }
-        
+
                 element.add_content(&format!("{}\n", line));
 
             }
