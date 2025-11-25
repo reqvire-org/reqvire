@@ -1395,6 +1395,13 @@ impl GraphRegistry {
             }
         }
 
+        // Find all files with attachments pointing to this element
+        for file in self.find_files_with_attachment_to(element_id) {
+            if !modified_files.contains(&file) {
+                modified_files.push(file);
+            }
+        }
+
         // Update the element's name and identifier in the node
         if let Some(node) = self.nodes.get_mut(element_id) {
             node.element.name = new_name.to_string();
@@ -1420,6 +1427,9 @@ impl GraphRegistry {
                 }
             }
         }
+
+        // Update all attachment identifiers pointing to this element
+        self.update_attachment_identifiers(&old_id, &new_identifier);
 
         // Track all modified files
         for file in &modified_files {
@@ -1520,6 +1530,15 @@ impl GraphRegistry {
             }
         }
 
+        // Find all files with attachments to elements in the source file
+        for old_id in &elements_in_source {
+            for file in self.find_files_with_attachment_to(old_id) {
+                if !modified_files.contains(&file) {
+                    modified_files.push(file);
+                }
+            }
+        }
+
         // Move nodes in HashMap (remove old key, insert with new key)
         for (old_id, new_id) in &identifier_mappings {
             if let Some(node) = self.nodes.remove(old_id) {
@@ -1538,6 +1557,11 @@ impl GraphRegistry {
                     }
                 }
             }
+        }
+
+        // Update all attachment identifiers pointing to moved elements
+        for (old_id, new_id) in &identifier_mappings {
+            self.update_attachment_identifiers(old_id, new_id);
         }
 
         modified_files.push(target_file.to_string());
@@ -1716,6 +1740,38 @@ impl GraphRegistry {
                 }
             }
         }
+    }
+
+    /// Updates attachment identifiers when a Refinement element is moved or renamed
+    /// Similar to update_relation_identifiers but for attachment references
+    fn update_attachment_identifiers(&mut self, old_identifier: &str, new_identifier: &str) {
+        // Find and update all attachment identifiers pointing to the old identifier
+        for node in self.nodes.values_mut() {
+            for attachment in &mut node.element.attachments {
+                if let crate::element::AttachmentTarget::ElementIdentifier(ref mut id) = attachment.target {
+                    if id == old_identifier {
+                        *id = new_identifier.to_string();
+                    }
+                }
+            }
+        }
+    }
+
+    /// Finds all files that have attachments pointing to the given element identifier
+    fn find_files_with_attachment_to(&self, element_id: &str) -> Vec<String> {
+        let mut files = Vec::new();
+        for node in self.nodes.values() {
+            let has_attachment = node.element.attachments.iter().any(|att| {
+                matches!(&att.target, crate::element::AttachmentTarget::ElementIdentifier(id) if id == element_id)
+            });
+            if has_attachment {
+                let file = node.element.file_path.clone();
+                if !files.contains(&file) {
+                    files.push(file);
+                }
+            }
+        }
+        files
     }
 
     /// Adds a new element to the graph
@@ -2085,22 +2141,30 @@ impl GraphRegistry {
             }
         }
 
+        // Find all files with attachments pointing to this element
+        for file in self.find_files_with_attachment_to(element_id) {
+            if !modified_files.contains(&file) {
+                modified_files.push(file);
+            }
+        }
+
         // Now perform the move
         self.move_element_to_location(element_id, target_file)?;
 
         // Update all relations (TO and FROM the moved element)
         self.update_relation_identifiers(&old_identifier, &source_file, target_file);
 
-        // Get new identifier after move
-        let new_identifier = self.nodes.values()
-            .find(|node| {
-                node.element.file_path == target_file &&
-                node.element.identifier.ends_with(&old_identifier.split('#').last().unwrap())
-            })
-            .map(|node| node.element.identifier.clone())
-            .ok_or_else(|| ReqvireError::ProcessError(
-                "Failed to find element after move".to_string()
-            ))?;
+        // Construct the new identifier (file path changed, fragment stays the same)
+        let fragment = old_identifier.split('#').last().unwrap_or("");
+        let new_identifier = format!("{}#{}", target_file, fragment);
+
+        // Update the element's identifier field in the node
+        if let Some(node) = self.nodes.get_mut(&old_identifier) {
+            node.element.identifier = new_identifier.clone();
+        }
+
+        // Update all attachment identifiers pointing to this element
+        self.update_attachment_identifiers(&old_identifier, &new_identifier);
 
         // Update file order index if provided
         if let Some(idx) = index {

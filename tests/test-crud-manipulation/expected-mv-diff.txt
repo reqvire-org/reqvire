@@ -1,4 +1,4 @@
-Moved element: Feature C (specifications/Requirements.md#feature-c)
+Moved element: Feature C (specifications/OtherRequirements.md#feature-c)
 
 📄 specifications/OtherRequirements.md
   [37m01     # Requirements[0m

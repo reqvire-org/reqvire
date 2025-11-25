@@ -239,6 +239,115 @@ if [ "$ATTACHMENTS" == "null" ] || [ "$ATTACHMENTS" == "[]" ]; then
 fi
 
 # ==================================
+# Test 9: Rename Refinement Element Updates Attachment Identifiers
+# ==================================
+echo "Test 9: Rename Refinement element updates attachment identifiers..."
+
+# Rename the constraint element
+set +e
+RENAME_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" rename "Test Constraint Element" "Renamed Constraint" 2>&1)
+RENAME_EXIT=$?
+set -e
+
+if [ $RENAME_EXIT -ne 0 ]; then
+  echo "FAILED: Rename command failed"
+  echo "$RENAME_OUTPUT"
+  exit 1
+fi
+
+# Verify the attachment identifier was updated
+FILE_CONTENT=$(cat "$TEST_DIR/specifications/Requirements.md")
+if ! echo "$FILE_CONTENT" | grep -q "#renamed-constraint"; then
+  echo "FAILED: Attachment identifier not updated after rename"
+  echo "File content:"
+  echo "$FILE_CONTENT"
+  exit 1
+fi
+
+# Validate the model after rename
+set +e
+VALIDATION_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" validate 2>&1)
+VALIDATION_EXIT=$?
+set -e
+
+if [ $VALIDATION_EXIT -ne 0 ]; then
+  echo "FAILED: Model validation failed after rename"
+  echo "$VALIDATION_OUTPUT"
+  exit 1
+fi
+
+# Rename back for subsequent tests
+set +e
+RENAME_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" rename "Renamed Constraint" "Test Constraint Element" 2>&1)
+RENAME_EXIT=$?
+set -e
+
+if [ $RENAME_EXIT -ne 0 ]; then
+  echo "FAILED: Rename back failed"
+  echo "$RENAME_OUTPUT"
+  exit 1
+fi
+
+# ==================================
+# Test 10: Move Refinement Element Updates Attachment Identifiers
+# ==================================
+echo "Test 10: Move Refinement element updates attachment identifiers..."
+
+# Create a new file to move to
+cat > "$TEST_DIR/specifications/Refinements.md" <<'EOF'
+# Refinements
+EOF
+
+# Move the constraint element to a new file
+set +e
+MOVE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv "Test Constraint Element" --to-file specifications/Refinements.md 2>&1)
+MOVE_EXIT=$?
+set -e
+
+if [ $MOVE_EXIT -ne 0 ]; then
+  echo "FAILED: Move command failed"
+  echo "$MOVE_OUTPUT"
+  exit 1
+fi
+
+# Verify the attachment identifier was updated with the new file path
+# Note: The markdown output uses relative paths, so we check for Refinements.md (not specifications/Refinements.md)
+FILE_CONTENT=$(cat "$TEST_DIR/specifications/Requirements.md")
+if ! echo "$FILE_CONTENT" | grep -q "Refinements.md#test-constraint-element"; then
+  echo "FAILED: Attachment identifier not updated after move"
+  echo "File content:"
+  echo "$FILE_CONTENT"
+  exit 1
+fi
+
+# Validate the model after move
+set +e
+VALIDATION_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" validate 2>&1)
+VALIDATION_EXIT=$?
+set -e
+
+if [ $VALIDATION_EXIT -ne 0 ]; then
+  echo "FAILED: Model validation failed after move"
+  echo "$VALIDATION_OUTPUT"
+  exit 1
+fi
+
+# Move back for cleanup
+set +e
+MOVE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv "Test Constraint Element" --to-file specifications/Requirements.md 2>&1)
+MOVE_EXIT=$?
+set -e
+
+if [ $MOVE_EXIT -ne 0 ]; then
+  echo "FAILED: Move back failed"
+  echo "$MOVE_OUTPUT"
+  exit 1
+fi
+
+# Remove the temporary file
+rm -f "$TEST_DIR/specifications/Refinements.md"
+
+# ==================================
 # Final Result
 # ==================================
 echo ""
