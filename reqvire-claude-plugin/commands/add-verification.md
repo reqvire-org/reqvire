@@ -119,7 +119,7 @@ ${1:-The user will specify which requirement needs verification.}
 
    Optional: Insert at specific position (0-based index):
    ```bash
-   reqvire add "specifications/Verifications/<file>.md" 0 <<'EOF'
+   reqvire add "specifications/Verifications/<file>.md" --index=0 <<'EOF'
    ...
    EOF
    ```

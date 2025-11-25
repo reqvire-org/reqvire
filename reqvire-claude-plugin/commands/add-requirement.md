@@ -80,7 +80,7 @@ ${1:-The user will provide requirement details.}
 
    Optional: Insert at specific position (0-based index):
    ```bash
-   reqvire add "<file-path>" 0 <<'EOF'
+   reqvire add "<file-path>" --index=0 <<'EOF'
    ...
    EOF
    ```
