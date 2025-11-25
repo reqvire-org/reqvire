@@ -136,6 +136,23 @@ All manipulation operations shall:
   * derivedFrom: [Managing System Models](../../UserStories.md#managing-system-models)
 ---
 
+### Attachment Identifier Updates
+
+When moving or renaming Refinement elements, the system shall update attachment identifiers in all referencing elements, using the same behavior as relation target updates.
+
+#### Details
+This requirement ensures consistency between relation updates and attachment identifier updates during CRUD operations:
+
+- When a Refinement element is **moved** to a different file, all attachments referencing that element shall be updated with the new identifier path
+- When a Refinement element is **renamed**, all attachments referencing that element shall be updated with the new element name in the identifier
+- The update behavior mirrors how relation targets are updated during move/rename operations
+- All files containing attachments that reference the affected element shall be modified
+
+#### Relations
+  * derivedFrom: [Element Manipulation Operations](#element-manipulation-operations)
+  * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
+---
+
 ### Verification Type Categories
 
 The system shall support defined verifications categories.
