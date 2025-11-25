@@ -46,3 +46,12 @@ Renamed element: Feature A → Feature Alpha (specifications/Requirements.md#fea
   [32m31 +     * derivedFrom: [Feature Alpha](#feature-alpha)[0m
   [37m32     ---[0m
   [37m33[0m
+  [37m34     ### Feature D Constraint[0m
+
+  [37m47       * [Feature D Constraint](Requirements.md#feature-d-constraint)[0m
+  [37m48[0m
+  [37m49     #### Relations[0m
+  [31m50 -     * derivedFrom: [Feature A](#feature-a)[0m
+  [32m50 +     * derivedFrom: [Feature Alpha](#feature-alpha)[0m
+  [37m51     ---[0m
+  [37m52[0m

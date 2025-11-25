@@ -27,7 +27,7 @@ ${1:-The user will provide element name and target location.}
 
 2. **Preview the move operation:**
    ```bash
-   reqvire mv "<element-name>" --to-file="<file>" --dry-run
+   reqvire mv "<element-name>" "<target-file>" --dry-run
    ```
 
    This shows:
@@ -38,7 +38,7 @@ ${1:-The user will provide element name and target location.}
 
 3. **Apply the move:**
    ```bash
-   reqvire mv "<element-name>" --to-file="<file>"
+   reqvire mv "<element-name>" "<target-file>"
    ```
 
    The mv command automatically:
@@ -63,7 +63,7 @@ ${1:-The user will provide element name and target location.}
 
 ## Move Options
 
-- `--to-file="<file>"`: Move element to a different file
+- `<target-file>`: Target file path (positional argument after element name)
 - `--index=<n>`: Position within target file (0-based, default: append to end)
 - `--dry-run`: Preview changes without applying
 - `--json`: Output results in JSON format
@@ -79,22 +79,22 @@ The mv operation will fail with a clear error if:
 
 **Move element to different file:**
 ```bash
-reqvire mv "User Authentication" --to-file="specifications/Security.md"
+reqvire mv "User Authentication" "specifications/Security.md"
 ```
 
 **Insert at specific position (index 0 = first element in file):**
 ```bash
-reqvire mv "High Priority Req" --to-file="specifications/Critical.md" --index=0
+reqvire mv "High Priority Req" "specifications/Critical.md" --index=0
 ```
 
 **Preview before moving:**
 ```bash
-reqvire mv "Feature X" --to-file="NewFile.md" --dry-run
+reqvire mv "Feature X" "NewFile.md" --dry-run
 ```
 
 **Get JSON output:**
 ```bash
-reqvire mv "Element" --to-file="File.md" --json
+reqvire mv "Element" "File.md" --json
 ```
 
 ## When to Use mv
@@ -108,7 +108,7 @@ Use mv when:
 
 ## Related Commands
 
-- **Move file**: `reqvire mv-file "<source-file>" "<target-file>"`
-- **Rename element**: `reqvire rename "<current-name>" "<new-name>"`
-- **Remove element**: `reqvire rm "<element-name>"`
-- **Add element**: `reqvire add "<file>" < element.md`
+- **Move file**: `reqvire mv-file <source-file> <target-file>`
+- **Rename element**: `reqvire rename <current-name> <new-name>`
+- **Remove element**: `reqvire rm <element-name>`
+- **Add element**: `reqvire add <file> < element.md`

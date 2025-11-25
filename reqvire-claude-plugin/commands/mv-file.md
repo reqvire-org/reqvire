@@ -145,7 +145,7 @@ Use mv-file with --squash when:
 
 ## Related Commands
 
-- **Move element**: `reqvire mv "<element-name>" --to-file="<file>"`
-- **Rename element**: `reqvire rename "<current-name>" "<new-name>"`
-- **Remove element**: `reqvire rm "<element-name>"`
-- **Add element**: `reqvire add "<file>" < element.md`
+- **Move element**: `reqvire mv <element-name> <target-file>`
+- **Rename element**: `reqvire rename <current-name> <new-name>`
+- **Remove element**: `reqvire rm <element-name>`
+- **Add element**: `reqvire add <file> < element.md`

@@ -130,7 +130,7 @@ This is requirement A3.
 
 sleep 1
 set +e
-OUTPUT=$(cd "$TEST_DIR" && echo "$NEW_ELEMENT" | "$REQVIRE_BIN" add specifications/FileA.md "Section A" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && echo "$NEW_ELEMENT" | "$REQVIRE_BIN" add specifications/FileA.md 2>&1)
 EXIT_CODE=$?
 set -e
 

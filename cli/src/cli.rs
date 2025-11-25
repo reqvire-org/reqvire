@@ -248,7 +248,7 @@ pub enum Commands {
         #[clap(long, help_heading = "ADD OPTIONS")]
         json: bool,
 
-        /// Positional arguments: [file] [section] [index] [element-markdown]
+        /// Positional arguments: [file]
         #[clap(trailing_var_arg = true)]
         args: Vec<String>,
     },
@@ -290,7 +290,7 @@ pub enum Commands {
         #[clap(long, help_heading = "MV OPTIONS")]
         json: bool,
 
-        /// Positional arguments: [file] [section] [index]
+        /// Positional arguments: [file] [index]
         #[clap(trailing_var_arg = true)]
         args: Vec<String>,
     },
@@ -335,10 +335,10 @@ pub enum Commands {
         json: bool,
     },
 
-    /// Attach external document to element
-    #[clap(name = "attach", override_help = "Attach external document to element\n\nATTACH OPTIONS:\n       <ATTACHMENT_PATH>        Path to attachment file (relative to current working directory)\n       <ELEMENT_NAME>           Name of element to attach document to\n      --dry-run                 Preview changes without applying\n\nUSAGE:\n    reqvire attach <attachment-path> <element-name>\n    reqvire attach docs/SLO.pdf \"System Performance Requirements\"")]
+    /// Attach external document or Refinement element to element
+    #[clap(name = "attach", override_help = "Attach external document or Refinement element to element\n\nATTACH OPTIONS:\n       <ATTACHMENT>             File path OR Refinement element name (auto-detected)\n       <ELEMENT_NAME>           Name of element to attach to\n      --dry-run                 Preview changes without applying\n\nAUTO-DETECTION:\n    1. Checks if attachment exists as file (file path priority)\n    2. If no file found, looks up element by name (must be Refinement type)\n    3. Error if neither file nor element found\n\nUSAGE:\n    reqvire attach docs/SLO.pdf \"System Performance Requirements\"\n    reqvire attach \"My Constraint Element\" \"System Performance Requirements\"")]
     Attach {
-        /// Path to attachment file
+        /// File path OR Refinement element name (auto-detected)
         attachment_path: String,
 
         /// Name of element to attach to
@@ -349,13 +349,13 @@ pub enum Commands {
         dry_run: bool,
     },
 
-    /// Detach external document from element
-    #[clap(name = "detach", override_help = "Detach external document from element\n\nDETACH OPTIONS:\n       <ELEMENT_NAME>           Name of element to detach document from\n       <ATTACHMENT_PATH>        Path to attachment file (relative to current working directory)\n      --dry-run                 Preview changes without applying\n\nUSAGE:\n    reqvire detach \"System Performance Requirements\" docs/SLO.pdf")]
+    /// Detach external document or Refinement element from element
+    #[clap(name = "detach", override_help = "Detach external document or Refinement element from element\n\nDETACH OPTIONS:\n       <ELEMENT_NAME>           Name of element to detach from\n       <ATTACHMENT>             File path OR Refinement element name (auto-detected)\n      --dry-run                 Preview changes without applying\n\nAUTO-DETECTION:\n    1. Checks if attachment exists as file (file path priority)\n    2. If no file found, looks up element by name\n    3. Error if neither file nor element found\n\nUSAGE:\n    reqvire detach \"System Performance Requirements\" docs/SLO.pdf\n    reqvire detach \"System Performance Requirements\" \"My Constraint Element\"")]
     Detach {
         /// Name of element to detach from
         element_name: String,
 
-        /// Path to attachment file
+        /// File path OR Refinement element name (auto-detected)
         attachment_path: String,
 
         /// Preview changes without applying
@@ -1033,28 +1033,66 @@ pub fn handle_command(
         },
         Some(Commands::Attach { attachment_path, element_name, dry_run }) => {
             let git_root = git_commands::get_git_root_dir()?;
-            let result = reqvire::crud::attach(
-                &mut model_manager,
-                &element_name,
-                &attachment_path,
-                &git_root,
-                dry_run,
-            )?;
 
-            render_crud_result(&result);
+            // Auto-detect: check if attachment_path is a file or element name
+            // Priority: file path first, then element name lookup
+            let cwd = std::env::current_dir().unwrap_or_default();
+            let file_exists_cwd = cwd.join(&attachment_path).exists();
+            let file_exists_git_root = git_root.join(&attachment_path).exists();
+
+            if file_exists_cwd || file_exists_git_root {
+                // It's a file path - use existing file attachment logic
+                let result = reqvire::crud::attach(
+                    &mut model_manager,
+                    &element_name,
+                    &attachment_path,
+                    &git_root,
+                    dry_run,
+                )?;
+                render_crud_result(&result);
+            } else {
+                // Not a file - try to resolve as element name
+                let result = reqvire::crud::attach_element(
+                    &mut model_manager,
+                    &element_name,
+                    &attachment_path, // This is actually the element name to attach
+                    &git_root,
+                    dry_run,
+                )?;
+                render_crud_result(&result);
+            }
             return Ok(0);
         },
         Some(Commands::Detach { element_name, attachment_path, dry_run }) => {
             let git_root = git_commands::get_git_root_dir()?;
-            let result = reqvire::crud::detach(
-                &mut model_manager,
-                &element_name,
-                &attachment_path,
-                &git_root,
-                dry_run,
-            )?;
 
-            render_crud_result(&result);
+            // Auto-detect: check if attachment_path is a file or element name
+            // Priority: file path first, then element name lookup
+            let cwd = std::env::current_dir().unwrap_or_default();
+            let file_exists_cwd = cwd.join(&attachment_path).exists();
+            let file_exists_git_root = git_root.join(&attachment_path).exists();
+
+            if file_exists_cwd || file_exists_git_root {
+                // It's a file path - use existing file detachment logic
+                let result = reqvire::crud::detach(
+                    &mut model_manager,
+                    &element_name,
+                    &attachment_path,
+                    &git_root,
+                    dry_run,
+                )?;
+                render_crud_result(&result);
+            } else {
+                // Not a file - try to resolve as element name
+                let result = reqvire::crud::detach_element(
+                    &mut model_manager,
+                    &element_name,
+                    &attachment_path, // This is actually the element name to detach
+                    &git_root,
+                    dry_run,
+                )?;
+                render_crud_result(&result);
+            }
             return Ok(0);
         },
         Some(Commands::MvAttachment { old_path, new_path, dry_run }) => {

@@ -108,7 +108,7 @@ This is a new derived requirement.
 '
 
 set +e
-OUTPUT=$(cd "$TEST_DIR" && echo "$NEW_ELEMENT" | "$REQVIRE_BIN" add specifications/Requirements.md "System Requirements" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && echo "$NEW_ELEMENT" | "$REQVIRE_BIN" add specifications/Requirements.md 2>&1)
 EXIT_CODE=$?
 set -e
 

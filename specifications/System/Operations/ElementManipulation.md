@@ -72,7 +72,11 @@ When creating a new element, the system shall:
 - Accept optional index parameter for insertion position within the file (0-based)
 - Validate the target location using path validation rules
 - Create target file if it does not exist (subject to validation constraints)
-- Parse the element definition string to extract element structure
+- Parse the element definition string to extract element structure, preserving all subsections:
+  - Metadata (element type and custom properties)
+  - Relations (derivedFrom, verifiedBy, satisfiedBy, verify)
+  - Details (refinement details and nested content)
+  - Attachments (links to Refinement elements and files)
 - Validate the element structure (proper subsections, valid relations, correct format)
 - Verify the element name is globally unique in the model
 - Generate a unique element identifier based on file path and element name
@@ -101,6 +105,7 @@ When creating a new element, the system shall:
   * derivedFrom: [Element Manipulation File Persistence](#element-manipulation-file-persistence)
   * derivedFrom: [Target Location Validation and Auto-Creation](#target-location-validation-and-auto-creation)
   * derivedFrom: [Structure and Addressing in Markdown Documents](../Core/StructureAndParsing.md#structure-and-addressing-in-markdown-documents)
+  * derivedFrom: [Reserved Subsections Support](../Core/StructureAndParsing.md#reserved-subsections-support)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * satisfiedBy: [crud.rs](../../../core/src/crud.rs)

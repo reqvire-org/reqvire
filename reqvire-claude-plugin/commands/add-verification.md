@@ -157,17 +157,17 @@ After adding verifications, you may need to reorganize:
 
 **Move verification to different file:**
 ```bash
-reqvire mv "<verification-name>" --to-file="specifications/Verifications/<file>.md"
+reqvire mv "<verification-name>" "specifications/Verifications/<file>.md"
 ```
 
 **Move verification with specific position:**
 ```bash
-reqvire mv "<verification-name>" --to-file="<target-file>" --index=0
+reqvire mv "<verification-name>" "<target-file>" --index=0
 ```
 
 **Remove verification:**
 ```bash
-reqvire rm "specifications/Verifications/<file>.md#<verification-name>"
+reqvire rm "<verification-name>"
 ```
 
 ## Decision Logic

@@ -84,13 +84,21 @@ Test cases for Refinement element rm operations:
 Verify attach command creates Attachments subsection and adds links.
 
 #### Details
-Test cases:
+Test cases for file attachments:
 - Create Attachments subsection if missing
-- Add link with format `[path](path)`
+- Add link with format `[filename](path)`
 - Idempotent: duplicate attach doesn't create duplicate entry
 - Many-to-many: same file attaches to multiple elements
 - Dry-run mode makes no changes
 - Validation passes after attach
+
+Test cases for element attachments:
+- Attach Refinement element by display name
+- Auto-detect: file path takes priority over element name when file exists
+- Element identifier format: `[Name](#id)` for same-file, `[Name](file.md#id)` for cross-file
+- Only Refinement types allowed (constraint, behavior, specification)
+- Error when attaching non-Refinement element (requirement, verification, etc.)
+- Error when neither file nor element found
 
 #### Metadata
   * type: test-verification
@@ -107,12 +115,17 @@ Verify detach command removes links and cleans up empty subsections.
 #### Details
 CRITICAL: Must verify detach triggers change impact.
 
-Test cases:
+Test cases for file attachments:
 - Remove link from Attachments subsection
 - Remove subsection when no attachments remain
 - Detach from one element doesn't affect others
 - Dry-run mode makes no changes
 - Change impact analysis shows element as changed
+
+Test cases for element attachments:
+- Detach Refinement element by display name
+- Auto-detect: match element name against existing attachments
+- Works for both same-file and cross-file element attachments
 
 #### Metadata
   * type: test-verification

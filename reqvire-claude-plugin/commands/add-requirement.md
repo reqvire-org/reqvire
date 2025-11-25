@@ -115,12 +115,12 @@ After adding requirements, you may need to reorganize:
 
 **Move element to different file:**
 ```bash
-reqvire mv "<element-name>" --to-file="<target-file>"
+reqvire mv "<element-name>" "<target-file>"
 ```
 
 **Move element with specific position:**
 ```bash
-reqvire mv "<element-name>" --to-file="<target-file>" --index=0
+reqvire mv "<element-name>" "<target-file>" --index=0
 ```
 
 **Remove element:**

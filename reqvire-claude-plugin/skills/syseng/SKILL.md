@@ -196,7 +196,7 @@ Reqvire provides powerful query and analysis commands that:
 | Understand changes | `reqvire change-impact --git-commit=<hash>` |
 | Add element | `cat element.md \| reqvire add <file>` |
 | Remove element | `reqvire rm "<element-name>"` |
-| Move element | `reqvire mv "<element-name>" --to-file=<file>` |
+| Move element | `reqvire mv "<element-name>" "<target-file>"` |
 | Move entire file | `reqvire mv-file "<source-file>" "<target-file>"` |
 | Rename element | `reqvire rename "<current-name>" "<new-name>"` |
 
@@ -210,7 +210,7 @@ reqvire search [--json] [--short] [--filter-*]
 # Element manipulation
 reqvire add <file> [--index=<index>]
 reqvire rm "<element-name>"
-reqvire mv "<element-name>" --to-file=<file> [--index=<index>]
+reqvire mv "<element-name>" "<target-file>" [--index=<index>]
 reqvire mv-file "<source-file>" "<target-file>"
 reqvire rename "<current-name>" "<new-name>"
 

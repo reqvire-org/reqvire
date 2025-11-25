@@ -81,6 +81,84 @@ echo "✓ Element added successfully"
 echo ""
 
 # ==================================
+# Test 1b: Add Element with Attachments
+# ==================================
+echo "Test 1b: Add element with attachments..."
+
+# First add a refinement element (constraint) that will be attached
+CONSTRAINT_ELEMENT='### Feature D Constraint
+
+Rate limiting constraint for Feature D.
+
+#### Metadata
+  * type: constraint
+'
+
+set +e
+ADD_CONSTRAINT_OUTPUT=$(cd "$TEST_DIR" && echo "$CONSTRAINT_ELEMENT" | "$REQVIRE_BIN" add specifications/Requirements.md 2>&1)
+ADD_CONSTRAINT_EXIT=$?
+set -e
+
+if [ $ADD_CONSTRAINT_EXIT -ne 0 ]; then
+  echo "❌ FAILED: Add constraint element failed with exit code $ADD_CONSTRAINT_EXIT"
+  echo "$ADD_CONSTRAINT_OUTPUT"
+  exit 1
+fi
+
+# Now add a requirement with attachment to the constraint
+ELEMENT_WITH_ATTACHMENT='### Feature E
+
+This feature has an attachment to a refinement element.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Feature A](#feature-a)
+
+#### Attachments
+  * [Feature D Constraint](#feature-d-constraint)
+'
+
+set +e
+ADD_ATTACH_OUTPUT=$(cd "$TEST_DIR" && echo "$ELEMENT_WITH_ATTACHMENT" | "$REQVIRE_BIN" add specifications/Requirements.md 2>&1)
+ADD_ATTACH_EXIT=$?
+set -e
+
+if [ $ADD_ATTACH_EXIT -ne 0 ]; then
+  echo "❌ FAILED: Add element with attachment failed with exit code $ADD_ATTACH_EXIT"
+  echo "$ADD_ATTACH_OUTPUT"
+  exit 1
+fi
+
+# Verify attachment section exists in file
+if ! grep -q "#### Attachments" "$TEST_DIR/specifications/Requirements.md"; then
+  echo "❌ FAILED: Attachments section not found in file"
+  exit 1
+fi
+
+# Verify attachment link exists
+if ! grep -q "Feature D Constraint" "$TEST_DIR/specifications/Requirements.md"; then
+  echo "❌ FAILED: Attachment link not found in file"
+  exit 1
+fi
+
+# Verify model still validates
+set +e
+VALIDATION_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" validate 2>&1)
+VALIDATION_EXIT=$?
+set -e
+
+if [ $VALIDATION_EXIT -ne 0 ]; then
+  echo "❌ FAILED: Model validation failed after add with attachment"
+  echo "$VALIDATION_OUTPUT"
+  exit 1
+fi
+
+echo "✓ Element with attachment added successfully"
+echo ""
+
+# ==================================
 # Test 2: Delete Element
 # ==================================
 echo "Test 2: Delete element operation..."

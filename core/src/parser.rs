@@ -202,6 +202,70 @@ pub fn parse_single_element(
                     ));
                 }
             }
+
+        // Parse attachments
+        } else if current_subsection == SubSection::Attachments {
+            if let Some(element) = &mut current_element {
+                if trimmed.starts_with("* ") || trimmed.starts_with("- ") {
+                    match utils::parse_attachment_line(trimmed) {
+                        Ok(href) => {
+                            // Determine if this is an element identifier or file path
+                            let target = if href.contains('#') {
+                                // Element identifier - use same normalization as relations
+                                let git_root = crate::git_commands::get_git_root_dir()?;
+                                let normalized = if href.starts_with('#') {
+                                    // Same-file reference: just prepend file_path
+                                    format!("{}{}", file_path, href)
+                                } else {
+                                    // Cross-file reference: normalize relative to file's directory
+                                    let file_parent = Path::new(file_path)
+                                        .parent()
+                                        .ok_or_else(|| ReqvireError::PathError(
+                                            format!("Cannot determine parent directory of '{}'", file_path)
+                                        ))?;
+                                    let base_path = git_root.join(file_parent);
+                                    utils::normalize_identifier(&href, &base_path)?
+                                };
+                                AttachmentTarget::ElementIdentifier(normalized)
+                            } else {
+                                // File path - resolve to git-root-relative
+                                let git_root = crate::git_commands::get_git_root_dir()?;
+                                let git_root_path = git_root.join(&href);
+                                let attachment_path = if git_root_path.exists() {
+                                    PathBuf::from(&href)
+                                } else {
+                                    // Try file-relative path
+                                    let file_parent = Path::new(file_path)
+                                        .parent()
+                                        .unwrap_or_else(|| Path::new("."));
+                                    let resolved = file_parent.join(&href);
+                                    // Normalize path
+                                    let mut normalized = PathBuf::new();
+                                    for component in resolved.components() {
+                                        match component {
+                                            std::path::Component::ParentDir => { normalized.pop(); }
+                                            std::path::Component::CurDir => { /* skip */ }
+                                            _ => { normalized.push(component); }
+                                        }
+                                    }
+                                    normalized
+                                };
+                                AttachmentTarget::FilePath(attachment_path)
+                            };
+                            element.attachments.push(Attachment { target, content_hash: None });
+                        }
+                        Err(e) => {
+                            return Err(ReqvireError::InvalidAttachmentFormat(
+                                format!("Invalid attachment format '{}': {}", trimmed, e)
+                            ));
+                        }
+                    }
+                } else if !trimmed.is_empty() {
+                    return Err(ReqvireError::InvalidAttachmentFormat(
+                        format!("Invalid attachment format: '{}'", trimmed)
+                    ));
+                }
+            }
         }
     }
 
