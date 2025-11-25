@@ -27,7 +27,9 @@ The system shall support following reserved subsections:
  * **Relations**: Define relationships between elements
  * **Details**: Extend requirement text with additional information
  * **Metadata**: Define element type and classification
- * **Attachments**: Link external documents
+ * **Attachments**: Link external documents and Refinement elements
+   - Can contain file paths (markdown links where text equals href)
+   - Can contain element identifiers (markdown links to Refinement elements ONLY)
 
 Each reserved subsection has specific parsing rules, validation requirements, and behaviors.
 
@@ -37,6 +39,32 @@ Each reserved subsection has specific parsing rules, validation requirements, an
 #### Relations
   * derivedFrom: [Structure and Addressing in Markdown Documents](#structure-and-addressing-in-markdown-documents)
   * satisfiedBy: [element.rs](../../../core/src/element.rs)
+  * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
+---
+
+### Attachment Target Validation
+
+The system shall validate attachment targets and reject invalid attachment references during model validation.
+
+#### Details
+Attachment targets support two types of references:
+
+**File Paths:**
+- Normalized to git-root-relative paths
+- Validated for file existence during model validation
+- Standard markdown link format where link text equals href
+
+**Element Identifiers:**
+- Must point to Refinement element types only (constraint, behavior, specification)
+- Normalized like relation targets (resolved to full identifier path)
+- Validation shall reject identifiers pointing to non-Refinement elements
+- Provides clear error message indicating the expected element type
+
+This validation ensures that attachments either reference existing files or valid Refinement elements that provide supplementary documentation.
+
+#### Relations
+  * derivedFrom: [Reserved Subsections Support](#reserved-subsections-support)
+  * satisfiedBy: [model.rs](../../../core/src/model.rs)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
 ---
 
