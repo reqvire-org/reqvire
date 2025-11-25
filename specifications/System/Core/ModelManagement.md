@@ -188,3 +188,20 @@ Element types are identified through a reserved "type" metadata property. The fo
   * satisfiedBy: [element.rs](../../../core/src/element.rs)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
 ---
+
+### Refinement Element Structure Constraints
+
+The system shall reject Refinement elements (constraint, behavior, specification) that include a Relations subsection during validation.
+
+#### Details
+Refinement elements serve as detailed documentation that can be attached to other elements. They are not allowed to have relations because:
+- They represent atomic pieces of information without traceability relationships
+- They are referenced through the Attachments subsection of other elements
+- Their content contributes to the parent element's documentation
+
+When a Refinement element contains a Relations subsection, the validator shall report an error indicating that relations are not allowed for this element type.
+
+#### Relations
+  * derivedFrom: [Supported Element Types](#supported-element-types)
+  * satisfiedBy: [model.rs](../../../core/src/model.rs)
+---
