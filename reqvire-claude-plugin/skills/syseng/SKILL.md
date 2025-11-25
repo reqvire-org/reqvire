@@ -108,6 +108,10 @@ You orchestrate Reqvire commands and provide expert guidance on systems engineer
 
 ### Document Structure
 
+**File Header**:
+- All specification files must begin with `# Elements` as the first level-1 heading
+- Files without this header are silently ignored during model parsing
+
 **Elements** (`###` headers):
 - Must have unique names within each file
 - Element names become URL fragments (lowercase, hyphens)
@@ -115,8 +119,9 @@ You orchestrate Reqvire commands and provide expert guidance on systems engineer
 
 **Subsections** (`####`):
 - **Metadata**: Element type and custom properties
-- **Relations**: Relationships between elements
+- **Relations**: Relationships between elements (NOT allowed for Refinement types)
 - **Details**: Refinement details (don't add capabilities, just clarify)
+- **Attachments**: References to files or Refinement elements
 
 **Relations** (two-space indentation):
 ```markdown
@@ -147,12 +152,22 @@ Use for requirement statements:
 
 ### Element Types
 
+**Requirement Types:**
 - **requirement** - System requirement
 - **user-requirement** - User requirement
+
+**Verification Types:**
 - **verification** (or test-verification) - Verification through testing
 - **analysis-verification** - Verification through analysis
 - **inspection-verification** - Verification through inspection
 - **demonstration-verification** - Verification through demonstration
+
+**Refinement Types:**
+- **constraint** - Design or implementation constraint
+- **behavior** - Behavioral specification or state machine
+- **specification** - Detailed specification document
+
+**Note:** Refinement elements cannot have Relations subsections. They are attached to requirements via the Attachments subsection.
 
 ### Model Exploration Strategy
 
