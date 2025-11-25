@@ -1,4 +1,4 @@
-# Requirements
+# Elements
 
 This is a requirements document specifically created for testing diagram generation.
 

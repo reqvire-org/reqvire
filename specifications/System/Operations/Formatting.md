@@ -1,4 +1,4 @@
-# Requirements
+# Elements
 
 ### Model Formatting
 
@@ -96,18 +96,18 @@ When generating formatted output, the system shall ensure all documents follow a
 
 #### Details
 When generating formatted output, the system shall:
-- Always output `# Requirements` as the page header (all specification files must have this header)
-- Add a default section header `## Requirements` when elements exist without an explicit section header
+- Always output `# Elements` as the page header (all specification files must have this header)
+- Add a default section header `## Elements` when elements exist without an explicit section header
 - Preserve existing section headers when present (starting with `## `)
 - Correctly distinguish between level 1 headers (`# `) and level 2 or deeper headers (`##`, `###`)
 
 **Default Header Names:**
-- Page header: Always `# Requirements` (required for all specification files)
-- Section header: "Requirements" (the default section name used by parser)
+- Page header: Always `# Elements` (required for all specification files)
+- Section header: "Elements" (the default section name used by parser)
 
 **Normalization Rules:**
-1. If document has `# Requirements` then `###` (no `##`): Add section header only
-2. If document has `# Requirements` and `##`: No header additions needed
+1. If document has `# Elements` then `###` (no `##`): Add section header only
+2. If document has `# Elements` and `##`: No header additions needed
 
 #### Relations
   * derivedFrom: [Format Consistency Enforcement](#format-consistency-enforcement)

@@ -37,7 +37,7 @@ mkdir -p "${TEST_DIR}/specifications/nested/deeper"
 # Create elements WITHOUT type metadata in various locations
 # 1. Root of specifications folder
 cat > "${TEST_DIR}/specifications/RootRequirements.md" << 'EOF'
-# Requirements
+# Elements
 
 ### Root User Requirement
 
@@ -63,7 +63,7 @@ EOF
 
 # 2. Subdirectory specifications/root/
 cat > "${TEST_DIR}/specifications/root/SubfolderRequirements.md" << 'EOF'
-# Requirements
+# Elements
 
 ### Subfolder Requirement Without Type
 
@@ -85,7 +85,7 @@ EOF
 
 # 3. Deeper nested directory specifications/nested/deeper/
 cat > "${TEST_DIR}/specifications/nested/deeper/NestedRequirements.md" << 'EOF'
-# Requirements
+# Elements
 
 ### Nested Requirement Without Type
 
@@ -189,7 +189,7 @@ mkdir -p "${TEST_DIR}/specifications"
 
 # Create elements with all supported explicit types
 cat > "${TEST_DIR}/specifications/AllTypes.md" << 'EOF'
-# Requirements
+# Elements
 
 ### Root User Requirement
 

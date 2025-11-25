@@ -1,4 +1,4 @@
-# Requirements
+# Elements
 
 ### CLI Add Element Test
 
@@ -88,7 +88,7 @@ The test shall verify that target file path validation and auto-creation work co
 
 **Test Steps - Auto-Creation:**
 1. Create element in non-existent file with valid path
-2. Verify file is created with proper structure (`# Requirements` header)
+2. Verify file is created with proper structure (`# Elements` header)
 3. Verify existing file content is preserved when adding elements
 
 **Success Criteria:**

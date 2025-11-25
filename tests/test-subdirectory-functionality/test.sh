@@ -184,7 +184,7 @@ echo "Running: reqvire mv (move element to different file within subdirectory)" 
 
 # Create a new target file in the submodule (just a header, no elements needed - pages are tracked)
 cat > "${TMP_DIR}/project-root/submodule/specifications/OtherRequirements.md" <<'EOF'
-# Requirements
+# Elements
 
 This file will receive the moved element.
 EOF

@@ -105,7 +105,7 @@ echo "Test 3: mv Refinement to different file..."
 
 # Create a new file for refinements
 cat > "$TEST_DIR/specifications/Refinements.md" << 'EOF'
-# Requirements
+# Elements
 EOF
 
 # Move Data Format Spec to Refinements.md

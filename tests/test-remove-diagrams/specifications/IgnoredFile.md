@@ -1,4 +1,4 @@
-# Requirements
+# Elements
 
 This file should be ignored by Reqvire based on the configuration.
 

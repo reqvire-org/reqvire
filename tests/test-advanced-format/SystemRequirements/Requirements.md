@@ -1,4 +1,4 @@
-# Requirements
+# Elements
 
 ### Requirements Processing
 The system shall parse the files in all folders and subfolders from the root of git repository.

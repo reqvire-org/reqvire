@@ -1,7 +1,7 @@
 Moved element: Feature C (specifications/OtherRequirements.md#feature-c)
 
 📄 specifications/OtherRequirements.md
-  [37m01     # Requirements[0m
+  [37m01     # Elements[0m
   [32m02 +   ### Feature C[0m
   [37m03[0m
   [32m04 +   This is a test requirement for feature C with relations.[0m
@@ -16,7 +16,7 @@ Moved element: Feature C (specifications/OtherRequirements.md#feature-c)
 
 
 📄 specifications/Requirements.md
-  [37m01     # Requirements[0m
+  [37m01     # Elements[0m
   [37m02[0m
   [37m03     ### Parent Feature[0m
 
@@ -40,7 +40,7 @@ Moved element: Feature C (specifications/OtherRequirements.md#feature-c)
 
 
 📄 specifications/Verifications/Tests.md
-  [37m01     # Requirements[0m
+  [37m01     # Elements[0m
   [37m02[0m
   [37m03     ### Test for Feature C[0m
 

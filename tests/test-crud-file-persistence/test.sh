@@ -33,7 +33,7 @@ OVERALL_RESULT=0
 mkdir -p "${TEST_DIR}/specifications"
 
 cat > "${TEST_DIR}/specifications/FileA.md" << 'EOF'
-# Requirements
+# Elements
 
 
 ### Root Requirement
@@ -65,7 +65,7 @@ This is requirement A2.
 EOF
 
 cat > "${TEST_DIR}/specifications/FileB.md" << 'EOF'
-# Requirements
+# Elements
 
 
 ### Requirement B1
@@ -91,7 +91,7 @@ This is requirement B2.
 EOF
 
 cat > "${TEST_DIR}/specifications/FileC.md" << 'EOF'
-# Requirements
+# Elements
 
 
 ### Requirement C1

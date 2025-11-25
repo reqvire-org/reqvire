@@ -1,4 +1,4 @@
-# Requirements
+# Elements
 
 ### Element Manipulation File Persistence
 
@@ -44,7 +44,7 @@ When validating and preparing target locations, the system shall:
 
 **Auto-Creation:**
 - If the target file does not exist and the path is valid, create the file with proper structure:
-  - Add `# Requirements` as the page header (required for specification files)
+  - Add `# Elements` as the page header (required for specification files)
 - Ensure created files follow Reqvire markdown structure conventions
 
 **Error Handling:**

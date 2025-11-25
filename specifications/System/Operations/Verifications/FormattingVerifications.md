@@ -1,4 +1,4 @@
-# Requirements
+# Elements
 
 ### Format Command Requirements Verification
 
@@ -31,8 +31,8 @@ This test verifies the format command requirements from SystemRequirements and U
 - System shall clean up file references to show filename only for implementation files
 
 **Document Structure Normalization:**
-- System shall always output `# Requirements` as the page header
-- System shall add `## Requirements` section header when elements exist without section header
+- System shall always output `# Elements` as the page header
+- System shall add `## Elements` section header when elements exist without section header
 - System shall preserve existing section headers (starting with `## `)
 - System shall correctly distinguish level 1 headers from level 2+ headers
 

@@ -32,7 +32,7 @@ OVERALL_RESULT=0
 mkdir -p "${TEST_DIR}/specifications/Verifications"
 
 cat > "${TEST_DIR}/specifications/Requirements.md" << 'EOF'
-# Requirements
+# Elements
 
 
 ### Root Requirement
@@ -66,7 +66,7 @@ This requirement is also derived from root.
 EOF
 
 cat > "${TEST_DIR}/specifications/Verifications/Tests.md" << 'EOF'
-# Requirements
+# Elements
 
 
 ### Test 1
@@ -199,7 +199,7 @@ echo "Test 3: Move element with incoming relations..." >> "${TEST_DIR}/test_resu
 
 # Create target file
 cat > "${TEST_DIR}/specifications/OtherRequirements.md" << 'EOF'
-# Requirements
+# Elements
 
 EOF
 
@@ -273,7 +273,7 @@ echo "Test 4: Move verification element and check verifiedBy relation updates...
 
 # Create target file for verification
 cat > "${TEST_DIR}/specifications/SystemTests.md" << 'EOF'
-# Requirements
+# Elements
 
 EOF
 

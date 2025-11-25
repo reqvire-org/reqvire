@@ -1259,8 +1259,8 @@ impl GraphRegistry {
     pub fn generate_file_markdown(&self, file_path: &str, elements: &[&Element]) -> String {
         let mut markdown = String::new();
 
-        // All specification files must have "# Requirements" as the page header
-        markdown.push_str("# Requirements\n\n");
+        // All specification files must have "# Elements" as the page header
+        markdown.push_str("# Elements\n\n");
 
         // Add page content if available
         if let Some(page) = self.pages.get(file_path) {
@@ -2745,9 +2745,9 @@ mod tests {
         assert!(!file2_content.contains("Virtual placeholder"));
         assert!(!file3_content.contains("Virtual placeholder"));
 
-        // Verify proper markdown structure - all files start with "# Requirements"
-        assert!(file1_content.starts_with("# Requirements\n"));
-        assert!(file3_content.starts_with("# Requirements\n"));
+        // Verify proper markdown structure - all files start with "# Elements"
+        assert!(file1_content.starts_with("# Elements\n"));
+        assert!(file3_content.starts_with("# Elements\n"));
     }
 
     #[test]
@@ -2783,8 +2783,8 @@ mod tests {
         println!("=== Generated file content ===");
         println!("{}", file_content);
 
-        // Verify file header is present - all files start with "# Requirements"
-        assert!(file_content.starts_with("# Requirements\n\n"));
+        // Verify file header is present - all files start with "# Elements"
+        assert!(file_content.starts_with("# Elements\n\n"));
 
         // Verify page content is included after header and before elements
         assert!(file_content.contains("This is page frontmatter content."));
@@ -2794,7 +2794,7 @@ mod tests {
         assert!(file_content.contains("### Element A Description"));
 
         // Verify order: header, page content, element
-        let header_pos = file_content.find("# Requirements").unwrap();
+        let header_pos = file_content.find("# Elements").unwrap();
         let page_content_pos = file_content.find("This is page frontmatter content.").unwrap();
         let element_pos = file_content.find("### Element A Description").unwrap();
 
@@ -2885,7 +2885,7 @@ mod tests {
     }
 
     #[test]
-    fn test_flush_always_outputs_requirements_header() {
+    fn test_flush_always_outputs_elements_header() {
         use std::fs;
         use tempfile::TempDir;
 
@@ -2917,8 +2917,8 @@ mod tests {
         println!("=== Generated file content ===");
         println!("{}", file_content);
 
-        // All specification files should start with "# Requirements"
-        assert!(file_content.starts_with("# Requirements\n\n"));
+        // All specification files should start with "# Elements"
+        assert!(file_content.starts_with("# Elements\n\n"));
 
         // Page content should be included after the header
         assert!(file_content.contains("This is the MOEs page content."));

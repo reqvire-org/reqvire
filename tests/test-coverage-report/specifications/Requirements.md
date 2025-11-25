@@ -1,4 +1,4 @@
-# Requirements
+# Elements
 
 This document contains test requirements and verifications to validate the coverage report functionality.
 

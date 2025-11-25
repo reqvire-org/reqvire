@@ -1,4 +1,4 @@
-# Requirements
+# Elements
 
 This file contains elements that will be moved to an existing target file using --squash.
 

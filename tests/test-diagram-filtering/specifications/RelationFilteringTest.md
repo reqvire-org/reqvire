@@ -1,4 +1,4 @@
-# Requirements
+# Elements
 
 This document contains test data specifically designed to verify diagram relation filtering behavior.
 

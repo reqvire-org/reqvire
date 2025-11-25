@@ -1,7 +1,7 @@
 Found 4 file(s) with formatting changes:
 
 📄 MOEs.md
-  01     # Requirements
+  01     # Elements
   02
   03     ### MOE_UA
   04 +   ␤
@@ -23,7 +23,7 @@ Found 4 file(s) with formatting changes:
 
 
 📄 SystemRequirements/Requirements.md
-  01     # Requirements
+  01     # Elements
   02
   03     ### Requirements Processing
   04 +   ␤
@@ -73,7 +73,7 @@ Found 4 file(s) with formatting changes:
 
 
 📄 UserStories.md
-  01     # Requirements
+  01     # Elements
   02
   03     Personas:
 
@@ -175,7 +175,7 @@ Found 4 file(s) with formatting changes:
 
 
 📄 Verifications/Tests.md
-  01     # Requirements
+  01     # Elements
   02
   03     This document contains various test cases.
   04

@@ -752,14 +752,14 @@ pub fn process_diagrams(
 }
 
 /// Replaces the auto-generated diagram in a markdown file.
-/// Inserts after the `# Requirements` header.
+/// Inserts after the `# Elements` header.
 ///
 /// - `content`: The original file content.
 /// - `new_diagram`: The newly generated Mermaid diagram.
 ///
 /// Returns the modified file content as a `String`.
 fn replace_file_diagram(content: &str, new_diagram: &str) -> String {
-    let requirements_header = "# Requirements";
+    let requirements_header = "# Elements";
     let mermaid_block_start = "```mermaid";
     let mermaid_block_end = "```";
 

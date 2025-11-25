@@ -43,7 +43,7 @@ macro_rules! info_println {
 
 /// Checks if a file should be ignored based on gitignore and reqvireignore patterns.
 /// Returns true if the file should be IGNORED (not processed).
-/// Note: This only checks ignore patterns. The `# Requirements` header check
+/// Note: This only checks ignore patterns. The `# Elements` header check
 /// happens later when reading file content (in parser.rs).
 pub fn is_to_be_ignored(path: &Path, excluded_filename_patterns: &GlobSet) -> bool {
     is_excluded_by_patterns(path, excluded_filename_patterns)

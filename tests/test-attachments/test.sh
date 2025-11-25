@@ -436,7 +436,7 @@ sed -i '/### Test Missing Attachment/,/^---$/d' "$TEST_DIR/specifications/Requir
 
 # Create a fresh requirement for dry-run test
 cat > "$TEST_DIR/specifications/DryRunTest.md" << 'EOF'
-# Requirements
+# Elements
 
 ### Dry Run Element
 

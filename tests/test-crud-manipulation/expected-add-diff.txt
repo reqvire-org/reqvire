@@ -1,7 +1,7 @@
 Added element: Feature D (specifications/Requirements.md#feature-d)
 
 📄 specifications/Requirements.md
-  [37m01     # Requirements[0m
+  [37m01     # Elements[0m
   [37m02[0m
   [37m03     ### Parent Feature[0m
 

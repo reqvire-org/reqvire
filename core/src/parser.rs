@@ -221,7 +221,7 @@ pub fn parse_single_element(
     }
 }
 
-/// Checks if the file is a specification file by looking for "# Requirements" as first H1 heading.
+/// Checks if the file is a specification file by looking for "# Elements" as first H1 heading.
 /// Returns true if file should be parsed, false if it should be skipped.
 fn is_specification_file(content: &str) -> bool {
     for line in content.lines() {
@@ -232,8 +232,8 @@ fn is_specification_file(content: &str) -> bool {
         }
         // Check if this is an H1 heading
         if trimmed.starts_with("# ") {
-            // First H1 heading found - check if it's "# Requirements"
-            return trimmed == "# Requirements";
+            // First H1 heading found - check if it's "# Elements"
+            return trimmed == "# Elements";
         }
         // If we hit any other H1 or content that's not a heading, keep looking
         // (allow frontmatter, comments, etc. before the heading)
@@ -248,7 +248,7 @@ fn is_specification_file(content: &str) -> bool {
 
 /// Parses a markdown document and extracts elements with metadata and relations.
 /// Returns: (elements, errors, page_content)
-/// Only parses files where the first H1 heading is "# Requirements".
+/// Only parses files where the first H1 heading is "# Elements".
 /// If git_commit is Some, file attachment hashes are computed from the git commit, not working directory.
 pub fn parse_elements(
     file: &str,
@@ -256,9 +256,9 @@ pub fn parse_elements(
     file_path: &PathBuf,
     git_commit: Option<&str>,
 ) -> (Vec<Element>, Vec<ReqvireError>, String) {
-    // Check if this is a specification file (first H1 must be "# Requirements")
+    // Check if this is a specification file (first H1 must be "# Elements")
     if !is_specification_file(content) {
-        debug!("Skipping file {} - not a specification file (no '# Requirements' heading)", file);
+        debug!("Skipping file {} - not a specification file (no '# Elements' heading)", file);
         return (Vec::new(), Vec::new(), String::new());
     }
 
@@ -694,7 +694,7 @@ pub fn parse_elements(
             }
 
         } else if matches!(current_subsection, SubSection::Other(_)) {
-            // Accumulate page content: everything outside of elements, but skip the # Requirements title
+            // Accumulate page content: everything outside of elements, but skip the # Elements title
             if !trimmed.starts_with("# ") {
                 page_content.push_str(line);
                 page_content.push('\n');

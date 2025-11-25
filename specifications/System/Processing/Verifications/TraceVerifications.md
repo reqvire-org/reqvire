@@ -1,4 +1,4 @@
-# Requirements
+# Elements
 
 ### Trace Relations No Cycles Verification
 

@@ -1,4 +1,4 @@
-# Requirements
+# Elements
 
 ### Element Subsection Parsing Test
 
@@ -83,31 +83,31 @@ This test verifies that the system correctly extracts and parses element subsect
 
 ### Specification File Identification Test
 
-This test verifies that the system only parses markdown files where the first H1 heading is exactly `# Requirements`, and silently ignores all other markdown files.
+This test verifies that the system only parses markdown files where the first H1 heading is exactly `# Elements`, and silently ignores all other markdown files.
 
 #### Details
 
 ##### Acceptance Criteria
 **File Identification:**
-- System shall parse markdown files where first H1 heading is `# Requirements`
-- System shall ignore markdown files where first H1 heading is not `# Requirements`
+- System shall parse markdown files where first H1 heading is `# Elements`
+- System shall ignore markdown files where first H1 heading is not `# Elements`
 - System shall ignore markdown files with no H1 heading
-- Files without `# Requirements` heading shall be silently skipped (no error)
+- Files without `# Elements` heading shall be silently skipped (no error)
 
 **Leading Content Handling:**
-- System shall allow blank lines before `# Requirements` heading
-- System shall allow frontmatter (YAML between `---` markers) before `# Requirements` heading
-- System shall allow HTML comments before `# Requirements` heading
+- System shall allow blank lines before `# Elements` heading
+- System shall allow frontmatter (YAML between `---` markers) before `# Elements` heading
+- System shall allow HTML comments before `# Elements` heading
 - System shall check the first H1 heading encountered, ignoring non-heading content
 
 **Backward Compatibility:**
 - Files with different H1 headings (e.g., `# User Stories`, `# System Design`) shall be ignored
 - This behavior applies in addition to `.gitignore` and `.reqvireignore` exclusions
-- Page title/header is not stored in the model (always output as `# Requirements`)
+- Page title/header is not stored in the model (always output as `# Elements`)
 
 ##### Test Criteria
 1. **Valid specification file parsing:**
-   - Create file with `# Requirements` as first H1
+   - Create file with `# Elements` as first H1
    - Run reqvire search
    - Verify elements from file are in model
 
@@ -123,12 +123,12 @@ This test verifies that the system only parses markdown files where the first H1
    - Verify file is ignored
 
 4. **Leading blank lines:**
-   - Create file with blank lines before `# Requirements`
+   - Create file with blank lines before `# Elements`
    - Run reqvire search
    - Verify file is parsed correctly
 
 5. **Combined with ignore patterns:**
-   - Create valid `# Requirements` file matching .gitignore pattern
+   - Create valid `# Elements` file matching .gitignore pattern
    - Verify file is still excluded by ignore pattern
    - Both checks must pass for file to be parsed
 

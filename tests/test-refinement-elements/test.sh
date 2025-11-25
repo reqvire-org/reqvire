@@ -179,7 +179,7 @@ echo "Test 7: Validation rejects Refinement with Relations..."
 
 # Restore invalid file
 cat > "$TEST_DIR/specifications/InvalidRefinement.md" <<'EOF'
-# Requirements
+# Elements
 
 ### Invalid Constraint With Relations
 
