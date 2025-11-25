@@ -16,7 +16,7 @@ This test verifies that the system correctly extracts and parses element subsect
 
 **Metadata Parsing:**
 - System shall extract element type from `* type:` metadata entry
-- System shall support all element types: requirement, user-requirement, verification, test-verification, analysis-verification, inspection-verification, demonstration-verification, other
+- System shall support all element types: requirement, user-requirement, verification, test-verification, analysis-verification, inspection-verification, demonstration-verification, constraint, behavior, specification, other
 - System shall assign default type 'requirement' when no type metadata present
 
 **Relations Parsing:**
@@ -216,4 +216,98 @@ This test verifies that the system correctly normalizes element name fragments a
 #### Relations
   * verify: [Element Identity Model](../StructureAndParsing.md#element-identity-model)
   * satisfiedBy: [test.sh](../../../../tests/test-parsing-functionality/test.sh)
+---
+
+### Refinement Element Type Parsing Test
+
+This test verifies that the system correctly parses Refinement element types (constraint, behavior, specification) from metadata and handles their structural constraints.
+
+#### Details
+
+##### Acceptance Criteria
+**Type Parsing:**
+- System shall parse `type: constraint` as Refinement type Constraint
+- System shall parse `type: behavior` as Refinement type Behavior
+- System shall parse `type: specification` as Refinement type Specification
+- Refinement types shall be stored distinctly from other element types
+- Refinement types shall display as `"constraint"`, `"behavior"`, `"specification"` in output
+
+**Search and Filtering:**
+- System shall support filtering by `--filter-type="constraint"`
+- System shall support filtering by `--filter-type="behavior"`
+- System shall support filtering by `--filter-type="specification"`
+
+##### Test Criteria
+1. **Constraint type parsing:**
+   - Create element with `type: constraint` metadata
+   - Query model via JSON output
+   - Verify `element_type` field is `"constraint"`
+
+2. **Behavior type parsing:**
+   - Create element with `type: behavior` metadata
+   - Query model via JSON output
+   - Verify `element_type` field is `"behavior"`
+
+3. **Specification type parsing:**
+   - Create element with `type: specification` metadata
+   - Query model via JSON output
+   - Verify `element_type` field is `"specification"`
+
+4. **Search filtering:**
+   - Create elements of all three Refinement types
+   - Test `--filter-type="constraint"` returns only constraint elements
+   - Test `--filter-type="behavior"` returns only behavior elements
+   - Test `--filter-type="specification"` returns only specification elements
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [Supported Element Types](../ModelManagement.md#supported-element-types)
+---
+
+### Refinement Relations Rejection Test
+
+This test verifies that the system rejects Refinement elements that include a Relations subsection during validation.
+
+#### Details
+
+##### Acceptance Criteria
+**Validation Rejection:**
+- System shall report validation error when Refinement element has Relations subsection
+- Error message shall indicate that Refinement elements cannot have relations
+- Error shall include element name and file location
+- Validation shall fail (non-zero exit code) when this error is detected
+
+**Valid Refinement Elements:**
+- Refinement elements without Relations subsection shall pass validation
+- Refinement elements with Metadata and Details subsections shall pass validation
+- Refinement elements with Attachments subsection shall pass validation
+
+##### Test Criteria
+1. **Relations rejection for constraint:**
+   - Create constraint element with Relations subsection
+   - Run reqvire validate
+   - Verify validation fails with appropriate error message
+
+2. **Relations rejection for behavior:**
+   - Create behavior element with Relations subsection
+   - Run reqvire validate
+   - Verify validation fails with appropriate error message
+
+3. **Relations rejection for specification:**
+   - Create specification element with Relations subsection
+   - Run reqvire validate
+   - Verify validation fails with appropriate error message
+
+4. **Valid Refinement elements:**
+   - Create Refinement elements without Relations (only Metadata, Details, Attachments)
+   - Run reqvire validate
+   - Verify validation passes
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [Refinement Element Structure Constraints](../ModelManagement.md#refinement-element-structure-constraints)
 ---
