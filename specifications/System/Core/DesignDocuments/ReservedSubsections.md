@@ -98,7 +98,12 @@ Some details.
 
 Must be defined with a level 4 header: `#### Attachments`.
 
-The Attachments subsection links external documents to requirements.
+The Attachments subsection links external resources to elements. Attachments support two target types:
+
+1. **File Paths**: Links to external documents (PDFs, spreadsheets, images, etc.)
+2. **Element Identifiers**: Links to Refinement elements within the model
+
+### File Path Attachments
 
 **Parsing Rules:**
 - Support markdown link syntax: `* [path](path)`
@@ -107,7 +112,7 @@ The Attachments subsection links external documents to requirements.
 - Never parse attachment files (treat as opaque)
 - Auto-cleanup: remove subsection when empty
 
-**Validation Rules (Pass 2):**
+**Validation Rules:**
 - Verify file existence on filesystem
 - Validate markdown link format: `[path](path)`
 - Detect duplicate attachments within element
@@ -123,3 +128,33 @@ The system shall meet defined performance criteria.
 * [docs/SLO.pdf](docs/SLO.pdf)
 * [docs/benchmarks.xlsx](docs/benchmarks.xlsx)
 ```
+
+### Element Identifier Attachments
+
+Element identifier attachments link to Refinement elements (constraint, behavior, specification types) within the model.
+
+**Parsing Rules:**
+- Support markdown link syntax with fragment identifiers: `* [Element Name](path#element-id)`
+- Same-file references: `* [Element Name](#element-id)`
+- Cross-file references: `* [Element Name](relative/path/file.md#element-id)`
+- Identifiers are normalized using the same rules as relation targets
+- Link text contains the element name
+
+**Validation Rules:**
+- Target element must exist in the model
+- Target element must be a Refinement type (constraint, behavior, specification)
+- Non-Refinement element identifiers are rejected with a validation error
+
+**Examples:**
+```markdown
+### System Performance Requirements
+
+The system shall meet defined performance criteria.
+
+#### Attachments
+* [docs/SLO.pdf](docs/SLO.pdf)
+* [Response Time Constraint](Constraints.md#response-time-constraint)
+* [Timeout Behavior](Behaviors.md#timeout-behavior)
+```
+
+See [Refinement Elements Specification](RefinementElements.md) for details on refinement element types.
