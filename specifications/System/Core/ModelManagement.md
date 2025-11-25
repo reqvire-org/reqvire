@@ -148,6 +148,9 @@ This requirement ensures consistency between relation updates and attachment ide
 - The update behavior mirrors how relation targets are updated during move/rename operations
 - All files containing attachments that reference the affected element shall be modified
 
+#### Attachments
+  * [Attachment Identifier CRUD Update Behavior](Behaviors.md#attachment-identifier-crud-update-behavior)
+
 #### Relations
   * derivedFrom: [Element Manipulation Operations](#element-manipulation-operations)
   * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
