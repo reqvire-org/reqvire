@@ -1,0 +1,41 @@
+Moved element: Complex chars, element/name example (specifications/OtherRequirements.md#complex-chars-elementname-example)
+
+📄 specifications/OtherRequirements.md
+  [37m01     # Elements[0m
+  [37m02[0m
+  [37m03     ### Feature C[0m
+
+  [37m08       * derivedFrom: [Feature Alpha](Requirements.md#feature-alpha)[0m
+  [37m09       * verifiedBy: [Test for Feature C](Verifications/Tests.md#test-for-feature-c)[0m
+  [37m10     ---[0m
+  [32m11 +   ### Complex chars, element/name example[0m
+  [37m12[0m
+  [32m13 +   This feature has special characters in its name including commas and slashes.[0m
+  [32m14 +   ␤[0m
+  [32m15 +   #### Relations[0m
+  [32m16 +     * derivedFrom: [Feature Alpha](Requirements.md#feature-alpha)[0m
+  [32m17 +   ---[0m
+  [32m18 +   ␤[0m
+  [32m19 +   ␤[0m
+
+
+
+📄 specifications/Requirements.md
+  [37m01     # Elements[0m
+  [37m02[0m
+  [37m03     ### Parent Feature[0m
+
+  [37m15     #### Relations[0m
+  [37m16       * derivedFrom: [Parent Feature](#parent-feature)[0m
+  [37m17     ---[0m
+  [31m18 -   ### Complex chars, element/name example[0m
+  [31m18 -   ␤[0m
+  [31m18 -   This feature has special characters in its name including commas and slashes.[0m
+  [31m18 -   ␤[0m
+  [31m18 -   #### Relations[0m
+  [31m18 -     * derivedFrom: [Feature Alpha](#feature-alpha)[0m
+  [31m18 -   ---[0m
+  [31m18 -   ␤[0m
+  [37m18     ### Feature D[0m
+  [37m19[0m
+  [37m20     This is a newly added feature.[0m

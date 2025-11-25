@@ -252,6 +252,57 @@ echo "✓ Element renamed successfully and relations updated"
 echo ""
 
 # ==================================
+# Test 4b: Move Element with Special Characters
+# ==================================
+echo "Test 4b: Move element with special characters..."
+
+set +e
+MOVE_SPECIAL_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv "Complex chars, element/name example" "specifications/OtherRequirements.md" 2>&1)
+MOVE_SPECIAL_EXIT=$?
+set -e
+
+if [ $MOVE_SPECIAL_EXIT -ne 0 ]; then
+  echo "❌ FAILED: Move command for special chars element failed with exit code $MOVE_SPECIAL_EXIT"
+  echo "$MOVE_SPECIAL_OUTPUT"
+  exit 1
+fi
+
+# Compare output with expected diff
+if ! diff -u "${TEST_SCRIPT_DIR}/expected/expected-mv-special-chars-diff.txt" <(echo "$MOVE_SPECIAL_OUTPUT"); then
+  echo "❌ FAILED: Move special chars element output does not match expected diff"
+  echo ""
+  echo "If changes are intentional, update ${TEST_SCRIPT_DIR}/expected/expected-mv-special-chars-diff.txt"
+  exit 1
+fi
+
+# Verify element was removed from source
+if grep -q "### Complex chars, element/name example" "$TEST_DIR/specifications/Requirements.md"; then
+  echo "❌ FAILED: Special chars element was not removed from source file"
+  exit 1
+fi
+
+# Verify element was added to target
+if ! grep -q "### Complex chars, element/name example" "$TEST_DIR/specifications/OtherRequirements.md"; then
+  echo "❌ FAILED: Special chars element was not added to target file"
+  exit 1
+fi
+
+# Verify model still validates
+set +e
+VALIDATION_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" validate 2>&1)
+VALIDATION_EXIT=$?
+set -e
+
+if [ $VALIDATION_EXIT -ne 0 ]; then
+  echo "❌ FAILED: Model validation failed after moving special chars element"
+  echo "$VALIDATION_OUTPUT"
+  exit 1
+fi
+
+echo "✓ Element with special characters moved successfully"
+echo ""
+
+# ==================================
 # Test 5: Move File
 # ==================================
 echo "Test 5: Move file operation..."

@@ -605,27 +605,26 @@ impl GraphRegistry {
     /// * Element identifier if found and unique
     /// * Error if not found or multiple matches
     pub fn find_element_by_name(&self, element_name: &str) -> Result<String, ReqvireError> {
-        // Generate slug from element name (same logic as HTML heading to ID)
-        let name_slug = element_name.trim().replace(' ', "-").to_lowercase();
+        let search_name = element_name.trim();
 
-        // Find all matching identifiers
-        let matching_ids: Vec<String> = self.nodes
-            .keys()
-            .filter(|id| id.ends_with(&format!("#{}", name_slug)))
-            .cloned()
+        // Find all elements with matching name
+        let matching: Vec<&String> = self.nodes
+            .iter()
+            .filter(|(_, node)| node.element.name == search_name)
+            .map(|(id, _)| id)
             .collect();
 
-        if matching_ids.is_empty() {
+        if matching.is_empty() {
             return Err(ReqvireError::MissingElement(
                 format!("Element not found: {}", element_name)
             ));
-        } else if matching_ids.len() > 1 {
+        } else if matching.len() > 1 {
             return Err(ReqvireError::ProcessError(
-                format!("Multiple elements found with name '{}': {:?}", element_name, matching_ids)
+                format!("Multiple elements found with name '{}': {:?}", element_name, matching)
             ));
         }
 
-        Ok(matching_ids[0].clone())
+        Ok(matching[0].clone())
     }
 
     /// Moves an element to an existing file in the graph

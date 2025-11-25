@@ -107,3 +107,15 @@ This test verifies that the search command supports all filter types and combine
   * verify: #requirement-with-valid-markdown-relations
 
 ---
+
+### Complex chars, element/name example
+
+This requirement tests special characters in element names including commas and slashes.
+
+#### Metadata
+  * type: user-requirement
+
+#### Relations
+  * derivedFrom: #requirement-with-valid-standard-relations
+
+---

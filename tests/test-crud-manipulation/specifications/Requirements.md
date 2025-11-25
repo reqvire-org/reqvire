@@ -42,3 +42,14 @@ This is a test requirement for feature C with relations.
   * derivedFrom: [Feature A](#feature-a)
   * verifiedBy: [Test for Feature C](Verifications/Tests.md#test-for-feature-c)
 ---
+
+### Complex chars, element/name example
+
+This feature has special characters in its name including commas and slashes.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Feature A](#feature-a)
+---
