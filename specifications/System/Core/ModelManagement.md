@@ -61,6 +61,9 @@ When an element does not have a `#### Metadata` subsection with a `type` propert
 - `analysis-verification`
 - `inspection-verification`
 - `demonstration-verification`
+- `constraint` (refinement type)
+- `behavior` (refinement type)
+- `specification` (refinement type)
 - `other`
 
 </details>
@@ -173,7 +176,12 @@ Element types are identified through a reserved "type" metadata property. The fo
 5. **analysis-verification**: For verification through formal analysis of documentation or code
 6. **inspection-verification**: For verification through formal inspection or review
 7. **demonstration-verification**: For verification through demonstration in a realistic environment
-8. **other**: Custom element types defined by users
+8. **constraint**: Refinement documenting constraints that limit or bound the system
+9. **behavior**: Refinement documenting behavior details and operational specifications
+10. **specification**: Refinement documenting detailed specifications and technical descriptions
+11. **other**: Custom element types defined by users
+
+**Note:** Refinement types (constraint, behavior, specification) cannot have a Relations subsection. These elements serve as detailed documentation that can be attached to other elements.
 
 #### Relations
   * derivedFrom: [Reserved Subsections Support](StructureAndParsing.md#reserved-subsections-support)
