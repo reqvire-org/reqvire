@@ -65,12 +65,12 @@ This element uses a custom type: actor.
 #### Metadata
 * type: actor
 
-### Constraint Element
+### Rule Element
 
-This element uses a custom type: constraint.
+This element uses a custom type: rule.
 
 #### Metadata
-* type: constraint
+* type: rule
 
 
 ### User Requirement 1

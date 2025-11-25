@@ -66,23 +66,23 @@ The search report must include:
 **Element Information:**
 - Element identifier, name, type, and section
 - Element content - omitted in short mode
-- Verified and satisfied relations counts - omitted in short mode
 - Complete list of relations with targets and types
 - Complete list of attachments as strings (file paths and element identifiers) - omitted in short mode
   - File path attachments displayed as relative paths (e.g., `"path/to/file.pdf"`)
   - Element identifier attachments displayed as full identifiers (e.g., `"specifications/File.md#refinement-element"`)
 
-**Global Counts:**
-- Total files, pages, sections, and elements - omitted in short mode
-- Requirements by type (system, user) - omitted in short mode
-- Verifications by type (test, analysis, inspection, demonstration) - omitted in short mode
-- Missing relations (unverified and unsatisfied requirements) - omitted in short mode
+**Global Counts** (omitted in short mode):
+- Total files and elements counts
+- Requirements by type: map of requirement types to counts (e.g., `{"user-requirement": 5, "system-requirement": 10}`)
+- Verifications by type: map of verification types to counts (e.g., `{"test-verification": 8, "analysis-verification": 2}`)
+- Refinements by type: map of refinement types to counts (e.g., `{"behavior": 3, "constraint": 1}`)
+- Other types: map of any custom element types not in standard categories
 
 **Output Formats:**
 - Human-readable text format with hierarchical display
 - Human-readable abbreviated text format (with --short flag): one-line per element showing `[type] identifier - name`
 - JSON format for programmatic processing
-- JSON abbreviated format (with --short flag): omits content, page_content, verified_relations_count, satisfied_relations_count, element_count, total_elements, global_counters
+- JSON abbreviated format (with --short flag): omits content, page_content, attachments, element_count, total_elements, global_counters
 
 The system must support comprehensive filtering by file path, element name, type, element content, page content, and relation presence. All filters are applied conjunctively.
 

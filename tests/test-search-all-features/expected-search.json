@@ -8,8 +8,6 @@
           "file": "specifications/Requirements.md",
           "type": "requirement",
           "content": "This requirement specifically tests validation of relations to files in the DesignSpecifications folder.",
-          "verified_relations_count": 0,
-          "satisfied_relations_count": 1,
           "relations": [
             {
               "relation_type": "derivedFrom",
@@ -34,8 +32,6 @@
           "file": "specifications/Requirements.md",
           "type": "user-requirement",
           "content": "This requirement specifically tests validation of 'Other' subsections",
-          "verified_relations_count": 0,
-          "satisfied_relations_count": 0,
           "relations": [],
           "attachments": []
         },
@@ -45,8 +41,6 @@
           "file": "specifications/Requirements.md",
           "type": "user-requirement",
           "content": "This requirement has valid relations to existing files, using markdown link format.",
-          "verified_relations_count": 2,
-          "satisfied_relations_count": 1,
           "relations": [
             {
               "relation_type": "derive",
@@ -92,8 +86,6 @@
           "file": "specifications/Requirements.md",
           "type": "user-requirement",
           "content": "This requirement has valid relations to existing files, using standard format.",
-          "verified_relations_count": 2,
-          "satisfied_relations_count": 1,
           "relations": [
             {
               "relation_type": "derive",
@@ -139,8 +131,6 @@
           "file": "specifications/Requirements.md",
           "type": "test-verification",
           "content": "This test verifies that the search command supports all filter types and combines them with AND logic.\n\n\n#### Details\n\n##### Acceptance Criteria\n- Search command accepts all documented filter flags\n- Multiple filters combine with AND logic (results must match ALL filters)\n- Invalid regex patterns produce clear error messages\n\n##### Test Criteria\n1. `reqvire search --json` returns valid JSON with all elements\n2. `reqvire search --filter-type=user-requirement` returns only user-requirements\n3. Element count with two filters is <= element count with one filter (additive behavior)",
-          "verified_relations_count": 2,
-          "satisfied_relations_count": 0,
           "relations": [
             {
               "relation_type": "verify",
@@ -165,8 +155,6 @@
           "file": "specifications/Requirements.md",
           "type": "test-verification",
           "content": "",
-          "verified_relations_count": 2,
-          "satisfied_relations_count": 0,
           "relations": [
             {
               "relation_type": "verify",
@@ -193,11 +181,20 @@
   "global_counters": {
     "total_elements": 6,
     "total_files": 1,
-    "total_requirements_system": 1,
-    "total_requirements_user": 3,
-    "total_verifications_test": 2,
-    "total_verifications_analysis": 0,
-    "total_verifications_inspection": 0,
-    "total_verifications_demonstration": 0
+    "total_requirements_types": {
+      "system-requirement": 1,
+      "user-requirement": 3
+    },
+    "total_verifications_types": {
+      "analysis-verification": 0,
+      "demonstration-verification": 0,
+      "inspection-verification": 0,
+      "test-verification": 2
+    },
+    "total_refinements_types": {
+      "behavior": 0,
+      "constraint": 0,
+      "specification": 0
+    }
   }
 }

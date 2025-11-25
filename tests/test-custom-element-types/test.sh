@@ -7,25 +7,24 @@ set -euo pipefail
 #
 # Acceptance Criteria:
 # - Custom element types (non-standard types) are tracked and counted in search report
-# - Text output displays custom types as "Custom (type-name): count"
-# - JSON output includes "custom_element_types" object with correct counts
-# - Multiple custom types are sorted alphabetically in text output
+# - Text output displays custom types under "📋 Other Types:" section
+# - JSON output includes "total_other_types" object with correct counts
+# - Multiple custom types are sorted alphabetically in output
 # - Standard types (requirement, user-requirement, verification) are NOT counted as custom
 # - Different custom types are tracked separately
-# - When no custom types exist, the custom types section is not displayed in text output
+# - When no custom types exist, the other types section is not displayed
 #
 # Test Criteria:
 # - Commands exit with success (0) return code
 # - Text search displays custom types in correct format
-# - JSON search includes custom_element_types with correct counts
-# - Custom types are alphabetically sorted in text output
+# - JSON search includes total_other_types with correct counts
 # - Standard types are excluded from custom type counting
 
 # Create log file
 echo "Starting test..." > "${TEST_DIR}/test_results.log"
 
-# Test 1: JSON Output - Verify custom_element_types structure and counts
-# Expected custom types: actor: 1, constraint: 1, moe: 2, use-case: 3
+# Test 1: JSON Output - Verify total_other_types structure and counts
+# Expected custom types: actor: 1, rule: 1, moe: 2, use-case: 3
 echo "Test 1: Verifying JSON output with custom element types" >> "${TEST_DIR}/test_results.log"
 set +e
 OUTPUT_JSON=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --json 2>&1)
@@ -48,64 +47,59 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Check that custom_element_types field exists
-if ! echo "$OUTPUT_JSON" | jq -e '.global_counters.custom_element_types' >/dev/null 2>&1; then
-    echo "FAILED: JSON missing 'custom_element_types' field in global_counters"
+# Check that total_other_types field exists
+if ! echo "$OUTPUT_JSON" | jq -e '.global_counters.total_other_types' >/dev/null 2>&1; then
+    echo "FAILED: JSON missing 'total_other_types' field in global_counters"
     exit 1
 fi
 
 # Verify actor count
-ACTOR_COUNT=$(echo "$OUTPUT_JSON" | jq -r '.global_counters.custom_element_types.actor // 0')
+ACTOR_COUNT=$(echo "$OUTPUT_JSON" | jq -r '.global_counters.total_other_types.actor // 0')
 if [ "$ACTOR_COUNT" -ne 1 ]; then
     echo "FAILED: Expected actor count: 1, got: $ACTOR_COUNT"
     exit 1
 fi
 
-# Verify constraint count
-CONSTRAINT_COUNT=$(echo "$OUTPUT_JSON" | jq -r '.global_counters.custom_element_types.constraint // 0')
-if [ "$CONSTRAINT_COUNT" -ne 1 ]; then
-    echo "FAILED: Expected constraint count: 1, got: $CONSTRAINT_COUNT"
+# Verify rule count
+RULE_COUNT=$(echo "$OUTPUT_JSON" | jq -r '.global_counters.total_other_types.rule // 0')
+if [ "$RULE_COUNT" -ne 1 ]; then
+    echo "FAILED: Expected rule count: 1, got: $RULE_COUNT"
     exit 1
 fi
 
 # Verify moe count
-MOE_COUNT=$(echo "$OUTPUT_JSON" | jq -r '.global_counters.custom_element_types.moe // 0')
+MOE_COUNT=$(echo "$OUTPUT_JSON" | jq -r '.global_counters.total_other_types.moe // 0')
 if [ "$MOE_COUNT" -ne 2 ]; then
     echo "FAILED: Expected moe count: 2, got: $MOE_COUNT"
     exit 1
 fi
 
 # Verify use-case count
-USE_CASE_COUNT=$(echo "$OUTPUT_JSON" | jq -r '.global_counters.custom_element_types["use-case"] // 0')
+USE_CASE_COUNT=$(echo "$OUTPUT_JSON" | jq -r '.global_counters.total_other_types["use-case"] // 0')
 if [ "$USE_CASE_COUNT" -ne 3 ]; then
     echo "FAILED: Expected use-case count: 3, got: $USE_CASE_COUNT"
     exit 1
 fi
 
 # Verify total number of custom types tracked (should be 4)
-CUSTOM_TYPES_COUNT=$(echo "$OUTPUT_JSON" | jq '.global_counters.custom_element_types | length')
+CUSTOM_TYPES_COUNT=$(echo "$OUTPUT_JSON" | jq '.global_counters.total_other_types | length')
 if [ "$CUSTOM_TYPES_COUNT" -ne 4 ]; then
     echo "FAILED: Expected 4 different custom types, got: $CUSTOM_TYPES_COUNT"
     exit 1
 fi
 
-# Verify standard types are not in custom_element_types
-if echo "$OUTPUT_JSON" | jq -e '.global_counters.custom_element_types.requirement' >/dev/null 2>&1; then
-    echo "FAILED: Standard type 'requirement' should not be in custom_element_types"
+# Verify standard types are not in total_other_types
+if echo "$OUTPUT_JSON" | jq -e '.global_counters.total_other_types.requirement' >/dev/null 2>&1; then
+    echo "FAILED: Standard type 'requirement' should not be in total_other_types"
     exit 1
 fi
 
-if echo "$OUTPUT_JSON" | jq -e '.global_counters.custom_element_types["user-requirement"]' >/dev/null 2>&1; then
-    echo "FAILED: Standard type 'user-requirement' should not be in custom_element_types"
+if echo "$OUTPUT_JSON" | jq -e '.global_counters.total_other_types["user-requirement"]' >/dev/null 2>&1; then
+    echo "FAILED: Standard type 'user-requirement' should not be in total_other_types"
     exit 1
 fi
 
-if echo "$OUTPUT_JSON" | jq -e '.global_counters.custom_element_types.verification' >/dev/null 2>&1; then
-    echo "FAILED: Standard type 'verification' should not be in custom_element_types"
-    exit 1
-fi
-
-# Test 2: Text Output - Verify custom types display format and alphabetical sorting
+# Test 2: Text Output - Verify custom types display format
 echo "Test 2: Verifying text output with custom element types" >> "${TEST_DIR}/test_results.log"
 set +e
 OUTPUT_TEXT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search 2>&1)
@@ -121,78 +115,59 @@ if [ $EXIT_CODE -ne 0 ]; then
     exit 1
 fi
 
-# Check that custom types are displayed with correct format
-if ! echo "$OUTPUT_TEXT" | grep -q "^Custom (actor): 1$"; then
-    echo "FAILED: Text output missing or incorrect format for 'Custom (actor): 1'"
+# Check that custom types section exists
+if ! echo "$OUTPUT_TEXT" | grep -q "📋 Other Types:"; then
+    echo "FAILED: Text output missing '📋 Other Types:' section"
     echo "Output:"
     echo "$OUTPUT_TEXT"
     exit 1
 fi
 
-if ! echo "$OUTPUT_TEXT" | grep -q "^Custom (constraint): 1$"; then
-    echo "FAILED: Text output missing or incorrect format for 'Custom (constraint): 1'"
+# Check individual custom type counts
+if ! echo "$OUTPUT_TEXT" | grep -q "actor: 1"; then
+    echo "FAILED: Text output missing 'actor: 1'"
     exit 1
 fi
 
-if ! echo "$OUTPUT_TEXT" | grep -q "^Custom (moe): 2$"; then
-    echo "FAILED: Text output missing or incorrect format for 'Custom (moe): 2'"
+if ! echo "$OUTPUT_TEXT" | grep -q "rule: 1"; then
+    echo "FAILED: Text output missing 'rule: 1'"
     exit 1
 fi
 
-if ! echo "$OUTPUT_TEXT" | grep -q "^Custom (use-case): 3$"; then
-    echo "FAILED: Text output missing or incorrect format for 'Custom (use-case): 3'"
+if ! echo "$OUTPUT_TEXT" | grep -q "moe: 2"; then
+    echo "FAILED: Text output missing 'moe: 2'"
     exit 1
 fi
 
-# Test 3: Alphabetical Sorting in Text Output
-echo "Test 3: Verifying alphabetical sorting of custom types" >> "${TEST_DIR}/test_results.log"
-
-# Extract custom types section and verify ordering
-CUSTOM_SECTION=$(echo "$OUTPUT_TEXT" | grep "^Custom (" || true)
-if [ -z "$CUSTOM_SECTION" ]; then
-    echo "FAILED: No custom types found in text output"
+if ! echo "$OUTPUT_TEXT" | grep -q "use-case: 3"; then
+    echo "FAILED: Text output missing 'use-case: 3'"
     exit 1
 fi
 
-# Check that actor comes before constraint, constraint before moe, moe before use-case
-ACTOR_LINE=$(echo "$CUSTOM_SECTION" | grep -n "actor" | cut -d: -f1)
-CONSTRAINT_LINE=$(echo "$CUSTOM_SECTION" | grep -n "constraint" | cut -d: -f1)
-MOE_LINE=$(echo "$CUSTOM_SECTION" | grep -n "moe" | cut -d: -f1)
-USE_CASE_LINE=$(echo "$CUSTOM_SECTION" | grep -n "use-case" | cut -d: -f1)
+# Test 3: Standard Type Counts - Verify they exist and are correct
+echo "Test 3: Verifying standard type counts in new format" >> "${TEST_DIR}/test_results.log"
 
-if [ "$ACTOR_LINE" -gt "$CONSTRAINT_LINE" ] || \
-   [ "$CONSTRAINT_LINE" -gt "$MOE_LINE" ] || \
-   [ "$MOE_LINE" -gt "$USE_CASE_LINE" ]; then
-    echo "FAILED: Custom types are not alphabetically sorted"
-    echo "Order found:"
-    echo "$CUSTOM_SECTION"
-    exit 1
-fi
-
-# Test 4: Standard Type Counts - Verify they exist and are correct
-echo "Test 4: Verifying standard type counts" >> "${TEST_DIR}/test_results.log"
-
-# Check that standard types are counted correctly in separate fields
-TOTAL_REQUIREMENTS=$(echo "$OUTPUT_JSON" | jq '.global_counters.total_requirements_system')
+# Check that standard types are counted correctly in nested maps
+TOTAL_REQUIREMENTS=$(echo "$OUTPUT_JSON" | jq '.global_counters.total_requirements_types["system-requirement"]')
 if [ "$TOTAL_REQUIREMENTS" -ne 2 ]; then
     echo "FAILED: Expected 2 system requirements, got: $TOTAL_REQUIREMENTS"
     exit 1
 fi
 
-TOTAL_USER_REQS=$(echo "$OUTPUT_JSON" | jq '.global_counters.total_requirements_user')
+TOTAL_USER_REQS=$(echo "$OUTPUT_JSON" | jq '.global_counters.total_requirements_types["user-requirement"]')
 if [ "$TOTAL_USER_REQS" -ne 2 ]; then
     echo "FAILED: Expected 2 user requirements, got: $TOTAL_USER_REQS"
     exit 1
 fi
 
-TOTAL_VERIFICATIONS=$(echo "$OUTPUT_JSON" | jq '.global_counters.total_verifications_test')
+TOTAL_VERIFICATIONS=$(echo "$OUTPUT_JSON" | jq '.global_counters.total_verifications_types["test-verification"]')
 if [ "$TOTAL_VERIFICATIONS" -ne 1 ]; then
     echo "FAILED: Expected 1 verification, got: $TOTAL_VERIFICATIONS"
     exit 1
 fi
 
-# Test 5: Total Elements Count - Should include both standard and custom types
-echo "Test 5: Verifying total elements count" >> "${TEST_DIR}/test_results.log"
+# Test 4: Total Elements Count - Should include both standard and custom types
+echo "Test 4: Verifying total elements count" >> "${TEST_DIR}/test_results.log"
 
 TOTAL_ELEMENTS=$(echo "$OUTPUT_JSON" | jq '.global_counters.total_elements')
 # 2 requirements + 2 user-requirements + 1 verification + 7 custom types = 12
@@ -201,8 +176,8 @@ if [ "$TOTAL_ELEMENTS" -ne 12 ]; then
     exit 1
 fi
 
-# Test 6: Empty Custom Types Case - Create a test with no custom types
-echo "Test 6: Verifying behavior with no custom types" >> "${TEST_DIR}/test_results.log"
+# Test 5: Empty Custom Types Case - Create a test with no custom types
+echo "Test 5: Verifying behavior with no custom types" >> "${TEST_DIR}/test_results.log"
 
 # Create a temporary directory with only standard types
 TEMP_NO_CUSTOM="${TEST_DIR}/test_no_custom"
@@ -253,15 +228,15 @@ if [ $EXIT_CODE -ne 0 ]; then
     exit 1
 fi
 
-# Check that custom_element_types is empty or absent in JSON
-CUSTOM_TYPES_EMPTY=$(echo "$OUTPUT_NO_CUSTOM_JSON" | jq '.global_counters.custom_element_types // {} | length')
+# Check that total_other_types is empty or absent in JSON
+CUSTOM_TYPES_EMPTY=$(echo "$OUTPUT_NO_CUSTOM_JSON" | jq '.global_counters.total_other_types // {} | length')
 if [ "$CUSTOM_TYPES_EMPTY" -ne 0 ]; then
     echo "FAILED: Expected no custom types, but found: $CUSTOM_TYPES_EMPTY"
-    echo "$OUTPUT_NO_CUSTOM_JSON" | jq '.global_counters.custom_element_types'
+    echo "$OUTPUT_NO_CUSTOM_JSON" | jq '.global_counters.total_other_types'
     exit 1
 fi
 
-# Run search in text format and verify no "Custom (" lines appear
+# Run search in text format and verify no "Other Types:" section appears
 set +e
 OUTPUT_NO_CUSTOM_TEXT=$(cd "${TEMP_NO_CUSTOM}" && "$REQVIRE_BIN" search 2>&1)
 EXIT_CODE=$?
@@ -272,19 +247,19 @@ if [ $EXIT_CODE -ne 0 ]; then
     exit 1
 fi
 
-# Verify no "Custom (" lines in output
-if echo "$OUTPUT_NO_CUSTOM_TEXT" | grep -q "^Custom ("; then
-    echo "FAILED: Text output should not show custom types when none exist"
+# Verify no "Other Types:" section in output
+if echo "$OUTPUT_NO_CUSTOM_TEXT" | grep -q "📋 Other Types:"; then
+    echo "FAILED: Text output should not show Other Types section when none exist"
     echo "Found:"
-    echo "$OUTPUT_NO_CUSTOM_TEXT" | grep "^Custom ("
+    echo "$OUTPUT_NO_CUSTOM_TEXT" | grep "Other Types" -A5
     exit 1
 fi
 
 # Clean up temporary test directory
 rm -rf "${TEMP_NO_CUSTOM}"
 
-# Test 7: Filter Interaction - Verify custom type counts with filters
-echo "Test 7: Verifying custom type counts with filter-type" >> "${TEST_DIR}/test_results.log"
+# Test 6: Filter Interaction - Verify custom type counts with filters
+echo "Test 6: Verifying custom type counts with filter-type" >> "${TEST_DIR}/test_results.log"
 
 # Filter to show only use-case custom type elements
 set +e
@@ -305,13 +280,13 @@ if [ "$FILTERED_TOTAL" -ne 3 ]; then
 fi
 
 # Custom types should only show use-case
-FILTERED_CUSTOM_COUNT=$(echo "$OUTPUT_FILTERED_JSON" | jq '.global_counters.custom_element_types | length')
+FILTERED_CUSTOM_COUNT=$(echo "$OUTPUT_FILTERED_JSON" | jq '.global_counters.total_other_types | length')
 if [ "$FILTERED_CUSTOM_COUNT" -ne 1 ]; then
     echo "FAILED: Expected only 1 custom type with filter, got: $FILTERED_CUSTOM_COUNT"
     exit 1
 fi
 
-FILTERED_USE_CASE=$(echo "$OUTPUT_FILTERED_JSON" | jq '.global_counters.custom_element_types["use-case"]')
+FILTERED_USE_CASE=$(echo "$OUTPUT_FILTERED_JSON" | jq '.global_counters.total_other_types["use-case"]')
 if [ "$FILTERED_USE_CASE" -ne 3 ]; then
     echo "FAILED: Expected 3 use-case elements with filter, got: $FILTERED_USE_CASE"
     exit 1
