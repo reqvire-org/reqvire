@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -uo pipefail
+
+TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Test: Model Summary JSON and Filters Validation (with text checks and relations coverage)
 # -------------------------------------------------------------------------------------
@@ -41,8 +43,7 @@ fi
 echo "$OUTPUT" | jq . >/dev/null 2>&1
 
 # Compare against expected JSON output
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-EXPECTED_JSON="${SCRIPT_DIR}/expected-search.json"
+EXPECTED_JSON="${TEST_SCRIPT_DIR}/expected/expected-search.json"
 if ! diff <(echo "$OUTPUT" | jq --sort-keys .) <(jq --sort-keys . "$EXPECTED_JSON") > /dev/null; then
   echo "❌ FAILED: JSON output does not match expected output"
   echo "Diff:"
@@ -105,7 +106,7 @@ if ! grep -q '^--- MBSE Search results ---' <<< "$OUTPUT"; then
 fi
 
 # Compare against expected text output
-EXPECTED_TEXT="${SCRIPT_DIR}/expected-search.txt"
+EXPECTED_TEXT="${TEST_SCRIPT_DIR}/expected/expected-search.txt"
 printf "%s\n" "$OUTPUT" > "${TEST_DIR}/actual-search.txt"
 if ! diff "${TEST_DIR}/actual-search.txt" "$EXPECTED_TEXT" > /dev/null; then
   echo "❌ FAILED: Text output does not match expected output"

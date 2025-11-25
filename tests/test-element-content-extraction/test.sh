@@ -1,5 +1,7 @@
 #!/bin/bash
-set -euo pipefail
+set -uo pipefail
+
+TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Create log file immediately to ensure it exists for runner
 echo "Starting test..." > "${TEST_DIR}/test_results.log"
@@ -25,13 +27,11 @@ set -e
 echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
 printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 
-
-GOTTEN_CONTENT=$(awk '/# [^:]+:/' "${TEST_DIR}/test_results.log")
 GOTTEN_CONTENT=$(echo "$OUTPUT" | jq -r '
   [
     .files
-    | .. 
-    | objects 
+    | ..
+    | objects
     | select(.content != null)
     | (
         (.name + ":" + (.content | gsub("\n+"; " ")))
@@ -43,33 +43,14 @@ GOTTEN_CONTENT=$(echo "$OUTPUT" | jq -r '
 
 GOTTEN_CONTENT=$(printf "\n%s" "$GOTTEN_CONTENT")
 
+# Write actual content for comparison
+printf "%s" "$GOTTEN_CONTENT" > "${TEST_DIR}/actual-content.txt"
 
-EXPECTED_CONTENT="
-REQ 0:Root requirement for relations to work.
-
-REQ 1:This is simple requirement with main text only.
-
-REQ 1A:This is simple requirement with main text and details. #### Details REQ 1A details.
-
-REQ 2:Requirement with main text and relations.
-
-REQ 3:Requirement with main text and relations and metadata.
-
-REQ 4:Requirement with main text and relations and metadata and details. #### Details REQ 4 Details.
-
-REQ 5:Requirement with main text and relations and metadata and details different order (A). #### Details REQ 5 Details.
-
-REQ 6:Requirement with main text and relations and metadata and details different order (B). #### Details REQ 6 Details.
-
-REQ 7:Requirement with main text and relations and metadata and details different order (C). #### Details REQ 7 Details.
-
-REQ 8:Requirement with main text and relations details with <details> element that should not break parsing and validation.    #### Details <details> ### REQ 8 Nested requirement which should not be processed as requirement. #### Relations   * derivedFrom: #req-0          </details>"
-
-
-
-if ! diff <(echo "$EXPECTED_CONTENT") <(echo "$GOTTEN_CONTENT") > /dev/null; then
-  echo "FAILED: Exctracted content not matching expected content."
-  diff -u <(echo "$EXPECTED_CONTENT") <(echo "$GOTTEN_CONTENT")
+if ! diff -u "${TEST_SCRIPT_DIR}/expected/expected-content.txt" "${TEST_DIR}/actual-content.txt"; then
+  echo "❌ FAILED: Extracted content does not match expected"
+  echo ""
+  echo "If changes are intentional, update the expected file:"
+  echo "  cp ${TEST_DIR}/actual-content.txt ${TEST_SCRIPT_DIR}/expected/expected-content.txt"
   exit 1
 fi
 

@@ -1,5 +1,5 @@
 #!/bin/bash
-set -euo pipefail
+set -uo pipefail
 
 # Test: Containment View Functionality
 # ----------------------------------------------------
@@ -346,10 +346,10 @@ fi
 echo "$SHORT_OUTPUT" > "$TEST_DIR/actual-containment-short.md"
 
 # Compare with expected --short output
-if ! diff -u "${TEST_SCRIPT_DIR}/expected-containment-output.md" "$TEST_DIR/actual-containment-short.md" > "$TEST_DIR/diff-short.txt" 2>&1; then
+if ! diff -u "${TEST_SCRIPT_DIR}/expected/expected-containment-output.md" "$TEST_DIR/actual-containment-short.md"; then
   echo "❌ FAILED: Containment --short output does not match expected"
-  echo "Diff (expected vs actual):"
-  cat "$TEST_DIR/diff-short.txt"
+  echo ""
+  echo "If changes are intentional, update ${TEST_SCRIPT_DIR}/expected/expected-containment-output.md"
   exit 1
 fi
 
@@ -365,10 +365,10 @@ echo "Test 8.6: Design documents in containment view..."
 echo "$MERMAID_DIAGRAM" > "$TEST_DIR/actual-containment-diagram.mmd"
 
 # Compare with expected diagram
-if ! diff -u "${TEST_SCRIPT_DIR}/expected-containment-diagram.mmd" "$TEST_DIR/actual-containment-diagram.mmd" > "$TEST_DIR/diff-diagram.txt" 2>&1; then
+if ! diff -u "${TEST_SCRIPT_DIR}/expected/expected-containment-diagram.mmd" "$TEST_DIR/actual-containment-diagram.mmd"; then
   echo "❌ FAILED: Containment diagram does not match expected output"
-  echo "Diff (expected vs actual):"
-  cat "$TEST_DIR/diff-diagram.txt"
+  echo ""
+  echo "If changes are intentional, update ${TEST_SCRIPT_DIR}/expected/expected-containment-diagram.mmd"
   exit 1
 fi
 

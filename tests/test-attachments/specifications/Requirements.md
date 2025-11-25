@@ -50,3 +50,25 @@ This requirement has no attachments.
   * derivedFrom: [System Requirements](#system-requirements)
 ---
 
+### Test Constraint Element
+
+This is a constraint Refinement element for testing element attachments.
+
+#### Details
+This constraint defines limits on system behavior.
+
+#### Metadata
+  * type: constraint
+---
+
+### Test Behavior Element
+
+This is a behavior Refinement element for testing element attachments.
+
+#### Details
+This behavior defines expected system operation.
+
+#### Metadata
+  * type: behavior
+---
+

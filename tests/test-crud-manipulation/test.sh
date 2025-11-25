@@ -1,5 +1,5 @@
 #!/bin/bash
-set -euo pipefail
+set -uo pipefail
 
 # Test: Element Manipulation Operations
 #
@@ -52,10 +52,10 @@ if [ $ADD_EXIT -ne 0 ]; then
 fi
 
 # Compare output with expected diff
-if ! diff -u "${TEST_SCRIPT_DIR}/expected-add-diff.txt" <(echo "$ADD_OUTPUT"); then
+if ! diff -u "${TEST_SCRIPT_DIR}/expected/expected-add-diff.txt" <(echo "$ADD_OUTPUT"); then
   echo "❌ FAILED: Add command output does not match expected diff"
   echo ""
-  echo "Differences shown above (expected vs actual)"
+  echo "If changes are intentional, update ${TEST_SCRIPT_DIR}/expected/expected-add-diff.txt"
   exit 1
 fi
 
@@ -100,10 +100,10 @@ if [ $DELETE_EXIT -ne 0 ]; then
 fi
 
 # Compare output with expected diff
-if ! diff -u "${TEST_SCRIPT_DIR}/expected-rm-diff.txt" <(echo "$DELETE_OUTPUT"); then
+if ! diff -u "${TEST_SCRIPT_DIR}/expected/expected-rm-diff.txt" <(echo "$DELETE_OUTPUT"); then
   echo "❌ FAILED: Delete command output does not match expected diff"
   echo ""
-  echo "Differences shown above (expected vs actual)"
+  echo "If changes are intentional, update ${TEST_SCRIPT_DIR}/expected/expected-rm-diff.txt"
   exit 1
 fi
 
@@ -154,10 +154,10 @@ if [ $MOVE_EXIT -ne 0 ]; then
 fi
 
 # Compare output with expected diff
-if ! diff -u "${TEST_SCRIPT_DIR}/expected-mv-diff.txt" <(echo "$MOVE_OUTPUT"); then
+if ! diff -u "${TEST_SCRIPT_DIR}/expected/expected-mv-diff.txt" <(echo "$MOVE_OUTPUT"); then
   echo "❌ FAILED: Move command output does not match expected diff"
   echo ""
-  echo "Differences shown above (expected vs actual)"
+  echo "If changes are intentional, update ${TEST_SCRIPT_DIR}/expected/expected-mv-diff.txt"
   exit 1
 fi
 
@@ -211,10 +211,10 @@ if [ $RENAME_EXIT -ne 0 ]; then
 fi
 
 # Compare output with expected diff
-if ! diff -u "${TEST_SCRIPT_DIR}/expected-rename-diff.txt" <(echo "$RENAME_OUTPUT"); then
+if ! diff -u "${TEST_SCRIPT_DIR}/expected/expected-rename-diff.txt" <(echo "$RENAME_OUTPUT"); then
   echo "❌ FAILED: Rename command output does not match expected diff"
   echo ""
-  echo "Differences shown above (expected vs actual)"
+  echo "If changes are intentional, update ${TEST_SCRIPT_DIR}/expected/expected-rename-diff.txt"
   exit 1
 fi
 

@@ -1,5 +1,7 @@
 #!/bin/bash
-set -euo pipefail
+set -uo pipefail
+
+TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Create log file immediately to ensure it exists for runner
 echo "Starting test..." > "${TEST_DIR}/test_results.log"
@@ -20,9 +22,20 @@ echo "Starting test..." > "${TEST_DIR}/test_results.log"
 # - No duplicate arrows exist for the same logical relationship
 # - Arrow directions follow the semantic direction defined in relation type registry
 
-# Make backup copies of original files for comparison
-mkdir -p "$TEST_DIR/backup"
-cp -r "$TEST_DIR/specifications" "$TEST_DIR/backup/"
+# Helper function to compare files and show diff on failure
+assert_file_matches() {
+  local expected="$1"
+  local actual="$2"
+  local description="$3"
+
+  if ! diff -u "$expected" "$actual"; then
+    echo "❌ FAILED: $description"
+    echo ""
+    echo "If changes are intentional, update the expected file:"
+    echo "  cp $actual $expected"
+    exit 1
+  fi
+}
 
 # Run reqvire to generate diagrams
 echo "Running: reqvire generate-diagrams" >> "${TEST_DIR}/test_results.log"
@@ -41,80 +54,10 @@ if [ $EXIT_CODE -ne 0 ]; then
   exit 1
 fi
 
-# Check that the test file was modified and contains mermaid diagrams
-TEST_FILE="$TEST_DIR/specifications/RelationFilteringTest.md"
-BACKUP_FILE="$TEST_DIR/backup/specifications/RelationFilteringTest.md"
-
-if cmp -s "$TEST_FILE" "$BACKUP_FILE"; then
-  echo "❌ NOT MODIFIED: Expected test file to be modified with diagrams"
-  exit 1
-fi
-
-if ! grep -q '```mermaid' "$TEST_FILE"; then
-  echo "❌ NO DIAGRAM: Expected test file to contain mermaid diagrams"
-  exit 1
-fi
-
-# Test 1: Forward relations should be present
-FAILED_CHECKS=0
-
-# Check that forward relations are rendered
-if ! grep -q -- "-.->|derive" "$TEST_FILE"; then
-  echo "❌ MISSING FORWARD: Expected 'derive' forward relation arrow"
-  FAILED_CHECKS=$((FAILED_CHECKS + 1))
-fi
-
-if ! grep -q -- "-->|satisfiedBy" "$TEST_FILE"; then
-  echo "❌ MISSING FORWARD: Expected 'satisfiedBy' forward relation arrow"
-  FAILED_CHECKS=$((FAILED_CHECKS + 1))
-fi
-
-if ! grep -q -- "-.->|verifiedBy" "$TEST_FILE"; then
-  echo "❌ MISSING FORWARD: Expected 'verifiedBy' forward relation arrow"
-  FAILED_CHECKS=$((FAILED_CHECKS + 1))
-fi
-
-# Test 2: Backward relation names should NOT be present in Mermaid diagrams
-# Extract only the Mermaid diagram sections
-MERMAID_DIAGRAMS=$(sed -n '/```mermaid/,/```/p' "$TEST_FILE")
-
-if echo "$MERMAID_DIAGRAMS" | grep -q -- "containedBy"; then
-  echo "❌ BACKWARD PRESENT: Found 'containedBy' backward relation in Mermaid diagrams - should be filtered"
-  FAILED_CHECKS=$((FAILED_CHECKS + 1))
-fi
-
-if echo "$MERMAID_DIAGRAMS" | grep -q -- "derivedFrom"; then
-  echo "❌ BACKWARD PRESENT: Found 'derivedFrom' backward relation in Mermaid diagrams - should be filtered"
-  FAILED_CHECKS=$((FAILED_CHECKS + 1))
-fi
-
-if echo "$MERMAID_DIAGRAMS" | grep -q -- "verify"; then
-  echo "❌ BACKWARD PRESENT: Found 'verify' backward relation in Mermaid diagrams - should be filtered"
-  FAILED_CHECKS=$((FAILED_CHECKS + 1))
-fi
-
-# Test 3: All elements with relations should be included in the file-level diagram
-# With section removal, there's 1 diagram per file that includes all related elements
-if ! echo "$MERMAID_DIAGRAMS" | grep -q '"Parent Element"'; then
-  echo "❌ MISSING ELEMENT: Parent Element should be included in file diagram"
-  FAILED_CHECKS=$((FAILED_CHECKS + 1))
-fi
-
-# Test 4: Check that the derive relation is present in the file-level diagram
-# The derive relation should flow from Parent Element to Derived Child
-if ! echo "$MERMAID_DIAGRAMS" | grep -q -- "-.->|deriveReqT|"; then
-  echo "❌ MISSING DERIVE: 'derive' relation should be present in file diagram"
-  FAILED_CHECKS=$((FAILED_CHECKS + 1))
-fi
-
-if [ $FAILED_CHECKS -gt 0 ]; then
-  echo "❌ FAILED: $FAILED_CHECKS relation filtering checks failed"
-  echo "Generated diagram content:"
-  cat "$TEST_FILE"
-  exit 1
-fi
-
-# Clean up backup directory
-rm -rf "$TEST_DIR/backup"
+# Compare output against expected file
+assert_file_matches \
+  "${TEST_SCRIPT_DIR}/expected/RelationFilteringTest.md" \
+  "$TEST_DIR/specifications/RelationFilteringTest.md" \
+  "RelationFilteringTest.md after diagram generation does not match expected"
 
 exit 0

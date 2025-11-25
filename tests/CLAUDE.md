@@ -91,6 +91,91 @@ The test runner (`run_tests.sh`):
 
 ## Common Test Patterns
 
+### CRITICAL: Expected Output Files with Diff Comparison
+
+**This is the preferred and REQUIRED pattern for file modification tests.** Instead of using inline grep checks, tests MUST use expected output files and `diff -u` for comparison. This ensures:
+- Clear visibility of what changed when tests fail
+- Easy updates when intentional changes are made
+- Deterministic, reproducible test results
+
+#### Directory Structure
+```
+test-feature-name/
+├── test.sh                    # Test execution script
+├── .gitignore                 # MUST exclude expected/ from reqvire parsing
+├── expected/                  # Expected output files
+│   ├── 01-after-step1.md     # Expected state after step 1
+│   ├── 02-after-step2.md     # Expected state after step 2
+│   └── output.txt            # Expected command output
+└── specifications/           # Initial test files
+    └── Requirements.md
+```
+
+#### .gitignore for Expected Files
+**CRITICAL**: Expected files contain `# Elements` headers, so they would be parsed as specifications causing duplicate element errors. Always add:
+```
+# .gitignore in test directory
+expected/
+```
+
+#### Helper Function Pattern
+```bash
+#!/bin/bash
+set -uo pipefail  # NOTE: Do NOT use -e, it causes silent failures with diff
+
+TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Helper function to compare files and show diff on failure
+assert_file_matches() {
+  local expected="$1"
+  local actual="$2"
+  local description="$3"
+
+  if ! diff -u "$expected" "$actual"; then
+    echo "❌ FAILED: $description"
+    echo ""
+    echo "If changes are intentional, update $expected"
+    exit 1
+  fi
+}
+
+# Usage in tests:
+cd "$TEST_DIR" && "$REQVIRE_BIN" some-command > /dev/null 2>&1
+
+assert_file_matches "${TEST_SCRIPT_DIR}/expected/01-after-command.md" \
+  "$TEST_DIR/specifications/Requirements.md" \
+  "File content after command does not match expected"
+
+echo "✅ Test passed"
+```
+
+#### Generating Expected Files
+When creating a new test or updating expected outputs:
+```bash
+# Set up test environment
+cd /tmp && mkdir test-gen && cp -r tests/test-feature/* test-gen/
+cd test-gen && git init && git add -A && git commit -m "init"
+
+# Run commands and capture expected outputs
+reqvire some-command
+cp specifications/Requirements.md /path/to/tests/test-feature/expected/01-after-command.md
+```
+
+#### Why NOT to Use Inline Grep Checks
+```bash
+# ❌ BAD - Silent failure, unclear what's wrong
+if ! grep -q "expected content" "$FILE"; then
+  echo "FAILED"
+  exit 1
+fi
+
+# ✅ GOOD - Shows exactly what differs
+if ! diff -u "$EXPECTED" "$ACTUAL"; then
+  echo "FAILED - see diff above"
+  exit 1
+fi
+```
+
 ### JSON Output Validation
 ```bash
 # Run command that produces JSON

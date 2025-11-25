@@ -1,5 +1,7 @@
 #!/bin/bash
-set -euo pipefail
+set -uo pipefail
+
+TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Create log file immediately to ensure it exists for runner
 echo "Starting test..." > "${TEST_DIR}/test_results.log"
@@ -46,11 +48,10 @@ fi
 SANITIZED_OUTPUT=$(echo "$OUTPUT" | grep -v "INFO  reqvire::config" | grep -v "Warning: Element" | grep -v "ERROR reqvire" | sed -E 's#https://[^ )]+/blob/[a-f0-9]{7,40}/##g')
 
 # Compare against expected output
-if ! diff "${TEST_DIR}/expected-content-change.txt" <(echo "$SANITIZED_OUTPUT") > /dev/null; then
-  echo "FAILED: Refinement content change output does not match expected."
+if ! diff -u "${TEST_SCRIPT_DIR}/expected/expected-content-change.txt" <(echo "$SANITIZED_OUTPUT"); then
+  echo "❌ FAILED: Refinement content change output does not match expected."
   echo ""
-  echo "DIFF (expected vs actual):"
-  diff -u "${TEST_DIR}/expected-content-change.txt" <(echo "$SANITIZED_OUTPUT") || true
+  echo "If changes are intentional, update ${TEST_SCRIPT_DIR}/expected/expected-content-change.txt"
   exit 1
 fi
 
@@ -84,11 +85,10 @@ fi
 SANITIZED_OUTPUT=$(echo "$OUTPUT" | grep -v "INFO  reqvire::config" | grep -v "Warning: Element" | grep -v "ERROR reqvire" | sed -E 's#https://[^ )]+/blob/[a-f0-9]{7,40}/##g')
 
 # Compare against expected output
-if ! diff "${TEST_DIR}/expected-file-attachment-change.txt" <(echo "$SANITIZED_OUTPUT") > /dev/null; then
-  echo "FAILED: File attachment content change output does not match expected."
+if ! diff -u "${TEST_SCRIPT_DIR}/expected/expected-file-attachment-change.txt" <(echo "$SANITIZED_OUTPUT"); then
+  echo "❌ FAILED: File attachment content change output does not match expected."
   echo ""
-  echo "DIFF (expected vs actual):"
-  diff -u "${TEST_DIR}/expected-file-attachment-change.txt" <(echo "$SANITIZED_OUTPUT") || true
+  echo "If changes are intentional, update ${TEST_SCRIPT_DIR}/expected/expected-file-attachment-change.txt"
   exit 1
 fi
 
@@ -143,11 +143,10 @@ fi
 SANITIZED_OUTPUT=$(echo "$OUTPUT" | grep -v "INFO  reqvire::config" | grep -v "Warning: Element" | grep -v "ERROR reqvire" | sed -E 's#https://[^ )]+/blob/[a-f0-9]{7,40}/##g')
 
 # Compare against expected output
-if ! diff "${TEST_DIR}/expected-mv-file.txt" <(echo "$SANITIZED_OUTPUT") > /dev/null; then
-  echo "FAILED: mv to different file output does not match expected."
+if ! diff -u "${TEST_SCRIPT_DIR}/expected/expected-mv-file.txt" <(echo "$SANITIZED_OUTPUT"); then
+  echo "❌ FAILED: mv to different file output does not match expected."
   echo ""
-  echo "DIFF (expected vs actual):"
-  diff -u "${TEST_DIR}/expected-mv-file.txt" <(echo "$SANITIZED_OUTPUT") || true
+  echo "If changes are intentional, update ${TEST_SCRIPT_DIR}/expected/expected-mv-file.txt"
   exit 1
 fi
 

@@ -1,5 +1,7 @@
 #!/bin/bash
-set -euo pipefail
+set -uo pipefail
+
+TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Create log file immediately to ensure it exists for runner
 echo "Starting test..." > "${TEST_DIR}/test_results.log"
@@ -73,7 +75,6 @@ printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results_default.log"
 if [ $EXIT_CODE -ne 0 ]; then
     echo "❌ FAILED: Change impact detection failed with exit code $EXIT_CODE"
     echo "$OUTPUT"
-    rm -rf "${TEST_DIR}"
     exit 1
 fi
 
@@ -81,35 +82,11 @@ fi
 GOTTEN_CONTENT=$(echo "$OUTPUT" | grep -v "INFO  reqvire::config" | grep -v "Warning: Element" | grep -v "DEBUG:" | grep -v "\[DEBUG\]")
 SANITIZED_OUTPUT=$(echo "$GOTTEN_CONTENT" | sed -E 's#https://[^ )]+/blob/[a-f0-9]{7,40}/##g')
 
-# Expected content - only parent should appear in new elements, child is filtered
-# New verification appears in both new elements and invalidated verifications
-EXPECTED_CONTENT='## Change Impact Report
-
-### New Elements
-
-* [New Parent Requirement](Requirements.md#new-parent-requirement)
-    * verifiedBy -> [New Verification](Requirements.md#new-verification) (new)
-    * derive -> [New Child Requirement](Requirements.md#new-child-requirement) (new)
-
-
-
----
-
-## Invalidated Verifications
-
-- [ ] [New Verification](Requirements.md#new-verification)'
-
 # Test 1: Verify smart filtering works correctly
-if ! diff <(echo "$EXPECTED_CONTENT") <(echo "$SANITIZED_OUTPUT") > /dev/null; then
+if ! diff -u "${TEST_SCRIPT_DIR}/expected/change-impact-report.txt" <(echo "$SANITIZED_OUTPUT"); then
   echo "❌ FAILED: Smart filtering not working correctly."
-  echo "Expected:"
-  echo "$EXPECTED_CONTENT"
   echo ""
-  echo "Got:"
-  echo "$SANITIZED_OUTPUT"
-  echo ""
-  diff -u <(echo "$EXPECTED_CONTENT") <(echo "$SANITIZED_OUTPUT")
-  rm -rf "${TEST_DIR}"
+  echo "If changes are intentional, update ${TEST_SCRIPT_DIR}/expected/change-impact-report.txt"
   exit 1
 fi
 
@@ -128,7 +105,6 @@ printf "%s\n" "$OUTPUT_JSON" >> "${TEST_DIR}/test_results.log"
 if [ $EXIT_CODE -ne 0 ]; then
     echo "❌ FAILED: Change impact JSON detection failed with exit code $EXIT_CODE"
     echo "$OUTPUT_JSON"
-    rm -rf "${TEST_DIR}"
     exit 1
 fi
 
@@ -138,7 +114,6 @@ JSON_OUTPUT=$(echo "$OUTPUT_JSON" | grep -v "Warning:" | grep -v "DEBUG:" | grep
 # Verify JSON format
 if ! echo "$JSON_OUTPUT" | jq . >/dev/null 2>&1; then
     echo "❌ FAILED: Output is not valid JSON"
-    rm -rf "${TEST_DIR}"
     exit 1
 fi
 
@@ -148,7 +123,6 @@ if [ "$NEW_COUNT" -ne 1 ]; then
     echo "❌ FAILED: Expected 1 new element in JSON (parent only), got $NEW_COUNT"
     echo "Elements found:"
     echo "$JSON_OUTPUT" | jq '.added[].element_id'
-    rm -rf "${TEST_DIR}"
     exit 1
 fi
 
@@ -158,13 +132,11 @@ CHILD_PRESENT=$(echo "$JSON_OUTPUT" | jq '.added | map(select(.element_id | cont
 
 if [ "$PARENT_PRESENT" -ne 1 ]; then
     echo "❌ FAILED: New Parent Requirement not found in JSON output"
-    rm -rf "${TEST_DIR}"
     exit 1
 fi
 
 if [ "$CHILD_PRESENT" -ne 0 ]; then
     echo "❌ FAILED: New Child Requirement should be filtered out but was found in JSON output"
-    rm -rf "${TEST_DIR}"
     exit 1
 fi
 
@@ -172,17 +144,13 @@ fi
 INVALIDATED_COUNT=$(echo "$JSON_OUTPUT" | jq '.invalidated_verifications | length')
 if [ "$INVALIDATED_COUNT" -ne 1 ]; then
     echo "❌ FAILED: Expected 1 invalidated verification in JSON, got $INVALIDATED_COUNT"
-    rm -rf "${TEST_DIR}"
     exit 1
 fi
 
 VERIFICATION_INVALIDATED=$(echo "$JSON_OUTPUT" | jq '.invalidated_verifications | map(select(.target_url | contains("new-verification"))) | length')
 if [ "$VERIFICATION_INVALIDATED" -ne 1 ]; then
     echo "❌ FAILED: New Verification not found in invalidated verifications"
-    rm -rf "${TEST_DIR}"
     exit 1
 fi
 
-# Clean up
-rm -rf "${TEST_DIR}"
 exit 0

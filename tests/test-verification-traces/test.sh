@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -uo pipefail
+
+TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Create log file immediately to ensure it exists for runner
 echo "Starting test..." > "${TEST_DIR}/test_results.log"
@@ -49,11 +51,11 @@ fi
 echo "$OUTPUT" > "${TEST_DIR}/actual_output.md"
 
 # Compare with expected output
-if ! diff -u "${TEST_DIR}/expected_output.md" "${TEST_DIR}/actual_output.md"; then
+if ! diff -u "${TEST_SCRIPT_DIR}/expected/expected_output.md" "${TEST_DIR}/actual_output.md"; then
     echo "❌ FAILED: Markdown output does not match expected format"
-    echo "Expected: ${TEST_DIR}/expected_output.md"
+    echo "Expected: ${TEST_SCRIPT_DIR}/expected/expected_output.md"
     echo "Actual: ${TEST_DIR}/actual_output.md"
-    diff -u "${TEST_DIR}/expected_output.md" "${TEST_DIR}/actual_output.md"
+    diff -u "${TEST_SCRIPT_DIR}/expected/expected_output.md" "${TEST_DIR}/actual_output.md"
     exit 1
 fi
 
@@ -84,12 +86,12 @@ fi
 echo "$OUTPUT" | jq '.' > "${TEST_DIR}/actual_output.json"
 
 # Compare JSON outputs using jq (to handle formatting differences)
-EXPECTED_JSON=$(jq -S '.' "${TEST_DIR}/expected_output.json")
+EXPECTED_JSON=$(jq -S '.' "${TEST_SCRIPT_DIR}/expected/expected_output.json")
 ACTUAL_JSON=$(jq -S '.' "${TEST_DIR}/actual_output.json")
 
 if [ "$EXPECTED_JSON" != "$ACTUAL_JSON" ]; then
     echo "❌ FAILED: JSON output does not match expected format"
-    echo "Expected: ${TEST_DIR}/expected_output.json"
+    echo "Expected: ${TEST_SCRIPT_DIR}/expected/expected_output.json"
     echo "Actual: ${TEST_DIR}/actual_output.json"
     diff -u <(echo "$EXPECTED_JSON") <(echo "$ACTUAL_JSON") || true
     exit 1
@@ -421,8 +423,8 @@ fi
 echo "$OUTPUT" > "${TEST_DIR}/actual_redundant_output.md"
 
 # Compare with expected output if it exists
-if [ -f "${TEST_DIR}/expected_redundant_output.md" ]; then
-    if ! diff -u "${TEST_DIR}/expected_redundant_output.md" "${TEST_DIR}/actual_redundant_output.md" > "${TEST_DIR}/diff_redundant.txt" 2>&1; then
+if [ -f "${TEST_SCRIPT_DIR}/expected/expected_redundant_output.md" ]; then
+    if ! diff -u "${TEST_SCRIPT_DIR}/expected/expected_redundant_output.md" "${TEST_DIR}/actual_redundant_output.md" > "${TEST_DIR}/diff_redundant.txt" 2>&1; then
         echo "❌ FAILED: Redundant relations markdown output does not match expected"
         echo "Diff (expected vs actual):"
         cat "${TEST_DIR}/diff_redundant.txt"
@@ -457,8 +459,8 @@ fi
 echo "$OUTPUT" | jq '.' > "${TEST_DIR}/actual_redundant_output.json"
 
 # Compare JSON outputs if expected exists
-if [ -f "${TEST_DIR}/expected_redundant_output.json" ]; then
-    EXPECTED_JSON=$(jq -S '.' "${TEST_DIR}/expected_redundant_output.json")
+if [ -f "${TEST_SCRIPT_DIR}/expected/expected_redundant_output.json" ]; then
+    EXPECTED_JSON=$(jq -S '.' "${TEST_SCRIPT_DIR}/expected/expected_redundant_output.json")
     ACTUAL_JSON=$(jq -S '.' "${TEST_DIR}/actual_redundant_output.json")
 
     if [ "$EXPECTED_JSON" != "$ACTUAL_JSON" ]; then

@@ -1,5 +1,7 @@
 #!/bin/bash
-set -euo pipefail
+set -uo pipefail
+
+TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Create log file immediately to ensure it exists for runner
 echo "Starting test..." > "${TEST_DIR}/test_results.log"
@@ -60,40 +62,19 @@ printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results_default.log"
 GOTTEN_CONTENT=$(echo "$OUTPUT" | grep -v "INFO  reqvire::config" | grep -v "Warning: Element" | grep -v "DEBUG:")
 SANITIZED_OUTPUT=$(echo "$GOTTEN_CONTENT" | sed -E 's#https://[^ )]+/blob/[a-f0-9]{7,40}/##g')
 
-# Load expected content from file
-EXPECTED_CONTENT=$(cat "${TEST_DIR}/expected_impact.md")
-
 # Check exit code AFTER extracting output for better error messages
 if [ $EXIT_CODE -ne 0 ]; then
     echo "❌ FAILED: Change impact detection failed with exit code $EXIT_CODE"
-    echo ""
-    echo "Expected:"
-    echo "$EXPECTED_CONTENT"
-    echo ""
-    echo "Got:"
     echo "$SANITIZED_OUTPUT"
-    echo ""
-    diff -u <(echo "$EXPECTED_CONTENT") <(echo "$SANITIZED_OUTPUT") || true
-    rm -rf "${TEST_DIR}"
     exit 1
 fi
 
 # Test 1: Verify that change impact report shows verifiedBy relation
-if ! diff <(echo "$EXPECTED_CONTENT") <(echo "$SANITIZED_OUTPUT") > /dev/null; then
+if ! diff -u "${TEST_SCRIPT_DIR}/expected/expected_impact.md" <(echo "$SANITIZED_OUTPUT"); then
   echo "❌ FAILED: Change impact report missing verifiedBy relation or invalidated verifications."
   echo ""
-  echo "Expected:"
-  echo "$EXPECTED_CONTENT"
-  echo ""
-  echo "Got:"
-  echo "$SANITIZED_OUTPUT"
-  echo ""
-  diff -u <(echo "$EXPECTED_CONTENT") <(echo "$SANITIZED_OUTPUT") || true
-  rm -rf "${TEST_DIR}"
+  echo "If changes are intentional, update ${TEST_SCRIPT_DIR}/expected/expected_impact.md"
   exit 1
 fi
 
-
-# Clean up
-rm -rf "${TEST_DIR}"
 exit 0

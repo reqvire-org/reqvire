@@ -1,5 +1,5 @@
 #!/bin/bash
-set -euo pipefail
+set -uo pipefail
 
 TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -89,7 +89,7 @@ fi
 # Element Name<br/>📎 DesignSpec.md
 
 # Extract expected content (trimmed)
-EXPECTED_PATTERN=$(cat "${TEST_SCRIPT_DIR}/expected-diagram-content.txt" | head -1)
+EXPECTED_PATTERN=$(cat "${TEST_SCRIPT_DIR}/expected/expected-diagram-content.txt" | head -1)
 
 # Check for the expected pattern in the HTML file
 if ! grep -qF "$EXPECTED_PATTERN" "$SPEC_HTML"; then

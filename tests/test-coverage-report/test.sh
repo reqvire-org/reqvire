@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -uo pipefail
+
+TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Test: Verification Coverage Report
 # --------------------------------------
@@ -43,19 +45,10 @@ if [ $EXIT_CODE -ne 0 ]; then
 fi
 
 # Compare output with expected output
-EXPECTED_OUTPUT=$(cat "${TEST_DIR}/expected_output.md")
-
-if [ "$OUTPUT" != "$EXPECTED_OUTPUT" ]; then
+if ! diff -u "${TEST_SCRIPT_DIR}/expected/expected_output.md" <(echo "$OUTPUT"); then
     echo "❌ FAILED: Coverage report output does not match expected output"
     echo ""
-    echo "Expected:"
-    echo "$EXPECTED_OUTPUT"
-    echo ""
-    echo "Actual:"
-    echo "$OUTPUT"
-    echo ""
-    echo "Diff:"
-    diff -u <(echo "$EXPECTED_OUTPUT") <(echo "$OUTPUT") || true
+    echo "If changes are intentional, update ${TEST_SCRIPT_DIR}/expected/expected_output.md"
     exit 1
 fi
 

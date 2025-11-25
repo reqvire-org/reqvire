@@ -1,9 +1,24 @@
 #!/bin/bash
+set -uo pipefail
 
 # Test: Format Command Requirements Verification
 # This test verifies the format command requirements from SystemRequirements and UserRequirements
 
-#set -e
+TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Helper function to compare files and show diff on failure
+assert_file_matches() {
+  local expected="$1"
+  local actual="$2"
+  local description="$3"
+
+  if ! diff -u "$expected" "$actual"; then
+    echo "❌ FAILED: $description"
+    echo ""
+    echo "If changes are intentional, update $expected"
+    exit 1
+  fi
+}
 
 # Use the test directory provided by run_tests.sh
 cd "$TEST_DIR"
@@ -35,14 +50,7 @@ fi
 sed 's/\x1b\[[0-9;]*m//g' dry_run_output.txt > dry_run_clean.txt
 
 # Test 1.2: Compare diff output with expected diff file (file order is now deterministic)
-if [ -f expected_diff.txt ]; then
-    if ! diff -u expected_diff.txt dry_run_clean.txt > /dev/null; then
-        echo "FAIL: Diff output does not match expected diff output"
-        echo "Differences (first 80 lines):"
-        diff -u expected_diff.txt dry_run_clean.txt | head -80
-        exit 1
-    fi
-fi
+assert_file_matches "${TEST_SCRIPT_DIR}/expected/expected_diff.txt" dry_run_clean.txt "Diff output does not match expected diff output"
 
 EXPECTED_LINK_CONVERSION="\[MOE_UA\](MOEs.md#moe_ua)"
 EXPECTED_SIMPLE_ID_CONVERSION="\[Requirements Processing\](SystemRequirements/Requirements.md#requirements-processing)"
@@ -236,40 +244,10 @@ fi
 
 # Test 3.11: Verify complete formatted file matches expected output
 # Compare entire UserStories.md file with expected output
-if [ -f expected_UserStories.md ]; then
-    if ! diff -u expected_UserStories.md UserStories.md > /dev/null; then
-        echo "FAIL: UserStories.md does not match expected output"
-        echo "Differences:"
-        diff -u expected_UserStories.md UserStories.md | head -50
-        exit 1
-    fi
-else
-    # Fallback to line count if expected file doesn't exist
-    EXPECTED_USERSTORIES_LINES=90
-    ACTUAL_USERSTORIES_LINES=$(wc -l < UserStories.md)
-    if [ "$ACTUAL_USERSTORIES_LINES" -ne "$EXPECTED_USERSTORIES_LINES" ]; then
-        echo "FAIL: UserStories.md line count mismatch. Expected $EXPECTED_USERSTORIES_LINES, got $ACTUAL_USERSTORIES_LINES"
-        exit 1
-    fi
-fi
+assert_file_matches "${TEST_SCRIPT_DIR}/expected/expected_UserStories.md" UserStories.md "UserStories.md does not match expected output"
 
 # Compare entire MOEs.md file with expected output
-if [ -f expected_MOEs.md ]; then
-    if ! diff -u expected_MOEs.md MOEs.md > /dev/null; then
-        echo "FAIL: MOEs.md does not match expected output"
-        echo "Differences:"
-        diff -u expected_MOEs.md MOEs.md | head -30
-        exit 1
-    fi
-else
-    # Fallback to line count
-    EXPECTED_MOES_LINES=21
-    ACTUAL_MOES_LINES=$(wc -l < MOEs.md)
-    if [ "$ACTUAL_MOES_LINES" -ne "$EXPECTED_MOES_LINES" ]; then
-        echo "FAIL: MOEs.md line count mismatch. Expected $EXPECTED_MOES_LINES, got $ACTUAL_MOES_LINES"
-        exit 1
-    fi
-fi
+assert_file_matches "${TEST_SCRIPT_DIR}/expected/expected_MOEs.md" MOEs.md "MOEs.md does not match expected output"
 
 # Test 4: Verify no additional changes needed (idempotent behavior)
 echo "Running: reqvire format (preview mode - second time)" >> test_results.log
@@ -348,56 +326,17 @@ fi
 
 # Test 8: Document Structure Normalization - Missing Headers
 # Test 8.1: File with no page header and no section header
-if [ -f expected_TestNoHeaders.md ]; then
-    if ! diff -u expected_TestNoHeaders.md TestNoHeaders.md > /dev/null; then
-        echo "FAIL: TestNoHeaders.md does not match expected output (headers not added correctly)"
-        echo "Differences:"
-        diff -u expected_TestNoHeaders.md TestNoHeaders.md | head -30
-        exit 1
-    fi
-fi
+assert_file_matches "${TEST_SCRIPT_DIR}/expected/expected_TestNoHeaders.md" TestNoHeaders.md "TestNoHeaders.md does not match expected output (headers not added correctly)"
 
 # Test 8.2: File with page header but no section header
-if [ -f expected_TestNoSectionHeader.md ]; then
-    if ! diff -u expected_TestNoSectionHeader.md TestNoSectionHeader.md > /dev/null; then
-        echo "FAIL: TestNoSectionHeader.md does not match expected output (section header not added)"
-        echo "Differences:"
-        diff -u expected_TestNoSectionHeader.md TestNoSectionHeader.md | head -30
-        exit 1
-    fi
-fi
+assert_file_matches "${TEST_SCRIPT_DIR}/expected/expected_TestNoSectionHeader.md" TestNoSectionHeader.md "TestNoSectionHeader.md does not match expected output (section header not added)"
 
 # Test 8.3: File with section header but no page header
-if [ -f expected_TestNoPageHeader.md ]; then
-    if ! diff -u expected_TestNoPageHeader.md TestNoPageHeader.md > /dev/null; then
-        echo "FAIL: TestNoPageHeader.md does not match expected output (page header not added)"
-        echo "Differences:"
-        diff -u expected_TestNoPageHeader.md TestNoPageHeader.md | head -30
-        exit 1
-    fi
-fi
+assert_file_matches "${TEST_SCRIPT_DIR}/expected/expected_TestNoPageHeader.md" TestNoPageHeader.md "TestNoPageHeader.md does not match expected output (page header not added)"
 
 # Test 9: Attachment Display Name Preservation
 # Test 9.1: Verify attachment with human-readable display name is preserved
-if [ -f expected_AttachmentTest.md ]; then
-    if ! diff -u expected_AttachmentTest.md AttachmentTest.md > /dev/null; then
-        echo "FAIL: AttachmentTest.md does not match expected output (attachment display name not preserved)"
-        echo "Differences:"
-        diff -u expected_AttachmentTest.md AttachmentTest.md | head -30
-        exit 1
-    fi
-fi
-
-# Test 9.2: Verify format does not use identifier fragment as display name
-if grep -q "\[my-test-behavior\](Behaviors.md#my-test-behavior)" AttachmentTest.md; then
-    echo "FAIL: Format used identifier fragment 'my-test-behavior' instead of element name"
-    exit 1
-fi
-
-# Test 9.3: Verify actual element name is used as display name
-if ! grep -q "\[My Test Behavior\](Behaviors.md#my-test-behavior)" AttachmentTest.md; then
-    echo "FAIL: Attachment display name should be actual element name 'My Test Behavior'"
-    exit 1
-fi
+assert_file_matches "${TEST_SCRIPT_DIR}/expected/expected_AttachmentTest.md" AttachmentTest.md "AttachmentTest.md does not match expected output (attachment display name not preserved)"
 
 # No cleanup needed - temporary directory will be deleted
+exit 0

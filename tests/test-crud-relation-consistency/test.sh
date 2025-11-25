@@ -1,5 +1,5 @@
 #!/bin/bash
-set -euo pipefail
+set -uo pipefail
 
 # Test: Relation Consistency Maintenance
 # ----------------------------------------------------
@@ -413,7 +413,7 @@ SUMMARY_EXIT=$?
 set -e
 
 # Compare with expected output
-if ! diff -u "${TEST_SCRIPT_DIR}/expected-summary.json" <(echo "$SUMMARY_OUTPUT"); then
+if ! diff -u "${TEST_SCRIPT_DIR}/expected/expected-summary.json" <(echo "$SUMMARY_OUTPUT"); then
   echo "❌ FAILED: Summary output does not match expected"
   echo ""
   echo "Differences shown above (expected vs actual)"
