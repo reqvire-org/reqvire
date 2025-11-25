@@ -204,7 +204,7 @@ cat > "${TEST_DIR}/specifications/OtherRequirements.md" << 'EOF'
 EOF
 
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv "Derived Requirement 2" "specifications/OtherRequirements.md" "Other Section" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv "Derived Requirement 2" "specifications/OtherRequirements.md" 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -278,7 +278,7 @@ cat > "${TEST_DIR}/specifications/SystemTests.md" << 'EOF'
 EOF
 
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv "Test 2" "specifications/SystemTests.md" "Integration Tests" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv "Test 2" "specifications/SystemTests.md" 2>&1)
 EXIT_CODE=$?
 set -e
 

@@ -233,7 +233,7 @@ fi
 
 # Move element to different file using mv command
 set +e
-MV_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv "My Feature Name" "specifications/Requirements.md" "Core Features" 2>&1)
+MV_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv "My Feature Name" "specifications/Requirements.md" 2>&1)
 MV_EXIT=$?
 set -e
 

@@ -300,7 +300,7 @@ EOF
 
 # Move the constraint element to a new file
 set +e
-MOVE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv "Test Constraint Element" --to-file specifications/Refinements.md 2>&1)
+MOVE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv "Test Constraint Element" specifications/Refinements.md 2>&1)
 MOVE_EXIT=$?
 set -e
 
@@ -334,7 +334,7 @@ fi
 
 # Move back for cleanup
 set +e
-MOVE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv "Test Constraint Element" --to-file specifications/Requirements.md 2>&1)
+MOVE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv "Test Constraint Element" specifications/Requirements.md 2>&1)
 MOVE_EXIT=$?
 set -e
 

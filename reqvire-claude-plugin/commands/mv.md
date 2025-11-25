@@ -1,6 +1,6 @@
 ---
 allowed-tools: Read, Bash(reqvire:*)
-argument-hint: [element-name] [--to-file] [--index]
+argument-hint: <element-name> <file> [index]
 description: Move an element to a different file or position
 model: claude-sonnet-4-5-20250929
 ---
@@ -63,8 +63,9 @@ ${1:-The user will provide element name and target location.}
 
 ## Move Options
 
-- `<target-file>`: Target file path (positional argument after element name)
-- `--index=<n>`: Position within target file (0-based, default: append to end)
+- `<element-name>`: Name of element to move (required)
+- `<file>`: Target file path (required)
+- `[index]`: Position within target file (0-based, default: append to end)
 - `--dry-run`: Preview changes without applying
 - `--json`: Output results in JSON format
 
@@ -84,7 +85,7 @@ reqvire mv "User Authentication" "specifications/Security.md"
 
 **Insert at specific position (index 0 = first element in file):**
 ```bash
-reqvire mv "High Priority Req" "specifications/Critical.md" --index=0
+reqvire mv "High Priority Req" "specifications/Critical.md" 0
 ```
 
 **Preview before moving:**

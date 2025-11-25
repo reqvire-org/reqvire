@@ -422,20 +422,13 @@ The system shall provide a diagram removal function, activated by the remove-dia
 
 ### CLI Add Element Command
 
-The system shall provide an `add` command to create new model elements by accepting element definition in Markdown format from stdin or as an inline string argument, validating the structure, and inserting it at the specified location.
+The system shall provide an `add` command to create new model elements by accepting element definition in Markdown format from stdin, validating the structure, and inserting it at the specified location.
 
 #### Details
 The `add` command shall:
-- Accept element definition input from:
-  - Standard input (stdin) for piped or redirected content
-  - Last positional argument as inline string when not reading from stdin
-- Accept target location arguments (resolved relative to Git repository root):
-  - Target file path (required, provided as argument or `--to-file` flag)
-  - Index within file (optional, provided as argument or `--index` flag, 0-based, defaults to end of file)
-- Support command syntax:
-  - `reqvire add <file> [<index>]` - reads element from stdin
-  - `reqvire add <file> [<index>] <element-markdown>` - element as last argument
-  - `reqvire add --to-file=<file> --index=<n> < element.md` - with named flags
+- Accept element definition input from standard input (stdin)
+- Accept target file path as required positional argument (resolved relative to Git repository root)
+- Support command syntax: `reqvire add <file>`
 - Validate element structure before insertion
 - Apply changes immediately by default
 - Support `--dry-run` flag to preview changes without applying
@@ -479,13 +472,10 @@ The system shall provide a `mv` command to move existing model elements to diffe
 
 #### Details
 The `mv` command shall:
-- Accept element name (required, provided as argument)
-- Accept target location arguments (resolved relative to Git repository root):
-  - Target file path (required, provided as argument or `--to-file` flag)
-  - Index within target file (optional, provided as argument or `--index` flag, 0-based, defaults to end of file)
-- Support command syntax:
-  - `reqvire mv <element-name> <file> [<index>]` - positional arguments
-  - `reqvire mv <element-name> --to-file=<file> --index=<n>` - with named flags
+- Accept element name as required positional argument
+- Accept target file path as required positional argument (resolved relative to Git repository root)
+- Accept optional index as positional argument (0-based, defaults to end of file)
+- Support command syntax: `reqvire mv <element-name> <file> [<index>]`
 - Move element to target location at specified index
 - Update all incoming relations system-wide with new identifier
 - Preserve element content, metadata, and outgoing relations

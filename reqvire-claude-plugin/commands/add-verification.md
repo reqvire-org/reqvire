@@ -117,12 +117,6 @@ ${1:-The user will specify which requirement needs verification.}
    EOF
    ```
 
-   Optional: Insert at specific position (0-based index):
-   ```bash
-   reqvire add "specifications/Verifications/<file>.md" --index=0 <<'EOF'
-   ...
-   EOF
-   ```
 
    The add command automatically:
    - Validates markdown format
@@ -160,9 +154,9 @@ After adding verifications, you may need to reorganize:
 reqvire mv "<verification-name>" "specifications/Verifications/<file>.md"
 ```
 
-**Move verification with specific position:**
+**Move verification with specific position (0-based index):**
 ```bash
-reqvire mv "<verification-name>" "<target-file>" --index=0
+reqvire mv "<verification-name>" "<target-file>" 0
 ```
 
 **Remove verification:**

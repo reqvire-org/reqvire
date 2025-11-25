@@ -193,7 +193,7 @@ EOF
 cd "${TMP_DIR}/project-root" && git add submodule/specifications/OtherRequirements.md && git commit -m "Add other requirements" >/dev/null 2>&1
 
 set +e
-OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" mv "Submodule System" --to-file="specifications/OtherRequirements.md" 2>&1)
+OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" mv "Submodule System" "specifications/OtherRequirements.md" 2>&1)
 EXIT_CODE=$?
 set -e
 

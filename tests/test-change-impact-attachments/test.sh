@@ -110,7 +110,7 @@ EOF
 
 # Move Data Format Spec to Refinements.md
 set +e
-MV_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv "Data Format Spec" --to-file specifications/Refinements.md 2>&1)
+MV_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv "Data Format Spec" specifications/Refinements.md 2>&1)
 MV_EXIT=$?
 set -e
 

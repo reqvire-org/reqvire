@@ -230,15 +230,10 @@ pub enum Commands {
     },
 
     /// Add new element to model from Markdown definition
-    #[clap(override_help = "Add new element to model from Markdown definition\n\nADD OPTIONS:\n      --to-file <FILE>           Target file path (relative to git repository root)\n      --index <INDEX>            Index within file (0-based, defaults to end)\n      --dry-run                  Preview changes without applying\n      --json                     Output results in JSON format\n\nUSAGE:\n    reqvire add <file> [<index>]           # reads element from stdin\n    reqvire add <file> [<index>] <element>  # element as last argument\n    reqvire add --to-file=<file> --index=<n> < element.md")]
+    #[clap(override_help = "Add new element to model from Markdown definition\n\nADD OPTIONS:\n       <FILE>                    Target file path (relative to git repository root)\n      --dry-run                  Preview changes without applying\n      --json                     Output results in JSON format\n\nUSAGE:\n    reqvire add <file>           # reads element from stdin")]
     Add {
         /// Target file path (relative to git repository root)
-        #[clap(long, value_name = "FILE", help_heading = "ADD OPTIONS")]
-        to_file: Option<String>,
-
-        /// Index within file (0-based, defaults to end)
-        #[clap(long, value_name = "INDEX", help_heading = "ADD OPTIONS")]
-        index: Option<usize>,
+        file: String,
 
         /// Preview changes without applying
         #[clap(long, help_heading = "ADD OPTIONS")]
@@ -247,10 +242,6 @@ pub enum Commands {
         /// Output results in JSON format
         #[clap(long, help_heading = "ADD OPTIONS")]
         json: bool,
-
-        /// Positional arguments: [file]
-        #[clap(trailing_var_arg = true)]
-        args: Vec<String>,
     },
 
     /// Remove element from model
@@ -269,17 +260,15 @@ pub enum Commands {
     },
 
     /// Move element to different location
-    #[clap(override_help = "Move element to different location\n\nMV OPTIONS:\n       <ELEMENT_NAME>           Element name\n      --to-file <FILE>          Target file path (relative to git repository root)\n      --index <INDEX>           Index within file (0-based, defaults to end)\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n\nUSAGE:\n    reqvire mv <element-name> <file> [<index>]\n    reqvire mv <element-name> --to-file=<file> --index=<n>")]
+    #[clap(override_help = "Move element to different location\n\nMV OPTIONS:\n       <ELEMENT_NAME>           Element name\n       <FILE>                   Target file path (relative to git repository root)\n       [INDEX]                  Index within file (0-based, defaults to end)\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n\nUSAGE:\n    reqvire mv <element-name> <file> [<index>]")]
     Mv {
         /// Element name
         element_name: String,
 
         /// Target file path (relative to git repository root)
-        #[clap(long, value_name = "FILE", help_heading = "MV OPTIONS")]
-        to_file: Option<String>,
+        file: String,
 
         /// Index within file (0-based, defaults to end)
-        #[clap(long, value_name = "INDEX", help_heading = "MV OPTIONS")]
         index: Option<usize>,
 
         /// Preview changes without applying
@@ -289,10 +278,6 @@ pub enum Commands {
         /// Output results in JSON format
         #[clap(long, help_heading = "MV OPTIONS")]
         json: bool,
-
-        /// Positional arguments: [file] [index]
-        #[clap(trailing_var_arg = true)]
-        args: Vec<String>,
     },
 
     /// Rename element
@@ -890,14 +875,7 @@ pub fn handle_command(
 
             return Ok(0);
         },
-        Some(Commands::Add { to_file, index, dry_run, json, args }) => {
-            // Parse arguments
-            let target_file = to_file.as_ref()
-                .or(args.get(0))
-                .ok_or_else(|| ReqvireError::ProcessError(
-                    "Target file required. Usage: reqvire add <file>".to_string()
-                ))?;
-
+        Some(Commands::Add { file, dry_run, json }) => {
             // Read element markdown from stdin
             use std::io::Read;
             let mut element_markdown = String::new();
@@ -914,8 +892,8 @@ pub fn handle_command(
             let result = crud::add_element(
                 &mut model_manager,
                 &element_markdown,
-                target_file,
-                index,
+                &file,
+                None,  // index not supported in positional-only mode
                 excluded_filename_patterns,
                 &current_dir,
                 &git_root,
@@ -953,23 +931,16 @@ pub fn handle_command(
 
             return Ok(0);
         },
-        Some(Commands::Mv { element_name, to_file, index, dry_run, json, args }) => {
+        Some(Commands::Mv { element_name, file, index, dry_run, json }) => {
             // Resolve element name to identifier
             let element_id = model_manager.graph_registry.find_element_by_name(&element_name)?;
-
-            // Parse arguments
-            let target_file = to_file.as_ref()
-                .or(args.get(0))
-                .ok_or_else(|| ReqvireError::ProcessError(
-                    "Target file required. Usage: reqvire mv <element-name> <file>".to_string()
-                ))?;
 
             // Call CRUD operation
             let git_root = git_commands::get_git_root_dir()?;
             let result = crud::move_element(
                 &mut model_manager,
                 &element_id,
-                target_file,
+                &file,
                 index,
                 excluded_filename_patterns,
                 &current_dir,

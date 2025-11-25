@@ -87,11 +87,9 @@ LINT OPTIONS:
       --json                    Output results in JSON format
 
 ADD OPTIONS:
-      --to-file <FILE>          Target file path (relative to git repository root)
-      --index <INDEX>           Index within file (0-based, defaults to end)
+       <FILE>                   Target file path (relative to git repository root)
       --dry-run                 Preview changes without applying
       --json                    Output results in JSON format
-       <ARGS>                   Positional arguments: [file]
 
 RM OPTIONS:
        <ELEMENT_NAME>           Element name
@@ -100,11 +98,10 @@ RM OPTIONS:
 
 MV OPTIONS:
        <ELEMENT_NAME>           Element name
-      --to-file <FILE>          Target file path (relative to git repository root)
-      --index <INDEX>           Index within file (0-based, defaults to end)
+       <FILE>                   Target file path (relative to git repository root)
+       <INDEX>                  Index within file (0-based, defaults to end)
       --dry-run                 Preview changes without applying
       --json                    Output results in JSON format
-       <ARGS>                   Positional arguments: [file] [index]
 
 RENAME OPTIONS:
        <ELEMENT_NAME>           Current element name

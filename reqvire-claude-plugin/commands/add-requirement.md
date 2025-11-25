@@ -78,12 +78,6 @@ ${1:-The user will provide requirement details.}
    EOF
    ```
 
-   Optional: Insert at specific position (0-based index):
-   ```bash
-   reqvire add "<file-path>" --index=0 <<'EOF'
-   ...
-   EOF
-   ```
 
    The add command automatically:
    - Validates markdown format
@@ -118,9 +112,9 @@ After adding requirements, you may need to reorganize:
 reqvire mv "<element-name>" "<target-file>"
 ```
 
-**Move element with specific position:**
+**Move element with specific position (0-based index):**
 ```bash
-reqvire mv "<element-name>" "<target-file>" --index=0
+reqvire mv "<element-name>" "<target-file>" 0
 ```
 
 **Remove element:**
