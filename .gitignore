@@ -28,3 +28,7 @@ codefetch.config.mjs
 .claude/
 
 Plan.md
+PlanTodo.md
+Prompt.md
+loop/
+yolo_claude_loop.sh
