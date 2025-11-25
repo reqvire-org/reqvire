@@ -468,6 +468,9 @@ This test verifies that the system provides a unified `search` command functiona
    - `--filter-file="**/*Reqs.md"` (glob)
    - `--filter-name=".*safety.*"` (regex)
    - `--filter-type="user-requirement"` (exact)
+   - `--filter-type="constraint"` (Refinement type)
+   - `--filter-type="behavior"` (Refinement type)
+   - `--filter-type="specification"` (Refinement type)
    - `--filter-content="MUST"` (regex)
    - `--filter-page-content="architecture"` (regex)
    - `--have-relations=verifiedBy` (comma-separated)
@@ -529,7 +532,9 @@ This test verifies that the system provides a unified `search` command functiona
 16. **Attachments in search output (full mode)**
     Command: `reqvire search --json`
     - JSON output must include `attachments` field for each element
-    - Attachments is an array of file path strings
+    - Attachments is an array of strings (file paths and element identifiers)
+    - File path attachments displayed as relative paths (e.g., `"path/to/file.pdf"`)
+    - Element identifier attachments displayed as full identifiers (e.g., `"specifications/File.md#refinement-element"`)
     - Elements without attachments have empty array `[]`
     - Attachment paths are relative to git root
 
