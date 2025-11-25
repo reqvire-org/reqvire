@@ -32,3 +32,6 @@ PlanTodo.md
 Prompt.md
 loop/
 yolo_claude_loop.sh
+
+# Generated HTML output
+cli/html/
