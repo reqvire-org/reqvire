@@ -323,6 +323,15 @@ fn build_search_result(
                         element::VerificationType::Demonstration => c.total_verifications_demonstration += 1,
                     }
                 }
+                element::ElementType::Refinement(ref_t) => {
+                    // Count refinement types as custom element types for now
+                    let type_name = match ref_t {
+                        element::RefinementType::Constraint => "constraint",
+                        element::RefinementType::Behavior => "behavior",
+                        element::RefinementType::Specification => "specification",
+                    };
+                    *c.custom_element_types.entry(type_name.to_string()).or_insert(0) += 1;
+                }
                 element::ElementType::Other(custom_type) => {
                     *c.custom_element_types.entry(custom_type.clone()).or_insert(0) += 1;
                 }
