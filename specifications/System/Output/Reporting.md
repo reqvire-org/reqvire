@@ -68,7 +68,9 @@ The search report must include:
 - Element content - omitted in short mode
 - Verified and satisfied relations counts - omitted in short mode
 - Complete list of relations with targets and types
-- Complete list of attachments as file paths - omitted in short mode
+- Complete list of attachments as strings (file paths and element identifiers) - omitted in short mode
+  - File path attachments displayed as relative paths (e.g., `"path/to/file.pdf"`)
+  - Element identifier attachments displayed as full identifiers (e.g., `"specifications/File.md#refinement-element"`)
 
 **Global Counts:**
 - Total files, pages, sections, and elements - omitted in short mode
@@ -162,7 +164,7 @@ System shall support markdown and JSON output formats.
 - Markdown shall show hierarchical structure (folders > files > sections > elements)
 - JSON format shall use structured data with folders, files, sections, elements, relations, and attachments
 - Both formats shall represent the same filtered or complete model data
-- Element attachments shall be included as an array of file paths in both formats
+- Element attachments shall be included as an array of strings in both formats (file paths and element identifiers)
 
 #### Relations
   * derivedFrom: [CLI Model Diagram Command](../../Interfaces/CLI.md#cli-model-diagram-command)
