@@ -1,4 +1,24 @@
-Found 4 file(s) with formatting changes:
+Found 5 file(s) with formatting changes:
+
+📄 AttachmentTest.md
+  01     # Elements
+  02
+  03     ### Attachment Display Name Test
+
+  05     This requirement tests that attachment display names are preserved by format.
+  06
+  07     #### Attachments
+  08 -     * [Human Readable Behavior Name](Behaviors.md#my-test-behavior)
+  08 +     * [My Test Behavior](Behaviors.md#my-test-behavior)
+  09
+  10 -   #### Metadata
+  10 -     * type: requirement
+  10 -   ␤
+  10     #### Relations
+  11       * derivedFrom: [Managing MBSE Models](UserStories.md#managing-mbse-models)
+  12     ---
+
+
 
 📄 MOEs.md
   01     # Elements

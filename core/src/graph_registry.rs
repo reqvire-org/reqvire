@@ -1060,8 +1060,13 @@ impl GraphRegistry {
                             true
                         ).unwrap_or_else(|_| identifier.clone());
 
-                        // Extract display name from identifier (fragment part)
-                        let display_name = identifier.split('#').last().unwrap_or(identifier);
+                        // Look up actual element name from registry for human-readable display
+                        let display_name = self.get_element(identifier)
+                            .map(|e| e.name.clone())
+                            .unwrap_or_else(|| {
+                                // Fallback to identifier fragment if element not found
+                                identifier.split('#').last().unwrap_or(identifier).to_string()
+                            });
                         markdown.push_str(&format!("  * [{}]({})\n", display_name, relative_id));
                     }
                 }

@@ -377,4 +377,27 @@ if [ -f expected_TestNoPageHeader.md ]; then
     fi
 fi
 
+# Test 9: Attachment Display Name Preservation
+# Test 9.1: Verify attachment with human-readable display name is preserved
+if [ -f expected_AttachmentTest.md ]; then
+    if ! diff -u expected_AttachmentTest.md AttachmentTest.md > /dev/null; then
+        echo "FAIL: AttachmentTest.md does not match expected output (attachment display name not preserved)"
+        echo "Differences:"
+        diff -u expected_AttachmentTest.md AttachmentTest.md | head -30
+        exit 1
+    fi
+fi
+
+# Test 9.2: Verify format does not use identifier fragment as display name
+if grep -q "\[my-test-behavior\](Behaviors.md#my-test-behavior)" AttachmentTest.md; then
+    echo "FAIL: Format used identifier fragment 'my-test-behavior' instead of element name"
+    exit 1
+fi
+
+# Test 9.3: Verify actual element name is used as display name
+if ! grep -q "\[My Test Behavior\](Behaviors.md#my-test-behavior)" AttachmentTest.md; then
+    echo "FAIL: Attachment display name should be actual element name 'My Test Behavior'"
+    exit 1
+fi
+
 # No cleanup needed - temporary directory will be deleted

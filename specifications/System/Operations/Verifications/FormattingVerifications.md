@@ -58,6 +58,12 @@ This test verifies the format command requirements from SystemRequirements and U
 - System shall convert implementation file paths to clean filename references
 - System shall preserve external URLs without modification
 
+**Attachment Formatting:**
+- System shall format element identifier attachments with human-readable element names
+- System shall look up actual element name from registry for attachment display names
+- System shall NOT use identifier fragment as display name (e.g., NOT `[my-behavior]` but `[My Behavior]`)
+- System shall preserve file attachment display names (filename)
+
 ##### Test Criteria
 1. **Basic format functionality**
    - Format command runs successfully on test markdown files
@@ -100,6 +106,11 @@ This test verifies the format command requirements from SystemRequirements and U
    - Context lines maintain proper numbering continuity
    - Added lines show correct position in final file
    - Line numbering reflects final file structure accurately
+
+7. **Attachment display name preservation**
+   - Element identifier attachments use actual element name as display text
+   - Format does NOT replace human-readable names with identifier fragments
+   - File attachments preserve filename as display text
 
 #### Metadata
   * type: test-verification
