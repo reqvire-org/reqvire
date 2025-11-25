@@ -140,10 +140,13 @@ impl<'a> ModelDiagramGenerator<'a> {
                     sorted_elements.sort_by(|a, b| a.identifier.cmp(&b.identifier));
                     for element in sorted_elements {
                         let attachments: Vec<String> = element.attachments.iter()
-                            .map(|a| a.file_path
-                                .file_name()
-                                .map(|n| n.to_string_lossy().into_owned())
-                                .unwrap_or_else(|| a.file_path.to_string_lossy().into_owned()))
+                            .map(|a| match &a.target {
+                                crate::element::AttachmentTarget::FilePath(path) => path
+                                    .file_name()
+                                    .map(|n| n.to_string_lossy().into_owned())
+                                    .unwrap_or_else(|| path.to_string_lossy().into_owned()),
+                                crate::element::AttachmentTarget::ElementIdentifier(id) => id.clone(),
+                            })
                             .collect();
                         element_nodes.push(ElementNode {
                             identifier: element.identifier.clone(),
@@ -528,10 +531,13 @@ fn add_element_to_diagram(
 
        // Add attachment links to label
        for attachment in &element.attachments {
-           let attachment_name = attachment.file_path
-               .file_name()
-               .map(|n| n.to_string_lossy().into_owned())
-               .unwrap_or_else(|| attachment.file_path.to_string_lossy().into_owned());
+           let attachment_name = match &attachment.target {
+               crate::element::AttachmentTarget::FilePath(path) => path
+                   .file_name()
+                   .map(|n| n.to_string_lossy().into_owned())
+                   .unwrap_or_else(|| path.to_string_lossy().into_owned()),
+               crate::element::AttachmentTarget::ElementIdentifier(id) => id.clone(),
+           };
            label.push_str(&format!("<br/>📎 {}", escape_label(&attachment_name)));
        }
 
@@ -616,10 +622,13 @@ fn add_element_to_diagram(
                             // Build label with attachments
                             let mut lbl = existing_element.name.replace('"', "&quot;");
                             for attachment in &existing_element.attachments {
-                                let attachment_name = attachment.file_path
-                                    .file_name()
-                                    .map(|n| n.to_string_lossy().into_owned())
-                                    .unwrap_or_else(|| attachment.file_path.to_string_lossy().into_owned());
+                                let attachment_name = match &attachment.target {
+                                    crate::element::AttachmentTarget::FilePath(path) => path
+                                        .file_name()
+                                        .map(|n| n.to_string_lossy().into_owned())
+                                        .unwrap_or_else(|| path.to_string_lossy().into_owned()),
+                                    crate::element::AttachmentTarget::ElementIdentifier(id) => id.clone(),
+                                };
                                 lbl.push_str(&format!("<br/>📎 {}", escape_label(&attachment_name)));
                             }
                             (c, lbl)

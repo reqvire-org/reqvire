@@ -134,28 +134,30 @@ pub fn copy_model_files_to_temp(
             }
         }
 
-        // Copy all attachment files
+        // Copy all attachment files (only for FilePath attachments, not ElementIdentifier)
         for attachment in &node.element.attachments {
-            let path = &attachment.file_path;
-            let src = git_root.join(path);
-            let path_str = path.to_string_lossy().to_string();
+            if let crate::element::AttachmentTarget::FilePath(path) = &attachment.target {
+                let src = git_root.join(path);
+                let path_str = path.to_string_lossy().to_string();
 
-            if src.is_file() && !copied_files.contains(&path_str) {
-                // Strip subdirectory prefix from destination path if running from subdirectory
-                let dest = if let Some(prefix) = subdir_prefix {
-                    if let Ok(stripped) = path.strip_prefix(prefix) {
-                        temp_dir.join(stripped)
+                if src.is_file() && !copied_files.contains(&path_str) {
+                    // Strip subdirectory prefix from destination path if running from subdirectory
+                    let dest = if let Some(prefix) = subdir_prefix {
+                        if let Ok(stripped) = path.strip_prefix(prefix) {
+                            temp_dir.join(stripped)
+                        } else {
+                            temp_dir.join(path)
+                        }
                     } else {
                         temp_dir.join(path)
-                    }
-                } else {
-                    temp_dir.join(path)
-                };
+                    };
 
-                filesystem::copy_file_with_structure(&src, &dest)?;
-                copied_files.insert(path_str);
-                debug!("Copied attachment: {} -> {}", path.display(), dest.display());
+                    filesystem::copy_file_with_structure(&src, &dest)?;
+                    copied_files.insert(path_str);
+                    debug!("Copied attachment: {} -> {}", path.display(), dest.display());
+                }
             }
+            // Element identifier attachments don't need to be copied - they reference other elements
         }
     }
 

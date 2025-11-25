@@ -372,9 +372,12 @@ impl<'a> VerificationTraceGenerator<'a> {
             is_directly_verified,
             children,
             attachments: requirement.attachments.iter()
-                .map(|a| a.file_path.file_name()
-                    .map(|n| n.to_string_lossy().into_owned())
-                    .unwrap_or_else(|| a.file_path.to_string_lossy().into_owned()))
+                .map(|a| match &a.target {
+                    crate::element::AttachmentTarget::FilePath(path) => path.file_name()
+                        .map(|n| n.to_string_lossy().into_owned())
+                        .unwrap_or_else(|| path.to_string_lossy().into_owned()),
+                    crate::element::AttachmentTarget::ElementIdentifier(id) => id.clone(),
+                })
                 .collect(),
         })
     }

@@ -51,11 +51,18 @@ pub fn generate_readme_index(
             // Add attachment links if present
             if !element.attachments.is_empty() {
                 for attachment in &element.attachments {
-                    let attachment_path = attachment.file_path.to_string_lossy();
-                    let attachment_name = attachment.file_path
-                        .file_name()
-                        .map(|n| n.to_string_lossy().into_owned())
-                        .unwrap_or_else(|| attachment_path.to_string());
+                    let (attachment_path, attachment_name) = match &attachment.target {
+                        crate::element::AttachmentTarget::FilePath(path) => {
+                            let path_str = path.to_string_lossy().to_string();
+                            let name = path.file_name()
+                                .map(|n| n.to_string_lossy().into_owned())
+                                .unwrap_or_else(|| path_str.clone());
+                            (path_str, name)
+                        },
+                        crate::element::AttachmentTarget::ElementIdentifier(id) => {
+                            (id.clone(), id.clone())
+                        },
+                    };
                     index_content.push_str(&format!("  - 📎 [{}]({})\n", attachment_name, attachment_path));
                 }
             }

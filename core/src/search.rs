@@ -179,7 +179,7 @@ impl SearchFilters {
         // Attachment glob filter - must have an attachment matching the glob
         if let Some(g) = &self.attachment_glob {
             let has_matching_attachment = elem.attachments.iter()
-                .any(|a| g.is_match(a.file_path.to_string_lossy().as_ref()));
+                .any(|a| g.is_match(a.target.as_str().as_str()));
             if !has_matching_attachment {
                 return false;
             }
@@ -384,7 +384,7 @@ fn build_search_result(
         } else {
             Some(elem.attachments
                 .iter()
-                .map(|a| a.file_path.to_string_lossy().to_string())
+                .map(|a| a.target.as_str())
                 .collect())
         };
 

@@ -204,7 +204,7 @@ fn build_element_recursive(
     // Build attachments list
     let attachments: Vec<String> = element.attachments
         .iter()
-        .map(|a| a.file_path.to_string_lossy().to_string())
+        .map(|a| a.target.as_str())
         .collect();
 
     Some(ModelCentricElement {

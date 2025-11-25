@@ -393,7 +393,7 @@ pub fn attach(
         .map_err(|e| ReqvireError::IoError(e))?;
 
     // Check if attachment already exists (idempotent)
-    if element.attachments.iter().any(|a| a.file_path.to_string_lossy() == attachment_path) {
+    if element.attachments.iter().any(|a| a.target.as_str() == attachment_path) {
         // Already attached, return success without changes
         return Ok(CrudResult {
             operation: CrudOperation::Update,
@@ -489,7 +489,7 @@ pub fn mv_attachment(
     // Find all elements with this attachment
     let affected_elements: Vec<_> = model_manager.graph_registry.nodes.values()
         .map(|node| &node.element)
-        .filter(|elem| elem.attachments.iter().any(|a| a.file_path.to_string_lossy() == old_path))
+        .filter(|elem| elem.attachments.iter().any(|a| a.target.as_str() == old_path))
         .map(|elem| (elem.identifier.clone(), elem.file_path.clone()))
         .collect();
 
@@ -566,7 +566,7 @@ pub fn rm_attachment(
     // Find all elements with this attachment
     let affected_elements: Vec<_> = model_manager.graph_registry.nodes.values()
         .map(|node| &node.element)
-        .filter(|elem| elem.attachments.iter().any(|a| a.file_path.to_string_lossy() == attachment_path))
+        .filter(|elem| elem.attachments.iter().any(|a| a.target.as_str() == attachment_path))
         .map(|elem| elem.name.clone())
         .collect();
 

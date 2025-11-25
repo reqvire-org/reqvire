@@ -1,4 +1,4 @@
-use crate::element::{Element, SubSection, ElementType, RequirementType, Attachment};
+use crate::element::{Element, SubSection, ElementType, RequirementType, Attachment, AttachmentTarget};
 use crate::relation::Relation;
 use crate::error::ReqvireError;
 use crate::utils;
@@ -599,8 +599,9 @@ pub fn parse_elements(
                             };
 
                             // Check for duplicates
-                            if !element.attachments.iter().any(|a| a.file_path == attachment_path) {
-                                element.attachments.push(Attachment { file_path: attachment_path });
+                            let target = AttachmentTarget::FilePath(attachment_path.clone());
+                            if !element.attachments.iter().any(|a| a.target == target) {
+                                element.attachments.push(Attachment { target });
                             } else {
                                 let msg = format!(
                                     "Duplicate attachment '{}' in element '{}' (file: {}, line {})",

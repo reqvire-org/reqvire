@@ -403,18 +403,47 @@ impl GraphRegistry {
             let element = &element_node.element;
 
             for attachment in &element.attachments {
-                // Resolve attachment path relative to git root
-                let full_path = git_root.join(&attachment.file_path);
+                match &attachment.target {
+                    crate::element::AttachmentTarget::FilePath(file_path) => {
+                        // Resolve attachment path relative to git root
+                        let full_path = git_root.join(file_path);
 
-                if !full_path.exists() {
-                    errors.push(ReqvireError::MissingAttachmentFile(
-                        format!(
-                            "File {}: Element '{}' references missing attachment file: {}",
-                            element.file_path,
-                            element.name,
-                            attachment.file_path.display()
-                        ),
-                    ));
+                        if !full_path.exists() {
+                            errors.push(ReqvireError::MissingAttachmentFile(
+                                format!(
+                                    "File {}: Element '{}' references missing attachment file: {}",
+                                    element.file_path,
+                                    element.name,
+                                    file_path.display()
+                                ),
+                            ));
+                        }
+                    }
+                    crate::element::AttachmentTarget::ElementIdentifier(identifier) => {
+                        // Validate that the identifier points to an existing Refinement element
+                        if let Some(target_node) = self.nodes.get(identifier) {
+                            // Check if target is a Refinement element type
+                            if !target_node.element.element_type.is_refinement() {
+                                errors.push(ReqvireError::InvalidAttachmentTarget(
+                                    format!(
+                                        "File {}: Element '{}' has attachment to '{}' which is not a Refinement element (constraint, behavior, specification)",
+                                        element.file_path,
+                                        element.name,
+                                        identifier
+                                    ),
+                                ));
+                            }
+                        } else {
+                            errors.push(ReqvireError::MissingAttachmentTarget(
+                                format!(
+                                    "File {}: Element '{}' references missing attachment element: {}",
+                                    element.file_path,
+                                    element.name,
+                                    identifier
+                                ),
+                            ));
+                        }
+                    }
                 }
             }
         }
@@ -948,31 +977,53 @@ impl GraphRegistry {
         if !element.attachments.is_empty() {
             markdown.push_str("#### Attachments\n");
             for attachment in &element.attachments {
-                // Attachment paths are stored as git-root-relative paths
-                let attachment_path = attachment.file_path.to_string_lossy().to_string();
+                match &attachment.target {
+                    crate::element::AttachmentTarget::FilePath(file_path) => {
+                        // Attachment paths are stored as git-root-relative paths
+                        let attachment_path = file_path.to_string_lossy().to_string();
 
-                // Make the path relative to the current file's directory (same as relations)
-                let current_file_path = std::path::PathBuf::from(_current_file);
-                let current_folder = current_file_path.parent()
-                    .unwrap_or_else(|| std::path::Path::new("."))
-                    .to_path_buf();
+                        // Make the path relative to the current file's directory (same as relations)
+                        let current_file_path = std::path::PathBuf::from(_current_file);
+                        let current_folder = current_file_path.parent()
+                            .unwrap_or_else(|| std::path::Path::new("."))
+                            .to_path_buf();
 
-                // Use to_relative_identifier like we do for InternalPath relations
-                // Prepend "/" to indicate git-root-relative path
-                let absolute_path = format!("/{}", attachment_path);
-                let relative_path = crate::utils::to_relative_identifier(
-                    &absolute_path,
-                    &current_folder,
-                    false
-                ).unwrap_or_else(|_| attachment_path.clone());
+                        // Use to_relative_identifier like we do for InternalPath relations
+                        // Prepend "/" to indicate git-root-relative path
+                        let absolute_path = format!("/{}", attachment_path);
+                        let relative_path = crate::utils::to_relative_identifier(
+                            &absolute_path,
+                            &current_folder,
+                            false
+                        ).unwrap_or_else(|_| attachment_path.clone());
 
-                // Use filename as display text for cleaner markdown
-                let display_name = attachment.file_path
-                    .file_name()
-                    .and_then(|name| name.to_str())
-                    .unwrap_or(&attachment_path);
+                        // Use filename as display text for cleaner markdown
+                        let display_name = file_path
+                            .file_name()
+                            .and_then(|name| name.to_str())
+                            .unwrap_or(&attachment_path);
 
-                markdown.push_str(&format!("  * [{}]({})\n", display_name, relative_path));
+                        markdown.push_str(&format!("  * [{}]({})\n", display_name, relative_path));
+                    }
+                    crate::element::AttachmentTarget::ElementIdentifier(identifier) => {
+                        // Element identifier attachments - format as markdown link
+                        let current_file_path = std::path::PathBuf::from(_current_file);
+                        let current_folder = current_file_path.parent()
+                            .unwrap_or_else(|| std::path::Path::new("."))
+                            .to_path_buf();
+
+                        // Use to_relative_identifier to make identifier relative to current file
+                        let relative_id = crate::utils::to_relative_identifier(
+                            identifier,
+                            &current_folder,
+                            true
+                        ).unwrap_or_else(|_| identifier.clone());
+
+                        // Extract display name from identifier (fragment part)
+                        let display_name = identifier.split('#').last().unwrap_or(identifier);
+                        markdown.push_str(&format!("  * [{}]({})\n", display_name, relative_id));
+                    }
+                }
             }
             markdown.push_str("\n");
         }

@@ -1,12 +1,41 @@
 use std::collections::HashMap;
 use std::path::PathBuf;
-use crate::relation::{Relation};
+use crate::relation::Relation;
 use crate::utils;
 use serde::Serialize;
 
+/// Represents the target of an attachment - either a file path or an element identifier
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub enum AttachmentTarget {
+    /// File path attachment (git-root-relative, normalized)
+    FilePath(PathBuf),
+    /// Element identifier attachment (must point to a Refinement element)
+    ElementIdentifier(String),
+}
+
+impl AttachmentTarget {
+    /// Returns a string representation of the attachment target
+    pub fn as_str(&self) -> String {
+        match self {
+            AttachmentTarget::FilePath(path) => path.to_string_lossy().to_string(),
+            AttachmentTarget::ElementIdentifier(id) => id.clone(),
+        }
+    }
+
+    /// Returns true if this is a file path attachment
+    pub fn is_file_path(&self) -> bool {
+        matches!(self, AttachmentTarget::FilePath(_))
+    }
+
+    /// Returns true if this is an element identifier attachment
+    pub fn is_element_identifier(&self) -> bool {
+        matches!(self, AttachmentTarget::ElementIdentifier(_))
+    }
+}
+
 #[derive(Debug, Clone, Serialize)]
 pub struct Attachment {
-    pub file_path: PathBuf,  // Git-root-relative, normalized
+    pub target: AttachmentTarget,
 }
 
 #[derive(Debug, PartialEq, Hash, Eq, Clone)]
