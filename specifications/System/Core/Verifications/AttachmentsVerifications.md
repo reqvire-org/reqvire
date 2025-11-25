@@ -2,51 +2,66 @@
 
 ### Attachments Subsection Parsing Verification
 
-Verify the system correctly parses Attachments subsections.
+Verify the system correctly parses Attachments subsections including both file paths and element identifiers.
 
 #### Details
-Test cases:
+Test cases for file paths:
 - Parse markdown links in Attachments subsection
 - Extract paths where link text equals href
 - Normalize paths to git-root-relative
 - Handle multiple attachments in single element
-- Reject links where text ≠ href
+- Reject links where text ≠ href (for file paths)
+
+Test cases for element identifiers:
+- Parse markdown links to Refinement elements (constraint, behavior, specification)
+- Normalize element identifiers like relation targets
+- Support full identifier format `file.md#element-name`
+- Support same-file format `#element-name`
+- Handle mixed file path and element identifier attachments
 
 #### Metadata
   * type: test-verification
 
 #### Relations
   * verify: [Reserved Subsections Support](../StructureAndParsing.md#reserved-subsections-support)
+  * verify: [Attachment Target Validation](../StructureAndParsing.md#attachment-target-validation)
   * satisfiedBy: [test.sh](../../../../tests/test-attachments/test.sh)
 ---
 
 ### Attachments Validation Verification
 
-Verify the system validates attachment file existence.
+Verify the system validates attachment targets including file existence and element identifier validity.
 
 #### Details
-Test cases:
+Test cases for file paths:
 - Validation passes when attachment files exist
 - Validation fails for missing attachment files
 - Error message includes element identifier and missing path
 - Validation occurs in Pass 2
+
+Test cases for element identifiers:
+- Accept Refinement element identifiers (constraint, behavior, specification)
+- Reject non-Refinement element identifiers (requirement, user-requirement, verification)
+- Error message indicates expected Refinement type
+- Validation fails for non-existent element identifiers
 
 #### Metadata
   * type: test-verification
 
 #### Relations
   * verify: [Reserved Subsections Support](../StructureAndParsing.md#reserved-subsections-support)
+  * verify: [Attachment Target Validation](../StructureAndParsing.md#attachment-target-validation)
   * satisfiedBy: [test.sh](../../../../tests/test-attachments/test.sh)
 ---
 
 ### Attachments Change Impact Verification
 
-Verify attach/detach operations trigger change impact analysis.
+Verify attach/detach operations and Refinement element changes trigger change impact analysis.
 
 #### Details
 CRITICAL: Detach operation must trigger change impact.
 
-Test cases:
+Test cases for file attachment operations:
 - Attach operation marks element as changed
 - Detach operation marks element as changed
 - mv-attachment operation marks affected elements as changed
@@ -54,11 +69,17 @@ Test cases:
 - Element hash changes when attachments modified
 - Change impact propagates through derivedFrom relations
 
+Test cases for Refinement element changes:
+- Refinement element content change propagates impact to elements with attachment identifiers
+- Attachment identifier relocation (move/rename) is reported but does NOT propagate impact
+- Behavior matches relation target relocation handling
+
 #### Metadata
   * type: test-verification
 
 #### Relations
   * verify: [Requirements Change Propagation](../../Processing/ChangeImpact.md#requirements-change-propagation)
+  * verify: [Change Impact Detection](../../Processing/ChangeImpact.md#change-impact-detection)
   * satisfiedBy: [test.sh](../../../../tests/test-attachments/test.sh)
 ---
 
@@ -147,6 +168,33 @@ Test cases:
   * satisfiedBy: [test.sh](../../../../tests/test-attachments/test.sh)
 ---
 
+### Attachment Identifier CRUD Verification
+
+Verify that moving or renaming Refinement elements updates attachment identifiers throughout the model.
+
+#### Details
+Test cases for move operations:
+- Moving a Refinement element updates all attachment identifiers referencing it
+- All files with referencing attachments are modified
+- Attachment format remains valid after move
+
+Test cases for rename operations:
+- Renaming a Refinement element updates all attachment identifiers referencing it
+- All files with referencing attachments are modified
+- Attachment format remains valid after rename
+
+Test cases for consistency:
+- Behavior matches relation target updates (same update logic)
+- Validation passes after CRUD operations
+- No orphaned or broken attachment references
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [Attachment Identifier Updates](../ModelManagement.md#attachment-identifier-updates)
+---
+
 ### Attachment Search Filters Verification
 
 Verify search filters correctly find elements by attachments.
@@ -172,12 +220,18 @@ Test cases:
 Verify attachments render correctly in all output formats.
 
 #### Details
-Test cases:
+Test cases for file paths:
 - Markdown output preserves format
 - HTML export renders clickable links
 - JSON includes attachments array
 - JSON file_path field contains git-root-relative path
 - Consistent indentation in markdown
+
+Test cases for element identifiers:
+- JSON includes element identifiers in attachments array as strings
+- Element identifier format: `"file.md#element-name"`
+- HTML export renders clickable links to Refinement elements
+- Mixed file path and element identifier attachments display correctly
 
 #### Metadata
   * type: test-verification
