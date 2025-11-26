@@ -464,7 +464,8 @@ impl GraphRegistry {
     }
 
     /// Validate Refinement element constraints
-    /// Refinement elements (constraint, behavior, specification) cannot have Relations subsection
+    /// Refinement elements (constraint, behavior, specification) cannot define relations themselves,
+    /// but can be targets of satisfiedBy relations from requirements.
     fn validate_refinement_elements(&self) -> Result<Vec<ReqvireError>, ReqvireError> {
         debug!("Validating Refinement element constraints...");
         let mut errors = Vec::new();
@@ -482,7 +483,7 @@ impl GraphRegistry {
                 if !user_relations.is_empty() {
                     errors.push(ReqvireError::InvalidMarkdownStructure(
                         format!(
-                            "File {}: Refinement element '{}' (type: {}) cannot have Relations subsection. Refinement elements are documentation-only and cannot have relations.",
+                            "File {}: Refinement element '{}' (type: {}) cannot define relations. Refinement elements can only be targets of satisfiedBy relations from requirements.",
                             element.file_path,
                             element.name,
                             element.element_type.as_str()

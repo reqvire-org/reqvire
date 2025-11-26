@@ -160,7 +160,7 @@ You orchestrate Reqvire commands and provide expert guidance on systems engineer
 | **derivedFrom** | Child → Parent | Requirement hierarchy |
 | **verifiedBy** | Requirement → Verification | Requirement verified by |
 | **verify** | Verification → Requirement | Verification verifies |
-| **satisfiedBy** | Requirement → Implementation | Satisfied by code/test |
+| **satisfiedBy** | Requirement → Implementation/Refinement | Satisfied by code/test/refinement |
 
 ### EARS Patterns
 
