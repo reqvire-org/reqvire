@@ -1,4 +1,2 @@
-# Ignore patterns for test
-.git/
-*.log
-expected_impact.md
+# Exclude expected output files from reqvire parsing
+expected/

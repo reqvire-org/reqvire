@@ -1,0 +1,65 @@
+{
+  "auto_fixable": [
+    {
+      "type": "safe_redundant_hierarchical_relations",
+      "element": {
+        "identifier": "specifications/Requirements.md#multi-path-redundant-requirement",
+        "name": "Multi-Path Redundant Requirement",
+        "file": "specifications/Requirements.md"
+      },
+      "redundant_relations": [
+        {
+          "relation_type": "derivedFrom",
+          "target": "specifications/Requirements.md#root-requirement"
+        }
+      ],
+      "rationale": "This element reaches 'specifications/Requirements.md#root-requirement' through multiple paths (via 'specifications/Requirements.md#alternative-parent-requirement' and 'specifications/Requirements.md#parent-requirement'). The direct relation to the ancestor is redundant and safe to remove."
+    },
+    {
+      "type": "safe_redundant_hierarchical_relations",
+      "element": {
+        "identifier": "specifications/Requirements.md#single-chain-redundant-requirement",
+        "name": "Single-Chain Redundant Requirement",
+        "file": "specifications/Requirements.md"
+      },
+      "redundant_relations": [
+        {
+          "relation_type": "derivedFrom",
+          "target": "specifications/Requirements.md#root-requirement"
+        }
+      ],
+      "rationale": "This element reaches 'specifications/Requirements.md#root-requirement' through a path via 'specifications/Requirements.md#parent-requirement'. The direct relation to the ancestor is redundant and safe to remove."
+    },
+    {
+      "type": "safe_redundant_hierarchical_relations",
+      "element": {
+        "identifier": "specifications/SystemRequirements.md#api-specification",
+        "name": "API Specification",
+        "file": "specifications/SystemRequirements.md"
+      },
+      "redundant_relations": [
+        {
+          "relation_type": "derivedFrom",
+          "target": "specifications/SystemRequirements.md#authorization"
+        }
+      ],
+      "rationale": "This element reaches 'specifications/SystemRequirements.md#authorization' through multiple paths (via 'specifications/SystemRequirements.md#management-api' and 'specifications/SystemRequirements.md#public-api'). The direct relation to the ancestor is redundant and safe to remove."
+    },
+    {
+      "type": "redundant_verify_relations",
+      "verification": {
+        "identifier": "specifications/Verifications/Tests.md#api-integration-test",
+        "name": "API Integration Test",
+        "file": "specifications/Verifications/Tests.md"
+      },
+      "redundant_relations": [
+        {
+          "relation_type": "verify",
+          "target": "specifications/SystemRequirements.md#authorization"
+        }
+      ],
+      "rationale": "This verification verifies leaf requirements which derive from parent requirements also directly verified. Verification traces automatically roll up through derivedFrom relations, so verifying the leaf requirements is sufficient."
+    }
+  ],
+  "needs_manual_review": []
+}

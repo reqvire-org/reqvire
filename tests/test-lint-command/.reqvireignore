@@ -1,3 +1,2 @@
-expected-*.txt
-expected-*.md
-expected-*.json
+# Exclude expected output files from reqvire parsing
+expected/

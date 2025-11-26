@@ -1,0 +1,9 @@
+## Change Impact Report
+
+### Relocated Elements
+
+* [Data Format Spec](specifications/Refinements.md#data-format-spec)
+  * Old location: specifications/Requirements.md#data-format-spec
+  * New location: specifications/Refinements.md#data-format-spec
+
+---

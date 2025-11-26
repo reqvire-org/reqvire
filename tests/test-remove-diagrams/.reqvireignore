@@ -1,3 +1,4 @@
-backup/
-temp/
-IgnoredFile.md
+# Exclude expected output files from reqvire parsing
+expected/
+# Test file that should be ignored by reqvire
+specifications/IgnoredFile.md

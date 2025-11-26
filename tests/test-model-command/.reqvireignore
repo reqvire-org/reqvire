@@ -1,3 +1,2 @@
-# Test exclusion patterns
-**/expected_*.md
-**/actual_*.md
+# Exclude expected output files from reqvire parsing
+expected/

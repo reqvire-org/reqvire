@@ -144,7 +144,7 @@ impl ElementType {
     pub fn from_metadata(value: &str) -> Self {
         match value.to_lowercase().as_str() {
             "user-requirement" => ElementType::Requirement(RequirementType::User),
-            "requirement" => ElementType::Requirement(RequirementType::System),
+            "requirement" | "system-requirement" => ElementType::Requirement(RequirementType::System),
 
             // Different verification types
             "verification" => ElementType::Verification(VerificationType::Test),

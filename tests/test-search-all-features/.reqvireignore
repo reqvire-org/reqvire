@@ -1,2 +1,2 @@
-# Test exclusion patterns
-**/DesignSpecifications/*.md
+# Exclude expected output files from reqvire parsing
+expected/

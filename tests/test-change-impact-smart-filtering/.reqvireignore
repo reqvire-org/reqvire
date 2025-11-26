@@ -1,4 +1,2 @@
-# Architecture diagrams
-**/Logical*.md
-**/Physical*.md
-**/software/*.md
+# Exclude expected output files from reqvire parsing
+expected/

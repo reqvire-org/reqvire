@@ -1,0 +1,20 @@
+
+REQ 0:Root requirement for relations to work.
+
+REQ 1:This is simple requirement with main text only.
+
+REQ 1A:This is simple requirement with main text and details. #### Details REQ 1A details.
+
+REQ 2:Requirement with main text and relations.
+
+REQ 3:Requirement with main text and relations and metadata.
+
+REQ 4:Requirement with main text and relations and metadata and details. #### Details REQ 4 Details.
+
+REQ 5:Requirement with main text and relations and metadata and details different order (A). #### Details REQ 5 Details.
+
+REQ 6:Requirement with main text and relations and metadata and details different order (B). #### Details REQ 6 Details.
+
+REQ 7:Requirement with main text and relations and metadata and details different order (C). #### Details REQ 7 Details.
+
+REQ 8:Requirement with main text and relations details with <details> element that should not break parsing and validation.    #### Details <details> ### REQ 8 Nested requirement which should not be processed as requirement. #### Relations   * derivedFrom: #req-0          </details>

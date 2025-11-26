@@ -1,0 +1,249 @@
+Found 5 file(s) with formatting changes:
+
+📄 AttachmentTest.md
+  01     # Elements
+  02
+  03     ### Attachment Display Name Test
+
+  05     This requirement tests that attachment display names are preserved by format.
+  06
+  07     #### Attachments
+  08 -     * [Human Readable Behavior Name](Behaviors.md#my-test-behavior)
+  08 +     * [My Test Behavior](Behaviors.md#my-test-behavior)
+  09
+  10 -   #### Metadata
+  10 -     * type: requirement
+  10 -   ␤
+  10     #### Relations
+  11       * derivedFrom: [Managing MBSE Models](UserStories.md#managing-mbse-models)
+  12     ---
+
+
+
+📄 MOEs.md
+  01     # Elements
+  02
+  03     ### MOE_UA
+  04 +   ␤
+  05     User adoption measure.
+  06
+  07     #### Metadata
+  08       * type: user-requirement
+  09 +   ---
+  10
+  11     ### MOE_CE
+  12 +   ␤
+  13     Cost effectiveness measure.
+  14
+  15     #### Metadata
+  16       * type: user-requirement
+  17 +   ---
+  18
+
+
+
+📄 SystemRequirements/Requirements.md
+  01     # Elements
+  02
+  03     ### Requirements Processing
+  04 +   ␤
+  05     The system shall parse the files in all folders and subfolders from the root of git repository.
+  06 -   #### Metadata
+  06 -     * type: requirement
+  06 -   ␤
+  06     #### Relations
+  07 -     * derivedFrom: ../UserStories.md#managing-mbse-models
+  07 -     * satisfiedBy: ../core/src/model.rs
+  07 +     * derivedFrom: [Managing MBSE Models](../UserStories.md#managing-mbse-models)
+  08 +     * satisfiedBy: [model.rs](../core/src/model.rs)
+  09 +   ---
+  10
+  11     ### Validation Framework
+  12
+  13     The system shall implement a two-pass validation architecture for comprehensive error detection.
+  14 -   #### Metadata
+  14 -     * type: requirement
+  14 -   ␤
+  14     #### Relations
+  15 -     * derivedFrom: #requirements-processing
+  15 -     * satisfiedBy: ../core/src/graph_registry.rs
+  15 -   ␤
+  15 +     * derivedFrom: [Requirements Processing](#requirements-processing)
+  16 +     * satisfiedBy: [graph_registry.rs](../core/src/graph_registry.rs)
+  17     ---
+  18
+  19     ### Path Resolution Testing
+  20
+  21     This requirement tests various absolute path conversions from a subfolder.
+  22 -   #### Metadata
+  22 -     * type: requirement
+  22 -   ␤
+  22     #### Relations
+  23 -     * derivedFrom: [../UserStories.md#managing-mbse-models](/UserStories.md#managing-mbse-models)
+  23 -     * trace: [../MOEs.md#moe_ua](/MOEs.md#moe_ua)
+  23 -     * verifiedBy: [../Verifications/Tests.md#format-test](/Verifications/Tests.md#format-test)
+  23 -     * satisfiedBy: /core/src/parser.rs
+  23 +     * derivedFrom: [Managing MBSE Models](../UserStories.md#managing-mbse-models)
+  24 +     * trace: [MOE_UA](../MOEs.md#moe_ua)
+  25 +     * verifiedBy: [Format Test](../Verifications/Tests.md#format-test)
+  26 +     * satisfiedBy: [parser.rs](../core/src/parser.rs)
+  27 +   ---
+  28
+
+
+
+📄 UserStories.md
+  01     # Elements
+  02
+  03     Personas:
+
+  05     2. SOI Developer: Implements features and makes system changes based on MBSE models, ensuring consistency between design and code.
+  06     3. Contributor: An external community member contributing to Reqvire by improving models, creating features, or providing feedback.
+  07     4. Manager: Oversees the MBSE processes, tracks progress, ensures alignment with objectives, and generates reports for decision-making.
+  08 -   ␤
+  08     ### Managing MBSE Models
+  09
+  10     As an **System Engineer**, I want to manage MBSE models effectively, so that I can ensure they align with project requirements and deliverable goals.
+
+  13       * type: user-requirement
+  14
+  15     #### Relations
+  16 -     * trace: [MOEs.md#moe_ua](/MOEs.md#moe_ua)
+  16 -   * derive: [SystemRequirements/Requirements.md#requirements-processing](/SystemRequirements/Requirements.md#requirements-processing)
+  16 +     * trace: [MOE_UA](MOEs.md#moe_ua)
+  17 +     * derive: [Requirements Processing](SystemRequirements/Requirements.md#requirements-processing)
+  18 +   ---
+  19
+  20     ### Generate Diagrams
+  21 +   ␤
+  22     As a **System Engineer**, I want to generate diagrams for different system viewpoints, so that I can communicate system architecture effectively and understand dependencies and impacts across the system.
+  23
+  24     #### Metadata
+  25       * type: user-requirement
+  26
+  27     #### Relations
+  28 -     * trace: [MOEs.md#moe_ua](/MOEs.md#moe_ua)
+  28 -   ␤
+  28 +     * trace: [MOE_UA](MOEs.md#moe_ua)
+  29     ---
+  30
+  31     ### Missing Blank Line Test
+  32 +   ␤
+  33     This element has content but no blank line before metadata.
+  34 +   ␤
+  35     #### Metadata
+  36       * type: user-requirement
+  37 -   ␤
+  37     ---
+  38
+  39     ### Metadata Repositioning Test
+  40
+  41     Verify that metadata repositioning maintains blank line spacing.
+  42 -   #### Metadata
+  42 -     * type: verification
+  42 -     * status: implemented
+  42 -   ␤
+  42     #### Details
+  43 -   ␤
+  43     This test verifies that when metadata is repositioned from early position to end position, a blank line is properly added before the metadata section.
+  44
+  45     ##### Acceptance Criteria
+  46 -   ␤
+  46       * [ ] Metadata is moved to end position
+  47       * [ ] Blank line exists before metadata after repositioning
+  48       * [ ] Content structure is preserved
+  49 +   #### Metadata
+  50 +     * type: test-verification
+  51 +     * status: implemented
+  52     ---
+  53
+  54     ### Details Block Formatting Test
+
+  62     ####Another Header Without Space
+  63     More content that should remain untouched.
+  64     </details>
+  65 +   ␤
+  66     #### Metadata
+  67       * type: user-requirement
+  68 -   ␤
+  68     ---
+  69
+  70     ### Exact Blank Line Count Test
+
+  73     Content line 1.
+  74     Content line 2.
+  75     Content line 3.
+  76 -   #### Metadata
+  76 -     * type: verification
+  76 -     * status: implemented
+  76 +   ␤
+  77     #### Details
+  78     Detail content here.
+  79 +   #### Metadata
+  80 +     * type: test-verification
+  81 +     * status: implemented
+  82     ---
+  83
+  84     ### External URL Preservation Test
+
+  90
+  91     #### Relations
+  92       * satisfiedBy: [PlansAndPricing](https://docs.google.com/spreadsheets/d/1YgO2THkvPQEtvoP2c4JU6q8Fx4K9rWJ9V5bhpGvo7DI/edit?gid=203583324#gid=203583324)
+  93 -   ␤
+  93     ---
+
+
+
+📄 Verifications/Tests.md
+  01     # Elements
+  02
+  03     This document contains various test cases.
+  04
+  05     ### Format Test
+  06 +   ␤
+  07     This test verifies formatting capabilities.
+  08
+  09     #### Metadata
+  10 -     * type: verification
+  10 +     * type: test-verification
+  11
+  12     #### Relations
+  13 -     * verify: ../SystemRequirements/Requirements.md#requirements-processing
+  13 -     * satisfiedBy: ../tests/test-format/test.sh
+  13 +     * verify: [Requirements Processing](../SystemRequirements/Requirements.md#requirements-processing)
+  14 +     * satisfiedBy: [test.sh](../tests/test-format/test.sh)
+  15 +   ---
+  16
+  17     ### Validation Test
+  18
+  19     This test verifies validation capabilities.
+  20
+  21     #### Metadata
+  22 -     * type: verification
+  22 +     * type: test-verification
+  23
+  24     #### Relations
+  25 -     * verify: ../SystemRequirements/Requirements.md#validation-framework
+  25 -   ␤
+  25 +     * verify: [Validation Framework](../SystemRequirements/Requirements.md#validation-framework)
+  26     ---
+  27
+  28     ### Absolute Path Verification
+
+  30     This verification uses absolute paths to rs files.
+  31
+  32     #### Metadata
+  33 -     * type: verification
+  33 +     * type: test-verification
+  34
+  35     #### Relations
+  36 -     * verify: [../SystemRequirements/Requirements.md#path-resolution-testing](/SystemRequirements/Requirements.md#path-resolution-testing)
+  36 -     * satisfiedBy: /core/src/element.rs
+  36 +     * verify: [Path Resolution Testing](../SystemRequirements/Requirements.md#path-resolution-testing)
+  37 +     * satisfiedBy: [element.rs](../core/src/element.rs)
+  38 +   ---
+  39
+
+
+
+Run with --fix to apply these changes.

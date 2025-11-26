@@ -1,2 +1,2 @@
-backup/
-temp/
+# Exclude expected output files from reqvire parsing
+expected/

@@ -1,3 +1,2 @@
-# Exclude design specifications and expected output
-**/DesignSpecifications/*.md
-**/expected_output.md
+# Exclude expected output files from reqvire parsing
+expected/
