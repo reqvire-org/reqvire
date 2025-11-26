@@ -100,8 +100,8 @@ This section defines which element types can use which relation types as source 
 |---------------|---------------------|---------------------|-------|
 | **derivedFrom** | requirement, user-requirement | requirement, user-requirement | Hierarchical requirement decomposition only |
 | **derive** | requirement, user-requirement | requirement, user-requirement | Inverse of derivedFrom |
-| **satisfiedBy** | requirement, user-requirement, test-verification | InternalPath (implementation files) | Requirements/tests link to implementations |
-| **satisfy** | InternalPath (implementation files) | requirement, user-requirement, test-verification | Inverse of satisfiedBy (auto-generated) |
+| **satisfiedBy** | requirement, user-requirement, test-verification | InternalPath (files), refinement types | Requirements/tests link to implementations or refinements |
+| **satisfy** | InternalPath (files), refinement types | requirement, user-requirement, test-verification | Inverse of satisfiedBy (auto-generated) |
 | **verifiedBy** | requirement, user-requirement | All verification types | Requirements link to verifications |
 | **verify** | All verification types | requirement, user-requirement | Verifications link to requirements |
 | **trace** | Any (except refinement types) | Any | Documentation/discovery, no type constraints |
@@ -116,9 +116,9 @@ This section defines which element types can use which relation types as source 
 | **analysis-verification** | verify, trace | verifiedBy, trace |
 | **inspection-verification** | verify, trace | verifiedBy, trace |
 | **demonstration-verification** | verify, trace | verifiedBy, trace |
-| **constraint** | None (no Relations allowed) | Attachment only |
-| **behavior** | None (no Relations allowed) | Attachment only |
-| **specification** | None (no Relations allowed) | Attachment only |
+| **constraint** | None (no Relations allowed) | satisfy, Attachment |
+| **behavior** | None (no Relations allowed) | satisfy, Attachment |
+| **specification** | None (no Relations allowed) | satisfy, Attachment |
 | **other** | trace | trace |
 
 ### Key Constraints

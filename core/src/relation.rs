@@ -376,7 +376,7 @@ pub fn validate_relation_element_types(
         },
         "satisfiedBy" => {
             // Source must be requirement or test-verification
-            // Target should be a file (implementation) - validated by target existence check
+            // Target can be a file (implementation) or refinement element (constraint, behavior, specification)
             // Note: non-test-verification satisfiedBy is checked separately in graph_registry
             let source_valid = match source_type {
                 ElementType::Requirement(_) => true,
@@ -385,13 +385,14 @@ pub fn validate_relation_element_types(
                 },
                 _ => false
             };
-            // For target, we allow File type or Other (for implementation files)
-            let target_valid = matches!(target_type, ElementType::File | ElementType::Other(_));
+            // For target, we allow File type, Other (for implementation files), or Refinement types
+            let target_valid = matches!(target_type, ElementType::File | ElementType::Other(_) | ElementType::Refinement(_));
             source_valid && target_valid
         },
         "satisfy" => {
-            // Source should be a file/implementation and target should be a requirement or test-verification
-            let source_valid = matches!(source_type, ElementType::File | ElementType::Other(_));
+            // Source should be a file/implementation or refinement, target should be a requirement or test-verification
+            // Note: satisfy from refinements is auto-generated, refinements cannot define relations themselves
+            let source_valid = matches!(source_type, ElementType::File | ElementType::Other(_) | ElementType::Refinement(_));
             let target_valid = match target_type {
                 ElementType::Requirement(_) => true,
                 ElementType::Verification(vtype) => {
@@ -419,8 +420,8 @@ pub fn get_relation_element_type_description(relation_type: &str) -> Option<Stri
         "derive" => Some("'derive' can only be used between requirement types (requirement, user-requirement)".to_string()),
         "verifiedBy" => Some("'verifiedBy' should connect a requirement to a verification element".to_string()),
         "verify" => Some("'verify' should connect a verification element to a requirement".to_string()),
-        "satisfiedBy" => Some("'satisfiedBy' should connect a requirement or test-verification to an implementation file".to_string()),
-        "satisfy" => Some("'satisfy' should connect an implementation file to a requirement or test-verification".to_string()),
+        "satisfiedBy" => Some("'satisfiedBy' should connect a requirement or test-verification to an implementation file or refinement element".to_string()),
+        "satisfy" => Some("'satisfy' should connect an implementation file or refinement element to a requirement or test-verification".to_string()),
         "trace" => Some("'trace' can be used by any element type except refinement types".to_string()),
         _ => None
     }

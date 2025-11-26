@@ -33,6 +33,9 @@ Based on the Element Type Relation Compatibility specification, the following te
 | requirement | InternalPath (file) | ✅ PASS | valid-cases/satisfiedby-req-to-file |
 | user-requirement | InternalPath (file) | ✅ PASS | valid-cases/satisfiedby-user-req-to-file |
 | test-verification | InternalPath (file) | ✅ PASS | valid-cases/satisfiedby-test-verif-to-file |
+| requirement | behavior | ✅ PASS | valid-cases/satisfiedby-req-to-behavior |
+| requirement | specification | ✅ PASS | valid-cases/satisfiedby-req-to-specification |
+| requirement | constraint | ✅ PASS | valid-cases/satisfiedby-req-to-constraint |
 | analysis-verification | InternalPath (file) | ❌ FAIL | invalid-satisfiedby/analysis-to-file |
 | inspection-verification | InternalPath (file) | ❌ FAIL | invalid-satisfiedby/inspection-to-file |
 | demonstration-verification | InternalPath (file) | ❌ FAIL | invalid-satisfiedby/demonstration-to-file |
@@ -90,9 +93,9 @@ Based on the Element Type Relation Compatibility specification, the following te
 | Category | Total Tests | Valid (PASS) | Invalid (FAIL) |
 |----------|-------------|--------------|----------------|
 | derivedFrom | 12 | 4 | 8 |
-| satisfiedBy | 9 | 3 | 6 |
+| satisfiedBy | 12 | 6 | 6 |
 | verifiedBy | 6 | 3 | 3 |
 | verify | 4 | 2 | 2 |
 | trace | 9 | 6 | 3 |
 | Refinement | 6 | 0 | 6 |
-| **TOTAL** | **46** | **18** | **28** |
+| **TOTAL** | **49** | **21** | **28** |

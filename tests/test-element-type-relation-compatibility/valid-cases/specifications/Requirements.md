@@ -144,3 +144,69 @@ Demonstration verification verifying a requirement.
   * verify: [User Requirement Parent](#user-requirement-parent)
 
 ---
+
+### Behavior Element
+
+A behavior element describing system behavior.
+
+#### Metadata
+  * type: behavior
+
+---
+
+### Specification Element
+
+A specification element describing detailed specifications.
+
+#### Metadata
+  * type: specification
+
+---
+
+### Constraint Element
+
+A constraint element describing system constraints.
+
+#### Metadata
+  * type: constraint
+
+---
+
+### Requirement Satisfied By Behavior
+
+Requirement that asks for behavior definition, satisfied by a behavior element.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [User Requirement Parent](#user-requirement-parent)
+  * satisfiedBy: [Behavior Element](#behavior-element)
+
+---
+
+### Requirement Satisfied By Specification
+
+Requirement that asks for specification, satisfied by a specification element.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [User Requirement Parent](#user-requirement-parent)
+  * satisfiedBy: [Specification Element](#specification-element)
+
+---
+
+### Requirement Satisfied By Constraint
+
+Requirement that asks for constraint definition, satisfied by a constraint element.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [User Requirement Parent](#user-requirement-parent)
+  * satisfiedBy: [Constraint Element](#constraint-element)
+
+---
