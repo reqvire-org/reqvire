@@ -283,9 +283,16 @@
                     };
                 });
 
+                // Calculate distance from point to bbox center
+                function distToBboxCenter(pt, bbox) {
+                    var centerX = bbox.x + bbox.width / 2;
+                    var centerY = bbox.y + bbox.height / 2;
+                    return Math.sqrt(Math.pow(pt.x - centerX, 2) + Math.pow(pt.y - centerY, 2));
+                }
+
                 // Check if point is near bbox
                 function isNearBbox(pt, bbox, margin) {
-                    margin = margin || 40;
+                    margin = margin || 10;
                     return pt.x >= bbox.x - margin && pt.x <= bbox.x + bbox.width + margin &&
                            pt.y >= bbox.y - margin && pt.y <= bbox.y + bbox.height + margin;
                 }
@@ -309,15 +316,29 @@
 
                     var sourceNode = null;
                     var targetNode = null;
+                    var sourceMinDist = Infinity;
+                    var targetMinDist = Infinity;
 
-                    // Find source and target nodes for this edge
+                    // Find closest source and target nodes for this edge
                     Object.keys(nodeData).forEach(function(hashId) {
                         var bbox = nodeData[hashId].bbox;
-                        if (isNearBbox(startPt, bbox, 20)) {
-                            sourceNode = hashId;
+
+                        // Find closest node to start point (source)
+                        if (isNearBbox(startPt, bbox, 30)) {
+                            var dist = distToBboxCenter(startPt, bbox);
+                            if (dist < sourceMinDist) {
+                                sourceMinDist = dist;
+                                sourceNode = hashId;
+                            }
                         }
-                        if (isNearBbox(endPt, bbox, 20)) {
-                            targetNode = hashId;
+
+                        // Find closest node to end point (target)
+                        if (isNearBbox(endPt, bbox, 30)) {
+                            var dist = distToBboxCenter(endPt, bbox);
+                            if (dist < targetMinDist) {
+                                targetMinDist = dist;
+                                targetNode = hashId;
+                            }
                         }
                     });
 
