@@ -1125,7 +1125,7 @@ fn generate_folder_tree(
             let mut label = escape_label(&element.name);
             // Add attachments to label
             for attachment in &element.attachments {
-                label.push_str(&format!("<br/>📎 {}", escape_label(attachment)));
+                label.push_str(&format!("<br/>📎 {}", escape_label(&attachment.name)));
             }
             output.push_str(&format!("    {}[\"{}\"]\n", hash_id, label));
         }
@@ -1214,4 +1214,37 @@ fn get_element_class_from_type(element_type: &ElementType) -> &'static str {
         ElementType::Verification(_) => "verification",
         _ => "default",
     }
+}
+
+/// Generate containment view as D3.js collapsible tree
+///
+/// Generates a markdown code block with `d3-tree` language containing JSON data
+/// that can be rendered as an interactive collapsible tree in HTML export.
+///
+/// When `short` is true, shows only root elements (those without hierarchical parents).
+/// When `short` is false (default), shows all elements.
+pub fn generate_containment_d3_tree(registry: &GraphRegistry, short: bool) -> Result<String, ReqvireError> {
+    // Build containment hierarchy structure
+    let hierarchy = crate::containment::ContainmentHierarchy::build(registry, short)?;
+
+    // Convert to D3 tree format
+    let d3_tree = hierarchy.to_d3_tree();
+
+    // Serialize to JSON
+    let json = serde_json::to_string_pretty(&d3_tree)
+        .map_err(|e| ReqvireError::SerializationError(format!("Failed to serialize D3 tree: {}", e)))?;
+
+    let mut output = String::new();
+
+    // Note about element display mode
+    if short {
+        output.push_str("*Elements filtered to show only root elements (those without hierarchical parent relations within the same file).*\n\n");
+    }
+
+    // Output as d3-tree code block
+    output.push_str("```d3-tree\n");
+    output.push_str(&json);
+    output.push_str("\n```\n");
+
+    Ok(output)
 }

@@ -14,7 +14,7 @@ The system SHALL generate comprehensive HTML documentation with all model artifa
 **Generation Pipeline (in temporary directory):**
 Execute all generation commands treating temporary directory as repository root:
 1. Generate all Mermaid diagrams in markdown files
-2. Generate index.md (model structure overview)
+2. Generate index.md (interactive D3.js tree showing containment hierarchy - main entry point)
 3. Generate model.md (model-centric visualization with nested relations from root requirements)
 4. Generate traces.md (verification upward traceability)
 5. Generate coverage.md (verification coverage report)
@@ -42,23 +42,23 @@ Execute all generation commands treating temporary directory as repository root:
 **Export Related System Elements:**
 - Ensure that any related system elements are also copied into output folder to ensure consistency of exported model
 
-**Index Generation:**
-The index document generator shall:
-1. Traverse all specifications and documents in the model
-2. Group elements by file and section
-3. Create a hierarchical index with links to documents and elements
-4. Generate summary statistics including total files, sections, and elements
-5. Generate the index as index.md during HTML export
-6. Be integrated into the HTML export pipeline
+**Containment Generation (D3.js Tree):**
+The containment page (containment.html) shall display an interactive D3.js collapsible tree showing the containment hierarchy:
+1. Root node representing the model root
+2. Folder nodes that can be expanded/collapsed
+3. File nodes containing element children
+4. Element nodes with type-specific icons and colors
+5. Attachment nodes as children of elements (element and file attachments)
+6. Clickable elements that navigate to their definitions
+7. Expand All / Collapse All buttons for tree control
 
-The index generation is automatically performed as part of the HTML export process and saves the result as index.md in the temporary working directory, which is then converted to index.html when exported. The index shall contain a structured summary of all specification documents and folders, serving as the primary entry point (index.html) for HTML documentation.
+The containment view serves as the primary entry point for HTML documentation, providing an interactive visual overview of the model structure.
 
 **HTML Navigation Bar:**
 The system shall provide a fixed navigation bar in all HTML pages with links to key model artifacts for easy access.
 
-The navigation bar must include:
-- Home: Link to index.html (model structure overview)
-- Containment: Link to containment.html (model containment diagram)
+The navigation bar must include (left to right):
+- Containment: Link to containment.html (interactive D3.js tree - main entry point)
 - Model: Link to model.html (model-centric view with nested relations)
 - Traces: Link to traces.html (verification upward traceability report)
 - Coverage: Link to coverage.html (verification coverage report)
@@ -154,11 +154,33 @@ The web interface shall use consistent colors matching the diagram color scheme:
 - Responsive design: Adapts to different screen sizes
 - Box shadows: rgba(0,0,0,0.08) for subtle depth
 
+**D3.js Containment Tree Colors:**
+The containment tree shall use consistent colors for node types:
+| Node Type | Color | Hex Code | Icon |
+|-----------|-------|----------|------|
+| folder | Gray | #9E9E9E | 📁 |
+| file | Yellow | #FFCA28 | 📄 |
+| user-requirement | Purple | #7E57C2 | 👤 |
+| system-requirement | Deep Purple | #673AB7 | 📐 |
+| requirement | Deep Purple | #673AB7 | 📐 |
+| verification | Green | #4CAF50 | ✅ |
+| refinement | Orange | #FF9800 | 🔧 |
+| design-document | Brown | #8D6E63 | 📝 |
+| attachment-element | Orange | #FF9800 | 🔧 |
+| attachment-file | Blue Gray | #607D8B | 📎 |
+
+**D3.js Tree Styling:**
+- Meta nodes (attachments): Smaller circles (r=4), italic 11px font, 85% opacity
+- Regular nodes: Standard circles (r=6), normal 13px font
+- Tree animations: Smooth transitions for expand/collapse
+- Node hover: Cursor pointer for interactive nodes
+
 #### Relations
   * derivedFrom: [HTML Export](#html-export)
   * derivedFrom: [Interactive Mermaid Diagrams](../System/Output/DiagramGeneration.md#interactive-mermaid-diagrams)
   * satisfiedBy: [html.rs](../../core/src/html.rs)
   * satisfiedBy: [base.html](../../core/templates/base.html)
+  * satisfiedBy: [containment.rs](../../core/src/containment.rs)
 ---
 
 ### Model-Centric View Generation
@@ -215,28 +237,22 @@ This ensures exported documentation includes all referenced external documents (
   * verifiedBy: [Attachment Export Verification](Verifications/WebInterfaceVerifications.md#attachment-export-verification)
 ---
 
-### Index View Attachment Links
+### Containment View Attachment Links
 
-The system shall display attachment links under each element in the index view to provide quick access to associated documents.
+The system shall display attachment links as children of elements in the containment D3.js tree to provide quick access to associated documents.
 
 #### Details
 For each element with attachments:
-- Display attachment links indented under the element entry
-- Use paperclip icon (📎) to indicate attachments
-- Show only filename (not full path) for readability
-- Link directly to the attachment file
-
-Example output:
-```
-- [Element Name](path#fragment)
-  - 📎 [DesignDoc.md](path/to/DesignDoc.md)
-  - 📎 [Spec.pdf](docs/Spec.pdf)
-```
+- Display attachments as child nodes in the D3.js tree
+- Element attachments use wrench icon (🔧) with type `attachment-element`
+- File attachments use paperclip icon (📎) with type `attachment-file`
+- Element attachments are clickable and navigate to the referenced element
+- File attachments show filename and path for reference
 
 #### Relations
   * derivedFrom: [HTML Export](#html-export)
-  * satisfiedBy: [index_generator.rs](../../core/src/index_generator.rs)
-  * verifiedBy: [Index Attachment Links Verification](Verifications/WebInterfaceVerifications.md#index-attachment-links-verification)
+  * satisfiedBy: [containment.rs](../../core/src/containment.rs)
+  * verifiedBy: [Containment Attachment Links Verification](Verifications/WebInterfaceVerifications.md#containment-attachment-links-verification)
 ---
 
 ### Diagram Attachment Display

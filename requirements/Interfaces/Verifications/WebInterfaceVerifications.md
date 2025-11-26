@@ -2,7 +2,7 @@
 
 ### HTML Export Verification
 
-This test verifies that the system exports specifications into HTML format with generated index and saves them in the designated output location.
+This test verifies that the system exports specifications into HTML format with generated containment view (D3.js tree) and saves them in the designated output location.
 
 #### Details
 
@@ -10,12 +10,11 @@ This test verifies that the system exports specifications into HTML format with 
 - System should export specifications to HTML format
 - HTML files should be saved in the designated output location
 - HTML output should maintain the structure and content of the original specifications
-- System shall generate index.md in the temporary working directory during HTML export
-- index.md shall be converted to index.html in the output directory
-- index.html shall contain links to all specification documents
-- index.html shall be properly structured with sections
-- index.html shall include brief summaries of each document
-- index.html shall serve as the primary entry point for HTML documentation
+- System shall generate containment.md in the temporary working directory during HTML export
+- containment.md shall be converted to containment.html in the output directory
+- containment.html shall contain an interactive D3.js collapsible tree showing containment hierarchy
+- containment.html shall display folders, files, and elements in a hierarchical tree
+- containment.html shall serve as the primary entry point for HTML documentation
 - Links in diagrams and text must be converted to use .html instead of .md
 - Paths in HTML files should maintain the original relative structure
 - System should work in environments without Git repositories
@@ -23,9 +22,9 @@ This test verifies that the system exports specifications into HTML format with 
 ##### Test Criteria:
 - Command exits with success (0) return code
 - HTML files are generated at the expected location with .html extension
-- Output directory contains index.html file
-- index.html contains links to all specification documents
-- index.html structure follows expected format
+- Output directory contains containment.html file
+- containment.html contains D3.js tree visualization
+- containment.html includes d3-tree JSON data block
 - HTML content preserves the structure and information from the source files
 - Links in HTML files use .html extension instead of .md
 - Mermaid click links are properly converted from .md to .html
@@ -51,7 +50,7 @@ This test verifies that the serve command exports HTML to a temporary directory 
 - System shall export HTML artifacts to a temporary directory
 - System shall start HTTP server on specified host and port
 - System shall display clickable terminal link to the server URL
-- System shall serve index.html when accessing root URL
+- System shall serve containment.html when accessing root URL
 - System shall serve all exported HTML files with correct paths
 - System shall serve static assets (SVG diagrams, CSS, etc.)
 - System shall return 404 for non-existent files
@@ -63,7 +62,7 @@ This test verifies that the serve command exports HTML to a temporary directory 
 ##### Test Criteria:
 - Command starts successfully and displays server URL with instructions
 - Server responds to HTTP requests on specified port
-- Root URL (/) serves index.html
+- Root URL (/) serves containment.html
 - HTML files are served with text/html content type
 - SVG files are served with image/svg+xml content type
 - Non-existent paths return 404 status
@@ -103,31 +102,31 @@ This test verifies that HTML export copies all attachment files to the output di
   * satisfiedBy: [test.sh](../../../tests/test-attachment-export/test.sh)
 ---
 
-### Index Attachment Links Verification
+### Containment Attachment Links Verification
 
-This test verifies that the index view displays attachment links under elements.
+This test verifies that the D3.js containment tree view displays attachments as children of elements.
 
 #### Details
 
 ##### Acceptance Criteria:
-- Elements with attachments shall show attachment links in index.html
-- Attachment links shall be indented under the parent element
-- Attachment links shall use paperclip icon (📎) prefix
-- Attachment links shall show filename only (not full path)
-- Attachment links shall be clickable and link to the correct file
+- Elements with attachments shall show attachments as child nodes in D3.js tree
+- Element attachments (refinements) shall use wrench icon (🔧) with type `attachment-element`
+- File attachments shall use paperclip icon (📎) with type `attachment-file`
+- Element attachments shall be clickable and navigate to the referenced element
+- File attachments shall show filename and path for reference
 
 ##### Test Criteria:
 - Create model with element having attachments
 - Run HTML export command
-- Verify index.html contains attachment links with 📎 icon
-- Verify attachment links are properly nested under element entries
-- Verify attachment link href points to correct file path
+- Verify containment.html contains d3-tree JSON data with attachment nodes
+- Verify attachment-element nodes have links to element definitions
+- Verify attachment-file nodes show file paths
 
 #### Metadata
   * type: test-verification
 
 #### Relations
-  * verify: [Index View Attachment Links](../WebInterface.md#index-view-attachment-links)
+  * verify: [Containment View Attachment Links](../WebInterface.md#containment-view-attachment-links)
   * satisfiedBy: [test.sh](../../../tests/test-attachment-export/test.sh)
 ---
 

@@ -31,7 +31,8 @@ const ASSETS: &[(&str, &[u8])] = &[
 /// Page descriptions for HTML export pages
 const PAGE_DESCRIPTION_CONTAINMENT: &str = r#"# Containment
 
-The containment view shows the physical organization of the model—how elements are structured within folders and files. This hierarchical view reflects the file system layout and helps navigate to specific specification documents. In MBSE, containment represents where model elements are stored, separate from their logical relationships."#;
+Interactive tree view showing the physical organization of the model—how elements are structured within folders and files. Click on folders and files to expand/collapse, or click on elements to navigate to their definitions. Use the Expand All/Collapse All buttons to control the tree view."#;
+
 
 const PAGE_DESCRIPTION_MODEL: &str = r#"# Model
 
@@ -346,14 +347,6 @@ pub fn generate_artifacts_in_temp(
         diagrams_with_blobs
     )?;
 
-    info!("Generating index.md...");
-    let index_content = crate::index_generator::generate_readme_index(
-        &temp_model_manager.graph_registry,
-        &PathBuf::from(".")
-    )?;
-    filesystem::write_file("index.md", index_content.as_bytes())?;
-
-
     // Generate model-centric view (root requirements with nested relations)
     info!("Generating model.md...");
     let model_report = crate::report_model::generate_model_report(
@@ -407,12 +400,13 @@ pub fn generate_artifacts_in_temp(
     );
     filesystem::write_file("coverage.md", coverage_content.as_bytes())?;
 
-    info!("Generating containment.md...");
-    let containment_diagram = crate::diagrams::generate_containment_diagram(&temp_model_manager.graph_registry, false)?;
+    // Generate containment.md (D3 tree - containment view)
+    info!("Generating containment.md (D3 tree - containment view)...");
+    let d3_tree_content = crate::diagrams::generate_containment_d3_tree(&temp_model_manager.graph_registry, false)?;
     let containment_content = format!(
         "{}\n\n{}",
         PAGE_DESCRIPTION_CONTAINMENT,
-        containment_diagram
+        d3_tree_content
     );
     filesystem::write_file("containment.md", containment_content.as_bytes())?;
 
@@ -420,6 +414,15 @@ pub fn generate_artifacts_in_temp(
     info!("Converting markdown to HTML...");
     let html_count = html_export::export_markdown_to_html(&temp_dir, &temp_dir)?;
     info!("✅ Converted {} markdown files to HTML", html_count);
+
+    // Step 6.4: Rename containment.html to index.html (for web server compatibility)
+    let containment_html = temp_dir.join("containment.html");
+    let index_html = temp_dir.join("index.html");
+    if containment_html.exists() {
+        fs::rename(&containment_html, &index_html)
+            .map_err(|e| ReqvireError::IoError(e))?;
+        info!("✅ Renamed containment.html to index.html");
+    }
 
     // Step 6.5: Copy assets folder for HTML pages
     info!("Copying assets...");

@@ -11,6 +11,17 @@ use serde::Serialize;
 use std::collections::BTreeMap;
 use std::path::Path;
 
+/// Represents an attachment for display in containment hierarchy
+#[derive(Debug, Clone, Serialize)]
+pub struct ContainmentAttachment {
+    /// Display name (element name or file name)
+    pub name: String,
+    /// Whether this is an element attachment (true) or file attachment (false)
+    pub is_element: bool,
+    /// Link to the attachment (element identifier or file path)
+    pub link: Option<String>,
+}
+
 /// Represents a single element in the containment hierarchy
 #[derive(Debug, Clone, Serialize)]
 pub struct ContainmentElement {
@@ -19,11 +30,11 @@ pub struct ContainmentElement {
     pub element_type: ElementType,
     pub file_path: String,
     pub identifier: String,
-    pub attachments: Vec<String>,
+    pub attachments: Vec<ContainmentAttachment>,
 }
 
 impl ContainmentElement {
-    pub fn from_element(element: &Element) -> Self {
+    pub fn from_element(element: &Element, registry: &GraphRegistry) -> Self {
         ContainmentElement {
             id: element.id.clone(),
             name: element.name.clone(),
@@ -32,10 +43,27 @@ impl ContainmentElement {
             identifier: element.identifier.clone(),
             attachments: element.attachments.iter()
                 .map(|a| match &a.target {
-                    crate::element::AttachmentTarget::FilePath(path) => path.file_name()
-                        .map(|n| n.to_string_lossy().into_owned())
-                        .unwrap_or_else(|| path.to_string_lossy().into_owned()),
-                    crate::element::AttachmentTarget::ElementIdentifier(id) => id.clone(),
+                    crate::element::AttachmentTarget::FilePath(path) => {
+                        let file_name = path.file_name()
+                            .map(|n| n.to_string_lossy().into_owned())
+                            .unwrap_or_else(|| path.to_string_lossy().into_owned());
+                        ContainmentAttachment {
+                            name: file_name,
+                            is_element: false,
+                            link: Some(path.to_string_lossy().into_owned()),
+                        }
+                    },
+                    crate::element::AttachmentTarget::ElementIdentifier(id) => {
+                        // Look up element name from registry using the identifier
+                        let name = registry.get_element(id)
+                            .map(|e| e.name.clone())
+                            .unwrap_or_else(|| id.clone());
+                        ContainmentAttachment {
+                            name,
+                            is_element: true,
+                            link: Some(id.clone()),
+                        }
+                    },
                 })
                 .collect(),
         }
@@ -94,12 +122,12 @@ impl ContainmentHierarchy {
                 // Short mode: only top-level elements
                 filter_top_level_elements(elements)
                     .iter()
-                    .map(|e| ContainmentElement::from_element(e))
+                    .map(|e| ContainmentElement::from_element(e, registry))
                     .collect()
             } else {
                 // Full mode: all elements
                 elements.iter()
-                    .map(|e| ContainmentElement::from_element(e))
+                    .map(|e| ContainmentElement::from_element(e, registry))
                     .collect()
             };
             elements_map.insert(file_path.clone(), selected_elements);
@@ -321,5 +349,106 @@ fn build_folder_recursive(
         files,
         design_documents: folder_design_docs,
         subfolders,
+    }
+}
+
+/// D3.js tree node structure for hierarchical visualization
+#[derive(Debug, Clone, Serialize)]
+pub struct D3TreeNode {
+    pub name: String,
+    #[serde(rename = "type")]
+    pub node_type: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub link: Option<String>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub children: Vec<D3TreeNode>,
+}
+
+impl ContainmentHierarchy {
+    /// Convert containment hierarchy to D3.js tree format
+    pub fn to_d3_tree(&self) -> D3TreeNode {
+        folder_to_d3_node(&self.root_folder)
+    }
+}
+
+/// Convert markdown links to HTML links for the D3 tree
+fn md_to_html_link(link: &str) -> String {
+    link.replace(".md", ".html")
+}
+
+/// Convert a ContainmentFolder to D3TreeNode recursively
+fn folder_to_d3_node(folder: &ContainmentFolder) -> D3TreeNode {
+    let mut children = Vec::new();
+
+    // Add subfolders first
+    for subfolder in &folder.subfolders {
+        children.push(folder_to_d3_node(subfolder));
+    }
+
+    // Add design documents
+    for doc in &folder.design_documents {
+        children.push(D3TreeNode {
+            name: doc.name.clone(),
+            node_type: "design-document".to_string(),
+            link: Some(md_to_html_link(&doc.path)),
+            children: Vec::new(),
+        });
+    }
+
+    // Add files
+    for file in &folder.files {
+        let mut file_children = Vec::new();
+
+        // Add elements as children of file
+        for element in &file.elements {
+            let element_type = match &element.element_type {
+                ElementType::Requirement(crate::element::RequirementType::User) => "user-requirement",
+                ElementType::Requirement(crate::element::RequirementType::System) => "system-requirement",
+                ElementType::Verification(_) => "verification",
+                ElementType::Refinement(_) => "refinement",
+                _ => "element",
+            };
+
+            // Build element children: attachments only (relations removed)
+            let mut element_children = Vec::new();
+
+            // Add attachments as children
+            for attachment in &element.attachments {
+                let (node_type, link) = if attachment.is_element {
+                    // Element attachment - show as refinement with link
+                    ("attachment-element".to_string(), attachment.link.as_ref().map(|l| md_to_html_link(l)))
+                } else {
+                    // File attachment - show path without conversion
+                    ("attachment-file".to_string(), attachment.link.clone())
+                };
+                element_children.push(D3TreeNode {
+                    name: attachment.name.clone(),
+                    node_type,
+                    link,
+                    children: Vec::new(),
+                });
+            }
+
+            file_children.push(D3TreeNode {
+                name: element.name.clone(),
+                node_type: element_type.to_string(),
+                link: Some(md_to_html_link(&element.identifier)),
+                children: element_children,
+            });
+        }
+
+        children.push(D3TreeNode {
+            name: file.name.clone(),
+            node_type: "file".to_string(),
+            link: Some(md_to_html_link(&file.path)),
+            children: file_children,
+        });
+    }
+
+    D3TreeNode {
+        name: folder.name.clone(),
+        node_type: "folder".to_string(),
+        link: None,
+        children,
     }
 }

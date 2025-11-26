@@ -1,5 +1,9 @@
 # Containment View Specification
 
+## Overview
+
+The containment view displays the physical organization of the model as an interactive D3.js collapsible tree. This serves as the main entry point (index.html) for HTML documentation, providing a complete navigable view of the model structure including elements and their attachments.
+
 ## Hierarchy Extraction
 
 The containment hierarchy extraction must:
@@ -9,123 +13,143 @@ The containment hierarchy extraction must:
 - Traverse folder structure recursively
 - For each folder: collect subfolders and files
 - For each file: collect all elements (H3 headers with Metadata)
+- For each element: collect attachments as children
 - Skip sections (H2 headers) in the hierarchy representation
 
 **Element Information:**
 - Extract element identifier, name, and type
 - Preserve file path and folder structure
 - Maintain insertion order for elements within files
+- Extract all attachments distinguishing between element and file attachments
 
 **Data Structure:**
 - Represent as tree: `Folder -> [Subfolders, Files]`
 - Files contain: `File -> [Elements]`
-- Elements contain: identifier, name, type
+- Elements contain: identifier, name, type, attachments
+- Attachments displayed as children of elements
 
 **Ordering:**
 - Folders sorted alphabetically
 - Files sorted alphabetically within folders
 - Elements preserve document order within files
+- Attachments preserve document order within elements
 
 ---
 
-## Mermaid Diagram Output
+## D3.js Tree Output
 
-The Mermaid diagram generation must:
+The D3.js tree visualization must:
 
-**Graph Structure:**
-- Use `graph TD` (top-down layout)
-- Folder nodes with connections to child folders and files
-- File subgraphs containing element nodes
-- Tree structure with explicit parent-child connections
+**Tree Structure:**
+- Root node representing the model root
+- Folder nodes that can be expanded/collapsed
+- File nodes containing element children
+- Element nodes as leaf nodes
 
-**Node Format:**
-- Root: `root["folder-icon Reqvire root"]`
-- Folders: `folderId["folder-icon Folder Name"]`
-- Files: subgraphs with format `fileId["file-icon File Name"]`
-- Elements: `hashId["Element Name"]` within file subgraphs
+**Node Types and Icons:**
+| Type | Icon | Color |
+|------|------|-------|
+| folder | 📁 | #9E9E9E (gray) |
+| file | 📄 | #FFCA28 (yellow) |
+| user-requirement | 👤 | #7E57C2 (purple) |
+| system-requirement | 📐 | #673AB7 (deep purple) |
+| requirement | 📐 | #673AB7 (deep purple) |
+| verification | ✅ | #4CAF50 (green) |
+| refinement | 🔧 | #FF9800 (orange) |
+| design-document | 📝 | #8D6E63 (brown) |
+| attachment-element | 🔧 | #FF9800 (orange) |
+| attachment-file | 📎 | #607D8B (blue-gray) |
 
-**Connections:**
-- `parent --> child` for folder/file hierarchy
-- No connections between elements within files
+**Attachment Types:**
+- `attachment-element`: References to refinement elements, shown with wrench icon and navigable link
+- `attachment-file`: References to external files (PDFs, docs), shown with paperclip icon
 
-**Element Display Modes:**
-- Default: Show ALL elements in each file
-- With `--short` flag: Show only root elements (those without hierarchical parents in same file)
+**Interactive Features:**
+- Click folder/file/element nodes to expand/collapse children
+- Click element nodes to navigate to their definition
+- Click element attachments to navigate to the refinement element
+- Expand All button to show entire tree
+- Collapse All button to collapse to root level
+- Smooth animations for expand/collapse transitions
 
-**Element Nodes:**
-- Use 16-character hash IDs for node uniqueness
-- Display element name as node label
-- Apply CSS classes based on element type
-
-**Styling:**
-- `userRequirement` - pink fill (#f9d6d6), red stroke (#f55f5f)
-- `systemRequirement` - light pink fill (#fce4e4), pink stroke (#e68a8a)
-- `requirement` - light pink fill (#fce4e4), pink stroke (#e68a8a)
-- `verification` - light green fill (#d6f9d6), green stroke (#5fd75f)
-- `folder` - light blue fill (#e8f4f8), blue stroke (#4a90a4)
-- `file` - light yellow fill (#fff8e1), orange stroke (#f9a825)
-- `default` - gray fill (#f5f5f5), dark stroke (#333333)
-
-**Clickable Links:**
-- Add `click` directives for each element node
-- Link to element location: `click hashId "path.md#fragment"`
-- Use relative paths from diagram location
-- Normalize fragments to lowercase with hyphens
-
-**Requirements:**
-- Valid Mermaid syntax
-- Deterministic node ordering
-- Consistent hash ID generation
-- Unique file IDs based on full path (not just filename)
+**Navigation:**
+- Element clicks navigate to `file.html#element-fragment`
+- Element attachment clicks navigate to refinement element definition
+- File attachments show path for reference
+- All links use `.html` extension for HTML export
 
 ---
 
-## JSON Output (Optional)
+## JSON Data Format
 
-The JSON structure must include:
+The D3.js tree consumes JSON data in this format:
 
-**Root Level:**
 ```json
 {
-  "root_folder": "specifications",
-  "folders": [ ... ],
-  "files": [ ... ],
-  "element_count": 123
+  "name": "Reqvire root",
+  "type": "folder",
+  "children": [
+    {
+      "name": "requirements",
+      "type": "folder",
+      "children": [
+        {
+          "name": "UserStories.html",
+          "type": "file",
+          "link": "requirements/UserStories.html",
+          "children": [
+            {
+              "name": "User Authentication",
+              "type": "user-requirement",
+              "link": "requirements/UserStories.html#user-authentication",
+              "children": [
+                {
+                  "name": "auth-design",
+                  "type": "attachment-element",
+                  "link": "requirements/Design.html#auth-design"
+                },
+                {
+                  "name": "AuthSpec.pdf",
+                  "type": "attachment-file",
+                  "link": "docs/AuthSpec.pdf"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
 }
 ```
 
-**Folder Objects:**
-```json
-{
-  "path": "specifications/SystemRequirements",
-  "name": "SystemRequirements",
-  "subfolders": [ ... ],
-  "files": [ ... ]
-}
+**Field Descriptions:**
+- `name`: Display name for the node
+- `type`: Node type (folder, file, user-requirement, attachment-element, attachment-file, etc.)
+- `link`: Optional navigation link for clickable nodes
+- `children`: Array of child nodes (empty array omitted in serialization)
+
+**Attachment Node Types:**
+- `attachment-element`: Element identifier (navigable to element definition)
+- `attachment-file`: File name only, link contains the full path
+
+---
+
+## Markdown Integration
+
+The D3.js tree is embedded in markdown using a code block:
+
+```
+```d3-tree
+{ "name": "Root", "type": "folder", "children": [...] }
+```
 ```
 
-**File Objects:**
-```json
-{
-  "path": "specifications/Requirements.md",
-  "name": "Requirements.md",
-  "elements": [ ... ]
-}
-```
-
-**Element Objects:**
-```json
-{
-  "identifier": "specifications/Requirements.md#auth-system",
-  "name": "Authentication System",
-  "type": "requirement"
-}
-```
-
-**Requirements:**
-- Valid JSON format with proper escaping
-- Deterministic key ordering
-- Include metadata counts (folders, files, elements)
+**Processing:**
+1. `d3-tree` code blocks are extracted before markdown processing
+2. JSON data is preserved as-is
+3. During HTML conversion, blocks are replaced with D3.js visualization
+4. D3.js library loaded from CDN (d3js.org)
 
 ---
 
@@ -133,26 +157,19 @@ The JSON structure must include:
 
 HTML export integration must:
 
-**Containment View Page:**
-- Create dedicated page: `containment.html`
-- Generate `containment.md` with Mermaid diagram
-- Convert to HTML during export process
-- Include in navigation menu as "Containment" (after "Index")
+**Index Page:**
+- Generate as `index.md` containing D3.js tree
+- Convert to `index.html` during export
+- Serve as primary entry point for documentation
 
 **Integration with Existing Export:**
 - Follow existing HTML export styling and structure
-- Use same CSS classes for element types
+- Use Reqvire color scheme for consistency
 - Maintain consistent navigation patterns
-- Apply post-processing for .md to .html conversions
-
-**Assets Export:**
-- Export `assets/` folder with logo, favicon, and touch icons
-- Include favicon link in all HTML pages
-- Include logo in navigation bar before Index link
-- Assets embedded at compile time for portability
+- Include in navigation bar as "Index" (first link)
 
 **Requirements:**
 - Generated during `reqvire export` command
 - Updates automatically when model changes
 - Deterministic output for version control
-- Interactive Mermaid diagram with pan/zoom
+- Interactive tree with expand/collapse functionality
