@@ -49,13 +49,13 @@ This guide is split into domain-specific guides for better organization:
 For comprehensive command reference, see the Reqvire skills.
 
 ### Key File Locations
-- Core specifications structure: [SpecificationsRequirements.md](specifications/SpecificationsRequirements.md)
-- User requirements: [UserRequirements.md](specifications/UserRequirements.md)
-- Mission requirements: [MissionRequirements.md](specifications/MissionRequirements.md)
-- System requirements: [SystemRequirements/Requirements.md](specifications/SystemRequirements/Requirements.md)
-- Verification specifications: [Verifications folder](specifications/Verifications)
-- Relationship types: [Relation Types and Behaviors](specifications/SpecificationsRequirements.md#relation-types-and-behaviors)
-- Architecture documentation: [Architecture.md](specifications/Architecture.md)
+- Core specifications structure: [SpecificationsRequirements.md](requirements/SpecificationsRequirements.md)
+- User requirements: [UserRequirements.md](requirements/UserRequirements.md)
+- Mission requirements: [MissionRequirements.md](requirements/MissionRequirements.md)
+- System requirements: [SystemRequirements/Requirements.md](requirements/SystemRequirements/Requirements.md)
+- Verification specifications: [Verifications folder](requirements/Verifications)
+- Relationship types: [Relation Types and Behaviors](requirements/SpecificationsRequirements.md#relation-types-and-behaviors)
+- Architecture documentation: [Architecture.md](requirements/Architecture.md)
 
 
 ## Core Architecture
@@ -113,7 +113,7 @@ cli/src/
 - Prefer strong typing over string manipulation
 
 ### Architecture Principles
-- Follow the requirements and architecture defined in specifications/
+- Follow the requirements and architecture defined in requirements/
 - Link code and implementations to requirements via satisfiedBy on requirement level
 - Use Result with custom error types for error handling
 - Document all public APIs with rustdoc

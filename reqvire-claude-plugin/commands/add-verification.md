@@ -94,7 +94,7 @@ ${1:-The user will specify which requirement needs verification.}
 7. **Add verification using reqvire add command:**
 
    ```bash
-   reqvire add "specifications/Verifications/<file>.md" <<'EOF'
+   reqvire add "requirements/Verifications/<file>.md" <<'EOF'
    ### Verification Name
 
    [Description of verification approach]
@@ -119,14 +119,14 @@ ${1:-The user will specify which requirement needs verification.}
 
    Optional: Insert at specific position (0-based index):
    ```bash
-   reqvire add "specifications/Verifications/<file>.md" 0 <<'EOF'
+   reqvire add "requirements/Verifications/<file>.md" 0 <<'EOF'
    ...
    EOF
    ```
 
    Alternative using pipe:
    ```bash
-   cat element.md | reqvire add "specifications/Verifications/<file>.md"
+   cat element.md | reqvire add "requirements/Verifications/<file>.md"
    ```
 
    The add command automatically:
@@ -162,7 +162,7 @@ After adding verifications, you may need to reorganize:
 
 **Move verification to different file:**
 ```bash
-reqvire mv "<verification-name>" "specifications/Verifications/<file>.md"
+reqvire mv "<verification-name>" "requirements/Verifications/<file>.md"
 ```
 
 **Move verification with specific position (0-based index):**
@@ -221,7 +221,7 @@ Reqvire uses **bottom roll-up verification**:
 
 ## Notes
 
-- Verifications go in `specifications/Verifications/` directory
+- Verifications go in `requirements/Verifications/` directory
 - Use two-space indentation for Relations entries
 - Always read full trace chain before writing test criteria
 - Run `reqvire lint --fix` after adding to remove redundancies

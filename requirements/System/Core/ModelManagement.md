@@ -20,7 +20,6 @@ The system shall implement relations following clearly defined specifications fo
 
 #### Relations
   * derivedFrom: [Identifiers and Relations](StructureAndParsing.md#identifiers-and-relations)
-  * derivedFrom: [Managing System Models](../../UserStories.md#managing-system-models)
   * satisfiedBy: [relation.rs](../../../core/src/relation.rs)
 ---
 
@@ -29,7 +28,6 @@ The system shall implement relations following clearly defined specifications fo
 The system shall enforce element type constraints for relation types, ensuring that only valid combinations of source and target element types are allowed for each relation type.
 
 #### Details
-
 The compatibility rules are:
 
 1. **derivedFrom/derive**: Only requirement types (`requirement`, `user-requirement`) can use these relations

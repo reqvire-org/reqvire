@@ -105,6 +105,9 @@ The system shall validate references when processing from a subdirectory and gen
 
 This validation ensures that subdirectory processing maintains logical boundaries and prevents architectural inconsistencies by reporting parent directory references as missing targets.
 
+#### Attachments
+  * [Subdirectory Auto-Detection Behavior](../System/Core/Behaviors.md#subdirectory-auto-detection-behavior)
+
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * derivedFrom: [Git Repository as Project Root](../System/Core/ModelManagement.md#git-repository-as-project-root)
@@ -212,6 +215,11 @@ Default output:
 - Human-readable text format when neither `--json` nor `--short` is specified
 - Full detail mode showing all element metadata and relations
 
+#### Attachments
+  * [JSON Output Structure](../System/Output/DesignDocuments/OutputFormats.md#json-output-structure)
+  * [Short Mode Behavior](../System/Output/DesignDocuments/OutputFormats.md#short-mode-behavior)
+  * [Text Output Formatting](../System/Output/DesignDocuments/OutputFormats.md#text-output-formatting)
+
 #### Relations
   * derivedFrom: [Search Fine Grained Filtering](../System/Output/Reporting.md#search-fine-grained-filtering)
   * derivedFrom: [Reserved Subsections Support](../System/Core/StructureAndParsing.md#reserved-subsections-support)
@@ -231,6 +239,9 @@ System shall provide CLI command to generate model diagrams with optional filter
 - Shall support `--json` flag for JSON output format
 - Default output shall be markdown with embedded Mermaid diagram
 - Shall integrate with existing model diagram generation functionality
+
+#### Attachments
+  * [JSON Output Structure](../System/Output/DesignDocuments/OutputFormats.md#json-output-structure)
 
 #### Relations
   * derivedFrom: [Model Visualization and Exploration](../System/Output/DiagramGeneration.md#model-visualization-and-exploration)
@@ -290,6 +301,10 @@ reqvire traces --from-folder=docs/reports > docs/reports/traces.md
 # Links in the output will be relative to docs/reports/ (e.g., ../../specifications/file.md)
 ```
 
+#### Attachments
+  * [JSON Output Structure](../System/Output/DesignDocuments/OutputFormats.md#json-output-structure)
+  * [Verification Trace Tree Construction](../System/Processing/DesignDocuments/VerificationTraceAlgorithm.md#verification-trace-tree-construction)
+
 #### Relations
   * derivedFrom: [Verification Trace Builder](../System/Processing/VerificationTraces.md#verification-trace-builder)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
@@ -333,6 +348,10 @@ The command shall:
 
 Command output shall be written to stdout for easy redirection to files.
 
+#### Attachments
+  * [JSON Output Structure](../System/Output/DesignDocuments/OutputFormats.md#json-output-structure)
+  * [Text Output Formatting](../System/Output/DesignDocuments/OutputFormats.md#text-output-formatting)
+
 #### Relations
   * derivedFrom: [Verification Coverage Report Generator](../System/Output/Reporting.md#verification-coverage-report-generator)
   * derivedFrom: [Verification Roll-up Strategy](../System/Processing/VerificationTraces.md#verification-roll-up-strategy)
@@ -360,6 +379,10 @@ The command shall:
 - Exit with non-zero status code on errors
 
 Command output shall be written to stdout for easy redirection to files.
+
+#### Attachments
+  * [JSON Output Structure](../System/Output/DesignDocuments/OutputFormats.md#json-output-structure)
+  * [Text Output Formatting](../System/Output/DesignDocuments/OutputFormats.md#text-output-formatting)
 
 #### Relations
   * derivedFrom: [Model Linting](../System/Operations/Linting.md#model-linting)
@@ -391,6 +414,10 @@ Command invocation: `reqvire change-impact [OPTIONS]`
 - Enable calling from external systems via API
 - Support webhook triggers for automated analysis
 - Allow scripting of analysis operations
+
+#### Attachments
+  * [JSON Output Structure](../System/Output/DesignDocuments/OutputFormats.md#json-output-structure)
+  * [Text Output Formatting](../System/Output/DesignDocuments/OutputFormats.md#text-output-formatting)
 
 #### Relations
   * derivedFrom: [Structural Change Analyzer](../System/Processing/ChangeImpact.md#structural-change-analyzer)
@@ -552,6 +579,10 @@ The markdown output shall include:
 - `# Containment View` header
 - Mermaid code block with flowchart diagram (using `graph TD` direction)
 - Description indicating whether all elements or only root elements are displayed
+
+#### Attachments
+  * [JSON Output Structure](../System/Output/DesignDocuments/OutputFormats.md#json-output-structure)
+  * [Short Mode Behavior](../System/Output/DesignDocuments/OutputFormats.md#short-mode-behavior)
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)

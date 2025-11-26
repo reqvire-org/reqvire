@@ -93,12 +93,12 @@ The mv-file operation will fail with a clear error if:
 
 **Move file within specifications directory:**
 ```bash
-reqvire mv-file "specifications/OldFile.md" "specifications/NewFile.md"
+reqvire mv-file "requirements/OldFile.md" "requirements/NewFile.md"
 ```
 
 **Move file to different directory:**
 ```bash
-reqvire mv-file "specifications/Auth.md" "security/Authentication.md"
+reqvire mv-file "requirements/Auth.md" "security/Authentication.md"
 ```
 
 **Preview before moving:**
@@ -120,12 +120,12 @@ reqvire mv-file "specs/File.md" "requirements/File.md"
 **Squash elements from multiple files:**
 ```bash
 # Merge experimental specs into main requirements
-reqvire mv-file "temp/Experiments.md" "specifications/Requirements.md" --squash
+reqvire mv-file "temp/Experiments.md" "requirements/Requirements.md" --squash
 ```
 
 **Preview squash before applying:**
 ```bash
-reqvire mv-file "old/File.md" "specifications/MainFile.md" --squash --dry-run
+reqvire mv-file "old/File.md" "requirements/MainFile.md" --squash --dry-run
 ```
 
 ## When to Use mv-file

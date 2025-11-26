@@ -9,7 +9,7 @@
     {
       "name": "reqvire",
       "description": "Requirements As A Code framework",
-      "version": "1.1.4",
+      "version": "1.1.5",
       "author": {
         "name": "Ilija Ljubicic",
         "email": "ilijaljubicic@users.noreply.github.com"
@@ -20,6 +20,7 @@
         "mbse",
         "requirements",
         "systems-engineering",
+        "context-engineering",        
         "verification",
         "traceability",
         "context",

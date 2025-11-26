@@ -104,7 +104,6 @@ When creating a new element, the system shall:
 #### Relations
   * derivedFrom: [Element Manipulation File Persistence](#element-manipulation-file-persistence)
   * derivedFrom: [Target Location Validation and Auto-Creation](#target-location-validation-and-auto-creation)
-  * derivedFrom: [Structure and Addressing in Markdown Documents](../Core/StructureAndParsing.md#structure-and-addressing-in-markdown-documents)
   * derivedFrom: [Reserved Subsections Support](../Core/StructureAndParsing.md#reserved-subsections-support)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)

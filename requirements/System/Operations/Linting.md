@@ -78,9 +78,11 @@ Detection shall:
 - Report these as redundant relations that add noise to the model
 - Categorize as **auto-fixable** since removing them is safe and mechanical
 
+#### Attachments
+  * [Verification Trace Tree Construction](../Processing/DesignDocuments/VerificationTraceAlgorithm.md#verification-trace-tree-construction)
+
 #### Relations
   * derivedFrom: [Model Linting](#model-linting)
-  * derivedFrom: [Verification Trace Builder](../Processing/VerificationTraces.md#verification-trace-builder)
 ---
 
 ### Redundant Hierarchical Relations Detection
@@ -112,9 +114,11 @@ This approach reuses the proven trace tree logic for redundancy detection, ensur
 
 **Note**: The current implementation only detects cases where a direct redundant relation EXISTS. It does not detect or suggest whether converging paths without a direct relation should have one added - that remains a semantic modeling decision.
 
+#### Attachments
+  * [Verification Trace Tree Construction](../Processing/DesignDocuments/VerificationTraceAlgorithm.md#verification-trace-tree-construction)
+
 #### Relations
   * derivedFrom: [Model Linting](#model-linting)
-  * derivedFrom: [Verification Trace Builder](../Processing/VerificationTraces.md#verification-trace-builder)
 ---
 
 ### Multi-Branch Convergence Detection
@@ -154,9 +158,11 @@ This enables the model author to review and decide:
 - Is one branch a modeling error? (remove that branch's intermediate relations)
 - Should there be a direct relation instead? (restructure the model)
 
+#### Attachments
+  * [Verification Trace Tree Construction](../Processing/DesignDocuments/VerificationTraceAlgorithm.md#verification-trace-tree-construction)
+
 #### Relations
   * derivedFrom: [Model Linting](#model-linting)
-  * derivedFrom: [Verification Trace Builder](../Processing/VerificationTraces.md#verification-trace-builder)
   * satisfiedBy: [lint.rs](../../../core/src/lint.rs)
   * verifiedBy: [Lint Command Verification](Verifications/LintingVerifications.md#lint-command-verification)
 ---

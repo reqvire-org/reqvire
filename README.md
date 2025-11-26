@@ -59,7 +59,7 @@ For detailed installation options (from source, pre-built binaries, etc.), see t
 
 - **[Documentation](https://www.reqvire.org)** - Learn how to use Reqvire
 - **[Browse Model](https://reqvire-org.github.io/reqvire/)** - Explore Reqvire's own specifications
-- **[Use Cases](./specifications/Usecases.md)** - See Reqvire in action
+- **[Use Cases](./requirements/Usecases.md)** - See Reqvire in action
 
 ---
 

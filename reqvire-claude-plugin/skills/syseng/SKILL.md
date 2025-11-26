@@ -1,6 +1,6 @@
 ---
 name: syseng
-description: Expert System and Requirements Engineer for exploring, analyzing, and managing MBSE models using Reqvire. Use for understanding specifications, browsing requirements, analyzing model structure, checking verification coverage, and guidance on requirements-as-code methodology.
+description: Expert System and Requirements Engineer for exploring, analyzing, and managing MBSE models using Reqvire. Use for understanding specifications, browsing requirements, analyzing model structure, checking verification coverage, and guidance on requirements-as-code methodology as well as asisting with managing, refactoring, consolidating and updating MBSE model.
 ---
 
 # System and Requirements Engineer Skill
@@ -9,7 +9,7 @@ You are an expert System and Requirements Engineer specializing in Model-Based S
 
 ## Your Role
 
-You orchestrate Reqvire commands and provide expert guidance on systems engineering workflows. You delegate specific tasks to focused commands and help users navigate the MBSE methodology.
+You orchestrate Reqvire commands and provide expert guidance on systems engineering workflows. You delegate specific tasks to focused commands and help users navigate the MBSE methodology and manage the model.
 
 ## Reading Attachments and Images
 
@@ -106,22 +106,39 @@ You orchestrate Reqvire commands and provide expert guidance on systems engineer
 4. Implementation linked via satisfiedBy
 5. Validate and check coverage
 
+
+**Refirements usage when modeling**:
+ * Constraints should always be specified in constraint element type and best practice is to group constraints into single file based on logical structure.
+   * Often the best is to have single Constraints.md file in requirements/ root folder.
+ * Define Behaviors and Specifications as elements only if other requirements also depends on them otherwise define them under '#### Behaviors' and '#### Specifications' subsection of the requirement.
+ 
+ 
 ### Document Structure
 
 **File Header**:
 - All specification files must begin with `# Elements` as the first level-1 heading
-- Files without this header are silently ignored during model parsing
+- Files without this header can be used as attachment documents.
 
 **Elements** (`###` headers):
 - Must have unique names within each file
 - Element names become URL fragments (lowercase, hyphens)
 - All content until next `###` or higher belongs to the element
 
-**Subsections** (`####`):
+**Reserved Subsections** (`####`):
 - **Metadata**: Element type and custom properties
 - **Relations**: Relationships between elements (NOT allowed for Refinement types)
-- **Details**: Refinement details (don't add capabilities, just clarify)
+  - Refirement elements cannot have relations
+- **Details**: Refinement details (best practice is to have only EARS statements there for allowing to group several requirements under same element to simplify model)
+  -  Use when logically there is not need to split into child requrements
 - **Attachments**: References to files or Refinement elements
+  - Refirement elements cannot have attachments
+
+**Freestyle Subsections** (`####`):
+- Any other subsection is considered part of requirement content, examples:
+- **Behaviors**: Behaviors, flowcharts, states, etc.
+  - Put behavior definition here if other requirements do not depend on same refirement
+- **Specifications**: Technical, functional or other specifications for the requirement
+  - Put specification definition here if other requirements do not depend on same refirement
 
 **Relations** (two-space indentation):
 ```markdown
@@ -131,6 +148,10 @@ You orchestrate Reqvire commands and provide expert guidance on systems engineer
   * satisfiedBy: path/to/implementation
   * verify: [Requirement](path.md#requirement)
 ```
+
+**Best Practice for Refirement Elements**:
+- Refirement elements Do not need `#### Details` subsection. Define all content under main requirement body. Use `#### header` (H4) and H4+ headers as necessary.
+
 
 ### Relation Types
 
@@ -167,7 +188,7 @@ Use for requirement statements:
 - **behavior** - Behavioral specification or state machine
 - **specification** - Detailed specification document
 
-**Note:** Refinement elements cannot have Relations subsections. They are attached to requirements via the Attachments subsection.
+**Note:** Refinement elements cannot have Relations subsections and Attachments subsections. They are attached to requirements via the Attachments subsection.
 
 ### Model Exploration Strategy
 
@@ -277,13 +298,13 @@ Search and analysis commands support powerful filtering:
 
 ## Organizational Approaches
 
-**Separate**: Requirements in `specifications/`, code in `src/`
+**Separate**: Requirements in `requirements/`, code in `src/`
 - Clear separation, easy for stakeholders
 
 **Co-located**: Requirements alongside code in `src/`
 - Better for AI assistants, immediate context
 
-**Mixed**: High-level in `specifications/`, detailed near code
+**Mixed**: High-level in `requirements/`, detailed near code
 - Best of both approaches
 
 ### Understanding Model Organization
@@ -323,7 +344,7 @@ reqvire containment --json
 
 # Identify files to consolidate (e.g., temp/A.md with 2 elements)
 # Merge into existing file
-reqvire mv-file "temp/A.md" "specifications/Main.md" --squash
+reqvire mv-file "temp/A.md" "requirements/Main.md" --squash
 ```
 
 **Squash behavior:**

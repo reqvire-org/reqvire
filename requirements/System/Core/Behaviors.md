@@ -44,3 +44,30 @@ This behavior ensures backward compatibility (existing file attachments work unc
 #### Metadata
   * type: behavior
 ---
+
+### Subdirectory Auto-Detection Behavior
+
+Describes how subdirectory scope detection and enforcement works.
+
+#### Details
+**Detection Steps:**
+
+1. **Detect git root**: Run `git rev-parse --show-toplevel` to find repository root
+2. **Determine relative scope**: Calculate current working directory path relative to git root
+3. **Limit file processing**: Only process specification files within the current subdirectory
+4. **Validate references**: References to elements outside the subdirectory scope generate missing target errors
+
+**Scope Boundary Enforcement:**
+- References using relative paths (e.g., `../ParentFile.md#element`) that escape the subdirectory result in missing relation target errors
+- Absolute paths pointing outside subdirectory scope generate errors
+- Logical boundaries are maintained during subdirectory operations
+
+**When run from git root:**
+- Process all files in the repository
+- No scope limitations apply
+
+This behavior enables focused work on specific areas of large models while maintaining reference integrity.
+
+#### Metadata
+  * type: behavior
+---

@@ -133,9 +133,9 @@ reqvire containment
 Provide clear, actionable recommendations:
 
 **Files to Split:**
-- `specifications/LargeFile.md` (45 elements) → Consider splitting into:
-  - `specifications/Feature1.md` (requirements for Feature 1)
-  - `specifications/Feature2.md` (requirements for Feature 2)
+- `requirements/LargeFile.md` (45 elements) → Consider splitting into:
+  - `requirements/Feature1.md` (requirements for Feature 1)
+  - `requirements/Feature2.md` (requirements for Feature 2)
 
 **Files to Consolidate:**
 - `temp/A.md` (2 elements) + `temp/B.md` (3 elements) → Use:
@@ -144,7 +144,7 @@ Provide clear, actionable recommendations:
   ```
 
 **Folder Reorganization:**
-- Move security-related files from `specifications/` to new `security/` folder
+- Move security-related files from `requirements/` to new `security/` folder
 
 ## Related Commands
 

@@ -206,7 +206,6 @@ This verification test checks that Reqvire correctly identifies and reports inva
   * verify: [Internal Consistency Validator](../Validation.md#internal-consistency-validator)
   * verify: [Relation Type Validation](../Validation.md#relation-type-validation)
   * verify: [Relation Element Type Validator](../Validation.md#relation-element-type-validator)
-  * verify: [Identifiers and Relations](../StructureAndParsing.md#identifiers-and-relations)
   * verify: [Trace Relation Non-Directional Behavior](../../Output/DiagramGeneration.md#trace-relation-non-directional-behavior)
   * satisfiedBy: [test.sh](../../../../tests/test-invalid-relations/test.sh)
 ---
@@ -299,7 +298,6 @@ This test verifies that the system correctly validates relation types based on e
 #### Details
 
 ##### Acceptance Criteria
-
 **derivedFrom/derive Validation:**
 - System shall allow `derivedFrom` relations only between requirement types (`requirement`, `user-requirement`)
 - System shall reject `derivedFrom` relations where source is a verification element
@@ -330,7 +328,6 @@ This test verifies that the system correctly validates relation types based on e
 - System shall allow `trace` relations to any target type
 
 ##### Test Criteria
-
 1. **derivedFrom type constraint tests:**
    - Create requirement with `derivedFrom` to another requirement - PASS
    - Create verification with `derivedFrom` to requirement - FAIL with type error

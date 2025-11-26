@@ -4,6 +4,9 @@
 
 The system shall provide functionality to build upward trace trees from verification elements by traversing all upward parent relations to reach root requirements, merging all paths into a single tree structure with marked directly-verified requirements.
 
+#### Attachments
+  * [Verification Trace Tree Construction](DesignDocuments/VerificationTraceAlgorithm.md#verification-trace-tree-construction)
+
 #### Relations
   * derivedFrom: [Verification Upward Traceability](../Output/Reporting.md#verification-upward-traceability)
 ---

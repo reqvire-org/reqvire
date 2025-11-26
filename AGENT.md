@@ -14,7 +14,7 @@ It serves as a single reference for:
 
 | Agent | Primary Purpose | When to Use | Relevant Commands / Files |
 |-------|-----------------|-------------|---------------------------|
-| **requirements‑engineer** | Manage specifications, add/update requirements and verifications, analyse model relations and coverage. | Any work that touches the Markdown specification files (e.g., `specifications/`, `SystemRequirements/`). | See the specifications guide for full syntax, element types, and relation rules.
+| **requirements‑engineer** | Manage specifications, add/update requirements and verifications, analyse model relations and coverage. | Any work that touches the Markdown specification files (e.g., `requirements/`, `SystemRequirements/`). | See the specifications guide for full syntax, element types, and relation rules.
 | **code‑reviewer** *(optional)* | Review Rust source changes, ensure style, linting, and correctness before committing. | After implementing code, before running `cargo test`. | Uses `cargo fmt`, `cargo clippy`, and runs unit tests under `core/tests/`.
 | **documentation‑agent** *(optional)* | Generate or update HTML documentation, diagrams, and traceability matrices. | When the model changes or a new release is prepared. | Commands: `./target/debug/reqvire export`, `./target/debug/reqvire serve`.
 
@@ -37,7 +37,7 @@ It serves as a single reference for:
   - Create a new `test-<feature>` directory.
   - Provide a `test.sh` script following the standard test script template.
   - Add any required `reqvire.yaml` config.
-  - Populate `specifications/` sub‑folders with the requirement and verification markdown that the test will satisfy.
+  - Populate `requirements/` sub‑folders with the requirement and verification markdown that the test will satisfy.
 - **Typical workflow**:
   1. Identify an unverified requirement (summary --filter-is-not-verified`).
   2. Scaffold a test directory (`mkdir tests/test‑my‑feature`).

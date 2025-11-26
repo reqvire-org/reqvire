@@ -80,12 +80,12 @@ The mv operation will fail with a clear error if:
 
 **Move element to different file:**
 ```bash
-reqvire mv "User Authentication" "specifications/Security.md"
+reqvire mv "User Authentication" "requirements/Security.md"
 ```
 
 **Insert at specific position (index 0 = first element in file):**
 ```bash
-reqvire mv "High Priority Req" "specifications/Critical.md" 0
+reqvire mv "High Priority Req" "requirements/Critical.md" 0
 ```
 
 **Preview before moving:**

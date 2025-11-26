@@ -81,10 +81,10 @@ For each requirement family to consolidate:
 
 ```bash
 # Read the parent requirement file
-Read specifications/path/to/ParentFile.md
+Read requirements/path/to/ParentFile.md
 
 # Read sections containing children if in different files
-Read specifications/path/to/ChildFile.md
+Read requirements/path/to/ChildFile.md
 ```
 
 #### 3.2 Create Enhanced Parent Details
