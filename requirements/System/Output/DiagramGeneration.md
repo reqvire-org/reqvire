@@ -134,6 +134,14 @@ Diagram generation follows a file-based approach:
 - The diagram shows all elements in the file and their relationships
 - External related resources are displayed as linked boxes to the actual resource
 
+**Containment Structure:**
+All mermaid diagrams shall use containment structure with nested subgraphs to show the physical organization of elements:
+- Folder subgraphs: `subgraph hashId["folder-icon Folder Name"]` groups files and subfolders
+- File subgraphs: `subgraph hashId["file-icon File Name"]` groups elements within files
+- Elements are rendered inside their containing file subgraph
+- This structure applies to file diagrams, model diagrams, and verification trace diagrams
+- Containment provides visual context for where elements are located in the model
+
 **Diagram Node Classes:**
 The system shall use Mermaid CSS classes to style diagram elements with differentiated colors:
 

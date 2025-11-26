@@ -7,29 +7,35 @@ graph TD;
   classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;
   classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
   classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
+  classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:3px;
+  classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
-  b4c1144098c87cfd["Child Element"];
-  class b4c1144098c87cfd systemRequirement;
-  click b4c1144098c87cfd "RelationFilteringTest.md#child-element";
+  subgraph b4c308bac4df6d65["📁 specifications"]
+    subgraph 4196b7086de0398a["📄 RelationFilteringTest.md"]
+      b4c1144098c87cfd["Child Element"];
+      class b4c1144098c87cfd systemRequirement;
+      click b4c1144098c87cfd "RelationFilteringTest.md#child-element";
+      d98145b2ad72dcda["Derived Child"];
+      class d98145b2ad72dcda systemRequirement;
+      click d98145b2ad72dcda "RelationFilteringTest.md#derived-child";
+      4e1cb636ad4ee816["Parent Element"];
+      class 4e1cb636ad4ee816 userRequirement;
+      click 4e1cb636ad4ee816 "RelationFilteringTest.md#parent-element";
+      abf09cce5116921b["Refined Element"];
+      class abf09cce5116921b systemRequirement;
+      click abf09cce5116921b "RelationFilteringTest.md#refined-element";
+      7f34373d0cdbaedb["Test Verification"];
+      class 7f34373d0cdbaedb verification;
+      click 7f34373d0cdbaedb "RelationFilteringTest.md#test-verification";
+    end
+  end
   cc713a8374185e34["implementation.rs"];
   class cc713a8374185e34 default;
   click cc713a8374185e34 "implementation.rs";
   b4c1144098c87cfd -->|satisfiedBy| cc713a8374185e34;
-  7f34373d0cdbaedb["Test Verification"];
-  class 7f34373d0cdbaedb verification;
-  click 7f34373d0cdbaedb "RelationFilteringTest.md#test-verification";
   b4c1144098c87cfd -.->|verifiedBy| 7f34373d0cdbaedb;
-  d98145b2ad72dcda["Derived Child"];
-  class d98145b2ad72dcda systemRequirement;
-  click d98145b2ad72dcda "RelationFilteringTest.md#derived-child";
-  abf09cce5116921b["Refined Element"];
-  class abf09cce5116921b systemRequirement;
-  click abf09cce5116921b "RelationFilteringTest.md#refined-element";
   d98145b2ad72dcda -.->|deriveReqT| abf09cce5116921b;
-  4e1cb636ad4ee816["Parent Element"];
-  class 4e1cb636ad4ee816 userRequirement;
-  click 4e1cb636ad4ee816 "RelationFilteringTest.md#parent-element";
   4e1cb636ad4ee816 -.->|deriveReqT| b4c1144098c87cfd;
   4e1cb636ad4ee816 -.->|deriveReqT| d98145b2ad72dcda;
   6b66956ccd4194af["refined_impl.rs"];

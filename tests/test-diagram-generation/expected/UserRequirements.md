@@ -7,35 +7,45 @@ graph TD;
   classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;
   classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
   classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
+  classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:3px;
+  classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
-  2c73cbd2f2a63974["Main User Interface Requirement"];
-  class 2c73cbd2f2a63974 userRequirement;
-  click 2c73cbd2f2a63974 "UserRequirements.md#main-user-interface-requirement";
-  d9cb537853e8286f["UI Element 1"];
-  class d9cb537853e8286f systemRequirement;
-  click d9cb537853e8286f "UserRequirements.md#ui-element-1";
+  subgraph b4c308bac4df6d65["📁 specifications"]
+    subgraph d76ffb0335b04f31["📄 SystemRequirements.md"]
+      7f2b10e005eeec75["System Element 1"];
+      class 7f2b10e005eeec75 systemRequirement;
+      click 7f2b10e005eeec75 "SystemRequirements.md#system-element-1";
+      d0a7d2972d10f70a["System Element 2"];
+      class d0a7d2972d10f70a systemRequirement;
+      click d0a7d2972d10f70a "SystemRequirements.md#system-element-2";
+    end
+    subgraph c057e38f409f215b["📄 UserRequirements.md"]
+      2c73cbd2f2a63974["Main User Interface Requirement"];
+      class 2c73cbd2f2a63974 userRequirement;
+      click 2c73cbd2f2a63974 "UserRequirements.md#main-user-interface-requirement";
+      f4c9118eafeb9203["Performance Element 1"];
+      class f4c9118eafeb9203 systemRequirement;
+      click f4c9118eafeb9203 "UserRequirements.md#performance-element-1";
+      b3c9118eafeb9203["Performance Element 2"];
+      class b3c9118eafeb9203 systemRequirement;
+      click b3c9118eafeb9203 "UserRequirements.md#performance-element-2";
+      d9cb537853e8286f["UI Element 1"];
+      class d9cb537853e8286f systemRequirement;
+      click d9cb537853e8286f "UserRequirements.md#ui-element-1";
+      e5550e52de8208b0["UI Element 2"];
+      class e5550e52de8208b0 systemRequirement;
+      click e5550e52de8208b0 "UserRequirements.md#ui-element-2";
+    end
+  end
   2c73cbd2f2a63974 -.->|deriveReqT| d9cb537853e8286f;
-  e5550e52de8208b0["UI Element 2"];
-  class e5550e52de8208b0 systemRequirement;
-  click e5550e52de8208b0 "UserRequirements.md#ui-element-2";
   2c73cbd2f2a63974 -.->|deriveReqT| e5550e52de8208b0;
-  f4c9118eafeb9203["Performance Element 1"];
-  class f4c9118eafeb9203 systemRequirement;
-  click f4c9118eafeb9203 "UserRequirements.md#performance-element-1";
-  b3c9118eafeb9203["Performance Element 2"];
-  class b3c9118eafeb9203 systemRequirement;
-  click b3c9118eafeb9203 "UserRequirements.md#performance-element-2";
-  7f2b10e005eeec75["System Element 1"];
-  class 7f2b10e005eeec75 systemRequirement;
-  click 7f2b10e005eeec75 "SystemRequirements.md#system-element-1";
   d9cb537853e8286f -.->|deriveReqT| 7f2b10e005eeec75;
   d9cb537853e8286f -.->|deriveReqT| f4c9118eafeb9203;
-  d0a7d2972d10f70a["System Element 2"];
-  class d0a7d2972d10f70a systemRequirement;
-  click d0a7d2972d10f70a "SystemRequirements.md#system-element-2";
   e5550e52de8208b0 -.->|deriveReqT| d0a7d2972d10f70a;
   e5550e52de8208b0 -.->|deriveReqT| b3c9118eafeb9203;
+  7f2b10e005eeec75 -.->|deriveReqT| 2224944e5433019f;
+  d0a7d2972d10f70a -.->|deriveReqT| 73a156057b550c34;
 ```
 This is a test user requirements document for diagram generation.
 

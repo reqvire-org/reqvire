@@ -52,7 +52,7 @@ pub struct RequirementNode {
 struct RequirementNodeWithRelation {
     pub id: String,
     pub name: String,
-    pub is_directly_verified: bool,
+    pub element_type: String, // CSS class name based on element type
     pub children: Vec<(String, RequirementNodeWithRelation)>, // (relation_type, node)
     pub attachments: Vec<String>,
 }
@@ -233,8 +233,10 @@ impl<'a> VerificationTraceGenerator<'a> {
         count
     }
 
-    /// Generate Mermaid diagram for a verification trace
+    /// Generate Mermaid diagram for a verification trace with containment structure
     pub fn generate_mermaid_diagram(&self, trace: &VerificationTrace) -> String {
+        use std::collections::HashMap;
+
         let mut diagram = String::new();
 
         // Get Git repository information for creating proper links
@@ -257,88 +259,238 @@ impl<'a> VerificationTraceGenerator<'a> {
             && !base_url.is_empty()
             && !commit_hash.is_empty();
 
-        // Header with CSS classes (MBSE color scheme)
-        diagram.push_str("```mermaid\n");
-        diagram.push_str("graph TD\n");
-        diagram.push_str("  classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;\n");
-        diagram.push_str("  classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;\n");
-        diagram.push_str("  classDef requirement fill:#ECEFF1,stroke:#673AB7,stroke-width:1.5px;\n");
-        diagram.push_str("  classDef verified fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;\n");
-        diagram.push_str("  classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;\n");
-        diagram.push_str("\n");
-
-        // Add verification node at the top
-        let verification_id = utils::hash_identifier(&trace.identifier);
-        diagram.push_str(&format!(
-            "  {}[\"{}\"]:::verification\n",
-            verification_id, trace.name
-        ));
-
-        // Add click handler for verification node
-        let verification_click_target = if self.diagrams_with_blobs && has_git_info {
-            // Use GitHub blob URLs when diagrams_with_blobs is enabled
-            let relative_id = match utils::get_relative_path(&PathBuf::from(&trace.identifier)) {
-                Ok(rel_path) => rel_path.to_string_lossy().to_string(),
-                Err(_) => trace.identifier.clone(),
-            };
-            format!("{}/blob/{}/{}", base_url, commit_hash, relative_id)
-        } else if let Some(ref from_folder) = self.from_folder {
-            // Special case: "/" means reqvire root (git root), use identifier as-is
-            if from_folder == "/" {
-                trace.identifier.clone()
-            } else {
-                // Calculate relative path from from_folder to the identifier
-                let from_folder_path = repo_root.join(from_folder);
-                match utils::to_relative_identifier(&trace.identifier, &from_folder_path, false) {
-                    Ok(rel_path) => rel_path,
-                    Err(_) => trace.identifier.clone(),
-                }
-            }
-        } else {
-            // Use identifier as-is (default behavior)
-            trace.identifier.clone()
-        };
-        diagram.push_str(&format!("  click {} \"{}\";\n", verification_id, verification_click_target));
-
-        // Build tree with relation information
+        // Build tree with relation information first to collect all elements
         let mut visited = HashSet::new();
         let mut tree_with_relations = Vec::new();
 
         for req_id in &trace.directly_verified_requirements {
             if let Some(req) = self.registry.get_element(req_id) {
-                if let Some(node) = self.build_node_with_relations(req, true, &mut visited) {
+                if let Some(node) = self.build_node_with_relations(req, &mut visited) {
                     tree_with_relations.push(node);
                 }
             }
         }
 
-        // Add all requirements from trace tree
-        let mut visited_nodes = HashSet::new();
-        let mut visited_edges = HashSet::new();
-        for node in &tree_with_relations {
-            self.add_node_to_diagram_with_relations(
-                node,
-                &verification_id,
-                VERIFY_RELATION, // Connection from verification to verified requirement
-                &mut diagram,
-                &mut visited_nodes,
-                &mut visited_edges,
-                &repo_root,
-                &base_url,
-                &commit_hash,
-                has_git_info,
-            );
+        // Collect all elements that will be in the diagram
+        // (id, name, element_type, attachments) - element_type is used for CSS class
+        let mut all_elements: Vec<(String, String, String, Vec<String>)> = Vec::new();
+        let mut collected_ids: HashSet<String> = HashSet::new();
+
+        // Add verification element
+        all_elements.push((trace.identifier.clone(), trace.name.clone(), "verification".to_string(), vec![]));
+        collected_ids.insert(trace.identifier.clone());
+
+        // Collect all requirements from tree
+        self.collect_elements_from_tree(&tree_with_relations, &mut all_elements, &mut collected_ids);
+
+        // Group elements by folder -> file for containment structure
+        let mut folders: HashMap<String, HashMap<String, Vec<(String, String, String, Vec<String>)>>> = HashMap::new();
+
+        for (elem_id, elem_name, elem_type, attachments) in all_elements {
+            // Extract folder and file from identifier (format: path/to/File.md#element-name)
+            let id_without_fragment = elem_id.split('#').next().unwrap_or(&elem_id);
+            let path = PathBuf::from(id_without_fragment);
+            let folder = path
+                .parent()
+                .and_then(|p| p.to_str())
+                .unwrap_or("")
+                .to_string();
+            let file_name = path
+                .file_name()
+                .and_then(|n| n.to_str())
+                .unwrap_or_else(|| {
+                    id_without_fragment.rsplit('/').next().unwrap_or(id_without_fragment)
+                })
+                .to_string();
+
+            folders.entry(folder)
+                .or_insert_with(HashMap::new)
+                .entry(file_name)
+                .or_insert_with(Vec::new)
+                .push((elem_id, elem_name, elem_type, attachments));
         }
+
+        // Header with CSS classes (MBSE color scheme - matching other diagrams)
+        diagram.push_str("```mermaid\n");
+        diagram.push_str("graph TD\n");
+        diagram.push_str("  classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;\n");
+        diagram.push_str("  classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;\n");
+        diagram.push_str("  classDef requirement fill:#ECEFF1,stroke:#673AB7,stroke-width:1.5px;\n");
+        diagram.push_str("  classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;\n");
+        diagram.push_str("  classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:3px;\n");
+        diagram.push_str("  classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;\n");
+        diagram.push_str("  classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;\n");
+        diagram.push_str("\n");
+
+        // Sort folders for deterministic output
+        let mut folder_names: Vec<&String> = folders.keys().collect();
+        folder_names.sort();
+
+        // Generate subgraphs for folders and files (containment structure)
+        for folder_name in folder_names {
+            let files = &folders[folder_name];
+            let folder_id = utils::hash_identifier(&format!("folder:{}", folder_name));
+            let folder_display = if folder_name.is_empty() { "root" } else { folder_name };
+
+            diagram.push_str(&format!("  subgraph {}[\"📁 {}\"]\n", folder_id, folder_display));
+
+            // Sort files for deterministic output
+            let mut file_names: Vec<&String> = files.keys().collect();
+            file_names.sort();
+
+            for file_name in file_names {
+                let file_elements = &files[file_name];
+                let file_id = utils::hash_identifier(&format!("file:{}:{}", folder_name, file_name));
+
+                diagram.push_str(&format!("    subgraph {}[\"📄 {}\"]\n", file_id, file_name));
+
+                // Sort elements for deterministic output
+                let mut sorted_elements: Vec<&(String, String, String, Vec<String>)> = file_elements.iter().collect();
+                sorted_elements.sort_by(|a, b| a.0.cmp(&b.0));
+
+                for (elem_id, elem_name, elem_type, attachments) in sorted_elements {
+                    let node_id = utils::hash_identifier(elem_id);
+
+                    // Build label with attachments
+                    let mut node_label = elem_name.to_string();
+                    for attachment in attachments {
+                        node_label.push_str(&format!("<br/>📎 {}", attachment));
+                    }
+
+                    // Use the element type directly for CSS class
+                    let class = elem_type.as_str();
+
+                    diagram.push_str(&format!(
+                        "      {}[\"{}\"]:::{}\n",
+                        node_id, node_label, class
+                    ));
+
+                    // Add click handler
+                    let click_target = self.get_click_target(elem_id, &repo_root, &base_url, &commit_hash, has_git_info);
+                    diagram.push_str(&format!("      click {} \"{}\";\n", node_id, click_target));
+                }
+
+                diagram.push_str("    end\n");
+            }
+
+            diagram.push_str("  end\n");
+        }
+
+        // Add all relations
+        let verification_id = utils::hash_identifier(&trace.identifier);
+        let mut visited_edges: HashSet<(String, String, String)> = HashSet::new();
+
+        // Add verify relations from verification to directly verified requirements
+        for req_id in &trace.directly_verified_requirements {
+            let req_node_id = utils::hash_identifier(req_id);
+            let edge_key = (verification_id.clone(), VERIFY_RELATION.to_string(), req_node_id.clone());
+            if !visited_edges.contains(&edge_key) {
+                visited_edges.insert(edge_key);
+                if let Some(info) = crate::relation::RELATION_TYPES.get(VERIFY_RELATION) {
+                    diagram.push_str(&format!(
+                        "  {} {}|{}| {};\n",
+                        verification_id,
+                        info.arrow,
+                        info.label,
+                        req_node_id,
+                    ));
+                }
+            }
+        }
+
+        // Add parent relations from tree
+        self.add_relations_from_tree(&tree_with_relations, &mut diagram, &mut visited_edges);
 
         diagram.push_str("```\n");
         diagram
+    }
+
+    /// Collect all elements from the tree for containment grouping
+    fn collect_elements_from_tree(
+        &self,
+        nodes: &[RequirementNodeWithRelation],
+        all_elements: &mut Vec<(String, String, String, Vec<String>)>,
+        collected_ids: &mut HashSet<String>,
+    ) {
+        for node in nodes {
+            // Only add if not already collected (avoid duplicates from multiple paths)
+            if !collected_ids.contains(&node.id) {
+                collected_ids.insert(node.id.clone());
+                all_elements.push((node.id.clone(), node.name.clone(), node.element_type.clone(), node.attachments.clone()));
+            }
+            // Recursively collect children
+            let children: Vec<RequirementNodeWithRelation> = node.children.iter().map(|(_, n)| n.clone()).collect();
+            self.collect_elements_from_tree(&children, all_elements, collected_ids);
+        }
+    }
+
+    /// Add relations from tree to diagram
+    fn add_relations_from_tree(
+        &self,
+        nodes: &[RequirementNodeWithRelation],
+        diagram: &mut String,
+        visited_edges: &mut HashSet<(String, String, String)>,
+    ) {
+        for node in nodes {
+            let node_id = utils::hash_identifier(&node.id);
+
+            for (relation_type, child) in &node.children {
+                let child_id = utils::hash_identifier(&child.id);
+                let edge_key = (node_id.clone(), relation_type.clone(), child_id.clone());
+
+                if !visited_edges.contains(&edge_key) {
+                    visited_edges.insert(edge_key);
+                    if let Some(info) = crate::relation::RELATION_TYPES.get(relation_type.as_str()) {
+                        diagram.push_str(&format!(
+                            "  {} {}|{}| {};\n",
+                            node_id,
+                            info.arrow,
+                            info.label,
+                            child_id,
+                        ));
+                    }
+                }
+
+                // Recursively add relations for children
+                self.add_relations_from_tree(&[child.clone()], diagram, visited_edges);
+            }
+        }
+    }
+
+    /// Get click target for an element
+    fn get_click_target(
+        &self,
+        elem_id: &str,
+        repo_root: &PathBuf,
+        base_url: &str,
+        commit_hash: &str,
+        has_git_info: bool,
+    ) -> String {
+        if self.diagrams_with_blobs && has_git_info {
+            let relative_id = match utils::get_relative_path(&PathBuf::from(elem_id)) {
+                Ok(rel_path) => rel_path.to_string_lossy().to_string(),
+                Err(_) => elem_id.to_string(),
+            };
+            format!("{}/blob/{}/{}", base_url, commit_hash, relative_id)
+        } else if let Some(ref from_folder) = self.from_folder {
+            if from_folder == "/" {
+                elem_id.to_string()
+            } else {
+                let from_folder_path = repo_root.join(from_folder);
+                match utils::to_relative_identifier(elem_id, &from_folder_path, false) {
+                    Ok(rel_path) => rel_path,
+                    Err(_) => elem_id.to_string(),
+                }
+            }
+        } else {
+            elem_id.to_string()
+        }
     }
 
     /// Build a requirement node with relation information
     fn build_node_with_relations(
         &self,
         requirement: &Element,
-        is_directly_verified: bool,
         visited: &mut HashSet<String>,
     ) -> Option<RequirementNodeWithRelation> {
         if visited.contains(&requirement.identifier) {
@@ -356,7 +508,7 @@ impl<'a> VerificationTraceGenerator<'a> {
                     if let Some(parent) = self.registry.get_element(parent_id) {
                         let mut branch_visited = visited.clone();
                         if let Some(parent_node) =
-                            self.build_node_with_relations(parent, false, &mut branch_visited)
+                            self.build_node_with_relations(parent, &mut branch_visited)
                         {
                             // Store relation type with the node
                             children.push((relation.relation_type.name.to_string(), parent_node));
@@ -366,10 +518,18 @@ impl<'a> VerificationTraceGenerator<'a> {
             }
         }
 
+        // Determine CSS class based on element type (matching other diagrams)
+        let element_type = match &requirement.element_type {
+            ElementType::Requirement(crate::element::RequirementType::User) => "userRequirement",
+            ElementType::Requirement(crate::element::RequirementType::System) => "systemRequirement",
+            ElementType::Verification(_) => "verification",
+            _ => "requirement"
+        };
+
         Some(RequirementNodeWithRelation {
             id: requirement.identifier.clone(),
             name: requirement.name.clone(),
-            is_directly_verified,
+            element_type: element_type.to_string(),
             children,
             attachments: requirement.attachments.iter()
                 .map(|a| match &a.target {
@@ -380,103 +540,6 @@ impl<'a> VerificationTraceGenerator<'a> {
                 })
                 .collect(),
         })
-    }
-
-    /// Add requirement node and its children to diagram with proper relation arrows
-    fn add_node_to_diagram_with_relations(
-        &self,
-        node: &RequirementNodeWithRelation,
-        source_id: &str,
-        relation_type_name: &str,
-        diagram: &mut String,
-        visited_nodes: &mut HashSet<String>,
-        visited_edges: &mut HashSet<(String, String, String)>,
-        repo_root: &PathBuf,
-        base_url: &str,
-        commit_hash: &str,
-        has_git_info: bool,
-    ) {
-        let node_id = utils::hash_identifier(&node.id);
-
-        // Add node if not already visited
-        if !visited_nodes.contains(&node.id) {
-            visited_nodes.insert(node.id.clone());
-
-            let class = if node.is_directly_verified {
-                "verified"
-            } else {
-                "requirement"
-            };
-
-            // Build label with attachments
-            let mut node_label = node.name.clone();
-            for attachment in &node.attachments {
-                node_label.push_str(&format!("<br/>📎 {}", attachment));
-            }
-
-            diagram.push_str(&format!(
-                "  {}[\"{}\"]:::{}\n",
-                node_id, node_label, class
-            ));
-
-            // Add click handler for requirement node
-            let click_target = if self.diagrams_with_blobs && has_git_info {
-                let relative_id = match utils::get_relative_path(&PathBuf::from(&node.id)) {
-                    Ok(rel_path) => rel_path.to_string_lossy().to_string(),
-                    Err(_) => node.id.clone(),
-                };
-                format!("{}/blob/{}/{}", base_url, commit_hash, relative_id)
-            } else if let Some(ref from_folder) = self.from_folder {
-                // Special case: "/" means reqvire root (git root), use identifier as-is
-                if from_folder == "/" {
-                    node.id.clone()
-                } else {
-                    // Calculate relative path from from_folder to the identifier
-                    let from_folder_path = repo_root.join(from_folder);
-                    match utils::to_relative_identifier(&node.id, &from_folder_path, false) {
-                        Ok(rel_path) => rel_path,
-                        Err(_) => node.id.clone(),
-                    }
-                }
-            } else {
-                node.id.clone()
-            };
-            diagram.push_str(&format!("  click {} \"{}\";\n", node_id, click_target));
-        }
-
-        // Add link from source to this node using proper relation metadata
-        // Track edges to avoid duplicates (source, relation_type, target)
-        let edge_key = (source_id.to_string(), relation_type_name.to_string(), node_id.clone());
-        if !visited_edges.contains(&edge_key) {
-            visited_edges.insert(edge_key);
-
-            if let Some(info) = crate::relation::RELATION_TYPES.get(relation_type_name) {
-                // Always render as element → target
-                diagram.push_str(&format!(
-                    "  {} {}|{}| {};\n",
-                    source_id,
-                    info.arrow,
-                    info.label,
-                    node_id,
-                ));
-            }
-        }
-
-        // Recursively add children
-        for (child_relation_type, child) in &node.children {
-            self.add_node_to_diagram_with_relations(
-                child,
-                &node_id,
-                child_relation_type,
-                diagram,
-                visited_nodes,
-                visited_edges,
-                repo_root,
-                base_url,
-                commit_hash,
-                has_git_info,
-            );
-        }
     }
 
     /// Generate Markdown report with Mermaid diagrams

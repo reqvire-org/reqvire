@@ -7,14 +7,20 @@ graph TD;
   classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;
   classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
   classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
+  classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:3px;
+  classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
-  73e63ed391cfc4bf["System Verification Test 1"];
-  class 73e63ed391cfc4bf verification;
-  click 73e63ed391cfc4bf "VerificationTests.md#system-verification-test-1";
-  f0a7f5fab3da59bf["System Verification Test 2"];
-  class f0a7f5fab3da59bf verification;
-  click f0a7f5fab3da59bf "VerificationTests.md#system-verification-test-2";
+  subgraph b4c308bac4df6d65["📁 specifications"]
+    subgraph e020853b49324636["📄 VerificationTests.md"]
+      73e63ed391cfc4bf["System Verification Test 1"];
+      class 73e63ed391cfc4bf verification;
+      click 73e63ed391cfc4bf "VerificationTests.md#system-verification-test-1";
+      f0a7f5fab3da59bf["System Verification Test 2"];
+      class f0a7f5fab3da59bf verification;
+      click f0a7f5fab3da59bf "VerificationTests.md#system-verification-test-2";
+    end
+  end
 ```
 This document contains verification tests for the system requirements.
 

@@ -161,7 +161,8 @@ System shall support markdown and JSON output formats.
 
 #### Details
 - Markdown format shall include embedded Mermaid diagram with model structure
-- Markdown shall show hierarchical structure (folders > files > sections > elements)
+- Markdown shall show hierarchical structure using containment subgraphs (folders > files > elements)
+- Mermaid diagrams shall use folder and file subgraphs to visually group elements by their physical location
 - JSON format shall use structured data with folders, files, sections, elements, relations, and attachments
 - Both formats shall represent the same filtered or complete model data
 - Element attachments shall be included as an array of strings in both formats (file paths and element identifiers)

@@ -7,14 +7,20 @@ graph TD;
   classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;
   classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
   classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
+  classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:3px;
+  classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
-  5cb18536e42c1e69["API Integration Test"];
-  class 5cb18536e42c1e69 verification;
-  click 5cb18536e42c1e69 "Tests.md#api-integration-test";
-  bd5f20d982e2da41["Test Verification"];
-  class bd5f20d982e2da41 verification;
-  click bd5f20d982e2da41 "Tests.md#test-verification";
+  subgraph 186822cd467e0417["📁 specifications/Verifications"]
+    subgraph b64358bba6ee017f["📄 Tests.md"]
+      5cb18536e42c1e69["API Integration Test"];
+      class 5cb18536e42c1e69 verification;
+      click 5cb18536e42c1e69 "Tests.md#api-integration-test";
+      bd5f20d982e2da41["Test Verification"];
+      class bd5f20d982e2da41 verification;
+      click bd5f20d982e2da41 "Tests.md#test-verification";
+    end
+  end
 ```
 ### Test Verification
 

@@ -4,6 +4,13 @@
 
 The system shall provide functionality to build upward trace trees from verification elements by traversing all upward parent relations to reach root requirements, merging all paths into a single tree structure with marked directly-verified requirements.
 
+#### Details
+**Diagram Output:**
+Verification trace diagrams shall use the same visual styling as other mermaid diagrams:
+- Containment structure with folder and file subgraphs showing physical location of elements
+- Element type-based CSS classes (userRequirement, systemRequirement, verification) for consistent coloring
+- Directly verified requirements highlighted with appropriate styling
+
 #### Attachments
   * [Verification Trace Tree Construction](DesignDocuments/VerificationTraceAlgorithm.md#verification-trace-tree-construction)
 

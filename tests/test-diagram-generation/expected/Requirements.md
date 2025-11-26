@@ -7,44 +7,47 @@ graph TD;
   classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;
   classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
   classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
+  classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:3px;
+  classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
-  cf79434a22b1507e["Element 1"];
-  class cf79434a22b1507e verification;
-  click cf79434a22b1507e "Requirements.md#element-1";
-  1079434a22b1507e["Element 2"];
-  class 1079434a22b1507e systemRequirement;
-  click 1079434a22b1507e "Requirements.md#element-2";
+  subgraph b4c308bac4df6d65["📁 specifications"]
+    subgraph 5dfefa354ee9a4f5["📄 Requirements.md"]
+      cf79434a22b1507e["Element 1"];
+      class cf79434a22b1507e verification;
+      click cf79434a22b1507e "Requirements.md#element-1";
+      1079434a22b1507e["Element 2"];
+      class 1079434a22b1507e systemRequirement;
+      click 1079434a22b1507e "Requirements.md#element-2";
+      a579434a22b1507e["Element 3"];
+      class a579434a22b1507e systemRequirement;
+      click a579434a22b1507e "Requirements.md#element-3";
+      8e79434a22b1507e["Element 4"];
+      class 8e79434a22b1507e systemRequirement;
+      click 8e79434a22b1507e "Requirements.md#element-4";
+      2379434a22b1507e["Element 5"];
+      class 2379434a22b1507e systemRequirement;
+      click 2379434a22b1507e "Requirements.md#element-5";
+      6479434a22b1507e["Element 6"];
+      class 6479434a22b1507e systemRequirement;
+      click 6479434a22b1507e "Requirements.md#element-6";
+      b03c0ee6775eb521["Root Requirement"];
+      class b03c0ee6775eb521 userRequirement;
+      click b03c0ee6775eb521 "Requirements.md#root-requirement";
+    end
+  end
   1079434a22b1507e -.->|trace| cf79434a22b1507e;
-  a579434a22b1507e["Element 3"];
-  class a579434a22b1507e systemRequirement;
-  click a579434a22b1507e "Requirements.md#element-3";
   a579434a22b1507e -.->|deriveReqT| 1079434a22b1507e;
-  8e79434a22b1507e["Element 4"];
-  class 8e79434a22b1507e systemRequirement;
-  click 8e79434a22b1507e "Requirements.md#element-4";
   a579434a22b1507e -.->|deriveReqT| 8e79434a22b1507e;
-  6479434a22b1507e["Element 6"];
-  class 6479434a22b1507e systemRequirement;
-  click 6479434a22b1507e "Requirements.md#element-6";
   a579434a22b1507e -.->|deriveReqT| 6479434a22b1507e;
   2de23bdcc3c1bb08["element2_implementation.py"];
   class 2de23bdcc3c1bb08 default;
   click 2de23bdcc3c1bb08 "element2_implementation.py";
   a579434a22b1507e -->|satisfiedBy| 2de23bdcc3c1bb08;
   a579434a22b1507e -.->|verifiedBy| cf79434a22b1507e;
-  2379434a22b1507e["Element 5"];
-  class 2379434a22b1507e systemRequirement;
-  click 2379434a22b1507e "Requirements.md#element-5";
-  2de23bdcc3c1bb08["element2_implementation.py"];
-  class 2de23bdcc3c1bb08 default;
-  click 2de23bdcc3c1bb08 "element2_implementation.py";
   2379434a22b1507e -->|satisfiedBy| 2de23bdcc3c1bb08;
   2379434a22b1507e -.->|trace| cf79434a22b1507e;
   6479434a22b1507e -.->|deriveReqT| 2379434a22b1507e;
-  b03c0ee6775eb521["Root Requirement"];
-  class b03c0ee6775eb521 userRequirement;
-  click b03c0ee6775eb521 "Requirements.md#root-requirement";
   b03c0ee6775eb521 -.->|deriveReqT| a579434a22b1507e;
 ```
 This is a requirements document specifically created for testing diagram generation.
