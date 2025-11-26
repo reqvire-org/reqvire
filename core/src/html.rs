@@ -245,6 +245,8 @@ pub const HTML_TEMPLATE_MODEL: &str = include_str!("../templates/model.html");
 
 /// HTML template for whole-model.html page with tighter edge detection for dense diagrams
 /// Loaded at compile time from templates/whole-model.html
+/// NOTE: Currently unused as whole-model generation is disabled, but preserved for future use
+#[allow(dead_code)]
 pub const HTML_TEMPLATE_WHOLE_MODEL: &str = include_str!("../templates/whole-model.html");
 
 /// HTML template for generated pages

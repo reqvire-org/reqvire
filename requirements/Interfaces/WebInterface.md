@@ -16,9 +16,8 @@ Execute all generation commands treating temporary directory as repository root:
 1. Generate all Mermaid diagrams in markdown files
 2. Generate index.md (model structure overview)
 3. Generate model.md (model-centric visualization with nested relations from root requirements)
-4. Generate whole-model.md (complete model diagram showing all elements and relations)
-5. Generate traces.md (verification upward traceability)
-6. Generate coverage.md (verification coverage report)
+4. Generate traces.md (verification upward traceability)
+5. Generate coverage.md (verification coverage report)
 
 **HTML Conversion:**
 - Convert all markdown files to HTML with embedded styles
@@ -61,7 +60,6 @@ The navigation bar must include:
 - Home: Link to index.html (model structure overview)
 - Containment: Link to containment.html (model containment diagram)
 - Model: Link to model.html (model-centric view with nested relations)
-- Whole Model: Link to whole-model.html (complete model diagram)
 - Traces: Link to traces.html (verification upward traceability report)
 - Coverage: Link to coverage.html (verification coverage report)
 
@@ -196,23 +194,6 @@ The system shall make element names in the model-centric view clickable links th
   * derivedFrom: [Model-Centric View Generation](#model-centric-view-generation)
   * satisfiedBy: [report_model.rs](../../core/src/report_model.rs)
   * verifiedBy: [Model View Element Navigation Test](Verifications/WebInterfaceVerifications.md#model-view-element-navigation-test)
----
-
-### Whole Model Diagram Generation
-
-The system shall generate a complete model diagram during HTML export showing all elements and their relationships.
-
-#### Details
-- Display all elements without filtering
-- Show all forward relations (derive, satisfiedBy, verifiedBy, trace)
-- Group elements by file and section
-- Use mermaid diagram format
-- Output as whole-model.html
-
-#### Relations
-  * derivedFrom: [HTML Export](#html-export)
-  * satisfiedBy: [export.rs](../../core/src/export.rs)
-  * satisfiedBy: [diagrams.rs](../../core/src/diagrams.rs)
 ---
 
 ### Attachment Export

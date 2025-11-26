@@ -37,6 +37,10 @@ const PAGE_DESCRIPTION_MODEL: &str = r#"# Model
 
 The model view displays the logical structure starting from root requirements—requirements without parent derivations. Each element shows its complete relation tree: derived child requirements, verifications, and implementations. This follows MBSE principles where stakeholder needs flow down through requirement hierarchies to verifiable, implementable specifications."#;
 
+// NOTE: Whole model generation is currently disabled but the functionality is preserved
+// for potential future use. The generate_model_diagram function in diagrams.rs can still
+// generate complete model diagrams when needed.
+#[allow(dead_code)]
 const PAGE_DESCRIPTION_WHOLE_MODEL: &str = r#"# Whole Model
 
 This diagram visualizes the complete model as a single interconnected graph showing all elements and their relationships. Hover over any node to highlight its connected elements—ancestors (upstream) and descendants (downstream). Use this bird's-eye view to understand the overall requirements architecture and identify traceability chains across the model."#;
@@ -365,15 +369,18 @@ pub fn generate_artifacts_in_temp(
     );
     filesystem::write_file("model.md", model_content.as_bytes())?;
 
-    // Generate whole model diagram (all elements and relations)
-    info!("Generating whole-model.md...");
-    let whole_model_mermaid = crate::diagrams::generate_model_diagram(&temp_model_manager.graph_registry, None)?;
-    let whole_model_content = format!(
-        "{}\n\n{}",
-        PAGE_DESCRIPTION_WHOLE_MODEL,
-        whole_model_mermaid
-    );
-    filesystem::write_file("whole-model.md", whole_model_content.as_bytes())?;
+    // NOTE: Whole model generation is disabled - the model.md view provides similar
+    // functionality with better organization. The code is preserved for potential future use.
+    // To re-enable, uncomment the following block:
+    //
+    // info!("Generating whole-model.md...");
+    // let whole_model_mermaid = crate::diagrams::generate_model_diagram(&temp_model_manager.graph_registry, None)?;
+    // let whole_model_content = format!(
+    //     "{}\n\n{}",
+    //     PAGE_DESCRIPTION_WHOLE_MODEL,
+    //     whole_model_mermaid
+    // );
+    // filesystem::write_file("whole-model.md", whole_model_content.as_bytes())?;
 
     info!("Generating traces.md...");
     let trace_generator = crate::verification_trace::VerificationTraceGenerator::new(
