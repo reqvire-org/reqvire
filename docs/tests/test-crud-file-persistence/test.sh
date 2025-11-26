@@ -33,7 +33,7 @@ OVERALL_RESULT=0
 mkdir -p "${TEST_DIR}/specifications"
 
 cat > "${TEST_DIR}/specifications/FileA.md" << 'EOF'
-# Requirements
+# Elements
 
 
 ### Root Requirement
@@ -65,7 +65,7 @@ This is requirement A2.
 EOF
 
 cat > "${TEST_DIR}/specifications/FileB.md" << 'EOF'
-# Requirements
+# Elements
 
 
 ### Requirement B1
@@ -91,7 +91,7 @@ This is requirement B2.
 EOF
 
 cat > "${TEST_DIR}/specifications/FileC.md" << 'EOF'
-# Requirements
+# Elements
 
 
 ### Requirement C1
@@ -130,7 +130,7 @@ This is requirement A3.
 
 sleep 1
 set +e
-OUTPUT=$(cd "$TEST_DIR" && echo "$NEW_ELEMENT" | "$REQVIRE_BIN" add specifications/FileA.md "Section A" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && echo "$NEW_ELEMENT" | "$REQVIRE_BIN" add specifications/FileA.md 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -257,7 +257,7 @@ TIMESTAMP_C_BEFORE=$(stat -c %Y "${TEST_DIR}/specifications/FileC.md" 2>/dev/nul
 
 sleep 1
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv "Requirement A2" "specifications/FileC.md" "Section C" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv "Requirement A2" "specifications/FileC.md" 2>&1)
 EXIT_CODE=$?
 set -e
 

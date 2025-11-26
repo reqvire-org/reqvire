@@ -324,6 +324,16 @@ pub fn is_satisfaction_relation(rtype: &RelationTypeInfo) -> bool {
 
 /// Validates if the element types are appropriate for a given relation type
 /// Returns true if the types are compatible, false otherwise
+///
+/// Element Type Relation Compatibility Matrix:
+/// - derivedFrom/derive: Only requirement types (requirement, user-requirement) can use these
+/// - verifiedBy: Source must be requirement, target must be verification
+/// - verify: Source must be verification, target must be requirement
+/// - satisfiedBy: Source must be requirement or test-verification, target must be file
+/// - satisfy: Inverse of satisfiedBy (auto-generated)
+/// - trace: Any non-refinement element type can use trace
+/// - Refinement types (constraint, behavior, specification): Cannot have any relations
+/// - Other type: Can only use trace relations
 pub fn validate_relation_element_types(
     relation_type: &str,
     source_type: &crate::element::ElementType,
@@ -331,56 +341,88 @@ pub fn validate_relation_element_types(
 ) -> bool {
     use crate::element::ElementType;
 
+    // First check: source element type restrictions based on relation type
+    // Refinement types cannot have ANY relations (this is checked elsewhere in parser)
+    // Other type can only use trace relations
+    if let ElementType::Other(type_str) = source_type {
+        // "other" type (explicit) can only use trace
+        if type_str == "other" && relation_type != "trace" {
+            return false;
+        }
+    }
+
     match relation_type {
         "derivedFrom" => {
-            // Source should be a requirement and target should be a requirement
-            matches!(source_type, ElementType::Requirement(_)) && 
+            // Only requirement types can use derivedFrom
+            // Source must be requirement, target must be requirement
+            matches!(source_type, ElementType::Requirement(_)) &&
             matches!(target_type, ElementType::Requirement(_))
         },
         "derive" => {
-            // Source should be a requirement and target should be a requirement
-            matches!(source_type, ElementType::Requirement(_)) && 
+            // Only requirement types can use derive
+            // Source must be requirement, target must be requirement
+            matches!(source_type, ElementType::Requirement(_)) &&
             matches!(target_type, ElementType::Requirement(_))
-        },    
+        },
         "verifiedBy" => {
-            // Source should be a requirement and target should be a verification
-            matches!(source_type, ElementType::Requirement(_)) && 
+            // Source must be a requirement and target must be a verification
+            matches!(source_type, ElementType::Requirement(_)) &&
             matches!(target_type, ElementType::Verification(_))
         },
         "verify" => {
-            // Source should be a verification and target should be a requirement
-            matches!(source_type, ElementType::Verification(_)) && 
+            // Source must be a verification and target must be a requirement
+            matches!(source_type, ElementType::Verification(_)) &&
             matches!(target_type, ElementType::Requirement(_))
         },
         "satisfiedBy" => {
-            // Source should be a requirement and target should be an implementation (or any element that can satisfy)
-            matches!(source_type, ElementType::Requirement(_)) && 
-            (match target_type {
-                ElementType::Other(impl_type) => impl_type.contains("implementation") || impl_type.contains("design"),
+            // Source must be requirement or test-verification
+            // Target can be a file (implementation) or refinement element (constraint, behavior, specification)
+            // Note: non-test-verification satisfiedBy is checked separately in graph_registry
+            let source_valid = match source_type {
+                ElementType::Requirement(_) => true,
+                ElementType::Verification(vtype) => {
+                    matches!(vtype, crate::element::VerificationType::Default | crate::element::VerificationType::Test)
+                },
                 _ => false
-            })
+            };
+            // For target, we allow File type, Other (for implementation files), or Refinement types
+            let target_valid = matches!(target_type, ElementType::File | ElementType::Other(_) | ElementType::Refinement(_));
+            source_valid && target_valid
         },
         "satisfy" => {
-            // Source should be an implementation and target should be a requirement
-            (match source_type {
-                ElementType::Other(impl_type) => impl_type.contains("implementation") || impl_type.contains("design"),
+            // Source should be a file/implementation or refinement, target should be a requirement or test-verification
+            // Note: satisfy from refinements is auto-generated, refinements cannot define relations themselves
+            let source_valid = matches!(source_type, ElementType::File | ElementType::Other(_) | ElementType::Refinement(_));
+            let target_valid = match target_type {
+                ElementType::Requirement(_) => true,
+                ElementType::Verification(vtype) => {
+                    matches!(vtype, crate::element::VerificationType::Default | crate::element::VerificationType::Test)
+                },
                 _ => false
-            }) && 
-            matches!(target_type, ElementType::Requirement(_))
+            };
+            source_valid && target_valid
+        },
+        "trace" => {
+            // Trace is allowed for any non-refinement element type
+            // Refinement types cannot have relations at all (checked in parser)
+            !matches!(source_type, ElementType::Refinement(_))
         },
         // For other relation types, no specific element type validation
         _ => true
     }
 }
 
-//TODO: we can refactor and put this into description of each relation type
 /// Gets a detailed description of the expected element types for a relation
+/// Returns None if the relation type has no specific type restrictions
 pub fn get_relation_element_type_description(relation_type: &str) -> Option<String> {
     match relation_type {
+        "derivedFrom" => Some("'derivedFrom' can only be used between requirement types (requirement, user-requirement)".to_string()),
+        "derive" => Some("'derive' can only be used between requirement types (requirement, user-requirement)".to_string()),
         "verifiedBy" => Some("'verifiedBy' should connect a requirement to a verification element".to_string()),
         "verify" => Some("'verify' should connect a verification element to a requirement".to_string()),
-        "satisfiedBy" => Some("'satisfiedBy' should connect a requirement to an implementation element".to_string()),
-        "satisfy" => Some("'satisfy' should connect an implementation element to a requirement".to_string()),
+        "satisfiedBy" => Some("'satisfiedBy' should connect a requirement or test-verification to an implementation file or refinement element".to_string()),
+        "satisfy" => Some("'satisfy' should connect an implementation file or refinement element to a requirement or test-verification".to_string()),
+        "trace" => Some("'trace' can be used by any element type except refinement types".to_string()),
         _ => None
     }
 }

@@ -179,7 +179,7 @@ impl SearchFilters {
         // Attachment glob filter - must have an attachment matching the glob
         if let Some(g) = &self.attachment_glob {
             let has_matching_attachment = elem.attachments.iter()
-                .any(|a| g.is_match(a.file_path.to_string_lossy().as_ref()));
+                .any(|a| g.is_match(a.target.as_str().as_str()));
             if !has_matching_attachment {
                 return false;
             }
@@ -215,10 +215,6 @@ struct ElementSearchResult {
     element_type: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     content: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    verified_relations_count: Option<usize>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    satisfied_relations_count: Option<usize>,
     relations: Vec<RelationSearchResult>,
     #[serde(skip_serializing_if = "Option::is_none")]
     attachments: Option<Vec<String>>,
@@ -241,28 +237,38 @@ struct TargetSearchResult {
 struct GlobalSearchCounters {
     total_elements: usize,
     total_files: usize,
-    total_requirements_system: usize,
-    total_requirements_user: usize,
-    total_verifications_test: usize,
-    total_verifications_analysis: usize,
-    total_verifications_inspection: usize,
-    total_verifications_demonstration: usize,
+    total_requirements_types: BTreeMap<String, usize>,
+    total_verifications_types: BTreeMap<String, usize>,
+    total_refinements_types: BTreeMap<String, usize>,
     #[serde(skip_serializing_if = "BTreeMap::is_empty")]
-    custom_element_types: BTreeMap<String, usize>,
+    total_other_types: BTreeMap<String, usize>,
 }
 
 impl Default for GlobalSearchCounters {
     fn default() -> Self {
+        // Initialize with all standard types at 0
+        let mut requirements = BTreeMap::new();
+        requirements.insert("system-requirement".to_string(), 0);
+        requirements.insert("user-requirement".to_string(), 0);
+
+        let mut verifications = BTreeMap::new();
+        verifications.insert("test-verification".to_string(), 0);
+        verifications.insert("analysis-verification".to_string(), 0);
+        verifications.insert("inspection-verification".to_string(), 0);
+        verifications.insert("demonstration-verification".to_string(), 0);
+
+        let mut refinements = BTreeMap::new();
+        refinements.insert("behavior".to_string(), 0);
+        refinements.insert("constraint".to_string(), 0);
+        refinements.insert("specification".to_string(), 0);
+
         Self {
             total_elements: 0,
             total_files: 0,
-            total_requirements_system: 0,
-            total_requirements_user: 0,
-            total_verifications_test: 0,
-            total_verifications_analysis: 0,
-            total_verifications_inspection: 0,
-            total_verifications_demonstration: 0,
-            custom_element_types: BTreeMap::new(),
+            total_requirements_types: requirements,
+            total_verifications_types: verifications,
+            total_refinements_types: refinements,
+            total_other_types: BTreeMap::new(),
         }
     }
 }
@@ -306,25 +312,35 @@ fn build_search_result(
         if let Some(ref mut c) = counters {
             c.total_elements += 1;
 
-            // Count by element type
+            // Count by element type category
             match &elem.element_type {
                 element::ElementType::Requirement(req_t) => {
-                    match req_t {
-                        element::RequirementType::System => c.total_requirements_system += 1,
-                        element::RequirementType::User => c.total_requirements_user += 1,
-                    }
+                    let type_name = match req_t {
+                        element::RequirementType::System => "system-requirement",
+                        element::RequirementType::User => "user-requirement",
+                    };
+                    *c.total_requirements_types.entry(type_name.to_string()).or_insert(0) += 1;
                 }
                 element::ElementType::Verification(ver_t) => {
-                    match ver_t {
-                        element::VerificationType::Default => c.total_verifications_test += 1,
-                        element::VerificationType::Test => c.total_verifications_test += 1,
-                        element::VerificationType::Analysis => c.total_verifications_analysis += 1,
-                        element::VerificationType::Inspection => c.total_verifications_inspection += 1,
-                        element::VerificationType::Demonstration => c.total_verifications_demonstration += 1,
-                    }
+                    let type_name = match ver_t {
+                        element::VerificationType::Default => "test-verification",
+                        element::VerificationType::Test => "test-verification",
+                        element::VerificationType::Analysis => "analysis-verification",
+                        element::VerificationType::Inspection => "inspection-verification",
+                        element::VerificationType::Demonstration => "demonstration-verification",
+                    };
+                    *c.total_verifications_types.entry(type_name.to_string()).or_insert(0) += 1;
+                }
+                element::ElementType::Refinement(ref_t) => {
+                    let type_name = match ref_t {
+                        element::RefinementType::Constraint => "constraint",
+                        element::RefinementType::Behavior => "behavior",
+                        element::RefinementType::Specification => "specification",
+                    };
+                    *c.total_refinements_types.entry(type_name.to_string()).or_insert(0) += 1;
                 }
                 element::ElementType::Other(custom_type) => {
-                    *c.custom_element_types.entry(custom_type.clone()).or_insert(0) += 1;
+                    *c.total_other_types.entry(custom_type.clone()).or_insert(0) += 1;
                 }
                 element::ElementType::File => {}
             }
@@ -356,26 +372,13 @@ fn build_search_result(
                 .then_with(|| a.target.target.cmp(&b.target.target))
         });
 
-        // Count verified and satisfied relations for this element (only if not short mode)
-        let (vc, sc) = if short_mode {
-            (None, None)
-        } else {
-            let verified_count = elem.relations.iter()
-                .filter(|r| relation::is_verification_relation(r.relation_type))
-                .count();
-            let satisfied_count = elem.relations.iter()
-                .filter(|r| relation::is_satisfaction_relation(r.relation_type))
-                .count();
-            (Some(verified_count), Some(satisfied_count))
-        };
-
         // Build attachments list (omit in short mode)
         let attachments = if short_mode {
             None
         } else {
             Some(elem.attachments
                 .iter()
-                .map(|a| a.file_path.to_string_lossy().to_string())
+                .map(|a| a.target.as_str())
                 .collect())
         };
 
@@ -386,8 +389,6 @@ fn build_search_result(
             file: elem.file_path.clone(),
             element_type: elem.element_type.as_str().to_string(),
             content: if short_mode { None } else { Some(elem.content.clone()) },
-            verified_relations_count: vc,
-            satisfied_relations_count: sc,
             relations: rels,
             attachments,
         };
@@ -462,12 +463,6 @@ fn generate_search_text(result: &SearchResult, short_mode: bool) -> String {
                 if let Some(content) = &elem.content {
                     output.push_str(&format!("      - Content: {:?}\n", content));
                 }
-                if let Some(vc) = elem.verified_relations_count {
-                    output.push_str(&format!("      - Verified relations count: {}\n", vc));
-                }
-                if let Some(sc) = elem.satisfied_relations_count {
-                    output.push_str(&format!("      - Satisfied relations count: {}\n", sc));
-                }
 
                 if elem.relations.is_empty() {
                     output.push_str("      - No relations.\n");
@@ -489,22 +484,42 @@ fn generate_search_text(result: &SearchResult, short_mode: bool) -> String {
             output.push_str(&format!("Total files: {}\n", c.total_files));
             output.push_str(&format!("Total elements: {}\n", c.total_elements));
             output.push('\n');
-            output.push_str("📋 Element Types:\n");
-            output.push_str(&format!("System Requirements: {}\n", c.total_requirements_system));
-            output.push_str(&format!("User Requirements: {}\n", c.total_requirements_user));
-            output.push_str(&format!("Verifications (Test): {}\n", c.total_verifications_test));
-            output.push_str(&format!("Verifications (Analysis): {}\n", c.total_verifications_analysis));
-            output.push_str(&format!("Verifications (Inspection): {}\n", c.total_verifications_inspection));
-            output.push_str(&format!("Verifications (Demonstration): {}\n", c.total_verifications_demonstration));
 
-            if !c.custom_element_types.is_empty() {
-                let mut custom_types: Vec<_> = c.custom_element_types.iter().collect();
-                custom_types.sort_by_key(|(type_name, _)| *type_name);
-                for (type_name, count) in custom_types {
-                    output.push_str(&format!("Custom ({}): {}\n", type_name, count));
+            // Requirements types
+            if !c.total_requirements_types.is_empty() {
+                output.push_str("📋 Requirement Types:\n");
+                for (type_name, count) in &c.total_requirements_types {
+                    output.push_str(&format!("  {}: {}\n", type_name, count));
                 }
+                output.push('\n');
             }
 
+            // Verification types
+            if !c.total_verifications_types.is_empty() {
+                output.push_str("📋 Verification Types:\n");
+                for (type_name, count) in &c.total_verifications_types {
+                    output.push_str(&format!("  {}: {}\n", type_name, count));
+                }
+                output.push('\n');
+            }
+
+            // Refinement types
+            if !c.total_refinements_types.is_empty() {
+                output.push_str("📋 Refinement Types:\n");
+                for (type_name, count) in &c.total_refinements_types {
+                    output.push_str(&format!("  {}: {}\n", type_name, count));
+                }
+                output.push('\n');
+            }
+
+            // Other/custom types
+            if !c.total_other_types.is_empty() {
+                output.push_str("📋 Other Types:\n");
+                for (type_name, count) in &c.total_other_types {
+                    output.push_str(&format!("  {}: {}\n", type_name, count));
+                }
+                output.push('\n');
+            }
         }
     }
 

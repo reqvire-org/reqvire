@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UserStories</title>
+    <link rel="icon" type="image/x-icon" href="../assets/favicon.ico">
+    <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+    
+<style>
+:root {
+    /* Primary Colors */
+    --color-primary: #3F51B5;           /* Indigo - core branding */
+    --color-primary-hover: #7986CB;     /* Much lighter Indigo for hover - more visible */
+    --color-primary-active: #303F9F;    /* Darker Indigo for active */
+
+    /* Element Type Colors */
+    --color-requirement: #673AB7;       /* Deep Purple - core requirements */
+    --color-verification: #4CAF50;      /* Emerald Green - validated/completed */
+    --color-other: #9E9E9E;             /* Cool Gray - other element types */
+
+    /* Status Colors */
+    --color-verified: #4CAF50;          /* Forest Green - verified/passing */
+    --color-pending: #FFB74D;           /* Amber - pending/warning */
+    --color-error: #F44336;             /* Red - error/failed */
+
+    /* Interactive Colors */
+    --color-highlight: #FFAB91;         /* Peach - hover highlight */
+    --color-link: #212121;              /* Black - link color */
+    --color-link-hover: #3F51B5;        /* Indigo (same as nav bar) - link hover */
+
+    /* Text Colors */
+    --color-text-primary: #212121;      /* Primary text */
+    --color-text-secondary: #424242;    /* Body text */
+    --color-text-muted: #757575;        /* De-emphasized text */
+    --color-background: #FAFAFA;        /* Off-white background */
+    --color-border: #EEEEEE;            /* Very light gray borders */
+}
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #FAFAFA;
+    color: var(--color-text-secondary);
+}
+.reqvire-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    background-color: var(--color-primary);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+}
+.reqvire-nav a {
+    color: #ffffff;
+    text-decoration: none;
+    padding: 10px 20px;
+    margin-right: 5px;
+    border-radius: 3px;
+    transition: background-color 0.2s, text-decoration 0.2s;
+}
+.reqvire-nav a.nav-logo {
+    display: flex;
+    align-items: center;
+    padding: 5px 15px 5px 0;
+}
+.reqvire-nav a.nav-logo img {
+    vertical-align: middle;
+}
+.reqvire-nav a:hover {
+    background-color: var(--color-primary-hover);
+    text-decoration: underline;
+    color: #ffffff;
+}
+.reqvire-nav a:active,
+.reqvire-nav a.active {
+    background-color: var(--color-primary-active);
+    text-decoration: underline;
+    color: #ffffff;
+}
+.reqvire-nav-spacer {
+    height: 50px;
+}
+.container {
+    max-width: 95%;
+    margin: 0 auto;
+    padding: 20px;
+}
+.content {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    border: 1px solid #E0E0E0;
+}
+h1 {
+    color: var(--color-text-primary);
+    border-bottom: 2px solid #EEEEEE;
+    padding-bottom: 10px;
+    margin-top: 0;
+}
+h2 {
+    color: var(--color-text-primary);
+    border-bottom: 1px solid #EEEEEE;
+    padding-bottom: 5px;
+}
+h3 {
+    color: var(--color-text-primary);
+    margin-top: 25px;
+}
+h4 {
+    color: var(--color-text-secondary);
+    font-weight: 600;
+}
+a {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: text-decoration 0.15s ease;
+}
+a:hover {
+    text-decoration: underline;
+}
+a:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 20px 0;
+}
+table, th, td {
+    border: 1px solid #EEEEEE;
+}
+th, td {
+    padding: 8px 12px;
+    text-align: left;
+}
+th {
+    background-color: #F5F5F5;
+    color: #212121;
+    font-weight: 600;
+}
+tr:hover td {
+    background-color: #FFF8E1;
+}
+code {
+    background: #f6f8fa;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 90%;
+}
+pre {
+    background: #f6f8fa;
+    border-radius: 3px;
+    padding: 16px;
+    overflow: auto;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+}
+blockquote {
+    margin: 0;
+    padding: 0 15px;
+    color: var(--color-text-muted);
+    border-left: 4px solid var(--color-primary);
+}
+.mermaid {
+    margin: 20px 0;
+    text-align: center;
+    height: calc(100vh - 150px);
+    width: 100%;
+    overflow: hidden;
+    position: relative; /* Required for absolutely-positioned navigation buttons */
+    border: 1px solid #EEEEEE;
+    border-radius: 3px;
+    background-color: #FAFAFA;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+.mermaid svg {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    position: relative;
+    z-index: 1;
+}
+.diagram-nav-buttons {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 999; /* higher than SVG (1) but lower than header nav (1000) */
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 5px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+.diagram-nav-row {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+}
+.diagram-nav-btn {
+    width: 32px;
+    height: 32px;
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.diagram-nav-btn:hover {
+    background-color: var(--color-primary-hover);
+}
+.diagram-nav-btn:active {
+    background-color: var(--color-primary-active);
+}
+</style>
+
+    <!-- Enhanced mermaid configuration for Reqvire diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.5.0/dist/svg-pan-zoom.min.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+        import elkLayouts from 'https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk/dist/mermaid-layout-elk.esm.min.mjs';
+
+        // Register ELK layout for large diagrams
+        mermaid.registerLayoutLoaders(elkLayouts);
+
+        // Capture Mermaid errors
+        mermaid.parseError = function(err, hash) {
+            console.error('Mermaid Parse Error:', err);
+            console.error('Error details:', {
+                str: err.str,
+                hash: err.hash,
+                message: err.message,
+                stack: err.stack
+            });
+        };
+
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'neutral',
+            maxTextSize: 5000000,
+            maxEdges: 50000,
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis',
+                defaultRenderer: 'elk'
+            },
+            layout: 'elk',
+            elk: {
+                mergeEdges: true,
+                nodePlacementStrategy: 'SIMPLE'
+            },
+            securityLevel: 'loose',
+            logLevel: 'error'
+        });
+
+        await mermaid.run();
+        window.mermaid = mermaid;
+
+        // Wait for SVGs to be fully rendered, then initialize
+        function waitForSvgs(callback) {
+            var containers = document.querySelectorAll('.mermaid');
+            var allReady = true;
+            containers.forEach(function(c) {
+                var svg = c.querySelector('svg');
+                // Check SVG exists, has getBBox, valid dimensions, and has actual content (nodes)
+                if (!svg || !svg.getBBox || svg.getBBox().width === 0 || !svg.querySelector('.node')) {
+                    allReady = false;
+                }
+            });
+            if (allReady && containers.length > 0) {
+                callback();
+            } else {
+                requestAnimationFrame(function() { waitForSvgs(callback); });
+            }
+        }
+
+        // Add pan/zoom to all Mermaid diagrams after rendering
+        waitForSvgs(function() {
+            var allMermaidContainers = document.querySelectorAll('.mermaid');
+
+            allMermaidContainers.forEach(function(mermaidContainer, index) {
+
+                var svg = mermaidContainer.querySelector('svg');
+                if (!svg) {
+                    return;
+                }
+
+                // Double-check SVG is ready
+                try {
+                    var bbox = svg.getBBox();
+                    if (bbox.width === 0 || bbox.height === 0) {
+                        return;
+                    }
+                } catch (e) {
+                    return;
+                }
+
+                svg.style.maxWidth = 'none';
+                svg.style.maxHeight = 'none';
+
+                var eventsHandler = {
+                    haltEventListeners: ['touchstart', 'touchend', 'touchmove', 'touchleave', 'touchcancel'],
+                        init: function(options) {
+                            var instance = options.instance;
+                            var initialScale = 1;
+                            var pannedX = 0;
+                            var pannedY = 0;
+
+                            this.hammer = Hammer(options.svgElement, {
+                                inputClass: Hammer.SUPPORT_POINTER_EVENTS ? Hammer.PointerEventInput : Hammer.TouchInput
+                            });
+
+                            this.hammer.get('pinch').set({enable: true});
+
+                            this.hammer.on('doubletap', function(ev){
+                                instance.zoomIn();
+                            });
+
+                            this.hammer.on('panstart panmove', function(ev){
+                                if (ev.type === 'panstart') {
+                                    pannedX = 0;
+                                    pannedY = 0;
+                                }
+                                instance.panBy({x: ev.deltaX - pannedX, y: ev.deltaY - pannedY});
+                                pannedX = ev.deltaX;
+                                pannedY = ev.deltaY;
+                            });
+
+                            this.hammer.on('pinchstart pinchmove', function(ev){
+                                if (ev.type === 'pinchstart') {
+                                    initialScale = instance.getZoom();
+                                }
+                                instance.zoomAtPoint(initialScale * ev.scale, {x: ev.center.x, y: ev.center.y});
+                            });
+
+                            options.svgElement.addEventListener('touchmove', function(e){ e.preventDefault(); });
+                        },
+                        destroy: function(){
+                            this.hammer.destroy();
+                        }
+                    };
+
+                    // Diagrams with default zoom (no auto-fit)
+                    var panZoomInstance;
+                    try {
+                        panZoomInstance = svgPanZoom(svg, {
+                            zoomEnabled: true,
+                            controlIconsEnabled: true,
+                            fit: false,
+                            center: false,
+                            contain: false,
+                            minZoom: 0.5,
+                            maxZoom: 10,
+                            zoomScaleSensitivity: 0.3,
+                            customEventsHandler: eventsHandler
+                        });
+                    } catch (e) {
+                        return; // Skip this diagram and continue with others
+                    }
+
+                    if (!panZoomInstance) {
+                        return;
+                    }
+
+                    // Add navigation buttons
+                    var navButtons = document.createElement('div');
+                    navButtons.className = 'diagram-nav-buttons';
+                    navButtons.innerHTML = `
+                        <div class="diagram-nav-row">
+                            <button class="diagram-nav-btn" data-action="up">▲</button>
+                        </div>
+                        <div class="diagram-nav-row">
+                            <button class="diagram-nav-btn" data-action="left">◀</button>
+                            <button class="diagram-nav-btn" data-action="down">▼</button>
+                            <button class="diagram-nav-btn" data-action="right">▶</button>
+                        </div>
+                    `;
+                    mermaidContainer.appendChild(navButtons);
+
+                    // Wire up navigation buttons
+                    var panStep = 100;
+                    navButtons.querySelectorAll('.diagram-nav-btn').forEach(function(btn) {
+                        btn.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            var action = this.getAttribute('data-action');
+                            switch(action) {
+                                case 'up':
+                                    panZoomInstance.panBy({x: 0, y: panStep});
+                                    break;
+                                case 'down':
+                                    panZoomInstance.panBy({x: 0, y: -panStep});
+                                    break;
+                                case 'left':
+                                    panZoomInstance.panBy({x: panStep, y: 0});
+                                    break;
+                                case 'right':
+                                    panZoomInstance.panBy({x: -panStep, y: 0});
+                                    break;
+                            }
+                        });
+                    });
+            });
+
+            // Add CSS for edge highlighting
+            var style = document.createElement('style');
+            style.textContent = `
+                path.edge-highlighted,
+                .edge-highlighted path,
+                svg path.edge-highlighted {
+                    stroke: #FFAB91 !important;
+                    stroke-width: 3px !important;
+                }
+            `;
+            document.head.appendChild(style);
+
+            // Initialize edge highlighting for all diagrams
+            document.querySelectorAll('.mermaid svg').forEach(function(svg) {
+                var nodes = svg.querySelectorAll('.node');
+
+                // Find flowchart-link paths (actual edges)
+                var edgePaths = svg.querySelectorAll('path.flowchart-link');
+                // Fallback: find paths in .edges group
+                if (edgePaths.length === 0) {
+                    var edgesGroup = svg.querySelector('.edges');
+                    if (edgesGroup) {
+                        edgePaths = edgesGroup.querySelectorAll('path');
+                    }
+                }
+
+                // Get SVG point for coordinate transforms
+                var svgPoint = svg.createSVGPoint();
+
+                // Helper: transform point through element's CTM
+                function getTransformedBBox(element) {
+                    var bbox = element.getBBox();
+                    var ctm = element.getCTM();
+                    if (!ctm) return bbox;
+
+                    // Transform all four corners
+                    var corners = [
+                        {x: bbox.x, y: bbox.y},
+                        {x: bbox.x + bbox.width, y: bbox.y},
+                        {x: bbox.x, y: bbox.y + bbox.height},
+                        {x: bbox.x + bbox.width, y: bbox.y + bbox.height}
+                    ];
+
+                    var transformed = corners.map(function(c) {
+                        svgPoint.x = c.x;
+                        svgPoint.y = c.y;
+                        var tp = svgPoint.matrixTransform(ctm);
+                        return {x: tp.x, y: tp.y};
+                    });
+
+                    var minX = Math.min.apply(null, transformed.map(function(p) { return p.x; }));
+                    var maxX = Math.max.apply(null, transformed.map(function(p) { return p.x; }));
+                    var minY = Math.min.apply(null, transformed.map(function(p) { return p.y; }));
+                    var maxY = Math.max.apply(null, transformed.map(function(p) { return p.y; }));
+
+                    return {x: minX, y: minY, width: maxX - minX, height: maxY - minY};
+                }
+
+                // Helper: get all points from path
+                function getPathPoints(path) {
+                    var d = path.getAttribute('d') || '';
+                    var points = [];
+                    var ctm = path.getCTM();
+
+                    // Get M (start) point
+                    var startMatch = d.match(/M\s*([\d.-]+)[,\s]+([\d.-]+)/i);
+                    if (startMatch) {
+                        var sx = parseFloat(startMatch[1]);
+                        var sy = parseFloat(startMatch[2]);
+                        if (ctm) {
+                            svgPoint.x = sx; svgPoint.y = sy;
+                            var tp = svgPoint.matrixTransform(ctm);
+                            points.push({x: tp.x, y: tp.y});
+                        } else {
+                            points.push({x: sx, y: sy});
+                        }
+                    }
+
+                    // Get last point - find last number pair before Z or end
+                    var allNums = d.match(/[\d.-]+/g);
+                    if (allNums && allNums.length >= 2) {
+                        var ex = parseFloat(allNums[allNums.length - 2]);
+                        var ey = parseFloat(allNums[allNums.length - 1]);
+                        if (ctm) {
+                            svgPoint.x = ex; svgPoint.y = ey;
+                            var tp = svgPoint.matrixTransform(ctm);
+                            points.push({x: tp.x, y: tp.y});
+                        } else {
+                            points.push({x: ex, y: ey});
+                        }
+                    }
+
+                    return points;
+                }
+
+                // Build node bounding boxes with transforms
+                var nodeData = {};
+                nodes.forEach(function(node) {
+                    var nodeId = node.id || '';
+                    var parts = nodeId.split('-');
+                    var hashId = parts.length >= 2 ? parts[1] : nodeId;
+
+                    nodeData[hashId] = {
+                        node: node,
+                        bbox: getTransformedBBox(node)
+                    };
+                });
+
+                // Check if point is near bbox
+                function isNearBbox(pt, bbox, margin) {
+                    margin = margin || 40;
+                    return pt.x >= bbox.x - margin && pt.x <= bbox.x + bbox.width + margin &&
+                           pt.y >= bbox.y - margin && pt.y <= bbox.y + bbox.height + margin;
+                }
+
+                // Calculate distance from point to bbox center
+                function distToBboxCenter(pt, bbox) {
+                    var centerX = bbox.x + bbox.width / 2;
+                    var centerY = bbox.y + bbox.height / 2;
+                    return Math.sqrt(Math.pow(pt.x - centerX, 2) + Math.pow(pt.y - centerY, 2));
+                }
+
+                // Build edge connections with direction tracking
+                var edgeConnections = []; // [{path, source, target}]
+                var upstreamOf = {}; // node -> [parent nodes that point TO this node]
+                var downstreamOf = {}; // node -> [child nodes this node points TO]
+
+                Object.keys(nodeData).forEach(function(hashId) {
+                    upstreamOf[hashId] = [];
+                    downstreamOf[hashId] = [];
+                });
+
+                edgePaths.forEach(function(path) {
+                    var points = getPathPoints(path);
+                    if (points.length < 2) return;
+
+                    var startPt = points[0];
+                    var endPt = points[points.length - 1];
+
+                    var sourceNode = null;
+                    var targetNode = null;
+                    var sourceMinDist = Infinity;
+                    var targetMinDist = Infinity;
+
+                    // Find closest source and target nodes for this edge
+                    Object.keys(nodeData).forEach(function(hashId) {
+                        var bbox = nodeData[hashId].bbox;
+                        // Find closest node to start point (source)
+                        if (isNearBbox(startPt, bbox, 30)) {
+                            var dist = distToBboxCenter(startPt, bbox);
+                            if (dist < sourceMinDist) {
+                                sourceMinDist = dist;
+                                sourceNode = hashId;
+                            }
+                        }
+                        // Find closest node to end point (target)
+                        if (isNearBbox(endPt, bbox, 30)) {
+                            var dist = distToBboxCenter(endPt, bbox);
+                            if (dist < targetMinDist) {
+                                targetMinDist = dist;
+                                targetNode = hashId;
+                            }
+                        }
+                    });
+
+                    if (sourceNode && targetNode && sourceNode !== targetNode) {
+                        edgeConnections.push({path: path, source: sourceNode, target: targetNode});
+                        // source -> target means: target's upstream includes source
+                        if (!upstreamOf[targetNode].includes(sourceNode)) {
+                            upstreamOf[targetNode].push(sourceNode);
+                        }
+                        // source -> target means: source's downstream includes target
+                        if (!downstreamOf[sourceNode].includes(targetNode)) {
+                            downstreamOf[sourceNode].push(targetNode);
+                        }
+                    }
+                });
+
+                // Traverse only upstream (to parents/ancestors)
+                function findUpstream(startNodeId) {
+                    var visited = {};
+                    var queue = [startNodeId];
+                    visited[startNodeId] = true;
+
+                    while (queue.length > 0) {
+                        var current = queue.shift();
+                        var parents = upstreamOf[current] || [];
+                        parents.forEach(function(parent) {
+                            if (!visited[parent]) {
+                                visited[parent] = true;
+                                queue.push(parent);
+                            }
+                        });
+                    }
+                    return visited;
+                }
+
+                // Traverse only downstream (to children/descendants)
+                function findDownstream(startNodeId) {
+                    var visited = {};
+                    var queue = [startNodeId];
+                    visited[startNodeId] = true;
+
+                    while (queue.length > 0) {
+                        var current = queue.shift();
+                        var children = downstreamOf[current] || [];
+                        children.forEach(function(child) {
+                            if (!visited[child]) {
+                                visited[child] = true;
+                                queue.push(child);
+                            }
+                        });
+                    }
+                    return visited;
+                }
+
+                // Get edges for connected nodes
+                function getChainEdges(nodeSet) {
+                    var edges = [];
+                    edgeConnections.forEach(function(conn) {
+                        if (nodeSet[conn.source] && nodeSet[conn.target]) {
+                            edges.push(conn.path);
+                        }
+                    });
+                    return edges;
+                }
+
+                // Attach hover handlers
+                nodes.forEach(function(node) {
+                    var nodeId = node.id || '';
+                    var parts = nodeId.split('-');
+                    var hashId = parts.length >= 2 ? parts[1] : nodeId;
+
+                    node.style.cursor = 'pointer';
+
+                    node.addEventListener('mouseenter', function(e) {
+                        e.stopPropagation();
+                        nodes.forEach(function(n) { n.style.filter = ''; });
+                        node.style.filter = 'drop-shadow(0 0 8px rgba(255, 171, 145, 0.7))';
+
+                        // Find upstream (ancestors) and downstream (descendants) separately
+                        var upstream = findUpstream(hashId);
+                        var downstream = findDownstream(hashId);
+                        // Merge both sets
+                        var allConnected = {};
+                        Object.keys(upstream).forEach(function(k) { allConnected[k] = true; });
+                        Object.keys(downstream).forEach(function(k) { allConnected[k] = true; });
+
+                        var chainEdges = getChainEdges(allConnected);
+                        chainEdges.forEach(function(path) {
+                            path.classList.add('edge-highlighted');
+                        });
+                    });
+
+                    node.addEventListener('mouseleave', function() {
+                        node.style.filter = '';
+                        // Remove highlight from all edges
+                        edgePaths.forEach(function(path) {
+                            path.classList.remove('edge-highlighted');
+                        });
+                    });
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <nav class="reqvire-nav">
+        <a href="../index.html" class="nav-logo"><img src="../assets/logo.png" alt="Reqvire" height="24"></a>
+        <a href="../index.html">Containment</a>
+        <a href="../model.html">Model</a>
+        <a href="../traces.html">Traces</a>
+        <a href="../coverage.html">Coverage</a>
+    </nav>
+    <div class="reqvire-nav-spacer"></div>
+    <div class="container">
+        <div class="content">
+            <h1 id="elements">Elements</h1>
+<div class="mermaid">graph TD;
+  %% REQVIRE-AUTOGENERATED-DIAGRAM
+  %% Graph styling
+  classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;
+  classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
+  classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
+  classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:3px;
+  classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
+  classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
+
+  subgraph ccd18b3b648cb511[&quot;📁 requirements&quot;]
+    subgraph c04c8276f7089bd7[&quot;📄 UserStories.md&quot;]
+      3b639401bf26361e[&quot;AI-Assisted System Model Management&quot;];
+      class 3b639401bf26361e userRequirement;
+      click 3b639401bf26361e &quot;UserStories.html#ai-assisted-system-model-management&quot;;
+      af32676245df957d[&quot;Align with Industry Standards&quot;];
+      class af32676245df957d userRequirement;
+      click af32676245df957d &quot;UserStories.html#align-with-industry-standards&quot;;
+      307b1ab4b1af6d4c[&quot;Aligning Design with Code&quot;];
+      class 307b1ab4b1af6d4c userRequirement;
+      click 307b1ab4b1af6d4c &quot;UserStories.html#aligning-design-with-code&quot;;
+      16a030df0115055c[&quot;Fostering Community Contributions&quot;];
+      class 16a030df0115055c userRequirement;
+      click 16a030df0115055c &quot;UserStories.html#fostering-community-contributions&quot;;
+      9caa9477fd42ad49[&quot;Generate Diagrams&quot;];
+      class 9caa9477fd42ad49 userRequirement;
+      click 9caa9477fd42ad49 &quot;UserStories.html#generate-diagrams&quot;;
+      597eaa457790e27d[&quot;Integrate with GitHub Workflows&quot;];
+      class 597eaa457790e27d userRequirement;
+      click 597eaa457790e27d &quot;UserStories.html#integrate-with-github-workflows&quot;;
+      cd3a39ba9afe827b[&quot;Managing System Models&quot;];
+      class cd3a39ba9afe827b userRequirement;
+      click cd3a39ba9afe827b &quot;UserStories.html#managing-system-models&quot;;
+      4bddb788310f1334[&quot;Model Export&quot;];
+      class 4bddb788310f1334 userRequirement;
+      click 4bddb788310f1334 &quot;UserStories.html#model-export&quot;;
+      c95172a704769975[&quot;Promote Automation and Efficiency&quot;];
+      class c95172a704769975 userRequirement;
+      click c95172a704769975 &quot;UserStories.html#promote-automation-and-efficiency&quot;;
+      55fe55b120a6ce42[&quot;Provide Reports&quot;];
+      class 55fe55b120a6ce42 userRequirement;
+      click 55fe55b120a6ce42 &quot;UserStories.html#provide-reports&quot;;
+      e5d253a08b0bb5a7[&quot;Trace Changes in System Model&quot;];
+      class e5d253a08b0bb5a7 userRequirement;
+      click e5d253a08b0bb5a7 &quot;UserStories.html#trace-changes-in-system-model&quot;;
+      acd3e3e7a45b34a7[&quot;Validating Structures&quot;];
+      class acd3e3e7a45b34a7 userRequirement;
+      click acd3e3e7a45b34a7 &quot;UserStories.html#validating-structures&quot;;
+    end
+  end
+  subgraph 1c3bc86f926627ab[&quot;📁 requirements/Interfaces&quot;]
+    subgraph f6785775bb60fd8f[&quot;📄 Interfaces.md&quot;]
+      70aad856f7414847[&quot;CLI interface&quot;];
+      class 70aad856f7414847 userRequirement;
+      click 70aad856f7414847 &quot;Interfaces/Interfaces.html#cli-interface&quot;;
+      8a608b4292b82398[&quot;Web Interface&quot;];
+      class 8a608b4292b82398 userRequirement;
+      click 8a608b4292b82398 &quot;Interfaces/Interfaces.html#web-interface&quot;;
+    end
+    subgraph ca2dd19eaaf80aea[&quot;📄 WebInterface.md&quot;]
+      7cee348e5d230f20[&quot;HTML Export&quot;];
+      class 7cee348e5d230f20 systemRequirement;
+      click 7cee348e5d230f20 &quot;Interfaces/WebInterface.html#html-export&quot;;
+    end
+  end
+  subgraph d262bfbbaa5049a3[&quot;📁 requirements/System/Core&quot;]
+    subgraph 9ac3c1b5de6a3113[&quot;📄 ModelManagement.md&quot;]
+      34f6dffd5f6ccfb7[&quot;Coexistence of Structured and Unstructured Documents&quot;];
+      class 34f6dffd5f6ccfb7 userRequirement;
+      click 34f6dffd5f6ccfb7 &quot;System/Core/ModelManagement.html#coexistence-of-structured-and-unstructured-documents&quot;;
+      237ab77c69cf9496[&quot;Default Requirement Type Assignment&quot;];
+      class 237ab77c69cf9496 userRequirement;
+      click 237ab77c69cf9496 &quot;System/Core/ModelManagement.html#default-requirement-type-assignment&quot;;
+      acc5f7e12f6c64e3[&quot;Efficient Processing&quot;];
+      class acc5f7e12f6c64e3 userRequirement;
+      click acc5f7e12f6c64e3 &quot;System/Core/ModelManagement.html#efficient-processing&quot;;
+      66091f40428d6d66[&quot;Element Manipulation Operations&quot;];
+      class 66091f40428d6d66 userRequirement;
+      click 66091f40428d6d66 &quot;System/Core/ModelManagement.html#element-manipulation-operations&quot;;
+      ba66a4ed15581f23[&quot;Git Repository as Project Root&quot;];
+      class ba66a4ed15581f23 userRequirement;
+      click ba66a4ed15581f23 &quot;System/Core/ModelManagement.html#git-repository-as-project-root&quot;;
+      ea8518e9205f5540[&quot;Template-Based Model Bootstrapping&quot;];
+      class ea8518e9205f5540 userRequirement;
+      click ea8518e9205f5540 &quot;System/Core/ModelManagement.html#template-based-model-bootstrapping&quot;;
+    end
+    subgraph 64f96f92d9fb9141[&quot;📄 StructureAndParsing.md&quot;]
+      d60acacd6d99991a[&quot;Identifiers and Relations<br/>📎 IdentifiersAndRelations.md&quot;];
+      class d60acacd6d99991a systemRequirement;
+      click d60acacd6d99991a &quot;System/Core/StructureAndParsing.html#identifiers-and-relations&quot;;
+      29f7bfa1550497ca[&quot;Specification File Identification&quot;];
+      class 29f7bfa1550497ca systemRequirement;
+      click 29f7bfa1550497ca &quot;System/Core/StructureAndParsing.html#specification-file-identification&quot;;
+      30b02d327e563ceb[&quot;Structure and Addressing in Markdown Documents<br/>📎 MarkdownStructure.md&quot;];
+      class 30b02d327e563ceb systemRequirement;
+      click 30b02d327e563ceb &quot;System/Core/StructureAndParsing.html#structure-and-addressing-in-markdown-documents&quot;;
+    end
+    subgraph a0a42393a244d64c[&quot;📄 Validation.md&quot;]
+      563518e7f0f446e[&quot;Enhanced Validation Error Reporting&quot;];
+      class 563518e7f0f446e userRequirement;
+      click 563518e7f0f446e &quot;System/Core/Validation.html#enhanced-validation-error-reporting&quot;;
+      574cda1664a91ad[&quot;Validate Cross-Component Dependencies&quot;];
+      class 574cda1664a91ad userRequirement;
+      click 574cda1664a91ad &quot;System/Core/Validation.html#validate-cross-component-dependencies&quot;;
+      9e5c92416f56827d[&quot;Validate Filesystem Structure&quot;];
+      class 9e5c92416f56827d userRequirement;
+      click 9e5c92416f56827d &quot;System/Core/Validation.html#validate-filesystem-structure&quot;;
+      a4d6ad305dbbad80[&quot;Validate Internal Consistency&quot;];
+      class a4d6ad305dbbad80 userRequirement;
+      click a4d6ad305dbbad80 &quot;System/Core/Validation.html#validate-internal-consistency&quot;;
+      275994f9e5e5407b[&quot;Validate Markdown Structure&quot;];
+      class 275994f9e5e5407b userRequirement;
+      click 275994f9e5e5407b &quot;System/Core/Validation.html#validate-markdown-structure&quot;;
+      83b654d72d72255[&quot;Validate Relation Types&quot;];
+      class 83b654d72d72255 userRequirement;
+      click 83b654d72d72255 &quot;System/Core/Validation.html#validate-relation-types&quot;;
+    end
+  end
+  subgraph 1d4bb727b3ab4a6c[&quot;📁 requirements/System/Integration&quot;]
+    subgraph 7cdfa652b08350b0[&quot;📄 CodeAlignment.md&quot;]
+      21c836664ae15aab[&quot;Code Traceability&quot;];
+      class 21c836664ae15aab userRequirement;
+      click 21c836664ae15aab &quot;System/Integration/CodeAlignment.html#code-traceability&quot;;
+      238aa11f608eaec2[&quot;Suggest Code Refactoring&quot;];
+      class 238aa11f608eaec2 userRequirement;
+      click 238aa11f608eaec2 &quot;System/Integration/CodeAlignment.html#suggest-code-refactoring&quot;;
+    end
+    subgraph 268068fe8571c82b[&quot;📄 GitHubIntegration.md&quot;]
+      d04391d8da99295c[&quot;Automate Documentation Export&quot;];
+      class d04391d8da99295c userRequirement;
+      click d04391d8da99295c &quot;System/Integration/GitHubIntegration.html#automate-documentation-export&quot;;
+      c1a9e533a6989fc9[&quot;Automate Pull Request Validations&quot;];
+      class c1a9e533a6989fc9 userRequirement;
+      click c1a9e533a6989fc9 &quot;System/Integration/GitHubIntegration.html#automate-pull-request-validations&quot;;
+      1b131bcd8f7c55b6[&quot;Generate Change Logs for Pull Requests&quot;];
+      class 1b131bcd8f7c55b6 userRequirement;
+      click 1b131bcd8f7c55b6 &quot;System/Integration/GitHubIntegration.html#generate-change-logs-for-pull-requests&quot;;
+    end
+  end
+  subgraph 94359ac729226de6[&quot;📁 requirements/System/Operations&quot;]
+    subgraph 76dc8a8951f1adad[&quot;📄 Formatting.md&quot;]
+      bf4135d4f544e1c[&quot;Format Consistency Enforcement&quot;];
+      class bf4135d4f544e1c systemRequirement;
+      click bf4135d4f544e1c &quot;System/Operations/Formatting.html#format-consistency-enforcement&quot;;
+      a2cb15bef87bc2ca[&quot;Model Formatting&quot;];
+      class a2cb15bef87bc2ca userRequirement;
+      click a2cb15bef87bc2ca &quot;System/Operations/Formatting.html#model-formatting&quot;;
+    end
+    subgraph ef60c20abd3a6265[&quot;📄 Linting.md&quot;]
+      b131ca76ea79134d[&quot;Model Linting&quot;];
+      class b131ca76ea79134d userRequirement;
+      click b131ca76ea79134d &quot;System/Operations/Linting.html#model-linting&quot;;
+    end
+  end
+  subgraph 59af30609eb6d57c[&quot;📁 requirements/System/Output&quot;]
+    subgraph c2b8a949c0da1f4[&quot;📄 DiagramGeneration.md&quot;]
+      8a76dfb4467e9e4e[&quot;Complete Model Structure Visualization&quot;];
+      class 8a76dfb4467e9e4e userRequirement;
+      click 8a76dfb4467e9e4e &quot;System/Output/DiagramGeneration.html#complete-model-structure-visualization&quot;;
+      618f2e2c98afc9d6[&quot;Interactive Mermaid Diagrams&quot;];
+      class 618f2e2c98afc9d6 userRequirement;
+      click 618f2e2c98afc9d6 &quot;System/Output/DiagramGeneration.html#interactive-mermaid-diagrams&quot;;
+      db3a76dd2787dd8d[&quot;Model Visualization and Exploration&quot;];
+      class db3a76dd2787dd8d userRequirement;
+      click db3a76dd2787dd8d &quot;System/Output/DiagramGeneration.html#model-visualization-and-exploration&quot;;
+      51bd2c44dd30ad28[&quot;Remove Generated Diagrams&quot;];
+      class 51bd2c44dd30ad28 userRequirement;
+      click 51bd2c44dd30ad28 &quot;System/Output/DiagramGeneration.html#remove-generated-diagrams&quot;;
+    end
+    subgraph 2216865f3e1298a7[&quot;📄 Reporting.md&quot;]
+      9b4f54c948e407db[&quot;Model Reports&quot;];
+      class 9b4f54c948e407db userRequirement;
+      click 9b4f54c948e407db &quot;System/Output/Reporting.html#model-reports&quot;;
+      518a35513910679a[&quot;Provide Validation Reports&quot;];
+      class 518a35513910679a userRequirement;
+      click 518a35513910679a &quot;System/Output/Reporting.html#provide-validation-reports&quot;;
+      50803e518e37d570[&quot;Tracing Structural Changes&quot;];
+      class 50803e518e37d570 userRequirement;
+      click 50803e518e37d570 &quot;System/Output/Reporting.html#tracing-structural-changes&quot;;
+    end
+  end
+  3b639401bf26361e -.->|deriveReqT| d60acacd6d99991a;
+  af32676245df957d -.->|deriveReqT| 574cda1664a91ad;
+  af32676245df957d -.->|deriveReqT| a4d6ad305dbbad80;
+  af32676245df957d -.->|deriveReqT| 275994f9e5e5407b;
+  af32676245df957d -.->|deriveReqT| 83b654d72d72255;
+  af32676245df957d -.->|deriveReqT| bf4135d4f544e1c;
+  af32676245df957d -.->|deriveReqT| 518a35513910679a;
+  307b1ab4b1af6d4c -.->|deriveReqT| 21c836664ae15aab;
+  307b1ab4b1af6d4c -.->|deriveReqT| 238aa11f608eaec2;
+  9caa9477fd42ad49 -.->|deriveReqT| 8a76dfb4467e9e4e;
+  9caa9477fd42ad49 -.->|deriveReqT| 618f2e2c98afc9d6;
+  9caa9477fd42ad49 -.->|deriveReqT| db3a76dd2787dd8d;
+  9caa9477fd42ad49 -.->|deriveReqT| 51bd2c44dd30ad28;
+  597eaa457790e27d -.->|deriveReqT| d04391d8da99295c;
+  597eaa457790e27d -.->|deriveReqT| c1a9e533a6989fc9;
+  597eaa457790e27d -.->|deriveReqT| 1b131bcd8f7c55b6;
+  cd3a39ba9afe827b -.->|deriveReqT| 70aad856f7414847;
+  cd3a39ba9afe827b -.->|deriveReqT| 8a608b4292b82398;
+  cd3a39ba9afe827b -.->|deriveReqT| 34f6dffd5f6ccfb7;
+  cd3a39ba9afe827b -.->|deriveReqT| 237ab77c69cf9496;
+  cd3a39ba9afe827b -.->|deriveReqT| acc5f7e12f6c64e3;
+  cd3a39ba9afe827b -.->|deriveReqT| 66091f40428d6d66;
+  cd3a39ba9afe827b -.->|deriveReqT| ba66a4ed15581f23;
+  cd3a39ba9afe827b -.->|deriveReqT| ea8518e9205f5540;
+  cd3a39ba9afe827b -.->|deriveReqT| 29f7bfa1550497ca;
+  cd3a39ba9afe827b -.->|deriveReqT| 30b02d327e563ceb;
+  cd3a39ba9afe827b -.->|deriveReqT| 3b639401bf26361e;
+  4bddb788310f1334 -.->|deriveReqT| 7cee348e5d230f20;
+  c95172a704769975 -.->|deriveReqT| acc5f7e12f6c64e3;
+  c95172a704769975 -.->|deriveReqT| 597eaa457790e27d;
+  55fe55b120a6ce42 -.->|deriveReqT| 9b4f54c948e407db;
+  e5d253a08b0bb5a7 -.->|deriveReqT| 50803e518e37d570;
+  acd3e3e7a45b34a7 -.->|deriveReqT| 563518e7f0f446e;
+  acd3e3e7a45b34a7 -.->|deriveReqT| 574cda1664a91ad;
+  acd3e3e7a45b34a7 -.->|deriveReqT| 9e5c92416f56827d;
+  acd3e3e7a45b34a7 -.->|deriveReqT| a4d6ad305dbbad80;
+  acd3e3e7a45b34a7 -.->|deriveReqT| 275994f9e5e5407b;
+  acd3e3e7a45b34a7 -.->|deriveReqT| 83b654d72d72255;
+  acd3e3e7a45b34a7 -.->|deriveReqT| a2cb15bef87bc2ca;
+  acd3e3e7a45b34a7 -.->|deriveReqT| b131ca76ea79134d;
+  d60acacd6d99991a -.->|deriveReqT| 4f7fa84403776a06;
+  9450d4313f47ef36[&quot;relation.rs&quot;];
+  class 9450d4313f47ef36 default;
+  click 9450d4313f47ef36 &quot;../core/src/relation.rs&quot;;
+  d60acacd6d99991a -->|satisfiedBy| 9450d4313f47ef36;
+  574cda1664a91ad -.->|deriveReqT| f34e39787323bba4;
+  83b654d72d72255 -.->|deriveReqT| f7d689fafa15738b;
+  275994f9e5e5407b -.->|deriveReqT| a0356ecbac250219;
+  bf4135d4f544e1c -.->|deriveReqT| 61bb064413777e7d;
+  8fbf4ca0471377ea[&quot;format.rs&quot;];
+  class 8fbf4ca0471377ea default;
+  click 8fbf4ca0471377ea &quot;../core/src/format.rs&quot;;
+  bf4135d4f544e1c -->|satisfiedBy| 8fbf4ca0471377ea;
+  bf4135d4f544e1c -.->|verifiedBy| 723757d62c730981;
+  518a35513910679a -.->|deriveReqT| a867b4bb3e22cabf;
+  518a35513910679a -.->|deriveReqT| ba9ff62b2514c184;
+  518a35513910679a -.->|deriveReqT| 421d9d50c6e84b40;
+  a4d6ad305dbbad80 -.->|deriveReqT| 6d54be5a9e9637e2;
+  a4d6ad305dbbad80 -.->|deriveReqT| 26e63d5a1bbe175;
+  21c836664ae15aab -.->|deriveReqT| 640ca7b4880a0f75;
+  8a76dfb4467e9e4e -.->|deriveReqT| a12088ce3af75577;
+  8a76dfb4467e9e4e -.->|deriveReqT| 287f6140c4c9ba05;
+  db3a76dd2787dd8d -.->|deriveReqT| 5eec4cd23be79416;
+  db3a76dd2787dd8d -.->|deriveReqT| 287f6140c4c9ba05;
+  618f2e2c98afc9d6 -.->|deriveReqT| 17774b4ce265515;
+  618f2e2c98afc9d6 -.->|deriveReqT| ab3055e037495da3;
+  51bd2c44dd30ad28 -.->|deriveReqT| 989bb7d020191e58;
+  d04391d8da99295c -.->|deriveReqT| 7146138ceda0c5b6;
+  c1a9e533a6989fc9 -.->|deriveReqT| 7146138ceda0c5b6;
+  8a608b4292b82398 -.->|deriveReqT| 7cee348e5d230f20;
+  8a608b4292b82398 -.->|deriveReqT| 7afe0ab429e8f97f;
+  ba66a4ed15581f23 -.->|deriveReqT| e64436de26e90ea9;
+  ba66a4ed15581f23 -.->|deriveReqT| 9987f9e9ae83fba3;
+  66091f40428d6d66 -.->|deriveReqT| 363332ee418d9a97;
+  66091f40428d6d66 -.->|deriveReqT| 5e9d1888d2914fd4;
+  66091f40428d6d66 -.->|deriveReqT| b7a7ab53d4242be8;
+  66091f40428d6d66 -.->|deriveReqT| 9987f9e9ae83fba3;
+  30b02d327e563ceb -.->|deriveReqT| 6133db8cff784cc5;
+  30b02d327e563ceb -.->|deriveReqT| d16211b28032c37b;
+  a814c4935e1a0449[&quot;element.rs&quot;];
+  class a814c4935e1a0449 default;
+  click a814c4935e1a0449 &quot;../core/src/element.rs&quot;;
+  30b02d327e563ceb -->|satisfiedBy| a814c4935e1a0449;
+  d50a859650933e55[&quot;model.rs&quot;];
+  class d50a859650933e55 default;
+  click d50a859650933e55 &quot;../core/src/model.rs&quot;;
+  30b02d327e563ceb -->|satisfiedBy| d50a859650933e55;
+  f22d93285fcd7664[&quot;parser.rs&quot;];
+  class f22d93285fcd7664 default;
+  click f22d93285fcd7664 &quot;../core/src/parser.rs&quot;;
+  30b02d327e563ceb -->|satisfiedBy| f22d93285fcd7664;
+  30b02d327e563ceb -->|satisfiedBy| 9450d4313f47ef36;
+  398003c91b6b2cde[&quot;subsection.rs&quot;];
+  class 398003c91b6b2cde default;
+  click 398003c91b6b2cde &quot;../core/src/subsection.rs&quot;;
+  30b02d327e563ceb -->|satisfiedBy| 398003c91b6b2cde;
+  30b02d327e563ceb -.->|verifiedBy| fec2cc6e4b40574c;
+  30b02d327e563ceb -.->|verifiedBy| 723757d62c730981;
+  29f7bfa1550497ca -->|satisfiedBy| d50a859650933e55;
+  29f7bfa1550497ca -->|satisfiedBy| f22d93285fcd7664;
+  29f7bfa1550497ca -.->|verifiedBy| d7b489a5edd073a2;
+  34f6dffd5f6ccfb7 -.->|deriveReqT| 6921a84a17b97dda;
+  70aad856f7414847 -.->|deriveReqT| e07bdd5602fc7d2c;
+  237ab77c69cf9496 -.->|verifiedBy| e21f26d3f283ac80;
+  237ab77c69cf9496 -.->|verifiedBy| 8f31ddf6fff8aa75;
+  7cee348e5d230f20 -.->|deriveReqT| 9548618d67bf80fd;
+  7cee348e5d230f20 -.->|deriveReqT| 7b6511f887489bc1;
+  7cee348e5d230f20 -.->|deriveReqT| a12088ce3af75577;
+  7cee348e5d230f20 -.->|deriveReqT| 287f6140c4c9ba05;
+  7cee348e5d230f20 -.->|deriveReqT| 17774b4ce265515;
+  80defdd4cbc7ee18[&quot;cli.rs&quot;];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 &quot;../cli/src/cli.rs&quot;;
+  7cee348e5d230f20 -->|satisfiedBy| 80defdd4cbc7ee18;
+  345c82cd34408acb[&quot;export.rs&quot;];
+  class 345c82cd34408acb default;
+  click 345c82cd34408acb &quot;../core/src/export.rs&quot;;
+  7cee348e5d230f20 -->|satisfiedBy| 345c82cd34408acb;
+  d0e6cc47b904faa5[&quot;html.rs&quot;];
+  class d0e6cc47b904faa5 default;
+  click d0e6cc47b904faa5 &quot;../core/src/html.rs&quot;;
+  7cee348e5d230f20 -->|satisfiedBy| d0e6cc47b904faa5;
+  c3d63c5d4133e346[&quot;html_export.rs&quot;];
+  class c3d63c5d4133e346 default;
+  click c3d63c5d4133e346 &quot;../core/src/html_export.rs&quot;;
+  7cee348e5d230f20 -->|satisfiedBy| c3d63c5d4133e346;
+  1a173441705701a0[&quot;index_generator.rs&quot;];
+  class 1a173441705701a0 default;
+  click 1a173441705701a0 &quot;../core/src/index_generator.rs&quot;;
+  7cee348e5d230f20 -->|satisfiedBy| 1a173441705701a0;
+  3a807a8535fb41fa[&quot;base.html&quot;];
+  class 3a807a8535fb41fa default;
+  click 3a807a8535fb41fa &quot;../core/templates/base.html&quot;;
+  7cee348e5d230f20 -->|satisfiedBy| 3a807a8535fb41fa;
+  c196fa9b3e2c2258[&quot;model.html&quot;];
+  class c196fa9b3e2c2258 default;
+  click c196fa9b3e2c2258 &quot;../core/templates/model.html&quot;;
+  7cee348e5d230f20 -->|satisfiedBy| c196fa9b3e2c2258;
+  7cee348e5d230f20 -.->|verifiedBy| 7ce243221ec8f143;
+  7cee348e5d230f20 -.->|verifiedBy| 3b945d4fc7ba69e7;
+  9b4f54c948e407db -.->|deriveReqT| 7cee348e5d230f20;
+  9b4f54c948e407db -.->|deriveReqT| 8a76dfb4467e9e4e;
+  9b4f54c948e407db -.->|deriveReqT| 618f2e2c98afc9d6;
+  9b4f54c948e407db -.->|deriveReqT| db3a76dd2787dd8d;
+  9b4f54c948e407db -.->|deriveReqT| ce4383b831c54c07;
+  9b4f54c948e407db -.->|deriveReqT| 518a35513910679a;
+  9b4f54c948e407db -.->|deriveReqT| 157f2dbe8bac3cda;
+  50803e518e37d570 -.->|deriveReqT| 87b7ea665c0ec9c2;
+  50803e518e37d570 -.->|verifiedBy| 74ab201081f0f730;
+  a2cb15bef87bc2ca -.->|deriveReqT| 5f9df693c47e2e9f;
+  a2cb15bef87bc2ca -.->|deriveReqT| bf4135d4f544e1c;
+  a2cb15bef87bc2ca -.->|deriveReqT| 151b5c7a2cdfda2f;
+  a2cb15bef87bc2ca -.->|deriveReqT| 9ead49b4bdac9bb2;
+  b131ca76ea79134d -.->|deriveReqT| e3d0ab61770fae47;
+  b131ca76ea79134d -.->|deriveReqT| 6f992bcf1f37ec46;
+  b131ca76ea79134d -.->|deriveReqT| 65dd8a2e87f01d79;
+  b131ca76ea79134d -.->|deriveReqT| 2bd0565cb57ff27c;
+  b131ca76ea79134d -.->|deriveReqT| 28b58286a606077a;
+  563518e7f0f446e -.->|deriveReqT| ef2f4482168d6af9;
+  563518e7f0f446e -.->|deriveReqT| a867b4bb3e22cabf;
+  563518e7f0f446e -.->|deriveReqT| c741649b0d9ace74;
+</div>
+<h3 id="align-with-industry-standards">Align with Industry Standards</h3>
+<p>As as <strong>System Engineer</strong>, I want to work with the system that adheres to widely recognized industry standards, such as ISO/IEC/IEEE 15288, to ensure compatibility and relevance in systems engineering practices.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<hr />
+<h3 id="promote-automation-and-efficiency">Promote Automation and Efficiency</h3>
+<p>As as <strong>System Engineer</strong>, I would like to reduce manual effort in managing requirements, models, and traceability by automating routine tasks.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<hr />
+<h3 id="managing-system-models">Managing System Models</h3>
+<p>As an <strong>System Engineer</strong>, I want to manage System models effectively, so that I can ensure they align with project requirements and deliverable goals.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<hr />
+<h3 id="ai-assisted-system-model-management">AI-Assisted System Model Management</h3>
+<p>As a <strong>Systems Engineer</strong>, I want to efficiently manage System models using AI-powered tools and LLM-based assistants.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#managing-system-models">Managing System Models</a></li>
+</ul>
+<hr />
+<h3 id="generate-diagrams">Generate Diagrams</h3>
+<p>As a <strong>System Engineer</strong>, I want to generate diagrams for different system viewpoints, so that I can communicate system architecture effectively and understand dependencies and impacts across the system.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<hr />
+<h3 id="model-export">Model Export</h3>
+<p>As a <strong>Manager</strong>, I want to export specifications into diferent formats including HTML, so that I can communicate system architecture effectively.</p>
+<h4>Details</h4>
+<p>All exports shall produce deterministic output with consistent ordering to enable reliable version control and reproducible builds.</p>
+<p>The system shall ensure deterministic export output by:</p>
+<ul>
+<li>Sorting elements by identifier before processing</li>
+<li>Sorting relations by type and target identifier</li>
+<li>Maintaining consistent file ordering alphabetically</li>
+</ul>
+<p>This determinism ensures that:</p>
+<ul>
+<li>Running exports multiple times produces byte-identical output</li>
+<li>Version control diffs reflect actual content changes</li>
+<li>Continuous integration pipelines produce reproducible results</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<hr />
+<h3 id="aligning-design-with-code">Aligning Design with Code</h3>
+<p>As a <strong>Developer</strong>, I want to align code with System models, so that implementation remains consistent with design specifications.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<hr />
+<h3 id="validating-structures">Validating Structures</h3>
+<p>As an <strong>System Engineer</strong>, I want to validate the structure of System models, so that I can ensure compliance with organizational and project standards.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<hr />
+<h3 id="integrate-with-github-workflows">Integrate with GitHub Workflows</h3>
+<p>As a <strong>Contributor</strong>, I want Reqvire to integrate seamlessly with GitHub workflows, so that I can collaborate on updates and manage contributions effectively.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#promote-automation-and-efficiency">Promote Automation and Efficiency</a></li>
+</ul>
+<hr />
+<h3 id="provide-reports">Provide Reports</h3>
+<p>As a <strong>Manager</strong>, I want to generate structured reports based on the System model, so that I can track progress and ensure alignment with organizational objectives.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<hr />
+<h3 id="trace-changes-in-system-model">Trace Changes in System Model</h3>
+<p>As a <strong>System Engineer</strong>, I want to trace changes in the System model to identify affected components and ensure all updates are consistent across the system.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<hr />
+<h3 id="fostering-community-contributions">Fostering Community Contributions</h3>
+<p>As a <strong>Contributor</strong>, I want Reqvire tools to be intuitive and well-documented, so that I can contribute effectively to the open-source project.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<hr />
+
+        </div>
+    </div>
+</body>
+</html>

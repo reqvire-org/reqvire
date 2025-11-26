@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuration</title>
+    <link rel="icon" type="image/x-icon" href="../../../assets/favicon.ico">
+    <link rel="apple-touch-icon" href="../../../assets/apple-touch-icon.png">
+    
+<style>
+:root {
+    /* Primary Colors */
+    --color-primary: #3F51B5;           /* Indigo - core branding */
+    --color-primary-hover: #7986CB;     /* Much lighter Indigo for hover - more visible */
+    --color-primary-active: #303F9F;    /* Darker Indigo for active */
+
+    /* Element Type Colors */
+    --color-requirement: #673AB7;       /* Deep Purple - core requirements */
+    --color-verification: #4CAF50;      /* Emerald Green - validated/completed */
+    --color-other: #9E9E9E;             /* Cool Gray - other element types */
+
+    /* Status Colors */
+    --color-verified: #4CAF50;          /* Forest Green - verified/passing */
+    --color-pending: #FFB74D;           /* Amber - pending/warning */
+    --color-error: #F44336;             /* Red - error/failed */
+
+    /* Interactive Colors */
+    --color-highlight: #FFAB91;         /* Peach - hover highlight */
+    --color-link: #212121;              /* Black - link color */
+    --color-link-hover: #3F51B5;        /* Indigo (same as nav bar) - link hover */
+
+    /* Text Colors */
+    --color-text-primary: #212121;      /* Primary text */
+    --color-text-secondary: #424242;    /* Body text */
+    --color-text-muted: #757575;        /* De-emphasized text */
+    --color-background: #FAFAFA;        /* Off-white background */
+    --color-border: #EEEEEE;            /* Very light gray borders */
+}
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #FAFAFA;
+    color: var(--color-text-secondary);
+}
+.reqvire-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    background-color: var(--color-primary);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+}
+.reqvire-nav a {
+    color: #ffffff;
+    text-decoration: none;
+    padding: 10px 20px;
+    margin-right: 5px;
+    border-radius: 3px;
+    transition: background-color 0.2s, text-decoration 0.2s;
+}
+.reqvire-nav a.nav-logo {
+    display: flex;
+    align-items: center;
+    padding: 5px 15px 5px 0;
+}
+.reqvire-nav a.nav-logo img {
+    vertical-align: middle;
+}
+.reqvire-nav a:hover {
+    background-color: var(--color-primary-hover);
+    text-decoration: underline;
+    color: #ffffff;
+}
+.reqvire-nav a:active,
+.reqvire-nav a.active {
+    background-color: var(--color-primary-active);
+    text-decoration: underline;
+    color: #ffffff;
+}
+.reqvire-nav-spacer {
+    height: 50px;
+}
+.container {
+    max-width: 95%;
+    margin: 0 auto;
+    padding: 20px;
+}
+.content {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    border: 1px solid #E0E0E0;
+}
+h1 {
+    color: var(--color-text-primary);
+    border-bottom: 2px solid #EEEEEE;
+    padding-bottom: 10px;
+    margin-top: 0;
+}
+h2 {
+    color: var(--color-text-primary);
+    border-bottom: 1px solid #EEEEEE;
+    padding-bottom: 5px;
+}
+h3 {
+    color: var(--color-text-primary);
+    margin-top: 25px;
+}
+h4 {
+    color: var(--color-text-secondary);
+    font-weight: 600;
+}
+a {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: text-decoration 0.15s ease;
+}
+a:hover {
+    text-decoration: underline;
+}
+a:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 20px 0;
+}
+table, th, td {
+    border: 1px solid #EEEEEE;
+}
+th, td {
+    padding: 8px 12px;
+    text-align: left;
+}
+th {
+    background-color: #F5F5F5;
+    color: #212121;
+    font-weight: 600;
+}
+tr:hover td {
+    background-color: #FFF8E1;
+}
+code {
+    background: #f6f8fa;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 90%;
+}
+pre {
+    background: #f6f8fa;
+    border-radius: 3px;
+    padding: 16px;
+    overflow: auto;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+}
+blockquote {
+    margin: 0;
+    padding: 0 15px;
+    color: var(--color-text-muted);
+    border-left: 4px solid var(--color-primary);
+}
+.mermaid {
+    margin: 20px 0;
+    text-align: center;
+    height: calc(100vh - 150px);
+    width: 100%;
+    overflow: hidden;
+    position: relative; /* Required for absolutely-positioned navigation buttons */
+    border: 1px solid #EEEEEE;
+    border-radius: 3px;
+    background-color: #FAFAFA;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+.mermaid svg {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    position: relative;
+    z-index: 1;
+}
+.diagram-nav-buttons {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 999; /* higher than SVG (1) but lower than header nav (1000) */
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 5px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+.diagram-nav-row {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+}
+.diagram-nav-btn {
+    width: 32px;
+    height: 32px;
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.diagram-nav-btn:hover {
+    background-color: var(--color-primary-hover);
+}
+.diagram-nav-btn:active {
+    background-color: var(--color-primary-active);
+}
+</style>
+
+    <!-- Enhanced mermaid configuration for Reqvire diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.5.0/dist/svg-pan-zoom.min.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+        import elkLayouts from 'https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk/dist/mermaid-layout-elk.esm.min.mjs';
+
+        // Register ELK layout for large diagrams
+        mermaid.registerLayoutLoaders(elkLayouts);
+
+        // Capture Mermaid errors
+        mermaid.parseError = function(err, hash) {
+            console.error('Mermaid Parse Error:', err);
+            console.error('Error details:', {
+                str: err.str,
+                hash: err.hash,
+                message: err.message,
+                stack: err.stack
+            });
+        };
+
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'neutral',
+            maxTextSize: 5000000,
+            maxEdges: 50000,
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis',
+                defaultRenderer: 'elk'
+            },
+            layout: 'elk',
+            elk: {
+                mergeEdges: true,
+                nodePlacementStrategy: 'SIMPLE'
+            },
+            securityLevel: 'loose',
+            logLevel: 'error'
+        });
+
+        await mermaid.run();
+        window.mermaid = mermaid;
+
+        // Wait for SVGs to be fully rendered, then initialize
+        function waitForSvgs(callback) {
+            var containers = document.querySelectorAll('.mermaid');
+            var allReady = true;
+            containers.forEach(function(c) {
+                var svg = c.querySelector('svg');
+                // Check SVG exists, has getBBox, valid dimensions, and has actual content (nodes)
+                if (!svg || !svg.getBBox || svg.getBBox().width === 0 || !svg.querySelector('.node')) {
+                    allReady = false;
+                }
+            });
+            if (allReady && containers.length > 0) {
+                callback();
+            } else {
+                requestAnimationFrame(function() { waitForSvgs(callback); });
+            }
+        }
+
+        // Add pan/zoom to all Mermaid diagrams after rendering
+        waitForSvgs(function() {
+            var allMermaidContainers = document.querySelectorAll('.mermaid');
+
+            allMermaidContainers.forEach(function(mermaidContainer, index) {
+
+                var svg = mermaidContainer.querySelector('svg');
+                if (!svg) {
+                    return;
+                }
+
+                // Double-check SVG is ready
+                try {
+                    var bbox = svg.getBBox();
+                    if (bbox.width === 0 || bbox.height === 0) {
+                        return;
+                    }
+                } catch (e) {
+                    return;
+                }
+
+                svg.style.maxWidth = 'none';
+                svg.style.maxHeight = 'none';
+
+                var eventsHandler = {
+                    haltEventListeners: ['touchstart', 'touchend', 'touchmove', 'touchleave', 'touchcancel'],
+                        init: function(options) {
+                            var instance = options.instance;
+                            var initialScale = 1;
+                            var pannedX = 0;
+                            var pannedY = 0;
+
+                            this.hammer = Hammer(options.svgElement, {
+                                inputClass: Hammer.SUPPORT_POINTER_EVENTS ? Hammer.PointerEventInput : Hammer.TouchInput
+                            });
+
+                            this.hammer.get('pinch').set({enable: true});
+
+                            this.hammer.on('doubletap', function(ev){
+                                instance.zoomIn();
+                            });
+
+                            this.hammer.on('panstart panmove', function(ev){
+                                if (ev.type === 'panstart') {
+                                    pannedX = 0;
+                                    pannedY = 0;
+                                }
+                                instance.panBy({x: ev.deltaX - pannedX, y: ev.deltaY - pannedY});
+                                pannedX = ev.deltaX;
+                                pannedY = ev.deltaY;
+                            });
+
+                            this.hammer.on('pinchstart pinchmove', function(ev){
+                                if (ev.type === 'pinchstart') {
+                                    initialScale = instance.getZoom();
+                                }
+                                instance.zoomAtPoint(initialScale * ev.scale, {x: ev.center.x, y: ev.center.y});
+                            });
+
+                            options.svgElement.addEventListener('touchmove', function(e){ e.preventDefault(); });
+                        },
+                        destroy: function(){
+                            this.hammer.destroy();
+                        }
+                    };
+
+                    // Diagrams with default zoom (no auto-fit)
+                    var panZoomInstance;
+                    try {
+                        panZoomInstance = svgPanZoom(svg, {
+                            zoomEnabled: true,
+                            controlIconsEnabled: true,
+                            fit: false,
+                            center: false,
+                            contain: false,
+                            minZoom: 0.5,
+                            maxZoom: 10,
+                            zoomScaleSensitivity: 0.3,
+                            customEventsHandler: eventsHandler
+                        });
+                    } catch (e) {
+                        return; // Skip this diagram and continue with others
+                    }
+
+                    if (!panZoomInstance) {
+                        return;
+                    }
+
+                    // Add navigation buttons
+                    var navButtons = document.createElement('div');
+                    navButtons.className = 'diagram-nav-buttons';
+                    navButtons.innerHTML = `
+                        <div class="diagram-nav-row">
+                            <button class="diagram-nav-btn" data-action="up">▲</button>
+                        </div>
+                        <div class="diagram-nav-row">
+                            <button class="diagram-nav-btn" data-action="left">◀</button>
+                            <button class="diagram-nav-btn" data-action="down">▼</button>
+                            <button class="diagram-nav-btn" data-action="right">▶</button>
+                        </div>
+                    `;
+                    mermaidContainer.appendChild(navButtons);
+
+                    // Wire up navigation buttons
+                    var panStep = 100;
+                    navButtons.querySelectorAll('.diagram-nav-btn').forEach(function(btn) {
+                        btn.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            var action = this.getAttribute('data-action');
+                            switch(action) {
+                                case 'up':
+                                    panZoomInstance.panBy({x: 0, y: panStep});
+                                    break;
+                                case 'down':
+                                    panZoomInstance.panBy({x: 0, y: -panStep});
+                                    break;
+                                case 'left':
+                                    panZoomInstance.panBy({x: panStep, y: 0});
+                                    break;
+                                case 'right':
+                                    panZoomInstance.panBy({x: -panStep, y: 0});
+                                    break;
+                            }
+                        });
+                    });
+            });
+
+            // Add CSS for edge highlighting
+            var style = document.createElement('style');
+            style.textContent = `
+                path.edge-highlighted,
+                .edge-highlighted path,
+                svg path.edge-highlighted {
+                    stroke: #FFAB91 !important;
+                    stroke-width: 3px !important;
+                }
+            `;
+            document.head.appendChild(style);
+
+            // Initialize edge highlighting for all diagrams
+            document.querySelectorAll('.mermaid svg').forEach(function(svg) {
+                var nodes = svg.querySelectorAll('.node');
+
+                // Find flowchart-link paths (actual edges)
+                var edgePaths = svg.querySelectorAll('path.flowchart-link');
+                // Fallback: find paths in .edges group
+                if (edgePaths.length === 0) {
+                    var edgesGroup = svg.querySelector('.edges');
+                    if (edgesGroup) {
+                        edgePaths = edgesGroup.querySelectorAll('path');
+                    }
+                }
+
+                // Get SVG point for coordinate transforms
+                var svgPoint = svg.createSVGPoint();
+
+                // Helper: transform point through element's CTM
+                function getTransformedBBox(element) {
+                    var bbox = element.getBBox();
+                    var ctm = element.getCTM();
+                    if (!ctm) return bbox;
+
+                    // Transform all four corners
+                    var corners = [
+                        {x: bbox.x, y: bbox.y},
+                        {x: bbox.x + bbox.width, y: bbox.y},
+                        {x: bbox.x, y: bbox.y + bbox.height},
+                        {x: bbox.x + bbox.width, y: bbox.y + bbox.height}
+                    ];
+
+                    var transformed = corners.map(function(c) {
+                        svgPoint.x = c.x;
+                        svgPoint.y = c.y;
+                        var tp = svgPoint.matrixTransform(ctm);
+                        return {x: tp.x, y: tp.y};
+                    });
+
+                    var minX = Math.min.apply(null, transformed.map(function(p) { return p.x; }));
+                    var maxX = Math.max.apply(null, transformed.map(function(p) { return p.x; }));
+                    var minY = Math.min.apply(null, transformed.map(function(p) { return p.y; }));
+                    var maxY = Math.max.apply(null, transformed.map(function(p) { return p.y; }));
+
+                    return {x: minX, y: minY, width: maxX - minX, height: maxY - minY};
+                }
+
+                // Helper: get all points from path
+                function getPathPoints(path) {
+                    var d = path.getAttribute('d') || '';
+                    var points = [];
+                    var ctm = path.getCTM();
+
+                    // Get M (start) point
+                    var startMatch = d.match(/M\s*([\d.-]+)[,\s]+([\d.-]+)/i);
+                    if (startMatch) {
+                        var sx = parseFloat(startMatch[1]);
+                        var sy = parseFloat(startMatch[2]);
+                        if (ctm) {
+                            svgPoint.x = sx; svgPoint.y = sy;
+                            var tp = svgPoint.matrixTransform(ctm);
+                            points.push({x: tp.x, y: tp.y});
+                        } else {
+                            points.push({x: sx, y: sy});
+                        }
+                    }
+
+                    // Get last point - find last number pair before Z or end
+                    var allNums = d.match(/[\d.-]+/g);
+                    if (allNums && allNums.length >= 2) {
+                        var ex = parseFloat(allNums[allNums.length - 2]);
+                        var ey = parseFloat(allNums[allNums.length - 1]);
+                        if (ctm) {
+                            svgPoint.x = ex; svgPoint.y = ey;
+                            var tp = svgPoint.matrixTransform(ctm);
+                            points.push({x: tp.x, y: tp.y});
+                        } else {
+                            points.push({x: ex, y: ey});
+                        }
+                    }
+
+                    return points;
+                }
+
+                // Build node bounding boxes with transforms
+                var nodeData = {};
+                nodes.forEach(function(node) {
+                    var nodeId = node.id || '';
+                    var parts = nodeId.split('-');
+                    var hashId = parts.length >= 2 ? parts[1] : nodeId;
+
+                    nodeData[hashId] = {
+                        node: node,
+                        bbox: getTransformedBBox(node)
+                    };
+                });
+
+                // Check if point is near bbox
+                function isNearBbox(pt, bbox, margin) {
+                    margin = margin || 40;
+                    return pt.x >= bbox.x - margin && pt.x <= bbox.x + bbox.width + margin &&
+                           pt.y >= bbox.y - margin && pt.y <= bbox.y + bbox.height + margin;
+                }
+
+                // Calculate distance from point to bbox center
+                function distToBboxCenter(pt, bbox) {
+                    var centerX = bbox.x + bbox.width / 2;
+                    var centerY = bbox.y + bbox.height / 2;
+                    return Math.sqrt(Math.pow(pt.x - centerX, 2) + Math.pow(pt.y - centerY, 2));
+                }
+
+                // Build edge connections with direction tracking
+                var edgeConnections = []; // [{path, source, target}]
+                var upstreamOf = {}; // node -> [parent nodes that point TO this node]
+                var downstreamOf = {}; // node -> [child nodes this node points TO]
+
+                Object.keys(nodeData).forEach(function(hashId) {
+                    upstreamOf[hashId] = [];
+                    downstreamOf[hashId] = [];
+                });
+
+                edgePaths.forEach(function(path) {
+                    var points = getPathPoints(path);
+                    if (points.length < 2) return;
+
+                    var startPt = points[0];
+                    var endPt = points[points.length - 1];
+
+                    var sourceNode = null;
+                    var targetNode = null;
+                    var sourceMinDist = Infinity;
+                    var targetMinDist = Infinity;
+
+                    // Find closest source and target nodes for this edge
+                    Object.keys(nodeData).forEach(function(hashId) {
+                        var bbox = nodeData[hashId].bbox;
+                        // Find closest node to start point (source)
+                        if (isNearBbox(startPt, bbox, 30)) {
+                            var dist = distToBboxCenter(startPt, bbox);
+                            if (dist < sourceMinDist) {
+                                sourceMinDist = dist;
+                                sourceNode = hashId;
+                            }
+                        }
+                        // Find closest node to end point (target)
+                        if (isNearBbox(endPt, bbox, 30)) {
+                            var dist = distToBboxCenter(endPt, bbox);
+                            if (dist < targetMinDist) {
+                                targetMinDist = dist;
+                                targetNode = hashId;
+                            }
+                        }
+                    });
+
+                    if (sourceNode && targetNode && sourceNode !== targetNode) {
+                        edgeConnections.push({path: path, source: sourceNode, target: targetNode});
+                        // source -> target means: target's upstream includes source
+                        if (!upstreamOf[targetNode].includes(sourceNode)) {
+                            upstreamOf[targetNode].push(sourceNode);
+                        }
+                        // source -> target means: source's downstream includes target
+                        if (!downstreamOf[sourceNode].includes(targetNode)) {
+                            downstreamOf[sourceNode].push(targetNode);
+                        }
+                    }
+                });
+
+                // Traverse only upstream (to parents/ancestors)
+                function findUpstream(startNodeId) {
+                    var visited = {};
+                    var queue = [startNodeId];
+                    visited[startNodeId] = true;
+
+                    while (queue.length > 0) {
+                        var current = queue.shift();
+                        var parents = upstreamOf[current] || [];
+                        parents.forEach(function(parent) {
+                            if (!visited[parent]) {
+                                visited[parent] = true;
+                                queue.push(parent);
+                            }
+                        });
+                    }
+                    return visited;
+                }
+
+                // Traverse only downstream (to children/descendants)
+                function findDownstream(startNodeId) {
+                    var visited = {};
+                    var queue = [startNodeId];
+                    visited[startNodeId] = true;
+
+                    while (queue.length > 0) {
+                        var current = queue.shift();
+                        var children = downstreamOf[current] || [];
+                        children.forEach(function(child) {
+                            if (!visited[child]) {
+                                visited[child] = true;
+                                queue.push(child);
+                            }
+                        });
+                    }
+                    return visited;
+                }
+
+                // Get edges for connected nodes
+                function getChainEdges(nodeSet) {
+                    var edges = [];
+                    edgeConnections.forEach(function(conn) {
+                        if (nodeSet[conn.source] && nodeSet[conn.target]) {
+                            edges.push(conn.path);
+                        }
+                    });
+                    return edges;
+                }
+
+                // Attach hover handlers
+                nodes.forEach(function(node) {
+                    var nodeId = node.id || '';
+                    var parts = nodeId.split('-');
+                    var hashId = parts.length >= 2 ? parts[1] : nodeId;
+
+                    node.style.cursor = 'pointer';
+
+                    node.addEventListener('mouseenter', function(e) {
+                        e.stopPropagation();
+                        nodes.forEach(function(n) { n.style.filter = ''; });
+                        node.style.filter = 'drop-shadow(0 0 8px rgba(255, 171, 145, 0.7))';
+
+                        // Find upstream (ancestors) and downstream (descendants) separately
+                        var upstream = findUpstream(hashId);
+                        var downstream = findDownstream(hashId);
+                        // Merge both sets
+                        var allConnected = {};
+                        Object.keys(upstream).forEach(function(k) { allConnected[k] = true; });
+                        Object.keys(downstream).forEach(function(k) { allConnected[k] = true; });
+
+                        var chainEdges = getChainEdges(allConnected);
+                        chainEdges.forEach(function(path) {
+                            path.classList.add('edge-highlighted');
+                        });
+                    });
+
+                    node.addEventListener('mouseleave', function() {
+                        node.style.filter = '';
+                        // Remove highlight from all edges
+                        edgePaths.forEach(function(path) {
+                            path.classList.remove('edge-highlighted');
+                        });
+                    });
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <nav class="reqvire-nav">
+        <a href="../../../index.html" class="nav-logo"><img src="../../../assets/logo.png" alt="Reqvire" height="24"></a>
+        <a href="../../../index.html">Containment</a>
+        <a href="../../../model.html">Model</a>
+        <a href="../../../traces.html">Traces</a>
+        <a href="../../../coverage.html">Coverage</a>
+    </nav>
+    <div class="reqvire-nav-spacer"></div>
+    <div class="container">
+        <div class="content">
+            <h1 id="elements">Elements</h1>
+<div class="mermaid">graph TD;
+  %% REQVIRE-AUTOGENERATED-DIAGRAM
+  %% Graph styling
+  classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;
+  classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
+  classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
+  classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:3px;
+  classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
+  classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
+
+  subgraph d262bfbbaa5049a3[&quot;📁 requirements/System/Core&quot;]
+    subgraph f23c409eff55fa7c[&quot;📄 Configuration.md&quot;]
+      b4fab4cd56cad6d8[&quot;Ignore Files Integration&quot;];
+      class b4fab4cd56cad6d8 systemRequirement;
+      click b4fab4cd56cad6d8 &quot;Configuration.html#ignore-files-integration&quot;;
+      6921a84a17b97dda[&quot;Ignoring Unstructured Documents&quot;];
+      class 6921a84a17b97dda systemRequirement;
+      click 6921a84a17b97dda &quot;Configuration.html#ignoring-unstructured-documents&quot;;
+      526d3fd6fb8c0baf[&quot;Requirements Processing&quot;];
+      class 526d3fd6fb8c0baf systemRequirement;
+      click 526d3fd6fb8c0baf &quot;Configuration.html#requirements-processing&quot;;
+      7b1990b8b1329152[&quot;Reserved Repository Files Exclusion&quot;];
+      class 7b1990b8b1329152 systemRequirement;
+      click 7b1990b8b1329152 &quot;Configuration.html#reserved-repository-files-exclusion&quot;;
+      533fcaf27edc0797[&quot;Structured Markdown Files Search and Detection&quot;];
+      class 533fcaf27edc0797 systemRequirement;
+      click 533fcaf27edc0797 &quot;Configuration.html#structured-markdown-files-search-and-detection&quot;;
+    end
+    subgraph a0a42393a244d64c[&quot;📄 Validation.md&quot;]
+      bd13cd060c399ea6[&quot;GraphRegistry as Primary Registry&quot;];
+      class bd13cd060c399ea6 systemRequirement;
+      click bd13cd060c399ea6 &quot;Validation.html#graphregistry-as-primary-registry&quot;;
+      26e63d5a1bbe175[&quot;Two-Pass Validation Strategy&quot;];
+      class 26e63d5a1bbe175 systemRequirement;
+      click 26e63d5a1bbe175 &quot;Validation.html#two-pass-validation-strategy&quot;;
+    end
+  end
+  subgraph 2d73a43cf375cb0f[&quot;📁 requirements/System/Core/Verifications&quot;]
+    subgraph 1e40212e2a6b5c6e[&quot;📄 ValidationVerifications.md&quot;]
+      1413dd439a2ce574[&quot;File Exclusion Test&quot;];
+      class 1413dd439a2ce574 verification;
+      click 1413dd439a2ce574 &quot;Verifications/ValidationVerifications.html#file-exclusion-test&quot;;
+      b32250e14e326cb[&quot;Requirements Files Search and Detection Test&quot;];
+      class b32250e14e326cb verification;
+      click b32250e14e326cb &quot;Verifications/ValidationVerifications.html#requirements-files-search-and-detection-test&quot;;
+      fcb309f0f899a983[&quot;Same-File Fragment Relations Test&quot;];
+      class fcb309f0f899a983 verification;
+      click fcb309f0f899a983 &quot;Verifications/ValidationVerifications.html#same-file-fragment-relations-test&quot;;
+    end
+  end
+  subgraph 94359ac729226de6[&quot;📁 requirements/System/Operations&quot;]
+    subgraph ce3b241a2629974e[&quot;📄 ElementManipulation.md&quot;]
+      9987f9e9ae83fba3[&quot;Target Location Validation and Auto-Creation&quot;];
+      class 9987f9e9ae83fba3 systemRequirement;
+      click 9987f9e9ae83fba3 &quot;../Operations/ElementManipulation.html#target-location-validation-and-auto-creation&quot;;
+    end
+    subgraph 76dc8a8951f1adad[&quot;📄 Formatting.md&quot;]
+      3e259233db2e4d25[&quot;File Pattern Exclusion for Format&quot;];
+      class 3e259233db2e4d25 systemRequirement;
+      click 3e259233db2e4d25 &quot;../Operations/Formatting.html#file-pattern-exclusion-for-format&quot;;
+    end
+  end
+  subgraph f876b12d880d294c[&quot;📁 requirements/System/Processing/Verifications&quot;]
+    subgraph 427027b536446d98[&quot;📄 ChangeImpactVerifications.md&quot;]
+      3753d18d6b61231c[&quot;Element Content Extraction Test&quot;];
+      class 3753d18d6b61231c verification;
+      click 3753d18d6b61231c &quot;../Processing/Verifications/ChangeImpactVerifications.html#element-content-extraction-test&quot;;
+    end
+  end
+  b4fab4cd56cad6d8 -.->|deriveReqT| 9987f9e9ae83fba3;
+  8419dcc77d92b609[&quot;config.rs&quot;];
+  class 8419dcc77d92b609 default;
+  click 8419dcc77d92b609 &quot;../../../cli/src/config.rs&quot;;
+  b4fab4cd56cad6d8 -->|satisfiedBy| 8419dcc77d92b609;
+  b4fab4cd56cad6d8 -.->|verifiedBy| 1413dd439a2ce574;
+  6921a84a17b97dda -.->|deriveReqT| b4fab4cd56cad6d8;
+  6921a84a17b97dda -.->|deriveReqT| 526d3fd6fb8c0baf;
+  6921a84a17b97dda -.->|deriveReqT| 7b1990b8b1329152;
+  6921a84a17b97dda -.->|deriveReqT| 3e259233db2e4d25;
+  6921a84a17b97dda -->|satisfiedBy| 8419dcc77d92b609;
+  526d3fd6fb8c0baf -.->|deriveReqT| 533fcaf27edc0797;
+  526d3fd6fb8c0baf -.->|deriveReqT| bd13cd060c399ea6;
+  526d3fd6fb8c0baf -.->|deriveReqT| 26e63d5a1bbe175;
+  d50a859650933e55[&quot;model.rs&quot;];
+  class d50a859650933e55 default;
+  click d50a859650933e55 &quot;../../../core/src/model.rs&quot;;
+  526d3fd6fb8c0baf -->|satisfiedBy| d50a859650933e55;
+  f22d93285fcd7664[&quot;parser.rs&quot;];
+  class f22d93285fcd7664 default;
+  click f22d93285fcd7664 &quot;../../../core/src/parser.rs&quot;;
+  526d3fd6fb8c0baf -->|satisfiedBy| f22d93285fcd7664;
+  526d3fd6fb8c0baf -.->|verifiedBy| fcb309f0f899a983;
+  526d3fd6fb8c0baf -.->|verifiedBy| 3753d18d6b61231c;
+  7b1990b8b1329152 -->|satisfiedBy| 8419dcc77d92b609;
+  7b1990b8b1329152 -.->|verifiedBy| 1413dd439a2ce574;
+  533fcaf27edc0797 -->|satisfiedBy| d50a859650933e55;
+  533fcaf27edc0797 -.->|verifiedBy| b32250e14e326cb;
+  9987f9e9ae83fba3 -.->|deriveReqT| ca74bbb037431e9b;
+  9987f9e9ae83fba3 -.->|deriveReqT| 84860e94fc819efd;
+  9987f9e9ae83fba3 -.->|deriveReqT| bbea6657a24b3f1c;
+  b7c871ab64a7059a[&quot;graph_registry.rs&quot;];
+  class b7c871ab64a7059a default;
+  click b7c871ab64a7059a &quot;../../../core/src/graph_registry.rs&quot;;
+  9987f9e9ae83fba3 -->|satisfiedBy| b7c871ab64a7059a;
+  ce2625feec883e55[&quot;utils.rs&quot;];
+  class ce2625feec883e55 default;
+  click ce2625feec883e55 &quot;../../../core/src/utils.rs&quot;;
+  9987f9e9ae83fba3 -->|satisfiedBy| ce2625feec883e55;
+  9987f9e9ae83fba3 -.->|verifiedBy| b6076972a6650ff1;
+  7f5e53340a03365f[&quot;test.sh&quot;];
+  class 7f5e53340a03365f default;
+  click 7f5e53340a03365f &quot;../../../tests/test-gitignore-integration/test.sh&quot;;
+  1413dd439a2ce574 -->|satisfiedBy| 7f5e53340a03365f;
+  3e259233db2e4d25 -.->|deriveReqT| bbe4bfafe31e5f09;
+  3e259233db2e4d25 -->|satisfiedBy| ce2625feec883e55;
+  c287b52ceb52aa04[&quot;test.sh&quot;];
+  class c287b52ceb52aa04 default;
+  click c287b52ceb52aa04 &quot;../../../tests/test-element-content-extraction/test.sh&quot;;
+  3753d18d6b61231c -->|satisfiedBy| c287b52ceb52aa04;
+  26e63d5a1bbe175 -.->|deriveReqT| a867b4bb3e22cabf;
+  26e63d5a1bbe175 -->|satisfiedBy| d50a859650933e55;
+  789c690d63402d63[&quot;test.sh&quot;];
+  class 789c690d63402d63 default;
+  click 789c690d63402d63 &quot;../../../tests/test-fragment-relations/test.sh&quot;;
+  fcb309f0f899a983 -->|satisfiedBy| 789c690d63402d63;
+  bd13cd060c399ea6 -->|satisfiedBy| b7c871ab64a7059a;
+  bd13cd060c399ea6 -->|satisfiedBy| d50a859650933e55;
+  bd13cd060c399ea6 -.->|verifiedBy| b32250e14e326cb;
+  a29e69e90fa71f39[&quot;test.sh&quot;];
+  class a29e69e90fa71f39 default;
+  click a29e69e90fa71f39 &quot;../../../tests/test-excluded-patterns/test.sh&quot;;
+  b32250e14e326cb -->|satisfiedBy| a29e69e90fa71f39;
+</div>
+<h3 id="ignoring-unstructured-documents">Ignoring Unstructured Documents</h3>
+<p>The system shall support configurable glob patterns to exclude specific files from requirement processing.</p>
+<h4>Details</h4>
+<p>Exclusion patterns are defined in <code>.reqvireignore</code> file at the repository root, using the same format as <code>.gitignore</code>:</p>
+<pre><code class="language-.reqvireignore"># Example patterns to exclude from structured documents processing
+**/Logical*.md
+**/Physical*.md
+**/draft-*.md
+examples/**
+</code></pre>
+<p>The <code>.reqvireignore</code> file provides Reqvire-specific exclusions for files that should remain in version control but not be processed as requirements.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="ModelManagement.html#coexistence-of-structured-and-unstructured-documents">Coexistence of Structured and Unstructured Documents</a></li>
+<li>satisfiedBy: <a href="../../../cli/src/config.rs">config.rs</a></li>
+</ul>
+<hr />
+<h3 id="ignore-files-integration">Ignore Files Integration</h3>
+<p>The system shall read exclusion patterns from the repository root .gitignore file and .reqvireignore file to automatically exclude files from requirement processing.</p>
+<h4>Details</h4>
+<p>Reqvire integrates with Git workflows by respecting exclusion patterns from two sources:</p>
+<ul>
+<li><strong><code>.gitignore</code></strong> - Version control exclusions (files not tracked by Git)</li>
+<li><strong><code>.reqvireignore</code></strong> - Reqvire-specific exclusions (files tracked by Git but excluded from requirements processing)</li>
+</ul>
+<p>Both ignore files use standard gitignore pattern syntax to exclude files from being parsed as structured markdown (requirements/verifications). However, they differ in an important way:</p>
+<ul>
+<li><strong><code>.gitignore</code></strong>: Files matching these patterns are <strong>completely excluded</strong> - they cannot be parsed as structured markdown AND cannot be referenced in file relations to elements</li>
+<li><strong><code>.reqvireignore</code></strong>: Files matching these patterns are excluded from structured markdown parsing BUT <strong>can still be referenced</strong> in file relations to elements (useful for design documents, diagrams, or other supporting files that you want to link to but not parse)</li>
+</ul>
+<p><strong>Rules:</strong></p>
+<ul>
+<li>ONLY the root .gitignore file shall be used (not nested .gitignore files in subdirectories)</li>
+<li>ONLY the root .reqvireignore file shall be used (not nested .reqvireignore files in subdirectories)</li>
+<li>.reqvireignore shall use the same format and syntax as .gitignore</li>
+<li>Patterns from .gitignore and .reqvireignore shall be combined</li>
+<li>Files matching ANY exclusion pattern (from .gitignore or .reqvireignore) shall be excluded from parsing as requirements</li>
+<li>Files excluded by .gitignore shall NOT be usable as relation targets (internal-path type) since they don’t exist in the repository</li>
+<li>Files excluded by .reqvireignore shall remain usable as relation targets (internal-path type) since they exist in the repository but are not parsed as requirements</li>
+<li>If .reqvireignore does not exist, the system shall process normally using only .gitignore patterns</li>
+<li>If .gitignore does not exist, the system shall process normally using only .reqvireignore patterns</li>
+</ul>
+<p><strong>Rationale:</strong></p>
+<ul>
+<li><code>.gitignore</code> integration ensures anything not tracked by version control is also excluded from requirements processing</li>
+<li><code>.reqvireignore</code> provides flexibility to exclude specific files from requirements processing while keeping them in version control (e.g., draft specifications, example files, or documentation that shouldn’t be processed as requirements)</li>
+<li>Using a <code>.reqvireignore</code> file follows the established convention that developers are familiar with from <code>.gitignore</code>, making it more intuitive</li>
+<li>File-based exclusion patterns are more maintainable than configuration-based approaches</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#ignoring-unstructured-documents">Ignoring Unstructured Documents</a></li>
+<li>satisfiedBy: <a href="../../../cli/src/config.rs">config.rs</a></li>
+</ul>
+<hr />
+<h3 id="reserved-repository-files-exclusion">Reserved Repository Files Exclusion</h3>
+<p>The system shall automatically exclude certain common repository documentation files from structured markdown processing.</p>
+<h4>Details</h4>
+<p>The following reserved filenames are always excluded from structured markdown processing, as they are typically used for general repository documentation purposes rather than system requirements:</p>
+<ul>
+<li><code>README.md</code></li>
+<li><code>CHANGELOG.md</code>, <code>CHANGES.md</code></li>
+<li><code>CONTRIBUTING.md</code></li>
+<li><code>LICENSE.md</code></li>
+<li><code>CODE_OF_CONDUCT.md</code></li>
+<li><code>SECURITY.md</code></li>
+<li><code>AUTHORS.md</code></li>
+<li><code>ROADMAP.md</code></li>
+</ul>
+<p><strong>Rules:</strong></p>
+<ul>
+<li>Reserved filenames shall be automatically excluded from structured markdown parsing across the entire repository</li>
+<li>Reserved files can still be referenced in file relations to elements (they are excluded from parsing but can be linked to)</li>
+<li>The exclusion of reserved filenames shall be combined with .gitignore and .reqvireignore patterns</li>
+<li>Files matching reserved filenames shall be excluded from parsing regardless of .gitignore or .reqvireignore configuration</li>
+</ul>
+<p><strong>Rationale:</strong></p>
+<ul>
+<li>These files serve general repository documentation purposes and should not be processed as structured requirements</li>
+<li>Standard repository files like README.md or LICENSE.md contain free-form documentation rather than structured requirements</li>
+<li>Automatically excluding these files prevents confusion and reduces the need for explicit .reqvireignore patterns</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#ignoring-unstructured-documents">Ignoring Unstructured Documents</a></li>
+<li>satisfiedBy: <a href="../../../cli/src/config.rs">config.rs</a></li>
+</ul>
+<hr />
+<h3 id="requirements-processing">Requirements Processing</h3>
+<p>The system shall parse the files in all folders and subfolders from the root of git repository which are not explicitly excluded using .gitignore and .reqvireignore files.</p>
+<h4>Details</h4>
+<p>File exclusion is handled through:</p>
+<ul>
+<li>.gitignore patterns (files not in version control)</li>
+<li>.reqvireignore patterns (files in version control but excluded from requirements processing)</li>
+<li>Reserved repository files (README.md, LICENSE.md, etc.)</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#ignoring-unstructured-documents">Ignoring Unstructured Documents</a></li>
+<li>satisfiedBy: <a href="../../../core/src/model.rs">model.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/parser.rs">parser.rs</a></li>
+</ul>
+<hr />
+<h3 id="structured-markdown-files-search-and-detection">Structured Markdown Files Search and Detection</h3>
+<p>The system shall identify all structured markdown documents available for processing in all directories and sub-directories of the git repository root based on predefined rules.</p>
+<h4>Details</h4>
+<p>Identification Process:</p>
+<ol>
+<li><strong>File Selection</strong>: The process scans all files in the the git repository root and all sub folders.</li>
+<li><strong>Excluded Patterns Check</strong>: If a file matches any excluded patterns, it is marked as <strong>not a structured document file</strong>.</li>
+<li><strong>File Extension Check</strong>: If the file does not have a <code>.md</code> extension, it is marked as <strong>not a structured document file</strong>.</li>
+</ol>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#requirements-processing">Requirements Processing</a></li>
+<li>satisfiedBy: <a href="../../../core/src/model.rs">model.rs</a></li>
+</ul>
+<hr />
+
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChangePropagation</title>
+    <link rel="icon" type="image/x-icon" href="../../../../assets/favicon.ico">
+    <link rel="apple-touch-icon" href="../../../../assets/apple-touch-icon.png">
+    
+<style>
+:root {
+    /* Primary Colors */
+    --color-primary: #3F51B5;           /* Indigo - core branding */
+    --color-primary-hover: #7986CB;     /* Much lighter Indigo for hover - more visible */
+    --color-primary-active: #303F9F;    /* Darker Indigo for active */
+
+    /* Element Type Colors */
+    --color-requirement: #673AB7;       /* Deep Purple - core requirements */
+    --color-verification: #4CAF50;      /* Emerald Green - validated/completed */
+    --color-other: #9E9E9E;             /* Cool Gray - other element types */
+
+    /* Status Colors */
+    --color-verified: #4CAF50;          /* Forest Green - verified/passing */
+    --color-pending: #FFB74D;           /* Amber - pending/warning */
+    --color-error: #F44336;             /* Red - error/failed */
+
+    /* Interactive Colors */
+    --color-highlight: #FFAB91;         /* Peach - hover highlight */
+    --color-link: #212121;              /* Black - link color */
+    --color-link-hover: #3F51B5;        /* Indigo (same as nav bar) - link hover */
+
+    /* Text Colors */
+    --color-text-primary: #212121;      /* Primary text */
+    --color-text-secondary: #424242;    /* Body text */
+    --color-text-muted: #757575;        /* De-emphasized text */
+    --color-background: #FAFAFA;        /* Off-white background */
+    --color-border: #EEEEEE;            /* Very light gray borders */
+}
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #FAFAFA;
+    color: var(--color-text-secondary);
+}
+.reqvire-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    background-color: var(--color-primary);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+}
+.reqvire-nav a {
+    color: #ffffff;
+    text-decoration: none;
+    padding: 10px 20px;
+    margin-right: 5px;
+    border-radius: 3px;
+    transition: background-color 0.2s, text-decoration 0.2s;
+}
+.reqvire-nav a.nav-logo {
+    display: flex;
+    align-items: center;
+    padding: 5px 15px 5px 0;
+}
+.reqvire-nav a.nav-logo img {
+    vertical-align: middle;
+}
+.reqvire-nav a:hover {
+    background-color: var(--color-primary-hover);
+    text-decoration: underline;
+    color: #ffffff;
+}
+.reqvire-nav a:active,
+.reqvire-nav a.active {
+    background-color: var(--color-primary-active);
+    text-decoration: underline;
+    color: #ffffff;
+}
+.reqvire-nav-spacer {
+    height: 50px;
+}
+.container {
+    max-width: 95%;
+    margin: 0 auto;
+    padding: 20px;
+}
+.content {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    border: 1px solid #E0E0E0;
+}
+h1 {
+    color: var(--color-text-primary);
+    border-bottom: 2px solid #EEEEEE;
+    padding-bottom: 10px;
+    margin-top: 0;
+}
+h2 {
+    color: var(--color-text-primary);
+    border-bottom: 1px solid #EEEEEE;
+    padding-bottom: 5px;
+}
+h3 {
+    color: var(--color-text-primary);
+    margin-top: 25px;
+}
+h4 {
+    color: var(--color-text-secondary);
+    font-weight: 600;
+}
+a {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: text-decoration 0.15s ease;
+}
+a:hover {
+    text-decoration: underline;
+}
+a:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 20px 0;
+}
+table, th, td {
+    border: 1px solid #EEEEEE;
+}
+th, td {
+    padding: 8px 12px;
+    text-align: left;
+}
+th {
+    background-color: #F5F5F5;
+    color: #212121;
+    font-weight: 600;
+}
+tr:hover td {
+    background-color: #FFF8E1;
+}
+code {
+    background: #f6f8fa;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 90%;
+}
+pre {
+    background: #f6f8fa;
+    border-radius: 3px;
+    padding: 16px;
+    overflow: auto;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+}
+blockquote {
+    margin: 0;
+    padding: 0 15px;
+    color: var(--color-text-muted);
+    border-left: 4px solid var(--color-primary);
+}
+.mermaid {
+    margin: 20px 0;
+    text-align: center;
+    height: calc(100vh - 150px);
+    width: 100%;
+    overflow: hidden;
+    position: relative; /* Required for absolutely-positioned navigation buttons */
+    border: 1px solid #EEEEEE;
+    border-radius: 3px;
+    background-color: #FAFAFA;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+.mermaid svg {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    position: relative;
+    z-index: 1;
+}
+.diagram-nav-buttons {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 999; /* higher than SVG (1) but lower than header nav (1000) */
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 5px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+.diagram-nav-row {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+}
+.diagram-nav-btn {
+    width: 32px;
+    height: 32px;
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.diagram-nav-btn:hover {
+    background-color: var(--color-primary-hover);
+}
+.diagram-nav-btn:active {
+    background-color: var(--color-primary-active);
+}
+</style>
+
+    <!-- Enhanced mermaid configuration for Reqvire diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.5.0/dist/svg-pan-zoom.min.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+        import elkLayouts from 'https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk/dist/mermaid-layout-elk.esm.min.mjs';
+
+        // Register ELK layout for large diagrams
+        mermaid.registerLayoutLoaders(elkLayouts);
+
+        // Capture Mermaid errors
+        mermaid.parseError = function(err, hash) {
+            console.error('Mermaid Parse Error:', err);
+            console.error('Error details:', {
+                str: err.str,
+                hash: err.hash,
+                message: err.message,
+                stack: err.stack
+            });
+        };
+
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'neutral',
+            maxTextSize: 5000000,
+            maxEdges: 50000,
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis',
+                defaultRenderer: 'elk'
+            },
+            layout: 'elk',
+            elk: {
+                mergeEdges: true,
+                nodePlacementStrategy: 'SIMPLE'
+            },
+            securityLevel: 'loose',
+            logLevel: 'error'
+        });
+
+        await mermaid.run();
+        window.mermaid = mermaid;
+
+        // Wait for SVGs to be fully rendered, then initialize
+        function waitForSvgs(callback) {
+            var containers = document.querySelectorAll('.mermaid');
+            var allReady = true;
+            containers.forEach(function(c) {
+                var svg = c.querySelector('svg');
+                // Check SVG exists, has getBBox, valid dimensions, and has actual content (nodes)
+                if (!svg || !svg.getBBox || svg.getBBox().width === 0 || !svg.querySelector('.node')) {
+                    allReady = false;
+                }
+            });
+            if (allReady && containers.length > 0) {
+                callback();
+            } else {
+                requestAnimationFrame(function() { waitForSvgs(callback); });
+            }
+        }
+
+        // Add pan/zoom to all Mermaid diagrams after rendering
+        waitForSvgs(function() {
+            var allMermaidContainers = document.querySelectorAll('.mermaid');
+
+            allMermaidContainers.forEach(function(mermaidContainer, index) {
+
+                var svg = mermaidContainer.querySelector('svg');
+                if (!svg) {
+                    return;
+                }
+
+                // Double-check SVG is ready
+                try {
+                    var bbox = svg.getBBox();
+                    if (bbox.width === 0 || bbox.height === 0) {
+                        return;
+                    }
+                } catch (e) {
+                    return;
+                }
+
+                svg.style.maxWidth = 'none';
+                svg.style.maxHeight = 'none';
+
+                var eventsHandler = {
+                    haltEventListeners: ['touchstart', 'touchend', 'touchmove', 'touchleave', 'touchcancel'],
+                        init: function(options) {
+                            var instance = options.instance;
+                            var initialScale = 1;
+                            var pannedX = 0;
+                            var pannedY = 0;
+
+                            this.hammer = Hammer(options.svgElement, {
+                                inputClass: Hammer.SUPPORT_POINTER_EVENTS ? Hammer.PointerEventInput : Hammer.TouchInput
+                            });
+
+                            this.hammer.get('pinch').set({enable: true});
+
+                            this.hammer.on('doubletap', function(ev){
+                                instance.zoomIn();
+                            });
+
+                            this.hammer.on('panstart panmove', function(ev){
+                                if (ev.type === 'panstart') {
+                                    pannedX = 0;
+                                    pannedY = 0;
+                                }
+                                instance.panBy({x: ev.deltaX - pannedX, y: ev.deltaY - pannedY});
+                                pannedX = ev.deltaX;
+                                pannedY = ev.deltaY;
+                            });
+
+                            this.hammer.on('pinchstart pinchmove', function(ev){
+                                if (ev.type === 'pinchstart') {
+                                    initialScale = instance.getZoom();
+                                }
+                                instance.zoomAtPoint(initialScale * ev.scale, {x: ev.center.x, y: ev.center.y});
+                            });
+
+                            options.svgElement.addEventListener('touchmove', function(e){ e.preventDefault(); });
+                        },
+                        destroy: function(){
+                            this.hammer.destroy();
+                        }
+                    };
+
+                    // Diagrams with default zoom (no auto-fit)
+                    var panZoomInstance;
+                    try {
+                        panZoomInstance = svgPanZoom(svg, {
+                            zoomEnabled: true,
+                            controlIconsEnabled: true,
+                            fit: false,
+                            center: false,
+                            contain: false,
+                            minZoom: 0.5,
+                            maxZoom: 10,
+                            zoomScaleSensitivity: 0.3,
+                            customEventsHandler: eventsHandler
+                        });
+                    } catch (e) {
+                        return; // Skip this diagram and continue with others
+                    }
+
+                    if (!panZoomInstance) {
+                        return;
+                    }
+
+                    // Add navigation buttons
+                    var navButtons = document.createElement('div');
+                    navButtons.className = 'diagram-nav-buttons';
+                    navButtons.innerHTML = `
+                        <div class="diagram-nav-row">
+                            <button class="diagram-nav-btn" data-action="up">▲</button>
+                        </div>
+                        <div class="diagram-nav-row">
+                            <button class="diagram-nav-btn" data-action="left">◀</button>
+                            <button class="diagram-nav-btn" data-action="down">▼</button>
+                            <button class="diagram-nav-btn" data-action="right">▶</button>
+                        </div>
+                    `;
+                    mermaidContainer.appendChild(navButtons);
+
+                    // Wire up navigation buttons
+                    var panStep = 100;
+                    navButtons.querySelectorAll('.diagram-nav-btn').forEach(function(btn) {
+                        btn.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            var action = this.getAttribute('data-action');
+                            switch(action) {
+                                case 'up':
+                                    panZoomInstance.panBy({x: 0, y: panStep});
+                                    break;
+                                case 'down':
+                                    panZoomInstance.panBy({x: 0, y: -panStep});
+                                    break;
+                                case 'left':
+                                    panZoomInstance.panBy({x: panStep, y: 0});
+                                    break;
+                                case 'right':
+                                    panZoomInstance.panBy({x: -panStep, y: 0});
+                                    break;
+                            }
+                        });
+                    });
+            });
+
+            // Add CSS for edge highlighting
+            var style = document.createElement('style');
+            style.textContent = `
+                path.edge-highlighted,
+                .edge-highlighted path,
+                svg path.edge-highlighted {
+                    stroke: #FFAB91 !important;
+                    stroke-width: 3px !important;
+                }
+            `;
+            document.head.appendChild(style);
+
+            // Initialize edge highlighting for all diagrams
+            document.querySelectorAll('.mermaid svg').forEach(function(svg) {
+                var nodes = svg.querySelectorAll('.node');
+
+                // Find flowchart-link paths (actual edges)
+                var edgePaths = svg.querySelectorAll('path.flowchart-link');
+                // Fallback: find paths in .edges group
+                if (edgePaths.length === 0) {
+                    var edgesGroup = svg.querySelector('.edges');
+                    if (edgesGroup) {
+                        edgePaths = edgesGroup.querySelectorAll('path');
+                    }
+                }
+
+                // Get SVG point for coordinate transforms
+                var svgPoint = svg.createSVGPoint();
+
+                // Helper: transform point through element's CTM
+                function getTransformedBBox(element) {
+                    var bbox = element.getBBox();
+                    var ctm = element.getCTM();
+                    if (!ctm) return bbox;
+
+                    // Transform all four corners
+                    var corners = [
+                        {x: bbox.x, y: bbox.y},
+                        {x: bbox.x + bbox.width, y: bbox.y},
+                        {x: bbox.x, y: bbox.y + bbox.height},
+                        {x: bbox.x + bbox.width, y: bbox.y + bbox.height}
+                    ];
+
+                    var transformed = corners.map(function(c) {
+                        svgPoint.x = c.x;
+                        svgPoint.y = c.y;
+                        var tp = svgPoint.matrixTransform(ctm);
+                        return {x: tp.x, y: tp.y};
+                    });
+
+                    var minX = Math.min.apply(null, transformed.map(function(p) { return p.x; }));
+                    var maxX = Math.max.apply(null, transformed.map(function(p) { return p.x; }));
+                    var minY = Math.min.apply(null, transformed.map(function(p) { return p.y; }));
+                    var maxY = Math.max.apply(null, transformed.map(function(p) { return p.y; }));
+
+                    return {x: minX, y: minY, width: maxX - minX, height: maxY - minY};
+                }
+
+                // Helper: get all points from path
+                function getPathPoints(path) {
+                    var d = path.getAttribute('d') || '';
+                    var points = [];
+                    var ctm = path.getCTM();
+
+                    // Get M (start) point
+                    var startMatch = d.match(/M\s*([\d.-]+)[,\s]+([\d.-]+)/i);
+                    if (startMatch) {
+                        var sx = parseFloat(startMatch[1]);
+                        var sy = parseFloat(startMatch[2]);
+                        if (ctm) {
+                            svgPoint.x = sx; svgPoint.y = sy;
+                            var tp = svgPoint.matrixTransform(ctm);
+                            points.push({x: tp.x, y: tp.y});
+                        } else {
+                            points.push({x: sx, y: sy});
+                        }
+                    }
+
+                    // Get last point - find last number pair before Z or end
+                    var allNums = d.match(/[\d.-]+/g);
+                    if (allNums && allNums.length >= 2) {
+                        var ex = parseFloat(allNums[allNums.length - 2]);
+                        var ey = parseFloat(allNums[allNums.length - 1]);
+                        if (ctm) {
+                            svgPoint.x = ex; svgPoint.y = ey;
+                            var tp = svgPoint.matrixTransform(ctm);
+                            points.push({x: tp.x, y: tp.y});
+                        } else {
+                            points.push({x: ex, y: ey});
+                        }
+                    }
+
+                    return points;
+                }
+
+                // Build node bounding boxes with transforms
+                var nodeData = {};
+                nodes.forEach(function(node) {
+                    var nodeId = node.id || '';
+                    var parts = nodeId.split('-');
+                    var hashId = parts.length >= 2 ? parts[1] : nodeId;
+
+                    nodeData[hashId] = {
+                        node: node,
+                        bbox: getTransformedBBox(node)
+                    };
+                });
+
+                // Check if point is near bbox
+                function isNearBbox(pt, bbox, margin) {
+                    margin = margin || 40;
+                    return pt.x >= bbox.x - margin && pt.x <= bbox.x + bbox.width + margin &&
+                           pt.y >= bbox.y - margin && pt.y <= bbox.y + bbox.height + margin;
+                }
+
+                // Calculate distance from point to bbox center
+                function distToBboxCenter(pt, bbox) {
+                    var centerX = bbox.x + bbox.width / 2;
+                    var centerY = bbox.y + bbox.height / 2;
+                    return Math.sqrt(Math.pow(pt.x - centerX, 2) + Math.pow(pt.y - centerY, 2));
+                }
+
+                // Build edge connections with direction tracking
+                var edgeConnections = []; // [{path, source, target}]
+                var upstreamOf = {}; // node -> [parent nodes that point TO this node]
+                var downstreamOf = {}; // node -> [child nodes this node points TO]
+
+                Object.keys(nodeData).forEach(function(hashId) {
+                    upstreamOf[hashId] = [];
+                    downstreamOf[hashId] = [];
+                });
+
+                edgePaths.forEach(function(path) {
+                    var points = getPathPoints(path);
+                    if (points.length < 2) return;
+
+                    var startPt = points[0];
+                    var endPt = points[points.length - 1];
+
+                    var sourceNode = null;
+                    var targetNode = null;
+                    var sourceMinDist = Infinity;
+                    var targetMinDist = Infinity;
+
+                    // Find closest source and target nodes for this edge
+                    Object.keys(nodeData).forEach(function(hashId) {
+                        var bbox = nodeData[hashId].bbox;
+                        // Find closest node to start point (source)
+                        if (isNearBbox(startPt, bbox, 30)) {
+                            var dist = distToBboxCenter(startPt, bbox);
+                            if (dist < sourceMinDist) {
+                                sourceMinDist = dist;
+                                sourceNode = hashId;
+                            }
+                        }
+                        // Find closest node to end point (target)
+                        if (isNearBbox(endPt, bbox, 30)) {
+                            var dist = distToBboxCenter(endPt, bbox);
+                            if (dist < targetMinDist) {
+                                targetMinDist = dist;
+                                targetNode = hashId;
+                            }
+                        }
+                    });
+
+                    if (sourceNode && targetNode && sourceNode !== targetNode) {
+                        edgeConnections.push({path: path, source: sourceNode, target: targetNode});
+                        // source -> target means: target's upstream includes source
+                        if (!upstreamOf[targetNode].includes(sourceNode)) {
+                            upstreamOf[targetNode].push(sourceNode);
+                        }
+                        // source -> target means: source's downstream includes target
+                        if (!downstreamOf[sourceNode].includes(targetNode)) {
+                            downstreamOf[sourceNode].push(targetNode);
+                        }
+                    }
+                });
+
+                // Traverse only upstream (to parents/ancestors)
+                function findUpstream(startNodeId) {
+                    var visited = {};
+                    var queue = [startNodeId];
+                    visited[startNodeId] = true;
+
+                    while (queue.length > 0) {
+                        var current = queue.shift();
+                        var parents = upstreamOf[current] || [];
+                        parents.forEach(function(parent) {
+                            if (!visited[parent]) {
+                                visited[parent] = true;
+                                queue.push(parent);
+                            }
+                        });
+                    }
+                    return visited;
+                }
+
+                // Traverse only downstream (to children/descendants)
+                function findDownstream(startNodeId) {
+                    var visited = {};
+                    var queue = [startNodeId];
+                    visited[startNodeId] = true;
+
+                    while (queue.length > 0) {
+                        var current = queue.shift();
+                        var children = downstreamOf[current] || [];
+                        children.forEach(function(child) {
+                            if (!visited[child]) {
+                                visited[child] = true;
+                                queue.push(child);
+                            }
+                        });
+                    }
+                    return visited;
+                }
+
+                // Get edges for connected nodes
+                function getChainEdges(nodeSet) {
+                    var edges = [];
+                    edgeConnections.forEach(function(conn) {
+                        if (nodeSet[conn.source] && nodeSet[conn.target]) {
+                            edges.push(conn.path);
+                        }
+                    });
+                    return edges;
+                }
+
+                // Attach hover handlers
+                nodes.forEach(function(node) {
+                    var nodeId = node.id || '';
+                    var parts = nodeId.split('-');
+                    var hashId = parts.length >= 2 ? parts[1] : nodeId;
+
+                    node.style.cursor = 'pointer';
+
+                    node.addEventListener('mouseenter', function(e) {
+                        e.stopPropagation();
+                        nodes.forEach(function(n) { n.style.filter = ''; });
+                        node.style.filter = 'drop-shadow(0 0 8px rgba(255, 171, 145, 0.7))';
+
+                        // Find upstream (ancestors) and downstream (descendants) separately
+                        var upstream = findUpstream(hashId);
+                        var downstream = findDownstream(hashId);
+                        // Merge both sets
+                        var allConnected = {};
+                        Object.keys(upstream).forEach(function(k) { allConnected[k] = true; });
+                        Object.keys(downstream).forEach(function(k) { allConnected[k] = true; });
+
+                        var chainEdges = getChainEdges(allConnected);
+                        chainEdges.forEach(function(path) {
+                            path.classList.add('edge-highlighted');
+                        });
+                    });
+
+                    node.addEventListener('mouseleave', function() {
+                        node.style.filter = '';
+                        // Remove highlight from all edges
+                        edgePaths.forEach(function(path) {
+                            path.classList.remove('edge-highlighted');
+                        });
+                    });
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <nav class="reqvire-nav">
+        <a href="../../../../index.html" class="nav-logo"><img src="../../../../assets/logo.png" alt="Reqvire" height="24"></a>
+        <a href="../../../../index.html">Containment</a>
+        <a href="../../../../model.html">Model</a>
+        <a href="../../../../traces.html">Traces</a>
+        <a href="../../../../coverage.html">Coverage</a>
+    </nav>
+    <div class="reqvire-nav-spacer"></div>
+    <div class="container">
+        <div class="content">
+            <h1 id="change-propagation-specification">Change Propagation Specification</h1>
+<h2 id="change-impact-propagation-in-requirements">Change Impact Propagation in Requirements</h2>
+<p>Requirements are interconnected through relations, and changes to a requirement may affect related requirements, verification methods, design specifications, or software components.</p>
+<p>Changes propagate based on the relation type, which determines the impact direction and scope.</p>
+<p>Changes to high-level requirements cascade down to implementation.
+Verification artifacts must be marked for revalidation to reflect changes.
+Automated tools should flag all impacted requirements for review.</p>
+<h3 id="relation-categories-for-change-propagation">Relation Categories for Change Propagation</h3>
+<p>For change propagation purposes, relations can be categorized into several groups:</p>
+<ol>
+<li><strong>Hierarchical Relations</strong> - Changes propagate from parent to child elements (derivedFrom)</li>
+<li><strong>Satisfaction Relations</strong> - Changes to requirements affect implementations (satisfiedBy)</li>
+<li><strong>Verification Relations</strong> - Changes to requirements invalidate verifications (verifiedBy)</li>
+<li><strong>Traceability Relations</strong> - No change propagation, for documentation only (trace)</li>
+</ol>
+<hr />
+<h2 id="change-propagation-mechanism">Change Propagation Mechanism</h2>
+<p>When a requirement changes, impact analysis must be conducted based on its relations. The following mechanism ensures traceability and controlled updates.</p>
+<ul>
+<li>Identify Modified Elements</li>
+<li>Identify Impacted Relations
+<ul>
+<li>When a element is modified, check its Relations subsection to identify linked elements.</li>
+</ul>
+</li>
+<li>Determine Change Propagation Scope
+<ul>
+<li>Apply the rules in Relation Types and Change Propagation Rules to assess whether the change affects child requirements, design artifacts, verification, or other linked documents.</li>
+</ul>
+</li>
+<li>Invalidate Affected Elements
+<ul>
+<li>If a related element is impacted, flag it for review.</li>
+<li>Example: If a requirement verified by a test changes, the test must be reviewed.</li>
+</ul>
+</li>
+<li>Require Re-validation or Re-design
+<ul>
+<li>If changes affect satisfaction (e.g., code or architecture), update the relevant design.</li>
+<li>If changes affect verification, update test cases or validation documents.</li>
+</ul>
+</li>
+<li>If a change results in a requirement being merged, split, or removed, update its Relations to maintain traceability.</li>
+</ul>
+<h2 id="identify-modified-elements-algorithm:">Identify Modified Elements Algorithm:</h2>
+<ol>
+<li>
+<p><strong>Diff Analysis</strong>:</p>
+<ul>
+<li>Compare elements between versions using stable Element IDs (not location-based identifiers)</li>
+<li>Identify changes by type:
+<ul>
+<li><strong>Content Changes</strong>: Element ID exists in both versions, content hash differs</li>
+<li><strong>Additions</strong>: Element ID exists only in current version</li>
+<li><strong>Removals</strong>: Element ID exists only in previous version</li>
+<li><strong>Relocations</strong>: Element ID exists in both, but file_path or section differs</li>
+</ul>
+</li>
+<li><strong>Attachment Content Changes</strong>:
+<ul>
+<li>Attachment hashes are stored separately from element content hash</li>
+<li>For file attachments: content_hash is computed from file content during parsing</li>
+<li>For element attachments: hash is looked up from referenced element’s hash_impact_content in registry</li>
+<li>Change impact compares both element hash AND attachment hashes independently</li>
+<li>Attach operation: new attachment hash appears -&gt; triggers impact</li>
+<li>Detach operation: attachment hash removed -&gt; triggers impact</li>
+<li>mv-attachment operation: path change only -&gt; does NOT trigger impact (tracked for reporting like relation renames)</li>
+<li>If attached document content changes: attachment hash differs -&gt; triggers impact on element</li>
+<li>Path renames are tracked separately for reference updates without impact propagation</li>
+</ul>
+</li>
+<li>Generate a ChangeSet representing all detected changes</li>
+<li>Associate changes with specific elements in the model</li>
+<li>Note: Pure relocations (no content changes) do not trigger impact propagation</li>
+</ul>
+</li>
+<li>
+<p><strong>Relocation Detection</strong>:</p>
+<ul>
+<li>For each element present in both versions (matched by Element ID):
+<ul>
+<li>Compare file_path field (implicit file containment)</li>
+<li>Compare section field (implicit section containment)</li>
+<li>If either differs -&gt; classify as relocation</li>
+<li>Track old location and new location for reporting</li>
+</ul>
+</li>
+<li>Relocations without content changes do NOT propagate impact</li>
+<li>Relocations WITH content changes propagate based on content change only</li>
+</ul>
+</li>
+<li>
+<p><strong>Impact Determination</strong>:</p>
+<ul>
+<li>For each changed element, identify all relations from the element</li>
+<li>Apply relation-specific propagation rules as defined in RelationTypesRegistry.md</li>
+<li>Consider the relation direction and change impact direction for each relation</li>
+<li>Build an impact tree representing the propagation of changes</li>
+</ul>
+</li>
+<li>
+<p><strong>Recursive Traversal</strong>:</p>
+<ul>
+<li>Perform a depth-first traversal of relationships</li>
+<li>Create a directed acyclic graph (DAG) of change impact</li>
+<li>Handle circular dependencies by preventing infinite recursion</li>
+<li>Track visited nodes to prevent duplicate processing</li>
+</ul>
+</li>
+<li>
+<p><strong>Impact Classification</strong>:</p>
+<ul>
+<li>Assign impact severity levels based on relation types</li>
+<li>Classify changes as:
+<ul>
+<li>Direct: Changes to the element itself</li>
+<li>Indirect: Changes propagated from related elements</li>
+<li>Potential: Changes that might affect an element based on semantic analysis</li>
+</ul>
+</li>
+<li>Calculate aggregated impact scores for each affected element</li>
+</ul>
+</li>
+<li>
+<p><strong>Performance Optimization</strong>:</p>
+<ul>
+<li>Implement caching of traversal results</li>
+<li>Use parallel processing for independent branches of the impact tree</li>
+<li>Apply pruning techniques to limit traversal depth when appropriate</li>
+<li>Support incremental impact analysis for large models</li>
+</ul>
+</li>
+</ol>
+<h2 id="change-impact-visualization">Change Impact Visualization</h2>
+<p>The system shall provide visual representations of change impact to help users understand the scope and implications of changes.</p>
+<p>The visualization shall include:</p>
+<ol>
+<li>
+<p><strong>Tree View</strong>:</p>
+<ul>
+<li>Display a hierarchical tree of affected elements</li>
+<li>Group elements by change type (content changes, additions, removals, relocations)</li>
+<li>Show relation types between elements</li>
+<li>Show old and new locations for relocated elements</li>
+<li>Support collapsing/expanding nodes for better navigation</li>
+</ul>
+</li>
+<li>
+<p><strong>Color Coding</strong>:</p>
+<ul>
+<li>Use consistent color scheme for impact types (Direct: Red, Indirect: Yellow, Potential: Blue)</li>
+<li>Indicate relation types with different line styles</li>
+<li>Highlight newly introduced or removed relationships</li>
+</ul>
+</li>
+<li>
+<p><strong>Interactive Elements</strong>:</p>
+<ul>
+<li>Allow clicking on elements to focus the view</li>
+</ul>
+</li>
+<li>
+<p><strong>Summary Statistics</strong>:</p>
+<ul>
+<li>Display counts of affected elements by type</li>
+<li>Show metrics for impact breadth and depth</li>
+<li>Calculate change propagation fan-out metrics</li>
+<li>Generate overall change impact assessment</li>
+</ul>
+</li>
+</ol>
+<h2 id="smart-filtering-for-change-impact-reports">Smart Filtering for Change Impact Reports</h2>
+<p>The system shall implement intelligent filtering logic to eliminate redundant information from change impact reports and focus on primary changes and their relationships.</p>
+<p>The smart filtering shall implement the following logic:</p>
+<ol>
+<li>
+<p><strong>Primary Change Detection</strong>:</p>
+<ul>
+<li>Distinguish between primary changes and secondary changes</li>
+<li>Filter out elements already referenced in relations of other elements</li>
+<li>Apply filtering to both new-to-new and changed-to-changed element relationships</li>
+</ul>
+</li>
+<li>
+<p><strong>Comprehensive Filtering Rules</strong>:</p>
+<ul>
+<li>Eliminate redundant new elements referenced in relations of other elements</li>
+<li>Eliminate redundant changed elements referenced in relations of other changed elements</li>
+<li>Show only independent elements not already covered by relationships</li>
+<li>Mark new elements with “(new)” suffix and changed elements with “warning” symbol</li>
+</ul>
+</li>
+<li>
+<p><strong>Cross-Category Filtering</strong>:</p>
+<ul>
+<li>Apply filtering across all categories (new, changed, removed)</li>
+<li>Preserve the most informative context for each filtered element</li>
+</ul>
+</li>
+<li>
+<p><strong>Hierarchical Organization</strong>:</p>
+<ul>
+<li>Present changes in order of importance</li>
+<li>Group related changes together to show impact chains clearly</li>
+<li>Maintain complete traceability while reducing visual clutter</li>
+</ul>
+</li>
+<li>
+<p><strong>Benefits</strong>:</p>
+<ul>
+<li>Reduced clutter by eliminating redundant information</li>
+<li>Improved focus on primary changes</li>
+<li>Clear context for elements shown in relevant relationship context</li>
+<li>Better readability with concise reports</li>
+</ul>
+</li>
+</ol>
+<h2 id="examples-of-change-propagation">Examples of Change Propagation</h2>
+<h3 id="parent-child-requirement-change">Parent-Child Requirement Change</h3>
+<pre><code class="language-markdown">---
+
+### Parent Requirement
+This requirement defines a high-level system constraint.
+
+#### Relations
+  * derive: [Child Requirement](#child-requirement)
+
+
+---
+
+### Child Requirement
+This requirement defines additional functionality.
+</code></pre>
+<p>If Parent Requirement changes, Child Requirement must be reviewed and updated.</p>
+<hr />
+<h3 id="requirement-verified-by-a-test">Requirement Verified by a Test</h3>
+<pre><code class="language-markdown">---
+
+### Safety Requirement
+
+The system shall shut down if temperature exceeds 100C.
+
+#### Relations
+  * verifiedBy: [test_cases/safety_verification.md/Overheat Shutdown Test](test_cases/safety_verification.html#overheat-shutdown-test)
+</code></pre>
+<p>If Safety Requirement changes, the Overheat Shutdown Test must be reviewed for update and executed again for verification.</p>
+<hr />
+<h3 id="requirement-with-attached-document-change">Requirement with Attached Document Change</h3>
+<pre><code class="language-markdown">---
+
+### Performance Requirements
+
+The system shall meet defined performance criteria as specified in the attached SLA document.
+
+#### Attachments
+* [docs/SLA.pdf](docs/SLA.pdf)
+
+#### Relations
+  * satisfiedBy: [architecture/load_balancer.html](architecture/load_balancer.html)
+  * verifiedBy: [test_cases/performance_tests.html](test_cases/performance_tests.html)
+</code></pre>
+<p><strong>Scenario 1: Attachment Content Changes</strong></p>
+<p>If <code>docs/SLA.pdf</code> content is modified (e.g., performance targets updated from 99.9% to 99.99% uptime):</p>
+<ul>
+<li>Document content hash changes</li>
+<li>Element content hash changes -&gt; Performance Requirements marked as changed</li>
+<li>Change impact propagates through satisfiedBy -&gt; <code>architecture/load_balancer.md</code> requires review</li>
+<li>Change impact propagates through verifiedBy -&gt; <code>test_cases/performance_tests.md</code> requires update</li>
+</ul>
+<p><strong>Scenario 2: Attachment Path Rename</strong></p>
+<p>If <code>docs/SLA.pdf</code> is renamed to <code>docs/service_level_agreement.pdf</code> using <code>mv-attachment</code>:</p>
+<ul>
+<li>Path changes but document content unchanged</li>
+<li>Element content hash remains the same -&gt; NO change impact triggered</li>
+<li>Path update tracked for reporting (like relation renames)</li>
+<li>References automatically updated across all elements</li>
+</ul>
+<p><strong>Key Distinction</strong>:</p>
+<ul>
+<li><strong>Content change</strong> in attached document = real change requiring review and verification</li>
+<li><strong>Path rename</strong> of attached document = metadata update only, no impact propagation</li>
+</ul>
+<hr />
+<h3 id="example-of-multi-level-change-propagation-in-requirements">Example of Multi-Level Change Propagation in Requirements</h3>
+<p>The following analysis explains how a <strong>change in the requirement</strong> propagates through multiple levels of related requirements, impacting their definitions, design artifacts, and verification processes.</p>
+<hr />
+<pre><code class="language-markdown">### Root Requirement: System Power Management
+
+The system shall implement power-saving mechanisms to optimize battery usage.
+
+---
+
+### Power Saving Mode
+
+The system shall activate power-saving mode when the battery level drops below 20%.
+
+#### Relations
+  * deriveFrom: [System Power Management](#system-power-management)
+  * satisfiedBy: [software/power_control.html](software/power_control.html)
+  * verifiedBy: [test_cases/power_saving.html](test_cases/power_saving.html)
+
+---
+
+### CPU Power Reduction
+
+The system shall reduce CPU frequency by 30% in power-saving mode.
+
+#### Relations
+  * deriveFrom: [Power Saving Mode](#power-saving-mode)
+  * satisfiedBy: [firmware/cpu_manager.html](firmware/cpu_manager.html)
+  * verifiedBy: [test_cases/cpu_throttling.html](test_cases/cpu_throttling.html)
+
+---
+
+### Screen Brightness Adjustment
+
+The system shall reduce screen brightness by 40% in power-saving mode.
+
+#### Relations
+  * deriveFrom: [Power Saving Mode](#power-saving-mode)
+  * verifiedBy: [test_cases/screen_brightness.html](test_cases/screen_brightness.html)
+
+---
+
+### Battery Optimization
+
+The system shall disable non-essential background services when battery levels drop below 15%.
+
+#### Relations
+  * deriveFrom: [System Power Management](#system-power-management)
+  * satisfiedBy: [software/battery_manager.html](software/battery_manager.html)
+  * verifiedBy: [test_cases/battery_saving.html](test_cases/battery_saving.html)
+
+---
+
+### Network Power Optimization
+The system shall reduce network polling frequency when battery levels drop below 15%.
+
+#### Relations
+  * deriveFrom: [Battery Optimization](#battery-optimization)
+  * satisfiedBy: [software/network_manager.html](software/network_manager.html)
+</code></pre>
+<p><strong>Power Saving Mode</strong> requirement has been changed to:
+&gt;The system shall activate power-saving mode when the battery level drops below 30%.</p>
+<p>Change Propagation Flow:</p>
+<ol>
+<li>A <strong>change</strong> in <strong>Power Saving Mode</strong> flows <strong>downward</strong> to <strong>CPU Power Reduction</strong>.</li>
+<li>A <strong>change</strong> in <strong>Power Saving Mode</strong> flows <strong>downward</strong> to <strong>Screen Brightness Adjustment</strong>.</li>
+<li>Additionally, all <strong>satisfiedBy</strong> and <strong>verifiedBy</strong> relations from affected requirements must be reviewed:
+<ul>
+<li><strong>Power Saving Mode</strong> -&gt; <strong>software/power_control.md</strong> (implementation) &amp; <strong>test_cases/power_saving.md</strong> (verification).</li>
+<li><strong>CPU Power Reduction</strong> -&gt; <strong>firmware/cpu_manager.md</strong> (implementation) &amp; <strong>test_cases/cpu_throttling.md</strong> (verification).</li>
+<li><strong>Screen Brightness Adjustment</strong> -&gt; <strong>test_cases/screen_brightness.md</strong> (verification).</li>
+</ul>
+</li>
+</ol>
+<p>Mermaid diagram showing relations:</p>
+<div class="mermaid">flowchart TD;
+    %% Define Classes
+    classDef requirement fill:#D0E0FF,stroke:#0066FF,stroke-width:2px;
+    classDef implementation fill:#DFFFD0,stroke:#009900,stroke-width:2px;
+    classDef verification fill:#FFF7B3,stroke:#CC9900,stroke-width:2px;
+
+    %% Requirements Hierarchy
+    A[System Power Management]:::requirement
+    A -->|deriveReqt| B[Power Saving Mode]:::requirement
+    B -->|deriveReqt| C[CPU Power Reduction]:::requirement
+    B -->|deriveReqt| D[Screen Brightness Adjustment]:::requirement
+    A -->|deriveReqt| E[Battery Optimization]:::requirement
+    E -->|deriveReqt| G[Network Power Optimization]:::requirement
+
+    %% Implementations (Satisfied By)
+    B -->|satisfiedBy| SB1[software/power_control.md]:::implementation
+    C -->|satisfiedBy| SB2[firmware/cpu_manager.md]:::implementation
+    E -->|satisfiedBy| SB3[software/battery_manager.md]:::implementation
+    G -->|satisfiedBy| SB4[software/network_manager.md]:::implementation
+
+    %% Verifications (Verified By)
+    B -->|verifiedBy| VB1[test_cases/power_saving.md]:::verification
+    C -->|verifiedBy| VB2[test_cases/cpu_throttling.md]:::verification
+    D -->|verifiedBy| VB3[test_cases/screen_brightness.md]:::verification
+    E -->|verifiedBy| VB4[test_cases/battery_saving.md]:::verification
+</div>
+<p>Legend:</p>
+<ul>
+<li><strong>Requirements (Blue)</strong> - Directly from your provided requirements.</li>
+<li><strong>Implementations (Green)</strong> - Only <strong>satisfiedBy</strong> links</li>
+<li><strong>Verifications (Yellow)</strong> - Only <strong>verifiedBy</strong> links</li>
+</ul>
+<p>Change propagation flow diagram:</p>
+<div class="mermaid">flowchart TD;
+    %% Define Classes
+    classDef requirement fill:#D0E0FF,stroke:#0066FF,stroke-width:2px;
+    classDef implementation fill:#DFFFD0,stroke:#009900,stroke-width:2px;
+    classDef verification fill:#FFF7B3,stroke:#CC9900,stroke-width:2px;
+    classDef changed fill:#FFDD57,stroke:#FF7700,stroke-width:2px;
+    classDef impacted fill:#FFAAAA,stroke:#FF0000,stroke-width:2px;
+    classDef validate fill:#E0D0FF,stroke:#6600CC,stroke-width:2px;
+
+    %% Change Propagation Paths
+    B[Power Saving Mode]
+    B -->|Impacts| A[CPU Power Reduction]:::impacted
+    B -->|Impacts| D[Screen Brightness Adjustment]:::impacted
+
+    %% Impact on Implementation (Code / Design)
+    B -->|Requires Update| SB1[software/power_control.md]:::implementation
+    A -->|Requires Update| SB2[firmware/cpu_manager.md]:::implementation
+
+
+    %% Impact on Verification (Test Cases)
+    B -->|Revalidate + Maybe Requires Update| VB1[test_cases/power_saving.md]:::verification
+    D -->|Revalidate + Maybe Requires Update| VB3[test_cases/screen_brightness.md]:::verification
+    A -->|Revalidate + Maybe Requires Update| VB4[test_cases/cpu_throttling.md]:::verification
+
+
+    %% Arrange Classes
+    class C changed;
+    class A,B,D,E,G impacted;
+    class SB1,SB2,SB3,SB4 implementation;
+    class VB1,VB2,VB3,VB4 verification;
+    class V validate;
+</div>
+
+        </div>
+    </div>
+</body>
+</html>

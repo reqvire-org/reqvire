@@ -1,5 +1,7 @@
 #!/bin/bash
-set -euo pipefail
+set -uo pipefail
+
+TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Create log file immediately to ensure it exists for runner
 echo "Starting test..." > "${TEST_DIR}/test_results.log"
@@ -81,7 +83,6 @@ printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results_relocation.log"
 if [ $EXIT_CODE -ne 0 ]; then
     echo "❌ FAILED: Change impact detection failed with exit code $EXIT_CODE"
     echo "$OUTPUT"
-    rm -rf "${TEST_DIR}"
     exit 1
 fi
 
@@ -90,15 +91,10 @@ GOTTEN_CONTENT=$(echo "$OUTPUT" | grep -v "INFO  reqvire::config" | grep -v "War
 SANITIZED_OUTPUT=$(echo "$GOTTEN_CONTENT" | sed -E 's#https://[^ )]+/blob/[a-f0-9]{7,40}/##g')
 
 # Compare against expected output file
-if ! diff "${TEST_DIR}/expected-output.txt" <(echo "$SANITIZED_OUTPUT") > /dev/null; then
+if ! diff -u "${TEST_SCRIPT_DIR}/expected/expected-output.txt" <(echo "$SANITIZED_OUTPUT"); then
   echo "❌ FAILED: Output does not match expected content."
   echo ""
-  echo "DIFF (expected vs actual):"
-  diff -u "${TEST_DIR}/expected-output.txt" <(echo "$SANITIZED_OUTPUT") || true
-  echo ""
-  echo "FULL OUTPUT:"
-  echo "$OUTPUT"
-  rm -rf "${TEST_DIR}"
+  echo "If changes are intentional, update ${TEST_SCRIPT_DIR}/expected/expected-output.txt"
   exit 1
 fi
 
@@ -112,7 +108,6 @@ set -e
 if [ $EXIT_CODE_JSON -ne 0 ]; then
     echo "❌ FAILED: Change impact JSON output failed with exit code $EXIT_CODE_JSON"
     echo "$JSON_OUTPUT"
-    rm -rf "${TEST_DIR}"
     exit 1
 fi
 
@@ -121,7 +116,6 @@ CLEAN_JSON=$(echo "$JSON_OUTPUT" | grep -v "Warning:" | grep -A 1000 "^{")
 if ! echo "$CLEAN_JSON" | jq -e '.relocated | length > 0' >/dev/null 2>&1; then
     echo "❌ FAILED: JSON output should contain 'relocated' array with elements"
     echo "$CLEAN_JSON"
-    rm -rf "${TEST_DIR}"
     exit 1
 fi
 
@@ -129,10 +123,7 @@ fi
 if ! echo "$CLEAN_JSON" | jq -e '.relocated[0] | has("old_location") and has("new_location")' >/dev/null 2>&1; then
     echo "❌ FAILED: Relocated element should have 'old_location' and 'new_location' fields"
     echo "$CLEAN_JSON" | jq '.relocated[0]'
-    rm -rf "${TEST_DIR}"
     exit 1
 fi
 
-# Clean up
-rm -rf "${TEST_DIR}"
 exit 0

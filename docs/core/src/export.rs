@@ -31,12 +31,17 @@ const ASSETS: &[(&str, &[u8])] = &[
 /// Page descriptions for HTML export pages
 const PAGE_DESCRIPTION_CONTAINMENT: &str = r#"# Containment
 
-The containment view shows the physical organization of the model—how elements are structured within folders and files. This hierarchical view reflects the file system layout and helps navigate to specific specification documents. In MBSE, containment represents where model elements are stored, separate from their logical relationships."#;
+Interactive tree view showing the physical organization of the model—how elements are structured within folders and files. Click on folders and files to expand/collapse, or click on elements to navigate to their definitions. Use the Expand All/Collapse All buttons to control the tree view."#;
+
 
 const PAGE_DESCRIPTION_MODEL: &str = r#"# Model
 
 The model view displays the logical structure starting from root requirements—requirements without parent derivations. Each element shows its complete relation tree: derived child requirements, verifications, and implementations. This follows MBSE principles where stakeholder needs flow down through requirement hierarchies to verifiable, implementable specifications."#;
 
+// NOTE: Whole model generation is currently disabled but the functionality is preserved
+// for potential future use. The generate_model_diagram function in diagrams.rs can still
+// generate complete model diagrams when needed.
+#[allow(dead_code)]
 const PAGE_DESCRIPTION_WHOLE_MODEL: &str = r#"# Whole Model
 
 This diagram visualizes the complete model as a single interconnected graph showing all elements and their relationships. Hover over any node to highlight its connected elements—ancestors (upstream) and descendants (downstream). Use this bird's-eye view to understand the overall requirements architecture and identify traceability chains across the model."#;
@@ -132,6 +137,32 @@ pub fn copy_model_files_to_temp(
                     debug!("Copied relation target: {} -> {}", path.display(), dest.display());
                 }
             }
+        }
+
+        // Copy all attachment files (only for FilePath attachments, not ElementIdentifier)
+        for attachment in &node.element.attachments {
+            if let crate::element::AttachmentTarget::FilePath(path) = &attachment.target {
+                let src = git_root.join(path);
+                let path_str = path.to_string_lossy().to_string();
+
+                if src.is_file() && !copied_files.contains(&path_str) {
+                    // Strip subdirectory prefix from destination path if running from subdirectory
+                    let dest = if let Some(prefix) = subdir_prefix {
+                        if let Ok(stripped) = path.strip_prefix(prefix) {
+                            temp_dir.join(stripped)
+                        } else {
+                            temp_dir.join(path)
+                        }
+                    } else {
+                        temp_dir.join(path)
+                    };
+
+                    filesystem::copy_file_with_structure(&src, &dest)?;
+                    copied_files.insert(path_str);
+                    debug!("Copied attachment: {} -> {}", path.display(), dest.display());
+                }
+            }
+            // Element identifier attachments don't need to be copied - they reference other elements
         }
     }
 
@@ -316,14 +347,6 @@ pub fn generate_artifacts_in_temp(
         diagrams_with_blobs
     )?;
 
-    info!("Generating index.md...");
-    let index_content = crate::index_generator::generate_readme_index(
-        &temp_model_manager.graph_registry,
-        &PathBuf::from(".")
-    )?;
-    filesystem::write_file("index.md", index_content.as_bytes())?;
-
-
     // Generate model-centric view (root requirements with nested relations)
     info!("Generating model.md...");
     let model_report = crate::report_model::generate_model_report(
@@ -339,15 +362,18 @@ pub fn generate_artifacts_in_temp(
     );
     filesystem::write_file("model.md", model_content.as_bytes())?;
 
-    // Generate whole model diagram (all elements and relations)
-    info!("Generating whole-model.md...");
-    let whole_model_mermaid = crate::diagrams::generate_model_diagram(&temp_model_manager.graph_registry, None)?;
-    let whole_model_content = format!(
-        "{}\n\n{}",
-        PAGE_DESCRIPTION_WHOLE_MODEL,
-        whole_model_mermaid
-    );
-    filesystem::write_file("whole-model.md", whole_model_content.as_bytes())?;
+    // NOTE: Whole model generation is disabled - the model.md view provides similar
+    // functionality with better organization. The code is preserved for potential future use.
+    // To re-enable, uncomment the following block:
+    //
+    // info!("Generating whole-model.md...");
+    // let whole_model_mermaid = crate::diagrams::generate_model_diagram(&temp_model_manager.graph_registry, None)?;
+    // let whole_model_content = format!(
+    //     "{}\n\n{}",
+    //     PAGE_DESCRIPTION_WHOLE_MODEL,
+    //     whole_model_mermaid
+    // );
+    // filesystem::write_file("whole-model.md", whole_model_content.as_bytes())?;
 
     info!("Generating traces.md...");
     let trace_generator = crate::verification_trace::VerificationTraceGenerator::new(
@@ -374,12 +400,13 @@ pub fn generate_artifacts_in_temp(
     );
     filesystem::write_file("coverage.md", coverage_content.as_bytes())?;
 
-    info!("Generating containment.md...");
-    let containment_diagram = crate::diagrams::generate_containment_diagram(&temp_model_manager.graph_registry, false)?;
+    // Generate containment.md (D3 tree - containment view)
+    info!("Generating containment.md (D3 tree - containment view)...");
+    let d3_tree_content = crate::diagrams::generate_containment_d3_tree(&temp_model_manager.graph_registry, false)?;
     let containment_content = format!(
         "{}\n\n{}",
         PAGE_DESCRIPTION_CONTAINMENT,
-        containment_diagram
+        d3_tree_content
     );
     filesystem::write_file("containment.md", containment_content.as_bytes())?;
 
@@ -387,6 +414,15 @@ pub fn generate_artifacts_in_temp(
     info!("Converting markdown to HTML...");
     let html_count = html_export::export_markdown_to_html(&temp_dir, &temp_dir)?;
     info!("✅ Converted {} markdown files to HTML", html_count);
+
+    // Step 6.4: Rename containment.html to index.html (for web server compatibility)
+    let containment_html = temp_dir.join("containment.html");
+    let index_html = temp_dir.join("index.html");
+    if containment_html.exists() {
+        fs::rename(&containment_html, &index_html)
+            .map_err(|e| ReqvireError::IoError(e))?;
+        info!("✅ Renamed containment.html to index.html");
+    }
 
     // Step 6.5: Copy assets folder for HTML pages
     info!("Copying assets...");

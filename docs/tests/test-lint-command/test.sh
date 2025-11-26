@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -uo pipefail
 
 # Test: Lint Command Verification
 # ---------------------------------
@@ -19,9 +19,9 @@ if [ $LINT_EXIT -ne 0 ]; then
   exit 1
 fi
 
-if ! diff -u "${TEST_SCRIPT_DIR}/expected-default.txt" <(echo "$LINT_OUTPUT") > /dev/null; then
+if ! diff -u "${TEST_SCRIPT_DIR}/expected/expected-default.txt" <(echo "$LINT_OUTPUT") > /dev/null; then
   echo "❌ FAILED: Default lint output does not match expected"
-  diff -u "${TEST_SCRIPT_DIR}/expected-default.txt" <(echo "$LINT_OUTPUT")
+  diff -u "${TEST_SCRIPT_DIR}/expected/expected-default.txt" <(echo "$LINT_OUTPUT")
   exit 1
 fi
 
@@ -37,9 +37,9 @@ if [ $FIXABLE_EXIT -ne 0 ]; then
   exit 1
 fi
 
-if ! diff -u "${TEST_SCRIPT_DIR}/expected-fixable.txt" <(echo "$FIXABLE_OUTPUT") > /dev/null; then
+if ! diff -u "${TEST_SCRIPT_DIR}/expected/expected-fixable.txt" <(echo "$FIXABLE_OUTPUT") > /dev/null; then
   echo "❌ FAILED: --fixable output mismatch"
-  diff -u "${TEST_SCRIPT_DIR}/expected-fixable.txt" <(echo "$FIXABLE_OUTPUT")
+  diff -u "${TEST_SCRIPT_DIR}/expected/expected-fixable.txt" <(echo "$FIXABLE_OUTPUT")
   exit 1
 fi
 
@@ -55,9 +55,9 @@ if [ $AUDITABLE_EXIT -ne 0 ]; then
   exit 1
 fi
 
-if ! diff -u "${TEST_SCRIPT_DIR}/expected-auditable.txt" <(echo "$AUDITABLE_OUTPUT") > /dev/null; then
+if ! diff -u "${TEST_SCRIPT_DIR}/expected/expected-auditable.txt" <(echo "$AUDITABLE_OUTPUT") > /dev/null; then
   echo "❌ FAILED: --auditable output mismatch"
-  diff -u "${TEST_SCRIPT_DIR}/expected-auditable.txt" <(echo "$AUDITABLE_OUTPUT")
+  diff -u "${TEST_SCRIPT_DIR}/expected/expected-auditable.txt" <(echo "$AUDITABLE_OUTPUT")
   exit 1
 fi
 
@@ -73,9 +73,9 @@ if [ $JSON_EXIT -ne 0 ]; then
   exit 1
 fi
 
-if ! diff -u <(jq -S . "${TEST_SCRIPT_DIR}/expected-json.json") <(echo "$JSON_OUTPUT" | jq -S .) > /dev/null; then
+if ! diff -u <(jq -S . "${TEST_SCRIPT_DIR}/expected/expected-json.json") <(echo "$JSON_OUTPUT" | jq -S .) > /dev/null; then
   echo "❌ FAILED: JSON output mismatch"
-  diff -u <(jq -S . "${TEST_SCRIPT_DIR}/expected-json.json") <(echo "$JSON_OUTPUT" | jq -S .)
+  diff -u <(jq -S . "${TEST_SCRIPT_DIR}/expected/expected-json.json") <(echo "$JSON_OUTPUT" | jq -S .)
   exit 1
 fi
 
@@ -161,9 +161,9 @@ if ! grep -q "verify:.*Public API" "$TEST_DIR/specifications/Verifications/Tests
 fi
 
 # Verify Requirements.md was modified correctly
-if ! diff -u "${TEST_SCRIPT_DIR}/expected-requirements.txt" "$TEST_DIR/specifications/Requirements.md" > /dev/null; then
+if ! diff -u "${TEST_SCRIPT_DIR}/expected/expected-requirements.txt" "$TEST_DIR/specifications/Requirements.md" > /dev/null; then
   echo "❌ FAILED: Requirements.md does not match expected state after fix"
-  diff -u "${TEST_SCRIPT_DIR}/expected-requirements.txt" "$TEST_DIR/specifications/Requirements.md"
+  diff -u "${TEST_SCRIPT_DIR}/expected/expected-requirements.txt" "$TEST_DIR/specifications/Requirements.md"
   exit 1
 fi
 
@@ -179,9 +179,9 @@ if [ $POST_FIX_EXIT -ne 0 ]; then
   exit 1
 fi
 
-if ! diff -u "${TEST_SCRIPT_DIR}/expected-after-fix.txt" <(echo "$POST_FIX_OUTPUT") > /dev/null; then
+if ! diff -u "${TEST_SCRIPT_DIR}/expected/expected-after-fix.txt" <(echo "$POST_FIX_OUTPUT") > /dev/null; then
   echo "❌ FAILED: Post-fix output mismatch"
-  diff -u "${TEST_SCRIPT_DIR}/expected-after-fix.txt" <(echo "$POST_FIX_OUTPUT")
+  diff -u "${TEST_SCRIPT_DIR}/expected/expected-after-fix.txt" <(echo "$POST_FIX_OUTPUT")
   exit 1
 fi
 
@@ -198,9 +198,9 @@ if [ $DIAGRAM_EXIT -ne 0 ]; then
 fi
 
 # Verify Verifications/Tests.md has correct diagrams after fix
-if ! diff -u "${TEST_SCRIPT_DIR}/expected-verifications-after-fix.md" "$TEST_DIR/specifications/Verifications/Tests.md" > /dev/null; then
+if ! diff -u "${TEST_SCRIPT_DIR}/expected/expected-verifications-after-fix.md" "$TEST_DIR/specifications/Verifications/Tests.md" > /dev/null; then
   echo "❌ FAILED: Verifications/Tests.md does not match expected state after fix and diagram generation"
-  diff -u "${TEST_SCRIPT_DIR}/expected-verifications-after-fix.md" "$TEST_DIR/specifications/Verifications/Tests.md"
+  diff -u "${TEST_SCRIPT_DIR}/expected/expected-verifications-after-fix.md" "$TEST_DIR/specifications/Verifications/Tests.md"
   exit 1
 fi
 

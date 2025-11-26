@@ -1,4 +1,4 @@
-use crate::element::{Element, SubSection, ElementType, RequirementType, Attachment};
+use crate::element::{Element, SubSection, ElementType, RequirementType, Attachment, AttachmentTarget};
 use crate::relation::Relation;
 use crate::error::ReqvireError;
 use crate::utils;
@@ -174,7 +174,7 @@ pub fn parse_single_element(
                         ))?;
 
                     // Normalize relation target
-                    // file_path is already relative to git root (e.g., "specifications/NewFile.md")
+                    // file_path is already relative to git root (e.g., "requirements/NewFile.md")
                     let git_root = crate::git_commands::get_git_root_dir()?;
 
                     let normalized_target = if link.starts_with('#') {
@@ -202,6 +202,70 @@ pub fn parse_single_element(
                     ));
                 }
             }
+
+        // Parse attachments
+        } else if current_subsection == SubSection::Attachments {
+            if let Some(element) = &mut current_element {
+                if trimmed.starts_with("* ") || trimmed.starts_with("- ") {
+                    match utils::parse_attachment_line(trimmed) {
+                        Ok(href) => {
+                            // Determine if this is an element identifier or file path
+                            let target = if href.contains('#') {
+                                // Element identifier - use same normalization as relations
+                                let git_root = crate::git_commands::get_git_root_dir()?;
+                                let normalized = if href.starts_with('#') {
+                                    // Same-file reference: just prepend file_path
+                                    format!("{}{}", file_path, href)
+                                } else {
+                                    // Cross-file reference: normalize relative to file's directory
+                                    let file_parent = Path::new(file_path)
+                                        .parent()
+                                        .ok_or_else(|| ReqvireError::PathError(
+                                            format!("Cannot determine parent directory of '{}'", file_path)
+                                        ))?;
+                                    let base_path = git_root.join(file_parent);
+                                    utils::normalize_identifier(&href, &base_path)?
+                                };
+                                AttachmentTarget::ElementIdentifier(normalized)
+                            } else {
+                                // File path - resolve to git-root-relative
+                                let git_root = crate::git_commands::get_git_root_dir()?;
+                                let git_root_path = git_root.join(&href);
+                                let attachment_path = if git_root_path.exists() {
+                                    PathBuf::from(&href)
+                                } else {
+                                    // Try file-relative path
+                                    let file_parent = Path::new(file_path)
+                                        .parent()
+                                        .unwrap_or_else(|| Path::new("."));
+                                    let resolved = file_parent.join(&href);
+                                    // Normalize path
+                                    let mut normalized = PathBuf::new();
+                                    for component in resolved.components() {
+                                        match component {
+                                            std::path::Component::ParentDir => { normalized.pop(); }
+                                            std::path::Component::CurDir => { /* skip */ }
+                                            _ => { normalized.push(component); }
+                                        }
+                                    }
+                                    normalized
+                                };
+                                AttachmentTarget::FilePath(attachment_path)
+                            };
+                            element.attachments.push(Attachment { target, content_hash: None });
+                        }
+                        Err(e) => {
+                            return Err(ReqvireError::InvalidAttachmentFormat(
+                                format!("Invalid attachment format '{}': {}", trimmed, e)
+                            ));
+                        }
+                    }
+                } else if !trimmed.is_empty() {
+                    return Err(ReqvireError::InvalidAttachmentFormat(
+                        format!("Invalid attachment format: '{}'", trimmed)
+                    ));
+                }
+            }
         }
     }
 
@@ -221,7 +285,7 @@ pub fn parse_single_element(
     }
 }
 
-/// Checks if the file is a specification file by looking for "# Requirements" as first H1 heading.
+/// Checks if the file is a specification file by looking for "# Elements" as first H1 heading.
 /// Returns true if file should be parsed, false if it should be skipped.
 fn is_specification_file(content: &str) -> bool {
     for line in content.lines() {
@@ -232,8 +296,8 @@ fn is_specification_file(content: &str) -> bool {
         }
         // Check if this is an H1 heading
         if trimmed.starts_with("# ") {
-            // First H1 heading found - check if it's "# Requirements"
-            return trimmed == "# Requirements";
+            // First H1 heading found - check if it's "# Elements"
+            return trimmed == "# Elements";
         }
         // If we hit any other H1 or content that's not a heading, keep looking
         // (allow frontmatter, comments, etc. before the heading)
@@ -248,15 +312,17 @@ fn is_specification_file(content: &str) -> bool {
 
 /// Parses a markdown document and extracts elements with metadata and relations.
 /// Returns: (elements, errors, page_content)
-/// Only parses files where the first H1 heading is "# Requirements".
+/// Only parses files where the first H1 heading is "# Elements".
+/// If git_commit is Some, file attachment hashes are computed from the git commit, not working directory.
 pub fn parse_elements(
     file: &str,
     content: &str,
     file_path: &PathBuf,
+    git_commit: Option<&str>,
 ) -> (Vec<Element>, Vec<ReqvireError>, String) {
-    // Check if this is a specification file (first H1 must be "# Requirements")
+    // Check if this is a specification file (first H1 must be "# Elements")
     if !is_specification_file(content) {
-        debug!("Skipping file {} - not a specification file (no '# Requirements' heading)", file);
+        debug!("Skipping file {} - not a specification file (no '# Elements' heading)", file);
         return (Vec::new(), Vec::new(), String::new());
     }
 
@@ -431,23 +497,28 @@ pub fn parse_elements(
                 }
             }
 
-            // If transitioning to Details subsection, add the header to content
-            if subsection == SubSection::Details && !skip_current_element {
+            // If transitioning to Details or non-reserved subsection, add the header to content
+            if !skip_current_element {
                 if let Some(element) = &mut current_element {
-                    element.add_content("\n#### Details\n");
+                    if subsection == SubSection::Details || matches!(subsection, SubSection::Other(_)) {
+                        element.add_content(&format!("\n{}\n", line));
+                    }
                 }
             }
 
             current_subsection = subsection;
 
-        } else if (current_subsection == SubSection::Requirement || current_subsection == SubSection::Details)
+        } else if (current_subsection == SubSection::Requirement
+            || current_subsection == SubSection::Details
+            || matches!(current_subsection, SubSection::Other(_)))
+            && current_element.is_some()
             && !skip_current_element
         {
             if let Some(element) = &mut current_element {
                 if trimmed.starts_with("<details") {
                     in_details_block = true;
                 }
-        
+
                 element.add_content(&format!("{}\n", line));
 
             }
@@ -560,22 +631,116 @@ pub fn parse_elements(
 
         } else if current_subsection == SubSection::Attachments && !skip_current_element {
             // Parse Attachments subsection
-            // Format: * [path](path) where link text equals href
+            // Format: * [text](path) where path can be:
+            // - File path (file-relative or git-root-relative)
+            // - Element identifier (contains # and points to a Refinement element)
             if let Some(element) = &mut current_element {
                 if trimmed.starts_with("* ") || trimmed.starts_with("- ") {
                     match utils::parse_attachment_line(trimmed) {
-                        Ok(path) => {
-                            // Store path as-is (git-root-relative)
-                            // File existence validation happens in Pass 2
-                            let attachment_path = PathBuf::from(&path);
+                        Ok(href) => {
+                            // Determine if this is an element identifier or file path
+                            // Element identifiers contain '#' (e.g., "File.md#element-name" or "#element-name")
+                            let (target, content_hash): (AttachmentTarget, Option<String>) = if href.contains('#') {
+                                // This is an element identifier - normalize it like relation targets
+                                // For same-file references (starting with #), prepend current file path
+                                let href_to_normalize = if href.starts_with('#') {
+                                    format!("{}{}", file, href)
+                                } else {
+                                    href.clone()
+                                };
+                                let file_dir = file_path
+                                    .parent()
+                                    .unwrap_or_else(|| Path::new("."))
+                                    .to_path_buf();
+                                match utils::normalize_identifier(&href_to_normalize, &file_dir) {
+                                    Ok(normalized) => (AttachmentTarget::ElementIdentifier(normalized), None),
+                                    Err(e) => {
+                                        let msg = format!(
+                                            "Invalid attachment identifier in element '{}': {} (file: {}, line {})",
+                                            element.name, e, file, line_num + 1
+                                        );
+                                        errors.push(ReqvireError::InvalidAttachmentFormat(msg.clone()));
+                                        debug!("Error: {}", msg);
+                                        continue;
+                                    }
+                                }
+                            } else {
+                                // This is a file path - resolve to git-root-relative
+                                let git_root = crate::git_commands::get_git_root_dir()
+                                    .unwrap_or_else(|_| PathBuf::from("."));
+
+                                // First, check if path exists as git-root-relative
+                                let git_root_path = git_root.join(&href);
+                                let attachment_path = if git_root_path.exists() {
+                                    // Path is git-root-relative (e.g., docs/SLA.txt)
+                                    PathBuf::from(&href)
+                                } else {
+                                    // Try file-relative path
+                                    let file_dir = file_path
+                                        .parent()
+                                        .unwrap_or_else(|| Path::new("."));
+                                    let resolved = file_dir.join(&href);
+
+                                    // Normalize path by resolving .. and . components
+                                    let mut normalized = PathBuf::new();
+                                    for component in resolved.components() {
+                                        match component {
+                                            std::path::Component::ParentDir => { normalized.pop(); }
+                                            std::path::Component::CurDir => { /* skip */ }
+                                            _ => { normalized.push(component); }
+                                        }
+                                    }
+
+                                    // Strip git root to get git-root-relative path
+                                    normalized.strip_prefix(&git_root)
+                                        .map(|p| p.to_path_buf())
+                                        .unwrap_or(normalized)
+                                };
+
+                                // Compute content_hash for file attachment
+                                // If parsing from a git commit, read file from commit; otherwise from working directory
+                                let full_path = git_root.join(&attachment_path);
+                                let file_hash = if let Some(commit) = git_commit {
+                                    // Read from git commit
+                                    match crate::git_commands::get_file_at_commit(
+                                        &full_path.to_string_lossy(),
+                                        &git_root,
+                                        commit
+                                    ) {
+                                        Ok(content) => Some(crate::utils::hash_content(&content)),
+                                        Err(_) => None, // File doesn't exist in commit
+                                    }
+                                } else if full_path.exists() {
+                                    // Read from working directory
+                                    match std::fs::read_to_string(&full_path) {
+                                        Ok(content) => Some(crate::utils::hash_content(&content)),
+                                        Err(_) => {
+                                            // Binary file or read error - hash the raw bytes
+                                            match std::fs::read(&full_path) {
+                                                Ok(bytes) => {
+                                                    use std::hash::{Hash, Hasher};
+                                                    let mut hasher = rustc_hash::FxHasher::default();
+                                                    bytes.hash(&mut hasher);
+                                                    Some(format!("{:x}", hasher.finish()))
+                                                }
+                                                Err(_) => None,
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    None // File doesn't exist yet
+                                };
+
+                                (AttachmentTarget::FilePath(attachment_path), file_hash)
+                            };
 
                             // Check for duplicates
-                            if !element.attachments.iter().any(|a| a.file_path == attachment_path) {
-                                element.attachments.push(Attachment { file_path: attachment_path });
+                            if !element.attachments.iter().any(|a| a.target == target) {
+                                element.attachments.push(Attachment { target, content_hash });
                             } else {
                                 let msg = format!(
                                     "Duplicate attachment '{}' in element '{}' (file: {}, line {})",
-                                    path, element.name, file, line_num + 1
+                                    href, element.name, file, line_num + 1
                                 );
                                 errors.push(ReqvireError::DuplicateAttachment(msg.clone()));
                                 debug!("Warning: {}", msg);
@@ -598,7 +763,7 @@ pub fn parse_elements(
             }
 
         } else if matches!(current_subsection, SubSection::Other(_)) {
-            // Accumulate page content: everything outside of elements, but skip the # Requirements title
+            // Accumulate page content: everything outside of elements, but skip the # Elements title
             if !trimmed.starts_with("# ") {
                 page_content.push_str(line);
                 page_content.push('\n');

@@ -100,6 +100,12 @@ impl GraphRegistry {
         // Validate attachments exist
         errors.extend(self.validate_attachments()?);
 
+        // Validate Refinement elements have no relations
+        errors.extend(self.validate_refinement_elements()?);
+
+        // Validate 'other' type elements only use trace relations
+        errors.extend(self.validate_other_element_relations()?);
+
         Ok(errors)
     }
 
@@ -403,18 +409,47 @@ impl GraphRegistry {
             let element = &element_node.element;
 
             for attachment in &element.attachments {
-                // Resolve attachment path relative to git root
-                let full_path = git_root.join(&attachment.file_path);
+                match &attachment.target {
+                    crate::element::AttachmentTarget::FilePath(file_path) => {
+                        // Resolve attachment path relative to git root
+                        let full_path = git_root.join(file_path);
 
-                if !full_path.exists() {
-                    errors.push(ReqvireError::MissingAttachmentFile(
-                        format!(
-                            "File {}: Element '{}' references missing attachment file: {}",
-                            element.file_path,
-                            element.name,
-                            attachment.file_path.display()
-                        ),
-                    ));
+                        if !full_path.exists() {
+                            errors.push(ReqvireError::MissingAttachmentFile(
+                                format!(
+                                    "File {}: Element '{}' references missing attachment file: {}",
+                                    element.file_path,
+                                    element.name,
+                                    file_path.display()
+                                ),
+                            ));
+                        }
+                    }
+                    crate::element::AttachmentTarget::ElementIdentifier(identifier) => {
+                        // Validate that the identifier points to an existing Refinement element
+                        if let Some(target_node) = self.nodes.get(identifier) {
+                            // Check if target is a Refinement element type
+                            if !target_node.element.element_type.is_refinement() {
+                                errors.push(ReqvireError::InvalidAttachmentTarget(
+                                    format!(
+                                        "File {}: Element '{}' has attachment to '{}' which is not a Refinement element (constraint, behavior, specification)",
+                                        element.file_path,
+                                        element.name,
+                                        identifier
+                                    ),
+                                ));
+                            }
+                        } else {
+                            errors.push(ReqvireError::MissingAttachmentTarget(
+                                format!(
+                                    "File {}: Element '{}' references missing attachment element: {}",
+                                    element.file_path,
+                                    element.name,
+                                    identifier
+                                ),
+                            ));
+                        }
+                    }
                 }
             }
         }
@@ -423,6 +458,85 @@ impl GraphRegistry {
             debug!("No attachment validation errors found.");
         } else {
             debug!("{} attachment validation errors found.", errors.len());
+        }
+
+        Ok(errors)
+    }
+
+    /// Validate Refinement element constraints
+    /// Refinement elements (constraint, behavior, specification) cannot define relations themselves,
+    /// but can be targets of satisfiedBy relations from requirements.
+    fn validate_refinement_elements(&self) -> Result<Vec<ReqvireError>, ReqvireError> {
+        debug!("Validating Refinement element constraints...");
+        let mut errors = Vec::new();
+
+        for element_node in self.nodes.values() {
+            let element = &element_node.element;
+
+            // Check if this is a Refinement element type
+            if element.element_type.is_refinement() {
+                // Refinement elements cannot have user-created relations
+                let user_relations: Vec<_> = element.relations.iter()
+                    .filter(|r| r.user_created)
+                    .collect();
+
+                if !user_relations.is_empty() {
+                    errors.push(ReqvireError::InvalidMarkdownStructure(
+                        format!(
+                            "File {}: Refinement element '{}' (type: {}) cannot define relations. Refinement elements can only be targets of satisfiedBy relations from requirements.",
+                            element.file_path,
+                            element.name,
+                            element.element_type.as_str()
+                        ),
+                    ));
+                }
+            }
+        }
+
+        if errors.is_empty() {
+            debug!("No Refinement element validation errors found.");
+        } else {
+            debug!("{} Refinement element validation errors found.", errors.len());
+        }
+
+        Ok(errors)
+    }
+
+    /// Validates that 'other' type elements only use trace relations
+    /// Returns a list of validation errors for 'other' elements using non-trace relations
+    fn validate_other_element_relations(&self) -> Result<Vec<ReqvireError>, ReqvireError> {
+        debug!("Validating 'other' element type relation constraints...");
+        let mut errors = Vec::new();
+
+        for element_node in self.nodes.values() {
+            let element = &element_node.element;
+
+            // Check if this is an 'other' type element
+            if let crate::element::ElementType::Other(type_str) = &element.element_type {
+                if type_str == "other" {
+                    // 'other' type can only use trace relations
+                    let non_trace_relations: Vec<_> = element.relations.iter()
+                        .filter(|r| r.user_created && r.relation_type.name != "trace")
+                        .collect();
+
+                    for relation in non_trace_relations {
+                        errors.push(ReqvireError::IncompatibleElementTypes(
+                            format!(
+                                "Element type 'other' can only use 'trace' relations: '{}' uses '{}' relation to '{}'. See Element Type Relation Compatibility specification.",
+                                element.identifier,
+                                relation.relation_type.name,
+                                &relation.target.text
+                            )
+                        ));
+                    }
+                }
+            }
+        }
+
+        if errors.is_empty() {
+            debug!("No 'other' element type relation errors found.");
+        } else {
+            debug!("{} 'other' element type relation errors found.", errors.len());
         }
 
         Ok(errors)
@@ -535,27 +649,26 @@ impl GraphRegistry {
     /// * Element identifier if found and unique
     /// * Error if not found or multiple matches
     pub fn find_element_by_name(&self, element_name: &str) -> Result<String, ReqvireError> {
-        // Generate slug from element name (same logic as HTML heading to ID)
-        let name_slug = element_name.trim().replace(' ', "-").to_lowercase();
+        let search_name = element_name.trim();
 
-        // Find all matching identifiers
-        let matching_ids: Vec<String> = self.nodes
-            .keys()
-            .filter(|id| id.ends_with(&format!("#{}", name_slug)))
-            .cloned()
+        // Find all elements with matching name
+        let matching: Vec<&String> = self.nodes
+            .iter()
+            .filter(|(_, node)| node.element.name == search_name)
+            .map(|(id, _)| id)
             .collect();
 
-        if matching_ids.is_empty() {
+        if matching.is_empty() {
             return Err(ReqvireError::MissingElement(
                 format!("Element not found: {}", element_name)
             ));
-        } else if matching_ids.len() > 1 {
+        } else if matching.len() > 1 {
             return Err(ReqvireError::ProcessError(
-                format!("Multiple elements found with name '{}': {:?}", element_name, matching_ids)
+                format!("Multiple elements found with name '{}': {:?}", element_name, matching)
             ));
         }
 
-        Ok(matching_ids[0].clone())
+        Ok(matching[0].clone())
     }
 
     /// Moves an element to an existing file in the graph
@@ -944,6 +1057,66 @@ impl GraphRegistry {
             markdown.push_str("\n");
         }
 
+        // Add attachments subsection if there are attachments
+        if !element.attachments.is_empty() {
+            markdown.push_str("#### Attachments\n");
+            for attachment in &element.attachments {
+                match &attachment.target {
+                    crate::element::AttachmentTarget::FilePath(file_path) => {
+                        // Attachment paths are stored as git-root-relative paths
+                        let attachment_path = file_path.to_string_lossy().to_string();
+
+                        // Make the path relative to the current file's directory (same as relations)
+                        let current_file_path = std::path::PathBuf::from(_current_file);
+                        let current_folder = current_file_path.parent()
+                            .unwrap_or_else(|| std::path::Path::new("."))
+                            .to_path_buf();
+
+                        // Use to_relative_identifier like we do for InternalPath relations
+                        // Prepend "/" to indicate git-root-relative path
+                        let absolute_path = format!("/{}", attachment_path);
+                        let relative_path = crate::utils::to_relative_identifier(
+                            &absolute_path,
+                            &current_folder,
+                            false
+                        ).unwrap_or_else(|_| attachment_path.clone());
+
+                        // Use filename as display text for cleaner markdown
+                        let display_name = file_path
+                            .file_name()
+                            .and_then(|name| name.to_str())
+                            .unwrap_or(&attachment_path);
+
+                        markdown.push_str(&format!("  * [{}]({})\n", display_name, relative_path));
+                    }
+                    crate::element::AttachmentTarget::ElementIdentifier(identifier) => {
+                        // Element identifier attachments - format as markdown link
+                        let current_file_path = std::path::PathBuf::from(_current_file);
+                        let current_folder = current_file_path.parent()
+                            .unwrap_or_else(|| std::path::Path::new("."))
+                            .to_path_buf();
+
+                        // Use to_relative_identifier to make identifier relative to current file
+                        let relative_id = crate::utils::to_relative_identifier(
+                            identifier,
+                            &current_folder,
+                            true
+                        ).unwrap_or_else(|_| identifier.clone());
+
+                        // Look up actual element name from registry for human-readable display
+                        let display_name = self.get_element(identifier)
+                            .map(|e| e.name.clone())
+                            .unwrap_or_else(|| {
+                                // Fallback to identifier fragment if element not found
+                                identifier.split('#').last().unwrap_or(identifier).to_string()
+                            });
+                        markdown.push_str(&format!("  * [{}]({})\n", display_name, relative_id));
+                    }
+                }
+            }
+            markdown.push_str("\n");
+        }
+
         // Add relations subsection if there are user-created relations
         let user_relations: Vec<_> = element.relations.iter().filter(|r| r.user_created).collect();
         if !user_relations.is_empty() {
@@ -1134,8 +1307,8 @@ impl GraphRegistry {
     pub fn generate_file_markdown(&self, file_path: &str, elements: &[&Element]) -> String {
         let mut markdown = String::new();
 
-        // All specification files must have "# Requirements" as the page header
-        markdown.push_str("# Requirements\n\n");
+        // All specification files must have "# Elements" as the page header
+        markdown.push_str("# Elements\n\n");
 
         // Add page content if available
         if let Some(page) = self.pages.get(file_path) {
@@ -1270,6 +1443,13 @@ impl GraphRegistry {
             }
         }
 
+        // Find all files with attachments pointing to this element
+        for file in self.find_files_with_attachment_to(element_id) {
+            if !modified_files.contains(&file) {
+                modified_files.push(file);
+            }
+        }
+
         // Update the element's name and identifier in the node
         if let Some(node) = self.nodes.get_mut(element_id) {
             node.element.name = new_name.to_string();
@@ -1295,6 +1475,9 @@ impl GraphRegistry {
                 }
             }
         }
+
+        // Update all attachment identifiers pointing to this element
+        self.update_attachment_identifiers(&old_id, &new_identifier);
 
         // Track all modified files
         for file in &modified_files {
@@ -1395,6 +1578,15 @@ impl GraphRegistry {
             }
         }
 
+        // Find all files with attachments to elements in the source file
+        for old_id in &elements_in_source {
+            for file in self.find_files_with_attachment_to(old_id) {
+                if !modified_files.contains(&file) {
+                    modified_files.push(file);
+                }
+            }
+        }
+
         // Move nodes in HashMap (remove old key, insert with new key)
         for (old_id, new_id) in &identifier_mappings {
             if let Some(node) = self.nodes.remove(old_id) {
@@ -1413,6 +1605,11 @@ impl GraphRegistry {
                     }
                 }
             }
+        }
+
+        // Update all attachment identifiers pointing to moved elements
+        for (old_id, new_id) in &identifier_mappings {
+            self.update_attachment_identifiers(old_id, new_id);
         }
 
         modified_files.push(target_file.to_string());
@@ -1591,6 +1788,38 @@ impl GraphRegistry {
                 }
             }
         }
+    }
+
+    /// Updates attachment identifiers when a Refinement element is moved or renamed
+    /// Similar to update_relation_identifiers but for attachment references
+    fn update_attachment_identifiers(&mut self, old_identifier: &str, new_identifier: &str) {
+        // Find and update all attachment identifiers pointing to the old identifier
+        for node in self.nodes.values_mut() {
+            for attachment in &mut node.element.attachments {
+                if let crate::element::AttachmentTarget::ElementIdentifier(ref mut id) = attachment.target {
+                    if id == old_identifier {
+                        *id = new_identifier.to_string();
+                    }
+                }
+            }
+        }
+    }
+
+    /// Finds all files that have attachments pointing to the given element identifier
+    fn find_files_with_attachment_to(&self, element_id: &str) -> Vec<String> {
+        let mut files = Vec::new();
+        for node in self.nodes.values() {
+            let has_attachment = node.element.attachments.iter().any(|att| {
+                matches!(&att.target, crate::element::AttachmentTarget::ElementIdentifier(id) if id == element_id)
+            });
+            if has_attachment {
+                let file = node.element.file_path.clone();
+                if !files.contains(&file) {
+                    files.push(file);
+                }
+            }
+        }
+        files
     }
 
     /// Adds a new element to the graph
@@ -1960,22 +2189,30 @@ impl GraphRegistry {
             }
         }
 
+        // Find all files with attachments pointing to this element
+        for file in self.find_files_with_attachment_to(element_id) {
+            if !modified_files.contains(&file) {
+                modified_files.push(file);
+            }
+        }
+
         // Now perform the move
         self.move_element_to_location(element_id, target_file)?;
 
         // Update all relations (TO and FROM the moved element)
         self.update_relation_identifiers(&old_identifier, &source_file, target_file);
 
-        // Get new identifier after move
-        let new_identifier = self.nodes.values()
-            .find(|node| {
-                node.element.file_path == target_file &&
-                node.element.identifier.ends_with(&old_identifier.split('#').last().unwrap())
-            })
-            .map(|node| node.element.identifier.clone())
-            .ok_or_else(|| ReqvireError::ProcessError(
-                "Failed to find element after move".to_string()
-            ))?;
+        // Construct the new identifier (file path changed, fragment stays the same)
+        let fragment = old_identifier.split('#').last().unwrap_or("");
+        let new_identifier = format!("{}#{}", target_file, fragment);
+
+        // Update the element's identifier field in the node
+        if let Some(node) = self.nodes.get_mut(&old_identifier) {
+            node.element.identifier = new_identifier.clone();
+        }
+
+        // Update all attachment identifiers pointing to this element
+        self.update_attachment_identifiers(&old_identifier, &new_identifier);
 
         // Update file order index if provided
         if let Some(idx) = index {
@@ -2556,9 +2793,9 @@ mod tests {
         assert!(!file2_content.contains("Virtual placeholder"));
         assert!(!file3_content.contains("Virtual placeholder"));
 
-        // Verify proper markdown structure - all files start with "# Requirements"
-        assert!(file1_content.starts_with("# Requirements\n"));
-        assert!(file3_content.starts_with("# Requirements\n"));
+        // Verify proper markdown structure - all files start with "# Elements"
+        assert!(file1_content.starts_with("# Elements\n"));
+        assert!(file3_content.starts_with("# Elements\n"));
     }
 
     #[test]
@@ -2594,8 +2831,8 @@ mod tests {
         println!("=== Generated file content ===");
         println!("{}", file_content);
 
-        // Verify file header is present - all files start with "# Requirements"
-        assert!(file_content.starts_with("# Requirements\n\n"));
+        // Verify file header is present - all files start with "# Elements"
+        assert!(file_content.starts_with("# Elements\n\n"));
 
         // Verify page content is included after header and before elements
         assert!(file_content.contains("This is page frontmatter content."));
@@ -2605,7 +2842,7 @@ mod tests {
         assert!(file_content.contains("### Element A Description"));
 
         // Verify order: header, page content, element
-        let header_pos = file_content.find("# Requirements").unwrap();
+        let header_pos = file_content.find("# Elements").unwrap();
         let page_content_pos = file_content.find("This is page frontmatter content.").unwrap();
         let element_pos = file_content.find("### Element A Description").unwrap();
 
@@ -2696,7 +2933,7 @@ mod tests {
     }
 
     #[test]
-    fn test_flush_always_outputs_requirements_header() {
+    fn test_flush_always_outputs_elements_header() {
         use std::fs;
         use tempfile::TempDir;
 
@@ -2728,8 +2965,8 @@ mod tests {
         println!("=== Generated file content ===");
         println!("{}", file_content);
 
-        // All specification files should start with "# Requirements"
-        assert!(file_content.starts_with("# Requirements\n\n"));
+        // All specification files should start with "# Elements"
+        assert!(file_content.starts_with("# Elements\n\n"));
 
         // Page content should be included after the header
         assert!(file_content.contains("This is the MOEs page content."));

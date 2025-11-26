@@ -105,6 +105,7 @@ impl ModelManager {
                         &file_name,
                         &file_content,
                         &path,
+                        git_commit_hash,
                     );
 
                     // Collect parse-time errors

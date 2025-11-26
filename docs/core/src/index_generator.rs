@@ -47,6 +47,25 @@ pub fn generate_readme_index(
                 generate_element_slug(&element.identifier)
             };
             index_content.push_str(&format!("- [{}]({}#{})\n", element.name, relative_path, element_id));
+
+            // Add attachment links if present
+            if !element.attachments.is_empty() {
+                for attachment in &element.attachments {
+                    let (attachment_path, attachment_name) = match &attachment.target {
+                        crate::element::AttachmentTarget::FilePath(path) => {
+                            let path_str = path.to_string_lossy().to_string();
+                            let name = path.file_name()
+                                .map(|n| n.to_string_lossy().into_owned())
+                                .unwrap_or_else(|| path_str.clone());
+                            (path_str, name)
+                        },
+                        crate::element::AttachmentTarget::ElementIdentifier(id) => {
+                            (id.clone(), id.clone())
+                        },
+                    };
+                    index_content.push_str(&format!("  - 📎 [{}]({})\n", attachment_name, attachment_path));
+                }
+            }
         }
 
         index_content.push_str("\n"); // Add spacing between files

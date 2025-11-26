@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -uo pipefail
+
+TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Test: Model Summary JSON and Filters Validation (with text checks and relations coverage)
 # -------------------------------------------------------------------------------------
@@ -41,8 +43,7 @@ fi
 echo "$OUTPUT" | jq . >/dev/null 2>&1
 
 # Compare against expected JSON output
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-EXPECTED_JSON="${SCRIPT_DIR}/expected-search.json"
+EXPECTED_JSON="${TEST_SCRIPT_DIR}/expected/expected-search.json"
 if ! diff <(echo "$OUTPUT" | jq --sort-keys .) <(jq --sort-keys . "$EXPECTED_JSON") > /dev/null; then
   echo "❌ FAILED: JSON output does not match expected output"
   echo "Diff:"
@@ -51,8 +52,8 @@ if ! diff <(echo "$OUTPUT" | jq --sort-keys .) <(jq --sort-keys . "$EXPECTED_JSO
 fi
 
 TOTAL=$(echo "$OUTPUT" | jq '.global_counters.total_elements')
-if [ "$TOTAL" -ne 6 ]; then
-  echo "FAILED: expected 6 elements in JSON, got $TOTAL"
+if [ "$TOTAL" -ne 7 ]; then
+  echo "FAILED: expected 7 elements in JSON, got $TOTAL"
   exit 1
 fi
 
@@ -105,7 +106,7 @@ if ! grep -q '^--- MBSE Search results ---' <<< "$OUTPUT"; then
 fi
 
 # Compare against expected text output
-EXPECTED_TEXT="${SCRIPT_DIR}/expected-search.txt"
+EXPECTED_TEXT="${TEST_SCRIPT_DIR}/expected/expected-search.txt"
 printf "%s\n" "$OUTPUT" > "${TEST_DIR}/actual-search.txt"
 if ! diff "${TEST_DIR}/actual-search.txt" "$EXPECTED_TEXT" > /dev/null; then
   echo "❌ FAILED: Text output does not match expected output"
@@ -115,8 +116,8 @@ if ! diff "${TEST_DIR}/actual-search.txt" "$EXPECTED_TEXT" > /dev/null; then
 fi
 
 ELEMS_TEXT=$(grep -c '🔹 Element:' <<< "$OUTPUT")
-if [ "$ELEMS_TEXT" -ne 6 ]; then
-  echo "FAILED: expected 6 elements in text search, got $ELEMS_TEXT"
+if [ "$ELEMS_TEXT" -ne 7 ]; then
+  echo "FAILED: expected 7 elements in text search, got $ELEMS_TEXT"
   exit 1
 fi
 
@@ -197,8 +198,8 @@ set -e
 
 echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
 printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
-if [ "$(echo "$OUTPUT" | jq '.global_counters.total_elements')" -ne 3 ]; then
-  echo "FAILED: --filter-type=user-requirement JSON should yield 3 elements"
+if [ "$(echo "$OUTPUT" | jq '.global_counters.total_elements')" -ne 4 ]; then
+  echo "FAILED: --filter-type=user-requirement JSON should yield 4 elements"
   exit 1
 fi
 echo "Running: reqvire search --filter-type=user-requirement" >> "${TEST_DIR}/test_results.log"
@@ -209,8 +210,8 @@ set -e
 
 echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
 printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
-if [ "$(grep -c '🔹 Element:' <<< "$OUTPUT")" -ne 3 ]; then
-  echo "FAILED: --filter-type=user-requirement text should yield 3 elements"
+if [ "$(grep -c '🔹 Element:' <<< "$OUTPUT")" -ne 4 ]; then
+  echo "FAILED: --filter-type=user-requirement text should yield 4 elements"
   exit 1
 fi
 
@@ -624,10 +625,10 @@ set -e
 echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results_requirement_filter.log"
 printf "%s\n" "$OUTPUT_REQUIREMENT_FILTER" >> "${TEST_DIR}/test_results_requirement_filter.log"
 
-# When filtering by requirement type, we should see 3 user-requirement elements
+# When filtering by requirement type, we should see 4 user-requirement elements
 TOTAL_ELEMENTS_REQUIREMENT_FILTER=$(echo "$OUTPUT_REQUIREMENT_FILTER" | jq '.global_counters.total_elements')
-if [ "$TOTAL_ELEMENTS_REQUIREMENT_FILTER" -ne 3 ]; then
-  echo "FAILED: --filter-type=user-requirement should show 3 elements"
+if [ "$TOTAL_ELEMENTS_REQUIREMENT_FILTER" -ne 4 ]; then
+  echo "FAILED: --filter-type=user-requirement should show 4 elements"
   echo "Found: $TOTAL_ELEMENTS_REQUIREMENT_FILTER elements"
   exit 1
 fi

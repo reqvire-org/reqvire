@@ -1,12 +1,44 @@
 use std::collections::HashMap;
 use std::path::PathBuf;
-use crate::relation::{Relation};
+use crate::relation::Relation;
 use crate::utils;
 use serde::Serialize;
 
+/// Represents the target of an attachment - either a file path or an element identifier
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub enum AttachmentTarget {
+    /// File path attachment (git-root-relative, normalized)
+    FilePath(PathBuf),
+    /// Element identifier attachment (must point to a Refinement element)
+    ElementIdentifier(String),
+}
+
+impl AttachmentTarget {
+    /// Returns a string representation of the attachment target
+    pub fn as_str(&self) -> String {
+        match self {
+            AttachmentTarget::FilePath(path) => path.to_string_lossy().to_string(),
+            AttachmentTarget::ElementIdentifier(id) => id.clone(),
+        }
+    }
+
+    /// Returns true if this is a file path attachment
+    pub fn is_file_path(&self) -> bool {
+        matches!(self, AttachmentTarget::FilePath(_))
+    }
+
+    /// Returns true if this is an element identifier attachment
+    pub fn is_element_identifier(&self) -> bool {
+        matches!(self, AttachmentTarget::ElementIdentifier(_))
+    }
+}
+
 #[derive(Debug, Clone, Serialize)]
 pub struct Attachment {
-    pub file_path: PathBuf,  // Git-root-relative, normalized
+    pub target: AttachmentTarget,
+    /// Content hash for file attachments (FilePath only).
+    /// For ElementIdentifier attachments, the hash is looked up from registry.
+    pub content_hash: Option<String>,
 }
 
 #[derive(Debug, PartialEq, Hash, Eq, Clone)]
@@ -54,19 +86,27 @@ pub enum RequirementType {
     User,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize)] 
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum VerificationType {
-    Default, 
+    Default,
     Test,
     Analysis,
     Inspection,
     Demonstration,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize)] 
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub enum RefinementType {
+    Constraint,
+    Behavior,
+    Specification,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum ElementType {
     Requirement(RequirementType),
     Verification(VerificationType),
+    Refinement(RefinementType),
     File,
     Other(String),
 }
@@ -89,6 +129,11 @@ impl ElementType {
                 VerificationType::Inspection    => "inspection-verification",
                 VerificationType::Demonstration => "demonstration-verification",
             },
+            ElementType::Refinement(ref_type) => match ref_type {
+                RefinementType::Constraint    => "constraint",
+                RefinementType::Behavior      => "behavior",
+                RefinementType::Specification => "specification",
+            },
             ElementType::File => "file",
             ElementType::Other(s) => s.as_str(),
         }
@@ -99,18 +144,28 @@ impl ElementType {
     pub fn from_metadata(value: &str) -> Self {
         match value.to_lowercase().as_str() {
             "user-requirement" => ElementType::Requirement(RequirementType::User),
-            "requirement" => ElementType::Requirement(RequirementType::System),
-            
+            "requirement" | "system-requirement" => ElementType::Requirement(RequirementType::System),
+
             // Different verification types
             "verification" => ElementType::Verification(VerificationType::Test),
             "test-verification" => ElementType::Verification(VerificationType::Test),
             "analysis-verification" => ElementType::Verification(VerificationType::Analysis),
             "inspection-verification" => ElementType::Verification(VerificationType::Inspection),
             "demonstration-verification" => ElementType::Verification(VerificationType::Demonstration),
-            
+
+            // Refinement types
+            "constraint" => ElementType::Refinement(RefinementType::Constraint),
+            "behavior" => ElementType::Refinement(RefinementType::Behavior),
+            "specification" => ElementType::Refinement(RefinementType::Specification),
+
             "file" => ElementType::File,
             other => ElementType::Other(other.to_string()),
         }
+    }
+
+    /// Returns true if this element type is a Refinement type
+    pub fn is_refinement(&self) -> bool {
+        matches!(self, ElementType::Refinement(_))
     }
 }
 

@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -uo pipefail
+
+TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Create log file immediately to ensure it exists for runner
 echo "Starting test..." > "${TEST_DIR}/test_results.log"
@@ -54,11 +56,11 @@ fi
 echo "$OUTPUT" > "${TEST_DIR}/actual_output.md"
 
 # Compare with expected output
-if ! diff -u "${TEST_DIR}/expected_output.md" "${TEST_DIR}/actual_output.md"; then
+if ! diff -u "${TEST_SCRIPT_DIR}/expected/expected_output.md" "${TEST_DIR}/actual_output.md"; then
     echo "❌ FAILED: Markdown output does not match expected format"
     echo "Expected: ${TEST_DIR}/expected_output.md"
     echo "Actual: ${TEST_DIR}/actual_output.md"
-    diff -u "${TEST_DIR}/expected_output.md" "${TEST_DIR}/actual_output.md"
+    diff -u "${TEST_SCRIPT_DIR}/expected/expected_output.md" "${TEST_DIR}/actual_output.md"
     exit 1
 fi
 
@@ -100,7 +102,7 @@ fi
 echo "$OUTPUT" | jq '.' > "${TEST_DIR}/actual_output.json"
 
 # Compare JSON outputs using jq (to handle formatting differences)
-EXPECTED_JSON=$(jq -S '.' "${TEST_DIR}/expected_output.json")
+EXPECTED_JSON=$(jq -S '.' "${TEST_SCRIPT_DIR}/expected/expected_output.json")
 ACTUAL_JSON=$(jq -S '.' "${TEST_DIR}/actual_output.json")
 
 if [ "$EXPECTED_JSON" != "$ACTUAL_JSON" ]; then
@@ -139,11 +141,11 @@ fi
 echo "$OUTPUT" > "${TEST_DIR}/actual_filtered_output.md"
 
 # Compare with expected filtered output
-if ! diff -u "${TEST_DIR}/expected_filtered_output.md" "${TEST_DIR}/actual_filtered_output.md"; then
+if ! diff -u "${TEST_SCRIPT_DIR}/expected/expected_filtered_output.md" "${TEST_DIR}/actual_filtered_output.md"; then
     echo "❌ FAILED: Filtered markdown output does not match expected format"
     echo "Expected: ${TEST_DIR}/expected_filtered_output.md"
     echo "Actual: ${TEST_DIR}/actual_filtered_output.md"
-    diff -u "${TEST_DIR}/expected_filtered_output.md" "${TEST_DIR}/actual_filtered_output.md"
+    diff -u "${TEST_SCRIPT_DIR}/expected/expected_filtered_output.md" "${TEST_DIR}/actual_filtered_output.md"
     exit 1
 fi
 
@@ -175,7 +177,7 @@ fi
 echo "$OUTPUT" | jq '.' > "${TEST_DIR}/actual_filtered_output.json"
 
 # Compare with expected filtered JSON
-EXPECTED_FILTERED_JSON=$(jq -S '.' "${TEST_DIR}/expected_filtered_output.json")
+EXPECTED_FILTERED_JSON=$(jq -S '.' "${TEST_SCRIPT_DIR}/expected/expected_filtered_output.json")
 ACTUAL_FILTERED_JSON=$(jq -S '.' "${TEST_DIR}/actual_filtered_output.json")
 
 if [ "$EXPECTED_FILTERED_JSON" != "$ACTUAL_FILTERED_JSON" ]; then

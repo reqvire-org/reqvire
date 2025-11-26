@@ -204,7 +204,7 @@ fn build_element_recursive(
     // Build attachments list
     let attachments: Vec<String> = element.attachments
         .iter()
-        .map(|a| a.file_path.to_string_lossy().to_string())
+        .map(|a| a.target.as_str())
         .collect();
 
     Some(ModelCentricElement {
@@ -277,8 +277,12 @@ fn generate_element_text(element: &ModelCentricElement, depth: usize, diagram_di
     let indent = "  ".repeat(depth);
     let mut output = String::new();
 
-    // Element header
-    output.push_str(&format!("{}## {}\n\n", indent, element.name));
+    // Element header - make name a link to the element
+    let element_fragment = element.identifier
+        .rfind('#')
+        .map(|pos| &element.identifier[pos..])
+        .unwrap_or("");
+    output.push_str(&format!("{}## [{}]({}{})\n\n", indent, element.name, element.file_path, element_fragment));
     output.push_str(&format!("{}**Type**: {}\n", indent, element.element_type));
     output.push_str(&format!("{}**File**: [{}]({})\n\n", indent, element.file_path, element.file_path));
 
@@ -301,18 +305,125 @@ fn generate_element_text(element: &ModelCentricElement, depth: usize, diagram_di
     output
 }
 
-/// Generate mermaid diagram content for an element's relations recursively
+/// Generate mermaid diagram content for an element's relations with containment structure
 fn generate_mermaid_for_element(element: &ModelCentricElement, indent: &str) -> String {
-    let mut visited = HashSet::new();
-    generate_mermaid_for_element_recursive(element, indent, &mut visited)
+    use std::collections::HashMap;
+    use std::path::Path;
+
+    // First, collect all elements that will be in the diagram
+    let mut all_elements: Vec<&ModelCentricElement> = Vec::new();
+    let mut visited_collect = HashSet::new();
+    collect_all_elements_recursive(element, &mut all_elements, &mut visited_collect);
+
+    // Group elements by folder -> file
+    let mut folders: HashMap<String, HashMap<String, Vec<&ModelCentricElement>>> = HashMap::new();
+
+    for elem in &all_elements {
+        let file_path = &elem.file_path;
+        let folder = Path::new(file_path)
+            .parent()
+            .and_then(|p| p.to_str())
+            .unwrap_or("")
+            .to_string();
+        let file_name = Path::new(file_path)
+            .file_name()
+            .and_then(|n| n.to_str())
+            .unwrap_or(file_path)
+            .to_string();
+
+        folders.entry(folder)
+            .or_insert_with(HashMap::new)
+            .entry(file_name)
+            .or_insert_with(Vec::new)
+            .push(*elem);
+    }
+
+    let mut output = String::new();
+
+    // Add folder styling
+    output.push_str(&format!("{}  classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:3px;\n", indent));
+    output.push_str(&format!("{}  classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;\n", indent));
+    output.push_str(&format!("{}\n", indent));
+
+    // Sort folders for deterministic output
+    let mut folder_names: Vec<&String> = folders.keys().collect();
+    folder_names.sort();
+
+    // Generate subgraphs for folders and files
+    for folder_name in folder_names {
+        let files = &folders[folder_name];
+        let folder_id = hash_identifier(&format!("folder:{}", folder_name));
+        let folder_display = if folder_name.is_empty() { "root" } else { folder_name };
+
+        output.push_str(&format!("{}  subgraph {}[\"📁 {}\"]\n", indent, folder_id, escape_label(folder_display)));
+
+        // Sort files for deterministic output
+        let mut file_names: Vec<&String> = files.keys().collect();
+        file_names.sort();
+
+        for file_name in file_names {
+            let elements = &files[file_name];
+            let file_id = hash_identifier(&format!("file:{}:{}", folder_name, file_name));
+
+            output.push_str(&format!("{}    subgraph {}[\"📄 {}\"]\n", indent, file_id, escape_label(file_name)));
+
+            // Sort elements for deterministic output
+            let mut sorted_elements: Vec<&&ModelCentricElement> = elements.iter().collect();
+            sorted_elements.sort_by(|a, b| a.identifier.cmp(&b.identifier));
+
+            for elem in sorted_elements {
+                let elem_id = hash_identifier(&elem.identifier);
+                let elem_class = get_element_class(&elem.element_type);
+
+                // Build label with attachments
+                let mut elem_label = escape_label(&elem.name);
+                for attachment in &elem.attachments {
+                    elem_label.push_str(&format!("<br/>📎 {}", escape_label(attachment)));
+                }
+
+                output.push_str(&format!("{}      {}[\"{}\"];\n", indent, elem_id, elem_label));
+                output.push_str(&format!("{}      class {} {};\n", indent, elem_id, elem_class));
+                output.push_str(&format!("{}      click {} \"{}\";\n", indent, elem_id, &elem.identifier));
+            }
+
+            output.push_str(&format!("{}    end\n", indent));
+        }
+
+        output.push_str(&format!("{}  end\n", indent));
+    }
+
+    // Now add all relations
+    let mut visited_relations = HashSet::new();
+    output.push_str(&generate_relations_recursive(element, indent, &mut visited_relations));
+
+    output
 }
 
-fn generate_mermaid_for_element_recursive(
+/// Collect all elements recursively for containment grouping
+fn collect_all_elements_recursive<'a>(
+    element: &'a ModelCentricElement,
+    all_elements: &mut Vec<&'a ModelCentricElement>,
+    visited: &mut HashSet<String>,
+) {
+    if visited.contains(&element.identifier) {
+        return;
+    }
+    visited.insert(element.identifier.clone());
+    all_elements.push(element);
+
+    for relation in &element.relations {
+        if let RelationTarget::Element { element: target } = &relation.target {
+            collect_all_elements_recursive(target, all_elements, visited);
+        }
+    }
+}
+
+/// Generate only the relations (edges) between elements
+fn generate_relations_recursive(
     element: &ModelCentricElement,
     indent: &str,
     visited: &mut HashSet<String>,
 ) -> String {
-    // Prevent infinite recursion
     if visited.contains(&element.identifier) {
         return String::new();
     }
@@ -321,27 +432,14 @@ fn generate_mermaid_for_element_recursive(
     let mut output = String::new();
     let element_id = hash_identifier(&element.identifier);
 
-    // Determine CSS class based on element type
-    let element_class = get_element_class(&element.element_type);
-
-    // Add element node with class and click handler
-    output.push_str(&format!("{}  {}[\"{}\"];\n", indent, element_id, escape_label(&element.name)));
-    output.push_str(&format!("{}  class {} {};\n", indent, element_id, element_class));
-    output.push_str(&format!("{}  click {} \"{}\";\n", indent, element_id, &element.identifier));
-
     for (idx, relation) in element.relations.iter().enumerate() {
         match &relation.target {
             RelationTarget::Element { element: target } => {
                 let target_id = hash_identifier(&target.identifier);
-                let target_class = get_element_class(&target.element_type);
-
-                output.push_str(&format!("{}  {}[\"{}\"];\n", indent, target_id, escape_label(&target.name)));
-                output.push_str(&format!("{}  class {} {};\n", indent, target_id, target_class));
-                output.push_str(&format!("{}  click {} \"{}\";\n", indent, target_id, &target.identifier));
                 output.push_str(&format!("{}  {} -->|{}| {};\n", indent, element_id, relation.relation_type, target_id));
 
-                // Recursively show target element's relations
-                output.push_str(&generate_mermaid_for_element_recursive(target, indent, visited));
+                // Recursively add relations for target
+                output.push_str(&generate_relations_recursive(target, indent, visited));
             },
             RelationTarget::File { path, .. } => {
                 let file_id = hash_identifier(&format!("file:{}:{}", element.identifier, idx));

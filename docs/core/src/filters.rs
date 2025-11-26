@@ -114,7 +114,7 @@ impl Filters {
         // 9) attachment_glob: only include elements with attachments matching the glob
         if let Some(g) = &self.attachment_glob {
             let has_matching_attachment = e.attachments.iter()
-                .any(|a| g.is_match(a.file_path.to_string_lossy().as_ref()));
+                .any(|a| g.is_match(a.target.as_str().as_str()));
             if !has_matching_attachment {
                 return false;
             }

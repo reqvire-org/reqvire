@@ -183,7 +183,7 @@ blockquote {
     height: calc(100vh - 150px);
     width: 100%;
     overflow: hidden;
-    position: relative;
+    position: relative; /* Required for absolutely-positioned navigation buttons */
     border: 1px solid #EEEEEE;
     border-radius: 3px;
     background-color: #FAFAFA;
@@ -245,6 +245,8 @@ pub const HTML_TEMPLATE_MODEL: &str = include_str!("../templates/model.html");
 
 /// HTML template for whole-model.html page with tighter edge detection for dense diagrams
 /// Loaded at compile time from templates/whole-model.html
+/// NOTE: Currently unused as whole-model generation is disabled, but preserved for future use
+#[allow(dead_code)]
 pub const HTML_TEMPLATE_WHOLE_MODEL: &str = include_str!("../templates/whole-model.html");
 
 /// HTML template for generated pages
@@ -258,11 +260,12 @@ pub fn convert_to_html(
     title: &str,
     base_folder: &PathBuf
 ) -> Result<String, ReqvireError> {
-    // 1. Extract Mermaid blocks before link conversion
+    // 1. Extract Mermaid and D3 tree blocks before link conversion
     let (markdown_without_mermaid, mermaid_blocks) = extract_mermaid_blocks(markdown_content);
+    let (markdown_without_d3, d3_tree_blocks) = extract_d3_tree_blocks(&markdown_without_mermaid);
 
     // 2. Convert .md links to .html — safely
-    let markdown_html_ready = convert_markdown_links_to_html(file_path, &markdown_without_mermaid, base_folder);
+    let markdown_html_ready = convert_markdown_links_to_html(file_path, &markdown_without_d3, base_folder);
 
     // 3. Restore Mermaid blocks (untouched by md → html rewrite)
     let markdown_final = restore_mermaid_blocks(&markdown_html_ready, &mermaid_blocks);
@@ -280,9 +283,10 @@ pub fn convert_to_html(
     let mut html_output = String::new();
     html::push_html(&mut html_output, parser);
 
-    // 5. Process anchor IDs, Mermaid blocks
+    // 5. Process anchor IDs, Mermaid blocks, and D3 tree blocks
     let html_with_anchors = add_anchor_ids(&html_output);
     let html_with_mermaid = process_mermaid_diagrams(file_path, &html_with_anchors);
+    let html_with_d3 = restore_d3_tree_blocks(&html_with_mermaid, &d3_tree_blocks);
 
     // 6. Calculate relative path prefix for navigation links
     let nav_prefix = calculate_nav_prefix(file_path, base_folder);
@@ -304,7 +308,7 @@ pub fn convert_to_html(
     let html_document = template
         .replace("{title}", title)
         .replace("{styles}", EMBEDDED_STYLES)
-        .replace("{content}", &html_with_mermaid)
+        .replace("{content}", &html_with_d3)
         .replace("{nav_prefix}", &nav_prefix);
 
     Ok(html_document)
@@ -430,6 +434,333 @@ fn extract_mermaid_blocks(markdown: &str) -> (String, HashMap<String, String>) {
     });
 
     (result.into_owned(), map)
+}
+
+/// Extracts D3 tree blocks and replaces them with placeholders
+fn extract_d3_tree_blocks(markdown: &str) -> (String, HashMap<String, String>) {
+    lazy_static! {
+        static ref D3_TREE_BLOCK: Regex = Regex::new(
+            r"(?s)```d3-tree\s*\n(?P<json>.*?)```"
+        ).unwrap();
+    }
+
+    let mut map = HashMap::new();
+    let mut counter = 0;
+    let result = D3_TREE_BLOCK.replace_all(markdown, |caps: &Captures| {
+        let json_data = caps["json"].trim();
+        let placeholder = format!("{{{{D3_TREE_BLOCK_{}}}}}", counter);
+        map.insert(placeholder.clone(), json_data.to_string());
+        counter += 1;
+        placeholder
+    });
+
+    (result.into_owned(), map)
+}
+
+/// Restores D3 tree placeholders with rendered HTML
+fn restore_d3_tree_blocks(content: &str, blocks: &HashMap<String, String>) -> String {
+    let mut result = content.to_string();
+    for (placeholder, json_data) in blocks {
+        let d3_html = generate_d3_tree_html(json_data);
+        result = result.replace(placeholder, &d3_html);
+    }
+    result
+}
+
+/// Generate HTML for D3.js collapsible tree visualization
+fn generate_d3_tree_html(json_data: &str) -> String {
+    let unique_id = format!("d3tree_{:x}", json_data.as_ptr() as usize);
+
+    format!(r##"
+<div class="d3-tree-container" id="{id}">
+    <div class="d3-tree-controls">
+        <button onclick="expandAll_{id}()">Expand All</button>
+        <button onclick="collapseAll_{id}()">Collapse All</button>
+    </div>
+    <svg class="d3-tree-svg"></svg>
+</div>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+(function() {{
+    const data = {json};
+    const container = document.getElementById("{id}");
+    const svg = container.querySelector("svg");
+
+    // Configuration
+    const nodeWidth = 200;
+    const nodeHeight = 28;
+    const margin = {{top: 20, right: 120, bottom: 20, left: 60}};
+
+    // Colors matching Reqvire theme
+    const colors = {{
+        "folder": "#9E9E9E",
+        "file": "#FFCA28",
+        "user-requirement": "#7E57C2",
+        "system-requirement": "#673AB7",
+        "requirement": "#673AB7",
+        "verification": "#4CAF50",
+        "refinement": "#FF9800",
+        "design-document": "#8D6E63",
+        "element": "#424242",
+        "attachment-element": "#FF9800",
+        "attachment-file": "#607D8B"
+    }};
+
+    const icons = {{
+        "folder": "📁",
+        "file": "📄",
+        "user-requirement": "👤",
+        "system-requirement": "📐",
+        "requirement": "📐",
+        "verification": "✅",
+        "refinement": "🔧",
+        "design-document": "📝",
+        "element": "◽",
+        "attachment-element": "🔧",
+        "attachment-file": "📎"
+    }};
+
+    // Get color for node type
+    function getColor(type) {{
+        if (colors[type]) return colors[type];
+        return "#424242";
+    }}
+
+    // Get icon for node type
+    function getIcon(type) {{
+        if (icons[type]) return icons[type];
+        return "◽";
+    }}
+
+    // Create hierarchy
+    const root = d3.hierarchy(data);
+    root.x0 = 0;
+    root.y0 = 0;
+
+    // Initially collapse all but first two levels
+    root.descendants().forEach((d, i) => {{
+        if (d.depth > 1) {{
+            d._children = d.children;
+            d.children = null;
+        }}
+    }});
+
+    // Tree layout
+    const tree = d3.tree().nodeSize([nodeHeight + 4, nodeWidth]);
+
+    // Create SVG group
+    const g = d3.select(svg)
+        .attr("width", "100%")
+        .attr("height", 600)
+        .append("g")
+        .attr("transform", `translate(${{margin.left}},${{margin.top}})`);
+
+    // Links group (rendered first, below nodes)
+    const linksGroup = g.append("g").attr("class", "links");
+    const nodesGroup = g.append("g").attr("class", "nodes");
+
+    function update(source) {{
+        const duration = 300;
+        const treeData = tree(root);
+        const nodes = treeData.descendants();
+        const links = treeData.links();
+
+        // Normalize for fixed-depth
+        nodes.forEach(d => {{ d.y = d.depth * nodeWidth; }});
+
+        // Update SVG height based on tree
+        const minX = d3.min(nodes, d => d.x);
+        const maxX = d3.max(nodes, d => d.x);
+        const height = maxX - minX + margin.top + margin.bottom + 50;
+        d3.select(svg).attr("height", height);
+        g.attr("transform", `translate(${{margin.left}},${{margin.top + Math.abs(minX) + 20}})`);
+
+        // --- LINKS ---
+        const link = linksGroup.selectAll("path.link")
+            .data(links, d => d.target.data.name + d.target.depth);
+
+        const linkEnter = link.enter()
+            .append("path")
+            .attr("class", "link")
+            .attr("fill", "none")
+            .attr("stroke", "#ccc")
+            .attr("stroke-width", 1.5)
+            .attr("d", d => {{
+                const o = {{x: source.x0, y: source.y0}};
+                return diagonal({{source: o, target: o}});
+            }});
+
+        link.merge(linkEnter)
+            .transition()
+            .duration(duration)
+            .attr("d", diagonal);
+
+        link.exit()
+            .transition()
+            .duration(duration)
+            .attr("d", d => {{
+                const o = {{x: source.x, y: source.y}};
+                return diagonal({{source: o, target: o}});
+            }})
+            .remove();
+
+        // --- NODES ---
+        const node = nodesGroup.selectAll("g.node")
+            .data(nodes, d => d.data.name + d.depth);
+
+        const nodeEnter = node.enter()
+            .append("g")
+            .attr("class", "node")
+            .attr("transform", d => `translate(${{source.y0}},${{source.x0}})`);
+
+        // Check if node is an attachment (child metadata)
+        function isMetaNode(type) {{
+            return type && type.startsWith("attachment-");
+        }}
+
+        // Circle for expand/collapse indicator - smaller for attachments
+        // Click on circle to toggle expand/collapse
+        nodeEnter.append("circle")
+            .attr("r", d => isMetaNode(d.data.type) ? 4 : 6)
+            .attr("fill", d => getColor(d.data.type))
+            .attr("stroke", "#fff")
+            .attr("stroke-width", d => isMetaNode(d.data.type) ? 1 : 1.5)
+            .style("cursor", d => d.children || d._children ? "pointer" : "default")
+            .on("click", (event, d) => {{
+                event.stopPropagation();
+                if (d.children || d._children) {{
+                    d.children = d.children ? null : d._children;
+                    d._children = d._children ? null : d.children;
+                    update(d);
+                }}
+            }});
+
+        // Icon + Text - click to navigate
+        nodeEnter.append("text")
+            .attr("dy", "0.35em")
+            .attr("x", d => isMetaNode(d.data.type) ? 10 : 12)
+            .attr("text-anchor", "start")
+            .style("font-size", d => isMetaNode(d.data.type) ? "11px" : "13px")
+            .style("font-style", d => isMetaNode(d.data.type) ? "italic" : "normal")
+            .style("opacity", d => isMetaNode(d.data.type) ? 0.85 : 1)
+            .style("font-family", "system-ui, sans-serif")
+            .style("cursor", d => d.data.link ? "pointer" : "default")
+            .text(d => `${{getIcon(d.data.type)}} ${{d.data.name}}`)
+            .on("click", (event, d) => {{
+                event.stopPropagation();
+                if (d.data.link) {{
+                    window.location.href = d.data.link.replace(".md", ".html");
+                }}
+            }})
+            .clone(true).lower()
+            .attr("stroke", "white")
+            .attr("stroke-width", 3);
+
+        // Update positions
+        const nodeUpdate = nodeEnter.merge(node);
+        nodeUpdate.transition()
+            .duration(duration)
+            .attr("transform", d => `translate(${{d.y}},${{d.x}})`);
+
+        // Update circles to show expand/collapse state
+        nodeUpdate.select("circle")
+            .attr("fill", d => getColor(d.data.type))
+            .attr("stroke", d => d._children ? "#333" : "#fff");
+
+        // Remove exiting nodes
+        node.exit()
+            .transition()
+            .duration(duration)
+            .attr("transform", d => `translate(${{source.y}},${{source.x}})`)
+            .remove();
+
+        // Store positions for next transition
+        nodes.forEach(d => {{
+            d.x0 = d.x;
+            d.y0 = d.y;
+        }});
+    }}
+
+    // Diagonal path generator
+    function diagonal(d) {{
+        return `M${{d.source.y}},${{d.source.x}}
+                C${{(d.source.y + d.target.y) / 2}},${{d.source.x}}
+                 ${{(d.source.y + d.target.y) / 2}},${{d.target.x}}
+                 ${{d.target.y}},${{d.target.x}}`;
+    }}
+
+    // Recursive expand function that handles collapsed children
+    function expandNode(d) {{
+        if (d._children) {{
+            d.children = d._children;
+            d._children = null;
+        }}
+        if (d.children) {{
+            d.children.forEach(expandNode);
+        }}
+    }}
+
+    // Recursive collapse function
+    function collapseNode(d) {{
+        if (d.children) {{
+            d.children.forEach(collapseNode);
+            d._children = d.children;
+            d.children = null;
+        }}
+    }}
+
+    // Expand/Collapse all functions
+    window.expandAll_{id} = function() {{
+        expandNode(root);
+        update(root);
+    }};
+
+    window.collapseAll_{id} = function() {{
+        if (root.children) {{
+            root.children.forEach(collapseNode);
+        }}
+        update(root);
+    }};
+
+    // Initial render
+    update(root);
+}})();
+</script>
+<style>
+.d3-tree-container {{
+    background: #FAFAFA;
+    border: 1px solid #EEEEEE;
+    border-radius: 4px;
+    padding: 10px;
+    overflow-x: auto;
+}}
+.d3-tree-controls {{
+    margin-bottom: 10px;
+}}
+.d3-tree-controls button {{
+    background: #3F51B5;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    margin-right: 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+}}
+.d3-tree-controls button:hover {{
+    background: #303F9F;
+}}
+.d3-tree-svg {{
+    display: block;
+}}
+.node text {{
+    fill: #424242;
+}}
+.node:hover text {{
+    fill: #3F51B5;
+}}
+</style>
+"##, id = unique_id, json = json_data)
 }
 
 /// Replaces placeholders back with the original Mermaid blocks

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -uo pipefail
 
 # Test: CLI Help Structure Verification
 # --------------------------------------
@@ -29,14 +29,11 @@ if [ $EXIT_CODE -ne 0 ]; then
 fi
 
 # Compare with expected output
-if ! diff -u "${TEST_SCRIPT_DIR}/expected.txt" <(echo "$ACTUAL_OUTPUT"); then
+if ! diff -u "${TEST_SCRIPT_DIR}/expected/expected.txt" <(echo "$ACTUAL_OUTPUT"); then
   echo "❌ FAILED: CLI help output does not match expected format"
   echo ""
-  echo "Differences shown above (expected vs actual)"
-  echo ""
-  echo "If the changes are intentional, update tests/test-cli-help-structure/expected.txt"
+  echo "If the changes are intentional, update ${TEST_SCRIPT_DIR}/expected/expected.txt"
   exit 1
 fi
 
-echo "✅ PASSED: CLI help structure verification"
 exit 0

@@ -1,5 +1,5 @@
 #!/bin/bash
-set -euo pipefail
+set -uo pipefail
 
 # Test: Element Manipulation Operations
 #
@@ -52,10 +52,10 @@ if [ $ADD_EXIT -ne 0 ]; then
 fi
 
 # Compare output with expected diff
-if ! diff -u "${TEST_SCRIPT_DIR}/expected-add-diff.txt" <(echo "$ADD_OUTPUT"); then
+if ! diff -u "${TEST_SCRIPT_DIR}/expected/expected-add-diff.txt" <(echo "$ADD_OUTPUT"); then
   echo "❌ FAILED: Add command output does not match expected diff"
   echo ""
-  echo "Differences shown above (expected vs actual)"
+  echo "If changes are intentional, update ${TEST_SCRIPT_DIR}/expected/expected-add-diff.txt"
   exit 1
 fi
 
@@ -81,6 +81,84 @@ echo "✓ Element added successfully"
 echo ""
 
 # ==================================
+# Test 1b: Add Element with Attachments
+# ==================================
+echo "Test 1b: Add element with attachments..."
+
+# First add a refinement element (constraint) that will be attached
+CONSTRAINT_ELEMENT='### Feature D Constraint
+
+Rate limiting constraint for Feature D.
+
+#### Metadata
+  * type: constraint
+'
+
+set +e
+ADD_CONSTRAINT_OUTPUT=$(cd "$TEST_DIR" && echo "$CONSTRAINT_ELEMENT" | "$REQVIRE_BIN" add specifications/Requirements.md 2>&1)
+ADD_CONSTRAINT_EXIT=$?
+set -e
+
+if [ $ADD_CONSTRAINT_EXIT -ne 0 ]; then
+  echo "❌ FAILED: Add constraint element failed with exit code $ADD_CONSTRAINT_EXIT"
+  echo "$ADD_CONSTRAINT_OUTPUT"
+  exit 1
+fi
+
+# Now add a requirement with attachment to the constraint
+ELEMENT_WITH_ATTACHMENT='### Feature E
+
+This feature has an attachment to a refinement element.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Feature A](#feature-a)
+
+#### Attachments
+  * [Feature D Constraint](#feature-d-constraint)
+'
+
+set +e
+ADD_ATTACH_OUTPUT=$(cd "$TEST_DIR" && echo "$ELEMENT_WITH_ATTACHMENT" | "$REQVIRE_BIN" add specifications/Requirements.md 2>&1)
+ADD_ATTACH_EXIT=$?
+set -e
+
+if [ $ADD_ATTACH_EXIT -ne 0 ]; then
+  echo "❌ FAILED: Add element with attachment failed with exit code $ADD_ATTACH_EXIT"
+  echo "$ADD_ATTACH_OUTPUT"
+  exit 1
+fi
+
+# Verify attachment section exists in file
+if ! grep -q "#### Attachments" "$TEST_DIR/specifications/Requirements.md"; then
+  echo "❌ FAILED: Attachments section not found in file"
+  exit 1
+fi
+
+# Verify attachment link exists
+if ! grep -q "Feature D Constraint" "$TEST_DIR/specifications/Requirements.md"; then
+  echo "❌ FAILED: Attachment link not found in file"
+  exit 1
+fi
+
+# Verify model still validates
+set +e
+VALIDATION_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" validate 2>&1)
+VALIDATION_EXIT=$?
+set -e
+
+if [ $VALIDATION_EXIT -ne 0 ]; then
+  echo "❌ FAILED: Model validation failed after add with attachment"
+  echo "$VALIDATION_OUTPUT"
+  exit 1
+fi
+
+echo "✓ Element with attachment added successfully"
+echo ""
+
+# ==================================
 # Test 2: Delete Element
 # ==================================
 echo "Test 2: Delete element operation..."
@@ -100,10 +178,10 @@ if [ $DELETE_EXIT -ne 0 ]; then
 fi
 
 # Compare output with expected diff
-if ! diff -u "${TEST_SCRIPT_DIR}/expected-rm-diff.txt" <(echo "$DELETE_OUTPUT"); then
+if ! diff -u "${TEST_SCRIPT_DIR}/expected/expected-rm-diff.txt" <(echo "$DELETE_OUTPUT"); then
   echo "❌ FAILED: Delete command output does not match expected diff"
   echo ""
-  echo "Differences shown above (expected vs actual)"
+  echo "If changes are intentional, update ${TEST_SCRIPT_DIR}/expected/expected-rm-diff.txt"
   exit 1
 fi
 
@@ -154,10 +232,10 @@ if [ $MOVE_EXIT -ne 0 ]; then
 fi
 
 # Compare output with expected diff
-if ! diff -u "${TEST_SCRIPT_DIR}/expected-mv-diff.txt" <(echo "$MOVE_OUTPUT"); then
+if ! diff -u "${TEST_SCRIPT_DIR}/expected/expected-mv-diff.txt" <(echo "$MOVE_OUTPUT"); then
   echo "❌ FAILED: Move command output does not match expected diff"
   echo ""
-  echo "Differences shown above (expected vs actual)"
+  echo "If changes are intentional, update ${TEST_SCRIPT_DIR}/expected/expected-mv-diff.txt"
   exit 1
 fi
 
@@ -211,10 +289,10 @@ if [ $RENAME_EXIT -ne 0 ]; then
 fi
 
 # Compare output with expected diff
-if ! diff -u "${TEST_SCRIPT_DIR}/expected-rename-diff.txt" <(echo "$RENAME_OUTPUT"); then
+if ! diff -u "${TEST_SCRIPT_DIR}/expected/expected-rename-diff.txt" <(echo "$RENAME_OUTPUT"); then
   echo "❌ FAILED: Rename command output does not match expected diff"
   echo ""
-  echo "Differences shown above (expected vs actual)"
+  echo "If changes are intentional, update ${TEST_SCRIPT_DIR}/expected/expected-rename-diff.txt"
   exit 1
 fi
 
@@ -249,6 +327,57 @@ if [ $VALIDATION_EXIT -ne 0 ]; then
 fi
 
 echo "✓ Element renamed successfully and relations updated"
+echo ""
+
+# ==================================
+# Test 4b: Move Element with Special Characters
+# ==================================
+echo "Test 4b: Move element with special characters..."
+
+set +e
+MOVE_SPECIAL_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv "Complex chars, element/name example" "specifications/OtherRequirements.md" 2>&1)
+MOVE_SPECIAL_EXIT=$?
+set -e
+
+if [ $MOVE_SPECIAL_EXIT -ne 0 ]; then
+  echo "❌ FAILED: Move command for special chars element failed with exit code $MOVE_SPECIAL_EXIT"
+  echo "$MOVE_SPECIAL_OUTPUT"
+  exit 1
+fi
+
+# Compare output with expected diff
+if ! diff -u "${TEST_SCRIPT_DIR}/expected/expected-mv-special-chars-diff.txt" <(echo "$MOVE_SPECIAL_OUTPUT"); then
+  echo "❌ FAILED: Move special chars element output does not match expected diff"
+  echo ""
+  echo "If changes are intentional, update ${TEST_SCRIPT_DIR}/expected/expected-mv-special-chars-diff.txt"
+  exit 1
+fi
+
+# Verify element was removed from source
+if grep -q "### Complex chars, element/name example" "$TEST_DIR/specifications/Requirements.md"; then
+  echo "❌ FAILED: Special chars element was not removed from source file"
+  exit 1
+fi
+
+# Verify element was added to target
+if ! grep -q "### Complex chars, element/name example" "$TEST_DIR/specifications/OtherRequirements.md"; then
+  echo "❌ FAILED: Special chars element was not added to target file"
+  exit 1
+fi
+
+# Verify model still validates
+set +e
+VALIDATION_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" validate 2>&1)
+VALIDATION_EXIT=$?
+set -e
+
+if [ $VALIDATION_EXIT -ne 0 ]; then
+  echo "❌ FAILED: Model validation failed after moving special chars element"
+  echo "$VALIDATION_OUTPUT"
+  exit 1
+fi
+
+echo "✓ Element with special characters moved successfully"
 echo ""
 
 # ==================================

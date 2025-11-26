@@ -54,7 +54,7 @@ EOF
 # Create files that SHOULD be excluded by .gitignore
 mkdir -p "${TEST_DIR}/specifications/build"
 cat > "${TEST_DIR}/specifications/build/BuildRequirements.md" << 'EOF'
-# Requirements
+# Elements
 
 ### Build Requirement 001
 
@@ -68,7 +68,7 @@ This file is in build/ folder and should be excluded by .gitignore.
 EOF
 
 cat > "${TEST_DIR}/specifications/temp-draft.md" << 'EOF'
-# Requirements
+# Elements
 
 ### Temp Requirement 001
 
@@ -83,7 +83,7 @@ EOF
 
 mkdir -p "${TEST_DIR}/specifications/cache"
 cat > "${TEST_DIR}/specifications/cache/CacheRequirements.md" << 'EOF'
-# Requirements
+# Elements
 
 ### Cache Requirement 001
 
@@ -98,7 +98,7 @@ EOF
 
 # Create a file that SHOULD be processed (not matching .gitignore)
 cat > "${TEST_DIR}/specifications/ValidRequirements.md" << 'EOF'
-# Requirements
+# Elements
 
 ### Test Root
 
@@ -181,7 +181,7 @@ EOF
 
 # Create root requirement file first
 cat > "${TEST_DIR}/specifications/ActiveRequirements.md" << 'EOF'
-# Requirements
+# Elements
 
 ### Test Root
 
@@ -200,7 +200,7 @@ EOF
 
 # Create files matching .gitignore pattern
 cat > "${TEST_DIR}/specifications/DRAFT-Feature.md" << 'EOF'
-# Requirements
+# Elements
 
 ### Draft Requirement 001
 
@@ -213,7 +213,7 @@ EOF
 # Create files matching .reqvireignore pattern
 mkdir -p "${TEST_DIR}/specifications/archive"
 cat > "${TEST_DIR}/specifications/archive/OldRequirements.md" << 'EOF'
-# Requirements
+# Elements
 
 ### Old Requirement 001
 
@@ -224,7 +224,7 @@ This file is in archive/ folder excluded by .reqvireignore.
 EOF
 
 cat > "${TEST_DIR}/specifications/README.md" << 'EOF'
-# Requirements
+# Elements
 
 ### README Element
 
@@ -296,7 +296,7 @@ EOF
 
 # Create files
 cat > "${TEST_DIR}/specifications/NormalRequirements.md" << 'EOF'
-# Requirements
+# Elements
 
 ### Test Root
 
@@ -317,7 +317,7 @@ This file should be processed.
 EOF
 
 cat > "${TEST_DIR}/specifications/excluded-test.md" << 'EOF'
-# Requirements
+# Elements
 
 ### Excluded Requirement
 
@@ -397,7 +397,7 @@ EOF
 
 # Create normal file that should be processed - with root requirement
 cat > "${TEST_DIR}/specifications/subsystem/normal-file.md" << 'EOF'
-# Requirements
+# Elements
 
 ### Test Root
 
@@ -419,7 +419,7 @@ EOF
 
 # Create files matching root .gitignore pattern
 cat > "${TEST_DIR}/specifications/root-excluded-file.md" << 'EOF'
-# Requirements
+# Elements
 
 ### Root Excluded Requirement
 
@@ -434,7 +434,7 @@ EOF
 
 # Create files matching root .reqvireignore pattern
 cat > "${TEST_DIR}/specifications/reqvire-excluded-file.md" << 'EOF'
-# Requirements
+# Elements
 
 ### Reqvire Excluded Requirement
 
@@ -449,7 +449,7 @@ EOF
 
 # Create file matching nested .gitignore pattern (should NOT be excluded)
 cat > "${TEST_DIR}/specifications/subsystem/nested-gitignore-excluded-file.md" << 'EOF'
-# Requirements
+# Elements
 
 ### Nested Gitignore Requirement
 
@@ -465,7 +465,7 @@ EOF
 
 # Create file matching nested .reqvireignore pattern (should NOT be excluded)
 cat > "${TEST_DIR}/specifications/subsystem/nested-reqvire-excluded-file.md" << 'EOF'
-# Requirements
+# Elements
 
 ### Nested Reqvireignore Requirement
 
@@ -548,7 +548,7 @@ EOF
 
 # Create files
 cat > "${TEST_DIR}/specifications/ProcessedRequirements.md" << 'EOF'
-# Requirements
+# Elements
 
 ### Test Root
 
@@ -569,7 +569,7 @@ This file should be processed.
 EOF
 
 cat > "${TEST_DIR}/specifications/reqvire-only-excluded-test.md" << 'EOF'
-# Requirements
+# Elements
 
 ### Reqvire Only Excluded Requirement
 
@@ -628,7 +628,7 @@ rm -f "${TEST_DIR}/.reqvireignore"
 
 # Create files that would match typical ignore patterns
 cat > "${TEST_DIR}/specifications/AllRequirements.md" << 'EOF'
-# Requirements
+# Elements
 
 ### Test Root
 
@@ -649,7 +649,7 @@ This file should be processed.
 EOF
 
 cat > "${TEST_DIR}/specifications/README.md" << 'EOF'
-# Requirements
+# Elements
 
 ### README Requirement
 
@@ -663,7 +663,7 @@ This is a reserved filename and should ALWAYS be excluded.
 EOF
 
 cat > "${TEST_DIR}/specifications/DRAFT-test.md" << 'EOF'
-# Requirements
+# Elements
 
 ### Draft Requirement
 
@@ -728,7 +728,7 @@ rm -f "${TEST_DIR}/.reqvireignore"
 
 # Create valid requirements file
 cat > "${TEST_DIR}/specifications/ValidRequirements.md" << 'EOF'
-# Requirements
+# Elements
 
 ### Test Root
 
@@ -750,7 +750,7 @@ EOF
 
 # Create reserved documentation files
 cat > "${TEST_DIR}/specifications/README.md" << 'EOF'
-# Requirements
+# Elements
 ### README Requirement
 Reserved filename - should be excluded.
 #### Relations

@@ -393,7 +393,7 @@ pub fn attach(
         .map_err(|e| ReqvireError::IoError(e))?;
 
     // Check if attachment already exists (idempotent)
-    if element.attachments.iter().any(|a| a.file_path.to_string_lossy() == attachment_path) {
+    if element.attachments.iter().any(|a| a.target.as_str() == attachment_path) {
         // Already attached, return success without changes
         return Ok(CrudResult {
             operation: CrudOperation::Update,
@@ -476,6 +476,186 @@ pub fn detach(
     })
 }
 
+/// Attach a Refinement element to another element by adding its identifier to the Attachments subsection
+///
+/// # Arguments
+/// * `model_manager` - The model manager
+/// * `element_name` - Name of the element to attach to
+/// * `attachment_element_name` - Name of the Refinement element to attach
+/// * `git_root` - Git root directory
+/// * `dry_run` - If true, don't write changes to disk
+pub fn attach_element(
+    model_manager: &mut ModelManager,
+    element_name: &str,
+    attachment_element_name: &str,
+    git_root: &Path,
+    dry_run: bool,
+) -> Result<CrudResult, ReqvireError> {
+    use std::fs;
+
+    // Find the target element by name (the element to attach TO)
+    let target_element = model_manager.graph_registry.get_element_by_name(element_name)
+        .ok_or_else(|| ReqvireError::ElementNotFound(
+            format!("Element '{}' not found", element_name)
+        ))?;
+
+    let element_id = target_element.identifier.clone();
+    let file_path = target_element.file_path.clone();
+
+    // Find the attachment element by name (the Refinement element to attach)
+    let attachment_element = model_manager.graph_registry.get_element_by_name(attachment_element_name)
+        .ok_or_else(|| ReqvireError::ElementNotFound(
+            format!("Attachment '{}' not found as file or element. Neither file exists nor element with this name was found in the model.", attachment_element_name)
+        ))?;
+
+    // Verify the attachment element is a Refinement type (constraint, behavior, specification)
+    if !attachment_element.element_type.is_refinement() {
+        return Err(ReqvireError::InvalidAttachmentTarget(
+            format!("Element '{}' is not a Refinement type (constraint, behavior, specification). Only Refinement elements can be attached.", attachment_element_name)
+        ));
+    }
+
+    let attachment_identifier = attachment_element.identifier.clone();
+    let attachment_display_name = attachment_element.name.clone();
+
+    // Check if already attached
+    if target_element.attachments.iter().any(|a| a.target.as_str() == attachment_identifier) {
+        return Ok(CrudResult {
+            operation: CrudOperation::Update,
+            element_id: element_id.clone(),
+            element_name: format!("Attachment already exists: {}", attachment_element_name),
+            diffs: vec![],
+            dry_run,
+        });
+    }
+
+    // Read current file content
+    let absolute_file_path = git_root.join(&file_path);
+    let content = fs::read_to_string(&absolute_file_path)
+        .map_err(|e| ReqvireError::IoError(e))?;
+
+    // Calculate relative identifier from target element's file to attachment element
+    // If both elements are in the same file, use just #fragment format
+    let attachment_file_path = attachment_element.file_path.clone();
+    let relative_identifier = if file_path == attachment_file_path {
+        // Same file - use just the fragment (like relations do)
+        let (_path, fragment_opt) = crate::utils::extract_path_and_fragment(&attachment_identifier);
+        let fragment = fragment_opt.unwrap_or(&attachment_identifier);
+        format!("#{}", fragment)
+    } else {
+        // Different files - calculate relative path
+        let target_file_path_buf = std::path::PathBuf::from(&file_path);
+        let target_folder = target_file_path_buf.parent()
+            .unwrap_or_else(|| std::path::Path::new("."))
+            .to_path_buf();
+
+        crate::utils::to_relative_identifier(
+            &attachment_identifier,
+            &target_folder,
+            true
+        ).unwrap_or_else(|_| attachment_identifier.clone())
+    };
+
+    // Add element attachment to file
+    let new_content = add_element_attachment_to_element(&content, element_name, &attachment_display_name, &relative_identifier)?;
+
+    // Generate diff
+    let diff = generate_file_diff(&file_path, &content, &new_content);
+
+    // Write to file if not dry run
+    if !dry_run {
+        fs::write(&absolute_file_path, &new_content)
+            .map_err(|e| ReqvireError::IoError(e))?;
+
+        // Mark file as modified for re-parsing
+        model_manager.graph_registry.modified_files.insert(file_path.clone());
+    }
+
+    Ok(CrudResult {
+        operation: CrudOperation::Update,
+        element_id,
+        element_name: format!("Attached element {} to {}", attachment_element_name, element_name),
+        diffs: vec![diff],
+        dry_run,
+    })
+}
+
+/// Detach a Refinement element from another element by removing its identifier from the Attachments subsection
+///
+/// # Arguments
+/// * `model_manager` - The model manager
+/// * `element_name` - Name of the element to detach from
+/// * `attachment_element_name` - Name of the Refinement element to detach
+/// * `git_root` - Git root directory
+/// * `dry_run` - If true, don't write changes to disk
+pub fn detach_element(
+    model_manager: &mut ModelManager,
+    element_name: &str,
+    attachment_element_name: &str,
+    git_root: &Path,
+    dry_run: bool,
+) -> Result<CrudResult, ReqvireError> {
+    use std::fs;
+
+    // Find the target element by name
+    let target_element = model_manager.graph_registry.get_element_by_name(element_name)
+        .ok_or_else(|| ReqvireError::ElementNotFound(
+            format!("Element '{}' not found", element_name)
+        ))?;
+
+    let element_id = target_element.identifier.clone();
+    let file_path = target_element.file_path.clone();
+
+    // Find the attachment element by name to get its identifier
+    let attachment_element = model_manager.graph_registry.get_element_by_name(attachment_element_name)
+        .ok_or_else(|| ReqvireError::ElementNotFound(
+            format!("Attachment '{}' not found as file or element. Neither file exists nor element with this name was found in the model.", attachment_element_name)
+        ))?;
+
+    let attachment_identifier = attachment_element.identifier.clone();
+    let attachment_display_name = attachment_element.name.clone();
+
+    // Read current file content
+    let absolute_file_path = git_root.join(&file_path);
+    let content = fs::read_to_string(&absolute_file_path)
+        .map_err(|e| ReqvireError::IoError(e))?;
+
+    // Calculate relative identifier from target element's file to attachment element
+    let target_file_path = std::path::PathBuf::from(&file_path);
+    let target_folder = target_file_path.parent()
+        .unwrap_or_else(|| std::path::Path::new("."))
+        .to_path_buf();
+
+    let relative_identifier = crate::utils::to_relative_identifier(
+        &attachment_identifier,
+        &target_folder,
+        true
+    ).unwrap_or_else(|_| attachment_identifier.clone());
+
+    // Remove element attachment from file
+    let new_content = remove_element_attachment_from_element(&content, element_name, &attachment_display_name, &relative_identifier)?;
+
+    // Generate diff
+    let diff = generate_file_diff(&file_path, &content, &new_content);
+
+    // Write to file if not dry run
+    if !dry_run {
+        fs::write(&absolute_file_path, &new_content)
+            .map_err(|e| ReqvireError::IoError(e))?;
+
+        // Mark file as modified for re-parsing
+        model_manager.graph_registry.modified_files.insert(file_path.clone());
+    }
+
+    Ok(CrudResult {
+        operation: CrudOperation::Update,
+        element_id,
+        element_name: format!("Detached element {} from {}", attachment_element_name, element_name),
+        diffs: vec![diff],
+        dry_run,
+    })
+}
+
 /// Move an attachment file and update all references across elements
 pub fn mv_attachment(
     model_manager: &mut ModelManager,
@@ -489,7 +669,7 @@ pub fn mv_attachment(
     // Find all elements with this attachment
     let affected_elements: Vec<_> = model_manager.graph_registry.nodes.values()
         .map(|node| &node.element)
-        .filter(|elem| elem.attachments.iter().any(|a| a.file_path.to_string_lossy() == old_path))
+        .filter(|elem| elem.attachments.iter().any(|a| a.target.as_str() == old_path))
         .map(|elem| (elem.identifier.clone(), elem.file_path.clone()))
         .collect();
 
@@ -566,7 +746,7 @@ pub fn rm_attachment(
     // Find all elements with this attachment
     let affected_elements: Vec<_> = model_manager.graph_registry.nodes.values()
         .map(|node| &node.element)
-        .filter(|elem| elem.attachments.iter().any(|a| a.file_path.to_string_lossy() == attachment_path))
+        .filter(|elem| elem.attachments.iter().any(|a| a.target.as_str() == attachment_path))
         .map(|elem| elem.name.clone())
         .collect();
 
@@ -730,6 +910,133 @@ fn remove_attachment_from_element(content: &str, element_name: &str, attachment_
         // Skip the attachment line we want to remove
         if in_target_element && in_attachments_section {
             if (trimmed.starts_with("* ") || trimmed.starts_with("- ")) && trimmed.contains(&attachment_link) {
+                removed = true;
+                continue; // Skip this line
+            }
+            if trimmed.starts_with("* ") || trimmed.starts_with("- ") {
+                remaining_attachments_count += 1;
+            }
+        }
+
+        result.push_str(line);
+        result.push('\n');
+    }
+
+    // If we removed the last attachment, clean up the empty Attachments section
+    if removed && remaining_attachments_count == 0 {
+        result = remove_empty_attachments_section(&result, element_name);
+    }
+
+    Ok(result)
+}
+
+// Helper function to add element attachment (with display name) to element in markdown content
+fn add_element_attachment_to_element(content: &str, element_name: &str, display_name: &str, identifier: &str) -> Result<String, ReqvireError> {
+    let mut result = String::new();
+    let mut in_target_element = false;
+    let mut inserted = false;
+    let mut lines_iter = content.lines().peekable();
+
+    // Format: * [Display Name](#identifier) or * [Display Name](file.md#identifier)
+    let attachment_line = format!("* [{}]({})", display_name, identifier);
+
+    while let Some(line) = lines_iter.next() {
+        let trimmed = line.trim();
+
+        // Check if we're entering the target element
+        if trimmed.starts_with("### ") {
+            let name = trimmed.trim_start_matches("### ").trim();
+            in_target_element = name == element_name;
+        }
+
+        // Check for Attachments subsection
+        if in_target_element && trimmed == "#### Attachments" {
+            result.push_str(line);
+            result.push('\n');
+
+            // Add the new attachment after existing ones
+            while let Some(next_line) = lines_iter.peek() {
+                let next_trimmed = next_line.trim();
+                if next_trimmed.starts_with("* ") || next_trimmed.starts_with("- ") {
+                    result.push_str(lines_iter.next().unwrap());
+                    result.push('\n');
+                } else if next_trimmed.is_empty() {
+                    result.push_str(lines_iter.next().unwrap());
+                    result.push('\n');
+                } else {
+                    break;
+                }
+            }
+
+            // Add our new attachment
+            result.push_str(&attachment_line);
+            result.push('\n');
+            inserted = true;
+            continue;
+        }
+
+        // Check for separator (end of element) - insert Attachments section if not found
+        if in_target_element && !inserted && trimmed == "---" {
+            // Need to add Attachments section before the separator
+            result.push_str("\n#### Attachments\n");
+            result.push_str(&attachment_line);
+            result.push('\n');
+            inserted = true;
+        }
+
+        result.push_str(line);
+        result.push('\n');
+    }
+
+    if !inserted {
+        return Err(ReqvireError::ElementNotFound(
+            format!("Could not find element '{}' to add attachment", element_name)
+        ));
+    }
+
+    Ok(result)
+}
+
+// Helper function to remove element attachment from element in markdown content
+fn remove_element_attachment_from_element(content: &str, element_name: &str, display_name: &str, identifier: &str) -> Result<String, ReqvireError> {
+    let mut result = String::new();
+    let mut in_target_element = false;
+    let mut in_attachments_section = false;
+    let mut removed = false;
+    let mut remaining_attachments_count = 0;
+
+    // Match by either identifier or display name in the link
+    let attachment_link_by_id = format!("]({})", identifier);
+    let attachment_link_full = format!("[{}]({})", display_name, identifier);
+
+    for line in content.lines() {
+        let trimmed = line.trim();
+
+        // Check if we're entering a new element
+        if trimmed.starts_with("### ") {
+            let name = trimmed.trim_start_matches("### ").trim();
+            if name == element_name {
+                in_target_element = true;
+            } else if in_target_element {
+                in_target_element = false;
+            }
+            in_attachments_section = false;
+        }
+
+        // Check for Attachments subsection
+        if in_target_element && trimmed == "#### Attachments" {
+            in_attachments_section = true;
+        }
+
+        // Check for end of Attachments section
+        if in_attachments_section && ((trimmed.starts_with("####") && trimmed != "#### Attachments") || trimmed == "---") {
+            in_attachments_section = false;
+        }
+
+        // Skip the attachment line we want to remove
+        if in_target_element && in_attachments_section {
+            if (trimmed.starts_with("* ") || trimmed.starts_with("- ")) &&
+               (trimmed.contains(&attachment_link_by_id) || trimmed.contains(&attachment_link_full)) {
                 removed = true;
                 continue; // Skip this line
             }

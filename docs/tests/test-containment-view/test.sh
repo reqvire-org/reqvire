@@ -1,5 +1,5 @@
 #!/bin/bash
-set -euo pipefail
+set -uo pipefail
 
 # Test: Containment View Functionality
 # ----------------------------------------------------
@@ -342,7 +342,37 @@ if ! echo "$SHORT_OUTPUT" | grep -qi "root elements"; then
   exit 1
 fi
 
+# Save --short output for diff comparison
+echo "$SHORT_OUTPUT" > "$TEST_DIR/actual-containment-short.md"
+
+# Compare with expected --short output
+if ! diff -u "${TEST_SCRIPT_DIR}/expected/expected-containment-output.md" "$TEST_DIR/actual-containment-short.md"; then
+  echo "❌ FAILED: Containment --short output does not match expected"
+  echo ""
+  echo "If changes are intentional, update ${TEST_SCRIPT_DIR}/expected/expected-containment-output.md"
+  exit 1
+fi
+
 echo "✓ --short flag works correctly (shows $SHORT_NODE_COUNT root elements vs $NODE_COUNT total)"
+
+# ==================================
+# Test 8.6: Design Documents in Containment View (diff comparison)
+# ==================================
+echo ""
+echo "Test 8.6: Design documents in containment view..."
+
+# Save extracted mermaid diagram for comparison
+echo "$MERMAID_DIAGRAM" > "$TEST_DIR/actual-containment-diagram.mmd"
+
+# Compare with expected diagram
+if ! diff -u "${TEST_SCRIPT_DIR}/expected/expected-containment-diagram.mmd" "$TEST_DIR/actual-containment-diagram.mmd"; then
+  echo "❌ FAILED: Containment diagram does not match expected output"
+  echo ""
+  echo "If changes are intentional, update ${TEST_SCRIPT_DIR}/expected/expected-containment-diagram.mmd"
+  exit 1
+fi
+
+echo "✓ Design documents are included in containment view"
 
 # ==================================
 # Test 9: HTML Export Integration (Optional)

@@ -1,5 +1,7 @@
 #!/bin/bash
-set -euo pipefail
+set -uo pipefail
+
+TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Create log file immediately to ensure it exists for runner
 echo "Starting test..." > "${TEST_DIR}/test_results.log"
@@ -44,7 +46,6 @@ printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results_default.log"
 if [ $EXIT_CODE -ne 0 ]; then
     echo "❌ FAILED: Change impact detection with default commit failed with exit code $EXIT_CODE"
     echo "$OUTPUT"
-    rm -rf "${TEST_DIR}"
     exit 1
 fi
 
@@ -52,45 +53,19 @@ fi
 # Test 0b: Check that at least one blob URL is present in raw output
 if ! echo "$OUTPUT" | grep -qE 'https://[^ )]+/blob/[a-f0-9]{7,40}/'; then
     echo "❌ FAILED: Expected at least one blob URL (GitHub-style) in the report, but none was found."
-    rm -rf "${TEST_DIR}"
     exit 1
 fi
 # Extract only the important parts (excluding timestamp and path-specific lines)
 GOTTEN_CONTENT=$(echo "$OUTPUT" | grep -v "INFO  reqvire::config" | grep -v "Warning: Element")
 SANITIZED_OUTPUT=$(echo "$GOTTEN_CONTENT" | sed -E 's#https://[^ )]+/blob/[a-f0-9]{7,40}/##g')
 
-# The expected content with blank lines matching actual output
+# Test 1: Verify that change impact report shows correct relationships between elements
 # Note: "Power Saving" is filtered out from standalone changed elements by enhanced smart filtering
 # since it appears in the change impact tree of "Power Saving Mode" with ⚠️ symbol
-EXPECTED_CONTENT='## Change Impact Report
-
-### Changed Elements
-
-* [Power Saving Mode](Requirements.md#power-saving-mode)
-    * verifiedBy -> [Power Saving](Requirements.md#power-saving) ⚠️
-    * satisfiedBy -> [software/power_control.txt](software/power_control.txt)
-    * derive -> [CPU Power Reduction](Requirements.md#cpu-power-reduction)
-      * verifiedBy -> [CPU Throttling](Requirements.md#cpu-throttling)
-      * satisfiedBy -> [software/cpu_manager.txt](software/cpu_manager.txt)
-    * derive -> [Screen Brightness Adjustment](Requirements.md#screen-brightness-adjustment)
-      * verifiedBy -> [Screen Brightness](Requirements.md#screen-brightness)
-
-
-
----
-
-## Invalidated Verifications
-
-- [ ] [CPU Throttling](Requirements.md#cpu-throttling)
-- [ ] [Power Saving](Requirements.md#power-saving)
-- [ ] [Screen Brightness](Requirements.md#screen-brightness)'
-
-
-# Test 1: Verify that change impact report shows correct relationships between elements
-if ! diff <(echo "$EXPECTED_CONTENT") <(echo "$SANITIZED_OUTPUT") > /dev/null; then
+if ! diff -u "${TEST_SCRIPT_DIR}/expected/change-impact-report.txt" <(echo "$SANITIZED_OUTPUT"); then
   echo "❌ FAILED: Extracted content not matching expected content."
-  diff -u <(echo "$EXPECTED_CONTENT") <(echo "$SANITIZED_OUTPUT")
-  rm -rf "${TEST_DIR}"
+  echo ""
+  echo "If changes are intentional, update ${TEST_SCRIPT_DIR}/expected/change-impact-report.txt"
   exit 1
 fi
 
@@ -112,7 +87,6 @@ printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results_explicit.log"
 if [ $EXIT_CODE -ne 0 ]; then
     echo "❌ FAILED: Change impact detection with explicit commit failed with exit code $EXIT_CODE"
     echo "$OUTPUT"
-    rm -rf "${TEST_DIR}"
     exit 1
 fi
 
@@ -133,7 +107,6 @@ printf "%s\n" "$OUTPUT" > "${TEST_DIR}/test_results_json.log"
 if [ $EXIT_CODE -ne 0 ]; then
     echo "❌ FAILED: Change impact detection with JSON output failed with exit code $EXIT_CODE"
     echo "$OUTPUT"
-    rm -rf "${TEST_DIR}"
     exit 1
 fi
 
@@ -144,14 +117,7 @@ printf "%s\n" "$JSON_OUTPUT" > "${TEST_DIR}/test_results_json_clean.log"
 # Verify JSON format by testing with jq
 if ! echo "$JSON_OUTPUT" | jq . >/dev/null 2>&1; then
     echo "❌ FAILED: Output is not valid JSON"
-    rm -rf "${TEST_DIR}"
     exit 1
 fi
 
-
-# For now, let's comment out Test 4 until we understand the issue better
-# The main tests (1-3) are passing and verify the core functionality
-
-# Clean up temporary directory
-rm -rf "${TEST_DIR}"
 exit 0

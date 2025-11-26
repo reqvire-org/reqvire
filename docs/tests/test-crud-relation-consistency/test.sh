@@ -1,5 +1,5 @@
 #!/bin/bash
-set -euo pipefail
+set -uo pipefail
 
 # Test: Relation Consistency Maintenance
 # ----------------------------------------------------
@@ -32,7 +32,7 @@ OVERALL_RESULT=0
 mkdir -p "${TEST_DIR}/specifications/Verifications"
 
 cat > "${TEST_DIR}/specifications/Requirements.md" << 'EOF'
-# Requirements
+# Elements
 
 
 ### Root Requirement
@@ -66,7 +66,7 @@ This requirement is also derived from root.
 EOF
 
 cat > "${TEST_DIR}/specifications/Verifications/Tests.md" << 'EOF'
-# Requirements
+# Elements
 
 
 ### Test 1
@@ -108,7 +108,7 @@ This is a new derived requirement.
 '
 
 set +e
-OUTPUT=$(cd "$TEST_DIR" && echo "$NEW_ELEMENT" | "$REQVIRE_BIN" add specifications/Requirements.md "System Requirements" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && echo "$NEW_ELEMENT" | "$REQVIRE_BIN" add specifications/Requirements.md 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -199,12 +199,12 @@ echo "Test 3: Move element with incoming relations..." >> "${TEST_DIR}/test_resu
 
 # Create target file
 cat > "${TEST_DIR}/specifications/OtherRequirements.md" << 'EOF'
-# Requirements
+# Elements
 
 EOF
 
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv "Derived Requirement 2" "specifications/OtherRequirements.md" "Other Section" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv "Derived Requirement 2" "specifications/OtherRequirements.md" 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -273,12 +273,12 @@ echo "Test 4: Move verification element and check verifiedBy relation updates...
 
 # Create target file for verification
 cat > "${TEST_DIR}/specifications/SystemTests.md" << 'EOF'
-# Requirements
+# Elements
 
 EOF
 
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv "Test 2" "specifications/SystemTests.md" "Integration Tests" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv "Test 2" "specifications/SystemTests.md" 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -413,7 +413,7 @@ SUMMARY_EXIT=$?
 set -e
 
 # Compare with expected output
-if ! diff -u "${TEST_SCRIPT_DIR}/expected-summary.json" <(echo "$SUMMARY_OUTPUT"); then
+if ! diff -u "${TEST_SCRIPT_DIR}/expected/expected-summary.json" <(echo "$SUMMARY_OUTPUT"); then
   echo "❌ FAILED: Summary output does not match expected"
   echo ""
   echo "Differences shown above (expected vs actual)"

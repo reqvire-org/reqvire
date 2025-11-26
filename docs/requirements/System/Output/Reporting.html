@@ -1,0 +1,1374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporting</title>
+    <link rel="icon" type="image/x-icon" href="../../../assets/favicon.ico">
+    <link rel="apple-touch-icon" href="../../../assets/apple-touch-icon.png">
+    
+<style>
+:root {
+    /* Primary Colors */
+    --color-primary: #3F51B5;           /* Indigo - core branding */
+    --color-primary-hover: #7986CB;     /* Much lighter Indigo for hover - more visible */
+    --color-primary-active: #303F9F;    /* Darker Indigo for active */
+
+    /* Element Type Colors */
+    --color-requirement: #673AB7;       /* Deep Purple - core requirements */
+    --color-verification: #4CAF50;      /* Emerald Green - validated/completed */
+    --color-other: #9E9E9E;             /* Cool Gray - other element types */
+
+    /* Status Colors */
+    --color-verified: #4CAF50;          /* Forest Green - verified/passing */
+    --color-pending: #FFB74D;           /* Amber - pending/warning */
+    --color-error: #F44336;             /* Red - error/failed */
+
+    /* Interactive Colors */
+    --color-highlight: #FFAB91;         /* Peach - hover highlight */
+    --color-link: #212121;              /* Black - link color */
+    --color-link-hover: #3F51B5;        /* Indigo (same as nav bar) - link hover */
+
+    /* Text Colors */
+    --color-text-primary: #212121;      /* Primary text */
+    --color-text-secondary: #424242;    /* Body text */
+    --color-text-muted: #757575;        /* De-emphasized text */
+    --color-background: #FAFAFA;        /* Off-white background */
+    --color-border: #EEEEEE;            /* Very light gray borders */
+}
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #FAFAFA;
+    color: var(--color-text-secondary);
+}
+.reqvire-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    background-color: var(--color-primary);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+}
+.reqvire-nav a {
+    color: #ffffff;
+    text-decoration: none;
+    padding: 10px 20px;
+    margin-right: 5px;
+    border-radius: 3px;
+    transition: background-color 0.2s, text-decoration 0.2s;
+}
+.reqvire-nav a.nav-logo {
+    display: flex;
+    align-items: center;
+    padding: 5px 15px 5px 0;
+}
+.reqvire-nav a.nav-logo img {
+    vertical-align: middle;
+}
+.reqvire-nav a:hover {
+    background-color: var(--color-primary-hover);
+    text-decoration: underline;
+    color: #ffffff;
+}
+.reqvire-nav a:active,
+.reqvire-nav a.active {
+    background-color: var(--color-primary-active);
+    text-decoration: underline;
+    color: #ffffff;
+}
+.reqvire-nav-spacer {
+    height: 50px;
+}
+.container {
+    max-width: 95%;
+    margin: 0 auto;
+    padding: 20px;
+}
+.content {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    border: 1px solid #E0E0E0;
+}
+h1 {
+    color: var(--color-text-primary);
+    border-bottom: 2px solid #EEEEEE;
+    padding-bottom: 10px;
+    margin-top: 0;
+}
+h2 {
+    color: var(--color-text-primary);
+    border-bottom: 1px solid #EEEEEE;
+    padding-bottom: 5px;
+}
+h3 {
+    color: var(--color-text-primary);
+    margin-top: 25px;
+}
+h4 {
+    color: var(--color-text-secondary);
+    font-weight: 600;
+}
+a {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: text-decoration 0.15s ease;
+}
+a:hover {
+    text-decoration: underline;
+}
+a:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 20px 0;
+}
+table, th, td {
+    border: 1px solid #EEEEEE;
+}
+th, td {
+    padding: 8px 12px;
+    text-align: left;
+}
+th {
+    background-color: #F5F5F5;
+    color: #212121;
+    font-weight: 600;
+}
+tr:hover td {
+    background-color: #FFF8E1;
+}
+code {
+    background: #f6f8fa;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 90%;
+}
+pre {
+    background: #f6f8fa;
+    border-radius: 3px;
+    padding: 16px;
+    overflow: auto;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+}
+blockquote {
+    margin: 0;
+    padding: 0 15px;
+    color: var(--color-text-muted);
+    border-left: 4px solid var(--color-primary);
+}
+.mermaid {
+    margin: 20px 0;
+    text-align: center;
+    height: calc(100vh - 150px);
+    width: 100%;
+    overflow: hidden;
+    position: relative; /* Required for absolutely-positioned navigation buttons */
+    border: 1px solid #EEEEEE;
+    border-radius: 3px;
+    background-color: #FAFAFA;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+.mermaid svg {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    position: relative;
+    z-index: 1;
+}
+.diagram-nav-buttons {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 999; /* higher than SVG (1) but lower than header nav (1000) */
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 5px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+.diagram-nav-row {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+}
+.diagram-nav-btn {
+    width: 32px;
+    height: 32px;
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.diagram-nav-btn:hover {
+    background-color: var(--color-primary-hover);
+}
+.diagram-nav-btn:active {
+    background-color: var(--color-primary-active);
+}
+</style>
+
+    <!-- Enhanced mermaid configuration for Reqvire diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.5.0/dist/svg-pan-zoom.min.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+        import elkLayouts from 'https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk/dist/mermaid-layout-elk.esm.min.mjs';
+
+        // Register ELK layout for large diagrams
+        mermaid.registerLayoutLoaders(elkLayouts);
+
+        // Capture Mermaid errors
+        mermaid.parseError = function(err, hash) {
+            console.error('Mermaid Parse Error:', err);
+            console.error('Error details:', {
+                str: err.str,
+                hash: err.hash,
+                message: err.message,
+                stack: err.stack
+            });
+        };
+
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'neutral',
+            maxTextSize: 5000000,
+            maxEdges: 50000,
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis',
+                defaultRenderer: 'elk'
+            },
+            layout: 'elk',
+            elk: {
+                mergeEdges: true,
+                nodePlacementStrategy: 'SIMPLE'
+            },
+            securityLevel: 'loose',
+            logLevel: 'error'
+        });
+
+        await mermaid.run();
+        window.mermaid = mermaid;
+
+        // Wait for SVGs to be fully rendered, then initialize
+        function waitForSvgs(callback) {
+            var containers = document.querySelectorAll('.mermaid');
+            var allReady = true;
+            containers.forEach(function(c) {
+                var svg = c.querySelector('svg');
+                // Check SVG exists, has getBBox, valid dimensions, and has actual content (nodes)
+                if (!svg || !svg.getBBox || svg.getBBox().width === 0 || !svg.querySelector('.node')) {
+                    allReady = false;
+                }
+            });
+            if (allReady && containers.length > 0) {
+                callback();
+            } else {
+                requestAnimationFrame(function() { waitForSvgs(callback); });
+            }
+        }
+
+        // Add pan/zoom to all Mermaid diagrams after rendering
+        waitForSvgs(function() {
+            var allMermaidContainers = document.querySelectorAll('.mermaid');
+
+            allMermaidContainers.forEach(function(mermaidContainer, index) {
+
+                var svg = mermaidContainer.querySelector('svg');
+                if (!svg) {
+                    return;
+                }
+
+                // Double-check SVG is ready
+                try {
+                    var bbox = svg.getBBox();
+                    if (bbox.width === 0 || bbox.height === 0) {
+                        return;
+                    }
+                } catch (e) {
+                    return;
+                }
+
+                svg.style.maxWidth = 'none';
+                svg.style.maxHeight = 'none';
+
+                var eventsHandler = {
+                    haltEventListeners: ['touchstart', 'touchend', 'touchmove', 'touchleave', 'touchcancel'],
+                        init: function(options) {
+                            var instance = options.instance;
+                            var initialScale = 1;
+                            var pannedX = 0;
+                            var pannedY = 0;
+
+                            this.hammer = Hammer(options.svgElement, {
+                                inputClass: Hammer.SUPPORT_POINTER_EVENTS ? Hammer.PointerEventInput : Hammer.TouchInput
+                            });
+
+                            this.hammer.get('pinch').set({enable: true});
+
+                            this.hammer.on('doubletap', function(ev){
+                                instance.zoomIn();
+                            });
+
+                            this.hammer.on('panstart panmove', function(ev){
+                                if (ev.type === 'panstart') {
+                                    pannedX = 0;
+                                    pannedY = 0;
+                                }
+                                instance.panBy({x: ev.deltaX - pannedX, y: ev.deltaY - pannedY});
+                                pannedX = ev.deltaX;
+                                pannedY = ev.deltaY;
+                            });
+
+                            this.hammer.on('pinchstart pinchmove', function(ev){
+                                if (ev.type === 'pinchstart') {
+                                    initialScale = instance.getZoom();
+                                }
+                                instance.zoomAtPoint(initialScale * ev.scale, {x: ev.center.x, y: ev.center.y});
+                            });
+
+                            options.svgElement.addEventListener('touchmove', function(e){ e.preventDefault(); });
+                        },
+                        destroy: function(){
+                            this.hammer.destroy();
+                        }
+                    };
+
+                    // Diagrams with default zoom (no auto-fit)
+                    var panZoomInstance;
+                    try {
+                        panZoomInstance = svgPanZoom(svg, {
+                            zoomEnabled: true,
+                            controlIconsEnabled: true,
+                            fit: false,
+                            center: false,
+                            contain: false,
+                            minZoom: 0.5,
+                            maxZoom: 10,
+                            zoomScaleSensitivity: 0.3,
+                            customEventsHandler: eventsHandler
+                        });
+                    } catch (e) {
+                        return; // Skip this diagram and continue with others
+                    }
+
+                    if (!panZoomInstance) {
+                        return;
+                    }
+
+                    // Add navigation buttons
+                    var navButtons = document.createElement('div');
+                    navButtons.className = 'diagram-nav-buttons';
+                    navButtons.innerHTML = `
+                        <div class="diagram-nav-row">
+                            <button class="diagram-nav-btn" data-action="up">▲</button>
+                        </div>
+                        <div class="diagram-nav-row">
+                            <button class="diagram-nav-btn" data-action="left">◀</button>
+                            <button class="diagram-nav-btn" data-action="down">▼</button>
+                            <button class="diagram-nav-btn" data-action="right">▶</button>
+                        </div>
+                    `;
+                    mermaidContainer.appendChild(navButtons);
+
+                    // Wire up navigation buttons
+                    var panStep = 100;
+                    navButtons.querySelectorAll('.diagram-nav-btn').forEach(function(btn) {
+                        btn.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            var action = this.getAttribute('data-action');
+                            switch(action) {
+                                case 'up':
+                                    panZoomInstance.panBy({x: 0, y: panStep});
+                                    break;
+                                case 'down':
+                                    panZoomInstance.panBy({x: 0, y: -panStep});
+                                    break;
+                                case 'left':
+                                    panZoomInstance.panBy({x: panStep, y: 0});
+                                    break;
+                                case 'right':
+                                    panZoomInstance.panBy({x: -panStep, y: 0});
+                                    break;
+                            }
+                        });
+                    });
+            });
+
+            // Add CSS for edge highlighting
+            var style = document.createElement('style');
+            style.textContent = `
+                path.edge-highlighted,
+                .edge-highlighted path,
+                svg path.edge-highlighted {
+                    stroke: #FFAB91 !important;
+                    stroke-width: 3px !important;
+                }
+            `;
+            document.head.appendChild(style);
+
+            // Initialize edge highlighting for all diagrams
+            document.querySelectorAll('.mermaid svg').forEach(function(svg) {
+                var nodes = svg.querySelectorAll('.node');
+
+                // Find flowchart-link paths (actual edges)
+                var edgePaths = svg.querySelectorAll('path.flowchart-link');
+                // Fallback: find paths in .edges group
+                if (edgePaths.length === 0) {
+                    var edgesGroup = svg.querySelector('.edges');
+                    if (edgesGroup) {
+                        edgePaths = edgesGroup.querySelectorAll('path');
+                    }
+                }
+
+                // Get SVG point for coordinate transforms
+                var svgPoint = svg.createSVGPoint();
+
+                // Helper: transform point through element's CTM
+                function getTransformedBBox(element) {
+                    var bbox = element.getBBox();
+                    var ctm = element.getCTM();
+                    if (!ctm) return bbox;
+
+                    // Transform all four corners
+                    var corners = [
+                        {x: bbox.x, y: bbox.y},
+                        {x: bbox.x + bbox.width, y: bbox.y},
+                        {x: bbox.x, y: bbox.y + bbox.height},
+                        {x: bbox.x + bbox.width, y: bbox.y + bbox.height}
+                    ];
+
+                    var transformed = corners.map(function(c) {
+                        svgPoint.x = c.x;
+                        svgPoint.y = c.y;
+                        var tp = svgPoint.matrixTransform(ctm);
+                        return {x: tp.x, y: tp.y};
+                    });
+
+                    var minX = Math.min.apply(null, transformed.map(function(p) { return p.x; }));
+                    var maxX = Math.max.apply(null, transformed.map(function(p) { return p.x; }));
+                    var minY = Math.min.apply(null, transformed.map(function(p) { return p.y; }));
+                    var maxY = Math.max.apply(null, transformed.map(function(p) { return p.y; }));
+
+                    return {x: minX, y: minY, width: maxX - minX, height: maxY - minY};
+                }
+
+                // Helper: get all points from path
+                function getPathPoints(path) {
+                    var d = path.getAttribute('d') || '';
+                    var points = [];
+                    var ctm = path.getCTM();
+
+                    // Get M (start) point
+                    var startMatch = d.match(/M\s*([\d.-]+)[,\s]+([\d.-]+)/i);
+                    if (startMatch) {
+                        var sx = parseFloat(startMatch[1]);
+                        var sy = parseFloat(startMatch[2]);
+                        if (ctm) {
+                            svgPoint.x = sx; svgPoint.y = sy;
+                            var tp = svgPoint.matrixTransform(ctm);
+                            points.push({x: tp.x, y: tp.y});
+                        } else {
+                            points.push({x: sx, y: sy});
+                        }
+                    }
+
+                    // Get last point - find last number pair before Z or end
+                    var allNums = d.match(/[\d.-]+/g);
+                    if (allNums && allNums.length >= 2) {
+                        var ex = parseFloat(allNums[allNums.length - 2]);
+                        var ey = parseFloat(allNums[allNums.length - 1]);
+                        if (ctm) {
+                            svgPoint.x = ex; svgPoint.y = ey;
+                            var tp = svgPoint.matrixTransform(ctm);
+                            points.push({x: tp.x, y: tp.y});
+                        } else {
+                            points.push({x: ex, y: ey});
+                        }
+                    }
+
+                    return points;
+                }
+
+                // Build node bounding boxes with transforms
+                var nodeData = {};
+                nodes.forEach(function(node) {
+                    var nodeId = node.id || '';
+                    var parts = nodeId.split('-');
+                    var hashId = parts.length >= 2 ? parts[1] : nodeId;
+
+                    nodeData[hashId] = {
+                        node: node,
+                        bbox: getTransformedBBox(node)
+                    };
+                });
+
+                // Check if point is near bbox
+                function isNearBbox(pt, bbox, margin) {
+                    margin = margin || 40;
+                    return pt.x >= bbox.x - margin && pt.x <= bbox.x + bbox.width + margin &&
+                           pt.y >= bbox.y - margin && pt.y <= bbox.y + bbox.height + margin;
+                }
+
+                // Calculate distance from point to bbox center
+                function distToBboxCenter(pt, bbox) {
+                    var centerX = bbox.x + bbox.width / 2;
+                    var centerY = bbox.y + bbox.height / 2;
+                    return Math.sqrt(Math.pow(pt.x - centerX, 2) + Math.pow(pt.y - centerY, 2));
+                }
+
+                // Build edge connections with direction tracking
+                var edgeConnections = []; // [{path, source, target}]
+                var upstreamOf = {}; // node -> [parent nodes that point TO this node]
+                var downstreamOf = {}; // node -> [child nodes this node points TO]
+
+                Object.keys(nodeData).forEach(function(hashId) {
+                    upstreamOf[hashId] = [];
+                    downstreamOf[hashId] = [];
+                });
+
+                edgePaths.forEach(function(path) {
+                    var points = getPathPoints(path);
+                    if (points.length < 2) return;
+
+                    var startPt = points[0];
+                    var endPt = points[points.length - 1];
+
+                    var sourceNode = null;
+                    var targetNode = null;
+                    var sourceMinDist = Infinity;
+                    var targetMinDist = Infinity;
+
+                    // Find closest source and target nodes for this edge
+                    Object.keys(nodeData).forEach(function(hashId) {
+                        var bbox = nodeData[hashId].bbox;
+                        // Find closest node to start point (source)
+                        if (isNearBbox(startPt, bbox, 30)) {
+                            var dist = distToBboxCenter(startPt, bbox);
+                            if (dist < sourceMinDist) {
+                                sourceMinDist = dist;
+                                sourceNode = hashId;
+                            }
+                        }
+                        // Find closest node to end point (target)
+                        if (isNearBbox(endPt, bbox, 30)) {
+                            var dist = distToBboxCenter(endPt, bbox);
+                            if (dist < targetMinDist) {
+                                targetMinDist = dist;
+                                targetNode = hashId;
+                            }
+                        }
+                    });
+
+                    if (sourceNode && targetNode && sourceNode !== targetNode) {
+                        edgeConnections.push({path: path, source: sourceNode, target: targetNode});
+                        // source -> target means: target's upstream includes source
+                        if (!upstreamOf[targetNode].includes(sourceNode)) {
+                            upstreamOf[targetNode].push(sourceNode);
+                        }
+                        // source -> target means: source's downstream includes target
+                        if (!downstreamOf[sourceNode].includes(targetNode)) {
+                            downstreamOf[sourceNode].push(targetNode);
+                        }
+                    }
+                });
+
+                // Traverse only upstream (to parents/ancestors)
+                function findUpstream(startNodeId) {
+                    var visited = {};
+                    var queue = [startNodeId];
+                    visited[startNodeId] = true;
+
+                    while (queue.length > 0) {
+                        var current = queue.shift();
+                        var parents = upstreamOf[current] || [];
+                        parents.forEach(function(parent) {
+                            if (!visited[parent]) {
+                                visited[parent] = true;
+                                queue.push(parent);
+                            }
+                        });
+                    }
+                    return visited;
+                }
+
+                // Traverse only downstream (to children/descendants)
+                function findDownstream(startNodeId) {
+                    var visited = {};
+                    var queue = [startNodeId];
+                    visited[startNodeId] = true;
+
+                    while (queue.length > 0) {
+                        var current = queue.shift();
+                        var children = downstreamOf[current] || [];
+                        children.forEach(function(child) {
+                            if (!visited[child]) {
+                                visited[child] = true;
+                                queue.push(child);
+                            }
+                        });
+                    }
+                    return visited;
+                }
+
+                // Get edges for connected nodes
+                function getChainEdges(nodeSet) {
+                    var edges = [];
+                    edgeConnections.forEach(function(conn) {
+                        if (nodeSet[conn.source] && nodeSet[conn.target]) {
+                            edges.push(conn.path);
+                        }
+                    });
+                    return edges;
+                }
+
+                // Attach hover handlers
+                nodes.forEach(function(node) {
+                    var nodeId = node.id || '';
+                    var parts = nodeId.split('-');
+                    var hashId = parts.length >= 2 ? parts[1] : nodeId;
+
+                    node.style.cursor = 'pointer';
+
+                    node.addEventListener('mouseenter', function(e) {
+                        e.stopPropagation();
+                        nodes.forEach(function(n) { n.style.filter = ''; });
+                        node.style.filter = 'drop-shadow(0 0 8px rgba(255, 171, 145, 0.7))';
+
+                        // Find upstream (ancestors) and downstream (descendants) separately
+                        var upstream = findUpstream(hashId);
+                        var downstream = findDownstream(hashId);
+                        // Merge both sets
+                        var allConnected = {};
+                        Object.keys(upstream).forEach(function(k) { allConnected[k] = true; });
+                        Object.keys(downstream).forEach(function(k) { allConnected[k] = true; });
+
+                        var chainEdges = getChainEdges(allConnected);
+                        chainEdges.forEach(function(path) {
+                            path.classList.add('edge-highlighted');
+                        });
+                    });
+
+                    node.addEventListener('mouseleave', function() {
+                        node.style.filter = '';
+                        // Remove highlight from all edges
+                        edgePaths.forEach(function(path) {
+                            path.classList.remove('edge-highlighted');
+                        });
+                    });
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <nav class="reqvire-nav">
+        <a href="../../../index.html" class="nav-logo"><img src="../../../assets/logo.png" alt="Reqvire" height="24"></a>
+        <a href="../../../index.html">Containment</a>
+        <a href="../../../model.html">Model</a>
+        <a href="../../../traces.html">Traces</a>
+        <a href="../../../coverage.html">Coverage</a>
+    </nav>
+    <div class="reqvire-nav-spacer"></div>
+    <div class="container">
+        <div class="content">
+            <h1 id="elements">Elements</h1>
+<div class="mermaid">graph TD;
+  %% REQVIRE-AUTOGENERATED-DIAGRAM
+  %% Graph styling
+  classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;
+  classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
+  classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
+  classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:3px;
+  classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
+  classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
+
+  subgraph 1c3bc86f926627ab[&quot;📁 requirements/Interfaces&quot;]
+    subgraph 315f1b2b98bf7d1b[&quot;📄 CLI.md&quot;]
+      d14547a0f9bdbe39[&quot;CLI Containment Command<br/>📎 requirements/System/Output/DesignDocuments/OutputFormats.md#json-output-structure<br/>📎 requirements/System/Output/DesignDocuments/OutputFormats.md#short-mode-behavior&quot;];
+      class d14547a0f9bdbe39 systemRequirement;
+      click d14547a0f9bdbe39 &quot;../../Interfaces/CLI.html#cli-containment-command&quot;;
+      ea0b85acf2bdcccc[&quot;CLI Coverage Command<br/>📎 requirements/System/Output/DesignDocuments/OutputFormats.md#json-output-structure<br/>📎 requirements/System/Output/DesignDocuments/OutputFormats.md#text-output-formatting&quot;];
+      class ea0b85acf2bdcccc systemRequirement;
+      click ea0b85acf2bdcccc &quot;../../Interfaces/CLI.html#cli-coverage-command&quot;;
+      da4e8889496fb531[&quot;CLI Search Command<br/>📎 requirements/System/Output/DesignDocuments/OutputFormats.md#json-output-structure<br/>📎 requirements/System/Output/DesignDocuments/OutputFormats.md#short-mode-behavior<br/>📎 requirements/System/Output/DesignDocuments/OutputFormats.md#text-output-formatting&quot;];
+      class da4e8889496fb531 systemRequirement;
+      click da4e8889496fb531 &quot;../../Interfaces/CLI.html#cli-search-command&quot;;
+      a867b4bb3e22cabf[&quot;Validate Command&quot;];
+      class a867b4bb3e22cabf systemRequirement;
+      click a867b4bb3e22cabf &quot;../../Interfaces/CLI.html#validate-command&quot;;
+    end
+    subgraph ca2dd19eaaf80aea[&quot;📄 WebInterface.md&quot;]
+      7cee348e5d230f20[&quot;HTML Export&quot;];
+      class 7cee348e5d230f20 systemRequirement;
+      click 7cee348e5d230f20 &quot;../../Interfaces/WebInterface.html#html-export&quot;;
+    end
+  end
+  subgraph d262bfbbaa5049a3[&quot;📁 requirements/System/Core&quot;]
+    subgraph a0a42393a244d64c[&quot;📄 Validation.md&quot;]
+      ba9ff62b2514c184[&quot;Integrated Validation&quot;];
+      class ba9ff62b2514c184 systemRequirement;
+      click ba9ff62b2514c184 &quot;../Core/Validation.html#integrated-validation&quot;;
+      af52a97918701e2b[&quot;Validation Error Handling&quot;];
+      class af52a97918701e2b systemRequirement;
+      click af52a97918701e2b &quot;../Core/Validation.html#validation-error-handling&quot;;
+    end
+  end
+  subgraph 59af30609eb6d57c[&quot;📁 requirements/System/Output&quot;]
+    subgraph c2b8a949c0da1f4[&quot;📄 DiagramGeneration.md&quot;]
+      8a76dfb4467e9e4e[&quot;Complete Model Structure Visualization&quot;];
+      class 8a76dfb4467e9e4e userRequirement;
+      click 8a76dfb4467e9e4e &quot;DiagramGeneration.html#complete-model-structure-visualization&quot;;
+      618f2e2c98afc9d6[&quot;Interactive Mermaid Diagrams&quot;];
+      class 618f2e2c98afc9d6 userRequirement;
+      click 618f2e2c98afc9d6 &quot;DiagramGeneration.html#interactive-mermaid-diagrams&quot;;
+      db3a76dd2787dd8d[&quot;Model Visualization and Exploration&quot;];
+      class db3a76dd2787dd8d userRequirement;
+      click db3a76dd2787dd8d &quot;DiagramGeneration.html#model-visualization-and-exploration&quot;;
+    end
+    subgraph 2216865f3e1298a7[&quot;📄 Reporting.md&quot;]
+      87fac08bbe3877e4[&quot;Containment View Design Documents&quot;];
+      class 87fac08bbe3877e4 systemRequirement;
+      click 87fac08bbe3877e4 &quot;Reporting.html#containment-view-design-documents&quot;;
+      317bfda53b1da283[&quot;Containment View Report&quot;];
+      class 317bfda53b1da283 userRequirement;
+      click 317bfda53b1da283 &quot;Reporting.html#containment-view-report&quot;;
+      b6400666dd617e85[&quot;Containment View Report Generation<br/>📎 ContainmentView.md&quot;];
+      class b6400666dd617e85 systemRequirement;
+      click b6400666dd617e85 &quot;Reporting.html#containment-view-report-generation&quot;;
+      787db9e95fce2764[&quot;Custom Element Type Tracking&quot;];
+      class 787db9e95fce2764 systemRequirement;
+      click 787db9e95fce2764 &quot;Reporting.html#custom-element-type-tracking&quot;;
+      3f684ef56a18a7e2[&quot;Forward-Only Relation Traversal&quot;];
+      class 3f684ef56a18a7e2 systemRequirement;
+      click 3f684ef56a18a7e2 &quot;Reporting.html#forward-only-relation-traversal&quot;;
+      cba7b63318ec7059[&quot;Model Diagram Output Formats&quot;];
+      class cba7b63318ec7059 systemRequirement;
+      click cba7b63318ec7059 &quot;Reporting.html#model-diagram-output-formats&quot;;
+      9b4f54c948e407db[&quot;Model Reports&quot;];
+      class 9b4f54c948e407db userRequirement;
+      click 9b4f54c948e407db &quot;Reporting.html#model-reports&quot;;
+      ce4383b831c54c07[&quot;Model Structure and Summaries&quot;];
+      class ce4383b831c54c07 userRequirement;
+      click ce4383b831c54c07 &quot;Reporting.html#model-structure-and-summaries&quot;;
+      518a35513910679a[&quot;Provide Validation Reports&quot;];
+      class 518a35513910679a userRequirement;
+      click 518a35513910679a &quot;Reporting.html#provide-validation-reports&quot;;
+      6edb21881e82dbf7[&quot;Search Fine Grained Filtering<br/>📎 SearchFiltering.md&quot;];
+      class 6edb21881e82dbf7 systemRequirement;
+      click 6edb21881e82dbf7 &quot;Reporting.html#search-fine-grained-filtering&quot;;
+      a4cab2effeab3574[&quot;Search Report Generator&quot;];
+      class a4cab2effeab3574 systemRequirement;
+      click a4cab2effeab3574 &quot;Reporting.html#search-report-generator&quot;;
+      50803e518e37d570[&quot;Tracing Structural Changes&quot;];
+      class 50803e518e37d570 userRequirement;
+      click 50803e518e37d570 &quot;Reporting.html#tracing-structural-changes&quot;;
+      421d9d50c6e84b40[&quot;Validation Report Generator&quot;];
+      class 421d9d50c6e84b40 systemRequirement;
+      click 421d9d50c6e84b40 &quot;Reporting.html#validation-report-generator&quot;;
+      157f2dbe8bac3cda[&quot;Verification Coverage Report&quot;];
+      class 157f2dbe8bac3cda userRequirement;
+      click 157f2dbe8bac3cda &quot;Reporting.html#verification-coverage-report&quot;;
+      dd40ce6df0f66132[&quot;Verification Coverage Report Generator&quot;];
+      class dd40ce6df0f66132 systemRequirement;
+      click dd40ce6df0f66132 &quot;Reporting.html#verification-coverage-report-generator&quot;;
+      32b392250c503b21[&quot;Verification Upward Traceability&quot;];
+      class 32b392250c503b21 userRequirement;
+      click 32b392250c503b21 &quot;Reporting.html#verification-upward-traceability&quot;;
+    end
+  end
+  subgraph fc8e08aa8f256556[&quot;📁 requirements/System/Output/Verifications&quot;]
+    subgraph fc906291b68b7869[&quot;📄 ReportingVerifications.md&quot;]
+      2ebc9ea8d0d6be5d[&quot;Containment Hierarchy Extraction Test&quot;];
+      class 2ebc9ea8d0d6be5d verification;
+      click 2ebc9ea8d0d6be5d &quot;Verifications/ReportingVerifications.html#containment-hierarchy-extraction-test&quot;;
+      d14f1bb1aea9a591[&quot;Containment View Design Documents Test&quot;];
+      class d14f1bb1aea9a591 verification;
+      click d14f1bb1aea9a591 &quot;Verifications/ReportingVerifications.html#containment-view-design-documents-test&quot;;
+      5dcedd9a446886d8[&quot;Containment View JSON Output Test&quot;];
+      class 5dcedd9a446886d8 verification;
+      click 5dcedd9a446886d8 &quot;Verifications/ReportingVerifications.html#containment-view-json-output-test&quot;;
+      57d8470cceeac21c[&quot;Containment View Mermaid Diagram Test&quot;];
+      class 57d8470cceeac21c verification;
+      click 57d8470cceeac21c &quot;Verifications/ReportingVerifications.html#containment-view-mermaid-diagram-test&quot;;
+      df7462e4272aef63[&quot;Containment View Text Output Test&quot;];
+      class df7462e4272aef63 verification;
+      click df7462e4272aef63 &quot;Verifications/ReportingVerifications.html#containment-view-text-output-test&quot;;
+      3461ab08d0f1dcea[&quot;Custom Element Type Tracking Test&quot;];
+      class 3461ab08d0f1dcea verification;
+      click 3461ab08d0f1dcea &quot;Verifications/ReportingVerifications.html#custom-element-type-tracking-test&quot;;
+      9d5883030e54208c[&quot;HTML Export Containment View Integration Test&quot;];
+      class 9d5883030e54208c verification;
+      click 9d5883030e54208c &quot;Verifications/ReportingVerifications.html#html-export-containment-view-integration-test&quot;;
+      d1d570121d0a16e0[&quot;Model Command Verification&quot;];
+      class d1d570121d0a16e0 verification;
+      click d1d570121d0a16e0 &quot;Verifications/ReportingVerifications.html#model-command-verification&quot;;
+      ef40ca1630031a4d[&quot;Search Command Tests&quot;];
+      class ef40ca1630031a4d verification;
+      click ef40ca1630031a4d &quot;Verifications/ReportingVerifications.html#search-command-tests&quot;;
+    end
+  end
+  subgraph 63d7cba3f920744c[&quot;📁 requirements/System/Processing&quot;]
+    subgraph 263fc0b0a2043fc1[&quot;📄 ChangeImpact.md&quot;]
+      87b7ea665c0ec9c2[&quot;Change Impact Detection&quot;];
+      class 87b7ea665c0ec9c2 systemRequirement;
+      click 87b7ea665c0ec9c2 &quot;../Processing/ChangeImpact.html#change-impact-detection&quot;;
+    end
+    subgraph c809e90dbf14fff7[&quot;📄 VerificationTraces.md&quot;]
+      3e62787c176807f6[&quot;Verification Roll-up Strategy&quot;];
+      class 3e62787c176807f6 systemRequirement;
+      click 3e62787c176807f6 &quot;../Processing/VerificationTraces.html#verification-roll-up-strategy&quot;;
+      61e7a56e6d8e29d[&quot;Verification Trace Builder<br/>📎 requirements/System/Processing/DesignDocuments/VerificationTraceAlgorithm.md#verification-trace-tree-construction&quot;];
+      class 61e7a56e6d8e29d systemRequirement;
+      click 61e7a56e6d8e29d &quot;../Processing/VerificationTraces.html#verification-trace-builder&quot;;
+    end
+  end
+  subgraph f876b12d880d294c[&quot;📁 requirements/System/Processing/Verifications&quot;]
+    subgraph 427027b536446d98[&quot;📄 ChangeImpactVerifications.md&quot;]
+      74ab201081f0f730[&quot;Structural Change Reports Verification&quot;];
+      class 74ab201081f0f730 verification;
+      click 74ab201081f0f730 &quot;../Processing/Verifications/ChangeImpactVerifications.html#structural-change-reports-verification&quot;;
+    end
+  end
+  2ab7d933a525a383[&quot;containment.rs&quot;];
+  class 2ab7d933a525a383 default;
+  click 2ab7d933a525a383 &quot;../../../core/src/containment.rs&quot;;
+  87fac08bbe3877e4 -->|satisfiedBy| 2ab7d933a525a383;
+  87fac08bbe3877e4 -.->|verifiedBy| d14f1bb1aea9a591;
+  317bfda53b1da283 -.->|deriveReqT| b6400666dd617e85;
+  b6400666dd617e85 -.->|deriveReqT| d14547a0f9bdbe39;
+  b6400666dd617e85 -.->|deriveReqT| 87fac08bbe3877e4;
+  b6400666dd617e85 -.->|verifiedBy| 2ebc9ea8d0d6be5d;
+  b6400666dd617e85 -.->|verifiedBy| 5dcedd9a446886d8;
+  b6400666dd617e85 -.->|verifiedBy| 57d8470cceeac21c;
+  b6400666dd617e85 -.->|verifiedBy| df7462e4272aef63;
+  b6400666dd617e85 -.->|verifiedBy| 9d5883030e54208c;
+  46f5ca73b0822d14[&quot;search.rs&quot;];
+  class 46f5ca73b0822d14 default;
+  click 46f5ca73b0822d14 &quot;../../../core/src/search.rs&quot;;
+  787db9e95fce2764 -->|satisfiedBy| 46f5ca73b0822d14;
+  787db9e95fce2764 -.->|verifiedBy| 3461ab08d0f1dcea;
+  dad7eeb932afdb92[&quot;diagrams.rs&quot;];
+  class dad7eeb932afdb92 default;
+  click dad7eeb932afdb92 &quot;../../../core/src/diagrams.rs&quot;;
+  3f684ef56a18a7e2 -->|satisfiedBy| dad7eeb932afdb92;
+  3f684ef56a18a7e2 -.->|verifiedBy| d1d570121d0a16e0;
+  cba7b63318ec7059 -->|satisfiedBy| dad7eeb932afdb92;
+  cba7b63318ec7059 -.->|verifiedBy| d1d570121d0a16e0;
+  9b4f54c948e407db -.->|deriveReqT| 7cee348e5d230f20;
+  9b4f54c948e407db -.->|deriveReqT| 8a76dfb4467e9e4e;
+  9b4f54c948e407db -.->|deriveReqT| 618f2e2c98afc9d6;
+  9b4f54c948e407db -.->|deriveReqT| db3a76dd2787dd8d;
+  9b4f54c948e407db -.->|deriveReqT| ce4383b831c54c07;
+  9b4f54c948e407db -.->|deriveReqT| 518a35513910679a;
+  9b4f54c948e407db -.->|deriveReqT| 157f2dbe8bac3cda;
+  ce4383b831c54c07 -.->|deriveReqT| 317bfda53b1da283;
+  ce4383b831c54c07 -.->|deriveReqT| a4cab2effeab3574;
+  518a35513910679a -.->|deriveReqT| a867b4bb3e22cabf;
+  518a35513910679a -.->|deriveReqT| ba9ff62b2514c184;
+  518a35513910679a -.->|deriveReqT| 421d9d50c6e84b40;
+  6edb21881e82dbf7 -.->|deriveReqT| da4e8889496fb531;
+  80defdd4cbc7ee18[&quot;cli.rs&quot;];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 &quot;../../../cli/src/cli.rs&quot;;
+  6edb21881e82dbf7 -->|satisfiedBy| 80defdd4cbc7ee18;
+  1c9b1c7c49701993[&quot;filters.rs&quot;];
+  class 1c9b1c7c49701993 default;
+  click 1c9b1c7c49701993 &quot;../../../core/src/filters.rs&quot;;
+  6edb21881e82dbf7 -->|satisfiedBy| 1c9b1c7c49701993;
+  6edb21881e82dbf7 -->|satisfiedBy| 46f5ca73b0822d14;
+  6edb21881e82dbf7 -.->|verifiedBy| ef40ca1630031a4d;
+  a4cab2effeab3574 -.->|deriveReqT| 787db9e95fce2764;
+  a4cab2effeab3574 -.->|deriveReqT| 6edb21881e82dbf7;
+  a4cab2effeab3574 -.->|deriveReqT| dd40ce6df0f66132;
+  a4cab2effeab3574 -->|satisfiedBy| 46f5ca73b0822d14;
+  50803e518e37d570 -.->|deriveReqT| 87b7ea665c0ec9c2;
+  50803e518e37d570 -.->|verifiedBy| 74ab201081f0f730;
+  421d9d50c6e84b40 -.->|deriveReqT| af52a97918701e2b;
+  d50a859650933e55[&quot;model.rs&quot;];
+  class d50a859650933e55 default;
+  click d50a859650933e55 &quot;../../../core/src/model.rs&quot;;
+  421d9d50c6e84b40 -->|satisfiedBy| d50a859650933e55;
+  157f2dbe8bac3cda -.->|deriveReqT| dd40ce6df0f66132;
+  157f2dbe8bac3cda -.->|deriveReqT| 32b392250c503b21;
+  dd40ce6df0f66132 -.->|deriveReqT| ea0b85acf2bdcccc;
+  1261cbc7612c8952[&quot;report_coverage.rs&quot;];
+  class 1261cbc7612c8952 default;
+  click 1261cbc7612c8952 &quot;../../../core/src/report_coverage.rs&quot;;
+  dd40ce6df0f66132 -->|satisfiedBy| 1261cbc7612c8952;
+  32b392250c503b21 -.->|deriveReqT| 3e62787c176807f6;
+  32b392250c503b21 -.->|deriveReqT| 61e7a56e6d8e29d;
+  a9afd714aa1408bb[&quot;test.sh&quot;];
+  class a9afd714aa1408bb default;
+  click a9afd714aa1408bb &quot;../../../tests/test-containment-view/test.sh&quot;;
+  d14f1bb1aea9a591 -->|satisfiedBy| a9afd714aa1408bb;
+  2ebc9ea8d0d6be5d -->|satisfiedBy| a9afd714aa1408bb;
+  d14547a0f9bdbe39 -->|satisfiedBy| 80defdd4cbc7ee18;
+  d14547a0f9bdbe39 -->|satisfiedBy| 2ab7d933a525a383;
+  d14547a0f9bdbe39 -->|satisfiedBy| dad7eeb932afdb92;
+  df7462e4272aef63 -->|satisfiedBy| a9afd714aa1408bb;
+  5dcedd9a446886d8 -->|satisfiedBy| a9afd714aa1408bb;
+  9d5883030e54208c -->|satisfiedBy| a9afd714aa1408bb;
+  57d8470cceeac21c -->|satisfiedBy| a9afd714aa1408bb;
+  e8358fc93fee95fb[&quot;test.sh&quot;];
+  class e8358fc93fee95fb default;
+  click e8358fc93fee95fb &quot;../../../tests/test-search-all-features/test.sh&quot;;
+  3461ab08d0f1dcea -->|satisfiedBy| e8358fc93fee95fb;
+  e3433ff5bc275516[&quot;test.sh&quot;];
+  class e3433ff5bc275516 default;
+  click e3433ff5bc275516 &quot;../../../tests/test-model-command/test.sh&quot;;
+  d1d570121d0a16e0 -->|satisfiedBy| e3433ff5bc275516;
+  7cee348e5d230f20 -.->|deriveReqT| 9548618d67bf80fd;
+  7cee348e5d230f20 -.->|deriveReqT| 7b6511f887489bc1;
+  7cee348e5d230f20 -.->|deriveReqT| a12088ce3af75577;
+  7cee348e5d230f20 -.->|deriveReqT| 287f6140c4c9ba05;
+  7cee348e5d230f20 -.->|deriveReqT| 17774b4ce265515;
+  7cee348e5d230f20 -->|satisfiedBy| 80defdd4cbc7ee18;
+  345c82cd34408acb[&quot;export.rs&quot;];
+  class 345c82cd34408acb default;
+  click 345c82cd34408acb &quot;../../../core/src/export.rs&quot;;
+  7cee348e5d230f20 -->|satisfiedBy| 345c82cd34408acb;
+  d0e6cc47b904faa5[&quot;html.rs&quot;];
+  class d0e6cc47b904faa5 default;
+  click d0e6cc47b904faa5 &quot;../../../core/src/html.rs&quot;;
+  7cee348e5d230f20 -->|satisfiedBy| d0e6cc47b904faa5;
+  c3d63c5d4133e346[&quot;html_export.rs&quot;];
+  class c3d63c5d4133e346 default;
+  click c3d63c5d4133e346 &quot;../../../core/src/html_export.rs&quot;;
+  7cee348e5d230f20 -->|satisfiedBy| c3d63c5d4133e346;
+  1a173441705701a0[&quot;index_generator.rs&quot;];
+  class 1a173441705701a0 default;
+  click 1a173441705701a0 &quot;../../../core/src/index_generator.rs&quot;;
+  7cee348e5d230f20 -->|satisfiedBy| 1a173441705701a0;
+  3a807a8535fb41fa[&quot;base.html&quot;];
+  class 3a807a8535fb41fa default;
+  click 3a807a8535fb41fa &quot;../../../core/templates/base.html&quot;;
+  7cee348e5d230f20 -->|satisfiedBy| 3a807a8535fb41fa;
+  c196fa9b3e2c2258[&quot;model.html&quot;];
+  class c196fa9b3e2c2258 default;
+  click c196fa9b3e2c2258 &quot;../../../core/templates/model.html&quot;;
+  7cee348e5d230f20 -->|satisfiedBy| c196fa9b3e2c2258;
+  7cee348e5d230f20 -.->|verifiedBy| 7ce243221ec8f143;
+  7cee348e5d230f20 -.->|verifiedBy| 3b945d4fc7ba69e7;
+  8a76dfb4467e9e4e -.->|deriveReqT| a12088ce3af75577;
+  8a76dfb4467e9e4e -.->|deriveReqT| 287f6140c4c9ba05;
+  db3a76dd2787dd8d -.->|deriveReqT| 5eec4cd23be79416;
+  db3a76dd2787dd8d -.->|deriveReqT| 287f6140c4c9ba05;
+  618f2e2c98afc9d6 -.->|deriveReqT| 17774b4ce265515;
+  618f2e2c98afc9d6 -.->|deriveReqT| ab3055e037495da3;
+  a867b4bb3e22cabf -->|satisfiedBy| 80defdd4cbc7ee18;
+  a867b4bb3e22cabf -.->|verifiedBy| 7ce243221ec8f143;
+  a867b4bb3e22cabf -.->|verifiedBy| 23a09f2d69fc3b23;
+  ba9ff62b2514c184 -->|satisfiedBy| 80defdd4cbc7ee18;
+  ef40ca1630031a4d -->|satisfiedBy| e8358fc93fee95fb;
+  da4e8889496fb531 -->|satisfiedBy| 80defdd4cbc7ee18;
+  da4e8889496fb531 -.->|verifiedBy| 7ce243221ec8f143;
+  da4e8889496fb531 -.->|verifiedBy| 405875bd7f079c80;
+  da4e8889496fb531 -.->|verifiedBy| ef40ca1630031a4d;
+  e95e3160edec8f1b[&quot;test.sh&quot;];
+  class e95e3160edec8f1b default;
+  click e95e3160edec8f1b &quot;../../../tests/test-change-impact-detection/test.sh&quot;;
+  74ab201081f0f730 -->|satisfiedBy| e95e3160edec8f1b;
+  87b7ea665c0ec9c2 -.->|deriveReqT| 1db62a3344255ecc;
+  87b7ea665c0ec9c2 -.->|deriveReqT| c93cc0e0f7685241;
+  4b89dbed94c08c3e[&quot;change_impact.rs&quot;];
+  class 4b89dbed94c08c3e default;
+  click 4b89dbed94c08c3e &quot;../../../core/src/change_impact.rs&quot;;
+  87b7ea665c0ec9c2 -->|satisfiedBy| 4b89dbed94c08c3e;
+  87b7ea665c0ec9c2 -.->|verifiedBy| f1dfbc33d1f30608;
+  a581221890d15c0c[&quot;error.rs&quot;];
+  class a581221890d15c0c default;
+  click a581221890d15c0c &quot;../../../core/src/error.rs&quot;;
+  af52a97918701e2b -->|satisfiedBy| a581221890d15c0c;
+  af52a97918701e2b -->|satisfiedBy| d50a859650933e55;
+  af52a97918701e2b -.->|verifiedBy| 23a09f2d69fc3b23;
+  ea0b85acf2bdcccc -->|satisfiedBy| 80defdd4cbc7ee18;
+  ea0b85acf2bdcccc -.->|verifiedBy| 7ce243221ec8f143;
+  ea0b85acf2bdcccc -.->|verifiedBy| d1b9ad25b33d992e;
+  61e7a56e6d8e29d -.->|deriveReqT| 71bccd7851730351;
+  3e62787c176807f6 -.->|deriveReqT| ea0b85acf2bdcccc;
+</div>
+<h3 id="containment-view-report-generation">Containment View Report Generation</h3>
+<p>The system shall generate containment view reports showing the physical hierarchical structure of the model (folders → files → elements) in multiple output formats including Mermaid diagrams, JSON, and HTML export integration.</p>
+<h4>Attachments</h4>
+<ul>
+<li><a href="DesignDocuments/ContainmentView.html">ContainmentView.html</a></li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#containment-view-report">Containment View Report</a></li>
+</ul>
+<hr />
+<h3 id="containment-view-design-documents">Containment View Design Documents</h3>
+<p>The system shall include design documents (files in DesignDocuments folders) in the containment view, grouped by their containing folder and displayed alongside specification elements.</p>
+<h4>Details</h4>
+<ul>
+<li>Design documents are non-specification markdown files in DesignDocuments folders</li>
+<li>They shall be shown in the containment hierarchy under their parent folder</li>
+<li>Each design document shall display its filename</li>
+<li>Design documents shall be visually distinguished from specification elements</li>
+<li>Clicking a design document in diagrams shall navigate to the file</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#containment-view-report-generation">Containment View Report Generation</a></li>
+<li>satisfiedBy: <a href="../../../core/src/containment.rs">containment.rs</a></li>
+<li>verifiedBy: <a href="Verifications/ReportingVerifications.html#containment-view-design-documents-test">Containment View Design Documents Test</a></li>
+</ul>
+<hr />
+<h3 id="forward-only-relation-traversal">Forward-Only Relation Traversal</h3>
+<p>When filtering by root element, system shall traverse only forward relations down to leaf elements.</p>
+<h4>Details</h4>
+<ul>
+<li>Shall follow only forward relations (derive, satisfiedBy, verifiedBy, trace)</li>
+<li>Shall start from specified root element (looked up by name)</li>
+<li>Shall recursively traverse outgoing relations to leaf elements</li>
+<li>Shall NOT traverse backward (no bidirectional traversal)</li>
+<li>Unfiltered diagrams (no –from) shall show complete model with all elements</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../../Interfaces/CLI.html#cli-model-diagram-command">CLI Model Diagram Command</a></li>
+<li>satisfiedBy: <a href="../../../core/src/diagrams.rs">diagrams.rs</a></li>
+<li>verifiedBy: <a href="Verifications/ReportingVerifications.html#model-command-verification">Model Command Verification</a></li>
+</ul>
+<hr />
+<h3 id="search-report-generator">Search Report Generator</h3>
+<p>The system shall implement a search report generator that produces comprehensive element searches with filtering, supporting both full and abbreviated output modes.</p>
+<h4>Details</h4>
+<p>The search report must include:</p>
+<p><strong>File-level Information:</strong></p>
+<ul>
+<li>File path and name</li>
+<li>Number of sections per file</li>
+<li>Number of elements per file</li>
+<li>Page content (frontmatter content before first section header) - omitted in short mode</li>
+</ul>
+<p><strong>Section-level Information:</strong></p>
+<ul>
+<li>Section name and hierarchy</li>
+<li>Number of elements per section - omitted in short mode</li>
+<li>Section content (content between section header and first element, excluding generated diagrams) - omitted in short mode</li>
+</ul>
+<p><strong>Element Information:</strong></p>
+<ul>
+<li>Element identifier, name, type, and section</li>
+<li>Element content - omitted in short mode</li>
+<li>Complete list of relations with targets and types</li>
+<li>Complete list of attachments as strings (file paths and element identifiers) - omitted in short mode
+<ul>
+<li>File path attachments displayed as relative paths (e.g., <code>&quot;path/to/file.pdf&quot;</code>)</li>
+<li>Element identifier attachments displayed as full identifiers (e.g., <code>&quot;specifications/File.md#refinement-element&quot;</code>)</li>
+</ul>
+</li>
+</ul>
+<p><strong>Global Counts</strong> (omitted in short mode):</p>
+<ul>
+<li>Total files and elements counts</li>
+<li>Requirements by type: map of requirement types to counts (e.g., <code>{&quot;user-requirement&quot;: 5, &quot;system-requirement&quot;: 10}</code>)</li>
+<li>Verifications by type: map of verification types to counts (e.g., <code>{&quot;test-verification&quot;: 8, &quot;analysis-verification&quot;: 2}</code>)</li>
+<li>Refinements by type: map of refinement types to counts (e.g., <code>{&quot;behavior&quot;: 3, &quot;constraint&quot;: 1}</code>)</li>
+<li>Other types: map of any custom element types not in standard categories</li>
+</ul>
+<p><strong>Output Formats:</strong></p>
+<ul>
+<li>Human-readable text format with hierarchical display</li>
+<li>Human-readable abbreviated text format (with –short flag): one-line per element showing <code>[type] identifier - name</code></li>
+<li>JSON format for programmatic processing</li>
+<li>JSON abbreviated format (with –short flag): omits content, page_content, attachments, element_count, total_elements, global_counters</li>
+</ul>
+<p>The system must support comprehensive filtering by file path, element name, type, element content, page content, and relation presence. All filters are applied conjunctively.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#model-structure-and-summaries">Model Structure and Summaries</a></li>
+<li>satisfiedBy: <a href="../../../core/src/search.rs">search.rs</a></li>
+</ul>
+<hr />
+<h3 id="verification-coverage-report-generator">Verification Coverage Report Generator</h3>
+<p>The system shall provide a verification coverage report generator that analyzes leaf requirements verification status, test-verification satisfaction status, and orphaned verifications to produce coverage metrics and detailed reports.</p>
+<h4>Details</h4>
+<p>The coverage report generator must:</p>
+<ul>
+<li>Identify all leaf requirements (requirements without forward relations to other requirements) in the model</li>
+<li>Determine leaf requirement verification status based on presence of verifiedBy relations</li>
+<li>Identify all verification elements in the model with breakdown by verification type</li>
+<li>Determine test-verification satisfaction status based on presence of satisfiedBy relations</li>
+<li>Identify orphaned verifications (verification elements without any verify relations to requirements)</li>
+<li>Calculate coverage percentages: (verified_leaf_requirements/total_leaf_requirements * 100), (satisfied_test_verifications/total_test_verifications * 100), and (orphaned_verifications/total_verifications * 100)</li>
+<li>Group results by file and section for organization</li>
+<li>Support both human-readable text and machine-readable JSON output formats</li>
+</ul>
+<p>The report structure shall include:</p>
+<ul>
+<li>Summary section with leaf requirements, test-verification, and orphaned verification counts and percentages</li>
+<li>Verified leaf requirements section grouped by file and section</li>
+<li>Unverified leaf requirements section with details (flagged for attention)</li>
+<li>Satisfied test-verification elements section grouped by file and section</li>
+<li>Unsatisfied test-verification elements section with details (flagged for attention)</li>
+<li>Orphaned verifications section with details (flagged for attention as they may be redundant or incorrectly configured)</li>
+<li>Analysis, inspection, and demonstration verification elements are considered satisfied by default</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfiedBy: <a href="../../../core/src/report_coverage.rs">report_coverage.rs</a></li>
+<li>derivedFrom: <a href="#verification-coverage-report">Verification Coverage Report</a></li>
+<li>derivedFrom: <a href="#search-report-generator">Search Report Generator</a></li>
+</ul>
+<hr />
+<h3 id="custom-element-type-tracking">Custom Element Type Tracking</h3>
+<p>The system SHALL track and display custom element types (any type not in the standard categories) in model summary reports, providing counts for each custom type in both text and JSON output formats.</p>
+<h4>Details</h4>
+<p>The custom element type tracking feature must:</p>
+<p><strong>Custom Type Definition:</strong></p>
+<ul>
+<li>Identify any element type that is not one of the standard types: requirement, user-requirement, verification, test-verification, analysis-verification, inspection-verification, or demonstration-verification</li>
+<li>Track custom types separately from standard element type counters</li>
+<li>Store custom types in a HashMap with type name as key and count as value</li>
+</ul>
+<p><strong>Text Output:</strong></p>
+<ul>
+<li>Display custom element types in the “Element Types” section of the summary</li>
+<li>Format: <code>Custom (type-name): count</code></li>
+<li>Sort custom types alphabetically by type name</li>
+<li>Only display custom types section when at least one custom type exists</li>
+</ul>
+<p><strong>JSON Output:</strong></p>
+<ul>
+<li>Include custom element types in global_counters as <code>custom_element_types</code> field</li>
+<li>Structure: <code>{&quot;custom_element_types&quot;: {&quot;type-name&quot;: count, ...}}</code></li>
+<li>Skip serialization of the field when no custom types exist (using <code>skip_serializing_if</code>)</li>
+<li>Maintain alphabetical sorting of type names in JSON output</li>
+</ul>
+<p><strong>Exclusions:</strong></p>
+<ul>
+<li>Standard requirement types (requirement, user-requirement) SHALL NOT be counted as custom</li>
+<li>Standard verification types (verification, test-verification, analysis-verification, inspection-verification, demonstration-verification) SHALL NOT be counted as custom</li>
+<li>File-type elements SHALL NOT be counted as custom types</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#search-report-generator">Search Report Generator</a></li>
+<li>satisfiedBy: <a href="../../../core/src/search.rs">search.rs</a></li>
+</ul>
+<hr />
+<h3 id="model-diagram-output-formats">Model Diagram Output Formats</h3>
+<p>System shall support markdown and JSON output formats.</p>
+<h4>Details</h4>
+<ul>
+<li>Markdown format shall include embedded Mermaid diagram with model structure</li>
+<li>Markdown shall show hierarchical structure using containment subgraphs (folders &gt; files &gt; elements)</li>
+<li>Mermaid diagrams shall use folder and file subgraphs to visually group elements by their physical location</li>
+<li>JSON format shall use structured data with folders, files, sections, elements, relations, and attachments</li>
+<li>Both formats shall represent the same filtered or complete model data</li>
+<li>Element attachments shall be included as an array of strings in both formats (file paths and element identifiers)</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../../Interfaces/CLI.html#cli-model-diagram-command">CLI Model Diagram Command</a></li>
+<li>satisfiedBy: <a href="../../../core/src/diagrams.rs">diagrams.rs</a></li>
+<li>verifiedBy: <a href="Verifications/ReportingVerifications.html#model-command-verification">Model Command Verification</a></li>
+</ul>
+<hr />
+<h3 id="search-fine-grained-filtering">Search Fine Grained Filtering</h3>
+<p>The system shall implement comprehensive fine-grained filtering for the search report generator following the specifications below.</p>
+<h4>Attachments</h4>
+<ul>
+<li><a href="DesignDocuments/SearchFiltering.html">SearchFiltering.html</a></li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfiedBy: <a href="../../../core/src/filters.rs">filters.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/search.rs">search.rs</a></li>
+<li>satisfiedBy: <a href="../../../cli/src/cli.rs">cli.rs</a></li>
+<li>derivedFrom: <a href="#search-report-generator">Search Report Generator</a></li>
+<li>verifiedBy: <a href="Verifications/ReportingVerifications.html#search-command-tests">Search Command Tests</a></li>
+</ul>
+<hr />
+<h3 id="tracing-structural-changes">Tracing Structural Changes</h3>
+<p>When tracing structural changes, the system shall analyze the System model and diffs to identify affected components and generate a report of impacted elements and structures, so that the user can review the changes and decide on further actions.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../../UserStories.html#trace-changes-in-system-model">Trace Changes in System Model</a></li>
+</ul>
+<hr />
+<h3 id="validation-report-generator">Validation Report Generator</h3>
+<p>The system shall implement a validation report generator that compiles and formats validation results from all validators, providing a unified view of model quality with categorized issues, remediation suggestions, and compliance metrics.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#provide-validation-reports">Provide Validation Reports</a></li>
+<li>satisfiedBy: <a href="../../../core/src/model.rs">model.rs</a></li>
+</ul>
+<hr />
+<h3 id="model-reports">Model Reports</h3>
+<p>When requested the system shall provide human readable and machine readable System model reports.</p>
+<h4>Details</h4>
+<p>All generated reports shall produce deterministic output with consistent ordering to enable reliable testing, version control, and reproducible builds.</p>
+<p>The system shall ensure deterministic output by:</p>
+<ol>
+<li><strong>Element Ordering</strong>: Elements shall be sorted by identifier before iteration to ensure consistent processing order across all operations</li>
+<li><strong>Relation Ordering</strong>: Relations within each element shall be sorted by relation type name and then by target identifier before rendering</li>
+<li><strong>Section Ordering</strong>: Sections within files shall be sorted alphabetically when order is not semantically significant</li>
+<li><strong>File Ordering</strong>: Files within folders shall be sorted alphabetically</li>
+</ol>
+<p>This determinism ensures that:</p>
+<ul>
+<li>Running the same operation multiple times produces byte-identical output</li>
+<li>Automated tests can reliably compare expected and actual outputs using simple diff tools without special normalization</li>
+<li>Version control diffs are meaningful and reflect actual changes rather than random ordering variations</li>
+<li>Continuous integration pipelines produce consistent, reproducible results</li>
+</ul>
+<p>This requirement applies to all report operations, including:</p>
+<ul>
+<li>Model summary reporting - Summary reports in text and JSON formats</li>
+<li>Verification tracing - Upward traceability trees from verifications to requirements</li>
+<li>Coverage reporting - Verification coverage analysis</li>
+<li>Change impact analysis - Reports showing propagation of changes</li>
+<li>Validation reporting - Model validation error reports</li>
+<li>Linting - Model quality issue reports</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../../UserStories.html#provide-reports">Provide Reports</a></li>
+</ul>
+<hr />
+<h3 id="model-structure-and-summaries">Model Structure and Summaries</h3>
+<p>When requested the system shall generate reports summarizing the structure and relationships in the System model, including counts and types of connections also supporting json and cypher output.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#model-reports">Model Reports</a></li>
+</ul>
+<hr />
+<h3 id="containment-view-report">Containment View Report</h3>
+<p>The system shall provide a containment view report that displays the physical hierarchical structure of the model showing the containment relationships between folders, files, and elements.</p>
+<h4>Details</h4>
+<p>The containment view shows the <strong>physical organization</strong> of the model, complementing the existing relation-centric model view that shows derivedFrom/verifiedBy relationships.</p>
+<p>The containment hierarchy represents:</p>
+<ul>
+<li><strong>Root folder</strong> → <strong>Subfolders</strong> → <strong>Files</strong> → <strong>Elements</strong></li>
+<li>Sections are skipped in this view (elements are shown directly under files)</li>
+</ul>
+<p>This view helps users:</p>
+<ul>
+<li>Understand model organization and file structure</li>
+<li>Navigate the physical layout of specifications</li>
+<li>Identify where elements are located</li>
+<li>Visualize the containment structure in diagrams</li>
+</ul>
+<p>The containment view must support multiple output formats (text, JSON, Mermaid diagram) and be included in HTML export.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#model-structure-and-summaries">Model Structure and Summaries</a></li>
+</ul>
+<hr />
+<h3 id="provide-validation-reports">Provide Validation Reports</h3>
+<p>The system shall generate detailed validation reports, highlighting any inconsistencies or errors in the System model structure.</p>
+<h4>Details</h4>
+<p>Validation shall be performed automatically when any command requires the parsed model, eliminating the need for a separate validation command. Commands that operate on raw files shall skip validation to allow operation on potentially invalid documents.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../../UserStories.html#align-with-industry-standards">Align with Industry Standards</a></li>
+<li>derivedFrom: <a href="#model-reports">Model Reports</a></li>
+</ul>
+<hr />
+<h3 id="verification-coverage-report">Verification Coverage Report</h3>
+<p>The system shall generate verification coverage reports focusing on leaf requirements (requirements that do not have forward relations to any other requirement), showing the percentage and details of verified and unverified leaf requirements, including breakdowns by file, section, and verification type.</p>
+<h4>Details</h4>
+<p>The verification coverage report shall provide:</p>
+<ul>
+<li>Total count of leaf requirements with breakdown by requirement type</li>
+<li>Count and percentage of verified leaf requirements (those with verifiedBy relations pointing to existing verification artifacts)</li>
+<li>Count and percentage of unverified leaf requirements</li>
+<li>Total count of verification artifacts with breakdown by verification type (test, analysis, inspection, demonstration)</li>
+<li>Count and percentage of satisfied test-verification artifacts (those with satisfiedBy relations pointing to existing test implementations)</li>
+<li>Count and percentage of orphaned verification artifacts (those without any verify relations to requirements)</li>
+<li>Detailed list of verified leaf requirements grouped by file and section</li>
+<li>Detailed list of unverified leaf requirements with impact analysis</li>
+<li>Detailed list of orphaned verifications (flagged for attention as they may be redundant or incorrectly configured)</li>
+<li>Output in both human-readable text and machine-readable JSON formats</li>
+</ul>
+<p>The report helps track verification completeness and identify gaps in requirement verification coverage, supporting quality assurance and compliance activities.</p>
+<p><strong>Coverage Philosophy:</strong></p>
+<ul>
+<li><strong>Leaf requirements</strong> (requirements that don’t derive other requirements) MUST be verified</li>
+<li><strong>Parent/intermediate requirements</strong> MAY be verified but it’s not a hard requirement as they might be covered in verification of leaf requirements</li>
+<li>One verification may verify multiple leaf requirements (N:1 relationship)</li>
+<li>The change impact analysis system propagates changes from parent requirements down to leaf requirements and their verifications</li>
+<li>System engineers/architects are responsible for ensuring verification scopes are broad enough to cover parent requirements when there’s no dedicated parent verification</li>
+<li>AI systems can help create comprehensive verification scopes and prevent verification overlap</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#model-reports">Model Reports</a></li>
+</ul>
+<hr />
+<h3 id="verification-upward-traceability">Verification Upward Traceability</h3>
+<p>The system shall provide upward traceability visualization from verifications to root requirements, showing the complete requirement hierarchy and indicating which requirements are directly verified.</p>
+<h4>Details</h4>
+<p><strong>Used for identifying redundant verifications</strong>: When a verification directly verifies both a leaf requirement and its parent requirement, this creates a redundant relation that adds noise into the model and may be removed from the parent - verifying the leaf requirement is sufficient since it traces upward to the parent. This keeps verification placement at the most specific level.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#verification-coverage-report">Verification Coverage Report</a></li>
+</ul>
+<hr />
+
+        </div>
+    </div>
+</body>
+</html>

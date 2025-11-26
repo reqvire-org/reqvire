@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ModelManagement</title>
+    <link rel="icon" type="image/x-icon" href="../../../assets/favicon.ico">
+    <link rel="apple-touch-icon" href="../../../assets/apple-touch-icon.png">
+    
+<style>
+:root {
+    /* Primary Colors */
+    --color-primary: #3F51B5;           /* Indigo - core branding */
+    --color-primary-hover: #7986CB;     /* Much lighter Indigo for hover - more visible */
+    --color-primary-active: #303F9F;    /* Darker Indigo for active */
+
+    /* Element Type Colors */
+    --color-requirement: #673AB7;       /* Deep Purple - core requirements */
+    --color-verification: #4CAF50;      /* Emerald Green - validated/completed */
+    --color-other: #9E9E9E;             /* Cool Gray - other element types */
+
+    /* Status Colors */
+    --color-verified: #4CAF50;          /* Forest Green - verified/passing */
+    --color-pending: #FFB74D;           /* Amber - pending/warning */
+    --color-error: #F44336;             /* Red - error/failed */
+
+    /* Interactive Colors */
+    --color-highlight: #FFAB91;         /* Peach - hover highlight */
+    --color-link: #212121;              /* Black - link color */
+    --color-link-hover: #3F51B5;        /* Indigo (same as nav bar) - link hover */
+
+    /* Text Colors */
+    --color-text-primary: #212121;      /* Primary text */
+    --color-text-secondary: #424242;    /* Body text */
+    --color-text-muted: #757575;        /* De-emphasized text */
+    --color-background: #FAFAFA;        /* Off-white background */
+    --color-border: #EEEEEE;            /* Very light gray borders */
+}
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #FAFAFA;
+    color: var(--color-text-secondary);
+}
+.reqvire-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    background-color: var(--color-primary);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+}
+.reqvire-nav a {
+    color: #ffffff;
+    text-decoration: none;
+    padding: 10px 20px;
+    margin-right: 5px;
+    border-radius: 3px;
+    transition: background-color 0.2s, text-decoration 0.2s;
+}
+.reqvire-nav a.nav-logo {
+    display: flex;
+    align-items: center;
+    padding: 5px 15px 5px 0;
+}
+.reqvire-nav a.nav-logo img {
+    vertical-align: middle;
+}
+.reqvire-nav a:hover {
+    background-color: var(--color-primary-hover);
+    text-decoration: underline;
+    color: #ffffff;
+}
+.reqvire-nav a:active,
+.reqvire-nav a.active {
+    background-color: var(--color-primary-active);
+    text-decoration: underline;
+    color: #ffffff;
+}
+.reqvire-nav-spacer {
+    height: 50px;
+}
+.container {
+    max-width: 95%;
+    margin: 0 auto;
+    padding: 20px;
+}
+.content {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    border: 1px solid #E0E0E0;
+}
+h1 {
+    color: var(--color-text-primary);
+    border-bottom: 2px solid #EEEEEE;
+    padding-bottom: 10px;
+    margin-top: 0;
+}
+h2 {
+    color: var(--color-text-primary);
+    border-bottom: 1px solid #EEEEEE;
+    padding-bottom: 5px;
+}
+h3 {
+    color: var(--color-text-primary);
+    margin-top: 25px;
+}
+h4 {
+    color: var(--color-text-secondary);
+    font-weight: 600;
+}
+a {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: text-decoration 0.15s ease;
+}
+a:hover {
+    text-decoration: underline;
+}
+a:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 20px 0;
+}
+table, th, td {
+    border: 1px solid #EEEEEE;
+}
+th, td {
+    padding: 8px 12px;
+    text-align: left;
+}
+th {
+    background-color: #F5F5F5;
+    color: #212121;
+    font-weight: 600;
+}
+tr:hover td {
+    background-color: #FFF8E1;
+}
+code {
+    background: #f6f8fa;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 90%;
+}
+pre {
+    background: #f6f8fa;
+    border-radius: 3px;
+    padding: 16px;
+    overflow: auto;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+}
+blockquote {
+    margin: 0;
+    padding: 0 15px;
+    color: var(--color-text-muted);
+    border-left: 4px solid var(--color-primary);
+}
+.mermaid {
+    margin: 20px 0;
+    text-align: center;
+    height: calc(100vh - 150px);
+    width: 100%;
+    overflow: hidden;
+    position: relative; /* Required for absolutely-positioned navigation buttons */
+    border: 1px solid #EEEEEE;
+    border-radius: 3px;
+    background-color: #FAFAFA;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+.mermaid svg {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    position: relative;
+    z-index: 1;
+}
+.diagram-nav-buttons {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 999; /* higher than SVG (1) but lower than header nav (1000) */
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 5px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+.diagram-nav-row {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+}
+.diagram-nav-btn {
+    width: 32px;
+    height: 32px;
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.diagram-nav-btn:hover {
+    background-color: var(--color-primary-hover);
+}
+.diagram-nav-btn:active {
+    background-color: var(--color-primary-active);
+}
+</style>
+
+    <!-- Enhanced mermaid configuration for Reqvire diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.5.0/dist/svg-pan-zoom.min.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+        import elkLayouts from 'https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk/dist/mermaid-layout-elk.esm.min.mjs';
+
+        // Register ELK layout for large diagrams
+        mermaid.registerLayoutLoaders(elkLayouts);
+
+        // Capture Mermaid errors
+        mermaid.parseError = function(err, hash) {
+            console.error('Mermaid Parse Error:', err);
+            console.error('Error details:', {
+                str: err.str,
+                hash: err.hash,
+                message: err.message,
+                stack: err.stack
+            });
+        };
+
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'neutral',
+            maxTextSize: 5000000,
+            maxEdges: 50000,
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis',
+                defaultRenderer: 'elk'
+            },
+            layout: 'elk',
+            elk: {
+                mergeEdges: true,
+                nodePlacementStrategy: 'SIMPLE'
+            },
+            securityLevel: 'loose',
+            logLevel: 'error'
+        });
+
+        await mermaid.run();
+        window.mermaid = mermaid;
+
+        // Wait for SVGs to be fully rendered, then initialize
+        function waitForSvgs(callback) {
+            var containers = document.querySelectorAll('.mermaid');
+            var allReady = true;
+            containers.forEach(function(c) {
+                var svg = c.querySelector('svg');
+                // Check SVG exists, has getBBox, valid dimensions, and has actual content (nodes)
+                if (!svg || !svg.getBBox || svg.getBBox().width === 0 || !svg.querySelector('.node')) {
+                    allReady = false;
+                }
+            });
+            if (allReady && containers.length > 0) {
+                callback();
+            } else {
+                requestAnimationFrame(function() { waitForSvgs(callback); });
+            }
+        }
+
+        // Add pan/zoom to all Mermaid diagrams after rendering
+        waitForSvgs(function() {
+            var allMermaidContainers = document.querySelectorAll('.mermaid');
+
+            allMermaidContainers.forEach(function(mermaidContainer, index) {
+
+                var svg = mermaidContainer.querySelector('svg');
+                if (!svg) {
+                    return;
+                }
+
+                // Double-check SVG is ready
+                try {
+                    var bbox = svg.getBBox();
+                    if (bbox.width === 0 || bbox.height === 0) {
+                        return;
+                    }
+                } catch (e) {
+                    return;
+                }
+
+                svg.style.maxWidth = 'none';
+                svg.style.maxHeight = 'none';
+
+                var eventsHandler = {
+                    haltEventListeners: ['touchstart', 'touchend', 'touchmove', 'touchleave', 'touchcancel'],
+                        init: function(options) {
+                            var instance = options.instance;
+                            var initialScale = 1;
+                            var pannedX = 0;
+                            var pannedY = 0;
+
+                            this.hammer = Hammer(options.svgElement, {
+                                inputClass: Hammer.SUPPORT_POINTER_EVENTS ? Hammer.PointerEventInput : Hammer.TouchInput
+                            });
+
+                            this.hammer.get('pinch').set({enable: true});
+
+                            this.hammer.on('doubletap', function(ev){
+                                instance.zoomIn();
+                            });
+
+                            this.hammer.on('panstart panmove', function(ev){
+                                if (ev.type === 'panstart') {
+                                    pannedX = 0;
+                                    pannedY = 0;
+                                }
+                                instance.panBy({x: ev.deltaX - pannedX, y: ev.deltaY - pannedY});
+                                pannedX = ev.deltaX;
+                                pannedY = ev.deltaY;
+                            });
+
+                            this.hammer.on('pinchstart pinchmove', function(ev){
+                                if (ev.type === 'pinchstart') {
+                                    initialScale = instance.getZoom();
+                                }
+                                instance.zoomAtPoint(initialScale * ev.scale, {x: ev.center.x, y: ev.center.y});
+                            });
+
+                            options.svgElement.addEventListener('touchmove', function(e){ e.preventDefault(); });
+                        },
+                        destroy: function(){
+                            this.hammer.destroy();
+                        }
+                    };
+
+                    // Diagrams with default zoom (no auto-fit)
+                    var panZoomInstance;
+                    try {
+                        panZoomInstance = svgPanZoom(svg, {
+                            zoomEnabled: true,
+                            controlIconsEnabled: true,
+                            fit: false,
+                            center: false,
+                            contain: false,
+                            minZoom: 0.5,
+                            maxZoom: 10,
+                            zoomScaleSensitivity: 0.3,
+                            customEventsHandler: eventsHandler
+                        });
+                    } catch (e) {
+                        return; // Skip this diagram and continue with others
+                    }
+
+                    if (!panZoomInstance) {
+                        return;
+                    }
+
+                    // Add navigation buttons
+                    var navButtons = document.createElement('div');
+                    navButtons.className = 'diagram-nav-buttons';
+                    navButtons.innerHTML = `
+                        <div class="diagram-nav-row">
+                            <button class="diagram-nav-btn" data-action="up">▲</button>
+                        </div>
+                        <div class="diagram-nav-row">
+                            <button class="diagram-nav-btn" data-action="left">◀</button>
+                            <button class="diagram-nav-btn" data-action="down">▼</button>
+                            <button class="diagram-nav-btn" data-action="right">▶</button>
+                        </div>
+                    `;
+                    mermaidContainer.appendChild(navButtons);
+
+                    // Wire up navigation buttons
+                    var panStep = 100;
+                    navButtons.querySelectorAll('.diagram-nav-btn').forEach(function(btn) {
+                        btn.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            var action = this.getAttribute('data-action');
+                            switch(action) {
+                                case 'up':
+                                    panZoomInstance.panBy({x: 0, y: panStep});
+                                    break;
+                                case 'down':
+                                    panZoomInstance.panBy({x: 0, y: -panStep});
+                                    break;
+                                case 'left':
+                                    panZoomInstance.panBy({x: panStep, y: 0});
+                                    break;
+                                case 'right':
+                                    panZoomInstance.panBy({x: -panStep, y: 0});
+                                    break;
+                            }
+                        });
+                    });
+            });
+
+            // Add CSS for edge highlighting
+            var style = document.createElement('style');
+            style.textContent = `
+                path.edge-highlighted,
+                .edge-highlighted path,
+                svg path.edge-highlighted {
+                    stroke: #FFAB91 !important;
+                    stroke-width: 3px !important;
+                }
+            `;
+            document.head.appendChild(style);
+
+            // Initialize edge highlighting for all diagrams
+            document.querySelectorAll('.mermaid svg').forEach(function(svg) {
+                var nodes = svg.querySelectorAll('.node');
+
+                // Find flowchart-link paths (actual edges)
+                var edgePaths = svg.querySelectorAll('path.flowchart-link');
+                // Fallback: find paths in .edges group
+                if (edgePaths.length === 0) {
+                    var edgesGroup = svg.querySelector('.edges');
+                    if (edgesGroup) {
+                        edgePaths = edgesGroup.querySelectorAll('path');
+                    }
+                }
+
+                // Get SVG point for coordinate transforms
+                var svgPoint = svg.createSVGPoint();
+
+                // Helper: transform point through element's CTM
+                function getTransformedBBox(element) {
+                    var bbox = element.getBBox();
+                    var ctm = element.getCTM();
+                    if (!ctm) return bbox;
+
+                    // Transform all four corners
+                    var corners = [
+                        {x: bbox.x, y: bbox.y},
+                        {x: bbox.x + bbox.width, y: bbox.y},
+                        {x: bbox.x, y: bbox.y + bbox.height},
+                        {x: bbox.x + bbox.width, y: bbox.y + bbox.height}
+                    ];
+
+                    var transformed = corners.map(function(c) {
+                        svgPoint.x = c.x;
+                        svgPoint.y = c.y;
+                        var tp = svgPoint.matrixTransform(ctm);
+                        return {x: tp.x, y: tp.y};
+                    });
+
+                    var minX = Math.min.apply(null, transformed.map(function(p) { return p.x; }));
+                    var maxX = Math.max.apply(null, transformed.map(function(p) { return p.x; }));
+                    var minY = Math.min.apply(null, transformed.map(function(p) { return p.y; }));
+                    var maxY = Math.max.apply(null, transformed.map(function(p) { return p.y; }));
+
+                    return {x: minX, y: minY, width: maxX - minX, height: maxY - minY};
+                }
+
+                // Helper: get all points from path
+                function getPathPoints(path) {
+                    var d = path.getAttribute('d') || '';
+                    var points = [];
+                    var ctm = path.getCTM();
+
+                    // Get M (start) point
+                    var startMatch = d.match(/M\s*([\d.-]+)[,\s]+([\d.-]+)/i);
+                    if (startMatch) {
+                        var sx = parseFloat(startMatch[1]);
+                        var sy = parseFloat(startMatch[2]);
+                        if (ctm) {
+                            svgPoint.x = sx; svgPoint.y = sy;
+                            var tp = svgPoint.matrixTransform(ctm);
+                            points.push({x: tp.x, y: tp.y});
+                        } else {
+                            points.push({x: sx, y: sy});
+                        }
+                    }
+
+                    // Get last point - find last number pair before Z or end
+                    var allNums = d.match(/[\d.-]+/g);
+                    if (allNums && allNums.length >= 2) {
+                        var ex = parseFloat(allNums[allNums.length - 2]);
+                        var ey = parseFloat(allNums[allNums.length - 1]);
+                        if (ctm) {
+                            svgPoint.x = ex; svgPoint.y = ey;
+                            var tp = svgPoint.matrixTransform(ctm);
+                            points.push({x: tp.x, y: tp.y});
+                        } else {
+                            points.push({x: ex, y: ey});
+                        }
+                    }
+
+                    return points;
+                }
+
+                // Build node bounding boxes with transforms
+                var nodeData = {};
+                nodes.forEach(function(node) {
+                    var nodeId = node.id || '';
+                    var parts = nodeId.split('-');
+                    var hashId = parts.length >= 2 ? parts[1] : nodeId;
+
+                    nodeData[hashId] = {
+                        node: node,
+                        bbox: getTransformedBBox(node)
+                    };
+                });
+
+                // Check if point is near bbox
+                function isNearBbox(pt, bbox, margin) {
+                    margin = margin || 40;
+                    return pt.x >= bbox.x - margin && pt.x <= bbox.x + bbox.width + margin &&
+                           pt.y >= bbox.y - margin && pt.y <= bbox.y + bbox.height + margin;
+                }
+
+                // Calculate distance from point to bbox center
+                function distToBboxCenter(pt, bbox) {
+                    var centerX = bbox.x + bbox.width / 2;
+                    var centerY = bbox.y + bbox.height / 2;
+                    return Math.sqrt(Math.pow(pt.x - centerX, 2) + Math.pow(pt.y - centerY, 2));
+                }
+
+                // Build edge connections with direction tracking
+                var edgeConnections = []; // [{path, source, target}]
+                var upstreamOf = {}; // node -> [parent nodes that point TO this node]
+                var downstreamOf = {}; // node -> [child nodes this node points TO]
+
+                Object.keys(nodeData).forEach(function(hashId) {
+                    upstreamOf[hashId] = [];
+                    downstreamOf[hashId] = [];
+                });
+
+                edgePaths.forEach(function(path) {
+                    var points = getPathPoints(path);
+                    if (points.length < 2) return;
+
+                    var startPt = points[0];
+                    var endPt = points[points.length - 1];
+
+                    var sourceNode = null;
+                    var targetNode = null;
+                    var sourceMinDist = Infinity;
+                    var targetMinDist = Infinity;
+
+                    // Find closest source and target nodes for this edge
+                    Object.keys(nodeData).forEach(function(hashId) {
+                        var bbox = nodeData[hashId].bbox;
+                        // Find closest node to start point (source)
+                        if (isNearBbox(startPt, bbox, 30)) {
+                            var dist = distToBboxCenter(startPt, bbox);
+                            if (dist < sourceMinDist) {
+                                sourceMinDist = dist;
+                                sourceNode = hashId;
+                            }
+                        }
+                        // Find closest node to end point (target)
+                        if (isNearBbox(endPt, bbox, 30)) {
+                            var dist = distToBboxCenter(endPt, bbox);
+                            if (dist < targetMinDist) {
+                                targetMinDist = dist;
+                                targetNode = hashId;
+                            }
+                        }
+                    });
+
+                    if (sourceNode && targetNode && sourceNode !== targetNode) {
+                        edgeConnections.push({path: path, source: sourceNode, target: targetNode});
+                        // source -> target means: target's upstream includes source
+                        if (!upstreamOf[targetNode].includes(sourceNode)) {
+                            upstreamOf[targetNode].push(sourceNode);
+                        }
+                        // source -> target means: source's downstream includes target
+                        if (!downstreamOf[sourceNode].includes(targetNode)) {
+                            downstreamOf[sourceNode].push(targetNode);
+                        }
+                    }
+                });
+
+                // Traverse only upstream (to parents/ancestors)
+                function findUpstream(startNodeId) {
+                    var visited = {};
+                    var queue = [startNodeId];
+                    visited[startNodeId] = true;
+
+                    while (queue.length > 0) {
+                        var current = queue.shift();
+                        var parents = upstreamOf[current] || [];
+                        parents.forEach(function(parent) {
+                            if (!visited[parent]) {
+                                visited[parent] = true;
+                                queue.push(parent);
+                            }
+                        });
+                    }
+                    return visited;
+                }
+
+                // Traverse only downstream (to children/descendants)
+                function findDownstream(startNodeId) {
+                    var visited = {};
+                    var queue = [startNodeId];
+                    visited[startNodeId] = true;
+
+                    while (queue.length > 0) {
+                        var current = queue.shift();
+                        var children = downstreamOf[current] || [];
+                        children.forEach(function(child) {
+                            if (!visited[child]) {
+                                visited[child] = true;
+                                queue.push(child);
+                            }
+                        });
+                    }
+                    return visited;
+                }
+
+                // Get edges for connected nodes
+                function getChainEdges(nodeSet) {
+                    var edges = [];
+                    edgeConnections.forEach(function(conn) {
+                        if (nodeSet[conn.source] && nodeSet[conn.target]) {
+                            edges.push(conn.path);
+                        }
+                    });
+                    return edges;
+                }
+
+                // Attach hover handlers
+                nodes.forEach(function(node) {
+                    var nodeId = node.id || '';
+                    var parts = nodeId.split('-');
+                    var hashId = parts.length >= 2 ? parts[1] : nodeId;
+
+                    node.style.cursor = 'pointer';
+
+                    node.addEventListener('mouseenter', function(e) {
+                        e.stopPropagation();
+                        nodes.forEach(function(n) { n.style.filter = ''; });
+                        node.style.filter = 'drop-shadow(0 0 8px rgba(255, 171, 145, 0.7))';
+
+                        // Find upstream (ancestors) and downstream (descendants) separately
+                        var upstream = findUpstream(hashId);
+                        var downstream = findDownstream(hashId);
+                        // Merge both sets
+                        var allConnected = {};
+                        Object.keys(upstream).forEach(function(k) { allConnected[k] = true; });
+                        Object.keys(downstream).forEach(function(k) { allConnected[k] = true; });
+
+                        var chainEdges = getChainEdges(allConnected);
+                        chainEdges.forEach(function(path) {
+                            path.classList.add('edge-highlighted');
+                        });
+                    });
+
+                    node.addEventListener('mouseleave', function() {
+                        node.style.filter = '';
+                        // Remove highlight from all edges
+                        edgePaths.forEach(function(path) {
+                            path.classList.remove('edge-highlighted');
+                        });
+                    });
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <nav class="reqvire-nav">
+        <a href="../../../index.html" class="nav-logo"><img src="../../../assets/logo.png" alt="Reqvire" height="24"></a>
+        <a href="../../../index.html">Containment</a>
+        <a href="../../../model.html">Model</a>
+        <a href="../../../traces.html">Traces</a>
+        <a href="../../../coverage.html">Coverage</a>
+    </nav>
+    <div class="reqvire-nav-spacer"></div>
+    <div class="container">
+        <div class="content">
+            <h1 id="elements">Elements</h1>
+<div class="mermaid">graph TD;
+  %% REQVIRE-AUTOGENERATED-DIAGRAM
+  %% Graph styling
+  classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;
+  classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
+  classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
+  classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:3px;
+  classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
+  classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
+
+  subgraph 1c3bc86f926627ab[&quot;📁 requirements/Interfaces&quot;]
+    subgraph 315f1b2b98bf7d1b[&quot;📄 CLI.md&quot;]
+      e64436de26e90ea9[&quot;Subdirectory Processing Option<br/>📎 requirements/System/Core/Behaviors.md#subdirectory-auto-detection-behavior&quot;];
+      class e64436de26e90ea9 systemRequirement;
+      click e64436de26e90ea9 &quot;../../Interfaces/CLI.html#subdirectory-processing-option&quot;;
+    end
+  end
+  subgraph d262bfbbaa5049a3[&quot;📁 requirements/System/Core&quot;]
+    subgraph f23c409eff55fa7c[&quot;📄 Configuration.md&quot;]
+      6921a84a17b97dda[&quot;Ignoring Unstructured Documents&quot;];
+      class 6921a84a17b97dda systemRequirement;
+      click 6921a84a17b97dda &quot;Configuration.html#ignoring-unstructured-documents&quot;;
+    end
+    subgraph 9ac3c1b5de6a3113[&quot;📄 ModelManagement.md&quot;]
+      363332ee418d9a97[&quot;Attachment Identifier Updates<br/>📎 requirements/System/Core/Behaviors.md#attachment-identifier-crud-update-behavior&quot;];
+      class 363332ee418d9a97 systemRequirement;
+      click 363332ee418d9a97 &quot;ModelManagement.html#attachment-identifier-updates&quot;;
+      34f6dffd5f6ccfb7[&quot;Coexistence of Structured and Unstructured Documents&quot;];
+      class 34f6dffd5f6ccfb7 userRequirement;
+      click 34f6dffd5f6ccfb7 &quot;ModelManagement.html#coexistence-of-structured-and-unstructured-documents&quot;;
+      237ab77c69cf9496[&quot;Default Requirement Type Assignment&quot;];
+      class 237ab77c69cf9496 userRequirement;
+      click 237ab77c69cf9496 &quot;ModelManagement.html#default-requirement-type-assignment&quot;;
+      acc5f7e12f6c64e3[&quot;Efficient Processing&quot;];
+      class acc5f7e12f6c64e3 userRequirement;
+      click acc5f7e12f6c64e3 &quot;ModelManagement.html#efficient-processing&quot;;
+      66091f40428d6d66[&quot;Element Manipulation Operations&quot;];
+      class 66091f40428d6d66 userRequirement;
+      click 66091f40428d6d66 &quot;ModelManagement.html#element-manipulation-operations&quot;;
+      bc4b202a0bb6f50c[&quot;Element Type Relation Compatibility<br/>📎 RelationTypes.md&quot;];
+      class bc4b202a0bb6f50c systemRequirement;
+      click bc4b202a0bb6f50c &quot;ModelManagement.html#element-type-relation-compatibility&quot;;
+      ba66a4ed15581f23[&quot;Git Repository as Project Root&quot;];
+      class ba66a4ed15581f23 userRequirement;
+      click ba66a4ed15581f23 &quot;ModelManagement.html#git-repository-as-project-root&quot;;
+      ef466393e75bd0d[&quot;Refinement Element Structure Constraints&quot;];
+      class ef466393e75bd0d systemRequirement;
+      click ef466393e75bd0d &quot;ModelManagement.html#refinement-element-structure-constraints&quot;;
+      4f7fa84403776a06[&quot;Relation Types and behaviors<br/>📎 RelationTypes.md&quot;];
+      class 4f7fa84403776a06 systemRequirement;
+      click 4f7fa84403776a06 &quot;ModelManagement.html#relation-types-and-behaviors&quot;;
+      661a84b5a9ab68c5[&quot;Supported Element Types&quot;];
+      class 661a84b5a9ab68c5 systemRequirement;
+      click 661a84b5a9ab68c5 &quot;ModelManagement.html#supported-element-types&quot;;
+      ea8518e9205f5540[&quot;Template-Based Model Bootstrapping&quot;];
+      class ea8518e9205f5540 userRequirement;
+      click ea8518e9205f5540 &quot;ModelManagement.html#template-based-model-bootstrapping&quot;;
+      6d3dc4e586860761[&quot;Verification Type Categories&quot;];
+      class 6d3dc4e586860761 systemRequirement;
+      click 6d3dc4e586860761 &quot;ModelManagement.html#verification-type-categories&quot;;
+    end
+    subgraph a0a42393a244d64c[&quot;📄 Validation.md&quot;]
+      f7d689fafa15738b[&quot;Relation Element Type Validator&quot;];
+      class f7d689fafa15738b systemRequirement;
+      click f7d689fafa15738b &quot;Validation.html#relation-element-type-validator&quot;;
+      83b654d72d72255[&quot;Validate Relation Types&quot;];
+      class 83b654d72d72255 userRequirement;
+      click 83b654d72d72255 &quot;Validation.html#validate-relation-types&quot;;
+    end
+  end
+  subgraph 2d73a43cf375cb0f[&quot;📁 requirements/System/Core/Verifications&quot;]
+    subgraph 41cd9fa811ae162b[&quot;📄 AttachmentsVerifications.md&quot;]
+      b2b2b0b30708887[&quot;Attachment Identifier CRUD Verification&quot;];
+      class b2b2b0b30708887 verification;
+      click b2b2b0b30708887 &quot;Verifications/AttachmentsVerifications.html#attachment-identifier-crud-verification&quot;;
+    end
+    subgraph 4d8e9ad42eee63c5[&quot;📄 ParsingVerifications.md&quot;]
+      e21f26d3f283ac80[&quot;Element Subsection Parsing Test&quot;];
+      class e21f26d3f283ac80 verification;
+      click e21f26d3f283ac80 &quot;Verifications/ParsingVerifications.html#element-subsection-parsing-test&quot;;
+      a6a558a9f2daccdd[&quot;Refinement Element Type Parsing Test&quot;];
+      class a6a558a9f2daccdd verification;
+      click a6a558a9f2daccdd &quot;Verifications/ParsingVerifications.html#refinement-element-type-parsing-test&quot;;
+      11bcef2a220fa0c8[&quot;Refinement Relations Rejection Test&quot;];
+      class 11bcef2a220fa0c8 verification;
+      click 11bcef2a220fa0c8 &quot;Verifications/ParsingVerifications.html#refinement-relations-rejection-test&quot;;
+    end
+    subgraph 1e40212e2a6b5c6e[&quot;📄 ValidationVerifications.md&quot;]
+      8f31ddf6fff8aa75[&quot;Default Element Type Assignment Test&quot;];
+      class 8f31ddf6fff8aa75 verification;
+      click 8f31ddf6fff8aa75 &quot;Verifications/ValidationVerifications.html#default-element-type-assignment-test&quot;;
+      d2ba1522cae21673[&quot;Element Type Relation Compatibility Test&quot;];
+      class d2ba1522cae21673 verification;
+      click d2ba1522cae21673 &quot;Verifications/ValidationVerifications.html#element-type-relation-compatibility-test&quot;;
+    end
+  end
+  subgraph 94359ac729226de6[&quot;📁 requirements/System/Operations&quot;]
+    subgraph ce3b241a2629974e[&quot;📄 ElementManipulation.md&quot;]
+      5e9d1888d2914fd4[&quot;Element Manipulation File Persistence&quot;];
+      class 5e9d1888d2914fd4 systemRequirement;
+      click 5e9d1888d2914fd4 &quot;../Operations/ElementManipulation.html#element-manipulation-file-persistence&quot;;
+      b7a7ab53d4242be8[&quot;Relation Consistency Maintenance&quot;];
+      class b7a7ab53d4242be8 systemRequirement;
+      click b7a7ab53d4242be8 &quot;../Operations/ElementManipulation.html#relation-consistency-maintenance&quot;;
+      9987f9e9ae83fba3[&quot;Target Location Validation and Auto-Creation&quot;];
+      class 9987f9e9ae83fba3 systemRequirement;
+      click 9987f9e9ae83fba3 &quot;../Operations/ElementManipulation.html#target-location-validation-and-auto-creation&quot;;
+    end
+  end
+  subgraph 59af30609eb6d57c[&quot;📁 requirements/System/Output&quot;]
+    subgraph c2b8a949c0da1f4[&quot;📄 DiagramGeneration.md&quot;]
+      978256deec70c016[&quot;Trace Relation Non-Directional Behavior&quot;];
+      class 978256deec70c016 systemRequirement;
+      click 978256deec70c016 &quot;../Output/DiagramGeneration.html#trace-relation-non-directional-behavior&quot;;
+    end
+  end
+  ea4ba0d9ffba93a5[&quot;crud.rs&quot;];
+  class ea4ba0d9ffba93a5 default;
+  click ea4ba0d9ffba93a5 &quot;../../../core/src/crud.rs&quot;;
+  363332ee418d9a97 -->|satisfiedBy| ea4ba0d9ffba93a5;
+  363332ee418d9a97 -.->|verifiedBy| b2b2b0b30708887;
+  34f6dffd5f6ccfb7 -.->|deriveReqT| 6921a84a17b97dda;
+  237ab77c69cf9496 -.->|verifiedBy| e21f26d3f283ac80;
+  237ab77c69cf9496 -.->|verifiedBy| 8f31ddf6fff8aa75;
+  66091f40428d6d66 -.->|deriveReqT| 363332ee418d9a97;
+  66091f40428d6d66 -.->|deriveReqT| 5e9d1888d2914fd4;
+  66091f40428d6d66 -.->|deriveReqT| b7a7ab53d4242be8;
+  66091f40428d6d66 -.->|deriveReqT| 9987f9e9ae83fba3;
+  bc4b202a0bb6f50c -.->|deriveReqT| f7d689fafa15738b;
+  bc4b202a0bb6f50c -.->|verifiedBy| d2ba1522cae21673;
+  ba66a4ed15581f23 -.->|deriveReqT| e64436de26e90ea9;
+  ba66a4ed15581f23 -.->|deriveReqT| 9987f9e9ae83fba3;
+  d50a859650933e55[&quot;model.rs&quot;];
+  class d50a859650933e55 default;
+  click d50a859650933e55 &quot;../../../core/src/model.rs&quot;;
+  ef466393e75bd0d -->|satisfiedBy| d50a859650933e55;
+  ef466393e75bd0d -.->|verifiedBy| 11bcef2a220fa0c8;
+  4f7fa84403776a06 -.->|deriveReqT| bc4b202a0bb6f50c;
+  4f7fa84403776a06 -.->|deriveReqT| 83b654d72d72255;
+  4f7fa84403776a06 -.->|deriveReqT| 978256deec70c016;
+  9450d4313f47ef36[&quot;relation.rs&quot;];
+  class 9450d4313f47ef36 default;
+  click 9450d4313f47ef36 &quot;../../../core/src/relation.rs&quot;;
+  4f7fa84403776a06 -->|satisfiedBy| 9450d4313f47ef36;
+  4f7fa84403776a06 -.->|verifiedBy| e21f26d3f283ac80;
+  661a84b5a9ab68c5 -.->|deriveReqT| bc4b202a0bb6f50c;
+  661a84b5a9ab68c5 -.->|deriveReqT| ef466393e75bd0d;
+  a814c4935e1a0449[&quot;element.rs&quot;];
+  class a814c4935e1a0449 default;
+  click a814c4935e1a0449 &quot;../../../core/src/element.rs&quot;;
+  661a84b5a9ab68c5 -->|satisfiedBy| a814c4935e1a0449;
+  f22d93285fcd7664[&quot;parser.rs&quot;];
+  class f22d93285fcd7664 default;
+  click f22d93285fcd7664 &quot;../../../core/src/parser.rs&quot;;
+  661a84b5a9ab68c5 -->|satisfiedBy| f22d93285fcd7664;
+  661a84b5a9ab68c5 -.->|verifiedBy| e21f26d3f283ac80;
+  661a84b5a9ab68c5 -.->|verifiedBy| a6a558a9f2daccdd;
+  6921a84a17b97dda -.->|deriveReqT| b4fab4cd56cad6d8;
+  6921a84a17b97dda -.->|deriveReqT| 526d3fd6fb8c0baf;
+  6921a84a17b97dda -.->|deriveReqT| 7b1990b8b1329152;
+  6921a84a17b97dda -.->|deriveReqT| 3e259233db2e4d25;
+  8419dcc77d92b609[&quot;config.rs&quot;];
+  class 8419dcc77d92b609 default;
+  click 8419dcc77d92b609 &quot;../../../cli/src/config.rs&quot;;
+  6921a84a17b97dda -->|satisfiedBy| 8419dcc77d92b609;
+  2203c109e20d9c4b[&quot;test.sh&quot;];
+  class 2203c109e20d9c4b default;
+  click 2203c109e20d9c4b &quot;../../../tests/test-default-type-assignment/test.sh&quot;;
+  8f31ddf6fff8aa75 -->|satisfiedBy| 2203c109e20d9c4b;
+  494239c0f3861cb5[&quot;test.sh&quot;];
+  class 494239c0f3861cb5 default;
+  click 494239c0f3861cb5 &quot;../../../tests/test-parsing-functionality/test.sh&quot;;
+  e21f26d3f283ac80 -->|satisfiedBy| 494239c0f3861cb5;
+  5e9d1888d2914fd4 -.->|deriveReqT| ca74bbb037431e9b;
+  5e9d1888d2914fd4 -.->|deriveReqT| b1ed46220f447242;
+  5e9d1888d2914fd4 -.->|deriveReqT| 84860e94fc819efd;
+  5e9d1888d2914fd4 -.->|deriveReqT| bbea6657a24b3f1c;
+  5e9d1888d2914fd4 -.->|deriveReqT| a6593dab7ef5d521;
+  5e9d1888d2914fd4 -->|satisfiedBy| ea4ba0d9ffba93a5;
+  b7c871ab64a7059a[&quot;graph_registry.rs&quot;];
+  class b7c871ab64a7059a default;
+  click b7c871ab64a7059a &quot;../../../core/src/graph_registry.rs&quot;;
+  5e9d1888d2914fd4 -->|satisfiedBy| b7c871ab64a7059a;
+  5e9d1888d2914fd4 -.->|verifiedBy| 9c8ea99467081d64;
+  9987f9e9ae83fba3 -.->|deriveReqT| ca74bbb037431e9b;
+  9987f9e9ae83fba3 -.->|deriveReqT| 84860e94fc819efd;
+  9987f9e9ae83fba3 -.->|deriveReqT| bbea6657a24b3f1c;
+  9987f9e9ae83fba3 -->|satisfiedBy| b7c871ab64a7059a;
+  ce2625feec883e55[&quot;utils.rs&quot;];
+  class ce2625feec883e55 default;
+  click ce2625feec883e55 &quot;../../../core/src/utils.rs&quot;;
+  9987f9e9ae83fba3 -->|satisfiedBy| ce2625feec883e55;
+  9987f9e9ae83fba3 -.->|verifiedBy| b6076972a6650ff1;
+  b7a7ab53d4242be8 -->|satisfiedBy| b7c871ab64a7059a;
+  b7a7ab53d4242be8 -.->|verifiedBy| 7f694d7fb7057fc4;
+  a62d9d7bace214e0[&quot;test.sh&quot;];
+  class a62d9d7bace214e0 default;
+  click a62d9d7bace214e0 &quot;../../../tests/test-element-type-relation-compatibility/test.sh&quot;;
+  d2ba1522cae21673 -->|satisfiedBy| a62d9d7bace214e0;
+  f7d689fafa15738b -->|satisfiedBy| d50a859650933e55;
+  f7d689fafa15738b -->|satisfiedBy| f22d93285fcd7664;
+  f7d689fafa15738b -.->|verifiedBy| d2ba1522cae21673;
+  f7d689fafa15738b -.->|verifiedBy| 23a09f2d69fc3b23;
+  e64436de26e90ea9 -.->|deriveReqT| e7cad857e370c39f;
+  e64436de26e90ea9 -.->|deriveReqT| 9feed439b94e2f2b;
+  e64436de26e90ea9 -.->|deriveReqT| d7e75b69b8102997;
+  e64436de26e90ea9 -.->|deriveReqT| 9f657ef9218da615;
+  80defdd4cbc7ee18[&quot;cli.rs&quot;];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 &quot;../../../cli/src/cli.rs&quot;;
+  e64436de26e90ea9 -->|satisfiedBy| 80defdd4cbc7ee18;
+  83b654d72d72255 -.->|deriveReqT| f7d689fafa15738b;
+  978256deec70c016 -.->|verifiedBy| 23a09f2d69fc3b23;
+  978256deec70c016 -.->|verifiedBy| 92720158539bac0d;
+</div>
+<h3 id="coexistence-of-structured-and-unstructured-documents">Coexistence of Structured and Unstructured Documents</h3>
+<p>The system shall allow structured markdown and unstructured. (eg., markdown, PDFs, DOCX, raw text) documents to coexist within the same MBSE model.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../../UserStories.html#managing-system-models">Managing System Models</a></li>
+</ul>
+<hr />
+<h3 id="relation-types-and-behaviors">Relation Types and behaviors</h3>
+<p>The system shall implement relations following clearly defined specifications for types and behaviors.</p>
+<h4>Attachments</h4>
+<ul>
+<li><a href="DesignDocuments/RelationTypes.html">RelationTypes.html</a></li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="StructureAndParsing.html#identifiers-and-relations">Identifiers and Relations</a></li>
+<li>satisfiedBy: <a href="../../../core/src/relation.rs">relation.rs</a></li>
+</ul>
+<hr />
+<h3 id="element-type-relation-compatibility">Element Type Relation Compatibility</h3>
+<p>The system shall enforce element type constraints for relation types, ensuring that only valid combinations of source and target element types are allowed for each relation type.</p>
+<h4>Details</h4>
+<p>The compatibility rules are:</p>
+<ol>
+<li><strong>derivedFrom/derive</strong>: Only requirement types (<code>requirement</code>, <code>user-requirement</code>) can use these relations</li>
+<li><strong>satisfiedBy/satisfy</strong>: Requirements and <code>test-verification</code> can use satisfiedBy; other verification types cannot</li>
+<li><strong>verifiedBy/verify</strong>: Requirements link to verifications, verifications link to requirements</li>
+<li><strong>trace</strong>: Any non-refinement element type can use trace relations</li>
+<li><strong>Refinement types</strong>: <code>constraint</code>, <code>behavior</code>, <code>specification</code> cannot have Relations subsections</li>
+</ol>
+<h4>Attachments</h4>
+<ul>
+<li><a href="DesignDocuments/RelationTypes.html">RelationTypes.html</a></li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#relation-types-and-behaviors">Relation Types and behaviors</a></li>
+<li>derivedFrom: <a href="#supported-element-types">Supported Element Types</a></li>
+<li>verifiedBy: <a href="Verifications/ValidationVerifications.html#element-type-relation-compatibility-test">Element Type Relation Compatibility Test</a></li>
+</ul>
+<hr />
+<h3 id="efficient-processing">Efficient Processing</h3>
+<p>The system shall process structured documents and relations to extract model-relevant information efficiently.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../../UserStories.html#managing-system-models">Managing System Models</a></li>
+<li>derivedFrom: <a href="../../UserStories.html#promote-automation-and-efficiency">Promote Automation and Efficiency</a></li>
+</ul>
+<hr />
+<h3 id="default-requirement-type-assignment">Default Requirement Type Assignment</h3>
+<p>The system shall automatically assign the <strong>default type <code>requirement</code></strong> to all elements if not explicitly specified in their <code>metadata</code> subsection.</p>
+<h4>Details</h4>
+<details>
+<summary>Type Assignment Rules</summary>
+<p>When an element does not have a <code>#### Metadata</code> subsection with a <code>type</code> property, the system assigns the default type <code>requirement</code>.</p>
+<p><strong>This behavior is location-independent:</strong> All elements default to type <code>requirement</code> regardless of their folder location within the Git repository.</p>
+<p><strong>To use other element types</strong>, users must explicitly specify the type in the element’s Metadata subsection:</p>
+<pre><code class="language-markdown">#### Metadata
+  * type: user-requirement
+</code></pre>
+<p><strong>Supported element types:</strong></p>
+<ul>
+<li><code>requirement</code> (default)</li>
+<li><code>user-requirement</code></li>
+<li><code>verification</code> / <code>test-verification</code></li>
+<li><code>analysis-verification</code></li>
+<li><code>inspection-verification</code></li>
+<li><code>demonstration-verification</code></li>
+<li><code>constraint</code> (refinement type)</li>
+<li><code>behavior</code> (refinement type)</li>
+<li><code>specification</code> (refinement type)</li>
+<li><code>other</code></li>
+</ul>
+</details>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../../UserStories.html#managing-system-models">Managing System Models</a></li>
+</ul>
+<hr />
+<h3 id="template-based-model-bootstrapping">Template-Based Model Bootstrapping</h3>
+<p>The system shall enable systems engineers to quickly bootstrap new MBSE models from predefined templates stored in Git repositories, accelerating project initialization and promoting best-practice model structures.</p>
+<h4>Details</h4>
+<p>Template Bootstrapping Capabilities</p>
+<p>Users can initialize new models using the CLI with templates from Git repositories:</p>
+<ul>
+<li>Discover available templates within a specified repository</li>
+<li>Select and apply templates interactively</li>
+<li>Bootstrap model structure with predefined files, folders, and requirements</li>
+</ul>
+<p>Templates are consumed from Git repositories only, with support for repositories containing multiple templates alongside other content.</p>
+<p><strong>Example usage:</strong></p>
+<pre><code class="language-bash">reqvire init --template &lt;github-repo-url&gt;
+</code></pre>
+<p>The system discovers all available templates in the repository and allows the user to select which template to apply.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../../UserStories.html#managing-system-models">Managing System Models</a></li>
+</ul>
+<hr />
+<h3 id="git-repository-as-project-root">Git Repository as Project Root</h3>
+<p>The system shall treat the <strong>root directory of the Git repository as the project’s base</strong> for all file and folder references, streamlining configuration and promoting a self-contained project structure.</p>
+<h4>Details</h4>
+<p>All paths specified in Reqvire commands will be resolved relative to the current working directory:</p>
+<ul>
+<li>When run from the git repository root: paths are relative to the git root</li>
+<li>When run from a subdirectory: paths are relative to that subdirectory, and processing is limited to files within that subdirectory scope</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../../UserStories.html#managing-system-models">Managing System Models</a></li>
+</ul>
+<hr />
+<h3 id="element-manipulation-operations">Element Manipulation Operations</h3>
+<p>The system shall provide programmatic manipulation of model elements through operations including, but not limited to, creating new elements, deleting existing elements, moving elements between locations, and renaming elements while maintaining model integrity and traceability.</p>
+<h4>Details</h4>
+<p>All manipulation operations shall:</p>
+<ul>
+<li>Maintain model integrity and consistency</li>
+<li>Update or remove affected relations automatically</li>
+<li>Preserve traceability where appropriate</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../../UserStories.html#managing-system-models">Managing System Models</a></li>
+</ul>
+<hr />
+<h3 id="attachment-identifier-updates">Attachment Identifier Updates</h3>
+<p>When moving or renaming Refinement elements, the system shall update attachment identifiers in all referencing elements, using the same behavior as relation target updates.</p>
+<h4>Details</h4>
+<p>This requirement ensures consistency between relation updates and attachment identifier updates during CRUD operations:</p>
+<ul>
+<li>When a Refinement element is <strong>moved</strong> to a different file, all attachments referencing that element shall be updated with the new identifier path</li>
+<li>When a Refinement element is <strong>renamed</strong>, all attachments referencing that element shall be updated with the new element name in the identifier</li>
+<li>The update behavior mirrors how relation targets are updated during move/rename operations</li>
+<li>All files containing attachments that reference the affected element shall be modified</li>
+</ul>
+<h4>Attachments</h4>
+<ul>
+<li><a href="Behaviors.html#attachment-identifier-crud-update-behavior">Attachment Identifier CRUD Update Behavior</a></li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#element-manipulation-operations">Element Manipulation Operations</a></li>
+<li>satisfiedBy: <a href="../../../core/src/crud.rs">crud.rs</a></li>
+</ul>
+<hr />
+<h3 id="verification-type-categories">Verification Type Categories</h3>
+<p>The system shall support defined verifications categories.</p>
+<h4>Details</h4>
+<p>The following verification types are supported:</p>
+<ol>
+<li>
+<p><strong>Default Verification Type</strong></p>
+<ul>
+<li><code>verification</code> - Verification through testing (equivalent to <code>test-verification</code>)</li>
+</ul>
+</li>
+<li>
+<p><strong>Specific Verification Types</strong></p>
+<ul>
+<li><code>test-verification</code> - Explicit verification through testing with documented test procedures</li>
+<li><code>analysis-verification</code> - Verification through formal analysis of documentation or code</li>
+<li><code>inspection-verification</code> - Verification through formal inspection or review</li>
+<li><code>demonstration-verification</code> - Verification through demonstration in a realistic environment</li>
+</ul>
+</li>
+</ol>
+<p>The appropriate verification type should be selected based on the nature of the requirement:</p>
+<ul>
+<li><strong>Test-verification</strong>: Used when formal test procedures with expected outcomes are required</li>
+<li><strong>Analysis-verification</strong>: Used when requirements can be verified through analysis of documentation or code</li>
+<li><strong>Inspection-verification</strong>: Used when requirements can be verified through review of artifacts</li>
+<li><strong>Demonstration-verification</strong>: Used when requirements can be verified by demonstrating functionality</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="StructureAndParsing.html#reserved-subsections-support">Reserved Subsections Support</a></li>
+</ul>
+<hr />
+<h3 id="supported-element-types">Supported Element Types</h3>
+<p>The system shall support predefined element types for classification and behavior determination.</p>
+<h4>Details</h4>
+<p>Element types are identified through a reserved “type” metadata property. The following types are supported:</p>
+<ol>
+<li><strong>requirement</strong>: System requirement</li>
+<li><strong>user-requirement</strong>: User requirement</li>
+<li><strong>verification</strong>: For verification tests and validation procedures (equivalent to test-verification)</li>
+<li><strong>test-verification</strong>: For verification tests and validation procedures</li>
+<li><strong>analysis-verification</strong>: For verification through formal analysis of documentation or code</li>
+<li><strong>inspection-verification</strong>: For verification through formal inspection or review</li>
+<li><strong>demonstration-verification</strong>: For verification through demonstration in a realistic environment</li>
+<li><strong>constraint</strong>: Refinement documenting constraints that limit or bound the system</li>
+<li><strong>behavior</strong>: Refinement documenting behavior details and operational specifications</li>
+<li><strong>specification</strong>: Refinement documenting detailed specifications and technical descriptions</li>
+<li><strong>other</strong>: Custom element types defined by users</li>
+</ol>
+<p><strong>Note:</strong> Refinement types (constraint, behavior, specification) cannot have a Relations subsection. These elements serve as detailed documentation that can be attached to other elements.</p>
+<p><strong>Relation constraints:</strong> Each element type has specific constraints on which relation types it can use. See <a href="DesignDocuments/RelationTypes.html#element-type-relation-compatibility">Element Type Relation Compatibility</a> for the complete compatibility matrix.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="StructureAndParsing.html#reserved-subsections-support">Reserved Subsections Support</a></li>
+<li>satisfiedBy: <a href="../../../core/src/element.rs">element.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/parser.rs">parser.rs</a></li>
+</ul>
+<hr />
+<h3 id="refinement-element-structure-constraints">Refinement Element Structure Constraints</h3>
+<p>The system shall reject Refinement elements (constraint, behavior, specification) that include a Relations subsection during validation.</p>
+<h4>Details</h4>
+<p>Refinement elements serve as detailed documentation that can be attached to other elements. They are not allowed to have relations because:</p>
+<ul>
+<li>They represent atomic pieces of information without traceability relationships</li>
+<li>They are referenced through the Attachments subsection of other elements</li>
+<li>Their content contributes to the parent element’s documentation</li>
+</ul>
+<p>When a Refinement element contains a Relations subsection, the validator shall report an error indicating that relations are not allowed for this element type.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#supported-element-types">Supported Element Types</a></li>
+<li>satisfiedBy: <a href="../../../core/src/model.rs">model.rs</a></li>
+</ul>
+<hr />
+
+        </div>
+    </div>
+</body>
+</html>

@@ -49,6 +49,7 @@ pub struct ElementNode {
     pub identifier: String,
     pub name: String,
     pub element_type: String,
+    pub attachments: Vec<String>,
 }
 
 /// Relation between elements in the model
@@ -138,10 +139,20 @@ impl<'a> ModelDiagramGenerator<'a> {
                     let mut sorted_elements = elements.clone();
                     sorted_elements.sort_by(|a, b| a.identifier.cmp(&b.identifier));
                     for element in sorted_elements {
+                        let attachments: Vec<String> = element.attachments.iter()
+                            .map(|a| match &a.target {
+                                crate::element::AttachmentTarget::FilePath(path) => path
+                                    .file_name()
+                                    .map(|n| n.to_string_lossy().into_owned())
+                                    .unwrap_or_else(|| path.to_string_lossy().into_owned()),
+                                crate::element::AttachmentTarget::ElementIdentifier(id) => id.clone(),
+                            })
+                            .collect();
                         element_nodes.push(ElementNode {
                             identifier: element.identifier.clone(),
                             name: element.name.clone(),
                             element_type: element.element_type.as_str().to_string(),
+                            attachments,
                         });
                     }
 
@@ -225,6 +236,7 @@ impl<'a> ModelDiagramGenerator<'a> {
         diagram.push_str("  classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;\n");
         diagram.push_str("  classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:3px;\n");
         diagram.push_str("  classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;\n");
+        diagram.push_str("  classDef attachment fill:#EFEBE9,stroke:#8D6E63,stroke-width:1.5px;\n");
         diagram.push_str("  classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;\n\n");
 
         // Add folders, files, and elements
@@ -238,7 +250,13 @@ impl<'a> ModelDiagramGenerator<'a> {
 
                 for element in &file.elements {
                     let element_id = utils::hash_identifier(&element.identifier);
-                    let label = escape_label(&element.name);
+
+                    // Build label with element name and attachments
+                    let mut label = escape_label(&element.name);
+                    for attachment in &element.attachments {
+                        label.push_str(&format!("<br/>📎 {}", escape_label(attachment)));
+                    }
+
                     diagram.push_str(&format!("      {}[\"{}\"];\n", element_id, label));
 
                     // Determine element class based on type
@@ -364,13 +382,15 @@ pub fn generate_diagrams_by_file(
     Ok(diagrams)
 }
 
-/// Generates a diagram for a single file
+/// Generates a diagram for a single file with containment structure
 fn generate_file_diagram(
     registry: &GraphRegistry,
     elements: &[&Element],
     file_path: &str,
     diagrams_with_blobs: bool
 ) -> Result<String, ReqvireError> {
+    use std::collections::HashMap;
+
     // Get Git repository information for creating proper links
     let repo_root = match git_commands::get_git_root_dir() {
         Ok(root) => root,
@@ -387,6 +407,63 @@ fn generate_file_diagram(
         Err(_) => String::from("HEAD"),
     };
 
+    let has_git_info = !base_url.is_empty() && !commit_hash.is_empty() && !repo_root.as_os_str().is_empty();
+
+    // Convert file path to its parent directory for relative links
+    let base_dir = PathBuf::from(file_path)
+        .parent()
+        .map(|p| p.to_path_buf())
+        .unwrap_or_else(|| PathBuf::from("."));
+
+    // Collect identifiers of elements in this file
+    let file_element_identifiers: HashSet<String> = elements.iter()
+        .map(|e| e.identifier.clone())
+        .collect();
+
+    // First pass: collect ALL elements that will be in the diagram
+    let mut all_elements: Vec<&Element> = elements.to_vec();
+    let mut included_ids: HashSet<String> = file_element_identifiers.clone();
+
+    // Find all children of file-local elements even if they are in other files
+    for file_element in elements {
+        for relation in &file_element.relations {
+            if !relation::DIAGRAM_RELATIONS.contains(&relation.relation_type.name) {
+                continue;
+            }
+            if let relation::LinkType::Identifier(target_id) = &relation.target.link {
+                if !included_ids.contains(target_id) {
+                    if let Some(target_element) = registry.get_element(target_id) {
+                        all_elements.push(target_element);
+                        included_ids.insert(target_id.clone());
+                    }
+                }
+            }
+        }
+    }
+
+    // Group elements by folder -> file for containment structure
+    let mut folders: HashMap<String, HashMap<String, Vec<&Element>>> = HashMap::new();
+
+    for elem in &all_elements {
+        let elem_file_path = &elem.file_path;
+        let folder = PathBuf::from(elem_file_path)
+            .parent()
+            .and_then(|p| p.to_str())
+            .unwrap_or("")
+            .to_string();
+        let file_name = PathBuf::from(elem_file_path)
+            .file_name()
+            .and_then(|n| n.to_str())
+            .unwrap_or(elem_file_path)
+            .to_string();
+
+        folders.entry(folder)
+            .or_insert_with(HashMap::new)
+            .entry(file_name)
+            .or_insert_with(Vec::new)
+            .push(*elem);
+    }
+
     // Use default diagram direction constant
     let mut diagram = String::from(format!("```mermaid\ngraph {};\n", DEFAULT_DIAGRAM_DIRECTION));
 
@@ -398,59 +475,161 @@ fn generate_file_diagram(
     diagram.push_str("  classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;\n");
     diagram.push_str("  classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;\n");
     diagram.push_str("  classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;\n");
+    diagram.push_str("  classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:3px;\n");
+    diagram.push_str("  classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;\n");
     diagram.push_str("  classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;\n\n");
 
-    let mut included_elements = HashSet::new();
+    // Sort folders for deterministic output
+    let mut folder_names: Vec<&String> = folders.keys().collect();
+    folder_names.sort();
 
-    // First, add all elements in the current file
-    for element in elements {
-        add_element_to_diagram(
-            registry,
-            &mut diagram,
-            element,
-            &mut included_elements,
-            file_path,
-            diagrams_with_blobs,
-            &repo_root,
-            &base_url,
-            &commit_hash,
-        )?;
-    }
+    // Generate subgraphs for folders and files (containment structure)
+    for folder_name in folder_names {
+        let files = &folders[folder_name];
+        let folder_id = utils::hash_identifier(&format!("folder:{}", folder_name));
+        let folder_display = if folder_name.is_empty() { "root" } else { folder_name };
 
-    // Then, find parent elements from other files that have forward relations pointing to elements in this file
-    let file_element_identifiers: HashSet<String> = elements.iter()
-        .map(|e| e.identifier.clone())
-        .collect();
+        diagram.push_str(&format!("  subgraph {}[\"📁 {}\"]\n", folder_id, escape_label(folder_display)));
 
-    for element in registry.get_all_elements() {
-        // Skip elements already in this file
-        if file_element_identifiers.contains(&element.identifier) {
-            continue;
+        // Sort files for deterministic output
+        let mut file_names: Vec<&String> = files.keys().collect();
+        file_names.sort();
+
+        for file_name in file_names {
+            let file_elements = &files[file_name];
+            let file_id = utils::hash_identifier(&format!("file:{}:{}", folder_name, file_name));
+
+            diagram.push_str(&format!("    subgraph {}[\"📄 {}\"]\n", file_id, escape_label(file_name)));
+
+            // Sort elements for deterministic output
+            let mut sorted_elements: Vec<&&Element> = file_elements.iter().collect();
+            sorted_elements.sort_by(|a, b| a.identifier.cmp(&b.identifier));
+
+            for elem in sorted_elements {
+                let elem_id = utils::hash_identifier(&elem.identifier);
+
+                // Build label with attachments
+                let mut label = elem.name.replace('"', "&quot;");
+                for attachment in &elem.attachments {
+                    let attachment_name = match &attachment.target {
+                        crate::element::AttachmentTarget::FilePath(path) => path
+                            .file_name()
+                            .map(|n| n.to_string_lossy().into_owned())
+                            .unwrap_or_else(|| path.to_string_lossy().into_owned()),
+                        crate::element::AttachmentTarget::ElementIdentifier(id) => id.clone(),
+                    };
+                    label.push_str(&format!("<br/>📎 {}", escape_label(&attachment_name)));
+                }
+
+                let class = match &elem.element_type {
+                    ElementType::Requirement(RequirementType::User) => "userRequirement",
+                    ElementType::Requirement(RequirementType::System) => "systemRequirement",
+                    ElementType::Verification(_) => "verification",
+                    _ => "default"
+                };
+
+                // Get click target (relative or git blob URL)
+                let click_target = get_element_click_target(
+                    elem, &base_dir, diagrams_with_blobs, has_git_info,
+                    &base_url, &commit_hash
+                )?;
+
+                diagram.push_str(&format!("      {}[\"{}\"];\n", elem_id, label));
+                diagram.push_str(&format!("      class {} {};\n", elem_id, class));
+                diagram.push_str(&format!("      click {} \"{}\";\n", elem_id, click_target));
+            }
+
+            diagram.push_str("    end\n");
         }
 
-        // Check if this element has diagram relations pointing to any element in the current file
-        let has_forward_relation_to_file = element.relations.iter().any(|relation| {
-            // Only consider relations that should be shown in diagrams
-            if relation::DIAGRAM_RELATIONS.contains(&relation.relation_type.name) {
-                if let relation::LinkType::Identifier(target_id) = &relation.target.link {
-                    return file_element_identifiers.contains(target_id);
-                }
-            }
-            false
+        diagram.push_str("  end\n");
+    }
+
+    // Second pass: add all relations
+    let mut rendered_relations: HashSet<String> = HashSet::new();
+
+    for elem in &all_elements {
+        let elem_id = utils::hash_identifier(&elem.identifier);
+
+        // Sort relations for deterministic output
+        let mut sorted_relations: Vec<_> = elem.relations.iter().collect();
+        sorted_relations.sort_by(|a, b| {
+            a.relation_type.name.cmp(b.relation_type.name)
+                .then_with(|| {
+                    match (&a.target.link, &b.target.link) {
+                        (relation::LinkType::Identifier(a_id), relation::LinkType::Identifier(b_id)) => a_id.cmp(b_id),
+                        (relation::LinkType::ExternalUrl(a_url), relation::LinkType::ExternalUrl(b_url)) => a_url.cmp(b_url),
+                        (relation::LinkType::InternalPath(a_path), relation::LinkType::InternalPath(b_path)) => a_path.cmp(b_path),
+                        _ => std::cmp::Ordering::Equal,
+                    }
+                })
         });
 
-        if has_forward_relation_to_file {
-            add_element_to_diagram(
-                registry,
-                &mut diagram,
-                element,
-                &mut included_elements,
-                file_path,
-                diagrams_with_blobs,
-                &repo_root,
-                &base_url,
-                &commit_hash,
-            )?;
+        for relation in sorted_relations {
+            if !relation::DIAGRAM_RELATIONS.contains(&relation.relation_type.name) {
+                continue;
+            }
+
+            let label = relation.target.text.clone();
+            let (target_id, needs_node) = match &relation.target.link {
+                relation::LinkType::Identifier(target) => {
+                    (utils::hash_identifier(target), false) // Node already in subgraph
+                },
+                relation::LinkType::ExternalUrl(url) => {
+                    (utils::hash_identifier(url), true)
+                },
+                relation::LinkType::InternalPath(path) => {
+                    let cow = path.to_string_lossy();
+                    (utils::hash_identifier(cow.as_ref()), true)
+                }
+            };
+
+            // Add external/file nodes that aren't in subgraphs
+            if needs_node {
+                let node_key = format!("node:{}", target_id);
+                if !rendered_relations.contains(&node_key) {
+                    rendered_relations.insert(node_key);
+
+                    let click_target = match &relation.target.link {
+                        relation::LinkType::ExternalUrl(url) => url.clone(),
+                        relation::LinkType::InternalPath(path) => {
+                            if diagrams_with_blobs && has_git_info {
+                                let relative_id = match utils::get_relative_path(&path) {
+                                    Ok(rel_path) => rel_path.to_string_lossy().to_string(),
+                                    Err(_) => path.to_string_lossy().to_string()
+                                };
+                                format!("{}/blob/{}/{}", base_url, commit_hash, relative_id)
+                            } else {
+                                utils::to_relative_identifier(
+                                    &path.to_string_lossy().into_owned(),
+                                    &base_dir,
+                                    false
+                                )?
+                            }
+                        },
+                        _ => String::new(),
+                    };
+
+                    diagram.push_str(&format!("  {}[\"{}\"];\n", target_id, label));
+                    diagram.push_str(&format!("  class {} default;\n", target_id));
+                    diagram.push_str(&format!("  click {} \"{}\";\n", target_id, click_target));
+                }
+            }
+
+            // Add the relation edge
+            if let Some(info) = relation::RELATION_TYPES.get(relation.relation_type.name) {
+                let relation_key = format!("{}->{}:{}", elem_id, target_id, relation.relation_type.name);
+                if !rendered_relations.contains(&relation_key) {
+                    rendered_relations.insert(relation_key);
+                    diagram.push_str(&format!(
+                        "  {} {}|{}| {};\n",
+                        elem_id,
+                        info.arrow,
+                        info.label,
+                        target_id,
+                    ));
+                }
+            }
         }
     }
 
@@ -459,206 +638,25 @@ fn generate_file_diagram(
     Ok(diagram)
 }
 
-/// Adds an element and its relations to the diagram
-fn add_element_to_diagram(
-    registry: &GraphRegistry,
-    diagram: &mut String,
+/// Get click target URL for an element (relative path or git blob URL)
+fn get_element_click_target(
     element: &Element,
-    included_elements: &mut HashSet<String>,
-    file_path: &str,
-    diagrams_with_blobs: bool,  
-    repo_root: &PathBuf,
+    base_dir: &PathBuf,
+    diagrams_with_blobs: bool,
+    has_git_info: bool,
     base_url: &str,
     commit_hash: &str,
-) -> Result<(), ReqvireError> {
-
-    // Convert file path to its parent directory (returns PathBuf)
-    let base_dir = PathBuf::from(file_path)
-        .parent()
-        .map(|p| p.to_path_buf()) 
-        .unwrap_or_else(|| PathBuf::from("."));
- 
-    // Get relative ID for local navigation
-    let relative_target = utils::to_relative_identifier(
-        &element.identifier.clone(),
-        &base_dir,
-        false
-    )?;
-
-
-    // Create a stable GitHub link for the element if we have the git info and diagrams should be with blobs
-    let has_git_info = !base_url.is_empty() && !commit_hash.is_empty() && !repo_root.as_os_str().is_empty();
-       
-    let click_target = if diagrams_with_blobs && has_git_info {
-        // Get repository-relative path
+) -> Result<String, ReqvireError> {
+    if diagrams_with_blobs && has_git_info {
         let relative_id = match utils::get_relative_path(&PathBuf::from(&element.identifier)) {
             Ok(rel_path) => rel_path.to_string_lossy().to_string(),
             Err(_) => element.identifier.clone(),
         };
-        
-        // Create a git link for the element
-        format!("{}/blob/{}/{}", base_url, commit_hash, relative_id)
+        Ok(format!("{}/blob/{}/{}", base_url, commit_hash, relative_id))
     } else {
-        // Fall back to the relative link for local navigation
-        relative_target.clone()
-    };    
-        
-    let element_id = utils::hash_identifier(&element.identifier);   
-
-    if !included_elements.contains(&element.identifier) {
-       included_elements.insert(element.identifier.clone());
-       
-       let label = element.name.replace('"', "&quot;");
-       
-       let class=match &element.element_type {
-           ElementType::Requirement(RequirementType::User)  => "userRequirement",
-           ElementType::Requirement(RequirementType::System) =>"systemRequirement",
-           ElementType::Verification(_) =>"verification",
-           _ => "default"
-       };
-           
-                  
-       // Add the element node
-       diagram.push_str(&format!("  {}[\"{}\"];\n", element_id, label));      
-       diagram.push_str(&format!("  class {} {};\n", element_id, class));
-       diagram.push_str(&format!("  click {} \"{}\";\n", element_id, click_target));       
+        utils::to_relative_identifier(&element.identifier, base_dir, false)
     }
-
-
-
-    // Sort relations for deterministic output
-    let mut sorted_relations: Vec<_> = element.relations.iter().collect();
-    sorted_relations.sort_by(|a, b| {
-        a.relation_type.name.cmp(b.relation_type.name)
-            .then_with(|| {
-                match (&a.target.link, &b.target.link) {
-                    (relation::LinkType::Identifier(a_id), relation::LinkType::Identifier(b_id)) => a_id.cmp(b_id),
-                    (relation::LinkType::ExternalUrl(a_url), relation::LinkType::ExternalUrl(b_url)) => a_url.cmp(b_url),
-                    (relation::LinkType::InternalPath(a_path), relation::LinkType::InternalPath(b_path)) => a_path.cmp(b_path),
-                    _ => std::cmp::Ordering::Equal,
-                }
-            })
-    });
-
-    for relation in sorted_relations {
-        // Only render relations that should be shown in diagrams (to prevent duplicate arrows)
-        if !relation::DIAGRAM_RELATIONS.contains(&relation.relation_type.name) {
-            continue;
-        }
-
-
-        let label = relation.target.text.clone();
-        let target_id = match &relation.target.link {
-            relation::LinkType::Identifier(target) => {            
-                
-                let target_id = utils::hash_identifier(&target);               
-
-                // Get relative ID for local navigation
-                let relative_target = utils::to_relative_identifier(
-                    &target,
-                    &base_dir,
-                    false
-                )?;
-                
-           
-                // Get a GitHub link if we have git info
-                let click_target = if diagrams_with_blobs &&  has_git_info {
-                    // Get repository-relative path
-                    let relative_id = match utils::get_relative_path(&PathBuf::from(target)) {
-                        Ok(rel_path) => rel_path.to_string_lossy().to_string(),
-                        Err(_) => target.clone(),
-                    };
-                    
-                    // Create a git link for the target element
-                    format!("{}/blob/{}/{}", base_url, commit_hash, relative_id)
-                } else {
-                    // Fall back to the relative link for local navigation
-                    relative_target.clone()
-                };
-                             
-                
-                if !included_elements.contains(target) {
-                    included_elements.insert(target.clone());
-                                 
-                    let class = match registry.get_element(&target) {
-                        Some(existing_element)=>{
-                            match existing_element.element_type {
-                                ElementType::Requirement(RequirementType::User)  => "userRequirement",
-                                ElementType::Requirement(RequirementType::System) => "systemRequirement",
-                                ElementType::Verification(_) => "verification",
-                                _ => "default"
-                             }
-                        },
-                        _ => "default"
-                    };
-                                                               
-                    diagram.push_str(&format!("  {}[\"{}\"];\n", target_id, label));
-                    diagram.push_str(&format!("  class {} {};\n", target_id, class));                    
-                    diagram.push_str(&format!("  click {} \"{}\";\n", target_id, click_target));                    
-                }
-                target_id
-            },
-            relation::LinkType::ExternalUrl(url) => {
-                // Always add external URLs, regardless of `included_elements`
-                let target_id = utils::hash_identifier(url);
-                diagram.push_str(&format!("  {}[\"{}\"];\n", target_id, label));
-                diagram.push_str(&format!("  class {} {};\n", target_id,"default"));
-                diagram.push_str(&format!("  click {} \"{}\";\n", target_id, url));
-                
-                target_id               
-            },
-            relation::LinkType::InternalPath(path) => {
-                // Get relative ID for local navigation
-                let relative_target = utils::to_relative_identifier(
-                    &path.to_string_lossy().into_owned(),
-                    &base_dir,
-                    false
-                )?;
-                
-           
-                // Get a GitHub link if we have git info
-                let click_target = if diagrams_with_blobs &&  has_git_info {
-                    // Get repository-relative path
-                    let relative_id = match utils::get_relative_path(&path) {
-                        Ok(rel_path) => rel_path.to_string_lossy().to_string(),
-                        Err(_) => path.to_string_lossy().to_string()
-                    };
-                    
-                    // Create a git link for the target element
-                    format!("{}/blob/{}/{}", base_url, commit_hash, relative_id)
-                } else {
-                    // Fall back to the relative link for local navigation
-                    relative_target.clone()
-                };
-            
-                // Always add internal paths, regardless of `included_elements`
-                let cow = path.to_string_lossy();
-                let path_str = cow.as_ref();
-                let target_id = utils::hash_identifier(path_str);
-                diagram.push_str(&format!("  {}[\"{}\"];\n", target_id, label));
-                diagram.push_str(&format!("  class {} {};\n", target_id,"default"));
-                diagram.push_str(&format!("  click {} \"{}\";\n", target_id, click_target));
-                
-                target_id               
-            }            
-        };
-
-
-        if let Some(info) = relation::RELATION_TYPES.get(relation.relation_type.name) {
-            // Always render as element → target
-            diagram.push_str(&format!(
-                "  {} {}|{}| {};\n",
-                element_id,
-                info.arrow,
-                info.label,
-                target_id,
-            ));
-        }
-    }
-
-    Ok(())
 }
-
 
 /// Processes diagram generation for markdown files in place (without writing to output).
 /// Used when the `--generate-diagrams` flag is set.
@@ -708,14 +706,14 @@ pub fn process_diagrams(
 }
 
 /// Replaces the auto-generated diagram in a markdown file.
-/// Inserts after the `# Requirements` header.
+/// Inserts after the `# Elements` header.
 ///
 /// - `content`: The original file content.
 /// - `new_diagram`: The newly generated Mermaid diagram.
 ///
 /// Returns the modified file content as a `String`.
 fn replace_file_diagram(content: &str, new_diagram: &str) -> String {
-    let requirements_header = "# Requirements";
+    let requirements_header = "# Elements";
     let mermaid_block_start = "```mermaid";
     let mermaid_block_end = "```";
 
@@ -1046,7 +1044,8 @@ pub fn generate_containment_diagram(registry: &GraphRegistry, short: bool) -> Re
     output.push_str("  classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;\n");
     output.push_str("  classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;\n");
     output.push_str("  classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:2px;\n");
-    output.push_str("  classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;\n\n");
+    output.push_str("  classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;\n");
+    output.push_str("  classDef attachment fill:#EFEBE9,stroke:#8D6E63,stroke-width:1.5px;\n\n");
 
     // Define root node
     output.push_str("  root[\"📁 Reqvire root\"]\n");
@@ -1058,6 +1057,7 @@ pub fn generate_containment_diagram(registry: &GraphRegistry, short: bool) -> Re
 
     // Collect all elements for styling and links
     let all_elements = collect_all_elements(&hierarchy.root_folder);
+    let all_design_docs = collect_all_design_documents(&hierarchy.root_folder);
 
     // Generate element styling
     output.push_str("  %% Element type styling\n");
@@ -1069,6 +1069,12 @@ pub fn generate_containment_diagram(registry: &GraphRegistry, short: bool) -> Re
 
     // Generate clickable links
     output.push_str("\n  %% Clickable links\n");
+    // Design documents first
+    for doc in &all_design_docs {
+        let doc_id = sanitize_design_doc_id(&doc.path);
+        output.push_str(&format!("  click {} \"{}\"\n", doc_id, doc.path));
+    }
+    // Elements
     for element in &all_elements {
         let hash_id = generate_element_hash(&element.identifier);
         let fragment = element.identifier.split('#').nth(1).unwrap_or("");
@@ -1097,6 +1103,14 @@ fn generate_folder_tree(
         generate_folder_tree(subfolder, &folder_id, output)?;
     }
 
+    // Generate design documents
+    for doc in &folder.design_documents {
+        let doc_id = sanitize_design_doc_id(&doc.path);
+        output.push_str(&format!("  {}[\"📝 {}\"]\n", doc_id, doc.name));
+        output.push_str(&format!("  {} --> {}\n", parent_id, doc_id));
+        output.push_str(&format!("  class {} attachment\n", doc_id));
+    }
+
     // Generate files
     for file in &folder.files {
         let file_id = sanitize_file_id(&file.path);
@@ -1105,10 +1119,14 @@ fn generate_folder_tree(
         output.push_str(&format!("  subgraph {}[\"📄 {}\"]\n", file_id, file.name));
         output.push_str("    direction TB\n");
 
-        // Generate element nodes
+        // Generate element nodes with attachments
         for element in &file.elements {
             let hash_id = generate_element_hash(&element.identifier);
-            let label = escape_label(&element.name);
+            let mut label = escape_label(&element.name);
+            // Add attachments to label
+            for attachment in &element.attachments {
+                label.push_str(&format!("<br/>📎 {}", escape_label(&attachment.name)));
+            }
             output.push_str(&format!("    {}[\"{}\"]\n", hash_id, label));
         }
 
@@ -1139,6 +1157,24 @@ fn collect_all_elements(folder: &crate::containment::ContainmentFolder) -> Vec<c
     elements
 }
 
+/// Collect all design documents from folder hierarchy for click links
+fn collect_all_design_documents(folder: &crate::containment::ContainmentFolder) -> Vec<crate::containment::DesignDocument> {
+    let mut docs = Vec::new();
+
+    // Collect from this folder
+    docs.extend(folder.design_documents.clone());
+
+    // Recursively collect from subfolders
+    for subfolder in &folder.subfolders {
+        docs.extend(collect_all_design_documents(subfolder));
+    }
+
+    // Sort for deterministic output
+    docs.sort_by(|a, b| a.path.cmp(&b.path));
+
+    docs
+}
+
 fn sanitize_folder_id(path: &[String]) -> String {
     path.join("_")
         .replace(".", "")
@@ -1148,6 +1184,14 @@ fn sanitize_folder_id(path: &[String]) -> String {
 
 fn sanitize_file_id(name: &str) -> String {
     name.replace(".md", "")
+        .replace(".", "")
+        .replace("-", "_")
+        .replace(" ", "_")
+}
+
+fn sanitize_design_doc_id(path: &str) -> String {
+    path.replace("/", "_")
+        .replace(".md", "")
         .replace(".", "")
         .replace("-", "_")
         .replace(" ", "_")
@@ -1170,4 +1214,37 @@ fn get_element_class_from_type(element_type: &ElementType) -> &'static str {
         ElementType::Verification(_) => "verification",
         _ => "default",
     }
+}
+
+/// Generate containment view as D3.js collapsible tree
+///
+/// Generates a markdown code block with `d3-tree` language containing JSON data
+/// that can be rendered as an interactive collapsible tree in HTML export.
+///
+/// When `short` is true, shows only root elements (those without hierarchical parents).
+/// When `short` is false (default), shows all elements.
+pub fn generate_containment_d3_tree(registry: &GraphRegistry, short: bool) -> Result<String, ReqvireError> {
+    // Build containment hierarchy structure
+    let hierarchy = crate::containment::ContainmentHierarchy::build(registry, short)?;
+
+    // Convert to D3 tree format
+    let d3_tree = hierarchy.to_d3_tree();
+
+    // Serialize to JSON
+    let json = serde_json::to_string_pretty(&d3_tree)
+        .map_err(|e| ReqvireError::SerializationError(format!("Failed to serialize D3 tree: {}", e)))?;
+
+    let mut output = String::new();
+
+    // Note about element display mode
+    if short {
+        output.push_str("*Elements filtered to show only root elements (those without hierarchical parent relations within the same file).*\n\n");
+    }
+
+    // Output as d3-tree code block
+    output.push_str("```d3-tree\n");
+    output.push_str(&json);
+    output.push_str("\n```\n");
+
+    Ok(output)
 }

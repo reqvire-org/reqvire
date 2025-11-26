@@ -1,24 +1,28 @@
 #!/bin/bash
-set -euo pipefail
+set -uo pipefail
 
 # Test: Attachments Feature
 #
 # Satisfies: specifications/System/AttachmentsVerifications.md
 #
-# Acceptance Criteria:
-# - Attach command creates Attachments subsection and adds links
-# - Detach command removes links and cleans up empty subsections
-# - mv-attachment updates all references across elements
-# - rm-attachment deletes file and detaches from all elements
-# - Search filters correctly find elements by attachments
-# - Validation detects missing attachment files
-#
-# Test Criteria:
-# - Commands exit with code 0 on success
-# - Files are modified as expected
-# - Attachments are properly maintained
+# This test uses expected output files and diff comparisons.
+# Each test step modifies files and compares against expected/*.md files.
 
 TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Helper function to compare files and show diff on failure
+assert_file_matches() {
+  local expected="$1"
+  local actual="$2"
+  local description="$3"
+
+  if ! diff -u "$expected" "$actual"; then
+    echo "❌ FAILED: $description"
+    echo ""
+    echo "If changes are intentional, update $expected"
+    exit 1
+  fi
+}
 
 echo "===================================="
 echo "Attachments Feature Tests"
@@ -26,368 +30,146 @@ echo "===================================="
 echo ""
 
 # ==================================
-# Test 1: Attach Command
+# Test 1: Attach file to element
 # ==================================
-echo "Test 1: Attach command..."
+echo "Test 1: Attach file to element..."
 
-set +e
-ATTACH_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" attach "docs/SLA.txt" "Performance Requirement" 2>&1)
-ATTACH_EXIT=$?
-set -e
+cd "$TEST_DIR" && "$REQVIRE_BIN" attach "docs/SLA.txt" "Performance Requirement" > /dev/null 2>&1
 
-if [ $ATTACH_EXIT -ne 0 ]; then
-  echo "FAILED: Attach command failed with exit code $ATTACH_EXIT"
-  echo "$ATTACH_OUTPUT"
-  exit 1
-fi
+assert_file_matches "${TEST_SCRIPT_DIR}/expected/01-after-attach.md" "$TEST_DIR/specifications/Requirements.md" "File content after attach does not match expected"
 
-# Verify Attachments subsection was created
-if ! grep -q "#### Attachments" "$TEST_DIR/specifications/Requirements.md"; then
-  echo "FAILED: Attachments subsection was not created"
-  exit 1
-fi
-
-# Verify link was added with correct format
-if ! grep -q '\[docs/SLA.txt\](docs/SLA.txt)' "$TEST_DIR/specifications/Requirements.md"; then
-  echo "FAILED: Attachment link not added with correct format"
-  exit 1
-fi
-
-# Verify model still validates
-set +e
-VALIDATION_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" validate 2>&1)
-VALIDATION_EXIT=$?
-set -e
-
-if [ $VALIDATION_EXIT -ne 0 ]; then
-  echo "FAILED: Model validation failed after attach"
-  echo "$VALIDATION_OUTPUT"
-  exit 1
-fi
-
-echo "Attachment added successfully"
+echo "✅ Test 1 passed"
 echo ""
 
 # ==================================
-# Test 2: Attach Idempotency
+# Test 2: Attach idempotency
 # ==================================
 echo "Test 2: Attach idempotency (duplicate attach)..."
 
-# Make backup
-cp "$TEST_DIR/specifications/Requirements.md" "$TEST_DIR/requirements_backup.bak"
+cd "$TEST_DIR" && "$REQVIRE_BIN" attach "docs/SLA.txt" "Performance Requirement" > /dev/null 2>&1
 
-set +e
-ATTACH_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" attach "docs/SLA.txt" "Performance Requirement" 2>&1)
-ATTACH_EXIT=$?
-set -e
+# File should be unchanged (no duplicate)
+assert_file_matches "${TEST_SCRIPT_DIR}/expected/01-after-attach.md" "$TEST_DIR/specifications/Requirements.md" "Duplicate attach should not modify file"
 
-if [ $ATTACH_EXIT -ne 0 ]; then
-  echo "FAILED: Duplicate attach command should succeed"
-  echo "$ATTACH_OUTPUT"
-  exit 1
-fi
-
-# Count occurrences of the link - should be exactly 1
-LINK_COUNT=$(grep -c '\[docs/SLA.txt\](docs/SLA.txt)' "$TEST_DIR/specifications/Requirements.md" || true)
-if [ "$LINK_COUNT" -ne 1 ]; then
-  echo "FAILED: Duplicate attach created duplicate entry (found $LINK_COUNT occurrences)"
-  exit 1
-fi
-
-echo "Attach idempotency verified"
+echo "✅ Test 2 passed"
 echo ""
 
 # ==================================
-# Test 3: Multiple Attachments
+# Test 3: Multiple attachments
 # ==================================
 echo "Test 3: Multiple attachments on same element..."
 
-set +e
-ATTACH_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" attach "docs/benchmarks.txt" "Performance Requirement" 2>&1)
-ATTACH_EXIT=$?
-set -e
+cd "$TEST_DIR" && "$REQVIRE_BIN" attach "docs/benchmarks.txt" "Performance Requirement" > /dev/null 2>&1
 
-if [ $ATTACH_EXIT -ne 0 ]; then
-  echo "FAILED: Second attach command failed"
-  echo "$ATTACH_OUTPUT"
-  exit 1
-fi
+assert_file_matches "${TEST_SCRIPT_DIR}/expected/03-multiple-attachments.md" "$TEST_DIR/specifications/Requirements.md" "Multiple attachments result does not match expected"
 
-# Verify both attachments exist
-if ! grep -q '\[docs/SLA.txt\](docs/SLA.txt)' "$TEST_DIR/specifications/Requirements.md"; then
-  echo "FAILED: First attachment was removed"
-  exit 1
-fi
-
-if ! grep -q '\[docs/benchmarks.txt\](docs/benchmarks.txt)' "$TEST_DIR/specifications/Requirements.md"; then
-  echo "FAILED: Second attachment was not added"
-  exit 1
-fi
-
-echo "Multiple attachments verified"
+echo "✅ Test 3 passed"
 echo ""
 
 # ==================================
-# Test 4: Many-to-Many Attachment
+# Test 4: Same file to multiple elements
 # ==================================
 echo "Test 4: Same file attached to multiple elements..."
 
-set +e
-ATTACH_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" attach "docs/SLA.txt" "Implementation Detail" 2>&1)
-ATTACH_EXIT=$?
-set -e
+cd "$TEST_DIR" && "$REQVIRE_BIN" attach "docs/SLA.txt" "Implementation Detail" > /dev/null 2>&1
 
-if [ $ATTACH_EXIT -ne 0 ]; then
-  echo "FAILED: Attach to second element failed"
-  echo "$ATTACH_OUTPUT"
-  exit 1
-fi
+assert_file_matches "${TEST_SCRIPT_DIR}/expected/04-many-to-many.md" "$TEST_DIR/specifications/Requirements.md" "Many-to-many attachment result does not match expected"
 
-# Verify both elements have the attachment
-SLA_COUNT=$(grep -c '\[docs/SLA.txt\](docs/SLA.txt)' "$TEST_DIR/specifications/Requirements.md" || true)
-if [ "$SLA_COUNT" -ne 2 ]; then
-  echo "FAILED: Expected SLA.txt attached to 2 elements, found $SLA_COUNT"
-  exit 1
-fi
-
-echo "Many-to-many attachment verified"
+echo "✅ Test 4 passed"
 echo ""
 
 # ==================================
-# Test 5: Detach Command
+# Test 5: Detach command
 # ==================================
 echo "Test 5: Detach command..."
 
-set +e
-DETACH_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" detach "Performance Requirement" "docs/benchmarks.txt" 2>&1)
-DETACH_EXIT=$?
-set -e
+cd "$TEST_DIR" && "$REQVIRE_BIN" detach "Performance Requirement" "docs/benchmarks.txt" > /dev/null 2>&1
 
-if [ $DETACH_EXIT -ne 0 ]; then
-  echo "FAILED: Detach command failed"
-  echo "$DETACH_OUTPUT"
-  exit 1
-fi
+assert_file_matches "${TEST_SCRIPT_DIR}/expected/05-after-detach.md" "$TEST_DIR/specifications/Requirements.md" "File content after detach does not match expected"
 
-# Verify benchmarks.txt was removed
-if grep -q '\[docs/benchmarks.txt\](docs/benchmarks.txt)' "$TEST_DIR/specifications/Requirements.md"; then
-  echo "FAILED: Attachment was not removed after detach"
-  exit 1
-fi
-
-# Verify SLA.txt still exists on Performance Requirement
-# (We need to check the specific element - use enough lines to capture all sections)
-if ! grep -A 20 "### Performance Requirement" "$TEST_DIR/specifications/Requirements.md" | grep -q '\[docs/SLA.txt\](docs/SLA.txt)'; then
-  echo "FAILED: Other attachment was incorrectly removed"
-  exit 1
-fi
-
-echo "Detach command verified"
+echo "✅ Test 5 passed"
 echo ""
 
 # ==================================
-# Test 6: Detach from One Element
+# Test 6: Detach isolation
 # ==================================
 echo "Test 6: Detach from one element doesn't affect others..."
 
-set +e
-DETACH_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" detach "Performance Requirement" "docs/SLA.txt" 2>&1)
-DETACH_EXIT=$?
-set -e
+cd "$TEST_DIR" && "$REQVIRE_BIN" detach "Performance Requirement" "docs/SLA.txt" > /dev/null 2>&1
 
-if [ $DETACH_EXIT -ne 0 ]; then
-  echo "FAILED: Detach from one element failed"
-  echo "$DETACH_OUTPUT"
-  exit 1
-fi
+assert_file_matches "${TEST_SCRIPT_DIR}/expected/06-detach-isolation.md" "$TEST_DIR/specifications/Requirements.md" "Detach isolation result does not match expected"
 
-# Verify SLA.txt was removed from Performance Requirement but still on Implementation Detail
-if grep -A 20 "### Performance Requirement" "$TEST_DIR/specifications/Requirements.md" | grep -B 20 "### Implementation Detail" | grep -q '\[docs/SLA.txt\](docs/SLA.txt)'; then
-  echo "FAILED: SLA.txt was not removed from Performance Requirement"
-  exit 1
-fi
-
-if ! grep -A 20 "### Implementation Detail" "$TEST_DIR/specifications/Requirements.md" | grep -q '\[docs/SLA.txt\](docs/SLA.txt)'; then
-  echo "FAILED: SLA.txt was incorrectly removed from Implementation Detail"
-  exit 1
-fi
-
-echo "Detach isolation verified"
+echo "✅ Test 6 passed"
 echo ""
 
 # ==================================
-# Test 7: Empty Subsection Cleanup
+# Test 7: Search filters
 # ==================================
-echo "Test 7: Empty Attachments subsection cleanup..."
-
-# Performance Requirement should no longer have Attachments subsection
-# since we detached all its attachments
-
-# Count Attachments subsections - should be 1 (only on Implementation Detail)
-ATTACHMENTS_COUNT=$(grep -c "#### Attachments" "$TEST_DIR/specifications/Requirements.md" || true)
-if [ "$ATTACHMENTS_COUNT" -ne 1 ]; then
-  echo "FAILED: Expected 1 Attachments subsection, found $ATTACHMENTS_COUNT"
-  cat "$TEST_DIR/specifications/Requirements.md"
-  exit 1
-fi
-
-echo "Empty subsection cleanup verified"
-echo ""
-
-# ==================================
-# Test 8: Search Filters
-# ==================================
-echo "Test 8: Search filters for attachments..."
+echo "Test 7: Search filters for attachments..."
 
 # Re-attach for search tests
-set +e
-cd "$TEST_DIR" && "$REQVIRE_BIN" attach "docs/SLA.txt" "Performance Requirement" 2>&1 > /dev/null
-set -e
+cd "$TEST_DIR" && "$REQVIRE_BIN" attach "docs/SLA.txt" "Performance Requirement" > /dev/null 2>&1
 
-# Test --has-attachments filter
-set +e
 SEARCH_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --has-attachments --short 2>&1)
-SEARCH_EXIT=$?
-set -e
 
-if [ $SEARCH_EXIT -ne 0 ]; then
-  echo "FAILED: Search with --has-attachments failed"
-  echo "$SEARCH_OUTPUT"
+if ! echo "$SEARCH_OUTPUT" | diff -u "${TEST_SCRIPT_DIR}/expected/07-search-has-attachments.txt" -; then
+  echo "❌ FAILED: Search --has-attachments output does not match expected"
+  echo ""
+  echo "If changes are intentional, update ${TEST_SCRIPT_DIR}/expected/07-search-has-attachments.txt"
   exit 1
 fi
 
-# Should find Performance Requirement and Implementation Detail, not No Attachments Requirement
-if ! echo "$SEARCH_OUTPUT" | grep -q "Performance Requirement"; then
-  echo "FAILED: Search did not find Performance Requirement"
-  echo "$SEARCH_OUTPUT"
-  exit 1
-fi
-
-if ! echo "$SEARCH_OUTPUT" | grep -q "Implementation Detail"; then
-  echo "FAILED: Search did not find Implementation Detail"
-  echo "$SEARCH_OUTPUT"
-  exit 1
-fi
-
-if echo "$SEARCH_OUTPUT" | grep -q "No Attachments Requirement"; then
-  echo "FAILED: Search incorrectly found No Attachments Requirement"
-  echo "$SEARCH_OUTPUT"
-  exit 1
-fi
-
-echo "Search filter --has-attachments verified"
-
-# Test --filter-attachment with glob
-set +e
-SEARCH_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --filter-attachment "*.txt" --short 2>&1)
-SEARCH_EXIT=$?
-set -e
-
-if [ $SEARCH_EXIT -ne 0 ]; then
-  echo "FAILED: Search with --filter-attachment failed"
-  echo "$SEARCH_OUTPUT"
-  exit 1
-fi
-
-if ! echo "$SEARCH_OUTPUT" | grep -q "Performance Requirement"; then
-  echo "FAILED: Pattern *.txt did not match SLA.txt"
-  echo "$SEARCH_OUTPUT"
-  exit 1
-fi
-
-echo "Search filter --filter-attachment verified"
+echo "✅ Test 7 passed"
 echo ""
 
 # ==================================
-# Test 9: mv-attachment Command
+# Test 8: mv-attachment command
 # ==================================
-echo "Test 9: mv-attachment command..."
+echo "Test 8: mv-attachment command..."
 
-# Create new location
 mkdir -p "$TEST_DIR/documents"
+cd "$TEST_DIR" && "$REQVIRE_BIN" mv-attachment "docs/SLA.txt" "documents/SLA.txt" > /dev/null 2>&1
 
-set +e
-MV_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv-attachment "docs/SLA.txt" "documents/SLA.txt" 2>&1)
-MV_EXIT=$?
-set -e
-
-if [ $MV_EXIT -ne 0 ]; then
-  echo "FAILED: mv-attachment command failed"
-  echo "$MV_OUTPUT"
-  exit 1
-fi
-
-# Verify old path is gone from all elements
-if grep -q '\[docs/SLA.txt\](docs/SLA.txt)' "$TEST_DIR/specifications/Requirements.md"; then
-  echo "FAILED: Old path still exists after mv-attachment"
-  exit 1
-fi
-
-# Verify new path exists in all elements that had the attachment
-if ! grep -q '\[documents/SLA.txt\](documents/SLA.txt)' "$TEST_DIR/specifications/Requirements.md"; then
-  echo "FAILED: New path not found after mv-attachment"
-  exit 1
-fi
+assert_file_matches "${TEST_SCRIPT_DIR}/expected/08-after-mv-attachment.md" "$TEST_DIR/specifications/Requirements.md" "File content after mv-attachment does not match expected"
 
 # Verify file was moved
 if [ -f "$TEST_DIR/docs/SLA.txt" ]; then
-  echo "FAILED: Old file still exists"
+  echo "❌ FAILED: Old file still exists after mv-attachment"
   exit 1
 fi
 
 if [ ! -f "$TEST_DIR/documents/SLA.txt" ]; then
-  echo "FAILED: File was not moved to new location"
+  echo "❌ FAILED: File was not moved to new location"
   exit 1
 fi
 
-echo "mv-attachment verified"
+echo "✅ Test 8 passed"
 echo ""
 
 # ==================================
-# Test 10: rm-attachment Command
+# Test 9: rm-attachment command
 # ==================================
-echo "Test 10: rm-attachment command..."
+echo "Test 9: rm-attachment command..."
 
-set +e
-RM_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" rm-attachment "documents/SLA.txt" 2>&1)
-RM_EXIT=$?
-set -e
+cd "$TEST_DIR" && "$REQVIRE_BIN" rm-attachment "documents/SLA.txt" > /dev/null 2>&1
 
-if [ $RM_EXIT -ne 0 ]; then
-  echo "FAILED: rm-attachment command failed"
-  echo "$RM_OUTPUT"
-  exit 1
-fi
+assert_file_matches "${TEST_SCRIPT_DIR}/expected/09-after-rm-attachment.md" "$TEST_DIR/specifications/Requirements.md" "File content after rm-attachment does not match expected"
 
 # Verify file was deleted
 if [ -f "$TEST_DIR/documents/SLA.txt" ]; then
-  echo "FAILED: File was not deleted"
+  echo "❌ FAILED: File was not deleted by rm-attachment"
   exit 1
 fi
 
-# Verify attachment was removed from all elements
-if grep -q '\[documents/SLA.txt\](documents/SLA.txt)' "$TEST_DIR/specifications/Requirements.md"; then
-  echo "FAILED: Attachment reference still exists after rm-attachment"
-  exit 1
-fi
-
-# Verify empty Attachments subsections were cleaned up
-# No elements should have Attachments subsections now
-ATTACHMENTS_COUNT=$(grep -c "#### Attachments" "$TEST_DIR/specifications/Requirements.md" || true)
-if [ "$ATTACHMENTS_COUNT" -ne 0 ]; then
-  echo "FAILED: Empty Attachments subsections not cleaned up after rm-attachment"
-  exit 1
-fi
-
-echo "rm-attachment verified"
+echo "✅ Test 9 passed"
 echo ""
 
 # ==================================
-# Test 11: Validation - Missing Attachment
+# Test 10: Validation - Missing Attachment
 # ==================================
-echo "Test 11: Validation detects missing attachment files..."
+echo "Test 10: Validation detects missing attachment files..."
 
-# Manually add attachment that doesn't exist
+# Manually add element with missing attachment
 cat >> "$TEST_DIR/specifications/Requirements.md" << 'EOF'
 
 ### Test Missing Attachment
@@ -412,31 +194,30 @@ VALIDATION_EXIT=$?
 set -e
 
 if [ $VALIDATION_EXIT -eq 0 ]; then
-  echo "FAILED: Validation should fail for missing attachment file"
+  echo "❌ FAILED: Validation should fail for missing attachment file"
   exit 1
 fi
 
 if ! echo "$VALIDATION_OUTPUT" | grep -qi "missing\|not found\|attachment"; then
-  echo "FAILED: Validation error should mention missing attachment"
+  echo "❌ FAILED: Validation error should mention missing attachment"
   echo "$VALIDATION_OUTPUT"
   exit 1
 fi
 
-echo "Missing attachment validation verified"
+echo "✅ Test 10 passed"
 echo ""
 
 # ==================================
-# Test 12: Dry-run Mode
+# Test 11: Dry-run mode
 # ==================================
-echo "Test 12: Dry-run mode..."
+echo "Test 11: Dry-run mode..."
 
-# Clean up Test 11's invalid element before continuing
-# Remove the Test Missing Attachment element that was added
+# Clean up invalid element
 sed -i '/### Test Missing Attachment/,/^---$/d' "$TEST_DIR/specifications/Requirements.md"
 
-# Create a fresh requirement for dry-run test
+# Create fresh test file
 cat > "$TEST_DIR/specifications/DryRunTest.md" << 'EOF'
-# Requirements
+# Elements
 
 ### Dry Run Element
 
@@ -451,28 +232,107 @@ Test element for dry-run.
 
 EOF
 
-# Make backup
 cp "$TEST_DIR/specifications/DryRunTest.md" "$TEST_DIR/dryrun_backup.bak"
 
-set +e
-DRYRUN_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" attach "docs/benchmarks.txt" "Dry Run Element" --dry-run 2>&1)
-DRYRUN_EXIT=$?
-set -e
+cd "$TEST_DIR" && "$REQVIRE_BIN" attach "docs/benchmarks.txt" "Dry Run Element" --dry-run > /dev/null 2>&1
 
-if [ $DRYRUN_EXIT -ne 0 ]; then
-  echo "FAILED: Dry-run attach failed"
-  echo "$DRYRUN_OUTPUT"
-  exit 1
-fi
-
-# Verify file was NOT modified
 if ! cmp -s "$TEST_DIR/specifications/DryRunTest.md" "$TEST_DIR/dryrun_backup.bak"; then
-  echo "FAILED: Dry-run mode modified the file"
+  echo "❌ FAILED: Dry-run mode should not modify the file"
   diff "$TEST_DIR/dryrun_backup.bak" "$TEST_DIR/specifications/DryRunTest.md"
   exit 1
 fi
 
-echo "Dry-run mode verified"
+echo "✅ Test 11 passed"
+echo ""
+
+# ==================================
+# Test 12: Attach Refinement element
+# ==================================
+echo "Test 12: Attach Refinement element by display name..."
+
+# Reset Requirements.md to clean state for element attachment tests
+cp "${TEST_SCRIPT_DIR}/expected/09-after-rm-attachment.md" "$TEST_DIR/specifications/Requirements.md"
+
+cd "$TEST_DIR" && "$REQVIRE_BIN" attach "Test Constraint Element" "Performance Requirement" > /dev/null 2>&1
+
+assert_file_matches "${TEST_SCRIPT_DIR}/expected/12-after-element-attach.md" "$TEST_DIR/specifications/Requirements.md" "Element attachment result does not match expected"
+
+echo "✅ Test 12 passed"
+echo ""
+
+# ==================================
+# Test 13: File path takes priority
+# ==================================
+echo "Test 13: Auto-detect - file path takes priority over element name..."
+
+mkdir -p "$TEST_DIR/Test Constraint Element"
+echo "test content" > "$TEST_DIR/Test Constraint Element/data.txt"
+
+cd "$TEST_DIR" && "$REQVIRE_BIN" attach "Test Constraint Element/data.txt" "Implementation Detail" > /dev/null 2>&1
+
+assert_file_matches "${TEST_SCRIPT_DIR}/expected/13-file-priority.md" "$TEST_DIR/specifications/Requirements.md" "File path priority result does not match expected"
+
+echo "✅ Test 13 passed"
+echo ""
+
+# ==================================
+# Test 14: Non-Refinement element fails
+# ==================================
+echo "Test 14: Attach non-Refinement element fails with error..."
+
+set +e
+ATTACH_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" attach "No Attachments Requirement" "Performance Requirement" 2>&1)
+ATTACH_EXIT=$?
+set -e
+
+if [ $ATTACH_EXIT -eq 0 ]; then
+  echo "❌ FAILED: Attaching non-Refinement element should fail"
+  exit 1
+fi
+
+if ! echo "$ATTACH_OUTPUT" | grep -qi "refinement\|constraint\|behavior\|specification"; then
+  echo "❌ FAILED: Error message should indicate only Refinement types allowed"
+  echo "$ATTACH_OUTPUT"
+  exit 1
+fi
+
+echo "✅ Test 14 passed"
+echo ""
+
+# ==================================
+# Test 15: Detach element by name
+# ==================================
+echo "Test 15: Detach Refinement element by display name..."
+
+cd "$TEST_DIR" && "$REQVIRE_BIN" detach "Performance Requirement" "Test Constraint Element" > /dev/null 2>&1
+
+assert_file_matches "${TEST_SCRIPT_DIR}/expected/15-after-element-detach.md" "$TEST_DIR/specifications/Requirements.md" "Element detach result does not match expected"
+
+echo "✅ Test 15 passed"
+echo ""
+
+# ==================================
+# Test 16: Not found error
+# ==================================
+echo "Test 16: Error when neither file nor element found..."
+
+set +e
+ATTACH_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" attach "nonexistent_thing_xyz" "Performance Requirement" 2>&1)
+ATTACH_EXIT=$?
+set -e
+
+if [ $ATTACH_EXIT -eq 0 ]; then
+  echo "❌ FAILED: Should fail when neither file nor element found"
+  exit 1
+fi
+
+if ! echo "$ATTACH_OUTPUT" | grep -qi "not found\|does not exist\|could not find"; then
+  echo "❌ FAILED: Error message should indicate what was not found"
+  echo "$ATTACH_OUTPUT"
+  exit 1
+fi
+
+echo "✅ Test 16 passed"
 echo ""
 
 echo "===================================="

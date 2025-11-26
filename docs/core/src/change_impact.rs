@@ -79,6 +79,9 @@ pub struct ChangedElement {
     pub added_relations: Vec<RelationSummary>,
     pub removed_relations: Vec<RelationSummary>,
     pub change_impact_tree: ElementNode,
+    /// Set of attachment target strings that changed (for rendering with ⚠️)
+    #[serde(skip_serializing_if = "HashSet::is_empty")]
+    pub changed_attachments: HashSet<String>,
 }
 
 impl ChangedElement {
@@ -284,7 +287,8 @@ impl ChangeImpactReport {
                 "[{}]({})\n",
                 elem.name, element_url
             ));
-            let rendered_tree = render_change_impact_tree(&elem.change_impact_tree, 2, base_url, git_commit, &new_element_ids);
+            let empty_changed: HashSet<String> = HashSet::new();
+            let rendered_tree = render_change_impact_tree(&elem.change_impact_tree, 1, base_url, git_commit, &new_element_ids, &empty_changed);
             if !rendered_tree.trim().is_empty() {
                 output.push_str(&rendered_tree);
                 output.push_str("\n\n");
@@ -293,25 +297,36 @@ impl ChangeImpactReport {
         if !self.added.is_empty() {
             output.push_str("\n---\n\n");
         }
-       
+
         // Changed Elements section
         if !self.changed.is_empty() {
             output.push_str("### Changed Elements\n\n");
         }
         for elem in &self.changed {
             let element_url = format!("{}/blob/{}/{}", base_url, git_commit, elem.element_id);
-            output.push_str("* ");
+            // Add ⚠️ if element has content or attachment changes
+            let change_marker = if elem.content_changed || !elem.changed_attachments.is_empty() { " ⚠️" } else { "" };
             output.push_str(&format!(
-                "[{}]({})\n",
-                elem.name, element_url
+                "* [{}]({}){}\n",
+                elem.name, element_url, change_marker
             ));
-            let rendered_tree = render_change_impact_tree(&elem.change_impact_tree, 2, base_url, git_commit, &new_element_ids);
-            if !rendered_tree.trim().is_empty() {
-                //let markdown_diff = generate_markdown_diff(&elem.old_content, &elem.new_content);
-                //output.push_str(&format!("{}\n", markdown_diff));
-                output.push_str(&rendered_tree);
-                output.push_str("\n\n");
+
+            // Render attachments with 📎 icon (and ⚠️ for changed ones)
+            let attachments = &elem.change_impact_tree.element.attachments;
+            for att in attachments {
+                let att_target = att.target.as_str();
+                let change_icon = if elem.changed_attachments.contains(&att_target) { " ⚠️" } else { "" };
+                let att_url = format_attachment_url(&att.target, &elem.change_impact_tree.element.file_path, base_url, git_commit);
+                let att_name = format_attachment_name(&att.target);
+                output.push_str(&format!("    * 📎 [{}]({}){}\n", att_name, att_url, change_icon));
             }
+
+            // Render relations tree
+            let rendered_tree = render_change_impact_tree(&elem.change_impact_tree, 1, base_url, git_commit, &new_element_ids, &elem.changed_attachments);
+            if !rendered_tree.trim().is_empty() {
+                output.push_str(&rendered_tree);
+            }
+            output.push_str("\n");
         }
         if !self.changed.is_empty() {
             output.push_str("\n---\n\n");
@@ -375,6 +390,41 @@ fn _generate_markdown_diff(old: &str, new: &str) -> String {
     format!("```diff\n{}```", diff_output)
 }
 
+/// Format attachment URL for rendering
+fn format_attachment_url(target: &element::AttachmentTarget, _element_file: &str, base_url: &str, git_commit: &str) -> String {
+    match target {
+        element::AttachmentTarget::FilePath(path) => {
+            format!("{}/blob/{}/{}", base_url, git_commit, path.to_string_lossy())
+        }
+        element::AttachmentTarget::ElementIdentifier(id) => {
+            format!("{}/blob/{}/{}", base_url, git_commit, id)
+        }
+    }
+}
+
+/// Format attachment name for rendering (extract just the name part)
+fn format_attachment_name(target: &element::AttachmentTarget) -> String {
+    match target {
+        element::AttachmentTarget::FilePath(path) => {
+            path.to_string_lossy().to_string()
+        }
+        element::AttachmentTarget::ElementIdentifier(id) => {
+            // Extract element name from identifier (after #)
+            id.split('#').last().unwrap_or(id)
+                .split('-')
+                .map(|word| {
+                    let mut chars = word.chars();
+                    match chars.next() {
+                        None => String::new(),
+                        Some(c) => c.to_uppercase().chain(chars).collect(),
+                    }
+                })
+                .collect::<Vec<_>>()
+                .join(" ")
+        }
+    }
+}
+
 /// Render the change impact tree recursively with GitHub links.
 fn render_change_impact_tree(
     node: &ElementNode,
@@ -382,9 +432,10 @@ fn render_change_impact_tree(
     base_url: &str,
     git_commit: &str,
     new_element_ids: &HashSet<String>,
+    changed_attachments: &HashSet<String>,
 ) -> String {
     let mut output = String::new();
-    let pad = "  ".repeat(indent);
+    let pad = "    ".repeat(indent);
     for relation_node in &node.relations {
         let target = &relation_node.element_node.element;
         let element_url = format!("{}/blob/{}/{}", base_url, git_commit, target.identifier);
@@ -399,12 +450,23 @@ fn render_change_impact_tree(
             new_icon,
             change_icon
         ));
+
+        // Render attachments for child elements
+        for att in &target.attachments {
+            let att_target = att.target.as_str();
+            let att_change_icon = if changed_attachments.contains(&att_target) { " ⚠️" } else { "" };
+            let att_url = format_attachment_url(&att.target, &target.file_path, base_url, git_commit);
+            let att_name = format_attachment_name(&att.target);
+            output.push_str(&format!("{}    * 📎 [{}]({}){}\n", pad, att_name, att_url, att_change_icon));
+        }
+
         output.push_str(&render_change_impact_tree(
             &relation_node.element_node,
             indent + 1,
             base_url,
             git_commit,
             new_element_ids,
+            changed_attachments,
         ));
     }
     output
@@ -582,17 +644,28 @@ pub fn apply_smart_filtering(
         for rel_node in &added.change_impact_tree.relations {
             collect_tree_ids_recursively(&rel_node.element_node, &mut referenced_ids);
         }
+        // Also collect attachment element identifiers
+        collect_attachment_element_ids(&added.change_impact_tree.element, &mut referenced_ids);
     }
 
     for changed in &report.changed {
         for rel_node in &changed.change_impact_tree.relations {
             collect_tree_ids_recursively(&rel_node.element_node, &mut referenced_ids);
         }
+        // Also collect attachment element identifiers
+        collect_attachment_element_ids(&changed.change_impact_tree.element, &mut referenced_ids);
     }
 
-    // Step 3: Store information for text output marking (removed actual marking to keep JSON clean)
+    // Step 3: Also collect attachments from children in the tree
+    for added in &report.added {
+        collect_attachment_ids_from_tree(&added.change_impact_tree, &mut referenced_ids);
+    }
+    for changed in &report.changed {
+        collect_attachment_ids_from_tree(&changed.change_impact_tree, &mut referenced_ids);
+    }
 
-    // Step 4: Filter out added/changed elements that are not root
+    // Step 4: Filter out added/changed elements that are referenced elsewhere (not root)
+    // This includes elements referenced via relations OR via attachments
     report.added.retain(|e| !referenced_ids.contains(&e.element_id));
     report.changed.retain(|e| !referenced_ids.contains(&e.element_id));
 }
@@ -610,8 +683,100 @@ fn collect_tree_ids_recursively(
     }
 }
 
+/// Collect element identifiers from attachments (for smart filtering)
+fn collect_attachment_element_ids(
+    elem: &element::Element,
+    set: &mut HashSet<String>,
+) {
+    for attachment in &elem.attachments {
+        if let element::AttachmentTarget::ElementIdentifier(id) = &attachment.target {
+            set.insert(id.clone());
+        }
+    }
+}
+
+/// Recursively collect attachment element IDs from the entire tree
+fn collect_attachment_ids_from_tree(
+    node: &ElementNode,
+    set: &mut HashSet<String>,
+) {
+    collect_attachment_element_ids(&node.element, set);
+    for relation in &node.relations {
+        collect_attachment_ids_from_tree(&relation.element_node, set);
+    }
+}
 
 
+
+
+/// Get attachment hashes for an element, resolving element attachment hashes from registry
+/// Returns a sorted list of (attachment_target_string, hash) tuples for deterministic comparison
+fn get_attachment_hashes(
+    element: &element::Element,
+    registry: &graph_registry::GraphRegistry,
+) -> Vec<(String, String)> {
+    let mut hashes: Vec<(String, String)> = element.attachments.iter()
+        .filter_map(|att| {
+            let target_str = att.target.as_str();
+            let hash = match &att.target {
+                element::AttachmentTarget::FilePath(_) => {
+                    // File attachment - use stored content_hash
+                    att.content_hash.clone()
+                }
+                element::AttachmentTarget::ElementIdentifier(elem_id) => {
+                    // Element attachment - look up hash from registry
+                    registry.get_element(elem_id)
+                        .map(|e| e.hash_impact_content.clone())
+                }
+            };
+            hash.map(|h| (target_str, h))
+        })
+        .collect();
+    hashes.sort_by(|a, b| a.0.cmp(&b.0));
+    hashes
+}
+
+/// Get the set of attachment target strings that changed between two versions
+fn get_changed_attachments(
+    cur_elem: &element::Element,
+    ref_elem: &element::Element,
+    current_registry: &graph_registry::GraphRegistry,
+    reference_registry: &graph_registry::GraphRegistry,
+) -> HashSet<String> {
+    let cur_hashes: Vec<(String, String)> =
+        get_attachment_hashes(cur_elem, current_registry);
+    let ref_hashes: Vec<(String, String)> =
+        get_attachment_hashes(ref_elem, reference_registry);
+
+    // Collect just the content hashes for comparison
+    let cur_hash_set: HashSet<&String> = cur_hashes.iter().map(|(_, h)| h).collect();
+    let ref_hash_set: HashSet<&String> = ref_hashes.iter().map(|(_, h)| h).collect();
+
+    let mut changed = HashSet::new();
+
+    // Check for changed or added attachments (hash in current but not in reference)
+    for (target, cur_hash) in &cur_hashes {
+        if !ref_hash_set.contains(cur_hash) {
+            changed.insert(target.clone());
+        }
+    }
+
+    // Check for removed attachments (hash in reference but not in current)
+    // We need to find the current target for hashes that were removed
+    for (target, ref_hash) in &ref_hashes {
+        if !cur_hash_set.contains(ref_hash) {
+            // Hash was removed - find if there's a current attachment with same target
+            // or use the reference target
+            let current_target = cur_hashes.iter()
+                .find(|(t, _)| t == target)
+                .map(|(t, _)| t.clone())
+                .unwrap_or_else(|| target.clone());
+            changed.insert(current_target);
+        }
+    }
+
+    changed
+}
 
 /// Helper to normalize a relation by resolving its target identifier to an element name
 /// Returns (relation_type_name, element_name) tuple for semantic comparison
@@ -642,6 +807,13 @@ pub fn compute_change_impact(
         let cur_elem = current.get_element(id).unwrap();
         let ref_elem = reference.get_element(id).unwrap();
         let content_changed = cur_elem.hash_impact_content != ref_elem.hash_impact_content;
+
+        // Compare attachment hashes (resolved from registries) - compare only hash values, not targets
+        let cur_attachment_hashes = get_attachment_hashes(cur_elem, current);
+        let ref_attachment_hashes = get_attachment_hashes(ref_elem, reference);
+        let cur_hash_set: HashSet<&String> = cur_attachment_hashes.iter().map(|(_, h)| h).collect();
+        let ref_hash_set: HashSet<&String> = ref_attachment_hashes.iter().map(|(_, h)| h).collect();
+        let attachments_changed = cur_hash_set != ref_hash_set;
 
         // Only track changes to relations that propagate impact according to specifications
         let cur_relations_raw: Vec<_> = cur_elem.relations.iter()
@@ -685,10 +857,14 @@ pub fn compute_change_impact(
             .map(|r| convert_relation_to_summary(r))
             .collect();
 
-        let has_changed = content_changed || !added_relations.is_empty() || !removed_relations.is_empty();
+        // Get changed attachments for rendering
+        let changed_attachments = get_changed_attachments(cur_elem, ref_elem, current, reference);
+
+        let has_changed = content_changed || attachments_changed || !added_relations.is_empty() || !removed_relations.is_empty();
         if has_changed {
-            // Debug: print element relations
-            log::debug!("Changed element '{}' has {} relations", cur_elem.name, cur_elem.relations.len());
+            // Debug: print element changes
+            log::debug!("Changed element '{}': content={}, attachments={}, relations={}",
+                cur_elem.name, content_changed, attachments_changed, cur_elem.relations.len());
             for rel in &cur_elem.relations {
                 log::debug!("  - {} -> {:?}", rel.relation_type.name, rel.target.link);
             }
@@ -706,6 +882,7 @@ pub fn compute_change_impact(
                 added_relations,
                 removed_relations,
                 change_impact_tree,
+                changed_attachments,
             });
         }
     }
@@ -770,7 +947,10 @@ pub fn compute_change_impact(
                     .map(|r| convert_relation_to_summary(r))
                     .collect();
 
-                let has_changed = content_changed || !added_relations.is_empty() || !removed_relations.is_empty();
+                // Get changed attachments for rendering
+                let changed_attachments = get_changed_attachments(cur_elem, ref_elem, current, reference);
+
+                let has_changed = content_changed || !changed_attachments.is_empty() || !added_relations.is_empty() || !removed_relations.is_empty();
                 if has_changed {
                     let mut visited = BTreeSet::new();
                     visited.insert(cur_elem.identifier.clone());
@@ -785,6 +965,7 @@ pub fn compute_change_impact(
                         added_relations,
                         removed_relations,
                         change_impact_tree,
+                        changed_attachments,
                     });
                 }
             }

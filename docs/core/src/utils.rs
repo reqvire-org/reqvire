@@ -43,7 +43,7 @@ macro_rules! info_println {
 
 /// Checks if a file should be ignored based on gitignore and reqvireignore patterns.
 /// Returns true if the file should be IGNORED (not processed).
-/// Note: This only checks ignore patterns. The `# Requirements` header check
+/// Note: This only checks ignore patterns. The `# Elements` header check
 /// happens later when reading file content (in parser.rs).
 pub fn is_to_be_ignored(path: &Path, excluded_filename_patterns: &GlobSet) -> bool {
     is_excluded_by_patterns(path, excluded_filename_patterns)
@@ -639,8 +639,8 @@ pub fn hash_content(content: &str) -> String {
 }
 
 /// Parses an attachment line from the Attachments subsection.
-/// Format: * [path](path) where link text must equal href
-/// Returns the path if valid, or an error if format is invalid.
+/// Format: * [display-text](path) - display text can be filename or full path
+/// Returns the path (href) if valid, or an error if format is invalid.
 pub fn parse_attachment_line(line: &str) -> Result<String, ReqvireError> {
     let trimmed = line.trim();
 
@@ -654,19 +654,12 @@ pub fn parse_attachment_line(line: &str) -> Result<String, ReqvireError> {
     // Extract the markdown link part (after bullet)
     let link_part = trimmed.trim_start_matches("* ").trim_start_matches("- ").trim();
 
-    // Parse as markdown link
-    if let Some((text, href)) = extract_markdown_link(link_part) {
-        // Validate: text must equal href (git-root-relative path)
-        if text == href {
-            Ok(href)
-        } else {
-            Err(ReqvireError::InvalidAttachmentFormat(
-                format!("Attachment link text must equal href. Got text='{}', href='{}'", text, href)
-            ))
-        }
+    // Parse as markdown link - display text can be anything (filename or path)
+    if let Some((_text, href)) = extract_markdown_link(link_part) {
+        Ok(href)
     } else {
         Err(ReqvireError::InvalidAttachmentFormat(
-            format!("Invalid attachment format, expected '[path](path)': '{}'", line)
+            format!("Invalid attachment format, expected '[text](path)': '{}'", line)
         ))
     }
 }
@@ -763,7 +756,7 @@ mod tests {
             .output()
             .expect("Failed to initialize git repo");
 
-        let base_path = temp_path.join("specifications/documents/");
+        let base_path = temp_path.join("requirements/documents/");
         fs::create_dir_all(&base_path).expect("Failed to create base path");
 
         let file_path = temp_path.join("File4.md");
@@ -902,23 +895,23 @@ mod tests {
         // Test cases for files that should NOT be ignored (will be processed)
         let not_ignored_cases = vec![
             // Requirements files in specifications root
-            "specifications/UserRequirements.md",
-            "specifications/SystemRequirements.md",
-            "specifications/MissionRequirements.md",
+            "requirements/UserRequirements.md",
+            "requirements/SystemRequirements.md",
+            "requirements/MissionRequirements.md",
 
             // Requirements files in system requirements folder
-            "specifications/SystemRequirements/Requirements.md",
-            "specifications/SystemRequirements/Subsystem/Requirements.md",
+            "requirements/SystemRequirements/Requirements.md",
+            "requirements/SystemRequirements/Subsystem/Requirements.md",
 
             // Design specifications (not in ignore patterns)
-            "specifications/DesignSpecifications/DSD_Diagram.md",
-            "specifications/DSD_Architecture.md",
+            "requirements/DesignSpecifications/DSD_Diagram.md",
+            "requirements/DSD_Architecture.md",
         ];
 
         // Test cases for files that SHOULD be ignored
         let ignored_cases = vec![
             // README files match **/README*.md pattern
-            "specifications/README.md",
+            "requirements/README.md",
             "README.md",
         ];
 
@@ -966,37 +959,37 @@ mod tests {
 
         let test_files = [
             // README* pattern test files
-            ("specifications/README.md", true), // Should be excluded
-            ("specifications/READMEtest.md", true), // Should be excluded
-            ("specifications/readme.md", false), // Should NOT be excluded (case sensitive)
-            ("specifications/READ.md", false), // Should NOT be excluded
-            ("specifications/subfolder/README.md", true), // Should be excluded
-            ("specifications/deep/nested/folder/README.md", true), // Should be excluded
+            ("requirements/README.md", true), // Should be excluded
+            ("requirements/READMEtest.md", true), // Should be excluded
+            ("requirements/readme.md", false), // Should NOT be excluded (case sensitive)
+            ("requirements/READ.md", false), // Should NOT be excluded
+            ("requirements/subfolder/README.md", true), // Should be excluded
+            ("requirements/deep/nested/folder/README.md", true), // Should be excluded
             
             // Logical* pattern test files (pattern still works for other files starting with Logical*)
-            ("specifications/LOGICAL_view.md", false), // Should NOT be excluded (case sensitive)
-            ("specifications/logical_design.md", false), // Should NOT be excluded (case sensitive)
-            ("specifications/Logicless.md", false), // Should NOT be excluded
-            ("specifications/subfolder/LogicalModel.md", true), // Should be excluded
+            ("requirements/LOGICAL_view.md", false), // Should NOT be excluded (case sensitive)
+            ("requirements/logical_design.md", false), // Should NOT be excluded (case sensitive)
+            ("requirements/Logicless.md", false), // Should NOT be excluded
+            ("requirements/subfolder/LogicalModel.md", true), // Should be excluded
             ("external_repo/specs/LogicalView.md", true), // Should be excluded
 
             // Physical* pattern test files (pattern still works for other files starting with Physical*)
-            ("specifications/subfolder/PhysicalDiagram.md", true), // Should be excluded
-            ("specifications/NotPhysical.md", false), // Should NOT be excluded
-            ("specifications/Physicalsomething.md", true), // Should be excluded
+            ("requirements/subfolder/PhysicalDiagram.md", true), // Should be excluded
+            ("requirements/NotPhysical.md", false), // Should NOT be excluded
+            ("requirements/Physicalsomething.md", true), // Should be excluded
             
             // index.md pattern test files
-            ("specifications/index.md", true), // Should be excluded
-            ("specifications/subfolder/index.md", true), // Should be excluded
-            ("specifications/INDEX.md", false), // Should NOT be excluded (case sensitive)
-            ("specifications/indexing_guide.md", false), // Should NOT be excluded
-            ("specifications/deep/nested/folder/index.md", true), // Should be excluded
+            ("requirements/index.md", true), // Should be excluded
+            ("requirements/subfolder/index.md", true), // Should be excluded
+            ("requirements/INDEX.md", false), // Should NOT be excluded (case sensitive)
+            ("requirements/indexing_guide.md", false), // Should NOT be excluded
+            ("requirements/deep/nested/folder/index.md", true), // Should be excluded
             
             // Standard requirement files - should never be excluded
-            ("specifications/Requirements.md", false),
-            ("specifications/SystemRequirements.md", false),
-            ("specifications/UserRequirements.md", false),
-            ("specifications/subfolder/Requirements.md", false),
+            ("requirements/Requirements.md", false),
+            ("requirements/SystemRequirements.md", false),
+            ("requirements/UserRequirements.md", false),
+            ("requirements/subfolder/Requirements.md", false),
             ("external_repo/specs/Requirements.md", false),
         ];
         
