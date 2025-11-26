@@ -15,14 +15,6 @@ graph TD;
   f0a7f5fab3da59bf["System Verification Test 2"];
   class f0a7f5fab3da59bf verification;
   click f0a7f5fab3da59bf "VerificationTests.md#system-verification-test-2";
-  2224944e5433019f["System Element 3"];
-  class 2224944e5433019f systemRequirement;
-  click 2224944e5433019f "SystemRequirements.md#system-element-3";
-  2224944e5433019f -.->|verifiedBy| 73e63ed391cfc4bf;
-  73a156057b550c34["System Element 4"];
-  class 73a156057b550c34 systemRequirement;
-  click 73a156057b550c34 "SystemRequirements.md#system-element-4";
-  73a156057b550c34 -.->|verifiedBy| f0a7f5fab3da59bf;
 ```
 This document contains verification tests for the system requirements.
 

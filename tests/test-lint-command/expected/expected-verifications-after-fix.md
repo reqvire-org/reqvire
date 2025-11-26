@@ -15,37 +15,6 @@ graph TD;
   bd5f20d982e2da41["Test Verification"];
   class bd5f20d982e2da41 verification;
   click bd5f20d982e2da41 "Tests.md#test-verification";
-  11b91dadfd2fceac["Leaf Requirement"];
-  class 11b91dadfd2fceac systemRequirement;
-  click 11b91dadfd2fceac "../Requirements.md#leaf-requirement";
-  11b91dadfd2fceac -.->|verifiedBy| bd5f20d982e2da41;
-  64aa16ca1de98c22["Parent Requirement"];
-  class 64aa16ca1de98c22 systemRequirement;
-  click 64aa16ca1de98c22 "../Requirements.md#parent-requirement";
-  64aa16ca1de98c22 -.->|deriveReqT| 11b91dadfd2fceac;
-  e497af9f2a35e90b["Multi-Path Redundant Requirement"];
-  class e497af9f2a35e90b systemRequirement;
-  click e497af9f2a35e90b "../Requirements.md#multi-path-redundant-requirement";
-  64aa16ca1de98c22 -.->|deriveReqT| e497af9f2a35e90b;
-  a813a0eefc6a57c["Single-Chain Redundant Requirement"];
-  class a813a0eefc6a57c systemRequirement;
-  click a813a0eefc6a57c "../Requirements.md#single-chain-redundant-requirement";
-  64aa16ca1de98c22 -.->|deriveReqT| a813a0eefc6a57c;
-  64aa16ca1de98c22 -.->|verifiedBy| bd5f20d982e2da41;
-  f2f4fbeaa65e23eb["API Specification"];
-  class f2f4fbeaa65e23eb systemRequirement;
-  click f2f4fbeaa65e23eb "../SystemRequirements.md#api-specification";
-  f2f4fbeaa65e23eb -.->|verifiedBy| 5cb18536e42c1e69;
-  203ee1cc247ddf4b["Management API"];
-  class 203ee1cc247ddf4b systemRequirement;
-  click 203ee1cc247ddf4b "../SystemRequirements.md#management-api";
-  203ee1cc247ddf4b -.->|deriveReqT| f2f4fbeaa65e23eb;
-  203ee1cc247ddf4b -.->|verifiedBy| 5cb18536e42c1e69;
-  9564b73ee8d85cce["Public API"];
-  class 9564b73ee8d85cce systemRequirement;
-  click 9564b73ee8d85cce "../SystemRequirements.md#public-api";
-  9564b73ee8d85cce -.->|deriveReqT| f2f4fbeaa65e23eb;
-  9564b73ee8d85cce -.->|verifiedBy| 5cb18536e42c1e69;
 ```
 ### Test Verification
 

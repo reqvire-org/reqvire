@@ -95,7 +95,7 @@ This test verifies that the system correctly filters relations in diagram genera
 
 ##### Acceptance Criteria
 - System should render only relations from DIAGRAM_RELATIONS list to prevent duplicate arrows for bidirectional relationships
-- System should include parent elements in diagrams even when they belong to different files
+- System should start with file-local parent requirements and include all children even if they are defined outside of the file
 - System should apply list-based rendering according to DIAGRAM_RELATIONS specification
 - Generated diagrams should not contain both relations from opposite pairs for the same logical relationship
 
@@ -103,7 +103,7 @@ This test verifies that the system correctly filters relations in diagram genera
 - Command exits with success (0) return code
 - Diagrams contain only relations specified in DIAGRAM_RELATIONS (e.g., `derive` but not `derivedFrom`)
 - Bidirectional relationships appear as single arrows using the relation specified in DIAGRAM_RELATIONS
-- Parent elements are included when child elements are in the file
+- Child elements are included when parent elements are in the file, even if children are in different files
 - No duplicate arrows exist for the same logical relationship
 - Arrow rendering follows the DIAGRAM_RELATIONS list specification
 

@@ -20,17 +20,17 @@ This enables the system to:
 - Support mixed documents containing both auto-generated and custom diagrams
 
 **Diagram Relation Filtering:**
-The system shall implement relation filtering in diagram generation to render only forward relations while ensuring complete element hierarchy representation starting from top-level parent elements.
+The system shall implement relation filtering in diagram generation to render only forward relations while ensuring complete element hierarchy representation starting from file-local parent elements and including all children.
 
 When generating diagrams, the system shall apply the following relation filtering rules:
 
 1. **Diagram Relation Filtering**: Only relations specified in the DIAGRAM_RELATIONS list shall be rendered to prevent duplicate arrows representing the same logical relationship
-2. **Complete Hierarchy Inclusion**: When any element in a hierarchical chain is included in a file, all parent elements up to the root of the hierarchy shall be automatically included in the diagram
+2. **Complete Hierarchy Inclusion**: Start with file-local parent requirements but include all children even if they are defined outside of the file
 3. **List-Based Rendering**: Relations shall be rendered according to the DIAGRAM_RELATIONS list which defines which relation from each opposite pair should be shown
 
 The filtering ensures that:
 - Bidirectional relationships (e.g., `derivedFrom`/`derive`) appear as single arrows using the relation specified in DIAGRAM_RELATIONS
-- Hierarchical context is preserved by including parent elements even if they belong to different files
+- Hierarchical context is preserved by starting from local parents and showing all derived children regardless of file location
 - Diagram readability is maintained while accurately representing the complete model structure
 
 #### Relations

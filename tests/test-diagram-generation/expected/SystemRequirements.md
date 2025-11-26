@@ -31,22 +31,6 @@ graph TD;
   class f0a7f5fab3da59bf verification;
   click f0a7f5fab3da59bf "VerificationTests.md#system-verification-test-2";
   73a156057b550c34 -.->|verifiedBy| f0a7f5fab3da59bf;
-  d9cb537853e8286f["UI Element 1"];
-  class d9cb537853e8286f systemRequirement;
-  click d9cb537853e8286f "UserRequirements.md#ui-element-1";
-  d9cb537853e8286f -.->|deriveReqT| 7f2b10e005eeec75;
-  f4c9118eafeb9203["Performance Element 1"];
-  class f4c9118eafeb9203 systemRequirement;
-  click f4c9118eafeb9203 "UserRequirements.md#performance-element-1";
-  d9cb537853e8286f -.->|deriveReqT| f4c9118eafeb9203;
-  e5550e52de8208b0["UI Element 2"];
-  class e5550e52de8208b0 systemRequirement;
-  click e5550e52de8208b0 "UserRequirements.md#ui-element-2";
-  e5550e52de8208b0 -.->|deriveReqT| d0a7d2972d10f70a;
-  b3c9118eafeb9203["Performance Element 2"];
-  class b3c9118eafeb9203 systemRequirement;
-  click b3c9118eafeb9203 "UserRequirements.md#performance-element-2";
-  e5550e52de8208b0 -.->|deriveReqT| b3c9118eafeb9203;
 ```
 This is a test system requirements document for diagram generation.
 

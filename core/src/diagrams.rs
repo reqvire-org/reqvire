@@ -435,40 +435,43 @@ fn generate_file_diagram(
         )?;
     }
 
-    // Then, find parent elements from other files that have forward relations pointing to elements in this file
+    // Collect identifiers of elements in this file
     let file_element_identifiers: HashSet<String> = elements.iter()
         .map(|e| e.identifier.clone())
         .collect();
 
-    for element in registry.get_all_elements() {
-        // Skip elements already in this file
-        if file_element_identifiers.contains(&element.identifier) {
-            continue;
-        }
+    // Then, find all children of file-local elements even if they are in other files
+    // This follows the "start with file-local parents, include all children" approach
+    for file_element in elements {
+        // Check each relation from file-local elements
+        for relation in &file_element.relations {
+            // Only consider forward relations (diagram relations like derive, verifiedBy, satisfiedBy)
+            if !relation::DIAGRAM_RELATIONS.contains(&relation.relation_type.name) {
+                continue;
+            }
 
-        // Check if this element has diagram relations pointing to any element in the current file
-        let has_forward_relation_to_file = element.relations.iter().any(|relation| {
-            // Only consider relations that should be shown in diagrams
-            if relation::DIAGRAM_RELATIONS.contains(&relation.relation_type.name) {
-                if let relation::LinkType::Identifier(target_id) = &relation.target.link {
-                    return file_element_identifiers.contains(target_id);
+            // If the target is an element identifier (not external URL or file path)
+            if let relation::LinkType::Identifier(target_id) = &relation.target.link {
+                // Skip if already in file or already included
+                if file_element_identifiers.contains(target_id) || included_elements.contains(target_id) {
+                    continue;
+                }
+
+                // Get the target element and add it to the diagram
+                if let Some(target_element) = registry.get_element(target_id) {
+                    add_element_to_diagram(
+                        registry,
+                        &mut diagram,
+                        target_element,
+                        &mut included_elements,
+                        file_path,
+                        diagrams_with_blobs,
+                        &repo_root,
+                        &base_url,
+                        &commit_hash,
+                    )?;
                 }
             }
-            false
-        });
-
-        if has_forward_relation_to_file {
-            add_element_to_diagram(
-                registry,
-                &mut diagram,
-                element,
-                &mut included_elements,
-                file_path,
-                diagrams_with_blobs,
-                &repo_root,
-                &base_url,
-                &commit_hash,
-            )?;
         }
     }
 
