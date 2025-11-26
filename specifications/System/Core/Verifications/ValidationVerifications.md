@@ -292,6 +292,81 @@ This test verifies that the system correctly searches for and detects structured
   * satisfiedBy: [test.sh](../../../../tests/test-excluded-patterns/test.sh)
 ---
 
+### Element Type Relation Compatibility Test
+
+This test verifies that the system correctly validates relation types based on element type constraints defined in the Element Type Relation Compatibility matrix.
+
+#### Details
+
+##### Acceptance Criteria
+
+**derivedFrom/derive Validation:**
+- System shall allow `derivedFrom` relations only between requirement types (`requirement`, `user-requirement`)
+- System shall reject `derivedFrom` relations where source is a verification element
+- System shall reject `derivedFrom` relations where target is a verification element
+- System shall reject `derivedFrom` relations where source is `other` type
+- System shall provide clear error message indicating element type incompatibility
+
+**satisfiedBy/satisfy Validation:**
+- System shall allow `satisfiedBy` relations from requirement types to implementation files
+- System shall allow `satisfiedBy` relations from `test-verification` to test implementation files
+- System shall reject `satisfiedBy` relations from `analysis-verification`, `inspection-verification`, `demonstration-verification` elements
+- System shall provide clear error message for non-test-verification elements using satisfiedBy
+
+**verifiedBy/verify Validation:**
+- System shall allow `verifiedBy` relations from requirement types to any verification type
+- System shall allow `verify` relations from any verification type to requirement types
+- System shall reject `verifiedBy` relations from verification elements
+- System shall reject `verify` relations to non-requirement elements
+
+**Refinement Type Validation:**
+- System shall reject Relations subsection on `constraint` type elements
+- System shall reject Relations subsection on `behavior` type elements
+- System shall reject Relations subsection on `specification` type elements
+- System shall provide clear error message indicating refinement types cannot have relations
+
+**trace Relation Validation:**
+- System shall allow `trace` relations for any non-refinement element type
+- System shall allow `trace` relations to any target type
+
+##### Test Criteria
+
+1. **derivedFrom type constraint tests:**
+   - Create requirement with `derivedFrom` to another requirement - PASS
+   - Create verification with `derivedFrom` to requirement - FAIL with type error
+   - Create requirement with `derivedFrom` to verification - FAIL with type error
+   - Verify error message includes element types and constraint explanation
+
+2. **satisfiedBy type constraint tests:**
+   - Create requirement with `satisfiedBy` to implementation file - PASS
+   - Create test-verification with `satisfiedBy` to test file - PASS
+   - Create analysis-verification with `satisfiedBy` to file - FAIL with type error
+   - Verify error message indicates only test-verification can use satisfiedBy
+
+3. **Refinement type relation rejection tests:**
+   - Create constraint element with Relations subsection (trace) - FAIL with error
+   - Create behavior element with Relations subsection (trace) - FAIL with error
+   - Create specification element with Relations subsection (trace) - FAIL with error
+   - Create constraint element with derivedFrom relation - FAIL with error
+   - Create behavior element with derivedFrom relation - FAIL with error
+   - Create specification element with derivedFrom relation - FAIL with error
+   - Verify error messages indicate refinement types cannot have relations
+
+4. **trace relation permissiveness tests:**
+   - Create requirement with `trace` to verification - PASS
+   - Create verification with `trace` to requirement - PASS
+   - Create verification with `trace` to other verification - PASS
+   - Verify trace relations do not trigger type compatibility errors
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [Relation Element Type Validator](../Validation.md#relation-element-type-validator)
+  * verify: [Element Type Relation Compatibility](../ModelManagement.md#element-type-relation-compatibility)
+  * satisfiedBy: [test.sh](../../../../tests/test-element-type-relation-compatibility/test.sh)
+---
+
 ### Subdirectory Processing Verification
 
 This test verifies that the system correctly processes only files within the current directory when run from a subfolder of a git repository and generates missing relation target errors for references to parent directories.

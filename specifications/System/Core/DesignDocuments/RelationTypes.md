@@ -89,3 +89,44 @@ When an element changes, the impact propagates according to these rules:
 5. **Trace Relationships**:
    - Changes do not propagate through trace relationships
    - Trace relationships are used for documentation and discovery purposes only
+
+## Element Type Relation Compatibility
+
+This section defines which element types can use which relation types as source or target. These constraints ensure semantic consistency in the MBSE model.
+
+### Relation-Centric View
+
+| Relation Type | Allowed Source Types | Allowed Target Types | Notes |
+|---------------|---------------------|---------------------|-------|
+| **derivedFrom** | requirement, user-requirement | requirement, user-requirement | Hierarchical requirement decomposition only |
+| **derive** | requirement, user-requirement | requirement, user-requirement | Inverse of derivedFrom |
+| **satisfiedBy** | requirement, user-requirement, test-verification | InternalPath (implementation files) | Requirements/tests link to implementations |
+| **satisfy** | InternalPath (implementation files) | requirement, user-requirement, test-verification | Inverse of satisfiedBy (auto-generated) |
+| **verifiedBy** | requirement, user-requirement | All verification types | Requirements link to verifications |
+| **verify** | All verification types | requirement, user-requirement | Verifications link to requirements |
+| **trace** | Any (except refinement types) | Any | Documentation/discovery, no type constraints |
+
+### Element-Centric View
+
+| Element Type | Can Use as Source | Can Be Target Of |
+|--------------|-------------------|------------------|
+| **requirement** | derivedFrom, derive, satisfiedBy, verifiedBy, trace | derivedFrom, derive, satisfy, verify, trace |
+| **user-requirement** | derivedFrom, derive, satisfiedBy, verifiedBy, trace | derivedFrom, derive, satisfy, verify, trace |
+| **test-verification** | verify, satisfiedBy, trace | verifiedBy, satisfy, trace |
+| **analysis-verification** | verify, trace | verifiedBy, trace |
+| **inspection-verification** | verify, trace | verifiedBy, trace |
+| **demonstration-verification** | verify, trace | verifiedBy, trace |
+| **constraint** | None (no Relations allowed) | Attachment only |
+| **behavior** | None (no Relations allowed) | Attachment only |
+| **specification** | None (no Relations allowed) | Attachment only |
+| **other** | trace | trace |
+
+### Key Constraints
+
+1. **derivedFrom/derive restricted to requirement types**: Only `requirement` and `user-requirement` elements can participate in derivation relationships. This ensures clean hierarchical requirement decomposition without mixing verification or other element types.
+
+2. **Refinement types cannot have relations**: Elements of type `constraint`, `behavior`, and `specification` cannot have a Relations subsection. They are referenced via the Attachments subsection of other elements.
+
+3. **test-verification special case**: Among verification types, only `test-verification` can use `satisfiedBy` relations (to link to test implementations). Other verification types (`analysis-verification`, `inspection-verification`, `demonstration-verification`) cannot use `satisfiedBy`.
+
+4. **other type conservative**: Elements with type `other` can only use `trace` relations to maintain flexibility while avoiding semantic conflicts.

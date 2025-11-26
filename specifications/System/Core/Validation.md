@@ -166,21 +166,26 @@ This ensures users see all relevant errors at once rather than fixing issues one
 
 ### Relation Element Type Validator
 
-The system shall implement validation that verifies relation endpoints have appropriate element types based on the relation type.
+The system shall implement validation that verifies relation endpoints have appropriate element types based on the relation type, following the Element Type Relation Compatibility matrix.
 
 #### Details
+The validator enforces the constraints defined in the [Element Type Relation Compatibility](DesignDocuments/RelationTypes.md#element-type-relation-compatibility) specification:
+
+- For `derivedFrom`/`derive` relations, validate that both source and target are requirement types (`requirement` or `user-requirement`)
 - For `verifiedBy`/`verify` relations, validate that one endpoint is a requirement element and the other is a verification element
 - For `satisfiedBy`/`satisfy` relations, validate that one endpoint is a requirement or test-verification element and the other is an implementation element
 - For verification elements with `satisfiedBy` relations, validate that only test-verification elements may use satisfiedBy (other verification types should not have satisfiedBy relations)
-- `trace` relations are always allowed for any verification type
-- Relations should only connect elements of appropriate types based on the RelationTypesRegistry definition
+- `trace` relations are always allowed for any non-refinement element type
+- Refinement types (`constraint`, `behavior`, `specification`) cannot have Relations subsections
 - Warnings should be issued when relation endpoints have incompatible element types
 
 #### Relations
   * derivedFrom: [Validate Relation Types](#validate-relation-types)
+  * derivedFrom: [Element Type Relation Compatibility](ModelManagement.md#element-type-relation-compatibility)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
   * verifiedBy: [Invalid Relations Test](Verifications/ValidationVerifications.md#invalid-relations-test)
+  * verifiedBy: [Element Type Relation Compatibility Test](Verifications/ValidationVerifications.md#element-type-relation-compatibility-test)
 ---
 
 ### GraphRegistry as Primary Registry

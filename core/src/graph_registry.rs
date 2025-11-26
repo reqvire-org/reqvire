@@ -103,6 +103,9 @@ impl GraphRegistry {
         // Validate Refinement elements have no relations
         errors.extend(self.validate_refinement_elements()?);
 
+        // Validate 'other' type elements only use trace relations
+        errors.extend(self.validate_other_element_relations()?);
+
         Ok(errors)
     }
 
@@ -493,6 +496,46 @@ impl GraphRegistry {
             debug!("No Refinement element validation errors found.");
         } else {
             debug!("{} Refinement element validation errors found.", errors.len());
+        }
+
+        Ok(errors)
+    }
+
+    /// Validates that 'other' type elements only use trace relations
+    /// Returns a list of validation errors for 'other' elements using non-trace relations
+    fn validate_other_element_relations(&self) -> Result<Vec<ReqvireError>, ReqvireError> {
+        debug!("Validating 'other' element type relation constraints...");
+        let mut errors = Vec::new();
+
+        for element_node in self.nodes.values() {
+            let element = &element_node.element;
+
+            // Check if this is an 'other' type element
+            if let crate::element::ElementType::Other(type_str) = &element.element_type {
+                if type_str == "other" {
+                    // 'other' type can only use trace relations
+                    let non_trace_relations: Vec<_> = element.relations.iter()
+                        .filter(|r| r.user_created && r.relation_type.name != "trace")
+                        .collect();
+
+                    for relation in non_trace_relations {
+                        errors.push(ReqvireError::IncompatibleElementTypes(
+                            format!(
+                                "Element type 'other' can only use 'trace' relations: '{}' uses '{}' relation to '{}'. See Element Type Relation Compatibility specification.",
+                                element.identifier,
+                                relation.relation_type.name,
+                                &relation.target.text
+                            )
+                        ));
+                    }
+                }
+            }
+        }
+
+        if errors.is_empty() {
+            debug!("No 'other' element type relation errors found.");
+        } else {
+            debug!("{} 'other' element type relation errors found.", errors.len());
         }
 
         Ok(errors)

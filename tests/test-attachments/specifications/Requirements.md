@@ -5,7 +5,7 @@
 Top-level container for test requirements.
 
 #### Metadata
-  * type: root-requirement
+  * type: user-requirement
 
 #### Relations
   * derive: [Performance Requirement](#performance-requirement)

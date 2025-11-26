@@ -24,6 +24,29 @@ The system shall implement relations following clearly defined specifications fo
   * satisfiedBy: [relation.rs](../../../core/src/relation.rs)
 ---
 
+### Element Type Relation Compatibility
+
+The system shall enforce element type constraints for relation types, ensuring that only valid combinations of source and target element types are allowed for each relation type.
+
+#### Details
+
+The compatibility rules are:
+
+1. **derivedFrom/derive**: Only requirement types (`requirement`, `user-requirement`) can use these relations
+2. **satisfiedBy/satisfy**: Requirements and `test-verification` can use satisfiedBy; other verification types cannot
+3. **verifiedBy/verify**: Requirements link to verifications, verifications link to requirements
+4. **trace**: Any non-refinement element type can use trace relations
+5. **Refinement types**: `constraint`, `behavior`, `specification` cannot have Relations subsections
+
+#### Attachments
+  * [RelationTypes.md](DesignDocuments/RelationTypes.md)
+
+#### Relations
+  * derivedFrom: [Relation Types and behaviors](#relation-types-and-behaviors)
+  * derivedFrom: [Supported Element Types](#supported-element-types)
+  * verifiedBy: [Element Type Relation Compatibility Test](Verifications/ValidationVerifications.md#element-type-relation-compatibility-test)
+---
+
 ### Efficient Processing
 
 The system shall process structured documents and relations to extract model-relevant information efficiently.
@@ -202,6 +225,8 @@ Element types are identified through a reserved "type" metadata property. The fo
 11. **other**: Custom element types defined by users
 
 **Note:** Refinement types (constraint, behavior, specification) cannot have a Relations subsection. These elements serve as detailed documentation that can be attached to other elements.
+
+**Relation constraints:** Each element type has specific constraints on which relation types it can use. See [Element Type Relation Compatibility](DesignDocuments/RelationTypes.md#element-type-relation-compatibility) for the complete compatibility matrix.
 
 #### Relations
   * derivedFrom: [Reserved Subsections Support](StructureAndParsing.md#reserved-subsections-support)

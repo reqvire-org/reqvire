@@ -47,7 +47,7 @@ This requirement completes the trace cycle back to Alpha, which should be allowe
 This is a valid child requirement of Alpha.
 
 #### Metadata
-  * type: system-requirement
+  * type: requirement
 
 #### Relations
   * derivedFrom: [Requirement Alpha](#requirement-alpha)
@@ -59,7 +59,7 @@ This is a valid child requirement of Alpha.
 This is a valid child requirement of Beta.
 
 #### Metadata
-  * type: system-requirement
+  * type: requirement
 
 #### Relations
   * derivedFrom: [Requirement Beta](#requirement-beta)
@@ -71,7 +71,7 @@ This is a valid child requirement of Beta.
 This is a valid child requirement of Gamma.
 
 #### Metadata
-  * type: system-requirement
+  * type: requirement
 
 #### Relations
   * derivedFrom: [Requirement Gamma](#requirement-gamma)
@@ -98,7 +98,7 @@ This requirement has multiple trace relations forming complex patterns that shou
 This child requirement also has trace relations.
 
 #### Metadata
-  * type: system-requirement
+  * type: requirement
 
 #### Relations
   * derivedFrom: [Complex Trace Scenario](#complex-trace-scenario)

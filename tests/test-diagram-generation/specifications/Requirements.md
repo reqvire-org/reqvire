@@ -15,29 +15,32 @@ This is a root requirement for testing purposes.
 
 ### Element 1
 
-This is a test element with relations.
+This is a test verification element with relations.
 
 #### Metadata
-  * type: verification
+  * type: test-verification
 
 #### Relations
   * verify: [Element 3](#element-3)
-  * derive: [Element 2](#element-2)
 
 ### Element 2
 
-This is another test element with relations.
+This is another test element (requirement) with relations.
+
+#### Metadata
+  * type: requirement
 
 #### Relations
+  * derivedFrom: [Element 3](#element-3)
   * trace: [Element 1](#element-1)
-  * derivedFrom: [Element 1](#element-1)
-
-
 
 
 ### Element 3
 
 This is a third test element.
+
+#### Metadata
+  * type: requirement
 
 #### Relations
   * derivedFrom: [Root Requirement](#root-requirement)
@@ -48,6 +51,9 @@ This is a third test element.
 
 This is a fourth test element with relations.
 
+#### Metadata
+  * type: requirement
+
 #### Relations
   * derivedFrom: [Element 3](#element-3)
 
@@ -55,15 +61,21 @@ This is a fourth test element with relations.
 
 This is a fifth test element.
 
+#### Metadata
+  * type: requirement
+
 #### Relations
   * derivedFrom: [Element 6](#element-6)
   * trace: [Element 1](#element-1)
-  * satisfiedBy: [element2_implementation.py](element2_implementation.py)  
+  * satisfiedBy: [element2_implementation.py](element2_implementation.py)
 
 
 ### Element 6
 
 This is a sixth test element.
+
+#### Metadata
+  * type: requirement
 
 #### Relations
   * derive: [Element 5](#element-5)

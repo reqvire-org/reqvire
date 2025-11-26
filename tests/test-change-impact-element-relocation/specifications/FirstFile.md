@@ -14,7 +14,7 @@ The system shall disable non-essential background services when battery levels d
 The system shall optimize power consumption during idle periods.
 
 #### Metadata
-  * type: system-requirement
+  * type: requirement
 
 #### Relations
   * derivedFrom: [Battery Saver](#battery-saver)
@@ -26,7 +26,7 @@ The system shall optimize power consumption during idle periods.
 The system shall provide brightness controls.
 
 #### Metadata
-  * type: system-requirement
+  * type: requirement
 
 #### Relations
   * derivedFrom: [Battery Saver](#battery-saver)
@@ -39,6 +39,6 @@ The system shall provide brightness controls.
 The system shall monitor battery levels continuously.
 
 #### Metadata
-  * type: system-requirement
+  * type: requirement
 
 ---
