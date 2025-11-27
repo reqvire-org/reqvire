@@ -74,6 +74,27 @@
                     var svg = mermaidContainer.querySelector('svg');
                     if (!svg) return;
 
+                    // Get the natural size of the diagram
+                    var bbox = svg.getBBox();
+                    var containerWidth = mermaidContainer.clientWidth;
+                    var containerHeight = mermaidContainer.clientHeight;
+
+                    // Check if diagram fits within container (with some padding)
+                    var padding = 40;
+                    var fitsInContainer = (bbox.width <= containerWidth - padding) && (bbox.height <= containerHeight - padding);
+
+                    if (fitsInContainer) {
+                        // Diagram fits - use natural size, shrink container to fit content
+                        svg.style.width = 'auto';
+                        svg.style.height = 'auto';
+                        mermaidContainer.style.height = 'auto';
+                        mermaidContainer.style.minHeight = (bbox.height + padding) + 'px';
+                        mermaidContainer.style.maxHeight = 'calc(100vh - 150px)';
+                        // No pan/zoom needed for small diagrams
+                        return;
+                    }
+
+                    // Large diagram - enable pan/zoom
                     svg.style.maxWidth = 'none';
                     svg.style.maxHeight = 'none';
 
@@ -446,10 +467,8 @@
 <body>
     <nav class="reqvire-nav">
         <a href="{nav_prefix}index.html" class="nav-logo"><img src="{nav_prefix}assets/logo.png" alt="Reqvire" height="24"></a>
-        <a href="{nav_prefix}index.html">Index</a>
-        <a href="{nav_prefix}containment.html">Containment</a>
+        <a href="{nav_prefix}index.html">Containment</a>
         <a href="{nav_prefix}model.html">Model</a>
-        <a href="{nav_prefix}whole-model.html">Whole Model</a>
         <a href="{nav_prefix}traces.html">Traces</a>
         <a href="{nav_prefix}coverage.html">Coverage</a>
     </nav>

@@ -201,31 +201,31 @@ blockquote {
 }
 .diagram-nav-buttons {
     position: absolute;
-    top: 10px;
-    left: 10px;
+    top: 5px;
+    left: 5px;
     z-index: 999; /* higher than SVG (1) but lower than header nav (1000) */
     display: flex;
     flex-direction: column;
-    gap: 5px;
-    background-color: rgba(255, 255, 255, 0.9);
-    padding: 5px;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    gap: 2px;
+    background-color: rgba(255, 255, 255, 0.85);
+    padding: 3px;
+    border-radius: 3px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
 }
 .diagram-nav-row {
     display: flex;
-    gap: 5px;
+    gap: 2px;
     justify-content: center;
 }
 .diagram-nav-btn {
-    width: 32px;
-    height: 32px;
+    width: 22px;
+    height: 22px;
     background-color: var(--color-primary);
     color: white;
     border: none;
-    border-radius: 3px;
+    border-radius: 2px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 11px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -635,7 +635,7 @@ fn generate_d3_tree_html(json_data: &str) -> String {
                 }}
             }});
 
-        // Icon + Text - click to navigate
+        // Icon + Text - click to navigate or expand/collapse
         nodeEnter.append("text")
             .attr("dy", "0.35em")
             .attr("x", d => isMetaNode(d.data.type) ? 10 : 12)
@@ -644,12 +644,18 @@ fn generate_d3_tree_html(json_data: &str) -> String {
             .style("font-style", d => isMetaNode(d.data.type) ? "italic" : "normal")
             .style("opacity", d => isMetaNode(d.data.type) ? 0.85 : 1)
             .style("font-family", "system-ui, sans-serif")
-            .style("cursor", d => d.data.link ? "pointer" : "default")
+            .style("cursor", "pointer")
             .text(d => `${{getIcon(d.data.type)}} ${{d.data.name}}`)
             .on("click", (event, d) => {{
                 event.stopPropagation();
                 if (d.data.link) {{
+                    // Navigate to link
                     window.location.href = d.data.link.replace(".md", ".html");
+                }} else if (d.children || d._children) {{
+                    // No link - toggle expand/collapse
+                    d.children = d.children ? null : d._children;
+                    d._children = d._children ? null : d.children;
+                    update(d);
                 }}
             }})
             .clone(true).lower()
