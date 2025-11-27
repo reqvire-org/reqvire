@@ -260,12 +260,15 @@ pub fn convert_to_html(
     title: &str,
     base_folder: &PathBuf
 ) -> Result<String, ReqvireError> {
-    // 1. Extract Mermaid and D3 tree blocks before link conversion
+    // 1. Extract Mermaid, D3 tree, D3 Sankey, D3 Sunburst, and D3 Icicle blocks before link conversion
     let (markdown_without_mermaid, mermaid_blocks) = extract_mermaid_blocks(markdown_content);
     let (markdown_without_d3, d3_tree_blocks) = extract_d3_tree_blocks(&markdown_without_mermaid);
+    let (markdown_without_sankey, d3_sankey_blocks) = extract_d3_sankey_blocks(&markdown_without_d3);
+    let (markdown_without_sunburst, d3_sunburst_blocks) = extract_d3_sunburst_blocks(&markdown_without_sankey);
+    let (markdown_without_icicle, d3_icicle_blocks) = extract_d3_icicle_blocks(&markdown_without_sunburst);
 
     // 2. Convert .md links to .html — safely
-    let markdown_html_ready = convert_markdown_links_to_html(file_path, &markdown_without_d3, base_folder);
+    let markdown_html_ready = convert_markdown_links_to_html(file_path, &markdown_without_icicle, base_folder);
 
     // 3. Restore Mermaid blocks (untouched by md → html rewrite)
     let markdown_final = restore_mermaid_blocks(&markdown_html_ready, &mermaid_blocks);
@@ -283,10 +286,13 @@ pub fn convert_to_html(
     let mut html_output = String::new();
     html::push_html(&mut html_output, parser);
 
-    // 5. Process anchor IDs, Mermaid blocks, and D3 tree blocks
+    // 5. Process anchor IDs, Mermaid blocks, D3 tree blocks, Sankey blocks, Sunburst blocks, and Icicle blocks
     let html_with_anchors = add_anchor_ids(&html_output);
     let html_with_mermaid = process_mermaid_diagrams(file_path, &html_with_anchors);
     let html_with_d3 = restore_d3_tree_blocks(&html_with_mermaid, &d3_tree_blocks);
+    let html_with_sankey = restore_d3_sankey_blocks(&html_with_d3, &d3_sankey_blocks);
+    let html_with_sunburst = restore_d3_sunburst_blocks(&html_with_sankey, &d3_sunburst_blocks);
+    let html_with_icicle = restore_d3_icicle_blocks(&html_with_sunburst, &d3_icicle_blocks);
 
     // 6. Calculate relative path prefix for navigation links
     let nav_prefix = calculate_nav_prefix(file_path, base_folder);
@@ -308,7 +314,7 @@ pub fn convert_to_html(
     let html_document = template
         .replace("{title}", title)
         .replace("{styles}", EMBEDDED_STYLES)
-        .replace("{content}", &html_with_d3)
+        .replace("{content}", &html_with_icicle)
         .replace("{nav_prefix}", &nav_prefix);
 
     Ok(html_document)
@@ -494,7 +500,7 @@ fn generate_d3_tree_html(json_data: &str) -> String {
     // Colors matching Reqvire theme
     const colors = {{
         "folder": "#9E9E9E",
-        "file": "#FFCA28",
+        "file": "#B8860B",
         "user-requirement": "#7E57C2",
         "system-requirement": "#673AB7",
         "requirement": "#673AB7",
@@ -764,6 +770,808 @@ fn generate_d3_tree_html(json_data: &str) -> String {
 }}
 .node:hover text {{
     fill: #3F51B5;
+}}
+</style>
+"##, id = unique_id, json = json_data)
+}
+
+/// Extracts D3 Sankey blocks and replaces them with placeholders
+fn extract_d3_sankey_blocks(markdown: &str) -> (String, HashMap<String, String>) {
+    lazy_static! {
+        static ref D3_SANKEY_BLOCK: Regex = Regex::new(
+            r"(?s)```d3-sankey\s*\n(?P<json>.*?)```"
+        ).unwrap();
+    }
+
+    let mut map = HashMap::new();
+    let mut counter = 0;
+    let result = D3_SANKEY_BLOCK.replace_all(markdown, |caps: &Captures| {
+        let json_data = caps["json"].trim();
+        let placeholder = format!("{{{{D3_SANKEY_BLOCK_{}}}}}", counter);
+        map.insert(placeholder.clone(), json_data.to_string());
+        counter += 1;
+        placeholder
+    });
+
+    (result.into_owned(), map)
+}
+
+/// Restores D3 Sankey placeholders with rendered HTML
+fn restore_d3_sankey_blocks(content: &str, blocks: &HashMap<String, String>) -> String {
+    let mut result = content.to_string();
+    for (placeholder, json_data) in blocks {
+        let sankey_html = generate_d3_sankey_html(json_data);
+        result = result.replace(placeholder, &sankey_html);
+    }
+    result
+}
+
+/// Generate HTML for D3.js Sankey diagram visualization
+/// Expected JSON format:
+/// {
+///   "nodes": [{"name": "Node1", "type": "requirement"}, ...],
+///   "links": [{"source": 0, "target": 1, "value": 1}, ...]
+/// }
+fn generate_d3_sankey_html(json_data: &str) -> String {
+    let unique_id = format!("d3sankey_{:x}", json_data.as_ptr() as usize);
+
+    format!(r##"
+<div class="d3-sankey-container" id="{id}">
+    <svg class="d3-sankey-svg"></svg>
+</div>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
+<script>
+(function() {{
+    const data = {json};
+    const container = document.getElementById("{id}");
+    const svg = d3.select(container).select("svg");
+
+    // Configuration
+    const margin = {{top: 20, right: 20, bottom: 20, left: 20}};
+    const width = container.clientWidth - margin.left - margin.right;
+    const height = Math.max(400, data.nodes.length * 25);
+
+    svg.attr("width", width + margin.left + margin.right)
+       .attr("height", height + margin.top + margin.bottom);
+
+    const g = svg.append("g")
+        .attr("transform", `translate(${{margin.left}},${{margin.top}})`);
+
+    // Colors matching Reqvire theme
+    const colors = {{
+        "user-requirement": "#7E57C2",
+        "system-requirement": "#673AB7",
+        "requirement": "#673AB7",
+        "verification": "#4CAF50",
+        "test-verification": "#4CAF50",
+        "refinement": "#FF9800",
+        "design-document": "#8D6E63",
+        "default": "#9E9E9E"
+    }};
+
+    function getColor(type) {{
+        return colors[type] || colors["default"];
+    }}
+
+    // Create sankey generator
+    const sankey = d3.sankey()
+        .nodeId(d => d.name)
+        .nodeWidth(20)
+        .nodePadding(15)
+        .nodeAlign(d3.sankeyLeft)
+        .extent([[0, 0], [width, height]]);
+
+    // Generate sankey layout
+    const {{nodes, links}} = sankey({{
+        nodes: data.nodes.map(d => Object.assign({{}}, d)),
+        links: data.links.map(d => Object.assign({{}}, d))
+    }});
+
+    // Draw links
+    const link = g.append("g")
+        .attr("fill", "none")
+        .attr("stroke-opacity", 0.4)
+        .selectAll("path")
+        .data(links)
+        .join("path")
+        .attr("d", d3.sankeyLinkHorizontal())
+        .attr("stroke", d => getColor(d.source.type))
+        .attr("stroke-width", d => Math.max(1, d.width))
+        .on("mouseover", function() {{
+            d3.select(this).attr("stroke-opacity", 0.7);
+        }})
+        .on("mouseout", function() {{
+            d3.select(this).attr("stroke-opacity", 0.4);
+        }});
+
+    link.append("title")
+        .text(d => `${{d.source.name}} → ${{d.target.name}}`);
+
+    // Draw nodes
+    const node = g.append("g")
+        .selectAll("g")
+        .data(nodes)
+        .join("g")
+        .attr("transform", d => `translate(${{d.x0}},${{d.y0}})`);
+
+    node.append("rect")
+        .attr("height", d => d.y1 - d.y0)
+        .attr("width", d => d.x1 - d.x0)
+        .attr("fill", d => getColor(d.type))
+        .attr("stroke", "#fff")
+        .attr("stroke-width", 1)
+        .style("cursor", d => d.link ? "pointer" : "default")
+        .on("click", (event, d) => {{
+            if (d.link) {{
+                window.location.href = d.link.replace(".md", ".html");
+            }}
+        }});
+
+    node.append("text")
+        .attr("x", d => d.x0 < width / 2 ? (d.x1 - d.x0) + 6 : -6)
+        .attr("y", d => (d.y1 - d.y0) / 2)
+        .attr("dy", "0.35em")
+        .attr("text-anchor", d => d.x0 < width / 2 ? "start" : "end")
+        .style("font-size", "12px")
+        .style("font-family", "system-ui, sans-serif")
+        .style("fill", "#424242")
+        .text(d => d.name)
+        .style("cursor", d => d.link ? "pointer" : "default")
+        .on("click", (event, d) => {{
+            if (d.link) {{
+                window.location.href = d.link.replace(".md", ".html");
+            }}
+        }});
+
+    node.append("title")
+        .text(d => `${{d.name}}\nType: ${{d.type || "unknown"}}`);
+}})();
+</script>
+<style>
+.d3-sankey-container {{
+    background: #FAFAFA;
+    border: 1px solid #EEEEEE;
+    border-radius: 4px;
+    padding: 10px;
+    overflow-x: auto;
+}}
+.d3-sankey-svg {{
+    display: block;
+    width: 100%;
+}}
+</style>
+"##, id = unique_id, json = json_data)
+}
+
+/// Extracts D3 Sunburst blocks and replaces them with placeholders
+fn extract_d3_sunburst_blocks(markdown: &str) -> (String, HashMap<String, String>) {
+    lazy_static! {
+        static ref D3_SUNBURST_BLOCK: Regex = Regex::new(
+            r"(?s)```d3-sunburst\s*\n(?P<json>.*?)```"
+        ).unwrap();
+    }
+
+    let mut map = HashMap::new();
+    let mut counter = 0;
+    let result = D3_SUNBURST_BLOCK.replace_all(markdown, |caps: &Captures| {
+        let json_data = caps["json"].trim();
+        let placeholder = format!("{{{{D3_SUNBURST_BLOCK_{}}}}}", counter);
+        map.insert(placeholder.clone(), json_data.to_string());
+        counter += 1;
+        placeholder
+    });
+
+    (result.into_owned(), map)
+}
+
+/// Restores D3 Sunburst placeholders with rendered HTML
+fn restore_d3_sunburst_blocks(content: &str, blocks: &HashMap<String, String>) -> String {
+    let mut result = content.to_string();
+    for (placeholder, json_data) in blocks {
+        let sunburst_html = generate_d3_sunburst_html(json_data);
+        result = result.replace(placeholder, &sunburst_html);
+    }
+    result
+}
+
+/// Generate HTML for D3.js Sunburst diagram visualization
+/// Uses same hierarchical JSON format as d3-tree
+fn generate_d3_sunburst_html(json_data: &str) -> String {
+    let unique_id = format!("d3sunburst_{:x}", json_data.as_ptr() as usize);
+
+    format!(r##"
+<div class="d3-sunburst-container" id="{id}">
+    <div class="d3-sunburst-breadcrumb"></div>
+    <div class="d3-sunburst-wrapper">
+        <svg class="d3-sunburst-svg"></svg>
+    </div>
+</div>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+(function() {{
+    const data = {json};
+    const container = document.getElementById("{id}");
+    const wrapper = container.querySelector(".d3-sunburst-wrapper");
+    const svgEl = container.querySelector("svg");
+    const svg = d3.select(svgEl);
+    const breadcrumb = d3.select(container).select(".d3-sunburst-breadcrumb");
+
+    // Fixed size for consistent rendering
+    const size = 650;
+    const radius = size / 2;
+
+    // Use viewBox centered on origin - svg fills container width
+    svg.attr("width", "100%")
+       .attr("height", size)
+       .attr("viewBox", `${{-size/2}} ${{-size/2}} ${{size}} ${{size}}`)
+       .attr("preserveAspectRatio", "xMidYMid meet")
+       .style("font", "12px system-ui, sans-serif")
+       .style("display", "block")
+       .style("margin", "0 auto");
+
+    // Main group for drawing (no transform needed - viewBox is centered)
+    const viewport = svg.append("g");
+
+    // Colors matching Mermaid diagram theme
+    const colors = {{
+        "folder": "#9E9E9E",
+        "file": "#B8860B",
+        "design-document": "#607D8B",
+        "user-requirement": "#7E57C2",
+        "system-requirement": "#673AB7",
+        "requirement": "#673AB7",
+        "verification": "#4CAF50",
+        "test-verification": "#4CAF50",
+        "refinement": "#FF9800",
+        "element": "#424242",
+        "attachment-element": "#8D6E63",
+        "attachment-file": "#8D6E63"
+    }};
+
+    const icons = {{
+        "folder": "📁",
+        "file": "📄",
+        "user-requirement": "👤",
+        "system-requirement": "📐",
+        "requirement": "📐",
+        "verification": "✅",
+        "refinement": "🔧",
+        "design-document": "📝",
+        "element": "◽",
+        "attachment-element": "🔧",
+        "attachment-file": "📎"
+    }};
+
+    function getColor(type) {{
+        return colors[type] || "#9E9E9E";
+    }}
+
+    function getIcon(type) {{
+        return icons[type] || "◽";
+    }}
+
+    // Create hierarchy
+    const root = d3.hierarchy(data)
+        .sum(d => d.children ? 0 : 1)
+        .sort((a, b) => b.value - a.value);
+
+    // Create partition layout
+    const partition = d3.partition()
+        .size([2 * Math.PI, radius]);
+
+    partition(root);
+
+    // Arc generator
+    const arc = d3.arc()
+        .startAngle(d => d.x0)
+        .endAngle(d => d.x1)
+        .padAngle(d => Math.min((d.x1 - d.x0) / 2, 0.005))
+        .padRadius(radius / 2)
+        .innerRadius(d => d.y0)
+        .outerRadius(d => d.y1 - 1);
+
+    // Store ancestor nodes for breadcrumb clicks
+    let breadcrumbAncestors = [];
+
+    // Helper function to generate breadcrumb HTML for a node with click handlers
+    function updateBreadcrumbDisplay(node, isHover = false) {{
+        const ancestors = node.ancestors().reverse();
+        breadcrumbAncestors = ancestors;
+
+        const pathText = ancestors.map((a, i) => {{
+            let name = a.data.name;
+            if (name.endsWith(".html")) {{
+                name = name.replace(".html", ".md");
+            }}
+            // Make clickable if not the last item (current focus) and not in hover mode
+            const isLast = i === ancestors.length - 1;
+            const canClick = !isHover && !isLast && node === currentFocus;
+            const style = isLast
+                ? `color: ${{getColor(a.data.type)}}; font-weight: bold;`
+                : canClick
+                    ? `color: ${{getColor(a.data.type)}}; cursor: pointer; text-decoration: underline;`
+                    : `color: ${{getColor(a.data.type)}};`;
+            return `<span class="breadcrumb-item" data-index="${{i}}" style="${{style}}">${{getIcon(a.data.type)}} ${{name}}</span>`;
+        }}).join(" → ");
+        breadcrumb.html(pathText);
+
+        // Add click handlers to breadcrumb items (only when showing current focus)
+        if (!isHover) {{
+            breadcrumb.selectAll(".breadcrumb-item").on("click", function() {{
+                const index = +d3.select(this).attr("data-index");
+                const targetNode = breadcrumbAncestors[index];
+                if (targetNode && targetNode !== currentFocus) {{
+                    clicked(null, targetNode);
+                }}
+            }});
+        }}
+    }}
+
+    // Draw arcs - use viewport group for pan/zoom
+    const path = viewport.append("g")
+        .selectAll("path")
+        .data(root.descendants().filter(d => d.depth))
+        .join("path")
+        .attr("fill", d => getColor(d.data.type))
+        .attr("fill-opacity", d => d.children ? 0.8 : 0.6)
+        .attr("d", arc)
+        .style("cursor", "pointer")
+        .on("click", clicked)
+        .on("mouseover", function(event, d) {{
+            d3.select(this).attr("fill-opacity", 1);
+            updateBreadcrumbDisplay(d, true);
+        }})
+        .on("mouseout", function(event, d) {{
+            d3.select(this).attr("fill-opacity", d.children ? 0.8 : 0.6);
+            // Show current focus breadcrumb when not hovering (with click handlers)
+            updateBreadcrumbDisplay(currentFocus, false);
+        }});
+
+    path.append("title")
+        .text(d => {{
+            const path = d.ancestors().map(d => d.data.name).reverse().join(" / ");
+            return d.data.link ? `${{path}}\n${{d.data.link}}` : path;
+        }});
+
+    // Add labels for larger segments - use viewport
+    const label = viewport.append("g")
+        .attr("pointer-events", "none")
+        .attr("text-anchor", "middle")
+        .selectAll("text")
+        .data(root.descendants().filter(d => d.depth && (d.y0 + d.y1) / 2 * (d.x1 - d.x0) > 10))
+        .join("text")
+        .attr("transform", function(d) {{
+            const x = (d.x0 + d.x1) / 2 * 180 / Math.PI;
+            const y = (d.y0 + d.y1) / 2;
+            return `rotate(${{x - 90}}) translate(${{y}},0) rotate(${{x < 180 ? 0 : 180}})`;
+        }})
+        .attr("dy", "0.35em")
+        .style("font-size", "10px")
+        .style("fill", "#fff")
+        .text(d => d.data.name.length > 12 ? d.data.name.substring(0, 10) + "..." : d.data.name);
+
+    // Center circle for going back - use viewport
+    const parent = viewport.append("circle")
+        .datum(root)
+        .attr("r", radius / 6)
+        .attr("fill", "#FAFAFA")
+        .attr("stroke", "#EEEEEE")
+        .attr("stroke-width", 2)
+        .attr("pointer-events", "all")
+        .style("cursor", "pointer")
+        .on("click", clicked);
+
+    // Track current focused node for center link
+    let currentFocus = root;
+
+    // Center text - clickable link when focused node has a link - use viewport
+    const centerText = viewport.append("text")
+        .attr("text-anchor", "middle")
+        .attr("dy", "0.35em")
+        .style("font-size", "14px")
+        .style("fill", "#424242")
+        .style("cursor", "default")
+        .text(data.name);
+
+    // Update center text to be a link if current node has a link
+    function updateCenterLink(node) {{
+        currentFocus = node;
+        const hasLink = node.data.link;
+        centerText
+            .text(node.data.name)
+            .style("cursor", hasLink ? "pointer" : "default")
+            .style("fill", hasLink ? "var(--color-link-hover, #3F51B5)" : "#424242")
+            .style("text-decoration", hasLink ? "underline" : "none");
+        // Update breadcrumb to show current focus with click handlers
+        updateBreadcrumbDisplay(node, false);
+    }}
+
+    // Show initial breadcrumb for root
+    updateBreadcrumbDisplay(root, false);
+
+    // Click on center text navigates to link
+    centerText.on("click", function(event) {{
+        event.stopPropagation();
+        if (currentFocus.data.link) {{
+            window.location.href = currentFocus.data.link.replace(".md", ".html");
+        }}
+    }});
+
+    function clicked(event, p) {{
+        // If clicking on a leaf with a link, navigate
+        if (!p.children && p.data.link) {{
+            window.location.href = p.data.link.replace(".md", ".html");
+            return;
+        }}
+
+        parent.datum(p.parent || root);
+        updateCenterLink(p);
+
+        root.each(d => d.target = {{
+            x0: Math.max(0, Math.min(1, (d.x0 - p.x0) / (p.x1 - p.x0))) * 2 * Math.PI,
+            x1: Math.max(0, Math.min(1, (d.x1 - p.x0) / (p.x1 - p.x0))) * 2 * Math.PI,
+            y0: Math.max(0, d.y0 - p.y0),
+            y1: Math.max(0, d.y1 - p.y0)
+        }});
+
+        const t = svg.transition().duration(750);
+
+        path.transition(t)
+            .tween("data", d => {{
+                const i = d3.interpolate(d.current, d.target);
+                return t => d.current = i(t);
+            }})
+            .filter(function(d) {{
+                return +this.getAttribute("fill-opacity") || arcVisible(d.target);
+            }})
+            .attr("fill-opacity", d => arcVisible(d.target) ? (d.children ? 0.8 : 0.6) : 0)
+            .attr("pointer-events", d => arcVisible(d.target) ? "auto" : "none")
+            .attrTween("d", d => () => arc(d.current));
+
+        label.filter(function(d) {{
+                return +this.getAttribute("fill-opacity") || labelVisible(d.target);
+            }}).transition(t)
+            .attr("fill-opacity", d => +labelVisible(d.target))
+            .attrTween("transform", d => () => labelTransform(d.current));
+    }}
+
+    function arcVisible(d) {{
+        return d.y1 <= radius && d.y0 >= 0 && d.x1 > d.x0;
+    }}
+
+    function labelVisible(d) {{
+        return d.y1 <= radius && d.y0 >= 0 && (d.y0 + d.y1) / 2 * (d.x1 - d.x0) > 10;
+    }}
+
+    function labelTransform(d) {{
+        const x = (d.x0 + d.x1) / 2 * 180 / Math.PI;
+        const y = (d.y0 + d.y1) / 2;
+        return `rotate(${{x - 90}}) translate(${{y}},0) rotate(${{x < 180 ? 0 : 180}})`;
+    }}
+
+    // Store current state for transitions
+    root.each(d => d.current = d);
+}})();
+</script>
+<style>
+.d3-sunburst-container {{
+    background: #FAFAFA;
+    border: 1px solid #EEEEEE;
+    border-radius: 4px;
+    padding: 10px;
+}}
+.d3-sunburst-wrapper {{
+    position: relative;
+    width: 100%;
+}}
+.d3-sunburst-svg {{
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+}}
+.d3-sunburst-breadcrumb {{
+    padding: 8px;
+    min-height: 24px;
+    font-size: 13px;
+    color: #424242;
+    background: #fff;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}}
+.d3-sunburst-breadcrumb span {{
+    margin: 0 2px;
+}}
+</style>
+"##, id = unique_id, json = json_data)
+}
+
+/// Extracts D3 Icicle blocks and replaces them with placeholders
+fn extract_d3_icicle_blocks(markdown: &str) -> (String, HashMap<String, String>) {
+    lazy_static! {
+        static ref D3_ICICLE_BLOCK: Regex = Regex::new(
+            r"(?s)```d3-icicle\s*\n(?P<json>.*?)```"
+        ).unwrap();
+    }
+
+    let mut map = HashMap::new();
+    let mut counter = 0;
+    let result = D3_ICICLE_BLOCK.replace_all(markdown, |caps: &Captures| {
+        let json_data = caps["json"].trim();
+        let placeholder = format!("{{{{D3_ICICLE_BLOCK_{}}}}}", counter);
+        map.insert(placeholder.clone(), json_data.to_string());
+        counter += 1;
+        placeholder
+    });
+
+    (result.into_owned(), map)
+}
+
+/// Restores D3 Icicle placeholders with rendered HTML
+fn restore_d3_icicle_blocks(content: &str, blocks: &HashMap<String, String>) -> String {
+    let mut result = content.to_string();
+    for (placeholder, json_data) in blocks {
+        let icicle_html = generate_d3_icicle_html(json_data);
+        result = result.replace(placeholder, &icicle_html);
+    }
+    result
+}
+
+/// Generate HTML for D3.js Icicle/Partition diagram visualization
+fn generate_d3_icicle_html(json_data: &str) -> String {
+    let unique_id = format!("d3icicle_{:x}", json_data.as_ptr() as usize);
+
+    format!(r##"
+<div class="d3-icicle-container" id="{id}">
+    <div class="d3-icicle-breadcrumb"></div>
+    <div class="d3-icicle-wrapper">
+        <svg class="d3-icicle-svg"></svg>
+    </div>
+</div>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+(function() {{
+    const data = {json};
+    const container = document.getElementById("{id}");
+    const wrapper = container.querySelector(".d3-icicle-wrapper");
+    const svgEl = container.querySelector("svg");
+    const svg = d3.select(svgEl);
+    const breadcrumb = d3.select(container).select(".d3-icicle-breadcrumb");
+
+    // Fixed dimensions for consistent rendering
+    const width = 1200;
+    const height = 800;
+
+    svg.attr("width", "100%")
+       .attr("height", height)
+       .attr("viewBox", `0 0 ${{width}} ${{height}}`)
+       .attr("preserveAspectRatio", "xMidYMid meet")
+       .style("font", "11px system-ui, sans-serif")
+       .style("display", "block");
+
+    // Main group for drawing
+    const viewport = svg.append("g");
+
+    // Colors matching Mermaid diagram theme
+    const colors = {{
+        "folder": "#9E9E9E",
+        "file": "#B8860B",
+        "design-document": "#607D8B",
+        "user-requirement": "#7E57C2",
+        "system-requirement": "#673AB7",
+        "requirement": "#673AB7",
+        "verification": "#4CAF50",
+        "test-verification": "#4CAF50",
+        "refinement": "#FF9800",
+        "element": "#424242",
+        "attachment-element": "#8D6E63",
+        "attachment-file": "#8D6E63"
+    }};
+
+    function getColor(type) {{
+        return colors[type] || colors["element"];
+    }}
+
+    // Create hierarchy
+    const root = d3.hierarchy(data)
+        .sum(d => d.children ? 0 : 1)
+        .sort((a, b) => b.height - a.height || a.data.name.localeCompare(b.data.name));
+
+    // Create partition layout
+    const partition = d3.partition()
+        .size([height, width])
+        .padding(1);
+
+    partition(root);
+
+    // Track current focus
+    let currentFocus = root;
+
+    // Create cells - use viewport for pan/zoom
+    const cell = viewport.selectAll("g")
+        .data(root.descendants())
+        .join("g")
+        .attr("transform", d => `translate(${{d.y0}},${{d.x0}})`);
+
+    const rect = cell.append("rect")
+        .attr("width", d => d.y1 - d.y0 - 1)
+        .attr("height", d => rectHeight(d))
+        .attr("fill", d => getColor(d.data.type))
+        .attr("fill-opacity", d => d.children ? 0.8 : 0.6)
+        .style("cursor", "pointer")
+        .on("click", clicked)
+        .on("mouseover", function(event, d) {{
+            d3.select(this).attr("fill-opacity", 1);
+            // Update breadcrumb
+            const ancestors = d.ancestors().reverse();
+            const pathText = ancestors.map(a => {{
+                let name = a.data.name;
+                if (name.endsWith(".html")) {{
+                    name = name.replace(".html", ".md");
+                }}
+                return `<span style="color: ${{getColor(a.data.type)}}">${{name}}</span>`;
+            }}).join(" → ");
+            breadcrumb.html(pathText);
+        }})
+        .on("mouseout", function(event, d) {{
+            d3.select(this).attr("fill-opacity", d.children ? 0.8 : 0.6);
+            // Show current focus path
+            updateBreadcrumb(currentFocus);
+        }});
+
+    rect.append("title")
+        .text(d => d.data.link ? `${{d.data.name}}\n${{d.data.link}}` : d.data.name);
+
+    // Add text labels
+    const text = cell.append("text")
+        .attr("pointer-events", "none")
+        .attr("x", 4)
+        .attr("y", d => Math.min(rectHeight(d) / 2 + 4, 14))
+        .attr("fill", "#fff")
+        .attr("fill-opacity", d => labelVisible(d) ? 1 : 0)
+        .text(d => d.data.name);
+
+    // Center link text (shown when zoomed into a node with a link) - use viewport
+    const centerLink = viewport.append("text")
+        .attr("class", "center-link")
+        .attr("text-anchor", "start")
+        .attr("x", 10)
+        .attr("y", 20)
+        .style("font-size", "14px")
+        .style("font-weight", "bold")
+        .style("fill", "var(--color-link-hover, #3F51B5)")
+        .style("cursor", "pointer")
+        .style("text-decoration", "underline")
+        .style("display", "none")
+        .on("click", function() {{
+            if (currentFocus.data.link) {{
+                window.location.href = currentFocus.data.link.replace(".md", ".html");
+            }}
+        }});
+
+    // Store ancestor nodes for breadcrumb clicks
+    let breadcrumbAncestors = [];
+
+    function updateBreadcrumb(node) {{
+        const ancestors = node.ancestors().reverse();
+        breadcrumbAncestors = ancestors;
+
+        const pathText = ancestors.map((a, i) => {{
+            let name = a.data.name;
+            if (name.endsWith(".html")) {{
+                name = name.replace(".html", ".md");
+            }}
+            // Make clickable if not the last item (current focus)
+            const isLast = i === ancestors.length - 1;
+            const style = isLast
+                ? `color: ${{getColor(a.data.type)}}; font-weight: bold;`
+                : `color: ${{getColor(a.data.type)}}; cursor: pointer; text-decoration: underline;`;
+            return `<span class="breadcrumb-item" data-index="${{i}}" style="${{style}}">${{name}}</span>`;
+        }}).join(" → ");
+        breadcrumb.html(pathText);
+
+        // Add click handlers to breadcrumb items
+        breadcrumb.selectAll(".breadcrumb-item").on("click", function() {{
+            const index = +d3.select(this).attr("data-index");
+            const targetNode = breadcrumbAncestors[index];
+            if (targetNode && targetNode !== currentFocus) {{
+                zoomTo(targetNode);
+            }}
+        }});
+
+        // Update center link
+        if (node.data.link && node !== root) {{
+            let displayName = node.data.name;
+            if (displayName.endsWith(".html")) {{
+                displayName = displayName.replace(".html", ".md");
+            }}
+            centerLink
+                .text("→ " + displayName)
+                .style("display", "block");
+        }} else {{
+            centerLink.style("display", "none");
+        }}
+    }}
+
+    function zoomTo(target) {{
+        currentFocus = target;
+        updateBreadcrumb(currentFocus);
+
+        root.each(d => {{
+            d.target = {{
+                x0: (d.x0 - currentFocus.x0) / (currentFocus.x1 - currentFocus.x0) * height,
+                x1: (d.x1 - currentFocus.x0) / (currentFocus.x1 - currentFocus.x0) * height,
+                y0: d.y0 - currentFocus.y0,
+                y1: d.y1 - currentFocus.y0
+            }};
+        }});
+
+        const t = svg.transition().duration(750);
+
+        cell.transition(t)
+            .attr("transform", d => `translate(${{d.target.y0}},${{d.target.x0}})`);
+
+        rect.transition(t)
+            .attr("height", d => rectHeight(d.target));
+
+        text.transition(t)
+            .attr("fill-opacity", d => labelVisible(d.target) ? 1 : 0)
+            .attr("y", d => Math.min(rectHeight(d.target) / 2 + 4, 14));
+    }}
+
+    function clicked(event, p) {{
+        // If clicking on a leaf with a link, navigate
+        if (!p.children && p.data.link) {{
+            window.location.href = p.data.link.replace(".md", ".html");
+            return;
+        }}
+
+        // Toggle: if clicking same node, go to parent; otherwise zoom into clicked node
+        const target = currentFocus === p ? (p.parent || root) : p;
+        zoomTo(target);
+    }}
+
+    function rectHeight(d) {{
+        return d.x1 - d.x0 - 1;
+    }}
+
+    function labelVisible(d) {{
+        return d.y1 <= width && d.y0 >= 0 && d.x1 - d.x0 > 16;
+    }}
+
+    // Store current state for transitions
+    root.each(d => d.target = {{ x0: d.x0, x1: d.x1, y0: d.y0, y1: d.y1 }});
+
+    // Show initial breadcrumb
+    updateBreadcrumb(root);
+}})();
+</script>
+<style>
+.d3-icicle-container {{
+    background: #FAFAFA;
+    border: 1px solid #EEEEEE;
+    border-radius: 4px;
+    padding: 10px;
+}}
+.d3-icicle-wrapper {{
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+}}
+.d3-icicle-svg {{
+    display: block;
+}}
+.d3-icicle-breadcrumb {{
+    margin-bottom: 10px;
+    padding: 8px;
+    min-height: 24px;
+    font-size: 13px;
+    color: #424242;
+    background: #fff;
+    border-radius: 4px;
+}}
+.d3-icicle-breadcrumb span {{
+    margin: 0 2px;
 }}
 </style>
 "##, id = unique_id, json = json_data)

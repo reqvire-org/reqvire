@@ -836,3 +836,56 @@ This test verifies that the --from-folder option correctly generates relative li
   * verify: [CLI Traces Command](../../../Interfaces/CLI.md#cli-traces-command)
   * satisfiedBy: [test.sh](../../../../tests/test-verification-traces/test.sh)
 ---
+
+### TraceFlow View Test
+
+This test verifies that the TraceFlow view page is correctly generated during HTML export with an interactive D3.js Sankey diagram showing verification traceability flow.
+
+#### Details
+
+##### Acceptance Criteria
+- System shall generate `traceflow.html` file during HTML export
+- TraceFlow page shall contain D3.js Sankey diagram visualization
+- Sankey diagram shall show flow from user requirements to system requirements to verifications
+- Navigation bar shall include "TraceFlow" link after "Traces"
+- Diagram shall support pan/zoom with mouse wheel and buttons
+- Diagram shall support touch pinch-zoom for mobile devices
+- Clicking nodes shall navigate to element definition pages
+- Page shall include title, description, and usage instructions
+
+##### Test Criteria
+1. **File Generation**
+   Command: `reqvire export --output <dir>`
+   - exits code **0**
+   - `traceflow.html` file exists in output directory
+   - file contains valid HTML5
+
+2. **Navigation Integration**
+   - All HTML files contain "TraceFlow" link in navigation bar
+   - Link positioned after "Traces" and before "Coverage"
+   - Link href is `traceflow.html` (with correct relative prefix)
+
+3. **Sankey Diagram Content**
+   - Page contains D3.js Sankey diagram
+   - Diagram shows requirement flow (user-req → system-req → verification)
+   - Nodes are color-coded by type
+   - Links connect related elements
+
+4. **Interactive Features**
+   - Pan/zoom buttons (+/-/reset) are present and functional
+   - Mouse wheel zoom works
+   - Touch pinch-zoom works on mobile
+   - Node click navigates to element page
+
+5. **Page Content**
+   - Title: "TraceFlow - Verification Traceability"
+   - Description text explaining the view
+   - Instructions for using the diagram
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [TraceFlow View Report Generation](../Reporting.md#traceflow-view-report-generation)
+  * satisfiedBy: [test.sh](../../../../tests/test-traceflow-view/test.sh)
+---

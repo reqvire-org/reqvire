@@ -342,3 +342,16 @@ The system shall provide upward traceability visualization from verifications to
 #### Relations
   * derivedFrom: [Verification Coverage Report](#verification-coverage-report)
 ---
+
+### TraceFlow View Report Generation
+
+The system shall generate a TraceFlow view page showing the verification traceability flow using an interactive D3.js Sankey diagram visualization. The view displays how requirements flow from user requirements through system requirements to verifications.
+
+#### Attachments
+  * [TraceFlowView.md](DesignDocuments/TraceFlowView.md)
+
+#### Relations
+  * derivedFrom: [Verification Upward Traceability](#verification-upward-traceability)
+  * satisfiedBy: [export.rs](../../../core/src/export.rs)
+  * verifiedBy: [TraceFlow View Test](Verifications/ReportingVerifications.md#traceflow-view-test)
+---

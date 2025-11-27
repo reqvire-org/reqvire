@@ -629,6 +629,119 @@ pub fn apply_filters(
     Ok(report)
 }
 
+/// Sankey diagram data structures
+#[derive(Debug, Serialize)]
+pub struct SankeyData {
+    pub nodes: Vec<SankeyNode>,
+    pub links: Vec<SankeyLink>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct SankeyNode {
+    pub name: String,
+    #[serde(rename = "type")]
+    pub node_type: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub link: Option<String>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct SankeyLink {
+    pub source: String,
+    pub target: String,
+    pub value: usize,
+}
+
+/// Generate Sankey diagram data from verification traces
+/// Shows flow from requirements to verifications
+pub fn generate_sankey_data(report: &VerificationTracesReport) -> SankeyData {
+    let mut nodes: Vec<SankeyNode> = Vec::new();
+    let mut links: Vec<SankeyLink> = Vec::new();
+    let mut node_names: HashSet<String> = HashSet::new();
+
+    // Collect all requirements and verifications
+    for file_verifications in report.files.values() {
+        for trace in &file_verifications.verifications {
+            // Add verification node
+            if !node_names.contains(&trace.name) {
+                nodes.push(SankeyNode {
+                    name: trace.name.clone(),
+                    node_type: "verification".to_string(),
+                    link: Some(trace.identifier.clone()),
+                });
+                node_names.insert(trace.name.clone());
+            }
+
+            // Add requirement nodes and links from trace tree
+            add_requirements_from_tree(&trace.trace_tree.requirements, &trace.name, &mut nodes, &mut links, &mut node_names);
+        }
+    }
+
+    SankeyData { nodes, links }
+}
+
+fn add_requirements_from_tree(
+    requirements: &[RequirementNode],
+    verification_name: &str,
+    nodes: &mut Vec<SankeyNode>,
+    links: &mut Vec<SankeyLink>,
+    node_names: &mut HashSet<String>,
+) {
+    for req in requirements {
+        // Add requirement node if not already present
+        if !node_names.contains(&req.name) {
+            nodes.push(SankeyNode {
+                name: req.name.clone(),
+                node_type: req.element_type.clone(),
+                link: Some(req.id.clone()),
+            });
+            node_names.insert(req.name.clone());
+        }
+
+        // Add link from requirement to verification (for directly verified)
+        if req.is_directly_verified {
+            links.push(SankeyLink {
+                source: req.name.clone(),
+                target: verification_name.to_string(),
+                value: 1,
+            });
+        }
+
+        // Process children (parent requirements in the derivedFrom hierarchy)
+        for child in &req.children {
+            // Add child node
+            if !node_names.contains(&child.name) {
+                nodes.push(SankeyNode {
+                    name: child.name.clone(),
+                    node_type: child.element_type.clone(),
+                    link: Some(child.id.clone()),
+                });
+                node_names.insert(child.name.clone());
+            }
+
+            // Add link from child to parent requirement
+            links.push(SankeyLink {
+                source: child.name.clone(),
+                target: req.name.clone(),
+                value: 1,
+            });
+
+            // Recursively process grandchildren
+            add_requirements_from_tree(&child.children, verification_name, nodes, links, node_names);
+        }
+    }
+}
+
+/// Generate Sankey markdown block for traces report
+pub fn generate_sankey_markdown(report: &VerificationTracesReport) -> String {
+    let sankey_data = generate_sankey_data(report);
+
+    let json = serde_json::to_string_pretty(&sankey_data)
+        .unwrap_or_else(|_| "{}".to_string());
+
+    format!("```d3-sankey\n{}\n```\n", json)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -1248,3 +1248,61 @@ pub fn generate_containment_d3_tree(registry: &GraphRegistry, short: bool) -> Re
 
     Ok(output)
 }
+
+/// Generate containment view as D3.js sunburst diagram
+///
+/// Generates a markdown code block with `d3-sunburst` language containing JSON data
+/// that can be rendered as an interactive sunburst diagram in HTML export.
+///
+/// Uses the same hierarchical JSON format as the D3 tree.
+pub fn generate_containment_d3_sunburst(registry: &GraphRegistry, short: bool) -> Result<String, ReqvireError> {
+    // Build containment hierarchy structure
+    let hierarchy = crate::containment::ContainmentHierarchy::build(registry, short)?;
+
+    // Convert to D3 tree format (same format works for sunburst)
+    let d3_tree = hierarchy.to_d3_tree();
+
+    // Serialize to JSON
+    let json = serde_json::to_string_pretty(&d3_tree)
+        .map_err(|e| ReqvireError::SerializationError(format!("Failed to serialize D3 sunburst: {}", e)))?;
+
+    let mut output = String::new();
+
+    // Note about element display mode
+    if short {
+        output.push_str("*Elements filtered to show only root elements (those without hierarchical parent relations within the same file).*\n\n");
+    }
+
+    // Output as d3-sunburst code block
+    output.push_str("```d3-sunburst\n");
+    output.push_str(&json);
+    output.push_str("\n```\n");
+
+    Ok(output)
+}
+
+/// Generate D3.js icicle/partition diagram for containment view
+pub fn generate_containment_d3_icicle(registry: &GraphRegistry, short: bool) -> Result<String, ReqvireError> {
+    // Build containment hierarchy structure (same as sunburst/tree)
+    let hierarchy = crate::containment::ContainmentHierarchy::build(registry, short)?;
+
+    // Convert to D3 tree format (works for icicle too)
+    let d3_tree = hierarchy.to_d3_tree();
+
+    // Serialize to JSON
+    let json = serde_json::to_string_pretty(&d3_tree)
+        .map_err(|e| ReqvireError::SerializationError(format!("Failed to serialize D3 icicle: {}", e)))?;
+
+    let mut output = String::new();
+
+    if short {
+        output.push_str("*Elements filtered to show only root elements (those without hierarchical parent relations within the same file).*\n\n");
+    }
+
+    // Output as d3-icicle code block
+    output.push_str("```d3-icicle\n");
+    output.push_str(&json);
+    output.push_str("\n```\n");
+
+    Ok(output)
+}
