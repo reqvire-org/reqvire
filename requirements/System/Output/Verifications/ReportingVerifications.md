@@ -57,7 +57,6 @@ This test verifies that the system correctly extracts the physical containment h
   * type: test-verification
 
 #### Relations
-  * verify: [Containment View Report Generation](../Reporting.md#containment-view-report-generation)
   * satisfiedBy: [test.sh](../../../../tests/test-containment-view/test.sh)
 ---
 
@@ -111,7 +110,6 @@ This test verifies that the system generates valid, well-structured JSON output 
   * type: test-verification
 
 #### Relations
-  * verify: [Containment View Report Generation](../Reporting.md#containment-view-report-generation)
   * satisfiedBy: [test.sh](../../../../tests/test-containment-view/test.sh)
 ---
 
@@ -184,7 +182,6 @@ This test verifies that the system generates valid Mermaid flowchart diagrams wi
   * type: test-verification
 
 #### Relations
-  * verify: [Containment View Report Generation](../Reporting.md#containment-view-report-generation)
   * satisfiedBy: [test.sh](../../../../tests/test-containment-view/test.sh)
 ---
 
@@ -235,7 +232,6 @@ This test verifies that the system generates correctly formatted human-readable 
   * type: test-verification
 
 #### Relations
-  * verify: [Containment View Report Generation](../Reporting.md#containment-view-report-generation)
   * satisfiedBy: [test.sh](../../../../tests/test-containment-view/test.sh)
 ---
 
@@ -318,7 +314,6 @@ This test verifies that the system correctly tracks and displays custom element 
   * type: test-verification
 
 #### Relations
-  * verify: [Custom Element Type Tracking](../Reporting.md#custom-element-type-tracking)
   * satisfiedBy: [test.sh](../../../../tests/test-search-all-features/test.sh)
 ---
 
@@ -384,7 +379,6 @@ This test verifies that the containment view is correctly integrated into HTML e
   * type: test-verification
 
 #### Relations
-  * verify: [Containment View Report Generation](../Reporting.md#containment-view-report-generation)
   * satisfiedBy: [test.sh](../../../../tests/test-containment-view/test.sh)
 ---
 
@@ -409,7 +403,6 @@ This test verifies that design documents (files in DesignDocuments folders) are 
   * type: test-verification
 
 #### Relations
-  * verify: [Containment View Design Documents](../Reporting.md#containment-view-design-documents)
   * satisfiedBy: [test.sh](../../../../tests/test-containment-view/test.sh)
 ---
 
@@ -548,7 +541,6 @@ This test verifies that the system provides a unified `search` command functiona
 
 #### Relations
   * verify: [CLI Search Command](../../../Interfaces/CLI.md#cli-search-command)
-  * verify: [Search Fine Grained Filtering](../Reporting.md#search-fine-grained-filtering)
   * satisfiedBy: [test.sh](../../../../tests/test-search-all-features/test.sh)
 ---
 
@@ -889,3 +881,4 @@ This test verifies that the TraceFlow view page is correctly generated during HT
   * verify: [TraceFlow View Report Generation](../Reporting.md#traceflow-view-report-generation)
   * satisfiedBy: [test.sh](../../../../tests/test-traceflow-view/test.sh)
 ---
+

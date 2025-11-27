@@ -2,34 +2,15 @@
 
 ### Two-Pass Validation Strategy
 
-The system shall implement a two-pass validation strategy that separates element collection from relation validation, enabling complete error reporting while maintaining existing error behavior.
+The system shall execute model validation in two phases: element collection and graph validation.
 
 #### Details
-The validation process shall be split into two distinct passes:
-
-**Pass 1: Element Collection and Local Validation**
-- Parse all markdown files
-- Extract elements with metadata
-- Apply automatic semantic normalization during parsing:
-  - Convert non-link identifiers to proper markdown links with display text
-  - Normalize absolute paths to relative paths for portable references
-- Perform local validation (element uniqueness, identifier format, metadata syntax)
-- Store elements in ElementRegistry
-- Defer relation validation to Pass 2
-- If errors are found, report them and exit the process
-
-**Pass 2: Graph Construction and Relation Validation**
-- Build GraphRegistry from ElementRegistry
-- Validate all relations (target existence, type compatibility)
-- Generate missing opposite relations
-- Perform cross-component validation
-- If errors are found, report them and exit the process
-
-Both passes maintain the existing behavior where validation errors cause process termination with appropriate error reporting.
+The system shall define two-pass validation behavior.
 
 #### Relations
   * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
   * derivedFrom: [Requirements Processing](Configuration.md#requirements-processing)
+  * satisfiedBy: [Two-Pass Validation Behavior](Refinements.md#two-pass-validation-behavior)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
 ---
 
@@ -46,13 +27,18 @@ The system shall implement a markdown structure validator that enforces Reqvire'
 
 ### Enhanced Validation Error Reporting
 
-The system shall provide comprehensive validation messages that include file paths and line numbers when available, to help users quickly locate and fix model integrity and structure issues in their MBSE specifications.
+The system shall include context for resolution in validation errors.
+
+#### Details
+The system shall define validation error reporting behavior.
 
 #### Metadata
   * type: user-requirement
 
 #### Relations
   * derivedFrom: [Validating Structures](../../UserStories.md#validating-structures)
+  * satisfiedBy: [Validation Error Reporting Behavior](Refinements.md#validation-error-reporting-behavior)
+  * satisfiedBy: [error.rs](../../../core/src/error.rs)
 ---
 
 ### Integrated Validation
@@ -225,7 +211,7 @@ The system shall check the internal consistency of the system model, ensuring th
 
 ### Validate Cross-Component Dependencies
 
-The system shall validate dependencies across different components of the MBSE model to identify mismatches or gaps.
+The system shall validate dependencies across different components of the System model to identify mismatches or gaps.
 
 #### Metadata
   * type: user-requirement

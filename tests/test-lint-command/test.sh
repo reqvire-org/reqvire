@@ -185,24 +185,5 @@ if ! diff -u "${TEST_SCRIPT_DIR}/expected/expected-after-fix.txt" <(echo "$POST_
   exit 1
 fi
 
-# Test 7: Generate diagrams after fix
-set +e
-DIAGRAM_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" generate-diagrams 2>&1)
-DIAGRAM_EXIT=$?
-set -e
-
-if [ $DIAGRAM_EXIT -ne 0 ]; then
-  echo "❌ FAILED: generate-diagrams exit code $DIAGRAM_EXIT"
-  echo "$DIAGRAM_OUTPUT"
-  exit 1
-fi
-
-# Verify Verifications/Tests.md has correct diagrams after fix
-if ! diff -u "${TEST_SCRIPT_DIR}/expected/expected-verifications-after-fix.md" "$TEST_DIR/specifications/Verifications/Tests.md" > /dev/null; then
-  echo "❌ FAILED: Verifications/Tests.md does not match expected state after fix and diagram generation"
-  diff -u "${TEST_SCRIPT_DIR}/expected/expected-verifications-after-fix.md" "$TEST_DIR/specifications/Verifications/Tests.md"
-  exit 1
-fi
-
 echo "✅ PASSED: Lint command verification"
 exit 0

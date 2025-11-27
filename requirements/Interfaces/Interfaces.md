@@ -13,7 +13,7 @@ The system shall provide command line interface (CLI) to faciliate model managem
 
 ### Web Interface
 
-The system SHALL provide a web-based interface to browse the MBSE model documentation, including all generated artifacts such as diagrams, reports, and verification traces.
+The system SHALL provide a web-based interface to browse the System model documentation, including all generated artifacts such as diagrams, reports, and verification traces.
 
 #### Details
 The browse interface allows users to:
@@ -22,7 +22,7 @@ The browse interface allows users to:
 - Access verification traces and coverage reports
 - Explore the complete model structure through an integrated web interface
 
-This capability enables both human users (via browser) and AI agents (via MCP server) to efficiently explore and understand the MBSE model without manually navigating file structures.
+This capability enables both human users (via browser) and AI agents (via MCP server) to efficiently explore and understand the System model without manually navigating file structures.
 
 All generated HTML content shall produce deterministic output with consistent ordering to enable reliable version control and reproducible builds.
 

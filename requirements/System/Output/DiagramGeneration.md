@@ -126,7 +126,7 @@ trace (Neutral):
 
 ### Interactive Mermaid Diagrams
 
-The system shall produce visual representations of relationships within the MBSE model in the form of Mermaid diagrams, enabling users to explore relations and understand dependencies and their impact.
+The system shall produce visual representations of relationships within the System model in the form of Mermaid diagrams, enabling users to explore relations and understand dependencies and their impact.
 
 #### Details
 Diagram generation follows a file-based approach:

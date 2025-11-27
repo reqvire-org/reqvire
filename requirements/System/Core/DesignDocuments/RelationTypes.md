@@ -92,7 +92,7 @@ When an element changes, the impact propagates according to these rules:
 
 ## Element Type Relation Compatibility
 
-This section defines which element types can use which relation types as source or target. These constraints ensure semantic consistency in the MBSE model.
+This section defines which element types can use which relation types as source or target. These constraints ensure semantic consistency in the System model.
 
 ### Relation-Centric View
 

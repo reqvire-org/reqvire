@@ -2,7 +2,7 @@
 
 ### CLI Add Element Test
 
-The test shall verify that the `add` command creates new elements from stdin or inline string input, validates structure, supports index-based insertion, and outputs git-style diffs.
+The test shall verify that the `add` command creates new elements from stdin or inline string input, validates structure, inserts following Element Ordering Behavior, and outputs git-style diffs.
 
 #### Details
 **Test Setup:**
@@ -12,31 +12,31 @@ The test shall verify that the `add` command creates new elements from stdin or 
 - Set up test environment with stdin/tty detection
 
 **Test Steps - Stdin Input:**
-1. Pipe element markdown to `reqvire add <file> <section>`
+1. Pipe element markdown to `reqvire add <file>`
 2. Verify element is read from stdin
 3. Verify element is validated and inserted
 4. Verify git-style diff is output showing changes
 5. Verify file is modified on disk
 
 **Test Steps - Inline String:**
-1. Run `reqvire add <file> <section> "### Element..."`
+1. Run `reqvire add <file> "### Element..."`
 2. Verify element is read from inline argument
 3. Verify element is validated and inserted
 4. Verify git-style diff is output
 
-**Test Steps - Index Insertion:**
-1. Run `reqvire add <file> <section> 0 < element.md`
-2. Verify element is inserted at index 0
-3. Run without index and verify append to end
-4. Run with out-of-bounds index and verify append
+**Test Steps - Element Ordering:**
+1. Add child element to file with existing parent
+2. Verify element is inserted following Element Ordering Behavior (parent before child)
+3. Add parent element to file with existing children
+4. Verify file is reordered with parent before children
 
 **Test Steps - Dry Run:**
-1. Run `reqvire add --dry-run <file> <section> < element.md`
+1. Run `reqvire add --dry-run <file> < element.md`
 2. Verify git-style diff is shown
 3. Verify no changes are applied to files
 
 **Test Steps - JSON Output:**
-1. Run `reqvire add --json <file> <section> < element.md`
+1. Run `reqvire add --json <file> < element.md`
 2. Verify JSON output with element details
 3. Verify changes are applied
 
@@ -50,12 +50,15 @@ The test shall verify that the `add` command creates new elements from stdin or 
 - Reads from stdin when piped
 - Reads from inline argument when provided
 - Validates before insertion
-- Inserts at specified index or appends
+- Inserts following Element Ordering Behavior
 - Shows git-style diff by default
 - Supports --dry-run preview
 - Supports --json output
 - Reports validation errors
 - Returns correct exit codes
+
+#### Attachments
+  * [Element Ordering Behavior](../Refinements.md#element-ordering-behavior)
 
 #### Metadata
   * type: test-verification
@@ -117,13 +120,14 @@ The test shall verify that target file path validation and auto-creation work co
 
 ### File Persistence Test
 
-The test shall verify that element manipulation operations are persisted to source files in storage and that only modified files are flushed.
+The test shall verify that element manipulation operations are persisted to source files in storage, that only modified files are flushed, and that elements are reordered following the Element Ordering Behavior.
 
 #### Details
 **Test Setup:**
 - Create a test model with multiple files and elements
 - Record initial file timestamps and content
 - Prepare element manipulation operations that affect specific files
+- Create files with unordered elements (children before parents)
 
 **Test Steps:**
 1. Perform element manipulation operation (create/delete/move)
@@ -134,6 +138,14 @@ The test shall verify that element manipulation operations are persisted to sour
 6. Read files from disk and parse to confirm changes persisted
 7. Test file I/O error handling (simulate write failures)
 
+**Test Steps - Element Ordering:**
+1. Add element that is a child of an existing element
+2. Verify that after persistence, parent appears before child
+3. Add element that is a parent of existing elements
+4. Verify that after persistence, new parent appears before its children
+5. Move element into a file with existing hierarchy
+6. Verify elements are reordered according to Element Ordering Behavior
+
 **Success Criteria:**
 - All changes are persisted to disk after manipulation completes
 - File content on disk matches in-memory model state exactly
@@ -141,6 +153,12 @@ The test shall verify that element manipulation operations are persisted to sour
 - Unmodified files have unchanged timestamps
 - File format and structure are maintained
 - Errors are handled gracefully with appropriate reporting
+- Elements are ordered with parents before children (file-local derivedFrom)
+- Siblings at same level are sorted alphabetically
+- Hierarchy groups are kept together
+
+#### Attachments
+  * [Element Ordering Behavior](../Refinements.md#element-ordering-behavior)
 
 #### Metadata
   * type: test-verification
@@ -152,7 +170,7 @@ The test shall verify that element manipulation operations are persisted to sour
 
 ### CLI Move Element Test
 
-The test shall verify that the `mv` command relocates elements, updates all relations, supports index-based insertion, and outputs git-style diffs.
+The test shall verify that the `mv` command relocates elements, updates all relations, inserts following Element Ordering Behavior, and outputs git-style diffs.
 
 #### Details
 **Test Setup:**
@@ -162,27 +180,27 @@ The test shall verify that the `mv` command relocates elements, updates all rela
 - Prepare target locations
 
 **Test Steps - Basic Move:**
-1. Run `reqvire mv <element-name> <target-file> <section>`
+1. Run `reqvire mv <element-name> <target-file>`
 2. Verify element is removed from source
-3. Verify element is inserted into target
+3. Verify element is inserted into target following Element Ordering Behavior
 4. Verify all incoming relations are updated
 5. Verify git-style diff shows all affected files
 6. Verify identifier change is reported
 
-**Test Steps - Index Insertion:**
-1. Run `reqvire mv <element-name> <file> <section> 0`
-2. Verify element is inserted at index 0 in target
-3. Run without index and verify append to end
-4. Run with out-of-bounds index and verify append
+**Test Steps - Element Ordering:**
+1. Move child element to file with existing parent
+2. Verify element is inserted after parent (following hierarchy)
+3. Move parent element to file with existing children
+4. Verify file is reordered with parent before children
 
 **Test Steps - Dry Run:**
-1. Run `reqvire mv --dry-run <element-name> <file> <section>`
+1. Run `reqvire mv --dry-run <element-name> <file>`
 2. Verify git-style diff is shown for all affected files
 3. Verify no changes are applied
 4. Verify relation updates are previewed
 
 **Test Steps - JSON Output:**
-1. Run `reqvire mv --json <element-name> <file> <section>`
+1. Run `reqvire mv --json <element-name> <file>`
 2. Verify JSON output with relation updates
 3. Verify old → new identifier mapping
 4. Verify changes are applied
@@ -198,13 +216,16 @@ The test shall verify that the `mv` command relocates elements, updates all rela
 - Moves element to target location
 - Updates all incoming relations
 - Preserves element content and outgoing relations
-- Inserts at specified index or appends
+- Inserts following Element Ordering Behavior
 - Shows git-style diff for all affected files
 - Reports identifier change
 - Supports --dry-run preview
 - Supports --json output with relation mapping
 - Reports validation and location errors
 - Returns correct exit codes
+
+#### Attachments
+  * [Element Ordering Behavior](../Refinements.md#element-ordering-behavior)
 
 #### Metadata
   * type: test-verification
@@ -401,11 +422,7 @@ The test shall verify that existing model elements can be moved to different loc
 - File creation and deletion are reported
 
 **Test Coverage:**
-- Move element within the same file (different position)
 - Move element to a different file
-- Move element to specific index in target file (0, middle, end)
-- Move element without index (defaults to end of target file)
-- Move element with out-of-bounds index (appends to end)
 - Move element with `derivedFrom` relations pointing to it
 - Move element with `verifiedBy` relations pointing to it
 - Move element with `verify` relations pointing to it
@@ -414,6 +431,7 @@ The test shall verify that existing model elements can be moved to different loc
 - Move to non-existent target file (auto-create)
 - Move last element from file (triggers source file deletion)
 - Move element leaving other elements (source file preserved)
+- Verify element ordering after move (parent before children)
 
 #### Metadata
   * type: test-verification
@@ -613,9 +631,6 @@ The test shall verify that new model elements can be created from a full Markdow
 **Test Coverage:**
 - Valid element with all subsections (metadata, relations, details)
 - Valid element with minimal structure (only ### header and content)
-- Valid element inserted at specific index (0, middle, end)
-- Valid element inserted without index (defaults to end)
-- Valid element inserted with out-of-bounds index (appends to end)
 - Invalid element with duplicate name (violates global uniqueness)
 - Invalid element with malformed subsections
 - Invalid element with invalid relations
@@ -626,14 +641,14 @@ The test shall verify that new model elements can be created from a full Markdow
 - **Relations specified as repo-relative paths (specifications/File.md#element)**
 - **Relations specified as same-file references (#element)**
 - **External link relations (http://, https://) are allowed**
+- **Element ordering after creation (parent before children)**
 
 **Success Criteria:**
 - Valid element definitions are accepted and created
 - Element is parsed from the Markdown string correctly
 - Element structure validation runs before insertion
 - Global uniqueness is enforced
-- Element inserted at specified index position within file
-- Element appended to end when index not provided or out of bounds
+- Element inserted following Element Ordering Behavior
 - Invalid element definitions are rejected
 - Validation errors are reported clearly
 - Failed operations do not modify target files

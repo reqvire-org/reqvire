@@ -43,11 +43,11 @@ pub struct Args {
 #[derive(Subcommand, Debug)]
 pub enum Commands {
     /// Export model to browsable HTML documentation with complete traceability
-    
+
     Export {
-        /// Output directory for HTML files
-        #[clap(long, short = 'o', default_value = "html", help_heading = "EXPORT OPTIONS")]
-        output: String,
+        /// Output directory for HTML files (defaults to temporary directory if not specified)
+        #[clap(long, help_heading = "EXPORT OPTIONS")]
+        output: Option<String>,
     },
 
     /// Serve model as browsable HTML documentation via HTTP server
@@ -82,17 +82,6 @@ pub enum Commands {
         json: bool,
     },
     
-
-    /// Generate mermaid diagrams in markdown files showing requirements relationships. Diagrams are placed at the top of each section
-    #[clap(override_help = "Generate mermaid diagrams in markdown files showing requirements relationships. Diagrams are placed at the top of each section\n\nGENERATE-DIAGRAMS OPTIONS:\n      --links-with-blobs     Use GitHub blob URLs in diagram links instead of relative paths")]
-    GenerateDiagrams {
-        /// Use GitHub blob URLs in diagram links instead of relative paths
-        #[clap(long, help_heading = "GENERATE-DIAGRAMS OPTIONS")]
-        links_with_blobs: bool,
-    },
-
-    /// Remove all generated mermaid diagrams from markdown files
-    RemoveDiagrams,
 
     /// Search and filter model elements with comprehensive filtering options
     #[clap(override_help = "Search and filter model elements with comprehensive filtering options\n\nSEARCH OPTIONS:\n      --json                            Output results in JSON format\n      --short                           Output abbreviated format (one-line per element)\n      --filter-file <GLOB>              Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`\n      --filter-name <REGEX>             Only include elements whose name matches this regular expression\n      --filter-type <TYPE>              Only include elements of the given type e.g. `user-requirement`, `system-requirement`, `verification`\n      --filter-content <REGEX>          Only include elements whose content matches this regular expression\n      --filter-page-content <REGEX>     Only include elements whose parent file page content matches this regular expression\n      --have-relations <LIST>           Only include elements that have ALL specified relations (comma-separated)\n      --not-have-relations <LIST>       Only include elements that do NOT have ALL specified relations (comma-separated)")]
@@ -230,13 +219,10 @@ pub enum Commands {
     },
 
     /// Add new element to model from Markdown definition
-    #[clap(override_help = "Add new element to model from Markdown definition\n\nADD OPTIONS:\n       <FILE>                    Target file path (relative to git repository root)\n       [INDEX]                   Index within file (0-based, defaults to end)\n      --dry-run                  Preview changes without applying\n      --json                     Output results in JSON format\n\nUSAGE:\n    reqvire add <file> [<index>]  # reads element from stdin")]
+    #[clap(override_help = "Add new element to model from Markdown definition\n\nADD OPTIONS:\n       <FILE>                    Target file path (relative to git repository root)\n      --dry-run                  Preview changes without applying\n      --json                     Output results in JSON format\n\nUSAGE:\n    reqvire add <file>  # reads element from stdin")]
     Add {
         /// Target file path (relative to git repository root)
         file: String,
-
-        /// Index within file (0-based, defaults to end)
-        index: Option<usize>,
 
         /// Preview changes without applying
         #[clap(long, help_heading = "ADD OPTIONS")]
@@ -263,16 +249,13 @@ pub enum Commands {
     },
 
     /// Move element to different location
-    #[clap(override_help = "Move element to different location\n\nMV OPTIONS:\n       <ELEMENT_NAME>           Element name\n       <FILE>                   Target file path (relative to git repository root)\n       [INDEX]                  Index within file (0-based, defaults to end)\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n\nUSAGE:\n    reqvire mv <element-name> <file> [<index>]")]
+    #[clap(override_help = "Move element to different location\n\nMV OPTIONS:\n       <ELEMENT_NAME>           Element name\n       <FILE>                   Target file path (relative to git repository root)\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n\nUSAGE:\n    reqvire mv <element-name> <file>")]
     Mv {
         /// Element name
         element_name: String,
 
         /// Target file path (relative to git repository root)
         file: String,
-
-        /// Index within file (0-based, defaults to end)
-        index: Option<usize>,
 
         /// Preview changes without applying
         #[clap(long, help_heading = "MV OPTIONS")]
@@ -654,21 +637,6 @@ pub fn handle_command(
             }
             return Ok(0);
         },
-        Some(Commands::GenerateDiagrams { links_with_blobs }) => {
-            info!("Generating mermaid diagrams");
-            // Only collect identifiers and process files to add diagrams
-            // Skip validation checks for diagram generation mode
-            diagrams::process_diagrams(&model_manager.graph_registry, links_with_blobs)?;
-
-            info!("Requirements diagrams updated in source files");
-            return Ok(0);
-        },
-        Some(Commands::RemoveDiagrams) => {
-            info!("Removing generated mermaid diagrams");
-            diagrams::remove_diagrams(&model_manager.graph_registry)?;
-            info!("Generated diagrams removed from source files");
-            return Ok(0);
-        },
         Some(Commands::Search {
             json,
             short,
@@ -837,23 +805,37 @@ pub fn handle_command(
             return Ok(0);
         },
         Some(Commands::Export { output }) => {
-            info!("Exporting model to HTML folder: {}", &output);
-            // Convert to absolute path before export (cwd changes during export)
-            let output_path = if PathBuf::from(&output).is_absolute() {
-                PathBuf::from(&output)
-            } else {
-                current_dir.join(&output)
-            };
             let git_root = git_commands::get_git_root_dir()?;
-            export::export_model_with_artifacts(
-                &model_manager.graph_registry,
-                &output_path,
-                excluded_filename_patterns,
-                false, // always generate links without blobs for Export
-                &current_dir,
-                &git_root
-            )?;
-            info!("✅ Export completed successfully");
+
+            if let Some(output_dir) = output {
+                // Export to specified directory
+                info!("Exporting model to HTML folder: {}", &output_dir);
+                // Convert to absolute path before export (cwd changes during export)
+                let output_path = if PathBuf::from(&output_dir).is_absolute() {
+                    PathBuf::from(&output_dir)
+                } else {
+                    current_dir.join(&output_dir)
+                };
+                export::export_model_with_artifacts(
+                    &model_manager.graph_registry,
+                    &output_path,
+                    excluded_filename_patterns,
+                    false, // always generate links without blobs for Export
+                    &current_dir,
+                    &git_root
+                )?;
+                info!("✅ Export completed successfully to: {}", output_path.display());
+            } else {
+                // Export to temporary directory
+                let temp_dir = export::generate_artifacts_in_temp(
+                    &model_manager.graph_registry,
+                    excluded_filename_patterns,
+                    false, // always generate links without blobs for Export
+                    &current_dir,
+                    &git_root
+                )?;
+                println!("✅ Export completed successfully to: {}", temp_dir.display());
+            }
             return Ok(0);
         },
         Some(Commands::Serve { host, port }) => {
@@ -878,7 +860,7 @@ pub fn handle_command(
 
             return Ok(0);
         },
-        Some(Commands::Add { file, index, dry_run, json }) => {
+        Some(Commands::Add { file, dry_run, json }) => {
             // Read element markdown from stdin
             use std::io::Read;
             let mut element_markdown = String::new();
@@ -896,7 +878,6 @@ pub fn handle_command(
                 &mut model_manager,
                 &element_markdown,
                 &file,
-                index,
                 excluded_filename_patterns,
                 &current_dir,
                 &git_root,
@@ -934,7 +915,7 @@ pub fn handle_command(
 
             return Ok(0);
         },
-        Some(Commands::Mv { element_name, file, index, dry_run, json }) => {
+        Some(Commands::Mv { element_name, file, dry_run, json }) => {
             // Resolve element name to identifier
             let element_id = model_manager.graph_registry.find_element_by_name(&element_name)?;
 
@@ -944,7 +925,6 @@ pub fn handle_command(
                 &mut model_manager,
                 &element_id,
                 &file,
-                index,
                 excluded_filename_patterns,
                 &current_dir,
                 &git_root,

@@ -60,7 +60,7 @@ This test verifies that the CLI help output displays all commands and their opti
    - output contains "Options:" section with `-h, --help`, `-V, --version`
 
 2. **Command listing completeness**
-   - All CLI commands are listed: html, format, validate, generate-diagrams, remove-diagrams, summary, section-summary, change-impact, verifications
+   - All CLI commands are listed: html, format, validate, summary, section-summary, change-impact, verifications
    - Nested commands are expanded: "traces", "coverage"
 
 3. **Options flattening - all command-specific option sections present**
@@ -82,8 +82,6 @@ This test verifies that the CLI help output displays all commands and their opti
   * verify: [Format Command](../CLI.md#format-command)
   * verify: [Validate Command](../CLI.md#validate-command)
   * verify: [HTML Export](../WebInterface.md#html-export)
-  * verify: [CLI Generate Diagrams Flag](../CLI.md#cli-generate-diagrams-flag)
-  * verify: [CLI Remove Diagrams Flag](../CLI.md#cli-remove-diagrams-flag)
   * verify: [CLI Search Command](../CLI.md#cli-search-command)
   * verify: [CLI Change Impact Report Command](../CLI.md#cli-change-impact-report-command)
   * verify: [CLI Traces Command](../CLI.md#cli-traces-command)

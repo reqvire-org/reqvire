@@ -2,7 +2,7 @@
 
 ### Format Command Requirements Verification
 
-This test verifies the format command requirements from SystemRequirements and UserRequirements, focusing on normalizing and standardizing MBSE models for consistency and readability.
+This test verifies the format command requirements from SystemRequirements and UserRequirements, focusing on normalizing and standardizing System models for consistency and readability.
 
 #### Details
 
@@ -120,4 +120,72 @@ This test verifies the format command requirements from SystemRequirements and U
   * verify: [Document Structure Normalization](../Formatting.md#document-structure-normalization)
   * verify: [Structure and Addressing in Markdown Documents](../../Core/StructureAndParsing.md#structure-and-addressing-in-markdown-documents)
   * satisfiedBy: [test.sh](../../../../tests/test-advanced-format/test.sh)
+---
+
+### Element Ordering Verification
+
+This test verifies that the format command reorders elements following the Element Ordering Behavior, ensuring parent elements appear before their children based on file-local derivedFrom hierarchy.
+
+#### Details
+
+##### Acceptance Criteria
+
+**Parent-Child Ordering:**
+- Elements with file-local derivedFrom relations shall be ordered with parents before children
+- Grandchildren shall appear after their parent elements
+- The ordering shall be applied recursively through the entire hierarchy
+
+**Sibling Alphabetical Ordering:**
+- Elements at the same hierarchy level (siblings) shall be sorted alphabetically
+- Root elements (no file-local parent) shall be sorted alphabetically among themselves
+- Children of the same parent shall be sorted alphabetically
+
+**Hierarchy Grouping:**
+- Elements shall be grouped by their file-local parent chains
+- Each parent's subtree shall be kept together (parent, then all descendants)
+- Cross-file derivedFrom relations shall not affect ordering
+
+##### Test Criteria
+
+1. **Basic parent-child ordering**
+   - Create file with child element before parent element
+   - Run format command
+   - Verify parent appears before child in output
+
+2. **Multi-level hierarchy**
+   - Create file with grandchild, child, parent in wrong order
+   - Run format command
+   - Verify order: parent → child → grandchild
+
+3. **Sibling alphabetical sorting**
+   - Create file with siblings "Child Z" and "Child A" under same parent
+   - Run format command
+   - Verify order: parent → Child A → Child Z
+
+4. **Multiple root elements**
+   - Create file with multiple root elements (no file-local parents) in wrong alphabetical order
+   - Run format command
+   - Verify roots are sorted alphabetically
+
+5. **Mixed hierarchy and standalone**
+   - Create file with hierarchy group and standalone elements
+   - Run format command
+   - Verify hierarchy groups are kept together and all roots sorted alphabetically
+
+6. **Cross-file relations ignored**
+   - Create file where element derives from element in different file
+   - Run format command
+   - Verify cross-file derivedFrom does not affect local ordering
+
+#### Attachments
+  * [Element Ordering Behavior](../Refinements.md#element-ordering-behavior)
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [Element Ordering Normalization](../Formatting.md#element-ordering-normalization)
+  * verify: [Element Manipulation File Persistence](../ElementManipulation.md#element-manipulation-file-persistence)
+  * verify: [Format Command](../../../Interfaces/CLI.md#format-command)
+  * satisfiedBy: [test.sh](../../../../tests/test-element-ordering/test.sh)
 ---

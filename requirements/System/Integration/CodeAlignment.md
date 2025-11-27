@@ -125,8 +125,12 @@ Where:
 
 The system shall use different comment style based of file extension of the code source file.
 
+#### Details
+The system shall define comment style specification for each file extension.
+
 #### Relations
   * derivedFrom: [Traceability Format](#traceability-format)
+  * satisfiedBy: [Comment Style Specification](Refinements.md#comment-style-specification)
 ---
 
 ### Validating Traceability Format
@@ -139,7 +143,7 @@ While processing traceability in code, the system shall ensure that each `[reqvi
 
 ### Code Traceability
 
-The system shall support code traceability by using structured comments to link code implementations to corresponding requirements in the MBSE model.
+The system shall support code traceability by using structured comments to link code implementations to corresponding requirements in the System model.
 
 #### Metadata
   * type: user-requirement
@@ -150,7 +154,7 @@ The system shall support code traceability by using structured comments to link 
 
 ### Suggest Code Refactoring
 
-The system shall suggest code refactoring opportunities to better align with the structure and relationships in the MBSE model.
+The system shall suggest code refactoring opportunities to better align with the structure and relationships in the System model.
 
 #### Metadata
   * type: user-requirement

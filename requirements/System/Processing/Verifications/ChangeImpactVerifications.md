@@ -76,12 +76,12 @@ This test verifies that the system correctly implements change impact detection,
 
 ### Structural Change Reports Verification
 
-This test verifies that the system analyzes and reports on structural changes in the MBSE model.
+This test verifies that the system analyzes and reports on structural changes in the System model.
 
 #### Details
 
 ##### Acceptance Criteria
-- System should analyze structural changes in the MBSE model
+- System should analyze structural changes in the System model
 - System should identify affected components through relationship traversal
 - System should generate reports of impacted elements and structures
 

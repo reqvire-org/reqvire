@@ -2,21 +2,13 @@
 
 ### Model Formatting
 
-The system shall provide formatting capabilities to normalize and standardize MBSE models for consistency and readability.
+The system shall provide formatting capabilities to normalize and standardize System models for consistency and readability.
 
 #### Metadata
   * type: user-requirement
 
 #### Relations
   * derivedFrom: [Validating Structures](../../UserStories.md#validating-structures)
----
-
-### Formatting Output
-
-The system shall display formatting changes suggestion in similar manner as git diffs.
-
-#### Relations
-  * derivedFrom: [Model Formatting](#model-formatting)
 ---
 
 ### Format Consistency Enforcement
@@ -58,38 +50,6 @@ The system shall implement the following formatting fixes:
   * verifiedBy: [Format Command Requirements Verification](Verifications/FormattingVerifications.md#format-command-requirements-verification)
 ---
 
-### Replace Absolute Links with Relative Links
-
-The system shall replace absolute links with relative links, where applicable and contextually appropriate, to conform to repository standards and enhance portability.
-
-#### Relations
-  * derivedFrom: [Model Formatting](#model-formatting)
-  * verifiedBy: [Format Command Requirements Verification](Verifications/FormattingVerifications.md#format-command-requirements-verification)
----
-
-### Git-Style Diff Output for Format
-
-The system shall display formatting change suggestions in a git-style diff format, color-coded when possible, to clearly show what modifications will be or have been made to the documents.
-
-#### Metadata
-  * type: user-requirement
-
-#### Relations
-  * derivedFrom: [Formatting Output](#formatting-output)
-  * satisfiedBy: [format.rs](../../../core/src/format.rs)
-  * satisfiedBy: [diff.rs](../../../core/src/diff.rs)
-  * verifiedBy: [Format Command Requirements Verification](Verifications/FormattingVerifications.md#format-command-requirements-verification)
----
-
-### File Pattern Exclusion for Format
-
-The system shall respect configured excluded filename patterns when performing formatting operations, ensuring that files intentionally excluded from processing do not receive inappropriate formatting suggestions.
-
-#### Relations
-  * derivedFrom: [Ignoring Unstructured Documents](../Core/Configuration.md#ignoring-unstructured-documents)
-  * satisfiedBy: [utils.rs](../../../core/src/utils.rs)
----
-
 ### Document Structure Normalization
 
 When generating formatted output, the system shall ensure all documents follow a consistent hierarchical structure.
@@ -113,4 +73,55 @@ When generating formatted output, the system shall:
   * derivedFrom: [Format Consistency Enforcement](#format-consistency-enforcement)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
+---
+
+### Element Ordering Normalization
+
+When formatting or persisting specification files, the system shall reorder elements following the Element Ordering Behavior.
+
+#### Attachments
+  * [Element Ordering Behavior](Refinements.md#element-ordering-behavior)
+
+#### Relations
+  * derivedFrom: [Format Consistency Enforcement](#format-consistency-enforcement)
+---
+
+### Formatting Output
+
+The system shall display formatting changes suggestion in similar manner as git diffs.
+
+#### Relations
+  * derivedFrom: [Model Formatting](#model-formatting)
+---
+
+### Git-Style Diff Output for Format
+
+The system shall display formatting change suggestions in a git-style diff format, color-coded when possible, to clearly show what modifications will be or have been made to the documents.
+
+#### Metadata
+  * type: user-requirement
+
+#### Relations
+  * derivedFrom: [Formatting Output](#formatting-output)
+  * satisfiedBy: [format.rs](../../../core/src/format.rs)
+  * satisfiedBy: [diff.rs](../../../core/src/diff.rs)
+  * verifiedBy: [Format Command Requirements Verification](Verifications/FormattingVerifications.md#format-command-requirements-verification)
+---
+
+### Replace Absolute Links with Relative Links
+
+The system shall replace absolute links with relative links, where applicable and contextually appropriate, to conform to repository standards and enhance portability.
+
+#### Relations
+  * derivedFrom: [Model Formatting](#model-formatting)
+  * verifiedBy: [Format Command Requirements Verification](Verifications/FormattingVerifications.md#format-command-requirements-verification)
+---
+
+### File Pattern Exclusion for Format
+
+The system shall respect configured excluded filename patterns when performing formatting operations, ensuring that files intentionally excluded from processing do not receive inappropriate formatting suggestions.
+
+#### Relations
+  * derivedFrom: [Ignoring Unstructured Documents](../Core/Configuration.md#ignoring-unstructured-documents)
+  * satisfiedBy: [utils.rs](../../../core/src/utils.rs)
 ---

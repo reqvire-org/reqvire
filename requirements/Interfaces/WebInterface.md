@@ -26,10 +26,11 @@ Execute all generation commands treating temporary directory as repository root:
 - Preserve directory structure
 
 **Output:**
-- Accept `--output` option (default: 'html')
-- Create output folder if not existing
+- Accept optional `--output` option to specify output directory
+- When `--output` is not specified, export to a temporary directory and print the path
+- When `--output` is specified, create output folder if not existing
 - Copy generated HTML and all artifacts from temp directory to output directory
-- Clean up temporary working directory
+- Clean up temporary working directory (except when output is temp directory)
 
 **Source Protection:**
 - Never modify original repository files
@@ -69,7 +70,7 @@ The navigation bar must be:
 - Clearly visible and accessible
 
 **HTML Design:**
-The system shall design and implement HTML pages with consistent layout, styling, and navigation for browsing the MBSE model.
+The system shall design and implement HTML pages with consistent layout, styling, and navigation for browsing the System model.
 
 **Logo and Branding:**
 - The navigation bar shall display the Reqvire logo on the left side before the navigation links
@@ -77,11 +78,12 @@ The system shall design and implement HTML pages with consistent layout, styling
 - Apple touch icons shall be included for mobile device support
 - All brand assets shall be exported to an assets folder during HTML export
 
+#### Attachments
+  * [Web Interface Style Specification](DesignDocuments/WebInterfaceStyles.md#web-interface-style-specification)
+  * [Web Interface Navigation Behavior](DesignDocuments/WebInterfaceStyles.md#web-interface-navigation-behavior)
+
 #### Relations
-  * derivedFrom: [Model Export](../UserStories.md#model-export)
   * derivedFrom: [Web Interface](Interfaces.md#web-interface)
-  * derivedFrom: [CLI Interface Structure](CLI.md#cli-interface-structure)
-  * derivedFrom: [Model Reports](../System/Output/Reporting.md#model-reports)
   * satisfiedBy: [html_export.rs](../../core/src/html_export.rs)
   * satisfiedBy: [html.rs](../../core/src/html.rs)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
@@ -175,9 +177,12 @@ The containment tree shall use consistent colors for node types:
 - Tree animations: Smooth transitions for expand/collapse
 - Node hover: Cursor pointer for interactive nodes
 
+#### Attachments
+  * [Color Scheme Specification](../System/Output/DesignDocuments/OutputFormats.md#color-scheme-specification)
+  * [Web Interface Style Specification](DesignDocuments/WebInterfaceStyles.md#web-interface-style-specification)
+
 #### Relations
   * derivedFrom: [HTML Export](#html-export)
-  * derivedFrom: [Interactive Mermaid Diagrams](../System/Output/DiagramGeneration.md#interactive-mermaid-diagrams)
   * satisfiedBy: [html.rs](../../core/src/html.rs)
   * satisfiedBy: [base.html](../../core/templates/base.html)
   * satisfiedBy: [containment.rs](../../core/src/containment.rs)
@@ -194,9 +199,10 @@ The system shall generate a model-centric visualization during HTML export showi
 - Generate mermaid diagrams showing all nested relations
 - Output as markdown with embedded visualizations (model.html)
 
+#### Attachments
+  * [Mermaid Diagram Style Specification](../System/Output/DesignDocuments/DiagramStyles.md#mermaid-diagram-style-specification)
+
 #### Relations
-  * derivedFrom: [Complete Model Structure Visualization](../System/Output/DiagramGeneration.md#complete-model-structure-visualization)
-  * derivedFrom: [Model Visualization and Exploration](../System/Output/DiagramGeneration.md#model-visualization-and-exploration)
   * derivedFrom: [HTML Export](#html-export)
   * satisfiedBy: [export.rs](../../core/src/export.rs)
   * satisfiedBy: [report_model.rs](../../core/src/report_model.rs)
@@ -272,9 +278,11 @@ Example Mermaid node:
 elementId["Element Name<br/>📎 DesignDoc.md"]
 ```
 
+#### Attachments
+  * [Mermaid Diagram Style Specification](../System/Output/DesignDocuments/DiagramStyles.md#mermaid-diagram-style-specification)
+
 #### Relations
   * derivedFrom: [HTML Export](#html-export)
-  * derivedFrom: [Complete Model Structure Visualization](../System/Output/DiagramGeneration.md#complete-model-structure-visualization)
   * satisfiedBy: [diagrams.rs](../../core/src/diagrams.rs)
   * verifiedBy: [Diagram Attachment Display Verification](Verifications/WebInterfaceVerifications.md#diagram-attachment-display-verification)
 ---

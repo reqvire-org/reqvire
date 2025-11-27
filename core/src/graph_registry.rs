@@ -2002,7 +2002,6 @@ impl GraphRegistry {
         &mut self,
         markdown: &str,
         target_file: &str,
-        index: Option<usize>,
         excluded_patterns: &GlobSet,
     ) -> Result<Element, ReqvireError> {
         // Validate target path
@@ -2058,19 +2057,14 @@ impl GraphRegistry {
             self.register_page(target_file.to_string(), format!("# {}\n", file_stem));
         }
 
-        // Set file_order_index if index provided
+        // Set file_order_index: append to end of file
         let mut new_element = element.clone();
-        if let Some(idx) = index {
-            new_element.file_order_index = idx;
-        } else {
-            // Default: append to end of file
-            let max_index = self.nodes.values()
-                .filter(|node| node.element.file_path == target_file)
-                .map(|node| node.element.file_order_index)
-                .max()
-                .unwrap_or(0);
-            new_element.file_order_index = max_index + 1;
-        }
+        let max_index = self.nodes.values()
+            .filter(|node| node.element.file_path == target_file)
+            .map(|node| node.element.file_order_index)
+            .max()
+            .unwrap_or(0);
+        new_element.file_order_index = max_index + 1;
 
         // Add to graph
         self.add_element(new_element.clone())?;
@@ -2133,7 +2127,6 @@ impl GraphRegistry {
         &mut self,
         element_id: &str,
         target_file: &str,
-        index: Option<usize>,
         excluded_patterns: &GlobSet,
     ) -> Result<(String, Vec<String>), ReqvireError> {
         // Validate element exists
@@ -2213,13 +2206,6 @@ impl GraphRegistry {
 
         // Update all attachment identifiers pointing to this element
         self.update_attachment_identifiers(&old_identifier, &new_identifier);
-
-        // Update file order index if provided
-        if let Some(idx) = index {
-            if let Some(node) = self.nodes.get_mut(&new_identifier) {
-                node.element.file_order_index = idx;
-            }
-        }
 
         // Track all modified files
         for file in &modified_files {

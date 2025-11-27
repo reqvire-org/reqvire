@@ -4,8 +4,14 @@
 
 As as **System Engineer**, I want to work with the system that adheres to widely recognized industry standards, such as ISO/IEC/IEEE 15288, to ensure compatibility and relevance in systems engineering practices.
 
+#### Details
+The system shall define industry standards and methodologies to follow.
+
 #### Metadata
   * type: user-requirement
+
+#### Relations
+  * satisfiedBy: [Industry Standards Specification](Refinements.md#industry-standards-specification)
 ---
 
 ### Promote Automation and Efficiency

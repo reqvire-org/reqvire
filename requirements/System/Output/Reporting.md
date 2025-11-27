@@ -1,33 +1,5 @@
 # Elements
 
-### Containment View Report Generation
-
-The system shall generate containment view reports showing the physical hierarchical structure of the model (folders → files → elements) in multiple output formats including Mermaid diagrams, JSON, and HTML export integration.
-
-#### Attachments
-  * [ContainmentView.md](DesignDocuments/ContainmentView.md)
-
-#### Relations
-  * derivedFrom: [Containment View Report](#containment-view-report)
----
-
-### Containment View Design Documents
-
-The system shall include design documents (files in DesignDocuments folders) in the containment view, grouped by their containing folder and displayed alongside specification elements.
-
-#### Details
-- Design documents are non-specification markdown files in DesignDocuments folders
-- They shall be shown in the containment hierarchy under their parent folder
-- Each design document shall display its filename
-- Design documents shall be visually distinguished from specification elements
-- Clicking a design document in diagrams shall navigate to the file
-
-#### Relations
-  * derivedFrom: [Containment View Report Generation](#containment-view-report-generation)
-  * satisfiedBy: [containment.rs](../../../core/src/containment.rs)
-  * verifiedBy: [Containment View Design Documents Test](Verifications/ReportingVerifications.md#containment-view-design-documents-test)
----
-
 ### Forward-Only Relation Traversal
 
 When filtering by root element, system shall traverse only forward relations down to leaf elements.
@@ -40,119 +12,40 @@ When filtering by root element, system shall traverse only forward relations dow
 - Unfiltered diagrams (no --from) shall show complete model with all elements
 
 #### Relations
-  * derivedFrom: [CLI Model Diagram Command](../../Interfaces/CLI.md#cli-model-diagram-command)
+  * derivedFrom: [Model Diagram Output Formats](#model-diagram-output-formats)
   * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
   * verifiedBy: [Model Command Verification](Verifications/ReportingVerifications.md#model-command-verification)
 ---
 
 ### Search Report Generator
 
-The system shall implement a search report generator that produces comprehensive element searches with filtering, supporting both full and abbreviated output modes.
+The system shall implement a search report generator with comprehensive filtering and element type tracking.
 
 #### Details
-The search report must include:
+The search report must include file-level, section-level, and element-level information.
 
-**File-level Information:**
-- File path and name
-- Number of sections per file
-- Number of elements per file
-- Page content (frontmatter content before first section header) - omitted in short mode
+The system shall define comprehensive search filtering capabilities:
+- By file path patterns
+- By element name patterns
+- By element type
+- By element content patterns
+- By presence/absence of relations
+- By presence/absence of attachments
 
-**Section-level Information:**
-- Section name and hierarchy
-- Number of elements per section - omitted in short mode
-- Section content (content between section header and first element, excluding generated diagrams) - omitted in short mode
+The system shall define custom element type tracking:
+- Identify types not in standard categories
+- Report custom types with counts
 
-**Element Information:**
-- Element identifier, name, type, and section
-- Element content - omitted in short mode
-- Complete list of relations with targets and types
-- Complete list of attachments as strings (file paths and element identifiers) - omitted in short mode
-  - File path attachments displayed as relative paths (e.g., `"path/to/file.pdf"`)
-  - Element identifier attachments displayed as full identifiers (e.g., `"specifications/File.md#refinement-element"`)
-
-**Global Counts** (omitted in short mode):
-- Total files and elements counts
-- Requirements by type: map of requirement types to counts (e.g., `{"user-requirement": 5, "system-requirement": 10}`)
-- Verifications by type: map of verification types to counts (e.g., `{"test-verification": 8, "analysis-verification": 2}`)
-- Refinements by type: map of refinement types to counts (e.g., `{"behavior": 3, "constraint": 1}`)
-- Other types: map of any custom element types not in standard categories
-
-**Output Formats:**
-- Human-readable text format with hierarchical display
-- Human-readable abbreviated text format (with --short flag): one-line per element showing `[type] identifier - name`
-- JSON format for programmatic processing
-- JSON abbreviated format (with --short flag): omits content, page_content, attachments, element_count, total_elements, global_counters
-
-The system must support comprehensive filtering by file path, element name, type, element content, page content, and relation presence. All filters are applied conjunctively.
+#### Attachments
+  * [SearchFiltering.md](DesignDocuments/SearchFiltering.md)
+  * [JSON Output Structure](DesignDocuments/OutputFormats.md#json-output-structure)
+  * [Text Output Formatting](DesignDocuments/OutputFormats.md#text-output-formatting)
 
 #### Relations
   * derivedFrom: [Model Structure and Summaries](#model-structure-and-summaries)
   * satisfiedBy: [search.rs](../../../core/src/search.rs)
----
-
-### Verification Coverage Report Generator
-
-The system shall provide a verification coverage report generator that analyzes leaf requirements verification status, test-verification satisfaction status, and orphaned verifications to produce coverage metrics and detailed reports.
-
-#### Details
-The coverage report generator must:
-- Identify all leaf requirements (requirements without forward relations to other requirements) in the model
-- Determine leaf requirement verification status based on presence of verifiedBy relations
-- Identify all verification elements in the model with breakdown by verification type
-- Determine test-verification satisfaction status based on presence of satisfiedBy relations
-- Identify orphaned verifications (verification elements without any verify relations to requirements)
-- Calculate coverage percentages: (verified_leaf_requirements/total_leaf_requirements * 100), (satisfied_test_verifications/total_test_verifications * 100), and (orphaned_verifications/total_verifications * 100)
-- Group results by file and section for organization
-- Support both human-readable text and machine-readable JSON output formats
-
-The report structure shall include:
-- Summary section with leaf requirements, test-verification, and orphaned verification counts and percentages
-- Verified leaf requirements section grouped by file and section
-- Unverified leaf requirements section with details (flagged for attention)
-- Satisfied test-verification elements section grouped by file and section
-- Unsatisfied test-verification elements section with details (flagged for attention)
-- Orphaned verifications section with details (flagged for attention as they may be redundant or incorrectly configured)
-- Analysis, inspection, and demonstration verification elements are considered satisfied by default
-
-#### Relations
-  * satisfiedBy: [report_coverage.rs](../../../core/src/report_coverage.rs)
-  * derivedFrom: [Verification Coverage Report](#verification-coverage-report)
-  * derivedFrom: [Search Report Generator](#search-report-generator)
----
-
-### Custom Element Type Tracking
-
-The system SHALL track and display custom element types (any type not in the standard categories) in model summary reports, providing counts for each custom type in both text and JSON output formats.
-
-#### Details
-The custom element type tracking feature must:
-
-**Custom Type Definition:**
-- Identify any element type that is not one of the standard types: requirement, user-requirement, verification, test-verification, analysis-verification, inspection-verification, or demonstration-verification
-- Track custom types separately from standard element type counters
-- Store custom types in a HashMap with type name as key and count as value
-
-**Text Output:**
-- Display custom element types in the "Element Types" section of the summary
-- Format: `Custom (type-name): count`
-- Sort custom types alphabetically by type name
-- Only display custom types section when at least one custom type exists
-
-**JSON Output:**
-- Include custom element types in global_counters as `custom_element_types` field
-- Structure: `{"custom_element_types": {"type-name": count, ...}}`
-- Skip serialization of the field when no custom types exist (using `skip_serializing_if`)
-- Maintain alphabetical sorting of type names in JSON output
-
-**Exclusions:**
-- Standard requirement types (requirement, user-requirement) SHALL NOT be counted as custom
-- Standard verification types (verification, test-verification, analysis-verification, inspection-verification, demonstration-verification) SHALL NOT be counted as custom
-- File-type elements SHALL NOT be counted as custom types
-
-#### Relations
-  * derivedFrom: [Search Report Generator](#search-report-generator)
-  * satisfiedBy: [search.rs](../../../core/src/search.rs)
+  * satisfiedBy: [filters.rs](../../../core/src/filters.rs)
+  * verifiedBy: [Search Command Tests](Verifications/ReportingVerifications.md#search-command-tests)
 ---
 
 ### Model Diagram Output Formats
@@ -168,24 +61,9 @@ System shall support markdown and JSON output formats.
 - Element attachments shall be included as an array of strings in both formats (file paths and element identifiers)
 
 #### Relations
-  * derivedFrom: [CLI Model Diagram Command](../../Interfaces/CLI.md#cli-model-diagram-command)
+  * derivedFrom: [Model Structure and Summaries](#model-structure-and-summaries)
   * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
   * verifiedBy: [Model Command Verification](Verifications/ReportingVerifications.md#model-command-verification)
----
-
-### Search Fine Grained Filtering
-
-The system shall implement comprehensive fine-grained filtering for the search report generator following the specifications below.
-
-#### Attachments
-  * [SearchFiltering.md](DesignDocuments/SearchFiltering.md)
-
-#### Relations
-  * satisfiedBy: [filters.rs](../../../core/src/filters.rs)
-  * satisfiedBy: [search.rs](../../../core/src/search.rs)
-  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
-  * derivedFrom: [Search Report Generator](#search-report-generator)
-  * verifiedBy: [Search Command Tests](Verifications/ReportingVerifications.md#search-command-tests)
 ---
 
 ### Tracing Structural Changes
@@ -256,28 +134,33 @@ When requested the system shall generate reports summarizing the structure and r
 
 ### Containment View Report
 
-The system shall provide a containment view report that displays the physical hierarchical structure of the model showing the containment relationships between folders, files, and elements.
+The system shall generate containment view reports showing the physical hierarchical structure of the model.
 
 #### Details
-The containment view shows the **physical organization** of the model, complementing the existing relation-centric model view that shows derivedFrom/verifiedBy relationships.
+The containment view shows the physical organization of the model:
+- Root folder → Subfolders → Files → Elements
+- Sections skipped (elements shown directly under files)
 
-The containment hierarchy represents:
-- **Root folder** → **Subfolders** → **Files** → **Elements**
-- Sections are skipped in this view (elements are shown directly under files)
+The system shall generate reports in multiple formats:
+- Mermaid diagrams for visualization
+- JSON for programmatic access
+- HTML export integration
 
-This view helps users:
-- Understand model organization and file structure
-- Navigate the physical layout of specifications
-- Identify where elements are located
-- Visualize the containment structure in diagrams
-
-The containment view must support multiple output formats (text, JSON, Mermaid diagram) and be included in HTML export.
+The system shall include design documents:
+- Files in DesignDocuments folders displayed alongside specifications
+- Design documents visually distinguished from specification elements
+- Clickable navigation to document files
 
 #### Metadata
   * type: user-requirement
 
+#### Attachments
+  * [ContainmentView.md](DesignDocuments/ContainmentView.md)
+
 #### Relations
   * derivedFrom: [Model Structure and Summaries](#model-structure-and-summaries)
+  * satisfiedBy: [containment.rs](../../../core/src/containment.rs)
+  * verifiedBy: [Containment View Design Documents Test](Verifications/ReportingVerifications.md#containment-view-design-documents-test)
 ---
 
 ### Provide Validation Reports
@@ -322,11 +205,16 @@ The report helps track verification completeness and identify gaps in requiremen
 - System engineers/architects are responsible for ensuring verification scopes are broad enough to cover parent requirements when there's no dedicated parent verification
 - AI systems can help create comprehensive verification scopes and prevent verification overlap
 
+#### Attachments
+  * [JSON Output Structure](DesignDocuments/OutputFormats.md#json-output-structure)
+  * [Text Output Formatting](DesignDocuments/OutputFormats.md#text-output-formatting)
+
 #### Metadata
   * type: user-requirement
 
 #### Relations
   * derivedFrom: [Model Reports](#model-reports)
+  * satisfiedBy: [report_coverage.rs](../../../core/src/report_coverage.rs)
 ---
 
 ### Verification Upward Traceability
@@ -355,3 +243,4 @@ The system shall generate a TraceFlow view page showing the verification traceab
   * satisfiedBy: [export.rs](../../../core/src/export.rs)
   * verifiedBy: [TraceFlow View Test](Verifications/ReportingVerifications.md#traceflow-view-test)
 ---
+

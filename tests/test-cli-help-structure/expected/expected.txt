@@ -7,8 +7,6 @@ Commands:
   serve             Serve model as browsable HTML documentation via HTTP server
   format            Format and normalize requirements files. By default, shows preview without applying changes
   validate          Validate model
-  generate-diagrams Generate mermaid diagrams in markdown files showing requirements relationships. Diagrams are placed at the top of each section
-  remove-diagrams   Remove all generated mermaid diagrams from markdown files
   search            Search and filter model elements with comprehensive filtering options
   change-impact     Analise change impact and provides report
   traces            Generate verification traces showing upward paths from verifications to root requirements
@@ -32,7 +30,7 @@ Options:
   -V, --version            Print version
 
 EXPORT OPTIONS:
-      --output <OUTPUT>         Output directory for HTML files
+      --output <OUTPUT>         Output directory for HTML files (defaults to temporary directory if not specified)
 
 SERVE OPTIONS:
       --host <HOST>             Bind address
@@ -44,9 +42,6 @@ FORMAT OPTIONS:
 
 VALIDATE OPTIONS:
       --json                    Output results in JSON format
-
-GENERATE DIAGRAMS OPTIONS:
-      --links-with-blobs        Use GitHub blob URLs in diagram links instead of relative paths
 
 SEARCH OPTIONS:
       --json                    Output results in JSON format
@@ -88,7 +83,6 @@ LINT OPTIONS:
 
 ADD OPTIONS:
        <FILE>                   Target file path (relative to git repository root)
-       <INDEX>                  Index within file (0-based, defaults to end)
       --dry-run                 Preview changes without applying
       --json                    Output results in JSON format
 
@@ -100,7 +94,6 @@ RM OPTIONS:
 MV OPTIONS:
        <ELEMENT_NAME>           Element name
        <FILE>                   Target file path (relative to git repository root)
-       <INDEX>                  Index within file (0-based, defaults to end)
       --dry-run                 Preview changes without applying
       --json                    Output results in JSON format
 

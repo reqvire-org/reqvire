@@ -13,7 +13,7 @@ The system shall automate validations of pull requests in the GitHub workflow to
 
 ### Generate Change Logs for Pull Requests
 
-The system shall generate detailed change logs for pull requests, summarizing modifications to the MBSE model and related components.
+The system shall generate detailed change logs for pull requests, summarizing modifications to the System model and related components.
 
 #### Metadata
   * type: user-requirement

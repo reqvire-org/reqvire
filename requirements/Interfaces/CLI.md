@@ -48,8 +48,12 @@ Additional behavior:
   - --json flag outputs formatting results in JSON format including file changes and diff information
   - When formatting is applied, show a summary of changed files with diff details
 
+#### Attachments
+  * [Dry-Run Mode Behavior](../System/Operations/Refinements.md#dry-run-mode-behavior)
+  * [Diff Output Format Specification](../System/Output/DesignDocuments/OutputFormats.md#diff-output-format-specification)
+  * [JSON Output Structure](../System/Output/DesignDocuments/OutputFormats.md#json-output-structure)
+
 #### Relations
-  * derivedFrom: [Model Formatting](../System/Operations/Formatting.md#model-formatting)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
 ---
@@ -75,10 +79,13 @@ The system shall provide a validation command that executes model validation and
   - Output a success message "No validation issues found" when the model is valid
   - Support --json flag to output validation results in JSON format
 
+#### Attachments
+  * [Two-Pass Validation Behavior](../System/Core/Refinements.md#two-pass-validation-behavior)
+  * [Validation Error Reporting Behavior](../System/Core/Refinements.md#validation-error-reporting-behavior)
+  * [JSON Output Structure](../System/Output/DesignDocuments/OutputFormats.md#json-output-structure)
+  * [Error Message Format Specification](../System/Output/DesignDocuments/OutputFormats.md#error-message-format-specification)
+
 #### Relations
-  * derivedFrom: [Provide Validation Reports](../System/Output/Reporting.md#provide-validation-reports)
-  * derivedFrom: [Enhanced Validation Error Reporting](../System/Core/Validation.md#enhanced-validation-error-reporting)
-  * derivedFrom: [Two-Pass Validation Strategy](../System/Core/Validation.md#two-pass-validation-strategy)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
 ---
@@ -221,8 +228,6 @@ Default output:
   * [Text Output Formatting](../System/Output/DesignDocuments/OutputFormats.md#text-output-formatting)
 
 #### Relations
-  * derivedFrom: [Search Fine Grained Filtering](../System/Output/Reporting.md#search-fine-grained-filtering)
-  * derivedFrom: [Reserved Subsections Support](../System/Core/StructureAndParsing.md#reserved-subsections-support)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
   * verifiedBy: [Search Command Tests](../System/Output/Verifications/ReportingVerifications.md#search-command-tests)
@@ -242,9 +247,10 @@ System shall provide CLI command to generate model diagrams with optional filter
 
 #### Attachments
   * [JSON Output Structure](../System/Output/DesignDocuments/OutputFormats.md#json-output-structure)
+  * [Mermaid Diagram Style Specification](../System/Output/DesignDocuments/DiagramStyles.md#mermaid-diagram-style-specification)
 
 #### Relations
-  * derivedFrom: [Model Visualization and Exploration](../System/Output/DiagramGeneration.md#model-visualization-and-exploration)
+  * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [diagrams.rs](../../core/src/diagrams.rs)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
 ---
@@ -304,9 +310,10 @@ reqvire traces --from-folder=docs/reports > docs/reports/traces.md
 #### Attachments
   * [JSON Output Structure](../System/Output/DesignDocuments/OutputFormats.md#json-output-structure)
   * [Verification Trace Tree Construction](../System/Processing/DesignDocuments/VerificationTraceAlgorithm.md#verification-trace-tree-construction)
+  * [Mermaid Diagram Style Specification](../System/Output/DesignDocuments/DiagramStyles.md#mermaid-diagram-style-specification)
 
 #### Relations
-  * derivedFrom: [Verification Trace Builder](../System/Processing/VerificationTraces.md#verification-trace-builder)
+  * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
 ---
 
@@ -353,8 +360,7 @@ Command output shall be written to stdout for easy redirection to files.
   * [Text Output Formatting](../System/Output/DesignDocuments/OutputFormats.md#text-output-formatting)
 
 #### Relations
-  * derivedFrom: [Verification Coverage Report Generator](../System/Output/Reporting.md#verification-coverage-report-generator)
-  * derivedFrom: [Verification Roll-up Strategy](../System/Processing/VerificationTraces.md#verification-roll-up-strategy)
+  * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
   * verifiedBy: [Verification Coverage Report Test](../System/Output/Verifications/ReportingVerifications.md#verification-coverage-report-test)
 ---
@@ -383,10 +389,11 @@ Command output shall be written to stdout for easy redirection to files.
 #### Attachments
   * [JSON Output Structure](../System/Output/DesignDocuments/OutputFormats.md#json-output-structure)
   * [Text Output Formatting](../System/Output/DesignDocuments/OutputFormats.md#text-output-formatting)
+  * [Dry-Run Mode Behavior](../System/Operations/Refinements.md#dry-run-mode-behavior)
 
 #### Relations
-  * derivedFrom: [Model Linting](../System/Operations/Linting.md#model-linting)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
+  * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
 ---
 
 ### CLI Change Impact Report Command
@@ -418,46 +425,26 @@ Command invocation: `reqvire change-impact [OPTIONS]`
 #### Attachments
   * [JSON Output Structure](../System/Output/DesignDocuments/OutputFormats.md#json-output-structure)
   * [Text Output Formatting](../System/Output/DesignDocuments/OutputFormats.md#text-output-formatting)
+  * [Change Propagation Behavior](../System/Processing/Refinements.md#change-propagation-behavior)
+  * [Mermaid Diagram Style Specification](../System/Output/DesignDocuments/DiagramStyles.md#mermaid-diagram-style-specification)
 
 #### Relations
-  * derivedFrom: [Structural Change Analyzer](../System/Processing/ChangeImpact.md#structural-change-analyzer)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
 ---
 
-### CLI Generate Diagrams Flag
-
-The system shall provide a diagrams generation function, activated by the (generate-diagrams command), which shall generate interactive mermaid diagrams.
-
-#### Relations
-  * derivedFrom: [Diagram Generation](../System/Output/DiagramGeneration.md#diagram-generation)
-  * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
-  * verifiedBy: [Diagram Generation Test](../System/Output/Verifications/DiagramVerifications.md#diagram-generation-test)
----
-
-### CLI Remove Diagrams Flag
-
-The system shall provide a diagram removal function, activated by the remove-diagrams command, which shall remove all generated mermaid diagrams from the model.
-
-#### Relations
-  * derivedFrom: [Diagram Removal](../System/Output/DiagramGeneration.md#diagram-removal)
-  * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
-  * verifiedBy: [Remove Generated Diagrams Verification](../System/Output/Verifications/DiagramVerifications.md#remove-generated-diagrams-verification)
----
 
 ### CLI Add Element Command
 
-The system shall provide an `add` command to create new model elements by accepting element definition in Markdown format from stdin, validating the structure, and inserting it at the specified location.
+The system shall provide an `add` command to create new model elements by accepting element definition in Markdown format from stdin, validating the structure, and inserting it into the target file.
 
 #### Details
 The `add` command shall:
 - Accept element definition input from standard input (stdin)
 - Accept target file path as required positional argument (resolved relative to Git repository root)
-- Accept optional index as positional argument (0-based, defaults to end of file)
-- Support command syntax: `reqvire add <file> [<index>]`
+- Support command syntax: `reqvire add <file>`
 - Validate element structure before insertion
+- Insert element into file following Element Ordering Behavior
 - Apply changes immediately by default
 - Support `--dry-run` flag to preview changes without applying
 - Output git-style diff showing file changes by default
@@ -465,9 +452,15 @@ The `add` command shall:
 - Report validation errors if element structure is invalid
 - Exit with code 0 on success, non-zero on error
 
+#### Attachments
+  * [File Persistence Behavior](../System/Operations/Refinements.md#file-persistence-behavior)
+  * [Target Location Constraint](../System/Operations/Refinements.md#target-location-constraint)
+  * [Dry-Run Mode Behavior](../System/Operations/Refinements.md#dry-run-mode-behavior)
+  * [Diff Output Format Specification](../System/Output/DesignDocuments/OutputFormats.md#diff-output-format-specification)
+  * [JSON Output Structure](../System/Output/DesignDocuments/OutputFormats.md#json-output-structure)
+
 #### Relations
-  * derivedFrom: [Create Element Operation](../System/Operations/ElementManipulation.md#create-element-operation)
-  * derivedFrom: [Subdirectory Processing Option](#subdirectory-processing-option)
+  * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
 ---
 
@@ -488,9 +481,14 @@ The `rm` command shall:
 - Report error if element does not exist
 - Exit with code 0 on success, non-zero on error
 
+#### Attachments
+  * [File Persistence Behavior](../System/Operations/Refinements.md#file-persistence-behavior)
+  * [Dry-Run Mode Behavior](../System/Operations/Refinements.md#dry-run-mode-behavior)
+  * [Diff Output Format Specification](../System/Output/DesignDocuments/OutputFormats.md#diff-output-format-specification)
+  * [JSON Output Structure](../System/Output/DesignDocuments/OutputFormats.md#json-output-structure)
+
 #### Relations
-  * derivedFrom: [Delete Element Operation](../System/Operations/ElementManipulation.md#delete-element-operation)
-  * derivedFrom: [Subdirectory Processing Option](#subdirectory-processing-option)
+  * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
 ---
 
@@ -502,9 +500,8 @@ The system shall provide a `mv` command to move existing model elements to diffe
 The `mv` command shall:
 - Accept element name as required positional argument
 - Accept target file path as required positional argument (resolved relative to Git repository root)
-- Accept optional index as positional argument (0-based, defaults to end of file)
-- Support command syntax: `reqvire mv <element-name> <file> [<index>]`
-- Move element to target location at specified index
+- Support command syntax: `reqvire mv <element-name> <file>`
+- Move element to target file following Element Ordering Behavior
 - Update all incoming relations system-wide with new identifier
 - Preserve element content, metadata, and outgoing relations
 - Apply changes immediately by default
@@ -515,9 +512,15 @@ The `mv` command shall:
 - Report error if element does not exist or target location is invalid
 - Exit with code 0 on success, non-zero on error
 
+#### Attachments
+  * [File Persistence Behavior](../System/Operations/Refinements.md#file-persistence-behavior)
+  * [Target Location Constraint](../System/Operations/Refinements.md#target-location-constraint)
+  * [Dry-Run Mode Behavior](../System/Operations/Refinements.md#dry-run-mode-behavior)
+  * [Diff Output Format Specification](../System/Output/DesignDocuments/OutputFormats.md#diff-output-format-specification)
+  * [JSON Output Structure](../System/Output/DesignDocuments/OutputFormats.md#json-output-structure)
+
 #### Relations
-  * derivedFrom: [Move Element Operation](../System/Operations/ElementManipulation.md#move-element-operation)
-  * derivedFrom: [Subdirectory Processing Option](#subdirectory-processing-option)
+  * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
 ---
 
@@ -534,9 +537,16 @@ The `mv-file` command shall:
 - Exit with code 0 on success, non-zero on error
 - Command syntax: `reqvire mv-file <source-file> <target-file>`
 
+#### Attachments
+  * [File Persistence Behavior](../System/Operations/Refinements.md#file-persistence-behavior)
+  * [Target Location Constraint](../System/Operations/Refinements.md#target-location-constraint)
+  * [Dry-Run Mode Behavior](../System/Operations/Refinements.md#dry-run-mode-behavior)
+  * [Diff Output Format Specification](../System/Output/DesignDocuments/OutputFormats.md#diff-output-format-specification)
+  * [JSON Output Structure](../System/Output/DesignDocuments/OutputFormats.md#json-output-structure)
+
 #### Relations
-  * derivedFrom: [Move File Operation](../System/Operations/ElementManipulation.md#move-file-operation)
-  * derivedFrom: [Subdirectory Processing Option](#subdirectory-processing-option)
+  * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
+  * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
 ---
 
 ### CLI Rename Element Command
@@ -556,8 +566,13 @@ The `rename` command shall:
 - Report error if element does not exist or new name conflicts with existing element
 - Exit with code 0 on success, non-zero on error
 
+#### Attachments
+  * [File Persistence Behavior](../System/Operations/Refinements.md#file-persistence-behavior)
+  * [Dry-Run Mode Behavior](../System/Operations/Refinements.md#dry-run-mode-behavior)
+  * [Diff Output Format Specification](../System/Output/DesignDocuments/OutputFormats.md#diff-output-format-specification)
+  * [JSON Output Structure](../System/Output/DesignDocuments/OutputFormats.md#json-output-structure)
+
 #### Relations
-  * derivedFrom: [Rename Element Operation](../System/Operations/ElementManipulation.md#rename-element-operation)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
 ---
@@ -583,11 +598,13 @@ The markdown output shall include:
 #### Attachments
   * [JSON Output Structure](../System/Output/DesignDocuments/OutputFormats.md#json-output-structure)
   * [Short Mode Behavior](../System/Output/DesignDocuments/OutputFormats.md#short-mode-behavior)
+  * [Mermaid Diagram Style Specification](../System/Output/DesignDocuments/DiagramStyles.md#mermaid-diagram-style-specification)
+  * [ContainmentView.md](../System/Output/DesignDocuments/ContainmentView.md)
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * derivedFrom: [Containment View Report Generation](../System/Output/Reporting.md#containment-view-report-generation)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
   * satisfiedBy: [containment.rs](../../core/src/containment.rs)
   * satisfiedBy: [diagrams.rs](../../core/src/diagrams.rs)
 ---
+

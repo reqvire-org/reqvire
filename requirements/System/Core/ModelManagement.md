@@ -2,7 +2,7 @@
 
 ### Coexistence of Structured and Unstructured Documents
 
-The system shall allow structured markdown and unstructured. (eg., markdown, PDFs, DOCX, raw text) documents to coexist within the same MBSE model.
+The system shall allow structured markdown and unstructured. (eg., markdown, PDFs, DOCX, raw text) documents to coexist within the same System model.
 
 #### Metadata
   * type: user-requirement
@@ -28,13 +28,7 @@ The system shall implement relations following clearly defined specifications fo
 The system shall enforce element type constraints for relation types, ensuring that only valid combinations of source and target element types are allowed for each relation type.
 
 #### Details
-The compatibility rules are:
-
-1. **derivedFrom/derive**: Only requirement types (`requirement`, `user-requirement`) can use these relations
-2. **satisfiedBy/satisfy**: Requirements and `test-verification` can use satisfiedBy; other verification types cannot
-3. **verifiedBy/verify**: Requirements link to verifications, verifications link to requirements
-4. **trace**: Any non-refinement element type can use trace relations
-5. **Refinement types**: `constraint`, `behavior`, `specification` cannot have Relations subsections
+The system shall define element type relation compatibility constraints.
 
 #### Attachments
   * [RelationTypes.md](DesignDocuments/RelationTypes.md)
@@ -42,6 +36,7 @@ The compatibility rules are:
 #### Relations
   * derivedFrom: [Relation Types and behaviors](#relation-types-and-behaviors)
   * derivedFrom: [Supported Element Types](#supported-element-types)
+  * satisfiedBy: [Element Type Relation Compatibility Constraint](Refinements.md#element-type-relation-compatibility-constraint)
   * verifiedBy: [Element Type Relation Compatibility Test](Verifications/ValidationVerifications.md#element-type-relation-compatibility-test)
 ---
 
@@ -98,7 +93,7 @@ When an element does not have a `#### Metadata` subsection with a `type` propert
 
 ### Template-Based Model Bootstrapping
 
-The system shall enable systems engineers to quickly bootstrap new MBSE models from predefined templates stored in Git repositories, accelerating project initialization and promoting best-practice model structures.
+The system shall enable systems engineers to quickly bootstrap new System models from predefined templates stored in Git repositories, accelerating project initialization and promoting best-practice model structures.
 
 #### Details
 Template Bootstrapping Capabilities

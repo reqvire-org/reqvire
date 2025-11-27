@@ -153,33 +153,7 @@ if [ $EXIT_CODE -ne 0 ]; then
   exit 1
 fi
 
-# Test 5: Generate diagrams from submodule directory
-echo "Running: reqvire generate-diagrams" >> "${TEST_DIR}/test_results.log"
-set +e
-OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" generate-diagrams 2>&1)
-EXIT_CODE=$?
-set -e
-
-echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
-printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
-
-if [ $EXIT_CODE -ne 0 ]; then
-  echo "❌ FAILED: Generate diagrams from submodule directory failed with exit code $EXIT_CODE"
-  echo "$OUTPUT"
-  exit 1
-fi
-
-# Check that diagrams were only generated for submodule files
-# The generate-diagrams command should only process files in the current subdirectory
-if echo "$OUTPUT" | grep -q "specifications/MainRequirements.md"; then
-  echo "❌ FAILED: Generate diagrams processed main requirements when it should only process submodule"
-  echo "Output: $OUTPUT"
-  exit 1
-fi
-
-# Note: Index generation is tested in Test 2 (export command generates index.html)
-
-# Test 6: CRUD mv command from submodule directory (move to different file in subdirectory)
+# Test 5: CRUD mv command from submodule directory (move to different file in subdirectory)
 echo "Running: reqvire mv (move element to different file within subdirectory)" >> "${TEST_DIR}/test_results.log"
 
 # Create a new target file in the submodule (just a header, no elements needed - pages are tracked)
@@ -228,7 +202,7 @@ if grep -q "### Submodule System" "${TMP_DIR}/project-root/submodule/specificati
   exit 1
 fi
 
-# Test 7: CRUD mv-file command from submodule directory
+# Test 6: CRUD mv-file command from submodule directory
 echo "Running: reqvire mv-file (move entire file within subdirectory)" >> "${TEST_DIR}/test_results.log"
 
 # Create a new directory structure

@@ -2,26 +2,11 @@
 
 ### Element Manipulation File Persistence
 
-The system shall persist all element manipulation operations to the source files in storage, synchronizing changes from the in-memory model to the file system to ensure data durability.
+The system shall persist all element manipulation operations to the source files in storage, synchronizing changes from the in-memory model to the file system and reordering elements following the Element Ordering Behavior.
 
-#### Details
-When element manipulation operations are performed, the system shall:
-- Track which files have been modified during manipulation operations
-- Flush modified files to storage after manipulation operations complete
-- Update only the files that were actually modified (optimization)
-- Ensure file content on disk reflects the current state of the in-memory model
-- Maintain file format and structure during write operations
-- Handle file I/O errors gracefully with appropriate error reporting
-
-**Optimization Strategy:**
-- The system may maintain a list of modified files during manipulation operations
-- Only files marked as modified need to be written to storage
-- Unmodified files shall not be rewritten to avoid unnecessary I/O operations
-
-**Synchronization Guarantee:**
-- After a manipulation operation completes successfully, all changes shall be persisted to disk
-- The on-disk representation shall match the in-memory model state
-- No changes shall be lost due to lack of persistence
+#### Attachments
+  * [File Persistence Behavior](Refinements.md#file-persistence-behavior)
+  * [Element Ordering Behavior](Refinements.md#element-ordering-behavior)
 
 #### Relations
   * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
@@ -34,42 +19,25 @@ When element manipulation operations are performed, the system shall:
 The system shall validate target file paths for element manipulation operations and automatically create files when they do not exist, subject to path safety constraints.
 
 #### Details
-When validating and preparing target locations, the system shall:
-
-**Path Validation:**
-- Verify the target file path is not excluded by `.gitignore` patterns
-- Verify the target file path is not excluded by `.reqvireignore` patterns
-- Verify the file path nesting depth does not exceed 10 subdirectories from the git repository root
-- Reject operations with invalid paths and provide clear error messages
-
-**Auto-Creation:**
-- If the target file does not exist and the path is valid, create the file with proper structure:
-  - Add `# Elements` as the page header (required for specification files)
-- Ensure created files follow Reqvire markdown structure conventions
-
-**Error Handling:**
-- Report error if path would be ignored by `.gitignore` or `.reqvireignore`
-- Report error if path nesting exceeds 10 subdirectories
-- Report error if file path is invalid or inaccessible
-- Provide specific error message indicating which constraint was violated
+The system shall define target location validation constraints.
 
 #### Relations
   * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
   * derivedFrom: [Ignore Files Integration](../Core/Configuration.md#ignore-files-integration)
   * derivedFrom: [Git Repository as Project Root](../Core/ModelManagement.md#git-repository-as-project-root)
+  * satisfiedBy: [Target Location Constraint](Refinements.md#target-location-constraint)
   * satisfiedBy: [utils.rs](../../../core/src/utils.rs)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
 ---
 
 ### Create Element Operation
 
-The system shall provide the capability to create new model elements by accepting a full element definition string in Markdown format, validating the element structure and relations, and inserting it into the specified location if valid.
+The system shall provide the capability to create new model elements by accepting a full element definition string in Markdown format, validating the element structure and relations, and inserting it into the target file following Element Ordering Behavior.
 
 #### Details
 When creating a new element, the system shall:
 - Accept a string containing the full element definition in Markdown format (including ### header, metadata, relations, and content)
 - Accept target location: file path
-- Accept optional index parameter for insertion position within the file (0-based)
 - Validate the target location using path validation rules
 - Create target file if it does not exist (subject to validation constraints)
 - Parse the element definition string to extract element structure, preserving all subsections:
@@ -86,9 +54,7 @@ When creating a new element, the system shall:
   - Validate that each relation target element exists in the model
   - Reject the operation if any relation target does not exist
   - Provide clear error messages indicating which relation target was not found
-- If validation passes, insert the element into the specified file:
-  - If index is provided and valid, insert at that position within the file
-  - If index is not provided or out of bounds, append to the end of the file
+- If validation passes, insert the element into the target file following Element Ordering Behavior
 - If validation fails, reject the operation and report validation errors
 - Maintain file structure and formatting after insertion
 
@@ -101,9 +67,13 @@ When creating a new element, the system shall:
 - All relation targets must reference existing elements in the model
 - External links (http://, https://, etc.) are allowed and not validated
 
+#### Attachments
+  * [File Persistence Behavior](Refinements.md#file-persistence-behavior)
+  * [Target Location Constraint](Refinements.md#target-location-constraint)
+  * [Element Ordering Behavior](Refinements.md#element-ordering-behavior)
+
 #### Relations
-  * derivedFrom: [Element Manipulation File Persistence](#element-manipulation-file-persistence)
-  * derivedFrom: [Target Location Validation and Auto-Creation](#target-location-validation-and-auto-creation)
+  * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
   * derivedFrom: [Reserved Subsections Support](../Core/StructureAndParsing.md#reserved-subsections-support)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
@@ -139,8 +109,11 @@ When deleting an element, the system shall:
 - All `satisfiedBy` relations pointing to the deleted element shall be removed
 - Relations from the deleted element are automatically removed with the element
 
+#### Attachments
+  * [File Persistence Behavior](Refinements.md#file-persistence-behavior)
+
 #### Relations
-  * derivedFrom: [Element Manipulation File Persistence](#element-manipulation-file-persistence)
+  * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
   * satisfiedBy: [diff.rs](../../../core/src/diff.rs)
@@ -156,10 +129,7 @@ When moving an element, the system shall:
 - Validate the target location using path validation rules
 - Create target file if it does not exist (subject to validation constraints)
 - Remove the element from the source file
-- Accept optional index parameter for insertion position within target file (0-based)
-- Insert the element into the target file:
-  - If index is provided and valid, insert at that position within the target file
-  - If index is not provided or out of bounds, append to the end of the target file
+- Insert the element into the target file following Element Ordering Behavior
 - Preserve all element content, metadata, and relations
 - Update the element's identifier to reflect the new location
 - Identify all relations pointing to the moved element (incoming relations)
@@ -181,9 +151,13 @@ When moving an element, the system shall:
 - The element's identifier changes from `<old-file>#<element-name>` to `<new-file>#<element-name>`
 - All references to the old identifier shall be updated to the new identifier
 
+#### Attachments
+  * [File Persistence Behavior](Refinements.md#file-persistence-behavior)
+  * [Target Location Constraint](Refinements.md#target-location-constraint)
+  * [Element Ordering Behavior](Refinements.md#element-ordering-behavior)
+
 #### Relations
-  * derivedFrom: [Element Manipulation File Persistence](#element-manipulation-file-persistence)
-  * derivedFrom: [Target Location Validation and Auto-Creation](#target-location-validation-and-auto-creation)
+  * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
   * satisfiedBy: [diff.rs](../../../core/src/diff.rs)
@@ -216,9 +190,12 @@ When the --squash flag is provided and the target file already exists, the syste
 - Remove the source file after all elements have been successfully moved
 - Preserve element ordering from the source file when inserting into target section
 
+#### Attachments
+  * [File Persistence Behavior](Refinements.md#file-persistence-behavior)
+  * [Target Location Constraint](Refinements.md#target-location-constraint)
+
 #### Relations
-  * derivedFrom: [Element Manipulation File Persistence](#element-manipulation-file-persistence)
-  * derivedFrom: [Target Location Validation and Auto-Creation](#target-location-validation-and-auto-creation)
+  * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
 ---
 
 ### Relation Consistency Maintenance
@@ -260,8 +237,11 @@ The system shall reject the operation with a clear error message if:
 - The element does not exist
 - The new name conflicts with an existing element
 
+#### Attachments
+  * [File Persistence Behavior](Refinements.md#file-persistence-behavior)
+
 #### Relations
-  * derivedFrom: [Element Manipulation File Persistence](#element-manipulation-file-persistence)
+  * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
   * satisfiedBy: [diff.rs](../../../core/src/diff.rs)
