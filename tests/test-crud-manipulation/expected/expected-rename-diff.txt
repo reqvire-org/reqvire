@@ -18,40 +18,74 @@ Renamed element: Feature A → Feature Alpha (specifications/Requirements.md#fea
 
 📄 specifications/Requirements.md
   [37m01     # Elements[0m
-  [37m02[0m
-  [37m03     ### Parent Feature[0m
-
-  [37m07     #### Metadata[0m
-  [37m08       * type: user-requirement[0m
-  [37m09     ---[0m
-  [31m10 -   ### Feature A[0m
-  [32m10 +   ### Feature Alpha[0m
-  [37m11[0m
-  [37m12     This is a test requirement for feature A.[0m
-  [37m13[0m
-
-  [37m20     This feature has special characters in its name including commas and slashes.[0m
-  [37m21[0m
-  [37m22     #### Relations[0m
-  [31m23 -     * derivedFrom: [Feature A](#feature-a)[0m
-  [32m23 +     * derivedFrom: [Feature Alpha](#feature-alpha)[0m
-  [37m24     ---[0m
-  [37m25[0m
-  [37m26     ### Feature D[0m
-
-  [37m28     This is a newly added feature.[0m
-  [37m29[0m
+  [31m02 -   ### Feature D Constraint[0m
+  [32m02 +   ### Complex chars, element/name example[0m
+  [37m03[0m
+  [31m04 -   Rate limiting constraint for Feature D.[0m
+  [32m04 +   This feature has special characters in its name including commas and slashes.[0m
+  [37m05[0m
+  [31m06 -   #### Metadata[0m
+  [31m06 -     * type: constraint[0m
+  [32m06 +   #### Relations[0m
+  [32m07 +     * derivedFrom: [Feature Alpha](#feature-alpha)[0m
+  [37m08     ---[0m
+  [31m09 -   ### Parent Feature[0m
+  [32m09 +   ### Feature D[0m
+  [37m10[0m
+  [31m11 -   This is a parent requirement.[0m
+  [32m11 +   This is a newly added feature.[0m
+  [37m12[0m
+  [31m13 -   #### Metadata[0m
+  [31m13 -     * type: user-requirement[0m
+  [32m13 +   #### Relations[0m
+  [32m14 +     * derivedFrom: [Feature Alpha](#feature-alpha)[0m
+  [37m15     ---[0m
+  [31m16 -   ### Feature A[0m
+  [32m16 +   ### Feature D Constraint[0m
+  [37m17[0m
+  [31m18 -   This is a test requirement for feature A.[0m
+  [32m18 +   Rate limiting constraint for Feature D.[0m
+  [37m19[0m
+  [31m20 -   #### Relations[0m
+  [31m20 -     * derivedFrom: [Parent Feature](#parent-feature)[0m
+  [32m20 +   #### Metadata[0m
+  [32m21 +     * type: constraint[0m
+  [37m22     ---[0m
+  [31m23 -   ### Complex chars, element/name example[0m
+  [32m23 +   ### Feature E[0m
+  [37m24[0m
+  [31m25 -   This feature has special characters in its name including commas and slashes.[0m
+  [32m25 +   This feature has an attachment to a refinement element.[0m
+  [37m26[0m
+  [32m27 +   #### Attachments[0m
+  [32m28 +     * [Feature D Constraint](Requirements.md#feature-d-constraint)[0m
+  [32m29 +   ␤[0m
   [37m30     #### Relations[0m
   [31m31 -     * derivedFrom: [Feature A](#feature-a)[0m
   [32m31 +     * derivedFrom: [Feature Alpha](#feature-alpha)[0m
   [37m32     ---[0m
-  [37m33[0m
-  [37m34     ### Feature D Constraint[0m
-
-  [37m47       * [Feature D Constraint](Requirements.md#feature-d-constraint)[0m
-  [37m48[0m
-  [37m49     #### Relations[0m
-  [31m50 -     * derivedFrom: [Feature A](#feature-a)[0m
-  [32m50 +     * derivedFrom: [Feature Alpha](#feature-alpha)[0m
-  [37m51     ---[0m
-  [37m52[0m
+  [31m33 -   ### Feature D[0m
+  [32m33 +   ### Parent Feature[0m
+  [37m34[0m
+  [31m35 -   This is a newly added feature.[0m
+  [32m35 +   This is a parent requirement.[0m
+  [37m36[0m
+  [31m37 -   #### Relations[0m
+  [31m37 -     * derivedFrom: [Feature A](#feature-a)[0m
+  [32m37 +   #### Metadata[0m
+  [32m38 +     * type: user-requirement[0m
+  [37m39     ---[0m
+  [31m40 -   ### Feature E[0m
+  [32m40 +   ### Feature Alpha[0m
+  [37m41[0m
+  [31m42 -   This feature has an attachment to a refinement element.[0m
+  [32m42 +   This is a test requirement for feature A.[0m
+  [37m43[0m
+  [31m44 -   #### Attachments[0m
+  [31m44 -     * [Feature D Constraint](Requirements.md#feature-d-constraint)[0m
+  [31m44 -   ␤[0m
+  [37m44     #### Relations[0m
+  [31m45 -     * derivedFrom: [Feature A](#feature-a)[0m
+  [32m45 +     * derivedFrom: [Parent Feature](#parent-feature)[0m
+  [37m46     ---[0m
+  [37m47[0m

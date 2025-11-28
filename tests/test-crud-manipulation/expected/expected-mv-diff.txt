@@ -18,23 +18,23 @@ Moved element: Feature C (specifications/OtherRequirements.md#feature-c)
 📄 specifications/Requirements.md
   [37m01     # Elements[0m
   [37m02[0m
-  [37m03     ### Parent Feature[0m
+  [37m03     ### Feature D Constraint[0m
 
-  [37m15     #### Relations[0m
-  [37m16       * derivedFrom: [Parent Feature](#parent-feature)[0m
-  [37m17     ---[0m
-  [31m18 -   ### Feature C[0m
-  [31m18 -   ␤[0m
-  [31m18 -   This is a test requirement for feature C with relations.[0m
-  [31m18 -   ␤[0m
-  [31m18 -   #### Relations[0m
-  [31m18 -     * derivedFrom: [Feature A](#feature-a)[0m
-  [31m18 -     * verifiedBy: [Test for Feature C](Verifications/Tests.md#test-for-feature-c)[0m
-  [31m18 -   ---[0m
-  [31m18 -   ␤[0m
-  [37m18     ### Complex chars, element/name example[0m
-  [37m19[0m
-  [37m20     This feature has special characters in its name including commas and slashes.[0m
+  [37m31     #### Relations[0m
+  [37m32       * derivedFrom: [Feature A](#feature-a)[0m
+  [37m33     ---[0m
+  [31m34 -   ### Feature C[0m
+  [31m34 -   ␤[0m
+  [31m34 -   This is a test requirement for feature C with relations.[0m
+  [31m34 -   ␤[0m
+  [31m34 -   #### Relations[0m
+  [31m34 -     * derivedFrom: [Feature A](#feature-a)[0m
+  [31m34 -     * verifiedBy: [Test for Feature C](Verifications/Tests.md#test-for-feature-c)[0m
+  [31m34 -   ---[0m
+  [31m34 -   ␤[0m
+  [37m34     ### Feature D[0m
+  [37m35[0m
+  [37m36     This is a newly added feature.[0m
 
 
 

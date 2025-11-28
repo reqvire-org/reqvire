@@ -4,6 +4,9 @@
 
 Child B element that derives from Parent A.
 
+#### Metadata
+  * type: system-requirement
+
 #### Relations
   * derivedFrom: [Parent A](#parent-a)
 ---
@@ -11,6 +14,9 @@ Child B element that derives from Parent A.
 ### Grandchild Z
 
 Grandchild Z derives from Child A.
+
+#### Metadata
+  * type: system-requirement
 
 #### Relations
   * derivedFrom: [Child A](#child-a)
@@ -20,11 +26,16 @@ Grandchild Z derives from Child A.
 
 Parent A is a root element with children.
 
+#### Metadata
+  * type: user-requirement
 ---
 
 ### Grandchild M
 
 Grandchild M derives from Child A.
+
+#### Metadata
+  * type: system-requirement
 
 #### Relations
   * derivedFrom: [Child A](#child-a)
@@ -34,6 +45,9 @@ Grandchild M derives from Child A.
 
 Child A derives from Parent A.
 
+#### Metadata
+  * type: system-requirement
+
 #### Relations
   * derivedFrom: [Parent A](#parent-a)
 ---
@@ -42,4 +56,6 @@ Child A derives from Parent A.
 
 Standalone element with no file-local parents.
 
+#### Metadata
+  * type: user-requirement
 ---

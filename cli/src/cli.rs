@@ -334,28 +334,28 @@ pub enum Commands {
         dry_run: bool,
     },
 
-    /// Move/rename attachment file and update all references
-    #[clap(name = "mv-attachment", override_help = "Move/rename attachment file and update all references\n\nMV-ATTACHMENT OPTIONS:\n       <OLD_PATH>               Current attachment file path\n       <NEW_PATH>               New attachment file path\n      --dry-run                 Preview changes without applying\n\nUSAGE:\n    reqvire mv-attachment docs/old.pdf docs/new.pdf")]
-    MvAttachment {
-        /// Current attachment file path
+    /// Move/rename asset file and update all references (Attachments and Relations)
+    #[clap(name = "mv-asset", override_help = "Move/rename asset file and update all references\n\nMV-ASSET OPTIONS:\n       <OLD_PATH>               Current file path\n       <NEW_PATH>               New file path\n      --dry-run                 Preview changes without applying\n\nUSAGE:\n    reqvire mv-asset docs/old.pdf docs/new.pdf")]
+    MvAsset {
+        /// Current file path
         old_path: String,
 
-        /// New attachment file path
+        /// New file path
         new_path: String,
 
         /// Preview changes without applying
-        #[clap(long, help_heading = "MV-ATTACHMENT OPTIONS")]
+        #[clap(long, help_heading = "MV-ASSET OPTIONS")]
         dry_run: bool,
     },
 
-    /// Remove attachment file and detach from all elements
-    #[clap(name = "rm-attachment", override_help = "Remove attachment file and detach from all elements\n\nRM-ATTACHMENT OPTIONS:\n       <ATTACHMENT_PATH>        Path to attachment file to remove\n      --dry-run                 Preview changes without applying\n\nUSAGE:\n    reqvire rm-attachment docs/obsolete.pdf")]
-    RmAttachment {
-        /// Path to attachment file to remove
-        attachment_path: String,
+    /// Remove asset file and remove all references (Attachments and Relations)
+    #[clap(name = "rm-asset", override_help = "Remove asset file and remove all references\n\nRM-ASSET OPTIONS:\n       <FILE_PATH>              Path to file to remove\n      --dry-run                 Preview changes without applying\n\nUSAGE:\n    reqvire rm-asset docs/obsolete.pdf")]
+    RmAsset {
+        /// Path to file to remove
+        file_path: String,
 
         /// Preview changes without applying
-        #[clap(long, help_heading = "RM-ATTACHMENT OPTIONS")]
+        #[clap(long, help_heading = "RM-ASSET OPTIONS")]
         dry_run: bool,
     },
 
@@ -1049,9 +1049,9 @@ pub fn handle_command(
             }
             return Ok(0);
         },
-        Some(Commands::MvAttachment { old_path, new_path, dry_run }) => {
+        Some(Commands::MvAsset { old_path, new_path, dry_run }) => {
             let git_root = git_commands::get_git_root_dir()?;
-            let result = reqvire::crud::mv_attachment(
+            let result = reqvire::crud::mv_asset(
                 &mut model_manager,
                 &old_path,
                 &new_path,
@@ -1062,11 +1062,11 @@ pub fn handle_command(
             render_crud_result(&result);
             return Ok(0);
         },
-        Some(Commands::RmAttachment { attachment_path, dry_run }) => {
+        Some(Commands::RmAsset { file_path, dry_run }) => {
             let git_root = git_commands::get_git_root_dir()?;
-            let result = reqvire::crud::rm_attachment(
+            let result = reqvire::crud::rm_asset(
                 &mut model_manager,
-                &attachment_path,
+                &file_path,
                 &git_root,
                 dry_run,
             )?;

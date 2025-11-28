@@ -54,7 +54,7 @@ When a requirement changes, impact analysis must be conducted based on its relat
      - Change impact compares both element hash AND attachment hashes independently
      - Attach operation: new attachment hash appears -> triggers impact
      - Detach operation: attachment hash removed -> triggers impact
-     - mv-attachment operation: path change only -> does NOT trigger impact (tracked for reporting like relation renames)
+     - mv-asset operation: path change only -> does NOT trigger impact (tracked for reporting like relation renames)
      - If attached document content changes: attachment hash differs -> triggers impact on element
      - Path renames are tracked separately for reference updates without impact propagation
    - Generate a ChangeSet representing all detected changes
@@ -225,7 +225,7 @@ If `docs/SLA.pdf` content is modified (e.g., performance targets updated from 99
 
 **Scenario 2: Attachment Path Rename**
 
-If `docs/SLA.pdf` is renamed to `docs/service_level_agreement.pdf` using `mv-attachment`:
+If `docs/SLA.pdf` is renamed to `docs/service_level_agreement.pdf` using `mv-asset`:
 - Path changes but document content unchanged
 - Element content hash remains the same -> NO change impact triggered
 - Path update tracked for reporting (like relation renames)

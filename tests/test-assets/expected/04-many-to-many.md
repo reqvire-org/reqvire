@@ -28,7 +28,8 @@ This requirement has an attached SLA document.
   * derive: [Implementation Detail](#implementation-detail)
 
 #### Attachments
-* [docs/SLA.txt](docs/SLA.txt)
+* [../docs/SLA.txt](../docs/SLA.txt)
+* [../docs/benchmarks.txt](../docs/benchmarks.txt)
 ---
 
 ### Implementation Detail
@@ -42,7 +43,7 @@ The implementation shall follow the SLA guidelines.
   * derivedFrom: [Performance Requirement](#performance-requirement)
 
 #### Attachments
-* [docs/SLA.txt](docs/SLA.txt)
+* [../docs/SLA.txt](../docs/SLA.txt)
 ---
 
 ### No Attachments Requirement

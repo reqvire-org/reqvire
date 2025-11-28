@@ -1,16 +1,16 @@
 # Elements
 
-### MOE_UA
+### MOE_CE
 
-User adoption measure.
+Cost effectiveness measure.
 
 #### Metadata
   * type: user-requirement
 ---
 
-### MOE_CE
+### MOE_UA
 
-Cost effectiveness measure.
+User adoption measure.
 
 #### Metadata
   * type: user-requirement

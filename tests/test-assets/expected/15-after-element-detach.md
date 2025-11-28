@@ -28,8 +28,9 @@ This requirement has an attached SLA document.
   * derive: [Implementation Detail](#implementation-detail)
 
 
+
 #### Attachments
-* [documents/SLA.txt](documents/SLA.txt)
+* [Test Constraint Element](#test-constraint-element)
 ---
 
 ### Implementation Detail
@@ -42,8 +43,9 @@ The implementation shall follow the SLA guidelines.
 #### Relations
   * derivedFrom: [Performance Requirement](#performance-requirement)
 
+
 #### Attachments
-* [documents/SLA.txt](documents/SLA.txt)
+* [../Test Constraint Element/data.txt](../Test Constraint Element/data.txt)
 ---
 
 ### No Attachments Requirement

@@ -4,6 +4,8 @@
 
 Parent A is a root element with children.
 
+#### Metadata
+  * type: user-requirement
 ---
 
 ### Child A
@@ -42,4 +44,6 @@ Child B element that derives from Parent A.
 
 Standalone element with no file-local parents.
 
+#### Metadata
+  * type: user-requirement
 ---

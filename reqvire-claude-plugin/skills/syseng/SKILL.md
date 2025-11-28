@@ -420,7 +420,8 @@ reqvire mv "<element-name>" "<target-file>" [<index>]  # Move element
 reqvire mv-file "<source>" "<target>"  # Move file with elements
 reqvire mv-file --squash "<source>" "<target>"  # Merge into existing file
 reqvire rename "<current-name>" "<new-name>"   # Rename element
-reqvire mv-attachment "<old-path>" "<new-path>"  # Move/rename attachment files
+reqvire mv-asset "<old-path>" "<new-path>"  # Move/rename asset files (updates Attachments & Relations)
+reqvire rm-asset "<file-path>"            # Remove asset file (removes from Attachments & Relations)
 ```
 
 ### Validation and Analysis
@@ -454,7 +455,7 @@ reqvire change-impact --git-commit=<hash> [--json]  # Analyze changes
 
 1. Always run commands from the git root folder
 2. Use full paths starting with `requirements/`
-3. After `mv-attachment`, verify all references were updated (may need manual fixes)
+3. After `mv-asset`, verify all references were updated (may need manual fixes)
 4. Never guess - read files before making changes
 5. Validate after each significant change
 6. Use `reqvire search --short --json` to explore model structure efficiently

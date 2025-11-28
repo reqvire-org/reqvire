@@ -1277,7 +1277,7 @@ impl GraphRegistry {
         }
     }
 
-    /// Groups elements by their file path
+    /// Groups elements by their file path and orders them following Element Ordering Behavior
     pub fn group_elements_by_location(&self) -> HashMap<String, Vec<&Element>> {
         let mut file_elements: HashMap<String, Vec<&Element>> = HashMap::new();
 
@@ -1295,12 +1295,105 @@ impl GraphRegistry {
                 .push(element);
         }
 
-        // Sort elements within each file by their original order index
+        // Apply Element Ordering Behavior to each file
         for elements in file_elements.values_mut() {
-            elements.sort_by_key(|element| element.file_order_index);
+            self.order_elements_hierarchically(elements);
         }
 
         file_elements
+    }
+
+    /// Orders elements following Element Ordering Behavior:
+    /// - Parent elements appear before their children (file-local derivedFrom hierarchy)
+    /// - Root elements (no file-local parent) sorted alphabetically
+    /// - Siblings at each level sorted alphabetically
+    fn order_elements_hierarchically(&self, elements: &mut Vec<&Element>) {
+        if elements.len() <= 1 {
+            return;
+        }
+
+        // Build a map of element fragment (slug) -> index for quick lookup
+        // The fragment is the part after # in the identifier (e.g., "parent-a" from "file.md#parent-a")
+        let fragment_to_idx: HashMap<String, usize> = elements
+            .iter()
+            .enumerate()
+            .map(|(i, e)| {
+                let fragment = e.identifier.split('#').last().unwrap_or(&e.identifier).to_string();
+                (fragment, i)
+            })
+            .collect();
+
+        // Build parent -> children map based on file-local derivedFrom relations
+        // Using indices to avoid lifetime issues
+        let mut children_map: HashMap<usize, Vec<usize>> = HashMap::new();
+        let mut has_parent: HashSet<usize> = HashSet::new();
+
+        for (idx, element) in elements.iter().enumerate() {
+            // Find file-local derivedFrom relations
+            for relation in &element.relations {
+                if relation.relation_type.name == "derivedFrom" {
+                    // Check if target is in the same file
+                    if let Some(target_id) = &relation.target.element_id {
+                        // target_id is the fragment (slug) like "parent-a"
+                        // Check if this target exists in the same file
+                        if let Some(&parent_idx) = fragment_to_idx.get(target_id) {
+                            // This element has a file-local parent
+                            children_map
+                                .entry(parent_idx)
+                                .or_insert_with(Vec::new)
+                                .push(idx);
+                            has_parent.insert(idx);
+                        }
+                    }
+                }
+            }
+        }
+
+        // Identify root element indices (those without file-local parents)
+        let mut roots: Vec<usize> = (0..elements.len())
+            .filter(|idx| !has_parent.contains(idx))
+            .collect();
+
+        // Sort roots alphabetically by element name
+        roots.sort_by(|&a, &b| elements[a].name.cmp(&elements[b].name));
+
+        // Sort children at each level alphabetically by element name
+        for children in children_map.values_mut() {
+            children.sort_by(|&a, &b| elements[a].name.cmp(&elements[b].name));
+        }
+
+        // Build ordered list using depth-first traversal with stack (iterative)
+        let mut ordered_indices: Vec<usize> = Vec::with_capacity(elements.len());
+        let mut visited: HashSet<usize> = HashSet::new();
+
+        // Process roots in reverse order so they come out in correct order
+        let mut stack: Vec<usize> = Vec::new();
+        for &root in roots.iter().rev() {
+            stack.push(root);
+        }
+
+        while let Some(idx) = stack.pop() {
+            if visited.contains(&idx) {
+                continue;
+            }
+            visited.insert(idx);
+            ordered_indices.push(idx);
+
+            // Push children in reverse alphabetical order so they come out in correct order
+            if let Some(children) = children_map.get(&idx) {
+                for &child_idx in children.iter().rev() {
+                    if !visited.contains(&child_idx) {
+                        stack.push(child_idx);
+                    }
+                }
+            }
+        }
+
+        // Reorder elements based on ordered indices
+        let original: Vec<&Element> = elements.drain(..).collect();
+        for idx in ordered_indices {
+            elements.push(original[idx]);
+        }
     }
 
     /// Generates markdown content for a file

@@ -3,19 +3,58 @@ Removed element: Feature B (specifications/Requirements.md#feature-b)
 📄 specifications/Requirements.md
   [37m01     # Elements[0m
   [37m02[0m
-  [37m03     ### Parent Feature[0m
+  [37m03     ### Feature D Constraint[0m
 
-  [37m15     #### Relations[0m
-  [37m16       * derivedFrom: [Parent Feature](#parent-feature)[0m
-  [37m17     ---[0m
-  [31m18 -   ### Feature B[0m
-  [31m18 -   ␤[0m
-  [31m18 -   This is a test requirement for feature B.[0m
-  [31m18 -   ␤[0m
-  [31m18 -   #### Relations[0m
-  [31m18 -     * derivedFrom: [Feature A](#feature-a)[0m
-  [31m18 -   ---[0m
-  [31m18 -   ␤[0m
-  [37m18     ### Feature C[0m
-  [37m19[0m
-  [37m20     This is a test requirement for feature C with relations.[0m
+  [37m07     #### Metadata[0m
+  [37m08       * type: constraint[0m
+  [37m09     ---[0m
+  [31m10 -   ### Feature E[0m
+  [31m10 -   ␤[0m
+  [31m10 -   This feature has an attachment to a refinement element.[0m
+  [31m10 -   ␤[0m
+  [31m10 -   #### Attachments[0m
+  [31m10 -     * [Feature D Constraint](Requirements.md#feature-d-constraint)[0m
+  [31m10 -   ␤[0m
+  [31m10 -   #### Relations[0m
+  [31m10 -     * derivedFrom: [Feature A](#feature-a)[0m
+  [31m10 -   ---[0m
+  [31m10 -   ␤[0m
+  [37m10     ### Parent Feature[0m
+  [37m11[0m
+  [37m12     This is a parent requirement.[0m
+
+  [37m30     #### Relations[0m
+  [37m31       * derivedFrom: [Feature A](#feature-a)[0m
+  [37m32     ---[0m
+  [31m33 -   ### Feature B[0m
+  [32m33 +   ### Feature C[0m
+  [37m34[0m
+  [31m35 -   This is a test requirement for feature B.[0m
+  [32m35 +   This is a test requirement for feature C with relations.[0m
+  [37m36[0m
+  [37m37     #### Relations[0m
+  [37m38       * derivedFrom: [Feature A](#feature-a)[0m
+  [32m39 +     * verifiedBy: [Test for Feature C](Verifications/Tests.md#test-for-feature-c)[0m
+  [37m40     ---[0m
+  [31m41 -   ### Feature C[0m
+  [32m41 +   ### Feature D[0m
+  [37m42[0m
+  [31m43 -   This is a test requirement for feature C with relations.[0m
+  [32m43 +   This is a newly added feature.[0m
+  [37m44[0m
+  [37m45     #### Relations[0m
+  [37m46       * derivedFrom: [Feature A](#feature-a)[0m
+  [31m47 -     * verifiedBy: [Test for Feature C](Verifications/Tests.md#test-for-feature-c)[0m
+  [37m47     ---[0m
+  [31m48 -   ### Feature D[0m
+  [32m48 +   ### Feature E[0m
+  [37m49[0m
+  [31m50 -   This is a newly added feature.[0m
+  [32m50 +   This feature has an attachment to a refinement element.[0m
+  [37m51[0m
+  [32m52 +   #### Attachments[0m
+  [32m53 +     * [Feature D Constraint](Requirements.md#feature-d-constraint)[0m
+  [32m54 +   ␤[0m
+  [37m55     #### Relations[0m
+  [37m56       * derivedFrom: [Feature A](#feature-a)[0m
+  [37m57     ---[0m

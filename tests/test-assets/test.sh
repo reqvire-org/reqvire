@@ -123,18 +123,18 @@ echo "✅ Test 7 passed"
 echo ""
 
 # ==================================
-# Test 8: mv-attachment command
+# Test 8: mv-asset command (Attachments)
 # ==================================
-echo "Test 8: mv-attachment command..."
+echo "Test 8: mv-asset command updates Attachments..."
 
 mkdir -p "$TEST_DIR/documents"
-cd "$TEST_DIR" && "$REQVIRE_BIN" mv-attachment "docs/SLA.txt" "documents/SLA.txt" > /dev/null 2>&1
+cd "$TEST_DIR" && "$REQVIRE_BIN" mv-asset "docs/SLA.txt" "documents/SLA.txt" > /dev/null 2>&1
 
-assert_file_matches "${TEST_SCRIPT_DIR}/expected/08-after-mv-attachment.md" "$TEST_DIR/specifications/Requirements.md" "File content after mv-attachment does not match expected"
+assert_file_matches "${TEST_SCRIPT_DIR}/expected/08-after-mv-asset.md" "$TEST_DIR/specifications/Requirements.md" "File content after mv-asset does not match expected"
 
 # Verify file was moved
 if [ -f "$TEST_DIR/docs/SLA.txt" ]; then
-  echo "❌ FAILED: Old file still exists after mv-attachment"
+  echo "❌ FAILED: Old file still exists after mv-asset"
   exit 1
 fi
 
@@ -147,17 +147,17 @@ echo "✅ Test 8 passed"
 echo ""
 
 # ==================================
-# Test 9: rm-attachment command
+# Test 9: rm-asset command (Attachments)
 # ==================================
-echo "Test 9: rm-attachment command..."
+echo "Test 9: rm-asset command removes from Attachments..."
 
-cd "$TEST_DIR" && "$REQVIRE_BIN" rm-attachment "documents/SLA.txt" > /dev/null 2>&1
+cd "$TEST_DIR" && "$REQVIRE_BIN" rm-asset "documents/SLA.txt" > /dev/null 2>&1
 
-assert_file_matches "${TEST_SCRIPT_DIR}/expected/09-after-rm-attachment.md" "$TEST_DIR/specifications/Requirements.md" "File content after rm-attachment does not match expected"
+assert_file_matches "${TEST_SCRIPT_DIR}/expected/09-after-rm-asset.md" "$TEST_DIR/specifications/Requirements.md" "File content after rm-asset does not match expected"
 
 # Verify file was deleted
 if [ -f "$TEST_DIR/documents/SLA.txt" ]; then
-  echo "❌ FAILED: File was not deleted by rm-attachment"
+  echo "❌ FAILED: File was not deleted by rm-asset"
   exit 1
 fi
 
@@ -251,7 +251,7 @@ echo ""
 echo "Test 12: Attach Refinement element by display name..."
 
 # Reset Requirements.md to clean state for element attachment tests
-cp "${TEST_SCRIPT_DIR}/expected/09-after-rm-attachment.md" "$TEST_DIR/specifications/Requirements.md"
+cp "${TEST_SCRIPT_DIR}/expected/09-after-rm-asset.md" "$TEST_DIR/specifications/Requirements.md"
 
 cd "$TEST_DIR" && "$REQVIRE_BIN" attach "Test Constraint Element" "Performance Requirement" > /dev/null 2>&1
 
@@ -333,6 +333,133 @@ if ! echo "$ATTACH_OUTPUT" | grep -qi "not found\|does not exist\|could not find
 fi
 
 echo "✅ Test 16 passed"
+echo ""
+
+# ==================================
+# Test 17: mv-asset updates Relations
+# ==================================
+echo "Test 17: mv-asset command updates satisfiedBy relations..."
+
+# Create a test file with satisfiedBy relation pointing to a script
+cat > "$TEST_DIR/specifications/RelationsTest.md" << 'EOF'
+# Elements
+
+### Relations Test System
+
+Top level container.
+
+#### Metadata
+  * type: user-requirement
+
+#### Relations
+  * derive: [Verified Requirement](#verified-requirement)
+---
+
+### Verified Requirement
+
+This requirement is satisfied by a script.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Relations Test System](#relations-test-system)
+  * satisfiedBy: [test_script.sh](../scripts/test_script.sh)
+---
+
+EOF
+
+# Create the script file
+mkdir -p "$TEST_DIR/scripts"
+echo "#!/bin/bash" > "$TEST_DIR/scripts/test_script.sh"
+echo "echo 'test'" >> "$TEST_DIR/scripts/test_script.sh"
+
+# Move the script
+mkdir -p "$TEST_DIR/src"
+cd "$TEST_DIR" && "$REQVIRE_BIN" mv-asset "scripts/test_script.sh" "src/test_script.sh" > /dev/null 2>&1
+
+assert_file_matches "${TEST_SCRIPT_DIR}/expected/17-after-mv-asset-relation.md" "$TEST_DIR/specifications/RelationsTest.md" "satisfiedBy relation not updated after mv-asset"
+
+# Verify file was moved
+if [ -f "$TEST_DIR/scripts/test_script.sh" ]; then
+  echo "❌ FAILED: Old file still exists after mv-asset"
+  exit 1
+fi
+
+if [ ! -f "$TEST_DIR/src/test_script.sh" ]; then
+  echo "❌ FAILED: File was not moved to new location"
+  exit 1
+fi
+
+echo "✅ Test 17 passed"
+echo ""
+
+# ==================================
+# Test 18: rm-asset removes Relations
+# ==================================
+echo "Test 18: rm-asset command removes satisfiedBy relations..."
+
+cd "$TEST_DIR" && "$REQVIRE_BIN" rm-asset "src/test_script.sh" > /dev/null 2>&1
+
+assert_file_matches "${TEST_SCRIPT_DIR}/expected/18-after-rm-asset-relation.md" "$TEST_DIR/specifications/RelationsTest.md" "satisfiedBy relation not removed after rm-asset"
+
+# Verify file was deleted
+if [ -f "$TEST_DIR/src/test_script.sh" ]; then
+  echo "❌ FAILED: File was not deleted by rm-asset"
+  exit 1
+fi
+
+echo "✅ Test 18 passed"
+echo ""
+
+# ==================================
+# Test 19: mv-asset updates both Attachments and Relations
+# ==================================
+echo "Test 19: mv-asset updates both Attachments and Relations in same element..."
+
+# Create test file with both attachment and satisfiedBy pointing to same file
+cat > "$TEST_DIR/specifications/MixedTest.md" << 'EOF'
+# Elements
+
+### Mixed Test System
+
+Top level container.
+
+#### Metadata
+  * type: user-requirement
+
+#### Relations
+  * derive: [Mixed Requirement](#mixed-requirement)
+---
+
+### Mixed Requirement
+
+This requirement has both attachment and relation to same file.
+
+#### Attachments
+  * [shared_doc.pdf](../shared/shared_doc.pdf)
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Mixed Test System](#mixed-test-system)
+  * satisfiedBy: [shared_doc.pdf](../shared/shared_doc.pdf)
+---
+
+EOF
+
+# Create the shared file
+mkdir -p "$TEST_DIR/shared"
+echo "PDF content" > "$TEST_DIR/shared/shared_doc.pdf"
+
+# Move the file
+mkdir -p "$TEST_DIR/documents"
+cd "$TEST_DIR" && "$REQVIRE_BIN" mv-asset "shared/shared_doc.pdf" "documents/shared_doc.pdf" > /dev/null 2>&1
+
+assert_file_matches "${TEST_SCRIPT_DIR}/expected/19-after-mv-asset-mixed.md" "$TEST_DIR/specifications/MixedTest.md" "Both attachment and relation should be updated after mv-asset"
+
+echo "✅ Test 19 passed"
 echo ""
 
 echo "===================================="

@@ -2,40 +2,84 @@ Moved element: Complex chars, element/name example (specifications/OtherRequirem
 
 📄 specifications/OtherRequirements.md
   [37m01     # Elements[0m
-  [37m02[0m
-  [37m03     ### Feature C[0m
+  [32m02 +   ### Complex chars, element/name example[0m
+  [32m03 +   ␤[0m
+  [32m04 +   This feature has special characters in its name including commas and slashes.[0m
+  [32m05 +   ␤[0m
+  [32m06 +   #### Relations[0m
+  [32m07 +     * derivedFrom: [Feature Alpha](Requirements.md#feature-alpha)[0m
+  [32m08 +   ---[0m
+  [32m09 +   ␤[0m
+  [37m10     ### Feature C[0m
+  [37m11[0m
+  [37m12     This is a test requirement for feature C with relations.[0m
 
-  [37m08       * derivedFrom: [Feature Alpha](Requirements.md#feature-alpha)[0m
-  [37m09       * verifiedBy: [Test for Feature C](Verifications/Tests.md#test-for-feature-c)[0m
-  [37m10     ---[0m
-  [32m11 +   ### Complex chars, element/name example[0m
-  [37m12[0m
-  [32m13 +   This feature has special characters in its name including commas and slashes.[0m
-  [32m14 +   ␤[0m
-  [32m15 +   #### Relations[0m
-  [32m16 +     * derivedFrom: [Feature Alpha](Requirements.md#feature-alpha)[0m
-  [32m17 +   ---[0m
-  [32m18 +   ␤[0m
-  [32m19 +   ␤[0m
 
 
 
 📄 specifications/Requirements.md
   [37m01     # Elements[0m
-  [37m02[0m
-  [37m03     ### Parent Feature[0m
+  [31m02 -   ### Complex chars, element/name example[0m
+  [32m02 +   ### Feature D Constraint[0m
+  [37m03[0m
+  [31m04 -   This feature has special characters in its name including commas and slashes.[0m
+  [32m04 +   Rate limiting constraint for Feature D.[0m
+  [37m05[0m
+  [32m06 +   #### Metadata[0m
+  [32m07 +     * type: constraint[0m
+  [32m08 +   ---[0m
+  [32m09 +   ␤[0m
+  [32m10 +   ### Parent Feature[0m
+  [32m11 +   ␤[0m
+  [32m12 +   This is a parent requirement.[0m
+  [32m13 +   ␤[0m
+  [32m14 +   #### Metadata[0m
+  [32m15 +     * type: user-requirement[0m
+  [32m16 +   ---[0m
+  [32m17 +   ␤[0m
+  [32m18 +   ### Feature Alpha[0m
+  [32m19 +   ␤[0m
+  [32m20 +   This is a test requirement for feature A.[0m
+  [32m21 +   ␤[0m
+  [37m22     #### Relations[0m
+  [31m23 -     * derivedFrom: [Feature Alpha](#feature-alpha)[0m
+  [32m23 +     * derivedFrom: [Parent Feature](#parent-feature)[0m
+  [37m24     ---[0m
+  [37m25[0m
+  [37m26     ### Feature D[0m
 
-  [37m15     #### Relations[0m
-  [37m16       * derivedFrom: [Parent Feature](#parent-feature)[0m
-  [37m17     ---[0m
-  [31m18 -   ### Complex chars, element/name example[0m
-  [31m18 -   ␤[0m
-  [31m18 -   This feature has special characters in its name including commas and slashes.[0m
-  [31m18 -   ␤[0m
-  [31m18 -   #### Relations[0m
-  [31m18 -     * derivedFrom: [Feature Alpha](#feature-alpha)[0m
-  [31m18 -   ---[0m
-  [31m18 -   ␤[0m
-  [37m18     ### Feature D[0m
-  [37m19[0m
-  [37m20     This is a newly added feature.[0m
+  [37m30     #### Relations[0m
+  [37m31       * derivedFrom: [Feature Alpha](#feature-alpha)[0m
+  [37m32     ---[0m
+  [31m33 -   ### Feature D Constraint[0m
+  [31m33 -   ␤[0m
+  [31m33 -   Rate limiting constraint for Feature D.[0m
+  [31m33 -   ␤[0m
+  [31m33 -   #### Metadata[0m
+  [31m33 -     * type: constraint[0m
+  [31m33 -   ---[0m
+  [31m33 -   ␤[0m
+  [37m33     ### Feature E[0m
+  [37m34[0m
+  [37m35     This feature has an attachment to a refinement element.[0m
+
+  [37m40     #### Relations[0m
+  [37m41       * derivedFrom: [Feature Alpha](#feature-alpha)[0m
+  [37m42     ---[0m
+  [31m43 -   ### Parent Feature[0m
+  [37m43[0m
+  [31m44 -   This is a parent requirement.[0m
+  [31m44 -   ␤[0m
+  [31m44 -   #### Metadata[0m
+  [31m44 -     * type: user-requirement[0m
+  [31m44 -   ---[0m
+  [31m44 -   ␤[0m
+  [31m44 -   ### Feature Alpha[0m
+  [31m44 -   ␤[0m
+  [31m44 -   This is a test requirement for feature A.[0m
+  [31m44 -   ␤[0m
+  [31m44 -   #### Relations[0m
+  [31m44 -     * derivedFrom: [Parent Feature](#parent-feature)[0m
+  [31m44 -   ---[0m
+  [31m44 -   ␤[0m
+  [31m44 -   ␤[0m
