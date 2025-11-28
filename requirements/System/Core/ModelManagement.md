@@ -11,47 +11,6 @@ The system shall allow structured markdown and unstructured. (eg., markdown, PDF
   * derivedFrom: [Managing System Models](../../UserStories.md#managing-system-models)
 ---
 
-### Relation Types and behaviors
-
-The system shall implement relations following clearly defined specifications for types and behaviors.
-
-#### Attachments
-  * [RelationTypes.md](DesignDocuments/RelationTypes.md)
-
-#### Relations
-  * derivedFrom: [Identifiers and Relations](StructureAndParsing.md#identifiers-and-relations)
-  * satisfiedBy: [relation.rs](../../../core/src/relation.rs)
----
-
-### Element Type Relation Compatibility
-
-The system shall enforce element type constraints for relation types, ensuring that only valid combinations of source and target element types are allowed for each relation type.
-
-#### Details
-The system shall define element type relation compatibility constraints.
-
-#### Attachments
-  * [RelationTypes.md](DesignDocuments/RelationTypes.md)
-
-#### Relations
-  * derivedFrom: [Relation Types and behaviors](#relation-types-and-behaviors)
-  * derivedFrom: [Supported Element Types](#supported-element-types)
-  * satisfiedBy: [Element Type Relation Compatibility Constraint](Refinements.md#element-type-relation-compatibility-constraint)
-  * verifiedBy: [Element Type Relation Compatibility Test](Verifications/ValidationVerifications.md#element-type-relation-compatibility-test)
----
-
-### Efficient Processing
-
-The system shall process structured documents and relations to extract model-relevant information efficiently.
-
-#### Metadata
-  * type: user-requirement
-
-#### Relations
-  * derivedFrom: [Managing System Models](../../UserStories.md#managing-system-models)
-  * derivedFrom: [Promote Automation and Efficiency](../../UserStories.md#promote-automation-and-efficiency)
----
-
 ### Default Requirement Type Assignment
 
 The system shall automatically assign the **default type `requirement`** to all elements if not explicitly specified in their `metadata` subsection.
@@ -91,48 +50,16 @@ When an element does not have a `#### Metadata` subsection with a `type` propert
   * derivedFrom: [Managing System Models](../../UserStories.md#managing-system-models)
 ---
 
-### Template-Based Model Bootstrapping
+### Efficient Processing
 
-The system shall enable systems engineers to quickly bootstrap new System models from predefined templates stored in Git repositories, accelerating project initialization and promoting best-practice model structures.
-
-#### Details
-Template Bootstrapping Capabilities
-
-Users can initialize new models using the CLI with templates from Git repositories:
-- Discover available templates within a specified repository
-- Select and apply templates interactively
-- Bootstrap model structure with predefined files, folders, and requirements
-
-Templates are consumed from Git repositories only, with support for repositories containing multiple templates alongside other content.
-
-**Example usage:**
-```bash
-reqvire init --template <github-repo-url>
-```
-
-The system discovers all available templates in the repository and allows the user to select which template to apply.
+The system shall process structured documents and relations to extract model-relevant information efficiently.
 
 #### Metadata
   * type: user-requirement
 
 #### Relations
   * derivedFrom: [Managing System Models](../../UserStories.md#managing-system-models)
----
-
-### Git Repository as Project Root
-
-The system shall treat the **root directory of the Git repository as the project's base** for all file and folder references, streamlining configuration and promoting a self-contained project structure.
-
-#### Details
-All paths specified in Reqvire commands will be resolved relative to the current working directory:
-- When run from the git repository root: paths are relative to the git root
-- When run from a subdirectory: paths are relative to that subdirectory, and processing is limited to files within that subdirectory scope
-
-#### Metadata
-  * type: user-requirement
-
-#### Relations
-  * derivedFrom: [Managing System Models](../../UserStories.md#managing-system-models)
+  * derivedFrom: [Promote Automation and Efficiency](../../UserStories.md#promote-automation-and-efficiency)
 ---
 
 ### Element Manipulation Operations
@@ -172,30 +99,49 @@ This requirement ensures consistency between relation updates and attachment ide
   * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
 ---
 
-### Verification Type Categories
+### Git Repository as Project Root
 
-The system shall support defined verifications categories.
+The system shall treat the **root directory of the Git repository as the project's base** for all file and folder references, streamlining configuration and promoting a self-contained project structure.
 
 #### Details
-The following verification types are supported:
+All paths specified in Reqvire commands will be resolved relative to the current working directory:
+- When run from the git repository root: paths are relative to the git root
+- When run from a subdirectory: paths are relative to that subdirectory, and processing is limited to files within that subdirectory scope
 
-1. **Default Verification Type**
-   - `verification` - Verification through testing (equivalent to `test-verification`)
-
-2. **Specific Verification Types**
-   - `test-verification` - Explicit verification through testing with documented test procedures
-   - `analysis-verification` - Verification through formal analysis of documentation or code
-   - `inspection-verification` - Verification through formal inspection or review
-   - `demonstration-verification` - Verification through demonstration in a realistic environment
-
-The appropriate verification type should be selected based on the nature of the requirement:
-- **Test-verification**: Used when formal test procedures with expected outcomes are required
-- **Analysis-verification**: Used when requirements can be verified through analysis of documentation or code
-- **Inspection-verification**: Used when requirements can be verified through review of artifacts
-- **Demonstration-verification**: Used when requirements can be verified by demonstrating functionality
+#### Metadata
+  * type: user-requirement
 
 #### Relations
-  * derivedFrom: [Reserved Subsections Support](StructureAndParsing.md#reserved-subsections-support)
+  * derivedFrom: [Managing System Models](../../UserStories.md#managing-system-models)
+---
+
+### Relation Types and behaviors
+
+The system shall implement relations following clearly defined specifications for types and behaviors.
+
+#### Attachments
+  * [RelationTypes.md](DesignDocuments/RelationTypes.md)
+
+#### Relations
+  * derivedFrom: [Identifiers and Relations](StructureAndParsing.md#identifiers-and-relations)
+  * satisfiedBy: [relation.rs](../../../core/src/relation.rs)
+---
+
+### Element Type Relation Compatibility
+
+The system shall enforce element type constraints for relation types, ensuring that only valid combinations of source and target element types are allowed for each relation type.
+
+#### Details
+The system shall define element type relation compatibility constraints.
+
+#### Attachments
+  * [RelationTypes.md](DesignDocuments/RelationTypes.md)
+
+#### Relations
+  * derivedFrom: [Relation Types and behaviors](#relation-types-and-behaviors)
+  * derivedFrom: [Supported Element Types](#supported-element-types)
+  * satisfiedBy: [Element Type Relation Compatibility Constraint](Refinements.md#element-type-relation-compatibility-constraint)
+  * verifiedBy: [Element Type Relation Compatibility Test](Verifications/ValidationVerifications.md#element-type-relation-compatibility-test)
 ---
 
 ### Supported Element Types
@@ -242,4 +188,58 @@ When a Refinement element contains a Relations subsection, the validator shall r
 #### Relations
   * derivedFrom: [Supported Element Types](#supported-element-types)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
+---
+
+### Template-Based Model Bootstrapping
+
+The system shall enable systems engineers to quickly bootstrap new System models from predefined templates stored in Git repositories, accelerating project initialization and promoting best-practice model structures.
+
+#### Details
+Template Bootstrapping Capabilities
+
+Users can initialize new models using the CLI with templates from Git repositories:
+- Discover available templates within a specified repository
+- Select and apply templates interactively
+- Bootstrap model structure with predefined files, folders, and requirements
+
+Templates are consumed from Git repositories only, with support for repositories containing multiple templates alongside other content.
+
+**Example usage:**
+```bash
+reqvire init --template <github-repo-url>
+```
+
+The system discovers all available templates in the repository and allows the user to select which template to apply.
+
+#### Metadata
+  * type: user-requirement
+
+#### Relations
+  * derivedFrom: [Managing System Models](../../UserStories.md#managing-system-models)
+---
+
+### Verification Type Categories
+
+The system shall support defined verifications categories.
+
+#### Details
+The following verification types are supported:
+
+1. **Default Verification Type**
+   - `verification` - Verification through testing (equivalent to `test-verification`)
+
+2. **Specific Verification Types**
+   - `test-verification` - Explicit verification through testing with documented test procedures
+   - `analysis-verification` - Verification through formal analysis of documentation or code
+   - `inspection-verification` - Verification through formal inspection or review
+   - `demonstration-verification` - Verification through demonstration in a realistic environment
+
+The appropriate verification type should be selected based on the nature of the requirement:
+- **Test-verification**: Used when formal test procedures with expected outcomes are required
+- **Analysis-verification**: Used when requirements can be verified through analysis of documentation or code
+- **Inspection-verification**: Used when requirements can be verified through review of artifacts
+- **Demonstration-verification**: Used when requirements can be verified by demonstrating functionality
+
+#### Relations
+  * derivedFrom: [Reserved Subsections Support](StructureAndParsing.md#reserved-subsections-support)
 ---

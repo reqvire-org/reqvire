@@ -14,9 +14,25 @@ The system shall define industry standards and methodologies to follow.
   * satisfiedBy: [Industry Standards Specification](Refinements.md#industry-standards-specification)
 ---
 
-### Promote Automation and Efficiency
+### Aligning Design with Code
 
-As as **System Engineer**, I would like to reduce manual effort in managing requirements, models, and traceability by automating routine tasks.
+As a **Developer**, I want to align code with System models, so that implementation remains consistent with design specifications.
+
+#### Metadata
+  * type: user-requirement
+---
+
+### Fostering Community Contributions
+
+As a **Contributor**, I want Reqvire tools to be intuitive and well-documented, so that I can contribute effectively to the open-source project.
+
+#### Metadata
+  * type: user-requirement
+---
+
+### Generate Diagrams
+
+As a **System Engineer**, I want to generate diagrams for different system viewpoints, so that I can communicate system architecture effectively and understand dependencies and impacts across the system.
 
 #### Metadata
   * type: user-requirement
@@ -41,14 +57,6 @@ As a **Systems Engineer**, I want to efficiently manage System models using AI-p
   * derivedFrom: [Managing System Models](#managing-system-models)
 ---
 
-### Generate Diagrams
-
-As a **System Engineer**, I want to generate diagrams for different system viewpoints, so that I can communicate system architecture effectively and understand dependencies and impacts across the system.
-
-#### Metadata
-  * type: user-requirement
----
-
 ### Model Export
 
 As a **Manager**, I want to export specifications into diferent formats including HTML, so that I can communicate system architecture effectively.
@@ -70,17 +78,9 @@ This determinism ensures that:
   * type: user-requirement
 ---
 
-### Aligning Design with Code
+### Promote Automation and Efficiency
 
-As a **Developer**, I want to align code with System models, so that implementation remains consistent with design specifications.
-
-#### Metadata
-  * type: user-requirement
----
-
-### Validating Structures
-
-As an **System Engineer**, I want to validate the structure of System models, so that I can ensure compliance with organizational and project standards.
+As as **System Engineer**, I would like to reduce manual effort in managing requirements, models, and traceability by automating routine tasks.
 
 #### Metadata
   * type: user-requirement
@@ -113,9 +113,9 @@ As a **System Engineer**, I want to trace changes in the System model to identif
   * type: user-requirement
 ---
 
-### Fostering Community Contributions
+### Validating Structures
 
-As a **Contributor**, I want Reqvire tools to be intuitive and well-documented, so that I can contribute effectively to the open-source project.
+As an **System Engineer**, I want to validate the structure of System models, so that I can ensure compliance with organizational and project standards.
 
 #### Metadata
   * type: user-requirement

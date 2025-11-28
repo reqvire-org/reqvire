@@ -60,6 +60,30 @@ This test verifies that the system correctly extracts the physical containment h
   * satisfiedBy: [test.sh](../../../../tests/test-containment-view/test.sh)
 ---
 
+### Containment View Design Documents Test
+
+This test verifies that design documents (files in DesignDocuments folders) are correctly included in the containment view output.
+
+#### Test Steps
+1. Create a model with DesignDocuments folder containing markdown files
+2. Run `reqvire containment` command
+3. Verify design documents appear in output grouped by folder
+4. Verify design documents are visually distinguished from elements
+5. In diagram output, verify design document nodes have click handlers
+
+#### Expected Results
+- Design documents are shown under their parent folder
+- Design documents display filename
+- Design documents are styled differently from specification elements
+- Click handlers navigate to document files
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-containment-view/test.sh)
+---
+
 ### Containment View JSON Output Test
 
 This test verifies that the system generates valid, well-structured JSON output for the containment view with correct schema and deterministic ordering.
@@ -382,28 +406,76 @@ This test verifies that the containment view is correctly integrated into HTML e
   * satisfiedBy: [test.sh](../../../../tests/test-containment-view/test.sh)
 ---
 
-### Containment View Design Documents Test
+### Model Command Verification
 
-This test verifies that design documents (files in DesignDocuments folders) are correctly included in the containment view output.
+Comprehensive test verifying model command generates model-centric nested output in different modes.
 
-#### Test Steps
-1. Create a model with DesignDocuments folder containing markdown files
-2. Run `reqvire containment` command
-3. Verify design documents appear in output grouped by folder
-4. Verify design documents are visually distinguished from elements
-5. In diagram output, verify design document nodes have click handlers
+#### Details
 
-#### Expected Results
-- Design documents are shown under their parent folder
-- Design documents display filename
-- Design documents are styled differently from specification elements
-- Click handlers navigate to document files
+##### Acceptance Criteria
+1. `reqvire model` generates model-centric output showing root requirements with nested relations
+2. `reqvire model --from=<name>` generates nested structure starting from specified element
+3. `reqvire model --json` generates valid JSON with nested element structure
+4. `reqvire model --from=<name> --json` generates filtered JSON from specified starting point
+5. Default mode filters to root requirements (no hierarchical parent relations)
+6. Relations contain full target element details recursively
+
+##### Test Criteria
+1. **Default Model Output (Root Requirements)**
+   Command: `reqvire model --json`
+   - exits code **0**
+   - output parses as valid JSON
+   - JSON contains `elements` array with root requirements only at top level
+   - JSON contains `metadata` with total_elements, total_relations, filtered_from (null)
+   - Only requirements without hierarchical parent relations at top level
+   - Nested relations contain full element details recursively
+
+2. **Filtered Model Output (From Specific Element)**
+   Command: `reqvire model --from=<test-element-name> --json`
+   - exits code **0**
+   - output parses as valid JSON
+   - JSON elements array contains specified element at top level
+   - metadata.filtered_from contains element name
+   - Only forward-related elements appear in nested structure
+
+3. **Markdown Output with Mermaid Diagrams**
+   Command: `reqvire model`
+   - exits code **0**
+   - output contains `# Model Structure`
+   - output contains metadata (Total Elements, Total Relations)
+   - output contains Mermaid diagram blocks showing all nested relations
+   - diagrams use hash identifiers for node IDs
+
+4. **Nested JSON Structure Validation**
+   Command: `reqvire model --json`
+   - JSON has keys: `elements`, `metadata`
+   - Each element has: `identifier`, `name`, `element_type`, `file_path`, `section`, `section_index`, `relations`, `attachments`
+   - Each relation has: `relation_type`, target (element/file/external)
+   - Element targets are nested recursively with same structure
+   - File targets have: `path`, `type: "file"`
+   - External targets have: `url`, `type: "external"`
+   - Attachments is an array of file path strings (empty array if no attachments)
+   - Metadata has: `total_elements`, `total_relations`, `filtered_from`
+
+5. **Forward-Only Traversal Verification**
+   - Create test with element A that derives B, and B derives C
+   - Running `reqvire model --from=<A-name>` includes B and C nested in relations
+   - Create element D that is derived from B (backward relation)
+   - Running `reqvire model --from=<A-name>` includes B and C but NOT D
+   - Confirms only forward relations (derive, satisfiedBy, verifiedBy, trace) are followed
+
+6. **Cycle Detection Verification**
+   - System prevents infinite recursion when cycles exist in forward relations
+   - Nested structure handles circular dependencies gracefully
+   - Each element appears at most once in traversal
 
 #### Metadata
   * type: test-verification
 
 #### Relations
-  * satisfiedBy: [test.sh](../../../../tests/test-containment-view/test.sh)
+  * verify: [Forward-Only Relation Traversal](../Reporting.md#forward-only-relation-traversal)
+  * verify: [Model Diagram Output Formats](../Reporting.md#model-diagram-output-formats)
+  * satisfiedBy: [test.sh](../../../../tests/test-model-command/test.sh)
 ---
 
 ### Search Command Tests
@@ -544,76 +616,57 @@ This test verifies that the system provides a unified `search` command functiona
   * satisfiedBy: [test.sh](../../../../tests/test-search-all-features/test.sh)
 ---
 
-### Model Command Verification
+### TraceFlow View Test
 
-Comprehensive test verifying model command generates model-centric nested output in different modes.
+This test verifies that the TraceFlow view page is correctly generated during HTML export with an interactive D3.js Sankey diagram showing verification traceability flow.
 
 #### Details
 
 ##### Acceptance Criteria
-1. `reqvire model` generates model-centric output showing root requirements with nested relations
-2. `reqvire model --from=<name>` generates nested structure starting from specified element
-3. `reqvire model --json` generates valid JSON with nested element structure
-4. `reqvire model --from=<name> --json` generates filtered JSON from specified starting point
-5. Default mode filters to root requirements (no hierarchical parent relations)
-6. Relations contain full target element details recursively
+- System shall generate `traceflow.html` file during HTML export
+- TraceFlow page shall contain D3.js Sankey diagram visualization
+- Sankey diagram shall show flow from user requirements to system requirements to verifications
+- Navigation bar shall include "TraceFlow" link after "Traces"
+- Diagram shall support pan/zoom with mouse wheel and buttons
+- Diagram shall support touch pinch-zoom for mobile devices
+- Clicking nodes shall navigate to element definition pages
+- Page shall include title, description, and usage instructions
 
 ##### Test Criteria
-1. **Default Model Output (Root Requirements)**
-   Command: `reqvire model --json`
+1. **File Generation**
+   Command: `reqvire export --output <dir>`
    - exits code **0**
-   - output parses as valid JSON
-   - JSON contains `elements` array with root requirements only at top level
-   - JSON contains `metadata` with total_elements, total_relations, filtered_from (null)
-   - Only requirements without hierarchical parent relations at top level
-   - Nested relations contain full element details recursively
+   - `traceflow.html` file exists in output directory
+   - file contains valid HTML5
 
-2. **Filtered Model Output (From Specific Element)**
-   Command: `reqvire model --from=<test-element-name> --json`
-   - exits code **0**
-   - output parses as valid JSON
-   - JSON elements array contains specified element at top level
-   - metadata.filtered_from contains element name
-   - Only forward-related elements appear in nested structure
+2. **Navigation Integration**
+   - All HTML files contain "TraceFlow" link in navigation bar
+   - Link positioned after "Traces" and before "Coverage"
+   - Link href is `traceflow.html` (with correct relative prefix)
 
-3. **Markdown Output with Mermaid Diagrams**
-   Command: `reqvire model`
-   - exits code **0**
-   - output contains `# Model Structure`
-   - output contains metadata (Total Elements, Total Relations)
-   - output contains Mermaid diagram blocks showing all nested relations
-   - diagrams use hash identifiers for node IDs
+3. **Sankey Diagram Content**
+   - Page contains D3.js Sankey diagram
+   - Diagram shows requirement flow (user-req → system-req → verification)
+   - Nodes are color-coded by type
+   - Links connect related elements
 
-4. **Nested JSON Structure Validation**
-   Command: `reqvire model --json`
-   - JSON has keys: `elements`, `metadata`
-   - Each element has: `identifier`, `name`, `element_type`, `file_path`, `section`, `section_index`, `relations`, `attachments`
-   - Each relation has: `relation_type`, target (element/file/external)
-   - Element targets are nested recursively with same structure
-   - File targets have: `path`, `type: "file"`
-   - External targets have: `url`, `type: "external"`
-   - Attachments is an array of file path strings (empty array if no attachments)
-   - Metadata has: `total_elements`, `total_relations`, `filtered_from`
+4. **Interactive Features**
+   - Pan/zoom buttons (+/-/reset) are present and functional
+   - Mouse wheel zoom works
+   - Touch pinch-zoom works on mobile
+   - Node click navigates to element page
 
-5. **Forward-Only Traversal Verification**
-   - Create test with element A that derives B, and B derives C
-   - Running `reqvire model --from=<A-name>` includes B and C nested in relations
-   - Create element D that is derived from B (backward relation)
-   - Running `reqvire model --from=<A-name>` includes B and C but NOT D
-   - Confirms only forward relations (derive, satisfiedBy, verifiedBy, trace) are followed
-
-6. **Cycle Detection Verification**
-   - System prevents infinite recursion when cycles exist in forward relations
-   - Nested structure handles circular dependencies gracefully
-   - Each element appears at most once in traversal
+5. **Page Content**
+   - Title: "TraceFlow - Verification Traceability"
+   - Description text explaining the view
+   - Instructions for using the diagram
 
 #### Metadata
   * type: test-verification
 
 #### Relations
-  * verify: [Forward-Only Relation Traversal](../Reporting.md#forward-only-relation-traversal)
-  * verify: [Model Diagram Output Formats](../Reporting.md#model-diagram-output-formats)
-  * satisfiedBy: [test.sh](../../../../tests/test-model-command/test.sh)
+  * verify: [TraceFlow View Report Generation](../Reporting.md#traceflow-view-report-generation)
+  * satisfiedBy: [test.sh](../../../../tests/test-traceflow-view/test.sh)
 ---
 
 ### Verification Coverage Report Test
@@ -828,57 +881,3 @@ This test verifies that the --from-folder option correctly generates relative li
   * verify: [CLI Traces Command](../../../Interfaces/CLI.md#cli-traces-command)
   * satisfiedBy: [test.sh](../../../../tests/test-verification-traces/test.sh)
 ---
-
-### TraceFlow View Test
-
-This test verifies that the TraceFlow view page is correctly generated during HTML export with an interactive D3.js Sankey diagram showing verification traceability flow.
-
-#### Details
-
-##### Acceptance Criteria
-- System shall generate `traceflow.html` file during HTML export
-- TraceFlow page shall contain D3.js Sankey diagram visualization
-- Sankey diagram shall show flow from user requirements to system requirements to verifications
-- Navigation bar shall include "TraceFlow" link after "Traces"
-- Diagram shall support pan/zoom with mouse wheel and buttons
-- Diagram shall support touch pinch-zoom for mobile devices
-- Clicking nodes shall navigate to element definition pages
-- Page shall include title, description, and usage instructions
-
-##### Test Criteria
-1. **File Generation**
-   Command: `reqvire export --output <dir>`
-   - exits code **0**
-   - `traceflow.html` file exists in output directory
-   - file contains valid HTML5
-
-2. **Navigation Integration**
-   - All HTML files contain "TraceFlow" link in navigation bar
-   - Link positioned after "Traces" and before "Coverage"
-   - Link href is `traceflow.html` (with correct relative prefix)
-
-3. **Sankey Diagram Content**
-   - Page contains D3.js Sankey diagram
-   - Diagram shows requirement flow (user-req → system-req → verification)
-   - Nodes are color-coded by type
-   - Links connect related elements
-
-4. **Interactive Features**
-   - Pan/zoom buttons (+/-/reset) are present and functional
-   - Mouse wheel zoom works
-   - Touch pinch-zoom works on mobile
-   - Node click navigates to element page
-
-5. **Page Content**
-   - Title: "TraceFlow - Verification Traceability"
-   - Description text explaining the view
-   - Instructions for using the diagram
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * verify: [TraceFlow View Report Generation](../Reporting.md#traceflow-view-report-generation)
-  * satisfiedBy: [test.sh](../../../../tests/test-traceflow-view/test.sh)
----
-

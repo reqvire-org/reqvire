@@ -94,6 +94,105 @@ The system shall design and implement HTML pages with consistent layout, styling
   * verifiedBy: [HTML Export Verification](Verifications/WebInterfaceVerifications.md#html-export-verification)
 ---
 
+### Attachment Export
+
+The system shall copy all attachment files referenced by elements during HTML export to preserve document completeness and enable navigation.
+
+#### Details
+During HTML export, the system shall:
+- Identify all attachments from element.attachments across the model
+- Copy each attachment file to the output directory preserving relative paths
+- Skip duplicate attachments (same file referenced by multiple elements)
+- Log attachment copying progress
+
+This ensures exported documentation includes all referenced external documents (PDFs, design documents, etc.) for complete offline browsing.
+
+#### Relations
+  * derivedFrom: [HTML Export](#html-export)
+  * satisfiedBy: [export.rs](../../core/src/export.rs)
+  * verifiedBy: [Attachment Export Verification](Verifications/WebInterfaceVerifications.md#attachment-export-verification)
+---
+
+### Containment View Attachment Links
+
+The system shall display attachment links as children of elements in the containment D3.js tree to provide quick access to associated documents.
+
+#### Details
+For each element with attachments:
+- Display attachments as child nodes in the D3.js tree
+- Element attachments use wrench icon (🔧) with type `attachment-element`
+- File attachments use paperclip icon (📎) with type `attachment-file`
+- Element attachments are clickable and navigate to the referenced element
+- File attachments show filename and path for reference
+
+#### Relations
+  * derivedFrom: [HTML Export](#html-export)
+  * satisfiedBy: [containment.rs](../../core/src/containment.rs)
+  * verifiedBy: [Containment Attachment Links Verification](Verifications/WebInterfaceVerifications.md#containment-attachment-links-verification)
+---
+
+### Diagram Attachment Display
+
+The system shall display attachment links within element boxes in generated diagrams to show document associations visually.
+
+#### Details
+In Mermaid diagrams:
+- Element boxes shall include attachment links below the element name
+- Use paperclip icon (📎) prefix for each attachment
+- Show filename only (not full path) for space efficiency
+- Make attachment links clickable to open the document
+- Format using Mermaid's multiline label syntax (`<br/>`)
+
+Example Mermaid node:
+```
+elementId["Element Name<br/>📎 DesignDoc.md"]
+```
+
+#### Attachments
+  * [Mermaid Diagram Style Specification](../System/Output/DesignDocuments/DiagramStyles.md#mermaid-diagram-style-specification)
+
+#### Relations
+  * derivedFrom: [HTML Export](#html-export)
+  * satisfiedBy: [diagrams.rs](../../core/src/diagrams.rs)
+  * verifiedBy: [Diagram Attachment Display Verification](Verifications/WebInterfaceVerifications.md#diagram-attachment-display-verification)
+---
+
+### Model-Centric View Generation
+
+The system shall generate a model-centric visualization during HTML export showing root requirements with nested relations containing full element details.
+
+#### Details
+- Display root requirements (no hierarchical parent) as top-level entries
+- Show relations nested inside elements with full target details recursively
+- Include metadata about total elements and relations
+- Generate mermaid diagrams showing all nested relations
+- Output as markdown with embedded visualizations (model.html)
+
+#### Attachments
+  * [Mermaid Diagram Style Specification](../System/Output/DesignDocuments/DiagramStyles.md#mermaid-diagram-style-specification)
+
+#### Relations
+  * derivedFrom: [HTML Export](#html-export)
+  * satisfiedBy: [export.rs](../../core/src/export.rs)
+  * satisfiedBy: [report_model.rs](../../core/src/report_model.rs)
+---
+
+### Model View Element Navigation
+
+The system shall make element names in the model-centric view clickable links that navigate to the element's definition in its source file.
+
+#### Details
+- Element names displayed as headers shall be hyperlinks
+- Links shall point to the element's source file with fragment identifier
+- Format: `[Element Name](file_path#element-fragment)`
+- Enables direct navigation from model view to element definition
+
+#### Relations
+  * derivedFrom: [Model-Centric View Generation](#model-centric-view-generation)
+  * satisfiedBy: [report_model.rs](../../core/src/report_model.rs)
+  * verifiedBy: [Model View Element Navigation Test](Verifications/WebInterfaceVerifications.md#model-view-element-navigation-test)
+---
+
 ### Web Interface Color Scheme
 
 The system shall implement a consistent color scheme across all HTML pages optimized for MBSE and requirements management applications.
@@ -186,105 +285,6 @@ The containment tree shall use consistent colors for node types:
   * satisfiedBy: [html.rs](../../core/src/html.rs)
   * satisfiedBy: [base.html](../../core/templates/base.html)
   * satisfiedBy: [containment.rs](../../core/src/containment.rs)
----
-
-### Model-Centric View Generation
-
-The system shall generate a model-centric visualization during HTML export showing root requirements with nested relations containing full element details.
-
-#### Details
-- Display root requirements (no hierarchical parent) as top-level entries
-- Show relations nested inside elements with full target details recursively
-- Include metadata about total elements and relations
-- Generate mermaid diagrams showing all nested relations
-- Output as markdown with embedded visualizations (model.html)
-
-#### Attachments
-  * [Mermaid Diagram Style Specification](../System/Output/DesignDocuments/DiagramStyles.md#mermaid-diagram-style-specification)
-
-#### Relations
-  * derivedFrom: [HTML Export](#html-export)
-  * satisfiedBy: [export.rs](../../core/src/export.rs)
-  * satisfiedBy: [report_model.rs](../../core/src/report_model.rs)
----
-
-### Model View Element Navigation
-
-The system shall make element names in the model-centric view clickable links that navigate to the element's definition in its source file.
-
-#### Details
-- Element names displayed as headers shall be hyperlinks
-- Links shall point to the element's source file with fragment identifier
-- Format: `[Element Name](file_path#element-fragment)`
-- Enables direct navigation from model view to element definition
-
-#### Relations
-  * derivedFrom: [Model-Centric View Generation](#model-centric-view-generation)
-  * satisfiedBy: [report_model.rs](../../core/src/report_model.rs)
-  * verifiedBy: [Model View Element Navigation Test](Verifications/WebInterfaceVerifications.md#model-view-element-navigation-test)
----
-
-### Attachment Export
-
-The system shall copy all attachment files referenced by elements during HTML export to preserve document completeness and enable navigation.
-
-#### Details
-During HTML export, the system shall:
-- Identify all attachments from element.attachments across the model
-- Copy each attachment file to the output directory preserving relative paths
-- Skip duplicate attachments (same file referenced by multiple elements)
-- Log attachment copying progress
-
-This ensures exported documentation includes all referenced external documents (PDFs, design documents, etc.) for complete offline browsing.
-
-#### Relations
-  * derivedFrom: [HTML Export](#html-export)
-  * satisfiedBy: [export.rs](../../core/src/export.rs)
-  * verifiedBy: [Attachment Export Verification](Verifications/WebInterfaceVerifications.md#attachment-export-verification)
----
-
-### Containment View Attachment Links
-
-The system shall display attachment links as children of elements in the containment D3.js tree to provide quick access to associated documents.
-
-#### Details
-For each element with attachments:
-- Display attachments as child nodes in the D3.js tree
-- Element attachments use wrench icon (🔧) with type `attachment-element`
-- File attachments use paperclip icon (📎) with type `attachment-file`
-- Element attachments are clickable and navigate to the referenced element
-- File attachments show filename and path for reference
-
-#### Relations
-  * derivedFrom: [HTML Export](#html-export)
-  * satisfiedBy: [containment.rs](../../core/src/containment.rs)
-  * verifiedBy: [Containment Attachment Links Verification](Verifications/WebInterfaceVerifications.md#containment-attachment-links-verification)
----
-
-### Diagram Attachment Display
-
-The system shall display attachment links within element boxes in generated diagrams to show document associations visually.
-
-#### Details
-In Mermaid diagrams:
-- Element boxes shall include attachment links below the element name
-- Use paperclip icon (📎) prefix for each attachment
-- Show filename only (not full path) for space efficiency
-- Make attachment links clickable to open the document
-- Format using Mermaid's multiline label syntax (`<br/>`)
-
-Example Mermaid node:
-```
-elementId["Element Name<br/>📎 DesignDoc.md"]
-```
-
-#### Attachments
-  * [Mermaid Diagram Style Specification](../System/Output/DesignDocuments/DiagramStyles.md#mermaid-diagram-style-specification)
-
-#### Relations
-  * derivedFrom: [HTML Export](#html-export)
-  * satisfiedBy: [diagrams.rs](../../core/src/diagrams.rs)
-  * verifiedBy: [Diagram Attachment Display Verification](Verifications/WebInterfaceVerifications.md#diagram-attachment-display-verification)
 ---
 
 ### Serve Command

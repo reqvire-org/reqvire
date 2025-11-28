@@ -356,7 +356,7 @@ The system shall allow adding IPs to whitelist.
 
 **Reserved Subsections** (`####`):
 - **Metadata**: Element type and custom properties
-- **Relations**: Relationships between elements (NOT allowed for Refinement types)
+- **Relations**: Relationships between elements (Refinement types can only have `satisfy` relations)
 - **Details**: Refinement details (use for EARS statements to group several requirements under same element)
 - **Attachments**: References to files or Refinement elements (NOT allowed for Refinement types)
 

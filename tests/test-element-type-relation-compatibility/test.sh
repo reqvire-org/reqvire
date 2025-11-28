@@ -140,4 +140,19 @@ if [ $EXIT_CODE_TRACE -ne 0 ]; then
   exit 1
 fi
 
+# Test 7: Valid refinement satisfy relations should pass
+echo "Test 7: Valid refinement satisfy relations"
+
+set +e
+OUTPUT_REFINEMENT_SATISFY=$(cd "${TEST_DIR}/valid-refinement-satisfy" && "$REQVIRE_BIN" validate 2>&1)
+EXIT_CODE_REFINEMENT_SATISFY=$?
+set -e
+
+if [ $EXIT_CODE_REFINEMENT_SATISFY -ne 0 ]; then
+  echo "FAILED: Valid refinement satisfy relations should pass validation"
+  echo "Exit code: $EXIT_CODE_REFINEMENT_SATISFY"
+  echo "Output: $OUTPUT_REFINEMENT_SATISFY"
+  exit 1
+fi
+
 exit 0

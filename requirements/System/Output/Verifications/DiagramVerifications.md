@@ -1,5 +1,32 @@
 # Elements
 
+### Automated Documentation Export on PR Merge Verification
+
+This test verifies that the system automatically exports and updates HTML documentation when pull requests are merged to the main branch.
+
+#### Details
+
+##### Acceptance Criteria
+- System should have a GitHub workflow that automatically exports documentation on PR merge
+- The workflow should only be triggered when PRs are merged to the main branch
+- Exported documentation should be committed back to the main branch
+- The commit message should clearly indicate the automated nature of the change
+
+##### Test Criteria
+- Workflow defined in the GitHub workflow configuration correctly
+- Workflow triggers only on PR merge to main branch
+- Workflow correctly checks out code, builds the tool, and exports documentation
+- Workflow commits and pushes changes back to the main branch
+- Commit message is informative and standardized
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [Automated Documentation Export on PR Merge](../../Integration/GitHubIntegration.md#automated-documentation-export-on-pr-merge)
+  * satisfiedBy: [update_docs.yml](../../../../.github/workflows/update_docs.yml)
+---
+
 ### Diagram Generation Test
 
 This test verifies that the HTML export correctly generates and embeds mermaid diagrams for requirements.
@@ -28,59 +55,6 @@ This test verifies that the HTML export correctly generates and embeds mermaid d
 
 #### Relations
   * verify: [Diagram Generation](../DiagramGeneration.md#diagram-generation)
-  * satisfiedBy: [test.sh](../../../../tests/test-diagram-generation/test.sh)
----
-
-### File Diagram Attachment Test
-
-This test verifies that element attachments are displayed within file-based diagram node boxes with clickable links.
-
-#### Test Steps
-1. Create a model with elements that have attachments
-2. Run export or generate-diagrams command
-3. Verify element nodes show attachment filenames with 📎 prefix
-4. Verify attachments appear below element name using `<br/>` separator
-5. Verify attachment links are clickable (click handlers present)
-
-#### Expected Results
-- Elements with attachments show `Element Name<br/>📎 filename.md` format
-- Multiple attachments are each on separate lines
-- Elements without attachments show only their name
-- Click handlers navigate to attachment files
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * verify: [File Diagram Attachment Display](../DiagramGeneration.md#file-diagram-attachment-display)
-  * satisfiedBy: [test.sh](../../../../tests/test-attachment-export/test.sh)
----
-
-### Automated Documentation Export on PR Merge Verification
-
-This test verifies that the system automatically exports and updates HTML documentation when pull requests are merged to the main branch.
-
-#### Details
-
-##### Acceptance Criteria
-- System should have a GitHub workflow that automatically exports documentation on PR merge
-- The workflow should only be triggered when PRs are merged to the main branch
-- Exported documentation should be committed back to the main branch
-- The commit message should clearly indicate the automated nature of the change
-
-##### Test Criteria
-- Workflow defined in the GitHub workflow configuration correctly
-- Workflow triggers only on PR merge to main branch
-- Workflow correctly checks out code, builds the tool, and exports documentation
-- Workflow commits and pushes changes back to the main branch
-- Commit message is informative and standardized
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * verify: [Automated Documentation Export on PR Merge](../../Integration/GitHubIntegration.md#automated-documentation-export-on-pr-merge)
-  * satisfiedBy: [update_docs.yml](../../../../.github/workflows/update_docs.yml)
 ---
 
 ### Diagram Relation Filtering Verification
@@ -108,32 +82,31 @@ This test verifies that the system correctly filters relations in diagram genera
 
 #### Relations
   * verify: [Diagram Generation](../DiagramGeneration.md#diagram-generation)
-  * satisfiedBy: [test.sh](../../../../tests/test-diagram-filtering/test.sh)
 ---
 
-### Visualize Model Relationships Verification
+### File Diagram Attachment Test
 
-This test verifies that the system provides visual representations of relationships within the System model in the generated diagrams.
+This test verifies that element attachments are displayed within file-based diagram node boxes with clickable links.
 
-#### Details
+#### Test Steps
+1. Create a model with elements that have attachments
+2. Run export or generate-diagrams command
+3. Verify element nodes show attachment filenames with 📎 prefix
+4. Verify attachments appear below element name using `<br/>` separator
+5. Verify attachment links are clickable (click handlers present)
 
-##### Acceptance Criteria
-- System should generate diagrams showing relationships between model elements
-- Diagrams should clearly represent different relationship types
-- Visual representation should aid in understanding dependencies between elements
-
-##### Test Criteria
-- Command exits with success (0) return code
-- Generated diagrams contain all expected relationship types
-- Relationships are visually differentiated based on their type
-- Element dependencies are clearly displayed in the diagrams
+#### Expected Results
+- Elements with attachments show `Element Name<br/>📎 filename.md` format
+- Multiple attachments are each on separate lines
+- Elements without attachments show only their name
+- Click handlers navigate to attachment files
 
 #### Metadata
   * type: test-verification
 
 #### Relations
-  * verify: [Diagram Generation](../DiagramGeneration.md#diagram-generation)
-  * satisfiedBy: [test.sh](../../../../tests/test-diagram-generation/test.sh)
+  * verify: [File Diagram Attachment Display](../DiagramGeneration.md#file-diagram-attachment-display)
+  * satisfiedBy: [test.sh](../../../../tests/test-attachment-export/test.sh)
 ---
 
 ### Remove Generated Diagrams Verification
@@ -166,4 +139,28 @@ This test verifies that the internal diagram removal functionality can remove al
 
 #### Relations
   * verify: [Diagram Removal](../DiagramGeneration.md#diagram-removal)
+---
+
+### Visualize Model Relationships Verification
+
+This test verifies that the system provides visual representations of relationships within the System model in the generated diagrams.
+
+#### Details
+
+##### Acceptance Criteria
+- System should generate diagrams showing relationships between model elements
+- Diagrams should clearly represent different relationship types
+- Visual representation should aid in understanding dependencies between elements
+
+##### Test Criteria
+- Command exits with success (0) return code
+- Generated diagrams contain all expected relationship types
+- Relationships are visually differentiated based on their type
+- Element dependencies are clearly displayed in the diagrams
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [Diagram Generation](../DiagramGeneration.md#diagram-generation)
 ---

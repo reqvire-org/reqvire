@@ -464,8 +464,7 @@ impl GraphRegistry {
     }
 
     /// Validate Refinement element constraints
-    /// Refinement elements (constraint, behavior, specification) cannot define relations themselves,
-    /// but can be targets of satisfiedBy relations from requirements.
+    /// Refinement elements (constraint, behavior, specification) can only have satisfy relations.
     fn validate_refinement_elements(&self) -> Result<Vec<ReqvireError>, ReqvireError> {
         debug!("Validating Refinement element constraints...");
         let mut errors = Vec::new();
@@ -475,18 +474,23 @@ impl GraphRegistry {
 
             // Check if this is a Refinement element type
             if element.element_type.is_refinement() {
-                // Refinement elements cannot have user-created relations
-                let user_relations: Vec<_> = element.relations.iter()
+                // Refinement elements can only have satisfy relations
+                let invalid_relations: Vec<_> = element.relations.iter()
                     .filter(|r| r.user_created)
+                    .filter(|r| r.relation_type.name.to_lowercase() != "satisfy")
                     .collect();
 
-                if !user_relations.is_empty() {
+                if !invalid_relations.is_empty() {
+                    let invalid_types: Vec<_> = invalid_relations.iter()
+                        .map(|r| &r.relation_type.name)
+                        .collect();
                     errors.push(ReqvireError::InvalidMarkdownStructure(
                         format!(
-                            "File {}: Refinement element '{}' (type: {}) cannot define relations. Refinement elements can only be targets of satisfiedBy relations from requirements.",
+                            "File {}: Refinement element '{}' (type: {}) can only have satisfy relations. Invalid relations: {:?}",
                             element.file_path,
                             element.name,
-                            element.element_type.as_str()
+                            element.element_type.as_str(),
+                            invalid_types
                         ),
                     ));
                 }

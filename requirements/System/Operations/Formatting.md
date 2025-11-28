@@ -1,5 +1,14 @@
 # Elements
 
+### File Pattern Exclusion for Format
+
+The system shall respect configured excluded filename patterns when performing formatting operations, ensuring that files intentionally excluded from processing do not receive inappropriate formatting suggestions.
+
+#### Relations
+  * derivedFrom: [Ignoring Unstructured Documents](../Core/Configuration.md#ignoring-unstructured-documents)
+  * satisfiedBy: [utils.rs](../../../core/src/utils.rs)
+---
+
 ### Model Formatting
 
 The system shall provide formatting capabilities to normalize and standardize System models for consistency and readability.
@@ -115,13 +124,4 @@ The system shall replace absolute links with relative links, where applicable an
 #### Relations
   * derivedFrom: [Model Formatting](#model-formatting)
   * verifiedBy: [Format Command Requirements Verification](Verifications/FormattingVerifications.md#format-command-requirements-verification)
----
-
-### File Pattern Exclusion for Format
-
-The system shall respect configured excluded filename patterns when performing formatting operations, ensuring that files intentionally excluded from processing do not receive inappropriate formatting suggestions.
-
-#### Relations
-  * derivedFrom: [Ignoring Unstructured Documents](../Core/Configuration.md#ignoring-unstructured-documents)
-  * satisfiedBy: [utils.rs](../../../core/src/utils.rs)
 ---

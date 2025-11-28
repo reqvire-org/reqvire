@@ -332,7 +332,7 @@ pub fn is_satisfaction_relation(rtype: &RelationTypeInfo) -> bool {
 /// - satisfiedBy: Source must be requirement or test-verification, target must be file
 /// - satisfy: Inverse of satisfiedBy (auto-generated)
 /// - trace: Any non-refinement element type can use trace
-/// - Refinement types (constraint, behavior, specification): Cannot have any relations
+/// - Refinement types (constraint, behavior, specification): Can only have satisfy relations
 /// - Other type: Can only use trace relations
 pub fn validate_relation_element_types(
     relation_type: &str,
@@ -391,7 +391,7 @@ pub fn validate_relation_element_types(
         },
         "satisfy" => {
             // Source should be a file/implementation or refinement, target should be a requirement or test-verification
-            // Note: satisfy from refinements is auto-generated, refinements cannot define relations themselves
+            // Refinement elements can explicitly define satisfy relations to requirements
             let source_valid = matches!(source_type, ElementType::File | ElementType::Other(_) | ElementType::Refinement(_));
             let target_valid = match target_type {
                 ElementType::Requirement(_) => true,

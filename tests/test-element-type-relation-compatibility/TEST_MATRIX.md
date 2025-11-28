@@ -77,7 +77,17 @@ Based on the Element Type Relation Compatibility specification, the following te
 | behavior | requirement | ❌ FAIL | invalid-refinement/behavior-trace |
 | specification | requirement | ❌ FAIL | invalid-refinement/specification-trace |
 
-## Refinement Type Tests (No Relations Allowed)
+## Refinement Type Tests (Only satisfy Allowed)
+
+### Valid Refinement Relations
+
+| Element Type | Relation | Target Type | Expected | Test Case |
+|--------------|----------|-------------|----------|-----------|
+| constraint | satisfy | requirement | ✅ PASS | valid-refinement-satisfy/constraint-satisfy |
+| behavior | satisfy | requirement | ✅ PASS | valid-refinement-satisfy/behavior-satisfy |
+| specification | satisfy | user-requirement | ✅ PASS | valid-refinement-satisfy/specification-satisfy |
+
+### Invalid Refinement Relations
 
 | Element Type | Any Relation | Expected | Test Case |
 |--------------|--------------|----------|-----------|
@@ -97,5 +107,5 @@ Based on the Element Type Relation Compatibility specification, the following te
 | verifiedBy | 6 | 3 | 3 |
 | verify | 4 | 2 | 2 |
 | trace | 9 | 6 | 3 |
-| Refinement | 6 | 0 | 6 |
-| **TOTAL** | **49** | **21** | **28** |
+| Refinement | 9 | 3 | 6 |
+| **TOTAL** | **52** | **24** | **28** |

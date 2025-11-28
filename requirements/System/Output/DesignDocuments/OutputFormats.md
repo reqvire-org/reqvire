@@ -1,5 +1,91 @@
 # Elements
 
+### Color Scheme Specification
+
+Color coding for terminal and HTML output.
+
+#### Details
+**Terminal Colors (ANSI):**
+| Color | Meaning | Usage |
+|-------|---------|-------|
+| Red | Error | Validation errors, failed operations |
+| Yellow | Warning | Lint issues needing review, deprecations |
+| Green | Success | Added content, passed checks |
+| Cyan | Info | Element names, identifiers |
+| White/Default | Normal | Regular content |
+
+**HTML Export Colors:**
+| Element | Hex | Usage |
+|---------|-----|-------|
+| Requirement | #D0E0FF | Requirement elements |
+| Verification | #FFF7B3 | Verification elements |
+| Implementation | #DFFFD0 | satisfiedBy targets |
+| File node | #B8860B | File containers |
+| Folder node | #4A90D9 | Folder containers |
+
+#### Metadata
+  * type: specification
+---
+
+### Diff Output Format Specification
+
+Git-style diff format for change previews.
+
+#### Details
+**Used by commands:** format, lint, add, rm, mv, rename, mv-file, change-impact
+
+**Format:**
+```diff
+--- a/<file_path>
++++ b/<file_path>
+@@ -<old_start>,<old_count> +<new_start>,<new_count> @@
+-<removed line>
++<added line>
+ <context line>
+```
+
+**Colors:**
+- Red: Removed lines (-)
+- Green: Added lines (+)
+- Cyan: Hunk headers (@@)
+- White: Context lines
+
+**Context:**
+- Show 3 lines before and after changes
+- Collapse large unchanged sections
+
+#### Metadata
+  * type: specification
+---
+
+### Error Message Format Specification
+
+Structure for error and warning messages.
+
+#### Details
+**Format:**
+```
+<file_path>:<line_number>: <level>: <message>
+  <context_line>
+  ^--- <pointer to issue>
+```
+
+**Fields:**
+- `file_path`: Git-root-relative path
+- `line_number`: 1-based line number
+- `level`: error | warning | info
+- `message`: Concise description
+- `context_line`: Source line (optional)
+- `suggestion`: How to fix (optional)
+
+**Grouping:**
+- Group errors by file
+- Sort by line number within file
+
+#### Metadata
+  * type: specification
+---
+
 ### JSON Output Structure
 
 Standard JSON output structure for CLI commands that support the `--json` flag.
@@ -25,6 +111,42 @@ JSON output conventions:
 - Error responses include `error` field with message
 - Successful responses omit error field entirely
 - Exit code accompanies JSON (0=success, non-zero=error)
+
+#### Metadata
+  * type: specification
+---
+
+### Markdown Report Style Specification
+
+Style guidelines for markdown text report output (model, coverage, traces, containment commands).
+
+#### Details
+**Document Structure:**
+- Title as H1 header
+- Major sections as H2 headers
+- Subsections as H3 headers
+- Element listings as bullet points or tables
+
+**Formatting Conventions:**
+- Element names in backticks: `Element Name`
+- File paths in backticks: `path/to/file.md`
+- Identifiers in backticks: `file.md#element-id`
+- Relation types in bold: **derivedFrom**, **verifiedBy**
+- Counts and percentages: `15 (75%)`
+
+**Tables:**
+- Use markdown tables for structured data
+- Align columns appropriately (left for text, right for numbers)
+- Include header row with separator
+
+**Lists:**
+- Hierarchical bullet lists for tree structures
+- Numbered lists for sequential steps
+- Indentation shows nesting (2 spaces per level)
+
+**Code Blocks:**
+- Mermaid diagrams in ```mermaid blocks
+- JSON output in ```json blocks
 
 #### Metadata
   * type: specification
@@ -84,128 +206,6 @@ Default text output (when neither `--json` nor other format flags specified):
 - Deterministic ordering (alphabetical by identifier)
 - Consistent spacing and alignment
 - No trailing whitespace
-
-#### Metadata
-  * type: specification
----
-
-### Color Scheme Specification
-
-Color coding for terminal and HTML output.
-
-#### Details
-**Terminal Colors (ANSI):**
-| Color | Meaning | Usage |
-|-------|---------|-------|
-| Red | Error | Validation errors, failed operations |
-| Yellow | Warning | Lint issues needing review, deprecations |
-| Green | Success | Added content, passed checks |
-| Cyan | Info | Element names, identifiers |
-| White/Default | Normal | Regular content |
-
-**HTML Export Colors:**
-| Element | Hex | Usage |
-|---------|-----|-------|
-| Requirement | #D0E0FF | Requirement elements |
-| Verification | #FFF7B3 | Verification elements |
-| Implementation | #DFFFD0 | satisfiedBy targets |
-| File node | #B8860B | File containers |
-| Folder node | #4A90D9 | Folder containers |
-
-#### Metadata
-  * type: specification
----
-
-### Error Message Format Specification
-
-Structure for error and warning messages.
-
-#### Details
-**Format:**
-```
-<file_path>:<line_number>: <level>: <message>
-  <context_line>
-  ^--- <pointer to issue>
-```
-
-**Fields:**
-- `file_path`: Git-root-relative path
-- `line_number`: 1-based line number
-- `level`: error | warning | info
-- `message`: Concise description
-- `context_line`: Source line (optional)
-- `suggestion`: How to fix (optional)
-
-**Grouping:**
-- Group errors by file
-- Sort by line number within file
-
-#### Metadata
-  * type: specification
----
-
-### Diff Output Format Specification
-
-Git-style diff format for change previews.
-
-#### Details
-**Used by commands:** format, lint, add, rm, mv, rename, mv-file, change-impact
-
-**Format:**
-```diff
---- a/<file_path>
-+++ b/<file_path>
-@@ -<old_start>,<old_count> +<new_start>,<new_count> @@
--<removed line>
-+<added line>
- <context line>
-```
-
-**Colors:**
-- Red: Removed lines (-)
-- Green: Added lines (+)
-- Cyan: Hunk headers (@@)
-- White: Context lines
-
-**Context:**
-- Show 3 lines before and after changes
-- Collapse large unchanged sections
-
-#### Metadata
-  * type: specification
----
-
-### Markdown Report Style Specification
-
-Style guidelines for markdown text report output (model, coverage, traces, containment commands).
-
-#### Details
-**Document Structure:**
-- Title as H1 header
-- Major sections as H2 headers
-- Subsections as H3 headers
-- Element listings as bullet points or tables
-
-**Formatting Conventions:**
-- Element names in backticks: `Element Name`
-- File paths in backticks: `path/to/file.md`
-- Identifiers in backticks: `file.md#element-id`
-- Relation types in bold: **derivedFrom**, **verifiedBy**
-- Counts and percentages: `15 (75%)`
-
-**Tables:**
-- Use markdown tables for structured data
-- Align columns appropriately (left for text, right for numbers)
-- Include header row with separator
-
-**Lists:**
-- Hierarchical bullet lists for tree structures
-- Numbered lists for sequential steps
-- Indentation shows nesting (2 spaces per level)
-
-**Code Blocks:**
-- Mermaid diagrams in ```mermaid blocks
-- JSON output in ```json blocks
 
 #### Metadata
   * type: specification

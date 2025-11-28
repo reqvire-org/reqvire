@@ -18,6 +18,48 @@ The system shall only parse markdown files that are identified as specification 
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
 ---
 
+### Structure and Addressing in Markdown Documents
+
+The system shall implement semi-structured markdown format specifications that defines the structure, rules, and usage of **Elements**, **Subsections**, **Relations**, and **Identifiers** in Markdown (`.md`) documents following clearly defined specifications.
+
+#### Attachments
+  * [MarkdownStructure.md](DesignDocuments/MarkdownStructure.md)
+
+#### Relations
+  * derivedFrom: [Managing System Models](../../UserStories.md#managing-system-models)
+  * satisfiedBy: [relation.rs](../../../core/src/relation.rs)
+  * satisfiedBy: [element.rs](../../../core/src/element.rs)
+  * satisfiedBy: [subsection.rs](../../../core/src/subsection.rs)
+  * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
+  * satisfiedBy: [model.rs](../../../core/src/model.rs)
+---
+
+### Element Identity Model
+
+The system shall distinguish between element identity (ID) and element addressing (identifier) to support stable element tracking independent of file location.
+
+#### Attachments
+  * [ElementIdentity.md](DesignDocuments/ElementIdentity.md)
+
+#### Relations
+  * derivedFrom: [Structure and Addressing in Markdown Documents](#structure-and-addressing-in-markdown-documents)
+  * satisfiedBy: [element.rs](../../../core/src/element.rs)
+  * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
+---
+
+### Identifiers and Relations
+
+The system shall implement  **Identifiers** and **Relations** following clearly defined specifications to ensure consistency, validity, and efficient querying and manipulation of these entities.
+
+#### Attachments
+  * [IdentifiersAndRelations.md](DesignDocuments/IdentifiersAndRelations.md)
+
+#### Relations
+  * derivedFrom: [Element Identity Model](#element-identity-model)
+  * derivedFrom: [AI-Assisted System Model Management](../../UserStories.md#ai-assisted-system-model-management)
+  * satisfiedBy: [relation.rs](../../../core/src/relation.rs)
+---
+
 ### Reserved Subsections Support
 
 The system shall support the following reserved subsections with predefined structure and behavior: Relations, Details, Metadata, and Attachments.
@@ -65,47 +107,5 @@ This validation ensures that attachments either reference existing files or vali
 #### Relations
   * derivedFrom: [Reserved Subsections Support](#reserved-subsections-support)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
-  * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
----
-
-### Structure and Addressing in Markdown Documents
-
-The system shall implement semi-structured markdown format specifications that defines the structure, rules, and usage of **Elements**, **Subsections**, **Relations**, and **Identifiers** in Markdown (`.md`) documents following clearly defined specifications.
-
-#### Attachments
-  * [MarkdownStructure.md](DesignDocuments/MarkdownStructure.md)
-
-#### Relations
-  * derivedFrom: [Managing System Models](../../UserStories.md#managing-system-models)
-  * satisfiedBy: [relation.rs](../../../core/src/relation.rs)
-  * satisfiedBy: [element.rs](../../../core/src/element.rs)
-  * satisfiedBy: [subsection.rs](../../../core/src/subsection.rs)
-  * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
-  * satisfiedBy: [model.rs](../../../core/src/model.rs)
----
-
-### Identifiers and Relations
-
-The system shall implement  **Identifiers** and **Relations** following clearly defined specifications to ensure consistency, validity, and efficient querying and manipulation of these entities.
-
-#### Attachments
-  * [IdentifiersAndRelations.md](DesignDocuments/IdentifiersAndRelations.md)
-
-#### Relations
-  * derivedFrom: [Element Identity Model](#element-identity-model)
-  * derivedFrom: [AI-Assisted System Model Management](../../UserStories.md#ai-assisted-system-model-management)
-  * satisfiedBy: [relation.rs](../../../core/src/relation.rs)
----
-
-### Element Identity Model
-
-The system shall distinguish between element identity (ID) and element addressing (identifier) to support stable element tracking independent of file location.
-
-#### Attachments
-  * [ElementIdentity.md](DesignDocuments/ElementIdentity.md)
-
-#### Relations
-  * derivedFrom: [Structure and Addressing in Markdown Documents](#structure-and-addressing-in-markdown-documents)
-  * satisfiedBy: [element.rs](../../../core/src/element.rs)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
 ---

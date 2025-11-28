@@ -46,29 +46,78 @@ This test verifies that the system assigns the default type 'requirement' to all
   * satisfiedBy: [test.sh](../../../../tests/test-default-type-assignment/test.sh)
 ---
 
-### Same-File Fragment Relations Test
+### Element Type Relation Compatibility Test
 
-This test verifies that Reqvire correctly handles and validates relations to fragments within the same file.
+This test verifies that the system correctly validates relation types based on element type constraints defined in the Element Type Relation Compatibility matrix.
 
 #### Details
 
 ##### Acceptance Criteria
-- System should correctly validate relations to fragments within the same file
-- System should not report errors for valid fragment references
-- System should handle both fragment-only references like "#fragment-id" and proper element IDs
+**derivedFrom/derive Validation:**
+- System shall allow `derivedFrom` relations only between requirement types (`requirement`, `user-requirement`)
+- System shall reject `derivedFrom` relations where source is a verification element
+- System shall reject `derivedFrom` relations where target is a verification element
+- System shall reject `derivedFrom` relations where source is `other` type
+- System shall provide clear error message indicating element type incompatibility
+
+**satisfiedBy/satisfy Validation:**
+- System shall allow `satisfiedBy` relations from requirement types to implementation files
+- System shall allow `satisfiedBy` relations from `test-verification` to test implementation files
+- System shall reject `satisfiedBy` relations from `analysis-verification`, `inspection-verification`, `demonstration-verification` elements
+- System shall provide clear error message for non-test-verification elements using satisfiedBy
+
+**verifiedBy/verify Validation:**
+- System shall allow `verifiedBy` relations from requirement types to any verification type
+- System shall allow `verify` relations from any verification type to requirement types
+- System shall reject `verifiedBy` relations from verification elements
+- System shall reject `verify` relations to non-requirement elements
+
+**Refinement Type Validation:**
+- System shall allow `satisfy` relations on `constraint` type elements pointing to requirements
+- System shall allow `satisfy` relations on `behavior` type elements pointing to requirements
+- System shall allow `satisfy` relations on `specification` type elements pointing to requirements
+- System shall reject all other relation types on refinement elements (derivedFrom, verifiedBy, trace, satisfiedBy)
+- System shall provide clear error message indicating refinement types can only have satisfy relations
+
+**trace Relation Validation:**
+- System shall allow `trace` relations for any non-refinement element type
+- System shall allow `trace` relations to any target type
 
 ##### Test Criteria
-- Command exits with success (zero) return code
-- No error output about missing relation targets when using #fragment references
-- Successful validation message is displayed
+1. **derivedFrom type constraint tests:**
+   - Create requirement with `derivedFrom` to another requirement - PASS
+   - Create verification with `derivedFrom` to requirement - FAIL with type error
+   - Create requirement with `derivedFrom` to verification - FAIL with type error
+   - Verify error message includes element types and constraint explanation
+
+2. **satisfiedBy type constraint tests:**
+   - Create requirement with `satisfiedBy` to implementation file - PASS
+   - Create test-verification with `satisfiedBy` to test file - PASS
+   - Create analysis-verification with `satisfiedBy` to file - FAIL with type error
+   - Verify error message indicates only test-verification can use satisfiedBy
+
+3. **Refinement type relation tests:**
+   - Create constraint element with `satisfy` relation to requirement - PASS
+   - Create behavior element with `satisfy` relation to requirement - PASS
+   - Create specification element with `satisfy` relation to requirement - PASS
+   - Create constraint element with `trace` relation - FAIL with error
+   - Create behavior element with `derivedFrom` relation - FAIL with error
+   - Create specification element with `satisfiedBy` relation - FAIL with error
+   - Verify error messages indicate refinement types can only have satisfy relations
+
+4. **trace relation permissiveness tests:**
+   - Create requirement with `trace` to verification - PASS
+   - Create verification with `trace` to requirement - PASS
+   - Create verification with `trace` to other verification - PASS
+   - Verify trace relations do not trigger type compatibility errors
 
 #### Metadata
   * type: test-verification
 
 #### Relations
-  * verify: [Relation Type Validation](../Validation.md#relation-type-validation)
-  * verify: [Requirements Processing](../Configuration.md#requirements-processing)
-  * satisfiedBy: [test.sh](../../../../tests/test-fragment-relations/test.sh)
+  * verify: [Relation Element Type Validator](../Validation.md#relation-element-type-validator)
+  * verify: [Element Type Relation Compatibility](../ModelManagement.md#element-type-relation-compatibility)
+  * satisfiedBy: [test.sh](../../../../tests/test-element-type-relation-compatibility/test.sh)
 ---
 
 ### File Exclusion Test
@@ -149,6 +198,35 @@ This test verifies that Reqvire correctly reads and applies exclusion patterns f
   * satisfiedBy: [test.sh](../../../../tests/test-gitignore-integration/test.sh)
 ---
 
+### Invalid Header Structure Test
+
+This test verifies that Reqvire correctly detects and reports invalid header structures in elements, specifically level 5+ headers appearing outside of Details subsections.
+
+#### Details
+
+##### Acceptance Criteria
+- System SHALL detect level 5+ headers (`#####`) appearing before reserved subsections (`#### Metadata`, `#### Relations`, `#### Details`)
+- System SHALL allow level 5+ headers only within `#### Details` subsection
+- System SHALL provide clear error messages indicating the invalid header structure with file and line number
+- Error message SHALL specify that level 5+ headers can only appear inside Details subsection
+- Validation SHALL fail when invalid header structure is detected
+
+##### Test Criteria
+- Command exits with non-zero error code when invalid header structure is found
+- Error output contains specific error message about invalid header level
+- Error message includes element name, file path, and line number
+- Valid elements with level 5+ headers inside Details subsection pass validation
+- Elements with level 5+ headers before reserved subsections fail validation
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [Markdown Structure Validator](../Validation.md#markdown-structure-validator)
+  * verify: [Structure and Addressing in Markdown Documents](../StructureAndParsing.md#structure-and-addressing-in-markdown-documents)
+  * satisfiedBy: [test.sh](../../../../tests/test-invalid-relations/test.sh)
+---
+
 ### Invalid Relations Test
 
 This verification test checks that Reqvire correctly identifies and reports invalid relations using the two-pass validation architecture, separating parsing errors (Pass 1) from relation validation errors (Pass 2). The test also verifies the validate command functionality.
@@ -210,61 +288,6 @@ This verification test checks that Reqvire correctly identifies and reports inva
   * satisfiedBy: [test.sh](../../../../tests/test-invalid-relations/test.sh)
 ---
 
-### Invalid Header Structure Test
-
-This test verifies that Reqvire correctly detects and reports invalid header structures in elements, specifically level 5+ headers appearing outside of Details subsections.
-
-#### Details
-
-##### Acceptance Criteria
-- System SHALL detect level 5+ headers (`#####`) appearing before reserved subsections (`#### Metadata`, `#### Relations`, `#### Details`)
-- System SHALL allow level 5+ headers only within `#### Details` subsection
-- System SHALL provide clear error messages indicating the invalid header structure with file and line number
-- Error message SHALL specify that level 5+ headers can only appear inside Details subsection
-- Validation SHALL fail when invalid header structure is detected
-
-##### Test Criteria
-- Command exits with non-zero error code when invalid header structure is found
-- Error output contains specific error message about invalid header level
-- Error message includes element name, file path, and line number
-- Valid elements with level 5+ headers inside Details subsection pass validation
-- Elements with level 5+ headers before reserved subsections fail validation
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * verify: [Markdown Structure Validator](../Validation.md#markdown-structure-validator)
-  * verify: [Structure and Addressing in Markdown Documents](../StructureAndParsing.md#structure-and-addressing-in-markdown-documents)
-  * satisfiedBy: [test.sh](../../../../tests/test-invalid-relations/test.sh)
----
-
-### Unstructured Documents Test
-
-This test verifies that the system correctly validates relations to excluded files.
-
-#### Details
-
-##### Acceptance Criteria
-- System shall allow referencing unstructured documents (text files, code files)
-- System shall not attempt to parse unstructured documents as requirements
-- System shall validate that referenced unstructured documents exist
-- System shall not report validation errors for valid references to unstructured documents
-
-##### Test Criteria
-- Relations referencing unstructured documents are treated as valid
-- No attempt is made to extract elements from unstructured documents
-- Validation succeeds when referenced unstructured documents exist
-- Validation fails when referenced unstructured documents don't exist
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * verify: [Excluded File Relation Validation](../Validation.md#excluded-file-relation-validation)
-  * satisfiedBy: [test.sh](../../../../tests/test-valid-relations/test.sh)
----
-
 ### Requirements Files Search and Detection Test
 
 This test verifies that the system correctly searches for and detects structured document files according to specified patterns.
@@ -291,77 +314,29 @@ This test verifies that the system correctly searches for and detects structured
   * satisfiedBy: [test.sh](../../../../tests/test-excluded-patterns/test.sh)
 ---
 
-### Element Type Relation Compatibility Test
+### Same-File Fragment Relations Test
 
-This test verifies that the system correctly validates relation types based on element type constraints defined in the Element Type Relation Compatibility matrix.
+This test verifies that Reqvire correctly handles and validates relations to fragments within the same file.
 
 #### Details
 
 ##### Acceptance Criteria
-**derivedFrom/derive Validation:**
-- System shall allow `derivedFrom` relations only between requirement types (`requirement`, `user-requirement`)
-- System shall reject `derivedFrom` relations where source is a verification element
-- System shall reject `derivedFrom` relations where target is a verification element
-- System shall reject `derivedFrom` relations where source is `other` type
-- System shall provide clear error message indicating element type incompatibility
-
-**satisfiedBy/satisfy Validation:**
-- System shall allow `satisfiedBy` relations from requirement types to implementation files
-- System shall allow `satisfiedBy` relations from `test-verification` to test implementation files
-- System shall reject `satisfiedBy` relations from `analysis-verification`, `inspection-verification`, `demonstration-verification` elements
-- System shall provide clear error message for non-test-verification elements using satisfiedBy
-
-**verifiedBy/verify Validation:**
-- System shall allow `verifiedBy` relations from requirement types to any verification type
-- System shall allow `verify` relations from any verification type to requirement types
-- System shall reject `verifiedBy` relations from verification elements
-- System shall reject `verify` relations to non-requirement elements
-
-**Refinement Type Validation:**
-- System shall reject Relations subsection on `constraint` type elements
-- System shall reject Relations subsection on `behavior` type elements
-- System shall reject Relations subsection on `specification` type elements
-- System shall provide clear error message indicating refinement types cannot have relations
-
-**trace Relation Validation:**
-- System shall allow `trace` relations for any non-refinement element type
-- System shall allow `trace` relations to any target type
+- System should correctly validate relations to fragments within the same file
+- System should not report errors for valid fragment references
+- System should handle both fragment-only references like "#fragment-id" and proper element IDs
 
 ##### Test Criteria
-1. **derivedFrom type constraint tests:**
-   - Create requirement with `derivedFrom` to another requirement - PASS
-   - Create verification with `derivedFrom` to requirement - FAIL with type error
-   - Create requirement with `derivedFrom` to verification - FAIL with type error
-   - Verify error message includes element types and constraint explanation
-
-2. **satisfiedBy type constraint tests:**
-   - Create requirement with `satisfiedBy` to implementation file - PASS
-   - Create test-verification with `satisfiedBy` to test file - PASS
-   - Create analysis-verification with `satisfiedBy` to file - FAIL with type error
-   - Verify error message indicates only test-verification can use satisfiedBy
-
-3. **Refinement type relation rejection tests:**
-   - Create constraint element with Relations subsection (trace) - FAIL with error
-   - Create behavior element with Relations subsection (trace) - FAIL with error
-   - Create specification element with Relations subsection (trace) - FAIL with error
-   - Create constraint element with derivedFrom relation - FAIL with error
-   - Create behavior element with derivedFrom relation - FAIL with error
-   - Create specification element with derivedFrom relation - FAIL with error
-   - Verify error messages indicate refinement types cannot have relations
-
-4. **trace relation permissiveness tests:**
-   - Create requirement with `trace` to verification - PASS
-   - Create verification with `trace` to requirement - PASS
-   - Create verification with `trace` to other verification - PASS
-   - Verify trace relations do not trigger type compatibility errors
+- Command exits with success (zero) return code
+- No error output about missing relation targets when using #fragment references
+- Successful validation message is displayed
 
 #### Metadata
   * type: test-verification
 
 #### Relations
-  * verify: [Relation Element Type Validator](../Validation.md#relation-element-type-validator)
-  * verify: [Element Type Relation Compatibility](../ModelManagement.md#element-type-relation-compatibility)
-  * satisfiedBy: [test.sh](../../../../tests/test-element-type-relation-compatibility/test.sh)
+  * verify: [Relation Type Validation](../Validation.md#relation-type-validation)
+  * verify: [Requirements Processing](../Configuration.md#requirements-processing)
+  * satisfiedBy: [test.sh](../../../../tests/test-fragment-relations/test.sh)
 ---
 
 ### Subdirectory Processing Verification
@@ -399,4 +374,30 @@ This test verifies that the system correctly processes only files within the cur
   * verify: [CLI Move Element Command](../../../Interfaces/CLI.md#cli-move-element-command)
   * verify: [CLI Move File Command](../../../Interfaces/CLI.md#cli-move-file-command)
   * satisfiedBy: [test.sh](../../../../tests/test-subdirectory-functionality/test.sh)
+---
+
+### Unstructured Documents Test
+
+This test verifies that the system correctly validates relations to excluded files.
+
+#### Details
+
+##### Acceptance Criteria
+- System shall allow referencing unstructured documents (text files, code files)
+- System shall not attempt to parse unstructured documents as requirements
+- System shall validate that referenced unstructured documents exist
+- System shall not report validation errors for valid references to unstructured documents
+
+##### Test Criteria
+- Relations referencing unstructured documents are treated as valid
+- No attempt is made to extract elements from unstructured documents
+- Validation succeeds when referenced unstructured documents exist
+- Validation fails when referenced unstructured documents don't exist
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [Excluded File Relation Validation](../Validation.md#excluded-file-relation-validation)
+  * satisfiedBy: [test.sh](../../../../tests/test-valid-relations/test.sh)
 ---

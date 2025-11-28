@@ -1,35 +1,5 @@
 # Elements
 
-### Element Manipulation File Persistence
-
-The system shall persist all element manipulation operations to the source files in storage, synchronizing changes from the in-memory model to the file system and reordering elements following the Element Ordering Behavior.
-
-#### Attachments
-  * [File Persistence Behavior](Refinements.md#file-persistence-behavior)
-  * [Element Ordering Behavior](Refinements.md#element-ordering-behavior)
-
-#### Relations
-  * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
-  * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
-  * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
----
-
-### Target Location Validation and Auto-Creation
-
-The system shall validate target file paths for element manipulation operations and automatically create files when they do not exist, subject to path safety constraints.
-
-#### Details
-The system shall define target location validation constraints.
-
-#### Relations
-  * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
-  * derivedFrom: [Ignore Files Integration](../Core/Configuration.md#ignore-files-integration)
-  * derivedFrom: [Git Repository as Project Root](../Core/ModelManagement.md#git-repository-as-project-root)
-  * satisfiedBy: [Target Location Constraint](Refinements.md#target-location-constraint)
-  * satisfiedBy: [utils.rs](../../../core/src/utils.rs)
-  * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
----
-
 ### Create Element Operation
 
 The system shall provide the capability to create new model elements by accepting a full element definition string in Markdown format, validating the element structure and relations, and inserting it into the target file following Element Ordering Behavior.
@@ -118,6 +88,20 @@ When deleting an element, the system shall:
   * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
   * satisfiedBy: [diff.rs](../../../core/src/diff.rs)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
+---
+
+### Element Manipulation File Persistence
+
+The system shall persist all element manipulation operations to the source files in storage, synchronizing changes from the in-memory model to the file system and reordering elements following the Element Ordering Behavior.
+
+#### Attachments
+  * [File Persistence Behavior](Refinements.md#file-persistence-behavior)
+  * [Element Ordering Behavior](Refinements.md#element-ordering-behavior)
+
+#### Relations
+  * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
+  * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
+  * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
 ---
 
 ### Move Element Operation
@@ -245,4 +229,20 @@ The system shall reject the operation with a clear error message if:
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
   * satisfiedBy: [diff.rs](../../../core/src/diff.rs)
+---
+
+### Target Location Validation and Auto-Creation
+
+The system shall validate target file paths for element manipulation operations and automatically create files when they do not exist, subject to path safety constraints.
+
+#### Details
+The system shall define target location validation constraints.
+
+#### Relations
+  * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
+  * derivedFrom: [Ignore Files Integration](../Core/Configuration.md#ignore-files-integration)
+  * derivedFrom: [Git Repository as Project Root](../Core/ModelManagement.md#git-repository-as-project-root)
+  * satisfiedBy: [Target Location Constraint](Refinements.md#target-location-constraint)
+  * satisfiedBy: [utils.rs](../../../core/src/utils.rs)
+  * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
 ---

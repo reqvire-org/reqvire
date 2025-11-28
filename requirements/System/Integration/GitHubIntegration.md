@@ -1,27 +1,5 @@
 # Elements
 
-### Automate Pull Request Validations
-
-The system shall automate validations of pull requests in the GitHub workflow to ensure model consistency before merging.
-
-#### Metadata
-  * type: user-requirement
-
-#### Relations
-  * derivedFrom: [Integrate with GitHub Workflows](../../UserStories.md#integrate-with-github-workflows)
----
-
-### Generate Change Logs for Pull Requests
-
-The system shall generate detailed change logs for pull requests, summarizing modifications to the System model and related components.
-
-#### Metadata
-  * type: user-requirement
-
-#### Relations
-  * derivedFrom: [Integrate with GitHub Workflows](../../UserStories.md#integrate-with-github-workflows)
----
-
 ### Automate Documentation Export
 
 The system shall automate export of HTML documentation in the GitHub workflow on PR merge event, so that the documentation is always accessible and up-to-date for GitHub Pages.
@@ -53,4 +31,26 @@ This ensures that the HTML documentation in the `docs/` folder is always up-to-d
   * derivedFrom: [Automate Documentation Export](#automate-documentation-export)
   * derivedFrom: [Automate Pull Request Validations](#automate-pull-request-validations)
   * satisfiedBy: [update_docs.yml](../../../.github/workflows/update_docs.yml)
+---
+
+### Automate Pull Request Validations
+
+The system shall automate validations of pull requests in the GitHub workflow to ensure model consistency before merging.
+
+#### Metadata
+  * type: user-requirement
+
+#### Relations
+  * derivedFrom: [Integrate with GitHub Workflows](../../UserStories.md#integrate-with-github-workflows)
+---
+
+### Generate Change Logs for Pull Requests
+
+The system shall generate detailed change logs for pull requests, summarizing modifications to the System model and related components.
+
+#### Metadata
+  * type: user-requirement
+
+#### Relations
+  * derivedFrom: [Integrate with GitHub Workflows](../../UserStories.md#integrate-with-github-workflows)
 ---

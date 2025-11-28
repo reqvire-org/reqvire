@@ -76,15 +76,36 @@ All API responses shall use JSON format with the following structure:
 
 ## Structure Rules
 
-### No Relations Subsection
+### Limited Relations Subsection
 
-Refinement elements **cannot have a Relations subsection**. This is enforced during validation.
+Refinement elements may have a Relations subsection, but **only for `satisfy` relations** pointing to requirements.
 
-**Rationale:**
-- Refinement elements are atomic documentation units
-- They are referenced through Attachments, not through Relations
-- Their content contributes to the parent element's documentation
-- Keeping them relation-free simplifies their lifecycle management
+#### Constraints
+
+**Allowed:**
+- `satisfy` - Link to requirements this refinement satisfies (element identifier)
+
+**Not Allowed:**
+- `satisfiedBy`, `derivedFrom`, `derive`, `verifiedBy`, `verify`, `trace`, `tracedFrom`
+
+#### Rationale
+- Refinements define specifications, constraints, or behaviors that **satisfy** requirements
+- This creates explicit traceability from refinement to the requirement it fulfills
+- The inverse `satisfiedBy` on the target requirement is auto-generated
+- Other relation types don't make semantic sense for refinements
+
+**Valid Example:**
+```markdown
+### Maximum Response Time
+
+The system shall respond to user requests within 200 milliseconds under normal operating conditions.
+
+#### Metadata
+  * type: constraint
+
+#### Relations
+  * satisfy: [Performance Requirement](../Requirements.md#performance-requirement)
+```
 
 **Invalid Example:**
 ```markdown
@@ -103,6 +124,7 @@ Some constraint text.
 
 Refinement elements may contain:
 - `#### Metadata` - Required for type specification
+- `#### Relations` - Optional, only `satisfy` relations allowed
 - `#### Details` - Optional additional information
 - `#### Attachments` - Optional file attachments
 

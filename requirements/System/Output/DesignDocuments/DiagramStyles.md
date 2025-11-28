@@ -1,5 +1,24 @@
 # Elements
 
+### Mermaid Diagram Interaction Behavior
+
+Interactive behavior for Mermaid diagrams in HTML export.
+
+#### Details
+**Click Behavior:**
+- Nodes are clickable links to element definition
+- Links use relative paths from output location
+- External links open in new tab
+
+**Zoom/Pan:**
+- Mouse wheel for zoom
+- Click and drag for pan
+- Reset button to restore initial view
+
+#### Metadata
+  * type: behavior
+---
+
 ### Mermaid Diagram Style Specification
 
 Styling conventions for Mermaid diagrams in CLI output and HTML export.
@@ -37,23 +56,4 @@ Styling conventions for Mermaid diagrams in CLI output and HTML export.
 
 #### Metadata
   * type: specification
----
-
-### Mermaid Diagram Interaction Behavior
-
-Interactive behavior for Mermaid diagrams in HTML export.
-
-#### Details
-**Click Behavior:**
-- Nodes are clickable links to element definition
-- Links use relative paths from output location
-- External links open in new tab
-
-**Zoom/Pan:**
-- Mouse wheel for zoom
-- Click and drag for pan
-- Reset button to restore initial view
-
-#### Metadata
-  * type: behavior
 ---

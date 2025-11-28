@@ -74,33 +74,6 @@ This test verifies that the system correctly implements change impact detection,
   * satisfiedBy: [test.sh](../../../../tests/test-change-impact-element-relocation/test.sh)
 ---
 
-### Structural Change Reports Verification
-
-This test verifies that the system analyzes and reports on structural changes in the System model.
-
-#### Details
-
-##### Acceptance Criteria
-- System should analyze structural changes in the System model
-- System should identify affected components through relationship traversal
-- System should generate reports of impacted elements and structures
-
-##### Test Criteria
-- Command exits with success (0) return code
-- Change reports correctly identify affected elements
-- Relationship traversal properly determines impact propagation
-
-##### Test Procedure
-TODO: write test procedure
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * verify: [Tracing Structural Changes](../../Output/Reporting.md#tracing-structural-changes)
-  * satisfiedBy: [test.sh](../../../../tests/test-change-impact-detection/test.sh)
----
-
 ### Change Impact Relations Test
 
 This test verifies that the system correctly handles different relation types when calculating change impact.
@@ -130,6 +103,39 @@ This test verifies that the system correctly handles different relation types wh
   * verify: [Requirements Change Propagation](../ChangeImpact.md#requirements-change-propagation)
   * verify: [CLI Change Impact Report Command](../../../Interfaces/CLI.md#cli-change-impact-report-command)
   * satisfiedBy: [test.sh](../../../../tests/test-change-impact-detection/test.sh)
+---
+
+### Change Impact Smart Filtering Test
+
+This test verifies that the smart filtering correctly handles new elements in change impact reports, filtering child elements while showing parent elements.
+
+#### Details
+
+##### Acceptance Criteria
+- New parent elements appear in the "New Elements" section
+- New child elements (with parent relationships to other new elements) are filtered out
+- Filtered child elements are shown in parent's relations with "(new)" marker
+- Verification elements that are not children remain in the report
+
+##### Test Criteria
+- When adding a parent and child requirement together, only parent appears in "New Elements"
+- When adding a requirement and its verification, both appear (verification is not a child)
+- Child elements are visible in the parent's change impact tree with appropriate markers
+
+##### Test Procedure
+1. Create test repository with existing requirements
+2. Add new parent requirement with derive relation to new child requirement
+3. Add new child requirement with derivedFrom relation to parent
+4. Run change impact detection
+5. Verify only parent appears in "New Elements" section
+6. Verify child appears in parent's relations with "(new)" marker
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [Requirements Change Propagation](../ChangeImpact.md#requirements-change-propagation)
+  * satisfiedBy: [test.sh](../../../../tests/test-change-impact-smart-filtering/test.sh)
 ---
 
 ### Element Content Extraction Test
@@ -164,35 +170,29 @@ This test verifies that the system correctly extracts element content for change
   * satisfiedBy: [test.sh](../../../../tests/test-element-content-extraction/test.sh)
 ---
 
-### Change Impact Smart Filtering Test
+### Structural Change Reports Verification
 
-This test verifies that the smart filtering correctly handles new elements in change impact reports, filtering child elements while showing parent elements.
+This test verifies that the system analyzes and reports on structural changes in the System model.
 
 #### Details
 
 ##### Acceptance Criteria
-- New parent elements appear in the "New Elements" section
-- New child elements (with parent relationships to other new elements) are filtered out
-- Filtered child elements are shown in parent's relations with "(new)" marker
-- Verification elements that are not children remain in the report
+- System should analyze structural changes in the System model
+- System should identify affected components through relationship traversal
+- System should generate reports of impacted elements and structures
 
 ##### Test Criteria
-- When adding a parent and child requirement together, only parent appears in "New Elements"
-- When adding a requirement and its verification, both appear (verification is not a child)
-- Child elements are visible in the parent's change impact tree with appropriate markers
+- Command exits with success (0) return code
+- Change reports correctly identify affected elements
+- Relationship traversal properly determines impact propagation
 
 ##### Test Procedure
-1. Create test repository with existing requirements
-2. Add new parent requirement with derive relation to new child requirement
-3. Add new child requirement with derivedFrom relation to parent
-4. Run change impact detection
-5. Verify only parent appears in "New Elements" section
-6. Verify child appears in parent's relations with "(new)" marker
+TODO: write test procedure
 
 #### Metadata
   * type: test-verification
 
 #### Relations
-  * verify: [Requirements Change Propagation](../ChangeImpact.md#requirements-change-propagation)
-  * satisfiedBy: [test.sh](../../../../tests/test-change-impact-smart-filtering/test.sh)
+  * verify: [Tracing Structural Changes](../../Output/Reporting.md#tracing-structural-changes)
+  * satisfiedBy: [test.sh](../../../../tests/test-change-impact-detection/test.sh)
 ---

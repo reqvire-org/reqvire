@@ -1,91 +1,5 @@
 # Elements
 
-### Forward-Only Relation Traversal
-
-When filtering by root element, system shall traverse only forward relations down to leaf elements.
-
-#### Details
-- Shall follow only forward relations (derive, satisfiedBy, verifiedBy, trace)
-- Shall start from specified root element (looked up by name)
-- Shall recursively traverse outgoing relations to leaf elements
-- Shall NOT traverse backward (no bidirectional traversal)
-- Unfiltered diagrams (no --from) shall show complete model with all elements
-
-#### Relations
-  * derivedFrom: [Model Diagram Output Formats](#model-diagram-output-formats)
-  * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
-  * verifiedBy: [Model Command Verification](Verifications/ReportingVerifications.md#model-command-verification)
----
-
-### Search Report Generator
-
-The system shall implement a search report generator with comprehensive filtering and element type tracking.
-
-#### Details
-The search report must include file-level, section-level, and element-level information.
-
-The system shall define comprehensive search filtering capabilities:
-- By file path patterns
-- By element name patterns
-- By element type
-- By element content patterns
-- By presence/absence of relations
-- By presence/absence of attachments
-
-The system shall define custom element type tracking:
-- Identify types not in standard categories
-- Report custom types with counts
-
-#### Attachments
-  * [SearchFiltering.md](DesignDocuments/SearchFiltering.md)
-  * [JSON Output Structure](DesignDocuments/OutputFormats.md#json-output-structure)
-  * [Text Output Formatting](DesignDocuments/OutputFormats.md#text-output-formatting)
-
-#### Relations
-  * derivedFrom: [Model Structure and Summaries](#model-structure-and-summaries)
-  * satisfiedBy: [search.rs](../../../core/src/search.rs)
-  * satisfiedBy: [filters.rs](../../../core/src/filters.rs)
-  * verifiedBy: [Search Command Tests](Verifications/ReportingVerifications.md#search-command-tests)
----
-
-### Model Diagram Output Formats
-
-System shall support markdown and JSON output formats.
-
-#### Details
-- Markdown format shall include embedded Mermaid diagram with model structure
-- Markdown shall show hierarchical structure using containment subgraphs (folders > files > elements)
-- Mermaid diagrams shall use folder and file subgraphs to visually group elements by their physical location
-- JSON format shall use structured data with folders, files, sections, elements, relations, and attachments
-- Both formats shall represent the same filtered or complete model data
-- Element attachments shall be included as an array of strings in both formats (file paths and element identifiers)
-
-#### Relations
-  * derivedFrom: [Model Structure and Summaries](#model-structure-and-summaries)
-  * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
-  * verifiedBy: [Model Command Verification](Verifications/ReportingVerifications.md#model-command-verification)
----
-
-### Tracing Structural Changes
-
-When tracing structural changes, the system shall analyze the System model and diffs to identify affected components and generate a report of impacted elements and structures, so that the user can review the changes and decide on further actions.
-
-#### Metadata
-  * type: user-requirement
-
-#### Relations
-  * derivedFrom: [Trace Changes in System Model](../../UserStories.md#trace-changes-in-system-model)
----
-
-### Validation Report Generator
-
-The system shall implement a validation report generator that compiles and formats validation results from all validators, providing a unified view of model quality with categorized issues, remediation suggestions, and compliance metrics.
-
-#### Relations
-  * derivedFrom: [Provide Validation Reports](#provide-validation-reports)
-  * satisfiedBy: [model.rs](../../../core/src/model.rs)
----
-
 ### Model Reports
 
 When requested the system shall provide human readable and machine readable System model reports.
@@ -163,6 +77,72 @@ The system shall include design documents:
   * verifiedBy: [Containment View Design Documents Test](Verifications/ReportingVerifications.md#containment-view-design-documents-test)
 ---
 
+### Model Diagram Output Formats
+
+System shall support markdown and JSON output formats.
+
+#### Details
+- Markdown format shall include embedded Mermaid diagram with model structure
+- Markdown shall show hierarchical structure using containment subgraphs (folders > files > elements)
+- Mermaid diagrams shall use folder and file subgraphs to visually group elements by their physical location
+- JSON format shall use structured data with folders, files, sections, elements, relations, and attachments
+- Both formats shall represent the same filtered or complete model data
+- Element attachments shall be included as an array of strings in both formats (file paths and element identifiers)
+
+#### Relations
+  * derivedFrom: [Model Structure and Summaries](#model-structure-and-summaries)
+  * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
+  * verifiedBy: [Model Command Verification](Verifications/ReportingVerifications.md#model-command-verification)
+---
+
+### Forward-Only Relation Traversal
+
+When filtering by root element, system shall traverse only forward relations down to leaf elements.
+
+#### Details
+- Shall follow only forward relations (derive, satisfiedBy, verifiedBy, trace)
+- Shall start from specified root element (looked up by name)
+- Shall recursively traverse outgoing relations to leaf elements
+- Shall NOT traverse backward (no bidirectional traversal)
+- Unfiltered diagrams (no --from) shall show complete model with all elements
+
+#### Relations
+  * derivedFrom: [Model Diagram Output Formats](#model-diagram-output-formats)
+  * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
+  * verifiedBy: [Model Command Verification](Verifications/ReportingVerifications.md#model-command-verification)
+---
+
+### Search Report Generator
+
+The system shall implement a search report generator with comprehensive filtering and element type tracking.
+
+#### Details
+The search report must include file-level, section-level, and element-level information.
+
+The system shall define comprehensive search filtering capabilities:
+- By file path patterns
+- By element name patterns
+- By element type
+- By element content patterns
+- By presence/absence of relations
+- By presence/absence of attachments
+
+The system shall define custom element type tracking:
+- Identify types not in standard categories
+- Report custom types with counts
+
+#### Attachments
+  * [SearchFiltering.md](DesignDocuments/SearchFiltering.md)
+  * [JSON Output Structure](DesignDocuments/OutputFormats.md#json-output-structure)
+  * [Text Output Formatting](DesignDocuments/OutputFormats.md#text-output-formatting)
+
+#### Relations
+  * derivedFrom: [Model Structure and Summaries](#model-structure-and-summaries)
+  * satisfiedBy: [search.rs](../../../core/src/search.rs)
+  * satisfiedBy: [filters.rs](../../../core/src/filters.rs)
+  * verifiedBy: [Search Command Tests](Verifications/ReportingVerifications.md#search-command-tests)
+---
+
 ### Provide Validation Reports
 
 The system shall generate detailed validation reports, highlighting any inconsistencies or errors in the System model structure.
@@ -176,6 +156,15 @@ Validation shall be performed automatically when any command requires the parsed
 #### Relations
   * derivedFrom: [Align with Industry Standards](../../UserStories.md#align-with-industry-standards)
   * derivedFrom: [Model Reports](#model-reports)
+---
+
+### Validation Report Generator
+
+The system shall implement a validation report generator that compiles and formats validation results from all validators, providing a unified view of model quality with categorized issues, remediation suggestions, and compliance metrics.
+
+#### Relations
+  * derivedFrom: [Provide Validation Reports](#provide-validation-reports)
+  * satisfiedBy: [model.rs](../../../core/src/model.rs)
 ---
 
 ### Verification Coverage Report
@@ -205,12 +194,12 @@ The report helps track verification completeness and identify gaps in requiremen
 - System engineers/architects are responsible for ensuring verification scopes are broad enough to cover parent requirements when there's no dedicated parent verification
 - AI systems can help create comprehensive verification scopes and prevent verification overlap
 
+#### Metadata
+  * type: user-requirement
+
 #### Attachments
   * [JSON Output Structure](DesignDocuments/OutputFormats.md#json-output-structure)
   * [Text Output Formatting](DesignDocuments/OutputFormats.md#text-output-formatting)
-
-#### Metadata
-  * type: user-requirement
 
 #### Relations
   * derivedFrom: [Model Reports](#model-reports)
@@ -244,3 +233,13 @@ The system shall generate a TraceFlow view page showing the verification traceab
   * verifiedBy: [TraceFlow View Test](Verifications/ReportingVerifications.md#traceflow-view-test)
 ---
 
+### Tracing Structural Changes
+
+When tracing structural changes, the system shall analyze the System model and diffs to identify affected components and generate a report of impacted elements and structures, so that the user can review the changes and decide on further actions.
+
+#### Metadata
+  * type: user-requirement
+
+#### Relations
+  * derivedFrom: [Trace Changes in System Model](../../UserStories.md#trace-changes-in-system-model)
+---

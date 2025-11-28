@@ -58,6 +58,37 @@ Both ignore files use standard gitignore pattern syntax to exclude files from be
   * satisfiedBy: [config.rs](../../../cli/src/config.rs)
 ---
 
+### Requirements Processing
+
+The system shall parse the files in all folders and subfolders from the root of git repository which are not explicitly excluded using .gitignore and .reqvireignore files.
+
+#### Details
+File exclusion is handled through:
+- .gitignore patterns (files not in version control)
+- .reqvireignore patterns (files in version control but excluded from requirements processing)
+- Reserved repository files (README.md, LICENSE.md, etc.)
+
+#### Relations
+  * derivedFrom: [Ignoring Unstructured Documents](#ignoring-unstructured-documents)
+  * satisfiedBy: [model.rs](../../../core/src/model.rs)
+  * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
+---
+
+### Structured Markdown Files Search and Detection
+
+The system shall identify all structured markdown documents available for processing in all directories and sub-directories of the git repository root based on predefined rules.
+
+#### Details
+Identification Process:
+1. **File Selection**: The process scans all files in the the git repository root and all sub folders.
+2. **Excluded Patterns Check**: If a file matches any excluded patterns, it is marked as **not a structured document file**.
+3. **File Extension Check**: If the file does not have a `.md` extension, it is marked as **not a structured document file**.
+
+#### Relations
+  * derivedFrom: [Requirements Processing](#requirements-processing)
+  * satisfiedBy: [model.rs](../../../core/src/model.rs)
+---
+
 ### Reserved Repository Files Exclusion
 
 The system shall automatically exclude certain common repository documentation files from structured markdown processing.
@@ -88,35 +119,4 @@ The following reserved filenames are always excluded from structured markdown pr
 #### Relations
   * derivedFrom: [Ignoring Unstructured Documents](#ignoring-unstructured-documents)
   * satisfiedBy: [config.rs](../../../cli/src/config.rs)
----
-
-### Requirements Processing
-
-The system shall parse the files in all folders and subfolders from the root of git repository which are not explicitly excluded using .gitignore and .reqvireignore files.
-
-#### Details
-File exclusion is handled through:
-- .gitignore patterns (files not in version control)
-- .reqvireignore patterns (files in version control but excluded from requirements processing)
-- Reserved repository files (README.md, LICENSE.md, etc.)
-
-#### Relations
-  * derivedFrom: [Ignoring Unstructured Documents](#ignoring-unstructured-documents)
-  * satisfiedBy: [model.rs](../../../core/src/model.rs)
-  * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
----
-
-### Structured Markdown Files Search and Detection
-
-The system shall identify all structured markdown documents available for processing in all directories and sub-directories of the git repository root based on predefined rules.
-
-#### Details
-Identification Process:
-1. **File Selection**: The process scans all files in the the git repository root and all sub folders.
-2. **Excluded Patterns Check**: If a file matches any excluded patterns, it is marked as **not a structured document file**.
-3. **File Extension Check**: If the file does not have a `.md` extension, it is marked as **not a structured document file**.
-
-#### Relations
-  * derivedFrom: [Requirements Processing](#requirements-processing)
-  * satisfiedBy: [model.rs](../../../core/src/model.rs)
 ---

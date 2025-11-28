@@ -20,21 +20,21 @@ Change impact detection encompasses:
   * satisfiedBy: [change_impact.rs](../../../core/src/change_impact.rs)
 ---
 
-### Structural Change Analyzer
-
-The system shall implement a model change analyzer that identifies structural modifications between model versions, determines affected elements through relationship traversal, and categorizes impacts according to change propagation rules.
-
-#### Relations
-  * derivedFrom: [Change Impact Detection](#change-impact-detection)
-  * satisfiedBy: [change_impact.rs](../../../core/src/change_impact.rs)
----
-
 ### Requirements Change Propagation
 
 When a requirement is changed, the system shall propagate the change through related requirements, verification artifacts, and design elements according to relation type definitions and propagation rules.
 
 #### Attachments
   * [ChangePropagation.md](DesignDocuments/ChangePropagation.md)
+
+#### Relations
+  * derivedFrom: [Change Impact Detection](#change-impact-detection)
+  * satisfiedBy: [change_impact.rs](../../../core/src/change_impact.rs)
+---
+
+### Structural Change Analyzer
+
+The system shall implement a model change analyzer that identifies structural modifications between model versions, determines affected elements through relationship traversal, and categorizes impacts according to change propagation rules.
 
 #### Relations
   * derivedFrom: [Change Impact Detection](#change-impact-detection)

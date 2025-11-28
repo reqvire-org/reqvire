@@ -1,5 +1,22 @@
 # Elements
 
+### Lint Auto-fix Capability
+
+The system shall provide automatic fixing capability for auto-fixable lint issues, applying changes directly to model files when the `--fix` flag is used.
+
+#### Details
+Auto-fix shall:
+- Only apply fixes for issues categorized as auto-fixable
+- Modify the affected markdown files directly
+- Remove redundant verify relations from verification elements
+- Preserve all other content and formatting in the files
+- Report all changes made (files modified, relations removed)
+- Skip issues categorized as needing manual review
+
+#### Relations
+  * derivedFrom: [CLI Lint Command](../../Interfaces/CLI.md#cli-lint-command)
+---
+
 ### Model Linting
 
 The system shall provide model linting capabilities to analyze model quality and detect issues in requirements relations.
@@ -40,82 +57,6 @@ Output format shall include:
   * Intermediate paths that make the direct relation redundant
 
 For auto-fixable issues, the output indicates these can be fixed with `--fix` flag. For manual review issues, the output explains why human judgment is required.
-
-#### Relations
-  * derivedFrom: [Model Linting](#model-linting)
----
-
-### Lint Auto-fix Capability
-
-The system shall provide automatic fixing capability for auto-fixable lint issues, applying changes directly to model files when the `--fix` flag is used.
-
-#### Details
-Auto-fix shall:
-- Only apply fixes for issues categorized as auto-fixable
-- Modify the affected markdown files directly
-- Remove redundant verify relations from verification elements
-- Preserve all other content and formatting in the files
-- Report all changes made (files modified, relations removed)
-- Skip issues categorized as needing manual review
-
-#### Relations
-  * derivedFrom: [CLI Lint Command](../../Interfaces/CLI.md#cli-lint-command)
----
-
-### Redundant Verify Relations Detection
-
-The system shall detect redundant verify relations where a verification directly verifies both a child requirement and its ancestor, leveraging the existing verification trace tree logic from the Verification Trace Builder.
-
-#### Details
-A verify relation is redundant when:
-- A verification directly verifies both a leaf requirement AND its parent/ancestor in the hierarchy
-- The verification trace tree shows that an ancestor requirement is also directly verified
-- Since verification traces roll up automatically through derivedFrom relations, verifying the leaf is sufficient
-
-Detection shall:
-- Reuse the trace tree building logic from [Verification Trace Builder](../ModelManagement/VerificationTraces.md#verification-trace-builder)
-- Identify ancestor requirements in each verification's trace tree that are also directly verified
-- Report these as redundant relations that add noise to the model
-- Categorize as **auto-fixable** since removing them is safe and mechanical
-
-#### Attachments
-  * [Verification Trace Tree Construction](../Processing/DesignDocuments/VerificationTraceAlgorithm.md#verification-trace-tree-construction)
-
-#### Relations
-  * derivedFrom: [Model Linting](#model-linting)
----
-
-### Redundant Hierarchical Relations Detection
-
-The system shall detect redundant derivedFrom relations where an element has direct derivedFrom relations to both a requirement and its ancestor in the requirement hierarchy, by leveraging the existing verification trace tree logic with a virtual verification element.
-
-#### Details
-A derivedFrom relation is redundant when:
-- An element has a derivedFrom relation to an ancestor requirement
-- The same element also reaches that ancestor through other derivedFrom relations via intermediate elements
-- The hierarchy chain is already established through other paths (single or multiple convergent paths)
-
-**Core Rule**: If an element has a direct relation to a parent, AND that parent is also reachable through ANY other path(s), then the direct relation is redundant and can be safely auto-removed.
-
-This applies to:
-- **Single-chain redundancy**: Element reaches ancestor through exactly one intermediate path (e.g., A → B → C, with redundant A → C)
-- **Multi-path/branching redundancy**: Element reaches ancestor through multiple convergent paths (e.g., A → B → D and A → C → D, with redundant A → D)
-
-Detection shall:
-- Create a virtual/dummy verification element
-- Connect the virtual verification to ALL leaf requirements (requirements with no derived children) via virtual verify relations
-- Apply the same trace tree building logic used for verification upward traceability
-- The trace tree will naturally identify when leaf requirements have derivedFrom relations to both a parent and its ancestor
-- Report these as redundant hierarchical relations
-- Categorize ALL redundant hierarchical relations as **auto-fixable** since the direct relation adds no value when alternate paths exist
-- Identify which intermediate paths provide the alternate routes to the ancestor
-
-This approach reuses the proven trace tree logic for redundancy detection, ensuring consistency with verify relation redundancy detection.
-
-**Note**: The current implementation only detects cases where a direct redundant relation EXISTS. It does not detect or suggest whether converging paths without a direct relation should have one added - that remains a semantic modeling decision.
-
-#### Attachments
-  * [Verification Trace Tree Construction](../Processing/DesignDocuments/VerificationTraceAlgorithm.md#verification-trace-tree-construction)
 
 #### Relations
   * derivedFrom: [Model Linting](#model-linting)
@@ -167,6 +108,42 @@ This enables the model author to review and decide:
   * verifiedBy: [Lint Command Verification](Verifications/LintingVerifications.md#lint-command-verification)
 ---
 
+### Redundant Hierarchical Relations Detection
+
+The system shall detect redundant derivedFrom relations where an element has direct derivedFrom relations to both a requirement and its ancestor in the requirement hierarchy, by leveraging the existing verification trace tree logic with a virtual verification element.
+
+#### Details
+A derivedFrom relation is redundant when:
+- An element has a derivedFrom relation to an ancestor requirement
+- The same element also reaches that ancestor through other derivedFrom relations via intermediate elements
+- The hierarchy chain is already established through other paths (single or multiple convergent paths)
+
+**Core Rule**: If an element has a direct relation to a parent, AND that parent is also reachable through ANY other path(s), then the direct relation is redundant and can be safely auto-removed.
+
+This applies to:
+- **Single-chain redundancy**: Element reaches ancestor through exactly one intermediate path (e.g., A → B → C, with redundant A → C)
+- **Multi-path/branching redundancy**: Element reaches ancestor through multiple convergent paths (e.g., A → B → D and A → C → D, with redundant A → D)
+
+Detection shall:
+- Create a virtual/dummy verification element
+- Connect the virtual verification to ALL leaf requirements (requirements with no derived children) via virtual verify relations
+- Apply the same trace tree building logic used for verification upward traceability
+- The trace tree will naturally identify when leaf requirements have derivedFrom relations to both a parent and its ancestor
+- Report these as redundant hierarchical relations
+- Categorize ALL redundant hierarchical relations as **auto-fixable** since the direct relation adds no value when alternate paths exist
+- Identify which intermediate paths provide the alternate routes to the ancestor
+
+This approach reuses the proven trace tree logic for redundancy detection, ensuring consistency with verify relation redundancy detection.
+
+**Note**: The current implementation only detects cases where a direct redundant relation EXISTS. It does not detect or suggest whether converging paths without a direct relation should have one added - that remains a semantic modeling decision.
+
+#### Attachments
+  * [Verification Trace Tree Construction](../Processing/DesignDocuments/VerificationTraceAlgorithm.md#verification-trace-tree-construction)
+
+#### Relations
+  * derivedFrom: [Model Linting](#model-linting)
+---
+
 ### Safe Redundant Hierarchical Relations Auto-Removal
 
 The system shall provide safe auto-removal of redundant hierarchical derivation relations when alternate paths to the target exist, ensuring model integrity is preserved while reducing redundancy.
@@ -214,4 +191,27 @@ Reason: D is reachable via A → B → D and A → C → D
   * derivedFrom: [Redundant Hierarchical Relations Detection](#redundant-hierarchical-relations-detection)
   * satisfiedBy: [lint.rs](../../../core/src/lint.rs)
   * verifiedBy: [Lint Command Verification](Verifications/LintingVerifications.md#lint-command-verification)
+---
+
+### Redundant Verify Relations Detection
+
+The system shall detect redundant verify relations where a verification directly verifies both a child requirement and its ancestor, leveraging the existing verification trace tree logic from the Verification Trace Builder.
+
+#### Details
+A verify relation is redundant when:
+- A verification directly verifies both a leaf requirement AND its parent/ancestor in the hierarchy
+- The verification trace tree shows that an ancestor requirement is also directly verified
+- Since verification traces roll up automatically through derivedFrom relations, verifying the leaf is sufficient
+
+Detection shall:
+- Reuse the trace tree building logic from [Verification Trace Builder](../ModelManagement/VerificationTraces.md#verification-trace-builder)
+- Identify ancestor requirements in each verification's trace tree that are also directly verified
+- Report these as redundant relations that add noise to the model
+- Categorize as **auto-fixable** since removing them is safe and mechanical
+
+#### Attachments
+  * [Verification Trace Tree Construction](../Processing/DesignDocuments/VerificationTraceAlgorithm.md#verification-trace-tree-construction)
+
+#### Relations
+  * derivedFrom: [Model Linting](#model-linting)
 ---

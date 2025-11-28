@@ -18,7 +18,6 @@ This behavior mirrors the existing relation target update behavior used when mov
 
 #### Metadata
   * type: behavior
-  
 ---
 
 ### Attachment Input Auto-Detection Behavior

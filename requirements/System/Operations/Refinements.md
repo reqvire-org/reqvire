@@ -1,40 +1,5 @@
 # Elements
 
-### File Persistence Behavior
-
-How element manipulation operations persist changes to files:
-- Track modified files during operations
-- Write only modified files to storage
-- Maintain file format and structure
-- Handle I/O errors with reporting
-
-**Synchronization:**
-- On-disk matches in-memory after success
-- No partial changes on error
-
-#### Metadata
-  * type: behavior
----
-
-### Target Location Constraint
-
-Validation rules for target paths in element operations.
-
-**Path Validation:**
-- Path not excluded by .gitignore/.reqvireignore
-- Maximum 10 subdirectory nesting depth
-- Path must be accessible and writable
-
-**Auto-creation:**
-- Create missing target files with `# Elements` header
-
-**Error Reporting:**
-- Clear message indicating which constraint was violated
-
-#### Metadata
-  * type: constraint
----
-
 ### Dry-Run Mode Behavior
 
 Preview mode behavior for modification commands.
@@ -92,4 +57,39 @@ Elements shall be ordered so that parent elements appear before their children (
 
 #### Metadata
   * type: behavior
+---
+
+### File Persistence Behavior
+
+How element manipulation operations persist changes to files:
+- Track modified files during operations
+- Write only modified files to storage
+- Maintain file format and structure
+- Handle I/O errors with reporting
+
+**Synchronization:**
+- On-disk matches in-memory after success
+- No partial changes on error
+
+#### Metadata
+  * type: behavior
+---
+
+### Target Location Constraint
+
+Validation rules for target paths in element operations.
+
+**Path Validation:**
+- Path not excluded by .gitignore/.reqvireignore
+- Maximum 10 subdirectory nesting depth
+- Path must be accessible and writable
+
+**Auto-creation:**
+- Create missing target files with `# Elements` header
+
+**Error Reporting:**
+- Clear message indicating which constraint was violated
+
+#### Metadata
+  * type: constraint
 ---
