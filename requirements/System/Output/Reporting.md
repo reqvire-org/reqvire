@@ -32,6 +32,13 @@ This requirement applies to all report operations, including:
   * type: user-requirement
 
 #### Relations
+  * derive: [Complete Model Structure Visualization](DiagramGeneration.md#complete-model-structure-visualization)
+  * derive: [Interactive Mermaid Diagrams](DiagramGeneration.md#interactive-mermaid-diagrams)
+  * derive: [Model Visualization and Exploration](DiagramGeneration.md#model-visualization-and-exploration)
+  * derive: [Model Structure and Summaries](#model-structure-and-summaries)
+  * derive: [Provide Validation Reports](#provide-validation-reports)
+  * derive: [Resources Report](#resources-report)
+  * derive: [Verification Coverage Report](#verification-coverage-report)
   * derivedFrom: [Provide Reports](../../UserStories.md#provide-reports)
 ---
 
@@ -43,6 +50,9 @@ When requested the system shall generate reports summarizing the structure and r
   * type: user-requirement
 
 #### Relations
+  * derive: [Containment View Report](#containment-view-report)
+  * derive: [Model Diagram Output Formats](#model-diagram-output-formats)
+  * derive: [Search Report Generator](#search-report-generator)
   * derivedFrom: [Model Reports](#model-reports)
 ---
 
@@ -90,6 +100,7 @@ System shall support markdown and JSON output formats.
 - Element attachments shall be included as an array of strings in both formats (file paths and element identifiers)
 
 #### Relations
+  * derive: [Forward-Only Relation Traversal](#forward-only-relation-traversal)
   * derivedFrom: [Model Structure and Summaries](#model-structure-and-summaries)
   * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
   * verifiedBy: [Model Command Verification](Verifications/ReportingVerifications.md#model-command-verification)
@@ -138,8 +149,8 @@ The system shall define custom element type tracking:
 
 #### Relations
   * derivedFrom: [Model Structure and Summaries](#model-structure-and-summaries)
-  * satisfiedBy: [search.rs](../../../core/src/search.rs)
   * satisfiedBy: [filters.rs](../../../core/src/filters.rs)
+  * satisfiedBy: [search.rs](../../../core/src/search.rs)
   * verifiedBy: [Search Command Tests](Verifications/ReportingVerifications.md#search-command-tests)
 ---
 
@@ -154,8 +165,10 @@ Validation shall be performed automatically when any command requires the parsed
   * type: user-requirement
 
 #### Relations
-  * derivedFrom: [Align with Industry Standards](../../UserStories.md#align-with-industry-standards)
+  * derive: [Integrated Validation](../Core/Validation.md#integrated-validation)
+  * derive: [Validation Report Generator](#validation-report-generator)
   * derivedFrom: [Model Reports](#model-reports)
+  * derivedFrom: [Align with Industry Standards](../../UserStories.md#align-with-industry-standards)
 ---
 
 ### Validation Report Generator
@@ -163,8 +176,47 @@ Validation shall be performed automatically when any command requires the parsed
 The system shall implement a validation report generator that compiles and formats validation results from all validators, providing a unified view of model quality with categorized issues, remediation suggestions, and compliance metrics.
 
 #### Relations
+  * derive: [Validation Error Handling](../Core/Validation.md#validation-error-handling)
   * derivedFrom: [Provide Validation Reports](#provide-validation-reports)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
+---
+
+### Resources Report
+
+The system shall provide a resources report showing all files referenced by the model through relations and attachments.
+
+#### Details
+**Report Structure:**
+- Two sections: Relations and Attachments
+- Each section lists files alphabetically by path
+- Each file shows referencing elements with links
+
+**Relations Section:**
+- Files from InternalPath relation targets (satisfiedBy, trace, etc.)
+- Shows relation type and source element for each reference
+- Sorted by relation type, then by element identifier
+
+**Attachments Section:**
+- Files from FilePath attachment targets
+- Shows source element for each reference
+- Sorted by element identifier
+
+**Output Formats:**
+- Text/Markdown: Human-readable with markdown links
+- JSON: Structured data for programmatic use
+
+**HTML Export:**
+- Resources view available in HTML export with navigation link
+- Shows complete list of referenced files with element traceability
+
+#### Metadata
+  * type: user-requirement
+
+#### Relations
+  * derive: [CLI Resources Command](../../Interfaces/CLI.md#cli-resources-command)
+  * derivedFrom: [Model Reports](#model-reports)
+  * satisfiedBy: [report_resources.rs](../../../core/src/report_resources.rs)
+  * verifiedBy: [Resources Report Verification](Verifications/ReportingVerifications.md#resources-report-verification)
 ---
 
 ### Verification Coverage Report
@@ -202,6 +254,7 @@ The report helps track verification completeness and identify gaps in requiremen
   * [Text Output Formatting](DesignDocuments/OutputFormats.md#text-output-formatting)
 
 #### Relations
+  * derive: [Verification Upward Traceability](#verification-upward-traceability)
   * derivedFrom: [Model Reports](#model-reports)
   * satisfiedBy: [report_coverage.rs](../../../core/src/report_coverage.rs)
 ---
@@ -217,6 +270,9 @@ The system shall provide upward traceability visualization from verifications to
   * type: user-requirement
 
 #### Relations
+  * derive: [TraceFlow View Report Generation](#traceflow-view-report-generation)
+  * derive: [Verification Roll-up Strategy](../Processing/VerificationTraces.md#verification-roll-up-strategy)
+  * derive: [Verification Trace Builder](../Processing/VerificationTraces.md#verification-trace-builder)
   * derivedFrom: [Verification Coverage Report](#verification-coverage-report)
 ---
 
@@ -241,42 +297,7 @@ When tracing structural changes, the system shall analyze the System model and d
   * type: user-requirement
 
 #### Relations
+  * derive: [Change Impact Detection](../Processing/ChangeImpact.md#change-impact-detection)
   * derivedFrom: [Trace Changes in System Model](../../UserStories.md#trace-changes-in-system-model)
----
-
-### Resources Report
-
-The system shall provide a resources report showing all files referenced by the model through relations and attachments.
-
-#### Details
-**Report Structure:**
-- Two sections: Relations and Attachments
-- Each section lists files alphabetically by path
-- Each file shows referencing elements with links
-
-**Relations Section:**
-- Files from InternalPath relation targets (satisfiedBy, trace, etc.)
-- Shows relation type and source element for each reference
-- Sorted by relation type, then by element identifier
-
-**Attachments Section:**
-- Files from FilePath attachment targets
-- Shows source element for each reference
-- Sorted by element identifier
-
-**Output Formats:**
-- Text/Markdown: Human-readable with markdown links
-- JSON: Structured data for programmatic use
-
-**HTML Export:**
-- Resources view available in HTML export with navigation link
-- Shows complete list of referenced files with element traceability
-
-#### Metadata
-  * type: user-requirement
-
-#### Relations
-  * derivedFrom: [Model Reports](#model-reports)
-  * satisfiedBy: [report_resources.rs](../../../core/src/report_resources.rs)
-  * verifiedBy: [Resources Report Verification](Verifications/ReportingVerifications.md#resources-report-verification)
+  * verifiedBy: [Structural Change Reports Verification](../Processing/Verifications/ChangeImpactVerifications.md#structural-change-reports-verification)
 ---

@@ -8,6 +8,7 @@ The system shall automate export of HTML documentation in the GitHub workflow on
   * type: user-requirement
 
 #### Relations
+  * derive: [Automated Documentation Export on PR Merge](#automated-documentation-export-on-pr-merge)
   * derivedFrom: [Integrate with GitHub Workflows](../../UserStories.md#integrate-with-github-workflows)
 ---
 
@@ -31,6 +32,7 @@ This ensures that the HTML documentation in the `docs/` folder is always up-to-d
   * derivedFrom: [Automate Documentation Export](#automate-documentation-export)
   * derivedFrom: [Automate Pull Request Validations](#automate-pull-request-validations)
   * satisfiedBy: [update_docs.yml](../../../.github/workflows/update_docs.yml)
+  * verifiedBy: [Automated Documentation Export on PR Merge Verification](../Output/Verifications/DiagramVerifications.md#automated-documentation-export-on-pr-merge-verification)
 ---
 
 ### Automate Pull Request Validations
@@ -41,6 +43,7 @@ The system shall automate validations of pull requests in the GitHub workflow to
   * type: user-requirement
 
 #### Relations
+  * derive: [Automated Documentation Export on PR Merge](#automated-documentation-export-on-pr-merge)
   * derivedFrom: [Integrate with GitHub Workflows](../../UserStories.md#integrate-with-github-workflows)
 ---
 

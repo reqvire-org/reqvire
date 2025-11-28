@@ -11,9 +11,11 @@ The system shall define validation error reporting behavior.
   * type: user-requirement
 
 #### Relations
+  * derive: [Detailed Error Handling and Logging](../../Interfaces/CLI.md#detailed-error-handling-and-logging)
+  * derive: [Relation Type Validation](#relation-type-validation)
   * derivedFrom: [Validating Structures](../../UserStories.md#validating-structures)
-  * satisfiedBy: [Validation Error Reporting Behavior](Refinements.md#validation-error-reporting-behavior)
   * satisfiedBy: [error.rs](../../../core/src/error.rs)
+  * satisfiedBy: [Validation Error Reporting Behavior](Refinements.md#validation-error-reporting-behavior)
 ---
 
 ### Relation Type Validation
@@ -23,6 +25,8 @@ The system shall validate relation types against a defined vocabulary and provid
 #### Relations
   * derivedFrom: [Enhanced Validation Error Reporting](#enhanced-validation-error-reporting)
   * satisfiedBy: [relation.rs](../../../core/src/relation.rs)
+  * verifiedBy: [Invalid Relations Test](Verifications/ValidationVerifications.md#invalid-relations-test)
+  * verifiedBy: [Same-File Fragment Relations Test](Verifications/ValidationVerifications.md#same-file-fragment-relations-test)
 ---
 
 ### Excluded File Relation Validation
@@ -37,6 +41,7 @@ The validation process for excluded files:
 #### Relations
   * derivedFrom: [File Pattern Exclusion for Format](../Operations/Formatting.md#file-pattern-exclusion-for-format)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
+  * verifiedBy: [Unstructured Documents Test](Verifications/ValidationVerifications.md#unstructured-documents-test)
 ---
 
 ### GraphRegistry as Primary Registry
@@ -86,8 +91,8 @@ Commands shall be categorized into two groups:
 Commands in the first group shall automatically run the two-pass validation and exit if any errors are found. Commands in the second group shall skip validation to allow operation on potentially invalid documents.
 
 #### Relations
-  * derivedFrom: [Provide Validation Reports](../Output/Reporting.md#provide-validation-reports)
   * derivedFrom: [CLI Interface Structure](../../Interfaces/CLI.md#cli-interface-structure)
+  * derivedFrom: [Provide Validation Reports](../Output/Reporting.md#provide-validation-reports)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
 ---
 
@@ -99,8 +104,9 @@ The system shall validate dependencies across different components of the System
   * type: user-requirement
 
 #### Relations
-  * derivedFrom: [Validating Structures](../../UserStories.md#validating-structures)
+  * derive: [Cross-Component Dependency Validator](#cross-component-dependency-validator)
   * derivedFrom: [Align with Industry Standards](../../UserStories.md#align-with-industry-standards)
+  * derivedFrom: [Validating Structures](../../UserStories.md#validating-structures)
 ---
 
 ### Cross-Component Dependency Validator
@@ -133,8 +139,10 @@ The system shall check the internal consistency of the system model, ensuring th
   * type: user-requirement
 
 #### Relations
-  * derivedFrom: [Validating Structures](../../UserStories.md#validating-structures)
+  * derive: [Internal Consistency Validator](#internal-consistency-validator)
+  * derive: [Two-Pass Validation Strategy](#two-pass-validation-strategy)
   * derivedFrom: [Align with Industry Standards](../../UserStories.md#align-with-industry-standards)
+  * derivedFrom: [Validating Structures](../../UserStories.md#validating-structures)
 ---
 
 ### Internal Consistency Validator
@@ -154,8 +162,8 @@ The consistency validator shall verify:
 Rationale: Element names serve as stable IDs for element identity, independent of file location. Global uniqueness is essential for proper element identification and change tracking across the model.
 
 #### Relations
-  * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
   * derivedFrom: [Element Identity Model](StructureAndParsing.md#element-identity-model)
+  * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
   * verifiedBy: [Invalid Relations Test](Verifications/ValidationVerifications.md#invalid-relations-test)
@@ -169,10 +177,10 @@ The system shall execute model validation in two phases: element collection and 
 The system shall define two-pass validation behavior.
 
 #### Relations
-  * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
   * derivedFrom: [Requirements Processing](Configuration.md#requirements-processing)
-  * satisfiedBy: [Two-Pass Validation Behavior](Refinements.md#two-pass-validation-behavior)
+  * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
+  * satisfiedBy: [Two-Pass Validation Behavior](Refinements.md#two-pass-validation-behavior)
 ---
 
 ### Validate Markdown Structure
@@ -183,8 +191,9 @@ The system shall validate the Markdown structure of system model to ensure compl
   * type: user-requirement
 
 #### Relations
-  * derivedFrom: [Validating Structures](../../UserStories.md#validating-structures)
+  * derive: [Markdown Structure Validator](#markdown-structure-validator)
   * derivedFrom: [Align with Industry Standards](../../UserStories.md#align-with-industry-standards)
+  * derivedFrom: [Validating Structures](../../UserStories.md#validating-structures)
 ---
 
 ### Markdown Structure Validator
@@ -195,6 +204,7 @@ The system shall implement a markdown structure validator that enforces Reqvire'
   * derivedFrom: [Validate Markdown Structure](#validate-markdown-structure)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
+  * verifiedBy: [Invalid Header Structure Test](Verifications/ValidationVerifications.md#invalid-header-structure-test)
   * verifiedBy: [Invalid Relations Test](Verifications/ValidationVerifications.md#invalid-relations-test)
 ---
 
@@ -206,9 +216,10 @@ The system shall validate relation types and allow only supported types.
   * type: user-requirement
 
 #### Relations
-  * derivedFrom: [Validating Structures](../../UserStories.md#validating-structures)
-  * derivedFrom: [Align with Industry Standards](../../UserStories.md#align-with-industry-standards)
+  * derive: [Relation Element Type Validator](#relation-element-type-validator)
   * derivedFrom: [Relation Types and behaviors](ModelManagement.md#relation-types-and-behaviors)
+  * derivedFrom: [Align with Industry Standards](../../UserStories.md#align-with-industry-standards)
+  * derivedFrom: [Validating Structures](../../UserStories.md#validating-structures)
 ---
 
 ### Relation Element Type Validator
@@ -227,12 +238,12 @@ The validator enforces the constraints defined in the [Element Type Relation Com
 - Warnings should be issued when relation endpoints have incompatible element types
 
 #### Relations
-  * derivedFrom: [Validate Relation Types](#validate-relation-types)
   * derivedFrom: [Element Type Relation Compatibility](ModelManagement.md#element-type-relation-compatibility)
+  * derivedFrom: [Validate Relation Types](#validate-relation-types)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
-  * verifiedBy: [Invalid Relations Test](Verifications/ValidationVerifications.md#invalid-relations-test)
   * verifiedBy: [Element Type Relation Compatibility Test](Verifications/ValidationVerifications.md#element-type-relation-compatibility-test)
+  * verifiedBy: [Invalid Relations Test](Verifications/ValidationVerifications.md#invalid-relations-test)
 ---
 
 ### Validation Error Handling
@@ -255,4 +266,5 @@ This ensures users see all relevant errors at once rather than fixing issues one
   * derivedFrom: [Validation Report Generator](../Output/Reporting.md#validation-report-generator)
   * satisfiedBy: [error.rs](../../../core/src/error.rs)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
+  * verifiedBy: [Invalid Relations Test](Verifications/ValidationVerifications.md#invalid-relations-test)
 ---

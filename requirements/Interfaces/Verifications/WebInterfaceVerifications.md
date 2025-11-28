@@ -22,8 +22,8 @@ This test verifies that HTML export copies all attachment files to the output di
   * type: test-verification
 
 #### Relations
-  * verify: [Attachment Export](../WebInterface.md#attachment-export)
   * satisfiedBy: [test.sh](../../../tests/test-attachment-export/test.sh)
+  * verify: [Attachment Export](../WebInterface.md#attachment-export)
 ---
 
 ### Containment Attachment Links Verification
@@ -50,8 +50,8 @@ This test verifies that the D3.js containment tree view displays attachments as 
   * type: test-verification
 
 #### Relations
-  * verify: [Containment View Attachment Links](../WebInterface.md#containment-view-attachment-links)
   * satisfiedBy: [test.sh](../../../tests/test-attachment-export/test.sh)
+  * verify: [Containment View Attachment Links](../WebInterface.md#containment-view-attachment-links)
 ---
 
 ### Diagram Attachment Display Verification
@@ -77,8 +77,8 @@ This test verifies that diagrams display attachment links within element boxes.
   * type: test-verification
 
 #### Relations
-  * verify: [Diagram Attachment Display](../WebInterface.md#diagram-attachment-display)
   * satisfiedBy: [test.sh](../../../tests/test-attachment-export/test.sh)
+  * verify: [Diagram Attachment Display](../WebInterface.md#diagram-attachment-display)
 ---
 
 ### HTML Export Verification
@@ -117,8 +117,8 @@ This test verifies that the system exports specifications into HTML format with 
   * type: test-verification
 
 #### Relations
-  * verify: [HTML Export](../WebInterface.md#html-export)
   * satisfiedBy: [test.sh](../../../tests/test-html-export/test.sh)
+  * verify: [HTML Export](../WebInterface.md#html-export)
 ---
 
 ### Model View Element Navigation Test
@@ -138,8 +138,8 @@ Test verifies that element names in the model-centric view are clickable links.
   * type: test-verification
 
 #### Relations
-  * verify: [Model View Element Navigation](../WebInterface.md#model-view-element-navigation)
   * satisfiedBy: [test.sh](../../../tests/test-model-command/test.sh)
+  * verify: [Model View Element Navigation](../WebInterface.md#model-view-element-navigation)
 ---
 
 ### Serve Command Verification
@@ -174,6 +174,6 @@ This test verifies that the serve command exports HTML to a temporary directory 
   * type: test-verification
 
 #### Relations
-  * verify: [Serve Command](../WebInterface.md#serve-command)
   * satisfiedBy: [test.sh](../../../tests/test-serve-command/test.sh)
+  * verify: [Serve Command](../WebInterface.md#serve-command)
 ---

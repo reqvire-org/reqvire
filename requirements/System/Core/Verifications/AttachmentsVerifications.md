@@ -25,8 +25,8 @@ Test cases for element attachments:
   * type: test-verification
 
 #### Relations
-  * verify: [Attachment Commands](../../../Interfaces/CLI.md#attachment-commands)
   * satisfiedBy: [test.sh](../../../../tests/test-assets/test.sh)
+  * verify: [Attachment Commands](../../../Interfaces/CLI.md#attachment-commands)
 ---
 
 ### Attachment Identifier CRUD Verification
@@ -78,8 +78,8 @@ Test cases for element identifiers:
   * type: test-verification
 
 #### Relations
-  * verify: [Reserved Subsections Support](../StructureAndParsing.md#reserved-subsections-support)
   * satisfiedBy: [test.sh](../../../../tests/test-assets/test.sh)
+  * verify: [Reserved Subsections Support](../StructureAndParsing.md#reserved-subsections-support)
 ---
 
 ### Attachment Search Filters Verification
@@ -98,8 +98,8 @@ Test cases:
   * type: test-verification
 
 #### Relations
-  * verify: [CLI Search Command](../../../Interfaces/CLI.md#cli-search-command)
   * satisfiedBy: [test.sh](../../../../tests/test-assets/test.sh)
+  * verify: [CLI Search Command](../../../Interfaces/CLI.md#cli-search-command)
 ---
 
 ### Attachments Change Impact Verification
@@ -123,8 +123,8 @@ Test cases for Refinement element rm operations:
   * type: test-verification
 
 #### Relations
-  * verify: [Change Impact Detection](../../Processing/ChangeImpact.md#change-impact-detection)
   * satisfiedBy: [test.sh](../../../../tests/test-change-impact-attachments/test.sh)
+  * verify: [Change Impact Detection](../../Processing/ChangeImpact.md#change-impact-detection)
 ---
 
 ### Attachments Subsection Parsing Verification
@@ -150,9 +150,9 @@ Test cases for element identifiers:
   * type: test-verification
 
 #### Relations
-  * verify: [Reserved Subsections Support](../StructureAndParsing.md#reserved-subsections-support)
-  * verify: [Attachment Target Validation](../StructureAndParsing.md#attachment-target-validation)
   * satisfiedBy: [test.sh](../../../../tests/test-assets/test.sh)
+  * verify: [Attachment Target Validation](../StructureAndParsing.md#attachment-target-validation)
+  * verify: [Reserved Subsections Support](../StructureAndParsing.md#reserved-subsections-support)
 ---
 
 ### Attachments Validation Verification
@@ -176,9 +176,9 @@ Test cases for element identifiers:
   * type: test-verification
 
 #### Relations
-  * verify: [Reserved Subsections Support](../StructureAndParsing.md#reserved-subsections-support)
-  * verify: [Attachment Target Validation](../StructureAndParsing.md#attachment-target-validation)
   * satisfiedBy: [test.sh](../../../../tests/test-assets/test.sh)
+  * verify: [Attachment Target Validation](../StructureAndParsing.md#attachment-target-validation)
+  * verify: [Reserved Subsections Support](../StructureAndParsing.md#reserved-subsections-support)
 ---
 
 ### Detach Command Verification
@@ -204,8 +204,8 @@ Test cases for element attachments:
   * type: test-verification
 
 #### Relations
-  * verify: [Attachment Commands](../../../Interfaces/CLI.md#attachment-commands)
   * satisfiedBy: [test.sh](../../../../tests/test-assets/test.sh)
+  * verify: [Attachment Commands](../../../Interfaces/CLI.md#attachment-commands)
 ---
 
 ### Move Asset Command Verification
@@ -238,8 +238,8 @@ Test cases for filesystem and reporting:
   * type: test-verification
 
 #### Relations
-  * verify: [CLI Move Asset Command](../../../Interfaces/CLI.md#cli-move-asset-command)
   * satisfiedBy: [test.sh](../../../../tests/test-assets/test.sh)
+  * verify: [CLI Move Asset Command](../../../Interfaces/CLI.md#cli-move-asset-command)
 ---
 
 ### Remove Asset Command Verification
@@ -270,6 +270,6 @@ Test cases for filesystem and reporting:
   * type: test-verification
 
 #### Relations
-  * verify: [CLI Remove Asset Command](../../../Interfaces/CLI.md#cli-remove-asset-command)
   * satisfiedBy: [test.sh](../../../../tests/test-assets/test.sh)
+  * verify: [CLI Remove Asset Command](../../../Interfaces/CLI.md#cli-remove-asset-command)
 ---

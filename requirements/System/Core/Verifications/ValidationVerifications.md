@@ -42,8 +42,8 @@ This test verifies that the system assigns the default type 'requirement' to all
   * type: test-verification
 
 #### Relations
-  * verify: [Default Requirement Type Assignment](../ModelManagement.md#default-requirement-type-assignment)
   * satisfiedBy: [test.sh](../../../../tests/test-default-type-assignment/test.sh)
+  * verify: [Default Requirement Type Assignment](../ModelManagement.md#default-requirement-type-assignment)
 ---
 
 ### Element Type Relation Compatibility Test
@@ -115,9 +115,9 @@ This test verifies that the system correctly validates relation types based on e
   * type: test-verification
 
 #### Relations
-  * verify: [Relation Element Type Validator](../Validation.md#relation-element-type-validator)
-  * verify: [Element Type Relation Compatibility](../ModelManagement.md#element-type-relation-compatibility)
   * satisfiedBy: [test.sh](../../../../tests/test-element-type-relation-compatibility/test.sh)
+  * verify: [Element Type Relation Compatibility](../ModelManagement.md#element-type-relation-compatibility)
+  * verify: [Relation Element Type Validator](../Validation.md#relation-element-type-validator)
 ---
 
 ### File Exclusion Test
@@ -193,9 +193,9 @@ This test verifies that Reqvire correctly reads and applies exclusion patterns f
   * type: test-verification
 
 #### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-gitignore-integration/test.sh)
   * verify: [Ignore Files Integration](../Configuration.md#ignore-files-integration)
   * verify: [Reserved Repository Files Exclusion](../Configuration.md#reserved-repository-files-exclusion)
-  * satisfiedBy: [test.sh](../../../../tests/test-gitignore-integration/test.sh)
 ---
 
 ### Invalid Header Structure Test
@@ -222,9 +222,9 @@ This test verifies that Reqvire correctly detects and reports invalid header str
   * type: test-verification
 
 #### Relations
-  * verify: [Markdown Structure Validator](../Validation.md#markdown-structure-validator)
-  * verify: [Structure and Addressing in Markdown Documents](../StructureAndParsing.md#structure-and-addressing-in-markdown-documents)
   * satisfiedBy: [test.sh](../../../../tests/test-invalid-relations/test.sh)
+  * verify: [Structure and Addressing in Markdown Documents](../StructureAndParsing.md#structure-and-addressing-in-markdown-documents)
+  * verify: [Markdown Structure Validator](../Validation.md#markdown-structure-validator)
 ---
 
 ### Invalid Relations Test
@@ -279,13 +279,15 @@ This verification test checks that Reqvire correctly identifies and reports inva
   * type: test-verification
 
 #### Relations
-  * verify: [Validate Command](../../../Interfaces/CLI.md#validate-command)
-  * verify: [Validation Error Handling](../Validation.md#validation-error-handling)
-  * verify: [Internal Consistency Validator](../Validation.md#internal-consistency-validator)
-  * verify: [Relation Type Validation](../Validation.md#relation-type-validation)
-  * verify: [Relation Element Type Validator](../Validation.md#relation-element-type-validator)
-  * verify: [Trace Relation Non-Directional Behavior](../../Output/DiagramGeneration.md#trace-relation-non-directional-behavior)
   * satisfiedBy: [test.sh](../../../../tests/test-invalid-relations/test.sh)
+  * verify: [Validate Command](../../../Interfaces/CLI.md#validate-command)
+  * verify: [Cross-Component Dependency Validator](../Validation.md#cross-component-dependency-validator)
+  * verify: [Internal Consistency Validator](../Validation.md#internal-consistency-validator)
+  * verify: [Markdown Structure Validator](../Validation.md#markdown-structure-validator)
+  * verify: [Relation Element Type Validator](../Validation.md#relation-element-type-validator)
+  * verify: [Relation Type Validation](../Validation.md#relation-type-validation)
+  * verify: [Validation Error Handling](../Validation.md#validation-error-handling)
+  * verify: [Trace Relation Non-Directional Behavior](../../Output/DiagramGeneration.md#trace-relation-non-directional-behavior)
 ---
 
 ### Requirements Files Search and Detection Test
@@ -310,8 +312,9 @@ This test verifies that the system correctly searches for and detects structured
   * type: test-verification
 
 #### Relations
-  * verify: [Structured Markdown Files Search and Detection](../Configuration.md#structured-markdown-files-search-and-detection)
   * satisfiedBy: [test.sh](../../../../tests/test-excluded-patterns/test.sh)
+  * verify: [Structured Markdown Files Search and Detection](../Configuration.md#structured-markdown-files-search-and-detection)
+  * verify: [GraphRegistry as Primary Registry](../Validation.md#graphregistry-as-primary-registry)
 ---
 
 ### Same-File Fragment Relations Test
@@ -334,9 +337,9 @@ This test verifies that Reqvire correctly handles and validates relations to fra
   * type: test-verification
 
 #### Relations
-  * verify: [Relation Type Validation](../Validation.md#relation-type-validation)
-  * verify: [Requirements Processing](../Configuration.md#requirements-processing)
   * satisfiedBy: [test.sh](../../../../tests/test-fragment-relations/test.sh)
+  * verify: [Requirements Processing](../Configuration.md#requirements-processing)
+  * verify: [Relation Type Validation](../Validation.md#relation-type-validation)
 ---
 
 ### Subdirectory Processing Verification
@@ -371,9 +374,9 @@ This test verifies that the system correctly processes only files within the cur
   * type: test-verification
 
 #### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-subdirectory-functionality/test.sh)
   * verify: [CLI Move Element Command](../../../Interfaces/CLI.md#cli-move-element-command)
   * verify: [CLI Move File Command](../../../Interfaces/CLI.md#cli-move-file-command)
-  * satisfiedBy: [test.sh](../../../../tests/test-subdirectory-functionality/test.sh)
 ---
 
 ### Unstructured Documents Test
@@ -398,6 +401,6 @@ This test verifies that the system correctly validates relations to excluded fil
   * type: test-verification
 
 #### Relations
-  * verify: [Excluded File Relation Validation](../Validation.md#excluded-file-relation-validation)
   * satisfiedBy: [test.sh](../../../../tests/test-valid-relations/test.sh)
+  * verify: [Excluded File Relation Validation](../Validation.md#excluded-file-relation-validation)
 ---

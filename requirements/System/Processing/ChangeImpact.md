@@ -15,9 +15,12 @@ Change impact detection encompasses:
 - Attachment identifier location changes (moved/renamed Refinement elements) shall be reported but do NOT propagate impact (same behavior as relation relocations)
 
 #### Relations
-  * derivedFrom: [Tracing Structural Changes](../Output/Reporting.md#tracing-structural-changes)
+  * derive: [Requirements Change Propagation](#requirements-change-propagation)
+  * derive: [Structural Change Analyzer](#structural-change-analyzer)
   * derivedFrom: [Element Identity Model](../Core/StructureAndParsing.md#element-identity-model)
+  * derivedFrom: [Tracing Structural Changes](../Output/Reporting.md#tracing-structural-changes)
   * satisfiedBy: [change_impact.rs](../../../core/src/change_impact.rs)
+  * verifiedBy: [Attachments Change Impact Verification](../Core/Verifications/AttachmentsVerifications.md#attachments-change-impact-verification)
 ---
 
 ### Requirements Change Propagation
@@ -30,6 +33,10 @@ When a requirement is changed, the system shall propagate the change through rel
 #### Relations
   * derivedFrom: [Change Impact Detection](#change-impact-detection)
   * satisfiedBy: [change_impact.rs](../../../core/src/change_impact.rs)
+  * verifiedBy: [Change Impact Detection Test](Verifications/ChangeImpactVerifications.md#change-impact-detection-test)
+  * verifiedBy: [Change Impact Relations Test](Verifications/ChangeImpactVerifications.md#change-impact-relations-test)
+  * verifiedBy: [Change Impact Smart Filtering Test](Verifications/ChangeImpactVerifications.md#change-impact-smart-filtering-test)
+  * verifiedBy: [Element Content Extraction Test](Verifications/ChangeImpactVerifications.md#element-content-extraction-test)
 ---
 
 ### Structural Change Analyzer

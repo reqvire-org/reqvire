@@ -60,10 +60,10 @@ This test verifies that the format command reorders elements following the Eleme
   * [Element Ordering Behavior](../Refinements.md#element-ordering-behavior)
 
 #### Relations
-  * verify: [Element Ordering Normalization](../Formatting.md#element-ordering-normalization)
-  * verify: [Element Manipulation File Persistence](../ElementManipulation.md#element-manipulation-file-persistence)
-  * verify: [Format Command](../../../Interfaces/CLI.md#format-command)
   * satisfiedBy: [test.sh](../../../../tests/test-element-ordering/test.sh)
+  * verify: [Format Command](../../../Interfaces/CLI.md#format-command)
+  * verify: [Element Manipulation File Persistence](../ElementManipulation.md#element-manipulation-file-persistence)
+  * verify: [Element Ordering Normalization](../Formatting.md#element-ordering-normalization)
 ---
 
 ### Format Command Requirements Verification
@@ -182,54 +182,13 @@ This test verifies the format command requirements from SystemRequirements and U
   * type: test-verification
 
 #### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-advanced-format/test.sh)
   * verify: [Format Command](../../../Interfaces/CLI.md#format-command)
-  * verify: [Document Structure Normalization](../Formatting.md#document-structure-normalization)
   * verify: [Structure and Addressing in Markdown Documents](../../Core/StructureAndParsing.md#structure-and-addressing-in-markdown-documents)
-  * satisfiedBy: [test.sh](../../../../tests/test-advanced-format/test.sh)
----
-
-### Relation Ordering Verification
-
-This test verifies that the format command sorts relations alphabetically for deterministic output.
-
-#### Details
-
-##### Acceptance Criteria
-**Primary Sort by Relation Type:**
-- Relations shall be sorted alphabetically by relation type name
-- derivedFrom shall appear before satisfiedBy
-- satisfy shall appear before trace
-- trace shall appear before verifiedBy
-
-**Secondary Sort by Target Identifier:**
-- Within the same relation type, relations shall be sorted alphabetically by target identifier
-- For example: `derivedFrom: A` shall appear before `derivedFrom: B`
-
-**Deterministic Output:**
-- Same input shall always produce same output
-- Output shall not depend on HashMap iteration order or parsing order
-
-##### Test Criteria
-1. **Relation type alphabetical ordering**
-   - Create element with relations in non-alphabetical type order
-   - Run format --fix
-   - Verify relations are sorted by type name alphabetically
-
-2. **Same-type relation ordering**
-   - Create element with multiple relations of same type to different targets
-   - Run format --fix
-   - Verify relations of same type are sorted by target identifier
-
-3. **Deterministic output across runs**
-   - Run format --fix multiple times
-   - Verify output is identical each time
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * verify: [Relation Ordering Normalization](../Formatting.md#relation-ordering-normalization)
-  * satisfiedBy: [test.sh](../../../../tests/test-advanced-format/test.sh)
+  * verify: [Document Structure Normalization](../Formatting.md#document-structure-normalization)
+  * verify: [Format Consistency Enforcement](../Formatting.md#format-consistency-enforcement)
+  * verify: [Git-Style Diff Output for Format](../Formatting.md#git-style-diff-output-for-format)
+  * verify: [Replace Absolute Links with Relative Links](../Formatting.md#replace-absolute-links-with-relative-links)
 ---
 
 ### Full Relations Insertion Verification
@@ -287,7 +246,51 @@ This test verifies that the --with-full-relations flag correctly inserts all reg
   * type: test-verification
 
 #### Relations
-  * verify: [Full Relations Insertion](../Formatting.md#full-relations-insertion)
-  * verify: [Format Command](../../../Interfaces/CLI.md#format-command)
   * satisfiedBy: [test.sh](../../../../tests/test-format-full-relations/test.sh)
+  * verify: [Format Command](../../../Interfaces/CLI.md#format-command)
+  * verify: [Full Relations Insertion](../Formatting.md#full-relations-insertion)
+---
+
+### Relation Ordering Verification
+
+This test verifies that the format command sorts relations alphabetically for deterministic output.
+
+#### Details
+
+##### Acceptance Criteria
+**Primary Sort by Relation Type:**
+- Relations shall be sorted alphabetically by relation type name
+- derivedFrom shall appear before satisfiedBy
+- satisfy shall appear before trace
+- trace shall appear before verifiedBy
+
+**Secondary Sort by Target Identifier:**
+- Within the same relation type, relations shall be sorted alphabetically by target identifier
+- For example: `derivedFrom: A` shall appear before `derivedFrom: B`
+
+**Deterministic Output:**
+- Same input shall always produce same output
+- Output shall not depend on HashMap iteration order or parsing order
+
+##### Test Criteria
+1. **Relation type alphabetical ordering**
+   - Create element with relations in non-alphabetical type order
+   - Run format --fix
+   - Verify relations are sorted by type name alphabetically
+
+2. **Same-type relation ordering**
+   - Create element with multiple relations of same type to different targets
+   - Run format --fix
+   - Verify relations of same type are sorted by target identifier
+
+3. **Deterministic output across runs**
+   - Run format --fix multiple times
+   - Verify output is identical each time
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-advanced-format/test.sh)
+  * verify: [Relation Ordering Normalization](../Formatting.md#relation-ordering-normalization)
 ---

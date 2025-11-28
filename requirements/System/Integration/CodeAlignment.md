@@ -8,6 +8,7 @@ The system shall support code traceability by using structured comments to link 
   * type: user-requirement
 
 #### Relations
+  * derive: [Traceability Format](#traceability-format)
   * derivedFrom: [Aligning Design with Code](../../UserStories.md#aligning-design-with-code)
 ---
 
@@ -30,6 +31,8 @@ Where:
 - `<element identifier>` is the identifier of the requirement being traced.
 
 #### Relations
+  * derive: [Comment Style by File Extension](#comment-style-by-file-extension)
+  * derive: [Validating Traceability Format](#validating-traceability-format)
   * derivedFrom: [Code Traceability](#code-traceability)
 ---
 
@@ -41,6 +44,12 @@ The system shall use different comment style based of file extension of the code
 The system shall define comment style specification for each file extension.
 
 #### Relations
+  * derive: [BAT style comment](#bat-style-comment)
+  * derive: [CSS style comment](#css-style-comment)
+  * derive: [Dash style comment](#dash-style-comment)
+  * derive: [Slash style comment](#slash-style-comment)
+  * derive: [SQL style comment](#sql-style-comment)
+  * derive: [XML style comment](#xml-style-comment)
   * derivedFrom: [Traceability Format](#traceability-format)
   * satisfiedBy: [Comment Style Specification](Refinements.md#comment-style-specification)
 ---

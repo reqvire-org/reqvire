@@ -18,6 +18,10 @@ examples/**
 The `.reqvireignore` file provides Reqvire-specific exclusions for files that should remain in version control but not be processed as requirements.
 
 #### Relations
+  * derive: [Ignore Files Integration](#ignore-files-integration)
+  * derive: [Requirements Processing](#requirements-processing)
+  * derive: [Reserved Repository Files Exclusion](#reserved-repository-files-exclusion)
+  * derive: [File Pattern Exclusion for Format](../Operations/Formatting.md#file-pattern-exclusion-for-format)
   * derivedFrom: [Coexistence of Structured and Unstructured Documents](ModelManagement.md#coexistence-of-structured-and-unstructured-documents)
   * satisfiedBy: [config.rs](../../../cli/src/config.rs)
 ---
@@ -54,8 +58,10 @@ Both ignore files use standard gitignore pattern syntax to exclude files from be
 - File-based exclusion patterns are more maintainable than configuration-based approaches
 
 #### Relations
+  * derive: [Target Location Validation and Auto-Creation](../Operations/ElementManipulation.md#target-location-validation-and-auto-creation)
   * derivedFrom: [Ignoring Unstructured Documents](#ignoring-unstructured-documents)
   * satisfiedBy: [config.rs](../../../cli/src/config.rs)
+  * verifiedBy: [File Exclusion Test](Verifications/ValidationVerifications.md#file-exclusion-test)
 ---
 
 ### Requirements Processing
@@ -69,9 +75,14 @@ File exclusion is handled through:
 - Reserved repository files (README.md, LICENSE.md, etc.)
 
 #### Relations
+  * derive: [Structured Markdown Files Search and Detection](#structured-markdown-files-search-and-detection)
+  * derive: [GraphRegistry as Primary Registry](Validation.md#graphregistry-as-primary-registry)
+  * derive: [Two-Pass Validation Strategy](Validation.md#two-pass-validation-strategy)
   * derivedFrom: [Ignoring Unstructured Documents](#ignoring-unstructured-documents)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
+  * verifiedBy: [Same-File Fragment Relations Test](Verifications/ValidationVerifications.md#same-file-fragment-relations-test)
+  * verifiedBy: [Element Content Extraction Test](../Processing/Verifications/ChangeImpactVerifications.md#element-content-extraction-test)
 ---
 
 ### Structured Markdown Files Search and Detection
@@ -87,6 +98,7 @@ Identification Process:
 #### Relations
   * derivedFrom: [Requirements Processing](#requirements-processing)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
+  * verifiedBy: [Requirements Files Search and Detection Test](Verifications/ValidationVerifications.md#requirements-files-search-and-detection-test)
 ---
 
 ### Reserved Repository Files Exclusion
@@ -119,4 +131,5 @@ The following reserved filenames are always excluded from structured markdown pr
 #### Relations
   * derivedFrom: [Ignoring Unstructured Documents](#ignoring-unstructured-documents)
   * satisfiedBy: [config.rs](../../../cli/src/config.rs)
+  * verifiedBy: [File Exclusion Test](Verifications/ValidationVerifications.md#file-exclusion-test)
 ---

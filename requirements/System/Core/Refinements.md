@@ -21,6 +21,9 @@ Validation rules for element type and relation type combinations.
 
 #### Metadata
   * type: constraint
+
+#### Relations
+  * satisfy: [Element Type Relation Compatibility](ModelManagement.md#element-type-relation-compatibility)
 ---
 
 ### Two-Pass Validation Behavior
@@ -42,6 +45,9 @@ Two-phase validation process for model parsing.
 
 #### Metadata
   * type: behavior
+
+#### Relations
+  * satisfy: [Two-Pass Validation Strategy](Validation.md#two-pass-validation-strategy)
 ---
 
 ### Validation Error Reporting Behavior
@@ -56,4 +62,7 @@ Error message structure for validation issues.
 
 #### Metadata
   * type: behavior
+
+#### Relations
+  * satisfy: [Enhanced Validation Error Reporting](Validation.md#enhanced-validation-error-reporting)
 ---

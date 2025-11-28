@@ -23,8 +23,8 @@ This test verifies that the system automatically exports and updates HTML docume
   * type: test-verification
 
 #### Relations
-  * verify: [Automated Documentation Export on PR Merge](../../Integration/GitHubIntegration.md#automated-documentation-export-on-pr-merge)
   * satisfiedBy: [update_docs.yml](../../../../.github/workflows/update_docs.yml)
+  * verify: [Automated Documentation Export on PR Merge](../../Integration/GitHubIntegration.md#automated-documentation-export-on-pr-merge)
 ---
 
 ### Diagram Generation Test
@@ -105,8 +105,8 @@ This test verifies that element attachments are displayed within file-based diag
   * type: test-verification
 
 #### Relations
-  * verify: [File Diagram Attachment Display](../DiagramGeneration.md#file-diagram-attachment-display)
   * satisfiedBy: [test.sh](../../../../tests/test-attachment-export/test.sh)
+  * verify: [File Diagram Attachment Display](../DiagramGeneration.md#file-diagram-attachment-display)
 ---
 
 ### Remove Generated Diagrams Verification

@@ -8,6 +8,7 @@ The system shall allow structured markdown and unstructured. (eg., markdown, PDF
   * type: user-requirement
 
 #### Relations
+  * derive: [Ignoring Unstructured Documents](Configuration.md#ignoring-unstructured-documents)
   * derivedFrom: [Managing System Models](../../UserStories.md#managing-system-models)
 ---
 
@@ -48,6 +49,8 @@ When an element does not have a `#### Metadata` subsection with a `type` propert
 
 #### Relations
   * derivedFrom: [Managing System Models](../../UserStories.md#managing-system-models)
+  * verifiedBy: [Element Subsection Parsing Test](Verifications/ParsingVerifications.md#element-subsection-parsing-test)
+  * verifiedBy: [Default Element Type Assignment Test](Verifications/ValidationVerifications.md#default-element-type-assignment-test)
 ---
 
 ### Efficient Processing
@@ -76,6 +79,15 @@ All manipulation operations shall:
   * type: user-requirement
 
 #### Relations
+  * derive: [Attachment Identifier Updates](#attachment-identifier-updates)
+  * derive: [Create Element Operation](../Operations/ElementManipulation.md#create-element-operation)
+  * derive: [Delete Element Operation](../Operations/ElementManipulation.md#delete-element-operation)
+  * derive: [Element Manipulation File Persistence](../Operations/ElementManipulation.md#element-manipulation-file-persistence)
+  * derive: [Move Element Operation](../Operations/ElementManipulation.md#move-element-operation)
+  * derive: [Move File Operation](../Operations/ElementManipulation.md#move-file-operation)
+  * derive: [Relation Consistency Maintenance](../Operations/ElementManipulation.md#relation-consistency-maintenance)
+  * derive: [Rename Element Operation](../Operations/ElementManipulation.md#rename-element-operation)
+  * derive: [Target Location Validation and Auto-Creation](../Operations/ElementManipulation.md#target-location-validation-and-auto-creation)
   * derivedFrom: [Managing System Models](../../UserStories.md#managing-system-models)
 ---
 
@@ -97,6 +109,7 @@ This requirement ensures consistency between relation updates and attachment ide
 #### Relations
   * derivedFrom: [Element Manipulation Operations](#element-manipulation-operations)
   * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
+  * verifiedBy: [Attachment Identifier CRUD Verification](Verifications/AttachmentsVerifications.md#attachment-identifier-crud-verification)
 ---
 
 ### Git Repository as Project Root
@@ -112,6 +125,8 @@ All paths specified in Reqvire commands will be resolved relative to the current
   * type: user-requirement
 
 #### Relations
+  * derive: [Subdirectory Processing Option](../../Interfaces/CLI.md#subdirectory-processing-option)
+  * derive: [Target Location Validation and Auto-Creation](../Operations/ElementManipulation.md#target-location-validation-and-auto-creation)
   * derivedFrom: [Managing System Models](../../UserStories.md#managing-system-models)
 ---
 
@@ -123,8 +138,12 @@ The system shall implement relations following clearly defined specifications fo
   * [RelationTypes.md](DesignDocuments/RelationTypes.md)
 
 #### Relations
+  * derive: [Element Type Relation Compatibility](#element-type-relation-compatibility)
+  * derive: [Validate Relation Types](Validation.md#validate-relation-types)
+  * derive: [Trace Relation Non-Directional Behavior](../Output/DiagramGeneration.md#trace-relation-non-directional-behavior)
   * derivedFrom: [Identifiers and Relations](StructureAndParsing.md#identifiers-and-relations)
   * satisfiedBy: [relation.rs](../../../core/src/relation.rs)
+  * verifiedBy: [Element Subsection Parsing Test](Verifications/ParsingVerifications.md#element-subsection-parsing-test)
 ---
 
 ### Element Type Relation Compatibility
@@ -138,6 +157,7 @@ The system shall define element type relation compatibility constraints.
   * [RelationTypes.md](DesignDocuments/RelationTypes.md)
 
 #### Relations
+  * derive: [Relation Element Type Validator](Validation.md#relation-element-type-validator)
   * derivedFrom: [Relation Types and behaviors](#relation-types-and-behaviors)
   * derivedFrom: [Supported Element Types](#supported-element-types)
   * satisfiedBy: [Element Type Relation Compatibility Constraint](Refinements.md#element-type-relation-compatibility-constraint)
@@ -168,9 +188,13 @@ Element types are identified through a reserved "type" metadata property. The fo
 **Relation constraints:** Each element type has specific constraints on which relation types it can use. See [Element Type Relation Compatibility](DesignDocuments/RelationTypes.md#element-type-relation-compatibility) for the complete compatibility matrix.
 
 #### Relations
+  * derive: [Element Type Relation Compatibility](#element-type-relation-compatibility)
+  * derive: [Refinement Element Structure Constraints](#refinement-element-structure-constraints)
   * derivedFrom: [Reserved Subsections Support](StructureAndParsing.md#reserved-subsections-support)
   * satisfiedBy: [element.rs](../../../core/src/element.rs)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
+  * verifiedBy: [Element Subsection Parsing Test](Verifications/ParsingVerifications.md#element-subsection-parsing-test)
+  * verifiedBy: [Refinement Element Type Parsing Test](Verifications/ParsingVerifications.md#refinement-element-type-parsing-test)
 ---
 
 ### Refinement Element Structure Constraints
@@ -188,6 +212,7 @@ When a Refinement element contains a Relations subsection, the validator shall r
 #### Relations
   * derivedFrom: [Supported Element Types](#supported-element-types)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
+  * verifiedBy: [Refinement Relations Rejection Test](Verifications/ParsingVerifications.md#refinement-relations-rejection-test)
 ---
 
 ### Template-Based Model Bootstrapping

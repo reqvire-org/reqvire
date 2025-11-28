@@ -64,8 +64,8 @@ The test shall verify that the `add` command creates new elements from stdin or 
   * [Element Ordering Behavior](../Refinements.md#element-ordering-behavior)
 
 #### Relations
-  * verify: [CLI Add Element Command](../../../Interfaces/CLI.md#cli-add-element-command)
   * satisfiedBy: [test.sh](../../../../tests/test-crud-manipulation/test.sh)
+  * verify: [CLI Add Element Command](../../../Interfaces/CLI.md#cli-add-element-command)
 ---
 
 ### CLI Move Element Test
@@ -131,8 +131,8 @@ The test shall verify that the `mv` command relocates elements, updates all rela
   * [Element Ordering Behavior](../Refinements.md#element-ordering-behavior)
 
 #### Relations
-  * verify: [CLI Move Element Command](../../../Interfaces/CLI.md#cli-move-element-command)
   * satisfiedBy: [test.sh](../../../../tests/test-crud-manipulation/test.sh)
+  * verify: [CLI Move Element Command](../../../Interfaces/CLI.md#cli-move-element-command)
 ---
 
 ### CLI Move File Test
@@ -218,9 +218,9 @@ The test shall verify that the `mv-file` command moves entire specification file
   * type: test-verification
 
 #### Relations
-  * verify: [CLI Move File Command](../../../Interfaces/CLI.md#cli-move-file-command)
   * satisfiedBy: [test.sh](../../../../tests/test-crud-manipulation/test.sh)
   * satisfiedBy: [test.sh](../../../../tests/test-subdirectory-functionality/test.sh)
+  * verify: [CLI Move File Command](../../../Interfaces/CLI.md#cli-move-file-command)
 ---
 
 ### CLI Remove Element Test
@@ -269,8 +269,8 @@ The test shall verify that the `rm` command deletes elements, removes relations,
   * type: test-verification
 
 #### Relations
-  * verify: [CLI Remove Element Command](../../../Interfaces/CLI.md#cli-remove-element-command)
   * satisfiedBy: [test.sh](../../../../tests/test-crud-manipulation/test.sh)
+  * verify: [CLI Remove Element Command](../../../Interfaces/CLI.md#cli-remove-element-command)
 ---
 
 ### CLI Rename Element Test
@@ -323,8 +323,8 @@ The test shall verify that the `rename` command renames elements, updates all re
   * type: test-verification
 
 #### Relations
-  * verify: [CLI Rename Element Command](../../../Interfaces/CLI.md#cli-rename-element-command)
   * satisfiedBy: [test.sh](../../../../tests/test-crud-manipulation/test.sh)
+  * verify: [CLI Rename Element Command](../../../Interfaces/CLI.md#cli-rename-element-command)
 ---
 
 ### Create Element Test
@@ -397,8 +397,8 @@ The test shall verify that new model elements can be created from a full Markdow
   * type: test-verification
 
 #### Relations
-  * verify: [Create Element Operation](../ElementManipulation.md#create-element-operation)
   * satisfiedBy: [test.sh](../../../../tests/test-crud-manipulation/test.sh)
+  * verify: [Create Element Operation](../ElementManipulation.md#create-element-operation)
 ---
 
 ### Delete Element Test
@@ -451,8 +451,8 @@ The test shall verify that existing model elements can be deleted, all relations
   * type: test-verification
 
 #### Relations
-  * verify: [Delete Element Operation](../ElementManipulation.md#delete-element-operation)
   * satisfiedBy: [test.sh](../../../../tests/test-crud-manipulation/test.sh)
+  * verify: [Delete Element Operation](../ElementManipulation.md#delete-element-operation)
 ---
 
 ### File Persistence Test
@@ -501,8 +501,8 @@ The test shall verify that element manipulation operations are persisted to sour
   * [Element Ordering Behavior](../Refinements.md#element-ordering-behavior)
 
 #### Relations
-  * verify: [Element Manipulation File Persistence](../ElementManipulation.md#element-manipulation-file-persistence)
   * satisfiedBy: [test.sh](../../../../tests/test-crud-file-persistence/test.sh)
+  * verify: [Element Manipulation File Persistence](../ElementManipulation.md#element-manipulation-file-persistence)
 ---
 
 ### Move Element Test
@@ -569,9 +569,9 @@ The test shall verify that existing model elements can be moved to different loc
   * type: test-verification
 
 #### Relations
-  * verify: [Move Element Operation](../ElementManipulation.md#move-element-operation)
-  * satisfiedBy: [test.sh](../../../../tests/test-crud-manipulation/test.sh)
   * satisfiedBy: [test.sh](../../../../tests/test-crud-empty-file-cleanup/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-crud-manipulation/test.sh)
+  * verify: [Move Element Operation](../ElementManipulation.md#move-element-operation)
 ---
 
 ### Move File Squash Test
@@ -645,8 +645,8 @@ The test shall verify that the `mv-file --squash` command moves all elements fro
   * type: test-verification
 
 #### Relations
-  * verify: [Move File Operation](../ElementManipulation.md#move-file-operation)
   * satisfiedBy: [test.sh](../../../../tests/test-crud-mv-file-squash/test.sh)
+  * verify: [Move File Operation](../ElementManipulation.md#move-file-operation)
 ---
 
 ### Relation Consistency Test
@@ -687,8 +687,8 @@ The test shall verify that bidirectional relation consistency is maintained when
   * type: test-verification
 
 #### Relations
-  * verify: [Relation Consistency Maintenance](../ElementManipulation.md#relation-consistency-maintenance)
   * satisfiedBy: [test.sh](../../../../tests/test-crud-relation-consistency/test.sh)
+  * verify: [Relation Consistency Maintenance](../ElementManipulation.md#relation-consistency-maintenance)
 ---
 
 ### Target Location Validation Test
@@ -737,6 +737,6 @@ The test shall verify that target file path validation and auto-creation work co
   * type: test-verification
 
 #### Relations
-  * verify: [Target Location Validation and Auto-Creation](../ElementManipulation.md#target-location-validation-and-auto-creation)
   * satisfiedBy: [test.sh](../../../../tests/test-crud-target-location-validation/test.sh)
+  * verify: [Target Location Validation and Auto-Creation](../ElementManipulation.md#target-location-validation-and-auto-creation)
 ---

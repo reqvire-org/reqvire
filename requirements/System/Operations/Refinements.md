@@ -92,4 +92,7 @@ Validation rules for target paths in element operations.
 
 #### Metadata
   * type: constraint
+
+#### Relations
+  * satisfy: [Target Location Validation and Auto-Creation](ElementManipulation.md#target-location-validation-and-auto-creation)
 ---

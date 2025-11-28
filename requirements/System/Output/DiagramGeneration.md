@@ -19,8 +19,8 @@ The visualization helps users understand the model's logical structure, navigate
   * type: user-requirement
 
 #### Relations
-  * derivedFrom: [Generate Diagrams](../../UserStories.md#generate-diagrams)
   * derivedFrom: [Model Reports](Reporting.md#model-reports)
+  * derivedFrom: [Generate Diagrams](../../UserStories.md#generate-diagrams)
 ---
 
 ### Interactive Mermaid Diagrams
@@ -87,8 +87,9 @@ The system shall use the following color scheme for rendering diagram elements:
   * type: user-requirement
 
 #### Relations
-  * derivedFrom: [Generate Diagrams](../../UserStories.md#generate-diagrams)
+  * derive: [Diagram Generation](#diagram-generation)
   * derivedFrom: [Model Reports](Reporting.md#model-reports)
+  * derivedFrom: [Generate Diagrams](../../UserStories.md#generate-diagrams)
 ---
 
 ### Diagram Generation
@@ -125,9 +126,15 @@ The filtering ensures that:
 - Diagram readability is maintained while accurately representing the complete model structure
 
 #### Relations
+  * derive: [File Diagram Attachment Display](#file-diagram-attachment-display)
+  * derive: [Interactive Mermaid Diagram Node Behavior](#interactive-mermaid-diagram-node-behavior)
+  * derive: [SysML-Compatible Relationship Rendering](#sysml-compatible-relationship-rendering)
   * derivedFrom: [Interactive Mermaid Diagrams](#interactive-mermaid-diagrams)
   * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
   * satisfiedBy: [utils.rs](../../../core/src/utils.rs)
+  * verifiedBy: [Diagram Generation Test](Verifications/DiagramVerifications.md#diagram-generation-test)
+  * verifiedBy: [Diagram Relation Filtering Verification](Verifications/DiagramVerifications.md#diagram-relation-filtering-verification)
+  * verifiedBy: [Visualize Model Relationships Verification](Verifications/DiagramVerifications.md#visualize-model-relationships-verification)
 ---
 
 ### File Diagram Attachment Display
@@ -176,8 +183,8 @@ The `change-impact` command shall continue to use GitHub blob URLs by default (u
 
 #### Relations
   * derivedFrom: [Diagram Generation](#diagram-generation)
-  * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
+  * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
 ---
 
 ### SysML-Compatible Relationship Rendering
@@ -261,8 +268,8 @@ Users shall be able to generate and view model structure diagrams from any start
   * type: user-requirement
 
 #### Relations
-  * derivedFrom: [Generate Diagrams](../../UserStories.md#generate-diagrams)
   * derivedFrom: [Model Reports](Reporting.md#model-reports)
+  * derivedFrom: [Generate Diagrams](../../UserStories.md#generate-diagrams)
 ---
 
 ### Remove Generated Diagrams
@@ -273,6 +280,7 @@ The system shall provide functionality to remove all generated Mermaid diagrams 
   * type: user-requirement
 
 #### Relations
+  * derive: [Diagram Removal](#diagram-removal)
   * derivedFrom: [Generate Diagrams](../../UserStories.md#generate-diagrams)
 ---
 
@@ -283,6 +291,7 @@ When requested, the system shall remove all generated diagrams from the model by
 #### Relations
   * derivedFrom: [Remove Generated Diagrams](#remove-generated-diagrams)
   * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
+  * verifiedBy: [Remove Generated Diagrams Verification](Verifications/DiagramVerifications.md#remove-generated-diagrams-verification)
 ---
 
 ### Trace Relation Non-Directional Behavior

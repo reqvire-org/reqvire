@@ -15,6 +15,7 @@ Auto-fix shall:
 
 #### Relations
   * derivedFrom: [CLI Lint Command](../../Interfaces/CLI.md#cli-lint-command)
+  * verifiedBy: [Lint Command Verification](Verifications/LintingVerifications.md#lint-command-verification)
 ---
 
 ### Model Linting
@@ -33,6 +34,10 @@ The linting capability should:
   * type: user-requirement
 
 #### Relations
+  * derive: [Lint Output Formatting](#lint-output-formatting)
+  * derive: [Multi-Branch Convergence Detection](#multi-branch-convergence-detection)
+  * derive: [Redundant Hierarchical Relations Detection](#redundant-hierarchical-relations-detection)
+  * derive: [Redundant Verify Relations Detection](#redundant-verify-relations-detection)
   * derivedFrom: [Validating Structures](../../UserStories.md#validating-structures)
 ---
 
@@ -60,6 +65,7 @@ For auto-fixable issues, the output indicates these can be fixed with `--fix` fl
 
 #### Relations
   * derivedFrom: [Model Linting](#model-linting)
+  * verifiedBy: [Lint Command Verification](Verifications/LintingVerifications.md#lint-command-verification)
 ---
 
 ### Multi-Branch Convergence Detection
@@ -141,6 +147,7 @@ This approach reuses the proven trace tree logic for redundancy detection, ensur
   * [Verification Trace Tree Construction](../Processing/DesignDocuments/VerificationTraceAlgorithm.md#verification-trace-tree-construction)
 
 #### Relations
+  * derive: [Safe Redundant Hierarchical Relations Auto-Removal](#safe-redundant-hierarchical-relations-auto-removal)
   * derivedFrom: [Model Linting](#model-linting)
 ---
 
@@ -214,4 +221,5 @@ Detection shall:
 
 #### Relations
   * derivedFrom: [Model Linting](#model-linting)
+  * verifiedBy: [Lint Command Verification](Verifications/LintingVerifications.md#lint-command-verification)
 ---

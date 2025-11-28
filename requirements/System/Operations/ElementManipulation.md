@@ -45,12 +45,13 @@ When creating a new element, the system shall:
 #### Relations
   * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
   * derivedFrom: [Reserved Subsections Support](../Core/StructureAndParsing.md#reserved-subsections-support)
-  * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
-  * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
+  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
   * satisfiedBy: [diff.rs](../../../core/src/diff.rs)
-  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
+  * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
+  * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
   * satisfiedBy: [utils.rs](../../../core/src/utils.rs)
+  * verifiedBy: [Create Element Test](Verifications/ElementManipulationVerifications.md#create-element-test)
 ---
 
 ### Delete Element Operation
@@ -84,10 +85,11 @@ When deleting an element, the system shall:
 
 #### Relations
   * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
-  * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
+  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
   * satisfiedBy: [diff.rs](../../../core/src/diff.rs)
-  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
+  * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
+  * verifiedBy: [Delete Element Test](Verifications/ElementManipulationVerifications.md#delete-element-test)
 ---
 
 ### Element Manipulation File Persistence
@@ -100,8 +102,10 @@ The system shall persist all element manipulation operations to the source files
 
 #### Relations
   * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
-  * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
+  * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
+  * verifiedBy: [File Persistence Test](Verifications/ElementManipulationVerifications.md#file-persistence-test)
+  * verifiedBy: [Element Ordering Verification](Verifications/FormattingVerifications.md#element-ordering-verification)
 ---
 
 ### Move Element Operation
@@ -142,10 +146,11 @@ When moving an element, the system shall:
 
 #### Relations
   * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
-  * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
+  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
   * satisfiedBy: [diff.rs](../../../core/src/diff.rs)
-  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
+  * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
+  * verifiedBy: [Move Element Test](Verifications/ElementManipulationVerifications.md#move-element-test)
 ---
 
 ### Move File Operation
@@ -180,6 +185,7 @@ When the --squash flag is provided and the target file already exists, the syste
 
 #### Relations
   * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
+  * verifiedBy: [Move File Squash Test](Verifications/ElementManipulationVerifications.md#move-file-squash-test)
 ---
 
 ### Relation Consistency Maintenance
@@ -202,6 +208,7 @@ When manipulating elements, the system shall ensure:
 #### Relations
   * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
+  * verifiedBy: [Relation Consistency Test](Verifications/ElementManipulationVerifications.md#relation-consistency-test)
 ---
 
 ### Rename Element Operation
@@ -226,9 +233,9 @@ The system shall reject the operation with a clear error message if:
 
 #### Relations
   * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
-  * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
   * satisfiedBy: [diff.rs](../../../core/src/diff.rs)
+  * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
 ---
 
 ### Target Location Validation and Auto-Creation
@@ -239,10 +246,11 @@ The system shall validate target file paths for element manipulation operations 
 The system shall define target location validation constraints.
 
 #### Relations
-  * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
   * derivedFrom: [Ignore Files Integration](../Core/Configuration.md#ignore-files-integration)
+  * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
   * derivedFrom: [Git Repository as Project Root](../Core/ModelManagement.md#git-repository-as-project-root)
-  * satisfiedBy: [Target Location Constraint](Refinements.md#target-location-constraint)
-  * satisfiedBy: [utils.rs](../../../core/src/utils.rs)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
+  * satisfiedBy: [utils.rs](../../../core/src/utils.rs)
+  * satisfiedBy: [Target Location Constraint](Refinements.md#target-location-constraint)
+  * verifiedBy: [Target Location Validation Test](Verifications/ElementManipulationVerifications.md#target-location-validation-test)
 ---

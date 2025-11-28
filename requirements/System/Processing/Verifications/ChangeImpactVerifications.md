@@ -23,8 +23,8 @@ TODO: write test procedure
   * type: test-verification
 
 #### Relations
-  * verify: [CLI Change Impact Report Command](../../../Interfaces/CLI.md#cli-change-impact-report-command)
   * satisfiedBy: [test.sh](../../../../tests/test-change-impact-detection/test.sh)
+  * verify: [CLI Change Impact Report Command](../../../Interfaces/CLI.md#cli-change-impact-report-command)
 ---
 
 ### Change Impact Detection Test
@@ -68,10 +68,10 @@ This test verifies that the system correctly implements change impact detection,
   * type: test-verification
 
 #### Relations
-  * verify: [Requirements Change Propagation](../ChangeImpact.md#requirements-change-propagation)
-  * verify: [CLI Change Impact Report Command](../../../Interfaces/CLI.md#cli-change-impact-report-command)
   * satisfiedBy: [test.sh](../../../../tests/test-change-impact-detection/test.sh)
   * satisfiedBy: [test.sh](../../../../tests/test-change-impact-element-relocation/test.sh)
+  * verify: [CLI Change Impact Report Command](../../../Interfaces/CLI.md#cli-change-impact-report-command)
+  * verify: [Requirements Change Propagation](../ChangeImpact.md#requirements-change-propagation)
 ---
 
 ### Change Impact Relations Test
@@ -100,9 +100,9 @@ This test verifies that the system correctly handles different relation types wh
   * type: test-verification
 
 #### Relations
-  * verify: [Requirements Change Propagation](../ChangeImpact.md#requirements-change-propagation)
-  * verify: [CLI Change Impact Report Command](../../../Interfaces/CLI.md#cli-change-impact-report-command)
   * satisfiedBy: [test.sh](../../../../tests/test-change-impact-detection/test.sh)
+  * verify: [CLI Change Impact Report Command](../../../Interfaces/CLI.md#cli-change-impact-report-command)
+  * verify: [Requirements Change Propagation](../ChangeImpact.md#requirements-change-propagation)
 ---
 
 ### Change Impact Smart Filtering Test
@@ -134,8 +134,8 @@ This test verifies that the smart filtering correctly handles new elements in ch
   * type: test-verification
 
 #### Relations
-  * verify: [Requirements Change Propagation](../ChangeImpact.md#requirements-change-propagation)
   * satisfiedBy: [test.sh](../../../../tests/test-change-impact-smart-filtering/test.sh)
+  * verify: [Requirements Change Propagation](../ChangeImpact.md#requirements-change-propagation)
 ---
 
 ### Element Content Extraction Test
@@ -165,9 +165,9 @@ This test verifies that the system correctly extracts element content for change
   * type: test-verification
 
 #### Relations
-  * verify: [Requirements Change Propagation](../ChangeImpact.md#requirements-change-propagation)
-  * verify: [Requirements Processing](../../Core/Configuration.md#requirements-processing)
   * satisfiedBy: [test.sh](../../../../tests/test-element-content-extraction/test.sh)
+  * verify: [Requirements Processing](../../Core/Configuration.md#requirements-processing)
+  * verify: [Requirements Change Propagation](../ChangeImpact.md#requirements-change-propagation)
 ---
 
 ### Structural Change Reports Verification
@@ -193,6 +193,6 @@ TODO: write test procedure
   * type: test-verification
 
 #### Relations
-  * verify: [Tracing Structural Changes](../../Output/Reporting.md#tracing-structural-changes)
   * satisfiedBy: [test.sh](../../../../tests/test-change-impact-detection/test.sh)
+  * verify: [Tracing Structural Changes](../../Output/Reporting.md#tracing-structural-changes)
 ---

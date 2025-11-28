@@ -24,6 +24,8 @@ The attachment commands manage entries in the Attachments subsection of elements
 
 #### Relations
   * derivedFrom: [Reserved Subsections Support](../System/Core/StructureAndParsing.md#reserved-subsections-support)
+  * verifiedBy: [Attach Command Verification](../System/Core/Verifications/AttachmentsVerifications.md#attach-command-verification)
+  * verifiedBy: [Detach Command Verification](../System/Core/Verifications/AttachmentsVerifications.md#detach-command-verification)
 ---
 
 ### CLI Interface Structure
@@ -52,6 +54,25 @@ FORMAT OPTIONS:
 ```
 
 #### Relations
+  * derive: [CLI Add Element Command](#cli-add-element-command)
+  * derive: [CLI Change Impact Report Command](#cli-change-impact-report-command)
+  * derive: [CLI Containment Command](#cli-containment-command)
+  * derive: [CLI Coverage Command](#cli-coverage-command)
+  * derive: [CLI Lint Command](#cli-lint-command)
+  * derive: [CLI Model Diagram Command](#cli-model-diagram-command)
+  * derive: [CLI Move Asset Command](#cli-move-asset-command)
+  * derive: [CLI Move Element Command](#cli-move-element-command)
+  * derive: [CLI Move File Command](#cli-move-file-command)
+  * derive: [CLI Remove Asset Command](#cli-remove-asset-command)
+  * derive: [CLI Remove Element Command](#cli-remove-element-command)
+  * derive: [CLI Rename Element Command](#cli-rename-element-command)
+  * derive: [CLI Resources Command](#cli-resources-command)
+  * derive: [CLI Search Command](#cli-search-command)
+  * derive: [CLI Traces Command](#cli-traces-command)
+  * derive: [Format Command](#format-command)
+  * derive: [Subdirectory Processing Option](#subdirectory-processing-option)
+  * derive: [Validate Command](#validate-command)
+  * derive: [Integrated Validation](../System/Core/Validation.md#integrated-validation)
   * derivedFrom: [CLI interface](Interfaces.md#cli-interface)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
 ---
@@ -84,6 +105,7 @@ The `add` command shall:
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
+  * verifiedBy: [CLI Add Element Test](../System/Operations/Verifications/ElementManipulationVerifications.md#cli-add-element-test)
 ---
 
 ### CLI Change Impact Report Command
@@ -121,6 +143,11 @@ Command invocation: `reqvire change-impact [OPTIONS]`
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
+  * verifiedBy: [CLI Git Commit Hash Flag Test](Verifications/CLIVerifications.md#cli-git-commit-hash-flag-test)
+  * verifiedBy: [CLI Help Structure Verification](Verifications/CLIVerifications.md#cli-help-structure-verification)
+  * verifiedBy: [Change Impact Analysis Verification](../System/Processing/Verifications/ChangeImpactVerifications.md#change-impact-analysis-verification)
+  * verifiedBy: [Change Impact Detection Test](../System/Processing/Verifications/ChangeImpactVerifications.md#change-impact-detection-test)
+  * verifiedBy: [Change Impact Relations Test](../System/Processing/Verifications/ChangeImpactVerifications.md#change-impact-relations-test)
 ---
 
 ### CLI Containment Command
@@ -183,6 +210,7 @@ Command output shall be written to stdout for easy redirection to files.
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
+  * verifiedBy: [CLI Help Structure Verification](Verifications/CLIVerifications.md#cli-help-structure-verification)
   * verifiedBy: [Verification Coverage Report Test](../System/Output/Verifications/ReportingVerifications.md#verification-coverage-report-test)
 ---
 
@@ -213,6 +241,7 @@ Command output shall be written to stdout for easy redirection to files.
   * [Dry-Run Mode Behavior](../System/Operations/Refinements.md#dry-run-mode-behavior)
 
 #### Relations
+  * derive: [Lint Auto-fix Capability](../System/Operations/Linting.md#lint-auto-fix-capability)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
 ---
@@ -235,8 +264,8 @@ System shall provide CLI command to generate model diagrams with optional filter
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * satisfiedBy: [diagrams.rs](../../core/src/diagrams.rs)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
+  * satisfiedBy: [diagrams.rs](../../core/src/diagrams.rs)
 ---
 
 ### CLI Move Asset Command
@@ -268,6 +297,7 @@ The `mv-asset` command shall:
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
+  * verifiedBy: [Move Asset Command Verification](../System/Core/Verifications/AttachmentsVerifications.md#move-asset-command-verification)
 ---
 
 ### CLI Move Element Command
@@ -300,6 +330,8 @@ The `mv` command shall:
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
+  * verifiedBy: [Subdirectory Processing Verification](../System/Core/Verifications/ValidationVerifications.md#subdirectory-processing-verification)
+  * verifiedBy: [CLI Move Element Test](../System/Operations/Verifications/ElementManipulationVerifications.md#cli-move-element-test)
 ---
 
 ### CLI Move File Command
@@ -325,6 +357,8 @@ The `mv-file` command shall:
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
+  * verifiedBy: [Subdirectory Processing Verification](../System/Core/Verifications/ValidationVerifications.md#subdirectory-processing-verification)
+  * verifiedBy: [CLI Move File Test](../System/Operations/Verifications/ElementManipulationVerifications.md#cli-move-file-test)
 ---
 
 ### CLI Remove Asset Command
@@ -355,6 +389,7 @@ The `rm-asset` command shall:
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
+  * verifiedBy: [Remove Asset Command Verification](../System/Core/Verifications/AttachmentsVerifications.md#remove-asset-command-verification)
 ---
 
 ### CLI Remove Element Command
@@ -383,6 +418,7 @@ The `rm` command shall:
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
+  * verifiedBy: [CLI Remove Element Test](../System/Operations/Verifications/ElementManipulationVerifications.md#cli-remove-element-test)
 ---
 
 ### CLI Rename Element Command
@@ -411,6 +447,7 @@ The `rename` command shall:
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
+  * verifiedBy: [CLI Rename Element Test](../System/Operations/Verifications/ElementManipulationVerifications.md#cli-rename-element-test)
 ---
 
 ### CLI Resources Command
@@ -480,6 +517,8 @@ Default output:
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
+  * verifiedBy: [CLI Help Structure Verification](Verifications/CLIVerifications.md#cli-help-structure-verification)
+  * verifiedBy: [Attachment Search Filters Verification](../System/Core/Verifications/AttachmentsVerifications.md#attachment-search-filters-verification)
   * verifiedBy: [Search Command Tests](../System/Output/Verifications/ReportingVerifications.md#search-command-tests)
 ---
 
@@ -541,8 +580,12 @@ reqvire traces --from-folder=docs/reports > docs/reports/traces.md
   * [Mermaid Diagram Style Specification](../System/Output/DesignDocuments/DiagramStyles.md#mermaid-diagram-style-specification)
 
 #### Relations
+  * derive: [Verification Traces Element Navigation](#verification-traces-element-navigation)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
+  * verifiedBy: [CLI Help Structure Verification](Verifications/CLIVerifications.md#cli-help-structure-verification)
+  * verifiedBy: [Verification Traces Filter Options Test](../System/Output/Verifications/ReportingVerifications.md#verification-traces-filter-options-test)
+  * verifiedBy: [Verification Traces From-Folder Test](../System/Output/Verifications/ReportingVerifications.md#verification-traces-from-folder-test)
 ---
 
 ### Verification Traces Element Navigation
@@ -589,6 +632,10 @@ Additional behavior:
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
+  * verifiedBy: [CLI Help Structure Verification](Verifications/CLIVerifications.md#cli-help-structure-verification)
+  * verifiedBy: [Element Ordering Verification](../System/Operations/Verifications/FormattingVerifications.md#element-ordering-verification)
+  * verifiedBy: [Format Command Requirements Verification](../System/Operations/Verifications/FormattingVerifications.md#format-command-requirements-verification)
+  * verifiedBy: [Full Relations Insertion Verification](../System/Operations/Verifications/FormattingVerifications.md#full-relations-insertion-verification)
 ---
 
 ### Subdirectory Processing Option
@@ -652,6 +699,8 @@ The system shall provide a validation command that executes model validation and
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
+  * verifiedBy: [CLI Help Structure Verification](Verifications/CLIVerifications.md#cli-help-structure-verification)
+  * verifiedBy: [Invalid Relations Test](../System/Core/Verifications/ValidationVerifications.md#invalid-relations-test)
 ---
 
 ### Detailed Error Handling and Logging
@@ -659,6 +708,7 @@ The system shall provide a validation command that executes model validation and
 The system shall implement detailed error handling and logging throughout the application to facilitate troubleshooting and provide meaningful feedback.
 
 #### Relations
+  * derive: [Validation Error Handling](../System/Core/Validation.md#validation-error-handling)
   * derivedFrom: [Enhanced Validation Error Reporting](../System/Core/Validation.md#enhanced-validation-error-reporting)
   * satisfiedBy: [error.rs](../../core/src/error.rs)
 ---

@@ -94,8 +94,9 @@ Implementation                       Verification Element
 - **Details**: Additional details (use for EARS statements)
 - **Attachments**: References to files or Refinement elements (NOT for Refinement types)
 
-**Non-reserved Subsections**:
-- Any other subsection will become part of element content. Can be used for eg. `#### Specifications` when need for new refirement element is not there (used by other elements).
+**Other Subsections** (`####`):
+- Any non-reserved subsection becomes part of element content
+- Use `#### Specifications` or `#### Behaviors` for inline definitions that don't need separate elements (i.e., not referenced by other requirements)
 
 **Relations syntax** (two-space indentation):
 ```markdown

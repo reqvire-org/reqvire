@@ -16,4 +16,7 @@ Comment syntax for code traceability markers by file extension.
 
 #### Metadata
   * type: specification
+
+#### Relations
+  * satisfy: [Comment Style by File Extension](CodeAlignment.md#comment-style-by-file-extension)
 ---

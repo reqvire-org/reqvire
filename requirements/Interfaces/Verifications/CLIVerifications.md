@@ -31,8 +31,8 @@ This test verifies that the system properly handles the git commit hash flag for
   * type: test-verification
 
 #### Relations
-  * verify: [CLI Change Impact Report Command](../CLI.md#cli-change-impact-report-command)
   * satisfiedBy: [test.sh](../../../tests/test-change-impact-detection/test.sh)
+  * verify: [CLI Change Impact Report Command](../CLI.md#cli-change-impact-report-command)
 ---
 
 ### CLI Help Structure Verification
@@ -79,14 +79,14 @@ This test verifies that the CLI help output displays all commands and their opti
   * type: test-verification
 
 #### Relations
+  * satisfiedBy: [test.sh](../../../tests/test-cli-help-structure/test.sh)
+  * verify: [CLI Change Impact Report Command](../CLI.md#cli-change-impact-report-command)
+  * verify: [CLI Coverage Command](../CLI.md#cli-coverage-command)
+  * verify: [CLI Search Command](../CLI.md#cli-search-command)
+  * verify: [CLI Traces Command](../CLI.md#cli-traces-command)
   * verify: [Format Command](../CLI.md#format-command)
   * verify: [Validate Command](../CLI.md#validate-command)
   * verify: [HTML Export](../WebInterface.md#html-export)
-  * verify: [CLI Search Command](../CLI.md#cli-search-command)
-  * verify: [CLI Change Impact Report Command](../CLI.md#cli-change-impact-report-command)
-  * verify: [CLI Traces Command](../CLI.md#cli-traces-command)
-  * verify: [CLI Coverage Command](../CLI.md#cli-coverage-command)
-  * satisfiedBy: [test.sh](../../../tests/test-cli-help-structure/test.sh)
 ---
 
 ### Verification Traces Element Navigation Test
@@ -106,6 +106,6 @@ Test verifies that verification element names in the traces report are clickable
   * type: test-verification
 
 #### Relations
-  * verify: [Verification Traces Element Navigation](../CLI.md#verification-traces-element-navigation)
   * satisfiedBy: [test.sh](../../../tests/test-verification-traces/test.sh)
+  * verify: [Verification Traces Element Navigation](../CLI.md#verification-traces-element-navigation)
 ---

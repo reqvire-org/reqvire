@@ -8,6 +8,7 @@ The system shall provide command line interface (CLI) to faciliate model managem
   * type: user-requirement
 
 #### Relations
+  * derive: [CLI Interface Structure](CLI.md#cli-interface-structure)
   * derivedFrom: [Managing System Models](../UserStories.md#managing-system-models)
 ---
 
@@ -41,5 +42,7 @@ This determinism ensures that:
   * type: user-requirement
 
 #### Relations
+  * derive: [HTML Export](WebInterface.md#html-export)
+  * derive: [Serve Command](WebInterface.md#serve-command)
   * derivedFrom: [Managing System Models](../UserStories.md#managing-system-models)
 ---

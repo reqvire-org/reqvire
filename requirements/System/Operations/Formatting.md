@@ -5,6 +5,7 @@
 The system shall respect configured excluded filename patterns when performing formatting operations, ensuring that files intentionally excluded from processing do not receive inappropriate formatting suggestions.
 
 #### Relations
+  * derive: [Excluded File Relation Validation](../Core/Validation.md#excluded-file-relation-validation)
   * derivedFrom: [Ignoring Unstructured Documents](../Core/Configuration.md#ignoring-unstructured-documents)
   * satisfiedBy: [utils.rs](../../../core/src/utils.rs)
 ---
@@ -17,6 +18,10 @@ The system shall provide formatting capabilities to normalize and standardize Sy
   * type: user-requirement
 
 #### Relations
+  * derive: [Format Consistency Enforcement](#format-consistency-enforcement)
+  * derive: [Formatting Output](#formatting-output)
+  * derive: [Full Relations Insertion](#full-relations-insertion)
+  * derive: [Replace Absolute Links with Relative Links](#replace-absolute-links-with-relative-links)
   * derivedFrom: [Validating Structures](../../UserStories.md#validating-structures)
 ---
 
@@ -53,6 +58,9 @@ The system shall implement the following formatting fixes:
 - Provide context lines with proper line number continuity
 
 #### Relations
+  * derive: [Document Structure Normalization](#document-structure-normalization)
+  * derive: [Element Ordering Normalization](#element-ordering-normalization)
+  * derive: [Relation Ordering Normalization](#relation-ordering-normalization)
   * derivedFrom: [Model Formatting](#model-formatting)
   * derivedFrom: [Align with Industry Standards](../../UserStories.md#align-with-industry-standards)
   * satisfiedBy: [format.rs](../../../core/src/format.rs)
@@ -82,6 +90,7 @@ When generating formatted output, the system shall:
   * derivedFrom: [Format Consistency Enforcement](#format-consistency-enforcement)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
+  * verifiedBy: [Format Command Requirements Verification](Verifications/FormattingVerifications.md#format-command-requirements-verification)
 ---
 
 ### Element Ordering Normalization
@@ -93,6 +102,7 @@ When formatting or persisting specification files, the system shall reorder elem
 
 #### Relations
   * derivedFrom: [Format Consistency Enforcement](#format-consistency-enforcement)
+  * verifiedBy: [Element Ordering Verification](Verifications/FormattingVerifications.md#element-ordering-verification)
 ---
 
 ### Relation Ordering Normalization
@@ -112,6 +122,7 @@ This ensures:
 #### Relations
   * derivedFrom: [Format Consistency Enforcement](#format-consistency-enforcement)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
+  * verifiedBy: [Relation Ordering Verification](Verifications/FormattingVerifications.md#relation-ordering-verification)
 ---
 
 ### Formatting Output
@@ -119,6 +130,7 @@ This ensures:
 The system shall display formatting changes suggestion in similar manner as git diffs.
 
 #### Relations
+  * derive: [Git-Style Diff Output for Format](#git-style-diff-output-for-format)
   * derivedFrom: [Model Formatting](#model-formatting)
 ---
 
@@ -131,17 +143,8 @@ The system shall display formatting change suggestions in a git-style diff forma
 
 #### Relations
   * derivedFrom: [Formatting Output](#formatting-output)
-  * satisfiedBy: [format.rs](../../../core/src/format.rs)
   * satisfiedBy: [diff.rs](../../../core/src/diff.rs)
-  * verifiedBy: [Format Command Requirements Verification](Verifications/FormattingVerifications.md#format-command-requirements-verification)
----
-
-### Replace Absolute Links with Relative Links
-
-The system shall replace absolute links with relative links, where applicable and contextually appropriate, to conform to repository standards and enhance portability.
-
-#### Relations
-  * derivedFrom: [Model Formatting](#model-formatting)
+  * satisfiedBy: [format.rs](../../../core/src/format.rs)
   * verifiedBy: [Format Command Requirements Verification](Verifications/FormattingVerifications.md#format-command-requirements-verification)
 ---
 
@@ -157,9 +160,18 @@ When --with-full-relations is active:
 - Relations are sorted according to the Relation Ordering Normalization requirement
 
 #### Attachments
-  * [Relation Types Specification](../Core/DesignDocuments/RelationTypes.md)
+  * [RelationTypes.md](../Core/DesignDocuments/RelationTypes.md)
 
 #### Relations
   * derivedFrom: [Model Formatting](#model-formatting)
   * verifiedBy: [Full Relations Insertion Verification](Verifications/FormattingVerifications.md#full-relations-insertion-verification)
+---
+
+### Replace Absolute Links with Relative Links
+
+The system shall replace absolute links with relative links, where applicable and contextually appropriate, to conform to repository standards and enhance portability.
+
+#### Relations
+  * derivedFrom: [Model Formatting](#model-formatting)
+  * verifiedBy: [Format Command Requirements Verification](Verifications/FormattingVerifications.md#format-command-requirements-verification)
 ---

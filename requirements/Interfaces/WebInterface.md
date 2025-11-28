@@ -83,14 +83,20 @@ The system shall design and implement HTML pages with consistent layout, styling
   * [Web Interface Navigation Behavior](DesignDocuments/WebInterfaceStyles.md#web-interface-navigation-behavior)
 
 #### Relations
+  * derive: [Attachment Export](#attachment-export)
+  * derive: [Containment View Attachment Links](#containment-view-attachment-links)
+  * derive: [Diagram Attachment Display](#diagram-attachment-display)
+  * derive: [Model-Centric View Generation](#model-centric-view-generation)
+  * derive: [Web Interface Color Scheme](#web-interface-color-scheme)
   * derivedFrom: [Web Interface](Interfaces.md#web-interface)
-  * satisfiedBy: [html_export.rs](../../core/src/html_export.rs)
-  * satisfiedBy: [html.rs](../../core/src/html.rs)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
+  * satisfiedBy: [export.rs](../../core/src/export.rs)
+  * satisfiedBy: [html.rs](../../core/src/html.rs)
+  * satisfiedBy: [html_export.rs](../../core/src/html_export.rs)
   * satisfiedBy: [index_generator.rs](../../core/src/index_generator.rs)
   * satisfiedBy: [base.html](../../core/templates/base.html)
   * satisfiedBy: [model.html](../../core/templates/model.html)
-  * satisfiedBy: [export.rs](../../core/src/export.rs)
+  * verifiedBy: [CLI Help Structure Verification](Verifications/CLIVerifications.md#cli-help-structure-verification)
   * verifiedBy: [HTML Export Verification](Verifications/WebInterfaceVerifications.md#html-export-verification)
 ---
 
@@ -172,6 +178,7 @@ The system shall generate a model-centric visualization during HTML export showi
   * [Mermaid Diagram Style Specification](../System/Output/DesignDocuments/DiagramStyles.md#mermaid-diagram-style-specification)
 
 #### Relations
+  * derive: [Model View Element Navigation](#model-view-element-navigation)
   * derivedFrom: [HTML Export](#html-export)
   * satisfiedBy: [export.rs](../../core/src/export.rs)
   * satisfiedBy: [report_model.rs](../../core/src/report_model.rs)
@@ -282,9 +289,9 @@ The containment tree shall use consistent colors for node types:
 
 #### Relations
   * derivedFrom: [HTML Export](#html-export)
+  * satisfiedBy: [containment.rs](../../core/src/containment.rs)
   * satisfiedBy: [html.rs](../../core/src/html.rs)
   * satisfiedBy: [base.html](../../core/templates/base.html)
-  * satisfiedBy: [containment.rs](../../core/src/containment.rs)
 ---
 
 ### Serve Command
@@ -304,8 +311,8 @@ The system SHALL provide a serve command that exports comprehensive HTML documen
 
 #### Relations
   * derivedFrom: [Web Interface](Interfaces.md#web-interface)
-  * trace: [Validate Command](CLI.md#validate-command)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
   * satisfiedBy: [serve.rs](../../cli/src/serve.rs)
+  * trace: [Validate Command](CLI.md#validate-command)
   * verifiedBy: [Serve Command Verification](Verifications/WebInterfaceVerifications.md#serve-command-verification)
 ---

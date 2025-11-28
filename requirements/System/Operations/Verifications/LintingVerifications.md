@@ -91,9 +91,10 @@ This test verifies that the lint command analyzes model quality, detects issues 
   * type: test-verification
 
 #### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-lint-command/test.sh)
+  * verify: [Lint Auto-fix Capability](../Linting.md#lint-auto-fix-capability)
+  * verify: [Lint Output Formatting](../Linting.md#lint-output-formatting)
+  * verify: [Multi-Branch Convergence Detection](../Linting.md#multi-branch-convergence-detection)
   * verify: [Redundant Verify Relations Detection](../Linting.md#redundant-verify-relations-detection)
   * verify: [Safe Redundant Hierarchical Relations Auto-Removal](../Linting.md#safe-redundant-hierarchical-relations-auto-removal)
-  * verify: [Lint Output Formatting](../Linting.md#lint-output-formatting)
-  * verify: [Lint Auto-fix Capability](../Linting.md#lint-auto-fix-capability)
-  * satisfiedBy: [test.sh](../../../../tests/test-lint-command/test.sh)
 ---

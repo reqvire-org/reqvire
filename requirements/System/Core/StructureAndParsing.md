@@ -13,9 +13,9 @@ The system shall only parse markdown files that are identified as specification 
 
 #### Relations
   * derivedFrom: [Managing System Models](../../UserStories.md#managing-system-models)
-  * verifiedBy: [Specification File Identification Test](Verifications/ParsingVerifications.md#specification-file-identification-test)
-  * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
+  * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
+  * verifiedBy: [Specification File Identification Test](Verifications/ParsingVerifications.md#specification-file-identification-test)
 ---
 
 ### Structure and Addressing in Markdown Documents
@@ -26,12 +26,16 @@ The system shall implement semi-structured markdown format specifications that d
   * [MarkdownStructure.md](DesignDocuments/MarkdownStructure.md)
 
 #### Relations
+  * derive: [Element Identity Model](#element-identity-model)
+  * derive: [Reserved Subsections Support](#reserved-subsections-support)
   * derivedFrom: [Managing System Models](../../UserStories.md#managing-system-models)
-  * satisfiedBy: [relation.rs](../../../core/src/relation.rs)
   * satisfiedBy: [element.rs](../../../core/src/element.rs)
-  * satisfiedBy: [subsection.rs](../../../core/src/subsection.rs)
-  * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
+  * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
+  * satisfiedBy: [relation.rs](../../../core/src/relation.rs)
+  * satisfiedBy: [subsection.rs](../../../core/src/subsection.rs)
+  * verifiedBy: [Invalid Header Structure Test](Verifications/ValidationVerifications.md#invalid-header-structure-test)
+  * verifiedBy: [Format Command Requirements Verification](../Operations/Verifications/FormattingVerifications.md#format-command-requirements-verification)
 ---
 
 ### Element Identity Model
@@ -42,9 +46,13 @@ The system shall distinguish between element identity (ID) and element addressin
   * [ElementIdentity.md](DesignDocuments/ElementIdentity.md)
 
 #### Relations
+  * derive: [Identifiers and Relations](#identifiers-and-relations)
+  * derive: [Internal Consistency Validator](Validation.md#internal-consistency-validator)
+  * derive: [Change Impact Detection](../Processing/ChangeImpact.md#change-impact-detection)
   * derivedFrom: [Structure and Addressing in Markdown Documents](#structure-and-addressing-in-markdown-documents)
   * satisfiedBy: [element.rs](../../../core/src/element.rs)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
+  * verifiedBy: [Fragment Normalization Test](Verifications/ParsingVerifications.md#fragment-normalization-test)
 ---
 
 ### Identifiers and Relations
@@ -55,6 +63,7 @@ The system shall implement  **Identifiers** and **Relations** following clearly 
   * [IdentifiersAndRelations.md](DesignDocuments/IdentifiersAndRelations.md)
 
 #### Relations
+  * derive: [Relation Types and behaviors](ModelManagement.md#relation-types-and-behaviors)
   * derivedFrom: [Element Identity Model](#element-identity-model)
   * derivedFrom: [AI-Assisted System Model Management](../../UserStories.md#ai-assisted-system-model-management)
   * satisfiedBy: [relation.rs](../../../core/src/relation.rs)
@@ -79,9 +88,19 @@ Each reserved subsection has specific parsing rules, validation requirements, an
   * [ReservedSubsections.md](DesignDocuments/ReservedSubsections.md)
 
 #### Relations
+  * derive: [Attachment Commands](../../Interfaces/CLI.md#attachment-commands)
+  * derive: [Supported Element Types](ModelManagement.md#supported-element-types)
+  * derive: [Verification Type Categories](ModelManagement.md#verification-type-categories)
+  * derive: [Attachment Target Validation](#attachment-target-validation)
+  * derive: [Create Element Operation](../Operations/ElementManipulation.md#create-element-operation)
   * derivedFrom: [Structure and Addressing in Markdown Documents](#structure-and-addressing-in-markdown-documents)
   * satisfiedBy: [element.rs](../../../core/src/element.rs)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
+  * verifiedBy: [Attachment Output Rendering Verification](Verifications/AttachmentsVerifications.md#attachment-output-rendering-verification)
+  * verifiedBy: [Attachments Subsection Parsing Verification](Verifications/AttachmentsVerifications.md#attachments-subsection-parsing-verification)
+  * verifiedBy: [Attachments Validation Verification](Verifications/AttachmentsVerifications.md#attachments-validation-verification)
+  * verifiedBy: [Element Subsection Parsing Test](Verifications/ParsingVerifications.md#element-subsection-parsing-test)
+  * verifiedBy: [Non-Reserved Subsections Content Test](Verifications/ParsingVerifications.md#non-reserved-subsections-content-test)
 ---
 
 ### Attachment Target Validation
@@ -108,4 +127,6 @@ This validation ensures that attachments either reference existing files or vali
   * derivedFrom: [Reserved Subsections Support](#reserved-subsections-support)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
+  * verifiedBy: [Attachments Subsection Parsing Verification](Verifications/AttachmentsVerifications.md#attachments-subsection-parsing-verification)
+  * verifiedBy: [Attachments Validation Verification](Verifications/AttachmentsVerifications.md#attachments-validation-verification)
 ---
