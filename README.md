@@ -4,7 +4,7 @@
 
 <img src="doc/logo.png" alt="Reqvire Logo" width="200">
 
-**The AI-Native Requirements As A Code framework for Modern Engineering Teams**
+**Architecture and Requirements As A Code framework for Modern Engineering Teams**
 
 [![Latest Release](https://img.shields.io/github/v/release/Reqvire/reqvire?style=flat-square&logo=github&color=blue)](https://github.com/reqvire-org/reqvire/releases)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=flat-square)](https://opensource.org/licenses/Apache-2.0)
@@ -18,9 +18,9 @@
 
 ## What is Reqvire?
 
-**Reqvire** is the lightweight Git-native **Requirements As a Code** framework that transforms how modern engineering teams build software. Seamlessly blending system modeling, requirements management, and AI-assisted development. Reqvire empowers teams to deliver better products faster with complete traceability and intelligent automation.
+**Reqvire** is the lightweight Git-native **Architecture** and **Requirements As a Code** framework that transforms how modern engineering teams build software. Seamlessly blending system modeling, requirements management, and AI-assisted development. Reqvire empowers teams to deliver better products faster with complete traceability and intelligent automation.
 
-Experience the future of development where your requirements live alongside your code, evolve with your project, and unlock the full potential of AI-powered engineering—from intelligent requirement synthesis to automated code generation—all within your familiar Git workflow.
+Experience the future of development where your architecture is expressed as system model with the requirements and specifications that live alongside your code, evolve with your project, and unlock the full potential of AI-powered engineering—from intelligent requirement synthesis to automated code generation—all within your familiar Git workflow.
 
 ## 🤖 Now Available for Claude Code
 
