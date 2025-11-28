@@ -881,3 +881,84 @@ This test verifies that the --from-folder option correctly generates relative li
   * verify: [CLI Traces Command](../../../Interfaces/CLI.md#cli-traces-command)
   * satisfiedBy: [test.sh](../../../../tests/test-verification-traces/test.sh)
 ---
+
+### Resources Report Verification
+
+This test verifies that the resources command correctly generates reports showing all files referenced by the model through relations and attachments.
+
+#### Details
+
+##### Acceptance Criteria
+**Report Structure:**
+- Report shall have two main sections: Relations and Attachments
+- Each section lists files alphabetically by path
+- Each file shows referencing elements with markdown links
+
+**Relations Section:**
+- Includes files from InternalPath relation targets (satisfiedBy, trace, etc.)
+- Each reference shows relation type and source element
+- References sorted by relation type, then by element identifier
+
+**Attachments Section:**
+- Includes files from FilePath attachment targets
+- Each reference shows source element
+- References sorted by element identifier
+
+**Output Formats:**
+- Text output uses markdown formatting with headers and bullet lists
+- JSON output provides structured data with relations, attachments, and summary
+
+**HTML Export Integration:**
+- Resources view available in HTML export
+- Navigation link appears in header alongside other views
+
+##### Test Criteria
+1. **Basic text output**
+   Command: `reqvire resources`
+   - exits code **0**
+   - output contains "## Relations" section header
+   - output contains "## Attachments" section header
+   - files are listed with ### headers
+   - referencing elements shown as bullet points with markdown links
+
+2. **JSON output structure**
+   Command: `reqvire resources --json`
+   - exits code **0**
+   - output parses under `jq`
+   - contains `relations` array with file_path and references
+   - contains `attachments` array with file_path and references
+   - contains `summary` with totals
+
+3. **Relations section content**
+   - satisfiedBy relations to code files appear in Relations section
+   - trace relations to document files appear in Relations section
+   - each reference includes relation_type, element_id, element_name
+
+4. **Attachments section content**
+   - FilePath attachments appear in Attachments section
+   - ElementIdentifier attachments do NOT appear (they reference model elements, not files)
+   - each reference includes element_id, element_name
+
+5. **Sorting verification**
+   - Files sorted alphabetically by path
+   - Within each file, references sorted by relation_type then element_id
+   - Consistent ordering across multiple runs
+
+6. **HTML export integration**
+   Command: `reqvire export --output=/tmp/test-export`
+   - resources.html file generated
+   - Navigation header includes Resources link
+   - Resources view contains same content as CLI text output
+
+7. **Empty sections handling**
+   - If no InternalPath relations exist, Relations section shows appropriate message
+   - If no FilePath attachments exist, Attachments section shows appropriate message
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [Resources Report](../Reporting.md#resources-report)
+  * verify: [CLI Resources Command](../../../Interfaces/CLI.md#cli-resources-command)
+  * satisfiedBy: [test.sh](../../../../tests/test-resources-report/test.sh)
+---

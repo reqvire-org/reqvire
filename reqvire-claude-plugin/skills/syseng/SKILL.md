@@ -276,8 +276,14 @@ Link via `satisfiedBy` from the requirement that asks for the refinement.
 ```bash
 reqvire validate           # Check model consistency
 reqvire coverage           # Check verification coverage
+reqvire resources          # List files referenced by model (implementations, docs)
 reqvire lint --fix         # Fix any issues
 ```
+
+Use `reqvire resources` to see all files referenced by the model through `satisfiedBy`, `trace` relations and attachments. This helps identify:
+- Which implementation files are linked to requirements
+- Which design documents are traced
+- Orphaned files that should be linked
 
 ## Examples
 
@@ -436,6 +442,7 @@ reqvire format --fix --with-full-relations  # Include auto-generated inverse rel
 reqvire validate [--json]              # Validate model consistency
 reqvire coverage [--json]              # Check verification coverage
 reqvire traces [--json] [--filter-*]   # Show traceability
+reqvire resources [--json]             # List files referenced by model
 reqvire lint [--fix] [--json]          # Find/fix model issues
 reqvire change-impact --git-commit=<hash> [--json]  # Analyze changes
 ```

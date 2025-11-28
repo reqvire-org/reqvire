@@ -60,6 +60,10 @@ The TraceFlow view visualizes the verification traceability flow as an interacti
 
 **Instructions:** Use mouse wheel to zoom, drag to pan. Click on nodes to navigate to element definitions. Use the +/-/reset buttons for precise control."#;
 
+const PAGE_DESCRIPTION_RESOURCES: &str = r#"# Resources
+
+The resources view shows all files referenced by the model through relations and attachments. This includes implementation files (via satisfiedBy relations), traced documents (via trace relations), and attachment files like design specifications and images. Use this view to understand the implementation landscape and identify which elements reference each file."#;
+
 /// Copies assets folder to output directory
 fn copy_assets_folder(output_dir: &Path) -> Result<(), ReqvireError> {
     let assets_dir = output_dir.join("assets");
@@ -524,6 +528,17 @@ function showView(view) {{
         icicle = d3_icicle_content
     );
     filesystem::write_file("containment.md", containment_content.as_bytes())?;
+
+    // Generate resources.md (files referenced by relations and attachments)
+    info!("Generating resources.md...");
+    let resources_report = crate::report_resources::generate_resources_report(&temp_model_manager.graph_registry);
+    let resources_text = resources_report.format_text();
+    let resources_content = format!(
+        "{}\n\n{}",
+        PAGE_DESCRIPTION_RESOURCES,
+        resources_text
+    );
+    filesystem::write_file("resources.md", resources_content.as_bytes())?;
 
     // Step 6: Convert markdown to HTML
     info!("Converting markdown to HTML...");

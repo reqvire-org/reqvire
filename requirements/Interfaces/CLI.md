@@ -413,6 +413,33 @@ The `rename` command shall:
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
 ---
 
+### CLI Resources Command
+
+The system shall provide a `resources` command that generates a report showing all files referenced by the model through relations and attachments.
+
+#### Details
+The command shall:
+- Be invoked as `reqvire resources`
+- Support `--json` flag for JSON output format
+- Default to human-readable text output when JSON flag is not present
+- Generate two sections: Relations and Attachments
+- Show files from InternalPath relation targets (satisfiedBy, trace, etc.)
+- Show files from FilePath attachment targets
+- List files alphabetically by path
+- For each file, show referencing elements with links
+- Sort references by relation type (for relations section), then by element identifier
+- Exit with status code 0 on success
+- Exit with non-zero status code on errors
+
+Command output shall be written to stdout for easy redirection to files.
+
+#### Relations
+  * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
+  * derivedFrom: [Resources Report](../System/Output/Reporting.md#resources-report)
+  * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
+  * verifiedBy: [Resources Report Verification](../System/Output/Verifications/ReportingVerifications.md#resources-report-verification)
+---
+
 ### CLI Search Command
 
 The system shall provide a unified search function, activated by the `search` root command, which shall search and report on model elements with comprehensive filtering capabilities.

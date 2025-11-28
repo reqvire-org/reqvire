@@ -243,3 +243,40 @@ When tracing structural changes, the system shall analyze the System model and d
 #### Relations
   * derivedFrom: [Trace Changes in System Model](../../UserStories.md#trace-changes-in-system-model)
 ---
+
+### Resources Report
+
+The system shall provide a resources report showing all files referenced by the model through relations and attachments.
+
+#### Details
+**Report Structure:**
+- Two sections: Relations and Attachments
+- Each section lists files alphabetically by path
+- Each file shows referencing elements with links
+
+**Relations Section:**
+- Files from InternalPath relation targets (satisfiedBy, trace, etc.)
+- Shows relation type and source element for each reference
+- Sorted by relation type, then by element identifier
+
+**Attachments Section:**
+- Files from FilePath attachment targets
+- Shows source element for each reference
+- Sorted by element identifier
+
+**Output Formats:**
+- Text/Markdown: Human-readable with markdown links
+- JSON: Structured data for programmatic use
+
+**HTML Export:**
+- Resources view available in HTML export with navigation link
+- Shows complete list of referenced files with element traceability
+
+#### Metadata
+  * type: user-requirement
+
+#### Relations
+  * derivedFrom: [Model Reports](#model-reports)
+  * satisfiedBy: [report_resources.rs](../../../core/src/report_resources.rs)
+  * verifiedBy: [Resources Report Verification](Verifications/ReportingVerifications.md#resources-report-verification)
+---

@@ -25,6 +25,7 @@ pub mod verification_trace;
 pub mod trace_tree_builder;
 pub mod lint;
 pub mod containment;
+pub mod report_resources;
 
 // Re-export commonly used modules
 pub use crate::model::ModelManager;

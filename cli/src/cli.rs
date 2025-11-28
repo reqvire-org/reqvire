@@ -15,6 +15,7 @@ use reqvire::git_commands;
 use reqvire::verification_trace;
 use crate::serve;
 use reqvire::lint;
+use reqvire::report_resources;
 use reqvire::GraphRegistry;
 use reqvire::graph_registry::Page;
 use reqvire::element::Element;
@@ -373,6 +374,14 @@ pub enum Commands {
         /// Show only root elements (without hierarchical parents in same file)
         #[clap(long, help_heading = "CONTAINMENT OPTIONS")]
         short: bool,
+    },
+
+    /// Generate resources report showing files referenced by the model
+    #[clap(override_help = "Generate resources report showing files referenced by the model\n\nRESOURCES OPTIONS:\n      --json     Output results in JSON format")]
+    Resources {
+        /// Output results in JSON format
+        #[clap(long, help_heading = "RESOURCES OPTIONS")]
+        json: bool,
     },
 
     /// Interactive shell for GraphRegistry operations (undocumented)
@@ -1090,6 +1099,11 @@ pub fn handle_command(
                 let output = diagrams::generate_containment_diagram(&model_manager.graph_registry, short)?;
                 println!("{}", output);
             }
+            return Ok(0);
+        },
+        Some(Commands::Resources { json }) => {
+            let report = report_resources::generate_resources_report(&model_manager.graph_registry);
+            report.print(json);
             return Ok(0);
         },
         Some(Commands::Shell) => {
