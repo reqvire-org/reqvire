@@ -28,7 +28,7 @@ Verification trace diagrams shall use the same visual styling as other mermaid d
 - Directly verified requirements highlighted with appropriate styling
 
 #### Attachments
-  * [Verification Trace Tree Construction](DesignDocuments/VerificationTraceAlgorithm.md#verification-trace-tree-construction)
+  * [Verification Trace Tree Construction](Specifications.md#verification-trace-tree-construction)
 
 #### Relations
   * derivedFrom: [Verification Upward Traceability](../Output/Reporting.md#verification-upward-traceability)

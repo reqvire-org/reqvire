@@ -28,39 +28,22 @@ The `.reqvireignore` file provides Reqvire-specific exclusions for files that sh
 
 ### Ignore Files Integration
 
-The system shall read exclusion patterns from the repository root .gitignore file and .reqvireignore file to automatically exclude files from requirement processing.
+The system shall integrate with Git workflows by reading exclusion patterns from .gitignore and .reqvireignore files.
 
 #### Details
-Reqvire integrates with Git workflows by respecting exclusion patterns from two sources:
-- **`.gitignore`** - Version control exclusions (files not tracked by Git)
-- **`.reqvireignore`** - Reqvire-specific exclusions (files tracked by Git but excluded from requirements processing)
+- The system shall read exclusion patterns from repository root .gitignore and .reqvireignore files
+- The system shall exclude files matching patterns from being parsed as structured markdown
+- The system shall differentiate between .gitignore exclusions (complete) and .reqvireignore exclusions (parsing only)
+- The system shall implement ignore file processing following clearly defined specifications
 
-Both ignore files use standard gitignore pattern syntax to exclude files from being parsed as structured markdown (requirements/verifications). However, they differ in an important way:
-
-- **`.gitignore`**: Files matching these patterns are **completely excluded** - they cannot be parsed as structured markdown AND cannot be referenced in file relations to elements
-- **`.reqvireignore`**: Files matching these patterns are excluded from structured markdown parsing BUT **can still be referenced** in file relations to elements (useful for design documents, diagrams, or other supporting files that you want to link to but not parse)
-
-**Rules:**
-- ONLY the root .gitignore file shall be used (not nested .gitignore files in subdirectories)
-- ONLY the root .reqvireignore file shall be used (not nested .reqvireignore files in subdirectories)
-- .reqvireignore shall use the same format and syntax as .gitignore
-- Patterns from .gitignore and .reqvireignore shall be combined
-- Files matching ANY exclusion pattern (from .gitignore or .reqvireignore) shall be excluded from parsing as requirements
-- Files excluded by .gitignore shall NOT be usable as relation targets (internal-path type) since they don't exist in the repository
-- Files excluded by .reqvireignore shall remain usable as relation targets (internal-path type) since they exist in the repository but are not parsed as requirements
-- If .reqvireignore does not exist, the system shall process normally using only .gitignore patterns
-- If .gitignore does not exist, the system shall process normally using only .reqvireignore patterns
-
-**Rationale:**
-- `.gitignore` integration ensures anything not tracked by version control is also excluded from requirements processing
-- `.reqvireignore` provides flexibility to exclude specific files from requirements processing while keeping them in version control (e.g., draft specifications, example files, or documentation that shouldn't be processed as requirements)
-- Using a `.reqvireignore` file follows the established convention that developers are familiar with from `.gitignore`, making it more intuitive
-- File-based exclusion patterns are more maintainable than configuration-based approaches
+#### Attachments
+  * [Ignore Files Specification](Specifications.md#ignore-files-specification)
 
 #### Relations
   * derive: [Target Location Validation and Auto-Creation](../Operations/ElementManipulation.md#target-location-validation-and-auto-creation)
   * derivedFrom: [Ignoring Unstructured Documents](#ignoring-unstructured-documents)
   * satisfiedBy: [config.rs](../../../cli/src/config.rs)
+  * satisfiedBy: [Ignore Files Specification](Specifications.md#ignore-files-specification)
   * verifiedBy: [File Exclusion Test](Verifications/ValidationVerifications.md#file-exclusion-test)
 ---
 

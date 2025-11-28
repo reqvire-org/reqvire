@@ -114,20 +114,28 @@ This requirement ensures consistency between relation updates and attachment ide
 
 ### Git Repository as Project Root
 
-The system shall treat the **root directory of the Git repository as the project's base** for all file and folder references, streamlining configuration and promoting a self-contained project structure.
+The system shall use the Git repository root as the project base for path resolution and scope management.
 
 #### Details
-All paths specified in Reqvire commands will be resolved relative to the current working directory:
-- When run from the git repository root: paths are relative to the git root
-- When run from a subdirectory: paths are relative to that subdirectory, and processing is limited to files within that subdirectory scope
+- The system shall treat the root directory of the Git repository as the project's base for all file and folder references
+- The system shall implement path resolution following clearly defined specifications
+- When run from git root, the system shall process all files with paths resolved relative to git root
+- When run from a subdirectory, the system shall automatically detect the subdirectory context and limit processing scope
+- When run from a subdirectory, the system shall validate that all references stay within scope boundaries following clearly defined specifications
 
 #### Metadata
   * type: user-requirement
 
+#### Attachments
+  * [Git Repository Scope Specification](Specifications.md#git-repository-scope-specification)
+  * [Subdirectory Auto-Detection Behavior](Behaviors.md#subdirectory-auto-detection-behavior)
+
 #### Relations
-  * derive: [Subdirectory Processing Option](../../Interfaces/CLI.md#subdirectory-processing-option)
   * derive: [Target Location Validation and Auto-Creation](../Operations/ElementManipulation.md#target-location-validation-and-auto-creation)
   * derivedFrom: [Managing System Models](../../UserStories.md#managing-system-models)
+  * satisfiedBy: [git_commands.rs](../../../core/src/git_commands.rs)
+  * satisfiedBy: [Git Repository Scope Specification](Specifications.md#git-repository-scope-specification)
+  * verifiedBy: [Subdirectory Processing Verification](Verifications/ValidationVerifications.md#subdirectory-processing-verification)
 ---
 
 ### Relation Types and behaviors
@@ -160,7 +168,7 @@ The system shall define element type relation compatibility constraints.
   * derive: [Relation Element Type Validator](Validation.md#relation-element-type-validator)
   * derivedFrom: [Relation Types and behaviors](#relation-types-and-behaviors)
   * derivedFrom: [Supported Element Types](#supported-element-types)
-  * satisfiedBy: [Element Type Relation Compatibility Constraint](Refinements.md#element-type-relation-compatibility-constraint)
+  * satisfiedBy: [Element Type Relation Compatibility Constraint](Constraints.md#element-type-relation-compatibility-constraint)
   * verifiedBy: [Element Type Relation Compatibility Test](Verifications/ValidationVerifications.md#element-type-relation-compatibility-test)
 ---
 

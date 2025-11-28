@@ -144,8 +144,8 @@ The system shall define custom element type tracking:
 
 #### Attachments
   * [SearchFiltering.md](DesignDocuments/SearchFiltering.md)
-  * [JSON Output Structure](DesignDocuments/OutputFormats.md#json-output-structure)
-  * [Text Output Formatting](DesignDocuments/OutputFormats.md#text-output-formatting)
+  * [JSON Output Structure](Specifications.md#json-output-structure)
+  * [Text Output Formatting](Specifications.md#text-output-formatting)
 
 #### Relations
   * derivedFrom: [Model Structure and Summaries](#model-structure-and-summaries)
@@ -250,8 +250,8 @@ The report helps track verification completeness and identify gaps in requiremen
   * type: user-requirement
 
 #### Attachments
-  * [JSON Output Structure](DesignDocuments/OutputFormats.md#json-output-structure)
-  * [Text Output Formatting](DesignDocuments/OutputFormats.md#text-output-formatting)
+  * [JSON Output Structure](Specifications.md#json-output-structure)
+  * [Text Output Formatting](Specifications.md#text-output-formatting)
 
 #### Relations
   * derive: [Verification Upward Traceability](#verification-upward-traceability)

@@ -152,31 +152,43 @@ Style guidelines for markdown text report output (model, coverage, traces, conta
   * type: specification
 ---
 
-### Short Mode Behavior
+### Mermaid Diagram Style Specification
 
-Behavior when `--short` flag is provided to CLI commands.
+Styling conventions for Mermaid diagrams in CLI output and HTML export.
 
 #### Details
-Short mode reduces output verbosity for quick scanning:
+**Node Shapes:**
+| Element Type | Shape | Example |
+|--------------|-------|---------|
+| Requirement | Rectangle | `[Requirement Name]` |
+| Verification | Stadium | `([Verification Name])` |
+| File | Folder shape | `{{File.md}}` |
+| Folder | Hexagon | `{{folder/}}` |
 
-**Text Output (--short without --json):**
-- One line per element: `[type] identifier - name`
-- Omit detailed content, relations, and metadata
-- Suitable for piping to other tools
+**Edge Styles:**
+| Relation | Line Style | Arrow |
+|----------|------------|-------|
+| derivedFrom | Solid | Arrow |
+| verifiedBy | Dashed | Arrow |
+| satisfiedBy | Dotted | Arrow |
+| trace | Dotted | No arrow |
 
-**JSON Output (--short with --json):**
-- Omit verbose fields: `content`, `page_content`, `attachments`
-- Omit computed fields: `element_count`, `total_elements`, `global_counters`
-- Retain: `identifier`, `name`, `type`, `file_path`
-- Retain: `relations` (for traceability)
+**Colors (CSS Classes):**
+| Class | Color | Usage |
+|-------|-------|-------|
+| requirement | #D0E0FF | Requirement nodes |
+| verification | #FFF7B3 | Verification nodes |
+| implementation | #DFFFD0 | Implementation nodes |
+| impacted | #FFAAAA | Change impact nodes |
+| changed | #FFDD57 | Changed nodes |
 
-**Rationale:**
-- Reduces output size for large models
-- Faster parsing by downstream tools
-- Maintains essential traceability information
+**Subgraph Styling:**
+- Folders as subgraphs with light gray background
+- Files as nested subgraphs
+- Collapsible in interactive mode
 
 #### Metadata
-  * type: behavior
+  * type: specification
 ---
 
 ### Text Output Formatting

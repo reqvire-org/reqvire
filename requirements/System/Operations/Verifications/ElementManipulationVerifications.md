@@ -61,7 +61,7 @@ The test shall verify that the `add` command creates new elements from stdin or 
   * type: test-verification
 
 #### Attachments
-  * [Element Ordering Behavior](../Refinements.md#element-ordering-behavior)
+  * [Element Ordering Behavior](../Behaviors.md#element-ordering-behavior)
 
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-crud-manipulation/test.sh)
@@ -128,7 +128,7 @@ The test shall verify that the `mv` command relocates elements, updates all rela
   * type: test-verification
 
 #### Attachments
-  * [Element Ordering Behavior](../Refinements.md#element-ordering-behavior)
+  * [Element Ordering Behavior](../Behaviors.md#element-ordering-behavior)
 
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-crud-manipulation/test.sh)
@@ -498,7 +498,7 @@ The test shall verify that element manipulation operations are persisted to sour
   * type: test-verification
 
 #### Attachments
-  * [Element Ordering Behavior](../Refinements.md#element-ordering-behavior)
+  * [Element Ordering Behavior](../Behaviors.md#element-ordering-behavior)
 
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-crud-file-persistence/test.sh)

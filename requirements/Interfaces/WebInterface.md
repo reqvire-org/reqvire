@@ -79,8 +79,8 @@ The system shall design and implement HTML pages with consistent layout, styling
 - All brand assets shall be exported to an assets folder during HTML export
 
 #### Attachments
-  * [Web Interface Style Specification](DesignDocuments/WebInterfaceStyles.md#web-interface-style-specification)
-  * [Web Interface Navigation Behavior](DesignDocuments/WebInterfaceStyles.md#web-interface-navigation-behavior)
+  * [Web Interface Style Specification](Specifications.md#web-interface-style-specification)
+  * [Web Interface Navigation Behavior](Behaviors.md#web-interface-navigation-behavior)
 
 #### Relations
   * derive: [Attachment Export](#attachment-export)
@@ -155,7 +155,7 @@ elementId["Element Name<br/>📎 DesignDoc.md"]
 ```
 
 #### Attachments
-  * [Mermaid Diagram Style Specification](../System/Output/DesignDocuments/DiagramStyles.md#mermaid-diagram-style-specification)
+  * [Mermaid Diagram Style Specification](../System/Output/Specifications.md#mermaid-diagram-style-specification)
 
 #### Relations
   * derivedFrom: [HTML Export](#html-export)
@@ -175,7 +175,7 @@ The system shall generate a model-centric visualization during HTML export showi
 - Output as markdown with embedded visualizations (model.html)
 
 #### Attachments
-  * [Mermaid Diagram Style Specification](../System/Output/DesignDocuments/DiagramStyles.md#mermaid-diagram-style-specification)
+  * [Mermaid Diagram Style Specification](../System/Output/Specifications.md#mermaid-diagram-style-specification)
 
 #### Relations
   * derive: [Model View Element Navigation](#model-view-element-navigation)
@@ -284,8 +284,8 @@ The containment tree shall use consistent colors for node types:
 - Node hover: Cursor pointer for interactive nodes
 
 #### Attachments
-  * [Color Scheme Specification](../System/Output/DesignDocuments/OutputFormats.md#color-scheme-specification)
-  * [Web Interface Style Specification](DesignDocuments/WebInterfaceStyles.md#web-interface-style-specification)
+  * [Color Scheme Specification](../System/Output/Specifications.md#color-scheme-specification)
+  * [Web Interface Style Specification](Specifications.md#web-interface-style-specification)
 
 #### Relations
   * derivedFrom: [HTML Export](#html-export)

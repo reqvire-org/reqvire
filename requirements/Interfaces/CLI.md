@@ -70,7 +70,6 @@ FORMAT OPTIONS:
   * derive: [CLI Search Command](#cli-search-command)
   * derive: [CLI Traces Command](#cli-traces-command)
   * derive: [Format Command](#format-command)
-  * derive: [Subdirectory Processing Option](#subdirectory-processing-option)
   * derive: [Validate Command](#validate-command)
   * derive: [Integrated Validation](../System/Core/Validation.md#integrated-validation)
   * derivedFrom: [CLI interface](Interfaces.md#cli-interface)
@@ -96,11 +95,12 @@ The `add` command shall:
 - Exit with code 0 on success, non-zero on error
 
 #### Attachments
-  * [File Persistence Behavior](../System/Operations/Refinements.md#file-persistence-behavior)
-  * [Target Location Constraint](../System/Operations/Refinements.md#target-location-constraint)
-  * [Dry-Run Mode Behavior](../System/Operations/Refinements.md#dry-run-mode-behavior)
-  * [Diff Output Format Specification](../System/Output/DesignDocuments/OutputFormats.md#diff-output-format-specification)
-  * [JSON Output Structure](../System/Output/DesignDocuments/OutputFormats.md#json-output-structure)
+  * [Git Repository Scope Specification](../System/Core/Specifications.md#git-repository-scope-specification)
+  * [File Persistence Behavior](../System/Operations/Behaviors.md#file-persistence-behavior)
+  * [Target Location Constraint](../System/Operations/Constraints.md#target-location-constraint)
+  * [Dry-Run Mode Behavior](../System/Operations/Behaviors.md#dry-run-mode-behavior)
+  * [Diff Output Format Specification](../System/Output/Specifications.md#diff-output-format-specification)
+  * [JSON Output Structure](../System/Output/Specifications.md#json-output-structure)
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
@@ -135,10 +135,10 @@ Command invocation: `reqvire change-impact [OPTIONS]`
 - Allow scripting of analysis operations
 
 #### Attachments
-  * [JSON Output Structure](../System/Output/DesignDocuments/OutputFormats.md#json-output-structure)
-  * [Text Output Formatting](../System/Output/DesignDocuments/OutputFormats.md#text-output-formatting)
-  * [Change Propagation Behavior](../System/Processing/Refinements.md#change-propagation-behavior)
-  * [Mermaid Diagram Style Specification](../System/Output/DesignDocuments/DiagramStyles.md#mermaid-diagram-style-specification)
+  * [JSON Output Structure](../System/Output/Specifications.md#json-output-structure)
+  * [Text Output Formatting](../System/Output/Specifications.md#text-output-formatting)
+  * [Change Propagation Behavior](../System/Processing/Behaviors.md#change-propagation-behavior)
+  * [Mermaid Diagram Style Specification](../System/Output/Specifications.md#mermaid-diagram-style-specification)
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
@@ -169,9 +169,9 @@ The markdown output shall include:
 - Description indicating whether all elements or only root elements are displayed
 
 #### Attachments
-  * [JSON Output Structure](../System/Output/DesignDocuments/OutputFormats.md#json-output-structure)
-  * [Short Mode Behavior](../System/Output/DesignDocuments/OutputFormats.md#short-mode-behavior)
-  * [Mermaid Diagram Style Specification](../System/Output/DesignDocuments/DiagramStyles.md#mermaid-diagram-style-specification)
+  * [JSON Output Structure](../System/Output/Specifications.md#json-output-structure)
+  * [Short Mode Behavior](../System/Output/Behaviors.md#short-mode-behavior)
+  * [Mermaid Diagram Style Specification](../System/Output/Specifications.md#mermaid-diagram-style-specification)
   * [ContainmentView.md](../System/Output/DesignDocuments/ContainmentView.md)
 
 #### Relations
@@ -204,8 +204,8 @@ The command shall:
 Command output shall be written to stdout for easy redirection to files.
 
 #### Attachments
-  * [JSON Output Structure](../System/Output/DesignDocuments/OutputFormats.md#json-output-structure)
-  * [Text Output Formatting](../System/Output/DesignDocuments/OutputFormats.md#text-output-formatting)
+  * [JSON Output Structure](../System/Output/Specifications.md#json-output-structure)
+  * [Text Output Formatting](../System/Output/Specifications.md#text-output-formatting)
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
@@ -236,9 +236,9 @@ The command shall:
 Command output shall be written to stdout for easy redirection to files.
 
 #### Attachments
-  * [JSON Output Structure](../System/Output/DesignDocuments/OutputFormats.md#json-output-structure)
-  * [Text Output Formatting](../System/Output/DesignDocuments/OutputFormats.md#text-output-formatting)
-  * [Dry-Run Mode Behavior](../System/Operations/Refinements.md#dry-run-mode-behavior)
+  * [JSON Output Structure](../System/Output/Specifications.md#json-output-structure)
+  * [Text Output Formatting](../System/Output/Specifications.md#text-output-formatting)
+  * [Dry-Run Mode Behavior](../System/Operations/Behaviors.md#dry-run-mode-behavior)
 
 #### Relations
   * derive: [Lint Auto-fix Capability](../System/Operations/Linting.md#lint-auto-fix-capability)
@@ -259,8 +259,8 @@ System shall provide CLI command to generate model diagrams with optional filter
 - Shall integrate with existing model diagram generation functionality
 
 #### Attachments
-  * [JSON Output Structure](../System/Output/DesignDocuments/OutputFormats.md#json-output-structure)
-  * [Mermaid Diagram Style Specification](../System/Output/DesignDocuments/DiagramStyles.md#mermaid-diagram-style-specification)
+  * [JSON Output Structure](../System/Output/Specifications.md#json-output-structure)
+  * [Mermaid Diagram Style Specification](../System/Output/Specifications.md#mermaid-diagram-style-specification)
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
@@ -289,10 +289,10 @@ The `mv-asset` command shall:
 - Exit with code 0 on success, non-zero on error
 
 #### Attachments
-  * [File Persistence Behavior](../System/Operations/Refinements.md#file-persistence-behavior)
-  * [Dry-Run Mode Behavior](../System/Operations/Refinements.md#dry-run-mode-behavior)
-  * [Diff Output Format Specification](../System/Output/DesignDocuments/OutputFormats.md#diff-output-format-specification)
-  * [JSON Output Structure](../System/Output/DesignDocuments/OutputFormats.md#json-output-structure)
+  * [File Persistence Behavior](../System/Operations/Behaviors.md#file-persistence-behavior)
+  * [Dry-Run Mode Behavior](../System/Operations/Behaviors.md#dry-run-mode-behavior)
+  * [Diff Output Format Specification](../System/Output/Specifications.md#diff-output-format-specification)
+  * [JSON Output Structure](../System/Output/Specifications.md#json-output-structure)
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
@@ -321,11 +321,12 @@ The `mv` command shall:
 - Exit with code 0 on success, non-zero on error
 
 #### Attachments
-  * [File Persistence Behavior](../System/Operations/Refinements.md#file-persistence-behavior)
-  * [Target Location Constraint](../System/Operations/Refinements.md#target-location-constraint)
-  * [Dry-Run Mode Behavior](../System/Operations/Refinements.md#dry-run-mode-behavior)
-  * [Diff Output Format Specification](../System/Output/DesignDocuments/OutputFormats.md#diff-output-format-specification)
-  * [JSON Output Structure](../System/Output/DesignDocuments/OutputFormats.md#json-output-structure)
+  * [Git Repository Scope Specification](../System/Core/Specifications.md#git-repository-scope-specification)
+  * [File Persistence Behavior](../System/Operations/Behaviors.md#file-persistence-behavior)
+  * [Target Location Constraint](../System/Operations/Constraints.md#target-location-constraint)
+  * [Dry-Run Mode Behavior](../System/Operations/Behaviors.md#dry-run-mode-behavior)
+  * [Diff Output Format Specification](../System/Output/Specifications.md#diff-output-format-specification)
+  * [JSON Output Structure](../System/Output/Specifications.md#json-output-structure)
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
@@ -348,11 +349,11 @@ The `mv-file` command shall:
 - Command syntax: `reqvire mv-file <source-file> <target-file>`
 
 #### Attachments
-  * [File Persistence Behavior](../System/Operations/Refinements.md#file-persistence-behavior)
-  * [Target Location Constraint](../System/Operations/Refinements.md#target-location-constraint)
-  * [Dry-Run Mode Behavior](../System/Operations/Refinements.md#dry-run-mode-behavior)
-  * [Diff Output Format Specification](../System/Output/DesignDocuments/OutputFormats.md#diff-output-format-specification)
-  * [JSON Output Structure](../System/Output/DesignDocuments/OutputFormats.md#json-output-structure)
+  * [File Persistence Behavior](../System/Operations/Behaviors.md#file-persistence-behavior)
+  * [Target Location Constraint](../System/Operations/Constraints.md#target-location-constraint)
+  * [Dry-Run Mode Behavior](../System/Operations/Behaviors.md#dry-run-mode-behavior)
+  * [Diff Output Format Specification](../System/Output/Specifications.md#diff-output-format-specification)
+  * [JSON Output Structure](../System/Output/Specifications.md#json-output-structure)
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
@@ -381,10 +382,10 @@ The `rm-asset` command shall:
 - Exit with code 0 on success, non-zero on error
 
 #### Attachments
-  * [File Persistence Behavior](../System/Operations/Refinements.md#file-persistence-behavior)
-  * [Dry-Run Mode Behavior](../System/Operations/Refinements.md#dry-run-mode-behavior)
-  * [Diff Output Format Specification](../System/Output/DesignDocuments/OutputFormats.md#diff-output-format-specification)
-  * [JSON Output Structure](../System/Output/DesignDocuments/OutputFormats.md#json-output-structure)
+  * [File Persistence Behavior](../System/Operations/Behaviors.md#file-persistence-behavior)
+  * [Dry-Run Mode Behavior](../System/Operations/Behaviors.md#dry-run-mode-behavior)
+  * [Diff Output Format Specification](../System/Output/Specifications.md#diff-output-format-specification)
+  * [JSON Output Structure](../System/Output/Specifications.md#json-output-structure)
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
@@ -410,10 +411,10 @@ The `rm` command shall:
 - Exit with code 0 on success, non-zero on error
 
 #### Attachments
-  * [File Persistence Behavior](../System/Operations/Refinements.md#file-persistence-behavior)
-  * [Dry-Run Mode Behavior](../System/Operations/Refinements.md#dry-run-mode-behavior)
-  * [Diff Output Format Specification](../System/Output/DesignDocuments/OutputFormats.md#diff-output-format-specification)
-  * [JSON Output Structure](../System/Output/DesignDocuments/OutputFormats.md#json-output-structure)
+  * [File Persistence Behavior](../System/Operations/Behaviors.md#file-persistence-behavior)
+  * [Dry-Run Mode Behavior](../System/Operations/Behaviors.md#dry-run-mode-behavior)
+  * [Diff Output Format Specification](../System/Output/Specifications.md#diff-output-format-specification)
+  * [JSON Output Structure](../System/Output/Specifications.md#json-output-structure)
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
@@ -439,10 +440,10 @@ The `rename` command shall:
 - Exit with code 0 on success, non-zero on error
 
 #### Attachments
-  * [File Persistence Behavior](../System/Operations/Refinements.md#file-persistence-behavior)
-  * [Dry-Run Mode Behavior](../System/Operations/Refinements.md#dry-run-mode-behavior)
-  * [Diff Output Format Specification](../System/Output/DesignDocuments/OutputFormats.md#diff-output-format-specification)
-  * [JSON Output Structure](../System/Output/DesignDocuments/OutputFormats.md#json-output-structure)
+  * [File Persistence Behavior](../System/Operations/Behaviors.md#file-persistence-behavior)
+  * [Dry-Run Mode Behavior](../System/Operations/Behaviors.md#dry-run-mode-behavior)
+  * [Diff Output Format Specification](../System/Output/Specifications.md#diff-output-format-specification)
+  * [JSON Output Structure](../System/Output/Specifications.md#json-output-structure)
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
@@ -510,9 +511,9 @@ Default output:
 - Full detail mode showing all element metadata and relations
 
 #### Attachments
-  * [JSON Output Structure](../System/Output/DesignDocuments/OutputFormats.md#json-output-structure)
-  * [Short Mode Behavior](../System/Output/DesignDocuments/OutputFormats.md#short-mode-behavior)
-  * [Text Output Formatting](../System/Output/DesignDocuments/OutputFormats.md#text-output-formatting)
+  * [JSON Output Structure](../System/Output/Specifications.md#json-output-structure)
+  * [Short Mode Behavior](../System/Output/Behaviors.md#short-mode-behavior)
+  * [Text Output Formatting](../System/Output/Specifications.md#text-output-formatting)
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
@@ -575,9 +576,9 @@ reqvire traces --from-folder=docs/reports > docs/reports/traces.md
 ```
 
 #### Attachments
-  * [JSON Output Structure](../System/Output/DesignDocuments/OutputFormats.md#json-output-structure)
-  * [Verification Trace Tree Construction](../System/Processing/DesignDocuments/VerificationTraceAlgorithm.md#verification-trace-tree-construction)
-  * [Mermaid Diagram Style Specification](../System/Output/DesignDocuments/DiagramStyles.md#mermaid-diagram-style-specification)
+  * [JSON Output Structure](../System/Output/Specifications.md#json-output-structure)
+  * [Verification Trace Tree Construction](../System/Processing/Specifications.md#verification-trace-tree-construction)
+  * [Mermaid Diagram Style Specification](../System/Output/Specifications.md#mermaid-diagram-style-specification)
 
 #### Relations
   * derive: [Verification Traces Element Navigation](#verification-traces-element-navigation)
@@ -625,9 +626,9 @@ Additional behavior:
   - --with-full-relations flag inserts all relations from the model registry into elements, including auto-generated inverse relations (e.g., satisfiedBy from satisfy, derive from derivedFrom)
 
 #### Attachments
-  * [Dry-Run Mode Behavior](../System/Operations/Refinements.md#dry-run-mode-behavior)
-  * [Diff Output Format Specification](../System/Output/DesignDocuments/OutputFormats.md#diff-output-format-specification)
-  * [JSON Output Structure](../System/Output/DesignDocuments/OutputFormats.md#json-output-structure)
+  * [Dry-Run Mode Behavior](../System/Operations/Behaviors.md#dry-run-mode-behavior)
+  * [Diff Output Format Specification](../System/Output/Specifications.md#diff-output-format-specification)
+  * [JSON Output Structure](../System/Output/Specifications.md#json-output-structure)
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
@@ -636,37 +637,6 @@ Additional behavior:
   * verifiedBy: [Element Ordering Verification](../System/Operations/Verifications/FormattingVerifications.md#element-ordering-verification)
   * verifiedBy: [Format Command Requirements Verification](../System/Operations/Verifications/FormattingVerifications.md#format-command-requirements-verification)
   * verifiedBy: [Full Relations Insertion Verification](../System/Operations/Verifications/FormattingVerifications.md#full-relations-insertion-verification)
----
-
-### Subdirectory Processing Option
-
-The system shall automatically detect when it is run from a subdirectory of a git repository and process only files within that subdirectory.
-
-#### Details
-The subdirectory auto-detection is designed to limit the scope of processing to the current working directory when it is a subdirectory of the git root.
-
-When run from the git root, the system processes all files. When run from a subdirectory, it automatically limits scope to that subdirectory:
-```
-cd specifications/Verifications
-reqvire model-summary  # Only processes files in Verifications directory (with automatic validation)
-```
-
-The system shall validate references when processing from a subdirectory and generate validation errors for any references to elements or files outside the current subdirectory scope. This includes:
-
-1. **Parent Directory Reference Validation**: Any relation that references an element or file outside the current subdirectory scope shall be reported as a missing relation target error
-2. **Scope Boundary Enforcement**: References using relative paths (e.g., `../ParentFile.md#element`) that escape the subdirectory shall result in missing relation target errors when the referenced elements cannot be found
-3. **Absolute Path Validation**: Absolute paths that point outside the subdirectory scope shall generate missing relation target errors
-4. **Error Reporting**: Missing relation target errors shall clearly identify the unreachable reference due to subdirectory scope limitations
-
-This validation ensures that subdirectory processing maintains logical boundaries and prevents architectural inconsistencies by reporting parent directory references as missing targets.
-
-#### Attachments
-  * [Subdirectory Auto-Detection Behavior](../System/Core/Behaviors.md#subdirectory-auto-detection-behavior)
-
-#### Relations
-  * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * derivedFrom: [Git Repository as Project Root](../System/Core/ModelManagement.md#git-repository-as-project-root)
-  * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
 ---
 
 ### Validate Command
@@ -691,10 +661,10 @@ The system shall provide a validation command that executes model validation and
   - Support --json flag to output validation results in JSON format
 
 #### Attachments
-  * [Two-Pass Validation Behavior](../System/Core/Refinements.md#two-pass-validation-behavior)
-  * [Validation Error Reporting Behavior](../System/Core/Refinements.md#validation-error-reporting-behavior)
-  * [JSON Output Structure](../System/Output/DesignDocuments/OutputFormats.md#json-output-structure)
-  * [Error Message Format Specification](../System/Output/DesignDocuments/OutputFormats.md#error-message-format-specification)
+  * [Two-Pass Validation Behavior](../System/Core/Behaviors.md#two-pass-validation-behavior)
+  * [Validation Error Reporting Behavior](../System/Core/Behaviors.md#validation-error-reporting-behavior)
+  * [JSON Output Structure](../System/Output/Specifications.md#json-output-structure)
+  * [Error Message Format Specification](../System/Output/Specifications.md#error-message-format-specification)
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)

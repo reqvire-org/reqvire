@@ -57,7 +57,7 @@ This test verifies that the format command reorders elements following the Eleme
   * type: test-verification
 
 #### Attachments
-  * [Element Ordering Behavior](../Refinements.md#element-ordering-behavior)
+  * [Element Ordering Behavior](../Behaviors.md#element-ordering-behavior)
 
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-element-ordering/test.sh)

@@ -98,7 +98,7 @@ When generating formatted output, the system shall:
 When formatting or persisting specification files, the system shall reorder elements following the Element Ordering Behavior.
 
 #### Attachments
-  * [Element Ordering Behavior](Refinements.md#element-ordering-behavior)
+  * [Element Ordering Behavior](Behaviors.md#element-ordering-behavior)
 
 #### Relations
   * derivedFrom: [Format Consistency Enforcement](#format-consistency-enforcement)

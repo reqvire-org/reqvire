@@ -15,7 +15,7 @@ The system shall define validation error reporting behavior.
   * derive: [Relation Type Validation](#relation-type-validation)
   * derivedFrom: [Validating Structures](../../UserStories.md#validating-structures)
   * satisfiedBy: [error.rs](../../../core/src/error.rs)
-  * satisfiedBy: [Validation Error Reporting Behavior](Refinements.md#validation-error-reporting-behavior)
+  * satisfiedBy: [Validation Error Reporting Behavior](Behaviors.md#validation-error-reporting-behavior)
 ---
 
 ### Relation Type Validation
@@ -180,7 +180,7 @@ The system shall define two-pass validation behavior.
   * derivedFrom: [Requirements Processing](Configuration.md#requirements-processing)
   * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
-  * satisfiedBy: [Two-Pass Validation Behavior](Refinements.md#two-pass-validation-behavior)
+  * satisfiedBy: [Two-Pass Validation Behavior](Behaviors.md#two-pass-validation-behavior)
 ---
 
 ### Validate Markdown Structure

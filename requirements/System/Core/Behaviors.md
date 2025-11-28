@@ -57,11 +57,6 @@ Describes how subdirectory scope detection and enforcement works.
 3. **Limit file processing**: Only process specification files within the current subdirectory
 4. **Validate references**: References to elements outside the subdirectory scope generate missing target errors
 
-**Scope Boundary Enforcement:**
-- References using relative paths (e.g., `../ParentFile.md#element`) that escape the subdirectory result in missing relation target errors
-- Absolute paths pointing outside subdirectory scope generate errors
-- Logical boundaries are maintained during subdirectory operations
-
 **When run from git root:**
 - Process all files in the repository
 - No scope limitations apply
@@ -70,4 +65,48 @@ This behavior enables focused work on specific areas of large models while maint
 
 #### Metadata
   * type: behavior
+
+#### Relations
+  * satisfy: [Git Repository as Project Root](ModelManagement.md#git-repository-as-project-root)
+---
+
+### Two-Pass Validation Behavior
+
+Two-phase validation process for model parsing.
+
+#### Details
+**Pass 1: Element Collection**
+- Parse all markdown files
+- Extract elements with metadata
+- Local validation (uniqueness, format, syntax)
+- Report errors if found
+
+**Pass 2: Graph Validation**
+- Build in-memory model representation from elements
+- Validate relations (existence, type compatibility)
+- Cross-component validation
+- Report errors if found
+
+#### Metadata
+  * type: behavior
+
+#### Relations
+  * satisfy: [Two-Pass Validation Strategy](Validation.md#two-pass-validation-strategy)
+---
+
+### Validation Error Reporting Behavior
+
+Error message structure for validation issues.
+
+#### Details
+- File path and line number included
+- Element name and relation details shown
+- Color coding per Color Scheme Specification
+- Actionable suggestions when possible
+
+#### Metadata
+  * type: behavior
+
+#### Relations
+  * satisfy: [Enhanced Validation Error Reporting](Validation.md#enhanced-validation-error-reporting)
 ---

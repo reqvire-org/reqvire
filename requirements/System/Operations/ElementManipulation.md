@@ -2,45 +2,25 @@
 
 ### Create Element Operation
 
-The system shall provide the capability to create new model elements by accepting a full element definition string in Markdown format, validating the element structure and relations, and inserting it into the target file following Element Ordering Behavior.
+The system shall provide the capability to create new model elements by accepting a full element definition string in Markdown format, validating the element structure and relations, and inserting it into the target file.
 
 #### Details
 When creating a new element, the system shall:
-- Accept a string containing the full element definition in Markdown format (including ### header, metadata, relations, and content)
+- Accept a string containing the full element definition in Markdown format
 - Accept target location: file path
 - Validate the target location using path validation rules
 - Create target file if it does not exist (subject to validation constraints)
-- Parse the element definition string to extract element structure, preserving all subsections:
-  - Metadata (element type and custom properties)
-  - Relations (derivedFrom, verifiedBy, satisfiedBy, verify)
-  - Details (refinement details and nested content)
-  - Attachments (links to Refinement elements and files)
-- Validate the element structure (proper subsections, valid relations, correct format)
+- Parse and validate the element definition string
 - Verify the element name is globally unique in the model
-- Generate a unique element identifier based on file path and element name
-- **Validate and normalize all relations in the element:**
-  - Parse relation targets from the markdown (may be relative paths or repo-relative paths)
-  - Normalize relation targets to be relative to the git repository root
-  - Validate that each relation target element exists in the model
-  - Reject the operation if any relation target does not exist
-  - Provide clear error messages indicating which relation target was not found
-- If validation passes, insert the element into the target file following Element Ordering Behavior
-- If validation fails, reject the operation and report validation errors
-- Maintain file structure and formatting after insertion
-
-**Relation Validation Rules:**
-- Relation targets may be specified as:
-  - Relative paths from the target file location (e.g., `../UserReqs.md#requirement`)
-  - Paths relative to git repository root (e.g., `specifications/UserReqs.md#requirement`)
-  - Same-file references (e.g., `#other-requirement`)
-- All relation targets must be normalized to git repository root relative format before insertion
-- All relation targets must reference existing elements in the model
-- External links (http://, https://, etc.) are allowed and not validated
+- Validate and normalize all relations following clearly defined specifications
+- Insert the element into the target file following Element Ordering Behavior
+- Reject the operation and report validation errors if validation fails
 
 #### Attachments
-  * [File Persistence Behavior](Refinements.md#file-persistence-behavior)
-  * [Target Location Constraint](Refinements.md#target-location-constraint)
-  * [Element Ordering Behavior](Refinements.md#element-ordering-behavior)
+  * [Relation Validation Specification](Specifications.md#relation-validation-specification)
+  * [File Persistence Behavior](Behaviors.md#file-persistence-behavior)
+  * [Target Location Constraint](Constraints.md#target-location-constraint)
+  * [Element Ordering Behavior](Behaviors.md#element-ordering-behavior)
 
 #### Relations
   * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
@@ -51,6 +31,7 @@ When creating a new element, the system shall:
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
   * satisfiedBy: [utils.rs](../../../core/src/utils.rs)
+  * satisfiedBy: [Relation Validation Specification](Specifications.md#relation-validation-specification)
   * verifiedBy: [Create Element Test](Verifications/ElementManipulationVerifications.md#create-element-test)
 ---
 
@@ -81,7 +62,7 @@ When deleting an element, the system shall:
 - Relations from the deleted element are automatically removed with the element
 
 #### Attachments
-  * [File Persistence Behavior](Refinements.md#file-persistence-behavior)
+  * [File Persistence Behavior](Behaviors.md#file-persistence-behavior)
 
 #### Relations
   * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
@@ -97,8 +78,8 @@ When deleting an element, the system shall:
 The system shall persist all element manipulation operations to the source files in storage, synchronizing changes from the in-memory model to the file system and reordering elements following the Element Ordering Behavior.
 
 #### Attachments
-  * [File Persistence Behavior](Refinements.md#file-persistence-behavior)
-  * [Element Ordering Behavior](Refinements.md#element-ordering-behavior)
+  * [File Persistence Behavior](Behaviors.md#file-persistence-behavior)
+  * [Element Ordering Behavior](Behaviors.md#element-ordering-behavior)
 
 #### Relations
   * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
@@ -140,9 +121,9 @@ When moving an element, the system shall:
 - All references to the old identifier shall be updated to the new identifier
 
 #### Attachments
-  * [File Persistence Behavior](Refinements.md#file-persistence-behavior)
-  * [Target Location Constraint](Refinements.md#target-location-constraint)
-  * [Element Ordering Behavior](Refinements.md#element-ordering-behavior)
+  * [File Persistence Behavior](Behaviors.md#file-persistence-behavior)
+  * [Target Location Constraint](Constraints.md#target-location-constraint)
+  * [Element Ordering Behavior](Behaviors.md#element-ordering-behavior)
 
 #### Relations
   * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
@@ -180,8 +161,8 @@ When the --squash flag is provided and the target file already exists, the syste
 - Preserve element ordering from the source file when inserting into target section
 
 #### Attachments
-  * [File Persistence Behavior](Refinements.md#file-persistence-behavior)
-  * [Target Location Constraint](Refinements.md#target-location-constraint)
+  * [File Persistence Behavior](Behaviors.md#file-persistence-behavior)
+  * [Target Location Constraint](Constraints.md#target-location-constraint)
 
 #### Relations
   * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
@@ -229,7 +210,7 @@ The system shall reject the operation with a clear error message if:
 - The new name conflicts with an existing element
 
 #### Attachments
-  * [File Persistence Behavior](Refinements.md#file-persistence-behavior)
+  * [File Persistence Behavior](Behaviors.md#file-persistence-behavior)
 
 #### Relations
   * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
@@ -245,12 +226,15 @@ The system shall validate target file paths for element manipulation operations 
 #### Details
 The system shall define target location validation constraints.
 
+#### Attachments
+  * [Git Repository Scope Specification](../Core/Specifications.md#git-repository-scope-specification)
+
 #### Relations
   * derivedFrom: [Ignore Files Integration](../Core/Configuration.md#ignore-files-integration)
   * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
   * derivedFrom: [Git Repository as Project Root](../Core/ModelManagement.md#git-repository-as-project-root)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * satisfiedBy: [utils.rs](../../../core/src/utils.rs)
-  * satisfiedBy: [Target Location Constraint](Refinements.md#target-location-constraint)
+  * satisfiedBy: [Target Location Constraint](Constraints.md#target-location-constraint)
   * verifiedBy: [Target Location Validation Test](Verifications/ElementManipulationVerifications.md#target-location-validation-test)
 ---
