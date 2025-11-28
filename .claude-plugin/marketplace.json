@@ -1,31 +1,53 @@
 {
-  "name": "reqvire-org-marketplace",
-  "description": "Official marketplace for reqvire-org plugins and tools",
-  "owner": {
-    "name": "Ilija Ljubicic",
-    "email": "ilijaljubicic@users.noreply.github.com"
-  },
-  "plugins": [
-    {
-      "name": "reqvire",
-      "description": "Requirements As A Code framework",
-      "version": "1.1.6",
-      "author": {
+    "name": "reqvire-org-marketplace",
+    "metadata": {
+        "description": "Official marketplace for reqvire-org plugins."
+    },
+    "owner": {
         "name": "Ilija Ljubicic",
         "email": "ilijaljubicic@users.noreply.github.com"
-      },
-      "repository": "https://github.com/reqvire-org/reqvire",
-      "source": "./reqvire-claude-plugin",
-      "tags": [
-        "mbse",
-        "requirements",
-        "systems-engineering",
-        "context-engineering",        
-        "verification",
-        "traceability",
-        "context",
-        "memory"
-      ]
-    }
-  ]
+    },
+    "plugins": [
+        {
+            "version": "1.2.0",
+            "name": "reqvire",
+            "description": "The Requirements As Code framework for Modern Engineering Teams. Includes specialized skills for requirements and context engineering and task planning.",
+            "author": {
+                "name": "Ilija Ljubicic",
+                "email": "ilijaljubicic@users.noreply.github.com"
+            },
+            "repository": "https://github.com/reqvire-org/reqvire",
+            "homepage": "https://www.reqvire.org",
+            "license": "Apache-2.0",
+            "keywords": [
+                "mbse",
+                "requirements",
+                "specifications",
+                "context",
+                "systems-engineering",
+                "verification",
+                "traceability",
+                "rust"
+            ],
+            "commands": [
+                "./commands/add-feature.md",
+                "./commands/analyze-model.md",
+                "./commands/lint-model.md",
+                "./commands/add-requirement.md",
+                "./commands/consolidate.md",
+                "./commands/mv-file.md",
+                "./commands/add-verification.md",
+                "./commands/containment.md",
+                "./commands/mv.md",
+                "./commands/analyze-coverage.md",
+                "./commands/find-redundant-verifications.md",
+                "./commands/rename-element.md",
+                "./commands/analyze-impact.md",
+                "./commands/generate-tasks.md",
+                "./commands/rm.md"
+            ],
+            "source": "./reqvire-claude-plugin",
+            "strict": false
+        }
+    ]
 }
