@@ -1562,7 +1562,7 @@ mod tests {
     fn test_handle_command() {
         // Mock CLI arguments
         let args = Args {
-            command: Some(Commands::Export { output: "html".to_string() }),
+            command: Some(Commands::Export { output: Some("html".to_string()) }),
         };
 
         // Define test input paths

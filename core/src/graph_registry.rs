@@ -2714,7 +2714,7 @@ mod tests {
 
         // Let's check what the markdown would look like:
         let b_element = graph.nodes.get("B").unwrap().element.clone();
-        let b_markdown = graph.element_to_markdown_with_context(&b_element, "file1.md");
+        let b_markdown = graph.element_to_markdown_with_context(&b_element, "file1.md",true);
         println!("B's markdown after A is moved:");
         println!("{}", b_markdown);
 
@@ -2750,7 +2750,7 @@ mod tests {
 
         // Check A's initial relations in markdown
         let a_element_initial = graph.nodes.get("A").unwrap().element.clone();
-        let a_markdown_initial = graph.element_to_markdown_with_context(&a_element_initial, "file1.md");
+        let a_markdown_initial = graph.element_to_markdown_with_context(&a_element_initial, "file1.md",true);
         println!("A's initial markdown (in file1.md):");
         println!("{}", a_markdown_initial);
 
@@ -2763,7 +2763,7 @@ mod tests {
 
         // Check A's relations after the move
         let a_element_moved = graph.nodes.get("A").unwrap().element.clone();
-        let a_markdown_moved = graph.element_to_markdown_with_context(&a_element_moved, "file3.md");
+        let a_markdown_moved = graph.element_to_markdown_with_context(&a_element_moved, "file3.md",true);
         println!("A's markdown after move to file3.md:");
         println!("{}", a_markdown_moved);
 
@@ -2832,7 +2832,7 @@ mod tests {
         let output_path = temp_dir.path();
 
         // Flush the graph to markdown files
-        let result = graph.flush_to_directory(output_path);
+        let result = graph.flush_to_directory(output_path,true);
         assert!(result.is_ok());
 
         // List what files were actually created
@@ -2919,7 +2919,7 @@ mod tests {
         let output_path = temp_dir.path();
 
         // Flush the graph to markdown files
-        let result = graph.flush_to_directory(output_path);
+        let result = graph.flush_to_directory(output_path,true);
         assert!(result.is_ok());
 
         // Read the generated markdown file
@@ -2977,7 +2977,7 @@ mod tests {
         let output_path = temp_dir.path();
 
         // Flush the graph to markdown files
-        let result = graph.flush_to_directory(output_path);
+        let result = graph.flush_to_directory(output_path,true);
         assert!(result.is_ok());
 
         // Read the generated markdown file
@@ -3016,7 +3016,7 @@ mod tests {
         let output_path = temp_dir.path();
 
         // Flush the graph to markdown files
-        let result = graph.flush_to_directory(output_path);
+        let result = graph.flush_to_directory(output_path,true);
         assert!(result.is_ok());
 
         // Read the generated markdown file
@@ -3053,7 +3053,7 @@ mod tests {
         let output_path = temp_dir.path();
 
         // Flush the graph to markdown files
-        let result = graph.flush_to_directory(output_path);
+        let result = graph.flush_to_directory(output_path,true);
         assert!(result.is_ok());
 
         // Read the generated markdown file
