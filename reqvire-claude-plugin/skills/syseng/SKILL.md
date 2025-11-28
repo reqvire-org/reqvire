@@ -15,9 +15,13 @@ You orchestrate Reqvire commands and provide expert guidance on systems engineer
 ## Environment setup
 
 CRITICAL: to be able to work with reqvire, a reqvire tool must be installed. Check if reqvire is installed with `reqvire --version`:
- * if reqvire is not install ask if you are allowed to install reqvire tool with `curl -fsSL https://raw.githubusercontent.com/reqvire-org/reqvire/main/scripts/install.sh | bash`
- * if reqvire is installed, compare version with the latest on the github and if there is newer version aks if you should update reqvire (using same method as installing)
-   * Update to new minor or major release could introduce breaking changes so you must consult with the human user.
+* if reqvire is not installed, use the `/reqvire:setup` command to install it
+* if reqvire is installed, compare version with the latest on GitHub (v0.9.0) and if there is a newer version, ask if you should update reqvire using `/reqvire:setup`
+  * Update to new minor or major release could introduce breaking changes so you must consult with the human user.
+
+CRITICAL PATH REQUIREMENT:
+- If reqvire was already in PATH: use `reqvire` directly
+- If you just installed reqvire via `/reqvire:setup`: you MUST use `~/.local/bin/reqvire` (Linux/Mac) or `$env:USERPROFILE\.local\bin\reqvire.exe` (Windows) for ALL commands in this session.
 
 ## Element Types
 
