@@ -1,0 +1,3536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>traceflow</title>
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+    <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+    
+<style>
+:root {
+    /* Primary Colors */
+    --color-primary: #3F51B5;           /* Indigo - core branding */
+    --color-primary-hover: #7986CB;     /* Much lighter Indigo for hover - more visible */
+    --color-primary-active: #303F9F;    /* Darker Indigo for active */
+
+    /* Element Type Colors */
+    --color-requirement: #673AB7;       /* Deep Purple - core requirements */
+    --color-verification: #4CAF50;      /* Emerald Green - validated/completed */
+    --color-other: #9E9E9E;             /* Cool Gray - other element types */
+
+    /* Status Colors */
+    --color-verified: #4CAF50;          /* Forest Green - verified/passing */
+    --color-pending: #FFB74D;           /* Amber - pending/warning */
+    --color-error: #F44336;             /* Red - error/failed */
+
+    /* Interactive Colors */
+    --color-highlight: #FFAB91;         /* Peach - hover highlight */
+    --color-link: #212121;              /* Black - link color */
+    --color-link-hover: #3F51B5;        /* Indigo (same as nav bar) - link hover */
+
+    /* Text Colors */
+    --color-text-primary: #212121;      /* Primary text */
+    --color-text-secondary: #424242;    /* Body text */
+    --color-text-muted: #757575;        /* De-emphasized text */
+    --color-background: #FAFAFA;        /* Off-white background */
+    --color-border: #EEEEEE;            /* Very light gray borders */
+}
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #FAFAFA;
+    color: var(--color-text-secondary);
+}
+.reqvire-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    background-color: var(--color-primary);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+}
+.reqvire-nav a {
+    color: #ffffff;
+    text-decoration: none;
+    padding: 10px 20px;
+    margin-right: 5px;
+    border-radius: 3px;
+    transition: background-color 0.2s, text-decoration 0.2s;
+}
+.reqvire-nav a.nav-logo {
+    display: flex;
+    align-items: center;
+    padding: 5px 15px 5px 0;
+}
+.reqvire-nav a.nav-logo img {
+    vertical-align: middle;
+}
+.reqvire-nav a:hover {
+    background-color: var(--color-primary-hover);
+    text-decoration: underline;
+    color: #ffffff;
+}
+.reqvire-nav a:active,
+.reqvire-nav a.active {
+    background-color: var(--color-primary-active);
+    text-decoration: underline;
+    color: #ffffff;
+}
+.reqvire-nav-spacer {
+    height: 50px;
+}
+.container {
+    max-width: 95%;
+    margin: 0 auto;
+    padding: 20px;
+}
+.content {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    border: 1px solid #E0E0E0;
+}
+h1 {
+    color: var(--color-text-primary);
+    border-bottom: 2px solid #EEEEEE;
+    padding-bottom: 10px;
+    margin-top: 0;
+}
+h2 {
+    color: var(--color-text-primary);
+    border-bottom: 1px solid #EEEEEE;
+    padding-bottom: 5px;
+}
+h3 {
+    color: var(--color-text-primary);
+    margin-top: 25px;
+}
+h4 {
+    color: var(--color-text-secondary);
+    font-weight: 600;
+}
+a {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: text-decoration 0.15s ease;
+}
+a:hover {
+    text-decoration: underline;
+}
+a:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 20px 0;
+}
+table, th, td {
+    border: 1px solid #EEEEEE;
+}
+th, td {
+    padding: 8px 12px;
+    text-align: left;
+}
+th {
+    background-color: #F5F5F5;
+    color: #212121;
+    font-weight: 600;
+}
+tr:hover td {
+    background-color: #FFF8E1;
+}
+code {
+    background: #f6f8fa;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 90%;
+}
+pre {
+    background: #f6f8fa;
+    border-radius: 3px;
+    padding: 16px;
+    overflow: auto;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+}
+blockquote {
+    margin: 0;
+    padding: 0 15px;
+    color: var(--color-text-muted);
+    border-left: 4px solid var(--color-primary);
+}
+.mermaid {
+    margin: 20px 0;
+    text-align: center;
+    height: calc(100vh - 150px);
+    width: 100%;
+    overflow: hidden;
+    position: relative; /* Required for absolutely-positioned navigation buttons */
+    border: 1px solid #EEEEEE;
+    border-radius: 3px;
+    background-color: #FAFAFA;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+.mermaid svg {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    position: relative;
+    z-index: 1;
+}
+.diagram-nav-buttons {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    z-index: 999; /* higher than SVG (1) but lower than header nav (1000) */
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    background-color: rgba(255, 255, 255, 0.85);
+    padding: 3px;
+    border-radius: 3px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+.diagram-nav-row {
+    display: flex;
+    gap: 2px;
+    justify-content: center;
+}
+.diagram-nav-btn {
+    width: 22px;
+    height: 22px;
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.diagram-nav-btn:hover {
+    background-color: var(--color-primary-hover);
+}
+.diagram-nav-btn:active {
+    background-color: var(--color-primary-active);
+}
+</style>
+
+    <!-- Enhanced mermaid configuration for Reqvire diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.5.0/dist/svg-pan-zoom.min.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+        import elkLayouts from 'https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk/dist/mermaid-layout-elk.esm.min.mjs';
+
+        // Register ELK layout for large diagrams
+        mermaid.registerLayoutLoaders(elkLayouts);
+
+        // Capture Mermaid errors
+        mermaid.parseError = function(err, hash) {
+            console.error('Mermaid Parse Error:', err);
+            console.error('Error details:', {
+                str: err.str,
+                hash: err.hash,
+                message: err.message,
+                stack: err.stack
+            });
+        };
+
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'neutral',
+            maxTextSize: 5000000,
+            maxEdges: 50000,
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis',
+                defaultRenderer: 'elk'
+            },
+            layout: 'elk',
+            elk: {
+                mergeEdges: true,
+                nodePlacementStrategy: 'SIMPLE'
+            },
+            securityLevel: 'loose',
+            logLevel: 'error'
+        });
+
+        await mermaid.run();
+        window.mermaid = mermaid;
+
+        // Wait for SVGs to be fully rendered, then initialize
+        function waitForSvgs(callback) {
+            var containers = document.querySelectorAll('.mermaid');
+            var allReady = true;
+            containers.forEach(function(c) {
+                var svg = c.querySelector('svg');
+                // Check SVG exists, has getBBox, valid dimensions, and has actual content (nodes)
+                if (!svg || !svg.getBBox || svg.getBBox().width === 0 || !svg.querySelector('.node')) {
+                    allReady = false;
+                }
+            });
+            if (allReady && containers.length > 0) {
+                callback();
+            } else {
+                requestAnimationFrame(function() { waitForSvgs(callback); });
+            }
+        }
+
+        // Add pan/zoom to all Mermaid diagrams after rendering
+        waitForSvgs(function() {
+            var allMermaidContainers = document.querySelectorAll('.mermaid');
+
+            allMermaidContainers.forEach(function(mermaidContainer, index) {
+
+                var svg = mermaidContainer.querySelector('svg');
+                if (!svg) {
+                    return;
+                }
+
+                // Double-check SVG is ready
+                try {
+                    var bbox = svg.getBBox();
+                    if (bbox.width === 0 || bbox.height === 0) {
+                        return;
+                    }
+                } catch (e) {
+                    return;
+                }
+
+                // Get the natural size of the diagram
+                var bbox = svg.getBBox();
+                var containerWidth = mermaidContainer.clientWidth;
+                var containerHeight = mermaidContainer.clientHeight;
+
+                // Check if diagram fits within container (with some padding)
+                var padding = 40;
+                var fitsInContainer = (bbox.width <= containerWidth - padding) && (bbox.height <= containerHeight - padding);
+
+                if (fitsInContainer) {
+                    // Diagram fits - use natural size, shrink container to fit content
+                    svg.style.width = 'auto';
+                    svg.style.height = 'auto';
+                    mermaidContainer.style.height = 'auto';
+                    mermaidContainer.style.minHeight = (bbox.height + padding) + 'px';
+                    mermaidContainer.style.maxHeight = 'calc(100vh - 150px)';
+                    // No pan/zoom needed for small diagrams
+                    return;
+                }
+
+                // Large diagram - enable pan/zoom
+                svg.style.maxWidth = 'none';
+                svg.style.maxHeight = 'none';
+
+                var eventsHandler = {
+                    haltEventListeners: ['touchstart', 'touchend', 'touchmove', 'touchleave', 'touchcancel'],
+                        init: function(options) {
+                            var instance = options.instance;
+                            var initialScale = 1;
+                            var pannedX = 0;
+                            var pannedY = 0;
+
+                            this.hammer = Hammer(options.svgElement, {
+                                inputClass: Hammer.SUPPORT_POINTER_EVENTS ? Hammer.PointerEventInput : Hammer.TouchInput
+                            });
+
+                            this.hammer.get('pinch').set({enable: true});
+
+                            this.hammer.on('doubletap', function(ev){
+                                instance.zoomIn();
+                            });
+
+                            this.hammer.on('panstart panmove', function(ev){
+                                if (ev.type === 'panstart') {
+                                    pannedX = 0;
+                                    pannedY = 0;
+                                }
+                                instance.panBy({x: ev.deltaX - pannedX, y: ev.deltaY - pannedY});
+                                pannedX = ev.deltaX;
+                                pannedY = ev.deltaY;
+                            });
+
+                            this.hammer.on('pinchstart pinchmove', function(ev){
+                                if (ev.type === 'pinchstart') {
+                                    initialScale = instance.getZoom();
+                                }
+                                instance.zoomAtPoint(initialScale * ev.scale, {x: ev.center.x, y: ev.center.y});
+                            });
+
+                            options.svgElement.addEventListener('touchmove', function(e){ e.preventDefault(); });
+                        },
+                        destroy: function(){
+                            this.hammer.destroy();
+                        }
+                    };
+
+                    // Diagrams with default zoom (no auto-fit)
+                    var panZoomInstance;
+                    try {
+                        panZoomInstance = svgPanZoom(svg, {
+                            zoomEnabled: true,
+                            controlIconsEnabled: true,
+                            fit: false,
+                            center: false,
+                            contain: false,
+                            minZoom: 0.5,
+                            maxZoom: 10,
+                            zoomScaleSensitivity: 0.3,
+                            customEventsHandler: eventsHandler
+                        });
+                    } catch (e) {
+                        return; // Skip this diagram and continue with others
+                    }
+
+                    if (!panZoomInstance) {
+                        return;
+                    }
+
+                    // Add navigation buttons
+                    var navButtons = document.createElement('div');
+                    navButtons.className = 'diagram-nav-buttons';
+                    navButtons.innerHTML = `
+                        <div class="diagram-nav-row">
+                            <button class="diagram-nav-btn" data-action="up">▲</button>
+                        </div>
+                        <div class="diagram-nav-row">
+                            <button class="diagram-nav-btn" data-action="left">◀</button>
+                            <button class="diagram-nav-btn" data-action="down">▼</button>
+                            <button class="diagram-nav-btn" data-action="right">▶</button>
+                        </div>
+                    `;
+                    mermaidContainer.appendChild(navButtons);
+
+                    // Wire up navigation buttons
+                    var panStep = 100;
+                    navButtons.querySelectorAll('.diagram-nav-btn').forEach(function(btn) {
+                        btn.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            var action = this.getAttribute('data-action');
+                            switch(action) {
+                                case 'up':
+                                    panZoomInstance.panBy({x: 0, y: panStep});
+                                    break;
+                                case 'down':
+                                    panZoomInstance.panBy({x: 0, y: -panStep});
+                                    break;
+                                case 'left':
+                                    panZoomInstance.panBy({x: panStep, y: 0});
+                                    break;
+                                case 'right':
+                                    panZoomInstance.panBy({x: -panStep, y: 0});
+                                    break;
+                            }
+                        });
+                    });
+            });
+
+            // Add CSS for edge highlighting
+            var style = document.createElement('style');
+            style.textContent = `
+                path.edge-highlighted,
+                .edge-highlighted path,
+                svg path.edge-highlighted {
+                    stroke: #FFAB91 !important;
+                    stroke-width: 3px !important;
+                }
+            `;
+            document.head.appendChild(style);
+
+            // Initialize edge highlighting for all diagrams
+            document.querySelectorAll('.mermaid svg').forEach(function(svg) {
+                var nodes = svg.querySelectorAll('.node');
+
+                // Find flowchart-link paths (actual edges)
+                var edgePaths = svg.querySelectorAll('path.flowchart-link');
+                // Fallback: find paths in .edges group
+                if (edgePaths.length === 0) {
+                    var edgesGroup = svg.querySelector('.edges');
+                    if (edgesGroup) {
+                        edgePaths = edgesGroup.querySelectorAll('path');
+                    }
+                }
+
+                // Get SVG point for coordinate transforms
+                var svgPoint = svg.createSVGPoint();
+
+                // Helper: transform point through element's CTM
+                function getTransformedBBox(element) {
+                    var bbox = element.getBBox();
+                    var ctm = element.getCTM();
+                    if (!ctm) return bbox;
+
+                    // Transform all four corners
+                    var corners = [
+                        {x: bbox.x, y: bbox.y},
+                        {x: bbox.x + bbox.width, y: bbox.y},
+                        {x: bbox.x, y: bbox.y + bbox.height},
+                        {x: bbox.x + bbox.width, y: bbox.y + bbox.height}
+                    ];
+
+                    var transformed = corners.map(function(c) {
+                        svgPoint.x = c.x;
+                        svgPoint.y = c.y;
+                        var tp = svgPoint.matrixTransform(ctm);
+                        return {x: tp.x, y: tp.y};
+                    });
+
+                    var minX = Math.min.apply(null, transformed.map(function(p) { return p.x; }));
+                    var maxX = Math.max.apply(null, transformed.map(function(p) { return p.x; }));
+                    var minY = Math.min.apply(null, transformed.map(function(p) { return p.y; }));
+                    var maxY = Math.max.apply(null, transformed.map(function(p) { return p.y; }));
+
+                    return {x: minX, y: minY, width: maxX - minX, height: maxY - minY};
+                }
+
+                // Helper: get all points from path
+                function getPathPoints(path) {
+                    var d = path.getAttribute('d') || '';
+                    var points = [];
+                    var ctm = path.getCTM();
+
+                    // Get M (start) point
+                    var startMatch = d.match(/M\s*([\d.-]+)[,\s]+([\d.-]+)/i);
+                    if (startMatch) {
+                        var sx = parseFloat(startMatch[1]);
+                        var sy = parseFloat(startMatch[2]);
+                        if (ctm) {
+                            svgPoint.x = sx; svgPoint.y = sy;
+                            var tp = svgPoint.matrixTransform(ctm);
+                            points.push({x: tp.x, y: tp.y});
+                        } else {
+                            points.push({x: sx, y: sy});
+                        }
+                    }
+
+                    // Get last point - find last number pair before Z or end
+                    var allNums = d.match(/[\d.-]+/g);
+                    if (allNums && allNums.length >= 2) {
+                        var ex = parseFloat(allNums[allNums.length - 2]);
+                        var ey = parseFloat(allNums[allNums.length - 1]);
+                        if (ctm) {
+                            svgPoint.x = ex; svgPoint.y = ey;
+                            var tp = svgPoint.matrixTransform(ctm);
+                            points.push({x: tp.x, y: tp.y});
+                        } else {
+                            points.push({x: ex, y: ey});
+                        }
+                    }
+
+                    return points;
+                }
+
+                // Build node bounding boxes with transforms
+                var nodeData = {};
+                nodes.forEach(function(node) {
+                    var nodeId = node.id || '';
+                    var parts = nodeId.split('-');
+                    var hashId = parts.length >= 2 ? parts[1] : nodeId;
+
+                    nodeData[hashId] = {
+                        node: node,
+                        bbox: getTransformedBBox(node)
+                    };
+                });
+
+                // Check if point is near bbox
+                function isNearBbox(pt, bbox, margin) {
+                    margin = margin || 40;
+                    return pt.x >= bbox.x - margin && pt.x <= bbox.x + bbox.width + margin &&
+                           pt.y >= bbox.y - margin && pt.y <= bbox.y + bbox.height + margin;
+                }
+
+                // Calculate distance from point to bbox center
+                function distToBboxCenter(pt, bbox) {
+                    var centerX = bbox.x + bbox.width / 2;
+                    var centerY = bbox.y + bbox.height / 2;
+                    return Math.sqrt(Math.pow(pt.x - centerX, 2) + Math.pow(pt.y - centerY, 2));
+                }
+
+                // Build edge connections with direction tracking
+                var edgeConnections = []; // [{path, source, target}]
+                var upstreamOf = {}; // node -> [parent nodes that point TO this node]
+                var downstreamOf = {}; // node -> [child nodes this node points TO]
+
+                Object.keys(nodeData).forEach(function(hashId) {
+                    upstreamOf[hashId] = [];
+                    downstreamOf[hashId] = [];
+                });
+
+                edgePaths.forEach(function(path) {
+                    var points = getPathPoints(path);
+                    if (points.length < 2) return;
+
+                    var startPt = points[0];
+                    var endPt = points[points.length - 1];
+
+                    var sourceNode = null;
+                    var targetNode = null;
+                    var sourceMinDist = Infinity;
+                    var targetMinDist = Infinity;
+
+                    // Find closest source and target nodes for this edge
+                    Object.keys(nodeData).forEach(function(hashId) {
+                        var bbox = nodeData[hashId].bbox;
+                        // Find closest node to start point (source)
+                        if (isNearBbox(startPt, bbox, 30)) {
+                            var dist = distToBboxCenter(startPt, bbox);
+                            if (dist < sourceMinDist) {
+                                sourceMinDist = dist;
+                                sourceNode = hashId;
+                            }
+                        }
+                        // Find closest node to end point (target)
+                        if (isNearBbox(endPt, bbox, 30)) {
+                            var dist = distToBboxCenter(endPt, bbox);
+                            if (dist < targetMinDist) {
+                                targetMinDist = dist;
+                                targetNode = hashId;
+                            }
+                        }
+                    });
+
+                    if (sourceNode && targetNode && sourceNode !== targetNode) {
+                        edgeConnections.push({path: path, source: sourceNode, target: targetNode});
+                        // source -> target means: target's upstream includes source
+                        if (!upstreamOf[targetNode].includes(sourceNode)) {
+                            upstreamOf[targetNode].push(sourceNode);
+                        }
+                        // source -> target means: source's downstream includes target
+                        if (!downstreamOf[sourceNode].includes(targetNode)) {
+                            downstreamOf[sourceNode].push(targetNode);
+                        }
+                    }
+                });
+
+                // Traverse only upstream (to parents/ancestors)
+                function findUpstream(startNodeId) {
+                    var visited = {};
+                    var queue = [startNodeId];
+                    visited[startNodeId] = true;
+
+                    while (queue.length > 0) {
+                        var current = queue.shift();
+                        var parents = upstreamOf[current] || [];
+                        parents.forEach(function(parent) {
+                            if (!visited[parent]) {
+                                visited[parent] = true;
+                                queue.push(parent);
+                            }
+                        });
+                    }
+                    return visited;
+                }
+
+                // Traverse only downstream (to children/descendants)
+                function findDownstream(startNodeId) {
+                    var visited = {};
+                    var queue = [startNodeId];
+                    visited[startNodeId] = true;
+
+                    while (queue.length > 0) {
+                        var current = queue.shift();
+                        var children = downstreamOf[current] || [];
+                        children.forEach(function(child) {
+                            if (!visited[child]) {
+                                visited[child] = true;
+                                queue.push(child);
+                            }
+                        });
+                    }
+                    return visited;
+                }
+
+                // Get edges for connected nodes
+                function getChainEdges(nodeSet) {
+                    var edges = [];
+                    edgeConnections.forEach(function(conn) {
+                        if (nodeSet[conn.source] && nodeSet[conn.target]) {
+                            edges.push(conn.path);
+                        }
+                    });
+                    return edges;
+                }
+
+                // Attach hover handlers
+                nodes.forEach(function(node) {
+                    var nodeId = node.id || '';
+                    var parts = nodeId.split('-');
+                    var hashId = parts.length >= 2 ? parts[1] : nodeId;
+
+                    node.style.cursor = 'pointer';
+
+                    node.addEventListener('mouseenter', function(e) {
+                        e.stopPropagation();
+                        nodes.forEach(function(n) { n.style.filter = ''; });
+                        node.style.filter = 'drop-shadow(0 0 8px rgba(255, 171, 145, 0.7))';
+
+                        // Find upstream (ancestors) and downstream (descendants) separately
+                        var upstream = findUpstream(hashId);
+                        var downstream = findDownstream(hashId);
+                        // Merge both sets
+                        var allConnected = {};
+                        Object.keys(upstream).forEach(function(k) { allConnected[k] = true; });
+                        Object.keys(downstream).forEach(function(k) { allConnected[k] = true; });
+
+                        var chainEdges = getChainEdges(allConnected);
+                        chainEdges.forEach(function(path) {
+                            path.classList.add('edge-highlighted');
+                        });
+                    });
+
+                    node.addEventListener('mouseleave', function() {
+                        node.style.filter = '';
+                        // Remove highlight from all edges
+                        edgePaths.forEach(function(path) {
+                            path.classList.remove('edge-highlighted');
+                        });
+                    });
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <nav class="reqvire-nav">
+        <a href="index.html" class="nav-logo"><img src="assets/logo.png" alt="Reqvire" height="24"></a>
+        <a href="index.html">Containment</a>
+        <a href="model.html">Model</a>
+        <a href="traces.html">Traces</a>
+        <a href="traceflow.html">TraceFlow</a>
+        <a href="coverage.html">Coverage</a>
+        <a href="resources.html">Resources</a>
+    </nav>
+    <div class="reqvire-nav-spacer"></div>
+    <div class="container">
+        <div class="content">
+            <h1 id="traceflow">TraceFlow</h1>
+<p>The TraceFlow view visualizes the verification traceability flow as an interactive Sankey diagram. It shows how requirements flow from stakeholder needs (user requirements) through system specifications (system requirements) to verifications. Link width indicates the number of connections between elements. Use this view to understand the overall traceability architecture and identify gaps in requirement coverage.</p>
+<p><strong>Instructions:</strong> Use mouse wheel to zoom, drag to pan. Click on nodes to navigate to element definitions. Use the +/-/reset buttons for precise control.</p>
+<p>
+<div class="d3-sankey-container" id="d3sankey_562b60f976c0">
+    <svg class="d3-sankey-svg"></svg>
+</div>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
+<script>
+(function() {
+    const data = {
+  "nodes": [
+    {
+      "name": "CLI Git Commit Hash Flag Test",
+      "type": "verification",
+      "link": "requirements/Interfaces/Verifications/CLIVerifications.md#cli-git-commit-hash-flag-test"
+    },
+    {
+      "name": "CLI Change Impact Report Command",
+      "type": "requirement",
+      "link": "requirements/Interfaces/CLI.md#cli-change-impact-report-command"
+    },
+    {
+      "name": "CLI Interface Structure",
+      "type": "requirement",
+      "link": "requirements/Interfaces/CLI.md#cli-interface-structure"
+    },
+    {
+      "name": "CLI interface",
+      "type": "user-requirement",
+      "link": "requirements/Interfaces/Interfaces.md#cli-interface"
+    },
+    {
+      "name": "Managing System Models",
+      "type": "user-requirement",
+      "link": "requirements/UserStories.md#managing-system-models"
+    },
+    {
+      "name": "CLI Help Structure Verification",
+      "type": "verification",
+      "link": "requirements/Interfaces/Verifications/CLIVerifications.md#cli-help-structure-verification"
+    },
+    {
+      "name": "CLI Coverage Command",
+      "type": "requirement",
+      "link": "requirements/Interfaces/CLI.md#cli-coverage-command"
+    },
+    {
+      "name": "CLI Search Command",
+      "type": "requirement",
+      "link": "requirements/Interfaces/CLI.md#cli-search-command"
+    },
+    {
+      "name": "CLI Traces Command",
+      "type": "requirement",
+      "link": "requirements/Interfaces/CLI.md#cli-traces-command"
+    },
+    {
+      "name": "Format Command",
+      "type": "requirement",
+      "link": "requirements/Interfaces/CLI.md#format-command"
+    },
+    {
+      "name": "Validate Command",
+      "type": "requirement",
+      "link": "requirements/Interfaces/CLI.md#validate-command"
+    },
+    {
+      "name": "HTML Export",
+      "type": "requirement",
+      "link": "requirements/Interfaces/WebInterface.md#html-export"
+    },
+    {
+      "name": "Web Interface",
+      "type": "user-requirement",
+      "link": "requirements/Interfaces/Interfaces.md#web-interface"
+    },
+    {
+      "name": "Verification Traces Element Navigation Test",
+      "type": "verification",
+      "link": "requirements/Interfaces/Verifications/CLIVerifications.md#verification-traces-element-navigation-test"
+    },
+    {
+      "name": "Verification Traces Element Navigation",
+      "type": "requirement",
+      "link": "requirements/Interfaces/CLI.md#verification-traces-element-navigation"
+    },
+    {
+      "name": "Attachment Export Verification",
+      "type": "verification",
+      "link": "requirements/Interfaces/Verifications/WebInterfaceVerifications.md#attachment-export-verification"
+    },
+    {
+      "name": "Attachment Export",
+      "type": "requirement",
+      "link": "requirements/Interfaces/WebInterface.md#attachment-export"
+    },
+    {
+      "name": "Containment Attachment Links Verification",
+      "type": "verification",
+      "link": "requirements/Interfaces/Verifications/WebInterfaceVerifications.md#containment-attachment-links-verification"
+    },
+    {
+      "name": "Containment View Attachment Links",
+      "type": "requirement",
+      "link": "requirements/Interfaces/WebInterface.md#containment-view-attachment-links"
+    },
+    {
+      "name": "Diagram Attachment Display Verification",
+      "type": "verification",
+      "link": "requirements/Interfaces/Verifications/WebInterfaceVerifications.md#diagram-attachment-display-verification"
+    },
+    {
+      "name": "Diagram Attachment Display",
+      "type": "requirement",
+      "link": "requirements/Interfaces/WebInterface.md#diagram-attachment-display"
+    },
+    {
+      "name": "HTML Export Verification",
+      "type": "verification",
+      "link": "requirements/Interfaces/Verifications/WebInterfaceVerifications.md#html-export-verification"
+    },
+    {
+      "name": "Model View Element Navigation Test",
+      "type": "verification",
+      "link": "requirements/Interfaces/Verifications/WebInterfaceVerifications.md#model-view-element-navigation-test"
+    },
+    {
+      "name": "Model View Element Navigation",
+      "type": "requirement",
+      "link": "requirements/Interfaces/WebInterface.md#model-view-element-navigation"
+    },
+    {
+      "name": "Model-Centric View Generation",
+      "type": "requirement",
+      "link": "requirements/Interfaces/WebInterface.md#model-centric-view-generation"
+    },
+    {
+      "name": "Serve Command Verification",
+      "type": "verification",
+      "link": "requirements/Interfaces/Verifications/WebInterfaceVerifications.md#serve-command-verification"
+    },
+    {
+      "name": "Serve Command",
+      "type": "requirement",
+      "link": "requirements/Interfaces/WebInterface.md#serve-command"
+    },
+    {
+      "name": "Attach Command Verification",
+      "type": "verification",
+      "link": "requirements/System/Core/Verifications/AttachmentsVerifications.md#attach-command-verification"
+    },
+    {
+      "name": "Attachment Commands",
+      "type": "requirement",
+      "link": "requirements/Interfaces/CLI.md#attachment-commands"
+    },
+    {
+      "name": "Reserved Subsections Support",
+      "type": "requirement",
+      "link": "requirements/System/Core/StructureAndParsing.md#reserved-subsections-support"
+    },
+    {
+      "name": "Structure and Addressing in Markdown Documents",
+      "type": "requirement",
+      "link": "requirements/System/Core/StructureAndParsing.md#structure-and-addressing-in-markdown-documents"
+    },
+    {
+      "name": "Attachment Identifier CRUD Verification",
+      "type": "verification",
+      "link": "requirements/System/Core/Verifications/AttachmentsVerifications.md#attachment-identifier-crud-verification"
+    },
+    {
+      "name": "Attachment Identifier Updates",
+      "type": "requirement",
+      "link": "requirements/System/Core/ModelManagement.md#attachment-identifier-updates"
+    },
+    {
+      "name": "Element Manipulation Operations",
+      "type": "user-requirement",
+      "link": "requirements/System/Core/ModelManagement.md#element-manipulation-operations"
+    },
+    {
+      "name": "Attachment Output Rendering Verification",
+      "type": "verification",
+      "link": "requirements/System/Core/Verifications/AttachmentsVerifications.md#attachment-output-rendering-verification"
+    },
+    {
+      "name": "Attachment Search Filters Verification",
+      "type": "verification",
+      "link": "requirements/System/Core/Verifications/AttachmentsVerifications.md#attachment-search-filters-verification"
+    },
+    {
+      "name": "Attachments Change Impact Verification",
+      "type": "verification",
+      "link": "requirements/System/Core/Verifications/AttachmentsVerifications.md#attachments-change-impact-verification"
+    },
+    {
+      "name": "Change Impact Detection",
+      "type": "requirement",
+      "link": "requirements/System/Processing/ChangeImpact.md#change-impact-detection"
+    },
+    {
+      "name": "Element Identity Model",
+      "type": "requirement",
+      "link": "requirements/System/Core/StructureAndParsing.md#element-identity-model"
+    },
+    {
+      "name": "Tracing Structural Changes",
+      "type": "user-requirement",
+      "link": "requirements/System/Output/Reporting.md#tracing-structural-changes"
+    },
+    {
+      "name": "Trace Changes in System Model",
+      "type": "user-requirement",
+      "link": "requirements/UserStories.md#trace-changes-in-system-model"
+    },
+    {
+      "name": "Attachments Subsection Parsing Verification",
+      "type": "verification",
+      "link": "requirements/System/Core/Verifications/AttachmentsVerifications.md#attachments-subsection-parsing-verification"
+    },
+    {
+      "name": "Attachment Target Validation",
+      "type": "requirement",
+      "link": "requirements/System/Core/StructureAndParsing.md#attachment-target-validation"
+    },
+    {
+      "name": "Attachments Validation Verification",
+      "type": "verification",
+      "link": "requirements/System/Core/Verifications/AttachmentsVerifications.md#attachments-validation-verification"
+    },
+    {
+      "name": "Detach Command Verification",
+      "type": "verification",
+      "link": "requirements/System/Core/Verifications/AttachmentsVerifications.md#detach-command-verification"
+    },
+    {
+      "name": "Move Asset Command Verification",
+      "type": "verification",
+      "link": "requirements/System/Core/Verifications/AttachmentsVerifications.md#move-asset-command-verification"
+    },
+    {
+      "name": "CLI Move Asset Command",
+      "type": "requirement",
+      "link": "requirements/Interfaces/CLI.md#cli-move-asset-command"
+    },
+    {
+      "name": "Remove Asset Command Verification",
+      "type": "verification",
+      "link": "requirements/System/Core/Verifications/AttachmentsVerifications.md#remove-asset-command-verification"
+    },
+    {
+      "name": "CLI Remove Asset Command",
+      "type": "requirement",
+      "link": "requirements/Interfaces/CLI.md#cli-remove-asset-command"
+    },
+    {
+      "name": "Element Subsection Parsing Test",
+      "type": "verification",
+      "link": "requirements/System/Core/Verifications/ParsingVerifications.md#element-subsection-parsing-test"
+    },
+    {
+      "name": "Default Requirement Type Assignment",
+      "type": "user-requirement",
+      "link": "requirements/System/Core/ModelManagement.md#default-requirement-type-assignment"
+    },
+    {
+      "name": "Relation Types and behaviors",
+      "type": "requirement",
+      "link": "requirements/System/Core/ModelManagement.md#relation-types-and-behaviors"
+    },
+    {
+      "name": "Identifiers and Relations",
+      "type": "requirement",
+      "link": "requirements/System/Core/StructureAndParsing.md#identifiers-and-relations"
+    },
+    {
+      "name": "AI-Assisted System Model Management",
+      "type": "user-requirement",
+      "link": "requirements/UserStories.md#ai-assisted-system-model-management"
+    },
+    {
+      "name": "Supported Element Types",
+      "type": "requirement",
+      "link": "requirements/System/Core/ModelManagement.md#supported-element-types"
+    },
+    {
+      "name": "Fragment Normalization Test",
+      "type": "verification",
+      "link": "requirements/System/Core/Verifications/ParsingVerifications.md#fragment-normalization-test"
+    },
+    {
+      "name": "Non-Reserved Subsections Content Test",
+      "type": "verification",
+      "link": "requirements/System/Core/Verifications/ParsingVerifications.md#non-reserved-subsections-content-test"
+    },
+    {
+      "name": "Refinement Element Type Parsing Test",
+      "type": "verification",
+      "link": "requirements/System/Core/Verifications/ParsingVerifications.md#refinement-element-type-parsing-test"
+    },
+    {
+      "name": "Refinement Relations Rejection Test",
+      "type": "verification",
+      "link": "requirements/System/Core/Verifications/ParsingVerifications.md#refinement-relations-rejection-test"
+    },
+    {
+      "name": "Refinement Element Structure Constraints",
+      "type": "requirement",
+      "link": "requirements/System/Core/ModelManagement.md#refinement-element-structure-constraints"
+    },
+    {
+      "name": "Specification File Identification Test",
+      "type": "verification",
+      "link": "requirements/System/Core/Verifications/ParsingVerifications.md#specification-file-identification-test"
+    },
+    {
+      "name": "Specification File Identification",
+      "type": "requirement",
+      "link": "requirements/System/Core/StructureAndParsing.md#specification-file-identification"
+    },
+    {
+      "name": "Default Element Type Assignment Test",
+      "type": "verification",
+      "link": "requirements/System/Core/Verifications/ValidationVerifications.md#default-element-type-assignment-test"
+    },
+    {
+      "name": "Element Type Relation Compatibility Test",
+      "type": "verification",
+      "link": "requirements/System/Core/Verifications/ValidationVerifications.md#element-type-relation-compatibility-test"
+    },
+    {
+      "name": "Element Type Relation Compatibility",
+      "type": "requirement",
+      "link": "requirements/System/Core/ModelManagement.md#element-type-relation-compatibility"
+    },
+    {
+      "name": "Relation Element Type Validator",
+      "type": "requirement",
+      "link": "requirements/System/Core/Validation.md#relation-element-type-validator"
+    },
+    {
+      "name": "Validate Relation Types",
+      "type": "user-requirement",
+      "link": "requirements/System/Core/Validation.md#validate-relation-types"
+    },
+    {
+      "name": "Align with Industry Standards",
+      "type": "user-requirement",
+      "link": "requirements/UserStories.md#align-with-industry-standards"
+    },
+    {
+      "name": "Validating Structures",
+      "type": "user-requirement",
+      "link": "requirements/UserStories.md#validating-structures"
+    },
+    {
+      "name": "File Exclusion Test",
+      "type": "verification",
+      "link": "requirements/System/Core/Verifications/ValidationVerifications.md#file-exclusion-test"
+    },
+    {
+      "name": "Ignore Files Integration",
+      "type": "requirement",
+      "link": "requirements/System/Core/Configuration.md#ignore-files-integration"
+    },
+    {
+      "name": "Ignoring Unstructured Documents",
+      "type": "requirement",
+      "link": "requirements/System/Core/Configuration.md#ignoring-unstructured-documents"
+    },
+    {
+      "name": "Coexistence of Structured and Unstructured Documents",
+      "type": "user-requirement",
+      "link": "requirements/System/Core/ModelManagement.md#coexistence-of-structured-and-unstructured-documents"
+    },
+    {
+      "name": "Reserved Repository Files Exclusion",
+      "type": "requirement",
+      "link": "requirements/System/Core/Configuration.md#reserved-repository-files-exclusion"
+    },
+    {
+      "name": "Invalid Header Structure Test",
+      "type": "verification",
+      "link": "requirements/System/Core/Verifications/ValidationVerifications.md#invalid-header-structure-test"
+    },
+    {
+      "name": "Markdown Structure Validator",
+      "type": "requirement",
+      "link": "requirements/System/Core/Validation.md#markdown-structure-validator"
+    },
+    {
+      "name": "Validate Markdown Structure",
+      "type": "user-requirement",
+      "link": "requirements/System/Core/Validation.md#validate-markdown-structure"
+    },
+    {
+      "name": "Invalid Relations Test",
+      "type": "verification",
+      "link": "requirements/System/Core/Verifications/ValidationVerifications.md#invalid-relations-test"
+    },
+    {
+      "name": "Cross-Component Dependency Validator",
+      "type": "requirement",
+      "link": "requirements/System/Core/Validation.md#cross-component-dependency-validator"
+    },
+    {
+      "name": "Validate Cross-Component Dependencies",
+      "type": "user-requirement",
+      "link": "requirements/System/Core/Validation.md#validate-cross-component-dependencies"
+    },
+    {
+      "name": "Internal Consistency Validator",
+      "type": "requirement",
+      "link": "requirements/System/Core/Validation.md#internal-consistency-validator"
+    },
+    {
+      "name": "Validate Internal Consistency",
+      "type": "user-requirement",
+      "link": "requirements/System/Core/Validation.md#validate-internal-consistency"
+    },
+    {
+      "name": "Relation Type Validation",
+      "type": "requirement",
+      "link": "requirements/System/Core/Validation.md#relation-type-validation"
+    },
+    {
+      "name": "Enhanced Validation Error Reporting",
+      "type": "user-requirement",
+      "link": "requirements/System/Core/Validation.md#enhanced-validation-error-reporting"
+    },
+    {
+      "name": "Validation Error Handling",
+      "type": "requirement",
+      "link": "requirements/System/Core/Validation.md#validation-error-handling"
+    },
+    {
+      "name": "Detailed Error Handling and Logging",
+      "type": "requirement",
+      "link": "requirements/Interfaces/CLI.md#detailed-error-handling-and-logging"
+    },
+    {
+      "name": "Validation Report Generator",
+      "type": "requirement",
+      "link": "requirements/System/Output/Reporting.md#validation-report-generator"
+    },
+    {
+      "name": "Provide Validation Reports",
+      "type": "user-requirement",
+      "link": "requirements/System/Output/Reporting.md#provide-validation-reports"
+    },
+    {
+      "name": "Model Reports",
+      "type": "user-requirement",
+      "link": "requirements/System/Output/Reporting.md#model-reports"
+    },
+    {
+      "name": "Provide Reports",
+      "type": "user-requirement",
+      "link": "requirements/UserStories.md#provide-reports"
+    },
+    {
+      "name": "Trace Relation Non-Directional Behavior",
+      "type": "requirement",
+      "link": "requirements/System/Output/DiagramGeneration.md#trace-relation-non-directional-behavior"
+    },
+    {
+      "name": "Requirements Files Search and Detection Test",
+      "type": "verification",
+      "link": "requirements/System/Core/Verifications/ValidationVerifications.md#requirements-files-search-and-detection-test"
+    },
+    {
+      "name": "Structured Markdown Files Search and Detection",
+      "type": "requirement",
+      "link": "requirements/System/Core/Configuration.md#structured-markdown-files-search-and-detection"
+    },
+    {
+      "name": "Requirements Processing",
+      "type": "requirement",
+      "link": "requirements/System/Core/Configuration.md#requirements-processing"
+    },
+    {
+      "name": "GraphRegistry as Primary Registry",
+      "type": "requirement",
+      "link": "requirements/System/Core/Validation.md#graphregistry-as-primary-registry"
+    },
+    {
+      "name": "Same-File Fragment Relations Test",
+      "type": "verification",
+      "link": "requirements/System/Core/Verifications/ValidationVerifications.md#same-file-fragment-relations-test"
+    },
+    {
+      "name": "Subdirectory Processing Verification",
+      "type": "verification",
+      "link": "requirements/System/Core/Verifications/ValidationVerifications.md#subdirectory-processing-verification"
+    },
+    {
+      "name": "CLI Move Element Command",
+      "type": "requirement",
+      "link": "requirements/Interfaces/CLI.md#cli-move-element-command"
+    },
+    {
+      "name": "CLI Move File Command",
+      "type": "requirement",
+      "link": "requirements/Interfaces/CLI.md#cli-move-file-command"
+    },
+    {
+      "name": "Unstructured Documents Test",
+      "type": "verification",
+      "link": "requirements/System/Core/Verifications/ValidationVerifications.md#unstructured-documents-test"
+    },
+    {
+      "name": "Excluded File Relation Validation",
+      "type": "requirement",
+      "link": "requirements/System/Core/Validation.md#excluded-file-relation-validation"
+    },
+    {
+      "name": "File Pattern Exclusion for Format",
+      "type": "requirement",
+      "link": "requirements/System/Operations/Formatting.md#file-pattern-exclusion-for-format"
+    },
+    {
+      "name": "CLI Add Element Test",
+      "type": "verification",
+      "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.md#cli-add-element-test"
+    },
+    {
+      "name": "CLI Add Element Command",
+      "type": "requirement",
+      "link": "requirements/Interfaces/CLI.md#cli-add-element-command"
+    },
+    {
+      "name": "CLI Move Element Test",
+      "type": "verification",
+      "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.md#cli-move-element-test"
+    },
+    {
+      "name": "CLI Move File Test",
+      "type": "verification",
+      "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.md#cli-move-file-test"
+    },
+    {
+      "name": "CLI Remove Element Test",
+      "type": "verification",
+      "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.md#cli-remove-element-test"
+    },
+    {
+      "name": "CLI Remove Element Command",
+      "type": "requirement",
+      "link": "requirements/Interfaces/CLI.md#cli-remove-element-command"
+    },
+    {
+      "name": "CLI Rename Element Test",
+      "type": "verification",
+      "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.md#cli-rename-element-test"
+    },
+    {
+      "name": "CLI Rename Element Command",
+      "type": "requirement",
+      "link": "requirements/Interfaces/CLI.md#cli-rename-element-command"
+    },
+    {
+      "name": "Create Element Test",
+      "type": "verification",
+      "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.md#create-element-test"
+    },
+    {
+      "name": "Create Element Operation",
+      "type": "requirement",
+      "link": "requirements/System/Operations/ElementManipulation.md#create-element-operation"
+    },
+    {
+      "name": "Delete Element Test",
+      "type": "verification",
+      "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.md#delete-element-test"
+    },
+    {
+      "name": "Delete Element Operation",
+      "type": "requirement",
+      "link": "requirements/System/Operations/ElementManipulation.md#delete-element-operation"
+    },
+    {
+      "name": "File Persistence Test",
+      "type": "verification",
+      "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.md#file-persistence-test"
+    },
+    {
+      "name": "Element Manipulation File Persistence",
+      "type": "requirement",
+      "link": "requirements/System/Operations/ElementManipulation.md#element-manipulation-file-persistence"
+    },
+    {
+      "name": "Move Element Test",
+      "type": "verification",
+      "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.md#move-element-test"
+    },
+    {
+      "name": "Move Element Operation",
+      "type": "requirement",
+      "link": "requirements/System/Operations/ElementManipulation.md#move-element-operation"
+    },
+    {
+      "name": "Move File Squash Test",
+      "type": "verification",
+      "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.md#move-file-squash-test"
+    },
+    {
+      "name": "Move File Operation",
+      "type": "requirement",
+      "link": "requirements/System/Operations/ElementManipulation.md#move-file-operation"
+    },
+    {
+      "name": "Relation Consistency Test",
+      "type": "verification",
+      "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.md#relation-consistency-test"
+    },
+    {
+      "name": "Relation Consistency Maintenance",
+      "type": "requirement",
+      "link": "requirements/System/Operations/ElementManipulation.md#relation-consistency-maintenance"
+    },
+    {
+      "name": "Target Location Validation Test",
+      "type": "verification",
+      "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.md#target-location-validation-test"
+    },
+    {
+      "name": "Target Location Validation and Auto-Creation",
+      "type": "requirement",
+      "link": "requirements/System/Operations/ElementManipulation.md#target-location-validation-and-auto-creation"
+    },
+    {
+      "name": "Git Repository as Project Root",
+      "type": "user-requirement",
+      "link": "requirements/System/Core/ModelManagement.md#git-repository-as-project-root"
+    },
+    {
+      "name": "Element Ordering Verification",
+      "type": "verification",
+      "link": "requirements/System/Operations/Verifications/FormattingVerifications.md#element-ordering-verification"
+    },
+    {
+      "name": "Element Ordering Normalization",
+      "type": "requirement",
+      "link": "requirements/System/Operations/Formatting.md#element-ordering-normalization"
+    },
+    {
+      "name": "Format Consistency Enforcement",
+      "type": "requirement",
+      "link": "requirements/System/Operations/Formatting.md#format-consistency-enforcement"
+    },
+    {
+      "name": "Model Formatting",
+      "type": "user-requirement",
+      "link": "requirements/System/Operations/Formatting.md#model-formatting"
+    },
+    {
+      "name": "Format Command Requirements Verification",
+      "type": "verification",
+      "link": "requirements/System/Operations/Verifications/FormattingVerifications.md#format-command-requirements-verification"
+    },
+    {
+      "name": "Document Structure Normalization",
+      "type": "requirement",
+      "link": "requirements/System/Operations/Formatting.md#document-structure-normalization"
+    },
+    {
+      "name": "Git-Style Diff Output for Format",
+      "type": "user-requirement",
+      "link": "requirements/System/Operations/Formatting.md#git-style-diff-output-for-format"
+    },
+    {
+      "name": "Formatting Output",
+      "type": "requirement",
+      "link": "requirements/System/Operations/Formatting.md#formatting-output"
+    },
+    {
+      "name": "Replace Absolute Links with Relative Links",
+      "type": "requirement",
+      "link": "requirements/System/Operations/Formatting.md#replace-absolute-links-with-relative-links"
+    },
+    {
+      "name": "Full Relations Insertion Verification",
+      "type": "verification",
+      "link": "requirements/System/Operations/Verifications/FormattingVerifications.md#full-relations-insertion-verification"
+    },
+    {
+      "name": "Full Relations Insertion",
+      "type": "requirement",
+      "link": "requirements/System/Operations/Formatting.md#full-relations-insertion"
+    },
+    {
+      "name": "Relation Ordering Verification",
+      "type": "verification",
+      "link": "requirements/System/Operations/Verifications/FormattingVerifications.md#relation-ordering-verification"
+    },
+    {
+      "name": "Relation Ordering Normalization",
+      "type": "requirement",
+      "link": "requirements/System/Operations/Formatting.md#relation-ordering-normalization"
+    },
+    {
+      "name": "Lint Command Verification",
+      "type": "verification",
+      "link": "requirements/System/Operations/Verifications/LintingVerifications.md#lint-command-verification"
+    },
+    {
+      "name": "Lint Auto-fix Capability",
+      "type": "requirement",
+      "link": "requirements/System/Operations/Linting.md#lint-auto-fix-capability"
+    },
+    {
+      "name": "CLI Lint Command",
+      "type": "requirement",
+      "link": "requirements/Interfaces/CLI.md#cli-lint-command"
+    },
+    {
+      "name": "Lint Output Formatting",
+      "type": "requirement",
+      "link": "requirements/System/Operations/Linting.md#lint-output-formatting"
+    },
+    {
+      "name": "Model Linting",
+      "type": "user-requirement",
+      "link": "requirements/System/Operations/Linting.md#model-linting"
+    },
+    {
+      "name": "Multi-Branch Convergence Detection",
+      "type": "requirement",
+      "link": "requirements/System/Operations/Linting.md#multi-branch-convergence-detection"
+    },
+    {
+      "name": "Redundant Verify Relations Detection",
+      "type": "requirement",
+      "link": "requirements/System/Operations/Linting.md#redundant-verify-relations-detection"
+    },
+    {
+      "name": "Safe Redundant Hierarchical Relations Auto-Removal",
+      "type": "requirement",
+      "link": "requirements/System/Operations/Linting.md#safe-redundant-hierarchical-relations-auto-removal"
+    },
+    {
+      "name": "Redundant Hierarchical Relations Detection",
+      "type": "requirement",
+      "link": "requirements/System/Operations/Linting.md#redundant-hierarchical-relations-detection"
+    },
+    {
+      "name": "Automated Documentation Export on PR Merge Verification",
+      "type": "verification",
+      "link": "requirements/System/Output/Verifications/DiagramVerifications.md#automated-documentation-export-on-pr-merge-verification"
+    },
+    {
+      "name": "Automated Documentation Export on PR Merge",
+      "type": "requirement",
+      "link": "requirements/System/Integration/GitHubIntegration.md#automated-documentation-export-on-pr-merge"
+    },
+    {
+      "name": "Automate Documentation Export",
+      "type": "user-requirement",
+      "link": "requirements/System/Integration/GitHubIntegration.md#automate-documentation-export"
+    },
+    {
+      "name": "Integrate with GitHub Workflows",
+      "type": "user-requirement",
+      "link": "requirements/UserStories.md#integrate-with-github-workflows"
+    },
+    {
+      "name": "Promote Automation and Efficiency",
+      "type": "user-requirement",
+      "link": "requirements/UserStories.md#promote-automation-and-efficiency"
+    },
+    {
+      "name": "Automate Pull Request Validations",
+      "type": "user-requirement",
+      "link": "requirements/System/Integration/GitHubIntegration.md#automate-pull-request-validations"
+    },
+    {
+      "name": "Diagram Generation Test",
+      "type": "verification",
+      "link": "requirements/System/Output/Verifications/DiagramVerifications.md#diagram-generation-test"
+    },
+    {
+      "name": "Diagram Generation",
+      "type": "requirement",
+      "link": "requirements/System/Output/DiagramGeneration.md#diagram-generation"
+    },
+    {
+      "name": "Interactive Mermaid Diagrams",
+      "type": "user-requirement",
+      "link": "requirements/System/Output/DiagramGeneration.md#interactive-mermaid-diagrams"
+    },
+    {
+      "name": "Generate Diagrams",
+      "type": "user-requirement",
+      "link": "requirements/UserStories.md#generate-diagrams"
+    },
+    {
+      "name": "Diagram Relation Filtering Verification",
+      "type": "verification",
+      "link": "requirements/System/Output/Verifications/DiagramVerifications.md#diagram-relation-filtering-verification"
+    },
+    {
+      "name": "File Diagram Attachment Test",
+      "type": "verification",
+      "link": "requirements/System/Output/Verifications/DiagramVerifications.md#file-diagram-attachment-test"
+    },
+    {
+      "name": "File Diagram Attachment Display",
+      "type": "requirement",
+      "link": "requirements/System/Output/DiagramGeneration.md#file-diagram-attachment-display"
+    },
+    {
+      "name": "Remove Generated Diagrams Verification",
+      "type": "verification",
+      "link": "requirements/System/Output/Verifications/DiagramVerifications.md#remove-generated-diagrams-verification"
+    },
+    {
+      "name": "Diagram Removal",
+      "type": "requirement",
+      "link": "requirements/System/Output/DiagramGeneration.md#diagram-removal"
+    },
+    {
+      "name": "Remove Generated Diagrams",
+      "type": "user-requirement",
+      "link": "requirements/System/Output/DiagramGeneration.md#remove-generated-diagrams"
+    },
+    {
+      "name": "Visualize Model Relationships Verification",
+      "type": "verification",
+      "link": "requirements/System/Output/Verifications/DiagramVerifications.md#visualize-model-relationships-verification"
+    },
+    {
+      "name": "Containment View Design Documents Test",
+      "type": "verification",
+      "link": "requirements/System/Output/Verifications/ReportingVerifications.md#containment-view-design-documents-test"
+    },
+    {
+      "name": "Containment View Report",
+      "type": "user-requirement",
+      "link": "requirements/System/Output/Reporting.md#containment-view-report"
+    },
+    {
+      "name": "Model Structure and Summaries",
+      "type": "user-requirement",
+      "link": "requirements/System/Output/Reporting.md#model-structure-and-summaries"
+    },
+    {
+      "name": "Model Command Verification",
+      "type": "verification",
+      "link": "requirements/System/Output/Verifications/ReportingVerifications.md#model-command-verification"
+    },
+    {
+      "name": "Forward-Only Relation Traversal",
+      "type": "requirement",
+      "link": "requirements/System/Output/Reporting.md#forward-only-relation-traversal"
+    },
+    {
+      "name": "Model Diagram Output Formats",
+      "type": "requirement",
+      "link": "requirements/System/Output/Reporting.md#model-diagram-output-formats"
+    },
+    {
+      "name": "Resources Report Verification",
+      "type": "verification",
+      "link": "requirements/System/Output/Verifications/ReportingVerifications.md#resources-report-verification"
+    },
+    {
+      "name": "CLI Resources Command",
+      "type": "requirement",
+      "link": "requirements/Interfaces/CLI.md#cli-resources-command"
+    },
+    {
+      "name": "Resources Report",
+      "type": "user-requirement",
+      "link": "requirements/System/Output/Reporting.md#resources-report"
+    },
+    {
+      "name": "Search Command Tests",
+      "type": "verification",
+      "link": "requirements/System/Output/Verifications/ReportingVerifications.md#search-command-tests"
+    },
+    {
+      "name": "Search Report Generator",
+      "type": "requirement",
+      "link": "requirements/System/Output/Reporting.md#search-report-generator"
+    },
+    {
+      "name": "TraceFlow View Test",
+      "type": "verification",
+      "link": "requirements/System/Output/Verifications/ReportingVerifications.md#traceflow-view-test"
+    },
+    {
+      "name": "TraceFlow View Report Generation",
+      "type": "requirement",
+      "link": "requirements/System/Output/Reporting.md#traceflow-view-report-generation"
+    },
+    {
+      "name": "Verification Upward Traceability",
+      "type": "user-requirement",
+      "link": "requirements/System/Output/Reporting.md#verification-upward-traceability"
+    },
+    {
+      "name": "Verification Coverage Report",
+      "type": "user-requirement",
+      "link": "requirements/System/Output/Reporting.md#verification-coverage-report"
+    },
+    {
+      "name": "Verification Coverage Report Test",
+      "type": "verification",
+      "link": "requirements/System/Output/Verifications/ReportingVerifications.md#verification-coverage-report-test"
+    },
+    {
+      "name": "Verification Traces Filter Options Test",
+      "type": "verification",
+      "link": "requirements/System/Output/Verifications/ReportingVerifications.md#verification-traces-filter-options-test"
+    },
+    {
+      "name": "Verification Traces From-Folder Test",
+      "type": "verification",
+      "link": "requirements/System/Output/Verifications/ReportingVerifications.md#verification-traces-from-folder-test"
+    },
+    {
+      "name": "Change Impact Analysis Verification",
+      "type": "verification",
+      "link": "requirements/System/Processing/Verifications/ChangeImpactVerifications.md#change-impact-analysis-verification"
+    },
+    {
+      "name": "Change Impact Detection Test",
+      "type": "verification",
+      "link": "requirements/System/Processing/Verifications/ChangeImpactVerifications.md#change-impact-detection-test"
+    },
+    {
+      "name": "Requirements Change Propagation",
+      "type": "requirement",
+      "link": "requirements/System/Processing/ChangeImpact.md#requirements-change-propagation"
+    },
+    {
+      "name": "Change Impact Relations Test",
+      "type": "verification",
+      "link": "requirements/System/Processing/Verifications/ChangeImpactVerifications.md#change-impact-relations-test"
+    },
+    {
+      "name": "Change Impact Smart Filtering Test",
+      "type": "verification",
+      "link": "requirements/System/Processing/Verifications/ChangeImpactVerifications.md#change-impact-smart-filtering-test"
+    },
+    {
+      "name": "Element Content Extraction Test",
+      "type": "verification",
+      "link": "requirements/System/Processing/Verifications/ChangeImpactVerifications.md#element-content-extraction-test"
+    },
+    {
+      "name": "Structural Change Reports Verification",
+      "type": "verification",
+      "link": "requirements/System/Processing/Verifications/ChangeImpactVerifications.md#structural-change-reports-verification"
+    },
+    {
+      "name": "Trace Relations No Cycles Verification",
+      "type": "verification",
+      "link": "requirements/System/Processing/Verifications/TraceVerifications.md#trace-relations-no-cycles-verification"
+    }
+  ],
+  "links": [
+    {
+      "source": "CLI Change Impact Report Command",
+      "target": "CLI Git Commit Hash Flag Test",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "CLI Change Impact Report Command",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "CLI interface",
+      "value": 1
+    },
+    {
+      "source": "CLI Change Impact Report Command",
+      "target": "CLI Help Structure Verification",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "CLI Change Impact Report Command",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "CLI interface",
+      "value": 1
+    },
+    {
+      "source": "CLI Coverage Command",
+      "target": "CLI Help Structure Verification",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "CLI Coverage Command",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "CLI interface",
+      "value": 1
+    },
+    {
+      "source": "CLI Search Command",
+      "target": "CLI Help Structure Verification",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "CLI Search Command",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "CLI interface",
+      "value": 1
+    },
+    {
+      "source": "CLI Traces Command",
+      "target": "CLI Help Structure Verification",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "CLI Traces Command",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "CLI interface",
+      "value": 1
+    },
+    {
+      "source": "Format Command",
+      "target": "CLI Help Structure Verification",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "Format Command",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "CLI interface",
+      "value": 1
+    },
+    {
+      "source": "Validate Command",
+      "target": "CLI Help Structure Verification",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "Validate Command",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "CLI interface",
+      "value": 1
+    },
+    {
+      "source": "HTML Export",
+      "target": "CLI Help Structure Verification",
+      "value": 1
+    },
+    {
+      "source": "Web Interface",
+      "target": "HTML Export",
+      "value": 1
+    },
+    {
+      "source": "Verification Traces Element Navigation",
+      "target": "Verification Traces Element Navigation Test",
+      "value": 1
+    },
+    {
+      "source": "CLI Traces Command",
+      "target": "Verification Traces Element Navigation",
+      "value": 1
+    },
+    {
+      "source": "CLI interface",
+      "target": "CLI Interface Structure",
+      "value": 1
+    },
+    {
+      "source": "Attachment Export",
+      "target": "Attachment Export Verification",
+      "value": 1
+    },
+    {
+      "source": "HTML Export",
+      "target": "Attachment Export",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "Web Interface",
+      "value": 1
+    },
+    {
+      "source": "Containment View Attachment Links",
+      "target": "Containment Attachment Links Verification",
+      "value": 1
+    },
+    {
+      "source": "HTML Export",
+      "target": "Containment View Attachment Links",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "Web Interface",
+      "value": 1
+    },
+    {
+      "source": "Diagram Attachment Display",
+      "target": "Diagram Attachment Display Verification",
+      "value": 1
+    },
+    {
+      "source": "HTML Export",
+      "target": "Diagram Attachment Display",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "Web Interface",
+      "value": 1
+    },
+    {
+      "source": "HTML Export",
+      "target": "HTML Export Verification",
+      "value": 1
+    },
+    {
+      "source": "Web Interface",
+      "target": "HTML Export",
+      "value": 1
+    },
+    {
+      "source": "Model View Element Navigation",
+      "target": "Model View Element Navigation Test",
+      "value": 1
+    },
+    {
+      "source": "Model-Centric View Generation",
+      "target": "Model View Element Navigation",
+      "value": 1
+    },
+    {
+      "source": "Web Interface",
+      "target": "HTML Export",
+      "value": 1
+    },
+    {
+      "source": "Serve Command",
+      "target": "Serve Command Verification",
+      "value": 1
+    },
+    {
+      "source": "Web Interface",
+      "target": "Serve Command",
+      "value": 1
+    },
+    {
+      "source": "Attachment Commands",
+      "target": "Attach Command Verification",
+      "value": 1
+    },
+    {
+      "source": "Reserved Subsections Support",
+      "target": "Attachment Commands",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "Structure and Addressing in Markdown Documents",
+      "value": 1
+    },
+    {
+      "source": "Attachment Identifier Updates",
+      "target": "Attachment Identifier CRUD Verification",
+      "value": 1
+    },
+    {
+      "source": "Element Manipulation Operations",
+      "target": "Attachment Identifier Updates",
+      "value": 1
+    },
+    {
+      "source": "Reserved Subsections Support",
+      "target": "Attachment Output Rendering Verification",
+      "value": 1
+    },
+    {
+      "source": "Structure and Addressing in Markdown Documents",
+      "target": "Reserved Subsections Support",
+      "value": 1
+    },
+    {
+      "source": "CLI Search Command",
+      "target": "Attachment Search Filters Verification",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "CLI Search Command",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "CLI interface",
+      "value": 1
+    },
+    {
+      "source": "Change Impact Detection",
+      "target": "Attachments Change Impact Verification",
+      "value": 1
+    },
+    {
+      "source": "Element Identity Model",
+      "target": "Change Impact Detection",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "Structure and Addressing in Markdown Documents",
+      "value": 1
+    },
+    {
+      "source": "Tracing Structural Changes",
+      "target": "Change Impact Detection",
+      "value": 1
+    },
+    {
+      "source": "Attachment Target Validation",
+      "target": "Attachments Subsection Parsing Verification",
+      "value": 1
+    },
+    {
+      "source": "Reserved Subsections Support",
+      "target": "Attachment Target Validation",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "Structure and Addressing in Markdown Documents",
+      "value": 1
+    },
+    {
+      "source": "Reserved Subsections Support",
+      "target": "Attachments Subsection Parsing Verification",
+      "value": 1
+    },
+    {
+      "source": "Structure and Addressing in Markdown Documents",
+      "target": "Reserved Subsections Support",
+      "value": 1
+    },
+    {
+      "source": "Attachment Target Validation",
+      "target": "Attachments Validation Verification",
+      "value": 1
+    },
+    {
+      "source": "Reserved Subsections Support",
+      "target": "Attachment Target Validation",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "Structure and Addressing in Markdown Documents",
+      "value": 1
+    },
+    {
+      "source": "Reserved Subsections Support",
+      "target": "Attachments Validation Verification",
+      "value": 1
+    },
+    {
+      "source": "Structure and Addressing in Markdown Documents",
+      "target": "Reserved Subsections Support",
+      "value": 1
+    },
+    {
+      "source": "Attachment Commands",
+      "target": "Detach Command Verification",
+      "value": 1
+    },
+    {
+      "source": "Reserved Subsections Support",
+      "target": "Attachment Commands",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "Structure and Addressing in Markdown Documents",
+      "value": 1
+    },
+    {
+      "source": "CLI Move Asset Command",
+      "target": "Move Asset Command Verification",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "CLI Move Asset Command",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "CLI interface",
+      "value": 1
+    },
+    {
+      "source": "CLI Remove Asset Command",
+      "target": "Remove Asset Command Verification",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "CLI Remove Asset Command",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "CLI interface",
+      "value": 1
+    },
+    {
+      "source": "Default Requirement Type Assignment",
+      "target": "Element Subsection Parsing Test",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "Default Requirement Type Assignment",
+      "value": 1
+    },
+    {
+      "source": "Relation Types and behaviors",
+      "target": "Element Subsection Parsing Test",
+      "value": 1
+    },
+    {
+      "source": "Identifiers and Relations",
+      "target": "Relation Types and behaviors",
+      "value": 1
+    },
+    {
+      "source": "Structure and Addressing in Markdown Documents",
+      "target": "Element Identity Model",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "AI-Assisted System Model Management",
+      "value": 1
+    },
+    {
+      "source": "Supported Element Types",
+      "target": "Element Subsection Parsing Test",
+      "value": 1
+    },
+    {
+      "source": "Reserved Subsections Support",
+      "target": "Supported Element Types",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "Structure and Addressing in Markdown Documents",
+      "value": 1
+    },
+    {
+      "source": "Reserved Subsections Support",
+      "target": "Element Subsection Parsing Test",
+      "value": 1
+    },
+    {
+      "source": "Structure and Addressing in Markdown Documents",
+      "target": "Reserved Subsections Support",
+      "value": 1
+    },
+    {
+      "source": "Element Identity Model",
+      "target": "Fragment Normalization Test",
+      "value": 1
+    },
+    {
+      "source": "Structure and Addressing in Markdown Documents",
+      "target": "Element Identity Model",
+      "value": 1
+    },
+    {
+      "source": "Reserved Subsections Support",
+      "target": "Non-Reserved Subsections Content Test",
+      "value": 1
+    },
+    {
+      "source": "Structure and Addressing in Markdown Documents",
+      "target": "Reserved Subsections Support",
+      "value": 1
+    },
+    {
+      "source": "Supported Element Types",
+      "target": "Refinement Element Type Parsing Test",
+      "value": 1
+    },
+    {
+      "source": "Reserved Subsections Support",
+      "target": "Supported Element Types",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "Structure and Addressing in Markdown Documents",
+      "value": 1
+    },
+    {
+      "source": "Refinement Element Structure Constraints",
+      "target": "Refinement Relations Rejection Test",
+      "value": 1
+    },
+    {
+      "source": "Supported Element Types",
+      "target": "Refinement Element Structure Constraints",
+      "value": 1
+    },
+    {
+      "source": "Structure and Addressing in Markdown Documents",
+      "target": "Reserved Subsections Support",
+      "value": 1
+    },
+    {
+      "source": "Specification File Identification",
+      "target": "Specification File Identification Test",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "Specification File Identification",
+      "value": 1
+    },
+    {
+      "source": "Default Requirement Type Assignment",
+      "target": "Default Element Type Assignment Test",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "Default Requirement Type Assignment",
+      "value": 1
+    },
+    {
+      "source": "Element Type Relation Compatibility",
+      "target": "Element Type Relation Compatibility Test",
+      "value": 1
+    },
+    {
+      "source": "Relation Types and behaviors",
+      "target": "Element Type Relation Compatibility",
+      "value": 1
+    },
+    {
+      "source": "Element Identity Model",
+      "target": "Identifiers and Relations",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "Structure and Addressing in Markdown Documents",
+      "value": 1
+    },
+    {
+      "source": "AI-Assisted System Model Management",
+      "target": "Identifiers and Relations",
+      "value": 1
+    },
+    {
+      "source": "Supported Element Types",
+      "target": "Element Type Relation Compatibility",
+      "value": 1
+    },
+    {
+      "source": "Structure and Addressing in Markdown Documents",
+      "target": "Reserved Subsections Support",
+      "value": 1
+    },
+    {
+      "source": "Relation Element Type Validator",
+      "target": "Element Type Relation Compatibility Test",
+      "value": 1
+    },
+    {
+      "source": "Validate Relation Types",
+      "target": "Relation Element Type Validator",
+      "value": 1
+    },
+    {
+      "source": "Identifiers and Relations",
+      "target": "Relation Types and behaviors",
+      "value": 1
+    },
+    {
+      "source": "Structure and Addressing in Markdown Documents",
+      "target": "Element Identity Model",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "AI-Assisted System Model Management",
+      "value": 1
+    },
+    {
+      "source": "Ignore Files Integration",
+      "target": "File Exclusion Test",
+      "value": 1
+    },
+    {
+      "source": "Ignoring Unstructured Documents",
+      "target": "Ignore Files Integration",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "Coexistence of Structured and Unstructured Documents",
+      "value": 1
+    },
+    {
+      "source": "Reserved Repository Files Exclusion",
+      "target": "File Exclusion Test",
+      "value": 1
+    },
+    {
+      "source": "Ignoring Unstructured Documents",
+      "target": "Reserved Repository Files Exclusion",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "Coexistence of Structured and Unstructured Documents",
+      "value": 1
+    },
+    {
+      "source": "Structure and Addressing in Markdown Documents",
+      "target": "Invalid Header Structure Test",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "Structure and Addressing in Markdown Documents",
+      "value": 1
+    },
+    {
+      "source": "Markdown Structure Validator",
+      "target": "Invalid Header Structure Test",
+      "value": 1
+    },
+    {
+      "source": "Validate Markdown Structure",
+      "target": "Markdown Structure Validator",
+      "value": 1
+    },
+    {
+      "source": "Validate Command",
+      "target": "Invalid Relations Test",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "Validate Command",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "CLI interface",
+      "value": 1
+    },
+    {
+      "source": "Cross-Component Dependency Validator",
+      "target": "Invalid Relations Test",
+      "value": 1
+    },
+    {
+      "source": "Validate Cross-Component Dependencies",
+      "target": "Cross-Component Dependency Validator",
+      "value": 1
+    },
+    {
+      "source": "Internal Consistency Validator",
+      "target": "Invalid Relations Test",
+      "value": 1
+    },
+    {
+      "source": "Element Identity Model",
+      "target": "Internal Consistency Validator",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "Structure and Addressing in Markdown Documents",
+      "value": 1
+    },
+    {
+      "source": "Validate Internal Consistency",
+      "target": "Internal Consistency Validator",
+      "value": 1
+    },
+    {
+      "source": "Markdown Structure Validator",
+      "target": "Invalid Relations Test",
+      "value": 1
+    },
+    {
+      "source": "Validate Markdown Structure",
+      "target": "Markdown Structure Validator",
+      "value": 1
+    },
+    {
+      "source": "Relation Element Type Validator",
+      "target": "Invalid Relations Test",
+      "value": 1
+    },
+    {
+      "source": "Element Type Relation Compatibility",
+      "target": "Relation Element Type Validator",
+      "value": 1
+    },
+    {
+      "source": "Identifiers and Relations",
+      "target": "Relation Types and behaviors",
+      "value": 1
+    },
+    {
+      "source": "Structure and Addressing in Markdown Documents",
+      "target": "Element Identity Model",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "AI-Assisted System Model Management",
+      "value": 1
+    },
+    {
+      "source": "Reserved Subsections Support",
+      "target": "Supported Element Types",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "Structure and Addressing in Markdown Documents",
+      "value": 1
+    },
+    {
+      "source": "Validate Relation Types",
+      "target": "Relation Element Type Validator",
+      "value": 1
+    },
+    {
+      "source": "Identifiers and Relations",
+      "target": "Relation Types and behaviors",
+      "value": 1
+    },
+    {
+      "source": "Structure and Addressing in Markdown Documents",
+      "target": "Element Identity Model",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "AI-Assisted System Model Management",
+      "value": 1
+    },
+    {
+      "source": "Relation Type Validation",
+      "target": "Invalid Relations Test",
+      "value": 1
+    },
+    {
+      "source": "Enhanced Validation Error Reporting",
+      "target": "Relation Type Validation",
+      "value": 1
+    },
+    {
+      "source": "Validation Error Handling",
+      "target": "Invalid Relations Test",
+      "value": 1
+    },
+    {
+      "source": "Detailed Error Handling and Logging",
+      "target": "Validation Error Handling",
+      "value": 1
+    },
+    {
+      "source": "Validating Structures",
+      "target": "Enhanced Validation Error Reporting",
+      "value": 1
+    },
+    {
+      "source": "Validation Report Generator",
+      "target": "Validation Error Handling",
+      "value": 1
+    },
+    {
+      "source": "Model Reports",
+      "target": "Provide Validation Reports",
+      "value": 1
+    },
+    {
+      "source": "Align with Industry Standards",
+      "target": "Provide Validation Reports",
+      "value": 1
+    },
+    {
+      "source": "Trace Relation Non-Directional Behavior",
+      "target": "Invalid Relations Test",
+      "value": 1
+    },
+    {
+      "source": "Relation Types and behaviors",
+      "target": "Trace Relation Non-Directional Behavior",
+      "value": 1
+    },
+    {
+      "source": "Element Identity Model",
+      "target": "Identifiers and Relations",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "Structure and Addressing in Markdown Documents",
+      "value": 1
+    },
+    {
+      "source": "AI-Assisted System Model Management",
+      "target": "Identifiers and Relations",
+      "value": 1
+    },
+    {
+      "source": "Structured Markdown Files Search and Detection",
+      "target": "Requirements Files Search and Detection Test",
+      "value": 1
+    },
+    {
+      "source": "Requirements Processing",
+      "target": "Structured Markdown Files Search and Detection",
+      "value": 1
+    },
+    {
+      "source": "Coexistence of Structured and Unstructured Documents",
+      "target": "Ignoring Unstructured Documents",
+      "value": 1
+    },
+    {
+      "source": "GraphRegistry as Primary Registry",
+      "target": "Requirements Files Search and Detection Test",
+      "value": 1
+    },
+    {
+      "source": "Requirements Processing",
+      "target": "GraphRegistry as Primary Registry",
+      "value": 1
+    },
+    {
+      "source": "Coexistence of Structured and Unstructured Documents",
+      "target": "Ignoring Unstructured Documents",
+      "value": 1
+    },
+    {
+      "source": "Requirements Processing",
+      "target": "Same-File Fragment Relations Test",
+      "value": 1
+    },
+    {
+      "source": "Ignoring Unstructured Documents",
+      "target": "Requirements Processing",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "Coexistence of Structured and Unstructured Documents",
+      "value": 1
+    },
+    {
+      "source": "Relation Type Validation",
+      "target": "Same-File Fragment Relations Test",
+      "value": 1
+    },
+    {
+      "source": "Enhanced Validation Error Reporting",
+      "target": "Relation Type Validation",
+      "value": 1
+    },
+    {
+      "source": "CLI Move Element Command",
+      "target": "Subdirectory Processing Verification",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "CLI Move Element Command",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "CLI interface",
+      "value": 1
+    },
+    {
+      "source": "CLI Move File Command",
+      "target": "Subdirectory Processing Verification",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "CLI Move File Command",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "CLI interface",
+      "value": 1
+    },
+    {
+      "source": "Excluded File Relation Validation",
+      "target": "Unstructured Documents Test",
+      "value": 1
+    },
+    {
+      "source": "File Pattern Exclusion for Format",
+      "target": "Excluded File Relation Validation",
+      "value": 1
+    },
+    {
+      "source": "Coexistence of Structured and Unstructured Documents",
+      "target": "Ignoring Unstructured Documents",
+      "value": 1
+    },
+    {
+      "source": "CLI Add Element Command",
+      "target": "CLI Add Element Test",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "CLI Add Element Command",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "CLI interface",
+      "value": 1
+    },
+    {
+      "source": "CLI Move Element Command",
+      "target": "CLI Move Element Test",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "CLI Move Element Command",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "CLI interface",
+      "value": 1
+    },
+    {
+      "source": "CLI Move File Command",
+      "target": "CLI Move File Test",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "CLI Move File Command",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "CLI interface",
+      "value": 1
+    },
+    {
+      "source": "CLI Remove Element Command",
+      "target": "CLI Remove Element Test",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "CLI Remove Element Command",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "CLI interface",
+      "value": 1
+    },
+    {
+      "source": "CLI Rename Element Command",
+      "target": "CLI Rename Element Test",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "CLI Rename Element Command",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "CLI interface",
+      "value": 1
+    },
+    {
+      "source": "Create Element Operation",
+      "target": "Create Element Test",
+      "value": 1
+    },
+    {
+      "source": "Element Manipulation Operations",
+      "target": "Create Element Operation",
+      "value": 1
+    },
+    {
+      "source": "Reserved Subsections Support",
+      "target": "Create Element Operation",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "Structure and Addressing in Markdown Documents",
+      "value": 1
+    },
+    {
+      "source": "Delete Element Operation",
+      "target": "Delete Element Test",
+      "value": 1
+    },
+    {
+      "source": "Element Manipulation Operations",
+      "target": "Delete Element Operation",
+      "value": 1
+    },
+    {
+      "source": "Element Manipulation File Persistence",
+      "target": "File Persistence Test",
+      "value": 1
+    },
+    {
+      "source": "Element Manipulation Operations",
+      "target": "Element Manipulation File Persistence",
+      "value": 1
+    },
+    {
+      "source": "Move Element Operation",
+      "target": "Move Element Test",
+      "value": 1
+    },
+    {
+      "source": "Element Manipulation Operations",
+      "target": "Move Element Operation",
+      "value": 1
+    },
+    {
+      "source": "Move File Operation",
+      "target": "Move File Squash Test",
+      "value": 1
+    },
+    {
+      "source": "Element Manipulation Operations",
+      "target": "Move File Operation",
+      "value": 1
+    },
+    {
+      "source": "Relation Consistency Maintenance",
+      "target": "Relation Consistency Test",
+      "value": 1
+    },
+    {
+      "source": "Element Manipulation Operations",
+      "target": "Relation Consistency Maintenance",
+      "value": 1
+    },
+    {
+      "source": "Target Location Validation and Auto-Creation",
+      "target": "Target Location Validation Test",
+      "value": 1
+    },
+    {
+      "source": "Ignore Files Integration",
+      "target": "Target Location Validation and Auto-Creation",
+      "value": 1
+    },
+    {
+      "source": "Coexistence of Structured and Unstructured Documents",
+      "target": "Ignoring Unstructured Documents",
+      "value": 1
+    },
+    {
+      "source": "Element Manipulation Operations",
+      "target": "Target Location Validation and Auto-Creation",
+      "value": 1
+    },
+    {
+      "source": "Git Repository as Project Root",
+      "target": "Target Location Validation and Auto-Creation",
+      "value": 1
+    },
+    {
+      "source": "Format Command",
+      "target": "Element Ordering Verification",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "Format Command",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "CLI interface",
+      "value": 1
+    },
+    {
+      "source": "Element Manipulation File Persistence",
+      "target": "Element Ordering Verification",
+      "value": 1
+    },
+    {
+      "source": "Element Manipulation Operations",
+      "target": "Element Manipulation File Persistence",
+      "value": 1
+    },
+    {
+      "source": "Element Ordering Normalization",
+      "target": "Element Ordering Verification",
+      "value": 1
+    },
+    {
+      "source": "Format Consistency Enforcement",
+      "target": "Element Ordering Normalization",
+      "value": 1
+    },
+    {
+      "source": "Validating Structures",
+      "target": "Model Formatting",
+      "value": 1
+    },
+    {
+      "source": "Format Command",
+      "target": "Format Command Requirements Verification",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "Format Command",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "CLI interface",
+      "value": 1
+    },
+    {
+      "source": "Structure and Addressing in Markdown Documents",
+      "target": "Format Command Requirements Verification",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "Structure and Addressing in Markdown Documents",
+      "value": 1
+    },
+    {
+      "source": "Document Structure Normalization",
+      "target": "Format Command Requirements Verification",
+      "value": 1
+    },
+    {
+      "source": "Format Consistency Enforcement",
+      "target": "Document Structure Normalization",
+      "value": 1
+    },
+    {
+      "source": "Validating Structures",
+      "target": "Model Formatting",
+      "value": 1
+    },
+    {
+      "source": "Format Consistency Enforcement",
+      "target": "Format Command Requirements Verification",
+      "value": 1
+    },
+    {
+      "source": "Model Formatting",
+      "target": "Format Consistency Enforcement",
+      "value": 1
+    },
+    {
+      "source": "Align with Industry Standards",
+      "target": "Format Consistency Enforcement",
+      "value": 1
+    },
+    {
+      "source": "Git-Style Diff Output for Format",
+      "target": "Format Command Requirements Verification",
+      "value": 1
+    },
+    {
+      "source": "Formatting Output",
+      "target": "Git-Style Diff Output for Format",
+      "value": 1
+    },
+    {
+      "source": "Validating Structures",
+      "target": "Model Formatting",
+      "value": 1
+    },
+    {
+      "source": "Replace Absolute Links with Relative Links",
+      "target": "Format Command Requirements Verification",
+      "value": 1
+    },
+    {
+      "source": "Model Formatting",
+      "target": "Replace Absolute Links with Relative Links",
+      "value": 1
+    },
+    {
+      "source": "Format Command",
+      "target": "Full Relations Insertion Verification",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "Format Command",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "CLI interface",
+      "value": 1
+    },
+    {
+      "source": "Full Relations Insertion",
+      "target": "Full Relations Insertion Verification",
+      "value": 1
+    },
+    {
+      "source": "Model Formatting",
+      "target": "Full Relations Insertion",
+      "value": 1
+    },
+    {
+      "source": "Relation Ordering Normalization",
+      "target": "Relation Ordering Verification",
+      "value": 1
+    },
+    {
+      "source": "Format Consistency Enforcement",
+      "target": "Relation Ordering Normalization",
+      "value": 1
+    },
+    {
+      "source": "Validating Structures",
+      "target": "Model Formatting",
+      "value": 1
+    },
+    {
+      "source": "Lint Auto-fix Capability",
+      "target": "Lint Command Verification",
+      "value": 1
+    },
+    {
+      "source": "CLI Lint Command",
+      "target": "Lint Auto-fix Capability",
+      "value": 1
+    },
+    {
+      "source": "CLI interface",
+      "target": "CLI Interface Structure",
+      "value": 1
+    },
+    {
+      "source": "Lint Output Formatting",
+      "target": "Lint Command Verification",
+      "value": 1
+    },
+    {
+      "source": "Model Linting",
+      "target": "Lint Output Formatting",
+      "value": 1
+    },
+    {
+      "source": "Multi-Branch Convergence Detection",
+      "target": "Lint Command Verification",
+      "value": 1
+    },
+    {
+      "source": "Model Linting",
+      "target": "Multi-Branch Convergence Detection",
+      "value": 1
+    },
+    {
+      "source": "Redundant Verify Relations Detection",
+      "target": "Lint Command Verification",
+      "value": 1
+    },
+    {
+      "source": "Model Linting",
+      "target": "Redundant Verify Relations Detection",
+      "value": 1
+    },
+    {
+      "source": "Safe Redundant Hierarchical Relations Auto-Removal",
+      "target": "Lint Command Verification",
+      "value": 1
+    },
+    {
+      "source": "Redundant Hierarchical Relations Detection",
+      "target": "Safe Redundant Hierarchical Relations Auto-Removal",
+      "value": 1
+    },
+    {
+      "source": "Validating Structures",
+      "target": "Model Linting",
+      "value": 1
+    },
+    {
+      "source": "Automated Documentation Export on PR Merge",
+      "target": "Automated Documentation Export on PR Merge Verification",
+      "value": 1
+    },
+    {
+      "source": "Automate Documentation Export",
+      "target": "Automated Documentation Export on PR Merge",
+      "value": 1
+    },
+    {
+      "source": "Promote Automation and Efficiency",
+      "target": "Integrate with GitHub Workflows",
+      "value": 1
+    },
+    {
+      "source": "Automate Pull Request Validations",
+      "target": "Automated Documentation Export on PR Merge",
+      "value": 1
+    },
+    {
+      "source": "Promote Automation and Efficiency",
+      "target": "Integrate with GitHub Workflows",
+      "value": 1
+    },
+    {
+      "source": "Diagram Generation",
+      "target": "Diagram Generation Test",
+      "value": 1
+    },
+    {
+      "source": "Interactive Mermaid Diagrams",
+      "target": "Diagram Generation",
+      "value": 1
+    },
+    {
+      "source": "Provide Reports",
+      "target": "Model Reports",
+      "value": 1
+    },
+    {
+      "source": "Diagram Generation",
+      "target": "Diagram Relation Filtering Verification",
+      "value": 1
+    },
+    {
+      "source": "Interactive Mermaid Diagrams",
+      "target": "Diagram Generation",
+      "value": 1
+    },
+    {
+      "source": "Provide Reports",
+      "target": "Model Reports",
+      "value": 1
+    },
+    {
+      "source": "File Diagram Attachment Display",
+      "target": "File Diagram Attachment Test",
+      "value": 1
+    },
+    {
+      "source": "Diagram Generation",
+      "target": "File Diagram Attachment Display",
+      "value": 1
+    },
+    {
+      "source": "Model Reports",
+      "target": "Interactive Mermaid Diagrams",
+      "value": 1
+    },
+    {
+      "source": "Generate Diagrams",
+      "target": "Interactive Mermaid Diagrams",
+      "value": 1
+    },
+    {
+      "source": "Diagram Removal",
+      "target": "Remove Generated Diagrams Verification",
+      "value": 1
+    },
+    {
+      "source": "Remove Generated Diagrams",
+      "target": "Diagram Removal",
+      "value": 1
+    },
+    {
+      "source": "Diagram Generation",
+      "target": "Visualize Model Relationships Verification",
+      "value": 1
+    },
+    {
+      "source": "Interactive Mermaid Diagrams",
+      "target": "Diagram Generation",
+      "value": 1
+    },
+    {
+      "source": "Provide Reports",
+      "target": "Model Reports",
+      "value": 1
+    },
+    {
+      "source": "Containment View Report",
+      "target": "Containment View Design Documents Test",
+      "value": 1
+    },
+    {
+      "source": "Model Structure and Summaries",
+      "target": "Containment View Report",
+      "value": 1
+    },
+    {
+      "source": "Provide Reports",
+      "target": "Model Reports",
+      "value": 1
+    },
+    {
+      "source": "Forward-Only Relation Traversal",
+      "target": "Model Command Verification",
+      "value": 1
+    },
+    {
+      "source": "Model Diagram Output Formats",
+      "target": "Forward-Only Relation Traversal",
+      "value": 1
+    },
+    {
+      "source": "Model Reports",
+      "target": "Model Structure and Summaries",
+      "value": 1
+    },
+    {
+      "source": "Model Diagram Output Formats",
+      "target": "Model Command Verification",
+      "value": 1
+    },
+    {
+      "source": "Model Structure and Summaries",
+      "target": "Model Diagram Output Formats",
+      "value": 1
+    },
+    {
+      "source": "Provide Reports",
+      "target": "Model Reports",
+      "value": 1
+    },
+    {
+      "source": "CLI Resources Command",
+      "target": "Resources Report Verification",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "CLI Resources Command",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "CLI interface",
+      "value": 1
+    },
+    {
+      "source": "Resources Report",
+      "target": "CLI Resources Command",
+      "value": 1
+    },
+    {
+      "source": "Provide Reports",
+      "target": "Model Reports",
+      "value": 1
+    },
+    {
+      "source": "Resources Report",
+      "target": "Resources Report Verification",
+      "value": 1
+    },
+    {
+      "source": "Model Reports",
+      "target": "Resources Report",
+      "value": 1
+    },
+    {
+      "source": "CLI Search Command",
+      "target": "Search Command Tests",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "CLI Search Command",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "CLI interface",
+      "value": 1
+    },
+    {
+      "source": "Search Report Generator",
+      "target": "Search Command Tests",
+      "value": 1
+    },
+    {
+      "source": "Model Structure and Summaries",
+      "target": "Search Report Generator",
+      "value": 1
+    },
+    {
+      "source": "Provide Reports",
+      "target": "Model Reports",
+      "value": 1
+    },
+    {
+      "source": "TraceFlow View Report Generation",
+      "target": "TraceFlow View Test",
+      "value": 1
+    },
+    {
+      "source": "Verification Upward Traceability",
+      "target": "TraceFlow View Report Generation",
+      "value": 1
+    },
+    {
+      "source": "Model Reports",
+      "target": "Verification Coverage Report",
+      "value": 1
+    },
+    {
+      "source": "CLI Coverage Command",
+      "target": "Verification Coverage Report Test",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "CLI Coverage Command",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "CLI interface",
+      "value": 1
+    },
+    {
+      "source": "CLI Traces Command",
+      "target": "Verification Traces Filter Options Test",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "CLI Traces Command",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "CLI interface",
+      "value": 1
+    },
+    {
+      "source": "CLI Traces Command",
+      "target": "Verification Traces From-Folder Test",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "CLI Traces Command",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "CLI interface",
+      "value": 1
+    },
+    {
+      "source": "CLI Change Impact Report Command",
+      "target": "Change Impact Analysis Verification",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "CLI Change Impact Report Command",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "CLI interface",
+      "value": 1
+    },
+    {
+      "source": "CLI Change Impact Report Command",
+      "target": "Change Impact Detection Test",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "CLI Change Impact Report Command",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "CLI interface",
+      "value": 1
+    },
+    {
+      "source": "Requirements Change Propagation",
+      "target": "Change Impact Detection Test",
+      "value": 1
+    },
+    {
+      "source": "Change Impact Detection",
+      "target": "Requirements Change Propagation",
+      "value": 1
+    },
+    {
+      "source": "Structure and Addressing in Markdown Documents",
+      "target": "Element Identity Model",
+      "value": 1
+    },
+    {
+      "source": "Trace Changes in System Model",
+      "target": "Tracing Structural Changes",
+      "value": 1
+    },
+    {
+      "source": "CLI Change Impact Report Command",
+      "target": "Change Impact Relations Test",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "CLI Change Impact Report Command",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "CLI interface",
+      "value": 1
+    },
+    {
+      "source": "Requirements Change Propagation",
+      "target": "Change Impact Relations Test",
+      "value": 1
+    },
+    {
+      "source": "Change Impact Detection",
+      "target": "Requirements Change Propagation",
+      "value": 1
+    },
+    {
+      "source": "Structure and Addressing in Markdown Documents",
+      "target": "Element Identity Model",
+      "value": 1
+    },
+    {
+      "source": "Trace Changes in System Model",
+      "target": "Tracing Structural Changes",
+      "value": 1
+    },
+    {
+      "source": "Requirements Change Propagation",
+      "target": "Change Impact Smart Filtering Test",
+      "value": 1
+    },
+    {
+      "source": "Change Impact Detection",
+      "target": "Requirements Change Propagation",
+      "value": 1
+    },
+    {
+      "source": "Structure and Addressing in Markdown Documents",
+      "target": "Element Identity Model",
+      "value": 1
+    },
+    {
+      "source": "Trace Changes in System Model",
+      "target": "Tracing Structural Changes",
+      "value": 1
+    },
+    {
+      "source": "Requirements Processing",
+      "target": "Element Content Extraction Test",
+      "value": 1
+    },
+    {
+      "source": "Ignoring Unstructured Documents",
+      "target": "Requirements Processing",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "Coexistence of Structured and Unstructured Documents",
+      "value": 1
+    },
+    {
+      "source": "Requirements Change Propagation",
+      "target": "Element Content Extraction Test",
+      "value": 1
+    },
+    {
+      "source": "Change Impact Detection",
+      "target": "Requirements Change Propagation",
+      "value": 1
+    },
+    {
+      "source": "Structure and Addressing in Markdown Documents",
+      "target": "Element Identity Model",
+      "value": 1
+    },
+    {
+      "source": "Trace Changes in System Model",
+      "target": "Tracing Structural Changes",
+      "value": 1
+    },
+    {
+      "source": "Tracing Structural Changes",
+      "target": "Structural Change Reports Verification",
+      "value": 1
+    },
+    {
+      "source": "Trace Changes in System Model",
+      "target": "Tracing Structural Changes",
+      "value": 1
+    },
+    {
+      "source": "Trace Relation Non-Directional Behavior",
+      "target": "Trace Relations No Cycles Verification",
+      "value": 1
+    },
+    {
+      "source": "Relation Types and behaviors",
+      "target": "Trace Relation Non-Directional Behavior",
+      "value": 1
+    },
+    {
+      "source": "Element Identity Model",
+      "target": "Identifiers and Relations",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "Structure and Addressing in Markdown Documents",
+      "value": 1
+    },
+    {
+      "source": "AI-Assisted System Model Management",
+      "target": "Identifiers and Relations",
+      "value": 1
+    }
+  ]
+};
+    const container = document.getElementById("d3sankey_562b60f976c0");
+    const svg = d3.select(container).select("svg");
+
+    // Configuration
+    const margin = {top: 20, right: 20, bottom: 20, left: 20};
+    const width = container.clientWidth - margin.left - margin.right;
+    const height = Math.max(400, data.nodes.length * 25);
+
+    svg.attr("width", width + margin.left + margin.right)
+       .attr("height", height + margin.top + margin.bottom);
+
+    const g = svg.append("g")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
+
+    // Colors matching Reqvire theme
+    const colors = {
+        "user-requirement": "#7E57C2",
+        "system-requirement": "#673AB7",
+        "requirement": "#673AB7",
+        "verification": "#4CAF50",
+        "test-verification": "#4CAF50",
+        "refinement": "#FF9800",
+        "design-document": "#8D6E63",
+        "default": "#9E9E9E"
+    };
+
+    function getColor(type) {
+        return colors[type] || colors["default"];
+    }
+
+    // Create sankey generator
+    const sankey = d3.sankey()
+        .nodeId(d => d.name)
+        .nodeWidth(20)
+        .nodePadding(15)
+        .nodeAlign(d3.sankeyLeft)
+        .extent([[0, 0], [width, height]]);
+
+    // Generate sankey layout
+    const {nodes, links} = sankey({
+        nodes: data.nodes.map(d => Object.assign({}, d)),
+        links: data.links.map(d => Object.assign({}, d))
+    });
+
+    // Draw links
+    const link = g.append("g")
+        .attr("fill", "none")
+        .attr("stroke-opacity", 0.4)
+        .selectAll("path")
+        .data(links)
+        .join("path")
+        .attr("d", d3.sankeyLinkHorizontal())
+        .attr("stroke", d => getColor(d.source.type))
+        .attr("stroke-width", d => Math.max(1, d.width))
+        .on("mouseover", function() {
+            d3.select(this).attr("stroke-opacity", 0.7);
+        })
+        .on("mouseout", function() {
+            d3.select(this).attr("stroke-opacity", 0.4);
+        });
+
+    link.append("title")
+        .text(d => `${d.source.name} → ${d.target.name}`);
+
+    // Draw nodes
+    const node = g.append("g")
+        .selectAll("g")
+        .data(nodes)
+        .join("g")
+        .attr("transform", d => `translate(${d.x0},${d.y0})`);
+
+    node.append("rect")
+        .attr("height", d => d.y1 - d.y0)
+        .attr("width", d => d.x1 - d.x0)
+        .attr("fill", d => getColor(d.type))
+        .attr("stroke", "#fff")
+        .attr("stroke-width", 1)
+        .style("cursor", d => d.link ? "pointer" : "default")
+        .on("click", (event, d) => {
+            if (d.link) {
+                window.location.href = d.link.replace(".md", ".html");
+            }
+        });
+
+    node.append("text")
+        .attr("x", d => d.x0 < width / 2 ? (d.x1 - d.x0) + 6 : -6)
+        .attr("y", d => (d.y1 - d.y0) / 2)
+        .attr("dy", "0.35em")
+        .attr("text-anchor", d => d.x0 < width / 2 ? "start" : "end")
+        .style("font-size", "12px")
+        .style("font-family", "system-ui, sans-serif")
+        .style("fill", "#424242")
+        .text(d => d.name)
+        .style("cursor", d => d.link ? "pointer" : "default")
+        .on("click", (event, d) => {
+            if (d.link) {
+                window.location.href = d.link.replace(".md", ".html");
+            }
+        });
+
+    node.append("title")
+        .text(d => `${d.name}\nType: ${d.type || "unknown"}`);
+})();
+</script>
+<style>
+.d3-sankey-container {
+    background: #FAFAFA;
+    border: 1px solid #EEEEEE;
+    border-radius: 4px;
+    padding: 10px;
+    overflow-x: auto;
+}
+.d3-sankey-svg {
+    display: block;
+    width: 100%;
+}
+</style>
+</p>
+
+        </div>
+    </div>
+</body>
+</html>

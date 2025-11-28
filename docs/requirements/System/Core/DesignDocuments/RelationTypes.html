@@ -198,31 +198,31 @@ blockquote {
 }
 .diagram-nav-buttons {
     position: absolute;
-    top: 10px;
-    left: 10px;
+    top: 5px;
+    left: 5px;
     z-index: 999; /* higher than SVG (1) but lower than header nav (1000) */
     display: flex;
     flex-direction: column;
-    gap: 5px;
-    background-color: rgba(255, 255, 255, 0.9);
-    padding: 5px;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    gap: 2px;
+    background-color: rgba(255, 255, 255, 0.85);
+    padding: 3px;
+    border-radius: 3px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
 }
 .diagram-nav-row {
     display: flex;
-    gap: 5px;
+    gap: 2px;
     justify-content: center;
 }
 .diagram-nav-btn {
-    width: 32px;
-    height: 32px;
+    width: 22px;
+    height: 22px;
     background-color: var(--color-primary);
     color: white;
     border: none;
-    border-radius: 3px;
+    border-radius: 2px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 11px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -318,6 +318,27 @@ blockquote {
                     return;
                 }
 
+                // Get the natural size of the diagram
+                var bbox = svg.getBBox();
+                var containerWidth = mermaidContainer.clientWidth;
+                var containerHeight = mermaidContainer.clientHeight;
+
+                // Check if diagram fits within container (with some padding)
+                var padding = 40;
+                var fitsInContainer = (bbox.width <= containerWidth - padding) && (bbox.height <= containerHeight - padding);
+
+                if (fitsInContainer) {
+                    // Diagram fits - use natural size, shrink container to fit content
+                    svg.style.width = 'auto';
+                    svg.style.height = 'auto';
+                    mermaidContainer.style.height = 'auto';
+                    mermaidContainer.style.minHeight = (bbox.height + padding) + 'px';
+                    mermaidContainer.style.maxHeight = 'calc(100vh - 150px)';
+                    // No pan/zoom needed for small diagrams
+                    return;
+                }
+
+                // Large diagram - enable pan/zoom
                 svg.style.maxWidth = 'none';
                 svg.style.maxHeight = 'none';
 
@@ -696,7 +717,9 @@ blockquote {
         <a href="../../../../index.html">Containment</a>
         <a href="../../../../model.html">Model</a>
         <a href="../../../../traces.html">Traces</a>
+        <a href="../../../../traceflow.html">TraceFlow</a>
         <a href="../../../../coverage.html">Coverage</a>
+        <a href="../../../../resources.html">Resources</a>
     </nav>
     <div class="reqvire-nav-spacer"></div>
     <div class="container">
@@ -812,7 +835,7 @@ blockquote {
 </li>
 </ol>
 <h2 id="element-type-relation-compatibility">Element Type Relation Compatibility</h2>
-<p>This section defines which element types can use which relation types as source or target. These constraints ensure semantic consistency in the MBSE model.</p>
+<p>This section defines which element types can use which relation types as source or target. These constraints ensure semantic consistency in the System model.</p>
 <h3 id="relation-centric-view">Relation-Centric View</h3>
 <table><thead><tr><th>Relation Type</th><th>Allowed Source Types</th><th>Allowed Target Types</th><th>Notes</th></tr></thead><tbody>
 <tr><td><strong>derivedFrom</strong></td><td>requirement, user-requirement</td><td>requirement, user-requirement</td><td>Hierarchical requirement decomposition only</td></tr>
@@ -831,9 +854,9 @@ blockquote {
 <tr><td><strong>analysis-verification</strong></td><td>verify, trace</td><td>verifiedBy, trace</td></tr>
 <tr><td><strong>inspection-verification</strong></td><td>verify, trace</td><td>verifiedBy, trace</td></tr>
 <tr><td><strong>demonstration-verification</strong></td><td>verify, trace</td><td>verifiedBy, trace</td></tr>
-<tr><td><strong>constraint</strong></td><td>None (no Relations allowed)</td><td>satisfy, Attachment</td></tr>
-<tr><td><strong>behavior</strong></td><td>None (no Relations allowed)</td><td>satisfy, Attachment</td></tr>
-<tr><td><strong>specification</strong></td><td>None (no Relations allowed)</td><td>satisfy, Attachment</td></tr>
+<tr><td><strong>constraint</strong></td><td>satisfy</td><td>satisfy, Attachment</td></tr>
+<tr><td><strong>behavior</strong></td><td>satisfy</td><td>satisfy, Attachment</td></tr>
+<tr><td><strong>specification</strong></td><td>satisfy</td><td>satisfy, Attachment</td></tr>
 <tr><td><strong>other</strong></td><td>trace</td><td>trace</td></tr>
 </tbody></table>
 <h3 id="key-constraints">Key Constraints</h3>
@@ -842,7 +865,7 @@ blockquote {
 <p><strong>derivedFrom/derive restricted to requirement types</strong>: Only <code>requirement</code> and <code>user-requirement</code> elements can participate in derivation relationships. This ensures clean hierarchical requirement decomposition without mixing verification or other element types.</p>
 </li>
 <li>
-<p><strong>Refinement types cannot have relations</strong>: Elements of type <code>constraint</code>, <code>behavior</code>, and <code>specification</code> cannot have a Relations subsection. They are referenced via the Attachments subsection of other elements.</p>
+<p><strong>Refinement types can only have satisfy relations</strong>: Elements of type <code>constraint</code>, <code>behavior</code>, and <code>specification</code> can only use <code>satisfy</code> relations to link to requirements they fulfill. They can also be referenced via the Attachments subsection of other elements.</p>
 </li>
 <li>
 <p><strong>test-verification special case</strong>: Among verification types, only <code>test-verification</code> can use <code>satisfiedBy</code> relations (to link to test implementations). Other verification types (<code>analysis-verification</code>, <code>inspection-verification</code>, <code>demonstration-verification</code>) cannot use <code>satisfiedBy</code>.</p>

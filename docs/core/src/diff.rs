@@ -280,7 +280,7 @@ pub fn generate_crud_diffs(
 
         // Generate new content from registry
         let new_content = if let Some(sections) = grouped_elements.get(file_path) {
-            registry.generate_file_markdown(file_path, sections)
+            registry.generate_file_markdown(file_path, sections, false)
         } else {
             // File was deleted or emptied
             String::new()

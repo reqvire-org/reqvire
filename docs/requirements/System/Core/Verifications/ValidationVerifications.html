@@ -198,31 +198,31 @@ blockquote {
 }
 .diagram-nav-buttons {
     position: absolute;
-    top: 10px;
-    left: 10px;
+    top: 5px;
+    left: 5px;
     z-index: 999; /* higher than SVG (1) but lower than header nav (1000) */
     display: flex;
     flex-direction: column;
-    gap: 5px;
-    background-color: rgba(255, 255, 255, 0.9);
-    padding: 5px;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    gap: 2px;
+    background-color: rgba(255, 255, 255, 0.85);
+    padding: 3px;
+    border-radius: 3px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
 }
 .diagram-nav-row {
     display: flex;
-    gap: 5px;
+    gap: 2px;
     justify-content: center;
 }
 .diagram-nav-btn {
-    width: 32px;
-    height: 32px;
+    width: 22px;
+    height: 22px;
     background-color: var(--color-primary);
     color: white;
     border: none;
-    border-radius: 3px;
+    border-radius: 2px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 11px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -318,6 +318,27 @@ blockquote {
                     return;
                 }
 
+                // Get the natural size of the diagram
+                var bbox = svg.getBBox();
+                var containerWidth = mermaidContainer.clientWidth;
+                var containerHeight = mermaidContainer.clientHeight;
+
+                // Check if diagram fits within container (with some padding)
+                var padding = 40;
+                var fitsInContainer = (bbox.width <= containerWidth - padding) && (bbox.height <= containerHeight - padding);
+
+                if (fitsInContainer) {
+                    // Diagram fits - use natural size, shrink container to fit content
+                    svg.style.width = 'auto';
+                    svg.style.height = 'auto';
+                    mermaidContainer.style.height = 'auto';
+                    mermaidContainer.style.minHeight = (bbox.height + padding) + 'px';
+                    mermaidContainer.style.maxHeight = 'calc(100vh - 150px)';
+                    // No pan/zoom needed for small diagrams
+                    return;
+                }
+
+                // Large diagram - enable pan/zoom
                 svg.style.maxWidth = 'none';
                 svg.style.maxHeight = 'none';
 
@@ -696,7 +717,9 @@ blockquote {
         <a href="../../../../index.html">Containment</a>
         <a href="../../../../model.html">Model</a>
         <a href="../../../../traces.html">Traces</a>
+        <a href="../../../../traceflow.html">TraceFlow</a>
         <a href="../../../../coverage.html">Coverage</a>
+        <a href="../../../../resources.html">Resources</a>
     </nav>
     <div class="reqvire-nav-spacer"></div>
     <div class="container">
@@ -831,34 +854,100 @@ blockquote {
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>verify: <a href="../ModelManagement.html#default-requirement-type-assignment">Default Requirement Type Assignment</a></li>
 <li>satisfiedBy: <a href="../../../../tests/test-default-type-assignment/test.sh">test.sh</a></li>
+<li>verify: <a href="../ModelManagement.html#default-requirement-type-assignment">Default Requirement Type Assignment</a></li>
 </ul>
 <hr />
-<h3 id="same-file-fragment-relations-test">Same-File Fragment Relations Test</h3>
-<p>This test verifies that Reqvire correctly handles and validates relations to fragments within the same file.</p>
+<h3 id="element-type-relation-compatibility-test">Element Type Relation Compatibility Test</h3>
+<p>This test verifies that the system correctly validates relation types based on element type constraints defined in the Element Type Relation Compatibility matrix.</p>
 <h4>Details</h4>
 <h5>Acceptance Criteria</h5>
+<p><strong>derivedFrom/derive Validation:</strong></p>
 <ul>
-<li>System should correctly validate relations to fragments within the same file</li>
-<li>System should not report errors for valid fragment references</li>
-<li>System should handle both fragment-only references like “#fragment-id” and proper element IDs</li>
+<li>System shall allow <code>derivedFrom</code> relations only between requirement types (<code>requirement</code>, <code>user-requirement</code>)</li>
+<li>System shall reject <code>derivedFrom</code> relations where source is a verification element</li>
+<li>System shall reject <code>derivedFrom</code> relations where target is a verification element</li>
+<li>System shall reject <code>derivedFrom</code> relations where source is <code>other</code> type</li>
+<li>System shall provide clear error message indicating element type incompatibility</li>
+</ul>
+<p><strong>satisfiedBy/satisfy Validation:</strong></p>
+<ul>
+<li>System shall allow <code>satisfiedBy</code> relations from requirement types to implementation files</li>
+<li>System shall allow <code>satisfiedBy</code> relations from <code>test-verification</code> to test implementation files</li>
+<li>System shall reject <code>satisfiedBy</code> relations from <code>analysis-verification</code>, <code>inspection-verification</code>, <code>demonstration-verification</code> elements</li>
+<li>System shall provide clear error message for non-test-verification elements using satisfiedBy</li>
+</ul>
+<p><strong>verifiedBy/verify Validation:</strong></p>
+<ul>
+<li>System shall allow <code>verifiedBy</code> relations from requirement types to any verification type</li>
+<li>System shall allow <code>verify</code> relations from any verification type to requirement types</li>
+<li>System shall reject <code>verifiedBy</code> relations from verification elements</li>
+<li>System shall reject <code>verify</code> relations to non-requirement elements</li>
+</ul>
+<p><strong>Refinement Type Validation:</strong></p>
+<ul>
+<li>System shall allow <code>satisfy</code> relations on <code>constraint</code> type elements pointing to requirements</li>
+<li>System shall allow <code>satisfy</code> relations on <code>behavior</code> type elements pointing to requirements</li>
+<li>System shall allow <code>satisfy</code> relations on <code>specification</code> type elements pointing to requirements</li>
+<li>System shall reject all other relation types on refinement elements (derivedFrom, verifiedBy, trace, satisfiedBy)</li>
+<li>System shall provide clear error message indicating refinement types can only have satisfy relations</li>
+</ul>
+<p><strong>trace Relation Validation:</strong></p>
+<ul>
+<li>System shall allow <code>trace</code> relations for any non-refinement element type</li>
+<li>System shall allow <code>trace</code> relations to any target type</li>
 </ul>
 <h5>Test Criteria</h5>
+<ol>
+<li>
+<p><strong>derivedFrom type constraint tests:</strong></p>
 <ul>
-<li>Command exits with success (zero) return code</li>
-<li>No error output about missing relation targets when using #fragment references</li>
-<li>Successful validation message is displayed</li>
+<li>Create requirement with <code>derivedFrom</code> to another requirement - PASS</li>
+<li>Create verification with <code>derivedFrom</code> to requirement - FAIL with type error</li>
+<li>Create requirement with <code>derivedFrom</code> to verification - FAIL with type error</li>
+<li>Verify error message includes element types and constraint explanation</li>
 </ul>
+</li>
+<li>
+<p><strong>satisfiedBy type constraint tests:</strong></p>
+<ul>
+<li>Create requirement with <code>satisfiedBy</code> to implementation file - PASS</li>
+<li>Create test-verification with <code>satisfiedBy</code> to test file - PASS</li>
+<li>Create analysis-verification with <code>satisfiedBy</code> to file - FAIL with type error</li>
+<li>Verify error message indicates only test-verification can use satisfiedBy</li>
+</ul>
+</li>
+<li>
+<p><strong>Refinement type relation tests:</strong></p>
+<ul>
+<li>Create constraint element with <code>satisfy</code> relation to requirement - PASS</li>
+<li>Create behavior element with <code>satisfy</code> relation to requirement - PASS</li>
+<li>Create specification element with <code>satisfy</code> relation to requirement - PASS</li>
+<li>Create constraint element with <code>trace</code> relation - FAIL with error</li>
+<li>Create behavior element with <code>derivedFrom</code> relation - FAIL with error</li>
+<li>Create specification element with <code>satisfiedBy</code> relation - FAIL with error</li>
+<li>Verify error messages indicate refinement types can only have satisfy relations</li>
+</ul>
+</li>
+<li>
+<p><strong>trace relation permissiveness tests:</strong></p>
+<ul>
+<li>Create requirement with <code>trace</code> to verification - PASS</li>
+<li>Create verification with <code>trace</code> to requirement - PASS</li>
+<li>Create verification with <code>trace</code> to other verification - PASS</li>
+<li>Verify trace relations do not trigger type compatibility errors</li>
+</ul>
+</li>
+</ol>
 <h4>Metadata</h4>
 <ul>
 <li>type: test-verification</li>
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>verify: <a href="../Validation.html#relation-type-validation">Relation Type Validation</a></li>
-<li>verify: <a href="../Configuration.html#requirements-processing">Requirements Processing</a></li>
-<li>satisfiedBy: <a href="../../../../tests/test-fragment-relations/test.sh">test.sh</a></li>
+<li>satisfiedBy: <a href="../../../../tests/test-element-type-relation-compatibility/test.sh">test.sh</a></li>
+<li>verify: <a href="../ModelManagement.html#element-type-relation-compatibility">Element Type Relation Compatibility</a></li>
+<li>verify: <a href="../Validation.html#relation-element-type-validator">Relation Element Type Validator</a></li>
 </ul>
 <hr />
 <h3 id="file-exclusion-test">File Exclusion Test</h3>
@@ -960,9 +1049,39 @@ blockquote {
 </ul>
 <h4>Relations</h4>
 <ul>
+<li>satisfiedBy: <a href="../../../../tests/test-gitignore-integration/test.sh">test.sh</a></li>
 <li>verify: <a href="../Configuration.html#ignore-files-integration">Ignore Files Integration</a></li>
 <li>verify: <a href="../Configuration.html#reserved-repository-files-exclusion">Reserved Repository Files Exclusion</a></li>
-<li>satisfiedBy: <a href="../../../../tests/test-gitignore-integration/test.sh">test.sh</a></li>
+</ul>
+<hr />
+<h3 id="invalid-header-structure-test">Invalid Header Structure Test</h3>
+<p>This test verifies that Reqvire correctly detects and reports invalid header structures in elements, specifically level 5+ headers appearing outside of Details subsections.</p>
+<h4>Details</h4>
+<h5>Acceptance Criteria</h5>
+<ul>
+<li>System SHALL detect level 5+ headers (<code>#####</code>) appearing before reserved subsections (<code>#### Metadata</code>, <code>#### Relations</code>, <code>#### Details</code>)</li>
+<li>System SHALL allow level 5+ headers only within <code>#### Details</code> subsection</li>
+<li>System SHALL provide clear error messages indicating the invalid header structure with file and line number</li>
+<li>Error message SHALL specify that level 5+ headers can only appear inside Details subsection</li>
+<li>Validation SHALL fail when invalid header structure is detected</li>
+</ul>
+<h5>Test Criteria</h5>
+<ul>
+<li>Command exits with non-zero error code when invalid header structure is found</li>
+<li>Error output contains specific error message about invalid header level</li>
+<li>Error message includes element name, file path, and line number</li>
+<li>Valid elements with level 5+ headers inside Details subsection pass validation</li>
+<li>Elements with level 5+ headers before reserved subsections fail validation</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfiedBy: <a href="../../../../tests/test-invalid-relations/test.sh">test.sh</a></li>
+<li>verify: <a href="../StructureAndParsing.html#structure-and-addressing-in-markdown-documents">Structure and Addressing in Markdown Documents</a></li>
+<li>verify: <a href="../Validation.html#markdown-structure-validator">Markdown Structure Validator</a></li>
 </ul>
 <hr />
 <h3 id="invalid-relations-test">Invalid Relations Test</h3>
@@ -1022,70 +1141,15 @@ blockquote {
 </ul>
 <h4>Relations</h4>
 <ul>
+<li>satisfiedBy: <a href="../../../../tests/test-invalid-relations/test.sh">test.sh</a></li>
 <li>verify: <a href="../../../Interfaces/CLI.html#validate-command">Validate Command</a></li>
-<li>verify: <a href="../Validation.html#validation-error-handling">Validation Error Handling</a></li>
+<li>verify: <a href="../Validation.html#cross-component-dependency-validator">Cross-Component Dependency Validator</a></li>
 <li>verify: <a href="../Validation.html#internal-consistency-validator">Internal Consistency Validator</a></li>
-<li>verify: <a href="../Validation.html#relation-type-validation">Relation Type Validation</a></li>
-<li>verify: <a href="../Validation.html#relation-element-type-validator">Relation Element Type Validator</a></li>
-<li>verify: <a href="../../Output/DiagramGeneration.html#trace-relation-non-directional-behavior">Trace Relation Non-Directional Behavior</a></li>
-<li>satisfiedBy: <a href="../../../../tests/test-invalid-relations/test.sh">test.sh</a></li>
-</ul>
-<hr />
-<h3 id="invalid-header-structure-test">Invalid Header Structure Test</h3>
-<p>This test verifies that Reqvire correctly detects and reports invalid header structures in elements, specifically level 5+ headers appearing outside of Details subsections.</p>
-<h4>Details</h4>
-<h5>Acceptance Criteria</h5>
-<ul>
-<li>System SHALL detect level 5+ headers (<code>#####</code>) appearing before reserved subsections (<code>#### Metadata</code>, <code>#### Relations</code>, <code>#### Details</code>)</li>
-<li>System SHALL allow level 5+ headers only within <code>#### Details</code> subsection</li>
-<li>System SHALL provide clear error messages indicating the invalid header structure with file and line number</li>
-<li>Error message SHALL specify that level 5+ headers can only appear inside Details subsection</li>
-<li>Validation SHALL fail when invalid header structure is detected</li>
-</ul>
-<h5>Test Criteria</h5>
-<ul>
-<li>Command exits with non-zero error code when invalid header structure is found</li>
-<li>Error output contains specific error message about invalid header level</li>
-<li>Error message includes element name, file path, and line number</li>
-<li>Valid elements with level 5+ headers inside Details subsection pass validation</li>
-<li>Elements with level 5+ headers before reserved subsections fail validation</li>
-</ul>
-<h4>Metadata</h4>
-<ul>
-<li>type: test-verification</li>
-</ul>
-<h4>Relations</h4>
-<ul>
 <li>verify: <a href="../Validation.html#markdown-structure-validator">Markdown Structure Validator</a></li>
-<li>verify: <a href="../StructureAndParsing.html#structure-and-addressing-in-markdown-documents">Structure and Addressing in Markdown Documents</a></li>
-<li>satisfiedBy: <a href="../../../../tests/test-invalid-relations/test.sh">test.sh</a></li>
-</ul>
-<hr />
-<h3 id="unstructured-documents-test">Unstructured Documents Test</h3>
-<p>This test verifies that the system correctly validates relations to excluded files.</p>
-<h4>Details</h4>
-<h5>Acceptance Criteria</h5>
-<ul>
-<li>System shall allow referencing unstructured documents (text files, code files)</li>
-<li>System shall not attempt to parse unstructured documents as requirements</li>
-<li>System shall validate that referenced unstructured documents exist</li>
-<li>System shall not report validation errors for valid references to unstructured documents</li>
-</ul>
-<h5>Test Criteria</h5>
-<ul>
-<li>Relations referencing unstructured documents are treated as valid</li>
-<li>No attempt is made to extract elements from unstructured documents</li>
-<li>Validation succeeds when referenced unstructured documents exist</li>
-<li>Validation fails when referenced unstructured documents don’t exist</li>
-</ul>
-<h4>Metadata</h4>
-<ul>
-<li>type: test-verification</li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>verify: <a href="../Validation.html#excluded-file-relation-validation">Excluded File Relation Validation</a></li>
-<li>satisfiedBy: <a href="../../../../tests/test-valid-relations/test.sh">test.sh</a></li>
+<li>verify: <a href="../Validation.html#relation-element-type-validator">Relation Element Type Validator</a></li>
+<li>verify: <a href="../Validation.html#relation-type-validation">Relation Type Validation</a></li>
+<li>verify: <a href="../Validation.html#validation-error-handling">Validation Error Handling</a></li>
+<li>verify: <a href="../../Output/DiagramGeneration.html#trace-relation-non-directional-behavior">Trace Relation Non-Directional Behavior</a></li>
 </ul>
 <hr />
 <h3 id="requirements-files-search-and-detection-test">Requirements Files Search and Detection Test</h3>
@@ -1111,99 +1175,35 @@ blockquote {
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>verify: <a href="../Configuration.html#structured-markdown-files-search-and-detection">Structured Markdown Files Search and Detection</a></li>
 <li>satisfiedBy: <a href="../../../../tests/test-excluded-patterns/test.sh">test.sh</a></li>
+<li>verify: <a href="../Configuration.html#structured-markdown-files-search-and-detection">Structured Markdown Files Search and Detection</a></li>
+<li>verify: <a href="../Validation.html#graphregistry-as-primary-registry">GraphRegistry as Primary Registry</a></li>
 </ul>
 <hr />
-<h3 id="element-type-relation-compatibility-test">Element Type Relation Compatibility Test</h3>
-<p>This test verifies that the system correctly validates relation types based on element type constraints defined in the Element Type Relation Compatibility matrix.</p>
+<h3 id="same-file-fragment-relations-test">Same-File Fragment Relations Test</h3>
+<p>This test verifies that Reqvire correctly handles and validates relations to fragments within the same file.</p>
 <h4>Details</h4>
 <h5>Acceptance Criteria</h5>
-<p><strong>derivedFrom/derive Validation:</strong></p>
 <ul>
-<li>System shall allow <code>derivedFrom</code> relations only between requirement types (<code>requirement</code>, <code>user-requirement</code>)</li>
-<li>System shall reject <code>derivedFrom</code> relations where source is a verification element</li>
-<li>System shall reject <code>derivedFrom</code> relations where target is a verification element</li>
-<li>System shall reject <code>derivedFrom</code> relations where source is <code>other</code> type</li>
-<li>System shall provide clear error message indicating element type incompatibility</li>
-</ul>
-<p><strong>satisfiedBy/satisfy Validation:</strong></p>
-<ul>
-<li>System shall allow <code>satisfiedBy</code> relations from requirement types to implementation files</li>
-<li>System shall allow <code>satisfiedBy</code> relations from <code>test-verification</code> to test implementation files</li>
-<li>System shall reject <code>satisfiedBy</code> relations from <code>analysis-verification</code>, <code>inspection-verification</code>, <code>demonstration-verification</code> elements</li>
-<li>System shall provide clear error message for non-test-verification elements using satisfiedBy</li>
-</ul>
-<p><strong>verifiedBy/verify Validation:</strong></p>
-<ul>
-<li>System shall allow <code>verifiedBy</code> relations from requirement types to any verification type</li>
-<li>System shall allow <code>verify</code> relations from any verification type to requirement types</li>
-<li>System shall reject <code>verifiedBy</code> relations from verification elements</li>
-<li>System shall reject <code>verify</code> relations to non-requirement elements</li>
-</ul>
-<p><strong>Refinement Type Validation:</strong></p>
-<ul>
-<li>System shall reject Relations subsection on <code>constraint</code> type elements</li>
-<li>System shall reject Relations subsection on <code>behavior</code> type elements</li>
-<li>System shall reject Relations subsection on <code>specification</code> type elements</li>
-<li>System shall provide clear error message indicating refinement types cannot have relations</li>
-</ul>
-<p><strong>trace Relation Validation:</strong></p>
-<ul>
-<li>System shall allow <code>trace</code> relations for any non-refinement element type</li>
-<li>System shall allow <code>trace</code> relations to any target type</li>
+<li>System should correctly validate relations to fragments within the same file</li>
+<li>System should not report errors for valid fragment references</li>
+<li>System should handle both fragment-only references like “#fragment-id” and proper element IDs</li>
 </ul>
 <h5>Test Criteria</h5>
-<ol>
-<li>
-<p><strong>derivedFrom type constraint tests:</strong></p>
 <ul>
-<li>Create requirement with <code>derivedFrom</code> to another requirement - PASS</li>
-<li>Create verification with <code>derivedFrom</code> to requirement - FAIL with type error</li>
-<li>Create requirement with <code>derivedFrom</code> to verification - FAIL with type error</li>
-<li>Verify error message includes element types and constraint explanation</li>
+<li>Command exits with success (zero) return code</li>
+<li>No error output about missing relation targets when using #fragment references</li>
+<li>Successful validation message is displayed</li>
 </ul>
-</li>
-<li>
-<p><strong>satisfiedBy type constraint tests:</strong></p>
-<ul>
-<li>Create requirement with <code>satisfiedBy</code> to implementation file - PASS</li>
-<li>Create test-verification with <code>satisfiedBy</code> to test file - PASS</li>
-<li>Create analysis-verification with <code>satisfiedBy</code> to file - FAIL with type error</li>
-<li>Verify error message indicates only test-verification can use satisfiedBy</li>
-</ul>
-</li>
-<li>
-<p><strong>Refinement type relation rejection tests:</strong></p>
-<ul>
-<li>Create constraint element with Relations subsection (trace) - FAIL with error</li>
-<li>Create behavior element with Relations subsection (trace) - FAIL with error</li>
-<li>Create specification element with Relations subsection (trace) - FAIL with error</li>
-<li>Create constraint element with derivedFrom relation - FAIL with error</li>
-<li>Create behavior element with derivedFrom relation - FAIL with error</li>
-<li>Create specification element with derivedFrom relation - FAIL with error</li>
-<li>Verify error messages indicate refinement types cannot have relations</li>
-</ul>
-</li>
-<li>
-<p><strong>trace relation permissiveness tests:</strong></p>
-<ul>
-<li>Create requirement with <code>trace</code> to verification - PASS</li>
-<li>Create verification with <code>trace</code> to requirement - PASS</li>
-<li>Create verification with <code>trace</code> to other verification - PASS</li>
-<li>Verify trace relations do not trigger type compatibility errors</li>
-</ul>
-</li>
-</ol>
 <h4>Metadata</h4>
 <ul>
 <li>type: test-verification</li>
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>verify: <a href="../Validation.html#relation-element-type-validator">Relation Element Type Validator</a></li>
-<li>verify: <a href="../ModelManagement.html#element-type-relation-compatibility">Element Type Relation Compatibility</a></li>
-<li>satisfiedBy: <a href="../../../../tests/test-element-type-relation-compatibility/test.sh">test.sh</a></li>
+<li>satisfiedBy: <a href="../../../../tests/test-fragment-relations/test.sh">test.sh</a></li>
+<li>verify: <a href="../Configuration.html#requirements-processing">Requirements Processing</a></li>
+<li>verify: <a href="../Validation.html#relation-type-validation">Relation Type Validation</a></li>
 </ul>
 <hr />
 <h3 id="subdirectory-processing-verification">Subdirectory Processing Verification</h3>
@@ -1239,9 +1239,36 @@ blockquote {
 </ul>
 <h4>Relations</h4>
 <ul>
+<li>satisfiedBy: <a href="../../../../tests/test-subdirectory-functionality/test.sh">test.sh</a></li>
 <li>verify: <a href="../../../Interfaces/CLI.html#cli-move-element-command">CLI Move Element Command</a></li>
 <li>verify: <a href="../../../Interfaces/CLI.html#cli-move-file-command">CLI Move File Command</a></li>
-<li>satisfiedBy: <a href="../../../../tests/test-subdirectory-functionality/test.sh">test.sh</a></li>
+</ul>
+<hr />
+<h3 id="unstructured-documents-test">Unstructured Documents Test</h3>
+<p>This test verifies that the system correctly validates relations to excluded files.</p>
+<h4>Details</h4>
+<h5>Acceptance Criteria</h5>
+<ul>
+<li>System shall allow referencing unstructured documents (text files, code files)</li>
+<li>System shall not attempt to parse unstructured documents as requirements</li>
+<li>System shall validate that referenced unstructured documents exist</li>
+<li>System shall not report validation errors for valid references to unstructured documents</li>
+</ul>
+<h5>Test Criteria</h5>
+<ul>
+<li>Relations referencing unstructured documents are treated as valid</li>
+<li>No attempt is made to extract elements from unstructured documents</li>
+<li>Validation succeeds when referenced unstructured documents exist</li>
+<li>Validation fails when referenced unstructured documents don’t exist</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfiedBy: <a href="../../../../tests/test-valid-relations/test.sh">test.sh</a></li>
+<li>verify: <a href="../Validation.html#excluded-file-relation-validation">Excluded File Relation Validation</a></li>
 </ul>
 <hr />
 

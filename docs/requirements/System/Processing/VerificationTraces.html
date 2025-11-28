@@ -198,31 +198,31 @@ blockquote {
 }
 .diagram-nav-buttons {
     position: absolute;
-    top: 10px;
-    left: 10px;
+    top: 5px;
+    left: 5px;
     z-index: 999; /* higher than SVG (1) but lower than header nav (1000) */
     display: flex;
     flex-direction: column;
-    gap: 5px;
-    background-color: rgba(255, 255, 255, 0.9);
-    padding: 5px;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    gap: 2px;
+    background-color: rgba(255, 255, 255, 0.85);
+    padding: 3px;
+    border-radius: 3px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
 }
 .diagram-nav-row {
     display: flex;
-    gap: 5px;
+    gap: 2px;
     justify-content: center;
 }
 .diagram-nav-btn {
-    width: 32px;
-    height: 32px;
+    width: 22px;
+    height: 22px;
     background-color: var(--color-primary);
     color: white;
     border: none;
-    border-radius: 3px;
+    border-radius: 2px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 11px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -318,6 +318,27 @@ blockquote {
                     return;
                 }
 
+                // Get the natural size of the diagram
+                var bbox = svg.getBBox();
+                var containerWidth = mermaidContainer.clientWidth;
+                var containerHeight = mermaidContainer.clientHeight;
+
+                // Check if diagram fits within container (with some padding)
+                var padding = 40;
+                var fitsInContainer = (bbox.width <= containerWidth - padding) && (bbox.height <= containerHeight - padding);
+
+                if (fitsInContainer) {
+                    // Diagram fits - use natural size, shrink container to fit content
+                    svg.style.width = 'auto';
+                    svg.style.height = 'auto';
+                    mermaidContainer.style.height = 'auto';
+                    mermaidContainer.style.minHeight = (bbox.height + padding) + 'px';
+                    mermaidContainer.style.maxHeight = 'calc(100vh - 150px)';
+                    // No pan/zoom needed for small diagrams
+                    return;
+                }
+
+                // Large diagram - enable pan/zoom
                 svg.style.maxWidth = 'none';
                 svg.style.maxHeight = 'none';
 
@@ -696,7 +717,9 @@ blockquote {
         <a href="../../../index.html">Containment</a>
         <a href="../../../model.html">Model</a>
         <a href="../../../traces.html">Traces</a>
+        <a href="../../../traceflow.html">TraceFlow</a>
         <a href="../../../coverage.html">Coverage</a>
+        <a href="../../../resources.html">Resources</a>
     </nav>
     <div class="reqvire-nav-spacer"></div>
     <div class="container">
@@ -712,16 +735,6 @@ blockquote {
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
-  subgraph 1c3bc86f926627ab[&quot;📁 requirements/Interfaces&quot;]
-    subgraph 315f1b2b98bf7d1b[&quot;📄 CLI.md&quot;]
-      ea0b85acf2bdcccc[&quot;CLI Coverage Command<br/>📎 requirements/System/Output/DesignDocuments/OutputFormats.md#json-output-structure<br/>📎 requirements/System/Output/DesignDocuments/OutputFormats.md#text-output-formatting&quot;];
-      class ea0b85acf2bdcccc systemRequirement;
-      click ea0b85acf2bdcccc &quot;../../Interfaces/CLI.html#cli-coverage-command&quot;;
-      71bccd7851730351[&quot;CLI Traces Command<br/>📎 requirements/System/Output/DesignDocuments/OutputFormats.md#json-output-structure<br/>📎 requirements/System/Processing/DesignDocuments/VerificationTraceAlgorithm.md#verification-trace-tree-construction&quot;];
-      class 71bccd7851730351 systemRequirement;
-      click 71bccd7851730351 &quot;../../Interfaces/CLI.html#cli-traces-command&quot;;
-    end
-  end
   subgraph 63d7cba3f920744c[&quot;📁 requirements/System/Processing&quot;]
     subgraph c809e90dbf14fff7[&quot;📄 VerificationTraces.md&quot;]
       3e62787c176807f6[&quot;Verification Roll-up Strategy&quot;];
@@ -732,20 +745,23 @@ blockquote {
       click 61e7a56e6d8e29d &quot;VerificationTraces.html#verification-trace-builder&quot;;
     end
   end
-  3e62787c176807f6 -.->|deriveReqT| ea0b85acf2bdcccc;
-  61e7a56e6d8e29d -.->|deriveReqT| 71bccd7851730351;
-  80defdd4cbc7ee18[&quot;cli.rs&quot;];
-  class 80defdd4cbc7ee18 default;
-  click 80defdd4cbc7ee18 &quot;../../../cli/src/cli.rs&quot;;
-  ea0b85acf2bdcccc -->|satisfiedBy| 80defdd4cbc7ee18;
-  ea0b85acf2bdcccc -.->|verifiedBy| 7ce243221ec8f143;
-  ea0b85acf2bdcccc -.->|verifiedBy| d1b9ad25b33d992e;
-  71bccd7851730351 -.->|deriveReqT| c1718232f67af8e3;
-  71bccd7851730351 -->|satisfiedBy| 80defdd4cbc7ee18;
-  71bccd7851730351 -.->|verifiedBy| 7ce243221ec8f143;
-  71bccd7851730351 -.->|verifiedBy| 72fcf5923ff6b63a;
-  71bccd7851730351 -.->|verifiedBy| 41c687e5ca1d5f1;
 </div>
+<h3 id="verification-roll-up-strategy">Verification Roll-up Strategy</h3>
+<p>The system shall implement a verification roll-up strategy where parent requirements are considered verified based on the verification status of their child requirements.</p>
+<h4>Details</h4>
+<p>The roll-up strategy shall work as follows:</p>
+<ul>
+<li>When a requirement has children (through derivedFrom relations), it is considered verified if ALL of its child requirements are verified, regardless of whether the parent has direct verifiedBy relations</li>
+<li>When a requirement has no children (leaf requirement), it is considered verified if it has direct verifiedBy relations</li>
+<li>A parent with any unverified child shall be marked as unverified (❌), even if the parent itself has direct verification</li>
+<li>Verification status rolls up from leaf requirements through the entire parent chain to root requirements</li>
+<li>This strategy applies to all verification matrices, coverage reports, and trace outputs</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../Output/Reporting.html#verification-upward-traceability">Verification Upward Traceability</a></li>
+</ul>
+<hr />
 <h3 id="verification-trace-builder">Verification Trace Builder</h3>
 <p>The system shall provide functionality to build upward trace trees from verification elements by traversing all upward parent relations to reach root requirements, merging all paths into a single tree structure with marked directly-verified requirements.</p>
 <h4>Details</h4>
@@ -759,22 +775,6 @@ Verification trace diagrams shall use the same visual styling as other mermaid d
 <h4>Attachments</h4>
 <ul>
 <li><a href="DesignDocuments/VerificationTraceAlgorithm.html#verification-trace-tree-construction">Verification Trace Tree Construction</a></li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="../Output/Reporting.html#verification-upward-traceability">Verification Upward Traceability</a></li>
-</ul>
-<hr />
-<h3 id="verification-roll-up-strategy">Verification Roll-up Strategy</h3>
-<p>The system shall implement a verification roll-up strategy where parent requirements are considered verified based on the verification status of their child requirements.</p>
-<h4>Details</h4>
-<p>The roll-up strategy shall work as follows:</p>
-<ul>
-<li>When a requirement has children (through derivedFrom relations), it is considered verified if ALL of its child requirements are verified, regardless of whether the parent has direct verifiedBy relations</li>
-<li>When a requirement has no children (leaf requirement), it is considered verified if it has direct verifiedBy relations</li>
-<li>A parent with any unverified child shall be marked as unverified (❌), even if the parent itself has direct verification</li>
-<li>Verification status rolls up from leaf requirements through the entire parent chain to root requirements</li>
-<li>This strategy applies to all verification matrices, coverage reports, and trace outputs</li>
 </ul>
 <h4>Relations</h4>
 <ul>

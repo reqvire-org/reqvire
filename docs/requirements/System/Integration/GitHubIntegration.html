@@ -198,31 +198,31 @@ blockquote {
 }
 .diagram-nav-buttons {
     position: absolute;
-    top: 10px;
-    left: 10px;
+    top: 5px;
+    left: 5px;
     z-index: 999; /* higher than SVG (1) but lower than header nav (1000) */
     display: flex;
     flex-direction: column;
-    gap: 5px;
-    background-color: rgba(255, 255, 255, 0.9);
-    padding: 5px;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    gap: 2px;
+    background-color: rgba(255, 255, 255, 0.85);
+    padding: 3px;
+    border-radius: 3px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
 }
 .diagram-nav-row {
     display: flex;
-    gap: 5px;
+    gap: 2px;
     justify-content: center;
 }
 .diagram-nav-btn {
-    width: 32px;
-    height: 32px;
+    width: 22px;
+    height: 22px;
     background-color: var(--color-primary);
     color: white;
     border: none;
-    border-radius: 3px;
+    border-radius: 2px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 11px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -318,6 +318,27 @@ blockquote {
                     return;
                 }
 
+                // Get the natural size of the diagram
+                var bbox = svg.getBBox();
+                var containerWidth = mermaidContainer.clientWidth;
+                var containerHeight = mermaidContainer.clientHeight;
+
+                // Check if diagram fits within container (with some padding)
+                var padding = 40;
+                var fitsInContainer = (bbox.width <= containerWidth - padding) && (bbox.height <= containerHeight - padding);
+
+                if (fitsInContainer) {
+                    // Diagram fits - use natural size, shrink container to fit content
+                    svg.style.width = 'auto';
+                    svg.style.height = 'auto';
+                    mermaidContainer.style.height = 'auto';
+                    mermaidContainer.style.minHeight = (bbox.height + padding) + 'px';
+                    mermaidContainer.style.maxHeight = 'calc(100vh - 150px)';
+                    // No pan/zoom needed for small diagrams
+                    return;
+                }
+
+                // Large diagram - enable pan/zoom
                 svg.style.maxWidth = 'none';
                 svg.style.maxHeight = 'none';
 
@@ -696,7 +717,9 @@ blockquote {
         <a href="../../../index.html">Containment</a>
         <a href="../../../model.html">Model</a>
         <a href="../../../traces.html">Traces</a>
+        <a href="../../../traceflow.html">TraceFlow</a>
         <a href="../../../coverage.html">Coverage</a>
+        <a href="../../../resources.html">Resources</a>
     </nav>
     <div class="reqvire-nav-spacer"></div>
     <div class="container">
@@ -744,28 +767,6 @@ blockquote {
   7146138ceda0c5b6 -.->|verifiedBy| e30cc861c688638f;
   e30cc861c688638f -->|satisfiedBy| 13fc1caf0ecb96e1;
 </div>
-<h3 id="automate-pull-request-validations">Automate Pull Request Validations</h3>
-<p>The system shall automate validations of pull requests in the GitHub workflow to ensure model consistency before merging.</p>
-<h4>Metadata</h4>
-<ul>
-<li>type: user-requirement</li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="../../UserStories.html#integrate-with-github-workflows">Integrate with GitHub Workflows</a></li>
-</ul>
-<hr />
-<h3 id="generate-change-logs-for-pull-requests">Generate Change Logs for Pull Requests</h3>
-<p>The system shall generate detailed change logs for pull requests, summarizing modifications to the MBSE model and related components.</p>
-<h4>Metadata</h4>
-<ul>
-<li>type: user-requirement</li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="../../UserStories.html#integrate-with-github-workflows">Integrate with GitHub Workflows</a></li>
-</ul>
-<hr />
 <h3 id="automate-documentation-export">Automate Documentation Export</h3>
 <p>The system shall automate export of HTML documentation in the GitHub workflow on PR merge event, so that the documentation is always accessible and up-to-date for GitHub Pages.</p>
 <h4>Metadata</h4>
@@ -774,6 +775,7 @@ blockquote {
 </ul>
 <h4>Relations</h4>
 <ul>
+<li>derive: <a href="#automated-documentation-export-on-pr-merge">Automated Documentation Export on PR Merge</a></li>
 <li>derivedFrom: <a href="../../UserStories.html#integrate-with-github-workflows">Integrate with GitHub Workflows</a></li>
 </ul>
 <hr />
@@ -796,6 +798,30 @@ blockquote {
 <li>derivedFrom: <a href="#automate-documentation-export">Automate Documentation Export</a></li>
 <li>derivedFrom: <a href="#automate-pull-request-validations">Automate Pull Request Validations</a></li>
 <li>satisfiedBy: <a href="../../../.github/workflows/update_docs.yml">update_docs.yml</a></li>
+<li>verifiedBy: <a href="../Output/Verifications/DiagramVerifications.html#automated-documentation-export-on-pr-merge-verification">Automated Documentation Export on PR Merge Verification</a></li>
+</ul>
+<hr />
+<h3 id="automate-pull-request-validations">Automate Pull Request Validations</h3>
+<p>The system shall automate validations of pull requests in the GitHub workflow to ensure model consistency before merging.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derive: <a href="#automated-documentation-export-on-pr-merge">Automated Documentation Export on PR Merge</a></li>
+<li>derivedFrom: <a href="../../UserStories.html#integrate-with-github-workflows">Integrate with GitHub Workflows</a></li>
+</ul>
+<hr />
+<h3 id="generate-change-logs-for-pull-requests">Generate Change Logs for Pull Requests</h3>
+<p>The system shall generate detailed change logs for pull requests, summarizing modifications to the System model and related components.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../../UserStories.html#integrate-with-github-workflows">Integrate with GitHub Workflows</a></li>
 </ul>
 <hr />
 

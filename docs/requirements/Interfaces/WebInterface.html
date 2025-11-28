@@ -198,31 +198,31 @@ blockquote {
 }
 .diagram-nav-buttons {
     position: absolute;
-    top: 10px;
-    left: 10px;
+    top: 5px;
+    left: 5px;
     z-index: 999; /* higher than SVG (1) but lower than header nav (1000) */
     display: flex;
     flex-direction: column;
-    gap: 5px;
-    background-color: rgba(255, 255, 255, 0.9);
-    padding: 5px;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    gap: 2px;
+    background-color: rgba(255, 255, 255, 0.85);
+    padding: 3px;
+    border-radius: 3px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
 }
 .diagram-nav-row {
     display: flex;
-    gap: 5px;
+    gap: 2px;
     justify-content: center;
 }
 .diagram-nav-btn {
-    width: 32px;
-    height: 32px;
+    width: 22px;
+    height: 22px;
     background-color: var(--color-primary);
     color: white;
     border: none;
-    border-radius: 3px;
+    border-radius: 2px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 11px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -318,6 +318,27 @@ blockquote {
                     return;
                 }
 
+                // Get the natural size of the diagram
+                var bbox = svg.getBBox();
+                var containerWidth = mermaidContainer.clientWidth;
+                var containerHeight = mermaidContainer.clientHeight;
+
+                // Check if diagram fits within container (with some padding)
+                var padding = 40;
+                var fitsInContainer = (bbox.width <= containerWidth - padding) && (bbox.height <= containerHeight - padding);
+
+                if (fitsInContainer) {
+                    // Diagram fits - use natural size, shrink container to fit content
+                    svg.style.width = 'auto';
+                    svg.style.height = 'auto';
+                    mermaidContainer.style.height = 'auto';
+                    mermaidContainer.style.minHeight = (bbox.height + padding) + 'px';
+                    mermaidContainer.style.maxHeight = 'calc(100vh - 150px)';
+                    // No pan/zoom needed for small diagrams
+                    return;
+                }
+
+                // Large diagram - enable pan/zoom
                 svg.style.maxWidth = 'none';
                 svg.style.maxHeight = 'none';
 
@@ -696,7 +717,9 @@ blockquote {
         <a href="../../index.html">Containment</a>
         <a href="../../model.html">Model</a>
         <a href="../../traces.html">Traces</a>
+        <a href="../../traceflow.html">TraceFlow</a>
         <a href="../../coverage.html">Coverage</a>
+        <a href="../../resources.html">Resources</a>
     </nav>
     <div class="reqvire-nav-spacer"></div>
     <div class="container">
@@ -714,7 +737,7 @@ blockquote {
 
   subgraph 1c3bc86f926627ab[&quot;📁 requirements/Interfaces&quot;]
     subgraph 315f1b2b98bf7d1b[&quot;📄 CLI.md&quot;]
-      a867b4bb3e22cabf[&quot;Validate Command&quot;];
+      a867b4bb3e22cabf[&quot;Validate Command<br/>📎 requirements/System/Core/Refinements.md#two-pass-validation-behavior<br/>📎 requirements/System/Core/Refinements.md#validation-error-reporting-behavior<br/>📎 requirements/System/Output/DesignDocuments/OutputFormats.md#json-output-structure<br/>📎 requirements/System/Output/DesignDocuments/OutputFormats.md#error-message-format-specification&quot;];
       class a867b4bb3e22cabf systemRequirement;
       click a867b4bb3e22cabf &quot;CLI.html#validate-command&quot;;
     end
@@ -725,13 +748,13 @@ blockquote {
       7b6511f887489bc1[&quot;Containment View Attachment Links&quot;];
       class 7b6511f887489bc1 systemRequirement;
       click 7b6511f887489bc1 &quot;WebInterface.html#containment-view-attachment-links&quot;;
-      a12088ce3af75577[&quot;Diagram Attachment Display&quot;];
+      a12088ce3af75577[&quot;Diagram Attachment Display<br/>📎 requirements/System/Output/DesignDocuments/DiagramStyles.md#mermaid-diagram-style-specification&quot;];
       class a12088ce3af75577 systemRequirement;
       click a12088ce3af75577 &quot;WebInterface.html#diagram-attachment-display&quot;;
-      7cee348e5d230f20[&quot;HTML Export&quot;];
+      7cee348e5d230f20[&quot;HTML Export<br/>📎 requirements/Interfaces/DesignDocuments/WebInterfaceStyles.md#web-interface-style-specification<br/>📎 requirements/Interfaces/DesignDocuments/WebInterfaceStyles.md#web-interface-navigation-behavior&quot;];
       class 7cee348e5d230f20 systemRequirement;
       click 7cee348e5d230f20 &quot;WebInterface.html#html-export&quot;;
-      287f6140c4c9ba05[&quot;Model-Centric View Generation&quot;];
+      287f6140c4c9ba05[&quot;Model-Centric View Generation<br/>📎 requirements/System/Output/DesignDocuments/DiagramStyles.md#mermaid-diagram-style-specification&quot;];
       class 287f6140c4c9ba05 systemRequirement;
       click 287f6140c4c9ba05 &quot;WebInterface.html#model-centric-view-generation&quot;;
       f2578977bd9395ad[&quot;Model View Element Navigation&quot;];
@@ -740,7 +763,7 @@ blockquote {
       7afe0ab429e8f97f[&quot;Serve Command&quot;];
       class 7afe0ab429e8f97f systemRequirement;
       click 7afe0ab429e8f97f &quot;WebInterface.html#serve-command&quot;;
-      17774b4ce265515[&quot;Web Interface Color Scheme&quot;];
+      17774b4ce265515[&quot;Web Interface Color Scheme<br/>📎 requirements/System/Output/DesignDocuments/OutputFormats.md#color-scheme-specification<br/>📎 requirements/Interfaces/DesignDocuments/WebInterfaceStyles.md#web-interface-style-specification&quot;];
       class 17774b4ce265515 systemRequirement;
       click 17774b4ce265515 &quot;WebInterface.html#web-interface-color-scheme&quot;;
     end
@@ -843,14 +866,14 @@ blockquote {
   6b82beacdfe5cb16 -->|satisfiedBy| 443f72e06773b2fa;
   3eba0fc81a8f5376 -->|satisfiedBy| 443f72e06773b2fa;
   22440e2b04a21e0d -->|satisfiedBy| 443f72e06773b2fa;
-  8899a52ea9866d8b[&quot;test.sh&quot;];
-  class 8899a52ea9866d8b default;
-  click 8899a52ea9866d8b &quot;../../tests/test-html-export/test.sh&quot;;
-  3b945d4fc7ba69e7 -->|satisfiedBy| 8899a52ea9866d8b;
   6fb925575a1602f1[&quot;test.sh&quot;];
   class 6fb925575a1602f1 default;
   click 6fb925575a1602f1 &quot;../../tests/test-cli-help-structure/test.sh&quot;;
   7ce243221ec8f143 -->|satisfiedBy| 6fb925575a1602f1;
+  8899a52ea9866d8b[&quot;test.sh&quot;];
+  class 8899a52ea9866d8b default;
+  click 8899a52ea9866d8b &quot;../../tests/test-html-export/test.sh&quot;;
+  3b945d4fc7ba69e7 -->|satisfiedBy| 8899a52ea9866d8b;
   e3433ff5bc275516[&quot;test.sh&quot;];
   class e3433ff5bc275516 default;
   click e3433ff5bc275516 &quot;../../tests/test-model-command/test.sh&quot;;
@@ -869,9 +892,9 @@ blockquote {
 <p><strong>Working Directory Setup:</strong></p>
 <ul>
 <li>Create temporary working directory (e.g., in /tmp)</li>
-<li>Use graph registry to identify all model files and artifacts</li>
-<li>Copy all identified files to temporary directory preserving structure</li>
+<li>Generate markdown files from registry with full relations (user-created and auto-generated inverse relations)</li>
 <li>Copy all related system elements (following satisfiedBy and other relations)</li>
+<li>Copy all attachment files to temporary directory preserving structure</li>
 </ul>
 <p><strong>Generation Pipeline (in temporary directory):</strong>
 Execute all generation commands treating temporary directory as repository root:</p>
@@ -891,10 +914,11 @@ Execute all generation commands treating temporary directory as repository root:
 </ul>
 <p><strong>Output:</strong></p>
 <ul>
-<li>Accept <code>--output</code> option (default: ‘html’)</li>
-<li>Create output folder if not existing</li>
+<li>Accept optional <code>--output</code> option to specify output directory</li>
+<li>When <code>--output</code> is not specified, export to a temporary directory and print the path</li>
+<li>When <code>--output</code> is specified, create output folder if not existing</li>
 <li>Copy generated HTML and all artifacts from temp directory to output directory</li>
-<li>Clean up temporary working directory</li>
+<li>Clean up temporary working directory (except when output is temp directory)</li>
 </ul>
 <p><strong>Source Protection:</strong></p>
 <ul>
@@ -938,7 +962,7 @@ The system shall provide a fixed navigation bar in all HTML pages with links to 
 <li>Clearly visible and accessible</li>
 </ul>
 <p><strong>HTML Design:</strong>
-The system shall design and implement HTML pages with consistent layout, styling, and navigation for browsing the MBSE model.</p>
+The system shall design and implement HTML pages with consistent layout, styling, and navigation for browsing the System model.</p>
 <p><strong>Logo and Branding:</strong></p>
 <ul>
 <li>The navigation bar shall display the Reqvire logo on the left side before the navigation links</li>
@@ -946,20 +970,127 @@ The system shall design and implement HTML pages with consistent layout, styling
 <li>Apple touch icons shall be included for mobile device support</li>
 <li>All brand assets shall be exported to an assets folder during HTML export</li>
 </ul>
+<h4>Attachments</h4>
+<ul>
+<li><a href="DesignDocuments/WebInterfaceStyles.html#web-interface-style-specification">Web Interface Style Specification</a></li>
+<li><a href="DesignDocuments/WebInterfaceStyles.html#web-interface-navigation-behavior">Web Interface Navigation Behavior</a></li>
+</ul>
 <h4>Relations</h4>
 <ul>
-<li>derivedFrom: <a href="../UserStories.html#model-export">Model Export</a></li>
+<li>derive: <a href="#attachment-export">Attachment Export</a></li>
+<li>derive: <a href="#containment-view-attachment-links">Containment View Attachment Links</a></li>
+<li>derive: <a href="#diagram-attachment-display">Diagram Attachment Display</a></li>
+<li>derive: <a href="#model-centric-view-generation">Model-Centric View Generation</a></li>
+<li>derive: <a href="#web-interface-color-scheme">Web Interface Color Scheme</a></li>
 <li>derivedFrom: <a href="Interfaces.html#web-interface">Web Interface</a></li>
-<li>derivedFrom: <a href="CLI.html#cli-interface-structure">CLI Interface Structure</a></li>
-<li>derivedFrom: <a href="../System/Output/Reporting.html#model-reports">Model Reports</a></li>
-<li>satisfiedBy: <a href="../../core/src/html_export.rs">html_export.rs</a></li>
-<li>satisfiedBy: <a href="../../core/src/html.rs">html.rs</a></li>
 <li>satisfiedBy: <a href="../../cli/src/cli.rs">cli.rs</a></li>
+<li>satisfiedBy: <a href="../../core/src/export.rs">export.rs</a></li>
+<li>satisfiedBy: <a href="../../core/src/html.rs">html.rs</a></li>
+<li>satisfiedBy: <a href="../../core/src/html_export.rs">html_export.rs</a></li>
 <li>satisfiedBy: <a href="../../core/src/index_generator.rs">index_generator.rs</a></li>
 <li>satisfiedBy: <a href="../../core/templates/base.html">base.html</a></li>
 <li>satisfiedBy: <a href="../../core/templates/model.html">model.html</a></li>
-<li>satisfiedBy: <a href="../../core/src/export.rs">export.rs</a></li>
+<li>verifiedBy: <a href="Verifications/CLIVerifications.html#cli-help-structure-verification">CLI Help Structure Verification</a></li>
 <li>verifiedBy: <a href="Verifications/WebInterfaceVerifications.html#html-export-verification">HTML Export Verification</a></li>
+</ul>
+<hr />
+<h3 id="attachment-export">Attachment Export</h3>
+<p>The system shall copy all attachment files referenced by elements during HTML export to preserve document completeness and enable navigation.</p>
+<h4>Details</h4>
+<p>During HTML export, the system shall:</p>
+<ul>
+<li>Identify all attachments from element.attachments across the model</li>
+<li>Copy each attachment file to the output directory preserving relative paths</li>
+<li>Skip duplicate attachments (same file referenced by multiple elements)</li>
+<li>Log attachment copying progress</li>
+</ul>
+<p>This ensures exported documentation includes all referenced external documents (PDFs, design documents, etc.) for complete offline browsing.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#html-export">HTML Export</a></li>
+<li>satisfiedBy: <a href="../../core/src/export.rs">export.rs</a></li>
+<li>verifiedBy: <a href="Verifications/WebInterfaceVerifications.html#attachment-export-verification">Attachment Export Verification</a></li>
+</ul>
+<hr />
+<h3 id="containment-view-attachment-links">Containment View Attachment Links</h3>
+<p>The system shall display attachment links as children of elements in the containment D3.js tree to provide quick access to associated documents.</p>
+<h4>Details</h4>
+<p>For each element with attachments:</p>
+<ul>
+<li>Display attachments as child nodes in the D3.js tree</li>
+<li>Element attachments use wrench icon (🔧) with type <code>attachment-element</code></li>
+<li>File attachments use paperclip icon (📎) with type <code>attachment-file</code></li>
+<li>Element attachments are clickable and navigate to the referenced element</li>
+<li>File attachments show filename and path for reference</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#html-export">HTML Export</a></li>
+<li>satisfiedBy: <a href="../../core/src/containment.rs">containment.rs</a></li>
+<li>verifiedBy: <a href="Verifications/WebInterfaceVerifications.html#containment-attachment-links-verification">Containment Attachment Links Verification</a></li>
+</ul>
+<hr />
+<h3 id="diagram-attachment-display">Diagram Attachment Display</h3>
+<p>The system shall display attachment links within element boxes in generated diagrams to show document associations visually.</p>
+<h4>Details</h4>
+<p>In Mermaid diagrams:</p>
+<ul>
+<li>Element boxes shall include attachment links below the element name</li>
+<li>Use paperclip icon (📎) prefix for each attachment</li>
+<li>Show filename only (not full path) for space efficiency</li>
+<li>Make attachment links clickable to open the document</li>
+<li>Format using Mermaid’s multiline label syntax (<code>&lt;br/&gt;</code>)</li>
+</ul>
+<p>Example Mermaid node:</p>
+<pre><code>elementId[&quot;Element Name&lt;br/&gt;📎 DesignDoc.md&quot;]
+</code></pre>
+<h4>Attachments</h4>
+<ul>
+<li><a href="../System/Output/DesignDocuments/DiagramStyles.html#mermaid-diagram-style-specification">Mermaid Diagram Style Specification</a></li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#html-export">HTML Export</a></li>
+<li>satisfiedBy: <a href="../../core/src/diagrams.rs">diagrams.rs</a></li>
+<li>verifiedBy: <a href="Verifications/WebInterfaceVerifications.html#diagram-attachment-display-verification">Diagram Attachment Display Verification</a></li>
+</ul>
+<hr />
+<h3 id="model-centric-view-generation">Model-Centric View Generation</h3>
+<p>The system shall generate a model-centric visualization during HTML export showing root requirements with nested relations containing full element details.</p>
+<h4>Details</h4>
+<ul>
+<li>Display root requirements (no hierarchical parent) as top-level entries</li>
+<li>Show relations nested inside elements with full target details recursively</li>
+<li>Include metadata about total elements and relations</li>
+<li>Generate mermaid diagrams showing all nested relations</li>
+<li>Output as markdown with embedded visualizations (model.html)</li>
+</ul>
+<h4>Attachments</h4>
+<ul>
+<li><a href="../System/Output/DesignDocuments/DiagramStyles.html#mermaid-diagram-style-specification">Mermaid Diagram Style Specification</a></li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derive: <a href="#model-view-element-navigation">Model View Element Navigation</a></li>
+<li>derivedFrom: <a href="#html-export">HTML Export</a></li>
+<li>satisfiedBy: <a href="../../core/src/export.rs">export.rs</a></li>
+<li>satisfiedBy: <a href="../../core/src/report_model.rs">report_model.rs</a></li>
+</ul>
+<hr />
+<h3 id="model-view-element-navigation">Model View Element Navigation</h3>
+<p>The system shall make element names in the model-centric view clickable links that navigate to the element’s definition in its source file.</p>
+<h4>Details</h4>
+<ul>
+<li>Element names displayed as headers shall be hyperlinks</li>
+<li>Links shall point to the element’s source file with fragment identifier</li>
+<li>Format: <code>[Element Name](file_path#element-fragment)</code></li>
+<li>Enables direct navigation from model view to element definition</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#model-centric-view-generation">Model-Centric View Generation</a></li>
+<li>satisfiedBy: <a href="../../core/src/report_model.rs">report_model.rs</a></li>
+<li>verifiedBy: <a href="Verifications/WebInterfaceVerifications.html#model-view-element-navigation-test">Model View Element Navigation Test</a></li>
 </ul>
 <hr />
 <h3 id="web-interface-color-scheme">Web Interface Color Scheme</h3>
@@ -1040,106 +1171,17 @@ The containment tree shall use consistent colors for node types:
 <li>Tree animations: Smooth transitions for expand/collapse</li>
 <li>Node hover: Cursor pointer for interactive nodes</li>
 </ul>
+<h4>Attachments</h4>
+<ul>
+<li><a href="../System/Output/DesignDocuments/OutputFormats.html#color-scheme-specification">Color Scheme Specification</a></li>
+<li><a href="DesignDocuments/WebInterfaceStyles.html#web-interface-style-specification">Web Interface Style Specification</a></li>
+</ul>
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#html-export">HTML Export</a></li>
-<li>derivedFrom: <a href="../System/Output/DiagramGeneration.html#interactive-mermaid-diagrams">Interactive Mermaid Diagrams</a></li>
+<li>satisfiedBy: <a href="../../core/src/containment.rs">containment.rs</a></li>
 <li>satisfiedBy: <a href="../../core/src/html.rs">html.rs</a></li>
 <li>satisfiedBy: <a href="../../core/templates/base.html">base.html</a></li>
-<li>satisfiedBy: <a href="../../core/src/containment.rs">containment.rs</a></li>
-</ul>
-<hr />
-<h3 id="model-centric-view-generation">Model-Centric View Generation</h3>
-<p>The system shall generate a model-centric visualization during HTML export showing root requirements with nested relations containing full element details.</p>
-<h4>Details</h4>
-<ul>
-<li>Display root requirements (no hierarchical parent) as top-level entries</li>
-<li>Show relations nested inside elements with full target details recursively</li>
-<li>Include metadata about total elements and relations</li>
-<li>Generate mermaid diagrams showing all nested relations</li>
-<li>Output as markdown with embedded visualizations (model.html)</li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="../System/Output/DiagramGeneration.html#complete-model-structure-visualization">Complete Model Structure Visualization</a></li>
-<li>derivedFrom: <a href="../System/Output/DiagramGeneration.html#model-visualization-and-exploration">Model Visualization and Exploration</a></li>
-<li>derivedFrom: <a href="#html-export">HTML Export</a></li>
-<li>satisfiedBy: <a href="../../core/src/export.rs">export.rs</a></li>
-<li>satisfiedBy: <a href="../../core/src/report_model.rs">report_model.rs</a></li>
-</ul>
-<hr />
-<h3 id="model-view-element-navigation">Model View Element Navigation</h3>
-<p>The system shall make element names in the model-centric view clickable links that navigate to the element’s definition in its source file.</p>
-<h4>Details</h4>
-<ul>
-<li>Element names displayed as headers shall be hyperlinks</li>
-<li>Links shall point to the element’s source file with fragment identifier</li>
-<li>Format: <code>[Element Name](file_path#element-fragment)</code></li>
-<li>Enables direct navigation from model view to element definition</li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="#model-centric-view-generation">Model-Centric View Generation</a></li>
-<li>satisfiedBy: <a href="../../core/src/report_model.rs">report_model.rs</a></li>
-<li>verifiedBy: <a href="Verifications/WebInterfaceVerifications.html#model-view-element-navigation-test">Model View Element Navigation Test</a></li>
-</ul>
-<hr />
-<h3 id="attachment-export">Attachment Export</h3>
-<p>The system shall copy all attachment files referenced by elements during HTML export to preserve document completeness and enable navigation.</p>
-<h4>Details</h4>
-<p>During HTML export, the system shall:</p>
-<ul>
-<li>Identify all attachments from element.attachments across the model</li>
-<li>Copy each attachment file to the output directory preserving relative paths</li>
-<li>Skip duplicate attachments (same file referenced by multiple elements)</li>
-<li>Log attachment copying progress</li>
-</ul>
-<p>This ensures exported documentation includes all referenced external documents (PDFs, design documents, etc.) for complete offline browsing.</p>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="#html-export">HTML Export</a></li>
-<li>satisfiedBy: <a href="../../core/src/export.rs">export.rs</a></li>
-<li>verifiedBy: <a href="Verifications/WebInterfaceVerifications.html#attachment-export-verification">Attachment Export Verification</a></li>
-</ul>
-<hr />
-<h3 id="containment-view-attachment-links">Containment View Attachment Links</h3>
-<p>The system shall display attachment links as children of elements in the containment D3.js tree to provide quick access to associated documents.</p>
-<h4>Details</h4>
-<p>For each element with attachments:</p>
-<ul>
-<li>Display attachments as child nodes in the D3.js tree</li>
-<li>Element attachments use wrench icon (🔧) with type <code>attachment-element</code></li>
-<li>File attachments use paperclip icon (📎) with type <code>attachment-file</code></li>
-<li>Element attachments are clickable and navigate to the referenced element</li>
-<li>File attachments show filename and path for reference</li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="#html-export">HTML Export</a></li>
-<li>satisfiedBy: <a href="../../core/src/containment.rs">containment.rs</a></li>
-<li>verifiedBy: <a href="Verifications/WebInterfaceVerifications.html#containment-attachment-links-verification">Containment Attachment Links Verification</a></li>
-</ul>
-<hr />
-<h3 id="diagram-attachment-display">Diagram Attachment Display</h3>
-<p>The system shall display attachment links within element boxes in generated diagrams to show document associations visually.</p>
-<h4>Details</h4>
-<p>In Mermaid diagrams:</p>
-<ul>
-<li>Element boxes shall include attachment links below the element name</li>
-<li>Use paperclip icon (📎) prefix for each attachment</li>
-<li>Show filename only (not full path) for space efficiency</li>
-<li>Make attachment links clickable to open the document</li>
-<li>Format using Mermaid’s multiline label syntax (<code>&lt;br/&gt;</code>)</li>
-</ul>
-<p>Example Mermaid node:</p>
-<pre><code>elementId[&quot;Element Name&lt;br/&gt;📎 DesignDoc.md&quot;]
-</code></pre>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="#html-export">HTML Export</a></li>
-<li>derivedFrom: <a href="../System/Output/DiagramGeneration.html#complete-model-structure-visualization">Complete Model Structure Visualization</a></li>
-<li>satisfiedBy: <a href="../../core/src/diagrams.rs">diagrams.rs</a></li>
-<li>verifiedBy: <a href="Verifications/WebInterfaceVerifications.html#diagram-attachment-display-verification">Diagram Attachment Display Verification</a></li>
 </ul>
 <hr />
 <h3 id="serve-command">Serve Command</h3>
@@ -1159,9 +1201,9 @@ The containment tree shall use consistent colors for node types:
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="Interfaces.html#web-interface">Web Interface</a></li>
-<li>trace: <a href="CLI.html#validate-command">Validate Command</a></li>
 <li>satisfiedBy: <a href="../../cli/src/cli.rs">cli.rs</a></li>
 <li>satisfiedBy: <a href="../../cli/src/serve.rs">serve.rs</a></li>
+<li>trace: <a href="CLI.html#validate-command">Validate Command</a></li>
 <li>verifiedBy: <a href="Verifications/WebInterfaceVerifications.html#serve-command-verification">Serve Command Verification</a></li>
 </ul>
 <hr />

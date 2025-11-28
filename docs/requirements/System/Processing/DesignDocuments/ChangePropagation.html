@@ -198,31 +198,31 @@ blockquote {
 }
 .diagram-nav-buttons {
     position: absolute;
-    top: 10px;
-    left: 10px;
+    top: 5px;
+    left: 5px;
     z-index: 999; /* higher than SVG (1) but lower than header nav (1000) */
     display: flex;
     flex-direction: column;
-    gap: 5px;
-    background-color: rgba(255, 255, 255, 0.9);
-    padding: 5px;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    gap: 2px;
+    background-color: rgba(255, 255, 255, 0.85);
+    padding: 3px;
+    border-radius: 3px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
 }
 .diagram-nav-row {
     display: flex;
-    gap: 5px;
+    gap: 2px;
     justify-content: center;
 }
 .diagram-nav-btn {
-    width: 32px;
-    height: 32px;
+    width: 22px;
+    height: 22px;
     background-color: var(--color-primary);
     color: white;
     border: none;
-    border-radius: 3px;
+    border-radius: 2px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 11px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -318,6 +318,27 @@ blockquote {
                     return;
                 }
 
+                // Get the natural size of the diagram
+                var bbox = svg.getBBox();
+                var containerWidth = mermaidContainer.clientWidth;
+                var containerHeight = mermaidContainer.clientHeight;
+
+                // Check if diagram fits within container (with some padding)
+                var padding = 40;
+                var fitsInContainer = (bbox.width <= containerWidth - padding) && (bbox.height <= containerHeight - padding);
+
+                if (fitsInContainer) {
+                    // Diagram fits - use natural size, shrink container to fit content
+                    svg.style.width = 'auto';
+                    svg.style.height = 'auto';
+                    mermaidContainer.style.height = 'auto';
+                    mermaidContainer.style.minHeight = (bbox.height + padding) + 'px';
+                    mermaidContainer.style.maxHeight = 'calc(100vh - 150px)';
+                    // No pan/zoom needed for small diagrams
+                    return;
+                }
+
+                // Large diagram - enable pan/zoom
                 svg.style.maxWidth = 'none';
                 svg.style.maxHeight = 'none';
 
@@ -696,7 +717,9 @@ blockquote {
         <a href="../../../../index.html">Containment</a>
         <a href="../../../../model.html">Model</a>
         <a href="../../../../traces.html">Traces</a>
+        <a href="../../../../traceflow.html">TraceFlow</a>
         <a href="../../../../coverage.html">Coverage</a>
+        <a href="../../../../resources.html">Resources</a>
     </nav>
     <div class="reqvire-nav-spacer"></div>
     <div class="container">
@@ -767,7 +790,7 @@ Automated tools should flag all impacted requirements for review.</p>
 <li>Change impact compares both element hash AND attachment hashes independently</li>
 <li>Attach operation: new attachment hash appears -&gt; triggers impact</li>
 <li>Detach operation: attachment hash removed -&gt; triggers impact</li>
-<li>mv-attachment operation: path change only -&gt; does NOT trigger impact (tracked for reporting like relation renames)</li>
+<li>mv-asset operation: path change only -&gt; does NOT trigger impact (tracked for reporting like relation renames)</li>
 <li>If attached document content changes: attachment hash differs -&gt; triggers impact on element</li>
 <li>Path renames are tracked separately for reference updates without impact propagation</li>
 </ul>
@@ -971,7 +994,7 @@ The system shall meet defined performance criteria as specified in the attached 
 <li>Change impact propagates through verifiedBy -&gt; <code>test_cases/performance_tests.md</code> requires update</li>
 </ul>
 <p><strong>Scenario 2: Attachment Path Rename</strong></p>
-<p>If <code>docs/SLA.pdf</code> is renamed to <code>docs/service_level_agreement.pdf</code> using <code>mv-attachment</code>:</p>
+<p>If <code>docs/SLA.pdf</code> is renamed to <code>docs/service_level_agreement.pdf</code> using <code>mv-asset</code>:</p>
 <ul>
 <li>Path changes but document content unchanged</li>
 <li>Element content hash remains the same -&gt; NO change impact triggered</li>

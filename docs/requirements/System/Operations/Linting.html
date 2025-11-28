@@ -198,31 +198,31 @@ blockquote {
 }
 .diagram-nav-buttons {
     position: absolute;
-    top: 10px;
-    left: 10px;
+    top: 5px;
+    left: 5px;
     z-index: 999; /* higher than SVG (1) but lower than header nav (1000) */
     display: flex;
     flex-direction: column;
-    gap: 5px;
-    background-color: rgba(255, 255, 255, 0.9);
-    padding: 5px;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    gap: 2px;
+    background-color: rgba(255, 255, 255, 0.85);
+    padding: 3px;
+    border-radius: 3px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
 }
 .diagram-nav-row {
     display: flex;
-    gap: 5px;
+    gap: 2px;
     justify-content: center;
 }
 .diagram-nav-btn {
-    width: 32px;
-    height: 32px;
+    width: 22px;
+    height: 22px;
     background-color: var(--color-primary);
     color: white;
     border: none;
-    border-radius: 3px;
+    border-radius: 2px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 11px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -318,6 +318,27 @@ blockquote {
                     return;
                 }
 
+                // Get the natural size of the diagram
+                var bbox = svg.getBBox();
+                var containerWidth = mermaidContainer.clientWidth;
+                var containerHeight = mermaidContainer.clientHeight;
+
+                // Check if diagram fits within container (with some padding)
+                var padding = 40;
+                var fitsInContainer = (bbox.width <= containerWidth - padding) && (bbox.height <= containerHeight - padding);
+
+                if (fitsInContainer) {
+                    // Diagram fits - use natural size, shrink container to fit content
+                    svg.style.width = 'auto';
+                    svg.style.height = 'auto';
+                    mermaidContainer.style.height = 'auto';
+                    mermaidContainer.style.minHeight = (bbox.height + padding) + 'px';
+                    mermaidContainer.style.maxHeight = 'calc(100vh - 150px)';
+                    // No pan/zoom needed for small diagrams
+                    return;
+                }
+
+                // Large diagram - enable pan/zoom
                 svg.style.maxWidth = 'none';
                 svg.style.maxHeight = 'none';
 
@@ -696,7 +717,9 @@ blockquote {
         <a href="../../../index.html">Containment</a>
         <a href="../../../model.html">Model</a>
         <a href="../../../traces.html">Traces</a>
+        <a href="../../../traceflow.html">TraceFlow</a>
         <a href="../../../coverage.html">Coverage</a>
+        <a href="../../../resources.html">Resources</a>
     </nav>
     <div class="reqvire-nav-spacer"></div>
     <div class="container">
@@ -712,13 +735,6 @@ blockquote {
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
-  subgraph 1c3bc86f926627ab[&quot;📁 requirements/Interfaces&quot;]
-    subgraph 315f1b2b98bf7d1b[&quot;📄 CLI.md&quot;]
-      e3d0ab61770fae47[&quot;CLI Lint Command<br/>📎 requirements/System/Output/DesignDocuments/OutputFormats.md#json-output-structure<br/>📎 requirements/System/Output/DesignDocuments/OutputFormats.md#text-output-formatting&quot;];
-      class e3d0ab61770fae47 systemRequirement;
-      click e3d0ab61770fae47 &quot;../../Interfaces/CLI.html#cli-lint-command&quot;;
-    end
-  end
   subgraph 94359ac729226de6[&quot;📁 requirements/System/Operations&quot;]
     subgraph ef60c20abd3a6265[&quot;📄 Linting.md&quot;]
       4ea9fd0cb008a7d1[&quot;Lint Auto-fix Capability&quot;];
@@ -753,7 +769,6 @@ blockquote {
   end
   4ea9fd0cb008a7d1 -.->|verifiedBy| ca79dd677191c9dd;
   6f992bcf1f37ec46 -.->|verifiedBy| ca79dd677191c9dd;
-  b131ca76ea79134d -.->|deriveReqT| e3d0ab61770fae47;
   b131ca76ea79134d -.->|deriveReqT| 6f992bcf1f37ec46;
   b131ca76ea79134d -.->|deriveReqT| 65dd8a2e87f01d79;
   b131ca76ea79134d -.->|deriveReqT| 2bd0565cb57ff27c;
@@ -771,8 +786,25 @@ blockquote {
   class 68ac732fe5c5db53 default;
   click 68ac732fe5c5db53 &quot;../../../tests/test-lint-command/test.sh&quot;;
   ca79dd677191c9dd -->|satisfiedBy| 68ac732fe5c5db53;
-  e3d0ab61770fae47 -.->|deriveReqT| 4ea9fd0cb008a7d1;
 </div>
+<h3 id="lint-auto-fix-capability">Lint Auto-fix Capability</h3>
+<p>The system shall provide automatic fixing capability for auto-fixable lint issues, applying changes directly to model files when the <code>--fix</code> flag is used.</p>
+<h4>Details</h4>
+<p>Auto-fix shall:</p>
+<ul>
+<li>Only apply fixes for issues categorized as auto-fixable</li>
+<li>Modify the affected markdown files directly</li>
+<li>Remove redundant verify relations from verification elements</li>
+<li>Preserve all other content and formatting in the files</li>
+<li>Report all changes made (files modified, relations removed)</li>
+<li>Skip issues categorized as needing manual review</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../../Interfaces/CLI.html#cli-lint-command">CLI Lint Command</a></li>
+<li>verifiedBy: <a href="Verifications/LintingVerifications.html#lint-command-verification">Lint Command Verification</a></li>
+</ul>
+<hr />
 <h3 id="model-linting">Model Linting</h3>
 <p>The system shall provide model linting capabilities to analyze model quality and detect issues in requirements relations.</p>
 <h4>Details</h4>
@@ -790,6 +822,10 @@ blockquote {
 </ul>
 <h4>Relations</h4>
 <ul>
+<li>derive: <a href="#lint-output-formatting">Lint Output Formatting</a></li>
+<li>derive: <a href="#multi-branch-convergence-detection">Multi-Branch Convergence Detection</a></li>
+<li>derive: <a href="#redundant-hierarchical-relations-detection">Redundant Hierarchical Relations Detection</a></li>
+<li>derive: <a href="#redundant-verify-relations-detection">Redundant Verify Relations Detection</a></li>
 <li>derivedFrom: <a href="../../UserStories.html#validating-structures">Validating Structures</a></li>
 </ul>
 <hr />
@@ -822,84 +858,7 @@ blockquote {
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#model-linting">Model Linting</a></li>
-</ul>
-<hr />
-<h3 id="lint-auto-fix-capability">Lint Auto-fix Capability</h3>
-<p>The system shall provide automatic fixing capability for auto-fixable lint issues, applying changes directly to model files when the <code>--fix</code> flag is used.</p>
-<h4>Details</h4>
-<p>Auto-fix shall:</p>
-<ul>
-<li>Only apply fixes for issues categorized as auto-fixable</li>
-<li>Modify the affected markdown files directly</li>
-<li>Remove redundant verify relations from verification elements</li>
-<li>Preserve all other content and formatting in the files</li>
-<li>Report all changes made (files modified, relations removed)</li>
-<li>Skip issues categorized as needing manual review</li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="../../Interfaces/CLI.html#cli-lint-command">CLI Lint Command</a></li>
-</ul>
-<hr />
-<h3 id="redundant-verify-relations-detection">Redundant Verify Relations Detection</h3>
-<p>The system shall detect redundant verify relations where a verification directly verifies both a child requirement and its ancestor, leveraging the existing verification trace tree logic from the Verification Trace Builder.</p>
-<h4>Details</h4>
-<p>A verify relation is redundant when:</p>
-<ul>
-<li>A verification directly verifies both a leaf requirement AND its parent/ancestor in the hierarchy</li>
-<li>The verification trace tree shows that an ancestor requirement is also directly verified</li>
-<li>Since verification traces roll up automatically through derivedFrom relations, verifying the leaf is sufficient</li>
-</ul>
-<p>Detection shall:</p>
-<ul>
-<li>Reuse the trace tree building logic from <a href="../ModelManagement/VerificationTraces.html#verification-trace-builder">Verification Trace Builder</a></li>
-<li>Identify ancestor requirements in each verification’s trace tree that are also directly verified</li>
-<li>Report these as redundant relations that add noise to the model</li>
-<li>Categorize as <strong>auto-fixable</strong> since removing them is safe and mechanical</li>
-</ul>
-<h4>Attachments</h4>
-<ul>
-<li><a href="../Processing/DesignDocuments/VerificationTraceAlgorithm.html#verification-trace-tree-construction">Verification Trace Tree Construction</a></li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="#model-linting">Model Linting</a></li>
-</ul>
-<hr />
-<h3 id="redundant-hierarchical-relations-detection">Redundant Hierarchical Relations Detection</h3>
-<p>The system shall detect redundant derivedFrom relations where an element has direct derivedFrom relations to both a requirement and its ancestor in the requirement hierarchy, by leveraging the existing verification trace tree logic with a virtual verification element.</p>
-<h4>Details</h4>
-<p>A derivedFrom relation is redundant when:</p>
-<ul>
-<li>An element has a derivedFrom relation to an ancestor requirement</li>
-<li>The same element also reaches that ancestor through other derivedFrom relations via intermediate elements</li>
-<li>The hierarchy chain is already established through other paths (single or multiple convergent paths)</li>
-</ul>
-<p><strong>Core Rule</strong>: If an element has a direct relation to a parent, AND that parent is also reachable through ANY other path(s), then the direct relation is redundant and can be safely auto-removed.</p>
-<p>This applies to:</p>
-<ul>
-<li><strong>Single-chain redundancy</strong>: Element reaches ancestor through exactly one intermediate path (e.g., A → B → C, with redundant A → C)</li>
-<li><strong>Multi-path/branching redundancy</strong>: Element reaches ancestor through multiple convergent paths (e.g., A → B → D and A → C → D, with redundant A → D)</li>
-</ul>
-<p>Detection shall:</p>
-<ul>
-<li>Create a virtual/dummy verification element</li>
-<li>Connect the virtual verification to ALL leaf requirements (requirements with no derived children) via virtual verify relations</li>
-<li>Apply the same trace tree building logic used for verification upward traceability</li>
-<li>The trace tree will naturally identify when leaf requirements have derivedFrom relations to both a parent and its ancestor</li>
-<li>Report these as redundant hierarchical relations</li>
-<li>Categorize ALL redundant hierarchical relations as <strong>auto-fixable</strong> since the direct relation adds no value when alternate paths exist</li>
-<li>Identify which intermediate paths provide the alternate routes to the ancestor</li>
-</ul>
-<p>This approach reuses the proven trace tree logic for redundancy detection, ensuring consistency with verify relation redundancy detection.</p>
-<p><strong>Note</strong>: The current implementation only detects cases where a direct redundant relation EXISTS. It does not detect or suggest whether converging paths without a direct relation should have one added - that remains a semantic modeling decision.</p>
-<h4>Attachments</h4>
-<ul>
-<li><a href="../Processing/DesignDocuments/VerificationTraceAlgorithm.html#verification-trace-tree-construction">Verification Trace Tree Construction</a></li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="#model-linting">Model Linting</a></li>
+<li>verifiedBy: <a href="Verifications/LintingVerifications.html#lint-command-verification">Lint Command Verification</a></li>
 </ul>
 <hr />
 <h3 id="multi-branch-convergence-detection">Multi-Branch Convergence Detection</h3>
@@ -950,6 +909,43 @@ blockquote {
 <li>verifiedBy: <a href="Verifications/LintingVerifications.html#lint-command-verification">Lint Command Verification</a></li>
 </ul>
 <hr />
+<h3 id="redundant-hierarchical-relations-detection">Redundant Hierarchical Relations Detection</h3>
+<p>The system shall detect redundant derivedFrom relations where an element has direct derivedFrom relations to both a requirement and its ancestor in the requirement hierarchy, by leveraging the existing verification trace tree logic with a virtual verification element.</p>
+<h4>Details</h4>
+<p>A derivedFrom relation is redundant when:</p>
+<ul>
+<li>An element has a derivedFrom relation to an ancestor requirement</li>
+<li>The same element also reaches that ancestor through other derivedFrom relations via intermediate elements</li>
+<li>The hierarchy chain is already established through other paths (single or multiple convergent paths)</li>
+</ul>
+<p><strong>Core Rule</strong>: If an element has a direct relation to a parent, AND that parent is also reachable through ANY other path(s), then the direct relation is redundant and can be safely auto-removed.</p>
+<p>This applies to:</p>
+<ul>
+<li><strong>Single-chain redundancy</strong>: Element reaches ancestor through exactly one intermediate path (e.g., A → B → C, with redundant A → C)</li>
+<li><strong>Multi-path/branching redundancy</strong>: Element reaches ancestor through multiple convergent paths (e.g., A → B → D and A → C → D, with redundant A → D)</li>
+</ul>
+<p>Detection shall:</p>
+<ul>
+<li>Create a virtual/dummy verification element</li>
+<li>Connect the virtual verification to ALL leaf requirements (requirements with no derived children) via virtual verify relations</li>
+<li>Apply the same trace tree building logic used for verification upward traceability</li>
+<li>The trace tree will naturally identify when leaf requirements have derivedFrom relations to both a parent and its ancestor</li>
+<li>Report these as redundant hierarchical relations</li>
+<li>Categorize ALL redundant hierarchical relations as <strong>auto-fixable</strong> since the direct relation adds no value when alternate paths exist</li>
+<li>Identify which intermediate paths provide the alternate routes to the ancestor</li>
+</ul>
+<p>This approach reuses the proven trace tree logic for redundancy detection, ensuring consistency with verify relation redundancy detection.</p>
+<p><strong>Note</strong>: The current implementation only detects cases where a direct redundant relation EXISTS. It does not detect or suggest whether converging paths without a direct relation should have one added - that remains a semantic modeling decision.</p>
+<h4>Attachments</h4>
+<ul>
+<li><a href="../Processing/DesignDocuments/VerificationTraceAlgorithm.html#verification-trace-tree-construction">Verification Trace Tree Construction</a></li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derive: <a href="#safe-redundant-hierarchical-relations-auto-removal">Safe Redundant Hierarchical Relations Auto-Removal</a></li>
+<li>derivedFrom: <a href="#model-linting">Model Linting</a></li>
+</ul>
+<hr />
 <h3 id="safe-redundant-hierarchical-relations-auto-removal">Safe Redundant Hierarchical Relations Auto-Removal</h3>
 <p>The system shall provide safe auto-removal of redundant hierarchical derivation relations when alternate paths to the target exist, ensuring model integrity is preserved while reducing redundancy.</p>
 <h4>Details</h4>
@@ -990,6 +986,32 @@ Reason: D is reachable via A → B → D and A → C → D
 <ul>
 <li>derivedFrom: <a href="#redundant-hierarchical-relations-detection">Redundant Hierarchical Relations Detection</a></li>
 <li>satisfiedBy: <a href="../../../core/src/lint.rs">lint.rs</a></li>
+<li>verifiedBy: <a href="Verifications/LintingVerifications.html#lint-command-verification">Lint Command Verification</a></li>
+</ul>
+<hr />
+<h3 id="redundant-verify-relations-detection">Redundant Verify Relations Detection</h3>
+<p>The system shall detect redundant verify relations where a verification directly verifies both a child requirement and its ancestor, leveraging the existing verification trace tree logic from the Verification Trace Builder.</p>
+<h4>Details</h4>
+<p>A verify relation is redundant when:</p>
+<ul>
+<li>A verification directly verifies both a leaf requirement AND its parent/ancestor in the hierarchy</li>
+<li>The verification trace tree shows that an ancestor requirement is also directly verified</li>
+<li>Since verification traces roll up automatically through derivedFrom relations, verifying the leaf is sufficient</li>
+</ul>
+<p>Detection shall:</p>
+<ul>
+<li>Reuse the trace tree building logic from <a href="../ModelManagement/VerificationTraces.html#verification-trace-builder">Verification Trace Builder</a></li>
+<li>Identify ancestor requirements in each verification’s trace tree that are also directly verified</li>
+<li>Report these as redundant relations that add noise to the model</li>
+<li>Categorize as <strong>auto-fixable</strong> since removing them is safe and mechanical</li>
+</ul>
+<h4>Attachments</h4>
+<ul>
+<li><a href="../Processing/DesignDocuments/VerificationTraceAlgorithm.html#verification-trace-tree-construction">Verification Trace Tree Construction</a></li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#model-linting">Model Linting</a></li>
 <li>verifiedBy: <a href="Verifications/LintingVerifications.html#lint-command-verification">Lint Command Verification</a></li>
 </ul>
 <hr />

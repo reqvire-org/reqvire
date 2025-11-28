@@ -31,7 +31,7 @@ const ASSETS: &[(&str, &[u8])] = &[
 /// Page descriptions for HTML export pages
 const PAGE_DESCRIPTION_CONTAINMENT: &str = r#"# Containment
 
-Interactive tree view showing the physical organization of the model—how elements are structured within folders and files. Click on folders and files to expand/collapse, or click on elements to navigate to their definitions. Use the Expand All/Collapse All buttons to control the tree view."#;
+The containment view shows the physical organization of the model—how requirements, verifications, and other elements are structured within folders and files. This hierarchical view helps you understand the model's file structure and navigate to specific elements."#;
 
 
 const PAGE_DESCRIPTION_MODEL: &str = r#"# Model
@@ -54,6 +54,16 @@ const PAGE_DESCRIPTION_COVERAGE: &str = r#"# Verification Coverage
 
 Coverage analysis focuses on **leaf requirements**—the lowest-level requirements that don't derive others. In MBSE, these are the implementable specifications. The **roll-up strategy** means verifying leaves provides automatic coverage to their ancestors through derivedFrom chains. This report shows verified vs. unverified leaf percentages by file and type, identifying where verification effort is needed."#;
 
+const PAGE_DESCRIPTION_TRACEFLOW: &str = r#"# TraceFlow
+
+The TraceFlow view visualizes the verification traceability flow as an interactive Sankey diagram. It shows how requirements flow from stakeholder needs (user requirements) through system specifications (system requirements) to verifications. Link width indicates the number of connections between elements. Use this view to understand the overall traceability architecture and identify gaps in requirement coverage.
+
+**Instructions:** Use mouse wheel to zoom, drag to pan. Click on nodes to navigate to element definitions. Use the +/-/reset buttons for precise control."#;
+
+const PAGE_DESCRIPTION_RESOURCES: &str = r#"# Resources
+
+The resources view shows all files referenced by the model through relations and attachments. This includes implementation files (via satisfiedBy relations), traced documents (via trace relations), and attachment files like design specifications and images. Use this view to understand the implementation landscape and identify which elements reference each file."#;
+
 /// Copies assets folder to output directory
 fn copy_assets_folder(output_dir: &Path) -> Result<(), ReqvireError> {
     let assets_dir = output_dir.join("assets");
@@ -72,8 +82,9 @@ fn copy_assets_folder(output_dir: &Path) -> Result<(), ReqvireError> {
 }
 
 
-/// Copies all model files from graph registry to temporary directory
-pub fn copy_model_files_to_temp(
+/// Generates model markdown files with full relations and copies referenced files to temporary directory
+/// This generates markdown from the registry (with all relations) instead of copying original files
+pub fn flush_model_to_temp(
     registry: &GraphRegistry,
     temp_dir: &Path,
     current_dir: &Path,
@@ -87,33 +98,47 @@ pub fn copy_model_files_to_temp(
         None
     };
 
-    info!("Copying model files to temporary directory...");
+    info!("Generating model files with full relations to temporary directory...");
 
     let mut copied_files = HashSet::new();
 
-    // Copy all model markdown files from pages
-    for file_path in registry.pages.keys() {
-        let src = git_root.join(file_path);
+    // Generate markdown files from registry with full relations (user-created + auto-generated)
+    let grouped_elements = registry.group_elements_by_location();
+    let mut markdown_files_written = 0;
+
+    for (file_path, elements) in grouped_elements {
+        // Generate markdown content with full relations
+        let markdown_content = registry.generate_file_markdown(&file_path, &elements, true);
 
         // Strip subdirectory prefix from destination path if running from subdirectory
         let dest_path = if let Some(prefix) = subdir_prefix {
             if let Ok(stripped) = Path::new(file_path.as_str()).strip_prefix(prefix) {
                 temp_dir.join(stripped)
             } else {
-                temp_dir.join(file_path)
+                temp_dir.join(&file_path)
             }
         } else {
-            temp_dir.join(file_path)
+            temp_dir.join(&file_path)
         };
 
-        if src.exists() && !copied_files.contains(file_path.as_str()) {
-            filesystem::copy_file_with_structure(&src, &dest_path)?;
-            copied_files.insert(file_path.clone());
-            debug!("Copied model file: {} -> {}", file_path, dest_path.display());
+        // Create parent directories if needed
+        if let Some(parent_dir) = dest_path.parent() {
+            fs::create_dir_all(parent_dir)
+                .map_err(|e| ReqvireError::IoError(e))?;
         }
+
+        // Write the generated markdown file
+        fs::write(&dest_path, markdown_content)
+            .map_err(|e| ReqvireError::IoError(e))?;
+
+        copied_files.insert(file_path.clone());
+        markdown_files_written += 1;
+        debug!("Generated model file: {} -> {}", file_path, dest_path.display());
     }
 
-    // Copy all files referenced in relations
+    info!("✅ Generated {} markdown files with full relations", markdown_files_written);
+
+    // Copy all files referenced in relations (InternalPath)
     for node in registry.nodes.values() {
         for relation in &node.element.relations {
             if let crate::relation::LinkType::InternalPath(path) = &relation.target.link {
@@ -166,7 +191,7 @@ pub fn copy_model_files_to_temp(
         }
     }
 
-    info!("✅ Copied {} files to temporary directory", copied_files.len());
+    info!("✅ Total {} files in temporary directory", copied_files.len());
     Ok(())
 }
 
@@ -232,7 +257,13 @@ fn copy_html_and_assets(src: &Path, dst: &Path, temp_root: &Path) -> Result<(), 
 /// Post-processes generated HTML files to convert .md references to .html in display text
 /// This fixes text like "File: path/to/file.md" that appears in HTML content
 fn post_process_html_files(temp_dir: &Path) -> Result<(), ReqvireError> {
-    let html_files = vec!["index.html", "traces.html", "coverage.html", "containment.html"];
+    use regex::Regex;
+
+    let html_files = vec!["index.html", "traces.html", "traceflow.html", "coverage.html", "containment.html"];
+
+    // Only convert .md to .html in heading id attributes and heading text content
+    // IMPORTANT: Do NOT convert .md in script tags - D3 JSON data and JS code need .md preserved
+    let id_attr_regex = Regex::new(r#"(id="[^"]*?)\.md""#).unwrap();
 
     for file_name in html_files {
         let file_path = temp_dir.join(file_name);
@@ -243,12 +274,15 @@ fn post_process_html_files(temp_dir: &Path) -> Result<(), ReqvireError> {
         let content = fs::read_to_string(&file_path)
             .map_err(|e| ReqvireError::IoError(e))?;
 
-        // Convert .md references to .html in HTML text content and id attributes
-        // This handles heading text and other display text containing file paths
-        // Example: <h2 id="file:-path/to/file.md">File: path/to/file.md</h2>
-        // becomes: <h2 id="file:-path/to/file.html">File: path/to/file.html</h2>
-        let processed = content
-            .replace(".md\"", ".html\"")  // Fix id attributes and quoted strings
+        // Convert .md references to .html ONLY in specific contexts:
+        // 1. ID attributes: id="file:-path/file.md" → id="file:-path/file.html"
+        // 2. Heading text ending tags: .md</h1>, .md</h2>, etc.
+        //
+        // We must NOT convert:
+        // - Script content (D3 JSON data with "name": "file.md")
+        // - JavaScript code with .replace(".html", ".md")
+        let processed = id_attr_regex.replace_all(&content, r#"${1}.html""#);
+        let processed = processed
             .replace(".md</h1>", ".html</h1>")
             .replace(".md</h2>", ".html</h2>")
             .replace(".md</h3>", ".html</h3>")
@@ -294,8 +328,8 @@ pub fn generate_artifacts_in_temp(
     let temp_dir = filesystem::create_temp_working_dir()?;
     info!("✅ Temporary directory: {}", temp_dir.display());
 
-    // Step 2: Copy all model files to temp
-    copy_model_files_to_temp(registry, &temp_dir, current_dir, git_root)?;
+    // Step 2: Generate model files with full relations to temp
+    flush_model_to_temp(registry, &temp_dir, current_dir, git_root)?;
 
     // Step 3: Initialize git repository in temp directory
     info!("Initializing git repository in temporary directory...");
@@ -383,12 +417,22 @@ pub fn generate_artifacts_in_temp(
     );
     let trace_report = trace_generator.generate();
     let traces_markdown = trace_generator.generate_markdown(&trace_report);
+    let sankey_markdown = crate::verification_trace::generate_sankey_markdown(&trace_report);
     let traces_content = format!(
         "{}\n\n{}",
         PAGE_DESCRIPTION_TRACES,
         traces_markdown
     );
     filesystem::write_file("traces.md", traces_content.as_bytes())?;
+
+    // Generate traceflow.md (dedicated TraceFlow page with just Sankey diagram)
+    info!("Generating traceflow.md...");
+    let traceflow_content = format!(
+        "{}\n\n{}",
+        PAGE_DESCRIPTION_TRACEFLOW,
+        sankey_markdown
+    );
+    filesystem::write_file("traceflow.md", traceflow_content.as_bytes())?;
 
     info!("Generating coverage.md...");
     let coverage_report = crate::report_coverage::generate_coverage_report(&temp_model_manager.graph_registry);
@@ -400,15 +444,101 @@ pub fn generate_artifacts_in_temp(
     );
     filesystem::write_file("coverage.md", coverage_content.as_bytes())?;
 
-    // Generate containment.md (D3 tree - containment view)
-    info!("Generating containment.md (D3 tree - containment view)...");
-    let d3_tree_content = crate::diagrams::generate_containment_d3_tree(&temp_model_manager.graph_registry, false)?;
+    // Generate containment.md (D3 visualizations - containment view with toggle)
+    info!("Generating containment.md (D3 visualizations - containment view)...");
+    let d3_sunburst_content = crate::diagrams::generate_containment_d3_sunburst(&temp_model_manager.graph_registry, false)?;
+    let d3_icicle_content = crate::diagrams::generate_containment_d3_icicle(&temp_model_manager.graph_registry, false)?;
+
+    // Create containment page with view toggle
     let containment_content = format!(
-        "{}\n\n{}",
-        PAGE_DESCRIPTION_CONTAINMENT,
-        d3_tree_content
+        r#"{description}
+
+<div class="view-toggle">
+    <button id="btn-sunburst" class="view-btn active" onclick="showView('sunburst')">Sunburst</button>
+    <button id="btn-icicle" class="view-btn" onclick="showView('icicle')">Icicle</button>
+</div>
+
+<div id="view-sunburst" class="containment-view">
+
+<p class="view-instructions">Click on segments to zoom in. Click center circle to zoom out. Click the center name link to navigate to the element.</p>
+
+{sunburst}
+
+</div>
+
+<div id="view-icicle" class="containment-view">
+
+<p class="view-instructions">Click on bars to zoom in. Click breadcrumb path to navigate back. Click the element link to open it.</p>
+
+{icicle}
+
+</div>
+
+<script>
+// Hide icicle view after page loads (both render first so D3 can calculate dimensions)
+document.addEventListener('DOMContentLoaded', function() {{
+    document.getElementById('view-icicle').style.display = 'none';
+}});
+
+function showView(view) {{
+    // Hide all views
+    document.querySelectorAll('.containment-view').forEach(el => el.style.display = 'none');
+    // Remove active from all buttons
+    document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
+    // Show selected view
+    document.getElementById('view-' + view).style.display = 'block';
+    // Mark button as active
+    document.getElementById('btn-' + view).classList.add('active');
+}}
+</script>
+
+<style>
+.view-toggle {{
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+}}
+.view-btn {{
+    padding: 8px 20px;
+    border: 1px solid #BDBDBD;
+    background: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+}}
+.view-btn:hover {{
+    background: #F5F5F5;
+}}
+.view-btn.active {{
+    background: var(--color-primary, #3F51B5);
+    color: #fff;
+    border-color: var(--color-primary, #3F51B5);
+}}
+.view-instructions {{
+    color: #757575;
+    font-size: 13px;
+    margin: 0 0 12px 0;
+    font-style: italic;
+}}
+</style>
+"#,
+        description = PAGE_DESCRIPTION_CONTAINMENT,
+        sunburst = d3_sunburst_content,
+        icicle = d3_icicle_content
     );
     filesystem::write_file("containment.md", containment_content.as_bytes())?;
+
+    // Generate resources.md (files referenced by relations and attachments)
+    info!("Generating resources.md...");
+    let resources_report = crate::report_resources::generate_resources_report(&temp_model_manager.graph_registry);
+    let resources_text = resources_report.format_text();
+    let resources_content = format!(
+        "{}\n\n{}",
+        PAGE_DESCRIPTION_RESOURCES,
+        resources_text
+    );
+    filesystem::write_file("resources.md", resources_content.as_bytes())?;
 
     // Step 6: Convert markdown to HTML
     info!("Converting markdown to HTML...");

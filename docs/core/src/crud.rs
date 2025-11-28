@@ -14,7 +14,6 @@ use std::path::Path;
 /// * `model_manager` - The model manager
 /// * `element_markdown` - The markdown content for the element
 /// * `target_file` - Target file path (relative to current working directory)
-/// * `index` - Optional index for insertion
 /// * `excluded_patterns` - Patterns to exclude from path validation
 /// * `current_dir` - Current working directory (where command was invoked)
 /// * `git_root` - Git root directory
@@ -23,7 +22,6 @@ pub fn add_element(
     model_manager: &mut ModelManager,
     element_markdown: &str,
     target_file: &str,
-    index: Option<usize>,
     excluded_patterns: &GlobSet,
     current_dir: &Path,
     git_root: &Path,
@@ -45,7 +43,6 @@ pub fn add_element(
     let element = model_manager.graph_registry.create_element_from_string(
         element_markdown,
         &target_file_normalized,
-        index,
         excluded_patterns,
     )?;
 
@@ -144,7 +141,6 @@ pub fn remove_element(
 /// * `model_manager` - The model manager
 /// * `element_id` - ID of the element to move
 /// * `target_file` - Target file path (relative to current working directory)
-/// * `index` - Optional index for insertion
 /// * `excluded_patterns` - Patterns to exclude from path validation
 /// * `current_dir` - Current working directory (where command was invoked)
 /// * `git_root` - Git root directory
@@ -153,7 +149,6 @@ pub fn move_element(
     model_manager: &mut ModelManager,
     element_id: &str,
     target_file: &str,
-    index: Option<usize>,
     excluded_patterns: &GlobSet,
     current_dir: &Path,
     git_root: &Path,
@@ -183,7 +178,6 @@ pub fn move_element(
     let (new_id, _affected_files) = model_manager.graph_registry.move_element_comprehensive(
         element_id,
         &target_file_normalized,
-        index,
         excluded_patterns,
     )?;
 
@@ -377,6 +371,7 @@ pub fn attach(
     dry_run: bool,
 ) -> Result<CrudResult, ReqvireError> {
     use std::fs;
+    use std::path::PathBuf;
 
     // Find the element by name
     let element = model_manager.graph_registry.get_element_by_name(element_name)
@@ -404,8 +399,17 @@ pub fn attach(
         });
     }
 
+    // Calculate file-relative path for the attachment link in markdown
+    let file_dir = PathBuf::from(&file_path).parent()
+        .map(|p| p.to_path_buf())
+        .unwrap_or_default();
+    let attachment_path_buf = PathBuf::from(attachment_path);
+    let relative_attachment_path = pathdiff::diff_paths(&attachment_path_buf, &file_dir)
+        .unwrap_or_else(|| attachment_path_buf.clone());
+    let relative_attachment_str = relative_attachment_path.to_string_lossy();
+
     // Find the element in the file and add/update Attachments subsection
-    let new_content = add_attachment_to_element(&content, element_name, attachment_path)?;
+    let new_content = add_attachment_to_element(&content, element_name, &relative_attachment_str)?;
 
     // Generate diff
     let diff = generate_file_diff(&file_path, &content, &new_content);
@@ -437,6 +441,7 @@ pub fn detach(
     dry_run: bool,
 ) -> Result<CrudResult, ReqvireError> {
     use std::fs;
+    use std::path::PathBuf;
 
     // Find the element by name
     let element = model_manager.graph_registry.get_element_by_name(element_name)
@@ -452,8 +457,17 @@ pub fn detach(
     let content = fs::read_to_string(&absolute_file_path)
         .map_err(|e| ReqvireError::IoError(e))?;
 
+    // Calculate file-relative path for finding the attachment link in markdown
+    let file_dir = PathBuf::from(&file_path).parent()
+        .map(|p| p.to_path_buf())
+        .unwrap_or_default();
+    let attachment_path_buf = PathBuf::from(attachment_path);
+    let relative_attachment_path = pathdiff::diff_paths(&attachment_path_buf, &file_dir)
+        .unwrap_or_else(|| attachment_path_buf.clone());
+    let relative_attachment_str = relative_attachment_path.to_string_lossy();
+
     // Remove attachment from element
-    let new_content = remove_attachment_from_element(&content, element_name, attachment_path)?;
+    let new_content = remove_attachment_from_element(&content, element_name, &relative_attachment_str)?;
 
     // Generate diff
     let diff = generate_file_diff(&file_path, &content, &new_content);
@@ -656,8 +670,8 @@ pub fn detach_element(
     })
 }
 
-/// Move an attachment file and update all references across elements
-pub fn mv_attachment(
+/// Move an asset file and update all references across elements (Attachments and Relations)
+pub fn mv_asset(
     model_manager: &mut ModelManager,
     old_path: &str,
     new_path: &str,
@@ -665,38 +679,79 @@ pub fn mv_attachment(
     dry_run: bool,
 ) -> Result<CrudResult, ReqvireError> {
     use std::fs;
+    use crate::relation::LinkType;
+    use std::path::PathBuf;
 
-    // Find all elements with this attachment
-    let affected_elements: Vec<_> = model_manager.graph_registry.nodes.values()
-        .map(|node| &node.element)
-        .filter(|elem| elem.attachments.iter().any(|a| a.target.as_str() == old_path))
-        .map(|elem| (elem.identifier.clone(), elem.file_path.clone()))
-        .collect();
+    let old_path_buf = PathBuf::from(old_path);
 
-    if affected_elements.is_empty() {
+    // Find all elements with this file as attachment OR as InternalPath relation target
+    let mut affected_files: std::collections::HashSet<String> = std::collections::HashSet::new();
+    let mut attachment_count = 0;
+    let mut relation_count = 0;
+
+    for node in model_manager.graph_registry.nodes.values() {
+        let elem = &node.element;
+
+        // Check attachments
+        for attachment in &elem.attachments {
+            if attachment.target.as_str() == old_path {
+                affected_files.insert(elem.file_path.clone());
+                attachment_count += 1;
+            }
+        }
+
+        // Check relations with InternalPath
+        for relation in &elem.relations {
+            if let LinkType::InternalPath(ref path) = relation.target.link {
+                if path.to_string_lossy() == old_path {
+                    affected_files.insert(elem.file_path.clone());
+                    relation_count += 1;
+                }
+            }
+        }
+    }
+
+    if affected_files.is_empty() {
         return Err(ReqvireError::MissingAttachmentTarget(
-            format!("No elements have attachment '{}'", old_path)
+            format!("No elements reference file '{}'", old_path)
         ));
     }
 
     let mut all_diffs = vec![];
-    let mut affected_files: std::collections::HashSet<String> = std::collections::HashSet::new();
 
     // Update references in each affected file
-    for (_, file_path) in &affected_elements {
-        if affected_files.contains(file_path) {
-            continue; // Already processed this file
-        }
-        affected_files.insert(file_path.clone());
-
+    for file_path in &affected_files {
         let absolute_file_path = git_root.join(file_path);
         let content = fs::read_to_string(&absolute_file_path)
             .map_err(|e| ReqvireError::IoError(e))?;
 
-        // Replace old attachment path with new path
-        let old_link = format!("[{}]({})", old_path, old_path);
-        let new_link = format!("[{}]({})", new_path, new_path);
-        let new_content = content.replace(&old_link, &new_link);
+        let mut new_content = content.clone();
+
+        // Paths in markdown are file-relative, but stored in registry as reqvire-root-relative
+        // Calculate the file-relative paths that appear in the markdown
+        let file_dir = PathBuf::from(file_path).parent()
+            .map(|p| p.to_path_buf())
+            .unwrap_or_default();
+
+        // Calculate old and new file-relative paths
+        let old_relative = pathdiff::diff_paths(&old_path_buf, &file_dir)
+            .unwrap_or_else(|| old_path_buf.clone());
+        let new_relative = pathdiff::diff_paths(new_path, &file_dir)
+            .unwrap_or_else(|| PathBuf::from(new_path));
+
+        let old_relative_str = old_relative.to_string_lossy();
+        let new_relative_str = new_relative.to_string_lossy();
+
+        // Replace attachment links: [path](path)
+        let old_link = format!("[{}]({})", old_relative_str, old_relative_str);
+        let new_link = format!("[{}]({})", new_relative_str, new_relative_str);
+        new_content = new_content.replace(&old_link, &new_link);
+
+        // Replace relation links: [display](path) where display may differ from path
+        // We need to match any [text](old_path) pattern
+        let old_link_pattern = format!("]({})", old_relative_str);
+        let new_link_pattern = format!("]({})", new_relative_str);
+        new_content = new_content.replace(&old_link_pattern, &new_link_pattern);
 
         if content != new_content {
             let diff = generate_file_diff(file_path, &content, &new_content);
@@ -727,69 +782,90 @@ pub fn mv_attachment(
     Ok(CrudResult {
         operation: CrudOperation::Move,
         element_id: old_path.to_string(),
-        element_name: format!("Moved attachment {} → {} (updated {} file(s))",
-            old_path, new_path, affected_files.len()),
+        element_name: format!("Moved {} → {} ({} attachment(s), {} relation(s) in {} file(s))",
+            old_path, new_path, attachment_count, relation_count, affected_files.len()),
         diffs: all_diffs,
         dry_run,
     })
 }
 
-/// Remove an attachment file and detach from all elements
-pub fn rm_attachment(
+/// Remove an asset file and remove all references from elements (Attachments and Relations)
+pub fn rm_asset(
     model_manager: &mut ModelManager,
-    attachment_path: &str,
+    file_path_arg: &str,
     git_root: &Path,
     dry_run: bool,
 ) -> Result<CrudResult, ReqvireError> {
     use std::fs;
+    use crate::relation::LinkType;
+    use std::path::PathBuf;
 
-    // Find all elements with this attachment
-    let affected_elements: Vec<_> = model_manager.graph_registry.nodes.values()
-        .map(|node| &node.element)
-        .filter(|elem| elem.attachments.iter().any(|a| a.target.as_str() == attachment_path))
-        .map(|elem| elem.name.clone())
-        .collect();
-
-    let mut all_diffs = vec![];
+    // Find all elements with this file as attachment OR as InternalPath relation target
     let mut affected_files: std::collections::HashSet<String> = std::collections::HashSet::new();
+    let mut attachment_count = 0;
+    let mut relation_count = 0;
 
-    // Detach from each affected element
-    for element_name in &affected_elements {
-        let element = model_manager.graph_registry.get_element_by_name(element_name)
-            .ok_or_else(|| ReqvireError::ElementNotFound(
-                format!("Element '{}' not found", element_name)
-            ))?;
+    for node in model_manager.graph_registry.nodes.values() {
+        let elem = &node.element;
 
-        let file_path = element.file_path.clone();
-
-        if affected_files.contains(&file_path) {
-            continue; // Already processed this file
+        // Check attachments
+        for attachment in &elem.attachments {
+            if attachment.target.as_str() == file_path_arg {
+                affected_files.insert(elem.file_path.clone());
+                attachment_count += 1;
+            }
         }
 
-        let absolute_file_path = git_root.join(&file_path);
+        // Check relations with InternalPath
+        for relation in &elem.relations {
+            if let LinkType::InternalPath(ref path) = relation.target.link {
+                if path.to_string_lossy() == file_path_arg {
+                    affected_files.insert(elem.file_path.clone());
+                    relation_count += 1;
+                }
+            }
+        }
+    }
+
+    let mut all_diffs = vec![];
+    let file_path_buf = PathBuf::from(file_path_arg);
+
+    // Remove references from each affected file
+    for spec_file_path in &affected_files {
+        let absolute_file_path = git_root.join(spec_file_path);
         let content = fs::read_to_string(&absolute_file_path)
             .map_err(|e| ReqvireError::IoError(e))?;
 
-        // Remove all occurrences of this attachment from the file
-        let new_content = remove_attachment_from_file(&content, attachment_path)?;
+        // Paths in markdown are file-relative, calculate the relative path from this file
+        let file_dir = PathBuf::from(spec_file_path).parent()
+            .map(|p| p.to_path_buf())
+            .unwrap_or_default();
+        let relative_path = pathdiff::diff_paths(&file_path_buf, &file_dir)
+            .unwrap_or_else(|| file_path_buf.clone());
+        let relative_path_str = relative_path.to_string_lossy();
+
+        // Remove attachments
+        let mut new_content = remove_attachment_from_file(&content, &relative_path_str)?;
+
+        // Remove InternalPath relations
+        new_content = remove_relation_with_path(&new_content, &relative_path_str)?;
 
         if content != new_content {
-            let diff = generate_file_diff(&file_path, &content, &new_content);
+            let diff = generate_file_diff(spec_file_path, &content, &new_content);
             all_diffs.push(diff);
-            affected_files.insert(file_path.clone());
 
             if !dry_run {
                 fs::write(&absolute_file_path, &new_content)
                     .map_err(|e| ReqvireError::IoError(e))?;
 
-                model_manager.graph_registry.modified_files.insert(file_path);
+                model_manager.graph_registry.modified_files.insert(spec_file_path.clone());
             }
         }
     }
 
     // Delete the actual file
     if !dry_run {
-        let abs_path = git_root.join(attachment_path);
+        let abs_path = git_root.join(file_path_arg);
         if abs_path.exists() {
             fs::remove_file(&abs_path).map_err(|e| ReqvireError::IoError(e))?;
         }
@@ -797,12 +873,67 @@ pub fn rm_attachment(
 
     Ok(CrudResult {
         operation: CrudOperation::Remove,
-        element_id: attachment_path.to_string(),
-        element_name: format!("Removed attachment {} (detached from {} element(s))",
-            attachment_path, affected_elements.len()),
+        element_id: file_path_arg.to_string(),
+        element_name: format!("Removed {} ({} attachment(s), {} relation(s) from {} file(s))",
+            file_path_arg, attachment_count, relation_count, affected_files.len()),
         diffs: all_diffs,
         dry_run,
     })
+}
+
+/// Helper function to remove a relation line containing a specific path from file content
+fn remove_relation_with_path(content: &str, path: &str) -> Result<String, ReqvireError> {
+    let mut result = String::new();
+    let mut in_relations_section = false;
+    let mut relations_section_empty = true;
+    let mut pending_relations_header: Option<String> = None;
+
+    for line in content.lines() {
+        let trimmed = line.trim();
+
+        // Detect Relations section start
+        if trimmed == "#### Relations" {
+            in_relations_section = true;
+            relations_section_empty = true;
+            pending_relations_header = Some(line.to_string());
+            continue;
+        }
+
+        // Detect section end
+        if in_relations_section && (trimmed.starts_with("####") || trimmed == "---") {
+            // Output the Relations header only if section is not empty
+            if !relations_section_empty {
+                if let Some(header) = pending_relations_header.take() {
+                    result.push_str(&header);
+                    result.push('\n');
+                }
+            }
+            in_relations_section = false;
+            pending_relations_header = None;
+        }
+
+        if in_relations_section {
+            // Check if this line contains a relation with the target path
+            let link_pattern = format!("]({})", path);
+            if trimmed.starts_with("*") && trimmed.contains(&link_pattern) {
+                // Skip this line (remove the relation)
+                continue;
+            } else if trimmed.starts_with("*") {
+                // This is a valid relation line, section is not empty
+                relations_section_empty = false;
+                // Output header if we haven't yet
+                if let Some(header) = pending_relations_header.take() {
+                    result.push_str(&header);
+                    result.push('\n');
+                }
+            }
+        }
+
+        result.push_str(line);
+        result.push('\n');
+    }
+
+    Ok(result)
 }
 
 // Helper function to add attachment to element in markdown content

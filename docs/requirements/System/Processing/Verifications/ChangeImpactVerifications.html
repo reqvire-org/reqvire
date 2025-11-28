@@ -198,31 +198,31 @@ blockquote {
 }
 .diagram-nav-buttons {
     position: absolute;
-    top: 10px;
-    left: 10px;
+    top: 5px;
+    left: 5px;
     z-index: 999; /* higher than SVG (1) but lower than header nav (1000) */
     display: flex;
     flex-direction: column;
-    gap: 5px;
-    background-color: rgba(255, 255, 255, 0.9);
-    padding: 5px;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    gap: 2px;
+    background-color: rgba(255, 255, 255, 0.85);
+    padding: 3px;
+    border-radius: 3px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
 }
 .diagram-nav-row {
     display: flex;
-    gap: 5px;
+    gap: 2px;
     justify-content: center;
 }
 .diagram-nav-btn {
-    width: 32px;
-    height: 32px;
+    width: 22px;
+    height: 22px;
     background-color: var(--color-primary);
     color: white;
     border: none;
-    border-radius: 3px;
+    border-radius: 2px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 11px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -318,6 +318,27 @@ blockquote {
                     return;
                 }
 
+                // Get the natural size of the diagram
+                var bbox = svg.getBBox();
+                var containerWidth = mermaidContainer.clientWidth;
+                var containerHeight = mermaidContainer.clientHeight;
+
+                // Check if diagram fits within container (with some padding)
+                var padding = 40;
+                var fitsInContainer = (bbox.width <= containerWidth - padding) && (bbox.height <= containerHeight - padding);
+
+                if (fitsInContainer) {
+                    // Diagram fits - use natural size, shrink container to fit content
+                    svg.style.width = 'auto';
+                    svg.style.height = 'auto';
+                    mermaidContainer.style.height = 'auto';
+                    mermaidContainer.style.minHeight = (bbox.height + padding) + 'px';
+                    mermaidContainer.style.maxHeight = 'calc(100vh - 150px)';
+                    // No pan/zoom needed for small diagrams
+                    return;
+                }
+
+                // Large diagram - enable pan/zoom
                 svg.style.maxWidth = 'none';
                 svg.style.maxHeight = 'none';
 
@@ -696,7 +717,9 @@ blockquote {
         <a href="../../../../index.html">Containment</a>
         <a href="../../../../model.html">Model</a>
         <a href="../../../../traces.html">Traces</a>
+        <a href="../../../../traceflow.html">TraceFlow</a>
         <a href="../../../../coverage.html">Coverage</a>
+        <a href="../../../../resources.html">Resources</a>
     </nav>
     <div class="reqvire-nav-spacer"></div>
     <div class="container">
@@ -777,8 +800,8 @@ blockquote {
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>verify: <a href="../../../Interfaces/CLI.html#cli-change-impact-report-command">CLI Change Impact Report Command</a></li>
 <li>satisfiedBy: <a href="../../../../tests/test-change-impact-detection/test.sh">test.sh</a></li>
+<li>verify: <a href="../../../Interfaces/CLI.html#cli-change-impact-report-command">CLI Change Impact Report Command</a></li>
 </ul>
 <hr />
 <h3 id="change-impact-detection-test">Change Impact Detection Test</h3>
@@ -823,37 +846,10 @@ blockquote {
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>verify: <a href="../ChangeImpact.html#requirements-change-propagation">Requirements Change Propagation</a></li>
-<li>verify: <a href="../../../Interfaces/CLI.html#cli-change-impact-report-command">CLI Change Impact Report Command</a></li>
 <li>satisfiedBy: <a href="../../../../tests/test-change-impact-detection/test.sh">test.sh</a></li>
 <li>satisfiedBy: <a href="../../../../tests/test-change-impact-element-relocation/test.sh">test.sh</a></li>
-</ul>
-<hr />
-<h3 id="structural-change-reports-verification">Structural Change Reports Verification</h3>
-<p>This test verifies that the system analyzes and reports on structural changes in the MBSE model.</p>
-<h4>Details</h4>
-<h5>Acceptance Criteria</h5>
-<ul>
-<li>System should analyze structural changes in the MBSE model</li>
-<li>System should identify affected components through relationship traversal</li>
-<li>System should generate reports of impacted elements and structures</li>
-</ul>
-<h5>Test Criteria</h5>
-<ul>
-<li>Command exits with success (0) return code</li>
-<li>Change reports correctly identify affected elements</li>
-<li>Relationship traversal properly determines impact propagation</li>
-</ul>
-<h5>Test Procedure</h5>
-<p>TODO: write test procedure</p>
-<h4>Metadata</h4>
-<ul>
-<li>type: test-verification</li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>verify: <a href="../../Output/Reporting.html#tracing-structural-changes">Tracing Structural Changes</a></li>
-<li>satisfiedBy: <a href="../../../../tests/test-change-impact-detection/test.sh">test.sh</a></li>
+<li>verify: <a href="../../../Interfaces/CLI.html#cli-change-impact-report-command">CLI Change Impact Report Command</a></li>
+<li>verify: <a href="../ChangeImpact.html#requirements-change-propagation">Requirements Change Propagation</a></li>
 </ul>
 <hr />
 <h3 id="change-impact-relations-test">Change Impact Relations Test</h3>
@@ -883,43 +879,9 @@ blockquote {
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>verify: <a href="../ChangeImpact.html#requirements-change-propagation">Requirements Change Propagation</a></li>
-<li>verify: <a href="../../../Interfaces/CLI.html#cli-change-impact-report-command">CLI Change Impact Report Command</a></li>
 <li>satisfiedBy: <a href="../../../../tests/test-change-impact-detection/test.sh">test.sh</a></li>
-</ul>
-<hr />
-<h3 id="element-content-extraction-test">Element Content Extraction Test</h3>
-<p>This test verifies that the system correctly extracts element content for change impact detection.</p>
-<h4>Details</h4>
-<h5>Acceptance Criteria</h5>
-<ul>
-<li>System should properly extract requirement body for change impact detection</li>
-<li>Requirement body should include normalized main text and content from the Details subsection</li>
-<li>System should handle requirements with various combinations of subsections</li>
-</ul>
-<h5>Test Criteria</h5>
-<ul>
-<li>Command exits with success (0) return code</li>
-<li>Output shows expected content for each element</li>
-<li>Content extraction correctly handles different subsection ordering</li>
-<li>Content extraction properly handles HTML details tags</li>
-</ul>
-<h5>Test Procedure</h5>
-<ol>
-<li>Create test fixtures with requirements containing various combinations of subsections</li>
-<li>Run Reqvire model summary on the test fixtures</li>
-<li>Verify that extracted content matches expected content for each element</li>
-<li>Verify that content from Details subsection is properly included</li>
-</ol>
-<h4>Metadata</h4>
-<ul>
-<li>type: test-verification</li>
-</ul>
-<h4>Relations</h4>
-<ul>
+<li>verify: <a href="../../../Interfaces/CLI.html#cli-change-impact-report-command">CLI Change Impact Report Command</a></li>
 <li>verify: <a href="../ChangeImpact.html#requirements-change-propagation">Requirements Change Propagation</a></li>
-<li>verify: <a href="../../Core/Configuration.html#requirements-processing">Requirements Processing</a></li>
-<li>satisfiedBy: <a href="../../../../tests/test-element-content-extraction/test.sh">test.sh</a></li>
 </ul>
 <hr />
 <h3 id="change-impact-smart-filtering-test">Change Impact Smart Filtering Test</h3>
@@ -953,8 +915,69 @@ blockquote {
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>verify: <a href="../ChangeImpact.html#requirements-change-propagation">Requirements Change Propagation</a></li>
 <li>satisfiedBy: <a href="../../../../tests/test-change-impact-smart-filtering/test.sh">test.sh</a></li>
+<li>verify: <a href="../ChangeImpact.html#requirements-change-propagation">Requirements Change Propagation</a></li>
+</ul>
+<hr />
+<h3 id="element-content-extraction-test">Element Content Extraction Test</h3>
+<p>This test verifies that the system correctly extracts element content for change impact detection.</p>
+<h4>Details</h4>
+<h5>Acceptance Criteria</h5>
+<ul>
+<li>System should properly extract requirement body for change impact detection</li>
+<li>Requirement body should include normalized main text and content from the Details subsection</li>
+<li>System should handle requirements with various combinations of subsections</li>
+</ul>
+<h5>Test Criteria</h5>
+<ul>
+<li>Command exits with success (0) return code</li>
+<li>Output shows expected content for each element</li>
+<li>Content extraction correctly handles different subsection ordering</li>
+<li>Content extraction properly handles HTML details tags</li>
+</ul>
+<h5>Test Procedure</h5>
+<ol>
+<li>Create test fixtures with requirements containing various combinations of subsections</li>
+<li>Run Reqvire model summary on the test fixtures</li>
+<li>Verify that extracted content matches expected content for each element</li>
+<li>Verify that content from Details subsection is properly included</li>
+</ol>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfiedBy: <a href="../../../../tests/test-element-content-extraction/test.sh">test.sh</a></li>
+<li>verify: <a href="../../Core/Configuration.html#requirements-processing">Requirements Processing</a></li>
+<li>verify: <a href="../ChangeImpact.html#requirements-change-propagation">Requirements Change Propagation</a></li>
+</ul>
+<hr />
+<h3 id="structural-change-reports-verification">Structural Change Reports Verification</h3>
+<p>This test verifies that the system analyzes and reports on structural changes in the System model.</p>
+<h4>Details</h4>
+<h5>Acceptance Criteria</h5>
+<ul>
+<li>System should analyze structural changes in the System model</li>
+<li>System should identify affected components through relationship traversal</li>
+<li>System should generate reports of impacted elements and structures</li>
+</ul>
+<h5>Test Criteria</h5>
+<ul>
+<li>Command exits with success (0) return code</li>
+<li>Change reports correctly identify affected elements</li>
+<li>Relationship traversal properly determines impact propagation</li>
+</ul>
+<h5>Test Procedure</h5>
+<p>TODO: write test procedure</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfiedBy: <a href="../../../../tests/test-change-impact-detection/test.sh">test.sh</a></li>
+<li>verify: <a href="../../Output/Reporting.html#tracing-structural-changes">Tracing Structural Changes</a></li>
 </ul>
 <hr />
 

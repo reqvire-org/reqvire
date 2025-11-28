@@ -198,31 +198,31 @@ blockquote {
 }
 .diagram-nav-buttons {
     position: absolute;
-    top: 10px;
-    left: 10px;
+    top: 5px;
+    left: 5px;
     z-index: 999; /* higher than SVG (1) but lower than header nav (1000) */
     display: flex;
     flex-direction: column;
-    gap: 5px;
-    background-color: rgba(255, 255, 255, 0.9);
-    padding: 5px;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    gap: 2px;
+    background-color: rgba(255, 255, 255, 0.85);
+    padding: 3px;
+    border-radius: 3px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
 }
 .diagram-nav-row {
     display: flex;
-    gap: 5px;
+    gap: 2px;
     justify-content: center;
 }
 .diagram-nav-btn {
-    width: 32px;
-    height: 32px;
+    width: 22px;
+    height: 22px;
     background-color: var(--color-primary);
     color: white;
     border: none;
-    border-radius: 3px;
+    border-radius: 2px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 11px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -318,6 +318,27 @@ blockquote {
                     return;
                 }
 
+                // Get the natural size of the diagram
+                var bbox = svg.getBBox();
+                var containerWidth = mermaidContainer.clientWidth;
+                var containerHeight = mermaidContainer.clientHeight;
+
+                // Check if diagram fits within container (with some padding)
+                var padding = 40;
+                var fitsInContainer = (bbox.width <= containerWidth - padding) && (bbox.height <= containerHeight - padding);
+
+                if (fitsInContainer) {
+                    // Diagram fits - use natural size, shrink container to fit content
+                    svg.style.width = 'auto';
+                    svg.style.height = 'auto';
+                    mermaidContainer.style.height = 'auto';
+                    mermaidContainer.style.minHeight = (bbox.height + padding) + 'px';
+                    mermaidContainer.style.maxHeight = 'calc(100vh - 150px)';
+                    // No pan/zoom needed for small diagrams
+                    return;
+                }
+
+                // Large diagram - enable pan/zoom
                 svg.style.maxWidth = 'none';
                 svg.style.maxHeight = 'none';
 
@@ -696,7 +717,9 @@ blockquote {
         <a href="../../../index.html">Containment</a>
         <a href="../../../model.html">Model</a>
         <a href="../../../traces.html">Traces</a>
+        <a href="../../../traceflow.html">TraceFlow</a>
         <a href="../../../coverage.html">Coverage</a>
+        <a href="../../../resources.html">Resources</a>
     </nav>
     <div class="reqvire-nav-spacer"></div>
     <div class="container">
@@ -717,12 +740,17 @@ blockquote {
       ef2f4482168d6af9[&quot;Detailed Error Handling and Logging&quot;];
       class ef2f4482168d6af9 systemRequirement;
       click ef2f4482168d6af9 &quot;../../Interfaces/CLI.html#detailed-error-handling-and-logging&quot;;
-      a867b4bb3e22cabf[&quot;Validate Command&quot;];
-      class a867b4bb3e22cabf systemRequirement;
-      click a867b4bb3e22cabf &quot;../../Interfaces/CLI.html#validate-command&quot;;
     end
   end
   subgraph d262bfbbaa5049a3[&quot;📁 requirements/System/Core&quot;]
+    subgraph bdf2d0d4066a95c0[&quot;📄 Refinements.md&quot;]
+      e79d4782d9a1d791[&quot;Two-Pass Validation Behavior&quot;];
+      class e79d4782d9a1d791 default;
+      click e79d4782d9a1d791 &quot;Refinements.html#two-pass-validation-behavior&quot;;
+      30ab6c7de24796d7[&quot;Validation Error Reporting Behavior&quot;];
+      class 30ab6c7de24796d7 default;
+      click 30ab6c7de24796d7 &quot;Refinements.html#validation-error-reporting-behavior&quot;;
+    end
     subgraph a0a42393a244d64c[&quot;📄 Validation.md&quot;]
       f34e39787323bba4[&quot;Cross-Component Dependency Validator&quot;];
       class f34e39787323bba4 systemRequirement;
@@ -806,8 +834,12 @@ blockquote {
   f34e39787323bba4 -->|satisfiedBy| f22d93285fcd7664;
   f34e39787323bba4 -.->|verifiedBy| 23a09f2d69fc3b23;
   563518e7f0f446e -.->|deriveReqT| ef2f4482168d6af9;
-  563518e7f0f446e -.->|deriveReqT| a867b4bb3e22cabf;
   563518e7f0f446e -.->|deriveReqT| c741649b0d9ace74;
+  a581221890d15c0c[&quot;error.rs&quot;];
+  class a581221890d15c0c default;
+  click a581221890d15c0c &quot;../../../core/src/error.rs&quot;;
+  563518e7f0f446e -->|satisfiedBy| a581221890d15c0c;
+  563518e7f0f446e -->|satisfiedBy| 30ab6c7de24796d7;
   bbe4bfafe31e5f09 -->|satisfiedBy| f22d93285fcd7664;
   bbe4bfafe31e5f09 -.->|verifiedBy| 90310f1e5378f4b2;
   b7c871ab64a7059a[&quot;graph_registry.rs&quot;];
@@ -837,16 +869,13 @@ blockquote {
   c741649b0d9ace74 -->|satisfiedBy| 9450d4313f47ef36;
   c741649b0d9ace74 -.->|verifiedBy| 23a09f2d69fc3b23;
   c741649b0d9ace74 -.->|verifiedBy| fcb309f0f899a983;
-  26e63d5a1bbe175 -.->|deriveReqT| a867b4bb3e22cabf;
   26e63d5a1bbe175 -->|satisfiedBy| d50a859650933e55;
+  26e63d5a1bbe175 -->|satisfiedBy| e79d4782d9a1d791;
   574cda1664a91ad -.->|deriveReqT| f34e39787323bba4;
   a4d6ad305dbbad80 -.->|deriveReqT| 6d54be5a9e9637e2;
   a4d6ad305dbbad80 -.->|deriveReqT| 26e63d5a1bbe175;
   275994f9e5e5407b -.->|deriveReqT| a0356ecbac250219;
   83b654d72d72255 -.->|deriveReqT| f7d689fafa15738b;
-  a581221890d15c0c[&quot;error.rs&quot;];
-  class a581221890d15c0c default;
-  click a581221890d15c0c &quot;../../../core/src/error.rs&quot;;
   af52a97918701e2b -->|satisfiedBy| a581221890d15c0c;
   af52a97918701e2b -->|satisfiedBy| d50a859650933e55;
   af52a97918701e2b -.->|verifiedBy| 23a09f2d69fc3b23;
@@ -854,9 +883,6 @@ blockquote {
   class 8b8c9b79dcbe085e default;
   click 8b8c9b79dcbe085e &quot;../../../tests/test-invalid-relations/test.sh&quot;;
   23a09f2d69fc3b23 -->|satisfiedBy| 8b8c9b79dcbe085e;
-  a867b4bb3e22cabf -->|satisfiedBy| 80defdd4cbc7ee18;
-  a867b4bb3e22cabf -.->|verifiedBy| 7ce243221ec8f143;
-  a867b4bb3e22cabf -.->|verifiedBy| 23a09f2d69fc3b23;
   ef2f4482168d6af9 -.->|deriveReqT| af52a97918701e2b;
   ef2f4482168d6af9 -->|satisfiedBy| a581221890d15c0c;
   b91bd280b4e9971[&quot;test.sh&quot;];
@@ -877,60 +903,67 @@ blockquote {
   click 789c690d63402d63 &quot;../../../tests/test-fragment-relations/test.sh&quot;;
   fcb309f0f899a983 -->|satisfiedBy| 789c690d63402d63;
 </div>
-<h3 id="two-pass-validation-strategy">Two-Pass Validation Strategy</h3>
-<p>The system shall implement a two-pass validation strategy that separates element collection from relation validation, enabling complete error reporting while maintaining existing error behavior.</p>
-<h4>Details</h4>
-<p>The validation process shall be split into two distinct passes:</p>
-<p><strong>Pass 1: Element Collection and Local Validation</strong></p>
-<ul>
-<li>Parse all markdown files</li>
-<li>Extract elements with metadata</li>
-<li>Apply automatic semantic normalization during parsing:
-<ul>
-<li>Convert non-link identifiers to proper markdown links with display text</li>
-<li>Normalize absolute paths to relative paths for portable references</li>
-</ul>
-</li>
-<li>Perform local validation (element uniqueness, identifier format, metadata syntax)</li>
-<li>Store elements in ElementRegistry</li>
-<li>Defer relation validation to Pass 2</li>
-<li>If errors are found, report them and exit the process</li>
-</ul>
-<p><strong>Pass 2: Graph Construction and Relation Validation</strong></p>
-<ul>
-<li>Build GraphRegistry from ElementRegistry</li>
-<li>Validate all relations (target existence, type compatibility)</li>
-<li>Generate missing opposite relations</li>
-<li>Perform cross-component validation</li>
-<li>If errors are found, report them and exit the process</li>
-</ul>
-<p>Both passes maintain the existing behavior where validation errors cause process termination with appropriate error reporting.</p>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="#validate-internal-consistency">Validate Internal Consistency</a></li>
-<li>derivedFrom: <a href="Configuration.html#requirements-processing">Requirements Processing</a></li>
-<li>satisfiedBy: <a href="../../../core/src/model.rs">model.rs</a></li>
-</ul>
-<hr />
-<h3 id="markdown-structure-validator">Markdown Structure Validator</h3>
-<p>The system shall implement a markdown structure validator that enforces Reqvire’s requirements for header levels, element structure, relation formatting, and other markdown-specific syntax rules, reporting violations with line numbers and suggested fixes.</p>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="#validate-markdown-structure">Validate Markdown Structure</a></li>
-<li>satisfiedBy: <a href="../../../core/src/model.rs">model.rs</a></li>
-<li>satisfiedBy: <a href="../../../core/src/parser.rs">parser.rs</a></li>
-<li>verifiedBy: <a href="Verifications/ValidationVerifications.html#invalid-relations-test">Invalid Relations Test</a></li>
-</ul>
-<hr />
 <h3 id="enhanced-validation-error-reporting">Enhanced Validation Error Reporting</h3>
-<p>The system shall provide comprehensive validation messages that include file paths and line numbers when available, to help users quickly locate and fix model integrity and structure issues in their MBSE specifications.</p>
+<p>The system shall include context for resolution in validation errors.</p>
+<h4>Details</h4>
+<p>The system shall define validation error reporting behavior.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: user-requirement</li>
 </ul>
 <h4>Relations</h4>
 <ul>
+<li>derive: <a href="../../Interfaces/CLI.html#detailed-error-handling-and-logging">Detailed Error Handling and Logging</a></li>
+<li>derive: <a href="#relation-type-validation">Relation Type Validation</a></li>
 <li>derivedFrom: <a href="../../UserStories.html#validating-structures">Validating Structures</a></li>
+<li>satisfiedBy: <a href="../../../core/src/error.rs">error.rs</a></li>
+<li>satisfiedBy: <a href="Refinements.html#validation-error-reporting-behavior">Validation Error Reporting Behavior</a></li>
+</ul>
+<hr />
+<h3 id="relation-type-validation">Relation Type Validation</h3>
+<p>The system shall validate relation types against a defined vocabulary and provide clear error messages for unsupported relation types, including suggestions for the correct relation types.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#enhanced-validation-error-reporting">Enhanced Validation Error Reporting</a></li>
+<li>satisfiedBy: <a href="../../../core/src/relation.rs">relation.rs</a></li>
+<li>verifiedBy: <a href="Verifications/ValidationVerifications.html#invalid-relations-test">Invalid Relations Test</a></li>
+<li>verifiedBy: <a href="Verifications/ValidationVerifications.html#same-file-fragment-relations-test">Same-File Fragment Relations Test</a></li>
+</ul>
+<hr />
+<h3 id="excluded-file-relation-validation">Excluded File Relation Validation</h3>
+<p>The system shall properly validate relations targeting files matching excluded filename patterns, enabling references to excluded files while still respecting their exclusion from processing and formatting operations.</p>
+<h4>Details</h4>
+<p>The validation process for excluded files:</p>
+<ol>
+<li>Files matching excluded patterns are registered in the element registry for relation validation only</li>
+<li>Internal elements within excluded files are not processed or validated</li>
+</ol>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../Operations/Formatting.html#file-pattern-exclusion-for-format">File Pattern Exclusion for Format</a></li>
+<li>satisfiedBy: <a href="../../../core/src/parser.rs">parser.rs</a></li>
+<li>verifiedBy: <a href="Verifications/ValidationVerifications.html#unstructured-documents-test">Unstructured Documents Test</a></li>
+</ul>
+<hr />
+<h3 id="graphregistry-as-primary-registry">GraphRegistry as Primary Registry</h3>
+<p>The system shall enhance GraphRegistry to serve as the primary structure for relation operations and validation during Pass 2.</p>
+<h4>Details</h4>
+<p>The GraphRegistry shall be responsible for:</p>
+<ol>
+<li><strong>Graph construction</strong>: Building adjacency lists from ElementRegistry</li>
+<li><strong>Relation validation</strong>: Checking target existence and type compatibility</li>
+<li><strong>Opposite generation</strong>: Creating missing bidirectional relations</li>
+<li><strong>Cycle detection</strong>: Identifying circular dependencies</li>
+<li><strong>Orphan detection</strong>: Finding isolated elements</li>
+<li><strong>Impact analysis</strong>: Supporting change propagation queries</li>
+</ol>
+<p>The GraphRegistry shall be constructed from the ElementRegistry after Pass 1 completes successfully.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="Configuration.html#requirements-processing">Requirements Processing</a></li>
+<li>satisfiedBy: <a href="../../../core/src/graph_registry.rs">graph_registry.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/model.rs">model.rs</a></li>
+<li>verifiedBy: <a href="Verifications/ValidationVerifications.html#requirements-files-search-and-detection-test">Requirements Files Search and Detection Test</a></li>
 </ul>
 <hr />
 <h3 id="integrated-validation">Integrated Validation</h3>
@@ -956,13 +989,36 @@ blockquote {
 <p>Commands in the first group shall automatically run the two-pass validation and exit if any errors are found. Commands in the second group shall skip validation to allow operation on potentially invalid documents.</p>
 <h4>Relations</h4>
 <ul>
-<li>derivedFrom: <a href="../Output/Reporting.html#provide-validation-reports">Provide Validation Reports</a></li>
 <li>derivedFrom: <a href="../../Interfaces/CLI.html#cli-interface-structure">CLI Interface Structure</a></li>
+<li>derivedFrom: <a href="../Output/Reporting.html#provide-validation-reports">Provide Validation Reports</a></li>
 <li>satisfiedBy: <a href="../../../cli/src/cli.rs">cli.rs</a></li>
 </ul>
 <hr />
-<h3 id="validate-markdown-structure">Validate Markdown Structure</h3>
-<p>The system shall validate the Markdown structure of system model to ensure compliance with formatting standards.</p>
+<h3 id="validate-cross-component-dependencies">Validate Cross-Component Dependencies</h3>
+<p>The system shall validate dependencies across different components of the System model to identify mismatches or gaps.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derive: <a href="#cross-component-dependency-validator">Cross-Component Dependency Validator</a></li>
+<li>derivedFrom: <a href="../../UserStories.html#align-with-industry-standards">Align with Industry Standards</a></li>
+<li>derivedFrom: <a href="../../UserStories.html#validating-structures">Validating Structures</a></li>
+</ul>
+<hr />
+<h3 id="cross-component-dependency-validator">Cross-Component Dependency Validator</h3>
+<p>The system shall implement a specialized validator that analyzes dependencies across different model components, ensuring proper alignment between architectural layers, requirement levels, and verification elements.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#validate-cross-component-dependencies">Validate Cross-Component Dependencies</a></li>
+<li>satisfiedBy: <a href="../../../core/src/model.rs">model.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/parser.rs">parser.rs</a></li>
+<li>verifiedBy: <a href="Verifications/ValidationVerifications.html#invalid-relations-test">Invalid Relations Test</a></li>
+</ul>
+<hr />
+<h3 id="validate-filesystem-structure">Validate Filesystem Structure</h3>
+<p>The system shall validate the organization of files and folders in the repository to ensure consistency with the MBSE methodology.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: user-requirement</li>
@@ -970,7 +1026,20 @@ blockquote {
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="../../UserStories.html#validating-structures">Validating Structures</a></li>
+</ul>
+<hr />
+<h3 id="validate-internal-consistency">Validate Internal Consistency</h3>
+<p>The system shall check the internal consistency of the system model, ensuring that relationships and elements align correctly.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derive: <a href="#internal-consistency-validator">Internal Consistency Validator</a></li>
+<li>derive: <a href="#two-pass-validation-strategy">Two-Pass Validation Strategy</a></li>
 <li>derivedFrom: <a href="../../UserStories.html#align-with-industry-standards">Align with Industry Standards</a></li>
+<li>derivedFrom: <a href="../../UserStories.html#validating-structures">Validating Structures</a></li>
 </ul>
 <hr />
 <h3 id="internal-consistency-validator">Internal Consistency Validator</h3>
@@ -989,31 +1058,83 @@ blockquote {
 <p>Rationale: Element names serve as stable IDs for element identity, independent of file location. Global uniqueness is essential for proper element identification and change tracking across the model.</p>
 <h4>Relations</h4>
 <ul>
-<li>derivedFrom: <a href="#validate-internal-consistency">Validate Internal Consistency</a></li>
 <li>derivedFrom: <a href="StructureAndParsing.html#element-identity-model">Element Identity Model</a></li>
+<li>derivedFrom: <a href="#validate-internal-consistency">Validate Internal Consistency</a></li>
 <li>satisfiedBy: <a href="../../../core/src/model.rs">model.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/parser.rs">parser.rs</a></li>
 <li>verifiedBy: <a href="Verifications/ValidationVerifications.html#invalid-relations-test">Invalid Relations Test</a></li>
 </ul>
 <hr />
-<h3 id="validate-filesystem-structure">Validate Filesystem Structure</h3>
-<p>The system shall validate the organization of files and folders in the repository to ensure consistency with the MBSE methodology.</p>
+<h3 id="two-pass-validation-strategy">Two-Pass Validation Strategy</h3>
+<p>The system shall execute model validation in two phases: element collection and graph validation.</p>
+<h4>Details</h4>
+<p>The system shall define two-pass validation behavior.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="Configuration.html#requirements-processing">Requirements Processing</a></li>
+<li>derivedFrom: <a href="#validate-internal-consistency">Validate Internal Consistency</a></li>
+<li>satisfiedBy: <a href="../../../core/src/model.rs">model.rs</a></li>
+<li>satisfiedBy: <a href="Refinements.html#two-pass-validation-behavior">Two-Pass Validation Behavior</a></li>
+</ul>
+<hr />
+<h3 id="validate-markdown-structure">Validate Markdown Structure</h3>
+<p>The system shall validate the Markdown structure of system model to ensure compliance with formatting standards.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: user-requirement</li>
 </ul>
 <h4>Relations</h4>
 <ul>
+<li>derive: <a href="#markdown-structure-validator">Markdown Structure Validator</a></li>
+<li>derivedFrom: <a href="../../UserStories.html#align-with-industry-standards">Align with Industry Standards</a></li>
 <li>derivedFrom: <a href="../../UserStories.html#validating-structures">Validating Structures</a></li>
 </ul>
 <hr />
-<h3 id="cross-component-dependency-validator">Cross-Component Dependency Validator</h3>
-<p>The system shall implement a specialized validator that analyzes dependencies across different model components, ensuring proper alignment between architectural layers, requirement levels, and verification elements.</p>
+<h3 id="markdown-structure-validator">Markdown Structure Validator</h3>
+<p>The system shall implement a markdown structure validator that enforces Reqvire’s requirements for header levels, element structure, relation formatting, and other markdown-specific syntax rules, reporting violations with line numbers and suggested fixes.</p>
 <h4>Relations</h4>
 <ul>
-<li>derivedFrom: <a href="#validate-cross-component-dependencies">Validate Cross-Component Dependencies</a></li>
+<li>derivedFrom: <a href="#validate-markdown-structure">Validate Markdown Structure</a></li>
 <li>satisfiedBy: <a href="../../../core/src/model.rs">model.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/parser.rs">parser.rs</a></li>
+<li>verifiedBy: <a href="Verifications/ValidationVerifications.html#invalid-header-structure-test">Invalid Header Structure Test</a></li>
+<li>verifiedBy: <a href="Verifications/ValidationVerifications.html#invalid-relations-test">Invalid Relations Test</a></li>
+</ul>
+<hr />
+<h3 id="validate-relation-types">Validate Relation Types</h3>
+<p>The system shall validate relation types and allow only supported types.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derive: <a href="#relation-element-type-validator">Relation Element Type Validator</a></li>
+<li>derivedFrom: <a href="ModelManagement.html#relation-types-and-behaviors">Relation Types and behaviors</a></li>
+<li>derivedFrom: <a href="../../UserStories.html#align-with-industry-standards">Align with Industry Standards</a></li>
+<li>derivedFrom: <a href="../../UserStories.html#validating-structures">Validating Structures</a></li>
+</ul>
+<hr />
+<h3 id="relation-element-type-validator">Relation Element Type Validator</h3>
+<p>The system shall implement validation that verifies relation endpoints have appropriate element types based on the relation type, following the Element Type Relation Compatibility matrix.</p>
+<h4>Details</h4>
+<p>The validator enforces the constraints defined in the <a href="DesignDocuments/RelationTypes.html#element-type-relation-compatibility">Element Type Relation Compatibility</a> specification:</p>
+<ul>
+<li>For <code>derivedFrom</code>/<code>derive</code> relations, validate that both source and target are requirement types (<code>requirement</code> or <code>user-requirement</code>)</li>
+<li>For <code>verifiedBy</code>/<code>verify</code> relations, validate that one endpoint is a requirement element and the other is a verification element</li>
+<li>For <code>satisfiedBy</code>/<code>satisfy</code> relations, validate that one endpoint is a requirement or test-verification element and the other is an implementation element</li>
+<li>For verification elements with <code>satisfiedBy</code> relations, validate that only test-verification elements may use satisfiedBy (other verification types should not have satisfiedBy relations)</li>
+<li><code>trace</code> relations are always allowed for any non-refinement element type</li>
+<li>Refinement types (<code>constraint</code>, <code>behavior</code>, <code>specification</code>) cannot have Relations subsections</li>
+<li>Warnings should be issued when relation endpoints have incompatible element types</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="ModelManagement.html#element-type-relation-compatibility">Element Type Relation Compatibility</a></li>
+<li>derivedFrom: <a href="#validate-relation-types">Validate Relation Types</a></li>
+<li>satisfiedBy: <a href="../../../core/src/model.rs">model.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/parser.rs">parser.rs</a></li>
+<li>verifiedBy: <a href="Verifications/ValidationVerifications.html#element-type-relation-compatibility-test">Element Type Relation Compatibility Test</a></li>
 <li>verifiedBy: <a href="Verifications/ValidationVerifications.html#invalid-relations-test">Invalid Relations Test</a></li>
 </ul>
 <hr />
@@ -1035,109 +1156,7 @@ blockquote {
 <li>derivedFrom: <a href="../Output/Reporting.html#validation-report-generator">Validation Report Generator</a></li>
 <li>satisfiedBy: <a href="../../../core/src/error.rs">error.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/model.rs">model.rs</a></li>
-</ul>
-<hr />
-<h3 id="relation-element-type-validator">Relation Element Type Validator</h3>
-<p>The system shall implement validation that verifies relation endpoints have appropriate element types based on the relation type, following the Element Type Relation Compatibility matrix.</p>
-<h4>Details</h4>
-<p>The validator enforces the constraints defined in the <a href="DesignDocuments/RelationTypes.html#element-type-relation-compatibility">Element Type Relation Compatibility</a> specification:</p>
-<ul>
-<li>For <code>derivedFrom</code>/<code>derive</code> relations, validate that both source and target are requirement types (<code>requirement</code> or <code>user-requirement</code>)</li>
-<li>For <code>verifiedBy</code>/<code>verify</code> relations, validate that one endpoint is a requirement element and the other is a verification element</li>
-<li>For <code>satisfiedBy</code>/<code>satisfy</code> relations, validate that one endpoint is a requirement or test-verification element and the other is an implementation element</li>
-<li>For verification elements with <code>satisfiedBy</code> relations, validate that only test-verification elements may use satisfiedBy (other verification types should not have satisfiedBy relations)</li>
-<li><code>trace</code> relations are always allowed for any non-refinement element type</li>
-<li>Refinement types (<code>constraint</code>, <code>behavior</code>, <code>specification</code>) cannot have Relations subsections</li>
-<li>Warnings should be issued when relation endpoints have incompatible element types</li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="#validate-relation-types">Validate Relation Types</a></li>
-<li>derivedFrom: <a href="ModelManagement.html#element-type-relation-compatibility">Element Type Relation Compatibility</a></li>
-<li>satisfiedBy: <a href="../../../core/src/model.rs">model.rs</a></li>
-<li>satisfiedBy: <a href="../../../core/src/parser.rs">parser.rs</a></li>
 <li>verifiedBy: <a href="Verifications/ValidationVerifications.html#invalid-relations-test">Invalid Relations Test</a></li>
-<li>verifiedBy: <a href="Verifications/ValidationVerifications.html#element-type-relation-compatibility-test">Element Type Relation Compatibility Test</a></li>
-</ul>
-<hr />
-<h3 id="graphregistry-as-primary-registry">GraphRegistry as Primary Registry</h3>
-<p>The system shall enhance GraphRegistry to serve as the primary structure for relation operations and validation during Pass 2.</p>
-<h4>Details</h4>
-<p>The GraphRegistry shall be responsible for:</p>
-<ol>
-<li><strong>Graph construction</strong>: Building adjacency lists from ElementRegistry</li>
-<li><strong>Relation validation</strong>: Checking target existence and type compatibility</li>
-<li><strong>Opposite generation</strong>: Creating missing bidirectional relations</li>
-<li><strong>Cycle detection</strong>: Identifying circular dependencies</li>
-<li><strong>Orphan detection</strong>: Finding isolated elements</li>
-<li><strong>Impact analysis</strong>: Supporting change propagation queries</li>
-</ol>
-<p>The GraphRegistry shall be constructed from the ElementRegistry after Pass 1 completes successfully.</p>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="Configuration.html#requirements-processing">Requirements Processing</a></li>
-<li>satisfiedBy: <a href="../../../core/src/graph_registry.rs">graph_registry.rs</a></li>
-<li>satisfiedBy: <a href="../../../core/src/model.rs">model.rs</a></li>
-<li>verifiedBy: <a href="Verifications/ValidationVerifications.html#requirements-files-search-and-detection-test">Requirements Files Search and Detection Test</a></li>
-</ul>
-<hr />
-<h3 id="validate-internal-consistency">Validate Internal Consistency</h3>
-<p>The system shall check the internal consistency of the system model, ensuring that relationships and elements align correctly.</p>
-<h4>Metadata</h4>
-<ul>
-<li>type: user-requirement</li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="../../UserStories.html#validating-structures">Validating Structures</a></li>
-<li>derivedFrom: <a href="../../UserStories.html#align-with-industry-standards">Align with Industry Standards</a></li>
-</ul>
-<hr />
-<h3 id="validate-cross-component-dependencies">Validate Cross-Component Dependencies</h3>
-<p>The system shall validate dependencies across different components of the MBSE model to identify mismatches or gaps.</p>
-<h4>Metadata</h4>
-<ul>
-<li>type: user-requirement</li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="../../UserStories.html#validating-structures">Validating Structures</a></li>
-<li>derivedFrom: <a href="../../UserStories.html#align-with-industry-standards">Align with Industry Standards</a></li>
-</ul>
-<hr />
-<h3 id="relation-type-validation">Relation Type Validation</h3>
-<p>The system shall validate relation types against a defined vocabulary and provide clear error messages for unsupported relation types, including suggestions for the correct relation types.</p>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="#enhanced-validation-error-reporting">Enhanced Validation Error Reporting</a></li>
-<li>satisfiedBy: <a href="../../../core/src/relation.rs">relation.rs</a></li>
-</ul>
-<hr />
-<h3 id="excluded-file-relation-validation">Excluded File Relation Validation</h3>
-<p>The system shall properly validate relations targeting files matching excluded filename patterns, enabling references to excluded files while still respecting their exclusion from processing and formatting operations.</p>
-<h4>Details</h4>
-<p>The validation process for excluded files:</p>
-<ol>
-<li>Files matching excluded patterns are registered in the element registry for relation validation only</li>
-<li>Internal elements within excluded files are not processed or validated</li>
-</ol>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="../Operations/Formatting.html#file-pattern-exclusion-for-format">File Pattern Exclusion for Format</a></li>
-<li>satisfiedBy: <a href="../../../core/src/parser.rs">parser.rs</a></li>
-</ul>
-<hr />
-<h3 id="validate-relation-types">Validate Relation Types</h3>
-<p>The system shall validate relation types and allow only supported types.</p>
-<h4>Metadata</h4>
-<ul>
-<li>type: user-requirement</li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="../../UserStories.html#validating-structures">Validating Structures</a></li>
-<li>derivedFrom: <a href="../../UserStories.html#align-with-industry-standards">Align with Industry Standards</a></li>
-<li>derivedFrom: <a href="ModelManagement.html#relation-types-and-behaviors">Relation Types and behaviors</a></li>
 </ul>
 <hr />
 

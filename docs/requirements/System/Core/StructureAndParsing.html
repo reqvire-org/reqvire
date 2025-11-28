@@ -198,31 +198,31 @@ blockquote {
 }
 .diagram-nav-buttons {
     position: absolute;
-    top: 10px;
-    left: 10px;
+    top: 5px;
+    left: 5px;
     z-index: 999; /* higher than SVG (1) but lower than header nav (1000) */
     display: flex;
     flex-direction: column;
-    gap: 5px;
-    background-color: rgba(255, 255, 255, 0.9);
-    padding: 5px;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    gap: 2px;
+    background-color: rgba(255, 255, 255, 0.85);
+    padding: 3px;
+    border-radius: 3px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
 }
 .diagram-nav-row {
     display: flex;
-    gap: 5px;
+    gap: 2px;
     justify-content: center;
 }
 .diagram-nav-btn {
-    width: 32px;
-    height: 32px;
+    width: 22px;
+    height: 22px;
     background-color: var(--color-primary);
     color: white;
     border: none;
-    border-radius: 3px;
+    border-radius: 2px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 11px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -318,6 +318,27 @@ blockquote {
                     return;
                 }
 
+                // Get the natural size of the diagram
+                var bbox = svg.getBBox();
+                var containerWidth = mermaidContainer.clientWidth;
+                var containerHeight = mermaidContainer.clientHeight;
+
+                // Check if diagram fits within container (with some padding)
+                var padding = 40;
+                var fitsInContainer = (bbox.width <= containerWidth - padding) && (bbox.height <= containerHeight - padding);
+
+                if (fitsInContainer) {
+                    // Diagram fits - use natural size, shrink container to fit content
+                    svg.style.width = 'auto';
+                    svg.style.height = 'auto';
+                    mermaidContainer.style.height = 'auto';
+                    mermaidContainer.style.minHeight = (bbox.height + padding) + 'px';
+                    mermaidContainer.style.maxHeight = 'calc(100vh - 150px)';
+                    // No pan/zoom needed for small diagrams
+                    return;
+                }
+
+                // Large diagram - enable pan/zoom
                 svg.style.maxWidth = 'none';
                 svg.style.maxHeight = 'none';
 
@@ -696,7 +717,9 @@ blockquote {
         <a href="../../../index.html">Containment</a>
         <a href="../../../model.html">Model</a>
         <a href="../../../traces.html">Traces</a>
+        <a href="../../../traceflow.html">TraceFlow</a>
         <a href="../../../coverage.html">Coverage</a>
+        <a href="../../../resources.html">Resources</a>
     </nav>
     <div class="reqvire-nav-spacer"></div>
     <div class="container">
@@ -717,9 +740,6 @@ blockquote {
       1096aca658ce4572[&quot;Attachment Commands&quot;];
       class 1096aca658ce4572 systemRequirement;
       click 1096aca658ce4572 &quot;../../Interfaces/CLI.html#attachment-commands&quot;;
-      da4e8889496fb531[&quot;CLI Search Command<br/>📎 requirements/System/Output/DesignDocuments/OutputFormats.md#json-output-structure<br/>📎 requirements/System/Output/DesignDocuments/OutputFormats.md#short-mode-behavior<br/>📎 requirements/System/Output/DesignDocuments/OutputFormats.md#text-output-formatting&quot;];
-      class da4e8889496fb531 systemRequirement;
-      click da4e8889496fb531 &quot;../../Interfaces/CLI.html#cli-search-command&quot;;
     end
   end
   subgraph d262bfbbaa5049a3[&quot;📁 requirements/System/Core&quot;]
@@ -794,7 +814,7 @@ blockquote {
   end
   subgraph 94359ac729226de6[&quot;📁 requirements/System/Operations&quot;]
     subgraph ce3b241a2629974e[&quot;📄 ElementManipulation.md&quot;]
-      ca74bbb037431e9b[&quot;Create Element Operation&quot;];
+      ca74bbb037431e9b[&quot;Create Element Operation<br/>📎 requirements/System/Operations/Refinements.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Refinements.md#target-location-constraint<br/>📎 requirements/System/Operations/Refinements.md#element-ordering-behavior&quot;];
       class ca74bbb037431e9b systemRequirement;
       click ca74bbb037431e9b &quot;../Operations/ElementManipulation.html#create-element-operation&quot;;
     end
@@ -838,7 +858,6 @@ blockquote {
   click 9450d4313f47ef36 &quot;../../../core/src/relation.rs&quot;;
   d60acacd6d99991a -->|satisfiedBy| 9450d4313f47ef36;
   d16211b28032c37b -.->|deriveReqT| 1096aca658ce4572;
-  d16211b28032c37b -.->|deriveReqT| da4e8889496fb531;
   d16211b28032c37b -.->|deriveReqT| 661a84b5a9ab68c5;
   d16211b28032c37b -.->|deriveReqT| 6d3dc4e586860761;
   d16211b28032c37b -.->|deriveReqT| d095766b4b7d0f74;
@@ -865,18 +884,14 @@ blockquote {
   30b02d327e563ceb -->|satisfiedBy| 398003c91b6b2cde;
   30b02d327e563ceb -.->|verifiedBy| fec2cc6e4b40574c;
   30b02d327e563ceb -.->|verifiedBy| 723757d62c730981;
-  1940de2d7d61adab[&quot;test.sh&quot;];
-  class 1940de2d7d61adab default;
-  click 1940de2d7d61adab &quot;../../../tests/test-attachments/test.sh&quot;;
-  ebdc4f53fb16d23b -->|satisfiedBy| 1940de2d7d61adab;
-  ab457fb3036a93b9 -->|satisfiedBy| 1940de2d7d61adab;
+  d540c1ffaaac63ad[&quot;test.sh&quot;];
+  class d540c1ffaaac63ad default;
+  click d540c1ffaaac63ad &quot;../../../tests/test-assets/test.sh&quot;;
+  ab457fb3036a93b9 -->|satisfiedBy| d540c1ffaaac63ad;
+  ebdc4f53fb16d23b -->|satisfiedBy| d540c1ffaaac63ad;
   6d54be5a9e9637e2 -->|satisfiedBy| d50a859650933e55;
   6d54be5a9e9637e2 -->|satisfiedBy| f22d93285fcd7664;
   6d54be5a9e9637e2 -.->|verifiedBy| 23a09f2d69fc3b23;
-  494239c0f3861cb5[&quot;test.sh&quot;];
-  class 494239c0f3861cb5 default;
-  click 494239c0f3861cb5 &quot;../../../tests/test-parsing-functionality/test.sh&quot;;
-  4b3aefbc8964bef0 -->|satisfiedBy| 494239c0f3861cb5;
   87b7ea665c0ec9c2 -.->|deriveReqT| 1db62a3344255ecc;
   87b7ea665c0ec9c2 -.->|deriveReqT| c93cc0e0f7685241;
   4b89dbed94c08c3e[&quot;change_impact.rs&quot;];
@@ -884,22 +899,23 @@ blockquote {
   click 4b89dbed94c08c3e &quot;../../../core/src/change_impact.rs&quot;;
   87b7ea665c0ec9c2 -->|satisfiedBy| 4b89dbed94c08c3e;
   87b7ea665c0ec9c2 -.->|verifiedBy| f1dfbc33d1f30608;
+  494239c0f3861cb5[&quot;test.sh&quot;];
+  class 494239c0f3861cb5 default;
+  click 494239c0f3861cb5 &quot;../../../tests/test-parsing-functionality/test.sh&quot;;
+  4b3aefbc8964bef0 -->|satisfiedBy| 494239c0f3861cb5;
   4f7fa84403776a06 -.->|deriveReqT| bc4b202a0bb6f50c;
   4f7fa84403776a06 -.->|deriveReqT| 83b654d72d72255;
   4f7fa84403776a06 -.->|deriveReqT| 978256deec70c016;
   4f7fa84403776a06 -->|satisfiedBy| 9450d4313f47ef36;
   4f7fa84403776a06 -.->|verifiedBy| e21f26d3f283ac80;
+  1096aca658ce4572 -.->|verifiedBy| 71269c3d60db1560;
+  1096aca658ce4572 -.->|verifiedBy| db3bde84906152d4;
   661a84b5a9ab68c5 -.->|deriveReqT| bc4b202a0bb6f50c;
   661a84b5a9ab68c5 -.->|deriveReqT| ef466393e75bd0d;
   661a84b5a9ab68c5 -->|satisfiedBy| a814c4935e1a0449;
   661a84b5a9ab68c5 -->|satisfiedBy| f22d93285fcd7664;
   661a84b5a9ab68c5 -.->|verifiedBy| e21f26d3f283ac80;
   661a84b5a9ab68c5 -.->|verifiedBy| a6a558a9f2daccdd;
-  1096aca658ce4572 -.->|verifiedBy| 71269c3d60db1560;
-  1096aca658ce4572 -.->|verifiedBy| db3bde84906152d4;
-  1096aca658ce4572 -.->|verifiedBy| b00cef5ce1ca24c6;
-  1096aca658ce4572 -.->|verifiedBy| 9f88f7d8780e9179;
-  ca74bbb037431e9b -.->|deriveReqT| e7cad857e370c39f;
   80defdd4cbc7ee18[&quot;cli.rs&quot;];
   class 80defdd4cbc7ee18 default;
   click 80defdd4cbc7ee18 &quot;../../../cli/src/cli.rs&quot;;
@@ -922,11 +938,7 @@ blockquote {
   click ce2625feec883e55 &quot;../../../core/src/utils.rs&quot;;
   ca74bbb037431e9b -->|satisfiedBy| ce2625feec883e55;
   ca74bbb037431e9b -.->|verifiedBy| e9c9cae75f37f06;
-  da4e8889496fb531 -->|satisfiedBy| 80defdd4cbc7ee18;
-  da4e8889496fb531 -.->|verifiedBy| 7ce243221ec8f143;
-  da4e8889496fb531 -.->|verifiedBy| 405875bd7f079c80;
-  da4e8889496fb531 -.->|verifiedBy| ef40ca1630031a4d;
-  a6cf9003ffcad7d2 -->|satisfiedBy| 1940de2d7d61adab;
+  a6cf9003ffcad7d2 -->|satisfiedBy| d540c1ffaaac63ad;
   e21f26d3f283ac80 -->|satisfiedBy| 494239c0f3861cb5;
   e8358fc93fee95fb[&quot;test.sh&quot;];
   class e8358fc93fee95fb default;
@@ -936,14 +948,14 @@ blockquote {
   class 7f5e53340a03365f default;
   click 7f5e53340a03365f &quot;../../../tests/test-gitignore-integration/test.sh&quot;;
   d7b489a5edd073a2 -->|satisfiedBy| 7f5e53340a03365f;
-  eaf33ce1e6113c8a[&quot;test.sh&quot;];
-  class eaf33ce1e6113c8a default;
-  click eaf33ce1e6113c8a &quot;../../../tests/test-advanced-format/test.sh&quot;;
-  723757d62c730981 -->|satisfiedBy| eaf33ce1e6113c8a;
   8b8c9b79dcbe085e[&quot;test.sh&quot;];
   class 8b8c9b79dcbe085e default;
   click 8b8c9b79dcbe085e &quot;../../../tests/test-invalid-relations/test.sh&quot;;
   fec2cc6e4b40574c -->|satisfiedBy| 8b8c9b79dcbe085e;
+  eaf33ce1e6113c8a[&quot;test.sh&quot;];
+  class eaf33ce1e6113c8a default;
+  click eaf33ce1e6113c8a &quot;../../../tests/test-advanced-format/test.sh&quot;;
+  723757d62c730981 -->|satisfiedBy| eaf33ce1e6113c8a;
 </div>
 <h3 id="specification-file-identification">Specification File Identification</h3>
 <p>The system shall only parse markdown files that are identified as specification files. A markdown file is considered a specification file if and only if its first level-1 heading (<code>#</code>) is exactly <code># Elements</code>. Files not meeting this criterion shall be ignored during model parsing, even if they have a <code>.md</code> extension.</p>
@@ -958,9 +970,60 @@ blockquote {
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="../../UserStories.html#managing-system-models">Managing System Models</a></li>
-<li>verifiedBy: <a href="Verifications/ParsingVerifications.html#specification-file-identification-test">Specification File Identification Test</a></li>
-<li>satisfiedBy: <a href="../../../core/src/parser.rs">parser.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/model.rs">model.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/parser.rs">parser.rs</a></li>
+<li>verifiedBy: <a href="Verifications/ParsingVerifications.html#specification-file-identification-test">Specification File Identification Test</a></li>
+</ul>
+<hr />
+<h3 id="structure-and-addressing-in-markdown-documents">Structure and Addressing in Markdown Documents</h3>
+<p>The system shall implement semi-structured markdown format specifications that defines the structure, rules, and usage of <strong>Elements</strong>, <strong>Subsections</strong>, <strong>Relations</strong>, and <strong>Identifiers</strong> in Markdown (<code>.md</code>) documents following clearly defined specifications.</p>
+<h4>Attachments</h4>
+<ul>
+<li><a href="DesignDocuments/MarkdownStructure.html">MarkdownStructure.html</a></li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derive: <a href="#element-identity-model">Element Identity Model</a></li>
+<li>derive: <a href="#reserved-subsections-support">Reserved Subsections Support</a></li>
+<li>derivedFrom: <a href="../../UserStories.html#managing-system-models">Managing System Models</a></li>
+<li>satisfiedBy: <a href="../../../core/src/element.rs">element.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/model.rs">model.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/parser.rs">parser.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/relation.rs">relation.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/subsection.rs">subsection.rs</a></li>
+<li>verifiedBy: <a href="Verifications/ValidationVerifications.html#invalid-header-structure-test">Invalid Header Structure Test</a></li>
+<li>verifiedBy: <a href="../Operations/Verifications/FormattingVerifications.html#format-command-requirements-verification">Format Command Requirements Verification</a></li>
+</ul>
+<hr />
+<h3 id="element-identity-model">Element Identity Model</h3>
+<p>The system shall distinguish between element identity (ID) and element addressing (identifier) to support stable element tracking independent of file location.</p>
+<h4>Attachments</h4>
+<ul>
+<li><a href="DesignDocuments/ElementIdentity.html">ElementIdentity.html</a></li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derive: <a href="#identifiers-and-relations">Identifiers and Relations</a></li>
+<li>derive: <a href="Validation.html#internal-consistency-validator">Internal Consistency Validator</a></li>
+<li>derive: <a href="../Processing/ChangeImpact.html#change-impact-detection">Change Impact Detection</a></li>
+<li>derivedFrom: <a href="#structure-and-addressing-in-markdown-documents">Structure and Addressing in Markdown Documents</a></li>
+<li>satisfiedBy: <a href="../../../core/src/element.rs">element.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/parser.rs">parser.rs</a></li>
+<li>verifiedBy: <a href="Verifications/ParsingVerifications.html#fragment-normalization-test">Fragment Normalization Test</a></li>
+</ul>
+<hr />
+<h3 id="identifiers-and-relations">Identifiers and Relations</h3>
+<p>The system shall implement  <strong>Identifiers</strong> and <strong>Relations</strong> following clearly defined specifications to ensure consistency, validity, and efficient querying and manipulation of these entities.</p>
+<h4>Attachments</h4>
+<ul>
+<li><a href="DesignDocuments/IdentifiersAndRelations.html">IdentifiersAndRelations.html</a></li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derive: <a href="ModelManagement.html#relation-types-and-behaviors">Relation Types and behaviors</a></li>
+<li>derivedFrom: <a href="#element-identity-model">Element Identity Model</a></li>
+<li>derivedFrom: <a href="../../UserStories.html#ai-assisted-system-model-management">AI-Assisted System Model Management</a></li>
+<li>satisfiedBy: <a href="../../../core/src/relation.rs">relation.rs</a></li>
 </ul>
 <hr />
 <h3 id="reserved-subsections-support">Reserved Subsections Support</h3>
@@ -985,9 +1048,19 @@ blockquote {
 </ul>
 <h4>Relations</h4>
 <ul>
+<li>derive: <a href="../../Interfaces/CLI.html#attachment-commands">Attachment Commands</a></li>
+<li>derive: <a href="ModelManagement.html#supported-element-types">Supported Element Types</a></li>
+<li>derive: <a href="ModelManagement.html#verification-type-categories">Verification Type Categories</a></li>
+<li>derive: <a href="#attachment-target-validation">Attachment Target Validation</a></li>
+<li>derive: <a href="../Operations/ElementManipulation.html#create-element-operation">Create Element Operation</a></li>
 <li>derivedFrom: <a href="#structure-and-addressing-in-markdown-documents">Structure and Addressing in Markdown Documents</a></li>
 <li>satisfiedBy: <a href="../../../core/src/element.rs">element.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/parser.rs">parser.rs</a></li>
+<li>verifiedBy: <a href="Verifications/AttachmentsVerifications.html#attachment-output-rendering-verification">Attachment Output Rendering Verification</a></li>
+<li>verifiedBy: <a href="Verifications/AttachmentsVerifications.html#attachments-subsection-parsing-verification">Attachments Subsection Parsing Verification</a></li>
+<li>verifiedBy: <a href="Verifications/AttachmentsVerifications.html#attachments-validation-verification">Attachments Validation Verification</a></li>
+<li>verifiedBy: <a href="Verifications/ParsingVerifications.html#element-subsection-parsing-test">Element Subsection Parsing Test</a></li>
+<li>verifiedBy: <a href="Verifications/ParsingVerifications.html#non-reserved-subsections-content-test">Non-Reserved Subsections Content Test</a></li>
 </ul>
 <hr />
 <h3 id="attachment-target-validation">Attachment Target Validation</h3>
@@ -1013,48 +1086,8 @@ blockquote {
 <li>derivedFrom: <a href="#reserved-subsections-support">Reserved Subsections Support</a></li>
 <li>satisfiedBy: <a href="../../../core/src/model.rs">model.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/parser.rs">parser.rs</a></li>
-</ul>
-<hr />
-<h3 id="structure-and-addressing-in-markdown-documents">Structure and Addressing in Markdown Documents</h3>
-<p>The system shall implement semi-structured markdown format specifications that defines the structure, rules, and usage of <strong>Elements</strong>, <strong>Subsections</strong>, <strong>Relations</strong>, and <strong>Identifiers</strong> in Markdown (<code>.md</code>) documents following clearly defined specifications.</p>
-<h4>Attachments</h4>
-<ul>
-<li><a href="DesignDocuments/MarkdownStructure.html">MarkdownStructure.html</a></li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="../../UserStories.html#managing-system-models">Managing System Models</a></li>
-<li>satisfiedBy: <a href="../../../core/src/relation.rs">relation.rs</a></li>
-<li>satisfiedBy: <a href="../../../core/src/element.rs">element.rs</a></li>
-<li>satisfiedBy: <a href="../../../core/src/subsection.rs">subsection.rs</a></li>
-<li>satisfiedBy: <a href="../../../core/src/parser.rs">parser.rs</a></li>
-<li>satisfiedBy: <a href="../../../core/src/model.rs">model.rs</a></li>
-</ul>
-<hr />
-<h3 id="identifiers-and-relations">Identifiers and Relations</h3>
-<p>The system shall implement  <strong>Identifiers</strong> and <strong>Relations</strong> following clearly defined specifications to ensure consistency, validity, and efficient querying and manipulation of these entities.</p>
-<h4>Attachments</h4>
-<ul>
-<li><a href="DesignDocuments/IdentifiersAndRelations.html">IdentifiersAndRelations.html</a></li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="#element-identity-model">Element Identity Model</a></li>
-<li>derivedFrom: <a href="../../UserStories.html#ai-assisted-system-model-management">AI-Assisted System Model Management</a></li>
-<li>satisfiedBy: <a href="../../../core/src/relation.rs">relation.rs</a></li>
-</ul>
-<hr />
-<h3 id="element-identity-model">Element Identity Model</h3>
-<p>The system shall distinguish between element identity (ID) and element addressing (identifier) to support stable element tracking independent of file location.</p>
-<h4>Attachments</h4>
-<ul>
-<li><a href="DesignDocuments/ElementIdentity.html">ElementIdentity.html</a></li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="#structure-and-addressing-in-markdown-documents">Structure and Addressing in Markdown Documents</a></li>
-<li>satisfiedBy: <a href="../../../core/src/element.rs">element.rs</a></li>
-<li>satisfiedBy: <a href="../../../core/src/parser.rs">parser.rs</a></li>
+<li>verifiedBy: <a href="Verifications/AttachmentsVerifications.html#attachments-subsection-parsing-verification">Attachments Subsection Parsing Verification</a></li>
+<li>verifiedBy: <a href="Verifications/AttachmentsVerifications.html#attachments-validation-verification">Attachments Validation Verification</a></li>
 </ul>
 <hr />
 

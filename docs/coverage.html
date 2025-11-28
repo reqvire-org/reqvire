@@ -198,31 +198,31 @@ blockquote {
 }
 .diagram-nav-buttons {
     position: absolute;
-    top: 10px;
-    left: 10px;
+    top: 5px;
+    left: 5px;
     z-index: 999; /* higher than SVG (1) but lower than header nav (1000) */
     display: flex;
     flex-direction: column;
-    gap: 5px;
-    background-color: rgba(255, 255, 255, 0.9);
-    padding: 5px;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    gap: 2px;
+    background-color: rgba(255, 255, 255, 0.85);
+    padding: 3px;
+    border-radius: 3px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
 }
 .diagram-nav-row {
     display: flex;
-    gap: 5px;
+    gap: 2px;
     justify-content: center;
 }
 .diagram-nav-btn {
-    width: 32px;
-    height: 32px;
+    width: 22px;
+    height: 22px;
     background-color: var(--color-primary);
     color: white;
     border: none;
-    border-radius: 3px;
+    border-radius: 2px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 11px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -318,6 +318,27 @@ blockquote {
                     return;
                 }
 
+                // Get the natural size of the diagram
+                var bbox = svg.getBBox();
+                var containerWidth = mermaidContainer.clientWidth;
+                var containerHeight = mermaidContainer.clientHeight;
+
+                // Check if diagram fits within container (with some padding)
+                var padding = 40;
+                var fitsInContainer = (bbox.width <= containerWidth - padding) && (bbox.height <= containerHeight - padding);
+
+                if (fitsInContainer) {
+                    // Diagram fits - use natural size, shrink container to fit content
+                    svg.style.width = 'auto';
+                    svg.style.height = 'auto';
+                    mermaidContainer.style.height = 'auto';
+                    mermaidContainer.style.minHeight = (bbox.height + padding) + 'px';
+                    mermaidContainer.style.maxHeight = 'calc(100vh - 150px)';
+                    // No pan/zoom needed for small diagrams
+                    return;
+                }
+
+                // Large diagram - enable pan/zoom
                 svg.style.maxWidth = 'none';
                 svg.style.maxHeight = 'none';
 
@@ -696,7 +717,9 @@ blockquote {
         <a href="index.html">Containment</a>
         <a href="model.html">Model</a>
         <a href="traces.html">Traces</a>
+        <a href="traceflow.html">TraceFlow</a>
         <a href="coverage.html">Coverage</a>
+        <a href="resources.html">Resources</a>
     </nav>
     <div class="reqvire-nav-spacer"></div>
     <div class="container">
@@ -706,25 +729,25 @@ blockquote {
 <h2 id="summary">Summary</h2>
 <h3 id="leaf-requirements">Leaf Requirements</h3>
 <ul>
-<li><strong>Total Leaf Requirements:</strong> 70</li>
-<li><strong>Verified Leaf Requirements:</strong> 51 (72.9%)</li>
-<li><strong>Unverified Leaf Requirements:</strong> 19</li>
+<li><strong>Total Leaf Requirements:</strong> 91</li>
+<li><strong>Verified Leaf Requirements:</strong> 62 (68.1%)</li>
+<li><strong>Unverified Leaf Requirements:</strong> 29</li>
 </ul>
 <h3 id="test-verifications">Test Verifications</h3>
 <ul>
-<li><strong>Total Test Verifications:</strong> 73</li>
-<li><strong>Satisfied Test Verifications:</strong> 70 (95.9%)</li>
-<li><strong>Unsatisfied Test Verifications:</strong> 3</li>
+<li><strong>Total Test Verifications:</strong> 77</li>
+<li><strong>Satisfied Test Verifications:</strong> 71 (92.2%)</li>
+<li><strong>Unsatisfied Test Verifications:</strong> 6</li>
 </ul>
 <h3 id="orphaned-verifications">Orphaned Verifications</h3>
 <ul>
-<li><strong>Total Verifications:</strong> 73</li>
-<li><strong>Orphaned Verifications:</strong> 0 (0.0%)</li>
+<li><strong>Total Verifications:</strong> 78</li>
+<li><strong>Orphaned Verifications:</strong> 6 (7.7%)</li>
 </ul>
 <h3 id="verification-types">Verification Types</h3>
 <ul>
-<li>Test: 73</li>
-<li>Analysis: 0</li>
+<li>Test: 77</li>
+<li>Analysis: 1</li>
 <li>Inspection: 0</li>
 <li>Demonstration: 0</li>
 </ul>
@@ -735,10 +758,8 @@ blockquote {
 <ul>
 <li>Verified by:
 <ul>
-<li><a href="requirements/System/Core/Verifications/AttachmentsVerifications.html#detach-command-verification">requirements/System/Core/Verifications/AttachmentsVerifications.md#detach-command-verification</a></li>
-<li><a href="requirements/System/Core/Verifications/AttachmentsVerifications.html#move-attachment-command-verification">requirements/System/Core/Verifications/AttachmentsVerifications.md#move-attachment-command-verification</a></li>
 <li><a href="requirements/System/Core/Verifications/AttachmentsVerifications.html#attach-command-verification">requirements/System/Core/Verifications/AttachmentsVerifications.md#attach-command-verification</a></li>
-<li><a href="requirements/System/Core/Verifications/AttachmentsVerifications.html#remove-attachment-command-verification">requirements/System/Core/Verifications/AttachmentsVerifications.md#remove-attachment-command-verification</a></li>
+<li><a href="requirements/System/Core/Verifications/AttachmentsVerifications.html#detach-command-verification">requirements/System/Core/Verifications/AttachmentsVerifications.md#detach-command-verification</a></li>
 </ul>
 </li>
 </ul>
@@ -759,8 +780,8 @@ blockquote {
 <li><a href="requirements/Interfaces/Verifications/CLIVerifications.html#cli-git-commit-hash-flag-test">requirements/Interfaces/Verifications/CLIVerifications.md#cli-git-commit-hash-flag-test</a></li>
 <li><a href="requirements/Interfaces/Verifications/CLIVerifications.html#cli-help-structure-verification">requirements/Interfaces/Verifications/CLIVerifications.md#cli-help-structure-verification</a></li>
 <li><a href="requirements/System/Processing/Verifications/ChangeImpactVerifications.html#change-impact-analysis-verification">requirements/System/Processing/Verifications/ChangeImpactVerifications.md#change-impact-analysis-verification</a></li>
-<li><a href="requirements/System/Processing/Verifications/ChangeImpactVerifications.html#change-impact-relations-test">requirements/System/Processing/Verifications/ChangeImpactVerifications.md#change-impact-relations-test</a></li>
 <li><a href="requirements/System/Processing/Verifications/ChangeImpactVerifications.html#change-impact-detection-test">requirements/System/Processing/Verifications/ChangeImpactVerifications.md#change-impact-detection-test</a></li>
+<li><a href="requirements/System/Processing/Verifications/ChangeImpactVerifications.html#change-impact-relations-test">requirements/System/Processing/Verifications/ChangeImpactVerifications.md#change-impact-relations-test</a></li>
 </ul>
 </li>
 </ul>
@@ -769,18 +790,17 @@ blockquote {
 <ul>
 <li>Verified by:
 <ul>
-<li><a href="requirements/System/Output/Verifications/ReportingVerifications.html#verification-coverage-report-test">requirements/System/Output/Verifications/ReportingVerifications.md#verification-coverage-report-test</a></li>
 <li><a href="requirements/Interfaces/Verifications/CLIVerifications.html#cli-help-structure-verification">requirements/Interfaces/Verifications/CLIVerifications.md#cli-help-structure-verification</a></li>
+<li><a href="requirements/System/Output/Verifications/ReportingVerifications.html#verification-coverage-report-test">requirements/System/Output/Verifications/ReportingVerifications.md#verification-coverage-report-test</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li>✅ <strong><a href="requirements/Interfaces/CLI.html#cli-generate-diagrams-flag">CLI Generate Diagrams Flag</a></strong>
+<li>✅ <strong><a href="requirements/Interfaces/CLI.html#cli-move-asset-command">CLI Move Asset Command</a></strong>
 <ul>
 <li>Verified by:
 <ul>
-<li><a href="requirements/System/Output/Verifications/DiagramVerifications.html#diagram-generation-test">requirements/System/Output/Verifications/DiagramVerifications.md#diagram-generation-test</a></li>
-<li><a href="requirements/Interfaces/Verifications/CLIVerifications.html#cli-help-structure-verification">requirements/Interfaces/Verifications/CLIVerifications.md#cli-help-structure-verification</a></li>
+<li><a href="requirements/System/Core/Verifications/AttachmentsVerifications.html#move-asset-command-verification">requirements/System/Core/Verifications/AttachmentsVerifications.md#move-asset-command-verification</a></li>
 </ul>
 </li>
 </ul>
@@ -799,18 +819,17 @@ blockquote {
 <ul>
 <li>Verified by:
 <ul>
-<li><a href="requirements/System/Operations/Verifications/ElementManipulationVerifications.html#cli-move-file-test">requirements/System/Operations/Verifications/ElementManipulationVerifications.md#cli-move-file-test</a></li>
 <li><a href="requirements/System/Core/Verifications/ValidationVerifications.html#subdirectory-processing-verification">requirements/System/Core/Verifications/ValidationVerifications.md#subdirectory-processing-verification</a></li>
+<li><a href="requirements/System/Operations/Verifications/ElementManipulationVerifications.html#cli-move-file-test">requirements/System/Operations/Verifications/ElementManipulationVerifications.md#cli-move-file-test</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li>✅ <strong><a href="requirements/Interfaces/CLI.html#cli-remove-diagrams-flag">CLI Remove Diagrams Flag</a></strong>
+<li>✅ <strong><a href="requirements/Interfaces/CLI.html#cli-remove-asset-command">CLI Remove Asset Command</a></strong>
 <ul>
 <li>Verified by:
 <ul>
-<li><a href="requirements/System/Output/Verifications/DiagramVerifications.html#remove-generated-diagrams-verification">requirements/System/Output/Verifications/DiagramVerifications.md#remove-generated-diagrams-verification</a></li>
-<li><a href="requirements/Interfaces/Verifications/CLIVerifications.html#cli-help-structure-verification">requirements/Interfaces/Verifications/CLIVerifications.md#cli-help-structure-verification</a></li>
+<li><a href="requirements/System/Core/Verifications/AttachmentsVerifications.html#remove-asset-command-verification">requirements/System/Core/Verifications/AttachmentsVerifications.md#remove-asset-command-verification</a></li>
 </ul>
 </li>
 </ul>
@@ -833,13 +852,22 @@ blockquote {
 </li>
 </ul>
 </li>
+<li>✅ <strong><a href="requirements/Interfaces/CLI.html#cli-resources-command">CLI Resources Command</a></strong>
+<ul>
+<li>Verified by:
+<ul>
+<li><a href="requirements/System/Output/Verifications/ReportingVerifications.html#resources-report-verification">requirements/System/Output/Verifications/ReportingVerifications.md#resources-report-verification</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li>✅ <strong><a href="requirements/Interfaces/CLI.html#cli-search-command">CLI Search Command</a></strong>
 <ul>
 <li>Verified by:
 <ul>
-<li><a href="requirements/System/Output/Verifications/ReportingVerifications.html#search-command-tests">requirements/System/Output/Verifications/ReportingVerifications.md#search-command-tests</a></li>
 <li><a href="requirements/Interfaces/Verifications/CLIVerifications.html#cli-help-structure-verification">requirements/Interfaces/Verifications/CLIVerifications.md#cli-help-structure-verification</a></li>
 <li><a href="requirements/System/Core/Verifications/AttachmentsVerifications.html#attachment-search-filters-verification">requirements/System/Core/Verifications/AttachmentsVerifications.md#attachment-search-filters-verification</a></li>
+<li><a href="requirements/System/Output/Verifications/ReportingVerifications.html#search-command-tests">requirements/System/Output/Verifications/ReportingVerifications.md#search-command-tests</a></li>
 </ul>
 </li>
 </ul>
@@ -848,8 +876,10 @@ blockquote {
 <ul>
 <li>Verified by:
 <ul>
-<li><a href="requirements/System/Operations/Verifications/FormattingVerifications.html#format-command-requirements-verification">requirements/System/Operations/Verifications/FormattingVerifications.md#format-command-requirements-verification</a></li>
 <li><a href="requirements/Interfaces/Verifications/CLIVerifications.html#cli-help-structure-verification">requirements/Interfaces/Verifications/CLIVerifications.md#cli-help-structure-verification</a></li>
+<li><a href="requirements/System/Operations/Verifications/FormattingVerifications.html#element-ordering-verification">requirements/System/Operations/Verifications/FormattingVerifications.md#element-ordering-verification</a></li>
+<li><a href="requirements/System/Operations/Verifications/FormattingVerifications.html#format-command-requirements-verification">requirements/System/Operations/Verifications/FormattingVerifications.md#format-command-requirements-verification</a></li>
+<li><a href="requirements/System/Operations/Verifications/FormattingVerifications.html#full-relations-insertion-verification">requirements/System/Operations/Verifications/FormattingVerifications.md#full-relations-insertion-verification</a></li>
 </ul>
 </li>
 </ul>
@@ -958,8 +988,8 @@ blockquote {
 <ul>
 <li>Verified by:
 <ul>
-<li><a href="requirements/System/Core/Verifications/ValidationVerifications.html#default-element-type-assignment-test">requirements/System/Core/Verifications/ValidationVerifications.md#default-element-type-assignment-test</a></li>
 <li><a href="requirements/System/Core/Verifications/ParsingVerifications.html#element-subsection-parsing-test">requirements/System/Core/Verifications/ParsingVerifications.md#element-subsection-parsing-test</a></li>
+<li><a href="requirements/System/Core/Verifications/ValidationVerifications.html#default-element-type-assignment-test">requirements/System/Core/Verifications/ValidationVerifications.md#default-element-type-assignment-test</a></li>
 </ul>
 </li>
 </ul>
@@ -980,8 +1010,8 @@ blockquote {
 <ul>
 <li>Verified by:
 <ul>
-<li><a href="requirements/System/Core/Verifications/AttachmentsVerifications.html#attachments-validation-verification">requirements/System/Core/Verifications/AttachmentsVerifications.md#attachments-validation-verification</a></li>
 <li><a href="requirements/System/Core/Verifications/AttachmentsVerifications.html#attachments-subsection-parsing-verification">requirements/System/Core/Verifications/AttachmentsVerifications.md#attachments-subsection-parsing-verification</a></li>
+<li><a href="requirements/System/Core/Verifications/AttachmentsVerifications.html#attachments-validation-verification">requirements/System/Core/Verifications/AttachmentsVerifications.md#attachments-validation-verification</a></li>
 </ul>
 </li>
 </ul>
@@ -1038,8 +1068,8 @@ blockquote {
 <ul>
 <li>Verified by:
 <ul>
-<li><a href="requirements/System/Core/Verifications/ValidationVerifications.html#invalid-relations-test">requirements/System/Core/Verifications/ValidationVerifications.md#invalid-relations-test</a></li>
 <li><a href="requirements/System/Core/Verifications/ValidationVerifications.html#invalid-header-structure-test">requirements/System/Core/Verifications/ValidationVerifications.md#invalid-header-structure-test</a></li>
+<li><a href="requirements/System/Core/Verifications/ValidationVerifications.html#invalid-relations-test">requirements/System/Core/Verifications/ValidationVerifications.md#invalid-relations-test</a></li>
 </ul>
 </li>
 </ul>
@@ -1048,8 +1078,8 @@ blockquote {
 <ul>
 <li>Verified by:
 <ul>
-<li><a href="requirements/System/Core/Verifications/ValidationVerifications.html#invalid-relations-test">requirements/System/Core/Verifications/ValidationVerifications.md#invalid-relations-test</a></li>
 <li><a href="requirements/System/Core/Verifications/ValidationVerifications.html#element-type-relation-compatibility-test">requirements/System/Core/Verifications/ValidationVerifications.md#element-type-relation-compatibility-test</a></li>
+<li><a href="requirements/System/Core/Verifications/ValidationVerifications.html#invalid-relations-test">requirements/System/Core/Verifications/ValidationVerifications.md#invalid-relations-test</a></li>
 </ul>
 </li>
 </ul>
@@ -1088,11 +1118,66 @@ blockquote {
 </ul>
 <h3><a href="requirements/System/Operations/ElementManipulation.html">requirements/System/Operations/ElementManipulation.html</a></h3>
 <ul>
+<li>✅ <strong><a href="requirements/System/Operations/ElementManipulation.html#create-element-operation">Create Element Operation</a></strong>
+<ul>
+<li>Verified by:
+<ul>
+<li><a href="requirements/System/Operations/Verifications/ElementManipulationVerifications.html#create-element-test">requirements/System/Operations/Verifications/ElementManipulationVerifications.md#create-element-test</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>✅ <strong><a href="requirements/System/Operations/ElementManipulation.html#delete-element-operation">Delete Element Operation</a></strong>
+<ul>
+<li>Verified by:
+<ul>
+<li><a href="requirements/System/Operations/Verifications/ElementManipulationVerifications.html#delete-element-test">requirements/System/Operations/Verifications/ElementManipulationVerifications.md#delete-element-test</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>✅ <strong><a href="requirements/System/Operations/ElementManipulation.html#element-manipulation-file-persistence">Element Manipulation File Persistence</a></strong>
+<ul>
+<li>Verified by:
+<ul>
+<li><a href="requirements/System/Operations/Verifications/ElementManipulationVerifications.html#file-persistence-test">requirements/System/Operations/Verifications/ElementManipulationVerifications.md#file-persistence-test</a></li>
+<li><a href="requirements/System/Operations/Verifications/FormattingVerifications.html#element-ordering-verification">requirements/System/Operations/Verifications/FormattingVerifications.md#element-ordering-verification</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>✅ <strong><a href="requirements/System/Operations/ElementManipulation.html#move-element-operation">Move Element Operation</a></strong>
+<ul>
+<li>Verified by:
+<ul>
+<li><a href="requirements/System/Operations/Verifications/ElementManipulationVerifications.html#move-element-test">requirements/System/Operations/Verifications/ElementManipulationVerifications.md#move-element-test</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>✅ <strong><a href="requirements/System/Operations/ElementManipulation.html#move-file-operation">Move File Operation</a></strong>
+<ul>
+<li>Verified by:
+<ul>
+<li><a href="requirements/System/Operations/Verifications/ElementManipulationVerifications.html#move-file-squash-test">requirements/System/Operations/Verifications/ElementManipulationVerifications.md#move-file-squash-test</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li>✅ <strong><a href="requirements/System/Operations/ElementManipulation.html#relation-consistency-maintenance">Relation Consistency Maintenance</a></strong>
 <ul>
 <li>Verified by:
 <ul>
 <li><a href="requirements/System/Operations/Verifications/ElementManipulationVerifications.html#relation-consistency-test">requirements/System/Operations/Verifications/ElementManipulationVerifications.md#relation-consistency-test</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>✅ <strong><a href="requirements/System/Operations/ElementManipulation.html#target-location-validation-and-auto-creation">Target Location Validation and Auto-Creation</a></strong>
+<ul>
+<li>Verified by:
+<ul>
+<li><a href="requirements/System/Operations/Verifications/ElementManipulationVerifications.html#target-location-validation-test">requirements/System/Operations/Verifications/ElementManipulationVerifications.md#target-location-validation-test</a></li>
 </ul>
 </li>
 </ul>
@@ -1109,11 +1194,38 @@ blockquote {
 </li>
 </ul>
 </li>
+<li>✅ <strong><a href="requirements/System/Operations/Formatting.html#element-ordering-normalization">Element Ordering Normalization</a></strong>
+<ul>
+<li>Verified by:
+<ul>
+<li><a href="requirements/System/Operations/Verifications/FormattingVerifications.html#element-ordering-verification">requirements/System/Operations/Verifications/FormattingVerifications.md#element-ordering-verification</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>✅ <strong><a href="requirements/System/Operations/Formatting.html#full-relations-insertion">Full Relations Insertion</a></strong>
+<ul>
+<li>Verified by:
+<ul>
+<li><a href="requirements/System/Operations/Verifications/FormattingVerifications.html#full-relations-insertion-verification">requirements/System/Operations/Verifications/FormattingVerifications.md#full-relations-insertion-verification</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li>✅ <strong><a href="requirements/System/Operations/Formatting.html#git-style-diff-output-for-format">Git-Style Diff Output for Format</a></strong>
 <ul>
 <li>Verified by:
 <ul>
 <li><a href="requirements/System/Operations/Verifications/FormattingVerifications.html#format-command-requirements-verification">requirements/System/Operations/Verifications/FormattingVerifications.md#format-command-requirements-verification</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>✅ <strong><a href="requirements/System/Operations/Formatting.html#relation-ordering-normalization">Relation Ordering Normalization</a></strong>
+<ul>
+<li>Verified by:
+<ul>
+<li><a href="requirements/System/Operations/Verifications/FormattingVerifications.html#relation-ordering-verification">requirements/System/Operations/Verifications/FormattingVerifications.md#relation-ordering-verification</a></li>
 </ul>
 </li>
 </ul>
@@ -1178,6 +1290,15 @@ blockquote {
 </ul>
 <h3><a href="requirements/System/Output/DiagramGeneration.html">requirements/System/Output/DiagramGeneration.html</a></h3>
 <ul>
+<li>✅ <strong><a href="requirements/System/Output/DiagramGeneration.html#diagram-removal">Diagram Removal</a></strong>
+<ul>
+<li>Verified by:
+<ul>
+<li><a href="requirements/System/Output/Verifications/DiagramVerifications.html#remove-generated-diagrams-verification">requirements/System/Output/Verifications/DiagramVerifications.md#remove-generated-diagrams-verification</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li>✅ <strong><a href="requirements/System/Output/DiagramGeneration.html#file-diagram-attachment-display">File Diagram Attachment Display</a></strong>
 <ul>
 <li>Verified by:
@@ -1200,20 +1321,11 @@ blockquote {
 </ul>
 <h3><a href="requirements/System/Output/Reporting.html">requirements/System/Output/Reporting.html</a></h3>
 <ul>
-<li>✅ <strong><a href="requirements/System/Output/Reporting.html#containment-view-design-documents">Containment View Design Documents</a></strong>
+<li>✅ <strong><a href="requirements/System/Output/Reporting.html#containment-view-report">Containment View Report</a></strong>
 <ul>
 <li>Verified by:
 <ul>
 <li><a href="requirements/System/Output/Verifications/ReportingVerifications.html#containment-view-design-documents-test">requirements/System/Output/Verifications/ReportingVerifications.md#containment-view-design-documents-test</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li>✅ <strong><a href="requirements/System/Output/Reporting.html#custom-element-type-tracking">Custom Element Type Tracking</a></strong>
-<ul>
-<li>Verified by:
-<ul>
-<li><a href="requirements/System/Output/Verifications/ReportingVerifications.html#custom-element-type-tracking-test">requirements/System/Output/Verifications/ReportingVerifications.md#custom-element-type-tracking-test</a></li>
 </ul>
 </li>
 </ul>
@@ -1227,11 +1339,20 @@ blockquote {
 </li>
 </ul>
 </li>
-<li>✅ <strong><a href="requirements/System/Output/Reporting.html#model-diagram-output-formats">Model Diagram Output Formats</a></strong>
+<li>✅ <strong><a href="requirements/System/Output/Reporting.html#search-report-generator">Search Report Generator</a></strong>
 <ul>
 <li>Verified by:
 <ul>
-<li><a href="requirements/System/Output/Verifications/ReportingVerifications.html#model-command-verification">requirements/System/Output/Verifications/ReportingVerifications.md#model-command-verification</a></li>
+<li><a href="requirements/System/Output/Verifications/ReportingVerifications.html#search-command-tests">requirements/System/Output/Verifications/ReportingVerifications.md#search-command-tests</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>✅ <strong><a href="requirements/System/Output/Reporting.html#traceflow-view-report-generation">TraceFlow View Report Generation</a></strong>
+<ul>
+<li>Verified by:
+<ul>
+<li><a href="requirements/System/Output/Verifications/ReportingVerifications.html#traceflow-view-test">requirements/System/Output/Verifications/ReportingVerifications.md#traceflow-view-test</a></li>
 </ul>
 </li>
 </ul>
@@ -1243,10 +1364,10 @@ blockquote {
 <ul>
 <li>Verified by:
 <ul>
-<li><a href="requirements/System/Processing/Verifications/ChangeImpactVerifications.html#element-content-extraction-test">requirements/System/Processing/Verifications/ChangeImpactVerifications.md#element-content-extraction-test</a></li>
-<li><a href="requirements/System/Processing/Verifications/ChangeImpactVerifications.html#change-impact-smart-filtering-test">requirements/System/Processing/Verifications/ChangeImpactVerifications.md#change-impact-smart-filtering-test</a></li>
-<li><a href="requirements/System/Processing/Verifications/ChangeImpactVerifications.html#change-impact-relations-test">requirements/System/Processing/Verifications/ChangeImpactVerifications.md#change-impact-relations-test</a></li>
 <li><a href="requirements/System/Processing/Verifications/ChangeImpactVerifications.html#change-impact-detection-test">requirements/System/Processing/Verifications/ChangeImpactVerifications.md#change-impact-detection-test</a></li>
+<li><a href="requirements/System/Processing/Verifications/ChangeImpactVerifications.html#change-impact-relations-test">requirements/System/Processing/Verifications/ChangeImpactVerifications.md#change-impact-relations-test</a></li>
+<li><a href="requirements/System/Processing/Verifications/ChangeImpactVerifications.html#change-impact-smart-filtering-test">requirements/System/Processing/Verifications/ChangeImpactVerifications.md#change-impact-smart-filtering-test</a></li>
+<li><a href="requirements/System/Processing/Verifications/ChangeImpactVerifications.html#element-content-extraction-test">requirements/System/Processing/Verifications/ChangeImpactVerifications.md#element-content-extraction-test</a></li>
 </ul>
 </li>
 </ul>
@@ -1256,6 +1377,8 @@ blockquote {
 <h3><a href="requirements/Interfaces/CLI.html">requirements/Interfaces/CLI.html</a></h3>
 <ul>
 <li>❌ <strong><a href="requirements/Interfaces/CLI.html#cli-containment-command">CLI Containment Command</a></strong></li>
+<li>❌ <strong><a href="requirements/Interfaces/CLI.html#cli-model-diagram-command">CLI Model Diagram Command</a></strong></li>
+<li>❌ <strong><a href="requirements/Interfaces/CLI.html#subdirectory-processing-option">Subdirectory Processing Option</a></strong></li>
 </ul>
 <h3><a href="requirements/Interfaces/WebInterface.html">requirements/Interfaces/WebInterface.html</a></h3>
 <ul>
@@ -1270,6 +1393,7 @@ blockquote {
 <h3><a href="requirements/System/Core/Validation.html">requirements/System/Core/Validation.html</a></h3>
 <ul>
 <li>❌ <strong><a href="requirements/System/Core/Validation.html#integrated-validation">Integrated Validation</a></strong></li>
+<li>❌ <strong><a href="requirements/System/Core/Validation.html#two-pass-validation-strategy">Two-Pass Validation Strategy</a></strong></li>
 <li>❌ <strong><a href="requirements/System/Core/Validation.html#validate-filesystem-structure">Validate Filesystem Structure</a></strong></li>
 </ul>
 <h3><a href="requirements/System/Integration/CodeAlignment.html">requirements/System/Integration/CodeAlignment.html</a></h3>
@@ -1287,14 +1411,30 @@ blockquote {
 <ul>
 <li>❌ <strong><a href="requirements/System/Integration/GitHubIntegration.html#generate-change-logs-for-pull-requests">Generate Change Logs for Pull Requests</a></strong></li>
 </ul>
+<h3><a href="requirements/System/Operations/ElementManipulation.html">requirements/System/Operations/ElementManipulation.html</a></h3>
+<ul>
+<li>❌ <strong><a href="requirements/System/Operations/ElementManipulation.html#rename-element-operation">Rename Element Operation</a></strong></li>
+</ul>
 <h3><a href="requirements/System/Output/DiagramGeneration.html">requirements/System/Output/DiagramGeneration.html</a></h3>
 <ul>
+<li>❌ <strong><a href="requirements/System/Output/DiagramGeneration.html#complete-model-structure-visualization">Complete Model Structure Visualization</a></strong></li>
 <li>❌ <strong><a href="requirements/System/Output/DiagramGeneration.html#interactive-mermaid-diagram-node-behavior">Interactive Mermaid Diagram Node Behavior</a></strong></li>
+<li>❌ <strong><a href="requirements/System/Output/DiagramGeneration.html#model-visualization-and-exploration">Model Visualization and Exploration</a></strong></li>
 <li>❌ <strong><a href="requirements/System/Output/DiagramGeneration.html#sysml-compatible-relationship-rendering">SysML-Compatible Relationship Rendering</a></strong></li>
+</ul>
+<h3><a href="requirements/System/Processing/ChangeImpact.html">requirements/System/Processing/ChangeImpact.html</a></h3>
+<ul>
+<li>❌ <strong><a href="requirements/System/Processing/ChangeImpact.html#structural-change-analyzer">Structural Change Analyzer</a></strong></li>
+</ul>
+<h3><a href="requirements/System/Processing/VerificationTraces.html">requirements/System/Processing/VerificationTraces.html</a></h3>
+<ul>
+<li>❌ <strong><a href="requirements/System/Processing/VerificationTraces.html#verification-roll-up-strategy">Verification Roll-up Strategy</a></strong></li>
+<li>❌ <strong><a href="requirements/System/Processing/VerificationTraces.html#verification-trace-builder">Verification Trace Builder</a></strong></li>
 </ul>
 <h3><a href="requirements/UserStories.html">requirements/UserStories.html</a></h3>
 <ul>
 <li>❌ <strong><a href="requirements/UserStories.html#fostering-community-contributions">Fostering Community Contributions</a></strong></li>
+<li>❌ <strong><a href="requirements/UserStories.html#model-export">Model Export</a></strong></li>
 </ul>
 <h2 id="satisfied-test-verifications">Satisfied Test Verifications</h2>
 <h3><a href="requirements/Interfaces/Verifications/CLIVerifications.html">requirements/Interfaces/Verifications/CLIVerifications.html</a></h3>
@@ -1390,7 +1530,7 @@ blockquote {
 <ul>
 <li>Satisfied by:
 <ul>
-<li><a href="tests/test-attachments/test.sh">tests/test-attachments/test.sh</a></li>
+<li><a href="tests/test-assets/test.sh">tests/test-assets/test.sh</a></li>
 </ul>
 </li>
 </ul>
@@ -1399,7 +1539,7 @@ blockquote {
 <ul>
 <li>Satisfied by:
 <ul>
-<li><a href="tests/test-attachments/test.sh">tests/test-attachments/test.sh</a></li>
+<li><a href="tests/test-assets/test.sh">tests/test-assets/test.sh</a></li>
 </ul>
 </li>
 </ul>
@@ -1408,7 +1548,7 @@ blockquote {
 <ul>
 <li>Satisfied by:
 <ul>
-<li><a href="tests/test-attachments/test.sh">tests/test-attachments/test.sh</a></li>
+<li><a href="tests/test-assets/test.sh">tests/test-assets/test.sh</a></li>
 </ul>
 </li>
 </ul>
@@ -1426,7 +1566,7 @@ blockquote {
 <ul>
 <li>Satisfied by:
 <ul>
-<li><a href="tests/test-attachments/test.sh">tests/test-attachments/test.sh</a></li>
+<li><a href="tests/test-assets/test.sh">tests/test-assets/test.sh</a></li>
 </ul>
 </li>
 </ul>
@@ -1435,7 +1575,7 @@ blockquote {
 <ul>
 <li>Satisfied by:
 <ul>
-<li><a href="tests/test-attachments/test.sh">tests/test-attachments/test.sh</a></li>
+<li><a href="tests/test-assets/test.sh">tests/test-assets/test.sh</a></li>
 </ul>
 </li>
 </ul>
@@ -1444,25 +1584,25 @@ blockquote {
 <ul>
 <li>Satisfied by:
 <ul>
-<li><a href="tests/test-attachments/test.sh">tests/test-attachments/test.sh</a></li>
+<li><a href="tests/test-assets/test.sh">tests/test-assets/test.sh</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li>✅ <strong><a href="requirements/System/Core/Verifications/AttachmentsVerifications.html#move-attachment-command-verification">Move Attachment Command Verification</a></strong> (test-verification)
+<li>✅ <strong><a href="requirements/System/Core/Verifications/AttachmentsVerifications.html#move-asset-command-verification">Move Asset Command Verification</a></strong> (test-verification)
 <ul>
 <li>Satisfied by:
 <ul>
-<li><a href="tests/test-attachments/test.sh">tests/test-attachments/test.sh</a></li>
+<li><a href="tests/test-assets/test.sh">tests/test-assets/test.sh</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li>✅ <strong><a href="requirements/System/Core/Verifications/AttachmentsVerifications.html#remove-attachment-command-verification">Remove Attachment Command Verification</a></strong> (test-verification)
+<li>✅ <strong><a href="requirements/System/Core/Verifications/AttachmentsVerifications.html#remove-asset-command-verification">Remove Asset Command Verification</a></strong> (test-verification)
 <ul>
 <li>Satisfied by:
 <ul>
-<li><a href="tests/test-attachments/test.sh">tests/test-attachments/test.sh</a></li>
+<li><a href="tests/test-assets/test.sh">tests/test-assets/test.sh</a></li>
 </ul>
 </li>
 </ul>
@@ -1670,8 +1810,8 @@ blockquote {
 <ul>
 <li>Satisfied by:
 <ul>
-<li><a href="tests/test-crud-manipulation/test.sh">tests/test-crud-manipulation/test.sh</a></li>
 <li><a href="tests/test-crud-empty-file-cleanup/test.sh">tests/test-crud-empty-file-cleanup/test.sh</a></li>
+<li><a href="tests/test-crud-manipulation/test.sh">tests/test-crud-manipulation/test.sh</a></li>
 </ul>
 </li>
 </ul>
@@ -1706,7 +1846,34 @@ blockquote {
 </ul>
 <h3><a href="requirements/System/Operations/Verifications/FormattingVerifications.html">requirements/System/Operations/Verifications/FormattingVerifications.html</a></h3>
 <ul>
+<li>✅ <strong><a href="requirements/System/Operations/Verifications/FormattingVerifications.html#element-ordering-verification">Element Ordering Verification</a></strong> (test-verification)
+<ul>
+<li>Satisfied by:
+<ul>
+<li><a href="tests/test-element-ordering/test.sh">tests/test-element-ordering/test.sh</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li>✅ <strong><a href="requirements/System/Operations/Verifications/FormattingVerifications.html#format-command-requirements-verification">Format Command Requirements Verification</a></strong> (test-verification)
+<ul>
+<li>Satisfied by:
+<ul>
+<li><a href="tests/test-advanced-format/test.sh">tests/test-advanced-format/test.sh</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>✅ <strong><a href="requirements/System/Operations/Verifications/FormattingVerifications.html#full-relations-insertion-verification">Full Relations Insertion Verification</a></strong> (test-verification)
+<ul>
+<li>Satisfied by:
+<ul>
+<li><a href="tests/test-format-full-relations/test.sh">tests/test-format-full-relations/test.sh</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>✅ <strong><a href="requirements/System/Operations/Verifications/FormattingVerifications.html#relation-ordering-verification">Relation Ordering Verification</a></strong> (test-verification)
 <ul>
 <li>Satisfied by:
 <ul>
@@ -1739,47 +1906,11 @@ blockquote {
 </li>
 </ul>
 </li>
-<li>✅ <strong><a href="requirements/System/Output/Verifications/DiagramVerifications.html#diagram-generation-test">Diagram Generation Test</a></strong> (test-verification)
-<ul>
-<li>Satisfied by:
-<ul>
-<li><a href="tests/test-diagram-generation/test.sh">tests/test-diagram-generation/test.sh</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li>✅ <strong><a href="requirements/System/Output/Verifications/DiagramVerifications.html#diagram-relation-filtering-verification">Diagram Relation Filtering Verification</a></strong> (test-verification)
-<ul>
-<li>Satisfied by:
-<ul>
-<li><a href="tests/test-diagram-filtering/test.sh">tests/test-diagram-filtering/test.sh</a></li>
-</ul>
-</li>
-</ul>
-</li>
 <li>✅ <strong><a href="requirements/System/Output/Verifications/DiagramVerifications.html#file-diagram-attachment-test">File Diagram Attachment Test</a></strong> (test-verification)
 <ul>
 <li>Satisfied by:
 <ul>
 <li><a href="tests/test-attachment-export/test.sh">tests/test-attachment-export/test.sh</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li>✅ <strong><a href="requirements/System/Output/Verifications/DiagramVerifications.html#remove-generated-diagrams-verification">Remove Generated Diagrams Verification</a></strong> (test-verification)
-<ul>
-<li>Satisfied by:
-<ul>
-<li><a href="tests/test-remove-diagrams/test.sh">tests/test-remove-diagrams/test.sh</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li>✅ <strong><a href="requirements/System/Output/Verifications/DiagramVerifications.html#visualize-model-relationships-verification">Visualize Model Relationships Verification</a></strong> (test-verification)
-<ul>
-<li>Satisfied by:
-<ul>
-<li><a href="tests/test-diagram-generation/test.sh">tests/test-diagram-generation/test.sh</a></li>
 </ul>
 </li>
 </ul>
@@ -1859,11 +1990,29 @@ blockquote {
 </li>
 </ul>
 </li>
+<li>✅ <strong><a href="requirements/System/Output/Verifications/ReportingVerifications.html#resources-report-verification">Resources Report Verification</a></strong> (test-verification)
+<ul>
+<li>Satisfied by:
+<ul>
+<li><a href="tests/test-resources-report/test.sh">tests/test-resources-report/test.sh</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li>✅ <strong><a href="requirements/System/Output/Verifications/ReportingVerifications.html#search-command-tests">Search Command Tests</a></strong> (test-verification)
 <ul>
 <li>Satisfied by:
 <ul>
 <li><a href="tests/test-search-all-features/test.sh">tests/test-search-all-features/test.sh</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>✅ <strong><a href="requirements/System/Output/Verifications/ReportingVerifications.html#traceflow-view-test">TraceFlow View Test</a></strong> (test-verification)
+<ul>
+<li>Satisfied by:
+<ul>
+<li><a href="tests/test-traceflow-view/test.sh">tests/test-traceflow-view/test.sh</a></li>
 </ul>
 </li>
 </ul>
@@ -1975,6 +2124,22 @@ blockquote {
 <ul>
 <li>❌ <strong><a href="requirements/System/Core/Verifications/ParsingVerifications.html#refinement-element-type-parsing-test">Refinement Element Type Parsing Test</a></strong> (test-verification)</li>
 <li>❌ <strong><a href="requirements/System/Core/Verifications/ParsingVerifications.html#refinement-relations-rejection-test">Refinement Relations Rejection Test</a></strong> (test-verification)</li>
+</ul>
+<h3><a href="requirements/System/Output/Verifications/DiagramVerifications.html">requirements/System/Output/Verifications/DiagramVerifications.html</a></h3>
+<ul>
+<li>❌ <strong><a href="requirements/System/Output/Verifications/DiagramVerifications.html#diagram-generation-test">Diagram Generation Test</a></strong> (test-verification)</li>
+<li>❌ <strong><a href="requirements/System/Output/Verifications/DiagramVerifications.html#diagram-relation-filtering-verification">Diagram Relation Filtering Verification</a></strong> (test-verification)</li>
+<li>❌ <strong><a href="requirements/System/Output/Verifications/DiagramVerifications.html#visualize-model-relationships-verification">Visualize Model Relationships Verification</a></strong> (test-verification)</li>
+</ul>
+<h2 id="orphaned-verifications">Orphaned Verifications</h2>
+<h3><a href="requirements/System/Output/Verifications/ReportingVerifications.html">requirements/System/Output/Verifications/ReportingVerifications.html</a></h3>
+<ul>
+<li>⚠️  <strong><a href="requirements/System/Output/Verifications/ReportingVerifications.html#containment-hierarchy-extraction-test">Containment Hierarchy Extraction Test</a></strong> (test-verification)</li>
+<li>⚠️  <strong><a href="requirements/System/Output/Verifications/ReportingVerifications.html#containment-view-json-output-test">Containment View JSON Output Test</a></strong> (test-verification)</li>
+<li>⚠️  <strong><a href="requirements/System/Output/Verifications/ReportingVerifications.html#containment-view-mermaid-diagram-test">Containment View Mermaid Diagram Test</a></strong> (test-verification)</li>
+<li>⚠️  <strong><a href="requirements/System/Output/Verifications/ReportingVerifications.html#containment-view-text-output-test">Containment View Text Output Test</a></strong> (test-verification)</li>
+<li>⚠️  <strong><a href="requirements/System/Output/Verifications/ReportingVerifications.html#custom-element-type-tracking-test">Custom Element Type Tracking Test</a></strong> (test-verification)</li>
+<li>⚠️  <strong><a href="requirements/System/Output/Verifications/ReportingVerifications.html#html-export-containment-view-integration-test">HTML Export Containment View Integration Test</a></strong> (test-verification)</li>
 </ul>
 
         </div>

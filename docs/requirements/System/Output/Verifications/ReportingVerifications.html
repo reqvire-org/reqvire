@@ -198,31 +198,31 @@ blockquote {
 }
 .diagram-nav-buttons {
     position: absolute;
-    top: 10px;
-    left: 10px;
+    top: 5px;
+    left: 5px;
     z-index: 999; /* higher than SVG (1) but lower than header nav (1000) */
     display: flex;
     flex-direction: column;
-    gap: 5px;
-    background-color: rgba(255, 255, 255, 0.9);
-    padding: 5px;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    gap: 2px;
+    background-color: rgba(255, 255, 255, 0.85);
+    padding: 3px;
+    border-radius: 3px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
 }
 .diagram-nav-row {
     display: flex;
-    gap: 5px;
+    gap: 2px;
     justify-content: center;
 }
 .diagram-nav-btn {
-    width: 32px;
-    height: 32px;
+    width: 22px;
+    height: 22px;
     background-color: var(--color-primary);
     color: white;
     border: none;
-    border-radius: 3px;
+    border-radius: 2px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 11px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -318,6 +318,27 @@ blockquote {
                     return;
                 }
 
+                // Get the natural size of the diagram
+                var bbox = svg.getBBox();
+                var containerWidth = mermaidContainer.clientWidth;
+                var containerHeight = mermaidContainer.clientHeight;
+
+                // Check if diagram fits within container (with some padding)
+                var padding = 40;
+                var fitsInContainer = (bbox.width <= containerWidth - padding) && (bbox.height <= containerHeight - padding);
+
+                if (fitsInContainer) {
+                    // Diagram fits - use natural size, shrink container to fit content
+                    svg.style.width = 'auto';
+                    svg.style.height = 'auto';
+                    mermaidContainer.style.height = 'auto';
+                    mermaidContainer.style.minHeight = (bbox.height + padding) + 'px';
+                    mermaidContainer.style.maxHeight = 'calc(100vh - 150px)';
+                    // No pan/zoom needed for small diagrams
+                    return;
+                }
+
+                // Large diagram - enable pan/zoom
                 svg.style.maxWidth = 'none';
                 svg.style.maxHeight = 'none';
 
@@ -696,7 +717,9 @@ blockquote {
         <a href="../../../../index.html">Containment</a>
         <a href="../../../../model.html">Model</a>
         <a href="../../../../traces.html">Traces</a>
+        <a href="../../../../traceflow.html">TraceFlow</a>
         <a href="../../../../coverage.html">Coverage</a>
+        <a href="../../../../resources.html">Resources</a>
     </nav>
     <div class="reqvire-nav-spacer"></div>
     <div class="container">
@@ -738,9 +761,15 @@ blockquote {
       d1d570121d0a16e0[&quot;Model Command Verification&quot;];
       class d1d570121d0a16e0 verification;
       click d1d570121d0a16e0 &quot;ReportingVerifications.html#model-command-verification&quot;;
+      ae04aa9608f29b60[&quot;Resources Report Verification&quot;];
+      class ae04aa9608f29b60 verification;
+      click ae04aa9608f29b60 &quot;ReportingVerifications.html#resources-report-verification&quot;;
       ef40ca1630031a4d[&quot;Search Command Tests&quot;];
       class ef40ca1630031a4d verification;
       click ef40ca1630031a4d &quot;ReportingVerifications.html#search-command-tests&quot;;
+      a5e0c759d9faedf9[&quot;TraceFlow View Test&quot;];
+      class a5e0c759d9faedf9 verification;
+      click a5e0c759d9faedf9 &quot;ReportingVerifications.html#traceflow-view-test&quot;;
       d1b9ad25b33d992e[&quot;Verification Coverage Report Test&quot;];
       class d1b9ad25b33d992e verification;
       click d1b9ad25b33d992e &quot;ReportingVerifications.html#verification-coverage-report-test&quot;;
@@ -769,7 +798,15 @@ blockquote {
   class e3433ff5bc275516 default;
   click e3433ff5bc275516 &quot;../../../../tests/test-model-command/test.sh&quot;;
   d1d570121d0a16e0 -->|satisfiedBy| e3433ff5bc275516;
+  dca415d301ebf7c2[&quot;test.sh&quot;];
+  class dca415d301ebf7c2 default;
+  click dca415d301ebf7c2 &quot;../../../../tests/test-resources-report/test.sh&quot;;
+  ae04aa9608f29b60 -->|satisfiedBy| dca415d301ebf7c2;
   ef40ca1630031a4d -->|satisfiedBy| e8358fc93fee95fb;
+  cf08a4043ab49203[&quot;test.sh&quot;];
+  class cf08a4043ab49203 default;
+  click cf08a4043ab49203 &quot;../../../../tests/test-traceflow-view/test.sh&quot;;
+  a5e0c759d9faedf9 -->|satisfiedBy| cf08a4043ab49203;
   7099e5b2f8a08808[&quot;test.sh&quot;];
   class 7099e5b2f8a08808 default;
   click 7099e5b2f8a08808 &quot;../../../../tests/test-coverage-report/test.sh&quot;;
@@ -857,8 +894,34 @@ blockquote {
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>verify: <a href="../Reporting.html#containment-view-report-generation">Containment View Report Generation</a></li>
 <li>satisfiedBy: <a href="../../../../tests/test-containment-view/test.sh">test.sh</a></li>
+</ul>
+<hr />
+<h3 id="containment-view-design-documents-test">Containment View Design Documents Test</h3>
+<p>This test verifies that design documents (files in DesignDocuments folders) are correctly included in the containment view output.</p>
+<h4>Test Steps</h4>
+<ol>
+<li>Create a model with DesignDocuments folder containing markdown files</li>
+<li>Run <code>reqvire containment</code> command</li>
+<li>Verify design documents appear in output grouped by folder</li>
+<li>Verify design documents are visually distinguished from elements</li>
+<li>In diagram output, verify design document nodes have click handlers</li>
+</ol>
+<h4>Expected Results</h4>
+<ul>
+<li>Design documents are shown under their parent folder</li>
+<li>Design documents display filename</li>
+<li>Design documents are styled differently from specification elements</li>
+<li>Click handlers navigate to document files</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfiedBy: <a href="../../../../tests/test-containment-view/test.sh">test.sh</a></li>
+<li>verify: <a href="../Reporting.html#containment-view-report">Containment View Report</a></li>
 </ul>
 <hr />
 <h3 id="containment-view-json-output-test">Containment View JSON Output Test</h3>
@@ -928,7 +991,6 @@ blockquote {
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>verify: <a href="../Reporting.html#containment-view-report-generation">Containment View Report Generation</a></li>
 <li>satisfiedBy: <a href="../../../../tests/test-containment-view/test.sh">test.sh</a></li>
 </ul>
 <hr />
@@ -1024,7 +1086,6 @@ blockquote {
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>verify: <a href="../Reporting.html#containment-view-report-generation">Containment View Report Generation</a></li>
 <li>satisfiedBy: <a href="../../../../tests/test-containment-view/test.sh">test.sh</a></li>
 </ul>
 <hr />
@@ -1092,7 +1153,6 @@ blockquote {
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>verify: <a href="../Reporting.html#containment-view-report-generation">Containment View Report Generation</a></li>
 <li>satisfiedBy: <a href="../../../../tests/test-containment-view/test.sh">test.sh</a></li>
 </ul>
 <hr />
@@ -1198,7 +1258,6 @@ Command: <code>reqvire summary --json</code> (on test data with custom types)</p
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>verify: <a href="../Reporting.html#custom-element-type-tracking">Custom Element Type Tracking</a></li>
 <li>satisfiedBy: <a href="../../../../tests/test-search-all-features/test.sh">test.sh</a></li>
 </ul>
 <hr />
@@ -1287,35 +1346,207 @@ Command: <code>reqvire summary --json</code> (on test data with custom types)</p
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>verify: <a href="../Reporting.html#containment-view-report-generation">Containment View Report Generation</a></li>
 <li>satisfiedBy: <a href="../../../../tests/test-containment-view/test.sh">test.sh</a></li>
 </ul>
 <hr />
-<h3 id="containment-view-design-documents-test">Containment View Design Documents Test</h3>
-<p>This test verifies that design documents (files in DesignDocuments folders) are correctly included in the containment view output.</p>
-<h4>Test Steps</h4>
+<h3 id="model-command-verification">Model Command Verification</h3>
+<p>Comprehensive test verifying model command generates model-centric nested output in different modes.</p>
+<h4>Details</h4>
+<h5>Acceptance Criteria</h5>
 <ol>
-<li>Create a model with DesignDocuments folder containing markdown files</li>
-<li>Run <code>reqvire containment</code> command</li>
-<li>Verify design documents appear in output grouped by folder</li>
-<li>Verify design documents are visually distinguished from elements</li>
-<li>In diagram output, verify design document nodes have click handlers</li>
+<li><code>reqvire model</code> generates model-centric output showing root requirements with nested relations</li>
+<li><code>reqvire model --from=&lt;name&gt;</code> generates nested structure starting from specified element</li>
+<li><code>reqvire model --json</code> generates valid JSON with nested element structure</li>
+<li><code>reqvire model --from=&lt;name&gt; --json</code> generates filtered JSON from specified starting point</li>
+<li>Default mode filters to root requirements (no hierarchical parent relations)</li>
+<li>Relations contain full target element details recursively</li>
 </ol>
-<h4>Expected Results</h4>
+<h5>Test Criteria</h5>
+<ol>
+<li>
+<p><strong>Default Model Output (Root Requirements)</strong>
+Command: <code>reqvire model --json</code></p>
 <ul>
-<li>Design documents are shown under their parent folder</li>
-<li>Design documents display filename</li>
-<li>Design documents are styled differently from specification elements</li>
-<li>Click handlers navigate to document files</li>
+<li>exits code <strong>0</strong></li>
+<li>output parses as valid JSON</li>
+<li>JSON contains <code>elements</code> array with root requirements only at top level</li>
+<li>JSON contains <code>metadata</code> with total_elements, total_relations, filtered_from (null)</li>
+<li>Only requirements without hierarchical parent relations at top level</li>
+<li>Nested relations contain full element details recursively</li>
 </ul>
+</li>
+<li>
+<p><strong>Filtered Model Output (From Specific Element)</strong>
+Command: <code>reqvire model --from=&lt;test-element-name&gt; --json</code></p>
+<ul>
+<li>exits code <strong>0</strong></li>
+<li>output parses as valid JSON</li>
+<li>JSON elements array contains specified element at top level</li>
+<li>metadata.filtered_from contains element name</li>
+<li>Only forward-related elements appear in nested structure</li>
+</ul>
+</li>
+<li>
+<p><strong>Markdown Output with Mermaid Diagrams</strong>
+Command: <code>reqvire model</code></p>
+<ul>
+<li>exits code <strong>0</strong></li>
+<li>output contains <code># Model Structure</code></li>
+<li>output contains metadata (Total Elements, Total Relations)</li>
+<li>output contains Mermaid diagram blocks showing all nested relations</li>
+<li>diagrams use hash identifiers for node IDs</li>
+</ul>
+</li>
+<li>
+<p><strong>Nested JSON Structure Validation</strong>
+Command: <code>reqvire model --json</code></p>
+<ul>
+<li>JSON has keys: <code>elements</code>, <code>metadata</code></li>
+<li>Each element has: <code>identifier</code>, <code>name</code>, <code>element_type</code>, <code>file_path</code>, <code>section</code>, <code>section_index</code>, <code>relations</code>, <code>attachments</code></li>
+<li>Each relation has: <code>relation_type</code>, target (element/file/external)</li>
+<li>Element targets are nested recursively with same structure</li>
+<li>File targets have: <code>path</code>, <code>type: &quot;file&quot;</code></li>
+<li>External targets have: <code>url</code>, <code>type: &quot;external&quot;</code></li>
+<li>Attachments is an array of file path strings (empty array if no attachments)</li>
+<li>Metadata has: <code>total_elements</code>, <code>total_relations</code>, <code>filtered_from</code></li>
+</ul>
+</li>
+<li>
+<p><strong>Forward-Only Traversal Verification</strong></p>
+<ul>
+<li>Create test with element A that derives B, and B derives C</li>
+<li>Running <code>reqvire model --from=&lt;A-name&gt;</code> includes B and C nested in relations</li>
+<li>Create element D that is derived from B (backward relation)</li>
+<li>Running <code>reqvire model --from=&lt;A-name&gt;</code> includes B and C but NOT D</li>
+<li>Confirms only forward relations (derive, satisfiedBy, verifiedBy, trace) are followed</li>
+</ul>
+</li>
+<li>
+<p><strong>Cycle Detection Verification</strong></p>
+<ul>
+<li>System prevents infinite recursion when cycles exist in forward relations</li>
+<li>Nested structure handles circular dependencies gracefully</li>
+<li>Each element appears at most once in traversal</li>
+</ul>
+</li>
+</ol>
 <h4>Metadata</h4>
 <ul>
 <li>type: test-verification</li>
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>verify: <a href="../Reporting.html#containment-view-design-documents">Containment View Design Documents</a></li>
-<li>satisfiedBy: <a href="../../../../tests/test-containment-view/test.sh">test.sh</a></li>
+<li>satisfiedBy: <a href="../../../../tests/test-model-command/test.sh">test.sh</a></li>
+<li>verify: <a href="../Reporting.html#forward-only-relation-traversal">Forward-Only Relation Traversal</a></li>
+<li>verify: <a href="../Reporting.html#model-diagram-output-formats">Model Diagram Output Formats</a></li>
+</ul>
+<hr />
+<h3 id="resources-report-verification">Resources Report Verification</h3>
+<p>This test verifies that the resources command correctly generates reports showing all files referenced by the model through relations and attachments.</p>
+<h4>Details</h4>
+<h5>Acceptance Criteria</h5>
+<p><strong>Report Structure:</strong></p>
+<ul>
+<li>Report shall have two main sections: Relations and Attachments</li>
+<li>Each section lists files alphabetically by path</li>
+<li>Each file shows referencing elements with markdown links</li>
+</ul>
+<p><strong>Relations Section:</strong></p>
+<ul>
+<li>Includes files from InternalPath relation targets (satisfiedBy, trace, etc.)</li>
+<li>Each reference shows relation type and source element</li>
+<li>References sorted by relation type, then by element identifier</li>
+</ul>
+<p><strong>Attachments Section:</strong></p>
+<ul>
+<li>Includes files from FilePath attachment targets</li>
+<li>Each reference shows source element</li>
+<li>References sorted by element identifier</li>
+</ul>
+<p><strong>Output Formats:</strong></p>
+<ul>
+<li>Text output uses markdown formatting with headers and bullet lists</li>
+<li>JSON output provides structured data with relations, attachments, and summary</li>
+</ul>
+<p><strong>HTML Export Integration:</strong></p>
+<ul>
+<li>Resources view available in HTML export</li>
+<li>Navigation link appears in header alongside other views</li>
+</ul>
+<h5>Test Criteria</h5>
+<ol>
+<li>
+<p><strong>Basic text output</strong>
+Command: <code>reqvire resources</code></p>
+<ul>
+<li>exits code <strong>0</strong></li>
+<li>output contains “## Relations” section header</li>
+<li>output contains “## Attachments” section header</li>
+<li>files are listed with ### headers</li>
+<li>referencing elements shown as bullet points with markdown links</li>
+</ul>
+</li>
+<li>
+<p><strong>JSON output structure</strong>
+Command: <code>reqvire resources --json</code></p>
+<ul>
+<li>exits code <strong>0</strong></li>
+<li>output parses under <code>jq</code></li>
+<li>contains <code>relations</code> array with file_path and references</li>
+<li>contains <code>attachments</code> array with file_path and references</li>
+<li>contains <code>summary</code> with totals</li>
+</ul>
+</li>
+<li>
+<p><strong>Relations section content</strong></p>
+<ul>
+<li>satisfiedBy relations to code files appear in Relations section</li>
+<li>trace relations to document files appear in Relations section</li>
+<li>each reference includes relation_type, element_id, element_name</li>
+</ul>
+</li>
+<li>
+<p><strong>Attachments section content</strong></p>
+<ul>
+<li>FilePath attachments appear in Attachments section</li>
+<li>ElementIdentifier attachments do NOT appear (they reference model elements, not files)</li>
+<li>each reference includes element_id, element_name</li>
+</ul>
+</li>
+<li>
+<p><strong>Sorting verification</strong></p>
+<ul>
+<li>Files sorted alphabetically by path</li>
+<li>Within each file, references sorted by relation_type then element_id</li>
+<li>Consistent ordering across multiple runs</li>
+</ul>
+</li>
+<li>
+<p><strong>HTML export integration</strong>
+Command: <code>reqvire export --output=/tmp/test-export</code></p>
+<ul>
+<li>resources.html file generated</li>
+<li>Navigation header includes Resources link</li>
+<li>Resources view contains same content as CLI text output</li>
+</ul>
+</li>
+<li>
+<p><strong>Empty sections handling</strong></p>
+<ul>
+<li>If no InternalPath relations exist, Relations section shows appropriate message</li>
+<li>If no FilePath attachments exist, Attachments section shows appropriate message</li>
+</ul>
+</li>
+</ol>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfiedBy: <a href="../../../../tests/test-resources-report/test.sh">test.sh</a></li>
+<li>verify: <a href="../../../Interfaces/CLI.html#cli-resources-command">CLI Resources Command</a></li>
+<li>verify: <a href="../Reporting.html#resources-report">Resources Report</a></li>
 </ul>
 <hr />
 <h3 id="search-command-tests">Search Command Tests</h3>
@@ -1502,89 +1733,68 @@ Command: <code>reqvire search --short --json</code></p>
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>verify: <a href="../../../Interfaces/CLI.html#cli-search-command">CLI Search Command</a></li>
-<li>verify: <a href="../Reporting.html#search-fine-grained-filtering">Search Fine Grained Filtering</a></li>
 <li>satisfiedBy: <a href="../../../../tests/test-search-all-features/test.sh">test.sh</a></li>
+<li>verify: <a href="../../../Interfaces/CLI.html#cli-search-command">CLI Search Command</a></li>
+<li>verify: <a href="../Reporting.html#search-report-generator">Search Report Generator</a></li>
 </ul>
 <hr />
-<h3 id="model-command-verification">Model Command Verification</h3>
-<p>Comprehensive test verifying model command generates model-centric nested output in different modes.</p>
+<h3 id="traceflow-view-test">TraceFlow View Test</h3>
+<p>This test verifies that the TraceFlow view page is correctly generated during HTML export with an interactive D3.js Sankey diagram showing verification traceability flow.</p>
 <h4>Details</h4>
 <h5>Acceptance Criteria</h5>
-<ol>
-<li><code>reqvire model</code> generates model-centric output showing root requirements with nested relations</li>
-<li><code>reqvire model --from=&lt;name&gt;</code> generates nested structure starting from specified element</li>
-<li><code>reqvire model --json</code> generates valid JSON with nested element structure</li>
-<li><code>reqvire model --from=&lt;name&gt; --json</code> generates filtered JSON from specified starting point</li>
-<li>Default mode filters to root requirements (no hierarchical parent relations)</li>
-<li>Relations contain full target element details recursively</li>
-</ol>
+<ul>
+<li>System shall generate <code>traceflow.html</code> file during HTML export</li>
+<li>TraceFlow page shall contain D3.js Sankey diagram visualization</li>
+<li>Sankey diagram shall show flow from user requirements to system requirements to verifications</li>
+<li>Navigation bar shall include “TraceFlow” link after “Traces”</li>
+<li>Diagram shall support pan/zoom with mouse wheel and buttons</li>
+<li>Diagram shall support touch pinch-zoom for mobile devices</li>
+<li>Clicking nodes shall navigate to element definition pages</li>
+<li>Page shall include title, description, and usage instructions</li>
+</ul>
 <h5>Test Criteria</h5>
 <ol>
 <li>
-<p><strong>Default Model Output (Root Requirements)</strong>
-Command: <code>reqvire model --json</code></p>
+<p><strong>File Generation</strong>
+Command: <code>reqvire export --output &lt;dir&gt;</code></p>
 <ul>
 <li>exits code <strong>0</strong></li>
-<li>output parses as valid JSON</li>
-<li>JSON contains <code>elements</code> array with root requirements only at top level</li>
-<li>JSON contains <code>metadata</code> with total_elements, total_relations, filtered_from (null)</li>
-<li>Only requirements without hierarchical parent relations at top level</li>
-<li>Nested relations contain full element details recursively</li>
+<li><code>traceflow.html</code> file exists in output directory</li>
+<li>file contains valid HTML5</li>
 </ul>
 </li>
 <li>
-<p><strong>Filtered Model Output (From Specific Element)</strong>
-Command: <code>reqvire model --from=&lt;test-element-name&gt; --json</code></p>
+<p><strong>Navigation Integration</strong></p>
 <ul>
-<li>exits code <strong>0</strong></li>
-<li>output parses as valid JSON</li>
-<li>JSON elements array contains specified element at top level</li>
-<li>metadata.filtered_from contains element name</li>
-<li>Only forward-related elements appear in nested structure</li>
+<li>All HTML files contain “TraceFlow” link in navigation bar</li>
+<li>Link positioned after “Traces” and before “Coverage”</li>
+<li>Link href is <code>traceflow.html</code> (with correct relative prefix)</li>
 </ul>
 </li>
 <li>
-<p><strong>Markdown Output with Mermaid Diagrams</strong>
-Command: <code>reqvire model</code></p>
+<p><strong>Sankey Diagram Content</strong></p>
 <ul>
-<li>exits code <strong>0</strong></li>
-<li>output contains <code># Model Structure</code></li>
-<li>output contains metadata (Total Elements, Total Relations)</li>
-<li>output contains Mermaid diagram blocks showing all nested relations</li>
-<li>diagrams use hash identifiers for node IDs</li>
+<li>Page contains D3.js Sankey diagram</li>
+<li>Diagram shows requirement flow (user-req → system-req → verification)</li>
+<li>Nodes are color-coded by type</li>
+<li>Links connect related elements</li>
 </ul>
 </li>
 <li>
-<p><strong>Nested JSON Structure Validation</strong>
-Command: <code>reqvire model --json</code></p>
+<p><strong>Interactive Features</strong></p>
 <ul>
-<li>JSON has keys: <code>elements</code>, <code>metadata</code></li>
-<li>Each element has: <code>identifier</code>, <code>name</code>, <code>element_type</code>, <code>file_path</code>, <code>section</code>, <code>section_index</code>, <code>relations</code>, <code>attachments</code></li>
-<li>Each relation has: <code>relation_type</code>, target (element/file/external)</li>
-<li>Element targets are nested recursively with same structure</li>
-<li>File targets have: <code>path</code>, <code>type: &quot;file&quot;</code></li>
-<li>External targets have: <code>url</code>, <code>type: &quot;external&quot;</code></li>
-<li>Attachments is an array of file path strings (empty array if no attachments)</li>
-<li>Metadata has: <code>total_elements</code>, <code>total_relations</code>, <code>filtered_from</code></li>
+<li>Pan/zoom buttons (+/-/reset) are present and functional</li>
+<li>Mouse wheel zoom works</li>
+<li>Touch pinch-zoom works on mobile</li>
+<li>Node click navigates to element page</li>
 </ul>
 </li>
 <li>
-<p><strong>Forward-Only Traversal Verification</strong></p>
+<p><strong>Page Content</strong></p>
 <ul>
-<li>Create test with element A that derives B, and B derives C</li>
-<li>Running <code>reqvire model --from=&lt;A-name&gt;</code> includes B and C nested in relations</li>
-<li>Create element D that is derived from B (backward relation)</li>
-<li>Running <code>reqvire model --from=&lt;A-name&gt;</code> includes B and C but NOT D</li>
-<li>Confirms only forward relations (derive, satisfiedBy, verifiedBy, trace) are followed</li>
-</ul>
-</li>
-<li>
-<p><strong>Cycle Detection Verification</strong></p>
-<ul>
-<li>System prevents infinite recursion when cycles exist in forward relations</li>
-<li>Nested structure handles circular dependencies gracefully</li>
-<li>Each element appears at most once in traversal</li>
+<li>Title: “TraceFlow - Verification Traceability”</li>
+<li>Description text explaining the view</li>
+<li>Instructions for using the diagram</li>
 </ul>
 </li>
 </ol>
@@ -1594,9 +1804,8 @@ Command: <code>reqvire model --json</code></p>
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>verify: <a href="../Reporting.html#forward-only-relation-traversal">Forward-Only Relation Traversal</a></li>
-<li>verify: <a href="../Reporting.html#model-diagram-output-formats">Model Diagram Output Formats</a></li>
-<li>satisfiedBy: <a href="../../../../tests/test-model-command/test.sh">test.sh</a></li>
+<li>satisfiedBy: <a href="../../../../tests/test-traceflow-view/test.sh">test.sh</a></li>
+<li>verify: <a href="../Reporting.html#traceflow-view-report-generation">TraceFlow View Report Generation</a></li>
 </ul>
 <hr />
 <h3 id="verification-coverage-report-test">Verification Coverage Report Test</h3>
@@ -1665,8 +1874,8 @@ Command: <code>reqvire coverage-report --json</code></p>
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>verify: <a href="../../../Interfaces/CLI.html#cli-coverage-command">CLI Coverage Command</a></li>
 <li>satisfiedBy: <a href="../../../../tests/test-coverage-report/test.sh">test.sh</a></li>
+<li>verify: <a href="../../../Interfaces/CLI.html#cli-coverage-command">CLI Coverage Command</a></li>
 </ul>
 <hr />
 <h3 id="verification-traces-filter-options-test">Verification Traces Filter Options Test</h3>
@@ -1765,8 +1974,8 @@ Command: <code>reqvire verification-traces --filter-type=&quot;test-verification
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>verify: <a href="../../../Interfaces/CLI.html#cli-traces-command">CLI Traces Command</a></li>
 <li>satisfiedBy: <a href="../../../../tests/test-verification-traces/test.sh">test.sh</a></li>
+<li>verify: <a href="../../../Interfaces/CLI.html#cli-traces-command">CLI Traces Command</a></li>
 </ul>
 <hr />
 <h3 id="verification-traces-from-folder-test">Verification Traces From-Folder Test</h3>
@@ -1874,8 +2083,8 @@ Command: <code>reqvire traces --from-folder=/</code></p>
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>verify: <a href="../../../Interfaces/CLI.html#cli-traces-command">CLI Traces Command</a></li>
 <li>satisfiedBy: <a href="../../../../tests/test-verification-traces/test.sh">test.sh</a></li>
+<li>verify: <a href="../../../Interfaces/CLI.html#cli-traces-command">CLI Traces Command</a></li>
 </ul>
 <hr />
 

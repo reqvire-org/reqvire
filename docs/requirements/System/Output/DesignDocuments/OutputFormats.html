@@ -198,31 +198,31 @@ blockquote {
 }
 .diagram-nav-buttons {
     position: absolute;
-    top: 10px;
-    left: 10px;
+    top: 5px;
+    left: 5px;
     z-index: 999; /* higher than SVG (1) but lower than header nav (1000) */
     display: flex;
     flex-direction: column;
-    gap: 5px;
-    background-color: rgba(255, 255, 255, 0.9);
-    padding: 5px;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    gap: 2px;
+    background-color: rgba(255, 255, 255, 0.85);
+    padding: 3px;
+    border-radius: 3px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
 }
 .diagram-nav-row {
     display: flex;
-    gap: 5px;
+    gap: 2px;
     justify-content: center;
 }
 .diagram-nav-btn {
-    width: 32px;
-    height: 32px;
+    width: 22px;
+    height: 22px;
     background-color: var(--color-primary);
     color: white;
     border: none;
-    border-radius: 3px;
+    border-radius: 2px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 11px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -318,6 +318,27 @@ blockquote {
                     return;
                 }
 
+                // Get the natural size of the diagram
+                var bbox = svg.getBBox();
+                var containerWidth = mermaidContainer.clientWidth;
+                var containerHeight = mermaidContainer.clientHeight;
+
+                // Check if diagram fits within container (with some padding)
+                var padding = 40;
+                var fitsInContainer = (bbox.width <= containerWidth - padding) && (bbox.height <= containerHeight - padding);
+
+                if (fitsInContainer) {
+                    // Diagram fits - use natural size, shrink container to fit content
+                    svg.style.width = 'auto';
+                    svg.style.height = 'auto';
+                    mermaidContainer.style.height = 'auto';
+                    mermaidContainer.style.minHeight = (bbox.height + padding) + 'px';
+                    mermaidContainer.style.maxHeight = 'calc(100vh - 150px)';
+                    // No pan/zoom needed for small diagrams
+                    return;
+                }
+
+                // Large diagram - enable pan/zoom
                 svg.style.maxWidth = 'none';
                 svg.style.maxHeight = 'none';
 
@@ -696,7 +717,9 @@ blockquote {
         <a href="../../../../index.html">Containment</a>
         <a href="../../../../model.html">Model</a>
         <a href="../../../../traces.html">Traces</a>
+        <a href="../../../../traceflow.html">TraceFlow</a>
         <a href="../../../../coverage.html">Coverage</a>
+        <a href="../../../../resources.html">Resources</a>
     </nav>
     <div class="reqvire-nav-spacer"></div>
     <div class="container">
@@ -714,9 +737,21 @@ blockquote {
 
   subgraph 8450fb687cd09c62[&quot;📁 requirements/System/Output/DesignDocuments&quot;]
     subgraph 48e67d899089ad17[&quot;📄 OutputFormats.md&quot;]
+      16074ff0c3cc7caa[&quot;Color Scheme Specification&quot;];
+      class 16074ff0c3cc7caa default;
+      click 16074ff0c3cc7caa &quot;OutputFormats.html#color-scheme-specification&quot;;
+      e66c44fb8458e88e[&quot;Diff Output Format Specification&quot;];
+      class e66c44fb8458e88e default;
+      click e66c44fb8458e88e &quot;OutputFormats.html#diff-output-format-specification&quot;;
+      e67e54011d4200fa[&quot;Error Message Format Specification&quot;];
+      class e67e54011d4200fa default;
+      click e67e54011d4200fa &quot;OutputFormats.html#error-message-format-specification&quot;;
       5be02a80c4e059cd[&quot;JSON Output Structure&quot;];
       class 5be02a80c4e059cd default;
       click 5be02a80c4e059cd &quot;OutputFormats.html#json-output-structure&quot;;
+      a8fb2c2e7c2a3545[&quot;Markdown Report Style Specification&quot;];
+      class a8fb2c2e7c2a3545 default;
+      click a8fb2c2e7c2a3545 &quot;OutputFormats.html#markdown-report-style-specification&quot;;
       9826d69cbc76ee97[&quot;Short Mode Behavior&quot;];
       class 9826d69cbc76ee97 default;
       click 9826d69cbc76ee97 &quot;OutputFormats.html#short-mode-behavior&quot;;
@@ -726,6 +761,86 @@ blockquote {
     end
   end
 </div>
+<h3 id="color-scheme-specification">Color Scheme Specification</h3>
+<p>Color coding for terminal and HTML output.</p>
+<h4>Details</h4>
+<p><strong>Terminal Colors (ANSI):</strong>
+| Color | Meaning | Usage |
+|—––|———|—––|
+| Red | Error | Validation errors, failed operations |
+| Yellow | Warning | Lint issues needing review, deprecations |
+| Green | Success | Added content, passed checks |
+| Cyan | Info | Element names, identifiers |
+| White/Default | Normal | Regular content |</p>
+<p><strong>HTML Export Colors:</strong>
+| Element | Hex | Usage |
+|———|—–|—––|
+| Requirement | #D0E0FF | Requirement elements |
+| Verification | #FFF7B3 | Verification elements |
+| Implementation | #DFFFD0 | satisfiedBy targets |
+| File node | #B8860B | File containers |
+| Folder node | #4A90D9 | Folder containers |</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<hr />
+<h3 id="diff-output-format-specification">Diff Output Format Specification</h3>
+<p>Git-style diff format for change previews.</p>
+<h4>Details</h4>
+<p><strong>Used by commands:</strong> format, lint, add, rm, mv, rename, mv-file, change-impact</p>
+<p><strong>Format:</strong></p>
+<pre><code class="language-diff">--- a/&lt;file_path&gt;
++++ b/&lt;file_path&gt;
+@@ -&lt;old_start&gt;,&lt;old_count&gt; +&lt;new_start&gt;,&lt;new_count&gt; @@
+-&lt;removed line&gt;
++&lt;added line&gt;
+ &lt;context line&gt;
+</code></pre>
+<p><strong>Colors:</strong></p>
+<ul>
+<li>Red: Removed lines (-)</li>
+<li>Green: Added lines (+)</li>
+<li>Cyan: Hunk headers (@@)</li>
+<li>White: Context lines</li>
+</ul>
+<p><strong>Context:</strong></p>
+<ul>
+<li>Show 3 lines before and after changes</li>
+<li>Collapse large unchanged sections</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<hr />
+<h3 id="error-message-format-specification">Error Message Format Specification</h3>
+<p>Structure for error and warning messages.</p>
+<h4>Details</h4>
+<p><strong>Format:</strong></p>
+<pre><code>&lt;file_path&gt;:&lt;line_number&gt;: &lt;level&gt;: &lt;message&gt;
+  &lt;context_line&gt;
+  ^--- &lt;pointer to issue&gt;
+</code></pre>
+<p><strong>Fields:</strong></p>
+<ul>
+<li><code>file_path</code>: Git-root-relative path</li>
+<li><code>line_number</code>: 1-based line number</li>
+<li><code>level</code>: error | warning | info</li>
+<li><code>message</code>: Concise description</li>
+<li><code>context_line</code>: Source line (optional)</li>
+<li><code>suggestion</code>: How to fix (optional)</li>
+</ul>
+<p><strong>Grouping:</strong></p>
+<ul>
+<li>Group errors by file</li>
+<li>Sort by line number within file</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<hr />
 <h3 id="json-output-structure">JSON Output Structure</h3>
 <p>Standard JSON output structure for CLI commands that support the <code>--json</code> flag.</p>
 <h4>Details</h4>
@@ -751,6 +866,46 @@ blockquote {
 <li>Error responses include <code>error</code> field with message</li>
 <li>Successful responses omit error field entirely</li>
 <li>Exit code accompanies JSON (0=success, non-zero=error)</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<hr />
+<h3 id="markdown-report-style-specification">Markdown Report Style Specification</h3>
+<p>Style guidelines for markdown text report output (model, coverage, traces, containment commands).</p>
+<h4>Details</h4>
+<p><strong>Document Structure:</strong></p>
+<ul>
+<li>Title as H1 header</li>
+<li>Major sections as H2 headers</li>
+<li>Subsections as H3 headers</li>
+<li>Element listings as bullet points or tables</li>
+</ul>
+<p><strong>Formatting Conventions:</strong></p>
+<ul>
+<li>Element names in backticks: <code>Element Name</code></li>
+<li>File paths in backticks: <code>path/to/file.md</code></li>
+<li>Identifiers in backticks: <code>file.md#element-id</code></li>
+<li>Relation types in bold: <strong>derivedFrom</strong>, <strong>verifiedBy</strong></li>
+<li>Counts and percentages: <code>15 (75%)</code></li>
+</ul>
+<p><strong>Tables:</strong></p>
+<ul>
+<li>Use markdown tables for structured data</li>
+<li>Align columns appropriately (left for text, right for numbers)</li>
+<li>Include header row with separator</li>
+</ul>
+<p><strong>Lists:</strong></p>
+<ul>
+<li>Hierarchical bullet lists for tree structures</li>
+<li>Numbered lists for sequential steps</li>
+<li>Indentation shows nesting (2 spaces per level)</li>
+</ul>
+<p><strong>Code Blocks:</strong></p>
+<ul>
+<li>Mermaid diagrams in ```mermaid blocks</li>
+<li>JSON output in ```json blocks</li>
 </ul>
 <h4>Metadata</h4>
 <ul>

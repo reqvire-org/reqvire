@@ -20,7 +20,8 @@ pub struct FormatResult {
 }
 
 /// Format all files in the registry, optionally in dry-run mode
-pub fn format_files(registry: &GraphRegistry, dry_run: bool) -> Result<FormatResult, ReqvireError> {
+/// When with_full_relations is true, includes all relations (user-created and auto-generated inverse relations)
+pub fn format_files(registry: &GraphRegistry, dry_run: bool, with_full_relations: bool) -> Result<FormatResult, ReqvireError> {
     let base_dir = std::env::current_dir()
         .map_err(|e| ReqvireError::PathError(format!("Failed to get current directory: {}", e)))?;
 
@@ -34,7 +35,7 @@ pub fn format_files(registry: &GraphRegistry, dry_run: bool) -> Result<FormatRes
 
     for (file_path, elements) in sorted_files {
         // Generate the new markdown content for this file
-        let mut new_content = registry.generate_file_markdown(&file_path, &elements);
+        let mut new_content = registry.generate_file_markdown(&file_path, &elements, with_full_relations);
 
         // Apply linting rules to ensure consistent formatting
         new_content = apply_formatting_rules(&new_content);

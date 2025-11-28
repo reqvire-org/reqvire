@@ -1,0 +1,163 @@
+#!/bin/bash
+# Test: TraceFlow View Generation
+# Verifies that reqvire export generates traceflow.html with Sankey diagram
+
+set -e
+
+# Get the directory where the test script is located
+TEST_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REQVIRE_BIN="${TEST_DIR}/../../target/debug/reqvire"
+
+# Create temporary directory for test
+TEMP_DIR=$(mktemp -d)
+trap "rm -rf $TEMP_DIR" EXIT
+
+# Initialize git repo (required for reqvire)
+cd "$TEMP_DIR"
+git init -q
+git config user.email "test@test.com"
+git config user.name "Test"
+
+# Create test specifications
+mkdir -p "$TEMP_DIR/specifications"
+
+cat > "$TEMP_DIR/specifications/UserRequirements.md" << 'EOF'
+# User Requirements
+
+### User Login
+
+Users shall be able to log into the system.
+
+#### Metadata
+  * type: user-requirement
+
+#### Relations
+  * derivedFrom: [System Access](#system-access)
+---
+
+### System Access
+
+Users shall have access to the system features.
+
+#### Metadata
+  * type: user-requirement
+---
+EOF
+
+cat > "$TEMP_DIR/specifications/SystemRequirements.md" << 'EOF'
+# System Requirements
+
+### Authentication Module
+
+The system shall implement authentication.
+
+#### Relations
+  * derivedFrom: [User Login](UserRequirements.md#user-login)
+---
+
+### Session Management
+
+The system shall manage user sessions.
+
+#### Relations
+  * derivedFrom: [User Login](UserRequirements.md#user-login)
+---
+EOF
+
+cat > "$TEMP_DIR/specifications/Verifications.md" << 'EOF'
+# Verifications
+
+### Auth Test
+
+Test for authentication module.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [Authentication Module](SystemRequirements.md#authentication-module)
+---
+
+### Session Test
+
+Test for session management.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [Session Management](SystemRequirements.md#session-management)
+---
+EOF
+
+# Create output directory
+OUTPUT_DIR=$(mktemp -d)
+trap "rm -rf $TEMP_DIR $OUTPUT_DIR" EXIT
+
+echo "Test 1: TraceFlow file generation"
+cd "$TEMP_DIR"
+"$REQVIRE_BIN" export --output "$OUTPUT_DIR" > /dev/null 2>&1
+
+if [ ! -f "$OUTPUT_DIR/traceflow.html" ]; then
+    echo "FAIL: traceflow.html was not generated"
+    exit 1
+fi
+echo "PASS: traceflow.html was generated"
+
+echo "Test 2: TraceFlow HTML is valid"
+if ! grep -q "<!DOCTYPE html>" "$OUTPUT_DIR/traceflow.html"; then
+    echo "FAIL: traceflow.html is not valid HTML"
+    exit 1
+fi
+echo "PASS: traceflow.html is valid HTML"
+
+echo "Test 3: TraceFlow contains Sankey diagram"
+if ! grep -q "d3-sankey" "$OUTPUT_DIR/traceflow.html"; then
+    echo "FAIL: traceflow.html does not contain Sankey diagram"
+    exit 1
+fi
+echo "PASS: traceflow.html contains Sankey diagram"
+
+echo "Test 4: TraceFlow page has title"
+if ! grep -q "TraceFlow" "$OUTPUT_DIR/traceflow.html"; then
+    echo "FAIL: traceflow.html does not have TraceFlow title"
+    exit 1
+fi
+echo "PASS: traceflow.html has TraceFlow title"
+
+echo "Test 5: Navigation contains TraceFlow link"
+if ! grep -q 'traceflow.html">TraceFlow' "$OUTPUT_DIR/index.html"; then
+    echo "FAIL: Navigation does not contain TraceFlow link"
+    exit 1
+fi
+echo "PASS: Navigation contains TraceFlow link"
+
+echo "Test 6: TraceFlow link is positioned after Traces"
+# Check that traceflow appears after traces in navigation by looking at line numbers
+TRACES_LINE=$(grep -n 'traces.html">Traces</a>' "$OUTPUT_DIR/index.html" | head -1 | cut -d: -f1)
+TRACEFLOW_LINE=$(grep -n 'traceflow.html">TraceFlow</a>' "$OUTPUT_DIR/index.html" | head -1 | cut -d: -f1)
+if [ -z "$TRACES_LINE" ]; then
+    echo "FAIL: Traces link not found"
+    exit 1
+fi
+if [ -z "$TRACEFLOW_LINE" ]; then
+    echo "FAIL: TraceFlow link not found"
+    exit 1
+fi
+if [ "$TRACEFLOW_LINE" -le "$TRACES_LINE" ]; then
+    echo "FAIL: TraceFlow link is not positioned after Traces (traces line: $TRACES_LINE, traceflow line: $TRACEFLOW_LINE)"
+    exit 1
+fi
+echo "PASS: TraceFlow link is positioned after Traces"
+
+echo "Test 7: All HTML files have TraceFlow in navigation"
+for html_file in "$OUTPUT_DIR"/*.html; do
+    if ! grep -q 'traceflow.html' "$html_file"; then
+        echo "FAIL: $html_file does not have TraceFlow in navigation"
+        exit 1
+    fi
+done
+echo "PASS: All HTML files have TraceFlow in navigation"
+
+echo ""
+echo "All TraceFlow view tests passed!"

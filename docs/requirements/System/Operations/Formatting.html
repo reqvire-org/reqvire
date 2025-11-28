@@ -198,31 +198,31 @@ blockquote {
 }
 .diagram-nav-buttons {
     position: absolute;
-    top: 10px;
-    left: 10px;
+    top: 5px;
+    left: 5px;
     z-index: 999; /* higher than SVG (1) but lower than header nav (1000) */
     display: flex;
     flex-direction: column;
-    gap: 5px;
-    background-color: rgba(255, 255, 255, 0.9);
-    padding: 5px;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    gap: 2px;
+    background-color: rgba(255, 255, 255, 0.85);
+    padding: 3px;
+    border-radius: 3px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
 }
 .diagram-nav-row {
     display: flex;
-    gap: 5px;
+    gap: 2px;
     justify-content: center;
 }
 .diagram-nav-btn {
-    width: 32px;
-    height: 32px;
+    width: 22px;
+    height: 22px;
     background-color: var(--color-primary);
     color: white;
     border: none;
-    border-radius: 3px;
+    border-radius: 2px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 11px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -318,6 +318,27 @@ blockquote {
                     return;
                 }
 
+                // Get the natural size of the diagram
+                var bbox = svg.getBBox();
+                var containerWidth = mermaidContainer.clientWidth;
+                var containerHeight = mermaidContainer.clientHeight;
+
+                // Check if diagram fits within container (with some padding)
+                var padding = 40;
+                var fitsInContainer = (bbox.width <= containerWidth - padding) && (bbox.height <= containerHeight - padding);
+
+                if (fitsInContainer) {
+                    // Diagram fits - use natural size, shrink container to fit content
+                    svg.style.width = 'auto';
+                    svg.style.height = 'auto';
+                    mermaidContainer.style.height = 'auto';
+                    mermaidContainer.style.minHeight = (bbox.height + padding) + 'px';
+                    mermaidContainer.style.maxHeight = 'calc(100vh - 150px)';
+                    // No pan/zoom needed for small diagrams
+                    return;
+                }
+
+                // Large diagram - enable pan/zoom
                 svg.style.maxWidth = 'none';
                 svg.style.maxHeight = 'none';
 
@@ -696,7 +717,9 @@ blockquote {
         <a href="../../../index.html">Containment</a>
         <a href="../../../model.html">Model</a>
         <a href="../../../traces.html">Traces</a>
+        <a href="../../../traceflow.html">TraceFlow</a>
         <a href="../../../coverage.html">Coverage</a>
+        <a href="../../../resources.html">Resources</a>
     </nav>
     <div class="reqvire-nav-spacer"></div>
     <div class="container">
@@ -712,13 +735,6 @@ blockquote {
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
-  subgraph 1c3bc86f926627ab[&quot;📁 requirements/Interfaces&quot;]
-    subgraph 315f1b2b98bf7d1b[&quot;📄 CLI.md&quot;]
-      5f9df693c47e2e9f[&quot;Format Command&quot;];
-      class 5f9df693c47e2e9f systemRequirement;
-      click 5f9df693c47e2e9f &quot;../../Interfaces/CLI.html#format-command&quot;;
-    end
-  end
   subgraph d262bfbbaa5049a3[&quot;📁 requirements/System/Core&quot;]
     subgraph a0a42393a244d64c[&quot;📄 Validation.md&quot;]
       bbe4bfafe31e5f09[&quot;Excluded File Relation Validation&quot;];
@@ -731,6 +747,9 @@ blockquote {
       61bb064413777e7d[&quot;Document Structure Normalization&quot;];
       class 61bb064413777e7d systemRequirement;
       click 61bb064413777e7d &quot;Formatting.html#document-structure-normalization&quot;;
+      a446aaa2a629e38f[&quot;Element Ordering Normalization<br/>📎 requirements/System/Operations/Refinements.md#element-ordering-behavior&quot;];
+      class a446aaa2a629e38f systemRequirement;
+      click a446aaa2a629e38f &quot;Formatting.html#element-ordering-normalization&quot;;
       3e259233db2e4d25[&quot;File Pattern Exclusion for Format&quot;];
       class 3e259233db2e4d25 systemRequirement;
       click 3e259233db2e4d25 &quot;Formatting.html#file-pattern-exclusion-for-format&quot;;
@@ -740,12 +759,18 @@ blockquote {
       151b5c7a2cdfda2f[&quot;Formatting Output&quot;];
       class 151b5c7a2cdfda2f systemRequirement;
       click 151b5c7a2cdfda2f &quot;Formatting.html#formatting-output&quot;;
+      28d990cbf4db1b00[&quot;Full Relations Insertion<br/>📎 RelationTypes.md&quot;];
+      class 28d990cbf4db1b00 systemRequirement;
+      click 28d990cbf4db1b00 &quot;Formatting.html#full-relations-insertion&quot;;
       40923d5efba35c34[&quot;Git-Style Diff Output for Format&quot;];
       class 40923d5efba35c34 userRequirement;
       click 40923d5efba35c34 &quot;Formatting.html#git-style-diff-output-for-format&quot;;
       a2cb15bef87bc2ca[&quot;Model Formatting&quot;];
       class a2cb15bef87bc2ca userRequirement;
       click a2cb15bef87bc2ca &quot;Formatting.html#model-formatting&quot;;
+      8ef7660c853b898a[&quot;Relation Ordering Normalization&quot;];
+      class 8ef7660c853b898a systemRequirement;
+      click 8ef7660c853b898a &quot;Formatting.html#relation-ordering-normalization&quot;;
       9ead49b4bdac9bb2[&quot;Replace Absolute Links with Relative Links&quot;];
       class 9ead49b4bdac9bb2 systemRequirement;
       click 9ead49b4bdac9bb2 &quot;Formatting.html#replace-absolute-links-with-relative-links&quot;;
@@ -753,9 +778,18 @@ blockquote {
   end
   subgraph 66aa2b416ad6d023[&quot;📁 requirements/System/Operations/Verifications&quot;]
     subgraph 5fdb7c9d75d9c8bf[&quot;📄 FormattingVerifications.md&quot;]
+      934319026295f62c[&quot;Element Ordering Verification<br/>📎 requirements/System/Operations/Refinements.md#element-ordering-behavior&quot;];
+      class 934319026295f62c verification;
+      click 934319026295f62c &quot;Verifications/FormattingVerifications.html#element-ordering-verification&quot;;
       723757d62c730981[&quot;Format Command Requirements Verification&quot;];
       class 723757d62c730981 verification;
       click 723757d62c730981 &quot;Verifications/FormattingVerifications.html#format-command-requirements-verification&quot;;
+      6d1f64516c7eb3bb[&quot;Full Relations Insertion Verification&quot;];
+      class 6d1f64516c7eb3bb verification;
+      click 6d1f64516c7eb3bb &quot;Verifications/FormattingVerifications.html#full-relations-insertion-verification&quot;;
+      de9c99ddb7e13f89[&quot;Relation Ordering Verification&quot;];
+      class de9c99ddb7e13f89 verification;
+      click de9c99ddb7e13f89 &quot;Verifications/FormattingVerifications.html#relation-ordering-verification&quot;;
     end
   end
   b7c871ab64a7059a[&quot;graph_registry.rs&quot;];
@@ -767,58 +801,73 @@ blockquote {
   click f22d93285fcd7664 &quot;../../../core/src/parser.rs&quot;;
   61bb064413777e7d -->|satisfiedBy| f22d93285fcd7664;
   61bb064413777e7d -.->|verifiedBy| 723757d62c730981;
+  a446aaa2a629e38f -.->|verifiedBy| 934319026295f62c;
   3e259233db2e4d25 -.->|deriveReqT| bbe4bfafe31e5f09;
   ce2625feec883e55[&quot;utils.rs&quot;];
   class ce2625feec883e55 default;
   click ce2625feec883e55 &quot;../../../core/src/utils.rs&quot;;
   3e259233db2e4d25 -->|satisfiedBy| ce2625feec883e55;
   bf4135d4f544e1c -.->|deriveReqT| 61bb064413777e7d;
+  bf4135d4f544e1c -.->|deriveReqT| a446aaa2a629e38f;
+  bf4135d4f544e1c -.->|deriveReqT| 8ef7660c853b898a;
   8fbf4ca0471377ea[&quot;format.rs&quot;];
   class 8fbf4ca0471377ea default;
   click 8fbf4ca0471377ea &quot;../../../core/src/format.rs&quot;;
   bf4135d4f544e1c -->|satisfiedBy| 8fbf4ca0471377ea;
   bf4135d4f544e1c -.->|verifiedBy| 723757d62c730981;
   151b5c7a2cdfda2f -.->|deriveReqT| 40923d5efba35c34;
+  28d990cbf4db1b00 -.->|verifiedBy| 6d1f64516c7eb3bb;
   e69395f926bba6a5[&quot;diff.rs&quot;];
   class e69395f926bba6a5 default;
   click e69395f926bba6a5 &quot;../../../core/src/diff.rs&quot;;
   40923d5efba35c34 -->|satisfiedBy| e69395f926bba6a5;
   40923d5efba35c34 -->|satisfiedBy| 8fbf4ca0471377ea;
   40923d5efba35c34 -.->|verifiedBy| 723757d62c730981;
-  a2cb15bef87bc2ca -.->|deriveReqT| 5f9df693c47e2e9f;
   a2cb15bef87bc2ca -.->|deriveReqT| bf4135d4f544e1c;
   a2cb15bef87bc2ca -.->|deriveReqT| 151b5c7a2cdfda2f;
+  a2cb15bef87bc2ca -.->|deriveReqT| 28d990cbf4db1b00;
   a2cb15bef87bc2ca -.->|deriveReqT| 9ead49b4bdac9bb2;
+  8ef7660c853b898a -->|satisfiedBy| b7c871ab64a7059a;
+  8ef7660c853b898a -.->|verifiedBy| de9c99ddb7e13f89;
   9ead49b4bdac9bb2 -.->|verifiedBy| 723757d62c730981;
   eaf33ce1e6113c8a[&quot;test.sh&quot;];
   class eaf33ce1e6113c8a default;
   click eaf33ce1e6113c8a &quot;../../../tests/test-advanced-format/test.sh&quot;;
   723757d62c730981 -->|satisfiedBy| eaf33ce1e6113c8a;
+  743d877eaae55d53[&quot;test.sh&quot;];
+  class 743d877eaae55d53 default;
+  click 743d877eaae55d53 &quot;../../../tests/test-element-ordering/test.sh&quot;;
+  934319026295f62c -->|satisfiedBy| 743d877eaae55d53;
   bbe4bfafe31e5f09 -->|satisfiedBy| f22d93285fcd7664;
   bbe4bfafe31e5f09 -.->|verifiedBy| 90310f1e5378f4b2;
-  80defdd4cbc7ee18[&quot;cli.rs&quot;];
-  class 80defdd4cbc7ee18 default;
-  click 80defdd4cbc7ee18 &quot;../../../cli/src/cli.rs&quot;;
-  5f9df693c47e2e9f -->|satisfiedBy| 80defdd4cbc7ee18;
-  5f9df693c47e2e9f -.->|verifiedBy| 7ce243221ec8f143;
-  5f9df693c47e2e9f -.->|verifiedBy| 723757d62c730981;
+  8c631136f1cd90f[&quot;test.sh&quot;];
+  class 8c631136f1cd90f default;
+  click 8c631136f1cd90f &quot;../../../tests/test-format-full-relations/test.sh&quot;;
+  6d1f64516c7eb3bb -->|satisfiedBy| 8c631136f1cd90f;
+  de9c99ddb7e13f89 -->|satisfiedBy| eaf33ce1e6113c8a;
 </div>
+<h3 id="file-pattern-exclusion-for-format">File Pattern Exclusion for Format</h3>
+<p>The system shall respect configured excluded filename patterns when performing formatting operations, ensuring that files intentionally excluded from processing do not receive inappropriate formatting suggestions.</p>
+<h4>Relations</h4>
+<ul>
+<li>derive: <a href="../Core/Validation.html#excluded-file-relation-validation">Excluded File Relation Validation</a></li>
+<li>derivedFrom: <a href="../Core/Configuration.html#ignoring-unstructured-documents">Ignoring Unstructured Documents</a></li>
+<li>satisfiedBy: <a href="../../../core/src/utils.rs">utils.rs</a></li>
+</ul>
+<hr />
 <h3 id="model-formatting">Model Formatting</h3>
-<p>The system shall provide formatting capabilities to normalize and standardize MBSE models for consistency and readability.</p>
+<p>The system shall provide formatting capabilities to normalize and standardize System models for consistency and readability.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: user-requirement</li>
 </ul>
 <h4>Relations</h4>
 <ul>
+<li>derive: <a href="#format-consistency-enforcement">Format Consistency Enforcement</a></li>
+<li>derive: <a href="#formatting-output">Formatting Output</a></li>
+<li>derive: <a href="#full-relations-insertion">Full Relations Insertion</a></li>
+<li>derive: <a href="#replace-absolute-links-with-relative-links">Replace Absolute Links with Relative Links</a></li>
 <li>derivedFrom: <a href="../../UserStories.html#validating-structures">Validating Structures</a></li>
-</ul>
-<hr />
-<h3 id="formatting-output">Formatting Output</h3>
-<p>The system shall display formatting changes suggestion in similar manner as git diffs.</p>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="#model-formatting">Model Formatting</a></li>
 </ul>
 <hr />
 <h3 id="format-consistency-enforcement">Format Consistency Enforcement</h3>
@@ -857,40 +906,13 @@ blockquote {
 </ul>
 <h4>Relations</h4>
 <ul>
+<li>derive: <a href="#document-structure-normalization">Document Structure Normalization</a></li>
+<li>derive: <a href="#element-ordering-normalization">Element Ordering Normalization</a></li>
+<li>derive: <a href="#relation-ordering-normalization">Relation Ordering Normalization</a></li>
 <li>derivedFrom: <a href="#model-formatting">Model Formatting</a></li>
 <li>derivedFrom: <a href="../../UserStories.html#align-with-industry-standards">Align with Industry Standards</a></li>
 <li>satisfiedBy: <a href="../../../core/src/format.rs">format.rs</a></li>
 <li>verifiedBy: <a href="Verifications/FormattingVerifications.html#format-command-requirements-verification">Format Command Requirements Verification</a></li>
-</ul>
-<hr />
-<h3 id="replace-absolute-links-with-relative-links">Replace Absolute Links with Relative Links</h3>
-<p>The system shall replace absolute links with relative links, where applicable and contextually appropriate, to conform to repository standards and enhance portability.</p>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="#model-formatting">Model Formatting</a></li>
-<li>verifiedBy: <a href="Verifications/FormattingVerifications.html#format-command-requirements-verification">Format Command Requirements Verification</a></li>
-</ul>
-<hr />
-<h3 id="git-style-diff-output-for-format">Git-Style Diff Output for Format</h3>
-<p>The system shall display formatting change suggestions in a git-style diff format, color-coded when possible, to clearly show what modifications will be or have been made to the documents.</p>
-<h4>Metadata</h4>
-<ul>
-<li>type: user-requirement</li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="#formatting-output">Formatting Output</a></li>
-<li>satisfiedBy: <a href="../../../core/src/format.rs">format.rs</a></li>
-<li>satisfiedBy: <a href="../../../core/src/diff.rs">diff.rs</a></li>
-<li>verifiedBy: <a href="Verifications/FormattingVerifications.html#format-command-requirements-verification">Format Command Requirements Verification</a></li>
-</ul>
-<hr />
-<h3 id="file-pattern-exclusion-for-format">File Pattern Exclusion for Format</h3>
-<p>The system shall respect configured excluded filename patterns when performing formatting operations, ensuring that files intentionally excluded from processing do not receive inappropriate formatting suggestions.</p>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="../Core/Configuration.html#ignoring-unstructured-documents">Ignoring Unstructured Documents</a></li>
-<li>satisfiedBy: <a href="../../../core/src/utils.rs">utils.rs</a></li>
 </ul>
 <hr />
 <h3 id="document-structure-normalization">Document Structure Normalization</h3>
@@ -918,6 +940,89 @@ blockquote {
 <li>derivedFrom: <a href="#format-consistency-enforcement">Format Consistency Enforcement</a></li>
 <li>satisfiedBy: <a href="../../../core/src/graph_registry.rs">graph_registry.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/parser.rs">parser.rs</a></li>
+<li>verifiedBy: <a href="Verifications/FormattingVerifications.html#format-command-requirements-verification">Format Command Requirements Verification</a></li>
+</ul>
+<hr />
+<h3 id="element-ordering-normalization">Element Ordering Normalization</h3>
+<p>When formatting or persisting specification files, the system shall reorder elements following the Element Ordering Behavior.</p>
+<h4>Attachments</h4>
+<ul>
+<li><a href="Refinements.html#element-ordering-behavior">Element Ordering Behavior</a></li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#format-consistency-enforcement">Format Consistency Enforcement</a></li>
+<li>verifiedBy: <a href="Verifications/FormattingVerifications.html#element-ordering-verification">Element Ordering Verification</a></li>
+</ul>
+<hr />
+<h3 id="relation-ordering-normalization">Relation Ordering Normalization</h3>
+<p>When formatting or persisting specification files, the system shall sort relations within each element for deterministic and consistent output.</p>
+<h4>Details</h4>
+<p>Relations are sorted using the following criteria:</p>
+<ol>
+<li>Primary sort: Alphabetically by relation type name (e.g., <code>derivedFrom</code> before <code>satisfiedBy</code>, <code>trace</code> before <code>verifiedBy</code>)</li>
+<li>Secondary sort: Alphabetically by target identifier within the same relation type</li>
+</ol>
+<p>This ensures:</p>
+<ul>
+<li>Deterministic output regardless of parsing order or HashMap iteration order</li>
+<li>Consistent diffs when comparing formatted files</li>
+<li>Predictable relation ordering for review and verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#format-consistency-enforcement">Format Consistency Enforcement</a></li>
+<li>satisfiedBy: <a href="../../../core/src/graph_registry.rs">graph_registry.rs</a></li>
+<li>verifiedBy: <a href="Verifications/FormattingVerifications.html#relation-ordering-verification">Relation Ordering Verification</a></li>
+</ul>
+<hr />
+<h3 id="formatting-output">Formatting Output</h3>
+<p>The system shall display formatting changes suggestion in similar manner as git diffs.</p>
+<h4>Relations</h4>
+<ul>
+<li>derive: <a href="#git-style-diff-output-for-format">Git-Style Diff Output for Format</a></li>
+<li>derivedFrom: <a href="#model-formatting">Model Formatting</a></li>
+</ul>
+<hr />
+<h3 id="git-style-diff-output-for-format">Git-Style Diff Output for Format</h3>
+<p>The system shall display formatting change suggestions in a git-style diff format, color-coded when possible, to clearly show what modifications will be or have been made to the documents.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#formatting-output">Formatting Output</a></li>
+<li>satisfiedBy: <a href="../../../core/src/diff.rs">diff.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/format.rs">format.rs</a></li>
+<li>verifiedBy: <a href="Verifications/FormattingVerifications.html#format-command-requirements-verification">Format Command Requirements Verification</a></li>
+</ul>
+<hr />
+<h3 id="full-relations-insertion">Full Relations Insertion</h3>
+<p>When the –with-full-relations flag is provided, the system shall insert all registered relations into elements, including both user-created and auto-generated relations.</p>
+<h4>Details</h4>
+<p>Auto-generated relations are inverse relations created by the parser during model loading but not persisted to files by default. See Relation Types Specification for opposite relation pairs.</p>
+<p>When –with-full-relations is active:</p>
+<ul>
+<li>All relations from the model registry are written to the Relations subsection</li>
+<li>Relations are sorted according to the Relation Ordering Normalization requirement</li>
+</ul>
+<h4>Attachments</h4>
+<ul>
+<li><a href="../Core/DesignDocuments/RelationTypes.html">RelationTypes.html</a></li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#model-formatting">Model Formatting</a></li>
+<li>verifiedBy: <a href="Verifications/FormattingVerifications.html#full-relations-insertion-verification">Full Relations Insertion Verification</a></li>
+</ul>
+<hr />
+<h3 id="replace-absolute-links-with-relative-links">Replace Absolute Links with Relative Links</h3>
+<p>The system shall replace absolute links with relative links, where applicable and contextually appropriate, to conform to repository standards and enhance portability.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#model-formatting">Model Formatting</a></li>
+<li>verifiedBy: <a href="Verifications/FormattingVerifications.html#format-command-requirements-verification">Format Command Requirements Verification</a></li>
 </ul>
 <hr />
 

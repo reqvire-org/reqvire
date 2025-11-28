@@ -198,31 +198,31 @@ blockquote {
 }
 .diagram-nav-buttons {
     position: absolute;
-    top: 10px;
-    left: 10px;
+    top: 5px;
+    left: 5px;
     z-index: 999; /* higher than SVG (1) but lower than header nav (1000) */
     display: flex;
     flex-direction: column;
-    gap: 5px;
-    background-color: rgba(255, 255, 255, 0.9);
-    padding: 5px;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    gap: 2px;
+    background-color: rgba(255, 255, 255, 0.85);
+    padding: 3px;
+    border-radius: 3px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
 }
 .diagram-nav-row {
     display: flex;
-    gap: 5px;
+    gap: 2px;
     justify-content: center;
 }
 .diagram-nav-btn {
-    width: 32px;
-    height: 32px;
+    width: 22px;
+    height: 22px;
     background-color: var(--color-primary);
     color: white;
     border: none;
-    border-radius: 3px;
+    border-radius: 2px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 11px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -318,6 +318,27 @@ blockquote {
                     return;
                 }
 
+                // Get the natural size of the diagram
+                var bbox = svg.getBBox();
+                var containerWidth = mermaidContainer.clientWidth;
+                var containerHeight = mermaidContainer.clientHeight;
+
+                // Check if diagram fits within container (with some padding)
+                var padding = 40;
+                var fitsInContainer = (bbox.width <= containerWidth - padding) && (bbox.height <= containerHeight - padding);
+
+                if (fitsInContainer) {
+                    // Diagram fits - use natural size, shrink container to fit content
+                    svg.style.width = 'auto';
+                    svg.style.height = 'auto';
+                    mermaidContainer.style.height = 'auto';
+                    mermaidContainer.style.minHeight = (bbox.height + padding) + 'px';
+                    mermaidContainer.style.maxHeight = 'calc(100vh - 150px)';
+                    // No pan/zoom needed for small diagrams
+                    return;
+                }
+
+                // Large diagram - enable pan/zoom
                 svg.style.maxWidth = 'none';
                 svg.style.maxHeight = 'none';
 
@@ -696,7 +717,9 @@ blockquote {
         <a href="../../../index.html">Containment</a>
         <a href="../../../model.html">Model</a>
         <a href="../../../traces.html">Traces</a>
+        <a href="../../../traceflow.html">TraceFlow</a>
         <a href="../../../coverage.html">Coverage</a>
+        <a href="../../../resources.html">Resources</a>
     </nav>
     <div class="reqvire-nav-spacer"></div>
     <div class="container">
@@ -712,13 +735,6 @@ blockquote {
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
-  subgraph 1c3bc86f926627ab[&quot;📁 requirements/Interfaces&quot;]
-    subgraph 315f1b2b98bf7d1b[&quot;📄 CLI.md&quot;]
-      dd4583cd268f06b7[&quot;CLI Change Impact Report Command<br/>📎 requirements/System/Output/DesignDocuments/OutputFormats.md#json-output-structure<br/>📎 requirements/System/Output/DesignDocuments/OutputFormats.md#text-output-formatting&quot;];
-      class dd4583cd268f06b7 systemRequirement;
-      click dd4583cd268f06b7 &quot;../../Interfaces/CLI.html#cli-change-impact-report-command&quot;;
-    end
-  end
   subgraph 2d73a43cf375cb0f[&quot;📁 requirements/System/Core/Verifications&quot;]
     subgraph 41cd9fa811ae162b[&quot;📄 AttachmentsVerifications.md&quot;]
       f1dfbc33d1f30608[&quot;Attachments Change Impact Verification&quot;];
@@ -767,38 +783,28 @@ blockquote {
   1db62a3344255ecc -.->|verifiedBy| 9c1a36e8cc156517;
   1db62a3344255ecc -.->|verifiedBy| f3e6e51e1f4e513e;
   1db62a3344255ecc -.->|verifiedBy| 3753d18d6b61231c;
-  c93cc0e0f7685241 -.->|deriveReqT| dd4583cd268f06b7;
   c93cc0e0f7685241 -->|satisfiedBy| 4b89dbed94c08c3e;
   17b004dcfcf8f444[&quot;test.sh&quot;];
   class 17b004dcfcf8f444 default;
   click 17b004dcfcf8f444 &quot;../../../tests/test-change-impact-attachments/test.sh&quot;;
   f1dfbc33d1f30608 -->|satisfiedBy| 17b004dcfcf8f444;
-  c287b52ceb52aa04[&quot;test.sh&quot;];
-  class c287b52ceb52aa04 default;
-  click c287b52ceb52aa04 &quot;../../../tests/test-element-content-extraction/test.sh&quot;;
-  3753d18d6b61231c -->|satisfiedBy| c287b52ceb52aa04;
-  6cc7cc8a3f2af10b[&quot;test.sh&quot;];
-  class 6cc7cc8a3f2af10b default;
-  click 6cc7cc8a3f2af10b &quot;../../../tests/test-change-impact-smart-filtering/test.sh&quot;;
-  f3e6e51e1f4e513e -->|satisfiedBy| 6cc7cc8a3f2af10b;
   e95e3160edec8f1b[&quot;test.sh&quot;];
   class e95e3160edec8f1b default;
   click e95e3160edec8f1b &quot;../../../tests/test-change-impact-detection/test.sh&quot;;
-  9c1a36e8cc156517 -->|satisfiedBy| e95e3160edec8f1b;
   aa925b8b82776365 -->|satisfiedBy| e95e3160edec8f1b;
   fe115b41c9238caf[&quot;test.sh&quot;];
   class fe115b41c9238caf default;
   click fe115b41c9238caf &quot;../../../tests/test-change-impact-element-relocation/test.sh&quot;;
   aa925b8b82776365 -->|satisfiedBy| fe115b41c9238caf;
-  80defdd4cbc7ee18[&quot;cli.rs&quot;];
-  class 80defdd4cbc7ee18 default;
-  click 80defdd4cbc7ee18 &quot;../../../cli/src/cli.rs&quot;;
-  dd4583cd268f06b7 -->|satisfiedBy| 80defdd4cbc7ee18;
-  dd4583cd268f06b7 -.->|verifiedBy| a39de65a7d24ee22;
-  dd4583cd268f06b7 -.->|verifiedBy| 7ce243221ec8f143;
-  dd4583cd268f06b7 -.->|verifiedBy| bcd76f8fac816fc9;
-  dd4583cd268f06b7 -.->|verifiedBy| aa925b8b82776365;
-  dd4583cd268f06b7 -.->|verifiedBy| 9c1a36e8cc156517;
+  9c1a36e8cc156517 -->|satisfiedBy| e95e3160edec8f1b;
+  6cc7cc8a3f2af10b[&quot;test.sh&quot;];
+  class 6cc7cc8a3f2af10b default;
+  click 6cc7cc8a3f2af10b &quot;../../../tests/test-change-impact-smart-filtering/test.sh&quot;;
+  f3e6e51e1f4e513e -->|satisfiedBy| 6cc7cc8a3f2af10b;
+  c287b52ceb52aa04[&quot;test.sh&quot;];
+  class c287b52ceb52aa04 default;
+  click c287b52ceb52aa04 &quot;../../../tests/test-element-content-extraction/test.sh&quot;;
+  3753d18d6b61231c -->|satisfiedBy| c287b52ceb52aa04;
 </div>
 <h3 id="change-impact-detection">Change Impact Detection</h3>
 <p>The system shall detect, analyze, and report changes to model elements between versions by comparing element content hashes, tracking relocations, and propagating impact through relationships.</p>
@@ -816,17 +822,12 @@ blockquote {
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>derivedFrom: <a href="../Output/Reporting.html#tracing-structural-changes">Tracing Structural Changes</a></li>
+<li>derive: <a href="#requirements-change-propagation">Requirements Change Propagation</a></li>
+<li>derive: <a href="#structural-change-analyzer">Structural Change Analyzer</a></li>
 <li>derivedFrom: <a href="../Core/StructureAndParsing.html#element-identity-model">Element Identity Model</a></li>
+<li>derivedFrom: <a href="../Output/Reporting.html#tracing-structural-changes">Tracing Structural Changes</a></li>
 <li>satisfiedBy: <a href="../../../core/src/change_impact.rs">change_impact.rs</a></li>
-</ul>
-<hr />
-<h3 id="structural-change-analyzer">Structural Change Analyzer</h3>
-<p>The system shall implement a model change analyzer that identifies structural modifications between model versions, determines affected elements through relationship traversal, and categorizes impacts according to change propagation rules.</p>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="#change-impact-detection">Change Impact Detection</a></li>
-<li>satisfiedBy: <a href="../../../core/src/change_impact.rs">change_impact.rs</a></li>
+<li>verifiedBy: <a href="../Core/Verifications/AttachmentsVerifications.html#attachments-change-impact-verification">Attachments Change Impact Verification</a></li>
 </ul>
 <hr />
 <h3 id="requirements-change-propagation">Requirements Change Propagation</h3>
@@ -835,6 +836,18 @@ blockquote {
 <ul>
 <li><a href="DesignDocuments/ChangePropagation.html">ChangePropagation.html</a></li>
 </ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#change-impact-detection">Change Impact Detection</a></li>
+<li>satisfiedBy: <a href="../../../core/src/change_impact.rs">change_impact.rs</a></li>
+<li>verifiedBy: <a href="Verifications/ChangeImpactVerifications.html#change-impact-detection-test">Change Impact Detection Test</a></li>
+<li>verifiedBy: <a href="Verifications/ChangeImpactVerifications.html#change-impact-relations-test">Change Impact Relations Test</a></li>
+<li>verifiedBy: <a href="Verifications/ChangeImpactVerifications.html#change-impact-smart-filtering-test">Change Impact Smart Filtering Test</a></li>
+<li>verifiedBy: <a href="Verifications/ChangeImpactVerifications.html#element-content-extraction-test">Element Content Extraction Test</a></li>
+</ul>
+<hr />
+<h3 id="structural-change-analyzer">Structural Change Analyzer</h3>
+<p>The system shall implement a model change analyzer that identifies structural modifications between model versions, determines affected elements through relationship traversal, and categorizes impacts according to change propagation rules.</p>
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#change-impact-detection">Change Impact Detection</a></li>

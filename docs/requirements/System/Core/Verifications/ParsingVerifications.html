@@ -198,31 +198,31 @@ blockquote {
 }
 .diagram-nav-buttons {
     position: absolute;
-    top: 10px;
-    left: 10px;
+    top: 5px;
+    left: 5px;
     z-index: 999; /* higher than SVG (1) but lower than header nav (1000) */
     display: flex;
     flex-direction: column;
-    gap: 5px;
-    background-color: rgba(255, 255, 255, 0.9);
-    padding: 5px;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    gap: 2px;
+    background-color: rgba(255, 255, 255, 0.85);
+    padding: 3px;
+    border-radius: 3px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
 }
 .diagram-nav-row {
     display: flex;
-    gap: 5px;
+    gap: 2px;
     justify-content: center;
 }
 .diagram-nav-btn {
-    width: 32px;
-    height: 32px;
+    width: 22px;
+    height: 22px;
     background-color: var(--color-primary);
     color: white;
     border: none;
-    border-radius: 3px;
+    border-radius: 2px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 11px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -318,6 +318,27 @@ blockquote {
                     return;
                 }
 
+                // Get the natural size of the diagram
+                var bbox = svg.getBBox();
+                var containerWidth = mermaidContainer.clientWidth;
+                var containerHeight = mermaidContainer.clientHeight;
+
+                // Check if diagram fits within container (with some padding)
+                var padding = 40;
+                var fitsInContainer = (bbox.width <= containerWidth - padding) && (bbox.height <= containerHeight - padding);
+
+                if (fitsInContainer) {
+                    // Diagram fits - use natural size, shrink container to fit content
+                    svg.style.width = 'auto';
+                    svg.style.height = 'auto';
+                    mermaidContainer.style.height = 'auto';
+                    mermaidContainer.style.minHeight = (bbox.height + padding) + 'px';
+                    mermaidContainer.style.maxHeight = 'calc(100vh - 150px)';
+                    // No pan/zoom needed for small diagrams
+                    return;
+                }
+
+                // Large diagram - enable pan/zoom
                 svg.style.maxWidth = 'none';
                 svg.style.maxHeight = 'none';
 
@@ -696,7 +717,9 @@ blockquote {
         <a href="../../../../index.html">Containment</a>
         <a href="../../../../model.html">Model</a>
         <a href="../../../../traces.html">Traces</a>
+        <a href="../../../../traceflow.html">TraceFlow</a>
         <a href="../../../../coverage.html">Coverage</a>
+        <a href="../../../../resources.html">Resources</a>
     </nav>
     <div class="reqvire-nav-spacer"></div>
     <div class="container">
@@ -843,89 +866,11 @@ blockquote {
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>verify: <a href="../StructureAndParsing.html#reserved-subsections-support">Reserved Subsections Support</a></li>
-<li>verify: <a href="../ModelManagement.html#supported-element-types">Supported Element Types</a></li>
-<li>verify: <a href="../ModelManagement.html#relation-types-and-behaviors">Relation Types and behaviors</a></li>
-<li>verify: <a href="../ModelManagement.html#default-requirement-type-assignment">Default Requirement Type Assignment</a></li>
 <li>satisfiedBy: <a href="../../../../tests/test-parsing-functionality/test.sh">test.sh</a></li>
-</ul>
-<hr />
-<h3 id="specification-file-identification-test">Specification File Identification Test</h3>
-<p>This test verifies that the system only parses markdown files where the first H1 heading is exactly <code># Elements</code>, and silently ignores all other markdown files.</p>
-<h4>Details</h4>
-<h5>Acceptance Criteria</h5>
-<p><strong>File Identification:</strong></p>
-<ul>
-<li>System shall parse markdown files where first H1 heading is <code># Elements</code></li>
-<li>System shall ignore markdown files where first H1 heading is not <code># Elements</code></li>
-<li>System shall ignore markdown files with no H1 heading</li>
-<li>Files without <code># Elements</code> heading shall be silently skipped (no error)</li>
-</ul>
-<p><strong>Leading Content Handling:</strong></p>
-<ul>
-<li>System shall allow blank lines before <code># Elements</code> heading</li>
-<li>System shall allow frontmatter (YAML between <code>---</code> markers) before <code># Elements</code> heading</li>
-<li>System shall allow HTML comments before <code># Elements</code> heading</li>
-<li>System shall check the first H1 heading encountered, ignoring non-heading content</li>
-</ul>
-<p><strong>Backward Compatibility:</strong></p>
-<ul>
-<li>Files with different H1 headings (e.g., <code># User Stories</code>, <code># System Design</code>) shall be ignored</li>
-<li>This behavior applies in addition to <code>.gitignore</code> and <code>.reqvireignore</code> exclusions</li>
-<li>Page title/header is not stored in the model (always output as <code># Elements</code>)</li>
-</ul>
-<h5>Test Criteria</h5>
-<ol>
-<li>
-<p><strong>Valid specification file parsing:</strong></p>
-<ul>
-<li>Create file with <code># Elements</code> as first H1</li>
-<li>Run reqvire search</li>
-<li>Verify elements from file are in model</li>
-</ul>
-</li>
-<li>
-<p><strong>Invalid specification file skipping:</strong></p>
-<ul>
-<li>Create file with different H1 (e.g., <code># Other Title</code>)</li>
-<li>Run reqvire search</li>
-<li>Verify elements from file are NOT in model</li>
-<li>Verify no error is reported</li>
-</ul>
-</li>
-<li>
-<p><strong>No H1 heading:</strong></p>
-<ul>
-<li>Create markdown file starting with <code>## Section</code> (no H1)</li>
-<li>Run reqvire search</li>
-<li>Verify file is ignored</li>
-</ul>
-</li>
-<li>
-<p><strong>Leading blank lines:</strong></p>
-<ul>
-<li>Create file with blank lines before <code># Elements</code></li>
-<li>Run reqvire search</li>
-<li>Verify file is parsed correctly</li>
-</ul>
-</li>
-<li>
-<p><strong>Combined with ignore patterns:</strong></p>
-<ul>
-<li>Create valid <code># Elements</code> file matching .gitignore pattern</li>
-<li>Verify file is still excluded by ignore pattern</li>
-<li>Both checks must pass for file to be parsed</li>
-</ul>
-</li>
-</ol>
-<h4>Metadata</h4>
-<ul>
-<li>type: test-verification</li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>verify: <a href="../StructureAndParsing.html#specification-file-identification">Specification File Identification</a></li>
-<li>satisfiedBy: <a href="../../../../tests/test-gitignore-integration/test.sh">test.sh</a></li>
+<li>verify: <a href="../ModelManagement.html#default-requirement-type-assignment">Default Requirement Type Assignment</a></li>
+<li>verify: <a href="../ModelManagement.html#relation-types-and-behaviors">Relation Types and behaviors</a></li>
+<li>verify: <a href="../ModelManagement.html#supported-element-types">Supported Element Types</a></li>
+<li>verify: <a href="../StructureAndParsing.html#reserved-subsections-support">Reserved Subsections Support</a></li>
 </ul>
 <hr />
 <h3 id="fragment-normalization-test">Fragment Normalization Test</h3>
@@ -1025,8 +970,67 @@ blockquote {
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>verify: <a href="../StructureAndParsing.html#element-identity-model">Element Identity Model</a></li>
 <li>satisfiedBy: <a href="../../../../tests/test-parsing-functionality/test.sh">test.sh</a></li>
+<li>verify: <a href="../StructureAndParsing.html#element-identity-model">Element Identity Model</a></li>
+</ul>
+<hr />
+<h3 id="non-reserved-subsections-content-test">Non-Reserved Subsections Content Test</h3>
+<p>This test verifies that non-reserved subsections (subsections other than Relations, Details, Metadata, Attachments) are correctly included in the element’s content field.</p>
+<h4>Details</h4>
+<h5>Acceptance Criteria</h5>
+<p><strong>Non-Reserved Subsection Handling:</strong></p>
+<ul>
+<li>System shall include non-reserved subsection headers (e.g., <code>#### Test Steps</code>, <code>#### Expected Results</code>) in element content</li>
+<li>System shall include content following non-reserved subsection headers in element content</li>
+<li>Non-reserved subsection content shall NOT be moved to page content</li>
+<li>Non-reserved subsections shall behave like <code>#### Details</code> (content goes into element’s content field)</li>
+</ul>
+<p><strong>Reserved Subsection Behavior:</strong></p>
+<ul>
+<li>Reserved subsections (Relations, Metadata, Attachments) shall NOT be included in element content</li>
+<li><code>#### Details</code> subsection header and its content shall be included in element content</li>
+</ul>
+<p><strong>Format Command:</strong></p>
+<ul>
+<li>Format command shall preserve non-reserved subsections within their parent element</li>
+<li>Format command shall NOT move non-reserved subsection content to page level</li>
+</ul>
+<h5>Test Criteria</h5>
+<ol>
+<li>
+<p><strong>Non-reserved subsection parsing:</strong></p>
+<ul>
+<li>Create element with <code>#### Test Steps</code> and <code>#### Expected Results</code> subsections</li>
+<li>Run reqvire search –json</li>
+<li>Verify element content includes both subsection headers and their content</li>
+</ul>
+</li>
+<li>
+<p><strong>Page content exclusion:</strong></p>
+<ul>
+<li>Create element with non-reserved subsections</li>
+<li>Run reqvire search –json</li>
+<li>Verify page_content does NOT contain non-reserved subsection content</li>
+</ul>
+</li>
+<li>
+<p><strong>Format preservation:</strong></p>
+<ul>
+<li>Run reqvire format on file with non-reserved subsections</li>
+<li>Verify format does not propose moving subsection content to page level</li>
+<li>Run reqvire format –fix</li>
+<li>Verify subsections remain under their parent element</li>
+</ul>
+</li>
+</ol>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfiedBy: <a href="../../../../tests/test-search-all-features/test.sh">test.sh</a></li>
+<li>verify: <a href="../StructureAndParsing.html#reserved-subsections-support">Reserved Subsections Support</a></li>
 </ul>
 <hr />
 <h3 id="refinement-element-type-parsing-test">Refinement Element Type Parsing Test</h3>
@@ -1153,52 +1157,71 @@ blockquote {
 <li>verify: <a href="../ModelManagement.html#refinement-element-structure-constraints">Refinement Element Structure Constraints</a></li>
 </ul>
 <hr />
-<h3 id="non-reserved-subsections-content-test">Non-Reserved Subsections Content Test</h3>
-<p>This test verifies that non-reserved subsections (subsections other than Relations, Details, Metadata, Attachments) are correctly included in the element’s content field.</p>
+<h3 id="specification-file-identification-test">Specification File Identification Test</h3>
+<p>This test verifies that the system only parses markdown files where the first H1 heading is exactly <code># Elements</code>, and silently ignores all other markdown files.</p>
 <h4>Details</h4>
 <h5>Acceptance Criteria</h5>
-<p><strong>Non-Reserved Subsection Handling:</strong></p>
+<p><strong>File Identification:</strong></p>
 <ul>
-<li>System shall include non-reserved subsection headers (e.g., <code>#### Test Steps</code>, <code>#### Expected Results</code>) in element content</li>
-<li>System shall include content following non-reserved subsection headers in element content</li>
-<li>Non-reserved subsection content shall NOT be moved to page content</li>
-<li>Non-reserved subsections shall behave like <code>#### Details</code> (content goes into element’s content field)</li>
+<li>System shall parse markdown files where first H1 heading is <code># Elements</code></li>
+<li>System shall ignore markdown files where first H1 heading is not <code># Elements</code></li>
+<li>System shall ignore markdown files with no H1 heading</li>
+<li>Files without <code># Elements</code> heading shall be silently skipped (no error)</li>
 </ul>
-<p><strong>Reserved Subsection Behavior:</strong></p>
+<p><strong>Leading Content Handling:</strong></p>
 <ul>
-<li>Reserved subsections (Relations, Metadata, Attachments) shall NOT be included in element content</li>
-<li><code>#### Details</code> subsection header and its content shall be included in element content</li>
+<li>System shall allow blank lines before <code># Elements</code> heading</li>
+<li>System shall allow frontmatter (YAML between <code>---</code> markers) before <code># Elements</code> heading</li>
+<li>System shall allow HTML comments before <code># Elements</code> heading</li>
+<li>System shall check the first H1 heading encountered, ignoring non-heading content</li>
 </ul>
-<p><strong>Format Command:</strong></p>
+<p><strong>Backward Compatibility:</strong></p>
 <ul>
-<li>Format command shall preserve non-reserved subsections within their parent element</li>
-<li>Format command shall NOT move non-reserved subsection content to page level</li>
+<li>Files with different H1 headings (e.g., <code># User Stories</code>, <code># System Design</code>) shall be ignored</li>
+<li>This behavior applies in addition to <code>.gitignore</code> and <code>.reqvireignore</code> exclusions</li>
+<li>Page title/header is not stored in the model (always output as <code># Elements</code>)</li>
 </ul>
 <h5>Test Criteria</h5>
 <ol>
 <li>
-<p><strong>Non-reserved subsection parsing:</strong></p>
+<p><strong>Valid specification file parsing:</strong></p>
 <ul>
-<li>Create element with <code>#### Test Steps</code> and <code>#### Expected Results</code> subsections</li>
-<li>Run reqvire search –json</li>
-<li>Verify element content includes both subsection headers and their content</li>
+<li>Create file with <code># Elements</code> as first H1</li>
+<li>Run reqvire search</li>
+<li>Verify elements from file are in model</li>
 </ul>
 </li>
 <li>
-<p><strong>Page content exclusion:</strong></p>
+<p><strong>Invalid specification file skipping:</strong></p>
 <ul>
-<li>Create element with non-reserved subsections</li>
-<li>Run reqvire search –json</li>
-<li>Verify page_content does NOT contain non-reserved subsection content</li>
+<li>Create file with different H1 (e.g., <code># Other Title</code>)</li>
+<li>Run reqvire search</li>
+<li>Verify elements from file are NOT in model</li>
+<li>Verify no error is reported</li>
 </ul>
 </li>
 <li>
-<p><strong>Format preservation:</strong></p>
+<p><strong>No H1 heading:</strong></p>
 <ul>
-<li>Run reqvire format on file with non-reserved subsections</li>
-<li>Verify format does not propose moving subsection content to page level</li>
-<li>Run reqvire format –fix</li>
-<li>Verify subsections remain under their parent element</li>
+<li>Create markdown file starting with <code>## Section</code> (no H1)</li>
+<li>Run reqvire search</li>
+<li>Verify file is ignored</li>
+</ul>
+</li>
+<li>
+<p><strong>Leading blank lines:</strong></p>
+<ul>
+<li>Create file with blank lines before <code># Elements</code></li>
+<li>Run reqvire search</li>
+<li>Verify file is parsed correctly</li>
+</ul>
+</li>
+<li>
+<p><strong>Combined with ignore patterns:</strong></p>
+<ul>
+<li>Create valid <code># Elements</code> file matching .gitignore pattern</li>
+<li>Verify file is still excluded by ignore pattern</li>
+<li>Both checks must pass for file to be parsed</li>
 </ul>
 </li>
 </ol>
@@ -1208,8 +1231,8 @@ blockquote {
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>verify: <a href="../StructureAndParsing.html#reserved-subsections-support">Reserved Subsections Support</a></li>
-<li>satisfiedBy: <a href="../../../../tests/test-search-all-features/test.sh">test.sh</a></li>
+<li>satisfiedBy: <a href="../../../../tests/test-gitignore-integration/test.sh">test.sh</a></li>
+<li>verify: <a href="../StructureAndParsing.html#specification-file-identification">Specification File Identification</a></li>
 </ul>
 <hr />
 

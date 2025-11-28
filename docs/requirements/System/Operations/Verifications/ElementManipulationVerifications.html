@@ -198,31 +198,31 @@ blockquote {
 }
 .diagram-nav-buttons {
     position: absolute;
-    top: 10px;
-    left: 10px;
+    top: 5px;
+    left: 5px;
     z-index: 999; /* higher than SVG (1) but lower than header nav (1000) */
     display: flex;
     flex-direction: column;
-    gap: 5px;
-    background-color: rgba(255, 255, 255, 0.9);
-    padding: 5px;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    gap: 2px;
+    background-color: rgba(255, 255, 255, 0.85);
+    padding: 3px;
+    border-radius: 3px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
 }
 .diagram-nav-row {
     display: flex;
-    gap: 5px;
+    gap: 2px;
     justify-content: center;
 }
 .diagram-nav-btn {
-    width: 32px;
-    height: 32px;
+    width: 22px;
+    height: 22px;
     background-color: var(--color-primary);
     color: white;
     border: none;
-    border-radius: 3px;
+    border-radius: 2px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 11px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -318,6 +318,27 @@ blockquote {
                     return;
                 }
 
+                // Get the natural size of the diagram
+                var bbox = svg.getBBox();
+                var containerWidth = mermaidContainer.clientWidth;
+                var containerHeight = mermaidContainer.clientHeight;
+
+                // Check if diagram fits within container (with some padding)
+                var padding = 40;
+                var fitsInContainer = (bbox.width <= containerWidth - padding) && (bbox.height <= containerHeight - padding);
+
+                if (fitsInContainer) {
+                    // Diagram fits - use natural size, shrink container to fit content
+                    svg.style.width = 'auto';
+                    svg.style.height = 'auto';
+                    mermaidContainer.style.height = 'auto';
+                    mermaidContainer.style.minHeight = (bbox.height + padding) + 'px';
+                    mermaidContainer.style.maxHeight = 'calc(100vh - 150px)';
+                    // No pan/zoom needed for small diagrams
+                    return;
+                }
+
+                // Large diagram - enable pan/zoom
                 svg.style.maxWidth = 'none';
                 svg.style.maxHeight = 'none';
 
@@ -696,7 +717,9 @@ blockquote {
         <a href="../../../../index.html">Containment</a>
         <a href="../../../../model.html">Model</a>
         <a href="../../../../traces.html">Traces</a>
+        <a href="../../../../traceflow.html">TraceFlow</a>
         <a href="../../../../coverage.html">Coverage</a>
+        <a href="../../../../resources.html">Resources</a>
     </nav>
     <div class="reqvire-nav-spacer"></div>
     <div class="container">
@@ -714,10 +737,10 @@ blockquote {
 
   subgraph 66aa2b416ad6d023[&quot;📁 requirements/System/Operations/Verifications&quot;]
     subgraph d274cf61b3f74735[&quot;📄 ElementManipulationVerifications.md&quot;]
-      10085920401e3002[&quot;CLI Add Element Test&quot;];
+      10085920401e3002[&quot;CLI Add Element Test<br/>📎 requirements/System/Operations/Refinements.md#element-ordering-behavior&quot;];
       class 10085920401e3002 verification;
       click 10085920401e3002 &quot;ElementManipulationVerifications.html#cli-add-element-test&quot;;
-      e820c3067eb8e3e2[&quot;CLI Move Element Test&quot;];
+      e820c3067eb8e3e2[&quot;CLI Move Element Test<br/>📎 requirements/System/Operations/Refinements.md#element-ordering-behavior&quot;];
       class e820c3067eb8e3e2 verification;
       click e820c3067eb8e3e2 &quot;ElementManipulationVerifications.html#cli-move-element-test&quot;;
       96f7bfbd9aa071f9[&quot;CLI Move File Test&quot;];
@@ -735,7 +758,7 @@ blockquote {
       489fbf5e3ec08a53[&quot;Delete Element Test&quot;];
       class 489fbf5e3ec08a53 verification;
       click 489fbf5e3ec08a53 &quot;ElementManipulationVerifications.html#delete-element-test&quot;;
-      9c8ea99467081d64[&quot;File Persistence Test&quot;];
+      9c8ea99467081d64[&quot;File Persistence Test<br/>📎 requirements/System/Operations/Refinements.md#element-ordering-behavior&quot;];
       class 9c8ea99467081d64 verification;
       click 9c8ea99467081d64 &quot;ElementManipulationVerifications.html#file-persistence-test&quot;;
       3df547c544ad75b1[&quot;Move Element Test&quot;];
@@ -789,7 +812,7 @@ blockquote {
   b6076972a6650ff1 -->|satisfiedBy| fe344320c82b0bbf;
 </div>
 <h3 id="cli-add-element-test">CLI Add Element Test</h3>
-<p>The test shall verify that the <code>add</code> command creates new elements from stdin or inline string input, validates structure, supports index-based insertion, and outputs git-style diffs.</p>
+<p>The test shall verify that the <code>add</code> command creates new elements from stdin or inline string input, validates structure, inserts following Element Ordering Behavior, and outputs git-style diffs.</p>
 <h4>Details</h4>
 <p><strong>Test Setup:</strong></p>
 <ul>
@@ -800,7 +823,7 @@ blockquote {
 </ul>
 <p><strong>Test Steps - Stdin Input:</strong></p>
 <ol>
-<li>Pipe element markdown to <code>reqvire add &lt;file&gt; &lt;section&gt;</code></li>
+<li>Pipe element markdown to <code>reqvire add &lt;file&gt;</code></li>
 <li>Verify element is read from stdin</li>
 <li>Verify element is validated and inserted</li>
 <li>Verify git-style diff is output showing changes</li>
@@ -808,27 +831,27 @@ blockquote {
 </ol>
 <p><strong>Test Steps - Inline String:</strong></p>
 <ol>
-<li>Run <code>reqvire add &lt;file&gt; &lt;section&gt; &quot;### Element...&quot;</code></li>
+<li>Run <code>reqvire add &lt;file&gt; &quot;### Element...&quot;</code></li>
 <li>Verify element is read from inline argument</li>
 <li>Verify element is validated and inserted</li>
 <li>Verify git-style diff is output</li>
 </ol>
-<p><strong>Test Steps - Index Insertion:</strong></p>
+<p><strong>Test Steps - Element Ordering:</strong></p>
 <ol>
-<li>Run <code>reqvire add &lt;file&gt; &lt;section&gt; 0 &lt; element.md</code></li>
-<li>Verify element is inserted at index 0</li>
-<li>Run without index and verify append to end</li>
-<li>Run with out-of-bounds index and verify append</li>
+<li>Add child element to file with existing parent</li>
+<li>Verify element is inserted following Element Ordering Behavior (parent before child)</li>
+<li>Add parent element to file with existing children</li>
+<li>Verify file is reordered with parent before children</li>
 </ol>
 <p><strong>Test Steps - Dry Run:</strong></p>
 <ol>
-<li>Run <code>reqvire add --dry-run &lt;file&gt; &lt;section&gt; &lt; element.md</code></li>
+<li>Run <code>reqvire add --dry-run &lt;file&gt; &lt; element.md</code></li>
 <li>Verify git-style diff is shown</li>
 <li>Verify no changes are applied to files</li>
 </ol>
 <p><strong>Test Steps - JSON Output:</strong></p>
 <ol>
-<li>Run <code>reqvire add --json &lt;file&gt; &lt;section&gt; &lt; element.md</code></li>
+<li>Run <code>reqvire add --json &lt;file&gt; &lt; element.md</code></li>
 <li>Verify JSON output with element details</li>
 <li>Verify changes are applied</li>
 </ol>
@@ -844,7 +867,7 @@ blockquote {
 <li>Reads from stdin when piped</li>
 <li>Reads from inline argument when provided</li>
 <li>Validates before insertion</li>
-<li>Inserts at specified index or appends</li>
+<li>Inserts following Element Ordering Behavior</li>
 <li>Shows git-style diff by default</li>
 <li>Supports –dry-run preview</li>
 <li>Supports –json output</li>
@@ -855,107 +878,18 @@ blockquote {
 <ul>
 <li>type: test-verification</li>
 </ul>
+<h4>Attachments</h4>
+<ul>
+<li><a href="../Refinements.html#element-ordering-behavior">Element Ordering Behavior</a></li>
+</ul>
 <h4>Relations</h4>
 <ul>
-<li>verify: <a href="../../../Interfaces/CLI.html#cli-add-element-command">CLI Add Element Command</a></li>
 <li>satisfiedBy: <a href="../../../../tests/test-crud-manipulation/test.sh">test.sh</a></li>
-</ul>
-<hr />
-<h3 id="target-location-validation-test">Target Location Validation Test</h3>
-<p>The test shall verify that target file path validation and auto-creation work correctly, enforcing safety constraints for gitignore, reqvireignore, and path depth limits.</p>
-<h4>Details</h4>
-<p><strong>Test Setup:</strong></p>
-<ul>
-<li>Create <code>.gitignore</code> with exclusion patterns (e.g., <code>**/build/**</code>, <code>temp-*.md</code>)</li>
-<li>Create <code>.reqvireignore</code> with exclusion patterns (e.g., <code>**/draft-*.md</code>)</li>
-<li>Prepare valid target paths within depth limits</li>
-<li>Prepare invalid target paths (ignored paths, excessive depth)</li>
-</ul>
-<p><strong>Test Steps - Path Validation:</strong></p>
-<ol>
-<li>Attempt to create element in path excluded by <code>.gitignore</code></li>
-<li>Verify operation is rejected with appropriate error message</li>
-<li>Attempt to create element in path excluded by <code>.reqvireignore</code></li>
-<li>Verify operation is rejected with appropriate error message</li>
-<li>Attempt to create element in path nested more than 10 subdirectories deep</li>
-<li>Verify operation is rejected with depth limit error</li>
-<li>Attempt to create element in valid path</li>
-<li>Verify operation succeeds</li>
-</ol>
-<p><strong>Test Steps - Auto-Creation:</strong></p>
-<ol>
-<li>Create element in non-existent file with valid path</li>
-<li>Verify file is created with proper structure (<code># Elements</code> header)</li>
-<li>Verify existing file content is preserved when adding elements</li>
-</ol>
-<p><strong>Success Criteria:</strong></p>
-<ul>
-<li>Paths excluded by <code>.gitignore</code> are rejected</li>
-<li>Paths excluded by <code>.reqvireignore</code> are rejected</li>
-<li>Paths exceeding 10 subdirectory depth are rejected</li>
-<li>Error messages clearly indicate which constraint was violated</li>
-<li>Valid paths are accepted</li>
-<li>Non-existent files are created with proper structure</li>
-<li>Created files follow Reqvire markdown conventions</li>
-</ul>
-<p><strong>Test Coverage:</strong></p>
-<ul>
-<li>Gitignore pattern exclusion</li>
-<li>Reqvireignore pattern exclusion</li>
-<li>Path depth limit (exactly 10, 11, 15 subdirectories)</li>
-<li>Auto-create file</li>
-<li>Valid path variations</li>
-</ul>
-<h4>Metadata</h4>
-<ul>
-<li>type: test-verification</li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>verify: <a href="../ElementManipulation.html#target-location-validation-and-auto-creation">Target Location Validation and Auto-Creation</a></li>
-<li>satisfiedBy: <a href="../../../../tests/test-crud-target-location-validation/test.sh">test.sh</a></li>
-</ul>
-<hr />
-<h3 id="file-persistence-test">File Persistence Test</h3>
-<p>The test shall verify that element manipulation operations are persisted to source files in storage and that only modified files are flushed.</p>
-<h4>Details</h4>
-<p><strong>Test Setup:</strong></p>
-<ul>
-<li>Create a test model with multiple files and elements</li>
-<li>Record initial file timestamps and content</li>
-<li>Prepare element manipulation operations that affect specific files</li>
-</ul>
-<p><strong>Test Steps:</strong></p>
-<ol>
-<li>Perform element manipulation operation (create/delete/move)</li>
-<li>Verify that modified files are written to disk</li>
-<li>Verify that file content on disk matches the in-memory model state</li>
-<li>Verify that only files affected by the operation were rewritten</li>
-<li>Verify that unmodified files remain unchanged (check timestamps)</li>
-<li>Read files from disk and parse to confirm changes persisted</li>
-<li>Test file I/O error handling (simulate write failures)</li>
-</ol>
-<p><strong>Success Criteria:</strong></p>
-<ul>
-<li>All changes are persisted to disk after manipulation completes</li>
-<li>File content on disk matches in-memory model state exactly</li>
-<li>Only modified files are written (optimization verified)</li>
-<li>Unmodified files have unchanged timestamps</li>
-<li>File format and structure are maintained</li>
-<li>Errors are handled gracefully with appropriate reporting</li>
-</ul>
-<h4>Metadata</h4>
-<ul>
-<li>type: test-verification</li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>verify: <a href="../ElementManipulation.html#element-manipulation-file-persistence">Element Manipulation File Persistence</a></li>
-<li>satisfiedBy: <a href="../../../../tests/test-crud-file-persistence/test.sh">test.sh</a></li>
+<li>verify: <a href="../../../Interfaces/CLI.html#cli-add-element-command">CLI Add Element Command</a></li>
 </ul>
 <hr />
 <h3 id="cli-move-element-test">CLI Move Element Test</h3>
-<p>The test shall verify that the <code>mv</code> command relocates elements, updates all relations, supports index-based insertion, and outputs git-style diffs.</p>
+<p>The test shall verify that the <code>mv</code> command relocates elements, updates all relations, inserts following Element Ordering Behavior, and outputs git-style diffs.</p>
 <h4>Details</h4>
 <p><strong>Test Setup:</strong></p>
 <ul>
@@ -966,30 +900,30 @@ blockquote {
 </ul>
 <p><strong>Test Steps - Basic Move:</strong></p>
 <ol>
-<li>Run <code>reqvire mv &lt;element-name&gt; &lt;target-file&gt; &lt;section&gt;</code></li>
+<li>Run <code>reqvire mv &lt;element-name&gt; &lt;target-file&gt;</code></li>
 <li>Verify element is removed from source</li>
-<li>Verify element is inserted into target</li>
+<li>Verify element is inserted into target following Element Ordering Behavior</li>
 <li>Verify all incoming relations are updated</li>
 <li>Verify git-style diff shows all affected files</li>
 <li>Verify identifier change is reported</li>
 </ol>
-<p><strong>Test Steps - Index Insertion:</strong></p>
+<p><strong>Test Steps - Element Ordering:</strong></p>
 <ol>
-<li>Run <code>reqvire mv &lt;element-name&gt; &lt;file&gt; &lt;section&gt; 0</code></li>
-<li>Verify element is inserted at index 0 in target</li>
-<li>Run without index and verify append to end</li>
-<li>Run with out-of-bounds index and verify append</li>
+<li>Move child element to file with existing parent</li>
+<li>Verify element is inserted after parent (following hierarchy)</li>
+<li>Move parent element to file with existing children</li>
+<li>Verify file is reordered with parent before children</li>
 </ol>
 <p><strong>Test Steps - Dry Run:</strong></p>
 <ol>
-<li>Run <code>reqvire mv --dry-run &lt;element-name&gt; &lt;file&gt; &lt;section&gt;</code></li>
+<li>Run <code>reqvire mv --dry-run &lt;element-name&gt; &lt;file&gt;</code></li>
 <li>Verify git-style diff is shown for all affected files</li>
 <li>Verify no changes are applied</li>
 <li>Verify relation updates are previewed</li>
 </ol>
 <p><strong>Test Steps - JSON Output:</strong></p>
 <ol>
-<li>Run <code>reqvire mv --json &lt;element-name&gt; &lt;file&gt; &lt;section&gt;</code></li>
+<li>Run <code>reqvire mv --json &lt;element-name&gt; &lt;file&gt;</code></li>
 <li>Verify JSON output with relation updates</li>
 <li>Verify old → new identifier mapping</li>
 <li>Verify changes are applied</li>
@@ -1007,7 +941,7 @@ blockquote {
 <li>Moves element to target location</li>
 <li>Updates all incoming relations</li>
 <li>Preserves element content and outgoing relations</li>
-<li>Inserts at specified index or appends</li>
+<li>Inserts following Element Ordering Behavior</li>
 <li>Shows git-style diff for all affected files</li>
 <li>Reports identifier change</li>
 <li>Supports –dry-run preview</li>
@@ -1019,10 +953,14 @@ blockquote {
 <ul>
 <li>type: test-verification</li>
 </ul>
+<h4>Attachments</h4>
+<ul>
+<li><a href="../Refinements.html#element-ordering-behavior">Element Ordering Behavior</a></li>
+</ul>
 <h4>Relations</h4>
 <ul>
-<li>verify: <a href="../../../Interfaces/CLI.html#cli-move-element-command">CLI Move Element Command</a></li>
 <li>satisfiedBy: <a href="../../../../tests/test-crud-manipulation/test.sh">test.sh</a></li>
+<li>verify: <a href="../../../Interfaces/CLI.html#cli-move-element-command">CLI Move Element Command</a></li>
 </ul>
 <hr />
 <h3 id="cli-move-file-test">CLI Move File Test</h3>
@@ -1116,9 +1054,9 @@ blockquote {
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>verify: <a href="../../../Interfaces/CLI.html#cli-move-file-command">CLI Move File Command</a></li>
 <li>satisfiedBy: <a href="../../../../tests/test-crud-manipulation/test.sh">test.sh</a></li>
 <li>satisfiedBy: <a href="../../../../tests/test-subdirectory-functionality/test.sh">test.sh</a></li>
+<li>verify: <a href="../../../Interfaces/CLI.html#cli-move-file-command">CLI Move File Command</a></li>
 </ul>
 <hr />
 <h3 id="cli-remove-element-test">CLI Remove Element Test</h3>
@@ -1173,86 +1111,8 @@ blockquote {
 </ul>
 <h4>Relations</h4>
 <ul>
+<li>satisfiedBy: <a href="../../../../tests/test-crud-manipulation/test.sh">test.sh</a></li>
 <li>verify: <a href="../../../Interfaces/CLI.html#cli-remove-element-command">CLI Remove Element Command</a></li>
-<li>satisfiedBy: <a href="../../../../tests/test-crud-manipulation/test.sh">test.sh</a></li>
-</ul>
-<hr />
-<h3 id="move-element-test">Move Element Test</h3>
-<p>The test shall verify that existing model elements can be moved to different locations, all relations referencing the moved element are automatically updated, target locations are created if needed, and empty source files are removed when no elements remain.</p>
-<h4>Details</h4>
-<p><strong>Test Setup:</strong></p>
-<ul>
-<li>Create a test model with multiple files</li>
-<li>Create an element to be moved with incoming and outgoing relations</li>
-<li>Document all relations pointing to the element</li>
-<li>Create a file with only one element for empty file cleanup testing</li>
-<li>Prepare non-existent target locations for auto-creation testing</li>
-</ul>
-<p><strong>Test Steps:</strong></p>
-<ol>
-<li>Move the element to the target location</li>
-<li>Verify the element was removed from the source location</li>
-<li>Verify the element was inserted into the target location</li>
-<li>Verify all element content, metadata, and outgoing relations are preserved</li>
-<li>Verify the element identifier was updated to reflect the new location</li>
-<li>Verify all incoming relations were updated to reference the new identifier</li>
-<li>Validate the model after element move</li>
-<li>Check that no dangling relations exist</li>
-</ol>
-<p><strong>Test Steps - Auto-Creation:</strong></p>
-<ol>
-<li>Move element to non-existent target file</li>
-<li>Verify target file is created with proper structure</li>
-</ol>
-<p><strong>Test Steps - Empty Source File Cleanup:</strong></p>
-<ol>
-<li>Move the only element from a file to another location</li>
-<li>Verify the element is moved successfully</li>
-<li>Verify the source file is deleted from the filesystem</li>
-<li>Verify the file deletion is reported in the operation output</li>
-<li>Move an element leaving other elements in the source file</li>
-<li>Verify the source file is NOT deleted (still contains elements)</li>
-</ol>
-<p><strong>Success Criteria:</strong></p>
-<ul>
-<li>Element is removed from source location</li>
-<li>Element is inserted into target location</li>
-<li>Element content and metadata are preserved</li>
-<li>Element identifier is updated correctly</li>
-<li>All incoming relations (derivedFrom, verifiedBy, verify, satisfiedBy) are updated to the new identifier</li>
-<li>Outgoing relations (relations from the moved element to other elements) are preserved unchanged</li>
-<li>File structure remains valid in both source and target files</li>
-<li>Model validation passes</li>
-<li>Non-existent target files are created with proper structure</li>
-<li>Empty source files are deleted after move</li>
-<li>Source files with remaining elements are preserved</li>
-<li>File creation and deletion are reported</li>
-</ul>
-<p><strong>Test Coverage:</strong></p>
-<ul>
-<li>Move element within the same file (different position)</li>
-<li>Move element to a different file</li>
-<li>Move element to specific index in target file (0, middle, end)</li>
-<li>Move element without index (defaults to end of target file)</li>
-<li>Move element with out-of-bounds index (appends to end)</li>
-<li>Move element with <code>derivedFrom</code> relations pointing to it</li>
-<li>Move element with <code>verifiedBy</code> relations pointing to it</li>
-<li>Move element with <code>verify</code> relations pointing to it</li>
-<li>Move element with <code>satisfiedBy</code> relations pointing to it</li>
-<li>Move element with multiple types of incoming relations</li>
-<li>Move to non-existent target file (auto-create)</li>
-<li>Move last element from file (triggers source file deletion)</li>
-<li>Move element leaving other elements (source file preserved)</li>
-</ul>
-<h4>Metadata</h4>
-<ul>
-<li>type: test-verification</li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>verify: <a href="../ElementManipulation.html#move-element-operation">Move Element Operation</a></li>
-<li>satisfiedBy: <a href="../../../../tests/test-crud-manipulation/test.sh">test.sh</a></li>
-<li>satisfiedBy: <a href="../../../../tests/test-crud-empty-file-cleanup/test.sh">test.sh</a></li>
 </ul>
 <hr />
 <h3 id="cli-rename-element-test">CLI Rename Element Test</h3>
@@ -1311,52 +1171,88 @@ blockquote {
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>verify: <a href="../../../Interfaces/CLI.html#cli-rename-element-command">CLI Rename Element Command</a></li>
 <li>satisfiedBy: <a href="../../../../tests/test-crud-manipulation/test.sh">test.sh</a></li>
+<li>verify: <a href="../../../Interfaces/CLI.html#cli-rename-element-command">CLI Rename Element Command</a></li>
 </ul>
 <hr />
-<h3 id="relation-consistency-test">Relation Consistency Test</h3>
-<p>The test shall verify that bidirectional relation consistency is maintained when elements are manipulated.</p>
+<h3 id="create-element-test">Create Element Test</h3>
+<p>The test shall verify that new model elements can be created from a full Markdown definition string after validation, and that invalid element definitions are rejected with appropriate error reporting.</p>
 <h4>Details</h4>
-<details>
-<summary>Test Criteria</summary>
 <p><strong>Test Setup:</strong></p>
 <ul>
-<li>Create a test model with elements having bidirectional relations</li>
-<li>Set up test cases for derivedFrom/derive, verifiedBy/verify relations</li>
+<li>Prepare a test model with existing files</li>
+<li>Prepare valid element definition strings in Markdown format (with ### header, metadata, relations, content)</li>
+<li>Prepare invalid element definition strings (malformed structure, duplicate names, invalid relations)</li>
+<li>Identify target file path</li>
 </ul>
 <p><strong>Test Steps:</strong></p>
 <ol>
-<li>Create an element with relations and verify bidirectional consistency</li>
-<li>Delete an element and verify both forward and backward relations are removed</li>
-<li>Move an element and verify both forward and backward relations are updated</li>
-<li>Validate model consistency after each manipulation operation</li>
+<li>Attempt to create an element with a valid definition string</li>
+<li>Verify the element was parsed correctly from the string</li>
+<li>Verify the element structure was validated (subsections, relations, format)</li>
+<li>Verify the element name was checked for global uniqueness</li>
+<li>Verify the element was inserted into the correct file</li>
+<li>Verify the element has proper Markdown structure in the file</li>
+<li>Validate the model after element creation</li>
 </ol>
-<p><strong>Success Criteria:</strong></p>
-<ul>
-<li>After element creation: bidirectional relations are properly established</li>
-<li>After element deletion: both forward and backward relations are removed</li>
-<li>After element move: both forward and backward relations are updated</li>
-<li>Model validation passes after each operation</li>
-<li>No dangling or inconsistent relations exist</li>
-</ul>
+<p><strong>Test Steps for Invalid Cases:</strong></p>
+<ol>
+<li>Attempt to create an element with an invalid definition string</li>
+<li>Verify the validation detects the structural errors</li>
+<li>Verify the operation is rejected before insertion</li>
+<li>Verify appropriate validation error messages are reported</li>
+<li>Verify the target file remains unchanged</li>
+</ol>
+<p><strong>Test Steps for Relation Validation:</strong></p>
+<ol>
+<li>Create element with valid relations (targets exist in model)</li>
+<li>Verify relations are normalized to git-root-relative format</li>
+<li>Verify element is created successfully</li>
+<li>Attempt to create element with non-existent relation target</li>
+<li>Verify operation is rejected with clear error message</li>
+<li>Verify error message indicates which relation target was not found</li>
+<li>Verify target file remains unchanged after rejection</li>
+</ol>
 <p><strong>Test Coverage:</strong></p>
 <ul>
-<li>Verify derivedFrom/derive relation consistency</li>
-<li>Verify verifiedBy/verify relation consistency</li>
-<li>Test consistency after create operations</li>
-<li>Test consistency after delete operations</li>
-<li>Test consistency after move operations</li>
+<li>Valid element with all subsections (metadata, relations, details)</li>
+<li>Valid element with minimal structure (only ### header and content)</li>
+<li>Invalid element with duplicate name (violates global uniqueness)</li>
+<li>Invalid element with malformed subsections</li>
+<li>Invalid element with invalid relations</li>
+<li>Invalid element with missing ### header</li>
+<li><strong>Valid element with relations to existing elements</strong></li>
+<li><strong>Invalid element with relation to non-existent element</strong></li>
+<li><strong>Relations specified as relative paths (../File.md#element)</strong></li>
+<li><strong>Relations specified as repo-relative paths (specifications/File.md#element)</strong></li>
+<li><strong>Relations specified as same-file references (#element)</strong></li>
+<li><strong>External link relations (http://, https://) are allowed</strong></li>
+<li><strong>Element ordering after creation (parent before children)</strong></li>
 </ul>
-</details>
+<p><strong>Success Criteria:</strong></p>
+<ul>
+<li>Valid element definitions are accepted and created</li>
+<li>Element is parsed from the Markdown string correctly</li>
+<li>Element structure validation runs before insertion</li>
+<li>Global uniqueness is enforced</li>
+<li>Element inserted following Element Ordering Behavior</li>
+<li>Invalid element definitions are rejected</li>
+<li>Validation errors are reported clearly</li>
+<li>Failed operations do not modify target files</li>
+<li>Model validation passes after successful creation</li>
+<li><strong>Relation targets are validated to exist in the model</strong></li>
+<li><strong>Non-existent relation targets cause rejection</strong></li>
+<li><strong>Relation paths are normalized to git-root-relative format</strong></li>
+<li><strong>External links (http://, https://) bypass validation</strong></li>
+</ul>
 <h4>Metadata</h4>
 <ul>
 <li>type: test-verification</li>
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>verify: <a href="../ElementManipulation.html#relation-consistency-maintenance">Relation Consistency Maintenance</a></li>
-<li>satisfiedBy: <a href="../../../../tests/test-crud-relation-consistency/test.sh">test.sh</a></li>
+<li>satisfiedBy: <a href="../../../../tests/test-crud-manipulation/test.sh">test.sh</a></li>
+<li>verify: <a href="../ElementManipulation.html#create-element-operation">Create Element Operation</a></li>
 </ul>
 <hr />
 <h3 id="delete-element-test">Delete Element Test</h3>
@@ -1414,82 +1310,128 @@ blockquote {
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>verify: <a href="../ElementManipulation.html#delete-element-operation">Delete Element Operation</a></li>
 <li>satisfiedBy: <a href="../../../../tests/test-crud-manipulation/test.sh">test.sh</a></li>
+<li>verify: <a href="../ElementManipulation.html#delete-element-operation">Delete Element Operation</a></li>
 </ul>
 <hr />
-<h3 id="create-element-test">Create Element Test</h3>
-<p>The test shall verify that new model elements can be created from a full Markdown definition string after validation, and that invalid element definitions are rejected with appropriate error reporting.</p>
+<h3 id="file-persistence-test">File Persistence Test</h3>
+<p>The test shall verify that element manipulation operations are persisted to source files in storage, that only modified files are flushed, and that elements are reordered following the Element Ordering Behavior.</p>
 <h4>Details</h4>
 <p><strong>Test Setup:</strong></p>
 <ul>
-<li>Prepare a test model with existing files</li>
-<li>Prepare valid element definition strings in Markdown format (with ### header, metadata, relations, content)</li>
-<li>Prepare invalid element definition strings (malformed structure, duplicate names, invalid relations)</li>
-<li>Identify target file path</li>
+<li>Create a test model with multiple files and elements</li>
+<li>Record initial file timestamps and content</li>
+<li>Prepare element manipulation operations that affect specific files</li>
+<li>Create files with unordered elements (children before parents)</li>
 </ul>
 <p><strong>Test Steps:</strong></p>
 <ol>
-<li>Attempt to create an element with a valid definition string</li>
-<li>Verify the element was parsed correctly from the string</li>
-<li>Verify the element structure was validated (subsections, relations, format)</li>
-<li>Verify the element name was checked for global uniqueness</li>
-<li>Verify the element was inserted into the correct file</li>
-<li>Verify the element has proper Markdown structure in the file</li>
-<li>Validate the model after element creation</li>
+<li>Perform element manipulation operation (create/delete/move)</li>
+<li>Verify that modified files are written to disk</li>
+<li>Verify that file content on disk matches the in-memory model state</li>
+<li>Verify that only files affected by the operation were rewritten</li>
+<li>Verify that unmodified files remain unchanged (check timestamps)</li>
+<li>Read files from disk and parse to confirm changes persisted</li>
+<li>Test file I/O error handling (simulate write failures)</li>
 </ol>
-<p><strong>Test Steps for Invalid Cases:</strong></p>
+<p><strong>Test Steps - Element Ordering:</strong></p>
 <ol>
-<li>Attempt to create an element with an invalid definition string</li>
-<li>Verify the validation detects the structural errors</li>
-<li>Verify the operation is rejected before insertion</li>
-<li>Verify appropriate validation error messages are reported</li>
-<li>Verify the target file remains unchanged</li>
+<li>Add element that is a child of an existing element</li>
+<li>Verify that after persistence, parent appears before child</li>
+<li>Add element that is a parent of existing elements</li>
+<li>Verify that after persistence, new parent appears before its children</li>
+<li>Move element into a file with existing hierarchy</li>
+<li>Verify elements are reordered according to Element Ordering Behavior</li>
 </ol>
-<p><strong>Test Steps for Relation Validation:</strong></p>
-<ol>
-<li>Create element with valid relations (targets exist in model)</li>
-<li>Verify relations are normalized to git-root-relative format</li>
-<li>Verify element is created successfully</li>
-<li>Attempt to create element with non-existent relation target</li>
-<li>Verify operation is rejected with clear error message</li>
-<li>Verify error message indicates which relation target was not found</li>
-<li>Verify target file remains unchanged after rejection</li>
-</ol>
-<p><strong>Test Coverage:</strong></p>
-<ul>
-<li>Valid element with all subsections (metadata, relations, details)</li>
-<li>Valid element with minimal structure (only ### header and content)</li>
-<li>Valid element inserted at specific index (0, middle, end)</li>
-<li>Valid element inserted without index (defaults to end)</li>
-<li>Valid element inserted with out-of-bounds index (appends to end)</li>
-<li>Invalid element with duplicate name (violates global uniqueness)</li>
-<li>Invalid element with malformed subsections</li>
-<li>Invalid element with invalid relations</li>
-<li>Invalid element with missing ### header</li>
-<li><strong>Valid element with relations to existing elements</strong></li>
-<li><strong>Invalid element with relation to non-existent element</strong></li>
-<li><strong>Relations specified as relative paths (../File.md#element)</strong></li>
-<li><strong>Relations specified as repo-relative paths (specifications/File.md#element)</strong></li>
-<li><strong>Relations specified as same-file references (#element)</strong></li>
-<li><strong>External link relations (http://, https://) are allowed</strong></li>
-</ul>
 <p><strong>Success Criteria:</strong></p>
 <ul>
-<li>Valid element definitions are accepted and created</li>
-<li>Element is parsed from the Markdown string correctly</li>
-<li>Element structure validation runs before insertion</li>
-<li>Global uniqueness is enforced</li>
-<li>Element inserted at specified index position within file</li>
-<li>Element appended to end when index not provided or out of bounds</li>
-<li>Invalid element definitions are rejected</li>
-<li>Validation errors are reported clearly</li>
-<li>Failed operations do not modify target files</li>
-<li>Model validation passes after successful creation</li>
-<li><strong>Relation targets are validated to exist in the model</strong></li>
-<li><strong>Non-existent relation targets cause rejection</strong></li>
-<li><strong>Relation paths are normalized to git-root-relative format</strong></li>
-<li><strong>External links (http://, https://) bypass validation</strong></li>
+<li>All changes are persisted to disk after manipulation completes</li>
+<li>File content on disk matches in-memory model state exactly</li>
+<li>Only modified files are written (optimization verified)</li>
+<li>Unmodified files have unchanged timestamps</li>
+<li>File format and structure are maintained</li>
+<li>Errors are handled gracefully with appropriate reporting</li>
+<li>Elements are ordered with parents before children (file-local derivedFrom)</li>
+<li>Siblings at same level are sorted alphabetically</li>
+<li>Hierarchy groups are kept together</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Attachments</h4>
+<ul>
+<li><a href="../Refinements.html#element-ordering-behavior">Element Ordering Behavior</a></li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfiedBy: <a href="../../../../tests/test-crud-file-persistence/test.sh">test.sh</a></li>
+<li>verify: <a href="../ElementManipulation.html#element-manipulation-file-persistence">Element Manipulation File Persistence</a></li>
+</ul>
+<hr />
+<h3 id="move-element-test">Move Element Test</h3>
+<p>The test shall verify that existing model elements can be moved to different locations, all relations referencing the moved element are automatically updated, target locations are created if needed, and empty source files are removed when no elements remain.</p>
+<h4>Details</h4>
+<p><strong>Test Setup:</strong></p>
+<ul>
+<li>Create a test model with multiple files</li>
+<li>Create an element to be moved with incoming and outgoing relations</li>
+<li>Document all relations pointing to the element</li>
+<li>Create a file with only one element for empty file cleanup testing</li>
+<li>Prepare non-existent target locations for auto-creation testing</li>
+</ul>
+<p><strong>Test Steps:</strong></p>
+<ol>
+<li>Move the element to the target location</li>
+<li>Verify the element was removed from the source location</li>
+<li>Verify the element was inserted into the target location</li>
+<li>Verify all element content, metadata, and outgoing relations are preserved</li>
+<li>Verify the element identifier was updated to reflect the new location</li>
+<li>Verify all incoming relations were updated to reference the new identifier</li>
+<li>Validate the model after element move</li>
+<li>Check that no dangling relations exist</li>
+</ol>
+<p><strong>Test Steps - Auto-Creation:</strong></p>
+<ol>
+<li>Move element to non-existent target file</li>
+<li>Verify target file is created with proper structure</li>
+</ol>
+<p><strong>Test Steps - Empty Source File Cleanup:</strong></p>
+<ol>
+<li>Move the only element from a file to another location</li>
+<li>Verify the element is moved successfully</li>
+<li>Verify the source file is deleted from the filesystem</li>
+<li>Verify the file deletion is reported in the operation output</li>
+<li>Move an element leaving other elements in the source file</li>
+<li>Verify the source file is NOT deleted (still contains elements)</li>
+</ol>
+<p><strong>Success Criteria:</strong></p>
+<ul>
+<li>Element is removed from source location</li>
+<li>Element is inserted into target location</li>
+<li>Element content and metadata are preserved</li>
+<li>Element identifier is updated correctly</li>
+<li>All incoming relations (derivedFrom, verifiedBy, verify, satisfiedBy) are updated to the new identifier</li>
+<li>Outgoing relations (relations from the moved element to other elements) are preserved unchanged</li>
+<li>File structure remains valid in both source and target files</li>
+<li>Model validation passes</li>
+<li>Non-existent target files are created with proper structure</li>
+<li>Empty source files are deleted after move</li>
+<li>Source files with remaining elements are preserved</li>
+<li>File creation and deletion are reported</li>
+</ul>
+<p><strong>Test Coverage:</strong></p>
+<ul>
+<li>Move element to a different file</li>
+<li>Move element with <code>derivedFrom</code> relations pointing to it</li>
+<li>Move element with <code>verifiedBy</code> relations pointing to it</li>
+<li>Move element with <code>verify</code> relations pointing to it</li>
+<li>Move element with <code>satisfiedBy</code> relations pointing to it</li>
+<li>Move element with multiple types of incoming relations</li>
+<li>Move to non-existent target file (auto-create)</li>
+<li>Move last element from file (triggers source file deletion)</li>
+<li>Move element leaving other elements (source file preserved)</li>
+<li>Verify element ordering after move (parent before children)</li>
 </ul>
 <h4>Metadata</h4>
 <ul>
@@ -1497,8 +1439,9 @@ blockquote {
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>verify: <a href="../ElementManipulation.html#create-element-operation">Create Element Operation</a></li>
+<li>satisfiedBy: <a href="../../../../tests/test-crud-empty-file-cleanup/test.sh">test.sh</a></li>
 <li>satisfiedBy: <a href="../../../../tests/test-crud-manipulation/test.sh">test.sh</a></li>
+<li>verify: <a href="../ElementManipulation.html#move-element-operation">Move Element Operation</a></li>
 </ul>
 <hr />
 <h3 id="move-file-squash-test">Move File Squash Test</h3>
@@ -1579,8 +1522,107 @@ blockquote {
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>verify: <a href="../ElementManipulation.html#move-file-operation">Move File Operation</a></li>
 <li>satisfiedBy: <a href="../../../../tests/test-crud-mv-file-squash/test.sh">test.sh</a></li>
+<li>verify: <a href="../ElementManipulation.html#move-file-operation">Move File Operation</a></li>
+</ul>
+<hr />
+<h3 id="relation-consistency-test">Relation Consistency Test</h3>
+<p>The test shall verify that bidirectional relation consistency is maintained when elements are manipulated.</p>
+<h4>Details</h4>
+<details>
+<summary>Test Criteria</summary>
+<p><strong>Test Setup:</strong></p>
+<ul>
+<li>Create a test model with elements having bidirectional relations</li>
+<li>Set up test cases for derivedFrom/derive, verifiedBy/verify relations</li>
+</ul>
+<p><strong>Test Steps:</strong></p>
+<ol>
+<li>Create an element with relations and verify bidirectional consistency</li>
+<li>Delete an element and verify both forward and backward relations are removed</li>
+<li>Move an element and verify both forward and backward relations are updated</li>
+<li>Validate model consistency after each manipulation operation</li>
+</ol>
+<p><strong>Success Criteria:</strong></p>
+<ul>
+<li>After element creation: bidirectional relations are properly established</li>
+<li>After element deletion: both forward and backward relations are removed</li>
+<li>After element move: both forward and backward relations are updated</li>
+<li>Model validation passes after each operation</li>
+<li>No dangling or inconsistent relations exist</li>
+</ul>
+<p><strong>Test Coverage:</strong></p>
+<ul>
+<li>Verify derivedFrom/derive relation consistency</li>
+<li>Verify verifiedBy/verify relation consistency</li>
+<li>Test consistency after create operations</li>
+<li>Test consistency after delete operations</li>
+<li>Test consistency after move operations</li>
+</ul>
+</details>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfiedBy: <a href="../../../../tests/test-crud-relation-consistency/test.sh">test.sh</a></li>
+<li>verify: <a href="../ElementManipulation.html#relation-consistency-maintenance">Relation Consistency Maintenance</a></li>
+</ul>
+<hr />
+<h3 id="target-location-validation-test">Target Location Validation Test</h3>
+<p>The test shall verify that target file path validation and auto-creation work correctly, enforcing safety constraints for gitignore, reqvireignore, and path depth limits.</p>
+<h4>Details</h4>
+<p><strong>Test Setup:</strong></p>
+<ul>
+<li>Create <code>.gitignore</code> with exclusion patterns (e.g., <code>**/build/**</code>, <code>temp-*.md</code>)</li>
+<li>Create <code>.reqvireignore</code> with exclusion patterns (e.g., <code>**/draft-*.md</code>)</li>
+<li>Prepare valid target paths within depth limits</li>
+<li>Prepare invalid target paths (ignored paths, excessive depth)</li>
+</ul>
+<p><strong>Test Steps - Path Validation:</strong></p>
+<ol>
+<li>Attempt to create element in path excluded by <code>.gitignore</code></li>
+<li>Verify operation is rejected with appropriate error message</li>
+<li>Attempt to create element in path excluded by <code>.reqvireignore</code></li>
+<li>Verify operation is rejected with appropriate error message</li>
+<li>Attempt to create element in path nested more than 10 subdirectories deep</li>
+<li>Verify operation is rejected with depth limit error</li>
+<li>Attempt to create element in valid path</li>
+<li>Verify operation succeeds</li>
+</ol>
+<p><strong>Test Steps - Auto-Creation:</strong></p>
+<ol>
+<li>Create element in non-existent file with valid path</li>
+<li>Verify file is created with proper structure (<code># Elements</code> header)</li>
+<li>Verify existing file content is preserved when adding elements</li>
+</ol>
+<p><strong>Success Criteria:</strong></p>
+<ul>
+<li>Paths excluded by <code>.gitignore</code> are rejected</li>
+<li>Paths excluded by <code>.reqvireignore</code> are rejected</li>
+<li>Paths exceeding 10 subdirectory depth are rejected</li>
+<li>Error messages clearly indicate which constraint was violated</li>
+<li>Valid paths are accepted</li>
+<li>Non-existent files are created with proper structure</li>
+<li>Created files follow Reqvire markdown conventions</li>
+</ul>
+<p><strong>Test Coverage:</strong></p>
+<ul>
+<li>Gitignore pattern exclusion</li>
+<li>Reqvireignore pattern exclusion</li>
+<li>Path depth limit (exactly 10, 11, 15 subdirectories)</li>
+<li>Auto-create file</li>
+<li>Valid path variations</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfiedBy: <a href="../../../../tests/test-crud-target-location-validation/test.sh">test.sh</a></li>
+<li>verify: <a href="../ElementManipulation.html#target-location-validation-and-auto-creation">Target Location Validation and Auto-Creation</a></li>
 </ul>
 <hr />
 

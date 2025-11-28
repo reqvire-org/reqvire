@@ -198,31 +198,31 @@ blockquote {
 }
 .diagram-nav-buttons {
     position: absolute;
-    top: 10px;
-    left: 10px;
+    top: 5px;
+    left: 5px;
     z-index: 999; /* higher than SVG (1) but lower than header nav (1000) */
     display: flex;
     flex-direction: column;
-    gap: 5px;
-    background-color: rgba(255, 255, 255, 0.9);
-    padding: 5px;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    gap: 2px;
+    background-color: rgba(255, 255, 255, 0.85);
+    padding: 3px;
+    border-radius: 3px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
 }
 .diagram-nav-row {
     display: flex;
-    gap: 5px;
+    gap: 2px;
     justify-content: center;
 }
 .diagram-nav-btn {
-    width: 32px;
-    height: 32px;
+    width: 22px;
+    height: 22px;
     background-color: var(--color-primary);
     color: white;
     border: none;
-    border-radius: 3px;
+    border-radius: 2px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 11px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -318,6 +318,27 @@ blockquote {
                     return;
                 }
 
+                // Get the natural size of the diagram
+                var bbox = svg.getBBox();
+                var containerWidth = mermaidContainer.clientWidth;
+                var containerHeight = mermaidContainer.clientHeight;
+
+                // Check if diagram fits within container (with some padding)
+                var padding = 40;
+                var fitsInContainer = (bbox.width <= containerWidth - padding) && (bbox.height <= containerHeight - padding);
+
+                if (fitsInContainer) {
+                    // Diagram fits - use natural size, shrink container to fit content
+                    svg.style.width = 'auto';
+                    svg.style.height = 'auto';
+                    mermaidContainer.style.height = 'auto';
+                    mermaidContainer.style.minHeight = (bbox.height + padding) + 'px';
+                    mermaidContainer.style.maxHeight = 'calc(100vh - 150px)';
+                    // No pan/zoom needed for small diagrams
+                    return;
+                }
+
+                // Large diagram - enable pan/zoom
                 svg.style.maxWidth = 'none';
                 svg.style.maxHeight = 'none';
 
@@ -696,7 +717,9 @@ blockquote {
         <a href="../../../index.html">Containment</a>
         <a href="../../../model.html">Model</a>
         <a href="../../../traces.html">Traces</a>
+        <a href="../../../traceflow.html">TraceFlow</a>
         <a href="../../../coverage.html">Coverage</a>
+        <a href="../../../resources.html">Resources</a>
     </nav>
     <div class="reqvire-nav-spacer"></div>
     <div class="container">
@@ -712,51 +735,37 @@ blockquote {
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
-  subgraph 1c3bc86f926627ab[&quot;📁 requirements/Interfaces&quot;]
-    subgraph 315f1b2b98bf7d1b[&quot;📄 CLI.md&quot;]
-      e7cad857e370c39f[&quot;CLI Add Element Command&quot;];
-      class e7cad857e370c39f systemRequirement;
-      click e7cad857e370c39f &quot;../../Interfaces/CLI.html#cli-add-element-command&quot;;
-      9feed439b94e2f2b[&quot;CLI Move Element Command&quot;];
-      class 9feed439b94e2f2b systemRequirement;
-      click 9feed439b94e2f2b &quot;../../Interfaces/CLI.html#cli-move-element-command&quot;;
-      d7e75b69b8102997[&quot;CLI Move File Command&quot;];
-      class d7e75b69b8102997 systemRequirement;
-      click d7e75b69b8102997 &quot;../../Interfaces/CLI.html#cli-move-file-command&quot;;
-      9f657ef9218da615[&quot;CLI Remove Element Command&quot;];
-      class 9f657ef9218da615 systemRequirement;
-      click 9f657ef9218da615 &quot;../../Interfaces/CLI.html#cli-remove-element-command&quot;;
-      2902c99ac98e29ce[&quot;CLI Rename Element Command&quot;];
-      class 2902c99ac98e29ce systemRequirement;
-      click 2902c99ac98e29ce &quot;../../Interfaces/CLI.html#cli-rename-element-command&quot;;
-    end
-  end
   subgraph 94359ac729226de6[&quot;📁 requirements/System/Operations&quot;]
     subgraph ce3b241a2629974e[&quot;📄 ElementManipulation.md&quot;]
-      ca74bbb037431e9b[&quot;Create Element Operation&quot;];
+      ca74bbb037431e9b[&quot;Create Element Operation<br/>📎 requirements/System/Operations/Refinements.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Refinements.md#target-location-constraint<br/>📎 requirements/System/Operations/Refinements.md#element-ordering-behavior&quot;];
       class ca74bbb037431e9b systemRequirement;
       click ca74bbb037431e9b &quot;ElementManipulation.html#create-element-operation&quot;;
-      b1ed46220f447242[&quot;Delete Element Operation&quot;];
+      b1ed46220f447242[&quot;Delete Element Operation<br/>📎 requirements/System/Operations/Refinements.md#file-persistence-behavior&quot;];
       class b1ed46220f447242 systemRequirement;
       click b1ed46220f447242 &quot;ElementManipulation.html#delete-element-operation&quot;;
-      5e9d1888d2914fd4[&quot;Element Manipulation File Persistence&quot;];
+      5e9d1888d2914fd4[&quot;Element Manipulation File Persistence<br/>📎 requirements/System/Operations/Refinements.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Refinements.md#element-ordering-behavior&quot;];
       class 5e9d1888d2914fd4 systemRequirement;
       click 5e9d1888d2914fd4 &quot;ElementManipulation.html#element-manipulation-file-persistence&quot;;
-      84860e94fc819efd[&quot;Move Element Operation&quot;];
+      84860e94fc819efd[&quot;Move Element Operation<br/>📎 requirements/System/Operations/Refinements.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Refinements.md#target-location-constraint<br/>📎 requirements/System/Operations/Refinements.md#element-ordering-behavior&quot;];
       class 84860e94fc819efd systemRequirement;
       click 84860e94fc819efd &quot;ElementManipulation.html#move-element-operation&quot;;
-      bbea6657a24b3f1c[&quot;Move File Operation&quot;];
+      bbea6657a24b3f1c[&quot;Move File Operation<br/>📎 requirements/System/Operations/Refinements.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Refinements.md#target-location-constraint&quot;];
       class bbea6657a24b3f1c systemRequirement;
       click bbea6657a24b3f1c &quot;ElementManipulation.html#move-file-operation&quot;;
       b7a7ab53d4242be8[&quot;Relation Consistency Maintenance&quot;];
       class b7a7ab53d4242be8 systemRequirement;
       click b7a7ab53d4242be8 &quot;ElementManipulation.html#relation-consistency-maintenance&quot;;
-      a6593dab7ef5d521[&quot;Rename Element Operation&quot;];
+      a6593dab7ef5d521[&quot;Rename Element Operation<br/>📎 requirements/System/Operations/Refinements.md#file-persistence-behavior&quot;];
       class a6593dab7ef5d521 systemRequirement;
       click a6593dab7ef5d521 &quot;ElementManipulation.html#rename-element-operation&quot;;
       9987f9e9ae83fba3[&quot;Target Location Validation and Auto-Creation&quot;];
       class 9987f9e9ae83fba3 systemRequirement;
       click 9987f9e9ae83fba3 &quot;ElementManipulation.html#target-location-validation-and-auto-creation&quot;;
+    end
+    subgraph 631c66437258bda5[&quot;📄 Refinements.md&quot;]
+      fc994be69cdad23[&quot;Target Location Constraint&quot;];
+      class fc994be69cdad23 default;
+      click fc994be69cdad23 &quot;Refinements.html#target-location-constraint&quot;;
     end
   end
   subgraph 66aa2b416ad6d023[&quot;📁 requirements/System/Operations/Verifications&quot;]
@@ -767,7 +776,7 @@ blockquote {
       489fbf5e3ec08a53[&quot;Delete Element Test&quot;];
       class 489fbf5e3ec08a53 verification;
       click 489fbf5e3ec08a53 &quot;Verifications/ElementManipulationVerifications.html#delete-element-test&quot;;
-      9c8ea99467081d64[&quot;File Persistence Test&quot;];
+      9c8ea99467081d64[&quot;File Persistence Test<br/>📎 requirements/System/Operations/Refinements.md#element-ordering-behavior&quot;];
       class 9c8ea99467081d64 verification;
       click 9c8ea99467081d64 &quot;Verifications/ElementManipulationVerifications.html#file-persistence-test&quot;;
       3df547c544ad75b1[&quot;Move Element Test&quot;];
@@ -783,8 +792,12 @@ blockquote {
       class b6076972a6650ff1 verification;
       click b6076972a6650ff1 &quot;Verifications/ElementManipulationVerifications.html#target-location-validation-test&quot;;
     end
+    subgraph 5fdb7c9d75d9c8bf[&quot;📄 FormattingVerifications.md&quot;]
+      934319026295f62c[&quot;Element Ordering Verification<br/>📎 requirements/System/Operations/Refinements.md#element-ordering-behavior&quot;];
+      class 934319026295f62c verification;
+      click 934319026295f62c &quot;Verifications/FormattingVerifications.html#element-ordering-verification&quot;;
+    end
   end
-  ca74bbb037431e9b -.->|deriveReqT| e7cad857e370c39f;
   80defdd4cbc7ee18[&quot;cli.rs&quot;];
   class 80defdd4cbc7ee18 default;
   click 80defdd4cbc7ee18 &quot;../../../cli/src/cli.rs&quot;;
@@ -810,63 +823,48 @@ blockquote {
   click ce2625feec883e55 &quot;../../../core/src/utils.rs&quot;;
   ca74bbb037431e9b -->|satisfiedBy| ce2625feec883e55;
   ca74bbb037431e9b -.->|verifiedBy| e9c9cae75f37f06;
-  b1ed46220f447242 -.->|deriveReqT| 9f657ef9218da615;
   b1ed46220f447242 -->|satisfiedBy| 80defdd4cbc7ee18;
   b1ed46220f447242 -->|satisfiedBy| ea4ba0d9ffba93a5;
   b1ed46220f447242 -->|satisfiedBy| e69395f926bba6a5;
   b1ed46220f447242 -->|satisfiedBy| b7c871ab64a7059a;
   b1ed46220f447242 -.->|verifiedBy| 489fbf5e3ec08a53;
-  5e9d1888d2914fd4 -.->|deriveReqT| ca74bbb037431e9b;
-  5e9d1888d2914fd4 -.->|deriveReqT| b1ed46220f447242;
-  5e9d1888d2914fd4 -.->|deriveReqT| 84860e94fc819efd;
-  5e9d1888d2914fd4 -.->|deriveReqT| bbea6657a24b3f1c;
-  5e9d1888d2914fd4 -.->|deriveReqT| a6593dab7ef5d521;
   5e9d1888d2914fd4 -->|satisfiedBy| ea4ba0d9ffba93a5;
   5e9d1888d2914fd4 -->|satisfiedBy| b7c871ab64a7059a;
   5e9d1888d2914fd4 -.->|verifiedBy| 9c8ea99467081d64;
-  84860e94fc819efd -.->|deriveReqT| 9feed439b94e2f2b;
+  5e9d1888d2914fd4 -.->|verifiedBy| 934319026295f62c;
   84860e94fc819efd -->|satisfiedBy| 80defdd4cbc7ee18;
   84860e94fc819efd -->|satisfiedBy| ea4ba0d9ffba93a5;
   84860e94fc819efd -->|satisfiedBy| e69395f926bba6a5;
   84860e94fc819efd -->|satisfiedBy| b7c871ab64a7059a;
   84860e94fc819efd -.->|verifiedBy| 3df547c544ad75b1;
-  bbea6657a24b3f1c -.->|deriveReqT| d7e75b69b8102997;
   bbea6657a24b3f1c -.->|verifiedBy| 98859ef52db96684;
   b7a7ab53d4242be8 -->|satisfiedBy| b7c871ab64a7059a;
   b7a7ab53d4242be8 -.->|verifiedBy| 7f694d7fb7057fc4;
-  a6593dab7ef5d521 -.->|deriveReqT| 2902c99ac98e29ce;
   a6593dab7ef5d521 -->|satisfiedBy| ea4ba0d9ffba93a5;
   a6593dab7ef5d521 -->|satisfiedBy| e69395f926bba6a5;
   a6593dab7ef5d521 -->|satisfiedBy| b7c871ab64a7059a;
-  9987f9e9ae83fba3 -.->|deriveReqT| ca74bbb037431e9b;
-  9987f9e9ae83fba3 -.->|deriveReqT| 84860e94fc819efd;
-  9987f9e9ae83fba3 -.->|deriveReqT| bbea6657a24b3f1c;
   9987f9e9ae83fba3 -->|satisfiedBy| b7c871ab64a7059a;
   9987f9e9ae83fba3 -->|satisfiedBy| ce2625feec883e55;
+  9987f9e9ae83fba3 -->|satisfiedBy| fc994be69cdad23;
   9987f9e9ae83fba3 -.->|verifiedBy| b6076972a6650ff1;
   e0536c36e7700661[&quot;test.sh&quot;];
   class e0536c36e7700661 default;
   click e0536c36e7700661 &quot;../../../tests/test-crud-manipulation/test.sh&quot;;
   e9c9cae75f37f06 -->|satisfiedBy| e0536c36e7700661;
-  e7cad857e370c39f -->|satisfiedBy| 80defdd4cbc7ee18;
-  e7cad857e370c39f -.->|verifiedBy| 10085920401e3002;
-  9f657ef9218da615 -->|satisfiedBy| 80defdd4cbc7ee18;
-  9f657ef9218da615 -.->|verifiedBy| baaf8586d45921fd;
   489fbf5e3ec08a53 -->|satisfiedBy| e0536c36e7700661;
   ed4c8791300dc55[&quot;test.sh&quot;];
   class ed4c8791300dc55 default;
   click ed4c8791300dc55 &quot;../../../tests/test-crud-file-persistence/test.sh&quot;;
   9c8ea99467081d64 -->|satisfiedBy| ed4c8791300dc55;
+  743d877eaae55d53[&quot;test.sh&quot;];
+  class 743d877eaae55d53 default;
+  click 743d877eaae55d53 &quot;../../../tests/test-element-ordering/test.sh&quot;;
+  934319026295f62c -->|satisfiedBy| 743d877eaae55d53;
   47784e5a5c634123[&quot;test.sh&quot;];
   class 47784e5a5c634123 default;
   click 47784e5a5c634123 &quot;../../../tests/test-crud-empty-file-cleanup/test.sh&quot;;
   3df547c544ad75b1 -->|satisfiedBy| 47784e5a5c634123;
   3df547c544ad75b1 -->|satisfiedBy| e0536c36e7700661;
-  9feed439b94e2f2b -->|satisfiedBy| 80defdd4cbc7ee18;
-  9feed439b94e2f2b -.->|verifiedBy| 48724d283e4c3b16;
-  9feed439b94e2f2b -.->|verifiedBy| e820c3067eb8e3e2;
-  d7e75b69b8102997 -.->|verifiedBy| 48724d283e4c3b16;
-  d7e75b69b8102997 -.->|verifiedBy| 96f7bfbd9aa071f9;
   53d96c0e15013013[&quot;test.sh&quot;];
   class 53d96c0e15013013 default;
   click 53d96c0e15013013 &quot;../../../tests/test-crud-mv-file-squash/test.sh&quot;;
@@ -875,88 +873,18 @@ blockquote {
   class 34577630f675428e default;
   click 34577630f675428e &quot;../../../tests/test-crud-relation-consistency/test.sh&quot;;
   7f694d7fb7057fc4 -->|satisfiedBy| 34577630f675428e;
-  2902c99ac98e29ce -->|satisfiedBy| 80defdd4cbc7ee18;
-  2902c99ac98e29ce -.->|verifiedBy| af7f2d098afce076;
   fe344320c82b0bbf[&quot;test.sh&quot;];
   class fe344320c82b0bbf default;
   click fe344320c82b0bbf &quot;../../../tests/test-crud-target-location-validation/test.sh&quot;;
   b6076972a6650ff1 -->|satisfiedBy| fe344320c82b0bbf;
 </div>
-<h3 id="element-manipulation-file-persistence">Element Manipulation File Persistence</h3>
-<p>The system shall persist all element manipulation operations to the source files in storage, synchronizing changes from the in-memory model to the file system to ensure data durability.</p>
-<h4>Details</h4>
-<p>When element manipulation operations are performed, the system shall:</p>
-<ul>
-<li>Track which files have been modified during manipulation operations</li>
-<li>Flush modified files to storage after manipulation operations complete</li>
-<li>Update only the files that were actually modified (optimization)</li>
-<li>Ensure file content on disk reflects the current state of the in-memory model</li>
-<li>Maintain file format and structure during write operations</li>
-<li>Handle file I/O errors gracefully with appropriate error reporting</li>
-</ul>
-<p><strong>Optimization Strategy:</strong></p>
-<ul>
-<li>The system may maintain a list of modified files during manipulation operations</li>
-<li>Only files marked as modified need to be written to storage</li>
-<li>Unmodified files shall not be rewritten to avoid unnecessary I/O operations</li>
-</ul>
-<p><strong>Synchronization Guarantee:</strong></p>
-<ul>
-<li>After a manipulation operation completes successfully, all changes shall be persisted to disk</li>
-<li>The on-disk representation shall match the in-memory model state</li>
-<li>No changes shall be lost due to lack of persistence</li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="../Core/ModelManagement.html#element-manipulation-operations">Element Manipulation Operations</a></li>
-<li>satisfiedBy: <a href="../../../core/src/graph_registry.rs">graph_registry.rs</a></li>
-<li>satisfiedBy: <a href="../../../core/src/crud.rs">crud.rs</a></li>
-</ul>
-<hr />
-<h3 id="target-location-validation-and-auto-creation">Target Location Validation and Auto-Creation</h3>
-<p>The system shall validate target file paths for element manipulation operations and automatically create files when they do not exist, subject to path safety constraints.</p>
-<h4>Details</h4>
-<p>When validating and preparing target locations, the system shall:</p>
-<p><strong>Path Validation:</strong></p>
-<ul>
-<li>Verify the target file path is not excluded by <code>.gitignore</code> patterns</li>
-<li>Verify the target file path is not excluded by <code>.reqvireignore</code> patterns</li>
-<li>Verify the file path nesting depth does not exceed 10 subdirectories from the git repository root</li>
-<li>Reject operations with invalid paths and provide clear error messages</li>
-</ul>
-<p><strong>Auto-Creation:</strong></p>
-<ul>
-<li>If the target file does not exist and the path is valid, create the file with proper structure:
-<ul>
-<li>Add <code># Elements</code> as the page header (required for specification files)</li>
-</ul>
-</li>
-<li>Ensure created files follow Reqvire markdown structure conventions</li>
-</ul>
-<p><strong>Error Handling:</strong></p>
-<ul>
-<li>Report error if path would be ignored by <code>.gitignore</code> or <code>.reqvireignore</code></li>
-<li>Report error if path nesting exceeds 10 subdirectories</li>
-<li>Report error if file path is invalid or inaccessible</li>
-<li>Provide specific error message indicating which constraint was violated</li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="../Core/ModelManagement.html#element-manipulation-operations">Element Manipulation Operations</a></li>
-<li>derivedFrom: <a href="../Core/Configuration.html#ignore-files-integration">Ignore Files Integration</a></li>
-<li>derivedFrom: <a href="../Core/ModelManagement.html#git-repository-as-project-root">Git Repository as Project Root</a></li>
-<li>satisfiedBy: <a href="../../../core/src/utils.rs">utils.rs</a></li>
-<li>satisfiedBy: <a href="../../../core/src/graph_registry.rs">graph_registry.rs</a></li>
-</ul>
-<hr />
 <h3 id="create-element-operation">Create Element Operation</h3>
-<p>The system shall provide the capability to create new model elements by accepting a full element definition string in Markdown format, validating the element structure and relations, and inserting it into the specified location if valid.</p>
+<p>The system shall provide the capability to create new model elements by accepting a full element definition string in Markdown format, validating the element structure and relations, and inserting it into the target file following Element Ordering Behavior.</p>
 <h4>Details</h4>
 <p>When creating a new element, the system shall:</p>
 <ul>
 <li>Accept a string containing the full element definition in Markdown format (including ### header, metadata, relations, and content)</li>
 <li>Accept target location: file path</li>
-<li>Accept optional index parameter for insertion position within the file (0-based)</li>
 <li>Validate the target location using path validation rules</li>
 <li>Create target file if it does not exist (subject to validation constraints)</li>
 <li>Parse the element definition string to extract element structure, preserving all subsections:
@@ -979,12 +907,7 @@ blockquote {
 <li>Provide clear error messages indicating which relation target was not found</li>
 </ul>
 </li>
-<li>If validation passes, insert the element into the specified file:
-<ul>
-<li>If index is provided and valid, insert at that position within the file</li>
-<li>If index is not provided or out of bounds, append to the end of the file</li>
-</ul>
-</li>
+<li>If validation passes, insert the element into the target file following Element Ordering Behavior</li>
 <li>If validation fails, reject the operation and report validation errors</li>
 <li>Maintain file structure and formatting after insertion</li>
 </ul>
@@ -1001,17 +924,23 @@ blockquote {
 <li>All relation targets must reference existing elements in the model</li>
 <li>External links (http://, https://, etc.) are allowed and not validated</li>
 </ul>
+<h4>Attachments</h4>
+<ul>
+<li><a href="Refinements.html#file-persistence-behavior">File Persistence Behavior</a></li>
+<li><a href="Refinements.html#target-location-constraint">Target Location Constraint</a></li>
+<li><a href="Refinements.html#element-ordering-behavior">Element Ordering Behavior</a></li>
+</ul>
 <h4>Relations</h4>
 <ul>
-<li>derivedFrom: <a href="#element-manipulation-file-persistence">Element Manipulation File Persistence</a></li>
-<li>derivedFrom: <a href="#target-location-validation-and-auto-creation">Target Location Validation and Auto-Creation</a></li>
+<li>derivedFrom: <a href="../Core/ModelManagement.html#element-manipulation-operations">Element Manipulation Operations</a></li>
 <li>derivedFrom: <a href="../Core/StructureAndParsing.html#reserved-subsections-support">Reserved Subsections Support</a></li>
-<li>satisfiedBy: <a href="../../../core/src/parser.rs">parser.rs</a></li>
-<li>satisfiedBy: <a href="../../../core/src/graph_registry.rs">graph_registry.rs</a></li>
+<li>satisfiedBy: <a href="../../../cli/src/cli.rs">cli.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/crud.rs">crud.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/diff.rs">diff.rs</a></li>
-<li>satisfiedBy: <a href="../../../cli/src/cli.rs">cli.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/graph_registry.rs">graph_registry.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/parser.rs">parser.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/utils.rs">utils.rs</a></li>
+<li>verifiedBy: <a href="Verifications/ElementManipulationVerifications.html#create-element-test">Create Element Test</a></li>
 </ul>
 <hr />
 <h3 id="delete-element-operation">Delete Element Operation</h3>
@@ -1041,13 +970,34 @@ blockquote {
 <li>All <code>satisfiedBy</code> relations pointing to the deleted element shall be removed</li>
 <li>Relations from the deleted element are automatically removed with the element</li>
 </ul>
+<h4>Attachments</h4>
+<ul>
+<li><a href="Refinements.html#file-persistence-behavior">File Persistence Behavior</a></li>
+</ul>
 <h4>Relations</h4>
 <ul>
-<li>derivedFrom: <a href="#element-manipulation-file-persistence">Element Manipulation File Persistence</a></li>
-<li>satisfiedBy: <a href="../../../core/src/graph_registry.rs">graph_registry.rs</a></li>
+<li>derivedFrom: <a href="../Core/ModelManagement.html#element-manipulation-operations">Element Manipulation Operations</a></li>
+<li>satisfiedBy: <a href="../../../cli/src/cli.rs">cli.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/crud.rs">crud.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/diff.rs">diff.rs</a></li>
-<li>satisfiedBy: <a href="../../../cli/src/cli.rs">cli.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/graph_registry.rs">graph_registry.rs</a></li>
+<li>verifiedBy: <a href="Verifications/ElementManipulationVerifications.html#delete-element-test">Delete Element Test</a></li>
+</ul>
+<hr />
+<h3 id="element-manipulation-file-persistence">Element Manipulation File Persistence</h3>
+<p>The system shall persist all element manipulation operations to the source files in storage, synchronizing changes from the in-memory model to the file system and reordering elements following the Element Ordering Behavior.</p>
+<h4>Attachments</h4>
+<ul>
+<li><a href="Refinements.html#file-persistence-behavior">File Persistence Behavior</a></li>
+<li><a href="Refinements.html#element-ordering-behavior">Element Ordering Behavior</a></li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../Core/ModelManagement.html#element-manipulation-operations">Element Manipulation Operations</a></li>
+<li>satisfiedBy: <a href="../../../core/src/crud.rs">crud.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/graph_registry.rs">graph_registry.rs</a></li>
+<li>verifiedBy: <a href="Verifications/ElementManipulationVerifications.html#file-persistence-test">File Persistence Test</a></li>
+<li>verifiedBy: <a href="Verifications/FormattingVerifications.html#element-ordering-verification">Element Ordering Verification</a></li>
 </ul>
 <hr />
 <h3 id="move-element-operation">Move Element Operation</h3>
@@ -1058,13 +1008,7 @@ blockquote {
 <li>Validate the target location using path validation rules</li>
 <li>Create target file if it does not exist (subject to validation constraints)</li>
 <li>Remove the element from the source file</li>
-<li>Accept optional index parameter for insertion position within target file (0-based)</li>
-<li>Insert the element into the target file:
-<ul>
-<li>If index is provided and valid, insert at that position within the target file</li>
-<li>If index is not provided or out of bounds, append to the end of the target file</li>
-</ul>
-</li>
+<li>Insert the element into the target file following Element Ordering Behavior</li>
 <li>Preserve all element content, metadata, and relations</li>
 <li>Update the element’s identifier to reflect the new location</li>
 <li>Identify all relations pointing to the moved element (incoming relations)</li>
@@ -1089,14 +1033,20 @@ blockquote {
 <li>The element’s identifier changes from <code>&lt;old-file&gt;#&lt;element-name&gt;</code> to <code>&lt;new-file&gt;#&lt;element-name&gt;</code></li>
 <li>All references to the old identifier shall be updated to the new identifier</li>
 </ul>
+<h4>Attachments</h4>
+<ul>
+<li><a href="Refinements.html#file-persistence-behavior">File Persistence Behavior</a></li>
+<li><a href="Refinements.html#target-location-constraint">Target Location Constraint</a></li>
+<li><a href="Refinements.html#element-ordering-behavior">Element Ordering Behavior</a></li>
+</ul>
 <h4>Relations</h4>
 <ul>
-<li>derivedFrom: <a href="#element-manipulation-file-persistence">Element Manipulation File Persistence</a></li>
-<li>derivedFrom: <a href="#target-location-validation-and-auto-creation">Target Location Validation and Auto-Creation</a></li>
-<li>satisfiedBy: <a href="../../../core/src/graph_registry.rs">graph_registry.rs</a></li>
+<li>derivedFrom: <a href="../Core/ModelManagement.html#element-manipulation-operations">Element Manipulation Operations</a></li>
+<li>satisfiedBy: <a href="../../../cli/src/cli.rs">cli.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/crud.rs">crud.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/diff.rs">diff.rs</a></li>
-<li>satisfiedBy: <a href="../../../cli/src/cli.rs">cli.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/graph_registry.rs">graph_registry.rs</a></li>
+<li>verifiedBy: <a href="Verifications/ElementManipulationVerifications.html#move-element-test">Move Element Test</a></li>
 </ul>
 <hr />
 <h3 id="move-file-operation">Move File Operation</h3>
@@ -1126,10 +1076,15 @@ When the –squash flag is provided and the target file already exists, the syst
 <li>Remove the source file after all elements have been successfully moved</li>
 <li>Preserve element ordering from the source file when inserting into target section</li>
 </ul>
+<h4>Attachments</h4>
+<ul>
+<li><a href="Refinements.html#file-persistence-behavior">File Persistence Behavior</a></li>
+<li><a href="Refinements.html#target-location-constraint">Target Location Constraint</a></li>
+</ul>
 <h4>Relations</h4>
 <ul>
-<li>derivedFrom: <a href="#element-manipulation-file-persistence">Element Manipulation File Persistence</a></li>
-<li>derivedFrom: <a href="#target-location-validation-and-auto-creation">Target Location Validation and Auto-Creation</a></li>
+<li>derivedFrom: <a href="../Core/ModelManagement.html#element-manipulation-operations">Element Manipulation Operations</a></li>
+<li>verifiedBy: <a href="Verifications/ElementManipulationVerifications.html#move-file-squash-test">Move File Squash Test</a></li>
 </ul>
 <hr />
 <h3 id="relation-consistency-maintenance">Relation Consistency Maintenance</h3>
@@ -1153,6 +1108,7 @@ When the –squash flag is provided and the target file already exists, the syst
 <ul>
 <li>derivedFrom: <a href="../Core/ModelManagement.html#element-manipulation-operations">Element Manipulation Operations</a></li>
 <li>satisfiedBy: <a href="../../../core/src/graph_registry.rs">graph_registry.rs</a></li>
+<li>verifiedBy: <a href="Verifications/ElementManipulationVerifications.html#relation-consistency-test">Relation Consistency Test</a></li>
 </ul>
 <hr />
 <h3 id="rename-element-operation">Rename Element Operation</h3>
@@ -1172,12 +1128,31 @@ When the –squash flag is provided and the target file already exists, the syst
 <li>The element does not exist</li>
 <li>The new name conflicts with an existing element</li>
 </ul>
+<h4>Attachments</h4>
+<ul>
+<li><a href="Refinements.html#file-persistence-behavior">File Persistence Behavior</a></li>
+</ul>
 <h4>Relations</h4>
 <ul>
-<li>derivedFrom: <a href="#element-manipulation-file-persistence">Element Manipulation File Persistence</a></li>
-<li>satisfiedBy: <a href="../../../core/src/graph_registry.rs">graph_registry.rs</a></li>
+<li>derivedFrom: <a href="../Core/ModelManagement.html#element-manipulation-operations">Element Manipulation Operations</a></li>
 <li>satisfiedBy: <a href="../../../core/src/crud.rs">crud.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/diff.rs">diff.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/graph_registry.rs">graph_registry.rs</a></li>
+</ul>
+<hr />
+<h3 id="target-location-validation-and-auto-creation">Target Location Validation and Auto-Creation</h3>
+<p>The system shall validate target file paths for element manipulation operations and automatically create files when they do not exist, subject to path safety constraints.</p>
+<h4>Details</h4>
+<p>The system shall define target location validation constraints.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../Core/Configuration.html#ignore-files-integration">Ignore Files Integration</a></li>
+<li>derivedFrom: <a href="../Core/ModelManagement.html#element-manipulation-operations">Element Manipulation Operations</a></li>
+<li>derivedFrom: <a href="../Core/ModelManagement.html#git-repository-as-project-root">Git Repository as Project Root</a></li>
+<li>satisfiedBy: <a href="../../../core/src/graph_registry.rs">graph_registry.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/utils.rs">utils.rs</a></li>
+<li>satisfiedBy: <a href="Refinements.html#target-location-constraint">Target Location Constraint</a></li>
+<li>verifiedBy: <a href="Verifications/ElementManipulationVerifications.html#target-location-validation-test">Target Location Validation Test</a></li>
 </ul>
 <hr />
 

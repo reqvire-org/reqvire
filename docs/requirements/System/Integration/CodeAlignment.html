@@ -198,31 +198,31 @@ blockquote {
 }
 .diagram-nav-buttons {
     position: absolute;
-    top: 10px;
-    left: 10px;
+    top: 5px;
+    left: 5px;
     z-index: 999; /* higher than SVG (1) but lower than header nav (1000) */
     display: flex;
     flex-direction: column;
-    gap: 5px;
-    background-color: rgba(255, 255, 255, 0.9);
-    padding: 5px;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    gap: 2px;
+    background-color: rgba(255, 255, 255, 0.85);
+    padding: 3px;
+    border-radius: 3px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
 }
 .diagram-nav-row {
     display: flex;
-    gap: 5px;
+    gap: 2px;
     justify-content: center;
 }
 .diagram-nav-btn {
-    width: 32px;
-    height: 32px;
+    width: 22px;
+    height: 22px;
     background-color: var(--color-primary);
     color: white;
     border: none;
-    border-radius: 3px;
+    border-radius: 2px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 11px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -318,6 +318,27 @@ blockquote {
                     return;
                 }
 
+                // Get the natural size of the diagram
+                var bbox = svg.getBBox();
+                var containerWidth = mermaidContainer.clientWidth;
+                var containerHeight = mermaidContainer.clientHeight;
+
+                // Check if diagram fits within container (with some padding)
+                var padding = 40;
+                var fitsInContainer = (bbox.width <= containerWidth - padding) && (bbox.height <= containerHeight - padding);
+
+                if (fitsInContainer) {
+                    // Diagram fits - use natural size, shrink container to fit content
+                    svg.style.width = 'auto';
+                    svg.style.height = 'auto';
+                    mermaidContainer.style.height = 'auto';
+                    mermaidContainer.style.minHeight = (bbox.height + padding) + 'px';
+                    mermaidContainer.style.maxHeight = 'calc(100vh - 150px)';
+                    // No pan/zoom needed for small diagrams
+                    return;
+                }
+
+                // Large diagram - enable pan/zoom
                 svg.style.maxWidth = 'none';
                 svg.style.maxHeight = 'none';
 
@@ -696,7 +717,9 @@ blockquote {
         <a href="../../../index.html">Containment</a>
         <a href="../../../model.html">Model</a>
         <a href="../../../traces.html">Traces</a>
+        <a href="../../../traceflow.html">TraceFlow</a>
         <a href="../../../coverage.html">Coverage</a>
+        <a href="../../../resources.html">Resources</a>
     </nav>
     <div class="reqvire-nav-spacer"></div>
     <div class="container">
@@ -748,6 +771,11 @@ blockquote {
       class fa7115a6438e0a52 systemRequirement;
       click fa7115a6438e0a52 &quot;CodeAlignment.html#xml-style-comment&quot;;
     end
+    subgraph 38e46b81f6dca385[&quot;📄 Refinements.md&quot;]
+      1927c0ce6e116270[&quot;Comment Style Specification&quot;];
+      class 1927c0ce6e116270 default;
+      click 1927c0ce6e116270 &quot;Refinements.html#comment-style-specification&quot;;
+    end
   end
   21c836664ae15aab -.->|deriveReqT| 640ca7b4880a0f75;
   9b5f9a7fd1e0f242 -.->|deriveReqT| 5d1f78408a91c908;
@@ -756,9 +784,62 @@ blockquote {
   9b5f9a7fd1e0f242 -.->|deriveReqT| 50bbe01fa1813913;
   9b5f9a7fd1e0f242 -.->|deriveReqT| 35cc91617e8c680e;
   9b5f9a7fd1e0f242 -.->|deriveReqT| fa7115a6438e0a52;
+  9b5f9a7fd1e0f242 -->|satisfiedBy| 1927c0ce6e116270;
   640ca7b4880a0f75 -.->|deriveReqT| 9b5f9a7fd1e0f242;
   640ca7b4880a0f75 -.->|deriveReqT| a9dc7bcdada8f895;
 </div>
+<h3 id="code-traceability">Code Traceability</h3>
+<p>The system shall support code traceability by using structured comments to link code implementations to corresponding requirements in the System model.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derive: <a href="#traceability-format">Traceability Format</a></li>
+<li>derivedFrom: <a href="../../UserStories.html#aligning-design-with-code">Aligning Design with Code</a></li>
+</ul>
+<hr />
+<h3 id="traceability-format">Traceability Format</h3>
+<p>When parsing a source file for traceability, the system shall identify and extract all <code>[reqvire::...]</code> markers along with their associated requirement element identifiers.</p>
+<h4>Details</h4>
+<p>Syntax used for <code>[reqvire::...]</code> markers:</p>
+<pre><code>[reqvire::&lt;relation_type&gt;: &lt;element identifier&gt;] START [reqvire::&lt;relation_type&gt;: &lt;element idetifier&gt;] END
+
+</code></pre>
+<p>Where:</p>
+<ul>
+<li><code>&lt;relation_type&gt;</code> specifies the type of relation with only 2 types allowed:
+<ul>
+<li>satisfies</li>
+<li>trace</li>
+</ul>
+</li>
+<li><code>&lt;element identifier&gt;</code> is the identifier of the requirement being traced.</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derive: <a href="#comment-style-by-file-extension">Comment Style by File Extension</a></li>
+<li>derive: <a href="#validating-traceability-format">Validating Traceability Format</a></li>
+<li>derivedFrom: <a href="#code-traceability">Code Traceability</a></li>
+</ul>
+<hr />
+<h3 id="comment-style-by-file-extension">Comment Style by File Extension</h3>
+<p>The system shall use different comment style based of file extension of the code source file.</p>
+<h4>Details</h4>
+<p>The system shall define comment style specification for each file extension.</p>
+<h4>Relations</h4>
+<ul>
+<li>derive: <a href="#bat-style-comment">BAT style comment</a></li>
+<li>derive: <a href="#css-style-comment">CSS style comment</a></li>
+<li>derive: <a href="#dash-style-comment">Dash style comment</a></li>
+<li>derive: <a href="#slash-style-comment">Slash style comment</a></li>
+<li>derive: <a href="#sql-style-comment">SQL style comment</a></li>
+<li>derive: <a href="#xml-style-comment">XML style comment</a></li>
+<li>derivedFrom: <a href="#traceability-format">Traceability Format</a></li>
+<li>satisfiedBy: <a href="Refinements.html#comment-style-specification">Comment Style Specification</a></li>
+</ul>
+<hr />
 <h3 id="bat-style-comment">BAT style comment</h3>
 <p>When a source file has a <code>.bat</code> or <code>.cmd</code> extension, the system shall use <code>REM</code> for comments.</p>
 <h4>Details</h4>
@@ -768,6 +849,18 @@ echo Hello, World!
 
 REM [reqvire::satisfies: Req1] END
 
+</code></pre>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#comment-style-by-file-extension">Comment Style by File Extension</a></li>
+</ul>
+<hr />
+<h3 id="css-style-comment">CSS style comment</h3>
+<p>When a source file has a <code>.css</code> or <code>.scss</code> extension, the system shall use <code>/* */</code> for comments.</p>
+<h4>Details</h4>
+<pre><code>/* [reqvire::satisfies: Req1] START */
+.button { background-color: blue; }
+/* [reqvire::satisfies: Req1] END */
 </code></pre>
 <h4>Relations</h4>
 <ul>
@@ -802,12 +895,14 @@ SELECT * FROM users;
 <li>derivedFrom: <a href="#comment-style-by-file-extension">Comment Style by File Extension</a></li>
 </ul>
 <hr />
-<h3 id="css-style-comment">CSS style comment</h3>
-<p>When a source file has a <code>.css</code> or <code>.scss</code> extension, the system shall use <code>/* */</code> for comments.</p>
+<h3 id="slash-style-comment">Slash style comment</h3>
+<p>When a source file has a <code>.c</code>, <code>.cpp</code>, <code>.cs</code>, <code>.java</code>, <code>.js</code>, or <code>.ts</code> extension, the system shall use <code>//</code> for single-line comments.</p>
 <h4>Details</h4>
-<pre><code>/* [reqvire::satisfies: Req1] START */
-.button { background-color: blue; }
-/* [reqvire::satisfies: Req1] END */
+<pre><code>// [reqvire::satisfies: Req1] START
+void processSensorData() {
+    // Implementation logic
+}
+// [reqvire::satisfies: Req1] END
 </code></pre>
 <h4>Relations</h4>
 <ul>
@@ -827,49 +922,6 @@ SELECT * FROM users;
 <li>derivedFrom: <a href="#comment-style-by-file-extension">Comment Style by File Extension</a></li>
 </ul>
 <hr />
-<h3 id="slash-style-comment">Slash style comment</h3>
-<p>When a source file has a <code>.c</code>, <code>.cpp</code>, <code>.cs</code>, <code>.java</code>, <code>.js</code>, or <code>.ts</code> extension, the system shall use <code>//</code> for single-line comments.</p>
-<h4>Details</h4>
-<pre><code>// [reqvire::satisfies: Req1] START
-void processSensorData() {
-    // Implementation logic
-}
-// [reqvire::satisfies: Req1] END
-</code></pre>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="#comment-style-by-file-extension">Comment Style by File Extension</a></li>
-</ul>
-<hr />
-<h3 id="traceability-format">Traceability Format</h3>
-<p>When parsing a source file for traceability, the system shall identify and extract all <code>[reqvire::...]</code> markers along with their associated requirement element identifiers.</p>
-<h4>Details</h4>
-<p>Syntax used for <code>[reqvire::...]</code> markers:</p>
-<pre><code>[reqvire::&lt;relation_type&gt;: &lt;element identifier&gt;] START [reqvire::&lt;relation_type&gt;: &lt;element idetifier&gt;] END
-
-</code></pre>
-<p>Where:</p>
-<ul>
-<li><code>&lt;relation_type&gt;</code> specifies the type of relation with only 2 types allowed:
-<ul>
-<li>satisfies</li>
-<li>trace</li>
-</ul>
-</li>
-<li><code>&lt;element identifier&gt;</code> is the identifier of the requirement being traced.</li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="#code-traceability">Code Traceability</a></li>
-</ul>
-<hr />
-<h3 id="comment-style-by-file-extension">Comment Style by File Extension</h3>
-<p>The system shall use different comment style based of file extension of the code source file.</p>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="#traceability-format">Traceability Format</a></li>
-</ul>
-<hr />
 <h3 id="validating-traceability-format">Validating Traceability Format</h3>
 <p>While processing traceability in code, the system shall ensure that each <code>[reqvire::...] START</code> tag has a corresponding <code>[reqvire::...] END</code> tag.</p>
 <h4>Relations</h4>
@@ -877,19 +929,8 @@ void processSensorData() {
 <li>derivedFrom: <a href="#traceability-format">Traceability Format</a></li>
 </ul>
 <hr />
-<h3 id="code-traceability">Code Traceability</h3>
-<p>The system shall support code traceability by using structured comments to link code implementations to corresponding requirements in the MBSE model.</p>
-<h4>Metadata</h4>
-<ul>
-<li>type: user-requirement</li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="../../UserStories.html#aligning-design-with-code">Aligning Design with Code</a></li>
-</ul>
-<hr />
 <h3 id="suggest-code-refactoring">Suggest Code Refactoring</h3>
-<p>The system shall suggest code refactoring opportunities to better align with the structure and relationships in the MBSE model.</p>
+<p>The system shall suggest code refactoring opportunities to better align with the structure and relationships in the System model.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: user-requirement</li>

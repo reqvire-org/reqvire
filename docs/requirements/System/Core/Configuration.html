@@ -198,31 +198,31 @@ blockquote {
 }
 .diagram-nav-buttons {
     position: absolute;
-    top: 10px;
-    left: 10px;
+    top: 5px;
+    left: 5px;
     z-index: 999; /* higher than SVG (1) but lower than header nav (1000) */
     display: flex;
     flex-direction: column;
-    gap: 5px;
-    background-color: rgba(255, 255, 255, 0.9);
-    padding: 5px;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    gap: 2px;
+    background-color: rgba(255, 255, 255, 0.85);
+    padding: 3px;
+    border-radius: 3px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
 }
 .diagram-nav-row {
     display: flex;
-    gap: 5px;
+    gap: 2px;
     justify-content: center;
 }
 .diagram-nav-btn {
-    width: 32px;
-    height: 32px;
+    width: 22px;
+    height: 22px;
     background-color: var(--color-primary);
     color: white;
     border: none;
-    border-radius: 3px;
+    border-radius: 2px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 11px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -318,6 +318,27 @@ blockquote {
                     return;
                 }
 
+                // Get the natural size of the diagram
+                var bbox = svg.getBBox();
+                var containerWidth = mermaidContainer.clientWidth;
+                var containerHeight = mermaidContainer.clientHeight;
+
+                // Check if diagram fits within container (with some padding)
+                var padding = 40;
+                var fitsInContainer = (bbox.width <= containerWidth - padding) && (bbox.height <= containerHeight - padding);
+
+                if (fitsInContainer) {
+                    // Diagram fits - use natural size, shrink container to fit content
+                    svg.style.width = 'auto';
+                    svg.style.height = 'auto';
+                    mermaidContainer.style.height = 'auto';
+                    mermaidContainer.style.minHeight = (bbox.height + padding) + 'px';
+                    mermaidContainer.style.maxHeight = 'calc(100vh - 150px)';
+                    // No pan/zoom needed for small diagrams
+                    return;
+                }
+
+                // Large diagram - enable pan/zoom
                 svg.style.maxWidth = 'none';
                 svg.style.maxHeight = 'none';
 
@@ -696,7 +717,9 @@ blockquote {
         <a href="../../../index.html">Containment</a>
         <a href="../../../model.html">Model</a>
         <a href="../../../traces.html">Traces</a>
+        <a href="../../../traceflow.html">TraceFlow</a>
         <a href="../../../coverage.html">Coverage</a>
+        <a href="../../../resources.html">Resources</a>
     </nav>
     <div class="reqvire-nav-spacer"></div>
     <div class="container">
@@ -799,9 +822,6 @@ blockquote {
   7b1990b8b1329152 -.->|verifiedBy| 1413dd439a2ce574;
   533fcaf27edc0797 -->|satisfiedBy| d50a859650933e55;
   533fcaf27edc0797 -.->|verifiedBy| b32250e14e326cb;
-  9987f9e9ae83fba3 -.->|deriveReqT| ca74bbb037431e9b;
-  9987f9e9ae83fba3 -.->|deriveReqT| 84860e94fc819efd;
-  9987f9e9ae83fba3 -.->|deriveReqT| bbea6657a24b3f1c;
   b7c871ab64a7059a[&quot;graph_registry.rs&quot;];
   class b7c871ab64a7059a default;
   click b7c871ab64a7059a &quot;../../../core/src/graph_registry.rs&quot;;
@@ -810,6 +830,7 @@ blockquote {
   class ce2625feec883e55 default;
   click ce2625feec883e55 &quot;../../../core/src/utils.rs&quot;;
   9987f9e9ae83fba3 -->|satisfiedBy| ce2625feec883e55;
+  9987f9e9ae83fba3 -->|satisfiedBy| fc994be69cdad23;
   9987f9e9ae83fba3 -.->|verifiedBy| b6076972a6650ff1;
   7f5e53340a03365f[&quot;test.sh&quot;];
   class 7f5e53340a03365f default;
@@ -817,19 +838,19 @@ blockquote {
   1413dd439a2ce574 -->|satisfiedBy| 7f5e53340a03365f;
   3e259233db2e4d25 -.->|deriveReqT| bbe4bfafe31e5f09;
   3e259233db2e4d25 -->|satisfiedBy| ce2625feec883e55;
-  c287b52ceb52aa04[&quot;test.sh&quot;];
-  class c287b52ceb52aa04 default;
-  click c287b52ceb52aa04 &quot;../../../tests/test-element-content-extraction/test.sh&quot;;
-  3753d18d6b61231c -->|satisfiedBy| c287b52ceb52aa04;
-  26e63d5a1bbe175 -.->|deriveReqT| a867b4bb3e22cabf;
+  bd13cd060c399ea6 -->|satisfiedBy| b7c871ab64a7059a;
+  bd13cd060c399ea6 -->|satisfiedBy| d50a859650933e55;
+  bd13cd060c399ea6 -.->|verifiedBy| b32250e14e326cb;
   26e63d5a1bbe175 -->|satisfiedBy| d50a859650933e55;
+  26e63d5a1bbe175 -->|satisfiedBy| e79d4782d9a1d791;
   789c690d63402d63[&quot;test.sh&quot;];
   class 789c690d63402d63 default;
   click 789c690d63402d63 &quot;../../../tests/test-fragment-relations/test.sh&quot;;
   fcb309f0f899a983 -->|satisfiedBy| 789c690d63402d63;
-  bd13cd060c399ea6 -->|satisfiedBy| b7c871ab64a7059a;
-  bd13cd060c399ea6 -->|satisfiedBy| d50a859650933e55;
-  bd13cd060c399ea6 -.->|verifiedBy| b32250e14e326cb;
+  c287b52ceb52aa04[&quot;test.sh&quot;];
+  class c287b52ceb52aa04 default;
+  click c287b52ceb52aa04 &quot;../../../tests/test-element-content-extraction/test.sh&quot;;
+  3753d18d6b61231c -->|satisfiedBy| c287b52ceb52aa04;
   a29e69e90fa71f39[&quot;test.sh&quot;];
   class a29e69e90fa71f39 default;
   click a29e69e90fa71f39 &quot;../../../tests/test-excluded-patterns/test.sh&quot;;
@@ -848,6 +869,10 @@ examples/**
 <p>The <code>.reqvireignore</code> file provides Reqvire-specific exclusions for files that should remain in version control but not be processed as requirements.</p>
 <h4>Relations</h4>
 <ul>
+<li>derive: <a href="#ignore-files-integration">Ignore Files Integration</a></li>
+<li>derive: <a href="#requirements-processing">Requirements Processing</a></li>
+<li>derive: <a href="#reserved-repository-files-exclusion">Reserved Repository Files Exclusion</a></li>
+<li>derive: <a href="../Operations/Formatting.html#file-pattern-exclusion-for-format">File Pattern Exclusion for Format</a></li>
 <li>derivedFrom: <a href="ModelManagement.html#coexistence-of-structured-and-unstructured-documents">Coexistence of Structured and Unstructured Documents</a></li>
 <li>satisfiedBy: <a href="../../../cli/src/config.rs">config.rs</a></li>
 </ul>
@@ -886,8 +911,47 @@ examples/**
 </ul>
 <h4>Relations</h4>
 <ul>
+<li>derive: <a href="../Operations/ElementManipulation.html#target-location-validation-and-auto-creation">Target Location Validation and Auto-Creation</a></li>
 <li>derivedFrom: <a href="#ignoring-unstructured-documents">Ignoring Unstructured Documents</a></li>
 <li>satisfiedBy: <a href="../../../cli/src/config.rs">config.rs</a></li>
+<li>verifiedBy: <a href="Verifications/ValidationVerifications.html#file-exclusion-test">File Exclusion Test</a></li>
+</ul>
+<hr />
+<h3 id="requirements-processing">Requirements Processing</h3>
+<p>The system shall parse the files in all folders and subfolders from the root of git repository which are not explicitly excluded using .gitignore and .reqvireignore files.</p>
+<h4>Details</h4>
+<p>File exclusion is handled through:</p>
+<ul>
+<li>.gitignore patterns (files not in version control)</li>
+<li>.reqvireignore patterns (files in version control but excluded from requirements processing)</li>
+<li>Reserved repository files (README.md, LICENSE.md, etc.)</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derive: <a href="#structured-markdown-files-search-and-detection">Structured Markdown Files Search and Detection</a></li>
+<li>derive: <a href="Validation.html#graphregistry-as-primary-registry">GraphRegistry as Primary Registry</a></li>
+<li>derive: <a href="Validation.html#two-pass-validation-strategy">Two-Pass Validation Strategy</a></li>
+<li>derivedFrom: <a href="#ignoring-unstructured-documents">Ignoring Unstructured Documents</a></li>
+<li>satisfiedBy: <a href="../../../core/src/model.rs">model.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/parser.rs">parser.rs</a></li>
+<li>verifiedBy: <a href="Verifications/ValidationVerifications.html#same-file-fragment-relations-test">Same-File Fragment Relations Test</a></li>
+<li>verifiedBy: <a href="../Processing/Verifications/ChangeImpactVerifications.html#element-content-extraction-test">Element Content Extraction Test</a></li>
+</ul>
+<hr />
+<h3 id="structured-markdown-files-search-and-detection">Structured Markdown Files Search and Detection</h3>
+<p>The system shall identify all structured markdown documents available for processing in all directories and sub-directories of the git repository root based on predefined rules.</p>
+<h4>Details</h4>
+<p>Identification Process:</p>
+<ol>
+<li><strong>File Selection</strong>: The process scans all files in the the git repository root and all sub folders.</li>
+<li><strong>Excluded Patterns Check</strong>: If a file matches any excluded patterns, it is marked as <strong>not a structured document file</strong>.</li>
+<li><strong>File Extension Check</strong>: If the file does not have a <code>.md</code> extension, it is marked as <strong>not a structured document file</strong>.</li>
+</ol>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#requirements-processing">Requirements Processing</a></li>
+<li>satisfiedBy: <a href="../../../core/src/model.rs">model.rs</a></li>
+<li>verifiedBy: <a href="Verifications/ValidationVerifications.html#requirements-files-search-and-detection-test">Requirements Files Search and Detection Test</a></li>
 </ul>
 <hr />
 <h3 id="reserved-repository-files-exclusion">Reserved Repository Files Exclusion</h3>
@@ -921,37 +985,7 @@ examples/**
 <ul>
 <li>derivedFrom: <a href="#ignoring-unstructured-documents">Ignoring Unstructured Documents</a></li>
 <li>satisfiedBy: <a href="../../../cli/src/config.rs">config.rs</a></li>
-</ul>
-<hr />
-<h3 id="requirements-processing">Requirements Processing</h3>
-<p>The system shall parse the files in all folders and subfolders from the root of git repository which are not explicitly excluded using .gitignore and .reqvireignore files.</p>
-<h4>Details</h4>
-<p>File exclusion is handled through:</p>
-<ul>
-<li>.gitignore patterns (files not in version control)</li>
-<li>.reqvireignore patterns (files in version control but excluded from requirements processing)</li>
-<li>Reserved repository files (README.md, LICENSE.md, etc.)</li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="#ignoring-unstructured-documents">Ignoring Unstructured Documents</a></li>
-<li>satisfiedBy: <a href="../../../core/src/model.rs">model.rs</a></li>
-<li>satisfiedBy: <a href="../../../core/src/parser.rs">parser.rs</a></li>
-</ul>
-<hr />
-<h3 id="structured-markdown-files-search-and-detection">Structured Markdown Files Search and Detection</h3>
-<p>The system shall identify all structured markdown documents available for processing in all directories and sub-directories of the git repository root based on predefined rules.</p>
-<h4>Details</h4>
-<p>Identification Process:</p>
-<ol>
-<li><strong>File Selection</strong>: The process scans all files in the the git repository root and all sub folders.</li>
-<li><strong>Excluded Patterns Check</strong>: If a file matches any excluded patterns, it is marked as <strong>not a structured document file</strong>.</li>
-<li><strong>File Extension Check</strong>: If the file does not have a <code>.md</code> extension, it is marked as <strong>not a structured document file</strong>.</li>
-</ol>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="#requirements-processing">Requirements Processing</a></li>
-<li>satisfiedBy: <a href="../../../core/src/model.rs">model.rs</a></li>
+<li>verifiedBy: <a href="Verifications/ValidationVerifications.html#file-exclusion-test">File Exclusion Test</a></li>
 </ul>
 <hr />
 

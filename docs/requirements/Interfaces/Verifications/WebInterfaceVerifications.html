@@ -198,31 +198,31 @@ blockquote {
 }
 .diagram-nav-buttons {
     position: absolute;
-    top: 10px;
-    left: 10px;
+    top: 5px;
+    left: 5px;
     z-index: 999; /* higher than SVG (1) but lower than header nav (1000) */
     display: flex;
     flex-direction: column;
-    gap: 5px;
-    background-color: rgba(255, 255, 255, 0.9);
-    padding: 5px;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    gap: 2px;
+    background-color: rgba(255, 255, 255, 0.85);
+    padding: 3px;
+    border-radius: 3px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
 }
 .diagram-nav-row {
     display: flex;
-    gap: 5px;
+    gap: 2px;
     justify-content: center;
 }
 .diagram-nav-btn {
-    width: 32px;
-    height: 32px;
+    width: 22px;
+    height: 22px;
     background-color: var(--color-primary);
     color: white;
     border: none;
-    border-radius: 3px;
+    border-radius: 2px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 11px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -318,6 +318,27 @@ blockquote {
                     return;
                 }
 
+                // Get the natural size of the diagram
+                var bbox = svg.getBBox();
+                var containerWidth = mermaidContainer.clientWidth;
+                var containerHeight = mermaidContainer.clientHeight;
+
+                // Check if diagram fits within container (with some padding)
+                var padding = 40;
+                var fitsInContainer = (bbox.width <= containerWidth - padding) && (bbox.height <= containerHeight - padding);
+
+                if (fitsInContainer) {
+                    // Diagram fits - use natural size, shrink container to fit content
+                    svg.style.width = 'auto';
+                    svg.style.height = 'auto';
+                    mermaidContainer.style.height = 'auto';
+                    mermaidContainer.style.minHeight = (bbox.height + padding) + 'px';
+                    mermaidContainer.style.maxHeight = 'calc(100vh - 150px)';
+                    // No pan/zoom needed for small diagrams
+                    return;
+                }
+
+                // Large diagram - enable pan/zoom
                 svg.style.maxWidth = 'none';
                 svg.style.maxHeight = 'none';
 
@@ -696,7 +717,9 @@ blockquote {
         <a href="../../../index.html">Containment</a>
         <a href="../../../model.html">Model</a>
         <a href="../../../traces.html">Traces</a>
+        <a href="../../../traceflow.html">TraceFlow</a>
         <a href="../../../coverage.html">Coverage</a>
+        <a href="../../../resources.html">Resources</a>
     </nav>
     <div class="reqvire-nav-spacer"></div>
     <div class="container">
@@ -753,6 +776,90 @@ blockquote {
   click dd6732f292fab4eb &quot;../../../tests/test-serve-command/test.sh&quot;;
   6b3462d7df6e97c7 -->|satisfiedBy| dd6732f292fab4eb;
 </div>
+<h3 id="attachment-export-verification">Attachment Export Verification</h3>
+<p>This test verifies that HTML export copies all attachment files to the output directory.</p>
+<h4>Details</h4>
+<h5>Acceptance Criteria:</h5>
+<ul>
+<li>System shall copy all attachment files referenced by elements</li>
+<li>Attachment files shall preserve their relative paths in output</li>
+<li>Duplicate attachments (same file referenced multiple times) shall be copied only once</li>
+<li>All attachment file types shall be supported (md, pdf, txt, etc.)</li>
+</ul>
+<h5>Test Criteria:</h5>
+<ul>
+<li>Create model with elements having attachments</li>
+<li>Run HTML export command</li>
+<li>Verify attachment files exist in output directory at correct relative paths</li>
+<li>Verify attachment files content matches original</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfiedBy: <a href="../../../tests/test-attachment-export/test.sh">test.sh</a></li>
+<li>verify: <a href="../WebInterface.html#attachment-export">Attachment Export</a></li>
+</ul>
+<hr />
+<h3 id="containment-attachment-links-verification">Containment Attachment Links Verification</h3>
+<p>This test verifies that the D3.js containment tree view displays attachments as children of elements.</p>
+<h4>Details</h4>
+<h5>Acceptance Criteria:</h5>
+<ul>
+<li>Elements with attachments shall show attachments as child nodes in D3.js tree</li>
+<li>Element attachments (refinements) shall use wrench icon (🔧) with type <code>attachment-element</code></li>
+<li>File attachments shall use paperclip icon (📎) with type <code>attachment-file</code></li>
+<li>Element attachments shall be clickable and navigate to the referenced element</li>
+<li>File attachments shall show filename and path for reference</li>
+</ul>
+<h5>Test Criteria:</h5>
+<ul>
+<li>Create model with element having attachments</li>
+<li>Run HTML export command</li>
+<li>Verify containment.html contains d3-tree JSON data with attachment nodes</li>
+<li>Verify attachment-element nodes have links to element definitions</li>
+<li>Verify attachment-file nodes show file paths</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfiedBy: <a href="../../../tests/test-attachment-export/test.sh">test.sh</a></li>
+<li>verify: <a href="../WebInterface.html#containment-view-attachment-links">Containment View Attachment Links</a></li>
+</ul>
+<hr />
+<h3 id="diagram-attachment-display-verification">Diagram Attachment Display Verification</h3>
+<p>This test verifies that diagrams display attachment links within element boxes.</p>
+<h4>Details</h4>
+<h5>Acceptance Criteria:</h5>
+<ul>
+<li>Element boxes in diagrams shall include attachment filenames</li>
+<li>Attachments shall be prefixed with paperclip icon (📎)</li>
+<li>Attachments shall appear below element name using line breaks</li>
+<li>Attachment display shall not break diagram rendering</li>
+</ul>
+<h5>Test Criteria:</h5>
+<ul>
+<li>Create model with element having attachments</li>
+<li>Generate diagram (format or model command)</li>
+<li>Verify Mermaid output contains multiline labels with attachments</li>
+<li>Verify attachment filenames appear with 📎 prefix</li>
+<li>Verify diagram renders correctly with attachment labels</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfiedBy: <a href="../../../tests/test-attachment-export/test.sh">test.sh</a></li>
+<li>verify: <a href="../WebInterface.html#diagram-attachment-display">Diagram Attachment Display</a></li>
+</ul>
+<hr />
 <h3 id="html-export-verification">HTML Export Verification</h3>
 <p>This test verifies that the system exports specifications into HTML format with generated containment view (D3.js tree) and saves them in the designated output location.</p>
 <h4>Details</h4>
@@ -790,8 +897,31 @@ blockquote {
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>verify: <a href="../WebInterface.html#html-export">HTML Export</a></li>
 <li>satisfiedBy: <a href="../../../tests/test-html-export/test.sh">test.sh</a></li>
+<li>verify: <a href="../WebInterface.html#html-export">HTML Export</a></li>
+</ul>
+<hr />
+<h3 id="model-view-element-navigation-test">Model View Element Navigation Test</h3>
+<p>Test verifies that element names in the model-centric view are clickable links.</p>
+<h4>Test Steps</h4>
+<ol>
+<li>Run <code>reqvire model</code> command to generate model report</li>
+<li>Verify output contains element headers as markdown links</li>
+<li>Verify links follow format <code>[Element Name](file_path#fragment)</code></li>
+</ol>
+<h4>Expected Results</h4>
+<ul>
+<li>Element names are rendered as markdown links</li>
+<li>Links point to source file with element fragment</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfiedBy: <a href="../../../tests/test-model-command/test.sh">test.sh</a></li>
+<li>verify: <a href="../WebInterface.html#model-view-element-navigation">Model View Element Navigation</a></li>
 </ul>
 <hr />
 <h3 id="serve-command-verification">Serve Command Verification</h3>
@@ -827,115 +957,8 @@ blockquote {
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>verify: <a href="../WebInterface.html#serve-command">Serve Command</a></li>
 <li>satisfiedBy: <a href="../../../tests/test-serve-command/test.sh">test.sh</a></li>
-</ul>
-<hr />
-<h3 id="attachment-export-verification">Attachment Export Verification</h3>
-<p>This test verifies that HTML export copies all attachment files to the output directory.</p>
-<h4>Details</h4>
-<h5>Acceptance Criteria:</h5>
-<ul>
-<li>System shall copy all attachment files referenced by elements</li>
-<li>Attachment files shall preserve their relative paths in output</li>
-<li>Duplicate attachments (same file referenced multiple times) shall be copied only once</li>
-<li>All attachment file types shall be supported (md, pdf, txt, etc.)</li>
-</ul>
-<h5>Test Criteria:</h5>
-<ul>
-<li>Create model with elements having attachments</li>
-<li>Run HTML export command</li>
-<li>Verify attachment files exist in output directory at correct relative paths</li>
-<li>Verify attachment files content matches original</li>
-</ul>
-<h4>Metadata</h4>
-<ul>
-<li>type: test-verification</li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>verify: <a href="../WebInterface.html#attachment-export">Attachment Export</a></li>
-<li>satisfiedBy: <a href="../../../tests/test-attachment-export/test.sh">test.sh</a></li>
-</ul>
-<hr />
-<h3 id="containment-attachment-links-verification">Containment Attachment Links Verification</h3>
-<p>This test verifies that the D3.js containment tree view displays attachments as children of elements.</p>
-<h4>Details</h4>
-<h5>Acceptance Criteria:</h5>
-<ul>
-<li>Elements with attachments shall show attachments as child nodes in D3.js tree</li>
-<li>Element attachments (refinements) shall use wrench icon (🔧) with type <code>attachment-element</code></li>
-<li>File attachments shall use paperclip icon (📎) with type <code>attachment-file</code></li>
-<li>Element attachments shall be clickable and navigate to the referenced element</li>
-<li>File attachments shall show filename and path for reference</li>
-</ul>
-<h5>Test Criteria:</h5>
-<ul>
-<li>Create model with element having attachments</li>
-<li>Run HTML export command</li>
-<li>Verify containment.html contains d3-tree JSON data with attachment nodes</li>
-<li>Verify attachment-element nodes have links to element definitions</li>
-<li>Verify attachment-file nodes show file paths</li>
-</ul>
-<h4>Metadata</h4>
-<ul>
-<li>type: test-verification</li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>verify: <a href="../WebInterface.html#containment-view-attachment-links">Containment View Attachment Links</a></li>
-<li>satisfiedBy: <a href="../../../tests/test-attachment-export/test.sh">test.sh</a></li>
-</ul>
-<hr />
-<h3 id="diagram-attachment-display-verification">Diagram Attachment Display Verification</h3>
-<p>This test verifies that diagrams display attachment links within element boxes.</p>
-<h4>Details</h4>
-<h5>Acceptance Criteria:</h5>
-<ul>
-<li>Element boxes in diagrams shall include attachment filenames</li>
-<li>Attachments shall be prefixed with paperclip icon (📎)</li>
-<li>Attachments shall appear below element name using line breaks</li>
-<li>Attachment display shall not break diagram rendering</li>
-</ul>
-<h5>Test Criteria:</h5>
-<ul>
-<li>Create model with element having attachments</li>
-<li>Generate diagram (format or model command)</li>
-<li>Verify Mermaid output contains multiline labels with attachments</li>
-<li>Verify attachment filenames appear with 📎 prefix</li>
-<li>Verify diagram renders correctly with attachment labels</li>
-</ul>
-<h4>Metadata</h4>
-<ul>
-<li>type: test-verification</li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>verify: <a href="../WebInterface.html#diagram-attachment-display">Diagram Attachment Display</a></li>
-<li>satisfiedBy: <a href="../../../tests/test-attachment-export/test.sh">test.sh</a></li>
-</ul>
-<hr />
-<h3 id="model-view-element-navigation-test">Model View Element Navigation Test</h3>
-<p>Test verifies that element names in the model-centric view are clickable links.</p>
-<h4>Test Steps</h4>
-<ol>
-<li>Run <code>reqvire model</code> command to generate model report</li>
-<li>Verify output contains element headers as markdown links</li>
-<li>Verify links follow format <code>[Element Name](file_path#fragment)</code></li>
-</ol>
-<h4>Expected Results</h4>
-<ul>
-<li>Element names are rendered as markdown links</li>
-<li>Links point to source file with element fragment</li>
-</ul>
-<h4>Metadata</h4>
-<ul>
-<li>type: test-verification</li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>verify: <a href="../WebInterface.html#model-view-element-navigation">Model View Element Navigation</a></li>
-<li>satisfiedBy: <a href="../../../tests/test-model-command/test.sh">test.sh</a></li>
+<li>verify: <a href="../WebInterface.html#serve-command">Serve Command</a></li>
 </ul>
 <hr />
 

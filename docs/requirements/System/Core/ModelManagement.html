@@ -198,31 +198,31 @@ blockquote {
 }
 .diagram-nav-buttons {
     position: absolute;
-    top: 10px;
-    left: 10px;
+    top: 5px;
+    left: 5px;
     z-index: 999; /* higher than SVG (1) but lower than header nav (1000) */
     display: flex;
     flex-direction: column;
-    gap: 5px;
-    background-color: rgba(255, 255, 255, 0.9);
-    padding: 5px;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    gap: 2px;
+    background-color: rgba(255, 255, 255, 0.85);
+    padding: 3px;
+    border-radius: 3px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
 }
 .diagram-nav-row {
     display: flex;
-    gap: 5px;
+    gap: 2px;
     justify-content: center;
 }
 .diagram-nav-btn {
-    width: 32px;
-    height: 32px;
+    width: 22px;
+    height: 22px;
     background-color: var(--color-primary);
     color: white;
     border: none;
-    border-radius: 3px;
+    border-radius: 2px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 11px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -318,6 +318,27 @@ blockquote {
                     return;
                 }
 
+                // Get the natural size of the diagram
+                var bbox = svg.getBBox();
+                var containerWidth = mermaidContainer.clientWidth;
+                var containerHeight = mermaidContainer.clientHeight;
+
+                // Check if diagram fits within container (with some padding)
+                var padding = 40;
+                var fitsInContainer = (bbox.width <= containerWidth - padding) && (bbox.height <= containerHeight - padding);
+
+                if (fitsInContainer) {
+                    // Diagram fits - use natural size, shrink container to fit content
+                    svg.style.width = 'auto';
+                    svg.style.height = 'auto';
+                    mermaidContainer.style.height = 'auto';
+                    mermaidContainer.style.minHeight = (bbox.height + padding) + 'px';
+                    mermaidContainer.style.maxHeight = 'calc(100vh - 150px)';
+                    // No pan/zoom needed for small diagrams
+                    return;
+                }
+
+                // Large diagram - enable pan/zoom
                 svg.style.maxWidth = 'none';
                 svg.style.maxHeight = 'none';
 
@@ -696,7 +717,9 @@ blockquote {
         <a href="../../../index.html">Containment</a>
         <a href="../../../model.html">Model</a>
         <a href="../../../traces.html">Traces</a>
+        <a href="../../../traceflow.html">TraceFlow</a>
         <a href="../../../coverage.html">Coverage</a>
+        <a href="../../../resources.html">Resources</a>
     </nav>
     <div class="reqvire-nav-spacer"></div>
     <div class="container">
@@ -763,6 +786,11 @@ blockquote {
       class 6d3dc4e586860761 systemRequirement;
       click 6d3dc4e586860761 &quot;ModelManagement.html#verification-type-categories&quot;;
     end
+    subgraph bdf2d0d4066a95c0[&quot;📄 Refinements.md&quot;]
+      e45df3681600a73c[&quot;Element Type Relation Compatibility Constraint&quot;];
+      class e45df3681600a73c default;
+      click e45df3681600a73c &quot;Refinements.html#element-type-relation-compatibility-constraint&quot;;
+    end
     subgraph a0a42393a244d64c[&quot;📄 Validation.md&quot;]
       f7d689fafa15738b[&quot;Relation Element Type Validator&quot;];
       class f7d689fafa15738b systemRequirement;
@@ -800,12 +828,27 @@ blockquote {
   end
   subgraph 94359ac729226de6[&quot;📁 requirements/System/Operations&quot;]
     subgraph ce3b241a2629974e[&quot;📄 ElementManipulation.md&quot;]
-      5e9d1888d2914fd4[&quot;Element Manipulation File Persistence&quot;];
+      ca74bbb037431e9b[&quot;Create Element Operation<br/>📎 requirements/System/Operations/Refinements.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Refinements.md#target-location-constraint<br/>📎 requirements/System/Operations/Refinements.md#element-ordering-behavior&quot;];
+      class ca74bbb037431e9b systemRequirement;
+      click ca74bbb037431e9b &quot;../Operations/ElementManipulation.html#create-element-operation&quot;;
+      b1ed46220f447242[&quot;Delete Element Operation<br/>📎 requirements/System/Operations/Refinements.md#file-persistence-behavior&quot;];
+      class b1ed46220f447242 systemRequirement;
+      click b1ed46220f447242 &quot;../Operations/ElementManipulation.html#delete-element-operation&quot;;
+      5e9d1888d2914fd4[&quot;Element Manipulation File Persistence<br/>📎 requirements/System/Operations/Refinements.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Refinements.md#element-ordering-behavior&quot;];
       class 5e9d1888d2914fd4 systemRequirement;
       click 5e9d1888d2914fd4 &quot;../Operations/ElementManipulation.html#element-manipulation-file-persistence&quot;;
+      84860e94fc819efd[&quot;Move Element Operation<br/>📎 requirements/System/Operations/Refinements.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Refinements.md#target-location-constraint<br/>📎 requirements/System/Operations/Refinements.md#element-ordering-behavior&quot;];
+      class 84860e94fc819efd systemRequirement;
+      click 84860e94fc819efd &quot;../Operations/ElementManipulation.html#move-element-operation&quot;;
+      bbea6657a24b3f1c[&quot;Move File Operation<br/>📎 requirements/System/Operations/Refinements.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Refinements.md#target-location-constraint&quot;];
+      class bbea6657a24b3f1c systemRequirement;
+      click bbea6657a24b3f1c &quot;../Operations/ElementManipulation.html#move-file-operation&quot;;
       b7a7ab53d4242be8[&quot;Relation Consistency Maintenance&quot;];
       class b7a7ab53d4242be8 systemRequirement;
       click b7a7ab53d4242be8 &quot;../Operations/ElementManipulation.html#relation-consistency-maintenance&quot;;
+      a6593dab7ef5d521[&quot;Rename Element Operation<br/>📎 requirements/System/Operations/Refinements.md#file-persistence-behavior&quot;];
+      class a6593dab7ef5d521 systemRequirement;
+      click a6593dab7ef5d521 &quot;../Operations/ElementManipulation.html#rename-element-operation&quot;;
       9987f9e9ae83fba3[&quot;Target Location Validation and Auto-Creation&quot;];
       class 9987f9e9ae83fba3 systemRequirement;
       click 9987f9e9ae83fba3 &quot;../Operations/ElementManipulation.html#target-location-validation-and-auto-creation&quot;;
@@ -827,10 +870,16 @@ blockquote {
   237ab77c69cf9496 -.->|verifiedBy| e21f26d3f283ac80;
   237ab77c69cf9496 -.->|verifiedBy| 8f31ddf6fff8aa75;
   66091f40428d6d66 -.->|deriveReqT| 363332ee418d9a97;
+  66091f40428d6d66 -.->|deriveReqT| ca74bbb037431e9b;
+  66091f40428d6d66 -.->|deriveReqT| b1ed46220f447242;
   66091f40428d6d66 -.->|deriveReqT| 5e9d1888d2914fd4;
+  66091f40428d6d66 -.->|deriveReqT| 84860e94fc819efd;
+  66091f40428d6d66 -.->|deriveReqT| bbea6657a24b3f1c;
   66091f40428d6d66 -.->|deriveReqT| b7a7ab53d4242be8;
+  66091f40428d6d66 -.->|deriveReqT| a6593dab7ef5d521;
   66091f40428d6d66 -.->|deriveReqT| 9987f9e9ae83fba3;
   bc4b202a0bb6f50c -.->|deriveReqT| f7d689fafa15738b;
+  bc4b202a0bb6f50c -->|satisfiedBy| e45df3681600a73c;
   bc4b202a0bb6f50c -.->|verifiedBy| d2ba1522cae21673;
   ba66a4ed15581f23 -.->|deriveReqT| e64436de26e90ea9;
   ba66a4ed15581f23 -.->|deriveReqT| 9987f9e9ae83fba3;
@@ -867,111 +916,80 @@ blockquote {
   class 8419dcc77d92b609 default;
   click 8419dcc77d92b609 &quot;../../../cli/src/config.rs&quot;;
   6921a84a17b97dda -->|satisfiedBy| 8419dcc77d92b609;
-  2203c109e20d9c4b[&quot;test.sh&quot;];
-  class 2203c109e20d9c4b default;
-  click 2203c109e20d9c4b &quot;../../../tests/test-default-type-assignment/test.sh&quot;;
-  8f31ddf6fff8aa75 -->|satisfiedBy| 2203c109e20d9c4b;
   494239c0f3861cb5[&quot;test.sh&quot;];
   class 494239c0f3861cb5 default;
   click 494239c0f3861cb5 &quot;../../../tests/test-parsing-functionality/test.sh&quot;;
   e21f26d3f283ac80 -->|satisfiedBy| 494239c0f3861cb5;
-  5e9d1888d2914fd4 -.->|deriveReqT| ca74bbb037431e9b;
-  5e9d1888d2914fd4 -.->|deriveReqT| b1ed46220f447242;
-  5e9d1888d2914fd4 -.->|deriveReqT| 84860e94fc819efd;
-  5e9d1888d2914fd4 -.->|deriveReqT| bbea6657a24b3f1c;
-  5e9d1888d2914fd4 -.->|deriveReqT| a6593dab7ef5d521;
-  5e9d1888d2914fd4 -->|satisfiedBy| ea4ba0d9ffba93a5;
+  2203c109e20d9c4b[&quot;test.sh&quot;];
+  class 2203c109e20d9c4b default;
+  click 2203c109e20d9c4b &quot;../../../tests/test-default-type-assignment/test.sh&quot;;
+  8f31ddf6fff8aa75 -->|satisfiedBy| 2203c109e20d9c4b;
+  80defdd4cbc7ee18[&quot;cli.rs&quot;];
+  class 80defdd4cbc7ee18 default;
+  click 80defdd4cbc7ee18 &quot;../../../cli/src/cli.rs&quot;;
+  ca74bbb037431e9b -->|satisfiedBy| 80defdd4cbc7ee18;
+  ca74bbb037431e9b -->|satisfiedBy| ea4ba0d9ffba93a5;
+  e69395f926bba6a5[&quot;diff.rs&quot;];
+  class e69395f926bba6a5 default;
+  click e69395f926bba6a5 &quot;../../../core/src/diff.rs&quot;;
+  ca74bbb037431e9b -->|satisfiedBy| e69395f926bba6a5;
   b7c871ab64a7059a[&quot;graph_registry.rs&quot;];
   class b7c871ab64a7059a default;
   click b7c871ab64a7059a &quot;../../../core/src/graph_registry.rs&quot;;
-  5e9d1888d2914fd4 -->|satisfiedBy| b7c871ab64a7059a;
-  5e9d1888d2914fd4 -.->|verifiedBy| 9c8ea99467081d64;
-  9987f9e9ae83fba3 -.->|deriveReqT| ca74bbb037431e9b;
-  9987f9e9ae83fba3 -.->|deriveReqT| 84860e94fc819efd;
-  9987f9e9ae83fba3 -.->|deriveReqT| bbea6657a24b3f1c;
-  9987f9e9ae83fba3 -->|satisfiedBy| b7c871ab64a7059a;
+  ca74bbb037431e9b -->|satisfiedBy| b7c871ab64a7059a;
+  ca74bbb037431e9b -->|satisfiedBy| f22d93285fcd7664;
   ce2625feec883e55[&quot;utils.rs&quot;];
   class ce2625feec883e55 default;
   click ce2625feec883e55 &quot;../../../core/src/utils.rs&quot;;
-  9987f9e9ae83fba3 -->|satisfiedBy| ce2625feec883e55;
-  9987f9e9ae83fba3 -.->|verifiedBy| b6076972a6650ff1;
+  ca74bbb037431e9b -->|satisfiedBy| ce2625feec883e55;
+  ca74bbb037431e9b -.->|verifiedBy| e9c9cae75f37f06;
+  b1ed46220f447242 -->|satisfiedBy| 80defdd4cbc7ee18;
+  b1ed46220f447242 -->|satisfiedBy| ea4ba0d9ffba93a5;
+  b1ed46220f447242 -->|satisfiedBy| e69395f926bba6a5;
+  b1ed46220f447242 -->|satisfiedBy| b7c871ab64a7059a;
+  b1ed46220f447242 -.->|verifiedBy| 489fbf5e3ec08a53;
+  5e9d1888d2914fd4 -->|satisfiedBy| ea4ba0d9ffba93a5;
+  5e9d1888d2914fd4 -->|satisfiedBy| b7c871ab64a7059a;
+  5e9d1888d2914fd4 -.->|verifiedBy| 9c8ea99467081d64;
+  5e9d1888d2914fd4 -.->|verifiedBy| 934319026295f62c;
+  84860e94fc819efd -->|satisfiedBy| 80defdd4cbc7ee18;
+  84860e94fc819efd -->|satisfiedBy| ea4ba0d9ffba93a5;
+  84860e94fc819efd -->|satisfiedBy| e69395f926bba6a5;
+  84860e94fc819efd -->|satisfiedBy| b7c871ab64a7059a;
+  84860e94fc819efd -.->|verifiedBy| 3df547c544ad75b1;
+  bbea6657a24b3f1c -.->|verifiedBy| 98859ef52db96684;
   b7a7ab53d4242be8 -->|satisfiedBy| b7c871ab64a7059a;
   b7a7ab53d4242be8 -.->|verifiedBy| 7f694d7fb7057fc4;
-  a62d9d7bace214e0[&quot;test.sh&quot;];
-  class a62d9d7bace214e0 default;
-  click a62d9d7bace214e0 &quot;../../../tests/test-element-type-relation-compatibility/test.sh&quot;;
-  d2ba1522cae21673 -->|satisfiedBy| a62d9d7bace214e0;
+  a6593dab7ef5d521 -->|satisfiedBy| ea4ba0d9ffba93a5;
+  a6593dab7ef5d521 -->|satisfiedBy| e69395f926bba6a5;
+  a6593dab7ef5d521 -->|satisfiedBy| b7c871ab64a7059a;
+  9987f9e9ae83fba3 -->|satisfiedBy| b7c871ab64a7059a;
+  9987f9e9ae83fba3 -->|satisfiedBy| ce2625feec883e55;
+  9987f9e9ae83fba3 -->|satisfiedBy| fc994be69cdad23;
+  9987f9e9ae83fba3 -.->|verifiedBy| b6076972a6650ff1;
   f7d689fafa15738b -->|satisfiedBy| d50a859650933e55;
   f7d689fafa15738b -->|satisfiedBy| f22d93285fcd7664;
   f7d689fafa15738b -.->|verifiedBy| d2ba1522cae21673;
   f7d689fafa15738b -.->|verifiedBy| 23a09f2d69fc3b23;
-  e64436de26e90ea9 -.->|deriveReqT| e7cad857e370c39f;
-  e64436de26e90ea9 -.->|deriveReqT| 9feed439b94e2f2b;
-  e64436de26e90ea9 -.->|deriveReqT| d7e75b69b8102997;
-  e64436de26e90ea9 -.->|deriveReqT| 9f657ef9218da615;
-  80defdd4cbc7ee18[&quot;cli.rs&quot;];
-  class 80defdd4cbc7ee18 default;
-  click 80defdd4cbc7ee18 &quot;../../../cli/src/cli.rs&quot;;
+  a62d9d7bace214e0[&quot;test.sh&quot;];
+  class a62d9d7bace214e0 default;
+  click a62d9d7bace214e0 &quot;../../../tests/test-element-type-relation-compatibility/test.sh&quot;;
+  d2ba1522cae21673 -->|satisfiedBy| a62d9d7bace214e0;
   e64436de26e90ea9 -->|satisfiedBy| 80defdd4cbc7ee18;
   83b654d72d72255 -.->|deriveReqT| f7d689fafa15738b;
   978256deec70c016 -.->|verifiedBy| 23a09f2d69fc3b23;
   978256deec70c016 -.->|verifiedBy| 92720158539bac0d;
 </div>
 <h3 id="coexistence-of-structured-and-unstructured-documents">Coexistence of Structured and Unstructured Documents</h3>
-<p>The system shall allow structured markdown and unstructured. (eg., markdown, PDFs, DOCX, raw text) documents to coexist within the same MBSE model.</p>
+<p>The system shall allow structured markdown and unstructured. (eg., markdown, PDFs, DOCX, raw text) documents to coexist within the same System model.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: user-requirement</li>
 </ul>
 <h4>Relations</h4>
 <ul>
+<li>derive: <a href="Configuration.html#ignoring-unstructured-documents">Ignoring Unstructured Documents</a></li>
 <li>derivedFrom: <a href="../../UserStories.html#managing-system-models">Managing System Models</a></li>
-</ul>
-<hr />
-<h3 id="relation-types-and-behaviors">Relation Types and behaviors</h3>
-<p>The system shall implement relations following clearly defined specifications for types and behaviors.</p>
-<h4>Attachments</h4>
-<ul>
-<li><a href="DesignDocuments/RelationTypes.html">RelationTypes.html</a></li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="StructureAndParsing.html#identifiers-and-relations">Identifiers and Relations</a></li>
-<li>satisfiedBy: <a href="../../../core/src/relation.rs">relation.rs</a></li>
-</ul>
-<hr />
-<h3 id="element-type-relation-compatibility">Element Type Relation Compatibility</h3>
-<p>The system shall enforce element type constraints for relation types, ensuring that only valid combinations of source and target element types are allowed for each relation type.</p>
-<h4>Details</h4>
-<p>The compatibility rules are:</p>
-<ol>
-<li><strong>derivedFrom/derive</strong>: Only requirement types (<code>requirement</code>, <code>user-requirement</code>) can use these relations</li>
-<li><strong>satisfiedBy/satisfy</strong>: Requirements and <code>test-verification</code> can use satisfiedBy; other verification types cannot</li>
-<li><strong>verifiedBy/verify</strong>: Requirements link to verifications, verifications link to requirements</li>
-<li><strong>trace</strong>: Any non-refinement element type can use trace relations</li>
-<li><strong>Refinement types</strong>: <code>constraint</code>, <code>behavior</code>, <code>specification</code> cannot have Relations subsections</li>
-</ol>
-<h4>Attachments</h4>
-<ul>
-<li><a href="DesignDocuments/RelationTypes.html">RelationTypes.html</a></li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="#relation-types-and-behaviors">Relation Types and behaviors</a></li>
-<li>derivedFrom: <a href="#supported-element-types">Supported Element Types</a></li>
-<li>verifiedBy: <a href="Verifications/ValidationVerifications.html#element-type-relation-compatibility-test">Element Type Relation Compatibility Test</a></li>
-</ul>
-<hr />
-<h3 id="efficient-processing">Efficient Processing</h3>
-<p>The system shall process structured documents and relations to extract model-relevant information efficiently.</p>
-<h4>Metadata</h4>
-<ul>
-<li>type: user-requirement</li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="../../UserStories.html#managing-system-models">Managing System Models</a></li>
-<li>derivedFrom: <a href="../../UserStories.html#promote-automation-and-efficiency">Promote Automation and Efficiency</a></li>
 </ul>
 <hr />
 <h3 id="default-requirement-type-assignment">Default Requirement Type Assignment</h3>
@@ -1006,23 +1024,12 @@ blockquote {
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="../../UserStories.html#managing-system-models">Managing System Models</a></li>
+<li>verifiedBy: <a href="Verifications/ParsingVerifications.html#element-subsection-parsing-test">Element Subsection Parsing Test</a></li>
+<li>verifiedBy: <a href="Verifications/ValidationVerifications.html#default-element-type-assignment-test">Default Element Type Assignment Test</a></li>
 </ul>
 <hr />
-<h3 id="template-based-model-bootstrapping">Template-Based Model Bootstrapping</h3>
-<p>The system shall enable systems engineers to quickly bootstrap new MBSE models from predefined templates stored in Git repositories, accelerating project initialization and promoting best-practice model structures.</p>
-<h4>Details</h4>
-<p>Template Bootstrapping Capabilities</p>
-<p>Users can initialize new models using the CLI with templates from Git repositories:</p>
-<ul>
-<li>Discover available templates within a specified repository</li>
-<li>Select and apply templates interactively</li>
-<li>Bootstrap model structure with predefined files, folders, and requirements</li>
-</ul>
-<p>Templates are consumed from Git repositories only, with support for repositories containing multiple templates alongside other content.</p>
-<p><strong>Example usage:</strong></p>
-<pre><code class="language-bash">reqvire init --template &lt;github-repo-url&gt;
-</code></pre>
-<p>The system discovers all available templates in the repository and allows the user to select which template to apply.</p>
+<h3 id="efficient-processing">Efficient Processing</h3>
+<p>The system shall process structured documents and relations to extract model-relevant information efficiently.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: user-requirement</li>
@@ -1030,23 +1037,7 @@ blockquote {
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="../../UserStories.html#managing-system-models">Managing System Models</a></li>
-</ul>
-<hr />
-<h3 id="git-repository-as-project-root">Git Repository as Project Root</h3>
-<p>The system shall treat the <strong>root directory of the Git repository as the project’s base</strong> for all file and folder references, streamlining configuration and promoting a self-contained project structure.</p>
-<h4>Details</h4>
-<p>All paths specified in Reqvire commands will be resolved relative to the current working directory:</p>
-<ul>
-<li>When run from the git repository root: paths are relative to the git root</li>
-<li>When run from a subdirectory: paths are relative to that subdirectory, and processing is limited to files within that subdirectory scope</li>
-</ul>
-<h4>Metadata</h4>
-<ul>
-<li>type: user-requirement</li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="../../UserStories.html#managing-system-models">Managing System Models</a></li>
+<li>derivedFrom: <a href="../../UserStories.html#promote-automation-and-efficiency">Promote Automation and Efficiency</a></li>
 </ul>
 <hr />
 <h3 id="element-manipulation-operations">Element Manipulation Operations</h3>
@@ -1064,6 +1055,15 @@ blockquote {
 </ul>
 <h4>Relations</h4>
 <ul>
+<li>derive: <a href="#attachment-identifier-updates">Attachment Identifier Updates</a></li>
+<li>derive: <a href="../Operations/ElementManipulation.html#create-element-operation">Create Element Operation</a></li>
+<li>derive: <a href="../Operations/ElementManipulation.html#delete-element-operation">Delete Element Operation</a></li>
+<li>derive: <a href="../Operations/ElementManipulation.html#element-manipulation-file-persistence">Element Manipulation File Persistence</a></li>
+<li>derive: <a href="../Operations/ElementManipulation.html#move-element-operation">Move Element Operation</a></li>
+<li>derive: <a href="../Operations/ElementManipulation.html#move-file-operation">Move File Operation</a></li>
+<li>derive: <a href="../Operations/ElementManipulation.html#relation-consistency-maintenance">Relation Consistency Maintenance</a></li>
+<li>derive: <a href="../Operations/ElementManipulation.html#rename-element-operation">Rename Element Operation</a></li>
+<li>derive: <a href="../Operations/ElementManipulation.html#target-location-validation-and-auto-creation">Target Location Validation and Auto-Creation</a></li>
 <li>derivedFrom: <a href="../../UserStories.html#managing-system-models">Managing System Models</a></li>
 </ul>
 <hr />
@@ -1085,6 +1085,130 @@ blockquote {
 <ul>
 <li>derivedFrom: <a href="#element-manipulation-operations">Element Manipulation Operations</a></li>
 <li>satisfiedBy: <a href="../../../core/src/crud.rs">crud.rs</a></li>
+<li>verifiedBy: <a href="Verifications/AttachmentsVerifications.html#attachment-identifier-crud-verification">Attachment Identifier CRUD Verification</a></li>
+</ul>
+<hr />
+<h3 id="git-repository-as-project-root">Git Repository as Project Root</h3>
+<p>The system shall treat the <strong>root directory of the Git repository as the project’s base</strong> for all file and folder references, streamlining configuration and promoting a self-contained project structure.</p>
+<h4>Details</h4>
+<p>All paths specified in Reqvire commands will be resolved relative to the current working directory:</p>
+<ul>
+<li>When run from the git repository root: paths are relative to the git root</li>
+<li>When run from a subdirectory: paths are relative to that subdirectory, and processing is limited to files within that subdirectory scope</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derive: <a href="../../Interfaces/CLI.html#subdirectory-processing-option">Subdirectory Processing Option</a></li>
+<li>derive: <a href="../Operations/ElementManipulation.html#target-location-validation-and-auto-creation">Target Location Validation and Auto-Creation</a></li>
+<li>derivedFrom: <a href="../../UserStories.html#managing-system-models">Managing System Models</a></li>
+</ul>
+<hr />
+<h3 id="relation-types-and-behaviors">Relation Types and behaviors</h3>
+<p>The system shall implement relations following clearly defined specifications for types and behaviors.</p>
+<h4>Attachments</h4>
+<ul>
+<li><a href="DesignDocuments/RelationTypes.html">RelationTypes.html</a></li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derive: <a href="#element-type-relation-compatibility">Element Type Relation Compatibility</a></li>
+<li>derive: <a href="Validation.html#validate-relation-types">Validate Relation Types</a></li>
+<li>derive: <a href="../Output/DiagramGeneration.html#trace-relation-non-directional-behavior">Trace Relation Non-Directional Behavior</a></li>
+<li>derivedFrom: <a href="StructureAndParsing.html#identifiers-and-relations">Identifiers and Relations</a></li>
+<li>satisfiedBy: <a href="../../../core/src/relation.rs">relation.rs</a></li>
+<li>verifiedBy: <a href="Verifications/ParsingVerifications.html#element-subsection-parsing-test">Element Subsection Parsing Test</a></li>
+</ul>
+<hr />
+<h3 id="element-type-relation-compatibility">Element Type Relation Compatibility</h3>
+<p>The system shall enforce element type constraints for relation types, ensuring that only valid combinations of source and target element types are allowed for each relation type.</p>
+<h4>Details</h4>
+<p>The system shall define element type relation compatibility constraints.</p>
+<h4>Attachments</h4>
+<ul>
+<li><a href="DesignDocuments/RelationTypes.html">RelationTypes.html</a></li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derive: <a href="Validation.html#relation-element-type-validator">Relation Element Type Validator</a></li>
+<li>derivedFrom: <a href="#relation-types-and-behaviors">Relation Types and behaviors</a></li>
+<li>derivedFrom: <a href="#supported-element-types">Supported Element Types</a></li>
+<li>satisfiedBy: <a href="Refinements.html#element-type-relation-compatibility-constraint">Element Type Relation Compatibility Constraint</a></li>
+<li>verifiedBy: <a href="Verifications/ValidationVerifications.html#element-type-relation-compatibility-test">Element Type Relation Compatibility Test</a></li>
+</ul>
+<hr />
+<h3 id="supported-element-types">Supported Element Types</h3>
+<p>The system shall support predefined element types for classification and behavior determination.</p>
+<h4>Details</h4>
+<p>Element types are identified through a reserved “type” metadata property. The following types are supported:</p>
+<ol>
+<li><strong>requirement</strong>: System requirement</li>
+<li><strong>user-requirement</strong>: User requirement</li>
+<li><strong>verification</strong>: For verification tests and validation procedures (equivalent to test-verification)</li>
+<li><strong>test-verification</strong>: For verification tests and validation procedures</li>
+<li><strong>analysis-verification</strong>: For verification through formal analysis of documentation or code</li>
+<li><strong>inspection-verification</strong>: For verification through formal inspection or review</li>
+<li><strong>demonstration-verification</strong>: For verification through demonstration in a realistic environment</li>
+<li><strong>constraint</strong>: Refinement documenting constraints that limit or bound the system</li>
+<li><strong>behavior</strong>: Refinement documenting behavior details and operational specifications</li>
+<li><strong>specification</strong>: Refinement documenting detailed specifications and technical descriptions</li>
+<li><strong>other</strong>: Custom element types defined by users</li>
+</ol>
+<p><strong>Note:</strong> Refinement types (constraint, behavior, specification) cannot have a Relations subsection. These elements serve as detailed documentation that can be attached to other elements.</p>
+<p><strong>Relation constraints:</strong> Each element type has specific constraints on which relation types it can use. See <a href="DesignDocuments/RelationTypes.html#element-type-relation-compatibility">Element Type Relation Compatibility</a> for the complete compatibility matrix.</p>
+<h4>Relations</h4>
+<ul>
+<li>derive: <a href="#element-type-relation-compatibility">Element Type Relation Compatibility</a></li>
+<li>derive: <a href="#refinement-element-structure-constraints">Refinement Element Structure Constraints</a></li>
+<li>derivedFrom: <a href="StructureAndParsing.html#reserved-subsections-support">Reserved Subsections Support</a></li>
+<li>satisfiedBy: <a href="../../../core/src/element.rs">element.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/parser.rs">parser.rs</a></li>
+<li>verifiedBy: <a href="Verifications/ParsingVerifications.html#element-subsection-parsing-test">Element Subsection Parsing Test</a></li>
+<li>verifiedBy: <a href="Verifications/ParsingVerifications.html#refinement-element-type-parsing-test">Refinement Element Type Parsing Test</a></li>
+</ul>
+<hr />
+<h3 id="refinement-element-structure-constraints">Refinement Element Structure Constraints</h3>
+<p>The system shall reject Refinement elements (constraint, behavior, specification) that include a Relations subsection during validation.</p>
+<h4>Details</h4>
+<p>Refinement elements serve as detailed documentation that can be attached to other elements. They are not allowed to have relations because:</p>
+<ul>
+<li>They represent atomic pieces of information without traceability relationships</li>
+<li>They are referenced through the Attachments subsection of other elements</li>
+<li>Their content contributes to the parent element’s documentation</li>
+</ul>
+<p>When a Refinement element contains a Relations subsection, the validator shall report an error indicating that relations are not allowed for this element type.</p>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#supported-element-types">Supported Element Types</a></li>
+<li>satisfiedBy: <a href="../../../core/src/model.rs">model.rs</a></li>
+<li>verifiedBy: <a href="Verifications/ParsingVerifications.html#refinement-relations-rejection-test">Refinement Relations Rejection Test</a></li>
+</ul>
+<hr />
+<h3 id="template-based-model-bootstrapping">Template-Based Model Bootstrapping</h3>
+<p>The system shall enable systems engineers to quickly bootstrap new System models from predefined templates stored in Git repositories, accelerating project initialization and promoting best-practice model structures.</p>
+<h4>Details</h4>
+<p>Template Bootstrapping Capabilities</p>
+<p>Users can initialize new models using the CLI with templates from Git repositories:</p>
+<ul>
+<li>Discover available templates within a specified repository</li>
+<li>Select and apply templates interactively</li>
+<li>Bootstrap model structure with predefined files, folders, and requirements</li>
+</ul>
+<p>Templates are consumed from Git repositories only, with support for repositories containing multiple templates alongside other content.</p>
+<p><strong>Example usage:</strong></p>
+<pre><code class="language-bash">reqvire init --template &lt;github-repo-url&gt;
+</code></pre>
+<p>The system discovers all available templates in the repository and allows the user to select which template to apply.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../../UserStories.html#managing-system-models">Managing System Models</a></li>
 </ul>
 <hr />
 <h3 id="verification-type-categories">Verification Type Categories</h3>
@@ -1118,48 +1242,6 @@ blockquote {
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="StructureAndParsing.html#reserved-subsections-support">Reserved Subsections Support</a></li>
-</ul>
-<hr />
-<h3 id="supported-element-types">Supported Element Types</h3>
-<p>The system shall support predefined element types for classification and behavior determination.</p>
-<h4>Details</h4>
-<p>Element types are identified through a reserved “type” metadata property. The following types are supported:</p>
-<ol>
-<li><strong>requirement</strong>: System requirement</li>
-<li><strong>user-requirement</strong>: User requirement</li>
-<li><strong>verification</strong>: For verification tests and validation procedures (equivalent to test-verification)</li>
-<li><strong>test-verification</strong>: For verification tests and validation procedures</li>
-<li><strong>analysis-verification</strong>: For verification through formal analysis of documentation or code</li>
-<li><strong>inspection-verification</strong>: For verification through formal inspection or review</li>
-<li><strong>demonstration-verification</strong>: For verification through demonstration in a realistic environment</li>
-<li><strong>constraint</strong>: Refinement documenting constraints that limit or bound the system</li>
-<li><strong>behavior</strong>: Refinement documenting behavior details and operational specifications</li>
-<li><strong>specification</strong>: Refinement documenting detailed specifications and technical descriptions</li>
-<li><strong>other</strong>: Custom element types defined by users</li>
-</ol>
-<p><strong>Note:</strong> Refinement types (constraint, behavior, specification) cannot have a Relations subsection. These elements serve as detailed documentation that can be attached to other elements.</p>
-<p><strong>Relation constraints:</strong> Each element type has specific constraints on which relation types it can use. See <a href="DesignDocuments/RelationTypes.html#element-type-relation-compatibility">Element Type Relation Compatibility</a> for the complete compatibility matrix.</p>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="StructureAndParsing.html#reserved-subsections-support">Reserved Subsections Support</a></li>
-<li>satisfiedBy: <a href="../../../core/src/element.rs">element.rs</a></li>
-<li>satisfiedBy: <a href="../../../core/src/parser.rs">parser.rs</a></li>
-</ul>
-<hr />
-<h3 id="refinement-element-structure-constraints">Refinement Element Structure Constraints</h3>
-<p>The system shall reject Refinement elements (constraint, behavior, specification) that include a Relations subsection during validation.</p>
-<h4>Details</h4>
-<p>Refinement elements serve as detailed documentation that can be attached to other elements. They are not allowed to have relations because:</p>
-<ul>
-<li>They represent atomic pieces of information without traceability relationships</li>
-<li>They are referenced through the Attachments subsection of other elements</li>
-<li>Their content contributes to the parent element’s documentation</li>
-</ul>
-<p>When a Refinement element contains a Relations subsection, the validator shall report an error indicating that relations are not allowed for this element type.</p>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="#supported-element-types">Supported Element Types</a></li>
-<li>satisfiedBy: <a href="../../../core/src/model.rs">model.rs</a></li>
 </ul>
 <hr />
 

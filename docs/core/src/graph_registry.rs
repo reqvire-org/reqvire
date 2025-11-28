@@ -464,8 +464,7 @@ impl GraphRegistry {
     }
 
     /// Validate Refinement element constraints
-    /// Refinement elements (constraint, behavior, specification) cannot define relations themselves,
-    /// but can be targets of satisfiedBy relations from requirements.
+    /// Refinement elements (constraint, behavior, specification) can only have satisfy relations.
     fn validate_refinement_elements(&self) -> Result<Vec<ReqvireError>, ReqvireError> {
         debug!("Validating Refinement element constraints...");
         let mut errors = Vec::new();
@@ -475,18 +474,23 @@ impl GraphRegistry {
 
             // Check if this is a Refinement element type
             if element.element_type.is_refinement() {
-                // Refinement elements cannot have user-created relations
-                let user_relations: Vec<_> = element.relations.iter()
+                // Refinement elements can only have satisfy relations
+                let invalid_relations: Vec<_> = element.relations.iter()
                     .filter(|r| r.user_created)
+                    .filter(|r| r.relation_type.name.to_lowercase() != "satisfy")
                     .collect();
 
-                if !user_relations.is_empty() {
+                if !invalid_relations.is_empty() {
+                    let invalid_types: Vec<_> = invalid_relations.iter()
+                        .map(|r| &r.relation_type.name)
+                        .collect();
                     errors.push(ReqvireError::InvalidMarkdownStructure(
                         format!(
-                            "File {}: Refinement element '{}' (type: {}) cannot define relations. Refinement elements can only be targets of satisfiedBy relations from requirements.",
+                            "File {}: Refinement element '{}' (type: {}) can only have satisfy relations. Invalid relations: {:?}",
                             element.file_path,
                             element.name,
-                            element.element_type.as_str()
+                            element.element_type.as_str(),
+                            invalid_types
                         ),
                     ));
                 }
@@ -1022,7 +1026,7 @@ impl GraphRegistry {
     }
 
 
-    fn element_to_markdown_with_context(&self, element: &Element, _current_file: &str) -> String {
+    fn element_to_markdown_with_context(&self, element: &Element, _current_file: &str, with_full_relations: bool) -> String {
         let mut markdown = String::new();
 
         // Add the element header
@@ -1117,11 +1121,22 @@ impl GraphRegistry {
             markdown.push_str("\n");
         }
 
-        // Add relations subsection if there are user-created relations
-        let user_relations: Vec<_> = element.relations.iter().filter(|r| r.user_created).collect();
-        if !user_relations.is_empty() {
+        // Add relations subsection if there are relations to include
+        // When with_full_relations is true, include all relations (user-created and auto-generated)
+        // Otherwise, only include user-created relations
+        let mut relations_to_include: Vec<_> = if with_full_relations {
+            element.relations.iter().collect()
+        } else {
+            element.relations.iter().filter(|r| r.user_created).collect()
+        };
+        // Sort relations for deterministic output: by relation type name, then by target link
+        relations_to_include.sort_by(|a, b| {
+            (&a.relation_type.name, a.target.link.as_str())
+                .cmp(&(&b.relation_type.name, b.target.link.as_str()))
+        });
+        if !relations_to_include.is_empty() {
             markdown.push_str("#### Relations\n");
-            for relation in user_relations {
+            for relation in relations_to_include {
                 // Format relation target based on type
                 // Format as proper markdown link using element name when possible
                 let target_text = match &relation.target.link {
@@ -1277,7 +1292,7 @@ impl GraphRegistry {
         }
     }
 
-    /// Groups elements by their file path
+    /// Groups elements by their file path and orders them following Element Ordering Behavior
     pub fn group_elements_by_location(&self) -> HashMap<String, Vec<&Element>> {
         let mut file_elements: HashMap<String, Vec<&Element>> = HashMap::new();
 
@@ -1295,16 +1310,110 @@ impl GraphRegistry {
                 .push(element);
         }
 
-        // Sort elements within each file by their original order index
+        // Apply Element Ordering Behavior to each file
         for elements in file_elements.values_mut() {
-            elements.sort_by_key(|element| element.file_order_index);
+            self.order_elements_hierarchically(elements);
         }
 
         file_elements
     }
 
+    /// Orders elements following Element Ordering Behavior:
+    /// - Parent elements appear before their children (file-local derivedFrom hierarchy)
+    /// - Root elements (no file-local parent) sorted alphabetically
+    /// - Siblings at each level sorted alphabetically
+    fn order_elements_hierarchically(&self, elements: &mut Vec<&Element>) {
+        if elements.len() <= 1 {
+            return;
+        }
+
+        // Build a map of element fragment (slug) -> index for quick lookup
+        // The fragment is the part after # in the identifier (e.g., "parent-a" from "file.md#parent-a")
+        let fragment_to_idx: HashMap<String, usize> = elements
+            .iter()
+            .enumerate()
+            .map(|(i, e)| {
+                let fragment = e.identifier.split('#').last().unwrap_or(&e.identifier).to_string();
+                (fragment, i)
+            })
+            .collect();
+
+        // Build parent -> children map based on file-local derivedFrom relations
+        // Using indices to avoid lifetime issues
+        let mut children_map: HashMap<usize, Vec<usize>> = HashMap::new();
+        let mut has_parent: HashSet<usize> = HashSet::new();
+
+        for (idx, element) in elements.iter().enumerate() {
+            // Find file-local derivedFrom relations
+            for relation in &element.relations {
+                if relation.relation_type.name == "derivedFrom" {
+                    // Check if target is in the same file
+                    if let Some(target_id) = &relation.target.element_id {
+                        // target_id is the fragment (slug) like "parent-a"
+                        // Check if this target exists in the same file
+                        if let Some(&parent_idx) = fragment_to_idx.get(target_id) {
+                            // This element has a file-local parent
+                            children_map
+                                .entry(parent_idx)
+                                .or_insert_with(Vec::new)
+                                .push(idx);
+                            has_parent.insert(idx);
+                        }
+                    }
+                }
+            }
+        }
+
+        // Identify root element indices (those without file-local parents)
+        let mut roots: Vec<usize> = (0..elements.len())
+            .filter(|idx| !has_parent.contains(idx))
+            .collect();
+
+        // Sort roots alphabetically by element name
+        roots.sort_by(|&a, &b| elements[a].name.cmp(&elements[b].name));
+
+        // Sort children at each level alphabetically by element name
+        for children in children_map.values_mut() {
+            children.sort_by(|&a, &b| elements[a].name.cmp(&elements[b].name));
+        }
+
+        // Build ordered list using depth-first traversal with stack (iterative)
+        let mut ordered_indices: Vec<usize> = Vec::with_capacity(elements.len());
+        let mut visited: HashSet<usize> = HashSet::new();
+
+        // Process roots in reverse order so they come out in correct order
+        let mut stack: Vec<usize> = Vec::new();
+        for &root in roots.iter().rev() {
+            stack.push(root);
+        }
+
+        while let Some(idx) = stack.pop() {
+            if visited.contains(&idx) {
+                continue;
+            }
+            visited.insert(idx);
+            ordered_indices.push(idx);
+
+            // Push children in reverse alphabetical order so they come out in correct order
+            if let Some(children) = children_map.get(&idx) {
+                for &child_idx in children.iter().rev() {
+                    if !visited.contains(&child_idx) {
+                        stack.push(child_idx);
+                    }
+                }
+            }
+        }
+
+        // Reorder elements based on ordered indices
+        let original: Vec<&Element> = elements.drain(..).collect();
+        for idx in ordered_indices {
+            elements.push(original[idx]);
+        }
+    }
+
     /// Generates markdown content for a file
-    pub fn generate_file_markdown(&self, file_path: &str, elements: &[&Element]) -> String {
+    /// When with_full_relations is true, includes all relations (user-created and auto-generated)
+    pub fn generate_file_markdown(&self, file_path: &str, elements: &[&Element], with_full_relations: bool) -> String {
         let mut markdown = String::new();
 
         // All specification files must have "# Elements" as the page header
@@ -1327,7 +1436,7 @@ impl GraphRegistry {
             if i > 0 {
                 markdown.push_str("---\n\n");
             }
-            markdown.push_str(&self.element_to_markdown_with_context(element, file_path));
+            markdown.push_str(&self.element_to_markdown_with_context(element, file_path, with_full_relations));
         }
 
         // Add final separator after the last element (if there were any elements)
@@ -1622,7 +1731,8 @@ impl GraphRegistry {
     }
 
     /// Flushes all elements to markdown files and copies InternalPath files to the specified directory
-    pub fn flush_to_directory(&self, output_dir: &Path) -> Result<(usize, usize), ReqvireError> {
+    /// When with_full_relations is true, includes all relations (user-created and auto-generated inverse relations)
+    pub fn flush_to_directory(&self, output_dir: &Path, with_full_relations: bool) -> Result<(usize, usize), ReqvireError> {
         // Create output directory if it doesn't exist
         if !output_dir.exists() {
             fs::create_dir_all(output_dir)
@@ -1635,7 +1745,7 @@ impl GraphRegistry {
 
         for (file_path, elements) in grouped_elements {
             // Generate the markdown content for this file
-            let markdown_content = self.generate_file_markdown(&file_path, &elements);
+            let markdown_content = self.generate_file_markdown(&file_path, &elements, with_full_relations);
 
             // Determine the output file path
             let output_file_path = output_dir.join(&file_path);
@@ -1669,7 +1779,8 @@ impl GraphRegistry {
     }
 
     /// Flushes elements from specific files to markdown files and copies related InternalPath files
-    pub fn flush_files_to_directory(&self, file_paths: &[String], output_dir: &Path) -> Result<(usize, usize), ReqvireError> {
+    /// When with_full_relations is true, includes all relations (user-created and auto-generated inverse relations)
+    pub fn flush_files_to_directory(&self, file_paths: &[String], output_dir: &Path, with_full_relations: bool) -> Result<(usize, usize), ReqvireError> {
         // Create output directory if it doesn't exist
         if !output_dir.exists() {
             fs::create_dir_all(output_dir)
@@ -1683,7 +1794,7 @@ impl GraphRegistry {
         for file_path in file_paths {
             if let Some(elements) = grouped_elements.get(file_path) {
                 // Generate the markdown content for this file
-                let markdown_content = self.generate_file_markdown(file_path, elements);
+                let markdown_content = self.generate_file_markdown(file_path, elements, with_full_relations);
 
                 // Determine the output file path
                 let output_file_path = output_dir.join(file_path);
@@ -2002,7 +2113,6 @@ impl GraphRegistry {
         &mut self,
         markdown: &str,
         target_file: &str,
-        index: Option<usize>,
         excluded_patterns: &GlobSet,
     ) -> Result<Element, ReqvireError> {
         // Validate target path
@@ -2058,19 +2168,14 @@ impl GraphRegistry {
             self.register_page(target_file.to_string(), format!("# {}\n", file_stem));
         }
 
-        // Set file_order_index if index provided
+        // Set file_order_index: append to end of file
         let mut new_element = element.clone();
-        if let Some(idx) = index {
-            new_element.file_order_index = idx;
-        } else {
-            // Default: append to end of file
-            let max_index = self.nodes.values()
-                .filter(|node| node.element.file_path == target_file)
-                .map(|node| node.element.file_order_index)
-                .max()
-                .unwrap_or(0);
-            new_element.file_order_index = max_index + 1;
-        }
+        let max_index = self.nodes.values()
+            .filter(|node| node.element.file_path == target_file)
+            .map(|node| node.element.file_order_index)
+            .max()
+            .unwrap_or(0);
+        new_element.file_order_index = max_index + 1;
 
         // Add to graph
         self.add_element(new_element.clone())?;
@@ -2133,7 +2238,6 @@ impl GraphRegistry {
         &mut self,
         element_id: &str,
         target_file: &str,
-        index: Option<usize>,
         excluded_patterns: &GlobSet,
     ) -> Result<(String, Vec<String>), ReqvireError> {
         // Validate element exists
@@ -2214,13 +2318,6 @@ impl GraphRegistry {
         // Update all attachment identifiers pointing to this element
         self.update_attachment_identifiers(&old_identifier, &new_identifier);
 
-        // Update file order index if provided
-        if let Some(idx) = index {
-            if let Some(node) = self.nodes.get_mut(&new_identifier) {
-                node.element.file_order_index = idx;
-            }
-        }
-
         // Track all modified files
         for file in &modified_files {
             self.modified_files.insert(file.clone());
@@ -2236,7 +2333,7 @@ impl GraphRegistry {
         }
 
         let file_vec: Vec<String> = self.modified_files.iter().cloned().collect();
-        let _result = self.flush_files_to_directory(&file_vec, directory)?;
+        let _result = self.flush_files_to_directory(&file_vec, directory, false)?;
 
         // Check for and delete empty files (files with no elements)
         let grouped_elements = self.group_elements_by_location();
@@ -2617,7 +2714,7 @@ mod tests {
 
         // Let's check what the markdown would look like:
         let b_element = graph.nodes.get("B").unwrap().element.clone();
-        let b_markdown = graph.element_to_markdown_with_context(&b_element, "file1.md");
+        let b_markdown = graph.element_to_markdown_with_context(&b_element, "file1.md",true);
         println!("B's markdown after A is moved:");
         println!("{}", b_markdown);
 
@@ -2653,7 +2750,7 @@ mod tests {
 
         // Check A's initial relations in markdown
         let a_element_initial = graph.nodes.get("A").unwrap().element.clone();
-        let a_markdown_initial = graph.element_to_markdown_with_context(&a_element_initial, "file1.md");
+        let a_markdown_initial = graph.element_to_markdown_with_context(&a_element_initial, "file1.md",true);
         println!("A's initial markdown (in file1.md):");
         println!("{}", a_markdown_initial);
 
@@ -2666,7 +2763,7 @@ mod tests {
 
         // Check A's relations after the move
         let a_element_moved = graph.nodes.get("A").unwrap().element.clone();
-        let a_markdown_moved = graph.element_to_markdown_with_context(&a_element_moved, "file3.md");
+        let a_markdown_moved = graph.element_to_markdown_with_context(&a_element_moved, "file3.md",true);
         println!("A's markdown after move to file3.md:");
         println!("{}", a_markdown_moved);
 
@@ -2735,7 +2832,7 @@ mod tests {
         let output_path = temp_dir.path();
 
         // Flush the graph to markdown files
-        let result = graph.flush_to_directory(output_path);
+        let result = graph.flush_to_directory(output_path,true);
         assert!(result.is_ok());
 
         // List what files were actually created
@@ -2822,7 +2919,7 @@ mod tests {
         let output_path = temp_dir.path();
 
         // Flush the graph to markdown files
-        let result = graph.flush_to_directory(output_path);
+        let result = graph.flush_to_directory(output_path,true);
         assert!(result.is_ok());
 
         // Read the generated markdown file
@@ -2880,7 +2977,7 @@ mod tests {
         let output_path = temp_dir.path();
 
         // Flush the graph to markdown files
-        let result = graph.flush_to_directory(output_path);
+        let result = graph.flush_to_directory(output_path,true);
         assert!(result.is_ok());
 
         // Read the generated markdown file
@@ -2919,7 +3016,7 @@ mod tests {
         let output_path = temp_dir.path();
 
         // Flush the graph to markdown files
-        let result = graph.flush_to_directory(output_path);
+        let result = graph.flush_to_directory(output_path,true);
         assert!(result.is_ok());
 
         // Read the generated markdown file
@@ -2956,7 +3053,7 @@ mod tests {
         let output_path = temp_dir.path();
 
         // Flush the graph to markdown files
-        let result = graph.flush_to_directory(output_path);
+        let result = graph.flush_to_directory(output_path,true);
         assert!(result.is_ok());
 
         // Read the generated markdown file

@@ -15,6 +15,7 @@ use reqvire::git_commands;
 use reqvire::verification_trace;
 use crate::serve;
 use reqvire::lint;
+use reqvire::report_resources;
 use reqvire::GraphRegistry;
 use reqvire::graph_registry::Page;
 use reqvire::element::Element;
@@ -43,11 +44,11 @@ pub struct Args {
 #[derive(Subcommand, Debug)]
 pub enum Commands {
     /// Export model to browsable HTML documentation with complete traceability
-    
+
     Export {
-        /// Output directory for HTML files
-        #[clap(long, short = 'o', default_value = "html", help_heading = "EXPORT OPTIONS")]
-        output: String,
+        /// Output directory for HTML files (defaults to temporary directory if not specified)
+        #[clap(long, help_heading = "EXPORT OPTIONS")]
+        output: Option<String>,
     },
 
     /// Serve model as browsable HTML documentation via HTTP server
@@ -63,7 +64,7 @@ pub enum Commands {
     },
 
     /// Format and normalize requirements files. By default, shows preview without applying changes
-    #[clap(override_help = "Format and normalize requirements files. By default, shows preview without applying changes\n\nFORMAT OPTIONS:\n      --fix      Apply formatting changes to files\n      --json     Output results in JSON format")]
+    #[clap(override_help = "Format and normalize requirements files. By default, shows preview without applying changes\n\nFORMAT OPTIONS:\n      --fix                   Apply formatting changes to files\n      --json                  Output results in JSON format\n      --with-full-relations   Include all relations (user-created and auto-generated)")]
     Format {
         /// Apply formatting changes to files
         #[clap(long, help_heading = "FORMAT OPTIONS")]
@@ -72,6 +73,10 @@ pub enum Commands {
         /// Output results in JSON format
         #[clap(long, help_heading = "FORMAT OPTIONS")]
         json: bool,
+
+        /// Include all relations (user-created and auto-generated inverse relations)
+        #[clap(long, help_heading = "FORMAT OPTIONS")]
+        with_full_relations: bool,
     },
 
     /// Validate model
@@ -82,17 +87,6 @@ pub enum Commands {
         json: bool,
     },
     
-
-    /// Generate mermaid diagrams in markdown files showing requirements relationships. Diagrams are placed at the top of each section
-    #[clap(override_help = "Generate mermaid diagrams in markdown files showing requirements relationships. Diagrams are placed at the top of each section\n\nGENERATE-DIAGRAMS OPTIONS:\n      --links-with-blobs     Use GitHub blob URLs in diagram links instead of relative paths")]
-    GenerateDiagrams {
-        /// Use GitHub blob URLs in diagram links instead of relative paths
-        #[clap(long, help_heading = "GENERATE-DIAGRAMS OPTIONS")]
-        links_with_blobs: bool,
-    },
-
-    /// Remove all generated mermaid diagrams from markdown files
-    RemoveDiagrams,
 
     /// Search and filter model elements with comprehensive filtering options
     #[clap(override_help = "Search and filter model elements with comprehensive filtering options\n\nSEARCH OPTIONS:\n      --json                            Output results in JSON format\n      --short                           Output abbreviated format (one-line per element)\n      --filter-file <GLOB>              Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`\n      --filter-name <REGEX>             Only include elements whose name matches this regular expression\n      --filter-type <TYPE>              Only include elements of the given type e.g. `user-requirement`, `system-requirement`, `verification`\n      --filter-content <REGEX>          Only include elements whose content matches this regular expression\n      --filter-page-content <REGEX>     Only include elements whose parent file page content matches this regular expression\n      --have-relations <LIST>           Only include elements that have ALL specified relations (comma-separated)\n      --not-have-relations <LIST>       Only include elements that do NOT have ALL specified relations (comma-separated)")]
@@ -230,13 +224,10 @@ pub enum Commands {
     },
 
     /// Add new element to model from Markdown definition
-    #[clap(override_help = "Add new element to model from Markdown definition\n\nADD OPTIONS:\n       <FILE>                    Target file path (relative to git repository root)\n       [INDEX]                   Index within file (0-based, defaults to end)\n      --dry-run                  Preview changes without applying\n      --json                     Output results in JSON format\n\nUSAGE:\n    reqvire add <file> [<index>]  # reads element from stdin")]
+    #[clap(override_help = "Add new element to model from Markdown definition\n\nADD OPTIONS:\n       <FILE>                    Target file path (relative to git repository root)\n      --dry-run                  Preview changes without applying\n      --json                     Output results in JSON format\n\nUSAGE:\n    reqvire add <file>  # reads element from stdin")]
     Add {
         /// Target file path (relative to git repository root)
         file: String,
-
-        /// Index within file (0-based, defaults to end)
-        index: Option<usize>,
 
         /// Preview changes without applying
         #[clap(long, help_heading = "ADD OPTIONS")]
@@ -263,16 +254,13 @@ pub enum Commands {
     },
 
     /// Move element to different location
-    #[clap(override_help = "Move element to different location\n\nMV OPTIONS:\n       <ELEMENT_NAME>           Element name\n       <FILE>                   Target file path (relative to git repository root)\n       [INDEX]                  Index within file (0-based, defaults to end)\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n\nUSAGE:\n    reqvire mv <element-name> <file> [<index>]")]
+    #[clap(override_help = "Move element to different location\n\nMV OPTIONS:\n       <ELEMENT_NAME>           Element name\n       <FILE>                   Target file path (relative to git repository root)\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n\nUSAGE:\n    reqvire mv <element-name> <file>")]
     Mv {
         /// Element name
         element_name: String,
 
         /// Target file path (relative to git repository root)
         file: String,
-
-        /// Index within file (0-based, defaults to end)
-        index: Option<usize>,
 
         /// Preview changes without applying
         #[clap(long, help_heading = "MV OPTIONS")]
@@ -351,28 +339,28 @@ pub enum Commands {
         dry_run: bool,
     },
 
-    /// Move/rename attachment file and update all references
-    #[clap(name = "mv-attachment", override_help = "Move/rename attachment file and update all references\n\nMV-ATTACHMENT OPTIONS:\n       <OLD_PATH>               Current attachment file path\n       <NEW_PATH>               New attachment file path\n      --dry-run                 Preview changes without applying\n\nUSAGE:\n    reqvire mv-attachment docs/old.pdf docs/new.pdf")]
-    MvAttachment {
-        /// Current attachment file path
+    /// Move/rename asset file and update all references (Attachments and Relations)
+    #[clap(name = "mv-asset", override_help = "Move/rename asset file and update all references\n\nMV-ASSET OPTIONS:\n       <OLD_PATH>               Current file path\n       <NEW_PATH>               New file path\n      --dry-run                 Preview changes without applying\n\nUSAGE:\n    reqvire mv-asset docs/old.pdf docs/new.pdf")]
+    MvAsset {
+        /// Current file path
         old_path: String,
 
-        /// New attachment file path
+        /// New file path
         new_path: String,
 
         /// Preview changes without applying
-        #[clap(long, help_heading = "MV-ATTACHMENT OPTIONS")]
+        #[clap(long, help_heading = "MV-ASSET OPTIONS")]
         dry_run: bool,
     },
 
-    /// Remove attachment file and detach from all elements
-    #[clap(name = "rm-attachment", override_help = "Remove attachment file and detach from all elements\n\nRM-ATTACHMENT OPTIONS:\n       <ATTACHMENT_PATH>        Path to attachment file to remove\n      --dry-run                 Preview changes without applying\n\nUSAGE:\n    reqvire rm-attachment docs/obsolete.pdf")]
-    RmAttachment {
-        /// Path to attachment file to remove
-        attachment_path: String,
+    /// Remove asset file and remove all references (Attachments and Relations)
+    #[clap(name = "rm-asset", override_help = "Remove asset file and remove all references\n\nRM-ASSET OPTIONS:\n       <FILE_PATH>              Path to file to remove\n      --dry-run                 Preview changes without applying\n\nUSAGE:\n    reqvire rm-asset docs/obsolete.pdf")]
+    RmAsset {
+        /// Path to file to remove
+        file_path: String,
 
         /// Preview changes without applying
-        #[clap(long, help_heading = "RM-ATTACHMENT OPTIONS")]
+        #[clap(long, help_heading = "RM-ASSET OPTIONS")]
         dry_run: bool,
     },
 
@@ -386,6 +374,14 @@ pub enum Commands {
         /// Show only root elements (without hierarchical parents in same file)
         #[clap(long, help_heading = "CONTAINMENT OPTIONS")]
         short: bool,
+    },
+
+    /// Generate resources report showing files referenced by the model
+    #[clap(override_help = "Generate resources report showing files referenced by the model\n\nRESOURCES OPTIONS:\n      --json     Output results in JSON format")]
+    Resources {
+        /// Output results in JSON format
+        #[clap(long, help_heading = "RESOURCES OPTIONS")]
+        json: bool,
     },
 
     /// Interactive shell for GraphRegistry operations (undocumented)
@@ -654,21 +650,6 @@ pub fn handle_command(
             }
             return Ok(0);
         },
-        Some(Commands::GenerateDiagrams { links_with_blobs }) => {
-            info!("Generating mermaid diagrams");
-            // Only collect identifiers and process files to add diagrams
-            // Skip validation checks for diagram generation mode
-            diagrams::process_diagrams(&model_manager.graph_registry, links_with_blobs)?;
-
-            info!("Requirements diagrams updated in source files");
-            return Ok(0);
-        },
-        Some(Commands::RemoveDiagrams) => {
-            info!("Removing generated mermaid diagrams");
-            diagrams::remove_diagrams(&model_manager.graph_registry)?;
-            info!("Generated diagrams removed from source files");
-            return Ok(0);
-        },
         Some(Commands::Search {
             json,
             short,
@@ -729,10 +710,10 @@ pub fn handle_command(
                 
             return Ok(0);
         },
-        Some(Commands::Format { fix, json }) => {
+        Some(Commands::Format { fix, json, with_full_relations }) => {
             // Default is dry-run mode (preview only), --fix flag applies changes
             let dry_run = !fix;
-            let format_result = format_files(&model_manager.graph_registry, dry_run)?;
+            let format_result = format_files(&model_manager.graph_registry, dry_run, with_full_relations)?;
 
             if json {
                 println!("{}", render_diff_json(&format_result));
@@ -805,8 +786,8 @@ pub fn handle_command(
                 match lint_report.apply_fixes(&mut model_manager.graph_registry) {
                     Ok(relations_removed) => {
                         if relations_removed > 0 {
-                            // Rewrite all files with updated relations
-                            let format_result = format_files(&model_manager.graph_registry, false)?;
+                            // Rewrite all files with updated relations (use default relations, not full)
+                            let format_result = format_files(&model_manager.graph_registry, false, false)?;
 
                             if !json {
                                 println!("✅ Fixed {} redundant verify relation(s)\n", relations_removed);
@@ -837,23 +818,37 @@ pub fn handle_command(
             return Ok(0);
         },
         Some(Commands::Export { output }) => {
-            info!("Exporting model to HTML folder: {}", &output);
-            // Convert to absolute path before export (cwd changes during export)
-            let output_path = if PathBuf::from(&output).is_absolute() {
-                PathBuf::from(&output)
-            } else {
-                current_dir.join(&output)
-            };
             let git_root = git_commands::get_git_root_dir()?;
-            export::export_model_with_artifacts(
-                &model_manager.graph_registry,
-                &output_path,
-                excluded_filename_patterns,
-                false, // always generate links without blobs for Export
-                &current_dir,
-                &git_root
-            )?;
-            info!("✅ Export completed successfully");
+
+            if let Some(output_dir) = output {
+                // Export to specified directory
+                info!("Exporting model to HTML folder: {}", &output_dir);
+                // Convert to absolute path before export (cwd changes during export)
+                let output_path = if PathBuf::from(&output_dir).is_absolute() {
+                    PathBuf::from(&output_dir)
+                } else {
+                    current_dir.join(&output_dir)
+                };
+                export::export_model_with_artifacts(
+                    &model_manager.graph_registry,
+                    &output_path,
+                    excluded_filename_patterns,
+                    false, // always generate links without blobs for Export
+                    &current_dir,
+                    &git_root
+                )?;
+                info!("✅ Export completed successfully to: {}", output_path.display());
+            } else {
+                // Export to temporary directory
+                let temp_dir = export::generate_artifacts_in_temp(
+                    &model_manager.graph_registry,
+                    excluded_filename_patterns,
+                    false, // always generate links without blobs for Export
+                    &current_dir,
+                    &git_root
+                )?;
+                println!("✅ Export completed successfully to: {}", temp_dir.display());
+            }
             return Ok(0);
         },
         Some(Commands::Serve { host, port }) => {
@@ -878,7 +873,7 @@ pub fn handle_command(
 
             return Ok(0);
         },
-        Some(Commands::Add { file, index, dry_run, json }) => {
+        Some(Commands::Add { file, dry_run, json }) => {
             // Read element markdown from stdin
             use std::io::Read;
             let mut element_markdown = String::new();
@@ -896,7 +891,6 @@ pub fn handle_command(
                 &mut model_manager,
                 &element_markdown,
                 &file,
-                index,
                 excluded_filename_patterns,
                 &current_dir,
                 &git_root,
@@ -934,7 +928,7 @@ pub fn handle_command(
 
             return Ok(0);
         },
-        Some(Commands::Mv { element_name, file, index, dry_run, json }) => {
+        Some(Commands::Mv { element_name, file, dry_run, json }) => {
             // Resolve element name to identifier
             let element_id = model_manager.graph_registry.find_element_by_name(&element_name)?;
 
@@ -944,7 +938,6 @@ pub fn handle_command(
                 &mut model_manager,
                 &element_id,
                 &file,
-                index,
                 excluded_filename_patterns,
                 &current_dir,
                 &git_root,
@@ -1069,9 +1062,9 @@ pub fn handle_command(
             }
             return Ok(0);
         },
-        Some(Commands::MvAttachment { old_path, new_path, dry_run }) => {
+        Some(Commands::MvAsset { old_path, new_path, dry_run }) => {
             let git_root = git_commands::get_git_root_dir()?;
-            let result = reqvire::crud::mv_attachment(
+            let result = reqvire::crud::mv_asset(
                 &mut model_manager,
                 &old_path,
                 &new_path,
@@ -1082,11 +1075,11 @@ pub fn handle_command(
             render_crud_result(&result);
             return Ok(0);
         },
-        Some(Commands::RmAttachment { attachment_path, dry_run }) => {
+        Some(Commands::RmAsset { file_path, dry_run }) => {
             let git_root = git_commands::get_git_root_dir()?;
-            let result = reqvire::crud::rm_attachment(
+            let result = reqvire::crud::rm_asset(
                 &mut model_manager,
-                &attachment_path,
+                &file_path,
                 &git_root,
                 dry_run,
             )?;
@@ -1106,6 +1099,11 @@ pub fn handle_command(
                 let output = diagrams::generate_containment_diagram(&model_manager.graph_registry, short)?;
                 println!("{}", output);
             }
+            return Ok(0);
+        },
+        Some(Commands::Resources { json }) => {
+            let report = report_resources::generate_resources_report(&model_manager.graph_registry);
+            report.print(json);
             return Ok(0);
         },
         Some(Commands::Shell) => {
@@ -1371,7 +1369,7 @@ fn process_shell_command(graph_registry: &mut GraphRegistry, command: &str) -> R
             }
             let output_dir = Path::new(parts[1]);
 
-            let (md_count, file_count) = graph_registry.flush_to_directory(output_dir)?;
+            let (md_count, file_count) = graph_registry.flush_to_directory(output_dir, false)?;
             println!("Flushed {} markdown files and {} other files to '{}'", md_count, file_count, output_dir.display());
         }
         "flush-files" => {
@@ -1382,7 +1380,7 @@ fn process_shell_command(graph_registry: &mut GraphRegistry, command: &str) -> R
             let output_dir = Path::new(parts[2]);
 
             let file_paths: Vec<String> = file_list.split(',').map(|s| s.trim().to_string()).collect();
-            let (md_count, file_count) = graph_registry.flush_files_to_directory(&file_paths, output_dir)?;
+            let (md_count, file_count) = graph_registry.flush_files_to_directory(&file_paths, output_dir, false)?;
             println!("Flushed {} markdown files and {} other files to '{}'", md_count, file_count, output_dir.display());
         }
         "stats" => {
@@ -1564,7 +1562,7 @@ mod tests {
     fn test_handle_command() {
         // Mock CLI arguments
         let args = Args {
-            command: Some(Commands::Export { output: "html".to_string() }),
+            command: Some(Commands::Export { output: Some("html".to_string()) }),
         };
 
         // Define test input paths
