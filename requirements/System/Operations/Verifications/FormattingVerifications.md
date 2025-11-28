@@ -187,3 +187,107 @@ This test verifies the format command requirements from SystemRequirements and U
   * verify: [Structure and Addressing in Markdown Documents](../../Core/StructureAndParsing.md#structure-and-addressing-in-markdown-documents)
   * satisfiedBy: [test.sh](../../../../tests/test-advanced-format/test.sh)
 ---
+
+### Relation Ordering Verification
+
+This test verifies that the format command sorts relations alphabetically for deterministic output.
+
+#### Details
+
+##### Acceptance Criteria
+**Primary Sort by Relation Type:**
+- Relations shall be sorted alphabetically by relation type name
+- derivedFrom shall appear before satisfiedBy
+- satisfy shall appear before trace
+- trace shall appear before verifiedBy
+
+**Secondary Sort by Target Identifier:**
+- Within the same relation type, relations shall be sorted alphabetically by target identifier
+- For example: `derivedFrom: A` shall appear before `derivedFrom: B`
+
+**Deterministic Output:**
+- Same input shall always produce same output
+- Output shall not depend on HashMap iteration order or parsing order
+
+##### Test Criteria
+1. **Relation type alphabetical ordering**
+   - Create element with relations in non-alphabetical type order
+   - Run format --fix
+   - Verify relations are sorted by type name alphabetically
+
+2. **Same-type relation ordering**
+   - Create element with multiple relations of same type to different targets
+   - Run format --fix
+   - Verify relations of same type are sorted by target identifier
+
+3. **Deterministic output across runs**
+   - Run format --fix multiple times
+   - Verify output is identical each time
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [Relation Ordering Normalization](../Formatting.md#relation-ordering-normalization)
+  * satisfiedBy: [test.sh](../../../../tests/test-advanced-format/test.sh)
+---
+
+### Full Relations Insertion Verification
+
+This test verifies that the --with-full-relations flag correctly inserts all registered relations (user-created and auto-generated) into elements during formatting.
+
+#### Details
+
+##### Acceptance Criteria
+**Auto-Generated Relations Insertion:**
+- System shall insert inverse relations when --with-full-relations is provided
+- satisfiedBy relations generated from satisfy shall be inserted
+- derive relations generated from derivedFrom shall be inserted
+- verify relations generated from verifiedBy shall be inserted
+- tracedFrom relations generated from trace shall be inserted
+
+**Relation Ordering:**
+- All relations (user-created and auto-generated) shall be sorted according to the Relation Ordering Normalization requirement
+- Relations shall be sorted alphabetically by type, then by target identifier
+
+**Idempotency:**
+- Running format --with-full-relations twice shall produce same output
+- Already present relations shall not be duplicated
+
+**Selective Behavior:**
+- Without --with-full-relations flag, only user-created relations are persisted
+- With --with-full-relations flag, all relations from registry are persisted
+
+##### Test Criteria
+1. **Basic inverse relation insertion**
+   - Create element A with satisfy relation to element B
+   - Run format --with-full-relations --fix
+   - Verify element B now has satisfiedBy relation to element A
+
+2. **Multiple inverse relation types**
+   - Create elements with derivedFrom, satisfiedBy, verifiedBy, trace relations
+   - Run format --with-full-relations --fix
+   - Verify all inverse relations (derive, satisfy, verify, tracedFrom) are inserted
+
+3. **No duplication**
+   - Run format --with-full-relations --fix twice
+   - Verify relations are not duplicated
+
+4. **Default behavior unchanged**
+   - Create element with satisfy relation
+   - Run format --fix (without --with-full-relations)
+   - Verify inverse relations are NOT inserted
+
+5. **Preview mode**
+   - Run format --with-full-relations (without --fix)
+   - Verify diff shows proposed relation insertions
+   - Verify files are not modified
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [Full Relations Insertion](../Formatting.md#full-relations-insertion)
+  * verify: [Format Command](../../../Interfaces/CLI.md#format-command)
+  * satisfiedBy: [test.sh](../../../../tests/test-format-full-relations/test.sh)
+---

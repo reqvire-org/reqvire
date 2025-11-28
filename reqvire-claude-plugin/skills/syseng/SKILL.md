@@ -424,6 +424,13 @@ reqvire mv-asset "<old-path>" "<new-path>"  # Move/rename asset files (updates A
 reqvire rm-asset "<file-path>"            # Remove asset file (removes from Attachments & Relations)
 ```
 
+### Formatting
+```bash
+reqvire format                         # Preview formatting changes (dry-run)
+reqvire format --fix                   # Apply formatting changes
+reqvire format --fix --with-full-relations  # Include auto-generated inverse relations
+```
+
 ### Validation and Analysis
 ```bash
 reqvire validate [--json]              # Validate model consistency

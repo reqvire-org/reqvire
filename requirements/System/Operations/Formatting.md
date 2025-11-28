@@ -95,6 +95,25 @@ When formatting or persisting specification files, the system shall reorder elem
   * derivedFrom: [Format Consistency Enforcement](#format-consistency-enforcement)
 ---
 
+### Relation Ordering Normalization
+
+When formatting or persisting specification files, the system shall sort relations within each element for deterministic and consistent output.
+
+#### Details
+Relations are sorted using the following criteria:
+1. Primary sort: Alphabetically by relation type name (e.g., `derivedFrom` before `satisfiedBy`, `trace` before `verifiedBy`)
+2. Secondary sort: Alphabetically by target identifier within the same relation type
+
+This ensures:
+- Deterministic output regardless of parsing order or HashMap iteration order
+- Consistent diffs when comparing formatted files
+- Predictable relation ordering for review and verification
+
+#### Relations
+  * derivedFrom: [Format Consistency Enforcement](#format-consistency-enforcement)
+  * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
+---
+
 ### Formatting Output
 
 The system shall display formatting changes suggestion in similar manner as git diffs.
@@ -124,4 +143,23 @@ The system shall replace absolute links with relative links, where applicable an
 #### Relations
   * derivedFrom: [Model Formatting](#model-formatting)
   * verifiedBy: [Format Command Requirements Verification](Verifications/FormattingVerifications.md#format-command-requirements-verification)
+---
+
+### Full Relations Insertion
+
+When the --with-full-relations flag is provided, the system shall insert all registered relations into elements, including both user-created and auto-generated relations.
+
+#### Details
+Auto-generated relations are inverse relations created by the parser during model loading but not persisted to files by default. See Relation Types Specification for opposite relation pairs.
+
+When --with-full-relations is active:
+- All relations from the model registry are written to the Relations subsection
+- Relations are sorted according to the Relation Ordering Normalization requirement
+
+#### Attachments
+  * [Relation Types Specification](../Core/DesignDocuments/RelationTypes.md)
+
+#### Relations
+  * derivedFrom: [Model Formatting](#model-formatting)
+  * verifiedBy: [Full Relations Insertion Verification](Verifications/FormattingVerifications.md#full-relations-insertion-verification)
 ---

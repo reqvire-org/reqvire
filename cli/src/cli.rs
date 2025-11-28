@@ -63,7 +63,7 @@ pub enum Commands {
     },
 
     /// Format and normalize requirements files. By default, shows preview without applying changes
-    #[clap(override_help = "Format and normalize requirements files. By default, shows preview without applying changes\n\nFORMAT OPTIONS:\n      --fix      Apply formatting changes to files\n      --json     Output results in JSON format")]
+    #[clap(override_help = "Format and normalize requirements files. By default, shows preview without applying changes\n\nFORMAT OPTIONS:\n      --fix                   Apply formatting changes to files\n      --json                  Output results in JSON format\n      --with-full-relations   Include all relations (user-created and auto-generated)")]
     Format {
         /// Apply formatting changes to files
         #[clap(long, help_heading = "FORMAT OPTIONS")]
@@ -72,6 +72,10 @@ pub enum Commands {
         /// Output results in JSON format
         #[clap(long, help_heading = "FORMAT OPTIONS")]
         json: bool,
+
+        /// Include all relations (user-created and auto-generated inverse relations)
+        #[clap(long, help_heading = "FORMAT OPTIONS")]
+        with_full_relations: bool,
     },
 
     /// Validate model
@@ -697,10 +701,10 @@ pub fn handle_command(
                 
             return Ok(0);
         },
-        Some(Commands::Format { fix, json }) => {
+        Some(Commands::Format { fix, json, with_full_relations }) => {
             // Default is dry-run mode (preview only), --fix flag applies changes
             let dry_run = !fix;
-            let format_result = format_files(&model_manager.graph_registry, dry_run)?;
+            let format_result = format_files(&model_manager.graph_registry, dry_run, with_full_relations)?;
 
             if json {
                 println!("{}", render_diff_json(&format_result));
@@ -773,8 +777,8 @@ pub fn handle_command(
                 match lint_report.apply_fixes(&mut model_manager.graph_registry) {
                     Ok(relations_removed) => {
                         if relations_removed > 0 {
-                            // Rewrite all files with updated relations
-                            let format_result = format_files(&model_manager.graph_registry, false)?;
+                            // Rewrite all files with updated relations (use default relations, not full)
+                            let format_result = format_files(&model_manager.graph_registry, false, false)?;
 
                             if !json {
                                 println!("✅ Fixed {} redundant verify relation(s)\n", relations_removed);
@@ -1351,7 +1355,7 @@ fn process_shell_command(graph_registry: &mut GraphRegistry, command: &str) -> R
             }
             let output_dir = Path::new(parts[1]);
 
-            let (md_count, file_count) = graph_registry.flush_to_directory(output_dir)?;
+            let (md_count, file_count) = graph_registry.flush_to_directory(output_dir, false)?;
             println!("Flushed {} markdown files and {} other files to '{}'", md_count, file_count, output_dir.display());
         }
         "flush-files" => {
@@ -1362,7 +1366,7 @@ fn process_shell_command(graph_registry: &mut GraphRegistry, command: &str) -> R
             let output_dir = Path::new(parts[2]);
 
             let file_paths: Vec<String> = file_list.split(',').map(|s| s.trim().to_string()).collect();
-            let (md_count, file_count) = graph_registry.flush_files_to_directory(&file_paths, output_dir)?;
+            let (md_count, file_count) = graph_registry.flush_files_to_directory(&file_paths, output_dir, false)?;
             println!("Flushed {} markdown files and {} other files to '{}'", md_count, file_count, output_dir.display());
         }
         "stats" => {

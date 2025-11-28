@@ -545,12 +545,14 @@ The system shall provide a formatting function, activated by the (format command
   - Display a diff-style summary of changes that would be or have been made
   - Support --json flag for structured output of formatting results
   - Show git diff style output with line numbers and colors for both preview and actual formatting
+  - Support --with-full-relations flag to include all registered relations (user-created and auto-generated)
 
 Additional behavior:
   - By default (no --fix flag), preview changes without applying them
   - --fix flag applies the formatting changes to files
   - --json flag outputs formatting results in JSON format including file changes and diff information
   - When formatting is applied, show a summary of changed files with diff details
+  - --with-full-relations flag inserts all relations from the model registry into elements, including auto-generated inverse relations (e.g., satisfiedBy from satisfy, derive from derivedFrom)
 
 #### Attachments
   * [Dry-Run Mode Behavior](../System/Operations/Refinements.md#dry-run-mode-behavior)

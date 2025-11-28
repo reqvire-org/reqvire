@@ -39,6 +39,7 @@ SERVE OPTIONS:
 FORMAT OPTIONS:
       --fix                     Apply formatting changes to files
       --json                    Output results in JSON format
+      --with-full-relations     Include all relations (user-created and auto-generated inverse relations)
 
 VALIDATE OPTIONS:
       --json                    Output results in JSON format

@@ -67,8 +67,8 @@ As an **System Engineer**, I want to manage MBSE models effectively, so that I c
   * type: user-requirement
 
 #### Relations
-  * trace: [MOE_UA](MOEs.md#moe_ua)
   * derive: [Requirements Processing](SystemRequirements/Requirements.md#requirements-processing)
+  * trace: [MOE_UA](MOEs.md#moe_ua)
 ---
 
 ### Metadata Repositioning Test

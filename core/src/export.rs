@@ -78,8 +78,9 @@ fn copy_assets_folder(output_dir: &Path) -> Result<(), ReqvireError> {
 }
 
 
-/// Copies all model files from graph registry to temporary directory
-pub fn copy_model_files_to_temp(
+/// Generates model markdown files with full relations and copies referenced files to temporary directory
+/// This generates markdown from the registry (with all relations) instead of copying original files
+pub fn flush_model_to_temp(
     registry: &GraphRegistry,
     temp_dir: &Path,
     current_dir: &Path,
@@ -93,33 +94,47 @@ pub fn copy_model_files_to_temp(
         None
     };
 
-    info!("Copying model files to temporary directory...");
+    info!("Generating model files with full relations to temporary directory...");
 
     let mut copied_files = HashSet::new();
 
-    // Copy all model markdown files from pages
-    for file_path in registry.pages.keys() {
-        let src = git_root.join(file_path);
+    // Generate markdown files from registry with full relations (user-created + auto-generated)
+    let grouped_elements = registry.group_elements_by_location();
+    let mut markdown_files_written = 0;
+
+    for (file_path, elements) in grouped_elements {
+        // Generate markdown content with full relations
+        let markdown_content = registry.generate_file_markdown(&file_path, &elements, true);
 
         // Strip subdirectory prefix from destination path if running from subdirectory
         let dest_path = if let Some(prefix) = subdir_prefix {
             if let Ok(stripped) = Path::new(file_path.as_str()).strip_prefix(prefix) {
                 temp_dir.join(stripped)
             } else {
-                temp_dir.join(file_path)
+                temp_dir.join(&file_path)
             }
         } else {
-            temp_dir.join(file_path)
+            temp_dir.join(&file_path)
         };
 
-        if src.exists() && !copied_files.contains(file_path.as_str()) {
-            filesystem::copy_file_with_structure(&src, &dest_path)?;
-            copied_files.insert(file_path.clone());
-            debug!("Copied model file: {} -> {}", file_path, dest_path.display());
+        // Create parent directories if needed
+        if let Some(parent_dir) = dest_path.parent() {
+            fs::create_dir_all(parent_dir)
+                .map_err(|e| ReqvireError::IoError(e))?;
         }
+
+        // Write the generated markdown file
+        fs::write(&dest_path, markdown_content)
+            .map_err(|e| ReqvireError::IoError(e))?;
+
+        copied_files.insert(file_path.clone());
+        markdown_files_written += 1;
+        debug!("Generated model file: {} -> {}", file_path, dest_path.display());
     }
 
-    // Copy all files referenced in relations
+    info!("✅ Generated {} markdown files with full relations", markdown_files_written);
+
+    // Copy all files referenced in relations (InternalPath)
     for node in registry.nodes.values() {
         for relation in &node.element.relations {
             if let crate::relation::LinkType::InternalPath(path) = &relation.target.link {
@@ -172,7 +187,7 @@ pub fn copy_model_files_to_temp(
         }
     }
 
-    info!("✅ Copied {} files to temporary directory", copied_files.len());
+    info!("✅ Total {} files in temporary directory", copied_files.len());
     Ok(())
 }
 
@@ -309,8 +324,8 @@ pub fn generate_artifacts_in_temp(
     let temp_dir = filesystem::create_temp_working_dir()?;
     info!("✅ Temporary directory: {}", temp_dir.display());
 
-    // Step 2: Copy all model files to temp
-    copy_model_files_to_temp(registry, &temp_dir, current_dir, git_root)?;
+    // Step 2: Generate model files with full relations to temp
+    flush_model_to_temp(registry, &temp_dir, current_dir, git_root)?;
 
     // Step 3: Initialize git repository in temp directory
     info!("Initializing git repository in temporary directory...");

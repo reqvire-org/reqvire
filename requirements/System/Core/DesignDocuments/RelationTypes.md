@@ -116,16 +116,16 @@ This section defines which element types can use which relation types as source 
 | **analysis-verification** | verify, trace | verifiedBy, trace |
 | **inspection-verification** | verify, trace | verifiedBy, trace |
 | **demonstration-verification** | verify, trace | verifiedBy, trace |
-| **constraint** | None (no Relations allowed) | satisfy, Attachment |
-| **behavior** | None (no Relations allowed) | satisfy, Attachment |
-| **specification** | None (no Relations allowed) | satisfy, Attachment |
+| **constraint** | satisfy | satisfy, Attachment |
+| **behavior** | satisfy | satisfy, Attachment |
+| **specification** | satisfy | satisfy, Attachment |
 | **other** | trace | trace |
 
 ### Key Constraints
 
 1. **derivedFrom/derive restricted to requirement types**: Only `requirement` and `user-requirement` elements can participate in derivation relationships. This ensures clean hierarchical requirement decomposition without mixing verification or other element types.
 
-2. **Refinement types cannot have relations**: Elements of type `constraint`, `behavior`, and `specification` cannot have a Relations subsection. They are referenced via the Attachments subsection of other elements.
+2. **Refinement types can only have satisfy relations**: Elements of type `constraint`, `behavior`, and `specification` can only use `satisfy` relations to link to requirements they fulfill. They can also be referenced via the Attachments subsection of other elements.
 
 3. **test-verification special case**: Among verification types, only `test-verification` can use `satisfiedBy` relations (to link to test implementations). Other verification types (`analysis-verification`, `inspection-verification`, `demonstration-verification`) cannot use `satisfiedBy`.
 

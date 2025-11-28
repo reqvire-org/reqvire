@@ -7,9 +7,9 @@ The system SHALL generate comprehensive HTML documentation with all model artifa
 #### Details
 **Working Directory Setup:**
 - Create temporary working directory (e.g., in /tmp)
-- Use graph registry to identify all model files and artifacts
-- Copy all identified files to temporary directory preserving structure
+- Generate markdown files from registry with full relations (user-created and auto-generated inverse relations)
 - Copy all related system elements (following satisfiedBy and other relations)
+- Copy all attachment files to temporary directory preserving structure
 
 **Generation Pipeline (in temporary directory):**
 Execute all generation commands treating temporary directory as repository root:

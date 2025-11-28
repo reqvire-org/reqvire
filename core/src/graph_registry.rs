@@ -1026,7 +1026,7 @@ impl GraphRegistry {
     }
 
 
-    fn element_to_markdown_with_context(&self, element: &Element, _current_file: &str) -> String {
+    fn element_to_markdown_with_context(&self, element: &Element, _current_file: &str, with_full_relations: bool) -> String {
         let mut markdown = String::new();
 
         // Add the element header
@@ -1121,11 +1121,22 @@ impl GraphRegistry {
             markdown.push_str("\n");
         }
 
-        // Add relations subsection if there are user-created relations
-        let user_relations: Vec<_> = element.relations.iter().filter(|r| r.user_created).collect();
-        if !user_relations.is_empty() {
+        // Add relations subsection if there are relations to include
+        // When with_full_relations is true, include all relations (user-created and auto-generated)
+        // Otherwise, only include user-created relations
+        let mut relations_to_include: Vec<_> = if with_full_relations {
+            element.relations.iter().collect()
+        } else {
+            element.relations.iter().filter(|r| r.user_created).collect()
+        };
+        // Sort relations for deterministic output: by relation type name, then by target link
+        relations_to_include.sort_by(|a, b| {
+            (&a.relation_type.name, a.target.link.as_str())
+                .cmp(&(&b.relation_type.name, b.target.link.as_str()))
+        });
+        if !relations_to_include.is_empty() {
             markdown.push_str("#### Relations\n");
-            for relation in user_relations {
+            for relation in relations_to_include {
                 // Format relation target based on type
                 // Format as proper markdown link using element name when possible
                 let target_text = match &relation.target.link {
@@ -1401,7 +1412,8 @@ impl GraphRegistry {
     }
 
     /// Generates markdown content for a file
-    pub fn generate_file_markdown(&self, file_path: &str, elements: &[&Element]) -> String {
+    /// When with_full_relations is true, includes all relations (user-created and auto-generated)
+    pub fn generate_file_markdown(&self, file_path: &str, elements: &[&Element], with_full_relations: bool) -> String {
         let mut markdown = String::new();
 
         // All specification files must have "# Elements" as the page header
@@ -1424,7 +1436,7 @@ impl GraphRegistry {
             if i > 0 {
                 markdown.push_str("---\n\n");
             }
-            markdown.push_str(&self.element_to_markdown_with_context(element, file_path));
+            markdown.push_str(&self.element_to_markdown_with_context(element, file_path, with_full_relations));
         }
 
         // Add final separator after the last element (if there were any elements)
@@ -1719,7 +1731,8 @@ impl GraphRegistry {
     }
 
     /// Flushes all elements to markdown files and copies InternalPath files to the specified directory
-    pub fn flush_to_directory(&self, output_dir: &Path) -> Result<(usize, usize), ReqvireError> {
+    /// When with_full_relations is true, includes all relations (user-created and auto-generated inverse relations)
+    pub fn flush_to_directory(&self, output_dir: &Path, with_full_relations: bool) -> Result<(usize, usize), ReqvireError> {
         // Create output directory if it doesn't exist
         if !output_dir.exists() {
             fs::create_dir_all(output_dir)
@@ -1732,7 +1745,7 @@ impl GraphRegistry {
 
         for (file_path, elements) in grouped_elements {
             // Generate the markdown content for this file
-            let markdown_content = self.generate_file_markdown(&file_path, &elements);
+            let markdown_content = self.generate_file_markdown(&file_path, &elements, with_full_relations);
 
             // Determine the output file path
             let output_file_path = output_dir.join(&file_path);
@@ -1766,7 +1779,8 @@ impl GraphRegistry {
     }
 
     /// Flushes elements from specific files to markdown files and copies related InternalPath files
-    pub fn flush_files_to_directory(&self, file_paths: &[String], output_dir: &Path) -> Result<(usize, usize), ReqvireError> {
+    /// When with_full_relations is true, includes all relations (user-created and auto-generated inverse relations)
+    pub fn flush_files_to_directory(&self, file_paths: &[String], output_dir: &Path, with_full_relations: bool) -> Result<(usize, usize), ReqvireError> {
         // Create output directory if it doesn't exist
         if !output_dir.exists() {
             fs::create_dir_all(output_dir)
@@ -1780,7 +1794,7 @@ impl GraphRegistry {
         for file_path in file_paths {
             if let Some(elements) = grouped_elements.get(file_path) {
                 // Generate the markdown content for this file
-                let markdown_content = self.generate_file_markdown(file_path, elements);
+                let markdown_content = self.generate_file_markdown(file_path, elements, with_full_relations);
 
                 // Determine the output file path
                 let output_file_path = output_dir.join(file_path);
@@ -2319,7 +2333,7 @@ impl GraphRegistry {
         }
 
         let file_vec: Vec<String> = self.modified_files.iter().cloned().collect();
-        let _result = self.flush_files_to_directory(&file_vec, directory)?;
+        let _result = self.flush_files_to_directory(&file_vec, directory, false)?;
 
         // Check for and delete empty files (files with no elements)
         let grouped_elements = self.group_elements_by_location();

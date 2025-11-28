@@ -21,8 +21,8 @@ This is an alternative parent requirement also derived from root.
 This requirement reaches root through MULTIPLE convergent paths (via parent-requirement and alternative-parent-requirement). Since root is reachable through other paths, the direct root relation is redundant and safe to auto-remove.
 
 #### Relations
-  * derivedFrom: [Parent Requirement](#parent-requirement)
   * derivedFrom: [Alternative Parent Requirement](#alternative-parent-requirement)
+  * derivedFrom: [Parent Requirement](#parent-requirement)
 ---
 
 ### Parent Requirement

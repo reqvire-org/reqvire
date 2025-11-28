@@ -59,9 +59,9 @@ Found 6 file(s) with formatting changes:
   07 -     * derivedFrom: ../UserStories.md#managing-mbse-models
   07 -     * satisfiedBy: ../core/src/model.rs
   07 +     * derivedFrom: [Managing MBSE Models](../UserStories.md#managing-mbse-models)
-  08 +     * trace: [MOE_UA](../MOEs.md#moe_ua)
-  09 +     * verifiedBy: [Format Test](../Verifications/Tests.md#format-test)
-  10 +     * satisfiedBy: [parser.rs](../core/src/parser.rs)
+  08 +     * satisfiedBy: [parser.rs](../core/src/parser.rs)
+  09 +     * trace: [MOE_UA](../MOEs.md#moe_ua)
+  10 +     * verifiedBy: [Format Test](../Verifications/Tests.md#format-test)
   11 +   ---
   12
   13 -   ### Validation Framework
@@ -200,8 +200,8 @@ Found 6 file(s) with formatting changes:
   65     #### Metadata
   66       * type: user-requirement
   67 +   #### Relations
-  68 +     * trace: [MOE_UA](MOEs.md#moe_ua)
-  69 +     * derive: [Requirements Processing](SystemRequirements/Requirements.md#requirements-processing)
+  68 +     * derive: [Requirements Processing](SystemRequirements/Requirements.md#requirements-processing)
+  69 +     * trace: [MOE_UA](MOEs.md#moe_ua)
   70     ---
   71
   72     ### Metadata Repositioning Test
@@ -285,8 +285,8 @@ Found 6 file(s) with formatting changes:
   11     #### Relations
   12 -     * verify: ../SystemRequirements/Requirements.md#requirements-processing
   12 -     * satisfiedBy: ../tests/test-format/test.sh
-  12 +     * verify: [Path Resolution Testing](../SystemRequirements/Requirements.md#path-resolution-testing)
-  13 +     * satisfiedBy: [element.rs](../core/src/element.rs)
+  12 +     * satisfiedBy: [element.rs](../core/src/element.rs)
+  13 +     * verify: [Path Resolution Testing](../SystemRequirements/Requirements.md#path-resolution-testing)
   14 +   ---
   15
   16 -   ### Validation Test
@@ -302,8 +302,8 @@ Found 6 file(s) with formatting changes:
   23     #### Relations
   24 -     * verify: ../SystemRequirements/Requirements.md#validation-framework
   24 -   ␤
-  24 +     * verify: [Requirements Processing](../SystemRequirements/Requirements.md#requirements-processing)
-  25 +     * satisfiedBy: [test.sh](../tests/test-format/test.sh)
+  24 +     * satisfiedBy: [test.sh](../tests/test-format/test.sh)
+  25 +     * verify: [Requirements Processing](../SystemRequirements/Requirements.md#requirements-processing)
   26     ---
   27 -   ### Absolute Path Verification
   27 +   ### Validation Test
